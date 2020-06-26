@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5214C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 01:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D6E6C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 01:38:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 684462075D
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 01:34:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15D59207D8
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 01:38:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Zny5JuXH";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="yzEwry/U"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fxyV2kDO";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="V6sIzCgp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727042AbgFZBeV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jun 2020 21:34:21 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:58163 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727041AbgFZBeV (ORCPT
+        id S1727061AbgFZBiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jun 2020 21:38:12 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:30500 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727052AbgFZBiL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jun 2020 21:34:21 -0400
+        Thu, 25 Jun 2020 21:38:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1593135261; x=1624671261;
+  t=1593135491; x=1624671491;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=mbmHn/m3vkWEehlVDeY6vXEx0eS2qlPTUYVxozIg5Lo=;
-  b=Zny5JuXH8Q9I5eYwsNb15UREufdI7D8CWTE7UJck+vlWoZR8bx3Sr7dB
-   VL2yXsMYnxipaEpy17h39HyC1UyNGgm7AoXK8BD94UyOcg1AIGThaGCtw
-   zJXb9fNVLrfWeZ0CHZoZSBo0pgulGJYrDFmBoB6ee4B/JqA2OGdwej2jI
-   gIGjl94MwLbPCr1od/1o4v6lJLYi6YAIBlRc9NNbVDSOqeE/OXqLieidq
-   6RXf8ZxPKHC5XbZlzblG7PmVqJlyMSJ8TSeY8sUnYRLpejonQcrDqfV+c
-   76qItjuGdMXBAQ0hMPDVfZjM9QaAF0D1scXcdzxtiT+LaM7Yn9Ejo7pe+
-   Q==;
-IronPort-SDR: ILwWOcl1ezDixi3m+FXWOZAyFlgXJ9fVt389kx9JSf15lpdDCaMg2jKh+f+TTVv9/K8gRNMSv3
- GMHG8aCGFOvob+rEEAdWP2mtc4q8P2xPMTzR82ciX8Tq3YZVOUC3ctXFucPYVGDHhLEiWqDtZf
- 57Nj+5qi6/wsgttU5ZtxjKpJKo9sDAuQaWDU2BtvkbiRGhWbj6CtPAiHI5y7nrR5YzP7lD9VbZ
- +7SXeD8UbBbjPm+A6+L/O1Vxbmd5lXokWXgMD+Ngrlpc71IArQNQ74bTR6WHIPqcNkciD+jRyD
- 27k=
+  bh=VNEMBL64Nrrgorsa6euS7Ll8zBO3+Ywn5BMhE93AZY4=;
+  b=fxyV2kDOTAagrFD7Nsj/osURtd3kCm1Va3Kmn7oss0qLjy/77Ug7dyR3
+   pFWiel9bRz9xpQvmflyytnBjH9//kr8maiXHN8pgqzqrb3t56foJEBFB1
+   uN6mL1kCEegsZdUSwrlmL76/FBDoSdcOjEHIbZHIqGVl0cYpz8pXo8ojQ
+   lkym1rn3l8TWD9VsyHE3hvaXhjqLroUBci88wV01KhZmYfuEox67xB7Wu
+   4v0bLN6aadFd/CYh/OsmSp58NaBD4/SyK5D3mHmtZ5qX0Uc7jrYjnGbFX
+   nxwYi0hRi5u3Xg+b+VsmwrxgAnIqf0EzU1n7tFpxWAn1xnsmNwc16P+UY
+   A==;
+IronPort-SDR: J6kbdRdMjWTHGcjUBoRXjdeWbF8HMQ8v6Jx0GDSQajRUP8uEPoFYK5Itejh4b9KyN6PAF4pEP5
+ lT9I98wl0MbHDyTNboljsLolVtcEELkFkVCtAhBbNr8QSISMcXndWxqAFNHKqmTOOjabF9m1uW
+ xdJ5afp24bS3LHSsgIpDqUYrjefZdKsUi8xFqJMNi+bQhUKKZ9uRtUqv+wD5E2INqmc2bxXz4N
+ s2OsneFcJY8gl3KbfQABxngJvRQeZBF6cyIltHGXzE6iTAtkUCUI2mV/DyXUlcBvsAT2vMOL5J
+ UM8=
 X-IronPort-AV: E=Sophos;i="5.75,281,1589212800"; 
-   d="scan'208";a="145289539"
-Received: from mail-bn3nam04lp2054.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.54])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jun 2020 09:34:07 +0800
+   d="scan'208";a="142330076"
+Received: from mail-sn1nam04lp2055.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.55])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jun 2020 09:38:10 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yoy6ZVN7dvHfSg0yuu+TZSwGevnx0GI1oCK+Tko22Azx3o0WzhyN5v//jOT3B7w+BETT2wzw861SYbWmQqo3ZnZlzyUl+e97/JA0fzHw4EAomDbiFNokJpP4vPyU9mIAvWXv1SQlcusZeIIk633egwlvoBt4ryLTW0wjgMszI3KK09H/DXhxm9+rdMi0OqkMbT7FdNk587O4i3tWI/5bNr5OBpvqZ/sVvKNYHZVcEVYl6e7ATlKH2k4ceIX4o4Gq9LnW4+rfKMDkZ2mKxA4tzieSbI2nM2fM+jPH7jvZnFyeitjlPuWV6fD2ozvQ4vyOfkpzIbCqhtYp9O+H2oLjzg==
+ b=DO2OOg4G/qXXGY8zZ9tNKPOWS7ejzNp0HxzxsUzfJomgaTXoC7qIYkHxh9NHpXWkPb5JtMtkHv/KWEYZqIGsExoU/z+lztBS28H14WQc2T0v9569MwYQDWjMFSA2LoF3jo9f5V/5mQPrqtN4ZrFNHhXOZr0LjkSqIQae1cPW3lqUzl9j0pgaxjJMoTPAnyK7jiJ55U/xCdl/vJBpU4BVE+x1DpWfBAjDI3vwofsqOelsHCbiYlvmvDSEWLvMB8fCMx/9AyUeFuKEvL5nM6PZYx0pFR8ewNscBXA09MjRywBdsKlGJ1hRe7lj8K6wKZPFcS596WkyJxSBlSM/L+B7oA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lr1eO3QDIVVZSHjixLaaOdJ6Z7ykXPQG6QVpjIXx820=;
- b=Z/eb0w77SRxnYo1nsVNAsLIBAUPPe2HHvo+yd4CA3O4IU8AXuKcV4C10CQYPhfncKQEe+l3OxrOyEAI8KcfFcqwvavY+dXNcAS3n99Y/v39LsyZPu90H2/zoDlh40/yB1jQdxeWVP6BvpvAOm3wY2PKuuUXMr5Q4ny07nY/WnBt29NnCaJ4PyoXZm65UmH+BMYxeFWf6EEhcsmgN90YhuA3vuqohq5I7OU1oBKaYsSaGnplek8qH/izvYeKauEQVODlCHOUuDxj8siAXWV/Nrc7EM4qjHGS3I7XSZhB5wKUUUhcXlmqp0iXw6zKRNoM8D1DB8CufP/y2YXxdU+AA8A==
+ bh=iF1wiQPZqW0R3xp+/BYfIeRC4HaS/cdipp7x2Hb2Eus=;
+ b=kk0WFs4KEegUw69d4Q+bEathZOw19S0nQoKJfdvglkHSSppiVmSRSq4ezHF/ygLBQUO+T106VNUgddkLhc04g2IDgWuQCC3/qds3yTwNJi5suIRm4KJZVHvEUdn808vz2fe1PffRmE6Sg7NXSHiNEbVmxC9AQvaa31bSi168as/scYtWjELO7debA7p4LIt03I/rOOdn3hkh66rhfE23vu0yXwMphfLLyKO0phZ75j5nIXKgvxW8P9moYVApwGP7rywpE7tbWjMdx244/ksmaGXOqsxiwf2GRrZTcSdrTeWPXwXyplzZXDKS4MONtlj8D5mTJWg0NRWejr5IV6SIWw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lr1eO3QDIVVZSHjixLaaOdJ6Z7ykXPQG6QVpjIXx820=;
- b=yzEwry/UdzxwjL/XYd5bqexutd0X2HXP5AvHru3NXpExZU9JaOfhC7IS3alTyFTUImyp0Ni6NbKXQ1zLJxqjE0iOBHlZaCt4pxuSx3qzpW/quMN2bHWS1s3FPWKoH2hK/Yc9mmh4Oo8H1VZwOCcZbB6zCHH4gT03Z28OvNXzR0w=
+ bh=iF1wiQPZqW0R3xp+/BYfIeRC4HaS/cdipp7x2Hb2Eus=;
+ b=V6sIzCgpnpA5cS+d0DMaiZrgQf0jldLwagbpXXUqBl8GRO43kPJ9wfWRLl0FVo085FMRlw7NiRKQmSU4G3XB8xojHqUyTMjc0Z9kQyS8Xslq4nPKeE1CILVxrbwHDl415jUZjMzxNewh+Nkjst4ni+sYeoGmLF2j0vJJj/M/lkE=
 Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
  by CY4PR04MB1032.namprd04.prod.outlook.com (2603:10b6:910:50::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.23; Fri, 26 Jun
- 2020 01:34:05 +0000
+ 2020 01:38:08 +0000
 Received: from CY4PR04MB3751.namprd04.prod.outlook.com
  ([fe80::c593:f271:eebe:ac7]) by CY4PR04MB3751.namprd04.prod.outlook.com
  ([fe80::c593:f271:eebe:ac7%9]) with mapi id 15.20.3131.024; Fri, 26 Jun 2020
- 01:34:05 +0000
+ 01:38:08 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
 To:     =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier@javigon.com>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
@@ -80,13 +80,13 @@ CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         SelvaKumar S <selvakuma.s1@samsung.com>,
         Kanchan Joshi <joshi.k@samsung.com>,
         Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH 3/6] block: add support for zone offline transition
-Thread-Topic: [PATCH 3/6] block: add support for zone offline transition
-Thread-Index: AQHWSutT3xCQHGem9k+D54mKrpOEQg==
-Date:   Fri, 26 Jun 2020 01:34:04 +0000
-Message-ID: <CY4PR04MB375111445246B570FAF4EE58E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
+Subject: Re: [PATCH 4/6] block: introduce IOCTL to report dev properties
+Thread-Topic: [PATCH 4/6] block: introduce IOCTL to report dev properties
+Thread-Index: AQHWSutNlrk/U7ZovU6aHVaoqZz0nw==
+Date:   Fri, 26 Jun 2020 01:38:07 +0000
+Message-ID: <CY4PR04MB3751A4DAA69F56A10F3D9196E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
 References: <20200625122152.17359-1-javier@javigon.com>
- <20200625122152.17359-4-javier@javigon.com>
+ <20200625122152.17359-5-javier@javigon.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -96,17 +96,17 @@ authentication-results: javigon.com; dkim=none (message not signed)
 x-originating-ip: [129.253.182.57]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 91701f0b-cb1c-45a8-8add-08d81971035d
+x-ms-office365-filtering-correlation-id: 92c2e757-96cf-4237-c4ed-08d819719439
 x-ms-traffictypediagnostic: CY4PR04MB1032:
-x-microsoft-antispam-prvs: <CY4PR04MB1032E314B8E9720A9CA1780EE7930@CY4PR04MB1032.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <CY4PR04MB1032CC2F8B15D3E9BF246F9EE7930@CY4PR04MB1032.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
 x-forefront-prvs: 0446F0FCE1
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Tulzoemxkje2Tf1Ekq+04lyLE84rDOVU7JW/owrEIl+jMbC9IA9jd/b446NzFB6RN5JoLmE+mmRFfMGZ/0JPgvQ319S56MgnPaYoXjsNTvva06GDgrNNyk6bdVPvm8fhjMgNbpYNELUxnjwZgtzgwta8QGdFkGydm5MW7l9ZmEfr5VXVvRSlcNxrsJZPhGBO43CStO9cXta0d9ODappXL2QPbetJeQSf9e/CHhGlRQlZVzu5PqzgUv3HMw2XchZpwhGZl4AE/bbMzWCBr+TzOVuYLC4JxwxKSaMgqCCH7kK60J1uSDUxcfJXItyVtZzl
+x-microsoft-antispam-message-info: wZZfGOeqp6hCBxCnZSwjhD9A5VGnOaJAbQZ0d6KQtRYwADAtYY6D2Eh8T2xx1XO5YWhRJfhjUNZP7PunSljcn5FQ0/bioeI7p6jFoo9sWWz4GMK5DEShKk7O/XzkiWHuwpseD0GLEwCXshR4bRO6eDa7y/ojSQ5xZMbkdGsyroZw17iMIFvm7ipxgS2aIhINCRtIzbMTKqGf25C1ippmjHG1MtwifuxM+qIJYsT0+OcT8hefAMw/xASP2P1uOl5AmVY4NhRisZdnKh8/daTmI3t7V44cjNolboVDy/XEujVUfLujY1iR7FHvog1Rf7mSRPl2focajZJa/Y6gbT64rw==
 x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(376002)(39860400002)(136003)(346002)(396003)(91956017)(7416002)(86362001)(55016002)(66446008)(2906002)(83380400001)(66946007)(71200400001)(66476007)(64756008)(478600001)(66556008)(5660300002)(186003)(76116006)(9686003)(26005)(8936002)(33656002)(53546011)(316002)(6506007)(66574015)(4326008)(8676002)(54906003)(52536014)(110136005)(7696005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: PLKOjJooXdpoNOF2fF0gbTx7VRDCd1EBPTn4i620QjvVU8KTotl4fUAUz6VY6FG7goVKBmfOnNkQpe9Ok4E0VyYprAHFkiW7dCv9g9IQH1SpSM5v5pccldq76VNbhR7RrbIgxxTPQsqTahhjP/Nfi2n2qDdPbmf+A5ncbFpQkv+r/eVHdhCJYtGx1Y2inuXbt+H7BaK9TdKVVz+0A2ufheD2X3WXNcmszko2v2IW8vZZtfnACTrOtpP5xQ8WSvQSahTau5lLZ2gg7Wi3cdz33cf0+0smBLv29WhQ7r1SmAwvZkuW5II8+Wa/RQcFO7PCe9W+SfZ7fXBfoOK6goiWNLcvfU8myRDmwhOem7L9yMPZ4TmtKowhKuEjrBZLOzLvgqd5o2KGe0ev6gj7bNOkUs+OBcVscjUknL+8TLf2zx4WNEsCmIWBjjCR+0lTquGTbdEs3fNIogRe5GRG4xMeW6OOgSdT+EK/sbs2ZFS9ag+Q2IS5wvahSsmFsyfnmjCJ
+x-ms-exchange-antispam-messagedata: uZZwbHSLXYa2LABKJl2J4tuUkITX2ZHKtKuuoUzHEs5zKMvvYKf6gZH1N4YNrcHQ/q8Y0wmZoWSkQQO8Xs3nkw7haV+bi1rDyAj0QEoqlTtr5U0VgjAJBSSpBFTJ+5L9pYEWd2owxMW20QUtX75pOVfacdroi0ojaLP+zGbCZJDuZEyGYa88Bvdq1L5A31JvDYe6DWTZndKHbn/YBROahx7WNc+3LyTouM1DOG84Yvc635wB74Uc4Tm6Q9zwVKOE88IeGBwSBjM1R+1MkZuowKMqnENVkMReetaSxpwYV30Wi1DgnkF+HdBfNBjKDtUVfqEZqCRpr5M8QqE09RY6d0iqWlWhgmAbilBXZJTQePB/CdrIpXVssbpiCxx9UwP5/uEyRclHAWb4NKwaNzUtAOARF35DSaJcBJthF6igIPPHVkWX+gxHzX7GECca6ChpRwBzHSQWi35XafBpGBKmJXaK1YtaChL8HhZlP/dUYwY9Ql2QIrY2otmBbL894lne
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
@@ -114,13 +114,13 @@ MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91701f0b-cb1c-45a8-8add-08d81971035d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2020 01:34:04.9656
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92c2e757-96cf-4237-c4ed-08d819719439
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2020 01:38:07.9908
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: i6lm/3OGlAJWhNzVnY9+abSJTqKcYss8A3U2IUsTIOpckCs95/JXUWwyPJZf2aUoPjqsSu32c3yzlz5kXkdggw==
+X-MS-Exchange-CrossTenant-userprincipalname: SJC9tfaPbYDLNetwjoTsNXqAi+0LRIvxiSW+fzBed6Bzb8RcKCMSme9OihnE45VMU9x/yt1bE3JWkXytSuyQWQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB1032
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -130,140 +130,344 @@ X-Mailing-List: linux-block@vger.kernel.org
 On 2020/06/25 21:22, Javier Gonz=E1lez wrote:=0A=
 > From: Javier Gonz=E1lez <javier.gonz@samsung.com>=0A=
 > =0A=
-> Add support for offline transition on the zoned block device using the=0A=
-> new zone management IOCTL=0A=
+> With the addition of ZNS, a new set of properties have been added to the=
+=0A=
+> zoned block device. This patch introduces a new IOCTL to expose these=0A=
+> rroperties to user space.=0A=
 > =0A=
 > Signed-off-by: Javier Gonz=E1lez <javier.gonz@samsung.com>=0A=
 > Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>=0A=
 > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>=0A=
 > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>=0A=
 > ---=0A=
->  block/blk-core.c              | 2 ++=0A=
->  block/blk-zoned.c             | 3 +++=0A=
->  drivers/nvme/host/core.c      | 3 +++=0A=
->  include/linux/blk_types.h     | 3 +++=0A=
->  include/linux/blkdev.h        | 1 -=0A=
->  include/uapi/linux/blkzoned.h | 1 +=0A=
->  6 files changed, 12 insertions(+), 1 deletion(-)=0A=
+>  block/blk-zoned.c             | 46 ++++++++++++++++++++++++++=0A=
+>  block/ioctl.c                 |  2 ++=0A=
+>  drivers/nvme/host/core.c      |  2 ++=0A=
+>  drivers/nvme/host/nvme.h      | 11 +++++++=0A=
+>  drivers/nvme/host/zns.c       | 61 +++++++++++++++++++++++++++++++++++=
+=0A=
+>  include/linux/blkdev.h        |  9 ++++++=0A=
+>  include/uapi/linux/blkzoned.h | 13 ++++++++=0A=
+>  7 files changed, 144 insertions(+)=0A=
 > =0A=
-> diff --git a/block/blk-core.c b/block/blk-core.c=0A=
-> index 03252af8c82c..589cbdacc5ec 100644=0A=
-> --- a/block/blk-core.c=0A=
-> +++ b/block/blk-core.c=0A=
-> @@ -140,6 +140,7 @@ static const char *const blk_op_name[] =3D {=0A=
->  	REQ_OP_NAME(ZONE_CLOSE),=0A=
->  	REQ_OP_NAME(ZONE_FINISH),=0A=
->  	REQ_OP_NAME(ZONE_APPEND),=0A=
-> +	REQ_OP_NAME(ZONE_OFFLINE),=0A=
->  	REQ_OP_NAME(WRITE_SAME),=0A=
->  	REQ_OP_NAME(WRITE_ZEROES),=0A=
->  	REQ_OP_NAME(SCSI_IN),=0A=
-> @@ -1030,6 +1031,7 @@ generic_make_request_checks(struct bio *bio)=0A=
->  	case REQ_OP_ZONE_OPEN:=0A=
->  	case REQ_OP_ZONE_CLOSE:=0A=
->  	case REQ_OP_ZONE_FINISH:=0A=
-> +	case REQ_OP_ZONE_OFFLINE:=0A=
->  		if (!blk_queue_is_zoned(q))=0A=
->  			goto not_supported;=0A=
->  		break;=0A=
 > diff --git a/block/blk-zoned.c b/block/blk-zoned.c=0A=
-> index 29194388a1bb..704fc15813d1 100644=0A=
+> index 704fc15813d1..39ec72af9537 100644=0A=
 > --- a/block/blk-zoned.c=0A=
 > +++ b/block/blk-zoned.c=0A=
-> @@ -416,6 +416,9 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev,=
- fmode_t mode,=0A=
->  	case BLK_ZONE_MGMT_RESET:=0A=
->  		op =3D REQ_OP_ZONE_RESET;=0A=
->  		break;=0A=
-> +	case BLK_ZONE_MGMT_OFFLINE:=0A=
-> +		op =3D REQ_OP_ZONE_OFFLINE;=0A=
-> +		break;=0A=
->  	default:=0A=
->  		return -ENOTTY;=0A=
->  	}=0A=
+> @@ -169,6 +169,17 @@ int blkdev_report_zones(struct block_device *bdev, s=
+ector_t sector,=0A=
+>  }=0A=
+>  EXPORT_SYMBOL_GPL(blkdev_report_zones);=0A=
+>  =0A=
+> +static int blkdev_report_zonedev_prop(struct block_device *bdev,=0A=
+> +				      struct blk_zone_dev *zprop)=0A=
+> +{=0A=
+> +	struct gendisk *disk =3D bdev->bd_disk;=0A=
+> +=0A=
+> +	if (WARN_ON_ONCE(!bdev->bd_disk->fops->report_zone_p))=0A=
+> +		return -EOPNOTSUPP;=0A=
+> +=0A=
+> +	return disk->fops->report_zone_p(disk, zprop);=0A=
+> +}=0A=
+> +=0A=
+>  static inline bool blkdev_allow_reset_all_zones(struct block_device *bde=
+v,=0A=
+>  						sector_t sector,=0A=
+>  						sector_t nr_sectors)=0A=
+> @@ -430,6 +441,41 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev=
+, fmode_t mode,=0A=
+>  				GFP_KERNEL);=0A=
+>  }=0A=
+>  =0A=
+> +int blkdev_zonedev_prop(struct block_device *bdev, fmode_t mode,=0A=
+> +			unsigned int cmd, unsigned long arg)=0A=
+> +{=0A=
+> +	void __user *argp =3D (void __user *)arg;=0A=
+> +	struct request_queue *q;=0A=
+> +	struct blk_zone_dev zprop;=0A=
+> +	int ret;=0A=
+> +=0A=
+> +	if (!argp)=0A=
+> +		return -EINVAL;=0A=
+> +=0A=
+> +	q =3D bdev_get_queue(bdev);=0A=
+> +	if (!q)=0A=
+> +		return -ENXIO;=0A=
+> +=0A=
+> +	if (!blk_queue_is_zoned(q))=0A=
+> +		return -ENOTTY;=0A=
+> +=0A=
+> +	if (!capable(CAP_SYS_ADMIN))=0A=
+> +		return -EACCES;=0A=
+> +=0A=
+> +	if (!(mode & FMODE_WRITE))=0A=
+> +		return -EBADF;=0A=
+> +=0A=
+> +	ret =3D blkdev_report_zonedev_prop(bdev, &zprop);=0A=
+> +	if (ret)=0A=
+> +		goto out;=0A=
+> +=0A=
+> +	if (copy_to_user(argp, &zprop, sizeof(struct blk_zone_dev)))=0A=
+> +		return -EFAULT;=0A=
+> +=0A=
+> +out:=0A=
+> +	return ret;=0A=
+> +}=0A=
+> +=0A=
+>  static inline unsigned long *blk_alloc_zone_bitmap(int node,=0A=
+>  						   unsigned int nr_zones)=0A=
+>  {=0A=
+> diff --git a/block/ioctl.c b/block/ioctl.c=0A=
+> index 0ea29754e7dd..f7b4e0f2dd4c 100644=0A=
+> --- a/block/ioctl.c=0A=
+> +++ b/block/ioctl.c=0A=
+> @@ -517,6 +517,8 @@ static int blkdev_common_ioctl(struct block_device *b=
+dev, fmode_t mode,=0A=
+>  		return blkdev_zone_ops_ioctl(bdev, mode, cmd, arg);=0A=
+>  	case BLKMGMTZONE:=0A=
+>  		return blkdev_zone_mgmt_ioctl(bdev, mode, cmd, arg);=0A=
+> +	case BLKZONEDEVPROP:=0A=
+> +		return blkdev_zonedev_prop(bdev, mode, cmd, arg);=0A=
+>  	case BLKGETZONESZ:=0A=
+>  		return put_uint(argp, bdev_zone_sectors(bdev));=0A=
+>  	case BLKGETNRZONES:=0A=
 > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c=0A=
-> index f1215523792b..5b95c81d2a2d 100644=0A=
+> index 5b95c81d2a2d..a32c909a915f 100644=0A=
 > --- a/drivers/nvme/host/core.c=0A=
 > +++ b/drivers/nvme/host/core.c=0A=
-> @@ -776,6 +776,9 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struc=
-t request *req,=0A=
->  	case REQ_OP_ZONE_FINISH:=0A=
->  		ret =3D nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_FINISH);=0A=
->  		break;=0A=
-> +	case REQ_OP_ZONE_OFFLINE:=0A=
-> +		ret =3D nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_OFFLINE);=0A=
-> +		break;=0A=
->  	case REQ_OP_WRITE_ZEROES:=0A=
->  		ret =3D nvme_setup_write_zeroes(ns, req, cmd);=0A=
->  		break;=0A=
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h=0A=
-> index 16b57fb2b99c..b3921263c3dd 100644=0A=
-> --- a/include/linux/blk_types.h=0A=
-> +++ b/include/linux/blk_types.h=0A=
-> @@ -316,6 +316,8 @@ enum req_opf {=0A=
->  	REQ_OP_ZONE_FINISH	=3D 12,=0A=
->  	/* write data at the current zone write pointer */=0A=
->  	REQ_OP_ZONE_APPEND	=3D 13,=0A=
-> +	/* Transition a zone to offline */=0A=
-> +	REQ_OP_ZONE_OFFLINE	=3D 14,=0A=
+> @@ -2254,6 +2254,7 @@ static const struct block_device_operations nvme_fo=
+ps =3D {=0A=
+>  	.getgeo		=3D nvme_getgeo,=0A=
+>  	.revalidate_disk=3D nvme_revalidate_disk,=0A=
+>  	.report_zones	=3D nvme_report_zones,=0A=
+> +	.report_zone_p	=3D nvme_report_zone_prop,=0A=
+>  	.pr_ops		=3D &nvme_pr_ops,=0A=
+>  };=0A=
 >  =0A=
->  	/* SCSI passthrough using struct scsi_request */=0A=
->  	REQ_OP_SCSI_IN		=3D 32,=0A=
-> @@ -456,6 +458,7 @@ static inline bool op_is_zone_mgmt(enum req_opf op)=
+> @@ -2280,6 +2281,7 @@ const struct block_device_operations nvme_ns_head_o=
+ps =3D {=0A=
+>  	.compat_ioctl	=3D nvme_compat_ioctl,=0A=
+>  	.getgeo		=3D nvme_getgeo,=0A=
+>  	.report_zones	=3D nvme_report_zones,=0A=
+> +	.report_zone_p	=3D nvme_report_zone_prop,=0A=
+>  	.pr_ops		=3D &nvme_pr_ops,=0A=
+>  };=0A=
+>  #endif /* CONFIG_NVME_MULTIPATH */=0A=
+> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h=0A=
+> index ecf443efdf91..172e0531f37f 100644=0A=
+> --- a/drivers/nvme/host/nvme.h=0A=
+> +++ b/drivers/nvme/host/nvme.h=0A=
+> @@ -407,6 +407,14 @@ struct nvme_ns {=0A=
+>  	u8 pi_type;=0A=
+>  #ifdef CONFIG_BLK_DEV_ZONED=0A=
+>  	u64 zsze;=0A=
+> +=0A=
+> +	u32 nr_zones;=0A=
+> +	u32 mar;=0A=
+> +	u32 mor;=0A=
+> +	u32 rrl;=0A=
+> +	u32 frl;=0A=
+> +	u16 zoc;=0A=
+> +	u16 ozcs;=0A=
+>  #endif=0A=
+>  	unsigned long features;=0A=
+>  	unsigned long flags;=0A=
+> @@ -704,11 +712,14 @@ int nvme_update_zone_info(struct gendisk *disk, str=
+uct nvme_ns *ns,=0A=
+>  int nvme_report_zones(struct gendisk *disk, sector_t sector,=0A=
+>  		      unsigned int nr_zones, report_zones_cb cb, void *data);=0A=
+>  =0A=
+> +int nvme_report_zone_prop(struct gendisk *disk, struct blk_zone_dev *zpr=
+op);=0A=
+> +=0A=
+>  blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct reques=
+t *req,=0A=
+>  				       struct nvme_command *cmnd,=0A=
+>  				       enum nvme_zone_mgmt_action action);=0A=
+>  #else=0A=
+>  #define nvme_report_zones NULL=0A=
+> +#define nvme_report_zone_prop NULL=0A=
+>  =0A=
+>  static inline blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns,=
 =0A=
->  	case REQ_OP_ZONE_OPEN:=0A=
->  	case REQ_OP_ZONE_CLOSE:=0A=
->  	case REQ_OP_ZONE_FINISH:=0A=
-> +	case REQ_OP_ZONE_OFFLINE:=0A=
->  		return true;=0A=
->  	default:=0A=
->  		return false;=0A=
+>  		struct request *req, struct nvme_command *cmnd,=0A=
+> diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c=0A=
+> index 2e6512ac6f01..258d03610cc0 100644=0A=
+> --- a/drivers/nvme/host/zns.c=0A=
+> +++ b/drivers/nvme/host/zns.c=0A=
+> @@ -32,6 +32,28 @@ static int nvme_set_max_append(struct nvme_ctrl *ctrl)=
+=0A=
+>  	return 0;=0A=
+>  }=0A=
+>  =0A=
+> +static u64 nvme_zns_nr_zones(struct nvme_ns *ns)=0A=
+> +{=0A=
+> +	struct nvme_command c =3D { };=0A=
+> +	struct nvme_zone_report report;=0A=
+> +	int buflen =3D sizeof(struct nvme_zone_report);=0A=
+> +	int ret;=0A=
+> +=0A=
+> +	c.zmr.opcode =3D nvme_cmd_zone_mgmt_recv;=0A=
+> +	c.zmr.nsid =3D cpu_to_le32(ns->head->ns_id);=0A=
+> +	c.zmr.slba =3D cpu_to_le64(0);=0A=
+> +	c.zmr.numd =3D cpu_to_le32(nvme_bytes_to_numd(buflen));=0A=
+> +	c.zmr.zra =3D NVME_ZRA_ZONE_REPORT;=0A=
+> +	c.zmr.zrasf =3D NVME_ZRASF_ZONE_REPORT_ALL;=0A=
+> +	c.zmr.pr =3D 0;=0A=
+> +=0A=
+> +	ret =3D nvme_submit_sync_cmd(ns->queue, &c, &report, buflen);=0A=
+> +	if (ret)=0A=
+> +		return ret;=0A=
+> +=0A=
+> +	return le64_to_cpu(report.nr_zones);=0A=
+> +}=0A=
+> +=0A=
+>  int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,=0A=
+>  			  unsigned lbaf)=0A=
+>  {=0A=
+> @@ -87,6 +109,13 @@ int nvme_update_zone_info(struct gendisk *disk, struc=
+t nvme_ns *ns,=0A=
+>  		goto free_data;=0A=
+>  	}=0A=
+>  =0A=
+> +	ns->nr_zones =3D nvme_zns_nr_zones(ns);=0A=
+> +	ns->mar =3D le32_to_cpu(id->mar);=0A=
+> +	ns->mor =3D le32_to_cpu(id->mor);=0A=
+> +	ns->rrl =3D le32_to_cpu(id->rrl);=0A=
+> +	ns->frl =3D le32_to_cpu(id->frl);=0A=
+> +	ns->zoc =3D le16_to_cpu(id->zoc);=0A=
+> +=0A=
+>  	q->limits.zoned =3D BLK_ZONED_HM;=0A=
+>  	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);=0A=
+>  free_data:=0A=
+> @@ -230,6 +259,38 @@ int nvme_report_zones(struct gendisk *disk, sector_t=
+ sector,=0A=
+>  	return ret;=0A=
+>  }=0A=
+>  =0A=
+> +static int nvme_ns_report_zone_prop(struct nvme_ns *ns, struct blk_zone_=
+dev *zprop)=0A=
+> +{=0A=
+> +	zprop->nr_zones =3D ns->nr_zones;=0A=
+> +	zprop->zoc =3D ns->zoc;=0A=
+> +	zprop->ozcs =3D ns->ozcs;=0A=
+> +	zprop->mar =3D ns->mar;=0A=
+> +	zprop->mor =3D ns->mor;=0A=
+> +	zprop->rrl =3D ns->rrl;=0A=
+> +	zprop->frl =3D ns->frl;=0A=
+> +=0A=
+> +	return 0;=0A=
+> +}=0A=
+> +=0A=
+> +int nvme_report_zone_prop(struct gendisk *disk, struct blk_zone_dev *zpr=
+op)=0A=
+> +{=0A=
+> +	struct nvme_ns_head *head =3D NULL;=0A=
+> +	struct nvme_ns *ns;=0A=
+> +	int srcu_idx, ret;=0A=
+> +=0A=
+> +	ns =3D nvme_get_ns_from_disk(disk, &head, &srcu_idx);=0A=
+> +	if (unlikely(!ns))=0A=
+> +		return -EWOULDBLOCK;=0A=
+> +=0A=
+> +	if (ns->head->ids.csi =3D=3D NVME_CSI_ZNS)=0A=
+> +		ret =3D nvme_ns_report_zone_prop(ns, zprop);=0A=
+> +	else=0A=
+> +		ret =3D -EINVAL;=0A=
+> +	nvme_put_ns_from_disk(head, srcu_idx);=0A=
+> +=0A=
+> +	return ret;=0A=
+> +}=0A=
+> +=0A=
+>  blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct reques=
+t *req,=0A=
+>  		struct nvme_command *c, enum nvme_zone_mgmt_action action)=0A=
+>  {=0A=
 > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
-> index bd8521f94dc4..8308d8a3720b 100644=0A=
+> index 8308d8a3720b..0c0faa58b7f4 100644=0A=
 > --- a/include/linux/blkdev.h=0A=
 > +++ b/include/linux/blkdev.h=0A=
-> @@ -372,7 +372,6 @@ extern int blkdev_zone_ops_ioctl(struct block_device =
+> @@ -372,6 +372,8 @@ extern int blkdev_zone_ops_ioctl(struct block_device =
 *bdev, fmode_t mode,=0A=
 >  				  unsigned int cmd, unsigned long arg);=0A=
 >  extern int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mod=
 e,=0A=
 >  				  unsigned int cmd, unsigned long arg);=0A=
-> -=0A=
+> +extern int blkdev_zonedev_prop(struct block_device *bdev, fmode_t mode,=
+=0A=
+> +			unsigned int cmd, unsigned long arg);=0A=
 >  #else /* CONFIG_BLK_DEV_ZONED */=0A=
 >  =0A=
 >  static inline unsigned int blkdev_nr_zones(struct gendisk *disk)=0A=
+> @@ -400,6 +402,12 @@ static inline int blkdev_zone_mgmt_ioctl(struct bloc=
+k_device *bdev,=0A=
+>  	return -ENOTTY;=0A=
+>  }=0A=
+>  =0A=
+> +static inline int blkdev_zonedev_prop(struct block_device *bdev, fmode_t=
+ mode,=0A=
+> +				      unsigned int cmd, unsigned long arg)=0A=
+> +{=0A=
+> +	return -ENOTTY;=0A=
+> +}=0A=
+> +=0A=
+>  #endif /* CONFIG_BLK_DEV_ZONED */=0A=
+>  =0A=
+>  struct request_queue {=0A=
+> @@ -1770,6 +1778,7 @@ struct block_device_operations {=0A=
+>  	int (*report_zones)(struct gendisk *, sector_t sector,=0A=
+>  			unsigned int nr_zones, report_zones_cb cb, void *data);=0A=
+>  	char *(*devnode)(struct gendisk *disk, umode_t *mode);=0A=
+> +	int (*report_zone_p)(struct gendisk *disk, struct blk_zone_dev *zprop);=
+=0A=
+>  	struct module *owner;=0A=
+>  	const struct pr_ops *pr_ops;=0A=
+>  };=0A=
 > diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.=
 h=0A=
-> index a8c89fe58f97..d0978ee10fc7 100644=0A=
+> index d0978ee10fc7..0c49a4b2ce5d 100644=0A=
 > --- a/include/uapi/linux/blkzoned.h=0A=
 > +++ b/include/uapi/linux/blkzoned.h=0A=
-> @@ -155,6 +155,7 @@ enum blk_zone_action {=0A=
->  	BLK_ZONE_MGMT_FINISH	=3D 0x2,=0A=
->  	BLK_ZONE_MGMT_OPEN	=3D 0x3,=0A=
->  	BLK_ZONE_MGMT_RESET	=3D 0x4,=0A=
-> +	BLK_ZONE_MGMT_OFFLINE	=3D 0x5,=0A=
+> @@ -142,6 +142,18 @@ struct blk_zone_range {=0A=
+>  	__u64		nr_sectors;=0A=
 >  };=0A=
 >  =0A=
+> +struct blk_zone_dev {=0A=
+> +	__u32	nr_zones;=0A=
+> +	__u32	mar;=0A=
+> +	__u32	mor;=0A=
+> +	__u32	rrl;=0A=
+> +	__u32	frl;=0A=
+> +	__u16	zoc;=0A=
+> +	__u16	ozcs;=0A=
+> +	__u32	rsv31[2];=0A=
+> +	__u64	rsv63[4];=0A=
+> +};=0A=
+> +=0A=
 >  /**=0A=
+>   * enum blk_zone_action - Zone state transitions managed from user-space=
+=0A=
+>   *=0A=
+> @@ -209,5 +221,6 @@ struct blk_zone_mgmt {=0A=
+>  #define BLKCLOSEZONE	_IOW(0x12, 135, struct blk_zone_range)=0A=
+>  #define BLKFINISHZONE	_IOW(0x12, 136, struct blk_zone_range)=0A=
+>  #define BLKMGMTZONE	_IOR(0x12, 137, struct blk_zone_mgmt)=0A=
+> +#define BLKZONEDEVPROP	_IOR(0x12, 138, struct blk_zone_dev)=0A=
+>  =0A=
+>  #endif /* _UAPI_BLKZONED_H */=0A=
 > =0A=
 =0A=
-As mentioned in previous email, the usefulness of this is dubious. Please=
+As commented already, NVMe passthrough or sysfs device attributes would be =
+much=0A=
+better. See scsi: there is no IOCTL defined to obtain every single log page=
+ or=0A=
+mode page defined. Passthrough is the interface to do that. For frequently =
+used=0A=
+log pages giving device information, sysfs is used as a cache. See all the=
 =0A=
-elaborate in the commit message. Sure NVMe ZNS defines this and we can supp=
-ort=0A=
-it. But without a good use case, what is the point ?=0A=
+"vpd_pgXX" entries under /sys/block/sdX/device. All of this is done by the=
 =0A=
-scsi SD driver will return BLK_STS_NOTSUPP if this offlining is sent to a=
-=0A=
-ZBC/ZAC drive. Not nice. Having a sysfs attribute "max_offline_zone_sectors=
-" or=0A=
-the like to indicate support by the device or not would be nicer.=0A=
-=0A=
-Does offling ALL zones make any sense ? Because this patch does not prevent=
- the=0A=
-use of the REQ_ZONE_ALL flags introduced in patch 2. Probably not a good id=
-ea to=0A=
-allow offlining all zones, no ?=0A=
+driver. Not the block layer.=0A=
 =0A=
 -- =0A=
 Damien Le Moal=0A=
