@@ -2,143 +2,183 @@ Return-Path: <SRS0=+Sn3=AH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA18C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 19:40:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A222CC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 21:18:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0695A206C3
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 19:40:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74D7A208C7
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 21:18:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Wn8OdBAD"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="M0xqz8l/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725852AbgFZTkt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jun 2020 15:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34900 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725838AbgFZTkt (ORCPT
+        id S1725883AbgFZVSU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jun 2020 17:18:20 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:33823 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725916AbgFZVSS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jun 2020 15:40:49 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 197D4C03E979
-        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 12:40:49 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id l63so5347499pge.12
-        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 12:40:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=b6bWTKBCohzXknciIdj4/TB9JpdLvGJ+V/Qc2SJ7UpY=;
-        b=Wn8OdBADrajOuELUVHBDDa1Jd6u4xaWwS5Wppyc6vatdMtffU23WLuhPpfT/g7xmVs
-         s4wVDyaNUx68vaGc7R3764vT/JUe+MusQM72twD/N62bze66jTU8Yzu0Zg9NxgS8gUL6
-         ApTgdra9y3XMEjp297Ky5y/vCdtmVw2b416LTsdObbfSS1b7iO/wcYyF0OAmcslY6/vR
-         gwOEugDICm5iau93ccxKAu2/3Suoaxk5gDA19yhehNeJ9CArLs7ZTKKqklrJ4N2Zbtnx
-         RmxdAyL0AxMwg5NRxFAVJS3H2wLAb5eriRkF6mMKhmkl6GIFLutVHJtusmB7mdvwWbNQ
-         A6Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=b6bWTKBCohzXknciIdj4/TB9JpdLvGJ+V/Qc2SJ7UpY=;
-        b=elJG5pIHM490Iqf1gNjxNX+1u/44DZ9R0xYvjp6BmsB9ZAvsXitZ2ApjGVkII9u4M8
-         ufbrE3aNRJt0gMVRXtVx3l5kUyv7w/kGMOq2lWqMGBnYA6BXDuU+4lDibdRtJDPxHXwU
-         tk8wq4vdsuG29OXIlUDeH92kOwks4nHsX7mn+okxczuyz3mW+EJ5p8eBfVYUPABWtGJ6
-         HL82dQwQOIqEZ682smIBZIZxXmfPnaTAnuAcyqbraTxar45Q4lsJ5doqASZvcuIMu9Jo
-         90hm/y+IUnGqCsBotW3F/hMtYS0L3bYwGSn0XTL7rM6WfhtuBECPBplkvpoT2+DTQ6S8
-         XJKQ==
-X-Gm-Message-State: AOAM533p9TU5+y8rzJCTsAa7o4BTuIaShhvHdVEJo7b0UCVE2g7dKpkZ
-        qK7brXNEmDxHZXZRfqCz4q4BEJykFuHBAg==
-X-Google-Smtp-Source: ABdhPJyKmIfLO3Pjfo+GY7TRdyK9p7Kb0dTJR6RFywiDFAvXgR0cZDsJxeDGJpXI8DDKo2q43Wm8Gw==
-X-Received: by 2002:a63:d318:: with SMTP id b24mr223683pgg.403.1593200448201;
-        Fri, 26 Jun 2020 12:40:48 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id o1sm28515896pfu.70.2020.06.26.12.40.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Jun 2020 12:40:47 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.8-rc3
-Message-ID: <cb6043bd-9ab0-0d3f-af78-cf9b72f10b20@kernel.dk>
-Date:   Fri, 26 Jun 2020 13:40:46 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Fri, 26 Jun 2020 17:18:18 -0400
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200626211814epoutp020c0823e14d3de346cfe1f53f49902b97~cNK7_4ZLR0527305273epoutp02e
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 21:18:14 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200626211814epoutp020c0823e14d3de346cfe1f53f49902b97~cNK7_4ZLR0527305273epoutp02e
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1593206294;
+        bh=SZTI3b2MpeXCFJcN29/uKoXauk27veSOn9r9Lck5MGI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=M0xqz8l/JqsO8zpxEKsAjI+XmEk2ALQloQWWNmYdX3NhYKk/HEhNB3yekT1oHC562
+         h/6KxOk7DFROwmVAPRnS4tPYRFHxmNOt4bvWz6dpRdP1pjQbMrgIr+FLd2TIBSMFhr
+         9enh9jHSH4c29Ome+0x9+G8udpizz8nekb68jaGM=
+Received: from epsmges5p1new.samsung.com (unknown [182.195.42.73]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20200626211813epcas5p4d1fb4de9488e3a8a82fdbc44edf341f6~cNK6tn31a2499124991epcas5p4t;
+        Fri, 26 Jun 2020 21:18:13 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        DE.AA.09467.41666FE5; Sat, 27 Jun 2020 06:18:12 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20200626211812epcas5p37e1748b113b3cccd4ce512bb5d772d17~cNK5xqFVU1921319213epcas5p3D;
+        Fri, 26 Jun 2020 21:18:12 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200626211811epsmtrp1eaa3529ab746d616963554d9e83bc917~cNK5wbGYj1468814688epsmtrp1x;
+        Fri, 26 Jun 2020 21:18:11 +0000 (GMT)
+X-AuditID: b6c32a49-a3fff700000024fb-83-5ef666143a4c
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        53.F5.08382.31666FE5; Sat, 27 Jun 2020 06:18:11 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20200626211809epsmtip20bf4db3e61e6a6ba5bd72cd1609895c3~cNK3W04j92794627946epsmtip2a;
+        Fri, 26 Jun 2020 21:18:09 +0000 (GMT)
+Date:   Sat, 27 Jun 2020 02:45:14 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org,
+        asml.silence@gmail.com, Damien.LeMoal@wdc.com,
+        linux-fsdevel@vger.kernel.org, mb@lightnvm.io,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        selvakuma.s1@samsung.com, nj.shetty@samsung.com,
+        javier.gonz@samsung.com, Arnav Dawn <a.dawn@samsung.com>
+Subject: Re: [PATCH v2 1/2] fs,block: Introduce RWF_ZONE_APPEND and handling
+ in direct IO path
+Message-ID: <20200626211514.GA24762@test-zns>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200626085846.GA24962@infradead.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrNKsWRmVeSWpSXmKPExsWy7bCmuq5I2rc4g0+LTC1+b3vEYvF7+hRW
+        izmrtjFarL7bz2bR9W8Li0Vr+zcmi9MTFjFZvGs9x2Lx+M5ndosp05oYLfbe0rbYs/cki8Xl
+        XXPYLFZsP8Jise33fGaLK1MWMVu8/nGSzeL83+OsDkIeO2fdZffYvELL4/LZUo9Nnyaxe3Rf
+        /cHo0bdlFaPH501yHu0Hupk8Nj15yxTAGcVlk5Kak1mWWqRvl8CV0fJ0B1vBW5GKe+0nmRoY
+        Twh0MXJySAiYSCxZ1M7excjFISSwm1Fi7domJgjnE6NE4/ljUJlvjBJn+38zwrQs2ncRqmov
+        o8TRnVOYIZxnjBL/Nh1lB6liEVCVmNz6C6iKg4NNQFPiwuRSkLAIkHlreTtYPbPATyaJ199/
+        sYPUCAskSKz97AlSwyugKzHpzgkWCFtQ4uTMJ2A2p4CxRP/EF8wgtqiAssSBbcfBjpAQeMMh
+        sejONajrXCQu/9vGCmELS7w6voUdwpaSeNnfBmUXS/y6c5QZormDUeJ6w0wWiIS9xMU9f8GO
+        ZhbIkDi4TgckzCzAJ9H7+wlYWEKAV6KjTQiiWlHi3qSnUKvEJR7OWAJle0gc29/PBgmTX4wS
+        sz6uZJvAKDcLyT+zEDbMAttgJdH5oYkVIiwtsfwfB4SpKbF+l/4CRtZVjJKpBcW56anFpgWG
+        eanlesWJucWleel6yfm5mxjB6U/Lcwfj3Qcf9A4xMnEwHmKU4GBWEuH9bP0tTog3JbGyKrUo
+        P76oNCe1+BCjNAeLkjiv0o8zcUIC6YklqdmpqQWpRTBZJg5OqQam8G+vXnpOE5rTO68xk7tl
+        6vaJj6VD5b6/F5LR/dUY37FyCrc20xUmS2uT8IBXMr67pL3/Ma9ZfrpAI4O5Ryt6dVD1ZKu1
+        7B1L5Dmj47Q1psTdKpw4zfFdzS7Vqdu2GGjs9qh59+V8D1tOSc+Jd+3S7750s3Cu+rTd9fRU
+        l+ag1u2BbQ0af5/cc2XfufnwGzfh1tIPnj7Nx2+f//r4j7vMdZ7q+NYe4aMvJsZ+zy29VXhZ
+        +1VkQ8Ced0KHGXzmuTxJNeNr++7pbJW5fg7fTf7aoxnv3i5u+K1d4a4itKGu13/+1p5Hgfpx
+        vlF3Fp2/VCWgfdy4YLq2entauHpv8g37Tee2Fr8v/jxF7PzbB5eUWIozEg21mIuKEwEon/gt
+        7gMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKIsWRmVeSWpSXmKPExsWy7bCSvK5w2rc4g8/XzCx+b3vEYvF7+hRW
+        izmrtjFarL7bz2bR9W8Li0Vr+zcmi9MTFjFZvGs9x2Lx+M5ndosp05oYLfbe0rbYs/cki8Xl
+        XXPYLFZsP8Jise33fGaLK1MWMVu8/nGSzeL83+OsDkIeO2fdZffYvELL4/LZUo9Nnyaxe3Rf
+        /cHo0bdlFaPH501yHu0Hupk8Nj15yxTAGcVlk5Kak1mWWqRvl8CVsfLnBpaC+UIVUzs6WRsY
+        p/B1MXJySAiYSCzad5Gpi5GLQ0hgN6PEioZT7BAJcYnmaz+gbGGJlf+es0MUPWGUOPL4HxtI
+        gkVAVWJy6y+gbg4ONgFNiQuTS0HCIkDmreXtzCD1zAK/mSQeXJnPClIjLJAgsfazJ0gNr4Cu
+        xKQ7J1ggZv5ilFj96DU7REJQ4uTMJywgNrOAmcS8zQ+ZQXqZBaQllv/jAAlzChhL9E98wQxi
+        iwooSxzYdpxpAqPgLCTds5B0z0LoXsDIvIpRMrWgODc9t9iwwDAvtVyvODG3uDQvXS85P3cT
+        IzgmtTR3MG5f9UHvECMTB+MhRgkOZiUR3s/W3+KEeFMSK6tSi/Lji0pzUosPMUpzsCiJ894o
+        XBgnJJCeWJKanZpakFoEk2Xi4JRqYArPkCz+I3j7qOPEbbcruw1/5L3b01n+WH/ZS6anTgb/
+        N/S7Rz1guKh+PUOO89vRpd43r26p+3J0N4tvve6rIp6z13/Pdd9XGpGu9LR951vJayu9pngp
+        z9V8Y+8QcuVq6h57/fePd6U7BL5VmPm6JvRAsdKy0q9Kl34cd0zoVp6/wm9uqKv7p5/HhBzb
+        9nJ/vHD564HL8l8+Xyh/EB7UGWLstOeKfeW8cucXdr/Pv6jZemFqSxZL8/lncosd3zzL3lXK
+        7WWbuj7kvFlPy8JTYdKH26b6e80Kinjb8dC4OOSgmUnW1urdVwNt7q/sXbDFf0uTon7kLuXb
+        syKXP85o9a+OZtv8cV2n6MywOp5lp7cosRRnJBpqMRcVJwIAwZRrwTgDAAA=
+X-CMS-MailID: 20200626211812epcas5p37e1748b113b3cccd4ce512bb5d772d17
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----LJmyoXw8O9.Ba._wAgamKaSQQ_oizdakYzSktnuewvRJuSc2=_9f048_"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20200625171834epcas5p226a24dfcb84cfa83fe29a2bd17795d85
+References: <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
+        <CGME20200625171834epcas5p226a24dfcb84cfa83fe29a2bd17795d85@epcas5p2.samsung.com>
+        <1593105349-19270-2-git-send-email-joshi.k@samsung.com>
+        <20200626085846.GA24962@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+------LJmyoXw8O9.Ba._wAgamKaSQQ_oizdakYzSktnuewvRJuSc2=_9f048_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Here's a set of changes that should go into the current release:
+On Fri, Jun 26, 2020 at 09:58:46AM +0100, Christoph Hellwig wrote:
+>To restate my previous NAK:
+>
+>A low-level protocol detail like RWF_ZONE_APPEND has absolutely no
+>business being exposed in the Linux file system interface.
+>
+>And as mentioned before I think the idea of returning the actual
+>position written for O_APPEND writes totally makes sense, and actually
+>is generalizable to all files.  Together with zonefs that gives you a
+>perfect interface for zone append.
+>
+>On Thu, Jun 25, 2020 at 10:45:48PM +0530, Kanchan Joshi wrote:
+>> Introduce RWF_ZONE_APPEND flag to represent zone-append.
+>
+>And no one but us select few even know what zone append is, nevermind
+>what the detailed semantics are.  If you add a userspace API you need
+>to very clearly document the semantics inluding errors and corner cases.
 
-- NVMe pull request from Christoph:
-	- multipath deadlock fixes (Anton)
-	- NUMA fixes (Max)
-	- RDMA completion vector fix (Max)
-	- IO deadlock fix (Sagi)
-	- multipath reference fix (Sagi)
-	- NS mutation fix (Sagi)
-- Use right allocator when freeing bip in error path (Chengguang)
+For block IO path (which is the scope of this patchset) there is no
+probelm in using RWF_APPEND for zone-append, because it does not do
+anything for block device. We can use that, avoiding introduction of
+RWF_ZONE_APPEND in user-space.
 
-Please pull!
+In kernel, will it be fine to keep IOCB_ZONE_APPEND apart from
+IOCB_APPEND? Reason being, this can help to isolate the code meant only
+for zone-append from the one that is already present for conventional
+append.
 
-The following changes since commit 3373a3461aa15b7f9a871fa4cb2c9ef21ac20b47:
+Snippet from quick reference -
 
-  block: make function 'kill_bdev' static (2020-06-18 09:24:35 -0600)
+static inline int kiocb_set_rw_flags(struct kiocb *ki, rwf_t flags)
+        ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
+        if (flags & RWF_APPEND)
+                ki->ki_flags |= IOCB_APPEND;
++       if (flags & RWF_ZONE_APPEND) {
++               /* currently support block device only */
++               umode_t mode = file_inode(ki->ki_filp)->i_mode;
++
++               if (!(S_ISBLK(mode)))
++                       return -EOPNOTSUPP;
++               ki->ki_flags |= IOCB_ZONE_APPEND;
++       }
 
-are available in the Git repository at:
 
-  git://git.kernel.dk/linux-block.git tags/block-5.8-2020-06-26
+As for file I/O in future, I see a potential problem with RWF_APPEND.
+In io_uring, zone-append requires bit of pre/post processing, which
+ideally should be done only for zone-append case. A ZoneFS file using
+RWF_APPEND as a mean to invoke zone-append vs a regular file (hosted on
+some other FS) requiring conventional RWF_APPEND - both will execute
+that processing.
+Is there a good way to differentiate ZoneFS file from another file which
+only wants use conventional file-append?
 
-for you to fetch changes up to 1b52671d79c4b9fdc91a85f99f69b7c91a3b1b71:
+------LJmyoXw8O9.Ba._wAgamKaSQQ_oizdakYzSktnuewvRJuSc2=_9f048_
+Content-Type: text/plain; charset="utf-8"
 
-  Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8 (2020-06-25 12:57:17 -0600)
 
-----------------------------------------------------------------
-block-5.8-2020-06-26
-
-----------------------------------------------------------------
-Anton Eidelman (2):
-      nvme-multipath: fix deadlock between ana_work and scan_work
-      nvme-multipath: fix deadlock due to head->lock
-
-Chengguang Xu (1):
-      block: release bip in a right way in error path
-
-Jens Axboe (1):
-      Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8
-
-Max Gurtovoy (6):
-      nvme: set initial value for controller's numa node
-      nvme-pci: override the value of the controller's numa node
-      nvme-pci: initialize tagset numa value to the value of the ctrl
-      nvme-tcp: initialize tagset numa value to the value of the ctrl
-      nvme-loop: initialize tagset numa value to the value of the ctrl
-      nvme-rdma: assign completion vector correctly
-
-Sagi Grimberg (3):
-      nvme: fix possible deadlock when I/O is blocked
-      nvme: don't protect ns mutation with ns->head->lock
-      nvme-multipath: fix bogus request queue reference put
-
- block/bio-integrity.c         | 23 +++++++++++++---------
- drivers/nvme/host/core.c      |  2 +-
- drivers/nvme/host/multipath.c | 46 +++++++++++++++++++++++++++----------------
- drivers/nvme/host/nvme.h      |  2 ++
- drivers/nvme/host/pci.c       |  6 ++++--
- drivers/nvme/host/rdma.c      |  2 +-
- drivers/nvme/host/tcp.c       |  4 ++--
- drivers/nvme/target/loop.c    |  4 ++--
- 8 files changed, 55 insertions(+), 34 deletions(-)
-
--- 
-Jens Axboe
-
+------LJmyoXw8O9.Ba._wAgamKaSQQ_oizdakYzSktnuewvRJuSc2=_9f048_--
