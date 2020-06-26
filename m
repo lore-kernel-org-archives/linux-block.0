@@ -2,268 +2,228 @@ Return-Path: <SRS0=+Sn3=AH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3814DC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 06:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF844C433E1
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 06:37:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04F742080C
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 06:35:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 92EBF207E8
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 06:37:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kcAbzrWm";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ED+3VEIj"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="uXSuWRwk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727987AbgFZGfM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jun 2020 02:35:12 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:17298 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726450AbgFZGfL (ORCPT
+        id S1728410AbgFZGhW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jun 2020 02:37:22 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:37234 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727016AbgFZGhV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jun 2020 02:35:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1593153310; x=1624689310;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=nenBgJ85kiE1NSwuuY5tGi7d+zGBN5vfMCBgLCyTfwU=;
-  b=kcAbzrWmf6yOyQyEDqd+WBFOz0QqHjY3kqgUn3SjWmXxKWF6xLczrLx+
-   w0ZyRjz81Zf6Bl6/Bp808i6ka6NyTzKfjm5wGGpXAwrqOjPrjWGgGDiao
-   mYhY9HSDZI3f/bLtk3GBsDKvUiRLidbt6QQyd7J+hdBmY19D2AvU9nIaM
-   M1/tLN56SvYYvEPev5QAKoHd4/78Y7C1c5HNVZ8kTRxQmIJcvpJgvnQSc
-   NX60LCYRzg1b0D3wGR1RXxHQN5dvf5OX2WZHqFsNorM3AjMrba2MjlCGE
-   zSB6rip5EZqkChD2NJ4sVFwTNzgPmUWIqlx0hoIAXM+yxHUGOi21EXjaP
-   A==;
-IronPort-SDR: jxSQCpoOd8u5bD0HhZxRvVJXdbUtjQ9Y6D9uHx3kcejNAw3IQ7s6sprrzY2XWuSVeccqdA486X
- XHzVAEiR3IwCeJLBEi3Vj6RJXSkDLZMyAoiEyePeurQsQFNYuZ/guqSHMMaCzXtv6eHCaSsRm+
- zVjqeqnIy8q/X8iRdJaPtc4cK3PDLqLDX6QGaX8J1f9TqLq2AevviMp38d/fU4XARDM+DDnuZz
- u+DQLnGd7aeH40baTG4DMK16LdssHRgIswR8atjz+v+N1CMlQDVZyzfKlVjo6+LwL2LkPgjaA7
- MkE=
-X-IronPort-AV: E=Sophos;i="5.75,282,1589212800"; 
-   d="scan'208";a="145304675"
-Received: from mail-bn3nam04lp2050.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.50])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jun 2020 14:35:09 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ehqR7aW9k9c6OG6oZ2Ltjp8nBEz/K+MGaXTp+4SBON0hFgq5wesRdACzk+RlZRUFaOYX32c5b6nqjHxhhnVWtsPYARIvKEKX8GDEmLO0PUWMe4dMW/DvyPIwhiFEK2IVXT3poyhRExJotOcnPiSrDqv07v/lcNXrikL/1InH0zGyOT0RYbKJY8IPgN203JiUaBq92TFmBgKZ9burjF4sswopvHWa0CJz8JoxK3TCjrhNBgUpIdEuapNO8Hrp+rj+ALhPyq4dzqMEJSFqeBQOFn55L1XRYY68+ATcq46yu7ijjmwQaCiJ4+XuXD8JBxTZ9ZSRT9UZ4T3EVRuWlatK5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PPMxpk4kL39xXoMHXmQplWk468yKOEPc0dDIJMCYLsU=;
- b=XKP5hIDiQZ8munr0UeWSu01ker2aidPVZ1LlaX1+o49ee7ngxZMjPfKoXypFisvlcUMrRkUH8/ceFpUtXU26carMmLwMHttlFNT9y/rd9ZTj+oNa20/6L8S9Th16Z5cctWSwnIFpo8VAKUHXiLrOPpEhH3BS06KjkE7w4kGx3/zMvU3/+oaREZxn0zwnOYlRyebz+dGMVleB91FsAFTk+js8aDEH+w3VFbUfMJc3VfAdNd8VitCr3rBZjibyPXsZhEENuGdlsA/oJ34twvYVNwF1wE8SseQ4azfTsIXJfgdSbIhgpdWBxOktC93HcrlVecsrmceFmttzrE1f1vTtfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PPMxpk4kL39xXoMHXmQplWk468yKOEPc0dDIJMCYLsU=;
- b=ED+3VEIj8jBasK0pFABtnbPuiqbdQhTIO9aXzowLpPn9qbUhJ8TL2uXUdM8422VquluMAXqnpyaO0W0CYjIqOfRYepuwSCk/GzFatq0a07n5R39GvE10XyfHq5eMzyUk+cotXXfC7PiI16cOYhDzxcb/dinC+BBQUwPoAl/EnzM=
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY1PR04MB2316.namprd04.prod.outlook.com (2a01:111:e400:c618::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.23; Fri, 26 Jun
- 2020 06:35:05 +0000
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::c593:f271:eebe:ac7]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::c593:f271:eebe:ac7%9]) with mapi id 15.20.3131.024; Fri, 26 Jun 2020
- 06:35:05 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier@javigon.com>
-CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org" <kbusch@kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
+        Fri, 26 Jun 2020 02:37:21 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20200626063718euoutp016bfa309a8b6b7c4fbfe3c2db5d6feb85~cBJyVF8-K2956929569euoutp01n
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 06:37:18 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20200626063718euoutp016bfa309a8b6b7c4fbfe3c2db5d6feb85~cBJyVF8-K2956929569euoutp01n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1593153438;
+        bh=DnZOg1QeKK+sJhQGxvuZAvm5j0AMbgRSaX4I7sGDGTM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=uXSuWRwkZc1FAkdAffl68KGNWoOYnh0gdLbalwLbGP0MY93c5B/JGodeexQF40QI+
+         8qqvJ6Xo4eqsbbIgx89OkSGQvyoi/W4P1NXS4/HIgyjiuP9LaFBNh2cRwr1/EnHjs2
+         zqBSFB+sZLGjIT6aVHJbVl+0qVpZA0KutxvaQBY4=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20200626063718eucas1p2a84fa9bbca86171bcbd8de1083067ebc~cBJyCn_ix1479414794eucas1p2t;
+        Fri, 26 Jun 2020 06:37:18 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id F4.0D.06318.E9795FE5; Fri, 26
+        Jun 2020 07:37:18 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20200626063718eucas1p1748b6bfd48ebf2ed3ef42a2bea39572e~cBJxvLHOk2881428814eucas1p1l;
+        Fri, 26 Jun 2020 06:37:18 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200626063718eusmtrp15400fa0e3ac6e179d02120ef7bc31ee6~cBJxpa0H72146421464eusmtrp1U;
+        Fri, 26 Jun 2020 06:37:18 +0000 (GMT)
+X-AuditID: cbfec7f5-371ff700000018ae-37-5ef5979e13ff
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 10.B8.06314.D9795FE5; Fri, 26
+        Jun 2020 07:37:17 +0100 (BST)
+Received: from localhost (unknown [106.210.248.142]) by eusmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20200626063717eusmtip10454345fafa276d58565a934f8d16afa~cBJxdPiAB2513525135eusmtip1W;
+        Fri, 26 Jun 2020 06:37:17 +0000 (GMT)
+Date:   Fri, 26 Jun 2020 08:37:17 +0200
+From:   "javier.gonz@samsung.com" <javier.gonz@samsung.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>,
         "axboe@kernel.dk" <axboe@kernel.dk>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH 2/6] block: add support for selecting all zones
-Thread-Topic: [PATCH 2/6] block: add support for selecting all zones
-Thread-Index: AQHWSutRrDHAt43U1UKTuwgck7oDsA==
-Date:   Fri, 26 Jun 2020 06:35:05 +0000
-Message-ID: <CY4PR04MB37515E78D85933EAFE159B0AE7930@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <20200625122152.17359-1-javier@javigon.com>
- <20200625122152.17359-3-javier@javigon.com>
- <CY4PR04MB375143652B4BA25F1680A91EE7930@CY4PR04MB3751.namprd04.prod.outlook.com>
- <20200626055852.ec6bfvx7mj3ucz5r@mpHalley.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: javigon.com; dkim=none (message not signed)
- header.d=none;javigon.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.182.57]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 04434c77-a80a-49fb-f065-08d8199b102e
-x-ms-traffictypediagnostic: CY1PR04MB2316:
-x-microsoft-antispam-prvs: <CY1PR04MB2316AFE477288E825088570DE7930@CY1PR04MB2316.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0446F0FCE1
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cgAA9Pwa0QbHpISYslt35uWSJCE4VbqGD9ebaVphacL51rql3H5CFCVCtpPuNcBjG8WqKNDsitojK+QxgXWMoQKlEufkZA7GKUP8euxdBTrBxlzLunUKBlPpQceS3r/+H6cqa5BhSWjAPIXSi9tUUrNVtrOBpWKovvlkXus9r03Gbsv/Vd8a+C91sxhsV/LiVCX5UpK6h+DAgVCWvKtfiZmBqwmPZj9pgzYvq/OfLfLqbS+6lGeueyo9q7A+s2sOLe+Hsun4DqC2ms9jbvUiFRryZarC1fumKcHODE5CRjuYZOvmWIWseekZ48T93+IM
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(346002)(136003)(366004)(376002)(39860400002)(6916009)(53546011)(8676002)(86362001)(66556008)(71200400001)(66446008)(316002)(64756008)(66946007)(66476007)(66574015)(4326008)(6506007)(2906002)(83380400001)(7696005)(26005)(8936002)(186003)(33656002)(7416002)(54906003)(478600001)(9686003)(76116006)(5660300002)(55016002)(91956017)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: YJwP5Nqpkwe1LDFQR5FHQLo81ah7o46MYVRneGxtut2d4zew0RwTSlCLlWKkAkBfNYk6Ud4/QIA09K5Kjn8cqWSX58gdtYE+7c3sM30r/G4vyVeGP8uWYer1ifpYMvE3KxGC5GFGXxKrMhN4FiXakF+vFWxyUHOaup19k+CUpx2bqqsCt9nYnRmbnP6K1K5O1zEcQ2ed3olaD2XwimOFm7ianIoljlT5imnIJvU1D720j9Pf+kugMewbXX8fRM+r1XruQAr+vHLM3UF4RzzNdbDqUtJyxpz/gCMVX5pT0adHy5rPjyycWToYorZs9RKaCbGDHEjE3WnFFSFCpQUSTvbhA3ML/9xhv9mgEAkTq0dkU0Qev4ph3TzeyMzYdKJSps3UDJ9hGc5cYahZO0h46XCvBU5MAGVLNWSb00HSGIVnwLxel+WK7U1fy1QFc2E287xhjawRw3K2PqdZL6+o9uu6vNtuo2fsenGQD2xsb7/SwSnWtVwUl/nrFZiVDhAz
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        "asml.silence@gmail.com" <asml.silence@gmail.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "mb@lightnvm.io" <mb@lightnvm.io>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>
+Subject: Re: [PATCH v2 0/2] zone-append support in io-uring and aio
+Message-ID: <20200626063717.4dhsydpcnezjhj3o@mpHalley.localdomain>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04434c77-a80a-49fb-f065-08d8199b102e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2020 06:35:05.3782
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6C7upWGAuvCz5KLhqGKxM4wmQK2ZV8i/fpRw5dh1WZVVo26PJGUAmbnE93gPH7Foi+Dw2wfhAOOnTQXZawr/7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2316
+In-Reply-To: <CY4PR04MB37511E3B19035012A143D006E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUhTURiAObsfu7NW11n4lpEwCcrIsiKvpX1H90dB4D9Ba+ZtSk7H1iwT
+        QSy11KazyFrObFiOOcymWInaGjab00VYYoEgWJHWLD8WM221eQ3897wfz3vOezgUJhkj1lOZ
+        2Rc4VbYsS0qG4O2OOfe2uhpv6o6f9nCm1tyOmKaRSpIp87fhTHHpLwHjqjIKmMliN868+ush
+        mVu3ixDT9XEr09nlxJnBjlqSMT3twZn2+fsY883nJJk3f3qJg6vZ5/oRIdtqimYHBzSsdbpa
+        yJa/9yFW22ZG7Ix1I1tqKxew1k8ewSlRckhCOpeVmcuptu8/E5Ixaj6rrN98qefOQ1SIvkWW
+        IREF9G4YvTKJl6EQSkKbEHQ6dGSwIKFnEUz9OMcXZhD0236j/0bJE4uQLzQiaBqeFfDBOIJC
+        c/GijtObwNJQKgwySceD7+NbLMhr6Gh41D1JBAWMthFQMja02BRGH4GBaRceZDF9GO7pvSTP
+        oeC8+2kxL6JT4MVLw6IM9JQQ5vs+CPk7HQXtvHWJw2Cit22JN4DrZgXOC1cCS1jeYXxQgWCh
+        2hTYiAoE+0DbnxUUMDoTjAavgJcPQZv/O8m3rIJhTyjfsgqq22swPi2GayUSHjdBnXcFL0ZA
+        d2EnyTMLQzrd0vtOIHDcMKAqFKlftpp+2cE874XrP4sIfWAsFpjV6Kd43AKPO7bXI8KMwjmN
+        WiHn1LuyuYsxaplCrcmWx5zNUVhR4Ou5/L3eZ6h7Ic2OaApJV4ptutlUCSHLVecp7AgoTLpG
+        fHjAlSoRp8vyLnOqnNMqTRantqMICpeGi3cZx1MktFx2gTvPcUpO9b8qoETrC5Hu5LovcsEJ
+        wwG9LP6mxtbs5zyxBRbj8PjxDy19daVf4ojjUY0NP24rE42ZGBU35MgXpQw/S3q41qv9erXr
+        c6vTfqhVuYd7vS55LjQp78iZyoRqTfH3irX4bkMi0dNScKxCO0hJPjco3b4Jf/4D9+yl5r4Z
+        MmpMkbzT6pxMU0lxdYYsNhpTqWX/AE+ZHjR2AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrIIsWRmVeSWpSXmKPExsVy+t/xu7pzp3+NM2juM7eYs2obo8Xqu/1s
+        Fl3/trBYtLZ/Y7I4PWERk8W71nMsFkf/v2WzmDKtidFi7y1tiz17T7JYXN41h81ixfYjLBbb
+        fs9ntnj94ySbxfm/x1kd+D12zrrL7rF5hZbH5bOlHps+TWL36L76g9Gjb8sqRo/Pm+Q82g90
+        M3lsevKWKYAzSs+mKL+0JFUhI7+4xFYp2tDCSM/Q0kLPyMRSz9DYPNbKyFRJ384mJTUnsyy1
+        SN8uQS/j7eb5TAXnVStev9vN1sC4RbaLkZNDQsBEom3jGvYuRi4OIYGljBLz13UBORxACWmJ
+        y19UIWqEJf5c62KDqHnOKPHt9xlGkASLgKrEmiXt7CA2m4ClxI9bF5lBbBEBLYll+96xgjQw
+        CxxjlZhyZhJYQljAWeLsp9MsIDavgJPE7Flfoaa+YpR48HsiVEJQ4uTMJ2A2s4CZxLzND5lB
+        LmIGumj5Pw6QMKdArMT+g3NZJzAKzELSMQtJxyyEjgWMzKsYRVJLi3PTc4sN9YoTc4tL89L1
+        kvNzNzECo3PbsZ+bdzBe2hh8iFGAg1GJh/fAxC9xQqyJZcWVuYcYJTiYlUR4nc6ejhPiTUms
+        rEotyo8vKs1JLT7EaAoMgInMUqLJ+cDEkVcSb2hqaG5haWhubG5sZqEkztshcDBGSCA9sSQ1
+        OzW1ILUIpo+Jg1OqgTFb+JvUQvurfxXk5t3+IbY+RKLX9pVuk3j8ld/dV9yn1U6//SetIi0x
+        vF946a7vh2efi2L5q71NjFnyB4+61OUj0mk2dvNUN9pp/qv7+G3Tx/SSluWGfc82Rt5O09rW
+        327ybvXEczP+dpSVfAr4INeekKisVf5ZouudUVb33uhDuqUT1N6yPFBiKc5INNRiLipOBADx
+        VMTW5AIAAA==
+X-CMS-MailID: 20200626063718eucas1p1748b6bfd48ebf2ed3ef42a2bea39572e
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----S-rmtJXel8VGy5BRhJETGRpDn59uh3J63auyVoMdzEU6LuX2=_11cc87_"
+X-RootMTR: 20200625171829epcas5p268486a0780571edb4999fc7b3caab602
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200625171829epcas5p268486a0780571edb4999fc7b3caab602
+References: <CGME20200625171829epcas5p268486a0780571edb4999fc7b3caab602@epcas5p2.samsung.com>
+        <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
+        <CY4PR04MB37511E3B19035012A143D006E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/06/26 14:58, Javier Gonz=E1lez wrote:=0A=
-> On 26.06.2020 01:27, Damien Le Moal wrote:=0A=
->> On 2020/06/25 21:22, Javier Gonz=E1lez wrote:=0A=
->>> From: Javier Gonz=E1lez <javier.gonz@samsung.com>=0A=
->>>=0A=
->>> Add flag to allow selecting all zones on a single zone management=0A=
->>> operation=0A=
->>>=0A=
->>> Signed-off-by: Javier Gonz=E1lez <javier.gonz@samsung.com>=0A=
->>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>=0A=
->>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>=0A=
->>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>=0A=
->>> ---=0A=
->>>  block/blk-zoned.c             | 3 +++=0A=
->>>  include/linux/blk_types.h     | 3 ++-=0A=
->>>  include/uapi/linux/blkzoned.h | 9 +++++++++=0A=
->>>  3 files changed, 14 insertions(+), 1 deletion(-)=0A=
->>>=0A=
->>> diff --git a/block/blk-zoned.c b/block/blk-zoned.c=0A=
->>> index e87c60004dc5..29194388a1bb 100644=0A=
->>> --- a/block/blk-zoned.c=0A=
->>> +++ b/block/blk-zoned.c=0A=
->>> @@ -420,6 +420,9 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bde=
-v, fmode_t mode,=0A=
->>>  		return -ENOTTY;=0A=
->>>  	}=0A=
->>>=0A=
->>> +	if (zmgmt.flags & BLK_ZONE_SELECT_ALL)=0A=
->>> +		op |=3D REQ_ZONE_ALL;=0A=
->>> +=0A=
->>>  	return blkdev_zone_mgmt(bdev, op, zmgmt.sector, zmgmt.nr_sectors,=0A=
->>>  				GFP_KERNEL);=0A=
->>>  }=0A=
->>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h=0A=
->>> index ccb895f911b1..16b57fb2b99c 100644=0A=
->>> --- a/include/linux/blk_types.h=0A=
->>> +++ b/include/linux/blk_types.h=0A=
->>> @@ -351,6 +351,7 @@ enum req_flag_bits {=0A=
->>>  	 * work item to avoid such priority inversions.=0A=
->>>  	 */=0A=
->>>  	__REQ_CGROUP_PUNT,=0A=
->>> +	__REQ_ZONE_ALL,		/* apply zone operation to all zones */=0A=
->>>=0A=
->>>  	/* command specific flags for REQ_OP_WRITE_ZEROES: */=0A=
->>>  	__REQ_NOUNMAP,		/* do not free blocks when zeroing */=0A=
->>> @@ -378,7 +379,7 @@ enum req_flag_bits {=0A=
->>>  #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)=0A=
->>>  #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)=0A=
->>>  #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)=0A=
->>> -=0A=
->>> +#define REQ_ZONE_ALL		(1ULL << __REQ_ZONE_ALL)=0A=
->>>  #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)=0A=
->>>  #define REQ_HIPRI		(1ULL << __REQ_HIPRI)=0A=
->>>=0A=
->>> diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzone=
-d.h=0A=
->>> index 07b5fde21d9f..a8c89fe58f97 100644=0A=
->>> --- a/include/uapi/linux/blkzoned.h=0A=
->>> +++ b/include/uapi/linux/blkzoned.h=0A=
->>> @@ -157,6 +157,15 @@ enum blk_zone_action {=0A=
->>>  	BLK_ZONE_MGMT_RESET	=3D 0x4,=0A=
->>>  };=0A=
->>>=0A=
->>> +/**=0A=
->>> + * enum blk_zone_mgmt_flags - Flags for blk_zone_mgmt=0A=
->>> + *=0A=
->>> + * BLK_ZONE_SELECT_ALL: Select all zones for current zone action=0A=
->>> + */=0A=
->>> +enum blk_zone_mgmt_flags {=0A=
->>> +	BLK_ZONE_SELECT_ALL	=3D 1 << 0,=0A=
->>> +};=0A=
->>> +=0A=
->>>  /**=0A=
->>>   * struct blk_zone_mgmt - Extended zoned management=0A=
->>>   *=0A=
->>>=0A=
->>=0A=
->> NACK.=0A=
->>=0A=
->> Details:=0A=
->> 1) REQ_OP_ZONE_RESET together with REQ_ZONE_ALL is the same as=0A=
->> REQ_OP_ZONE_RESET_ALL, isn't it ? You are duplicating a functionality th=
-at=0A=
->> already exists.=0A=
->> 2) The patch introduces REQ_ZONE_ALL at the block layer only without def=
-ining=0A=
->> how it ties into SCSI and NVMe driver use of it. Is REQ_ZONE_ALL indicat=
-ing that=0A=
->> the zone management commands are to be executed with the ALL bit set ? I=
-f yes,=0A=
->> that will break device-mapper. See the special code for handling=0A=
->> REQ_OP_ZONE_RESET_ALL. That code is in place for a reason: the target bl=
-ock=0A=
->> device may not be an entire physical device. In that case, applying a zo=
-ne=0A=
->> management command to all zones of the physical drive is wrong.=0A=
->> 3) REQ_ZONE_ALL seems completely equivalent to specifying a sector range=
- of [0=0A=
->> .. drive capacity]. So what is the point ? The current interface handles=
- that.=0A=
->> That is how we chose between REQ_OP_ZONE_RESET and REQ_OP_ZONE_RESET_ALL=
- right now.=0A=
->> 4) Without any in-kernel user, I do not see the point. And for applicati=
-ons, I=0A=
->> do not see any good use case for doing open all, close all, offline all =
-or=0A=
->> finish all. If you have any such good use case, please elaborate.=0A=
->>=0A=
-> =0A=
-> The main use if reset all, but without having to look through all zones,=
-=0A=
-> as it imposes an overhead when we have a large number of zones. Having=0A=
-> the possibility to offload it to HW is more efficient.=0A=
-> =0A=
-> I had not thought about the device mapper use case. Would it be an=0A=
-> option to translate this into REQ_OP_ZONE_RESET_ALL when we have a=0A=
-> device mapper (or any other case where this might break) and then leave=
-=0A=
-> the bit go to the driver if it applies to the whole device?=0A=
-=0A=
-But REQ_OP_ZONE_RESET_ALL is already implemented and supported and will res=
-et=0A=
-all zones of a drive using a single command if the ioctl is called for the=
-=0A=
-entire sector range of a physical drive. For device mapper with a partial=
-=0A=
-mapping, the per zone reset loop will be used. If you have no other use cas=
-e for=0A=
-the REQ_ZONE_ALL flag, what is the point here ? Reset is already optimized =
-for=0A=
-the all zones case=0A=
-=0A=
-> =0A=
-> Javier=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+------S-rmtJXel8VGy5BRhJETGRpDn59uh3J63auyVoMdzEU6LuX2=_11cc87_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+
+On 26.06.2020 03:11, Damien Le Moal wrote:
+>On 2020/06/26 2:18, Kanchan Joshi wrote:
+>> [Revised as per feedback from Damien, Pavel, Jens, Christoph, Matias, Wilcox]
+>>
+>> This patchset enables zone-append using io-uring/linux-aio, on block IO path.
+>> Purpose is to provide zone-append consumption ability to applications which are
+>> using zoned-block-device directly.
+>>
+>> The application may specify RWF_ZONE_APPEND flag with write when it wants to
+>> send zone-append. RWF_* flags work with a certain subset of APIs e.g. uring,
+>> aio, and pwritev2. An error is reported if zone-append is requested using
+>> pwritev2. It is not in the scope of this patchset to support pwritev2 or any
+>> other sync write API for reasons described later.
+>>
+>> Zone-append completion result --->
+>> With zone-append, where write took place can only be known after completion.
+>> So apart from usual return value of write, additional mean is needed to obtain
+>> the actual written location.
+>>
+>> In aio, this is returned to application using res2 field of io_event -
+>>
+>> struct io_event {
+>>         __u64           data;           /* the data field from the iocb */
+>>         __u64           obj;            /* what iocb this event came from */
+>>         __s64           res;            /* result code for this event */
+>>         __s64           res2;           /* secondary result */
+>> };
+>>
+>> In io-uring, cqe->flags is repurposed for zone-append result.
+>>
+>> struct io_uring_cqe {
+>>         __u64   user_data;      /* sqe->data submission passed back */
+>>         __s32   res;            /* result code for this event */
+>>         __u32   flags;
+>> };
+>>
+>> Since 32 bit flags is not sufficient, we choose to return zone-relative offset
+>> in sector/512b units. This can cover zone-size represented by chunk_sectors.
+>> Applications will have the trouble to combine this with zone start to know
+>> disk-relative offset. But if more bits are obtained by pulling from res field
+>> that too would compel application to interpret res field differently, and it
+>> seems more painstaking than the former option.
+>> To keep uniformity, even with aio, zone-relative offset is returned.
+>
+>I am really not a fan of this, to say the least. The input is byte offset, the
+>output is 512B relative sector count... Arg... We really cannot do better than
+>that ?
+>
+>At the very least, byte relative offset ? The main reason is that this is
+>_somewhat_ acceptable for raw block device accesses since the "sector"
+>abstraction has a clear meaning, but once we add iomap/zonefs async zone append
+>support, we really will want to have byte unit as the interface is regular
+>files, not block device file. We could argue that 512B sector unit is still
+>around even for files (e.g. block counts in file stat). Bu the different unit
+>for input and output of one operation is really ugly. This is not nice for the user.
+>
+
+You can refer to the discussion with Jens, Pavel and Alex on the uring
+interface. With the bits we have and considering the maximun zone size
+supported, there is no space for a byte relative offset. We can take
+some bits from cqe->res, but we were afraid this is not very
+future-proof. Do you have a better idea?
+
+
+>>
+>> Append using io_uring fixed-buffer --->
+>> This is flagged as not-supported at the moment. Reason being, for fixed-buffer
+>> io-uring sends iov_iter of bvec type. But current append-infra in block-layer
+>> does not support such iov_iter.
+>>
+>> Block IO vs File IO --->
+>> For now, the user zone-append interface is supported only for zoned-block-device.
+>> Regular files/block-devices are not supported. Regular file-system (e.g. F2FS)
+>> will not need this anyway, because zone peculiarities are abstracted within FS.
+>> At this point, ZoneFS also likes to use append implicitly rather than explicitly.
+>> But if/when ZoneFS starts supporting explicit/on-demand zone-append, the check
+>> allowing-only-block-device should be changed.
+>
+>Sure, but I think the interface is still a problem. I am not super happy about
+>the 512B sector unit. Zonefs will be the only file system that will be impacted
+>since other normal POSIX file system will not have zone append interface for
+>users. So this is a limited problem. Still, even for raw block device files
+>accesses, POSIX system calls use Byte unit everywhere. Let's try to use that.
+>
+>For aio, it is easy since res2 is unsigned long long. For io_uring, as discussed
+>already, we can still 8 bits from the cqe res. All  you need is to add a small
+>helper function in userspace iouring.h to simplify the work of the application
+>to get that result.
+
+Ok. See above. We can do this.
+
+Jens: Do you see this as a problem in the future?
+
+[...]
+
+Javier
+
+------S-rmtJXel8VGy5BRhJETGRpDn59uh3J63auyVoMdzEU6LuX2=_11cc87_
+Content-Type: text/plain; charset="utf-8"
+
+
+------S-rmtJXel8VGy5BRhJETGRpDn59uh3J63auyVoMdzEU6LuX2=_11cc87_--
