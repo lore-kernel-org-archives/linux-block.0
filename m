@@ -2,65 +2,74 @@ Return-Path: <SRS0=+Sn3=AH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D420C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 19:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA18C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 19:40:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A97E2070A
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 19:29:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0695A206C3
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 19:40:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBz+3CU2"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Wn8OdBAD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725792AbgFZT3A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jun 2020 15:29:00 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52412 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725768AbgFZT27 (ORCPT
+        id S1725852AbgFZTkt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jun 2020 15:40:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725838AbgFZTkt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jun 2020 15:28:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593199738;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Jcm1BDWWyjIRk1f7YdEql8B5bvJaP4t/Th5WMi2ZGog=;
-        b=VBz+3CU2tw5Or7CvuUs/QjdUzlUjoGGNIlxAniPuGydvCPGRERTTtJNBG3z5oTsoRIsYc3
-        KulklFlT141nojxA3GCrwcnjgWDA4V8jbEEVvkIz5AOy1rJBwmAyEZclD+pJ1Dz5D2EaQO
-        T9KNQe+hYSfS8JQdTXEXh9j96hbcLbI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-eLtdpE8vPUKGAJNIX4H2Kw-1; Fri, 26 Jun 2020 15:28:53 -0400
-X-MC-Unique: eLtdpE8vPUKGAJNIX4H2Kw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EF8D800D5C;
-        Fri, 26 Jun 2020 19:28:51 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AF578202D;
-        Fri, 26 Jun 2020 19:28:48 +0000 (UTC)
-Date:   Fri, 26 Jun 2020 15:28:47 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Hou Tao <houtao1@huawei.com>, Huaisheng Ye <yehs1@lenovo.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [git pull] device mapper fixes for 5.8-rc3
-Message-ID: <20200626192847.GA11459@redhat.com>
+        Fri, 26 Jun 2020 15:40:49 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 197D4C03E979
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 12:40:49 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id l63so5347499pge.12
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 12:40:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=b6bWTKBCohzXknciIdj4/TB9JpdLvGJ+V/Qc2SJ7UpY=;
+        b=Wn8OdBADrajOuELUVHBDDa1Jd6u4xaWwS5Wppyc6vatdMtffU23WLuhPpfT/g7xmVs
+         s4wVDyaNUx68vaGc7R3764vT/JUe+MusQM72twD/N62bze66jTU8Yzu0Zg9NxgS8gUL6
+         ApTgdra9y3XMEjp297Ky5y/vCdtmVw2b416LTsdObbfSS1b7iO/wcYyF0OAmcslY6/vR
+         gwOEugDICm5iau93ccxKAu2/3Suoaxk5gDA19yhehNeJ9CArLs7ZTKKqklrJ4N2Zbtnx
+         RmxdAyL0AxMwg5NRxFAVJS3H2wLAb5eriRkF6mMKhmkl6GIFLutVHJtusmB7mdvwWbNQ
+         A6Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=b6bWTKBCohzXknciIdj4/TB9JpdLvGJ+V/Qc2SJ7UpY=;
+        b=elJG5pIHM490Iqf1gNjxNX+1u/44DZ9R0xYvjp6BmsB9ZAvsXitZ2ApjGVkII9u4M8
+         ufbrE3aNRJt0gMVRXtVx3l5kUyv7w/kGMOq2lWqMGBnYA6BXDuU+4lDibdRtJDPxHXwU
+         tk8wq4vdsuG29OXIlUDeH92kOwks4nHsX7mn+okxczuyz3mW+EJ5p8eBfVYUPABWtGJ6
+         HL82dQwQOIqEZ682smIBZIZxXmfPnaTAnuAcyqbraTxar45Q4lsJ5doqASZvcuIMu9Jo
+         90hm/y+IUnGqCsBotW3F/hMtYS0L3bYwGSn0XTL7rM6WfhtuBECPBplkvpoT2+DTQ6S8
+         XJKQ==
+X-Gm-Message-State: AOAM533p9TU5+y8rzJCTsAa7o4BTuIaShhvHdVEJo7b0UCVE2g7dKpkZ
+        qK7brXNEmDxHZXZRfqCz4q4BEJykFuHBAg==
+X-Google-Smtp-Source: ABdhPJyKmIfLO3Pjfo+GY7TRdyK9p7Kb0dTJR6RFywiDFAvXgR0cZDsJxeDGJpXI8DDKo2q43Wm8Gw==
+X-Received: by 2002:a63:d318:: with SMTP id b24mr223683pgg.403.1593200448201;
+        Fri, 26 Jun 2020 12:40:48 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id o1sm28515896pfu.70.2020.06.26.12.40.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jun 2020 12:40:47 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.8-rc3
+Message-ID: <cb6043bd-9ab0-0d3f-af78-cf9b72f10b20@kernel.dk>
+Date:   Fri, 26 Jun 2020 13:40:46 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -68,66 +77,68 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Linus,
 
-The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
+Here's a set of changes that should go into the current release:
 
-  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
+- NVMe pull request from Christoph:
+	- multipath deadlock fixes (Anton)
+	- NUMA fixes (Max)
+	- RDMA completion vector fix (Max)
+	- IO deadlock fix (Sagi)
+	- multipath reference fix (Sagi)
+	- NS mutation fix (Sagi)
+- Use right allocator when freeing bip in error path (Chengguang)
+
+Please pull!
+
+The following changes since commit 3373a3461aa15b7f9a871fa4cb2c9ef21ac20b47:
+
+  block: make function 'kill_bdev' static (2020-06-18 09:24:35 -0600)
 
 are available in the Git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.8/dm-fixes
+  git://git.kernel.dk/linux-block.git tags/block-5.8-2020-06-26
 
-for you to fetch changes up to d35bd764e6899a7bea71958f08d16cea5bfa1919:
+for you to fetch changes up to 1b52671d79c4b9fdc91a85f99f69b7c91a3b1b71:
 
-  dm writecache: add cond_resched to loop in persistent_memory_claim() (2020-06-19 12:32:24 -0400)
-
-Please pull, thanks!
-Mike
+  Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8 (2020-06-25 12:57:17 -0600)
 
 ----------------------------------------------------------------
-- Quite a few DM zoned target fixes and a Zone append fix in DM core.
-  Considering the amount of dm-zoned changes that went in during the
-  5.8 merge window these fixes are not that surprising.
-
-- A few DM writecache target fixes.
-
-- A fix to Documentation index to include DM ebs target docs.
-
-- Small cleanup to use struct_size() in DM core's retrieve_deps().
+block-5.8-2020-06-26
 
 ----------------------------------------------------------------
-Damien Le Moal (2):
-      dm zoned: fix uninitialized pointer dereference
-      dm zoned: Fix random zone reclaim selection
+Anton Eidelman (2):
+      nvme-multipath: fix deadlock between ana_work and scan_work
+      nvme-multipath: fix deadlock due to head->lock
 
-Gustavo A. R. Silva (1):
-      dm ioctl: use struct_size() helper in retrieve_deps()
+Chengguang Xu (1):
+      block: release bip in a right way in error path
 
-Hou Tao (1):
-      dm zoned: assign max_io_len correctly
+Jens Axboe (1):
+      Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8
 
-Huaisheng Ye (2):
-      dm writecache: correct uncommitted_block when discarding uncommitted entry
-      dm writecache: skip writecache_wait when using pmem mode
+Max Gurtovoy (6):
+      nvme: set initial value for controller's numa node
+      nvme-pci: override the value of the controller's numa node
+      nvme-pci: initialize tagset numa value to the value of the ctrl
+      nvme-tcp: initialize tagset numa value to the value of the ctrl
+      nvme-loop: initialize tagset numa value to the value of the ctrl
+      nvme-rdma: assign completion vector correctly
 
-Johannes Thumshirn (1):
-      dm: update original bio sector on Zone Append
+Sagi Grimberg (3):
+      nvme: fix possible deadlock when I/O is blocked
+      nvme: don't protect ns mutation with ns->head->lock
+      nvme-multipath: fix bogus request queue reference put
 
-Mauro Carvalho Chehab (1):
-      docs: device-mapper: add dm-ebs.rst to an index file
+ block/bio-integrity.c         | 23 +++++++++++++---------
+ drivers/nvme/host/core.c      |  2 +-
+ drivers/nvme/host/multipath.c | 46 +++++++++++++++++++++++++++----------------
+ drivers/nvme/host/nvme.h      |  2 ++
+ drivers/nvme/host/pci.c       |  6 ++++--
+ drivers/nvme/host/rdma.c      |  2 +-
+ drivers/nvme/host/tcp.c       |  4 ++--
+ drivers/nvme/target/loop.c    |  4 ++--
+ 8 files changed, 55 insertions(+), 34 deletions(-)
 
-Mikulas Patocka (1):
-      dm writecache: add cond_resched to loop in persistent_memory_claim()
-
-Shin'ichiro Kawasaki (2):
-      dm zoned: Fix metadata zone size check
-      dm zoned: Fix reclaim zone selection
-
- Documentation/admin-guide/device-mapper/index.rst |  1 +
- drivers/md/dm-ioctl.c                             |  2 +-
- drivers/md/dm-writecache.c                        | 10 ++++--
- drivers/md/dm-zoned-metadata.c                    | 42 +++++++++++++++++------
- drivers/md/dm-zoned-reclaim.c                     |  4 +--
- drivers/md/dm-zoned-target.c                      |  2 +-
- drivers/md/dm.c                                   | 13 +++++++
- 7 files changed, 56 insertions(+), 18 deletions(-)
+-- 
+Jens Axboe
 
