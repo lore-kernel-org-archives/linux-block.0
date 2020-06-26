@@ -2,104 +2,132 @@ Return-Path: <SRS0=+Sn3=AH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4ECC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 16:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D420C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 19:29:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B70B20791
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 16:25:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A97E2070A
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 19:29:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="fo9I1T9u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBz+3CU2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726509AbgFZQZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jun 2020 12:25:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33002 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726041AbgFZQZJ (ORCPT
+        id S1725792AbgFZT3A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jun 2020 15:29:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52412 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725768AbgFZT27 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jun 2020 12:25:09 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BEBEC03E979
-        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 09:25:09 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id z17so7374846edr.9
-        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 09:25:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=JmQ1A0vGh7Xxt46gow4Vy8pp18yVO8i7HKAvWSMhmBk=;
-        b=fo9I1T9uGN5+4oNHkuOJ7sTyIW12MmMPzQeYW0gUtg+XfqwkgRXBDE7XKbsJn2TMCT
-         PnXdSvbPiqFcOUF0RtAI9HSNXGOIt0bgB5d/t7fBBARbJTH2tA8iCxFxqOELGm3vtZC1
-         EUoZtT3tohebDXXlAysvvFbXVjrDRPtEMoDRerqhtg5MpG/Lin+52/tRA4YtHT6y9aF7
-         j390lVVZ6Rk2c87ul62gYhHP8hOPdOZDPl9jKnPGOnBDNT4mehGTEwY1oJMQCa1D5FEK
-         iLksPKy81v8AZr9oC+imn6IT0fFszpWVuwNwiPYk+02U+3Ttz57rpwslcln7uHcuCK8C
-         xpfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=JmQ1A0vGh7Xxt46gow4Vy8pp18yVO8i7HKAvWSMhmBk=;
-        b=fggieE2q+fEot+PNEc3W9IcFVFO1RXB/rFaYro7ESTN0+Md4IBZiuXLkYwHQ9ti8GD
-         eHi0ASwePSdr0XCMbBEkBUSeYmyQIhmTHS3uPe7f+BM4xSo20d6jNC4ttIQ+4/SvR4Z7
-         54J5XSwkTFjPQwyBcZ5vGiwNYNn/+wROnM9j9XoQjWXw7YsinfWRRoRh7I2ZXTyxut5j
-         6BM5FltbsaY9GrDlXYMZbT4TyZ6nCwi77Hyh1jdDXhm/ZUkvpmYR/arKn8w38bjhxOqg
-         4r8FEBjhXWN/Tl9tJzewMDXNJXRLf4HTY6LG0GPmccjsPqM8nKsM4g7rhEmhlgmaMSzD
-         Ac5g==
-X-Gm-Message-State: AOAM5309gYmHGkH0f8ifAoYsR6wMzckRNvGEkju2hfpgUxTNL/vEtoDD
-        CNPFn2VOl4GaW1/olKNxFvIzPg==
-X-Google-Smtp-Source: ABdhPJxOEtUI8X/VPkdyKqw3YxFUm77242GA2tpY1LE/AGyLDwTVZDpZaZjuU3yr83xqTCR4wojHvA==
-X-Received: by 2002:a05:6402:1217:: with SMTP id c23mr4169817edw.270.1593188707993;
-        Fri, 26 Jun 2020 09:25:07 -0700 (PDT)
-Received: from [192.168.2.16] (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
-        by smtp.gmail.com with ESMTPSA id lv17sm9073093ejb.56.2020.06.26.09.25.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Jun 2020 09:25:07 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 4/6] block: introduce IOCTL to report dev properties
-Date:   Fri, 26 Jun 2020 18:25:06 +0200
-Message-Id: <E5BC0C5B-C99F-40E2-9C17-0AFEFCE2446A@javigon.com>
-References: <20200626155225.GA1774486@dhcp-10-100-145-180.wdl.wdc.com>
-Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, sagi@grimberg.me, axboe@kernel.dk,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-In-Reply-To: <20200626155225.GA1774486@dhcp-10-100-145-180.wdl.wdc.com>
-To:     Keith Busch <kbusch@kernel.org>
-X-Mailer: iPhone Mail (17F80)
+        Fri, 26 Jun 2020 15:28:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593199738;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=Jcm1BDWWyjIRk1f7YdEql8B5bvJaP4t/Th5WMi2ZGog=;
+        b=VBz+3CU2tw5Or7CvuUs/QjdUzlUjoGGNIlxAniPuGydvCPGRERTTtJNBG3z5oTsoRIsYc3
+        KulklFlT141nojxA3GCrwcnjgWDA4V8jbEEVvkIz5AOy1rJBwmAyEZclD+pJ1Dz5D2EaQO
+        T9KNQe+hYSfS8JQdTXEXh9j96hbcLbI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-eLtdpE8vPUKGAJNIX4H2Kw-1; Fri, 26 Jun 2020 15:28:53 -0400
+X-MC-Unique: eLtdpE8vPUKGAJNIX4H2Kw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EF8D800D5C;
+        Fri, 26 Jun 2020 19:28:51 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AF578202D;
+        Fri, 26 Jun 2020 19:28:48 +0000 (UTC)
+Date:   Fri, 26 Jun 2020 15:28:47 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Hou Tao <houtao1@huawei.com>, Huaisheng Ye <yehs1@lenovo.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [git pull] device mapper fixes for 5.8-rc3
+Message-ID: <20200626192847.GA11459@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Linus,
 
-> On 26 Jun 2020, at 17.52, Keith Busch <kbusch@kernel.org> wrote:
->=20
-> =EF=BB=BFOn Fri, Jun 26, 2020 at 08:28:28AM +0200, Javier Gonz=C3=A1lez wr=
-ote:
->>> On 26.06.2020 05:25, Keith Busch wrote:
->>> On Thu, Jun 25, 2020 at 09:42:48PM +0200, Javier Gonz=C3=A1lez wrote:
->>>> We can use nvme passthru, but this bypasses the zoned block abstraction=
-.
->>>> Why not representing ZNS features in the standard zoned block API?
->>>=20
->>> This looks too nvme zns specific to want the block layer in the middle.
->>> Just use the driver's passthrough interface.
->>=20
->> Ok. Is it OK with you to expose them in sysfs as Damien suggested?
->=20
-> sysfs sounds fine to me for some attributes (ex: mar/mor), but I don't
-> think every zns property warrants exposing through this interface. I
-> just don't want to corner driver maintenance into chasing every spec
-> field. If applications really want every last detail, they can get it
-> directly from the device without any kernel dependencies.
+The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
 
-Ok. Think Niklas sent a patch with mar/mor already. Will check which ones we=
- depend on in user space.=20=
+  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.8/dm-fixes
+
+for you to fetch changes up to d35bd764e6899a7bea71958f08d16cea5bfa1919:
+
+  dm writecache: add cond_resched to loop in persistent_memory_claim() (2020-06-19 12:32:24 -0400)
+
+Please pull, thanks!
+Mike
+
+----------------------------------------------------------------
+- Quite a few DM zoned target fixes and a Zone append fix in DM core.
+  Considering the amount of dm-zoned changes that went in during the
+  5.8 merge window these fixes are not that surprising.
+
+- A few DM writecache target fixes.
+
+- A fix to Documentation index to include DM ebs target docs.
+
+- Small cleanup to use struct_size() in DM core's retrieve_deps().
+
+----------------------------------------------------------------
+Damien Le Moal (2):
+      dm zoned: fix uninitialized pointer dereference
+      dm zoned: Fix random zone reclaim selection
+
+Gustavo A. R. Silva (1):
+      dm ioctl: use struct_size() helper in retrieve_deps()
+
+Hou Tao (1):
+      dm zoned: assign max_io_len correctly
+
+Huaisheng Ye (2):
+      dm writecache: correct uncommitted_block when discarding uncommitted entry
+      dm writecache: skip writecache_wait when using pmem mode
+
+Johannes Thumshirn (1):
+      dm: update original bio sector on Zone Append
+
+Mauro Carvalho Chehab (1):
+      docs: device-mapper: add dm-ebs.rst to an index file
+
+Mikulas Patocka (1):
+      dm writecache: add cond_resched to loop in persistent_memory_claim()
+
+Shin'ichiro Kawasaki (2):
+      dm zoned: Fix metadata zone size check
+      dm zoned: Fix reclaim zone selection
+
+ Documentation/admin-guide/device-mapper/index.rst |  1 +
+ drivers/md/dm-ioctl.c                             |  2 +-
+ drivers/md/dm-writecache.c                        | 10 ++++--
+ drivers/md/dm-zoned-metadata.c                    | 42 +++++++++++++++++------
+ drivers/md/dm-zoned-reclaim.c                     |  4 +--
+ drivers/md/dm-zoned-target.c                      |  2 +-
+ drivers/md/dm.c                                   | 13 +++++++
+ 7 files changed, 56 insertions(+), 18 deletions(-)
+
