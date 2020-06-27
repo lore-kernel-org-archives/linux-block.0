@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D62FDC433E0
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD5AC433DF
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B32B921473
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79A502137B
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lXKR3KOv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NllTbXB2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726401AbgF0Hcp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Jun 2020 03:32:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59336 "EHLO
+        id S1726161AbgF0Hcf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Jun 2020 03:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726394AbgF0Hco (ORCPT
+        with ESMTP id S1725994AbgF0Hce (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jun 2020 03:32:44 -0400
+        Sat, 27 Jun 2020 03:32:34 -0400
 Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 484C2C03E97A;
-        Sat, 27 Jun 2020 00:32:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C4BC03E97E;
+        Sat, 27 Jun 2020 00:32:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=Xpio8MsBnjn0ZZX6kn1sCcutxgSaexamcwAr94sVSxo=; b=lXKR3KOvyolkJvQ5vU5UcEIzmG
-        NYPk7kN3ZRmanvN7d8Wa79vMwEVXOCKwhA5cRXqxRnIzRaQKFfeyijCzahSTeBwTtWxQdOXhVpyO/
-        YuHacuqeUBjX3qf3iAdjhLyYUt1l/IQAcaFJsrw2gxdW0HYASxszrpqF1yn41OUOea6/fVJZr/T6K
-        60U+ok5Yg/ke/5eSyH/QCSPyx1bDiWE8jYVYGCoahVg4SZqCwkcX6+WR85l+0dHx4s82sh1IT7KeT
-        P3vou1PSNgXzRlYwf4Fvs1JsOZLLoK4ZGYC11tzwf5gfVLbj7i+vGui4+co9JaY7GjpfoIjre4B5O
-        CO34+0jQ==;
+        bh=te67Kz6q7FtaNJUJ111t8gsYne197tgP/jW4K8xX9vA=; b=NllTbXB2YDFcVqcI043iyFsHwr
+        tt77jKmSatOzYm5rqro2913myOlHulKnX4dt+8MOfTpepgR6TO2fYBzD4y3xZLLq57sFsuQKwjUn/
+        lLsBuzEeKDXVHq14z0Y+4mUXx0ae20B6us+olRYV4IeSBgdmadhqE/mKZGOP0xLqG7DAOykeARTW8
+        Vjwxz8hyIJzVL46ScOCngCuMa5pAPZ9e4ExDnntp/DtIrhC5V8t0SDq3ssA0P/EEZesARi7JZ4vl/
+        YcKpLXYo8gmWNoJberB6ct7R0JEf97ic7E/wfDM/BF56/51DV1p8WH5aKgRth6mdXE0o4D8tMK60/
+        N0hDQYQg==;
 Received: from [2001:4bb8:184:76e3:595:ba65:ae56:65a6] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jp5Jw-0006me-CB; Sat, 27 Jun 2020 07:32:18 +0000
+        id 1jp5Jr-0006mC-8O; Sat, 27 Jun 2020 07:32:12 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
 Cc:     Dennis Zhou <dennis@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 05/14] block: move bio_associate_blkg_from_page to mm/page_io.c
-Date:   Sat, 27 Jun 2020 09:31:50 +0200
-Message-Id: <20200627073159.2447325-6-hch@lst.de>
+Subject: [PATCH 03/14] block: really clone the block cgroup in bio_clone_blkg_association
+Date:   Sat, 27 Jun 2020 09:31:48 +0200
+Message-Id: <20200627073159.2447325-4-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200627073159.2447325-1-hch@lst.de>
 References: <20200627073159.2447325-1-hch@lst.de>
@@ -58,100 +58,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio_associate_blkg_from_page is a special purpose helper for swap bios
-that doesn't need access to bio internals.  Move it to the swap code
-instead of having it in bio.c.
+bio_clone_blkg_association is supposed to clone the associatation, but
+actually ends up doing a search with a tryget.  As we know we have a
+reference on the source cgroup just get an unconditional additional
+reference to it and call it a day.  That also removes the need for
+a RCU critical section.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c         | 26 --------------------------
- include/linux/bio.h |  7 -------
- mm/page_io.c        | 17 +++++++++++++++++
- 3 files changed, 17 insertions(+), 33 deletions(-)
+ block/bio.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index bc8de2432e3645..901d22715dd4f3 100644
+index 8aef4460b32e0e..e1d01acce8070c 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -1659,32 +1659,6 @@ void bio_associate_blkg_from_css(struct bio *bio,
- }
- EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
- 
--#ifdef CONFIG_MEMCG
--/**
-- * bio_associate_blkg_from_page - associate a bio with the page's blkg
-- * @bio: target bio
-- * @page: the page to lookup the blkcg from
-- *
-- * Associate @bio with the blkg from @page's owning memcg and the respective
-- * request_queue.  If cgroup_e_css returns %NULL, fall back to the queue's
-- * root_blkg.
-- */
--void bio_associate_blkg_from_page(struct bio *bio, struct page *page)
--{
--	struct cgroup_subsys_state *css;
--
--	if (!page->mem_cgroup)
--		return;
--
+@@ -1737,12 +1737,12 @@ EXPORT_SYMBOL_GPL(bio_associate_blkg);
+  */
+ void bio_clone_blkg_association(struct bio *dst, struct bio *src)
+ {
 -	rcu_read_lock();
 -
--	css = cgroup_e_css(page->mem_cgroup->css.cgroup, &io_cgrp_subsys);
--	bio_associate_blkg_from_css(bio, css);
+-	if (src->bi_blkg)
+-		__bio_associate_blkg(dst, src->bi_blkg);
 -
 -	rcu_read_unlock();
--}
--#endif /* CONFIG_MEMCG */
--
- /**
-  * bio_associate_blkg - associate a bio with a blkg
-  * @bio: target bio
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 4cd229e175c058..c6d76538292644 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -489,13 +489,6 @@ do {						\
- #define bio_dev(bio) \
- 	disk_devt((bio)->bi_disk)
- 
--#if defined(CONFIG_MEMCG) && defined(CONFIG_BLK_CGROUP)
--void bio_associate_blkg_from_page(struct bio *bio, struct page *page);
--#else
--static inline void bio_associate_blkg_from_page(struct bio *bio,
--						struct page *page) { }
--#endif
--
- #ifdef CONFIG_BLK_CGROUP
- void bio_associate_blkg(struct bio *bio);
- void bio_associate_blkg_from_css(struct bio *bio,
-diff --git a/mm/page_io.c b/mm/page_io.c
-index e8726f3e3820bf..ccda7679008851 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -277,6 +277,23 @@ static inline void count_swpout_vm_event(struct page *page)
- 	count_vm_events(PSWPOUT, hpage_nr_pages(page));
++	if (src->bi_blkg) {
++		if (dst->bi_blkg)
++			blkg_put(dst->bi_blkg);
++		blkg_get(src->bi_blkg);
++		dst->bi_blkg = src->bi_blkg;
++	}
  }
- 
-+#if defined(CONFIG_MEMCG) && defined(CONFIG_BLK_CGROUP)
-+static void bio_associate_blkg_from_page(struct bio *bio, struct page *page)
-+{
-+	struct cgroup_subsys_state *css;
-+
-+	if (!page->mem_cgroup)
-+		return;
-+
-+	rcu_read_lock();
-+	css = cgroup_e_css(page->mem_cgroup->css.cgroup, &io_cgrp_subsys);
-+	bio_associate_blkg_from_css(bio, css);
-+	rcu_read_unlock();
-+}
-+#else
-+#define bio_associate_blkg_from_page(bio, page)		do { } while (0)
-+#endif /* CONFIG_MEMCG && CONFIG_BLK_CGROUP */
-+
- int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 		bio_end_io_t end_write_func)
- {
+ EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
+ #endif /* CONFIG_BLK_CGROUP */
 -- 
 2.26.2
 
