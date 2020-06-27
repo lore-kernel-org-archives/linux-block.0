@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7B7C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F7FC433DF
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EFD1208C7
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FD252137B
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Pg+uD5yS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YdxLWQTA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726515AbgF0Hc7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Jun 2020 03:32:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59380 "EHLO
+        id S1726451AbgF0Hct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Jun 2020 03:32:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725991AbgF0Hc7 (ORCPT
+        with ESMTP id S1725994AbgF0Hcs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jun 2020 03:32:59 -0400
+        Sat, 27 Jun 2020 03:32:48 -0400
 Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7A3C03E979;
-        Sat, 27 Jun 2020 00:32:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3156FC03E979;
+        Sat, 27 Jun 2020 00:32:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=nSd3C/DSNsC2O/2jsqExpsnu1gd7FF5TZdmvZuWRNPs=; b=Pg+uD5ySHobKze+G3z72vgMqje
-        I3LI6dZfO3nOCLTW9PT7d6ugzTiNDCEtNY0mB8yeFck0uVAD2NK5kK59O4flLxaLCnECUhOYCji/N
-        23QiHSqYjFn0jgYdIdjxCpjH5iZhuxzwRMC4wcK+4Twctub06mZx70N39Cbqk/hfMBAkUlPxfTQ2g
-        31pSU1TgdBefiv2HiZm9UGCDAiZyPFWA+BRsBAHsiC++udMAeoOwBhV/B6DEPUDWSu+2pKW9N+h9T
-        9oxhhPsi7vxIWB8qxOh9/U4FNAjdd0QkyaliIKRQ+QJF/o7aLfD7PoAqxpk6jCQ1OXTSVMnAoGcrS
-        q7oYemlA==;
+        bh=S7ew7tFSTCy/AgXfhknQUe2b8dthYpBxIvPKvi74jmI=; b=YdxLWQTAi5Ieyyatgq0h9uJfn1
+        BGXkahQmOZuu9szIz6bz4ij6CxtHBH4Ab+5mc0WAE/Lz8VHb2l3vz9Nv11Uau3jfnvvMhlNtPph2W
+        476eG96my0sNe0X6xcuGOWkoLNTLAI+BVMhRNE0mZwr/vfKAhSeeNtn3WYUlfeHKbQ9zEBNfM1+jG
+        v8F/RPXkYoIfuas7wxO0yuB2C3eigotYi1AfVik7M7Aq4YZM4wdxg5AJyNa4tU1cYZ+Q1Y+i+4Y16
+        g6mVz15f41EyQ+5CSe/9nlppdQ+Cj70QyR+cStzXHF091tiiVKIUcfiuT+A4vIT+UoaeT0mQtmyXX
+        0VA1lnlw==;
 Received: from [2001:4bb8:184:76e3:595:ba65:ae56:65a6] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jp5KD-0006nj-M4; Sat, 27 Jun 2020 07:32:35 +0000
+        id 1jp5K3-0006nC-48; Sat, 27 Jun 2020 07:32:24 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
 Cc:     Dennis Zhou <dennis@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 10/14] blk-cgroup: remove the !bio->bi_blkg check in blkcg_bio_issue_check
-Date:   Sat, 27 Jun 2020 09:31:55 +0200
-Message-Id: <20200627073159.2447325-11-hch@lst.de>
+Subject: [PATCH 07/14] block: merge blkg_lookup_create and __blkg_lookup_create
+Date:   Sat, 27 Jun 2020 09:31:52 +0200
+Message-Id: <20200627073159.2447325-8-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200627073159.2447325-1-hch@lst.de>
 References: <20200627073159.2447325-1-hch@lst.de>
@@ -58,44 +58,101 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is purely a sanity check for grave programming errors.  Remove it
-to simplify further work in this area.
+No good reason to keep these two functions split.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/blk-cgroup.h | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
+ block/blk-cgroup.c | 49 +++++++++++++++++-----------------------------
+ 1 file changed, 18 insertions(+), 31 deletions(-)
 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 60df97202314c7..8e86b598316c10 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -543,24 +543,11 @@ static inline void blkcg_bio_issue_init(struct bio *bio)
- static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 					 struct bio *bio)
- {
--	struct blkcg_gq *blkg;
-+	struct blkcg_gq *blkg = bio->bi_blkg;
- 	bool throtl = false;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index bb0607bfd771cd..6aedb73ffbf473 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -316,30 +316,35 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ }
  
- 	rcu_read_lock();
--
--	if (!bio->bi_blkg) {
--		char b[BDEVNAME_SIZE];
--
--		WARN_ONCE(1,
--			  "no blkg associated for bio on block-device: %s\n",
--			  bio_devname(bio, b));
--		bio_associate_blkg(bio);
+ /**
+- * __blkg_lookup_create - lookup blkg, try to create one if not there
++ * blkg_lookup_create - lookup blkg, try to create one if not there
+  * @blkcg: blkcg of interest
+  * @q: request_queue of interest
+  *
+  * Lookup blkg for the @blkcg - @q pair.  If it doesn't exist, try to
+  * create one.  blkg creation is performed recursively from blkcg_root such
+  * that all non-root blkg's have access to the parent blkg.  This function
+- * should be called under RCU read lock and @q->queue_lock.
++ * should be called under RCU read lock and takes @q->queue_lock.
+  *
+  * Returns the blkg or the closest blkg if blkg_create() fails as it walks
+  * down from root.
+  */
+-static struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
+-				      struct request_queue *q)
++static struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
++		struct request_queue *q)
+ {
+ 	struct blkcg_gq *blkg;
++	unsigned long flags;
+ 
+ 	WARN_ON_ONCE(!rcu_read_lock_held());
+-	lockdep_assert_held(&q->queue_lock);
+ 
+-	blkg = __blkg_lookup(blkcg, q, true);
++	blkg = blkg_lookup(blkcg, q);
+ 	if (blkg)
+ 		return blkg;
+ 
++	spin_lock_irqsave(&q->queue_lock, flags);
++	blkg = __blkg_lookup(blkcg, q, true);
++	if (blkg)
++		goto found;
++
+ 	/*
+ 	 * Create blkgs walking down from blkcg_root to @blkcg, so that all
+ 	 * non-root blkgs have access to their parents.  Returns the closest
+@@ -362,34 +367,16 @@ static struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
+ 		}
+ 
+ 		blkg = blkg_create(pos, q, NULL);
+-		if (IS_ERR(blkg))
+-			return ret_blkg;
++		if (IS_ERR(blkg)) {
++			blkg = ret_blkg;
++			break;
++		}
+ 		if (pos == blkcg)
+-			return blkg;
 -	}
+-}
 -
--	blkg = bio->bi_blkg;
+-/**
+- * blkg_lookup_create - find or create a blkg
+- * @blkcg: target block cgroup
+- * @q: target request_queue
+- *
+- * This looks up or creates the blkg representing the unique pair
+- * of the blkcg and the request_queue.
+- */
+-static struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+-				    struct request_queue *q)
+-{
+-	struct blkcg_gq *blkg = blkg_lookup(blkcg, q);
 -
- 	throtl = blk_throtl_bio(q, blkg, bio);
+-	if (unlikely(!blkg)) {
+-		unsigned long flags;
 -
- 	if (!throtl) {
- 		struct blkg_iostat_set *bis;
- 		int rwd, cpu;
+-		spin_lock_irqsave(&q->queue_lock, flags);
+-		blkg = __blkg_lookup_create(blkcg, q);
+-		spin_unlock_irqrestore(&q->queue_lock, flags);
++			break;
+ 	}
+ 
++found:
++	spin_unlock_irqrestore(&q->queue_lock, flags);
+ 	return blkg;
+ }
+ 
 -- 
 2.26.2
 
