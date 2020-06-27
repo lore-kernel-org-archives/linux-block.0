@@ -2,51 +2,54 @@ Return-Path: <SRS0=phs8=AI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93554C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B83EC433E0
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 684DC208C7
+	by mail.kernel.org (Postfix) with ESMTP id DDF612081A
 	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WcBaL3YX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="C+ZyH4XC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726086AbgF0Hce (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726065AbgF0Hce (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 27 Jun 2020 03:32:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59304 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725954AbgF0Hce (ORCPT
+        with ESMTP id S1725885AbgF0Hce (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 27 Jun 2020 03:32:34 -0400
 Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A561C03E97A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23067C03E979;
         Sat, 27 Jun 2020 00:32:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=N+m/TXktm7C+5rnFX+JYBp/qnm40iMw/fl+XJO+IQXQ=; b=WcBaL3YXkyCLpW49SEw94Y7D7m
-        KWLLqqIf2P69pD8tAY359N3kZtCw5LoPgZKsURUZH2Qukvx25sNRUgk3v9T0orAQ9etd19GFMwoZD
-        c66gs10ktq3G6v+WWjcxpSciiwaHav362XO47NiGVoZznIG6j+FMh0/uCdPcv1byY7QzaVqFkemJg
-        72Ax6ywHK0a62Dppe7UEOgY5E/005452+fFhjLyJMUzfmV2q/dqgt2BbvlSECDuNPLLri1gjSGV1Z
-        hzQfPe/jU7lascGNtDABHjfzAFsOG0k2ysNNSLa631LuB2fCkJTrm1eWVsvfISjbt9X9BGVbCAjfN
-        OitVpYQA==;
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=TqBMh8wKMnVF/qZj/bM6cnnHs8Yim2J3gFC2ELItu+s=; b=C+ZyH4XC/PkkkGo8OrL4qvcn92
+        TnizwBndOG4NHHJpYFLRpu8LYRZqZAN2x6fPq3HSY0c0038FlIUnkfpTHi3Qt2VhrxPFglng/X4Cc
+        aZdSwTUR1u/eINbQC2X9UvbpnjV1m7wgCSeWJCDjROxe87fuIzT0EQqaXmxcSmrm4yq1F+bzu8VUN
+        1HvaMG5Z4RE93Payt3MIpxhHccumVWuOutqXqy60zCifApzwCB2YgfFIETkyIrT0uDpmMHAqwsDmS
+        jmmV+CbyN7d3VFXs3yi5MBQmvswTJ9K17V+dHSM5wowN9H+wv4o0R17ejZHH5EoXtFjTRlYlOK53+
+        nUeLzM7Q==;
 Received: from [2001:4bb8:184:76e3:595:ba65:ae56:65a6] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jp5Jg-0006lM-6A; Sat, 27 Jun 2020 07:32:04 +0000
+        id 1jp5Jo-0006m0-Ro; Sat, 27 Jun 2020 07:32:09 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
 Cc:     Dennis Zhou <dennis@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: drive-by blk-cgroup cleanups
-Date:   Sat, 27 Jun 2020 09:31:45 +0200
-Message-Id: <20200627073159.2447325-1-hch@lst.de>
+Subject: [PATCH 02/14] block: remove bio_disassociate_blkg
+Date:   Sat, 27 Jun 2020 09:31:47 +0200
+Message-Id: <20200627073159.2447325-3-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200627073159.2447325-1-hch@lst.de>
+References: <20200627073159.2447325-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -55,21 +58,85 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+bio_disassociate_blkg has two callers, of which one immediately assigns
+a new value to >bi_blkg.  Just open code the function in the two callers.
 
-while looking into another "project" I ended up wading through the
-blkcq code for research and found a bunch of lose ends.  So here is
-a bunch of drive-by cleanups for the code.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c         | 27 ++++++++-------------------
+ include/linux/bio.h |  2 --
+ 2 files changed, 8 insertions(+), 21 deletions(-)
 
-Diffstat:
- block/bio.c                |  143 +----------------------------------
- block/blk-cgroup.c         |  182 +++++++++++++++++++++++++++++++++++++--------
- block/blk-core.c           |    7 +
- block/blk-throttle.c       |   10 +-
- block/blk.h                |    2 
- drivers/md/dm.c            |    5 -
- include/linux/bio.h        |    9 --
- include/linux/blk-cgroup.h |  101 ------------------------
- kernel/cgroup/rstat.c      |    1 
- mm/page_io.c               |   17 ++++
- 10 files changed, 192 insertions(+), 285 deletions(-)
+diff --git a/block/bio.c b/block/bio.c
+index fb5533416fa670..8aef4460b32e0e 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -234,8 +234,12 @@ struct bio_vec *bvec_alloc(gfp_t gfp_mask, int nr, unsigned long *idx,
+ 
+ void bio_uninit(struct bio *bio)
+ {
+-	bio_disassociate_blkg(bio);
+-
++#ifdef CONFIG_BLK_CGROUP
++	if (bio->bi_blkg) {
++		blkg_put(bio->bi_blkg);
++		bio->bi_blkg = NULL;
++	}
++#endif
+ 	if (bio_integrity(bio))
+ 		bio_integrity_free(bio);
+ 
+@@ -1625,21 +1629,6 @@ EXPORT_SYMBOL(bioset_init_from_src);
+ 
+ #ifdef CONFIG_BLK_CGROUP
+ 
+-/**
+- * bio_disassociate_blkg - puts back the blkg reference if associated
+- * @bio: target bio
+- *
+- * Helper to disassociate the blkg from @bio if a blkg is associated.
+- */
+-void bio_disassociate_blkg(struct bio *bio)
+-{
+-	if (bio->bi_blkg) {
+-		blkg_put(bio->bi_blkg);
+-		bio->bi_blkg = NULL;
+-	}
+-}
+-EXPORT_SYMBOL_GPL(bio_disassociate_blkg);
+-
+ /**
+  * __bio_associate_blkg - associate a bio with the a blkg
+  * @bio: target bio
+@@ -1656,8 +1645,8 @@ EXPORT_SYMBOL_GPL(bio_disassociate_blkg);
+  */
+ static void __bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
+ {
+-	bio_disassociate_blkg(bio);
+-
++	if (bio->bi_blkg)
++		blkg_put(bio->bi_blkg);
+ 	bio->bi_blkg = blkg_tryget_closest(blkg);
+ }
+ 
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 0282f8aa85935c..4cd229e175c058 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -497,13 +497,11 @@ static inline void bio_associate_blkg_from_page(struct bio *bio,
+ #endif
+ 
+ #ifdef CONFIG_BLK_CGROUP
+-void bio_disassociate_blkg(struct bio *bio);
+ void bio_associate_blkg(struct bio *bio);
+ void bio_associate_blkg_from_css(struct bio *bio,
+ 				 struct cgroup_subsys_state *css);
+ void bio_clone_blkg_association(struct bio *dst, struct bio *src);
+ #else	/* CONFIG_BLK_CGROUP */
+-static inline void bio_disassociate_blkg(struct bio *bio) { }
+ static inline void bio_associate_blkg(struct bio *bio) { }
+ static inline void bio_associate_blkg_from_css(struct bio *bio,
+ 					       struct cgroup_subsys_state *css)
+-- 
+2.26.2
+
