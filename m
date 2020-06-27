@@ -2,131 +2,75 @@ Return-Path: <SRS0=phs8=AI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA646C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 10:31:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B05BC433DF
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 16:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5149208B6
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 10:31:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA3F520702
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 16:05:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593273918;
+	bh=LvXTsPdSp+bVnYeWQWLd/30sbOsD/vLr06RSXaJmN9s=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=p7lVVFgvZY4V2dPo+vLO9SGMr1SGLmA5wnG05+WBkyDmvmGVYQxg4JJT0N66RPYrm
+	 Sca06FHq2YxY/R1q0Lscna1GqmEoUxzcUcHTzWGLcgicGWsGZBMM7wZrIUPlPw0fGT
+	 t5Wv1Uv0+YMWONrjJdkQypd8s36PhhZ+uyNSEE/E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726489AbgF0Kb0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Jun 2020 06:31:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbgF0Kb0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jun 2020 06:31:26 -0400
-Received: from smtp.al2klimov.de (smtp.al2klimov.de [IPv6:2a01:4f8:c0c:1465::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04700C03E979;
-        Sat, 27 Jun 2020 03:31:26 -0700 (PDT)
-Received: from authenticated-user (PRIMARY_HOSTNAME [PUBLIC_IP])
-        by smtp.al2klimov.de (Postfix) with ESMTPA id B4757BC130;
-        Sat, 27 Jun 2020 10:31:22 +0000 (UTC)
-From:   "Alexander A. Klimov" <grandmaster@al2klimov.de>
-To:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        corbet@lwn.net, axboe@kernel.dk, mchehab+samsung@kernel.org,
-        drbd-dev@lists.linbit.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     "Alexander A. Klimov" <grandmaster@al2klimov.de>
-Subject: [PATCH] Replace HTTP links with HTTPS ones: DRBD driver
-Date:   Sat, 27 Jun 2020 12:31:11 +0200
-Message-Id: <20200627103111.71771-1-grandmaster@al2klimov.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Bar: ++++++
-Authentication-Results: smtp.al2klimov.de;
-        auth=pass smtp.auth=aklimov@al2klimov.de smtp.mailfrom=grandmaster@al2klimov.de
-X-Spam: Yes
+        id S1726554AbgF0QFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Jun 2020 12:05:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43820 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726559AbgF0QFO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 Jun 2020 12:05:14 -0400
+Subject: Re: [git pull] device mapper fixes for 5.8-rc3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593273913;
+        bh=LvXTsPdSp+bVnYeWQWLd/30sbOsD/vLr06RSXaJmN9s=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=qEE2HSoG7PoZHL6rHclB2MXvaaYaKBFUwQda876M7cy2ZgIb2jhr5446+tNekhZDw
+         43OvLw6rUMCX1U++dcnDBqi4yTysw0KQm6ayxf6a7JGQ+suI+nw6+Qp9ZjB767I1uj
+         KIc1Bobfsa8T/LePVIJo8ubYmUlAdc1OYjzRx+E0=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200626192847.GA11459@redhat.com>
+References: <20200626192847.GA11459@redhat.com>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200626192847.GA11459@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+ tags/for-5.8/dm-fixes
+X-PR-Tracked-Commit-Id: d35bd764e6899a7bea71958f08d16cea5bfa1919
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5e8eed279f280d6ad4cf59b3330d5d6d7b9de733
+Message-Id: <159327391366.13835.5012151205727257026.pr-tracker-bot@kernel.org>
+Date:   Sat, 27 Jun 2020 16:05:13 +0000
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Hou Tao <houtao1@huawei.com>, Huaisheng Ye <yehs1@lenovo.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Rationale:
-Reduces attack surface on kernel devs opening the links for MITM
-as HTTPS traffic is much harder to manipulate.
+The pull request you sent on Fri, 26 Jun 2020 15:28:47 -0400:
 
-Deterministic algorithm:
-For each file:
-  If not .svg:
-    For each line:
-      If doesn't contain `\bxmlns\b`:
-        For each link, `\bhttp://[^# \t\r\n]*(?:\w|/)`:
-          If both the HTTP and HTTPS versions
-          return 200 OK and serve the same content:
-            Replace HTTP with HTTPS.
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.8/dm-fixes
 
-Signed-off-by: Alexander A. Klimov <grandmaster@al2klimov.de>
----
- If there are any URLs to be removed completely or at least not HTTPSified:
- Just clearly say so and I'll *undo my change*.
- See also https://lkml.org/lkml/2020/6/27/64
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5e8eed279f280d6ad4cf59b3330d5d6d7b9de733
 
- If there are any valid, but yet not changed URLs:
- See https://lkml.org/lkml/2020/6/26/837
+Thank you!
 
- Documentation/admin-guide/blockdev/drbd/index.rst | 2 +-
- Documentation/admin-guide/blockdev/floppy.rst     | 6 +++---
- drivers/block/drbd/Kconfig                        | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/admin-guide/blockdev/drbd/index.rst b/Documentation/admin-guide/blockdev/drbd/index.rst
-index 68ecd5c113e9..561fd1e35917 100644
---- a/Documentation/admin-guide/blockdev/drbd/index.rst
-+++ b/Documentation/admin-guide/blockdev/drbd/index.rst
-@@ -10,7 +10,7 @@ Description
-   clusters and in this context, is a "drop-in" replacement for shared
-   storage. Simplistically, you could see it as a network RAID 1.
- 
--  Please visit http://www.drbd.org to find out more.
-+  Please visit https://www.drbd.org to find out more.
- 
- .. toctree::
-    :maxdepth: 1
-diff --git a/Documentation/admin-guide/blockdev/floppy.rst b/Documentation/admin-guide/blockdev/floppy.rst
-index 4a8f31cf4139..0328438ebe2c 100644
---- a/Documentation/admin-guide/blockdev/floppy.rst
-+++ b/Documentation/admin-guide/blockdev/floppy.rst
-@@ -6,7 +6,7 @@ FAQ list:
- =========
- 
- A FAQ list may be found in the fdutils package (see below), and also
--at <http://fdutils.linux.lu/faq.html>.
-+at <https://fdutils.linux.lu/faq.html>.
- 
- 
- LILO configuration options (Thinkpad users, read this)
-@@ -220,11 +220,11 @@ It also contains additional documentation about the floppy driver.
- 
- The latest version can be found at fdutils homepage:
- 
-- http://fdutils.linux.lu
-+ https://fdutils.linux.lu
- 
- The fdutils releases can be found at:
- 
-- http://fdutils.linux.lu/download.html
-+ https://fdutils.linux.lu/download.html
- 
-  http://www.tux.org/pub/knaff/fdutils/
- 
-diff --git a/drivers/block/drbd/Kconfig b/drivers/block/drbd/Kconfig
-index 52d885cdccb5..cbacddc55a1d 100644
---- a/drivers/block/drbd/Kconfig
-+++ b/drivers/block/drbd/Kconfig
-@@ -35,7 +35,7 @@ config BLK_DEV_DRBD
- 	  cache coherency.
- 
- 	  For automatic failover you need a cluster manager (e.g. heartbeat).
--	  See also: http://www.drbd.org/, http://www.linux-ha.org
-+	  See also: https://www.drbd.org/, http://www.linux-ha.org
- 
- 	  If unsure, say N.
- 
 -- 
-2.27.0
-
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
