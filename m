@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F7FC433DF
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D42C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FD252137B
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C537C208C7
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YdxLWQTA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Y+/+SN3N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726451AbgF0Hct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Jun 2020 03:32:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59344 "EHLO
+        id S1726404AbgF0Hcp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Jun 2020 03:32:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbgF0Hcs (ORCPT
+        with ESMTP id S1725994AbgF0Hco (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jun 2020 03:32:48 -0400
+        Sat, 27 Jun 2020 03:32:44 -0400
 Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3156FC03E979;
-        Sat, 27 Jun 2020 00:32:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47DE9C03E979;
+        Sat, 27 Jun 2020 00:32:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=S7ew7tFSTCy/AgXfhknQUe2b8dthYpBxIvPKvi74jmI=; b=YdxLWQTAi5Ieyyatgq0h9uJfn1
-        BGXkahQmOZuu9szIz6bz4ij6CxtHBH4Ab+5mc0WAE/Lz8VHb2l3vz9Nv11Uau3jfnvvMhlNtPph2W
-        476eG96my0sNe0X6xcuGOWkoLNTLAI+BVMhRNE0mZwr/vfKAhSeeNtn3WYUlfeHKbQ9zEBNfM1+jG
-        v8F/RPXkYoIfuas7wxO0yuB2C3eigotYi1AfVik7M7Aq4YZM4wdxg5AJyNa4tU1cYZ+Q1Y+i+4Y16
-        g6mVz15f41EyQ+5CSe/9nlppdQ+Cj70QyR+cStzXHF091tiiVKIUcfiuT+A4vIT+UoaeT0mQtmyXX
-        0VA1lnlw==;
+        bh=LREORKkL9EawusRPfY+RfGgkga9SJryaB1y7sBbv+3c=; b=Y+/+SN3Nj38jfxO2i3lNtkEEEh
+        p5PU9kxKUEStA039sBaU80FUIIvTpcHFt36RI1FknpmJhMWGKFgiwg7s+Ms4DQI1MtXDPeUM0wIlV
+        38tOKbh9wlcT5Kj6Ny5CNIX5um8hs4EbmbRw5gwgMH3tffQVM7ubNGIG8NC+S/yEQMYZDHuLWxqmi
+        9IPc4iePF4IzCvsADXfxFap/nSeBhF4g2Upoi5yYBu1877xEsCRJU4tl1kUnbUmTivqgDceaxmw7y
+        X4I/EqORE71u36SwJMR6c7nexLlV+8Lg6IfBUPe9FwHt6SC1jFfbKqSNrFRrIuHZR74kmPbEayDff
+        UkYW2/YQ==;
 Received: from [2001:4bb8:184:76e3:595:ba65:ae56:65a6] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jp5K3-0006nC-48; Sat, 27 Jun 2020 07:32:24 +0000
+        id 1jp5Jt-0006mN-VO; Sat, 27 Jun 2020 07:32:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
 Cc:     Dennis Zhou <dennis@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 07/14] block: merge blkg_lookup_create and __blkg_lookup_create
-Date:   Sat, 27 Jun 2020 09:31:52 +0200
-Message-Id: <20200627073159.2447325-8-hch@lst.de>
+Subject: [PATCH 04/14] block: merge __bio_associate_blkg into bio_associate_blkg_from_css
+Date:   Sat, 27 Jun 2020 09:31:49 +0200
+Message-Id: <20200627073159.2447325-5-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200627073159.2447325-1-hch@lst.de>
 References: <20200627073159.2447325-1-hch@lst.de>
@@ -58,101 +58,84 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-No good reason to keep these two functions split.
+Merge __bio_associate_blkg into the only caller, which allows to slightly
+reduce the RCU crticial section and better explain the code flow.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-cgroup.c | 49 +++++++++++++++++-----------------------------
- 1 file changed, 18 insertions(+), 31 deletions(-)
+ block/bio.c | 45 +++++++++++++--------------------------------
+ 1 file changed, 13 insertions(+), 32 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index bb0607bfd771cd..6aedb73ffbf473 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -316,30 +316,35 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
- }
+diff --git a/block/bio.c b/block/bio.c
+index e1d01acce8070c..bc8de2432e3645 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1628,52 +1628,33 @@ int bioset_init_from_src(struct bio_set *bs, struct bio_set *src)
+ EXPORT_SYMBOL(bioset_init_from_src);
  
- /**
-- * __blkg_lookup_create - lookup blkg, try to create one if not there
-+ * blkg_lookup_create - lookup blkg, try to create one if not there
-  * @blkcg: blkcg of interest
-  * @q: request_queue of interest
-  *
-  * Lookup blkg for the @blkcg - @q pair.  If it doesn't exist, try to
-  * create one.  blkg creation is performed recursively from blkcg_root such
-  * that all non-root blkg's have access to the parent blkg.  This function
-- * should be called under RCU read lock and @q->queue_lock.
-+ * should be called under RCU read lock and takes @q->queue_lock.
-  *
-  * Returns the blkg or the closest blkg if blkg_create() fails as it walks
-  * down from root.
-  */
--static struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
--				      struct request_queue *q)
-+static struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
-+		struct request_queue *q)
- {
- 	struct blkcg_gq *blkg;
-+	unsigned long flags;
- 
- 	WARN_ON_ONCE(!rcu_read_lock_held());
--	lockdep_assert_held(&q->queue_lock);
- 
--	blkg = __blkg_lookup(blkcg, q, true);
-+	blkg = blkg_lookup(blkcg, q);
- 	if (blkg)
- 		return blkg;
- 
-+	spin_lock_irqsave(&q->queue_lock, flags);
-+	blkg = __blkg_lookup(blkcg, q, true);
-+	if (blkg)
-+		goto found;
-+
- 	/*
- 	 * Create blkgs walking down from blkcg_root to @blkcg, so that all
- 	 * non-root blkgs have access to their parents.  Returns the closest
-@@ -362,34 +367,16 @@ static struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
- 		}
- 
- 		blkg = blkg_create(pos, q, NULL);
--		if (IS_ERR(blkg))
--			return ret_blkg;
-+		if (IS_ERR(blkg)) {
-+			blkg = ret_blkg;
-+			break;
-+		}
- 		if (pos == blkcg)
--			return blkg;
--	}
--}
+ #ifdef CONFIG_BLK_CGROUP
 -
 -/**
-- * blkg_lookup_create - find or create a blkg
-- * @blkcg: target block cgroup
-- * @q: target request_queue
+- * __bio_associate_blkg - associate a bio with the a blkg
+- * @bio: target bio
+- * @blkg: the blkg to associate
 - *
-- * This looks up or creates the blkg representing the unique pair
-- * of the blkcg and the request_queue.
+- * This tries to associate @bio with the specified @blkg.  Association failure
+- * is handled by walking up the blkg tree.  Therefore, the blkg associated can
+- * be anything between @blkg and the root_blkg.  This situation only happens
+- * when a cgroup is dying and then the remaining bios will spill to the closest
+- * alive blkg.
+- *
+- * A reference will be taken on the @blkg and will be released when @bio is
+- * freed.
 - */
--static struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
--				    struct request_queue *q)
+-static void __bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
 -{
--	struct blkcg_gq *blkg = blkg_lookup(blkcg, q);
+-	if (bio->bi_blkg)
+-		blkg_put(bio->bi_blkg);
+-	bio->bi_blkg = blkg_tryget_closest(blkg);
+-}
 -
--	if (unlikely(!blkg)) {
--		unsigned long flags;
--
--		spin_lock_irqsave(&q->queue_lock, flags);
--		blkg = __blkg_lookup_create(blkcg, q);
--		spin_unlock_irqrestore(&q->queue_lock, flags);
-+			break;
- 	}
+ /**
+  * bio_associate_blkg_from_css - associate a bio with a specified css
+  * @bio: target bio
+  * @css: target css
+  *
+  * Associate @bio with the blkg found by combining the css's blkg and the
+- * request_queue of the @bio.  This falls back to the queue's root_blkg if
+- * the association fails with the css.
++ * request_queue of the @bio.  An association failure is handled by walking up
++ * the blkg tree.  Therefore, the blkg associated can be anything between @blkg
++ * and q->root_blkg.  This situation only happens when a cgroup is dying and
++ * then the remaining bios will spill to the closest alive blkg.
++ *
++ * A reference will be taken on the blkg and will be released when @bio is
++ * freed.
+  */
+ void bio_associate_blkg_from_css(struct bio *bio,
+ 				 struct cgroup_subsys_state *css)
+ {
+ 	struct request_queue *q = bio->bi_disk->queue;
+-	struct blkcg_gq *blkg;
++	struct blkcg_gq *blkg = q->root_blkg;
  
-+found:
-+	spin_unlock_irqrestore(&q->queue_lock, flags);
- 	return blkg;
+-	rcu_read_lock();
++	if (bio->bi_blkg)
++		blkg_put(bio->bi_blkg);
+ 
+-	if (!css || !css->parent)
+-		blkg = q->root_blkg;
+-	else
++	rcu_read_lock();
++	if (css && css->parent)
+ 		blkg = blkg_lookup_create(css_to_blkcg(css), q);
+-
+-	__bio_associate_blkg(bio, blkg);
+-
++	bio->bi_blkg = blkg_tryget_closest(blkg);
+ 	rcu_read_unlock();
  }
- 
+ EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
 -- 
 2.26.2
 
