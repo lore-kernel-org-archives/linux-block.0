@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD5AC433DF
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DE9C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79A502137B
-	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 342D52137B
+	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NllTbXB2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="L6XusXQS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726161AbgF0Hcf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726094AbgF0Hcf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 27 Jun 2020 03:32:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59308 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbgF0Hce (ORCPT
+        with ESMTP id S1725980AbgF0Hce (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 27 Jun 2020 03:32:34 -0400
 Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C4BC03E97E;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30E77C03E97B;
         Sat, 27 Jun 2020 00:32:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=te67Kz6q7FtaNJUJ111t8gsYne197tgP/jW4K8xX9vA=; b=NllTbXB2YDFcVqcI043iyFsHwr
-        tt77jKmSatOzYm5rqro2913myOlHulKnX4dt+8MOfTpepgR6TO2fYBzD4y3xZLLq57sFsuQKwjUn/
-        lLsBuzEeKDXVHq14z0Y+4mUXx0ae20B6us+olRYV4IeSBgdmadhqE/mKZGOP0xLqG7DAOykeARTW8
-        Vjwxz8hyIJzVL46ScOCngCuMa5pAPZ9e4ExDnntp/DtIrhC5V8t0SDq3ssA0P/EEZesARi7JZ4vl/
-        YcKpLXYo8gmWNoJberB6ct7R0JEf97ic7E/wfDM/BF56/51DV1p8WH5aKgRth6mdXE0o4D8tMK60/
-        N0hDQYQg==;
+        bh=NlgrihBG7jLl3wBy3//te4S7VLbqg8KMSQ1SCyyAmko=; b=L6XusXQSYNrkbPY1ZdnER6a0Nu
+        Py0nKSkGK+tqq//lZU3f6lPIlLqG7AwZDlD80X6uiQQANhC9Ki8YdsEqf9AWVeG36X7qV8wvG7yQN
+        l7JSHH5pmxXnSXhQtKZ5GfBXasr2Ed+pL5T8qBFltJr8Q3fMZih0pDDvewnEKHD28qc0qPykDOhkh
+        RVbyPFhCwYMvDErZaaz3FWTQvFdWCrRfJCEysY6/qtq9tPk+ZEZvyZNQrZszBQBru7LQTLFoLMubm
+        FzUcKEhDSMKiq+Zp2Io/VybxiZLnRBMn+cv+M6efXuH/gGtFhunXjbuF7DZ8bshY/XNpJ5WpkEbdO
+        U9MgZkRQ==;
 Received: from [2001:4bb8:184:76e3:595:ba65:ae56:65a6] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jp5Jr-0006mC-8O; Sat, 27 Jun 2020 07:32:12 +0000
+        id 1jp5Jm-0006la-8A; Sat, 27 Jun 2020 07:32:07 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
 Cc:     Dennis Zhou <dennis@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 03/14] block: really clone the block cgroup in bio_clone_blkg_association
-Date:   Sat, 27 Jun 2020 09:31:48 +0200
-Message-Id: <20200627073159.2447325-4-hch@lst.de>
+Subject: [PATCH 01/14] dm: use bio_uninit instead of bio_disassociate_blkg
+Date:   Sat, 27 Jun 2020 09:31:46 +0200
+Message-Id: <20200627073159.2447325-2-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200627073159.2447325-1-hch@lst.de>
 References: <20200627073159.2447325-1-hch@lst.de>
@@ -58,40 +58,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio_clone_blkg_association is supposed to clone the associatation, but
-actually ends up doing a search with a tryget.  As we know we have a
-reference on the source cgroup just get an unconditional additional
-reference to it and call it a day.  That also removes the need for
-a RCU critical section.
+bio_uninit is the proper API to clean up a BIO that has been allocated
+on stack or inside a structure that doesn't come from the BIO allocator.
+Switch dm to use that instead of bio_disassociate_blkg, which really is
+an implementation detail.  Note that the bio_uninit calls are also moved
+to the two callers of __send_empty_flush, so that they better pair with
+the bio_init calls used to initialize them.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/md/dm.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 8aef4460b32e0e..e1d01acce8070c 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1737,12 +1737,12 @@ EXPORT_SYMBOL_GPL(bio_associate_blkg);
-  */
- void bio_clone_blkg_association(struct bio *dst, struct bio *src)
- {
--	rcu_read_lock();
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 109e81f33edb2d..e44473fe0f4873 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1452,9 +1452,6 @@ static int __send_empty_flush(struct clone_info *ci)
+ 	BUG_ON(bio_has_data(ci->bio));
+ 	while ((ti = dm_table_get_target(ci->map, target_nr++)))
+ 		__send_duplicate_bios(ci, ti, ti->num_flush_bios, NULL);
 -
--	if (src->bi_blkg)
--		__bio_associate_blkg(dst, src->bi_blkg);
+-	bio_disassociate_blkg(ci->bio);
 -
--	rcu_read_unlock();
-+	if (src->bi_blkg) {
-+		if (dst->bi_blkg)
-+			blkg_put(dst->bi_blkg);
-+		blkg_get(src->bi_blkg);
-+		dst->bi_blkg = src->bi_blkg;
-+	}
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
- #endif /* CONFIG_BLK_CGROUP */
+ 
+@@ -1642,6 +1639,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 		ci.bio = &flush_bio;
+ 		ci.sector_count = 0;
+ 		error = __send_empty_flush(&ci);
++		bio_uninit(ci.bio);
+ 		/* dec_pending submits any data associated with flush */
+ 	} else if (op_is_zone_mgmt(bio_op(bio))) {
+ 		ci.bio = bio;
+@@ -1716,6 +1714,7 @@ static blk_qc_t __process_bio(struct mapped_device *md, struct dm_table *map,
+ 		ci.bio = &flush_bio;
+ 		ci.sector_count = 0;
+ 		error = __send_empty_flush(&ci);
++		bio_uninit(ci.bio);
+ 		/* dec_pending submits any data associated with flush */
+ 	} else {
+ 		struct dm_target_io *tio;
 -- 
 2.26.2
 
