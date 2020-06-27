@@ -4,49 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89437C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE0EEC433DF
 	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62B2821473
+	by mail.kernel.org (Postfix) with ESMTP id 83CF721532
 	for <linux-block@archiver.kernel.org>; Sat, 27 Jun 2020 07:33:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lBBFTQqt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cbYqXmVe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726568AbgF0HdO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Jun 2020 03:33:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59420 "EHLO
+        id S1726590AbgF0HdS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Jun 2020 03:33:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726547AbgF0HdN (ORCPT
+        with ESMTP id S1726547AbgF0HdR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jun 2020 03:33:13 -0400
+        Sat, 27 Jun 2020 03:33:17 -0400
 Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE510C03E979;
-        Sat, 27 Jun 2020 00:33:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C94F2C03E979;
+        Sat, 27 Jun 2020 00:33:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=TotXMoDr4SMB2qAUQWeT1iUDwtwRZjQn0sDaTbNw3KE=; b=lBBFTQqtqPDmKcz4C2xD/zM/hu
-        Lrzy51/shbHq+GN4MpENNU+6yV67bBHqSSioPVy0RchQm5VxOyJgLQP6umNIPnNZ2sR945Vfxjpd/
-        /hue1Aei3ALd+WQ2tq3K3FcM4HyMRuyCPeIuUQ7cwJigY8EEgTF8r0aD2/qwQt91Vywh+ZIu0toG+
-        +PkK+1vEPRG9l1s0mKPgGsfxyDttV9haep1R+Uwaj/JQWy5QRXi8xPwioRwTEP/ScYyGwmFxbkJ/c
-        hXdX1GFMy79Vf4ofCFXTs3Pd+ijSmZ0PHxDPNtultydJoEPMMuE9W7sagWDR6VRHNNYHh5ENAddnC
-        YrPOgNRg==;
+        bh=vmpoA1D7dyjV06bzwDyN/+k+GU++bNP7VnywwlpIVGc=; b=cbYqXmVeSoBvWX/9hZmJT+Lpgl
+        l5Y6Vcm2ctIJzcPBTMX3VolpG677Sf4JJWJZfg14gMcYc1m3NFSPX26I/Vdufl8Wj4OJD/jl2Umzw
+        27pEigOY5nvjxvYMvM49rAPEbxY55yRTlPi3Lbfj1+TngLfjOcWXmlbk3hcRzSGoz6hhvGr0okR7W
+        GCJr60AtGTdEOj8PSSltng1UW/O17eCtnu6LH/wkHVpdPf76uXKO6uYRjV3pBB02z8yKJ9PAQx81q
+        mu+xZlNzRT5mjjmmiZE8tNwZpxaMdqqkKx8I//a0cFfvkQn/kdUEIwH5bGq7AXsO0yq6LLvd29UPA
+        2/yaXMOg==;
 Received: from [2001:4bb8:184:76e3:595:ba65:ae56:65a6] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jp5KO-0006oz-Bj; Sat, 27 Jun 2020 07:32:46 +0000
+        id 1jp5KY-0006qv-AN; Sat, 27 Jun 2020 07:32:56 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
 Cc:     Dennis Zhou <dennis@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 12/14] blk-cgroup: move rcu locking from blkcg_bio_issue_check to blk_throtl_bio
-Date:   Sat, 27 Jun 2020 09:31:57 +0200
-Message-Id: <20200627073159.2447325-13-hch@lst.de>
+Subject: [PATCH 14/14] blk-cgroup: remove a dead check in blk_throtl_bio
+Date:   Sat, 27 Jun 2020 09:31:59 +0200
+Message-Id: <20200627073159.2447325-15-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200627073159.2447325-1-hch@lst.de>
 References: <20200627073159.2447325-1-hch@lst.de>
@@ -58,56 +58,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The only thing in blkcg_bio_issue_check that needs to be under
-rcu_read_lock is blk_throtl_bio, so move the locking there.
+bios must have a valid block group by the time they are submitted.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-throttle.c       | 3 ++-
- include/linux/blk-cgroup.h | 2 --
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ block/blk-throttle.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 209fdd8939fba6..ac008345050010 100644
+index 9d00f62c05ecdf..ad37043297ed58 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -2168,7 +2168,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	bool throttled = false;
- 	struct throtl_data *td = tg->td;
- 
--	WARN_ON_ONCE(!rcu_read_lock_held());
-+	rcu_read_lock();
- 
- 	/* see throtl_charge_bio() */
- 	if (bio_flagged(bio, BIO_THROTTLED))
-@@ -2273,6 +2273,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	if (throttled || !td->track_bio_latency)
- 		bio->bi_issue.value |= BIO_ISSUE_THROTL_SKIP_LATENCY;
- #endif
-+	rcu_read_unlock();
- 	return throttled;
- }
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 8e86b598316c10..8ab043c911f233 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -546,7 +546,6 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+@@ -2163,7 +2163,7 @@ bool blk_throtl_bio(struct bio *bio)
+ 	struct request_queue *q = bio->bi_disk->queue;
  	struct blkcg_gq *blkg = bio->bi_blkg;
- 	bool throtl = false;
- 
--	rcu_read_lock();
- 	throtl = blk_throtl_bio(q, blkg, bio);
- 	if (!throtl) {
- 		struct blkg_iostat_set *bis;
-@@ -582,7 +581,6 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 
- 	blkcg_bio_issue_init(bio);
- 
--	rcu_read_unlock();
- 	return !throtl;
- }
- 
+ 	struct throtl_qnode *qn = NULL;
+-	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
++	struct throtl_grp *tg = blkg_to_tg(blkg);
+ 	struct throtl_service_queue *sq;
+ 	bool rw = bio_data_dir(bio);
+ 	bool throttled = false;
 -- 
 2.26.2
 
