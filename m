@@ -2,122 +2,193 @@ Return-Path: <SRS0=t6Xx=AJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_SIGNED,DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC79C433E0
-	for <linux-block@archiver.kernel.org>; Sun, 28 Jun 2020 15:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45239C433E0
+	for <linux-block@archiver.kernel.org>; Sun, 28 Jun 2020 17:20:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69DC6206F1
-	for <linux-block@archiver.kernel.org>; Sun, 28 Jun 2020 15:58:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1593359928;
-	bh=TABu29BI2c2+MRgRU1Lp6FgWpAUZToEc49ZuYWCqrwY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=MSJv2DuAzzxd6a9AxWWqbvcR+1+HV6NDF9TiHNZIp5SGHJJe9BDj+u00u+4CQSiDA
-	 71NFbs5Vq3/FDfFQUHl2fSr2TKHKI/q7zPCvNrzFuF16vKzcZ416QUgfVgRCyfOs+J
-	 6jMCry0/DA3snByTah2gmfvVBDMv1GCgN9nIxtaE=
+	by mail.kernel.org (Postfix) with ESMTP id B2810206C3
+	for <linux-block@archiver.kernel.org>; Sun, 28 Jun 2020 17:20:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="i7o08oxK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725970AbgF1P6r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Jun 2020 11:58:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35428 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726075AbgF1P6r (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Jun 2020 11:58:47 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E207B2071A;
-        Sun, 28 Jun 2020 15:58:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593359927;
-        bh=TABu29BI2c2+MRgRU1Lp6FgWpAUZToEc49ZuYWCqrwY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=O2VVzPPuS4p+UcSYmiyCkYc3MuRC/eV0+XGU3zj9Oy0Z5QZZ8nKO9SMZRuThM2ho3
-         V7UduENIdaHhvg/HRkpUL/8SKz4HVUM+dnZ06VXaDQR+OI1k7sIgG3exEfYTFfZxHB
-         JPxCeEiqUYsMECWRPKNaXVM/fEZh44dOXH+oX13g=
-Date:   Sun, 28 Jun 2020 08:58:45 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Zheng Bin <zhengbin13@huawei.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "nbd@other.debian.org" <nbd@other.debian.org>,
-        "yi.zhang@huawei.com" <yi.zhang@huawei.com>
-Subject: Re: [PATCH] nbd: Fix memory leak in nbd_add_socket
-Message-ID: <20200628155845.GB2310@sol.localdomain>
-References: <20200612090437.77977-1-zhengbin13@huawei.com>
- <BYAPR04MB4965BCC5D59A22A417274A5486920@BYAPR04MB4965.namprd04.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR04MB4965BCC5D59A22A417274A5486920@BYAPR04MB4965.namprd04.prod.outlook.com>
+        id S1726143AbgF1RUt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Jun 2020 13:20:49 -0400
+Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:53770 "EHLO
+        forwardcorp1o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726060AbgF1RUs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 Jun 2020 13:20:48 -0400
+Received: from iva8-d077482f1536.qloud-c.yandex.net (iva8-d077482f1536.qloud-c.yandex.net [IPv6:2a02:6b8:c0c:2f26:0:640:d077:482f])
+        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 53EF32E19C0;
+        Sun, 28 Jun 2020 20:20:45 +0300 (MSK)
+Received: from iva8-88b7aa9dc799.qloud-c.yandex.net (iva8-88b7aa9dc799.qloud-c.yandex.net [2a02:6b8:c0c:77a0:0:640:88b7:aa9d])
+        by iva8-d077482f1536.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id pM0SH2ClET-Khn0egtc;
+        Sun, 28 Jun 2020 20:20:45 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1593364845; bh=kKRrfxb90VfzoXGfhNPYe5HmgW3st+L4rXe9X50lhVE=;
+        h=Message-Id:Date:Subject:To:From:Cc;
+        b=i7o08oxKIQ6LebaGj7RjcZEmSQ/jVIhZDVLMmqRI5fPe18FKATrS6E0JMF8eqIxrZ
+         XF6/8cgk8a3BSlMoAkM5sGF/Scgfdd0e5Rr6C6WZgOWK8K6cLHW9Gn/94/EyvsuU5J
+         SHA3MAurrEWt/OvZdYhzCX0cDPeOdCjVT/MGbacQ=
+Authentication-Results: iva8-d077482f1536.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from 95.108.174.193-red.dhcp.yndx.net (95.108.174.193-red.dhcp.yndx.net [95.108.174.193])
+        by iva8-88b7aa9dc799.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id UGedWxu57L-KhhKEAMr;
+        Sun, 28 Jun 2020 20:20:43 +0300
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (Client certificate not present)
+From:   Dmitry Monakhov <dmonakhov@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        paolo.valente@linaro.org, khlebnikov@yandex-team.ru,
+        Dmitry Monakhov <dmonakhov@gmail.com>
+Subject: [PATCH] bfq: fix blkio cgroup leakage
+Date:   Sun, 28 Jun 2020 17:20:40 +0000
+Message-Id: <20200628172040.1869-1-dmonakhov@gmail.com>
+X-Mailer: git-send-email 2.18.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 25, 2020 at 12:16:33AM +0000, Chaitanya Kulkarni wrote:
-> On 6/12/20 1:57 AM, Zheng Bin wrote:
-> > nbd_add_socket
-> >    socks = krealloc(num_connections+1) -->if num_connections is 0, alloc 1
-> >    nsock = kzalloc                     -->If fail, will return
-> > 
-> > nbd_config_put
-> >    if (config->num_connections)        -->0, not free
-> >      kfree(config->socks)
-> > 
-> > Thus memleak happens, this patch fixes that.
-> > 
-> > Signed-off-by: Zheng Bin<zhengbin13@huawei.com>
+commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
+introduce leak forbfq_group and blkcg_gq objects because of get/put
+imbalance. See trace balow:
+-> blkg_alloc
+   -> bfq_pq_alloc
+     -> bfqg_get (+1)
+->bfq_activate_bfqq
+  ->bfq_activate_requeue_entity
+    -> __bfq_activate_entity
+       ->bfq_get_entity
+         ->bfqg_and_blkg_get (+1)  <==== : Note1
+->bfq_del_bfqq_busy
+  ->bfq_deactivate_entity+0x53/0xc0 [bfq]
+    ->__bfq_deactivate_entity+0x1b8/0x210 [bfq]
+      -> bfq_forget_entity(is_in_service = true)
+	 entity->on_st_or_in_serv = false   <=== :Note2
+	 if (is_in_service)
+	     return;  ==> do not touch reference
+-> blkcg_css_offline
+ -> blkcg_destroy_blkgs
+  -> blkg_destroy
+   -> bfq_pd_offline
+    -> __bfq_deactivate_entity
+         if (!entity->on_st_or_in_serv) /* true, because (Note2)
+		return false;
+ -> bfq_pd_free
+    -> bfqg_put() (-1, byt bfqg->ref == 2) because of (Note2)
+So bfq_group and blkcg_gq  will leak forever, see test-case below.
+If fact bfq_group objects reference counting are quite different
+from bfq_queue. bfq_groups object are referenced by blkcg_gq via
+blkg_policy_data pointer, so  neither nor blkg_get() neither bfqg_get
+required here.
 
-This appears to address the syzbot report "memory leak in nbd_add_socket"
-https://syzkaller.appspot.com/bug?id=08283193956ab772623e65242b3ed6d0e7c7d9ce
-Can you please add:
 
-	Reported-by: syzbot+934037347002901b8d2a@syzkaller.appspotmail.com
+This patch drop commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
+and add corresponding comment.
 
-> 
-> Not an nbd expert but wouldn't it be easier use following which matches 
-> the + 1 in the nbd_add_socket() :-
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 01794cd2b6ca..e67c790039c9 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -1209,9 +1209,9 @@ static void nbd_config_put(struct nbd_device *nbd)
->                          device_remove_file(disk_to_dev(nbd->disk), 
-> &pid_attr);
->                  nbd->task_recv = NULL;
->                  nbd_clear_sock(nbd);
-> -               if (config->num_connections) {
-> +               if (config->num_connections + 1) {
->                          int i;
-> -                       for (i = 0; i < config->num_connections; i++) {
-> +                       for (i = 0; i < (config->num_connections + 1); 
-> i++) {
->                                  sockfd_put(config->socks[i]->sock);
->                                  kfree(config->socks[i]);
->                          }
+##TESTCASE_BEGIN:
+#!/bin/bash
 
-That looks wrong.  The + 1 is just nbd_add_socket() preparing to append an entry
-to the array.
+max_iters=${1:-100}
+#prep cgroup mounts
+mount -t tmpfs cgroup_root /sys/fs/cgroup
+mkdir /sys/fs/cgroup/blkio
+mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
 
-Why not just check whether the pointer is NULL or not:
+# Prepare blkdev
+grep blkio /proc/cgroups
+truncate -s 1M img
+losetup /dev/loop0 img
+echo bfq > /sys/block/loop0/queue/scheduler
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 43cff01a5a67..cb8e86174edb 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1206,7 +1206,7 @@ static void nbd_config_put(struct nbd_device *nbd)
- 			device_remove_file(disk_to_dev(nbd->disk), &pid_attr);
- 		nbd->task_recv = NULL;
- 		nbd_clear_sock(nbd);
--		if (config->num_connections) {
-+		if (config->socks) {
- 			int i;
- 			for (i = 0; i < config->num_connections; i++) {
- 				sockfd_put(config->socks[i]->sock);
+grep blkio /proc/cgroups
+for ((i=0;i<max_iters;i++))
+do
+    mkdir -p /sys/fs/cgroup/blkio/a
+    echo 0 > /sys/fs/cgroup/blkio/a/cgroup.procs
+    dd if=/dev/loop0 bs=4k count=1 of=/dev/null iflag=direct 2> /dev/null
+    echo 0 > /sys/fs/cgroup/blkio/cgroup.procs
+    rmdir /sys/fs/cgroup/blkio/a
+    grep blkio /proc/cgroups
+done
+##TESTCASE_END:
+
+Signed-off-by: Dmitry Monakhov <dmonakhov@gmail.com>
+---
+ block/bfq-cgroup.c  |  2 +-
+ block/bfq-iosched.h |  1 -
+ block/bfq-wf2q.c    | 15 +++++----------
+ 3 files changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 68882b9..b791e20 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -332,7 +332,7 @@ static void bfqg_put(struct bfq_group *bfqg)
+ 		kfree(bfqg);
+ }
+ 
+-void bfqg_and_blkg_get(struct bfq_group *bfqg)
++static void bfqg_and_blkg_get(struct bfq_group *bfqg)
+ {
+ 	/* see comments in bfq_bic_update_cgroup for why refcounting bfqg */
+ 	bfqg_get(bfqg);
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index cd224aa..7038952 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -986,7 +986,6 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
+ struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
+ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node);
+-void bfqg_and_blkg_get(struct bfq_group *bfqg);
+ void bfqg_and_blkg_put(struct bfq_group *bfqg);
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 34ad095..6a363bb 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -529,13 +529,14 @@ static void bfq_get_entity(struct bfq_entity *entity)
+ {
+ 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
+ 
++	/* Grab reference only for bfq_queue's objects, bfq_group ones
++	 * are owned by blkcg_gq
++	 */
+ 	if (bfqq) {
+ 		bfqq->ref++;
+ 		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
+ 			     bfqq, bfqq->ref);
+-	} else
+-		bfqg_and_blkg_get(container_of(entity, struct bfq_group,
+-					       entity));
++	}
+ }
+ 
+ /**
+@@ -649,14 +650,8 @@ static void bfq_forget_entity(struct bfq_service_tree *st,
+ 
+ 	entity->on_st_or_in_serv = false;
+ 	st->wsum -= entity->weight;
+-	if (is_in_service)
+-		return;
+-
+-	if (bfqq)
++	if (bfqq && !is_in_service)
+ 		bfq_put_queue(bfqq);
+-	else
+-		bfqg_and_blkg_put(container_of(entity, struct bfq_group,
+-					       entity));
+ }
+ 
+ /**
+-- 
+2.7.4
+
