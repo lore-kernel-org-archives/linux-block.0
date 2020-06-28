@@ -2,193 +2,116 @@ Return-Path: <SRS0=t6Xx=AJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_SIGNED,DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45239C433E0
-	for <linux-block@archiver.kernel.org>; Sun, 28 Jun 2020 17:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B52C433DF
+	for <linux-block@archiver.kernel.org>; Sun, 28 Jun 2020 20:53:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2810206C3
-	for <linux-block@archiver.kernel.org>; Sun, 28 Jun 2020 17:20:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="i7o08oxK"
+	by mail.kernel.org (Postfix) with ESMTP id 9FCAE2053B
+	for <linux-block@archiver.kernel.org>; Sun, 28 Jun 2020 20:53:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726143AbgF1RUt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Jun 2020 13:20:49 -0400
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:53770 "EHLO
-        forwardcorp1o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726060AbgF1RUs (ORCPT
+        id S1726188AbgF1Uxy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Jun 2020 16:53:54 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43788 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726104AbgF1Uxy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Jun 2020 13:20:48 -0400
-Received: from iva8-d077482f1536.qloud-c.yandex.net (iva8-d077482f1536.qloud-c.yandex.net [IPv6:2a02:6b8:c0c:2f26:0:640:d077:482f])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 53EF32E19C0;
-        Sun, 28 Jun 2020 20:20:45 +0300 (MSK)
-Received: from iva8-88b7aa9dc799.qloud-c.yandex.net (iva8-88b7aa9dc799.qloud-c.yandex.net [2a02:6b8:c0c:77a0:0:640:88b7:aa9d])
-        by iva8-d077482f1536.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id pM0SH2ClET-Khn0egtc;
-        Sun, 28 Jun 2020 20:20:45 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1593364845; bh=kKRrfxb90VfzoXGfhNPYe5HmgW3st+L4rXe9X50lhVE=;
-        h=Message-Id:Date:Subject:To:From:Cc;
-        b=i7o08oxKIQ6LebaGj7RjcZEmSQ/jVIhZDVLMmqRI5fPe18FKATrS6E0JMF8eqIxrZ
-         XF6/8cgk8a3BSlMoAkM5sGF/Scgfdd0e5Rr6C6WZgOWK8K6cLHW9Gn/94/EyvsuU5J
-         SHA3MAurrEWt/OvZdYhzCX0cDPeOdCjVT/MGbacQ=
-Authentication-Results: iva8-d077482f1536.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from 95.108.174.193-red.dhcp.yndx.net (95.108.174.193-red.dhcp.yndx.net [95.108.174.193])
-        by iva8-88b7aa9dc799.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id UGedWxu57L-KhhKEAMr;
-        Sun, 28 Jun 2020 20:20:43 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client certificate not present)
-From:   Dmitry Monakhov <dmonakhov@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, khlebnikov@yandex-team.ru,
-        Dmitry Monakhov <dmonakhov@gmail.com>
-Subject: [PATCH] bfq: fix blkio cgroup leakage
-Date:   Sun, 28 Jun 2020 17:20:40 +0000
-Message-Id: <20200628172040.1869-1-dmonakhov@gmail.com>
-X-Mailer: git-send-email 2.18.0
+        Sun, 28 Jun 2020 16:53:54 -0400
+Received: by mail-pg1-f195.google.com with SMTP id w2so6558114pgg.10;
+        Sun, 28 Jun 2020 13:53:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=/Skqv25wAnqYg3Blzd9AIoqF08tRedT1L7V60PB1U9c=;
+        b=U6BGqjGSBMC/RL2sfhGvXkSpBqTNLs/ME+YOZDLyR6VGXwCRl/OsyIRLYwtylS4BoE
+         d1a5brfmEVnz1gpzaVXyHC9zmwYMRbmEePewsuQILNXYUGxGUUMccpPFQ4xQpmfXwcmO
+         7yhoj01fYnkGW1e2htXp3mr3wLk4eHIPehVDbrTXunbXdhf2syYnSR7J7A19Y0vaRh0R
+         5wkkJClZXlreJDwDWfREwDyIAcw14E2naKX2ol55H1yYECmECJU7eJ0pleu10Riaah5r
+         Z58vWnBCuFGRP4Siw/77tQn8P/1lL2MGrSRKESx6qYF9WcoHqFBIrrsgxj+Ak1scROpx
+         BJ8w==
+X-Gm-Message-State: AOAM531bOz71kCgydjDVOI2Rsy4wBM8JD3Y/YAoAvKHcFNtZPKv7yl4h
+        s7hvII5llJP2GzizVTqrYF/oQWx9
+X-Google-Smtp-Source: ABdhPJzz2265fEWWmSqdhE0+OvrR6x850B3reKP/z5FWuVMsWimAj2NZAiXm8edO4ZU0ThiJeiedlQ==
+X-Received: by 2002:a63:5d1:: with SMTP id 200mr7787221pgf.59.1593377632994;
+        Sun, 28 Jun 2020 13:53:52 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id r17sm4867487pfg.62.2020.06.28.13.53.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 28 Jun 2020 13:53:51 -0700 (PDT)
+Subject: Re: [PATCH 1/2] block: add initial kdoc over the request_queue
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        damien.lemoal@wdc.com, ming.lei@redhat.com,
+        martin.petersen@oracle.com, satyat@google.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200623220311.8033-1-mcgrof@kernel.org>
+ <20200623220311.8033-2-mcgrof@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <9bdf8661-f616-7cd3-b78c-4a00424a0bac@acm.org>
+Date:   Sun, 28 Jun 2020 13:53:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200623220311.8033-2-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
-introduce leak forbfq_group and blkcg_gq objects because of get/put
-imbalance. See trace balow:
--> blkg_alloc
-   -> bfq_pq_alloc
-     -> bfqg_get (+1)
-->bfq_activate_bfqq
-  ->bfq_activate_requeue_entity
-    -> __bfq_activate_entity
-       ->bfq_get_entity
-         ->bfqg_and_blkg_get (+1)  <==== : Note1
-->bfq_del_bfqq_busy
-  ->bfq_deactivate_entity+0x53/0xc0 [bfq]
-    ->__bfq_deactivate_entity+0x1b8/0x210 [bfq]
-      -> bfq_forget_entity(is_in_service = true)
-	 entity->on_st_or_in_serv = false   <=== :Note2
-	 if (is_in_service)
-	     return;  ==> do not touch reference
--> blkcg_css_offline
- -> blkcg_destroy_blkgs
-  -> blkg_destroy
-   -> bfq_pd_offline
-    -> __bfq_deactivate_entity
-         if (!entity->on_st_or_in_serv) /* true, because (Note2)
-		return false;
- -> bfq_pd_free
-    -> bfqg_put() (-1, byt bfqg->ref == 2) because of (Note2)
-So bfq_group and blkcg_gq  will leak forever, see test-case below.
-If fact bfq_group objects reference counting are quite different
-from bfq_queue. bfq_groups object are referenced by blkcg_gq via
-blkg_policy_data pointer, so  neither nor blkg_get() neither bfqg_get
-required here.
+On 2020-06-23 15:03, Luis Chamberlain wrote:
+> +/**
+> + * struct request_queue - block device driver request queue
 
+Since request queues are used as a communication channel between the
+block layer core and block drivers and since the block layer core
+creates request queues, I propose to leave out the word "driver".
 
-This patch drop commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
-and add corresponding comment.
+> + * @debugfs_mutex: used to protect access to the @debugfs_dir
+> + * @blk_trace: used by blktrace to keep track of setup / tracing
+> + * @debugfs_dir: directory created to place debugfs information. This is always
+> + *	created for make_request and request-based block drivers upon
+> + *	initialization. blktrace requires for this directory to be created,
+> + *	and so it will be created on demand if its block driver type does not
+> + *	create it opon initialization.
+> + *
+> + * The request_queue is used to manage incoming block layer device driver
+> + * requests. We have three main type of block driver types which end up making
+> + * use of the request_queue:
 
-##TESTCASE_BEGIN:
-#!/bin/bash
+"incoming" is correct from the perspective of the block driver but not
+from the perspective of the block layer core. How about describing
+request queues as a communication channel between the block layer core
+and block drivers?
 
-max_iters=${1:-100}
-#prep cgroup mounts
-mount -t tmpfs cgroup_root /sys/fs/cgroup
-mkdir /sys/fs/cgroup/blkio
-mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
+Thanks,
 
-# Prepare blkdev
-grep blkio /proc/cgroups
-truncate -s 1M img
-losetup /dev/loop0 img
-echo bfq > /sys/block/loop0/queue/scheduler
-
-grep blkio /proc/cgroups
-for ((i=0;i<max_iters;i++))
-do
-    mkdir -p /sys/fs/cgroup/blkio/a
-    echo 0 > /sys/fs/cgroup/blkio/a/cgroup.procs
-    dd if=/dev/loop0 bs=4k count=1 of=/dev/null iflag=direct 2> /dev/null
-    echo 0 > /sys/fs/cgroup/blkio/cgroup.procs
-    rmdir /sys/fs/cgroup/blkio/a
-    grep blkio /proc/cgroups
-done
-##TESTCASE_END:
-
-Signed-off-by: Dmitry Monakhov <dmonakhov@gmail.com>
----
- block/bfq-cgroup.c  |  2 +-
- block/bfq-iosched.h |  1 -
- block/bfq-wf2q.c    | 15 +++++----------
- 3 files changed, 6 insertions(+), 12 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 68882b9..b791e20 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -332,7 +332,7 @@ static void bfqg_put(struct bfq_group *bfqg)
- 		kfree(bfqg);
- }
- 
--void bfqg_and_blkg_get(struct bfq_group *bfqg)
-+static void bfqg_and_blkg_get(struct bfq_group *bfqg)
- {
- 	/* see comments in bfq_bic_update_cgroup for why refcounting bfqg */
- 	bfqg_get(bfqg);
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index cd224aa..7038952 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -986,7 +986,6 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
- struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node);
--void bfqg_and_blkg_get(struct bfq_group *bfqg);
- void bfqg_and_blkg_put(struct bfq_group *bfqg);
- 
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 34ad095..6a363bb 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -529,13 +529,14 @@ static void bfq_get_entity(struct bfq_entity *entity)
- {
- 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
- 
-+	/* Grab reference only for bfq_queue's objects, bfq_group ones
-+	 * are owned by blkcg_gq
-+	 */
- 	if (bfqq) {
- 		bfqq->ref++;
- 		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
- 			     bfqq, bfqq->ref);
--	} else
--		bfqg_and_blkg_get(container_of(entity, struct bfq_group,
--					       entity));
-+	}
- }
- 
- /**
-@@ -649,14 +650,8 @@ static void bfq_forget_entity(struct bfq_service_tree *st,
- 
- 	entity->on_st_or_in_serv = false;
- 	st->wsum -= entity->weight;
--	if (is_in_service)
--		return;
--
--	if (bfqq)
-+	if (bfqq && !is_in_service)
- 		bfq_put_queue(bfqq);
--	else
--		bfqg_and_blkg_put(container_of(entity, struct bfq_group,
--					       entity));
- }
- 
- /**
--- 
-2.7.4
-
+Bart.
