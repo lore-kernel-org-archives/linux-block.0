@@ -2,59 +2,98 @@ Return-Path: <SRS0=rGXo=AK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C070C433E2
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7BFC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:43:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59BEE2063A
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:41:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 197532064B
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:43:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593456219;
+	bh=joxDTKR8NyITh5hj0bUUqfSyS5rJlgFhvTKbYzozqtw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=JJJgEigBXR7/DJk5KD0QXEQuuDy7EAFeouZ89P7xrzRkOvVsQjb3MH0sBtxzEWOvW
+	 7jPcEL0rlV2MM3L0Lzho5tUy0e4udO5qlhuirq7tD2f4W38V6/YjDqqrmubw8L98i+
+	 BzqwhPWm7L/C7pYx1zwZzLfgbSC6fusdR8BvKYFM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727997AbgF2Slk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Jun 2020 14:41:40 -0400
-Received: from verein.lst.de ([213.95.11.211]:58786 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728976AbgF2Slg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:41:36 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 19BC168C4E; Mon, 29 Jun 2020 17:04:38 +0200 (CEST)
-Date:   Mon, 29 Jun 2020 17:04:37 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] blk-mq: put driver tag when this request is completed
-Message-ID: <20200629150437.GA25144@lst.de>
-References: <20200629094759.2002708-1-ming.lei@redhat.com>
+        id S1729161AbgF2SnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jun 2020 14:43:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729146AbgF2Smw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jun 2020 14:42:52 -0400
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19FA2C02A57F;
+        Mon, 29 Jun 2020 06:56:47 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id o38so12855166qtf.6;
+        Mon, 29 Jun 2020 06:56:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=LrEjvuOin918PAofPsAgLqEkYaBJUx4P898a1Pb6YYM=;
+        b=JsskD35qz0tKWuO+mM+x0GiX77OCsGGD4vVCBnK6DOfFQsQR9uocw+MWCsVcLjFD/l
+         uVT5fFqZckHiENcqGHRdTsCXwE6L9gIvEROpH+ej4xid3FM9It6v9BUHunTC3MK/j3/2
+         TOdOUR9CVZSfBRkUZY9Od9x2BSf/eU/kgwwYswE3hg5EY0/jz385OEfhFGrTYLOf8nlq
+         xnUbq5WJsd1oWvXr53EdHHZHwXG5g1p6167gqIJvrXO/Qz59KyepI7sdAiXoXS5aZ1Rt
+         HTdttPbGp8H2jq7D7QfAoVhc2MJkN5zTVcmye06vcv9hAzgrOnnRVm08SpGDZwuPdBLs
+         rLEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=LrEjvuOin918PAofPsAgLqEkYaBJUx4P898a1Pb6YYM=;
+        b=Kacyb3PTGLOD+hxsmQQu2V6yL+PlhqjHb4GIaAALPfJM0WXCpu22lL5zs+2CYKN3QE
+         lGmoiYskqPx0JjfPBnHes4bjFdnr/YPgbMR1hQmq4fIrGVn8UKKEXhE1TkdufBulficu
+         rIGhncdmDYNkCqsPvsxgKM91sT8Q+0+OMfVHaJAs3W9e2pTGbJ5rnnxwacAL+J1hiY38
+         oT9OAJ0/D/tszk26j13mZ9ImsaO+6SmwtG6c4uHxKTrP/exulPHEo0cz03cK9bvfpOBU
+         qHZ40P48MSka+o9iGaN3UQgRtdqWsNvRStTqS8Lc8kRxAVGPeMVxzAQBv2m50amtQbGo
+         zPWA==
+X-Gm-Message-State: AOAM5338uaouzKgOJzb8rOYAYdGA5sq50C49VxoRpUvC96ovECKJa73R
+        v/TtQahl7g+wvCkp0GuLmhR3U2kttvE=
+X-Google-Smtp-Source: ABdhPJzVW9rKTRYYquAhom+ajTl8S5hOknpLXTSQ3LijLTqXn91ePIJzb9xDmTsfRnCr1uRKtQrd2Q==
+X-Received: by 2002:ac8:154:: with SMTP id f20mr14767600qtg.331.1593439005608;
+        Mon, 29 Jun 2020 06:56:45 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:26be])
+        by smtp.gmail.com with ESMTPSA id f22sm19861844qko.89.2020.06.29.06.56.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jun 2020 06:56:44 -0700 (PDT)
+Date:   Mon, 29 Jun 2020 09:56:43 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Dennis Zhou <dennis@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: drive-by blk-cgroup cleanups
+Message-ID: <20200629135643.GA233973@mtj.thefacebook.com>
+References: <20200627073159.2447325-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200629094759.2002708-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200627073159.2447325-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 29, 2020 at 05:47:59PM +0800, Ming Lei wrote:
-> It is natural to release driver tag when this request is completed by
-> LLD or device since its purpose is for LLD use.
+On Sat, Jun 27, 2020 at 09:31:45AM +0200, Christoph Hellwig wrote:
+> Hi all,
 > 
-> One big benefit is that the released tag can be re-used quicker since
-> bio_endio() may take too long.
-> 
-> Meantime we don't need to release driver tag for flush request.
+> while looking into another "project" I ended up wading through the
+> blkcq code for research and found a bunch of lose ends.  So here is
+> a bunch of drive-by cleanups for the code.
 
+The whole series looks great to me.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Tejun Heo <tj@kernel.org>
 
-A bunch of comments on the surrounding code from reviewing it, though:
+Thanks.
 
- - blk_mq_put_driver_tag and __blk_mq_put_driver_tag can and should be
-   moved to blk-mq.c and marked static in a follow on patch (and possibly
-   merged as well)
- - The rq->internal_tag == BLK_MQ_NO_TAG check in shold probably be
-   replaced with a !data->q->elevator check to make it more obvious
-   that we are only putting the driver tag for the iosched case
+-- 
+tejun
