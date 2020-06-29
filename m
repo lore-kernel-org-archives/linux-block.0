@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D54CFC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 23:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F697C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 23:44:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B394620780
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 23:44:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A2F820780
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 23:44:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rNKfuhCz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hwDlQASi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727065AbgF2XoQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Jun 2020 19:44:16 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:29224 "EHLO
+        id S1727069AbgF2XoY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jun 2020 19:44:24 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:29235 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726865AbgF2XoP (ORCPT
+        with ESMTP id S1726865AbgF2XoY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jun 2020 19:44:15 -0400
+        Mon, 29 Jun 2020 19:44:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1593474255; x=1625010255;
+  t=1593474263; x=1625010263;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0TV88dsrPxDiMSQl2gPAupgdWEaQUiQ8JI8KTgMEfVo=;
-  b=rNKfuhCz2AO7QWhPIoBQLOajtojO1tQIJHN2hyGOgAWe6zGSZm78WCJ1
-   U2WGJb58QBy8TxPhadMSDDb1TwAJrJ1TZnsvIuPZrGpOizpotV5QIQP6m
-   JvNfy3xo3ze/CMD2PP+ckFQRs9m5ZbaPxgVqfWpJqWRfld01b9tbJB42P
-   KdbSAc55FHISH0AMTb1U2y60RoQWjuGbynZHrPS9YjZFBd0tzCdvSDk1E
-   ED/A+mVEPrTqDbAyg+cVr3GBzCoAD7DmQimTJ2v4YK3NEU8ISCFzGEQyC
-   gMjqZeuFj4UQl+0WMOzT1p1DAPhYETzQsQ2SkT4xab37mZIFhkD/A8GR0
+  bh=tijSnB8jSt60tSYH9WyDHzSpzATYyWUOHH0kfxtZ+Tc=;
+  b=hwDlQASiQBjRH7kpZM3CylG9ixqE8Kia+BMjdnhcesv3HqiG6RkSok53
+   rqN0JTFO83gWqN/H8JkIwOj9WENWCrAlUjuoqqWvsn13caKdzE5ITCefE
+   U/E5atoxm3tBnk5vw1K/NEgFoMwfyUqv3zvI7rt6dBHLzlRtzdPoamHYp
+   CuFPBhlNqvpxi+vfCEiPMCHXano0SrjUdYDE7Q51DLm0a2VKTwdg+rz8C
+   pXHcA33cA9olhEZ9aIqmMj3MNhfhCLCFKDOYJgsXokKXuVTcI3iufaG/q
+   EdJXBxWwPXEH/lfDiOuKQDSfwJeqq6I1nN54dnKjsh+QH+VIvvt1XsCCd
    Q==;
-IronPort-SDR: mXcSi05VFLRU3AVJA7Es12d6iqyOYICt32ksuS64QVZyjF9nRbYw214d3eZLaJGOyqCCdSGoOM
- 75ewU8/CCtbAC0I5iZQlUwYie/BZSzkphil/lZTUEv4ghLqa2D+G3OTRgM6V6lTdje9FIvmr69
- v0nn/DPRYpBOyEtDpolRQyWgnWFr+eyzAf9hgGViAoGsfbVzlEH6VMdiAaPRe5HowuIpZYmyyt
- RgY38x11ShyuoCPBOh2dHVVhp2lVzhiXUFUZvqBmYMf2S4v4JTsEo74+fTIpC3cuXVWPFyIl2o
- 8Ic=
+IronPort-SDR: BOXzo4dYIODKPDbC/tH1uEj9evowgMSPAvh6Ftb3MdCtrVmGHqXq3R5Ye43c5vwbBA0fJ+A9gi
+ OozYW57QBKuz28bi9ATg8KByetwPFB0nAIgaHGcsEoFaPTPgRU7ZqGEKi3AaZcgikvrXcG3phT
+ GyKc4bvlP/9gUrA01jwsXC/VBnU5B9cD9KRb7NKoQCA5EeVbFN8s5h6n2BkiACslWEvjvgb3nW
+ cfG0Hf8d0A0DVUPbfOslBg0rEPH+nVCw9pQHJwH8tRqXCz40R0/Jp2YC23WRmqKkWTF9VqBv7q
+ uzU=
 X-IronPort-AV: E=Sophos;i="5.75,296,1589212800"; 
-   d="scan'208";a="141431430"
+   d="scan'208";a="141431439"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Jun 2020 07:44:15 +0800
-IronPort-SDR: 1ZM4JW0RsdGniHFDWXhMKkGxaEEWvyWIU/zAaohh9M/CDb+SIZS9mhoiHHiBEqu92MRFj1NgSB
- Uoc+gt/Th1jJA51GvmyYAqQkTej3XHq6A=
+  by ob1.hgst.iphmx.com with ESMTP; 30 Jun 2020 07:44:23 +0800
+IronPort-SDR: LEMweQhxhEPySHkR+hWaMOqe9cHGpq96oUEcUwYoOet1kawzvkP17CBPBDi9V0Me43mvXNP6p1
+ U0jU5H8br+4GxSD+uwqeqburI3mbory5c=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2020 16:32:34 -0700
-IronPort-SDR: QFmmXIwnVwMqHDqonKjxZOGDQQVIf2sH9oQwNx0KXycFd6uadSP94t6PxOe0NRoAWO/UJAx0RJ
- 8ovtlsScHh/Q==
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2020 16:32:43 -0700
+IronPort-SDR: TMjCv1P8V1EeKz6bnWpEiZmnvuYzuTYBmaPtIh375x1fm74/Pz/7R5PydgzYumXw90ZHscENtH
+ UmSWjd8gVN2A==
 WDCIronportException: Internal
 Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip01.wdc.com with ESMTP; 29 Jun 2020 16:44:14 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 29 Jun 2020 16:44:22 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, dm-devel@redhat.com
 Cc:     jack@suse.czi, rdunlap@infradead.org, sagi@grimberg.me,
@@ -61,9 +61,9 @@ Cc:     jack@suse.czi, rdunlap@infradead.org, sagi@grimberg.me,
         ming.lei@redhat.com, bvanassche@acm.org, fangguoju@gmail.com,
         colyli@suse.de, hch@lst.de,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 06/11] block: remove extra param for trace_block_getrq()
-Date:   Mon, 29 Jun 2020 16:43:09 -0700
-Message-Id: <20200629234314.10509-7-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 07/11] block: get rid of blk_trace_request_get_cgid()
+Date:   Mon, 29 Jun 2020 16:43:10 -0700
+Message-Id: <20200629234314.10509-8-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200629234314.10509-1-chaitanya.kulkarni@wdc.com>
 References: <20200629234314.10509-1-chaitanya.kulkarni@wdc.com>
@@ -74,125 +74,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the extra parameter for trace_block_getrq() since we can derive
-I/O direction from bio->bi_opf.
+Now that we have done cleanup we can safely get rid of the
+blk_trace_request_get_cgid() and replace it with
+blk_trace_bio_get_cgid().
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-mq.c               |  2 +-
- include/trace/events/block.h | 14 ++++++--------
- kernel/trace/blktrace.c      | 13 ++++++-------
- 3 files changed, 13 insertions(+), 16 deletions(-)
+ kernel/trace/blktrace.c | 26 +++++++++-----------------
+ 1 file changed, 9 insertions(+), 17 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index dbb98b2bc868..d66bb299d4ae 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2111,7 +2111,7 @@ blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		goto queue_exit;
- 	}
- 
--	trace_block_getrq(bio, bio->bi_opf);
-+	trace_block_getrq(bio);
- 
- 	rq_qos_track(q, rq, bio);
- 
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index d7289576f1fd..3d8923062fc4 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -347,9 +347,9 @@ DEFINE_EVENT(block_bio, block_bio_queue,
- 
- DECLARE_EVENT_CLASS(block_get_rq,
- 
--	TP_PROTO(struct bio *bio, int rw),
-+	TP_PROTO(struct bio *bio),
- 
--	TP_ARGS(bio, rw),
-+	TP_ARGS(bio),
- 
- 	TP_STRUCT__entry(
- 		__field( dev_t,		dev			)
-@@ -377,22 +377,20 @@ DECLARE_EVENT_CLASS(block_get_rq,
- /**
-  * block_getrq - get a free request entry in queue for block IO operations
-  * @bio: pending block IO operation (can be %NULL)
-- * @rw: low bit indicates a read (%0) or a write (%1)
-  *
-  * A request struct for queue has been allocated to handle the
-  * block IO operation @bio.
-  */
- DEFINE_EVENT(block_get_rq, block_getrq,
- 
--	TP_PROTO(struct bio *bio, int rw),
-+	TP_PROTO(struct bio *bio),
- 
--	TP_ARGS(bio, rw)
-+	TP_ARGS(bio)
- );
- 
- /**
-  * block_sleeprq - waiting to get a free request entry in queue for block IO operation
-  * @bio: pending block IO operation (can be %NULL)
-- * @rw: low bit indicates a read (%0) or a write (%1)
-  *
-  * In the case where a request struct cannot be provided for queue
-  * the process needs to wait for an request struct to become
-@@ -401,9 +399,9 @@ DEFINE_EVENT(block_get_rq, block_getrq,
-  */
- DEFINE_EVENT(block_get_rq, block_sleeprq,
- 
--	TP_PROTO(struct bio *bio, int rw),
-+	TP_PROTO(struct bio *bio),
- 
--	TP_ARGS(bio, rw)
-+	TP_ARGS(bio)
- );
- 
- /**
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 7b72781a591d..1d36e6153ab8 100644
+index 1d36e6153ab8..bb864a50307f 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -949,8 +949,7 @@ static void blk_add_trace_bio_queue(void *ignore, struct bio *bio)
- 	blk_add_trace_bio(bio, BLK_TA_QUEUE, 0);
+@@ -804,15 +804,6 @@ u64 blk_trace_bio_get_cgid(struct request_queue *q, struct bio *bio)
  }
+ #endif
  
--static void blk_add_trace_getrq(void *ignore,
--				struct bio *bio, int rw)
-+static void blk_add_trace_getrq(void *ignore, struct bio *bio)
+-static u64
+-blk_trace_request_get_cgid(struct request_queue *q, struct request *rq)
+-{
+-	if (!rq->bio)
+-		return 0;
+-	/* Use the first bio */
+-	return blk_trace_bio_get_cgid(q, rq->bio);
+-}
+-
+ /*
+  * blktrace probes
+  */
+@@ -854,32 +845,32 @@ static void blk_add_trace_rq(struct request *rq, int error,
+ static void blk_add_trace_rq_insert(void *ignore, struct request *rq)
  {
- 	if (bio)
- 		blk_add_trace_bio(bio, BLK_TA_GETRQ, 0);
-@@ -960,14 +959,14 @@ static void blk_add_trace_getrq(void *ignore,
- 		rcu_read_lock();
- 		bt = rcu_dereference(bio_q(bio)->blk_trace);
- 		if (bt)
--			__blk_add_trace(bt, 0, 0, rw, 0, BLK_TA_GETRQ, 0, 0,
--					NULL, 0);
-+			__blk_add_trace(bt, 0, 0, bio->bi_opf, 0,
-+					BLK_TA_GETRQ, 0, 0, NULL, 0);
- 		rcu_read_unlock();
- 	}
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_INSERT,
+-			 blk_trace_request_get_cgid(rq->q, rq));
++			 rq->bio ? blk_trace_bio_get_cgid(rq->q, rq->bio) : 0);
  }
  
- 
--static void blk_add_trace_sleeprq(void *ignore, struct bio *bio, int rw)
-+static void blk_add_trace_sleeprq(void *ignore, struct bio *bio)
+ static void blk_add_trace_rq_issue(void *ignore, struct request *rq)
  {
- 	if (bio)
- 		blk_add_trace_bio(bio, BLK_TA_SLEEPRQ, 0);
-@@ -977,8 +976,8 @@ static void blk_add_trace_sleeprq(void *ignore, struct bio *bio, int rw)
- 		rcu_read_lock();
- 		bt = rcu_dereference(bio_q(bio)->blk_trace);
- 		if (bt)
--			__blk_add_trace(bt, 0, 0, rw, 0, BLK_TA_SLEEPRQ,
--					0, 0, NULL, 0);
-+			__blk_add_trace(bt, 0, 0, bio->bi_opf, 0,
-+					BLK_TA_SLEEPRQ, 0, 0, NULL, 0);
- 		rcu_read_unlock();
- 	}
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_ISSUE,
+-			 blk_trace_request_get_cgid(rq->q, rq));
++			 rq->bio ? blk_trace_bio_get_cgid(rq->q, rq->bio) : 0);
  }
+ 
+ static void blk_add_trace_rq_merge(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_BACKMERGE,
+-			 blk_trace_request_get_cgid(rq->q, rq));
++			 rq->bio ? blk_trace_bio_get_cgid(rq->q, rq->bio) : 0);
+ }
+ 
+ static void blk_add_trace_rq_requeue(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_REQUEUE,
+-			 blk_trace_request_get_cgid(rq->q, rq));
++			 rq->bio ? blk_trace_bio_get_cgid(rq->q, rq->bio) : 0);
+ }
+ 
+ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
+ 			int error, unsigned int nr_bytes)
+ {
+ 	blk_add_trace_rq(rq, error, nr_bytes, BLK_TA_COMPLETE,
+-			 blk_trace_request_get_cgid(rq->q, rq));
++			 rq->bio ? blk_trace_bio_get_cgid(rq->q, rq->bio) : 0);
+ }
+ 
+ /**
+@@ -1105,7 +1096,8 @@ static void blk_add_trace_rq_remap(void *ignore,
+ 
+ 	__blk_add_trace(bt, blk_rq_pos(rq), blk_rq_bytes(rq),
+ 			rq_data_dir(rq), 0, BLK_TA_REMAP, 0,
+-			sizeof(r), &r, blk_trace_request_get_cgid(q, rq));
++			sizeof(r), &r,
++			rq->bio ? blk_trace_bio_get_cgid(q, rq->bio) : 0);
+ 	rcu_read_unlock();
+ }
+ 
+@@ -1134,8 +1126,8 @@ void blk_add_driver_data(struct request_queue *q,
+ 	}
+ 
+ 	__blk_add_trace(bt, blk_rq_trace_sector(rq), blk_rq_bytes(rq), 0, 0,
+-				BLK_TA_DRV_DATA, 0, len, data,
+-				blk_trace_request_get_cgid(q, rq));
++			BLK_TA_DRV_DATA, 0, len, data,
++			rq->bio ? blk_trace_bio_get_cgid(q, rq->bio) : 0);
+ 	rcu_read_unlock();
+ }
+ EXPORT_SYMBOL_GPL(blk_add_driver_data);
 -- 
 2.26.0
 
