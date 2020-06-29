@@ -2,163 +2,179 @@ Return-Path: <SRS0=rGXo=AK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A90DBC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 01:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B41C433E3
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:35:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80E4A20773
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 01:36:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B03BB255DA
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:35:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="s2IxXCxl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbgF2Bg3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Jun 2020 21:36:29 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:38617 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726465AbgF2Bg3 (ORCPT
+        id S1726087AbgF2SfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jun 2020 14:35:05 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:63879 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725869AbgF2SfE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Jun 2020 21:36:29 -0400
-Received: by mail-pj1-f68.google.com with SMTP id d6so7305513pjs.3;
-        Sun, 28 Jun 2020 18:36:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=s4x1Od24FXLrarpF97nRPGvbMk3D5kp3VfdEZSEmDhw=;
-        b=p8sUSbMCdb+dAckjgIHn0PSamNBXz+CWb996fZ8BMckQKBGAly16RpEO45p29CecKX
-         N51FLwyyRodzJdbnWt4SZlcsv/Vxq+WjI3T90Mop35uE5YqQ0GJ5p6sq7ssOOz1W85fj
-         ZUeBGNdoWYMiDQnc5DOaKgUBY9NYlGNI8/75rjtsfNHqAeS4mwS8zVGj/+woZw1lNhcA
-         CigSb5MqkbxhB9Wk1mTST6SLEHp/E9gjBGmqA9nPbUH63Dzk86g4PBvB1WQoTdoXZQBa
-         5Dm+bckrb/iDxHUVyU012SB8CMoSD686240LmIGJoWkRVZUfOxHVeoDDp5hbp2Pb6E6e
-         fGAw==
-X-Gm-Message-State: AOAM532ZOvOWavjzvW+Wbm4fD6fjGq12FPH9GwK7n/MhZ5oCyMYXcbQu
-        Q+QM+YyKk8148kr7GWjUDXI=
-X-Google-Smtp-Source: ABdhPJz7xUgN970SnEgTAeV9FLe4mfvopgGs1JOIp0QPQ6aC2kw6RkTdzy4i7BI5V2xGik2Bz3QRBA==
-X-Received: by 2002:a17:902:6181:: with SMTP id u1mr11517203plj.205.1593394588106;
-        Sun, 28 Jun 2020 18:36:28 -0700 (PDT)
-Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id z1sm27702053pgk.89.2020.06.28.18.36.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 28 Jun 2020 18:36:27 -0700 (PDT)
-Subject: Re: [PATCH 2/2] block: add BLKSETDESCZONE ioctl for Zoned Block
- Devices
-To:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias.bjorling@wdc.com>,
-        axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        martin.petersen@oracle.com, damien.lemoal@wdc.com,
-        niklas.cassel@wdc.com, hans.holmberg@wdc.com
-Cc:     linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <20200628230102.26990-1-matias.bjorling@wdc.com>
- <20200628230102.26990-3-matias.bjorling@wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <cbb91e7d-5cc8-eeb7-5219-b712545cb5c4@acm.org>
-Date:   Sun, 28 Jun 2020 18:36:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Mon, 29 Jun 2020 14:35:04 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20200629183500epoutp019cd5e9722d9f13413ad7550562fd1840~dF4RrRwRS1319913199epoutp012
+        for <linux-block@vger.kernel.org>; Mon, 29 Jun 2020 18:35:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20200629183500epoutp019cd5e9722d9f13413ad7550562fd1840~dF4RrRwRS1319913199epoutp012
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1593455700;
+        bh=GOb5F6IEPqqUzppfmpm5q/EtUDLSZpl8Hl/nDzpT/II=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=s2IxXCxlP0DxRQWjQCAElJjGgGLZwVziDdmjh6WwL1NUfVg7PtLaxqxPj1yS/b9Jq
+         6K3jcZ/sVaZ4EPg5JmlFC/cvjxywO9MEnxDx/ErMuDRGPqlEnZc2N1z8LPV9jaQMkq
+         //6kLW40RNAyxr4Aewxvu0iXbnU0qA2JxQ4N7SZk=
+Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20200629183459epcas5p3e5d54b1bd9edce6f19f739b187e730bb~dF4Q0gKG30377803778epcas5p3y;
+        Mon, 29 Jun 2020 18:34:59 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        DB.07.09703.3543AFE5; Tue, 30 Jun 2020 03:34:59 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20200629183459epcas5p464fdcdf272ea360bcd50901ccc79ca6e~dF4QV4RQj0162001620epcas5p4P;
+        Mon, 29 Jun 2020 18:34:59 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20200629183459epsmtrp29abb784126e5b438d6071a9f61937274~dF4QU9PJ80229002290epsmtrp2j;
+        Mon, 29 Jun 2020 18:34:59 +0000 (GMT)
+X-AuditID: b6c32a4a-4b5ff700000025e7-6e-5efa34533fce
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        A1.55.08303.3543AFE5; Tue, 30 Jun 2020 03:34:59 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20200629183456epsmtip268cd4e9ea0911be74ab0ec579850ff0c~dF4OJ4uE21597515975epsmtip2a;
+        Mon, 29 Jun 2020 18:34:56 +0000 (GMT)
+Date:   Tue, 30 Jun 2020 00:02:02 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        "asml.silence@gmail.com" <asml.silence@gmail.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "mb@lightnvm.io" <mb@lightnvm.io>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
+        "javier.gonz@samsung.com" <javier.gonz@samsung.com>,
+        Arnav Dawn <a.dawn@samsung.com>
+Subject: Re: [PATCH v2 1/2] fs,block: Introduce RWF_ZONE_APPEND and handling
+ in direct IO path
+Message-ID: <20200629183202.GA24003@test-zns>
 MIME-Version: 1.0
-In-Reply-To: <20200628230102.26990-3-matias.bjorling@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CY4PR04MB37511FB1D3B3491A2CED5470E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrIKsWRmVeSWpSXmKPExsWy7bCmum6wya84g20vVC1+b3vEYjFn1TZG
+        i9V3+9ksuv5tYbFobf/GZHF6wiImi3et51gsHt/5zG4xZVoTo8XeW9oWe/aeZLG4vGsOm8WK
+        7UdYLLb9ns9s8frHSTaL83+PszoIeOycdZfdY/MKLY/LZ0s9Nn2axO7RffUHo0ffllWMHp83
+        yXm0H+hm8tj05C1TAGcUl01Kak5mWWqRvl0CV8ah8xuYC+YJVqxceo+xgXEXXxcjJ4eEgInE
+        wqurmLsYuTiEBHYzSjxesJcFwvnEKLF54QVWCOczo0Tnne0sMC3fH74Es4UEdjFKfN7OAVH0
+        jFHi2L5XrCAJFgFViWW/O9i6GDk42AQ0JS5MLgUJiwhoSSzb9w5sKLPAZ1aJ1jvrwWqEBRIk
+        1n72BKnhFdCVmP20iQXCFpQ4OfMJmM0pECvx+NBuMFtUQFniwLbjTCBzJARucEhMn70N6jgX
+        ibN/HkHZwhKvjm9hh7ClJD6/28sGYRdL/LpzlBmiuYNR4nrDTKgGe4mLe/4ygdjMAhkSC6Zc
+        hLL5JHp/P2ECOVRCgFeio00IolxR4t6kp6wQtrjEwxlLoGwPiWP7+9kgAbSESeLK9KIJjHKz
+        kPwzC8kGCNtKovNDE+ssoA3MAtISy/9xQJiaEut36S9gZF3FKJlaUJybnlpsWmCUl1quV5yY
+        W1yal66XnJ+7iRGc6rS8djA+fPBB7xAjEwfjIUYJDmYlEd7TBr/ihHhTEiurUovy44tKc1KL
+        DzFKc7AoifMq/TgTJySQnliSmp2aWpBaBJNl4uCUamBauZNXf6/s58OZcRmpPrzCgi+uvght
+        WJd37p6TBtOZ3aYvGb68yzLe6L//XHmI1eu/PRrHDAsy1LWDPV46vDMS6DvAkLAwf17c1rN3
+        Jnw/4mBZHWk+4UH65leh/9sPP7r/PFf+84U1EWG2V7VPKP/W3vTwQ+keJcFtO3bn/jOwmm6X
+        I7vplNdtiek+S6q8nRef5jgVVzGjm+nkGbPj6jrLxbVnqt/nXH/vYkbQa5FNN/f5vFthECC6
+        +vu6iGjNwgTezGNPb6wtnd75m5Ox1P1zmahCk83jW/aHGPItmEs3q6eslWXxM9vDvVJPrTU0
+        rtXitqPNXvHNAR9u+xQlSz6KiDG9Vejkxfuqp3xZcL4SS3FGoqEWc1FxIgCanNv45AMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNIsWRmVeSWpSXmKPExsWy7bCSvG6wya84g7fX2S1+b3vEYjFn1TZG
+        i9V3+9ksuv5tYbFobf/GZHF6wiImi3et51gsHt/5zG4xZVoTo8XeW9oWe/aeZLG4vGsOm8WK
+        7UdYLLb9ns9s8frHSTaL83+PszoIeOycdZfdY/MKLY/LZ0s9Nn2axO7RffUHo0ffllWMHp83
+        yXm0H+hm8tj05C1TAGcUl01Kak5mWWqRvl0CV0bz5EbGggt8FRdmvWNpYGzj6WLk5JAQMJH4
+        /vAlSxcjF4eQwA5GiUWv5rNAJMQlmq/9YIewhSVW/nvODlH0hFHizJKTTCAJFgFViWW/O9i6
+        GDk42AQ0JS5MLgUJiwhoSSzb944VpJ5Z4CerxKUfGxhBaoQFEiTWfvYEqeEV0JWY/bQJavES
+        JomLH+6zQSQEJU7OfAJ2BLOAmcS8zQ+ZQXqZBaQllv/jAAlzCsRKPD60G6xEVEBZ4sC240wT
+        GAVnIemehaR7FkL3AkbmVYySqQXFuem5xYYFRnmp5XrFibnFpXnpesn5uZsYwfGnpbWDcc+q
+        D3qHGJk4GA8xSnAwK4nwnjb4FSfEm5JYWZValB9fVJqTWnyIUZqDRUmc9+ushXFCAumJJanZ
+        qakFqUUwWSYOTqkGJjbJG7cM+jIOWtrnMTw7aMCbOivG5RObtItF8CZDLhMFj05fsWXO6xfM
+        cpBYExTwRjrh0fc0V2eWNQmhlQ55DEUrb64Qm/7wX2arFneq88TLr5dyy6pX+DtPm8u2/Upc
+        3P8mmxypK/8kijslOfcEP/LhibU1WMQh076vxLMhefqTlIuZBqJzM1uaNFtz4w0etOWULJX3
+        sW7YWanv/vgGr9vO3YX+xSucqv5PzXr05UMtJ0eEwt7QHaK79gud2arydN5spp/3JXfw96R9
+        rjrBofVQ6rXEmXO8+RUzFarjygV/Km0WTReYcSJHrifUy5BPRHi6QaTX+uqau027lbQXcfld
+        le9fqCv2O+LEbSWW4oxEQy3mouJEAFK+Z2ouAwAA
+X-CMS-MailID: 20200629183459epcas5p464fdcdf272ea360bcd50901ccc79ca6e
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----nai8lIH9ngBNHun9R6qswQcIIemhXBCkNXu5CagZqSM5j8ea=_aa309_"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20200625171834epcas5p226a24dfcb84cfa83fe29a2bd17795d85
+References: <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
+        <CGME20200625171834epcas5p226a24dfcb84cfa83fe29a2bd17795d85@epcas5p2.samsung.com>
+        <1593105349-19270-2-git-send-email-joshi.k@samsung.com>
+        <CY4PR04MB37511FB1D3B3491A2CED5470E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-06-28 16:01, Matias Bjørling wrote:
-> +	/* This may take a while, so be nice to others */
-> +	cond_resched();
-> +
-> +	return submit_bio_wait(&bio);
+------nai8lIH9ngBNHun9R6qswQcIIemhXBCkNXu5CagZqSM5j8ea=_aa309_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-A cond_resched() call before a submit_bio_wait() call? I think it's the
-first time that I see this. Is that call really necessary? Isn't the
-wait_for_completion() call inside submit_bio_wait() sufficient?
+On Fri, Jun 26, 2020 at 02:50:20AM +0000, Damien Le Moal wrote:
+>On 2020/06/26 2:18, Kanchan Joshi wrote:
+>> Introduce RWF_ZONE_APPEND flag to represent zone-append. User-space
+>> sends this with write. Add IOCB_ZONE_APPEND which is set in
+>> kiocb->ki_flags on receiving RWF_ZONE_APPEND.
+>> Make direct IO submission path use IOCB_ZONE_APPEND to send bio with
+>> append op. Direct IO completion returns zone-relative offset, in sector
+>> unit, to upper layer using kiocb->ki_complete interface.
+>> Report error if zone-append is requested on regular file or on sync
+>> kiocb (i.e. one without ki_complete).
+>>
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+>> Signed-off-by: Arnav Dawn <a.dawn@samsung.com>
+>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
+>> ---
+>>  fs/block_dev.c          | 28 ++++++++++++++++++++++++----
+>>  include/linux/fs.h      |  9 +++++++++
+>>  include/uapi/linux/fs.h |  5 ++++-
+>>  3 files changed, 37 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>> index 47860e5..5180268 100644
+>> --- a/fs/block_dev.c
+>> +++ b/fs/block_dev.c
+>> @@ -185,6 +185,10 @@ static unsigned int dio_bio_write_op(struct kiocb *iocb)
+>>  	/* avoid the need for a I/O completion work item */
+>>  	if (iocb->ki_flags & IOCB_DSYNC)
+>>  		op |= REQ_FUA;
+>> +
+>> +	if (iocb->ki_flags & IOCB_ZONE_APPEND)
+>> +		op |= REQ_OP_ZONE_APPEND;
+>
+>This is wrong. REQ_OP_WRITE is already set in the declaration of "op". How can
+>this work ?
+REQ_OP_ZONE_APPEND will override the REQ_WRITE op, while previously set op
+flags (REQ_FUA etc.) will be retained. But yes, this can be made to look
+cleaner.
+V3 will include the other changes you pointed out. Thanks for the review.
 
-> +	/* no flags is currently supported */
-                    ^^
-                    are?
 
-> +	/* allocate the size of the zone descriptor extension and fill
-> +	 * with the data in the user data buffer. If the data size is less
-> +	 * than the zone descriptor extension size, then the rest of the
-> +	 * zone description extension data buffer is zero-filled.
-> +	 */
-> +	zsd_data = (void *) get_zeroed_page(GFP_KERNEL);
-> +	if (!zsd_data)
-> +		return -ENOMEM;
-> +
-> +	if (copy_from_user(zsd_data, argp + sizeof(struct blk_zone_set_desc),
-> +			   zsd.len)) {
-> +		ret = -EFAULT;
-> +		goto free;
-> +	}
+------nai8lIH9ngBNHun9R6qswQcIIemhXBCkNXu5CagZqSM5j8ea=_aa309_
+Content-Type: text/plain; charset="utf-8"
 
-Has it been considered to use kmalloc() instead of get_zeroed_page()?
 
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index ccb895f911b1..53b7b05b0004 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -316,6 +316,8 @@ enum req_opf {
->  	REQ_OP_ZONE_FINISH	= 12,
->  	/* write data at the current zone write pointer */
->  	REQ_OP_ZONE_APPEND	= 13,
-> +	/* associate zone desc extension data to a zone */
-> +	REQ_OP_ZONE_SET_DESC	= 14,
->  
->  	/* SCSI passthrough using struct scsi_request */
->  	REQ_OP_SCSI_IN		= 32,
-
-Does REQ_OP_ZONE_SET_DESC count as a read or as a write operation? See also:
-
-static inline bool op_is_write(unsigned int op)
-{
-	return (op & 1);
-}
-
-> +/**
-> + * struct blk_zone_set_desc - BLKSETDESCZONE ioctl requests
-> + * @sector: Starting sector of the zone to operate on.
-> + * @flags: Feature flags.
-> + * @len: size, in bytes, of the data to be associated to the zone.
-> + * @data: data to be associated.
-> + */
-> +struct blk_zone_set_desc {
-> +	__u64		sector;
-> +	__u32		flags;
-> +	__u32		len;
-> +	__u8		data[0];
-> +};
-
-Isn't the recommended style to use a flexible array ([] instead of [0])?
-See also https://lore.kernel.org/lkml/20200608213711.GA22271@embeddedor/.
-
-Thanks,
-
-Bart.
+------nai8lIH9ngBNHun9R6qswQcIIemhXBCkNXu5CagZqSM5j8ea=_aa309_--
