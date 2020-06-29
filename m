@@ -2,135 +2,82 @@ Return-Path: <SRS0=rGXo=AK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4D0C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 19:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C06C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 19:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D346206C3
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 19:15:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jc0SCair";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="XwIcg7UO"
+	by mail.kernel.org (Postfix) with ESMTP id CD12120702
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 19:20:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593458419;
+	bh=lAWJH6y2JHj7l3WROnIUTbAtWV6gbRyKvK+nJkOMGac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=x5DMTipJs7dI6Q0gBlISvbhIEtXPGIDlcMm9hSsn4ZygKaaV8T/Dp9skdGccnA2WI
+	 gpjPXtcAt8swJMsDIqYYJReF0OAJwxN50LlLx/gYitPwOqk5Hffnu0XKMDn1YdbcYr
+	 j2UMhumNwnEfilb1rUhbzCUKl8E1nNgphnmxkjQY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730567AbgF2TPf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Jun 2020 15:15:35 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:8610 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730195AbgF2TP0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jun 2020 15:15:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1593458125; x=1624994125;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=Ys1E1iNEH+s9I1xO50TimGpjtogkatztTVv/Jem6Dc8=;
-  b=jc0SCair4xwLIna6A0f5chV2tBe1Vjasw5aVQm+JxUoa04H7IS2djltI
-   R6qdMcpd3WpkzsPROWVFFkCcQuHOpf9kQlewLnHFgGaOWBoNgfbYmW7dx
-   /tVkgjsGoel7k2hGtWwdNPn7K8AeyyKLuab4lc1OS9mNSugjNIVuYUbTx
-   F7FEWG6upsqaR2Rm4sr9w6DdqBnfAjUjVmSToMnhPhRvtdZQuJDGOfrB2
-   jE5OShs9z/NyAD7Rf5upitxDhMQLkUNj/SlEpDY6U9BpIVyszNboWgOp0
-   AB+aTKWsgUfvGgjycCAvqoUqLwhO/6w7WVrgA50EMDhbjMq4sWbT01Yzz
-   w==;
-IronPort-SDR: 0UGPOV2dK3CbSP6xn/1y6/akdyB8d2z+Kw4QG3rmQfnDvOCL4fgGIN01EfdG73nck/neYVS2FD
- dK/IWub0HkrtXq8XngpP2zZie+SUnbhphCzUPWCdsjdByHlYdXP7Mz4whUIr9510xBD0J25oRq
- qmNx71zrv78vl/4O7lIelK82F8DWhy7LrmPMrg63dbagR3/+d6X8yzLEw3+Qff8jeRNdUlkZ+H
- 1Xj66Qh2Lm8qb5VjCjMWth6Mf2PI17EFo/x1l2QwCOpO+x5Y7UdnteIt34hOmztdgs9fT+kiVr
- iDo=
-X-IronPort-AV: E=Sophos;i="5.75,294,1589212800"; 
-   d="scan'208";a="145495340"
-Received: from mail-dm6nam11lp2177.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.177])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Jun 2020 18:08:30 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VgLIUVuVv0e/aSXoH0IpR/mBPhjAySvHC6GnpSF9w61Nj2YjNVsSMfFvtb4cTlmw92W0IJos/o87BzQIWCvhgSUUalmJ7XtZULzWkfOapYR42T8nYk4ZuWQCBBnTV6ZGYn2g686VRdMlCcClA5ZxiSCC7SBJl45uxiuWR+gnq7KBUROMwvKt1CalluMeorwc3r+7hu+Uqq7IEwrrlpaPXuXvOcLE1iJfKdVwZZbIbkGY7KOv3pLkwBYs6oTO+UgX1mLTMhpVyWx+EqOkthrj8azeszu1cYUd5ctKXPOBY/uDpoIJQtLnBYKFZMhafQYJJ0CLjkrc8QKltSb0q6/Tqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ys1E1iNEH+s9I1xO50TimGpjtogkatztTVv/Jem6Dc8=;
- b=HIycddnu7WCyVMbLIJqsE5AJzglrPTV2Mz/FMGh1Mt7H7mkxhWW30peAq28EpMpvZDJ7o5xMkal1WpCn26TBNanGFdx2ztQ16R9gMhWhnE4/ntPVRdmt5vOxsG+u2R9CeCcX3ATeDNJuMwQzTapjezlhMRC9nFa5e5lWKx0Osd1Qv8n/uUExgPuqz4l3K5Xi9I2FS+O675cYApJuXNYR7m9zhFUB17snNu+OKw0keS0WUJCyq0PXvzqV4CoPz2p2J8sBu73UQ9llDZjAMe//uMIvqQlrCBctaK4GmcVhKewKDTnIOZE85T2Q2tIyTbLv34optcwKvplxPRTcVIEkhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ys1E1iNEH+s9I1xO50TimGpjtogkatztTVv/Jem6Dc8=;
- b=XwIcg7UOmYRHljTqa3zyXhouAfYaPeUdqCgsBFX+6a4z/UAEcsRZPtdKmCUH4EQe+woqn9x9UlqLxDiIPGFjQnNdnhBlIgodHv/MyY1wQtGGP7ZSf1vs+baokbTOxiCcAXWJEPsSGCFZSUecutBqVN04DF5VbQKIAxpsF57wtyg=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN4PR0401MB3600.namprd04.prod.outlook.com
- (2603:10b6:803:46::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.20; Mon, 29 Jun
- 2020 10:08:28 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::1447:186c:326e:30b2]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::1447:186c:326e:30b2%7]) with mapi id 15.20.3131.026; Mon, 29 Jun 2020
- 10:08:28 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>
-CC:     Dennis Zhou <dennis@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>
-Subject: Re: [PATCH 05/14] block: move bio_associate_blkg_from_page to
- mm/page_io.c
-Thread-Topic: [PATCH 05/14] block: move bio_associate_blkg_from_page to
- mm/page_io.c
-Thread-Index: AQHWTFVJvbniMUYqRE62LRQB5ELYuA==
-Date:   Mon, 29 Jun 2020 10:08:28 +0000
-Message-ID: <SN4PR0401MB3598A350166C7B419FA8853F9B6E0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200627073159.2447325-1-hch@lst.de>
- <20200627073159.2447325-6-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2001:a62:1515:bd01:5d2:80d1:159b:260e]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: cc4d6c6b-c75e-471d-f869-08d81c145e90
-x-ms-traffictypediagnostic: SN4PR0401MB3600:
-x-microsoft-antispam-prvs: <SN4PR0401MB360012D1892D43F1FB1FE8DA9B6E0@SN4PR0401MB3600.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2887;
-x-forefront-prvs: 044968D9E1
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: tLykQdwmCmQ+hRPvhHzV7ITBWV08ZjvCIvOfJZrm44aoMv1o97XZXQluqlClsWotI5DJDd8b2TTFHSQr6KyBCkDoIxS+9v1behyw5m52bRxcLy6d5Oxctgk1jyOfJRtVttVpPoe6X2huJzNMkZyfsizy7Hv6+bxFkA3WhPnwoGrjN9QsQtypdZ/5SH+Z1KnisOvSBB4w5yjucVZataOKAE91X+Mu5Z1+aa3CdQJVU7R/a1a/gjOfi8YDCF0iPRw624qJQUDoKEjB/lwbgxETY65fvfqJbzJOSurtp3yVqLaqWLxE4FYlvI7nNswqVSRq
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(136003)(366004)(396003)(346002)(376002)(55016002)(54906003)(110136005)(316002)(558084003)(4326008)(7696005)(9686003)(53546011)(6506007)(186003)(71200400001)(66556008)(66476007)(64756008)(7416002)(2906002)(5660300002)(52536014)(76116006)(8676002)(8936002)(66446008)(66946007)(478600001)(91956017)(33656002)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: kFztssL6AgodECkMisBYuW5IwRli1aZAKYwXmYD38tUu9C5pyRR1bPeTgkZwezqQqrZIdKXS/gY0KyjixIKowdbCiz75AbX9JFPdMCJnZ9uxqMtliojEez0tBaBWuTVX7ypvpc69Uk0KLoJCa/qODQ7PcDLZBKgag+MTDG1NnEYlMLmaWN7ZpHMdmDZkrDDSSQZuzyLW90r5dO8J9+ktuwKdyJ3ajJrrPoXOu1QK0jsjOowrYtHlRlYw47csJj2sJ6TG8ZBIh04YFc4uqyTgLjmc75oAmqy92VxIsIOXRhZdbck2JR121tbVXk6Cb+Ht8nQHXOhlLINJ9ng+nOAiDRb2oLmjDBvEOSMtpsBjkmvn18/NpRnDnimMFMT1PVDBeH6cIWrWxKSfRXDcp2yb+O4Z4Jw6q69PnmiyDkq1S9KYFyJlbXjyb9ObCwcB+lmXSDWCWGsFY9/8fg9EM5/Ya3tjFmzxDAi/qQyAkrP0vaYUo4XvkDjPX2jq0V4DLrThGW42bA6xdVNnyaVMu53VvUkrX4b7G059vIFqqJBugu1moI2CGlC2mWGO859iDezg
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1732115AbgF2TUS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jun 2020 15:20:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33182 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732105AbgF2TUR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jun 2020 15:20:17 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 033B82559A;
+        Mon, 29 Jun 2020 16:52:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593449521;
+        bh=lAWJH6y2JHj7l3WROnIUTbAtWV6gbRyKvK+nJkOMGac=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=oR2Fa16jrQK3sMyMD5a6gGmQM7P77YD+h8hX8rj3ASdSIYAXXX02sL3PQmhSOOM0N
+         D6G2X8WiBIyh7uOl2qxS5BAWBdAhdiw2UQzz+zVfObp3FFeTajZ589ADx9CXvZnhLd
+         PcsBL9h1xaeN/tSw7v8b84c2PWQKyXxjfrn11Gug=
+Date:   Mon, 29 Jun 2020 09:51:59 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-block@vger.kernel.org
+Cc:     Satya Tangirala <satyat@google.com>
+Subject: Re: [PATCH] block/keyslot-manager: use kvfree_sensitive()
+Message-ID: <20200629165159.GB20492@sol.localdomain>
+References: <20200616155654.191263-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc4d6c6b-c75e-471d-f869-08d81c145e90
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jun 2020 10:08:28.2858
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VAqoNFuK7vz70iEfCoIGcF1+Ha6HDxfv/ZdiQGnWHVgV8qnKFkqCZnTfmRh9+91xs/TKfX2iU0t4fnqNH9+ZLIkb+i5Y6cyaIJXy89xuzHE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3600
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200616155654.191263-1-ebiggers@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27/06/2020 09:33, Christoph Hellwig wrote:=0A=
-> bio_associate_blkg_from_page is a special purpose helper for swap bios=0A=
-=0A=
-'for swapping' or 'to swap' I think.=0A=
-=0A=
-Otherwise,=0A=
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+On Tue, Jun 16, 2020 at 08:56:54AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Make blk_ksm_destroy() use the kvfree_sensitive() function (which was
+> introduced in v5.8-rc1) instead of open-coding it.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  block/keyslot-manager.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
+> index c2ef41b3147b..35abcb1ec051 100644
+> --- a/block/keyslot-manager.c
+> +++ b/block/keyslot-manager.c
+> @@ -374,8 +374,7 @@ void blk_ksm_destroy(struct blk_keyslot_manager *ksm)
+>  	if (!ksm)
+>  		return;
+>  	kvfree(ksm->slot_hashtable);
+> -	memzero_explicit(ksm->slots, sizeof(ksm->slots[0]) * ksm->num_slots);
+> -	kvfree(ksm->slots);
+> +	kvfree_sensitive(ksm->slots, sizeof(ksm->slots[0]) * ksm->num_slots);
+>  	memzero_explicit(ksm, sizeof(*ksm));
+>  }
+>  EXPORT_SYMBOL_GPL(blk_ksm_destroy);
+> -- 
+
+Ping?
