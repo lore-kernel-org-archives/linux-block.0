@@ -2,185 +2,130 @@ Return-Path: <SRS0=rGXo=AK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 277ABC433EB
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2984FC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:55:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0359B2065D
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:55:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A03F20656
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:55:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oqFsggA7";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="eXQNbYTa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PUzrMPCv";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ahuB1EAr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728949AbgF2SzC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Jun 2020 14:55:02 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:57271 "EHLO
+        id S1729700AbgF2SzN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jun 2020 14:55:13 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:57277 "EHLO
         esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729909AbgF2SzA (ORCPT
+        with ESMTP id S1729915AbgF2SzC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:55:00 -0400
+        Mon, 29 Jun 2020 14:55:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
   t=1593456903; x=1624992903;
   h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=6acM9xpylVregUcLgxo03dakaGiRmdfj2Enb6u/SGeg=;
-  b=oqFsggA7OYmZMKwKCE+4AYmwPJy4kxfnUJ4Q2SpiH5fysAcRMmdYfdEI
-   cLwrkdVO1HLxfIdwN0EMY1Uw7fIrQPr4vCBH66Cta1M4b2akaxRkasEZk
-   qhhaLxmj/oBKQlAZKLYpM4XYG9++1aOTizqXb1dhbk/OMkrBpA8EwZYUU
-   MHwOASBEHteOTXcuJjYg16hM3vbJRrSFCMeGqTEM/BdyeHXl7h+7AE4TS
-   mxiwza+97lCMZF2emwrA/WSWsNZ7IpX8sQdvjrzZoefAuvdz2l+E+AkC3
-   hOsgQpRG9fL6VXOFEud9bUaJcP3bV6yrBuqvxDGXOfGE7iH6kAZsq3eq1
+   content-transfer-encoding:mime-version;
+  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+  b=PUzrMPCvQRgKFPptoGH1iHwrWY4W0MKUEl4I50pJ6RSnYF/Hg36sFsn3
+   m3ThVZZHikKTi2Egq8mzNUgC43gUujZ4Ub1eLc+7hcnsRc64dzB+ORlLw
+   odJEQfQ1OBFhvv+ddbj8OFT+yqhhzCCfVm2jwdVOj8trIF7Z3CuV81/fi
+   yN+rI5IraYGCr7cl+w1VU9m18ACRLV/ye+l9tcjBjiV5O3M30WKAuc3gW
+   EpkPA3pHE4Kuo+5T9glzJtsQcgDwcJltfEPupbQiq8ziJ7pUHSYNyikse
+   odje5wOYwgmhmPIOAfHCt2B1m2XszmuP8dVOu8j1DzAknjbL+f/lAUmQn
    A==;
-IronPort-SDR: GDQ0hGp9tiI2h++dOOJgSgoVgQqLWu/kYSG4AcnI5b005EY5W42uwA8Hqh/VGOY5T+fs+qTPti
- RBqStqPRbHy2PeLd5mQSM/Bw/7IkiO+gVNq/esHG+VzFsJtOSltyIQmJtvdHQix+rSiGggxafv
- Pbe7LtQstA0/1BTZyH15pLnO1sjZoO76Z71gsQd6qfycDj+nlmUAu/Qj1HjftyisHGFm29ESob
- WsESOmnalN+iyUK8jw7alHjTIE/SMBR6reveQLbiVXLw48BaPDjrobLIyh/GpUAfs4TqnZwJMS
- ifw=
+IronPort-SDR: KhXGgmHMMb9SG+CtFZQqtGZAxoYN9wrpDFS/2sJYGbEoL6tvuMqS+bdTm5I1ky2XohrMBGpnTy
+ CshMSQjiqIJzk5nvZZ031DdGewwyFkQNNv9DxrSWgp79XaqNKGh5EgCaih0O/A3RxMP97drznJ
+ KIeghhPAFzB6NBUu8MV0GrroWdXC2l2mV8wwQLsQ4+OooGQbx9Y/8RW2/AAfWFv1i0Lq8r0vwO
+ 4+AcnTT1kFf5fJKwDDUg4Wz066L3bj2HaowxH8Ek1qJXDTNp9kyMbga4J/+IJ1zV4DYqYk5khq
+ Cug=
 X-IronPort-AV: E=Sophos;i="5.75,294,1589212800"; 
-   d="scan'208";a="244187532"
-Received: from mail-dm6nam10lp2100.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.100])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Jun 2020 17:04:11 +0800
+   d="scan'208";a="244196826"
+Received: from mail-bn3nam04lp2057.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.57])
+  by ob1.hgst.iphmx.com with ESMTP; 29 Jun 2020 19:52:39 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nB7tC2X6IRg2ddPHEnU/LsswHobDiCoA6IX7zWEw+enOi0spsoWqxs5wHUXV6zIXS/8fSKpc2Uqq2+25PkaFIDTV9wX49FfwHz9+vWyHP43+jlSzsUxaBWNPFZ/Ly2p3pwFWwU7mO78ZNfD87WHJn0JciaQqM3tiqgY8ka2PCPBxGMlSoBRinDgNnA8yUkPjQmBsO1OWlA45adFH9VeC4A5g7r/3VjABngkRacMFEfYHOmUumVDtxdKmHI9EWJKrpuJiShwCE+4LwFYICfXG64UnJBeJweS8H9J4Yhs6Ipu0bcKjX04SZl890AS/mzbSMgWqU3fGk7ja3ODjkxuJYw==
+ b=ZeRxOost6a/NHDB7o56bl1df/Zv6JHcM9C0Na8qOgLGs5ssrPp2az0zqDxxhMidDSBFtyTxD8x8gXCybU6MG9SwB/VreUJ4LvCETVcxuSxb4E7u8fJdG9dHgH/TyD1Trr+evTTiOw1/aygV+i/7u7A3rtHxgYbGsB7dX7aQDw1vmEW7bTpOfz0q97kFnAas3USi0X9T4JP0UgiZBYrKwggmtw5+kJvO7f5aCihmORiFAxJ1P0BKHs1cIiVEpUHWR7v4j4AOZZpikIGJ4Pvlqm1aECe8Kx0mxbNax/XtuhsMa7WEmhMrC8xg+ePGGEKHLATTYk8bI3Q3/B1kipOkakA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RKwWAB1xpnyns5hqFEw0Cvuv8gNmxEIPpG5h/5HhQj8=;
- b=dwtq1wS3rvfGK3WNDnAOU93Nfba05Wa4lnPSd1+3GpVEQNpJWLm4zok8zhHlnCe6MK/FjeodmWZ2foXaP/gZk9E6WYpnl8lW1h0mJ/L/5IdPHr1hNMxBP0cH6o7pz30MtfVP5tuN1rTXz0HvDcuyjL8LJdgqA/43NLEG/6O6F4kNTcfnLnoNLz2GY2+alPv9YStUGx94jNsdYmAhgiY+Tg3n8Qdt66kZG4njFNAGAdl78TJUwc9MGOIewlvPy5fZUZ79H3Jn3N2j+Z1gy5iK0mtOBeuoJPniSYv1sqarmuLYraskEKCmDxRBZ1x+0KX9YHObfzcOc4Tuh3CGucl8Dw==
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=ZzdpcuBTlzrG6QAQClmf8Rur3gc3YK3ZlYzCfWftUUY/pzQfj7fnwl9KlY+6Rm6bfYFUrNCnIZqdC/+e6vT7s01unwHn8OH0+5osxF7eKWiquplJaF6EPtKE2oTVXA0c25HSuSUp8fUT02pyeTLjC6lKJYCfTqkegv89L3ScekYU/EuKKhbF/f7OWoGFfExK7ZqhyRRldL9hjdbkIBAwyYZsc3Jzvve3Y1kaciu+Zgbd0PIstJsa382rzRViMInD08oiJYjM/qljXxPyrcavHmuM3cEac5ZkXoWRaVv3MhrpZwKS65UwdLnk2tH4G6FXoA7eTHcLPrBeCWW2OACj5g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RKwWAB1xpnyns5hqFEw0Cvuv8gNmxEIPpG5h/5HhQj8=;
- b=eXQNbYTaiWAMql+dAJS8qQnBMv9eMDRpU55QdlAVaJMuXTRQOx6YhqFwMG+YnJWQZppSBcRZSAjl150uABtEzC+ji7veyrhdfXGgYNo0XlyBgIZxB7WjQveCCCg3ZxZ1fnkQSjdFhBxC+MqjyP+w+gXcrvOWWSq7ZLPC2FEvp+0=
-Received: from BYAPR04MB5112.namprd04.prod.outlook.com (2603:10b6:a03:45::10)
- by BYAPR04MB5783.namprd04.prod.outlook.com (2603:10b6:a03:112::15) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=ahuB1EArBr0OakjXg/kmgKkHlShI6WADXeGdzgxl/Bc9y5KRLRFuKPFECh5H71wrjcFgq6ZQhg9SxncVhJSGGUsZbuZCHNPLWHA/gJ0NU18gnrMiPZPIQcb7ZxAbrvO0Gtxx2B1UhhY2rJGbspbqyhkHgP4ozlB8qPezIpkP4oU=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN2PR04MB2141.namprd04.prod.outlook.com
+ (2603:10b6:804:10::20) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.21; Mon, 29 Jun
- 2020 09:03:58 +0000
-Received: from BYAPR04MB5112.namprd04.prod.outlook.com
- ([fe80::a442:4836:baba:c84b]) by BYAPR04MB5112.namprd04.prod.outlook.com
- ([fe80::a442:4836:baba:c84b%6]) with mapi id 15.20.3131.027; Mon, 29 Jun 2020
- 09:03:58 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-CC:     Matias Bjorling <Matias.Bjorling@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ 2020 11:51:53 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::1447:186c:326e:30b2]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::1447:186c:326e:30b2%7]) with mapi id 15.20.3131.026; Mon, 29 Jun 2020
+ 11:51:53 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>
+CC:     Dennis Zhou <dennis@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH 1/2] block: add zone_desc_ext_bytes to sysfs
-Thread-Topic: [PATCH 1/2] block: add zone_desc_ext_bytes to sysfs
-Thread-Index: AQHWTaAfatwqFYUzT0SXO2cOAFMc8qjvTS8A
-Date:   Mon, 29 Jun 2020 09:03:58 +0000
-Message-ID: <20200629090356.GA521026@localhost.localdomain>
-References: <20200628230102.26990-1-matias.bjorling@wdc.com>
- <20200628230102.26990-2-matias.bjorling@wdc.com>
- <CY4PR04MB375197387D94CE4E60E836F4E76E0@CY4PR04MB3751.namprd04.prod.outlook.com>
-In-Reply-To: <CY4PR04MB375197387D94CE4E60E836F4E76E0@CY4PR04MB3751.namprd04.prod.outlook.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>
+Subject: Re: [PATCH 06/14] block: move the bio cgroup associatation helpers to
+ blk-cgroup.c
+Thread-Topic: [PATCH 06/14] block: move the bio cgroup associatation helpers
+ to blk-cgroup.c
+Thread-Index: AQHWTFUu08pVkN1Cw0KGAMSZ5Pm71w==
+Date:   Mon, 29 Jun 2020 11:51:53 +0000
+Message-ID: <SN4PR0401MB3598CB2CD25407E4E2C036299B6E0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20200627073159.2447325-1-hch@lst.de>
+ <20200627073159.2447325-7-hch@lst.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [85.224.200.150]
+authentication-results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2001:a62:1515:bd01:5d2:80d1:159b:260e]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 8169bcc9-24b6-45e1-2e48-08d81c0b5c11
-x-ms-traffictypediagnostic: BYAPR04MB5783:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB5783462B45B1E98F6B5A56FFF26E0@BYAPR04MB5783.namprd04.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: 5ae21004-5992-4af0-edbe-08d81c22d108
+x-ms-traffictypediagnostic: SN2PR04MB2141:
+x-microsoft-antispam-prvs: <SN2PR04MB2141FB87E3D46E1561FDC7D89B6E0@SN2PR04MB2141.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
 x-forefront-prvs: 044968D9E1
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: nUjTuhIBw5LP0lK7w8Wgi0HTq6JB25hlERwsW94KJcOzwih5SKejS7kOM5NgAKZyUkGbPp5zly73XZaE+fmAimA/pfjyEKf1xZxf/PxBOaALIruxrGDzJoypAKKcp4EAcWECbILXWoQHxPNaB1elz0cQOYnZG4/iYH05eyynEwDsF6dE1XVGU3KEQPGbC6e0GCk/pt6LuF1cqwXTht24XUM9VOm7WGsH2Hfzg1KiQtKUcF+mg8hy/ICcxFJ1cweFpRQzr9nFgU2b/a5sUBnfk5HMwPZ9235yxFVrAEkaW59fcW3DEqq0EUTiclksx2MqI59mx0whUyOGcf8XNuF0V/5okdrMh3o3gJZADJcGCI8JNlp7CbRGQ04UfJ8WGlM0xWfL4ZiyG/BKBsgWPUIprw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB5112.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(346002)(136003)(39860400002)(366004)(396003)(478600001)(2906002)(186003)(6486002)(8936002)(86362001)(6636002)(1076003)(6512007)(8676002)(71200400001)(66574015)(66446008)(64756008)(66556008)(66476007)(33656002)(66946007)(6862004)(4326008)(54906003)(76116006)(83380400001)(316002)(53546011)(966005)(91956017)(26005)(6506007)(5660300002)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: PpGST/+wBAz/IWWYrNEU9BADbDQ1L4nXvWpWpW/uZPD8+r9KemI3kdBhzGCdZhhrSpDqfP/IDM0CYT3qrqqY2ke8qWUHzFzMYCJLLYRkKzGo03/c4GUa3bIcCX7yyj/kIOqWzL69i1wMu6c1pGcvVXqs5NgrXVpUwW7JcvJUTsMSbgQf/B8RcNogxOB5dnT0aFrDHtaYee/HCBT8WrqZVPx8HVdcHSpzRtlrPMsUZWwKmaKbp6G8BrxtJnncZNXm+kHnlfy79v1342H9uG3CbIefmpDZdYcAhp6Y2OotzytLHrDQZVMSzdh/Vb0qt3tEgJq3/U7UphSumkx6VCkYv6EaQbmoVtEn46cW/Ljt23CKWHa9Trf1L0ZiaxnyZ7xkduHjDe6rZ8GxsnKFXRqPmSQj5bwLKURFf3Be73Jl+6BXwXPjU+5+oWQzrIPLR7V0qSIBqsRMl5jq7NSiPMx6f3/CFFHtb4DS0Od2287CbU1jmW4J2m6AOrh/pMDmZweq
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <16E428DEE464C14EBD113635E6B45B7C@namprd04.prod.outlook.com>
+x-microsoft-antispam-message-info: 69At67BcIfvYdTKT0TLkseflVB2srWWRyGF+x2DVR09iqaX8hzsn6oXipDu2dZj4B9bNZFPTfwmn9yLdASzLiDtLcN7BAhiYIWZejcBJIexjYUp0nFO9cM1bo3DTuz2Zf19ZnEtwf70pvkvtiLsTdzGVWBls0UZnlm82qEyn+Lvs3zLf0oHe2wOpZotvIDMHzIY5o7lgdJiSjJ4JtsSZgTtWQtpTmq7D4mZqCjkRoZdkFaF011QH/0wfc/LboAUy5pi9KN7xVMnzit1OznPC63qBG8CSydIW3v/S4AGRonft2mw+WeSQFSJEuHL6TAZVJTF+lnF8zqEEYaHPAHuHhQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(376002)(396003)(346002)(39860400002)(366004)(2906002)(55016002)(8676002)(9686003)(4270600006)(478600001)(7416002)(52536014)(33656002)(86362001)(5660300002)(71200400001)(186003)(6506007)(316002)(8936002)(66946007)(76116006)(66446008)(558084003)(91956017)(19618925003)(7696005)(66556008)(64756008)(4326008)(66476007)(110136005)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: RGPjjeMEQ3C3Wu/hVRjcsUVGvY8r1u3Zd8G4YTEsD5HNhDvqZFgkVnHp3q0rcXKpgaO0mwPRu2LRI4SNTCP/2F0XBl3VzX1arPyTc7wYFKAygNVcWoP2l3r6vRDzzygdIU1pn+yRq4hTmwrcPNa04g2Ty1yXU7aV5LBhnXZu8oy8Hv3W6AXolXmDhjlNdYuCnibChKTOIPBC5fnAGW0juI835vEkSnlfYmGgvKVIZCJ5KwZTSW2ODuUQCox81o1wJ1xkWJFTPCh1Ry3cSMP7yxlxW1FefSENvA7+YXdvzPA0BEOYhjRI1uVuC1AsNniWCpLzZE/pAINXohE8kJqFwoygOiMV5La0wEjAq4ORdAgYWikNza1cgDvqQrmWaXCRZ3Nlp/D9E2qs7+zGjUX1gXdR11ZNCTfPSWMCIrJO3MxzZmd0YrmLjMsrvc/xRFmG1SHizqrZ5+T5hy1u5sXf8VCRd1I1Eru5P2GCgkLddYnj27owP7e74fj27ddmiHY4GSgo12db35dZTGBS8BkEMZL7uDt02aNxwoDchlaxYYOulq5ylLD3U/mLrD1xPxB0
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB5112.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8169bcc9-24b6-45e1-2e48-08d81c0b5c11
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jun 2020 09:03:58.6103
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ae21004-5992-4af0-edbe-08d81c22d108
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jun 2020 11:51:53.3005
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: W3OzWRj0BZ2GupmMs1QpEm3RvQQi2ooNGFhVCW2hSZjCQSe8IGR/4UEnJNCFlT5kZEve/UrIoGpIFX7vXSeuoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5783
+X-MS-Exchange-CrossTenant-userprincipalname: q1bvhzTli5C8EXlrDuPw7lYmef1F1zxqjOuLwDzWBqoWpsemymXP6oUBUAq87Ul9Ylzj6Hb0GpVALLm0oE7aPvNChpyybnwIjORJ9Eknwvs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR04MB2141
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 29, 2020 at 12:52:46AM +0000, Damien Le Moal wrote:
-> On 2020/06/29 8:01, Matias Bjorling wrote:
-> > The NVMe Zoned Namespace Command Set adds support for associating
-> > data to a zone through the Zone Descriptor Extension feature.
-> >=20
-> > The Zone Descriptor Extension size is fixed to a multiple of 64
-> > bytes. A value of zero communicates the feature is not available.
-> > A value larger than zero communites the feature is available, and
-> > the specified Zone Descriptor Extension size in bytes.
-> >=20
-> > The Zone Descriptor Extension feature is only available in the
-> > NVMe Zoned Namespaces Command Set. Devices that supports ZAC/ZBC
-> > therefore reports this value as zero, where as the NVMe device
-> > driver reports the Zone Descriptor Extension size from the
-> > specific device.
-> >=20
-> > Signed-off-by: Matias Bj=F8rling <matias.bjorling@wdc.com>
-> > ---
-> >  Documentation/block/queue-sysfs.rst |  6 ++++++
-> >  block/blk-sysfs.c                   | 15 ++++++++++++++-
-> >  drivers/nvme/host/zns.c             |  1 +
-> >  drivers/scsi/sd_zbc.c               |  1 +
-> >  include/linux/blkdev.h              | 22 ++++++++++++++++++++++
-> >  5 files changed, 44 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/=
-queue-sysfs.rst
-> > index f261a5c84170..c4fa195c87b4 100644
-
-(snip)
-
-> >  static struct queue_sysfs_entry queue_nomerges_entry =3D {
-> >  	.attr =3D {.name =3D "nomerges", .mode =3D 0644 },
-> >  	.show =3D queue_nomerges_show,
-> > @@ -787,6 +798,7 @@ static struct attribute *queue_attrs[] =3D {
-> >  	&queue_nr_zones_entry.attr,
-> >  	&queue_max_open_zones_entry.attr,
-> >  	&queue_max_active_zones_entry.attr,
->=20
-> Which tree is this patch based on ? Not I have seen any patch introducing=
- max
-> active zones.
-
-The cover letter forgot to mention this patch series' dependencies.
-I assume that it is based on the following patch series:
-https://lore.kernel.org/linux-block/20200622162530.1287650-1-kbusch@kernel.=
-org/
-https://lore.kernel.org/linux-block/20200616102546.491961-1-niklas.cassel@w=
-dc.com/
-
-
-Kind regards,
-Niklas=
+Looks good,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
