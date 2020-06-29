@@ -6,42 +6,38 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE20C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 20:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46377C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 20:16:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FFB520760
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 20:14:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D47F20656
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 20:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729320AbgF2UOI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Jun 2020 16:14:08 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36904 "EHLO huawei.com"
+        id S1731013AbgF2UQx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jun 2020 16:16:53 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:6878 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726291AbgF2UOH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jun 2020 16:14:07 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id ABD5ECCB7585C2BB0B97;
-        Mon, 29 Jun 2020 12:28:49 +0800 (CST)
+        id S1732962AbgF2UQw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jun 2020 16:16:52 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id C9971347AD4FFBC5593D;
+        Mon, 29 Jun 2020 12:31:28 +0800 (CST)
 Received: from [10.133.219.224] (10.133.219.224) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 29 Jun 2020 12:28:46 +0800
-Subject: Re: [PATCH] virtio-blk: free vblk-vqs in error path of
- virtblk_probe()
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     Stefano Garzarella <sgarzare@redhat.com>,
-        <linux-block@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ming Lei <ming.lei@canonical.com>
-References: <20200615041459.22477-1-houtao1@huawei.com>
- <20200615073219.eeydysnn3d3xkwzg@steredhat>
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 29 Jun 2020 12:31:25 +0800
+Subject: Re: [PATCH v2] blk-mq-debugfs: update blk_queue_flag_name[]
+ accordingly for new flags
 From:   Hou Tao <houtao1@huawei.com>
-Message-ID: <92ff941c-c40a-2e59-3b97-d931e53cde11@huawei.com>
-Date:   Mon, 29 Jun 2020 12:28:46 +0800
+To:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
+CC:     Bart Van Assche <bvanassche@acm.org>
+References: <e1e28027-2dac-3ae3-21c1-9ba779a5a566@acm.org>
+ <20200428015456.1194-1-houtao1@huawei.com>
+ <ff8105fe-f426-8ff6-9e16-1f3d58da76f3@huawei.com>
+Message-ID: <27a64716-00c7-9382-3f6f-8c590b3fd20a@huawei.com>
+Date:   Mon, 29 Jun 2020 12:31:25 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
  Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200615073219.eeydysnn3d3xkwzg@steredhat>
+In-Reply-To: <ff8105fe-f426-8ff6-9e16-1f3d58da76f3@huawei.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -52,36 +48,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ping ?
+ping again ?
 
-On 2020/6/15 15:32, Stefano Garzarella wrote:
-> On Mon, Jun 15, 2020 at 12:14:59PM +0800, Hou Tao wrote:
->> Else there will be memory leak if alloc_disk() fails.
+On 2020/5/25 14:32, Hou Tao wrote:
+> ping ?
+> 
+> On 2020/4/28 9:54, Hou Tao wrote:
+>> Else there may be magic numbers in /sys/kernel/debug/block/*/state.
 >>
->> Fixes: 6a27b656fc02 ("block: virtio-blk: support multi virt queues per virtio-blk device")
 >> Signed-off-by: Hou Tao <houtao1@huawei.com>
+>> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 >> ---
->>  drivers/block/virtio_blk.c | 1 +
->>  1 file changed, 1 insertion(+)
+>> v2: comments update as suggested by Bart
+>> ---
+>>  block/blk-mq-debugfs.c | 3 +++
+>>  include/linux/blkdev.h | 1 +
+>>  2 files changed, 4 insertions(+)
 >>
->> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
->> index 9d21bf0f155e..980df853ee49 100644
->> --- a/drivers/block/virtio_blk.c
->> +++ b/drivers/block/virtio_blk.c
->> @@ -878,6 +878,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->>  	put_disk(vblk->disk);
->>  out_free_vq:
->>  	vdev->config->del_vqs(vdev);
->> +	kfree(vblk->vqs);
->>  out_free_vblk:
->>  	kfree(vblk);
->>  out_free_index:
->> -- 
->> 2.25.0.4.g0ad7144999
+>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+>> index 7a79db81a63f..49fdbc8a025f 100644
+>> --- a/block/blk-mq-debugfs.c
+>> +++ b/block/blk-mq-debugfs.c
+>> @@ -125,6 +125,9 @@ static const char *const blk_queue_flag_name[] = {
+>>  	QUEUE_FLAG_NAME(REGISTERED),
+>>  	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
+>>  	QUEUE_FLAG_NAME(QUIESCED),
+>> +	QUEUE_FLAG_NAME(PCI_P2PDMA),
+>> +	QUEUE_FLAG_NAME(ZONE_RESETALL),
+>> +	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
+>>  };
+>>  #undef QUEUE_FLAG_NAME
+>>  
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 32868fbedc9e..02809e4dd661 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -585,6 +585,7 @@ struct request_queue {
+>>  	u64			write_hints[BLK_MAX_WRITE_HINTS];
+>>  };
+>>  
+>> +/* Keep blk_queue_flag_name[] in sync with the definitions below */
+>>  #define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
+>>  #define QUEUE_FLAG_DYING	1	/* queue being torn down */
+>>  #define QUEUE_FLAG_NOMERGES     3	/* disable merge attempts */
 >>
 > 
-> The patch LGTM:
 > 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
+> .
 > 
