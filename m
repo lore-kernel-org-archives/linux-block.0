@@ -2,179 +2,240 @@ Return-Path: <SRS0=rGXo=AK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B41C433E3
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53CEEC433E1
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:36:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B03BB255DA
-	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:35:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 376C222281
+	for <linux-block@archiver.kernel.org>; Mon, 29 Jun 2020 18:36:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="s2IxXCxl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yhs4gp/j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726087AbgF2SfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Jun 2020 14:35:05 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:63879 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725869AbgF2SfE (ORCPT
+        id S1726959AbgF2SgT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jun 2020 14:36:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25128 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726939AbgF2SgS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:35:04 -0400
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20200629183500epoutp019cd5e9722d9f13413ad7550562fd1840~dF4RrRwRS1319913199epoutp012
-        for <linux-block@vger.kernel.org>; Mon, 29 Jun 2020 18:35:00 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20200629183500epoutp019cd5e9722d9f13413ad7550562fd1840~dF4RrRwRS1319913199epoutp012
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1593455700;
-        bh=GOb5F6IEPqqUzppfmpm5q/EtUDLSZpl8Hl/nDzpT/II=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=s2IxXCxlP0DxRQWjQCAElJjGgGLZwVziDdmjh6WwL1NUfVg7PtLaxqxPj1yS/b9Jq
-         6K3jcZ/sVaZ4EPg5JmlFC/cvjxywO9MEnxDx/ErMuDRGPqlEnZc2N1z8LPV9jaQMkq
-         //6kLW40RNAyxr4Aewxvu0iXbnU0qA2JxQ4N7SZk=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20200629183459epcas5p3e5d54b1bd9edce6f19f739b187e730bb~dF4Q0gKG30377803778epcas5p3y;
-        Mon, 29 Jun 2020 18:34:59 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        DB.07.09703.3543AFE5; Tue, 30 Jun 2020 03:34:59 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20200629183459epcas5p464fdcdf272ea360bcd50901ccc79ca6e~dF4QV4RQj0162001620epcas5p4P;
-        Mon, 29 Jun 2020 18:34:59 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20200629183459epsmtrp29abb784126e5b438d6071a9f61937274~dF4QU9PJ80229002290epsmtrp2j;
-        Mon, 29 Jun 2020 18:34:59 +0000 (GMT)
-X-AuditID: b6c32a4a-4b5ff700000025e7-6e-5efa34533fce
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A1.55.08303.3543AFE5; Tue, 30 Jun 2020 03:34:59 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20200629183456epsmtip268cd4e9ea0911be74ab0ec579850ff0c~dF4OJ4uE21597515975epsmtip2a;
-        Mon, 29 Jun 2020 18:34:56 +0000 (GMT)
-Date:   Tue, 30 Jun 2020 00:02:02 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        "asml.silence@gmail.com" <asml.silence@gmail.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "mb@lightnvm.io" <mb@lightnvm.io>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "javier.gonz@samsung.com" <javier.gonz@samsung.com>,
-        Arnav Dawn <a.dawn@samsung.com>
-Subject: Re: [PATCH v2 1/2] fs,block: Introduce RWF_ZONE_APPEND and handling
- in direct IO path
-Message-ID: <20200629183202.GA24003@test-zns>
+        Mon, 29 Jun 2020 14:36:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593455776;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fjagmTwiCwtECKEHef/gdN1a57qHPTuTjyIucHq2PWc=;
+        b=Yhs4gp/jcyN5hpTDQy+jYhtBcoP/4gzLTTGZJmt9zisigX8T+AVWzH8XNjMFuC3BxleaU+
+        zIJPh/9M41lgDCMxwYd9rD7naf63zH+PrATEn/E/pnwZHXaN9W4nzi5unVHlxxp+f6H3/D
+        AwTT740qOeHdjo4twzbrjpThZRFVCuk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-euUb91qwPj6Sa83USK6jLg-1; Mon, 29 Jun 2020 06:32:50 -0400
+X-MC-Unique: euUb91qwPj6Sa83USK6jLg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BA5A107B118;
+        Mon, 29 Jun 2020 10:32:49 +0000 (UTC)
+Received: from T590 (ovpn-13-98.pek2.redhat.com [10.72.13.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E07C5BAEC;
+        Mon, 29 Jun 2020 10:32:43 +0000 (UTC)
+Date:   Mon, 29 Jun 2020 18:32:39 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Baolin Wang <baolin.wang7@gmail.com>
+Subject: Re: [PATCH V6 6/6] blk-mq: support batching dispatch in case of io
+ scheduler
+Message-ID: <20200629103239.GB1881343@T590>
+References: <20200624230349.1046821-1-ming.lei@redhat.com>
+ <20200624230349.1046821-7-ming.lei@redhat.com>
+ <20200629090452.GA4892@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <CY4PR04MB37511FB1D3B3491A2CED5470E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrIKsWRmVeSWpSXmKPExsWy7bCmum6wya84g20vVC1+b3vEYjFn1TZG
-        i9V3+9ksuv5tYbFobf/GZHF6wiImi3et51gsHt/5zG4xZVoTo8XeW9oWe/aeZLG4vGsOm8WK
-        7UdYLLb9ns9s8frHSTaL83+PszoIeOycdZfdY/MKLY/LZ0s9Nn2axO7RffUHo0ffllWMHp83
-        yXm0H+hm8tj05C1TAGcUl01Kak5mWWqRvl0CV8ah8xuYC+YJVqxceo+xgXEXXxcjJ4eEgInE
-        wqurmLsYuTiEBHYzSjxesJcFwvnEKLF54QVWCOczo0Tnne0sMC3fH74Es4UEdjFKfN7OAVH0
-        jFHi2L5XrCAJFgFViWW/O9i6GDk42AQ0JS5MLgUJiwhoSSzb9w5sKLPAZ1aJ1jvrwWqEBRIk
-        1n72BKnhFdCVmP20iQXCFpQ4OfMJmM0pECvx+NBuMFtUQFniwLbjTCBzJARucEhMn70N6jgX
-        ibN/HkHZwhKvjm9hh7ClJD6/28sGYRdL/LpzlBmiuYNR4nrDTKgGe4mLe/4ygdjMAhkSC6Zc
-        hLL5JHp/P2ECOVRCgFeio00IolxR4t6kp6wQtrjEwxlLoGwPiWP7+9kgAbSESeLK9KIJjHKz
-        kPwzC8kGCNtKovNDE+ssoA3MAtISy/9xQJiaEut36S9gZF3FKJlaUJybnlpsWmCUl1quV5yY
-        W1yal66XnJ+7iRGc6rS8djA+fPBB7xAjEwfjIUYJDmYlEd7TBr/ihHhTEiurUovy44tKc1KL
-        DzFKc7AoifMq/TgTJySQnliSmp2aWpBaBJNl4uCUamBauZNXf6/s58OZcRmpPrzCgi+uvght
-        WJd37p6TBtOZ3aYvGb68yzLe6L//XHmI1eu/PRrHDAsy1LWDPV46vDMS6DvAkLAwf17c1rN3
-        Jnw/4mBZHWk+4UH65leh/9sPP7r/PFf+84U1EWG2V7VPKP/W3vTwQ+keJcFtO3bn/jOwmm6X
-        I7vplNdtiek+S6q8nRef5jgVVzGjm+nkGbPj6jrLxbVnqt/nXH/vYkbQa5FNN/f5vFthECC6
-        +vu6iGjNwgTezGNPb6wtnd75m5Ox1P1zmahCk83jW/aHGPItmEs3q6eslWXxM9vDvVJPrTU0
-        rtXitqPNXvHNAR9u+xQlSz6KiDG9Vejkxfuqp3xZcL4SS3FGoqEWc1FxIgCanNv45AMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNIsWRmVeSWpSXmKPExsWy7bCSvG6wya84g7fX2S1+b3vEYjFn1TZG
-        i9V3+9ksuv5tYbFobf/GZHF6wiImi3et51gsHt/5zG4xZVoTo8XeW9oWe/aeZLG4vGsOm8WK
-        7UdYLLb9ns9s8frHSTaL83+PszoIeOycdZfdY/MKLY/LZ0s9Nn2axO7RffUHo0ffllWMHp83
-        yXm0H+hm8tj05C1TAGcUl01Kak5mWWqRvl0CV0bz5EbGggt8FRdmvWNpYGzj6WLk5JAQMJH4
-        /vAlSxcjF4eQwA5GiUWv5rNAJMQlmq/9YIewhSVW/nvODlH0hFHizJKTTCAJFgFViWW/O9i6
-        GDk42AQ0JS5MLgUJiwhoSSzb944VpJ5Z4CerxKUfGxhBaoQFEiTWfvYEqeEV0JWY/bQJavES
-        JomLH+6zQSQEJU7OfAJ2BLOAmcS8zQ+ZQXqZBaQllv/jAAlzCsRKPD60G6xEVEBZ4sC240wT
-        GAVnIemehaR7FkL3AkbmVYySqQXFuem5xYYFRnmp5XrFibnFpXnpesn5uZsYwfGnpbWDcc+q
-        D3qHGJk4GA8xSnAwK4nwnjb4FSfEm5JYWZValB9fVJqTWnyIUZqDRUmc9+ushXFCAumJJanZ
-        qakFqUUwWSYOTqkGJjbJG7cM+jIOWtrnMTw7aMCbOivG5RObtItF8CZDLhMFj05fsWXO6xfM
-        cpBYExTwRjrh0fc0V2eWNQmhlQ55DEUrb64Qm/7wX2arFneq88TLr5dyy6pX+DtPm8u2/Upc
-        3P8mmxypK/8kijslOfcEP/LhibU1WMQh076vxLMhefqTlIuZBqJzM1uaNFtz4w0etOWULJX3
-        sW7YWanv/vgGr9vO3YX+xSucqv5PzXr05UMtJ0eEwt7QHaK79gud2arydN5spp/3JXfw96R9
-        rjrBofVQ6rXEmXO8+RUzFarjygV/Km0WTReYcSJHrifUy5BPRHi6QaTX+uqau027lbQXcfld
-        le9fqCv2O+LEbSWW4oxEQy3mouJEAFK+Z2ouAwAA
-X-CMS-MailID: 20200629183459epcas5p464fdcdf272ea360bcd50901ccc79ca6e
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----nai8lIH9ngBNHun9R6qswQcIIemhXBCkNXu5CagZqSM5j8ea=_aa309_"
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20200625171834epcas5p226a24dfcb84cfa83fe29a2bd17795d85
-References: <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
-        <CGME20200625171834epcas5p226a24dfcb84cfa83fe29a2bd17795d85@epcas5p2.samsung.com>
-        <1593105349-19270-2-git-send-email-joshi.k@samsung.com>
-        <CY4PR04MB37511FB1D3B3491A2CED5470E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200629090452.GA4892@infradead.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------nai8lIH9ngBNHun9R6qswQcIIemhXBCkNXu5CagZqSM5j8ea=_aa309_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On Mon, Jun 29, 2020 at 10:04:52AM +0100, Christoph Hellwig wrote:
+> > +/*
+> > + * We know bfq and deadline apply single scheduler queue instead of multi
+> > + * queue. However, the two are often used on single queue devices, also
+> > + * the current @hctx should affect the real device status most of times
+> > + * because of locality principle.
+> > + *
+> > + * So use current hctx->dispatch_busy directly for figuring out batching
+> > + * dispatch count.
+> > + */
+> 
+> I don't really understand this comment.  Also I think the code might
+> be cleaner if this function is inlined as an if/else in the only
+> caller.
+> 
+> > +static inline bool blk_mq_do_dispatch_rq_lists(struct blk_mq_hw_ctx *hctx,
+> > +		struct list_head *lists, bool multi_hctxs, unsigned count)
+> > +{
+> > +	bool ret;
+> > +
+> > +	if (!count)
+> > +		return false;
+> > +
+> > +	if (likely(!multi_hctxs))
+> > +		return blk_mq_dispatch_rq_list(hctx, lists, count);
+> 
+> Keeping these checks in the callers would keep things a little cleaner,
+> especially as the multi hctx case only really needs the lists argument.
+> 
+> > +		LIST_HEAD(list);
+> > +		struct request *new, *rq = list_first_entry(lists,
+> > +				struct request, queuelist);
+> > +		unsigned cnt = 0;
+> > +
+> > +		list_for_each_entry(new, lists, queuelist) {
+> > +			if (new->mq_hctx != rq->mq_hctx)
+> > +				break;
+> > +			cnt++;
+> > +		}
+> > +
+> > +		if (new->mq_hctx == rq->mq_hctx)
+> > +			list_splice_tail_init(lists, &list);
+> > +		else
+> > +			list_cut_before(&list, lists, &new->queuelist);
+> > +
+> > +		ret = blk_mq_dispatch_rq_list(rq->mq_hctx, &list, cnt);
+> > +	}
+> 
+> I think this has two issues:  for one ret should be ORed as any dispatch
+> or error should leaave ret set.  Also we need to splice the dispatch
 
-On Fri, Jun 26, 2020 at 02:50:20AM +0000, Damien Le Moal wrote:
->On 2020/06/26 2:18, Kanchan Joshi wrote:
->> Introduce RWF_ZONE_APPEND flag to represent zone-append. User-space
->> sends this with write. Add IOCB_ZONE_APPEND which is set in
->> kiocb->ki_flags on receiving RWF_ZONE_APPEND.
->> Make direct IO submission path use IOCB_ZONE_APPEND to send bio with
->> append op. Direct IO completion returns zone-relative offset, in sector
->> unit, to upper layer using kiocb->ki_complete interface.
->> Report error if zone-append is requested on regular file or on sync
->> kiocb (i.e. one without ki_complete).
->>
->> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
->> Signed-off-by: Arnav Dawn <a.dawn@samsung.com>
->> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
->> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
->> ---
->>  fs/block_dev.c          | 28 ++++++++++++++++++++++++----
->>  include/linux/fs.h      |  9 +++++++++
->>  include/uapi/linux/fs.h |  5 ++++-
->>  3 files changed, 37 insertions(+), 5 deletions(-)
->>
->> diff --git a/fs/block_dev.c b/fs/block_dev.c
->> index 47860e5..5180268 100644
->> --- a/fs/block_dev.c
->> +++ b/fs/block_dev.c
->> @@ -185,6 +185,10 @@ static unsigned int dio_bio_write_op(struct kiocb *iocb)
->>  	/* avoid the need for a I/O completion work item */
->>  	if (iocb->ki_flags & IOCB_DSYNC)
->>  		op |= REQ_FUA;
->> +
->> +	if (iocb->ki_flags & IOCB_ZONE_APPEND)
->> +		op |= REQ_OP_ZONE_APPEND;
->
->This is wrong. REQ_OP_WRITE is already set in the declaration of "op". How can
->this work ?
-REQ_OP_ZONE_APPEND will override the REQ_WRITE op, while previously set op
-flags (REQ_FUA etc.) will be retained. But yes, this can be made to look
-cleaner.
-V3 will include the other changes you pointed out. Thanks for the review.
+OK.
+
+> list back onto the main list here, otherwise we can lose those requests.
+
+The dispatch list always becomes empty after blk_mq_dispatch_rq_list()
+returns, so no need to splice it back.
+
+> 
+> FYI, while reviewing this I ended up editing things into a shape I
+> could better understand.  Let me know what you think of this version?
+> 
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 4c72073830f3cb..466dce99699ae4 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/blk-mq.h>
+> +#include <linux/list_sort.h>
+>  
+>  #include <trace/events/block.h>
+>  
+> @@ -80,6 +81,38 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+>  	blk_mq_run_hw_queue(hctx, true);
+>  }
+>  
+> +static int sched_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
+> +{
+> +	struct request *rqa = container_of(a, struct request, queuelist);
+> +	struct request *rqb = container_of(b, struct request, queuelist);
+> +
+> +	return rqa->mq_hctx > rqb->mq_hctx;
+> +}
+> +
+> +static bool blk_mq_dispatch_hctx_list(struct list_head *rq_list)
+> +{
+> +	struct blk_mq_hw_ctx *hctx =
+> +		list_first_entry(rq_list, struct request, queuelist)->mq_hctx;
+> +	struct request *rq;
+> +	LIST_HEAD(hctx_list);
+> +	unsigned int count = 0;
+> +	bool ret;
+> +
+> +	list_for_each_entry(rq, rq_list, queuelist) {
+> +		if (rq->mq_hctx != hctx) {
+> +			list_cut_before(&hctx_list, rq_list, &rq->queuelist);
+> +			goto dispatch;
+> +		}
+> +		count++;
+> +	}
+> +	list_splice_tail_init(rq_list, &hctx_list);
+> +
+> +dispatch:
+> +	ret = blk_mq_dispatch_rq_list(hctx, &hctx_list, count);
+> +	list_splice(&hctx_list, rq_list);
+
+The above line isn't needed.
+
+> +	return ret;
+> +}
+> +
+>  #define BLK_MQ_BUDGET_DELAY	3		/* ms units */
+>  
+>  /*
+> @@ -90,20 +123,29 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+>   * Returns -EAGAIN if hctx->dispatch was found non-empty and run_work has to
+>   * be run again.  This is necessary to avoid starving flushes.
+>   */
+> -static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> +static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+
+The return type can be changed to 'bool'.
+
+>  {
+>  	struct request_queue *q = hctx->queue;
+>  	struct elevator_queue *e = q->elevator;
+> +	bool multi_hctxs = false, run_queue = false;
+> +	bool dispatched = false, busy = false;
+> +	unsigned int max_dispatch;
+>  	LIST_HEAD(rq_list);
+> -	int ret = 0;
+> -	struct request *rq;
+> +	int count = 0;
+> +
+> +	if (hctx->dispatch_busy)
+> +		max_dispatch = 1;
+> +	else
+> +		max_dispatch = hctx->queue->nr_requests;
+>  
+>  	do {
+> +		struct request *rq;
+> +
+>  		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+>  			break;
+>  
+>  		if (!list_empty_careful(&hctx->dispatch)) {
+> -			ret = -EAGAIN;
+> +			busy = true;
+>  			break;
+>  		}
+>  
+> @@ -120,7 +162,7 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  			 * no guarantee anyone will kick the queue.  Kick it
+>  			 * ourselves.
+>  			 */
+> -			blk_mq_delay_run_hw_queues(q, BLK_MQ_BUDGET_DELAY);
+> +			run_queue = true;
+>  			break;
+>  		}
+>  
+> @@ -130,7 +172,43 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  		 * in blk_mq_dispatch_rq_list().
+>  		 */
+>  		list_add(&rq->queuelist, &rq_list);
+
+The above should change to list_add_tail(&rq->queuelist, &rq_list).
 
 
-------nai8lIH9ngBNHun9R6qswQcIIemhXBCkNXu5CagZqSM5j8ea=_aa309_
-Content-Type: text/plain; charset="utf-8"
+Thanks, 
+Ming
 
-
-------nai8lIH9ngBNHun9R6qswQcIIemhXBCkNXu5CagZqSM5j8ea=_aa309_--
