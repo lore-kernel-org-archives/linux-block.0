@@ -2,66 +2,91 @@ Return-Path: <SRS0=9ToN=AL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1BAC433DF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 07:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D73B1C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 07:32:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D32B20759
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 07:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0A6720775
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 07:32:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730645AbgF3HMC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jun 2020 03:12:02 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41342 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730637AbgF3HMC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jun 2020 03:12:02 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id B5E4FAAC5;
-        Tue, 30 Jun 2020 07:12:00 +0000 (UTC)
-Date:   Tue, 30 Jun 2020 09:11:59 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     "Ahmed S. Darwish" <a.darwish@linutronix.de>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        "Sebastian A. Siewior" <bigeasy@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 16/20] iocost: Use sequence counter with associated
- spinlock
-Message-ID: <20200630071159.llgfzs3n4xekexcw@beryllium.lan>
-References: <20200519214547.352050-1-a.darwish@linutronix.de>
- <20200630054452.3675847-1-a.darwish@linutronix.de>
- <20200630054452.3675847-17-a.darwish@linutronix.de>
+        id S1731014AbgF3Hca (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jun 2020 03:32:30 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2416 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730089AbgF3Hc3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jun 2020 03:32:29 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id 42C4B91FCEED01591AEA;
+        Tue, 30 Jun 2020 08:32:28 +0100 (IST)
+Received: from [127.0.0.1] (10.47.7.58) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 30 Jun
+ 2020 08:32:26 +0100
+Subject: Re: About sbitmap_bitmap_show() and cleared bits (was Re: [PATCH RFC
+ v7 07/12] blk-mq: Add support in hctx_tags_bitmap_show() for a shared
+ sbitmap)
+To:     Hannes Reinecke <hare@suse.de>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>
+CC:     <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <don.brace@microsemi.com>, <kashyap.desai@broadcom.com>,
+        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
+        <shivasharan.srikanteshwara@broadcom.com>,
+        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
+        <chenxiang66@hisilicon.com>, <megaraidlinux.pdl@broadcom.com>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-8-git-send-email-john.garry@huawei.com>
+ <9f4741c5-d117-d764-cf3a-a57192a788c3@suse.de>
+ <aad6efa3-2d7f-ca68-d239-44ea187c8017@huawei.com>
+ <7ed6ccf1-6ad9-1df7-f55d-4ed6cac1e08d@suse.de>
+ <8ffd5c22-f644-3436-0a9f-2e08c220525e@huawei.com>
+ <84f9623e-961e-3c9b-eed6-795b64f1ab76@suse.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <a30ff47d-a06a-13d6-ef5d-8c90ba3261eb@huawei.com>
+Date:   Tue, 30 Jun 2020 08:30:52 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200630054452.3675847-17-a.darwish@linutronix.de>
+In-Reply-To: <84f9623e-961e-3c9b-eed6-795b64f1ab76@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.7.58]
+X-ClientProxiedBy: lhreml738-chm.china.huawei.com (10.201.108.188) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 30, 2020 at 07:44:48AM +0200, Ahmed S. Darwish wrote:
-> A sequence counter write side critical section must be protected by some
-> form of locking to serialize writers. A plain seqcount_t does not
-> contain the information of which lock must be held when entering a write
-> side critical section.
-> 
-> Use the new seqcount_spinlock_t data type, which allows to associate a
-> spinlock with the sequence counter. This enables lockdep to verify that
-> the spinlock used for writer serialization is held when the write side
-> critical section is entered.
-> 
-> If lockdep is disabled this lock association is compiled out and has
-> neither storage size nor runtime overhead.
-> 
-> Signed-off-by: Ahmed S. Darwish <a.darwish@linutronix.de>
+On 30/06/2020 07:33, Hannes Reinecke wrote:
+> On 6/29/20 5:32 PM, John Garry wrote:
+>> Hi all,
+>>
+>> I noticed that sbitmap_bitmap_show() only shows set bits and does not 
+>> consider cleared bits. Is that the proper thing to do?
+>>
+>> I ask, as from trying to support sbitmap_bitmap_show() for hostwide 
+>> shared tags feature, we currently use blk_mq_queue_tag_busy_iter() to 
+>> find active requests (and associated tags/bits) for a particular hctx. 
+>> So, AFAICT, would give a change in behavior for sbitmap_bitmap_show(), 
+>> in that it would effectively show set and not cleared bits.
+>>
+> Why would you need to do this?
+> Where would be the point traversing cleared bits?
 
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
+I'm not talking about traversing cleared bits specifically. I just think 
+that today sbitmap_bitmap_show() only showing the bits in 
+sbitmap_word.word may not be useful or even misleading, as in reality 
+the "set" bits are sbitmap_word.word & ~sbitmap_word.cleared.
+
+And for hostwide shared tags feature, iterating the busy rqs to find the 
+per-hctx tags/bits would effectively give us the "set" bits, above, so 
+there would be a difference.
+
+Thanks,
+John
