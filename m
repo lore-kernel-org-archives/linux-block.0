@@ -2,197 +2,397 @@ Return-Path: <SRS0=9ToN=AL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E0B2C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 00:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1690BC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 00:57:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 199E320760
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 00:37:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D683C20781
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 00:57:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bOcYeEkl";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="DNck0QxC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jce7pnpW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728164AbgF3AhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Jun 2020 20:37:20 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:49489 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726899AbgF3AhT (ORCPT
+        id S1726601AbgF3A5r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Jun 2020 20:57:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36899 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725998AbgF3A5r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jun 2020 20:37:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1593477438; x=1625013438;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=94NUDgzJspE7b79qyazCkvEL33BuRqQhjDStP5FN1dc=;
-  b=bOcYeEklb+QyfMMwnT4Sj46lvFq8mtdaTD8j60myjJMilD/AGUpRMPhU
-   K4Ji8mQR+aCWoOOvMyCqSErGrxt5uTVG7XxFCVSG0rFUXdgJTlJg4U3IV
-   KZRvm1wHjTUmvLqmpdLK1sO9zdi9ohCDWUanST55ZWDu9o5QGzCRK2qaO
-   3qEYCze/qbosH9YXLQHkDV1pPuNNTL1ZERoyt3AFmax0294ofxPZ33QUb
-   ovGASq+vPa8KT1zPVrTC/tXfgVVjjHdxaB0dWz+Ge+3Bl4nmeltoctEOM
-   eRr0Ovcx/RA3WxVqM27hZxAoXZAYbOvLyKMjfEJT/LangFk+Hc4LUMwNC
-   g==;
-IronPort-SDR: sposJSDnpqD2+AfkM7QGhoy7wktazGegbadBcxRnQ7CObY09ddd45BRsrS7PcAc4BtwWKrsHA3
- D8523uS1uatlt56fgrJ8dIKQSjR19nTkeSj/dmofy7kuM8UZkEZwh05Bo0ZUrfVAV9qJbbWZUN
- RrEPVsvnXT9s7AGllA+RK33YhJGsRB2/lxoJh+f5zTz2kDaOkOKGitmCysmBcxLmvND39GV0Ur
- drTpV5KjCteegudDrNm3/oGxdK/x3jgQuAAYUGC8v0TCwjxdrai5o8SlPW3mzRNHL3h7Am2h6p
- tz0=
-X-IronPort-AV: E=Sophos;i="5.75,296,1589212800"; 
-   d="scan'208";a="250458418"
-Received: from mail-mw2nam10lp2103.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.103])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Jun 2020 08:37:08 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QDOSx3AA/ZPClhIiXaULlUf9ryVriGzZTqRZSjZyBE3WuFFuHBtQwO00sa1EDi/mUGGkH1G5vcjgZ9gpn7+nidc72+rseuukESVPQucxegEB9i/pVZ9sp9YF0ZHnRPb2tLdb1A4FjyFdMWtLNXUhTjGuuKpkCnUnNsVHFJhMQIOPaUkM0HgE9rx8MVL+kh5GK4IXTfnr/KS9oO/TyyxRfH3yvlZfCy086ZeEp3duLNcHkHZ9L2m9vqWlJWyrKi/XoQRrbJNJrAPGZr+DKdx62Dpjum3l5NyuK6Au9Md1R3M4PsmDZ/OWBp+yclEu/elEUFK4hzYjlULZ5n06moHlLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YmWMQOVuaFcY8lbgjPkNm3PlxqZ43HAmsT1qfOpFgGE=;
- b=AV/exT0i9E78ThAM9Y/PMCtIZfMkIeXE4v9uRU+4krE3iw40fOwPKc8R6j7A4XIsIjBXwR8YOROAP/QaipROCJrzhm2EUe1EsM54y8qG9a09ILsek8Ko7k1xhuFRXW7g0bCNnIA94kofS3pDYZ3xgEYioCuofDEsbZPyGUxaKJKoP1D0ayC/sQ1m67ByHv5nOd9h85dcHJDKLbyoy/eawW9LVEaVBV5jHV+qjE2VO4ah8sut5Lx8+eqANvg1j5w45m4j7d9M9qSpYpUxRk6XeQnr/vQYPIfufAcE7YJJWKIddBF+lIOT8kD46+oDuUfa++iyDF0F9rs8qFvoqx4EQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YmWMQOVuaFcY8lbgjPkNm3PlxqZ43HAmsT1qfOpFgGE=;
- b=DNck0QxCwbui6MA+3joqNcGffS/Vgltz87i2RjnssCLTB0qKTksdn2gSXfRXSBNwyfbMp0XBp43mCQJ3MRaAoHQNfdDPWRwrUzUDpL/NC9+hNzYVE37tNTveIPxGcHYJJqn6tHzSBw7tkb7LVA8Sv1umoPMwLXy59amBEr6zfmQ=
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY4PR0401MB3585.namprd04.prod.outlook.com (2603:10b6:910:8a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.25; Tue, 30 Jun
- 2020 00:37:07 +0000
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::c593:f271:eebe:ac7]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::c593:f271:eebe:ac7%9]) with mapi id 15.20.3131.024; Tue, 30 Jun 2020
- 00:37:07 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        "asml.silence@gmail.com" <asml.silence@gmail.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "mb@lightnvm.io" <mb@lightnvm.io>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "javier.gonz@samsung.com" <javier.gonz@samsung.com>,
-        Arnav Dawn <a.dawn@samsung.com>
-Subject: Re: [PATCH v2 1/2] fs,block: Introduce RWF_ZONE_APPEND and handling
- in direct IO path
-Thread-Topic: [PATCH v2 1/2] fs,block: Introduce RWF_ZONE_APPEND and handling
- in direct IO path
-Thread-Index: AQHWSxStAvYl2c5t2kCK+9TjcP8ZXw==
-Date:   Tue, 30 Jun 2020 00:37:07 +0000
-Message-ID: <CY4PR04MB3751213DD4B370F58A63368BE76F0@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
- <CGME20200625171834epcas5p226a24dfcb84cfa83fe29a2bd17795d85@epcas5p2.samsung.com>
- <1593105349-19270-2-git-send-email-joshi.k@samsung.com>
- <CY4PR04MB37511FB1D3B3491A2CED5470E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
- <20200629183202.GA24003@test-zns>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samsung.com; dkim=none (message not signed)
- header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.47.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 06c0ab7e-e7ad-4f1d-95f1-08d81c8db7fa
-x-ms-traffictypediagnostic: CY4PR0401MB3585:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-microsoft-antispam-prvs: <CY4PR0401MB3585E746C1667BE5EF95E1CFE76F0@CY4PR0401MB3585.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
-x-forefront-prvs: 0450A714CB
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: EoUGPV2yBxHBw0/h/paCK4uYcE7z8n7FVtRM2fV4owbRZoDfIoMq2iKAAL/48xcSkclB9XxWWyEw5xBK3WxM1fV4AQsRyEgAzUnipAIxl7y4/3YTukIYuAUo0ilzhijtvGJ1gPezccsbRoyxftixXCfkVcFDg/B9OD2/wXBXcdZIYFbBI2gl2kRHJS94QpqFk7KleTyg2NaK8CiKopiiLHoVHgWdRhZ9e1ER1SYWbG+gjfVoPU5VDhzvNTCA2LA3qq+sz0tUAuKlAsQy8KdhsUkoBjlX/Ssk72K/6jivps+FJkIn+bzViMIcUZK3ww2phNinDaudASzbzXep3z4o+gAOuwpilugWvdk0HBxTBX5KrXqmA9UcuWHtX3zRcgfB
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(396003)(136003)(376002)(39860400002)(366004)(83380400001)(6506007)(7696005)(53546011)(54906003)(316002)(76116006)(66446008)(64756008)(66556008)(66476007)(91956017)(6916009)(66946007)(186003)(26005)(71200400001)(8676002)(86362001)(2906002)(7416002)(8936002)(478600001)(4326008)(55016002)(9686003)(5660300002)(33656002)(52536014)(142933001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: YVDMOcQMkUGnfQOllFEvDD9szp+s9u8RH8YfNL71McptW2FPQ5ur/wAuq+PJipwiaR07OIU1BiulHYNUEjBBJTSa/4IupbxwuvI/xSxmZz5oiotN/HSKKB3QTWs/R4gZNK3X7aUlGPpoXiYBZTzTT3LiOVHgLzonBgfD3XtkrkmDQAysq7DBCVkMGZfUFs36pdZLKJPfFc0yhplrWg7bdO3dqtDfoqo9+z7CxbQskrWdREYKiObvf/jLHYn5xezXOYUL8QXcJWwImrV+zaAI69jJ1U+Na2A3CPh1MTMb3dLJ0CMSJWrOrf2tueXgz8ajOW0g+bF9k0gr9G46dMhb+IWGBW9AqqiXw0fJz5GxDHbAj85t85U+ey4M0bySSyy/mArredG1bhVDzE5F8WwTSgeVwBjXjkqgktGLPqCEzHPc7WNDs6tl3x5j7KJSggoylMIcyjSG4F5lizlvN2RXVHGynhseriB2PvlFpdRrvaQ=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 29 Jun 2020 20:57:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593478664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=42nLYzYhkWK6/r5DmX+hlkd7lSnr9BbdwwD5Wi4QyC8=;
+        b=Jce7pnpWVDpkGo73k47nO1YamJ4wIRqyVUdvih792erFKja5x7zpLjsH0EFTKuJZ9pwFXp
+        BwVXz10tqSgxIt6FcGpUouxj+WqnpZZ0JXeuX9zgItC1fnTKpHTnYWlPpXBQW3y7pdTKqA
+        VtNVi3oSc1v3AGlGwmiLljPcFt7MFWw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-5mQI4EAgPPajF_mX7Hr3Ug-1; Mon, 29 Jun 2020 20:57:42 -0400
+X-MC-Unique: 5mQI4EAgPPajF_mX7Hr3Ug-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F3CE107ACF5;
+        Tue, 30 Jun 2020 00:57:41 +0000 (UTC)
+Received: from T590 (ovpn-13-98.pek2.redhat.com [10.72.13.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C03A428573;
+        Tue, 30 Jun 2020 00:57:34 +0000 (UTC)
+Date:   Tue, 30 Jun 2020 08:57:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Baolin Wang <baolin.wang7@gmail.com>
+Subject: Re: [PATCH V6 6/6] blk-mq: support batching dispatch in case of io
+ scheduler
+Message-ID: <20200630005730.GA2049266@T590>
+References: <20200624230349.1046821-1-ming.lei@redhat.com>
+ <20200624230349.1046821-7-ming.lei@redhat.com>
+ <20200629090452.GA4892@infradead.org>
+ <20200629103239.GB1881343@T590>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06c0ab7e-e7ad-4f1d-95f1-08d81c8db7fa
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2020 00:37:07.4924
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KFosDTofffRpTi5froaY52jK4ofSFaOlAAbrtFaQhLhETQ7ZneeS8S1PIaryU9ZTCZXlmhU6wisvo/mRwyffTw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0401MB3585
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200629103239.GB1881343@T590>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/06/30 3:35, Kanchan Joshi wrote:=0A=
-> On Fri, Jun 26, 2020 at 02:50:20AM +0000, Damien Le Moal wrote:=0A=
->> On 2020/06/26 2:18, Kanchan Joshi wrote:=0A=
->>> Introduce RWF_ZONE_APPEND flag to represent zone-append. User-space=0A=
->>> sends this with write. Add IOCB_ZONE_APPEND which is set in=0A=
->>> kiocb->ki_flags on receiving RWF_ZONE_APPEND.=0A=
->>> Make direct IO submission path use IOCB_ZONE_APPEND to send bio with=0A=
->>> append op. Direct IO completion returns zone-relative offset, in sector=
-=0A=
->>> unit, to upper layer using kiocb->ki_complete interface.=0A=
->>> Report error if zone-append is requested on regular file or on sync=0A=
->>> kiocb (i.e. one without ki_complete).=0A=
->>>=0A=
->>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>=0A=
->>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>=0A=
->>> Signed-off-by: Arnav Dawn <a.dawn@samsung.com>=0A=
->>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>=0A=
->>> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>=0A=
->>> ---=0A=
->>>  fs/block_dev.c          | 28 ++++++++++++++++++++++++----=0A=
->>>  include/linux/fs.h      |  9 +++++++++=0A=
->>>  include/uapi/linux/fs.h |  5 ++++-=0A=
->>>  3 files changed, 37 insertions(+), 5 deletions(-)=0A=
->>>=0A=
->>> diff --git a/fs/block_dev.c b/fs/block_dev.c=0A=
->>> index 47860e5..5180268 100644=0A=
->>> --- a/fs/block_dev.c=0A=
->>> +++ b/fs/block_dev.c=0A=
->>> @@ -185,6 +185,10 @@ static unsigned int dio_bio_write_op(struct kiocb =
-*iocb)=0A=
->>>  	/* avoid the need for a I/O completion work item */=0A=
->>>  	if (iocb->ki_flags & IOCB_DSYNC)=0A=
->>>  		op |=3D REQ_FUA;=0A=
->>> +=0A=
->>> +	if (iocb->ki_flags & IOCB_ZONE_APPEND)=0A=
->>> +		op |=3D REQ_OP_ZONE_APPEND;=0A=
->>=0A=
->> This is wrong. REQ_OP_WRITE is already set in the declaration of "op". H=
-ow can=0A=
->> this work ?=0A=
-> REQ_OP_ZONE_APPEND will override the REQ_WRITE op, while previously set o=
-p=0A=
-> flags (REQ_FUA etc.) will be retained. But yes, this can be made to look=
-=0A=
-> cleaner.=0A=
-> V3 will include the other changes you pointed out. Thanks for the review.=
-=0A=
-> =0A=
-=0A=
-REQ_OP_WRITE and REQ_OP_ZONE_APPEND are different bits, so there is no=0A=
-"override". A well formed BIO bi_opf is one op+flags. Specifying multiple O=
-P=0A=
-codes does not make sense.=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On Mon, Jun 29, 2020 at 06:32:39PM +0800, Ming Lei wrote:
+> On Mon, Jun 29, 2020 at 10:04:52AM +0100, Christoph Hellwig wrote:
+> > > +/*
+> > > + * We know bfq and deadline apply single scheduler queue instead of multi
+> > > + * queue. However, the two are often used on single queue devices, also
+> > > + * the current @hctx should affect the real device status most of times
+> > > + * because of locality principle.
+> > > + *
+> > > + * So use current hctx->dispatch_busy directly for figuring out batching
+> > > + * dispatch count.
+> > > + */
+> > 
+> > I don't really understand this comment.  Also I think the code might
+> > be cleaner if this function is inlined as an if/else in the only
+> > caller.
+> > 
+> > > +static inline bool blk_mq_do_dispatch_rq_lists(struct blk_mq_hw_ctx *hctx,
+> > > +		struct list_head *lists, bool multi_hctxs, unsigned count)
+> > > +{
+> > > +	bool ret;
+> > > +
+> > > +	if (!count)
+> > > +		return false;
+> > > +
+> > > +	if (likely(!multi_hctxs))
+> > > +		return blk_mq_dispatch_rq_list(hctx, lists, count);
+> > 
+> > Keeping these checks in the callers would keep things a little cleaner,
+> > especially as the multi hctx case only really needs the lists argument.
+> > 
+> > > +		LIST_HEAD(list);
+> > > +		struct request *new, *rq = list_first_entry(lists,
+> > > +				struct request, queuelist);
+> > > +		unsigned cnt = 0;
+> > > +
+> > > +		list_for_each_entry(new, lists, queuelist) {
+> > > +			if (new->mq_hctx != rq->mq_hctx)
+> > > +				break;
+> > > +			cnt++;
+> > > +		}
+> > > +
+> > > +		if (new->mq_hctx == rq->mq_hctx)
+> > > +			list_splice_tail_init(lists, &list);
+> > > +		else
+> > > +			list_cut_before(&list, lists, &new->queuelist);
+> > > +
+> > > +		ret = blk_mq_dispatch_rq_list(rq->mq_hctx, &list, cnt);
+> > > +	}
+> > 
+> > I think this has two issues:  for one ret should be ORed as any dispatch
+> > or error should leaave ret set.  Also we need to splice the dispatch
+> 
+> OK.
+> 
+> > list back onto the main list here, otherwise we can lose those requests.
+> 
+> The dispatch list always becomes empty after blk_mq_dispatch_rq_list()
+> returns, so no need to splice it back.
+> 
+> > 
+> > FYI, while reviewing this I ended up editing things into a shape I
+> > could better understand.  Let me know what you think of this version?
+> > 
+> > 
+> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> > index 4c72073830f3cb..466dce99699ae4 100644
+> > --- a/block/blk-mq-sched.c
+> > +++ b/block/blk-mq-sched.c
+> > @@ -7,6 +7,7 @@
+> >  #include <linux/kernel.h>
+> >  #include <linux/module.h>
+> >  #include <linux/blk-mq.h>
+> > +#include <linux/list_sort.h>
+> >  
+> >  #include <trace/events/block.h>
+> >  
+> > @@ -80,6 +81,38 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+> >  	blk_mq_run_hw_queue(hctx, true);
+> >  }
+> >  
+> > +static int sched_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
+> > +{
+> > +	struct request *rqa = container_of(a, struct request, queuelist);
+> > +	struct request *rqb = container_of(b, struct request, queuelist);
+> > +
+> > +	return rqa->mq_hctx > rqb->mq_hctx;
+> > +}
+> > +
+> > +static bool blk_mq_dispatch_hctx_list(struct list_head *rq_list)
+> > +{
+> > +	struct blk_mq_hw_ctx *hctx =
+> > +		list_first_entry(rq_list, struct request, queuelist)->mq_hctx;
+> > +	struct request *rq;
+> > +	LIST_HEAD(hctx_list);
+> > +	unsigned int count = 0;
+> > +	bool ret;
+> > +
+> > +	list_for_each_entry(rq, rq_list, queuelist) {
+> > +		if (rq->mq_hctx != hctx) {
+> > +			list_cut_before(&hctx_list, rq_list, &rq->queuelist);
+> > +			goto dispatch;
+> > +		}
+> > +		count++;
+> > +	}
+> > +	list_splice_tail_init(rq_list, &hctx_list);
+> > +
+> > +dispatch:
+> > +	ret = blk_mq_dispatch_rq_list(hctx, &hctx_list, count);
+> > +	list_splice(&hctx_list, rq_list);
+> 
+> The above line isn't needed.
+> 
+> > +	return ret;
+> > +}
+> > +
+> >  #define BLK_MQ_BUDGET_DELAY	3		/* ms units */
+> >  
+> >  /*
+> > @@ -90,20 +123,29 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+> >   * Returns -EAGAIN if hctx->dispatch was found non-empty and run_work has to
+> >   * be run again.  This is necessary to avoid starving flushes.
+> >   */
+> > -static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > +static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> 
+> The return type can be changed to 'bool'.
+> 
+> >  {
+> >  	struct request_queue *q = hctx->queue;
+> >  	struct elevator_queue *e = q->elevator;
+> > +	bool multi_hctxs = false, run_queue = false;
+> > +	bool dispatched = false, busy = false;
+> > +	unsigned int max_dispatch;
+> >  	LIST_HEAD(rq_list);
+> > -	int ret = 0;
+> > -	struct request *rq;
+> > +	int count = 0;
+> > +
+> > +	if (hctx->dispatch_busy)
+> > +		max_dispatch = 1;
+> > +	else
+> > +		max_dispatch = hctx->queue->nr_requests;
+> >  
+> >  	do {
+> > +		struct request *rq;
+> > +
+> >  		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+> >  			break;
+> >  
+> >  		if (!list_empty_careful(&hctx->dispatch)) {
+> > -			ret = -EAGAIN;
+> > +			busy = true;
+> >  			break;
+> >  		}
+> >  
+> > @@ -120,7 +162,7 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> >  			 * no guarantee anyone will kick the queue.  Kick it
+> >  			 * ourselves.
+> >  			 */
+> > -			blk_mq_delay_run_hw_queues(q, BLK_MQ_BUDGET_DELAY);
+> > +			run_queue = true;
+> >  			break;
+> >  		}
+> >  
+> > @@ -130,7 +172,43 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> >  		 * in blk_mq_dispatch_rq_list().
+> >  		 */
+> >  		list_add(&rq->queuelist, &rq_list);
+> 
+> The above should change to list_add_tail(&rq->queuelist, &rq_list).
+
+Hi Christoph,
+
+Follows the revised patch, and will post it as V7 if you are fine:
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 4c72073830f3..1c52e56a19b1 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -7,6 +7,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/blk-mq.h>
++#include <linux/list_sort.h>
+ 
+ #include <trace/events/block.h>
+ 
+@@ -80,6 +81,37 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+ 	blk_mq_run_hw_queue(hctx, true);
+ }
+ 
++static int sched_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
++{
++	struct request *rqa = container_of(a, struct request, queuelist);
++	struct request *rqb = container_of(b, struct request, queuelist);
++
++	return rqa->mq_hctx > rqb->mq_hctx;
++}
++
++static bool blk_mq_dispatch_hctx_list(struct list_head *rq_list)
++{
++	struct blk_mq_hw_ctx *hctx =
++		list_first_entry(rq_list, struct request, queuelist)->mq_hctx;
++	struct request *rq;
++	LIST_HEAD(hctx_list);
++	unsigned int count = 0;
++	bool ret;
++
++	list_for_each_entry(rq, rq_list, queuelist) {
++		if (rq->mq_hctx != hctx) {
++			list_cut_before(&hctx_list, rq_list, &rq->queuelist);
++			goto dispatch;
++		}
++		count++;
++	}
++	list_splice_tail_init(rq_list, &hctx_list);
++
++dispatch:
++	ret = blk_mq_dispatch_rq_list(hctx, &hctx_list, count);
++	return ret;
++}
++
+ #define BLK_MQ_BUDGET_DELAY	3		/* ms units */
+ 
+ /*
+@@ -90,20 +122,29 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+  * Returns -EAGAIN if hctx->dispatch was found non-empty and run_work has to
+  * be run again.  This is necessary to avoid starving flushes.
+  */
+-static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
++static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
++	bool multi_hctxs = false, run_queue = false;
++	bool dispatched = false, busy = false;
++	unsigned int max_dispatch;
+ 	LIST_HEAD(rq_list);
+-	int ret = 0;
+-	struct request *rq;
++	int count = 0;
++
++	if (hctx->dispatch_busy)
++		max_dispatch = 1;
++	else
++		max_dispatch = hctx->queue->nr_requests;
+ 
+ 	do {
++		struct request *rq;
++
+ 		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+ 			break;
+ 
+ 		if (!list_empty_careful(&hctx->dispatch)) {
+-			ret = -EAGAIN;
++			busy = true;
+ 			break;
+ 		}
+ 
+@@ -120,7 +161,7 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 			 * no guarantee anyone will kick the queue.  Kick it
+ 			 * ourselves.
+ 			 */
+-			blk_mq_delay_run_hw_queues(q, BLK_MQ_BUDGET_DELAY);
++			run_queue = true;
+ 			break;
+ 		}
+ 
+@@ -129,8 +170,42 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 		 * if this rq won't be queued to driver via .queue_rq()
+ 		 * in blk_mq_dispatch_rq_list().
+ 		 */
+-		list_add(&rq->queuelist, &rq_list);
+-	} while (blk_mq_dispatch_rq_list(rq->mq_hctx, &rq_list, 1));
++		list_add_tail(&rq->queuelist, &rq_list);
++		if (rq->mq_hctx != hctx)
++			multi_hctxs = true;
++	} while (++count < max_dispatch);
++
++	if (!count) {
++		if (run_queue)
++			blk_mq_delay_run_hw_queues(q, BLK_MQ_BUDGET_DELAY);
++	} else if (multi_hctxs) {
++		/*
++		 * Requests from different hctx may be dequeued from some
++		 * schedulers, such as bfq and deadline.
++		 *
++		 * Sort the requests in the list according to their hctx,
++		 * dispatch batching requests from same hctx at a time.
++		 */
++		list_sort(NULL, &rq_list, sched_rq_cmp);
++		do {
++			dispatched |= blk_mq_dispatch_hctx_list(&rq_list);
++		} while (!list_empty(&rq_list));
++	} else {
++		dispatched = blk_mq_dispatch_rq_list(hctx, &rq_list, count);
++	}
++
++	if (busy)
++		return -EAGAIN;
++	return !!dispatched;
++}
++
++static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
++{
++	int ret;
++
++	do {
++		ret = __blk_mq_do_dispatch_sched(hctx);
++	} while (ret == 1);
+ 
+ 	return ret;
+ }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d273a56f11c0..57ae018d5cc8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1323,8 +1323,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	if (list_empty(list))
+ 		return false;
+ 
+-	WARN_ON(!list_is_singular(list) && nr_budgets);
+-
+ 	/*
+ 	 * Now process all the entries, sending them to the driver.
+ 	 */
+
+Thanks, 
+Ming
+
