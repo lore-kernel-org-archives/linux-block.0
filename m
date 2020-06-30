@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4772AC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFEFC433DF
 	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 10:25:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19DD520771
+	by mail.kernel.org (Postfix) with ESMTP id 4DD6220771
 	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 10:25:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DjCXIhPl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmpHroGE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732434AbgF3KZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1732446AbgF3KZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 30 Jun 2020 06:25:40 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49285 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732452AbgF3KZi (ORCPT
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33482 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732512AbgF3KZj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jun 2020 06:25:38 -0400
+        Tue, 30 Jun 2020 06:25:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1593512737;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IByy82y7HuBW6Y3JaXB/0a1+G6TgF2ex3DZ0VWkVc3A=;
-        b=DjCXIhPl5J8YYoQ+BrLyELLK7f3fmRYSF45pxKjEh3IgE6bKs7tbNb1j0JV4K4DWmoAvBL
-        K3Uhg1ZdekOrnON2RUVzyNffFlMZ5URak2XY4tjY5Yl9dG3izutqh5yZvm9KGc2l8bgtHs
-        BFv2hoiGZcOVYSJ+4cqK7Vl74HSjlUQ=
+        bh=jNP+1N4J8KnnGw4V2VSIZHvytLG0pUfP8f/gfBb66lo=;
+        b=cmpHroGEIxWEVHDzf5wvy0+9WDCVW/RJ8qsxOT9cv077yZas8I7yTUkZ/ireQr4ERQTQ5/
+        XaGywFWgmx/A64SsinYCAlDW8lItWUH+7JmmmDJxOnNz3cBEVooFkJwz9zcayBXAcqIo38
+        yDvgVdiUE+UT04/LQ5e7lM5WtvfHk7Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-IwVrQfAkNxuom6qrfa5qoA-1; Tue, 30 Jun 2020 06:25:35 -0400
-X-MC-Unique: IwVrQfAkNxuom6qrfa5qoA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-234-sOcMHllJOUq7WHFBzm9xow-1; Tue, 30 Jun 2020 06:25:32 -0400
+X-MC-Unique: sOcMHllJOUq7WHFBzm9xow-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 055C6107ACCD;
-        Tue, 30 Jun 2020 10:25:34 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48D3D107ACCA;
+        Tue, 30 Jun 2020 10:25:31 +0000 (UTC)
 Received: from localhost (ovpn-13-98.pek2.redhat.com [10.72.13.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5365C7BEA0;
-        Tue, 30 Jun 2020 10:25:32 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A0E39741A0;
+        Tue, 30 Jun 2020 10:25:30 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -51,58 +51,144 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Baolin Wang <baolin.wang7@gmail.com>,
         Christoph Hellwig <hch@infradead.org>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH V7 4/6] blk-mq: remove dead check from blk_mq_dispatch_rq_list
-Date:   Tue, 30 Jun 2020 18:24:59 +0800
-Message-Id: <20200630102501.2238972-5-ming.lei@redhat.com>
+Subject: [PATCH V7 3/6] blk-mq: move getting driver tag and budget into one helper
+Date:   Tue, 30 Jun 2020 18:24:58 +0800
+Message-Id: <20200630102501.2238972-4-ming.lei@redhat.com>
 In-Reply-To: <20200630102501.2238972-1-ming.lei@redhat.com>
 References: <20200630102501.2238972-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE is returned from
-.queue_rq, the 'list' variable always holds this rq which isn't
-queued to LLD successfully.
+Move code for getting driver tag and budget into one helper, so
+blk_mq_dispatch_rq_list gets a bit simplified, and easier to read.
 
-So blk_mq_dispatch_rq_list() always returns false from the branch
-of '!list_empty(list)'.
+Meantime move updating of 'no_tag' and 'no_budget_available' into
+the branch for handling partial dispatch because that is exactly
+consumer of the two local variables.
+
+Also rename the parameter of 'got_budget' as 'ask_budget'.
 
 No functional change.
 
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Baolin Wang <baolin.wang7@gmail.com>
 Cc: Christoph Hellwig <hch@infradead.org>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 Reviewed-by: Christoph Hellwig <hch@infradead.org>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Tested-by: Baolin Wang <baolin.wang7@gmail.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 7 -------
- 1 file changed, 7 deletions(-)
+ block/blk-mq.c | 66 ++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 40 insertions(+), 26 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 39a2332e32ac..0a6fb6d647f6 100644
+index 2a1ce2990b83..39a2332e32ac 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1482,13 +1482,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 	} else
- 		blk_mq_update_dispatch_busy(hctx, false);
- 
--	/*
--	 * If the host/device is unable to accept more work, inform the
--	 * caller of that.
--	 */
--	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
--		return false;
--
- 	return (queued + errors) != 0;
+@@ -1311,18 +1311,50 @@ static void blk_mq_handle_zone_resource(struct request *rq,
+ 	__blk_mq_requeue_request(rq);
  }
  
++enum prep_dispatch {
++	PREP_DISPATCH_OK,
++	PREP_DISPATCH_NO_TAG,
++	PREP_DISPATCH_NO_BUDGET,
++};
++
++static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
++						  bool need_budget)
++{
++	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
++
++	if (need_budget && !blk_mq_get_dispatch_budget(rq->q)) {
++		blk_mq_put_driver_tag(rq);
++		return PREP_DISPATCH_NO_BUDGET;
++	}
++
++	if (!blk_mq_get_driver_tag(rq)) {
++		/*
++		 * The initial allocation attempt failed, so we need to
++		 * rerun the hardware queue when a tag is freed. The
++		 * waitqueue takes care of that. If the queue is run
++		 * before we add this entry back on the dispatch list,
++		 * we'll re-run it below.
++		 */
++		if (!blk_mq_mark_tag_wait(hctx, rq)) {
++			blk_mq_put_dispatch_budget(rq->q);
++			return PREP_DISPATCH_NO_TAG;
++		}
++	}
++
++	return PREP_DISPATCH_OK;
++}
++
+ /*
+  * Returns true if we did some work AND can potentially do more.
+  */
+ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 			     bool got_budget)
+ {
++	enum prep_dispatch prep;
+ 	struct request_queue *q = hctx->queue;
+ 	struct request *rq, *nxt;
+-	bool no_tag = false;
+ 	int errors, queued;
+ 	blk_status_t ret = BLK_STS_OK;
+-	bool no_budget_avail = false;
+ 	LIST_HEAD(zone_list);
+ 
+ 	if (list_empty(list))
+@@ -1340,31 +1372,9 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 		rq = list_first_entry(list, struct request, queuelist);
+ 
+ 		WARN_ON_ONCE(hctx != rq->mq_hctx);
+-		if (!got_budget && !blk_mq_get_dispatch_budget(q)) {
+-			blk_mq_put_driver_tag(rq);
+-			no_budget_avail = true;
++		prep = blk_mq_prep_dispatch_rq(rq, !got_budget);
++		if (prep != PREP_DISPATCH_OK)
+ 			break;
+-		}
+-
+-		if (!blk_mq_get_driver_tag(rq)) {
+-			/*
+-			 * The initial allocation attempt failed, so we need to
+-			 * rerun the hardware queue when a tag is freed. The
+-			 * waitqueue takes care of that. If the queue is run
+-			 * before we add this entry back on the dispatch list,
+-			 * we'll re-run it below.
+-			 */
+-			if (!blk_mq_mark_tag_wait(hctx, rq)) {
+-				blk_mq_put_dispatch_budget(q);
+-				/*
+-				 * For non-shared tags, the RESTART check
+-				 * will suffice.
+-				 */
+-				if (hctx->flags & BLK_MQ_F_TAG_SHARED)
+-					no_tag = true;
+-				break;
+-			}
+-		}
+ 
+ 		list_del_init(&rq->queuelist);
+ 
+@@ -1417,6 +1427,10 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	 */
+ 	if (!list_empty(list)) {
+ 		bool needs_restart;
++		/* For non-shared tags, the RESTART check will suffice */
++		bool no_tag = prep == PREP_DISPATCH_NO_TAG &&
++                        (hctx->flags & BLK_MQ_F_TAG_SHARED);
++		bool no_budget_avail = prep == PREP_DISPATCH_NO_BUDGET;
+ 
+ 		/*
+ 		 * If we didn't flush the entire list, we could have told
 -- 
 2.25.2
 
