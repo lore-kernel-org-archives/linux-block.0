@@ -2,138 +2,129 @@ Return-Path: <SRS0=9ToN=AL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70CEFC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 11:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDD5C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 12:46:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5245B20760
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 11:38:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D79B2082F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 12:46:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="byFHeKGW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731645AbgF3LiY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jun 2020 07:38:24 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2421 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731382AbgF3LiW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jun 2020 07:38:22 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id 011AE30E3D89DB2688FB;
-        Tue, 30 Jun 2020 12:38:21 +0100 (IST)
-Received: from [127.0.0.1] (10.47.7.58) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 30 Jun
- 2020 12:38:19 +0100
-Subject: Re: About sbitmap_bitmap_show() and cleared bits (was Re: [PATCH RFC
- v7 07/12] blk-mq: Add support in hctx_tags_bitmap_show() for a shared
- sbitmap)
-From:   John Garry <john.garry@huawei.com>
-To:     Hannes Reinecke <hare@suse.de>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>
-CC:     <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
-        <don.brace@microsemi.com>, <kashyap.desai@broadcom.com>,
-        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
-        <shivasharan.srikanteshwara@broadcom.com>,
-        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
-        <chenxiang66@hisilicon.com>, <megaraidlinux.pdl@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-8-git-send-email-john.garry@huawei.com>
- <9f4741c5-d117-d764-cf3a-a57192a788c3@suse.de>
- <aad6efa3-2d7f-ca68-d239-44ea187c8017@huawei.com>
- <7ed6ccf1-6ad9-1df7-f55d-4ed6cac1e08d@suse.de>
- <8ffd5c22-f644-3436-0a9f-2e08c220525e@huawei.com>
- <84f9623e-961e-3c9b-eed6-795b64f1ab76@suse.de>
- <a30ff47d-a06a-13d6-ef5d-8c90ba3261eb@huawei.com>
-Message-ID: <c95f6566-0f17-9d11-a52a-ac7433c8a2f0@huawei.com>
-Date:   Tue, 30 Jun 2020 12:36:44 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S2387935AbgF3Mqx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jun 2020 08:46:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37706 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387855AbgF3Mqw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jun 2020 08:46:52 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F0C8C061755;
+        Tue, 30 Jun 2020 05:46:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Q7p5xLxn4weNWP/HSAg2W+OjOZyX+vfU5i1SyJ0YNkk=; b=byFHeKGWpcfPv6qNe1knSNSdd6
+        eTgTvR0X9jhfJDShcpq/+Smav0j66PLJDLVbsrnabXaeL3hdlPv9cK+CbGNuN1O6xk2pN/b2vozu5
+        K8ANv0hrL4k975gPSzFONfyGBTuTBI+iv9T4Wif+0SG9XZouSDlLL2Ay6vVVrknvyYzFNmSrP+F8w
+        2TYFjzSAvJUEC0u7dBI8zbpZN7AM0FnSFStLNXRe5ELDXp8MfThkylMV9+LJWwXFJRvsW0cmPso7d
+        ZFoigGJDR8+BatGxguaXFHEzj5/dnI5AuWy993WCQ2axR2aRxQvTTFQbg8m0v53SKiF0qCA/EVuzX
+        1kh4QSKA==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jqFer-0005Em-Bb; Tue, 30 Jun 2020 12:46:41 +0000
+Date:   Tue, 30 Jun 2020 13:46:41 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org,
+        asml.silence@gmail.com, Damien.LeMoal@wdc.com, hch@infradead.org,
+        linux-fsdevel@vger.kernel.org, mb@lightnvm.io,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        selvakuma.s1@samsung.com, nj.shetty@samsung.com,
+        javier.gonz@samsung.com
+Subject: Re: [PATCH v2 0/2] zone-append support in io-uring and aio
+Message-ID: <20200630124641.GN25523@casper.infradead.org>
+References: <CGME20200625171829epcas5p268486a0780571edb4999fc7b3caab602@epcas5p2.samsung.com>
+ <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <a30ff47d-a06a-13d6-ef5d-8c90ba3261eb@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.7.58]
-X-ClientProxiedBy: lhreml738-chm.china.huawei.com (10.201.108.188) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/06/2020 08:30, John Garry wrote:
-> On 30/06/2020 07:33, Hannes Reinecke wrote:
->> On 6/29/20 5:32 PM, John Garry wrote:
->>> Hi all,
->>>
->>> I noticed that sbitmap_bitmap_show() only shows set bits and does not 
->>> consider cleared bits. Is that the proper thing to do?
->>>
->>> I ask, as from trying to support sbitmap_bitmap_show() for hostwide 
->>> shared tags feature, we currently use blk_mq_queue_tag_busy_iter() to 
->>> find active requests (and associated tags/bits) for a particular 
->>> hctx. So, AFAICT, would give a change in behavior for 
->>> sbitmap_bitmap_show(), in that it would effectively show set and not 
->>> cleared bits.
->>>
->> Why would you need to do this?
->> Where would be the point traversing cleared bits?
+On Thu, Jun 25, 2020 at 10:45:47PM +0530, Kanchan Joshi wrote:
+> Zone-append completion result --->
+> With zone-append, where write took place can only be known after completion.
+> So apart from usual return value of write, additional mean is needed to obtain
+> the actual written location.
 > 
-> I'm not talking about traversing cleared bits specifically. I just think 
-> that today sbitmap_bitmap_show() only showing the bits in 
-> sbitmap_word.word may not be useful or even misleading, as in reality 
-> the "set" bits are sbitmap_word.word & ~sbitmap_word.cleared.
+> In aio, this is returned to application using res2 field of io_event -
 > 
-> And for hostwide shared tags feature, iterating the busy rqs to find the 
-> per-hctx tags/bits would effectively give us the "set" bits, above, so 
-> there would be a difference.
+> struct io_event {
+>         __u64           data;           /* the data field from the iocb */
+>         __u64           obj;            /* what iocb this event came from */
+>         __s64           res;            /* result code for this event */
+>         __s64           res2;           /* secondary result */
+> };
+
+Ah, now I understand.  I think you're being a little too specific by
+calling this zone-append.  This is really a "write-anywhere" operation,
+and the specified address is only a hint.
+
+> In io-uring, cqe->flags is repurposed for zone-append result.
 > 
+> struct io_uring_cqe {
+>         __u64   user_data;      /* sqe->data submission passed back */
+>         __s32   res;            /* result code for this event */
+>         __u32   flags;
+> };
+> 
+> Since 32 bit flags is not sufficient, we choose to return zone-relative offset
+> in sector/512b units. This can cover zone-size represented by chunk_sectors.
+> Applications will have the trouble to combine this with zone start to know
+> disk-relative offset. But if more bits are obtained by pulling from res field
+> that too would compel application to interpret res field differently, and it
+> seems more painstaking than the former option.
+> To keep uniformity, even with aio, zone-relative offset is returned.
 
-As an example, here's a sample tags_bitmap output:
+Urgh, no, that's dreadful.  I'm not familiar with the io_uring code.
+Maybe the first 8 bytes of the user_data could be required to be the
+result offset for this submission type?
 
-00000000: 00f0 0fff 03c0 0000 0000 0000 efff fdff
-00000010: 0000 c0f7 7fff ffff 0000 00e0 fef7 ffff
-00000020: 0000 0000 f0ff ffff 0000 ffff 01d0 ffff
-00000030: 0f80
+> Block IO vs File IO --->
+> For now, the user zone-append interface is supported only for zoned-block-device.
+> Regular files/block-devices are not supported. Regular file-system (e.g. F2FS)
+> will not need this anyway, because zone peculiarities are abstracted within FS.
+> At this point, ZoneFS also likes to use append implicitly rather than explicitly.
+> But if/when ZoneFS starts supporting explicit/on-demand zone-append, the check
+> allowing-only-block-device should be changed.
 
-And here's what we would have taking cleared bits into account:
+But we also have O_APPEND files.  And maybe we'll have other kinds of file
+in future for which this would make sense.
 
-00000000: 00f0 0fff 03c0 0000 0000 0000 0000 0000 (20 bits set)
-00000010: 0000 0000 0000 0000 0000 0000 0000 0000
-00000020: 0000 0000 0000 0000 0000 f8ff 0110 8000 (16 bits set)
-00000030: 0f00					  (1 bit set)
+> Semantics --->
+> Zone-append, by its nature, may perform write on a different location than what
+> was specified. It does not fit into POSIX, and trying to fit may just undermine
 
-Here's tags file output:
+... I disagree that it doesn't fit into POSIX.  As I said above, O_APPEND
+is a POSIX concept, so POSIX already understands that writes may not end
+up at the current write pointer.
 
-nr_tags=400
-nr_reserved_tags=0
-active_queues=2
-
-bitmap_tags:
-depth=400
-busy=40
-cleared=182
-bits_per_word=64
-map_nr=7
-alloc_hint={22, 0, 0, 0, 103, 389, 231, 57, 377, 167, 0, 0, 69, 24, 44, 
-50, 54,
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-0, 0, 0, 0
-, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-wake_batch=8
-wake_index=0
-
-[snip]
-
-20+16+1=39 more closely matches with busy=40.
-
-So it seems sensible to go this way for whether hostwide tags are used 
-or not.
-
-thanks,
-John
+> its benefit. It may be better to keep semantics as close to zone-append as
+> possible i.e. specify zone-start location, and obtain the actual-write location
+> post completion. Towards that goal, existing async APIs seem to fit fine.
+> Async APIs (uring, linux aio) do not work on implicit write-pointer and demand
+> explicit write offset (which is what we need for append). Neither write-pointer
+> is taken as input, nor it is updated on completion. And there is a clear way to
+> get zone-append result. Zone-aware applications while using these async APIs
+> can be fine with, for the lack of better word, zone-append semantics itself.
+> 
+> Sync APIs work with implicit write-pointer (at least few of those), and there is
+> no way to obtain zone-append result, making it hard for user-space zone-append.
