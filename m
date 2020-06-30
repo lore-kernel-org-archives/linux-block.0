@@ -2,90 +2,96 @@ Return-Path: <SRS0=9ToN=AL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6D8C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 19:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55ED8C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 22:30:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D2E62067D
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 19:00:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2A91206CB
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 22:30:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vIyCu074"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WwoiYjlK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726192AbgF3TAY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jun 2020 15:00:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38944 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725845AbgF3TAX (ORCPT
+        id S1726094AbgF3Wad (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jun 2020 18:30:33 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45913 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726065AbgF3Wab (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jun 2020 15:00:23 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A29C061755
-        for <linux-block@vger.kernel.org>; Tue, 30 Jun 2020 12:00:23 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id x11so8831193plo.7
-        for <linux-block@vger.kernel.org>; Tue, 30 Jun 2020 12:00:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xRcKUYv8vLMl07E2wdlABymQJFgrXbgTcbsQgAon5/Y=;
-        b=vIyCu074YMPyf2Ko3ofarVXk/Wxbl62AqwQ2UDR5UU8SRPqmxHf+1uFctP73i4xGPC
-         UM553wn8Jn7Gk7IP4wsYjza2xy5UHJ9ppYcm6xqsmpPYSzMvX5MI3I9jcHzI8qh1ENRr
-         RQh3zxcGI9lITyz/c6TlyJ62hLloJACxieH2CO9YJPxUfEnERzIVnVpoyyuLnqABUzc2
-         09OWpgauhVKk5aAcaly00m/Rujet839tXO72Wfoe8CtvLgFmE0jZ9v+vLMptv6Gm2sa1
-         BKCOPatyl/v4JwP7ZO5xvW2g1d755NzL78E+wbW3nNQFmF0bvWSogT/g28bJP0wQ5err
-         DAPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xRcKUYv8vLMl07E2wdlABymQJFgrXbgTcbsQgAon5/Y=;
-        b=ZeVk+ZpwSIaUNjcaS20l0lhRRKtH4IJuVZsysKUC2ezQ3LDDwZBQrbbSubXRBgK8kL
-         p1y4dH+HfjYoqr4WsZYxsZ8YKifygeYZWk+H6LfQ7Bc5neSE4JFrmbZH5o5wPNkuiSfC
-         qKbiyyf3nSbNqWLFMfwX5uW8E/cQhLn+Gv54KAsYURMjB6vkDwKnZn+cpurZKwPU/hK5
-         GlLUVS7jNzko3JMRIoZ1pOanLkr+efFKUXk36PwK3edpAS8PLvsmrOP2bYSLjidKIfsb
-         vEqpmWPmBztFmZEiIOzBQEZyyoVT63pHtBxJhf8RE5cPcZXN+hg89ysZ38As7BwIaUNB
-         uI4g==
-X-Gm-Message-State: AOAM530G0cxyVKC8cznWcGQMEgjzip6EC5EUT5amIyIedGLoF5NpItPG
-        sBDyzqxWOhDYp/dYSDkqdq8mfQ==
-X-Google-Smtp-Source: ABdhPJzsjTFT0KHYgvipUVj/IOy0DkeFygIVTw7V0JqjKb+vc9JixphbA5csC5gy8bdDgwbaF2EcvA==
-X-Received: by 2002:a17:90b:1103:: with SMTP id gi3mr23711760pjb.110.1593543623094;
-        Tue, 30 Jun 2020 12:00:23 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:4113:50ea:3eb3:a39b? ([2605:e000:100e:8c61:4113:50ea:3eb3:a39b])
-        by smtp.gmail.com with ESMTPSA id u188sm929814pfu.26.2020.06.30.12.00.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jun 2020 12:00:22 -0700 (PDT)
-Subject: Re: [PATCH][next] blk-cgroup: clean up indentation
-To:     Colin King <colin.king@canonical.com>, Tejun Heo <tj@kernel.org>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200630155441.518850-1-colin.king@canonical.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a75d74f9-88a6-7bfd-d0e2-b4f05c8aa7b7@kernel.dk>
-Date:   Tue, 30 Jun 2020 13:00:20 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Tue, 30 Jun 2020 18:30:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593556230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UfviXLg7XzaMbM+hNuQYcNab3PT4KOfUFzlReRkI2dI=;
+        b=WwoiYjlKg8hf+yq1XALyPTF82lTs5V8hoqzZK1sMZA/w7ID1PXVRbwdhemKfoGRA2WPxj1
+        UNtVQp36JmLUuJN0HLzWVFi5uLaoCLJC3mFo1ht8jhxN6N0HwLYjjDOsm4AG3rmDUr2J2f
+        M04xKYnUKJ98jDharyyBOaQ4FcIc320=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-j3z0j1TmORy0Vb8F9Vvvwg-1; Tue, 30 Jun 2020 18:30:27 -0400
+X-MC-Unique: j3z0j1TmORy0Vb8F9Vvvwg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A52B7800597;
+        Tue, 30 Jun 2020 22:30:25 +0000 (UTC)
+Received: from T590 (ovpn-12-33.pek2.redhat.com [10.72.12.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E3C36106222A;
+        Tue, 30 Jun 2020 22:30:16 +0000 (UTC)
+Date:   Wed, 1 Jul 2020 06:30:12 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] virtio-blk: free vblk-vqs in error path of
+ virtblk_probe()
+Message-ID: <20200630223012.GA2251557@T590>
+References: <20200615041459.22477-1-houtao1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200630155441.518850-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200615041459.22477-1-houtao1@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/30/20 9:54 AM, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Mon, Jun 15, 2020 at 12:14:59PM +0800, Hou Tao wrote:
+> Else there will be memory leak if alloc_disk() fails.
 > 
-> There is a statement that is indented one level too deeply, fix it
-> by removing a tab.
+> Fixes: 6a27b656fc02 ("block: virtio-blk: support multi virt queues per virtio-blk device")
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> ---
+>  drivers/block/virtio_blk.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 9d21bf0f155e..980df853ee49 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -878,6 +878,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	put_disk(vblk->disk);
+>  out_free_vq:
+>  	vdev->config->del_vqs(vdev);
+> +	kfree(vblk->vqs);
+>  out_free_vblk:
+>  	kfree(vblk);
+>  out_free_index:
+> -- 
+> 2.25.0.4.g0ad7144999
+> 
 
-Applied, thanks.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 -- 
-Jens Axboe
+Ming
 
