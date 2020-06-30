@@ -2,96 +2,92 @@ Return-Path: <SRS0=9ToN=AL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55ED8C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 22:30:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A07EAC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 23:12:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2A91206CB
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 22:30:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B82120780
+	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 23:12:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WwoiYjlK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U13XQ12R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726094AbgF3Wad (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jun 2020 18:30:33 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45913 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726065AbgF3Wab (ORCPT
+        id S1726228AbgF3XMo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jun 2020 19:12:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726135AbgF3XMn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jun 2020 18:30:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593556230;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UfviXLg7XzaMbM+hNuQYcNab3PT4KOfUFzlReRkI2dI=;
-        b=WwoiYjlKg8hf+yq1XALyPTF82lTs5V8hoqzZK1sMZA/w7ID1PXVRbwdhemKfoGRA2WPxj1
-        UNtVQp36JmLUuJN0HLzWVFi5uLaoCLJC3mFo1ht8jhxN6N0HwLYjjDOsm4AG3rmDUr2J2f
-        M04xKYnUKJ98jDharyyBOaQ4FcIc320=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-j3z0j1TmORy0Vb8F9Vvvwg-1; Tue, 30 Jun 2020 18:30:27 -0400
-X-MC-Unique: j3z0j1TmORy0Vb8F9Vvvwg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A52B7800597;
-        Tue, 30 Jun 2020 22:30:25 +0000 (UTC)
-Received: from T590 (ovpn-12-33.pek2.redhat.com [10.72.12.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E3C36106222A;
-        Tue, 30 Jun 2020 22:30:16 +0000 (UTC)
-Date:   Wed, 1 Jul 2020 06:30:12 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Hou Tao <houtao1@huawei.com>
-Cc:     linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] virtio-blk: free vblk-vqs in error path of
- virtblk_probe()
-Message-ID: <20200630223012.GA2251557@T590>
-References: <20200615041459.22477-1-houtao1@huawei.com>
+        Tue, 30 Jun 2020 19:12:43 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90BD0C061755;
+        Tue, 30 Jun 2020 16:12:43 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a1so22408510ejg.12;
+        Tue, 30 Jun 2020 16:12:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=EEziaIM/P7+22lxNofy08U1YgTxMBEFHBjSY3HZLox8=;
+        b=U13XQ12RtySqRFFcdAgVVayD93hsV5QjurKvCaIPjTMREpQsx3IQt4i7+vB+/1hohA
+         h9cZs7pdDcaPptjlXXYOP2CGaXtSG/jt1rRJuPGmOHgfLCwReY4AtBtqTzNOtDAnWK3V
+         VGdXHZnqK0vO7NJp0JDlnNCAYvvxI7tLA+EnX3JsUjXfPnroG7VFEMlYkKfdox2bnLmI
+         tpBjAPEq/U15BCusKwJcc0rsLqUxKIwbOgk9VI6jpPJBSi7Er8NBQt0fNHT3ectSqID1
+         LYfEyFhhLHwEkCrL2Zi3evslp+ZoE3PDAhJjPukqpHJnItQ1iYrKm80RXqhFAKgZQ34c
+         tmpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EEziaIM/P7+22lxNofy08U1YgTxMBEFHBjSY3HZLox8=;
+        b=n5qYMKJoqNm1DnpvxdUkyzhNSqL3X+7QVregikh7sNNdD6Iwjuxq/5xVTQcgNOZINg
+         FKQWX3OIqjgiyHiQ0mDvc/kZHgzTA96fSGw46LtVuCFNR2p+FAx3PaGUG7vvON/ZVrjG
+         Su/ofEIpUxJbDMQSX0g/C50FRLEYBZ7o7EELJihAbNgSS/TSm1IzxKrzOPUmjPEDok9l
+         /zGToo82/s7XPLQPrZRJMIROE81Kl+f2emo8RHNhm6CWIVq1efGcuealNPaFidaL9EYx
+         DsqqcnJ6YwaCdQV6q7HTf2IxqNNuFNq8tG2hWDYMv2vbZzqzuxxRaXUAm/Ku7Ye1R6or
+         BXfA==
+X-Gm-Message-State: AOAM533QF5XKgMk+ko7ThNZSdPfRhChz89Ug26cOiZ9ThlXcXE3K9WF+
+        oeo901tG3eY7nV4keT3b2oNdcHKlPfqYdTGQkqEJZF1t
+X-Google-Smtp-Source: ABdhPJyfoxgKsOwNFi4UiM4o394ThnPEmsLIf5RI7arVjkMCEBGVByy0HnH8XipAyieXjvVmACz92Ad9o0yYQwdYmMM=
+X-Received: by 2002:a17:906:fcab:: with SMTP id qw11mr20041483ejb.456.1593558762319;
+ Tue, 30 Jun 2020 16:12:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200615041459.22477-1-houtao1@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20200515163956.GA2158595@mit.edu>
+In-Reply-To: <20200515163956.GA2158595@mit.edu>
+From:   Dave Airlie <airlied@gmail.com>
+Date:   Wed, 1 Jul 2020 09:12:31 +1000
+Message-ID: <CAPM=9tz3heu1-xTyYDA4huszt3LLgF87pKcifc+OCFqJv-KWdA@mail.gmail.com>
+Subject: Re: Maintainers / Kernel Summit 2020 planning kick-off
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     LKML <linux-kernel@vger.kernel.org>, inux-fsdevel@vger.kernel.org,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 15, 2020 at 12:14:59PM +0800, Hou Tao wrote:
-> Else there will be memory leak if alloc_disk() fails.
-> 
-> Fixes: 6a27b656fc02 ("block: virtio-blk: support multi virt queues per virtio-blk device")
-> Signed-off-by: Hou Tao <houtao1@huawei.com>
-> ---
->  drivers/block/virtio_blk.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 9d21bf0f155e..980df853ee49 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -878,6 +878,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	put_disk(vblk->disk);
->  out_free_vq:
->  	vdev->config->del_vqs(vdev);
-> +	kfree(vblk->vqs);
->  out_free_vblk:
->  	kfree(vblk);
->  out_free_index:
-> -- 
-> 2.25.0.4.g0ad7144999
-> 
+On Sat, 16 May 2020 at 02:41, Theodore Y. Ts'o <tytso@mit.edu> wrote:
+>
+> [ Feel free to forward this to other Linux kernel mailing lists as
+>   appropriate -- Ted ]
+>
+> This year, the Maintainers and Kernel Summit will NOT be held in
+> Halifax, August 25 -- 28th, as a result of the COVID-19 pandemic.
+> Instead, we will be pursuing a virtual conference format for both the
+> Maintainers and Kernel Summit, around the last week of August.
+>
+> As in previous years, the Maintainers Summit is invite-only, where the
+> primary focus will be process issues around Linux Kernel Development.
+> It will be limited to 30 invitees and a handful of sponsored
+> attendees.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+What timezone are the conferences being held in? It impacts on what I
+can attend quite heavily :-)
 
--- 
-Ming
-
+Dave.
