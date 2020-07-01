@@ -2,91 +2,118 @@ Return-Path: <SRS0=s14/=AM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A1EC433DF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 09:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D42C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 10:16:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D566C207CD
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 09:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CDCA20722
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 10:16:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fqj9Bq+L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQAPfGio"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728848AbgGAJG3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 05:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56906 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726372AbgGAJG2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 05:06:28 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B283C061755;
-        Wed,  1 Jul 2020 02:06:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=kVtz6vlqJaw/bVcdduLYH4iE1TfD3bHAdPcoJqUty3c=; b=fqj9Bq+LPiX5Cw82+DKENOtZGq
-        aBH2pV9JriMzRvy5+0j64xrRmqbi06FwHdCyyH3uCDubulK1NERetFJK1xFzKQY+iXQVy5XGPU+xl
-        /8+zjmJSUzyKDSohp1PbTPulp7b3LNcKbeAeTRiFa5ER5du9CjNnVFmk1/cLC4YQcwJeNFeAu/B/t
-        7LQYhpHNJ89uXgEEGIP8Kl/6Q59oBdTnE2iI0XlR6ib/eAbUM2WK68TsWfzhy2JvgP5NrxmDNwUdK
-        2kLdrPLtmrx4+deQuyG8ej+JvRoHTRyPjJ4ocq2XFWOIjBChE8rflkGjPJ8f2cJsvLg9xAC3ZO5Oq
-        zQLc42fA==;
-Received: from [2001:4bb8:184:76e3:ea38:596b:3e9e:422a] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jqYhD-0000hE-MD; Wed, 01 Jul 2020 09:06:24 +0000
-From:   Christoph Hellwig <hch@lst.de>
+        id S1729671AbgGAKQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 06:16:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25359 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729226AbgGAKQd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Jul 2020 06:16:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593598592;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LAop02g6KSXyvsnBY8aZ2bcMLBTNcGuy/P4SZXkSxmw=;
+        b=OQAPfGioRVvqMYe7NczAmuIQpEl1mkGIV0Uobq1g7dBwttTo1zMEnThp0BBTP61vvgfCff
+        ISNrqevagK/UlBOxpX/KoPa+PpT2bHsjUDza8Em+dl5AQXZ0luaNW2vywYbDT7kgF0XVji
+        oUhN8tAzbyiDjiPVGXxTs+PAogTcCDk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-Q3hZ6QaoN62rve8dt_Titg-1; Wed, 01 Jul 2020 06:16:30 -0400
+X-MC-Unique: Q3hZ6QaoN62rve8dt_Titg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AD86EC1A3;
+        Wed,  1 Jul 2020 10:16:29 +0000 (UTC)
+Received: from localhost (ovpn-12-33.pek2.redhat.com [10.72.12.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4712660CD0;
+        Wed,  1 Jul 2020 10:16:20 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Tejun Heo <tj@kernel.org>, dm-devel@redhat.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: remove dead bdi congestion leftovers
-Date:   Wed,  1 Jul 2020 11:06:18 +0200
-Message-Id: <20200701090622.3354860-1-hch@lst.de>
-X-Mailer: git-send-email 2.26.2
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH] blk-mq: streamline handling of q->mq_ops->queue_rq result
+Date:   Wed,  1 Jul 2020 18:16:17 +0800
+Message-Id: <20200701101617.2434985-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Current handling of q->mq_ops->queue_rq result is a bit ugly:
 
-we have a lot of bdi congestion related code that is left around without
-any use.  This series removes it in preparation of sorting out the bdi
-lifetime rules properly.
+- two branches which needs to 'continue' have to check if the
+dispatch local list is empty, otherwise one bad request may
+be retrieved via 'rq = list_first_entry(list, struct request, queuelist);'
 
-Diffstat:
- block/blk-cgroup.c               |   19 ----
- drivers/block/drbd/drbd_main.c   |   59 --------------
- drivers/block/drbd/drbd_proc.c   |    1 
- drivers/md/bcache/request.c      |   43 ----------
- drivers/md/bcache/super.c        |    1 
- drivers/md/dm-cache-target.c     |   19 ----
- drivers/md/dm-clone-target.c     |   15 ---
- drivers/md/dm-era-target.c       |   15 ---
- drivers/md/dm-raid.c             |   12 --
- drivers/md/dm-table.c            |   37 ---------
- drivers/md/dm-thin.c             |   16 ---
- drivers/md/dm.c                  |   33 --------
- drivers/md/dm.h                  |    1 
- drivers/md/md-linear.c           |   24 -----
- drivers/md/md-multipath.c        |   23 -----
- drivers/md/md.c                  |   23 -----
- drivers/md/md.h                  |    4 
- drivers/md/raid0.c               |   16 ---
- drivers/md/raid1.c               |   31 -------
- drivers/md/raid10.c              |   26 ------
- drivers/md/raid5.c               |   25 ------
- fs/btrfs/disk-io.c               |   23 -----
- include/linux/backing-dev-defs.h |   43 ----------
- include/linux/backing-dev.h      |   22 -----
- include/linux/blk-cgroup.h       |    6 -
- include/linux/device-mapper.h    |   11 --
- mm/backing-dev.c                 |  157 +++------------------------------------
- 27 files changed, 20 insertions(+), 685 deletions(-)
+- the branch of 'if (unlikely(ret != BLK_STS_OK))' isn't easy
+to follow, since it is actually one error branch.
+
+Streamline this handling, so the code becomes more readable, meantime
+potential kernel oops can be avoided in case that the last request in
+local dispatch list is failed.
+
+Fixes: fc17b6534eb8 ("blk-mq: switch ->queue_rq return value to blk_status_t")
+Cc: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 65e0846fd065..c3862144a2a7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1407,7 +1407,10 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 		if (nr_budgets)
+ 			nr_budgets--;
+ 		ret = q->mq_ops->queue_rq(hctx, &bd);
+-		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
++		if (likely(ret == BLK_STS_OK)) {
++			queued++;
++		} else if (ret == BLK_STS_RESOURCE ||
++				ret == BLK_STS_DEV_RESOURCE) {
+ 			blk_mq_handle_dev_resource(rq, list);
+ 			break;
+ 		} else if (ret == BLK_STS_ZONE_RESOURCE) {
+@@ -1417,18 +1420,10 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 			 * accept.
+ 			 */
+ 			blk_mq_handle_zone_resource(rq, &zone_list);
+-			if (list_empty(list))
+-				break;
+-			continue;
+-		}
+-
+-		if (unlikely(ret != BLK_STS_OK)) {
++		} else {
+ 			errors++;
+ 			blk_mq_end_request(rq, BLK_STS_IOERR);
+-			continue;
+ 		}
+-
+-		queued++;
+ 	} while (!list_empty(list));
+ 
+ 	if (!list_empty(&zone_list))
+-- 
+2.25.2
+
