@@ -2,124 +2,84 @@ Return-Path: <SRS0=s14/=AM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3CE6C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 17:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CDBC433DF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 17:41:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BFFD920771
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 17:21:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82AF42078A
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 17:41:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="uK7iH2hm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRssY8jH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732016AbgGARVi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 13:21:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49558 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726432AbgGARVi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 13:21:38 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC31C08C5C1
-        for <linux-block@vger.kernel.org>; Wed,  1 Jul 2020 10:21:37 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id d194so8663562pga.13
-        for <linux-block@vger.kernel.org>; Wed, 01 Jul 2020 10:21:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=z1vC3E+MLYsLNplhpDprmDKhQTnhrPn5rlIWFLB9TJE=;
-        b=uK7iH2hmxR3/dcpQatFru7JoMk1Ge2su3ktrLG/PgToaVW8x7c4rymwOT8ILM05DRx
-         Tn9qyfdRIt/KAiCL1CiVeXzg94+fnv9uYiRxeQlP/Vb4HcqJ1qIKlMaG3SN7Ja68rL0o
-         yPZV9pik1dip7RkwMkUZmK9a/fgderF2vmbvPSH6aw2YJy7nKQ0NAmBdw8kBDv08D0rF
-         JLkEIBb9NdvWDDrRUszsR5gRlbHtkH0ezlgeYBPOFfTe3YrmT7ECcMUOpvRlgnlaRXt8
-         A+ZO4KMG7XiZhfUIw+qgX3p8QEYG/Z5fJjNK5hwtx1XIpAfe+uRBFK2lQBszLOYHMtIl
-         rLRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=z1vC3E+MLYsLNplhpDprmDKhQTnhrPn5rlIWFLB9TJE=;
-        b=T0Hk+6CkfCr+YuSQVgQUhptwQWeCAYkOq+Ogi8ErEdC/jFtjZnt9pTzQ4CFAOoY9g5
-         9HmOlefdfhkha3YzgKzV6fOg31B0WnudH4j0JbUzIk4KXDFFKpySh83SwJ/AhtapUQ/v
-         +HEdCJSXojpdZX4W6yrgk2ca1gIYeQwVcyAHsMt4afynbIX8ZaitcQsM5BHFjfKiibBx
-         D2ZclS7cq4aAC4yWNeUt6rU7r58w3Sn2IhVCBnQ/XpUqbAArATTMJQ2P0Bl9dpRc9ZMO
-         OBt7TosgSvn/BhUvcMtbekQQhhmoDo3M1IIe6sBGy7OvwMLxvHPbdJI5jifrCGPa+Cgi
-         l8NQ==
-X-Gm-Message-State: AOAM532pwRIlcMRm47ilGHSR+8yaMUVmx8FWBBAogWFBRusI8wsmhRGX
-        F3OximjIJwLFM54jTbB+VyN0Hg==
-X-Google-Smtp-Source: ABdhPJyzM1c4Hj4uYoojYPNqHdrIu3VXSdDm13k3NvCbjfMh5cJ5EZJFCllBMgJeQ+Apv7/t17nsGw==
-X-Received: by 2002:a63:af50:: with SMTP id s16mr21712160pgo.365.1593624097147;
-        Wed, 01 Jul 2020 10:21:37 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:ab5a:d4e:a03a:d89? ([2605:e000:100e:8c61:ab5a:d4e:a03a:d89])
-        by smtp.gmail.com with ESMTPSA id az13sm4833248pjb.34.2020.07.01.10.21.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Jul 2020 10:21:36 -0700 (PDT)
-Subject: =?UTF-8?Q?Re=3a_=f0=9f=92=a5_PANICKED=3a_Test_report_for_kernel_5?=
- =?UTF-8?Q?=2e8=2e0-rc2-c698ae9=2ecki_=28block=29?=
-To:     Rachel Sibley <rasibley@redhat.com>,
-        CKI Project <cki-project@redhat.com>,
-        linux-block@vger.kernel.org
-Cc:     Xiong Zhou <xzhou@redhat.com>
-References: <cki.6F69C04B6D.Z70BF8WNV2@redhat.com>
- <8388a5c5-e5b9-e17b-1522-cf742bb23ad9@redhat.com>
- <a856bc99-eece-f56c-dc79-0ba37979f3dd@kernel.dk>
- <3248254e-ef26-7de1-c814-7cb23dd4fc55@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e16e3e9d-33b2-2b44-3c41-6b04db9b10e0@kernel.dk>
-Date:   Wed, 1 Jul 2020 11:21:35 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1731491AbgGARlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 13:41:11 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30909 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731122AbgGARlK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Jul 2020 13:41:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593625269;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=tXKGxpnc5BMs3iDgwihQRstOyMb/SsOmJWMhA/a2H4Q=;
+        b=iRssY8jH6rmNOC4kwQjfLDacvOeiesE3VbwYYASQL5w4UJazL6Q1jnH44RWadtZQxAaqBr
+        8BgaJnUjN2hneIBeV5eHpvEiJanmKmprsRCQwQyeQ5+Lu5J9vFoRHqCTpshzAlNSKBJ7ZI
+        Nf7laTzBlNqZfTsOVoC/MiKMzj9W4r4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-Jk4wup8QPmylhlXZ_xTslg-1; Wed, 01 Jul 2020 13:41:07 -0400
+X-MC-Unique: Jk4wup8QPmylhlXZ_xTslg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB355107ACCD;
+        Wed,  1 Jul 2020 17:41:05 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 93E7D5C6C0;
+        Wed,  1 Jul 2020 17:41:02 +0000 (UTC)
+Date:   Wed, 1 Jul 2020 12:39:42 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc:     Ewan Milne <emilne@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        John Meneghini <johnm@netapp.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, dm-devel@redhat.com
+Subject: NVMe regression, NVMe no longer uses blk_path_error()
+Message-ID: <20200701163942.GB27063@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3248254e-ef26-7de1-c814-7cb23dd4fc55@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/1/20 11:16 AM, Rachel Sibley wrote:
-> 
-> 
-> On 7/1/20 12:42 PM, Jens Axboe wrote:
->> On 7/1/20 10:37 AM, Rachel Sibley wrote:
->>> Hi, we're seeing multiple panics across all arches, I included a snippet of the call trace for both
->>> xfstests and boot test.
->>>
->>> You should be able to inspect in more detail by viewing the console.log under each build/tests directory:
->>> https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefix=datawarehouse/2020/06/30/609250
->>
->> This was due to a bad patch series, which since got reverted and redone. Current
->> tree should be fine.
->>
->> Now it doesn't matter for this one since I guessed what this was and found it
->> before the bot did, but I do wish the reports were easier to look at. I should
->> not have to dig through directories (which were empty when the report went out,
-> 
-> Sorry about that we noticed this right after we sent the report and
-> worked quickly to resolve it on our end, the logs are now accessible
-> in the external artifacts location.
+IF NVMe's isn't a primary user of blk_path_error() it largely kills
+the entire point of blk_path_error(). (And no the response to this must
+not be: "that's fine")
 
-I was probably just too quick, but if we can fix the below, then it'd
-work much nicer and the logs would just be a secondary resource.
+This commit shows NVMe's previous continued use of blk_path_error():
 
->> btw) to find logs, then download logs and leaf through hundreds of kb of text
->> to find out why the bot thought the tree was broken. It should be readily
->> apparent and in the email. If there's an OOPS, include the oops.
-> 
-> Agreed, this is also something we'd like to do and we have an
-> outstanding ticket to work on it.  I'll follow up and see if we can
-> move this along quicker to make it easier to find it in the reports.
+  8decf5d5b9f3f7 ("nvme: remove nvme_req_needs_failover")
 
-Thanks, that would be a massive improvement! The OOPS is really the key
-thing here, and then I think it's fine to have to dig in
-logs/directories to find other related information. Sometimes you just
-know what it is just by seeing the OOPS.
+but then nvme_failover_req() was relatively recently refactored with:
 
--- 
-Jens Axboe
+  764e9332098c0 ("nvme-multipath: do not reset on unknown status")
+
+NVMe should've continued to use blk_path_error().  If there was some gap
+in error classification that should've been fixed in NVMe.
+
+Instead, with commit 764e9332098c0 NVMe is no longer using retryable
+error classifications commonly maintained within block core.  As such it
+introduces serious potential for regression with DM multipath no longer
+having a shared understanding for what _really_ constitutes a retryable
+blk_status_t from NVMe.
+
+Mike
 
