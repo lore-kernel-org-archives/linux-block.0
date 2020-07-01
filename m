@@ -2,85 +2,175 @@ Return-Path: <SRS0=s14/=AM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4EDDC433DF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 18:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F41C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 18:37:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B45A6207F5
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 18:25:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="o7SDqMAw"
+	by mail.kernel.org (Postfix) with ESMTP id 6207420748
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 18:37:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732990AbgGASZm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 14:25:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59404 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732835AbgGASZm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 14:25:42 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29356C08C5C1;
-        Wed,  1 Jul 2020 11:25:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=79iDJfFRYlYHrisn3ouDHG53Aq0lK8z2VddrdPxeVyA=; b=o7SDqMAwBo7t+TzTt83Wnbb4Mf
-        /u3FPb35bitwFjn51sx/gj3Y9SatyNLQ4rgWXHyeRpDSuy2msqXigA7OPbbMBLBZH4hqJdMl6nn4j
-        o+oNlcrRUlnxx6s1auiuL4a9abVDq46ghr0Ywah7Ao7UudMSVkL0IvmrZuixAAq9t7XLxby/vTDpD
-        66p1DhcwBNMn2HW7Kd0s1SbNOfzFt7MnNzqs6ZeP2YjAYbVADLriPSyKR43Cxp2dGBQbRz1ID7kyG
-        wnhB7OkOwvB4o3qDO8VvcqOP5sGj6DpgyZfHicwM2Rmsyv+O6qL0Q2QA193Apy1eQwBhl+yj/wnuE
-        eK83FPaA==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jqhQQ-0004j0-GK; Wed, 01 Jul 2020 18:25:38 +0000
-Date:   Wed, 1 Jul 2020 19:25:38 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-raid@vger.kernel.org, linux-mm@kvack.org,
-        linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, drbd-dev@tron.linbit.com,
-        dm-devel@redhat.com, Tejun Heo <tj@kernel.org>,
-        cgroups@vger.kernel.org, linux-btrfs@vger.kernel.org
-Subject: Re: remove dead bdi congestion leftovers
-Message-ID: <20200701182538.GU25523@casper.infradead.org>
-References: <20200701090622.3354860-1-hch@lst.de>
- <20200701164103.GC27063@redhat.com>
- <20200701175747.GT25523@casper.infradead.org>
+        id S1728192AbgGAShV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 14:37:21 -0400
+Received: from netrider.rowland.org ([192.131.102.5]:50633 "HELO
+        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1728178AbgGAShU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 14:37:20 -0400
+Received: (qmail 508077 invoked by uid 1000); 1 Jul 2020 14:37:18 -0400
+Date:   Wed, 1 Jul 2020 14:37:18 -0400
+From:   Alan Stern <stern@rowland.harvard.edu>
+To:     Bart Van Assche <bvanassche@acm.org>, martin.petersen@oracle.com
+Cc:     Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH v2] SCSI and block: Simplify resume handling
+Message-ID: <20200701183718.GA507293@rowland.harvard.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200701175747.GT25523@casper.infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 01, 2020 at 06:57:47PM +0100, Matthew Wilcox wrote:
-> On Wed, Jul 01, 2020 at 12:41:03PM -0400, Mike Snitzer wrote:
-> > On Wed, Jul 01 2020 at  5:06am -0400,
-> > Christoph Hellwig <hch@lst.de> wrote:
-> > 
-> > > Hi Jens,
-> > > 
-> > > we have a lot of bdi congestion related code that is left around without
-> > > any use.  This series removes it in preparation of sorting out the bdi
-> > > lifetime rules properly.
-> > 
-> > I could do some git archeology to see what the fs, mm and block core
-> > changes were to stop using bdi congested but a pointer to associated
-> > changes (or quick recap) would save me some time.
-> > 
-> > Also, curious to know how back-pressure should be felt back up the IO
-> > stack now? (apologies if these are well worn topics, I haven't been
-> > tracking this area of development).
-> 
-> It isn't.  Jens declared the implementation was broken, and broke it
-> more.  So we're just living with stupid broken timeouts.
+Commit 05d18ae1cc8a ("scsi: pm: Balance pm_only counter of request
+queue during system resume") fixed a problem in the block layer's
+runtime-PM code: blk_set_runtime_active() failed to call
+blk_clear_pm_only().  However, the commit's implementation was
+awkward; it forced the SCSI system-resume handler to choose whether to
+call blk_post_runtime_resume() or blk_set_runtime_active(), depending
+on whether or not the SCSI device had previously been runtime
+suspended.
 
-Here's a thread about it.  This would have been a discussion topic at
-LSFMM2020, but COVID.
+This patch simplifies the situation considerably by adding the missing
+function call directly into blk_set_runtime_active() (under the
+condition that the queue is not already in the RPM_ACTIVE state).
+This allows the SCSI routine to revert back to its original form.
+Furthermore, making this change reveals that blk_post_runtime_resume()
+(in its success pathway) does exactly the same thing as
+blk_set_runtime_active().  The duplicate code is easily removed by
+making one routine call the other.
 
-https://lore.kernel.org/linux-mm/20190917115824.16990-1-linf@wangsu.com/T/#u
+No functional changes are intended.
+
+Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+CC: Can Guo <cang@codeaurora.org>
+CC: Bart Van Assche <bvanassche@acm.org>
+
+---
+
+v2:	Don't call blk_clear_pm_only() if the queue's RPM status was
+	already set to RPM_ACTIVE.  This happens during a system resume
+	if the device was not in runtime suspend beforehand.
+
+Martin:
+
+Since you merged the oritinal 05d18ae1cc8a commit, I'm submitting this to
+you as an update.  If you would prefer to have it go by way of the
+block-layer tree, let me know and I'll resend it.
+
+
+[as1939b]
+
+
+ block/blk-pm.c         |   30 +++++++++++++++---------------
+ drivers/scsi/scsi_pm.c |   10 ++--------
+ 2 files changed, 17 insertions(+), 23 deletions(-)
+
+Index: usb-devel/block/blk-pm.c
+===================================================================
+--- usb-devel.orig/block/blk-pm.c
++++ usb-devel/block/blk-pm.c
+@@ -164,30 +164,21 @@ EXPORT_SYMBOL(blk_pre_runtime_resume);
+  *
+  * Description:
+  *    Update the queue's runtime status according to the return value of the
+- *    device's runtime_resume function. If it is successfully resumed, process
+- *    the requests that are queued into the device's queue when it is resuming
+- *    and then mark last busy and initiate autosuspend for it.
++ *    device's runtime_resume function. If the resume was successful, call
++ *    blk_set_runtime_active() to do the real work of restarting the queue.
+  *
+  *    This function should be called near the end of the device's
+  *    runtime_resume callback.
+  */
+ void blk_post_runtime_resume(struct request_queue *q, int err)
+ {
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(&q->queue_lock);
+ 	if (!err) {
+-		q->rpm_status = RPM_ACTIVE;
+-		pm_runtime_mark_last_busy(q->dev);
+-		pm_request_autosuspend(q->dev);
+-	} else {
++		blk_set_runtime_active(q);
++	} else if (q->dev) {
++		spin_lock_irq(&q->queue_lock);
+ 		q->rpm_status = RPM_SUSPENDED;
++		spin_unlock_irq(&q->queue_lock);
+ 	}
+-	spin_unlock_irq(&q->queue_lock);
+-
+-	if (!err)
+-		blk_clear_pm_only(q);
+ }
+ EXPORT_SYMBOL(blk_post_runtime_resume);
+ 
+@@ -204,15 +195,24 @@ EXPORT_SYMBOL(blk_post_runtime_resume);
+  * This function can be used in driver's resume hook to correct queue
+  * runtime PM status and re-enable peeking requests from the queue. It
+  * should be called before first request is added to the queue.
++ *
++ * This function is also called by blk_post_runtime_resume() for successful
++ * runtime resumes.  It does everything necessary to restart the queue.
+  */
+ void blk_set_runtime_active(struct request_queue *q)
+ {
+ 	if (q->dev) {
++		int old_status;
++
+ 		spin_lock_irq(&q->queue_lock);
++		old_status = q->rpm_status;
+ 		q->rpm_status = RPM_ACTIVE;
+ 		pm_runtime_mark_last_busy(q->dev);
+ 		pm_request_autosuspend(q->dev);
+ 		spin_unlock_irq(&q->queue_lock);
++
++		if (old_status != RPM_ACTIVE)
++			blk_clear_pm_only(q);
+ 	}
+ }
+ EXPORT_SYMBOL(blk_set_runtime_active);
+Index: usb-devel/drivers/scsi/scsi_pm.c
+===================================================================
+--- usb-devel.orig/drivers/scsi/scsi_pm.c
++++ usb-devel/drivers/scsi/scsi_pm.c
+@@ -80,10 +80,6 @@ static int scsi_dev_type_resume(struct d
+ 	dev_dbg(dev, "scsi resume: %d\n", err);
+ 
+ 	if (err == 0) {
+-		bool was_runtime_suspended;
+-
+-		was_runtime_suspended = pm_runtime_suspended(dev);
+-
+ 		pm_runtime_disable(dev);
+ 		err = pm_runtime_set_active(dev);
+ 		pm_runtime_enable(dev);
+@@ -97,10 +93,8 @@ static int scsi_dev_type_resume(struct d
+ 		 */
+ 		if (!err && scsi_is_sdev_device(dev)) {
+ 			struct scsi_device *sdev = to_scsi_device(dev);
+-			if (was_runtime_suspended)
+-				blk_post_runtime_resume(sdev->request_queue, 0);
+-			else
+-				blk_set_runtime_active(sdev->request_queue);
++
++			blk_set_runtime_active(sdev->request_queue);
+ 		}
+ 	}
+ 
+
