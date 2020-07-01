@@ -2,131 +2,103 @@ Return-Path: <SRS0=s14/=AM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB824C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 13:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3696CC433E0
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 14:05:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B419A20663
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 13:59:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18F732068F
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 14:05:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fWzRLKx9"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fwWoE7od"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729808AbgGAN7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 09:59:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33931 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728021AbgGAN7N (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Jul 2020 09:59:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593611951;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=tvg6bb+r20Vp7qxbnSu3jxpHrXmD8FOCaXMRkieQw8E=;
-        b=fWzRLKx9vkFN24P+aFrnxWZoJkL7d3cuGZweavxgmNo07Ky618pY3lE7fi8HPkXMR3Qltd
-        UxX9lKOfPI+xVsp3RdIwzCHPLD+5PDcSw/M7vYbt7Afoi+JH+uyxvAn5OLsgxGU5WPOtTo
-        MKm9BJbfqro54nILADLtIcKTpOIyGsA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-Y8PpWS-dM7mMQz6hScG_YA-1; Wed, 01 Jul 2020 09:59:08 -0400
-X-MC-Unique: Y8PpWS-dM7mMQz6hScG_YA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F4CFA0BD8;
-        Wed,  1 Jul 2020 13:59:07 +0000 (UTC)
-Received: from localhost (ovpn-12-33.pek2.redhat.com [10.72.12.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B61FB100164D;
-        Wed,  1 Jul 2020 13:59:02 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH V2] blk-mq: streamline handling of q->mq_ops->queue_rq result
-Date:   Wed,  1 Jul 2020 21:58:57 +0800
-Message-Id: <20200701135857.2445459-1-ming.lei@redhat.com>
+        id S1731290AbgGAOFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 10:05:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47570 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731287AbgGAOFo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 10:05:44 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57EFEC08C5C1
+        for <linux-block@vger.kernel.org>; Wed,  1 Jul 2020 07:05:44 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id w2so10969460pgg.10
+        for <linux-block@vger.kernel.org>; Wed, 01 Jul 2020 07:05:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=DS8Kv4Y2KXgOfDSHA4KpPd5LfAuLqzqsI4w9bTH/pd8=;
+        b=fwWoE7od+j4gOCbnOmZLrN2K/KUr4b4JGLKH2uKZISgY51i6l9aGOZ9g8ppk1x6fln
+         eQFs8fpF3O1Q0QWji7JB+/sonOxe9WBXQgzfvSDTS1m1ADbcwCUVw5afqR/N0hHOONLD
+         GIucSMU7EvuxyzyP4wUG2H7HdoePSdoIWtqO4gXklrEyonny9OSRAcwQvClxy1nhEACJ
+         RzTCg/Dni+oiXoPu/ubp7+FrnokRnE1GODOAcuTRKmI5+NAmiOiCCuCf69kjLYgpE0z3
+         2YFplaPaMfs3V4fHVZ7+kL1U6947JGT0oUuAwgxyAq5NCdQBJuKjmNmCs25ACTn5oOUP
+         7mZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DS8Kv4Y2KXgOfDSHA4KpPd5LfAuLqzqsI4w9bTH/pd8=;
+        b=sOIgDN5NPb5J280GdHAQKEaD4loaZMgEDBu1Eaxh+0ovtbEkrdlkVJxfPnhzc1HTsu
+         WtPgvRCLQGwYHmuQg753Kl+iU94VRRSuRRxhWbbvsroQWIZy0Nxif7kSbyIdH0DPvH/X
+         A11fBl+2dhqvuU/C8Kro5k6mvB1H/5c+6TspqgRvYnGszzuJC+sEBS/FK7T1ss3QXPdp
+         2Ufbtac1AsKFG4hx8TfpGVo2M6rhYPoGgNQnYjerIheuFfPU8P3SDBFMBnO4cqBXzMZn
+         ozfqj0bWYScIsKJ4ynG76Q8tp4ps+Ex39mbMUKxn9amXR6qOR3kDXUFaBvvSRVNTtSQX
+         pFyg==
+X-Gm-Message-State: AOAM533apFMoXbNBeilRbXaful3Q411YKxtDhqql8h7UxDTY/4vPaPiG
+        Sx7nEkF9PqsHnaFA2XFAafDUqZDGg1NXGQ==
+X-Google-Smtp-Source: ABdhPJww1Uf5EvUsoqHygJu0ev06xD7d78GM0zADhKMn2bWRb+Snf5eSX3uo+/1mrBfNK98tQa/H7A==
+X-Received: by 2002:a62:de81:: with SMTP id h123mr24144711pfg.217.1593612343465;
+        Wed, 01 Jul 2020 07:05:43 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:8c61:64c1:67b1:df51:2fa8? ([2605:e000:100e:8c61:64c1:67b1:df51:2fa8])
+        by smtp.gmail.com with ESMTPSA id az13sm4523999pjb.34.2020.07.01.07.05.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2020 07:05:42 -0700 (PDT)
+Subject: Re: [PATCH v2] blk-iolatency: postpone ktime_get() execution until
+ blk_iolatency_enabled() return true
+To:     Hongnan Li <hongnan.li@linux.alibaba.com>,
+        linux-block@vger.kernel.org
+References: <1593590978-23382-1-git-send-email-hongnan.li@linux.alibaba.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bb6e02cb-052c-e94c-e38e-b6d02b55da48@kernel.dk>
+Date:   Wed, 1 Jul 2020 08:05:41 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <1593590978-23382-1-git-send-email-hongnan.li@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Current handling of q->mq_ops->queue_rq result is a bit ugly:
+On 7/1/20 2:09 AM, Hongnan Li wrote:
+> ktime_to_ns(ktime_get()) which is expensive do not need to be executed if
+> blk_iolatency_enabled() return false in blkcg_iolatency_done_bio().
+> Postponing ktime_to_ns(ktime_get()) execution can reduce CPU usage
+> when blk_iolatency was disabled.
+> 
+> ---
+> V2:
+>   1.Fix compile warnings.
+> 
+> Signed-off-by: Hongnan Li <hongnan.li@linux.alibaba.com>
 
-- two branches which needs to 'continue' have to check if the
-dispatch local list is empty, otherwise one bad request may
-be retrieved via 'rq = list_first_entry(list, struct request, queuelist);'
+I've applied this (rewrote header+commit message somewhat). But a note for the
+future - anything below the first --- is removed, so you'll need to put your
+SOB right below the commit message. And the v2 etc info should go here:
 
-- the branch of 'if (unlikely(ret != BLK_STS_OK))' isn't easy
-to follow, since it is actually one error branch.
+> ---
+>  block/blk-iolatency.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Streamline this handling, so the code becomes more readable, meantime
-potential kernel oops can be avoided in case that the last request in
-local dispatch list is failed.
+instead of having two --- sections.
 
-Fixes: fc17b6534eb8 ("blk-mq: switch ->queue_rq return value to blk_status_t")
-Cc: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- change 'if else' to switch as suggested by Christoph
-
- block/blk-mq.c | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 65e0846fd065..cc85775fc372 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1407,30 +1407,28 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 		if (nr_budgets)
- 			nr_budgets--;
- 		ret = q->mq_ops->queue_rq(hctx, &bd);
--		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
--			blk_mq_handle_dev_resource(rq, list);
-+		switch (ret) {
-+		case BLK_STS_OK:
-+			queued++;
- 			break;
--		} else if (ret == BLK_STS_ZONE_RESOURCE) {
-+		case BLK_STS_RESOURCE:
-+		case BLK_STS_DEV_RESOURCE:
-+			blk_mq_handle_dev_resource(rq, list);
-+			goto out;
-+		case BLK_STS_ZONE_RESOURCE:
- 			/*
- 			 * Move the request to zone_list and keep going through
- 			 * the dispatch list to find more requests the drive can
- 			 * accept.
- 			 */
- 			blk_mq_handle_zone_resource(rq, &zone_list);
--			if (list_empty(list))
--				break;
--			continue;
--		}
--
--		if (unlikely(ret != BLK_STS_OK)) {
-+			break;
-+		default:
- 			errors++;
- 			blk_mq_end_request(rq, BLK_STS_IOERR);
--			continue;
- 		}
--
--		queued++;
- 	} while (!list_empty(list));
--
-+out:
- 	if (!list_empty(&zone_list))
- 		list_splice_tail_init(&zone_list, list);
- 
 -- 
-2.25.2
+Jens Axboe
 
