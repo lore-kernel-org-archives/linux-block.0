@@ -4,71 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EC3C433DF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 08:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04946C433E2
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 08:10:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20DF4206A1
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 08:10:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E31AE2078A
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 08:10:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728450AbgGAIKR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728143AbgGAIKS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 04:10:18 -0400
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:50572 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728188AbgGAIKR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
         Wed, 1 Jul 2020 04:10:17 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59528 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728143AbgGAIKQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Jul 2020 04:10:16 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 35897AED521D87ABDEB2;
-        Wed,  1 Jul 2020 16:10:14 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 1 Jul 2020 16:10:08 +0800
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <bvanassche@acm.org>, <osandov@fb.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <hare@suse.com>, John Garry <john.garry@huawei.com>
-Subject: [PATCH] sbitmap: Consider cleared bits in sbitmap_bitmap_show()
-Date:   Wed, 1 Jul 2020 16:06:25 +0800
-Message-ID: <1593590785-191512-1-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-CFilter-Loop: Reflected
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=hongnan.li@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0U1G8MLP_1593590997;
+Received: from AliYun.localdomain(mailfrom:hongnan.li@linux.alibaba.com fp:SMTPD_---0U1G8MLP_1593590997)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 01 Jul 2020 16:10:15 +0800
+From:   Hongnan Li <hongnan.li@linux.alibaba.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, Hongnan Li <hongnan.li@linux.alibaba.com>
+Subject: [PATCH v2] blk-iolatency: postpone ktime_get() execution until blk_iolatency_enabled() return true
+Date:   Wed,  1 Jul 2020 16:09:38 +0800
+Message-Id: <1593590978-23382-1-git-send-email-hongnan.li@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-sbitmap works by maintaining separate bitmaps of set and cleared bits.
-The set bits are cleared in a batch, to save the burden of continuously
-locking the "word" map to unset.
+ktime_to_ns(ktime_get()) which is expensive do not need to be executed if
+blk_iolatency_enabled() return false in blkcg_iolatency_done_bio().
+Postponing ktime_to_ns(ktime_get()) execution can reduce CPU usage
+when blk_iolatency was disabled.
 
-sbitmap_bitmap_show() only shows the set bits (in "word"), which is not
-too much use, so mask out the cleared bits.
+---
+V2:
+  1.Fix compile warnings.
 
-Fixes: ea86ea2cdced ("sbitmap: ammortize cost of clearing bits")
-Signed-off-by: John Garry <john.garry@huawei.com>
+Signed-off-by: Hongnan Li <hongnan.li@linux.alibaba.com>
+---
+ block/blk-iolatency.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index af88d1346dd7..267aa7709416 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -292,8 +292,11 @@ void sbitmap_bitmap_show(struct sbitmap *sb, struct seq_file *m)
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index c128d50..f90429c 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -591,7 +591,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 	struct rq_wait *rqw;
+ 	struct iolatency_grp *iolat;
+ 	u64 window_start;
+-	u64 now = ktime_to_ns(ktime_get());
++	u64 now;
+ 	bool issue_as_root = bio_issue_as_root_blkg(bio);
+ 	bool enabled = false;
+ 	int inflight = 0;
+@@ -608,6 +608,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 	if (!enabled)
+ 		return;
  
- 	for (i = 0; i < sb->map_nr; i++) {
- 		unsigned long word = READ_ONCE(sb->map[i].word);
-+		unsigned long cleared = READ_ONCE(sb->map[i].cleared);
- 		unsigned int word_bits = READ_ONCE(sb->map[i].depth);
- 
-+		word &= ~cleared;
-+
- 		while (word_bits > 0) {
- 			unsigned int bits = min(8 - byte_bits, word_bits);
- 
++	now = ktime_to_ns(ktime_get());
+ 	while (blkg && blkg->parent) {
+ 		iolat = blkg_to_lat(blkg);
+ 		if (!iolat) {
 -- 
-2.26.2
+1.8.3.1
 
