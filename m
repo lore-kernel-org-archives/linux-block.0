@@ -2,118 +2,211 @@ Return-Path: <SRS0=s14/=AM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D42C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 10:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35779C433DF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 11:16:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CDCA20722
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 10:16:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09BD62067D
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 11:16:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQAPfGio"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="izsE4d/M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729671AbgGAKQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 06:16:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25359 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729226AbgGAKQd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Jul 2020 06:16:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593598592;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=LAop02g6KSXyvsnBY8aZ2bcMLBTNcGuy/P4SZXkSxmw=;
-        b=OQAPfGioRVvqMYe7NczAmuIQpEl1mkGIV0Uobq1g7dBwttTo1zMEnThp0BBTP61vvgfCff
-        ISNrqevagK/UlBOxpX/KoPa+PpT2bHsjUDza8Em+dl5AQXZ0luaNW2vywYbDT7kgF0XVji
-        oUhN8tAzbyiDjiPVGXxTs+PAogTcCDk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-Q3hZ6QaoN62rve8dt_Titg-1; Wed, 01 Jul 2020 06:16:30 -0400
-X-MC-Unique: Q3hZ6QaoN62rve8dt_Titg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AD86EC1A3;
-        Wed,  1 Jul 2020 10:16:29 +0000 (UTC)
-Received: from localhost (ovpn-12-33.pek2.redhat.com [10.72.12.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4712660CD0;
-        Wed,  1 Jul 2020 10:16:20 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH] blk-mq: streamline handling of q->mq_ops->queue_rq result
-Date:   Wed,  1 Jul 2020 18:16:17 +0800
-Message-Id: <20200701101617.2434985-1-ming.lei@redhat.com>
+        id S1730161AbgGALQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 07:16:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48986 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730133AbgGALQz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 07:16:55 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68714C061755
+        for <linux-block@vger.kernel.org>; Wed,  1 Jul 2020 04:16:55 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id n26so10201642ejx.0
+        for <linux-block@vger.kernel.org>; Wed, 01 Jul 2020 04:16:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=w5k0/vPEZeTqwY5SXJ0/YDPUmmXWJlzEh3JyeTs1JGI=;
+        b=izsE4d/MxGx5PCBufUvd6Yby0hi5tUgK41AM6BrSGZML4kl+Q5GVb4kIosbzdcdZ6Q
+         y8jEE9b2jt4DcXdhclUnQjFSOLyQBgnTCrK34sqvoKQzYD+kh1INlDOXUSg1UvK8N3ov
+         FiBhVLW6YBYsHLL1g4yLijqhLct2dO+rIAAA+zcFY0UkZ6L8f/wicU9arfRCoPZ5mkbB
+         J/GTwRbSYp7WPzfl5x0GKHQD94hEVEc7/ENiN/lCY6K4WGIYlSVAoxHxjQDq/1/as9A4
+         w40i1d0DkjwdoCdX+GTg9zDJporiggTqcGdLE8cR3LxyfnzW2Lzx2O5/5BFiWOLQBS6p
+         i1/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=w5k0/vPEZeTqwY5SXJ0/YDPUmmXWJlzEh3JyeTs1JGI=;
+        b=Rq2qMSvz7jjYJP1ma9bBGw93EA64LrEpaX796MLIRh/LrIweqi3jxKzpVYuqwgChLN
+         /OY1cleVLkVnTWSWUVkeKaR1n4dHV3vGvRyMQRTPS6d482x7YQ7kVGEg2aFvMa3dwfpv
+         jlbgsYmur3pd2yVShyd2rtSI+s2mHTdP38Vat7qUvc1gtMwCREYVNegrDlRBgQp2s1CI
+         i8n1npRs5eWjpp7uEsrxkwXi6x+GMGl9V4G9S19ijdVAc5xPy09aArWx5Tr6LIia41KV
+         1WMeNQZ40gUTfjyTpyPRJDK4rpTFNpcwUaecJgVlGFzIJ5ptqfpHSqZmpf1CGzJI2S7h
+         JyBA==
+X-Gm-Message-State: AOAM5327Bm2hFel7FzKeebLW27o9ZxwIincweTxvgngpeJziQ5jrM2pc
+        CHY2aZJ67qlraP4AMC7xAYZjJw==
+X-Google-Smtp-Source: ABdhPJyDtq06fyfgH0Hy0pHn1yaEw14o/ndhRf2GJZrvJwMnQIZ0MHbpzMb8C5Fkuj+N4bF92wEkyg==
+X-Received: by 2002:a17:906:2616:: with SMTP id h22mr22010171ejc.154.1593602214045;
+        Wed, 01 Jul 2020 04:16:54 -0700 (PDT)
+Received: from localhost ([194.62.217.57])
+        by smtp.gmail.com with ESMTPSA id b14sm3081906ejg.18.2020.07.01.04.16.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jul 2020 04:16:53 -0700 (PDT)
+Date:   Wed, 1 Jul 2020 13:16:52 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Niklas Cassel <niklas.cassel@wdc.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: add max_active_zones to blk-sysfs
+Message-ID: <20200701111330.3vpivrovh3i46maa@mpHalley.local>
+References: <20200616102546.491961-1-niklas.cassel@wdc.com>
+ <20200616102546.491961-3-niklas.cassel@wdc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200616102546.491961-3-niklas.cassel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Current handling of q->mq_ops->queue_rq result is a bit ugly:
+On 16.06.2020 12:25, Niklas Cassel wrote:
+>Add a new max_active zones definition in the sysfs documentation.
+>This definition will be common for all devices utilizing the zoned block
+>device support in the kernel.
+>
+>Export max_active_zones according to this new definition for NVMe Zoned
+>Namespace devices, ZAC ATA devices (which are treated as SCSI devices by
+>the kernel), and ZBC SCSI devices.
+>
+>Add the new max_active_zones struct member to the request_queue, rather
+>than as a queue limit, since this property cannot be split across stacking
+>drivers.
+>
+>For SCSI devices, even though max active zones is not part of the ZBC/ZAC
+>spec, export max_active_zones as 0, signifying "no limit".
+>
+>Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+>---
+> Documentation/block/queue-sysfs.rst |  7 +++++++
+> block/blk-sysfs.c                   | 14 +++++++++++++-
+> drivers/nvme/host/zns.c             |  1 +
+> drivers/scsi/sd_zbc.c               |  1 +
+> include/linux/blkdev.h              | 20 ++++++++++++++++++++
+> 5 files changed, 42 insertions(+), 1 deletion(-)
+>
+>diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
+>index f01cf8530ae4..f261a5c84170 100644
+>--- a/Documentation/block/queue-sysfs.rst
+>+++ b/Documentation/block/queue-sysfs.rst
+>@@ -117,6 +117,13 @@ Maximum number of elements in a DMA scatter/gather list with integrity
+> data that will be submitted by the block layer core to the associated
+> block driver.
+>
+>+max_active_zones (RO)
+>+---------------------
+>+For zoned block devices (zoned attribute indicating "host-managed" or
+>+"host-aware"), the sum of zones belonging to any of the zone states:
+>+EXPLICIT OPEN, IMPLICIT OPEN or CLOSED, is limited by this value.
+>+If this value is 0, there is no limit.
+>+
+> max_open_zones (RO)
+> -------------------
+> For zoned block devices (zoned attribute indicating "host-managed" or
+>diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+>index fa42961e9678..624bb4d85fc7 100644
+>--- a/block/blk-sysfs.c
+>+++ b/block/blk-sysfs.c
+>@@ -310,6 +310,11 @@ static ssize_t queue_max_open_zones_show(struct request_queue *q, char *page)
+> 	return queue_var_show(queue_max_open_zones(q), page);
+> }
+>
+>+static ssize_t queue_max_active_zones_show(struct request_queue *q, char *page)
+>+{
+>+	return queue_var_show(queue_max_active_zones(q), page);
+>+}
+>+
+> static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
+> {
+> 	return queue_var_show((blk_queue_nomerges(q) << 1) |
+>@@ -677,6 +682,11 @@ static struct queue_sysfs_entry queue_max_open_zones_entry = {
+> 	.show = queue_max_open_zones_show,
+> };
+>
+>+static struct queue_sysfs_entry queue_max_active_zones_entry = {
+>+	.attr = {.name = "max_active_zones", .mode = 0444 },
+>+	.show = queue_max_active_zones_show,
+>+};
+>+
+> static struct queue_sysfs_entry queue_nomerges_entry = {
+> 	.attr = {.name = "nomerges", .mode = 0644 },
+> 	.show = queue_nomerges_show,
+>@@ -776,6 +786,7 @@ static struct attribute *queue_attrs[] = {
+> 	&queue_zoned_entry.attr,
+> 	&queue_nr_zones_entry.attr,
+> 	&queue_max_open_zones_entry.attr,
+>+	&queue_max_active_zones_entry.attr,
+> 	&queue_nomerges_entry.attr,
+> 	&queue_rq_affinity_entry.attr,
+> 	&queue_iostats_entry.attr,
+>@@ -803,7 +814,8 @@ static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
+> 		(!q->mq_ops || !q->mq_ops->timeout))
+> 			return 0;
+>
+>-	if (attr == &queue_max_open_zones_entry.attr &&
+>+	if ((attr == &queue_max_open_zones_entry.attr ||
+>+	     attr == &queue_max_active_zones_entry.attr) &&
+> 	    !blk_queue_is_zoned(q))
+> 		return 0;
+>
+>diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+>index af156529f3b6..502070763266 100644
+>--- a/drivers/nvme/host/zns.c
+>+++ b/drivers/nvme/host/zns.c
+>@@ -83,6 +83,7 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+> 	q->limits.zoned = BLK_ZONED_HM;
+> 	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+> 	blk_queue_max_open_zones(q, le32_to_cpu(id->mor) + 1);
+>+	blk_queue_max_active_zones(q, le32_to_cpu(id->mar) + 1);
+> free_data:
+> 	kfree(id);
+> 	return status;
+>diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+>index aa3564139b40..d8b2c49d645b 100644
+>--- a/drivers/scsi/sd_zbc.c
+>+++ b/drivers/scsi/sd_zbc.c
+>@@ -721,6 +721,7 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+> 		blk_queue_max_open_zones(q, 0);
+> 	else
+> 		blk_queue_max_open_zones(q, sdkp->zones_max_open);
+>+	blk_queue_max_active_zones(q, 0);
+> 	nr_zones = round_up(sdkp->capacity, zone_blocks) >> ilog2(zone_blocks);
+>
+> 	/* READ16/WRITE16 is mandatory for ZBC disks */
+>diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>index 2f332f00501d..3776140f8f20 100644
+>--- a/include/linux/blkdev.h
+>+++ b/include/linux/blkdev.h
+>@@ -521,6 +521,7 @@ struct request_queue {
+> 	unsigned long		*conv_zones_bitmap;
+> 	unsigned long		*seq_zones_wlock;
+> 	unsigned int		max_open_zones;
+>+	unsigned int		max_active_zones;
+> #endif /* CONFIG_BLK_DEV_ZONED */
 
-- two branches which needs to 'continue' have to check if the
-dispatch local list is empty, otherwise one bad request may
-be retrieved via 'rq = list_first_entry(list, struct request, queuelist);'
+Looking a second time at these patches, wouldn't it make sense to move
+this to queue_limits?
 
-- the branch of 'if (unlikely(ret != BLK_STS_OK))' isn't easy
-to follow, since it is actually one error branch.
-
-Streamline this handling, so the code becomes more readable, meantime
-potential kernel oops can be avoided in case that the last request in
-local dispatch list is failed.
-
-Fixes: fc17b6534eb8 ("blk-mq: switch ->queue_rq return value to blk_status_t")
-Cc: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 65e0846fd065..c3862144a2a7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1407,7 +1407,10 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 		if (nr_budgets)
- 			nr_budgets--;
- 		ret = q->mq_ops->queue_rq(hctx, &bd);
--		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
-+		if (likely(ret == BLK_STS_OK)) {
-+			queued++;
-+		} else if (ret == BLK_STS_RESOURCE ||
-+				ret == BLK_STS_DEV_RESOURCE) {
- 			blk_mq_handle_dev_resource(rq, list);
- 			break;
- 		} else if (ret == BLK_STS_ZONE_RESOURCE) {
-@@ -1417,18 +1420,10 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 			 * accept.
- 			 */
- 			blk_mq_handle_zone_resource(rq, &zone_list);
--			if (list_empty(list))
--				break;
--			continue;
--		}
--
--		if (unlikely(ret != BLK_STS_OK)) {
-+		} else {
- 			errors++;
- 			blk_mq_end_request(rq, BLK_STS_IOERR);
--			continue;
- 		}
--
--		queued++;
- 	} while (!list_empty(list));
- 
- 	if (!list_empty(&zone_list))
--- 
-2.25.2
-
+Javier
