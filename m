@@ -3,100 +3,131 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA2F5C433DF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 13:45:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 481C5C433DF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 13:51:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99F2A206B6
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 13:45:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23FFC20663
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 13:51:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iuP/lgMr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VmmIzLxw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731230AbgGANpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 09:45:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41859 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731194AbgGANp2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 09:45:28 -0400
+        id S1731181AbgGANvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 09:51:53 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26889 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730408AbgGANvx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Jul 2020 09:51:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593611127;
+        s=mimecast20190719; t=1593611512;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=DZxSkx34tkBmlaabILfMfIsOlNK9eGRAl15m0sVIO5M=;
-        b=iuP/lgMrbRGY0wP/AYbu+J69a+BQAw+I7f8rMXVkqr9hiQQF9VhYZQR83TLBUsvmY6jYDc
-        duSM8oU2mUA7t1FFGbsuv3qPaCm7ZgpMaO76EgnafLdbjjHy97qv6uBzIXKnuWtA89AYTC
-        +gsERGyAaLhC57ogIO6Gvxq3zIbN5Us=
+        bh=o9+wvHf4EhMOC7EtJKRx4gVvmTjL560eBnKQZls3AmE=;
+        b=VmmIzLxwS2NgdHw/ES9D5e4FdxcZBU88Xf6Eer3x5xGSsnIxtTfoK9JAyH6/EEDvLZbk60
+        kxXCTnudPK30jVhbPgCy89TQCg7LEf5MKIF5KSVRj3Z2DC4+xa9vW7MLVHZ3N2c6hVlV3E
+        fYEDufKOxzcQsB9pJ1OoffbZn2x+XgM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-wsgrDM6yNca50KONfE81uQ-1; Wed, 01 Jul 2020 09:45:25 -0400
-X-MC-Unique: wsgrDM6yNca50KONfE81uQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-86-b5ntXv5hPiC4inrOabGHXQ-1; Wed, 01 Jul 2020 09:51:50 -0400
+X-MC-Unique: b5ntXv5hPiC4inrOabGHXQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F2D7800C60;
-        Wed,  1 Jul 2020 13:45:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92F18835B67;
+        Wed,  1 Jul 2020 13:51:49 +0000 (UTC)
 Received: from T590 (ovpn-12-33.pek2.redhat.com [10.72.12.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D1D710013C0;
-        Wed,  1 Jul 2020 13:45:17 +0000 (UTC)
-Date:   Wed, 1 Jul 2020 21:45:12 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A34D45C1C5;
+        Wed,  1 Jul 2020 13:51:44 +0000 (UTC)
+Date:   Wed, 1 Jul 2020 21:51:39 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Marek Szyprowski <m.szyprowski@samsung.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Subject: Re: [PATCH] blk-mq: put driver tag when this request is completed
-Message-ID: <20200701134512.GA2443512@T590>
-References: <20200629094759.2002708-1-ming.lei@redhat.com>
- <CGME20200701130104eucas1p1f8dcce58bf704b726aee1e89980fe19e@eucas1p1.samsung.com>
- <57fb09b1-54ba-f3aa-f82c-d709b0e6b281@samsung.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: streamline handling of q->mq_ops->queue_rq result
+Message-ID: <20200701135139.GB2443512@T590>
+References: <20200701101617.2434985-1-ming.lei@redhat.com>
+ <20200701125409.GA13335@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <57fb09b1-54ba-f3aa-f82c-d709b0e6b281@samsung.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200701125409.GA13335@infradead.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Marek,
-
-On Wed, Jul 01, 2020 at 03:01:03PM +0200, Marek Szyprowski wrote:
-> Hi
+On Wed, Jul 01, 2020 at 01:54:09PM +0100, Christoph Hellwig wrote:
+> On Wed, Jul 01, 2020 at 06:16:17PM +0800, Ming Lei wrote:
+> > Current handling of q->mq_ops->queue_rq result is a bit ugly:
+> > 
+> > - two branches which needs to 'continue' have to check if the
+> > dispatch local list is empty, otherwise one bad request may
+> > be retrieved via 'rq = list_first_entry(list, struct request, queuelist);'
+> > 
+> > - the branch of 'if (unlikely(ret != BLK_STS_OK))' isn't easy
+> > to follow, since it is actually one error branch.
+> > 
+> > Streamline this handling, so the code becomes more readable, meantime
+> > potential kernel oops can be avoided in case that the last request in
+> > local dispatch list is failed.
 > 
-> On 29.06.2020 11:47, Ming Lei wrote:
-> > It is natural to release driver tag when this request is completed by
-> > LLD or device since its purpose is for LLD use.
-> >
-> > One big benefit is that the released tag can be re-used quicker since
-> > bio_endio() may take too long.
-> >
-> > Meantime we don't need to release driver tag for flush request.
-> >
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> I don't really find that much easier to read.  If we want to clean
+> this up for rea we should use a proper switch statement.  Something like
+> this:
 > 
-> This patch landed recently in linux-next as commit 36a3df5a4574. Sadly 
-> it causes a regression on one of my test systems (ARM 32bit, Samsung 
-> Exynos5422 SoC based Odroid XU3 board with eMMC). The system boots fine 
-> and then after a few seconds every executed command hangs. No 
-> panic/ops/any other message. I will try to provide more information asap 
-> I find something to share. Simple reverting it in linux-next is not 
-> possible due to dependencies.
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index a9aa6d1e44cf32..f3721f274b800e 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1275,30 +1275,28 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+>  		}
+>  
+>  		ret = q->mq_ops->queue_rq(hctx, &bd);
+> -		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
+> -			blk_mq_handle_dev_resource(rq, list);
+> +		switch (ret) {
+> +		case BLK_STS_OK:
+> +			queued++;
+>  			break;
+> -		} else if (ret == BLK_STS_ZONE_RESOURCE) {
+> +		case BLK_STS_RESOURCE:
+> +		case BLK_STS_DEV_RESOURCE:
+> +			blk_mq_handle_dev_resource(rq, list);
+> +			goto out;
+> +		case BLK_STS_ZONE_RESOURCE:
+>  			/*
+>  			 * Move the request to zone_list and keep going through
+>  			 * the dispatch list to find more requests the drive can
+>  			 * accept.
+>  			 */
+>  			blk_mq_handle_zone_resource(rq, &zone_list);
+> -			if (list_empty(list))
+> -				break;
+> -			continue;
+> -		}
+> -
+> -		if (unlikely(ret != BLK_STS_OK)) {
+> +			break;
+> +		default:
+>  			errors++;
+>  			blk_mq_end_request(rq, BLK_STS_IOERR);
+> -			continue;
+>  		}
+> -
+> -		queued++;
+>  	} while (!list_empty(list));
+> -
+> +out:
+>  	if (!list_empty(&zone_list))
+>  		list_splice_tail_init(&zone_list, list);
 
-What is the exact eMMC's driver code(include the host driver)?
-
-The usual way for handling completion is that host driver notifies block
-layer via blk_mq_complete_request() after the LLD specific handling for
-this request is done.
-
-However, there might be driver which may use rq->tag in its rq completion
-handler. I will see if the special case can be dealt with once you share
-the driver info.
+I am fine to switch back to 'switch'. I doesn't take 'switch' because you
+changed 'switch' to 'if else' before.
 
 
 Thanks,
