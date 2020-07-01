@@ -1,93 +1,91 @@
-Return-Path: <SRS0=9ToN=AL=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=s14/=AM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A07EAC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 23:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75ED9C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 01:03:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B82120780
-	for <linux-block@archiver.kernel.org>; Tue, 30 Jun 2020 23:12:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FF0D2074D
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 01:03:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U13XQ12R"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SRqgOiDf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726228AbgF3XMo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jun 2020 19:12:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49912 "EHLO
+        id S1726082AbgGABDd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jun 2020 21:03:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726135AbgF3XMn (ORCPT
+        with ESMTP id S1725805AbgGABDc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jun 2020 19:12:43 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90BD0C061755;
-        Tue, 30 Jun 2020 16:12:43 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a1so22408510ejg.12;
-        Tue, 30 Jun 2020 16:12:43 -0700 (PDT)
+        Tue, 30 Jun 2020 21:03:32 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D44C061755
+        for <linux-block@vger.kernel.org>; Tue, 30 Jun 2020 18:03:32 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id s14so9204796plq.6
+        for <linux-block@vger.kernel.org>; Tue, 30 Jun 2020 18:03:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EEziaIM/P7+22lxNofy08U1YgTxMBEFHBjSY3HZLox8=;
-        b=U13XQ12RtySqRFFcdAgVVayD93hsV5QjurKvCaIPjTMREpQsx3IQt4i7+vB+/1hohA
-         h9cZs7pdDcaPptjlXXYOP2CGaXtSG/jt1rRJuPGmOHgfLCwReY4AtBtqTzNOtDAnWK3V
-         VGdXHZnqK0vO7NJp0JDlnNCAYvvxI7tLA+EnX3JsUjXfPnroG7VFEMlYkKfdox2bnLmI
-         tpBjAPEq/U15BCusKwJcc0rsLqUxKIwbOgk9VI6jpPJBSi7Er8NBQt0fNHT3ectSqID1
-         LYfEyFhhLHwEkCrL2Zi3evslp+ZoE3PDAhJjPukqpHJnItQ1iYrKm80RXqhFAKgZQ34c
-         tmpQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=i1SOchKZ/ulQnHhpPSyWO9xT/75BMeth9ktg5RGv4Y4=;
+        b=SRqgOiDfo+bpResuzcf8kRlzdKislh9gJEKWyIyeIbhJ2hHpcPyq5galX8RPNblatx
+         1oIap2OsheBZHwLXbh6XHHP6KGu1TMvSQ/kj03iTncRrd7brzs08FifIDGSOU6DmqUls
+         rzUpjtM0HD9UQAqlZhmljy5Si/PiJoBoItMmZegeFGIkC4ZD76aE1J4VHg7rPHheJ+AB
+         lBOjpgjJBGd9gvR12hVLSfCcpZOyAbFDP4o56WnzAGLjJ649NqtmaeAnfWvoggoNX2/w
+         X2TQ593A/+V+oDAh1jeUJpHXHlK4KGSExxc2jleA5JfSuLwhw6z9QdaBL6VMi+sRhSc5
+         NnxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EEziaIM/P7+22lxNofy08U1YgTxMBEFHBjSY3HZLox8=;
-        b=n5qYMKJoqNm1DnpvxdUkyzhNSqL3X+7QVregikh7sNNdD6Iwjuxq/5xVTQcgNOZINg
-         FKQWX3OIqjgiyHiQ0mDvc/kZHgzTA96fSGw46LtVuCFNR2p+FAx3PaGUG7vvON/ZVrjG
-         Su/ofEIpUxJbDMQSX0g/C50FRLEYBZ7o7EELJihAbNgSS/TSm1IzxKrzOPUmjPEDok9l
-         /zGToo82/s7XPLQPrZRJMIROE81Kl+f2emo8RHNhm6CWIVq1efGcuealNPaFidaL9EYx
-         DsqqcnJ6YwaCdQV6q7HTf2IxqNNuFNq8tG2hWDYMv2vbZzqzuxxRaXUAm/Ku7Ye1R6or
-         BXfA==
-X-Gm-Message-State: AOAM533QF5XKgMk+ko7ThNZSdPfRhChz89Ug26cOiZ9ThlXcXE3K9WF+
-        oeo901tG3eY7nV4keT3b2oNdcHKlPfqYdTGQkqEJZF1t
-X-Google-Smtp-Source: ABdhPJyfoxgKsOwNFi4UiM4o394ThnPEmsLIf5RI7arVjkMCEBGVByy0HnH8XipAyieXjvVmACz92Ad9o0yYQwdYmMM=
-X-Received: by 2002:a17:906:fcab:: with SMTP id qw11mr20041483ejb.456.1593558762319;
- Tue, 30 Jun 2020 16:12:42 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=i1SOchKZ/ulQnHhpPSyWO9xT/75BMeth9ktg5RGv4Y4=;
+        b=HV8ORBIq3JeCfAwvRB/XJgib8R5zYQtNnCyH4OCcCq+RIHkLqxanzEVkDgJClDdkC6
+         i0LK/WLatuvIdki8B9Fx9qP2v8QRqXFcmg0HStMt+dDcXPxyTDnyRRTN/9FtnuCdOvUf
+         dteqmoz9EqT8ZSP+rZgCtQthcDhJsT0IE4CFrLEKsBXirTdj1Uh5zL+6QO9ZxAd649bY
+         xr51qXN6soyNV06k+I/WG6YAFDsYs9pPv4m9e6tZFusseLTqiH62kIlGlsKg1lpMNp6X
+         7bUNozLdi8p/FOnC7aA4S9HMUe323cRCi+iibJJhKfepxFpi4IwO2jkqT1VZNzFWFxHX
+         IhcQ==
+X-Gm-Message-State: AOAM533fW6Ihcu/QSgz6B7Vvs6Zp1KcVMYNhfezSNuFvZhwrWj0u1GeS
+        /bGdf3teXOqv+MwsChMwfBua5Q==
+X-Google-Smtp-Source: ABdhPJzXoVRhuyjhMLrMjLWtZrz422qjtMxAxEoKnokFEMriFw4m4fSOrPCyc/pZW0SA+xTbCDCdmw==
+X-Received: by 2002:a17:902:6ac4:: with SMTP id i4mr18471013plt.252.1593565412020;
+        Tue, 30 Jun 2020 18:03:32 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:8c61:5066:4556:8aed:6810? ([2605:e000:100e:8c61:5066:4556:8aed:6810])
+        by smtp.gmail.com with ESMTPSA id 26sm3781308pfp.35.2020.06.30.18.03.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jun 2020 18:03:31 -0700 (PDT)
+Subject: Re: [PATCH] virtio-blk: free vblk-vqs in error path of
+ virtblk_probe()
+To:     Hou Tao <houtao1@huawei.com>, linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ming Lei <ming.lei@canonical.com>
+References: <20200615041459.22477-1-houtao1@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <daba0f31-df05-0d1f-9422-15c6813f62af@kernel.dk>
+Date:   Tue, 30 Jun 2020 19:03:30 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <20200515163956.GA2158595@mit.edu>
-In-Reply-To: <20200515163956.GA2158595@mit.edu>
-From:   Dave Airlie <airlied@gmail.com>
-Date:   Wed, 1 Jul 2020 09:12:31 +1000
-Message-ID: <CAPM=9tz3heu1-xTyYDA4huszt3LLgF87pKcifc+OCFqJv-KWdA@mail.gmail.com>
-Subject: Re: Maintainers / Kernel Summit 2020 planning kick-off
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     LKML <linux-kernel@vger.kernel.org>, inux-fsdevel@vger.kernel.org,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Network Development <netdev@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200615041459.22477-1-houtao1@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 16 May 2020 at 02:41, Theodore Y. Ts'o <tytso@mit.edu> wrote:
->
-> [ Feel free to forward this to other Linux kernel mailing lists as
->   appropriate -- Ted ]
->
-> This year, the Maintainers and Kernel Summit will NOT be held in
-> Halifax, August 25 -- 28th, as a result of the COVID-19 pandemic.
-> Instead, we will be pursuing a virtual conference format for both the
-> Maintainers and Kernel Summit, around the last week of August.
->
-> As in previous years, the Maintainers Summit is invite-only, where the
-> primary focus will be process issues around Linux Kernel Development.
-> It will be limited to 30 invitees and a handful of sponsored
-> attendees.
+On 6/14/20 10:14 PM, Hou Tao wrote:
+> Else there will be memory leak if alloc_disk() fails.
 
-What timezone are the conferences being held in? It impacts on what I
-can attend quite heavily :-)
+Applied, thanks.
 
-Dave.
+-- 
+Jens Axboe
+
