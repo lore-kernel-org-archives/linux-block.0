@@ -2,164 +2,85 @@ Return-Path: <SRS0=s14/=AM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D7ABC433DF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 01:08:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E5BC433DF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 01:24:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 489BF20771
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 01:08:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C87720771
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 01:24:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726016AbgGABIJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Jun 2020 21:08:09 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:32785 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1725805AbgGABIJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jun 2020 21:08:09 -0400
-Received: (qmail 474035 invoked by uid 1000); 30 Jun 2020 21:08:08 -0400
-Date:   Tue, 30 Jun 2020 21:08:08 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Bart Van Assche <bvanassche@acm.org>, martin.petersen@oracle.com
-Cc:     Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] SCSI and block: Simplify resume handling
-Message-ID: <20200701010808.GC473187@rowland.harvard.edu>
-References: <20200630151734.GA451991@rowland.harvard.edu>
+        id S1725763AbgGABYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Jun 2020 21:24:42 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7320 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725937AbgGABYm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jun 2020 21:24:42 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 8EE556A0211A0AE2C43A;
+        Wed,  1 Jul 2020 09:24:36 +0800 (CST)
+Received: from [10.133.219.224] (10.133.219.224) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 1 Jul 2020 09:24:33 +0800
+Subject: Re: [PATCH 1/1] blk-mq: remove the pointless call of list_entry_rq()
+ in hctx_show_busy_rq()
+From:   Hou Tao <houtao1@huawei.com>
+To:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
+CC:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20200427131250.13725-1-houtao1@huawei.com>
+ <244626f4-3469-1127-377c-d54c589d829b@acm.org>
+ <51b569f8-57a0-58bb-4f41-ab1f10363918@huawei.com>
+Message-ID: <80f57663-c5b3-015a-d0f8-7c354f424a6a@huawei.com>
+Date:   Wed, 1 Jul 2020 09:24:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200630151734.GA451991@rowland.harvard.edu>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <51b569f8-57a0-58bb-4f41-ab1f10363918@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.219.224]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 30, 2020 at 11:17:34AM -0400, Alan Stern wrote:
-> Commit 05d18ae1cc8a ("scsi: pm: Balance pm_only counter of request
-> queue during system resume") fixed a problem in the block layer's
-> runtime-PM code: blk_set_runtime_active() failed to call
-> blk_clear_pm_only().  However, the commit's implementation was
-> awkward; it forced the SCSI system-resume handler to choose whether to
-> call blk_post_runtime_resume() or blk_set_runtime_active(), depending
-> on whether or not the SCSI device had previously been runtime
-> suspended.
+ping ?
+
+On 2020/5/25 14:32, Hou Tao wrote:
+> ping ?
 > 
-> This patch simplifies the situation considerably by adding the missing
-> function call directly into blk_set_runtime_active().  This allows the
-> SCSI routine to revert back to its original form.  Furthermore, making
-> this change reveals that blk_post_runtime_resume() (in its success
-> pathway) does exactly the same thing as blk_set_runtime_active().  The
-> duplicate code is easily removed by making one routine call the other.
+> On 2020/4/28 1:27, Bart Van Assche wrote:
+>> On 2020-04-27 06:12, Hou Tao wrote:
+>>> And use rq directly.
+>>>
+>>> Signed-off-by: Hou Tao <houtao1@huawei.com>
+>>> ---
+>>>  block/blk-mq-debugfs.c | 3 +--
+>>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>>
+>>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+>>> index b3f2ba483992..7a79db81a63f 100644
+>>> --- a/block/blk-mq-debugfs.c
+>>> +++ b/block/blk-mq-debugfs.c
+>>> @@ -400,8 +400,7 @@ static bool hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
+>>>  	const struct show_busy_params *params = data;
+>>>  
+>>>  	if (rq->mq_hctx == params->hctx)
+>>> -		__blk_mq_debugfs_rq_show(params->m,
+>>> -					 list_entry_rq(&rq->queuelist));
+>>> +		__blk_mq_debugfs_rq_show(params->m, rq);
+>>>  
+>>>  	return true;
+>>>  }
+>>
+>> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+>>
+>>
 > 
-> No functional changes are intended.
 > 
-> Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
-> CC: Can Guo <cang@codeaurora.org>
-> CC: Bart Van Assche <bvanassche@acm.org>
-
-Please disregard this patch.  When I wrote it, I didn't realize that 
-blk_clear_pm_only() is meant to be used like a reference counter (it's a 
-bad choice of name, since the routine does a decrement rather than a 
-clear -- and likewise for blk_set_pm_only()).
-
-I'll submit a revised patch later.
-
-Alan Stern
-
-
->  block/blk-pm.c         |   25 ++++++++++---------------
->  drivers/scsi/scsi_pm.c |   10 ++--------
->  2 files changed, 12 insertions(+), 23 deletions(-)
-> 
-> Index: usb-devel/block/blk-pm.c
-> ===================================================================
-> --- usb-devel.orig/block/blk-pm.c
-> +++ usb-devel/block/blk-pm.c
-> @@ -164,30 +164,21 @@ EXPORT_SYMBOL(blk_pre_runtime_resume);
->   *
->   * Description:
->   *    Update the queue's runtime status according to the return value of the
-> - *    device's runtime_resume function. If it is successfully resumed, process
-> - *    the requests that are queued into the device's queue when it is resuming
-> - *    and then mark last busy and initiate autosuspend for it.
-> + *    device's runtime_resume function. If the resume was successful, call
-> + *    blk_set_runtime_active() to do the real work of restarting the queue.
->   *
->   *    This function should be called near the end of the device's
->   *    runtime_resume callback.
->   */
->  void blk_post_runtime_resume(struct request_queue *q, int err)
->  {
-> -	if (!q->dev)
-> -		return;
-> -
-> -	spin_lock_irq(&q->queue_lock);
->  	if (!err) {
-> -		q->rpm_status = RPM_ACTIVE;
-> -		pm_runtime_mark_last_busy(q->dev);
-> -		pm_request_autosuspend(q->dev);
-> -	} else {
-> +		blk_set_runtime_active(q);
-> +	} else if (q->dev) {
-> +		spin_lock_irq(&q->queue_lock);
->  		q->rpm_status = RPM_SUSPENDED;
-> +		spin_unlock_irq(&q->queue_lock);
->  	}
-> -	spin_unlock_irq(&q->queue_lock);
-> -
-> -	if (!err)
-> -		blk_clear_pm_only(q);
->  }
->  EXPORT_SYMBOL(blk_post_runtime_resume);
->  
-> @@ -204,6 +195,9 @@ EXPORT_SYMBOL(blk_post_runtime_resume);
->   * This function can be used in driver's resume hook to correct queue
->   * runtime PM status and re-enable peeking requests from the queue. It
->   * should be called before first request is added to the queue.
-> + *
-> + * This function is also called by blk_post_runtime_resume() for successful
-> + * runtime resumes.  It does everything necessary to restart the queue.
->   */
->  void blk_set_runtime_active(struct request_queue *q)
->  {
-> @@ -213,6 +207,7 @@ void blk_set_runtime_active(struct reque
->  		pm_runtime_mark_last_busy(q->dev);
->  		pm_request_autosuspend(q->dev);
->  		spin_unlock_irq(&q->queue_lock);
-> +		blk_clear_pm_only(q);
->  	}
->  }
->  EXPORT_SYMBOL(blk_set_runtime_active);
-> Index: usb-devel/drivers/scsi/scsi_pm.c
-> ===================================================================
-> --- usb-devel.orig/drivers/scsi/scsi_pm.c
-> +++ usb-devel/drivers/scsi/scsi_pm.c
-> @@ -80,10 +80,6 @@ static int scsi_dev_type_resume(struct d
->  	dev_dbg(dev, "scsi resume: %d\n", err);
->  
->  	if (err == 0) {
-> -		bool was_runtime_suspended;
-> -
-> -		was_runtime_suspended = pm_runtime_suspended(dev);
-> -
->  		pm_runtime_disable(dev);
->  		err = pm_runtime_set_active(dev);
->  		pm_runtime_enable(dev);
-> @@ -97,10 +93,8 @@ static int scsi_dev_type_resume(struct d
->  		 */
->  		if (!err && scsi_is_sdev_device(dev)) {
->  			struct scsi_device *sdev = to_scsi_device(dev);
-> -			if (was_runtime_suspended)
-> -				blk_post_runtime_resume(sdev->request_queue, 0);
-> -			else
-> -				blk_set_runtime_active(sdev->request_queue);
-> +
-> +			blk_set_runtime_active(sdev->request_queue);
->  		}
->  	}
->  
 > 
