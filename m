@@ -2,156 +2,153 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1A6C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 00:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 880FEC433DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 01:22:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1467120748
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 00:49:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DB8B20748
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 01:22:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GOqqzAgB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vve012Ed"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728104AbgGBAtX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 20:49:23 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:9937 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728021AbgGBAtX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 20:49:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1593650963; x=1625186963;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2mE728bmsvHyQ812gN/5CisKb2i/dG2E5a8C6v2+4Z4=;
-  b=GOqqzAgB0THwi93DQr/a1sG1GIJe7IVwcuU0fz2q3V35xw7SRru8Y5FB
-   n0wyM/oG30LznYpPCgIVZZztdFQGG8hR/IdtXOnOaPbQGJm+Si/DsP3yk
-   8IdlFPoWvdoiB93NNA8QylvP/P5tTpNCLy4wYnyn6eW4duxBA2K/tediN
-   WFlekCtvXd8SdKK9wABaPyruqwox4ZlGKmRh5iF3oF6eeu5xBCezRyy7o
-   G4Qq7zPiiGp/goUY34odzvx5S2RGS2DZ/YeIj0TG28LlBc8jPxB5RIiCd
-   hqa7RP6u8IfcsrOoF5S0JdHuZdoh8W3jr/nEzmqn+mim07gbMX5STzA9Q
-   w==;
-IronPort-SDR: /seqFUziD2Jc0fqavQIK1+OW+1ioLp88fVsKNKz0Xma8sHYW3yl5g7wjI5lA7bJ2Qa1O28V3F4
- ThCJpwDAfE8wZ7LU/vKO1218c+cqDkbQpDUjE1csRO8UFb8krDmR3xgMQ7p5dfFiE52UjmI7xr
- 51ecMpEgyDdZELZsUp4yLR900BXIH7cL6ndDqq9TPg8byv9BXZrh3RbwLOf590qz/KDdVUyABB
- i9tVOv0bZTqpOjNYz9zZ+zN10nqHDDmUQnBGj94DBbEhquTtmGfHM2gtlRlRLIHQyQtAjmnO+2
- /Ts=
-X-IronPort-AV: E=Sophos;i="5.75,302,1589212800"; 
-   d="scan'208";a="142783249"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2020 08:49:22 +0800
-IronPort-SDR: BqljRPRKhBIN+1n1P3qV6NnQicSo+CJdMeYpfcmXJ5KgXIBt+MtYdi7nbv0Enyrty2eOJrviOv
- XRYQCLB7AqFjrWBFdQgz9Z6NNHEZ1wFI4=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2020 17:37:38 -0700
-IronPort-SDR: M/rJu84hnzT9bsCi5PCYAEGeGbdFes3u3Q31yD7dVU5sqFUklIYYLWKfPQ6F33RB77ERJqKM6J
- HlIYGtd+r/kA==
-WDCIronportException: Internal
-Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip02.wdc.com with ESMTP; 01 Jul 2020 17:49:23 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH V2] null_blk: add helper for deleting the nullb_list
-Date:   Wed,  1 Jul 2020 17:49:14 -0700
-Message-Id: <20200702004914.9017-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.26.0
+        id S1727846AbgGBBWs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 21:22:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22108 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726073AbgGBBWs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 21:22:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593652967;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RizfHX/eJKGpvGR/WwGfKwPzo48IcL+lZ2c8DUfvyX8=;
+        b=Vve012EdpeE0Y79hsAkzCnbyP5kRNQna0w9NTFInFJR8BpOFH6gmKh609FE74/DlaMfR30
+        vBoOgw+Ow/PW5vjStx/2VpN2VsowUOGHvXCMRjFgZWRfSLXa+Uae81/4VHJIAIVSwLHXOR
+        bD7hpQ9yoZACnlK7WN7uWLF8RC1ob/E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-Lxd2osTBPRSg58lLoIxuBw-1; Wed, 01 Jul 2020 21:22:43 -0400
+X-MC-Unique: Lxd2osTBPRSg58lLoIxuBw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C32821005513;
+        Thu,  2 Jul 2020 01:22:41 +0000 (UTC)
+Received: from T590 (ovpn-12-180.pek2.redhat.com [10.72.12.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FF4F10023A6;
+        Thu,  2 Jul 2020 01:22:35 +0000 (UTC)
+Date:   Thu, 2 Jul 2020 09:22:31 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Marek Szyprowski <m.szyprowski@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Subject: Re: [PATCH] blk-mq: put driver tag when this request is completed
+Message-ID: <20200702012231.GA2452799@T590>
+References: <20200629094759.2002708-1-ming.lei@redhat.com>
+ <CGME20200701130104eucas1p1f8dcce58bf704b726aee1e89980fe19e@eucas1p1.samsung.com>
+ <57fb09b1-54ba-f3aa-f82c-d709b0e6b281@samsung.com>
+ <20200701134512.GA2443512@T590>
+ <2fcd389f-b341-7cd1-692b-8c9d1918198a@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2fcd389f-b341-7cd1-692b-8c9d1918198a@samsung.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The nullb_list is destroyed when error occurs in the null_init() and
-when removing the module in null_exit(). The identical code is repeated
-in those functions which can be a part of helper function. This also
-removes the extra variable struct nullb *nullb in the both functions.
+On Wed, Jul 01, 2020 at 04:16:32PM +0200, Marek Szyprowski wrote:
+> Hi Ming,
+> 
+> On 01.07.2020 15:45, Ming Lei wrote:
+> > On Wed, Jul 01, 2020 at 03:01:03PM +0200, Marek Szyprowski wrote:
+> >> On 29.06.2020 11:47, Ming Lei wrote:
+> >>> It is natural to release driver tag when this request is completed by
+> >>> LLD or device since its purpose is for LLD use.
+> >>>
+> >>> One big benefit is that the released tag can be re-used quicker since
+> >>> bio_endio() may take too long.
+> >>>
+> >>> Meantime we don't need to release driver tag for flush request.
+> >>>
+> >>> Cc: Christoph Hellwig <hch@lst.de>
+> >>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> >> This patch landed recently in linux-next as commit 36a3df5a4574. Sadly
+> >> it causes a regression on one of my test systems (ARM 32bit, Samsung
+> >> Exynos5422 SoC based Odroid XU3 board with eMMC). The system boots fine
+> >> and then after a few seconds every executed command hangs. No
+> >> panic/ops/any other message. I will try to provide more information asap
+> >> I find something to share. Simple reverting it in linux-next is not
+> >> possible due to dependencies.
+> > What is the exact eMMC's driver code(include the host driver)?
+> 
+> dwmmc-exynos (drivers/mmc/host/dw_mmc-exynos.c)
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
+Hi,
 
-* Changes from V1: -
---------------------
+Just take a quick look at mmc code, there are only two req->tag
+consumers:
 
-1. Add missing sign-off and reviewed-by tag.
+1) cqhci_tag
+cqhci_tag
+	cqhci_request
+		host->cqe_ops->cqe_request
+			mmc_cqe_start_req
+	cqhci_timeout
 
----
- drivers/block/null_blk_main.c | 32 +++++++++++++++-----------------
- 1 file changed, 15 insertions(+), 17 deletions(-)
+2) mmc_hsq_request
+mmc_hsq_request
+	host->cqe_ops->cqe_request
+		mmc_cqe_start_req
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 907c6858aec0..3f5ff75fcb3d 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1868,11 +1868,23 @@ static int null_add_dev(struct nullb_device *dev)
- 	return rv;
- }
+mmc_cqe_start_req() is called before issuing this request to hardware,
+so completion won't happen when the tag is used in mmc_cqe_start_req().
+
+cqhci_timeout() may race with normal completion, however looks the
+following code can handle the race correctly:
+
+        spin_lock_irqsave(&cq_host->lock, flags);
+        timed_out = slot->mrq == mrq;
+
+So still no idea why the commit causes the trouble for mmc.
+
+Do you know it is cqhci or mmc_hsh which works for dw_mmc-exynos?
+And can you apply the following patch and see if warning can be
+triggered?
+
+diff --git a/drivers/mmc/host/cqhci.c b/drivers/mmc/host/cqhci.c
+index 75934f3c117e..2cb49ecfbf34 100644
+--- a/drivers/mmc/host/cqhci.c
++++ b/drivers/mmc/host/cqhci.c
+@@ -612,6 +612,7 @@ static int cqhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
+ 		goto out_unlock;
+ 	}
  
-+static void null_delete_nullb_list(void)
-+{
-+	struct nullb_device *dev;
-+	struct nullb *nullb;
-+
-+	while (!list_empty(&nullb_list)) {
-+		nullb = list_entry(nullb_list.next, struct nullb, list);
-+		dev = nullb->dev;
-+		null_del_dev(nullb);
-+		null_free_dev(dev);
-+	}
-+}
-+
- static int __init null_init(void)
- {
- 	int ret = 0;
- 	unsigned int i;
--	struct nullb *nullb;
- 	struct nullb_device *dev;
++	WARN_ON_ONCE(cq_host->slot[tag].mrq);
+ 	cq_host->slot[tag].mrq = mrq;
+ 	cq_host->slot[tag].flags = 0;
  
- 	if (g_bs > PAGE_SIZE) {
-@@ -1939,12 +1951,7 @@ static int __init null_init(void)
- 	return 0;
+diff --git a/drivers/mmc/host/mmc_hsq.c b/drivers/mmc/host/mmc_hsq.c
+index a5e05ed0fda3..11a4c1f3a970 100644
+--- a/drivers/mmc/host/mmc_hsq.c
++++ b/drivers/mmc/host/mmc_hsq.c
+@@ -227,6 +227,7 @@ static int mmc_hsq_request(struct mmc_host *mmc, struct mmc_request *mrq)
+ 		return -EBUSY;
+ 	}
  
- err_dev:
--	while (!list_empty(&nullb_list)) {
--		nullb = list_entry(nullb_list.next, struct nullb, list);
--		dev = nullb->dev;
--		null_del_dev(nullb);
--		null_free_dev(dev);
--	}
-+	null_delete_nullb_list();
- 	unregister_blkdev(null_major, "nullb");
- err_conf:
- 	configfs_unregister_subsystem(&nullb_subsys);
-@@ -1956,21 +1963,12 @@ static int __init null_init(void)
++	WARN_ON_ONCE(hsq->slot[tag].mrq);
+ 	hsq->slot[tag].mrq = mrq;
  
- static void __exit null_exit(void)
- {
--	struct nullb *nullb;
--
- 	configfs_unregister_subsystem(&nullb_subsys);
- 
- 	unregister_blkdev(null_major, "nullb");
- 
- 	mutex_lock(&lock);
--	while (!list_empty(&nullb_list)) {
--		struct nullb_device *dev;
--
--		nullb = list_entry(nullb_list.next, struct nullb, list);
--		dev = nullb->dev;
--		null_del_dev(nullb);
--		null_free_dev(dev);
--	}
-+	null_delete_nullb_list();
- 	mutex_unlock(&lock);
- 
- 	if (g_queue_mode == NULL_Q_MQ && shared_tags)
--- 
-2.26.0
+ 	/*
+
+Thanks, 
+Ming
 
