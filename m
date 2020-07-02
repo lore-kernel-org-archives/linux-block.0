@@ -2,103 +2,144 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41863C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 06:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A442C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 06:55:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06E2D20874
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 06:21:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26E572089D
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 06:55:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YSE3x8Uj"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="FN7XbHQo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725774AbgGBGU7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 02:20:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33206 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725263AbgGBGU7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Jul 2020 02:20:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593670858;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0Zgjx2s9gHe5mI93ICC99MayNgJA8yJl+NPVwMMEctI=;
-        b=YSE3x8Uj7q3+0agrYIv+q0wbCPU146TpTn1tu6HtOfntlAlvAyAJbbmKyOgHMjNtm+D3Kq
-        iVIOYd2GPfi0eDksMMOOaNbGDT6J03n+AuFNF12Emq5UlIkfVBvH0sVbQUbHwbpkHra4+B
-        A40o+eDvyOIV9Kizp4aTaoNGZKWMybE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-aWgCUtrvOoeBHrbpx2drTg-1; Thu, 02 Jul 2020 02:20:54 -0400
-X-MC-Unique: aWgCUtrvOoeBHrbpx2drTg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44ACDBFC6;
-        Thu,  2 Jul 2020 06:20:52 +0000 (UTC)
-Received: from T590 (ovpn-12-180.pek2.redhat.com [10.72.12.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 825CF5D9CA;
-        Thu,  2 Jul 2020 06:20:45 +0000 (UTC)
-Date:   Thu, 2 Jul 2020 14:20:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Qian Cai <cai@lca.pw>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>, m.szyprowski@samsung.com
-Subject: Re: [PATCH V3 3/3] blk-mq: centralise related handling into
- blk_mq_get_driver_tag
-Message-ID: <20200702062041.GC2452799@T590>
-References: <20200630140357.2251174-1-ming.lei@redhat.com>
- <20200630140357.2251174-4-ming.lei@redhat.com>
- <20200702043721.GA1087@lca.pw>
+        id S1727860AbgGBGzF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 02:55:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33430 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726092AbgGBGzE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 02:55:04 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 443A8C08C5C1
+        for <linux-block@vger.kernel.org>; Wed,  1 Jul 2020 23:55:04 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id d18so16803825edv.6
+        for <linux-block@vger.kernel.org>; Wed, 01 Jul 2020 23:55:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tKRN22hKzeStPgjui2Aao8XmNMEwN3gIdlFGNF8bcf4=;
+        b=FN7XbHQo4xyfGORiZbDAiwfaCw/As7tXLMA465wGW51kVtnODvtYjipR9wQxgboJzd
+         wXCkztxzx6y8/gowuiSm3AHBtzPsTfoz9n9otceNQ4lDVLPxb2UnF0qp84KptNLIMqj7
+         xSGvguJVkAGewqgACIN9/FrDqSMT2sEWTtcjj5i0Sono1FMDkxLN/FaH5F895nqwn3D6
+         uC4M6E9gsy2bMJzKETUN0oTuQnjpalqmRzxzHSiwaXizvXNBrU+SPBbX/MtbtpYiLNIZ
+         3vhtXADC7XWqNhs3hLpjrLx1CZNxvyiodKcaT1D1ZbPSvqksdldWTaTitN4a4cuM6Dlf
+         sPEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tKRN22hKzeStPgjui2Aao8XmNMEwN3gIdlFGNF8bcf4=;
+        b=Zmy2wiii1RK+HgP0Fx8uhvGaWqZ0C0ZUJQCu2NtgOk28M6YVo3KYOrPQzz58gUrIoJ
+         tznu0OiQHTzXsBSUBPupUzr2hBZB/toD0WPbfwL1baL5Zn+YEwIiB2Xqn8l3evueqQWk
+         JmLJ2teqzywDFVDRtTC362jk09ncpOyF8KSwJnsWWIL4dJUTQEpwPReP3Kvc84DGtmTX
+         1ad6mcciwohbq3/miO1IlG0+rU0cN/j0CBpiwoZ90TpYE+vna4s182FhyjkZKNeo9kSk
+         tWvk6NW0F4InJgMQkLFsu1vOfVFy2JvZjwGR0qg6vOT/2tHf2En4912Iel/PPJAGF77n
+         arWg==
+X-Gm-Message-State: AOAM531DCryqmnBG2myt/qWhMMivhCZKYkON+NUZHYF6heDkErmLSFK2
+        qwywcIsVugVeBkmwmRXpHyHMIEdjdHOM25up
+X-Google-Smtp-Source: ABdhPJyNaV0mZrV9WTfrMB2Fykl35XKkFhaci5zrL8Xo4QS2a1xUy6GDh/BvSNhowznWRuVYIhoAEA==
+X-Received: by 2002:a05:6402:202e:: with SMTP id ay14mr33026426edb.233.1593672902962;
+        Wed, 01 Jul 2020 23:55:02 -0700 (PDT)
+Received: from localhost.localdomain ([194.62.217.57])
+        by smtp.gmail.com with ESMTPSA id cz2sm7912769edb.82.2020.07.01.23.55.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 01 Jul 2020 23:55:02 -0700 (PDT)
+From:   =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
+        sagi@grimberg.me, axboe@kernel.dk, Damien.LeMoal@wdc.com,
+        mb@lightnvm.io,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+Subject: [V2 PATCH 0/4] ZNS: Extra features for current patche
+Date:   Thu,  2 Jul 2020 08:54:34 +0200
+Message-Id: <20200702065438.46350-1-javier@javigon.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200702043721.GA1087@lca.pw>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 02, 2020 at 12:37:21AM -0400, Qian Cai wrote:
-> On Tue, Jun 30, 2020 at 10:03:57PM +0800, Ming Lei wrote:
-> > Move .nr_active update and request assignment into blk_mq_get_driver_tag(),
-> > all are good to do during getting driver tag.
-> > 
-> > Meantime blk-flush related code is simplified and flush request needn't
-> > to update the request table manually any more.
-> > 
-> > Cc: Christoph Hellwig <hch@infradead.org>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> 
-> Reverting this commit on the top of next-20200701 fixed an issue where
-> swapping is unable to move progress for hours while it will only take
-> 5-min after the reverting.
+From: Javier González <javier.gonz@samsung.com>
 
-Hi Qian,
+This patchset extends zoned device functionality on top of the existing
+ZNS patchset that Keith sent.
 
-Could you apply the following patch and see if it makes a difference?
+Changes since V1
+  - Remove new IOCTLs for zone management and zone values. I believe we
+    will need the zone management IOCTL to support new ZNS features in
+    the near future, but we will wait until we upstream these too. In
+    the meantime, feedback on the IOCTL is welcome. We drop the zone
+    values IOCTL completely - Niklas send a patch to expose mar / mor
+    through sysfs already - we will extend on this if needed.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 65e0846fd065..e89ce9ae51fd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1147,7 +1147,8 @@ static bool blk_mq_get_driver_tag(struct request *rq)
- 	if (rq->tag == BLK_MQ_NO_TAG && !__blk_mq_get_driver_tag(rq))
- 		return false;
- 
--	if (hctx->flags & BLK_MQ_F_TAG_SHARED) {
-+	if ((hctx->flags & BLK_MQ_F_TAG_SHARED) &&
-+			!(rq->rq_flags & RQF_MQ_INFLIGHT)) {
- 		rq->rq_flags |= RQF_MQ_INFLIGHT;
- 		atomic_inc(&hctx->nr_active);
- 	}
+  - Reimplement zone offline transition to be a IOCTL in itself, as the
+    rest of the existing zone transitions. In the process, implement a
+    way for drivers to report zone feature support in the newly added
+    feature flags. Refactor support for capacity to adopt this model.
+    Here, note that we have maintained behaviour for the scsi driver,
+    even though zone_size == zone_capacity
 
+  - Reimplement the zone count consistency check to do a correct zone
+    calculation. Move this logic to the initialization logic, instead of
+    doing it each time we report zones.
 
 Thanks,
-Ming
+Javier
+
+--- V1 cover letter ---
+
+Patches 1-5 are zoned block interface and IOCTL additions to expose ZNS
+values to user-space. One major change is the addition of a new zone
+management IOCTL that allows to extend zone management commands with
+flags. I recall a conversation in the mailing list from early this year
+where a similar approach was proposed by Matias, but never made it
+upstream. We extended the IOCTL here to align with the comments in that
+thread. Here, we are happy to get sign-offs by anyone that contributed
+to the thread - just comment here or on the patch.
+
+Patch 6 is nvme-only and adds an extra check to the ZNS report code to
+ensure consistency on the zone count.
+
+The patches apply on top of Jens' block-5.8 + Keith's V3 ZNS patches.
+
+Thanks,
+Javier
+
+
+Javier González (4):
+  block: Add zone flags to queue zone prop.
+  block: add support for zone offline transition
+  nvme: Add consistency check for zone count
+  block: add attributes to zone report
+
+ block/blk-core.c               |  2 ++
+ block/blk-zoned.c              | 11 +++++++--
+ drivers/block/null_blk_zoned.c |  2 ++
+ drivers/nvme/host/core.c       |  5 ++++-
+ drivers/nvme/host/nvme.h       |  6 +++--
+ drivers/nvme/host/zns.c        | 41 +++++++++++++++++++++++++++++++++-
+ drivers/scsi/sd.c              |  2 ++
+ drivers/scsi/sd_zbc.c          |  8 +++++--
+ include/linux/blk_types.h      |  3 +++
+ include/linux/blkdev.h         |  4 +++-
+ include/uapi/linux/blkzoned.h  | 29 +++++++++++++++++++++++-
+ 11 files changed, 103 insertions(+), 10 deletions(-)
+
+-- 
+2.17.1
 
