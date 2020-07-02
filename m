@@ -2,262 +2,156 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23980C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 00:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1A6C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 00:49:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F08A720748
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 00:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1467120748
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 00:49:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GOqqzAgB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbgGBAik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 20:38:40 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39804 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726161AbgGBAij (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Jul 2020 20:38:39 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 62419B1C2;
-        Thu,  2 Jul 2020 00:38:35 +0000 (UTC)
-Subject: Re: [PATCH 4/4] writeback: remove bdi->congested_fn
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Tejun Heo <tj@kernel.org>, dm-devel@redhat.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-References: <20200701090622.3354860-1-hch@lst.de>
- <20200701090622.3354860-5-hch@lst.de>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <69234075-06c9-fcca-0c59-2452aa4e2714@suse.de>
-Date:   Thu, 2 Jul 2020 08:38:29 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+        id S1728104AbgGBAtX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 20:49:23 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:9937 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728021AbgGBAtX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 20:49:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1593650963; x=1625186963;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2mE728bmsvHyQ812gN/5CisKb2i/dG2E5a8C6v2+4Z4=;
+  b=GOqqzAgB0THwi93DQr/a1sG1GIJe7IVwcuU0fz2q3V35xw7SRru8Y5FB
+   n0wyM/oG30LznYpPCgIVZZztdFQGG8hR/IdtXOnOaPbQGJm+Si/DsP3yk
+   8IdlFPoWvdoiB93NNA8QylvP/P5tTpNCLy4wYnyn6eW4duxBA2K/tediN
+   WFlekCtvXd8SdKK9wABaPyruqwox4ZlGKmRh5iF3oF6eeu5xBCezRyy7o
+   G4Qq7zPiiGp/goUY34odzvx5S2RGS2DZ/YeIj0TG28LlBc8jPxB5RIiCd
+   hqa7RP6u8IfcsrOoF5S0JdHuZdoh8W3jr/nEzmqn+mim07gbMX5STzA9Q
+   w==;
+IronPort-SDR: /seqFUziD2Jc0fqavQIK1+OW+1ioLp88fVsKNKz0Xma8sHYW3yl5g7wjI5lA7bJ2Qa1O28V3F4
+ ThCJpwDAfE8wZ7LU/vKO1218c+cqDkbQpDUjE1csRO8UFb8krDmR3xgMQ7p5dfFiE52UjmI7xr
+ 51ecMpEgyDdZELZsUp4yLR900BXIH7cL6ndDqq9TPg8byv9BXZrh3RbwLOf590qz/KDdVUyABB
+ i9tVOv0bZTqpOjNYz9zZ+zN10nqHDDmUQnBGj94DBbEhquTtmGfHM2gtlRlRLIHQyQtAjmnO+2
+ /Ts=
+X-IronPort-AV: E=Sophos;i="5.75,302,1589212800"; 
+   d="scan'208";a="142783249"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2020 08:49:22 +0800
+IronPort-SDR: BqljRPRKhBIN+1n1P3qV6NnQicSo+CJdMeYpfcmXJ5KgXIBt+MtYdi7nbv0Enyrty2eOJrviOv
+ XRYQCLB7AqFjrWBFdQgz9Z6NNHEZ1wFI4=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2020 17:37:38 -0700
+IronPort-SDR: M/rJu84hnzT9bsCi5PCYAEGeGbdFes3u3Q31yD7dVU5sqFUklIYYLWKfPQ6F33RB77ERJqKM6J
+ HlIYGtd+r/kA==
+WDCIronportException: Internal
+Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
+  by uls-op-cesaip02.wdc.com with ESMTP; 01 Jul 2020 17:49:23 -0700
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH V2] null_blk: add helper for deleting the nullb_list
+Date:   Wed,  1 Jul 2020 17:49:14 -0700
+Message-Id: <20200702004914.9017-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-In-Reply-To: <20200701090622.3354860-5-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/7/1 17:06, Christoph Hellwig wrote:
-> Except for pktdvd, the only places setting congested bits are file
-> systems that allocate their own backing_dev_info structures.  And
-> pktdvd is a deprecated driver that isn't useful in stack setup
-> either.  So remove the dead congested_fn stacking infrastructure.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+The nullb_list is destroyed when error occurs in the null_init() and
+when removing the module in null_exit(). The identical code is repeated
+in those functions which can be a part of helper function. This also
+removes the extra variable struct nullb *nullb in the both functions.
 
-For the bcache part, Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
 
-Thanks.
+* Changes from V1: -
+--------------------
 
-Coly Li
+1. Add missing sign-off and reviewed-by tag.
 
+---
+ drivers/block/null_blk_main.c | 32 +++++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 17 deletions(-)
 
-> ---
->  drivers/block/drbd/drbd_main.c   | 59 --------------------------------
->  drivers/md/bcache/request.c      | 43 -----------------------
->  drivers/md/bcache/super.c        |  1 -
->  drivers/md/dm-cache-target.c     | 19 ----------
->  drivers/md/dm-clone-target.c     | 15 --------
->  drivers/md/dm-era-target.c       | 15 --------
->  drivers/md/dm-raid.c             | 12 -------
->  drivers/md/dm-table.c            | 37 +-------------------
->  drivers/md/dm-thin.c             | 16 ---------
->  drivers/md/dm.c                  | 33 ------------------
->  drivers/md/dm.h                  |  1 -
->  drivers/md/md-linear.c           | 24 -------------
->  drivers/md/md-multipath.c        | 23 -------------
->  drivers/md/md.c                  | 23 -------------
->  drivers/md/md.h                  |  4 ---
->  drivers/md/raid0.c               | 16 ---------
->  drivers/md/raid1.c               | 31 -----------------
->  drivers/md/raid10.c              | 26 --------------
->  drivers/md/raid5.c               | 25 --------------
->  fs/btrfs/disk-io.c               | 23 -------------
->  include/linux/backing-dev-defs.h |  4 ---
->  include/linux/backing-dev.h      |  4 ---
->  include/linux/device-mapper.h    | 11 ------
->  23 files changed, 1 insertion(+), 464 deletions(-)
-> 
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 907c6858aec0..3f5ff75fcb3d 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1868,11 +1868,23 @@ static int null_add_dev(struct nullb_device *dev)
+ 	return rv;
+ }
+ 
++static void null_delete_nullb_list(void)
++{
++	struct nullb_device *dev;
++	struct nullb *nullb;
++
++	while (!list_empty(&nullb_list)) {
++		nullb = list_entry(nullb_list.next, struct nullb, list);
++		dev = nullb->dev;
++		null_del_dev(nullb);
++		null_free_dev(dev);
++	}
++}
++
+ static int __init null_init(void)
+ {
+ 	int ret = 0;
+ 	unsigned int i;
+-	struct nullb *nullb;
+ 	struct nullb_device *dev;
+ 
+ 	if (g_bs > PAGE_SIZE) {
+@@ -1939,12 +1951,7 @@ static int __init null_init(void)
+ 	return 0;
+ 
+ err_dev:
+-	while (!list_empty(&nullb_list)) {
+-		nullb = list_entry(nullb_list.next, struct nullb, list);
+-		dev = nullb->dev;
+-		null_del_dev(nullb);
+-		null_free_dev(dev);
+-	}
++	null_delete_nullb_list();
+ 	unregister_blkdev(null_major, "nullb");
+ err_conf:
+ 	configfs_unregister_subsystem(&nullb_subsys);
+@@ -1956,21 +1963,12 @@ static int __init null_init(void)
+ 
+ static void __exit null_exit(void)
+ {
+-	struct nullb *nullb;
+-
+ 	configfs_unregister_subsystem(&nullb_subsys);
+ 
+ 	unregister_blkdev(null_major, "nullb");
+ 
+ 	mutex_lock(&lock);
+-	while (!list_empty(&nullb_list)) {
+-		struct nullb_device *dev;
+-
+-		nullb = list_entry(nullb_list.next, struct nullb, list);
+-		dev = nullb->dev;
+-		null_del_dev(nullb);
+-		null_free_dev(dev);
+-	}
++	null_delete_nullb_list();
+ 	mutex_unlock(&lock);
+ 
+ 	if (g_queue_mode == NULL_Q_MQ && shared_tags)
+-- 
+2.26.0
 
-[snipped]
-
-> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-> index 7acf024e99f351..cda05fc61c3afa 100644
-> --- a/drivers/md/bcache/request.c
-> +++ b/drivers/md/bcache/request.c
-> @@ -1228,36 +1228,10 @@ static int cached_dev_ioctl(struct bcache_device *d, fmode_t mode,
->  	return __blkdev_driver_ioctl(dc->bdev, mode, cmd, arg);
->  }
->  
-> -static int cached_dev_congested(void *data, int bits)
-> -{
-> -	struct bcache_device *d = data;
-> -	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
-> -	struct request_queue *q = bdev_get_queue(dc->bdev);
-> -	int ret = 0;
-> -
-> -	if (bdi_congested(q->backing_dev_info, bits))
-> -		return 1;
-> -
-> -	if (cached_dev_get(dc)) {
-> -		unsigned int i;
-> -		struct cache *ca;
-> -
-> -		for_each_cache(ca, d->c, i) {
-> -			q = bdev_get_queue(ca->bdev);
-> -			ret |= bdi_congested(q->backing_dev_info, bits);
-> -		}
-> -
-> -		cached_dev_put(dc);
-> -	}
-> -
-> -	return ret;
-> -}
-> -
->  void bch_cached_dev_request_init(struct cached_dev *dc)
->  {
->  	struct gendisk *g = dc->disk.disk;
->  
-> -	g->queue->backing_dev_info->congested_fn = cached_dev_congested;
->  	dc->disk.cache_miss			= cached_dev_cache_miss;
->  	dc->disk.ioctl				= cached_dev_ioctl;
->  }
-> @@ -1342,27 +1316,10 @@ static int flash_dev_ioctl(struct bcache_device *d, fmode_t mode,
->  	return -ENOTTY;
->  }
->  
-> -static int flash_dev_congested(void *data, int bits)
-> -{
-> -	struct bcache_device *d = data;
-> -	struct request_queue *q;
-> -	struct cache *ca;
-> -	unsigned int i;
-> -	int ret = 0;
-> -
-> -	for_each_cache(ca, d->c, i) {
-> -		q = bdev_get_queue(ca->bdev);
-> -		ret |= bdi_congested(q->backing_dev_info, bits);
-> -	}
-> -
-> -	return ret;
-> -}
-> -
->  void bch_flash_dev_request_init(struct bcache_device *d)
->  {
->  	struct gendisk *g = d->disk;
->  
-> -	g->queue->backing_dev_info->congested_fn = flash_dev_congested;
->  	d->cache_miss				= flash_dev_cache_miss;
->  	d->ioctl				= flash_dev_ioctl;
->  }
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 2014016f9a60d3..1810d7ca2f6653 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -877,7 +877,6 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
->  
->  	d->disk->queue			= q;
->  	q->queuedata			= d;
-> -	q->backing_dev_info->congested_data = d;
->  	q->limits.max_hw_sectors	= UINT_MAX;
->  	q->limits.max_sectors		= UINT_MAX;
->  	q->limits.max_segment_size	= UINT_MAX;
-> diff --git a/drivers/md/dm-cache-target.c b/drivers/md/dm-cache-target.c
-> index d3bb355819a421..24549dc92eeec5 100644
-> --- a/drivers/md/dm-cache-target.c
-> +++ b/drivers/md/dm-cache-target.c
-> @@ -421,8 +421,6 @@ struct cache {
->  
->  	struct rw_semaphore quiesce_lock;
->  
-> -	struct dm_target_callbacks callbacks;
-> -
->  	/*
->  	 * origin_blocks entries, discarded if set.
->  	 */
-> @@ -2423,20 +2421,6 @@ static void set_cache_size(struct cache *cache, dm_cblock_t size)
->  	cache->cache_size = size;
->  }
->  
-> -static int is_congested(struct dm_dev *dev, int bdi_bits)
-> -{
-> -	struct request_queue *q = bdev_get_queue(dev->bdev);
-> -	return bdi_congested(q->backing_dev_info, bdi_bits);
-> -}
-> -
-> -static int cache_is_congested(struct dm_target_callbacks *cb, int bdi_bits)
-> -{
-> -	struct cache *cache = container_of(cb, struct cache, callbacks);
-> -
-> -	return is_congested(cache->origin_dev, bdi_bits) ||
-> -		is_congested(cache->cache_dev, bdi_bits);
-> -}
-> -
->  #define DEFAULT_MIGRATION_THRESHOLD 2048
->  
->  static int cache_create(struct cache_args *ca, struct cache **result)
-> @@ -2471,9 +2455,6 @@ static int cache_create(struct cache_args *ca, struct cache **result)
->  			goto bad;
->  	}
->  
-> -	cache->callbacks.congested_fn = cache_is_congested;
-> -	dm_table_add_target_callbacks(ti->table, &cache->callbacks);
-> -
->  	cache->metadata_dev = ca->metadata_dev;
->  	cache->origin_dev = ca->origin_dev;
->  	cache->cache_dev = ca->cache_dev;
-
-[snipped]
