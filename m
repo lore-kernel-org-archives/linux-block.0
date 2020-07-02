@@ -2,141 +2,169 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C16FC433E0
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 13:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4A0C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 13:27:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0759920772
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 13:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D17620672
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 13:27:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="PwcqrbBb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728931AbgGBNQw convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 09:16:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30438 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728851AbgGBNQw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Jul 2020 09:16:52 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 062D3lp6092955;
-        Thu, 2 Jul 2020 09:16:44 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 320xaywgu4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jul 2020 09:16:44 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 062D44iY094400;
-        Thu, 2 Jul 2020 09:16:44 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 320xaywgt8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jul 2020 09:16:44 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 062DATCh027107;
-        Thu, 2 Jul 2020 13:16:42 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma05fra.de.ibm.com with ESMTP id 31wwr8avt7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jul 2020 13:16:42 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 062DGekB11927982
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Jul 2020 13:16:40 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 289084C04E;
-        Thu,  2 Jul 2020 13:16:40 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 26D524C044;
-        Thu,  2 Jul 2020 13:16:39 +0000 (GMT)
-Received: from [9.85.87.208] (unknown [9.85.87.208])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Jul 2020 13:16:38 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.14\))
-Subject: Re: [powerpc][next-20200701] Hung task timeouts during regression
- test runs
-From:   Sachin Sant <sachinp@linux.vnet.ibm.com>
-In-Reply-To: <20200702115216.GF2452799@T590>
-Date:   Thu, 2 Jul 2020 18:46:38 +0530
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-block@vger.kernel.org,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        id S1729124AbgGBN1W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 09:27:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37840 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728851AbgGBN1V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 09:27:21 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 396C1C08C5C1
+        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 06:27:21 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id e15so23851069edr.2
+        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 06:27:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=zBaUOzBUmZvfHz2BrgXV4tbsfNQDmUh4O5tah2+TEQA=;
+        b=PwcqrbBbcthT5ztTfKZdLaQXrCUSB09PnEybMbNBDsdwdafapuB/4ZJ/MeR4BSj8+r
+         LIsgCccpJJ3oNIOWxGmSqnrhGjX0sZH15eEQkJuIHEHHSbAcdTyeeYI4Etn65pQGNCJX
+         tzeG6WNEuHCFw/gdvgqubPclNCVDcQOUMeqR8/8okgJP1UfdQY7qjryQ2blar78tfcGC
+         Xsh4vxZlwNBmxNohs40cUv0aQcfSgpsm7p1U0iUoVO/9QliX4sGyYNBXxdbPMEi0YewK
+         Q4XFX7Tle8swndJF/t9Z/afPxDXjuBwwfije73RFx91SW+7XIxlqSh1GH0vo7C16DJQI
+         e0pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=zBaUOzBUmZvfHz2BrgXV4tbsfNQDmUh4O5tah2+TEQA=;
+        b=n/x0mmO6STM+VrjuO1gWayEm/8oUbrw4iZ/+7gRuaoGt5dAeKY8v3vt9UUTXrwxleS
+         UWZ2iS93QpFePbMUoQZ1e4Gii2jBp0XMO7q0Psrkl6VyLXMFiI09mKEqOx60AMNNdpgi
+         qJTI/QSNaURrFoRw2mo3k00AzFfybHccfzKm0m5G7lUH1hGaXqM5qKGvu0cmzUVw/cfL
+         54zkQe4Uetn1yBie4If9uZpdLu3FjsvDJV/qTEHokRH1ZkR/+rfzdJbpBhzTJwwiO8Lt
+         k0/0tx9YHEZuA6dLMpaIxM2ygzrHXSBx3IM6USwVzflJfMLd6UfXETxNb7S/E29FGNmB
+         qn4g==
+X-Gm-Message-State: AOAM531m3TkbFB1nHYWke1DWlgP/cx4lVvMvCGAG4yF37A2n5iqIadi6
+        4Bxz6rQC/FjL8oxIP+a34UIq00Id4dcFc6PB
+X-Google-Smtp-Source: ABdhPJxuv8V0d1zbj/MJOSdSMlHsXnv7nD5lQU09cPL917aGicFfOhxR6EORhHGv4b7puk9tBV0pTg==
+X-Received: by 2002:a50:cd1a:: with SMTP id z26mr36023142edi.120.1593696439901;
+        Thu, 02 Jul 2020 06:27:19 -0700 (PDT)
+Received: from ls00508.pb.local ([2001:1438:4010:2540:2968:e1c0:a871:b69c])
+        by smtp.gmail.com with ESMTPSA id m13sm6863457ejc.1.2020.07.02.06.27.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jul 2020 06:27:19 -0700 (PDT)
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+To:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
         axboe@kernel.dk
-Content-Transfer-Encoding: 8BIT
-Message-Id: <16B5C41B-2078-4259-9942-6642F713788E@linux.vnet.ibm.com>
-References: <CDAB3931-FAAD-443A-A9CD-362E527043A1@linux.vnet.ibm.com>
- <20200702115216.GF2452799@T590>
-To:     Ming Lei <ming.lei@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.14)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-02_08:2020-07-02,2020-07-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- cotscore=-2147483648 suspectscore=0 impostorscore=0 priorityscore=1501
- mlxscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0 spamscore=0
- adultscore=0 mlxlogscore=999 malwarescore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007020094
+Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Subject: [PATCH V2] drbd: remove unused argument from drbd_request_prepare and __drbd_make_request
+Date:   Thu,  2 Jul 2020 15:27:02 +0200
+Message-Id: <20200702132702.6914-1-guoqing.jiang@cloud.ionos.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200701123832.3868-1-guoqing.jiang@cloud.ionos.com>
+References: <20200701123832.3868-1-guoqing.jiang@cloud.ionos.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+We can remove start_jif since it is not used by drbd_request_prepare,
+then remove it from __drbd_make_request further.
 
+Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+---
+V2:
+1. rebased with latest for-next branch
 
-> On 02-Jul-2020, at 5:22 PM, Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> On Thu, Jul 02, 2020 at 04:53:04PM +0530, Sachin Sant wrote:
->> Starting with linux-next 20200701 release I am observing automated regressions
->> tests taking longer time to complete. A test which took 10 minutes with next-20200630
->> took more than 60 minutes against next-20200701. 
->> 
->> Following hung task timeout messages were seen during these runs
->> 
->> [ 1718.848351]       Not tainted 5.8.0-rc3-next-20200701-autotest #1
->> [ 1718.848356] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
->> [ 1718.848362] NetworkManager  D    0  2626      1 0x00040080
->> [ 1718.848367] Call Trace:
->> [ 1718.848374] [c0000008b0f6b8f0] [c000000000c6d558] schedule+0x78/0x130 (unreliable)
->> [ 1718.848382] [c0000008b0f6bad0] [c00000000001b070] __switch_to+0x2e0/0x480
->> [ 1718.848388] [c0000008b0f6bb30] [c000000000c6ce9c] __schedule+0x2cc/0x910
->> [ 1718.848394] [c0000008b0f6bc10] [c000000000c6d558] schedule+0x78/0x130
->> [ 1718.848401] [c0000008b0f6bc40] [c0000000005d5a64] jbd2_log_wait_commit+0xd4/0x1a0
->> [ 1718.848408] [c0000008b0f6bcc0] [c00000000055fb6c] ext4_sync_file+0x1cc/0x480
->> [ 1718.848415] [c0000008b0f6bd20] [c000000000493530] vfs_fsync_range+0x70/0xf0
->> [ 1718.848421] [c0000008b0f6bd60] [c000000000493638] do_fsync+0x58/0xd0
->> [ 1718.848427] [c0000008b0f6bda0] [c0000000004936d8] sys_fsync+0x28/0x40
->> [ 1718.848433] [c0000008b0f6bdc0] [c000000000035e28] system_call_exception+0xf8/0x1c0
->> [ 1718.848440] [c0000008b0f6be20] [c00000000000ca70] system_call_common+0xf0/0x278
->> 
->> Comparing next-20200630 with next-20200701 one possible candidate seems to
->> be following commit:
->> 
->> commit 37f4a24c2469a10a4c16c641671bd766e276cf9f
->>    blk-mq: centralise related handling into blk_mq_get_driver_tag
->> 
->> Reverting this commit allows the test to complete in 10 minutes.
-> 
-> Hello,
-> 
-> Thanks for the report.
-> 
-> Please try the following fix:
-> 
-> https://lore.kernel.org/linux-block/20200702062041.GC2452799@T590/raw
+ drivers/block/drbd/drbd_int.h  |  2 +-
+ drivers/block/drbd/drbd_main.c |  3 +--
+ drivers/block/drbd/drbd_req.c  | 11 ++++-------
+ 3 files changed, 6 insertions(+), 10 deletions(-)
 
-The fix works for me.
-
-Tested-by : Sachin Sant <sachinp@linux.vnet.ibm.com>
-
-Thanks
--Sachin
-
-> 
-> 
-> Thanks,
-> Ming
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index fe6cb99eb917..aacd2010b555 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -1450,7 +1450,7 @@ extern void conn_free_crypto(struct drbd_connection *connection);
+ 
+ /* drbd_req */
+ extern void do_submit(struct work_struct *ws);
+-extern void __drbd_make_request(struct drbd_device *, struct bio *, unsigned long);
++extern void __drbd_make_request(struct drbd_device *, struct bio *);
+ extern blk_qc_t drbd_submit_bio(struct bio *bio);
+ extern int drbd_read_remote(struct drbd_device *device, struct drbd_request *req);
+ extern int is_valid_ar_handle(struct drbd_request *, sector_t);
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 7c34cc0ad8cc..42f2a235417c 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2293,7 +2293,6 @@ static void do_retry(struct work_struct *ws)
+ 	list_for_each_entry_safe(req, tmp, &writes, tl_requests) {
+ 		struct drbd_device *device = req->device;
+ 		struct bio *bio = req->master_bio;
+-		unsigned long start_jif = req->start_jif;
+ 		bool expected;
+ 
+ 		expected =
+@@ -2328,7 +2327,7 @@ static void do_retry(struct work_struct *ws)
+ 		/* We are not just doing submit_bio_noacct(),
+ 		 * as we want to keep the start_time information. */
+ 		inc_ap_bio(device);
+-		__drbd_make_request(device, bio, start_jif);
++		__drbd_make_request(device, bio);
+ 	}
+ }
+ 
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index 674be09b2da9..f705128b4f27 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -1188,7 +1188,7 @@ static void drbd_queue_write(struct drbd_device *device, struct drbd_request *re
+  * Returns ERR_PTR(-ENOMEM) if we cannot allocate a drbd_request.
+  */
+ static struct drbd_request *
+-drbd_request_prepare(struct drbd_device *device, struct bio *bio, unsigned long start_jif)
++drbd_request_prepare(struct drbd_device *device, struct bio *bio)
+ {
+ 	const int rw = bio_data_dir(bio);
+ 	struct drbd_request *req;
+@@ -1416,9 +1416,9 @@ static void drbd_send_and_submit(struct drbd_device *device, struct drbd_request
+ 		complete_master_bio(device, &m);
+ }
+ 
+-void __drbd_make_request(struct drbd_device *device, struct bio *bio, unsigned long start_jif)
++void __drbd_make_request(struct drbd_device *device, struct bio *bio)
+ {
+-	struct drbd_request *req = drbd_request_prepare(device, bio, start_jif);
++	struct drbd_request *req = drbd_request_prepare(device, bio);
+ 	if (IS_ERR_OR_NULL(req))
+ 		return;
+ 	drbd_send_and_submit(device, req);
+@@ -1596,19 +1596,16 @@ void do_submit(struct work_struct *ws)
+ blk_qc_t drbd_submit_bio(struct bio *bio)
+ {
+ 	struct drbd_device *device = bio->bi_disk->private_data;
+-	unsigned long start_jif;
+ 
+ 	blk_queue_split(&bio);
+ 
+-	start_jif = jiffies;
+-
+ 	/*
+ 	 * what we "blindly" assume:
+ 	 */
+ 	D_ASSERT(device, IS_ALIGNED(bio->bi_iter.bi_size, 512));
+ 
+ 	inc_ap_bio(device);
+-	__drbd_make_request(device, bio, start_jif);
++	__drbd_make_request(device, bio);
+ 	return BLK_QC_T_NONE;
+ }
+ 
+-- 
+2.17.1
 
