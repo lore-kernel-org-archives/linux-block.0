@@ -4,60 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0CEC433DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 08:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2736AC433E0
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 08:40:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61CD320720
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 08:34:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1A1D2084C
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 08:40:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="QMaVtQUw"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="2G+5hg19"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726475AbgGBIeg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 04:34:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48788 "EHLO
+        id S1726462AbgGBIkE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 04:40:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726445AbgGBIeg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 04:34:36 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 322D3C08C5C1
-        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 01:34:36 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id n2so13698895edr.5
-        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 01:34:36 -0700 (PDT)
+        with ESMTP id S1725263AbgGBIkE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 04:40:04 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3409C08C5C1
+        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 01:40:03 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id lx13so9645598ejb.4
+        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 01:40:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=qi9qGF+SqQYuKRudvW84peIMSp1FDuyHvZ3I82vYQjg=;
-        b=QMaVtQUw67TOY8AIWVh5B/jTHwhYg/McW4YY3DLJr4nE2LTcEgxHyqm6BB+xkN2sxS
-         e5yDTfynX2vrT7S/vmx4xp/bECLjs++MjdCvldaQbv6R2v+phwdYiZwBxvPkSrzo4ELU
-         MEqyEVSCkE4sDy9ra8jHwrz8zIIBJ4tfYmw5W9Xckc6spGHwg3H5a2s3dzuLIpLdlT1u
-         uwsr/P0i7eWnel0BTxgX+y5ZY8czC+NDrovMfImI/LgN/k77SjAH6dHCH9Tu1OvRUgv1
-         MghwDW+4JkXAOFivNSkLYwRUQz5LbSgZcLZlLBJtpOoE9+UQ+udP0XVfyruSTN7InDiV
-         2Evw==
+        bh=CY1+xXeM98A+4ORvwrMrgQ9HrN1UK/F/dXmhdXBR9Q8=;
+        b=2G+5hg19z8zKRrhF6e9qYJrqb9QevMu7duG3B47GG3zmgOnY8QY1fD0z/P23IPx07k
+         gBCCEJW4iT12nsuTeiKO0LNuZ/NNHe7elGJP9yerFAkkDlfgk4k0kElJOTHM3IxAABJz
+         GqOXYn0kQuqM1xCLq9kHB17Wg2UJPEvCPtsIi/nb3n5CE3DBlqPXUtXYnwlIdTTd+zZy
+         31tJVZmZeKpGv6x0wtEI72hl/EQ2kmpQraoUnNls58Zc/sEfFBvkFIkq09gcvcAdRSME
+         cEivk/dMnqdUy/FdXcWQIX9pioIkvS11VtFMZQlW+RUK6ITk+oyM8B5txaMzoAOUq8mj
+         mwvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=qi9qGF+SqQYuKRudvW84peIMSp1FDuyHvZ3I82vYQjg=;
-        b=ulJpOtxEGCTWr64SHlVpyxrcFE3zfD1CnQKRkIvTiqXp2QA8yLm+Y6VbNRoBbQWlTw
-         iS9CvDxOggczI69LVoIf1WG/GoX6rDkyuMIfLKf6byt0jDvwMjd3JXnz14Z1fGPg1f0Y
-         AtBB50VbMWnyb+9WoZFLHPGYJYYYAWN93hMrAM0NyWuV7qhZXME0MkRhp4pXo1I1EHCk
-         4u7IC1vXeS7Kl5CONxAtfI7Mvdg4W0UgoxZPS0zCEDH2EgsNpWtoHceeRO4+DkCEHac4
-         3LM1dipdNbLyPnTKGd+KCBMjyTffyrWM7e1dXfhRQjyrnSCKRk2E3Wd/8OzSotEvinDo
-         HgIg==
-X-Gm-Message-State: AOAM5303fjYsPtFM34ncHeIrK5sOZeQtjX5tCl5RhAE6hjHVh4DlM5gz
-        Qo5ZADMYVWvbU5nmVMSVEgIP7A==
-X-Google-Smtp-Source: ABdhPJxyKxm9ZA5zyOrNFXILHYk1ydemwjcqycIrZHrUPV+z5kl1jj+rAQi3+BMRu5PEERrCEZCJjA==
-X-Received: by 2002:aa7:c1d8:: with SMTP id d24mr34060818edp.178.1593678874803;
-        Thu, 02 Jul 2020 01:34:34 -0700 (PDT)
+        bh=CY1+xXeM98A+4ORvwrMrgQ9HrN1UK/F/dXmhdXBR9Q8=;
+        b=RApZPj9taUjHVygKnZMX+c57i8QOFTJ4nrSM7a5qvncUPytrkWor2VJ5Ba3n1f+TQR
+         AQY8kuPxiEMu/Nckw1NekT7nn5ZQrmJ89dr8GbOZGvJfLb0aB3CwuXGwO37f6f+UvjX1
+         DhtfbQEHAf6AootX7eTei4loJGKMu1oigOTPnkZEUvkxK5L0mMxTQl3/jm834ijkJZd2
+         NAXyO7aqb8ubs9sLUglBPlqlENJvC+7t+dWaxcBpE5gQ/4QeqpgH3+jDf9y0I7dTOa0H
+         1WQI0IkIXic250ZjctDOsZG0jGkKMO1HRuzXTlRCa5SML5bZz5pDWNS69b84afytG8/j
+         9WIQ==
+X-Gm-Message-State: AOAM530eTjIOZFCVOAR9q/0VEYUKcdpsOMvN+VhlxeaSd1B3HIy7mfIb
+        AC6MOb7dhCgYdUz9ZbTMc9HbEA==
+X-Google-Smtp-Source: ABdhPJxobGY9yFW8oPSZk92kT6B6MKt1vmHt8jcVvdaNT58s95f3ggU08VHZZOMFxiSzlBcLG/d4QA==
+X-Received: by 2002:a17:906:240d:: with SMTP id z13mr24636676eja.346.1593679202338;
+        Thu, 02 Jul 2020 01:40:02 -0700 (PDT)
 Received: from localhost ([194.62.217.57])
-        by smtp.gmail.com with ESMTPSA id b14sm4996168ejg.18.2020.07.02.01.34.33
+        by smtp.gmail.com with ESMTPSA id s2sm8677638edu.39.2020.07.02.01.40.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2020 01:34:34 -0700 (PDT)
-Date:   Thu, 2 Jul 2020 10:34:30 +0200
+        Thu, 02 Jul 2020 01:40:01 -0700 (PDT)
+Date:   Thu, 2 Jul 2020 10:39:56 +0200
 From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
 To:     Damien Le Moal <Damien.LeMoal@wdc.com>
 Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
@@ -69,155 +70,220 @@ Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         SelvaKumar S <selvakuma.s1@samsung.com>,
         Kanchan Joshi <joshi.k@samsung.com>,
         Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH 1/4] block: Add zone flags to queue zone prop.
-Message-ID: <20200702083430.miax2cd44mkhc5fb@mpHalley.local>
+Subject: Re: [PATCH 2/4] block: add support for zone offline transition
+Message-ID: <20200702083956.rwlewfgyc6ycs4ys@mpHalley.local>
 References: <20200702065438.46350-1-javier@javigon.com>
- <20200702065438.46350-2-javier@javigon.com>
- <CY4PR04MB37511008EEBF1A77DB4F423BE76D0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200702065438.46350-3-javier@javigon.com>
+ <CY4PR04MB3751F9F6BBBAD8CAC7E15431E76D0@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CY4PR04MB37511008EEBF1A77DB4F423BE76D0@CY4PR04MB3751.namprd04.prod.outlook.com>
+In-Reply-To: <CY4PR04MB3751F9F6BBBAD8CAC7E15431E76D0@CY4PR04MB3751.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 02.07.2020 07:54, Damien Le Moal wrote:
+On 02.07.2020 08:10, Damien Le Moal wrote:
 >On 2020/07/02 15:55, Javier González wrote:
 >> From: Javier González <javier.gonz@samsung.com>
 >>
->> As the zoned block device will have to deal with features that are
->> optional for the backend device, add a flag field to inform the block
->> layer about supported features. This builds on top of
->> blk_zone_report_flags and extendes to the zone report code.
+>> Add support for offline transition on the zoned block device. Use the
+>> existing feature flags for the underlying driver to report support for
+>> the feature, as currently this transition is only supported in ZNS and
+>> not in ZAC/ZBC
 >>
 >> Signed-off-by: Javier González <javier.gonz@samsung.com>
 >> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
 >> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 >> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
 >> ---
->>  block/blk-zoned.c              | 3 ++-
->>  drivers/block/null_blk_zoned.c | 2 ++
->>  drivers/nvme/host/zns.c        | 1 +
->>  drivers/scsi/sd.c              | 2 ++
->>  include/linux/blkdev.h         | 3 +++
->>  5 files changed, 10 insertions(+), 1 deletion(-)
+>>  block/blk-core.c              | 2 ++
+>>  block/blk-zoned.c             | 8 +++++++-
+>>  drivers/nvme/host/core.c      | 3 +++
+>>  drivers/nvme/host/zns.c       | 2 +-
+>>  include/linux/blk_types.h     | 3 +++
+>>  include/linux/blkdev.h        | 1 -
+>>  include/uapi/linux/blkzoned.h | 3 +++
+>>  7 files changed, 19 insertions(+), 3 deletions(-)
 >>
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index 03252af8c82c..589cbdacc5ec 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -140,6 +140,7 @@ static const char *const blk_op_name[] = {
+>>  	REQ_OP_NAME(ZONE_CLOSE),
+>>  	REQ_OP_NAME(ZONE_FINISH),
+>>  	REQ_OP_NAME(ZONE_APPEND),
+>> +	REQ_OP_NAME(ZONE_OFFLINE),
+>>  	REQ_OP_NAME(WRITE_SAME),
+>>  	REQ_OP_NAME(WRITE_ZEROES),
+>>  	REQ_OP_NAME(SCSI_IN),
+>> @@ -1030,6 +1031,7 @@ generic_make_request_checks(struct bio *bio)
+>>  	case REQ_OP_ZONE_OPEN:
+>>  	case REQ_OP_ZONE_CLOSE:
+>>  	case REQ_OP_ZONE_FINISH:
+>> +	case REQ_OP_ZONE_OFFLINE:
+>>  		if (!blk_queue_is_zoned(q))
+>>  			goto not_supported;
+>>  		break;
 >> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
->> index 81152a260354..0f156e96e48f 100644
+>> index 0f156e96e48f..b97f67f462b4 100644
 >> --- a/block/blk-zoned.c
 >> +++ b/block/blk-zoned.c
->> @@ -312,7 +312,8 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
->>  		return ret;
+>> @@ -320,7 +320,8 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
+>>  }
 >>
->>  	rep.nr_zones = ret;
->> -	rep.flags = BLK_ZONE_REP_CAPACITY;
->> +	rep.flags = q->zone_flags;
+>>  /*
+>> - * BLKRESETZONE, BLKOPENZONE, BLKCLOSEZONE and BLKFINISHZONE ioctl processing.
+>> + * BLKRESETZONE, BLKOPENZONE, BLKCLOSEZONE, BLKFINISHZONE and BLKOFFLINEZONE
+>> + * ioctl processing.
+>>   * Called from blkdev_ioctl.
+>>   */
+>>  int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+>> @@ -363,6 +364,11 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+>>  	case BLKFINISHZONE:
+>>  		op = REQ_OP_ZONE_FINISH;
+>>  		break;
+>> +	case BLKOFFLINEZONE:
+>> +		if (!(q->zone_flags & BLK_ZONE_REP_OFFLINE))
+>> +			return -EINVAL;
 >
->zone_flags seem to be a fairly generic flags field while rep.flags is only about
->the reported descriptors structure. So you may want to define a
->BLK_ZONE_REP_FLAGS_MASK and have:
+>return -ENOTTY here.
 >
->	rep.flags = q->zone_flags & BLK_ZONE_REP_FLAGS_MASK;
->
->to avoid flags meaningless for the user being set.
->
->In any case, since *all* zoned block devices now report capacity, I do not
->really see the point to add BLK_ZONE_REP_FLAGS_MASK to q->zone_flags, especially
->considering that you set the flag for all zoned device types, including scsi
->which does not have zone capacity. This makes q->zone_flags rather confusing
->instead of clearly defining the device features as you mentioned in the commit
->message.
->
->I think it may be better to just drop this patch, and if needed, introduce the
->zone_flags field where it may be needed (e.g. OFFLINE zone ioctl support).
+>That is the error returned for regular block devices when a zone ioctl is
+>received, indicating the lack of support for these ioctls. Since this is also a
+>lack  of support by the device here too, we may as well keep the same error
+>code. Returning -EINVAL should be reserved for cases where the device can accept
+>the ioctl but start sector or number of sectors is invalid.
 
-I am using this as a way to pass the OFFLINE support flag to the block
-layer. I used this too for the attributes. Are you thinking of a
-different way to send this?
-
-I believe this fits too for capacity, but we can just pass it in
-all report as before if you prefer.
+Ok.
 
 >
->> +
->>  	if (copy_to_user(argp, &rep, sizeof(struct blk_zone_report)))
->>  		return -EFAULT;
->>  	return 0;
->> diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
->> index b05832eb21b2..957c2103f240 100644
->> --- a/drivers/block/null_blk_zoned.c
->> +++ b/drivers/block/null_blk_zoned.c
->> @@ -78,6 +78,8 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+>
+>> +		op = REQ_OP_ZONE_OFFLINE;
+>> +		break;
+>>  	default:
+>>  		return -ENOTTY;
 >>  	}
->>
->>  	q->limits.zoned = BLK_ZONED_HM;
->> +	q->zone_flags = BLK_ZONE_REP_CAPACITY;
->> +
->>  	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
->>  	blk_queue_required_elevator_features(q, ELEVATOR_F_ZBD_SEQ_WRITE);
->>
+>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>> index e5f754889234..1f5c7fc3d2c9 100644
+>> --- a/drivers/nvme/host/core.c
+>> +++ b/drivers/nvme/host/core.c
+>> @@ -776,6 +776,9 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+>>  	case REQ_OP_ZONE_FINISH:
+>>  		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_FINISH);
+>>  		break;
+>> +	case REQ_OP_ZONE_OFFLINE:
+>> +		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_OFFLINE);
+>> +		break;
+>>  	case REQ_OP_WRITE_ZEROES:
+>>  		ret = nvme_setup_write_zeroes(ns, req, cmd);
+>>  		break;
 >> diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
->> index 0642d3c54e8f..888264261ba3 100644
+>> index 888264261ba3..b34d2ed13825 100644
 >> --- a/drivers/nvme/host/zns.c
 >> +++ b/drivers/nvme/host/zns.c
->> @@ -81,6 +81,7 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+>> @@ -81,7 +81,7 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
 >>  	}
 >>
 >>  	q->limits.zoned = BLK_ZONED_HM;
->> +	q->zone_flags = BLK_ZONE_REP_CAPACITY;
+>> -	q->zone_flags = BLK_ZONE_REP_CAPACITY;
+>> +	q->zone_flags = BLK_ZONE_REP_CAPACITY | BLK_ZONE_REP_OFFLINE;
+>
+>The name BLK_ZONE_REP_OFFLINE is not ideal.  This flag is not about if offline
+>condition will be reported or not. It is about the drive supporting an explicit
+>offlining zone operation.
+
+I wanted to follow the same convention. I can change the name in the
+same enum for the report flags.
+
+>
 >>  	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
 >>  free_data:
 >>  	kfree(id);
->> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
->> index d90fefffe31b..b9c920bace28 100644
->> --- a/drivers/scsi/sd.c
->> +++ b/drivers/scsi/sd.c
->> @@ -2967,6 +2967,7 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
->>  	if (sdkp->device->type == TYPE_ZBC) {
->>  		/* Host-managed */
->>  		q->limits.zoned = BLK_ZONED_HM;
->> +		q->zone_flags = BLK_ZONE_REP_CAPACITY;
->>  	} else {
->>  		sdkp->zoned = (buffer[8] >> 4) & 3;
->>  		if (sdkp->zoned == 1 && !disk_has_partitions(sdkp->disk)) {
->> @@ -2983,6 +2984,7 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
->>  					  "Drive-managed SMR disk\n");
->>  		}
->>  	}
->> +
->>  	if (blk_queue_is_zoned(q) && sdkp->first_scan)
->>  		sd_printk(KERN_NOTICE, sdkp, "Host-%s zoned block device\n",
->>  		      q->limits.zoned == BLK_ZONED_HM ? "managed" : "aware");
+>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>> index ccb895f911b1..c0123c643e2f 100644
+>> --- a/include/linux/blk_types.h
+>> +++ b/include/linux/blk_types.h
+>> @@ -316,6 +316,8 @@ enum req_opf {
+>>  	REQ_OP_ZONE_FINISH	= 12,
+>>  	/* write data at the current zone write pointer */
+>>  	REQ_OP_ZONE_APPEND	= 13,
+>> +	/* Transition a zone to offline */
+>> +	REQ_OP_ZONE_OFFLINE	= 14,
+>>
+>>  	/* SCSI passthrough using struct scsi_request */
+>>  	REQ_OP_SCSI_IN		= 32,
+>> @@ -455,6 +457,7 @@ static inline bool op_is_zone_mgmt(enum req_opf op)
+>>  	case REQ_OP_ZONE_OPEN:
+>>  	case REQ_OP_ZONE_CLOSE:
+>>  	case REQ_OP_ZONE_FINISH:
+>> +	case REQ_OP_ZONE_OFFLINE:
+>>  		return true;
+>>  	default:
+>>  		return false;
 >> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index 8fd900998b4e..3f2e3425fa53 100644
+>> index 3f2e3425fa53..e489b646486d 100644
 >> --- a/include/linux/blkdev.h
 >> +++ b/include/linux/blkdev.h
->> @@ -512,12 +512,15 @@ struct request_queue {
->>  	 * Stacking drivers (device mappers) may or may not initialize
->>  	 * these fields.
->>  	 *
->> +	 * Flags represent features as described by blk_zone_report_flags in blkzoned.h
->> +	 *
->>  	 * Reads of this information must be protected with blk_queue_enter() /
->>  	 * blk_queue_exit(). Modifying this information is only allowed while
->>  	 * no requests are being processed. See also blk_mq_freeze_queue() and
->>  	 * blk_mq_unfreeze_queue().
->>  	 */
->>  	unsigned int		nr_zones;
->> +	unsigned int		zone_flags;
->>  	unsigned long		*conv_zones_bitmap;
->>  	unsigned long		*seq_zones_wlock;
->>  #endif /* CONFIG_BLK_DEV_ZONED */
+>> @@ -370,7 +370,6 @@ extern int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
+>>  				     unsigned int cmd, unsigned long arg);
+>>  extern int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+>>  				  unsigned int cmd, unsigned long arg);
+>> -
+>>  #else /* CONFIG_BLK_DEV_ZONED */
+>>
+>>  static inline unsigned int blkdev_nr_zones(struct gendisk *disk)
+>> diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+>> index 42c3366cc25f..e5adf4a9f4b0 100644
+>> --- a/include/uapi/linux/blkzoned.h
+>> +++ b/include/uapi/linux/blkzoned.h
+>> @@ -77,9 +77,11 @@ enum blk_zone_cond {
+>>   * enum blk_zone_report_flags - Feature flags of reported zone descriptors.
+>>   *
+>>   * @BLK_ZONE_REP_CAPACITY: Zone descriptor has capacity field.
+>> + * @BLK_ZONE_REP_OFFLINE : Zone device supports offline transition.
+>
+>The device supports explicit zone offline transition
+>
+>Since the implicit transition by the device may happen, even on SMR disks.
+>
+>But I am not sure this flags is very useful. Or rather, isn't it out of place
+>here ? Device features are normally reported through sysfs (e.g. discard, etc).
+>It is certainly confusing and not matching the user doc for rep.flag which
+>states that the flags are about the zone descriptors, not what the device can
+>do. So at the very least, the comments need to change.
+>
+>The other thing is that the implementation does not consider device mapper case
+>again: if a DM target is built on one or more ZNS drives all supporting zone
+>offline, then the target should be allowed to report zone offline support too,
+>no ? dm-linear and dm-flakey certainly should be allowed to do that. Exporting a
+>"zone_offline" (or something like named that) sysfs limit would allow that to be
+>supported easily through limit stacking and avoid the need for the report flag.
+
+I can add that too. I left it out as I did not add any implementation on
+top of it for the device mapper itself. If this is the way that it makes
+sense, then we can add it to the different device mappers later on.
+
+>
+>Happy to here others opinion about this one though.
+>
+>>   */
+>>  enum blk_zone_report_flags {
+>>  	BLK_ZONE_REP_CAPACITY	= (1 << 0),
+>> +	BLK_ZONE_REP_OFFLINE	= (1 << 1),
+>>  };
+>>
+>>  /**
+>> @@ -166,5 +168,6 @@ struct blk_zone_range {
+>>  #define BLKOPENZONE	_IOW(0x12, 134, struct blk_zone_range)
+>>  #define BLKCLOSEZONE	_IOW(0x12, 135, struct blk_zone_range)
+>>  #define BLKFINISHZONE	_IOW(0x12, 136, struct blk_zone_range)
+>> +#define BLKOFFLINEZONE	_IOW(0x12, 137, struct blk_zone_range)
+>>
+>>  #endif /* _UAPI_BLKZONED_H */
 >>
 >
->And you are missing device-mapper support. DM target devices have a request
->queue that would need to set the zone_flags too.
-
-Ok. I looked at it and I thought that this would be inherited by the
-underlying device. I will add it in V3.
-
-Javier
 
