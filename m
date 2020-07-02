@@ -2,102 +2,161 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F89C433E2
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 16:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4109C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 16:42:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8191520720
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 16:23:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA52B20720
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 16:42:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726615AbgGBQXO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 12:23:14 -0400
-Received: from smtprelay0229.hostedemail.com ([216.40.44.229]:53202 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726140AbgGBQXN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Jul 2020 12:23:13 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay04.hostedemail.com (Postfix) with ESMTP id 53EF6180A813A;
-        Thu,  2 Jul 2020 16:23:11 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: eggs64_191235726e8a
-X-Filterd-Recvd-Size: 3163
-Received: from XPS-9350.home (unknown [47.151.133.149])
-        (Authenticated sender: joe@perches.com)
-        by omf06.hostedemail.com (Postfix) with ESMTPA;
-        Thu,  2 Jul 2020 16:23:08 +0000 (UTC)
-Message-ID: <f65392bbd1732eff72d5b24c5ba3ea230ab2a3ae.camel@perches.com>
-Subject: Re: [PATCH v2 08/16] spi: davinci: Remove uninitialized_var() usage
-From:   Joe Perches <joe@perches.com>
-To:     Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Andy Whitcroft <apw@canonical.com>, x86@kernel.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        b43-dev@lists.infradead.org, netdev@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-mm@kvack.org,
-        clang-built-linux@googlegroups.com
-Date:   Thu, 02 Jul 2020 09:23:07 -0700
-In-Reply-To: <202007020839.545A571CA4@keescook>
-References: <20200620033007.1444705-1-keescook@chromium.org>
-         <20200620033007.1444705-9-keescook@chromium.org>
-         <20200701203920.GC3776@sirena.org.uk> <202007020819.318824DA@keescook>
-         <20200702152335.GJ4483@sirena.org.uk> <202007020839.545A571CA4@keescook>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.36.3-0ubuntu1 
+        id S1726199AbgGBQm3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 12:42:29 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46800 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726140AbgGBQm3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Jul 2020 12:42:29 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 50E20ADC0;
+        Thu,  2 Jul 2020 16:42:27 +0000 (UTC)
+Subject: Re: [PATCH] blk-mq: release driver tag before freeing request via
+ .end_io
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+References: <20200702134838.2822844-1-ming.lei@redhat.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <383fa210-cf08-740c-cb39-a2564a7934ea@suse.de>
+Date:   Thu, 2 Jul 2020 18:42:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200702134838.2822844-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2020-07-02 at 08:42 -0700, Kees Cook wrote:
-> On Thu, Jul 02, 2020 at 04:23:35PM +0100, Mark Brown wrote:
-> > On Thu, Jul 02, 2020 at 08:21:40AM -0700, Kees Cook wrote:
-> > > On Wed, Jul 01, 2020 at 09:39:20PM +0100, Mark Brown wrote:
-> > > > Please copy maintainers on patches :(
-> > > Hi! Sorry about that; the CC list was giant, so I had opted for using
-> > > subsystem mailing lists where possible.
-> > 
-> > If you're going to err in a direction there I'd err in the direction of
-> > CCing the people not the list - I only saw this since I was looking for
-> > something else, I don't normally see stuff in the mailing list folder.
+On 7/2/20 3:48 PM, Ming Lei wrote:
+> The built-in flush request shares tag with the request inserted to flush
+> machinery, turns out its .end_io callback has to touch the built-in
+> flush request's internal tag or tag.
 > 
-> Yeah, I've gotten conflicting feedback on treewide changes:
-> - please CC me on only the one patch, I don't want to see everything else
-> - please CC me on the whole series, I want the full context for the change
+> On the other hand, we have to make sure that driver tag is released
+> from __blk_mq_end_request(), since this request may not be completed
+> via blk_mq_complete_request().
 > 
-> I opted toward "CC me on this series", but then I get stuck when the CC
-> is giant. I think I may switch back to individual CCs for specific
-> patches, and point people to lore if they want greater context. (lore
-> didn't exist before...)
+> Given we have moved blk_mq_put_driver_tag() out of header file, fix this
+> issue by releasing driver tag before calling .end_io().
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Fixes: 36a3df5a4574("blk-mq: put driver tag when this request is completed")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-mq.c | 46 ++++++++++++++++++++++++----------------------
+>   1 file changed, 24 insertions(+), 22 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 948987e9b6ab..6b36969220c1 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -532,6 +532,26 @@ void blk_mq_free_request(struct request *rq)
+>   }
+>   EXPORT_SYMBOL_GPL(blk_mq_free_request);
+>   
+> +static void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+> +		struct request *rq)
+> +{
+> +	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+> +	rq->tag = BLK_MQ_NO_TAG;
+> +
+> +	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+> +		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+> +		atomic_dec(&hctx->nr_active);
+> +	}
+> +}
+> +
+> +static inline void blk_mq_put_driver_tag(struct request *rq)
+> +{
+> +	if (rq->tag == BLK_MQ_NO_TAG || rq->internal_tag == BLK_MQ_NO_TAG)
+> +		return;
+> +
+> +	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
+> +}
+> +
+>   inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+>   {
+>   	u64 now = 0;
+> @@ -551,6 +571,7 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+>   
+>   	if (rq->end_io) {
+>   		rq_qos_done(rq->q, rq);
+> +		blk_mq_put_driver_tag(rq);
+>   		rq->end_io(rq, error);
+>   	} else {
+>   		blk_mq_free_request(rq);
+> @@ -660,26 +681,6 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
+>   	return cpu_online(rq->mq_ctx->cpu);
+>   }
+>   
+> -static void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+> -		struct request *rq)
+> -{
+> -	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+> -	rq->tag = BLK_MQ_NO_TAG;
+> -
+> -	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+> -		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+> -		atomic_dec(&hctx->nr_active);
+> -	}
+> -}
+> -
+> -static inline void blk_mq_put_driver_tag(struct request *rq)
+> -{
+> -	if (rq->tag == BLK_MQ_NO_TAG || rq->internal_tag == BLK_MQ_NO_TAG)
+> -		return;
+> -
+> -	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
+> -}
+> -
+>   bool blk_mq_complete_request_remote(struct request *rq)
+>   {
+>   	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+> @@ -983,9 +984,10 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+>   	if (blk_mq_req_expired(rq, next))
+>   		blk_mq_rq_timed_out(rq, reserved);
+>   
+> -	if (is_flush_rq(rq, hctx))
+> +	if (is_flush_rq(rq, hctx)) {
+> +		blk_mq_put_driver_tag(rq);
+>   		rq->end_io(rq, 0);
+> -	else if (refcount_dec_and_test(&rq->ref))
+> +	} else if (refcount_dec_and_test(&rq->ref))
+>   		__blk_mq_free_request(rq);
+>   
+>   	return true;
+> 
+Hmm.
+Let's hope that no-one in the ->end_io() handler will need to look at 
+the tag, because that's gone now.
 
-IMO:
+But if that fixes the flush machinery:
 
-For a patch series that spans multiple subsystems,
-each patch should always CC any specific subsystem
-maintainers..
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-A good trick would be to use the cover letter
-message-id: and have each individual patch in the
-series reference the cover letter id below the
---- line so any reviewer doesn't have to find the
-in-reply-to: message id and then reference the
-lore link.
+Cheers,
 
-Something like:
-
----
-
-For complete series see: https://lore.kernel.org/r/<cover_letter_message_id>
-
-
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
