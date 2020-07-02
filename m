@@ -2,143 +2,209 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96769C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 10:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07656C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 10:18:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D3962084C
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 10:02:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1D3320780
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 10:18:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="jcXYO2C3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728331AbgGBKCQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 06:02:16 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:33962 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728193AbgGBKCP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 06:02:15 -0400
-Received: by mail-io1-f72.google.com with SMTP id i5so8463040iow.1
-        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 03:02:15 -0700 (PDT)
+        id S1727860AbgGBKSW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 06:18:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36560 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727769AbgGBKSV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 06:18:21 -0400
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81BF4C08C5C1
+        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 03:18:21 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id rk21so28674938ejb.2
+        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 03:18:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=xbWDHuFi/asrt9wfewvCpHAZIXQkTs3SNUDtcY1u8hU=;
+        b=jcXYO2C3KpOvz2vxbAF9UuZbvbe1p7N9wWO46hx2xV5iYz+16cf2tv5D0tdiFN35av
+         cNjIfrHtOFD05lCWRB2p/K2kh968Jzhy4e3ttjGUPMABoxAUfIQH23QS7hhnogrQgfbv
+         RxxPdsJmync1TQe6wv3YNdlkbFvhEV3XFR3xSGtv2wstx+aDlw5f5etM9ZBAjs2e6cl+
+         KFkBE/uy8iAoFYXqqGSvRf2eGpBoLYvpSHM/L9HJptaSrhBBxiShXAO1zPqnAgiggRUn
+         X13epM/lUnJTra/507kFIU9IZFLFJsRTDLMjJwxKcCFkR73REtWtyAa7i+5O/G4PVFtt
+         oi9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=I2TZiyWWg+x4g0ftnTY+ci49EZOdDdJP5dPgJjQJwsY=;
-        b=tKPeCrt8E5Cn5GGie//hn1wIEOLHHdCfqpt2IUnWQhh8pS/PiLJ4QtbsgHm0RaxTWC
-         vMUmLJaqYjk0kBiIg4PToCA91+NX6yVmUhLTu8vg46oLsX4VppKLQBLiWm0dT2UtJNwX
-         9zDfnbRGjaQOOXFx22bmxMC79OjchSoePglnvZzFACbvoD61vXjj+o2fJPx5X5PT9HGj
-         k7uEI+y42343Rj8gHYHkEGIojAbaHhzRzJLtOqIXiQQpQbckmIL0JPE9wRWUZABOBwzK
-         lBbzzxC3o1kKEcAf1HmFLrj9T/B/Al11w+ieWDKdQVf+dWoeOA0BgVjLQwI56QtyPmhO
-         99GA==
-X-Gm-Message-State: AOAM530/Ok0cR1aER2x1kUFpBxQQMm9/h5QfALU+Q7oR+skCPlf9yxXq
-        HWmJ6lOb6gacfO+0FbGLn/C6P2oimS/XH9urNfqJW0ObO9gx
-X-Google-Smtp-Source: ABdhPJwWFsGZdUwNgwwL/ZmJRM0bbrRycFiGovtXtYUFJl3vRmUcVyotoaJKtU4bmn1JJjWjWZoSBiqDMEqogG9ysN5+HCIvwtaR
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=xbWDHuFi/asrt9wfewvCpHAZIXQkTs3SNUDtcY1u8hU=;
+        b=WHDWCsTG5b7/X3FwayWl3WQqg2SnFR8J1W1RIIPA74YNMYUhXS4DfP7uoIpZ1dMkks
+         dj3Q14O0dOufvwMOxdICyhGZRsLIvoqxf9gd3S7XxUIRT1iMVMg1wQEaucKUo+AGGhXH
+         Kt/OYjuDT0BJh7FuS2s0wpT/63NhngfcJsXffC1fhFNZSdwb/TaHh6XsGhqSZCI3AGKB
+         MoO/oYsrvuqXU8mNEb9BUVfXRWREyY73gpL6VcACecgPnXOHELxiRVihRr8lRno/yYQk
+         B1NOes+ZcsACjiTypACKHK6l2ivxCV+aIR9P0LgX+VtN+Z/fjQP4F+8aC5fgC90ikSz/
+         /7+w==
+X-Gm-Message-State: AOAM531Ge4qsfQlPahpt1oVd2Hs4bw4GcELFuwxmjiVlootePCHvkIa7
+        cj599hpQuUXQkvTNqOQ181VFyg==
+X-Google-Smtp-Source: ABdhPJyT2g6O3CfkBUhFCbbksffwPXhxQC9QzTc0kfnvqAD2Rt0+u2BvJlNloBVXAkXCrroe0BR2zw==
+X-Received: by 2002:a17:907:7244:: with SMTP id ds4mr17235363ejc.509.1593685100092;
+        Thu, 02 Jul 2020 03:18:20 -0700 (PDT)
+Received: from localhost ([194.62.217.57])
+        by smtp.gmail.com with ESMTPSA id a37sm9289788edf.86.2020.07.02.03.18.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jul 2020 03:18:19 -0700 (PDT)
+Date:   Thu, 2 Jul 2020 12:18:18 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org" <kbusch@kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "mb@lightnvm.io" <mb@lightnvm.io>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [PATCH v3 1/4] block: Add zone flags to queue zone prop.
+Message-ID: <20200702101818.letttarzs4pwi7os@mpHalley.local>
+References: <20200702092438.63717-1-javier@javigon.com>
+ <20200702092438.63717-2-javier@javigon.com>
+ <CY4PR04MB37519E324412FC96FDE6BFC1E76D0@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:4409:: with SMTP id r9mr6501262ioa.158.1593684134778;
- Thu, 02 Jul 2020 03:02:14 -0700 (PDT)
-Date:   Thu, 02 Jul 2020 03:02:14 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bcdeaa05a97280e4@google.com>
-Subject: linux-next test error: KASAN: stack-out-of-bounds Read in bio_alloc_bioset
-From:   syzbot <syzbot+bf04628c1f6179269b0b@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
-        sfr@canb.auug.org.au, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CY4PR04MB37519E324412FC96FDE6BFC1E76D0@CY4PR04MB3751.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 02.07.2020 09:46, Damien Le Moal wrote:
+>On 2020/07/02 18:25, Javier González wrote:
+>> From: Javier González <javier.gonz@samsung.com>
+>>
+>> As the zoned block device will have to deal with features that are
+>> optional for the backend device, add a flag field to inform the block
+>> layer about supported features. This builds on top of
+>> blk_zone_report_flags and extendes to the zone report code.
+>>
+>> Signed-off-by: Javier González <javier.gonz@samsung.com>
+>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>> ---
+>>  block/blk-zoned.c              | 3 ++-
+>>  drivers/block/null_blk_zoned.c | 2 ++
+>>  drivers/nvme/host/zns.c        | 1 +
+>>  drivers/scsi/sd.c              | 2 ++
+>>  include/linux/blkdev.h         | 3 +++
+>>  5 files changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+>> index 81152a260354..0f156e96e48f 100644
+>> --- a/block/blk-zoned.c
+>> +++ b/block/blk-zoned.c
+>> @@ -312,7 +312,8 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
+>>  		return ret;
+>>
+>>  	rep.nr_zones = ret;
+>> -	rep.flags = BLK_ZONE_REP_CAPACITY;
+>> +	rep.flags = q->zone_flags;
+>
+>*all* zoned devices support capacity. So why changing this ?
+>You are only forcing adding setting the queue flags for all device drivers. That
+>is more code.
+>
+>> +
+>
+>White line change
+>
+>>  	if (copy_to_user(argp, &rep, sizeof(struct blk_zone_report)))
+>>  		return -EFAULT;
+>>  	return 0;
+>> diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+>> index b05832eb21b2..957c2103f240 100644
+>> --- a/drivers/block/null_blk_zoned.c
+>> +++ b/drivers/block/null_blk_zoned.c
+>> @@ -78,6 +78,8 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+>>  	}
+>>
+>>  	q->limits.zoned = BLK_ZONED_HM;
+>> +	q->zone_flags = BLK_ZONE_REP_CAPACITY;
+>> +
+>
+>White line change
+>
+>>  	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+>>  	blk_queue_required_elevator_features(q, ELEVATOR_F_ZBD_SEQ_WRITE);
+>>
+>> diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+>> index c08f6281b614..afe62dc27ff7 100644
+>> --- a/drivers/nvme/host/zns.c
+>> +++ b/drivers/nvme/host/zns.c
+>> @@ -81,6 +81,7 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+>>  	}
+>>
+>>  	q->limits.zoned = BLK_ZONED_HM;
+>> +	q->zone_flags = BLK_ZONE_REP_CAPACITY;
+>>  	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+>>  free_data:
+>>  	kfree(id);
+>> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+>> index d90fefffe31b..b9c920bace28 100644
+>> --- a/drivers/scsi/sd.c
+>> +++ b/drivers/scsi/sd.c
+>> @@ -2967,6 +2967,7 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
+>>  	if (sdkp->device->type == TYPE_ZBC) {
+>>  		/* Host-managed */
+>>  		q->limits.zoned = BLK_ZONED_HM;
+>> +		q->zone_flags = BLK_ZONE_REP_CAPACITY;
+>>  	} else {
+>>  		sdkp->zoned = (buffer[8] >> 4) & 3;
+>>  		if (sdkp->zoned == 1 && !disk_has_partitions(sdkp->disk)) {
+>> @@ -2983,6 +2984,7 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
+>>  					  "Drive-managed SMR disk\n");
+>>  		}
+>>  	}
+>> +
+>
+>White line change
+>
+>>  	if (blk_queue_is_zoned(q) && sdkp->first_scan)
+>>  		sd_printk(KERN_NOTICE, sdkp, "Host-%s zoned block device\n",
+>>  		      q->limits.zoned == BLK_ZONED_HM ? "managed" : "aware");
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 8fd900998b4e..3f2e3425fa53 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -512,12 +512,15 @@ struct request_queue {
+>>  	 * Stacking drivers (device mappers) may or may not initialize
+>>  	 * these fields.
+>>  	 *
+>> +	 * Flags represent features as described by blk_zone_report_flags in blkzoned.h
+>> +	 *
+>>  	 * Reads of this information must be protected with blk_queue_enter() /
+>>  	 * blk_queue_exit(). Modifying this information is only allowed while
+>>  	 * no requests are being processed. See also blk_mq_freeze_queue() and
+>>  	 * blk_mq_unfreeze_queue().
+>>  	 */
+>>  	unsigned int		nr_zones;
+>> +	unsigned int		zone_flags;
+>>  	unsigned long		*conv_zones_bitmap;
+>>  	unsigned long		*seq_zones_wlock;
+>>  #endif /* CONFIG_BLK_DEV_ZONED */
+>>
+>
+>And you are still breaking device mapper targets report zones with this patch.
 
-syzbot found the following crash on:
+Yes. I mentioned in the version changes that I only fixed a bad commit
+with debug code. I'll address this in a new version when the use of the
+feature bit is clarified (i.e., keep it this way or move to sysfs).
 
-HEAD commit:    d37d5704 Add linux-next specific files for 20200702
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1549d0a3100000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a0a0972a399422ff
-dashboard link: https://syzkaller.appspot.com/bug?extid=bf04628c1f6179269b0b
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+bf04628c1f6179269b0b@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: stack-out-of-bounds in bio_list_empty include/linux/bio.h:561 [inline]
-BUG: KASAN: stack-out-of-bounds in bio_alloc_bioset+0x5b2/0x5d0 block/bio.c:482
-Read of size 8 at addr ffffc90000fc7150 by task kworker/u4:4/169
-
-CPU: 0 PID: 169 Comm: kworker/u4:4 Not tainted 5.8.0-rc3-next-20200702-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: writeback wb_workfn (flush-8:0)
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x18f/0x20d lib/dump_stack.c:118
- print_address_description.constprop.0.cold+0x5/0x436 mm/kasan/report.c:383
- __kasan_report mm/kasan/report.c:513 [inline]
- kasan_report.cold+0x1f/0x37 mm/kasan/report.c:530
- bio_list_empty include/linux/bio.h:561 [inline]
- bio_alloc_bioset+0x5b2/0x5d0 block/bio.c:482
- bio_clone_fast+0x21/0x1b0 block/bio.c:710
- bio_split+0xc7/0x2c0 block/bio.c:1477
- blk_bio_segment_split block/blk-merge.c:281 [inline]
- __blk_queue_split+0x10e2/0x1650 block/blk-merge.c:331
- blk_mq_submit_bio+0x1b0/0x1760 block/blk-mq.c:2169
- __submit_bio_noacct_mq block/blk-core.c:1181 [inline]
- submit_bio_noacct+0xc9e/0x12d0 block/blk-core.c:1214
- submit_bio+0x263/0x5b0 block/blk-core.c:1284
- ext4_io_submit fs/ext4/page-io.c:382 [inline]
- io_submit_add_bh fs/ext4/page-io.c:423 [inline]
- ext4_bio_write_page+0x9a8/0x1c27 fs/ext4/page-io.c:550
- mpage_submit_page+0x140/0x2c0 fs/ext4/inode.c:2082
- mpage_map_and_submit_buffers fs/ext4/inode.c:2330 [inline]
- mpage_map_and_submit_extent fs/ext4/inode.c:2469 [inline]
- ext4_writepages+0x237e/0x3960 fs/ext4/inode.c:2782
- do_writepages+0xec/0x290 mm/page-writeback.c:2352
- __writeback_single_inode+0x125/0x1400 fs/fs-writeback.c:1461
- writeback_sb_inodes+0x53d/0xf40 fs/fs-writeback.c:1721
- __writeback_inodes_wb+0xc6/0x280 fs/fs-writeback.c:1790
- wb_writeback+0x8bb/0xd40 fs/fs-writeback.c:1896
- wb_check_background_flush fs/fs-writeback.c:1964 [inline]
- wb_do_writeback fs/fs-writeback.c:2052 [inline]
- wb_workfn+0xb20/0x13e0 fs/fs-writeback.c:2080
- process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
- kthread+0x3b5/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-
-
-addr ffffc90000fc7150 is located in stack of task kworker/u4:4/169 at offset 80 in frame:
- arch_atomic64_read arch/x86/include/asm/atomic64_64.h:22 [inline]
- arch_atomic64_fetch_add_unless include/linux/atomic-arch-fallback.h:2195 [inline]
- arch_atomic64_add_unless include/linux/atomic-arch-fallback.h:2220 [inline]
- arch_atomic64_inc_not_zero include/linux/atomic-arch-fallback.h:2236 [inline]
- atomic64_inc_not_zero include/asm-generic/atomic-instrumented.h:1609 [inline]
- atomic_long_inc_not_zero include/asm-generic/atomic-long.h:497 [inline]
- percpu_ref_tryget_live include/linux/percpu-refcount.h:282 [inline]
- submit_bio_noacct+0x0/0x12d0 block/blk-core.c:433
-
-this frame has 3 objects:
- [32, 40) 'bio'
- [64, 80) 'bio_list'
- [96, 128) 'bio_list_on_stack'
-
-Memory state around the buggy address:
- ffffc90000fc7000: 00 00 00 f2 f2 f2 00 00 00 00 00 f3 f3 f3 f3 f3
- ffffc90000fc7080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffffc90000fc7100: f1 f1 f1 f1 00 f2 f2 f2 00 00 f2 f2 00 00 00 00
-                                                 ^
- ffffc90000fc7180: f3 f3 f3 f3 00 00 00 00 00 00 00 00 00 00 00 00
- ffffc90000fc7200: 00 00 00 f1 f1 f1 f1 00 f2 f2 f2 00 00 00 00 f3
-==================================================================
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Javier
