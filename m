@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D090C433E1
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 01:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 364CAC433E1
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 01:32:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7386D20884
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 01:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A22A20748
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 01:32:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1593653462;
-	bh=2Z8yd9Hrf9PnWZtHopSUaQ1KmI9By6p9fMY4XUXGzNk=;
+	s=default; t=1593653554;
+	bh=PSzzfbTuoUNF3dRKfP49WxHtPiD1fc3IO882Ix6zJLg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=x7Mf9eYtAcYDg5MgWfqQby60XLebHKFQA4Jb50BJmEl3ZPH5sqKhezcpv+Qd1d+YT
-	 WG1jkY2A7dPWILXdxIosMVKRkM8iCos0m7SseM4qNJQu/SNWDSq/sbIBXiHZ47M5+i
-	 lgcJqCmG44tO3Rw8vfRrhPMDXMIEe8zVdPg7vZgo=
+	b=mZJjJteJAa9aJh3/qf+YD+2nUsy26eOwsIyDHkCYX56N26KQHl69rfbMcRPyXrcTz
+	 OhA4x4C/pq5NTKxgsY0xH9dgyumnhybI4Jck4dwml06nUERfs//TxNbDqhQE5qWTLn
+	 GyOfyGEDPDsgvNDUybvx/MAgsmmw1ThcCHOLKLfI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729056AbgGBBa5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 21:30:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58302 "EHLO mail.kernel.org"
+        id S1729100AbgGBB0K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 21:26:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57378 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729271AbgGBB0p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Jul 2020 21:26:45 -0400
+        id S1729089AbgGBB0K (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Jul 2020 21:26:10 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8E6F120874;
-        Thu,  2 Jul 2020 01:26:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AAFC120B80;
+        Thu,  2 Jul 2020 01:26:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593653205;
-        bh=2Z8yd9Hrf9PnWZtHopSUaQ1KmI9By6p9fMY4XUXGzNk=;
+        s=default; t=1593653169;
+        bh=PSzzfbTuoUNF3dRKfP49WxHtPiD1fc3IO882Ix6zJLg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dI8bSm3C9zA9D07zmFeK6FMaQes5B+KmjPMDQEyKUH5YDcJTBTiHltyS+lpXGElas
-         gLPhUvwQzcD4z/do4uopefzZf6BnmPygNfWp0i1rZVvLo2CqBEP1c/8K1IEmZwz4my
-         MaOqv+Cxzkt/hX8rOJ26+SpOnqnEPvjoIdFNA2+A=
+        b=Dd+JmM3qbLK+efRttCUN+1oxjrSDLVNLj5yQXEMfmIq5J4EmwBuyAQaXoZJvXqJbS
+         QQ9gY46SHOg1D2LrtnaRntY/dj4c6aQWMgjw55MwRRWiAeCkBJVs+kszZHUNhniXNS
+         NX7PvDHpJHkFu/Cc7zIcY7jAfGm9kFXoXi9x5g0k=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Chengguang Xu <cgxu519@mykernel.net>,
@@ -45,12 +45,12 @@ Cc:     Chengguang Xu <cgxu519@mykernel.net>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 24/27] block: release bip in a right way in error path
-Date:   Wed,  1 Jul 2020 21:26:12 -0400
-Message-Id: <20200702012615.2701532-24-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 36/40] block: release bip in a right way in error path
+Date:   Wed,  1 Jul 2020 21:23:57 -0400
+Message-Id: <20200702012402.2701121-36-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200702012615.2701532-1-sashal@kernel.org>
-References: <20200702012615.2701532-1-sashal@kernel.org>
+In-Reply-To: <20200702012402.2701121-1-sashal@kernel.org>
+References: <20200702012402.2701121-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 14 insertions(+), 9 deletions(-)
 
 diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 5bd90cd4b51e3..d3ef211d006ef 100644
+index bf62c25cde8f4..1d173feb38831 100644
 --- a/block/bio-integrity.c
 +++ b/block/bio-integrity.c
-@@ -38,6 +38,18 @@ void blk_flush_integrity(void)
+@@ -24,6 +24,18 @@ void blk_flush_integrity(void)
  	flush_workqueue(kintegrityd_wq);
  }
  
@@ -99,7 +99,7 @@ index 5bd90cd4b51e3..d3ef211d006ef 100644
  /**
   * bio_integrity_alloc - Allocate integrity payload and attach it to bio
   * @bio:	bio to attach integrity metadata to
-@@ -90,7 +102,7 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
+@@ -75,7 +87,7 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
  
  	return bip;
  err:
@@ -108,7 +108,7 @@ index 5bd90cd4b51e3..d3ef211d006ef 100644
  	return ERR_PTR(-ENOMEM);
  }
  EXPORT_SYMBOL(bio_integrity_alloc);
-@@ -111,14 +123,7 @@ static void bio_integrity_free(struct bio *bio)
+@@ -96,14 +108,7 @@ void bio_integrity_free(struct bio *bio)
  		kfree(page_address(bip->bip_vec->bv_page) +
  		      bip->bip_vec->bv_offset);
  
