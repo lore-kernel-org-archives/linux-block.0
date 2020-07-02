@@ -2,138 +2,123 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 987E6C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 15:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255EAC433E0
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 15:42:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 760C1208D5
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 15:42:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 045B6208D5
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 15:42:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="lsdTsq2i"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="T+sAuD3l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730214AbgGBPmd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 11:42:33 -0400
-Received: from mailout4.samsung.com ([203.254.224.34]:50288 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728754AbgGBPmO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 11:42:14 -0400
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20200702154210epoutp0447a725c5c59666fb8b620c00402a5a41~d_dOIl8cR0370403704epoutp04T
-        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 15:42:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20200702154210epoutp0447a725c5c59666fb8b620c00402a5a41~d_dOIl8cR0370403704epoutp04T
+        id S1728754AbgGBPme (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 11:42:34 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:49562 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726353AbgGBPmJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 11:42:09 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200702154206epoutp0270d717cf158dc162396a471c49a5a429~d_dLEooS41594515945epoutp02P
+        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 15:42:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200702154206epoutp0270d717cf158dc162396a471c49a5a429~d_dLEooS41594515945epoutp02P
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1593704530;
-        bh=K2+mo5xwtG55Pc3yxkOmmDHced+n9HmetT3RPTBR6qo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lsdTsq2iD8fvVh5VNbFGBMQ/P2EE73NS4bOpy1C3SagWi47RvzS8ClZ0fBdJgX1Tf
-         +yYA6etUGBCXh0Pcl55VfHPrv2ncP7/q+r0E0ElYPfnqI3WvR6cUaDW3vk0tKMRvPU
-         I49W85ySCeyD9d6ZmHR1i/AlZHLd9hdku2jtTcto=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20200702154209epcas5p32cccb69e788b0aebef47dc18e38c6a86~d_dNpPej60760807608epcas5p33;
-        Thu,  2 Jul 2020 15:42:09 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        AE.F4.09703.1500EFE5; Fri,  3 Jul 2020 00:42:09 +0900 (KST)
+        s=mail20170921; t=1593704526;
+        bh=hysM3c4xp8mz2RoHJXjNUcMrUuaAnVpURb0TToaAgcg=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=T+sAuD3lgv9FTnfubK66Ip5wYe4fDi1Bo9Cs6gOY8M4X++maQYnZoK4ITD7aXEgEC
+         dEfHG2SerCXKPLtsFYyLoi0pd4hlQmb/N65OW5OEgTZhQBjFtSQ+U5Khu49Wcd1iKW
+         tJp4yVDRhLolQDzzRH7XF0pSfwQ28yezrX4NFdoQ=
+Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20200702154206epcas5p16cf30866565a800b0b47ddddd035ac44~d_dKdLsG52199921999epcas5p1u;
+        Thu,  2 Jul 2020 15:42:06 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        AA.93.09475.D400EFE5; Fri,  3 Jul 2020 00:42:06 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20200702154208epcas5p39fe202f642a9d5c8dde9b911645c594c~d_dNAacFJ0760807608epcas5p32;
-        Thu,  2 Jul 2020 15:42:08 +0000 (GMT)
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20200702154204epcas5p15106774a3d556b77050710722da89922~d_dJR0RxH0362503625epcas5p12;
+        Thu,  2 Jul 2020 15:42:04 +0000 (GMT)
 Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
         epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20200702154208epsmtrp267a36aa897c5d7f936c14f2572b63871~d_dM-igcg1523715237epsmtrp2H;
-        Thu,  2 Jul 2020 15:42:08 +0000 (GMT)
-X-AuditID: b6c32a4a-4cbff700000025e7-7c-5efe00515716
+        20200702154204epsmtrp28b3a1b4bd241cf66c1da132bc730a710~d_dJQ7Fn91523715237epsmtrp2G;
+        Thu,  2 Jul 2020 15:42:04 +0000 (GMT)
+X-AuditID: b6c32a4b-39fff70000002503-0f-5efe004da22b
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
         epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A2.3A.08382.0500EFE5; Fri,  3 Jul 2020 00:42:08 +0900 (KST)
+        02.3A.08382.C400EFE5; Fri,  3 Jul 2020 00:42:04 +0900 (KST)
 Received: from localhost.localdomain (unknown [107.110.206.5]) by
         epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20200702154206epsmtip10254bcf4288da0e1fe7b88f3d3197880~d_dLAKyfU2838528385epsmtip13;
-        Thu,  2 Jul 2020 15:42:06 +0000 (GMT)
+        20200702154203epsmtip14afc6ea65b1b130ba47eeba550dbd81a~d_dHyOAFO2839128391epsmtip1o;
+        Thu,  2 Jul 2020 15:42:03 +0000 (GMT)
 From:   Kanchan Joshi <joshi.k@samsung.com>
 To:     axboe@kernel.dk, kbusch@kernel.org
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         hch@lst.de, Damien.LeMoal@wdc.com,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Selvakumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-Subject: [PATCH 1/2] block: fix error code for zone-append
-Date:   Thu,  2 Jul 2020 21:08:49 +0530
-Message-Id: <1593704330-11540-2-git-send-email-joshi.k@samsung.com>
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH 0/2] fix/extend zone-append in block-layer
+Date:   Thu,  2 Jul 2020 21:08:48 +0530
+Message-Id: <1593704330-11540-1-git-send-email-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1593704330-11540-1-git-send-email-joshi.k@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCIsWRmVeSWpSXmKPExsWy7bCmhm4gw784gz8XpCx+T5/CarH6bj+b
-        RWv7NyaLlauPMlk8vvOZ3eLo/7dsFpMOXWO02HtL2+LyrjlsFtt+z2e2uDJlEbPF6x8n2Rx4
-        PC6fLfXYtKqTzWP3zQY2j74tqxg9Pm+S82g/0M0UwBbFZZOSmpNZllqkb5fAlXHr8AOmgjls
-        FSeW/GNvYOxn7WLk5JAQMJG439rD1sXIxSEksJtR4tiKd1DOJ0aJJVfmM0E43xglVrYfZuli
-        5ABrWfRPHSK+F6ho0VNWCOczo8TG20sZQYrYBDQlLkwuBVkhIqAmsXfRJ7CpzAJtTBKzVlxn
-        B0kIC1hJnH23lwXEZhFQlTi65TkjiM0r4Cxx98gEZoj75CRunusEszkFXCS+zm1kARkkIfCV
-        XWLq9e0sEEUuEr1rVjFB2MISr45vYYewpSQ+v9vLBmEXS/y6c5QZormDUeJ6w0yoZnuJi3v+
-        MoFczQx09fpd+iBhZgE+id7fT5ggPuaV6GgTgqhWlLg36Sk07MQlHs5YAmV7SHx6+AhslZDA
-        dEaJg4s4JzDKzkIYuoCRcRWjZGpBcW56arFpgVFearlecWJucWleul5yfu4mRnDC0PLawfjw
-        wQe9Q4xMHIyHGCU4mJVEeE8b/IoT4k1JrKxKLcqPLyrNSS0+xCjNwaIkzqv040yckEB6Yklq
-        dmpqQWoRTJaJg1Oqgam9yFPGZJlsfcRh7v8ru5W/753K89LQXTjOpDH98r1ZFYeXqW2VYU88
-        dcXVZi7rb9+vfY5nHhlFfp94oXvCqRmy8mdf2aVKJQlZLdn0Uu+HnlHunw+bjjX/unB/l99s
-        eeONGxxeWSbq5juVeOpr/94i3uTgzvbzVLyMTc3q5Eu/WeZt8Nr+M3J9Esdxp31agourPl34
-        8vDl1sXRD/mfRpRvEDH+Xvtp3aXsio06ddvV/G9oS2wJbL9be5TdZc/f6N/fVGr/3nRnvMH3
-        Z8VZqWCJO/PXNtS8eeOqcO9ZQeeMPK2lE08aKoaI+5Rf9IhZFTkt5ZjWncPXU5dFikx3vl0Y
-        IT/X/LUdR27nygqOpmtKLMUZiYZazEXFiQAeGzB+hwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrELMWRmVeSWpSXmKPExsWy7bCSnG4Aw784g3sb9Cx+T5/CarH6bj+b
-        RWv7NyaLlauPMlk8vvOZ3eLo/7dsFpMOXWO02HtL2+LyrjlsFtt+z2e2uDJlEbPF6x8n2Rx4
-        PC6fLfXYtKqTzWP3zQY2j74tqxg9Pm+S82g/0M0UwBbFZZOSmpNZllqkb5fAlXHr8AOmgjls
-        FSeW/GNvYOxn7WLk4JAQMJFY9E+9i5GLQ0hgN6PE1L0zmbsYOYHi4hLN136wQ9jCEiv/PWeH
-        KPrIKLH81kRmkGY2AU2JC5NLQWpEBDQkVnxexgRSwyzQxySx5N0MsGZhASuJs+/2soDYLAKq
-        Eke3PGcEsXkFnCXuHpkAtUxO4ua5TjCbU8BF4uvcRrB6IaCa7W9a2Ccw8i1gZFjFKJlaUJyb
-        nltsWGCYl1quV5yYW1yal66XnJ+7iREcrFqaOxi3r/qgd4iRiYPxEKMEB7OSCO9pg19xQrwp
-        iZVVqUX58UWlOanFhxilOViUxHlvFC6MExJITyxJzU5NLUgtgskycXBKNTBxi96pPnn6yu1D
-        sxPfq/47ZLT4TFWXQvyz39efRVmuWVX3s2bPkUvLWJtfzTO04v1wmMHty1bD8gPnGRLP3QvX
-        /diV+8S+T+2S7QLpNe9rDxw7uiSHd8/i2PvntBjPzP5oWpb7Nq//6am4VQs0FwfWXQ3xXbiE
-        Y6bTrsw0vr9TGUomGLVMP6r518f0fG0cy8W9mkq7L7zIVlc+Elhz0q01nWFtuodRMOPide7G
-        lgv/9ey3Oiqi82YCg9I6Be94yTjtMlfhi5dj3N4feZ3h0nAt3PejcvxnA8GZnrqbP+zfZ3/5
-        1r2bX39LsCzOmn3ImvF85ffXcb5Miqten3APvfq148yhTdXyKopzreTS2ZkmKbEUZyQaajEX
-        FScCADYgtYPFAgAA
-X-CMS-MailID: 20200702154208epcas5p39fe202f642a9d5c8dde9b911645c594c
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGIsWRmVeSWpSXmKPExsWy7bCmuq4fw784g6NtjBa/p09htVh9t5/N
+        orX9G5PFytVHmSyO/n/LZjHp0DVGi723tC0u75rDZnFlyiJmB06Py2dLPTat6mTz2H2zgc2j
+        b8sqRo/Pm+Q82g90MwWwRXHZpKTmZJalFunbJXBlvL1kWXCWpWLC6uesDYyPmLsYOTkkBEwk
+        9u3qAbOFBHYzSjz+w9/FyAVkf2KUePh1OVTiG6NE35EqmIbLn6azQhTtZZTYtLuPCcL5zCix
+        +vYnoA4ODjYBTYkLk0tBGkQE1CT2LvrEBlLDLNDOKPHtcBcbSEJYwEriT287mM0ioCqx7fke
+        FhCbV8BZYtXyRywQ2+Qkbp7rZAZplhA4xC6xbNU5VoiEi8ThR/1QPwhLvDq+hR3ClpL4/G4v
+        G4RdLPHrzlGo5g5GiesNM6Gm2ktc3POXCeRSZqBL1+/SBwkzC/BJ9P5+AhaWEOCV6GgTgqhW
+        lLg36SnUWnGJhzOWQNkeEm9ufmcFKRcSiJVYdcZ5AqPMLISZCxgZVzFKphYU56anFpsWGOel
+        lusVJ+YWl+al6yXn525iBEe9lvcOxkcPPugdYmTiYDzEKMHBrCTCe9rgV5wQb0piZVVqUX58
+        UWlOavEhRmkOFiVxXqUfZ+KEBNITS1KzU1MLUotgskwcnFINTObtDiqbf93SE2G1mrnYV8bJ
+        Q/RyZP+uLTlM/zJTTxcXCIgsWrpvVcU0s90TVKs9+vdH5bQfPywYIflNcxpXQWvGRzdb3ZfH
+        so+4T16w02ylTHC0usXFlD3Js3ltalMcNTf9UzwSr7ljUzTLx2Uivx6H7BafzHTJ2Wbb1a8z
+        r86IsvKP1UnfuyRm2p/45+vNo2e5uQXfyrM/wPJSxCOnKvr5XaaQe4qisSt+6vscS8qv4Ndb
+        5Z5v3ORWICVoFr5tg+zsRyIJEqePPjPd6bJX2fqHydYwIYvAvXJZ8lveftTJr+9jUuQ1bi55
+        d23R/Y3a8x+nLF+pMdNWI0pucv9EHQ1Hq8U7BaXLt7PGPtyoxFKckWioxVxUnAgABli55WkD
+        AAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupmluLIzCtJLcpLzFFi42LZdlhJTteH4V+cwbFXuha/p09htVh9t5/N
+        orX9G5PFytVHmSyO/n/LZjHp0DVGi723tC0u75rDZnFlyiJmB06Py2dLPTat6mTz2H2zgc2j
+        b8sqRo/Pm+Q82g90MwWwRXHZpKTmZJalFunbJXBlvL1kWXCWpWLC6uesDYyPmLsYOTkkBEwk
+        Ln+aztrFyMUhJLCbUWLX26NQCXGJ5ms/2CFsYYmV/56zQxR9ZJTo3vabpYuRg4NNQFPiwuRS
+        kBoRAQ2JFZ+XMYHUMAv0Mkp8/zuFESQhLGAl8ae3nQ3EZhFQldj2fA8LiM0r4CyxavkjFogF
+        chI3z3UyT2DkWcDIsIpRMrWgODc9t9iwwDAvtVyvODG3uDQvXS85P3cTIzi8tDR3MG5f9UHv
+        ECMTB+MhRgkOZiUR3tMGv+KEeFMSK6tSi/Lji0pzUosPMUpzsCiJ894oXBgnJJCeWJKanZpa
+        kFoEk2Xi4JRqYGqN2H9Fv8NCZ5PsfME0Np7XbcxBcSrCW/QyJJYlPirtSYsqrQy3nS8p2nB8
+        ceapNYcE5Qp231K/9m/57c+bGZ9WHyufLR3N7ObDs/CbUm+9ucnWzKmLS2pM7vYVm/K1XX6f
+        /FLno9CX67ur1rGoOPV0Hzu0ybb9ouuS7u8XImoXd57yKrRRY1P4LzDHOXdP4dF5f0tLshYf
+        DXvQ+0TD+9vqdM9zWY7Fq8Q+OeklmS5oVe3bPPdk0NS0N2tuRihalX19Eyly+bndLV0WUbML
+        1QwVT1VKK4L+xHVu3nR3R9jclcmilXP8Z2SU2habONu124m3GHirr1y70WuRnsQ143uhV0Vt
+        b6+RSggJXB2nxFKckWioxVxUnAgA3oMPsZ4CAAA=
+X-CMS-MailID: 20200702154204epcas5p15106774a3d556b77050710722da89922
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
-X-CMS-RootMailID: 20200702154208epcas5p39fe202f642a9d5c8dde9b911645c594c
-References: <1593704330-11540-1-git-send-email-joshi.k@samsung.com>
-        <CGME20200702154208epcas5p39fe202f642a9d5c8dde9b911645c594c@epcas5p3.samsung.com>
+X-CMS-RootMailID: 20200702154204epcas5p15106774a3d556b77050710722da89922
+References: <CGME20200702154204epcas5p15106774a3d556b77050710722da89922@epcas5p1.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-avoid returning success when it should report failure, preventing
-odd behavior in caller.
+First patch is about returning failure (rather than success) when
+max_append_sectors is 0. This prevents bio_iov_iter_get_pages() from
+getting into an endless loop.
 
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-Signed-off-by: Selvakumar S <selvakuma.s1@samsung.com>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Second patch enables issuing zone-append with iov_iter of bvec type.
+It adds a helper which is similar to __bio_iov_bvec_add_pages() but
+takes zone-append limits into account.
 
-diff --git a/block/bio.c b/block/bio.c
-index a7366c0..0cecdbc 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1044,7 +1044,7 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
- 	size_t offset;
- 
- 	if (WARN_ON_ONCE(!max_append_sectors))
--		return 0;
-+		return -EINVAL;
- 
- 	/*
- 	 * Move page array up in the allocated memory for the bio vecs as far as
+Kanchan Joshi (2):
+  block: fix error code for zone-append
+  block: enable zone-append for iov_iter of bvec type
+
+ block/bio.c | 33 +++++++++++++++++++++++++++++----
+ 1 file changed, 29 insertions(+), 4 deletions(-)
+
 -- 
 2.7.4
 
