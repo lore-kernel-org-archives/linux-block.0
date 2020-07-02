@@ -2,161 +2,135 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4109C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 16:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E107CC433DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 16:57:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA52B20720
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 16:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF1F92088E
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 16:57:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kgIqadgb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726199AbgGBQm3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 12:42:29 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46800 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726140AbgGBQm3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Jul 2020 12:42:29 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 50E20ADC0;
-        Thu,  2 Jul 2020 16:42:27 +0000 (UTC)
-Subject: Re: [PATCH] blk-mq: release driver tag before freeing request via
- .end_io
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-References: <20200702134838.2822844-1-ming.lei@redhat.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <383fa210-cf08-740c-cb39-a2564a7934ea@suse.de>
-Date:   Thu, 2 Jul 2020 18:42:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726140AbgGBQ5e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 12:57:34 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:44450 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726632AbgGBQ5e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 12:57:34 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 062GqJGE156916;
+        Thu, 2 Jul 2020 16:57:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=BvjLT1ZYJAR6dbqrkdQx5cOnxCqmgZXn/o58vda98r4=;
+ b=kgIqadgbCDfs+DKLhXNxl+MKXL014Y8XC5Iyhjq3i/IZt6iBN0x0CHOCo4F5fpz6KVd9
+ oLy46+d/JU+wD8y9cLXFgvnrp6wBL6D176z2qk2J6gEnwed9wSWeZGcGsfm3BcNvetZx
+ Dll++F7VHLCi7nUSNstk7OTgR6kftrCtUpD+sntQLqsgvZ0ygPT4TDRtnCZD2+zJBRlB
+ xwoktOfnqycyD6Cak15Rdtpks5B0F5ljb1NVnFw76FuSp4SM8urh7mgOzdKG14thEFlD
+ LXMsFCxKgY1qkY+lhZmaKS9MiwMSTZad16LP42/Owf3LR0WESBcDHW4BAlJJlUDSVJHK uQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 31xx1e6fap-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 02 Jul 2020 16:57:25 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 062GrsiH121697;
+        Thu, 2 Jul 2020 16:57:24 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 31xg218b9t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Jul 2020 16:57:24 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 062GvNZn023108;
+        Thu, 2 Jul 2020 16:57:23 GMT
+Received: from localhost (/10.159.237.133)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 02 Jul 2020 16:57:23 +0000
+Date:   Thu, 2 Jul 2020 09:57:21 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Shijie Luo <luoshijie1@huawei.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH] loop: change to punch hole if zero range is not supported
+Message-ID: <20200702165721.GS7625@magnolia>
+References: <20200702015401.51199-1-luoshijie1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200702134838.2822844-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200702015401.51199-1-luoshijie1@huawei.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9670 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 phishscore=0
+ malwarescore=0 mlxlogscore=999 adultscore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2007020115
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9670 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 clxscore=1011 adultscore=0
+ suspectscore=0 mlxlogscore=999 cotscore=-2147483648 lowpriorityscore=0
+ malwarescore=0 phishscore=0 impostorscore=0 mlxscore=0 spamscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2007020115
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/2/20 3:48 PM, Ming Lei wrote:
-> The built-in flush request shares tag with the request inserted to flush
-> machinery, turns out its .end_io callback has to touch the built-in
-> flush request's internal tag or tag.
+On Wed, Jul 01, 2020 at 09:54:01PM -0400, Shijie Luo wrote:
+> We found a problem when excuting these operations.
 > 
-> On the other hand, we have to make sure that driver tag is released
-> from __blk_mq_end_request(), since this request may not be completed
-> via blk_mq_complete_request().
+> $ cd /tmp
+> $ qemu-img create -f raw test.img 10G
+> $ mknod -m 0660 /dev/loop0 b 7 0
+> $ losetup /dev/loop0 test.img
+> $ mkfs /dev/loop0
 > 
-> Given we have moved blk_mq_put_driver_tag() out of header file, fix this
-> issue by releasing driver tag before calling .end_io().
+> Here is the error message.
 > 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> Fixes: 36a3df5a4574("blk-mq: put driver tag when this request is completed")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> [  142.364823] blk_update_request: operation not supported error,
+>  dev loop0, sector 20971392 op 0x9:(WRITE_ZEROES) flags 0x1000800
+>  phys_seg 0 prio class 0
+> [  142.371823] blk_update_request: operation not supported error,
+>  dev loop0, sector 5144 op 0x9:(WRITE_ZEROES) flags 0x1000800
+>  phys_seg 0 prio class 0
+> 
+> The problem is that not all filesystem support zero range (eg, tmpfs), if
+>  filesystem doesn 't support zero range, change to punch hole to fix it.
+
+NAK, ZERO_RANGE requires[1] that "Within the specified range, blocks are
+preallocated for the regions that span the holes in the file."
+PUNCH_HOLE has the opposite effect, and does not qualify as a
+replacement.
+
+--D
+
+[1] https://man7.org/linux/man-pages/man2/fallocate.2.html
+
+> Fixes: efcfec579f613 ("loop: fix no-unmap write-zeroes request behavior")
+> Signed-off-by: Shijie Luo <luoshijie1@huawei.com>
 > ---
->   block/blk-mq.c | 46 ++++++++++++++++++++++++----------------------
->   1 file changed, 24 insertions(+), 22 deletions(-)
+>  drivers/block/loop.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 948987e9b6ab..6b36969220c1 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -532,6 +532,26 @@ void blk_mq_free_request(struct request *rq)
->   }
->   EXPORT_SYMBOL_GPL(blk_mq_free_request);
->   
-> +static void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
-> +		struct request *rq)
-> +{
-> +	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
-> +	rq->tag = BLK_MQ_NO_TAG;
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index c33bbbfd1bd9..504e658adcaf 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -450,6 +450,13 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+>  	}
+>  
+>  	ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
 > +
-> +	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
-> +		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
-> +		atomic_dec(&hctx->nr_active);
+> +	if ((ret == -EOPNOTSUPP) && (mode & FALLOC_FL_ZERO_RANGE)) {
+> +		mode &= ~FALLOC_FL_ZERO_RANGE;
+> +		mode |= FALLOC_FL_PUNCH_HOLE;
+> +		ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
 > +	}
-> +}
 > +
-> +static inline void blk_mq_put_driver_tag(struct request *rq)
-> +{
-> +	if (rq->tag == BLK_MQ_NO_TAG || rq->internal_tag == BLK_MQ_NO_TAG)
-> +		return;
-> +
-> +	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
-> +}
-> +
->   inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
->   {
->   	u64 now = 0;
-> @@ -551,6 +571,7 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
->   
->   	if (rq->end_io) {
->   		rq_qos_done(rq->q, rq);
-> +		blk_mq_put_driver_tag(rq);
->   		rq->end_io(rq, error);
->   	} else {
->   		blk_mq_free_request(rq);
-> @@ -660,26 +681,6 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
->   	return cpu_online(rq->mq_ctx->cpu);
->   }
->   
-> -static void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
-> -		struct request *rq)
-> -{
-> -	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
-> -	rq->tag = BLK_MQ_NO_TAG;
-> -
-> -	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
-> -		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
-> -		atomic_dec(&hctx->nr_active);
-> -	}
-> -}
-> -
-> -static inline void blk_mq_put_driver_tag(struct request *rq)
-> -{
-> -	if (rq->tag == BLK_MQ_NO_TAG || rq->internal_tag == BLK_MQ_NO_TAG)
-> -		return;
-> -
-> -	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
-> -}
-> -
->   bool blk_mq_complete_request_remote(struct request *rq)
->   {
->   	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-> @@ -983,9 +984,10 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
->   	if (blk_mq_req_expired(rq, next))
->   		blk_mq_rq_timed_out(rq, reserved);
->   
-> -	if (is_flush_rq(rq, hctx))
-> +	if (is_flush_rq(rq, hctx)) {
-> +		blk_mq_put_driver_tag(rq);
->   		rq->end_io(rq, 0);
-> -	else if (refcount_dec_and_test(&rq->ref))
-> +	} else if (refcount_dec_and_test(&rq->ref))
->   		__blk_mq_free_request(rq);
->   
->   	return true;
+>  	if (unlikely(ret && ret != -EINVAL && ret != -EOPNOTSUPP))
+>  		ret = -EIO;
+>   out:
+> -- 
+> 2.19.1
 > 
-Hmm.
-Let's hope that no-one in the ->end_io() handler will need to look at 
-the tag, because that's gone now.
-
-But if that fixes the flush machinery:
-
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
