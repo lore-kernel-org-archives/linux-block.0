@@ -2,85 +2,79 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 144C3C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 05:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB65C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 05:36:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EDE99207D4
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 05:26:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56A5920836
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 05:36:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593668194;
+	bh=w80HNCQd43j8lsfGDknlfMWRCtxh8+ZfOTuzLjUb+Tg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=mtVhGHBk6PyKVWv954x/IwFEWy6BnbWXseVm8J4iM1NsxDfhMsPklvuLIGE1+3jR0
+	 lPjWaEEoiW0Qn7EPua9vo7rK2Fmv1RRRJrQ0avinmytCcTkdFQVGCLU7gCaYocZuBM
+	 bSvj4Z5V8mWNeUYG3EMHIbe7fXWYD0MTWtOfFlMs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726118AbgGBF0o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 01:26:44 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60982 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725872AbgGBF0o (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Jul 2020 01:26:44 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 32875F289A79CC233160;
-        Thu,  2 Jul 2020 13:26:30 +0800 (CST)
-Received: from kernelci-master.huawei.com (10.175.101.6) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 2 Jul 2020 13:26:21 +0800
-From:   Wei Yongjun <weiyongjun1@huawei.com>
-To:     Wei Yongjun <weiyongjun1@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        "Ming Lei" <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>
-Subject: [PATCH -next v2] block: remove unused but set variable 'hctx'
-Date:   Thu, 2 Jul 2020 13:36:35 +0800
-Message-ID: <20200702053635.29386-1-weiyongjun1@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726152AbgGBFg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 01:36:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44358 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726015AbgGBFg1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Jul 2020 01:36:27 -0400
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5B51120724;
+        Thu,  2 Jul 2020 05:36:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593668186;
+        bh=w80HNCQd43j8lsfGDknlfMWRCtxh8+ZfOTuzLjUb+Tg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=CiLGW4fQE83/yPSoaLNjNXxWdQztSEnfSUvobWj5SL08wFtpj7ITwNpTCpr8fXJG6
+         v6LQ82S6Iopo0IEnBC03ZMkH1MPLHvkJL0OmNAg4PDKmTLqsnglMl5I7VLK6hBNzY0
+         Hln49f0USlhkO3bp1JcuqHNbQ5T9o97V4VbFqjxw=
+Received: by mail-lj1-f181.google.com with SMTP id 9so30093459ljv.5;
+        Wed, 01 Jul 2020 22:36:26 -0700 (PDT)
+X-Gm-Message-State: AOAM5302EguksHGyx96McGzP+vV2RAVmZBDx1EaWZ+TwumcXBHDsn2h5
+        R3h7HgXRHajHkaz9f7jIRk/c+HS3t9Ql2rUoykU=
+X-Google-Smtp-Source: ABdhPJymqO+8A/ON6cgRlyAmaadzhb/A3ETkgEahkbFx3Wp1rU/jFwtY3MDkzrSEOGWene4L2hOwuUlW51s/XrqmVQI=
+X-Received: by 2002:a2e:7f06:: with SMTP id a6mr4621445ljd.446.1593668184748;
+ Wed, 01 Jul 2020 22:36:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.175.101.6]
-X-CFilter-Loop: Reflected
+References: <20200701090622.3354860-1-hch@lst.de> <20200701090622.3354860-5-hch@lst.de>
+In-Reply-To: <20200701090622.3354860-5-hch@lst.de>
+From:   Song Liu <song@kernel.org>
+Date:   Wed, 1 Jul 2020 22:36:13 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW7QShNMnbCK-OrKkE8F5XyH45-ML-w5qKLVrO=VTt6npw@mail.gmail.com>
+Message-ID: <CAPhsuW7QShNMnbCK-OrKkE8F5XyH45-ML-w5qKLVrO=VTt6npw@mail.gmail.com>
+Subject: Re: [PATCH 4/4] writeback: remove bdi->congested_fn
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        dm-devel@redhat.com, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bcache@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-btrfs@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
+        open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After commit 37f4a24c2469 ("blk-mq: centralise related handling
-into blk_mq_get_driver_tag"), 'hctx' is never be used. Gcc report
-build warning:
+On Wed, Jul 1, 2020 at 2:06 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Except for pktdvd, the only places setting congested bits are file
+> systems that allocate their own backing_dev_info structures.  And
+> pktdvd is a deprecated driver that isn't useful in stack setup
+> either.  So remove the dead congested_fn stacking infrastructure.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-block/blk-flush.c:222:24: warning:
- variable hctx set but not used [-Wunused-but-set-variable]
-  222 |  struct blk_mq_hw_ctx *hctx;
-      |                        ^~~~
+For md bits:
 
-Just removing it to avoid build warning.
-
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
-v1 -> v2: fix signed-off-by
----
- block/blk-flush.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index e756db088d84..a20fe125e9fa 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -219,7 +219,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	struct request *rq, *n;
- 	unsigned long flags = 0;
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
--	struct blk_mq_hw_ctx *hctx;
- 
- 	blk_account_io_flush(flush_rq);
- 
-@@ -235,7 +234,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	if (fq->rq_status != BLK_STS_OK)
- 		error = fq->rq_status;
- 
--	hctx = flush_rq->mq_hctx;
- 	if (!q->elevator)
- 		flush_rq->tag = BLK_MQ_NO_TAG;
- 	else
-
+Acked-by: Song Liu <song@kernel.org>
