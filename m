@@ -6,69 +6,70 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B218C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 18:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37817C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 19:06:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6614B20772
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 18:38:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F6DE20772
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 19:06:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zRNio4Wt"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dLEeSTbd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726010AbgGBSij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 14:38:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57872 "EHLO
+        id S1725878AbgGBTGD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 15:06:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726003AbgGBSij (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 14:38:39 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D0E0C08C5C1
-        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 11:38:39 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id gc9so6306643pjb.2
-        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 11:38:39 -0700 (PDT)
+        with ESMTP id S1725847AbgGBTGD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 15:06:03 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B70F3C08C5C1
+        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 12:06:02 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id 72so1088949ple.0
+        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 12:06:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=6AIxUfWesqVTIVZwRsSBeuaSBvzLAiGbT6IoV06t0o8=;
-        b=zRNio4WtQ62ONrby1MckVrsvPJ1FeBc98HbZptJGFJqT8u878Ly4njokAd517/IzXN
-         od/4LYFt7PCq1kFN6vko62HCaDMSuY2fPouPuXM/1FfyNiH3DNBdd5qpHZa/NgKt/grg
-         9awJUoMM/ciMLKgmJ1JIMuWB/L5fFB3mkMlaT8ZfVgq2t8X9L6WcBPC32Rnhh+375TQt
-         Exu0eoIapvSbP2z8oD9ixBtSW37UfFBp+sua0fBj8GiaWaVVbCAqmJnbxzlZCNT+tZFD
-         RF7G/LuFZatnPWf4A2vMf4ShisSM157RwoFAfVkWxor2sk0lNuEoSwqBWV3Xx+1T4tOE
-         zUrg==
+        bh=uNkDA+ksKrwzfRgaRZJIL/u4W1JOCNY1j9WesonYres=;
+        b=dLEeSTbd68m1IjLim5QGg8dn/kneJAmWaDb6Oa9HPC8XDDED3c0j3Z1lxlhWff7LZz
+         4KPT7luVYAwqsAmnk8g9l6TqdKjjqON7p9oKmoBJCAQe6CH4/viYgtL20o6VSW5XUFMM
+         KjnpemarBUpY3M4a/brupE0lYpn1mEFq9+26H4+QqnAeVJ6xC11bOaEToMxFFpJw2k5s
+         AJT+zaFoZQrd+lHPAfFL1bX8LNI7Mvl3tvsMUcjPMcW04G32OQwMcRlqBQxJeZkNzKvu
+         Vio6masvQsxdWk99PSYR9BMZl/O9dKsjnpuoffWtbP3HD2b3z5jjjeZjobhqam6dapao
+         tmDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=6AIxUfWesqVTIVZwRsSBeuaSBvzLAiGbT6IoV06t0o8=;
-        b=qYuMzcyo1f/iRAMxxSWX2yyTQcLJ/LCnNR0lfLYJ/CDl5PR+kbQ6CaCi5iAXLEv4+L
-         hIxdo7M8oCgt+7fqRWjMmZ7NWaRXYfJL2urQJgVFIelH2n4m4KsKO5kIouzkst1AOoFn
-         WzBG4aKdtgciG+CFaUMeAAfAjLCQ205suFgFt4/OcDnTD+C2e7rgN0DhD751jb0t8/j+
-         9mIph1MUtFw2iffw1FvbejNIksmi9gxL414SPMg61q/S7xiLXnM4frU9jcS+AkxlFXNs
-         Tk0kj0iluFPUA1WKhQZqHCjutI17p7PwSEY0wDGEj+JACRYphnm2ZWNH692XtKFOKAc8
-         /iWQ==
-X-Gm-Message-State: AOAM531AVN5qTVBrhmq6EOBj0gyVpBz21hVyLcxvbJqvYGVcohzAm+z0
-        OhtIorpuiJsMOR95vdEfacMBvzToItn/kg==
-X-Google-Smtp-Source: ABdhPJxttNPbE2YNRAqhs5lEj1I7YptMKwoMbFtuvwVQPJe0Pz9P6xZYdK12DFM9jrQ/3cXLZQWXTw==
-X-Received: by 2002:a17:902:7c09:: with SMTP id x9mr28200651pll.27.1593715118586;
-        Thu, 02 Jul 2020 11:38:38 -0700 (PDT)
+        bh=uNkDA+ksKrwzfRgaRZJIL/u4W1JOCNY1j9WesonYres=;
+        b=jPfHoCl25hYCB3yQSGpgztcVpIvY6JHGsg4k5e9IuJG3AedbjV+y2/YP2ueBiZv9Ap
+         1acxH8pKL0gEYc3vV+zWLApxPajUSCn2Cz+s7siRoShxywwTub+iL1HsqegP4Br7L8Zv
+         AXLLntcAYULQyVAxy/+eyhI8M3O80C+B3y6L2NZ5I+ym3hIKSxkEAeS7ZcWM30wXBw8H
+         KaEcMNkPNDtawjg8wGvjPAeAGcVP7XhIdjvjeU6WQPP8RZOz7Dm/4ujeid8teiuDH+c5
+         UZwpLC5hssyys0N6+uiLMguzJVOjlcnOjW1n7dsrOoK+0dte0NB9iQOyTNBm7gtIYL8s
+         0P2w==
+X-Gm-Message-State: AOAM532Er9lTWRNe0MejIzeM0ik62ZkY7LN2360eb/Vb2zhb4ztGL1Qo
+        7E5knIILHdFoa4ExrPlC0RCaIQ==
+X-Google-Smtp-Source: ABdhPJxZDh1MRR1LLLMetht4Yl4xP49t6qjEJeZIDzEgyKZzW8ls/Kct0psmuVQvswbwcQyj2yO6Lw==
+X-Received: by 2002:a17:90a:e007:: with SMTP id u7mr23417660pjy.9.1593716762178;
+        Thu, 02 Jul 2020 12:06:02 -0700 (PDT)
 Received: from [10.174.189.217] ([204.156.180.104])
-        by smtp.gmail.com with ESMTPSA id 202sm9323177pfw.84.2020.07.02.11.38.37
+        by smtp.gmail.com with ESMTPSA id u20sm9258983pfm.152.2020.07.02.12.06.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jul 2020 11:38:37 -0700 (PDT)
-Subject: Re: [PATCH -next v2] block: make function __bio_integrity_free()
- static
-To:     Wei Yongjun <weiyongjun1@huawei.com>
-Cc:     linux-block@vger.kernel.org
-References: <20200702053543.29293-1-weiyongjun1@huawei.com>
+        Thu, 02 Jul 2020 12:06:01 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: release driver tag before freeing request via
+ .end_io
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+References: <20200702134838.2822844-1-ming.lei@redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0fa5d527-5a2e-5dc8-0847-7ff450d99a02@kernel.dk>
-Date:   Thu, 2 Jul 2020 12:38:36 -0600
+Message-ID: <54bc7fb4-2780-7c55-1fe5-806e0de5e945@kernel.dk>
+Date:   Thu, 2 Jul 2020 13:05:58 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200702053543.29293-1-weiyongjun1@huawei.com>
+In-Reply-To: <20200702134838.2822844-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,13 +78,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/1/20 11:35 PM, Wei Yongjun wrote:
-> Fix sparse build warning:
+On 7/2/20 7:48 AM, Ming Lei wrote:
+> The built-in flush request shares tag with the request inserted to flush
+> machinery, turns out its .end_io callback has to touch the built-in
+> flush request's internal tag or tag.
 > 
-> block/bio-integrity.c:27:6: warning:
->  symbol '__bio_integrity_free' was not declared. Should it be static?
+> On the other hand, we have to make sure that driver tag is released
+> from __blk_mq_end_request(), since this request may not be completed
+> via blk_mq_complete_request().
+> 
+> Given we have moved blk_mq_put_driver_tag() out of header file, fix this
+> issue by releasing driver tag before calling .end_io().
 
-Applied, thanks.
+As I wrote yesterday, I reverted the three patches:
+
+https://git.kernel.dk/cgit/linux-block/log/?h=for-5.9/block
+
+so you'll need to send a new and updated series. Please fold in the
+'unused variable' and related fixes as well.
 
 -- 
 Jens Axboe
