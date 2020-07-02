@@ -1,138 +1,263 @@
-Return-Path: <SRS0=s14/=AM=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91716C433DF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 23:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23980C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 00:38:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59AE8207E8
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jul 2020 23:39:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hqtfypK8";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="FPm5+q99"
+	by mail.kernel.org (Postfix) with ESMTP id F08A720748
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 00:38:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726527AbgGAXjy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jul 2020 19:39:54 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:25025 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726438AbgGAXjy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jul 2020 19:39:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1593646797; x=1625182797;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=e35h1BWpoPJ891JnwqZ8sAZ2xKs69/MRORqSQZFEnh0=;
-  b=hqtfypK8+MKu2PkO8bXDulPGBUpMlic9+efcFVlxS4pg08PR23xgBUEu
-   JUfhuaQNywmcqYMQkS7ngtI1kUk13SRUD0zI6pONKLZHeWT1jh0YlR3ns
-   eB7jJh3pb4nLgKzaTugnPhR69YP0WbnXQc0EpcVYdElBQsdIpyaGTGmwO
-   rRIa2/RcU8dUi1+xCrP5EtbDGKtbxtXr+OZA18HZP1pyuw5OIAkNIfVpw
-   tB7Kh8M187bkUvMT3FgwMzsgjXIchO7SG3hrzrIvCE8rtP3M+9CsLgNEO
-   TcuP4zeZzMDXtxLu8uPuu2F/86OVN2qhuuJqJVIaBC2CnHIX8c7512Ssp
-   A==;
-IronPort-SDR: unLtmBssNFykHSCJt9JxeEX0VVb9gZXOorM2cKjwFQguJyiBc1VLSM43drptMn1R461mynzNAz
- KnqNK9pj+fa2RiHGNAtPJtBfCJ3d3LoRZiNw90SEik1kDZAF/Gy2rxXJ6oy4vP7lR1iGqDBFSb
- p8psHZ6yAGue6wlJdpQfHVd1fg1zAwIvN0r/ruaCThVwG0b1I3z2yPrii58K7TIUupAHlF/ind
- WpI1t1yxzL50Ww8fg9IbcjRwJ8eNWWbEoGbv5mNk1iyChK0tH/so19hfPv87jktj4OEBxU2KQm
- gPs=
-X-IronPort-AV: E=Sophos;i="5.75,302,1589212800"; 
-   d="scan'208";a="244448302"
-Received: from mail-bn8nam12lp2173.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.173])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2020 07:39:56 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WOk4gd5rKzwaj+lgs+G6m9CVcW2W1svhTs5nYG7mP3vqSU0pqasx2hfDKyJLrxxjgaGU/l/boQ3T+zrH/izLmE18Z7Iha2IkQNOSbEiwU9VU+wqLotULRf2W421Zryi9vTzxAx7VVMa+puInMbQ1/+zipSaAi+tvxc2og+G0YV79hflZR5+UaFYFd2US45RcWzpMqZGmxrXVjpNDyoprA+tAEg0klcCnTwyuZFW7VpoaPAJFZtdhu1RfZH9zRD8uE/lnHQHzLJ3TDVLhx/IPKWygcJF0kqnBydUqI86TVesHs4IMpk44TlZzwSI6XwIPlCE1moNSmXi5k2dDGm49Fw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e35h1BWpoPJ891JnwqZ8sAZ2xKs69/MRORqSQZFEnh0=;
- b=kZ9ewQ9Zv7Q/ockcn4lTwmF4criT64r1z/fEWbZnGwI10ExlVsDfGLCRpdAaVMIlZ9y07sDSY9Tp6o6fW4OFpJqdxCCmB/WK+Jszw65kcobIUYBUmtfh19wi58bB9CVp5gt7YH142s6Zn7nMiM9P25VYgC/s1CxEHT6AkPWZw4yaTOgOk40Hm5PBvPgmYScPZ/7A48J2qEOuKxoA5M8X3fN6SfNeXJ4JpMQeWcJ3S9Zn5R6AuypIcnZqEQrfmYOsL+iTlmEhwwGM0JCfUyvl+y2dQvur+bCIZ1NLhuDP5uwlSjNjQM3RGEokqun17dh3+NLUi4bqhKHBcrlaDtgSaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e35h1BWpoPJ891JnwqZ8sAZ2xKs69/MRORqSQZFEnh0=;
- b=FPm5+q99pZGY+eHtmHnQWNfIOaG0UpLOcCtt66B9BWmcOK+Tn2+VJ/Hwml44BgXD5ILV1Yfysh+/KUosoE7jIiOkN7BDwxdVdhudDH9u9zSvlweXjOtshyLofGLsj7W2I2KFqR5aWWX0kCeq944nUg/qk31iYL2fHYlHNPvP7vs=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BY5PR04MB6852.namprd04.prod.outlook.com (2603:10b6:a03:225::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.23; Wed, 1 Jul
- 2020 23:39:51 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::4d72:27c:c075:c5e6]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::4d72:27c:c075:c5e6%7]) with mapi id 15.20.3131.027; Wed, 1 Jul 2020
- 23:39:51 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] null_blk: add helper for deleting the nullb_list
-Thread-Topic: [PATCH] null_blk: add helper for deleting the nullb_list
-Thread-Index: AQHWT1/biaZTnaGKVkig3mq80wjSXw==
-Date:   Wed, 1 Jul 2020 23:39:51 +0000
-Message-ID: <BYAPR04MB4965EBC788D1A0BFB3A4611A866C0@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20200701042653.26207-1-chaitanya.kulkarni@wdc.com>
- <SN4PR0401MB3598CBDDC91C894992996DA29B6C0@SN4PR0401MB3598.namprd04.prod.outlook.com>
- <BYAPR04MB49657173EED97FAE92FEE156866C0@BYAPR04MB4965.namprd04.prod.outlook.com>
- <812af519-7bb3-586d-14dc-d3a529b49b69@kernel.dk>
- <BYAPR04MB4965B21154FC796B1D4AAB07866C0@BYAPR04MB4965.namprd04.prod.outlook.com>
- <fe505644-0cd0-0fa4-3dc9-aebc3e299660@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: kernel.dk; dkim=none (message not signed)
- header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 224ec729-5f96-472f-8723-08d81e180ccd
-x-ms-traffictypediagnostic: BY5PR04MB6852:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR04MB68527DADBA9E9D1A87F3409A866C0@BY5PR04MB6852.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:196;
-x-forefront-prvs: 04519BA941
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZHZGTuvZDn/8j6nbSmNd/xT4qVBseTa6KwcEdPXySckysD/Wp9LTRcojqugZGvMsUMXR5hIyk/wmItjgVqnOjA3I8LdfxNFBae/okcYWxn2SjRUpDloymBIrBvFn8342ytpSw+3hngz+gWNyZhinm9EjFvH2VlDtmjz9wUYiBqpdb+ZHaTRmeY5Ndqu77DIDKYhtKjY/+GzvVcx2dDfNZDkPAJZXiP9FtjYE8aAs41e7q3A5yZYBNu6ecQLmkQlv9Tpwwqk/GkyA9iH0IvtzmZQZtklq3b+IlryHJY76480ccZlT+KvtUmNum2yyuu9/3K8slezxaAyfV2mXKg7YHw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(136003)(376002)(366004)(346002)(39850400004)(71200400001)(2906002)(55016002)(5660300002)(478600001)(33656002)(86362001)(9686003)(7696005)(4744005)(4326008)(186003)(66476007)(66556008)(64756008)(66446008)(6506007)(66946007)(76116006)(54906003)(6916009)(53546011)(8936002)(316002)(26005)(8676002)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: qWYoSdJRs5aM3Aj7l7LnqzgEqkplO+lpFKwuevzUGBdHPXfjRlgKBFIEpnEsDbE3jWPHCfdIFVsMCVd2PHYRg92FYM/P7xo/DiDiTj4tcJ3HAQz96XJ3cfLgFHW1maCjjMKNtYQin1KEc1RDhXD6qEQBv7dx/HmQjeft9HNbxI12scA7DgtoviXdIFAdm9j9lUGIQX+/CjaQQbgPUIuoGGQSoWT/mlE6IOCAaStJ4MKGryKvtgcwwp3w/tdoL6e1nOgIh8v5VAFC25QWxkuS7sckI3O9tprJBFrtOwJdDF5886FRfUilDIkSm0oD2GVOK/SMMMD+X1y/KqAv6VXmKHobO9GwKtYVons1hiIF7JfUZo1m3vS54jelL2+hPHX9JmWjLp+t4EZrWBVR3lSr+Efw0r4FBkQ8DZ3hXIAyV0iYlu0o8yDf4TMy0HcqroJWdBts9JZRuGxQyNN4dUToH+QbAcmhRDqccbe7c8mHRT+zQg05cDRnJeaIJT1YLmPj
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726824AbgGBAik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jul 2020 20:38:40 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39804 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726161AbgGBAij (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Jul 2020 20:38:39 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 62419B1C2;
+        Thu,  2 Jul 2020 00:38:35 +0000 (UTC)
+Subject: Re: [PATCH 4/4] writeback: remove bdi->congested_fn
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Tejun Heo <tj@kernel.org>, dm-devel@redhat.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+References: <20200701090622.3354860-1-hch@lst.de>
+ <20200701090622.3354860-5-hch@lst.de>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Message-ID: <69234075-06c9-fcca-0c59-2452aa4e2714@suse.de>
+Date:   Thu, 2 Jul 2020 08:38:29 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 224ec729-5f96-472f-8723-08d81e180ccd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2020 23:39:51.4910
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qaekbZknSWkUSJFsqr5gYIICiJVsDJMT3PJTOG+A5OFmihbl3Azn02cGtiO1QtTmXOhqlQ2J9tQUKVDInzlJ9wL+bt8Z9zqusN1M4V63FNo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6852
+In-Reply-To: <20200701090622.3354860-5-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/1/20 2:46 PM, Jens Axboe wrote:=0A=
-> On 7/1/20 3:38 PM, Chaitanya Kulkarni wrote:=0A=
->> On 7/1/20 12:08 PM, Jens Axboe wrote:=0A=
->>>> Can we add this ?=0A=
->>> Please don't ping me for something trivial just a day after posting=0A=
->>> it. I'll queue it up, but it's not like this is a stop everything=0A=
->>> and get it in kind of moment.=0A=
->>=0A=
->> Okay I'll keep in mind unless it is stopping something important.=0A=
-> =0A=
-> You also missed a signed-off-by line, so I can't commit it as-is.=0A=
-> =0A=
-=0A=
-Let me send V2 with reviewed-by Johannes tag and sign-off.=0A=
+On 2020/7/1 17:06, Christoph Hellwig wrote:
+> Except for pktdvd, the only places setting congested bits are file
+> systems that allocate their own backing_dev_info structures.  And
+> pktdvd is a deprecated driver that isn't useful in stack setup
+> either.  So remove the dead congested_fn stacking infrastructure.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+For the bcache part, Acked-by: Coly Li <colyli@suse.de>
+
+Thanks.
+
+Coly Li
+
+
+> ---
+>  drivers/block/drbd/drbd_main.c   | 59 --------------------------------
+>  drivers/md/bcache/request.c      | 43 -----------------------
+>  drivers/md/bcache/super.c        |  1 -
+>  drivers/md/dm-cache-target.c     | 19 ----------
+>  drivers/md/dm-clone-target.c     | 15 --------
+>  drivers/md/dm-era-target.c       | 15 --------
+>  drivers/md/dm-raid.c             | 12 -------
+>  drivers/md/dm-table.c            | 37 +-------------------
+>  drivers/md/dm-thin.c             | 16 ---------
+>  drivers/md/dm.c                  | 33 ------------------
+>  drivers/md/dm.h                  |  1 -
+>  drivers/md/md-linear.c           | 24 -------------
+>  drivers/md/md-multipath.c        | 23 -------------
+>  drivers/md/md.c                  | 23 -------------
+>  drivers/md/md.h                  |  4 ---
+>  drivers/md/raid0.c               | 16 ---------
+>  drivers/md/raid1.c               | 31 -----------------
+>  drivers/md/raid10.c              | 26 --------------
+>  drivers/md/raid5.c               | 25 --------------
+>  fs/btrfs/disk-io.c               | 23 -------------
+>  include/linux/backing-dev-defs.h |  4 ---
+>  include/linux/backing-dev.h      |  4 ---
+>  include/linux/device-mapper.h    | 11 ------
+>  23 files changed, 1 insertion(+), 464 deletions(-)
+> 
+
+[snipped]
+
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 7acf024e99f351..cda05fc61c3afa 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -1228,36 +1228,10 @@ static int cached_dev_ioctl(struct bcache_device *d, fmode_t mode,
+>  	return __blkdev_driver_ioctl(dc->bdev, mode, cmd, arg);
+>  }
+>  
+> -static int cached_dev_congested(void *data, int bits)
+> -{
+> -	struct bcache_device *d = data;
+> -	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+> -	struct request_queue *q = bdev_get_queue(dc->bdev);
+> -	int ret = 0;
+> -
+> -	if (bdi_congested(q->backing_dev_info, bits))
+> -		return 1;
+> -
+> -	if (cached_dev_get(dc)) {
+> -		unsigned int i;
+> -		struct cache *ca;
+> -
+> -		for_each_cache(ca, d->c, i) {
+> -			q = bdev_get_queue(ca->bdev);
+> -			ret |= bdi_congested(q->backing_dev_info, bits);
+> -		}
+> -
+> -		cached_dev_put(dc);
+> -	}
+> -
+> -	return ret;
+> -}
+> -
+>  void bch_cached_dev_request_init(struct cached_dev *dc)
+>  {
+>  	struct gendisk *g = dc->disk.disk;
+>  
+> -	g->queue->backing_dev_info->congested_fn = cached_dev_congested;
+>  	dc->disk.cache_miss			= cached_dev_cache_miss;
+>  	dc->disk.ioctl				= cached_dev_ioctl;
+>  }
+> @@ -1342,27 +1316,10 @@ static int flash_dev_ioctl(struct bcache_device *d, fmode_t mode,
+>  	return -ENOTTY;
+>  }
+>  
+> -static int flash_dev_congested(void *data, int bits)
+> -{
+> -	struct bcache_device *d = data;
+> -	struct request_queue *q;
+> -	struct cache *ca;
+> -	unsigned int i;
+> -	int ret = 0;
+> -
+> -	for_each_cache(ca, d->c, i) {
+> -		q = bdev_get_queue(ca->bdev);
+> -		ret |= bdi_congested(q->backing_dev_info, bits);
+> -	}
+> -
+> -	return ret;
+> -}
+> -
+>  void bch_flash_dev_request_init(struct bcache_device *d)
+>  {
+>  	struct gendisk *g = d->disk;
+>  
+> -	g->queue->backing_dev_info->congested_fn = flash_dev_congested;
+>  	d->cache_miss				= flash_dev_cache_miss;
+>  	d->ioctl				= flash_dev_ioctl;
+>  }
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 2014016f9a60d3..1810d7ca2f6653 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -877,7 +877,6 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
+>  
+>  	d->disk->queue			= q;
+>  	q->queuedata			= d;
+> -	q->backing_dev_info->congested_data = d;
+>  	q->limits.max_hw_sectors	= UINT_MAX;
+>  	q->limits.max_sectors		= UINT_MAX;
+>  	q->limits.max_segment_size	= UINT_MAX;
+> diff --git a/drivers/md/dm-cache-target.c b/drivers/md/dm-cache-target.c
+> index d3bb355819a421..24549dc92eeec5 100644
+> --- a/drivers/md/dm-cache-target.c
+> +++ b/drivers/md/dm-cache-target.c
+> @@ -421,8 +421,6 @@ struct cache {
+>  
+>  	struct rw_semaphore quiesce_lock;
+>  
+> -	struct dm_target_callbacks callbacks;
+> -
+>  	/*
+>  	 * origin_blocks entries, discarded if set.
+>  	 */
+> @@ -2423,20 +2421,6 @@ static void set_cache_size(struct cache *cache, dm_cblock_t size)
+>  	cache->cache_size = size;
+>  }
+>  
+> -static int is_congested(struct dm_dev *dev, int bdi_bits)
+> -{
+> -	struct request_queue *q = bdev_get_queue(dev->bdev);
+> -	return bdi_congested(q->backing_dev_info, bdi_bits);
+> -}
+> -
+> -static int cache_is_congested(struct dm_target_callbacks *cb, int bdi_bits)
+> -{
+> -	struct cache *cache = container_of(cb, struct cache, callbacks);
+> -
+> -	return is_congested(cache->origin_dev, bdi_bits) ||
+> -		is_congested(cache->cache_dev, bdi_bits);
+> -}
+> -
+>  #define DEFAULT_MIGRATION_THRESHOLD 2048
+>  
+>  static int cache_create(struct cache_args *ca, struct cache **result)
+> @@ -2471,9 +2455,6 @@ static int cache_create(struct cache_args *ca, struct cache **result)
+>  			goto bad;
+>  	}
+>  
+> -	cache->callbacks.congested_fn = cache_is_congested;
+> -	dm_table_add_target_callbacks(ti->table, &cache->callbacks);
+> -
+>  	cache->metadata_dev = ca->metadata_dev;
+>  	cache->origin_dev = ca->origin_dev;
+>  	cache->cache_dev = ca->cache_dev;
+
+[snipped]
