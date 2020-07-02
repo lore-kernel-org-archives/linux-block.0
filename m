@@ -2,70 +2,76 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17138C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 09:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C84C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 09:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E689920771
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 09:25:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14AF720771
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 09:25:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="jdUUOzes"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="Eiz0lbAm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726795AbgGBJZS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 05:25:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56624 "EHLO
+        id S1727006AbgGBJZT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 05:25:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726092AbgGBJZR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 05:25:17 -0400
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E575C08C5C1
-        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 02:25:17 -0700 (PDT)
-Received: by mail-ed1-x543.google.com with SMTP id e22so22862273edq.8
-        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 02:25:17 -0700 (PDT)
+        with ESMTP id S1726092AbgGBJZS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 05:25:18 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AED4C08C5C1
+        for <linux-block@vger.kernel.org>; Thu,  2 Jul 2020 02:25:18 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id w6so28473418ejq.6
+        for <linux-block@vger.kernel.org>; Thu, 02 Jul 2020 02:25:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Dh0cAN0tCAhAhB/CRVYwfSOkE6VN85xMjc2R7od/DSU=;
-        b=jdUUOzes/8whsQdIjZxLbY4pNmZtGSNLcWl6sQbTXJvHixYZjuuWnsVs1nnXRPTpRJ
-         +HZxIvyfmGTF3G2tT7ULo2iN3AM/jKg4kYU4xx3dtJfgfekTYh/t+FqYCwNbaW5/maC1
-         wzEyBD+g/2R/DiA5Yb8qwQ/mpMHxTCeaXcz6nGB8LGG2hfHYbfPIudueKdJBcmHk3t7y
-         jfH3V+eFH4bLdUF+CXgZ4mvhJ7HW5qxYI9CoCkU2OQGLyTEN9Eh2JQioB3vFDr14REsI
-         Gp3BMM3bydRPQm2S0XxUWxpB3slNy4Xp63xif7a7wE930dOruAQnuei1WZIUhFB+Bxjo
-         KX6g==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=RFQAZPjeEEYPnNvZUHiuMpATVhic2B+bZ8De7e+nmoI=;
+        b=Eiz0lbAmK2GuapskPcLetUryfUEnrhbufhFxX+2rC0p89cws92fGcolnElsigE062O
+         42STEJ0EaxP+HGZjgYn2sA2VXzKeQmaGDZly3yGtEfZx4rvPKrlSpLBCf0EejmGJLsx4
+         bGhDx7WZz+Rz16H34AsqNZ+oX5ncXFR4IYAAhlxIwlNpWjmfUV3cYDvAJfLstA7wpBOy
+         LTPx9bhOiQJ6Aeaw9g1fDQ8Ep3umS74Wkk6JbaMlrVeAm/BETjGAI7DhLJ2Btx+69X53
+         cmoiMyYc3EiIiujXbnX5nnQ9A+MfagAg1Gq8R05I33L1gvBMrfc6spvnnWlMldiCqX1U
+         VM8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Dh0cAN0tCAhAhB/CRVYwfSOkE6VN85xMjc2R7od/DSU=;
-        b=D+7OflC7SXhT+j32higjAnQ70hhb8sLuFwhCZ0wfEk1yV+bfUEYEGmmY7jyTeFHnTe
-         ZNdTeswqkGmmxVSKdsSY7JlYHdP6NoyqPbES7qA7xzW1DIG7DbgoErMU97X6sOe2E9NZ
-         Us1e/8FLzfk3x/LQkwl90lrGyKsmpKF1i/g6bXvQlcKUmiz2XcDA63G7+nYTuCxy3NaW
-         Rl/VyqIvuv/Nh/3CXR6PRwiOXabyd3mjbW16r/ZX6bVlLdIHIy3q0XmW3ufnRY6bqOGf
-         MYMoXW1e8q4t49g3eDnGJhhH8nP3Xjr8KIna4Pi/Qjb/b832LRA7fOHlPwmGHQs8THOI
-         VoqA==
-X-Gm-Message-State: AOAM531dpGsdTyeDszxH4+QJWHRs5g60TZ1TslQH/U4KDKTXVv/niVkD
-        1WFmv8om5bTNLErinq5hQrhlpg==
-X-Google-Smtp-Source: ABdhPJwbUgBlqWZ8Bv+GRN6+E17pyzzFdFFYXKVD+gNN8hPiigqPcpUUHUAmw4q0d7PyejHCnJ6XKw==
-X-Received: by 2002:a05:6402:1687:: with SMTP id a7mr33297542edv.358.1593681915998;
-        Thu, 02 Jul 2020 02:25:15 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=RFQAZPjeEEYPnNvZUHiuMpATVhic2B+bZ8De7e+nmoI=;
+        b=LicTHTpyFGD1Sh4DJ0M1qptkLVczlmn9/rrVPrJwM7sLIPEuMIzUIpXJ/RnEkQiCFZ
+         PYoStdmfvK4kqNMwq6GeBWejdfEhNVrip72se2BgV263crRxTc6PZP/qOeuq7JpqjGJB
+         r5E8v8fyJRQotafunKNKEFZGt0vMbJfhL+96Rnag8y8y2+KJ20cgsYmrkX8f9r73Lamz
+         1fXA39ndWAXk3zcjiFJ8EL0mEdX2FY2fjGoxe753UoNFNKOodSE59lTTkCi3ORc09Aka
+         H2LAgcHaYiwClp0AtvPbgapIZ8IcH7iMHGiT84JJ1/wDvWgBdiDG9p7i7IWsYCwezNpz
+         CLag==
+X-Gm-Message-State: AOAM532cLvA9PPZLwsw6BXmiNlo7glPl1dscDjuExsciZ+cJ/FPQzYHf
+        medCunh//r80ojULIjPUY/hxUQ==
+X-Google-Smtp-Source: ABdhPJynySCUYW9OcsHXk9q3JwHz0Wmor0c6AIMY6LxpHHERrZ9Q1QmtUZAnZR2fonz7CQR0wbc2+g==
+X-Received: by 2002:a17:906:924d:: with SMTP id c13mr20309117ejx.518.1593681917258;
+        Thu, 02 Jul 2020 02:25:17 -0700 (PDT)
 Received: from localhost.localdomain ([194.62.217.57])
-        by smtp.gmail.com with ESMTPSA id b18sm6569464ejl.52.2020.07.02.02.25.15
+        by smtp.gmail.com with ESMTPSA id b18sm6569464ejl.52.2020.07.02.02.25.16
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 Jul 2020 02:25:15 -0700 (PDT)
+        Thu, 02 Jul 2020 02:25:16 -0700 (PDT)
 From:   =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
         sagi@grimberg.me, axboe@kernel.dk, Damien.LeMoal@wdc.com,
         mb@lightnvm.io, Johannes.Thumshirn@wdc.com,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>
-Subject: [PATCH v3 0/4]  ZNS: Extra features for current patches
-Date:   Thu,  2 Jul 2020 11:24:34 +0200
-Message-Id: <20200702092438.63717-1-javier@javigon.com>
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: [PATCH v3 1/4] block: Add zone flags to queue zone prop.
+Date:   Thu,  2 Jul 2020 11:24:35 +0200
+Message-Id: <20200702092438.63717-2-javier@javigon.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200702092438.63717-1-javier@javigon.com>
+References: <20200702092438.63717-1-javier@javigon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -76,77 +82,102 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Javier González <javier.gonz@samsung.com>
 
-This patchset extends zoned device functionality on top of the existing
-ZNS patchset that Keith sent.
+As the zoned block device will have to deal with features that are
+optional for the backend device, add a flag field to inform the block
+layer about supported features. This builds on top of
+blk_zone_report_flags and extendes to the zone report code.
 
-Changes since V2
-  - Remove debug code added by mistake
-  - Address return value and constant naming by Damien
-  - Leave rest of the comments for a V4, after discussion in the mailing
-    list
+Signed-off-by: Javier González <javier.gonz@samsung.com>
+Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+---
+ block/blk-zoned.c              | 3 ++-
+ drivers/block/null_blk_zoned.c | 2 ++
+ drivers/nvme/host/zns.c        | 1 +
+ drivers/scsi/sd.c              | 2 ++
+ include/linux/blkdev.h         | 3 +++
+ 5 files changed, 10 insertions(+), 1 deletion(-)
 
-Changes since V1
-  - Remove new IOCTLs for zone management and zone values. I believe we
-    will need the zone management IOCTL to support new ZNS features in
-    the near future, but we will wait until we upstream these too. In
-    the meantime, feedback on the IOCTL is welcome. We drop the zone
-    values IOCTL completely - Niklas send a patch to expose mar / mor
-    through sysfs already - we will extend on this if needed.
-
-  - Reimplement zone offline transition to be a IOCTL in itself, as the
-    rest of the existing zone transitions. In the process, implement a
-    way for drivers to report zone feature support in the newly added
-    feature flags. Refactor support for capacity to adopt this model.
-    Here, note that we have maintained behaviour for the scsi driver,
-    even though zone_size == zone_capacity
-
-  - Reimplement the zone count consistency check to do a correct zone
-    calculation. Move this logic to the initialization logic, instead of
-    doing it each time we report zones.
-
-Thanks,
-Javier
-
---- V1 cover letter ---
-
-Patches 1-5 are zoned block interface and IOCTL additions to expose ZNS
-values to user-space. One major change is the addition of a new zone
-management IOCTL that allows to extend zone management commands with
-flags. I recall a conversation in the mailing list from early this year
-where a similar approach was proposed by Matias, but never made it
-upstream. We extended the IOCTL here to align with the comments in that
-thread. Here, we are happy to get sign-offs by anyone that contributed
-to the thread - just comment here or on the patch.
-
-Patch 6 is nvme-only and adds an extra check to the ZNS report code to
-ensure consistency on the zone count.
-
-The patches apply on top of Jens' block-5.8 + Keith's V3 ZNS patches.
-
-Thanks,
-Javier
-
-
-
-Javier González (4):
-  block: Add zone flags to queue zone prop.
-  block: add support for zone offline transition
-  nvme: Add consistency check for zone count
-  block: add attributes to zone report
-
- block/blk-core.c               |  2 ++
- block/blk-zoned.c              | 11 +++++++--
- drivers/block/null_blk_zoned.c |  2 ++
- drivers/nvme/host/core.c       |  5 ++++-
- drivers/nvme/host/nvme.h       |  6 +++--
- drivers/nvme/host/zns.c        | 41 +++++++++++++++++++++++++++++++++-
- drivers/scsi/sd.c              |  2 ++
- drivers/scsi/sd_zbc.c          |  8 +++++--
- include/linux/blk_types.h      |  3 +++
- include/linux/blkdev.h         |  4 +++-
- include/uapi/linux/blkzoned.h  | 32 +++++++++++++++++++++++++-
- 11 files changed, 106 insertions(+), 10 deletions(-)
-
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 81152a260354..0f156e96e48f 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -312,7 +312,8 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
+ 		return ret;
+ 
+ 	rep.nr_zones = ret;
+-	rep.flags = BLK_ZONE_REP_CAPACITY;
++	rep.flags = q->zone_flags;
++
+ 	if (copy_to_user(argp, &rep, sizeof(struct blk_zone_report)))
+ 		return -EFAULT;
+ 	return 0;
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+index b05832eb21b2..957c2103f240 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk_zoned.c
+@@ -78,6 +78,8 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+ 	}
+ 
+ 	q->limits.zoned = BLK_ZONED_HM;
++	q->zone_flags = BLK_ZONE_REP_CAPACITY;
++
+ 	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+ 	blk_queue_required_elevator_features(q, ELEVATOR_F_ZBD_SEQ_WRITE);
+ 
+diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+index c08f6281b614..afe62dc27ff7 100644
+--- a/drivers/nvme/host/zns.c
++++ b/drivers/nvme/host/zns.c
+@@ -81,6 +81,7 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+ 	}
+ 
+ 	q->limits.zoned = BLK_ZONED_HM;
++	q->zone_flags = BLK_ZONE_REP_CAPACITY;
+ 	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+ free_data:
+ 	kfree(id);
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index d90fefffe31b..b9c920bace28 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -2967,6 +2967,7 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
+ 	if (sdkp->device->type == TYPE_ZBC) {
+ 		/* Host-managed */
+ 		q->limits.zoned = BLK_ZONED_HM;
++		q->zone_flags = BLK_ZONE_REP_CAPACITY;
+ 	} else {
+ 		sdkp->zoned = (buffer[8] >> 4) & 3;
+ 		if (sdkp->zoned == 1 && !disk_has_partitions(sdkp->disk)) {
+@@ -2983,6 +2984,7 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
+ 					  "Drive-managed SMR disk\n");
+ 		}
+ 	}
++
+ 	if (blk_queue_is_zoned(q) && sdkp->first_scan)
+ 		sd_printk(KERN_NOTICE, sdkp, "Host-%s zoned block device\n",
+ 		      q->limits.zoned == BLK_ZONED_HM ? "managed" : "aware");
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 8fd900998b4e..3f2e3425fa53 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -512,12 +512,15 @@ struct request_queue {
+ 	 * Stacking drivers (device mappers) may or may not initialize
+ 	 * these fields.
+ 	 *
++	 * Flags represent features as described by blk_zone_report_flags in blkzoned.h
++	 *
+ 	 * Reads of this information must be protected with blk_queue_enter() /
+ 	 * blk_queue_exit(). Modifying this information is only allowed while
+ 	 * no requests are being processed. See also blk_mq_freeze_queue() and
+ 	 * blk_mq_unfreeze_queue().
+ 	 */
+ 	unsigned int		nr_zones;
++	unsigned int		zone_flags;
+ 	unsigned long		*conv_zones_bitmap;
+ 	unsigned long		*seq_zones_wlock;
+ #endif /* CONFIG_BLK_DEV_ZONED */
 -- 
 2.17.1
 
