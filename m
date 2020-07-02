@@ -2,207 +2,114 @@ Return-Path: <SRS0=sMug=AN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EEF4C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 10:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA11CC433E1
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 11:23:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC9A420772
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 10:58:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5jizEqu"
+	by mail.kernel.org (Postfix) with ESMTP id C43E320780
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jul 2020 11:23:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728009AbgGBK6K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jul 2020 06:58:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42732 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728007AbgGBK6J (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jul 2020 06:58:09 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DEABC08C5C1;
-        Thu,  2 Jul 2020 03:58:09 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id t25so26743333lji.12;
-        Thu, 02 Jul 2020 03:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=kKRrfxb90VfzoXGfhNPYe5HmgW3st+L4rXe9X50lhVE=;
-        b=M5jizEqu0whp1mWCOc7mCG0MqJ+3nBdSSCWbYjY5AtvlruQJOFWkk/uOcem20L271/
-         3OrK02PrH2xU5ivMXit67+Qt6HiQr9toxA4KYEvrjJEh5ndlN2/dnAZdTRvjRojL2qu6
-         44qMR8N0qhwZkfTGIHltX+EPl9uvHZrOv48XPh2/7DaguUTkKZRbrORVc0bT9QxutjHY
-         57hyQyF5gkCrbLfeH2gvcoaa5sIgdwyjrxFCqY5CXCDkv5G1Wmv6jHkD+OiQcHdePK+3
-         mkdJLRyQAA1hlQH/954UswcQtHMtevAWNWOBQLfrDiI7q3siT8jqJIWYPIYQK5eRGkhf
-         ULZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=kKRrfxb90VfzoXGfhNPYe5HmgW3st+L4rXe9X50lhVE=;
-        b=gIQbyjBtIPnypwG8dcf0Wkh6ITFjTTWzZQQg6XeG0UH/XWoPqOFoWFv2E5Sn65yM7p
-         i+ONTg0gAwimrkcsmd8qr17hNtO8YcAM275Zi1Kw9YGea7tJg+XDHGAzUACRQy+UKhS/
-         GOohKyVt67H4CQo43ZIeTBFIweo4mswZ3YWim1M6O/mhjXDE8hvj9VWgFjBz5VhAyKTr
-         hY0TQt91u0pJx30MwFiEnGtpqULWf9eE3fffgqnpGmuY/yrrFqBHjaS9KExS4/fPyRwW
-         mEJcV/dZ5o3FzDiXAnhU8mMz4ZyI2EKyGnk5CJmuv6Yg0xtWCQsK5P6OTqSULc+6KAzU
-         sDJw==
-X-Gm-Message-State: AOAM533jZBCpbkjwBT1Gug1TgqsXEwHulSg6iBz0N3vc9yj8daX4Xkk/
-        buvp35ImAo77tlgJxl5J1dZppYi8
-X-Google-Smtp-Source: ABdhPJzdo/qQ2Z3Hfy5L+tGUBzoUfTRwMbyWzP0wyBFXT+6IRzG/dBG/3PUJwrvwJ689yjDxsm9qFQ==
-X-Received: by 2002:a05:651c:222:: with SMTP id z2mr614115ljn.395.1593687487828;
-        Thu, 02 Jul 2020 03:58:07 -0700 (PDT)
-Received: from smtp.gmail.com (95.108.174.193-red.dhcp.yndx.net. [95.108.174.193])
-        by smtp.gmail.com with ESMTPSA id n9sm3219097lfd.60.2020.07.02.03.58.06
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 02 Jul 2020 03:58:07 -0700 (PDT)
-From:   Dmitry Monakhov <dmonakhov@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, Dmitry Monakhov <dmonakhov@gmail.com>
-Subject: [PATCH] bfq: fix blkio cgroup leakage
-Date:   Thu,  2 Jul 2020 10:57:51 +0000
-Message-Id: <20200702105751.20482-1-dmonakhov@gmail.com>
-X-Mailer: git-send-email 2.18.0
+        id S1728385AbgGBLXR convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jul 2020 07:23:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36952 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728009AbgGBLXQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Jul 2020 07:23:16 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 062B35Q1106284;
+        Thu, 2 Jul 2020 07:23:11 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 320ss3ubp6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Jul 2020 07:23:11 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 062B5X2Y114827;
+        Thu, 2 Jul 2020 07:23:11 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 320ss3ubnd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Jul 2020 07:23:11 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 062BH5tL024933;
+        Thu, 2 Jul 2020 11:23:09 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 31wwch5kv1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Jul 2020 11:23:08 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 062BN6CT64028808
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Jul 2020 11:23:06 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9F0642042;
+        Thu,  2 Jul 2020 11:23:06 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A4E504203F;
+        Thu,  2 Jul 2020 11:23:05 +0000 (GMT)
+Received: from [9.85.87.208] (unknown [9.85.87.208])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Jul 2020 11:23:05 +0000 (GMT)
+From:   Sachin Sant <sachinp@linux.vnet.ibm.com>
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.14\))
+Subject: [powerpc][next-20200701] Hung task timeouts during regression test
+ runs
+Message-Id: <CDAB3931-FAAD-443A-A9CD-362E527043A1@linux.vnet.ibm.com>
+Date:   Thu, 2 Jul 2020 16:53:04 +0530
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        ming.lei@redhat.com, axboe@kernel.dk
+To:     linuxppc-dev@lists.ozlabs.org, linux-block@vger.kernel.org
+X-Mailer: Apple Mail (2.3445.104.14)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-02_04:2020-07-02,2020-07-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ cotscore=-2147483648 spamscore=0 clxscore=1011 phishscore=0 adultscore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=967 suspectscore=0 mlxscore=0
+ impostorscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2007020078
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
-introduce leak forbfq_group and blkcg_gq objects because of get/put
-imbalance. See trace balow:
--> blkg_alloc
-   -> bfq_pq_alloc
-     -> bfqg_get (+1)
-->bfq_activate_bfqq
-  ->bfq_activate_requeue_entity
-    -> __bfq_activate_entity
-       ->bfq_get_entity
-         ->bfqg_and_blkg_get (+1)  <==== : Note1
-->bfq_del_bfqq_busy
-  ->bfq_deactivate_entity+0x53/0xc0 [bfq]
-    ->__bfq_deactivate_entity+0x1b8/0x210 [bfq]
-      -> bfq_forget_entity(is_in_service = true)
-	 entity->on_st_or_in_serv = false   <=== :Note2
-	 if (is_in_service)
-	     return;  ==> do not touch reference
--> blkcg_css_offline
- -> blkcg_destroy_blkgs
-  -> blkg_destroy
-   -> bfq_pd_offline
-    -> __bfq_deactivate_entity
-         if (!entity->on_st_or_in_serv) /* true, because (Note2)
-		return false;
- -> bfq_pd_free
-    -> bfqg_put() (-1, byt bfqg->ref == 2) because of (Note2)
-So bfq_group and blkcg_gq  will leak forever, see test-case below.
-If fact bfq_group objects reference counting are quite different
-from bfq_queue. bfq_groups object are referenced by blkcg_gq via
-blkg_policy_data pointer, so  neither nor blkg_get() neither bfqg_get
-required here.
+Starting with linux-next 20200701 release I am observing automated regressions
+tests taking longer time to complete. A test which took 10 minutes with next-20200630
+took more than 60 minutes against next-20200701. 
 
+Following hung task timeout messages were seen during these runs
 
-This patch drop commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
-and add corresponding comment.
+[ 1718.848351]       Not tainted 5.8.0-rc3-next-20200701-autotest #1
+[ 1718.848356] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[ 1718.848362] NetworkManager  D    0  2626      1 0x00040080
+[ 1718.848367] Call Trace:
+[ 1718.848374] [c0000008b0f6b8f0] [c000000000c6d558] schedule+0x78/0x130 (unreliable)
+[ 1718.848382] [c0000008b0f6bad0] [c00000000001b070] __switch_to+0x2e0/0x480
+[ 1718.848388] [c0000008b0f6bb30] [c000000000c6ce9c] __schedule+0x2cc/0x910
+[ 1718.848394] [c0000008b0f6bc10] [c000000000c6d558] schedule+0x78/0x130
+[ 1718.848401] [c0000008b0f6bc40] [c0000000005d5a64] jbd2_log_wait_commit+0xd4/0x1a0
+[ 1718.848408] [c0000008b0f6bcc0] [c00000000055fb6c] ext4_sync_file+0x1cc/0x480
+[ 1718.848415] [c0000008b0f6bd20] [c000000000493530] vfs_fsync_range+0x70/0xf0
+[ 1718.848421] [c0000008b0f6bd60] [c000000000493638] do_fsync+0x58/0xd0
+[ 1718.848427] [c0000008b0f6bda0] [c0000000004936d8] sys_fsync+0x28/0x40
+[ 1718.848433] [c0000008b0f6bdc0] [c000000000035e28] system_call_exception+0xf8/0x1c0
+[ 1718.848440] [c0000008b0f6be20] [c00000000000ca70] system_call_common+0xf0/0x278
 
-##TESTCASE_BEGIN:
-#!/bin/bash
+Comparing next-20200630 with next-20200701 one possible candidate seems to
+be following commit:
 
-max_iters=${1:-100}
-#prep cgroup mounts
-mount -t tmpfs cgroup_root /sys/fs/cgroup
-mkdir /sys/fs/cgroup/blkio
-mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
+commit 37f4a24c2469a10a4c16c641671bd766e276cf9f
+    blk-mq: centralise related handling into blk_mq_get_driver_tag
 
-# Prepare blkdev
-grep blkio /proc/cgroups
-truncate -s 1M img
-losetup /dev/loop0 img
-echo bfq > /sys/block/loop0/queue/scheduler
+Reverting this commit allows the test to complete in 10 minutes.
 
-grep blkio /proc/cgroups
-for ((i=0;i<max_iters;i++))
-do
-    mkdir -p /sys/fs/cgroup/blkio/a
-    echo 0 > /sys/fs/cgroup/blkio/a/cgroup.procs
-    dd if=/dev/loop0 bs=4k count=1 of=/dev/null iflag=direct 2> /dev/null
-    echo 0 > /sys/fs/cgroup/blkio/cgroup.procs
-    rmdir /sys/fs/cgroup/blkio/a
-    grep blkio /proc/cgroups
-done
-##TESTCASE_END:
-
-Signed-off-by: Dmitry Monakhov <dmonakhov@gmail.com>
----
- block/bfq-cgroup.c  |  2 +-
- block/bfq-iosched.h |  1 -
- block/bfq-wf2q.c    | 15 +++++----------
- 3 files changed, 6 insertions(+), 12 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 68882b9..b791e20 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -332,7 +332,7 @@ static void bfqg_put(struct bfq_group *bfqg)
- 		kfree(bfqg);
- }
- 
--void bfqg_and_blkg_get(struct bfq_group *bfqg)
-+static void bfqg_and_blkg_get(struct bfq_group *bfqg)
- {
- 	/* see comments in bfq_bic_update_cgroup for why refcounting bfqg */
- 	bfqg_get(bfqg);
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index cd224aa..7038952 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -986,7 +986,6 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
- struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node);
--void bfqg_and_blkg_get(struct bfq_group *bfqg);
- void bfqg_and_blkg_put(struct bfq_group *bfqg);
- 
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 34ad095..6a363bb 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -529,13 +529,14 @@ static void bfq_get_entity(struct bfq_entity *entity)
- {
- 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
- 
-+	/* Grab reference only for bfq_queue's objects, bfq_group ones
-+	 * are owned by blkcg_gq
-+	 */
- 	if (bfqq) {
- 		bfqq->ref++;
- 		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
- 			     bfqq, bfqq->ref);
--	} else
--		bfqg_and_blkg_get(container_of(entity, struct bfq_group,
--					       entity));
-+	}
- }
- 
- /**
-@@ -649,14 +650,8 @@ static void bfq_forget_entity(struct bfq_service_tree *st,
- 
- 	entity->on_st_or_in_serv = false;
- 	st->wsum -= entity->weight;
--	if (is_in_service)
--		return;
--
--	if (bfqq)
-+	if (bfqq && !is_in_service)
- 		bfq_put_queue(bfqq);
--	else
--		bfqg_and_blkg_put(container_of(entity, struct bfq_group,
--					       entity));
- }
- 
- /**
--- 
-2.7.4
+Thanks
+-Sachin
 
