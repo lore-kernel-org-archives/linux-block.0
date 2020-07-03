@@ -6,200 +6,145 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2699AC433E0
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jul 2020 12:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C18F6C433E0
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jul 2020 13:02:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD30920B80
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jul 2020 12:09:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C94D206B7
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jul 2020 13:02:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="F+kU3V7m";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="rQh1beat"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="G7PHcRIc";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="zAbiGc+K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726286AbgGCMJf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jul 2020 08:09:35 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:49716 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725984AbgGCMJe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jul 2020 08:09:34 -0400
+        id S1726108AbgGCNCs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jul 2020 09:02:48 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:56667 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726035AbgGCNCr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jul 2020 09:02:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1593778172; x=1625314172;
+  t=1593781367; x=1625317367;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=SfS+K5MTPTZIhplI+MGYFH12O6KVup+8QR4l4HmL+eI=;
-  b=F+kU3V7mrL53C2sE5D6FxyZ6nTEHJhcsnPatQDQXWDH5llT6TVJK4r1a
-   /yojJ37jkwAZ0yWidocdlAK0OYLJC/JamOVPUg5ooAEIHizrOzD8G7aZm
-   DXgbbEWHzhE8P5Bda6VzAdL4f+CbSVNrL/ix2fA70vpmEFZb2G5xNnkOT
-   rCkRswtqv0ctCo6Fv1jNGzQsD00gl1uv1VB3mKkpURM7jY2MG4Qhonbf2
-   nTSuUFkmsiAW5tCfqZU7HSZqYfwfBqdTTZMUN+PN/DF9sKKhjWCJUNdKP
-   YQ0kPg1jJSh5ffpLWfMUOz4zYA00GbLX+ZLBA5roQlWlSgRyBIrpcIU5l
+  bh=d9wQppb/ZvEDda8ooX3NUuk0Ma9Oy0G2WC1EJihT9RY=;
+  b=G7PHcRIccTwR2ytE7b5T4lIWYsXWuLbtswFM8omFa/Rwd8DQQ9qn6Z6n
+   z75hpmtAUYp9hbpO7SxdAMV+U/aKiKwCzjGIh6vol5z5Glb9arUEQMTFq
+   Tjn8PXjVIP0OdQQPfu6DmEJkH7WeAdAfW615t+tGqCX3Y4QQlstWkBKm2
+   R+4sGfl3d3cd1vdBve/714CcDORXziRQvyO8HnSENT5n5wsay5+WkX8cd
+   OCbrS5MWYcx4OpxOvE0n9rC6bT56+JBs+z1osrsrN9dA4lveT2dKpyRHT
+   nf9SYmIOfXqAEbnlmAoU5hW/5JyB4cEqh6J+7SyKe/PMqwJHtzjS+ORQT
    g==;
-IronPort-SDR: lmmBmfUOval16CTT4O4qyuLEKa1/vpnl/lrdqaG6i7j6xRningeLYDu9OqSQgh2sqToylvfk5U
- Atjc9SoaHpSgGxSGkDf1D3k/EEjVjMpqKQMr11yROSdboyD0+AcCJzgMimlnRrb8DUR/8pbWRr
- zGMFwuSpksL1YVzyPM9WsIF+XasOjYRyAa2bMvelsAY6BdLl2uhynf8UNjGzHsdiuAtJjEA46l
- W01F4wv1CeGy5hM2UHZSMnFK9p/j+YEBUVmMStVpWAzIbmVGhzW4hjUDWW2rCYa/RXW9sEW7gA
- Bio=
+IronPort-SDR: kB0a1BOwfldlr+Cuw+VKcVrrI4DP5Jx1SdXFJHjOC3rZgZe7q6+v7TyW0SESPC0fFmfJAW5l0r
+ Uz5yL+nMHicURY6E5qbElauqAvVfbvk+5eg03Z69Nbd0NZs7/Jdhw56SCfy5HgmCFzWy3XhVbU
+ WMLts68JRTDr6t2s13hHkdRWlrXT8jdM1faBADNaV3wzcC6qCn1eK1BQ/5u9u0BVhACwsgZJaR
+ nZyY+Ay6gRwP3WNvNwiu1s28Tj5Fc6R96xlTxu4ZQlBhc+IGULfQL2l8Etn+FVJQ1f6P2FGp0X
+ hcE=
 X-IronPort-AV: E=Sophos;i="5.75,308,1589212800"; 
-   d="scan'208";a="141580301"
-Received: from mail-bn3nam04lp2052.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.52])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 20:09:31 +0800
+   d="scan'208";a="142922802"
+Received: from mail-mw2nam12lp2044.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.44])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 21:02:45 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n66OSmkv2kEsfM/Ln1ppXocQYO1K0cP/lQJg5oet9ZuhkjZUjECgFQRvM/BM6uoPai+QCzZPM5TDiBjdpJL6DBzICUdcL+Rv8cmi/jWuHCPsVHPzBX9X3aPxUJRkUG9Er5pUZ/TZiyz0WPyzbaClIj4zxwMGThr+RDRHVLUzT5x5idPemeO7l5CG+UkBNSilA7RALsp5sUr4HFKGFaOvA4AmBHjQmO+qq21y3hQ6vBUxyUCi+Azr6R1hO1StSWIE3uR2CQtkiSTYtiGabQyWqdVz8GhhcvqRc+uhneBkNQe3D7uITIuBbChjzXoaxH46onFAI5saazKcPUU4esWw8w==
+ b=HObZ8QccxtmbopyWfd10emA4pVqPNo/ItmgB4iCyEVN6jhKjr3Vg7yYjp/lxaHZFOo7pHLpwftkysf1n8cuJCLxQypBgsrvcBzELpgH0ehPkyvvup6XK323w5TjX4DSbbaNZX/rNkTUkv3/XQOotABbDypBwEWfN2aaOb2xKaxn6/cvPBhRk6gvDRHN4eiV1oGE3kXgZa2cje0zoGk4LQfTGBrl67GGFyRr/xY15o6FTTB0UeUd8Vvc02a0WTikNIQc0pJATHx++LDwEAwNq5p0l320Fbtwro6lKH+D08ug+p4Hf5ZLtH5Z8hG2ETSswW8M+4poE+dlVbhoSYivNaw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w10F6oAfULdcNMEWTN0Mi6P5uD958F92baLMWdJeN9c=;
- b=SGg3CPuNvAEPWyZJIoUnQCS/QJe3uefCp6N8cU4j9Xm1WQ1irlpM9EwxwKKMEqO4HvMB8jR4SZAsU4PpReY9MSiu7p9SjGjgHaUUVWATjDWLMdP72wTBX4Tgk+jV6KRkapXgwiyrr+4UNdeZXSVOm96D11YKr1Y/6KObhTTvbWKgQRa6I99gpsXwOChXwH+KI/SNXEr0ZlNjdJ+uye2w5sNP7qiGfT/22pDEgLi0/llGxk5AmJknl+r/4hMiJStosUwinHWi9L0GkvT0inyqB/Al6zlOHbfnkNMLOMxVKR589H7kEr7VbNU8f2pxt4oj5YHrenZuuG83tZnS52mT0Q==
+ bh=d9wQppb/ZvEDda8ooX3NUuk0Ma9Oy0G2WC1EJihT9RY=;
+ b=a1eS7ApS97Btiqb0vADmHsrURdgwWFvlQZ3Bai9Vy92jPwEZf151E/sS2UeIiHEMVr+XE7v0NgqahByNe3YCYu2zXx4p8E+6cJRecV4sPGtpV9WNgcB845pSKuCnTGX4StUK/GQsbNzuGrwe8ISjQD8FW9IutNwxNIsaS4PlZCFBdHONM6nnS06qYvIgxad47EQhB++osSimMG+L6h0xPHaKR0LLa1pJTNNV7c39rGJNxcf081roNN2Y5/TzCSoj/wSPMlQNK9dzxMRRNHJuBSMGGwKNKngsQFrRgMlG7I+Ovqjt+tepN56dsnF/h98u/44hXmI0nKBD4Hcsl0HqCA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w10F6oAfULdcNMEWTN0Mi6P5uD958F92baLMWdJeN9c=;
- b=rQh1beatMIyGPTumsXODKRT5jr6QFYDbZsEuwyKiHdLZffWbTvf4NdiaDzQIeRUKuUXylDstECKL7Q6b18xmrEUVj2NUPL1MU1aX9MX0lTmwX5Ztg9uKZ++RiWUBAtpNpx8qhfux/UpeDlMh2KQoa2HOuqlnhpi9r/8DIf4eh38=
+ bh=d9wQppb/ZvEDda8ooX3NUuk0Ma9Oy0G2WC1EJihT9RY=;
+ b=zAbiGc+KZhdr6Oiy+tWkOx0RkR0NUgM3lOClNabTk++LuD06I7V4Utujo82PzLJVtfaUJqHWVhkfX+CzmCW/QLFyRTvlxBTAp71C8Ftxrxh7pFvstEHaeM3BLsIXnXtcYcIu8CeCPpwmZjJA4Vca04OVugDm7EjD0EBaUbHVXKM=
 Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN6PR04MB4461.namprd04.prod.outlook.com
- (2603:10b6:805:ac::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.27; Fri, 3 Jul
- 2020 12:09:30 +0000
+ (2603:10b6:803:47::21) by SN6PR04MB4159.namprd04.prod.outlook.com
+ (2603:10b6:805:2f::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Fri, 3 Jul
+ 2020 13:02:44 +0000
 Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
  ([fe80::1447:186c:326e:30b2]) by SN4PR0401MB3598.namprd04.prod.outlook.com
  ([fe80::1447:186c:326e:30b2%7]) with mapi id 15.20.3153.028; Fri, 3 Jul 2020
- 12:09:29 +0000
+ 13:02:44 +0000
 From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-CC:     Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier@javigon.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+To:     Kanchan Joshi <joshi.k@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH v2 1/2] block: add max_open_zones to blk-sysfs
-Thread-Topic: [PATCH v2 1/2] block: add max_open_zones to blk-sysfs
-Thread-Index: AQHWUJ1laLSAJw11LUObxsrvIlcW1g==
-Date:   Fri, 3 Jul 2020 12:09:29 +0000
-Message-ID: <SN4PR0401MB359801D165A0B9882B43B3719B6A0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200702181922.24190-1-niklas.cassel@wdc.com>
- <20200702181922.24190-2-niklas.cassel@wdc.com>
- <SN4PR0401MB359886C77E3711DAF16D9B9F9B6A0@SN4PR0401MB3598.namprd04.prod.outlook.com>
- <20200703092353.GA33841@localhost.localdomain>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>, Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Subject: Re: [PATCH 2/2] block: enable zone-append for iov_iter of bvec type
+Thread-Topic: [PATCH 2/2] block: enable zone-append for iov_iter of bvec type
+Thread-Index: AQHWUIdr8xWbLJJJdEuR1V88dlaKiQ==
+Date:   Fri, 3 Jul 2020 13:02:43 +0000
+Message-ID: <SN4PR0401MB3598BB905AE2F34D3D7C60749B6A0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <1593704330-11540-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200702154213epcas5p4e8d42861cb5ae91ddeccf1ed73107304@epcas5p4.samsung.com>
+ <1593704330-11540-3-git-send-email-joshi.k@samsung.com>
+ <CY4PR04MB37516E788EC8804D7DF9780EE76A0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200703065311.GB26058@test-zns>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
+authentication-results: samsung.com; dkim=none (message not signed)
+ header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
 x-originating-ip: [129.253.240.72]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 3dfaa944-a9a9-4990-bf38-08d81f49f070
-x-ms-traffictypediagnostic: SN6PR04MB4461:
+x-ms-office365-filtering-correlation-id: c72f9911-8596-4aad-e294-08d81f516043
+x-ms-traffictypediagnostic: SN6PR04MB4159:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN6PR04MB44615F2758B78935B11E2E629B6A0@SN6PR04MB4461.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <SN6PR04MB41599524431BE50F3BD1900A9B6A0@SN6PR04MB4159.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
 x-forefront-prvs: 045315E1EE
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: O+k/nqfHhf/fHqc0BERP1I/oYmJ5MBxRwkmR/7tBf81qxhYeP786eenYs5EP40kQ5Rcla5+ocqJStMhJg5k8D2/snNtbwB96sA7XGVJPRv2N5kToB+Mz3p1Dl8F0hfyHHbBg0ybDfYaYLlOJ9Xb05xaqjicnv+6h1OIBESTGU+TJtnGppCuCii/AfdYJNLB5OJzrAQnNIZn7/9nwPaK0cv5cFzbL81cFhr15y6nf6ZH1tixpwINtc5G8+obGLwInqVjtC7uvvlG6Bs9zQ+NVUWZEd2l7YhI3HwWP0tmktg4IQNQGWfpk04i5OLfhGoLYju9kgISqoJ9h4VIYf7dsGg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(39860400002)(396003)(366004)(346002)(376002)(8676002)(8936002)(478600001)(5660300002)(2906002)(52536014)(7416002)(6862004)(71200400001)(76116006)(64756008)(91956017)(66946007)(66476007)(66556008)(66446008)(54906003)(55016002)(9686003)(6636002)(26005)(186003)(86362001)(4326008)(7696005)(316002)(6506007)(53546011)(83380400001)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: 2mHiQPS5zKMFY6rBZbxLRI429dulqXhIy1G5jRfJ357ZYe6JBvEnWpoR3QYa1AvsODIuIjwGuRr4FgBtO9Hg6lLGgaImENexCfuBDaQCYmtwpI+UPV5Loq1Zc/QN58/6w+SbdhV6ZVdrI25WZSo31Q0hotCXsfKQD/i+MCdG6V6Mb5M9yh0sdQeLHT14pPXwJL3v8gJIc50EVokh0aXsp+W0v5UA2ye4hudYJZ9spQXQAU96x2jDZZk2lExX1NlR6t2J3tIhZ1TdMG/6nFU1GDmRKnp57WdDM8ryzZ1XoFCjn81jnWx+Wg3XkKidvUNPJmIDOwGykpyBFdRYafZTuhInjkFE4gZvt0b4bu+Dh/7xqChdZ9SiRRwzYbzrF+pHKpD6McvezHCMhk5SUiliUoZgsr95IUf3vjDCBgsSfnKmjzmAC892n60mitmAGIlCD/34ybFGLHfXEgKX0abVLrc2KyhgoTdmwcEutE7Q9IaE9hHTjvUojggx6Ci+BFeW
-Content-Type: text/plain; charset="iso-8859-1"
+x-microsoft-antispam-message-info: sVenqDRNcNvvze32Yv3Hk7p6i1kP0PTc2xyd9Q5+8fS0t9lrvgsmpsIam1ptpzYNgJtVWRYi14zI9H2xmwb3UEzZ9uBlZ7gN+e0JfuCcnE4yIkAkJRNDB6/y/A6y3Pn0Do3tXmKT0yEBqRoYKwZN1Q4akq+Wrk/gM5SJ2a2F3ctFqCXAbtJ54l2p5mzvELwpuIIbzK4kuvIOdhe8C73HZ9GHV/E6dWe6/nWrB+EUcA5Zrr+BTc7xZ7Ir8eLzQ0ZZLYEuDNlnwA7BjmBm7WGGNLyZ6cVzdHVde6bd9t2K285/wR5aYLAzki8km+1njNABuhv+aN3in4LqjC26j4gijw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(366004)(376002)(396003)(39860400002)(136003)(8936002)(4326008)(9686003)(2906002)(86362001)(66556008)(83380400001)(33656002)(66446008)(66476007)(64756008)(6506007)(53546011)(66946007)(91956017)(7696005)(76116006)(26005)(8676002)(55016002)(71200400001)(186003)(54906003)(6636002)(316002)(52536014)(5660300002)(478600001)(4744005)(110136005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: zQNlfDd7lm1SaxJp5YH6sg8Y4bGQte1YrnTG5ikHAUc974mzWJ7fzC+n0ahZQhbS8B8ce2DfhGm1lHrchsopnt347RxDFyeNtCjz+HW7RnK73zXiipQZvBejg40GLHopDkKNIkQ0uTwvHbeW1OqVFhLWywLIDTSH8YGXpttV8yoeSNQA+dSV0o4yP+9/SfWejFh2McUFwzp09w/ij+/O+Cfzh31MO9C6qqrWvumfk4gKrXJbJdR0gFtqFrY/yajH5O1B9QPVnignm3rHB3FHsk/BL1kd8qyznIEjbzDJIsCgYhFJtZyyaTwFgJhrYjBMqQHZcR17OKLW4xyUuNGJTr+VZzpkblQj8mQBsy4ZxIngmFpBYSspKX7D+0EY1QA/5s1brZv0QMIhdBM0F3QYN8QTM1P4ND/4MBXt3xblMnBvP+CbxtBc94BsxrhofzMXw93BBeD5CCEBRb+86/1QtuhWRUni/lbLJbYgqGnzYKBvANfw2C2KYEfzOZOf6Fpu
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3dfaa944-a9a9-4990-bf38-08d81f49f070
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2020 12:09:29.9051
+X-MS-Exchange-CrossTenant-Network-Message-Id: c72f9911-8596-4aad-e294-08d81f516043
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2020 13:02:43.9850
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 62akM7fmIZD5H6031culOFUlMnyLDYsMJXvB+doiJDaU5oSRad7m83vHtkqWbe/o1wkKUOhzDj+HKuifAJRY7ZKM2EgTB+aN35VU+UZGHOM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4461
+X-MS-Exchange-CrossTenant-userprincipalname: Hapokm7eCjIVhe9xdPY/CuU18J0fKnkk4PyVda1rsXu65307QO5wILa8jWBkA8+f3sC+9hJ1RWEHCcxq4m8GWkgU8ZHpx31F6hKhqB+CxHM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4159
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03/07/2020 11:23, Niklas Cassel wrote:=0A=
-> On Fri, Jul 03, 2020 at 08:22:45AM +0000, Johannes Thumshirn wrote:=0A=
->> On 02/07/2020 20:20, Niklas Cassel wrote:=0A=
->>> Documentation/block/queue-sysfs.rst |  7 +++++++=0A=
->>>  block/blk-sysfs.c                   | 15 +++++++++++++++=0A=
->>>  drivers/nvme/host/zns.c             |  1 +=0A=
->>>  drivers/scsi/sd_zbc.c               |  4 ++++=0A=
->>>  include/linux/blkdev.h              | 16 ++++++++++++++++=0A=
->>>  5 files changed, 43 insertions(+)=0A=
->>=0A=
->> Sorry I haven't noticed before, but you forgot null_blk.=0A=
+On 03/07/2020 08:56, Kanchan Joshi wrote:=0A=
+[...]=0A=
+> Yes, zonefs does not use bvec iter. But while enabling io-uring path for=
+=0A=
+> zone-append, I hit into this condition returning -EINVAL. =0A=
 > =0A=
-> Hello Johannes,=0A=
+> Reference (from user zone-append series cover letter):=0A=
+> "Append using io_uring fixed-buffer --->=0A=
+> This is flagged as not-supported at the moment. Reason being, for fixed-b=
+uffer=0A=
+> io-uring sends iov_iter of bvec type. But current append-infra in block-l=
+ayer=0A=
+> does not support such iov_iter."=0A=
 > =0A=
-> Actually, I haven't forgotten about null_blk :)=0A=
-> =0A=
-> The problem with null_blk is that, compared to these simple patches that=
+> And zone-append doesn't have a problem in using bvec iter as well, so=0A=
+> thought that this may make infra more complete/future-proof?=0A=
 =0A=
-> simply exposes the Max Open Zones/Max Active Zones, null_blk additionally=
+As long as it's no problem for current in-tree users please keep it as is. =
 =0A=
-> has to keep track of all the zone accounting, and give an error if any=0A=
-> of these limits are exceeded.=0A=
-> =0A=
-> null_blk right now follows neither the ZBC nor the ZNS specification=0A=
-> (even though it is almost compliant with ZBC). However, since null_blk=0A=
-> is really great to test with, we want it to support Max Active Zones,=0A=
-> even if that concept does not exist in the ZBC standard.=0A=
-> =0A=
-> To add to the problem, open() does not work exactly the same in ZBC and=
-=0A=
-> ZNS. In ZBC, the device always tries to close an implicit zone to make=0A=
-> room for an explicit zone. In ZNS, a controller that doesn't do this is=
-=0A=
-> fully compliant with the spec.=0A=
-> =0A=
-> So now for null_blk, you have things like zones being implicit closed whe=
-n=0A=
-> a new zone is opened. And now we will have an additional limit (Max Activ=
-e=0A=
-> Zones), that we need to consider before we can even try to close a zone.=
-=0A=
-> =0A=
-> =0A=
-> I've spent a couple of days trying to implement this already, and I think=
-=0A=
-> that I have a way forward. However, considering that vacations are coming=
-=0A=
-> up, and that I have a bunch of other stuff that I need to do before then,=
-=0A=
-> I'm not 100% sure that I will be able to finish it in time for the coming=
-=0A=
-> merge window.=0A=
-> =0A=
-> Therefore, I was hoping that we could merge this series as is, and I will=
-=0A=
-> send out the null_blk changes when they are ready, which might or might=
-=0A=
-> not make it for this merge window.=0A=
-=0A=
-No problem, I'm just working on MOR support for zonefs and though about how=
-=0A=
-I'm going to test it. This is where I've noticed null_blk doesn't really =
-=0A=
-expose a config knob for MOR. I can do some temporary hacks to test my chan=
-ges=0A=
-and wait for your's to materialize. =0A=
-=0A=
-=0A=
-> In the meantime, MAR/MOR properties for null_blk will be exposed as 0,=0A=
-> which means "no limit". (Which is the case when a zoned block device driv=
-er=0A=
-> doesn't do an explicit call to blk_queue_max_{open,active}_zones()).=0A=
-=0A=
+Please submit this patch together with your io_uring series as a preparator=
+y patch.=0A=
