@@ -1,76 +1,71 @@
-Return-Path: <SRS0=lYHe=AP=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=GQ+f=AQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B47EBC433DF
-	for <linux-block@archiver.kernel.org>; Sat,  4 Jul 2020 14:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F435C433E0
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 13:05:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 867CC207CD
-	for <linux-block@archiver.kernel.org>; Sat,  4 Jul 2020 14:25:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A4AE20739
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 13:05:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="o1r5vWX9"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="j2jbHsrF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726488AbgGDOZf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Jul 2020 10:25:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37894 "EHLO
+        id S1726974AbgGENF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Jul 2020 09:05:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726258AbgGDOZf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Jul 2020 10:25:35 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42475C061794
-        for <linux-block@vger.kernel.org>; Sat,  4 Jul 2020 07:25:35 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id x3so9566087pfo.9
-        for <linux-block@vger.kernel.org>; Sat, 04 Jul 2020 07:25:35 -0700 (PDT)
+        with ESMTP id S1726819AbgGENF5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jul 2020 09:05:57 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB4C1C061794
+        for <linux-block@vger.kernel.org>; Sun,  5 Jul 2020 06:05:57 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id md7so724885pjb.1
+        for <linux-block@vger.kernel.org>; Sun, 05 Jul 2020 06:05:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=bonV9lqc6J6a0nZgeeGxa+83b8+hl9OcR8Wa/VCq8tM=;
-        b=o1r5vWX9MAJGE/id2/vJlnRwnCFtxRrkLYOrq0tx6uIIWtGxi5Ugv8n1MbX6+ImK3y
-         gdGVHigbHVYQxrp2Y0ASha7fy6XkFHnbrS8J/ZxU/aJJuhhqV+EM4OwtPFLtKYU6BpqH
-         +7atSTW71DI7qksOe2ebTWysLtimQ59OjK+olU+EMQzscKvQ9v8DpJZbfDWtx3ox2AVK
-         VCTEnEj7hg46BkYmdrp/ec17FuKD8648KW/l+vkvu1zpoG9V2WBG572mIHYBUfdZIanA
-         K+eVCkMEUtRenDmaCY7z4vi8yUFWZLscCjHBJl8Vydkoa3cV/HKQE0WhKJ2C6jSSu6Y3
-         EB4g==
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=8hS9v/Wq2EmMJjFyv9QN9KzBMgFZNbV5hSqDzWbJAq0=;
+        b=j2jbHsrF/hIaYgrlKaFvlv2OtdZt55QAJlC6rNH5/89pTwdEABl8KQA28S1+2lun7V
+         zyE1um92hoyH+aEERA01omXLMw8iQW+ijlc51/Ow24hP/f8q8jGGASllId/qC4RoO7Za
+         u0/5vc9J6ZefOoJDfjAKE6Lov79JB4ReoqEwUur+Y/BuPzte5B1F1jRNtPu3zv/zIVrI
+         ECWgYS4BOgeEW77DOjP+Ws1Rm+L2rnZxaX+0NkE5ZfjQuvpbn06S/8dROvLhH3Fhk1Jm
+         eJLGjvb5ZQAD7ORy/5nV5zWUqq5iKztQYgtdnFBWBsI0G2f3PRLwUmjedwYy0hx1ghrM
+         6+EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bonV9lqc6J6a0nZgeeGxa+83b8+hl9OcR8Wa/VCq8tM=;
-        b=ZhO4Ge9koDATGaB2GR/2c0Bj67vN9mno/AcPDuYmF87W4Ao3+cSoXSJlBeBR/XkFWM
-         ynxQK9QlDr227n/cHHFH/80H0KBUyzTH4GntRacUTLApC8fPnV1D57gFboAJHMXrRPhg
-         ukMib4sZ0iXl8db0kneuMaSKQg4hWkgUHgZuQBFhJk1DlgHeLnI3XZpyaDvz4w1glHT4
-         wbgu5XoWlqkto8F52XXo4TS0m2s/U/q1POOg18GjS5Ys2T+YeaYlMnMM4vTlGZmZY4AV
-         0OyTy8btAQsbXjKVOOG06FSahFcKeYq0PaHA86LZF/fVpMwhO9q8YbcfsJuZ2Anqx0am
-         zsrA==
-X-Gm-Message-State: AOAM5325iJgeUIvgWkugGwgTUnKJsy/Y9LFQl4aHd6gTJT04VjPzlUyZ
-        R0CVnPFoxX4OxUtYw3DTfvTN4g==
-X-Google-Smtp-Source: ABdhPJzq+GqQI/UMescL2+euv57g+aZqpEwQcobWy287BAZOLuEHI/kkKzIiUbLK3nIKKkM1cb4MZQ==
-X-Received: by 2002:a63:1119:: with SMTP id g25mr32374289pgl.126.1593872734572;
-        Sat, 04 Jul 2020 07:25:34 -0700 (PDT)
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=8hS9v/Wq2EmMJjFyv9QN9KzBMgFZNbV5hSqDzWbJAq0=;
+        b=nW1DNoIan7GHqAVho/li8ZCcitLsrV4g7HIIw7A3SfYoiRe9ygjNPMnI/76ZB+GcCG
+         1s2bD0uztrW4qtdtUdi8AKqDhYyuEV3RzMjmLK2YnSad1l7cwD9aVZnxFxT44LlCiH8S
+         0pX6oKLjn/fGtVBIfl6S7nMdMC8I2Z9eE+fNCBBML2MYABopwqmrKvvTIjRapu4CukX8
+         vlqERZm3YlBfR/RoPeNgbIRmhD86BfBoaueoGLZv2PgBHnt26/dqJBZKVCEUGv8QTB0Q
+         q/dqOYLk/qq8qPnhbC7xoG0GpCBHSbtBDv3jEA1SBkKncP9zIzzzfLYYKPI6quwHwqeP
+         mCaA==
+X-Gm-Message-State: AOAM533v+nwpokl+BXI8Ix3xJ/yP6lVAo1XeP4KSgXclT7+5TUVL4ej6
+        WA0R9X01mpgDEqvU8odU5PWbQ1xKZwtTMA==
+X-Google-Smtp-Source: ABdhPJwgfZxribzc1C+B36nf57xf6Sl4YX2b6dDJHeolIahF2Uh3RBJ5z/C3vdeOZO2W+E8MjveyJw==
+X-Received: by 2002:a17:90a:324c:: with SMTP id k70mr48604108pjb.18.1593954357125;
+        Sun, 05 Jul 2020 06:05:57 -0700 (PDT)
 Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id io3sm7942177pjb.22.2020.07.04.07.25.33
+        by smtp.gmail.com with ESMTPSA id e8sm7353985pfl.125.2020.07.05.06.05.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Jul 2020 07:25:33 -0700 (PDT)
-Subject: Re: regression with commit "null_blk: add helper for deleting the
- nullb_list"
-To:     Yi Zhang <yi.zhang@redhat.com>, chaitanya.kulkarni@wdc.com
-Cc:     CKI Project <cki-project@redhat.com>, linux-block@vger.kernel.org,
-        Rachel Sibley <rasibley@redhat.com>
-References: <cki.3B19A2362B.9VSYF9B2I1@redhat.com>
- <44170938.33551884.1593862676831.JavaMail.zimbra@redhat.com>
+        Sun, 05 Jul 2020 06:05:56 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1b60cae2-c135-5aa1-1127-2ef89c320f43@kernel.dk>
-Date:   Sat, 4 Jul 2020 08:25:32 -0600
+Subject: [GIT PULL] Block fixes for 5.8-rc4
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <38cb5040-bc16-298d-bc78-624f22a9f0a1@kernel.dk>
+Date:   Sun, 5 Jul 2020 07:05:55 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <44170938.33551884.1593862676831.JavaMail.zimbra@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,23 +74,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/4/20 5:37 AM, Yi Zhang wrote:
-> Hello
-> 
-> commit[1] on linux-block/for-next introduced one regression which lead kernel panic, could you help check it?
-> 
-> [1]
-> commit a65dee60e5384a648bc49c4ffbd3960d3fa354b0 (origin/for-5.9/drivers)
-> Author: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> Date:   Thu Jul 2 18:31:30 2020 -0700
-> 
->     null_blk: add helper for deleting the nullb_list
+Hi Linus,
 
-Chaitanya, did you even test your patch?
+A few later fixes came in after the initial -rc4 pull request, let's
+flush them out before the release is tagged.
 
-+ nullb = list_first_entry(nullb_list.next, struct nullb, list);
+- NVMe pull request from Christoph
+	- Fix crash in multi-path disk add (Christoph)
+	- Fix ignore of identify error (Sagi)
+- Fix a compiler complaint that a function should be static (Wei)
 
-I'm guessing no... Dropped it.
+Please pull!
+
+
+The following changes since commit e7eea44eefbdd5f0345a0a8b80a3ca1c21030d06:
+
+  virtio-blk: free vblk-vqs in error path of virtblk_probe() (2020-06-30 19:02:58 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.8-2020-07-05
+
+for you to fetch changes up to 3197d48a7c04eee3e50bd54ef7e17e383b8a919e:
+
+  block: make function __bio_integrity_free() static (2020-07-02 12:38:18 -0600)
+
+----------------------------------------------------------------
+block-5.8-2020-07-05
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme: fix a crash in nvme_mpath_add_disk
+
+Jens Axboe (1):
+      Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8
+
+Sagi Grimberg (1):
+      nvme: fix identify error status silent ignore
+
+Wei Yongjun (1):
+      block: make function __bio_integrity_free() static
+
+ block/bio-integrity.c         |  3 ++-
+ drivers/nvme/host/core.c      | 12 +++++++++---
+ drivers/nvme/host/multipath.c |  7 ++++---
+ 3 files changed, 15 insertions(+), 7 deletions(-)
 
 -- 
 Jens Axboe
