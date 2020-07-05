@@ -5,56 +5,56 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 777E3C433DF
-	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 18:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B713C433DF
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 18:52:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 515312073E
-	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 18:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55C412073E
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 18:52:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="TCGvSGVy"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="o71jpY2Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728110AbgGESwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Jul 2020 14:52:16 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:31836 "EHLO
+        id S1728172AbgGESwb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Jul 2020 14:52:31 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:31874 "EHLO
         mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728107AbgGESwP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jul 2020 14:52:15 -0400
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200705185214epoutp0231987a20cbd6c67473f9c867d08ca4a5~e7-BrIVj13075530755epoutp02-
-        for <linux-block@vger.kernel.org>; Sun,  5 Jul 2020 18:52:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200705185214epoutp0231987a20cbd6c67473f9c867d08ca4a5~e7-BrIVj13075530755epoutp02-
+        with ESMTP id S1728133AbgGESw1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jul 2020 14:52:27 -0400
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200705185222epoutp0206781dd720db1b28de91b3a81f4078e1~e7-J47NFj3075530755epoutp02G
+        for <linux-block@vger.kernel.org>; Sun,  5 Jul 2020 18:52:22 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200705185222epoutp0206781dd720db1b28de91b3a81f4078e1~e7-J47NFj3075530755epoutp02G
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1593975134;
-        bh=EdQAf5+zw6N5J2+HOrsvrQfxx8kc7JZeLZVVK6M6PcA=;
+        s=mail20170921; t=1593975142;
+        bh=+K/IUmUogGLkZXpodowxoJ/FLK3QQNBHyElRvdThP3s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TCGvSGVyqOKSya2EEIuudSvnZj5fnJRrSwoTnr5kY4jH09H83B+QgsK0iBJcrOiAi
-         PNhxyOeKwO5R1lWtfF/DzJ/mHJ+Wma5Gw/8kDUD84szYoe9LttBuX0NhA2tsU9hvNY
-         Bag031VVnUjczQb3NDjpYsXQqftHbSBpkWOoBU44=
+        b=o71jpY2ZOxyciu+t4fgwqMBtNL8KFU0JrmgqKR2CYv0LWY9G6fYJIqyhXsddRR78E
+         1eMzZfMACk1XA8JV3T5Oe3TllxQ159IqKxT0NEnI2JvD2RZWKAarWEcbm8zGXMyxvB
+         P4DH6IHquYxmrGAZ1CsMxYWvPaK3rhLx/RM+EFMI=
 Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20200705185212epcas5p3f7db3dbbf75a909dbc5d85f66b033014~e7-AqOR6C0482204822epcas5p3x;
-        Sun,  5 Jul 2020 18:52:12 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20200705185222epcas5p2655d7f75c9997d925e61cb0a57c09c0d~e7-JbJsS92058620586epcas5p2g;
+        Sun,  5 Jul 2020 18:52:22 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
         epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4F.B7.09703.C51220F5; Mon,  6 Jul 2020 03:52:12 +0900 (KST)
+        84.C7.09703.661220F5; Mon,  6 Jul 2020 03:52:22 +0900 (KST)
 Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20200705185211epcas5p4059d05d2fcedb91829300a7a7d03fda3~e7_-ewc7F1418914189epcas5p45;
-        Sun,  5 Jul 2020 18:52:11 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20200705185221epcas5p28b6d060df829b751109265222285da0e~e7-IRsvrN2058620586epcas5p2f;
+        Sun,  5 Jul 2020 18:52:21 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
         epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20200705185211epsmtrp1bb12d193d2271b7451da13042d046c6d~e7_-dwRAV0303903039epsmtrp10;
-        Sun,  5 Jul 2020 18:52:11 +0000 (GMT)
-X-AuditID: b6c32a4a-4cbff700000025e7-37-5f02215c0cd3
+        20200705185221epsmtrp147a3216c334bbd4f68ec760f75006703~e7-IQ2VDE0303903039epsmtrp17;
+        Sun,  5 Jul 2020 18:52:21 +0000 (GMT)
+X-AuditID: b6c32a4a-4b5ff700000025e7-4c-5f022166c93c
 Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D9.37.08303.B51220F5; Mon,  6 Jul 2020 03:52:11 +0900 (KST)
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        85.04.08382.461220F5; Mon,  6 Jul 2020 03:52:20 +0900 (KST)
 Received: from localhost.localdomain (unknown [107.110.206.5]) by
         epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20200705185209epsmtip2b4cf5e349418fb0b9c4ddd3670b42090~e7_9FQgN73204832048epsmtip2s;
-        Sun,  5 Jul 2020 18:52:08 +0000 (GMT)
+        20200705185218epsmtip2e411299166826203d3627aeeceb51079~e7-F3kW7_3204832048epsmtip2u;
+        Sun,  5 Jul 2020 18:52:18 +0000 (GMT)
 From:   Kanchan Joshi <joshi.k@samsung.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org
 Cc:     hch@infradead.org, Damien.LeMoal@wdc.com, asml.silence@gmail.com,
@@ -65,121 +65,117 @@ Cc:     hch@infradead.org, Damien.LeMoal@wdc.com, asml.silence@gmail.com,
         Selvakumar S <selvakuma.s1@samsung.com>,
         Nitesh Shetty <nj.shetty@samsung.com>,
         Javier Gonzalez <javier.gonz@samsung.com>
-Subject: [PATCH v3 1/4] fs: introduce FMODE_ZONE_APPEND and IOCB_ZONE_APPEND
-Date:   Mon,  6 Jul 2020 00:17:47 +0530
-Message-Id: <1593974870-18919-2-git-send-email-joshi.k@samsung.com>
+Subject: [PATCH v3 3/4] block: enable zone-append for iov_iter of bvec type
+Date:   Mon,  6 Jul 2020 00:17:49 +0530
+Message-Id: <1593974870-18919-4-git-send-email-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA0WSaUwTURSFfTPTdopWJ8XEJ+JCgRhqRBE0z7jgho5GAvpLCYpVxkKEgi11
-        qxhAKaUNgkpksW5AFDGKFoJQBE21YkGoFmRLJaJFBXdwISAopVX/ffeec899uXkkzr/AciOj
-        JQmMVCKKEbBdiIoHPsL54R5YxEJzmx8azslmIW1JBUDXX2SykXq0nECpaT8w1JBVgKFPqU0E
-        em0d4CDj749slH02BaCaznnobo2JQM16LRsV33lIoIrhizhqyS7A0ftBExuZR+pYq/h0Vf4L
-        Dl1WLKSbG+W0rv80h9Y8HwT0yfISQA/oZtFp9zUYrbN9xEK5YS7LI5mY6AOMdMHKXS5RhZ15
-        WLze9VDbryxWEkih1IBLQioAGqsfse3Mp6oBHLwfqAYuY9wP4NtXD4CjGAAwrcDG+jvRbqti
-        OQQ9gPW1mcQ/182Ox5gakCSb8oFPz8jtOJVaDquKvOwWnErDYavJMh7kSm2GQw3vMDsTlDds
-        vNgI7Myj1sJ6UynbsWwW7GhKx+3MpdZBZXUDbg+CVCUJW5Lfju+CY4LmK+3wu8K+unKOg91g
-        b6bSyTI4ZDU6Z1UAtiXlEQ4hED67OzKeg4+9uVS/wN7GqckwY9jmjOdBlZLvcHvArtM9zjtM
-        g925RU6m4dO8IuC4Yg6Ayfo5WWBm/v/QSwCUgOlMvCxWzMgWxy+SMAd9ZaJYmVwi9t0TF6sD
-        419IuKkSdL/84msAGAkMAJK4YCovYx6I4PMiRYePMNK4CKk8hpEZwAySEEzjCQaf7ORTYlEC
-        s49h4hnpXxUjuW5J2IQo61ZBwI7Xu/fmnzD/NmtCw9sjUJB3yJDqRsqG4MIS63Flj7+78vsp
-        YVd/y3ZtHM+2+abiztyUJ4VvSEn7lNrPu+oSR/Uhy47d05sKI2d/Dfomql2RLG+1eG7d4aMg
-        uEe6z6SCOdbcCbzb6TfCHlvU33met/Z5Gm6dK6OL3d+sV3gH+vdi+aXGdG7mlX4ppV0iSgx+
-        x7n0Y7Wib015R/S2+qCA9MCehGtcvw9bRkavNgu14Srq3HujbSLTlYt+WVozdOdPeeRsvFy2
-        dO5u6QGL+INbd0+H//NJisTO6UeTFSEbztaUafb3NvmGfur76bNXcGKN3Fx5OCxG7K7y0hsE
-        hCxK5CfEpTLRH4P2NpuxAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLLMWRmVeSWpSXmKPExsWy7bCSvG60IlO8wamVSha/p09htZizahuj
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrAKsWRmVeSWpSXmKPExsWy7bCmhm6aIlO8wbHpPBa/p09htZizahuj
         xeq7/WwWXf+2sFi0tn9jsjg9YRGTxbvWcywWj+98Zrc4+v8tm8WUaU2MFntvaVvs2XuSxeLy
         rjlsFiu2H2Gx2PZ7PrPFlSmLmC1e/zjJZnH+73FWByGPnbPusntsXqHlcflsqcemT5PYPbqv
-        /mD06NuyitHj8yY5j/YD3Uwem568ZQrgjOKySUnNySxLLdK3S+DKWHxrJlPBLuGK638msDYw
-        Ngl0MXJySAiYSNx4spO1i5GLQ0hgB6PE2ZMLmCES4hLN136wQ9jCEiv/PQezhQQ+Mkos+mDS
-        xcjBwSagKXFhcilIWETAQaLr+GMmkDnMAlOZJeY2H2ADSQgL+Ej8Ov2CCcRmEVCVODv/LCOI
-        zSvgLHHq5Ho2iPlyEjfPdYLt5RRwkWjbfZoZZL4QUM3US4oTGPkWMDKsYpRMLSjOTc8tNiww
-        ykst1ytOzC0uzUvXS87P3cQIjgEtrR2Me1Z90DvEyMTBeIhRgoNZSYS3V5sxXog3JbGyKrUo
-        P76oNCe1+BCjNAeLkjjv11kL44QE0hNLUrNTUwtSi2CyTBycUg1MJZOKTjFq/ymPNP230afs
-        44L3k6K3bDyU8CV3rWrA3vmZK5dPeyD45JALV98m3sVaQVHNOx0X6Rk0P79SEfuyQ4PH/0wJ
-        Q5zipqszFjhOTGWZWXu96e6dLTdv5dot/2gqsk0tUGWqTXihZfLnbYJLC9TMCzcKaDBW/e3l
-        1pedyLhrJZ+PiJ+hvMH7o7/nss/3D5rS0nuQ6btzw5mCVkY/kWMt/1Xmfr183W7GidqE5TMz
-        C9c1/tqyMuZEvX7kO5cU+RUSL/uv8c2cq+XYNefknsLVYX9kanh2PdPpUL0X5lpcsubk6swb
-        XTlN3TuuxdTemrf/0RpP8ZzdqZauva8rhDUT11qd2My+z3KCuy+TEktxRqKhFnNRcSIAqAaK
-        GPACAAA=
-X-CMS-MailID: 20200705185211epcas5p4059d05d2fcedb91829300a7a7d03fda3
+        /mD06NuyitHj8yY5j/YD3Uwem568ZQrgjOKySUnNySxLLdK3S+DK+HB2KXPBC4GKRTd/sDUw
+        vuftYuTkkBAwkeh5f4Wli5GLQ0hgN6NE14MeZgjnE6PE990vGSGcb4wS11b8ZYVpebCphw0i
+        sZdR4vCOh1DOZ0aJS83NQFUcHGwCmhIXJpeCmCICNhI7l6iAlDALtDNLXDt5CWyQsIC3xPXl
+        TYwgNouAqsSjmdfBbF4BZ4n5m38wQyyTk7h5rhPM5hRwkWjbfRrsPAmBLRwS1yf3sEMUuUhc
+        ODUT6jphiVfHt0DFpSRe9rdB2cUSv+4chWruYJS43jCTBSJhL3Fxz18mkEuZgY5ev0sfJMws
+        wCfR+/sJWFhCgFeio00IolpR4t6kp1CrxCUezlgCZXtIdLw9DLZKSGA6o8S9izYTGGVnIQxd
+        wMi4ilEytaA4Nz212LTAKC+1XK84Mbe4NC9dLzk/dxMjOBFpee1gfPjgg94hRiYOxkOMEhzM
+        SiK8vdqM8UK8KYmVValF+fFFpTmpxYcYpTlYlMR5lX6ciRMSSE8sSc1OTS1ILYLJMnFwSjUw
+        mS3oz3sXoDTvb+bCHFa/5bEZP2dMX1A/LbjnhW4+8+pG+1W//4ZrRKlt3RR3cs25V69O2nr9
+        rxAQrz30S03xd0jw3Exf7dfSccsi9zWX2k6J4Y4szplyvnpWXINegqiVVcXll+63g2YITU/S
+        /Gz078BD8a3n6hsU6m8u/jpnxltZjemG9YFfLh99ZORww5OzYbWkkExkpcP8YG3DVYnaU9Q9
+        woX7q0xeWpz3+B1ZFRYvV5Mpd+tAZ5uk52Lxo07vbS7uFBXYkf/cyyD1jNF7hbMSEyO2ZHiw
+        mO/vOPe1smLp9Cd5Vy86+aQYBjqfDrnyYauHYPlT2fRFRwVW3z/39X5qzmOVqOPCXee2hP9U
+        YinOSDTUYi4qTgQATTmlBrMDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLLMWRmVeSWpSXmKPExsWy7bCSvG6KIlO8wcwfNha/p09htZizahuj
+        xeq7/WwWXf+2sFi0tn9jsjg9YRGTxbvWcywWj+98Zrc4+v8tm8WUaU2MFntvaVvs2XuSxeLy
+        rjlsFiu2H2Gx2PZ7PrPFlSmLmC1e/zjJZnH+73FWByGPnbPusntsXqHlcflsqcemT5PYPbqv
+        /mD06NuyitHj8yY5j/YD3Uwem568ZQrgjOKySUnNySxLLdK3S+DK+HB2KXPBC4GKRTd/sDUw
+        vuftYuTkkBAwkXiwqYcNxBYS2M0o0bFEEiIuLtF87Qc7hC0ssfLfcyCbC6jmI6PE+VlTmboY
+        OTjYBDQlLkwuBakREXCQ6Dr+mAmkhllgKrPE3OYDYEOFBbwlri9vYgSxWQRUJR7NvA5m8wo4
+        S8zf/IMZYoGcxM1znWA2p4CLRNvu08wg84WAaqZeUpzAyLeAkWEVo2RqQXFuem6xYYFhXmq5
+        XnFibnFpXrpecn7uJkZwDGhp7mDcvuqD3iFGJg7GQ4wSHMxKIry92ozxQrwpiZVVqUX58UWl
+        OanFhxilOViUxHlvFC6MExJITyxJzU5NLUgtgskycXBKNTBJcRnavZt3fq1B85q0RSuN/zU0
+        HxO/NnuOaWSi6kYtRU/lNOW6fg/+1YYznGX/JL9a7ziN8frEiQcCUiYJNkWuWvE01TY7QXz5
+        37kWujLsm9vSmd4GBy9yDK+aMq/17faqJbv/Kgf8vO5efi1mQ7PslnzNoqx50V6i32xPTdD0
+        qaq7sujT3yc/E3NXM+a9fWn371WepNTaRUWZ/cc7c1id7Ly4P2d9WLdKxSH5nf6v5fPmuvz5
+        X/tPO78t+6zksTO7vgo17EkuajNs/BfyhvXlKV2dKoWNyxbt/v1LPqfKkWU757P37BVyBs1N
+        t0R8ZFxP6bvt+i5zXjx8be0pezlDQebowxszz9bviWuZMluJpTgj0VCLuag4EQCG1RVp8AIA
+        AA==
+X-CMS-MailID: 20200705185221epcas5p28b6d060df829b751109265222285da0e
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
-X-CMS-RootMailID: 20200705185211epcas5p4059d05d2fcedb91829300a7a7d03fda3
+X-CMS-RootMailID: 20200705185221epcas5p28b6d060df829b751109265222285da0e
 References: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
-        <CGME20200705185211epcas5p4059d05d2fcedb91829300a7a7d03fda3@epcas5p4.samsung.com>
+        <CGME20200705185221epcas5p28b6d060df829b751109265222285da0e@epcas5p2.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Enable zone-append using existing O_APPEND and RWF_APPEND infra.
-Unlike file-append, zone-apppend requires bit of additional processing
-in common path to send completion-result to upper layer. To skip that
-for non-zoned block-devices/files, introduce FMODE_ZONE_APPEND and
-IOCB_ZONE_APPEND.
-When a file is opened, it can subscribe to zone-append by setting
-FMODE_ZONE_APPEND. Add IOCB_ZONE_APPEND which is set in kiocb->ki_flags
-if write meets existing file-append critera, and file has subscribed to
-zone-append.
+zone-append with bvec iov_iter gives WARN_ON, and returns -EINVAL.
+Add new helper to process such iov_iter and add pages in bio honoring
+zone-append specific constraints.
+This is used to enable zone-append with io-uring fixed-buffer.
 
-Signed-off-by: Selvakumar S <selvakuma.s1@samsung.com>
 Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+Signed-off-by: Selvakumar S <selvakuma.s1@samsung.com>
 Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
 Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
 ---
- include/linux/fs.h | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ block/bio.c | 31 ++++++++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 6c4ab4d..ef13df4 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -175,6 +175,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- /* File does not contribute to nr_files count */
- #define FMODE_NOACCOUNT		((__force fmode_t)0x20000000)
- 
-+/* File can support zone-append */
-+#define FMODE_ZONE_APPEND	((__force fmode_t)0x40000000)
-+
- /*
-  * Flag for rw_copy_check_uvector and compat_rw_copy_check_uvector
-  * that indicates that they should check the contents of the iovec are
-@@ -315,6 +318,7 @@ enum rw_hint {
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
- #define IOCB_NOWAIT		(1 << 7)
-+#define IOCB_ZONE_APPEND	(1 << 8)
- 
- struct kiocb {
- 	struct file		*ki_filp;
-@@ -3427,8 +3431,11 @@ static inline bool vma_is_fsdax(struct vm_area_struct *vma)
- static inline int iocb_flags(struct file *file)
- {
- 	int res = 0;
--	if (file->f_flags & O_APPEND)
-+	if (file->f_flags & O_APPEND) {
- 		res |= IOCB_APPEND;
-+		if (file->f_mode & FMODE_ZONE_APPEND)
-+			res |= IOCB_ZONE_APPEND;
-+	}
- 	if (file->f_flags & O_DIRECT)
- 		res |= IOCB_DIRECT;
- 	if ((file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host))
-@@ -3454,8 +3461,11 @@ static inline int kiocb_set_rw_flags(struct kiocb *ki, rwf_t flags)
- 		ki->ki_flags |= IOCB_DSYNC;
- 	if (flags & RWF_SYNC)
- 		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
--	if (flags & RWF_APPEND)
-+	if (flags & RWF_APPEND) {
- 		ki->ki_flags |= IOCB_APPEND;
-+		if (ki->ki_filp->f_mode & FMODE_ZONE_APPEND)
-+			ki->ki_flags |= IOCB_ZONE_APPEND;
-+	}
+diff --git a/block/bio.c b/block/bio.c
+index 0cecdbc..ade9da7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -975,6 +975,30 @@ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
+ 	iov_iter_advance(iter, size);
  	return 0;
  }
++static int __bio_iov_bvec_append_add_pages(struct bio *bio, struct iov_iter *iter)
++{
++	const struct bio_vec *bv = iter->bvec;
++	unsigned int len;
++	size_t size;
++	struct request_queue *q = bio->bi_disk->queue;
++	unsigned int max_append_sectors = queue_max_zone_append_sectors(q);
++	bool same_page = false;
++
++	if (WARN_ON_ONCE(!max_append_sectors))
++		return -EINVAL;
++
++	if (WARN_ON_ONCE(iter->iov_offset > bv->bv_len))
++		return -EINVAL;
++
++	len = min_t(size_t, bv->bv_len - iter->iov_offset, iter->count);
++	size = bio_add_hw_page(q, bio, bv->bv_page, len,
++				bv->bv_offset + iter->iov_offset,
++				max_append_sectors, &same_page);
++	if (unlikely(size != len))
++		return -EINVAL;
++	iov_iter_advance(iter, size);
++	return 0;
++}
  
+ #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct page *))
+ 
+@@ -1105,9 +1129,10 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 
+ 	do {
+ 		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+-			if (WARN_ON_ONCE(is_bvec))
+-				return -EINVAL;
+-			ret = __bio_iov_append_get_pages(bio, iter);
++			if (is_bvec)
++				ret = __bio_iov_bvec_append_add_pages(bio, iter);
++			else
++				ret = __bio_iov_append_get_pages(bio, iter);
+ 		} else {
+ 			if (is_bvec)
+ 				ret = __bio_iov_bvec_add_pages(bio, iter);
 -- 
 2.7.4
 
