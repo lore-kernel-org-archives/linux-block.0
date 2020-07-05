@@ -2,283 +2,116 @@ Return-Path: <SRS0=GQ+f=AQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01683C433E2
-	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 18:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 481FCC433E0
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 19:33:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD6E92073E
-	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 18:52:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F08362074F
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jul 2020 19:33:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="nsNCWCzK"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="i0bmKAuh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728146AbgGESwZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Jul 2020 14:52:25 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:40488 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728121AbgGESwW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jul 2020 14:52:22 -0400
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20200705185219epoutp0358392432eac9aa210b108952db1cf9a6~e7-Gas_gS2669326693epoutp03G
-        for <linux-block@vger.kernel.org>; Sun,  5 Jul 2020 18:52:19 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20200705185219epoutp0358392432eac9aa210b108952db1cf9a6~e7-Gas_gS2669326693epoutp03G
+        id S1727916AbgGETdl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Jul 2020 15:33:41 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:38602 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727877AbgGETdk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jul 2020 15:33:40 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200705193338epoutp02e74783490390c87897dbc9f8c5ebbe60~e8jLZ9Uq32710727107epoutp02n
+        for <linux-block@vger.kernel.org>; Sun,  5 Jul 2020 19:33:38 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200705193338epoutp02e74783490390c87897dbc9f8c5ebbe60~e8jLZ9Uq32710727107epoutp02n
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1593975139;
-        bh=o9X0/DRGhOiQAeeouZvDE/Hf3lYVHbd1pPCwPfh4oTA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nsNCWCzK63+qWyYDE4QkfeOCXbGb0RczV8vpBz6Zi03PF77nJ/j69qW//6qeux39j
-         i67CsoW7PvZoUZleslD7kADS0my2x8W6bZCk2xtIrYS9VwWf/eqn7uDM92Kd2Le88t
-         v9biNQGLKX6FKMBKjLVeTYqyVqkxoD9sdfqg/eL0=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20200705185218epcas5p13f0f63e2276c1542beebf9c323633bce~e7-FrCPVo2311023110epcas5p16;
-        Sun,  5 Jul 2020 18:52:18 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        82.C7.09703.261220F5; Mon,  6 Jul 2020 03:52:18 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20200705185217epcas5p1cc12d4b892f057a1fe06d73a00869daa~e7-Eg1lv30734507345epcas5p1d;
-        Sun,  5 Jul 2020 18:52:17 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20200705185217epsmtrp2b1eda7d6b157d43bd4a3e1756bf6c6ce~e7-Ef8QyP1855618556epsmtrp20;
-        Sun,  5 Jul 2020 18:52:17 +0000 (GMT)
-X-AuditID: b6c32a4a-4b5ff700000025e7-42-5f022162852b
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        6B.37.08303.061220F5; Mon,  6 Jul 2020 03:52:16 +0900 (KST)
+        s=mail20170921; t=1593977618;
+        bh=SyMl7bBNaD9Z9xCVsaajbmXskTQfdvRXW5zIIM5T2sY=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=i0bmKAuh8rGWwY5J0ny+CPw6IDtTKjGkMzi8ACuEP8OgtU9+I5KNh30nbW0Qy7YEn
+         ouXMYNgcX2l+dqTSwaBEUImVIzAIJZrlG3vnOGmPgMvxszXYzS0B9xerwDr+qHuhdr
+         rrGNh2pJCMyupiLxkRCwHhk11WiQkKPwckeoZyjM=
+Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20200705193333epcas5p2f55f1788164e8bdc86339be76df8b452~e8jGv8g_X3112531125epcas5p2S;
+        Sun,  5 Jul 2020 19:33:33 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        2B.56.09475.D0B220F5; Mon,  6 Jul 2020 04:33:33 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20200705193332epcas5p409173a9d12f203d3817305dd3250ca59~e8jFrKK-N1079210792epcas5p4S;
+        Sun,  5 Jul 2020 19:33:32 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200705193332epsmtrp1c2d9bc67b21166afde626bd5d5757836~e8jFqUjNQ2501025010epsmtrp1m;
+        Sun,  5 Jul 2020 19:33:32 +0000 (GMT)
+X-AuditID: b6c32a4b-389ff70000002503-36-5f022b0d0703
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        51.B4.08382.B0B220F5; Mon,  6 Jul 2020 04:33:32 +0900 (KST)
 Received: from localhost.localdomain (unknown [107.110.206.5]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20200705185214epsmtip2d532bc57741d334bd3d8583d01ff37ee~e7-B8VoeE3260032600epsmtip2z;
-        Sun,  5 Jul 2020 18:52:14 +0000 (GMT)
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20200705193330epsmtip166b64ca6c2ff895983125b8c909de754~e8jEhUCT_2520125201epsmtip1b;
+        Sun,  5 Jul 2020 19:33:30 +0000 (GMT)
 From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org
-Cc:     hch@infradead.org, Damien.LeMoal@wdc.com, asml.silence@gmail.com,
-        linux-fsdevel@vger.kernel.org, mb@lightnvm.io,
-        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Selvakumar S <selvakuma.s1@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Arnav Dawn <a.dawn@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-Subject: [PATCH v3 2/4] block: add zone append handling for direct I/O path
-Date:   Mon,  6 Jul 2020 00:17:48 +0530
-Message-Id: <1593974870-18919-3-git-send-email-joshi.k@samsung.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Damien.LeMoal@wdc.com, Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH v2] Fix zone-append error code
+Date:   Mon,  6 Jul 2020 00:59:52 +0530
+Message-Id: <1593977393-21446-1-git-send-email-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKKsWRmVeSWpSXmKPExsWy7bCmum6SIlO8wcf5vBa/tz1isfg9fQqr
-        xZxV2xgtVt/tZ7Po+reFxaK1/RuTxekJi5gs3rWeY7F4fOczu8XR/2/ZLKZMa2K02HtL22LP
-        3pMsFpd3zWGzWLH9CIvFtt/zmS2uTFnEbPH6x0k2i/N/j7M6CHvsnHWX3WPzCi2Py2dLPTZ9
-        msTu0X31B6NH35ZVjB6fN8l5tB/oZvLY9OQtUwBnFJdNSmpOZllqkb5dAldGx+xVrAXftCoa
-        n/9kbGA8p9TFyMkhIWAicfH4TuYuRi4OIYHdjBIXJ71jhHA+MUqc/XyaBcL5zCjRMucRE0zL
-        lCMfwWwhgV2MEv/nC8IVtS29ytbFyMHBJqApcWFyKYgpImAjsXOJCkgJs8AKZolzF98zgvQK
-        C3hLzH9znw3EZhFQlVg5fwUziM0r4Cwx/eUUdohdchI3z3WCxTkFXCTadp8GO1VCYAeHxP62
-        d2wQRS4Sh6Y1MkLYwhKvjm+BapaS+PxuL1RNscSvO0ehmjsYJa43zGSBSNhLXNzzlwnkUmag
-        o9fv0gcJMwvwSfT+fgIWlhDglehoE4KoVpS4N+kpK4QtLvFwxhIo20Piyu5/rJBwmM4osezZ
-        bvYJjLKzEKYuYGRcxSiZWlCcm55abFpglJdarlecmFtcmpeul5yfu4kRnJK0vHYwPnzwQe8Q
-        IxMH4yFGCQ5mJRHeXm3GeCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8Sj/OxAkJpCeWpGanphak
-        FsFkmTg4pRqY1Gu6JFp2TEqee/bDrXm3C6LUdlyqKzSaem+WavSyz/POKB0Pkp/UdEHR5pC6
-        fcxTm2mLWBZW1RmXSFTqu9Zf2STqdur+nXyT77kxqgFfzyi/8GBfHTb3SO0LjWr9vYUFBqId
-        a+QFnKcHBfc8ylyXe86j8Y6F9bS8s8XHrlUZyf7+M2P2kVWLN0itrGT4F3rMrf5N/tk/77W0
-        9kWzMgjPuyYbx97fZf7y/dzaiu3X294pfNXU72lZonjl+xFNZ58vU46UOEYHPshev/ZSzuye
-        mjObGFpdIyeG73m9yFH5Som4xklNoRtvWy79LGpgfVeiN1vv6GwBxSLxbcJOmWt59y5dbXKq
-        1qrwXZdBgp+3EktxRqKhFnNRcSIAqs0TpbgDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrELMWRmVeSWpSXmKPExsWy7bCSvG6CIlO8wYU1Fha/tz1isfg9fQqr
-        xZxV2xgtVt/tZ7Po+reFxaK1/RuTxekJi5gs3rWeY7F4fOczu8XR/2/ZLKZMa2K02HtL22LP
-        3pMsFpd3zWGzWLH9CIvFtt/zmS2uTFnEbPH6x0k2i/N/j7M6CHvsnHWX3WPzCi2Py2dLPTZ9
-        msTu0X31B6NH35ZVjB6fN8l5tB/oZvLY9OQtUwBnFJdNSmpOZllqkb5dAldGx+xVrAXftCoa
-        n/9kbGA8p9TFyMkhIWAiMeXIRyYQW0hgB6PEg98qEHFxieZrP9ghbGGJlf+eA9lcQDUfGSXu
-        PjgN1MDBwSagKXFhcilIjYiAg0TX8cdMIDXMAjuYJV5dWckMkhAW8JaY/+Y+G4jNIqAqsXL+
-        CrA4r4CzxPSXU6AWyEncPNcJFucUcJFo232aGWS+EFDN1EuKExj5FjAyrGKUTC0ozk3PLTYs
-        MMpLLdcrTswtLs1L10vOz93ECI4GLa0djHtWfdA7xMjEwXiIUYKDWUmEt1ebMV6INyWxsiq1
-        KD++qDQntfgQozQHi5I479dZC+OEBNITS1KzU1MLUotgskwcnFINTCtyknhWv33+wsf2Ztyc
-        GKkGPhUh9Y7rR5gYpnrt2pQTtpfpV6if2eZP+fcn7zh97ZKY95MDt3/OaxJjulG95fDzj/L+
-        S/VtBCMONexomzlH/Ofu4FOcrekZOu+mfNjbV6rh2fmw/emLvHm6k6YdSH2v0FQeWXckhG/B
-        xK3XpcvPpH5cevbiU5a551+9y6lcK9Ptxq2x0Kv2Q/JpxmtRSSb8kXPz8m3nB6/wrbx87V/T
-        6VM7u76dV9svLbapssKx762htEmYXL7MkVvNOSWRnpue6T7NCTjQfkNY97Sf8o93vQKmnz7N
-        NS/ZGM5gN/9X1S8lP4cUSZOTEaoMkfdZdMIiFRo/db+wPJgql9Otp8RSnJFoqMVcVJwIAOO9
-        /971AgAA
-X-CMS-MailID: 20200705185217epcas5p1cc12d4b892f057a1fe06d73a00869daa
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEIsWRmVeSWpSXmKPExsWy7bCmhi6vNlO8wdtZvBa/p09htVh9t5/N
+        orX9G5PF0f9v2Sz23tK2uLxrDpvFlSmLmB3YPS6fLfXo27KK0ePzJjmP9gPdTAEsUVw2Kak5
+        mWWpRfp2CVwZX86dYi24w1ix58dUlgbGZYxdjJwcEgImEg37F7B1MXJxCAnsZpT4Nv0llPOJ
+        UWL9swOMEM43Rol1WycAORxgLS8maULE9zJKzN6/GarjM6PE1C0bmECK2AQ0JS5MLgVZISIg
+        LLG/o5UFxGYWqJaYdPsWK4gtLKAn8Xv2byYQm0VAVeLLri3sIDavgLPEvsefWCHOk5O4ea6T
+        GcJexC5x8HcdhO0iMXHSLzYIW1ji1XGIXgkBKYmX/W1QdrHErztHmUFukxDoYJS43jCTBSJh
+        L3Fxz1+wO5mB7ly/Sx/iNj6J3t9PmCB+5JXoaBOCqFaUuDfpKdQ54hIPZyxhhSjxkJh+yxok
+        LCQQK3F4yV/GCYwysxBmLmBkXMUomVpQnJueWmxaYJyXWq5XnJhbXJqXrpecn7uJERzNWt47
+        GB89+KB3iJGJg/EQowQHs5IIb682Y7wQb0piZVVqUX58UWlOavEhRmkOFiVxXqUfZ+KEBNIT
+        S1KzU1MLUotgskwcnFINTLyfzLrquNvu/3BfzHXt++SG7qVffK7M4/mnxrGrd8rbNhWVlDof
+        rnWPy0wyhbPviL28u5KZJ+zMbsuSkJriVesPRWuF/1u2b12NK7fh4pddqjdO2ZQIPxfqfr2O
+        e8eBS1M5V/Rv+PlJ/85Ck851ljk7UuprjW7yJb5Nerd1+ku19ocP7r3J4zBd5d6XwhV91zj8
+        SIeiwtqlx+6q3a1knXVd6M7TX71+XlzsMvfdOJOOa1pVLl8c8sVJXMex12fBjdam2ZwfH723
+        WRkrc9/nzen7HAo8Ze86jB7b6RYvnNAY6pJTXHn92VrFc0HvV/n1vDh31e5p0cT2PfvcLs/T
+        thfg8pq+/UHa1Q9aj+ds1lNiKc5INNRiLipOBADQzFbmVQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKJMWRmVeSWpSXmKPExsWy7bCSnC6PNlO8Qd8zJovf06ewWqy+289m
+        0dr+jcni6P+3bBZ7b2lbXN41h83iypRFzA7sHpfPlnr0bVnF6PF5k5xH+4FupgCWKC6blNSc
+        zLLUIn27BK6ML+dOsRbcYazY82MqSwPjMsYuRg4OCQETiReTNLsYuTiEBHYzSkw/1wMU5wSK
+        i0s0X/vBDmELS6z895wdougjo8Tn223MIM1sApoSFyaXgtSIANXs72hlAQkzC9RL9GxnAQkL
+        C+hJ/J79mwnEZhFQlfiyawvYSF4BZ4l9jz+xQoyXk7h5rpN5AiPPAkaGVYySqQXFuem5xYYF
+        hnmp5XrFibnFpXnpesn5uZsYwSGjpbmDcfuqD3qHGJk4GA8xSnAwK4nw9mozxgvxpiRWVqUW
+        5ccXleakFh9ilOZgURLnvVG4ME5IID2xJDU7NbUgtQgmy8TBKdXAZNixsOm044e1VpNjfe3O
+        vzvvtYg5Oti9WLn6xL7zmv7zlaZUHd37532PrrPiGdbIo/OthUKtsxa5H9u+NCSXfcGR2xXO
+        8zN0RWurvrmLfuXlM4rZsSPOQeSmlqvtIe3HL76vtvta8T95uuaZedrzmXdqzlg9uyLF8cSF
+        fbUx/Zp7/vFXztP7mnTiu/vSgzcjs614E/fkfJSde/xIemKvY3B1cuCutPScs8kiNvc6eA5I
+        eE3ceXT2Pv/WuEU9K5YL7WuWC/zycP0No3MJ4k9u61xXn15RZJNtPbP66ra599Sux7aVXlb9
+        qFbhftbdpOFLxKQE350y3hdNtIws/mxNipieP3GiZkbpzhtm+7qZlViKMxINtZiLihMBnJ2G
+        GogCAAA=
+X-CMS-MailID: 20200705193332epcas5p409173a9d12f203d3817305dd3250ca59
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
-X-CMS-RootMailID: 20200705185217epcas5p1cc12d4b892f057a1fe06d73a00869daa
-References: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
-        <CGME20200705185217epcas5p1cc12d4b892f057a1fe06d73a00869daa@epcas5p1.samsung.com>
+X-CMS-RootMailID: 20200705193332epcas5p409173a9d12f203d3817305dd3250ca59
+References: <CGME20200705193332epcas5p409173a9d12f203d3817305dd3250ca59@epcas5p4.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Selvakumar S <selvakuma.s1@samsung.com>
+Changes since v1:
+- updated commit description
+- added reviewed-by
 
-For zoned block device, subscribe to zone-append by setting
-FMODE_ZONE_APPEND during open. Make direct IO submission path use
-IOCB_ZONE_APPEND to send bio with append op. Make direct IO completion
-return zone-relative offset, in sector unit, to upper layer using
-kiocb->ki_complete interface.
-Return failure if write is larger than max_append_limit and therefore
-requires formation of multiple bios.
+Kanchan Joshi (1):
+  block: fix error code for zone-append
 
-Signed-off-by: Selvakumar S <selvakuma.s1@samsung.com>
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-Signed-off-by: Arnav Dawn <a.dawn@samsung.com>
-Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
----
- fs/block_dev.c | 49 ++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 40 insertions(+), 9 deletions(-)
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 47860e5..941fb22 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -178,10 +178,19 @@ static struct inode *bdev_file_inode(struct file *file)
- 	return file->f_mapping->host;
- }
- 
--static unsigned int dio_bio_write_op(struct kiocb *iocb)
-+static unsigned int dio_bio_op(bool is_read, struct kiocb *iocb)
- {
--	unsigned int op = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
-+	unsigned int op;
- 
-+	if (is_read)
-+		return REQ_OP_READ;
-+
-+	if (iocb->ki_flags & IOCB_ZONE_APPEND)
-+		op = REQ_OP_ZONE_APPEND;
-+	else
-+		op = REQ_OP_WRITE;
-+
-+	op |= REQ_SYNC | REQ_IDLE;
- 	/* avoid the need for a I/O completion work item */
- 	if (iocb->ki_flags & IOCB_DSYNC)
- 		op |= REQ_FUA;
-@@ -207,6 +216,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	struct bio_vec inline_vecs[DIO_INLINE_BIO_VECS], *vecs;
- 	loff_t pos = iocb->ki_pos;
- 	bool should_dirty = false;
-+	bool is_read = (iov_iter_rw(iter) == READ);
- 	struct bio bio;
- 	ssize_t ret;
- 	blk_qc_t qc;
-@@ -231,18 +241,17 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	bio.bi_private = current;
- 	bio.bi_end_io = blkdev_bio_end_io_simple;
- 	bio.bi_ioprio = iocb->ki_ioprio;
-+	bio.bi_opf = dio_bio_op(is_read, iocb);
- 
- 	ret = bio_iov_iter_get_pages(&bio, iter);
- 	if (unlikely(ret))
- 		goto out;
- 	ret = bio.bi_iter.bi_size;
- 
--	if (iov_iter_rw(iter) == READ) {
--		bio.bi_opf = REQ_OP_READ;
-+	if (is_read) {
- 		if (iter_is_iovec(iter))
- 			should_dirty = true;
- 	} else {
--		bio.bi_opf = dio_bio_write_op(iocb);
- 		task_io_account_write(ret);
- 	}
- 	if (iocb->ki_flags & IOCB_HIPRI)
-@@ -295,6 +304,16 @@ static int blkdev_iopoll(struct kiocb *kiocb, bool wait)
- 	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), wait);
- }
- 
-+static inline long blkdev_bio_res2(struct kiocb *iocb, struct bio *bio)
-+{
-+	/* calculate zone relative offset for zone append */
-+	if (op_is_write(bio_op(bio)) && iocb->ki_flags & IOCB_ZONE_APPEND) {
-+		sector_t zone_sec = blk_queue_zone_sectors(bio->bi_disk->queue);
-+		return bio->bi_iter.bi_sector & (zone_sec - 1);
-+	}
-+	return 0;
-+}
-+
- static void blkdev_bio_end_io(struct bio *bio)
- {
- 	struct blkdev_dio *dio = bio->bi_private;
-@@ -307,15 +326,17 @@ static void blkdev_bio_end_io(struct bio *bio)
- 		if (!dio->is_sync) {
- 			struct kiocb *iocb = dio->iocb;
- 			ssize_t ret;
-+			long res2;
- 
- 			if (likely(!dio->bio.bi_status)) {
- 				ret = dio->size;
- 				iocb->ki_pos += ret;
-+				res2 = blkdev_bio_res2(iocb, bio);
- 			} else {
- 				ret = blk_status_to_errno(dio->bio.bi_status);
- 			}
- 
--			dio->iocb->ki_complete(iocb, ret, 0);
-+			dio->iocb->ki_complete(iocb, ret, res2);
- 			if (dio->multi_bio)
- 				bio_put(&dio->bio);
- 		} else {
-@@ -382,6 +403,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		bio->bi_private = dio;
- 		bio->bi_end_io = blkdev_bio_end_io;
- 		bio->bi_ioprio = iocb->ki_ioprio;
-+		bio->bi_opf = dio_bio_op(is_read, iocb);
- 
- 		ret = bio_iov_iter_get_pages(bio, iter);
- 		if (unlikely(ret)) {
-@@ -391,11 +413,9 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		}
- 
- 		if (is_read) {
--			bio->bi_opf = REQ_OP_READ;
- 			if (dio->should_dirty)
- 				bio_set_pages_dirty(bio);
- 		} else {
--			bio->bi_opf = dio_bio_write_op(iocb);
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		}
- 
-@@ -419,6 +439,12 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		}
- 
- 		if (!dio->multi_bio) {
-+			/* zone-append cannot work with multi bio*/
-+			if (!is_read && iocb->ki_flags & IOCB_ZONE_APPEND) {
-+				bio->bi_status = BLK_STS_IOERR;
-+				bio_endio(bio);
-+				break;
-+			}
- 			/*
- 			 * AIO needs an extra reference to ensure the dio
- 			 * structure which is embedded into the first bio
-@@ -1841,6 +1867,7 @@ EXPORT_SYMBOL(blkdev_get_by_dev);
- static int blkdev_open(struct inode * inode, struct file * filp)
- {
- 	struct block_device *bdev;
-+	int ret;
- 
- 	/*
- 	 * Preserve backwards compatibility and allow large file access
-@@ -1866,7 +1893,11 @@ static int blkdev_open(struct inode * inode, struct file * filp)
- 	filp->f_mapping = bdev->bd_inode->i_mapping;
- 	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
- 
--	return blkdev_get(bdev, filp->f_mode, filp);
-+	ret = blkdev_get(bdev, filp->f_mode, filp);
-+	if (blk_queue_is_zoned(bdev->bd_disk->queue))
-+		filp->f_mode |= FMODE_ZONE_APPEND;
-+
-+	return ret;
- }
- 
- static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
 -- 
 2.7.4
 
