@@ -2,138 +2,131 @@ Return-Path: <SRS0=7JbN=AR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D707C433DF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 02:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1313C433E0
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 07:16:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F18D20739
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 02:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B0382074F
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 07:16:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zw5NNvo0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728632AbgGFClL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Jul 2020 22:41:11 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:39582 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726684AbgGFClL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jul 2020 22:41:11 -0400
-Received: by mail-pj1-f66.google.com with SMTP id b92so16352837pjc.4;
-        Sun, 05 Jul 2020 19:41:10 -0700 (PDT)
+        id S1728306AbgGFHQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jul 2020 03:16:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728079AbgGFHQx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jul 2020 03:16:53 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6E8C061794
+        for <linux-block@vger.kernel.org>; Mon,  6 Jul 2020 00:16:53 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id g10so15021819wmc.1
+        for <linux-block@vger.kernel.org>; Mon, 06 Jul 2020 00:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=vLESYTwRgIEzacl15YJZpza+9kyceaKMoLaqX6m40MQ=;
+        b=zw5NNvo0Eu8+IjaRXjHxdwT7ZCRIe6Hu5r+f7ZNg90MoD5ohiSJUqHDU9OIVb60+XQ
+         9sUReu++a5Tt3Tss82ZcGbLj0IKCgXbaRcfjoI0tGvMB/VIBiYuw4OsJ01mSnZw7V7wk
+         0O6c0nR4tqeQSRmhRfaEvPnxHCi63gP03Fa5QK7068l5Pdou723cpl/3IOY1GD89/jQc
+         zmORq0LL3qzmOaTNZTjE0t+aU74ki50BSFYcihFvaYRHfAZ0ZAgzS8Be/k1OZIjS0j1W
+         CCW/tW7hrDJKWK67ZG65n0D7oNmw9UNzRzIBLilvw+X5ufYy4KDirDG5Z5TqiusMo0E9
+         mD4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=81NTEqDyZvRshxK436Y1/22euKYv5lsQgXKxLCuXD2E=;
-        b=GEDxe16suR7P+4rnKI/uZq6yII1eninz7Y6UXphu2HMcowaUlnAvBJ4w3Jkv0YK0ms
-         8W5PwADgB1A30Oh5R9RDEZE1LCXytpZw9DIpFra/hDi3+pgZUAf/TFu5sai/6WDnmpUC
-         LPfdYDVrPN4xHAVDtgki7DnCAzfi7pzcZa+OkpqrTmytLtIAyMVcSvMKFsh3KG0+Nuyu
-         Jyap0WKvcnupm4yChb4yUmmNJpigqmYBrrDwU2DhLjTNoXJBEa095OnwdXvMlVQhJT8L
-         NiT/VFG38/Cm2//NKPbCUW9bjIjIIarmsFdLr/ZmsVZ5PepKBbcpzs9auk+ov8zw2y3z
-         z2fw==
-X-Gm-Message-State: AOAM533zFqHeIeImBt+fStic3dgmHy1U++LKiN3ym7na0JyxWAs0dfU8
-        Oc570VDfKPJUkwxCkHVcC1DUHDWG
-X-Google-Smtp-Source: ABdhPJyo99JpoklWM+tc9dEeSPA6GAkADROtb/hL1h8tP63d31sWgyKW00TNP5b/4zcd/cQDTtEs6Q==
-X-Received: by 2002:a17:90a:f2c3:: with SMTP id gt3mr33462329pjb.92.1594003269735;
-        Sun, 05 Jul 2020 19:41:09 -0700 (PDT)
-Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id 199sm17815077pgc.79.2020.07.05.19.41.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Jul 2020 19:41:08 -0700 (PDT)
-Subject: Re: [PATCH v2] SCSI and block: Simplify resume handling
-To:     Alan Stern <stern@rowland.harvard.edu>, martin.petersen@oracle.com
-Cc:     Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=vLESYTwRgIEzacl15YJZpza+9kyceaKMoLaqX6m40MQ=;
+        b=JPvFyDfDmmoxCd6kOEfq8/XE3AOqnCUwSzRJo27r3MDYB3OFMJCCFHOmif/MtmHzx1
+         x6kz7aXW4/p4ihxKjIOKMx/LhgwARHw6wxIClL3HLRpz1WD5kLkPHzrZlJkQSBfjqcJj
+         ElJtzV1NJ4NecwLlUpbbV+ij0k2qajeJTWvaYZtFld4mewNJJ2WScktP6CFz+Sv2Dae0
+         xizQmCRx1c5wr50jjdOzktwITVs7SD68A0R5S6dZB+INzWR7FvaytGBpGeg+MHUR62ul
+         QQQUuSnUc9O55DENluphQSP55IOdIoxownF3fsma0bd8x60SdWpDDDfNKBH5bzd1lBua
+         B9Cg==
+X-Gm-Message-State: AOAM530qmRZ+lzDHqoIJjwFensFa377NYPDpbsn8+zowmZrWrKZ+0YOh
+        eKK+o/w+0KYg6m5FCUiXPKUvBA==
+X-Google-Smtp-Source: ABdhPJxfyyFOAUjRwqmCoAeF7td/gWS8mcZ3rJISSVH2W0WCap4JqRbYzRLfeVuu43SB0/OV5bV9zw==
+X-Received: by 2002:a7b:c4d8:: with SMTP id g24mr45546915wmk.127.1594019811942;
+        Mon, 06 Jul 2020 00:16:51 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id 22sm23456880wmb.11.2020.07.06.00.16.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 Jul 2020 00:16:51 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH] docs: block: update and fix tiny error for bfq
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20200703061323.959519-1-yuyufen@huawei.com>
+Date:   Mon, 6 Jul 2020 09:17:06 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-doc@vger.kernel.org,
         linux-block@vger.kernel.org
-References: <20200701183718.GA507293@rowland.harvard.edu>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <9e824700-dfd1-5d71-5e91-833c35ea55eb@acm.org>
-Date:   Sun, 5 Jul 2020 19:41:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200701183718.GA507293@rowland.harvard.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <295D7F7E-2B17-469C-B758-9A9DAEC65E66@linaro.org>
+References: <20200703061323.959519-1-yuyufen@huawei.com>
+To:     Yufen Yu <yuyufen@huawei.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-07-01 11:37, Alan Stern wrote:
->  void blk_post_runtime_resume(struct request_queue *q, int err)
->  {
-> -	if (!q->dev)
-> -		return;
+
+
+> Il giorno 3 lug 2020, alle ore 08:13, Yufen Yu <yuyufen@huawei.com> ha =
+scritto:
+>=20
+> The max value of blkio.bfq.weight is 1000, rather than 10000.
+> And 'weights' have been remove from /sys/block/XXX/queue/iosched.
+>=20
+Acked-by: Paolo Valente <paolo.valente@linaro.org>
+
+Thanks!
+Paolo
+
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> ---
+> Documentation/block/bfq-iosched.rst | 9 +--------
+> 1 file changed, 1 insertion(+), 8 deletions(-)
+>=20
+> diff --git a/Documentation/block/bfq-iosched.rst =
+b/Documentation/block/bfq-iosched.rst
+> index 0d237d402860..19d4d1570cee 100644
+> --- a/Documentation/block/bfq-iosched.rst
+> +++ b/Documentation/block/bfq-iosched.rst
+> @@ -492,13 +492,6 @@ set max_budget to higher values than those to =
+which BFQ would have set
+> it with auto-tuning. An alternative way to achieve this goal is to
+> just increase the value of timeout_sync, leaving max_budget equal to =
+0.
+>=20
+> -weights
+> --------
 > -
-> -	spin_lock_irq(&q->queue_lock);
->  	if (!err) {
-> -		q->rpm_status = RPM_ACTIVE;
-> -		pm_runtime_mark_last_busy(q->dev);
-> -		pm_request_autosuspend(q->dev);
-> -	} else {
-> +		blk_set_runtime_active(q);
-> +	} else if (q->dev) {
-> +		spin_lock_irq(&q->queue_lock);
->  		q->rpm_status = RPM_SUSPENDED;
-> +		spin_unlock_irq(&q->queue_lock);
->  	}
-> -	spin_unlock_irq(&q->queue_lock);
+> -Read-only parameter, used to show the weights of the currently active
+> -BFQ queues.
 > -
-> -	if (!err)
-> -		blk_clear_pm_only(q);
->  }
->  EXPORT_SYMBOL(blk_post_runtime_resume);
+> -
+> 4. Group scheduling with BFQ
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+>=20
+> @@ -566,7 +559,7 @@ Parameters to set
+> For each group, there is only the following parameter to set.
+>=20
+> weight (namely blkio.bfq.weight or io.bfq-weight): the weight of the
+> -group inside its parent. Available values: 1..10000 (default 100). =
+The
+> +group inside its parent. Available values: 1..1000 (default 100). The
+> linear mapping between ioprio and weights, described at the beginning
+> of the tunable section, is still valid, but all weights higher than
+> IOPRIO_BE_NR*10 are mapped to ioprio 0.
+> --=20
+> 2.25.4
+>=20
 
-I'd like to keep the if (!q->dev) check at the start of the function instead
-of moving it to the middle of the function to keep the symmetry with the
-existing runtime power management functions in the same source file.
-
->  void blk_set_runtime_active(struct request_queue *q)
->  {
->  	if (q->dev) {
-> +		int old_status;
-> +
->  		spin_lock_irq(&q->queue_lock);
-> +		old_status = q->rpm_status;
->  		q->rpm_status = RPM_ACTIVE;
->  		pm_runtime_mark_last_busy(q->dev);
->  		pm_request_autosuspend(q->dev);
->  		spin_unlock_irq(&q->queue_lock);
-> +
-> +		if (old_status != RPM_ACTIVE)
-> +			blk_clear_pm_only(q);
->  	}
->  }
-
-Since this function is being modified, please change the if (q->dev) into
-if (!q->dev) return since returning early is the recommended kernel coding
-style.
-
-Thanks,
-
-Bart.
