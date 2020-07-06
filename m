@@ -2,134 +2,166 @@ Return-Path: <SRS0=7JbN=AR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 892DDC433DF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 09:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 939AFC433DF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 14:01:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BAA92074F
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 09:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66C162070C
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 14:01:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hEzJM6ht"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728135AbgGFJk6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jul 2020 05:40:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41166 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728024AbgGFJk6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Jul 2020 05:40:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C6702AC67;
-        Mon,  6 Jul 2020 09:40:56 +0000 (UTC)
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     John Garry <john.garry@huawei.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        ming.lei@redhat.com, bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-11-git-send-email-john.garry@huawei.com>
- <d55972999b9370f947c20537e41b49bf@mail.gmail.com>
- <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
- <b63d200f-9221-ceff-f32c-342fdbd21555@suse.de>
- <fd06b790-8f3d-50d0-f9e8-563f4650e90f@huawei.com>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <1f70aed0-52c3-73e3-8acf-bf25aa6de9c9@suse.de>
-Date:   Mon, 6 Jul 2020 11:40:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1729310AbgGFOBn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jul 2020 10:01:43 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:32156 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729209AbgGFOBm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jul 2020 10:01:42 -0400
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20200706140139epoutp015e1df5508429713dd84b9f10e368585b~fLqm1I47g1105711057epoutp01S
+        for <linux-block@vger.kernel.org>; Mon,  6 Jul 2020 14:01:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20200706140139epoutp015e1df5508429713dd84b9f10e368585b~fLqm1I47g1105711057epoutp01S
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1594044099;
+        bh=r/dgxZFDzwndXBBLDY9ZULIdgyOK//Icnp95tJ9Cro8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=hEzJM6ht6xotFTo83+Rdy0BaN3x1yc4HxLMnWlXbhikorSefWHBS6BGn7ebDL9As/
+         eiy8sZznX1ES8is8qU5j61Wm131FLCagnQd510zBJVDBOWzljwg5/XEg4bvgJ1TvUG
+         +s+NpTw0nP8mVpm7z11yJqEaQYFsKAMV4XmLx5h0=
+Received: from epsmges5p1new.samsung.com (unknown [182.195.42.73]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20200706140138epcas5p16f6bc1001884616e44e50f407fc840a4~fLqmNZuNJ3229432294epcas5p1v;
+        Mon,  6 Jul 2020 14:01:38 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4B.6D.09467.2CE230F5; Mon,  6 Jul 2020 23:01:38 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20200706140137epcas5p338bac6dd19a756290dd75134c48760d3~fLqlCBYnJ3117831178epcas5p3K;
+        Mon,  6 Jul 2020 14:01:37 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20200706140137epsmtrp20352bcd7b6da4097db7205248976d35c~fLqlBHgOC0630006300epsmtrp2w;
+        Mon,  6 Jul 2020 14:01:37 +0000 (GMT)
+X-AuditID: b6c32a49-a3fff700000024fb-66-5f032ec2a1c2
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        94.0C.08303.1CE230F5; Mon,  6 Jul 2020 23:01:37 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20200706140135epsmtip198d637b3809f86e0420f957158fb5dec~fLqiuOKev1018210182epsmtip1c;
+        Mon,  6 Jul 2020 14:01:34 +0000 (GMT)
+Date:   Mon, 6 Jul 2020 19:28:39 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     viro@zeniv.linux.org.uk, bcrl@kvack.org, hch@infradead.org,
+        Damien.LeMoal@wdc.com, asml.silence@gmail.com,
+        linux-fsdevel@vger.kernel.org, mb@lightnvm.io,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
+Message-ID: <20200706135839.GA23212@test-zns>
 MIME-Version: 1.0
-In-Reply-To: <fd06b790-8f3d-50d0-f9e8-563f4650e90f@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrHKsWRmVeSWpSXmKPExsWy7bCmuu4hPeZ4g9Yz+hZzVm1jtFh9t5/N
+        ouvfFhaL1vZvTBanJyxisnjXeo7F4vGdz+wWU6Y1MVrsvaVtsWfvSRaLy7vmsFms2H6ExWLb
+        7/nMFq9/nGSzOP/3OKsDv8fOWXfZPTav0PK4fLbUY9OnSewe3Vd/MHr0bVnF6PF5k5xH+4Fu
+        Jo9NT94yBXBGcdmkpOZklqUW6dslcGU839LPUnCHt+LHvbVsDYw7uLsYOTkkBEwk3t6cz9rF
+        yMUhJLCbUWL1rlZGCOcTo8TbPVvZIJzPjBLPWtazwrT0bT7ABJHYxSjxd+cCKOcZo8TxI3uY
+        QapYBFQkXiz/B9TOwcEmoClxYXIpSFhEQEGi5/dKsKnMAt3MEnc6G8HqhQUcJT7vPMkIYvMK
+        6EqcfLieDcIWlDg58wkLyBxOAVuJYwcjQcKiAsoSB7YdB9srIXCFQ2Ju/wI2iOtcJKZu72KH
+        sIUlXh3fAmVLSXx+txeqplji152jzBDNHYwS1xtmskAk7CUu7vnLBGIzC2RIXDg2Ecrmk+j9
+        /YQJ5AgJAV6JjjYhiHJFiXuTnkJDRVzi4YwlULaHxLHmC9BAaWGSaJo2hXECo9wsJP/MQrIC
+        wraS6PzQxDoLaAWzgLTE8n8cEKamxPpd+gsYWVcxSqYWFOempxabFhjmpZbrFSfmFpfmpesl
+        5+duYgQnOS3PHYx3H3zQO8TIxMF4iFGCg1lJhLdXmzFeiDclsbIqtSg/vqg0J7X4EKM0B4uS
+        OK/SjzNxQgLpiSWp2ampBalFMFkmDk6pBqYdmnZtQUJf5QsnPeLr25VzRfpkbefHHXILVSd+
+        2ptrEPra+5VVy1nzK9M92y8vnshw55LVNK4l9vV7Q0Kfrvvm4MNx942QziXfau4p9XqX/I9e
+        mSZ7aP986cDUNRaTE1/xdmp+a4oInMSo2qpi1vroxuM0J92FfA73ddcc6vROuzpdaIGM6OJt
+        V8/3tYnfMVW65P7SuqO49aji52pTtsnKEq4Htjy7tZ7llvj5zBuBzz056jTajh5ukP4+4VMW
+        69F0r8NFMw0tNnh1/X/GoLBT4f6H3yz6VtnWc+b/fTx949S8bW4z2Pb7P3t3qfLM1a8GaUGP
+        SiaF6TS/6+5ZUX5uznNmvyM/P+guP3z+sPc/JZbijERDLeai4kQAS9nm4+EDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKIsWRmVeSWpSXmKPExsWy7bCSnO5BPeZ4g5fHpC3mrNrGaLH6bj+b
+        Rde/LSwWre3fmCxOT1jEZPGu9RyLxeM7n9ktpkxrYrTYe0vbYs/ekywWl3fNYbNYsf0Ii8W2
+        3/OZLV7/OMlmcf7vcVYHfo+ds+6ye2xeoeVx+Wypx6ZPk9g9uq/+YPTo27KK0ePzJjmP9gPd
+        TB6bnrxlCuCM4rJJSc3JLEst0rdL4Mq4vvU9Y0Efd8XOQxMYGxhbOLsYOTkkBEwk+jYfYAKx
+        hQR2MEp8macAEReXaL72gx3CFpZY+e85kM0FVPOEUWLF8zmsIAkWARWJF8v/sXUxcnCwCWhK
+        XJhcChIWEVCQ6Pm9kg2knlmgn1ni8IppzCAJYQFHic87TzKC2LwCuhInH65ngxjawiTx9to8
+        doiEoMTJmU9YQGxmATOJeZsfMoMsYBaQllj+jwPE5BSwlTh2MBKkQlRAWeLAtuNMExgFZyFp
+        noWkeRZC8wJG5lWMkqkFxbnpucWGBUZ5qeV6xYm5xaV56XrJ+bmbGMExp6W1g3HPqg96hxiZ
+        OBgPMUpwMCuJ8PZqM8YL8aYkVlalFuXHF5XmpBYfYpTmYFES5/06a2GckEB6YklqdmpqQWoR
+        TJaJg1Oqgan4CZ9rdO6p/wqCHwLF1y00S96z9ayH54+G368kta2lttdM3LvM7KvQVO59/95m
+        xa170en/30L3XeXvhOptB4SCVL8lW6yUbTU+2ivIn9wnumDnV4s4HTXxc2GSKx+kFSWz/Hy4
+        5vT3D0VxVpKG6U+kVm3iPynGsi5/z0KO+zVroj0Vd5X7M7ILse3/MUn+nUOd4FMTraerf3Rm
+        RsvmO3yy+7tsbm3UmSvlc3u3sxs9sNqwWb32ilBBxD0lb/n74R/mJhupf68XOZt9qEPlXPNT
+        z0DuR7NCdhuebNdlTOD4Hln3822keamZdPPi59p9GQc/zrggUVvzs0U+dfdfllju2M+XvSI+
+        99zlvm5spsRSnJFoqMVcVJwIADMMuSAoAwAA
+X-CMS-MailID: 20200706140137epcas5p338bac6dd19a756290dd75134c48760d3
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----RtrVgMPcOOSLrhJloRVgptxhQONXYtyOWZJ9JvnugceJtZ1T=_db49e_"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20200705185227epcas5p16fba3cb92561794b960184c89fdf2bb7
+References: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
+        <CGME20200705185227epcas5p16fba3cb92561794b960184c89fdf2bb7@epcas5p1.samsung.com>
+        <1593974870-18919-5-git-send-email-joshi.k@samsung.com>
+        <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/6/20 11:26 AM, John Garry wrote:
-> On 06/07/2020 09:45, Hannes Reinecke wrote:
->> Originally I thought it would help for CPU hotplug, too, but typically
->> the internal commands are not bound to any specific CPU, 
-> 
-> When we alloc the request in scsi_get_internal_cmd() - >
-> blk_mq_alloc_request() -> __blk_mq_alloc_request(), the request will
-> have an associated hctx.
-> 
-> As such, I would expect the LLDD to honor this, in that it should use
-> the hwq associated with the hctx to send/receive the command.
-> 
-> And from that, the hwq managed interrupt should not be shut down until
-> the queue is drained, including internal commands.
-> 
-> Is there something wrong with this idea?
-> 
-Oh, no, not at all.
+------RtrVgMPcOOSLrhJloRVgptxhQONXYtyOWZJ9JvnugceJtZ1T=_db49e_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-What I'm referring to are driver internals; some driver allow (or set)
-the MSIx vector only for 'normal' I/O; internal commands don't have an
-MSIx vector set.
-As such it's pretty much driver-dependent _where_ they end up, be it on
-the same CPU, or on any CPU who might be listening.
-Be it as it may, when waiting for hctx to drain we are pretty safe, and
-hence CPU hotplug will be improved here.
+On Sun, Jul 05, 2020 at 03:00:47PM -0600, Jens Axboe wrote:
+>On 7/5/20 12:47 PM, Kanchan Joshi wrote:
+>> From: Selvakumar S <selvakuma.s1@samsung.com>
+>>
+>> For zone-append, block-layer will return zone-relative offset via ret2
+>> of ki_complete interface. Make changes to collect it, and send to
+>> user-space using cqe->flags.
+>>
+>> Signed-off-by: Selvakumar S <selvakuma.s1@samsung.com>
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
+>> ---
+>>  fs/io_uring.c | 21 +++++++++++++++++++--
+>>  1 file changed, 19 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>> index 155f3d8..cbde4df 100644
+>> --- a/fs/io_uring.c
+>> +++ b/fs/io_uring.c
+>> @@ -402,6 +402,8 @@ struct io_rw {
+>>  	struct kiocb			kiocb;
+>>  	u64				addr;
+>>  	u64				len;
+>> +	/* zone-relative offset for append, in sectors */
+>> +	u32			append_offset;
+>>  };
+>
+>I don't like this very much at all. As it stands, the first cacheline
+>of io_kiocb is set aside for request-private data. io_rw is already
+>exactly 64 bytes, which means that you're now growing io_rw beyond
+>a cacheline and increasing the size of io_kiocb as a whole.
+>
+>Maybe you can reuse io_rw->len for this, as that is only used on the
+>submission side of things.
 
-Cheers,
+Yes, this will be good. Thanks.
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+------RtrVgMPcOOSLrhJloRVgptxhQONXYtyOWZJ9JvnugceJtZ1T=_db49e_
+Content-Type: text/plain; charset="utf-8"
+
+
+------RtrVgMPcOOSLrhJloRVgptxhQONXYtyOWZJ9JvnugceJtZ1T=_db49e_--
