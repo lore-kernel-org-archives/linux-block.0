@@ -2,162 +2,114 @@ Return-Path: <SRS0=7JbN=AR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9F3C433DF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 14:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0454CC433DF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 14:41:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC6932070B
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 14:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C57F02070C
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jul 2020 14:41:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IgeFwe3M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C9yWL8pp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729286AbgGFOdm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jul 2020 10:33:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56512 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729250AbgGFOdm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jul 2020 10:33:42 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D20EC08C5DF
-        for <linux-block@vger.kernel.org>; Mon,  6 Jul 2020 07:33:42 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id o3so15678141ilo.12
-        for <linux-block@vger.kernel.org>; Mon, 06 Jul 2020 07:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=fmUO+MRhKaF9iDr809BkP0BZ1FEwKum+d6TqO74BCHY=;
-        b=IgeFwe3MEabbYSbiAs+p2J1s7Hx8+qkGi0XKQXS+TMUtSUDcHZAsfvxQjSInnGs/hG
-         n6Fz7r5BjsVqrvUpgJdUSa9Ot7cb3E6+iRdD+agLt9B0IjYMp38UYZJEIF9y1vE2HjAp
-         Kbh529x6F3DrjiKAglmQCbHz0hx2QoAmqXWuzy5jvlhkcptALLA19v/KuTWX5paTji/t
-         nnKCxKV6cikD2Rff9ULQNZcyBUKvKrKkgmgVI2AKCBdtELl8UVLddf8bUulVaSn76hIL
-         edeo419KBLPKXNwu7YGkq7y+OUUCily9z0J0WPonnjRVbqCDElrL1f6uf/ihcltKINg7
-         tOpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fmUO+MRhKaF9iDr809BkP0BZ1FEwKum+d6TqO74BCHY=;
-        b=C9zHWhcnhWwy9UtOVqJW4BO8H7ecvUzhiX8tySqLSefIRahIiv8Pbz8/iAkzahdIQs
-         Slo4GplpUvpCSSdJ+z7F4D7tCMzK4Kxw6rEhE6+T5zyBYUqtikE5Dzzsii/sY0Bsq5sB
-         sAUnSBJMOGJCjiC/ILEhlZecar7cyvepGik5A2ns4FChEXk416i6aaoKFvQT3RsTMySf
-         aOjxeNqtd5EI2rq7xD2g0KoPUz0gmVZfWrIV3fr7x26tvVu6l7T6VSIoqJr2Fv3Xpmny
-         q77BGdkgof6stTNn9/ldEHZrIiajVDPlG61rB8mZxDp56ovo1yFPI6pEtOaVpOGik+Rw
-         4m4A==
-X-Gm-Message-State: AOAM533GtN9jOw0judDQeWbn7GMOgyovO88gWD0It3bIONkMH0bskU+3
-        bSobNwJSrXtctYOT3ABxuBIwXg==
-X-Google-Smtp-Source: ABdhPJwOtHmNnHmEW2Bjrz3fklq2Hr32zEZPkqI1YmYfRyWomLR+5Awwy7juGYxR0E2eZ/0IStYegA==
-X-Received: by 2002:a05:6e02:10d4:: with SMTP id s20mr31143956ilj.203.1594046021328;
-        Mon, 06 Jul 2020 07:33:41 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id y6sm10971417ila.74.2020.07.06.07.33.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jul 2020 07:33:40 -0700 (PDT)
-Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
-        bcrl@kvack.org, hch@infradead.org, Damien.LeMoal@wdc.com,
-        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
-        mb@lightnvm.io, linux-kernel@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Selvakumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-References: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
- <CGME20200705185227epcas5p16fba3cb92561794b960184c89fdf2bb7@epcas5p1.samsung.com>
- <1593974870-18919-5-git-send-email-joshi.k@samsung.com>
- <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk>
- <20200705210947.GW25523@casper.infradead.org>
- <239ee322-9c38-c838-a5b2-216787ad2197@kernel.dk>
- <20200706141002.GZ25523@casper.infradead.org>
- <4a9bf73e-f3ee-4f06-7fad-b8f8861b0bc1@kernel.dk>
- <20200706143208.GA25523@casper.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ee671380-86f0-d50d-7fb4-2e1901c4173c@kernel.dk>
-Date:   Mon, 6 Jul 2020 08:33:39 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1729186AbgGFOlJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jul 2020 10:41:09 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46879 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729140AbgGFOlJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Jul 2020 10:41:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594046467;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RZLz2TvGlNW4VHfZVnuCtBVhDNr1EiCSgDVb01qC8Bg=;
+        b=C9yWL8ppX50NTumrWfyYdl51n2ZFLm617hGil3cCiYuplftm1tmjk9+YRN7UZBp5uwjEvp
+        +OPbktSmzDBtbQlDKbj8kOSZSi9xVqzZHb9h2UVbWY+t/ufzYM01hpJWdbo/B9NKMfbHhn
+        ufjEPC37LPbImjbjTMuhGW5wk6tUBNI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-_0s0Qc81OyCgK6DGU4malA-1; Mon, 06 Jul 2020 10:41:05 -0400
+X-MC-Unique: _0s0Qc81OyCgK6DGU4malA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6B85100CCC0;
+        Mon,  6 Jul 2020 14:41:04 +0000 (UTC)
+Received: from localhost (ovpn-12-99.pek2.redhat.com [10.72.12.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 29DCA60BF3;
+        Mon,  6 Jul 2020 14:41:00 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] blk-mq: put driver tag when this request is completed
+Date:   Mon,  6 Jul 2020 22:40:54 +0800
+Message-Id: <20200706144054.3260791-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200706143208.GA25523@casper.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/6/20 8:32 AM, Matthew Wilcox wrote:
-> On Mon, Jul 06, 2020 at 08:27:17AM -0600, Jens Axboe wrote:
->> On 7/6/20 8:10 AM, Matthew Wilcox wrote:
->>> On Sun, Jul 05, 2020 at 03:12:50PM -0600, Jens Axboe wrote:
->>>> On 7/5/20 3:09 PM, Matthew Wilcox wrote:
->>>>> On Sun, Jul 05, 2020 at 03:00:47PM -0600, Jens Axboe wrote:
->>>>>> On 7/5/20 12:47 PM, Kanchan Joshi wrote:
->>>>>>> From: Selvakumar S <selvakuma.s1@samsung.com>
->>>>>>>
->>>>>>> For zone-append, block-layer will return zone-relative offset via ret2
->>>>>>> of ki_complete interface. Make changes to collect it, and send to
->>>>>>> user-space using cqe->flags.
->>>
->>>>> I'm surprised you aren't more upset by the abuse of cqe->flags for the
->>>>> address.
->>>>
->>>> Yeah, it's not great either, but we have less leeway there in terms of
->>>> how much space is available to pass back extra data.
->>>>
->>>>> What do you think to my idea of interpreting the user_data as being a
->>>>> pointer to somewhere to store the address?  Obviously other things
->>>>> can be stored after the address in the user_data.
->>>>
->>>> I don't like that at all, as all other commands just pass user_data
->>>> through. This means the application would have to treat this very
->>>> differently, and potentially not have a way to store any data for
->>>> locating the original command on the user side.
->>>
->>> I think you misunderstood me.  You seem to have thought I meant
->>> "use the user_data field to return the address" when I actually meant
->>> "interpret the user_data field as a pointer to where userspace
->>> wants the address stored".
->>
->> It's still somewhat weird to have user_data have special meaning, you're
->> now having the kernel interpret it while every other command it's just
->> an opaque that is passed through.
->>
->> But it could of course work, and the app could embed the necessary
->> u32/u64 in some other structure that's persistent across IO. If it
->> doesn't have that, then it'd need to now have one allocated and freed
->> across the lifetime of the IO.
->>
->> If we're going that route, it'd be better to define the write such that
->> you're passing in the necessary information upfront. In syscall terms,
->> then that'd be something ala:
->>
->> ssize_t my_append_write(int fd, const struct iovec *iov, int iovcnt,
->> 			off_t *offset, int flags);
->>
->> where *offset is copied out when the write completes. That removes the
->> need to abuse user_data, with just providing the storage pointer for the
->> offset upfront.
-> 
-> That works for me!  In io_uring terms, would you like to see that done
-> as adding:
-> 
->         union {
->                 __u64   off;    /* offset into file */
-> +		__u64   *offp;	/* appending writes */
->                 __u64   addr2;
->         };
-> 
+It is natural to release driver tag when this request is completed by
+LLD or device since its purpose is for LLD use.
 
-Either that, or just use addr2 for it directly. I consider the appending
-writes a marginal enough use case that it doesn't really warrant adding
-a specially named field for that.
+One big benefit is that the released tag can be re-used quicker since
+bio_endio() may take too long.
 
+.complete() is usually called for notifying block layer that this request
+is completed from LLD, and it is often the last thing done wrt. completion
+from LLD viewpoint. Not see rq->tag is used in driver's complete() too.
+
+Remove the warn in flush code because the driver tag should be released
+in normal completion path, however we can't kill it because request may
+be done directly via blk_mq_end_request(). Meantime not necessary to
+check q->elevator cause blk_mq_put_driver_tag() has run the same check
+already.
+
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-flush.c | 5 +----
+ block/blk-mq.c    | 2 ++
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 15ae0155ec07..86a8b6e747df 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -341,10 +341,7 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
+ 	unsigned long flags;
+ 	struct blk_flush_queue *fq = blk_get_flush_queue(q, ctx);
+ 
+-	if (q->elevator) {
+-		WARN_ON(rq->tag < 0);
+-		blk_mq_put_driver_tag(rq);
+-	}
++	blk_mq_put_driver_tag(rq);
+ 
+ 	/*
+ 	 * After populating an empty queue, kick it to avoid stall.  Read
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index abcf590f6238..117dec9abace 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -670,6 +670,8 @@ bool blk_mq_complete_request_remote(struct request *rq)
+ {
+ 	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+ 
++	blk_mq_put_driver_tag(rq);
++
+ 	/*
+ 	 * For a polled request, always complete locallly, it's pointless
+ 	 * to redirect the completion.
 -- 
-Jens Axboe
+2.25.2
 
