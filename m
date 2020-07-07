@@ -2,106 +2,88 @@ Return-Path: <SRS0=CAbX=AS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B73C433DF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 16:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C51C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 17:45:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97D5220674
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 16:18:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC83420738
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 17:45:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qhAsF6If"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729123AbgGGQS6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jul 2020 12:18:58 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2435 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729122AbgGGQS5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Jul 2020 12:18:57 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id A36CEE2F4E952071E6B1;
-        Tue,  7 Jul 2020 17:18:55 +0100 (IST)
-Received: from [127.0.0.1] (10.47.9.47) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 7 Jul 2020
- 17:18:54 +0100
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>,
-        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
-        <don.brace@microsemi.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        <ming.lei@redhat.com>, <bvanassche@acm.org>, <hare@suse.com>,
-        <hch@lst.de>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-11-git-send-email-john.garry@huawei.com>
- <d55972999b9370f947c20537e41b49bf@mail.gmail.com>
- <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
- <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com>
- <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
- <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
-Date:   Tue, 7 Jul 2020 17:17:13 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1727791AbgGGRpK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jul 2020 13:45:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54730 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727777AbgGGRpK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 13:45:10 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E53DAC061755
+        for <linux-block@vger.kernel.org>; Tue,  7 Jul 2020 10:45:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=gECaeIlagpow9M0HqX79L7dXqps6WX9nssgPAvLViJc=; b=qhAsF6If8Vgc5B+0gczkG5vDgG
+        7uiplQO7FdBZpAY3ZdRvdsW5VBHQyZkpRF3pSLJ87vPrpQ32W7kJFKHd7P/efd/O8Ws3zgIwTaiXd
+        1yhhchVONmH3dJqzH0xzeuyLfg+KziJJXJrNZLeUEEDuRLCfY9scDC/xxUhSdrzKNGbzD/iTdAzON
+        xu9PAJhkkBTmre/TyZnWjaJwdWzDIDUjQ2+evFeKeBpg1AojEybZdH1M1uR0hzhEFL/qWczSOtLoX
+        ncYVaHjrnvT8x3T0gpTA1WxQqKDldQhuvV8IXj4K69EuKpQ3lmryWSNnClkej7Ld9aRnSibGm4KX8
+        uUx2yq/A==;
+Received: from [2001:4bb8:18c:3b3b:a49f:8154:a2b7:8b6c] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jsreU-0003AO-18; Tue, 07 Jul 2020 17:45:07 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, kernel test robot <lkp@intel.com>
+Subject: [PATCH] block: remove a bogus warning in __submit_bio_noacct_mq
+Date:   Tue,  7 Jul 2020 19:45:03 +0200
+Message-Id: <20200707174503.4162535-1-hch@lst.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.9.47]
-X-ClientProxiedBy: lhreml742-chm.china.huawei.com (10.201.108.192) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 07/07/2020 15:45, Kashyap Desai wrote:
->>>>>            .eh_timed_out = megasas_reset_timer,
->>>>>            .shost_attrs = megaraid_host_attrs,
->>>>>            .bios_param = megasas_bios_param,
->>>>> +       .map_queues = megasas_map_queues,
->>>>>            .change_queue_depth = scsi_change_queue_depth,
->>>>>            .max_segment_size = 0xffffffff,
->>>>> +       .host_tagset = 1,
->>>> Is your intention to always have this set for Scsi_Host, and just
->>>> change nr_hw_queues?
->>> Actually I wanted to turn off  this feature using host_tagset and not
->>> through nr_hw_queue. I will address this.
->>>
->>> Additional request -
->>> In MR we have old controllers (called MFI_SERIES). We prefer not to
->>> change behavior for those controller.
->>> Having host_tagset in template does not allow to cherry pick different
->>> values for different type of controller.
->> Ok, so it seems sensible to add host_tagset to Scsi_Host structure also,
->> to
->> allow overwriting during probe time.
->>
->> If you want to share an updated megaraid sas driver patch based on that,
->> then
->> that's fine. I can incorporate that change in the patch where we add
->> host_tagset to the scsi host template.
-> If you share git repo link of next submission, I can send you megaraid_sas
-> driver patch which you can include in series.
+If blk_mq_submit_bio flushes the plug list, bios for other disks can
+show up on current->bio_list.  As that doesn't involve any stacking of
+block device it is entirely harmless and we should not warn about
+this case.
 
-So this is my work-en-progress branch:
+Fixes: ff93ea0ce763 ("block: shortcut __submit_bio_noacct for blk-mq drivers")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-https://github.com/hisilicon/kernel-dev/commits/private-topic-blk-mq-shared-tags-rfc-v8
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 9f1bf8658b611a..93104c7470e8ac 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1154,14 +1154,13 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
+ 
+ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
+ {
+-	struct gendisk *disk = bio->bi_disk;
+ 	struct bio_list bio_list[2] = { };
+ 	blk_qc_t ret = BLK_QC_T_NONE;
+ 
+ 	current->bio_list = bio_list;
+ 
+ 	do {
+-		WARN_ON_ONCE(bio->bi_disk != disk);
++		struct gendisk *disk = bio->bi_disk;
+ 
+ 		if (unlikely(bio_queue_enter(bio) != 0))
+ 			continue;
+-- 
+2.26.2
 
-I just updated to include the change to have Scsi_Host.host_tagset in 
-4291f617a02b commit ("scsi: Add host and host template flag 'host_tagset'")
-
-megaraid sas support is not on the branch yet, but I think everything 
-else required is. And it is mutable, so I'd clone it now if I were you - 
-or just replace the required patch onto your v7 branch.
-
-Thanks,
-John
