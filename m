@@ -2,82 +2,76 @@ Return-Path: <SRS0=CAbX=AS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D120C433DF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 06:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0634DC433E0
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 06:59:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A448206E9
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 06:57:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF764206E9
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 06:59:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vYqLWnKQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728209AbgGGG5K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jul 2020 02:57:10 -0400
-Received: from verein.lst.de ([213.95.11.211]:57439 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726788AbgGGG5K (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Jul 2020 02:57:10 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 24C5D68AFE; Tue,  7 Jul 2020 08:57:08 +0200 (CEST)
-Date:   Tue, 7 Jul 2020 08:57:07 +0200
-From:   "hch@lst.de" <hch@lst.de>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     "hch@lst.de" <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "jack@suse.czi" <jack@suse.czi>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "fangguoju@gmail.com" <fangguoju@gmail.com>,
-        "colyli@suse.de" <colyli@suse.de>
-Subject: Re: [PATCH 05/11] block: get rid of the trace rq insert wrapper
-Message-ID: <20200707065707.GA23805@lst.de>
-References: <20200629234314.10509-1-chaitanya.kulkarni@wdc.com> <20200629234314.10509-6-chaitanya.kulkarni@wdc.com> <BYAPR04MB4965DFE805071F971DC8C71C866A0@BYAPR04MB4965.namprd04.prod.outlook.com>
+        id S1728100AbgGGG7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jul 2020 02:59:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39108 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726434AbgGGG7J (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 02:59:09 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B834EC061755
+        for <linux-block@vger.kernel.org>; Mon,  6 Jul 2020 23:59:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Sn6owS6IktH7Ha8Kn+nWEcaAdqhHjyd+PySOwpvD6Xs=; b=vYqLWnKQ57+P0UbObapAxUu0z+
+        vpILQSa+yDvAKUizFguSYeEaGrjCHmmnfgmPvq7USfnpsrk0veZaYmaQg3U2+hG7iPADbhX4uiNlG
+        T50otXeKPJEkeTumcbQQhTSPQWt9pNQwh7k3wORuVG4izHuS9vm7gAx4zTuiSZ3w3BUVkKrdbrYxw
+        lRBzTs1DCsS4DwEXzptWHmp1Uy8qJn4YMllzqrhPMGmUTzlLHjGregqfc0/xaOu0m6i13n6gjooP4
+        k+ehCPgn39iH/pfQaDkKm80FKaOaGacWcpof9xut29vztwfd4i0XT7eXQ3yKdYhlQTmNBR6ksT4+i
+        6J+PXvRQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jshZ9-0006F0-Ot; Tue, 07 Jul 2020 06:58:55 +0000
+Date:   Tue, 7 Jul 2020 07:58:55 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH] blk-mq: centralise related handling into
+ blk_mq_get_driver_tag
+Message-ID: <20200707065855.GA23827@infradead.org>
+References: <20200706144111.3260859-1-ming.lei@redhat.com>
+ <841c8170-f082-814a-70cc-b0e3e8b5be54@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BYAPR04MB4965DFE805071F971DC8C71C866A0@BYAPR04MB4965.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <841c8170-f082-814a-70cc-b0e3e8b5be54@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 03, 2020 at 11:29:25PM +0000, Chaitanya Kulkarni wrote:
-> Christoph,
+On Tue, Jul 07, 2020 at 07:37:41AM +0100, John Garry wrote:
+> On 06/07/2020 15:41, Ming Lei wrote:
+> > -	hctx = flush_rq->mq_hctx;
+> >   	if (!q->elevator) {
 > 
-> On 6/29/20 4:44 PM, Chaitanya Kulkarni wrote:
-> > Get rid of the wrapper for trace_block_rq_insert() and call the function
-> > directly.
-> > 
-> > Signed-off-by: Chaitanya Kulkarni<chaitanya.kulkarni@wdc.com>
-> > ---
+> Is there a specific reason we do:
 > 
-> Can we re-consider adding this patch ? here are couple of reasons:-
+> if (!a)
+> 	do x
+> else
+> 	do y
 > 
-> 1. Increase in the size of the text region of the object file:-
+> as opposed to:
 > 
->     By adding the trace header #include <trace/events/block.h>
->     in io-scheduler where it is calling trace_block_rq_insert()
->     increases the size of the text region of the object file
->     kyber(+215) & bfq (+317) [1].
+> if (a)
+> 	do y
+> else
+> 	do x
 
-You really shouldn't have both loaded, never mind used at the same
-time.  It also avoid a function call for the scheduler fast path.
-
-> 2. Mandatory io-sched built-in kernel compilation:-
-> 
->     When testing with a different io-sched KConfig options ("*" vs "M"),
->     when kyber and bfq compilation option set to "M" having this patch
->     reports error[2].
-
-See EXPORT_TRACEPOINT_SYMBOL_GPL.
+I much prefer the latter.
