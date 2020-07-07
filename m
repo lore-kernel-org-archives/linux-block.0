@@ -2,88 +2,88 @@ Return-Path: <SRS0=CAbX=AS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C51C433E0
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 17:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB534C433DF
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 17:46:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC83420738
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 17:45:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7860620675
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 17:46:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qhAsF6If"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SjO0ay4x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727791AbgGGRpK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jul 2020 13:45:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54730 "EHLO
+        id S1727791AbgGGRqe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jul 2020 13:46:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727777AbgGGRpK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 13:45:10 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E53DAC061755
-        for <linux-block@vger.kernel.org>; Tue,  7 Jul 2020 10:45:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=gECaeIlagpow9M0HqX79L7dXqps6WX9nssgPAvLViJc=; b=qhAsF6If8Vgc5B+0gczkG5vDgG
-        7uiplQO7FdBZpAY3ZdRvdsW5VBHQyZkpRF3pSLJ87vPrpQ32W7kJFKHd7P/efd/O8Ws3zgIwTaiXd
-        1yhhchVONmH3dJqzH0xzeuyLfg+KziJJXJrNZLeUEEDuRLCfY9scDC/xxUhSdrzKNGbzD/iTdAzON
-        xu9PAJhkkBTmre/TyZnWjaJwdWzDIDUjQ2+evFeKeBpg1AojEybZdH1M1uR0hzhEFL/qWczSOtLoX
-        ncYVaHjrnvT8x3T0gpTA1WxQqKDldQhuvV8IXj4K69EuKpQ3lmryWSNnClkej7Ld9aRnSibGm4KX8
-        uUx2yq/A==;
-Received: from [2001:4bb8:18c:3b3b:a49f:8154:a2b7:8b6c] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jsreU-0003AO-18; Tue, 07 Jul 2020 17:45:07 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
+        with ESMTP id S1727777AbgGGRqd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 13:46:33 -0400
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8223AC061755
+        for <linux-block@vger.kernel.org>; Tue,  7 Jul 2020 10:46:33 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id h16so13423746ilj.11
+        for <linux-block@vger.kernel.org>; Tue, 07 Jul 2020 10:46:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=9R+3nS+6lf72MGoAssRY+zCXXoW/UwC4DS/gYhCBvbg=;
+        b=SjO0ay4xPGT/P7CSpxa0jnggN0CvA+unE55fp7EmXQdcq3xHf07/Wj9EX1lawf4nOA
+         U/Z29s//mQ0y7j35CHEz9yNJsc1ovZQM6O2qzrr30k1EPQJRB8voYQXk84GZtAqaxR+z
+         r5aNQpjxjU7ZbP5mS6b0VLADvji8ZTkLjxbCx1N9CmSMPQiSroy/+xwZNAoVi/rWe/+u
+         gC9j/dTKnuchOkx4NVAhj5o0m8GmF/IbSlJh1wxlk91ebHaYOwQdHe997wbMrsJCRF+v
+         iCmnKZU1uld+RRHnK1dSt3Gcsk3HMS8vHzawnk17iHsx8HSLVTLDDD6efWqcP9307a3R
+         HWNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9R+3nS+6lf72MGoAssRY+zCXXoW/UwC4DS/gYhCBvbg=;
+        b=GKBsB+PRb4NBhq9SBjZFOmH+h0Z0R43o9N7avt+8g4OGgUdrIDKCLx77stQ0QC7eHX
+         3RXAnO7sah0qvI813lPLincNmywdGv2N9U7felW+FT+MNFH2SCkk4Sk8fyo/oDGFVogn
+         5BXS3m0Cziw5Jh+aaY7bh745QE12uLEgBkExlRcrPAlVTVOeX/hB7fsq/p6A/I56aXme
+         w+ka4KnF9hiZwZPmPcJEVsRbBjJUu5yfffblPgDPktWYyoDVG5yvFID105vQhF6MgkWH
+         SkPeY5CE2EfzXetdRmNNIblqFX0EMgxlinz+YieD2X5HlbXF8XPsYWDDZVDTvqTY8fCH
+         9T/Q==
+X-Gm-Message-State: AOAM532SE8zbUlTV0kYh1Y/NlV0EFUIceXmXJsxd2eRPgjjOr9ks1603
+        M6xFGgWpn+dMMjtfxXq0+CUaF8+ML4kZGA==
+X-Google-Smtp-Source: ABdhPJzFySWmDp9K1x3JstsNtG29Y87pAGodbxB5nOPB2PmBkA3T2Aq5c/XdV/hyM7qy8l/aa6foeQ==
+X-Received: by 2002:a92:1f11:: with SMTP id i17mr8456884ile.277.1594143992948;
+        Tue, 07 Jul 2020 10:46:32 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id v62sm13558223ila.37.2020.07.07.10.46.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jul 2020 10:46:32 -0700 (PDT)
+Subject: Re: [PATCH] block: remove a bogus warning in __submit_bio_noacct_mq
+To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: [PATCH] block: remove a bogus warning in __submit_bio_noacct_mq
-Date:   Tue,  7 Jul 2020 19:45:03 +0200
-Message-Id: <20200707174503.4162535-1-hch@lst.de>
-X-Mailer: git-send-email 2.26.2
+References: <20200707174503.4162535-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bb59f085-2856-8c0b-4fa3-b2aa619c7c2d@kernel.dk>
+Date:   Tue, 7 Jul 2020 11:46:31 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200707174503.4162535-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If blk_mq_submit_bio flushes the plug list, bios for other disks can
-show up on current->bio_list.  As that doesn't involve any stacking of
-block device it is entirely harmless and we should not warn about
-this case.
+On 7/7/20 11:45 AM, Christoph Hellwig wrote:
+> If blk_mq_submit_bio flushes the plug list, bios for other disks can
+> show up on current->bio_list.  As that doesn't involve any stacking of
+> block device it is entirely harmless and we should not warn about
+> this case.
 
-Fixes: ff93ea0ce763 ("block: shortcut __submit_bio_noacct for blk-mq drivers")
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Applied, thanks.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9f1bf8658b611a..93104c7470e8ac 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1154,14 +1154,13 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
- 
- static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
- {
--	struct gendisk *disk = bio->bi_disk;
- 	struct bio_list bio_list[2] = { };
- 	blk_qc_t ret = BLK_QC_T_NONE;
- 
- 	current->bio_list = bio_list;
- 
- 	do {
--		WARN_ON_ONCE(bio->bi_disk != disk);
-+		struct gendisk *disk = bio->bi_disk;
- 
- 		if (unlikely(bio_queue_enter(bio) != 0))
- 			continue;
 -- 
-2.26.2
+Jens Axboe
 
