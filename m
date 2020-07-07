@@ -2,92 +2,146 @@ Return-Path: <SRS0=CAbX=AS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A3EC433DF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 07:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F998C433DF
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 07:59:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62BDA20702
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 07:17:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d1yCZd/l"
+	by mail.kernel.org (Postfix) with ESMTP id 7316520578
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 07:59:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726757AbgGGHRJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jul 2020 03:17:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37149 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726661AbgGGHRJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 03:17:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594106228;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PTBV+ndw8S9JKbMmISO7ODhQ88POe57xFK/8XW1bhfY=;
-        b=d1yCZd/lwmw3SCQ4NUF0z/0D0Ijtlle9KxxKTjjJM/BqizXowghj0H+EKBvl0TqhOq5dlk
-        TK+0mpyy1zo/ekn5gkX5f5/KluGw+LOI/s6cbk67C+3XRLRPobJTue3XPiemI5RFihWma1
-        cs5uTB0EXGLBoT7EsBqek9saWeSf8jU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-8tr40A0-PJeK04fY2uDF4Q-1; Tue, 07 Jul 2020 03:17:04 -0400
-X-MC-Unique: 8tr40A0-PJeK04fY2uDF4Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64DED107ACF3;
-        Tue,  7 Jul 2020 07:17:03 +0000 (UTC)
-Received: from T590 (ovpn-12-188.pek2.redhat.com [10.72.12.188])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D84D5D9C9;
-        Tue,  7 Jul 2020 07:16:57 +0000 (UTC)
-Date:   Tue, 7 Jul 2020 15:16:52 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH] blk-mq: centralise related handling into
- blk_mq_get_driver_tag
-Message-ID: <20200707071652.GA3269442@T590>
-References: <20200706144111.3260859-1-ming.lei@redhat.com>
- <841c8170-f082-814a-70cc-b0e3e8b5be54@huawei.com>
+        id S1726817AbgGGH7u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jul 2020 03:59:50 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2432 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726757AbgGGH7t (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Jul 2020 03:59:49 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id 011B2FDC1BA9E9419402;
+        Tue,  7 Jul 2020 08:59:48 +0100 (IST)
+Received: from [127.0.0.1] (10.47.9.47) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 7 Jul 2020
+ 08:59:46 +0100
+Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <don.brace@microsemi.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        <ming.lei@redhat.com>, <bvanassche@acm.org>, <hare@suse.com>,
+        <hch@lst.de>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-11-git-send-email-john.garry@huawei.com>
+ <d55972999b9370f947c20537e41b49bf@mail.gmail.com>
+ <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
+ <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
+Date:   Tue, 7 Jul 2020 08:58:06 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <841c8170-f082-814a-70cc-b0e3e8b5be54@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.9.47]
+X-ClientProxiedBy: lhreml742-chm.china.huawei.com (10.201.108.192) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 07, 2020 at 07:37:41AM +0100, John Garry wrote:
-> On 06/07/2020 15:41, Ming Lei wrote:
-> > -	hctx = flush_rq->mq_hctx;
-> >   	if (!q->elevator) {
-> 
-> Is there a specific reason we do:
-> 
-> if (!a)
-> 	do x
-> else
-> 	do y
-> 
-> as opposed to:
-> 
-> if (a)
-> 	do y
-> else
-> 	do x
-> 
-> Do people find this easier to read or more obvious? Just wondering.
+>>>
+>>>    #include <scsi/scsi.h>
+>>>    #include <scsi/scsi_cmnd.h>
+>>> @@ -113,6 +114,10 @@ unsigned int enable_sdev_max_qd;
+>>>    module_param(enable_sdev_max_qd, int, 0444);
+>>>    MODULE_PARM_DESC(enable_sdev_max_qd, "Enable sdev max qd as
+>> can_queue.
+>>> Default: 0");
+>>>
+>>> +int host_tagset_disabled = 0;
+>>> +module_param(host_tagset_disabled, int, 0444);
+>>> +MODULE_PARM_DESC(host_tagset_disabled, "Shared host tagset
+>> enable/disable
+>>> Default: enable(1)");
+>> The logic seems inverted here: for passing 1, I would expect Shared host
+>> tagset enabled, while it actually means to disable, right?
+> No. passing 1 means shared_hosttag support will be turned off.
 
-If you like the style, please go ahead to switch to this way.
+Just reading "Shared host tagset enable/disable Default: enable(1)" 
+looked inconsistent to me.
 
-The check on 'q->elevator' isn't added by this patch, and it won't be
-this patch's purpose at all.
+>>> +
+>>>    MODULE_LICENSE("GPL");
+>>>    MODULE_VERSION(MEGASAS_VERSION);
+>>>    MODULE_AUTHOR("megaraidlinux.pdl@broadcom.com");
+>>> @@ -3115,6 +3120,18 @@ megasas_bios_param(struct scsi_device *sdev,
+>> struct
+>>> block_device *bdev,
+>>>           return 0;
+>>>    }
+>>>
+>>> +static int megasas_map_queues(struct Scsi_Host *shost)
+>>> +{
+>>> +       struct megasas_instance *instance;
+>>> +       instance = (struct megasas_instance *)shost->hostdata;
+>>> +
+>>> +       if (instance->host->nr_hw_queues == 1)
+>>> +               return 0;
+>>> +
+>>> +       return
+>>> blk_mq_pci_map_queues(&shost->tag_set.map[HCTX_TYPE_DEFAULT],
+>>> +                       instance->pdev,
+>>> instance->low_latency_index_start);
+>>> +}
+>>> +
+>>>    static void megasas_aen_polling(struct work_struct *work);
+>>>
+>>>    /**
+>>> @@ -3423,8 +3440,10 @@ static struct scsi_host_template
+>> megasas_template =
+>>> {
+>>>           .eh_timed_out = megasas_reset_timer,
+>>>           .shost_attrs = megaraid_host_attrs,
+>>>           .bios_param = megasas_bios_param,
+>>> +       .map_queues = megasas_map_queues,
+>>>           .change_queue_depth = scsi_change_queue_depth,
+>>>           .max_segment_size = 0xffffffff,
+>>> +       .host_tagset = 1,
+>> Is your intention to always have this set for Scsi_Host, and just change
+>> nr_hw_queues?
+> Actually I wanted to turn off  this feature using host_tagset and not
+> through nr_hw_queue. I will address this.
+> 
+> Additional request -
+> In MR we have old controllers (called MFI_SERIES). We prefer not to change
+> behavior for those controller.
+> Having host_tagset in template does not allow to cherry pick different
+> values for different type of controller.
+
+Ok, so it seems sensible to add host_tagset to Scsi_Host structure also, 
+to allow overwriting during probe time.
+
+If you want to share an updated megaraid sas driver patch based on that, 
+then that's fine. I can incorporate that change in the patch where we 
+add host_tagset to the scsi host template.
+
+> If host_tagset is part of Scsi_Host OR we add check in scsi_lib.c that
+> host_tagset = 1 only make sense if nr_hw_queues > 1, we can cherry pick in
+> driver.
+> 
+> 
 
 
-Thanks, 
-Ming
 
