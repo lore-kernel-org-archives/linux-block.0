@@ -2,148 +2,178 @@ Return-Path: <SRS0=CAbX=AS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF2FC433DF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 08:46:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09639C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 14:15:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2CBF5206E2
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 08:46:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7542206E2
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 14:15:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmgPDPaY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dDzphevn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbgGGIqU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jul 2020 04:46:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41937 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725944AbgGGIqU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 04:46:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594111579;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=X3/5qKEEIHenwqx1XIbYlB5tYhqdYlS0V/aQaqfa+0k=;
-        b=NmgPDPaYPWbAfkJgGRKqh2npI8S3mOcTkPRRgKnXmn+vvwcSdYoj3E3MsR2TrKUgfCpF+4
-        VO9z1YuAYiaCAWY7HS55LuKrv3NxPdZL/g2nWVf/EE+n/rr0nSws0z2QJfYUutigkHdLmN
-        yWoM/2VaC8ix7x0ucAeS6fqoJTGf78A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-9c5N46fbP_Oxq5FHfheEUA-1; Tue, 07 Jul 2020 04:46:15 -0400
-X-MC-Unique: 9c5N46fbP_Oxq5FHfheEUA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 453BC461;
-        Tue,  7 Jul 2020 08:46:14 +0000 (UTC)
-Received: from localhost (ovpn-12-188.pek2.redhat.com [10.72.12.188])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9B1C160BF3;
-        Tue,  7 Jul 2020 08:46:13 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/2] block: loop: delete partitions after clearing & changing fd
-Date:   Tue,  7 Jul 2020 16:45:52 +0800
-Message-Id: <20200707084552.3294693-3-ming.lei@redhat.com>
-In-Reply-To: <20200707084552.3294693-1-ming.lei@redhat.com>
-References: <20200707084552.3294693-1-ming.lei@redhat.com>
+        id S1726911AbgGGOP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jul 2020 10:15:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50126 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725944AbgGGOP2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 10:15:28 -0400
+Received: from mail-vs1-xe44.google.com (mail-vs1-xe44.google.com [IPv6:2607:f8b0:4864:20::e44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B472EC061755
+        for <linux-block@vger.kernel.org>; Tue,  7 Jul 2020 07:15:28 -0700 (PDT)
+Received: by mail-vs1-xe44.google.com with SMTP id p25so14791444vsg.4
+        for <linux-block@vger.kernel.org>; Tue, 07 Jul 2020 07:15:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QY085zBtw2pHr+bAZzUJfI7AThS/xpJ8o4s75hDOq4A=;
+        b=dDzphevn2nyzKAWSoITp9wWqB3YF15C5q5ScDmerS0imJ1WiOBqRFUeNmotMLd9jzo
+         Lrh7jtzDVG3TZmzcgvJ+rNk4aK3eSE85dwpr4QRsgKy6kaLPAUz9+Zu9jQXXuEgw1KvI
+         qWjNtv/pmpkUoOz0WB5U+F+73rrE9gAAt4/vZ37cPWwrEWL/OlwtnsxFNLxXXIQ9z3/R
+         spjh2qrmoS0/1mKgGwdLgbetzmMxGkknrCjQQe9EbC5ii/8WOO1ZPUZ/JuL5ZG59ukc6
+         sP3aOSZ49TgNWaPwnXSALKvCdMCkjd8Qr3ftiE8TUMD9pqLMy7FJ/LdycduvdHnJ2KWy
+         xbXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QY085zBtw2pHr+bAZzUJfI7AThS/xpJ8o4s75hDOq4A=;
+        b=lGrIVj8U3h88Yp+yGJQd+3ybR116bpRy0vJepY6LtCZxCq9FXb1V43uGQAfQghImhh
+         15okrm3gwptuVFu3RxQsiFE2BqhMCww79HkglGdNN4NqOyOfFXvq8ixbGS3HaVkcLBhB
+         W2ddIloztFdLl2CiWnZdKHKbCNi+HIQdmDV6V3GiNlNu4RafTgzlSrPa7FB8rhoFMOes
+         G5nSBVmFks0jg8AfPhlroNSOe9oP1hil2Qe0egMuoMw59hUXzkg5nDzi2kMSUk/V1Z3R
+         GtbF20moOLKdrkkWQFbXbv9w9bpJd9rcGbUNj+2U+N4Jr2eZ9IMEs6AuTrNidE1F7fA+
+         uAtw==
+X-Gm-Message-State: AOAM532ZMtBf0sNpNutyjOtwfb6ROxuPmA7dUMIXb+yAQYRcryFhoTZb
+        ZRy0pm2IBAqFdUe6NQfnV3/76LPBpqHd99dKHEcdIg==
+X-Google-Smtp-Source: ABdhPJxJdmPt/k+0X7cBgq2UD0h5HLptPNTtXBc6HARpzt6VPRKcR2Eo7FUJytJ0fWCWHoRjEC4+9XkoBr5brpazGkI=
+X-Received: by 2002:a67:ca03:: with SMTP id z3mr32799304vsk.34.1594131327772;
+ Tue, 07 Jul 2020 07:15:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <fb0340aaf273be84e915214a3d8bae4ac85d7c0b.camel@ew.tq-group.com>
+ <CAPDyKFq+RiwbDj+58+W5GTcT7=ZOpZFmc02+FxjRGYwbBgA8oQ@mail.gmail.com> <cfcec3df57e6dd5ef353ef3a5b4b9793c28eb401.camel@ew.tq-group.com>
+In-Reply-To: <cfcec3df57e6dd5ef353ef3a5b4b9793c28eb401.camel@ew.tq-group.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Tue, 7 Jul 2020 16:14:51 +0200
+Message-ID: <CAPDyKFptySRTbWto9QYWZ-feL51JvPkZDGsETJ4svz0VbV31Bw@mail.gmail.com>
+Subject: Re: (EXT) Re: Consistent block device references for root= cmdline
+To:     Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After clearing fd or changing fd, we have to delete old partitions,
-otherwise they may become ghost partitions.
+On Thu, 11 Jun 2020 at 13:20, Matthias Schiffer
+<matthias.schiffer@ew.tq-group.com> wrote:
+>
+> On Wed, 2020-06-10 at 16:52 +0200, Ulf Hansson wrote:
+> > On Wed, 10 Jun 2020 at 15:15, Matthias Schiffer
+> > <matthias.schiffer@ew.tq-group.com> wrote:
+> > >
+> > > Hello all,
+> > >
+> > > there have been numerous attempts to make the numbering of mmcblk
+> > > devices consistent, mostly by using aliases from the DTS ([1], [2],
+> > > [3]), but all have been (rightfully) rejected. Unless I have
+> > > overlooked
+> > > a more recent development, no attempts for a different solution
+> > > were
+> > > made.
+> >
+> > According to aliases attempts, I think those have failed, mainly
+> > because of two reasons.
+> >
+> > 1. Arguments stating that LABELs/UUIDs are variable alternatives.
+> > This
+> > isn't the case, which I think was also concluded from the several
+> > earlier discussions.
+> > 2. Patches that tried adding support for mmc aliases, were not
+> > correctly coded. More precisely, what needs to be addressed is that
+> > the mmc core also preserves the same ids to be set for the host class
+> > as the block device, mmc[n] must correspond to mmcblk[n].
+> >
+> > >
+> > > As far as I can tell, the core of the issue seems to be the
+> > > following:
+> > >
+> > > The existing solutions like LABELs and UUIDs are viable
+> > > alternatives in
+> > > many cases, but in particular on embedded systems, this is not
+> > > quite
+> > > sufficient: In addition to the problem that more knowledge about
+> > > the
+> > > system to boot is required in the bootloader, this approach fails
+> > > completely when the same firmware image exists on multiple devices,
+> > > for
+> > > example on an eMMC and an SD card - not an entirely uncommon
+> > > situation
+> > > during the development of embedded systems.
+> > >
+> > > With udev, I can refer to a specific partition using a path like
+> > > /dev/disk/by-path/platform-2194000.usdhc-part2. In [4] it was
+> > > proposed
+> > > to add a way to refer to a device path/phandle from the kernel
+> > > command
+> > > line. Has there been any progress on this proposal?
+> >
+> > Lots of time during the years I have been approached, both publicly
+> > and offlist, about whether it would be possible to add support for
+> > "consistent" mmcblk devices. To me, I am fine with the aliases
+> > approach, as long as it gets implemented correctly.
+>
+>
+> It seems the principal technical problem is the one described here:
+>
+> https://www.spinics.net/lists/linux-mmc/msg26602.html
+>
+> I don't see any way to solve this completely, as there seem to be two
+> fundamentally conflicting requirements:
+>
+> 1) If a mounted SD card is replaced, it must be assigned a new
+> /dev/mmcblkN
+> 2) /dev/mmcblkN should always match the configured alias IDs
+>
+> What is the reason we need 1) - is it possible to have multiple eMMCs
+> or SD cards on a single bus, with detection at runtime?
 
-Fix this issue by clearing GENHD_FL_NO_PART_SCAN during calling
-bdev_disk_changed() which won't drop old partitions if GENHD_FL_NO_PART_SCAN
-isn't set.
+Yes. The mmc_bus_type holds all cards - all discovered at runtime.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+> Otherwise I'd
+> expect this to be handled like other drives with removable media (CD,
+> floppy), with static device assignment.
+>
+> If we can't give up on 1) for some reason, we'll have to accept that we
+> can't guarantee 2) unconditionally. As far as I can tell, the patches
+> provided by Sascha and others did that in a reasonable way: The aliases
+> would work in most cases - in particular for the first assignment on
+> boot, which is required to find the correct rootfs.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 0e08468b9ce0..cf71a1bbcd45 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -650,17 +650,26 @@ static inline void loop_update_dio(struct loop_device *lo)
- }
- 
- static void loop_reread_partitions(struct loop_device *lo,
--				   struct block_device *bdev, bool locked)
-+				   struct block_device *bdev, bool locked,
-+				   bool force_scan)
- {
- 	int rc;
-+	bool no_scan;
- 
--	if (locked) {
--		rc = bdev_disk_changed(bdev, false);
--	} else {
-+	if (!locked)
- 		mutex_lock(&bdev->bd_mutex);
--		rc = bdev_disk_changed(bdev, false);
-+
-+	no_scan = lo->lo_disk->flags & GENHD_FL_NO_PART_SCAN;
-+	if (force_scan && no_scan)
-+		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
-+
-+	rc = bdev_disk_changed(bdev, false);
-+
-+	if (force_scan && no_scan)
-+		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
-+
-+	if (!locked)
- 		mutex_unlock(&bdev->bd_mutex);
--	}
- 	if (rc)
- 		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
- 			__func__, lo->lo_number, lo->lo_file_name, rc);
-@@ -758,7 +767,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	 */
- 	fput(old_file);
- 	if (partscan)
--		loop_reread_partitions(lo, bdev, false);
-+		loop_reread_partitions(lo, bdev, false, true);
- 	return 0;
- 
- out_err:
-@@ -1183,7 +1192,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	bdgrab(bdev);
- 	mutex_unlock(&loop_ctl_mutex);
- 	if (partscan)
--		loop_reread_partitions(lo, bdev, false);
-+		loop_reread_partitions(lo, bdev, false, false);
- 	if (claimed_bdev)
- 		bd_abort_claiming(bdev, claimed_bdev, loop_configure);
- 	return 0;
-@@ -1274,7 +1283,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 		 * must be at least one and it can only become zero when the
- 		 * current holder is released.
- 		 */
--		loop_reread_partitions(lo, bdev, release);
-+		loop_reread_partitions(lo, bdev, release, true);
- 	}
- 
- 	/*
-@@ -1415,7 +1424,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
- 	if (partscan)
--		loop_reread_partitions(lo, bdev, false);
-+		loop_reread_partitions(lo, bdev, false, false);
- 
- 	return err;
- }
--- 
-2.25.2
+Well, if we would pre-parse the DTB to look for all "mmc block
+aliases" and keep a mark of those ids as being reserved, then we
+should be able to cope with both 1) and 2).
 
+>
+> >
+> > >
+> > > Kind regards,
+> > > Matthias
+> > >
+> > >
+> > > [1] https://patchwork.kernel.org/patch/8685711/
+> > > [2] https://lore.kernel.org/patchwork/cover/674381/
+> > > [3] https://www.spinics.net/lists/linux-mmc/msg26586.html
+> > > [4] https://www.spinics.net/lists/linux-mmc/msg26708.html
+> > >
+> >
+
+Kind regards
+Uffe
