@@ -2,54 +2,60 @@ Return-Path: <SRS0=CAbX=AS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0634DC433E0
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 06:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A3EC433DF
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 07:17:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF764206E9
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 06:59:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62BDA20702
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 07:17:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vYqLWnKQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d1yCZd/l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728100AbgGGG7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jul 2020 02:59:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39108 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726434AbgGGG7J (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 02:59:09 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B834EC061755
-        for <linux-block@vger.kernel.org>; Mon,  6 Jul 2020 23:59:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Sn6owS6IktH7Ha8Kn+nWEcaAdqhHjyd+PySOwpvD6Xs=; b=vYqLWnKQ57+P0UbObapAxUu0z+
-        vpILQSa+yDvAKUizFguSYeEaGrjCHmmnfgmPvq7USfnpsrk0veZaYmaQg3U2+hG7iPADbhX4uiNlG
-        T50otXeKPJEkeTumcbQQhTSPQWt9pNQwh7k3wORuVG4izHuS9vm7gAx4zTuiSZ3w3BUVkKrdbrYxw
-        lRBzTs1DCsS4DwEXzptWHmp1Uy8qJn4YMllzqrhPMGmUTzlLHjGregqfc0/xaOu0m6i13n6gjooP4
-        k+ehCPgn39iH/pfQaDkKm80FKaOaGacWcpof9xut29vztwfd4i0XT7eXQ3yKdYhlQTmNBR6ksT4+i
-        6J+PXvRQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jshZ9-0006F0-Ot; Tue, 07 Jul 2020 06:58:55 +0000
-Date:   Tue, 7 Jul 2020 07:58:55 +0100
-From:   Christoph Hellwig <hch@infradead.org>
+        id S1726757AbgGGHRJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jul 2020 03:17:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37149 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726661AbgGGHRJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 03:17:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594106228;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PTBV+ndw8S9JKbMmISO7ODhQ88POe57xFK/8XW1bhfY=;
+        b=d1yCZd/lwmw3SCQ4NUF0z/0D0Ijtlle9KxxKTjjJM/BqizXowghj0H+EKBvl0TqhOq5dlk
+        TK+0mpyy1zo/ekn5gkX5f5/KluGw+LOI/s6cbk67C+3XRLRPobJTue3XPiemI5RFihWma1
+        cs5uTB0EXGLBoT7EsBqek9saWeSf8jU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-8tr40A0-PJeK04fY2uDF4Q-1; Tue, 07 Jul 2020 03:17:04 -0400
+X-MC-Unique: 8tr40A0-PJeK04fY2uDF4Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64DED107ACF3;
+        Tue,  7 Jul 2020 07:17:03 +0000 (UTC)
+Received: from T590 (ovpn-12-188.pek2.redhat.com [10.72.12.188])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D84D5D9C9;
+        Tue,  7 Jul 2020 07:16:57 +0000 (UTC)
+Date:   Tue, 7 Jul 2020 15:16:52 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     John Garry <john.garry@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
 Subject: Re: [PATCH] blk-mq: centralise related handling into
  blk_mq_get_driver_tag
-Message-ID: <20200707065855.GA23827@infradead.org>
+Message-ID: <20200707071652.GA3269442@T590>
 References: <20200706144111.3260859-1-ming.lei@redhat.com>
  <841c8170-f082-814a-70cc-b0e3e8b5be54@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <841c8170-f082-814a-70cc-b0e3e8b5be54@huawei.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -73,5 +79,15 @@ On Tue, Jul 07, 2020 at 07:37:41AM +0100, John Garry wrote:
 > 	do y
 > else
 > 	do x
+> 
+> Do people find this easier to read or more obvious? Just wondering.
 
-I much prefer the latter.
+If you like the style, please go ahead to switch to this way.
+
+The check on 'q->elevator' isn't added by this patch, and it won't be
+this patch's purpose at all.
+
+
+Thanks, 
+Ming
+
