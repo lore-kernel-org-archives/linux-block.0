@@ -2,70 +2,92 @@ Return-Path: <SRS0=UAvt=AT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F91CC433E0
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 20:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94176C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 21:42:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E16320772
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 20:32:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594240327;
-	bh=Phr+m9logqBbeGjOMUdUtNLbZiR9Q8OLEMn3mWsvao8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=dATmA1zBbXY/VIj83gwEHvhQiPrPSK6fGMctvHvv3GNZzgXhUwVB0a7l7BavbLAIA
-	 JJlm/EVIL0LmOpBKbZWXhMYhrP4NKyBJCV6qVjmybTCkhcGXkiytBFa+XyqgyZ/cqs
-	 +STYMNqHniVTOgdpP8ZYnEPMoslciAAykrZdL1YU=
+	by mail.kernel.org (Postfix) with ESMTP id 62CCE2078B
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 21:42:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="18LQyLoT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725964AbgGHUcG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jul 2020 16:32:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39156 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725915AbgGHUcG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 8 Jul 2020 16:32:06 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E36BC20720;
-        Wed,  8 Jul 2020 20:32:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594240326;
-        bh=Phr+m9logqBbeGjOMUdUtNLbZiR9Q8OLEMn3mWsvao8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qhUtPzDPYysvTjVFW40ey+9VkdAW+90/1lX07VNQuDb78Itivr4ZHuD275dXwOn3G
-         mjFs3V/IUr6W+IeM2I2eq9sAABwc7wOdgftlw5Z7FMpAuJ0n4TOCGBWYPXXr9HOy7F
-         bZwnwfQtdxk6h5um4Jel7s91n9ksWc0qNt/vduSA=
-Date:   Wed, 8 Jul 2020 13:32:04 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Zheng Bin <zhengbin13@huawei.com>
-Cc:     mchristi@redhat.com, josef@toxicpanda.com, axboe@kernel.dk,
-        navid.emamdoost@gmail.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
+        id S1725903AbgGHVmi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jul 2020 17:42:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725787AbgGHVmi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 17:42:38 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 513C9C061A0B
+        for <linux-block@vger.kernel.org>; Wed,  8 Jul 2020 14:42:38 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id f16so145571pjt.0
+        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2020 14:42:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=LDdlqqViKy4NCWMYpbRbkVG8WrQZL6OuDPANlMIK/JI=;
+        b=18LQyLoTvbAC6GnFTcC6drJgLAXGofZzdiN1mbx2ijUEH3DQWigQ64u0JpQJPOMEBT
+         eumfGnUTryqlWU5Uwm0nweGFiTB3BrRTxALHN20vcmzaI4EY0vDbBCcjo8hdHL6julph
+         dDF7O+Tzxqr26YIv/q2nDWRhjYjvH6SN7Bzx0AI+UOhpczQBbIAbkZ5SXsnjpzuB8w0i
+         eAKAWXeSKeBTbAKQoUg1PgKDRXHg3hIRsA6UR/+DBidPV1mk31BeQWnA8yV9a4K09r8X
+         1gUJlzZtKgfrg/eZeo0+STc9uJX7ku1z/pVfQCGTZ+NVAbhqHiTwIRTJeQ8dNa5oATQ/
+         xpgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LDdlqqViKy4NCWMYpbRbkVG8WrQZL6OuDPANlMIK/JI=;
+        b=hJ9K8DRUhnf/9ZA5BAb0QX6lgmDHX7crikwjtQKSOt4nqEp4/Yuz0IOvHisJi1f1o/
+         6sxROTScs0OkOUAJA0c7imW/cZsLXospqH94FnwqXb9QDrBEhxPQAXLbXF4tT0kV3KC6
+         3utRZS/hu2SHBjAskPF9SKz03AHdkM2X+c4Czb5GwchYjv4mgPWus1cpUU0tzfIWhc4j
+         tnHGV4GzZu3RNCfeCO3JL86CwD2YMQRglvBl9E90NDyr9E9KmkQjkPXyrCz8ZvpAIW8B
+         R8gde+Zffm/vw37g0XZWTkK8IzHn0FEQZQQNMt83e0mtu4XepgN7gddeE1jeW658XABm
+         KtRw==
+X-Gm-Message-State: AOAM532t7sfXFnzE6Wz/5zA00yqWidWDoZZ1N1hrCeaIEjNird+mwven
+        HX14MgOts9zftNDYlji1Y5CpHg==
+X-Google-Smtp-Source: ABdhPJz+O253nBtbQqfn85QqkbS32yMg4aWObX7KPy12N7UoJG4AJ3rXkgeNIooTOrDqHQ0PS3LAAg==
+X-Received: by 2002:a17:90a:1089:: with SMTP id c9mr11731466pja.180.1594244557753;
+        Wed, 08 Jul 2020 14:42:37 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id 207sm663258pfa.100.2020.07.08.14.42.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2020 14:42:37 -0700 (PDT)
 Subject: Re: [PATCH v4] nbd: Fix memory leak in nbd_add_socket
-Message-ID: <20200708203204.GB35321@sol.localdomain>
+To:     Zheng Bin <zhengbin13@huawei.com>, mchristi@redhat.com,
+        ebiggers@kernel.org, josef@toxicpanda.com,
+        navid.emamdoost@gmail.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-kernel@vger.kernel.org
+Cc:     yi.zhang@huawei.com
 References: <20200629012349.26641-1-zhengbin13@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5a7597c2-2d51-8382-5b60-73cd39e55fda@kernel.dk>
+Date:   Wed, 8 Jul 2020 15:42:35 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20200629012349.26641-1-zhengbin13@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 29, 2020 at 09:23:49AM +0800, Zheng Bin wrote:
+On 6/28/20 7:23 PM, Zheng Bin wrote:
 > When adding first socket to nbd, if nsock's allocation failed, the data
 > structure member "config->socks" was reallocated, but the data structure
 > member "config->num_connections" was not updated. A memory leak will occur
 > then because the function "nbd_config_put" will free "config->socks" only
 > when "config->num_connections" is not zero.
-> 
-> Fixes: 03bf73c315ed ("nbd: prevent memory leak")
-> Reported-by: syzbot+934037347002901b8d2a@syzkaller.appspotmail.com
-> Signed-off-by: Zheng Bin <zhengbin13@huawei.com>
-> ---
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+Applied, thanks.
+
+-- 
+Jens Axboe
+
