@@ -7,74 +7,71 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4535FC433DF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 13:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C703C433E1
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 14:02:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2106E2078B
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 13:53:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47CCF20786
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 14:02:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="TmcKxcvB"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="SZHSJQxz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729392AbgGHNxF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jul 2020 09:53:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44614 "EHLO
+        id S1729865AbgGHOCn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jul 2020 10:02:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729357AbgGHNxF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 09:53:05 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B84EAC061A0B
-        for <linux-block@vger.kernel.org>; Wed,  8 Jul 2020 06:53:04 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id by13so32016030edb.11
-        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2020 06:53:04 -0700 (PDT)
+        with ESMTP id S1729861AbgGHOCm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 10:02:42 -0400
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7BB3C08C5CE
+        for <linux-block@vger.kernel.org>; Wed,  8 Jul 2020 07:02:41 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id n26so36762285ejx.0
+        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2020 07:02:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=Ncvb6VeoaaXfIcdBHstcjJpioUW0rI3XEPCr4yiRdjE=;
-        b=TmcKxcvBF4N3go1Iss5nYU5Ywl8n9jVe1JzqyoHRkDdFKf35xIqFb3geXPVetwi8QU
-         40kjtIYMRMOBDM2MnWIw7g231CVctMIeUgyLpmvS347pPcQq/6Om3op4vHBuB8GZSkyW
-         G6jrP0zO/V/uzdS+JPqUcUvQf0mdDj9WGauE3g4j9xbN8f9yHoHN7pmDAcOwAF74tH8W
-         WryJYe8kOTq+SOWzgfOz6BEm/2KXG7JK4O4pMF6VGBm3kaJ/zsOmKk/4jG9C/QzAK3IB
-         kZPfFvWJjqkvFmd6RAheZnUAxaoSskzjkDGDzfqsko982Gw2yo0rShSoUJ+Bye0FShQ3
-         ggLg==
+        bh=xBqfUGQFJEzPmvQMGn6nklTGsSp7G56fYYjdka7qpTU=;
+        b=SZHSJQxzQspxK+IoSdsc0z5HAdzxihstA26dwbR+z9XKESAOsiP6Uz9kebxQ7kQQQt
+         AG5yOxKIpY5kwBjsqXHPTCDkiv9V+agAxOdUJwkibUPHPcYr+TpBoWHHyPiZAgSQsaVy
+         DG75XTGrFd5l8km4qIntUQnJAUzQzGErNvcrxj6OYvTerdE0xfnozQgi68TpuF7zipsG
+         qNPTUN+UWvLmumzTdeky+Stn8C8RDRErv3JkhayvhPnRdn2s6OX/38lIXL/P1H+MCUIb
+         g+9u2l1IctuQnKVGrb4iKnxYW0D8CQNR6XTKxlxVDU59tOM6ZRMWYB8hSSPvtOg95bdV
+         Jutw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=Ncvb6VeoaaXfIcdBHstcjJpioUW0rI3XEPCr4yiRdjE=;
-        b=gAPcUHExBgQi3I7mjy+r6Cgy23tjo+Kukb6pA+8SRF7je1raXUgYNAfXnJv2E3QalQ
-         ufvH7XGZ8x9TtHZIEmTDDu1C9o4W5X2UkoS2qbMB70qnI+WXE/xzzQ8/VuEckCh1qr/v
-         bWJ5Wgomm+0OxlQSze5sNDAeyuE8wdCkQhwedLuP/9/TQTnk/N4EIirDw9qblKq9WS2l
-         YAf2gT60Blvg9IcAZOQKPXBxlGzApAu6m+Fh5YoE2ogwMeiTrx65+QoMpKOeVi9pXTdB
-         DP6gzLyUa1VQmm8X+pxc2OkALVJhB/DkIs+j91Hr/FqkCE7fcf8OII7IRHP0uKRYpMNz
-         rOQA==
-X-Gm-Message-State: AOAM531/Al3YXsIK6w6R2Z5A80X7sZHH+ZFrJpRm3kbi+/W9bgL+imxG
-        RoiWK0jYp/+Hs64QZ6u2f9sUMQ==
-X-Google-Smtp-Source: ABdhPJysxgwhCjV7WAfdYK8zmBz47BscJbNq/a2N/7oiidqDwg/jk+kqbZTIpjmjzM76lQCAXTP/NQ==
-X-Received: by 2002:a05:6402:1ade:: with SMTP id ba30mr7065017edb.231.1594216383034;
-        Wed, 08 Jul 2020 06:53:03 -0700 (PDT)
+        bh=xBqfUGQFJEzPmvQMGn6nklTGsSp7G56fYYjdka7qpTU=;
+        b=pQTRWOxzQypqc5G9s27eMiP6Kpq2Wcl2m1wi8wfNrk1BWio2dTHJzGeFJyR/lu2bcs
+         6mMY3uVR9GeeGNDyL2pRl07yiV1XFuGitS+7iiuJOgEXxJbLrqTKIJ8lqNBX9jG496lS
+         Plfxuvxrc2WziRVF3KRGtOKdyALFMdwsXLPW0Eu/cvRhA3QTQmeg1Uwakqoi5wcrSWBt
+         cm+NGxe8NrWXvEBIL7z6R6/AMuTqp5yeCNl6vmmJ3p+A+KUkWXZIlIjq/SyoFXTQyu1o
+         beIeQkWXVg+ATDGe6WNCCyPdF9HMHAA4zf6Txu/bx3qTpxTdsXv97honMz4vN/YIQJuV
+         60Vw==
+X-Gm-Message-State: AOAM532CrubNUMVYpkpvDavBJI8CgjCY/4gdULVses1elX8FZDBN8NI+
+        6vbw/9l1BZ+jGzap2rPlVfe07w==
+X-Google-Smtp-Source: ABdhPJwtQoYoNHqTf8wtXTu8fLVRvRLyMSAve0PsOm+l+gedy487gblopozrldaNk0/RmPkg2cXYow==
+X-Received: by 2002:a17:906:eb93:: with SMTP id mh19mr50453022ejb.552.1594216960254;
+        Wed, 08 Jul 2020 07:02:40 -0700 (PDT)
 Received: from [192.168.178.33] (i5C746C99.versanet.de. [92.116.108.153])
-        by smtp.gmail.com with ESMTPSA id o17sm2051708ejb.105.2020.07.08.06.53.02
+        by smtp.gmail.com with ESMTPSA id x64sm31267045edc.95.2020.07.08.07.02.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2020 06:53:02 -0700 (PDT)
-Subject: Re: [PATCH RFC 1/5] block: return ns precision from
- disk_start_io_acct
+        Wed, 08 Jul 2020 07:02:39 -0700 (PDT)
+Subject: Re: [PATCH RFC 4/5] block: add a statistic table for io latency
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        drbd-dev@lists.linbit.com
+        Florian-Ewald Mueller <florian-ewald.mueller@cloud.ionos.com>
 References: <20200708075819.4531-1-guoqing.jiang@cloud.ionos.com>
- <20200708075819.4531-2-guoqing.jiang@cloud.ionos.com>
- <20200708132704.GB3340386@T590>
+ <20200708075819.4531-5-guoqing.jiang@cloud.ionos.com>
+ <20200708132958.GC3340386@T590>
 From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Message-ID: <ad89a0b2-3b40-b515-2120-85bc0274165b@cloud.ionos.com>
-Date:   Wed, 8 Jul 2020 15:53:01 +0200
+Message-ID: <eb2cf4d0-4260-8f10-0ba9-3cbf4ff85449@cloud.ionos.com>
+Date:   Wed, 8 Jul 2020 16:02:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200708132704.GB3340386@T590>
+In-Reply-To: <20200708132958.GC3340386@T590>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -83,71 +80,183 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
-
-On 7/8/20 3:27 PM, Ming Lei wrote:
-> On Wed, Jul 08, 2020 at 09:58:15AM +0200, Guoqing Jiang wrote:
->> Currently the duration accounting of bio based driver is converted from
->> jiffies to ns, means it could be less accurate as request based driver.
+On 7/8/20 3:29 PM, Ming Lei wrote:
+> On Wed, Jul 08, 2020 at 09:58:18AM +0200, Guoqing Jiang wrote:
+>> Usually, we get the status of block device by cat stat file,
+>> but we can only know the total time with that file. And we
+>> would like to know more accurate statistic, such as each
+>> latency range, which helps people to diagnose if there is
+>> issue about the hardware.
 >>
->> So let disk_start_io_acct return from ns precision, instead of convert
->> jiffies to ns in disk_end_io_acct.
+>> Also a new config option is introduced to control if people
+>> want to know the additional statistics or not, and we also
+>> use the option for io sector in next patch.
 >>
->> Cc: Philipp Reisner <philipp.reisner@linbit.com>
->> Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
->> Cc: drbd-dev@lists.linbit.com
+>> Signed-off-by: Florian-Ewald Mueller <florian-ewald.mueller@cloud.ionos.com>
 >> Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 >> ---
->>   block/blk-core.c | 7 ++++---
->>   1 file changed, 4 insertions(+), 3 deletions(-)
+>>   block/Kconfig             |  8 ++++++++
+>>   block/blk-core.c          | 35 +++++++++++++++++++++++++++++++++++
+>>   block/genhd.c             | 26 ++++++++++++++++++++++++++
+>>   include/linux/part_stat.h |  7 +++++++
+>>   4 files changed, 76 insertions(+)
 >>
+>> diff --git a/block/Kconfig b/block/Kconfig
+>> index 9357d7302398..dba71feaa85b 100644
+>> --- a/block/Kconfig
+>> +++ b/block/Kconfig
+>> @@ -175,6 +175,14 @@ config BLK_DEBUG_FS
+>>   	Unless you are building a kernel for a tiny system, you should
+>>   	say Y here.
+>>   
+>> +config BLK_ADDITIONAL_DISKSTAT
+>> +	bool "Block layer additional diskstat"
+>> +	default n
+>> +	help
+>> +	Enabling this option adds io latency statistics for each block device.
+>> +
+>> +	If unsure, say N.
+>> +
+>>   config BLK_DEBUG_FS_ZONED
+>>          bool
+>>          default BLK_DEBUG_FS && BLK_DEV_ZONED
 >> diff --git a/block/blk-core.c b/block/blk-core.c
->> index d9d632639bd1..0e806a8c62fb 100644
+>> index 0e806a8c62fb..7a129c8f1b23 100644
 >> --- a/block/blk-core.c
 >> +++ b/block/blk-core.c
->> @@ -1466,6 +1466,7 @@ unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
->>   	struct hd_struct *part = &disk->part0;
->>   	const int sgrp = op_stat_group(op);
->>   	unsigned long now = READ_ONCE(jiffies);
->> +	unsigned long start_ns = ktime_get_ns();
->>   
->>   	part_stat_lock();
->>   	update_io_ticks(part, now, false);
->> @@ -1474,7 +1475,7 @@ unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
->>   	part_stat_local_inc(part, in_flight[op_is_write(op)]);
->>   	part_stat_unlock();
->>   
->> -	return now;
->> +	return start_ns;
+>> @@ -1411,6 +1411,39 @@ static void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
+>>   	}
 >>   }
->>   EXPORT_SYMBOL(disk_start_io_acct);
 >>   
->> @@ -1484,11 +1485,11 @@ void disk_end_io_acct(struct gendisk *disk, unsigned int op,
->>   	struct hd_struct *part = &disk->part0;
->>   	const int sgrp = op_stat_group(op);
->>   	unsigned long now = READ_ONCE(jiffies);
->> -	unsigned long duration = now - start_time;
->> +	unsigned long duration = ktime_get_ns() - start_time;
+>> +#ifdef CONFIG_BLK_ADDITIONAL_DISKSTAT
+>> +/*
+>> + * Either account additional stat for request if req is not NULL or account for bio.
+>> + */
+>> +static void blk_additional_latency(struct hd_struct *part, const int sgrp,
+>> +				   struct request *req, unsigned long start_ns)
+>> +{
+>> +	unsigned int idx;
+>> +	unsigned long duration, now = ktime_get_ns();
+>> +
+>> +	if (req)
+>> +		duration = (now - req->start_time_ns) / NSEC_PER_MSEC;
+>> +	else
+>> +		duration = (now - start_ns) / NSEC_PER_MSEC;
+>> +
+>> +	duration /= HZ_TO_MSEC_NUM;
+>> +	if (likely(duration > 0)) {
+>> +		idx = ilog2(duration);
+>> +		if (idx > ADD_STAT_NUM - 1)
+>> +			idx = ADD_STAT_NUM - 1;
+>> +	} else
+>> +		idx = 0;
+>> +	part_stat_inc(part, latency_table[idx][sgrp]);
+>> +
+>> +}
+>> +#else
+>> +static void blk_additional_latency(struct hd_struct *part, const int sgrp,
+>> +				   struct request *req, unsigned long start_jiffies)
+>> +
+>> +{
+>> +}
+>> +#endif
+>> +
+>>   static void blk_account_io_completion(struct request *req, unsigned int bytes)
+>>   {
+>>   	if (req->part && blk_do_io_stat(req)) {
+>> @@ -1440,6 +1473,7 @@ void blk_account_io_done(struct request *req, u64 now)
+>>   		part = req->part;
+>>   
+>>   		update_io_ticks(part, jiffies, true);
+>> +		blk_additional_latency(part, sgrp, req, 0);
+>>   		part_stat_inc(part, ios[sgrp]);
+>>   		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
+>>   		part_stat_unlock();
+>> @@ -1489,6 +1523,7 @@ void disk_end_io_acct(struct gendisk *disk, unsigned int op,
 >>   
 >>   	part_stat_lock();
 >>   	update_io_ticks(part, now, true);
->> -	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
->> +	part_stat_add(part, nsecs[sgrp], duration);
+>> +	blk_additional_latency(part, sgrp, NULL, start_time);
+>>   	part_stat_add(part, nsecs[sgrp], duration);
 >>   	part_stat_local_dec(part, in_flight[op_is_write(op)]);
 >>   	part_stat_unlock();
+>> diff --git a/block/genhd.c b/block/genhd.c
+>> index 60ae4e1b4d38..a33937a74fb1 100644
+>> --- a/block/genhd.c
+>> +++ b/block/genhd.c
+>> @@ -1420,6 +1420,29 @@ static struct device_attribute dev_attr_fail_timeout =
+>>   	__ATTR(io-timeout-fail, 0644, part_timeout_show, part_timeout_store);
+>>   #endif
+>>   
+>> +#ifdef CONFIG_BLK_ADDITIONAL_DISKSTAT
+>> +static ssize_t io_latency_show(struct device *dev, struct device_attribute *attr, char *buf)
+>> +{
+>> +	struct hd_struct *p = dev_to_part(dev);
+>> +	size_t count = 0;
+>> +	int i, sgrp;
+>> +
+>> +	for (i = 0; i < ADD_STAT_NUM; i++) {
+>> +		count += scnprintf(buf + count, PAGE_SIZE - count, "%5d ms: ",
+>> +				   (1 << i) * HZ_TO_MSEC_NUM);
+>> +		for (sgrp = 0; sgrp < NR_STAT_GROUPS; sgrp++)
+>> +			count += scnprintf(buf + count, PAGE_SIZE - count, "%lu ",
+>> +					   part_stat_read(p, latency_table[i][sgrp]));
+>> +		count += scnprintf(buf + count, PAGE_SIZE - count, "\n");
+>> +	}
+>> +
+>> +	return count;
+>> +}
+>> +
+>> +static struct device_attribute dev_attr_io_latency =
+>> +	__ATTR(io_latency, 0444, io_latency_show, NULL);
+>> +#endif
+>> +
+>>   static struct attribute *disk_attrs[] = {
+>>   	&dev_attr_range.attr,
+>>   	&dev_attr_ext_range.attr,
+>> @@ -1438,6 +1461,9 @@ static struct attribute *disk_attrs[] = {
+>>   #endif
+>>   #ifdef CONFIG_FAIL_IO_TIMEOUT
+>>   	&dev_attr_fail_timeout.attr,
+>> +#endif
+>> +#ifdef CONFIG_BLK_ADDITIONAL_DISKSTAT
+>> +	&dev_attr_io_latency.attr,
+>>   #endif
+>>   	NULL
+>>   };
+>> diff --git a/include/linux/part_stat.h b/include/linux/part_stat.h
+>> index 24125778ef3e..fe3def8c69d7 100644
+>> --- a/include/linux/part_stat.h
+>> +++ b/include/linux/part_stat.h
+>> @@ -9,6 +9,13 @@ struct disk_stats {
+>>   	unsigned long sectors[NR_STAT_GROUPS];
+>>   	unsigned long ios[NR_STAT_GROUPS];
+>>   	unsigned long merges[NR_STAT_GROUPS];
+>> +#ifdef CONFIG_BLK_ADDITIONAL_DISKSTAT
+>> +/*
+>> + * We measure latency (ms) for 1, 2, ..., 1024 and >=1024.
+>> + */
+>> +#define ADD_STAT_NUM	12
+>> +	unsigned long latency_table[ADD_STAT_NUM][NR_STAT_GROUPS];
+>> +#endif
+>>   	unsigned long io_ticks;
+>>   	local_t in_flight[2];
+>>   };
+>> -- 
+>> 2.17.1
+>>
 > Hi Guoqing,
 >
-> Cost of ktime_get_ns() can be observed as not cheap in high IOPS device,
+> I believe it isn't hard to write a ebpf based script(bcc or bpftrace) to
+> collect this kind of performance data, so looks not necessary to do it
+> in kernel.
 
-Could you share some links about it? Thanks.
+Hi Ming,
 
-> so not sure the conversion is good. Also could you share what benefit we can
-> get with this change?
-
-Without the conversion, we have to track io latency with jiffies in 4th 
-patch.
-Then with HZ=100, some rows (such as 1ms, 2ms and 4ms) in that table
-don't make sense.
+Sorry, I don't know well about bcc or bpftrace, but I assume they need to
+read the latency value from somewhere inside kernel. Could you point
+how can I get the latency value? Thanks in advance!
 
 Thanks,
 Guoqing
+
