@@ -2,88 +2,97 @@ Return-Path: <SRS0=UAvt=AT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5BAC433E0
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 22:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 358F8C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 22:05:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A95E2078B
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 22:03:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D549206DF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 22:05:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d1QWMgn6"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cA4YQx3R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725915AbgGHWDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jul 2020 18:03:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30010 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725903AbgGHWDi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 18:03:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594245817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WThmnM70xpTfPhR+gWfqnJ5OrmYYzQYfa2iRKS+jwKU=;
-        b=d1QWMgn6aheqFM4zE17O5CghMKibZoNAIJokpfzKU0ykp3KePEHHSWdfiJl67YvGcjegOD
-        LqFm8h7r8KYhLEOB0wWrgO049uqWdM2u5BJwh7AA9HuDT/Eaik/9g6sNZ6oioelUjQsICx
-        bzDkC/Vu9/cRCDFbs7UsV9OZX5hcH2g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-P8ZwmZmFP9Wu5hy8mDP_wQ-1; Wed, 08 Jul 2020 18:03:32 -0400
-X-MC-Unique: P8ZwmZmFP9Wu5hy8mDP_wQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4505C10060D4;
-        Wed,  8 Jul 2020 22:03:31 +0000 (UTC)
-Received: from T590 (ovpn-12-29.pek2.redhat.com [10.72.12.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B386479811;
-        Wed,  8 Jul 2020 22:03:22 +0000 (UTC)
-Date:   Thu, 9 Jul 2020 06:03:17 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
+        id S1725964AbgGHWFO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jul 2020 18:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36136 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725903AbgGHWFO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 18:05:14 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F5AAC061A0B
+        for <linux-block@vger.kernel.org>; Wed,  8 Jul 2020 15:05:14 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id e18so3520pgn.7
+        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2020 15:05:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+dcCNqQfq+GGAohNtidK8fXg4IXlIGhMyJSsVaTzSEs=;
+        b=cA4YQx3Rn8eiqk3/8gIv7ncFqDvo8b7/cSPqTqO/3LjHL7OD4jzPvfAVBQqnpGSSnu
+         pMYbR3xRaqFiewOn4R3TagBRds+YO3pNSr0Bq7cINyagQa/ooYDqEeRWor2rxUUwheaE
+         zXhcRCd0tv4tHXlyJUVRZPnYJO5UmYni6lq6E0BQkqSX2QSga3nZ7l051/KFhulKCCeI
+         gkfyYVVENxPoHxYDyKS9S9EN2FI4pEgel0mYRQdAwHfo9o3E/cuRByiMwq6DtxWouhAB
+         /W7inoLrLw7i9cZL3Li9JR1HrP8/Pi4R5fGIMNLDvepPTkGuS3hMiVlquF0FyZ8ZBaoZ
+         qmhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+dcCNqQfq+GGAohNtidK8fXg4IXlIGhMyJSsVaTzSEs=;
+        b=E5Dfh8ogdEaISufoG9HaIJzgSGM7wCc5ot+fBsWJz6L6Y21e0kpqtSF1kTUtOa7T1w
+         54vvoGLfg7qoX94F6+WuZIxP++R5Bj55RExGeVXKgg0011Ip6b3SV4I2pR8gG23o/19d
+         O182rTcnfAcDbRZCe38ShgdYEUH2xlvFHS40MmLvITtjSblWvFl+mCQZCvAsE3q/PVPu
+         XtK0b60iXo78Cwql5DlCStGUOmQtnwiKQAmvlybpFSiuIiYSyXEWUX00zjxu+IkGHHyA
+         b4NOejWo/icK7nvUAgMVGqLr9nDLC5k70jJL6uxnZtFyE7oavkGEyD4T2XiNpudI+ecq
+         unuw==
+X-Gm-Message-State: AOAM532WeP8lbMlqCJRKrJOdcJhiC6XwJuFOcIRRsUyc379QbJXHNLiP
+        DZtnLRhp21/A4NPABCdBRc5hl4rp4/7jyQ==
+X-Google-Smtp-Source: ABdhPJwq2FrJusKcVu0CTqXdMyXWPktvhfZEKZqaCWf8X0JAsEVQ/2PgHlIxreFDJxSZwqjk6iHCMw==
+X-Received: by 2002:a62:17d8:: with SMTP id 207mr52098025pfx.44.1594245913425;
+        Wed, 08 Jul 2020 15:05:13 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id o42sm483035pje.10.2020.07.08.15.05.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2020 15:05:12 -0700 (PDT)
 Subject: Re: [PATCH V2] blk-mq: streamline handling of q->mq_ops->queue_rq
  result
-Message-ID: <20200708220317.GA3348426@T590>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
 References: <20200701135857.2445459-1-ming.lei@redhat.com>
- <20200708122749.GA3340386@T590>
- <90d57d37-6da9-cae4-55b0-264c3dd885b0@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f4163e85-5b23-fadd-bfbf-8c33106cdacf@kernel.dk>
+Date:   Wed, 8 Jul 2020 16:05:11 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <90d57d37-6da9-cae4-55b0-264c3dd885b0@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200701135857.2445459-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 08, 2020 at 03:05:03PM +0100, John Garry wrote:
-> On 08/07/2020 13:27, Ming Lei wrote:
-> > k;
-> > -		} else if (ret == BLK_STS_ZONE_RESOURCE) {
-> > +		case BLK_STS_RESOURCE:
-> > +		case BLK_STS_DEV_RESOURCE:
-> > +			blk_mq_handle_dev_resource(rq, list);
-> > +			goto out;
-> > +		case BLK_STS_ZONE_RESOURCE:
-> >   			/*
-> >   			 * Move the request to zone_list and keep going through
-> >   			 * the dispatch list to find more requests the drive can
+On 7/1/20 7:58 AM, Ming Lei wrote:
+> Current handling of q->mq_ops->queue_rq result is a bit ugly:
 > 
-> question not on this patch specifically: is this supposed to be "driver",
-> and not "drive"? "driver" is mentioned earlier in the function
+> - two branches which needs to 'continue' have to check if the
+> dispatch local list is empty, otherwise one bad request may
+> be retrieved via 'rq = list_first_entry(list, struct request, queuelist);'
+> 
+> - the branch of 'if (unlikely(ret != BLK_STS_OK))' isn't easy
+> to follow, since it is actually one error branch.
+> 
+> Streamline this handling, so the code becomes more readable, meantime
+> potential kernel oops can be avoided in case that the last request in
+> local dispatch list is failed.
 
-Hi John,
+Applied, thanks.
 
-Please focus on change added by this patch instead of existed context code.
-
-If you have question on existed code, start a new thread for the discussion.
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
