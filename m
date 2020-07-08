@@ -2,127 +2,84 @@ Return-Path: <SRS0=UAvt=AT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4F1C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 15:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2730C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 15:04:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD12120720
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 15:03:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 968EC2078D
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 15:04:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="djVZpEIB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CG4COg6x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729848AbgGHPDe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jul 2020 11:03:34 -0400
-Received: from casper.infradead.org ([90.155.50.34]:36686 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729206AbgGHPDd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 11:03:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=zBHCkuCe5RFCedmEBx2CZK7LS4k3WZ+7jOD5fQ9ed9Y=; b=djVZpEIBtWMWxRw3CqqH/NFd4i
-        a4zr7rIrC8/W8xunIZNCpi+Zb8uXFFQqUTfV6c/TR/p3OJCbxCExyLnKLGPBTSyChk2zmQz7wrGYL
-        4W/89zj8RJAInOQYr0SpZry7v5ixoHyXs33qzoOQGhaMjKrQbPpSfHZIfkbY0F+cVsQ/BINFM/fdA
-        TO4zabYCHmemwCzKTU1ar+3trAsn7gMAR5EhPjkoHY3j17LHzQm/prWRt+QM97WXA11zcpZQrTq61
-        MvfXv5S2HGPsOJsW6NmTFLhSFetX+7cit4zXSnl0v8cg9gdsruyvn/+T0AhY5meP7ZEYT3F/OnRnc
-        yfBttG4g==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jtBat-00014u-JD; Wed, 08 Jul 2020 15:02:45 +0000
-Date:   Wed, 8 Jul 2020 16:02:40 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
-        bcrl@kvack.org, hch@infradead.org, Damien.LeMoal@wdc.com,
-        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
-        mb@lightnvm.io, linux-kernel@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Selvakumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
-Message-ID: <20200708150240.GT25523@casper.infradead.org>
-References: <20200707155237.GM25523@casper.infradead.org>
- <20200707202342.GA28364@test-zns>
- <7a44d9c6-bf7d-0666-fc29-32c3cba9d1d8@kernel.dk>
- <20200707221812.GN25523@casper.infradead.org>
- <CGME20200707223803epcas5p41814360c764d6b5f67fdbf173a8ba64e@epcas5p4.samsung.com>
- <145cc0ad-af86-2d6a-78b3-9ade007aae52@kernel.dk>
- <20200708125805.GA16495@test-zns>
- <2962cd68-de34-89be-0464-8b102a3f1d0e@kernel.dk>
- <20200708145826.GS25523@casper.infradead.org>
- <b1c58211-496a-ed85-a9bb-0d0cc56e250c@kernel.dk>
+        id S1729206AbgGHPEZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jul 2020 11:04:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40036 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729022AbgGHPEY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 11:04:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594220663;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cCfFQ9unhV8AALYAbnlDEYp86FEPgYE4PEBMEl3tJ+k=;
+        b=CG4COg6xclwjEypPnhQtXV6DUNMAczbN/JgdbKn8fC7f6HCvgw8b8O0IOIKZV/+RNDcggb
+        sRhQtnvWezBfEZYeZeljLHpPTjVJhcDGhfUNHXWsJWdSCZFdeq7kEUSuEIFf1anZ97CwKR
+        m43qinSj3RxIaW8/PSWCZ50I8nUig0g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-_cOtDcHDMqSgQS042k_P3g-1; Wed, 08 Jul 2020 11:04:20 -0400
+X-MC-Unique: _cOtDcHDMqSgQS042k_P3g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47FA510506EE;
+        Wed,  8 Jul 2020 15:04:18 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC18910013D7;
+        Wed,  8 Jul 2020 15:04:14 +0000 (UTC)
+Date:   Wed, 8 Jul 2020 10:02:54 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dennis Zhou <dennis@kernel.org>
+Subject: Re: [PATCH 01/14] dm: use bio_uninit instead of bio_disassociate_blkg
+Message-ID: <20200708140254.GA7539@redhat.com>
+References: <20200627073159.2447325-1-hch@lst.de>
+ <20200627073159.2447325-2-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b1c58211-496a-ed85-a9bb-0d0cc56e250c@kernel.dk>
+In-Reply-To: <20200627073159.2447325-2-hch@lst.de>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 08, 2020 at 08:59:50AM -0600, Jens Axboe wrote:
-> On 7/8/20 8:58 AM, Matthew Wilcox wrote:
-> > On Wed, Jul 08, 2020 at 08:54:07AM -0600, Jens Axboe wrote:
-> >> On 7/8/20 6:58 AM, Kanchan Joshi wrote:
-> >>>>> +#define IOCB_NO_CMPL		(15 << 28)
-> >>>>>
-> >>>>>  struct kiocb {
-> >>>>> [...]
-> >>>>> -	void (*ki_complete)(struct kiocb *iocb, long ret, long ret2);
-> >>>>> +	loff_t __user *ki_uposp;
-> >>>>> -	int			ki_flags;
-> >>>>> +	unsigned int		ki_flags;
-> >>>>>
-> >>>>> +typedef void ki_cmpl(struct kiocb *, long ret, long ret2);
-> >>>>> +static ki_cmpl * const ki_cmpls[15];
-> >>>>>
-> >>>>> +void ki_complete(struct kiocb *iocb, long ret, long ret2)
-> >>>>> +{
-> >>>>> +	unsigned int id = iocb->ki_flags >> 28;
-> >>>>> +
-> >>>>> +	if (id < 15)
-> >>>>> +		ki_cmpls[id](iocb, ret, ret2);
-> >>>>> +}
-> >>>>>
-> >>>>> +int kiocb_cmpl_register(void (*cb)(struct kiocb *, long, long))
-> >>>>> +{
-> >>>>> +	for (i = 0; i < 15; i++) {
-> >>>>> +		if (ki_cmpls[id])
-> >>>>> +			continue;
-> >>>>> +		ki_cmpls[id] = cb;
-> >>>>> +		return id;
-> >>>>> +	}
-> >>>>> +	WARN();
-> >>>>> +	return -1;
-> >>>>> +}
-> >>>>
-> >>>> That could work, we don't really have a lot of different completion
-> >>>> types in the kernel.
-> >>>
-> >>> Thanks, this looks sorted.
-> >>
-> >> Not really, someone still needs to do that work. I took a quick look, and
-> >> most of it looks straight forward. The only potential complication is
-> >> ocfs2, which does a swap of the completion for the kiocb. That would just
-> >> turn into an upper flag swap. And potential sync kiocb with NULL
-> >> ki_complete. The latter should be fine, I think we just need to reserve
-> >> completion nr 0 for being that.
-> > 
-> > I was reserving completion 15 for that ;-)
-> > 
-> > +#define IOCB_NO_CMPL		(15 << 28)
-> > ...
-> > +	if (id < 15)
-> > +		ki_cmpls[id](iocb, ret, ret2);
-> > 
-> > Saves us one pointer in the array ...
-> 
-> That works. Are you going to turn this into an actual series of patches,
-> adding the functionality and converting users?
+On Sat, Jun 27 2020 at  3:31am -0400,
+Christoph Hellwig <hch@lst.de> wrote:
 
-I was under the impression Kanchan was going to do that, but I can run it
-off quickly ...
+> bio_uninit is the proper API to clean up a BIO that has been allocated
+> on stack or inside a structure that doesn't come from the BIO allocator.
+> Switch dm to use that instead of bio_disassociate_blkg, which really is
+> an implementation detail.  Note that the bio_uninit calls are also moved
+> to the two callers of __send_empty_flush, so that they better pair with
+> the bio_init calls used to initialize them.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+I've picked this up as a fix for 5.8
+
+Thanks,
+Mike
+
