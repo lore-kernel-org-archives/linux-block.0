@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A21DFC433E1
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 07:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B7AC433E0
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 07:59:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CA4720672
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 07:59:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0DD520672
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 07:59:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Y4FjnqkA"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="RmG9H1oO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726918AbgGHH7a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jul 2020 03:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45766 "EHLO
+        id S1726935AbgGHH7b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jul 2020 03:59:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726081AbgGHH73 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 03:59:29 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4E5C08C5DC
-        for <linux-block@vger.kernel.org>; Wed,  8 Jul 2020 00:59:29 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id dg28so40856508edb.3
-        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2020 00:59:29 -0700 (PDT)
+        with ESMTP id S1726081AbgGHH7a (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 03:59:30 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28201C08C5DC
+        for <linux-block@vger.kernel.org>; Wed,  8 Jul 2020 00:59:30 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id dr13so49373586ejc.3
+        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2020 00:59:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=d1La/axhT/8d5t9Aiud14eTBdaZWaa7PgEVZl8V6a7I=;
-        b=Y4FjnqkAa3dAXCGTBn4aKdECC3vAa4sYo1/cDYBmmbSTpZ/YDuIL33IS4GCNQeMc4X
-         fYjFEql0UQuN/iocsdDsGOH5wGLIjpUy1hyWyFwqc8mqMWmUFhlgrlbtsquAam+Udxec
-         qKGxL6LQXUDzhk9fi0wKcKcXEb8Ot2BWPLegN+EckKh2YPbZy/1WLwJ5WRF/xPsBVjbi
-         8Aj6l+rKV8kdSQ87iZ5SQCfLsTVQoEaRheEWw4v9ykgc9raZwU9lHJeXQfCTOPnb6R5r
-         b6femXPdiKKp+tKYyLBOd9histw5KzSMzJXAKRYvs6lJykvNYT04IrHn2Ngw0ee4IKh8
-         FlAQ==
+        bh=nrkWmuZbynTCM3f/uot82ff2fO71eir9goNysLeUz2E=;
+        b=RmG9H1oOSBSNGo/T97+ya0G6yXyZCmXTHIM5aehQxamWs383yIiZwJwxh1HQ5CBeZ1
+         CJi8BrLTX811AbY9Zs8DeWluHXXr4bU38RzynkigS48Iyvi1jAL7/mw4cyfxhnndvh/d
+         zUKyKi9fenPYcENkF6Mdp+C+msaO/UhkX2fCmX0mkgna6dJirzRdWIQh++fMYZtvC9bz
+         BH+dpgtvsp77UI1Q03opUrXhKiAxfWlT7O5xqGr54m2LYYyM3tU+3da8ucXl0WKlZdDF
+         HJWBEPfykY+uWmBSJS55PI+1P2GI0Zcc2QaQeCBg9VRuGlnGf7O6tgAiLufHGcAZkpwn
+         RfLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=d1La/axhT/8d5t9Aiud14eTBdaZWaa7PgEVZl8V6a7I=;
-        b=SNPjx6st9GWO0a74zkfdmt+0ChEtrtN+vC1KYBBNX40y3aVxD+BAPVxbUrxqM9UnBO
-         T8zX5qBQM8GbF1nhI0oAW7VFvykzS7v/fE2NryB+1Ou90zzU0YRKs4ZbX1tVVI54x6/A
-         OyhUr+z10IF0qBCRNXBtXtOHD5nubPlm4afposnfiugZQXt3ts9QHcU5ZRz1DcJ9rKFO
-         laaAoEYz4Lb+Z5Nxx4zzX0Rf4F16Khajb4KweCY6Cbn08wxdQOEr79r8gAlGqiAxa1x8
-         H5LLTJxoG2bsgwquBafhg4auJSFHwz9HH9msbVh7PZDCKHiGZzYwbSYpR33anRADCigO
-         OzXQ==
-X-Gm-Message-State: AOAM533ip5S2SoYWt1urSja9BAZme/8X0Qzty1FsCPzk3e/Xy9S5iA3A
-        82l6FZC4pU+aiirx7M3+gxRHAw==
-X-Google-Smtp-Source: ABdhPJy2Jb+wDl/LMTi0wrDGkP0jOSRoR3G+rxq7VueNcnI68JbJFWmNFwLIr6Ow3Xr+mVc99qtAgg==
-X-Received: by 2002:a50:a451:: with SMTP id v17mr46534548edb.256.1594195167995;
-        Wed, 08 Jul 2020 00:59:27 -0700 (PDT)
+        bh=nrkWmuZbynTCM3f/uot82ff2fO71eir9goNysLeUz2E=;
+        b=b/UwuMdJYE2c2BoKpeIXR2RDiwrRCHuQk8LNbCGTMXfxBrGxE4Ib5p3PQwHN2/o8Fl
+         Hca9TYPrI1hjGevUogOcUeeRs6S1xsrJ8jGcTgGEt3NwFHFpxeVepfv0Djn/1hWm/M9g
+         qq45hHKgPdkDQZMMHx2MmrHFhcS6hH91cO7zPub1xq8djfBAb1keEORNSyUl2LLMMuXF
+         X+CJBU7c9kQ1u6RjIyCVboG70cJFPb7/om7Eh9vyLiP8UQ+BJFXQXETMVWGgYnmZQX/e
+         Q+c1lLruMMLsFRGbIAnND5hFnpiYg5dGnrnotFh/kHsJsJ50EPSx4H8xqQMTysAqUYf2
+         bzUw==
+X-Gm-Message-State: AOAM532vr7oAxlMEtlL+67e4pVIaK97rxIVAsId0PmSxFHgBV8EeLY0s
+        9e1RTSDeZupwVcDSQqZ8/cbzfQ==
+X-Google-Smtp-Source: ABdhPJz6fQHh44FVZ3nYKLo4pWFQDwYG6Ttpq89pfgkJ/Nb927v0oE90LAToh58TazOdqFHlL/u6Wg==
+X-Received: by 2002:a17:906:7802:: with SMTP id u2mr52350656ejm.478.1594195168913;
+        Wed, 08 Jul 2020 00:59:28 -0700 (PDT)
 Received: from ls00508.pb.local ([2001:1438:4010:2540:b161:f409:fd1d:3a1f])
-        by smtp.gmail.com with ESMTPSA id mj22sm1570858ejb.118.2020.07.08.00.59.26
+        by smtp.gmail.com with ESMTPSA id mj22sm1570858ejb.118.2020.07.08.00.59.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2020 00:59:27 -0700 (PDT)
+        Wed, 08 Jul 2020 00:59:28 -0700 (PDT)
 From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org,
@@ -63,9 +63,9 @@ Cc:     linux-block@vger.kernel.org,
         Philipp Reisner <philipp.reisner@linbit.com>,
         Lars Ellenberg <lars.ellenberg@linbit.com>,
         drbd-dev@lists.linbit.com
-Subject: [PATCH RFC 2/5] drbd: remove unused argument from drbd_request_prepare and __drbd_make_request
-Date:   Wed,  8 Jul 2020 09:58:16 +0200
-Message-Id: <20200708075819.4531-3-guoqing.jiang@cloud.ionos.com>
+Subject: [PATCH RFC 3/5] drbd: rename start_jif to start_ns
+Date:   Wed,  8 Jul 2020 09:58:17 +0200
+Message-Id: <20200708075819.4531-4-guoqing.jiang@cloud.ionos.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200708075819.4531-1-guoqing.jiang@cloud.ionos.com>
 References: <20200708075819.4531-1-guoqing.jiang@cloud.ionos.com>
@@ -74,104 +74,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We can remove start_jif since it is not used by drbd_request_prepare,
-then remove it from __drbd_make_request further.
+Let's rename start_jif to start_ns to reflect that bio_start_io_acct
+returns ns presicion now.
 
 Cc: Philipp Reisner <philipp.reisner@linbit.com>
 Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
 Cc: drbd-dev@lists.linbit.com
 Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 ---
-This had been sent before, now it is better to include it in the thread.
+ drivers/block/drbd/drbd_debugfs.c | 8 ++++----
+ drivers/block/drbd/drbd_int.h     | 2 +-
+ drivers/block/drbd/drbd_req.c     | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-https://marc.info/?l=linux-block&m=159369644305325&w=2
-
-
- drivers/block/drbd/drbd_int.h  |  2 +-
- drivers/block/drbd/drbd_main.c |  3 +--
- drivers/block/drbd/drbd_req.c  | 11 ++++-------
- 3 files changed, 6 insertions(+), 10 deletions(-)
-
+diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
+index b3b9cd5628fd..672fd7e6587d 100644
+--- a/drivers/block/drbd/drbd_debugfs.c
++++ b/drivers/block/drbd/drbd_debugfs.c
+@@ -105,7 +105,7 @@ static void seq_print_one_request(struct seq_file *m, struct drbd_request *req,
+ 		(s & RQ_WRITE) ? "W" : "R");
+ 
+ #define RQ_HDR_2 "\tstart\tin AL\tsubmit"
+-	seq_printf(m, "\t%d", jiffies_to_msecs(now - req->start_jif));
++	seq_printf(m, "\t%llu", (ktime_get_ns() - req->start_ns) / NSEC_PER_MSEC);
+ 	seq_print_age_or_dash(m, s & RQ_IN_ACT_LOG, now - req->in_actlog_jif);
+ 	seq_print_age_or_dash(m, s & RQ_LOCAL_PENDING, now - req->pre_submit_jif);
+ 
+@@ -161,7 +161,7 @@ static void seq_print_waiting_for_AL(struct seq_file *m, struct drbd_resource *r
+ 	seq_puts(m, "minor\tvnr\tage\t#waiting\n");
+ 	rcu_read_lock();
+ 	idr_for_each_entry(&resource->devices, device, i) {
+-		unsigned long jif;
++		unsigned long ns;
+ 		struct drbd_request *req;
+ 		int n = atomic_read(&device->ap_actlog_cnt);
+ 		if (n) {
+@@ -171,7 +171,7 @@ static void seq_print_waiting_for_AL(struct seq_file *m, struct drbd_resource *r
+ 			/* if the oldest request does not wait for the activity log
+ 			 * it is not interesting for us here */
+ 			if (req && !(req->rq_state & RQ_IN_ACT_LOG))
+-				jif = req->start_jif;
++				ns = req->start_ns;
+ 			else
+ 				req = NULL;
+ 			spin_unlock_irq(&device->resource->req_lock);
+@@ -179,7 +179,7 @@ static void seq_print_waiting_for_AL(struct seq_file *m, struct drbd_resource *r
+ 		if (n) {
+ 			seq_printf(m, "%u\t%u\t", device->minor, device->vnr);
+ 			if (req)
+-				seq_printf(m, "%u\t", jiffies_to_msecs(now - jif));
++				seq_printf(m, "%llu\t", (ktime_get_ns() - ns) / NSEC_PER_MSEC);
+ 			else
+ 				seq_puts(m, "-\t");
+ 			seq_printf(m, "%u\n", n);
 diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index fe6cb99eb917..aacd2010b555 100644
+index aacd2010b555..467d96316230 100644
 --- a/drivers/block/drbd/drbd_int.h
 +++ b/drivers/block/drbd/drbd_int.h
-@@ -1450,7 +1450,7 @@ extern void conn_free_crypto(struct drbd_connection *connection);
+@@ -301,7 +301,7 @@ struct drbd_request {
+ 	struct list_head req_pending_local;
  
- /* drbd_req */
- extern void do_submit(struct work_struct *ws);
--extern void __drbd_make_request(struct drbd_device *, struct bio *, unsigned long);
-+extern void __drbd_make_request(struct drbd_device *, struct bio *);
- extern blk_qc_t drbd_submit_bio(struct bio *bio);
- extern int drbd_read_remote(struct drbd_device *device, struct drbd_request *req);
- extern int is_valid_ar_handle(struct drbd_request *, sector_t);
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 7c34cc0ad8cc..42f2a235417c 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -2293,7 +2293,6 @@ static void do_retry(struct work_struct *ws)
- 	list_for_each_entry_safe(req, tmp, &writes, tl_requests) {
- 		struct drbd_device *device = req->device;
- 		struct bio *bio = req->master_bio;
--		unsigned long start_jif = req->start_jif;
- 		bool expected;
+ 	/* for generic IO accounting */
+-	unsigned long start_jif;
++	unsigned long start_ns;
  
- 		expected =
-@@ -2328,7 +2327,7 @@ static void do_retry(struct work_struct *ws)
- 		/* We are not just doing submit_bio_noacct(),
- 		 * as we want to keep the start_time information. */
- 		inc_ap_bio(device);
--		__drbd_make_request(device, bio, start_jif);
-+		__drbd_make_request(device, bio);
- 	}
- }
+ 	/* for DRBD internal statistics */
  
 diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index 674be09b2da9..f705128b4f27 100644
+index f705128b4f27..6ad6b4470ebd 100644
 --- a/drivers/block/drbd/drbd_req.c
 +++ b/drivers/block/drbd/drbd_req.c
-@@ -1188,7 +1188,7 @@ static void drbd_queue_write(struct drbd_device *device, struct drbd_request *re
-  * Returns ERR_PTR(-ENOMEM) if we cannot allocate a drbd_request.
-  */
- static struct drbd_request *
--drbd_request_prepare(struct drbd_device *device, struct bio *bio, unsigned long start_jif)
-+drbd_request_prepare(struct drbd_device *device, struct bio *bio)
- {
- 	const int rw = bio_data_dir(bio);
- 	struct drbd_request *req;
-@@ -1416,9 +1416,9 @@ static void drbd_send_and_submit(struct drbd_device *device, struct drbd_request
- 		complete_master_bio(device, &m);
- }
+@@ -245,7 +245,7 @@ void drbd_req_complete(struct drbd_request *req, struct bio_and_error *m)
+ 		start_new_tl_epoch(first_peer_device(device)->connection);
  
--void __drbd_make_request(struct drbd_device *device, struct bio *bio, unsigned long start_jif)
-+void __drbd_make_request(struct drbd_device *device, struct bio *bio)
- {
--	struct drbd_request *req = drbd_request_prepare(device, bio, start_jif);
-+	struct drbd_request *req = drbd_request_prepare(device, bio);
- 	if (IS_ERR_OR_NULL(req))
- 		return;
- 	drbd_send_and_submit(device, req);
-@@ -1596,19 +1596,16 @@ void do_submit(struct work_struct *ws)
- blk_qc_t drbd_submit_bio(struct bio *bio)
- {
- 	struct drbd_device *device = bio->bi_disk->private_data;
--	unsigned long start_jif;
+ 	/* Update disk stats */
+-	bio_end_io_acct(req->master_bio, req->start_jif);
++	bio_end_io_acct(req->master_bio, req->start_ns);
  
- 	blk_queue_split(&bio);
+ 	/* If READ failed,
+ 	 * have it be pushed back to the retry work queue,
+@@ -1206,7 +1206,7 @@ drbd_request_prepare(struct drbd_device *device, struct bio *bio)
+ 	}
  
--	start_jif = jiffies;
--
- 	/*
- 	 * what we "blindly" assume:
- 	 */
- 	D_ASSERT(device, IS_ALIGNED(bio->bi_iter.bi_size, 512));
+ 	/* Update disk stats */
+-	req->start_jif = bio_start_io_acct(req->master_bio);
++	req->start_ns = bio_start_io_acct(req->master_bio);
  
- 	inc_ap_bio(device);
--	__drbd_make_request(device, bio, start_jif);
-+	__drbd_make_request(device, bio);
- 	return BLK_QC_T_NONE;
- }
- 
+ 	if (!get_ldev(device)) {
+ 		bio_put(req->private_bio);
 -- 
 2.17.1
 
