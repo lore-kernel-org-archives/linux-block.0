@@ -1,156 +1,148 @@
-Return-Path: <SRS0=CAbX=AS=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=UAvt=AT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F7BC433DF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 22:38:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF037C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 07:59:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2021C20675
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jul 2020 22:38:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0BC020672
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jul 2020 07:59:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="k5O7SoEu"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="hT2pRGbq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729348AbgGGWiA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jul 2020 18:38:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43828 "EHLO
+        id S1726342AbgGHH72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jul 2020 03:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728299AbgGGWh7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jul 2020 18:37:59 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3FC5C061755
-        for <linux-block@vger.kernel.org>; Tue,  7 Jul 2020 15:37:59 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id d10so5296165pll.3
-        for <linux-block@vger.kernel.org>; Tue, 07 Jul 2020 15:37:59 -0700 (PDT)
+        with ESMTP id S1726081AbgGHH71 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jul 2020 03:59:27 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49933C08C5DC
+        for <linux-block@vger.kernel.org>; Wed,  8 Jul 2020 00:59:27 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id n2so31839508edr.5
+        for <linux-block@vger.kernel.org>; Wed, 08 Jul 2020 00:59:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ujEygxc3d5j3mD7Fz8DXKzp+VHqFRmCSAyV6TACKRqY=;
-        b=k5O7SoEuB4v6eAKTQCGR+WdOKA3x9uxJYb+gAPfh3XvulB0NUO8KAQitfuJa9ojiSH
-         hxKVrpKXGznJXSNUg9l/jd5QyFaTM+4Eb3lSE69M4/KL2f9OFW1/Ms8Fw7c5Z7VudOMo
-         tCLp+SrSLpUSbbAMy+WG/OHB+odh5rndXsxAiBUnwSaS34Ahhg0rVR+db6V3tTCIu1NN
-         eDfPa05dmlFdw9/Mb/JNujhTLFEzBBdOagseogP3GiACZ4+xPX0M877Cm544V+awZNDO
-         BpbhGyU+kbXhZowakppxW8sAXBwZssx2nSOq1RHiXZjqDiktcfi8tcZpEBVn+DPU4bVv
-         mENw==
+        d=cloud.ionos.com; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=y/mRE6lKrupeh64EK6hYhYjXO+H5alQ6a0YuJYC6SS8=;
+        b=hT2pRGbqRu+uXvp0LAZvsalcw4ilY3TODQnlM/IExD9s/MGgN74eJDWn83G628TcR3
+         3XxNB/cd36zz12GO9hmtBqXtHQtPkSoMLiDA7oeyZDEGxNfYup2pFtCiuNXoVAw5+tuq
+         qckoLOKD1XePiimv8T72fL2+XCrqw2Hj3VC1r5GHc5VFNUBP97kFogyQQrv59UYeuSwk
+         nnt3aQDenBUgv8KjqSN8uRxnlv7OihfMrmYDbrW0LCQRvae+C/W2N540x+lI3MzpD0KJ
+         NGlfx4uamfPRMstpfRBY2+W7nnTQ4TBNavNsIxzDt/G0V0HIdgHU68k1UZcqbz91v+Y3
+         sijw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ujEygxc3d5j3mD7Fz8DXKzp+VHqFRmCSAyV6TACKRqY=;
-        b=YQUFo9OSNoF9ezaXlypBuWJmPchEx+3Y8nP5jGnbfSPxCxMXxmcs8uAx2CLh+qFJgG
-         7Ch6gZwd3kaCh3Rqqo6ifDZEhfCYQA45g7J4BnYEvKxWmTSoTvsdpgWHWeC4qEEKRjZ6
-         yus+KYObh74sy9MOkx/I+4wwqIPrYjF5gItYkOzDkyiZHJE0HcY28ZbSD7VsQMGm/FRM
-         jV6mb/gfsAIM5XQLWonSOu0fDIpeiWOzVY2lMjdEp63GzuYL+SNZ+tSSVnZx3PfGuDZu
-         CbEsa8dtHxllTlK4E/bXt2hRzQEk4RihMmga16YlPbeyhQf5e0qRUvZtdejMUsnYZNWm
-         jD8w==
-X-Gm-Message-State: AOAM531+1qzlJJSJ3Hhv1zlBQ1OFi/quGABZdQCF4Qr28exvmzYWCPR8
-        iCC+Iq9/kMxSvQ10B9D8MrgJKg==
-X-Google-Smtp-Source: ABdhPJynwm1vS5HIwknN1B1A+r1QOKKGTnZqhLY/x2Zvdjf5NrFMJCsGKME8x1h9+LkeExWE4OO7ig==
-X-Received: by 2002:a17:90a:9f4a:: with SMTP id q10mr6612744pjv.139.1594161479264;
-        Tue, 07 Jul 2020 15:37:59 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id e6sm15496691pfh.176.2020.07.07.15.37.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2020 15:37:58 -0700 (PDT)
-Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
-        bcrl@kvack.org, hch@infradead.org, Damien.LeMoal@wdc.com,
-        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
-        mb@lightnvm.io, linux-kernel@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Selvakumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-References: <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk>
- <20200705210947.GW25523@casper.infradead.org>
- <239ee322-9c38-c838-a5b2-216787ad2197@kernel.dk>
- <20200706141002.GZ25523@casper.infradead.org>
- <4a9bf73e-f3ee-4f06-7fad-b8f8861b0bc1@kernel.dk>
- <20200706143208.GA25523@casper.infradead.org>
- <20200707151105.GA23395@test-zns>
- <20200707155237.GM25523@casper.infradead.org>
- <20200707202342.GA28364@test-zns>
- <7a44d9c6-bf7d-0666-fc29-32c3cba9d1d8@kernel.dk>
- <20200707221812.GN25523@casper.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <145cc0ad-af86-2d6a-78b3-9ade007aae52@kernel.dk>
-Date:   Tue, 7 Jul 2020 16:37:55 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200707221812.GN25523@casper.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=y/mRE6lKrupeh64EK6hYhYjXO+H5alQ6a0YuJYC6SS8=;
+        b=iLaIdcRhE1WBBnsB5k14kDQklRGEhVrFLIkBzPWsgq5qG1ej+fR8d4mlxmpCrNdyzD
+         GPGPpKszPPAWwZ3/uGMDU108GCwBamBFZ722dK4FYPEpNzF+T2mqDZY6ZQyMI9fXlToe
+         MZBZo1LX75tRzJp02UH6bN+aDxREVGJi046df4E3Fp1A/OnDq9/eahNGIFRw6DPSHzFA
+         0z3uNXoXibuQ5OXZkY2axU60gs62D0sl2Ai1yYr7Ztl5/0hybdpx8DcP0lguSvd3Hpkk
+         ahtbfYRkc7n0zcsRyVAHvcb92g14CIyA7MAxE6lQs9G2r1l+xNdT+zIRQOUXIWb4hAlU
+         02fw==
+X-Gm-Message-State: AOAM532Z2a+tPir3SRzT+gzVIuVb5L0nrRkclVYZlk/z+uCVCWXLcQV0
+        FpfHC3R+d9EUUuGPp9JqMYcooA==
+X-Google-Smtp-Source: ABdhPJxyNlEJ61sBlcbPLvd92QRNbV/ZVVF5QBlb8RWg7Mh1DSNr7Tp1y7X2SOCA2hAEGd+1e9Q5Zw==
+X-Received: by 2002:a05:6402:1c11:: with SMTP id ck17mr62525346edb.38.1594195165885;
+        Wed, 08 Jul 2020 00:59:25 -0700 (PDT)
+Received: from ls00508.pb.local ([2001:1438:4010:2540:b161:f409:fd1d:3a1f])
+        by smtp.gmail.com with ESMTPSA id mj22sm1570858ejb.118.2020.07.08.00.59.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2020 00:59:25 -0700 (PDT)
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org,
+        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Subject: [RFC PATCH 0/4] block: add two statistic tables
+Date:   Wed,  8 Jul 2020 09:58:14 +0200
+Message-Id: <20200708075819.4531-1-guoqing.jiang@cloud.ionos.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/7/20 4:18 PM, Matthew Wilcox wrote:
-> On Tue, Jul 07, 2020 at 02:40:06PM -0600, Jens Axboe wrote:
->>>> so we have another 24 bytes before io_kiocb takes up another cacheline.
->>>> If that's a serious problem, I have an idea about how to shrink struct
->>>> kiocb by 8 bytes so struct io_rw would have space to store another
->>>> pointer.
->>> Yes, io_kiocb has room. Cache-locality wise whether that is fine or
->>> it must be placed within io_rw - I'll come to know once I get to
->>> implement this. Please share the idea you have, it can come handy.
->>
->> Except it doesn't, I'm not interested in adding per-request type fields
->> to the generic part of it. Before we know it, we'll blow past the next
->> cacheline.
->>
->> If we can find space in the kiocb, that'd be much better. Note that once
->> the async buffered bits go in for 5.9, then there's no longer a 4-byte
->> hole in struct kiocb.
-> 
-> Well, poot, I was planning on using that.  OK, how about this:
+Hi,
 
-Figured you might have had your sights set on that one, which is why I
-wanted to bring it up upfront :-)
+The patchset mostly introduces some additional io stats for latency and sector,
+with those tables, we can know better about the io patttern. And we want the
+disk_start_io_acct returns ns instead of convert from jiffies, so some code
+in drbd are changed accordingly.
 
-> +#define IOCB_NO_CMPL		(15 << 28)
-> 
->  struct kiocb {
-> [...]
-> -	void (*ki_complete)(struct kiocb *iocb, long ret, long ret2);
-> +	loff_t __user *ki_uposp;
-> -	int			ki_flags;
-> +	unsigned int		ki_flags;
-> 
-> +typedef void ki_cmpl(struct kiocb *, long ret, long ret2);
-> +static ki_cmpl * const ki_cmpls[15];
-> 
-> +void ki_complete(struct kiocb *iocb, long ret, long ret2)
-> +{
-> +	unsigned int id = iocb->ki_flags >> 28;
-> +
-> +	if (id < 15)
-> +		ki_cmpls[id](iocb, ret, ret2);
-> +}
-> 
-> +int kiocb_cmpl_register(void (*cb)(struct kiocb *, long, long))
-> +{
-> +	for (i = 0; i < 15; i++) {
-> +		if (ki_cmpls[id])
-> +			continue;
-> +		ki_cmpls[id] = cb;
-> +		return id;
-> +	}
-> +	WARN();
-> +	return -1;
-> +}
+For the table, the first row of below tables means the number which are "<= 1",
+while the last row means the number which are ">= 1024". And the rest rows in
+the table represent the number in a range.
 
-That could work, we don't really have a lot of different completion
-types in the kernel.
+With HZ=1000.
+$ cat /sys/block/md127/io_latency
+     1 ms: 3 0 0 0     - means 3 read IOs are finished less than or equal 1 ms
+     2 ms: 1 0 0 0     - means 1 read IO is finished in the range [2ms, 4ms)
+     4 ms: 0 0 0 0
+     8 ms: 0 0 0 0
+    16 ms: 1 0 0 0
+    32 ms: 0 0 0 0
+    64 ms: 0 0 0 0
+   128 ms: 0 0 0 0
+   256 ms: 0 0 0 0
+   512 ms: 0 0 0 0
+  1024 ms: 1 0 0 0
+  2048 ms: 1 0 0 0     - means 1 read IO is finished more than or equal 2048 ms
 
--- 
-Jens Axboe
+While with HZ=100.
+$ cat /sys/block/md127/io_latency
+     10 ms: 3 0 0 0
+     20 ms: 1 0 0 0
+     40 ms: 0 0 0 0
+     80 ms: 0 0 0 0
+    160 ms: 1 0 0 0
+    320 ms: 0 0 0 0
+    640 ms: 0 0 0 0
+   1280 ms: 0 0 0 0
+   2560 ms: 0 0 0 0
+   5120 ms: 0 0 0 0
+  10240 ms: 1 0 0 0
+  20480 ms: 1 0 0 0
 
+
+$ cat /sys/block/md127/io_size
+     1 KB: 0 0 0 0
+     2 KB: 0 0 0 0
+     4 KB: 0 0 0 0
+     8 KB: 5 0 0 0
+    16 KB: 0 0 0 0
+    32 KB: 0 0 0 0
+    64 KB: 0 0 0 0
+   128 KB: 0 0 0 0
+   256 KB: 0 0 0 0
+   512 KB: 0 0 0 0
+  1024 KB: 0 0 0 0
+  2048 KB: 0 0 0 0
+
+I will add a document if it is worth to add the two tables, review and comment
+are welcome.
+
+Thanks,
+Guoqing
+
+Guoqing Jiang (5):
+  block: return ns precision from disk_start_io_acct
+  drbd: remove unused argument from drbd_request_prepare and
+    __drbd_make_request
+  drbd: rename start_jif to start_ns
+  block: add a statistic table for io latency
+  block: add a statistic table for io sector
+
+ block/Kconfig                     |  9 +++++
+ block/blk-core.c                  | 61 +++++++++++++++++++++++++++++--
+ block/genhd.c                     | 47 ++++++++++++++++++++++++
+ drivers/block/drbd/drbd_debugfs.c |  8 ++--
+ drivers/block/drbd/drbd_int.h     |  4 +-
+ drivers/block/drbd/drbd_main.c    |  3 +-
+ drivers/block/drbd/drbd_req.c     | 15 +++-----
+ include/linux/part_stat.h         |  8 ++++
+ 8 files changed, 135 insertions(+), 20 deletions(-)
