@@ -2,78 +2,113 @@ Return-Path: <SRS0=YKm5=AU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE27EC433E0
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jul 2020 14:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC5AC433DF
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jul 2020 14:05:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9DD7D20708
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jul 2020 14:01:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAB0B2073A
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jul 2020 14:05:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="C5rui48L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbgGIOBu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jul 2020 10:01:50 -0400
-Received: from verein.lst.de ([213.95.11.211]:39578 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726353AbgGIOBt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Jul 2020 10:01:49 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 03E3D68AEF; Thu,  9 Jul 2020 16:01:46 +0200 (CEST)
-Date:   Thu, 9 Jul 2020 16:01:45 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
-        dm-devel@redhat.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: remove dead bdi congestion leftovers
-Message-ID: <20200709140145.GA3068@lst.de>
-References: <20200701090622.3354860-1-hch@lst.de> <b5d6df17-68af-d535-79e4-f95e16dd5632@kernel.dk> <20200709053233.GA3243@lst.de> <82e2785d-2091-1986-0014-3b7cea7cd0d8@kernel.dk>
+        id S1726482AbgGIOFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jul 2020 10:05:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43116 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726748AbgGIOFt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jul 2020 10:05:49 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D88C08C5DD
+        for <linux-block@vger.kernel.org>; Thu,  9 Jul 2020 07:05:49 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id r12so2122806ilh.4
+        for <linux-block@vger.kernel.org>; Thu, 09 Jul 2020 07:05:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=oMnI/eFxxJ+Rr9dk/y2RZbs/7bqRU/Yv7VYpCv09jjQ=;
+        b=C5rui48LchhJZsNpOpZKkjblQ0CTY2MPXDSz4bmp81soQ7GL+mRU0qziWXkLkqg+Dy
+         lClg6xJDkVIHrL8Byb8utF+/Zz69CsyFMkZixqLUf0DOuUj2n0BQCP4Bk5D2gBsKxhub
+         CBPhvXRkP+8oivA89E8UF3wklQjxODE8+urJ2PPzWPWnLX2tv7Xxejg8j4fifP/zXzHx
+         mBwYe35MwDctRpH4PI4J7EB6hiRDTkPI1JB7SjlZHlxXzRgPIM5VED8dHafaq/fYNO2O
+         4Vqc4dTq6q+GOACFAaLZVj4+gp1Wxs//znqmRO+lqNQcRWZfa/bn2cIi8LnZn7I05H3A
+         LesA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oMnI/eFxxJ+Rr9dk/y2RZbs/7bqRU/Yv7VYpCv09jjQ=;
+        b=EUEOONNlTqoD1lR7HV7oAsxjWMUdFdWEwvCWISI/I02ry2K0GHxQ3SR4mD7sT7MAMs
+         OnJo2jpOpxwCmZjpvl5aV/VX7w4BFwkgEhK6cSJRLWKiE5fNRxeu+tH1dikfb+5NrKhp
+         BXIDmAiSnMmVUZSHa3gzg+3NXLPxGuM15TsDLNlh1rVwVlYDjvRDatrpMg9z1/MgQwzJ
+         vwO3kdG+BekLrGw8P6h5ygOOVi4ppEvbg5ZDFXNXUJd+yD31zRDXikCz/3fnMvdB/jPp
+         Hx2fArIufSI/sbAcN4H+NzdhFW2QD2WnTI35LQwx7P2sa+u5ph6qQZFITOVz7LWxw9xF
+         9A0w==
+X-Gm-Message-State: AOAM532M91pBqpLkDfUusDCxcR5jSIPBFjmh9V8gmuHMKGyhgbfeb/Ej
+        noUed3L6Lt4Jrdo221XwsOFOAg==
+X-Google-Smtp-Source: ABdhPJya7WxrYyOKxMjO9jamdVLBDLUrjy8VegR37opYbGRoDIWCNtaSbFAkPSzRltHkfkNagHedyg==
+X-Received: by 2002:a92:bb57:: with SMTP id w84mr47025123ili.104.1594303548684;
+        Thu, 09 Jul 2020 07:05:48 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h11sm1910739ilh.69.2020.07.09.07.05.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jul 2020 07:05:47 -0700 (PDT)
+Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
+        bcrl@kvack.org, Damien.LeMoal@wdc.com, asml.silence@gmail.com,
+        linux-fsdevel@vger.kernel.org, mb@lightnvm.io,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+References: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200705185227epcas5p16fba3cb92561794b960184c89fdf2bb7@epcas5p1.samsung.com>
+ <1593974870-18919-5-git-send-email-joshi.k@samsung.com>
+ <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk>
+ <20200709085501.GA64935@infradead.org>
+ <adc14700-8e95-10b2-d914-afa5029ae80c@kernel.dk>
+ <20200709140053.GA7528@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2270907f-670c-5182-f4ec-9756dc645376@kernel.dk>
+Date:   Thu, 9 Jul 2020 08:05:46 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20200709140053.GA7528@infradead.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <82e2785d-2091-1986-0014-3b7cea7cd0d8@kernel.dk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 09, 2020 at 07:58:58AM -0600, Jens Axboe wrote:
-> On 7/8/20 11:32 PM, Christoph Hellwig wrote:
-> > On Wed, Jul 08, 2020 at 05:14:29PM -0600, Jens Axboe wrote:
-> >> On 7/1/20 3:06 AM, Christoph Hellwig wrote:
-> >>> Hi Jens,
-> >>>
-> >>> we have a lot of bdi congestion related code that is left around without
-> >>> any use.  This series removes it in preparation of sorting out the bdi
-> >>> lifetime rules properly.
-> >>
-> >> Please run series like this through a full compilation, for both this one
-> >> and the previous series I had to fix up issues like this:
-> >>
-> >> drivers/md/bcache/request.c: In function ‘bch_cached_dev_request_init’:
-> >> drivers/md/bcache/request.c:1233:18: warning: unused variable ‘g’ [-Wunused-variable]
-> >>  1233 |  struct gendisk *g = dc->disk.disk;
-> >>       |                  ^
-> >> drivers/md/bcache/request.c: In function ‘bch_flash_dev_request_init’:
-> >> drivers/md/bcache/request.c:1320:18: warning: unused variable ‘g’ [-Wunused-variable]
-> >>  1320 |  struct gendisk *g = d->disk;
-> >>       |                  ^
-> >>
-> >> Did the same here, applied it.
-> > 
-> > And just like the previous one I did, and the compiler did not complain.
-> > There must be something about certain gcc versions not warning about
-> > variables that are initialized but not otherwise used.
+On 7/9/20 8:00 AM, Christoph Hellwig wrote:
+> On Thu, Jul 09, 2020 at 07:58:04AM -0600, Jens Axboe wrote:
+>>> We don't actually need any new field at all.  By the time the write
+>>> returned ki_pos contains the offset after the write, and the res
+>>> argument to ->ki_complete contains the amount of bytes written, which
+>>> allow us to trivially derive the starting position.
+>>
+>> Then let's just do that instead of jumping through hoops either
+>> justifying growing io_rw/io_kiocb or turning kiocb into a global
+>> completion thing.
 > 
-> Are you using gcc-10? It sucks for that. gcc-9 seems to reliably hit
-> these cases for me, not sure why gcc-10 doesn't. And the ones quoted
-> above are about as trivial as they can get.
+> Unfortunately that is a totally separate issue - the in-kernel offset
+> can be trivially calculated.  But we still need to figure out a way to
+> pass it on to userspace.  The current patchset does that by abusing
+> the flags, which doesn't really work as the flags are way too small.
+> So we somewhere need to have an address to do the put_user to.
 
-gcc-9.3 from Debian -testing.  And yes, I'm really surprised it didn't
-find those.
+Right, we're just trading the 'append_offset' for a 'copy_offset_here'
+pointer, which are stored in the same spot...
+
+-- 
+Jens Axboe
+
