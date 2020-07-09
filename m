@@ -2,322 +2,89 @@ Return-Path: <SRS0=YKm5=AU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A761C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jul 2020 08:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1B0C433E2
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jul 2020 10:16:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08E3320708
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jul 2020 08:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14B9F20674
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jul 2020 10:16:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IwxO+aSs"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kfAlLVsR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726269AbgGIIfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jul 2020 04:35:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48284 "EHLO
+        id S1726353AbgGIKQO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jul 2020 06:16:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726193AbgGIIf3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jul 2020 04:35:29 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE7CC061A0B
-        for <linux-block@vger.kernel.org>; Thu,  9 Jul 2020 01:35:29 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id k6so1428963wrn.3
-        for <linux-block@vger.kernel.org>; Thu, 09 Jul 2020 01:35:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=zB1HvRKR7/GKTWPcldNvE0H8P9GmRoVKrz01N/ZFhZc=;
-        b=IwxO+aSsASD+UXRn0555f9DCfxVE5eoIQNw0hFn2TXP4BrhYXPXTfbaxBUQRk114Kh
-         rQJQrWc+1AuzaAY5TCNaC8ewLZlKv6/nYa2Vep9qULqcd/lWdKqV2hrONQK9TKaYd3Ft
-         IuMbf6O51xROJNogG/zETMnd8fP2bkHxxCwomg6KUEz4WJ7Nwp6d+zmiZCQplCy3rqV0
-         Pz3iRuHr7moj+526q0/jZxGNLhEQTkWstammrzGMODCdi8k/G2Yq+T6gyAARJrJCaIv+
-         DqzxSLfooiGz5CStqt82ZJc23bXG2QMtyZ01REU/Ez3nrds8Pp8Q6B5o+SNBF5jsOy3O
-         vzpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=zB1HvRKR7/GKTWPcldNvE0H8P9GmRoVKrz01N/ZFhZc=;
-        b=hK9BSgAvpBnyVYA+bkCr7y7LMoJZQyCYT9UCGDDqCi36/PbKIGAkzWdJ4nz4SXFtih
-         oDm57DUzxKmIZ1L7DMvLOdmHeL0rmxR7WBIokqwJ+9yhVqbQGs1bS865ozWMYEjKWO39
-         RoWuAVyyFL8EFtUD6DkWJPr4g5pGLegWYEEH1qep6Vkhw/jZEq/KRpRW29P4nAUiigO9
-         A6hJOjkYWYsAd7Urp0pyOMFqjUo8g4yVvezoxqiJHutFUl0RexgfcUUDPeAYJVW1UKN8
-         r4+lHc5vLnNfTRLkAdE0BgQCOc1lcmEBzS1edX9Shya5N+Mq2bK57EN16hOUnQT0D2BP
-         hI+g==
-X-Gm-Message-State: AOAM5323nJkcyBN17d9Bz5lnq9n9JhwwkkjVOlua+u5vRX5npfXMxG5J
-        5YGG/FcDRBDzmppM/A49TLLqPA==
-X-Google-Smtp-Source: ABdhPJxElteVX3OvMWfh2fxogrFKB0e2fun27QzkHRSnC5JLjzA8ZU21cjt+tkapkvAQzGEtFmMulw==
-X-Received: by 2002:adf:edd0:: with SMTP id v16mr60988734wro.214.1594283727566;
-        Thu, 09 Jul 2020 01:35:27 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id 59sm4642072wrj.37.2020.07.09.01.35.26
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 09 Jul 2020 01:35:26 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] bfq: fix blkio cgroup leakage
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <87h7uhqewn.fsf@dmws.yandex.net>
-Date:   Thu, 9 Jul 2020 10:35:49 +0200
-Cc:     LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <22087F19-BC93-447E-848A-109392E0622D@linaro.org>
-References: <20200702105751.20482-1-dmonakhov@gmail.com>
- <429E50C6-83BA-4A3F-BE9C-06C7C762AF33@linaro.org>
- <87k0zdrj7s.fsf@dmws.yandex.net>
- <545F1ABF-B2B2-4523-9259-D3F93A9BB330@linaro.org>
- <87h7uhqewn.fsf@dmws.yandex.net>
-To:     Dmitry Monakhov <dmonakhov@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        with ESMTP id S1726140AbgGIKQN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jul 2020 06:16:13 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 337FAC061A0B;
+        Thu,  9 Jul 2020 03:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=+4y1tH7JgQGg/m4Y2HPNpPcl0NpQqyVNAfEoubft9uY=; b=kfAlLVsRpqnbZQEAK40SMcQERa
+        AJ3dkC/7hx9RCDtrf0/3gke1gSrkFxyJf+EkHzqRSG2oK+901gljldEXBKdkGbomGpYn1EapFRu6Q
+        HtpsebXW3mT3AJ7A/iUdncW27w3voAXB1ykeDfelYyIfxvgjmF32l4dB+dqkg6GDU3HVaDCf1B3VM
+        hl9DInOwoFkeAlr6t+Hz9maFrGkMHr+BcG6SApp1XiUze3uBczRlS9d45yOfyfdaQ8BymLq8TlYfV
+        Bp9/pC3nrvuEJg/IaqP0CHEfyJgNA9ZAl4XPHDXNx6u58PfGJvJfsmDwELO/eD2GabcXZTwTR2gff
+        AFhDMLkg==;
+Received: from [2001:4bb8:188:5f50:7053:304b:bf82:82cf] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jtTax-0000ZA-F3; Thu, 09 Jul 2020 10:15:59 +0000
+Date:   Thu, 9 Jul 2020 12:15:59 +0200
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
+        bcrl@kvack.org, hch@infradead.org, Damien.LeMoal@wdc.com,
+        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+        mb@lightnvm.io, linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
+Message-ID: <20200709085501.GA64935@infradead.org>
+References: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200705185227epcas5p16fba3cb92561794b960184c89fdf2bb7@epcas5p1.samsung.com>
+ <1593974870-18919-5-git-send-email-joshi.k@samsung.com>
+ <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Sun, Jul 05, 2020 at 03:00:47PM -0600, Jens Axboe wrote:
+> > diff --git a/fs/io_uring.c b/fs/io_uring.c
+> > index 155f3d8..cbde4df 100644
+> > --- a/fs/io_uring.c
+> > +++ b/fs/io_uring.c
+> > @@ -402,6 +402,8 @@ struct io_rw {
+> >  	struct kiocb			kiocb;
+> >  	u64				addr;
+> >  	u64				len;
+> > +	/* zone-relative offset for append, in sectors */
+> > +	u32			append_offset;
+> >  };
+> 
+> I don't like this very much at all. As it stands, the first cacheline
+> of io_kiocb is set aside for request-private data. io_rw is already
+> exactly 64 bytes, which means that you're now growing io_rw beyond
+> a cacheline and increasing the size of io_kiocb as a whole.
+> 
+> Maybe you can reuse io_rw->len for this, as that is only used on the
+> submission side of things.
 
-
-> Il giorno 9 lug 2020, alle ore 10:19, Dmitry Monakhov =
-<dmonakhov@gmail.com> ha scritto:
->=20
-> Paolo Valente <paolo.valente@linaro.org> writes:
->=20
->>> Il giorno 8 lug 2020, alle ore 19:48, Dmitry Monakhov =
-<dmonakhov@gmail.com> ha scritto:
->>>=20
->>> Paolo Valente <paolo.valente@linaro.org> writes:
->>>=20
->>>> Hi,
->>>> sorry for the delay.  The commit you propose to drop fix the issues
->>>> reported in [1].
->>>>=20
->>>> Such a commit does introduce the leak that you report (thank you =
-for
->>>> spotting it).  Yet, according to the threads mentioned in [1],
->>>> dropping that commit would take us back to those issues.
->>>>=20
->>>> Maybe the solution is to fix the unbalance that you spotted?
->>> I'm not quite shure that do I understand which bug was addressed for =
-commit db37a34c563b.
->>> AFAIU both bugs mentioned in original patchset was fixed by:
->>> 478de3380 ("block, bfq: deschedule empty bfq_queues not referred by =
-any proces")
->>> f718b0932 ( block, bfq: do not plug I/O for bfq_queues with no proc =
-refs)"
->>>=20
->>> So I review commit db37a34c563b as independent one.
->>> It introduces extra reference for bfq_groups via =
-bfqg_and_blkg_get(),
->>> but do we actually need it here?
->>>=20
->>> #IF CONFIG_BFQ_GROUP_IOSCHED is enabled:
->>> bfqd->root_group is holded by bfqd from bfq_init_queue()
->>> other bfq_queue objects are owned by corresponding blkcg from =
-bfq_pd_alloc()
->>> So bfq_queue can not disappear under us.
->>>=20
->>=20
->> You are right, but incomplete.  No extra ref is needed for an entity
->> that represents a bfq_queue.  And this consideration mistook me =
-before
->> I realized that that commit was needed.  The problem is that an =
-entity
->> may also represent a group of entities.  In that case no reference is
->> taken through any bfq_queue.  The commit you want to remove takes =
-this
->> missing reference.
-> Sorry, It looks like I've mistyped sentance above, I ment to say =
-bfq_group.
-> So here is my statement corrected:
-> #IF CONFIG_BFQ_GROUP_IOSCHED is enabled:
-> bfqd->root_group is holded by bfqd from bfq_init_queue()
-> other *bfq_group* objects are owned by corresponding blkcg, reference =
-get from bfq_pd_alloc()
-> So *bfq_group* can not disappear under us.
->=20
-> So no extra reference is required for entity represents bfq_group. =
-Commit is not required.
-
-No, the entity may remain alive and on some tree after bfq_pd_offline =
-has been invoked.
-
-Paolo
-
->>=20
->> Paolo
->>=20
->>> #IF CONFIG_BFQ_GROUP_IOSCHED is disabled:
->>> we have only one  bfqd->root_group object which allocated from =
-bfq_create_group_hierarch()
->>> and bfqg_and_blkg_get() bfqg_and_blkg_put() are noop
->>>=20
->>> Resume: in both cases extra reference is not required, so I continue =
-to
->>> insist that we should revert  commit db37a34c563b because it tries =
-to
->>> solve a non existing issue, but introduce the real one.
->>>=20
->>> Please correct me if I'm wrong.
->>>>=20
->>>> I'll check it ASAP, unless you do it before me.
->>>>=20
->>>> Thanks,
->>>> Paolo
->>>>=20
->>>> [1] https://lkml.org/lkml/2020/1/31/94
->>>>=20
->>>>> Il giorno 2 lug 2020, alle ore 12:57, Dmitry Monakhov =
-<dmonakhov@gmail.com> ha scritto:
->>>>>=20
->>>>> commit db37a34c563b ("block, bfq: get a ref to a group when adding =
-it to a service tree")
->>>>> introduce leak forbfq_group and blkcg_gq objects because of =
-get/put
->>>>> imbalance. See trace balow:
->>>>> -> blkg_alloc
->>>>> -> bfq_pq_alloc
->>>>>   -> bfqg_get (+1)
->>>>> ->bfq_activate_bfqq
->>>>> ->bfq_activate_requeue_entity
->>>>>  -> __bfq_activate_entity
->>>>>     ->bfq_get_entity
->>> ->>         ->bfqg_and_blkg_get (+1)  <=3D=3D=3D=3D : Note1
->>>>> ->bfq_del_bfqq_busy
->>>>> ->bfq_deactivate_entity+0x53/0xc0 [bfq]
->>>>>  ->__bfq_deactivate_entity+0x1b8/0x210 [bfq]
->>>>>    -> bfq_forget_entity(is_in_service =3D true)
->>>>> 	 entity->on_st_or_in_serv =3D false   <=3D=3D=3D :Note2
->>>>> 	 if (is_in_service)
->>>>> 	     return;  =3D=3D> do not touch reference
->>>>> -> blkcg_css_offline
->>>>> -> blkcg_destroy_blkgs
->>>>> -> blkg_destroy
->>>>> -> bfq_pd_offline
->>>>>  -> __bfq_deactivate_entity
->>>>>       if (!entity->on_st_or_in_serv) /* true, because (Note2)
->>>>> 		return false;
->>>>> -> bfq_pd_free
->>>>>  -> bfqg_put() (-1, byt bfqg->ref =3D=3D 2) because of (Note2)
->>>>> So bfq_group and blkcg_gq  will leak forever, see test-case below.
->>>>> If fact bfq_group objects reference counting are quite different
->>>>> from bfq_queue. bfq_groups object are referenced by blkcg_gq via
->>>>> blkg_policy_data pointer, so  neither nor blkg_get() neither =
-bfqg_get
->>>>> required here.
->>>>>=20
->>>>>=20
->>>>> This patch drop commit db37a34c563b ("block, bfq: get a ref to a =
-group when adding it to a service tree")
->>>>> and add corresponding comment.
->>>>>=20
->>>>> ##TESTCASE_BEGIN:
->>>>> #!/bin/bash
->>>>>=20
->>>>> max_iters=3D${1:-100}
->>>>> #prep cgroup mounts
->>>>> mount -t tmpfs cgroup_root /sys/fs/cgroup
->>>>> mkdir /sys/fs/cgroup/blkio
->>>>> mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
->>>>>=20
->>>>> # Prepare blkdev
->>>>> grep blkio /proc/cgroups
->>>>> truncate -s 1M img
->>>>> losetup /dev/loop0 img
->>>>> echo bfq > /sys/block/loop0/queue/scheduler
->>>>>=20
->>>>> grep blkio /proc/cgroups
->>>>> for ((i=3D0;i<max_iters;i++))
->>>>> do
->>>>>  mkdir -p /sys/fs/cgroup/blkio/a
->>>>>  echo 0 > /sys/fs/cgroup/blkio/a/cgroup.procs
->>>>>  dd if=3D/dev/loop0 bs=3D4k count=3D1 of=3D/dev/null iflag=3Ddirect =
-2> /dev/null
->>>>>  echo 0 > /sys/fs/cgroup/blkio/cgroup.procs
->>>>>  rmdir /sys/fs/cgroup/blkio/a
->>>>>  grep blkio /proc/cgroups
->>>>> done
->>>>> ##TESTCASE_END:
->>>>>=20
->>>>> Signed-off-by: Dmitry Monakhov <dmonakhov@gmail.com>
->>>>> ---
->>>>> block/bfq-cgroup.c  |  2 +-
->>>>> block/bfq-iosched.h |  1 -
->>>>> block/bfq-wf2q.c    | 15 +++++----------
->>>>> 3 files changed, 6 insertions(+), 12 deletions(-)
->>>>>=20
->>>>> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
->>>>> index 68882b9..b791e20 100644
->>>>> --- a/block/bfq-cgroup.c
->>>>> +++ b/block/bfq-cgroup.c
->>>>> @@ -332,7 +332,7 @@ static void bfqg_put(struct bfq_group *bfqg)
->>>>> 		kfree(bfqg);
->>>>> }
->>>>>=20
->>>>> -void bfqg_and_blkg_get(struct bfq_group *bfqg)
->>>>> +static void bfqg_and_blkg_get(struct bfq_group *bfqg)
->>>>> {
->>>>> 	/* see comments in bfq_bic_update_cgroup for why refcounting =
-bfqg */
->>>>> 	bfqg_get(bfqg);
->>>>> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
->>>>> index cd224aa..7038952 100644
->>>>> --- a/block/bfq-iosched.h
->>>>> +++ b/block/bfq-iosched.h
->>>>> @@ -986,7 +986,6 @@ struct bfq_group *bfq_find_set_group(struct =
-bfq_data *bfqd,
->>>>> struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
->>>>> struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
->>>>> struct bfq_group *bfq_create_group_hierarchy(struct bfq_data =
-*bfqd, int node);
->>>>> -void bfqg_and_blkg_get(struct bfq_group *bfqg);
->>>>> void bfqg_and_blkg_put(struct bfq_group *bfqg);
->>>>>=20
->>>>> #ifdef CONFIG_BFQ_GROUP_IOSCHED
->>>>> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
->>>>> index 34ad095..6a363bb 100644
->>>>> --- a/block/bfq-wf2q.c
->>>>> +++ b/block/bfq-wf2q.c
->>>>> @@ -529,13 +529,14 @@ static void bfq_get_entity(struct bfq_entity =
-*entity)
->>>>> {
->>>>> 	struct bfq_queue *bfqq =3D bfq_entity_to_bfqq(entity);
->>>>>=20
->>>>> +	/* Grab reference only for bfq_queue's objects, bfq_group ones
->>>>> +	 * are owned by blkcg_gq
->>>>> +	 */
->>>>> 	if (bfqq) {
->>>>> 		bfqq->ref++;
->>>>> 		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
->>>>> 			     bfqq, bfqq->ref);
->>>>> -	} else
->>>>> -		bfqg_and_blkg_get(container_of(entity, struct bfq_group,
->>>>> -					       entity));
->>>>> +	}
->>>>> }
->>>>>=20
->>>>> /**
->>>>> @@ -649,14 +650,8 @@ static void bfq_forget_entity(struct =
-bfq_service_tree *st,
->>>>>=20
->>>>> 	entity->on_st_or_in_serv =3D false;
->>>>> 	st->wsum -=3D entity->weight;
->>>>> -	if (is_in_service)
->>>>> -		return;
->>>>> -
->>>>> -	if (bfqq)
->>>>> +	if (bfqq && !is_in_service)
->>>>> 		bfq_put_queue(bfqq);
->>>>> -	else
->>>>> -		bfqg_and_blkg_put(container_of(entity, struct bfq_group,
->>>>> -					       entity));
->>>>> }
->>>>>=20
->>>>> /**
->>>>> --=20
->>>>> 2.7.4
-
+We don't actually need any new field at all.  By the time the write
+returned ki_pos contains the offset after the write, and the res
+argument to ->ki_complete contains the amount of bytes written, which
+allow us to trivially derive the starting position.
