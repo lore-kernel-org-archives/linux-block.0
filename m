@@ -2,112 +2,147 @@ Return-Path: <SRS0=lEwc=AV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC5C8C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 07:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A58C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 08:12:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9621C207F9
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 07:29:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y0p4lCNY"
+	by mail.kernel.org (Postfix) with ESMTP id ACE11207BC
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 08:12:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725851AbgGJH30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jul 2020 03:29:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35316 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726288AbgGJH3Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jul 2020 03:29:25 -0400
-Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01419C08C5DC
-        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2020 00:29:24 -0700 (PDT)
-Received: by mail-ua1-x943.google.com with SMTP id l12so1525144uak.7
-        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2020 00:29:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MTkYNwGzgj0pnyOd6/mQEfIDNv2BJD5cxzVN7vZlhGA=;
-        b=y0p4lCNYaKfzGKjhuYKHtmPHT4iXqEDmIgWN26ISyxSxBt81oHuLSHNxKPhgM3L/nj
-         cgLPf7XjGdPg1QTdRrEN1F1mm2xssHUcybsGXU4wkzDoKlHK8Ad8IQ1iKHPyEJSiAR5w
-         GSxgKc54e4fGLzDhC0xe/dZTQApa03txbWo0ZpFRlW4LCc73VeVAaB2QY/87tdBJSjzO
-         uvgQ9qau4PFqv/MGUE+C/Eh7jd/56qMSpqMBtwhQXgUEImjRD1RswdC5dV2LZdHVlpVJ
-         F4sZRiuB915rWbtTKX/KoId0n77xzcEYdmc75oWqbZ8SoIo9cBsEDPZ9DVnmV9PV7+eU
-         btAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MTkYNwGzgj0pnyOd6/mQEfIDNv2BJD5cxzVN7vZlhGA=;
-        b=Wgc3SMoBhElRZfw9U3n/0jzEEZdOHSg8Zz8FiCwGHs68XGaiiR+CE2RcJzHRW5bPcK
-         4ux8npFBcB4PCRa/lYN6FyGyNNxWbTgTSrmqiuZVIfoW6KmLtEmbjEf+ag4fRFAgaz98
-         CTwDHmLthhsN8gn8pWf4fVRLLjxRt/tq/b9URRKYHi+uUpEviTPYkB7q/gABn/zKcxf7
-         LvXOhtGQeHuufC51lWIYLTRShRdh3v55yCDkMkSIGsZak0CjFydeZ/dpedKZWPLBm0m6
-         r1PgKS1TtV/2qKFijkkzkWXfz+m3fyr7v/Av35ror/mF0zXK3uYXx4EShXwLq3EAxYLm
-         0e3g==
-X-Gm-Message-State: AOAM531nuLxHcDltS8cKBjOsewNCSSEPo0FIl9H5w1CjjoYuofXgu7Oq
-        5H6FiToHb0+EYzxOie/KxKcgacPOqWGJrKwacTkOWme/nrI=
-X-Google-Smtp-Source: ABdhPJxHNlCLh9CShjrDdywo7NsnP0aoWUv878oapDo31qCG/k1VUc7yJ0S59pkOnASjsky1KC/KK1QIO9xbZzpbFaw=
-X-Received: by 2002:ab0:6f0a:: with SMTP id r10mr57659956uah.100.1594366164126;
- Fri, 10 Jul 2020 00:29:24 -0700 (PDT)
+        id S1726536AbgGJIMJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jul 2020 04:12:09 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2451 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726496AbgGJIMI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Jul 2020 04:12:08 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 05DA8F45D4E6DACBDC9E;
+        Fri, 10 Jul 2020 09:12:07 +0100 (IST)
+Received: from [127.0.0.1] (10.47.5.154) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 10 Jul
+ 2020 09:12:05 +0100
+Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <don.brace@microsemi.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        <ming.lei@redhat.com>, <bvanassche@acm.org>, <hare@suse.com>,
+        <hch@lst.de>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-11-git-send-email-john.garry@huawei.com>
+ <d55972999b9370f947c20537e41b49bf@mail.gmail.com>
+ <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
+ <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com>
+ <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
+ <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com>
+ <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
+ <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
+Date:   Fri, 10 Jul 2020 09:10:21 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-References: <20200708122546.214579-1-hch@lst.de> <20200708122546.214579-7-hch@lst.de>
-In-Reply-To: <20200708122546.214579-7-hch@lst.de>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Fri, 10 Jul 2020 09:28:47 +0200
-Message-ID: <CAPDyKFqgHXAmc1k3BTpfUOW_iDWtyqWEcy3vRfZ3Lv3WaJwnBQ@mail.gmail.com>
-Subject: Re: [PATCH 6/6] mmc: remove the call to check_disk_change
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-xtensa@linux-xtensa.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-raid@vger.kernel.org,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.5.154]
+X-ClientProxiedBy: lhreml730-chm.china.huawei.com (10.201.108.81) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 8 Jul 2020 at 14:41, Christoph Hellwig <hch@lst.de> wrote:
->
-> The mmc driver doesn't support event notifications, which means
-> that check_disk_change is a no-op.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Feel free to add:
+>>
+>> https://github.com/hisilicon/kernel-dev/commits/private-topic-blk-mq-
+>> shared-tags-rfc-v8
+> I tested this repo + megaraid_sas shared hosttag driver. This repo (5.8-rc)
+> has CPU hotplug patch.
+> " bf0beec0607d blk-mq: drain I/O when all CPUs in a hctx are offline"
+> 
+> Looking at description of above patch and changes, it looks like
+> megaraid_sas driver can still work without shared host tag for this feature.
+> 
+> I observe CPU hotplug works irrespective of shared host tag
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+Can you be clear exactly what you mean by "irrespective of shared host tag"?
 
-Kind regards
-Uffe
+Do you mean that for your test Scsi_Host.nr_hw_queues is set to expose 
+hw queues and scsi_host_template.map_queues = blk_mq_pci_map_queues(), 
+but you just don't set the host_tagset flag?
 
-> ---
->  drivers/mmc/core/block.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-> index 4791c82f8f7c78..fa313b63413547 100644
-> --- a/drivers/mmc/core/block.c
-> +++ b/drivers/mmc/core/block.c
-> @@ -312,10 +312,7 @@ static int mmc_blk_open(struct block_device *bdev, fmode_t mode)
->
->         mutex_lock(&block_mutex);
->         if (md) {
-> -               if (md->usage == 2)
-> -                       check_disk_change(bdev);
->                 ret = 0;
-> -
->                 if ((mode & FMODE_WRITE) && md->read_only) {
->                         mmc_blk_put(md);
->                         ret = -EROFS;
-> --
-> 2.26.2
->
+  in megaraid_sas
+> on 5.8-rc.
+> 
+> Without shared host tag, megaraid driver will expose single hctx and all the
+> CPU will be mapped to hctx0.
+
+right
+
+> Any CPU offline event will have " blk_mq_hctx_notify_offline" callback in
+> blk-mq module. If we do not have this callback/patch, we will see IO
+> timeout.
+> blk_mq_hctx_notify_offline callback will make sure all the outstanding on
+> hctx0 is cleared and only after it is cleared, CPU will go offline.
+
+But that is only for when the last CPU for the hctx is going offline. If 
+nr_hw_queues == 1, then hctx0 would cover all CPUs, so that would never 
+occur during normal operation. See initial check in 
+blk_mq_hctx_notify_offline():
+
+static int blk_mq_hctx_notify_offline(unsigned int cpu, struct 
+hlist_node *node)
+{
+	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
+	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
+		return 0;
+
+> 
+> megaraid_sas driver has  internal reply_queue mapping which helps to get IO
+> completion on same cpu.  Driver get msix index from that table based on "
+> raw_smp_processor_id".
+> If table is mapped correctly at probe time,  It is not possible to pick
+> entry of offline CPU.
+> 
+> Am I missing anything ?
+
+Not sure, I think I need to be clear exactly what you're doing.
+
+> 
+> If you can help me to understand why we need shared host tag for CPU
+> hotplug, I can try to frame some test case for possible reproduction.
+
+I think it's best explained in cover letter for "blk-mq: Facilitate a 
+shared sbitmap per tagset".
+
+See points "HBA HW queues are required to be mapped to that of the 
+blk-mq hctx", "HBA LLDD would have to generate this tag internally", and 
+"blk-mq assumes the host may accept (Scsi_host.can_queue * #hw queue) 
+commands".
+> 
+>> I just updated to include the change to have Scsi_Host.host_tagset in
+>> 4291f617a02b commit ("scsi: Add host and host template flag
+>> 'host_tagset'")
+>>
+>> megaraid sas support is not on the branch yet, but I think everything else
+>> required is. And it is mutable, so I'd clone it now if I were you - or
+>> just replace
+>> the required patch onto your v7 branch.
+> I am working on this.
+> 
+
+Great, thanks
+
