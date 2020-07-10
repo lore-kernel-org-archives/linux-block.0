@@ -2,136 +2,110 @@ Return-Path: <SRS0=lEwc=AV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7F71C433E8
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 13:26:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A95C433E4
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 13:30:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FE88207DD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 13:26:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72D63207D0
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 13:30:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KcwrI94e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727082AbgGJN01 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jul 2020 09:26:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50192 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726774AbgGJN00 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jul 2020 09:26:26 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 8E585AD1E;
-        Fri, 10 Jul 2020 13:26:25 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-bcache@vger.kernel.org
-Cc:     Coly Li <colyli@suse.de>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Vlastimil Babka <vbabka@suse.com>, stable@vger.kernel.org
-Subject: [PATCH 2/2] bcache: allocate meta data pages as compound pages
-Date:   Fri, 10 Jul 2020 21:26:10 +0800
-Message-Id: <20200710132610.11756-2-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200710132610.11756-1-colyli@suse.de>
-References: <20200710132610.11756-1-colyli@suse.de>
+        id S1727038AbgGJNaO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jul 2020 09:30:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34646 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726774AbgGJNaN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Jul 2020 09:30:13 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0E1C08C5CE;
+        Fri, 10 Jul 2020 06:30:13 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id f18so5929094wml.3;
+        Fri, 10 Jul 2020 06:30:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Lae28X5NqcxG2FkZllIwJ7rLXNOqpJ0hcVAbxGcaJfo=;
+        b=KcwrI94ePdRwkKKuRogJd8GJW5bDThOJjUI7BVmH6y23YIeZAxnzrTIJ8aYRPDmkc1
+         +FIzAob5CZY0gvuCboQ/YlM0icsgy6oaztKFcopRxRuXuXpBxAPVfc/Jykb2trIlyV65
+         EQM2Zxb967Z+HD7G5XpF0GzM4TvfcqiCEwYE1EeuSMdfeyUVtEBhxqU+toyhzmFCnbf2
+         S3o1k7vViI85Rxsq6y9HQDzuWrqXfHwVjPxumG8I3jZZg0oceB02T4e0O7eUGLuvcdLa
+         9bO9qwRoot5hjvxXmk3y1awkmnn0kg4QeJDkzVLchkWVtGf0nux2hmglYpva45PAFfR6
+         876g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Lae28X5NqcxG2FkZllIwJ7rLXNOqpJ0hcVAbxGcaJfo=;
+        b=nnN7lFH1HYsY46JT/Spb5+oThT7GJN3oB8mCY4FwvPvJkQdpwwssBxbd5O2kTBM1ex
+         i4ISQISo7zHfdJ95Nzmra2HYJLxoPpegO9X7l4qn68Yn5YrRfy2LjYfa2YOlM3WlW9Zm
+         /fTe0c6PhccleszEeNFMuRSqsDyzWKBRyf4eH4QBvlo4ZRgjc5TKniWl+mGohuwnj5L3
+         QTnha61SOqPQnWRPA70CblcmDP1ipkJlZY2cW9h6oJwpee2XFvgqMDc2pdzak3uF8OfD
+         OpCDJrHyDbkKWZeMrhzbbEfnX9H36wdRW5SkF5mcs2BJ1sjOByB3nXMoWQZ6a7eYcv4g
+         hJnA==
+X-Gm-Message-State: AOAM531rYXUuBN8xusyef0pBj2FEpq3dEs6I9x8JNzNPPeZ3mMxMbrra
+        eu6OCEJDEgHxwzpbHfoA5V/ckMWu6ImXpT9+6Dc=
+X-Google-Smtp-Source: ABdhPJxV6sZDd/duo2t8dOTY3pdMfPW0OzsDpz5mQA4e2iT3L9zXWuR/crJcD3LQi6MzOrxc+eK7xqhsbYwEDDNTizk=
+X-Received: by 2002:a7b:cc92:: with SMTP id p18mr5455500wma.4.1594387811885;
+ Fri, 10 Jul 2020 06:30:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1593974870-18919-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200705185227epcas5p16fba3cb92561794b960184c89fdf2bb7@epcas5p1.samsung.com>
+ <1593974870-18919-5-git-send-email-joshi.k@samsung.com> <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk>
+ <20200709085501.GA64935@infradead.org> <adc14700-8e95-10b2-d914-afa5029ae80c@kernel.dk>
+ <20200709140053.GA7528@infradead.org> <2270907f-670c-5182-f4ec-9756dc645376@kernel.dk>
+ <CA+1E3r+H7WEyfTufNz3xBQQynOVV-uD3myYynkfp7iU+D=Svuw@mail.gmail.com>
+ <f5e3e931-ef1b-2eb6-9a03-44dd5589c8d3@kernel.dk> <20200710130912.GA7491@infradead.org>
+In-Reply-To: <20200710130912.GA7491@infradead.org>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Fri, 10 Jul 2020 18:59:45 +0530
+Message-ID: <CA+1E3rJSiS58TE=hHv5wVv-umJ19_7zKv-JqZTNzD=xi3MoX1g@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
+        viro@zeniv.linux.org.uk, bcrl@kvack.org, Damien.LeMoal@wdc.com,
+        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+        "Matias Bj??rling" <mb@lightnvm.io>, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are some meta data of bcache are allocated by multiple pages,
-and they are used as bio bv_page for I/Os to the cache device. for
-example cache_set->uuids, cache->disk_buckets, journal_write->data,
-bset_tree->data.
+On Fri, Jul 10, 2020 at 6:39 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Thu, Jul 09, 2020 at 12:50:27PM -0600, Jens Axboe wrote:
+> > It might, if you have IRQ context for the completion. task_work isn't
+> > expensive, however. It's not like a thread offload.
+> >
+> > > Using flags have not been liked here, but given the upheaval involved so
+> > > far I have begun to feel - it was keeping things simple. Should it be
+> > > reconsidered?
+> >
+> > It's definitely worth considering, especially since we can use cflags
+> > like Pavel suggested upfront and not need any extra storage. But it
+> > brings us back to the 32-bit vs 64-bit discussion, and then using blocks
+> > instead of bytes. Which isn't exactly super pretty.
+>
+> block doesn't work for the case of writes to files that don't have
+> to be aligned in any way.  And that I think is the more broadly
+> applicable use case than zone append on block devices.
 
-For such meta data memory, all the allocated pages should be treated
-as a single memory block. Then the memory management and underlying I/O
-code can treat them more clearly.
+But when can it happen that we do zone-append on a file (zonefs I
+asssume), and device returns a location (write-pointer essentially)
+which is not in multiple of 512b?
 
-This patch adds __GFP_COMP flag to all the location allocating >0 order
-pages for the above mentioned meta data. Then their pages are treated
-as compound pages now.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Jan Kara <jack@suse.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Vlastimil Babka <vbabka@suse.com>
-Cc: stable@vger.kernel.org
----
- drivers/md/bcache/bset.c    | 2 +-
- drivers/md/bcache/btree.c   | 2 +-
- drivers/md/bcache/journal.c | 4 ++--
- drivers/md/bcache/super.c   | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index 4995fcaefe29..67a2c47f4201 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -322,7 +322,7 @@ int bch_btree_keys_alloc(struct btree_keys *b,
- 
- 	b->page_order = page_order;
- 
--	t->data = (void *) __get_free_pages(gfp, b->page_order);
-+	t->data = (void *) __get_free_pages(__GFP_COMP|gfp, b->page_order);
- 	if (!t->data)
- 		goto err;
- 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 6548a601edf0..dd116c83de80 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -785,7 +785,7 @@ int bch_btree_cache_alloc(struct cache_set *c)
- 	mutex_init(&c->verify_lock);
- 
- 	c->verify_ondisk = (void *)
--		__get_free_pages(GFP_KERNEL, ilog2(bucket_pages(c)));
-+		__get_free_pages(GFP_KERNEL|__GFP_COMP, ilog2(bucket_pages(c)));
- 
- 	c->verify_data = mca_bucket_alloc(c, &ZERO_KEY, GFP_KERNEL);
- 
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index 90aac4e2333f..d8586b6ccb76 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -999,8 +999,8 @@ int bch_journal_alloc(struct cache_set *c)
- 	j->w[1].c = c;
- 
- 	if (!(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
--	    !(j->w[0].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)) ||
--	    !(j->w[1].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)))
-+	    !(j->w[0].data = (void *) __get_free_pages(GFP_KERNEL|__GFP_COMP, JSET_BITS)) ||
-+	    !(j->w[1].data = (void *) __get_free_pages(GFP_KERNEL|__GFP_COMP, JSET_BITS)))
- 		return -ENOMEM;
- 
- 	return 0;
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 2014016f9a60..daa4626024a2 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1776,7 +1776,7 @@ void bch_cache_set_unregister(struct cache_set *c)
- }
- 
- #define alloc_bucket_pages(gfp, c)			\
--	((void *) __get_free_pages(__GFP_ZERO|gfp, ilog2(bucket_pages(c))))
-+	((void *) __get_free_pages(__GFP_ZERO|__GFP_COMP|gfp, ilog2(bucket_pages(c))))
- 
- struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- {
 -- 
-2.26.2
-
+Joshi
