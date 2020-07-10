@@ -2,121 +2,112 @@ Return-Path: <SRS0=lEwc=AV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF26C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 00:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC5C8C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 07:29:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D8562073A
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 00:54:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9621C207F9
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jul 2020 07:29:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ql0Vnz3c"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y0p4lCNY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbgGJAyL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jul 2020 20:54:11 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42437 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726311AbgGJAyK (ORCPT
+        id S1725851AbgGJH30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jul 2020 03:29:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35316 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726288AbgGJH3Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Jul 2020 20:54:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594342449;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EapRtSU2QNt1NzNhoxrX4bLoQr998x+J/E2XwR1l2wY=;
-        b=Ql0Vnz3ccD5qIBsLwMqvYQTxACLRfXa1ADHL1fExQ2q8CxLupXD15nNk+mPQta6OwM+mRV
-        Dbl2GNCdCvIbEM16Ns0cdAj+GNlhnNuIHj18I12EwaK/7Z+a0P197CCjZOpIK1SWrtrDEB
-        cZHt+iQu+pThiM/Smm/aE/14Q1OX8ck=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-cC4wDhvXNY-8nX_D1WALmA-1; Thu, 09 Jul 2020 20:54:05 -0400
-X-MC-Unique: cC4wDhvXNY-8nX_D1WALmA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 645738015FB;
-        Fri, 10 Jul 2020 00:54:04 +0000 (UTC)
-Received: from T590 (ovpn-12-70.pek2.redhat.com [10.72.12.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B940E60C80;
-        Fri, 10 Jul 2020 00:53:58 +0000 (UTC)
-Date:   Fri, 10 Jul 2020 08:53:54 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Florian-Ewald Mueller <florian-ewald.mueller@cloud.ionos.com>
-Subject: Re: [PATCH RFC 4/5] block: add a statistic table for io latency
-Message-ID: <20200710005354.GA3395574@T590>
-References: <20200708075819.4531-1-guoqing.jiang@cloud.ionos.com>
- <20200708075819.4531-5-guoqing.jiang@cloud.ionos.com>
- <20200708132958.GC3340386@T590>
- <eb2cf4d0-4260-8f10-0ba9-3cbf4ff85449@cloud.ionos.com>
- <b37dd9cd-aebc-88ee-2b09-ac4eb36ca0f7@cloud.ionos.com>
- <cc04e449-3d41-3ef7-10c2-c257512d7650@cloud.ionos.com>
+        Fri, 10 Jul 2020 03:29:25 -0400
+Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01419C08C5DC
+        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2020 00:29:24 -0700 (PDT)
+Received: by mail-ua1-x943.google.com with SMTP id l12so1525144uak.7
+        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2020 00:29:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MTkYNwGzgj0pnyOd6/mQEfIDNv2BJD5cxzVN7vZlhGA=;
+        b=y0p4lCNYaKfzGKjhuYKHtmPHT4iXqEDmIgWN26ISyxSxBt81oHuLSHNxKPhgM3L/nj
+         cgLPf7XjGdPg1QTdRrEN1F1mm2xssHUcybsGXU4wkzDoKlHK8Ad8IQ1iKHPyEJSiAR5w
+         GSxgKc54e4fGLzDhC0xe/dZTQApa03txbWo0ZpFRlW4LCc73VeVAaB2QY/87tdBJSjzO
+         uvgQ9qau4PFqv/MGUE+C/Eh7jd/56qMSpqMBtwhQXgUEImjRD1RswdC5dV2LZdHVlpVJ
+         F4sZRiuB915rWbtTKX/KoId0n77xzcEYdmc75oWqbZ8SoIo9cBsEDPZ9DVnmV9PV7+eU
+         btAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MTkYNwGzgj0pnyOd6/mQEfIDNv2BJD5cxzVN7vZlhGA=;
+        b=Wgc3SMoBhElRZfw9U3n/0jzEEZdOHSg8Zz8FiCwGHs68XGaiiR+CE2RcJzHRW5bPcK
+         4ux8npFBcB4PCRa/lYN6FyGyNNxWbTgTSrmqiuZVIfoW6KmLtEmbjEf+ag4fRFAgaz98
+         CTwDHmLthhsN8gn8pWf4fVRLLjxRt/tq/b9URRKYHi+uUpEviTPYkB7q/gABn/zKcxf7
+         LvXOhtGQeHuufC51lWIYLTRShRdh3v55yCDkMkSIGsZak0CjFydeZ/dpedKZWPLBm0m6
+         r1PgKS1TtV/2qKFijkkzkWXfz+m3fyr7v/Av35ror/mF0zXK3uYXx4EShXwLq3EAxYLm
+         0e3g==
+X-Gm-Message-State: AOAM531nuLxHcDltS8cKBjOsewNCSSEPo0FIl9H5w1CjjoYuofXgu7Oq
+        5H6FiToHb0+EYzxOie/KxKcgacPOqWGJrKwacTkOWme/nrI=
+X-Google-Smtp-Source: ABdhPJxHNlCLh9CShjrDdywo7NsnP0aoWUv878oapDo31qCG/k1VUc7yJ0S59pkOnASjsky1KC/KK1QIO9xbZzpbFaw=
+X-Received: by 2002:ab0:6f0a:: with SMTP id r10mr57659956uah.100.1594366164126;
+ Fri, 10 Jul 2020 00:29:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cc04e449-3d41-3ef7-10c2-c257512d7650@cloud.ionos.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20200708122546.214579-1-hch@lst.de> <20200708122546.214579-7-hch@lst.de>
+In-Reply-To: <20200708122546.214579-7-hch@lst.de>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Fri, 10 Jul 2020 09:28:47 +0200
+Message-ID: <CAPDyKFqgHXAmc1k3BTpfUOW_iDWtyqWEcy3vRfZ3Lv3WaJwnBQ@mail.gmail.com>
+Subject: Re: [PATCH 6/6] mmc: remove the call to check_disk_change
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-xtensa@linux-xtensa.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-raid@vger.kernel.org,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Guoqing,
+On Wed, 8 Jul 2020 at 14:41, Christoph Hellwig <hch@lst.de> wrote:
+>
+> The mmc driver doesn't support event notifications, which means
+> that check_disk_change is a no-op.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-On Thu, Jul 09, 2020 at 08:48:08PM +0200, Guoqing Jiang wrote:
-> Hi Ming,
-> 
-> On 7/8/20 4:06 PM, Guoqing Jiang wrote:
-> > On 7/8/20 4:02 PM, Guoqing Jiang wrote:
-> > > > Hi Guoqing,
-> > > > 
-> > > > I believe it isn't hard to write a ebpf based script(bcc or
-> > > > bpftrace) to
-> > > > collect this kind of performance data, so looks not necessary to do it
-> > > > in kernel.
-> > > 
-> > > Hi Ming,
-> > > 
-> > > Sorry, I don't know well about bcc or bpftrace, but I assume they
-> > > need to
-> > > read the latency value from somewhere inside kernel. Could you point
-> > > how can I get the latency value? Thanks in advance!
-> > 
-> > Hmm, I suppose biolatency is suitable for track latency, will look into
-> > it.
-> 
-> I think biolatency can't trace data if it is not running,
+Feel free to add:
 
-Yeah, the ebpf prog is only injected when the trace is started.
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-> also seems no
-> place
-> inside kernel have recorded such information for ebpf to read, correct me
-> if my understanding is wrong.
+Kind regards
+Uffe
 
-Just record the info by starting the bcc script in case you need that, is there
-anything wrong with this usage? Always doing such stuff in kernel isn't fair for
-users which don't care or need this info.
-
-> 
-> And as cloud provider,we would like to know data when necessary instead
-> of collect data by keep script running because it is expensive than just
-> read
-> node IMHO.
-
-It shouldn't be expensive. It might be a bit slow to inject the ebpf prog because
-the code has to be verified, however once it is put inside kernel, it should have
-been efficient enough. The kernel side prog only updates & stores the latency
-summery data into bpf map, and the stored summery data can be read out anytime
-by userspace.
-
-Could you explain a bit why it is expensive? such as biolatency
-
-
-Thanks, 
-Ming
-
+> ---
+>  drivers/mmc/core/block.c | 3 ---
+>  1 file changed, 3 deletions(-)
+>
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index 4791c82f8f7c78..fa313b63413547 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -312,10 +312,7 @@ static int mmc_blk_open(struct block_device *bdev, fmode_t mode)
+>
+>         mutex_lock(&block_mutex);
+>         if (md) {
+> -               if (md->usage == 2)
+> -                       check_disk_change(bdev);
+>                 ret = 0;
+> -
+>                 if ((mode & FMODE_WRITE) && md->read_only) {
+>                         mmc_blk_put(md);
+>                         ret = -EROFS;
+> --
+> 2.26.2
+>
