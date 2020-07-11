@@ -2,161 +2,146 @@ Return-Path: <SRS0=SfXy=AW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B832C433E2
-	for <linux-block@archiver.kernel.org>; Sat, 11 Jul 2020 01:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BA8C433E1
+	for <linux-block@archiver.kernel.org>; Sat, 11 Jul 2020 05:34:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F26A42075F
-	for <linux-block@archiver.kernel.org>; Sat, 11 Jul 2020 01:32:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZMJXNE7y"
+	by mail.kernel.org (Postfix) with ESMTP id 5BB8220720
+	for <linux-block@archiver.kernel.org>; Sat, 11 Jul 2020 05:34:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726606AbgGKBc2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jul 2020 21:32:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31886 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726605AbgGKBc2 (ORCPT
+        id S1727118AbgGKFeV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Jul 2020 01:34:21 -0400
+Received: from mail-io1-f70.google.com ([209.85.166.70]:44483 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726900AbgGKFeU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jul 2020 21:32:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594431146;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ywzfmEJAR9HCZOYfuzPomOjeA+xI/lNXbKtFBrGVazk=;
-        b=ZMJXNE7yywjoaCC+7o+xVaJ5IcbpgXHB+PKrQ4uJuHgzNkp0CmMs3wp7EOrF89zMxCtoiv
-        0QUt8pGbDeYBBwt+/Ptnp1sxFLYwynIfQO4uf2cKcXzxP/0cRRS2XrpX40mNATdc/m9xC2
-        O9FbDtogEKCXunNzUcxEURvn9x9UCTs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-dl7J0iv9P2SD5pf7Zx83-A-1; Fri, 10 Jul 2020 21:32:24 -0400
-X-MC-Unique: dl7J0iv9P2SD5pf7Zx83-A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F111F1080;
-        Sat, 11 Jul 2020 01:32:22 +0000 (UTC)
-Received: from T590 (ovpn-12-86.pek2.redhat.com [10.72.12.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 37A6C7EF9C;
-        Sat, 11 Jul 2020 01:32:16 +0000 (UTC)
-Date:   Sat, 11 Jul 2020 09:32:12 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Florian-Ewald Mueller <florian-ewald.mueller@cloud.ionos.com>
-Subject: Re: [PATCH RFC 4/5] block: add a statistic table for io latency
-Message-ID: <20200711013212.GA3426141@T590>
-References: <20200708075819.4531-1-guoqing.jiang@cloud.ionos.com>
- <20200708075819.4531-5-guoqing.jiang@cloud.ionos.com>
- <20200708132958.GC3340386@T590>
- <eb2cf4d0-4260-8f10-0ba9-3cbf4ff85449@cloud.ionos.com>
- <b37dd9cd-aebc-88ee-2b09-ac4eb36ca0f7@cloud.ionos.com>
- <cc04e449-3d41-3ef7-10c2-c257512d7650@cloud.ionos.com>
- <20200710005354.GA3395574@T590>
- <f1243a13-8773-f943-a6c3-021cde0eb661@cloud.ionos.com>
- <20200710100051.GA3418163@T590>
- <c772fa01-2fe3-b72f-a7d9-193dde7b165c@cloud.ionos.com>
+        Sat, 11 Jul 2020 01:34:20 -0400
+Received: by mail-io1-f70.google.com with SMTP id h15so4924958ioj.11
+        for <linux-block@vger.kernel.org>; Fri, 10 Jul 2020 22:34:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=xQqkzXJSiBOJC7uDqFIe38A+OBOOU1MTrcP1CTp3drI=;
+        b=e3Z3DYdih5mbRDEhuKmRcntgMTFFecYHOPXDyz91E89slggmFy1xFDR0nHPXlGdx/O
+         fGqgW9cYS/XeXUSAv5eztHMYNaxGYZWj0L+mRyqfe7RIlOnpe93/HnIRCo4kymrmXZuY
+         lEc2yp3U60MlCUxyu4JjEh5kN6+3iZukCVMOJD1A6eWFyjp/0ru/eQeqIGVZeyquSqFe
+         aWAlSMtALaOBbCeQqVaXIlqhRZZH/8vck49Je2s6B3bnh9xwEoj6lxrhzcxDoQGnpZXW
+         QiJKt4XWuwB32jzJwj1/3WS1P4LyPYlBFBCVvtk6IoSmTH+ED34kZhAeUdawxcbSK/R9
+         ZMGg==
+X-Gm-Message-State: AOAM530A9j1Civ1Bxq5g/v35njvO8NYhgAtyaxUeIORWAcuh28dm+Y1A
+        Z3cxkwP1ZZbb4NzBOCjR6EnyN3w/t7Mo1y0txXDmOvht5vcM
+X-Google-Smtp-Source: ABdhPJy3gXGHkaStF2y9rzpoQ6EvN0VBPV0QVIj+hwYXeTq8RkWJR/T8QvD8x+5OqQMBPfG1KhEoxyJ1abEqc9VmvIrdNLoy9KEE
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c772fa01-2fe3-b72f-a7d9-193dde7b165c@cloud.ionos.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Received: by 2002:a92:a196:: with SMTP id b22mr25062377ill.303.1594445659724;
+ Fri, 10 Jul 2020 22:34:19 -0700 (PDT)
+Date:   Fri, 10 Jul 2020 22:34:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000029663005aa23cff4@google.com>
+Subject: WARNING in submit_bio_checks
+From:   syzbot <syzbot+4c50ac32e5b10e4133e1@syzkaller.appspotmail.com>
+To:     andriin@fb.com, ast@kernel.org, axboe@kernel.dk,
+        bpf@vger.kernel.org, daniel@iogearbox.net,
+        john.fastabend@gmail.com, kafai@fb.com, kpsingh@chromium.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, songliubraving@fb.com,
+        syzkaller-bugs@googlegroups.com, yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 12:29:28PM +0200, Guoqing Jiang wrote:
-> On 7/10/20 12:00 PM, Ming Lei wrote:
-> > On Fri, Jul 10, 2020 at 10:55:24AM +0200, Guoqing Jiang wrote:
-> > > Hi Ming,
-> > > 
-> > > On 7/10/20 2:53 AM, Ming Lei wrote:
-> > > > Hi Guoqing,
-> > > > 
-> > > > On Thu, Jul 09, 2020 at 08:48:08PM +0200, Guoqing Jiang wrote:
-> > > > > Hi Ming,
-> > > > > 
-> > > > > On 7/8/20 4:06 PM, Guoqing Jiang wrote:
-> > > > > > On 7/8/20 4:02 PM, Guoqing Jiang wrote:
-> > > > > > > > Hi Guoqing,
-> > > > > > > > 
-> > > > > > > > I believe it isn't hard to write a ebpf based script(bcc or
-> > > > > > > > bpftrace) to
-> > > > > > > > collect this kind of performance data, so looks not necessary to do it
-> > > > > > > > in kernel.
-> > > > > > > Hi Ming,
-> > > > > > > 
-> > > > > > > Sorry, I don't know well about bcc or bpftrace, but I assume they
-> > > > > > > need to
-> > > > > > > read the latency value from somewhere inside kernel. Could you point
-> > > > > > > how can I get the latency value? Thanks in advance!
-> > > > > > Hmm, I suppose biolatency is suitable for track latency, will look into
-> > > > > > it.
-> > > > > I think biolatency can't trace data if it is not running,
-> > > > Yeah, the ebpf prog is only injected when the trace is started.
-> > > > 
-> > > > > also seems no
-> > > > > place
-> > > > > inside kernel have recorded such information for ebpf to read, correct me
-> > > > > if my understanding is wrong.
-> > > > Just record the info by starting the bcc script in case you need that, is there
-> > > > anything wrong with this usage? Always doing such stuff in kernel isn't fair for
-> > > > users which don't care or need this info.
-> > > That is why we add a Kconfig option and set it to N by default. And I
-> > > suppose
-> > > with modern cpu, the cost with several more instructions would not be that
-> > > expensive even the option is enabled, just my $0.02.
-> > > 
-> > > > > And as cloud provider,we would like to know data when necessary instead
-> > > > > of collect data by keep script running because it is expensive than just
-> > > > > read
-> > > > > node IMHO.
-> > > > It shouldn't be expensive. It might be a bit slow to inject the ebpf prog because
-> > > > the code has to be verified, however once it is put inside kernel, it should have
-> > > > been efficient enough. The kernel side prog only updates & stores the latency
-> > > > summery data into bpf map, and the stored summery data can be read out anytime
-> > > > by userspace.
-> > > > 
-> > > > Could you explain a bit why it is expensive? such as biolatency
-> > > I thought I am compare read a sys node + extra instructions in kernel with
-> > > launch a specific process for monitoring which need to occupy more
-> > > resources (memory) and context switch. And for biolatency, it calls the
-> > > bpf_ktime_get_ns to calculate latency for each IO which I assume the
-> > > ktime_get_ns will be triggered finally, and it is not cheap as you said.
-> > You can replace one read of timestamp with rq->start_time_ns too, just
-> > like what this patch does. You can write your bcc/bfptrace script,
-> > which is quite easy to start. Once you learn its power, maybe you will love
-> > it.
-> 
-> Yes, I definitely need to learn more about it :-). But even with the change,
-> I still believe read a node is cheaper than a script.
-> 
-> And seems biolatency can't trace bio based driver per below, and with
-> collect data in tree we can trace all block drivers.
-> 
-> # load BPF program
-> b = BPF(text=bpf_text)
-> if args.queued:
->     b.attach_kprobe(event="blk_account_io_start", fn_name="trace_req_start")
-> else:
->     b.attach_kprobe(event="blk_start_request", fn_name="trace_req_start")
->     b.attach_kprobe(event="blk_mq_start_request", fn_name="trace_req_start")
-> b.attach_kprobe(event="blk_account_io_completion",
->     fn_name="trace_req_completion")
-> 
-> Could it possible to extend it support trace both request and bio? Otherwise
-> we have to run another script to trace md raid.
+Hello,
 
-It is pretty easy to extend support bio, just add kprobe on submit_bio
-and bio_endio().
+syzbot found the following crash on:
 
-thanks,
-Ming
+HEAD commit:    9e50b94b Add linux-next specific files for 20200703
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=112aaa1f100000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f99cc0faa1476ed6
+dashboard link: https://syzkaller.appspot.com/bug?extid=4c50ac32e5b10e4133e1
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1111fb6d100000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1218fa1f100000
 
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+4c50ac32e5b10e4133e1@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+Trying to write to read-only block-device nullb0 (partno 0)
+WARNING: CPU: 0 PID: 6821 at block/blk-core.c:857 bio_check_ro block/blk-core.c:857 [inline]
+WARNING: CPU: 0 PID: 6821 at block/blk-core.c:857 submit_bio_checks+0x1aba/0x1f70 block/blk-core.c:985
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 6821 Comm: syz-executor914 Not tainted 5.8.0-rc3-next-20200703-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x18f/0x20d lib/dump_stack.c:118
+ panic+0x2e3/0x75c kernel/panic.c:231
+ __warn.cold+0x20/0x45 kernel/panic.c:600
+ report_bug+0x1bd/0x210 lib/bug.c:198
+ handle_bug+0x38/0x90 arch/x86/kernel/traps.c:235
+ exc_invalid_op+0x13/0x40 arch/x86/kernel/traps.c:255
+ asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:563
+RIP: 0010:bio_check_ro block/blk-core.c:857 [inline]
+RIP: 0010:submit_bio_checks+0x1aba/0x1f70 block/blk-core.c:985
+Code: 04 00 00 45 8b a4 24 a4 05 00 00 48 8d 74 24 68 48 89 ef e8 b8 21 fe ff 48 c7 c7 e0 ce 91 88 48 89 c6 44 89 e2 e8 08 df c0 fd <0f> 0b 48 b8 00 00 00 00 00 fc ff df 4c 89 ea 48 c1 ea 03 80 3c 02
+RSP: 0018:ffffc90001277338 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: ffff8880a0cb2240 RCX: 0000000000000000
+RDX: ffff8880a8ebc180 RSI: ffffffff815d7d27 RDI: fffff5200024ee59
+RBP: ffff8880a03101c0 R08: 0000000000000001 R09: ffff8880ae6318e7
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: ffff8880a03101c8 R14: 0000000000000000 R15: ffff8880a03101e8
+ submit_bio_noacct+0x89/0x12d0 block/blk-core.c:1198
+ submit_bio+0x263/0x5b0 block/blk-core.c:1283
+ submit_bh_wbc+0x685/0x8e0 fs/buffer.c:3105
+ __block_write_full_page+0x837/0x12e0 fs/buffer.c:1848
+ block_write_full_page+0x214/0x270 fs/buffer.c:3034
+ __writepage+0x60/0x170 mm/page-writeback.c:2311
+ write_cache_pages+0x736/0x11b0 mm/page-writeback.c:2246
+ generic_writepages mm/page-writeback.c:2337 [inline]
+ generic_writepages+0xe2/0x150 mm/page-writeback.c:2326
+ do_writepages+0xec/0x290 mm/page-writeback.c:2352
+ __filemap_fdatawrite_range+0x2a1/0x380 mm/filemap.c:422
+ filemap_write_and_wait_range mm/filemap.c:655 [inline]
+ filemap_write_and_wait_range+0xe1/0x1c0 mm/filemap.c:649
+ filemap_write_and_wait include/linux/fs.h:2629 [inline]
+ __sync_blockdev fs/block_dev.c:480 [inline]
+ sync_blockdev fs/block_dev.c:489 [inline]
+ __blkdev_put+0x69a/0x890 fs/block_dev.c:1863
+ blkdev_close+0x8c/0xb0 fs/block_dev.c:1947
+ __fput+0x33c/0x880 fs/file_table.c:281
+ task_work_run+0xdd/0x190 kernel/task_work.c:135
+ exit_task_work include/linux/task_work.h:25 [inline]
+ do_exit+0xb72/0x2a40 kernel/exit.c:806
+ do_group_exit+0x125/0x310 kernel/exit.c:904
+ __do_sys_exit_group kernel/exit.c:915 [inline]
+ __se_sys_exit_group kernel/exit.c:913 [inline]
+ __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:913
+ do_syscall_64+0x60/0xe0 arch/x86/entry/common.c:367
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x43ee48
+Code: Bad RIP value.
+RSP: 002b:00007ffdd4c8f808 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 000000000043ee48
+RDX: 0000000000000000 RSI: 000000000000003c RDI: 0000000000000000
+RBP: 00000000004be648 R08: 00000000000000e7 R09: ffffffffffffffd0
+R10: 0000000000000003 R11: 0000000000000246 R12: 0000000000000001
+R13: 00000000006d0180 R14: 0000000000000000 R15: 0000000000000000
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
