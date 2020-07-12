@@ -1,95 +1,302 @@
-Return-Path: <SRS0=SfXy=AW=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=lQ3E=AX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F8FC433E1
-	for <linux-block@archiver.kernel.org>; Sat, 11 Jul 2020 15:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6DE3C433DF
+	for <linux-block@archiver.kernel.org>; Sun, 12 Jul 2020 06:19:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03D922075F
-	for <linux-block@archiver.kernel.org>; Sat, 11 Jul 2020 15:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BA7920725
+	for <linux-block@archiver.kernel.org>; Sun, 12 Jul 2020 06:19:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BYy9wj6h"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Na+UhwAz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728505AbgGKP1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Jul 2020 11:27:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48056 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728415AbgGKP1s (ORCPT
+        id S1727946AbgGLGT3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Jul 2020 02:19:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54924 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727777AbgGLGT3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Jul 2020 11:27:48 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC58C08C5DD
-        for <linux-block@vger.kernel.org>; Sat, 11 Jul 2020 08:27:47 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id p1so3456911pls.4
-        for <linux-block@vger.kernel.org>; Sat, 11 Jul 2020 08:27:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=aJhe6zCH1WNKrcTnZAWBMSujOY8veheAqOunmYv7YNY=;
-        b=BYy9wj6hr+/2xBff/O9U6Mv8X2RuoxrhGspttITfJd4H8BT42Uvff1YmrFUq1cxZjM
-         /RlLAChkcLmFmI+uTo4zm5wijjEeCSEKarUvluxfkHEzzxmXiQlqMrHG2/F4iJIIcrUU
-         dlISfhoybUvWlEufXBVpXrUwypgMaxD7ZGIprD/q16PiAC6VPerZ8yOEw6qfLn7b1gxp
-         yBLasf14IkCYP1/Sbgl7pveb8Ap5sLlIU6Tn0JjWQLLV63+9FPOd+AGwZ5hKOXwD6lbs
-         /+Tf7pb6hwTXQ6mywbOPTiiiCpJe3T/y4srOH3PaOr0xp8zFTuVKircjNbS/AODWG60I
-         bEaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aJhe6zCH1WNKrcTnZAWBMSujOY8veheAqOunmYv7YNY=;
-        b=FlvoyK4ReDBYPDSfGc5F5CD2L+0T2rZ1kfII2ChSNYCxb6hfm+LlF/WAZnvctTcmc0
-         uySrOGyjYg78fWj+doU76CCMleoHlPj7e6LwKmMtPFGoQ1cpypqdnemTuJob63xCQ2ZN
-         /FsoB4qn/Xs1AD2beutcc4AHQY6Q0K9+05Q/jhP7DnEIO3yQ6RcqzriDYRaXlpm2G89J
-         ws8WFK3Cb1/z2dt/sE0+XhmbrZR4CAuyXeYfqRzkwi/4nF3YIAEyOT28RIpOoE26T6H9
-         AvtjQ3C8/X1qnsjLTCJScCywHtX4oPMXbxnVRHZ6OJ4GZrzoE3a42QgWQIAOkQNwf3lG
-         oGxQ==
-X-Gm-Message-State: AOAM533MEVbh0nua4mmaNpurA1afjQBLwkrjGoufOqcilG6ml71GgU6G
-        VN6WArMtlwh5+4GfU2QZZD6nbQ==
-X-Google-Smtp-Source: ABdhPJyBB95eQ4mlp1x88D2vqXWSfX0Jo3FgIJzOV4+vOR092AfZ2VdaRT1r4N6tEvSEQtk9/OdRQw==
-X-Received: by 2002:a17:90b:1b06:: with SMTP id nu6mr11139688pjb.106.1594481267471;
-        Sat, 11 Jul 2020 08:27:47 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id cv7sm8923477pjb.9.2020.07.11.08.27.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Jul 2020 08:27:46 -0700 (PDT)
-Subject: Re: [PATCH] rsxx: switch from 'pci_free_consistent()' to
- 'dma_free_coherent()'
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        josh.h.morris@us.ibm.com, pjk1939@linux.ibm.com, hch@infradead.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-References: <20200711064647.247564-1-christophe.jaillet@wanadoo.fr>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c885edac-8de8-ba4c-c8bc-98654417ce20@kernel.dk>
-Date:   Sat, 11 Jul 2020 09:27:45 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Sun, 12 Jul 2020 02:19:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594534766;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=HVoZv94t4Yae5Xv7UQafHcjUA5iqkdv1UYo9U0yRmCE=;
+        b=Na+UhwAzpugAMqgMDhQ2WiXg/yvzfJ1dCryxDRMHjoTyYhn09RjtnD2JWXaz2+feYOdqyN
+        fR1PCOItW6iRPVtFiuF79ifWTn5ivL43D9oM1pM2Uk9ByVIJpPChwj3PXkvf27R171O7hk
+        oead/YZIfwcKcE6GDgM9Bthj7RdDj2c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-n-WBoUnMPbyUtFDVAku9iA-1; Sun, 12 Jul 2020 02:19:23 -0400
+X-MC-Unique: n-WBoUnMPbyUtFDVAku9iA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D22F102C7E9;
+        Sun, 12 Jul 2020 06:19:22 +0000 (UTC)
+Received: from [10.130.8.232] (unknown [10.0.117.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A9B6078A43;
+        Sun, 12 Jul 2020 06:19:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20200711064647.247564-1-christophe.jaillet@wanadoo.fr>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   CKI Project <cki-project@redhat.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: =?utf-8?b?4pyF?= PASS: Test report for kernel 5.8.0-rc4-2057de4.cki
+ (block)
+Date:   Sun, 12 Jul 2020 06:19:18 -0000
+Message-ID: <cki.9AC8D1D210.PV9EAT3MK9@redhat.com>
+X-Gitlab-Pipeline-ID: 610008
+X-Gitlab-Url: https://xci32.lab.eng.rdu2.redhat.com/
+X-Gitlab-Path: /cki-project/cki-pipeline/pipelines/610008
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/11/20 12:46 AM, Christophe JAILLET wrote:
-> The wrappers in include/linux/pci-dma-compat.h should go away.
-> 
-> The patch has been generated with the coccinelle script bellow.
-> It has been compile tested.
-> 
-> This also aligns code with what is in use in '/rsxx/dma.c'
 
-Applied, thanks.
+Hello,
 
--- 
-Jens Axboe
+We ran automated tests on a recent commit from this kernel tree:
+
+       Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/lin=
+ux-block.git
+            Commit: 2057de49daee - Merge branch 'for-5.9/drivers' into for-ne=
+xt
+
+The results of these automated tests are provided below.
+
+    Overall result: PASSED
+             Merge: OK
+           Compile: OK
+             Tests: OK
+
+All kernel binaries, config files, and logs are available for download here:
+
+  https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefix=3Ddatawa=
+rehouse/2020/07/11/610008
+
+Please reply to this email if you have any questions about the tests that we
+ran or if you have any suggestions on how to make future tests more effective.
+
+        ,-.   ,-.
+       ( C ) ( K )  Continuous
+        `-',-.`-'   Kernel
+          ( I )     Integration
+           `-'
+______________________________________________________________________________
+
+Compile testing
+---------------
+
+We compiled the kernel for 4 architectures:
+
+    aarch64:
+      make options: -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    ppc64le:
+      make options: -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    s390x:
+      make options: -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    x86_64:
+      make options: -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+
+
+Hardware testing
+----------------
+We booted each kernel and ran the following tests:
+
+  aarch64:
+    Host 1:
+       =E2=9C=85 Boot test
+       =E2=9C=85 xfstests - ext4
+       =E2=9C=85 xfstests - xfs
+       =E2=9C=85 storage: software RAID testing
+       =E2=9C=85 stress: stress-ng
+       =F0=9F=9A=A7 =E2=9C=85 Storage blktests
+
+    Host 2:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9C=85 Boot test
+       =E2=9C=85 ACPI table test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 LTP
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Loopdev Sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: memfd_create
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 AMTU (Abstract Machine Test Utility)
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Ethernet drivers sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: SCSI VPD
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 POSIX pjd-fstest suites
+
+    Host 3:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9C=85 Boot test
+       =E2=9C=85 ACPI table test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 LTP
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Loopdev Sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: memfd_create
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 AMTU (Abstract Machine Test Utility)
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Ethernet drivers sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: SCSI VPD
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 POSIX pjd-fstest suites
+
+    Host 4:
+       =E2=9C=85 Boot test
+       =E2=9C=85 ACPI table test
+       =E2=9C=85 LTP
+       =E2=9C=85 Loopdev Sanity
+       =E2=9C=85 Memory function: memfd_create
+       =E2=9C=85 AMTU (Abstract Machine Test Utility)
+       =E2=9C=85 Ethernet drivers sanity
+       =E2=9C=85 storage: SCSI VPD
+       =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+
+  ppc64le:
+    Host 1:
+       =E2=9C=85 Boot test
+       =F0=9F=9A=A7 =E2=9C=85 kdump - sysrq-c
+
+    Host 2:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9C=85 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 LTP
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Loopdev Sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: memfd_create
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 AMTU (Abstract Machine Test Utility)
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Ethernet drivers sanity
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 POSIX pjd-fstest suites
+
+    Host 3:
+       =E2=9C=85 Boot test
+       =E2=9C=85 xfstests - ext4
+       =E2=9C=85 xfstests - xfs
+       =E2=9C=85 storage: software RAID testing
+       =F0=9F=9A=A7 =E2=9C=85 Storage blktests
+
+  s390x:
+    Host 1:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9C=85 Boot test
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 kdump - sysrq-c
+
+    Host 2:
+       =E2=9C=85 Boot test
+       =E2=9C=85 stress: stress-ng
+       =F0=9F=9A=A7 =E2=9C=85 Storage blktests
+
+    Host 3:
+       =E2=9C=85 Boot test
+       =E2=9C=85 LTP
+       =E2=9C=85 Loopdev Sanity
+       =E2=9C=85 Memory function: memfd_create
+       =E2=9C=85 Ethernet drivers sanity
+       =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+
+  x86_64:
+    Host 1:
+       =E2=9C=85 Boot test
+       =E2=9C=85 kdump - sysrq-c - megaraid_sas
+
+    Host 2:
+       =E2=9C=85 Boot test
+       =E2=9C=85 Storage SAN device stress - lpfc driver
+
+    Host 3:
+       =E2=9C=85 Boot test
+       =F0=9F=9A=A7 =E2=9C=85 kdump - sysrq-c - mpt3sas_gen1
+
+    Host 4:
+       =E2=9C=85 Boot test
+       =E2=9C=85 Storage SAN device stress - qla2xxx driver
+
+    Host 5:
+       =E2=9C=85 Boot test
+       =E2=9C=85 Storage SAN device stress - mpt3sas_gen1
+
+    Host 6:
+       =E2=9C=85 Boot test
+       =E2=9C=85 Storage SAN device stress - qedf driver
+
+    Host 7:
+       =E2=9C=85 Boot test
+       =E2=9C=85 ACPI table test
+       =E2=9C=85 LTP
+       =E2=9C=85 Loopdev Sanity
+       =E2=9C=85 Memory function: memfd_create
+       =E2=9C=85 AMTU (Abstract Machine Test Utility)
+       =E2=9C=85 Ethernet drivers sanity
+       =E2=9C=85 storage: SCSI VPD
+       =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+
+    Host 8:
+       =E2=9C=85 Boot test
+       =F0=9F=9A=A7 =E2=9C=85 kdump - sysrq-c
+
+    Host 9:
+       =E2=9C=85 Boot test
+       =E2=9C=85 xfstests - ext4
+       =E2=9C=85 xfstests - xfs
+       =E2=9C=85 storage: software RAID testing
+       =E2=9C=85 stress: stress-ng
+       =F0=9F=9A=A7 =E2=9C=85 Storage blktests
+
+  Test sources: https://gitlab.com/cki-project/kernel-tests
+    =F0=9F=92=9A Pull requests are welcome for new tests or improvements to e=
+xisting tests!
+
+Aborted tests
+-------------
+Tests that didn't complete running successfully are marked with =E2=9A=A1=E2=
+=9A=A1=E2=9A=A1.
+If this was caused by an infrastructure issue, we try to mark that
+explicitly in the report.
+
+Waived tests
+------------
+If the test run included waived tests, they are marked with =F0=9F=9A=A7. Suc=
+h tests are
+executed but their results are not taken into account. Tests are waived when
+their results are not reliable enough, e.g. when they're just introduced or a=
+re
+being fixed.
+
+Testing timeout
+---------------
+We aim to provide a report within reasonable timeframe. Tests that haven't
+finished running yet are marked with =E2=8F=B1.
 
