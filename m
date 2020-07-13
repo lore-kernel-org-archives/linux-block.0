@@ -2,66 +2,178 @@ Return-Path: <SRS0=ze0F=AY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E054FC433E2
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 10:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3534C433E5
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 11:15:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B411F20773
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 10:18:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WuQ0kxda"
+	by mail.kernel.org (Postfix) with ESMTP id 9C6592082E
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 11:15:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729518AbgGMKSp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jul 2020 06:18:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45644 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729492AbgGMKSo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jul 2020 06:18:44 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EFF1C061755;
-        Mon, 13 Jul 2020 03:18:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=0o9oacOGT+yOP9IRqdUPc2s8dF57vl7CrgaxsIQm6kY=; b=WuQ0kxda7+r8HBqZI0FTm2qhm+
-        5A9vgpkAf8rH1wmYr9cGGMxCB9LiUQKW0DN9hpk5Oh4UK/n9SNW5Wulb0Pt0qfbYfyeBv7Za3kMMm
-        hPYnPgMcWIVNDuCYT443bmjIgq8Ca3Rgo55/ecfAP9NTnGSoG/65q+OjIfCA4bvkRurASiiBCjs4F
-        Z1aw3KpdXkUMypAla0yUfu60Y20JM4i36X5ivA4NLys3HN2y/+F18dk31OdpI1A2fSJet0cEQ4XXS
-        TUenmlDt7ff0mPmWSDxtFbrzMxjay79EfqNOcFxVm4NO3MI+hKwsLn2HoaeqnCKgudpp1fV/A1BAk
-        UjLSA/Bw==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1juvXg-0000B0-6d; Mon, 13 Jul 2020 10:18:36 +0000
-Date:   Mon, 13 Jul 2020 11:18:36 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     syzbot <syzbot+4c50ac32e5b10e4133e1@syzkaller.appspotmail.com>
-Cc:     andriin@fb.com, ast@kernel.org, axboe@kernel.dk,
-        bpf@vger.kernel.org, daniel@iogearbox.net,
-        john.fastabend@gmail.com, kafai@fb.com, kpsingh@chromium.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, songliubraving@fb.com,
-        syzkaller-bugs@googlegroups.com, yhs@fb.com
-Subject: Re: WARNING in submit_bio_checks
-Message-ID: <20200713101836.GA536@infradead.org>
-References: <00000000000029663005aa23cff4@google.com>
+        id S1729485AbgGMLPM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jul 2020 07:15:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48244 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728950AbgGMLPL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Jul 2020 07:15:11 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id EBDB4B1A1;
+        Mon, 13 Jul 2020 11:15:11 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Ken Raeburn <raeburn@redhat.com>, stable@vger.kernel.org
+Subject: [PATCH v2 2/2] bcche: fix overflow in offset_to_stripe()
+Date:   Mon, 13 Jul 2020 19:15:01 +0800
+Message-Id: <20200713111501.19061-2-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200713111501.19061-1-colyli@suse.de>
+References: <20200713111501.19061-1-colyli@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00000000000029663005aa23cff4@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 10:34:19PM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following crash on:
+offset_to_stripe() returns the stripe number (in type unsigned int) from
+an offset (in type uint64_t) by the following calculation,
+	do_div(offset, d->stripe_size);
+For large capacity backing device (e.g. 18TB) with small stripe size
+(e.g. 4KB), the result is 4831838208 and exceeds UINT_MAX. The actual
+returned value which caller receives is 536870912, due to the overflow.
 
-This is not a crash, but a WARN_ONCE.  A pre-existing one that just
-slightly changed the printed message recently.
+Indeed in bcache_device_init(), bcache_device->nr_stripes is limited in
+range [1, INT_MAX]. Therefore all valid stripe numbers in bcache are
+in range [0, bcache_dev->nr_stripes - 1].
+
+This patch adds a upper limition check in offset_to_stripe(): the max
+valid stripe number should be less than bcache_device->nr_stripes. If
+the calculated stripe number from do_div() is equal to or larger than
+bcache_device->nr_stripe, -EINVAL will be returned. (Normally nr_stripes
+is less than INT_MAX, exceeding upper limitation doesn't mean overflow,
+therefore -EOVERFLOW is not used as error code.)
+
+This patch also changes nr_stripes' type of struct bcache_device from
+'unsigned int' to 'int', and return value type of offset_to_stripe()
+from 'unsigned int' to 'int', to match their exact data ranges.
+
+All locations where bcache_device->nr_stripes and offset_to_stripe() are
+referenced also get updated for the above type change.
+
+Reported-by: Ken Raeburn <raeburn@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=1783075
+Cc: stable@vger.kernel.org
+---
+Changelog:
+v2: Improve overflow fix on 32bit machine, suggested by Jens and Ken.
+v1: initial version.
+
+ drivers/md/bcache/bcache.h    |  2 +-
+ drivers/md/bcache/writeback.c | 14 +++++++++-----
+ drivers/md/bcache/writeback.h | 19 +++++++++++++++++--
+ 3 files changed, 27 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 0bfbf4729285..0ebfda284866 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -264,7 +264,7 @@ struct bcache_device {
+ #define BCACHE_DEV_UNLINK_DONE		2
+ #define BCACHE_DEV_WB_RUNNING		3
+ #define BCACHE_DEV_RATE_DW_RUNNING	4
+-	unsigned int		nr_stripes;
++	int			nr_stripes;
+ 	unsigned int		stripe_size;
+ 	atomic_t		*stripe_sectors_dirty;
+ 	unsigned long		*full_dirty_stripes;
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 5397a2c5d6cc..4f4ad6b3d43a 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -521,15 +521,19 @@ void bcache_dev_sectors_dirty_add(struct cache_set *c, unsigned int inode,
+ 				  uint64_t offset, int nr_sectors)
+ {
+ 	struct bcache_device *d = c->devices[inode];
+-	unsigned int stripe_offset, stripe, sectors_dirty;
++	unsigned int stripe_offset, sectors_dirty;
++	int stripe;
+ 
+ 	if (!d)
+ 		return;
+ 
++	stripe = offset_to_stripe(d, offset);
++	if (stripe < 0)
++		return;
++
+ 	if (UUID_FLASH_ONLY(&c->uuids[inode]))
+ 		atomic_long_add(nr_sectors, &c->flash_dev_dirty_sectors);
+ 
+-	stripe = offset_to_stripe(d, offset);
+ 	stripe_offset = offset & (d->stripe_size - 1);
+ 
+ 	while (nr_sectors) {
+@@ -569,12 +573,12 @@ static bool dirty_pred(struct keybuf *buf, struct bkey *k)
+ static void refill_full_stripes(struct cached_dev *dc)
+ {
+ 	struct keybuf *buf = &dc->writeback_keys;
+-	unsigned int start_stripe, stripe, next_stripe;
++	unsigned int start_stripe, next_stripe;
++	int stripe;
+ 	bool wrapped = false;
+ 
+ 	stripe = offset_to_stripe(&dc->disk, KEY_OFFSET(&buf->last_scanned));
+-
+-	if (stripe >= dc->disk.nr_stripes)
++	if (stripe < 0)
+ 		stripe = 0;
+ 
+ 	start_stripe = stripe;
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index b029843ce5b6..3f1230e22de0 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -52,10 +52,22 @@ static inline uint64_t bcache_dev_sectors_dirty(struct bcache_device *d)
+ 	return ret;
+ }
+ 
+-static inline unsigned int offset_to_stripe(struct bcache_device *d,
++static inline int offset_to_stripe(struct bcache_device *d,
+ 					uint64_t offset)
+ {
+ 	do_div(offset, d->stripe_size);
++
++	/* d->nr_stripes is in range [1, INT_MAX] */
++	if (unlikely(offset >= d->nr_stripes)) {
++		pr_err("Invalid stripe %llu (>= nr_stripes %d).\n",
++			offset, d->nr_stripes);
++		return -EINVAL;
++	}
++
++	/*
++	 * Here offset is definitly smaller than INT_MAX,
++	 * return it as int will never overflow.
++	 */
+ 	return offset;
+ }
+ 
+@@ -63,7 +75,10 @@ static inline bool bcache_dev_stripe_dirty(struct cached_dev *dc,
+ 					   uint64_t offset,
+ 					   unsigned int nr_sectors)
+ {
+-	unsigned int stripe = offset_to_stripe(&dc->disk, offset);
++	int stripe = offset_to_stripe(&dc->disk, offset);
++
++	if (stripe < 0)
++		return false;
+ 
+ 	while (1) {
+ 		if (atomic_read(dc->disk.stripe_sectors_dirty + stripe))
+-- 
+2.26.2
+
