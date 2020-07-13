@@ -6,58 +6,51 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 370A3C433E5
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 08:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 674DCC433E1
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 09:43:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 180AA20773
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 08:44:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47BC02075B
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 09:43:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729414AbgGMIo2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jul 2020 04:44:28 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2453 "EHLO huawei.com"
+        id S1727829AbgGMJns (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jul 2020 05:43:48 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2454 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725830AbgGMIo1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jul 2020 04:44:27 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id BC0F5B83E6F9ECA54EDD;
-        Mon, 13 Jul 2020 09:44:26 +0100 (IST)
+        id S1726523AbgGMJns (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Jul 2020 05:43:48 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id AFEAACD331EB8885E103;
+        Mon, 13 Jul 2020 10:43:45 +0100 (IST)
 Received: from [127.0.0.1] (10.47.2.10) by lhreml724-chm.china.huawei.com
  (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Mon, 13 Jul
- 2020 09:44:25 +0100
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>,
+ 2020 10:43:44 +0100
+Subject: Re: [PATCH RFC v7 07/12] blk-mq: Add support in
+ hctx_tags_bitmap_show() for a shared sbitmap
+To:     Hannes Reinecke <hare@suse.de>, <axboe@kernel.dk>,
         <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
-        <don.brace@microsemi.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        <ming.lei@redhat.com>, <bvanassche@acm.org>, <hare@suse.com>,
-        <hch@lst.de>,
-        Shivasharan Srikanteshwara 
+        <don.brace@microsemi.com>, <kashyap.desai@broadcom.com>,
+        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
         <shivasharan.srikanteshwara@broadcom.com>
 CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
         <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+        <megaraidlinux.pdl@broadcom.com>
 References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-11-git-send-email-john.garry@huawei.com>
- <d55972999b9370f947c20537e41b49bf@mail.gmail.com>
- <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
- <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com>
- <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
- <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com>
- <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
- <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com>
- <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
- <34a832717fef4702b143ea21aa12b79e@mail.gmail.com>
+ <1591810159-240929-8-git-send-email-john.garry@huawei.com>
+ <9f4741c5-d117-d764-cf3a-a57192a788c3@suse.de>
+ <aad6efa3-2d7f-ca68-d239-44ea187c8017@huawei.com>
+ <7ed6ccf1-6ad9-1df7-f55d-4ed6cac1e08d@suse.de>
 From:   John Garry <john.garry@huawei.com>
-Message-ID: <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
-Date:   Mon, 13 Jul 2020 09:42:40 +0100
+Message-ID: <2de767d0-d472-9101-f805-68194687279a@huawei.com>
+Date:   Mon, 13 Jul 2020 10:41:58 +0100
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <34a832717fef4702b143ea21aa12b79e@mail.gmail.com>
+In-Reply-To: <7ed6ccf1-6ad9-1df7-f55d-4ed6cac1e08d@suse.de>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.47.2.10]
 X-ClientProxiedBy: lhreml739-chm.china.huawei.com (10.201.108.189) To
  lhreml724-chm.china.huawei.com (10.201.108.75)
@@ -67,71 +60,69 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 13/07/2020 08:55, Kashyap Desai wrote:
->> ring normal operation. See initial check in
->> blk_mq_hctx_notify_offline():
+On 12/06/2020 07:06, Hannes Reinecke wrote:
+>>>>
+>>>> +out:
+>>>> +    sbitmap_free(&shared_sb);
+>>>> +    return res;
+>>>> +}
+>>>> +
+>>>>   static int hctx_tags_bitmap_show(void *data, struct seq_file *m)
+>>>>   {
+>>>>       struct blk_mq_hw_ctx *hctx = data;
+>>>> @@ -823,6 +884,7 @@ static const struct blk_mq_debugfs_attr 
+>>>> blk_mq_debugfs_hctx_shared_sbitmap_attrs
+>>>>       {"busy", 0400, hctx_busy_show},
+>>>>       {"ctx_map", 0400, hctx_ctx_map_show},
+>>>>       {"tags", 0400, hctx_tags_show},
+>>>> +    {"tags_bitmap", 0400, hctx_tags_shared_sbitmap_bitmap_show},
+>>>>       {"sched_tags", 0400, hctx_sched_tags_show},
+>>>>       {"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
+>>>>       {"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
+>>>>
+>>> Ah, right. Here it is.
+>>>
+>>> But I don't get it; why do we have to allocate a temporary bitmap and 
+>>> can't walk the existing shared sbitmap?
 >>
->> static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node
->> *node) {
->> 	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
->> 	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
->> 		return 0;
+
+Just coming back to this now...
+
+>> For the bitmap dump - sbitmap_bitmap_show() - it is passed a struct 
+>> sbitmap *. So we have to filter into a temp per-hctx struct sbitmap. 
+>> We could change sbitmap_bitmap_show() to accept a filter iterator - 
+>> which I think you're getting at - but I am not sure it's worth the 
+>> change. Or else use the allocated sbitmap for the hctx, as above*, but 
+>> I may be remove that (see 4/12 response).
 >>
-> Thanks John for this pointer. I missed this part and now I understood what
-> was happening in my testing.
+> Yes, I do think I would prefer updating sbitmap_bitmap_show() to accept 
+> a filter. Especially as Ming Lei has now updated the tag iterators to 
+> accept a filter, too, so it should be an easy change.
 
-JFYI, I always have this as a sanity check for my testing:
+Can you please explain how you would use an iterator here?
 
-void irq_shutdown(struct irq_desc *desc)
+In fact, I am half thinking of dropping this patch entirely.
+
+So I feel that current behavior is a little strange, as some may expect 
+/sys/kernel/debug/block/sdX/hctxY/tags_bitmap would only show tags for 
+hctxY for sdX, while it is for hctxY for all queues. Same for 
+/sys/kernel/debug/block/sdX/hctxY/tags
+
+And then, for what we have in this patch:
+
+static void hctx_filter_sb(struct sbitmap *sb, struct blk_mq_hw_ctx *hctx)
 {
-+	pr_err("%s irq%d\n", __func__, desc->irq_data.irq);
-+
-	if (irqd_is_started(&desc->irq_data)) {
-		desc->depth = 1;
-		if (desc->irq_data.chip->irq_shutdown) {
+struct hctx_sb_data hctx_sb_data = { .sb = sb, .hctx = hctx };
 
-> There were more than one CPU mapped to one msix index in my earlier testing
-> and because of that I could see Interrupt migration happens on available CPU
-> from affinity mask. So my earlier testing was incorrect.
-> 
-> Now I am consistently able to reproduce issue - Best setup is have 1:1
-> mapping of CPU to MSIX vector mapping. I used 128 logical CPU and 128 msix
-> vectors and I noticed IO timeout without this RFC (without host_tagset).
-> I did not noticed IO timeout with RFC (with host_tagset.) I will update this
-> data in Driver's commit message.
+blk_mq_queue_tag_busy_iter(hctx->queue, hctx_filter_fn, &hctx_sb_data);
+}
 
-ok, great. That's what we want. I'm not sure exactly what your test 
-consists of, though.
+This will give tags only for this queue. So not the same. So I feel it's 
+better to change current behavior (so consistent) or change neither. And 
+changing current behavior would also mean we need to change what we show 
+in /sys/kernel/debug/block/sdX/hctxY/tags, and that looks troublesome also.
 
-> 
-> Just for my understanding -
-> What if we have below code in blk_mq_hctx_notify_offline, CPU hotplug should
-> work for megaraid_sas driver without this RFC (without shared host tagset).
-> Right ?
-
-> If answer is yes, will there be any side effect of having below code in
-> block layer ?
-> 
-
-Sorry, I'm sure sure what you're getting at with this change, below.
-
-It seems that you're trying to drain hctx0 (which is your only hctx, as 
-nr_hw_queues = 0 without this patchset) and set it inactive whenever any 
-CPU is offlined. If so, that's not right.
-
-> static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node
->   *node) {
->   	if (hctx->queue->nr_hw_queues > 1
-> 	    && (!cpumask_test_cpu(cpu, hctx->cpumask) ||
->   	    !blk_mq_last_cpu_in_hctx(cpu, hctx)))
->   		return 0;
-> 
-> I also noticed nr_hw_queues are now exposed in sysfs -
-> 
-> /sys/devices/pci0000:85/0000:85:00.0/0000:86:00.0/0000:87:04.0/0000:8b:00.0/0000:8c:00.0/0000:8d:00.0/host14/scsi_host/host14/nr_hw_queues:128
-> .
-
-That's on my v8 wip branch, so I guess you're picking it up from there.
+Opinion?
 
 Thanks,
 John
