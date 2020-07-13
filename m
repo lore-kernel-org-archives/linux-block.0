@@ -2,124 +2,153 @@ Return-Path: <SRS0=ze0F=AY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D26AC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 03:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DBAC433E0
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 07:55:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16801206B6
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 03:35:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 957D120702
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jul 2020 07:55:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dWXhlmpW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728665AbgGMDfp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Jul 2020 23:35:45 -0400
-Received: from mx2.suse.de ([195.135.220.15]:51916 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728550AbgGMDfp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Jul 2020 23:35:45 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 7A83BAD1A;
-        Mon, 13 Jul 2020 03:35:45 +0000 (UTC)
-Subject: Re: [PATCH 1/2] bcache: avoid nr_stripes overflow in
- bcache_device_init()
-To:     Ken Raeburn <raeburn@redhat.com>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20200712174736.9840-1-colyli@suse.de>
- <1011c22f-d186-6398-98e1-83f1c363dedd@suse.de>
- <a504604d-ac8a-3276-e0b8-f42cb3782356@redhat.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- mQINBFYX6S8BEAC9VSamb2aiMTQREFXK4K/W7nGnAinca7MRuFUD4JqWMJ9FakNRd/E0v30F
- qvZ2YWpidPjaIxHwu3u9tmLKqS+2vnP0k7PRHXBYbtZEMpy3kCzseNfdrNqwJ54A430BHf2S
- GMVRVENiScsnh4SnaYjFVvB8SrlhTsgVEXEBBma5Ktgq9YSoy5miatWmZvHLFTQgFMabCz/P
- j5/xzykrF6yHo0rHZtwzQzF8rriOplAFCECp/t05+OeHHxjSqSI0P/G79Ll+AJYLRRm9til/
- K6yz/1hX5xMToIkYrshDJDrUc8DjEpISQQPhG19PzaUf3vFpmnSVYprcWfJWsa2wZyyjRFkf
- J51S82WfclafNC6N7eRXedpRpG6udUAYOA1YdtlyQRZa84EJvMzW96iSL1Gf+ZGtRuM3k49H
- 1wiWOjlANiJYSIWyzJjxAd/7Xtiy/s3PRKL9u9y25ftMLFa1IljiDG+mdY7LyAGfvdtIkanr
- iBpX4gWXd7lNQFLDJMfShfu+CTMCdRzCAQ9hIHPmBeZDJxKq721CyBiGAhRxDN+TYiaG/UWT
- 7IB7LL4zJrIe/xQ8HhRO+2NvT89o0LxEFKBGg39yjTMIrjbl2ZxY488+56UV4FclubrG+t16
- r2KrandM7P5RjR+cuHhkKseim50Qsw0B+Eu33Hjry7YCihmGswARAQABtBhDb2x5IExpIDxj
- b2x5bGlAc3VzZS5kZT6JAlYEEwEIAEACGyMHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgBYh
- BOo+RS/0+Uhgjej60Mc5B5Nrffj8BQJcR84dBQkY++fuAAoJEMc5B5Nrffj8ixcP/3KAKg1X
- EcoW4u/0z+Ton5rCyb/NpAww8MuRjNW82UBUac7yCi1y3OW7NtLjuBLw5SaVG5AArb7IF3U0
- qTOobqfl5XHsT0o5wFHZaKUrnHb6y7V3SplsJWfkP3JmOooJsQB3z3K96ZTkFelsNb0ZaBRu
- gV+LA4MomhQ+D3BCDR1it1OX/tpvm2uaDF6s/8uFtcDEM9eQeqATN/QAJ49nvU/I8zDSY9rc
- 0x9mP0x+gH4RccbnoPu/rUG6Fm1ZpLrbb6NpaYBBJ/V1BC4lIOjnd24bsoQrQmnJn9dSr60X
- 1MY60XDszIyzRw7vbJcUn6ZzPNFDxFFT9diIb+wBp+DD8ZlD/hnVpl4f921ZbvfOSsXAJrKB
- 1hGY17FPwelp1sPcK2mDT+pfHEMV+OQdZzD2OCKtza/5IYismJJm3oVUYMogb5vDNAw9X2aP
- XgwUuG+FDEFPamFMUwIfzYHcePfqf0mMsaeSgtA/xTxzx/0MLjUJHl46Bc0uKDhv7QUyGz0j
- Ywgr2mHTvG+NWQ/mDeHNGkcnsnp3IY7koDHnN2xMFXzY4bn9m8ctqKo2roqjCzoxD/njoAhf
- KBzdybLHATqJG/yiZSbCxDA1n/J4FzPyZ0rNHUAJ/QndmmVspE9syFpFCKigvvyrzm016+k+
- FJ59Q6RG4MSy/+J565Xj+DNY3/dCuQINBFYX6S8BEADZP+2cl4DRFaSaBms08W8/smc5T2CO
- YhAoygZn71rB7Djml2ZdvrLRjR8Qbn0Q/2L2gGUVc63pJnbrjlXSx2LfAFE0SlfYIJ11aFdF
- 9w7RvqWByQjDJor3Z0fWvPExplNgMvxpD0U0QrVT5dIGTx9hadejCl/ug09Lr6MPQn+a4+qs
- aRWwgCSHaIuDkH3zI1MJXiqXXFKUzJ/Fyx6R72rqiMPHH2nfwmMu6wOXAXb7+sXjZz5Po9GJ
- g2OcEc+rpUtKUJGyeQsnCDxUcqJXZDBi/GnhPCcraQuqiQ7EGWuJfjk51vaI/rW4bZkA9yEP
- B9rBYngbz7cQymUsfxuTT8OSlhxjP3l4ZIZFKIhDaQeZMj8pumBfEVUyiF6KVSfgfNQ/5PpM
- R4/pmGbRqrAAElhrRPbKQnCkGWDr8zG+AjN1KF6rHaFgAIO7TtZ+F28jq4reLkur0N5tQFww
- wFwxzROdeLHuZjL7eEtcnNnzSkXHczLkV4kQ3+vr/7Gm65mQfnVpg6JpwpVrbDYQeOFlxZ8+
- GERY5Dag4KgKa/4cSZX2x/5+KkQx9wHwackw5gDCvAdZ+Q81nm6tRxEYBBiVDQZYqO73stgT
- ZyrkxykUbQIy8PI+g7XMDCMnPiDncQqgf96KR3cvw4wN8QrgA6xRo8xOc2C3X7jTMQUytCz9
- 0MyV1QARAQABiQI8BBgBCAAmAhsMFiEE6j5FL/T5SGCN6PrQxzkHk2t9+PwFAlxHziAFCRj7
- 5/EACgkQxzkHk2t9+PxgfA//cH5R1DvpJPwraTAl24SUcG9EWe+NXyqveApe05nk15zEuxxd
- e4zFEjo+xYZilSveLqYHrm/amvQhsQ6JLU+8N60DZHVcXbw1Eb8CEjM5oXdbcJpXh1/1BEwl
- 4phsQMkxOTns51bGDhTQkv4lsZKvNByB9NiiMkT43EOx14rjkhHw3rnqoI7ogu8OO7XWfKcL
- CbchjJ8t3c2XK1MUe056yPpNAT2XPNF2EEBPG2Y2F4vLgEbPv1EtpGUS1+JvmK3APxjXUl5z
- 6xrxCQDWM5AAtGfM/IswVjbZYSJYyH4BQKrShzMb0rWUjkpXvvjsjt8rEXpZEYJgX9jvCoxt
- oqjCKiVLpwje9WkEe9O9VxljmPvxAhVqJjX62S+TGp93iD+mvpCoHo3+CcvyRcilz+Ko8lfO
- hS9tYT0HDUiDLvpUyH1AR2xW9RGDevGfwGTpF0K6cLouqyZNdhlmNciX48tFUGjakRFsxRmX
- K0Jx4CEZubakJe+894sX6pvNFiI7qUUdB882i5GR3v9ijVPhaMr8oGuJ3kvwBIA8lvRBGVGn
- 9xvzkQ8Prpbqh30I4NMp8MjFdkwCN6znBKPHdjNTwE5PRZH0S9J0o67IEIvHfH0eAWAsgpTz
- +jwc7VKH7vkvgscUhq/v1/PEWCAqh9UHy7R/jiUxwzw/288OpgO+i+2l11Y=
-Message-ID: <16edd3bb-944e-83fe-784c-35221f9ee287@suse.de>
-Date:   Mon, 13 Jul 2020 11:35:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+        id S1725818AbgGMHzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jul 2020 03:55:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51766 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725985AbgGMHzm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Jul 2020 03:55:42 -0400
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A465CC061794
+        for <linux-block@vger.kernel.org>; Mon, 13 Jul 2020 00:55:42 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id b185so11359890qkg.1
+        for <linux-block@vger.kernel.org>; Mon, 13 Jul 2020 00:55:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=ShBbu9sSYjap4DNNY3AXNyJIdESjeWRe5yF7SlDXnuM=;
+        b=dWXhlmpWo5QoCPI2izE2yTmGwoKzRlwOsgOZwO875I7HbgY5tyXt+83r4yacOebEBs
+         u+YeHsZHh9nuo05CLbNQk9lDe6gs/lgBcxcg0moedib5WQizGbTxfZNsplw8/xK5cVru
+         2VWdTpnmGVW+kqHX1dwLe9ZdCEm6Ayrjz2hDg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=ShBbu9sSYjap4DNNY3AXNyJIdESjeWRe5yF7SlDXnuM=;
+        b=AUWWpMUCuBlkF+qCv0Xww9U1ONJfcg91+9wdoMEqz1yHVQBkpT4B33H5HpXBUBr1JA
+         dOUIdESMQOfC5+6EZMzvW+GiS1rOYDrxM4gBx2DUq0AS4FyU+X3gjkFm1KLINRwLuTk7
+         p8g35Ve3Sgwtw8YcQQ+cabBI5YWIbMsAZ9KFBi30h6wjMovO0cC90svMU2Hrvme+uLcn
+         4xT995nmaTACR44WYXFOTopeyXv5uoMSG6c486MR0KijfAHpcfGYmOF7EXkJEg7wBwQE
+         IxM8B0R2TRPWK0M/B4/0dgYIKNKJxdzjlfDcXKHdZJoj1JFLCbhy3vMAH93+u5apIHG5
+         gcEw==
+X-Gm-Message-State: AOAM531TOGfnfJUSDIvGSa5PwGtghbwxFQJRgb5njLT9IDzfVEx3lMBK
+        CWfO9lE6Qs3aBV2dQoakggHgTsFRQb1bnucraFSv2w==
+X-Google-Smtp-Source: ABdhPJy2hEhEZRa0fM9TYLsRxdVxdjIA2gv9Xrbar7MUzaUTDRZ/fV2dWEMyqlQiRZC2SKNDqA3BYHY52EIFKXPyBG8=
+X-Received: by 2002:a37:aa87:: with SMTP id t129mr80362516qke.70.1594626941585;
+ Mon, 13 Jul 2020 00:55:41 -0700 (PDT)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-11-git-send-email-john.garry@huawei.com>
+ <d55972999b9370f947c20537e41b49bf@mail.gmail.com> <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
+ <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com> <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
+ <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com> <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
+ <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com> <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
+In-Reply-To: <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <a504604d-ac8a-3276-e0b8-f42cb3782356@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQBVjmvxAE7FMYb7GtMRWGcwtMcECgFIs823Ad7lfqMBmFaE1AGZowweAlKrFcUB/hGY5AG4aoXNAvsHUMYCeW9VQ6t3/AoA
+Date:   Mon, 13 Jul 2020 13:25:36 +0530
+Message-ID: <34a832717fef4702b143ea21aa12b79e@mail.gmail.com>
+Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        ming.lei@redhat.com, bvanassche@acm.org, hare@suse.com, hch@lst.de,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/7/13 04:38, Ken Raeburn wrote:
-> 
-> On 7/12/20 1:49 PM, Coly Li wrote:
->> On 2020/7/13 01:47, Coly Li wrote:
->>> For some block devices which large capacity (e.g. 8TB) but small io_opt
->>> size (e.g. 8 sectors), in bcache_device_init() the stripes number calcu-
->>> lated by,
->>>     DIV_ROUND_UP_ULL(sectors, d->stripe_size);
->>> might be overflow to the unsigned int bcache_device->nr_stripes.
->>>
->>> This patch uses an unsigned long variable to store DIV_ROUND_UP_ULL()
->>> and after the value is checked to be available in unsigned int range,
->>> sets it to bache_device->nr_stripes. Then the overflow is avoided.
->> Hi Ken,
->>
->> Could you please to try whether these two patches may avoid the kernel
->> panic ? I will post the overwhelm stripe_size patch later.
->>
->> Thanks.
->>
->> Coly Li
->>
-> I will. But, from inspection: On a 32-bit system, "unsigned long" will
-> still be 32 bits, but sector_t (u64) will still be 64 bits, so that
-> assignment will still discard high bits before validation in that
-> environment. I suggest "unsigned long long" or another specifically
-> 64-bit type.
-> 
-> Also, the VDO driver I work on doesn't support 32-bit platforms
-> currently, so my own testing will be limited to 64-bit platforms.
+> > Looking at description of above patch and changes, it looks like
+> > megaraid_sas driver can still work without shared host tag for this
+> > feature.
+> >
+> > I observe CPU hotplug works irrespective of shared host tag
+>
+> Can you be clear exactly what you mean by "irrespective of shared host
+> tag"?
+>
+> Do you mean that for your test Scsi_Host.nr_hw_queues is set to expose hw
+> queues and scsi_host_template.map_queues = blk_mq_pci_map_queues(),
+> but you just don't set the host_tagset flag?
 
-I will post a v2 for your test. Thanks :-)
+Yes. I only disabled "host_tagset". <map_queue> is still hooked.
 
-Coly Li
+>
+>   in megaraid_sas
+> > on 5.8-rc.
+> >
+> > Without shared host tag, megaraid driver will expose single hctx and
+> > all the CPU will be mapped to hctx0.
+>
+> right
+>
+> > Any CPU offline event will have " blk_mq_hctx_notify_offline" callback
+> > in blk-mq module. If we do not have this callback/patch, we will see
+> > IO timeout.
+> > blk_mq_hctx_notify_offline callback will make sure all the outstanding
+> > on
+> > hctx0 is cleared and only after it is cleared, CPU will go offline.
+>
+> But that is only for when the last CPU for the hctx is going offline. If
+> nr_hw_queues == 1, then hctx0 would cover all CPUs, so that would never
+> occur during normal operation. See initial check in
+> blk_mq_hctx_notify_offline():
+>
+> static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node
+> *node) {
+> 	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
+> 	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
+> 		return 0;
+>
 
+Thanks John for this pointer. I missed this part and now I understood what
+was happening in my testing.
+There were more than one CPU mapped to one msix index in my earlier testing
+and because of that I could see Interrupt migration happens on available CPU
+from affinity mask. So my earlier testing was incorrect.
+
+Now I am consistently able to reproduce issue - Best setup is have 1:1
+mapping of CPU to MSIX vector mapping. I used 128 logical CPU and 128 msix
+vectors and I noticed IO timeout without this RFC (without host_tagset).
+I did not noticed IO timeout with RFC (with host_tagset.) I will update this
+data in Driver's commit message.
+
+Just for my understanding -
+What if we have below code in blk_mq_hctx_notify_offline, CPU hotplug should
+work for megaraid_sas driver without this RFC (without shared host tagset).
+Right ?
+If answer is yes, will there be any side effect of having below code in
+block layer ?
+
+static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node
+ *node) {
+ 	if (hctx->queue->nr_hw_queues > 1
+	    && (!cpumask_test_cpu(cpu, hctx->cpumask) ||
+ 	    !blk_mq_last_cpu_in_hctx(cpu, hctx)))
+ 		return 0;
+
+I also noticed nr_hw_queues are now exposed in sysfs -
+
+/sys/devices/pci0000:85/0000:85:00.0/0000:86:00.0/0000:87:04.0/0000:8b:00.0/0000:8c:00.0/0000:8d:00.0/host14/scsi_host/host14/nr_hw_queues:128
