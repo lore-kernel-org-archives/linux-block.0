@@ -2,142 +2,149 @@ Return-Path: <SRS0=uy3D=AZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F281C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 00:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C96C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 05:57:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0ADB421835
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 00:37:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWEwf9i0"
+	by mail.kernel.org (Postfix) with ESMTP id 0B194221E8
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 05:57:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726358AbgGNAh0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jul 2020 20:37:26 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45852 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726347AbgGNAh0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jul 2020 20:37:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594687044;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nvAaUN3/DSc+c3utpslSKECgwxMKIgbkAfFaINr4qsY=;
-        b=EWEwf9i0edckUnLWYpUYYPVUALkNx4wJ4mo2/+TpTzESxWQSCcFq256UjhJoF+6BYdiAe6
-        pg5NuN62kn2hnGOkJvkow/k3ZehG+HD/bwEjq2T0n5AKERuNROq4hzWZrk0hTNyoiAH2rt
-        YppDOKdKHGs3dWSo4dZnUVPpVlftrnU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-jCExFSo7PKu8bwq-BQ5M5Q-1; Mon, 13 Jul 2020 20:37:22 -0400
-X-MC-Unique: jCExFSo7PKu8bwq-BQ5M5Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52B081081;
-        Tue, 14 Jul 2020 00:37:21 +0000 (UTC)
-Received: from T590 (ovpn-12-153.pek2.redhat.com [10.72.12.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D9E5757DF;
-        Tue, 14 Jul 2020 00:37:14 +0000 (UTC)
-Date:   Tue, 14 Jul 2020 08:37:10 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] scsi: core: run queue in case of IO queueing failure
-Message-ID: <20200714003710.GB308476@T590>
-References: <20200708131405.3346107-1-ming.lei@redhat.com>
+        id S1725951AbgGNF5K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jul 2020 01:57:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58310 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725853AbgGNF5K (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Jul 2020 01:57:10 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 49906B031;
+        Tue, 14 Jul 2020 05:57:10 +0000 (UTC)
+Subject: Re: [PATCH] bcache: add a new sysfs interface to disable refill when
+ read miss
+To:     Guoju Fang <fangguoju@gmail.com>, colyli@suse.de
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1594610902-4428-1-git-send-email-fangguoju@gmail.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <141fbeaf-8fb6-43fb-56ed-5f8a5a019cc7@suse.de>
+Date:   Tue, 14 Jul 2020 07:57:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200708131405.3346107-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <1594610902-4428-1-git-send-email-fangguoju@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 08, 2020 at 09:14:05PM +0800, Ming Lei wrote:
-> IO requests may be held in scheduler queue because of resource contention.
-> However, not like normal completion, when queueing request failed, we don't
-> ask block layer to queue these requests, so IO hang[1] is caused.
+On 7/13/20 5:28 AM, Guoju Fang wrote:
+> When read cache miss, backing device will be read first, and then refill
+> the cache device. But under some scenarios there are large number of new
+> reads and rarely hit, so it's necessary to disable the refill when read
+> miss to save space for writes.
 > 
-> Fix this issue by run queue when IO request failure happens.
+> This patch add a new config called refill_on_miss_disabled which is not set
+> by default. Bcache user can set it by sysfs interface and then the bcache
+> device will not refill when read cache miss.
 > 
-> [1] IO hang log by running heavy IO with removing scsi device
-> 
-> [   39.054963] scsi 13:0:0:0: rejecting I/O to dead device
-> [   39.058700] scsi 13:0:0:0: rejecting I/O to dead device
-> [   39.087855] sd 13:0:0:1: [sdd] Synchronizing SCSI cache
-> [   39.088909] scsi 13:0:0:1: rejecting I/O to dead device
-> [   39.095351] scsi 13:0:0:1: rejecting I/O to dead device
-> [   39.096962] scsi 13:0:0:1: rejecting I/O to dead device
-> [  247.021859] INFO: task scsi-stress-rem:813 blocked for more than 122 seconds.
-> [  247.023258]       Not tainted 5.8.0-rc2 #8
-> [  247.024069] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> [  247.025331] scsi-stress-rem D    0   813    802 0x00004000
-> [  247.025334] Call Trace:
-> [  247.025354]  __schedule+0x504/0x55f
-> [  247.027987]  schedule+0x72/0xa8
-> [  247.027991]  blk_mq_freeze_queue_wait+0x63/0x8c
-> [  247.027994]  ? do_wait_intr_irq+0x7a/0x7a
-> [  247.027996]  blk_cleanup_queue+0x4b/0xc9
-> [  247.028000]  __scsi_remove_device+0xf6/0x14e
-> [  247.028002]  scsi_remove_device+0x21/0x2b
-> [  247.029037]  sdev_store_delete+0x58/0x7c
-> [  247.029041]  kernfs_fop_write+0x10d/0x14f
-> [  247.031281]  vfs_write+0xa2/0xdf
-> [  247.032670]  ksys_write+0x6b/0xb3
-> [  247.032673]  do_syscall_64+0x56/0x82
-> [  247.034053]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> [  247.034059] RIP: 0033:0x7f69f39e9008
-> [  247.036330] Code: Bad RIP value.
-> [  247.036331] RSP: 002b:00007ffdd8116498 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> [  247.037613] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f69f39e9008
-> [  247.039714] RDX: 0000000000000002 RSI: 000055cde92a0ab0 RDI: 0000000000000001
-> [  247.039715] RBP: 000055cde92a0ab0 R08: 000000000000000a R09: 00007f69f3a79e80
-> [  247.039716] R10: 000000000000000a R11: 0000000000000246 R12: 00007f69f3abb780
-> [  247.039717] R13: 0000000000000002 R14: 00007f69f3ab6740 R15: 0000000000000002
-> 
-> Cc: linux-block@vger.kernel.org
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Guoju Fang <fangguoju@gmail.com>
 > ---
->  drivers/scsi/scsi_lib.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>   drivers/md/bcache/bcache.h  | 1 +
+>   drivers/md/bcache/request.c | 2 ++
+>   drivers/md/bcache/super.c   | 1 +
+>   drivers/md/bcache/sysfs.c   | 5 +++++
+>   4 files changed, 9 insertions(+)
 > 
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index 534b85e87c80..4d7fab9e8af9 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -1694,6 +1694,16 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
->  		 */
->  		if (req->rq_flags & RQF_DONTPREP)
->  			scsi_mq_uninit_cmd(cmd);
+> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+> index 221e0191b687..3a19ee6de3a7 100644
+> --- a/drivers/md/bcache/bcache.h
+> +++ b/drivers/md/bcache/bcache.h
+> @@ -730,6 +730,7 @@ struct cache_set {
+>   	unsigned int		shrinker_disabled:1;
+>   	unsigned int		copy_gc_enabled:1;
+>   	unsigned int		idle_max_writeback_rate_enabled:1;
+> +	unsigned int		refill_on_miss_disabled:1;
+>   
+>   #define BUCKET_HASH_BITS	12
+>   	struct hlist_head	bucket_hash[1 << BUCKET_HASH_BITS];
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 7acf024e99f3..4bfa0e0b4b3f 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -378,6 +378,8 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+>   	     op_is_write(bio_op(bio))))
+>   		goto skip;
+>   
+> +	if (c->refill_on_miss_disabled && !op_is_write(bio_op(bio)))
+> +		goto skip;
+>   	/*
+>   	 * If the bio is for read-ahead or background IO, bypass it or
+>   	 * not depends on the following situations,
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 2014016f9a60..c1e9bfec1267 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -1862,6 +1862,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+>   	c->congested_write_threshold_us	= 20000;
+>   	c->error_limit	= DEFAULT_IO_ERROR_LIMIT;
+>   	c->idle_max_writeback_rate_enabled = 1;
+> +	c->refill_on_miss_disabled = 0;
+>   	WARN_ON(test_and_clear_bit(CACHE_SET_IO_DISABLE, &c->flags));
+>   
+>   	return c;
+> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+> index 0dadec5a78f6..178300f401bb 100644
+> --- a/drivers/md/bcache/sysfs.c
+> +++ b/drivers/md/bcache/sysfs.c
+> @@ -144,6 +144,7 @@ rw_attribute(copy_gc_enabled);
+>   rw_attribute(idle_max_writeback_rate);
+>   rw_attribute(gc_after_writeback);
+>   rw_attribute(size);
+> +rw_attribute(refill_on_miss_disabled);
+>   
+>   static ssize_t bch_snprint_string_list(char *buf,
+>   				       size_t size,
+> @@ -779,6 +780,8 @@ SHOW(__bch_cache_set)
+>   	if (attr == &sysfs_bset_tree_stats)
+>   		return bch_bset_print_stats(c, buf);
+>   
+> +	sysfs_printf(refill_on_miss_disabled, "%i", c->refill_on_miss_disabled);
 > +
-> +		/*
-> +		 * Requests may be held in block layer queue because of
-> +		 * resource contention. We usually run queue in normal
-> +		 * completion for queuing these requests again. Block layer
-> +		 * will finish this failed request simply, run queue in case
-> +		 * of IO queueing failure so that requests can get chance to
-> +		 * be finished.
-> +		 */
-> +		scsi_run_queue(q);
->  		break;
->  	}
->  	return ret;
+>   	return 0;
+>   }
+>   SHOW_LOCKED(bch_cache_set)
+> @@ -898,6 +901,7 @@ STORE(__bch_cache_set)
+>   	 * set in next chance.
+>   	 */
+>   	sysfs_strtoul_clamp(gc_after_writeback, c->gc_after_writeback, 0, 1);
+> +	sysfs_strtoul(refill_on_miss_disabled, c->refill_on_miss_disabled);
+>   
+>   	return size;
+>   }
+> @@ -948,6 +952,7 @@ static struct attribute *bch_cache_set_files[] = {
+>   	&sysfs_congested_read_threshold_us,
+>   	&sysfs_congested_write_threshold_us,
+>   	&sysfs_clear_stats,
+> +	&sysfs_refill_on_miss_disabled,
+>   	NULL
+>   };
+>   KTYPE(bch_cache_set);
+> 
+Please don't call the attribute refill_on_miss_disabled.
+This kind of double-negation will always lead to issues; please invert 
+the meaning and call it 'refill_on_miss'.
 
-Hello Guys,
+Cheers,
 
-Ping...
-
-
-Thanks,
-Ming
-
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
