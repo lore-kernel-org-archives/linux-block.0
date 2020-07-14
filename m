@@ -2,111 +2,136 @@ Return-Path: <SRS0=uy3D=AZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CE68C433EB
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 08:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E18C433E3
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 08:17:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A7A5217A0
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 08:07:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JRGHHhE9"
+	by mail.kernel.org (Postfix) with ESMTP id 68FF721841
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 08:17:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1594714674;
+	bh=nKnSg22CPcnQVI12S7+deTddw0rpP4aIXgukl5B6K8c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=MS4otymRJ9Z3YEy9mSV+hRfSSR5Yhrm4zAamS1ThMEZAUGet/68/QZ5gD0O6gmEmu
+	 AmpkoJpr9gyW0iwMifyCFRkg7c3X8EQf1WiHE/mIIYIxvc5mOqCRm0MBLUUhVsXQ+P
+	 lbriAwgRMDItghBcJktaukWz3UYWRrrUIZE+2FYo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725876AbgGNIHA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jul 2020 04:07:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36100 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725816AbgGNIHA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jul 2020 04:07:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594714019;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=O2WkUS2baLZHo/qw2l6XXN08NWlFRGUaRro8FxAfMIo=;
-        b=JRGHHhE9Nhcx2kCRE+VvsBPsqKYr6XSH6Dzf2k4TwgMCA+5LP2ojtUlEIUabc1o+jt0B1M
-        zlV65RCiiXzauilXnJclzcOhw811gh9Vq7vxuaudvfNGKqpw1uJFzFYGIW2EUaEdUAp5wS
-        XD2y6y9+opqqa3Ws/VYMDauykAt/jS0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-ve21ehAVP72vb1IRekK_zA-1; Tue, 14 Jul 2020 04:06:55 -0400
-X-MC-Unique: ve21ehAVP72vb1IRekK_zA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1725931AbgGNIRx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jul 2020 04:17:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53936 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725793AbgGNIRw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Jul 2020 04:17:52 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88193800400;
-        Tue, 14 Jul 2020 08:06:52 +0000 (UTC)
-Received: from T590 (ovpn-13-177.pek2.redhat.com [10.72.13.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F92372E59;
-        Tue, 14 Jul 2020 08:06:39 +0000 (UTC)
-Date:   Tue, 14 Jul 2020 16:06:31 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Hannes Reinecke <hare@suse.de>, don.brace@microsemi.com,
-        axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        kashyap.desai@broadcom.com, sumit.saxena@broadcom.com,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        shivasharan.srikanteshwara@broadcom.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        megaraidlinux.pdl@broadcom.com
-Subject: Re: [PATCH RFC v7 12/12] hpsa: enable host_tagset and switch to MQ
-Message-ID: <20200714080631.GA600766@T590>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-13-git-send-email-john.garry@huawei.com>
- <939891db-a584-1ff7-d6a0-3857e4257d3e@huawei.com>
- <3b3ead84-5d2f-dcf2-33d5-6aa12d5d9f7e@suse.de>
- <4319615a-220b-3629-3bf4-1e7fd2d27b92@huawei.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 5CCE9217D9;
+        Tue, 14 Jul 2020 08:17:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594714672;
+        bh=nKnSg22CPcnQVI12S7+deTddw0rpP4aIXgukl5B6K8c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=neXZydRlXLz7DfZ8j/UJVAIIskDRuG7kJMLKPa0EYkaGKPubLxQe+dQBcID3DGO71
+         3It0lqY3c9Wnh5tSKKizV6le0JpE3C5QW4M9+iN/0N23WtQdVIt3PtI921hwKT3ejb
+         w9wmqQicGyMWWU+f2EudgKvyQCOZJQ8bt1ebCLgs=
+Date:   Tue, 14 Jul 2020 10:17:50 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Cc:     tasleson@redhat.com, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [RFC PATCH v3 5/8] ata_dev_printk: Use dev_printk
+Message-ID: <20200714081750.GB862637@kroah.com>
+References: <20200623191749.115200-1-tasleson@redhat.com>
+ <20200623191749.115200-6-tasleson@redhat.com>
+ <CGME20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee@eucas1p2.samsung.com>
+ <d817c9dd-6852-9233-5f61-1c0bc0f65ca4@samsung.com>
+ <7ed08b94-755f-baab-0555-b4e454405729@redhat.com>
+ <cfff719b-dc12-a06a-d0ee-4165323171de@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4319615a-220b-3629-3bf4-1e7fd2d27b92@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <cfff719b-dc12-a06a-d0ee-4165323171de@samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 14, 2020 at 08:52:36AM +0100, John Garry wrote:
-> On 14/07/2020 08:41, Hannes Reinecke wrote:
-> > On 7/14/20 9:37 AM, John Garry wrote:
-> > > On 10/06/2020 18:29, John Garry wrote:
-> > > > From: Hannes Reinecke <hare@suse.de>
-> > > > 
-> > > > The smart array HBAs can steer interrupt completion, so this
-> > > > patch switches the implementation to use multiqueue and enables
-> > > > 'host_tagset' as the HBA has a shared host-wide tagset.
-> > > > 
-> > > 
-> > > Hi Don,
-> > > 
-> > > I am preparing the next iteration of this series, and we're getting
-> > > close to dropping the RFC tags. The series has grown a bit, and I am not
-> > > sure what to do with hpsa support.
-> > > 
-> > > The latest versions of this series have not been tested for hpsa, AFAIK.
-> > > Can you let me know if you can test and review this patch? Or someone
-> > > else let me know it's tested (Hannes?)
-> > > I'll give it a go.
+On Tue, Jul 14, 2020 at 10:06:05AM +0200, Bartlomiej Zolnierkiewicz wrote:
+> 
+> Hi Tony,
+> 
+> On 7/9/20 11:18 PM, Tony Asleson wrote:
+> > Hi Bartlomiej,
 > > 
-> > Which git repository should I base the tests on?
-> 
-> v7 is here:
-> 
-> https://github.com/hisilicon/kernel-dev/commits/private-topic-blk-mq-shared-tags-rfc-v7
-> 
-> So that should be good to test with for now.
-> 
-> And I was going to ask this same question about smartpqi, so can you please
-> let me know about this one?
+> > On 6/24/20 5:35 AM, Bartlomiej Zolnierkiewicz wrote:
+> >> The root source of problem is that libata transport uses different
+> >> naming scheme for ->tdev devices (please see dev_set_name() in
+> >> ata_t{dev,link,port}_add()) than libata core for its logging
+> >> functionality (ata_{dev,link,port}_printk()).
+> >>
+> >> Since libata transport is part of sysfs ABI we should be careful
+> >> to not break it so one idea for solving the issue is to convert
+> >> ata_t{dev,link,port}_add() to use libata logging naming scheme and
+> >> at the same time add sysfs symlinks for the old libata transport
+> >> naming scheme.
 
-smartpqi is real MQ HBA, do you need any change wrt. shared tags?
+Given the age of the current implementation, what suddenly broke that
+requires this to change at this point in time?
 
+> > 
+> > I tried doing as you suggested.  I've included what I've done so far.  I
+> > haven't been able to get all the needed parts for the symlinks to
+> > maintain compatibility.
+> > 
+> > The /sys/class/.. seems OK, eg.
+> > 
+> > $  ls -x -w 70 /sys/class/ata_[dl]*
+> > /sys/class/ata_device:
+> > ata1.00  ata2.00  ata3.00  ata4.00  ata5.00  ata6.00  ata7.00
+> > ata7.01  ata8.00  ata8.01  dev1.0   dev2.0   dev3.0   dev4.0
+> > dev5.0   dev6.0   dev7.0   dev7.1   dev8.0   dev8.1
+> > 
+> > /sys/class/ata_link:
+> > ata1   ata2   ata3   ata4   ata5   ata6   ata7  ata8  link1  link2
+> > link3  link4  link5  link6  link7  link8
 
-Thanks,
-Ming
+A link class?  Ick ick ick.
 
+> > but the implementation is a hack, see device.h, core.c changes.  There
+> > must be a better way?
+> > 
+> > Also I'm missing part of the full path, eg.
+> > 
+> > /sys/devices/pci0000:00/0000:00:01.1/ata7/link7/dev7.0/ata_device/dev7.0/gscr
+> > 
+> > becomes
+> > 
+> > /sys/devices/pci0000:00/0000:00:01.1/ata7/ata7/ata7.01/ata_device/ata7.01/gscr
+> > 
+> > but the compatibility symlinks added only get me to
+> > 
+> > /sys/devices/pci0000:00/0000:00:01.1/ata7/link7/dev7.0/ata_device/
+> > 
+> > I haven't found the right spot to get the last symlink included.
+> > 
+> > If you or anyone else has suggestions to correct the incomplete symlink
+> > and/or correct the implementation to set the
+> > /sys/class/ata_device it would be greatly appreciated.
+
+I can't understand what you are trying to do here.
+
+What do you want to represent in sysfs with a symlink that you can't
+just have in a single sysfs file like "name" or "new_name" or
+"name_because_we_didnt_think_about_this_10_years_ago" that shows you the
+other "name" that you are trying to look up here?
+
+Why abuse symlinks like this at all?
+
+And no, the device.h and core.c changes aren't ok :)
+
+thanks,
+
+greg k-h
