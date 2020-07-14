@@ -2,118 +2,134 @@ Return-Path: <SRS0=uy3D=AZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D4AC433E1
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 20:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1034BC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 20:12:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13DFE207BB
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 20:06:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD774212CC
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 20:12:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="W35J3FGe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729803AbgGNUGM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jul 2020 16:06:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16520 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729713AbgGNUGM (ORCPT
+        id S1726472AbgGNUMa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jul 2020 16:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51860 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725945AbgGNUM3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jul 2020 16:06:12 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06EK5dbU067695;
-        Tue, 14 Jul 2020 16:06:09 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 327u1hwtmt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jul 2020 16:06:04 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06EK0DXW002164;
-        Tue, 14 Jul 2020 20:03:32 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3275283p3m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jul 2020 20:03:32 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06EK3R8b56557674
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Jul 2020 20:03:27 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BDA1142042;
-        Tue, 14 Jul 2020 20:03:27 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AB5854204B;
-        Tue, 14 Jul 2020 20:03:27 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 14 Jul 2020 20:03:27 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
-        id 11722E05C0; Tue, 14 Jul 2020 22:03:27 +0200 (CEST)
-From:   Stefan Haberland <sth@linux.ibm.com>
-To:     axboe@kernel.dk
+        Tue, 14 Jul 2020 16:12:29 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F92C061755
+        for <linux-block@vger.kernel.org>; Tue, 14 Jul 2020 13:12:29 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id k23so18646788iom.10
+        for <linux-block@vger.kernel.org>; Tue, 14 Jul 2020 13:12:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=UOX8399h0mZZNRUdm40q4oW+3enpCIEzfSYybRJxWdc=;
+        b=W35J3FGel87rvzHbryaZVxtOm38w8W78AWz5yEfZDKO5DnRhEYIbZecPuvmsjmoyYu
+         fUuDo5YX9J4FBalu27vgFPgkMpAvPzqOs9vN+OxKQIQSpzLqma/hy5T7nuTOVyld5k86
+         dgaHp/ED3qUSJLdcwVQ7Zn0lLe3sIvNU6HD2ofW+s/RxXGMGUWSZ7c6J3tFeuBS5lnEn
+         4gmeZJ3EheL35j3Zavr7AGZ65+nhirn10x+ABBmlIv1bcU0vKuS3jjls3lNcQMEMhnbK
+         x4F8IIqSehFZXHkyjyl1A2fE9X/UH6pakH7FDyCPJL6ZIDeZzIO3KzVEU45VLSf97H7E
+         5wAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UOX8399h0mZZNRUdm40q4oW+3enpCIEzfSYybRJxWdc=;
+        b=D6l+RArskavZLfqox2LgzfpLJB2gJGLBpVdFmF+++p6x8GviGpgzh78a73wLX/dPoo
+         /8Jhus1MFYyWgXjF80okggQ3JHGDGP/hPyQZlDyH3teXJ6n2IrpY8L7g8a7BG5/6PmGw
+         o431yy1D8kKL7fKoFTWf0YWscJDQaCAYBi1hUNeTICXGGxHuECtKPYXCZj3WK/5y6JJL
+         JVc22+s+BYaLscnWL0HKNFPha0GW7WzjXgjp7BoL40sbNCMe6gLaXEsNQIkAYeQMwg7c
+         wzpnHrOO3gT+tB5jhG3xSiOxh/X4rralgtxiqQql7axadtpdQebuCluw8oAiZWErHirv
+         xQMg==
+X-Gm-Message-State: AOAM532PDsXxmILJI86fOIvUYtqNCz0WfKJPen8rIj/FWJPhfcv5Ipp+
+        QQ0cCRv4PmYGth3Tag16I/pPcQ==
+X-Google-Smtp-Source: ABdhPJzOuLWMOpR0c+My6l3ZClJCoKHR0SX+rDLyA01YGspLWRs9j702CD9L1ELKk35XLO+2DCPhxg==
+X-Received: by 2002:a6b:8e56:: with SMTP id q83mr6733681iod.61.1594757548794;
+        Tue, 14 Jul 2020 13:12:28 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id w82sm10769268ili.42.2020.07.14.13.12.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jul 2020 13:12:28 -0700 (PDT)
+Subject: Re: [PATCH 1/2] s390/dasd: fix inability to use DASD with DIAG driver
+To:     Stefan Haberland <sth@linux.ibm.com>
 Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
         linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
         gor@linux.ibm.com, borntraeger@de.ibm.com
-Subject: [PATCH 2/2] s390/dasd: Use struct_size() helper
-Date:   Tue, 14 Jul 2020 22:03:27 +0200
-Message-Id: <20200714200327.40927-3-sth@linux.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200714200327.40927-1-sth@linux.ibm.com>
 References: <20200714200327.40927-1-sth@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-14_08:2020-07-14,2020-07-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- spamscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=964
- suspectscore=1 phishscore=0 bulkscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007140140
+ <20200714200327.40927-2-sth@linux.ibm.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c368fa07-4a7d-3eae-6143-a2db298c204e@kernel.dk>
+Date:   Tue, 14 Jul 2020 14:12:27 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200714200327.40927-2-sth@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+On 7/14/20 2:03 PM, Stefan Haberland wrote:
+> During initialization of the DASD DIAG driver a request is issued
+> that has a bio structure that resides on the stack. With virtually
+> mapped kernel stacks this bio address might be in virtual storage
+> which is unsuitable for usage with the diag250 call.
+> In this case the device can not be set online using the DIAG
+> discipline and fails with -EOPNOTSUP.
+> In the system journal the following error message is presented:
+> 
+> dasd: X.X.XXXX Setting the DASD online with discipline DIAG failed
+> with rc=-95
+> 
+> Fix by allocating the bio structure instead of having it on the stack.
+> 
+> Fixes: ce3dc447493f ("s390: add support for virtually mapped kernel stacks")
+> Cc: stable@vger.kernel.org #4.20
+> Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+> Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+> ---
+>  drivers/s390/block/dasd_diag.c | 25 +++++++++++++++++--------
+>  1 file changed, 17 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/s390/block/dasd_diag.c b/drivers/s390/block/dasd_diag.c
+> index facb588d09e4..069d6b39cacf 100644
+> --- a/drivers/s390/block/dasd_diag.c
+> +++ b/drivers/s390/block/dasd_diag.c
+> @@ -319,7 +319,7 @@ dasd_diag_check_device(struct dasd_device *device)
+>  	struct dasd_diag_characteristics *rdc_data;
+>  	struct vtoc_cms_label *label;
+>  	struct dasd_block *block;
+> -	struct dasd_diag_bio bio;
+> +	struct dasd_diag_bio *bio;
+>  	unsigned int sb, bsize;
+>  	blocknum_t end_block;
+>  	int rc;
+> @@ -395,29 +395,36 @@ dasd_diag_check_device(struct dasd_device *device)
+>  		rc = -ENOMEM;
+>  		goto out;
+>  	}
+> +	bio = kzalloc(sizeof(*bio), GFP_KERNEL);
+> +	if (bio == NULL)  {
+> +		DBF_DEV_EVENT(DBF_WARNING, device, "%s",
+> +			      "No memory to allocate initialization bio");
+> +		rc = -ENOMEM;
+> +		goto out_label;
+> +	}
 
-Make use of the struct_size() helper instead of an open-coded version
-in order to avoid any potential type mistakes. Also, remove unnecessary
-variable _datasize_.
+Just curious, any reason this isn't just using bio_alloc()?
 
-This code was detected with the help of Coccinelle and, audited and
-fixed manually.
-
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
----
- drivers/s390/block/dasd_diag.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/s390/block/dasd_diag.c b/drivers/s390/block/dasd_diag.c
-index 069d6b39cacf..1b9e1442e6a5 100644
---- a/drivers/s390/block/dasd_diag.c
-+++ b/drivers/s390/block/dasd_diag.c
-@@ -515,7 +515,7 @@ static struct dasd_ccw_req *dasd_diag_build_cp(struct dasd_device *memdev,
- 	struct req_iterator iter;
- 	struct bio_vec bv;
- 	char *dst;
--	unsigned int count, datasize;
-+	unsigned int count;
- 	sector_t recid, first_rec, last_rec;
- 	unsigned int blksize, off;
- 	unsigned char rw_cmd;
-@@ -543,10 +543,8 @@ static struct dasd_ccw_req *dasd_diag_build_cp(struct dasd_device *memdev,
- 	if (count != last_rec - first_rec + 1)
- 		return ERR_PTR(-EINVAL);
- 	/* Build the request */
--	datasize = sizeof(struct dasd_diag_req) +
--		count*sizeof(struct dasd_diag_bio);
--	cqr = dasd_smalloc_request(DASD_DIAG_MAGIC, 0, datasize, memdev,
--				   blk_mq_rq_to_pdu(req));
-+	cqr = dasd_smalloc_request(DASD_DIAG_MAGIC, 0, struct_size(dreq, bio, count),
-+				   memdev, blk_mq_rq_to_pdu(req));
- 	if (IS_ERR(cqr))
- 		return cqr;
- 
 -- 
-2.17.1
+Jens Axboe
 
