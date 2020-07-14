@@ -2,136 +2,140 @@ Return-Path: <SRS0=uy3D=AZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E18C433E3
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 08:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E417FC433E1
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 08:25:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68FF721841
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 08:17:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594714674;
-	bh=nKnSg22CPcnQVI12S7+deTddw0rpP4aIXgukl5B6K8c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=MS4otymRJ9Z3YEy9mSV+hRfSSR5Yhrm4zAamS1ThMEZAUGet/68/QZ5gD0O6gmEmu
-	 AmpkoJpr9gyW0iwMifyCFRkg7c3X8EQf1WiHE/mIIYIxvc5mOqCRm0MBLUUhVsXQ+P
-	 lbriAwgRMDItghBcJktaukWz3UYWRrrUIZE+2FYo=
+	by mail.kernel.org (Postfix) with ESMTP id BE9692193E
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jul 2020 08:25:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="irw3nMlp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725931AbgGNIRx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jul 2020 04:17:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53936 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725793AbgGNIRw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jul 2020 04:17:52 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5CCE9217D9;
-        Tue, 14 Jul 2020 08:17:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594714672;
-        bh=nKnSg22CPcnQVI12S7+deTddw0rpP4aIXgukl5B6K8c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=neXZydRlXLz7DfZ8j/UJVAIIskDRuG7kJMLKPa0EYkaGKPubLxQe+dQBcID3DGO71
-         3It0lqY3c9Wnh5tSKKizV6le0JpE3C5QW4M9+iN/0N23WtQdVIt3PtI921hwKT3ejb
-         w9wmqQicGyMWWU+f2EudgKvyQCOZJQ8bt1ebCLgs=
-Date:   Tue, 14 Jul 2020 10:17:50 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Cc:     tasleson@redhat.com, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [RFC PATCH v3 5/8] ata_dev_printk: Use dev_printk
-Message-ID: <20200714081750.GB862637@kroah.com>
-References: <20200623191749.115200-1-tasleson@redhat.com>
- <20200623191749.115200-6-tasleson@redhat.com>
- <CGME20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee@eucas1p2.samsung.com>
- <d817c9dd-6852-9233-5f61-1c0bc0f65ca4@samsung.com>
- <7ed08b94-755f-baab-0555-b4e454405729@redhat.com>
- <cfff719b-dc12-a06a-d0ee-4165323171de@samsung.com>
+        id S1725977AbgGNIZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jul 2020 04:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54040 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725801AbgGNIZF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Jul 2020 04:25:05 -0400
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BEA7C061755
+        for <linux-block@vger.kernel.org>; Tue, 14 Jul 2020 01:25:05 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id dm19so16180674edb.13
+        for <linux-block@vger.kernel.org>; Tue, 14 Jul 2020 01:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=xZ2OdY0qIdsBZAj8mtj7FWcdDgOIO8FGxK3quwm7nbQ=;
+        b=irw3nMlpEhpItOFgii5ezupRLDs822w8JZUO1WtN+SNiTdnNcxc5ZmJlLOd2QNhW+f
+         ENyYHquwkrD5alooj8VhAmnqwO87kdp30q6jkW93BKWDk9XNwp9GEiUuMTuYNu4ICOld
+         haEH4fHnXaiVVPfO3YyvT9ZMCCHTZO3FWbmCUZRBCxLM3RZIoF1Yo4Trzf0IJeHT4pH4
+         kCvezGkaQuKZX3dlg7XP+i5aPQ087aOBZROS6jROVmbzlwq5s7M0DnROUdjbFG/oF+Xb
+         knq05bplZofSSET39mLRmzsXjQPn6BqNrL6KsHoFASBkFJvXHvg6yR574LBzgWl5xkSs
+         oucQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=xZ2OdY0qIdsBZAj8mtj7FWcdDgOIO8FGxK3quwm7nbQ=;
+        b=ZY/AQXu4ztNror8wBxGK9g7x/bXeF8uFkXPANagWMhjWYEfrKQrctRhMCuK2rZ11vg
+         NUDWSbkhAG7OcuYnj0pH1wp5u4zmV5aXIMMuo7RIMN3iFTQ5ALAnwBD0L/7QIluMbHMO
+         3tTGnLnqjaTD5OgJ3Ua6bNBmHt8v0XH4lajYARNwg5PirqnEjEkSG5l1ZzLZ3gK0hp9r
+         cVk1zd+1Df6ziss+OZDA6Qf72L/GSBuaSQ0PKM53ea0urrJDpLmQu94x3+IQ7oXAA+r/
+         LGcZs8JYYk2PhydE5ZFdo0KUX1xU6l37qO2aDQn769B3s5VgOQU2+Y/WqIxEHGPVA3B8
+         M/IQ==
+X-Gm-Message-State: AOAM5312hypMU2Szk2vrvb9cepop4Gni2OXijg+oE5Cy/lg/LG7dZTi2
+        YhfUiGbVEN9t8unjnbpM0PBma4C/1A4=
+X-Google-Smtp-Source: ABdhPJyMggBzX4Yku1DHwLGv0JVpX1wZkBUNy4U32J8Rv0Nei2A9NxKExiGJvO85/hCO4xYrg/0jvw==
+X-Received: by 2002:a05:6402:17ee:: with SMTP id t14mr3371340edy.359.1594715104151;
+        Tue, 14 Jul 2020 01:25:04 -0700 (PDT)
+Received: from ?IPv6:2001:16b8:4814:b400:587:bfc1:3ea4:c2f6? ([2001:16b8:4814:b400:587:bfc1:3ea4:c2f6])
+        by smtp.gmail.com with ESMTPSA id m14sm11774133ejx.80.2020.07.14.01.25.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jul 2020 01:25:03 -0700 (PDT)
+Subject: Re: [PATCH RFC V2 1/4] block: add a statistic table for io latency
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Florian-Ewald Mueller <florian-ewald.mueller@cloud.ionos.com>
+References: <20200713211321.21123-1-guoqing.jiang@cloud.ionos.com>
+ <20200713211321.21123-2-guoqing.jiang@cloud.ionos.com>
+ <SN4PR0401MB3598BB82CD8660B4A8ACBC479B610@SN4PR0401MB3598.namprd04.prod.outlook.com>
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Message-ID: <62737df2-482a-7efc-1dcb-2b9ac5e89392@cloud.ionos.com>
+Date:   Tue, 14 Jul 2020 10:25:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cfff719b-dc12-a06a-d0ee-4165323171de@samsung.com>
+In-Reply-To: <SN4PR0401MB3598BB82CD8660B4A8ACBC479B610@SN4PR0401MB3598.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 14, 2020 at 10:06:05AM +0200, Bartlomiej Zolnierkiewicz wrote:
-> 
-> Hi Tony,
-> 
-> On 7/9/20 11:18 PM, Tony Asleson wrote:
-> > Hi Bartlomiej,
-> > 
-> > On 6/24/20 5:35 AM, Bartlomiej Zolnierkiewicz wrote:
-> >> The root source of problem is that libata transport uses different
-> >> naming scheme for ->tdev devices (please see dev_set_name() in
-> >> ata_t{dev,link,port}_add()) than libata core for its logging
-> >> functionality (ata_{dev,link,port}_printk()).
-> >>
-> >> Since libata transport is part of sysfs ABI we should be careful
-> >> to not break it so one idea for solving the issue is to convert
-> >> ata_t{dev,link,port}_add() to use libata logging naming scheme and
-> >> at the same time add sysfs symlinks for the old libata transport
-> >> naming scheme.
+On 7/14/20 9:43 AM, Johannes Thumshirn wrote:
+> On 13/07/2020 23:14, Guoqing Jiang wrote:
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index d9d632639bd1..036eb04782de 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -1411,6 +1411,34 @@ static void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
+>>   	}
+>>   }
+>>   
+>> +#ifdef CONFIG_BLK_ADDITIONAL_DISKSTAT
+>> +/*
+>> + * Either account additional stat for request if req is not NULL or account for bio.
+>> + */
+>> +static void blk_additional_latency(struct hd_struct *part, const int sgrp,
+>> +				   struct request *req, unsigned long start_jiffies)
+>> +{
+>> +	unsigned int idx;
+>> +	unsigned long duration, now = READ_ONCE(jiffies);
+>> +
+>> +	if (req)
+>> +		duration = jiffies_to_nsecs(now) - req->start_time_ns;
+>> +	else
+>> +		duration = jiffies_to_nsecs(now - start_jiffies);
+>> +
+>> +	duration /= NSEC_PER_MSEC;
+>> +	duration /= HZ_TO_MSEC_NUM;
+>> +	if (likely(duration > 0)) {
+>> +		idx = ilog2(duration);
+>> +		if (idx > ADD_STAT_NUM - 1)
+>> +			idx = ADD_STAT_NUM - 1;
+>> +	} else
+>> +		idx = 0;
+>> +	part_stat_inc(part, latency_table[idx][sgrp]);
+>> +
+>> +}
+>> +#endif
+>> +
+>>   static void blk_account_io_completion(struct request *req, unsigned int bytes)
+>>   {
+>>   	if (req->part && blk_do_io_stat(req)) {
+>> @@ -1440,6 +1468,9 @@ void blk_account_io_done(struct request *req, u64 now)
+>>   		part = req->part;
+>>   
+>>   		update_io_ticks(part, jiffies, true);
+>> +#ifdef CONFIG_BLK_ADDITIONAL_DISKSTAT
+>> +		blk_additional_latency(part, sgrp, req, 0);
+>> +#endif
+> Not commenting on the general idea here but only the code. The above introduces quite a
+> lot of ifdefs in code. Please at least move the #ifdef CONFIG_BLK_ADDITIONAL_DISKSTAT
+> into the function body of blk_additional_latency() so you don't need any ifdefs at the
+> call sites.
 
-Given the age of the current implementation, what suddenly broke that
-requires this to change at this point in time?
+Sure, will do it, thanks for your suggestion.
 
-> > 
-> > I tried doing as you suggested.  I've included what I've done so far.  I
-> > haven't been able to get all the needed parts for the symlinks to
-> > maintain compatibility.
-> > 
-> > The /sys/class/.. seems OK, eg.
-> > 
-> > $  ls -x -w 70 /sys/class/ata_[dl]*
-> > /sys/class/ata_device:
-> > ata1.00  ata2.00  ata3.00  ata4.00  ata5.00  ata6.00  ata7.00
-> > ata7.01  ata8.00  ata8.01  dev1.0   dev2.0   dev3.0   dev4.0
-> > dev5.0   dev6.0   dev7.0   dev7.1   dev8.0   dev8.1
-> > 
-> > /sys/class/ata_link:
-> > ata1   ata2   ata3   ata4   ata5   ata6   ata7  ata8  link1  link2
-> > link3  link4  link5  link6  link7  link8
-
-A link class?  Ick ick ick.
-
-> > but the implementation is a hack, see device.h, core.c changes.  There
-> > must be a better way?
-> > 
-> > Also I'm missing part of the full path, eg.
-> > 
-> > /sys/devices/pci0000:00/0000:00:01.1/ata7/link7/dev7.0/ata_device/dev7.0/gscr
-> > 
-> > becomes
-> > 
-> > /sys/devices/pci0000:00/0000:00:01.1/ata7/ata7/ata7.01/ata_device/ata7.01/gscr
-> > 
-> > but the compatibility symlinks added only get me to
-> > 
-> > /sys/devices/pci0000:00/0000:00:01.1/ata7/link7/dev7.0/ata_device/
-> > 
-> > I haven't found the right spot to get the last symlink included.
-> > 
-> > If you or anyone else has suggestions to correct the incomplete symlink
-> > and/or correct the implementation to set the
-> > /sys/class/ata_device it would be greatly appreciated.
-
-I can't understand what you are trying to do here.
-
-What do you want to represent in sysfs with a symlink that you can't
-just have in a single sysfs file like "name" or "new_name" or
-"name_because_we_didnt_think_about_this_10_years_ago" that shows you the
-other "name" that you are trying to look up here?
-
-Why abuse symlinks like this at all?
-
-And no, the device.h and core.c changes aren't ok :)
-
-thanks,
-
-greg k-h
+Thanks,
+Guoqing
