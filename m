@@ -7,29 +7,29 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1094C433E2
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 14:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53063C433E8
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 14:30:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7DC9D205CB
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 14:30:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32308205CB
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 14:30:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728347AbgGOOad (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 10:30:33 -0400
-Received: from [195.135.220.15] ([195.135.220.15]:59410 "EHLO mx2.suse.de"
+        id S1728603AbgGOOam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 10:30:42 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:59576 "EHLO mx2.suse.de"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1726935AbgGOOac (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 10:30:32 -0400
+        id S1728565AbgGOOam (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 10:30:42 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id EA893AF17;
-        Wed, 15 Jul 2020 14:30:33 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 2AB58AF17;
+        Wed, 15 Jul 2020 14:30:44 +0000 (UTC)
 From:   colyli@suse.de
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v3 03/16] bcache: disassemble the big if() checks in bch_cache_set_alloc()
-Date:   Wed, 15 Jul 2020 22:30:02 +0800
-Message-Id: <20200715143015.14957-4-colyli@suse.de>
+Subject: [PATCH v3 07/16] bcache: struct cache_sb is only for in-memory super block now
+Date:   Wed, 15 Jul 2020 22:30:06 +0800
+Message-Id: <20200715143015.14957-8-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200715143015.14957-1-colyli@suse.de>
 References: <20200715143015.14957-1-colyli@suse.de>
@@ -42,82 +42,61 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Coly Li <colyli@suse.de>
 
-In bch_cache_set_alloc() there is a big if() checks combined by 11 items
-together. When this big if() statement fails, it is difficult to tell
-exactly which item fails indeed.
+We have struct cache_sb_disk for on-disk super block already, it is
+unnecessary to keep the in-memory super block format exactly mapping
+to the on-disk struct layout.
 
-This patch disassembles this big if() checks into 11 single if() checks,
-which makes code debug more easier.
+This patch adds code comments to notice that struct cache_sb is not
+exactly mapping to cache_sb_disk, and removes the useless member csum
+and pad[5].
+
+Although struct cache_sb does not belong to uapi, but there are still
+some on-disk format related macros reference it and it is unncessary to
+get rid of such dependency now. So struct cache_sb will continue to stay
+in include/uapi/linux/bache.h for now.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/md/bcache/super.c | 52 ++++++++++++++++++++++++++++-----------
- 1 file changed, 37 insertions(+), 15 deletions(-)
+ include/uapi/linux/bcache.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index e162941122d4..acee8163f38a 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1865,21 +1865,43 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 	iter_size = (sb->bucket_size / sb->block_size + 1) *
- 		sizeof(struct btree_iter_set);
+diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
+index 47df2db2e727..0ef984ea515a 100644
+--- a/include/uapi/linux/bcache.h
++++ b/include/uapi/linux/bcache.h
+@@ -215,8 +215,13 @@ struct cache_sb_disk {
+ 	__le64			d[SB_JOURNAL_BUCKETS];	/* journal buckets */
+ };
  
--	if (!(c->devices = kcalloc(c->nr_uuids, sizeof(void *), GFP_KERNEL)) ||
--	    mempool_init_slab_pool(&c->search, 32, bch_search_cache) ||
--	    mempool_init_kmalloc_pool(&c->bio_meta, 2,
--				sizeof(struct bbio) + sizeof(struct bio_vec) *
--				bucket_pages(c)) ||
--	    mempool_init_kmalloc_pool(&c->fill_iter, 1, iter_size) ||
--	    bioset_init(&c->bio_split, 4, offsetof(struct bbio, bio),
--			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER) ||
--	    !(c->uuids = alloc_bucket_pages(GFP_KERNEL, c)) ||
--	    !(c->moving_gc_wq = alloc_workqueue("bcache_gc",
--						WQ_MEM_RECLAIM, 0)) ||
--	    bch_journal_alloc(c) ||
--	    bch_btree_cache_alloc(c) ||
--	    bch_open_buckets_alloc(c) ||
--	    bch_bset_sort_state_init(&c->sort, ilog2(c->btree_pages)))
-+	c->devices = kcalloc(c->nr_uuids, sizeof(void *), GFP_KERNEL);
-+	if (!c->devices)
-+		goto err;
-+
-+	if (mempool_init_slab_pool(&c->search, 32, bch_search_cache))
-+		goto err;
-+
-+	if (mempool_init_kmalloc_pool(&c->bio_meta, 2,
-+			sizeof(struct bbio) +
-+			sizeof(struct bio_vec) * bucket_pages(c)))
-+		goto err;
-+
-+	if (mempool_init_kmalloc_pool(&c->fill_iter, 1, iter_size))
-+		goto err;
-+
-+	if (bioset_init(&c->bio_split, 4, offsetof(struct bbio, bio),
-+			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER))
-+		goto err;
-+
-+	c->uuids = alloc_bucket_pages(GFP_KERNEL, c);
-+	if (!c->uuids)
-+		goto err;
-+
-+	c->moving_gc_wq = alloc_workqueue("bcache_gc", WQ_MEM_RECLAIM, 0);
-+	if (!c->moving_gc_wq)
-+		goto err;
-+
-+	if (bch_journal_alloc(c))
-+		goto err;
-+
-+	if (bch_btree_cache_alloc(c))
-+		goto err;
-+
-+	if (bch_open_buckets_alloc(c))
-+		goto err;
-+
-+	if (bch_bset_sort_state_init(&c->sort, ilog2(c->btree_pages)))
- 		goto err;
++/*
++ * This is for in-memory bcache super block.
++ * NOTE: cache_sb is NOT exactly mapping to cache_sb_disk, the member
++ *       size, ordering and even whole struct size may be different
++ *       from cache_sb_disk.
++ */
+ struct cache_sb {
+-	__u64			csum;
+ 	__u64			offset;	/* sector where this sb was written */
+ 	__u64			version;
  
- 	c->congested_read_threshold_us	= 2000;
+@@ -236,8 +241,6 @@ struct cache_sb {
+ 	__u64			feature_incompat;
+ 	__u64			feature_ro_compat;
+ 
+-	__u64			pad[5];
+-
+ 	union {
+ 	struct {
+ 		/* Cache devices */
+@@ -245,7 +248,6 @@ struct cache_sb {
+ 
+ 		__u16		block_size;	/* sectors */
+ 		__u16		bucket_size;	/* sectors */
+-
+ 		__u16		nr_in_set;
+ 		__u16		nr_this_dev;
+ 	};
 -- 
 2.26.2
 
