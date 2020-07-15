@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDE5C433E5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8004CC433E8
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17131206D5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F251206F4
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728674AbgGOFqb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 01:46:31 -0400
-Received: from [195.135.220.15] ([195.135.220.15]:38426 "EHLO mx2.suse.de"
+        id S1728684AbgGOFqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 01:46:36 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:38472 "EHLO mx2.suse.de"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1728666AbgGOFqb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 01:46:31 -0400
+        id S1728663AbgGOFqg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 01:46:36 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 8E48DAC20;
-        Wed, 15 Jul 2020 05:46:32 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id C4453AB7D;
+        Wed, 15 Jul 2020 05:46:37 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v2 05/17] bcache: fix super block seq numbers comparision in register_cache_set()
-Date:   Wed, 15 Jul 2020 13:46:00 +0800
-Message-Id: <20200715054612.6349-6-colyli@suse.de>
+Subject: [PATCH v2 07/17] bcache: move bucket related code into read_super_basic()
+Date:   Wed, 15 Jul 2020 13:46:02 +0800
+Message-Id: <20200715054612.6349-8-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200715054612.6349-1-colyli@suse.de>
 References: <20200715054612.6349-1-colyli@suse.de>
@@ -39,69 +39,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In register_cache_set(), c is pointer to struct cache_set, and ca is
-pointer to struct cache, if ca->sb.seq > c->sb.seq, it means this
-registering cache has up to date version and other members, the in-
-memory version and other members should be updated to the newer value.
+Setting sb->first_bucket and checking sb->keys indeed are only for cache
+device, it does not make sense to do them in read_super() for backing
+device too.
 
-But current implementation makes a cache set only has a single cache
-device, so the above assumption works well except for a special case.
-The execption is when a cache device new created and both ca->sb.seq and
-c->sb.seq are 0, because the super block is never flushed out yet. In
-the location for the following if() check,
-2156         if (ca->sb.seq > c->sb.seq) {
-2157                 c->sb.version           = ca->sb.version;
-2158                 memcpy(c->sb.set_uuid, ca->sb.set_uuid, 16);
-2159                 c->sb.flags             = ca->sb.flags;
-2160                 c->sb.seq               = ca->sb.seq;
-2161                 pr_debug("set version = %llu\n", c->sb.version);
-2162         }
-c->sb.version is not initialized yet and valued 0. When ca->sb.seq is 0,
-the if() check will fail (because both values are 0), and the cache set
-version, set_uuid, flags and seq won't be updated.
-
-The above problem is hiden for current code, because the bucket size is
-compatible among different super block version. And the next time when
-running cache set again, ca->sb.seq will be larger than 0 and cache set
-super block version will be updated properly.
-
-But if the large bucket feature is enabled,  sb->bucket_size is the low
-16bits of the bucket size. For a power of 2 value, when the actual
-bucket size exceeds 16bit width, sb->bucket_size will always be 0. Then
-read_super_basic() will fail because the if() check to
-is_power_of_2(sb->bucket_size) is false. This is how the long time
-hidden bug is triggered.
-
-This patch modifies the if() check to the following way,
-2156         if (ca->sb.seq > c->sb.seq || c->sb.seq == 0) {
-Then cache set's version, set_uuid, flags and seq will always be updated
-corectly including for a new created cache device.
+This patch moves the related code piece into read_super_basic()
+explicitly for cache device and avoid the confusion.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/super.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/md/bcache/super.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 1d5b2b3ad93a..0a51ea857e3f 100644
+index 071509590e1e..4c97d8c4a878 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -2146,7 +2146,14 @@ static const char *register_cache_set(struct cache *ca)
- 	    sysfs_create_link(&c->kobj, &ca->kobj, buf))
+@@ -66,12 +66,17 @@ static const char *read_super_basic(struct cache_sb *sb,  struct block_device *b
+ 	const char *err;
+ 	unsigned int i;
+ 
++	sb->first_bucket= le16_to_cpu(s->first_bucket);
+ 	sb->nbuckets	= le64_to_cpu(s->nbuckets);
+ 	sb->bucket_size	= le16_to_cpu(s->bucket_size);
+ 
+ 	sb->nr_in_set	= le16_to_cpu(s->nr_in_set);
+ 	sb->nr_this_dev	= le16_to_cpu(s->nr_this_dev);
+ 
++	err = "Too many journal buckets";
++	if (sb->keys > SB_JOURNAL_BUCKETS)
++		goto err;
++
+ 	err = "Too many buckets";
+ 	if (sb->nbuckets > LONG_MAX)
+ 		goto err;
+@@ -155,7 +160,6 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+ 	sb->flags		= le64_to_cpu(s->flags);
+ 	sb->seq			= le64_to_cpu(s->seq);
+ 	sb->last_mount		= le32_to_cpu(s->last_mount);
+-	sb->first_bucket	= le16_to_cpu(s->first_bucket);
+ 	sb->keys		= le16_to_cpu(s->keys);
+ 
+ 	for (i = 0; i < SB_JOURNAL_BUCKETS; i++)
+@@ -172,10 +176,6 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+ 	if (memcmp(sb->magic, bcache_magic, 16))
  		goto err;
  
--	if (ca->sb.seq > c->sb.seq) {
-+	/*
-+	 * A special case is both ca->sb.seq and c->sb.seq are 0,
-+	 * such condition happens on a new created cache device whose
-+	 * super block is never flushed yet. In this case c->sb.version
-+	 * and other members should be updated too, otherwise we will
-+	 * have a mistaken super block version in cache set.
-+	 */
-+	if (ca->sb.seq > c->sb.seq || c->sb.seq == 0) {
- 		c->sb.version		= ca->sb.version;
- 		memcpy(c->sb.set_uuid, ca->sb.set_uuid, 16);
- 		c->sb.flags             = ca->sb.flags;
+-	err = "Too many journal buckets";
+-	if (sb->keys > SB_JOURNAL_BUCKETS)
+-		goto err;
+-
+ 	err = "Bad checksum";
+ 	if (s->csum != csum_set(s))
+ 		goto err;
 -- 
 2.26.2
 
