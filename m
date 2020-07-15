@@ -2,64 +2,81 @@ Return-Path: <SRS0=PIBb=A2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD70BC433E3
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 06:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C688C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 07:30:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA6DC20663
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 06:48:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PikKUoj5"
+	by mail.kernel.org (Postfix) with ESMTP id F084420760
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 07:30:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728030AbgGOGs6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 02:48:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36696 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725924AbgGOGs5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 02:48:57 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A82D0C061755;
-        Tue, 14 Jul 2020 23:48:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=2Xu0wDeMJVr4Fso9VMDrFXFtdZDxizg0iRDFYzL7qxg=; b=PikKUoj5RJk+gJSIrWoefNe2LO
-        MYOdcsUH5TxR9dW7uwJKsy17jAfuJ68+U0y8Qd2Boo79ZpjG7i+/mGPnPuUhHrn1X9OVT8OCn7CkE
-        HGUV+gjxVRrEBumyrkMN8s8w4drtjOo1QxCdtRfY50bc9dr1Ndg4ujsY2TrzrqQWT3aNS4YOoUQ/J
-        ctjMTk/gE2+9zKkomv0jMdroxC7KQu4Pu4ID3wlCIt7PB69AXfRkb4eF8hUnivTE4hFAKPa+gKwZb
-        VHplUcokz24V5bF+MDO9RaOMyHyBdIqySdrMkdGCMTbA0jrrTda/wBy+NjUkFUp48yLWPhE6mj2hH
-        OktsMzUw==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jvbDq-0001Vp-VP; Wed, 15 Jul 2020 06:48:55 +0000
-Date:   Wed, 15 Jul 2020 07:48:54 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Stefan Haberland <sth@linux.ibm.com>, linux-block@vger.kernel.org,
-        hoeppner@linux.ibm.com, linux-s390@vger.kernel.org,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com
-Subject: Re: [PATCH 1/2] s390/dasd: fix inability to use DASD with DIAG driver
-Message-ID: <20200715064854.GA5409@infradead.org>
-References: <20200714200327.40927-1-sth@linux.ibm.com>
- <20200714200327.40927-2-sth@linux.ibm.com>
- <c368fa07-4a7d-3eae-6143-a2db298c204e@kernel.dk>
+        id S1729321AbgGOHaP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 03:30:15 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2480 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728888AbgGOHaP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 03:30:15 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id E78918ACBCDD2BA09E4F;
+        Wed, 15 Jul 2020 08:30:10 +0100 (IST)
+Received: from [127.0.0.1] (10.47.6.38) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Wed, 15 Jul
+ 2020 08:30:09 +0100
+Subject: Re: [PATCH RFC v7 11/12] smartpqi: enable host tagset
+To:     <Don.Brace@microchip.com>, <don.brace@microsemi.com>,
+        <hare@suse.com>
+CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <kashyap.desai@broadcom.com>,
+        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <hch@lst.de>,
+        <shivasharan.srikanteshwara@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
+        <megaraidlinux.pdl@broadcom.com>, <hare@suse.de>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-12-git-send-email-john.garry@huawei.com>
+ <a8afea5c-97f2-ac84-f4b5-155963bebb2c@huawei.com>
+ <786e0b9d-ab42-aaf6-f552-072010892778@huawei.com>
+ <SN6PR11MB28486DB217EFB23F26321236E1610@SN6PR11MB2848.namprd11.prod.outlook.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <dad8d9de-ef36-e412-db04-644bca623c01@huawei.com>
+Date:   Wed, 15 Jul 2020 08:28:23 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c368fa07-4a7d-3eae-6143-a2db298c204e@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <SN6PR11MB28486DB217EFB23F26321236E1610@SN6PR11MB2848.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.6.38]
+X-ClientProxiedBy: lhreml728-chm.china.huawei.com (10.201.108.79) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 14, 2020 at 02:12:27PM -0600, Jens Axboe wrote:
-> Just curious, any reason this isn't just using bio_alloc()?
+On 14/07/2020 19:16, Don.Brace@microchip.com wrote:
+> Subject: Re: [PATCH RFC v7 11/12] smartpqi: enable host tagset
+> 
+> 
+> Both the driver author and myself do not want to change how commands are processed in the smartpqi driver.
+> 
+> Nak.
+> 
 
-The dasd_diag_bio doesn't seem to have anything to do with the
-block layer struct bio..
+ok, your call. But it still seems that the driver should set the 
+host_tagset flag.
+
+Anyway, can you also let us know your stance on the hpsa change in this 
+series?
+
+https://lore.kernel.org/linux-scsi/1591810159-240929-1-git-send-email-john.garry@huawei.com/T/#m1057b8a8c23a9bf558a048817a1cda4a576291b2
+
+thanks
+
+
