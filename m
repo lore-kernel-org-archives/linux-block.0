@@ -2,104 +2,124 @@ Return-Path: <SRS0=PIBb=A2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 645C2C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 10:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A25A5C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 11:16:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40D3520656
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 10:37:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 820DE2067D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 11:16:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="P5w04vOc"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="GkaBGqWr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731207AbgGOKhI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 06:37:08 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:52535 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731197AbgGOKhI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 06:37:08 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1594809428; h=Date: Message-Id: Cc: To: References:
- In-Reply-To: From: Subject: Content-Transfer-Encoding: MIME-Version:
- Content-Type: Sender; bh=pYgx74LtrBLVD12x3ELyZuAqEdnOVxhRlDanXsj1kC8=;
- b=P5w04vOc+Pfl6b39NL7pycBqfT4dKZdmpJtKVLay69u6fG9ugGyAhi1DDYfKyJ6EXKzGMqQg
- L915gqSTXg3chWf/WpuQ60gJZt1tfv6K8ba9WadrPAwEhfpbfUqZ+c4bH1Gdr3aZf0mVmyGO
- Xi87rEmYJQr8a1ik3woi40l+KtY=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n04.prod.us-west-2.postgun.com with SMTP id
- 5f0edc4db35196d59d5e52fa (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 15 Jul 2020 10:37:01
- GMT
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 5B429C43449; Wed, 15 Jul 2020 10:37:01 +0000 (UTC)
-Received: from potku.adurom.net (88-114-240-156.elisa-laajakaista.fi [88.114.240.156])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727925AbgGOLQD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 07:16:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49806 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725912AbgGOLQD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 07:16:03 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15E66C061755;
+        Wed, 15 Jul 2020 04:16:03 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        (Authenticated sender: kvalo)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 639D1C433CA;
-        Wed, 15 Jul 2020 10:36:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 639D1C433CA
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=kvalo@codeaurora.org
-Content-Type: text/plain; charset="utf-8"
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B6FDs4szfz9sRf;
+        Wed, 15 Jul 2020 21:15:57 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1594811759;
+        bh=3WOh8dyM4Vi1i0NxC/9yQndiresf1N+xQQw5HKnVsqw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=GkaBGqWroEWltm8HhGQzyaVmSkDXgfMKwzCEeTOkAItaY8Y39meiPHPS4mMnGsgIj
+         6Lo4BFiF+GZDIwxdWsIOQVqY+WGmnFoO3XLeFEMNoD7yyssBTW1PmE6RfYukR7Jliy
+         BkL42vqKecgwC60UQCQ6d6yLfUHihrxQouON6bHCkfx41epvvs2mdnln1GvlXhjWgZ
+         MWqhyt4kro4RBdLWOxUZHmWSyXYz59z9A/T9fgewg6qmeP5Gobab0jLXeAbNHvuL0C
+         Z1hUi9E1T6JGN5SRYLi1YdvCIZdH/n+5bZA0S+zl50wFudi0K+2cK0Da8N2uvUj52s
+         JRK810a0dRk4g==
+Date:   Wed, 15 Jul 2020 21:15:56 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     syzbot <syzbot+fa64e680a1ff32087778@syzkaller.appspotmail.com>
+Cc:     akpm@linux-foundation.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pmladek@suse.com, qiang.zhang@windriver.com,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: WARNING in kthread_queue_work
+Message-ID: <20200715211556.61705064@canb.auug.org.au>
+In-Reply-To: <00000000000031a14405aa780bdb@google.com>
+References: <000000000000e6807f05aa4608b7@google.com>
+        <00000000000031a14405aa780bdb@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v2 04/16] b43: Remove uninitialized_var() usage
-From:   Kalle Valo <kvalo@codeaurora.org>
-In-Reply-To: <20200620033007.1444705-5-keescook@chromium.org>
-References: <20200620033007.1444705-5-keescook@chromium.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Joe Perches <joe@perches.com>,
-        Andy Whitcroft <apw@canonical.com>, x86@kernel.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        b43-dev@lists.infradead.org, netdev@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-mm@kvack.org,
-        clang-built-linux@googlegroups.com
-User-Agent: pwcli/0.1.0-git (https://github.com/kvalo/pwcli/) Python/3.5.2
-Message-Id: <20200715103701.5B429C43449@smtp.codeaurora.org>
-Date:   Wed, 15 Jul 2020 10:37:01 +0000 (UTC)
+Content-Type: multipart/signed; boundary="Sig_/ahPpGGhSCtt9pBV9/XE.=pa";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> wrote:
+--Sig_/ahPpGGhSCtt9pBV9/XE.=pa
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> (or can in the future), and suppresses unrelated compiler warnings (e.g.
-> "unused variable"). If the compiler thinks it is uninitialized, either
-> simply initialize the variable or make compiler changes. As a precursor
-> to removing[2] this[3] macro[4], just initialize this variable to NULL.
-> No later NULL deref is possible due to the early returns outside of the
-> (phy->rev >= 7 && phy->rev < 19) case, which explicitly tests for NULL.
-> 
-> [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-> [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-> [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-> [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
-> 
-> Fixes: 58619b14d106 ("b43: move under broadcom vendor directory")
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Hi syzbot,
 
-2 patches applied to wireless-drivers-next.git, thanks.
+On Wed, 15 Jul 2020 03:04:04 -0700 syzbot <syzbot+fa64e680a1ff32087778@syzk=
+aller.appspotmail.com> wrote:
+>
+> syzbot has bisected this issue to:
+>=20
+> commit 4977caef05aa154f5e45a232fc4f0e1c74a0c739
+> Author: Zhang Qiang <qiang.zhang@windriver.com>
+> Date:   Tue Jul 7 02:29:47 2020 +0000
+>=20
+>     kthread: work could not be queued when worker being destroyed
+>=20
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D12c58f5710=
+0000
+> start commit:   89032636 Add linux-next specific files for 20200708
+> git tree:       linux-next
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D11c58f5710=
+0000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D16c58f57100000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D64a250ebabc6c=
+320
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dfa64e680a1ff320=
+87778
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D16bf9f2f100=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D118380ed100000
+>=20
+> Reported-by: syzbot+fa64e680a1ff32087778@syzkaller.appspotmail.com
+> Fixes: 4977caef05aa ("kthread: work could not be queued when worker being=
+ destroyed")
+>=20
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
+ion
 
-800e7a205a0f b43: Remove uninitialized_var() usage
-f8279dad4e36 rtlwifi: rtl8192cu: Remove uninitialized_var() usage
+#syz invalid
 
--- 
-https://patchwork.kernel.org/patch/11615573/
+This patch was removed.
+--=20
+Cheers,
+Stephen Rothwell
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+--Sig_/ahPpGGhSCtt9pBV9/XE.=pa
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8O5WwACgkQAVBC80lX
+0Gw+DQf/fLLZPQPNoACTbZnOrP7NSSsjaXnens7+3QkbZlSCAiUCedarlTPop4Wm
+YHGepi0ykJtd1pFFHJg7+0fzSjqdHlr6JES5zMaWoTo9xjqj4Z2ko4e6ulCV51NA
+7FOSUJ7KN7pbCuABwSx5sliQgD7tZaY7ZNYQJqiV9p1Eg4XD9tgqR9wjm/hH764b
+U1nJzaUwrhPZBFuKqyMuWDqiYarBVM+P6DrC8yNnIEt6LH89yeWYm9ew/zsjHKHz
+WKXtH7mFX904r5m92spjsHVJtQkJZpq7imBPLgKjy2nY4lKmQJtaqn+HsXkLJqGt
+SMRpnu8zcLsUNDXpOlj4HI/rcQYjMg==
+=Rc9o
+-----END PGP SIGNATURE-----
+
+--Sig_/ahPpGGhSCtt9pBV9/XE.=pa--
