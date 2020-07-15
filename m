@@ -2,159 +2,77 @@ Return-Path: <SRS0=PIBb=A2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C53C5C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 16:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 130C0C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 18:21:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3C79206D5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 16:36:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC43A2065F
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 18:21:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="izvgTdok"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LCsT5BYw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbgGOQg4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 12:36:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43018 "EHLO
+        id S1726402AbgGOSVc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 14:21:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbgGOQgy (ORCPT
+        with ESMTP id S1726376AbgGOSVb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 12:36:54 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FDBCC08C5DB
-        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2020 09:36:54 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id r19so3252265ljn.12
-        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2020 09:36:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=eCQSS5Z/XAuJJ0ObjR5nRfl8x7vpuq0gBBiMlc5n388=;
-        b=izvgTdokwsQbPkEHKbGYg+vgL3PLbT710ndTtF+lw0QVNhZPDQQjkr8aN4juyq1ITY
-         yQaBTbw4G262maEKv7mI6zKBmKapyRz7IN5soCyNo1VZQX2zOEPVC7DSLWN/JmKEwdA5
-         lI8Oeb9+QNbM582nfIuOILLRmXR0wXZ8dtVMWeD5p77C+CgAO3F/4N3Oz+huCpu3K9Vc
-         OTktHziUeHCrwlIub3z5XnFu/xigyh3HdjfxCrAXVzW9vuSRzKqfZ0DvNEKYGC28/++q
-         gYM+2CZgooNe3NtWog1NoDMOmCYr8FS9mjj8RmfHzJ1TEOktmvCLP6r3NgZXZhU/gB35
-         sxGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eCQSS5Z/XAuJJ0ObjR5nRfl8x7vpuq0gBBiMlc5n388=;
-        b=nAznRKm0+AfxW8qy0cxnsfGCeUhtg8jhHCS712NtTCTsmb6M34BKjh3qhnikhuirGC
-         lNeHkUKFT4I3PRGApUifgzxQz4hReODyScYFDCQClUKkJd3S9spkJ/DCj95Fs/M4RX6O
-         3DuKw9o/YvbFgXdX2QvI3cExpraqwDM/gCozIBNr0Q76ehmCOzglUOZU7setTycOsaUI
-         LuxetuQi5LPie2JMHf7tslng9VErI0t+bnWQ7Qvt5+ZaouaODoMw2b0eV+fRYVkTVRPM
-         PF3mNr7oieyldYqF3e8PbNIePDn87BB6ulw5loDEtMfctEe+lLxHSq04tF66iigGWt8X
-         ijGw==
-X-Gm-Message-State: AOAM533pH/sPVPR3AxkKPTlM83PAUpyNPBwuYyBgUiZ7Q+TZ/TpW8Eoh
-        8tZXucYHcSrOOYN9SOzJ0F5Pwy1YS3HyVDEnCt72/Qyv
-X-Google-Smtp-Source: ABdhPJxkvCC8/QXGjTsKModznq9Sitpzv8TpZrU2xepInx6yXDiYQJ55n1/Rgdh/Jkbnh3Eg86yNuwgRgkS6wU5FZEc=
-X-Received: by 2002:a2e:9585:: with SMTP id w5mr24703ljh.58.1594831012200;
- Wed, 15 Jul 2020 09:36:52 -0700 (PDT)
+        Wed, 15 Jul 2020 14:21:31 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F18D0C061755;
+        Wed, 15 Jul 2020 11:21:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=QjSMmrT9T2E0YbGnNbA74XDA7KOSZ0YsKlQgmRsxjoo=; b=LCsT5BYwnUVa6qWtm86Jur8nV/
+        iLdyDopu9rfw9ZTj2p+0xe2gABlUY5dH7LnXeBiR86Q10/6gNeG6exqqMKqc6/ChBzPKveyxDVu78
+        8OJ8aL4j6X429TXFy9n4ZRINpwaEMuPZ1AyJXQ7gK2Be3XTAv4xfCE9ZVokyG8dgQSRGsvBsyVdJX
+        grbvH3zuC2YGKJgS5tYg7wiNOWMVOHFnnyYsTum53Oo3eNeUZFdD/gNngaGsBUdR7zgP3Y317knQK
+        ZJk+Ezk6jWCQgyNKqNmxx9mTp9+IyTK1zXTfvCJq8apMosvjWOUcjWuQI4pNdjSWruHeebr9UHHtI
+        6SHVC8hw==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jvm25-0005Ej-G9; Wed, 15 Jul 2020 18:21:29 +0000
+Date:   Wed, 15 Jul 2020 19:21:29 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     colyli@suse.de
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v3 07/16] bcache: struct cache_sb is only for in-memory
+ super block now
+Message-ID: <20200715182129.GA20035@infradead.org>
+References: <20200715143015.14957-1-colyli@suse.de>
+ <20200715143015.14957-8-colyli@suse.de>
 MIME-Version: 1.0
-References: <1585649077-10896-1-git-send-email-laoar.shao@gmail.com>
-In-Reply-To: <1585649077-10896-1-git-send-email-laoar.shao@gmail.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Wed, 15 Jul 2020 09:36:41 -0700
-Message-ID: <CALvZod6Yn=_fYEM+xN3a+4W2e5CCLkvMXZg_txD3j+dZieX-CQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] psi: enhance psi with the help of ebpf
-To:     Yafang Shao <laoar.shao@gmail.com>
-Cc:     Johannes Weiner <hannes@cmpxchg.org>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linux MM <linux-mm@kvack.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200715143015.14957-8-colyli@suse.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Yafang,
+On Wed, Jul 15, 2020 at 10:30:06PM +0800, colyli@suse.de wrote:
+> From: Coly Li <colyli@suse.de>
+> 
+> We have struct cache_sb_disk for on-disk super block already, it is
+> unnecessary to keep the in-memory super block format exactly mapping
+> to the on-disk struct layout.
+> 
+> This patch adds code comments to notice that struct cache_sb is not
+> exactly mapping to cache_sb_disk, and removes the useless member csum
+> and pad[5].
+> 
+> Although struct cache_sb does not belong to uapi, but there are still
+> some on-disk format related macros reference it and it is unncessary to
+> get rid of such dependency now. So struct cache_sb will continue to stay
+> in include/uapi/linux/bache.h for now.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-On Tue, Mar 31, 2020 at 3:05 AM Yafang Shao <laoar.shao@gmail.com> wrote:
->
-> PSI gives us a powerful way to anaylze memory pressure issue, but we can
-> make it more powerful with the help of tracepoint, kprobe, ebpf and etc.
-> Especially with ebpf we can flexiblely get more details of the memory
-> pressure.
->
-> In orderc to achieve this goal, a new parameter is added into
-> psi_memstall_{enter, leave}, which indicates the specific type of a
-> memstall. There're totally ten memstalls by now,
->         MEMSTALL_KSWAPD
->         MEMSTALL_RECLAIM_DIRECT
->         MEMSTALL_RECLAIM_MEMCG
->         MEMSTALL_RECLAIM_HIGH
->         MEMSTALL_KCOMPACTD
->         MEMSTALL_COMPACT
->         MEMSTALL_WORKINGSET_REFAULT
->         MEMSTALL_WORKINGSET_THRASH
->         MEMSTALL_MEMDELAY
->         MEMSTALL_SWAPIO
-> With the help of kprobe or tracepoint to trace this newly added agument we
-> can know which type of memstall it is and then do corresponding
-> improvement. I can also help us to analyze the latency spike caused by
-> memory pressure.
->
-> But note that we can't use it to build memory pressure for a specific type
-> of memstall, e.g. memcg pressure, compaction pressure and etc, because it
-> doesn't implement various types of task->in_memstall, e.g.
-> task->in_memcgstall, task->in_compactionstall and etc.
->
-> Although there're already some tracepoints can help us to achieve this
-> goal, e.g.
->         vmscan:mm_vmscan_kswapd_{wake, sleep}
->         vmscan:mm_vmscan_direct_reclaim_{begin, end}
->         vmscan:mm_vmscan_memcg_reclaim_{begin, end}
->         /* no tracepoint for memcg high reclaim*/
->         compcation:mm_compaction_kcompactd_{wake, sleep}
->         compcation:mm_compaction_begin_{begin, end}
->         /* no tracepoint for workingset refault */
->         /* no tracepoint for workingset thrashing */
->         /* no tracepoint for use memdelay */
->         /* no tracepoint for swapio */
-> but psi_memstall_{enter, leave} gives us a unified entrance for all
-> types of memstall and we don't need to add many begin and end tracepoints
-> that hasn't been implemented yet.
->
-> Patch #2 gives us an example of how to use it with ebpf. With the help of
-> ebpf we can trace a specific task, application, container and etc. It also
-> can help us to analyze the spread of latencies and whether they were
-> clustered at a point of time or spread out over long periods of time.
->
-> To summarize, with the pressure data in /proc/pressure/memroy we know that
-> the system is under memory pressure, and then with the newly added tracing
-> facility in this patchset we can get the reason of this memory pressure,
-> and then thinks about how to make the change.
-> The workflow can be illustrated as bellow.
->
->                    REASON         ACTION
->                  | compcation   | improve compcation    |
->                  | vmscan       | improve vmscan        |
-> Memory pressure -| workingset   | improve workingset    |
->                  | etc          | ...                   |
->
-
-I have not looked at the patch series in detail but I wanted to get
-your thoughts if it is possible to achieve what I am trying to do with
-this patch series.
-
-At the moment I am only interested in global reclaim and I wanted to
-enable alerts like "alert if there is process stuck in global reclaim
-for x seconds in last y seconds window" or "alert if all the processes
-are stuck in global reclaim for some z seconds".
-
-I see that using this series I can identify global reclaim but I am
-wondering if alert or notifications are possible. Android is using psi
-monitors for such alerts but it does not use cgroups, so, most of the
-memstalls are related to global reclaim stall. For cgroup environment,
-do we need for add support to psi monitor similar to this patch
-series?
-
-thanks,
-Shakeel
+If you change this it really needs to move out of the uapi header.
