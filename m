@@ -2,89 +2,86 @@ Return-Path: <SRS0=PIBb=A2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDF8C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 15:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F611C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 15:50:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EAE320720
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 15:38:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1ECEB20658
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 15:50:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=seas-upenn-edu.20150623.gappssmtp.com header.i=@seas-upenn-edu.20150623.gappssmtp.com header.b="CiWkOA92"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726201AbgGOPi2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 11:38:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41594 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725897AbgGOPi1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 11:38:27 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6A2B8AD1E;
-        Wed, 15 Jul 2020 15:38:29 +0000 (UTC)
-Subject: Re: [PATCH v3 10/16] bcache: handle cache prio_buckets and
- disk_buckets properly for bucket size > 8MB
-To:     colyli@suse.de, linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20200715143015.14957-1-colyli@suse.de>
- <20200715143015.14957-11-colyli@suse.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <8d42ce3f-070d-7862-e8cb-d92ad14059a5@suse.de>
-Date:   Wed, 15 Jul 2020 17:38:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200715143015.14957-11-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1725861AbgGOPuv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 11:50:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35852 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725835AbgGOPuv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 11:50:51 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C37BBC061755
+        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2020 08:50:50 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id b25so2069477qto.2
+        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2020 08:50:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=seas-upenn-edu.20150623.gappssmtp.com; s=20150623;
+        h=from:content-transfer-encoding:mime-version:subject:message-id:date
+         :to;
+        bh=br4dNMr1BfeckqthKTUuXQUh0U9JhhSK+KDy6h7SFt8=;
+        b=CiWkOA92iOlSxEKxxYGTq1DY6iAzCOf71aC51LEbdm79guZozMC9Cuenxm++CyGphJ
+         VaCEPdRQra8NdjQ91QIcFFBY1bHDtlS81mrKHAo1cZGQd8u43SugAzdOO55LaiYvBFVZ
+         4qWotY0+5j8BSgGbDUMxLiG6XaOvKc7QE63mUggfr8bkDw8zxzGA8B+BGxP906yutR0y
+         LNGrmyzXS9pAyWAPLELRjRhsITP3YtGehdI+l8DVK4Y9DXFYWhiozkCcOfOMDvgrzlxK
+         o0q2gefrT16ptxQgHi2rx9vFV0D2BkXL8rdN27vsf2PurlYIB9TS8/MLwBzk0NR7MzO9
+         Yvkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:content-transfer-encoding:mime-version
+         :subject:message-id:date:to;
+        bh=br4dNMr1BfeckqthKTUuXQUh0U9JhhSK+KDy6h7SFt8=;
+        b=HBdZavCT4zKf9JAa2R1wmQzR1QzPq+TNKRKCrPaxfzVG4mvYDUM2c5BoVxdicdhPsZ
+         05s0ILKdHJv60PfOMjwwi6HTF8OqppOrhGPRmLXcCws3aDZvIJ9vcB70g7zLEIh3aWHU
+         V8OzN3oUVrQ9By8oRQc95ZeGHrxMb+yl2u0PF8OgtGJj6yky5bak5LKlL1k3z00bjBd2
+         QuNeRnGxTItEEd/JSfJXiCHCJ61cQ6QpqSBXjZkazoyTLz3qn2z5Nf6uz9f6DAEGp21q
+         RUZrdeWZhEnbalHSC5Hw84oUj/aA+HA3VgONilUBNQsMkxo1koG4H1y3Oe5RGakYVm5p
+         UToQ==
+X-Gm-Message-State: AOAM531aKPqLa4NVcjY8H8LpyveojKVgPJ2L4iy7Pw9Wd0FFXupjjPJa
+        zQ1gpJRt2jAMjEU3T/EMNEIrNg==
+X-Google-Smtp-Source: ABdhPJxq4PE6FT0NlCMxmJyniDV9V4j6/G7aCgY6zqYO+GUkGnW8qYwZuW22CLCPzeE/v4Jx1kqyag==
+X-Received: by 2002:ac8:87d:: with SMTP id x58mr440306qth.28.1594828249646;
+        Wed, 15 Jul 2020 08:50:49 -0700 (PDT)
+Received: from tsukihi.fios-router.home (pool-98-114-65-2.phlapa.fios.verizon.net. [98.114.65.2])
+        by smtp.gmail.com with ESMTPSA id m20sm2681644qkk.104.2020.07.15.08.50.48
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 15 Jul 2020 08:50:49 -0700 (PDT)
+From:   Ziyang Li <liby99@seas.upenn.edu>
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3645.0.6.2.4\))
+Subject: Possible bug in block/bounce.c
+Message-Id: <1CEFBFC5-7B0D-4F92-BE37-013CFDEC9F5B@seas.upenn.edu>
+Date:   Wed, 15 Jul 2020 11:50:46 -0400
+To:     axboe@kernel.dk, linux-block@vger.kernel.org
+X-Mailer: Apple Mail (2.3645.0.6.2.4)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/15/20 4:30 PM, colyli@suse.de wrote:
-> From: Coly Li <colyli@suse.de>
-> 
-> Similar to c->uuids, struct cache's prio_buckets and disk_buckets also
-> have the potential memory allocation failure during cache registration
-> if the bucket size > 8MB.
-> 
-> ca->prio_buckets can be stored on cache device in multiple buckets, its
-> in-memory space is allocated by kzalloc() interface but normally
-> allocated by alloc_pages() because the size > KMALLOC_MAX_CACHE_SIZE.
-> 
-> So allocation of ca->prio_buckets has the MAX_ORDER restriction too. If
-> the bucket size > 8MB, by default the page allocator will fail because
-> the page order > 11 (default MAX_ORDER value). ca->prio_buckets should
-> also use meta_bucket_bytes(), meta_bucket_pages() to decide its memory
-> size and use alloc_meta_bucket_pages() to allocate pages, to avoid the
-> allocation failure during cache set registration when bucket size > 8MB.
-> 
-> ca->disk_buckets is a single bucket size memory buffer, it is used to
-> iterate each bucket of ca->prio_buckets, and compose the bio based on
-> memory of ca->disk_buckets, then write ca->disk_buckets memory to cache
-> disk one-by-one for each bucket of ca->prio_buckets. ca->disk_buckets
-> should have in-memory size exact to the meta_bucket_pages(), this is the
-> size that ca->prio_buckets will be stored into each on-disk bucket.
-> 
-> This patch fixes the above issues and handle cache's prio_buckets and
-> disk_buckets properly for bucket size larger than 8MB.
-> 
-> Signed-off-by: Coly Li <colyli@suse.de>
-> ---
->   drivers/md/bcache/bcache.h |  9 +++++----
->   drivers/md/bcache/super.c  | 10 +++++-----
->   2 files changed, 10 insertions(+), 9 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi all:
 
-Cheers,
+I hope this is the right place to ask about a potential bug in bounce.c. =
+So on line 329 we assign the result of `mempool_alloc` to `to->bv_page` =
+but we never check if `to->bv_page` is a valid pointer, also given that =
+this variable is dereferenced in inc_zone_page_state. I wonder if we =
+should add something like `if (to->bv_page =3D=3D null)` here?
 
-Hannes
--- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+329: to->bv_page =3D mempool_alloc(pool, q->bounce_gfp);
+330: inc_zone_page_state(to->bv_page, NR_BOUNCE);
+
+Best,
+Ziyang=
