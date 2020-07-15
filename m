@@ -7,29 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1FDC433E6
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 14:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B9BC433E7
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 14:30:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 354E42064B
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 14:30:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24716205CB
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 14:30:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728295AbgGOOak (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 10:30:40 -0400
-Received: from [195.135.220.15] ([195.135.220.15]:59540 "EHLO mx2.suse.de"
+        id S1728712AbgGOOas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 10:30:48 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:59976 "EHLO mx2.suse.de"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1726935AbgGOOak (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 10:30:40 -0400
+        id S1728623AbgGOOas (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 10:30:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 14F6DAEFC;
-        Wed, 15 Jul 2020 14:30:41 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 03E11AF0C;
+        Wed, 15 Jul 2020 14:30:50 +0000 (UTC)
 From:   colyli@suse.de
 To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v3 06/16] bcache: move bucket related code into read_super_common()
-Date:   Wed, 15 Jul 2020 22:30:05 +0800
-Message-Id: <20200715143015.14957-7-colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 09/16] bcache: handle c->uuids properly for bucket size > 8MB
+Date:   Wed, 15 Jul 2020 22:30:08 +0800
+Message-Id: <20200715143015.14957-10-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200715143015.14957-1-colyli@suse.de>
 References: <20200715143015.14957-1-colyli@suse.de>
@@ -42,60 +41,71 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Coly Li <colyli@suse.de>
 
-Setting sb->first_bucket and checking sb->keys indeed are only for cache
-device, it does not make sense to do them in read_super() for backing
-device too.
+Bcache allocates a whole bucket to store c->uuids on cache device, and
+allocates continuous pages to store it in-memory. When the bucket size
+exceeds maximum allocable continuous pages, bch_cache_set_alloc() will
+fail and cache device registration will fail.
 
-This patch moves the related code piece into read_super_common()
-explicitly for cache device and avoid the confusion.
+This patch allocates c->uuids by alloc_meta_bucket_pages(), and uses
+ilog2(meta_bucket_pages(c)) to indicate order of c->uuids pages when
+free it. When writing c->uuids to cache device, its size is decided
+by meta_bucket_pages(c) * PAGE_SECTORS. Now c->uuids is properly handled
+for bucket size > 8MB.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/md/bcache/super.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/md/bcache/super.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 9f273bd58507..e8a505ef766d 100644
+index 4baec6ac55c8..0c9153fdcc10 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -66,12 +66,17 @@ static const char *read_super_common(struct cache_sb *sb,  struct block_device *
- 	const char *err;
- 	unsigned int i;
+@@ -466,6 +466,7 @@ static int __uuid_write(struct cache_set *c)
+ 	BKEY_PADDED(key) k;
+ 	struct closure cl;
+ 	struct cache *ca;
++	unsigned int size;
  
-+	sb->first_bucket= le16_to_cpu(s->first_bucket);
- 	sb->nbuckets	= le64_to_cpu(s->nbuckets);
- 	sb->bucket_size	= le16_to_cpu(s->bucket_size);
+ 	closure_init_stack(&cl);
+ 	lockdep_assert_held(&bch_register_lock);
+@@ -473,7 +474,8 @@ static int __uuid_write(struct cache_set *c)
+ 	if (bch_bucket_alloc_set(c, RESERVE_BTREE, &k.key, 1, true))
+ 		return 1;
  
- 	sb->nr_in_set	= le16_to_cpu(s->nr_in_set);
- 	sb->nr_this_dev	= le16_to_cpu(s->nr_this_dev);
+-	SET_KEY_SIZE(&k.key, c->sb.bucket_size);
++	size =  meta_bucket_pages(&c->sb) * PAGE_SECTORS;
++	SET_KEY_SIZE(&k.key, size);
+ 	uuid_io(c, REQ_OP_WRITE, 0, &k.key, &cl);
+ 	closure_sync(&cl);
  
-+	err = "Too many journal buckets";
-+	if (sb->keys > SB_JOURNAL_BUCKETS)
-+		goto err;
-+
- 	err = "Too many buckets";
- 	if (sb->nbuckets > LONG_MAX)
+@@ -1656,7 +1658,7 @@ static void cache_set_free(struct closure *cl)
+ 		}
+ 
+ 	bch_bset_sort_state_free(&c->sort);
+-	free_pages((unsigned long) c->uuids, ilog2(bucket_pages(c)));
++	free_pages((unsigned long) c->uuids, ilog2(meta_bucket_pages(&c->sb)));
+ 
+ 	if (c->moving_gc_wq)
+ 		destroy_workqueue(c->moving_gc_wq);
+@@ -1862,7 +1864,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+ 
+ 	c->bucket_bits		= ilog2(sb->bucket_size);
+ 	c->block_bits		= ilog2(sb->block_size);
+-	c->nr_uuids		= bucket_bytes(c) / sizeof(struct uuid_entry);
++	c->nr_uuids		= meta_bucket_bytes(&c->sb) / sizeof(struct uuid_entry);
+ 	c->devices_max_used	= 0;
+ 	atomic_set(&c->attached_dev_nr, 0);
+ 	c->btree_pages		= bucket_pages(c);
+@@ -1913,7 +1915,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+ 			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER))
  		goto err;
-@@ -155,7 +160,6 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
- 	sb->flags		= le64_to_cpu(s->flags);
- 	sb->seq			= le64_to_cpu(s->seq);
- 	sb->last_mount		= le32_to_cpu(s->last_mount);
--	sb->first_bucket	= le16_to_cpu(s->first_bucket);
- 	sb->keys		= le16_to_cpu(s->keys);
  
- 	for (i = 0; i < SB_JOURNAL_BUCKETS; i++)
-@@ -172,10 +176,6 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
- 	if (memcmp(sb->magic, bcache_magic, 16))
+-	c->uuids = alloc_bucket_pages(GFP_KERNEL, c);
++	c->uuids = alloc_meta_bucket_pages(GFP_KERNEL, &c->sb);
+ 	if (!c->uuids)
  		goto err;
  
--	err = "Too many journal buckets";
--	if (sb->keys > SB_JOURNAL_BUCKETS)
--		goto err;
--
- 	err = "Bad checksum";
- 	if (s->csum != csum_set(s))
- 		goto err;
 -- 
 2.26.2
 
