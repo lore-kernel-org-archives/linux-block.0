@@ -2,154 +2,199 @@ Return-Path: <SRS0=PIBb=A2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0DB4C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 10:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 285B2C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 10:35:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A80D2067D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 10:34:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o3SVj6Bl"
+	by mail.kernel.org (Postfix) with ESMTP id 12EDD2075B
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 10:35:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731145AbgGOKeJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 06:34:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43364 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726437AbgGOKeJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 06:34:09 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C43C061755;
-        Wed, 15 Jul 2020 03:34:09 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id z15so1992928wrl.8;
-        Wed, 15 Jul 2020 03:34:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qMUY6llyiVBHai5nrhOTf3JZHya8KtMcnB9MpKaEZPI=;
-        b=o3SVj6BlSqIoxI/NdTPa8Rna1RspumQOntproHK00T8T/pG7cJIaYWI0Sp8ez2F8Tx
-         mKAwnghTbCuPG6kgc3nedbXtGNrsg+CaO51/WYI8kUWOFv/ftCDl23egIkksWNFuD8bf
-         QdPklSuM/NcikmyFKYr6f0GWhhvGAvZaeZNEBvGcPO/LWKWR3t37kDm02nAbwes/NF0g
-         uZGbFvgg4ICoypiqeavzk+s8shdUUnLICqqLej68j/1cp/Ly85BbGYpWYKZxrcxOQhdM
-         gzQ52xoNEl6mAyv0DbZePFoVA5ZjJgCUadRTzKAmFitC23HQPIweoc/OmKmwM6VnDyNC
-         CP0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qMUY6llyiVBHai5nrhOTf3JZHya8KtMcnB9MpKaEZPI=;
-        b=M+AMkYjd65a+TYKYodTia7Cgf9Qj14OjUBU6RkitzifVb9iBhdT0BQgqHd+lMHbtmv
-         jQgsvbXGdlJrcdC/abYrYOoB4nLJR9CPtHCXG8KoUWEdVWl3/sSp/v4QmiiD9g8H0S7Y
-         iNGqwJAy5coZtmCulsJ6ul7yX7acROEE5NQPVABPLGOvHRUh5XCNvz1AdGIYX2MYKMpg
-         TWXdSZlmtN/MRgd2NMicCZtttKmkoauOMsfXI+9HHOQPr3ZSB5f/lX3NtaFv79MEwvzm
-         X0iHF/yj2GgudPWkImTdxiRizSU6NjIOejEfmbZsvObTyjMzDXW0Ql3gXluhheurPWHS
-         P45A==
-X-Gm-Message-State: AOAM531QmAPEBO8dqJOIL31d2ltSp4hk6n/g1hpUwSmWo/61e89gqq0+
-        b5Rc1t2dSPz0dmLhpirPR+P5yQisL4eBAHDYkPVccIjP
-X-Google-Smtp-Source: ABdhPJzNsKouENzx8y2K6sU54DBiAnwG5Ytys1zlDwRBxHM5drfl4AvksrGrKDVYNADhYZxk72LP/kthmEg8yPavkfs=
-X-Received: by 2002:adf:e850:: with SMTP id d16mr10941653wrn.426.1594809247738;
- Wed, 15 Jul 2020 03:34:07 -0700 (PDT)
+        id S1728769AbgGOKfX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 06:35:23 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:58680 "EHLO mx2.suse.de"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1726437AbgGOKfW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 06:35:22 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 7AB14B1F7;
+        Wed, 15 Jul 2020 10:35:22 +0000 (UTC)
+Subject: Re: [PATCH v2 01/17] bcache: add comments to mark member offset of
+ struct cache_sb_disk
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20200715054612.6349-1-colyli@suse.de>
+ <20200715054612.6349-2-colyli@suse.de>
+ <668b8126-6a34-7029-dea4-2ad0ecc3915e@suse.de>
+ <f48d11e2-bd17-ba6e-1bc1-b496929e5e59@suse.de>
+ <SN4PR0401MB3598A8BA332C0148A0494B459B7E0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Message-ID: <8ba5d50d-5fa3-9aa3-3f82-b790a51bef9a@suse.de>
+Date:   Wed, 15 Jul 2020 18:35:15 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200715095518.3724-1-mlevitsk@redhat.com>
-In-Reply-To: <20200715095518.3724-1-mlevitsk@redhat.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Wed, 15 Jul 2020 18:33:56 +0800
-Message-ID: <CACVXFVNu+HjGJUvAEK96TB7pOC=k=p5f0Yg3K6t_13qudDAjjw@mail.gmail.com>
-Subject: Re: [PATCH] virtio-blk: check host supplied logical block size
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "open list:VIRTIO CORE AND NET DRIVERS" 
-        <virtualization@lists.linux-foundation.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <SN4PR0401MB3598A8BA332C0148A0494B459B7E0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 15, 2020 at 5:55 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> Linux kernel only supports logical block sizes which are power of two,
-> at least 512 bytes and no more that PAGE_SIZE.
->
-> Check this instead of crashing later on.
->
-> Note that there is no need to check physical block size since it is
-> only a hint, and virtio-blk already only supports power of two values.
->
-> Bugzilla link: https://bugzilla.redhat.com/show_bug.cgi?id=1664619
->
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  drivers/block/virtio_blk.c | 20 ++++++++++++++++++--
->  1 file changed, 18 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 980df853ee497..36dda31cc4e96 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -681,6 +681,12 @@ static const struct blk_mq_ops virtio_mq_ops = {
->  static unsigned int virtblk_queue_depth;
->  module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
->
-> +
-> +static bool virtblk_valid_block_size(unsigned int blksize)
-> +{
-> +       return blksize >= 512 && blksize <= PAGE_SIZE && is_power_of_2(blksize);
-> +}
-> +
->  static int virtblk_probe(struct virtio_device *vdev)
->  {
->         struct virtio_blk *vblk;
-> @@ -809,9 +815,16 @@ static int virtblk_probe(struct virtio_device *vdev)
->         err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
->                                    struct virtio_blk_config, blk_size,
->                                    &blk_size);
-> -       if (!err)
-> +       if (!err) {
-> +               if (!virtblk_valid_block_size(blk_size)) {
-> +                       dev_err(&vdev->dev,
-> +                               "%s failure: unsupported logical block size %d\n",
-> +                               __func__, blk_size);
-> +                       err = -EINVAL;
-> +                       goto out_cleanup_queue;
-> +               }
->                 blk_queue_logical_block_size(q, blk_size);
-> -       else
-> +       } else
->                 blk_size = queue_logical_block_size(q);
->
->         /* Use topology information if available */
-> @@ -872,6 +885,9 @@ static int virtblk_probe(struct virtio_device *vdev)
->         device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
->         return 0;
->
-> +out_cleanup_queue:
-> +       blk_cleanup_queue(vblk->disk->queue);
-> +       vblk->disk->queue = NULL;
->  out_free_tags:
->         blk_mq_free_tag_set(&vblk->tag_set);
->  out_put_disk:
-> --
-> 2.26.2
->
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+On 2020/7/15 17:08, Johannes Thumshirn wrote:
+> On 15/07/2020 11:03, Coly Li wrote:
+>> On 2020/7/15 14:02, Hannes Reinecke wrote:
+>>> On 7/15/20 7:45 AM, Coly Li wrote:
+>>>> This patch adds comments to mark each member of struct cache_sb_disk,
+>>>> it is helpful to understand the bcache superblock on-disk layout.
+>>>>
+>>>> Signed-off-by: Coly Li <colyli@suse.de>
+>>>> ---
+>>>>   include/uapi/linux/bcache.h | 39 +++++++++++++++++++------------------
+>>>>   1 file changed, 20 insertions(+), 19 deletions(-)
+>>>>
+>>>> diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
+>>>> index 9a1965c6c3d0..afbd1b56a661 100644
+>>>> --- a/include/uapi/linux/bcache.h
+>>>> +++ b/include/uapi/linux/bcache.h
+>>>> @@ -158,33 +158,33 @@ static inline struct bkey *bkey_idx(const struct
+>>>> bkey *k, unsigned int nr_keys)
+>>>>   #define BDEV_DATA_START_DEFAULT        16    /* sectors */
+>>>>     struct cache_sb_disk {
+>>>> -    __le64            csum;
+>>>> -    __le64            offset;    /* sector where this sb was written */
+>>>> -    __le64            version;
+>>>> +/*000*/    __le64            csum;
+>>>> +/*008*/    __le64            offset;    /* sector where this sb was
+>>>> written */
+>>>> +/*010*/    __le64            version;
+>>>>   -    __u8            magic[16];
+>>>> +/*018*/    __u8            magic[16];
+>>>>   -    __u8            uuid[16];
+>>>> +/*028*/    __u8            uuid[16];
+>>>>       union {
+>>>> -        __u8        set_uuid[16];
+>>>> +/*038*/        __u8        set_uuid[16];
+>>>>           __le64        set_magic;
+>>>>       };
+>>>> -    __u8            label[SB_LABEL_SIZE];
+>>>> +/*048*/    __u8            label[SB_LABEL_SIZE];
+>>>>   -    __le64            flags;
+>>>> -    __le64            seq;
+>>>> -    __le64            pad[8];
+>>>> +/*068*/    __le64            flags;
+>>>> +/*070*/    __le64            seq;
+>>>> +/*078*/    __le64            pad[8];
+>>>>         union {
+>>>>       struct {
+>>>>           /* Cache devices */
+>>>> -        __le64        nbuckets;    /* device size */
+>>>> +/*0b8*/        __le64        nbuckets;    /* device size */
+>>>>   -        __le16        block_size;    /* sectors */
+>>>> -        __le16        bucket_size;    /* sectors */
+>>>> +/*0c0*/        __le16        block_size;    /* sectors */
+>>>> +/*0c2*/        __le16        bucket_size;    /* sectors */
+>>>>   -        __le16        nr_in_set;
+>>>> -        __le16        nr_this_dev;
+>>>> +/*0c4*/        __le16        nr_in_set;
+>>>> +/*0c6*/        __le16        nr_this_dev;
+>>>>       };
+>>>>       struct {
+>>>>           /* Backing devices */
+>>>> @@ -198,14 +198,15 @@ struct cache_sb_disk {
+>>>>       };
+>>>>       };
+>>>>   -    __le32            last_mount;    /* time overflow in y2106 */
+>>>> +/*0c8*/    __le32            last_mount;    /* time overflow in y2106 */
+>>>>   -    __le16            first_bucket;
+>>>> +/*0cc*/    __le16            first_bucket;
+>>>>       union {
+>>>> -        __le16        njournal_buckets;
+>>>> +/*0ce*/        __le16        njournal_buckets;
+>>>>           __le16        keys;
+>>>>       };
+>>>> -    __le64            d[SB_JOURNAL_BUCKETS];    /* journal buckets */
+>>>> +/*0d0*/    __le64            d[SB_JOURNAL_BUCKETS];    /* journal
+>>>> buckets */
+>>>> +/*8d0*/
+>>>>   };
+>>>>     struct cache_sb {
+>>>>
+>>> Common practice is to place comments at the end; please don't use the
+>>> start of the line here.
+>>
+>> Hi Hannes,
+>>
+>> When I try to move the offset comment to the line end, I find it
+>> conflicts with normal code comment, e.g.
+>>    __le64            d[SB_JOURNAL_BUCKETS];    /* journal buckets */
+>>
+>> I have to add the offset comment to the line start. I guess this is why
+>> ocfs2 code adds the offset comment at the line start.
+>>
+>> So finally I have to keep the offset comment on line start still...
+> 
+> Why at them at all? pahole -C or crash/gdb will show them for you if you're
+> interested and if you need it in the code you can use offsetof().
+> 
+> I don't really see a good reason to add these comments. 
+> 
 
-Looks fine,
+You are right :-)  With pahole there is no reason for having this patch.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Thanks for the informative hint, this patch will disappear in next
+version series.
 
--- 
-Ming Lei
+Coly Li
+
