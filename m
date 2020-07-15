@@ -4,31 +4,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C067AC433E2
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B761BC433E3
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0A04206D5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A9982067D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728658AbgGOFqV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 01:46:21 -0400
-Received: from [195.135.220.15] ([195.135.220.15]:38334 "EHLO mx2.suse.de"
+        id S1728664AbgGOFq0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 01:46:26 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:38372 "EHLO mx2.suse.de"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1728650AbgGOFqU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 01:46:20 -0400
+        id S1728663AbgGOFqZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 01:46:25 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 14E8FAC20;
-        Wed, 15 Jul 2020 05:46:22 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 222C7AB7D;
+        Wed, 15 Jul 2020 05:46:27 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v2 01/17] bcache: add comments to mark member offset of struct cache_sb_disk
-Date:   Wed, 15 Jul 2020 13:45:56 +0800
-Message-Id: <20200715054612.6349-2-colyli@suse.de>
+Subject: [PATCH v2 03/17] bcache: add more accurate error information in read_super_basic()
+Date:   Wed, 15 Jul 2020 13:45:58 +0800
+Message-Id: <20200715054612.6349-4-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200715054612.6349-1-colyli@suse.de>
 References: <20200715054612.6349-1-colyli@suse.de>
@@ -39,87 +39,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds comments to mark each member of struct cache_sb_disk,
-it is helpful to understand the bcache superblock on-disk layout.
+The improperly set bucket or block size will trigger error in
+read_super_basic(). For large bucket size, a more accurate error message
+for invalid bucket or block size is necessary.
+
+This patch disassembles the combined if() checks into multile single
+if() check, and provide more accurate error message for each check
+failure condition.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- include/uapi/linux/bcache.h | 39 +++++++++++++++++++------------------
- 1 file changed, 20 insertions(+), 19 deletions(-)
+ drivers/md/bcache/super.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
-index 9a1965c6c3d0..afbd1b56a661 100644
---- a/include/uapi/linux/bcache.h
-+++ b/include/uapi/linux/bcache.h
-@@ -158,33 +158,33 @@ static inline struct bkey *bkey_idx(const struct bkey *k, unsigned int nr_keys)
- #define BDEV_DATA_START_DEFAULT		16	/* sectors */
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 74681fb92158..2abeb3ba88be 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -79,11 +79,20 @@ static const char *read_super_basic(struct cache_sb *sb,  struct block_device *b
+ 	if (sb->nbuckets < 1 << 7)
+ 		goto err;
  
- struct cache_sb_disk {
--	__le64			csum;
--	__le64			offset;	/* sector where this sb was written */
--	__le64			version;
-+/*000*/	__le64			csum;
-+/*008*/	__le64			offset;	/* sector where this sb was written */
-+/*010*/	__le64			version;
+-	err = "Bad block/bucket size";
+-	if (!is_power_of_2(sb->block_size) ||
+-	    sb->block_size > PAGE_SECTORS ||
+-	    !is_power_of_2(sb->bucket_size) ||
+-	    sb->bucket_size < PAGE_SECTORS)
++	err = "Bad block size (not power of 2)";
++	if (!is_power_of_2(sb->block_size))
++		goto err;
++
++	err = "Bad block size (larger than page size)";
++	if (sb->block_size > PAGE_SECTORS)
++		goto err;
++
++	err = "Bad bucket size (not power of 2)";
++	if (!is_power_of_2(sb->bucket_size))
++		goto err;
++
++	err = "Bad bucket size (smaller than page size)";
++	if (sb->bucket_size < PAGE_SECTORS)
+ 		goto err;
  
--	__u8			magic[16];
-+/*018*/	__u8			magic[16];
- 
--	__u8			uuid[16];
-+/*028*/	__u8			uuid[16];
- 	union {
--		__u8		set_uuid[16];
-+/*038*/		__u8		set_uuid[16];
- 		__le64		set_magic;
- 	};
--	__u8			label[SB_LABEL_SIZE];
-+/*048*/	__u8			label[SB_LABEL_SIZE];
- 
--	__le64			flags;
--	__le64			seq;
--	__le64			pad[8];
-+/*068*/	__le64			flags;
-+/*070*/	__le64			seq;
-+/*078*/	__le64			pad[8];
- 
- 	union {
- 	struct {
- 		/* Cache devices */
--		__le64		nbuckets;	/* device size */
-+/*0b8*/		__le64		nbuckets;	/* device size */
- 
--		__le16		block_size;	/* sectors */
--		__le16		bucket_size;	/* sectors */
-+/*0c0*/		__le16		block_size;	/* sectors */
-+/*0c2*/		__le16		bucket_size;	/* sectors */
- 
--		__le16		nr_in_set;
--		__le16		nr_this_dev;
-+/*0c4*/		__le16		nr_in_set;
-+/*0c6*/		__le16		nr_this_dev;
- 	};
- 	struct {
- 		/* Backing devices */
-@@ -198,14 +198,15 @@ struct cache_sb_disk {
- 	};
- 	};
- 
--	__le32			last_mount;	/* time overflow in y2106 */
-+/*0c8*/	__le32			last_mount;	/* time overflow in y2106 */
- 
--	__le16			first_bucket;
-+/*0cc*/	__le16			first_bucket;
- 	union {
--		__le16		njournal_buckets;
-+/*0ce*/		__le16		njournal_buckets;
- 		__le16		keys;
- 	};
--	__le64			d[SB_JOURNAL_BUCKETS];	/* journal buckets */
-+/*0d0*/	__le64			d[SB_JOURNAL_BUCKETS];	/* journal buckets */
-+/*8d0*/
- };
- 
- struct cache_sb {
+ 	err = "Invalid superblock: device too small";
 -- 
 2.26.2
 
