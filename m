@@ -2,176 +2,159 @@ Return-Path: <SRS0=PIBb=A2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 959CEC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 16:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C53C5C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 16:36:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7455A20658
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 16:00:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3C79206D5
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 16:36:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="izvgTdok"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725917AbgGOQAQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 12:00:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54534 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725835AbgGOQAN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 12:00:13 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id DE548AE54;
-        Wed, 15 Jul 2020 16:00:12 +0000 (UTC)
-Subject: Re: [PATCH v3 08/16] bcache: introduce meta_bucket_pages() related
- helper routines
-To:     Hannes Reinecke <hare@suse.de>, linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20200715143015.14957-1-colyli@suse.de>
- <20200715143015.14957-9-colyli@suse.de>
- <b6083e37-9eb2-5e9e-7b90-27b1308828d2@suse.de>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <0d51646b-4feb-56ad-f1b0-4afedaa83880@suse.de>
-Date:   Thu, 16 Jul 2020 00:00:03 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+        id S1726332AbgGOQg4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 12:36:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43018 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725932AbgGOQgy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 12:36:54 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FDBCC08C5DB
+        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2020 09:36:54 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id r19so3252265ljn.12
+        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2020 09:36:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eCQSS5Z/XAuJJ0ObjR5nRfl8x7vpuq0gBBiMlc5n388=;
+        b=izvgTdokwsQbPkEHKbGYg+vgL3PLbT710ndTtF+lw0QVNhZPDQQjkr8aN4juyq1ITY
+         yQaBTbw4G262maEKv7mI6zKBmKapyRz7IN5soCyNo1VZQX2zOEPVC7DSLWN/JmKEwdA5
+         lI8Oeb9+QNbM582nfIuOILLRmXR0wXZ8dtVMWeD5p77C+CgAO3F/4N3Oz+huCpu3K9Vc
+         OTktHziUeHCrwlIub3z5XnFu/xigyh3HdjfxCrAXVzW9vuSRzKqfZ0DvNEKYGC28/++q
+         gYM+2CZgooNe3NtWog1NoDMOmCYr8FS9mjj8RmfHzJ1TEOktmvCLP6r3NgZXZhU/gB35
+         sxGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eCQSS5Z/XAuJJ0ObjR5nRfl8x7vpuq0gBBiMlc5n388=;
+        b=nAznRKm0+AfxW8qy0cxnsfGCeUhtg8jhHCS712NtTCTsmb6M34BKjh3qhnikhuirGC
+         lNeHkUKFT4I3PRGApUifgzxQz4hReODyScYFDCQClUKkJd3S9spkJ/DCj95Fs/M4RX6O
+         3DuKw9o/YvbFgXdX2QvI3cExpraqwDM/gCozIBNr0Q76ehmCOzglUOZU7setTycOsaUI
+         LuxetuQi5LPie2JMHf7tslng9VErI0t+bnWQ7Qvt5+ZaouaODoMw2b0eV+fRYVkTVRPM
+         PF3mNr7oieyldYqF3e8PbNIePDn87BB6ulw5loDEtMfctEe+lLxHSq04tF66iigGWt8X
+         ijGw==
+X-Gm-Message-State: AOAM533pH/sPVPR3AxkKPTlM83PAUpyNPBwuYyBgUiZ7Q+TZ/TpW8Eoh
+        8tZXucYHcSrOOYN9SOzJ0F5Pwy1YS3HyVDEnCt72/Qyv
+X-Google-Smtp-Source: ABdhPJxkvCC8/QXGjTsKModznq9Sitpzv8TpZrU2xepInx6yXDiYQJ55n1/Rgdh/Jkbnh3Eg86yNuwgRgkS6wU5FZEc=
+X-Received: by 2002:a2e:9585:: with SMTP id w5mr24703ljh.58.1594831012200;
+ Wed, 15 Jul 2020 09:36:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b6083e37-9eb2-5e9e-7b90-27b1308828d2@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <1585649077-10896-1-git-send-email-laoar.shao@gmail.com>
+In-Reply-To: <1585649077-10896-1-git-send-email-laoar.shao@gmail.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Wed, 15 Jul 2020 09:36:41 -0700
+Message-ID: <CALvZod6Yn=_fYEM+xN3a+4W2e5CCLkvMXZg_txD3j+dZieX-CQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] psi: enhance psi with the help of ebpf
+To:     Yafang Shao <laoar.shao@gmail.com>
+Cc:     Johannes Weiner <hannes@cmpxchg.org>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux MM <linux-mm@kvack.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/7/15 23:36, Hannes Reinecke wrote:
-> On 7/15/20 4:30 PM, colyli@suse.de wrote:
->> From: Coly Li <colyli@suse.de>
->>
->> Currently the in-memory meta data like c->uuids or c->disk_buckets
->> are allocated by alloc_bucket_pages(). The macro alloc_bucket_pages()
->> calls __get_free_pages() to allocated continuous pages with order
->> indicated by ilog2(bucket_pages(c)),
->>   #define alloc_bucket_pages(gfp, c)                      \
->>       ((void *) __get_free_pages(__GFP_ZERO|gfp, ilog2(bucket_pages(c))))
->>
->> The maximum order is defined as MAX_ORDER, the default value is 11 (and
->> can be overwritten by CONFIG_FORCE_MAX_ZONEORDER). In bcache code the
->> maximum bucket size width is 16bits, this is restricted both by KEY_SIZE
->> size and bucket_size size from struct cache_sb_disk. The maximum 16bits
->> width and power-of-2 value is (1<<15) in unit of sector (512byte). It
->> means the maximum value of bucket size in bytes is (1<<24) bytes a.k.a
->> 4096 pages.
->>
->> When the bucket size is set to maximum permitted value, ilog2(4096) is
->> 12, which exceeds the default maximum order __get_free_pages() can
->> accepted, the failed pages allocation will fail cache set registration
->> procedure and print a kernel oops message for the exceeded pages order.
->>
->> This patch introduces meta_bucket_pages(), meta_bucket_bytes(), and
->> alloc_bucket_pages() helper routines. meta_bucket_pages() indicates the
->> maximum pages can be allocated to meta data bucket, meta_bucket_bytes()
->> indicates the according maximum bytes, and alloc_bucket_pages() does
->> the pages allocation for meta bucket. Because meta_bucket_pages()
->> chooses the smaller value among the bucket size and MAX_ORDER_NR_PAGES,
->> it still works when MAX_ORDER overwritten by CONFIG_FORCE_MAX_ZONEORDER.
->>
->> Following patches will use these helper routines to decide maximum pages
->> can be allocated for different meta data buckets. If the bucket size is
->> larger than meta_bucket_bytes(), the bcache registration can continue to
->> success, just the space more than meta_bucket_bytes() inside the bucket
->> is wasted. Comparing bcache failed for large bucket size, wasting some
->> space for meta data buckets is acceptable at this moment.
->>
->> Signed-off-by: Coly Li <colyli@suse.de>
->> ---
->>   drivers/md/bcache/bcache.h | 20 ++++++++++++++++++++
->>   drivers/md/bcache/super.c  |  3 +++
->>   2 files changed, 23 insertions(+)
->>
->> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
->> index 80e3c4813fb0..972f1aff0f70 100644
->> --- a/drivers/md/bcache/bcache.h
->> +++ b/drivers/md/bcache/bcache.h
->> @@ -762,6 +762,26 @@ struct bbio {
->>   #define bucket_bytes(c)        ((c)->sb.bucket_size << 9)
->>   #define block_bytes(c)        ((c)->sb.block_size << 9)
->>   +static inline unsigned int meta_bucket_pages(struct cache_sb *sb)
->> +{
->> +    unsigned int n, max_pages;
->> +
->> +    max_pages = min_t(unsigned int,
->> +              __rounddown_pow_of_two(USHRT_MAX) / PAGE_SECTORS,
->> +              MAX_ORDER_NR_PAGES);
->> +
->> +    n = sb->bucket_size / PAGE_SECTORS;
->> +    if (n > max_pages)
->> +        n = max_pages;
->> +
->> +    return n;
->> +}
->> +
->> +static inline unsigned int meta_bucket_bytes(struct cache_sb *sb)
->> +{
->> +    return meta_bucket_pages(sb) << PAGE_SHIFT;
->> +}
->> +
->>   #define prios_per_bucket(c)                \
->>       ((bucket_bytes(c) - sizeof(struct prio_set)) /    \
->>        sizeof(struct bucket_disk))
-> I'm not particular happy with the division followed by a shift; might be
-> an idea to replace the division by a shift.
-> 
-> But that's minor, so:
-> 
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi Yafang,
 
-This is from existing bcache code, let me think how to improve in future.
+On Tue, Mar 31, 2020 at 3:05 AM Yafang Shao <laoar.shao@gmail.com> wrote:
+>
+> PSI gives us a powerful way to anaylze memory pressure issue, but we can
+> make it more powerful with the help of tracepoint, kprobe, ebpf and etc.
+> Especially with ebpf we can flexiblely get more details of the memory
+> pressure.
+>
+> In orderc to achieve this goal, a new parameter is added into
+> psi_memstall_{enter, leave}, which indicates the specific type of a
+> memstall. There're totally ten memstalls by now,
+>         MEMSTALL_KSWAPD
+>         MEMSTALL_RECLAIM_DIRECT
+>         MEMSTALL_RECLAIM_MEMCG
+>         MEMSTALL_RECLAIM_HIGH
+>         MEMSTALL_KCOMPACTD
+>         MEMSTALL_COMPACT
+>         MEMSTALL_WORKINGSET_REFAULT
+>         MEMSTALL_WORKINGSET_THRASH
+>         MEMSTALL_MEMDELAY
+>         MEMSTALL_SWAPIO
+> With the help of kprobe or tracepoint to trace this newly added agument we
+> can know which type of memstall it is and then do corresponding
+> improvement. I can also help us to analyze the latency spike caused by
+> memory pressure.
+>
+> But note that we can't use it to build memory pressure for a specific type
+> of memstall, e.g. memcg pressure, compaction pressure and etc, because it
+> doesn't implement various types of task->in_memstall, e.g.
+> task->in_memcgstall, task->in_compactionstall and etc.
+>
+> Although there're already some tracepoints can help us to achieve this
+> goal, e.g.
+>         vmscan:mm_vmscan_kswapd_{wake, sleep}
+>         vmscan:mm_vmscan_direct_reclaim_{begin, end}
+>         vmscan:mm_vmscan_memcg_reclaim_{begin, end}
+>         /* no tracepoint for memcg high reclaim*/
+>         compcation:mm_compaction_kcompactd_{wake, sleep}
+>         compcation:mm_compaction_begin_{begin, end}
+>         /* no tracepoint for workingset refault */
+>         /* no tracepoint for workingset thrashing */
+>         /* no tracepoint for use memdelay */
+>         /* no tracepoint for swapio */
+> but psi_memstall_{enter, leave} gives us a unified entrance for all
+> types of memstall and we don't need to add many begin and end tracepoints
+> that hasn't been implemented yet.
+>
+> Patch #2 gives us an example of how to use it with ebpf. With the help of
+> ebpf we can trace a specific task, application, container and etc. It also
+> can help us to analyze the spread of latencies and whether they were
+> clustered at a point of time or spread out over long periods of time.
+>
+> To summarize, with the pressure data in /proc/pressure/memroy we know that
+> the system is under memory pressure, and then with the newly added tracing
+> facility in this patchset we can get the reason of this memory pressure,
+> and then thinks about how to make the change.
+> The workflow can be illustrated as bellow.
+>
+>                    REASON         ACTION
+>                  | compcation   | improve compcation    |
+>                  | vmscan       | improve vmscan        |
+> Memory pressure -| workingset   | improve workingset    |
+>                  | etc          | ...                   |
+>
 
-Thanks.
+I have not looked at the patch series in detail but I wanted to get
+your thoughts if it is possible to achieve what I am trying to do with
+this patch series.
 
-Coly Li
+At the moment I am only interested in global reclaim and I wanted to
+enable alerts like "alert if there is process stuck in global reclaim
+for x seconds in last y seconds window" or "alert if all the processes
+are stuck in global reclaim for some z seconds".
+
+I see that using this series I can identify global reclaim but I am
+wondering if alert or notifications are possible. Android is using psi
+monitors for such alerts but it does not use cgroups, so, most of the
+memstalls are related to global reclaim stall. For cgroup environment,
+do we need for add support to psi monitor similar to this patch
+series?
+
+thanks,
+Shakeel
