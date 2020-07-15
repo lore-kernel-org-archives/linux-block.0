@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9E1C433F1
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC0BC433F4
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 600FD2067D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21F3D206D5
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 05:46:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728712AbgGOFqy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 01:46:54 -0400
-Received: from [195.135.220.15] ([195.135.220.15]:38682 "EHLO mx2.suse.de"
+        id S1725832AbgGOFq6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 01:46:58 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:38762 "EHLO mx2.suse.de"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1728685AbgGOFqy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 01:46:54 -0400
+        id S1728260AbgGOFq6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 01:46:58 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 31C3DAB7D;
-        Wed, 15 Jul 2020 05:46:55 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 8C467AB7D;
+        Wed, 15 Jul 2020 05:46:59 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v2 15/17] bcache: add sysfs file to display feature sets information of cache set
-Date:   Wed, 15 Jul 2020 13:46:10 +0800
-Message-Id: <20200715054612.6349-16-colyli@suse.de>
+Subject: [PATCH v2 17/17] bcache: avoid extra memory consumption in struct bbio for large bucket size
+Date:   Wed, 15 Jul 2020 13:46:12 +0800
+Message-Id: <20200715054612.6349-18-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200715054612.6349-1-colyli@suse.de>
 References: <20200715054612.6349-1-colyli@suse.de>
@@ -39,152 +39,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A new sysfs file /sys/fs/bcache/<cache set UUID>/internal/feature_sets
-is added by this patch, to display feature sets information of the cache
-set.
+Bcache uses struct bbio to do I/Os for meta data pages like uuids,
+disk_buckets, prio_buckets, and btree nodes.
 
-Now only an incompat feature 'large_bucket' added in bcache, the sysfs
-file content is:
-	feature_incompat: [large_bucket]
-string large_bucket means the running bcache drive supports incompat
-feature 'large_bucket', the wrapping [] means the 'large_bucket' feature
-is currently enabled on this cache set.
+Example writing a btree node onto cache device, the process is,
+- Allocate a struct bbio from mempool c->bio_meta.
+- Inside struct bbio embedded a struct bio, initialize bi_inline_vecs
+  for this embedded bio.
+- Call bch_bio_map() to map each meta data page to each bv from the
+  inlined  bi_io_vec table.
+- Call bch_submit_bbio() to submit the bio into underlying block layer.
+- When the I/O completed, only release the struct bbio, don't touch the
+  reference counter of the meta data pages.
 
-This patch is ready to display compat and ro_compat features, in future
-once bcache code implements such feature sets, the according feature
-strings will be displayed in this sysfs file too.
+The struct bbio is defined as,
+738 struct bbio {
+739     unsigned int            submit_time_us;
+	[snipped]
+748     struct bio              bio;
+749 };
+
+Because struct bio is embedded at the end of struct bbio, therefore the
+actual size of struct bbio is sizeof(struct bio) + size of the embedded
+bio->bi_inline_vecs.
+
+Now all the meta data bucket size are limited to meta_bucket_pages(), if
+the bucket size is large than meta_bucket_pages()*PAGE_SECTORS, rested
+space in the bucket is unused. Therefore the most used space in meta
+bucket is (1<<MAX_ORDER) pages, or (1<<CONFIG_FORCE_MAX_ZONEORDER) if it
+is configured.
+
+Therefore for large bucket size, it is unnecessary to calculate the
+allocation size of mempool c->bio_meta as,
+	mempool_init_kmalloc_pool(&c->bio_meta, 2,
+			sizeof(struct bbio) +
+			sizeof(struct bio_vec) * bucket_pages(c))
+It is too large, neither the Linux buddy allocator cannot allocate so
+much continuous pages, nor the extra allocated pages are wasted.
+
+This patch replace bucket_pages() to meta_bucket_pages() in two places,
+- In bch_cache_set_alloc(), when initialize mempool c->bio_meta, uses
+  sizeof(struct bbio) + sizeof(struct bio_vec) * bucket_pages(c) to set
+  the allocating object size.
+- In bch_bbio_alloc(), when calling bio_init() to set inline bvec talbe
+  bi_inline_bvecs, uses meta_bucket_pages() to indicate number of the
+  inline bio vencs number.
+
+Now the maximum size of embedded bio inside struct bbio exactly matches
+the limit of meta_bucket_pages(), no extra page wasted.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/Makefile   |  2 +-
- drivers/md/bcache/features.c | 48 ++++++++++++++++++++++++++++++++++++
- drivers/md/bcache/features.h |  3 +++
- drivers/md/bcache/sysfs.c    |  6 +++++
- 4 files changed, 58 insertions(+), 1 deletion(-)
+ drivers/md/bcache/io.c    | 2 +-
+ drivers/md/bcache/super.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/Makefile b/drivers/md/bcache/Makefile
-index fd714628da6a..5b87e59676b8 100644
---- a/drivers/md/bcache/Makefile
-+++ b/drivers/md/bcache/Makefile
-@@ -4,4 +4,4 @@ obj-$(CONFIG_BCACHE)	+= bcache.o
+diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+index b25ee33b0d0b..a14a445618b4 100644
+--- a/drivers/md/bcache/io.c
++++ b/drivers/md/bcache/io.c
+@@ -26,7 +26,7 @@ struct bio *bch_bbio_alloc(struct cache_set *c)
+ 	struct bbio *b = mempool_alloc(&c->bio_meta, GFP_NOIO);
+ 	struct bio *bio = &b->bio;
  
- bcache-y		:= alloc.o bset.o btree.o closure.o debug.o extents.o\
- 	io.o journal.o movinggc.o request.o stats.o super.o sysfs.o trace.o\
--	util.o writeback.o
-+	util.o writeback.o features.o
-diff --git a/drivers/md/bcache/features.c b/drivers/md/bcache/features.c
-index ba53944bb390..5c601635e11c 100644
---- a/drivers/md/bcache/features.c
-+++ b/drivers/md/bcache/features.c
-@@ -8,6 +8,7 @@
-  */
- #include <linux/bcache.h>
- #include "bcache.h"
-+#include "features.h"
+-	bio_init(bio, bio->bi_inline_vecs, bucket_pages(c));
++	bio_init(bio, bio->bi_inline_vecs, meta_bucket_pages(&c->sb));
  
- struct feature {
- 	int		compat;
-@@ -20,3 +21,50 @@ static struct feature feature_list[] = {
- 		"large_bucket"},
- 	{0, 0, 0 },
- };
-+
-+#define compose_feature_string(type, head)				\
-+({									\
-+	struct feature *f;						\
-+	bool first = true;						\
-+									\
-+	for (f = &feature_list[0]; f->compat != 0; f++) {		\
-+		if (f->compat != BCH_FEATURE_ ## type)			\
-+			continue;					\
-+		if (BCH_HAS_ ## type ## _FEATURE(&c->sb, f->mask)) {	\
-+			if (first) {					\
-+				out += snprintf(out, buf + size - out,	\
-+						"%s%s", head, ": [");	\
-+			} else {					\
-+				out += snprintf(out, buf + size - out,	\
-+						" [");			\
-+			}						\
-+		} else {						\
-+			if (first)					\
-+				out += snprintf(out, buf + size - out,	\
-+						"%s%s", head, ": ");	\
-+			else						\
-+				out += snprintf(out, buf + size - out,	\
-+						" ");			\
-+		}							\
-+									\
-+		out += snprintf(out, buf + size - out, "%s", f->string);\
-+									\
-+		if (BCH_HAS_ ## type ## _FEATURE(&c->sb, f->mask))	\
-+			out += snprintf(out, buf + size - out, "]");	\
-+									\
-+		first = false;						\
-+	}								\
-+	if (!first)							\
-+		out += snprintf(out, buf + size - out, "\n");		\
-+})
-+
-+int bch_print_cache_set_feature_set(struct cache_set *c, char *buf, int size)
-+{
-+	char *out = buf;
-+
-+	compose_feature_string(COMPAT, "feature_compat");
-+	compose_feature_string(RO_COMPAT, "feature_ro_compat");
-+	compose_feature_string(INCOMPAT, "feature_incompat");
-+
-+	return out - buf;
-+}
-diff --git a/drivers/md/bcache/features.h b/drivers/md/bcache/features.h
-index dca052cf5203..350a4f413136 100644
---- a/drivers/md/bcache/features.h
-+++ b/drivers/md/bcache/features.h
-@@ -78,4 +78,7 @@ static inline void bch_clear_feature_##name(struct cache_sb *sb) \
+ 	return bio;
  }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 3d05f7f46b01..aba535ecc335 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1920,7 +1920,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
  
- BCH_FEATURE_INCOMPAT_FUNCS(large_bucket, LARGE_BUCKET);
-+
-+int bch_print_cache_set_feature_set(struct cache_set *c, char *buf, int size);
-+
- #endif
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 0dadec5a78f6..e3633f06d43b 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -11,6 +11,7 @@
- #include "btree.h"
- #include "request.h"
- #include "writeback.h"
-+#include "features.h"
+ 	if (mempool_init_kmalloc_pool(&c->bio_meta, 2,
+ 			sizeof(struct bbio) +
+-			sizeof(struct bio_vec) * bucket_pages(c)))
++			sizeof(struct bio_vec) * meta_bucket_pages(&c->sb)))
+ 		goto err;
  
- #include <linux/blkdev.h>
- #include <linux/sort.h>
-@@ -88,6 +89,7 @@ read_attribute(btree_used_percent);
- read_attribute(average_key_size);
- read_attribute(dirty_data);
- read_attribute(bset_tree_stats);
-+read_attribute(feature_sets);
- 
- read_attribute(state);
- read_attribute(cache_read_races);
-@@ -779,6 +781,9 @@ SHOW(__bch_cache_set)
- 	if (attr == &sysfs_bset_tree_stats)
- 		return bch_bset_print_stats(c, buf);
- 
-+	if (attr == &sysfs_feature_sets)
-+		return bch_print_cache_set_feature_set(c, buf, PAGE_SIZE);
-+
- 	return 0;
- }
- SHOW_LOCKED(bch_cache_set)
-@@ -987,6 +992,7 @@ static struct attribute *bch_cache_set_internal_files[] = {
- 	&sysfs_io_disable,
- 	&sysfs_cutoff_writeback,
- 	&sysfs_cutoff_writeback_sync,
-+	&sysfs_feature_sets,
- 	NULL
- };
- KTYPE(bch_cache_set_internal);
+ 	if (mempool_init_kmalloc_pool(&c->fill_iter, 1, iter_size))
 -- 
 2.26.2
 
