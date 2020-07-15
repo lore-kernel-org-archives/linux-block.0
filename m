@@ -2,94 +2,181 @@ Return-Path: <SRS0=PIBb=A2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1670FC433E3
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 08:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BA8C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 09:03:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DCF89206E9
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 08:36:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BrGbjMMs"
+	by mail.kernel.org (Postfix) with ESMTP id 5C2AB206E9
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jul 2020 09:03:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730268AbgGOIgd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jul 2020 04:36:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47368 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730269AbgGOIgd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jul 2020 04:36:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594802191;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=2hBedVP56Gc7tO1+rdsGC37hPrJ8v6J3aBBm+CJA7Lg=;
-        b=BrGbjMMs9TNXJaO2yrEHXSYZ+wTBsiqIdfp8ftVl58ZLR+hXmAkhwz8jmHcexaRvxZZya8
-        4nZlDf1quX28lYHMe5QrMB1F3BmroWAlBv9EvEajE+KO/iJWn7aAfSAJgKGM7bPr7dtq+L
-        mnnJ4zmzfjwg2kGN5snjOnOI4zNkgLM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-69Y27cQsOnOgINm04PsX6g-1; Wed, 15 Jul 2020 04:36:29 -0400
-X-MC-Unique: 69Y27cQsOnOgINm04PsX6g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A45D81083E82;
-        Wed, 15 Jul 2020 08:36:28 +0000 (UTC)
-Received: from localhost (ovpn-12-91.pek2.redhat.com [10.72.12.91])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA4E46FED1;
-        Wed, 15 Jul 2020 08:36:23 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] block: always remove partitions from blk_drop_partitions()
-Date:   Wed, 15 Jul 2020 16:36:19 +0800
-Message-Id: <20200715083619.624249-1-ming.lei@redhat.com>
+        id S1730139AbgGOJDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jul 2020 05:03:13 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:45508 "EHLO mx2.suse.de"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1729856AbgGOJDN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Jul 2020 05:03:13 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id CFAD2AF59;
+        Wed, 15 Jul 2020 09:03:12 +0000 (UTC)
+Subject: Re: [PATCH v2 01/17] bcache: add comments to mark member offset of
+ struct cache_sb_disk
+To:     Hannes Reinecke <hare@suse.de>, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20200715054612.6349-1-colyli@suse.de>
+ <20200715054612.6349-2-colyli@suse.de>
+ <668b8126-6a34-7029-dea4-2ad0ecc3915e@suse.de>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Message-ID: <f48d11e2-bd17-ba6e-1bc1-b496929e5e59@suse.de>
+Date:   Wed, 15 Jul 2020 17:03:05 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <668b8126-6a34-7029-dea4-2ad0ecc3915e@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In theory, when GENHD_FL_NO_PART_SCAN is set, no partitions can be created
-on one disk. However, ioctl(BLKPG, BLKPG_ADD_PARTITION) doesn't check
-GENHD_FL_NO_PART_SCAN, so partitions still can be added even though
-GENHD_FL_NO_PART_SCAN is set.
+On 2020/7/15 14:02, Hannes Reinecke wrote:
+> On 7/15/20 7:45 AM, Coly Li wrote:
+>> This patch adds comments to mark each member of struct cache_sb_disk,
+>> it is helpful to understand the bcache superblock on-disk layout.
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> ---
+>>   include/uapi/linux/bcache.h | 39 +++++++++++++++++++------------------
+>>   1 file changed, 20 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
+>> index 9a1965c6c3d0..afbd1b56a661 100644
+>> --- a/include/uapi/linux/bcache.h
+>> +++ b/include/uapi/linux/bcache.h
+>> @@ -158,33 +158,33 @@ static inline struct bkey *bkey_idx(const struct
+>> bkey *k, unsigned int nr_keys)
+>>   #define BDEV_DATA_START_DEFAULT        16    /* sectors */
+>>     struct cache_sb_disk {
+>> -    __le64            csum;
+>> -    __le64            offset;    /* sector where this sb was written */
+>> -    __le64            version;
+>> +/*000*/    __le64            csum;
+>> +/*008*/    __le64            offset;    /* sector where this sb was
+>> written */
+>> +/*010*/    __le64            version;
+>>   -    __u8            magic[16];
+>> +/*018*/    __u8            magic[16];
+>>   -    __u8            uuid[16];
+>> +/*028*/    __u8            uuid[16];
+>>       union {
+>> -        __u8        set_uuid[16];
+>> +/*038*/        __u8        set_uuid[16];
+>>           __le64        set_magic;
+>>       };
+>> -    __u8            label[SB_LABEL_SIZE];
+>> +/*048*/    __u8            label[SB_LABEL_SIZE];
+>>   -    __le64            flags;
+>> -    __le64            seq;
+>> -    __le64            pad[8];
+>> +/*068*/    __le64            flags;
+>> +/*070*/    __le64            seq;
+>> +/*078*/    __le64            pad[8];
+>>         union {
+>>       struct {
+>>           /* Cache devices */
+>> -        __le64        nbuckets;    /* device size */
+>> +/*0b8*/        __le64        nbuckets;    /* device size */
+>>   -        __le16        block_size;    /* sectors */
+>> -        __le16        bucket_size;    /* sectors */
+>> +/*0c0*/        __le16        block_size;    /* sectors */
+>> +/*0c2*/        __le16        bucket_size;    /* sectors */
+>>   -        __le16        nr_in_set;
+>> -        __le16        nr_this_dev;
+>> +/*0c4*/        __le16        nr_in_set;
+>> +/*0c6*/        __le16        nr_this_dev;
+>>       };
+>>       struct {
+>>           /* Backing devices */
+>> @@ -198,14 +198,15 @@ struct cache_sb_disk {
+>>       };
+>>       };
+>>   -    __le32            last_mount;    /* time overflow in y2106 */
+>> +/*0c8*/    __le32            last_mount;    /* time overflow in y2106 */
+>>   -    __le16            first_bucket;
+>> +/*0cc*/    __le16            first_bucket;
+>>       union {
+>> -        __le16        njournal_buckets;
+>> +/*0ce*/        __le16        njournal_buckets;
+>>           __le16        keys;
+>>       };
+>> -    __le64            d[SB_JOURNAL_BUCKETS];    /* journal buckets */
+>> +/*0d0*/    __le64            d[SB_JOURNAL_BUCKETS];    /* journal
+>> buckets */
+>> +/*8d0*/
+>>   };
+>>     struct cache_sb {
+>>
+> Common practice is to place comments at the end; please don't use the
+> start of the line here.
 
-So far blk_drop_partitions() only removes partitions when disk_part_scan_enabled()
-return true. This way can make ghost partition on loop device after changing/clearing
-FD in case that PARTSCAN is disabled, such as partitions can be added
-via 'parted' on loop disk even though GENHD_FL_NO_PART_SCAN is set.
+Hi Hannes,
 
-Fix this issue by always removing partitions in blk_drop_partitions(), and
-this way is correct because the current code supposes that no partitions
-can be added in case of GENHD_FL_NO_PART_SCAN.
+When I try to move the offset comment to the line end, I find it
+conflicts with normal code comment, e.g.
+   __le64            d[SB_JOURNAL_BUCKETS];    /* journal buckets */
 
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/partitions/core.c | 2 --
- 1 file changed, 2 deletions(-)
+I have to add the offset comment to the line start. I guess this is why
+ocfs2 code adds the offset comment at the line start.
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 78951e33b2d7..e62a98a8eeb7 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -619,8 +619,6 @@ int blk_drop_partitions(struct block_device *bdev)
- 	struct disk_part_iter piter;
- 	struct hd_struct *part;
- 
--	if (!disk_part_scan_enabled(bdev->bd_disk))
--		return 0;
- 	if (bdev->bd_part_count)
- 		return -EBUSY;
- 
--- 
-2.25.2
+So finally I have to keep the offset comment on line start still...
 
+Coly Li
