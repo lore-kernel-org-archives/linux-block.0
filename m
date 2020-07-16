@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA59C433E4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EC0C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E974207CB
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AA93207CB
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q/wv6t7T"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="d2klmSWD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728547AbgGPOdS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jul 2020 10:33:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48322 "EHLO
+        id S1728694AbgGPOdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jul 2020 10:33:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727844AbgGPOdS (ORCPT
+        with ESMTP id S1727844AbgGPOdT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jul 2020 10:33:18 -0400
+        Thu, 16 Jul 2020 10:33:19 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14507C061755
-        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2020 07:33:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E39C061755
+        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2020 07:33:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=AahNguEfNZOn+G74MhalxTS9iAxX1yEKCQMWNpUyIn8=; b=q/wv6t7Ta3GUuRzn83B6K4vAod
-        i8HKsopEF2tNyi+AChQV1UHo1O4LsZRSm+xUN+AhZZ0Lff22NvMWUb+NQ/QybwAHYxtjco9fhvMkl
-        VWqYpty19BEdzlPMa4bPaXJ3K9PgSIWCS10yx6RxkNlZ8Ujsm7uW0zPzqbEVlvRoggw1GrNjkeki5
-        ObWesr6SK1ub1PgrmJM0sbMlJxmudeHEhqpZU0cpT3vJnqorWU5rkaIqqLsXZscEgxrWS7fjKyV6v
-        VGO89OYIeBuYnLTz1wEz/J16lOTh1xA6AOJJyFci5J6fQioiS3T/BXgO4l83w3UEZMQ+yupkzjjDJ
-        01eQ653w==;
+        bh=Iav16luBG5iUM/TR+LXAILzbiTmUYqdW5J6NNIvn7+M=; b=d2klmSWDwhH+jhvBA9gM1bpBZd
+        K00Xzbvne5EOGMUHL81Jh4XN+ppTd1cIUAwgT7RTN4/lKig0pZiUZnbx1hMyyoBgk7HQGiRSlw96I
+        BdbJD4QDB1W3ZCpDDKgZ/pKFwDhj6o6WCR18DaCiuA6IWdQPwVgaet7kIr+joRuTvtkQDft2a92jf
+        jjp8I30h+2DYNqQWVYWJPYM6AjiLMqYVaw9XFEu5ehlu4ykrh2OS+xyHTn+YWzylfBsXBjynJm84g
+        ZwMl9rdaHHd6TNl4vnE9+GUYzETUzfEZ/7kynfHId4YRt2WFhefYt0wyjQRuSljdNhNKiiQreC+VE
+        Q2ZsaRaQ==;
 Received: from [2001:4bb8:105:4a81:1bd9:4dba:216e:37b8] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jw4wl-0000CI-Sh; Thu, 16 Jul 2020 14:33:16 +0000
+        id 1jw4wn-0000CP-7S; Thu, 16 Jul 2020 14:33:17 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH 3/4] block: use bd_prepare_to_claim directly in the loop driver
-Date:   Thu, 16 Jul 2020 16:33:09 +0200
-Message-Id: <20200716143310.473136-4-hch@lst.de>
+Subject: [PATCH 4/4] block: integrate bd_start_claiming into __blkdev_get
+Date:   Thu, 16 Jul 2020 16:33:10 +0200
+Message-Id: <20200716143310.473136-5-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200716143310.473136-1-hch@lst.de>
 References: <20200716143310.473136-1-hch@lst.de>
@@ -55,92 +55,280 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The arcane magic in bd_start_claiming is only needed to be able to claim
-a block_device that hasn't been fully set up.  Switch the loop driver
-that claims from the ioctl path with a fully set up struct block_device
-to just use the much simpler bd_prepare_to_claim directly.
+bd_start_claiming duplicates a lot of the work done in __blkdev_get.
+Integrate the two functions to avoid the duplicate work, and to do the
+right thing for the md -ERESTARTSYS corner case.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/loop.c   | 7 +++----
- fs/block_dev.c         | 9 +++++----
- include/linux/blkdev.h | 3 ++-
- 3 files changed, 10 insertions(+), 9 deletions(-)
+ fs/block_dev.c | 177 +++++++++++++++----------------------------------
+ 1 file changed, 55 insertions(+), 122 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index a943207705ddf1..d181601462260b 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1090,11 +1090,10 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	 * here to avoid changing device under exclusive owner.
- 	 */
- 	if (!(mode & FMODE_EXCL)) {
--		claimed_bdev = bd_start_claiming(bdev, loop_configure);
--		if (IS_ERR(claimed_bdev)) {
--			error = PTR_ERR(claimed_bdev);
-+		claimed_bdev = bdev->bd_contains;
-+		error = bd_prepare_to_claim(bdev, claimed_bdev, loop_configure);
-+		if (error)
- 			goto out_putf;
--		}
- 	}
- 
- 	error = mutex_lock_killable(&loop_ctl_mutex);
 diff --git a/fs/block_dev.c b/fs/block_dev.c
-index b7b2ee4b288ae9..ee80bd81af748d 100644
+index ee80bd81af748d..3f94a06a094675 100644
 --- a/fs/block_dev.c
 +++ b/fs/block_dev.c
-@@ -1027,8 +1027,8 @@ static bool bd_may_claim(struct block_device *bdev, struct block_device *whole,
-  * RETURNS:
-  * 0 if @bdev can be claimed, -EBUSY otherwise.
-  */
--static int bd_prepare_to_claim(struct block_device *bdev,
--			       struct block_device *whole, void *holder)
-+int bd_prepare_to_claim(struct block_device *bdev, struct block_device *whole,
-+		void *holder)
- {
- retry:
- 	spin_lock(&bdev_lock);
-@@ -1055,6 +1055,7 @@ static int bd_prepare_to_claim(struct block_device *bdev,
- 	spin_unlock(&bdev_lock);
- 	return 0;
+@@ -1078,72 +1078,6 @@ static struct gendisk *bdev_get_gendisk(struct block_device *bdev, int *partno)
+ 	return disk;
  }
-+EXPORT_SYMBOL_GPL(bd_prepare_to_claim); /* only for the loop driver */
  
- static struct gendisk *bdev_get_gendisk(struct block_device *bdev, int *partno)
- {
-@@ -1100,7 +1101,8 @@ static struct gendisk *bdev_get_gendisk(struct block_device *bdev, int *partno)
-  * Pointer to the block device containing @bdev on success, ERR_PTR()
-  * value on failure.
-  */
--struct block_device *bd_start_claiming(struct block_device *bdev, void *holder)
-+static struct block_device *bd_start_claiming(struct block_device *bdev,
-+		void *holder)
- {
- 	struct gendisk *disk;
- 	struct block_device *whole;
-@@ -1141,7 +1143,6 @@ struct block_device *bd_start_claiming(struct block_device *bdev, void *holder)
- 
- 	return whole;
- }
--EXPORT_SYMBOL(bd_start_claiming);
- 
+-/**
+- * bd_start_claiming - start claiming a block device
+- * @bdev: block device of interest
+- * @holder: holder trying to claim @bdev
+- *
+- * @bdev is about to be opened exclusively.  Check @bdev can be opened
+- * exclusively and mark that an exclusive open is in progress.  Each
+- * successful call to this function must be matched with a call to
+- * either bd_finish_claiming() or bd_abort_claiming() (which do not
+- * fail).
+- *
+- * This function is used to gain exclusive access to the block device
+- * without actually causing other exclusive open attempts to fail. It
+- * should be used when the open sequence itself requires exclusive
+- * access but may subsequently fail.
+- *
+- * CONTEXT:
+- * Might sleep.
+- *
+- * RETURNS:
+- * Pointer to the block device containing @bdev on success, ERR_PTR()
+- * value on failure.
+- */
+-static struct block_device *bd_start_claiming(struct block_device *bdev,
+-		void *holder)
+-{
+-	struct gendisk *disk;
+-	struct block_device *whole;
+-	int partno, err;
+-
+-	might_sleep();
+-
+-	/*
+-	 * @bdev might not have been initialized properly yet, look up
+-	 * and grab the outer block device the hard way.
+-	 */
+-	disk = bdev_get_gendisk(bdev, &partno);
+-	if (!disk)
+-		return ERR_PTR(-ENXIO);
+-
+-	/*
+-	 * Normally, @bdev should equal what's returned from bdget_disk()
+-	 * if partno is 0; however, some drivers (floppy) use multiple
+-	 * bdev's for the same physical device and @bdev may be one of the
+-	 * aliases.  Keep @bdev if partno is 0.  This means claimer
+-	 * tracking is broken for those devices but it has always been that
+-	 * way.
+-	 */
+-	if (partno)
+-		whole = bdget_disk(disk, 0);
+-	else
+-		whole = bdgrab(bdev);
+-
+-	put_disk_and_module(disk);
+-	if (!whole)
+-		return ERR_PTR(-ENOMEM);
+-
+-	err = bd_prepare_to_claim(bdev, whole, holder);
+-	if (err) {
+-		bdput(whole);
+-		return ERR_PTR(err);
+-	}
+-
+-	return whole;
+-}
+-
  static void bd_clear_claiming(struct block_device *whole, void *holder)
  {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 71173a1ffa8b87..06995b96e94679 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1919,7 +1919,8 @@ int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder);
- struct block_device *blkdev_get_by_path(const char *path, fmode_t mode,
- 		void *holder);
- struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder);
--struct block_device *bd_start_claiming(struct block_device *bdev, void *holder);
-+int bd_prepare_to_claim(struct block_device *bdev, struct block_device *whole,
-+		void *holder);
- void bd_abort_claiming(struct block_device *bdev, struct block_device *whole,
- 		void *holder);
- void blkdev_put(struct block_device *bdev, fmode_t mode);
+ 	lockdep_assert_held(&bdev_lock);
+@@ -1156,7 +1090,7 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
+ /**
+  * bd_finish_claiming - finish claiming of a block device
+  * @bdev: block device of interest
+- * @whole: whole block device (returned from bd_start_claiming())
++ * @whole: whole block device
+  * @holder: holder that has claimed @bdev
+  *
+  * Finish exclusive open of a block device. Mark the device as exlusively
+@@ -1182,7 +1116,7 @@ static void bd_finish_claiming(struct block_device *bdev,
+ /**
+  * bd_abort_claiming - abort claiming of a block device
+  * @bdev: block device of interest
+- * @whole: whole block device (returned from bd_start_claiming())
++ * @whole: whole block device
+  * @holder: holder that has claimed @bdev
+  *
+  * Abort claiming of a block device when the exclusive open failed. This can be
+@@ -1505,13 +1439,15 @@ EXPORT_SYMBOL_GPL(bdev_disk_changed);
+  *    mutex_lock_nested(whole->bd_mutex, 1)
+  */
+ 
+-static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
++static int __blkdev_get(struct block_device *bdev, fmode_t mode, void *holder,
++		int for_part)
+ {
++	struct block_device *whole = NULL, *claiming = NULL;
+ 	struct gendisk *disk;
+ 	int ret;
+ 	int partno;
+ 	int perm = 0;
+-	bool first_open = false, need_restart;
++	bool first_open = false, unblock_events = true, need_restart;
+ 
+ 	if (mode & FMODE_READ)
+ 		perm |= MAY_READ;
+@@ -1533,6 +1469,25 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	if (!disk)
+ 		goto out;
+ 
++	if (partno) {
++		whole = bdget_disk(disk, 0);
++		if (!whole) {
++			ret = -ENOMEM;
++			goto out_put_disk;
++		}
++	}
++
++	if (!for_part && (mode & FMODE_EXCL)) {
++		WARN_ON_ONCE(!holder);
++		if (whole)
++			claiming = whole;
++		else
++			claiming = bdev;
++		ret = bd_prepare_to_claim(bdev, claiming, holder);
++		if (ret)
++			goto out_put_whole;
++	}
++
+ 	disk_block_events(disk);
+ 	mutex_lock_nested(&bdev->bd_mutex, for_part);
+ 	if (!bdev->bd_openers) {
+@@ -1576,18 +1531,11 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 			if (ret)
+ 				goto out_clear;
+ 		} else {
+-			struct block_device *whole;
+-			whole = bdget_disk(disk, 0);
+-			ret = -ENOMEM;
+-			if (!whole)
+-				goto out_clear;
+ 			BUG_ON(for_part);
+-			ret = __blkdev_get(whole, mode, 1);
+-			if (ret) {
+-				bdput(whole);
++			ret = __blkdev_get(whole, mode, NULL, 1);
++			if (ret)
+ 				goto out_clear;
+-			}
+-			bdev->bd_contains = whole;
++			bdev->bd_contains = bdgrab(whole);
+ 			bdev->bd_part = disk_get_part(disk, partno);
+ 			if (!(disk->flags & GENHD_FL_UP) ||
+ 			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
+@@ -1616,11 +1564,30 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	bdev->bd_openers++;
+ 	if (for_part)
+ 		bdev->bd_part_count++;
++	if (claiming)
++		bd_finish_claiming(bdev, claiming, holder);
++
++	/*
++	 * Block event polling for write claims if requested.  Any write holder
++	 * makes the write_holder state stick until all are released.  This is
++	 * good enough and tracking individual writeable reference is too
++	 * fragile given the way @mode is used in blkdev_get/put().
++	 */
++	if (claiming && (mode & FMODE_WRITE) && !bdev->bd_write_holder &&
++	    (disk->flags & GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE)) {
++		bdev->bd_write_holder = true;
++		unblock_events = false;
++	}
+ 	mutex_unlock(&bdev->bd_mutex);
+-	disk_unblock_events(disk);
++
++	if (unblock_events)
++		disk_unblock_events(disk);
++
+ 	/* only one opener holds refs to the module and disk */
+ 	if (!first_open)
+ 		put_disk_and_module(disk);
++	if (whole)
++		bdput(whole);
+ 	return 0;
+ 
+  out_clear:
+@@ -1631,13 +1598,18 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 		__blkdev_put(bdev->bd_contains, mode, 1);
+ 	bdev->bd_contains = NULL;
+  out_unlock_bdev:
++	if (claiming)
++		bd_abort_claiming(bdev, claiming, holder);
+ 	mutex_unlock(&bdev->bd_mutex);
+ 	disk_unblock_events(disk);
++ out_put_whole:
++ 	if (whole)
++		bdput(whole);
++ out_put_disk:
+ 	put_disk_and_module(disk);
+ 	if (need_restart)
+ 		goto restart;
+  out:
+-
+ 	return ret;
+ }
+ 
+@@ -1662,50 +1634,11 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+  */
+ int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
+ {
+-	struct block_device *whole = NULL;
+ 	int res;
+ 
+-	WARN_ON_ONCE((mode & FMODE_EXCL) && !holder);
+-
+-	if ((mode & FMODE_EXCL) && holder) {
+-		whole = bd_start_claiming(bdev, holder);
+-		if (IS_ERR(whole)) {
+-			bdput(bdev);
+-			return PTR_ERR(whole);
+-		}
+-	}
+-
+-	res = __blkdev_get(bdev, mode, 0);
+-
+-	if (whole) {
+-		struct gendisk *disk = whole->bd_disk;
+-
+-		/* finish claiming */
+-		mutex_lock(&bdev->bd_mutex);
+-		if (!res)
+-			bd_finish_claiming(bdev, whole, holder);
+-		else
+-			bd_abort_claiming(bdev, whole, holder);
+-		/*
+-		 * Block event polling for write claims if requested.  Any
+-		 * write holder makes the write_holder state stick until
+-		 * all are released.  This is good enough and tracking
+-		 * individual writeable reference is too fragile given the
+-		 * way @mode is used in blkdev_get/put().
+-		 */
+-		if (!res && (mode & FMODE_WRITE) && !bdev->bd_write_holder &&
+-		    (disk->flags & GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE)) {
+-			bdev->bd_write_holder = true;
+-			disk_block_events(disk);
+-		}
+-
+-		mutex_unlock(&bdev->bd_mutex);
+-		bdput(whole);
+-	}
+-
++	res =__blkdev_get(bdev, mode, holder, 0);
+ 	if (res)
+ 		bdput(bdev);
+-
+ 	return res;
+ }
+ EXPORT_SYMBOL(blkdev_get);
 -- 
 2.27.0
 
