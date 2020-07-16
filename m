@@ -2,93 +2,258 @@ Return-Path: <SRS0=Ci6H=A3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F3CC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 06:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1580C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 07:02:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18CE2206F4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 06:51:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A56F12070E
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 07:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728146AbgGPGvA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jul 2020 02:51:00 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60380 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728139AbgGPGvA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jul 2020 02:51:00 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id E3FB81A860EF525CAD5B;
-        Thu, 16 Jul 2020 14:50:54 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Thu, 16 Jul 2020
- 14:50:53 +0800
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <tj@kernel.org>, <hch@lst.de>
-Subject: [RFC PATCH] block: defer flush request no matter whether we have elevator
-Date:   Thu, 16 Jul 2020 02:52:01 -0400
-Message-ID: <20200716065201.3213045-1-yuyufen@huawei.com>
-X-Mailer: git-send-email 2.25.4
+        id S1727861AbgGPHCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jul 2020 03:02:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:34464 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726069AbgGPHCI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Jul 2020 03:02:08 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id BFCD0AC7C;
+        Thu, 16 Jul 2020 07:02:09 +0000 (UTC)
+Subject: Re: [PATCH v3 13/16] bcache: add bucket_size_hi into struct
+ cache_sb_disk for large bucket
+To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20200715143015.14957-1-colyli@suse.de>
+ <20200715143015.14957-14-colyli@suse.de>
+ <ce7d11f4-e77d-d0c2-0e9b-e7f7a16fd3c9@suse.de>
+ <c34b9fc4-3458-c7cc-72ba-cb2da7f18d03@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <d7d44a3d-3126-1aea-d31f-a56054511759@suse.de>
+Date:   Thu, 16 Jul 2020 09:02:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-CFilter-Loop: Reflected
+In-Reply-To: <c34b9fc4-3458-c7cc-72ba-cb2da7f18d03@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 7520872c0cf4 ("block: don't defer flushes on blk-mq + scheduling")
-tried to fix deadlock for cycled wait between flush requests and data
-request into flush_data_in_flight. The former holded all driver tags
-and wait for data request completion, but the latter can not complete
-for waiting free driver tags.
+On 7/16/20 8:41 AM, Coly Li wrote:
+> On 2020/7/16 14:15, Hannes Reinecke wrote:
+>> On 7/15/20 4:30 PM, colyli@suse.de wrote:
+>>> From: Coly Li <colyli@suse.de>
+>>>
+>>> The large bucket feature is to extend bucket_size from 16bit to 32bit.
+>>>
+>>> When create cache device on zoned device (e.g. zoned NVMe SSD), making
+>>> a single bucket cover one or more zones of the zoned device is the
+>>> simplest way to support zoned device as cache by bcache.
+>>>
+>>> But current maximum bucket size is 16MB and a typical zone size of zoned
+>>> device is 256MB, this is the major motiviation to extend bucket size to
+>>> a larger bit width.
+>>>
+>>> This patch is the basic and first change to support large bucket size,
+>>> the major changes it makes are,
+>>> - Add BCH_FEATURE_INCOMPAT_LARGE_BUCKET for the large bucket feature,
+>>>     INCOMPAT means it introduces incompatible on-disk format change.
+>>> - Add BCH_FEATURE_INCOMPAT_FUNCS(large_bucket, LARGE_BUCKET) routines.
+>>> - Adds __le32 bucket_size_hi into struct cache_sb_disk at offset 0x8d0
+>>>     for the on-disk super block format.
+>>> - For the in-memory super block struct cache_sb, member bucket_size is
+>>>     extended from __u16 to __32.
+>>> - Add get_bucket_size() to combine the bucket_size and bucket_size_hi
+>>>     from struct cache_sb_disk into an unsigned int value.
+>>>
+>>> Since we already have large bucket size helpers meta_bucket_pages(),
+>>> meta_bucket_bytes() and alloc_meta_bucket_pages(), they make sure when
+>>> bucket size > 8MB, the memory allocation for bcache meta data bucket
+>>> won't fail no matter how large the bucket size extended. So these meta
+>>> data buckets are handled properly when the bucket size width increase
+>>> from 16bit to 32bit, we don't need to worry about them.
+>>>
+>>> Signed-off-by: Coly Li <colyli@suse.de>
+>>> ---
+>>>    drivers/md/bcache/alloc.c    |  2 +-
+>>>    drivers/md/bcache/features.c | 22 ++++++++++++++++++++++
+>>>    drivers/md/bcache/features.h |  9 ++++++---
+>>>    drivers/md/bcache/movinggc.c |  4 ++--
+>>>    drivers/md/bcache/super.c    | 23 +++++++++++++++++++----
+>>>    include/uapi/linux/bcache.h  |  3 ++-
+>>>    6 files changed, 52 insertions(+), 11 deletions(-)
+>>>    create mode 100644 drivers/md/bcache/features.c
+>>>
+>>> diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+>>> index a1df0d95151c..52035a78d836 100644
+>>> --- a/drivers/md/bcache/alloc.c
+>>> +++ b/drivers/md/bcache/alloc.c
+>>> @@ -87,7 +87,7 @@ void bch_rescale_priorities(struct cache_set *c, int
+>>> sectors)
+>>>    {
+>>>        struct cache *ca;
+>>>        struct bucket *b;
+>>> -    unsigned int next = c->nbuckets * c->sb.bucket_size / 1024;
+>>> +    unsigned long next = c->nbuckets * c->sb.bucket_size / 1024;
+>>>        unsigned int i;
+>>>        int r;
+>>>    diff --git a/drivers/md/bcache/features.c
+>>> b/drivers/md/bcache/features.c
+>>> new file mode 100644
+>>> index 000000000000..ba53944bb390
+>>> --- /dev/null
+>>> +++ b/drivers/md/bcache/features.c
+>>> @@ -0,0 +1,22 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +/*
+>>> + * Feature set bits and string conversion.
+>>> + * Inspired by ext4's features compat/incompat/ro_compat related code.
+>>> + *
+>>> + * Copyright 2020 Coly Li <colyli@suse.de>
+>>> + *
+>>> + */
+>>> +#include <linux/bcache.h>
+>>> +#include "bcache.h"
+>>> +
+>>> +struct feature {
+>>> +    int        compat;
+>>> +    unsigned int    mask;
+>>> +    const char    *string;
+>>> +};
+>>> +
+>>> +static struct feature feature_list[] = {
+>>> +    {BCH_FEATURE_INCOMPAT, BCH_FEATURE_INCOMPAT_LARGE_BUCKET,
+>>> +        "large_bucket"},
+>>> +    {0, 0, 0 },
+>>> +};
+>>> diff --git a/drivers/md/bcache/features.h b/drivers/md/bcache/features.h
+>>> index ae7df37b9862..dca052cf5203 100644
+>>> --- a/drivers/md/bcache/features.h
+>>> +++ b/drivers/md/bcache/features.h
+>>> @@ -11,9 +11,13 @@
+>>>    #define BCH_FEATURE_INCOMPAT        2
+>>>    #define BCH_FEATURE_TYPE_MASK        0x03
+>>>    +/* Feature set definition */
+>>> +/* Incompat feature set */
+>>> +#define BCH_FEATURE_INCOMPAT_LARGE_BUCKET    0x0001 /* 32bit bucket
+>>> size */
+>>> +
+>>>    #define BCH_FEATURE_COMPAT_SUUP        0
+>>>    #define BCH_FEATURE_RO_COMPAT_SUUP    0
+>>> -#define BCH_FEATURE_INCOMPAT_SUUP    0
+>>> +#define BCH_FEATURE_INCOMPAT_SUUP    BCH_FEATURE_INCOMPAT_LARGE_BUCKET
+>>>      #define BCH_HAS_COMPAT_FEATURE(sb, mask) \
+>>>            ((sb)->feature_compat & (mask))
+>>> @@ -22,8 +26,6 @@
+>>>    #define BCH_HAS_INCOMPAT_FEATURE(sb, mask) \
+>>>            ((sb)->feature_incompat & (mask))
+>>>    -/* Feature set definition */
+>>> -
+>>>    #define BCH_FEATURE_COMPAT_FUNCS(name, flagname) \
+>>>    static inline int bch_has_feature_##name(struct cache_sb *sb) \
+>>>    { \
+>>> @@ -75,4 +77,5 @@ static inline void bch_clear_feature_##name(struct
+>>> cache_sb *sb) \
+>>>            ~BCH##_FEATURE_INCOMPAT_##flagname; \
+>>>    }
+>>>    +BCH_FEATURE_INCOMPAT_FUNCS(large_bucket, LARGE_BUCKET);
+>>>    #endif
+>>> diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
+>>> index b7dd2d75f58c..5872d6470470 100644
+>>> --- a/drivers/md/bcache/movinggc.c
+>>> +++ b/drivers/md/bcache/movinggc.c
+>>> @@ -206,8 +206,8 @@ void bch_moving_gc(struct cache_set *c)
+>>>        mutex_lock(&c->bucket_lock);
+>>>          for_each_cache(ca, c, i) {
+>>> -        unsigned int sectors_to_move = 0;
+>>> -        unsigned int reserve_sectors = ca->sb.bucket_size *
+>>> +        unsigned long sectors_to_move = 0;
+>>> +        unsigned long reserve_sectors = ca->sb.bucket_size *
+>>>                     fifo_used(&ca->free[RESERVE_MOVINGGC]);
+>>>              ca->heap.used = 0;
+>>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>>> index 02901d0ae8e2..e0da52f8e8c9 100644
+>>> --- a/drivers/md/bcache/super.c
+>>> +++ b/drivers/md/bcache/super.c
+>>> @@ -60,6 +60,17 @@ struct workqueue_struct *bch_journal_wq;
+>>>      /* Superblock */
+>>>    +static unsigned int get_bucket_size(struct cache_sb *sb, struct
+>>> cache_sb_disk *s)
+>>> +{
+>>> +    unsigned int bucket_size = le16_to_cpu(s->bucket_size);
+>>> +
+>>> +    if (sb->version >= BCACHE_SB_VERSION_CDEV_WITH_FEATURES &&
+>>> +         bch_has_feature_large_bucket(sb))
+>>> +        bucket_size |= le32_to_cpu(s->bucket_size_hi) << 16;
+>>> +
+>>> +    return bucket_size;
+>>> +}
+>>> +
+>>>    static const char *read_super_common(struct cache_sb *sb,  struct
+>>> block_device *bdev,
+>>>                         struct cache_sb_disk *s)
+>>>    {
+>> That is a bit unfortunate; bucket_size_hi is 32 bits, so we might end up
+>> with an overflow here if bucket_size_hi is larger that USHRT_MAX.
+>>
+> 
+> In bcache-tools, the maximum value of bucket_size is restricted to
+> UINT_MAX in make_bcache(),
+> 	case 'b':
+> 		bucket_size =
+> 			hatoi_validate(optarg, "bucket size", UINT_MAX);
+> 		break;
+> 
+> So the overflow won't happen if people use bcache program to make the
+> cache device.
+> 
+> If people want to modify bucket_size_hi themselves, in
+> read_super_common(), there are several checks to make sure the hacked
+> cache_sb->bucket_size composed from the hacked bucket_size_hi won't mess
+> up whole kernel,
+> 1) should be power of 2
+> 	if (!is_power_of_2(sb->bucket_size))
+> 2) should large than page size
+> 	if (sb->bucket_size < PAGE_SECTORS)
+> 3) should match sb->nbuckets
+> 	if (get_capacity(bdev->bd_disk) <
+> 	    sb->bucket_size * sb->nbuckets)
+> 4) no overlap with super block
+> 	if (sb->first_bucket * sb->bucket_size < 16)
+> 
+> Therefore the overflow won't happen, and even happen by hacking it won't
+> panic kernel.
+> 
+>> So to avoid overflow either make bucket_size_hi 16 bit, too, or define
+>> this feature such that the original bucket_size field is ignored and
+>> just the new size field is used.
+>>
+> 
+> Now cache_sb_disk is for on-disk format, it contains 16bit bucket_size
+> and 32bit bucket_size_hi. cache_sb is for in-memory object only, it
+> simply has a 32bit bucket_size.
+> 
+> Indeed I planed to set cache_sb->bucket_size to be uint64_t, but I feel
+> people won't use bucket size > 1TB, and finally make it to be a 32bit value.
+> 
+> I will add more code comments to explain why there won't be overflow in
+> get_bucket_size() because user space tool limits the maximum size.
+> 
+So why not make bucket_size_hi 16-bit?
+That would clear up the ambiguity, and you wouldn't need to add comments ...
 
-After commit 923218f6166a ("blk-mq: don't allocate driver tag upfront
-for flush rq"), flush requests will not get driver tag before queuing
-into flush queue.
+Cheers,
 
-* With elevator, flush request just get sched_tags before inserting
-  flush queue. It will not get driver tag until issue them to driver.
-  data request on list fq->flush_data_in_flight will complete in
-  the end.
-
-* Without elevator, each flush request will get a driver tag when
-  allocate request. Then data request on fq->flush_data_in_flight
-  don't worry about lacking driver tag.
-
-In both of these cases, cycled wait cannot be true. So we may allow
-to defer flush request.
-
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
----
- block/blk-flush.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 15ae0155ec07..24c208d21793 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -286,13 +286,8 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	if (fq->flush_pending_idx != fq->flush_running_idx || list_empty(pending))
- 		return;
- 
--	/* C2 and C3
--	 *
--	 * For blk-mq + scheduling, we can risk having all driver tags
--	 * assigned to empty flushes, and we deadlock if we are expecting
--	 * other requests to make progress. Don't defer for that case.
--	 */
--	if (!list_empty(&fq->flush_data_in_flight) && q->elevator &&
-+	/* C2 and C3 */
-+	if (!list_empty(&fq->flush_data_in_flight) &&
- 	    time_before(jiffies,
- 			fq->flush_pending_since + FLUSH_PENDING_TIMEOUT))
- 		return;
+Hannes
 -- 
-2.25.4
-
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
