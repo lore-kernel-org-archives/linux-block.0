@@ -5,45 +5,45 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74D4C433E2
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92245C433E3
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5C0A206F4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D298206F4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rLYHFdOd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ilqmhLBt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728345AbgGPOdQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jul 2020 10:33:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48310 "EHLO
+        id S1728435AbgGPOdR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jul 2020 10:33:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727844AbgGPOdP (ORCPT
+        with ESMTP id S1727844AbgGPOdR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jul 2020 10:33:15 -0400
+        Thu, 16 Jul 2020 10:33:17 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA8A1C061755
-        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2020 07:33:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A873C061755
+        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2020 07:33:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=WbJncdurVVf0z70ZOfQahFzc+lpUBewmye/8KNALHHU=; b=rLYHFdOdN5xvl9Mlpxi6FkrgZV
-        wCO974N+vj68r5FC8NNYVmHP/HVEAYggffgz5TvYGMt6RmBKdHb//n0QNTRLqPT8gOLbkuq3/4qqu
-        pvorkBf47LXUYUARQ826fDk0cUFKZS7GHnK5NgGXPnCXnlPCMO2uYxcc2iHe5wVSoJUY49tl+IWpQ
-        O8RCQ2LvunNntCt4LziqdMwOCGm/bis5sp9yMl7H2CzbmHrmHxyr0BljN1x3Bb96Gu4+6d4Z5xhFy
-        XXT6meMFIhuoipN4RIIGtgLchYggZgUMGpuhup9vPj2dvJi6hWzdBmgMtHBqptGUfao3a1PcRfs6s
-        t0NU3dVw==;
+        bh=Ogni89yUVV/gCuY4mF2UPPoyZIMVax7pm/2sFwwrfxI=; b=ilqmhLBtGSXmgbo97V457Mqw+x
+        Sd9xq/e6IhvaSwiRlU0W9P3c6e/jDn3Cn74Dk0NSaeYrJBxLFM8tB1ua7mypsljFkWa75hjpaj89R
+        trwqQjAoZGGnfOxLa4l8vfvOmst0k2+5A03Dkp16NkfwSR+qFYRqX2Iv4Oyx4lmETkMiuQ9mU9JlC
+        NJbVeNscNkZCyBRjpjC3ysY45K7S7cqfGBBQkQuRBsXziP5YFJfjT34dZ0Nm4x9kordrUxAj7PnhW
+        S4ZTDJKtvlni/FOKQRfPZKZud/ul8KCqbDYMJSVKy7yPkvan4tKSyDh/O+YmLS6zRaO5Wnm+ShvSQ
+        SHjYijvw==;
 Received: from [2001:4bb8:105:4a81:1bd9:4dba:216e:37b8] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jw4wj-0000C1-9j; Thu, 16 Jul 2020 14:33:13 +0000
+        id 1jw4wk-0000C9-Kj; Thu, 16 Jul 2020 14:33:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH 1/4] block: simplify the restart case in __blkdev_get
-Date:   Thu, 16 Jul 2020 16:33:07 +0200
-Message-Id: <20200716143310.473136-2-hch@lst.de>
+Subject: [PATCH 2/4] block: refactor bd_start_claiming
+Date:   Thu, 16 Jul 2020 16:33:08 +0200
+Message-Id: <20200716143310.473136-3-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200716143310.473136-1-hch@lst.de>
 References: <20200716143310.473136-1-hch@lst.de>
@@ -55,71 +55,93 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Insted of duplicating all the cleanup logic jump to the code that cleans
-up anyway, and restart after that.
+Move the locking and assignment of bd_claiming from bd_start_claiming to
+bd_prepare_to_claim.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/block_dev.c | 25 ++++++++++---------------
- 1 file changed, 10 insertions(+), 15 deletions(-)
+ fs/block_dev.c | 33 +++++++++++++--------------------
+ 1 file changed, 13 insertions(+), 20 deletions(-)
 
 diff --git a/fs/block_dev.c b/fs/block_dev.c
-index a36d5b6907ea4e..376832250c8e91 100644
+index 376832250c8e91..b7b2ee4b288ae9 100644
 --- a/fs/block_dev.c
 +++ b/fs/block_dev.c
-@@ -1517,7 +1517,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	int ret;
- 	int partno;
- 	int perm = 0;
--	bool first_open = false;
-+	bool first_open = false, need_restart;
+@@ -1015,19 +1015,14 @@ static bool bd_may_claim(struct block_device *bdev, struct block_device *whole,
+ }
  
- 	if (mode & FMODE_READ)
- 		perm |= MAY_READ;
-@@ -1533,7 +1533,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ /**
+- * bd_prepare_to_claim - prepare to claim a block device
++ * bd_prepare_to_claim - claim a block device
+  * @bdev: block device of interest
+  * @whole: the whole device containing @bdev, may equal @bdev
+  * @holder: holder trying to claim @bdev
+  *
+- * Prepare to claim @bdev.  This function fails if @bdev is already
+- * claimed by another holder and waits if another claiming is in
+- * progress.  This function doesn't actually claim.  On successful
+- * return, the caller has ownership of bd_claiming and bd_holder[s].
+- *
+- * CONTEXT:
+- * spin_lock(&bdev_lock).  Might release bdev_lock, sleep and regrab
+- * it multiple times.
++ * Claim @bdev.  This function fails if @bdev is already claimed by another
++ * holder and waits if another claiming is in progress. return, the caller
++ * has ownership of bd_claiming and bd_holder[s].
+  *
+  * RETURNS:
+  * 0 if @bdev can be claimed, -EBUSY otherwise.
+@@ -1036,9 +1031,12 @@ static int bd_prepare_to_claim(struct block_device *bdev,
+ 			       struct block_device *whole, void *holder)
+ {
+ retry:
++	spin_lock(&bdev_lock);
+ 	/* if someone else claimed, fail */
+-	if (!bd_may_claim(bdev, whole, holder))
++	if (!bd_may_claim(bdev, whole, holder)) {
++		spin_unlock(&bdev_lock);
+ 		return -EBUSY;
++	}
+ 
+ 	/* if claiming is already in progress, wait for it to finish */
+ 	if (whole->bd_claiming) {
+@@ -1049,11 +1047,12 @@ static int bd_prepare_to_claim(struct block_device *bdev,
+ 		spin_unlock(&bdev_lock);
+ 		schedule();
+ 		finish_wait(wq, &wait);
+-		spin_lock(&bdev_lock);
+ 		goto retry;
  	}
  
-  restart:
+ 	/* yay, all mine */
++	whole->bd_claiming = holder;
++	spin_unlock(&bdev_lock);
+ 	return 0;
+ }
+ 
+@@ -1134,19 +1133,13 @@ struct block_device *bd_start_claiming(struct block_device *bdev, void *holder)
+ 	if (!whole)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	/* prepare to claim, if successful, mark claiming in progress */
+-	spin_lock(&bdev_lock);
 -
-+	need_restart = false;
- 	ret = -ENXIO;
- 	disk = bdev_get_gendisk(bdev, &partno);
- 	if (!disk)
-@@ -1556,19 +1556,12 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 			ret = 0;
- 			if (disk->fops->open) {
- 				ret = disk->fops->open(bdev, mode);
--				if (ret == -ERESTARTSYS) {
--					/* Lost a race with 'disk' being
--					 * deleted, try again.
--					 * See md.c
--					 */
--					disk_put_part(bdev->bd_part);
--					bdev->bd_part = NULL;
--					bdev->bd_disk = NULL;
--					mutex_unlock(&bdev->bd_mutex);
--					disk_unblock_events(disk);
--					put_disk_and_module(disk);
--					goto restart;
--				}
-+				/*
-+				 * If we lost a race with 'disk' being deleted,
-+				 * try again.  See md.c
-+				 */
-+				if (ret == -ERESTARTSYS)
-+					need_restart = true;
- 			}
+ 	err = bd_prepare_to_claim(bdev, whole, holder);
+-	if (err == 0) {
+-		whole->bd_claiming = holder;
+-		spin_unlock(&bdev_lock);
+-		return whole;
+-	} else {
+-		spin_unlock(&bdev_lock);
++	if (err) {
+ 		bdput(whole);
+ 		return ERR_PTR(err);
+ 	}
++
++	return whole;
+ }
+ EXPORT_SYMBOL(bd_start_claiming);
  
- 			if (!ret) {
-@@ -1647,6 +1640,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	mutex_unlock(&bdev->bd_mutex);
- 	disk_unblock_events(disk);
- 	put_disk_and_module(disk);
-+	if (need_restart)
-+		goto restart;
-  out:
- 
- 	return ret;
 -- 
 2.27.0
 
