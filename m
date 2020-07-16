@@ -2,333 +2,98 @@ Return-Path: <SRS0=Ci6H=A3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EC0C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DECC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:34:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AA93207CB
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:33:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33DBE206F4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 14:34:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="d2klmSWD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bCPjPsYL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728694AbgGPOdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jul 2020 10:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48326 "EHLO
+        id S1727844AbgGPOen (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jul 2020 10:34:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727844AbgGPOdT (ORCPT
+        with ESMTP id S1726963AbgGPOen (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jul 2020 10:33:19 -0400
+        Thu, 16 Jul 2020 10:34:43 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E39C061755
-        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2020 07:33:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49B50C061755
+        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2020 07:34:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=Iav16luBG5iUM/TR+LXAILzbiTmUYqdW5J6NNIvn7+M=; b=d2klmSWDwhH+jhvBA9gM1bpBZd
-        K00Xzbvne5EOGMUHL81Jh4XN+ppTd1cIUAwgT7RTN4/lKig0pZiUZnbx1hMyyoBgk7HQGiRSlw96I
-        BdbJD4QDB1W3ZCpDDKgZ/pKFwDhj6o6WCR18DaCiuA6IWdQPwVgaet7kIr+joRuTvtkQDft2a92jf
-        jjp8I30h+2DYNqQWVYWJPYM6AjiLMqYVaw9XFEu5ehlu4ykrh2OS+xyHTn+YWzylfBsXBjynJm84g
-        ZwMl9rdaHHd6TNl4vnE9+GUYzETUzfEZ/7kynfHId4YRt2WFhefYt0wyjQRuSljdNhNKiiQreC+VE
-        Q2ZsaRaQ==;
-Received: from [2001:4bb8:105:4a81:1bd9:4dba:216e:37b8] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jw4wn-0000CP-7S; Thu, 16 Jul 2020 14:33:17 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH 4/4] block: integrate bd_start_claiming into __blkdev_get
-Date:   Thu, 16 Jul 2020 16:33:10 +0200
-Message-Id: <20200716143310.473136-5-hch@lst.de>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200716143310.473136-1-hch@lst.de>
-References: <20200716143310.473136-1-hch@lst.de>
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zGJzjGaIXggDvLFVYP8RonukC8k5gLioaGYOWhyJhiM=; b=bCPjPsYLvOrTWm0OOBtSooeTUS
+        VMRXuRzHo2M0O52E7c/78zujehnR5k+/1rjoEf/O80C3r1Pnk/ZTCWEt4C8WdAlX/2o+Huzc7u9Qh
+        V0Dxy0mosWsOAm0LP2oFwdUPUb22008dWmuyGLVmi9g8KeRUWKoAjqORFL7eXAc/cltIANUDf0Y17
+        3Z19xhx5X9pVtOQZH3CXfYSD/U9tF3xR3uzBqQWFOsPrElAWIm0RDRiieKfc2hdTz6QM9R8FXNKym
+        ojxSWIHsfhAxlQVVhZ0VWbYsJ67XznYUOmf+XJBgqZEi4YXsqCyJW2OAsCWPQ35AZeAchGboYLyf4
+        TRZLDtrg==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jw4y9-0000H1-6Q; Thu, 16 Jul 2020 14:34:41 +0000
+Date:   Thu, 16 Jul 2020 15:34:41 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: align max append sectors to physical block size
+Message-ID: <20200716143441.GA937@infradead.org>
+References: <20200716100933.3132-1-johannes.thumshirn@wdc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200716100933.3132-1-johannes.thumshirn@wdc.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bd_start_claiming duplicates a lot of the work done in __blkdev_get.
-Integrate the two functions to avoid the duplicate work, and to do the
-right thing for the md -ERESTARTSYS corner case.
+On Thu, Jul 16, 2020 at 07:09:33PM +0900, Johannes Thumshirn wrote:
+> Max append sectors needs to be aligned to physical block size, otherwise
+> we can end up in a situation where it's off by 1-3 sectors which would
+> cause short writes with asynchronous zone append submissions from an FS.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/block_dev.c | 177 +++++++++++++++----------------------------------
- 1 file changed, 55 insertions(+), 122 deletions(-)
+Huh? The physical block size is purely a hint.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index ee80bd81af748d..3f94a06a094675 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1078,72 +1078,6 @@ static struct gendisk *bdev_get_gendisk(struct block_device *bdev, int *partno)
- 	return disk;
- }
- 
--/**
-- * bd_start_claiming - start claiming a block device
-- * @bdev: block device of interest
-- * @holder: holder trying to claim @bdev
-- *
-- * @bdev is about to be opened exclusively.  Check @bdev can be opened
-- * exclusively and mark that an exclusive open is in progress.  Each
-- * successful call to this function must be matched with a call to
-- * either bd_finish_claiming() or bd_abort_claiming() (which do not
-- * fail).
-- *
-- * This function is used to gain exclusive access to the block device
-- * without actually causing other exclusive open attempts to fail. It
-- * should be used when the open sequence itself requires exclusive
-- * access but may subsequently fail.
-- *
-- * CONTEXT:
-- * Might sleep.
-- *
-- * RETURNS:
-- * Pointer to the block device containing @bdev on success, ERR_PTR()
-- * value on failure.
-- */
--static struct block_device *bd_start_claiming(struct block_device *bdev,
--		void *holder)
--{
--	struct gendisk *disk;
--	struct block_device *whole;
--	int partno, err;
--
--	might_sleep();
--
--	/*
--	 * @bdev might not have been initialized properly yet, look up
--	 * and grab the outer block device the hard way.
--	 */
--	disk = bdev_get_gendisk(bdev, &partno);
--	if (!disk)
--		return ERR_PTR(-ENXIO);
--
--	/*
--	 * Normally, @bdev should equal what's returned from bdget_disk()
--	 * if partno is 0; however, some drivers (floppy) use multiple
--	 * bdev's for the same physical device and @bdev may be one of the
--	 * aliases.  Keep @bdev if partno is 0.  This means claimer
--	 * tracking is broken for those devices but it has always been that
--	 * way.
--	 */
--	if (partno)
--		whole = bdget_disk(disk, 0);
--	else
--		whole = bdgrab(bdev);
--
--	put_disk_and_module(disk);
--	if (!whole)
--		return ERR_PTR(-ENOMEM);
--
--	err = bd_prepare_to_claim(bdev, whole, holder);
--	if (err) {
--		bdput(whole);
--		return ERR_PTR(err);
--	}
--
--	return whole;
--}
--
- static void bd_clear_claiming(struct block_device *whole, void *holder)
- {
- 	lockdep_assert_held(&bdev_lock);
-@@ -1156,7 +1090,7 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
- /**
-  * bd_finish_claiming - finish claiming of a block device
-  * @bdev: block device of interest
-- * @whole: whole block device (returned from bd_start_claiming())
-+ * @whole: whole block device
-  * @holder: holder that has claimed @bdev
-  *
-  * Finish exclusive open of a block device. Mark the device as exlusively
-@@ -1182,7 +1116,7 @@ static void bd_finish_claiming(struct block_device *bdev,
- /**
-  * bd_abort_claiming - abort claiming of a block device
-  * @bdev: block device of interest
-- * @whole: whole block device (returned from bd_start_claiming())
-+ * @whole: whole block device
-  * @holder: holder that has claimed @bdev
-  *
-  * Abort claiming of a block device when the exclusive open failed. This can be
-@@ -1505,13 +1439,15 @@ EXPORT_SYMBOL_GPL(bdev_disk_changed);
-  *    mutex_lock_nested(whole->bd_mutex, 1)
-  */
- 
--static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
-+static int __blkdev_get(struct block_device *bdev, fmode_t mode, void *holder,
-+		int for_part)
- {
-+	struct block_device *whole = NULL, *claiming = NULL;
- 	struct gendisk *disk;
- 	int ret;
- 	int partno;
- 	int perm = 0;
--	bool first_open = false, need_restart;
-+	bool first_open = false, unblock_events = true, need_restart;
- 
- 	if (mode & FMODE_READ)
- 		perm |= MAY_READ;
-@@ -1533,6 +1469,25 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	if (!disk)
- 		goto out;
- 
-+	if (partno) {
-+		whole = bdget_disk(disk, 0);
-+		if (!whole) {
-+			ret = -ENOMEM;
-+			goto out_put_disk;
-+		}
-+	}
-+
-+	if (!for_part && (mode & FMODE_EXCL)) {
-+		WARN_ON_ONCE(!holder);
-+		if (whole)
-+			claiming = whole;
-+		else
-+			claiming = bdev;
-+		ret = bd_prepare_to_claim(bdev, claiming, holder);
-+		if (ret)
-+			goto out_put_whole;
-+	}
-+
- 	disk_block_events(disk);
- 	mutex_lock_nested(&bdev->bd_mutex, for_part);
- 	if (!bdev->bd_openers) {
-@@ -1576,18 +1531,11 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 			if (ret)
- 				goto out_clear;
- 		} else {
--			struct block_device *whole;
--			whole = bdget_disk(disk, 0);
--			ret = -ENOMEM;
--			if (!whole)
--				goto out_clear;
- 			BUG_ON(for_part);
--			ret = __blkdev_get(whole, mode, 1);
--			if (ret) {
--				bdput(whole);
-+			ret = __blkdev_get(whole, mode, NULL, 1);
-+			if (ret)
- 				goto out_clear;
--			}
--			bdev->bd_contains = whole;
-+			bdev->bd_contains = bdgrab(whole);
- 			bdev->bd_part = disk_get_part(disk, partno);
- 			if (!(disk->flags & GENHD_FL_UP) ||
- 			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
-@@ -1616,11 +1564,30 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	bdev->bd_openers++;
- 	if (for_part)
- 		bdev->bd_part_count++;
-+	if (claiming)
-+		bd_finish_claiming(bdev, claiming, holder);
-+
-+	/*
-+	 * Block event polling for write claims if requested.  Any write holder
-+	 * makes the write_holder state stick until all are released.  This is
-+	 * good enough and tracking individual writeable reference is too
-+	 * fragile given the way @mode is used in blkdev_get/put().
-+	 */
-+	if (claiming && (mode & FMODE_WRITE) && !bdev->bd_write_holder &&
-+	    (disk->flags & GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE)) {
-+		bdev->bd_write_holder = true;
-+		unblock_events = false;
-+	}
- 	mutex_unlock(&bdev->bd_mutex);
--	disk_unblock_events(disk);
-+
-+	if (unblock_events)
-+		disk_unblock_events(disk);
-+
- 	/* only one opener holds refs to the module and disk */
- 	if (!first_open)
- 		put_disk_and_module(disk);
-+	if (whole)
-+		bdput(whole);
- 	return 0;
- 
-  out_clear:
-@@ -1631,13 +1598,18 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 		__blkdev_put(bdev->bd_contains, mode, 1);
- 	bdev->bd_contains = NULL;
-  out_unlock_bdev:
-+	if (claiming)
-+		bd_abort_claiming(bdev, claiming, holder);
- 	mutex_unlock(&bdev->bd_mutex);
- 	disk_unblock_events(disk);
-+ out_put_whole:
-+ 	if (whole)
-+		bdput(whole);
-+ out_put_disk:
- 	put_disk_and_module(disk);
- 	if (need_restart)
- 		goto restart;
-  out:
--
- 	return ret;
- }
- 
-@@ -1662,50 +1634,11 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
-  */
- int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
- {
--	struct block_device *whole = NULL;
- 	int res;
- 
--	WARN_ON_ONCE((mode & FMODE_EXCL) && !holder);
--
--	if ((mode & FMODE_EXCL) && holder) {
--		whole = bd_start_claiming(bdev, holder);
--		if (IS_ERR(whole)) {
--			bdput(bdev);
--			return PTR_ERR(whole);
--		}
--	}
--
--	res = __blkdev_get(bdev, mode, 0);
--
--	if (whole) {
--		struct gendisk *disk = whole->bd_disk;
--
--		/* finish claiming */
--		mutex_lock(&bdev->bd_mutex);
--		if (!res)
--			bd_finish_claiming(bdev, whole, holder);
--		else
--			bd_abort_claiming(bdev, whole, holder);
--		/*
--		 * Block event polling for write claims if requested.  Any
--		 * write holder makes the write_holder state stick until
--		 * all are released.  This is good enough and tracking
--		 * individual writeable reference is too fragile given the
--		 * way @mode is used in blkdev_get/put().
--		 */
--		if (!res && (mode & FMODE_WRITE) && !bdev->bd_write_holder &&
--		    (disk->flags & GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE)) {
--			bdev->bd_write_holder = true;
--			disk_block_events(disk);
--		}
--
--		mutex_unlock(&bdev->bd_mutex);
--		bdput(whole);
--	}
--
-+	res =__blkdev_get(bdev, mode, holder, 0);
- 	if (res)
- 		bdput(bdev);
--
- 	return res;
- }
- EXPORT_SYMBOL(blkdev_get);
--- 
-2.27.0
-
+> 
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> ---
+>  block/blk-settings.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 9a2c23cd9700..d75c4cc34a7a 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -231,6 +231,7 @@ EXPORT_SYMBOL(blk_queue_max_write_zeroes_sectors);
+>  void blk_queue_max_zone_append_sectors(struct request_queue *q,
+>  		unsigned int max_zone_append_sectors)
+>  {
+> +	unsigned int phys = queue_physical_block_size(q);
+>  	unsigned int max_sectors;
+>  
+>  	if (WARN_ON(!blk_queue_is_zoned(q)))
+> @@ -246,6 +247,13 @@ void blk_queue_max_zone_append_sectors(struct request_queue *q,
+>  	 */
+>  	WARN_ON(!max_sectors);
+>  
+> +	/*
+> +	 * Max append sectors needs to be aligned to physical block size,
+> +	 * otherwise we can end up in a situation where it's off by 1-3 sectors
+> +	 * which would cause short writes with asynchronous zone append
+> +	 * submissions from an FS.
+> +	 */
+> +	max_sectors = ALIGN_DOWN(max_sectors << 9, phys) >> 9;
+>  	q->limits.max_zone_append_sectors = max_sectors;
+>  }
+>  EXPORT_SYMBOL_GPL(blk_queue_max_zone_append_sectors);
+> -- 
+> 2.26.2
+> 
+---end quoted text---
