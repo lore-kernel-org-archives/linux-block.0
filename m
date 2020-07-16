@@ -7,32 +7,31 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D2BC433E3
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 09:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D29DC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 09:02:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 973542078C
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 09:02:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03EAC2071B
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 09:02:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726080AbgGPJCX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jul 2020 05:02:23 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7866 "EHLO huawei.com"
+        id S1726218AbgGPJCf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jul 2020 05:02:35 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7867 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725897AbgGPJCX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jul 2020 05:02:23 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 3CAA0674F7CDB51A6087;
-        Thu, 16 Jul 2020 17:02:19 +0800 (CST)
+        id S1726333AbgGPJCf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Jul 2020 05:02:35 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 05C7D9C5811B2F9A705F;
+        Thu, 16 Jul 2020 17:02:31 +0800 (CST)
 Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 16 Jul 2020 17:02:16 +0800
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 16 Jul 2020 17:02:27 +0800
 From:   Qinglang Miao <miaoqinglang@huawei.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Josef Bacik <josef@toxicpanda.com>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH -next] nbd: Convert to DEFINE_SHOW_ATTRIBUTE
-Date:   Thu, 16 Jul 2020 17:06:12 +0800
-Message-ID: <20200716090612.14005-1-miaoqinglang@huawei.com>
+        Justin Sanders <justin@coraid.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next] aoe: Convert to DEFINE_SHOW_ATTRIBUTE
+Date:   Thu, 16 Jul 2020 17:06:21 +0800
+Message-ID: <20200716090621.14063-1-miaoqinglang@huawei.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
@@ -50,65 +49,48 @@ Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
 
 Signed-off-by: Liu Shixin <liushixin2@huawei.com>
 ---
- drivers/block/nbd.c | 28 ++++------------------------
- 1 file changed, 4 insertions(+), 24 deletions(-)
+ drivers/block/aoe/aoeblk.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 25208ff71..43f9cfd9a 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1540,17 +1540,7 @@ static int nbd_dbg_tasks_show(struct seq_file *s, void *unused)
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 57905a495..3502a8325 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -110,7 +110,7 @@ static ssize_t aoedisk_show_payload(struct device *dev,
+ 	return snprintf(page, PAGE_SIZE, "%lu\n", d->maxbcnt);
+ }
+ 
+-static int aoedisk_debugfs_show(struct seq_file *s, void *ignored)
++static int aoe_debugfs_show(struct seq_file *s, void *ignored)
+ {
+ 	struct aoedev *d;
+ 	struct aoetgt **t, **te;
+@@ -154,10 +154,7 @@ static int aoedisk_debugfs_show(struct seq_file *s, void *ignored)
  	return 0;
  }
  
--static int nbd_dbg_tasks_open(struct inode *inode, struct file *file)
+-static int aoe_debugfs_open(struct inode *inode, struct file *file)
 -{
--	return single_open(file, nbd_dbg_tasks_show, inode->i_private);
+-	return single_open(file, aoedisk_debugfs_show, inode->i_private);
 -}
--
--static const struct file_operations nbd_dbg_tasks_ops = {
--	.open = nbd_dbg_tasks_open,
++DEFINE_SHOW_ATTRIBUTE(aoe_debugfs);
+ 
+ static DEVICE_ATTR(state, 0444, aoedisk_show_state, NULL);
+ static DEVICE_ATTR(mac, 0444, aoedisk_show_mac, NULL);
+@@ -186,13 +183,6 @@ static const struct attribute_group *aoe_attr_groups[] = {
+ 	NULL,
+ };
+ 
+-static const struct file_operations aoe_debugfs_fops = {
+-	.open = aoe_debugfs_open,
 -	.read_iter = seq_read_iter,
 -	.llseek = seq_lseek,
 -	.release = single_release,
 -};
-+DEFINE_SHOW_ATTRIBUTE(nbd_dbg_tasks);
- 
- static int nbd_dbg_flags_show(struct seq_file *s, void *unused)
- {
-@@ -1575,17 +1565,7 @@ static int nbd_dbg_flags_show(struct seq_file *s, void *unused)
- 	return 0;
- }
- 
--static int nbd_dbg_flags_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, nbd_dbg_flags_show, inode->i_private);
--}
 -
--static const struct file_operations nbd_dbg_flags_ops = {
--	.open = nbd_dbg_flags_open,
--	.read_iter = seq_read_iter,
--	.llseek = seq_lseek,
--	.release = single_release,
--};
-+DEFINE_SHOW_ATTRIBUTE(nbd_dbg_flags);
- 
- static int nbd_dev_dbg_init(struct nbd_device *nbd)
+ static void
+ aoedisk_add_debugfs(struct aoedev *d)
  {
-@@ -1603,11 +1583,11 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
- 	}
- 	config->dbg_dir = dir;
- 
--	debugfs_create_file("tasks", 0444, dir, nbd, &nbd_dbg_tasks_ops);
-+	debugfs_create_file("tasks", 0444, dir, nbd, &nbd_dbg_tasks_fops);
- 	debugfs_create_u64("size_bytes", 0444, dir, &config->bytesize);
- 	debugfs_create_u32("timeout", 0444, dir, &nbd->tag_set.timeout);
- 	debugfs_create_u64("blocksize", 0444, dir, &config->blksize);
--	debugfs_create_file("flags", 0444, dir, nbd, &nbd_dbg_flags_ops);
-+	debugfs_create_file("flags", 0444, dir, nbd, &nbd_dbg_flags_fops);
- 
- 	return 0;
- }
 -- 
 2.17.1
 
