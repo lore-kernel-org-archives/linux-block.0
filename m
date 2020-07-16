@@ -2,83 +2,84 @@ Return-Path: <SRS0=Ci6H=A3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A838C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 05:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1923FC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 06:08:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 82E58207BC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 05:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECA122074B
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jul 2020 06:08:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726090AbgGPFAH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jul 2020 01:00:07 -0400
-Received: from mail-il1-f197.google.com ([209.85.166.197]:33179 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725957AbgGPFAG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jul 2020 01:00:06 -0400
-Received: by mail-il1-f197.google.com with SMTP id c1so2899190ilr.0
-        for <linux-block@vger.kernel.org>; Wed, 15 Jul 2020 22:00:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=cE1hhRVuLf2gZer2Ucpnx9HKI06D31CoZ/RNlVo8Pe0=;
-        b=bQpOY4mY1E1iYufWcPhT7woUTbvNrq/WclKoopKgzfjcH6lldf6pf19TgJDHF9sJAe
-         nxyjEke7xgoM3fQfI7CiRZ70ipyLPrwiZdhS048jYfJJem4nwzrKzuR0c7niEjoVTCy5
-         6X3d3Tv71S0bMHuLY2CXaqmGkLVBKqcDz84hGTuTwZ0qimN37gN/Qg7cjWZTrbjXswJN
-         Qvmo5xCFoo0olBJKVd7BNc9tpWb6qeq+yMHejEL6N4T4qMiABOCnkQp7F5psfChaC4Fp
-         AWaK+w7UI2eD0Pm4e3O9F8fzkytZJjPeyKiCA+pkZPUeFs4l1+5nRyQej+Tm5cOQ2e9s
-         xjww==
-X-Gm-Message-State: AOAM532UJQKVCPgGaBmMAxWEfhQdjVVaOo3ZLX/ENH0XNTx0RXSwIpwE
-        q/nv3/Z7hPn5/anWhysJsOsvtgtf/yGyhaleQVCwmgQINlJm
-X-Google-Smtp-Source: ABdhPJwrtEU1PwKJDwMkynoxse8GDaDxlNH/e4aaSkK3f5Z72MwWHALTn6uAryXSscOV5ZuIi1/gjdhbEGKyVnlXGRdUASMWb0gi
+        id S1726069AbgGPGIA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jul 2020 02:08:00 -0400
+Received: from mx2.suse.de ([195.135.220.15]:38660 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725844AbgGPGIA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Jul 2020 02:08:00 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 165D5AF8E;
+        Thu, 16 Jul 2020 06:08:02 +0000 (UTC)
+Subject: Re: [PATCH v3 11/16] bcache: handle cache set verify_ondisk properly
+ for bucket size > 8MB
+To:     colyli@suse.de, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20200715143015.14957-1-colyli@suse.de>
+ <20200715143015.14957-12-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <2c45279a-9faf-a0a7-6527-bda7c598442b@suse.de>
+Date:   Thu, 16 Jul 2020 08:07:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Received: by 2002:a6b:7c02:: with SMTP id m2mr2790747iok.49.1594875605629;
- Wed, 15 Jul 2020 22:00:05 -0700 (PDT)
-Date:   Wed, 15 Jul 2020 22:00:05 -0700
-In-Reply-To: <00000000000029663005aa23cff4@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ef406d05aa87e9ba@google.com>
-Subject: Re: WARNING in submit_bio_checks
-From:   syzbot <syzbot+4c50ac32e5b10e4133e1@syzkaller.appspotmail.com>
-To:     andriin@fb.com, ast@kernel.org, axboe@kernel.dk,
-        bkkarthik@pesu.pes.edu, bpf@vger.kernel.org, daniel@iogearbox.net,
-        davem@davemloft.net, ebiggers@kernel.org, hch@infradead.org,
-        john.fastabend@gmail.com, kafai@fb.com, kpsingh@chromium.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mcgrof@kernel.org,
-        netdev@vger.kernel.org, songliubraving@fb.com,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk,
-        yhs@fb.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200715143015.14957-12-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this issue to:
+On 7/15/20 4:30 PM, colyli@suse.de wrote:
+> From: Coly Li <colyli@suse.de>
+> 
+> In bch_btree_cache_alloc() when CONFIG_BCACHE_DEBUG is configured,
+> allocate memory for c->verify_ondisk may fail if the bucket size > 8MB,
+> which will require __get_free_pages() to allocate continuous pages
+> with order > 11 (the default MAX_ORDER of Linux buddy allocator). Such
+> over size allocation will fail, and cause 2 problems,
+> - When CONFIG_BCACHE_DEBUG is configured,  bch_btree_verify() does not
+>    work, because c->verify_ondisk is NULL and bch_btree_verify() returns
+>    immediately.
+> - bch_btree_cache_alloc() will fail due to c->verify_ondisk allocation
+>    failed, then the whole cache device registration fails. And because of
+>    this failure, the first problem of bch_btree_verify() has no chance to
+>    be triggered.
+> 
+> This patch fixes the above problem by two means,
+> 1) If pages allocation of c->verify_ondisk fails, set it to NULL and
+>     returns bch_btree_cache_alloc() with -ENOMEM.
+> 2) When calling __get_free_pages() to allocate c->verify_ondisk pages,
+>     use ilog2(meta_bucket_pages(&c->sb)) to make sure ilog2() will always
+>     generate a pages order <= MAX_ORDER (or CONFIG_FORCE_MAX_ZONEORDER).
+>     Then the buddy system won't directly reject the allocation request.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>   drivers/md/bcache/btree.c | 12 ++++++++++--
+>   1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-commit 449325b52b7a6208f65ed67d3484fd7b7184477b
-Author: Alexei Starovoitov <ast@kernel.org>
-Date:   Tue May 22 02:22:29 2018 +0000
+Cheers,
 
-    umh: introduce fork_usermode_blob() helper
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10fc4b00900000
-start commit:   9e50b94b Add linux-next specific files for 20200703
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12fc4b00900000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14fc4b00900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f99cc0faa1476ed6
-dashboard link: https://syzkaller.appspot.com/bug?extid=4c50ac32e5b10e4133e1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1111fb6d100000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1218fa1f100000
-
-Reported-by: syzbot+4c50ac32e5b10e4133e1@syzkaller.appspotmail.com
-Fixes: 449325b52b7a ("umh: introduce fork_usermode_blob() helper")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
