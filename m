@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F3BC433ED
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 11:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EB9C433EC
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 11:23:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8FDF2080D
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 11:23:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 285DC20734
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 11:23:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726782AbgGQLXJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jul 2020 07:23:09 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60608 "EHLO mx2.suse.de"
+        id S1726794AbgGQLXN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jul 2020 07:23:13 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60626 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726090AbgGQLXJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jul 2020 07:23:09 -0400
+        id S1726090AbgGQLXN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jul 2020 07:23:13 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 91589AE55;
-        Fri, 17 Jul 2020 11:23:11 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 06382AE55;
+        Fri, 17 Jul 2020 11:23:16 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, hare@suse.de, Coly Li <colyli@suse.de>
-Subject: [PATCH v4 09/16] bcache: handle c->uuids properly for bucket size > 8MB
-Date:   Fri, 17 Jul 2020 19:22:29 +0800
-Message-Id: <20200717112236.44761-10-colyli@suse.de>
+Subject: [PATCH v4 11/16] bcache: handle cache set verify_ondisk properly for bucket size > 8MB
+Date:   Fri, 17 Jul 2020 19:22:31 +0800
+Message-Id: <20200717112236.44761-12-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200717112236.44761-1-colyli@suse.de>
 References: <20200717112236.44761-1-colyli@suse.de>
@@ -39,71 +39,62 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Bcache allocates a whole bucket to store c->uuids on cache device, and
-allocates continuous pages to store it in-memory. When the bucket size
-exceeds maximum allocable continuous pages, bch_cache_set_alloc() will
-fail and cache device registration will fail.
+In bch_btree_cache_alloc() when CONFIG_BCACHE_DEBUG is configured,
+allocate memory for c->verify_ondisk may fail if the bucket size > 8MB,
+which will require __get_free_pages() to allocate continuous pages
+with order > 11 (the default MAX_ORDER of Linux buddy allocator). Such
+over size allocation will fail, and cause 2 problems,
+- When CONFIG_BCACHE_DEBUG is configured,  bch_btree_verify() does not
+  work, because c->verify_ondisk is NULL and bch_btree_verify() returns
+  immediately.
+- bch_btree_cache_alloc() will fail due to c->verify_ondisk allocation
+  failed, then the whole cache device registration fails. And because of
+  this failure, the first problem of bch_btree_verify() has no chance to
+  be triggered.
 
-This patch allocates c->uuids by alloc_meta_bucket_pages(), and uses
-ilog2(meta_bucket_pages(c)) to indicate order of c->uuids pages when
-free it. When writing c->uuids to cache device, its size is decided
-by meta_bucket_pages(c) * PAGE_SECTORS. Now c->uuids is properly handled
-for bucket size > 8MB.
+This patch fixes the above problem by two means,
+1) If pages allocation of c->verify_ondisk fails, set it to NULL and
+   returns bch_btree_cache_alloc() with -ENOMEM.
+2) When calling __get_free_pages() to allocate c->verify_ondisk pages,
+   use ilog2(meta_bucket_pages(&c->sb)) to make sure ilog2() will always
+   generate a pages order <= MAX_ORDER (or CONFIG_FORCE_MAX_ZONEORDER).
+   Then the buddy system won't directly reject the allocation request.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/md/bcache/super.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ drivers/md/bcache/btree.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d0bdbbc3ff5c..a19f1baa8664 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -466,6 +466,7 @@ static int __uuid_write(struct cache_set *c)
- 	BKEY_PADDED(key) k;
- 	struct closure cl;
- 	struct cache *ca;
-+	unsigned int size;
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index dd116c83de80..79716ac9fb5d 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -738,7 +738,7 @@ void bch_btree_cache_free(struct cache_set *c)
+ 	if (c->verify_data)
+ 		list_move(&c->verify_data->list, &c->btree_cache);
  
- 	closure_init_stack(&cl);
- 	lockdep_assert_held(&bch_register_lock);
-@@ -473,7 +474,8 @@ static int __uuid_write(struct cache_set *c)
- 	if (bch_bucket_alloc_set(c, RESERVE_BTREE, &k.key, 1, true))
- 		return 1;
+-	free_pages((unsigned long) c->verify_ondisk, ilog2(bucket_pages(c)));
++	free_pages((unsigned long) c->verify_ondisk, ilog2(meta_bucket_pages(&c->sb)));
+ #endif
  
--	SET_KEY_SIZE(&k.key, c->sb.bucket_size);
-+	size =  meta_bucket_pages(&c->sb) * PAGE_SECTORS;
-+	SET_KEY_SIZE(&k.key, size);
- 	uuid_io(c, REQ_OP_WRITE, 0, &k.key, &cl);
- 	closure_sync(&cl);
+ 	list_splice(&c->btree_cache_freeable,
+@@ -785,7 +785,15 @@ int bch_btree_cache_alloc(struct cache_set *c)
+ 	mutex_init(&c->verify_lock);
  
-@@ -1656,7 +1658,7 @@ static void cache_set_free(struct closure *cl)
- 		}
+ 	c->verify_ondisk = (void *)
+-		__get_free_pages(GFP_KERNEL|__GFP_COMP, ilog2(bucket_pages(c)));
++		__get_free_pages(GFP_KERNEL|__GFP_COMP, ilog2(meta_bucket_pages(&c->sb)));
++	if (!c->verify_ondisk) {
++		/*
++		 * Don't worry about the mca_rereserve buckets
++		 * allocated in previous for-loop, they will be
++		 * handled properly in bch_cache_set_unregister().
++		 */
++		return -ENOMEM;
++	}
  
- 	bch_bset_sort_state_free(&c->sort);
--	free_pages((unsigned long) c->uuids, ilog2(bucket_pages(c)));
-+	free_pages((unsigned long) c->uuids, ilog2(meta_bucket_pages(&c->sb)));
- 
- 	if (c->moving_gc_wq)
- 		destroy_workqueue(c->moving_gc_wq);
-@@ -1862,7 +1864,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 
- 	c->bucket_bits		= ilog2(sb->bucket_size);
- 	c->block_bits		= ilog2(sb->block_size);
--	c->nr_uuids		= bucket_bytes(c) / sizeof(struct uuid_entry);
-+	c->nr_uuids		= meta_bucket_bytes(&c->sb) / sizeof(struct uuid_entry);
- 	c->devices_max_used	= 0;
- 	atomic_set(&c->attached_dev_nr, 0);
- 	c->btree_pages		= bucket_pages(c);
-@@ -1913,7 +1915,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER))
- 		goto err;
- 
--	c->uuids = alloc_bucket_pages(GFP_KERNEL, c);
-+	c->uuids = alloc_meta_bucket_pages(GFP_KERNEL, &c->sb);
- 	if (!c->uuids)
- 		goto err;
+ 	c->verify_data = mca_bucket_alloc(c, &ZERO_KEY, GFP_KERNEL);
  
 -- 
 2.26.2
