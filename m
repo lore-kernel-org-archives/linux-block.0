@@ -2,112 +2,134 @@ Return-Path: <SRS0=LVe3=A4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D824DC433E1
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 15:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79912C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 17:08:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADE26206BE
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 15:50:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aKcsqNs6"
+	by mail.kernel.org (Postfix) with ESMTP id 59639207EA
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 17:08:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1595005725;
+	bh=iszOuuRFn0grWAUjNr1O+f5aLxO1F5cAvHJyL0IRrX0=;
+	h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
+	 List-ID:From;
+	b=F+dTBXXOr2IUykG6j3F7sr8cSFnNrFuZZZb/xG7p1GrYxu0CmzKtuatjzWHfstZlS
+	 fHrgqMVWVWZqh0a1ywPgni08+SlT9WHgFyxirpcPRrb6k/uzGuOimRTYGauk8eQ32S
+	 9XkLpuF3BqFyIN6LVetkqeKcw9gq/xtocI899Jf0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726233AbgGQPuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jul 2020 11:50:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726090AbgGQPup (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jul 2020 11:50:45 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AADFBC0619D2
-        for <linux-block@vger.kernel.org>; Fri, 17 Jul 2020 08:50:45 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d1so5600247plr.8
-        for <linux-block@vger.kernel.org>; Fri, 17 Jul 2020 08:50:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=GYLi1TpV7jolzw2RC2neJrdZm9TyamLEIPv7aAqRKYE=;
-        b=aKcsqNs669xGAxg1VoEAnaSnzgps2sY9J5QOM2g1f+9/glGDHPtWS++K1PBU+yu2C9
-         o78UUHwgTnWFWjoryPGendtyeppwPwpWZ8XGyR9boBbvmci5qlQqS6jSUlVjfkT+RAch
-         N1hQbn8MY8rBZi3qgjj03pMRbwtz9Cr3O9aUEc/zPah1Ru/Vy8/G7oNXy928L4vYV9+A
-         J44r3K24XpEhhMTSEkE703mzeJMbVnsVlUrTKZj+gAOwpzJRoeyl6emx0g7MMLsQcH1P
-         Pb5kQ2p87Y3kqiLeWdKeYa5sHA+NVMfpP9IQKv/JJfRrsdkkO7xgRmEYc4VKE6Ez1pcX
-         k1jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=GYLi1TpV7jolzw2RC2neJrdZm9TyamLEIPv7aAqRKYE=;
-        b=WR2ruWhhwRLVzbmeclX0O/AzggHI+u9I6sUjL/iP7tA1VbITplmgVIGmyUUOL6vB61
-         w6KZQcqDG8uedVnXsrheUGvw8arz18kIk6PHogSuUL826v4kE/0v8S0aRLH2kL91FrSW
-         VLgl0oKfrc8e2p9UcRSNzKtHtT3sM3oZX/WfoGWX3UKc9Vll71xvrhJAG4DXGKMzeC+N
-         hrT9xtNqN3T9BnyYjU6B9I2YE3HkL3gW09w7F2oIJkFcshFnxO7gcv2iR2x9bAxzg41K
-         qJ97IxaFJUMTjMSaErBBJHRp4OapNaWaUYpbK3inL5Xr+WH5XhI52qtFvYx7PDLiNq/l
-         Rjtg==
-X-Gm-Message-State: AOAM531M+Q/T/pwvg3KXgRKHNn8bJ2xOg4rSfT63awL6GIIbum7u+qf+
-        PZb/LfgdD6JOhV0qrCf3woKhpvkBXfZG1w==
-X-Google-Smtp-Source: ABdhPJyGBRxlH4o7U8rdn8gkCTBAjP/HllMXuV+3w50MbWQ+BnPPWJvKDNejxIYoxn7oGzcEsoQWtw==
-X-Received: by 2002:a17:90a:66c7:: with SMTP id z7mr10822225pjl.172.1595001044511;
-        Fri, 17 Jul 2020 08:50:44 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id q29sm8239141pfl.77.2020.07.17.08.50.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jul 2020 08:50:43 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 5.8-rc6
-Message-ID: <4dd7ab11-feb0-6ea8-46b6-0e9590d0890d@kernel.dk>
-Date:   Fri, 17 Jul 2020 09:50:41 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726798AbgGQRIo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jul 2020 13:08:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46022 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726393AbgGQRIo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jul 2020 13:08:44 -0400
+Received: from localhost (unknown [137.135.114.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CDC5020717;
+        Fri, 17 Jul 2020 17:08:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595005724;
+        bh=iszOuuRFn0grWAUjNr1O+f5aLxO1F5cAvHJyL0IRrX0=;
+        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
+        b=j65yTO6VC/N6CizIUMdmLQpOElnJz20fK3fWfiRPCFgb1FqgutmAO1OtBPYmG2ZEi
+         rfkduxC+dAFVdh1VKwY7kixJROlVO42pRrrg+vOVNz5RPqTwuoww2Iw4LP3YqJfDD+
+         GqDoW1SZgWUBu3GL8q8xbVskkLux+osyzcqvjmCk=
+Date:   Fri, 17 Jul 2020 17:08:42 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+To:     Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Cc:     stable@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] bcche: fix overflow in offset_to_stripe()
+In-Reply-To: <20200713111501.19061-2-colyli@suse.de>
+References: <20200713111501.19061-2-colyli@suse.de>
+Message-Id: <20200717170843.CDC5020717@mail.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Hi
 
-Single NVMe multipath capacity fix
+[This is an automated email]
 
-Please pull!
+This commit has been processed because it contains a -stable tag.
+The stable tag indicates that it's relevant for the following trees: all
+
+The bot has tested the following trees: v5.7.8, v5.4.51, v4.19.132, v4.14.188, v4.9.230, v4.4.230.
+
+v5.7.8: Build OK!
+v5.4.51: Build OK!
+v4.19.132: Build OK!
+v4.14.188: Failed to apply! Possible dependencies:
+    1d316e658374f ("bcache: implement PI controller for writeback rate")
+    25d8be77e1922 ("block: move bio_alloc_pages() to bcache")
+    27a40ab9269e7 ("bcache: add backing_request_endio() for bi_end_io")
+    2831231d4c3f9 ("bcache: reduce cache_set devices iteration by devices_max_used")
+    3b304d24a718a ("bcache: convert cached_dev.count from atomic_t to refcount_t")
+    3fd47bfe55b00 ("bcache: stop dc->writeback_rate_update properly")
+    5138ac6748e38 ("bcache: fix misleading error message in bch_count_io_errors()")
+    539d39eb27083 ("bcache: fix wrong return value in bch_debug_init()")
+    5fa89fb9a86bc ("bcache: don't write back data if reading it failed")
+    6f10f7d1b02b1 ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
+    771f393e8ffc9 ("bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags")
+    7ba0d830dc0e4 ("bcache: set error_limit correctly")
+    7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to backing device")
+    804f3c6981f5e ("bcache: fix cached_dev->count usage for bch_cache_set_error()")
+    a8500fc816b19 ("bcache: rearrange writeback main thread ratelimit")
+    b1092c9af9ed8 ("bcache: allow quick writeback when backing idle")
+    bc082a55d25c8 ("bcache: fix inaccurate io state for detached bcache devices")
+    c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
+
+v4.9.230: Failed to apply! Possible dependencies:
+    1d316e658374f ("bcache: implement PI controller for writeback rate")
+    2831231d4c3f9 ("bcache: reduce cache_set devices iteration by devices_max_used")
+    297e3d8547848 ("blk-throttle: make throtl_slice tunable")
+    3fd47bfe55b00 ("bcache: stop dc->writeback_rate_update properly")
+    4e4cbee93d561 ("block: switch bios to blk_status_t")
+    5138ac6748e38 ("bcache: fix misleading error message in bch_count_io_errors()")
+    6f10f7d1b02b1 ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
+    7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to backing device")
+    87760e5eef359 ("block: hook up writeback throttling")
+    9e234eeafbe17 ("blk-throttle: add a simple idle detection")
+    c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
+    cf43e6be865a5 ("block: add scalable completion tracking of requests")
+    e806402130c9c ("block: split out request-only flags into a new namespace")
+    fbbaf700e7b16 ("block: trace completion of all bios.")
+
+v4.4.230: Failed to apply! Possible dependencies:
+    005411ea7ee77 ("doc: update block/queue-sysfs.txt entries")
+    1d316e658374f ("bcache: implement PI controller for writeback rate")
+    2831231d4c3f9 ("bcache: reduce cache_set devices iteration by devices_max_used")
+    297e3d8547848 ("blk-throttle: make throtl_slice tunable")
+    38f8baae89056 ("block: factor out chained bio completion")
+    3fd47bfe55b00 ("bcache: stop dc->writeback_rate_update properly")
+    4e4cbee93d561 ("block: switch bios to blk_status_t")
+    511cbce2ff8b9 ("irq_poll: make blk-iopoll available outside the block layer")
+    5138ac6748e38 ("bcache: fix misleading error message in bch_count_io_errors()")
+    6f10f7d1b02b1 ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
+    7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to backing device")
+    87760e5eef359 ("block: hook up writeback throttling")
+    9467f85960a31 ("blk-mq/cpu-notif: Convert to new hotplug state machine")
+    9e234eeafbe17 ("blk-throttle: add a simple idle detection")
+    af3e3a5259e35 ("block: don't unecessarily clobber bi_error for chained bios")
+    ba8c6967b7391 ("block: cleanup bio_endio")
+    c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
+    cf43e6be865a5 ("block: add scalable completion tracking of requests")
+    e57690fe009b2 ("blk-mq: don't overwrite rq->mq_ctx")
+    fbbaf700e7b16 ("block: trace completion of all bios.")
 
 
-The following changes since commit 579dd91ab3a5446b148e7f179b6596b270dace46:
+NOTE: The patch will not be queued to stable trees until it is upstream.
 
-  nbd: Fix memory leak in nbd_add_socket (2020-07-08 15:42:18 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.8-2020-07-17
-
-for you to fetch changes up to 1f273e255b285282707fa3246391f66e9dc4178f:
-
-  Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8 (2020-07-16 08:58:14 -0600)
-
-----------------------------------------------------------------
-block-5.8-2020-07-17
-
-----------------------------------------------------------------
-Anthony Iliopoulos (1):
-      nvme: explicitly update mpath disk capacity on revalidation
-
-Jens Axboe (1):
-      Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8
-
- drivers/nvme/host/core.c |  1 +
- drivers/nvme/host/nvme.h | 13 +++++++++++++
- 2 files changed, 14 insertions(+)
+How should we proceed with this patch?
 
 -- 
-Jens Axboe
-
+Thanks
+Sasha
