@@ -2,207 +2,114 @@ Return-Path: <SRS0=LVe3=A4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14253C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 01:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F12A7C433E3
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 02:16:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5D092070E
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 01:44:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF8262074B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 02:16:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TUpHlW5D"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BxQ1adGx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726166AbgGQBoZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jul 2020 21:44:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39188 "EHLO
+        id S1726547AbgGQCQg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jul 2020 22:16:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726130AbgGQBoZ (ORCPT
+        with ESMTP id S1726229AbgGQCQg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jul 2020 21:44:25 -0400
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D041CC061755;
-        Thu, 16 Jul 2020 18:44:24 -0700 (PDT)
-Received: by mail-io1-xd43.google.com with SMTP id y2so8660281ioy.3;
-        Thu, 16 Jul 2020 18:44:24 -0700 (PDT)
+        Thu, 16 Jul 2020 22:16:36 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E953C061755
+        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2020 19:16:36 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id j19so5897329pgm.11
+        for <linux-block@vger.kernel.org>; Thu, 16 Jul 2020 19:16:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6QzsHeBtWdfPRJc72cjcNJ2eDpwrQoR+YjWmSQsKGCU=;
-        b=TUpHlW5DHmCjWYFJ26FnI50sVyMu3sXI1wh3Cb/tZ4MumMTdK1cUrHVERMcZDmaeG0
-         eumY6AF63FEZi3Bv42zAyCzl8lDFw3a/5HXSr4eIc7M9VX6NWGKXM8etA/hmBSRv2qsq
-         s/MXpLja9oDT+SCOZIPtkq813R3xZm/XWeauu7xD1RhwGfFhTuIMXg0vEKAjfNeq5gZD
-         WKpoKskIkFNxiZcwQRjhsmIHHUMCWNiV4ibO27IEV3ib/8dTYUe1ML4aJv8b6ZPgwdHh
-         Hr2237S4OU/UNhnMpkE2moODtWC9BNGbUwGamJ2UzpxS/VUt2ywvz7w/UlEbO58FJclQ
-         czag==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=k/j//DrqA105JQB+yLLyaqJ9jhi6KMPYTBR0gDdzdRY=;
+        b=BxQ1adGxHQqa8k4kj4znuKdnMoztP0XQDdDcHV4CEkMyhF3h7pXPkorgvdhMY/XaKA
+         qhNQwel/88jUrfDLV1O1Gjh9TKHDIg2sLr0VVQJL5Yz5i9GtkVidc+kvuT04wGvl+BEX
+         d/Byyx8aTCy22K51FZxR3bx3d1duO1KC/ZQsf8YSudgLrZIXTwW16/rv3W0vwWpOGYsr
+         I2U69Qm04ugGfqrp6SQPWFrckfqNmRr8jZBk+/2+VgozwGYxfBwWnd18j6QY4B6sTXrA
+         DT1Ej8MN9d8FemaZGFFwEA3ccL5eIC6AsfCKGzJEt9bCO94cRuKMsc3fgxP4hcWdBobN
+         Ndog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6QzsHeBtWdfPRJc72cjcNJ2eDpwrQoR+YjWmSQsKGCU=;
-        b=esEtf2YmwflECScxEzOhcgbuHKVDHZdhoAqI/4aO3IGZKBwuphY20UtbtegIvaPC+h
-         ulVg7BgcgfkNhJEFlSajn5HB7XQV7mIm421mMP3T98MkyFjvxz9NdiJ2IjTdMEcR3hi9
-         CGx84yi1EL/6TE1v6kTEMN8U7T0C6XhMwcjKbmjE446Fo0ZzAo/kzIeTRxQPy0paaAm0
-         YRpUoVqXOARQ6tGN2efdTOEQNSZueGmyUET6fBtpgAXUoRP1xMVU9/DJEbfe3Nez7kW4
-         B48YrSNX63OO9t14DcdYBzDYmnvtMFLKou15FVOEFNxiH/KLNnntfZeme5g1wSs3pWw+
-         eUvw==
-X-Gm-Message-State: AOAM530zlPoSDjM44HUkp7tHySIntT7xFlakgYJ4jiv8E+o0NyBKv/Bn
-        8Lb9U05O3POOmCC6gW5yD1llQt/fCVtEnmm3Wgdqt3DYn28=
-X-Google-Smtp-Source: ABdhPJyZFH/Nv24e1GTUAjN9roKJWlI71UI6ebSWu/k9tEF0QIjoZgP3E1NE4EqeWwMzxE/GhRf8PvsrMBihz+BmUKc=
-X-Received: by 2002:a02:3905:: with SMTP id l5mr8633273jaa.64.1594950264076;
- Thu, 16 Jul 2020 18:44:24 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=k/j//DrqA105JQB+yLLyaqJ9jhi6KMPYTBR0gDdzdRY=;
+        b=Bu/eFq/d2RrhbLCCB42vRu6AMi+ceqd/+xdIylMzDrLTbB5bzX2sQ+C/G3mmF7oios
+         SSp9zwuJeSHUUaISUIPxMxUDyblLv0lRLdgJYCW74jtXDVZYavP40n7szX/bjyjI9KpV
+         CmCy55igmfiGougv3mn4b2kzi+c8v73dNWUTWFHWzFbP1b5AiQVw1PB4ujqui9KsIY1Y
+         XiA4VS0FAy97t7Syg0vhCbfmb7GFkl0fNe+msnpAfYihCdQXWH3BvRTw619Ogdp40N74
+         Zx0O6F3+0pn/g/CRVwm5c9kTFynizwxi9rHSEy1dCFTgufA60j2piDoiCLas/cFxhree
+         Vrmg==
+X-Gm-Message-State: AOAM5332xCFT5tjmv6Hr7QMk3YENtaEg38ABlDUHGe3ygZujND+o19PP
+        23wNxYJ7eX1kg6wqOMSPgIwUYA==
+X-Google-Smtp-Source: ABdhPJxjT6UxMk4dugu2pkV2kCi5VK/E9SIRHyOkuEc25MvJm3iR7aQyn05v7ts6ekzr7eHuNaO7LQ==
+X-Received: by 2002:a63:b546:: with SMTP id u6mr6507607pgo.381.1594952195776;
+        Thu, 16 Jul 2020 19:16:35 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id bf11sm1082019pjb.48.2020.07.16.19.16.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jul 2020 19:16:35 -0700 (PDT)
+Subject: Re: [PATCH -next] rsxx: Convert to DEFINE_SHOW_ATTRIBUTE
+To:     miaoqinglang <miaoqinglang@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200716090432.13691-1-miaoqinglang@huawei.com>
+ <e4caa1de-db2c-c2f4-d1e8-fef7073a52ea@kernel.dk>
+ <c19c9e32-4b31-bcf1-df45-a29220e7e6cc@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <87a5f046-e77b-af25-6656-c8b075a16edf@kernel.dk>
+Date:   Thu, 16 Jul 2020 20:16:33 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <1585649077-10896-1-git-send-email-laoar.shao@gmail.com>
- <CALvZod6Yn=_fYEM+xN3a+4W2e5CCLkvMXZg_txD3j+dZieX-CQ@mail.gmail.com>
- <CALOAHbB_Koc8MTCqEg5Ev8mccqCGrBvPieCg+aeogn2PDuKFeg@mail.gmail.com> <CALvZod4D4H70XJYUcY=5NxHcRUff+17Qz2OegXVm8wnoZ1TfuA@mail.gmail.com>
-In-Reply-To: <CALvZod4D4H70XJYUcY=5NxHcRUff+17Qz2OegXVm8wnoZ1TfuA@mail.gmail.com>
-From:   Yafang Shao <laoar.shao@gmail.com>
-Date:   Fri, 17 Jul 2020 09:43:48 +0800
-Message-ID: <CALOAHbBkQbw49T=22zdiK9BzEvy7fEmCmhhJh3mTkm3JvjsD_g@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] psi: enhance psi with the help of ebpf
-To:     Shakeel Butt <shakeelb@google.com>
-Cc:     Johannes Weiner <hannes@cmpxchg.org>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linux MM <linux-mm@kvack.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <c19c9e32-4b31-bcf1-df45-a29220e7e6cc@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 17, 2020 at 1:04 AM Shakeel Butt <shakeelb@google.com> wrote:
->
-> On Wed, Jul 15, 2020 at 8:19 PM Yafang Shao <laoar.shao@gmail.com> wrote:
-> >
-> > On Thu, Jul 16, 2020 at 12:36 AM Shakeel Butt <shakeelb@google.com> wrote:
-> > >
-> > > Hi Yafang,
-> > >
-> > > On Tue, Mar 31, 2020 at 3:05 AM Yafang Shao <laoar.shao@gmail.com> wrote:
-> > > >
-> > > > PSI gives us a powerful way to anaylze memory pressure issue, but we can
-> > > > make it more powerful with the help of tracepoint, kprobe, ebpf and etc.
-> > > > Especially with ebpf we can flexiblely get more details of the memory
-> > > > pressure.
-> > > >
-> > > > In orderc to achieve this goal, a new parameter is added into
-> > > > psi_memstall_{enter, leave}, which indicates the specific type of a
-> > > > memstall. There're totally ten memstalls by now,
-> > > >         MEMSTALL_KSWAPD
-> > > >         MEMSTALL_RECLAIM_DIRECT
-> > > >         MEMSTALL_RECLAIM_MEMCG
-> > > >         MEMSTALL_RECLAIM_HIGH
-> > > >         MEMSTALL_KCOMPACTD
-> > > >         MEMSTALL_COMPACT
-> > > >         MEMSTALL_WORKINGSET_REFAULT
-> > > >         MEMSTALL_WORKINGSET_THRASH
-> > > >         MEMSTALL_MEMDELAY
-> > > >         MEMSTALL_SWAPIO
-> > > > With the help of kprobe or tracepoint to trace this newly added agument we
-> > > > can know which type of memstall it is and then do corresponding
-> > > > improvement. I can also help us to analyze the latency spike caused by
-> > > > memory pressure.
-> > > >
-> > > > But note that we can't use it to build memory pressure for a specific type
-> > > > of memstall, e.g. memcg pressure, compaction pressure and etc, because it
-> > > > doesn't implement various types of task->in_memstall, e.g.
-> > > > task->in_memcgstall, task->in_compactionstall and etc.
-> > > >
-> > > > Although there're already some tracepoints can help us to achieve this
-> > > > goal, e.g.
-> > > >         vmscan:mm_vmscan_kswapd_{wake, sleep}
-> > > >         vmscan:mm_vmscan_direct_reclaim_{begin, end}
-> > > >         vmscan:mm_vmscan_memcg_reclaim_{begin, end}
-> > > >         /* no tracepoint for memcg high reclaim*/
-> > > >         compcation:mm_compaction_kcompactd_{wake, sleep}
-> > > >         compcation:mm_compaction_begin_{begin, end}
-> > > >         /* no tracepoint for workingset refault */
-> > > >         /* no tracepoint for workingset thrashing */
-> > > >         /* no tracepoint for use memdelay */
-> > > >         /* no tracepoint for swapio */
-> > > > but psi_memstall_{enter, leave} gives us a unified entrance for all
-> > > > types of memstall and we don't need to add many begin and end tracepoints
-> > > > that hasn't been implemented yet.
-> > > >
-> > > > Patch #2 gives us an example of how to use it with ebpf. With the help of
-> > > > ebpf we can trace a specific task, application, container and etc. It also
-> > > > can help us to analyze the spread of latencies and whether they were
-> > > > clustered at a point of time or spread out over long periods of time.
-> > > >
-> > > > To summarize, with the pressure data in /proc/pressure/memroy we know that
-> > > > the system is under memory pressure, and then with the newly added tracing
-> > > > facility in this patchset we can get the reason of this memory pressure,
-> > > > and then thinks about how to make the change.
-> > > > The workflow can be illustrated as bellow.
-> > > >
-> > > >                    REASON         ACTION
-> > > >                  | compcation   | improve compcation    |
-> > > >                  | vmscan       | improve vmscan        |
-> > > > Memory pressure -| workingset   | improve workingset    |
-> > > >                  | etc          | ...                   |
-> > > >
-> > >
-> > > I have not looked at the patch series in detail but I wanted to get
-> > > your thoughts if it is possible to achieve what I am trying to do with
-> > > this patch series.
-> > >
-> > > At the moment I am only interested in global reclaim and I wanted to
-> > > enable alerts like "alert if there is process stuck in global reclaim
-> > > for x seconds in last y seconds window" or "alert if all the processes
-> > > are stuck in global reclaim for some z seconds".
-> > >
-> > > I see that using this series I can identify global reclaim but I am
-> > > wondering if alert or notifications are possible. Android is using psi
-> > > monitors for such alerts but it does not use cgroups, so, most of the
-> > > memstalls are related to global reclaim stall. For cgroup environment,
-> > > do we need for add support to psi monitor similar to this patch
-> > > series?
-> > >
-> >
-> > Hi Shakeel,
-> >
-> > We use the PSI tracepoints in our kernel to analyze the individual
-> > latency caused by memory pressure, but the PSI tracepoints are
-> > implemented with a new version as bellow:
-> >     trace_psi_memstall_enter(_RET_IP_);
-> >     trace_psi_memstall_leave(_RET_IP_);
-> > And then using the _RET_IP_ to identify the specific PSI type.
-> >
-> > If the _RET_IP_ is at try_to_free_mem_cgroup_pages(), then it means
-> > the pressure caused by the memory cgroup, IOW, the limit of memcg is
-> > reached and it has to do memcg reclaim. Otherwise we can consider it
-> > as global memory pressure.
-> > try_to_free_mem_cgroup_pages
-> >     psi_memstall_enter
-> >         if (static_branch_likely(&psi_disabled))
-> >             return;
-> >         *flags = current->in_memstall;
-> >          if (*flags)
-> >              return;
-> >          trace_psi_memstall_enter(_RET_IP_);  <<<<< memcg pressure
-> >
->
-> Thanks for the response. I am looking for 'always on' monitoring. More
-> specifically defining the system level SLIs based on PSI. My concern
-> with ftrace is its global shared state and also it is not really for
-> 'always on' monitoring. You have mentioned ebpf. Is ebpf fine for
-> 'always on' monitoring and is it possible to notify user space by ebpf
-> on specific conditions (e.g. a process stuck in global reclaim for 60
-> seconds)?
->
+On 7/16/20 7:37 PM, miaoqinglang wrote:
+> 
+> 在 2020/7/16 23:45, Jens Axboe 写道:
+>> On 7/16/20 3:04 AM, Qinglang Miao wrote:
+>>> From: Liu Shixin <liushixin2@huawei.com>
+>>>
+>>> Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
+>> None of these apply against the 5.9 block tree, looks like some
+>> read -> read_iter conversion has happened in another branch that
+>> I'm not privy to.
+> 
+> Hi Jens,
+> 
+>      Sorry I didn't mention it in commit log, but this patch is based  
+> on linux-next where commit <4d4901c6d7> has switched over direct  
+> seq_read method calls to seq_read_iter, this is why there's conflict in  
+> your apply.
+> 
+>      Do you think I should send a new patch based on 5.8rc?
 
-ebpf is fine for  'always on' monitoring  from my experience, but I'm
-not sure whether it is possible to notify user space on specific
-conditions.
-Notifying user space would be a useful feature, so I think we can have a try.
+That'll just create a needless conflict. But I don't even know what tree
+is carrying the patch that changes it to use seq_read_iter, so hard to
+make other suggestions.
 
+Alternatively, I can hang on to them until the other change hits
+mainline, and then queue them up after that.
 
 -- 
-Thanks
-Yafang
+Jens Axboe
+
