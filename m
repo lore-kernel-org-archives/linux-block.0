@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E0EC433E1
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 11:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4802C433F2
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 11:23:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AACB5207F5
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 11:23:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8695B20768
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 11:23:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbgGQLXL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jul 2020 07:23:11 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60620 "EHLO mx2.suse.de"
+        id S1726812AbgGQLXU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jul 2020 07:23:20 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60648 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726090AbgGQLXL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jul 2020 07:23:11 -0400
+        id S1726648AbgGQLXT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jul 2020 07:23:19 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id BE635AE3C;
-        Fri, 17 Jul 2020 11:23:13 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 992FBAE55;
+        Fri, 17 Jul 2020 11:23:20 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, hare@suse.de, Coly Li <colyli@suse.de>
-Subject: [PATCH v4 10/16] bcache: handle cache prio_buckets and disk_buckets properly for bucket size > 8MB
-Date:   Fri, 17 Jul 2020 19:22:30 +0800
-Message-Id: <20200717112236.44761-11-colyli@suse.de>
+Subject: [PATCH v4 13/16] bcache: add bucket_size_hi into struct cache_sb_disk for large bucket
+Date:   Fri, 17 Jul 2020 19:22:33 +0800
+Message-Id: <20200717112236.44761-14-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200717112236.44761-1-colyli@suse.de>
 References: <20200717112236.44761-1-colyli@suse.de>
@@ -39,108 +39,215 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Similar to c->uuids, struct cache's prio_buckets and disk_buckets also
-have the potential memory allocation failure during cache registration
-if the bucket size > 8MB.
+The large bucket feature is to extend bucket_size from 16bit to 32bit.
 
-ca->prio_buckets can be stored on cache device in multiple buckets, its
-in-memory space is allocated by kzalloc() interface but normally
-allocated by alloc_pages() because the size > KMALLOC_MAX_CACHE_SIZE.
+When create cache device on zoned device (e.g. zoned NVMe SSD), making
+a single bucket cover one or more zones of the zoned device is the
+simplest way to support zoned device as cache by bcache.
 
-So allocation of ca->prio_buckets has the MAX_ORDER restriction too. If
-the bucket size > 8MB, by default the page allocator will fail because
-the page order > 11 (default MAX_ORDER value). ca->prio_buckets should
-also use meta_bucket_bytes(), meta_bucket_pages() to decide its memory
-size and use alloc_meta_bucket_pages() to allocate pages, to avoid the
-allocation failure during cache set registration when bucket size > 8MB.
+But current maximum bucket size is 16MB and a typical zone size of zoned
+device is 256MB, this is the major motiviation to extend bucket size to
+a larger bit width.
 
-ca->disk_buckets is a single bucket size memory buffer, it is used to
-iterate each bucket of ca->prio_buckets, and compose the bio based on
-memory of ca->disk_buckets, then write ca->disk_buckets memory to cache
-disk one-by-one for each bucket of ca->prio_buckets. ca->disk_buckets
-should have in-memory size exact to the meta_bucket_pages(), this is the
-size that ca->prio_buckets will be stored into each on-disk bucket.
+This patch is the basic and first change to support large bucket size,
+the major changes it makes are,
+- Add BCH_FEATURE_INCOMPAT_LARGE_BUCKET for the large bucket feature,
+  INCOMPAT means it introduces incompatible on-disk format change.
+- Add BCH_FEATURE_INCOMPAT_FUNCS(large_bucket, LARGE_BUCKET) routines.
+- Adds __le32 bucket_size_hi into struct cache_sb_disk at offset 0x8d0
+  for the on-disk super block format.
+- For the in-memory super block struct cache_sb, member bucket_size is
+  extended from __u16 to __32.
+- Add get_bucket_size() to combine the bucket_size and bucket_size_hi
+  from struct cache_sb_disk into an unsigned int value.
 
-This patch fixes the above issues and handle cache's prio_buckets and
-disk_buckets properly for bucket size larger than 8MB.
+Since we already have large bucket size helpers meta_bucket_pages(),
+meta_bucket_bytes() and alloc_meta_bucket_pages(), they make sure when
+bucket size > 8MB, the memory allocation for bcache meta data bucket
+won't fail no matter how large the bucket size extended. So these meta
+data buckets are handled properly when the bucket size width increase
+from 16bit to 32bit, we don't need to worry about them.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/md/bcache/bcache.h |  9 +++++----
- drivers/md/bcache/super.c  | 10 +++++-----
- 2 files changed, 10 insertions(+), 9 deletions(-)
+Changlog:
+v2: change cache_sb_disk->bucket_size_hi from 32bit to 16bit to avoid
+    integer overflow in get_bucket_size()
+v1: initial version.
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 972f1aff0f70..0ebfda284866 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -782,11 +782,12 @@ static inline unsigned int meta_bucket_bytes(struct cache_sb *sb)
- 	return meta_bucket_pages(sb) << PAGE_SHIFT;
+ drivers/md/bcache/alloc.c    |  2 +-
+ drivers/md/bcache/features.c | 22 ++++++++++++++++++++++
+ drivers/md/bcache/features.h |  9 ++++++---
+ drivers/md/bcache/movinggc.c |  4 ++--
+ drivers/md/bcache/super.c    | 23 +++++++++++++++++++----
+ include/uapi/linux/bcache.h  |  3 ++-
+ 6 files changed, 52 insertions(+), 11 deletions(-)
+ create mode 100644 drivers/md/bcache/features.c
+
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index a1df0d95151c..52035a78d836 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -87,7 +87,7 @@ void bch_rescale_priorities(struct cache_set *c, int sectors)
+ {
+ 	struct cache *ca;
+ 	struct bucket *b;
+-	unsigned int next = c->nbuckets * c->sb.bucket_size / 1024;
++	unsigned long next = c->nbuckets * c->sb.bucket_size / 1024;
+ 	unsigned int i;
+ 	int r;
+ 
+diff --git a/drivers/md/bcache/features.c b/drivers/md/bcache/features.c
+new file mode 100644
+index 000000000000..ba53944bb390
+--- /dev/null
++++ b/drivers/md/bcache/features.c
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Feature set bits and string conversion.
++ * Inspired by ext4's features compat/incompat/ro_compat related code.
++ *
++ * Copyright 2020 Coly Li <colyli@suse.de>
++ *
++ */
++#include <linux/bcache.h>
++#include "bcache.h"
++
++struct feature {
++	int		compat;
++	unsigned int	mask;
++	const char	*string;
++};
++
++static struct feature feature_list[] = {
++	{BCH_FEATURE_INCOMPAT, BCH_FEATURE_INCOMPAT_LARGE_BUCKET,
++		"large_bucket"},
++	{0, 0, 0 },
++};
+diff --git a/drivers/md/bcache/features.h b/drivers/md/bcache/features.h
+index ae7df37b9862..dca052cf5203 100644
+--- a/drivers/md/bcache/features.h
++++ b/drivers/md/bcache/features.h
+@@ -11,9 +11,13 @@
+ #define BCH_FEATURE_INCOMPAT		2
+ #define BCH_FEATURE_TYPE_MASK		0x03
+ 
++/* Feature set definition */
++/* Incompat feature set */
++#define BCH_FEATURE_INCOMPAT_LARGE_BUCKET	0x0001 /* 32bit bucket size */
++
+ #define BCH_FEATURE_COMPAT_SUUP		0
+ #define BCH_FEATURE_RO_COMPAT_SUUP	0
+-#define BCH_FEATURE_INCOMPAT_SUUP	0
++#define BCH_FEATURE_INCOMPAT_SUUP	BCH_FEATURE_INCOMPAT_LARGE_BUCKET
+ 
+ #define BCH_HAS_COMPAT_FEATURE(sb, mask) \
+ 		((sb)->feature_compat & (mask))
+@@ -22,8 +26,6 @@
+ #define BCH_HAS_INCOMPAT_FEATURE(sb, mask) \
+ 		((sb)->feature_incompat & (mask))
+ 
+-/* Feature set definition */
+-
+ #define BCH_FEATURE_COMPAT_FUNCS(name, flagname) \
+ static inline int bch_has_feature_##name(struct cache_sb *sb) \
+ { \
+@@ -75,4 +77,5 @@ static inline void bch_clear_feature_##name(struct cache_sb *sb) \
+ 		~BCH##_FEATURE_INCOMPAT_##flagname; \
  }
  
--#define prios_per_bucket(c)				\
--	((bucket_bytes(c) - sizeof(struct prio_set)) /	\
-+#define prios_per_bucket(ca)						\
-+	((meta_bucket_bytes(&(ca)->sb) - sizeof(struct prio_set)) /	\
- 	 sizeof(struct bucket_disk))
--#define prio_buckets(c)					\
--	DIV_ROUND_UP((size_t) (c)->sb.nbuckets, prios_per_bucket(c))
-+
-+#define prio_buckets(ca)						\
-+	DIV_ROUND_UP((size_t) (ca)->sb.nbuckets, prios_per_bucket(ca))
++BCH_FEATURE_INCOMPAT_FUNCS(large_bucket, LARGE_BUCKET);
+ #endif
+diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
+index b7dd2d75f58c..5872d6470470 100644
+--- a/drivers/md/bcache/movinggc.c
++++ b/drivers/md/bcache/movinggc.c
+@@ -206,8 +206,8 @@ void bch_moving_gc(struct cache_set *c)
+ 	mutex_lock(&c->bucket_lock);
  
- static inline size_t sector_to_bucket(struct cache_set *c, sector_t s)
- {
+ 	for_each_cache(ca, c, i) {
+-		unsigned int sectors_to_move = 0;
+-		unsigned int reserve_sectors = ca->sb.bucket_size *
++		unsigned long sectors_to_move = 0;
++		unsigned long reserve_sectors = ca->sb.bucket_size *
+ 			     fifo_used(&ca->free[RESERVE_MOVINGGC]);
+ 
+ 		ca->heap.used = 0;
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a19f1baa8664..1c4a4c3557f7 100644
+index 172246ff5ec2..b7ef11da026c 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -563,7 +563,7 @@ static void prio_io(struct cache *ca, uint64_t bucket, int op,
+@@ -60,6 +60,17 @@ struct workqueue_struct *bch_journal_wq;
  
- 	bio->bi_iter.bi_sector	= bucket * ca->sb.bucket_size;
- 	bio_set_dev(bio, ca->bdev);
--	bio->bi_iter.bi_size	= bucket_bytes(ca);
-+	bio->bi_iter.bi_size	= meta_bucket_bytes(&ca->sb);
+ /* Superblock */
  
- 	bio->bi_end_io	= prio_endio;
- 	bio->bi_private = ca;
-@@ -621,7 +621,7 @@ int bch_prio_write(struct cache *ca, bool wait)
++static unsigned int get_bucket_size(struct cache_sb *sb, struct cache_sb_disk *s)
++{
++	unsigned int bucket_size = le16_to_cpu(s->bucket_size);
++
++	if (sb->version >= BCACHE_SB_VERSION_CDEV_WITH_FEATURES &&
++	     bch_has_feature_large_bucket(sb))
++		bucket_size |= le16_to_cpu(s->bucket_size_hi) << 16;
++
++	return bucket_size;
++}
++
+ static const char *read_super_common(struct cache_sb *sb,  struct block_device *bdev,
+ 				     struct cache_sb_disk *s)
+ {
+@@ -68,7 +79,7 @@ static const char *read_super_common(struct cache_sb *sb,  struct block_device *
  
- 		p->next_bucket	= ca->prio_buckets[i + 1];
- 		p->magic	= pset_magic(&ca->sb);
--		p->csum		= bch_crc64(&p->magic, bucket_bytes(ca) - 8);
-+		p->csum		= bch_crc64(&p->magic, meta_bucket_bytes(&ca->sb) - 8);
+ 	sb->first_bucket= le16_to_cpu(s->first_bucket);
+ 	sb->nbuckets	= le64_to_cpu(s->nbuckets);
+-	sb->bucket_size	= le16_to_cpu(s->bucket_size);
++	sb->bucket_size	= get_bucket_size(sb, s);
  
- 		bucket = bch_bucket_alloc(ca, RESERVE_PRIO, wait);
- 		BUG_ON(bucket == -1);
-@@ -674,7 +674,7 @@ static int prio_read(struct cache *ca, uint64_t bucket)
- 			prio_io(ca, bucket, REQ_OP_READ, 0);
+ 	sb->nr_in_set	= le16_to_cpu(s->nr_in_set);
+ 	sb->nr_this_dev	= le16_to_cpu(s->nr_this_dev);
+@@ -210,12 +221,16 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+ 			goto err;
+ 		break;
+ 	case BCACHE_SB_VERSION_CDEV_WITH_FEATURES:
+-		err = read_super_common(sb, bdev, s);
+-		if (err)
+-			goto err;
++		/*
++		 * Feature bits are needed in read_super_common(),
++		 * convert them firstly.
++		 */
+ 		sb->feature_compat = le64_to_cpu(s->feature_compat);
+ 		sb->feature_incompat = le64_to_cpu(s->feature_incompat);
+ 		sb->feature_ro_compat = le64_to_cpu(s->feature_ro_compat);
++		err = read_super_common(sb, bdev, s);
++		if (err)
++			goto err;
+ 		break;
+ 	default:
+ 		err = "Unsupported superblock version";
+diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
+index 0ef984ea515a..52e8bcb33981 100644
+--- a/include/uapi/linux/bcache.h
++++ b/include/uapi/linux/bcache.h
+@@ -213,6 +213,7 @@ struct cache_sb_disk {
+ 		__le16		keys;
+ 	};
+ 	__le64			d[SB_JOURNAL_BUCKETS];	/* journal buckets */
++	__le16			bucket_size_hi;
+ };
  
- 			if (p->csum !=
--			    bch_crc64(&p->magic, bucket_bytes(ca) - 8)) {
-+			    bch_crc64(&p->magic, meta_bucket_bytes(&ca->sb) - 8)) {
- 				pr_warn("bad csum reading priorities\n");
- 				goto out;
- 			}
-@@ -2222,7 +2222,7 @@ void bch_cache_release(struct kobject *kobj)
- 		ca->set->cache[ca->sb.nr_this_dev] = NULL;
- 	}
+ /*
+@@ -247,9 +248,9 @@ struct cache_sb {
+ 		__u64		nbuckets;	/* device size */
  
--	free_pages((unsigned long) ca->disk_buckets, ilog2(bucket_pages(ca)));
-+	free_pages((unsigned long) ca->disk_buckets, ilog2(meta_bucket_pages(&ca->sb)));
- 	kfree(ca->prio_buckets);
- 	vfree(ca->buckets);
- 
-@@ -2319,7 +2319,7 @@ static int cache_alloc(struct cache *ca)
- 		goto err_prio_buckets_alloc;
- 	}
- 
--	ca->disk_buckets = alloc_bucket_pages(GFP_KERNEL, ca);
-+	ca->disk_buckets = alloc_meta_bucket_pages(GFP_KERNEL, &ca->sb);
- 	if (!ca->disk_buckets) {
- 		err = "ca->disk_buckets alloc failed";
- 		goto err_disk_buckets_alloc;
+ 		__u16		block_size;	/* sectors */
+-		__u16		bucket_size;	/* sectors */
+ 		__u16		nr_in_set;
+ 		__u16		nr_this_dev;
++		__u32		bucket_size;	/* sectors */
+ 	};
+ 	struct {
+ 		/* Backing devices */
 -- 
 2.26.2
 
