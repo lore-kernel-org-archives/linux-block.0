@@ -8,57 +8,57 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F212C433EA
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C63C433E1
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3863120775
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 92BED20737
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HmHO/eZD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHAChKFH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728235AbgGQIKm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jul 2020 04:10:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42072 "EHLO
+        id S1728277AbgGQIKt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jul 2020 04:10:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726113AbgGQIKm (ORCPT
+        with ESMTP id S1726113AbgGQIKs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jul 2020 04:10:42 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C721C061755;
-        Fri, 17 Jul 2020 01:10:42 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id 72so5140361ple.0;
-        Fri, 17 Jul 2020 01:10:42 -0700 (PDT)
+        Fri, 17 Jul 2020 04:10:48 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69693C061755;
+        Fri, 17 Jul 2020 01:10:48 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id e8so6321403pgc.5;
+        Fri, 17 Jul 2020 01:10:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=iRMBvN5jV5opfKEhcuX/0MlxIGyzv8/E8aHaaJydPsI=;
-        b=HmHO/eZDd0+8PW70sN9QzeabUtqpZZrvu2RYNEtW25g5QZ7/HT9+hDxQ2gBLm1aJyU
-         ZBZbKlKA8GBPsSdf6GMHnzCdMUJsPij6/lKPox6+Te3Sj7pSAbZTB6H+TcWqhR7Dpj5M
-         H90j9eVITqNucGzIk1rsKC7znL3hTG9PeNbXhlX4YkybdM6SOGRGhi0wtCsJV1e3qWjz
-         vSo+/ATEK276kyKxNtFkuLmfukJvVRPBd58R11Jrj3xy/W2xp5ky366Hbbsf2J7RuKB5
-         MKWtbvW3joAr3FoQP1GQjv+HWo5RmQzE3pAVHSy05PkBEdMSDY1cGlsq0neqWpF9axLQ
-         0veg==
+        bh=lLhlrw/90h7K4R1QF2JfjCIuOOucm4jPTVhciHTu7NQ=;
+        b=XHAChKFHhQc6obPfyO+UKg/XlIwERzLzqEX6cJAhJOvU/hWMeD9qdbFrQIGZHfjS6X
+         fsrdNtWZ+dtR0YuDf5+T7jFayKJ2xs+nl+uFyBEdm0cvLI/E9S9qGDd0SKGFs6fCj5J8
+         7wxCkTIx69J3WtMwMjIW0dJ3ij62cpDqS5kVU0cB9sbyNnfVZbqlgTt7ZlHvmQEFA67g
+         W2l2/qNgWdnBWhPgLrOXTy7tiZ22XPnfMU828RWZBbAwe47Gnggn6MYt9aPMhNHFO5l7
+         0bdk6glvzgR0WXAqsUIceEJQjq8KooGzaJOQPLfNphESHQC95lcr05OVauDMk4xEIw2v
+         w2CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=iRMBvN5jV5opfKEhcuX/0MlxIGyzv8/E8aHaaJydPsI=;
-        b=e9B6bovYsOtyP6G2WfKlcjjTek7WgZD9YWseQ+cLP+nEub+z++QeHqm/3EbySUkhJQ
-         sDsMUUxYEDubs972/Y6NAXlN6oYXsJE08IhEns4rpwPGPU1xPgiI/pD87eXZdQIZGqpj
-         HnuKWQelOW1xvt04y33VfXqL+vuiGlbV1KZYM30CN2hCGTUHNwlL9Ch2MJpoyr85+Z/U
-         gXbydsup0qd/UuetpDV9i36ThcUmRFrTT96YUZ0uafph/KZ9ofPCrSGcww8sCUeU2pbr
-         lonrNpaI9vvJyNNFh2Nn5Z6GyIon7jgydrVr4bz7JsQwlIXExhM9iK3/+3dmHlUoNpLZ
-         WtAQ==
-X-Gm-Message-State: AOAM532I6LoiQFSo64T78ggCBxVd6n+KlwSvqj5m0FEt1iEfeP+rnb6h
-        B5f0KALa6k1gVWGlZyGoy68=
-X-Google-Smtp-Source: ABdhPJyE8L2iwEKxWiGnIhifYEnsfEu0RpKl7X3WakdF5Pv/dp2KCSwf8f471+NnlYLcej7ngyRL8Q==
-X-Received: by 2002:a17:90a:4b0d:: with SMTP id g13mr908667pjh.200.1594973441663;
-        Fri, 17 Jul 2020 01:10:41 -0700 (PDT)
+        bh=lLhlrw/90h7K4R1QF2JfjCIuOOucm4jPTVhciHTu7NQ=;
+        b=Nh70wpGLvo+yBIDzVCCCO1ACxmFOwCdmRsjQyPBSMsjW6phbfGS1r4Ldj8KEFPrglz
+         jxDHzYdNSzXOtUsmIH6YQLs3dcA5/DGd+PLaMl+Q3asSUBd/Kfo5Oqk7OQsX4ikd/ycB
+         hd85L9XZC3guRouAbSBAVPTN84R+ba7wB96YFwjaHgf/rCjTtB5hjJYJ+kGorl9nKm7Y
+         M+e0/wF1YvURs70PQNrIEeYQXO0ypEGxFDuKXpKIDaNC3PmzEu/ww91pbzfd1/l+2wf5
+         oG9TS9+7nO9l5N3KHlBXCbuu2FSRwkwMWHSGHHyWwFor1n3y1D6qOqmxVGS1zGLAc6WJ
+         scWQ==
+X-Gm-Message-State: AOAM533HPttoCFuelFD4H/a/PcpOfyKrlmHnWezicZeSnIE/pZXRy/s2
+        pA6jGsKNbEDwgtEDMiEaGeQ=
+X-Google-Smtp-Source: ABdhPJxjPpwPG0D9XGfq9voxFl0VuxE7FX55nSfoIgIuNg8975Ev940nVh6O+LLYSJPd2LMRPzVwFQ==
+X-Received: by 2002:aa7:8582:: with SMTP id w2mr7318162pfn.34.1594973447856;
+        Fri, 17 Jul 2020 01:10:47 -0700 (PDT)
 Received: from varodek.iballbatonwifi.com ([103.105.153.67])
-        by smtp.gmail.com with ESMTPSA id d5sm1937296pju.15.2020.07.17.01.10.37
+        by smtp.gmail.com with ESMTPSA id d5sm1937296pju.15.2020.07.17.01.10.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jul 2020 01:10:41 -0700 (PDT)
+        Fri, 17 Jul 2020 01:10:47 -0700 (PDT)
 From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
 To:     Bjorn Helgaas <helgaas@kernel.org>,
         Bjorn Helgaas <bhelgaas@google.com>,
@@ -72,9 +72,9 @@ Cc:     Vaibhav Gupta <vaibhavgupta40@gmail.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kernel-mentees@lists.linuxfoundation.org,
         Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH v1 2/3] rsxx: use generic power management
-Date:   Fri, 17 Jul 2020 13:39:09 +0530
-Message-Id: <20200717080910.342741-3-vaibhavgupta40@gmail.com>
+Subject: [PATCH v1 3/3] skd: use generic power management
+Date:   Fri, 17 Jul 2020 13:39:10 +0530
+Message-Id: <20200717080910.342741-4-vaibhavgupta40@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200717080910.342741-1-vaibhavgupta40@gmail.com>
 References: <20200717080910.342741-1-vaibhavgupta40@gmail.com>
@@ -91,56 +91,118 @@ themselves. They also need to take care of configuration registers.
 With improved and powerful support of generic PM, PCI Core takes care of
 above mentioned, device-independent, jobs.
 
-This driver has not defined .resume(), hence define it as NULL.
+This driver makes use of PCI helper functions like
+pci_save/restore_state(), pci_enable/disable_device(),
+pci_request/release_regions(), pci_set_power_state() and
+pci_set_master() to do required operations. In generic mode, they are no
+longer needed.
 
-Change function parameter in both .suspend() to "struct device*" type and
-mark the parameter as "__attribute__((unused)) " as the function body is
-empty.
+Change function parameter in both .suspend() and .resume() to
+"struct device*" type. Use to_pci_dev() to get "struct pci_dev*" variable.
 
 Compile-tested only.
 
 Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
 ---
- drivers/block/rsxx/core.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ drivers/block/skd_main.c | 36 ++++++++++--------------------------
+ 1 file changed, 10 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-index 10f6368117d8..866153fd380a 100644
---- a/drivers/block/rsxx/core.c
-+++ b/drivers/block/rsxx/core.c
-@@ -1030,12 +1030,15 @@ static void rsxx_pci_remove(struct pci_dev *dev)
- 	kfree(card);
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 51569c199a6c..d8d1042e7338 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -3315,12 +3315,12 @@ static void skd_pci_remove(struct pci_dev *pdev)
+ 	return;
  }
  
--static int rsxx_pci_suspend(struct pci_dev *dev, pm_message_t state)
-+static int __maybe_unused rsxx_pci_suspend(
-+	__attribute__((unused)) struct device *dev)
+-static int skd_pci_suspend(struct pci_dev *pdev, pm_message_t state)
++static int __maybe_unused skd_pci_suspend(struct device *dev)
  {
- 	/* We don't support suspend at this time. */
- 	return -ENOSYS;
+ 	int i;
+-	struct skd_device *skdev;
++	struct pci_dev *pdev = to_pci_dev(dev);
++	struct skd_device *skdev = pci_get_drvdata(pdev);
+ 
+-	skdev = pci_get_drvdata(pdev);
+ 	if (!skdev) {
+ 		dev_err(&pdev->dev, "no device data for PCI\n");
+ 		return -EIO;
+@@ -3337,35 +3337,23 @@ static int skd_pci_suspend(struct pci_dev *pdev, pm_message_t state)
+ 	if (skdev->pcie_error_reporting_is_enabled)
+ 		pci_disable_pcie_error_reporting(pdev);
+ 
+-	pci_release_regions(pdev);
+-	pci_save_state(pdev);
+-	pci_disable_device(pdev);
+-	pci_set_power_state(pdev, pci_choose_state(pdev, state));
+ 	return 0;
  }
  
-+#define rsxx_pci_resume NULL
-+
- static void rsxx_pci_shutdown(struct pci_dev *dev)
+-static int skd_pci_resume(struct pci_dev *pdev)
++static int __maybe_unused skd_pci_resume(struct device *dev)
  {
- 	struct rsxx_cardinfo *card = pci_get_drvdata(dev);
-@@ -1071,12 +1074,14 @@ static const struct pci_device_id rsxx_pci_ids[] = {
+ 	int i;
+ 	int rc = 0;
+-	struct skd_device *skdev;
  
- MODULE_DEVICE_TABLE(pci, rsxx_pci_ids);
+-	skdev = pci_get_drvdata(pdev);
++	struct pci_dev *pdev = to_pci_dev(dev);
++	struct skd_device *skdev = pci_get_drvdata(pdev);
+ 	if (!skdev) {
+ 		dev_err(&pdev->dev, "no device data for PCI\n");
+ 		return -1;
+ 	}
  
-+static SIMPLE_DEV_PM_OPS(rsxx_pci_pm_ops, rsxx_pci_suspend, rsxx_pci_resume);
+-	pci_set_power_state(pdev, PCI_D0);
+-	pci_enable_wake(pdev, PCI_D0, 0);
+-	pci_restore_state(pdev);
++	device_wakeup_disable(dev);
+ 
+-	rc = pci_enable_device(pdev);
+-	if (rc)
+-		return rc;
+-	rc = pci_request_regions(pdev, DRV_NAME);
+-	if (rc)
+-		goto err_out;
+ 	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+ 	if (rc)
+ 		rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
+@@ -3374,7 +3362,6 @@ static int skd_pci_resume(struct pci_dev *pdev)
+ 		goto err_out_regions;
+ 	}
+ 
+-	pci_set_master(pdev);
+ 	rc = pci_enable_pcie_error_reporting(pdev);
+ 	if (rc) {
+ 		dev_err(&pdev->dev,
+@@ -3427,10 +3414,6 @@ static int skd_pci_resume(struct pci_dev *pdev)
+ 		pci_disable_pcie_error_reporting(pdev);
+ 
+ err_out_regions:
+-	pci_release_regions(pdev);
+-
+-err_out:
+-	pci_disable_device(pdev);
+ 	return rc;
+ }
+ 
+@@ -3450,13 +3433,14 @@ static void skd_pci_shutdown(struct pci_dev *pdev)
+ 	skd_stop_device(skdev);
+ }
+ 
++static SIMPLE_DEV_PM_OPS(skd_pci_pm_ops, skd_pci_suspend, skd_pci_resume);
 +
- static struct pci_driver rsxx_pci_driver = {
- 	.name		= DRIVER_NAME,
- 	.id_table	= rsxx_pci_ids,
- 	.probe		= rsxx_pci_probe,
- 	.remove		= rsxx_pci_remove,
--	.suspend	= rsxx_pci_suspend,
-+	.driver.pm	= &rsxx_pci_pm_ops,
- 	.shutdown	= rsxx_pci_shutdown,
- 	.err_handler    = &rsxx_err_handler,
+ static struct pci_driver skd_driver = {
+ 	.name		= DRV_NAME,
+ 	.id_table	= skd_pci_tbl,
+ 	.probe		= skd_pci_probe,
+ 	.remove		= skd_pci_remove,
+-	.suspend	= skd_pci_suspend,
+-	.resume		= skd_pci_resume,
++	.driver.pm	= &skd_pci_pm_ops,
+ 	.shutdown	= skd_pci_shutdown,
  };
+ 
 -- 
 2.27.0
 
