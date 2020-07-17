@@ -2,218 +2,184 @@ Return-Path: <SRS0=LVe3=A4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0A5C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 10:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27347C433E1
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 10:27:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 095D320768
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 10:13:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 044DD2070E
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 10:27:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="HhCwo2et"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725932AbgGQKN1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jul 2020 06:13:27 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2495 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725864AbgGQKN1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jul 2020 06:13:27 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 31D0E2E6071145B9A0EA;
-        Fri, 17 Jul 2020 11:13:25 +0100 (IST)
-Received: from [127.0.0.1] (10.210.167.164) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 17 Jul
- 2020 11:13:23 +0100
-Subject: Re: [PATCH RFC v7 12/12] hpsa: enable host_tagset and switch to MQ
-To:     <Don.Brace@microchip.com>, <don.brace@microsemi.com>,
-        <hare@suse.de>
-CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <kashyap.desai@broadcom.com>,
-        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
-        <shivasharan.srikanteshwara@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
-        <megaraidlinux.pdl@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-13-git-send-email-john.garry@huawei.com>
- <939891db-a584-1ff7-d6a0-3857e4257d3e@huawei.com>
- <SN6PR11MB2848FA24579653F347A4E552E17F0@SN6PR11MB2848.namprd11.prod.outlook.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <dc0e72d8-7076-060c-3cd3-3d51ac7e6de8@huawei.com>
-Date:   Fri, 17 Jul 2020 11:11:34 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726205AbgGQK1m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jul 2020 06:27:42 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:54729 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726113AbgGQK1l (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jul 2020 06:27:41 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20200717102739euoutp01d8792cce983b92017d26f06ac4425542~ig151y2b20973509735euoutp01g
+        for <linux-block@vger.kernel.org>; Fri, 17 Jul 2020 10:27:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20200717102739euoutp01d8792cce983b92017d26f06ac4425542~ig151y2b20973509735euoutp01g
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1594981659;
+        bh=GCBjWDcrMnG38qjYCEA11Ot2XOnA4sWzJETM5YLkq10=;
+        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
+        b=HhCwo2etRSYBfmSy36SJT9+Yc4JTlgjTbQtfUNGehLHZ2h4//vMuvR2z9PGl7sJoD
+         NP0aEUxT/XrWBrT4NR4xrWmn5UegtLYynbYNEgMdeKdGsfggrusMhV7qjOAtNltTcm
+         N7uaIWbwHbDIdqB0aUwp5bCM3SluZ86ecEQTdkYc=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20200717102739eucas1p1f30ec9d11c98b79b470a9b8bdb4cf1a2~ig15tdAa92663326633eucas1p1v;
+        Fri, 17 Jul 2020 10:27:39 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 39.13.06318.B1D711F5; Fri, 17
+        Jul 2020 11:27:39 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20200717102739eucas1p20ecc9169dbae3898d48e04a0d28f94d5~ig15P39my0782607826eucas1p2v;
+        Fri, 17 Jul 2020 10:27:39 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200717102739eusmtrp195c57224947067fe509402612e4b1d41~ig15PTvvj1159811598eusmtrp1n;
+        Fri, 17 Jul 2020 10:27:39 +0000 (GMT)
+X-AuditID: cbfec7f5-371ff700000018ae-b2-5f117d1bd151
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 68.D9.06017.B1D711F5; Fri, 17
+        Jul 2020 11:27:39 +0100 (BST)
+Received: from [106.120.51.71] (unknown [106.120.51.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20200717102738eusmtip2ddecac7a3ad6008727d442ad037bc409~ig14513dY2740927409eusmtip2k;
+        Fri, 17 Jul 2020 10:27:38 +0000 (GMT)
+Subject: Re: [RFC PATCH v3 5/8] ata_dev_printk: Use dev_printk
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     tasleson@redhat.com, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+From:   Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Message-ID: <e6517dd6-b6b6-ead3-2e60-03832e0c43bf@samsung.com>
+Date:   Fri, 17 Jul 2020 12:27:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+        Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <SN6PR11MB2848FA24579653F347A4E552E17F0@SN6PR11MB2848.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200717100610.GA2667456@kroah.com>
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.167.164]
-X-ClientProxiedBy: lhreml741-chm.china.huawei.com (10.201.108.191) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHKsWRmVeSWpSXmKPExsWy7djPc7rStYLxBh2TFCxW3+1ns2hevJ7N
+        Yu8tbYtjOx4xWXRf38FmcfHeTXYHNo/LZ0s99s9dw+7xft9VNo/Pm+QCWKK4bFJSczLLUov0
+        7RK4MrZs28FeMEuk4sWP7UwNjCcEuhg5OCQETCRm/AntYuTiEBJYwSjx9vl7RgjnC6PE2rYP
+        bBDOZ0aJ9ovz2WA6GtdHQcSXM0rs/nWfGcJ5yyjR3PGEGaRIWMBOYvHPwi5GTg4RAWOJ/rOz
+        2EFqmAV6GSXeTZ3KDJJgE7CSmNi+ihHE5gWqn3dgLROIzSKgKvH/1R2wGlGBCIlPDw6zQtQI
+        Spyc+YQFxOYUMJSYOb8DrJ5ZQFzi1pP5ULa8xPa3c8AOkhBYxC7R2bwcLCEh4CLR9fkwO4Qt
+        LPHq+BYoW0bi9OQeFoiGdYwSfzteQHVvZ5RYPvkfG0SVtcSdc7/A/mcW0JRYv0sfIuwocffI
+        OxZIsPBJ3HgrCHEEn8SkbdOZIcK8Eh1tQhDVahIblm1gg1nbtXMl8wRGpVlIXpuF5J1ZSN6Z
+        hbB3ASPLKkbx1NLi3PTUYuO81HK94sTc4tK8dL3k/NxNjMBUc/rf8a87GPf9STrEKMDBqMTD
+        u8BLIF6INbGsuDL3EKMEB7OSCK/T2dNxQrwpiZVVqUX58UWlOanFhxilOViUxHmNF72MFRJI
+        TyxJzU5NLUgtgskycXBKNTA2O8RemGN7rnK+473N75+yWinKG7+dzfglXOHDlxU+7k6CJznf
+        rprVfJdnidavUz/TjIKOVt3d1v63N5Tx+20Ld7PGH2VSFTtOKP6499tY+hzPdwf/p2HTf18o
+        nR7J3q0wT93AreR1pw2fnITkDxvGYunKkgu83vMWVa3W9TsSelH+7nMbLVslluKMREMt5qLi
+        RADLiqDrMQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrPIsWRmVeSWpSXmKPExsVy+t/xe7rStYLxBh9ms1qsvtvPZtG8eD2b
+        xd5b2hbHdjxisui+voPN4uK9m+wObB6Xz5Z67J+7ht3j/b6rbB6fN8kFsETp2RTll5akKmTk
+        F5fYKkUbWhjpGVpa6BmZWOoZGpvHWhmZKunb2aSk5mSWpRbp2yXoZWzZtoO9YJZIxYsf25ka
+        GE8IdDFycEgImEg0ro/qYuTiEBJYyiix/cUmVoi4jMTx9WVdjJxAprDEn2tdbBA1rxklzp9s
+        YwGpERawk1j8sxCkRkTAWKL/7Cx2EJtZoJdR4tkRf4j6u8wSLXuPsoIk2ASsJCa2r2IEsXmB
+        eucdWMsEYrMIqEr8f3WHGcQWFYiQOLxjFlSNoMTJmU9YQGxOAUOJmfM7mCAWqEv8mXeJGcIW
+        l7j1ZD5UXF5i+9s5zBMYhWYhaZ+FpGUWkpZZSFoWMLKsYhRJLS3OTc8tNtIrTswtLs1L10vO
+        z93ECIysbcd+btnB2PUu+BCjAAejEg/vAi+BeCHWxLLiytxDjBIczEoivE5nT8cJ8aYkVlal
+        FuXHF5XmpBYfYjQFem4is5Rocj4w6vNK4g1NDc0tLA3Njc2NzSyUxHk7BA7GCAmkJ5akZqem
+        FqQWwfQxcXBKNTDOKFjHHtWox+TXMM2xxYx5b9o7+WcagWyb3FazrJ52Wm2Oc7Fc8+NVfFuF
+        1eK251d0b557znri6z8T2P8cnq6/RVhmhYXxstrzKo/WcIu+FMhfz8hgwae8vEfS5Izv1Vp/
+        wVmWkc3T134WuD+jIu+Ax17rexeYPRWNXj3wuVRhnsM4fVvdm2lKLMUZiYZazEXFiQBUgHDi
+        wgIAAA==
+X-CMS-MailID: 20200717102739eucas1p20ecc9169dbae3898d48e04a0d28f94d5
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee
+References: <20200623191749.115200-1-tasleson@redhat.com>
+        <20200623191749.115200-6-tasleson@redhat.com>
+        <CGME20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee@eucas1p2.samsung.com>
+        <d817c9dd-6852-9233-5f61-1c0bc0f65ca4@samsung.com>
+        <7ed08b94-755f-baab-0555-b4e454405729@redhat.com>
+        <cfff719b-dc12-a06a-d0ee-4165323171de@samsung.com>
+        <20200714081750.GB862637@kroah.com>
+        <dff66d00-e6c3-f9ef-3057-27c60e0bfc11@samsung.com>
+        <20200717100610.GA2667456@kroah.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Don,
 
-Thanks for checking this.
-
-> I cloned:
-> https://github.com/hisilicon/kernel-dev
-> switched to branch: origin/private-topic-blk-mq-shared-tags-rfc-v8
-
-I would have suggested to use v7 for now, but does not look relevant here.
-
-> 
-> And built the kernel. The hpsa driver oopsed on load. It was attempting to do driver initiated commands, so there would need to be some reserved tags set aside to communicate with the controller.
-> 
-> Was I supposed to add this patch on top of Hannes's hpsa patches?
-
-I didn't think so, but I now realize that it may be necessary here - 
-please see below. And since Hannes's reserved commands work is not 
-merged, I do not include it.
-
-> [   14.717025] Call Trace:
-> [   14.717034]  __enqueue_cmd_and_start_io.isra.60+0x20/0x170 [hpsa]
-> [   14.717039]  hpsa_scsi_do_simple_cmd.isra.62+0x6b/0xd0 [hpsa]
-> [   14.717042]  hpsa_scsi_do_simple_cmd_with_retry+0x63/0x160 [hpsa]
-> [   14.717045]  hpsa_scsi_do_inquiry+0x62/0xc0 [hpsa]
-> [   14.717048]  hpsa_init_one+0x1167/0x1400 [hpsa]
-> [   14.717052]  local_pci_probe+0x42/0x80
-> [   14.717054]  work_for_cpu_fn+0x16/0x20
-> [   14.717057]  process_one_work+0x1a7/0x370
-> [   14.717059]  ? process_one_work+0x370/0x370
-> [   14.717061]  worker_thread+0x1c9/0x370
-> [   14.717062]  ? process_one_work+0x370/0x370
-> [   14.717064]  kthread+0x114/0x130
-> [   14.717065]  ? kthread_park+0x80/0x80
-> [   14.717068]  ret_from_fork+0x22/0x30
-> [   14.717070] Modules linked in: crc32c_intel libahci(+) uas tg3(+) libata usb_storage i2c_algo_bit hpsa(+) scsi_transport_sas wmi dm_mirror dm_region_hash dm_log dm_mod
-> [   14.717077] CR2: 0000000000000010
-> [   14.717099] ---[ end trace 3845f459e9223caa ]---
-> [   14.724750] ERST: [Firmware Warn]: Firmware does not respond in time.
-> [   14.724753] RIP: 0010:blk_mq_unique_tag+0x5/0x20
-> [   14.724754] Code: cd 0f 1f 40 00 0f 1f 44 00 00 8b 87 cc 00 00 00 83 f8 02 75 03 83 06 01 b8 01 00 00 00 c3 0f 1f 80 00 00 00 00 0f 1f 44 00 00 <48> 8b 47 10 0f b7 57 20 8b 80 94 01 00 00 c1 e0 10 09 d0 c3 0f 1f
-> [   14.724755] RSP: 0000:ffff989f42893d08 EFLAGS: 00010246
-> [   14.724756] RAX: ffffffffc0493f80 RBX: ffff8ab761c00000 RCX: 0000000000000000
-> [   14.724757] RDX: ffff8ab9b7600000 RSI: ffff8ab761c00000 RDI: 0000000000000000
-> [   14.724757] RBP: ffff8ab9a5b98000 R08: ffffffffffffffff R09: 0000000000000000
-> [   14.724758] R10: ffff8ab8b5280070 R11: 0000000000000000 R12: 000000000000000a
-> [   14.724758] R13: 0000000000000002 R14: ffff8ab761c00000 R15: ffffffffc0493b60
-> [   14.724759] FS:  0000000000000000(0000) GS:ffff8ab9b7600000(0000) knlGS:0000000000000000
-> [   14.724760] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   14.724760] CR2: 0000000000000010 CR3: 000000024f33e006 CR4: 00000000001606f0
-> [   14.724761] Kernel panic - not syncing: Fatal exception
-> [   14.724833] Kernel Offset: 0x38400000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> [   16.487017] ---[ end Kernel panic - not syncing: Fatal exception ]---
-> 
-> 
-> 
->> Signed-off-by: Hannes Reinecke<hare@suse.de>
->> ---
->>    drivers/scsi/hpsa.c | 44 +++++++-------------------------------------
->>    drivers/scsi/hpsa.h |  1 -
->>    2 files changed, 7 insertions(+), 38 deletions(-)
+On 7/17/20 12:06 PM, Greg Kroah-Hartman wrote:
+> On Tue, Jul 14, 2020 at 10:50:39AM +0200, Bartlomiej Zolnierkiewicz wrote:
 >>
->> diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c index
->> 1e9302e99d05..f807f9bdae85 100644
->> --- a/drivers/scsi/hpsa.c
->> +++ b/drivers/scsi/hpsa.c
->> @@ -980,6 +980,7 @@ static struct scsi_host_template hpsa_driver_template = {
->>        .shost_attrs = hpsa_shost_attrs,
->>        .max_sectors = 2048,
->>        .no_write_same = 1,
->> +     .host_tagset = 1,
->>    };
+>> On 7/14/20 10:17 AM, Greg Kroah-Hartman wrote:
+>>> On Tue, Jul 14, 2020 at 10:06:05AM +0200, Bartlomiej Zolnierkiewicz wrote:
+>>>>
+>>>> Hi Tony,
+>>>>
+>>>> On 7/9/20 11:18 PM, Tony Asleson wrote:
+>>>>> Hi Bartlomiej,
+>>>>>
+>>>>> On 6/24/20 5:35 AM, Bartlomiej Zolnierkiewicz wrote:
+>>>>>> The root source of problem is that libata transport uses different
+>>>>>> naming scheme for ->tdev devices (please see dev_set_name() in
+>>>>>> ata_t{dev,link,port}_add()) than libata core for its logging
+>>>>>> functionality (ata_{dev,link,port}_printk()).
+>>>>>>
+>>>>>> Since libata transport is part of sysfs ABI we should be careful
+>>>>>> to not break it so one idea for solving the issue is to convert
+>>>>>> ata_t{dev,link,port}_add() to use libata logging naming scheme and
+>>>>>> at the same time add sysfs symlinks for the old libata transport
+>>>>>> naming scheme.
+>>>
+>>> Given the age of the current implementation, what suddenly broke that
+>>> requires this to change at this point in time?
 >>
->>    static inline u32 next_command(struct ctlr_info *h, u8 q) @@
->> -1144,12 +1145,14 @@ static void dial_up_lockup_detection_on_fw_flash_complete(struct ctlr_info *h,
->>    static void __enqueue_cmd_and_start_io(struct ctlr_info *h,
->>        struct CommandList *c, int reply_queue)
->>    {
->> +     u32 blk_tag = blk_mq_unique_tag(c->scsi_cmd->request);
-
-For the hpsa_scsi_do_inquiry() -> fill_cmd(HPSA_INQUIRY) call, 
-c->scsi_cmd = SCSI_CMD_BUSY, which just seems to be a pointer flag.
-
-And so I guess that c->scsi_cmd->request == NULL, and we deference this 
-in blk_mq_unique_tag() -> oops. I figure that the code should look like 
-this for now:
-
-static void __enqueue_cmd_and_start_io(struct ctlr_info *h,
-struct CommandList *c, int reply_queue)
-{
-	if (c->scsi_cmd->request) {
-		u32 blk_tag = blk_mq_unique_tag(c->scsi_cmd->request);
-
-		reply_queue = blk_mq_unique_tag_to_hwq(blk_tag);
-	}
-
-	dial_down_lockup_detection_during_fw_flash(h, c);
-	atomic_inc(&h->commands_outstanding);
-	if (c->device)
-	atomic_inc(&c->device->commands_outstanding);
-
-	switch (c->cmd_type) {
-
-But then reply_queue may be = DEFAULT_REPLY_QUEUE (=1), so I am not sure 
-if that is a problem. However this issue should go away with Hannes's 
-reserved command work, as we allocate a "real" SCSI cmd there.
-
-@Hannes, any suggestion what to do here?
-
->> +
->>        dial_down_lockup_detection_during_fw_flash(h, c);
->>        atomic_inc(&h->commands_outstanding);
->>        if (c->device)
->>                atomic_inc(&c->device->commands_outstanding);
+>> Unfortunately when adding libata transport classes (+ at the same
+>> time embedding struct device-s in libata dev/link/port objects) in
+>> the past someone has decided to use different naming scheme than
+>> the one used for standard libata log messages (which use printk()
+>> without any reference to struct device-s in libata dev/link/port
+>> objects).
 >>
->> -     reply_queue = h->reply_map[raw_smp_processor_id()];
->> +     reply_queue = blk_mq_unique_tag_to_hwq(blk_tag);
->>        switch (c->cmd_type) {
->>        case CMD_IOACCEL1:
->>                set_ioaccel1_performant_mode(h, c, reply_queue); @@
->> -5653,8 +5656,6 @@ static int hpsa_scsi_queue_command(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
->>        /* Get the ptr to our adapter structure out of cmd->host. */
->>        h = sdev_to_hba(cmd->device);
+>> Now we would like to use dev_printk() for standard libata logging
+>> functionality as this is required for 2 pending patchsets:
 >>
->> -     BUG_ON(cmd->request->tag < 0);
->> -
->>        dev = cmd->device->hostdata;
->>        if (!dev) {
->>                cmd->result = DID_NO_CONNECT << 16; @@ -5830,7 +5831,7
->> @@ static int hpsa_scsi_host_alloc(struct ctlr_info *h)
->>        sh->hostdata[0] = (unsigned long) h;
->>        sh->irq = pci_irq_vector(h->pdev, 0);
->>        sh->unique_id = sh->irq;
->> -
->> +     sh->nr_hw_queues = h->msix_vectors > 0 ? h->msix_vectors : 1;
->>        h->scsi_host = sh;
->>        return 0;
->>    }
->> @@ -5856,7 +5857,8 @@ static int hpsa_scsi_add_host(struct ctlr_info *h)
->>     */
->>    static int hpsa_get_cmd_index(struct scsi_cmnd *scmd)
->>    {
->> -     int idx = scmd->request->tag;
->> +     u32 blk_tag = blk_mq_unique_tag(scmd->request);
->> +     int idx = blk_mq_unique_tag_to_tag(blk_tag);
-
-@Hannes, This looks like a pointless change - we make a 32b unique tag, 
-including the request->tag, and then convert back to the request->tag.
-
+>> - move DPRINTK to dynamic debugging (from Hannes Reinecke)
 >>
->>        if (idx < 0)
->>                return idx;
->> @@ -7456,26 +7458,6 @@ static void hpsa_disable_interrupt_mode(struct ctlr_info *h)
->>        h->msix_vectors = 0;
->>    }
+>> - add persistent durable identifier storage log messages (from Tony)
+>>
+>> but we don't want to change standard libata log messages and
+>> confuse users..
+> 
+> All of that mess with symlinks just for a common debug printk?  That
+> seems excessive :)
 
-Thanks,
-John
+Unfortunately "a common debug printk" means all log messages generated
+by libata core..
+
+> Just use the device name and don't worry about it, I doubt anyone will
+> notice, unless the name is _really_ different.
+
+Well, Geert has noticed and complained pretty quickly:
+
+https://lore.kernel.org/linux-ide/alpine.DEB.2.21.2003241414490.21582@ramsan.of.borg/
+
+Anyway, I don't insist that hard on keeping the old names and
+I won't be the one handling potential bug-reports.. (added Jens to Cc:).
+
+Best regards,
+--
+Bartlomiej Zolnierkiewicz
+Samsung R&D Institute Poland
+Samsung Electronics
