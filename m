@@ -8,57 +8,57 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C063C433E2
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F212C433EA
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E81E12074B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3863120775
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VMnHL1YO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HmHO/eZD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728173AbgGQIKh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jul 2020 04:10:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42054 "EHLO
+        id S1728235AbgGQIKm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jul 2020 04:10:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726113AbgGQIKg (ORCPT
+        with ESMTP id S1726113AbgGQIKm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jul 2020 04:10:36 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDBB7C061755;
-        Fri, 17 Jul 2020 01:10:36 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id ls15so6163314pjb.1;
-        Fri, 17 Jul 2020 01:10:36 -0700 (PDT)
+        Fri, 17 Jul 2020 04:10:42 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C721C061755;
+        Fri, 17 Jul 2020 01:10:42 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id 72so5140361ple.0;
+        Fri, 17 Jul 2020 01:10:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=PZjzGiciE1mRdv57FSEZmpziMkegKz0PO+BIzmQwRfA=;
-        b=VMnHL1YOb9YOEXXi/OnuLA/sSel2Odj47qKeawJDhqx1RAoLxMXt+Q//5VIxc6wnXp
-         RZB6OdTw35/W1ERtFx9vBDPYJm6le1X5GVy9YmfUa6+19Nrcf2p+pXCSEAw0/0R1jNs1
-         c2F0xbfbwL+wxsivT3czCVjRrqXbcCEjvvfbLVCBPDIIHS/KJ62ZMmwFx+tmSEjNSQC3
-         cWwa3sHY95Axfuw5naqINQPuz49HDx4qo12KrZdVO85qzzjH4KUi2hVDrmqe0ddbUUsB
-         OKsPeSHu5WhTmxUBFNn1/al/dt8/4U3Vpc7zX3Flchi8qnI+6h+ype58UYMzDzw8iQ2y
-         f1bw==
+        bh=iRMBvN5jV5opfKEhcuX/0MlxIGyzv8/E8aHaaJydPsI=;
+        b=HmHO/eZDd0+8PW70sN9QzeabUtqpZZrvu2RYNEtW25g5QZ7/HT9+hDxQ2gBLm1aJyU
+         ZBZbKlKA8GBPsSdf6GMHnzCdMUJsPij6/lKPox6+Te3Sj7pSAbZTB6H+TcWqhR7Dpj5M
+         H90j9eVITqNucGzIk1rsKC7znL3hTG9PeNbXhlX4YkybdM6SOGRGhi0wtCsJV1e3qWjz
+         vSo+/ATEK276kyKxNtFkuLmfukJvVRPBd58R11Jrj3xy/W2xp5ky366Hbbsf2J7RuKB5
+         MKWtbvW3joAr3FoQP1GQjv+HWo5RmQzE3pAVHSy05PkBEdMSDY1cGlsq0neqWpF9axLQ
+         0veg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=PZjzGiciE1mRdv57FSEZmpziMkegKz0PO+BIzmQwRfA=;
-        b=mvhHXduV9Lqrqe7p/hzV9wd5rVSt4V16hmtdgcwe+07MGiGx+MIkgqe5/k8mP7ZSHc
-         rUFGJ2qtnAuuXfHQ+xO9CgW65z2mnWC0KqfVLzRtyD3w4VLWhI3OJHKLsg78A67x6blK
-         jVbdDiD0E0C1zw90uJoDGkRluNwFOvxVWY7Zo4bbcYh1Ok5u46YAAhNh28KdRNlvKdC6
-         YXAuCl8ukr5y+tJD1CehOLn28geKHwm9NmokEMLSFiSx6wMfUPG0n543LI4ejYuA1zae
-         tKMWQIO+sqKpTtRbcPlHNPQh9nHi7ZoNu0fyoZNW3uXhO6mCAEjw/+MXQHkl8oMxzRG/
-         mQhg==
-X-Gm-Message-State: AOAM533juvQ8G8wQ+um2cmWbQPw+2eZLn5sH9Wli64nBjszw3H14UcDP
-        gIXFpzdBQwAORJu5VZuMYYM=
-X-Google-Smtp-Source: ABdhPJyGKgakP3e2eFrh35aHdGLeSwy7yHiVg0bx3UuHraWqnM5wZiRGjyj0qHqCkCz5Dz583pnhTQ==
-X-Received: by 2002:a17:90a:1901:: with SMTP id 1mr9158692pjg.199.1594973436153;
-        Fri, 17 Jul 2020 01:10:36 -0700 (PDT)
+        bh=iRMBvN5jV5opfKEhcuX/0MlxIGyzv8/E8aHaaJydPsI=;
+        b=e9B6bovYsOtyP6G2WfKlcjjTek7WgZD9YWseQ+cLP+nEub+z++QeHqm/3EbySUkhJQ
+         sDsMUUxYEDubs972/Y6NAXlN6oYXsJE08IhEns4rpwPGPU1xPgiI/pD87eXZdQIZGqpj
+         HnuKWQelOW1xvt04y33VfXqL+vuiGlbV1KZYM30CN2hCGTUHNwlL9Ch2MJpoyr85+Z/U
+         gXbydsup0qd/UuetpDV9i36ThcUmRFrTT96YUZ0uafph/KZ9ofPCrSGcww8sCUeU2pbr
+         lonrNpaI9vvJyNNFh2Nn5Z6GyIon7jgydrVr4bz7JsQwlIXExhM9iK3/+3dmHlUoNpLZ
+         WtAQ==
+X-Gm-Message-State: AOAM532I6LoiQFSo64T78ggCBxVd6n+KlwSvqj5m0FEt1iEfeP+rnb6h
+        B5f0KALa6k1gVWGlZyGoy68=
+X-Google-Smtp-Source: ABdhPJyE8L2iwEKxWiGnIhifYEnsfEu0RpKl7X3WakdF5Pv/dp2KCSwf8f471+NnlYLcej7ngyRL8Q==
+X-Received: by 2002:a17:90a:4b0d:: with SMTP id g13mr908667pjh.200.1594973441663;
+        Fri, 17 Jul 2020 01:10:41 -0700 (PDT)
 Received: from varodek.iballbatonwifi.com ([103.105.153.67])
-        by smtp.gmail.com with ESMTPSA id d5sm1937296pju.15.2020.07.17.01.10.31
+        by smtp.gmail.com with ESMTPSA id d5sm1937296pju.15.2020.07.17.01.10.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jul 2020 01:10:35 -0700 (PDT)
+        Fri, 17 Jul 2020 01:10:41 -0700 (PDT)
 From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
 To:     Bjorn Helgaas <helgaas@kernel.org>,
         Bjorn Helgaas <bhelgaas@google.com>,
@@ -72,9 +72,9 @@ Cc:     Vaibhav Gupta <vaibhavgupta40@gmail.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kernel-mentees@lists.linuxfoundation.org,
         Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH v1 1/3] mtip32xx: use generic power management
-Date:   Fri, 17 Jul 2020 13:39:08 +0530
-Message-Id: <20200717080910.342741-2-vaibhavgupta40@gmail.com>
+Subject: [PATCH v1 2/3] rsxx: use generic power management
+Date:   Fri, 17 Jul 2020 13:39:09 +0530
+Message-Id: <20200717080910.342741-3-vaibhavgupta40@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200717080910.342741-1-vaibhavgupta40@gmail.com>
 References: <20200717080910.342741-1-vaibhavgupta40@gmail.com>
@@ -91,132 +91,56 @@ themselves. They also need to take care of configuration registers.
 With improved and powerful support of generic PM, PCI Core takes care of
 above mentioned, device-independent, jobs.
 
-This driver makes use of PCI helper functions like
-pci_save/restore_state(), pci_disable_device(), pcim_enable_device(),
-pci_set_power_state() and pci_set_master() to do required operations. In
-generic mode, they are no longer needed.
+This driver has not defined .resume(), hence define it as NULL.
 
-Change function parameter in both .suspend() and .resume() to
-"struct device*" type. Use dev_get_drvdata() to get drv data.
+Change function parameter in both .suspend() to "struct device*" type and
+mark the parameter as "__attribute__((unused)) " as the function body is
+empty.
 
 Compile-tested only.
 
 Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 54 +++++++------------------------
- 1 file changed, 12 insertions(+), 42 deletions(-)
+ drivers/block/rsxx/core.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index f6bafa9a68b9..7d1280952b35 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -4246,14 +4246,13 @@ static void mtip_pci_remove(struct pci_dev *pdev)
-  *	0  Success
-  *	<0 Error
-  */
--static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
-+static int __maybe_unused mtip_pci_suspend(struct device *dev)
- {
- 	int rv = 0;
--	struct driver_data *dd = pci_get_drvdata(pdev);
-+	struct driver_data *dd = dev_get_drvdata(dev);
- 
- 	if (!dd) {
--		dev_err(&pdev->dev,
--			"Driver private datastructure is NULL\n");
-+		dev_err(dev, "Driver private datastructure is NULL\n");
- 		return -EFAULT;
- 	}
- 
-@@ -4261,21 +4260,8 @@ static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
- 
- 	/* Disable ports & interrupts then send standby immediate */
- 	rv = mtip_block_suspend(dd);
--	if (rv < 0) {
--		dev_err(&pdev->dev,
--			"Failed to suspend controller\n");
--		return rv;
--	}
--
--	/*
--	 * Save the pci config space to pdev structure &
--	 * disable the device
--	 */
--	pci_save_state(pdev);
--	pci_disable_device(pdev);
--
--	/* Move to Low power state*/
--	pci_set_power_state(pdev, PCI_D3hot);
-+	if (rv < 0)
-+		dev_err(dev, "Failed to suspend controller\n");
- 
- 	return rv;
+diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
+index 10f6368117d8..866153fd380a 100644
+--- a/drivers/block/rsxx/core.c
++++ b/drivers/block/rsxx/core.c
+@@ -1030,12 +1030,15 @@ static void rsxx_pci_remove(struct pci_dev *dev)
+ 	kfree(card);
  }
-@@ -4287,42 +4273,25 @@ static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
-  *      0  Success
-  *      <0 Error
-  */
--static int mtip_pci_resume(struct pci_dev *pdev)
-+static int __maybe_unused mtip_pci_resume(struct device *dev)
+ 
+-static int rsxx_pci_suspend(struct pci_dev *dev, pm_message_t state)
++static int __maybe_unused rsxx_pci_suspend(
++	__attribute__((unused)) struct device *dev)
  {
- 	int rv = 0;
- 	struct driver_data *dd;
+ 	/* We don't support suspend at this time. */
+ 	return -ENOSYS;
+ }
  
--	dd = pci_get_drvdata(pdev);
-+	dd = dev_get_drvdata(dev);
- 	if (!dd) {
--		dev_err(&pdev->dev,
--			"Driver private datastructure is NULL\n");
-+		dev_err(dev, "Driver private datastructure is NULL\n");
- 		return -EFAULT;
- 	}
- 
--	/* Move the device to active State */
--	pci_set_power_state(pdev, PCI_D0);
--
--	/* Restore PCI configuration space */
--	pci_restore_state(pdev);
--
--	/* Enable the PCI device*/
--	rv = pcim_enable_device(pdev);
--	if (rv < 0) {
--		dev_err(&pdev->dev,
--			"Failed to enable card during resume\n");
--		goto err;
--	}
--	pci_set_master(pdev);
--
- 	/*
- 	 * Calls hbaReset, initPort, & startPort function
- 	 * then enables interrupts
- 	 */
- 	rv = mtip_block_resume(dd);
- 	if (rv < 0)
--		dev_err(&pdev->dev, "Unable to resume\n");
-+		dev_err(dev, "Unable to resume\n");
- 
--err:
- 	clear_bit(MTIP_DDF_RESUME_BIT, &dd->dd_flag);
- 
- 	return rv;
-@@ -4353,14 +4322,15 @@ static const struct pci_device_id mtip_pci_tbl[] = {
- 	{ 0 }
- };
- 
-+static SIMPLE_DEV_PM_OPS(mtip_pci_pm_ops, mtip_pci_suspend, mtip_pci_resume);
++#define rsxx_pci_resume NULL
 +
- /* Structure that describes the PCI driver functions. */
- static struct pci_driver mtip_pci_driver = {
- 	.name			= MTIP_DRV_NAME,
- 	.id_table		= mtip_pci_tbl,
- 	.probe			= mtip_pci_probe,
- 	.remove			= mtip_pci_remove,
--	.suspend		= mtip_pci_suspend,
--	.resume			= mtip_pci_resume,
-+	.driver.pm		= &mtip_pci_pm_ops,
- 	.shutdown		= mtip_pci_shutdown,
- };
+ static void rsxx_pci_shutdown(struct pci_dev *dev)
+ {
+ 	struct rsxx_cardinfo *card = pci_get_drvdata(dev);
+@@ -1071,12 +1074,14 @@ static const struct pci_device_id rsxx_pci_ids[] = {
  
+ MODULE_DEVICE_TABLE(pci, rsxx_pci_ids);
+ 
++static SIMPLE_DEV_PM_OPS(rsxx_pci_pm_ops, rsxx_pci_suspend, rsxx_pci_resume);
++
+ static struct pci_driver rsxx_pci_driver = {
+ 	.name		= DRIVER_NAME,
+ 	.id_table	= rsxx_pci_ids,
+ 	.probe		= rsxx_pci_probe,
+ 	.remove		= rsxx_pci_remove,
+-	.suspend	= rsxx_pci_suspend,
++	.driver.pm	= &rsxx_pci_pm_ops,
+ 	.shutdown	= rsxx_pci_shutdown,
+ 	.err_handler    = &rsxx_err_handler,
+ };
 -- 
 2.27.0
 
