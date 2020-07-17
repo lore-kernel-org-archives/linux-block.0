@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79912C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 17:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6B53C433E6
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 17:08:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59639207EA
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 17:08:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8808C20775
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 17:08:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595005725;
-	bh=iszOuuRFn0grWAUjNr1O+f5aLxO1F5cAvHJyL0IRrX0=;
+	s=default; t=1595005728;
+	bh=gGebyc7p+P0/4ivjXN7mnEH/Fir9C918/3IfsXtRvEc=;
 	h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
 	 List-ID:From;
-	b=F+dTBXXOr2IUykG6j3F7sr8cSFnNrFuZZZb/xG7p1GrYxu0CmzKtuatjzWHfstZlS
-	 fHrgqMVWVWZqh0a1ywPgni08+SlT9WHgFyxirpcPRrb6k/uzGuOimRTYGauk8eQ32S
-	 9XkLpuF3BqFyIN6LVetkqeKcw9gq/xtocI899Jf0=
+	b=upGYADSHb3HhMqhVHRN1XzcKDuJhaiJ92A6d8+BTt1zfu6OQ8LaV+dl4SyLqpAQ1c
+	 r3gupmSv4Ny4QoJZyndEB/eger8fFedPJDYXR8e5okm1clMlZQS+w9Pg/FKPvos1IW
+	 XiaGgYLvwBng31sRiSTIS+Kzilr/gHDNxxCTxt6s=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726798AbgGQRIo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jul 2020 13:08:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46022 "EHLO mail.kernel.org"
+        id S1726962AbgGQRIr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jul 2020 13:08:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46044 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726393AbgGQRIo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jul 2020 13:08:44 -0400
+        id S1726293AbgGQRIq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jul 2020 13:08:46 -0400
 Received: from localhost (unknown [137.135.114.1])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CDC5020717;
-        Fri, 17 Jul 2020 17:08:43 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D4F9420737;
+        Fri, 17 Jul 2020 17:08:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595005724;
-        bh=iszOuuRFn0grWAUjNr1O+f5aLxO1F5cAvHJyL0IRrX0=;
+        s=default; t=1595005725;
+        bh=gGebyc7p+P0/4ivjXN7mnEH/Fir9C918/3IfsXtRvEc=;
         h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=j65yTO6VC/N6CizIUMdmLQpOElnJz20fK3fWfiRPCFgb1FqgutmAO1OtBPYmG2ZEi
-         rfkduxC+dAFVdh1VKwY7kixJROlVO42pRrrg+vOVNz5RPqTwuoww2Iw4LP3YqJfDD+
-         GqDoW1SZgWUBu3GL8q8xbVskkLux+osyzcqvjmCk=
-Date:   Fri, 17 Jul 2020 17:08:42 +0000
+        b=DLLy1lsrmkS2+uDP93e/qU2aKvlb/arARmUfYl5AdJsi2rPwK8WE1Hc/5kuMv5KyI
+         trePLpTpK4k5Be9XVNwhWIEV4w0KKN/cxPh8c/b9Qk3U7+kQlJCZ0rPYavwXtM/EO0
+         4WWWdhbVLcKIzI959PIs1HnDoRE7gXiHQr2Jz+KY=
+Date:   Fri, 17 Jul 2020 17:08:44 +0000
 From:   Sasha Levin <sashal@kernel.org>
 To:     Sasha Levin <sashal@kernel.org>
 To:     Coly Li <colyli@suse.de>
@@ -46,10 +46,10 @@ To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
 Cc:     stable@vger.kernel.org
 Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] bcche: fix overflow in offset_to_stripe()
-In-Reply-To: <20200713111501.19061-2-colyli@suse.de>
-References: <20200713111501.19061-2-colyli@suse.de>
-Message-Id: <20200717170843.CDC5020717@mail.kernel.org>
+Subject: Re: [PATCH 2/2] bcche: fix overflow in offset_to_stripe()
+In-Reply-To: <20200712174736.9840-2-colyli@suse.de>
+References: <20200712174736.9840-2-colyli@suse.de>
+Message-Id: <20200717170844.D4F9420737@mail.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -116,6 +116,7 @@ v4.4.230: Failed to apply! Possible dependencies:
     6f10f7d1b02b1 ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
     7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to backing device")
     87760e5eef359 ("block: hook up writeback throttling")
+    8d354f133e86d ("blk-mq: improve layout of blk_mq_hw_ctx")
     9467f85960a31 ("blk-mq/cpu-notif: Convert to new hotplug state machine")
     9e234eeafbe17 ("blk-throttle: add a simple idle detection")
     af3e3a5259e35 ("block: don't unecessarily clobber bi_error for chained bios")
