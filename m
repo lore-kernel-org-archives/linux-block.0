@@ -2,109 +2,130 @@ Return-Path: <SRS0=LVe3=A4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC40C433E5
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 19:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C9C8C433E3
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 20:53:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E94D21744
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 19:47:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17A3520775
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jul 2020 20:53:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wsmw0C78"
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="JMp4YhPh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728803AbgGQTrY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jul 2020 15:47:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59186 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728669AbgGQTrY (ORCPT
+        id S1726634AbgGQUx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jul 2020 16:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47168 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726619AbgGQUx0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jul 2020 15:47:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595015243;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eCmhCWwIJ6CKG2s7cwMGJnhsahUrbS+DMabjHA0qqv0=;
-        b=Wsmw0C78mwRxFKDUSlDvp7T0oIk/TqOyQjZO4GrROXQ4Ix3YTWY1QiVYOMO2RrNBxBgzzn
-        9C1u5jYk2uR2C71Tdqgt44h8JKf4BaDcbyCOBeeaj9rTXzY/DNjL2BYf7h4P3kktZ2zazW
-        tWUKuaSBUY22FXirtAbAuRoWCtURkxs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-115-9SgCXpOSO7mFrw412bUIFw-1; Fri, 17 Jul 2020 15:47:19 -0400
-X-MC-Unique: 9SgCXpOSO7mFrw412bUIFw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52E3C100CC85;
-        Fri, 17 Jul 2020 19:47:18 +0000 (UTC)
-Received: from [10.3.128.8] (unknown [10.3.128.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AEDEB10013C4;
-        Fri, 17 Jul 2020 19:47:16 +0000 (UTC)
-Reply-To: tasleson@redhat.com
-Subject: Re: [RFC PATCH v3 5/8] ata_dev_printk: Use dev_printk
-To:     Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <20200623191749.115200-1-tasleson@redhat.com>
- <20200623191749.115200-6-tasleson@redhat.com>
- <CGME20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee@eucas1p2.samsung.com>
- <d817c9dd-6852-9233-5f61-1c0bc0f65ca4@samsung.com>
- <7ed08b94-755f-baab-0555-b4e454405729@redhat.com>
- <cfff719b-dc12-a06a-d0ee-4165323171de@samsung.com>
- <20200714081750.GB862637@kroah.com>
- <dff66d00-e6c3-f9ef-3057-27c60e0bfc11@samsung.com>
- <20200717100610.GA2667456@kroah.com>
- <e6517dd6-b6b6-ead3-2e60-03832e0c43bf@samsung.com>
-From:   Tony Asleson <tasleson@redhat.com>
-Organization: Red Hat
-Message-ID: <84fec7af-3f51-c956-d2ca-41581e0f3cbb@redhat.com>
-Date:   Fri, 17 Jul 2020 14:47:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Fri, 17 Jul 2020 16:53:26 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D84BAC0619D3
+        for <linux-block@vger.kernel.org>; Fri, 17 Jul 2020 13:53:25 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id u12so8644169qth.12
+        for <linux-block@vger.kernel.org>; Fri, 17 Jul 2020 13:53:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=soleen.com; s=google;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z0lyHoK43hN4cDd36fR30aBsfsjpWFSili5oOrrjQGw=;
+        b=JMp4YhPhX2BOIq5T9z/+RqMxUO9j8D3Vzgaod/I5xxCSsAubANIyH7vgHDnFaQ7UyR
+         lgg6q8PlVeb5rzoUIG5Uhp5mHjClldmmfBUguGZ5CbY7DT9aw6uSzB/r5Sj9aNK6cZRR
+         45uQ8QF6e2Ivb/qotjjT5SKXPBf7ajM/e2JtXrss1BbphJpTIOFTQU6D58E2OhW3x+Ej
+         tTchcGIQA+S9pnkAqz/gPJ/0o/F4yJccT4p1XLXws5qcGp7e9bzk44ZejxMBIfdQMpKp
+         zDm37LpIl/knod+bmBLeLxS6V7+3LpraNiSdUQGHoKBpVxGiqh+APPzNxDE6LPxRqqes
+         zEGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z0lyHoK43hN4cDd36fR30aBsfsjpWFSili5oOrrjQGw=;
+        b=bXCML4rv1n26vY6M/5ju5XA3p2ZpDLR+WBXRPs53Pfq1KPITj6m6rCsn7VR2hNgK+5
+         O/19x+IPwRlTzdaNTFOZ1U+oHezoOekWs1An1IchLxuqsz6MYcePmXaIERJRBEp2KmeY
+         DeiqAbfhaPMPDrPrpkgOjQPUkGUT92H5zLbgb/VZBI0X96vMsejftC2n0IPPScHpgIGI
+         oxY2BQEoNNCjRIin3mhbtdJlFMpk1R9ljPprq/ewZlYoQzmymV06EhemRvifG3QOkhKT
+         z2R0A8Dr6f9Wxgl1Sa48HJgurGjUhVOlWAQC0c3e3sZug7uB+2PpGhtmF7UD3u6xir0L
+         D4yg==
+X-Gm-Message-State: AOAM530Dk8GvJYKE4gHiUb5gVO+Rdxbyj31J3WDUfz/HAm+buItCUUoh
+        ULZ9C5/Y9CynyEZYrXHxkx9nOw==
+X-Google-Smtp-Source: ABdhPJwpSsm++s0Zuf+nkOJqYeeWPyr6Sm7eiS8p/5vaiD45aJ1mGeGKgmx+4o5e6uNxzOLn9xImKA==
+X-Received: by 2002:ac8:478f:: with SMTP id k15mr12526417qtq.287.1595019204907;
+        Fri, 17 Jul 2020 13:53:24 -0700 (PDT)
+Received: from localhost.localdomain (c-73-69-118-222.hsd1.nh.comcast.net. [73.69.118.222])
+        by smtp.gmail.com with ESMTPSA id d14sm10576733qkl.9.2020.07.17.13.53.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jul 2020 13:53:24 -0700 (PDT)
+From:   Pavel Tatashin <pasha.tatashin@soleen.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v1 0/1] scale loop device lock
+Date:   Fri, 17 Jul 2020 16:53:21 -0400
+Message-Id: <20200717205322.127694-1-pasha.tatashin@soleen.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <e6517dd6-b6b6-ead3-2e60-03832e0c43bf@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/17/20 5:27 AM, Bartlomiej Zolnierkiewicz wrote:
-> 
-> On 7/17/20 12:06 PM, Greg Kroah-Hartman wrote:
-> 
->> Just use the device name and don't worry about it, I doubt anyone will
->> notice, unless the name is _really_ different.
->
-> Well, Geert has noticed and complained pretty quickly:
-> 
-> https://lore.kernel.org/linux-ide/alpine.DEB.2.21.2003241414490.21582@ramsan.of.borg/
-> 
-> Anyway, I don't insist that hard on keeping the old names and
-> I won't be the one handling potential bug-reports.. (added Jens to Cc:).
+In our environment we are using systemd portable containers in
+squashfs formats, convert them into loop device, and mount.
 
-I would think having sysfs use one naming convention and the logging
-using another would be confusing for users, but apparently they've
-managed this long with that.
+NAME                      MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+loop5                       7:5    0  76.4M  0 loop
+`-BaseImageM1908          252:3    0  76.4M  1 crypt /BaseImageM1908
+loop6                       7:6    0    20K  0 loop
+`-test_launchperf20       252:17   0   1.3M  1 crypt /app/test_launchperf20
+loop7                       7:7    0    20K  0 loop
+`-test_launchperf18       252:4    0   1.5M  1 crypt /app/test_launchperf18
+loop8                       7:8    0     8K  0 loop
+`-test_launchperf8        252:25   0    28K  1 crypt app/test_launchperf8
+loop9                       7:9    0   376K  0 loop
+`-test_launchperf14       252:29   0  45.7M  1 crypt /app/test_launchperf14
+loop10                      7:10   0    16K  0 loop
+`-test_launchperf4        252:11   0   968K  1 crypt app/test_launchperf4
+loop11                      7:11   0   1.2M  0 loop
+`-test_launchperf17       252:26   0 150.4M  1 crypt /app/test_launchperf17
+loop12                      7:12   0    36K  0 loop
+`-test_launchperf19       252:13   0   3.3M  1 crypt /app/test_launchperf19
+loop13                      7:13   0     8K  0 loop
+...
 
+We have over 50 loop devices which are mounted  during boot.
 
-It appears changes are being rejected because of logging content
-differences, implying we shouldn't be changing printk usage to dev_printk.
+We observed contentions around loop_ctl_mutex.
 
-Should I re-work my changes to support dev_printk path in addition to
-utilizing printk_emit functionality so that we can avoid user space
-visible log changes?  I don't see a way to make the transition from
-printk to dev_printk without having user visible changes to message content.
+The sample contentions stacks:
 
-Thanks
--Tony
+Contention 1:
+__blkdev_get()
+   bdev->bd_disk->fops->open()
+      lo_open()
+         mutex_lock_killable(&loop_ctl_mutex); <- contention
+
+Contention 2:
+__blkdev_put()
+   disk->fops->release()
+      lo_release()
+         mutex_lock(&loop_ctl_mutex); <- contention
+
+With total time waiting for loop_ctl_mutex ~18.8s during boot (across 8
+CPUs) on our machine (69 loop devices): 2.35s per CPU.
+
+Scaling this lock eliminates this contention entirly, and improves the boot
+performance by 2s on our machine.
+
+Pavel Tatashin (1):
+  loop: scale loop device by introducing per device lock
+
+ drivers/block/loop.c | 86 ++++++++++++++++++++++++--------------------
+ drivers/block/loop.h |  1 +
+ 2 files changed, 48 insertions(+), 39 deletions(-)
+
+-- 
+2.25.1
 
