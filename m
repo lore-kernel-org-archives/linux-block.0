@@ -2,67 +2,29 @@ Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D438FC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 11:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7368C433EC
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 12:07:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EB6E20773
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 11:58:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pzO5UY59"
+	by mail.kernel.org (Postfix) with ESMTP id 901CF22BF3
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 12:07:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728513AbgGTL6f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 07:58:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32932 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728058AbgGTL6e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 07:58:34 -0400
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 993AEC061794;
-        Mon, 20 Jul 2020 04:58:34 -0700 (PDT)
-Received: by mail-qk1-x743.google.com with SMTP id u64so1671314qka.12;
-        Mon, 20 Jul 2020 04:58:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oyadEz0eZwOz4veMiu/99Xwk84Lj2bAOI1P6STGAbTM=;
-        b=pzO5UY59E2I78nkbHVVchIb8xSq5dpsUcOpNS7Gkxof5sNSjCEODEhGzsvVVjAfJyl
-         VSwzSp6U1Zs9krrRKUF/u2Bk2AkyMb7A4vyZNN5lBySozBpWv75kuuSymSQ75I0lOQIq
-         /aNfumnu9UNKeQqzNIgsFnNCRnWlLEXCl5HKsdcBqoLY2AX4WupdTDUkutMtkReFDd/p
-         7rLcMb8CsQvVO2aMkGCvC0cISIr9opF8PILSUSavYLWpTTSmyGJ8atrT4DsGICF1czPS
-         GjukeM8re+7Is53uuqLc1gz9fVVpsyasqxmhyXdVNJb4jwNSaNcNEMbvPaz5r/mI8alC
-         KLmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oyadEz0eZwOz4veMiu/99Xwk84Lj2bAOI1P6STGAbTM=;
-        b=Y4CledokJc6GI0n6XJUpXO1Iy42iDV40Vm+i5Wi3eBacq6KYNoq2KmB/n0j0qQjhPG
-         WdxK8emySDybueGcv3LByUrKFevz9aAbJ/3IxzNipfzWfhxsTq/T+SksofUineYlu54L
-         Pslw2GWv1VqlEgN8FK37XazhuIGKVOy3u8npCkdODWcOyRdUKdXTnbwOYSUi/XirioQc
-         CzZe6vlB7aGJ4VWVbqEx9odqL4KpN3xZuv/zoqIftUimPxwH5jVOE+UwVbL1WH5Ww6ls
-         zQ9ZAj3mgWe6KuuupeV7V71IxbsiZCbsC/+GL4NsejI1C0mo7PbieQGG3ElJeq22e8h1
-         Psgw==
-X-Gm-Message-State: AOAM532q4BcFDn1SQcD5gmDldO30sN4yaHsco2aHqOARwywJsH+20skt
-        49xWIm1A2aRCQiYZixu2lANPEEGq6GbwUMqIGsw=
-X-Google-Smtp-Source: ABdhPJxZvpi5p/rGIGspu/X0VuST2fAly2yyAucRwLGlbJciYxHfYOGN4y9O3LRxtfeMHSSpDlexGGV5rTPgQNTp1kc=
-X-Received: by 2002:a37:9147:: with SMTP id t68mr20753351qkd.34.1595246313907;
- Mon, 20 Jul 2020 04:58:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200720075148.172156-1-hch@lst.de> <20200720075148.172156-5-hch@lst.de>
-In-Reply-To: <20200720075148.172156-5-hch@lst.de>
-From:   Richard Weinberger <richard.weinberger@gmail.com>
-Date:   Mon, 20 Jul 2020 13:58:22 +0200
-Message-ID: <CAFLxGvxNHGEOrj6nKTtDeiU+Rx4xv_6asjSQYcFWXhk5m=1cBA@mail.gmail.com>
-Subject: Re: [PATCH 04/14] bdi: initialize ->ra_pages in bdi_init
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        id S1728532AbgGTMHj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 08:07:39 -0400
+Received: from verein.lst.de ([213.95.11.211]:46623 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728712AbgGTMHi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Jul 2020 08:07:38 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 18CA168BFE; Mon, 20 Jul 2020 14:07:35 +0200 (CEST)
+Date:   Mon, 20 Jul 2020 14:07:34 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Richard Weinberger <richard.weinberger@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Song Liu <song@kernel.org>,
         Hans de Goede <hdegoede@redhat.com>,
         Richard Weinberger <richard@nod.at>,
         linux-mtd@lists.infradead.org,
@@ -71,23 +33,29 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
         drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         linux-mm@kvack.org, cgroups mailinglist <cgroups@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 04/14] bdi: initialize ->ra_pages in bdi_init
+Message-ID: <20200720120734.GA29061@lst.de>
+References: <20200720075148.172156-1-hch@lst.de> <20200720075148.172156-5-hch@lst.de> <CAFLxGvxNHGEOrj6nKTtDeiU+Rx4xv_6asjSQYcFWXhk5m=1cBA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFLxGvxNHGEOrj6nKTtDeiU+Rx4xv_6asjSQYcFWXhk5m=1cBA@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Chrstoph,
+On Mon, Jul 20, 2020 at 01:58:22PM +0200, Richard Weinberger wrote:
+> Hello Chrstoph,
+> 
+> On Mon, Jul 20, 2020 at 9:53 AM Christoph Hellwig <hch@lst.de> wrote:
+> >
+> > Set up a readahead size by default.  This changes behavior for mtd,
+> > ubifs, and vboxsf to actually enabled readahead, the lack of which
+> > very much looks like an oversight.
+> 
+> UBIFS doesn't enable readahead on purpose, please see:
+> http://www.linux-mtd.infradead.org/doc/ubifs.html#L_readahead
 
-On Mon, Jul 20, 2020 at 9:53 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> Set up a readahead size by default.  This changes behavior for mtd,
-> ubifs, and vboxsf to actually enabled readahead, the lack of which
-> very much looks like an oversight.
-
-UBIFS doesn't enable readahead on purpose, please see:
-http://www.linux-mtd.infradead.org/doc/ubifs.html#L_readahead
-
--- 
-Thanks,
-//richard
+What about jffs2 and blk2mtd raw block devices?
