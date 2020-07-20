@@ -2,175 +2,93 @@ Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1696BC433E4
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 16:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D0DC433E3
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 16:56:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9F55206F2
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 16:50:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97529206E9
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 16:56:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GgOnivf6"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lVDe0o3b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728890AbgGTQu0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 12:50:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49878 "EHLO
+        id S1729001AbgGTQ42 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 12:56:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728495AbgGTQuZ (ORCPT
+        with ESMTP id S1729089AbgGTQ4Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 12:50:25 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49520C061794;
-        Mon, 20 Jul 2020 09:50:25 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id o2so199691wmh.2;
-        Mon, 20 Jul 2020 09:50:25 -0700 (PDT)
+        Mon, 20 Jul 2020 12:56:25 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2DCAC061794
+        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 09:56:25 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id t4so13928012iln.1
+        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 09:56:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=C4b8qhvwAjwGhT6JyfXt5H1f2fkHwdgJiTZMLInpoWY=;
-        b=GgOnivf6O+qwfUQUg2D0y3V0uajSxUn+4a5Q0Y5M//QasuxiU8RHZZn1QL0HBjDCbl
-         iUAfDLFaqvv8m0HXaPekB/UL3aUJHgT371PTLFy2LuffToVmY93vEXxpjdkoggrcDtRF
-         Un03YyD+9nc+MZA39zGLDH/J3s4J6xxPPe0IeVxW8L79nBV2HJggUcfSQur+WGv7ilXA
-         fe8YI85YZfKb9CbDfxloBSKCAu3h5PtcGaQdXdT3ztcqhrBfazl31QLCX3x7UN3UaNyf
-         XP5bPuN2AHaA2KxUwSltX5CLE+zZ84QPu3yaHrqZmHGDo6mEv5zFFxzVYGp/fLkhuDTl
-         mN2Q==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=VP2nB550LCm9f5amiI4hf7RrVCu1pcK2lzmvzfZ1TsY=;
+        b=lVDe0o3bN+yA/jUNW84yekfdG4ELTxibo4Z4+y+kWe74S7MJypffKWTwxc3g7f9Svo
+         hE4QK7tUyIsfB2QeKZct0sysO+xM9OZ0ym36+VQhW8eUHCpuQOwNjXtjdLEH6/kLt/XO
+         Cb+Q/umAUYnJglnK8f0MV6ogsgyFIc3FuywSCTkVO91uh6Z9RlSUCn6hMgHWo2vbxsb0
+         P5wskmDSANHCDh2cDG0k/QlGbaNRpd3gQaQmlIY2Z+HK71Z0E4qGET6af78TZAayv3+2
+         /BzJDtjU3aXhXYrEjTPv4mzo91Mp/ShNNRSMiPoe+dEE+qAa15R9CNcJeJfoSGry0duB
+         WzDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=C4b8qhvwAjwGhT6JyfXt5H1f2fkHwdgJiTZMLInpoWY=;
-        b=WflUH8LMEhdFv85KNuhOXKFHEfMGx/E/+L2OMcIjxe7Kgx02+itPyQWLF7m3wdDZQu
-         bE82LbXCgv14RNs4WBO+d4hbu5/NSKbeZnFDA6hvGoQHywUkltbYDiGci+536DhEpXow
-         sSUAx8IMLZG/xjVUibGB+NVOoVcGdI3zsYY2u3ZOmfcRbfvJMnzv83SBVq3VuiMgKmgL
-         rW+q5BgWh+DnQ5BJR9hkl4eTzXTh3a1R5h7RpOyd+2YAYTuYvBHSKlhZfVM1zT26vH76
-         zqNkmuQm1/rXz+KfndDj/IK5u8BMpvRjffD/L8EQ9LxxMmfXD7qw/QUUfnFw6W+BwxBV
-         nUqQ==
-X-Gm-Message-State: AOAM530fMwpdjW0T4LA5m3n3CTaH9mPqRhKtxzeCA3PjP42SlOXugtMQ
-        tjN2KCL3D9Z91swOkFoqA6v8e5P0w5WNcq2+lLU=
-X-Google-Smtp-Source: ABdhPJwFSzZ/u8TUd7I2y8wpKszzOhMiqh0+Orsk3QC9nGTrARDpeWv0iNp2kQSTc2PonZjZuA78BWemRwKJT3Y9w/o=
-X-Received: by 2002:a1c:2485:: with SMTP id k127mr231539wmk.138.1595263823888;
- Mon, 20 Jul 2020 09:50:23 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VP2nB550LCm9f5amiI4hf7RrVCu1pcK2lzmvzfZ1TsY=;
+        b=pQTbMqi01LTUbSG6lCdk+eBXyM4elWE6VG93gBRahqjtnGq/RH2DSfv8z27YYJCNyg
+         0VhsIpg94vnJr+dDgVGUIP91IWqCPZK14U3bo2hk5C/EC/YdC0/3TJ+qbjZlfAIb3uB7
+         KA5gTVjnr59EDuDePCDkWDpz7nPHAaV3SbWriz4NgrIPBXNXYu/0c9fzEmJk/cYhKcEJ
+         SJjv3EmgCrIQ3MgIu2mKsS3Ih3YedIwF/dQ12sMOIzogplw+lONLTs6JtKxlXvU7hvkS
+         KWpWH6zDCjp9zp9c1ZiqeATuR1Gw06uc1RLvM1K1ogTZmB8bXQjdgg8kv45RjC0PXOFn
+         Bqjw==
+X-Gm-Message-State: AOAM531eJ+RYiUlFMmlJJ+auj5p6zUTPPuqMnnE7FWXepoJA2eGUUbxm
+        YMrGr9V08oqXJCIz3k9uBnIt3MHUNWtdRA==
+X-Google-Smtp-Source: ABdhPJw1cGdsnGdd3eRJFrNgk4zjQ8yfTB5C639kXeWtf+7dgPZWeRXaP19mTHO8+c/Fq3IrY+Wkow==
+X-Received: by 2002:a05:6e02:4ca:: with SMTP id f10mr24127244ils.291.1595264185179;
+        Mon, 20 Jul 2020 09:56:25 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id o19sm9141493iob.5.2020.07.20.09.56.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jul 2020 09:56:24 -0700 (PDT)
+Subject: Re: a fix and two cleanups around blk_stack_limits
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Damien.LeMoal@wdc.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+References: <20200720061251.652457-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <dfe56cf2-db3d-3461-9834-be314f4080ef@kernel.dk>
+Date:   Mon, 20 Jul 2020 10:56:23 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200709085501.GA64935@infradead.org> <adc14700-8e95-10b2-d914-afa5029ae80c@kernel.dk>
- <20200709140053.GA7528@infradead.org> <2270907f-670c-5182-f4ec-9756dc645376@kernel.dk>
- <CA+1E3r+H7WEyfTufNz3xBQQynOVV-uD3myYynkfp7iU+D=Svuw@mail.gmail.com>
- <f5e3e931-ef1b-2eb6-9a03-44dd5589c8d3@kernel.dk> <CA+1E3rLna6VVuwMSHVVEFmrgsTyJN=U4CcZtxSGWYr_UYV7AmQ@mail.gmail.com>
- <20200710131054.GB7491@infradead.org> <20200710134824.GK12769@casper.infradead.org>
- <20200710134932.GA16257@infradead.org> <20200710135119.GL12769@casper.infradead.org>
- <CA+1E3rKOZUz7oZ_DGW6xZPQaDu+T5iEKXctd+gsJw05VwpGQSQ@mail.gmail.com>
-In-Reply-To: <CA+1E3rKOZUz7oZ_DGW6xZPQaDu+T5iEKXctd+gsJw05VwpGQSQ@mail.gmail.com>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Mon, 20 Jul 2020 22:19:57 +0530
-Message-ID: <CA+1E3r+j=amkEg-_KUKSiu6gt2TRU6AU-_jwnB1C6wHHKnptfQ@mail.gmail.com>
-Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
-        bcrl@kvack.org, Damien.LeMoal@wdc.com, asml.silence@gmail.com,
-        linux-fsdevel@vger.kernel.org, "Matias Bj??rling" <mb@lightnvm.io>,
-        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Selvakumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200720061251.652457-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 7:41 PM Kanchan Joshi <joshiiitr@gmail.com> wrote:
->
-> On Fri, Jul 10, 2020 at 7:21 PM Matthew Wilcox <willy@infradead.org> wrote:
-> >
-> > On Fri, Jul 10, 2020 at 02:49:32PM +0100, Christoph Hellwig wrote:
-> > > On Fri, Jul 10, 2020 at 02:48:24PM +0100, Matthew Wilcox wrote:
-> > > > If we're going to go the route of changing the CQE, how about:
-> > > >
-> > > >  struct io_uring_cqe {
-> > > >          __u64   user_data;      /* sqe->data submission passed back */
-> > > > -        __s32   res;            /* result code for this event */
-> > > > -        __u32   flags;
-> > > > +   union {
-> > > > +           struct {
-> > > > +                   __s32   res;            /* result code for this event */
-> > > > +                   __u32   flags;
-> > > > +           };
-> > > > +           __s64   res64;
-> > > > +   };
-> > > >  };
-> > > >
-> > > > then we don't need to change the CQE size and it just depends on the SQE
-> > > > whether the CQE for it uses res+flags or res64.
-> > >
-> > > How do you return a status code or short write when you just have
-> > > a u64 that is needed for the offset?
-> >
-> > it's an s64 not a u64 so you can return a negative errno.  i didn't
-> > think we allowed short writes for objects-which-have-a-pos.
->
-> If we are doing this for zone-append (and not general cases), "__s64
-> res64" should work -.
-> 64 bits = 1 (sign) + 23 (bytes-copied: cqe->res) + 40
-> (written-location: chunk_sector bytes limit)
+On 7/20/20 12:12 AM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> this series ensures that the zoned device limitations are properly
+> inherited in blk_stack_limits, and then cleanups up two rather
+> pointless wrappers around it.
 
-And this is for the scheme when single CQE is used with bits
-refactoring into "_s64 res64" instead of res/flags.
-
-41 bits for zone-append completion = in bytes, sufficient to cover
-chunk_sectors size zone
-1+22 bits for zone-append bytes-copied = can cover 4MB bytes copied
-(single I/O is capped at 4MB in NVMe)
-
-+ * zone-append specific flags
-+#define APPEND_OFFSET_BITS     (41)
-+#define APPEND_RES_BITS                (23)
-+
-+/*
-  * IO completion data structure (Completion Queue Entry)
-  */
- struct io_uring_cqe {
--       __u64   user_data;      /* sqe->data submission passed back */
--       __s32   res;            /* result code for this event */
--       __u32   flags;
-+       __u64   user_data;      /* sqe->data submission passed back */
-+        union {
-+                struct {
-+                        __s32   res;            /* result code for
-this event */
-+                        __u32   flags;
-+                };
-+               /* Alternate for zone-append */
-+               struct {
-+                       union {
-+                               /*
-+                                * kernel uses this to store append result
-+                                * Most significant 23 bits to return number of
-+                                * bytes or error, and least significant 41 bits
-+                                * to return zone-relative offset in bytes
-+                                * */
-+                               __s64 res64;
-+                               /*for user-space ease, kernel does not use*/
-+                               struct {
-+#if defined(__LITTLE_ENDIAN_BITFIELD)
-+                                       __u64 append_offset :
-APPEND_OFFSET_BITS;
-+                                       __s32 append_res : APPEND_RES_BITS;
-+#elif defined(__BIG_ENDIAN_BITFIELD)
-+                                       __s32 append_res : APPEND_RES_BITS;
-+                                       __u64 append_offset :
-APPEND_OFFSET_BITS;
-+#endif
-+                               }__attribute__ ((__packed__));
-+                       };
-+                };
-+        };
- };
+We should probably make this against for-5.9/drivers instead, to avoid
+an unnecessary conflict when merging.
 
 -- 
-Joshi
+Jens Axboe
+
