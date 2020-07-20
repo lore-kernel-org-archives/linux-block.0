@@ -2,85 +2,81 @@ Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE57C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 10:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E3C4C433E5
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 11:08:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 987702068F
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 10:53:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3039D22B4E
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 11:08:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DfbfY0OC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eGLeUV9p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728404AbgGTKxJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 06:53:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51036 "EHLO
+        id S1728413AbgGTLIm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 07:08:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728348AbgGTKxI (ORCPT
+        with ESMTP id S1728232AbgGTLIm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 06:53:08 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE20CC061794;
-        Mon, 20 Jul 2020 03:53:08 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id p3so10137845pgh.3;
-        Mon, 20 Jul 2020 03:53:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=0qEaLy0Hyr3SwuDgUAydri7YBfNLnnwpux/l1PMZrXs=;
-        b=DfbfY0OClpMHAFSaP+f9tqbmvr533JaX4bNcruO+IiubyumIIzF+ZR7evBBXjmuleh
-         R0y0HxshhdySi25YF8SHlPQj7zmSWAFkOKx8mRVYCtJyJKV0U8uGKQMDI+mM6CX2w5+4
-         anzvsNc8DC07lf+jLdDPHBl0IgiIuP7vuYGDkfIRY3kSaTCyPxv/1knuqiQlFm7rzisM
-         1mOuwxynMQKshI3u02qIbMOgyrLi2cQInAdG/nxy8kNET2ktdBZ0CRpK7HTLrisYD/Kt
-         Cmfl8sl+grmeBz3BLzBBu7xYzx1v0wgkdSQdeIZTua85gRztILnYxuw+ULo1+dIy+7Wk
-         E6jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=0qEaLy0Hyr3SwuDgUAydri7YBfNLnnwpux/l1PMZrXs=;
-        b=DHuSQonZ8vMoj6k7LqrTrgw9/zMjj6LM9ZbAYfFpzykwUe1wCi3CUsbuTAEvarhPGX
-         Nsvb8oDdfGagFCFqbUSvQimbuCWnhKNGheElM8T2V600Xdge+I61Onkb21vraShxffL/
-         6Bx5tx7tLv4hwL9lfybRGTgeSxvadmU/XuIoDSPP0pzG8sNxjTac3DHtxeQpPoZbKBNG
-         wRKXnF1S6WPk5YrDJtS1KKcCY/xyrlLBQK8ZaV/c8a7VAAo0nwWqTFWOikfhHIh4kGcs
-         jiQmbpL1glc0NviokDdY2UdVKnzRo1PG0G6lSEvuR1UxzHCBVFP3urqAd/FcgwB1Inrb
-         W7DQ==
-X-Gm-Message-State: AOAM532ijqrwstqvMeGYfEeW/1WcsLEXXXtcuDLuNOYbZiYTZU5pRNYm
-        HhG05RMoH/tZravFWyQkl8ncIgzkSLtCxZ4md19xdXyteas=
-X-Google-Smtp-Source: ABdhPJxSxfvZHSnPCHB3+sKTFypPPlKhNZB18FrBL+Aj0NR3DL6NzsvwlGecY4X4aL9KHFMgvGGlaG7WNOlk0joiKCQ=
-X-Received: by 2002:a65:6714:: with SMTP id u20mr18262640pgf.121.1595242387927;
- Mon, 20 Jul 2020 03:53:07 -0700 (PDT)
+        Mon, 20 Jul 2020 07:08:42 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDCD4C061794
+        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 04:08:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=+1VKiIB05OSw8wxWIRmyLFmYP2GWy1n4g8zJvXo4pr4=; b=eGLeUV9pVFpUJUTE+IamCe8hzD
+        QS/XDaXHa9gjoG2SjvLzk3y6DpcUVgXwHDjqlpdRnBhwdOe13ipRv8MI1v3nYGbrxB0YHe2bSXles
+        YfSRyGLJJZoPZs4MlwZ7xv+VyBEH4v/ObRoTMaBZK8Nb+qTbIFgSuDOcTPZU3nOdSAOdRR15qHi9F
+        4yc/gvcfTZaN8YsNZp3aaHpkIXlD+1OliqiD+dxFiaLTOcS+FRTVFLEOcTnVstNeqehL/4fsrkeY7
+        QBbMmQCw/EMNckhVe5lpSQkDPh9BoHibP2BYDdrgtCITejmlt5vdl2V25i/0E+RaiFeqp4DR+/7Nj
+        ojF4BoeQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jxTep-0007Z1-9I; Mon, 20 Jul 2020 11:08:31 +0000
+Date:   Mon, 20 Jul 2020 12:08:31 +0100
+From:   "hch@infradead.org" <hch@infradead.org>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: align max append sectors to physical block size
+Message-ID: <20200720110831.GA28284@infradead.org>
+References: <20200716100933.3132-1-johannes.thumshirn@wdc.com>
+ <20200716143441.GA937@infradead.org>
+ <CY4PR04MB37512CC98154F5FDCF96B857E77C0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200717075006.GA670561@T590>
+ <CY4PR04MB3751DAD907DFFB3A00B73039E77C0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200717091124.GC670561@T590>
+ <CY4PR04MB3751D86F13E852C1831FB3A0E77C0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200717100232.GD670561@T590>
+ <CY4PR04MB3751B7720950B99A50CEF485E77C0@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-From:   Feng Li <lifeng1519@gmail.com>
-Date:   Mon, 20 Jul 2020 18:52:37 +0800
-Message-ID: <CAEK8JBC+0deq-aYeq=xNsypRUkR1gZVpiHjuNjh6MugYSe42XA@mail.gmail.com>
-Subject: [Question] About IO timeout and hang
-To:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY4PR04MB3751B7720950B99A50CEF485E77C0@CY4PR04MB3751.namprd04.prod.outlook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Experts,
+On Fri, Jul 17, 2020 at 10:55:49AM +0000, Damien Le Moal wrote:
+> > 
+> > 2) add one new limit for write on seq zone, such as: zone_write_block_size
+> > 
+> > Then the two cases can be dealt with in same way, and physical block
+> > size is usually a hint as Christoph mentioned, looks a bit weird to use
+> > it in this way, or at least the story should be documented.
+> 
+> Yeah, but zone_write_block_size would end up always being equal to the physical
+> block size for SMR. For ZNS and nullblk, logical block size == physical block
+> size, always, so it would not be useful. I do not think such change is necessary.
 
-Consider accessing a "bad" disk, if the user process submits a
-'read/write' request to the kernel through libaio,
-and the kernel doesn't return the IO, because the underlay disk is
-bad, and IO is stuck for a long time.
-
-When the IO is a 'read', the user-space process has its own timeout
-policy, and find this IO has timeout-ed, then is it safe
-to free the io buffer before IO error return?
-If the user-space doesn't free the buffer and use this buffer as
-another read request, for example, read from another health disk,
-and if at this time the bad disk response the IO,
-will the buffer be corrupted by the before 'read' request?
-
-Could anyone help me clarify this concern?
-
-Thanks in advance.
+I think we should add a write_block_size (or write_granularity) field.
+There have been some early stage NVMe proposal to add that even for
+conventional random/write namespaces.
