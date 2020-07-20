@@ -2,135 +2,113 @@ Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 463FAC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 19:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F543C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 20:17:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3017B2073A
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 19:46:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7970B208E4
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 20:17:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CHHIdvTf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728320AbgGTTqz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 15:46:55 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:37147 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726491AbgGTTqy (ORCPT
+        id S1729026AbgGTURt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 16:17:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53576 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727123AbgGTURt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 15:46:54 -0400
-Received: by mail-pj1-f68.google.com with SMTP id o22so400816pjw.2;
-        Mon, 20 Jul 2020 12:46:54 -0700 (PDT)
+        Mon, 20 Jul 2020 16:17:49 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF75C061794;
+        Mon, 20 Jul 2020 13:17:49 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id 88so8791109wrh.3;
+        Mon, 20 Jul 2020 13:17:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Jzw/8onKma0qauB0WGLcDc9iDqAqJvDHoJWk74V2lfo=;
+        b=CHHIdvTfP8EqK9uyRez8Lcjdq5Oe+D6Y7pnyDlXGm1LUZuhlkz0Krw3rk/qbSEC6Am
+         ruzsz3YaCd2sHkMTRIF1I5OnVcwnh9XSgvSvFoboW8IKdyCwAgSsp42T/oBex6yLYEZj
+         eTO5kvRRfcadyvvtUxlO/Hl6A4zzwWxn8uiQHZbTWtrigambUNXvgKseo+As8PQbpe/o
+         Rrpm4tddDCNl5F6gUrvPhXxnyDYgsVr80aEwaPdjZLC0SMnGHf9DsvNaZpKVcGgHH62n
+         6LoY6IW7yZa9nh+rePv4N5G2GSWS06nEbicm9GhwgPHFMnu5fSM/9P6mXqFprykqGyH0
+         hmsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hF8palGIv8TI4BXkf/MtnUqfeyrr+QIHoD4KLAnuRtA=;
-        b=qCjsnq8D5S+vk7AM9FqOdjEC1RKQesIEdQyDaR1Zu7LngByLyR6Wg0h1IwtCjLQ6BR
-         dTDchOhCSLSg3sY5Ar5/7l7RmmXh9pGtQnzk4WzYT+yn2jO/sJFGwB/j4t01iHhwNdu6
-         TpourmnW5j334N+1JK7ScwR8x7DwPKREUsBWJpWBHcxCNIkLvTolzalTUXlfJUhh7C6F
-         4tUialu2fPsTb908CkSzzIK0L/VEnSdZ49xA7mpMuv0yE2ZztwE+i4TOAPyNaXPsY/uE
-         sCYGuRl15ANAnQ26RkZNVTGZQ9TXAsD1INl1ZixihSpdaJjfaQgFnuo0i4IfCapy+MBW
-         aNaA==
-X-Gm-Message-State: AOAM531sQulrtAxACvMgncEYU0/WOxDZJM4bE3ibrQXPyLcZpZZ7wsgs
-        OkfuqbtfFpnIGwDJJL+YSJCCKVri
-X-Google-Smtp-Source: ABdhPJxQ+Wt1oXs2Yt1z/f2sFOZ4lWJvrpfWgApnTaWJqLQpNjFxeO5byMOGFMOtE9bIim1Cgltyxg==
-X-Received: by 2002:a17:902:7284:: with SMTP id d4mr18116121pll.164.1595274413951;
-        Mon, 20 Jul 2020 12:46:53 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:81fd:84d6:3c38:f7ef? ([2601:647:4802:9070:81fd:84d6:3c38:f7ef])
-        by smtp.gmail.com with ESMTPSA id f6sm18054206pfe.174.2020.07.20.12.46.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jul 2020 12:46:53 -0700 (PDT)
-Subject: Re: [PATCH v2] nvme-tcp: don't use sendpage for pages not taking
- reference counter
-To:     Coly Li <colyli@suse.de>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        hch@lst.de
-Cc:     Jens Axboe <axboe@kernel.dk>, Vlastimil Babka <vbabka@suse.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        stable@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        Jan Kara <jack@suse.com>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
-References: <20200713124444.19640-1-colyli@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <75efd1ba-284d-f5b0-faeb-ca8cefd673c0@grimberg.me>
-Date:   Mon, 20 Jul 2020 12:46:51 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Jzw/8onKma0qauB0WGLcDc9iDqAqJvDHoJWk74V2lfo=;
+        b=AtdBxNgVzp8ootlckDr1a5GtV8nhd40u7CVergJAGPnU/wWctHPn1eGqgGOGyN65d4
+         AapS/TLNrzYG12OyxCGeUzAPmPNl/bfrrfNbZU+Tvj/tE6013XomMyyCSlFwZmK9XaU7
+         Vjm72hBH+hK8CkBXdW502hdDH4IS7Jdp0dv7flfo+g9k2iLYEf7Ry9oN9s9WpdYYcFf0
+         ebCDcm89+c+MKwPP/NFcDwrepHtY1+7rqulG7w1yxqvOfzvDD2TZ7qZXbjiII7XhIjMz
+         PVllbyit9pFSQTQCcEAc7ZUSFQS8iUcsl93IA7AIauXpAW6cYoQLfO3FCRgteiGbTrRQ
+         GSRw==
+X-Gm-Message-State: AOAM530xSfsrBlvry0+G4ESJIxz15rjwYWvKk+I1uSNwqNH9Rda8IU6e
+        xWBoipf5LQ0A2MaXTVJWxNOLVYRHCfmZA7DgMj4=
+X-Google-Smtp-Source: ABdhPJwPxH7QBtP6wc4HBaQCIWU0o/YJOzNcPKhclaoxZuQg8Gf7VoRYP5hEuqNnOXAm3b1u0V1tXFsd75nMfdMeAAY=
+X-Received: by 2002:adf:f0ce:: with SMTP id x14mr22656173wro.137.1595276267720;
+ Mon, 20 Jul 2020 13:17:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200713124444.19640-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <2270907f-670c-5182-f4ec-9756dc645376@kernel.dk>
+ <CA+1E3r+H7WEyfTufNz3xBQQynOVV-uD3myYynkfp7iU+D=Svuw@mail.gmail.com>
+ <f5e3e931-ef1b-2eb6-9a03-44dd5589c8d3@kernel.dk> <CA+1E3rLna6VVuwMSHVVEFmrgsTyJN=U4CcZtxSGWYr_UYV7AmQ@mail.gmail.com>
+ <20200710131054.GB7491@infradead.org> <20200710134824.GK12769@casper.infradead.org>
+ <20200710134932.GA16257@infradead.org> <20200710135119.GL12769@casper.infradead.org>
+ <CA+1E3rKOZUz7oZ_DGW6xZPQaDu+T5iEKXctd+gsJw05VwpGQSQ@mail.gmail.com>
+ <CA+1E3r+j=amkEg-_KUKSiu6gt2TRU6AU-_jwnB1C6wHHKnptfQ@mail.gmail.com> <20200720171416.GY12769@casper.infradead.org>
+In-Reply-To: <20200720171416.GY12769@casper.infradead.org>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Tue, 21 Jul 2020 01:47:20 +0530
+Message-ID: <CA+1E3rLNo5sFH3RPFAM4_SYXSmyWTCdbC3k3-6jeaj3FRPYLkQ@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
+        bcrl@kvack.org, Damien.LeMoal@wdc.com, asml.silence@gmail.com,
+        linux-fsdevel@vger.kernel.org, "Matias Bj??rling" <mb@lightnvm.io>,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Jul 20, 2020 at 10:44 PM Matthew Wilcox <willy@infradead.org> wrote:
+>
+> On Mon, Jul 20, 2020 at 10:19:57PM +0530, Kanchan Joshi wrote:
+> > On Fri, Jul 10, 2020 at 7:41 PM Kanchan Joshi <joshiiitr@gmail.com> wrote:
+> > > If we are doing this for zone-append (and not general cases), "__s64
+> > > res64" should work -.
+> > > 64 bits = 1 (sign) + 23 (bytes-copied: cqe->res) + 40
+> > > (written-location: chunk_sector bytes limit)
+>
+> No, don't do this.
+>
+>  struct io_uring_cqe {
+>         __u64   user_data;      /* sqe->data submission passed back */
+> -       __s32   res;            /* result code for this event */
+> -       __u32   flags;
+> +       union {
+> +               struct {
+> +                       __s32   res;    /* result code for this event */
+> +                       __u32   flags;
+> +               };
+> +               __s64           res64;
+> +       };
+>  };
+>
+> Return the value in bytes in res64, or a negative errno.  Done.
 
-
-On 7/13/20 5:44 AM, Coly Li wrote:
-> Currently nvme_tcp_try_send_data() doesn't use kernel_sendpage() to
-> send slab pages. But for pages allocated by __get_free_pages() without
-> __GFP_COMP, which also have refcount as 0, they are still sent by
-> kernel_sendpage() to remote end, this is problematic.
-> 
-> When bcache uses a remote NVMe SSD via nvme-over-tcp as its cache
-> device, writing meta data e.g. cache_set->disk_buckets to remote SSD may
-> trigger a kernel panic due to the above problem. Bcause the meta data
-> pages for cache_set->disk_buckets are allocated by __get_free_pages()
-> without __GFP_COMP.
-> 
-> This problem should be fixed both in upper layer driver (bcache) and
-> nvme-over-tcp code. This patch fixes the nvme-over-tcp code by checking
-> whether the page refcount is 0, if yes then don't use kernel_sendpage()
-> and call sock_no_sendpage() to send the page into network stack.
-> 
-> The code comments in this patch is copied and modified from drbd where
-> the similar problem already gets solved by Philipp Reisner. This is the
-> best code comment including my own version.
-> 
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Jan Kara <jack@suse.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
-> Cc: Philipp Reisner <philipp.reisner@linbit.com>
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Cc: Vlastimil Babka <vbabka@suse.com>
-> Cc: stable@vger.kernel.org
-> ---
-> Changelog:
-> v2: fix typo in patch subject.
-> v1: the initial version.
->   drivers/nvme/host/tcp.c | 13 +++++++++++--
->   1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 79ef2b8e2b3c..faa71db7522a 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -887,8 +887,17 @@ static int nvme_tcp_try_send_data(struct nvme_tcp_request *req)
->   		else
->   			flags |= MSG_MORE | MSG_SENDPAGE_NOTLAST;
->   
-> -		/* can't zcopy slab pages */
-> -		if (unlikely(PageSlab(page))) {
-> +		/*
-> +		 * e.g. XFS meta- & log-data is in slab pages, or bcache meta
-> +		 * data pages, or other high order pages allocated by
-> +		 * __get_free_pages() without __GFP_COMP, which have a page_count
-> +		 * of 0 and/or have PageSlab() set. We cannot use send_page for
-> +		 * those, as that does get_page(); put_page(); and would cause
-> +		 * either a VM_BUG directly, or __page_cache_release a page that
-> +		 * would actually still be referenced by someone, leading to some
-> +		 * obscure delayed Oops somewhere else.
-> +		 */
-> +		if (unlikely(PageSlab(page) || page_count(page) < 1)) {
-
-Can we unify these checks to a common sendpage_ok(page) ?
+I concur. Can do away with bytes-copied. It's either in its entirety
+or not at all.
