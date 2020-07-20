@@ -1,156 +1,149 @@
-Return-Path: <SRS0=RlKP=A6=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB71BC433E0
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jul 2020 19:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7ED3C433E3
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 01:32:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7DED620B1F
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jul 2020 19:07:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95AB12177B
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 01:32:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="iRGETB51"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y3XuSL8T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726492AbgGSTHh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Jul 2020 15:07:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46930 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726009AbgGSTHh (ORCPT
+        id S1726468AbgGTBcc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Jul 2020 21:32:32 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28159 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726225AbgGTBcb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Jul 2020 15:07:37 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F4BAC0619D2
-        for <linux-block@vger.kernel.org>; Sun, 19 Jul 2020 12:07:37 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id i3so11433612qtq.13
-        for <linux-block@vger.kernel.org>; Sun, 19 Jul 2020 12:07:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=y7UVmsUUWW+syouiI5q9i86+HUw5PbC+q5saIQcigd0=;
-        b=iRGETB51iiFqAL8vEhkG7ijBOJac/45G6/cxCS3s2r1z3OuqMhtgJ8FyEyyg3gVC2i
-         MHsR+u7ZaLWpc0RxBZHIX9SbCD41rK84mAAkuqzLe0NG4cDtXekagqPC7fGdCC6Puyi0
-         XNvVdx67kV3x2wderf2hffRdR8jDdgZtNQ+3g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=y7UVmsUUWW+syouiI5q9i86+HUw5PbC+q5saIQcigd0=;
-        b=VvF0Y6yReDoThffW8zt5vzB2ZUTHBg0Mza1+78lsLJtxBP+sXDWqZcOeJlU2iwaqVc
-         k3HvxUOZqZyvFBwQzTtGhI3EAorg/SxrgwaEHeQ9tozllcejbsJRWDQf5Y3DaadG5Ns9
-         vM2TOdiAm6/HZ601g2AsYkp+kzHjvo47qVWxqNqK77PhCgue+WgLR1FPnOkccuejfKFp
-         1MtL8QM6Vg538q55wJFXglUvxysuIfUOMve2x9bJjsjkpyeWrYYd7EiJ76ICYVunralD
-         Ij4EtIo2CFFDdO1B0nxOzjI2CQ/gTmW8v6TWMmbAxs3TMZYIyh65+9cdOOjJPqFIHZPP
-         QO0A==
-X-Gm-Message-State: AOAM531xNC3alkiJoUGr3wEUqRaLHoI75IUdYvdSk03v+kgWAV0IzPZa
-        WhdiMmyWUhlTInreTEBL+PkDxjBYmGYYLUYc8aFJqA==
-X-Google-Smtp-Source: ABdhPJxKi3TygIZ5EUVL8Pwm+D+6VmBDEb60NK8bJIxj0PInxDwlM8iUvWcR6jGgzt36XLpHTcaTBw5cgNjjh1shSqQ=
-X-Received: by 2002:ac8:4f50:: with SMTP id i16mr19112429qtw.216.1595185656196;
- Sun, 19 Jul 2020 12:07:36 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-11-git-send-email-john.garry@huawei.com>
- <d55972999b9370f947c20537e41b49bf@mail.gmail.com> <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
- <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com> <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
- <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com> <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
- <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com> <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
- <34a832717fef4702b143ea21aa12b79e@mail.gmail.com> <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
-In-Reply-To: <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
+        Sun, 19 Jul 2020 21:32:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595208748;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LKXUgkFTtCjgOzaIWPHlugk+9da50v8Cx/Ge5BvU5Q4=;
+        b=Y3XuSL8TfDuV93mBiVGwG4Q9Wqyn/umcIVxNFzS/HCfwj8/CgW1QjKPRiIIz3/9L3J12xO
+        3csTb6h2dIyd/IRQG1c+7es6JGTaBBIhwnBjVL+fiV48Bz1vryMxqoBMEWStliPmLMm1+H
+        TP/fvE8bViofffVcUE35dxxoRmlz/gg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-293-ZHsXdbn8MKWiFUENKQkPWQ-1; Sun, 19 Jul 2020 21:32:26 -0400
+X-MC-Unique: ZHsXdbn8MKWiFUENKQkPWQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6E5F801A03;
+        Mon, 20 Jul 2020 01:32:24 +0000 (UTC)
+Received: from T590 (ovpn-13-88.pek2.redhat.com [10.72.13.88])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 02A9F872E6;
+        Mon, 20 Jul 2020 01:32:17 +0000 (UTC)
+Date:   Mon, 20 Jul 2020 09:32:13 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] scsi: core: run queue in case of IO queueing failure
+Message-ID: <20200720013213.GA791101@T590>
+References: <20200708131405.3346107-1-ming.lei@redhat.com>
+ <bd3039d4-0c24-ad67-bdfe-85096ad60721@acm.org>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQBVjmvxAE7FMYb7GtMRWGcwtMcECgFIs823Ad7lfqMBmFaE1AGZowweAlKrFcUB/hGY5AG4aoXNAvsHUMYCeW9VQwH6WrIOAzKzW+yrWLxrUA==
-Date:   Mon, 20 Jul 2020 00:37:33 +0530
-Message-ID: <2314e216d1d546e2072d09bd111b4b58@mail.gmail.com>
-Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        ming.lei@redhat.com, bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bd3039d4-0c24-ad67-bdfe-85096ad60721@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > I also noticed nr_hw_queues are now exposed in sysfs -
-> >
-> > /sys/devices/pci0000:85/0000:85:00.0/0000:86:00.0/0000:87:04.0/0000:8b
-> >
-> :00.0/0000:8c:00.0/0000:8d:00.0/host14/scsi_host/host14/nr_hw_queues:1
-> > 28
-> > .
->
-> That's on my v8 wip branch, so I guess you're picking it up from there.
+On Sat, Jul 18, 2020 at 01:22:27PM -0700, Bart Van Assche wrote:
+> On 2020-07-08 06:14, Ming Lei wrote:
+> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > index 534b85e87c80..4d7fab9e8af9 100644
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -1694,6 +1694,16 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+> >  		 */
+> >  		if (req->rq_flags & RQF_DONTPREP)
+> >  			scsi_mq_uninit_cmd(cmd);
+> > +
+> > +		/*
+> > +		 * Requests may be held in block layer queue because of
+> > +		 * resource contention. We usually run queue in normal
+> > +		 * completion for queuing these requests again. Block layer
+> > +		 * will finish this failed request simply, run queue in case
+> > +		 * of IO queueing failure so that requests can get chance to
+> > +		 * be finished.
+> > +		 */
+> > +		scsi_run_queue(q);
+> >  		break;
+> >  	}
+> >  	return ret;
+> 
+> So this patch causes blk_mq_run_hw_queues() to be called synchronously
+> from inside blk_mq_run_hw_queues()? Wouldn't it be better to avoid such
 
-John - I did more testing on v8 wip branch.  CPU hotplug is working as
-expected, but I still see some performance issue on Logical Volumes.
+OK, look this patch may risk to overflow stack.
 
-I created 8 Drives Raid-0 VD on MR controller and below is performance
-impact of this RFC. Looks like contention is on single <sdev>.
+> recursion and to run the queue asynchronously instead of synchronously
+> from inside scsi_queue_rq()? The following code already exists in
+> scsi_end_request():
+> 
+> 	blk_mq_run_hw_queues(q, true);
 
-I used command - "numactl -N 1  fio
-1vd.fio --iodepth=128 --bs=4k --rw=randread
---cpus_allowed_policy=split --ioscheduler=none
- --group_reporting --runtime=200 --numjobs=1"
-IOPS without RFC = 300K IOPS with RFC = 230K.
+How about the following change?
 
-Perf top (shared host tag. IOPS = 230K)
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index b9adee0a9266..9798fbffe307 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -564,6 +564,15 @@ static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
+ 	scsi_uninit_cmd(cmd);
+ }
+ 
++static void scsi_run_queue_async(struct scsi_device *sdev)
++{
++	if (scsi_target(sdev)->single_lun ||
++	    !list_empty(&sdev->host->starved_list))
++		kblockd_schedule_work(&sdev->requeue_work);
++	else
++		blk_mq_run_hw_queues(sdev->request_queue, true);
++}
++
+ /* Returns false when no more bytes to process, true if there are more */
+ static bool scsi_end_request(struct request *req, blk_status_t error,
+ 		unsigned int bytes)
+@@ -608,11 +617,7 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
+ 
+ 	__blk_mq_end_request(req, error);
+ 
+-	if (scsi_target(sdev)->single_lun ||
+-	    !list_empty(&sdev->host->starved_list))
+-		kblockd_schedule_work(&sdev->requeue_work);
+-	else
+-		blk_mq_run_hw_queues(q, true);
++	scsi_run_queue_async(sdev);
+ 
+ 	percpu_ref_put(&q->q_usage_counter);
+ 	return false;
+@@ -1721,6 +1726,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		 */
+ 		if (req->rq_flags & RQF_DONTPREP)
+ 			scsi_mq_uninit_cmd(cmd);
++		scsi_run_queue_async(sdev);
+ 		break;
+ 	}
+ 	return ret;
 
-13.98%  [kernel]        [k] sbitmap_any_bit_set
-     6.43%  [kernel]        [k] blk_mq_run_hw_queue
-     6.00%  [kernel]        [k] __audit_syscall_exit
-     3.47%  [kernel]        [k] read_tsc
-     3.19%  [megaraid_sas]  [k] complete_cmd_fusion
-     3.19%  [kernel]        [k] irq_entries_start
-     2.75%  [kernel]        [k] blk_mq_run_hw_queues
-     2.45%  fio             [.] fio_gettime
-     1.76%  [kernel]        [k] entry_SYSCALL_64
-     1.66%  [kernel]        [k] add_interrupt_randomness
-     1.48%  [megaraid_sas]  [k] megasas_build_and_issue_cmd_fusion
-     1.42%  [kernel]        [k] copy_user_generic_string
-     1.36%  [kernel]        [k] scsi_queue_rq
-     1.03%  [kernel]        [k] kmem_cache_alloc
-     1.03%  [kernel]        [k] internal_get_user_pages_fast
-     1.01%  [kernel]        [k] swapgs_restore_regs_and_return_to_usermode
-     0.96%  [kernel]        [k] kmem_cache_free
-     0.88%  [kernel]        [k] blkdev_direct_IO
-     0.84%  fio             [.] td_io_queue
-     0.83%  [kernel]        [k] __get_user_4
 
-Perf top (shared host tag. IOPS = 300K)
+Thanks,
+Ming
 
-    6.36%  [kernel]        [k] unroll_tree_refs
-     5.77%  [kernel]        [k] __do_softirq
-     4.56%  [kernel]        [k] irq_entries_start
-     4.38%  [kernel]        [k] read_tsc
-     3.95%  [megaraid_sas]  [k] complete_cmd_fusion
-     3.21%  fio             [.] fio_gettime
-     2.98%  [kernel]        [k] add_interrupt_randomness
-     1.79%  [kernel]        [k] entry_SYSCALL_64
-     1.61%  [kernel]        [k] copy_user_generic_string
-     1.61%  [megaraid_sas]  [k] megasas_build_and_issue_cmd_fusion
-     1.34%  [kernel]        [k] scsi_queue_rq
-     1.11%  [kernel]        [k] kmem_cache_free
-     1.05%  [kernel]        [k] blkdev_direct_IO
-     1.05%  [kernel]        [k] internal_get_user_pages_fast
-     1.00%  [kernel]        [k] __memset
-     1.00%  fio             [.] td_io_queue
-     0.98%  [kernel]        [k] kmem_cache_alloc
-     0.94%  [kernel]        [k] __get_user_4
-     0.93%  [kernel]        [k] lookup_ioctx
-     0.88%  [kernel]        [k] sbitmap_any_bit_set
-
-Kashyap
-
->
-> Thanks,
-> John
