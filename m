@@ -2,93 +2,107 @@ Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D0DC433E3
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 16:56:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E29C433EC
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 17:03:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97529206E9
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 16:56:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6402020729
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 17:03:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lVDe0o3b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDSdkoTt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729001AbgGTQ42 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 12:56:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50806 "EHLO
+        id S1729083AbgGTRDO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 13:03:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729089AbgGTQ4Z (ORCPT
+        with ESMTP id S1728346AbgGTRDO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 12:56:25 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2DCAC061794
-        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 09:56:25 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id t4so13928012iln.1
-        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 09:56:25 -0700 (PDT)
+        Mon, 20 Jul 2020 13:03:14 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16861C061794;
+        Mon, 20 Jul 2020 10:03:14 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id a15so3637538wrh.10;
+        Mon, 20 Jul 2020 10:03:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=VP2nB550LCm9f5amiI4hf7RrVCu1pcK2lzmvzfZ1TsY=;
-        b=lVDe0o3bN+yA/jUNW84yekfdG4ELTxibo4Z4+y+kWe74S7MJypffKWTwxc3g7f9Svo
-         hE4QK7tUyIsfB2QeKZct0sysO+xM9OZ0ym36+VQhW8eUHCpuQOwNjXtjdLEH6/kLt/XO
-         Cb+Q/umAUYnJglnK8f0MV6ogsgyFIc3FuywSCTkVO91uh6Z9RlSUCn6hMgHWo2vbxsb0
-         P5wskmDSANHCDh2cDG0k/QlGbaNRpd3gQaQmlIY2Z+HK71Z0E4qGET6af78TZAayv3+2
-         /BzJDtjU3aXhXYrEjTPv4mzo91Mp/ShNNRSMiPoe+dEE+qAa15R9CNcJeJfoSGry0duB
-         WzDQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2z6vfRN45O58360WXxB9JosENc0eD1jtyLCvWHGh1YY=;
+        b=NDSdkoTtQtN9k8e5yU0/Q6OJPgewxcja66aFKP8Z7ADQhogTJURkNUpGl91G2fpCCU
+         oIkZoqpmJ/x1DP3gXTsvgKPG2qkgxg7rLWiYBSMsPyfyECt8X4/CYlT8TvVEBnGbPnvO
+         yhxBYdlA2ZXvEuMIGUxXzn75G7Kua2nEsR2NMUAkmMiJg5uOmfWYmmVFAbfbQbesJWEt
+         LlS6Ou/POWTJOLnbo/h7xECwdjuxZ1t2atpEjWmxDllEDUmevYK9J1jM8unZROSC3aJf
+         TER0ScfQ2MpTlWMVo4cYQaU10tOokxlhrgFoiZVHfW2W4jXw8xxyOoPY/JVpEy8KWQ/C
+         V9Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VP2nB550LCm9f5amiI4hf7RrVCu1pcK2lzmvzfZ1TsY=;
-        b=pQTbMqi01LTUbSG6lCdk+eBXyM4elWE6VG93gBRahqjtnGq/RH2DSfv8z27YYJCNyg
-         0VhsIpg94vnJr+dDgVGUIP91IWqCPZK14U3bo2hk5C/EC/YdC0/3TJ+qbjZlfAIb3uB7
-         KA5gTVjnr59EDuDePCDkWDpz7nPHAaV3SbWriz4NgrIPBXNXYu/0c9fzEmJk/cYhKcEJ
-         SJjv3EmgCrIQ3MgIu2mKsS3Ih3YedIwF/dQ12sMOIzogplw+lONLTs6JtKxlXvU7hvkS
-         KWpWH6zDCjp9zp9c1ZiqeATuR1Gw06uc1RLvM1K1ogTZmB8bXQjdgg8kv45RjC0PXOFn
-         Bqjw==
-X-Gm-Message-State: AOAM531eJ+RYiUlFMmlJJ+auj5p6zUTPPuqMnnE7FWXepoJA2eGUUbxm
-        YMrGr9V08oqXJCIz3k9uBnIt3MHUNWtdRA==
-X-Google-Smtp-Source: ABdhPJw1cGdsnGdd3eRJFrNgk4zjQ8yfTB5C639kXeWtf+7dgPZWeRXaP19mTHO8+c/Fq3IrY+Wkow==
-X-Received: by 2002:a05:6e02:4ca:: with SMTP id f10mr24127244ils.291.1595264185179;
-        Mon, 20 Jul 2020 09:56:25 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id o19sm9141493iob.5.2020.07.20.09.56.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jul 2020 09:56:24 -0700 (PDT)
-Subject: Re: a fix and two cleanups around blk_stack_limits
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Damien.LeMoal@wdc.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-References: <20200720061251.652457-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <dfe56cf2-db3d-3461-9834-be314f4080ef@kernel.dk>
-Date:   Mon, 20 Jul 2020 10:56:23 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2z6vfRN45O58360WXxB9JosENc0eD1jtyLCvWHGh1YY=;
+        b=rNTqgr0YeqS5MJRRck2jJ1YubKfKVvWigWXM0S4618NGxcbRyAxKc1sh2Foej0fZhu
+         +ofG0U/2CfPSX+VWDj3uj15ovuULmAC+By0O20VKi9DN6TBuyGNnFetAAojkKMYHdZXJ
+         5pHH16LjotwTm7CPZmIW2NOnuUu8WKzN7s+ho9VGkfeKaszCeeNfP0tz9InarT8w/L/J
+         MphzfIxTe1IAqrDFpa5PaEdjD0dvRAkkHyoyuiKXaqE4LwkLisVvfxZr/70kLXHerrUb
+         zv/nz2PnjpEhjQeS/9YhEnONw+r16lkXzrLeBfU6TOFPDVcYjnRQ94DNXZ88PBgO/jx6
+         jRRQ==
+X-Gm-Message-State: AOAM532a58aXQpjytQf7UTc9NmbqDEbbcmi+t6LMo1xibH88B85pNdpA
+        pLPaRhplkjA5QV+QcU6j+nGVIyhcOqvYfaT2DQ0=
+X-Google-Smtp-Source: ABdhPJzLTTWPjYGX0RzMnJeUOLrnHeGFH1UOcpvlUTIsjffcPcqfeW0pNI6XGZeS+hFgMQxoz0bLNak5dIzAX9LyPrY=
+X-Received: by 2002:adf:f0ce:: with SMTP id x14mr22109097wro.137.1595264592763;
+ Mon, 20 Jul 2020 10:03:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200720061251.652457-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1593974870-18919-5-git-send-email-joshi.k@samsung.com>
+ <fe0066b7-5380-43ee-20b2-c9b17ba18e4f@kernel.dk> <20200709085501.GA64935@infradead.org>
+ <adc14700-8e95-10b2-d914-afa5029ae80c@kernel.dk> <20200709140053.GA7528@infradead.org>
+ <2270907f-670c-5182-f4ec-9756dc645376@kernel.dk> <CA+1E3r+H7WEyfTufNz3xBQQynOVV-uD3myYynkfp7iU+D=Svuw@mail.gmail.com>
+ <f5e3e931-ef1b-2eb6-9a03-44dd5589c8d3@kernel.dk> <20200710130912.GA7491@infradead.org>
+ <CA+1E3rJSiS58TE=hHv5wVv-umJ19_7zKv-JqZTNzD=xi3MoX1g@mail.gmail.com> <20200710134350.GA14704@infradead.org>
+In-Reply-To: <20200710134350.GA14704@infradead.org>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Mon, 20 Jul 2020 22:32:45 +0530
+Message-ID: <CA+1E3r+DgR=vVCsUv0cCbPC4MV3Rxfyzee-HWwTogSQ-7F=MoA@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
+        viro@zeniv.linux.org.uk, bcrl@kvack.org, Damien.LeMoal@wdc.com,
+        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+        "Matias Bj??rling" <mb@lightnvm.io>, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/20/20 12:12 AM, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this series ensures that the zoned device limitations are properly
-> inherited in blk_stack_limits, and then cleanups up two rather
-> pointless wrappers around it.
-
-We should probably make this against for-5.9/drivers instead, to avoid
-an unnecessary conflict when merging.
+On Fri, Jul 10, 2020 at 7:13 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Fri, Jul 10, 2020 at 06:59:45PM +0530, Kanchan Joshi wrote:
+> > > block doesn't work for the case of writes to files that don't have
+> > > to be aligned in any way.  And that I think is the more broadly
+> > > applicable use case than zone append on block devices.
+> >
+> > But when can it happen that we do zone-append on a file (zonefs I
+> > asssume), and device returns a location (write-pointer essentially)
+> > which is not in multiple of 512b?
+>
+> All the time.  You open a file with O_APPEND.  You write a record to
+> it of any kind of size, then the next write will return the position
+> it got written at, which can be anything.
+I understand if this is about cached write and we are talking about
+O_APPEND in general.
+But for direct block I/O write and ZoneFS writes, page-cache is not
+used, so write(and zone-append result) will be aligned to underlying
+block size.
+Even though this patchset uses O_APPEND, it filters regular files and
+non zoned-block devices by using new FMODE_ZONE_APPEND flag.
 
 -- 
-Jens Axboe
-
+Joshi
