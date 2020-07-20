@@ -2,149 +2,85 @@ Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B4F8C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 09:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE57C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 10:53:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 821D32065F
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 09:20:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 987702068F
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 10:53:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DfbfY0OC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728005AbgGTJUT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 05:20:19 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2504 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727780AbgGTJUS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 05:20:18 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id 0A685CB9C9AD4A7FB5F7;
-        Mon, 20 Jul 2020 10:20:17 +0100 (IST)
-Received: from [127.0.0.1] (10.210.170.208) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Mon, 20 Jul
- 2020 10:20:15 +0100
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "don.brace@microsemi.com" <don.brace@microsemi.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "hare@suse.com" <hare@suse.com>, "hch@lst.de" <hch@lst.de>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "esc.storagedev@microsemi.com" <esc.storagedev@microsemi.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-11-git-send-email-john.garry@huawei.com>
- <d55972999b9370f947c20537e41b49bf@mail.gmail.com>
- <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
- <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com>
- <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
- <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com>
- <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
- <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com>
- <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
- <34a832717fef4702b143ea21aa12b79e@mail.gmail.com>
- <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
- <e69dc243174664efd414a4cd0176e59d@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <4fa30c15-1b94-8b1c-83a8-f1f91f4d8c66@huawei.com>
-Date:   Mon, 20 Jul 2020 10:18:22 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1728404AbgGTKxJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 06:53:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51036 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728348AbgGTKxI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Jul 2020 06:53:08 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE20CC061794;
+        Mon, 20 Jul 2020 03:53:08 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id p3so10137845pgh.3;
+        Mon, 20 Jul 2020 03:53:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=0qEaLy0Hyr3SwuDgUAydri7YBfNLnnwpux/l1PMZrXs=;
+        b=DfbfY0OClpMHAFSaP+f9tqbmvr533JaX4bNcruO+IiubyumIIzF+ZR7evBBXjmuleh
+         R0y0HxshhdySi25YF8SHlPQj7zmSWAFkOKx8mRVYCtJyJKV0U8uGKQMDI+mM6CX2w5+4
+         anzvsNc8DC07lf+jLdDPHBl0IgiIuP7vuYGDkfIRY3kSaTCyPxv/1knuqiQlFm7rzisM
+         1mOuwxynMQKshI3u02qIbMOgyrLi2cQInAdG/nxy8kNET2ktdBZ0CRpK7HTLrisYD/Kt
+         Cmfl8sl+grmeBz3BLzBBu7xYzx1v0wgkdSQdeIZTua85gRztILnYxuw+ULo1+dIy+7Wk
+         E6jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=0qEaLy0Hyr3SwuDgUAydri7YBfNLnnwpux/l1PMZrXs=;
+        b=DHuSQonZ8vMoj6k7LqrTrgw9/zMjj6LM9ZbAYfFpzykwUe1wCi3CUsbuTAEvarhPGX
+         Nsvb8oDdfGagFCFqbUSvQimbuCWnhKNGheElM8T2V600Xdge+I61Onkb21vraShxffL/
+         6Bx5tx7tLv4hwL9lfybRGTgeSxvadmU/XuIoDSPP0pzG8sNxjTac3DHtxeQpPoZbKBNG
+         wRKXnF1S6WPk5YrDJtS1KKcCY/xyrlLBQK8ZaV/c8a7VAAo0nwWqTFWOikfhHIh4kGcs
+         jiQmbpL1glc0NviokDdY2UdVKnzRo1PG0G6lSEvuR1UxzHCBVFP3urqAd/FcgwB1Inrb
+         W7DQ==
+X-Gm-Message-State: AOAM532ijqrwstqvMeGYfEeW/1WcsLEXXXtcuDLuNOYbZiYTZU5pRNYm
+        HhG05RMoH/tZravFWyQkl8ncIgzkSLtCxZ4md19xdXyteas=
+X-Google-Smtp-Source: ABdhPJxSxfvZHSnPCHB3+sKTFypPPlKhNZB18FrBL+Aj0NR3DL6NzsvwlGecY4X4aL9KHFMgvGGlaG7WNOlk0joiKCQ=
+X-Received: by 2002:a65:6714:: with SMTP id u20mr18262640pgf.121.1595242387927;
+ Mon, 20 Jul 2020 03:53:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e69dc243174664efd414a4cd0176e59d@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.170.208]
-X-ClientProxiedBy: lhreml721-chm.china.huawei.com (10.201.108.72) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+From:   Feng Li <lifeng1519@gmail.com>
+Date:   Mon, 20 Jul 2020 18:52:37 +0800
+Message-ID: <CAEK8JBC+0deq-aYeq=xNsypRUkR1gZVpiHjuNjh6MugYSe42XA@mail.gmail.com>
+Subject: [Question] About IO timeout and hang
+To:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20/07/2020 08:23, Kashyap Desai wrote:
+Hi Experts,
 
-Hi Kashyap,
+Consider accessing a "bad" disk, if the user process submits a
+'read/write' request to the kernel through libaio,
+and the kernel doesn't return the IO, because the underlay disk is
+bad, and IO is stuck for a long time.
 
->> John - I did more testing on v8 wip branch.  CPU hotplug is working as
->> expected, 
+When the IO is a 'read', the user-space process has its own timeout
+policy, and find this IO has timeout-ed, then is it safe
+to free the io buffer before IO error return?
+If the user-space doesn't free the buffer and use this buffer as
+another read request, for example, read from another health disk,
+and if at this time the bad disk response the IO,
+will the buffer be corrupted by the before 'read' request?
 
-Good to hear.
+Could anyone help me clarify this concern?
 
-but I still see some performance issue on Logical Volumes.
->>
->> I created 8 Drives Raid-0 VD on MR controller and below is performance
->> impact of this RFC. Looks like contention is on single <sdev>.
->>
->> I used command - "numactl -N 1  fio 1vd.fio --iodepth=128 --bs=4k --
->> rw=randread --cpus_allowed_policy=split --ioscheduler=none --
->> group_reporting --runtime=200 --numjobs=1"
->> IOPS without RFC = 300K IOPS with RFC = 230K.
->>
->> Perf top (shared host tag. IOPS = 230K)
->>
->> 13.98%  [kernel]        [k] sbitmap_any_bit_set
-
-I guess that this comes from the blk_mq_hctx_has_pending() -> 
-sbitmap_any_bit_set(&hctx->ctx_map) call. The 
-list_empty_careful(&hctx->dispatch) and blk_mq_sched_has_work(hctx) 
-[when scheduler=none] calls look pretty lightweight.
-
->>       6.43%  [kernel]        [k] blk_mq_run_hw_queue
-> blk_mq_run_hw_queue function take more CPU which is called from "
-> scsi_end_request"
-> It looks like " blk_mq_hctx_has_pending" handles only elevator (scheduler)
-> case. If  queue has ioscheduler=none, we can skip. I case of scheduler=none,
-> IO will be pushed to hardware queue and it by pass software queue.
-> Based on above understanding, I added below patch and I can see performance
-> scale back to expectation.
-> 
-> Ming mentioned that - we cannot remove blk_mq_run_hw_queues() from IO
-> completion path otherwise we may see IO hang. So I have just modified
-> completion path assuming it is only required for IO scheduler case.
-> https://www.spinics.net/lists/linux-block/msg55049.html
-> 
-> Please review and let me know if this is good or we have to address with
-> proper fix.
-> 
-
-So what you're doing looks reasonable, but I would be concerned about 
-missing the blk_mq_run_hw_queue() -> blk_mq_hctx_has_pending() -> 
-list_empty_careful(&hctx->dispatch) check - if it's not really needed 
-there, then why not remove?
-
-Hi Ming, any opinion on this?
-
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 1be7ac5a4040..b6a5b41b7fc2 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1559,6 +1559,9 @@ void blk_mq_run_hw_queues(struct request_queue *q,
-> bool async)
->          struct blk_mq_hw_ctx *hctx;
->          int i;
-> 
-> +       if (!q->elevator)
-> +               return;
-> +
->          queue_for_each_hw_ctx(q, hctx, i) {
->                  if (blk_mq_hctx_stopped(hctx))
->                          continue;
-> 
-
-Thanks,
-John
-
+Thanks in advance.
