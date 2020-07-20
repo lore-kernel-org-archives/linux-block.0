@@ -2,84 +2,82 @@ Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B8FC433E0
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 08:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59745C433E2
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 08:13:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEB1E2080D
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 08:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33E7A2080D
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 08:13:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="c6MO7wn0";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Sj8fZyc/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="NO7r3MHi";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="krLkY5Ep"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726730AbgGTIL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 04:11:56 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:11686 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726486AbgGTILz (ORCPT
+        id S1726486AbgGTIN2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 04:13:28 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:26567 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726389AbgGTIN2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 04:11:55 -0400
+        Mon, 20 Jul 2020 04:13:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1595232714; x=1626768714;
+  t=1595232829; x=1626768829;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=QcesJcF1Ypn74ChTM9l6qSR5D2LPDejOPPVa38NBU5A=;
-  b=c6MO7wn0wC9XtqXe7r68+MVdue3C61+gd3zd5JqFZZENrhPz8jVYJ+Ao
-   6dCNoP72Dc8Ozpe4JH+7akQtqYKogE2DLwkz9C9euJwigQwwB122e0ZYv
-   WL3/kTnQmUck4YU1UapB+Xl+nkpMudySGlsHqmgMs6IdNQ5nsbQlFjDGD
-   OyYwSPLKNNWWYFFa2cM/GIQIst9SRar+jMIcjo9mdstEfJsle60/vbE5F
-   zsifdHZdMcdpNh42Aw2fmQQ5M7jf0K+aIs66TGd6q7W4IZrZX5pOfjg5E
-   3NeFNzg94Pq/TsHnAQ2/IP3t9JrKGQRlqYUJvVC8bo2djevfO3Dnd+Z98
-   w==;
-IronPort-SDR: 4SW1Mn9CGPxIRwPq4jToTj1pz4+M4+OvAa2XxV5nsO+yEvYLR30lQ0iN0aHWPfZ+qzfyQpUMGc
- OQ4sGBJtM4UuvKOghmcsawhBncm37zNaaVE6+YL8mtmhjO7Pr4KI1OUMEfKLAWqV7VqUgx9/Aq
- dQCLknARcIkjRlsTL2QoUXWOAagL8yVmmuWh7oiwzJRI9QUt8yYAyPPHeH2BEkBZXv+TO76Bw1
- nBwukOVKbPxllfJ1Aw2jkfPgt6mc2xvbV2SLQn3WdjYuGyges6754RcOdfCZPVxh3w5o2Ex1Jf
- 9G0=
+  bh=50VKRs6PP3DMV5tGSXe9WhwMva6wOsXu1yjTKjdUYhc=;
+  b=NO7r3MHiCY2HwCs6KJoVIltu5gEHkE/aHSmnmugrJPTmB2sbplnDC6NP
+   igwKjiUkSSfbuCmiwHA8MMFULHy7vkX7OUx8WDaMPX2kK0f4Y62DCDoN+
+   hkE+Diyj3QAAK+1IbkAipEq0LJxR9I4HDmQdP5XykGztnIKcYr4BJh2HQ
+   XzsH/ucfO8WbnVJppicSxQigDqHiIgvA8tsKju9sCbAI9DQFYCXZtB723
+   Dm+FCgkkue03M3nZ9GgP9THp/6D+Qhj7Awl2sOnMOPia+m7qyAhymZ+lH
+   egiVGXL3BOAKbKlqKU9ufkbdBkphMMCCV9OOa2VuGMGoAE89O0zddb+nx
+   g==;
+IronPort-SDR: mbD0LHmvs3e9DYdeaCisNne+U2VKE1sXx0DnRQXK1QxeYjAQBJ1tX+WcoaxwTztGnbnAhjjN8q
+ D5TAn/rAfyrqVpVgp9P81EYoJs1Y6WiP2U0j6DoVDIHARi0p6+T91QvHp2BbBw6fdPUshQiHqr
+ NBOF9xmI6G4dBu21MNFVQXyXlO/N/khvwEON3Qb7YPgnUvJIbiziC9chomMpSpsNb/e0VoDV12
+ D/+v28pe8iwPKYbRPvk4NyHEfrvUzxreCXwMwshb7VDA2NEDB0rg6lCO8rnHMpCTWBAcd8AWq6
+ 7i8=
 X-IronPort-AV: E=Sophos;i="5.75,374,1589212800"; 
-   d="scan'208";a="252169118"
-Received: from mail-bl2nam02lp2052.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.52])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Jul 2020 16:11:54 +0800
+   d="scan'208";a="245934841"
+Received: from mail-bl2nam02lp2054.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.54])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Jul 2020 16:13:48 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K5/kV09nTi0JtQYdxHeRCB0v392Cvsu/IutB6gfakq4xQ/ZxSHgiY/KIZIWMvbc35jgjYxZh8E8Bmb7H//HiJelGcIXNRN+EiMBNwU3wen8Q5JTGnRwQ0+haQGttApl5ttxata2VylcF+/joIrGui+Uabnmw/eDB5rNEVBjLT0qdDsKhFCtz9yyyH/PUOjJqn320Y3EtCOuJzPGtCyiOPF6GMiLjUnGlAlPb1sih1nPGm4Pi+xYiI1GSM5ktCegEcKO3vvPYXijwOKbcpki7VI0r/aejqWGoEdAn2enoyJSQn1PMljx+eD8i9uf8qicnuHqBwX5p43gtduCItsZD4g==
+ b=Bv/nJaajFHa8GfkewMVHfcIeimfNfvwN3bSQqC3MrG8pTEdjXwT4I5zKfEkYlKC8URlYAa5XwIcNcPlf9Ru0fX/pGNSFbGq0USrumJLEqYPyC3X2Nv1kKQYd6vFojO1Ota99nj2Lce4A85njDCWKVK7i02VU02xWtrbrpA5uwmlNFpfg39Z7mwXHL788F2h0eq+q5X/hiRJqLIYjvAk+Q//rDPdCPtZxh0O5nHmsFPTvL8D3fgJANv5gLZMksnW3xSFfJr3ByfN0KI+xqxBriuxqqiSaiKXIBA3FyKyjhUKKcxh1lTymZVSRcY6CoD3mLtnu1hjzBv3q2J6cupTpyg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tCDUczjUfbBszB4LlUJ0eKZyo9+3zmUBL08Ot2EkTX8=;
- b=lr+OlFZvkkaNwFoZwlIpvouRbzDfFaZW3xMQJSK2dnA+NmQAk7A49zkoVDagbHFxZZHZSeYIQAjyV0KBOnvzvJf86yPgHrO/A9z8TO+hdBO2vDy8A/KP5107r1lTgDPkzpPaNOV43wgzABAYXM6yrK6ZEuPWBT6PRTAHu9227jQ8aW4QRT/3AQ0qnCBNh6WpJZPeWKpgYl/cX1l5KKCaKCYbFTGliHUtudLFDS0+0bNoWf9hmcKBW6+M4lGJ+FjOpdcuyvmvsnVXwmxUDKbblbRpv0LgAzi+U8OZv6Cc61nHkp5euAG5yLYK5++2E4xkrqDC49qW0OYIeViusiKr9g==
+ bh=50VKRs6PP3DMV5tGSXe9WhwMva6wOsXu1yjTKjdUYhc=;
+ b=IIk7jmrZsJFBfggD5scTYuW1k0L0neO+3t5NePtxay9dkNyh7Lq52SXrYo3I0uudV3cVh45fXNHMzfI3uS1T7qSY99U3ewFTJJ1gwrdgy96vPxlQT8Ha8Jh1EEmlKymTfsk42Qs/7e4ytxnwwgx0FfPaspHzfguhKdXlUjAHHALn0XTwnxotQ9Wp4FOOVGlh4ZUflv9X9PmcuwzYGWE31yNJGhsTyV3o3h8iig2NWTe6Ta7Xu4pe5tR1h1N48cJLezjSEpTtwLSfpeiE4Eddn/0cBaVIgcvuUTdhLRd8CoiesR8uvWqfg4Ecd8Wa0Xkb2A81WeI34xRv/Dfcfmp3Lg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tCDUczjUfbBszB4LlUJ0eKZyo9+3zmUBL08Ot2EkTX8=;
- b=Sj8fZyc/OfJWdcwLnq+OMu6sPxPQqPVWNJDPKiIwJmV+kBq/JTF08uAfIsBiD6fLng0CFqI5IXoTgMW/w5cYW0kkccjSfWCinUJnCOf0oGizkhzbmiQPF+xX3Cz/FInBN7K03fzVKZAP85Oox8gV1Sz4+ReK+WUhklzvaXbVt/I=
+ bh=50VKRs6PP3DMV5tGSXe9WhwMva6wOsXu1yjTKjdUYhc=;
+ b=krLkY5EpxuslbOqAen3eIJV3cSp2L0nbLQ8HlhL5mABgB2kBRnVAQr7w616SDqYEV/x1Wp6gK383Jx0PMN1ucgHagX/W7in7SQn6xUkqRziSD0DYHcQW8PqFynFM9wdJvJ7hSRuaCnrcpIDpjr/4PhJfqlljeJNdyJSGJhH8XCg=
 Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
  by CY1PR04MB2220.namprd04.prod.outlook.com (2a01:111:e400:c60e::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.23; Mon, 20 Jul
- 2020 08:11:53 +0000
+ 2020 08:13:25 +0000
 Received: from CY4PR04MB3751.namprd04.prod.outlook.com
  ([fe80::d9e5:135e:cfd9:4de0]) by CY4PR04MB3751.namprd04.prod.outlook.com
  ([fe80::d9e5:135e:cfd9:4de0%7]) with mapi id 15.20.3195.025; Mon, 20 Jul 2020
- 08:11:53 +0000
+ 08:13:25 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
 To:     Christoph Hellwig <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: [PATCH 3/3] block: remove blk_queue_stack_limits
-Thread-Topic: [PATCH 3/3] block: remove blk_queue_stack_limits
-Thread-Index: AQHWXlzVh7oGnzbSMEeGw8J4Z4JGYg==
-Date:   Mon, 20 Jul 2020 08:11:53 +0000
-Message-ID: <CY4PR04MB37519991BBC1A1341F3CBFA6E77B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+Subject: Re: a fix and two cleanups around blk_stack_limits
+Thread-Topic: a fix and two cleanups around blk_stack_limits
+Thread-Index: AQHWXlzSo6SIEk/VxUe714FCmwMHuQ==
+Date:   Mon, 20 Jul 2020 08:13:25 +0000
+Message-ID: <CY4PR04MB3751242EF7AE2172A719F201E77B0@CY4PR04MB3751.namprd04.prod.outlook.com>
 References: <20200720061251.652457-1-hch@lst.de>
- <20200720061251.652457-4-hch@lst.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -89,16 +87,16 @@ authentication-results: lst.de; dkim=none (message not signed)
 x-originating-ip: [129.253.182.57]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 47495b88-b2aa-4873-44ee-08d82c848fbb
+x-ms-office365-filtering-correlation-id: 4023288c-0cfe-47a3-828a-08d82c84c6e3
 x-ms-traffictypediagnostic: CY1PR04MB2220:
-x-microsoft-antispam-prvs: <CY1PR04MB2220E56A3397BBC7AEC3F43BE77B0@CY1PR04MB2220.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <CY1PR04MB22200F1BBCF50B9BBD4258EDE77B0@CY1PR04MB2220.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
+x-ms-oob-tlc-oobclassifiers: OLM:3968;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: pN3tNSp2o96/RaAs3mzVFoz1eXRn6jJpR0H5B5xLcJLxbNlE680CXE24ny5oOf8xVkcCQHrHeNydErvb7fnH/y0YA1CixF0sjZIlB7cAg0LbGe6ABw0MosX7xS2gU3ZnPGlXFX4F6CI3tE6OpsbTpC5IxdoId5Z+7fcqpUG0JEZM0bfWTmFBbTTt63BvcVPnXqs/BlMF4QF8z6g9pw1X2u0fag3q38WPwGNuJnxDDnGbKuoLZTRuLsHqraXNCoMnGk/9cEFhmnzuc4nJIYovuGpONqqV/5S0nfbZo/ubm/dmP5Q8dHASllJbPchf1MC8gwxGOJMWO1takzLjMMwlRA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(366004)(346002)(136003)(376002)(83380400001)(8676002)(7696005)(71200400001)(66946007)(316002)(55016002)(66476007)(2906002)(8936002)(478600001)(53546011)(6506007)(186003)(33656002)(86362001)(5660300002)(110136005)(52536014)(66446008)(64756008)(66556008)(4326008)(26005)(9686003)(76116006)(91956017)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: H+usXrfvklC4It3GgDcByq9VR0zdO2/byjC1S260C8D6TQexS9Gw0gauF/LLd96dlLANwI1gOxsoBayKIpTg3bhlwGFxkct/I4EcXc6WSllEfDqHHtkzue+nAk0kf4Vv1OHHmS6xi0TA5gyiK6rMbEIfUwTpuJlBQmaNOq3AzkYjuVWlHmrqSDRwtIRXfdNIqLgVGSVpkJzUgflDiVLIHNJJJsBRrwR4cnrbub1SvslepNYkxOxfRnqWJAwZWIGBzVHDusPT1wwBypWUZzRZcWGreuIDFeD6x1K4CDj06v1EUgZCLV2G3yRnWxsmWeP2l0htGMAemcrhvr5vaW5d+jR8Jka4fy//6t7RsBmwiFyQ22+0+PL1gMycJ2dvSfQYMpQSUDbcXVLyiaJZY2Y123SRig1twEiXd+GYvrFEn2TreC6nIPdzFsQYclNG0jaJMWqCLXVXyfb85mZ0+UkDnUmldHn9UgjsNfjxk0lEQMW7c4v0fplcC/GLWP8F0tih
+x-microsoft-antispam-message-info: PGVSv1pcDhicHPCFelzhY2O9cC3rLmsUFaVe3yL8PDMtAu8FfJ3V2dSNCrx4KEPfdpZGv/d3Iso5RDd1ToXz+5I4eoXs1mCtnXR3hzeSyAHFPxqBpFPrW0wxKM0dCSq3Py0rqR/r68EjxG53wscaYt1I56xLXLbTIdU/Q8IMZKQf1jtsmxbHd5aM4J6rEoayniG/D82FbWSQzct54d6dsAiOdQY1/iahUSdoSqp1g5yJI14be2gPePj/yjFbZznA+1s7c351kTZGhtxtAgRv6q1yH9VmK5kH6Chi7qk4svm6iCQ9PA34Crhi2xJN4n0p
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(136003)(346002)(366004)(396003)(39860400002)(6506007)(53546011)(186003)(2906002)(316002)(55016002)(66476007)(478600001)(8936002)(9686003)(4326008)(26005)(91956017)(54906003)(76116006)(86362001)(5660300002)(33656002)(110136005)(52536014)(66446008)(64756008)(66556008)(66946007)(4744005)(7696005)(71200400001)(8676002)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: D2nwjhA4GRlR6LIiZqOQcaV8KisqqjVJPiL+G3Dzvi1sjrynV6+IsXvDkgBSMuR0omLVYWsM32GCKCthS6E+9zBTiE1PMNHNQsSFI3f+qQ43sjeI/d1XHR3r5nGrwZ19Y1I8kPsSvV51/ZePp61i20oxWD52jX2+vJ/D4ghsyBbMuczBjnkVpc7zsRcg9V8IY8DidGFAJk3W32WjniqK5vDOY9wpR6CT7d8T2GomO21vdDcxiHOmImFDSb31WRuI6RHmkA1i87P7HVBfa+Cyla18OvvjfevBhy2+2ICxjiefdijx3+eBmqD8DXD+Gmd3rQxWEyYJlzF8Q5oP1rhG5mIuDDk+z++dejI8iAmBZlsafZo0o4U1mu0qXCmyaYwabB9/OhSMAhlt5BSIivs/BIqCqsHjQIANjwl8L2OXA1+sUUJPrXGpUKdO1cx6RMQyVvVaK4u6E4ijPQmLG1M5eYffts2xA2751PvhPYsbvCQKTcpuP5XXWV4ifO69d3GQ
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
@@ -106,13 +104,13 @@ MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47495b88-b2aa-4873-44ee-08d82c848fbb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2020 08:11:53.0325
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4023288c-0cfe-47a3-828a-08d82c84c6e3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2020 08:13:25.6319
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NdGGmHrVwKrbgbYcE8Ahdm3+0J1JFLTh2R1pJJBXWpnDjP1ooiUMdnRuZud7soaoZIqVMtcA/Iv61VGSH4fkRg==
+X-MS-Exchange-CrossTenant-userprincipalname: kMDc+0yXC417TPpfT/J8n5RNHwOocazEESzip8O/VUPaCqEi3wqmCtYd2Y3Xa1kRH6nOBGNimWFQiAkosUPRhA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2220
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -120,107 +118,18 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020/07/20 15:13, Christoph Hellwig wrote:=0A=
-> This function is just a tiny wrapper around blk_stack_limits.  Open code=
-=0A=
-> it int the two callers.=0A=
+> Hi Jens,=0A=
 > =0A=
-> Signed-off-by: Christoph Hellwig <hch@lst.de>=0A=
-> ---=0A=
->  block/blk-settings.c         | 11 -----------=0A=
->  drivers/block/drbd/drbd_nl.c |  4 ++--=0A=
->  drivers/nvme/host/core.c     |  3 ++-=0A=
->  include/linux/blkdev.h       |  1 -=0A=
->  4 files changed, 4 insertions(+), 15 deletions(-)=0A=
-> =0A=
-> diff --git a/block/blk-settings.c b/block/blk-settings.c=0A=
-> index 8c63af7726850c..76a7e03bcd6cac 100644=0A=
-> --- a/block/blk-settings.c=0A=
-> +++ b/block/blk-settings.c=0A=
-> @@ -455,17 +455,6 @@ void blk_queue_io_opt(struct request_queue *q, unsig=
-ned int opt)=0A=
->  }=0A=
->  EXPORT_SYMBOL(blk_queue_io_opt);=0A=
->  =0A=
-> -/**=0A=
-> - * blk_queue_stack_limits - inherit underlying queue limits for stacked =
-drivers=0A=
-> - * @t:	the stacking driver (top)=0A=
-> - * @b:  the underlying device (bottom)=0A=
-> - **/=0A=
-> -void blk_queue_stack_limits(struct request_queue *t, struct request_queu=
-e *b)=0A=
-> -{=0A=
-> -	blk_stack_limits(&t->limits, &b->limits, 0);=0A=
-> -}=0A=
-> -EXPORT_SYMBOL(blk_queue_stack_limits);=0A=
-> -=0A=
->  /**=0A=
->   * blk_stack_limits - adjust queue_limits for stacked devices=0A=
->   * @t:	the stacking driver limits (top device)=0A=
-> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c=
-=0A=
-> index da4a3ebe04efa5..d0d9a549b58388 100644=0A=
-> --- a/drivers/block/drbd/drbd_nl.c=0A=
-> +++ b/drivers/block/drbd/drbd_nl.c=0A=
-> @@ -1250,7 +1250,7 @@ static void fixup_discard_if_not_supported(struct r=
-equest_queue *q)=0A=
->  =0A=
->  static void fixup_write_zeroes(struct drbd_device *device, struct reques=
-t_queue *q)=0A=
->  {=0A=
-> -	/* Fixup max_write_zeroes_sectors after blk_queue_stack_limits():=0A=
-> +	/* Fixup max_write_zeroes_sectors after blk_stack_limits():=0A=
->  	 * if we can handle "zeroes" efficiently on the protocol,=0A=
->  	 * we want to do that, even if our backend does not announce=0A=
->  	 * max_write_zeroes_sectors itself. */=0A=
-> @@ -1361,7 +1361,7 @@ static void drbd_setup_queue_param(struct drbd_devi=
-ce *device, struct drbd_backi=0A=
->  	decide_on_write_same_support(device, q, b, o, disable_write_same);=0A=
->  =0A=
->  	if (b) {=0A=
-> -		blk_queue_stack_limits(q, b);=0A=
-> +		blk_stack_limits(&q->limits, &b->limits, 0);=0A=
->  =0A=
->  		if (q->backing_dev_info->ra_pages !=3D=0A=
->  		    b->backing_dev_info->ra_pages) {=0A=
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c=0A=
-> index 5192a024dc1b9c..45c4c408649080 100644=0A=
-> --- a/drivers/nvme/host/core.c=0A=
-> +++ b/drivers/nvme/host/core.c=0A=
-> @@ -1973,7 +1973,8 @@ static int __nvme_revalidate_disk(struct gendisk *d=
-isk, struct nvme_id_ns *id)=0A=
->  #ifdef CONFIG_NVME_MULTIPATH=0A=
->  	if (ns->head->disk) {=0A=
->  		nvme_update_disk_info(ns->head->disk, ns, id);=0A=
-> -		blk_queue_stack_limits(ns->head->disk->queue, ns->queue);=0A=
-> +		blk_stack_limits(&ns->head->disk->queue->limits,=0A=
-> +				 &ns->queue->limits, 0);=0A=
->  		revalidate_disk(ns->head->disk);=0A=
->  	}=0A=
->  #endif=0A=
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
-> index 247b0e0a2901f0..484cd3c8447452 100644=0A=
-> --- a/include/linux/blkdev.h=0A=
-> +++ b/include/linux/blkdev.h=0A=
-> @@ -1108,7 +1108,6 @@ extern int blk_stack_limits(struct queue_limits *t,=
- struct queue_limits *b,=0A=
->  			    sector_t offset);=0A=
->  extern void disk_stack_limits(struct gendisk *disk, struct block_device =
-*bdev,=0A=
->  			      sector_t offset);=0A=
-> -extern void blk_queue_stack_limits(struct request_queue *t, struct reque=
-st_queue *b);=0A=
->  extern void blk_queue_update_dma_pad(struct request_queue *, unsigned in=
-t);=0A=
->  extern void blk_queue_segment_boundary(struct request_queue *, unsigned =
-long);=0A=
->  extern void blk_queue_virt_boundary(struct request_queue *, unsigned lon=
-g);=0A=
+> this series ensures that the zoned device limitations are properly=0A=
+> inherited in blk_stack_limits, and then cleanups up two rather=0A=
+> pointless wrappers around it.=0A=
 > =0A=
 =0A=
-Looks good.=0A=
+Tested with dm-linear, dm-crypt and dm-zoned multi device setup (from dm-5.=
+9=0A=
+tree). No problems detected.=0A=
 =0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+Tested-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
 =0A=
 -- =0A=
 Damien Le Moal=0A=
