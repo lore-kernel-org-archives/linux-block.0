@@ -2,98 +2,103 @@ Return-Path: <SRS0=KbiG=A7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFBDC433E2
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 21:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E66C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 21:35:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 391A2208E4
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 21:28:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91CEC207FC
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 21:35:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EulKUbZ0"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="l8FDkzqv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbgGTV2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 17:28:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36184 "EHLO
+        id S1726419AbgGTVfr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 17:35:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726428AbgGTV2J (ORCPT
+        with ESMTP id S1726012AbgGTVfq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 17:28:09 -0400
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9917AC061794;
-        Mon, 20 Jul 2020 14:28:09 -0700 (PDT)
-Received: by mail-qk1-x743.google.com with SMTP id b79so3438304qkg.9;
-        Mon, 20 Jul 2020 14:28:09 -0700 (PDT)
+        Mon, 20 Jul 2020 17:35:46 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62AAEC061794
+        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 14:35:46 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id a11so14661205ilk.0
+        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 14:35:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Sh/KLSzQqnJr0/PMf2DmO5rUtVYfFwMH4ti+obo2a7s=;
-        b=EulKUbZ0padoY58Gz7BUn19Q8Hk6KEJaTssCqM4lILM7IAI6zewfZh8oqNUoUyQoQB
-         7NTznTeKJycRqCHBebiJHdUDc3dJuXT4oWkSqv7Nd8vAXT58D5mHAgRZrE/rlefmctXk
-         iF0R314VBwwyPtZ5vQ9GjPl1jHRYIZxMQkWwbkCU5KpbxSiLWlT5Nqva2QiK7czML7c5
-         URTZec+Vmlsd24zt83lXA6dlTzT6u6pS8nCtPCyLiAvWG+LFRFdZ5hizdC/H3ow8Mkn8
-         0jt58w1ztanJnkcf9f7qnHKksF3N35HduNlT0BJ1Z5fBq2yUpp1KgYjnlkc1j3tOh7m6
-         BfSQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=y4WvrFF4oT60WCYFzoEKcEPOboTCnMH1fSK6qyG/Ly4=;
+        b=l8FDkzqvqY6XDitCTANqZJqam+Me0W3VxU8H50jZXASL9c9dKhuySoSJVmWOsnL1Sm
+         GlzJtEkdqGAwZRlgavRwLugcX7++0gOi2/uOOHfnW3IAIKSNscSZYuD34vb8MjPxNlFW
+         ADt9xoQxuGfdLIHSJmMbwBiE/u2DZlN1DwqXOtTHrVvn0mrOrALURftJuLNIaF+zKAGY
+         ej4uDgU49kC0Oc72dRGmmtjeu92URIATJJn3Pu1UOAOcHZjJ35/yfjkkR1yXoZN1PbSd
+         tSliN/a50XAwAX3U92GiJ2PJUMSvkDDvx7o1P10d5l/qPsV2nlFlY4osP0kqbpSRje5A
+         sfKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Sh/KLSzQqnJr0/PMf2DmO5rUtVYfFwMH4ti+obo2a7s=;
-        b=gudpn3MvtSCEHHB0yIwr2tNZ7iTRR6paf8TE9QGtm8N21TzL8EAOmTXkXVeeY1XHWv
-         cjbIIWrttcbKsaAt/2KDbtk09ZAEbD8wP0e26XPVrFCS2KLu5n8OeCJqYyRzZKWKuMUD
-         NGOx7UKpcYTNxM+CHuQHUWS2nHmWiZ5nXAj8uEec5XnPo07UVlJDguRECN/8O3jZFv2x
-         6/VJawQshzzMvW1vRKwW2Ta2HJxdtkalfzx0Ip5eikVW2CMU2rJrDRJrQndGShI6Lw1z
-         LS9Wn2Sn52WL+f3fSgUN1qiCG2GizDjzhv40MVCOVmfIeRnpFb87joet8qsq3/wiY1UB
-         7T/A==
-X-Gm-Message-State: AOAM532TvstF8Ibwg0zJQyXGeHwLuThUHDBwJsu5BZ3nyWwxs4nj1T3y
-        qK2RnpOSFAyqvGT6920E676dFD/gpJBFwtUgGF0=
-X-Google-Smtp-Source: ABdhPJzsaontx5ozyXPRUXIspav4OYKL8Yae9yGB7WLujLekyBKPAJ+mXHiIErPXcPeOXd4tel2AAhIoC764A4fM5+Q=
-X-Received: by 2002:a37:9147:: with SMTP id t68mr23191512qkd.34.1595280488864;
- Mon, 20 Jul 2020 14:28:08 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=y4WvrFF4oT60WCYFzoEKcEPOboTCnMH1fSK6qyG/Ly4=;
+        b=nGGQxAkcT41+3SHZK5j2v6/bv7JywkR14F4Uqvx91pMja0OQ1pL3aDd6HlM7+ctgTf
+         8LEK2PA1eRyCCzAYm6ZqbnN+D3o2J+2NFnIrhC8+0lsUGu3hOtq0/NNSjbymf9OAk8SB
+         rTDhC+ndyVhKDDo0clD6LLyqm2e0WIe1jr+lJAPWP/Z83OVmfL/dzoapLCYuGvCvTni/
+         e7pyF61w+xxHNqkpSP10oRfWfxTtoFsmL3LaotG75/qlDCGXaBkzA1wn9hzHbDCZZSKh
+         SuE/72wUkdsjmKOOks1encIknofDGCPqPKzyyOAKmwE82onQcjuoMA2OIodtDYjnz+cD
+         5d4w==
+X-Gm-Message-State: AOAM533qImUCrOrm8RthnguehN7e55FicVy2t8foL613/eDdjovo5mSj
+        W7M+wkdkFx18KgeTNL+SLo7CgQ==
+X-Google-Smtp-Source: ABdhPJzfbtVS2ywymY14m6Uc8uJPxy+acgbORpzyzeKQBWPDwVaDILjxcWyHjBgsOE25AY9kZzSQtA==
+X-Received: by 2002:a05:6e02:4ca:: with SMTP id f10mr25177577ils.291.1595280945704;
+        Mon, 20 Jul 2020 14:35:45 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id c77sm9628425ill.13.2020.07.20.14.35.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jul 2020 14:35:45 -0700 (PDT)
+Subject: Re: a fix and two cleanups around blk_stack_limits
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Damien.LeMoal@wdc.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+References: <20200720061251.652457-1-hch@lst.de>
+ <dfe56cf2-db3d-3461-9834-be314f4080ef@kernel.dk>
+ <20200720173530.GA21442@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ab942c19-68c3-2a76-b3b2-136a2bf3ca54@kernel.dk>
+Date:   Mon, 20 Jul 2020 15:35:44 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200720075148.172156-1-hch@lst.de> <20200720075148.172156-5-hch@lst.de>
- <CAFLxGvxNHGEOrj6nKTtDeiU+Rx4xv_6asjSQYcFWXhk5m=1cBA@mail.gmail.com>
- <20200720120734.GA29061@lst.de> <2827a5dbd94bc5c2c1706a6074d9a9a32a590feb.camel@gmail.com>
-In-Reply-To: <2827a5dbd94bc5c2c1706a6074d9a9a32a590feb.camel@gmail.com>
-From:   Richard Weinberger <richard.weinberger@gmail.com>
-Date:   Mon, 20 Jul 2020 23:27:57 +0200
-Message-ID: <CAFLxGvyxtYnJ5UdD18uNA97zQaDB8-Wv8MHQn2g9GYD74v7cTg@mail.gmail.com>
-Subject: Re: [PATCH 04/14] bdi: initialize ->ra_pages in bdi_init
-To:     Artem Bityutskiy <dedekind1@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-raid@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        Song Liu <song@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-mtd@lists.infradead.org, linux-mm@kvack.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        cgroups mailinglist <cgroups@vger.kernel.org>,
-        drbd-dev@lists.linbit.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200720173530.GA21442@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 2:37 PM Artem Bityutskiy <dedekind1@gmail.com> wrote:
->
-> On Mon, 2020-07-20 at 14:07 +0200, Christoph Hellwig wrote:
-> > What about jffs2 and blk2mtd raw block devices?
+On 7/20/20 11:35 AM, Christoph Hellwig wrote:
+> On Mon, Jul 20, 2020 at 10:56:23AM -0600, Jens Axboe wrote:
+>> On 7/20/20 12:12 AM, Christoph Hellwig wrote:
+>>> Hi Jens,
+>>>
+>>> this series ensures that the zoned device limitations are properly
+>>> inherited in blk_stack_limits, and then cleanups up two rather
+>>> pointless wrappers around it.
+>>
+>> We should probably make this against for-5.9/drivers instead, to avoid
+>> an unnecessary conflict when merging.
+> 
+> Then we'd also need a merge as my next series depends on this, and it
+> clearly is core material.  Not sure which one is more important.
 
-I don't worry much about blk2mtd.
-
-> If my memory serves me correctly JFFS2 did not mind readahead.
-
-This covers my knowledge too.
-I fear enabling readahead on JFFS2 will cause performance issues, this
-filesystem
-is mostly used on small and slow NOR devices.
+Hmm, might make more sense to kick off a branch topic for this and just
+merge it after the other ones.
 
 -- 
-Thanks,
-//richard
+Jens Axboe
+
