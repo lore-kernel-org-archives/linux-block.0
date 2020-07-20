@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E227C433E7
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 07:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2724C4345C
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 07:53:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C52620674
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 07:53:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79B3022C7B
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jul 2020 07:53:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="R6OsUSxk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="flVROLQu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728162AbgGTHxW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 03:53:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50648 "EHLO
+        id S1727052AbgGTHwD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 03:52:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727829AbgGTHwI (ORCPT
+        with ESMTP id S1727774AbgGTHwC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 03:52:08 -0400
+        Mon, 20 Jul 2020 03:52:02 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D3F6C061794;
-        Mon, 20 Jul 2020 00:52:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CCF5C061794;
+        Mon, 20 Jul 2020 00:52:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=UaxK9i4Mki9lVWLBCoh/BWGT2dspFfc4dGG4K3OkffY=; b=R6OsUSxkp5x6W991243/6zzLTz
-        uCt4Vfakh2gcksb/nlks10bjRsnek2/VGUkw4ETEjBN3hUPcjLEBvT6+ybN+SjRHlwg1ZVIwwSeIl
-        YfivaWzU80xjqeJ6jLgjK4uMJiwuC+b8R/HBWvG/18JFbDf4Z+1i9FVzuFAnwo03AXF7JgMzyYwAH
-        YD+XONxAKf5S4Yj9/x2YBp/QNn38hGRsl+pFW3MooMNxsiFuk1q4V8e+Ewqi4ENWQOYFrfP6VP53e
-        TAGj8ulu8jjjNzq525xZnm5QWbEJqsI76LH4o+v/E2NYFdRezBQR0lJQr78I8Zf2uuMPtceNYQGIz
-        2VwEdTag==;
+        bh=CuUaZG9Qhitrr+iOhUhgyWHM76MKMZjl3OX8RO552bE=; b=flVROLQubR6uF1pCvEN9P45yX8
+        5OLapfMKCH0fY2r35ViO2jMD0d4StlwWmgHdCrsXL7HSL44gfNJRb2hVc1XqgP4UwA7wccIEHL3o7
+        LxyAjWM5UEjl3VtB5ooa5L5xa8pASt6teZcxkL6m5Y0NO5F75MnjygFOIleuz9LwqjYbVsd+Ic722
+        BMaSQMfg9fPWIjfJs3NP+wah/dr3BLa8zbN8rg33h9tju4hfj61KvRciKJOnAIMoAW7W7oQ9zLeu+
+        dzMDoZv+isOyqu3IqtuWZrIeVd/D56WGbsd9+Tj+a8wrPCO4FD2P9xsKH32tkikbg9cegkxdWwvXq
+        e/kaZwKQ==;
 Received: from [2001:4bb8:105:4a81:5185:88fc:94bb:f8bf] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jxQag-00041a-64; Mon, 20 Jul 2020 07:52:02 +0000
+        id 1jxQaU-0003zM-Ln; Mon, 20 Jul 2020 07:51:51 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
@@ -47,9 +47,9 @@ Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
         drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         cgroups@vger.kernel.org
-Subject: [PATCH 07/14] block: make QUEUE_SYSFS_BIT_FNS a little more useful
-Date:   Mon, 20 Jul 2020 09:51:41 +0200
-Message-Id: <20200720075148.172156-8-hch@lst.de>
+Subject: [PATCH 01/14] fs: remove the unused SB_I_MULTIROOT flag
+Date:   Mon, 20 Jul 2020 09:51:35 +0200
+Message-Id: <20200720075148.172156-2-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200720075148.172156-1-hch@lst.de>
 References: <20200720075148.172156-1-hch@lst.de>
@@ -61,85 +61,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Generate the queue_sysfs_entry given that we have all the required
-information for it, and rename the generated show and store methods
-to match the other ones in the file.
-
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-sysfs.c | 31 +++++++++----------------------
- 1 file changed, 9 insertions(+), 22 deletions(-)
+ fs/namei.c         | 4 ++--
+ include/linux/fs.h | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index d7cf560efa92e5..358268bb88b700 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -257,16 +257,16 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
- 	return queue_var_show(max_hw_sectors_kb, (page));
- }
+diff --git a/fs/namei.c b/fs/namei.c
+index 72d4219c93acb7..e9ff0d54a110a7 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -568,8 +568,8 @@ static bool path_connected(struct vfsmount *mnt, struct dentry *dentry)
+ {
+ 	struct super_block *sb = mnt->mnt_sb;
  
--#define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
-+#define QUEUE_SYSFS_BIT_FNS(_name, flag, neg)				\
- static ssize_t								\
--queue_show_##name(struct request_queue *q, char *page)			\
-+queue_##_name##_show(struct request_queue *q, char *page)		\
- {									\
- 	int bit;							\
- 	bit = test_bit(QUEUE_FLAG_##flag, &q->queue_flags);		\
- 	return queue_var_show(neg ? !bit : bit, page);			\
- }									\
- static ssize_t								\
--queue_store_##name(struct request_queue *q, const char *page, size_t count) \
-+queue_##_name##_store(struct request_queue *q, const char *page, size_t count) \
- {									\
- 	unsigned long val;						\
- 	ssize_t ret;							\
-@@ -281,7 +281,12 @@ queue_store_##name(struct request_queue *q, const char *page, size_t count) \
- 	else								\
- 		blk_queue_flag_clear(QUEUE_FLAG_##flag, q);		\
- 	return ret;							\
--}
-+}									\
-+static struct queue_sysfs_entry queue_##_name##_entry = {		\
-+	.attr	= { .name = __stringify(_name), .mode = 0644 },		\
-+	.show	= queue_##_name##_show,					\
-+	.store	= queue_##_name##_store,				\
-+};
+-	/* Bind mounts and multi-root filesystems can have disconnected paths */
+-	if (!(sb->s_iflags & SB_I_MULTIROOT) && (mnt->mnt_root == sb->s_root))
++	/* Bind mounts can have disconnected paths */
++	if (mnt->mnt_root == sb->s_root)
+ 		return true;
  
- QUEUE_SYSFS_BIT_FNS(nonrot, NONROT, 1);
- QUEUE_SYSFS_BIT_FNS(random, ADD_RANDOM, 0);
-@@ -651,12 +656,6 @@ static struct queue_sysfs_entry queue_zone_append_max_entry = {
- 	.show = queue_zone_append_max_show,
- };
+ 	return is_subdir(dentry, mnt->mnt_root);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 1d7c4f7465d24c..613323008519ca 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1365,7 +1365,6 @@ extern int send_sigurg(struct fown_struct *fown);
+ #define SB_I_CGROUPWB	0x00000001	/* cgroup-aware writeback enabled */
+ #define SB_I_NOEXEC	0x00000002	/* Ignore executables on this fs */
+ #define SB_I_NODEV	0x00000004	/* Ignore devices on this fs */
+-#define SB_I_MULTIROOT	0x00000008	/* Multiple roots to the dentry tree */
  
--static struct queue_sysfs_entry queue_nonrot_entry = {
--	.attr = {.name = "rotational", .mode = 0644 },
--	.show = queue_show_nonrot,
--	.store = queue_store_nonrot,
--};
--
- static struct queue_sysfs_entry queue_zoned_entry = {
- 	.attr = {.name = "zoned", .mode = 0444 },
- 	.show = queue_zoned_show,
-@@ -679,18 +678,6 @@ static struct queue_sysfs_entry queue_rq_affinity_entry = {
- 	.store = queue_rq_affinity_store,
- };
- 
--static struct queue_sysfs_entry queue_iostats_entry = {
--	.attr = {.name = "iostats", .mode = 0644 },
--	.show = queue_show_iostats,
--	.store = queue_store_iostats,
--};
--
--static struct queue_sysfs_entry queue_random_entry = {
--	.attr = {.name = "add_random", .mode = 0644 },
--	.show = queue_show_random,
--	.store = queue_store_random,
--};
--
- static struct queue_sysfs_entry queue_poll_entry = {
- 	.attr = {.name = "io_poll", .mode = 0644 },
- 	.show = queue_poll_show,
+ /* sb->s_iflags to limit user namespace mounts */
+ #define SB_I_USERNS_VISIBLE		0x00000010 /* fstype already mounted */
 -- 
 2.27.0
 
