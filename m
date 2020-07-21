@@ -2,130 +2,73 @@ Return-Path: <SRS0=rrL6=BA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01716C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 01:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E92FC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 01:50:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C543920714
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 01:29:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vAQqP/EZ"
+	by mail.kernel.org (Postfix) with ESMTP id 3723F2072E
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 01:50:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726032AbgGUB3V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 21:29:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44996 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725847AbgGUB3U (ORCPT
+        id S1725954AbgGUBug (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 21:50:36 -0400
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:34354 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726042AbgGUBug (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 21:29:20 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE52C061794
-        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 18:29:19 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id q17so9511015pls.9
-        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 18:29:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=sjioqcVovtB/2GCCf7EiFORrXptq/bceaX/G5i7rT0U=;
-        b=vAQqP/EZ0OO90K0v/2nWrxljG688ypm6ngU3+V2nfTwkI9kAqyJQBq2IqJz15IsGgN
-         FQBvcTfqYEHNloL/UC+GlYtIZonKyfl1GMPHmomJ3Sx2F1ymKVTIEoDRfFvUZ8QPPg8x
-         3iVQsTVkMjf3GgVyqO6Z78vpvb2uaTJXzniXkA7BNHW+ggOdBYJkv9bsfUJQYmR0a+jK
-         5xz2kpoKb2+yQYZkWIyua9E7hgM9JwJnZ1QmqGchBVcwhJsqMX3qe4tib2vjbi4AZ6yg
-         Ma0eRl2hzB60otJ/FNczONw4hC465Acjq3GdkguO3n2khtQkHVQtij6VNjkmntxxWOG8
-         ZhUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sjioqcVovtB/2GCCf7EiFORrXptq/bceaX/G5i7rT0U=;
-        b=QncydG9cLdFb5NXZ0OcTnmosSuiQoeQUNP7mEQW7M6jIgvdlNGK8EA/CKhiY4g5OOD
-         yApWb8U1JQw6SoUnvOt7aHYHp7qu2OOnaGbs9xErNP27Ys3l2BhIySr7YqCx/DmfbpOP
-         Bt566OjDwVYIuCdjqFJmK/Jf0CvkzWFx/QMpLLxfbWAJ/sgNhk3ObeBKNAQPdNe8iFbw
-         w1rEBnfXRkjINhm9U+fFps8fR2YZJiiX9lNCcASCIH76K6lt/TNrxok5MmBVLGStxWT3
-         xGPeJi5n76kkRbwaR0Ti113xsthMAK7lXpJ8hcJeUldD2h1pRo4q5bdIxe/PK7ynLR8K
-         gXhg==
-X-Gm-Message-State: AOAM530hm2CrHy3vQcy8RXBPbXmpPfMtFYYmm1Jm7dEUbWT1X4siN2Rw
-        pmohNEe5dNydMojxq4B0htVvWw==
-X-Google-Smtp-Source: ABdhPJz6Q6JFb2MQ4nKJvlDB5yiikt5Aee2yKzIluLMpzv17W4Llpioax46MPzDMiRGLeYhyYSRuNQ==
-X-Received: by 2002:a17:902:c38a:: with SMTP id g10mr19287307plg.50.1595294959039;
-        Mon, 20 Jul 2020 18:29:19 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id b18sm870640pju.10.2020.07.20.18.29.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jul 2020 18:29:18 -0700 (PDT)
-Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
-To:     Matthew Wilcox <willy@infradead.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Kanchan Joshi <joshiiitr@gmail.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        "asml.silence@gmail.com" <asml.silence@gmail.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        Matias Bj??rling <mb@lightnvm.io>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Selvakumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-References: <CA+1E3rLna6VVuwMSHVVEFmrgsTyJN=U4CcZtxSGWYr_UYV7AmQ@mail.gmail.com>
- <20200710131054.GB7491@infradead.org>
- <20200710134824.GK12769@casper.infradead.org>
- <20200710134932.GA16257@infradead.org>
- <20200710135119.GL12769@casper.infradead.org>
- <CA+1E3rKOZUz7oZ_DGW6xZPQaDu+T5iEKXctd+gsJw05VwpGQSQ@mail.gmail.com>
- <CA+1E3r+j=amkEg-_KUKSiu6gt2TRU6AU-_jwnB1C6wHHKnptfQ@mail.gmail.com>
- <20200720171416.GY12769@casper.infradead.org>
- <CA+1E3rLNo5sFH3RPFAM4_SYXSmyWTCdbC3k3-6jeaj3FRPYLkQ@mail.gmail.com>
- <CY4PR04MB37513C3424E81955EE7BFDA4E7780@CY4PR04MB3751.namprd04.prod.outlook.com>
- <20200721011509.GB15516@casper.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3ac5bfe7-f086-7531-fbd8-8dde77f13638@kernel.dk>
-Date:   Mon, 20 Jul 2020 19:29:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 20 Jul 2020 21:50:36 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R891e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01419;MF=jiufei.xue@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0U3M6Jl4_1595296233;
+Received: from ali-186590e05fa3.local(mailfrom:jiufei.xue@linux.alibaba.com fp:SMTPD_---0U3M6Jl4_1595296233)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 21 Jul 2020 09:50:33 +0800
+Subject: Re: [PATCH v2] block: delete unused Kconfig
+To:     Jens Axboe <axboe@kernel.dk>, tj@kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <1595233988-28342-1-git-send-email-jiufei.xue@linux.alibaba.com>
+ <c889122c-890e-405b-8f93-0affd2882c6b@kernel.dk>
+From:   Jiufei Xue <jiufei.xue@linux.alibaba.com>
+Message-ID: <f24171eb-b1f8-746d-d379-4478ebe9ad70@linux.alibaba.com>
+Date:   Tue, 21 Jul 2020 09:50:32 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200721011509.GB15516@casper.infradead.org>
+In-Reply-To: <c889122c-890e-405b-8f93-0affd2882c6b@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/20/20 7:15 PM, Matthew Wilcox wrote:
->> Also, the completed size should be in res in the first cqe to follow
->> io_uring current interface, no ?. The second cqe would use the res64
->> field to return the written offset. Wasn't that the plan ?
+
+
+On 2020/7/20 下午11:49, Jens Axboe wrote:
+> On 7/20/20 2:33 AM, Jiufei Xue wrote:
+>> Signed-off-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+>> ---
+>>  block/Kconfig | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/block/Kconfig b/block/Kconfig
+>> index 9357d73..d52c9bc 100644
+>> --- a/block/Kconfig
+>> +++ b/block/Kconfig
+>> @@ -146,7 +146,6 @@ config BLK_CGROUP_IOLATENCY
+>>  config BLK_CGROUP_IOCOST
+>>  	bool "Enable support for cost model based cgroup IO controller"
+>>  	depends on BLK_CGROUP=y
+>> -	select BLK_RQ_IO_DATA_LEN
+>>  	select BLK_RQ_ALLOC_TIME
+>>  	help
+>>  	Enabling this option enables the .weight interface for cost
 > 
-> two cqes for one sqe seems like a bad idea to me.
+> What's the difference between v1 and v2? A commit message would
+> also be nice...
+> Sorry for the confusion. I have misspelled *unused* in patch v1.
 
-I have to agree with that, it's counter to everything else. The app will
-then have to wait for two CQEs when it issues that one "special" SQE,
-which is really iffy. And we'd have to promise that they are adjacent in
-the ring. This isn't necessarily a problem right now, but I've been
-playing with un-serialized completions and this would then become an
-issue. The io_uring interface is clearly defined as "any sqe will either
-return an error on submit (if the error is not specific to the sqe
-contents), or post a completion event". Not two events, one.
-
-And imho, zoned device append isn't an interesting enough use case to
-warrant doing something special. If there was a super strong (and
-generic) use case for passing back more information in the cqe then
-maybe it would be considered. But it'd have to be a killer application.
-If that's not the case, then the use case should work within the
-constraints of the existing API.
-
--- 
-Jens Axboe
-
+Thanks,
+Jiufei
