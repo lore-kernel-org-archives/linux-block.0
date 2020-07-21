@@ -2,82 +2,144 @@ Return-Path: <SRS0=rrL6=BA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 328FBC433DF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 05:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0880C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 06:53:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0259A207DD
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 05:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BD1120B1F
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 06:53:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wVPar65B"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bK8YIY79"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726010AbgGUFyT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jul 2020 01:54:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59378 "EHLO
+        id S1728117AbgGUGxn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jul 2020 02:53:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726003AbgGUFyT (ORCPT
+        with ESMTP id S1726698AbgGUGxm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jul 2020 01:54:19 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CB8C061794;
-        Mon, 20 Jul 2020 22:54:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ccOJ6FB795/vobkJf1yBXfmPbnqPVCWQ8goe4E50Er8=; b=wVPar65BnwEgAoFZ9bzL2bJIk5
-        X5fXv4u58GsAdmT/QnTNClTUTH+LBXMT0F628t0QcobAh0RwlOkTLDnpJzrFLPhi+0SZK7b0axHJM
-        bnoK7jR84F7sK5JC6v3UNgOnogbUKqDiKe13dPtdaA4IbhhRDNxW2dGX9zfLL2ZXRPsiIKZr+hV9i
-        jtPCMQ9vkiRgkc3pbercKsO+El/mS+Rui/Iq2qmrD/fv7dKr6UKWUrKCKNo8rA+0PyCq3VZvcfdt7
-        iskd3Ca0G7JQWFwXxto3FjmdaPlxXMhyF0FLUQm+YXsnOzeMDHsBNGeOHUHEjPdPAXeB3xnu7OB9W
-        ijNB3C4w==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jxlEA-0004iC-LT; Tue, 21 Jul 2020 05:54:10 +0000
-Date:   Tue, 21 Jul 2020 06:54:10 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 2/2] zonefs: use zone-append for AIO as well
-Message-ID: <20200721055410.GA18032@infradead.org>
-References: <20200720132118.10934-1-johannes.thumshirn@wdc.com>
- <20200720132118.10934-3-johannes.thumshirn@wdc.com>
- <20200720134549.GB3342@lst.de>
- <SN4PR0401MB3598A542AA5BC8218C2A78D19B7B0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+        Tue, 21 Jul 2020 02:53:42 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268BAC061794
+        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 23:53:42 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id e12so15370150qtr.9
+        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 23:53:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=/LzX205OrVJxpDVgD3okbRlxqqEZJ1kZvD6gwUPc6+w=;
+        b=bK8YIY79uozJq8nAajqEK227dyxwk/ewc+lSm4zEJp4hFMrzvVBAK/UStdfJGz8pK/
+         xfex1nbbbqNWdolykGggSOqmlvMLGr6bVnUFALah9O0qn0S2CX/mdfV5PrICYAYYhjwv
+         T1rgXpyCIhEo6ihcdRPCMVt+6nFBEuLxj/F04=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=/LzX205OrVJxpDVgD3okbRlxqqEZJ1kZvD6gwUPc6+w=;
+        b=MeuMpHD5gOQyjiHyUD2xLjSfyvknMmvvRd+V0NbGIICXq9Uf0b2sdMo3yNb2H1yrav
+         yysBtwj05XvqYrDMcR/CfxFNt6c2wG1eWdW10mhUd/900ZDOPgfL13IFJSrznOpXlyuZ
+         PbkjbaoZSmMHQrp+WO7TpZNBCD+uh+xfzXHQAebzrmd/25oi+I5krOdB+CfI2pPM1JWR
+         gDDnB8I14zoVCD1A6TbSb9BK+2SGrDe9Cps4KY3ZFnjwPg1/xn7entY5q3ypVoBzBQx3
+         Jr5g++HzeF1MpOriz32IykiMLjU212vXOMhMSvrDv/PSPOnoWMc6UodrjkxWJvlrsGpm
+         VIUg==
+X-Gm-Message-State: AOAM531UvUw2vSwhOlx/8e6gvcbmKfqZaRnYvTR6SbI8NAzCShN2X5SJ
+        ywMcx7oheFzQ0KZyJoNbck2BnAJqljLlkS7HK4/3tQ==
+X-Google-Smtp-Source: ABdhPJx9UIqbJmT3ciJpPn/RECvKEVWHhtsDZpKUoXVlcMNzMGiz5RapIvzx6yBFENi+j4pIIeS78ePC4YigAXjBNo0=
+X-Received: by 2002:ac8:36bb:: with SMTP id a56mr27509911qtc.201.1595314421244;
+ Mon, 20 Jul 2020 23:53:41 -0700 (PDT)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
+ <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com> <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
+ <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com> <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
+ <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com> <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
+ <34a832717fef4702b143ea21aa12b79e@mail.gmail.com> <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
+ <e69dc243174664efd414a4cd0176e59d@mail.gmail.com> <20200721011323.GA833377@T590>
+In-Reply-To: <20200721011323.GA833377@T590>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN4PR0401MB3598A542AA5BC8218C2A78D19B7B0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQGYVoTUA+B9zIZNqWv71qXbwKlkDwGZowweAlKrFcUB/hGY5AG4aoXNAvsHUMYCeW9VQwH6WrIOAzKzW+wCpzQ5OANTX/rUqMuvaHA=
+Date:   Tue, 21 Jul 2020 12:23:39 +0530
+Message-ID: <c71bbdf2607a8183926430b5f4aa1ae1@mail.gmail.com>
+Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        bvanassche@acm.org, hare@suse.com, hch@lst.de,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 04:48:50PM +0000, Johannes Thumshirn wrote:
-> On 20/07/2020 15:45, Christoph Hellwig wrote:
-> > On Mon, Jul 20, 2020 at 10:21:18PM +0900, Johannes Thumshirn wrote:
-> >> On a successful completion, the position the data is written to is
-> >> returned via AIO's res2 field to the calling application.
-> > 
-> > That is a major, and except for this changelog, undocumented ABI
-> > change.  We had the whole discussion about reporting append results
-> > in a few threads and the issues with that in io_uring.  So let's
-> > have that discussion there and don't mix it up with how zonefs
-> > writes data.  Without that a lot of the boilerplate code should
-> > also go away.
-> > 
-> 
-> OK maybe I didn't remember correctly, but wasn't this all around 
-> io_uring and how we'd report the location back for raw block device
-> access?
+> > >
+> > > Perf top (shared host tag. IOPS = 230K)
+> > >
+> > > 13.98%  [kernel]        [k] sbitmap_any_bit_set
+> > >      6.43%  [kernel]        [k] blk_mq_run_hw_queue
+> >
+> > blk_mq_run_hw_queue function take more CPU which is called from "
+> > scsi_end_request"
+>
+> The problem could be that nr_hw_queues is increased a lot so that sample
+on
+> blk_mq_run_hw_queue() can be observed now.
 
-Report the write offset.  The author seems to be hell bent on making
-it block device specific, but that is a horrible idea as it is just
-as useful for normal file systems (or zonefs).
+Yes. That is correct.
+
+>
+> > It looks like " blk_mq_hctx_has_pending" handles only elevator
+> > (scheduler) case. If  queue has ioscheduler=none, we can skip. I case
+> > of scheduler=none, IO will be pushed to hardware queue and it by pass
+> software queue.
+> > Based on above understanding, I added below patch and I can see
+> > performance scale back to expectation.
+> >
+> > Ming mentioned that - we cannot remove blk_mq_run_hw_queues() from IO
+> > completion path otherwise we may see IO hang. So I have just modified
+> > completion path assuming it is only required for IO scheduler case.
+> > https://www.spinics.net/lists/linux-block/msg55049.html
+> >
+> > Please review and let me know if this is good or we have to address
+> > with proper fix.
+> >
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c index
+> > 1be7ac5a4040..b6a5b41b7fc2 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -1559,6 +1559,9 @@ void blk_mq_run_hw_queues(struct
+> request_queue
+> > *q, bool async)
+> >         struct blk_mq_hw_ctx *hctx;
+> >         int i;
+> >
+> > +       if (!q->elevator)
+> > +               return;
+> > +
+>
+> This way shouldn't be correct, blk_mq_run_hw_queues() is still needed
+for
+> none because request may not be dispatched successfully by direct issue.
+
+When block layer attempt posting request to h/w queue directly (for
+ioscheduler=none) and if it fails, it is calling
+blk_mq_request_bypass_insert().
+blk_mq_request_bypass_insert function will start the h/w queue from
+submission context. Do we still have an issue if we skip running hw queue
+from completion ?
+
+Kashyap
+
+>
+>
+> Thanks,
+> Ming
