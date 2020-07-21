@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36565C433E4
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 10:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 916C1C433EB
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 10:55:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11D142065D
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 10:55:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6ABAE2077D
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 10:55:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fch9ILKD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CHASMHz1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729428AbgGUKze (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jul 2020 06:55:34 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36239 "EHLO
+        id S1727905AbgGUKzq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jul 2020 06:55:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45782 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726977AbgGUKze (ORCPT
+        by vger.kernel.org with ESMTP id S1728037AbgGUKzq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jul 2020 06:55:34 -0400
+        Tue, 21 Jul 2020 06:55:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595328932;
+        s=mimecast20190719; t=1595328944;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jOZ3UhCTTXauv567OIWb7UfFogeyp1mZiVe9qWbA3oo=;
-        b=fch9ILKDuYiDt9QcuC3gKzH2obelIFKjiZJQrhSOnbQrD1R7irhMjg8RDhrC9karYSjX7S
-        aZZciA5JV+nzruTwYRV3r85ckZIgLlwUbs/e6SP+LMni96RDxmMrW25h3KbunbdY6FdkIE
-        qpDcNrDlV2jlQNgnkMAGaYtjOAoDrps=
+        bh=+3seadylwcW1rKfz25C5YjNc+LNMmMOgRxWnx3VfrYM=;
+        b=CHASMHz1Fkm12q6t4XQbY2HCbkoFQGGi1vZJ2Pqwk1qO+BCprDlBAWVgsBeF2tp3wMZrqO
+        dvYAgE3LhmNhUgVMxa5cIn7XZf6vEykxH9ZLChsxsMXv0JgRGgLu4t8zEVSdMZ0KUkJ5Gd
+        yHwnT8bjCqypRNCPtSOdZbx52Q1SWHM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-MW0yyVdePGqPeJmXvqorTQ-1; Tue, 21 Jul 2020 06:55:29 -0400
-X-MC-Unique: MW0yyVdePGqPeJmXvqorTQ-1
+ us-mta-51-YSjNVmjPOw2mHuqqn-p2Cw-1; Tue, 21 Jul 2020 06:55:42 -0400
+X-MC-Unique: YSjNVmjPOw2mHuqqn-p2Cw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12326193F561;
-        Tue, 21 Jul 2020 10:55:26 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07C091005504;
+        Tue, 21 Jul 2020 10:55:39 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1C0181C4;
-        Tue, 21 Jul 2020 10:55:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7482876216;
+        Tue, 21 Jul 2020 10:55:26 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Keith Busch <kbusch@kernel.org>,
@@ -74,9 +74,9 @@ Cc:     Keith Busch <kbusch@kernel.org>,
         NET DRIVERS), "James E.J. Bottomley" <jejb@linux.ibm.com>,
         Alex Dubov <oakad@yahoo.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 09/10] block: scsi: sd: use blk_is_valid_logical_block_size
-Date:   Tue, 21 Jul 2020 13:52:38 +0300
-Message-Id: <20200721105239.8270-10-mlevitsk@redhat.com>
+Subject: [PATCH 10/10] block: scsi: sr: use blk_is_valid_logical_block_size
+Date:   Tue, 21 Jul 2020 13:52:39 +0300
+Message-Id: <20200721105239.8270-11-mlevitsk@redhat.com>
 In-Reply-To: <20200721105239.8270-1-mlevitsk@redhat.com>
 References: <20200721105239.8270-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -87,29 +87,62 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use blk_is_valid_logical_block_size instead of hardcoded list
+Plus some tiny refactoring.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- drivers/scsi/sd.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/scsi/sr.c | 31 +++++++++++++------------------
+ 1 file changed, 13 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index d90fefffe31b7..f012e7397b058 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -2520,10 +2520,7 @@ sd_read_capacity(struct scsi_disk *sdkp, unsigned char *buffer)
- 			  "assuming 512.\n");
- 	}
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index 0c4aa4665a2f9..0e96338029310 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -866,31 +866,26 @@ static void get_sectorsize(struct scsi_cd *cd)
+ 			cd->capacity = max_t(long, cd->capacity, last_written);
  
--	if (sector_size != 512 &&
--	    sector_size != 1024 &&
--	    sector_size != 2048 &&
--	    sector_size != 4096) {
-+	if (!blk_is_valid_logical_block_size(sector_size)) {
- 		sd_printk(KERN_NOTICE, sdkp, "Unsupported sector size %d.\n",
- 			  sector_size);
+ 		sector_size = get_unaligned_be32(&buffer[4]);
+-		switch (sector_size) {
+-			/*
+-			 * HP 4020i CD-Recorder reports 2340 byte sectors
+-			 * Philips CD-Writers report 2352 byte sectors
+-			 *
+-			 * Use 2k sectors for them..
+-			 */
+-		case 0:
+-		case 2340:
+-		case 2352:
++
++		/*
++		 * HP 4020i CD-Recorder reports 2340 byte sectors
++		 * Philips CD-Writers report 2352 byte sectors
++		 *
++		 * Use 2k sectors for them..
++		 */
++
++		if (!sector_size || sector_size == 2340 || sector_size == 2352)
+ 			sector_size = 2048;
+-			/* fall through */
+-		case 2048:
+-			cd->capacity *= 4;
+-			/* fall through */
+-		case 512:
+-			break;
+-		default:
++
++		cd->capacity *= (sector_size >> SECTOR_SHIFT);
++
++		if (!blk_is_valid_logical_block_size(sector_size)) {
+ 			sr_printk(KERN_INFO, cd,
+ 				  "unsupported sector size %d.", sector_size);
+ 			cd->capacity = 0;
+ 		}
+ 
+ 		cd->device->sector_size = sector_size;
+-
  		/*
+ 		 * Add this so that we have the ability to correctly gauge
+ 		 * what the device is capable of.
 -- 
 2.26.2
 
