@@ -2,144 +2,124 @@ Return-Path: <SRS0=rrL6=BA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0880C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 06:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98956C433E3
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 07:06:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9BD1120B1F
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 06:53:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6ACF122482
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 07:06:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bK8YIY79"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o1nHLbny"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728117AbgGUGxn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jul 2020 02:53:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40242 "EHLO
+        id S1726759AbgGUHGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jul 2020 03:06:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726698AbgGUGxm (ORCPT
+        with ESMTP id S1726698AbgGUHGH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jul 2020 02:53:42 -0400
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268BAC061794
-        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 23:53:42 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id e12so15370150qtr.9
-        for <linux-block@vger.kernel.org>; Mon, 20 Jul 2020 23:53:42 -0700 (PDT)
+        Tue, 21 Jul 2020 03:06:07 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C881C061794;
+        Tue, 21 Jul 2020 00:06:07 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id x8so9845682plm.10;
+        Tue, 21 Jul 2020 00:06:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=/LzX205OrVJxpDVgD3okbRlxqqEZJ1kZvD6gwUPc6+w=;
-        b=bK8YIY79uozJq8nAajqEK227dyxwk/ewc+lSm4zEJp4hFMrzvVBAK/UStdfJGz8pK/
-         xfex1nbbbqNWdolykGggSOqmlvMLGr6bVnUFALah9O0qn0S2CX/mdfV5PrICYAYYhjwv
-         T1rgXpyCIhEo6ihcdRPCMVt+6nFBEuLxj/F04=
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hQAVZqdCDGXaSgKJO4tHAULnO6o8IgHcxHvcFrASXJM=;
+        b=o1nHLbnyC76cTBkZ8o02WGza5nv95DmFPmE6Kv/2qtedmnUgrkutnnB7W5dDKaHXn7
+         gsbzIzAVg2SXSaHepfx67ZVvQCbn75pEENAb5buco7ZGoXgEH5L+uaTMq8p9PIntP5/9
+         Pg6P/Hiz4k3Qe/JUKHeOwPly1AeyA2gPYhUbcMPcW5NNyVVLVCDhq3oomjJkRrujZLKp
+         mh2Gj1QxVxhYq9UCMU6FxXhwixv6ANQQ9a+Gqio4OhFPKQesVf1ybjnN32OPj2409y29
+         J4TVfgKPj+wYb6uGzT0lf5Mzm8JBN2G0rMVLHhWBAy+UMJem0dyM2AFBb7Hw6qIgVeQF
+         FT0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=/LzX205OrVJxpDVgD3okbRlxqqEZJ1kZvD6gwUPc6+w=;
-        b=MeuMpHD5gOQyjiHyUD2xLjSfyvknMmvvRd+V0NbGIICXq9Uf0b2sdMo3yNb2H1yrav
-         yysBtwj05XvqYrDMcR/CfxFNt6c2wG1eWdW10mhUd/900ZDOPgfL13IFJSrznOpXlyuZ
-         PbkjbaoZSmMHQrp+WO7TpZNBCD+uh+xfzXHQAebzrmd/25oi+I5krOdB+CfI2pPM1JWR
-         gDDnB8I14zoVCD1A6TbSb9BK+2SGrDe9Cps4KY3ZFnjwPg1/xn7entY5q3ypVoBzBQx3
-         Jr5g++HzeF1MpOriz32IykiMLjU212vXOMhMSvrDv/PSPOnoWMc6UodrjkxWJvlrsGpm
-         VIUg==
-X-Gm-Message-State: AOAM531UvUw2vSwhOlx/8e6gvcbmKfqZaRnYvTR6SbI8NAzCShN2X5SJ
-        ywMcx7oheFzQ0KZyJoNbck2BnAJqljLlkS7HK4/3tQ==
-X-Google-Smtp-Source: ABdhPJx9UIqbJmT3ciJpPn/RECvKEVWHhtsDZpKUoXVlcMNzMGiz5RapIvzx6yBFENi+j4pIIeS78ePC4YigAXjBNo0=
-X-Received: by 2002:ac8:36bb:: with SMTP id a56mr27509911qtc.201.1595314421244;
- Mon, 20 Jul 2020 23:53:41 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
- <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com> <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
- <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com> <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
- <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com> <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
- <34a832717fef4702b143ea21aa12b79e@mail.gmail.com> <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
- <e69dc243174664efd414a4cd0176e59d@mail.gmail.com> <20200721011323.GA833377@T590>
-In-Reply-To: <20200721011323.GA833377@T590>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hQAVZqdCDGXaSgKJO4tHAULnO6o8IgHcxHvcFrASXJM=;
+        b=G+ljNrJy3F8DMqLlT6UvxzdOsHSYWxrvP9cYe1udgN5sdBa1c0sfzfaAeCNiBidBPy
+         fdfHzDqbMq/7LfUZQge50pWJyj2e5S8dfEtJuF1t3R8vMiBb8oDKxsslUR9/GoyudpL1
+         TUSrXczWB5SAAH2FnM06FpHqygfUNmxDLDhwzeuv61iiH2tFZjyMd2D0LyNr9TcWQj2M
+         SLc25svcBY8G2Erz9aLYxE3eM6Pmt68uUftruXb/frKXLPxEGc9LKyygTGFTumKzOL9s
+         fw1MfScoClfJGkSnusfKWen5Gje7eX7obZR3ECKZ4KIyY1KcStQ8kzkLbF2cdJPEKDbE
+         +dbA==
+X-Gm-Message-State: AOAM530tD8+qB1ifGZk20qZ9hcIPXej5BkMbzUhkrBarhinc+UE5wLn0
+        28KUq9v4dJKQl79trFqGLYY=
+X-Google-Smtp-Source: ABdhPJzf3truDWDxS9RbTZomnBgsQrj7q4dk+RFuooF81G1rrHqrSeIGTHAI2483Gk4mGi0I+frPZA==
+X-Received: by 2002:a17:90b:3683:: with SMTP id mj3mr3303694pjb.91.1595315166748;
+        Tue, 21 Jul 2020 00:06:06 -0700 (PDT)
+Received: from gmail.com ([103.105.153.67])
+        by smtp.gmail.com with ESMTPSA id h2sm16144431pfk.93.2020.07.21.00.05.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jul 2020 00:06:05 -0700 (PDT)
+Date:   Tue, 21 Jul 2020 12:34:40 +0530
+From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Bjorn Helgaas <bjorn@helgaas.com>,
+        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kernel-mentees@lists.linuxfoundation.org" 
+        <linux-kernel-mentees@lists.linuxfoundation.org>,
+        Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [PATCH v1 3/3] skd: use generic power management
+Message-ID: <20200721070440.GA51743@gmail.com>
+References: <20200717080910.342741-1-vaibhavgupta40@gmail.com>
+ <20200717080910.342741-4-vaibhavgupta40@gmail.com>
+ <CY4PR04MB37516C5544A7DCAD84921937E77B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200720131627.GA447599@gmail.com>
+ <CY4PR04MB3751EB3DA357A6856B3337D0E7780@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQGYVoTUA+B9zIZNqWv71qXbwKlkDwGZowweAlKrFcUB/hGY5AG4aoXNAvsHUMYCeW9VQwH6WrIOAzKzW+wCpzQ5OANTX/rUqMuvaHA=
-Date:   Tue, 21 Jul 2020 12:23:39 +0530
-Message-ID: <c71bbdf2607a8183926430b5f4aa1ae1@mail.gmail.com>
-Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CY4PR04MB3751EB3DA357A6856B3337D0E7780@CY4PR04MB3751.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > >
-> > > Perf top (shared host tag. IOPS = 230K)
-> > >
-> > > 13.98%  [kernel]        [k] sbitmap_any_bit_set
-> > >      6.43%  [kernel]        [k] blk_mq_run_hw_queue
-> >
-> > blk_mq_run_hw_queue function take more CPU which is called from "
-> > scsi_end_request"
+On Tue, Jul 21, 2020 at 02:49:06AM +0000, Damien Le Moal wrote:
+> On 2020/07/20 22:18, Vaibhav Gupta wrote:
+> > On Mon, Jul 20, 2020 at 12:52:14PM +0000, Damien Le Moal wrote:
+> >> On 2020/07/17 17:10, Vaibhav Gupta wrote:
+> >>> Change function parameter in both .suspend() and .resume() to
+> >>> "struct device*" type. Use to_pci_dev() to get "struct pci_dev*" variable.
+> >>>
+> >>> Compile-tested only.
+> >>
+> >> I do not think this belongs into the commit message. This was mentioned in the
+> >> cover letter.
+> >>
+> > The messages in cover letter and commit message are bit similar. But the commit
+> > message has patch specific changes mentioned in it.
+> 
+> My point was about the "compile-tested only" mention in the commit message. That
+> should be mentioned in the cover letter only. The goal of the patch review
+> process is also to get these patches tested by others if you do not have access
+> to the hardware. That is fine, and I can test for the skd driver. But a patch
+> mentioning that it is untested cannot be applied, for obvious reasons :)
+> 
+> So I only requested that you remove the "compiled tested only" note. The commit
+> message could be simpler too, see followup comment.
 >
-> The problem could be that nr_hw_queues is increased a lot so that sample
-on
-> blk_mq_run_hw_queue() can be observed now.
+Oh okay. Thanks for clarification and pointing this out :) . From now on, I
+will put "Compile-tested only." message only in cover letters.
 
-Yes. That is correct.
-
->
-> > It looks like " blk_mq_hctx_has_pending" handles only elevator
-> > (scheduler) case. If  queue has ioscheduler=none, we can skip. I case
-> > of scheduler=none, IO will be pushed to hardware queue and it by pass
-> software queue.
-> > Based on above understanding, I added below patch and I can see
-> > performance scale back to expectation.
-> >
-> > Ming mentioned that - we cannot remove blk_mq_run_hw_queues() from IO
-> > completion path otherwise we may see IO hang. So I have just modified
-> > completion path assuming it is only required for IO scheduler case.
-> > https://www.spinics.net/lists/linux-block/msg55049.html
-> >
-> > Please review and let me know if this is good or we have to address
-> > with proper fix.
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c index
-> > 1be7ac5a4040..b6a5b41b7fc2 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -1559,6 +1559,9 @@ void blk_mq_run_hw_queues(struct
-> request_queue
-> > *q, bool async)
-> >         struct blk_mq_hw_ctx *hctx;
-> >         int i;
-> >
-> > +       if (!q->elevator)
-> > +               return;
-> > +
->
-> This way shouldn't be correct, blk_mq_run_hw_queues() is still needed
-for
-> none because request may not be dispatched successfully by direct issue.
-
-When block layer attempt posting request to h/w queue directly (for
-ioscheduler=none) and if it fails, it is calling
-blk_mq_request_bypass_insert().
-blk_mq_request_bypass_insert function will start the h/w queue from
-submission context. Do we still have an issue if we skip running hw queue
-from completion ?
-
-Kashyap
-
->
->
-> Thanks,
-> Ming
+Thanks.
+--Vaibhav Gupta
+> 
+> 
+> -- 
+> Damien Le Moal
+> Western Digital Research
