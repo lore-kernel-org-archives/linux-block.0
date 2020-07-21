@@ -2,147 +2,115 @@ Return-Path: <SRS0=rrL6=BA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC6DC433E1
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 01:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 488E8C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 01:15:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E194207DD
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 01:13:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2875D207DD
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 01:15:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEQm4AGf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pQbISmCe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726425AbgGUBNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jul 2020 21:13:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34489 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726046AbgGUBNr (ORCPT
+        id S1726618AbgGUBPW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jul 2020 21:15:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726046AbgGUBPW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jul 2020 21:13:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595294025;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=242qISjfeixY1o86Yfb+A75hdUEk1zcgp/jdbdwcQqI=;
-        b=AEQm4AGfoCW+ZvWrubAtLBuC7cwdz6UIk/fuMI7DwgCyX9GGOHmjZjwAbWslgKBBpsczBg
-        kHoOJ5SbRizE+vIvmby29+OPX7s/49MI6zhtg3fiBEUzWtzDqE7HGs89Ey78FjzmMi+sJw
-        91Yyxo3w977F+NzMpicPnQIq9hyEdNo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-vKVOsk1wMi63ao8GHId7CQ-1; Mon, 20 Jul 2020 21:13:41 -0400
-X-MC-Unique: vKVOsk1wMi63ao8GHId7CQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 714A51DE9;
-        Tue, 21 Jul 2020 01:13:39 +0000 (UTC)
-Received: from T590 (ovpn-12-200.pek2.redhat.com [10.72.12.200])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 91AD760E1C;
-        Tue, 21 Jul 2020 01:13:28 +0000 (UTC)
-Date:   Tue, 21 Jul 2020 09:13:23 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>
-Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-Message-ID: <20200721011323.GA833377@T590>
-References: <e61593f8-5ee7-5763-9d02-d0ea13aeb49f@huawei.com>
- <92ba1829c9e822e4239a7cdfd94acbce@mail.gmail.com>
- <10d36c09-9d5b-92e9-23ac-ea1a2628e7d9@huawei.com>
- <0563e53f843c97de1a5a035fae892bf8@mail.gmail.com>
- <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
- <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com>
- <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
- <34a832717fef4702b143ea21aa12b79e@mail.gmail.com>
- <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
- <e69dc243174664efd414a4cd0176e59d@mail.gmail.com>
+        Mon, 20 Jul 2020 21:15:22 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93ECC061794;
+        Mon, 20 Jul 2020 18:15:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=rfyhcPl9yATKYlIzjLr+e3/ETCiHE9A88WTd3Cfuwq8=; b=pQbISmCeuLOm33gOVjUe/3XMwu
+        8+fp6sISGUaQcuvvJXy4HS2N48WBarQc00tX4EiqDW8QgmyQNmiQh9kcUR3ufwoakx5eucXfY4pOd
+        hK1gjZSdwBcskY8uYqIagekeMC0NBgreIhonxrpxcY8k3RO1iJVbcjW6O3fSA/F6UPnypXVqZYrvw
+        mqAjLRgnT9OJ+kqj13qR7ec3qEpahCVR66trvmMPc9u+pbd0dp5WV9/tFMU8hQhGRXgA7WhfwUuwG
+        TkQcp5afvKaM3YszjZSaf1nnOWdtjVjag02kFjbdDYA/elF42KHNPDZsLhkBWxMclmq8iMSrcHfFe
+        FpdPfKow==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jxgs9-0007nN-Ny; Tue, 21 Jul 2020 01:15:10 +0000
+Date:   Tue, 21 Jul 2020 02:15:09 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Kanchan Joshi <joshiiitr@gmail.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        "asml.silence@gmail.com" <asml.silence@gmail.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        Matias Bj??rling <mb@lightnvm.io>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Subject: Re: [PATCH v3 4/4] io_uring: add support for zone-append
+Message-ID: <20200721011509.GB15516@casper.infradead.org>
+References: <CA+1E3rLna6VVuwMSHVVEFmrgsTyJN=U4CcZtxSGWYr_UYV7AmQ@mail.gmail.com>
+ <20200710131054.GB7491@infradead.org>
+ <20200710134824.GK12769@casper.infradead.org>
+ <20200710134932.GA16257@infradead.org>
+ <20200710135119.GL12769@casper.infradead.org>
+ <CA+1E3rKOZUz7oZ_DGW6xZPQaDu+T5iEKXctd+gsJw05VwpGQSQ@mail.gmail.com>
+ <CA+1E3r+j=amkEg-_KUKSiu6gt2TRU6AU-_jwnB1C6wHHKnptfQ@mail.gmail.com>
+ <20200720171416.GY12769@casper.infradead.org>
+ <CA+1E3rLNo5sFH3RPFAM4_SYXSmyWTCdbC3k3-6jeaj3FRPYLkQ@mail.gmail.com>
+ <CY4PR04MB37513C3424E81955EE7BFDA4E7780@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e69dc243174664efd414a4cd0176e59d@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <CY4PR04MB37513C3424E81955EE7BFDA4E7780@CY4PR04MB3751.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 12:53:55PM +0530, Kashyap Desai wrote:
-> > > > I also noticed nr_hw_queues are now exposed in sysfs -
-> > > >
-> > > >
-> > /sys/devices/pci0000:85/0000:85:00.0/0000:86:00.0/0000:87:04.0/0000:8b
-> > > >
-> > >
-> > :00.0/0000:8c:00.0/0000:8d:00.0/host14/scsi_host/host14/nr_hw_queues:1
-> > > > 28
-> > > > .
-> > >
-> > > That's on my v8 wip branch, so I guess you're picking it up from there.
-> >
-> > John - I did more testing on v8 wip branch.  CPU hotplug is working as
-> > expected, but I still see some performance issue on Logical Volumes.
-> >
-> > I created 8 Drives Raid-0 VD on MR controller and below is performance
-> > impact of this RFC. Looks like contention is on single <sdev>.
-> >
-> > I used command - "numactl -N 1  fio 1vd.fio --iodepth=128 --bs=4k --
-> > rw=randread --cpus_allowed_policy=split --ioscheduler=none --
-> > group_reporting --runtime=200 --numjobs=1"
-> > IOPS without RFC = 300K IOPS with RFC = 230K.
-> >
-> > Perf top (shared host tag. IOPS = 230K)
-> >
-> > 13.98%  [kernel]        [k] sbitmap_any_bit_set
-> >      6.43%  [kernel]        [k] blk_mq_run_hw_queue
+On Tue, Jul 21, 2020 at 12:59:59AM +0000, Damien Le Moal wrote:
+> On 2020/07/21 5:17, Kanchan Joshi wrote:
+> > On Mon, Jul 20, 2020 at 10:44 PM Matthew Wilcox <willy@infradead.org> wrote:
+> >>  struct io_uring_cqe {
+> >>         __u64   user_data;      /* sqe->data submission passed back */
+> >> -       __s32   res;            /* result code for this event */
+> >> -       __u32   flags;
+> >> +       union {
+> >> +               struct {
+> >> +                       __s32   res;    /* result code for this event */
+> >> +                       __u32   flags;
+> >> +               };
+> >> +               __s64           res64;
+> >> +       };
+> >>  };
+> >>
+> >> Return the value in bytes in res64, or a negative errno.  Done.
+> > 
+> > I concur. Can do away with bytes-copied. It's either in its entirety
+> > or not at all.
+> > 
 > 
-> blk_mq_run_hw_queue function take more CPU which is called from "
-> scsi_end_request"
+> SAS SMR drives may return a partial completion. So the size written may be less
+> than requested, but not necessarily 0, which would be an error anyway since any
+> condition that would lead to 0B being written will cause the drive to fail the
+> command with an error.
 
-The problem could be that nr_hw_queues is increased a lot so that
-sample on blk_mq_run_hw_queue() can be observed now.
+Why might it return a short write?  And, given how assiduous programmers
+are about checking for exceptional conditions, is it useful to tell
+userspace "only the first 512 bytes of your 2kB write made it to storage"?
+Or would we rather just tell userspace "you got an error" and _not_
+tell them that the first N bytes made it to storage?
 
-> It looks like " blk_mq_hctx_has_pending" handles only elevator (scheduler)
-> case. If  queue has ioscheduler=none, we can skip. I case of scheduler=none,
-> IO will be pushed to hardware queue and it by pass software queue.
-> Based on above understanding, I added below patch and I can see performance
-> scale back to expectation.
-> 
-> Ming mentioned that - we cannot remove blk_mq_run_hw_queues() from IO
-> completion path otherwise we may see IO hang. So I have just modified
-> completion path assuming it is only required for IO scheduler case.
-> https://www.spinics.net/lists/linux-block/msg55049.html
-> 
-> Please review and let me know if this is good or we have to address with
-> proper fix.
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 1be7ac5a4040..b6a5b41b7fc2 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1559,6 +1559,9 @@ void blk_mq_run_hw_queues(struct request_queue *q,
-> bool async)
->         struct blk_mq_hw_ctx *hctx;
->         int i;
-> 
-> +       if (!q->elevator)
-> +               return;
-> +
+> Also, the completed size should be in res in the first cqe to follow io_uring
+> current interface, no ?. The second cqe would use the res64 field to return the
+> written offset. Wasn't that the plan ?
 
-This way shouldn't be correct, blk_mq_run_hw_queues() is still needed for
-none because request may not be dispatched successfully by direct issue.
-
-
-Thanks,
-Ming
-
+two cqes for one sqe seems like a bad idea to me.
