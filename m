@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD5FC433E3
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 10:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32564C433E8
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 10:54:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE9EE2073A
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 10:54:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12D8D2073A
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jul 2020 10:54:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OL5vP3xB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LBDjojBG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726882AbgGUKyK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jul 2020 06:54:10 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56071 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726611AbgGUKyJ (ORCPT
+        id S1729408AbgGUKyU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jul 2020 06:54:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57059 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728542AbgGUKyT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jul 2020 06:54:09 -0400
+        Tue, 21 Jul 2020 06:54:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595328848;
+        s=mimecast20190719; t=1595328858;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4gteU3EGNoUKPt8oYOM7d1sSCLxaOHL3O+rsdN+CvQ8=;
-        b=OL5vP3xBzb2Jb48dKiAbakVaWoMp8FpFFY2ky8PUhkfkZTHePO7WB4CotKJsVFAEAvgMiI
-        zy0wsdckQEUwo6Izggp8m5UbObQT6dVbECNOC+1XDiUxtW1LP3Rdu/oTQymLQAVUlVfjEO
-        Rhwd4hG8sJrQBuX5Y9xhAkVJKoVqvY4=
+        bh=cmSsOYM3N+BuN/CNETLIG8cntCXD0+KnIyiVkfU5Fy8=;
+        b=LBDjojBGJUpxUHU+TZBA0adCebN9ADDFbyUpRCXqliMOBFSR3kcPyAhWI9a1K+Rx7fLIca
+        GkKEJVmTmIcBHAv5wVbbdHezUUSkcal0fSBNyI7+AWuZ5WPXu1scssWLUttd3zuAl157Xs
+        V6Ks6T4gG0l6foTPVIuqULOgqCoY3Lc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-QTw1zjUEPNq-t8eTeL3FpQ-1; Tue, 21 Jul 2020 06:54:04 -0400
-X-MC-Unique: QTw1zjUEPNq-t8eTeL3FpQ-1
+ us-mta-442-e_rhm3fDNaaAvpbYUw1vLw-1; Tue, 21 Jul 2020 06:54:14 -0400
+X-MC-Unique: e_rhm3fDNaaAvpbYUw1vLw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DC681009625;
-        Tue, 21 Jul 2020 10:54:01 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1F1DE929;
+        Tue, 21 Jul 2020 10:54:11 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA0CD1C4;
-        Tue, 21 Jul 2020 10:53:26 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BF55A7621A;
+        Tue, 21 Jul 2020 10:54:01 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Keith Busch <kbusch@kernel.org>,
@@ -74,9 +74,9 @@ Cc:     Keith Busch <kbusch@kernel.org>,
         NET DRIVERS), "James E.J. Bottomley" <jejb@linux.ibm.com>,
         Alex Dubov <oakad@yahoo.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 02/10] block: virtio-blk: check logical block size
-Date:   Tue, 21 Jul 2020 13:52:31 +0300
-Message-Id: <20200721105239.8270-3-mlevitsk@redhat.com>
+Subject: [PATCH 03/10] block: loop: use blk_is_valid_logical_block_size
+Date:   Tue, 21 Jul 2020 13:52:32 +0300
+Message-Id: <20200721105239.8270-4-mlevitsk@redhat.com>
 In-Reply-To: <20200721105239.8270-1-mlevitsk@redhat.com>
 References: <20200721105239.8270-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -87,56 +87,62 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linux kernel only supports logical block sizes which are power of two,
-at least 512 bytes and no more that PAGE_SIZE.
-
-Check this instead of crashing later on.
-
-Note that there is no need to check physical block size since it is
-only a hint, and virtio-blk already only supports power of two values.
-
-Bugzilla link: https://bugzilla.redhat.com/show_bug.cgi?id=1664619
+This allows to remove loop's own check for supported block size
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- drivers/block/virtio_blk.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ drivers/block/loop.c | 23 +++++------------------
+ 1 file changed, 5 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 980df853ee497..b5ee87cba00ed 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -809,10 +809,18 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
- 				   struct virtio_blk_config, blk_size,
- 				   &blk_size);
--	if (!err)
-+	if (!err) {
-+		if (!blk_is_valid_logical_block_size(blk_size)) {
-+			dev_err(&vdev->dev,
-+				"%s failure: invalid logical block size %d\n",
-+				__func__, blk_size);
-+			err = -EINVAL;
-+			goto out_cleanup_queue;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 475e1a738560d..9984c8f824271 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -228,19 +228,6 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+ 		blk_mq_unfreeze_queue(lo->lo_queue);
+ }
+ 
+-/**
+- * loop_validate_block_size() - validates the passed in block size
+- * @bsize: size to validate
+- */
+-static int
+-loop_validate_block_size(unsigned short bsize)
+-{
+-	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
+-		return -EINVAL;
+-
+-	return 0;
+-}
+-
+ /**
+  * loop_set_size() - sets device size and notifies userspace
+  * @lo: struct loop_device to set the size for
+@@ -1119,9 +1106,10 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	}
+ 
+ 	if (config->block_size) {
+-		error = loop_validate_block_size(config->block_size);
+-		if (error)
++		if (!blk_is_valid_logical_block_size(config->block_size)) {
++			error = -EINVAL;
+ 			goto out_unlock;
 +		}
- 		blk_queue_logical_block_size(q, blk_size);
--	else
-+	} else {
- 		blk_size = queue_logical_block_size(q);
-+	}
+ 	}
  
- 	/* Use topology information if available */
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_TOPOLOGY,
-@@ -872,6 +880,9 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
- 	return 0;
+ 	error = loop_set_status_from_info(lo, &config->info);
+@@ -1607,9 +1595,8 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ 	if (lo->lo_state != Lo_bound)
+ 		return -ENXIO;
  
-+out_cleanup_queue:
-+	blk_cleanup_queue(vblk->disk->queue);
-+	vblk->disk->queue = NULL;
- out_free_tags:
- 	blk_mq_free_tag_set(&vblk->tag_set);
- out_put_disk:
+-	err = loop_validate_block_size(arg);
+-	if (err)
+-		return err;
++	if (!blk_is_valid_logical_block_size(arg))
++		return -EINVAL;
+ 
+ 	if (lo->lo_queue->limits.logical_block_size == arg)
+ 		return 0;
 -- 
 2.26.2
 
