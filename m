@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C66C43618
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 06:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB78C433EA
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 06:27:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6427720872
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 06:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46C4620872
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 06:27:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ANtpF1jf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uEFqCD7B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729238AbgGVG0o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 02:26:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33404 "EHLO
+        id S1728784AbgGVG02 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 02:26:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728871AbgGVG0h (ORCPT
+        with ESMTP id S1726147AbgGVG0Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 02:26:37 -0400
+        Wed, 22 Jul 2020 02:26:25 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCF9C061794;
-        Tue, 21 Jul 2020 23:26:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E351C061794;
+        Tue, 21 Jul 2020 23:26:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=va/h+wWyCoJg1xNOoHbk7lvmV/IMHTiU8wUk5cwnCTg=; b=ANtpF1jf8sE5Fd0TXOfriC9j/U
-        +LVASm0MyiGuAlIqyjVQGPtp8ufue/bxE9yn64nUj7TLYpoAnKVw1Tyt/IiCSheKIVmsF2z2tRmEl
-        mHxOeuwOHpOIofh2hPPLi3yGn4qYpqrIVIwjAEOh9aAw4CKgh8V5UNeGsqfQtKrSIlnbR9CfYLDlS
-        63LMLhhAST8a3NviY7GxTMVAgEFy+4jHavyF/+4FlAddcNj5+au/ubUclZrKdayPVsqlQAk8ZzKbk
-        nQML/k10or8YASvZo0Ao8BQLx9Kw0zJdHRVjf9Qje75iKag+/Fkl68wK2IQ2N5YRMFC5hwLp7Ypg7
-        oAFsEPMQ==;
+        bh=bUYYhGUygoqWMKKuho81ixqziKjBSgraLpIlc+nIh5c=; b=uEFqCD7B3H4B3UtE7iHzIIYryx
+        WwyoYXlyIGrJLFhqj2zal8w4lRDiuTCEaWUPozkaTptpeDskI7AylNYAmnHGmypRq2lqQLy/Ivn7k
+        J/40RAGwged0+YZYjvGJoUPjOuR+E5Nm5SIemukVhG1QbLgA3g+fnZfRf4RW2gFLg3f8qYMmkcK9z
+        dxHfldVIXyR+ONHj4Tmsysogs8B/B8J3zk95bj7JuBi72xwfqJ0wYGroh3ahPF1BTKv1AuQl1VePt
+        QtkkeuVPTA9STXd9Ax8LFqFf/G7F5sth6X371lU1IzL7+5bGDcxvp5Dx6c+auGyu4np3uPVtbrzAe
+        0pAeS8YA==;
 Received: from [2001:4bb8:18c:2acc:e75:d48f:65ef:e944] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jy8Cw-0004mm-C7; Wed, 22 Jul 2020 06:26:29 +0000
+        id 1jy8Ch-0004ln-Kd; Wed, 22 Jul 2020 06:26:15 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
@@ -48,9 +48,9 @@ Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
         drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         cgroups@vger.kernel.org
-Subject: [PATCH 05/14] md: update the optimal I/O size on reshape
-Date:   Wed, 22 Jul 2020 08:25:43 +0200
-Message-Id: <20200722062552.212200-6-hch@lst.de>
+Subject: [PATCH 01/14] fs: remove the unused SB_I_MULTIROOT flag
+Date:   Wed, 22 Jul 2020 08:25:39 +0200
+Message-Id: <20200722062552.212200-2-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200722062552.212200-1-hch@lst.de>
 References: <20200722062552.212200-1-hch@lst.de>
@@ -62,107 +62,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The raid5 and raid10 drivers currently update the read-ahead size,
-but not the optimal I/O size on reshape.  To prepare for deriving the
-read-ahead size from the optimal I/O size make sure it is updated
-as well.
-
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/raid10.c | 22 ++++++++++++++--------
- drivers/md/raid5.c  | 10 ++++++++--
- 2 files changed, 22 insertions(+), 10 deletions(-)
+ fs/namei.c         | 4 ++--
+ include/linux/fs.h | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index b1d0c9d4ef7757..9f88ff9bdee437 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3695,10 +3695,20 @@ static struct r10conf *setup_conf(struct mddev *mddev)
- 	return ERR_PTR(err);
- }
- 
-+static void raid10_set_io_opt(struct r10conf *conf)
-+{
-+	int raid_disks = conf->geo.raid_disks;
-+
-+	if (!(conf->geo.raid_disks % conf->geo.near_copies))
-+		raid_disks /= conf->geo.near_copies;
-+	blk_queue_io_opt(conf->mddev->queue, (conf->mddev->chunk_sectors << 9) *
-+			 raid_disks);
-+}
-+
- static int raid10_run(struct mddev *mddev)
+diff --git a/fs/namei.c b/fs/namei.c
+index 72d4219c93acb7..e9ff0d54a110a7 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -568,8 +568,8 @@ static bool path_connected(struct vfsmount *mnt, struct dentry *dentry)
  {
- 	struct r10conf *conf;
--	int i, disk_idx, chunk_size;
-+	int i, disk_idx;
- 	struct raid10_info *disk;
- 	struct md_rdev *rdev;
- 	sector_t size;
-@@ -3734,18 +3744,13 @@ static int raid10_run(struct mddev *mddev)
- 	mddev->thread = conf->thread;
- 	conf->thread = NULL;
+ 	struct super_block *sb = mnt->mnt_sb;
  
--	chunk_size = mddev->chunk_sectors << 9;
- 	if (mddev->queue) {
- 		blk_queue_max_discard_sectors(mddev->queue,
- 					      mddev->chunk_sectors);
- 		blk_queue_max_write_same_sectors(mddev->queue, 0);
- 		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
--		blk_queue_io_min(mddev->queue, chunk_size);
--		if (conf->geo.raid_disks % conf->geo.near_copies)
--			blk_queue_io_opt(mddev->queue, chunk_size * conf->geo.raid_disks);
--		else
--			blk_queue_io_opt(mddev->queue, chunk_size *
--					 (conf->geo.raid_disks / conf->geo.near_copies));
-+		blk_queue_io_min(mddev->queue, mddev->chunk_sectors << 9);
-+		raid10_set_io_opt(conf);
- 	}
+-	/* Bind mounts and multi-root filesystems can have disconnected paths */
+-	if (!(sb->s_iflags & SB_I_MULTIROOT) && (mnt->mnt_root == sb->s_root))
++	/* Bind mounts can have disconnected paths */
++	if (mnt->mnt_root == sb->s_root)
+ 		return true;
  
- 	rdev_for_each(rdev, mddev) {
-@@ -4719,6 +4724,7 @@ static void end_reshape(struct r10conf *conf)
- 		stripe /= conf->geo.near_copies;
- 		if (conf->mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
- 			conf->mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
-+		raid10_set_io_opt(conf);
- 	}
- 	conf->fullsync = 0;
- }
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index d7780b1dd0c528..68e41ce3ca75cc 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7123,6 +7123,12 @@ static int only_parity(int raid_disk, int algo, int raid_disks, int max_degraded
- 	return 0;
- }
+ 	return is_subdir(dentry, mnt->mnt_root);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 41cd993ec0f686..236543605dd118 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1366,7 +1366,6 @@ extern int send_sigurg(struct fown_struct *fown);
+ #define SB_I_CGROUPWB	0x00000001	/* cgroup-aware writeback enabled */
+ #define SB_I_NOEXEC	0x00000002	/* Ignore executables on this fs */
+ #define SB_I_NODEV	0x00000004	/* Ignore devices on this fs */
+-#define SB_I_MULTIROOT	0x00000008	/* Multiple roots to the dentry tree */
  
-+static void raid5_set_io_opt(struct r5conf *conf)
-+{
-+	blk_queue_io_opt(conf->mddev->queue, (conf->chunk_sectors << 9) *
-+			 (conf->raid_disks - conf->max_degraded));
-+}
-+
- static int raid5_run(struct mddev *mddev)
- {
- 	struct r5conf *conf;
-@@ -7412,8 +7418,7 @@ static int raid5_run(struct mddev *mddev)
- 
- 		chunk_size = mddev->chunk_sectors << 9;
- 		blk_queue_io_min(mddev->queue, chunk_size);
--		blk_queue_io_opt(mddev->queue, chunk_size *
--				 (conf->raid_disks - conf->max_degraded));
-+		raid5_set_io_opt(conf);
- 		mddev->queue->limits.raid_partial_stripes_expensive = 1;
- 		/*
- 		 * We can only discard a whole stripe. It doesn't make sense to
-@@ -8006,6 +8011,7 @@ static void end_reshape(struct r5conf *conf)
- 						   / PAGE_SIZE);
- 			if (conf->mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
- 				conf->mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
-+			raid5_set_io_opt(conf);
- 		}
- 	}
- }
+ /* sb->s_iflags to limit user namespace mounts */
+ #define SB_I_USERNS_VISIBLE		0x00000010 /* fstype already mounted */
 -- 
 2.27.0
 
