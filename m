@@ -2,213 +2,217 @@ Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 419BCC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 13:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A26DC433E2
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 14:32:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E43F20729
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 13:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D440820729
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 14:32:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kcSt6Eic";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="A0cl1Gca"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qpA11iX1";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="aERQETBn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731630AbgGVNCR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 09:02:17 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:23288 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726161AbgGVNCQ (ORCPT
+        id S1732516AbgGVOcb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 10:32:31 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:22601 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729642AbgGVOca (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 09:02:16 -0400
+        Wed, 22 Jul 2020 10:32:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1595422937; x=1626958937;
+  t=1595428350; x=1626964350;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=fGdST2IlJgZwpyUorU1ryFuOruLXN6Fxy5kH+uCvI5E=;
-  b=kcSt6EiciIrcr4c1SmCO5LtlDjTgZjLF2NddullBSu6V9NAmfRae0JDk
-   l9hf65qy7LiBPWl33n27+FtoZ/3gBsuc/JqfNTYhc5/29Q+dSgeUXDJV0
-   zRLdfcON46YbqIVnEAVuUT0Xh7ZoI8Nh9Apeo0CremrpXRZIndSQdl1sz
-   T8ZOXRLqoVo2Tw846feA8ofdpZVVXY3U2u/3t2ZZOOFLPQRsBHwqSK4/I
-   jPO1/MlH3rfFqDBVFSg0lHaDxF5MPRwPHnteozj35CtBmFPpXU+5rI0kB
-   ENf41ouWwDc7SWaFvNUD3sTZIIvO81Y9aw5Bnf/J5WC3dciVN3dwLz1kn
+  bh=PuoDC017WeeuiJvZB02eCzGu3ROWuDo8Ht1IM1oE98k=;
+  b=qpA11iX1qfaN341XQPRUdPv6SwYtQODDMBvRj0aiemFtEOvX6JU7gymb
+   CgU919fhJi4ek+T6kD9dMdCD4pm9HjlrlQFy5sM+Y2h66eGyQhr6w6/QC
+   F03bMz1bdsBNS1wnsCk2X8//szeoRc5iP+2Q0IG/y8TEcOeZQc0lzloWX
+   Zny9I6eor11KEXhJFvqMgFakiTxpfu2wTEVeecYKb2f+IbYkAxY4wTRbR
+   DBMGvDSZdharPxI0YuCpbDaGoUz1bJN8ZUrngFUvvG6wwEigC1+7cyRhD
+   RyxnZFYfdaSI01XkIODAz1zYo9d1/Rn+EgGRCJ6f7ApMfbtMyAPIukEQr
    A==;
-IronPort-SDR: 0GQO0/rjAzLCRBCHCNzvY8P/8bzK8Dz7WC2qI2qBR6PwKZPnILMh7XrtnZbvv8l4OoWMUKtj5D
- n9gsnVy+LLTKbqlBPehEl+TaVP/Tj0jb9R36BaV4tuh9azKyQVxPnkwkfk8Jc+XPVLYvAW38ob
- E+ZBplhsyr1657nBByjLYiuE5qAb3LkPBCulUC0T6ydOMbpAf6g6X8n/w3/wP2T+a5/7v8i2Ca
- ZKDLI/1MROcxrjklidOJkC1QpcltRrTw7LVjYS1KE3HKaDV2Y52xB1MlgXcylyKV5D16ai7dzD
- EtU=
-X-IronPort-AV: E=Sophos;i="5.75,381,1589212800"; 
-   d="scan'208";a="147415326"
-Received: from mail-dm6nam11lp2171.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.171])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Jul 2020 21:02:16 +0800
+IronPort-SDR: YchkogHDAhlkvvwfvfFRvCGdosErwV+qc6HV1ath0uu7WyeHsn//tgqel7Z2I9ZnCMjMi7ZiPT
+ lkM3bPJcgDsfKoMq270cIIQoNOrffIVglGbG9IUjB4IKv6UwJRnkkpCXrsLAhdx0UNTeA3/O/F
+ TI5EadLTK5Z653bmdhhw7u3+NkOyME72vWAD4g8mZAzNnsJDVCOPN6NBnCNXCyJrkxKTIvv6z8
+ 6bk8eM7a491xzb0OxqwppRDN6Nc0mk3A959W+a+fkvZ2xKZhuU/OLlE72a0xQDd/++ZICol8fJ
+ fek=
+X-IronPort-AV: E=Sophos;i="5.75,383,1589212800"; 
+   d="scan'208";a="143211681"
+Received: from mail-sn1nam02lp2054.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.36.54])
+  by ob1.hgst.iphmx.com with ESMTP; 22 Jul 2020 22:32:30 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZdtFm4a7mVxjXjxsovL8ezs88TJz2hl8YMlKuzElkcoRSld35E+D1/4gr7Z8daOk/zgn6Gd/PkS1G2pEsWHuI/HR6egSFAAOaAZlkWdSWm/iLh6hytJpjuGDMxR5ZtKSlBeMB6ad5hOp07S7YfB/dy7j14KV5y9hoMEW4k9Ls+/MtkSXBi6WHPzUAKsvDpqyeve8HVnaRDFxdj40z1rjyUhaV/BNjeQf9kTUOQUUhwK1bFqJYo0oZX/cRT5tBsPSwSruV//MxPsX0gBg/5tFft9P7Nkl74dB6nrJdUtTXcxEeiX71r+C1gAUpSLqq0AVqNWDeDLrQ7nvHF1VfPOqpg==
+ b=IEXVoMcEPWfu2Ob8ZBBos/pWr5Ee+pskHvUn/tBHMxS61x8bLZ9n9YuVmAbL8m+XYeSzn3PCR8ZckICZMoSgYNqQHIRA+q1bgXq8MaVGeBropeAHaqrZfR+C9BN9Tsf0yE4kQI4n/qErlJFndfWYY2DX+HRZgEmX4biFYNOsdV32AZ00vRbKBqya2dg5rTgkQ+m5cRCMJRLZ7dZhR3rgYnYFWRRKudAl4p2hjwWNENgjmA6jRg6zMz0rtn46PhMJco2SzgYQy9gMJ3Cf3fhJDM1B6xdoeigVrJQZjCchhL4q8h4ARYHcpm6k14bY572y7nxzO9USAg7ZaLfttL3akQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JY0/ZHJrRtcAW94HuHbq55AKpO46Yzs/dMXvJz/lcGU=;
- b=HhpEY93nmvdiV033Nt24XtZpDwZSgwdOtsmDFI6j0D62xkHemXwZK6PGPLppJAbQhrWi/ty8gzNMDqPlZRzlDETtlGZDYqasn8niHrjRrOiQ2IdlKPVM5EsY31JjKn9wjYpzvYQE5D66+/chMcf1583SMbgrvsmD+Q0er94V5dcQQ7+pLNOoHft+W26s0pA5QXKV7dT3xA2NqhwzZ8xky5vFna0XqlAtfXLsg96WQCFAq45Xu7WoczU6POsstHWm0zVDkx7vVjohk4fQv1Ta8jPT1mGNoygzU1uWEWMBaiZ1XW/DT64UfEwPLYg19xeNp34fs9ytXpOwu0RO6NGgYQ==
+ bh=Cxk+DhQ+SuMEvg14K0d1ydh9/tjs9QeWow4ivS+olHo=;
+ b=myusQPypYcEo88pxie+PfGqdNleYBv0e1p/AhNKQm6IM8kxxp10btvDo/jUl4a0zK7wIp3E0HuEgnPkqj5vlhJHwuLY2lXLL6MR2zBcH6ys7vap/sdcbJKJp0jNiG5J8yKHjj3l/fQpuG/iQk98A8np9rwErTppWJ1iIWurvDSwKakBiJX8pUEORsGZXPEPX2CwSLxnxphEH54FTSAIFdtfYHM+c0RJvEhBAb/I10REhOwLgucHAZyBCTalCzhGgFV7cwzZnyv9E7KDKh0dtj167V6SBoX07aPebE4ln8k+/F/mGtKTW8ZR6ZdKOUGBDhY5Ixcg20lepEfBj+6PtyQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JY0/ZHJrRtcAW94HuHbq55AKpO46Yzs/dMXvJz/lcGU=;
- b=A0cl1Gca7/5EFAsGw2Z9qqwKFuPtbFQ7z7s/Y/OsSD/8OPQKsi8eq+51kpIaaZN7MDwX0F4u21CFVDrsXTnxD+4tRBMjxZFoeCxoMuhlAyou+27f3wKNRC7Y1xqdgWBuo41Ej0KGnNNEPRdV5zTdrOIszyNBddOL4bSL14MEs6A=
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY4PR04MB1030.namprd04.prod.outlook.com (2603:10b6:910:56::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.23; Wed, 22 Jul
- 2020 13:02:14 +0000
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::d9e5:135e:cfd9:4de0]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::d9e5:135e:cfd9:4de0%7]) with mapi id 15.20.3195.025; Wed, 22 Jul 2020
- 13:02:14 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "hch@infradead.org" <hch@infradead.org>
-CC:     Christoph Hellwig <hch@lst.de>,
+ bh=Cxk+DhQ+SuMEvg14K0d1ydh9/tjs9QeWow4ivS+olHo=;
+ b=aERQETBnLPqAvrUXLQXm8Kyvbl7nB2/y0onBM64mkHsJ7h34coEfGWjuhRFhHHNSeyr6Sz0RcAqRfHURf4XbTgSxSxrvrLX2r67eymmcFCFFouly4F+f2gb9Bz1pDJO0nUyP9SLBmTe6Z6GdGJ8rfdjZKW0iLunjLkolNS+pGEI=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN4PR0401MB3597.namprd04.prod.outlook.com
+ (2603:10b6:803:45::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.21; Wed, 22 Jul
+ 2020 14:32:27 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::1447:186c:326e:30b2]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::1447:186c:326e:30b2%7]) with mapi id 15.20.3195.026; Wed, 22 Jul 2020
+ 14:32:27 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH 2/2] zonefs: use zone-append for AIO as well
 Thread-Topic: [PATCH 2/2] zonefs: use zone-append for AIO as well
-Thread-Index: AQHWXpithxnH4YX78EmlwzCUDX/15g==
-Date:   Wed, 22 Jul 2020 13:02:14 +0000
-Message-ID: <CY4PR04MB375139CC436B04DDE02B8560E7790@CY4PR04MB3751.namprd04.prod.outlook.com>
+Thread-Index: AQHWXpitifll0c+NqUqXemZ9Ae0oAA==
+Date:   Wed, 22 Jul 2020 14:32:26 +0000
+Message-ID: <SN4PR0401MB3598D4B6188B031D7C8191329B790@SN4PR0401MB3598.namprd04.prod.outlook.com>
 References: <20200720132118.10934-1-johannes.thumshirn@wdc.com>
+ <CGME20200720132131epcas5p390f6f8a13696a3f54ef906d8ce8cc0ea@epcas5p3.samsung.com>
  <20200720132118.10934-3-johannes.thumshirn@wdc.com>
- <20200720134549.GB3342@lst.de>
- <SN4PR0401MB3598A542AA5BC8218C2A78D19B7B0@SN4PR0401MB3598.namprd04.prod.outlook.com>
- <20200721055410.GA18032@infradead.org>
- <SN4PR0401MB3598536959BFAE08AA8DA8AD9B790@SN4PR0401MB3598.namprd04.prod.outlook.com>
+ <20200721122724.GA17629@test-zns>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.182.57]
+authentication-results: samsung.com; dkim=none (message not signed)
+ header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [129.253.240.72]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 9df2f3b0-d29b-4043-f2f6-08d82e3f7444
-x-ms-traffictypediagnostic: CY4PR04MB1030:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-ms-office365-filtering-correlation-id: b49b304e-75d1-415f-59d3-08d82e4c0e9b
+x-ms-traffictypediagnostic: SN4PR0401MB3597:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR04MB1030E8D2092634FF03CEA3BFE7790@CY4PR04MB1030.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <SN4PR0401MB3597D100DBC1127A7B4496E79B790@SN4PR0401MB3597.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UERRijvO+68XVZvrWrtbWVGmT9Ft3A+V6Twe+3uy8wJ6Mcn3V4wfc3ZlulMaRbNpWmRw4+8yCPM/x6XXzo9rEwEczJziapr78xm9tPdfqC/5dAccHjW+BsxFhQ1AXktzdbfQyr/aj+hl42V4GW6RsNNOa6JQaIEPciOIE0puJmrtryXgCS9XFub/37K81jn5YUKeeq9P+pQmV0YiOjGEws643odP1UiP52DGY5OI0BregOMyofz16nG54OK5M7WpFJg9+nl2UP3oaBbwWIY5HGtux0WUahMnUU7aAGfmOow+TkJy+C1+cCW5nige+NlpZs6V8zwLeHZmeFp0vjeNbA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(346002)(136003)(376002)(366004)(39860400002)(7696005)(9686003)(2906002)(52536014)(55016002)(26005)(54906003)(83380400001)(71200400001)(5660300002)(66476007)(66556008)(64756008)(66946007)(91956017)(8936002)(316002)(110136005)(33656002)(4326008)(86362001)(186003)(76116006)(66446008)(6506007)(478600001)(8676002)(53546011);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: l2vYTR+Niin2fWvLyYBA8IzE2npgAHnqDpewV8j5up6wX/7/7gbo9otfkdNGVYl0fo1oe/CBjcaqYjG/bRPV23UogmANZs4aMUniXyrsClzk+sY4cgVR6+oieT9DO6TG/XOk4NzZm5/PJdkm+VxsitHMCFOetexplIcVKGvemsc16cazAr8+7wIMozwcYFGoHmhrBvdldMGQ//NZEvSAUHZxWakW7mViEXmPEpNVcc9wgOo4Zgj/nrbTGO10cPGWMnuFEVmQ9neiGNAfJ3wceWQS6UWcnXpxLbXfsWqu8dBpED0l4zWOLlAKOvqepfQ1kKqW0/Dm8Tdni5OOW0pwze/xC3euxVAhVFeAzVYjtExP7/zsaEi0ZDYyMNN2iYNT+RkATT5gEBYBC9icwd7VR/bkjnK+wsCzqHuIa5G8IG8x0hud6lQ5WoKiN+U+2szS7IAf0VWGmSYtT172VU8oMll4hKdjYNfaqyN8cesvPlHTPzZcAG1N8yG2N6twCSsu
+x-microsoft-antispam-message-info: bet3t+gaVVPYY+R96o6qIJ1u0joPLcr8X4QQnFRC5DYC2SSNt8B5ae3KBkS1zi6NC9Lx6M1ac47mKBEGTGlCVQqZfjd1Wi5aBz7cQKbRhgISD2mcy0aq/T6QLLAi/v7vcv1DP5GUw14AqbPmMwU8gyQUqCrftgs/bZihhzC80pzUqKz3lKuKJ8EXnWwV0JsJONfIN3VqQ+rCiLIQ28sEyRELIgN6agQD7q9zJUXMjDuGPBT6J/EQMXnTfpnompja9Gh2L8SFM5K9vxP6NJd5xzlHP4GMlOlSjdTVW5bA9mgbhyZvimLktSh9x+mbnBlcq14+UHt6j3HjWR371Pojsw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(346002)(39860400002)(136003)(376002)(366004)(7696005)(52536014)(478600001)(86362001)(316002)(71200400001)(83380400001)(4326008)(54906003)(5660300002)(26005)(6916009)(53546011)(6506007)(66476007)(66946007)(64756008)(76116006)(91956017)(66446008)(66556008)(9686003)(186003)(33656002)(55016002)(2906002)(8936002)(8676002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: sx81vTrkmwI6ka+HX3r7wA+2gS9xHjmjlduK961DKSB4dzmMV6ChJKPrXUEgSkqQvds/AN6eAlIZAgaNqVHvF71EN1tQeBLsxWieRtC/UNVS3vmGaUo/d+J3JAo9dLVb9P4c7F15Sk/cfCVYC0T/ft7wrYfWdru0RCmoAQH2Pb+LOHazSfET/fQ3T769WyoNgWYvfbJmcJfPqAy/WViV60f8fzyJFzYIUUxh5I/CdIOnc7s64iaY2BAdJx0Rrhq3NEfaTp5bg6w1hP4dJt+nW36PKAq0NjUnIkM6UGRiInDGv3ih4x+XqqJ98Hw/wEXwr77AKeZjvl8lpZSodk2Qy2v5lwsLDCexlCecS2XJ4pjdlO43hpnx8CEJwv3NuZDz+kwma2z1+9RIKxCDrFxnZmtnJMU/4gKNiuc8UT/ncfePW8k5auyjPp0ip2GFcoX/O4tFEE+zINVUngd/aROrSOrenxtcj4mz8meKuM7lwwULi9JdffYdudrDLWGlhUqF
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9df2f3b0-d29b-4043-f2f6-08d82e3f7444
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2020 13:02:14.0218
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b49b304e-75d1-415f-59d3-08d82e4c0e9b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2020 14:32:26.8950
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /71I49Sv6zaEDw1dTvye+i7Zplri99SmPU9X79kjV6WUwyNmuZFHnJXpVZQ1TaogvXNcY4c97h45OQAB58NFYw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB1030
+X-MS-Exchange-CrossTenant-userprincipalname: z9XHT9dvaXeSp49yf7EM/KGSVT1hh72ptzfZZTSF+/S2k9B+DUFsOe8+gpUWCQqarc9IhqQ5WXPvGo123h1m0l+g1XPT/ixATZ6L7Bfjm9Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3597
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/07/22 21:43, Johannes Thumshirn wrote:=0A=
-> On 21/07/2020 07:54, Christoph Hellwig wrote:=0A=
->> On Mon, Jul 20, 2020 at 04:48:50PM +0000, Johannes Thumshirn wrote:=0A=
->>> On 20/07/2020 15:45, Christoph Hellwig wrote:=0A=
->>>> On Mon, Jul 20, 2020 at 10:21:18PM +0900, Johannes Thumshirn wrote:=0A=
->>>>> On a successful completion, the position the data is written to is=0A=
->>>>> returned via AIO's res2 field to the calling application.=0A=
->>>>=0A=
->>>> That is a major, and except for this changelog, undocumented ABI=0A=
->>>> change.  We had the whole discussion about reporting append results=0A=
->>>> in a few threads and the issues with that in io_uring.  So let's=0A=
->>>> have that discussion there and don't mix it up with how zonefs=0A=
->>>> writes data.  Without that a lot of the boilerplate code should=0A=
->>>> also go away.=0A=
->>>>=0A=
->>>=0A=
->>> OK maybe I didn't remember correctly, but wasn't this all around =0A=
->>> io_uring and how we'd report the location back for raw block device=0A=
->>> access?=0A=
+On 21/07/2020 15:02, Kanchan Joshi wrote:=0A=
+> On Mon, Jul 20, 2020 at 10:21:18PM +0900, Johannes Thumshirn wrote:=0A=
+>> If we get an async I/O iocb with an O_APPEND or RWF_APPEND flag set,=0A=
+>> submit it using REQ_OP_ZONE_APPEND to the block layer.=0A=
 >>=0A=
->> Report the write offset.  The author seems to be hell bent on making=0A=
->> it block device specific, but that is a horrible idea as it is just=0A=
->> as useful for normal file systems (or zonefs).=0A=
+>> As an REQ_OP_ZONE_APPEND bio must not be split, this does come with an=
+=0A=
+>> additional constraint, namely the buffer submitted to zonefs must not be=
+=0A=
+>> bigger than the max zone append size of the underlying device. For=0A=
+>> synchronous I/O we don't care about this constraint as we can return sho=
+rt=0A=
+>> writes, for AIO we need to return an error on too big buffers.=0A=
 > =0A=
-> After having looked into io_uring I don't this there is anything that=0A=
-> prevents io_uring from picking up the write offset from ki_complete's=0A=
-> res2 argument. As of now io_uring ignores the filed but that can be =0A=
-> changed.=0A=
+> I wonder what part of the patch implements that constraint on large=0A=
+> buffer and avoids short-write.=0A=
+> Existing code seems to trim iov_iter in the outset. =0A=
 > =0A=
-> The reporting of the write offset to user-space still needs to be =0A=
-> decided on from an io_uring PoV.=0A=
-> =0A=
-> So the only thing that needs to be done from a zonefs perspective is =0A=
-> documenting the use of res2 and CC linux-aio and linux-abi (including=0A=
-> an update of the io_getevents man page).=0A=
-> =0A=
-> Or am I completely off track now?=0A=
+>         max =3D queue_max_zone_append_sectors(bdev_get_queue(bdev));=0A=
+>         max =3D ALIGN_DOWN(max << SECTOR_SHIFT, inode->i_sb->s_blocksize)=
+;=0A=
+>         iov_iter_truncate(from, max);=0A=
 =0A=
-That is the general idea. But Christoph point was that reporting the effect=
-ive=0A=
-write offset back to user space can be done not only for zone append, but a=
-lso=0A=
-for regular FS/files that are open with O_APPEND and being written with AIO=
-s,=0A=
-legacy or io_uring. Since for this case, the aio->aio_offset field is ignor=
-ed=0A=
-and the kiocb pos is initialized with the file size, then incremented with =
-size=0A=
-for the next AIO, the user never actually sees the actual write offset of i=
-ts=0A=
-AIOs. Reporting that back for regular files too can be useful, even though=
-=0A=
-current application can do without this (or do not use O_APPEND because it =
-is=0A=
-lacking).=0A=
-=0A=
-Christoph, please loudly shout at me if I misunderstood you :)=0A=
-=0A=
-For the regular FS/file case, getting the written file offset is simple. On=
-ly=0A=
-need to use the kiocb->pos. That is not a per FS change.=0A=
-=0A=
-For the user interface, yes, I agree, res2 is the way to go. And we need to=
-=0A=
-decide for io_uring how to do it. That is an API change, bacward compatible=
- for=0A=
-legacy AIO, but still a change. So linux-aio and linux-api lists should be=
-=0A=
-consulted. Ideally, for io_uring, something backward compatible would be ni=
-ce=0A=
-too. Not sure how to do it yet.=0A=
-=0A=
-Whatever the interface, plugging zonefs into it is the trivial part as you=
-=0A=
-already did the heavier lifting with writing the async zone append path.=0A=
-=0A=
+This actually needs a 'if (sync)' before the iov_iter_truncate() you're rig=
+ht.=0A=
 =0A=
 > =0A=
-> Thanks,=0A=
-> 	Johannes=0A=
+> This will prevent large-buffer seeing that error, and will lead to partia=
+l write.=0A=
+> =0A=
+>> On a successful completion, the position the data is written to is=0A=
+>> returned via AIO's res2 field to the calling application.=0A=
+>>=0A=
+>> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+>> ---=0A=
+>> fs/zonefs/super.c  | 143 +++++++++++++++++++++++++++++++++++++++------=
+=0A=
+>> fs/zonefs/zonefs.h |   3 +=0A=
+>> 2 files changed, 128 insertions(+), 18 deletions(-)=0A=
+>>=0A=
+>> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c=0A=
+>> index 5832e9f69268..f155a658675b 100644=0A=
+>> --- a/fs/zonefs/super.c=0A=
+>> +++ b/fs/zonefs/super.c=0A=
+>> @@ -24,6 +24,8 @@=0A=
+>>=0A=
+>> #include "zonefs.h"=0A=
+>>=0A=
+>> +static struct bio_set zonefs_dio_bio_set;=0A=
+>> +=0A=
+>> static inline int zonefs_zone_mgmt(struct zonefs_inode_info *zi,=0A=
+>> 				   enum req_opf op)=0A=
+>> {=0A=
+>> @@ -700,16 +702,71 @@ static const struct iomap_dio_ops zonefs_write_dio=
+_ops =3D {=0A=
+>> 	.end_io			=3D zonefs_file_write_dio_end_io,=0A=
+>> };=0A=
+>>=0A=
+>> +struct zonefs_dio {=0A=
+>> +	struct kiocb		*iocb;=0A=
+>> +	struct task_struct	*waiter;=0A=
+>> +	int			error;=0A=
+>> +	struct work_struct	work;=0A=
+>> +	size_t			size;=0A=
+>> +	u64			sector;=0A=
+>> +	struct completion	completion;=0A=
+>> +	struct bio		bio;=0A=
+>> +};=0A=
+> =0A=
+> How about this (will save 32 bytes) - =0A=
+> +struct zonefs_dio {=0A=
+> +       struct kiocb            *iocb;=0A=
+> +       struct task_struct      *waiter;=0A=
+> +       int                     error;=0A=
+> +	union {=0A=
+> +       	struct work_struct      work;   //only for async IO=0A=
+> +       	struct completion       completion; //only for sync IO=0A=
+> +	};=0A=
+> +       size_t                  size;=0A=
+> +       u64                     sector;=0A=
+> +       struct bio              bio;=0A=
+> +};=0A=
+> And dio->error field is not required.=0A=
+> I see it being used at one place -=0A=
+> +       ret =3D zonefs_file_write_dio_end_io(iocb, dio->size,=0A=
+> +                                          dio->error, 0);=0A=
+> Here error-code can be picked from dio->bio.=0A=
 > =0A=
 =0A=
+Indeed, did that and also removed the unused completion from =0A=
+zonefs_dio and made a union of work and waiter.=0A=
 =0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
