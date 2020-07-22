@@ -2,208 +2,127 @@ Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C580C433E2
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 09:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2471CC433E2
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 09:34:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0526B20729
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 09:13:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AsiQyKbc"
+	by mail.kernel.org (Postfix) with ESMTP id 06E832077D
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 09:34:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731208AbgGVJNc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 05:13:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59160 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726807AbgGVJNc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 05:13:32 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE15FC0619DC
-        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2020 02:13:31 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id w6so1426883ejq.6
-        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2020 02:13:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Jykpt/Kb2fIe75xsqlTS0vliRxM4ipl7gvFFaG21xG0=;
-        b=AsiQyKbc+e9nzeW+S+gzkMe7A3+2fPTqxGAa33Ix7mL5qJGLQGDpFrd6nl6vVhqGIJ
-         776ax402SIffwek2MvDgJY28LOp+ZRSz5+w3DmSyQZ2Nap107Q+N5CyV+l3IFn9/9kS7
-         dEEGQ1i7Ut1v9FkB1l3M73oMiJ5DOPhlXhpku6QSh7xY4vmE/1v14QVyQZrhYvL1Tora
-         oDffH1Vv/KmQQ0V9jGQ2LqtEFV6qchBUoLJBRfMxGt3bT7dl1SWZQ6eyAyj+wEqeMagt
-         sIhBtAaYwHPrJwsGq7/ZYxaxERJIiyQgReU7JShQO6e0boDg2ONB0JVo4CUtEXvKgFxY
-         mWHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Jykpt/Kb2fIe75xsqlTS0vliRxM4ipl7gvFFaG21xG0=;
-        b=IF4rgsy7sDXT6Rszdyeh6/EWNA5ckBBcALNYw5cTzTC4WiKvL79LNbDCvmjOp/YESS
-         YHALaZhMhxiWomHdZ5dL+BLJaEzMgXhdiLvsHTY5X75p9RlhcX8Dm1JPZJdMb1Uk0h4T
-         iUPvq/6Xwh2ChOBXyQaG4dgmmgBoqWi2tA4RjUwcXiECKGRuxxKo0Vu3PschMMvSIB90
-         XCCaGXZUV4CyWx2Bt39SmJ7HtJIRGwnRMbu2qk8gJv79kC0XWxpGvokSXv+QouJwuJQF
-         JJg91qSCdmPF93eQiRPNLfTdWoJxeVSa8l3rA63kyLSJMQGG9+xV1St6Yav2ut3fmPMb
-         ULBw==
-X-Gm-Message-State: AOAM532WBYrA2njhOXuBB1vgIqqL0WFmadDper/id+fsfYwMMdWpBbXH
-        EpBF6o2WZTi8iDHDtvEjWTZnnc91pyG7Eg==
-X-Google-Smtp-Source: ABdhPJzg0bwXNZjhl7ury7bO6Uo/g0VYGxZKYqqCLM+GiSM6TaPpIQgNr4caqVEnwdNZ5/g1mu4V4A==
-X-Received: by 2002:a17:906:1c05:: with SMTP id k5mr28489553ejg.320.1595409210287;
-        Wed, 22 Jul 2020 02:13:30 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id m14sm17871507ejx.80.2020.07.22.02.13.29
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 22 Jul 2020 02:13:29 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 3/3] bfq: Use only idle IO periods for think time
- calculations
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20200611143912.GC19132@quack2.suse.cz>
-Date:   Wed, 22 Jul 2020 11:13:28 +0200
-Cc:     linux-block@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7BE4BFD7-F8C1-49DE-A318-9E038B9A19BC@linaro.org>
-References: <20200605140837.5394-1-jack@suse.cz>
- <20200605141629.15347-3-jack@suse.cz>
- <934FEB51-BB23-4ACA-BCEC-310E56A910CC@linaro.org>
- <20200611143912.GC19132@quack2.suse.cz>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1728360AbgGVJej (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 05:34:39 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2505 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727819AbgGVJei (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Jul 2020 05:34:38 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id 6FE4675AE90AF695EA1C;
+        Wed, 22 Jul 2020 10:34:36 +0100 (IST)
+Received: from [127.0.0.1] (10.47.1.221) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Wed, 22 Jul
+ 2020 10:34:35 +0100
+Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+To:     Ming Lei <ming.lei@redhat.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>
+CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>, <bvanassche@acm.org>,
+        <hare@suse.com>, <hch@lst.de>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+References: <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
+ <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com>
+ <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
+ <34a832717fef4702b143ea21aa12b79e@mail.gmail.com>
+ <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
+ <e69dc243174664efd414a4cd0176e59d@mail.gmail.com>
+ <20200721011323.GA833377@T590>
+ <c71bbdf2607a8183926430b5f4aa1ae1@mail.gmail.com>
+ <20200722041201.GA912316@T590>
+ <f6f05483491c391ce79486b8fb78cb2e@mail.gmail.com>
+ <20200722080409.GB912316@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <fe7a7acf-d62b-d541-4203-29c1d0403c2a@huawei.com>
+Date:   Wed, 22 Jul 2020 10:32:41 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
+MIME-Version: 1.0
+In-Reply-To: <20200722080409.GB912316@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.1.221]
+X-ClientProxiedBy: lhreml729-chm.china.huawei.com (10.201.108.80) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+>>>>>>
+>>>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c index
+>>>>>> 1be7ac5a4040..b6a5b41b7fc2 100644
+>>>>>> --- a/block/blk-mq.c
+>>>>>> +++ b/block/blk-mq.c
+>>>>>> @@ -1559,6 +1559,9 @@ void blk_mq_run_hw_queues(struct
+>>>>> request_queue
+>>>>>> *q, bool async)
+>>>>>>          struct blk_mq_hw_ctx *hctx;
+>>>>>>          int i;
+>>>>>>
+>>>>>> +       if (!q->elevator)
+>>>>>> +               return;
+>>>>>> +
+>>>>> This way shouldn't be correct, blk_mq_run_hw_queues() is still
+>>>>> needed
 
+Could the logic of blk_mq_run_hw_queue() -> blk_mq_hctx_has_pending() -> 
+sbitmap_any_bit_set(&hctx->ctx_map) be optimised for megaraid scenario?
 
-> Il giorno 11 giu 2020, alle ore 16:39, Jan Kara <jack@suse.cz> ha =
-scritto:
->=20
-> On Thu 11-06-20 16:11:10, Paolo Valente wrote:
->>=20
->>=20
->>> Il giorno 5 giu 2020, alle ore 16:16, Jan Kara <jack@suse.cz> ha =
-scritto:
->>>=20
->>> Currently whenever bfq queue has a request queued we add now -
->>> last_completion_time to the think time statistics. This is however
->>> misleading in case the process is able to submit several requests in
->>> parallel because e.g. if the queue has request completed at time T0 =
-and
->>> then queues new requests at times T1, T2, then we will add T1-T0 and
->>> T2-T0 to think time statistics which just doesn't make any sence =
-(the
->>> queue's think time is penalized by the queue being able to submit =
-more
->>> IO).
->>=20
->> I've thought about this issue several times.  My concern is that, by
->> updating the think time only when strictly meaningful, we reduce the
->> number of samples.  In some cases, we may reduce it to a very low
->> value.  For this reason, so far I have desisted from changing the
->> current scheme.  IOW, I opted for dirtier statistics to avoid the =
-risk
->> of too scarse statistics.  Any feedback is very welcome.
->=20
-> I understand the concern.
+As I see, since megaraid will have 1:1 mapping of CPU to hw queue, will 
+there only ever possibly a single bit set in ctx_map? If so, it seems a 
+waste to always check every sbitmap map. But adding logic for this may 
+negate any possible gains.
 
-Hi,
-sorry for the sidereal delay.
+>>>> for
+>>>>> none because request may not be dispatched successfully by direct
+>> issue.
+>>>> When block layer attempt posting request to h/w queue directly (for
+>>>> ioscheduler=none) and if it fails, it is calling
+>>>> blk_mq_request_bypass_insert().
+>>>> blk_mq_request_bypass_insert function will start the h/w queue from
+>>>> submission context. Do we still have an issue if we skip running hw
+>>>> queue from completion ?
+>>> The thing is that we can't guarantee that direct issue or adding request
+>> into
+>>> hctx->dispatch is always done for MQ/none, for example, request still
+>>> can be added to sw queue from blk_mq_flush_plug_list() when mq plug is
+>>> applied.
+>> I see even blk_mq_sched_insert_requests() from blk_mq_flush_plug_list make
+>> sure it run the h/w queue. If all the submission path which deals with s/w
+>> queue make sure they run h/w queue, can't we remove blk_mq_run_hw_queues()
+>> from scsi_end_request ?
+> No, one purpose of blk_mq_run_hw_queues() is for rerun queue in case that
+> dispatch budget is running out of in submission path, and sdev->device_busy is
+> shared by all hw queues on this scsi device.
+> 
+> I posted one patch for avoiding it in scsi_end_request() before, looks it
+> never lands upstream:
+> 
 
-> But:
->=20
-> a) I don't think adding these samples to statistics helps in any way =
-(you
-> cannot improve the prediction power of the statistics by including in =
-it
-> some samples that are not directly related to the thing you try to
-> predict). And think time is used to predict the answer to the =
-question: If
-> bfq queue becomes idle, how long will it take for new request to =
-arrive? So
-> second and further requests are simply irrelevant.
->=20
-
-Yes, you are super right in theory.
-
-Unfortunately this may not mean that your patch will do only good, for
-the concerns in my previous email.=20
-
-So, here is a proposal to move forward:
-1) I test your patch on my typical set of
-   latency/guaranteed-bandwidth/total-throughput benchmarks
-2) You test your patch on a significant set of benchmarks in mmtests
-
-What do you think?
+I saw that you actually posted the v3:
+https://lore.kernel.org/linux-scsi/BL0PR2101MB11230C5F70151037B23C0C35CE2D0@BL0PR2101MB1123.namprd21.prod.outlook.com/
+And it no longer applies, due to the changes in scsi_mq_get_budget(), I 
+think, which look non-trivial. Any chance to repost?
 
 Thanks,
-Paolo
-
-> b) =46rom my testing with 4 fio sequential readers (the workload =
-mentioned in
-> the previous patch) this patch caused a noticeable change in computed =
-think
-> time and that allowed fio processes to be reliably marked as having =
-short
-> think time (without this patch they were oscilating between short =
-ttime and
-> not short ttime) and consequently achieving better throughput because =
-we
-> were idling for new requests from these bfq queues. Note that this was =
-with
-> somewhat aggressive slice_idle setting (2ms). Having slice_idle >=3D =
-4ms was
-> enough hide the ttime computation issue but still this demonstrates =
-that
-> these bogus samples noticeably raise computed average.
->=20
-> 								Honza
->=20
->>> So add to think time statistics only time intervals when the queue
->>> had no IO pending.
->>>=20
->>> Signed-off-by: Jan Kara <jack@suse.cz>
->>> ---
->>> block/bfq-iosched.c | 12 ++++++++++--
->>> 1 file changed, 10 insertions(+), 2 deletions(-)
->>>=20
->>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>> index c66c3eaa9e26..4b1c9c5f57b6 100644
->>> --- a/block/bfq-iosched.c
->>> +++ b/block/bfq-iosched.c
->>> @@ -5192,8 +5192,16 @@ static void bfq_update_io_thinktime(struct =
-bfq_data *bfqd,
->>> 				    struct bfq_queue *bfqq)
->>> {
->>> 	struct bfq_ttime *ttime =3D &bfqq->ttime;
->>> -	u64 elapsed =3D ktime_get_ns() - bfqq->ttime.last_end_request;
->>> -
->>> +	u64 elapsed;
->>> +=09
->>> +	/*
->>> +	 * We are really interested in how long it takes for the queue =
-to
->>> +	 * become busy when there is no outstanding IO for this queue. =
-So
->>> +	 * ignore cases when the bfq queue has already IO queued.
->>> +	 */
->>> +	if (bfqq->dispatched || bfq_bfqq_busy(bfqq))
->>> +		return;
->>> +	elapsed =3D ktime_get_ns() - bfqq->ttime.last_end_request;
->>> 	elapsed =3D min_t(u64, elapsed, 2ULL * bfqd->bfq_slice_idle);
->>>=20
->>> 	ttime->ttime_samples =3D (7*ttime->ttime_samples + 256) / 8;
->>> --=20
->>> 2.16.4
->>>=20
->>=20
-> --=20
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
-
+John
