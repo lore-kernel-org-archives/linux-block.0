@@ -2,136 +2,166 @@ Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 839D6C433E5
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 07:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31724C433E4
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 08:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5792120714
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 07:45:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0516E207DD
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 08:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AX+FqyFP";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="a/9R+n5B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C70VoXmx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726929AbgGVHpa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 03:45:30 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:60082 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726253AbgGVHp3 (ORCPT
+        id S1726667AbgGVIEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 04:04:32 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37006 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726500AbgGVIEb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 03:45:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1595403929; x=1626939929;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=2dYsmetetAQjGFOstq75gNTdBHAVPGPd6z19LIgcbAs=;
-  b=AX+FqyFP42cvLdAwluqAh6NJ4NC9KumH6E5bwT2Do6gs35PIRX44z/fp
-   rHFo2N6mcQ1c9TpzbPJnMdS+/vIJPdezH9ELCuoQbWM294ewrU8AOjrP8
-   srit02Vsv9yJozycvqVfww6wx3N7vg96O8YIpaZFpmwUhas0cCikpzLPl
-   vnWUkEHDsIkE2QkALziB/UmqluvTEmFinO0589aqYSgjB3I8CtrBASTJd
-   NvmFfHrauXPZYvKdzj46zQj1yhGETqXX/v1O6JtW3FAqPnoHkRTA3DD+j
-   M6Jjx36GZHmQq2ICEBhny7PJiCjdazGU/sefV3bD6u/70D8ASJ3W4dsBc
-   Q==;
-IronPort-SDR: SDjlXVEhUp0fAxb7HA0iZl2lppjVGzgppUkGG+WGLW49GubZShj2qUNUK5fNy4VXMQ7uM5NF6g
- MarhJ3NvqMvRPN/606pU/xuhmhczi+lE91rLKYEKA+oV6uoB5H0IdBUqdnKqU36BIXI5+/DVgT
- wgx9aceZ/vD9Eop0RBjUf+MudWDzMAGwbQcjD0PFQ5hzZ1q/QUjE19+Vql9NhvSaR8W98oqvMz
- qjibeh+XqSl2YoU50c12tPKRtuhHIbtFEukHVOoXJJV86GB5DD7DPM0Lpj5gzLvU6/YwO3x6Y6
- Q4U=
-X-IronPort-AV: E=Sophos;i="5.75,381,1589212800"; 
-   d="scan'208";a="144357296"
-Received: from mail-bn8nam12lp2172.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.172])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Jul 2020 15:45:27 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=drU+PObeyP3UdTqV790WO7C7ywL2JUxTmqUeMUz5Stk/lb7uW1UesRnhM8Bghke9cpVbX1l+A0ghUYsD6uONEDPIfm/z73C0GptuwOLdoSOStVdRiK4ErYwGSMmTB8GIKxQcRNNzTxjcOPVWnXyT5Vx5KQURD3ibXiCeDKmWVmck++vNxZvfTwuK2LakYaiYqUVJY/uwDcNQEi0NOKYQyB9Ko0LK6xTwgHSA3zUUtmswN1NC7eaVqD/KQYJqitLhRooZBMUUzLJ2Q3ofLymn/bHO4FNyx94dLVizecb6ggSo72Ipoxfsan24IL40+mn2OdzVTf88LZL4EvK9AbABeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I0K5mJznmfxjwY39VW0JeYpFKeILGV3n8VhABZp5fF0=;
- b=QHi8m12gXJAZFvDfFS+/9Ds0HLkoapN9cfjcRy0VvFYZTBR6NyuCx+otChUHAnb3qlIROeJaR8ji5RPiKRDI0L4/ARXAgOPzY/GfSRmtn4NuPG+79LUDpHZg53LN3S93p7x+FMV2P1bymnvylbv3SQvnD83FciBm2Bq6pct4/uFcyQ5NDK4VeqvN/5Vfoxsieogb7of8PRjCCfyHpS+mzpNFkWxHZ1PjyLYPjaNKJ4REhYDQb5bH3YH0rSJ+bLlCZlMxy+T95pW4MnG2MSILwebfSbMXDaYktgpq+5z9aDJ5CSNKM7zDdl29OErlCFRXEoLdsAgKHMXV4eNdyRh2LA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I0K5mJznmfxjwY39VW0JeYpFKeILGV3n8VhABZp5fF0=;
- b=a/9R+n5BrdGnFvHmK72vVSTNqZyTcUh2/W/H5HRXaBYZJJFj6fag2W8sUdt+D1wg8YbLPwkfmtSwkPd6qAfXsxozzx/9GJcww1xDIA9SHpfliZe3w2opM2huZfYgSW77aFyzYlj43Q6qS1FVjdu8ZM81iim5HkVQKJqFQRyTIDc=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN6PR04MB5166.namprd04.prod.outlook.com
- (2603:10b6:805:94::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17; Wed, 22 Jul
- 2020 07:45:25 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::1447:186c:326e:30b2]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::1447:186c:326e:30b2%7]) with mapi id 15.20.3195.026; Wed, 22 Jul 2020
- 07:45:25 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>
-Subject: Re: [PATCH 09/14] bdi: remove BDI_CAP_CGROUP_WRITEBACK
-Thread-Topic: [PATCH 09/14] bdi: remove BDI_CAP_CGROUP_WRITEBACK
-Thread-Index: AQHWX/E7tn9lZZ9OhUyy9G9ALxYa2w==
-Date:   Wed, 22 Jul 2020 07:45:24 +0000
-Message-ID: <SN4PR0401MB35988BC2003CCDFC7CE8258F9B790@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200722062552.212200-1-hch@lst.de>
- <20200722062552.212200-10-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.240.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: c408b401-570b-44b8-cdf6-08d82e133232
-x-ms-traffictypediagnostic: SN6PR04MB5166:
-x-microsoft-antispam-prvs: <SN6PR04MB51661888992ABF6700F326FB9B790@SN6PR04MB5166.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4502;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: EfDnxd+GPm0gZxTebfIFv6FzPlTSO1L25VMdJjFqeTLDSm95+2EeoCncor1Ikx12NOs4A+eQLtb91OotgtTkwkMqjEjcLDYer1UXXwFK88XlDNn1VcC789J1XI+YCfboC4NQONkv1aqjH2CGDULcJvndJokgksu+OyxWeUJ7sui9iztfLHfi4h58+IcNHU9petmCnmts7XzJ8feEu8J7MzCOPz/+O66g51FfXLHwDFfuo/FKIH9r0/+Cg4GR4g+BJTTeRFfkvlUyiQGc9z/ZjV+LrFhQKJD7JCd+oqdQXKCqCMn/aQUmhjRqjxZN7XcLPYMVWY6tgZGNDWXbz1Uqpw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(366004)(376002)(39860400002)(136003)(346002)(9686003)(55016002)(86362001)(26005)(558084003)(7416002)(52536014)(5660300002)(83380400001)(186003)(76116006)(66946007)(66446008)(64756008)(66476007)(66556008)(8936002)(478600001)(54906003)(8676002)(7696005)(110136005)(316002)(2906002)(91956017)(4326008)(53546011)(6506007)(71200400001)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: 4Vf7Bw2L2SMhl3Jt3ilKs7ZxghqXd79kKvSP0ct+ChAlqLmLNj25NXPhAalKXCu+YIG48i068OUEUN4KbDcYD0Hs/4j3WJUCFvzLlt53HJvY/ue9U+1J4qJGyiIFHnJbqZkwfh5gcTysF4pp0RekCJ9GpLa/gL7pxT5vh35fxY/ONSjnEm1YFiihH0NflWOi62TZ4iUOtvcqy8kPeRgvhsMxNHAD+c3NVTilVhm32WxzcUWmG8IEJS+97EFA3iCNiQr3EbnB8sozmmMHjVZH0QG7Vp1YT2z2PL0ZR9pM5MyFMTN/unviq9YFquqWSSmDfyEu+VQ8XJYnvqHzkqTkEZ1ZiQ0x9U2ydIA5/YGw/KT8m+pA2hWsxgBhkidG5ZrFUqkSkUSwJ5jhWEusaX4QaW+vL6YHK4QyZrHGmLc9W5hvA0iDXzx+//rVN6Q5xL0DCjkkAO59PGD5+es9JShbbi+JPLfiXOeIrnzflaWg4qgWIqs51Z6d8CAdXS8f0wwv
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 22 Jul 2020 04:04:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595405070;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nb0bmuOR5AabZ9/kmNkKSWj6VAfofR2sm0D19qrFIWw=;
+        b=C70VoXmxHlIsl3Qsq/VfzjEOAaihX7JgUfiZpINWL5mI5qTm7TdgwilBGudBnG2jCy9QiJ
+        56VmLbYEEITBVYQ/ygjYvhSqZHR4DElkGdHSTQO3IGdf75VGS5VFjR53Mc26iHdIOu5tl0
+        tWTgrlsCBh0zNNhOlIyKE6/Ju+M/07Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-493-rurFKqdUPPCDlNJHLIdkmw-1; Wed, 22 Jul 2020 04:04:27 -0400
+X-MC-Unique: rurFKqdUPPCDlNJHLIdkmw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 822EA18C63C1;
+        Wed, 22 Jul 2020 08:04:24 +0000 (UTC)
+Received: from T590 (ovpn-13-96.pek2.redhat.com [10.72.13.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 42410610AF;
+        Wed, 22 Jul 2020 08:04:13 +0000 (UTC)
+Date:   Wed, 22 Jul 2020 16:04:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Kashyap Desai <kashyap.desai@broadcom.com>
+Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        bvanassche@acm.org, hare@suse.com, hch@lst.de,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+Message-ID: <20200722080409.GB912316@T590>
+References: <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
+ <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com>
+ <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
+ <34a832717fef4702b143ea21aa12b79e@mail.gmail.com>
+ <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
+ <e69dc243174664efd414a4cd0176e59d@mail.gmail.com>
+ <20200721011323.GA833377@T590>
+ <c71bbdf2607a8183926430b5f4aa1ae1@mail.gmail.com>
+ <20200722041201.GA912316@T590>
+ <f6f05483491c391ce79486b8fb78cb2e@mail.gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c408b401-570b-44b8-cdf6-08d82e133232
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2020 07:45:24.9244
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SirNX0bUajLMGXRH0iKCjWPNXUs9Ukmcwo5ehc24DNrjMj6KWKusnbx4pI2xSrXuVT41q2axOQJFRyDnqTFudULMSRzXqqnqTrUhVIuh+2Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB5166
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6f05483491c391ce79486b8fb78cb2e@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 22/07/2020 08:27, Christoph Hellwig wrote:=0A=
-> it is know to support cgroup writeback, or the bdi comes from the block=
-=0A=
-knwon  ~^=0A=
-=0A=
-Apart from that,=0A=
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+On Wed, Jul 22, 2020 at 11:00:45AM +0530, Kashyap Desai wrote:
+> > On Tue, Jul 21, 2020 at 12:23:39PM +0530, Kashyap Desai wrote:
+> > > > > >
+> > > > > > Perf top (shared host tag. IOPS = 230K)
+> > > > > >
+> > > > > > 13.98%  [kernel]        [k] sbitmap_any_bit_set
+> > > > > >      6.43%  [kernel]        [k] blk_mq_run_hw_queue
+> > > > >
+> > > > > blk_mq_run_hw_queue function take more CPU which is called from "
+> > > > > scsi_end_request"
+> > > >
+> > > > The problem could be that nr_hw_queues is increased a lot so that
+> > > > sample
+> > > on
+> > > > blk_mq_run_hw_queue() can be observed now.
+> > >
+> > > Yes. That is correct.
+> > >
+> > > >
+> > > > > It looks like " blk_mq_hctx_has_pending" handles only elevator
+> > > > > (scheduler) case. If  queue has ioscheduler=none, we can skip. I
+> > > > > case of scheduler=none, IO will be pushed to hardware queue and it
+> > > > > by pass
+> > > > software queue.
+> > > > > Based on above understanding, I added below patch and I can see
+> > > > > performance scale back to expectation.
+> > > > >
+> > > > > Ming mentioned that - we cannot remove blk_mq_run_hw_queues()
+> > from
+> > > > > IO completion path otherwise we may see IO hang. So I have just
+> > > > > modified completion path assuming it is only required for IO
+> scheduler
+> > case.
+> > > > > https://www.spinics.net/lists/linux-block/msg55049.html
+> > > > >
+> > > > > Please review and let me know if this is good or we have to
+> > > > > address with proper fix.
+> > > > >
+> > > > > diff --git a/block/blk-mq.c b/block/blk-mq.c index
+> > > > > 1be7ac5a4040..b6a5b41b7fc2 100644
+> > > > > --- a/block/blk-mq.c
+> > > > > +++ b/block/blk-mq.c
+> > > > > @@ -1559,6 +1559,9 @@ void blk_mq_run_hw_queues(struct
+> > > > request_queue
+> > > > > *q, bool async)
+> > > > >         struct blk_mq_hw_ctx *hctx;
+> > > > >         int i;
+> > > > >
+> > > > > +       if (!q->elevator)
+> > > > > +               return;
+> > > > > +
+> > > >
+> > > > This way shouldn't be correct, blk_mq_run_hw_queues() is still
+> > > > needed
+> > > for
+> > > > none because request may not be dispatched successfully by direct
+> issue.
+> > >
+> > > When block layer attempt posting request to h/w queue directly (for
+> > > ioscheduler=none) and if it fails, it is calling
+> > > blk_mq_request_bypass_insert().
+> > > blk_mq_request_bypass_insert function will start the h/w queue from
+> > > submission context. Do we still have an issue if we skip running hw
+> > > queue from completion ?
+> >
+> > The thing is that we can't guarantee that direct issue or adding request
+> into
+> > hctx->dispatch is always done for MQ/none, for example, request still
+> > can be added to sw queue from blk_mq_flush_plug_list() when mq plug is
+> > applied.
+> 
+> I see even blk_mq_sched_insert_requests() from blk_mq_flush_plug_list make
+> sure it run the h/w queue. If all the submission path which deals with s/w
+> queue make sure they run h/w queue, can't we remove blk_mq_run_hw_queues()
+> from scsi_end_request ?
+
+No, one purpose of blk_mq_run_hw_queues() is for rerun queue in case that
+dispatch budget is running out of in submission path, and sdev->device_busy is
+shared by all hw queues on this scsi device.
+
+I posted one patch for avoiding it in scsi_end_request() before, looks it
+never lands upstream:
+
+https://lore.kernel.org/linux-block/20191118100640.3673-1-ming.lei@redhat.com/
+
+Thanks,
+Ming
+
