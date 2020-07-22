@@ -2,224 +2,121 @@ Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3935C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 01:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD63C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 03:05:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D03CF2073A
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 01:46:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3074E207CD
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 03:05:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="ALr2mHuH"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Ert4ww4q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731592AbgGVBqa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jul 2020 21:46:30 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:18439 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731594AbgGVBq3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jul 2020 21:46:29 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1595382388; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=/jxanz1wFazqMvN3WsdKChaq8AyQBI/wW5LslckLOws=;
- b=ALr2mHuHpm8eC7wMMGn+uPeRlx7rh+JeoO9MzeyCdjX03LhAZGsSY+8VFxKFFublOuav7jMl
- KDzUNJKuxQzDElk9dE5D6aqiUZ4o64KyZxZIe+aBRPU/xdl9/5BDFnYvGZKyNiIxSlejQX0C
- NB1bwQX4REekzdYw4b3CaQrNTEw=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
- 5f179a64e3bee12510cc0e03 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 22 Jul 2020 01:46:12
- GMT
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id BD5DFC433C6; Wed, 22 Jul 2020 01:46:11 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: cang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id CDC1EC433C9;
-        Wed, 22 Jul 2020 01:46:10 +0000 (UTC)
+        id S1731847AbgGVDF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jul 2020 23:05:56 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:35800 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731837AbgGVDF4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Jul 2020 23:05:56 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06M2kTjo191446;
+        Wed, 22 Jul 2020 02:55:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=01BXubBTTggiGme5bAGTUB+IF85y9Gt5mJRvOB950ac=;
+ b=Ert4ww4qHWKQEvayACm71Ls9WksxesZoOaQuXn1rooMPeky0Jrb3Txsjhfab7151opH+
+ +ba9k2HaDjO+952t0cWNI9dQ5WIUYlfWf21ewpsJhWYjcp3N0pcTJv58VOOiL/rw4ZJ6
+ iz8Tt3rOrUGPL774E+aOOMdpr1AJ4rPAQVYkJ8tuwulHR8WsPhlqGNhCTMtVwJGZI8Su
+ HIBl9tQrmPPnenq/MvlY3LRHb4yzdgqsGtAjLjY176yMEaePZyb/9GiUf2AUdZxzL18+
+ SsUZlrUq97Om51YkiNCIV1uh+Ie3EhzxivvOSUhEO/vIHZqNevq4QRm6YstexeMtuoCD CA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 32brgrgmt4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 22 Jul 2020 02:55:24 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06M2m6rK048369;
+        Wed, 22 Jul 2020 02:55:24 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 32e9usdjva-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Jul 2020 02:55:23 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06M2tDDp005896;
+        Wed, 22 Jul 2020 02:55:13 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 22 Jul 2020 02:55:13 +0000
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        "open list:SCSI CDROM DRIVER" <linux-scsi@vger.kernel.org>,
+        Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "open list:SONY MEMORYSTICK SUBSYSTEM" <linux-mmc@vger.kernel.org>,
+        Satya Tangirala <satyat@google.com>,
+        "open list:NETWORK BLOCK DEVICE (NBD)" <nbd@other.debian.org>,
+        Hou Tao <houtao1@huawei.com>, Jens Axboe <axboe@fb.com>,
+        "open list:VIRTIO CORE AND NET DRIVERS" 
+        <virtualization@lists.linux-foundation.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Alex Dubov <oakad@yahoo.com>
+Subject: Re: [PATCH 02/10] block: virtio-blk: check logical block size
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1zh7sfedj.fsf@ca-mkp.ca.oracle.com>
+References: <20200721105239.8270-1-mlevitsk@redhat.com>
+        <20200721105239.8270-3-mlevitsk@redhat.com>
+        <20200721151437.GB10620@lst.de>
+Date:   Tue, 21 Jul 2020 22:55:07 -0400
+In-Reply-To: <20200721151437.GB10620@lst.de> (Christoph Hellwig's message of
+        "Tue, 21 Jul 2020 17:14:37 +0200")
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 22 Jul 2020 09:46:10 +0800
-From:   Can Guo <cang@codeaurora.org>
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     Bart Van Assche <bvanassche@acm.org>, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2] SCSI and block: Simplify resume handling
-In-Reply-To: <20200701183718.GA507293@rowland.harvard.edu>
-References: <20200701183718.GA507293@rowland.harvard.edu>
-Message-ID: <d2605929ee63b3a2386bc01965202950@codeaurora.org>
-X-Sender: cang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9689 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 phishscore=0
+ bulkscore=0 malwarescore=0 suspectscore=1 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007220017
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9689 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 spamscore=0
+ impostorscore=0 suspectscore=1 adultscore=0 clxscore=1011 mlxlogscore=999
+ priorityscore=1501 phishscore=0 lowpriorityscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007220017
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Alan,
 
-On 2020-07-02 02:37, Alan Stern wrote:
-> Commit 05d18ae1cc8a ("scsi: pm: Balance pm_only counter of request
-> queue during system resume") fixed a problem in the block layer's
-> runtime-PM code: blk_set_runtime_active() failed to call
-> blk_clear_pm_only().  However, the commit's implementation was
-> awkward; it forced the SCSI system-resume handler to choose whether to
-> call blk_post_runtime_resume() or blk_set_runtime_active(), depending
-> on whether or not the SCSI device had previously been runtime
-> suspended.
-> 
+Christoph,
 
-Yeah, even I thoght it was awkward as I couldn't find a way or a 
-existing
-API to fix it subtly without changing block layer. I was trying not to
-make noise to block layer as I am not an expert of it, so I chose the 
-akward
-way to keep the fix within driver layer. Anyways, thanks for the change 
-and
-I will come back after I test it.
+> Hmm, I wonder if we should simply add the check and warning to
+> blk_queue_logical_block_size and add an error in that case.  Then
+> drivers only have to check the error return, which might add a lot
+> less boiler plate code.
 
-Can Guo.
+Yep, I agree.
 
-> This patch simplifies the situation considerably by adding the missing
-> function call directly into blk_set_runtime_active() (under the
-> condition that the queue is not already in the RPM_ACTIVE state).
-> This allows the SCSI routine to revert back to its original form.
-> Furthermore, making this change reveals that blk_post_runtime_resume()
-> (in its success pathway) does exactly the same thing as
-> blk_set_runtime_active().  The duplicate code is easily removed by
-> making one routine call the other.
-> 
-> No functional changes are intended.
-> 
-> Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
-> CC: Can Guo <cang@codeaurora.org>
-> CC: Bart Van Assche <bvanassche@acm.org>
-> 
-> ---
-> 
-> v2:	Don't call blk_clear_pm_only() if the queue's RPM status was
-> 	already set to RPM_ACTIVE.  This happens during a system resume
-> 	if the device was not in runtime suspend beforehand.
-> 
-> Martin:
-> 
-> Since you merged the oritinal 05d18ae1cc8a commit, I'm submitting this 
-> to
-> you as an update.  If you would prefer to have it go by way of the
-> block-layer tree, let me know and I'll resend it.
-> 
-> 
-> [as1939b]
-> 
-> 
->  block/blk-pm.c         |   30 +++++++++++++++---------------
->  drivers/scsi/scsi_pm.c |   10 ++--------
->  2 files changed, 17 insertions(+), 23 deletions(-)
-> 
-> Index: usb-devel/block/blk-pm.c
-> ===================================================================
-> --- usb-devel.orig/block/blk-pm.c
-> +++ usb-devel/block/blk-pm.c
-> @@ -164,30 +164,21 @@ EXPORT_SYMBOL(blk_pre_runtime_resume);
->   *
->   * Description:
->   *    Update the queue's runtime status according to the return value 
-> of the
-> - *    device's runtime_resume function. If it is successfully resumed, 
-> process
-> - *    the requests that are queued into the device's queue when it is 
-> resuming
-> - *    and then mark last busy and initiate autosuspend for it.
-> + *    device's runtime_resume function. If the resume was successful, 
-> call
-> + *    blk_set_runtime_active() to do the real work of restarting the 
-> queue.
->   *
->   *    This function should be called near the end of the device's
->   *    runtime_resume callback.
->   */
->  void blk_post_runtime_resume(struct request_queue *q, int err)
->  {
-> -	if (!q->dev)
-> -		return;
-> -
-> -	spin_lock_irq(&q->queue_lock);
->  	if (!err) {
-> -		q->rpm_status = RPM_ACTIVE;
-> -		pm_runtime_mark_last_busy(q->dev);
-> -		pm_request_autosuspend(q->dev);
-> -	} else {
-> +		blk_set_runtime_active(q);
-> +	} else if (q->dev) {
-> +		spin_lock_irq(&q->queue_lock);
->  		q->rpm_status = RPM_SUSPENDED;
-> +		spin_unlock_irq(&q->queue_lock);
->  	}
-> -	spin_unlock_irq(&q->queue_lock);
-> -
-> -	if (!err)
-> -		blk_clear_pm_only(q);
->  }
->  EXPORT_SYMBOL(blk_post_runtime_resume);
-> 
-> @@ -204,15 +195,24 @@ EXPORT_SYMBOL(blk_post_runtime_resume);
->   * This function can be used in driver's resume hook to correct queue
->   * runtime PM status and re-enable peeking requests from the queue. It
->   * should be called before first request is added to the queue.
-> + *
-> + * This function is also called by blk_post_runtime_resume() for 
-> successful
-> + * runtime resumes.  It does everything necessary to restart the 
-> queue.
->   */
->  void blk_set_runtime_active(struct request_queue *q)
->  {
->  	if (q->dev) {
-> +		int old_status;
-> +
->  		spin_lock_irq(&q->queue_lock);
-> +		old_status = q->rpm_status;
->  		q->rpm_status = RPM_ACTIVE;
->  		pm_runtime_mark_last_busy(q->dev);
->  		pm_request_autosuspend(q->dev);
->  		spin_unlock_irq(&q->queue_lock);
-> +
-> +		if (old_status != RPM_ACTIVE)
-> +			blk_clear_pm_only(q);
->  	}
->  }
->  EXPORT_SYMBOL(blk_set_runtime_active);
-> Index: usb-devel/drivers/scsi/scsi_pm.c
-> ===================================================================
-> --- usb-devel.orig/drivers/scsi/scsi_pm.c
-> +++ usb-devel/drivers/scsi/scsi_pm.c
-> @@ -80,10 +80,6 @@ static int scsi_dev_type_resume(struct d
->  	dev_dbg(dev, "scsi resume: %d\n", err);
-> 
->  	if (err == 0) {
-> -		bool was_runtime_suspended;
-> -
-> -		was_runtime_suspended = pm_runtime_suspended(dev);
-> -
->  		pm_runtime_disable(dev);
->  		err = pm_runtime_set_active(dev);
->  		pm_runtime_enable(dev);
-> @@ -97,10 +93,8 @@ static int scsi_dev_type_resume(struct d
->  		 */
->  		if (!err && scsi_is_sdev_device(dev)) {
->  			struct scsi_device *sdev = to_scsi_device(dev);
-> -			if (was_runtime_suspended)
-> -				blk_post_runtime_resume(sdev->request_queue, 0);
-> -			else
-> -				blk_set_runtime_active(sdev->request_queue);
-> +
-> +			blk_set_runtime_active(sdev->request_queue);
->  		}
->  	}
+-- 
+Martin K. Petersen	Oracle Linux Engineering
