@@ -2,96 +2,86 @@ Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65150C433E2
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 10:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DCBC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 11:24:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38B1920729
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 10:27:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="d5v3GZHu"
+	by mail.kernel.org (Postfix) with ESMTP id E7BE020771
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 11:24:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728599AbgGVK1P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 06:27:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42340 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731203AbgGVK1P (ORCPT
+        id S1727847AbgGVLYC convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 07:24:02 -0400
+Received: from lithops.sigma-star.at ([195.201.40.130]:39892 "EHLO
+        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726028AbgGVLYC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 06:27:15 -0400
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7E55C0619DE
-        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2020 03:27:14 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id n22so1659070ejy.3
-        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2020 03:27:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=W+7tLjvt0BWcidRoTzG/t7+SsWX9LjazHSpPYqjY3Ww=;
-        b=d5v3GZHuvndVFZ4GbqVfkTFs7OOHi8ljIpC0aKgQ/WOBIHLU75JigzwZFkEgJtTh93
-         W6JCr8eyU956r/Igl8qOgsKaHnmVl8vg7KdwNC+xvHqTcQDXGZiWoorQho80EzecNEiB
-         pwjxz1lP9Ii6xLI1U0HCzw25kZ6l+TmK1Ud7u0K947ZrmdtBuQrr1mdvQnhZfPAQJNSj
-         5KvxFIZigLUrl6JsYs+AdiCdr+Ng1MFuxI/slxcga5kK9AgaHB6J5f1t2j0jZCSvDA1v
-         nfknyK7ckegpUUgCvJRyjdciS55N+h+UG7g8Lv+t9VwxQ583ZpXnKG6yaVNmSyQmvFdk
-         bhzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=W+7tLjvt0BWcidRoTzG/t7+SsWX9LjazHSpPYqjY3Ww=;
-        b=oSPXd1WJqYqePLim4/8ne0AVydwKzDvhQ3pHqino93Ma2vYPnJs9p+pyNzdOO37Bv7
-         ZvKJtuNJSaONzMJ7IdQyFMLYg0YwyEYer9P4aOSZ61YcKSzWplO5lUe+w21cDEVvzygd
-         VCro0ORTt19HzTSId5cRmgJWGiCs9dQ/fXnHUCW+m/U/TjRB520vUK7254Yo6oJTYy2g
-         TBdUBc9USeU4XelI00bz1FtE8V0+5JMp1HZ1Sta1Vad1cFFPTAkjHugsOw38b+493niS
-         lsqccPcpdEnyNMkdtplx1T983K7498eJDE/PQuUijsu3M6RV9WEpXCqPM7avELX07UiC
-         Cg0A==
-X-Gm-Message-State: AOAM533RksJ2NLuepanthH2tgne5EvToLrxzvf18j6sDhO6pfUequ1I0
-        vc+wxA64GrTI6GkoTGtigdW/RA==
-X-Google-Smtp-Source: ABdhPJy3fxGJbp5Tgeh6OHqOTEc60aTjyYy6Gy8z45ccS1gWZxsKuWiTmAfGWI6q021kOk0eZc9ioQ==
-X-Received: by 2002:a17:906:9716:: with SMTP id k22mr29563349ejx.200.1595413633487;
-        Wed, 22 Jul 2020 03:27:13 -0700 (PDT)
-Received: from ls00508.pb.local ([2001:1438:4010:2540:c136:467c:a322:7c9f])
-        by smtp.gmail.com with ESMTPSA id w17sm18581044eju.42.2020.07.22.03.27.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jul 2020 03:27:13 -0700 (PDT)
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-To:     danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH 2/2] rnbd: no need to set bi_end_io in rnbd_bio_map_kern
-Date:   Wed, 22 Jul 2020 12:26:53 +0200
-Message-Id: <20200722102653.19224-3-guoqing.jiang@cloud.ionos.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200722102653.19224-1-guoqing.jiang@cloud.ionos.com>
-References: <20200722102653.19224-1-guoqing.jiang@cloud.ionos.com>
+        Wed, 22 Jul 2020 07:24:02 -0400
+X-Greylist: delayed 495 seconds by postgrey-1.27 at vger.kernel.org; Wed, 22 Jul 2020 07:24:00 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 319D462D8C69;
+        Wed, 22 Jul 2020 13:15:44 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id Zc9TNu-wkYTl; Wed, 22 Jul 2020 13:15:43 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 9006B62D8C68;
+        Wed, 22 Jul 2020 13:15:43 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Ze2yEkGTJ1nH; Wed, 22 Jul 2020 13:15:43 +0200 (CEST)
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 5BAE56071A74;
+        Wed, 22 Jul 2020 13:15:43 +0200 (CEST)
+Date:   Wed, 22 Jul 2020 13:15:43 +0200 (CEST)
+From:   Richard Weinberger <richard@nod.at>
+To:     hch <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        linux-mtd <linux-mtd@lists.infradead.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, cgroups@vger.kernel.org
+Message-ID: <1212963412.160863.1595416543195.JavaMail.zimbra@nod.at>
+In-Reply-To: <20200722062552.212200-5-hch@lst.de>
+References: <20200722062552.212200-1-hch@lst.de> <20200722062552.212200-5-hch@lst.de>
+Subject: Re: [PATCH 04/14] bdi: initialize ->ra_pages in bdi_init
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [195.201.40.130]
+X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF68 (Linux)/8.8.12_GA_3809)
+Thread-Topic: initialize ->ra_pages in bdi_init
+Thread-Index: SEPLczWq50DYtFrGpPhckNZ8Awj6bw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since we always set bi_end_io after call rnbd_bio_map_kern, so the
-setting in rnbd_bio_map_kern is redundant.
+----- Ursprüngliche Mail -----
+> Set up a readahead size by default, as very few users have a good
+> reason to change it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+> block/blk-core.c      | 1 -
+> drivers/mtd/mtdcore.c | 1 +
+> fs/9p/vfs_super.c     | 4 ++--
+> fs/afs/super.c        | 1 -
+> fs/btrfs/disk-io.c    | 1 -
+> fs/fuse/inode.c       | 1 -
+> fs/nfs/super.c        | 9 +--------
+> fs/ubifs/super.c      | 1 +
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
----
- drivers/block/rnbd/rnbd-srv-dev.c | 1 -
- 1 file changed, 1 deletion(-)
+For ubifs and mtd:
 
-diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
-index 49c62b506c9b..b241a099aeae 100644
---- a/drivers/block/rnbd/rnbd-srv-dev.c
-+++ b/drivers/block/rnbd/rnbd-srv-dev.c
-@@ -99,6 +99,5 @@ struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
- 		offset = 0;
- 	}
- 
--	bio->bi_end_io = bio_put;
- 	return bio;
- }
--- 
-2.17.1
+Acked-by: Richard Weinberger <richard@nod.at>
 
+Thanks,
+//richard
