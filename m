@@ -2,129 +2,74 @@ Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0252C433E4
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 08:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F0A9C433F1
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 09:04:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBF0F20792
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 08:51:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HBhs7XXY"
+	by mail.kernel.org (Postfix) with ESMTP id 14D652077D
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 09:04:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731050AbgGVIuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 04:50:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22375 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731026AbgGVIut (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 04:50:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595407848;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H24R8qVAxwYFcsepHzRqkh8E1U4cEvx3I96Wl9ElKtQ=;
-        b=HBhs7XXYUsZnZBl5sU85W/BFjxpdKv3ZJLBl+VZZi6Jz+BpzbmYLubLQpkK7iC1n65siEA
-        E+D0lsZEdHuwPJ8KiEP8g4W81VUaWNjlz/6O0s+1IOrnpgql/HB4/BQYJCGfTTsCmj351v
-        2BlYHpT9z1gt3FknxaYGz9bJ1B4wybU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-M4qKbPESN9G2w4ycP9uygQ-1; Wed, 22 Jul 2020 04:50:46 -0400
-X-MC-Unique: M4qKbPESN9G2w4ycP9uygQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13A376C2F3;
-        Wed, 22 Jul 2020 08:50:34 +0000 (UTC)
-Received: from fedora-32-enviroment (unknown [10.35.206.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3615969317;
-        Wed, 22 Jul 2020 08:50:27 +0000 (UTC)
-Message-ID: <c9124b5487ed51e02dc9264fa8c87b93313fa68f.camel@redhat.com>
-Subject: Re: [PATCH 01/10] block: introduce blk_is_valid_logical_block_size
-From:   Maxim Levitsky <mlevitsk@redhat.com>
+        id S1731093AbgGVJEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 05:04:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57230 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729894AbgGVJEy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Jul 2020 05:04:54 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id BA40FABD2;
+        Wed, 22 Jul 2020 09:04:59 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 8AA96DA70B; Wed, 22 Jul 2020 11:04:26 +0200 (CEST)
+Date:   Wed, 22 Jul 2020 11:04:26 +0200
+From:   David Sterba <dsterba@suse.cz>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        "open list:SCSI CDROM DRIVER" <linux-scsi@vger.kernel.org>,
-        Tejun Heo <tj@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Ajay Joshi <ajay.joshi@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "open list:SONY MEMORYSTICK SUBSYSTEM" <linux-mmc@vger.kernel.org>,
-        Satya Tangirala <satyat@google.com>,
-        "open list:NETWORK BLOCK DEVICE (NBD)" <nbd@other.debian.org>,
-        Hou Tao <houtao1@huawei.com>, Jens Axboe <axboe@fb.com>,
-        "open list:VIRTIO CORE AND NET DRIVERS" 
-        <virtualization@lists.linux-foundation.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Alex Dubov <oakad@yahoo.com>
-Date:   Wed, 22 Jul 2020 11:50:26 +0300
-In-Reply-To: <20200721151313.GA10620@lst.de>
-References: <20200721105239.8270-1-mlevitsk@redhat.com>
-         <20200721105239.8270-2-mlevitsk@redhat.com> <20200721151313.GA10620@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        drbd-dev@tron.linbit.com, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        cgroups@vger.kernel.org
+Subject: Re: [PATCH 04/14] bdi: initialize ->ra_pages in bdi_init
+Message-ID: <20200722090426.GQ3703@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>, linux-mtd@lists.infradead.org,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@tron.linbit.com,
+        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, cgroups@vger.kernel.org
+References: <20200722062552.212200-1-hch@lst.de>
+ <20200722062552.212200-5-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200722062552.212200-5-hch@lst.de>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2020-07-21 at 17:13 +0200, Christoph Hellwig wrote:
-> > +/**
-> > + * blk_check_logical_block_size - check if logical block size is
-> > supported
-> > + * by the kernel
-> > + * @size:  the logical block size, in bytes
-> > + *
-> > + * Description:
-> > + *   This function checks if the block layers supports given block
-> > size
-> > + **/
-> > +bool blk_is_valid_logical_block_size(unsigned int size)
-> > +{
-> > +	return size >= SECTOR_SIZE && size <= PAGE_SIZE &&
-> > !is_power_of_2(size);
+On Wed, Jul 22, 2020 at 08:25:42AM +0200, Christoph Hellwig wrote:
+> Set up a readahead size by default, as very few users have a good
+> reason to change it.
 > 
-> Shouldn't this be a ... && is_power_of_2(size)?
-Yep. I noticed that few minutes after I sent the patches.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-> 
-> >  	if (q->limits.io_min < q->limits.physical_block_size)
-> >  		q->limits.io_min = q->limits.physical_block_size;
-> > +
-> >  }
-> 
-> This adds a pointless empty line.
-Will fix.
-> 
-> > +extern bool blk_is_valid_logical_block_size(unsigned int size);
-> 
-> No need for externs on function declarations.
-I also think so, but I followed the style of all existing function
-prototypes in this file. Most of them have 'extern'.
+For the btrfs bits
 
-Thanks for the review!
+>  fs/btrfs/disk-io.c    | 1 -
 
-Best regards,
-	maxim Levitsky
-
+Acked-by: David Sterba <dsterba@suse.com>
