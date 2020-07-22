@@ -2,217 +2,129 @@ Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5180FC433E6
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 08:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0252C433E4
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 08:51:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 246E120787
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 08:35:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBF0F20792
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 08:51:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GmynCEVD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HBhs7XXY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729133AbgGVIfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 04:35:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53222 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726632AbgGVIfI (ORCPT
+        id S1731050AbgGVIuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 04:50:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22375 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731026AbgGVIut (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 04:35:08 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E956BC0619DC;
-        Wed, 22 Jul 2020 01:35:07 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id t6so605277plo.3;
-        Wed, 22 Jul 2020 01:35:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=28LVHZQ5kNi3X4WVWRNBhsyjK8e2AXuHyTrkUX2gYzI=;
-        b=GmynCEVDYL8vUdF/dEi+NEtI+iKXNlgK/RQ7XrkC2bdnEwCeiQfM1MQxJyBxznCxdP
-         kmxk4C66hNqBKB2QUc1skHhm0mSkkVJ/LRRTFxUfyzsd8PXE3ddJtkc7VEk1yxt8G/SS
-         hMX+b0zA3PVxDyNytY3xg9t2INZFXrYXhQWH7nWt3WWjjmRPcwAx+frJioOPSFP1aLJ+
-         LC46zqpag99ScnDKs+RI6xPDmy25JXWhh+xOlQ/Fg0c1KwuP7O/PJgEYXV9XgjoET6UL
-         tljtmCnUcXhtWWu/8iHiwKn6W0INYH2kTKw82cxg79tJYMfI1Ct0MhyoducO00LIDmH4
-         LOrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=28LVHZQ5kNi3X4WVWRNBhsyjK8e2AXuHyTrkUX2gYzI=;
-        b=SGaqe7orSQtpa2xUCCogZVHzIQS8hZowf2v/+xU9bu3hmO4BJtB6XRmt7XosXPQSA+
-         lbt6AnjXeVtryyyTkAft4KWWyDMOPA7lR3SQDi0pqtynRFH4CcyuO9EhgP9nt4ltTAiZ
-         DEbz3l/CGVO0HGCc95xauuzqrBT9gZHpuJxlpbawheppSGdtXMkZKG2ZnJqDHwkX/AbI
-         7h9rtthg4i8B25ReegbChy3Dx3Qxz5CjmL91KNo5CMbMWRQcO1yABKreTcJlLKjHL8K4
-         HufnHfBvQIXjMhOzlVA4W4zxLVEIkux7gWB3IohvexYHGoQegvThlbYq9HEk210O1xBw
-         HEDg==
-X-Gm-Message-State: AOAM530ZqnAq3o5IiBHSNw2YRHkcnJRlrItZx1nNrDaVktfOL239q9+k
-        XVI44xIQSE0D0+dXcSYF6J1PNzn3JoHmkg==
-X-Google-Smtp-Source: ABdhPJwbgrO0RP+E/o1QaKac8oSWHOrV2QrpXZWoauBIG5d+sFnfguSNdUB9tr89uey4iD3pQ1ow3w==
-X-Received: by 2002:a17:902:a5c5:: with SMTP id t5mr25735544plq.47.1595406907398;
-        Wed, 22 Jul 2020 01:35:07 -0700 (PDT)
-Received: from varodek.iballbatonwifi.com ([103.105.153.67])
-        by smtp.gmail.com with ESMTPSA id g13sm5777319pje.29.2020.07.22.01.35.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jul 2020 01:35:06 -0700 (PDT)
-From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Bjorn Helgaas <bjorn@helgaas.com>,
-        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Vaibhav Gupta <vaibhavgupta40@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH v3 1/3] mtip32xx: use generic power management
-Date:   Wed, 22 Jul 2020 14:03:33 +0530
-Message-Id: <20200722083335.50068-2-vaibhavgupta40@gmail.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200722083335.50068-1-vaibhavgupta40@gmail.com>
-References: <ea5881cdfd4d612193feed646ce89f253a36db69.camel@wdc.com>
- <20200722083335.50068-1-vaibhavgupta40@gmail.com>
+        Wed, 22 Jul 2020 04:50:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595407848;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=H24R8qVAxwYFcsepHzRqkh8E1U4cEvx3I96Wl9ElKtQ=;
+        b=HBhs7XXYUsZnZBl5sU85W/BFjxpdKv3ZJLBl+VZZi6Jz+BpzbmYLubLQpkK7iC1n65siEA
+        E+D0lsZEdHuwPJ8KiEP8g4W81VUaWNjlz/6O0s+1IOrnpgql/HB4/BQYJCGfTTsCmj351v
+        2BlYHpT9z1gt3FknxaYGz9bJ1B4wybU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-293-M4qKbPESN9G2w4ycP9uygQ-1; Wed, 22 Jul 2020 04:50:46 -0400
+X-MC-Unique: M4qKbPESN9G2w4ycP9uygQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13A376C2F3;
+        Wed, 22 Jul 2020 08:50:34 +0000 (UTC)
+Received: from fedora-32-enviroment (unknown [10.35.206.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3615969317;
+        Wed, 22 Jul 2020 08:50:27 +0000 (UTC)
+Message-ID: <c9124b5487ed51e02dc9264fa8c87b93313fa68f.camel@redhat.com>
+Subject: Re: [PATCH 01/10] block: introduce blk_is_valid_logical_block_size
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        "open list:SCSI CDROM DRIVER" <linux-scsi@vger.kernel.org>,
+        Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "open list:SONY MEMORYSTICK SUBSYSTEM" <linux-mmc@vger.kernel.org>,
+        Satya Tangirala <satyat@google.com>,
+        "open list:NETWORK BLOCK DEVICE (NBD)" <nbd@other.debian.org>,
+        Hou Tao <houtao1@huawei.com>, Jens Axboe <axboe@fb.com>,
+        "open list:VIRTIO CORE AND NET DRIVERS" 
+        <virtualization@lists.linux-foundation.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Alex Dubov <oakad@yahoo.com>
+Date:   Wed, 22 Jul 2020 11:50:26 +0300
+In-Reply-To: <20200721151313.GA10620@lst.de>
+References: <20200721105239.8270-1-mlevitsk@redhat.com>
+         <20200721105239.8270-2-mlevitsk@redhat.com> <20200721151313.GA10620@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Drivers using legacy power management .suspen()/.resume() callbacks
-have to manage PCI states and device's PM states themselves. They also
-need to take care of standard configuration registers.
+On Tue, 2020-07-21 at 17:13 +0200, Christoph Hellwig wrote:
+> > +/**
+> > + * blk_check_logical_block_size - check if logical block size is
+> > supported
+> > + * by the kernel
+> > + * @size:  the logical block size, in bytes
+> > + *
+> > + * Description:
+> > + *   This function checks if the block layers supports given block
+> > size
+> > + **/
+> > +bool blk_is_valid_logical_block_size(unsigned int size)
+> > +{
+> > +	return size >= SECTOR_SIZE && size <= PAGE_SIZE &&
+> > !is_power_of_2(size);
+> 
+> Shouldn't this be a ... && is_power_of_2(size)?
+Yep. I noticed that few minutes after I sent the patches.
 
-Switch to generic power management framework using a single
-"struct dev_pm_ops" variable to take the unnecessary load from the driver.
-This also avoids the need for the driver to directly call most of the PCI
-helper functions and device power state control functions, as through
-the generic framework PCI Core takes care of the necessary operations,
-and drivers are required to do only device-specific jobs.
+> 
+> >  	if (q->limits.io_min < q->limits.physical_block_size)
+> >  		q->limits.io_min = q->limits.physical_block_size;
+> > +
+> >  }
+> 
+> This adds a pointless empty line.
+Will fix.
+> 
+> > +extern bool blk_is_valid_logical_block_size(unsigned int size);
+> 
+> No need for externs on function declarations.
+I also think so, but I followed the style of all existing function
+prototypes in this file. Most of them have 'extern'.
 
-Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 54 +++++++------------------------
- 1 file changed, 12 insertions(+), 42 deletions(-)
+Thanks for the review!
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index f6bafa9a68b9..7d1280952b35 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -4246,14 +4246,13 @@ static void mtip_pci_remove(struct pci_dev *pdev)
-  *	0  Success
-  *	<0 Error
-  */
--static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
-+static int __maybe_unused mtip_pci_suspend(struct device *dev)
- {
- 	int rv = 0;
--	struct driver_data *dd = pci_get_drvdata(pdev);
-+	struct driver_data *dd = dev_get_drvdata(dev);
- 
- 	if (!dd) {
--		dev_err(&pdev->dev,
--			"Driver private datastructure is NULL\n");
-+		dev_err(dev, "Driver private datastructure is NULL\n");
- 		return -EFAULT;
- 	}
- 
-@@ -4261,21 +4260,8 @@ static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
- 
- 	/* Disable ports & interrupts then send standby immediate */
- 	rv = mtip_block_suspend(dd);
--	if (rv < 0) {
--		dev_err(&pdev->dev,
--			"Failed to suspend controller\n");
--		return rv;
--	}
--
--	/*
--	 * Save the pci config space to pdev structure &
--	 * disable the device
--	 */
--	pci_save_state(pdev);
--	pci_disable_device(pdev);
--
--	/* Move to Low power state*/
--	pci_set_power_state(pdev, PCI_D3hot);
-+	if (rv < 0)
-+		dev_err(dev, "Failed to suspend controller\n");
- 
- 	return rv;
- }
-@@ -4287,42 +4273,25 @@ static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
-  *      0  Success
-  *      <0 Error
-  */
--static int mtip_pci_resume(struct pci_dev *pdev)
-+static int __maybe_unused mtip_pci_resume(struct device *dev)
- {
- 	int rv = 0;
- 	struct driver_data *dd;
- 
--	dd = pci_get_drvdata(pdev);
-+	dd = dev_get_drvdata(dev);
- 	if (!dd) {
--		dev_err(&pdev->dev,
--			"Driver private datastructure is NULL\n");
-+		dev_err(dev, "Driver private datastructure is NULL\n");
- 		return -EFAULT;
- 	}
- 
--	/* Move the device to active State */
--	pci_set_power_state(pdev, PCI_D0);
--
--	/* Restore PCI configuration space */
--	pci_restore_state(pdev);
--
--	/* Enable the PCI device*/
--	rv = pcim_enable_device(pdev);
--	if (rv < 0) {
--		dev_err(&pdev->dev,
--			"Failed to enable card during resume\n");
--		goto err;
--	}
--	pci_set_master(pdev);
--
- 	/*
- 	 * Calls hbaReset, initPort, & startPort function
- 	 * then enables interrupts
- 	 */
- 	rv = mtip_block_resume(dd);
- 	if (rv < 0)
--		dev_err(&pdev->dev, "Unable to resume\n");
-+		dev_err(dev, "Unable to resume\n");
- 
--err:
- 	clear_bit(MTIP_DDF_RESUME_BIT, &dd->dd_flag);
- 
- 	return rv;
-@@ -4353,14 +4322,15 @@ static const struct pci_device_id mtip_pci_tbl[] = {
- 	{ 0 }
- };
- 
-+static SIMPLE_DEV_PM_OPS(mtip_pci_pm_ops, mtip_pci_suspend, mtip_pci_resume);
-+
- /* Structure that describes the PCI driver functions. */
- static struct pci_driver mtip_pci_driver = {
- 	.name			= MTIP_DRV_NAME,
- 	.id_table		= mtip_pci_tbl,
- 	.probe			= mtip_pci_probe,
- 	.remove			= mtip_pci_remove,
--	.suspend		= mtip_pci_suspend,
--	.resume			= mtip_pci_resume,
-+	.driver.pm		= &mtip_pci_pm_ops,
- 	.shutdown		= mtip_pci_shutdown,
- };
- 
--- 
-2.27.0
+Best regards,
+	maxim Levitsky
 
