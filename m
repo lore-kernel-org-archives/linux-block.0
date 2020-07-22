@@ -2,217 +2,238 @@ Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A26DC433E2
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 14:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF63C433E6
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 14:32:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D440820729
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 14:32:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86E8720781
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 14:32:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qpA11iX1";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="aERQETBn"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="fPOOVigl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732516AbgGVOcb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 10:32:31 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:22601 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729642AbgGVOca (ORCPT
+        id S1732603AbgGVOcu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 10:32:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52156 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729642AbgGVOcu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 10:32:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1595428350; x=1626964350;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=PuoDC017WeeuiJvZB02eCzGu3ROWuDo8Ht1IM1oE98k=;
-  b=qpA11iX1qfaN341XQPRUdPv6SwYtQODDMBvRj0aiemFtEOvX6JU7gymb
-   CgU919fhJi4ek+T6kD9dMdCD4pm9HjlrlQFy5sM+Y2h66eGyQhr6w6/QC
-   F03bMz1bdsBNS1wnsCk2X8//szeoRc5iP+2Q0IG/y8TEcOeZQc0lzloWX
-   Zny9I6eor11KEXhJFvqMgFakiTxpfu2wTEVeecYKb2f+IbYkAxY4wTRbR
-   DBMGvDSZdharPxI0YuCpbDaGoUz1bJN8ZUrngFUvvG6wwEigC1+7cyRhD
-   RyxnZFYfdaSI01XkIODAz1zYo9d1/Rn+EgGRCJ6f7ApMfbtMyAPIukEQr
-   A==;
-IronPort-SDR: YchkogHDAhlkvvwfvfFRvCGdosErwV+qc6HV1ath0uu7WyeHsn//tgqel7Z2I9ZnCMjMi7ZiPT
- lkM3bPJcgDsfKoMq270cIIQoNOrffIVglGbG9IUjB4IKv6UwJRnkkpCXrsLAhdx0UNTeA3/O/F
- TI5EadLTK5Z653bmdhhw7u3+NkOyME72vWAD4g8mZAzNnsJDVCOPN6NBnCNXCyJrkxKTIvv6z8
- 6bk8eM7a491xzb0OxqwppRDN6Nc0mk3A959W+a+fkvZ2xKZhuU/OLlE72a0xQDd/++ZICol8fJ
- fek=
-X-IronPort-AV: E=Sophos;i="5.75,383,1589212800"; 
-   d="scan'208";a="143211681"
-Received: from mail-sn1nam02lp2054.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.36.54])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Jul 2020 22:32:30 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IEXVoMcEPWfu2Ob8ZBBos/pWr5Ee+pskHvUn/tBHMxS61x8bLZ9n9YuVmAbL8m+XYeSzn3PCR8ZckICZMoSgYNqQHIRA+q1bgXq8MaVGeBropeAHaqrZfR+C9BN9Tsf0yE4kQI4n/qErlJFndfWYY2DX+HRZgEmX4biFYNOsdV32AZ00vRbKBqya2dg5rTgkQ+m5cRCMJRLZ7dZhR3rgYnYFWRRKudAl4p2hjwWNENgjmA6jRg6zMz0rtn46PhMJco2SzgYQy9gMJ3Cf3fhJDM1B6xdoeigVrJQZjCchhL4q8h4ARYHcpm6k14bY572y7nxzO9USAg7ZaLfttL3akQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cxk+DhQ+SuMEvg14K0d1ydh9/tjs9QeWow4ivS+olHo=;
- b=myusQPypYcEo88pxie+PfGqdNleYBv0e1p/AhNKQm6IM8kxxp10btvDo/jUl4a0zK7wIp3E0HuEgnPkqj5vlhJHwuLY2lXLL6MR2zBcH6ys7vap/sdcbJKJp0jNiG5J8yKHjj3l/fQpuG/iQk98A8np9rwErTppWJ1iIWurvDSwKakBiJX8pUEORsGZXPEPX2CwSLxnxphEH54FTSAIFdtfYHM+c0RJvEhBAb/I10REhOwLgucHAZyBCTalCzhGgFV7cwzZnyv9E7KDKh0dtj167V6SBoX07aPebE4ln8k+/F/mGtKTW8ZR6ZdKOUGBDhY5Ixcg20lepEfBj+6PtyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Wed, 22 Jul 2020 10:32:50 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18865C0619DC
+        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2020 07:32:50 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id w3so2211235wmi.4
+        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2020 07:32:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cxk+DhQ+SuMEvg14K0d1ydh9/tjs9QeWow4ivS+olHo=;
- b=aERQETBnLPqAvrUXLQXm8Kyvbl7nB2/y0onBM64mkHsJ7h34coEfGWjuhRFhHHNSeyr6Sz0RcAqRfHURf4XbTgSxSxrvrLX2r67eymmcFCFFouly4F+f2gb9Bz1pDJO0nUyP9SLBmTe6Z6GdGJ8rfdjZKW0iLunjLkolNS+pGEI=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN4PR0401MB3597.namprd04.prod.outlook.com
- (2603:10b6:803:45::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.21; Wed, 22 Jul
- 2020 14:32:27 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::1447:186c:326e:30b2]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::1447:186c:326e:30b2%7]) with mapi id 15.20.3195.026; Wed, 22 Jul 2020
- 14:32:27 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 2/2] zonefs: use zone-append for AIO as well
-Thread-Topic: [PATCH 2/2] zonefs: use zone-append for AIO as well
-Thread-Index: AQHWXpitifll0c+NqUqXemZ9Ae0oAA==
-Date:   Wed, 22 Jul 2020 14:32:26 +0000
-Message-ID: <SN4PR0401MB3598D4B6188B031D7C8191329B790@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200720132118.10934-1-johannes.thumshirn@wdc.com>
- <CGME20200720132131epcas5p390f6f8a13696a3f54ef906d8ce8cc0ea@epcas5p3.samsung.com>
- <20200720132118.10934-3-johannes.thumshirn@wdc.com>
- <20200721122724.GA17629@test-zns>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samsung.com; dkim=none (message not signed)
- header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.240.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: b49b304e-75d1-415f-59d3-08d82e4c0e9b
-x-ms-traffictypediagnostic: SN4PR0401MB3597:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN4PR0401MB3597D100DBC1127A7B4496E79B790@SN4PR0401MB3597.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: bet3t+gaVVPYY+R96o6qIJ1u0joPLcr8X4QQnFRC5DYC2SSNt8B5ae3KBkS1zi6NC9Lx6M1ac47mKBEGTGlCVQqZfjd1Wi5aBz7cQKbRhgISD2mcy0aq/T6QLLAi/v7vcv1DP5GUw14AqbPmMwU8gyQUqCrftgs/bZihhzC80pzUqKz3lKuKJ8EXnWwV0JsJONfIN3VqQ+rCiLIQ28sEyRELIgN6agQD7q9zJUXMjDuGPBT6J/EQMXnTfpnompja9Gh2L8SFM5K9vxP6NJd5xzlHP4GMlOlSjdTVW5bA9mgbhyZvimLktSh9x+mbnBlcq14+UHt6j3HjWR371Pojsw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(346002)(39860400002)(136003)(376002)(366004)(7696005)(52536014)(478600001)(86362001)(316002)(71200400001)(83380400001)(4326008)(54906003)(5660300002)(26005)(6916009)(53546011)(6506007)(66476007)(66946007)(64756008)(76116006)(91956017)(66446008)(66556008)(9686003)(186003)(33656002)(55016002)(2906002)(8936002)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: sx81vTrkmwI6ka+HX3r7wA+2gS9xHjmjlduK961DKSB4dzmMV6ChJKPrXUEgSkqQvds/AN6eAlIZAgaNqVHvF71EN1tQeBLsxWieRtC/UNVS3vmGaUo/d+J3JAo9dLVb9P4c7F15Sk/cfCVYC0T/ft7wrYfWdru0RCmoAQH2Pb+LOHazSfET/fQ3T769WyoNgWYvfbJmcJfPqAy/WViV60f8fzyJFzYIUUxh5I/CdIOnc7s64iaY2BAdJx0Rrhq3NEfaTp5bg6w1hP4dJt+nW36PKAq0NjUnIkM6UGRiInDGv3ih4x+XqqJ98Hw/wEXwr77AKeZjvl8lpZSodk2Qy2v5lwsLDCexlCecS2XJ4pjdlO43hpnx8CEJwv3NuZDz+kwma2z1+9RIKxCDrFxnZmtnJMU/4gKNiuc8UT/ncfePW8k5auyjPp0ip2GFcoX/O4tFEE+zINVUngd/aROrSOrenxtcj4mz8meKuM7lwwULi9JdffYdudrDLWGlhUqF
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NqMRv6R7id+eyDXUL3yV2jYaLUCIdAlCUaj36ZwSpoY=;
+        b=fPOOVigl30NCt3WY9wGVgO0aA+zo/jyfMV5EJjhKohfC79tS+N35V4QKb+xJ3+Pjcf
+         p8zopB4pLOPiga0NzqBiF22ML1waSGfg0QjNj9MLfJamLpndqwPIhh6OVIkU/dHfoX35
+         dg9jquFrbXKxVpNi0kYWfKUzDZdnypuMV1h9WjRcSKr2mWKqzTSogU2YDuWlLHV66AqO
+         fFaRHFz2LBnHI+XEEkJJlK4Z2Umi+XluKrFts3Fw5oVBFnBzgOPwQMXuc3/auL8JgtL8
+         KXhCc/PFJAarSnnEtGiwZdYqQyw8YrcPcFwPQp7sP5HwbKT3Ae1qzppl/mmsSrJF6rZX
+         r/9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NqMRv6R7id+eyDXUL3yV2jYaLUCIdAlCUaj36ZwSpoY=;
+        b=ASrnKUKVj1qmpK2LR0ovHQamAJmm4Rp1P5ZjIPvSv98sbU7o6Zqs1sXRaOfR8HbFUI
+         kncVJifUG1xiBz/JeENyYj17yf+aPwUrLmGapWedWYoFQ4RtM1YPaSuYjkQT4PGwPrTh
+         176Lazu6Vsn3n82MgegmGeutDkLJDgJoWPVt+m041jh1k4xptGFg+jjwv2Tt/BWOkYEY
+         i1GnLp78BcEaiGNKnhBJ10fjAdYrMGe5gEQTvHaxBxG2pCeNXPXtRfSk8IvxrnHKLUrZ
+         EEx7fDGwKwBSw8097fK6ovewKw98UaopAwZfHgpiFv4mHgN/Bus5o/BlrEwcNHCW/Om+
+         7nHQ==
+X-Gm-Message-State: AOAM532oIdVdPP9T01ZJSGhBSQYbvw6Yy1CO9flP6n7ueFjizGW1mSiP
+        o5Xu2UKUDOrOfxQ5z+j/25Ln0yiWV1BFT3ZiEzDJ
+X-Google-Smtp-Source: ABdhPJygFe93BMbhyPsWdLz4TFoKsmTCwgy/VPhs+mv7qzUtLtfaRo36VQcrweM0KnfPm8sqCiwp3TDsfeMARC70wiI=
+X-Received: by 2002:a1c:ba83:: with SMTP id k125mr4220903wmf.160.1595428368616;
+ Wed, 22 Jul 2020 07:32:48 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b49b304e-75d1-415f-59d3-08d82e4c0e9b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2020 14:32:26.8950
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: z9XHT9dvaXeSp49yf7EM/KGSVT1hh72ptzfZZTSF+/S2k9B+DUFsOe8+gpUWCQqarc9IhqQ5WXPvGo123h1m0l+g1XPT/ixATZ6L7Bfjm9Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3597
+References: <20200722102653.19224-1-guoqing.jiang@cloud.ionos.com> <20200722102653.19224-2-guoqing.jiang@cloud.ionos.com>
+In-Reply-To: <20200722102653.19224-2-guoqing.jiang@cloud.ionos.com>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Wed, 22 Jul 2020 16:32:37 +0200
+Message-ID: <CAHg0Huw-spFy=H5PpvNJQwXrPSZZaERj-xjb3R99QUDAiVfbCQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] rnbd: remove rnbd_dev_submit_io
+To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Cc:     Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/07/2020 15:02, Kanchan Joshi wrote:=0A=
-> On Mon, Jul 20, 2020 at 10:21:18PM +0900, Johannes Thumshirn wrote:=0A=
->> If we get an async I/O iocb with an O_APPEND or RWF_APPEND flag set,=0A=
->> submit it using REQ_OP_ZONE_APPEND to the block layer.=0A=
->>=0A=
->> As an REQ_OP_ZONE_APPEND bio must not be split, this does come with an=
-=0A=
->> additional constraint, namely the buffer submitted to zonefs must not be=
-=0A=
->> bigger than the max zone append size of the underlying device. For=0A=
->> synchronous I/O we don't care about this constraint as we can return sho=
-rt=0A=
->> writes, for AIO we need to return an error on too big buffers.=0A=
-> =0A=
-> I wonder what part of the patch implements that constraint on large=0A=
-> buffer and avoids short-write.=0A=
-> Existing code seems to trim iov_iter in the outset. =0A=
-> =0A=
->         max =3D queue_max_zone_append_sectors(bdev_get_queue(bdev));=0A=
->         max =3D ALIGN_DOWN(max << SECTOR_SHIFT, inode->i_sb->s_blocksize)=
-;=0A=
->         iov_iter_truncate(from, max);=0A=
-=0A=
-This actually needs a 'if (sync)' before the iov_iter_truncate() you're rig=
-ht.=0A=
-=0A=
-> =0A=
-> This will prevent large-buffer seeing that error, and will lead to partia=
-l write.=0A=
-> =0A=
->> On a successful completion, the position the data is written to is=0A=
->> returned via AIO's res2 field to the calling application.=0A=
->>=0A=
->> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
->> ---=0A=
->> fs/zonefs/super.c  | 143 +++++++++++++++++++++++++++++++++++++++------=
-=0A=
->> fs/zonefs/zonefs.h |   3 +=0A=
->> 2 files changed, 128 insertions(+), 18 deletions(-)=0A=
->>=0A=
->> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c=0A=
->> index 5832e9f69268..f155a658675b 100644=0A=
->> --- a/fs/zonefs/super.c=0A=
->> +++ b/fs/zonefs/super.c=0A=
->> @@ -24,6 +24,8 @@=0A=
->>=0A=
->> #include "zonefs.h"=0A=
->>=0A=
->> +static struct bio_set zonefs_dio_bio_set;=0A=
->> +=0A=
->> static inline int zonefs_zone_mgmt(struct zonefs_inode_info *zi,=0A=
->> 				   enum req_opf op)=0A=
->> {=0A=
->> @@ -700,16 +702,71 @@ static const struct iomap_dio_ops zonefs_write_dio=
-_ops =3D {=0A=
->> 	.end_io			=3D zonefs_file_write_dio_end_io,=0A=
->> };=0A=
->>=0A=
->> +struct zonefs_dio {=0A=
->> +	struct kiocb		*iocb;=0A=
->> +	struct task_struct	*waiter;=0A=
->> +	int			error;=0A=
->> +	struct work_struct	work;=0A=
->> +	size_t			size;=0A=
->> +	u64			sector;=0A=
->> +	struct completion	completion;=0A=
->> +	struct bio		bio;=0A=
->> +};=0A=
-> =0A=
-> How about this (will save 32 bytes) - =0A=
-> +struct zonefs_dio {=0A=
-> +       struct kiocb            *iocb;=0A=
-> +       struct task_struct      *waiter;=0A=
-> +       int                     error;=0A=
-> +	union {=0A=
-> +       	struct work_struct      work;   //only for async IO=0A=
-> +       	struct completion       completion; //only for sync IO=0A=
-> +	};=0A=
-> +       size_t                  size;=0A=
-> +       u64                     sector;=0A=
-> +       struct bio              bio;=0A=
-> +};=0A=
-> And dio->error field is not required.=0A=
-> I see it being used at one place -=0A=
-> +       ret =3D zonefs_file_write_dio_end_io(iocb, dio->size,=0A=
-> +                                          dio->error, 0);=0A=
-> Here error-code can be picked from dio->bio.=0A=
-> =0A=
-=0A=
-Indeed, did that and also removed the unused completion from =0A=
-zonefs_dio and made a union of work and waiter.=0A=
-=0A=
+On Wed, Jul 22, 2020 at 12:27 PM Guoqing Jiang
+<guoqing.jiang@cloud.ionos.com> wrote:
+>
+> The function only has one caller, so let's open code it in process_rdma.
+> Another bonus is we can avoid push/pop stack, since we need to pass 8
+> arguments to rnbd_dev_submit_io.
+>
+> Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+> ---
+>  drivers/block/rnbd/rnbd-srv-dev.c | 36 +++----------------------------
+>  drivers/block/rnbd/rnbd-srv-dev.h | 19 +++++-----------
+>  drivers/block/rnbd/rnbd-srv.c     | 32 +++++++++++++++++++--------
+>  3 files changed, 31 insertions(+), 56 deletions(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
+> index 5eddfd29ab64..49c62b506c9b 100644
+> --- a/drivers/block/rnbd/rnbd-srv-dev.c
+> +++ b/drivers/block/rnbd/rnbd-srv-dev.c
+> @@ -45,7 +45,7 @@ void rnbd_dev_close(struct rnbd_dev *dev)
+>         kfree(dev);
+>  }
+>
+> -static void rnbd_dev_bi_end_io(struct bio *bio)
+> +void rnbd_dev_bi_end_io(struct bio *bio)
+>  {
+>         struct rnbd_dev_blk_io *io = bio->bi_private;
+>
+> @@ -63,8 +63,8 @@ static void rnbd_dev_bi_end_io(struct bio *bio)
+>   *     Map the kernel address into a bio suitable for io to a block
+>   *     device. Returns an error pointer in case of error.
+>   */
+> -static struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+> -                                    unsigned int len, gfp_t gfp_mask)
+> +struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+> +                             unsigned int len, gfp_t gfp_mask)
+>  {
+>         unsigned long kaddr = (unsigned long)data;
+>         unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+> @@ -102,33 +102,3 @@ static struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+>         bio->bi_end_io = bio_put;
+>         return bio;
+>  }
+> -
+> -int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
+> -                      size_t len, u32 bi_size, enum rnbd_io_flags flags,
+> -                      short prio, void *priv)
+> -{
+> -       struct rnbd_dev_blk_io *io;
+> -       struct bio *bio;
+> -
+> -       /* Generate bio with pages pointing to the rdma buffer */
+> -       bio = rnbd_bio_map_kern(data, dev->ibd_bio_set, len, GFP_KERNEL);
+> -       if (IS_ERR(bio))
+> -               return PTR_ERR(bio);
+> -
+> -       io = container_of(bio, struct rnbd_dev_blk_io, bio);
+> -
+> -       io->dev = dev;
+> -       io->priv = priv;
+> -
+> -       bio->bi_end_io = rnbd_dev_bi_end_io;
+> -       bio->bi_private = io;
+> -       bio->bi_opf = rnbd_to_bio_flags(flags);
+> -       bio->bi_iter.bi_sector = sector;
+> -       bio->bi_iter.bi_size = bi_size;
+> -       bio_set_prio(bio, prio);
+> -       bio_set_dev(bio, dev->bdev);
+> -
+> -       submit_bio(bio);
+> -
+> -       return 0;
+> -}
+> diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
+> index 0f65b09a270e..0eb23850afb9 100644
+> --- a/drivers/block/rnbd/rnbd-srv-dev.h
+> +++ b/drivers/block/rnbd/rnbd-srv-dev.h
+> @@ -41,6 +41,11 @@ void rnbd_dev_close(struct rnbd_dev *dev);
+>
+>  void rnbd_endio(void *priv, int error);
+>
+> +void rnbd_dev_bi_end_io(struct bio *bio);
+> +
+> +struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+> +                             unsigned int len, gfp_t gfp_mask);
+> +
+>  static inline int rnbd_dev_get_max_segs(const struct rnbd_dev *dev)
+>  {
+>         return queue_max_segments(bdev_get_queue(dev->bdev));
+> @@ -75,18 +80,4 @@ static inline int rnbd_dev_get_discard_alignment(const struct rnbd_dev *dev)
+>         return bdev_get_queue(dev->bdev)->limits.discard_alignment;
+>  }
+>
+> -/**
+> - * rnbd_dev_submit_io() - Submit an I/O to the disk
+> - * @dev:       device to that the I/O is submitted
+> - * @sector:    address to read/write data to
+> - * @data:      I/O data to write or buffer to read I/O date into
+> - * @len:       length of @data
+> - * @bi_size:   Amount of data that will be read/written
+> - * @prio:       IO priority
+> - * @priv:      private data passed to @io_fn
+> - */
+> -int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
+> -                       size_t len, u32 bi_size, enum rnbd_io_flags flags,
+> -                       short prio, void *priv);
+> -
+>  #endif /* RNBD_SRV_DEV_H */
+> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+> index 86e61523907b..0fb94843a495 100644
+> --- a/drivers/block/rnbd/rnbd-srv.c
+> +++ b/drivers/block/rnbd/rnbd-srv.c
+> @@ -124,6 +124,9 @@ static int process_rdma(struct rtrs_srv *sess,
+>         struct rnbd_srv_sess_dev *sess_dev;
+>         u32 dev_id;
+>         int err;
+> +       struct rnbd_dev_blk_io *io;
+> +       struct bio *bio;
+> +       short prio;
+>
+>         priv = kmalloc(sizeof(*priv), GFP_KERNEL);
+>         if (!priv)
+> @@ -142,18 +145,29 @@ static int process_rdma(struct rtrs_srv *sess,
+>         priv->sess_dev = sess_dev;
+>         priv->id = id;
+>
+> -       err = rnbd_dev_submit_io(sess_dev->rnbd_dev, le64_to_cpu(msg->sector),
+> -                                 data, datalen, le32_to_cpu(msg->bi_size),
+> -                                 le32_to_cpu(msg->rw),
+> -                                 srv_sess->ver < RNBD_PROTO_VER_MAJOR ||
+> -                                 usrlen < sizeof(*msg) ?
+> -                                 0 : le16_to_cpu(msg->prio), priv);
+> -       if (unlikely(err)) {
+> -               rnbd_srv_err(sess_dev, "Submitting I/O to device failed, err: %d\n",
+> -                             err);
+> +       /* Generate bio with pages pointing to the rdma buffer */
+> +       bio = rnbd_bio_map_kern(data, sess_dev->rnbd_dev->ibd_bio_set, datalen, GFP_KERNEL);
+> +       if (IS_ERR(bio)) {
+> +               rnbd_srv_err(sess_dev, "Failed to generate bio, err: %ld\n", PTR_ERR(bio));
+>                 goto sess_dev_put;
+>         }
+>
+> +       io = container_of(bio, struct rnbd_dev_blk_io, bio);
+> +       io->dev = sess_dev->rnbd_dev;
+> +       io->priv = priv;
+> +
+> +       bio->bi_end_io = rnbd_dev_bi_end_io;
+> +       bio->bi_private = io;
+> +       bio->bi_opf = rnbd_to_bio_flags(le32_to_cpu(msg->rw));
+> +       bio->bi_iter.bi_sector = le64_to_cpu(msg->sector);
+> +       bio->bi_iter.bi_size = le32_to_cpu(msg->bi_size);
+> +       prio = srv_sess->ver < RNBD_PROTO_VER_MAJOR ||
+> +              usrlen < sizeof(*msg) ? 0 : le16_to_cpu(msg->prio);
+> +       bio_set_prio(bio, prio);
+> +       bio_set_dev(bio, sess_dev->rnbd_dev->bdev);
+> +
+> +       submit_bio(bio);
+> +
+>         return 0;
+>
+>  sess_dev_put:
+> --
+> 2.17.1
+>
+
+Looks good. Thank you!
+
+Acked-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
