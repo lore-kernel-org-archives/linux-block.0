@@ -1,111 +1,110 @@
-Return-Path: <SRS0=4wZT=BB=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=kKib=BC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F75BC433E2
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 18:08:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF49FC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jul 2020 03:53:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2F10208E4
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jul 2020 18:08:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ni0DuArt"
+	by mail.kernel.org (Postfix) with ESMTP id 9485C206F4
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jul 2020 03:53:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727044AbgGVSIf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 14:08:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726980AbgGVSIe (ORCPT
+        id S1725822AbgGWDxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jul 2020 23:53:11 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:34269 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725774AbgGWDxL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 14:08:34 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5005C0619DC;
-        Wed, 22 Jul 2020 11:08:34 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id x8so1377014plm.10;
-        Wed, 22 Jul 2020 11:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=uAqHhbL8Bv/ZNYIQ4GNW4miZnWZzAlf8d/zWNsbgOgM=;
-        b=Ni0DuArt5evdxjjJbC673B9IK6n1LEB66RemFkvlPRNbxtJxk10YPsrSUH8klxbWQE
-         v7fpcGsc27Ebd3mk/aOWe7Zv5ZAviu4OOYP5WhGzVLoppzgeE3f/1nzk7rJyjBxZZioW
-         +QbO+g70jD5M1oEL9O3M0oZk9vcxEE0iUdIQZiaSuElf+XOOeBX3vSSGZL8ars+JwytC
-         Lwi3IGid4++GquLS8Wcs7GzEULVKq0jOLnI7s/1a51smJJL/LwFZ+ZJOXvt87igU0Bhm
-         B6UbqrbFNy+Lvvht3deTCHIpEILFzZrPzrgJuoVfSbESWNhwFKQEpKA0BkfnmuWSY2Zy
-         AX8Q==
+        Wed, 22 Jul 2020 23:53:11 -0400
+Received: by mail-pj1-f68.google.com with SMTP id cv18so3736755pjb.1;
+        Wed, 22 Jul 2020 20:53:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uAqHhbL8Bv/ZNYIQ4GNW4miZnWZzAlf8d/zWNsbgOgM=;
-        b=PCKgAeZyTgf91S8YMy8wMIFKDLzIGw9tRpac3xmZ1CZYfmN3v8FaQ4nfyNU6BzWg8a
-         1zRU1DbbSH1VW88xjbR2ssBV7aiCHuHyy/OmpXfMi5r71bRFzfnDGeJ4R4fmf4fqG3X9
-         FCySX6aKD/dfEKbF7InRDr+ci0n8n2k+UJ7ehMH5kefiZiaKeg6YFaZgbgQoVsl1HBL7
-         JOVQuamvbz6Uz4Nm51rY/FKyuCoRVIqXDXfSlwWT4UGv2/84cAxBES8BFlCgXaKB5cYO
-         ReW1KckgTPEx745TJdAEeE1eXxnTv8/ib0zXvjTcHKYhKTBbVqNa1Hp0P9wafI0E/l/o
-         d6/A==
-X-Gm-Message-State: AOAM530DvkwKtbMfFigwzIF/Ig1ELEIblSY+P1TMGX46paOMRw3+sztg
-        lMR28e5zpRKqZjjGqBlU+Ec=
-X-Google-Smtp-Source: ABdhPJyIYxrSDW6ruHrOIuq3057oRw1Bh7OoBHkfqMIeHRSypstq6dmCdXHxVSaeQp+1iy3Qm0kVSw==
-X-Received: by 2002:a17:90b:811:: with SMTP id bk17mr535628pjb.183.1595441314266;
-        Wed, 22 Jul 2020 11:08:34 -0700 (PDT)
-Received: from gmail.com ([103.105.153.67])
-        by smtp.gmail.com with ESMTPSA id z11sm277591pfj.104.2020.07.22.11.08.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jul 2020 11:08:33 -0700 (PDT)
-Date:   Wed, 22 Jul 2020 23:37:01 +0530
-From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Bjorn Helgaas <bjorn@helgaas.com>,
-        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kernel-mentees@lists.linuxfoundation.org" 
-        <linux-kernel-mentees@lists.linuxfoundation.org>,
-        Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: [PATCH v2 3/3] skd: use generic power management
-Message-ID: <20200722180701.GA616@gmail.com>
-References: <20200721070939.GB51743@gmail.com>
- <20200722175247.GA1293794@bjorn-Precision-5520>
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=xjAKpHFHzgoSZ1buN8IrXmLnuePQtpjKoqBhopDmhts=;
+        b=sgHfIsz2dMUsrXM5oU60kBdwx4nSt33jV06SlXbKMZKXaSsHMk44u0pSYj/V/6UMdw
+         1qnB/8Br5688h6a9yLe3PZ16KihrE0pjjpXxqaPZ4PDd9Jkf8fJ/Y9KgdeZdKPLHWzko
+         W+IxemjXGR/a/Na7sCAoImmqh3dWNn22jHDV5wYosn/+HBF0fwKUUnhAfX6NnVp5+SPN
+         GGL2kwXTj8TlJFItmzjRr1Dbwut21Eh3PI6aSEdHMfdVZRpxjMHoFWpSNmlWV/QL/Y9J
+         rj3XR84FjUGvmxtqO5aJzO11IsAIMf4eGIw+nf115MwwQH4so3uAZikpGeFFKu3/mVer
+         OlBw==
+X-Gm-Message-State: AOAM5300z0qPM9YmOfvo5wD4xL3WC8rEew6jdBwZiGDqRr1PkAMG8v1E
+        9ORxzTQEAVgEVN0LoqhTIp+5jMXm
+X-Google-Smtp-Source: ABdhPJyd+5A8LXHNsdrqFWC+C3NGi5AFfEX0ynFb5N6BORH6hriMhKWLNk3qLQbWcM+bOyjDM0UJfg==
+X-Received: by 2002:a17:90a:9287:: with SMTP id n7mr2110685pjo.223.1595476390247;
+        Wed, 22 Jul 2020 20:53:10 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id q14sm1170753pgk.86.2020.07.22.20.53.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Jul 2020 20:53:09 -0700 (PDT)
+Subject: Re: [PATCH v3] SCSI and block: Simplify resume handling
+To:     Alan Stern <stern@rowland.harvard.edu>
+Cc:     martin.petersen@oracle.com, Can Guo <cang@codeaurora.org>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20200701183718.GA507293@rowland.harvard.edu>
+ <9e824700-dfd1-5d71-5e91-833c35ea55eb@acm.org>
+ <20200706151436.GA702867@rowland.harvard.edu>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <b1dcfb82-e6d4-cb34-c4b3-6557f776e0df@acm.org>
+Date:   Wed, 22 Jul 2020 20:53:08 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20200706151436.GA702867@rowland.harvard.edu>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200722175247.GA1293794@bjorn-Precision-5520>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 12:52:47PM -0500, Bjorn Helgaas wrote:
-> On Tue, Jul 21, 2020 at 12:39:39PM +0530, Vaibhav Gupta wrote:
-> > Okay. I will improve on it. Just inform me after testing that if any other
-> > changes are required. I guess [PATCH 1/3] and [PATCH 2/3] are okay, so I will
-> > only send v3 of [PATCH 3/3] after suggested changes.
+On 2020-07-06 08:14, Alan Stern wrote:
+> Commit 05d18ae1cc8a ("scsi: pm: Balance pm_only counter of request
+> queue during system resume") fixed a problem in the block layer's
+> runtime-PM code: blk_set_runtime_active() failed to call
+> blk_clear_pm_only().  However, the commit's implementation was
+> awkward; it forced the SCSI system-resume handler to choose whether to
+> call blk_post_runtime_resume() or blk_set_runtime_active(), depending
+> on whether or not the SCSI device had previously been runtime
+> suspended.
 > 
-> FWIW, there's a recent conversation on users@linux.kernel.org about
-> updating individual patches in a series (sorry, can't find a link to
-> it).  But the gist of it was that posting only [v3 3/3] leads to
-> confusion because
-> 
->   - we can't tell whether [v3 1/3] and [v3 2/3] got lost en-route, and
-> 
->   - collecting things from v2 and v3 is more work for the maintainer.
-> 
-> Bottom line: repost the whole series, even if some patches haven't
-> changed.
-Thanks a lot for updating me with the info :D .
-I sent the whole series as v3 hours ago.
+> This patch simplifies the situation considerably by adding the missing
+> function call directly into blk_set_runtime_active() (under the
+> condition that the queue is not already in the RPM_ACTIVE state).
+> This allows the SCSI routine to revert back to its original form.
+> Furthermore, making this change reveals that blk_post_runtime_resume()
+> (in its success pathway) does exactly the same thing as
+> blk_set_runtime_active().  The duplicate code is easily removed by
+> making one routine call the other.
 
---Vaibhav Gupta
-> 
-> Bjorn
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
