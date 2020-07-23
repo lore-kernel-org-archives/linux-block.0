@@ -2,109 +2,236 @@ Return-Path: <SRS0=kKib=BC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF49FC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jul 2020 03:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FA7C433E4
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jul 2020 04:54:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9485C206F4
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jul 2020 03:53:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2485207F5
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jul 2020 04:54:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="g3GIbjHA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725822AbgGWDxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jul 2020 23:53:11 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:34269 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725774AbgGWDxL (ORCPT
+        id S1726092AbgGWEyx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jul 2020 00:54:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44906 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725774AbgGWEyx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jul 2020 23:53:11 -0400
-Received: by mail-pj1-f68.google.com with SMTP id cv18so3736755pjb.1;
-        Wed, 22 Jul 2020 20:53:11 -0700 (PDT)
+        Thu, 23 Jul 2020 00:54:53 -0400
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C43EDC0619DC
+        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2020 21:54:52 -0700 (PDT)
+Received: by mail-ed1-x543.google.com with SMTP id i26so218622edv.4
+        for <linux-block@vger.kernel.org>; Wed, 22 Jul 2020 21:54:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ShajOwqOY5CvNYmSgW6m2GmWSAZafmOJXtFLB48nnaI=;
+        b=g3GIbjHAi4ExXfdsytcqAqHhN+WEqHNQi/Nfo9g8Aq9qS1tmiveT4U/7jYncT4XOpI
+         l0T5VgWxBX73/32/KjVf7/XmizzqCn0pfljwSjVyAdwo9CVWRT8xTOv73lnTpT/6IToD
+         17xfbLctr6w4Uj3q7G15ja9b0nuRcHvanVZP80OQwFn44AUm4BxoH8VYKQioT3imq292
+         Y/VNs//q9Qyf7YGv+y2uPAjfh9VogJW3kIZ1HXgVmaw1UoZvT+28h5/Tnf5AkokS6CXM
+         Zu/WKxMKNmBXNZkTM7n6LcXVmxwKtAB1r5qWTrjgPph45BpYzSKnvQkoaBzdVlNGJvOS
+         qWvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=xjAKpHFHzgoSZ1buN8IrXmLnuePQtpjKoqBhopDmhts=;
-        b=sgHfIsz2dMUsrXM5oU60kBdwx4nSt33jV06SlXbKMZKXaSsHMk44u0pSYj/V/6UMdw
-         1qnB/8Br5688h6a9yLe3PZ16KihrE0pjjpXxqaPZ4PDd9Jkf8fJ/Y9KgdeZdKPLHWzko
-         W+IxemjXGR/a/Na7sCAoImmqh3dWNn22jHDV5wYosn/+HBF0fwKUUnhAfX6NnVp5+SPN
-         GGL2kwXTj8TlJFItmzjRr1Dbwut21Eh3PI6aSEdHMfdVZRpxjMHoFWpSNmlWV/QL/Y9J
-         rj3XR84FjUGvmxtqO5aJzO11IsAIMf4eGIw+nf115MwwQH4so3uAZikpGeFFKu3/mVer
-         OlBw==
-X-Gm-Message-State: AOAM5300z0qPM9YmOfvo5wD4xL3WC8rEew6jdBwZiGDqRr1PkAMG8v1E
-        9ORxzTQEAVgEVN0LoqhTIp+5jMXm
-X-Google-Smtp-Source: ABdhPJyd+5A8LXHNsdrqFWC+C3NGi5AFfEX0ynFb5N6BORH6hriMhKWLNk3qLQbWcM+bOyjDM0UJfg==
-X-Received: by 2002:a17:90a:9287:: with SMTP id n7mr2110685pjo.223.1595476390247;
-        Wed, 22 Jul 2020 20:53:10 -0700 (PDT)
-Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id q14sm1170753pgk.86.2020.07.22.20.53.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jul 2020 20:53:09 -0700 (PDT)
-Subject: Re: [PATCH v3] SCSI and block: Simplify resume handling
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     martin.petersen@oracle.com, Can Guo <cang@codeaurora.org>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20200701183718.GA507293@rowland.harvard.edu>
- <9e824700-dfd1-5d71-5e91-833c35ea55eb@acm.org>
- <20200706151436.GA702867@rowland.harvard.edu>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <b1dcfb82-e6d4-cb34-c4b3-6557f776e0df@acm.org>
-Date:   Wed, 22 Jul 2020 20:53:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ShajOwqOY5CvNYmSgW6m2GmWSAZafmOJXtFLB48nnaI=;
+        b=lvguaddLWt6EVXNdWshABFPOu2sfuNJ2fplyY/5jsvCJqyVm3/8A/Ovtk/2gSFz1bY
+         4wwicmwebgQuWXCurbYYNtOJ+5T5bhlwbnIlOHPdupxxw+VpeJos/YR4ex/Hr0iZr+IF
+         4R/NcSWG5qD3hmyzzxeEGQga5vAbKlL0NuD+SjCzvYFaV0mMAGoM+YgV3l9aPQm8cY57
+         QQFZScv87nL516x3yLlfJ9r+HAo0uaTuPhq3r2fdIxtO7qsYUFWjo15a5fn5+9QN+CqK
+         1rbZhVGQ6A4oq2GceiQTGMZZOpJtCoP+rhk9idTakv4ReKx3VI9Wf0Y4BS0tub9Den+u
+         VHCg==
+X-Gm-Message-State: AOAM53131WQI5PezNlJ/Heis6VxiRxdUjIFbSR5pjjq2a6+nAPwpyuCy
+        xrek5mSoDgZD2FpyCE8TGxM4qdOdNr8IOslhWUoQCw==
+X-Google-Smtp-Source: ABdhPJw1v78D7FN4IzHg/iniiOin2RvdI/yns5ufTQK7ga7R+riO8ZIVSnzEem3W+GRfA6pylgSmuGLaGp2TPsQl/5U=
+X-Received: by 2002:a50:c88d:: with SMTP id d13mr2602896edh.104.1595480091181;
+ Wed, 22 Jul 2020 21:54:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200706151436.GA702867@rowland.harvard.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200722102653.19224-1-guoqing.jiang@cloud.ionos.com> <20200722102653.19224-2-guoqing.jiang@cloud.ionos.com>
+In-Reply-To: <20200722102653.19224-2-guoqing.jiang@cloud.ionos.com>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Thu, 23 Jul 2020 06:54:40 +0200
+Message-ID: <CAMGffEkQbjjyMYEQipi6RPdv0Og+Sn47sLh9TVaPCp7cUW65Jw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] rnbd: remove rnbd_dev_submit_io
+To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-07-06 08:14, Alan Stern wrote:
-> Commit 05d18ae1cc8a ("scsi: pm: Balance pm_only counter of request
-> queue during system resume") fixed a problem in the block layer's
-> runtime-PM code: blk_set_runtime_active() failed to call
-> blk_clear_pm_only().  However, the commit's implementation was
-> awkward; it forced the SCSI system-resume handler to choose whether to
-> call blk_post_runtime_resume() or blk_set_runtime_active(), depending
-> on whether or not the SCSI device had previously been runtime
-> suspended.
-> 
-> This patch simplifies the situation considerably by adding the missing
-> function call directly into blk_set_runtime_active() (under the
-> condition that the queue is not already in the RPM_ACTIVE state).
-> This allows the SCSI routine to revert back to its original form.
-> Furthermore, making this change reveals that blk_post_runtime_resume()
-> (in its success pathway) does exactly the same thing as
-> blk_set_runtime_active().  The duplicate code is easily removed by
-> making one routine call the other.
-
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+On Wed, Jul 22, 2020 at 12:27 PM Guoqing Jiang
+<guoqing.jiang@cloud.ionos.com> wrote:
+>
+> The function only has one caller, so let's open code it in process_rdma.
+> Another bonus is we can avoid push/pop stack, since we need to pass 8
+> arguments to rnbd_dev_submit_io.
+>
+> Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Thanks!
+Acked-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> ---
+>  drivers/block/rnbd/rnbd-srv-dev.c | 36 +++----------------------------
+>  drivers/block/rnbd/rnbd-srv-dev.h | 19 +++++-----------
+>  drivers/block/rnbd/rnbd-srv.c     | 32 +++++++++++++++++++--------
+>  3 files changed, 31 insertions(+), 56 deletions(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
+> index 5eddfd29ab64..49c62b506c9b 100644
+> --- a/drivers/block/rnbd/rnbd-srv-dev.c
+> +++ b/drivers/block/rnbd/rnbd-srv-dev.c
+> @@ -45,7 +45,7 @@ void rnbd_dev_close(struct rnbd_dev *dev)
+>         kfree(dev);
+>  }
+>
+> -static void rnbd_dev_bi_end_io(struct bio *bio)
+> +void rnbd_dev_bi_end_io(struct bio *bio)
+>  {
+>         struct rnbd_dev_blk_io *io = bio->bi_private;
+>
+> @@ -63,8 +63,8 @@ static void rnbd_dev_bi_end_io(struct bio *bio)
+>   *     Map the kernel address into a bio suitable for io to a block
+>   *     device. Returns an error pointer in case of error.
+>   */
+> -static struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+> -                                    unsigned int len, gfp_t gfp_mask)
+> +struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+> +                             unsigned int len, gfp_t gfp_mask)
+>  {
+>         unsigned long kaddr = (unsigned long)data;
+>         unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+> @@ -102,33 +102,3 @@ static struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+>         bio->bi_end_io = bio_put;
+>         return bio;
+>  }
+> -
+> -int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
+> -                      size_t len, u32 bi_size, enum rnbd_io_flags flags,
+> -                      short prio, void *priv)
+> -{
+> -       struct rnbd_dev_blk_io *io;
+> -       struct bio *bio;
+> -
+> -       /* Generate bio with pages pointing to the rdma buffer */
+> -       bio = rnbd_bio_map_kern(data, dev->ibd_bio_set, len, GFP_KERNEL);
+> -       if (IS_ERR(bio))
+> -               return PTR_ERR(bio);
+> -
+> -       io = container_of(bio, struct rnbd_dev_blk_io, bio);
+> -
+> -       io->dev = dev;
+> -       io->priv = priv;
+> -
+> -       bio->bi_end_io = rnbd_dev_bi_end_io;
+> -       bio->bi_private = io;
+> -       bio->bi_opf = rnbd_to_bio_flags(flags);
+> -       bio->bi_iter.bi_sector = sector;
+> -       bio->bi_iter.bi_size = bi_size;
+> -       bio_set_prio(bio, prio);
+> -       bio_set_dev(bio, dev->bdev);
+> -
+> -       submit_bio(bio);
+> -
+> -       return 0;
+> -}
+> diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
+> index 0f65b09a270e..0eb23850afb9 100644
+> --- a/drivers/block/rnbd/rnbd-srv-dev.h
+> +++ b/drivers/block/rnbd/rnbd-srv-dev.h
+> @@ -41,6 +41,11 @@ void rnbd_dev_close(struct rnbd_dev *dev);
+>
+>  void rnbd_endio(void *priv, int error);
+>
+> +void rnbd_dev_bi_end_io(struct bio *bio);
+> +
+> +struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+> +                             unsigned int len, gfp_t gfp_mask);
+> +
+>  static inline int rnbd_dev_get_max_segs(const struct rnbd_dev *dev)
+>  {
+>         return queue_max_segments(bdev_get_queue(dev->bdev));
+> @@ -75,18 +80,4 @@ static inline int rnbd_dev_get_discard_alignment(const struct rnbd_dev *dev)
+>         return bdev_get_queue(dev->bdev)->limits.discard_alignment;
+>  }
+>
+> -/**
+> - * rnbd_dev_submit_io() - Submit an I/O to the disk
+> - * @dev:       device to that the I/O is submitted
+> - * @sector:    address to read/write data to
+> - * @data:      I/O data to write or buffer to read I/O date into
+> - * @len:       length of @data
+> - * @bi_size:   Amount of data that will be read/written
+> - * @prio:       IO priority
+> - * @priv:      private data passed to @io_fn
+> - */
+> -int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
+> -                       size_t len, u32 bi_size, enum rnbd_io_flags flags,
+> -                       short prio, void *priv);
+> -
+>  #endif /* RNBD_SRV_DEV_H */
+> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+> index 86e61523907b..0fb94843a495 100644
+> --- a/drivers/block/rnbd/rnbd-srv.c
+> +++ b/drivers/block/rnbd/rnbd-srv.c
+> @@ -124,6 +124,9 @@ static int process_rdma(struct rtrs_srv *sess,
+>         struct rnbd_srv_sess_dev *sess_dev;
+>         u32 dev_id;
+>         int err;
+> +       struct rnbd_dev_blk_io *io;
+> +       struct bio *bio;
+> +       short prio;
+>
+>         priv = kmalloc(sizeof(*priv), GFP_KERNEL);
+>         if (!priv)
+> @@ -142,18 +145,29 @@ static int process_rdma(struct rtrs_srv *sess,
+>         priv->sess_dev = sess_dev;
+>         priv->id = id;
+>
+> -       err = rnbd_dev_submit_io(sess_dev->rnbd_dev, le64_to_cpu(msg->sector),
+> -                                 data, datalen, le32_to_cpu(msg->bi_size),
+> -                                 le32_to_cpu(msg->rw),
+> -                                 srv_sess->ver < RNBD_PROTO_VER_MAJOR ||
+> -                                 usrlen < sizeof(*msg) ?
+> -                                 0 : le16_to_cpu(msg->prio), priv);
+> -       if (unlikely(err)) {
+> -               rnbd_srv_err(sess_dev, "Submitting I/O to device failed, err: %d\n",
+> -                             err);
+> +       /* Generate bio with pages pointing to the rdma buffer */
+> +       bio = rnbd_bio_map_kern(data, sess_dev->rnbd_dev->ibd_bio_set, datalen, GFP_KERNEL);
+> +       if (IS_ERR(bio)) {
+> +               rnbd_srv_err(sess_dev, "Failed to generate bio, err: %ld\n", PTR_ERR(bio));
+>                 goto sess_dev_put;
+>         }
+>
+> +       io = container_of(bio, struct rnbd_dev_blk_io, bio);
+> +       io->dev = sess_dev->rnbd_dev;
+> +       io->priv = priv;
+> +
+> +       bio->bi_end_io = rnbd_dev_bi_end_io;
+> +       bio->bi_private = io;
+> +       bio->bi_opf = rnbd_to_bio_flags(le32_to_cpu(msg->rw));
+> +       bio->bi_iter.bi_sector = le64_to_cpu(msg->sector);
+> +       bio->bi_iter.bi_size = le32_to_cpu(msg->bi_size);
+> +       prio = srv_sess->ver < RNBD_PROTO_VER_MAJOR ||
+> +              usrlen < sizeof(*msg) ? 0 : le16_to_cpu(msg->prio);
+> +       bio_set_prio(bio, prio);
+> +       bio_set_dev(bio, sess_dev->rnbd_dev->bdev);
+> +
+> +       submit_bio(bio);
+> +
+>         return 0;
+>
+>  sess_dev_put:
+> --
+> 2.17.1
+>
