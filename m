@@ -2,144 +2,205 @@ Return-Path: <SRS0=qKaS=BD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B137FC433E4
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 13:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D904C433E8
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:22:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91E68206F0
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 13:58:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34585206F6
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:22:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGT15mfN"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="iMyLrAai"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726674AbgGXN6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jul 2020 09:58:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42032 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726539AbgGXN6B (ORCPT
+        id S1726782AbgGXQWk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jul 2020 12:22:40 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:16794 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726650AbgGXQWi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jul 2020 09:58:01 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E242DC0619D3;
-        Fri, 24 Jul 2020 06:58:00 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id k20so706561wmi.5;
-        Fri, 24 Jul 2020 06:58:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CUhUhKCuy8agxo7tDptaGW+9yrnkDXsJKIUfVuiOOsk=;
-        b=TGT15mfNTOTGaL2vs88EXgpQzE9DMiI17s6WLMqXZ8pqC64tIhL23QZ4PTf36/8IrD
-         yNSOZ7NBCciligIswVZJKcHbI2m+KRe+O2kVYrkc25S+uPgmoJzcURCBWDw+XN2cDOEm
-         zd0dK6e3y4M66CGJ9hn5FPrrUFG/JGRizDdKq4OQWbMh7MnhuJbhi8pB+SCS4NUQZxmv
-         //VRw4TBJV9H1gcaNHqcTDLvDS6uIdidimGes4PSYXFXpr0SJfREm/aFyxEJhNWuZX9K
-         BJndGBI4F+QebTwnSZw/jkICUzgI9qO4HxqrKpHml9WJil9DPVzScpOVNEVH0MHpv2i6
-         Anwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CUhUhKCuy8agxo7tDptaGW+9yrnkDXsJKIUfVuiOOsk=;
-        b=fla7Rmm0kEL7W6JH+7QiUB42dEK4wr9q/8TC07wSpAsmdmfhZbjygkUInL3w0ZIfnW
-         iDlldsjkqDnCQPihVegyvppqSschKfZHFVh+c7Czai2jm6usPa1haNwkMxKTFv7eyR1I
-         SgITj+TV07IVop4DXBqsHIJevBM9pxaA4lFvzgKHqlyPc/UCWrDsQJ0m/MG64ab4TcbF
-         NonMGVJDFg/goY8gDtLI5JR0CDk6gFqeZv3xbvN0aBXzq8mplXLzBG3Mx9UqckUSNgk0
-         Irpp7jWY1GWWLXoRPL4r1+s3a+EeK8kM+Jk2Q4TELDG4f5+MkwVFPHu3GZbcv8Die2/B
-         I9lA==
-X-Gm-Message-State: AOAM532zvK9nk2n0F62CeUcRyYigvG1UY3gRhZ8hA7aH9CZup+/A/AGG
-        qFx/hF+wT5N73NliBVZTYEe9hXjaYvMtsMpstso=
-X-Google-Smtp-Source: ABdhPJzXYsFesSNHLRuxFOcIheC7s7E2FyeJN/nG7rNB42+dgqlSME4YpGtL9el1Ip3s4MqOowe/EHGqQfESz0IfEmw=
-X-Received: by 2002:a7b:c841:: with SMTP id c1mr9462849wml.25.1595599079523;
- Fri, 24 Jul 2020 06:57:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200720132118.10934-1-johannes.thumshirn@wdc.com>
- <20200720132118.10934-3-johannes.thumshirn@wdc.com> <20200720134549.GB3342@lst.de>
- <SN4PR0401MB3598A542AA5BC8218C2A78D19B7B0@SN4PR0401MB3598.namprd04.prod.outlook.com>
- <20200721055410.GA18032@infradead.org> <SN4PR0401MB3598536959BFAE08AA8DA8AD9B790@SN4PR0401MB3598.namprd04.prod.outlook.com>
- <20200722145156.GA20266@lst.de>
-In-Reply-To: <20200722145156.GA20266@lst.de>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Fri, 24 Jul 2020 19:27:32 +0530
-Message-ID: <CA+1E3rKBH=Pj+Do3p0zv+WPipgZKDLaHr20fb+WqLh55CQ7J6A@mail.gmail.com>
-Subject: Re: [PATCH 2/2] zonefs: use zone-append for AIO as well
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 24 Jul 2020 12:22:38 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20200724162233epoutp04637b52fc0588231d641e48a5a1f77b74~kvMxYNr953120231202epoutp04j
+        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2020 16:22:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20200724162233epoutp04637b52fc0588231d641e48a5a1f77b74~kvMxYNr953120231202epoutp04j
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1595607753;
+        bh=NpX7UIFijjINqb3RWh4VijxgxpUkaoRam/J9yuwq45w=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=iMyLrAais4clOXdyCr14MKC66+MzicmVz0j1aPLQqbMecHdRR6JcA2C8DhQacApyZ
+         oxS3sgvoUC+8J/WyAqphqb9sV6hjMTwlrj9VL8ysjN+g7Uh1Zzud3qZmxVR+ADG8Kj
+         Hoyl4aKiivcPhPrrIeoSctcyXEZZrtdoTLzC+GmE=
+Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20200724162233epcas5p25a3465dd26c4fee9658f3b92f13833eb~kvMwnEXZj2133721337epcas5p2v;
+        Fri, 24 Jul 2020 16:22:33 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        7F.BE.40333.8CA0B1F5; Sat, 25 Jul 2020 01:22:32 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20200724155244epcas5p2902f57e36e490ee8772da19aa9408cdc~kuyu_vaUD1470214702epcas5p2W;
+        Fri, 24 Jul 2020 15:52:44 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200724155244epsmtrp1b58587ff618d981a15758dd145d2b24b~kuyu96uhd3045430454epsmtrp1R;
+        Fri, 24 Jul 2020 15:52:44 +0000 (GMT)
+X-AuditID: b6c32a4a-9a7ff70000019d8d-20-5f1b0ac88328
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        75.02.08382.CC30B1F5; Sat, 25 Jul 2020 00:52:44 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20200724155242epsmtip185a0b33a5d3780b627934a3288559d7f~kuysrDUXM0434604346epsmtip14;
+        Fri, 24 Jul 2020 15:52:41 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org
+Cc:     willy@infradead.org, hch@infradead.org, Damien.LeMoal@wdc.com,
+        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH v4 0/6] zone-append support in io-uring and aio
+Date:   Fri, 24 Jul 2020 21:19:16 +0530
+Message-Id: <1595605762-17010-1-git-send-email-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.7.4
+X-Brightmail-Tracker: H4sIAAAAAAAAA0WSWUwTURiFc2em07GxOhah1yI1VI2CsahxuZpGUTFOfHGJD2CiUGUCRqi1
+        QxXFGFyQWrUiqwJxCyRSE8BSBVnUVIkgWlCMpGxCBCMQt6KFQAtapsS37/zn/v85D5fCJdcF
+        MuqwJonVadQJClJEPH4RsnR5gygwesVXD0LjedkCVGh+DNCDrmskMk5YCZSW7sJQU8Y9DH1P
+        sxOofvIbibJzzwFUMWIgUV37MlRb10ig1upCEn3IvoejZs8rARofLSTDaeZJfpeQqbgfyrS+
+        1TMWZ6aQMVnNgBm2yJn055cxxtL3DdtF7ROpYtmEw8dZXdjGGFF85Uu3UOtZkOz6UyVMBW6p
+        EcygIL0amkvfk0YgoiR0DYAVmc2AF04Ae85+9wkXgB3dpWB6pakkB+eNOgAvDHYSvBgGsL7Y
+        8U9QFEmHwJYsvRfn0ir4pGiR9wlOmzH4u+0C4T3kR2+CfQVlU0zQi+G44+pUgJjeCpsmPb4w
+        OXTYL02FQTqNgoPlFgFvRMDerIckz35w8JVVyLMMDly76GMOjnXW+5YNALal3iR4YxN8V+vB
+        vO3wf0XLqsP4cRDMeV2KeRmnZ8Gr430YPxfDqlvTHAy7M/t9HaSw90aRwHsG0gwc6tzmHUvo
+        /dCd1STIAEH5/wPuAGAG81gtlxjHcmu0qzTsCSWnTuT0mjjloaOJFjD1a0J3VIHenp9KG8Ao
+        YAOQwhVzxfddsmiJOFZ98hSrOxqt0yewnA0EUoRCKlaMvjkgoePUSewRltWyumkXo2bIUjEi
+        WGk10D+OCd50xKyTx+RXT0jD5O1nZp23O01nx25X7Zv4cz2lZ4l8bOMeUYdGgSv78nI16f7F
+        +mO9EbNXjJYowpNHKpuNAZWNKSNf9g5EFvxKmL17w+bTFf7Lc/tBGvusv//RM1P7HWJwKGrn
+        FX9VY15nsGqrLjiFvbt9UXFGQGly68+a4trYofnxjoZHpqxD2+zHtc6F52Xu7KIc6+nyIreJ
+        Dgl4WaMowW2upJgA45boj3Mc6sKvBS2qp4kLdkz6tRyI0NVFxckMUWR45bD0U9tawYbVIWKw
+        /v38zM93bweOGiLNK+1z9jpnUmWRv209OVwDddEmOiiSlA8FDSgILl69MhTXceq/Avp+86QD
+        AAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrOLMWRmVeSWpSXmKPExsWy7bCSnO4ZZul4g54jEha/p09htZizahuj
+        xeq7/WwWXf+2sFi0tn9jsjg9YRGTxbvWcywWR/+/ZbOYMq2J0WLz9w42i723tC327D3JYnF5
+        1xw2iytTFjFbnP97nNXi9485bA4CHjtn3WX32LxCy+Py2VKPTZ8msXv0bVnF6PF5k5xH+4Fu
+        Jo9NT94yBXBEcdmkpOZklqUW6dslcGVsP/KHveCvfMW3rzvYGxj/iHcxcnJICJhInF45lbmL
+        kYtDSGA3o0RTw2cWiIS4RPO1H+wQtrDEyn/PwWwhgY+MEn3vDboYOTjYBDQlLkwuBQmLCDhI
+        dB1/zAQyh1lgG5PE08Z2sHphAXuJJ7PXg81kEVCV+H2zlxHE5hVwljj9/y8jxHw5iZvnOpkn
+        MPIsYGRYxSiZWlCcm55bbFhgmJdarlecmFtcmpeul5yfu4kRHLZamjsYt6/6oHeIkYmD8RCj
+        BAezkgjvim9S8UK8KYmVValF+fFFpTmpxYcYpTlYlMR5bxQujBMSSE8sSc1OTS1ILYLJMnFw
+        SjUw6U+cEHRS0q15YrWZTE9q8+aYUzUXdx3dn/hpXnVokML7h59Nkt4yyR1W23P+pV7DZ1/d
+        Upsdcg1L+NZZsyXxTFnHbXKfsWSW28NunxU3Ix3l+EXWbbx168/rdf/ubPOY2lHr6hk0/4Op
+        jt/WYMFjZ09ucsw22FozQ/9wxDyegH9PK7Z/9sk1tvsktFx7/vYu4bCL17OEIs7vkfdI+rrZ
+        0IKzWDikQcX3q1NTzr6D5+xObgxWyXj4ki+7Z1Hm+um31m1eUNq7JGfqQ2buu38OOTTwhh/8
+        OcNUVOvSVfb3p1hi94SdOLwjS0JzS8KGc2qvhDJ6djWtEVn1vuRBEldG1sdJ6/W0/t6ZE+P3
+        WtOvWYmlOCPRUIu5qDgRAHQYDHzKAgAA
+X-CMS-MailID: 20200724155244epcas5p2902f57e36e490ee8772da19aa9408cdc
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20200724155244epcas5p2902f57e36e490ee8772da19aa9408cdc
+References: <CGME20200724155244epcas5p2902f57e36e490ee8772da19aa9408cdc@epcas5p2.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 8:22 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Wed, Jul 22, 2020 at 12:43:21PM +0000, Johannes Thumshirn wrote:
-> > On 21/07/2020 07:54, Christoph Hellwig wrote:
-> > > On Mon, Jul 20, 2020 at 04:48:50PM +0000, Johannes Thumshirn wrote:
-> > >> On 20/07/2020 15:45, Christoph Hellwig wrote:
-> > >>> On Mon, Jul 20, 2020 at 10:21:18PM +0900, Johannes Thumshirn wrote:
-> > >>>> On a successful completion, the position the data is written to is
-> > >>>> returned via AIO's res2 field to the calling application.
-> > >>>
-> > >>> That is a major, and except for this changelog, undocumented ABI
-> > >>> change.  We had the whole discussion about reporting append results
-> > >>> in a few threads and the issues with that in io_uring.  So let's
-> > >>> have that discussion there and don't mix it up with how zonefs
-> > >>> writes data.  Without that a lot of the boilerplate code should
-> > >>> also go away.
-> > >>>
-> > >>
-> > >> OK maybe I didn't remember correctly, but wasn't this all around
-> > >> io_uring and how we'd report the location back for raw block device
-> > >> access?
-> > >
-> > > Report the write offset.  The author seems to be hell bent on making
-> > > it block device specific, but that is a horrible idea as it is just
-> > > as useful for normal file systems (or zonefs).
+Changes since v3:
+- Return absolute append offset in bytes, in both io_uring and aio
+- Repurpose cqe's res/flags and introduce res64 to send 64bit append-offset
+- Change iov_iter_truncate to report whether it actually truncated
+- Prevent short write and return failure if zone-append is spanning
+beyond end-of-device
+- Change ki_complete(...,long ret2) interface to support 64bit ret2
 
-Patchset only made the feature opt-in, due to the constraints that we
-had. ZoneFS was always considered and it fits as fine as block-IO.
-You already know that  we did not have enough room in io-uring, which
-did not really allow to think of other FS (any-size cached-writes).
-After working on multiple schemes in io_uring, now we have 64bits, and
-we will return absolute offset in bytes now (in V4).
+v3: https://lore.kernel.org/lkml/1593974870-18919-1-git-send-email-joshi.k@samsung.com/
 
-But still, it comes at the cost of sacrificing the ability to do
-short-write, which is fine for zone-append but may trigger
-behavior-change for regular file-append.
-Write may become short if
-- spanning beyond end-of-file
-- going beyond RLIMIT_FSIZE limit
-- probably for MAX_NON_LFS as well
+Changes since v2:
+- Use file append infra (O_APPEND/RWF_APPEND) to trigger zone-append
+(Christoph, Wilcox)
+- Added Block I/O path changes (Damien). Avoided append split into multi-bio.
+- Added patch to extend zone-append in block-layer to support bvec iov_iter.
+Append using io-uring fixed-buffer is enabled with this.
+- Made io-uring support code more concise, added changes mentioned by Pavel.
 
-We need to fail all above cases if we extend the current model for
-regular FS. And that may break existing file-append users.
-Class of applications which just append without caring about the exact
-location - attempt was not to affect these while we try to enable the
-path for zone-append.
+v2: https://lore.kernel.org/io-uring/1593105349-19270-1-git-send-email-joshi.k@samsung.com/
 
-Patches use O/RWF_APPEND, but try to isolate appending-write
-(IOCB_APPEND) from appending-write-that-returns-location
-(IOCB_ZONE_APPEND - can be renamed when we actually have all that it
-takes to apply the feature in regular FS).
-Enabling block-IO and zoneFS now, and keeping regular-FS as future
-work - hope that does not sound too bad!
+Changes since v1:
+- No new opcodes in uring or aio. Use RWF_ZONE_APPEND flag instead.
+- linux-aio changes vanish because of no new opcode
+- Fixed the overflow and other issues mentioned by Damien
+- Simplified uring support code, fixed the issues mentioned by Pavel
+- Added error checks for io-uring fixed-buffer and sync kiocb
 
-> > After having looked into io_uring I don't this there is anything that
-> > prevents io_uring from picking up the write offset from ki_complete's
-> > res2 argument. As of now io_uring ignores the filed but that can be
-> > changed.
+v1: https://lore.kernel.org/io-uring/1592414619-5646-1-git-send-email-joshi.k@samsung.com/
 
-We use ret2 of ki_complete to collect append-offset in io_uring too.
-It's just that unlike aio it required some work to send it to user-space.
+Cover letter (updated):
 
+This patchset enables zone-append using io-uring/linux-aio, on block IO path.
+Purpose is to provide zone-append consumption ability to applications which are
+using zoned-block-device directly.
+Application can send write with existing O/RWF_APPEND;On a zoned-block-device
+this will trigger zone-append. On regular block device, existing file-append
+behavior is retained. However, infra allows zone-append to be triggered on
+any file if FMODE_ZONE_APPEND (new kernel-only fmode) is set during open.
 
---
-Kanchan Joshi
+With zone-append, written-location within zone is known only after completion.
+So apart from the usual return value of write, additional means are
+needed to obtain the actual written-location.
+
+In aio, 64bit append-offset is returned to application using res2
+field of io_event -
+
+struct io_event {
+        __u64           data;           /* the data field from the iocb */
+        __u64           obj;            /* what iocb this event came from */
+        __s64           res;            /* result code for this event */
+        __s64           res2;           /* secondary result */
+};
+
+In io-uring, [cqe->res, cqq->flags] repurposed into res64 to return
+64bit append-offset to user-space.
+
+struct io_uring_cqe {
+        __u64   user_data;      /* sqe->data submission passed back */
+        union {
+                struct {
+                        __s32   res;    /* result code for this event */
+                        __u32   flags;
+                };
+                __s64   res64;  /* appending offset for zone append */
+        };
+};
+Zone-append write is ensured not to be a short-write.
+
+Kanchan Joshi (3):
+  fs: introduce FMODE_ZONE_APPEND and IOCB_ZONE_APPEND
+  block: add zone append handling for direct I/O path
+  block: enable zone-append for iov_iter of bvec type
+
+SelvaKumar S (3):
+  fs: change ki_complete interface to support 64bit ret2
+  uio: return status with iov truncation
+  io_uring: add support for zone-append
+
+ block/bio.c                       | 31 ++++++++++++++++++++---
+ drivers/block/loop.c              |  2 +-
+ drivers/nvme/target/io-cmd-file.c |  2 +-
+ drivers/target/target_core_file.c |  2 +-
+ fs/aio.c                          |  2 +-
+ fs/block_dev.c                    | 51 +++++++++++++++++++++++++++++--------
+ fs/io_uring.c                     | 53 +++++++++++++++++++++++++++++++--------
+ fs/overlayfs/file.c               |  2 +-
+ include/linux/fs.h                | 16 +++++++++---
+ include/linux/uio.h               |  7 ++++--
+ include/uapi/linux/io_uring.h     |  9 +++++--
+ 11 files changed, 142 insertions(+), 35 deletions(-)
+
+-- 
+2.7.4
+
