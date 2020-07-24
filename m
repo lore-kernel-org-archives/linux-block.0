@@ -2,117 +2,126 @@ Return-Path: <SRS0=qKaS=BD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40666C433EA
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C28C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:48:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19143206D8
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:34:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EF4920674
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:48:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="K7XpyhQv"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AKpxBSKN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbgGXQee (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jul 2020 12:34:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38614 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726717AbgGXQee (ORCPT
+        id S1726397AbgGXQso (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jul 2020 12:48:44 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:60208 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726326AbgGXQsn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jul 2020 12:34:34 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0446C0619E4
-        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2020 09:34:33 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id w2so5511277pgg.10
-        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2020 09:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=KxUVJu2tVsXuL6ozXtsDLOIo+4JxBbyht8pFne+rsMU=;
-        b=K7XpyhQvrenGn2Xu15vi76JcRUT9sC1liRgYcCIGd9iGI1u0NGrLkxgPuwufFBfvx0
-         I/C3wBLb9TCtHH5QjgJVmj4daBGbHavWk+DVx/3IjdtnfdkCBBhocCDJT5Rxnu8BvzeN
-         mCqzqbB59MjQsoiZzBtZ15Q/yIgmPozIOIx1SlN02Pg/DvEWOqWCyl5hsjbzqBE6K5Db
-         Fa6O+23rfJS3D1mMkhzPo+FLntzB0TbISxoiWU2HQcOpkERblpEAgh2EsVdLGDpvvtLV
-         JkZBYmpwFdV+YU9UiXZtLLkqDrlg4J1mnyx8QF6UgHCGszO1D6Kjxn3qln+FBsCEJ+pl
-         LyxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KxUVJu2tVsXuL6ozXtsDLOIo+4JxBbyht8pFne+rsMU=;
-        b=ewOpt7Jv1b2Znf4sLfI2JEb3YeuUl/RtiArdZADuaWCDOojupZhTtl+cEPcjHxpKwG
-         Y5uFqpYbF1rJttIbzk7Bbi8ac8N1DHvpJ0ez2oH0+LNpqMz3UMD3aWBkUgh6OoRG3vs4
-         zflA9Jlf74t02vxFN6pJrfO/p7HrAYxKTlx6avGhZe/w4O5IgsTTEYXr4gDLt+PREN+Z
-         s7fzOv0AE0DMaTPg0aXFRhGXTiAiTFXOD+zN6DAHID86bENXLfdp/R+3ZkPjuXay7Jju
-         U1LSWSFS4v0R6Sx+DjmS5ZGeslzn8NUAvd3oyAsH00BvMEcmB+8bviW7fBM1WhHHLha1
-         c7Bg==
-X-Gm-Message-State: AOAM5308PtQQpsaTrRhhv0kAaFKhbURoW/U3NpKVYdfKe0oMaTh3sMWW
-        e+bsfCpDeFsT3gRtHW0Rlmyl/Q==
-X-Google-Smtp-Source: ABdhPJy4sWKBDhVsVVTB4Rz+Di1yRjyZBmXNP884n02aTr/meZ8zL6S9UB8hgZlBhiOPmt1234c8iw==
-X-Received: by 2002:aa7:970a:: with SMTP id a10mr10129338pfg.319.1595608473248;
-        Fri, 24 Jul 2020 09:34:33 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id y6sm6486959pji.2.2020.07.24.09.34.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jul 2020 09:34:32 -0700 (PDT)
-Subject: Re: [PATCH v4 1/6] fs: introduce FMODE_ZONE_APPEND and
- IOCB_ZONE_APPEND
-To:     Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
-        bcrl@kvack.org
-Cc:     willy@infradead.org, hch@infradead.org, Damien.LeMoal@wdc.com,
-        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, Selvakumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-References: <1595605762-17010-1-git-send-email-joshi.k@samsung.com>
- <CGME20200724155258epcas5p1a75b926950a18cd1e6c8e7a047e6c589@epcas5p1.samsung.com>
- <1595605762-17010-2-git-send-email-joshi.k@samsung.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <733bb8bb-cd4f-bee7-516d-359c565d11d3@kernel.dk>
-Date:   Fri, 24 Jul 2020 10:34:30 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <1595605762-17010-2-git-send-email-joshi.k@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Fri, 24 Jul 2020 12:48:43 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06OGVt58099130;
+        Fri, 24 Jul 2020 16:48:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=8jDaDjjGEgb8b9pwjImoVbxzSY6YeuKGwEYJvT3kk2E=;
+ b=AKpxBSKNRh87CQZDrJNEbCCT6i9qgnywvTgsfUnJk95f3Tv9SLyDBc4N1xRmkCrPwWYW
+ PLaK3WWEKdUh/yOPWZj/ynioQKSaDVDNDFwsd5hLjU2HtxibMy2PfH5Msik0DyoO17hx
+ s5jBJxP6kAc4KrRodAG2ktd4meuBtDOOA7gtS5cEsJRgIb2c2adDSsyGwrKF6kh2ft0r
+ R7SApzdJokb70fN0ts+69qexwYs4O0iiVUvlMa5oOdtjoGzucHC1LC7LmaygMAbClac5
+ KYszH6wm/CfT0z16AOl+PitTYuwVZCcSXuIqkQt3tRD6rIreKzDGmvzIGNzyZ/W/oysO VQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 32bs1n04ar-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 24 Jul 2020 16:48:40 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06OGWTHT159479;
+        Fri, 24 Jul 2020 16:48:40 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 32fsr7m7cu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jul 2020 16:48:40 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06OGmdMd012483;
+        Fri, 24 Jul 2020 16:48:39 GMT
+Received: from rsrivast-us.us.oracle.com (/10.211.44.96)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 24 Jul 2020 16:48:39 +0000
+From:   Ritika Srivastava <ritika.srivastava@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, ritika.srivastava@oracle.com
+Subject: [PATCH 1/1] block: return BLK_STS_NOTSUPP if operation is not supported
+Date:   Fri, 24 Jul 2020 09:33:22 -0700
+Message-Id: <1595608402-16457-1-git-send-email-ritika.srivastava@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9692 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=1
+ bulkscore=0 mlxscore=0 spamscore=0 adultscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007240128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9692 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 bulkscore=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=999 malwarescore=0 clxscore=1011
+ spamscore=0 mlxscore=0 impostorscore=0 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007240128
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/24/20 9:49 AM, Kanchan Joshi wrote:
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 6c4ab4d..ef13df4 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -175,6 +175,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
->  /* File does not contribute to nr_files count */
->  #define FMODE_NOACCOUNT		((__force fmode_t)0x20000000)
->  
-> +/* File can support zone-append */
-> +#define FMODE_ZONE_APPEND	((__force fmode_t)0x40000000)
+If WRITE_ZERO/WRITE_SAME operation is not supported by the storage,
+blk_cloned_rq_check_limits() will return -EIO which will cause
+device-mapper to fail the paths.
 
-This conflicts with the async buffered read support in linux-next that
-has been queued up for a long time.
+Instead, if the queue limit is set to 0, return BLK_STS_NOTSUPP.
+BLK_STS_NOTSUPP will be ignored by device-mapper and will not fail the
+paths.
 
-> @@ -315,6 +318,7 @@ enum rw_hint {
->  #define IOCB_SYNC		(1 << 5)
->  #define IOCB_WRITE		(1 << 6)
->  #define IOCB_NOWAIT		(1 << 7)
-> +#define IOCB_ZONE_APPEND	(1 << 8)
+Suggested-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Ritika Srivastava <ritika.srivastava@oracle.com>
+---
+ block/blk-core.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-Ditto this one, and that also clashes with mainline. The next available
-bit would be 10, IOCB_WAITQ and IOCB_NOIO are 8 and 9.
-
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 9bfaee0..173bb04 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1223,10 +1223,13 @@ blk_qc_t submit_bio(struct bio *bio)
+ static int blk_cloned_rq_check_limits(struct request_queue *q,
+ 				      struct request *rq)
+ {
+-	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
++	unsigned int queue_max_sector = blk_queue_get_max_sectors(q, req_op(rq));
++
++	if (blk_rq_sectors(rq) > queue_max_sector) {
+ 		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
+-			__func__, blk_rq_sectors(rq),
+-			blk_queue_get_max_sectors(q, req_op(rq)));
++			__func__, blk_rq_sectors(rq), queue_max_sector);
++		if (queue_max_sector == 0)
++			return -EOPNOTSUPP;
+ 		return -EIO;
+ 	}
+ 
+@@ -1253,7 +1256,11 @@ static int blk_cloned_rq_check_limits(struct request_queue *q,
+  */
+ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *rq)
+ {
+-	if (blk_cloned_rq_check_limits(q, rq))
++	int cloned_limit_check = blk_cloned_rq_check_limits(q, rq);
++
++	if (cloned_limit_check == -EOPNOTSUPP)
++		return BLK_STS_NOTSUPP;
++	else if (cloned_limit_check)
+ 		return BLK_STS_IOERR;
+ 
+ 	if (rq->rq_disk &&
 -- 
-Jens Axboe
+1.8.3.1
 
