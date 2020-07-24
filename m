@@ -2,163 +2,144 @@ Return-Path: <SRS0=qKaS=BD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F045DC433E4
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 08:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B137FC433E4
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 13:58:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFD1A2070B
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 08:50:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91E68206F0
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 13:58:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="pEPpJwey"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGT15mfN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726784AbgGXIur (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jul 2020 04:50:47 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:37951 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726878AbgGXIur (ORCPT
+        id S1726674AbgGXN6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jul 2020 09:58:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42032 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726539AbgGXN6B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jul 2020 04:50:47 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20200724085045euoutp016f889708791521fee3ff00743df78168~kpCS6bdrp0186301863euoutp01-
-        for <linux-block@vger.kernel.org>; Fri, 24 Jul 2020 08:50:45 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20200724085045euoutp016f889708791521fee3ff00743df78168~kpCS6bdrp0186301863euoutp01-
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1595580645;
-        bh=JCaoIX/Ct2B1o6jzU1B+BPTjqPyceMizPHeHhqEvRPE=;
-        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
-        b=pEPpJweyxPgLATd6DIxnWKM8jX2UaNeqEbCbCsdSPoGOkrjfqC/SHXZPtaXmHUyxD
-         Jt8Q1AWmAaphCNJM+TDc5T2gfvCgUWUNfJc5lKv0PluJGU9GUBhQhJtaksx1Z9bZdY
-         xxQSXibHXh+7AYrN092gSdJdIlVeKjQMqiHLJTEg=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20200724085045eucas1p2ffef272f435a518fa4d1cf773626ab4e~kpCSsGiBA2974529745eucas1p2_;
-        Fri, 24 Jul 2020 08:50:45 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 76.EF.06456.5E0AA1F5; Fri, 24
-        Jul 2020 09:50:45 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20200724085044eucas1p2bae591d154a38a8283ef0d55a48be7bf~kpCR7SUDN3011730117eucas1p23;
-        Fri, 24 Jul 2020 08:50:44 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20200724085044eusmtrp1371cb979181545dde0a463205d4d0273~kpCR6oqbU1666716667eusmtrp1D;
-        Fri, 24 Jul 2020 08:50:44 +0000 (GMT)
-X-AuditID: cbfec7f2-7efff70000001938-e0-5f1aa0e5731a
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id C2.30.06017.4E0AA1F5; Fri, 24
-        Jul 2020 09:50:44 +0100 (BST)
-Received: from [106.120.51.71] (unknown [106.120.51.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20200724085044eusmtip1375ed4e8129771eaa312921c96d036e4~kpCRj2LN92939429394eusmtip16;
-        Fri, 24 Jul 2020 08:50:44 +0000 (GMT)
-Subject: Re: [RFC PATCH v3 5/8] ata_dev_printk: Use dev_printk
-To:     tasleson@redhat.com, Jens Axboe <axboe@kernel.dk>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-From:   Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Message-ID: <800d28d5-2432-f591-f942-df63aa37086c@samsung.com>
-Date:   Fri, 24 Jul 2020 10:50:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-        Thunderbird/60.8.0
+        Fri, 24 Jul 2020 09:58:01 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E242DC0619D3;
+        Fri, 24 Jul 2020 06:58:00 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id k20so706561wmi.5;
+        Fri, 24 Jul 2020 06:58:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CUhUhKCuy8agxo7tDptaGW+9yrnkDXsJKIUfVuiOOsk=;
+        b=TGT15mfNTOTGaL2vs88EXgpQzE9DMiI17s6WLMqXZ8pqC64tIhL23QZ4PTf36/8IrD
+         yNSOZ7NBCciligIswVZJKcHbI2m+KRe+O2kVYrkc25S+uPgmoJzcURCBWDw+XN2cDOEm
+         zd0dK6e3y4M66CGJ9hn5FPrrUFG/JGRizDdKq4OQWbMh7MnhuJbhi8pB+SCS4NUQZxmv
+         //VRw4TBJV9H1gcaNHqcTDLvDS6uIdidimGes4PSYXFXpr0SJfREm/aFyxEJhNWuZX9K
+         BJndGBI4F+QebTwnSZw/jkICUzgI9qO4HxqrKpHml9WJil9DPVzScpOVNEVH0MHpv2i6
+         Anwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CUhUhKCuy8agxo7tDptaGW+9yrnkDXsJKIUfVuiOOsk=;
+        b=fla7Rmm0kEL7W6JH+7QiUB42dEK4wr9q/8TC07wSpAsmdmfhZbjygkUInL3w0ZIfnW
+         iDlldsjkqDnCQPihVegyvppqSschKfZHFVh+c7Czai2jm6usPa1haNwkMxKTFv7eyR1I
+         SgITj+TV07IVop4DXBqsHIJevBM9pxaA4lFvzgKHqlyPc/UCWrDsQJ0m/MG64ab4TcbF
+         NonMGVJDFg/goY8gDtLI5JR0CDk6gFqeZv3xbvN0aBXzq8mplXLzBG3Mx9UqckUSNgk0
+         Irpp7jWY1GWWLXoRPL4r1+s3a+EeK8kM+Jk2Q4TELDG4f5+MkwVFPHu3GZbcv8Die2/B
+         I9lA==
+X-Gm-Message-State: AOAM532zvK9nk2n0F62CeUcRyYigvG1UY3gRhZ8hA7aH9CZup+/A/AGG
+        qFx/hF+wT5N73NliBVZTYEe9hXjaYvMtsMpstso=
+X-Google-Smtp-Source: ABdhPJzXYsFesSNHLRuxFOcIheC7s7E2FyeJN/nG7rNB42+dgqlSME4YpGtL9el1Ip3s4MqOowe/EHGqQfESz0IfEmw=
+X-Received: by 2002:a7b:c841:: with SMTP id c1mr9462849wml.25.1595599079523;
+ Fri, 24 Jul 2020 06:57:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <84fec7af-3f51-c956-d2ca-41581e0f3cbb@redhat.com>
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHKsWRmVeSWpSXmKPExsWy7djPc7pPF0jFG2w7LWqx+m4/m0Xz4vVs
-        FntvaVsc2/GIyaL7+g42i4v3brI7sHlcPlvqsX/uGnaP9/uusnl83iQXwBLFZZOSmpNZllqk
-        b5fAlTHn4nWmgh08FR/WrWVqYOzn6mLk5JAQMJE4cukvWxcjF4eQwApGiYurzkA5Xxglbs3p
-        ZYJwPjNK7PnUygrTcmPHb6iq5YwSbY82QFW9ZZT4tG4zkMPBISxgJ7H4ZyGIKSJgKvH1sgZI
-        CbNAN6PEvav9YIPYBKwkJravYgSxeYHKF25axARiswioSqx59xSsRlQgQuLTg8OsEDWCEidn
-        PmEBmckJVL9sfjlImFlAXOLWk/lMELa8xPa3c5hBdkkILGKXmP3oNAvE0S4S06eeZYSwhSVe
-        Hd/CDmHLSJye3MMC0bCOUeJvxwuo7u2MEssn/2ODqLKWuHPuFxvIZmYBTYn1u/Qhwo4Sd4+8
-        AztIQoBP4sZbQYgj+CQmbZvODBHmlehoE4KoVpPYsGwDG8zarp0rmScwKs1C8tksJO/MQvLO
-        LIS9CxhZVjGKp5YW56anFhvmpZbrFSfmFpfmpesl5+duYgSmmtP/jn/awfj1UtIhRgEORiUe
-        Xok6yXgh1sSy4srcQ4wSHMxKIrxOZ0/HCfGmJFZWpRblxxeV5qQWH2KU5mBREuc1XvQyVkgg
-        PbEkNTs1tSC1CCbLxMEp1cDIdMj5WeExNr7kp9lFTe/Ftk9Unl52uqnzusj+U3zXTm01Wz7P
-        qPHFM47KeUxLN/7Z8txFt2V6ptn8i5/3ZB43Wxi3/djaNSxZ6aKv1zRuuxC36sKhK2VuuzL5
-        ahn1Sp+Jm6pfyWc8VOS1tMPa8vgySd1pq7vTUvdrB4r2fwjh11todv3UDsM5SizFGYmGWsxF
-        xYkAZs098zEDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHIsWRmVeSWpSXmKPExsVy+t/xu7pPFkjFGzQdkrdYfbefzaJ58Xo2
-        i723tC2O7XjEZNF9fQebxcV7N9kd2Dwuny312D93DbvH+31X2Tw+b5ILYInSsynKLy1JVcjI
-        Ly6xVYo2tDDSM7S00DMysdQzNDaPtTIyVdK3s0lJzcksSy3St0vQy5hz8TpTwQ6eig/r1jI1
-        MPZzdTFyckgImEjc2PGbDcQWEljKKPHkH3sXIwdQXEbi+PoyiBJhiT/XuoBKuIBKXjNKbNmw
-        kwWkRljATmLxz0IQU0TAVOLrZQ2QEmaBbkaJf00/2CHqj7FIPPpznBVkEJuAlcTE9lWMIDYv
-        UO/CTYuYQGwWAVWJNe+egtWICkRIHN4xC6pGUOLkzCdguziB6pfNLwcJMwuoS/yZd4kZwhaX
-        uPVkPhOELS+x/e0c5gmMQrOQdM9C0jILScssJC0LGFlWMYqklhbnpucWG+kVJ+YWl+al6yXn
-        525iBMbVtmM/t+xg7HoXfIhRgINRiYdXok4yXog1say4MvcQowQHs5IIr9PZ03FCvCmJlVWp
-        RfnxRaU5qcWHGE2BfpvILCWanA+M+bySeENTQ3MLS0NzY3NjMwslcd4OgYMxQgLpiSWp2amp
-        BalFMH1MHJxSDYxZr5aovfG9M+n6H6aTTu99nl9mncvgcUnQoea1LFuuioPtqS3hzW/fMTgE
-        BnAs/C1rNe/ZyRSjWEnehCOMs077ZsS+SQptPqTinB2+bcGD0+fyns3iqPvY+6r+vMtmo1Px
-        Glzme69pnluvHSrN8ODmQf8FKY/Yvc7ETVbZLLJHoaLjbo/fvnlKLMUZiYZazEXFiQDLsSXe
-        wQIAAA==
-X-CMS-MailID: 20200724085044eucas1p2bae591d154a38a8283ef0d55a48be7bf
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee
-References: <20200623191749.115200-1-tasleson@redhat.com>
-        <20200623191749.115200-6-tasleson@redhat.com>
-        <CGME20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee@eucas1p2.samsung.com>
-        <d817c9dd-6852-9233-5f61-1c0bc0f65ca4@samsung.com>
-        <7ed08b94-755f-baab-0555-b4e454405729@redhat.com>
-        <cfff719b-dc12-a06a-d0ee-4165323171de@samsung.com>
-        <20200714081750.GB862637@kroah.com>
-        <dff66d00-e6c3-f9ef-3057-27c60e0bfc11@samsung.com>
-        <20200717100610.GA2667456@kroah.com>
-        <e6517dd6-b6b6-ead3-2e60-03832e0c43bf@samsung.com>
-        <84fec7af-3f51-c956-d2ca-41581e0f3cbb@redhat.com>
+References: <20200720132118.10934-1-johannes.thumshirn@wdc.com>
+ <20200720132118.10934-3-johannes.thumshirn@wdc.com> <20200720134549.GB3342@lst.de>
+ <SN4PR0401MB3598A542AA5BC8218C2A78D19B7B0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+ <20200721055410.GA18032@infradead.org> <SN4PR0401MB3598536959BFAE08AA8DA8AD9B790@SN4PR0401MB3598.namprd04.prod.outlook.com>
+ <20200722145156.GA20266@lst.de>
+In-Reply-To: <20200722145156.GA20266@lst.de>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Fri, 24 Jul 2020 19:27:32 +0530
+Message-ID: <CA+1E3rKBH=Pj+Do3p0zv+WPipgZKDLaHr20fb+WqLh55CQ7J6A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] zonefs: use zone-append for AIO as well
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jul 22, 2020 at 8:22 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Wed, Jul 22, 2020 at 12:43:21PM +0000, Johannes Thumshirn wrote:
+> > On 21/07/2020 07:54, Christoph Hellwig wrote:
+> > > On Mon, Jul 20, 2020 at 04:48:50PM +0000, Johannes Thumshirn wrote:
+> > >> On 20/07/2020 15:45, Christoph Hellwig wrote:
+> > >>> On Mon, Jul 20, 2020 at 10:21:18PM +0900, Johannes Thumshirn wrote:
+> > >>>> On a successful completion, the position the data is written to is
+> > >>>> returned via AIO's res2 field to the calling application.
+> > >>>
+> > >>> That is a major, and except for this changelog, undocumented ABI
+> > >>> change.  We had the whole discussion about reporting append results
+> > >>> in a few threads and the issues with that in io_uring.  So let's
+> > >>> have that discussion there and don't mix it up with how zonefs
+> > >>> writes data.  Without that a lot of the boilerplate code should
+> > >>> also go away.
+> > >>>
+> > >>
+> > >> OK maybe I didn't remember correctly, but wasn't this all around
+> > >> io_uring and how we'd report the location back for raw block device
+> > >> access?
+> > >
+> > > Report the write offset.  The author seems to be hell bent on making
+> > > it block device specific, but that is a horrible idea as it is just
+> > > as useful for normal file systems (or zonefs).
 
-On 7/17/20 9:47 PM, Tony Asleson wrote:
-> On 7/17/20 5:27 AM, Bartlomiej Zolnierkiewicz wrote:
->>
->> On 7/17/20 12:06 PM, Greg Kroah-Hartman wrote:
->>
->>> Just use the device name and don't worry about it, I doubt anyone will
->>> notice, unless the name is _really_ different.
->>
->> Well, Geert has noticed and complained pretty quickly:
->>
->> https://lore.kernel.org/linux-ide/alpine.DEB.2.21.2003241414490.21582@ramsan.of.borg/
->>
->> Anyway, I don't insist that hard on keeping the old names and
->> I won't be the one handling potential bug-reports.. (added Jens to Cc:).
-> 
-> I would think having sysfs use one naming convention and the logging
-> using another would be confusing for users, but apparently they've
-> managed this long with that.
-> 
-> 
-> It appears changes are being rejected because of logging content
-> differences, implying we shouldn't be changing printk usage to dev_printk.
-> 
-> Should I re-work my changes to support dev_printk path in addition to
-> utilizing printk_emit functionality so that we can avoid user space
+Patchset only made the feature opt-in, due to the constraints that we
+had. ZoneFS was always considered and it fits as fine as block-IO.
+You already know that  we did not have enough room in io-uring, which
+did not really allow to think of other FS (any-size cached-writes).
+After working on multiple schemes in io_uring, now we have 64bits, and
+we will return absolute offset in bytes now (in V4).
 
-Unfortunately this won't fix the issue for Hannes' patchset.
+But still, it comes at the cost of sacrificing the ability to do
+short-write, which is fine for zone-append but may trigger
+behavior-change for regular file-append.
+Write may become short if
+- spanning beyond end-of-file
+- going beyond RLIMIT_FSIZE limit
+- probably for MAX_NON_LFS as well
 
-> visible log changes?  I don't see a way to make the transition from
-> printk to dev_printk without having user visible changes to message content.
-The usage of sysfs symlinks for fixing the naming issue turned out
-to not be (easily) possible so we should consider other options (or
-just go forward with the original dev_printk() conversion)..
+We need to fail all above cases if we extend the current model for
+regular FS. And that may break existing file-append users.
+Class of applications which just append without caring about the exact
+location - attempt was not to affect these while we try to enable the
+path for zone-append.
 
-Jens?
+Patches use O/RWF_APPEND, but try to isolate appending-write
+(IOCB_APPEND) from appending-write-that-returns-location
+(IOCB_ZONE_APPEND - can be renamed when we actually have all that it
+takes to apply the feature in regular FS).
+Enabling block-IO and zoneFS now, and keeping regular-FS as future
+work - hope that does not sound too bad!
 
-Best regards,
+> > After having looked into io_uring I don't this there is anything that
+> > prevents io_uring from picking up the write offset from ki_complete's
+> > res2 argument. As of now io_uring ignores the filed but that can be
+> > changed.
+
+We use ret2 of ki_complete to collect append-offset in io_uring too.
+It's just that unlike aio it required some work to send it to user-space.
+
+
 --
-Bartlomiej Zolnierkiewicz
-Samsung R&D Institute Poland
-Samsung Electronics
+Kanchan Joshi
