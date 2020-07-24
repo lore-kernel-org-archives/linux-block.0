@@ -7,19 +7,19 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4942CC433F1
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 17:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FB3C433F4
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 17:17:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C90020658
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 17:17:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7122E20658
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 17:17:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NpyVqwUk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tlq6UCxa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726838AbgGXRRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jul 2020 13:17:19 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30878 "EHLO
+        id S1726915AbgGXRRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jul 2020 13:17:20 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45765 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726764AbgGXRRS (ORCPT
+        by vger.kernel.org with ESMTP id S1726381AbgGXRRS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 24 Jul 2020 13:17:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -28,29 +28,29 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1I1jj7ycE4M8Ce2HJV0/6+ITH9/gcB8f4Vcrj+v3V5Q=;
-        b=NpyVqwUk8+ROG/u8kv+cku1HpOrFoxdjrBSeepP7Em3fafJpzhCVLjNYEnefiKcPSxARQc
-        iICvnBKFm0+/k0TZM4zVruXIvQrKZamHKlqQeFubidQo7IBIVIUv3knuBpKXKF2CB1HOSZ
-        9YUEYcjyGGgetsb4kfjARrEwbN6NH3o=
+        bh=X0buJHSrkh+I+Rp+R9nG+KdqCDEy/CQ4RAkkP1NBj9Q=;
+        b=Tlq6UCxaLIHTYgC42ffpCvgdu5SZ+gGZBZyaHnwrjygwnhdFb09/W0zmCfq43QPMGlMn+f
+        5NHuYEpdEBzsudID+hM3fUYAlvuTZmLYh+T3JV6efDXB790eVfNyTdYZobfevOTNAuhpSL
+        gFGEG1cK6sqGn9D/Bf6GMZrtsIPijkg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-euqzHgGTMtaMOXJQeLhktw-1; Fri, 24 Jul 2020 13:17:15 -0400
-X-MC-Unique: euqzHgGTMtaMOXJQeLhktw-1
+ us-mta-427-dwpUV2gQPf2WEQ1e6Y2zfg-1; Fri, 24 Jul 2020 13:17:14 -0400
+X-MC-Unique: dwpUV2gQPf2WEQ1e6Y2zfg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 402291009615;
-        Fri, 24 Jul 2020 17:17:14 +0000 (UTC)
-Received: from sulaco.redhat.com (unknown [10.3.128.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 02EE379D01;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2299800C64;
         Fri, 24 Jul 2020 17:17:12 +0000 (UTC)
+Received: from sulaco.redhat.com (unknown [10.3.128.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A54174F64;
+        Fri, 24 Jul 2020 17:17:11 +0000 (UTC)
 From:   Tony Asleson <tasleson@redhat.com>
 To:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-scsi@vger.kernel.org, b.zolnierkie@samsung.com,
         axboe@kernel.dk
-Subject: [v4 03/11] dev_vprintk_emit: Increase hdr size
-Date:   Fri, 24 Jul 2020 12:16:58 -0500
-Message-Id: <20200724171706.1550403-4-tasleson@redhat.com>
+Subject: [v4 02/11] create_syslog_header: Add durable name
+Date:   Fri, 24 Jul 2020 12:16:57 -0500
+Message-Id: <20200724171706.1550403-3-tasleson@redhat.com>
 In-Reply-To: <20200724171706.1550403-1-tasleson@redhat.com>
 References: <20200724171706.1550403-1-tasleson@redhat.com>
 MIME-Version: 1.0
@@ -61,29 +61,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the addition of the device persistent id we have the possibility
-of adding 154 more bytes to the hdr.  Thus if we assume the previous
-size of 128 was sufficent we can simply add the 2 amounts and round
-up.
+This gets us a persistent durable name for code that logs messages in the
+block layer that have the appropriate callbacks setup for durable name.
 
 Signed-off-by: Tony Asleson <tasleson@redhat.com>
 ---
- drivers/base/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/base/core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/drivers/base/core.c b/drivers/base/core.c
-index 964690572a89..c2439d12608d 100644
+index 511b7d2fc916..964690572a89 100644
 --- a/drivers/base/core.c
 +++ b/drivers/base/core.c
-@@ -3814,7 +3814,7 @@ create_syslog_header(const struct device *dev, char *hdr, size_t hdrlen)
- int dev_vprintk_emit(int level, const struct device *dev,
- 		     const char *fmt, va_list args)
+@@ -3754,6 +3754,7 @@ create_syslog_header(const struct device *dev, char *hdr, size_t hdrlen)
  {
--	char hdr[128];
-+	char hdr[288];
- 	size_t hdrlen;
+ 	const char *subsys;
+ 	size_t pos = 0;
++	int dlen;
  
- 	hdrlen = create_syslog_header(dev, hdr, sizeof(hdr));
+ 	if (dev->class)
+ 		subsys = dev->class->name;
+@@ -3796,6 +3797,10 @@ create_syslog_header(const struct device *dev, char *hdr, size_t hdrlen)
+ 				"DEVICE=+%s:%s", subsys, dev_name(dev));
+ 	}
+ 
++	dlen = dev_durable_name(dev, hdr + (pos + 1), hdrlen - (pos + 1));
++	if (dlen)
++		pos += dlen + 1;
++
+ 	if (pos >= hdrlen)
+ 		goto overflow;
+ 
 -- 
 2.26.2
 
