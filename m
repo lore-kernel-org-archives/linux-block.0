@@ -2,126 +2,137 @@ Return-Path: <SRS0=qKaS=BD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C28C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA49BC433E5
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:46:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EF4920674
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:48:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AKpxBSKN"
+	by mail.kernel.org (Postfix) with ESMTP id 92A1C20674
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jul 2020 16:46:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726397AbgGXQso (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jul 2020 12:48:44 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:60208 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726326AbgGXQsn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jul 2020 12:48:43 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06OGVt58099130;
-        Fri, 24 Jul 2020 16:48:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2020-01-29;
- bh=8jDaDjjGEgb8b9pwjImoVbxzSY6YeuKGwEYJvT3kk2E=;
- b=AKpxBSKNRh87CQZDrJNEbCCT6i9qgnywvTgsfUnJk95f3Tv9SLyDBc4N1xRmkCrPwWYW
- PLaK3WWEKdUh/yOPWZj/ynioQKSaDVDNDFwsd5hLjU2HtxibMy2PfH5Msik0DyoO17hx
- s5jBJxP6kAc4KrRodAG2ktd4meuBtDOOA7gtS5cEsJRgIb2c2adDSsyGwrKF6kh2ft0r
- R7SApzdJokb70fN0ts+69qexwYs4O0iiVUvlMa5oOdtjoGzucHC1LC7LmaygMAbClac5
- KYszH6wm/CfT0z16AOl+PitTYuwVZCcSXuIqkQt3tRD6rIreKzDGmvzIGNzyZ/W/oysO VQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 32bs1n04ar-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 24 Jul 2020 16:48:40 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06OGWTHT159479;
-        Fri, 24 Jul 2020 16:48:40 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 32fsr7m7cu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jul 2020 16:48:40 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06OGmdMd012483;
-        Fri, 24 Jul 2020 16:48:39 GMT
-Received: from rsrivast-us.us.oracle.com (/10.211.44.96)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 24 Jul 2020 16:48:39 +0000
-From:   Ritika Srivastava <ritika.srivastava@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, ritika.srivastava@oracle.com
-Subject: [PATCH 1/1] block: return BLK_STS_NOTSUPP if operation is not supported
-Date:   Fri, 24 Jul 2020 09:33:22 -0700
-Message-Id: <1595608402-16457-1-git-send-email-ritika.srivastava@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9692 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=1
- bulkscore=0 mlxscore=0 spamscore=0 adultscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007240128
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9692 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 bulkscore=0 adultscore=0
- lowpriorityscore=0 mlxlogscore=999 malwarescore=0 clxscore=1011
- spamscore=0 mlxscore=0 impostorscore=0 phishscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007240128
+        id S1726956AbgGXQqI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jul 2020 12:46:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55270 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726455AbgGXQqH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Jul 2020 12:46:07 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 7876AAF5B;
+        Fri, 24 Jul 2020 16:46:13 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Christoph Hellwig <hch@lst.de>, stable@vger.kernel.org
+Subject: [PATCH] bcache: fix bio_{start,end}_io_acct with proper device
+Date:   Sat, 25 Jul 2020 00:45:58 +0800
+Message-Id: <20200724164558.87191-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If WRITE_ZERO/WRITE_SAME operation is not supported by the storage,
-blk_cloned_rq_check_limits() will return -EIO which will cause
-device-mapper to fail the paths.
+Commit 85750aeb748f ("bcache: use bio_{start,end}_io_acct") moves the
+io account code to the location after bio_set_dev(bio, dc->bdev) in
+cached_dev_make_request(). Then the account is performed incorrectly on
+backing device, indeed the I/O should be counted to bcache device like
+/dev/bcache0.
 
-Instead, if the queue limit is set to 0, return BLK_STS_NOTSUPP.
-BLK_STS_NOTSUPP will be ignored by device-mapper and will not fail the
-paths.
+With the mistaken I/O account, iostat does not display I/O counts for
+bcache device and all the numbers go to backing device. In writeback
+mode, the hard drive may have 340K+ IOPS which is impossible and wrong
+for spinning disk.
 
-Suggested-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Ritika Srivastava <ritika.srivastava@oracle.com>
+This patch introduces bch_bio_start_io_acct() and bch_bio_end_io_acct(),
+which switches bio->bi_disk to bcache device before calling
+bio_start_io_acct() or bio_end_io_acct(). Now the I/Os are counted to
+bcache device, and bcache device, cache device and backing device have
+their correct I/O count information back.
+
+Fixes: 85750aeb748f ("bcache: use bio_{start,end}_io_acct")
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: stable@vger.kernel.org
 ---
- block/blk-core.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ drivers/md/bcache/request.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9bfaee0..173bb04 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1223,10 +1223,13 @@ blk_qc_t submit_bio(struct bio *bio)
- static int blk_cloned_rq_check_limits(struct request_queue *q,
- 				      struct request *rq)
- {
--	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
-+	unsigned int queue_max_sector = blk_queue_get_max_sectors(q, req_op(rq));
-+
-+	if (blk_rq_sectors(rq) > queue_max_sector) {
- 		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
--			__func__, blk_rq_sectors(rq),
--			blk_queue_get_max_sectors(q, req_op(rq)));
-+			__func__, blk_rq_sectors(rq), queue_max_sector);
-+		if (queue_max_sector == 0)
-+			return -EOPNOTSUPP;
- 		return -EIO;
- 	}
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 7acf024e99f3..8ea0f079c1d0 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -617,6 +617,28 @@ static void cache_lookup(struct closure *cl)
  
-@@ -1253,7 +1256,11 @@ static int blk_cloned_rq_check_limits(struct request_queue *q,
-  */
- blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *rq)
- {
--	if (blk_cloned_rq_check_limits(q, rq))
-+	int cloned_limit_check = blk_cloned_rq_check_limits(q, rq);
-+
-+	if (cloned_limit_check == -EOPNOTSUPP)
-+		return BLK_STS_NOTSUPP;
-+	else if (cloned_limit_check)
- 		return BLK_STS_IOERR;
+ /* Common code for the make_request functions */
  
- 	if (rq->rq_disk &&
++static inline void bch_bio_start_io_acct(struct gendisk *acct_bi_disk,
++					 struct bio *bio,
++					 unsigned long *start_time)
++{
++	struct gendisk *saved_bi_disk = bio->bi_disk;
++
++	bio->bi_disk = acct_bi_disk;
++	*start_time = bio_start_io_acct(bio);
++	bio->bi_disk = saved_bi_disk;
++}
++
++static inline void bch_bio_end_io_acct(struct gendisk *acct_bi_disk,
++				       struct bio *bio,
++				       unsigned long start_time)
++{
++	struct gendisk *saved_bi_disk = bio->bi_disk;
++
++	bio->bi_disk = acct_bi_disk;
++	bio_end_io_acct(bio, start_time);
++	bio->bi_disk = saved_bi_disk;
++}
++
+ static void request_endio(struct bio *bio)
+ {
+ 	struct closure *cl = bio->bi_private;
+@@ -668,7 +690,7 @@ static void backing_request_endio(struct bio *bio)
+ static void bio_complete(struct search *s)
+ {
+ 	if (s->orig_bio) {
+-		bio_end_io_acct(s->orig_bio, s->start_time);
++		bch_bio_end_io_acct(s->d->disk, s->orig_bio, s->start_time);
+ 		trace_bcache_request_end(s->d, s->orig_bio);
+ 		s->orig_bio->bi_status = s->iop.status;
+ 		bio_endio(s->orig_bio);
+@@ -728,7 +750,7 @@ static inline struct search *search_alloc(struct bio *bio,
+ 	s->recoverable		= 1;
+ 	s->write		= op_is_write(bio_op(bio));
+ 	s->read_dirty_data	= 0;
+-	s->start_time		= bio_start_io_acct(bio);
++	bch_bio_start_io_acct(d->disk, bio, &s->start_time);
+ 
+ 	s->iop.c		= d->c;
+ 	s->iop.bio		= NULL;
+@@ -1080,7 +1102,7 @@ static void detached_dev_end_io(struct bio *bio)
+ 	bio->bi_end_io = ddip->bi_end_io;
+ 	bio->bi_private = ddip->bi_private;
+ 
+-	bio_end_io_acct(bio, ddip->start_time);
++	bch_bio_end_io_acct(ddip->d->disk, bio, ddip->start_time);
+ 
+ 	if (bio->bi_status) {
+ 		struct cached_dev *dc = container_of(ddip->d,
+@@ -1105,7 +1127,8 @@ static void detached_dev_do_request(struct bcache_device *d, struct bio *bio)
+ 	 */
+ 	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
+ 	ddip->d = d;
+-	ddip->start_time = bio_start_io_acct(bio);
++	bch_bio_start_io_acct(d->disk, bio, &ddip->start_time);
++
+ 	ddip->bi_end_io = bio->bi_end_io;
+ 	ddip->bi_private = bio->bi_private;
+ 	bio->bi_end_io = detached_dev_end_io;
 -- 
-1.8.3.1
+2.26.2
 
