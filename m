@@ -7,38 +7,39 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A69BC433DF
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A4E1C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 11:36:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09B13206D7
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:50:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 757A8206D7
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 11:36:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="bz0Mdmxe"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="Tmj0rhVY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726639AbgGYKuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Jul 2020 06:50:46 -0400
-Received: from mout.web.de ([212.227.15.14]:56425 "EHLO mout.web.de"
+        id S1726612AbgGYLgI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Jul 2020 07:36:08 -0400
+Received: from mout.web.de ([212.227.15.3]:52021 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726618AbgGYKuq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Jul 2020 06:50:46 -0400
+        id S1726593AbgGYLgH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 25 Jul 2020 07:36:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1595674230;
-        bh=AnGv9cWvi54PTE4qUiwmpJgilT77DJk3ggZXrzH/RDI=;
-        h=X-UI-Sender-Class:To:Cc:Subject:From:Date;
-        b=bz0MdmxeS1kJSd8odomdpkrnUukYKsIctkY/wSP36WkKCbOeWBcRtbbpENhIPGLwh
-         Nz9LlWJhPlpJ5NwO992xaIsKzZBsLy7CY67zs7OkH5cpyxxjkLC4qNKvAq9MqdZFXy
-         HhP24PhQOmhRB7+1bTbARk8smEae8XYQeWUk11jU=
+        s=dbaedf251592; t=1595676956;
+        bh=tL632JoesBjA1nIjOOtilNQQx0JJmdlSdql+Vgh01R0=;
+        h=X-UI-Sender-Class:Cc:Subject:To:From:Date;
+        b=Tmj0rhVYBtMO2v9NcBxUwh20IPVhwePRmDQ2SlW0arpOGmt/QPfvxfqRSXLEmMEYB
+         en3ENpj2301lVsU7k/flndv6r5ZFWtHYEqwbsf24Nq0v5m1t00wpEL6CPOv/wZT1+p
+         LgbIP9Z96eprRoigXcyA6ek4xENWwsazjtZkUHi4=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([93.135.94.55]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1M2xrs-1jvyNG2vgC-003Q9K; Sat, 25
- Jul 2020 12:50:30 +0200
-To:     Li Heng <liheng40@huawei.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org
+Received: from [192.168.1.2] ([93.135.94.55]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0LmLK6-1kZBW53gva-00Zu6Q; Sat, 25
+ Jul 2020 13:35:56 +0200
 Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: [PATCH] nbd: add missed destroy_workqueue when nbd_start_device
- fails
+        Wang Liang <wang.liang82@zte.com.cn>,
+        Xue Zhihong <xue.zhihong@zte.com.cn>
+Subject: Re: [PATCH] block: Fix reference count leak in blk_integrity_add
+To:     Yi Wang <wang.yi59@zte.com.cn>,
+        Liao Pingfang <liao.pingfang@zte.com.cn>,
+        linux-block@vger.kernel.org
 From:   Markus Elfring <Markus.Elfring@web.de>
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
@@ -83,44 +84,45 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <d7b60d29-4a02-ae2a-fa9d-0c4918eba91a@web.de>
-Date:   Sat, 25 Jul 2020 12:50:29 +0200
+Message-ID: <6301315e-1613-0970-ce9b-019d18458819@web.de>
+Date:   Sat, 25 Jul 2020 13:35:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:hleuPqUzD+dDoJhRdlhRKzMh/C+nunVKjL7cUSKPetW2aG9Rr8K
- j18eXSTeRevigNyUMsUvQzsQDmC9GT8B5Ty64Y6etr+Tt8Bm5XmEhV7Zh+vOEhttOApmD/2
- nO/OIxqeXhZKX0PtszyFzB6fR6n+f0km9eQF4R2qH0l28YFH5phaKXSZCCU1rhYztbhu41m
- Kr5rrxuJjhycJ/fQxEPEQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DKSK7Ph4Tko=:1hWy2Q8K4+yAAcfxEOe358
- ydGMr4ewOgxRWSpOUZxkRY1b41ha1a93p0myi1apD3eRtu6l57bDZ80nJcEqg0I5n2dNHuWxI
- JxBG1TP69j4fnupQWwAZGxnwuZIIAFQ66dW4Lf8IOVkzn6HT+8RtVoCkoYM+Nb+uf5DtPcxol
- MTy9CLD/OF8USvuFjmJq8o0+pdSd1nLV4aDaR9fDjswvdFV/EKLBNgkJ5nYnQSPxQphoRbR+G
- yEWW2xIWWZVG1xx8HmdmIY2OlIKKGDGEo13aPLPhR+/1i5IIm+3jxQojku7qKZMKvPbiluAUR
- K9L+bcPl0GFLcTJgFrswhhyVAFi3lV1HSUfsAxDRcBreFWsHTeepUc6YINkL7IH767sHMl+mP
- Y5+pdZMK08cf1nVKzpUK88s8tXAuOJCMj0t8gEfvT5kMKRObeACexazsngoIXcTdQEDMgGFMG
- F0ew/jItnVcoJ9Cc5Z1wKdXXMn3AwG47JCjrY0zmA7NzwI/1Ch9NwtiHoSqPyn6/NzdXxaZk+
- vsFcPI9OGDKb+c3BgTsT2s3uPjoWmfkuxZLZcwaEt07PFksRJFPMXX8bCRw7fNYba4hRlpwpX
- 0Gg4Dj9/EGXqyX78yRui+IVSaPbUMKmnUO6t1nBjHyW4dhxmOhziqyv0NkP6YGLpqg0E52wu7
- 4ajX2em+UBKOy3ds7pJ8gd/rSXsBv1ZRmehHI/4MwhjkftQeOjJ0ubTT4hK7V4V9ljAemEJOn
- 97dA1poLaVZsRbwMY3Wik078iSSpinSKp+wl728n+L/AhpzuILl/qCsC5kTepFnMiNMle5YPb
- Xehe95Es8CGtyeBCyTwqfm2plj4twffQXubv2bpsJsqYVOozhXvE288aVOf46JVkgsK4SY+g9
- UlSlsH9mPnhlj5T5zrL80t6kSPdlN1xowqcSwjM5lmrxm1xsrxdBg/q1kfu7MhmMazeC0Mwnl
- g/h+LeHboqixIMxAUJ2DliEG8KWBHnPbpkZXuChM5lDFZQe2Zi0Y4RzmW3sFJnrvK5uc36faw
- Txly/8+Z0EQtoVRWqqyj0pxgxkRBkiP4MRj16SgXSUb7UfHG/slsnIPeZq4hIV0sjnv4t0l9f
- xdcB8XkNo07ZXr7bqVYS2l33chRoqwv7FHLTVouLYnDxfqvKtjH1MQz8fEJHHfPuJ/tCVdnhS
- Vpz8vub6KEXe2TyZSaKBS16jyVcwf9QRktMFjAmGTrN5TUsroasNIPRSWKROLTmiwWa0pgAPh
- A7KY94os6iiZJlJSJzSta6dcws6ubBTkn1L/y5g==
+X-Provags-ID: V03:K1:XfHm/7x7X87q7ow25EkeuukmVKR88tw1SDzdqxDdDUzGIDzOEXy
+ zQdV32f2j+uMjFN/E7kkeh7D2TASJ4MVIDDWqjjHTU4ry4B2DM+hxB7B7cQij2Ws33nvviH
+ vFmMrkEvxYptoQGr7mWUu3aJ4EGJyeoyRReyNQkojWYcZd55quXovnKoGaDCD611u+D5igm
+ u5k6A5hmu0VPUTDvIzchg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:DyzV1VLVpu4=:Fm6QWsnHUAFGLZmmcBBdO/
+ 2T4uTzLG02bzVkUXhSAnWw7toP5bz3RluDB626xSYnhAFu6700ytrmgBFbBxERkbFmQGDiCLl
+ 5uxzcIFXVtSd9zpPoMHtlQ1wX0Y/cieSHi2n3Ep1u6alsLF0Bg5+t+kWss8AKT5czF0Rf9Jf2
+ ddkgOGfseSERmaJje8mv/IyiXXaUm6nLtZ3IDzsuWjReCWShDwNqJR3kcWpIOocaoO9+LYFbu
+ mmSaEMcN6hFMZ61EJoVe5FbilfhEQIqWzVK7O7E7BvHZF4EovcP8s5N3h+iSBI/DYngnFpoO2
+ QeM7ZvJLeFVVCjCho+cBNoXUHCbo6WVdrihtkgGwnzPY4ug5lzsGZxXF9NtXEBtr7S44lrA9e
+ NaTSgtIYKvYOQI+pX0f3TQO4Ns7PRpGmNXMk/+aj9bN6dcDNvzyXgAzufcBgrqxsJcKxAzbp2
+ VopnYbUkiMufyaoYBpHo5MlF7i7s/7OQsW6+lKZkEIHk5zPUbjJ0P3W+AVYPX1BOMkiX1d1Ki
+ YRrMbhSv1LzqUVFz3GkjXXn2ITmh3ZBYHFGeTHlAyPVkocNJrtgJrOBsAOcJlINW9pAQtttul
+ tJJz6EVIRF2r0gkxmflFKYIHgR1WfPtuUOOPkvlAIXF/8SsxgfXBRVRx1KJgYh5PVHtu9IXfk
+ LLzkfIbmtnUnJDcBk9qmU9pwWSRWNZnefNM9yZBPdOIcXcXTEpSuHzVOJ16apdNzJ3IBNDCmZ
+ W1tBDpN3xd3U9PgeY8lZ5uK+Jqy8MIzW8eTbksLGYFvwoapDy5dt+my3M88zDoV4GTr2tECNL
+ ph+xGa/ZibeVGp5ov0ZWzYNa8x/5lnDN18nevow01hb06qlTIJocOS9AlK8EXceYn8mCOx1H4
+ VZiXgXhe3irmFVyNtQZRsu/TQKfZAf7vm4UhY9LONEoBpEEIcC6XO9eUpK+CG/SjrvuDO0MsD
+ E5k/S1jW5Yjf1KjPlzEyeXRV0bzCNhVN9oPLB4gp3RNddUBaVOeXKRr8WLB/lljTa804Bah68
+ XvIm3cX324iFrtnN4Y1M8d7PoPrfaLhDdVBuSNS20tUC+xiqmNnCVAUioXvSE9SnKmtG7PYl0
+ th/USxeOeRewandQjYsm1Jd339FbqrCJU2cTWpIxsp1EVdDzbKnFQ6BOxgcnwlert636FKIm4
+ 4raof7AQTIj3Pc5iuGYhvHiG+mQShtF50gqnrTq/KE/Oe+vfuV58nyYbMvXRfF6oLue6lbpOU
+ LGXIm5F6KYktApoBfobFOLad6amBrHBJTFqgIww==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> destroy_workqueue() should be called to destroy ndev->tx_wq
-> when nbd_start_device init resources fails.
+> kobject_init_and_add() takes reference even when it fails. If this
+> function returns an error, kobject_put() must be called to properly
+> clean up the memory associated with the object.
 
 * An imperative wording can be preferred for the change description,
   can't it?
