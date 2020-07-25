@@ -2,65 +2,65 @@ Return-Path: <SRS0=mT+h=BE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E054C433E1
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C70DC433E3
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:29:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E073820714
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:26:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C2F6206F6
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:29:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fU2pWFw4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QrvbgmPC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726745AbgGYK0h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Jul 2020 06:26:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35468 "EHLO
+        id S1726618AbgGYK3q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Jul 2020 06:29:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726572AbgGYK0g (ORCPT
+        with ESMTP id S1726572AbgGYK3p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Jul 2020 06:26:36 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D71C0619D3;
-        Sat, 25 Jul 2020 03:26:35 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id x72so6598118pfc.6;
-        Sat, 25 Jul 2020 03:26:35 -0700 (PDT)
+        Sat, 25 Jul 2020 06:29:45 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A29B9C0619D3;
+        Sat, 25 Jul 2020 03:29:45 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id x9so5835484plr.2;
+        Sat, 25 Jul 2020 03:29:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=RgZlB5gf3rHPNMgpLHmZRCAYCoGgXfxGyETCwUduUsc=;
-        b=fU2pWFw4y+QeFWlwpd5xApuENt+nNL/8Her7E4AMDECBYiulJZlURIPrcMsTOq/dgG
-         qLojpw8bpzg5KhYhjG1ZV/KVkeY9fi9x+bAa8elqQ+drHAMLH3DMWLaCuPoI5o8tCM1X
-         11g0AtAly7YvXrlzMh9jKjWEbGA/SEJ69XCDoV3t8+KqKhWgrCti+96EITeSzgApWpqq
-         HcUeeo6XSs8Oo/kIimy0TmFHinrvLdDOB8stGBVzh67cjzVYCZq4vE7b+GyLpbpPlZI8
-         LPtpKUYj7yQg1RgZXSWMzWqtPfNWatGvu95wW6mDiBFtFLpJfb3eqQa4H/QElQluLpPV
-         SosQ==
+        bh=5iiobHJC3O2IChZKdVtcb9SVSJs7fTb/PaPBRVV381I=;
+        b=QrvbgmPCB44/PtF+dfEMgm6KzsPzjZ4gJzJwcOv/e+Q+kmmqiwku3f5KsveJ6tNkSO
+         iBPd27ixdWLcPUZOj8OPhywq/BYLv1AtMB6mzvdKHC/SJCSOQanYy8qGa1I5AwsYMI0V
+         hqqTpPtUYHkzauLHaCGeizRhwc5PMfBpb+rJzsZ8Rz7BCN6/T7/1AUf1WWBDlFiA2pJX
+         LDwiTp7eYkZp9MiqJjImyPDBFHlk/uNOMAZePvGHoHumZB7Cymup+Y/V4AbS0ClIxvM1
+         qeNp/XE+6bn0Oz8adsCPUVNFEB0vxhvie9O+oJt6BZ7gsu6gJsWew0QOAYnzLO/ILMK4
+         Es9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=RgZlB5gf3rHPNMgpLHmZRCAYCoGgXfxGyETCwUduUsc=;
-        b=LOhK63cIAs9wmB/9clgy7N0MZ08pi1YBd42GMJ/Ybw1ocbpaQ+d8sNpZ5VGmEphFW7
-         hQMbYW2sJK8nqzDWM2yVxDFAsgybRfy5NU+jSQ74LOtnIi4iQL16SLyqBpshGn4E9/KU
-         anymdYqm8Mjw8C0CakuGTW6uC7I8X8IFzm7x1xw6FDxoenpsZuUo3Yi8MlI7kyVL3Jir
-         Ujz2nPm2IPnn6IZo/bdZ0DniqMdIUk5y09BcG8+WQhte8X9p/Ejx6QxHQRGzfD1EOXTN
-         bdoxB0hSiHuIst4BxST+GNJ8QN5a/3kkC0+FFHUrOUo2eJwSbukMdEwcy5ezsQgNhgy7
-         eqWg==
-X-Gm-Message-State: AOAM5322TjJ4gzVvYSm0NLW90WkwyLJgvShUUP53Urbv50ZKTi03Kxfg
-        tjFoch3fJjAWyIHz79y4cxmfW5aXsBUFfutTaqc=
-X-Google-Smtp-Source: ABdhPJxj3+CHev14xjBiaBJKvcLF4p+ytZKzrXuth9FI7a1YkW1UyQ6yXaDWh2InG4sBtd8JfrcddKYhjvrxtp8fbDM=
-X-Received: by 2002:a62:8ccb:: with SMTP id m194mr12855127pfd.36.1595672795207;
- Sat, 25 Jul 2020 03:26:35 -0700 (PDT)
+        bh=5iiobHJC3O2IChZKdVtcb9SVSJs7fTb/PaPBRVV381I=;
+        b=K3dBx9wd1KYEP7Z6DKzGuObt6YnQoZJzMwIehtiXHM64xGwDiQMOoQLrBZLP0Ht28l
+         HXaM8+oYUY0Ybi6B4iIUpLRkqg/0yGqVuTGcHx+MT69czTeHXEdptTps2iyjfQj9hq8j
+         PnMMYX0rrcZvVp/FrV37IogLzBRiQgsbwQBVb0794fqyX9C9+G0EFadNXCA+XCn6JSU9
+         CeGbOnHBKCZjTVmjMXO3HKD3/y+cmV4ytITxqZaLx2umKG89ye12RISOxT+snOpwYJFt
+         fbkzIk0fzSo11z5/BGE5ljeVJAtseB3kGdLcPy2YBcC/6d1eswojqCvOjArNsRQUmrtK
+         xyGg==
+X-Gm-Message-State: AOAM530F9iX688T3nGbqITcoeY+lt7GGcTV8Iko9Ma0KHjUsbmLEXxa4
+        QmJgHQNSRolDJOy2rkwoRjUBrnaHnijDJYcKf1tlDFjF
+X-Google-Smtp-Source: ABdhPJwQV5hQSViTB/TcdBE4vtYE2CsMSC0ic/lA5AGomE7JF336tMBGTG/H4psobnqk+RIgItE7FclooWFBaTTeOuE=
+X-Received: by 2002:a17:902:b098:: with SMTP id p24mr12097167plr.18.1595672984994;
+ Sat, 25 Jul 2020 03:29:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200724171706.1550403-1-tasleson@redhat.com> <20200724171706.1550403-7-tasleson@redhat.com>
-In-Reply-To: <20200724171706.1550403-7-tasleson@redhat.com>
+References: <20200724171706.1550403-1-tasleson@redhat.com> <20200724171706.1550403-12-tasleson@redhat.com>
+In-Reply-To: <20200724171706.1550403-12-tasleson@redhat.com>
 From:   Andy Shevchenko <andy.shevchenko@gmail.com>
-Date:   Sat, 25 Jul 2020 13:26:19 +0300
-Message-ID: <CAHp75VdRCaOp4eg4XKuGbCvh6BFAzmaqnyRA2UwfcPmuNzk9zA@mail.gmail.com>
-Subject: Re: [v4 06/11] libata: Add ata_scsi_durable_name
+Date:   Sat, 25 Jul 2020 13:29:28 +0300
+Message-ID: <CAHp75VeRzY9wrLpEgi73p=7PEaG9N5iiBAuuys1nY6n4_arFCQ@mail.gmail.com>
+Subject: Re: [v4 11/11] buffer_io_error: Use durable_name_printk_ratelimited
 To:     Tony Asleson <tasleson@redhat.com>
 Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-scsi <linux-scsi@vger.kernel.org>,
@@ -74,41 +74,34 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On Fri, Jul 24, 2020 at 8:19 PM Tony Asleson <tasleson@redhat.com> wrote:
 >
-> Function used to create the durable name for ata scsi.
+> Replace printk_ratelimited with one that adds the key/value
+> durable name to log entry.
 
-https://chris.beams.io/posts/git-commit/
-
-> Signed-off-by: Tony Asleson <tasleson@redhat.com>
-
-...
-
-> +}
+>  static void buffer_io_error(struct buffer_head *bh, char *msg)
+>  {
+> -       if (!test_bit(BH_Quiet, &bh->b_state))
+> -               printk_ratelimited(KERN_ERR
+> +       if (!test_bit(BH_Quiet, &bh->b_state)) {
+> +               struct device *gendev;
 > +
+> +               gendev = (bh->b_bdev->bd_disk) ?
+> +                       disk_to_dev(bh->b_bdev->bd_disk) : NULL;
+
+Besides unneeded parentheses as Sergey noticed...
+
 > +
-
-One is enough, really!
-
->  /**
-
-...
-
-> -       if (dev)
-> +       if (dev) {
->                 rc = ata_scsi_dev_config(sdev, dev);
-> +               if (!rc)
-> +                       dev->tdev.durable_name = ata_scsi_durable_name;
+> +               durable_name_printk_ratelimited(KERN_ERR, gendev,
+>                         "Buffer I/O error on dev %pg, logical block %llu%s\n",
+>                         bh->b_bdev, (unsigned long long)bh->b_blocknr, msg);
 > +       }
 
-Can we stick to our usual pattern?
+...can we drop indentation level?
 
-rc = ...
-if (rc)
-  return rc;
-...
+  if (test_bit(...))
+   return;
+  ...
 
->         return rc;
 >  }
-
 
 -- 
 With Best Regards,
