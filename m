@@ -2,129 +2,108 @@ Return-Path: <SRS0=mT+h=BE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0A2C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 12:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40DF9C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 13:39:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F29F3206C1
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 12:02:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11AF620714
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 13:39:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Xd0UQ0Yg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726612AbgGYMCi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Jul 2020 08:02:38 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52018 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726583AbgGYMCi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Jul 2020 08:02:38 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id A8E66AB55;
-        Sat, 25 Jul 2020 12:02:44 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH 00/25] bcache patches for Linux v5.9 
-Date:   Sat, 25 Jul 2020 20:00:14 +0800
-Message-Id: <20200725120039.91071-1-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
+        id S1726995AbgGYNjD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Jul 2020 09:39:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36840 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726728AbgGYNjC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 25 Jul 2020 09:39:02 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13F4C08C5C0
+        for <linux-block@vger.kernel.org>; Sat, 25 Jul 2020 06:39:02 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id 207so6752932pfu.3
+        for <linux-block@vger.kernel.org>; Sat, 25 Jul 2020 06:39:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=TY9S0ksY0gJHg8WOxYnWVFJ79KubheFo7aJATivXmzk=;
+        b=Xd0UQ0YgU7eSeirgLJWGWBxbU+KYNjUAsAm2rTJrtr75LiG0Cn/oOfC5UJ1HxDY13M
+         qUxl5IzZP7C0MNB3vGIfTRY2qt3yXCRqagjINxYa5IBf1LJZXFtIGYueIIdcYai25+ih
+         g6qnK37I0uv+gYlZydlAAq2NUAnW72r/VjCLuSGuMLxL2IXnJmx8p4Vje6KSuUbnsvOa
+         TAN02cduHe5A6WA/qmA5td3OGiRQzT/pDJFQe/K9Ret6wBqz/FzaLMcMitwhl3cO1O1l
+         4nzxIHIPyAExHOV9s1abWfWmj3+ikSmWFx0I47NiCwbNhIE34mGfMcUIVjQKiTFgQ6Fa
+         P+yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TY9S0ksY0gJHg8WOxYnWVFJ79KubheFo7aJATivXmzk=;
+        b=laelqLiPmHOljYkt46pe8rEzDYlQ6Uw12tbc9iFPvNznGBKP+VWKNuPhRCpxsqugX2
+         S95qg5MWxjmcgSD0J0pz5K9fL3FKMtsdsKdTTav24ldrmgMwyf/H9vW8g4fBpIIw0/Yr
+         ZdPr06VYNqCFNpLhnJdzxn+SOeRwo/VVk/qeN0bNomoB5Q6ejazw0X2JQaS/5bYG8dhU
+         V/6Gx6uDl4xV5sKo6L/UaeARZPoxsaOZL3oCg1ADHy7EI6QgUXCrhDnawRq2tns9vWdm
+         7wMDa+ucX76qh5Wk6DsfQOjpbbLeJU+fCzf0d5U+mLPZ6wR/vDt9d8B2W/v0SwIyiXWF
+         sWIw==
+X-Gm-Message-State: AOAM530rvmD9kHWBkhJZ5nto76Ba3YwWAb0ThyEbLwtNLxYpMsNKtzhq
+        WpogAaotUItNHWxVaQiV34lSKg==
+X-Google-Smtp-Source: ABdhPJz2Gx0wKg1a/G6l9hILWNgeCCNZA/azxL2DSPyCDd2OtJQF3fKvbO1YfF39F2jZ4yMgt/TCew==
+X-Received: by 2002:a62:5a45:: with SMTP id o66mr12366758pfb.43.1595684341950;
+        Sat, 25 Jul 2020 06:39:01 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id x7sm9625443pfq.197.2020.07.25.06.39.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Jul 2020 06:39:01 -0700 (PDT)
+Subject: Re: [PATCH 00/25] bcache patches for Linux v5.9
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
+References: <20200725120039.91071-1-colyli@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bbc97069-6d8f-d8c5-35b1-d85ccb2566df@kernel.dk>
+Date:   Sat, 25 Jul 2020 07:39:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200725120039.91071-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On 7/25/20 6:00 AM, Coly Li wrote:
+> Hi Jens,
+> 
+> This is the first wave bcache series for Linux v5.9.
+> 
+> The most part of change is to add large_bucket size support to bcache,
+> which permits user to extend the bucket size from 16bit to 32bit width.
+> This is the initial state of large bucket feature, more improvement will
+> happen in future versions.
+> 
+> Most of the patches from me are for the large_bucket feature, except for,
+> - The fix for stripe size overflow
+>    bcache: avoid nr_stripes overflow in bcache_device_init()
+>    bcache: fix overflow in offset_to_stripe()
+> - The fix to I/O account on wrong device
+>    bcache: fix bio_{start,end}_io_acct with proper device
+> 
+> Also we have Gustavo A. R. Silva to contribute 2 patches to cleanup
+> kzalloc() code by using struct_size(), Jean Delvare to contribute a
+> typo fix in bcache Kconfig file, and Xu Wang to contribute two code
+> cleanup patches.
+> 
+> Please take them for your Linux v5.9 block drivers branch.
 
-This is the first wave bcache series for Linux v5.9.
-
-The most part of change is to add large_bucket size support to bcache,
-which permits user to extend the bucket size from 16bit to 32bit width.
-This is the initial state of large bucket feature, more improvement will
-happen in future versions.
-
-Most of the patches from me are for the large_bucket feature, except for,
-- The fix for stripe size overflow
-   bcache: avoid nr_stripes overflow in bcache_device_init()
-   bcache: fix overflow in offset_to_stripe()
-- The fix to I/O account on wrong device
-   bcache: fix bio_{start,end}_io_acct with proper device
-
-Also we have Gustavo A. R. Silva to contribute 2 patches to cleanup
-kzalloc() code by using struct_size(), Jean Delvare to contribute a
-typo fix in bcache Kconfig file, and Xu Wang to contribute two code
-cleanup patches.
-
-Please take them for your Linux v5.9 block drivers branch.
-
-Thank you in advance.
-
-Coly Li
----
-
-Coly Li (20):
-  bcache: allocate meta data pages as compound pages
-  bcache: avoid nr_stripes overflow in bcache_device_init()
-  bcache: fix overflow in offset_to_stripe()
-  bcache: add read_super_common() to read major part of super block
-  bcache: add more accurate error information in read_super_common()
-  bcache: disassemble the big if() checks in bch_cache_set_alloc()
-  bcache: fix super block seq numbers comparision in
-    register_cache_set()
-  bcache: increase super block version for cache device and backing
-    device
-  bcache: move bucket related code into read_super_common()
-  bcache: struct cache_sb is only for in-memory super block now
-  bcache: introduce meta_bucket_pages() related helper routines
-  bcache: handle c->uuids properly for bucket size > 8MB
-  bcache: handle cache prio_buckets and disk_buckets properly for bucket
-    size > 8MB
-  bcache: handle cache set verify_ondisk properly for bucket size > 8MB
-  bcache: handle btree node memory allocation properly for bucket size >
-    8MB
-  bcache: add bucket_size_hi into struct cache_sb_disk for large bucket
-  bcache: add sysfs file to display feature sets information of cache
-    set
-  bcache: avoid extra memory allocation from mempool c->fill_iter
-  bcache: avoid extra memory consumption in struct bbio for large bucket
-    size
-  bcache: fix bio_{start,end}_io_acct with proper device
-
-Gustavo A. R. Silva (2):
-  bcache: movinggc: Use struct_size() helper in kzalloc()
-  bcache: Use struct_size() in kzalloc()
-
-Jean Delvare (1):
-  bcache: Fix typo in Kconfig name
-
-Xu Wang (2):
-  bcache: journel: use for_each_clear_bit() to simplify the code
-  bcache: writeback: Remove unneeded variable i
-
- drivers/md/bcache/Kconfig     |   2 +-
- drivers/md/bcache/Makefile    |   2 +-
- drivers/md/bcache/alloc.c     |   2 +-
- drivers/md/bcache/bcache.h    |  31 +++-
- drivers/md/bcache/bset.c      |   2 +-
- drivers/md/bcache/btree.c     |  12 +-
- drivers/md/bcache/features.c  |  75 +++++++++
- drivers/md/bcache/features.h  |  86 +++++++++++
- drivers/md/bcache/io.c        |   2 +-
- drivers/md/bcache/journal.c   |   9 +-
- drivers/md/bcache/movinggc.c  |   8 +-
- drivers/md/bcache/request.c   |  31 +++-
- drivers/md/bcache/super.c     | 277 +++++++++++++++++++++++-----------
- drivers/md/bcache/sysfs.c     |  14 ++
- drivers/md/bcache/writeback.c |  22 +--
- drivers/md/bcache/writeback.h |  19 ++-
- include/uapi/linux/bcache.h   |  38 +++--
- 17 files changed, 493 insertions(+), 139 deletions(-)
- create mode 100644 drivers/md/bcache/features.c
- create mode 100644 drivers/md/bcache/features.h
+Thanks, applied.
 
 -- 
-2.26.2
+Jens Axboe
 
