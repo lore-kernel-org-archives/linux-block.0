@@ -2,103 +2,127 @@ Return-Path: <SRS0=mT+h=BE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D84D4C433ED
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 02:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89324C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 09:05:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B326820748
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 02:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55BF12064C
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 09:05:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Y3HDXur8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oi+Pr/Ns"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726890AbgGYCvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jul 2020 22:51:13 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:47048 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726842AbgGYCvK (ORCPT
+        id S1726639AbgGYJFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Jul 2020 05:05:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51272 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726593AbgGYJFl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jul 2020 22:51:10 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06P2ljM9049082;
-        Sat, 25 Jul 2020 02:51:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=Nk9Y4P1lBGMoakEF/1P13Rylbj7xhKtTYPpTXEOLdd8=;
- b=Y3HDXur88RDoMriRCmdH7z4RSs4dFTLKk6mfrCCuJMen8NQfnkal0VGZQgNoImD2Z8vq
- NSZbpJTF572QzaeDN5hljqPVfnw8UwYGqlMKRoymrrL7lqYc5vjLkYzdD7v5c23JdJEf
- hkAq913tiOEMS3SM8rCeERWF6KIhUpP6PxXoJJEld94MdibL6S3LpSPSPdlpYr9PBckQ
- ANqAPjNf9ZkgO7PA5rjvioBepOPEeYIebLsGkqKSCG9L+Gu6KeS/sT3EBLmsIqCU51jz
- JL0pJ2S7N+aMC/vRvFoTw1TUwOm5bUoq4PoByo6iyo3lvf618WJG2kUoc4BwGcznNT3b 3Q== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 32d6kt641y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 25 Jul 2020 02:51:04 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06P2mPlG001438;
-        Sat, 25 Jul 2020 02:51:03 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 32gam27gs6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 25 Jul 2020 02:51:03 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06P2p0DQ000946;
-        Sat, 25 Jul 2020 02:51:01 GMT
-Received: from ca-mkp.ca.oracle.com (/10.156.108.201)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sat, 25 Jul 2020 02:51:00 +0000
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Alan Stern <stern@rowland.harvard.edu>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v3] SCSI and block: Simplify resume handling
-Date:   Fri, 24 Jul 2020 22:50:41 -0400
-Message-Id: <159564519422.31464.4004746407722721245.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200706151436.GA702867@rowland.harvard.edu>
-References: <20200701183718.GA507293@rowland.harvard.edu> <9e824700-dfd1-5d71-5e91-833c35ea55eb@acm.org> <20200706151436.GA702867@rowland.harvard.edu>
+        Sat, 25 Jul 2020 05:05:41 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CBBCC0619D3;
+        Sat, 25 Jul 2020 02:05:41 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id b30so6431638lfj.12;
+        Sat, 25 Jul 2020 02:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:references:from:organization:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=lBqWR5j4t0yuchVZX2lSk3WHc2oz3Eo2sq0evh7hl7I=;
+        b=Oi+Pr/NsgYuNWbP43HLNuLGti/JGGwWRHsO8P6vND/72PchlDlR5EeD6nkCGJGhhTl
+         HdiG4BFDqivnSaNX7G7B/XUqZKx4JXbATiKDelg34I6vob5e5AK0xeogIy/DnwjCizXE
+         UIodbwEg7K/kNEjayUkvOkA2rjInuQjahgIWveRTyPnJrU1Ys8zTE55TZGKCqDoCU64e
+         uI+/Rzn9BYQ5gY08JbQdJlPs8lzzpJhhhhKDfjNVxQH3xvp7mTY4QufLmd+8DEvxLG99
+         VK0wyPtooM5UgCm1gp5/FqQmnvwcE0TgwO0uu7ihrPyICI2CmDOpTEss70v/+D6Bx/qD
+         mySw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=lBqWR5j4t0yuchVZX2lSk3WHc2oz3Eo2sq0evh7hl7I=;
+        b=ih3znZqwTak5VUd4r0epN/Vzz+MMqOAB1bPj6etSUWpkkXBjKqD9nLPT0JEqAMOamr
+         aFzHpBN+SiHR4xGBTfzEFkjCh+Y2phtyaiIBedfvpOn2K1CS3gxI1etnaIMsYGAFkX6+
+         iUBReOEKzmjiMjKjnCwhShGLBkh5AQMobUaxPSITGMbOS43iP5xsPO9Z2xWJmSUNN/T4
+         S5DLusNs9jltN3KoB6HFwRVkhvaRhzKygwa41nnzqjnq6wDonUsEDwIaWTjaLkGXn+66
+         AzolBGRINe5BfQ/6QUrhOyvaX48Zz6VjXDY/HIDAUxTWL48WRb6SC74w7VGnH3LKfBlG
+         xbEw==
+X-Gm-Message-State: AOAM531/OPwUYX5coWgNNwMFQa8PkW7rbQooImFsQpGuigHpGAkU/ULG
+        aHoAP04TPiNOCGdEw98t2mHrqb9er1Q=
+X-Google-Smtp-Source: ABdhPJy8teDmDB5p/V8ujD+no5KZ9UfsaAhXWKajaWDkDvxb9TDUYcvuV2n4HVmu7De20Up3b9QLFg==
+X-Received: by 2002:a05:6512:3317:: with SMTP id k23mr7071486lfe.111.1595667939443;
+        Sat, 25 Jul 2020 02:05:39 -0700 (PDT)
+Received: from ?IPv6:2a00:1fa0:253:4416:cc94:657b:2972:b01d? ([2a00:1fa0:253:4416:cc94:657b:2972:b01d])
+        by smtp.gmail.com with ESMTPSA id 20sm554222ljj.51.2020.07.25.02.05.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Jul 2020 02:05:38 -0700 (PDT)
+Subject: Re: [v4 05/11] nvme: Add durable name for dev_printk
+To:     Tony Asleson <tasleson@redhat.com>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        b.zolnierkie@samsung.com, axboe@kernel.dk
+References: <20200724171706.1550403-1-tasleson@redhat.com>
+ <20200724171706.1550403-6-tasleson@redhat.com>
+From:   Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Organization: Brain-dead Software
+Message-ID: <f68275a4-9a83-2d1a-4371-7a8e61e91577@gmail.com>
+Date:   Sat, 25 Jul 2020 12:05:36 +0300
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9692 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- malwarescore=0 spamscore=0 bulkscore=0 phishscore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007250020
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9692 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
- bulkscore=0 mlxscore=0 mlxlogscore=999 impostorscore=0 priorityscore=1501
- lowpriorityscore=0 phishscore=0 spamscore=0 adultscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007250020
+In-Reply-To: <20200724171706.1550403-6-tasleson@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 6 Jul 2020 11:14:36 -0400, Alan Stern wrote:
+Hello!
 
-> Commit 05d18ae1cc8a ("scsi: pm: Balance pm_only counter of request
-> queue during system resume") fixed a problem in the block layer's
-> runtime-PM code: blk_set_runtime_active() failed to call
-> blk_clear_pm_only().  However, the commit's implementation was
-> awkward; it forced the SCSI system-resume handler to choose whether to
-> call blk_post_runtime_resume() or blk_set_runtime_active(), depending
-> on whether or not the SCSI device had previously been runtime
-> suspended.
+On 24.07.2020 20:17, Tony Asleson wrote:
+
+> Corrections from Keith Busch review comments.
 > 
-> [...]
+> Signed-off-by: Tony Asleson <tasleson@redhat.com>
+> ---
+>   drivers/nvme/host/core.c | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index f3c037f5a9ba..f2e5b91668a1 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -2667,6 +2667,22 @@ static bool nvme_validate_cntlid(struct nvme_subsystem *subsys,
+>   	return true;
+>   }
+>   
+> +static ssize_t wwid_show(struct device *dev, struct device_attribute *attr,
+> +			char *buf);
+> +
+> +static int dev_to_nvme_durable_name(const struct device *dev, char *buf, size_t len)
+> +{
+> +	char serial[144];	/* Max 141 for wwid_show */
+> +	ssize_t serial_len = wwid_show((struct device *)dev, NULL, serial);
+> +
+> +	if (serial_len > 0 && serial_len < len) {
+> +		serial_len -= 1;  /* Remove the '\n' from the string */
 
-Applied to 5.9/scsi-queue, thanks!
+    serial_len-- instead?
 
-[1/1] scsi: block: pm: Simplify resume handling
-      https://git.kernel.org/mkp/scsi/c/8f38f8e0a30e
+> +		strncpy(buf, serial, serial_len);
+> +		return serial_len;
+> +	}
+> +	return 0;
+> +}
+> +
+>   static int nvme_init_subsystem(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
+>   {
+>   	struct nvme_sub
+[...]
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+MBR, Sergei
