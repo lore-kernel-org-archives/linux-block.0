@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBBEC433E0
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 487C9C433E3
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:24:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 86FF5206EB
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:20:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22B4B206EB
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jul 2020 10:24:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="spus77cQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CuqnYAU7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726593AbgGYKUz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Jul 2020 06:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34602 "EHLO
+        id S1726613AbgGYKYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Jul 2020 06:24:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726572AbgGYKUy (ORCPT
+        with ESMTP id S1726572AbgGYKYJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Jul 2020 06:20:54 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E3EAC0619D3;
-        Sat, 25 Jul 2020 03:20:54 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id t11so6577662pfq.11;
-        Sat, 25 Jul 2020 03:20:54 -0700 (PDT)
+        Sat, 25 Jul 2020 06:24:09 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C402C0619D3;
+        Sat, 25 Jul 2020 03:24:08 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id k71so6669234pje.0;
+        Sat, 25 Jul 2020 03:24:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=yvszqsmZlg6itxeGw8L/x/wm1qBJqQZweDO1j96IDO0=;
-        b=spus77cQf8R8Ufv34pZOkS6h7F4RUoF76Uz/b4+1iIACduk0vhcWn7Z1GFX+EFkxLR
-         p2CbKkTO2nGKY13+7PRrYsQGa0K1q52eIE++tuolq2MNNnBQy8rI59xZmdFx2mIKvDWW
-         aVV7AKxql0j8x8VJ+13Qy+fsPCM3XchTx52vGETEIr8cqIpnWr3xny6JMQpYkN5Nlqkv
-         Z9jsXtWyQt9PVdpCBWbpJB7n5LEMmyr0RCmu+IWNoNdgIP2JWoGyDtddDx17yNxs/Vpe
-         fzaTmYa0vUODDEeWlFXKB5sx5Rf2ow29Ng2bXLnFMWDukRGjd3zUONvwrsZTzkL6Vbx9
-         jcGQ==
+        bh=xya5iI6mez6VslA4WdyUYY4hYny+oShJ8iGDbkTMdog=;
+        b=CuqnYAU7N/48bI5+Re7xSER7U0PmBoiTZMFXzwKrLovKAZSCrcZGp0tqyIzHE89WED
+         5D8i7ovJ2GSa5gbDx6uIi4SaEA6Gkdzd5tYYMZOOV59Z1BleX3fktbSILxWJecNUv9JG
+         Z7U9r853PPne6Jjv3kzqB9Q9EIFM7N8xqXD+wbmwMBeumVF7akdhdghYi15pjPtWYE31
+         oORnDkHE1wHmQkrhiYKnDGP1pgUjnjGWaG9AY687angKKQbI7oMfP6qBIvwRhSaXc69F
+         BPURuIRgGpimIylas2PUB99IEghQW1IEG+StN0XnSNb8Cz0RVdBZnJKL05y8fkHLiJB+
+         OIOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yvszqsmZlg6itxeGw8L/x/wm1qBJqQZweDO1j96IDO0=;
-        b=byRU5bFLONM3jNjn4v0VTY/BD/zqiaDjfekvJqor6AZ159DjWf97jrN+jmfeUbtpau
-         EkXjMtQ+VkZkJLbCB8FxRDt3ZaBUQLjvjjAdIGjmaVLhSXI5DmpB7hZMDk98Py6vTU1b
-         tBzU+DJesqtnOzkTP7Orjzr3OwX0A7GKCGO4SnWNyc+/t8AiAjdGR7V0oH3qMXTqGvcz
-         KND0gDJ2B2StxX4+lx1ZZdwN6gOcnpeVuxplIDamxu/T+Srzr7DcpwIWvqWKE7eWfJxz
-         HNn4rehLpAyXIhy75gGymQpU6Kip6/OeevK5KkbvpItIng0OIWvcQUYUCvi3mywxRDSJ
-         lxfA==
-X-Gm-Message-State: AOAM533CbKvbA3EDYLPUMwdObZmgcoxiJ0eEeItF08Rtr2nuVBUfdDe/
-        6XCIEuZgXT3HdrS4CpXMiYJli9dssH2UdVsEQJ0=
-X-Google-Smtp-Source: ABdhPJz0X5iLT59t4opLAqzgWSJH6IM58/2aP6ew7FM7GCnar7T5Pa42WdgNvCCTNvTMOgHHnxLcfpLH49dPCOVMUHI=
-X-Received: by 2002:a63:ce41:: with SMTP id r1mr12254644pgi.203.1595672453929;
- Sat, 25 Jul 2020 03:20:53 -0700 (PDT)
+        bh=xya5iI6mez6VslA4WdyUYY4hYny+oShJ8iGDbkTMdog=;
+        b=Dg1rJmfv9z4XtpdBTTN9JcyNpH0qnYRzojEgIenyCDpl2pobp0K94i5Oel/pVuk/Xh
+         eHl6DMmyFyWqwoexsuRSMt0IFakkNTOiAvIZQu1fAFjNPX61m1GRPOcLbqDTyt4jDDjr
+         9auaT6NWek0tan59x91csisipcaTsxksiHuarlpQsxyTXMwxYq6xBnVbZPf6GEouHgnG
+         49FBPNPEsVrZNCCdhOzRaLa9f/+ltyrPT/sgg5kvjZcg6wMR5MGgOFLfDFrYKLB54Ulv
+         YVZVCuJQ/nQthmrqm7K2HV57qOW7ruj9gOM8sthCtTMjTjiZEkY6FtOw6arYZ83ZdZ1y
+         RZNg==
+X-Gm-Message-State: AOAM5301jPT1Y7xNL/wqVO4rzZks6w0+0PlKUF6Wr79sPEPGThCDdR+Y
+        PoA+ZzqBYdl/LhqmratsWQsfVheU+Mk1Z6MClok=
+X-Google-Smtp-Source: ABdhPJxZDi30ldujm27ky8oI7MBOqxieiu1hysjQsqeG6INm3eAisFNDfHQewgGivDRncMAbee+CvYgrdtqqInaoAAg=
+X-Received: by 2002:a17:90a:498b:: with SMTP id d11mr9956403pjh.129.1595672647801;
+ Sat, 25 Jul 2020 03:24:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200724171706.1550403-1-tasleson@redhat.com> <20200724171706.1550403-5-tasleson@redhat.com>
-In-Reply-To: <20200724171706.1550403-5-tasleson@redhat.com>
+References: <20200724171706.1550403-1-tasleson@redhat.com> <20200724171706.1550403-6-tasleson@redhat.com>
+In-Reply-To: <20200724171706.1550403-6-tasleson@redhat.com>
 From:   Andy Shevchenko <andy.shevchenko@gmail.com>
-Date:   Sat, 25 Jul 2020 13:20:37 +0300
-Message-ID: <CAHp75VdT8pMzy84J_JGU7xHfuTw1TVX1WCe-PXKyMdzuGh9gyA@mail.gmail.com>
-Subject: Re: [v4 04/11] scsi: Add durable_name for dev_printk
+Date:   Sat, 25 Jul 2020 13:23:51 +0300
+Message-ID: <CAHp75Ve8oanxSj5Uj4N6nv5xP42kAo0-gyfTjtrgRVFX8Mi3dQ@mail.gmail.com>
+Subject: Re: [v4 05/11] nvme: Add durable name for dev_printk
 To:     Tony Asleson <tasleson@redhat.com>
 Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-scsi <linux-scsi@vger.kernel.org>,
@@ -74,86 +74,30 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On Fri, Jul 24, 2020 at 8:19 PM Tony Asleson <tasleson@redhat.com> wrote:
 >
-> Add the needed functions to fill out the durable_name function
-> call back for scsi based storage devices.  This allows calls
-> into dev_printk for scsi devices to have a persistent id
-> associated with them.
+> Corrections from Keith Busch review comments.
 
-...
+Good! And where is the commit message?
 
-> +int scsi_durable_name(struct scsi_device *sdev, char *buf, size_t len)
-> +{
-> +       int vpd_len = 0;
 
-What is the purpose of the assignment?
 
-> +       vpd_len = scsi_vpd_lun_id(sdev, buf, len);
-> +       if (vpd_len > 0 && vpd_len < len)
-> +               vpd_len++;
-> +       else
-> +               vpd_len = 0;
+> +static ssize_t wwid_show(struct device *dev, struct device_attribute *attr,
+> +                       char *buf);
 > +
-> +       return vpd_len;
-
-int vpd_len;
-
-vpd_len = ...(...);
-if (vpd_len ...)
-  return vpd_len + 1;
-return 0;
-
-> +}
-
-...
-
->  };
->
-> +
-
-One blank line is enough.
-
-> +int dev_to_scsi_durable_name(const struct device *dev, char *buf, size_t len)
+> +static int dev_to_nvme_durable_name(const struct device *dev, char *buf, size_t len)
 > +{
-> +       struct scsi_device *sd_dev = NULL;
-
-Redundant assignment.
-
-> +       // When we go through dev_printk in the scsi layer, dev is embedded
-> +       // in a struct scsi_device.  When we go through the block layer,
-> +       // dev is embedded in struct genhd, thus we need different paths to
-> +       // retrieve the struct scsi_device to call scsi_durable_name.
-> +       if (dev->type == &scsi_dev_type) {
-> +               sd_dev = to_scsi_device(dev);
-
-This...
-
-> +       } else if (dev->parent && dev->parent->type == &scsi_dev_type) {
-> +               sd_dev = to_scsi_device(dev->parent);
-
-...and this along with pieces in scsi_bus_uevent(), scsi_bus_match()
-are candidates for a good helper (perhaps with utilization of
-scsi_is_sdev_device(), but maybe not necessary).
-
-static struct scsi_device *dev_to_scsi_device(struct device *dev)
-{
-  return dev->type == &scsi_dev_type ? to_scsi_device(dev) : NULL;
-}
-
-sdev = dev_to_scsi_device(dev);
-if (!sdev)
-  sdev = dev_to_scsi_device(dev->parent);
-if (!sdev)
-  return 0;
-
-And when introducing a helper change users at the same time.
-
-> +       } else {
-> +               // We have a pointer to something else, bail
-> +               return 0;
+> +       char serial[144];       /* Max 141 for wwid_show */
+> +       ssize_t serial_len = wwid_show((struct device *)dev, NULL, serial);
+> +
+> +       if (serial_len > 0 && serial_len < len) {
+> +               serial_len -= 1;  /* Remove the '\n' from the string */
+> +               strncpy(buf, serial, serial_len);
+> +               return serial_len;
 > +       }
-> +
-> +       return scsi_durable_name(sd_dev, buf, len);
+> +       return 0;
 > +}
+
+Sorry, but this is ugly. Can we rather get some common code from
+wwid_show() and reuse it there and here w/o above dances with \n?
 
 -- 
 With Best Regards,
