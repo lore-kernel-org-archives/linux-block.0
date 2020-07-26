@@ -2,99 +2,61 @@ Return-Path: <SRS0=9ghM=BF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82638C433FC
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BCCC433EB
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:07:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 583C52065F
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:05:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nzfTTc0U"
+	by mail.kernel.org (Postfix) with ESMTP id 61AEF206E3
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:07:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726717AbgGZPDt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jul 2020 11:03:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725978AbgGZPDt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jul 2020 11:03:49 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABB8C0619D2;
-        Sun, 26 Jul 2020 08:03:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=7sLr773opB4TCq8qFsHUwDVwSWroJwloCS8BnU42JTo=; b=nzfTTc0USVN6e4AgohXkVVBtnB
-        ao8yENWY5PaMchxhF88PqoEDZtsOvvDBfsVqL5hxXs1TfPKZsT0QKdC04koNuyIqUVWff6t7WpMsO
-        6ROQmy7Z3SuqIBiB5MY/GlauBE2dCXtfkRYHkWeVcikSjYbCzVU2/9edWtltJgwhQPO8y9ky/Xq/n
-        Dq60znZ4ygSsHIMpgg0I35t1JLX8qrL50CEXCilpvkDH9ZQuY5bE4HRktCNPrXIuHlRbKpJ2f0ipn
-        dC9zHgaHUxCnVaVQ4ZdLhkeU0PuMsURYlqj8BSpk8D6OEOUCXOpRijEYlhL5KzDLJWB3Oi9DhpYgb
-        NRdWrmvQ==;
-Received: from [2001:4bb8:18c:2acc:2375:88ff:9f84:118d] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jziBe-0005fc-UA; Sun, 26 Jul 2020 15:03:39 +0000
+        id S1726929AbgGZPHG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jul 2020 11:07:06 -0400
+Received: from verein.lst.de ([213.95.11.211]:40620 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725989AbgGZPHG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 26 Jul 2020 11:07:06 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 050B968B05; Sun, 26 Jul 2020 17:07:03 +0200 (CEST)
+Date:   Sun, 26 Jul 2020 17:07:02 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org
-Subject: [PATCH 02/14] drbd: remove dead code in device_to_statistics
-Date:   Sun, 26 Jul 2020 17:03:21 +0200
-Message-Id: <20200726150333.305527-3-hch@lst.de>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200726150333.305527-1-hch@lst.de>
-References: <20200726150333.305527-1-hch@lst.de>
+To:     Coly Li <colyli@suse.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-bcache@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 25/25] bcache: fix bio_{start,end}_io_acct with proper
+ device
+Message-ID: <20200726150702.GA23338@lst.de>
+References: <20200725120039.91071-1-colyli@suse.de> <20200725120039.91071-26-colyli@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200725120039.91071-26-colyli@suse.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ever since the switch to blk-mq, a lower device not used for VM
-writeback will not be marked congested, so the check will never
-trigger.
+On Sat, Jul 25, 2020 at 08:00:39PM +0800, Coly Li wrote:
+> Commit 85750aeb748f ("bcache: use bio_{start,end}_io_acct") moves the
+> io account code to the location after bio_set_dev(bio, dc->bdev) in
+> cached_dev_make_request(). Then the account is performed incorrectly on
+> backing device, indeed the I/O should be counted to bcache device like
+> /dev/bcache0.
+> 
+> With the mistaken I/O account, iostat does not display I/O counts for
+> bcache device and all the numbers go to backing device. In writeback
+> mode, the hard drive may have 340K+ IOPS which is impossible and wrong
+> for spinning disk.
+> 
+> This patch introduces bch_bio_start_io_acct() and bch_bio_end_io_acct(),
+> which switches bio->bi_disk to bcache device before calling
+> bio_start_io_acct() or bio_end_io_acct(). Now the I/Os are counted to
+> bcache device, and bcache device, cache device and backing device have
+> their correct I/O count information back.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/drbd/drbd_nl.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index d0d9a549b58388..650372ee2c7822 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -3370,7 +3370,6 @@ static void device_to_statistics(struct device_statistics *s,
- 	if (get_ldev(device)) {
- 		struct drbd_md *md = &device->ldev->md;
- 		u64 *history_uuids = (u64 *)s->history_uuids;
--		struct request_queue *q;
- 		int n;
- 
- 		spin_lock_irq(&md->uuid_lock);
-@@ -3384,11 +3383,6 @@ static void device_to_statistics(struct device_statistics *s,
- 		spin_unlock_irq(&md->uuid_lock);
- 
- 		s->dev_disk_flags = md->flags;
--		q = bdev_get_queue(device->ldev->backing_bdev);
--		s->dev_lower_blocked =
--			bdi_congested(q->backing_dev_info,
--				      (1 << WB_async_congested) |
--				      (1 << WB_sync_congested));
- 		put_ldev(device);
- 	}
- 	s->dev_size = drbd_get_capacity(device->this_bdev);
--- 
-2.27.0
-
+Please switch to use disk_{start,end}_io_acct instead of hacking around
+with bi_disk assignments.
