@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C0FC433E8
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0609FC433E4
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:04:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 756972070B
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D83862070B
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:04:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eWgKThWa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZlUbIgvz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726967AbgGZPD7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726952AbgGZPD7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sun, 26 Jul 2020 11:03:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47350 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726911AbgGZPDz (ORCPT
+        with ESMTP id S1726918AbgGZPDz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sun, 26 Jul 2020 11:03:55 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1708FC0619D4;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE3BC0619D5;
         Sun, 26 Jul 2020 08:03:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=1H+lWVRYCWt4MODEgPxnHmFqCfz3JoG7JBlKzqx59xM=; b=eWgKThWa0DCq3ocZZM8vW2pqqI
-        EvMO3324fvECNiFdOvuYaTs1ikg718R/7MWDrMeTkO70rqX6CwczbydY2EZDUDQaG1TxV4r5cMFxA
-        wgXrU+rVXni2/Xm7nUR/Hw8SQDuDbn5OyelhEujgWzkOR3saDjhgf/ZCeSsoH1Ov5ZGjQxRoMDJGk
-        hplz9w9gNwA0c8uJclphBCGObuMI5fCwVhLZnZNX7ijJx2GOH7ZUHxqQLpVJWLt3QUI4JnMLJ8HNZ
-        c+ZWYZoI/FNi4Mlhx0NkySCeyHRV6GTUbyDQuWmEAEnCrJHPE9PMGbr1gicZd+KQ/ajhEgKiWLSwv
-        rIlFtrBQ==;
+        bh=kdnG/8uKQIMddLsDA/8BZYPUgnH5s1kSDlqsFlCYesw=; b=ZlUbIgvz5W+wNZyXR6smJAUXas
+        evPOz6Ja3vFXE9UY2uAmviOobnai2PzHbDI+ijvPBexgfsz1flsWVkMK3mMsjPeRfpzTtILWc4olD
+        Hj+/WaWcA6UhlhC80A+lhxePrJn4C44YMiZhGd8QAKQ/i8EthVTqcPNN7UqDnUR30qrdZ4fG1iudN
+        XBDssURerbKMOfZhaB0z0cjf41fJx8gqw/53CntsqtJiJrZfYmDDcMm+ieudAv5pwN/pd9KDuNkal
+        CXpWl6zKdMFN2J37a8Slp+8TFWLMHjB6LAwa0cpEDl/bTu+fjIb9lz5Fe0cBbaueULO6dV+eNfOr8
+        cPAkBGvw==;
 Received: from [2001:4bb8:18c:2acc:2375:88ff:9f84:118d] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jziBp-0005hL-T9; Sun, 26 Jul 2020 15:03:50 +0000
+        id 1jziBn-0005h0-2s; Sun, 26 Jul 2020 15:03:47 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
@@ -49,9 +49,9 @@ Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         cgroups@vger.kernel.org,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 09/14] bdi: remove BDI_CAP_CGROUP_WRITEBACK
-Date:   Sun, 26 Jul 2020 17:03:28 +0200
-Message-Id: <20200726150333.305527-10-hch@lst.de>
+Subject: [PATCH 07/14] block: make QUEUE_SYSFS_BIT_FNS a little more useful
+Date:   Sun, 26 Jul 2020 17:03:26 +0200
+Message-Id: <20200726150333.305527-8-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200726150333.305527-1-hch@lst.de>
 References: <20200726150333.305527-1-hch@lst.de>
@@ -63,76 +63,86 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just checking SB_I_CGROUPWB for cgroup writeback support is enough.
-Either the file system allocates its own bdi (e.g. btrfs), in which case
-it is known to support cgroup writeback, or the bdi comes from the block
-layer, which always supports cgroup writeback.
+Generate the queue_sysfs_entry given that we have all the required
+information for it, and rename the generated show and store methods
+to match the other ones in the file.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/blk-core.c            | 1 -
- fs/btrfs/disk-io.c          | 1 -
- include/linux/backing-dev.h | 8 +++-----
- 3 files changed, 3 insertions(+), 7 deletions(-)
+ block/blk-sysfs.c | 31 +++++++++----------------------
+ 1 file changed, 9 insertions(+), 22 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ea1665de7a2079..68db7e745b49dd 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -538,7 +538,6 @@ struct request_queue *blk_alloc_queue(int node_id)
- 	if (!q->stats)
- 		goto fail_stats;
- 
--	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
- 	q->node = node_id;
- 
- 	timer_setup(&q->backing_dev_info->laptop_mode_wb_timer,
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index f92c45fe019c48..4b5a8640329e4c 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -3032,7 +3032,6 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
- 		goto fail_sb_buffer;
- 	}
- 
--	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
- 	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
- 	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
- 
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 0b06b2d26c9aa3..52583b6f2ea05d 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -123,7 +123,6 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ratio);
-  * BDI_CAP_NO_ACCT_WB:     Don't automatically account writeback pages
-  * BDI_CAP_STRICTLIMIT:    Keep number of dirty pages below bdi threshold.
-  *
-- * BDI_CAP_CGROUP_WRITEBACK: Supports cgroup-aware writeback.
-  * BDI_CAP_SYNCHRONOUS_IO: Device is so fast that asynchronous IO would be
-  *			   inefficient.
-  */
-@@ -233,9 +232,9 @@ int inode_congested(struct inode *inode, int cong_bits);
-  * inode_cgwb_enabled - test whether cgroup writeback is enabled on an inode
-  * @inode: inode of interest
-  *
-- * cgroup writeback requires support from both the bdi and filesystem.
-- * Also, both memcg and iocg have to be on the default hierarchy.  Test
-- * whether all conditions are met.
-+ * Cgroup writeback requires support from the filesystem.  Also, both memcg and
-+ * iocg have to be on the default hierarchy.  Test whether all conditions are
-+ * met.
-  *
-  * Note that the test result may change dynamically on the same inode
-  * depending on how memcg and iocg are configured.
-@@ -247,7 +246,6 @@ static inline bool inode_cgwb_enabled(struct inode *inode)
- 	return cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
- 		cgroup_subsys_on_dfl(io_cgrp_subsys) &&
- 		bdi_cap_account_dirty(bdi) &&
--		(bdi->capabilities & BDI_CAP_CGROUP_WRITEBACK) &&
- 		(inode->i_sb->s_iflags & SB_I_CGROUPWB);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index ce418d9128a0b2..cfbb039da8751f 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -257,16 +257,16 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
+ 	return queue_var_show(max_hw_sectors_kb, (page));
  }
  
+-#define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
++#define QUEUE_SYSFS_BIT_FNS(_name, flag, neg)				\
+ static ssize_t								\
+-queue_show_##name(struct request_queue *q, char *page)			\
++queue_##_name##_show(struct request_queue *q, char *page)		\
+ {									\
+ 	int bit;							\
+ 	bit = test_bit(QUEUE_FLAG_##flag, &q->queue_flags);		\
+ 	return queue_var_show(neg ? !bit : bit, page);			\
+ }									\
+ static ssize_t								\
+-queue_store_##name(struct request_queue *q, const char *page, size_t count) \
++queue_##_name##_store(struct request_queue *q, const char *page, size_t count) \
+ {									\
+ 	unsigned long val;						\
+ 	ssize_t ret;							\
+@@ -281,7 +281,12 @@ queue_store_##name(struct request_queue *q, const char *page, size_t count) \
+ 	else								\
+ 		blk_queue_flag_clear(QUEUE_FLAG_##flag, q);		\
+ 	return ret;							\
+-}
++}									\
++static struct queue_sysfs_entry queue_##_name##_entry = {		\
++	.attr	= { .name = __stringify(_name), .mode = 0644 },		\
++	.show	= queue_##_name##_show,					\
++	.store	= queue_##_name##_store,				\
++};
+ 
+ QUEUE_SYSFS_BIT_FNS(nonrot, NONROT, 1);
+ QUEUE_SYSFS_BIT_FNS(random, ADD_RANDOM, 0);
+@@ -661,12 +666,6 @@ static struct queue_sysfs_entry queue_zone_append_max_entry = {
+ 	.show = queue_zone_append_max_show,
+ };
+ 
+-static struct queue_sysfs_entry queue_nonrot_entry = {
+-	.attr = {.name = "rotational", .mode = 0644 },
+-	.show = queue_show_nonrot,
+-	.store = queue_store_nonrot,
+-};
+-
+ static struct queue_sysfs_entry queue_zoned_entry = {
+ 	.attr = {.name = "zoned", .mode = 0444 },
+ 	.show = queue_zoned_show,
+@@ -699,18 +698,6 @@ static struct queue_sysfs_entry queue_rq_affinity_entry = {
+ 	.store = queue_rq_affinity_store,
+ };
+ 
+-static struct queue_sysfs_entry queue_iostats_entry = {
+-	.attr = {.name = "iostats", .mode = 0644 },
+-	.show = queue_show_iostats,
+-	.store = queue_store_iostats,
+-};
+-
+-static struct queue_sysfs_entry queue_random_entry = {
+-	.attr = {.name = "add_random", .mode = 0644 },
+-	.show = queue_show_random,
+-	.store = queue_store_random,
+-};
+-
+ static struct queue_sysfs_entry queue_poll_entry = {
+ 	.attr = {.name = "io_poll", .mode = 0644 },
+ 	.show = queue_poll_show,
 -- 
 2.27.0
 
