@@ -2,41 +2,42 @@ Return-Path: <SRS0=9ghM=BF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F638C43467
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:05:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D379C43470
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:05:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EBC62073E
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:05:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 727EA2065F
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:05:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gcCyhFok"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YMWzVCgz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726741AbgGZPDt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jul 2020 11:03:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47320 "EHLO
+        id S1727895AbgGZPE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jul 2020 11:04:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726121AbgGZPDt (ORCPT
+        with ESMTP id S1726857AbgGZPDw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jul 2020 11:03:49 -0400
+        Sun, 26 Jul 2020 11:03:52 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03342C0619D4;
-        Sun, 26 Jul 2020 08:03:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA3AC0619D2;
+        Sun, 26 Jul 2020 08:03:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=04VE7HPmOaEIcQmpVyHs48tjQkwZrMnq91D8chn1PWs=; b=gcCyhFoksQsWO0hBn75l9y3eqO
-        rt7vUoyyQ9uPDBBFPq3XTHLMjW3AjTgCzBO7uTLnkzsJ1uYPw8ycXoDFcMhrQisMj+zvN/aTVihsw
-        1hgMXQRfoxvh+sEv+0wfcelGuxKwdudBPeZjx4VCI4fL6bZ24Sbo13xsIp0pR/acwSKk8xlQnswXm
-        JdJUIHrcVzKgjZDPTlvdTExghgDiF+byhGFaaQSQrUkAUpH9N0viDO1N29oOCGjpZ/3uWPjZEvbeG
-        sjHA/7Ii8CvICPtcoIBb9xkg9PYMmFVoSvqoE/fwHTcuKmUdlhJDbe8KAeCL+k+aVJFCbu+TASYWg
-        RLrHiiIg==;
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=S8Ttwcc94B0Xl9tEeP23NWmZAdd1Fm0GDSqESxJAyFs=; b=YMWzVCgzX29h5w6kZFM6oUoNMr
+        9gXLP/Ib5QVPfsZG0AAn/rXKE+D/N2C8DnBZzhv3p4q+7Hvzj4rXtmv1GWAV6nNCHkYnow6VnUeGb
+        tfg7+LutO+I7qgJihKfLNV0bioQiwOd7ue+CPYdTYIJKpWq+05hnuInoQy1ujJQexg4BRsGSlIz2Z
+        YZ7J8pfIWExlvsv9pgxeI1cIQvPqFjaJ3zRlmz7+bHnAJieME2sgtOnGvFS+Opg0XaNy/I+HY6ox/
+        qofchlkyZcbtNwfFSRr4nu6fEXNekMBd5Rs/0KLFlzA4MdQTFmHHa3ICI8wvaZJWqiBY1fFhGVFrd
+        8CX0M/+w==;
 Received: from [2001:4bb8:18c:2acc:2375:88ff:9f84:118d] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jziBb-0005eu-MR; Sun, 26 Jul 2020 15:03:36 +0000
+        id 1jziBh-0005g2-F1; Sun, 26 Jul 2020 15:03:41 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
@@ -46,11 +47,14 @@ Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org
-Subject: bdi cleanups v3
-Date:   Sun, 26 Jul 2020 17:03:19 +0200
-Message-Id: <20200726150333.305527-1-hch@lst.de>
+        cgroups@vger.kernel.org,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 03/14] drbd: remove RB_CONGESTED_REMOTE
+Date:   Sun, 26 Jul 2020 17:03:22 +0200
+Message-Id: <20200726150333.305527-4-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200726150333.305527-1-hch@lst.de>
+References: <20200726150333.305527-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -59,71 +63,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+This case isn't ever used.
 
-this series contains a bunch of different BDI cleanups.  The biggest item
-is to isolate block drivers from the BDI in preparation of changing the
-lifetime of the block device BDI in a follow up series.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ drivers/block/drbd/drbd_req.c | 4 ----
+ include/linux/drbd.h          | 1 -
+ 2 files changed, 5 deletions(-)
 
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index 674be09b2da94a..4d944f2eb56efa 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -901,13 +901,9 @@ static bool drbd_may_do_local_read(struct drbd_device *device, sector_t sector,
+ static bool remote_due_to_read_balancing(struct drbd_device *device, sector_t sector,
+ 		enum drbd_read_balancing rbm)
+ {
+-	struct backing_dev_info *bdi;
+ 	int stripe_shift;
+ 
+ 	switch (rbm) {
+-	case RB_CONGESTED_REMOTE:
+-		bdi = device->ldev->backing_bdev->bd_disk->queue->backing_dev_info;
+-		return bdi_read_congested(bdi);
+ 	case RB_LEAST_PENDING:
+ 		return atomic_read(&device->local_cnt) >
+ 			atomic_read(&device->ap_pending_cnt) + atomic_read(&device->rs_pending_cnt);
+diff --git a/include/linux/drbd.h b/include/linux/drbd.h
+index 5755537b51b114..6a8286132751df 100644
+--- a/include/linux/drbd.h
++++ b/include/linux/drbd.h
+@@ -94,7 +94,6 @@ enum drbd_read_balancing {
+ 	RB_PREFER_REMOTE,
+ 	RB_ROUND_ROBIN,
+ 	RB_LEAST_PENDING,
+-	RB_CONGESTED_REMOTE,
+ 	RB_32K_STRIPING,
+ 	RB_64K_STRIPING,
+ 	RB_128K_STRIPING,
+-- 
+2.27.0
 
-Changes since v2:
- - fix a rw_page return value check
- - fix up various changelogs
-
-Changes since v1:
- - rebased to the for-5.9/block-merge branch
- - explicitly set the readahead to 0 for ubifs, vboxsf and mtd
- - split the zram block_device operations
- - let rw_page users fall back to bios in swap_readpage
-
-
-Diffstat:
- block/blk-core.c              |    2 
- block/blk-integrity.c         |    4 
- block/blk-mq-debugfs.c        |    1 
- block/blk-settings.c          |    5 
- block/blk-sysfs.c             |  282 ++++++++++--------------------------------
- block/genhd.c                 |   13 +
- drivers/block/aoe/aoeblk.c    |    2 
- drivers/block/brd.c           |    1 
- drivers/block/drbd/drbd_nl.c  |   18 --
- drivers/block/drbd/drbd_req.c |    4 
- drivers/block/rbd.c           |    2 
- drivers/block/zram/zram_drv.c |   19 +-
- drivers/md/bcache/super.c     |    4 
- drivers/md/dm-table.c         |    9 -
- drivers/md/raid0.c            |   16 --
- drivers/md/raid10.c           |   46 ++----
- drivers/md/raid5.c            |   31 +---
- drivers/mmc/core/queue.c      |    3 
- drivers/mtd/mtdcore.c         |    1 
- drivers/nvdimm/btt.c          |    2 
- drivers/nvdimm/pmem.c         |    1 
- drivers/nvme/host/core.c      |    3 
- drivers/nvme/host/multipath.c |   10 -
- drivers/scsi/iscsi_tcp.c      |    4 
- fs/9p/vfs_file.c              |    2 
- fs/9p/vfs_super.c             |    4 
- fs/afs/super.c                |    1 
- fs/btrfs/disk-io.c            |    2 
- fs/fs-writeback.c             |    7 -
- fs/fuse/inode.c               |    4 
- fs/namei.c                    |    4 
- fs/nfs/super.c                |    9 -
- fs/super.c                    |    2 
- fs/ubifs/super.c              |    1 
- fs/vboxsf/super.c             |    1 
- include/linux/backing-dev.h   |   78 +----------
- include/linux/blkdev.h        |    3 
- include/linux/drbd.h          |    1 
- include/linux/fs.h            |    2 
- mm/backing-dev.c              |   12 -
- mm/filemap.c                  |    4 
- mm/memcontrol.c               |    2 
- mm/memory-failure.c           |    2 
- mm/migrate.c                  |    2 
- mm/mmap.c                     |    2 
- mm/page-writeback.c           |   18 +-
- mm/page_io.c                  |   18 +-
- mm/swapfile.c                 |    4 
- 48 files changed, 204 insertions(+), 464 deletions(-)
