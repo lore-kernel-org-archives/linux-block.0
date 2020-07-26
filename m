@@ -2,61 +2,54 @@ Return-Path: <SRS0=9ghM=BF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F0BC433E4
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECEB5C433E3
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:12:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5C33206E3
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:10:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ultu3nd1"
+	by mail.kernel.org (Postfix) with ESMTP id D88C62073E
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 15:12:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbgGZPKh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jul 2020 11:10:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48398 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725978AbgGZPKh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jul 2020 11:10:37 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89795C0619D2;
-        Sun, 26 Jul 2020 08:10:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kcuMXgFNFtIkl0GDj0p20pjT96YpQLVHcMeUCcbH19o=; b=ultu3nd1Zhi8vL8FqmXKkj+BID
-        BNIjw/hg0UdljRqFd7Rt8DJFCCNdkCL2ihNeIiatBgZyRIqxDR6Ba/cDaTgqG1bMdFY31yVUv6uil
-        SdZoK9WXeKq9uleEJF7W/Acu6G4jvO2q3dj304dy28OndAm0VqiftzEVfBiOQEAamCdfAihZ4Xko0
-        y7eWnsGb6A1EqyThHab2Qv2VtpG+i6dvEISnNqdeayq4QgK5HeozbiGbHKnXcbIQKX6l+tNF/0qDQ
-        Aym2A8NtFTDoCKCd0/Z/gjFWYb7xaeUEU3/pu2dUNJ0vgXWvonCEyRcxlMWnVIJAhCYP674xLg9Xm
-        j2LQEwfg==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jziIN-0006JY-E5; Sun, 26 Jul 2020 15:10:35 +0000
-Date:   Sun, 26 Jul 2020 16:10:35 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Tony Asleson <tasleson@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, b.zolnierkie@samsung.com,
-        axboe@kernel.dk
-Subject: Re: [v4 00/11] Add persistent durable identifier to storage log
- messages
-Message-ID: <20200726151035.GC20628@infradead.org>
-References: <20200724171706.1550403-1-tasleson@redhat.com>
+        id S1726042AbgGZPMm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jul 2020 11:12:42 -0400
+Received: from verein.lst.de ([213.95.11.211]:40668 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725978AbgGZPMl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 26 Jul 2020 11:12:41 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id B6A7A68B05; Sun, 26 Jul 2020 17:12:38 +0200 (CEST)
+Date:   Sun, 26 Jul 2020 17:12:38 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        cgroups@vger.kernel.org
+Subject: Re: bdi cleanups v3
+Message-ID: <20200726151238.GA23460@lst.de>
+References: <20200726150333.305527-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200724171706.1550403-1-tasleson@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200726150333.305527-1-hch@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-FYI, I think these identifiers are absolutely horrible and have no
-business in dmesg:
+On Sun, Jul 26, 2020 at 05:03:19PM +0200, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> this series contains a bunch of different BDI cleanups.  The biggest item
+> is to isolate block drivers from the BDI in preparation of changing the
+> lifetime of the block device BDI in a follow up series.
 
-Nacked-by: Christoph Hellwig <hch@lst.de>
+Ooops, sorry for reposting this - it is exactly the same v3 I already
+posted.
