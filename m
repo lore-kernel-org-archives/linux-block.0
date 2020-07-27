@@ -2,87 +2,80 @@ Return-Path: <SRS0=68Kh=BG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B225C433EA
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 20:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A92D7C433E3
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 20:37:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0825D20792
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 20:34:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78FA420792
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 20:37:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Zafaxclz"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="UusocTr6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729332AbgG0Ued (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 16:34:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38894 "EHLO
+        id S1728810AbgG0Uhv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 16:37:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728356AbgG0Uec (ORCPT
+        with ESMTP id S1727008AbgG0Uhu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 16:34:32 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC396C0619D4
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 13:34:32 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id gc9so10323965pjb.2
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 13:34:32 -0700 (PDT)
+        Mon, 27 Jul 2020 16:37:50 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CCA5C061794
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 13:37:50 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id s189so10581416pgc.13
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 13:37:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1e9h0tE+ElK0HWRPXiuc5VM0AhTp1F0sLszAnPFX/o4=;
-        b=ZafaxclzPZhVsXz8l83xVPlfPaaHGIsnBsq3YYS+6u818LolWPB9JvqcfE5gaa8xTt
-         xMeKMiEUoOBjhQEN30y00OvB3GJvnZCmHen3WlDqQl1atnjPNZzXQnXq13xWBdO0RqDk
-         UjBeZR8HAFCSn6EgK2imAOBWV4HTBBMGp+cS1LMXd97OoXjDVUB7TSQtJTGuKlyPFlGv
-         47hzCZYu25rqnnw5lCBm48U/PxTUsLm9HQwDcpHJ8BS5Iqy1eq8Y1QSbIF+igXGeLiaw
-         5kQb4Je9qd10su3MNHjyZt2WiZXA5AoXdEge+klxew2Fz7tViQhLADlu2el1GkI3bMX9
-         ko6g==
+        bh=BoMGSFrK6JuNKJj0yzQkT5G/Ydi9HB5iMMp3B/Ar/NU=;
+        b=UusocTr6Wn5ya8x5g7nFGEyJc8UZUmDNAQgB4983QxdSzLkqYvlSLtF2vuYsjVUBuF
+         YeCgKhKyqgnSJor+vuG2KxcGmaJ502UTwJK0KF0mycK94hP+HQMYA8e2suKl2DJj0hCs
+         tkIP0bkQapW8XcBilA9KV8IBiZ6nbKwyltEefHGBx3KH6aQOkM72342mcVy9aosHAv07
+         BBGvWLv6cLA2dwMV72X6L6PlOuDbdQ3OC4VAFwgLLYzb9Ajneu/+Tr2XkuTJkXxI+6hJ
+         okuUT1br2bAM9KD2ATd90v/FLIyT1TUwa7on7pSArJfS1OJtzxpD0Uo/h32x2/V5jdYm
+         C3Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=1e9h0tE+ElK0HWRPXiuc5VM0AhTp1F0sLszAnPFX/o4=;
-        b=mCP1TxLffaKfQAPERTp8NyEj2YwAP+8c84VeWu5e0g0B34n5dwj7U6XnMpSTjn98xK
-         NRjYBYig/Z6WFG/puU4HrsLywfJcoE+x6kDgr0XBQNx0TXLmuc/7fZ+EbJ+swTh8OPwF
-         iZoe9gDhpq+e0HbSsrP+YaN8MpnbXu/2pBjY80vEt/AK7BR3iWWOC5DH5kBZJJUEM858
-         ikr5WGr4QbwA7P/sMVe8dbG3p4ke3lG4V7yhSS9EhhSaM+IwEmwcWthjb1S/wnovqAOF
-         pVCIkrvmSl5DskgYWR9a4eYUBGASTu/OgrLfPcJfoMVT7EvJZNsOzi4KAt+pyYqE5Elw
-         fDpw==
-X-Gm-Message-State: AOAM530xhXsPAdwCBSmXVHofksVOlCQjPRXy6w3S3gKxirvSYSfrXTzR
-        kPZBdt6C8GuIlpjTTkSJTFIl+w==
-X-Google-Smtp-Source: ABdhPJwgxPuj693Id+Oo3CVUmOizUrGVehGlzvteg1ajBPCJTwzcrqE4V3UY3qCfXHxGAvoiCewkzg==
-X-Received: by 2002:a17:90b:120a:: with SMTP id gl10mr927614pjb.44.1595882072153;
-        Mon, 27 Jul 2020 13:34:32 -0700 (PDT)
+        bh=BoMGSFrK6JuNKJj0yzQkT5G/Ydi9HB5iMMp3B/Ar/NU=;
+        b=riCtY1ebdsXlw5GMNRtkykAJLGI1ZjmWESTfKCOnmAhZaZZDKaibpqnbMxuPtYt/ta
+         rgbQN6QQFUZVP3ElQ4LLuO89FeXqdME5hh5v/1LJyyW5kJuhmUl8K22/QFI8OsQb9ujK
+         gWEDamxMH5OgUSHWONCMBoX4LCUE3+jsettA0N845792GgUAhIes7ShcctZ3l/U1h2l0
+         7dbfSXR+iCE/lKPUXOdvQ+mwnCv0vCjNG/XOuzBIJj/h6z/hlgARTgLRU1QWw9BcZd79
+         QYnIQ4tb+VT64GvNfZXfzcWm6XPgyhmrN4paqfRq1Rgwvpsn0X5XBwt2dPAvu7FbJzDK
+         Apxg==
+X-Gm-Message-State: AOAM531xJGpqkPo3tgK3LPdyEd89SsNmHOxkVRyd9khuT+PWc8rR3Mq+
+        usCHWtBvLOMwgJcXD9p2EfMJZw==
+X-Google-Smtp-Source: ABdhPJxmez7ADoFSJNVMEcnyiur5YEx6PVUnQDGsz7qtvYp8baQZcPhTa5spOpDdvjAqtsiRJBGt1Q==
+X-Received: by 2002:a63:495c:: with SMTP id y28mr21606643pgk.30.1595882270081;
+        Mon, 27 Jul 2020 13:37:50 -0700 (PDT)
 Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id u26sm16345833pfn.54.2020.07.27.13.34.29
+        by smtp.gmail.com with ESMTPSA id s22sm15056230pgv.43.2020.07.27.13.37.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jul 2020 13:34:31 -0700 (PDT)
-Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
-To:     Kanchan Joshi <joshiiitr@gmail.com>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
-        bcrl@kvack.org, Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>
-References: <1595605762-17010-1-git-send-email-joshi.k@samsung.com>
- <CGME20200724155350epcas5p3b8f1d59eda7f8fbb38c828f692d42fd6@epcas5p3.samsung.com>
- <1595605762-17010-7-git-send-email-joshi.k@samsung.com>
- <f5416bd4-93b3-4d14-3266-bdbc4ae1990b@kernel.dk>
- <CA+1E3rJAa3E2Ti0fvvQTzARP797qge619m4aYLjXeR3wxdFwWw@mail.gmail.com>
+        Mon, 27 Jul 2020 13:37:49 -0700 (PDT)
+Subject: Re: [PATCH v3 1/2] blk-mq: add async quiesce interface
+To:     Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>
+Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Chao Leng <lengchao@huawei.com>
+References: <20200726002301.145627-1-sagi@grimberg.me>
+ <20200726002301.145627-2-sagi@grimberg.me> <20200726093132.GD1110104@T590>
+ <9ac5f658-31b3-bb19-e5fe-385a629a7d67@grimberg.me>
+ <20200727020803.GC1129253@T590>
+ <2c2ae567-6953-5b7f-2fa1-a65e287b5a9d@grimberg.me>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b0b7159d-ed10-08ad-b6c7-b85d45f60d16@kernel.dk>
-Date:   Mon, 27 Jul 2020 14:34:28 -0600
+Message-ID: <f2fc0ecf-b599-678f-7241-fcd44cde6fab@kernel.dk>
+Date:   Mon, 27 Jul 2020 14:37:46 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CA+1E3rJAa3E2Ti0fvvQTzARP797qge619m4aYLjXeR3wxdFwWw@mail.gmail.com>
+In-Reply-To: <2c2ae567-6953-5b7f-2fa1-a65e287b5a9d@grimberg.me>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -91,92 +84,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/20 1:16 PM, Kanchan Joshi wrote:
-> On Fri, Jul 24, 2020 at 10:00 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 7/24/20 9:49 AM, Kanchan Joshi wrote:
->>> diff --git a/fs/io_uring.c b/fs/io_uring.c
->>> index 7809ab2..6510cf5 100644
->>> --- a/fs/io_uring.c
->>> +++ b/fs/io_uring.c
->>> @@ -1284,8 +1301,15 @@ static void __io_cqring_fill_event(struct io_kiocb *req, long res, long cflags)
->>>       cqe = io_get_cqring(ctx);
->>>       if (likely(cqe)) {
->>>               WRITE_ONCE(cqe->user_data, req->user_data);
->>> -             WRITE_ONCE(cqe->res, res);
->>> -             WRITE_ONCE(cqe->flags, cflags);
->>> +             if (unlikely(req->flags & REQ_F_ZONE_APPEND)) {
->>> +                     if (likely(res > 0))
->>> +                             WRITE_ONCE(cqe->res64, req->rw.append_offset);
->>> +                     else
->>> +                             WRITE_ONCE(cqe->res64, res);
->>> +             } else {
->>> +                     WRITE_ONCE(cqe->res, res);
->>> +                     WRITE_ONCE(cqe->flags, cflags);
->>> +             }
->>
->> This would be nice to keep out of the fast path, if possible.
+On 7/27/20 12:36 PM, Sagi Grimberg wrote:
 > 
-> I was thinking of keeping a function-pointer (in io_kiocb) during
-> submission. That would have avoided this check......but argument count
-> differs, so it did not add up.
-
-But that'd grow the io_kiocb just for this use case, which is arguably
-even worse. Unless you can keep it in the per-request private data,
-but there's no more room there for the regular read/write side.
-
->>> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
->>> index 92c2269..2580d93 100644
->>> --- a/include/uapi/linux/io_uring.h
->>> +++ b/include/uapi/linux/io_uring.h
->>> @@ -156,8 +156,13 @@ enum {
->>>   */
->>>  struct io_uring_cqe {
->>>       __u64   user_data;      /* sqe->data submission passed back */
->>> -     __s32   res;            /* result code for this event */
->>> -     __u32   flags;
->>> +     union {
->>> +             struct {
->>> +                     __s32   res;    /* result code for this event */
->>> +                     __u32   flags;
->>> +             };
->>> +             __s64   res64;  /* appending offset for zone append */
->>> +     };
->>>  };
+>>>>> +void blk_mq_quiesce_queue_async(struct request_queue *q)
+>>>>> +{
+>>>>> +	struct blk_mq_hw_ctx *hctx;
+>>>>> +	unsigned int i;
+>>>>> +
+>>>>> +	blk_mq_quiesce_queue_nowait(q);
+>>>>> +
+>>>>> +	queue_for_each_hw_ctx(q, hctx, i) {
+>>>>> +		init_completion(&hctx->rcu_sync.completion);
+>>>>> +		init_rcu_head(&hctx->rcu_sync.head);
+>>>>> +		if (hctx->flags & BLK_MQ_F_BLOCKING)
+>>>>> +			call_srcu(hctx->srcu, &hctx->rcu_sync.head,
+>>>>> +				wakeme_after_rcu);
+>>>>> +		else
+>>>>> +			call_rcu(&hctx->rcu_sync.head,
+>>>>> +				wakeme_after_rcu);
+>>>>> +	}
+>>>>
+>>>> Looks not necessary to do anything in case of !BLK_MQ_F_BLOCKING, and single
+>>>> synchronize_rcu() is OK for all hctx during waiting.
+>>>
+>>> That's true, but I want a single interface for both. v2 had exactly
+>>> that, but I decided that this approach is better.
 >>
->> Is this a compatible change, both for now but also going forward? You
->> could randomly have IORING_CQE_F_BUFFER set, or any other future flags.
-> 
-> Sorry, I didn't quite understand the concern. CQE_F_BUFFER is not
-> used/set for write currently, so it looked compatible at this point.
-
-Not worried about that, since we won't ever use that for writes. But it
-is a potential headache down the line for other flags, if they apply to
-normal writes.
-
-> Yes, no room for future flags for this operation.
-> Do you see any other way to enable this support in io-uring?
-
-Honestly I think the only viable option is as we discussed previously,
-pass in a pointer to a 64-bit type where we can copy the additional
-completion information to.
-
->> Layout would also be different between big and little endian, so not
->> even that easy to set aside a flag for this. But even if that was done,
->> we'd still have this weird API where liburing or the app would need to
->> distinguish this cqe from all others based on... the user_data? Hence
->> liburing can't do it, only the app would be able to.
+>> Not sure one new interface is needed, and one simple way is to:
 >>
->> Just seems like a hack to me.
+>> 1) call blk_mq_quiesce_queue_nowait() for each request queue
+>>
+>> 2) wait in driver specific way
+>>
+>> Or just wondering why nvme doesn't use set->tag_list to retrieve NS,
+>> then you may add per-tagset APIs for the waiting.
 > 
-> Yes, only user_data to distinguish. Do liburing helpers need to look
-> at cqe->res (and decide something) before returning the cqe to
-> application?
+> Because it puts assumptions on how quiesce works, which is something
+> I'd like to avoid because I think its cleaner, what do others think?
+> Jens? Christoph?
 
-They generally don't, outside of the internal timeout. But it's an issue
-for the API, as it forces applications to handle the CQEs a certain way.
-Normally there's flexibility. This makes the append writes behave
-differently than everything else, which is never a good idea.
+I'd prefer to have it in a helper, and just have blk_mq_quiesce_queue()
+call that.
 
 -- 
 Jens Axboe
