@@ -2,188 +2,182 @@ Return-Path: <SRS0=68Kh=BG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C39C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 20:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B225C433EA
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 20:34:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 097CC2074F
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 20:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0825D20792
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 20:34:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OismDgiu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Zafaxclz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728041AbgG0U1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 16:27:48 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22084 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726196AbgG0U1s (ORCPT
+        id S1729332AbgG0Ued (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 16:34:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38894 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728356AbgG0Uec (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 16:27:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595881666;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CwKmubcIReo7OG/Ru61MF52rixv+ulVEz8sMP+mOKY8=;
-        b=OismDgiuwXRoSw4DR6hRw/lRnuSc2EwPsVyTJ4DsvlrCRJwyNbcOO+DDX/iXQrKq5NWcL/
-        psw554H9oL58TL5OGE4UBG6bkEeRcNfnIKj2t8mkexKAdc6bv3C7fs6K3L3IStEJKsSGVx
-        R9rJAAAo38Zyk81r/6MdHAkLyl91y6Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-T1zP8mhaNziATfke2YsjeA-1; Mon, 27 Jul 2020 16:27:44 -0400
-X-MC-Unique: T1zP8mhaNziATfke2YsjeA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEC5A79EC0;
-        Mon, 27 Jul 2020 20:27:42 +0000 (UTC)
-Received: from [10.3.128.8] (unknown [10.3.128.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D2F866842F;
-        Mon, 27 Jul 2020 20:27:40 +0000 (UTC)
-Reply-To: tasleson@redhat.com
-Subject: Re: [v4 00/11] Add persistent durable identifier to storage log
- messages
-To:     dgilbert@interlog.com, Hannes Reinecke <hare@suse.de>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, b.zolnierkie@samsung.com,
-        axboe@kernel.dk
-References: <20200724171706.1550403-1-tasleson@redhat.com>
- <20200726151035.GC20628@infradead.org>
- <e3184753-bda1-fcfd-5cc2-7aa865d420fd@redhat.com>
- <bd1fb6dc-9fc1-0ee2-13a4-d221f28442c6@suse.de>
- <a67a11dc-1a5a-648a-7ef1-cf36d3a56518@redhat.com>
- <90798655-0ee1-330f-cae4-937c4981563a@interlog.com>
-From:   Tony Asleson <tasleson@redhat.com>
-Organization: Red Hat
-Message-ID: <6973893a-eda8-6128-b484-7c89c1dc5070@redhat.com>
-Date:   Mon, 27 Jul 2020 15:27:39 -0500
+        Mon, 27 Jul 2020 16:34:32 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC396C0619D4
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 13:34:32 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id gc9so10323965pjb.2
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 13:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=1e9h0tE+ElK0HWRPXiuc5VM0AhTp1F0sLszAnPFX/o4=;
+        b=ZafaxclzPZhVsXz8l83xVPlfPaaHGIsnBsq3YYS+6u818LolWPB9JvqcfE5gaa8xTt
+         xMeKMiEUoOBjhQEN30y00OvB3GJvnZCmHen3WlDqQl1atnjPNZzXQnXq13xWBdO0RqDk
+         UjBeZR8HAFCSn6EgK2imAOBWV4HTBBMGp+cS1LMXd97OoXjDVUB7TSQtJTGuKlyPFlGv
+         47hzCZYu25rqnnw5lCBm48U/PxTUsLm9HQwDcpHJ8BS5Iqy1eq8Y1QSbIF+igXGeLiaw
+         5kQb4Je9qd10su3MNHjyZt2WiZXA5AoXdEge+klxew2Fz7tViQhLADlu2el1GkI3bMX9
+         ko6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1e9h0tE+ElK0HWRPXiuc5VM0AhTp1F0sLszAnPFX/o4=;
+        b=mCP1TxLffaKfQAPERTp8NyEj2YwAP+8c84VeWu5e0g0B34n5dwj7U6XnMpSTjn98xK
+         NRjYBYig/Z6WFG/puU4HrsLywfJcoE+x6kDgr0XBQNx0TXLmuc/7fZ+EbJ+swTh8OPwF
+         iZoe9gDhpq+e0HbSsrP+YaN8MpnbXu/2pBjY80vEt/AK7BR3iWWOC5DH5kBZJJUEM858
+         ikr5WGr4QbwA7P/sMVe8dbG3p4ke3lG4V7yhSS9EhhSaM+IwEmwcWthjb1S/wnovqAOF
+         pVCIkrvmSl5DskgYWR9a4eYUBGASTu/OgrLfPcJfoMVT7EvJZNsOzi4KAt+pyYqE5Elw
+         fDpw==
+X-Gm-Message-State: AOAM530xhXsPAdwCBSmXVHofksVOlCQjPRXy6w3S3gKxirvSYSfrXTzR
+        kPZBdt6C8GuIlpjTTkSJTFIl+w==
+X-Google-Smtp-Source: ABdhPJwgxPuj693Id+Oo3CVUmOizUrGVehGlzvteg1ajBPCJTwzcrqE4V3UY3qCfXHxGAvoiCewkzg==
+X-Received: by 2002:a17:90b:120a:: with SMTP id gl10mr927614pjb.44.1595882072153;
+        Mon, 27 Jul 2020 13:34:32 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id u26sm16345833pfn.54.2020.07.27.13.34.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Jul 2020 13:34:31 -0700 (PDT)
+Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
+To:     Kanchan Joshi <joshiiitr@gmail.com>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, viro@zeniv.linux.org.uk,
+        bcrl@kvack.org, Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+References: <1595605762-17010-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200724155350epcas5p3b8f1d59eda7f8fbb38c828f692d42fd6@epcas5p3.samsung.com>
+ <1595605762-17010-7-git-send-email-joshi.k@samsung.com>
+ <f5416bd4-93b3-4d14-3266-bdbc4ae1990b@kernel.dk>
+ <CA+1E3rJAa3E2Ti0fvvQTzARP797qge619m4aYLjXeR3wxdFwWw@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b0b7159d-ed10-08ad-b6c7-b85d45f60d16@kernel.dk>
+Date:   Mon, 27 Jul 2020 14:34:28 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <90798655-0ee1-330f-cae4-937c4981563a@interlog.com>
+In-Reply-To: <CA+1E3rJAa3E2Ti0fvvQTzARP797qge619m4aYLjXeR3wxdFwWw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/20 2:17 PM, Douglas Gilbert wrote:
-> On 2020-07-27 1:42 p.m., Tony Asleson wrote:
->> On 7/27/20 11:46 AM, Hannes Reinecke wrote:
->>> On 7/27/20 5:45 PM, Tony Asleson wrote:
->>>> On 7/26/20 10:10 AM, Christoph Hellwig wrote:
->>>>> FYI, I think these identifiers are absolutely horrible and have no
->>>>> business in dmesg:
->>>>
->>>> The identifiers are structured data, they're not visible unless you go
->>>> looking for them.
->>>>
->>>> I'm open to other suggestions on how we can positively identify storage
->>>> devices over time, across reboots, replacement, and dynamic
->>>> reconfiguration.
->>>>
->>>> My home system has 4 disks, 2 are identical except for serial number.
->>>> Even with this simple configuration, it's not trivial to identify which
->>>> message goes with which disk across reboots.
->>>>
->>> Well; the more important bits would be to identify the physical location
->>> where these disks reside.
->>> If one goes bad it doesn't really help you if have a persistent
->>> identification in the OS; what you really need is a physical indicator
->>> or a physical location allowing you to identify which disk to pull.
+On 7/27/20 1:16 PM, Kanchan Joshi wrote:
+> On Fri, Jul 24, 2020 at 10:00 PM Jens Axboe <axboe@kernel.dk> wrote:
 >>
->> In my use case I have no slot information.  I have no SCSI enclosure
->> services to toggle identification LEDs or fault LEDs for the drive sled.
->>   For some users the device might be a virtual one in a storage server,
->> vpd helps.
+>> On 7/24/20 9:49 AM, Kanchan Joshi wrote:
+>>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>>> index 7809ab2..6510cf5 100644
+>>> --- a/fs/io_uring.c
+>>> +++ b/fs/io_uring.c
+>>> @@ -1284,8 +1301,15 @@ static void __io_cqring_fill_event(struct io_kiocb *req, long res, long cflags)
+>>>       cqe = io_get_cqring(ctx);
+>>>       if (likely(cqe)) {
+>>>               WRITE_ONCE(cqe->user_data, req->user_data);
+>>> -             WRITE_ONCE(cqe->res, res);
+>>> -             WRITE_ONCE(cqe->flags, cflags);
+>>> +             if (unlikely(req->flags & REQ_F_ZONE_APPEND)) {
+>>> +                     if (likely(res > 0))
+>>> +                             WRITE_ONCE(cqe->res64, req->rw.append_offset);
+>>> +                     else
+>>> +                             WRITE_ONCE(cqe->res64, res);
+>>> +             } else {
+>>> +                     WRITE_ONCE(cqe->res, res);
+>>> +                     WRITE_ONCE(cqe->flags, cflags);
+>>> +             }
 >>
->> In my case the in kernel vpd (WWN) data can be used to correlate with
->> the sticker on the disk as the disks have the WWN printed on them.  I
->> would think this is true for most disks/storage devices, but obviously I
->> can't make that statement with 100% certainty as I have a small sample
->> size.
->>
->>> Which isn't addressed at all with this patchset (nor should it; the
->>> physical location it typically found via other means).
->>>
->>> And for the other use-cases: We do have persistent device links, do we
->>> not?
->>
->> How does /dev/disk/by-* help when you are looking at the journal from 1
->> or more reboots ago and the only thing you have in your journal is
->> something like:
->>
->> blk_update_request: critical medium error, dev sde, sector 43578 op
->> 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
->>
->> The links are only valid for right now.
+>> This would be nice to keep out of the fast path, if possible.
 > 
-> Does:
->    lsscsi -U
-> or
->    lsscsi -UU
+> I was thinking of keeping a function-pointer (in io_kiocb) during
+> submission. That would have avoided this check......but argument count
+> differs, so it did not add up.
+
+But that'd grow the io_kiocb just for this use case, which is arguably
+even worse. Unless you can keep it in the per-request private data,
+but there's no more room there for the regular read/write side.
+
+>>> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+>>> index 92c2269..2580d93 100644
+>>> --- a/include/uapi/linux/io_uring.h
+>>> +++ b/include/uapi/linux/io_uring.h
+>>> @@ -156,8 +156,13 @@ enum {
+>>>   */
+>>>  struct io_uring_cqe {
+>>>       __u64   user_data;      /* sqe->data submission passed back */
+>>> -     __s32   res;            /* result code for this event */
+>>> -     __u32   flags;
+>>> +     union {
+>>> +             struct {
+>>> +                     __s32   res;    /* result code for this event */
+>>> +                     __u32   flags;
+>>> +             };
+>>> +             __s64   res64;  /* appending offset for zone append */
+>>> +     };
+>>>  };
+>>
+>> Is this a compatible change, both for now but also going forward? You
+>> could randomly have IORING_CQE_F_BUFFER set, or any other future flags.
 > 
-> solve your problem, or come close?
+> Sorry, I didn't quite understand the concern. CQE_F_BUFFER is not
+> used/set for write currently, so it looked compatible at this point.
+
+Not worried about that, since we won't ever use that for writes. But it
+is a potential headache down the line for other flags, if they apply to
+normal writes.
+
+> Yes, no room for future flags for this operation.
+> Do you see any other way to enable this support in io-uring?
+
+Honestly I think the only viable option is as we discussed previously,
+pass in a pointer to a 64-bit type where we can copy the additional
+completion information to.
+
+>> Layout would also be different between big and little endian, so not
+>> even that easy to set aside a flag for this. But even if that was done,
+>> we'd still have this weird API where liburing or the app would need to
+>> distinguish this cqe from all others based on... the user_data? Hence
+>> liburing can't do it, only the app would be able to.
+>>
+>> Just seems like a hack to me.
 > 
-> Example:
-> # lsscsi -UU
-> [1:0:0:0]    disk    naa.5000cca02b38d0b8  /dev/sda
-> [1:0:1:0]    disk    naa.5000c5003011cb2b  /dev/sdb
-> [1:0:2:0]    enclosu naa.5001b4d516ecc03f  -
-> [N:0:1:1]    disk    eui.e8238fa6bf530001001b448b46bd5525    /dev/nvme0n1
-> 
-> The first two (SAS SSDs) NAAs are printed on the disk labels. I don't
-> think either that enclosure or the M2 NVMe SSD have their numbers
-> visible (i.e. the last two lines of output).
-> 
-> If it is what you want, then perhaps you could arrange for its output
-> to be sent to the log when the system has stabilized after a reboot. That
-> would only leave disk hotplug events exposed.
+> Yes, only user_data to distinguish. Do liburing helpers need to look
+> at cqe->res (and decide something) before returning the cqe to
+> application?
 
-Yes, if we write a new udev rule or script we could place bread crumbs
-in the journal so we can correlate
-sda == naa.5000cca02b38d0b8 at the time of the error.  However, none of
-the existing tooling will allow you to see all the log messages that
-pertain to the device easily.  The user is still left with a bunch of
-log messages that have different ways to refer to the same device
-attachment eg. sda, ata1.00, sd 0:0:0:0.  For them to understand which
-messages go with which device is not trivial.  Even if someone writes a
-tool to parse the messages, looking for the string that contains the ID
-and has the needed decoder information to associate it with the correct
-piece of hardware, it's only good until the message changes in the kernel.
+They generally don't, outside of the internal timeout. But it's an issue
+for the API, as it forces applications to handle the CQEs a certain way.
+Normally there's flexibility. This makes the append writes behave
+differently than everything else, which is never a good idea.
 
-If we stuff the defacto ID into the message itself when it occurs, the
-ambiguity of what device is associated with a message is removed.
-
-I would like to know, why this is so horrible?  Is it processing time in
-an error path?  Stack usage holding the data in flight, wasted disk
-space on disk?  Unique identifiers are just too long and terse?
-
-The only valid reason I can think of is someone working with very
-sensitive data and not wanting the unique ID of a removable or network
-storage device to be in their logs.  Of course we could add a disable
-boot time option for that or make the default off for those that don't
-want/care.
-
-> Faced with the above medium error I would try:
->    dd if=<all_possibles> bs=512 skip=43578 iflag=direct of=/dev/null
-> count=1
-> and look for noise in the logs. Change 'bs=512' up to 4096 if that is
-> the logical block size. For <all_possibles> use /dev/sde (and /dev/sdf and
-> /dev/dev/sdg or whatever) IOWs the _whole_ disk device name.
-
-Assuming the error reproduces, this would work.  However, I think this
-solution speaks volumes for how difficult it is to simply identify what
-device an error originated from.
-
--Tony
+-- 
+Jens Axboe
 
