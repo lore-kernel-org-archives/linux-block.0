@@ -2,125 +2,197 @@ Return-Path: <SRS0=68Kh=BG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC652C433E8
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 17:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 767E5C433E4
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 18:36:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91E3E2074F
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 17:42:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/Vl/Etv"
+	by mail.kernel.org (Postfix) with ESMTP id 5995120729
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 18:36:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729512AbgG0Rmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 13:42:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53308 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729097AbgG0Rml (ORCPT
+        id S1729469AbgG0SgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 14:36:12 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:40127 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728313AbgG0SgM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 13:42:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595871760;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GPJHj7p2LacY4Ta5KOq4eAi0+Ch16+e8ZHqKKvhaWG4=;
-        b=c/Vl/EtvxBerH1cgYxrhX+lYDSWJgPYFCpr6yjhXx4Alx4q3yw2aJDD/QIBtCTSTmbyDak
-        hP4rUWt0YVodMmClJ5gkLICV0I1rc3DxR+00wksP5cDO/sARerAGXqc2jYy8N6jq+P/srO
-        /fn/szN8xCK1rN1/c92dToRtzy/ce9I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-tb2Dog7AOUOfSPJ-dVwPuA-1; Mon, 27 Jul 2020 13:42:36 -0400
-X-MC-Unique: tb2Dog7AOUOfSPJ-dVwPuA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74B1E2D0;
-        Mon, 27 Jul 2020 17:42:34 +0000 (UTC)
-Received: from [10.3.128.8] (unknown [10.3.128.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C3A2A5C1BD;
-        Mon, 27 Jul 2020 17:42:32 +0000 (UTC)
-Reply-To: tasleson@redhat.com
-Subject: Re: [v4 00/11] Add persistent durable identifier to storage log
- messages
-To:     Hannes Reinecke <hare@suse.de>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, b.zolnierkie@samsung.com,
-        axboe@kernel.dk
-References: <20200724171706.1550403-1-tasleson@redhat.com>
- <20200726151035.GC20628@infradead.org>
- <e3184753-bda1-fcfd-5cc2-7aa865d420fd@redhat.com>
- <bd1fb6dc-9fc1-0ee2-13a4-d221f28442c6@suse.de>
-From:   Tony Asleson <tasleson@redhat.com>
-Organization: Red Hat
-Message-ID: <a67a11dc-1a5a-648a-7ef1-cf36d3a56518@redhat.com>
-Date:   Mon, 27 Jul 2020 12:42:31 -0500
+        Mon, 27 Jul 2020 14:36:12 -0400
+Received: by mail-pl1-f194.google.com with SMTP id l6so8562475plt.7
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 11:36:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5/iRfyPjaQoajA2PYsWzU8KDtKSbvhWEM8nxkAj9vrU=;
+        b=tOfWRpzshRonyqlmr6pngsfhbQokCVKO4wAnQmkIKUzYER1bT4MBcIkVaH4mspJMCG
+         mgOMbqxKzQ0Ftst7LJPkaMjAFnmIOQpb1v6kXzKefbmQ2UQ26ASYQCcqiNHB1MIk0xvR
+         DkzXTvaTnUSO30fox8dgKCXauDq1G/4pQ8+lx3wc0weYzTEF43jJgcoUbMIbVqRXd954
+         QhDtdTXFraPYirffvhRYQsdhxEwu3CdAj4uBAjq6ho3ZDnOJGU+62eNMr9d7yr9ChOTY
+         VGGbNKCKChbly2WPu7UhoDW7dbu0FXFamnKmEEe4wpjfPng+55MrjBIiNZSSsUyywxpa
+         6kwg==
+X-Gm-Message-State: AOAM532dS+sSxHf1WElNx514R5Usb729gHmsv5Bio1VLbxbnweTAuWD/
+        3bbKALg2JfXO3YLfkb08OhI=
+X-Google-Smtp-Source: ABdhPJxBMbYhr78xpaCXN8tdvoA5GDb1qATLaqyTOrnGO8ZcyQmjQ2Epo+HjB5shx3APQ9K2rol5ow==
+X-Received: by 2002:a17:902:b20a:: with SMTP id t10mr19269862plr.185.1595874971708;
+        Mon, 27 Jul 2020 11:36:11 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:5d7d:f206:b163:f30b? ([2601:647:4802:9070:5d7d:f206:b163:f30b])
+        by smtp.gmail.com with ESMTPSA id h131sm15860736pfe.138.2020.07.27.11.36.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Jul 2020 11:36:11 -0700 (PDT)
+Subject: Re: [PATCH v3 1/2] blk-mq: add async quiesce interface
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Chao Leng <lengchao@huawei.com>
+References: <20200726002301.145627-1-sagi@grimberg.me>
+ <20200726002301.145627-2-sagi@grimberg.me> <20200726093132.GD1110104@T590>
+ <9ac5f658-31b3-bb19-e5fe-385a629a7d67@grimberg.me>
+ <20200727020803.GC1129253@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <2c2ae567-6953-5b7f-2fa1-a65e287b5a9d@grimberg.me>
+Date:   Mon, 27 Jul 2020 11:36:08 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <bd1fb6dc-9fc1-0ee2-13a4-d221f28442c6@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200727020803.GC1129253@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/20 11:46 AM, Hannes Reinecke wrote:
-> On 7/27/20 5:45 PM, Tony Asleson wrote:
->> On 7/26/20 10:10 AM, Christoph Hellwig wrote:
->>> FYI, I think these identifiers are absolutely horrible and have no
->>> business in dmesg:
->>
->> The identifiers are structured data, they're not visible unless you go
->> looking for them.
->>
->> I'm open to other suggestions on how we can positively identify storage
->> devices over time, across reboots, replacement, and dynamic
->> reconfiguration.
->>
->> My home system has 4 disks, 2 are identical except for serial number.
->> Even with this simple configuration, it's not trivial to identify which
->> message goes with which disk across reboots.
->>
-> Well; the more important bits would be to identify the physical location
-> where these disks reside.
-> If one goes bad it doesn't really help you if have a persistent
-> identification in the OS; what you really need is a physical indicator
-> or a physical location allowing you to identify which disk to pull.
 
-In my use case I have no slot information.  I have no SCSI enclosure
-services to toggle identification LEDs or fault LEDs for the drive sled.
- For some users the device might be a virtual one in a storage server,
-vpd helps.
-
-In my case the in kernel vpd (WWN) data can be used to correlate with
-the sticker on the disk as the disks have the WWN printed on them.  I
-would think this is true for most disks/storage devices, but obviously I
-can't make that statement with 100% certainty as I have a small sample size.
-
-> Which isn't addressed at all with this patchset (nor should it; the
-> physical location it typically found via other means).
+>>>> +void blk_mq_quiesce_queue_async(struct request_queue *q)
+>>>> +{
+>>>> +	struct blk_mq_hw_ctx *hctx;
+>>>> +	unsigned int i;
+>>>> +
+>>>> +	blk_mq_quiesce_queue_nowait(q);
+>>>> +
+>>>> +	queue_for_each_hw_ctx(q, hctx, i) {
+>>>> +		init_completion(&hctx->rcu_sync.completion);
+>>>> +		init_rcu_head(&hctx->rcu_sync.head);
+>>>> +		if (hctx->flags & BLK_MQ_F_BLOCKING)
+>>>> +			call_srcu(hctx->srcu, &hctx->rcu_sync.head,
+>>>> +				wakeme_after_rcu);
+>>>> +		else
+>>>> +			call_rcu(&hctx->rcu_sync.head,
+>>>> +				wakeme_after_rcu);
+>>>> +	}
+>>>
+>>> Looks not necessary to do anything in case of !BLK_MQ_F_BLOCKING, and single
+>>> synchronize_rcu() is OK for all hctx during waiting.
+>>
+>> That's true, but I want a single interface for both. v2 had exactly
+>> that, but I decided that this approach is better.
 > 
-> And for the other use-cases: We do have persistent device links, do we
-> not?
+> Not sure one new interface is needed, and one simple way is to:
+> 
+> 1) call blk_mq_quiesce_queue_nowait() for each request queue
+> 
+> 2) wait in driver specific way
+> 
+> Or just wondering why nvme doesn't use set->tag_list to retrieve NS,
+> then you may add per-tagset APIs for the waiting.
 
-How does /dev/disk/by-* help when you are looking at the journal from 1
-or more reboots ago and the only thing you have in your journal is
-something like:
+Because it puts assumptions on how quiesce works, which is something
+I'd like to avoid because I think its cleaner, what do others think?
+Jens? Christoph?
 
-blk_update_request: critical medium error, dev sde, sector 43578 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+>> Also, having the driver call a single synchronize_rcu isn't great
+> 
+> Too many drivers are using synchronize_rcu():
+> 
+> 	$ git grep -n synchronize_rcu ./drivers/ | wc
+> 	    186     524   11384
 
-The links are only valid for right now.
+Wasn't talking about the usage of synchronize_rcu, was referring to
+the hidden assumption that quiesce is an rcu driven operation.
 
--Tony
+>> layering (as quiesce can possibly use a different mechanism in the future).
+> 
+> What is the different mechanism?
 
+Nothing specific, just said that having drivers assume that quiesce is
+synchronizing rcu or srcu is not great.
+
+>> So drivers assumptions like:
+>>
+>>          /*
+>>           * SCSI never enables blk-mq's BLK_MQ_F_BLOCKING flag so
+>>           * calling synchronize_rcu() once is enough.
+>>           */
+>>          WARN_ON_ONCE(shost->tag_set.flags & BLK_MQ_F_BLOCKING);
+>>
+>>          if (!ret)
+>>                  synchronize_rcu();
+>>
+>> Are not great...
+> 
+> Both rcu read lock/unlock and synchronize_rcu is global interface, then
+> it is reasonable to avoid unnecessary synchronize_rcu().
+
+Again, the fact that quiesce translates to synchronize rcu/srcu based
+on the underlying tagset is implicit.
+
+>>>> +}
+>>>> +EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_async);
+>>>> +
+>>>> +void blk_mq_quiesce_queue_async_wait(struct request_queue *q)
+>>>> +{
+>>>> +	struct blk_mq_hw_ctx *hctx;
+>>>> +	unsigned int i;
+>>>> +
+>>>> +	queue_for_each_hw_ctx(q, hctx, i) {
+>>>> +		wait_for_completion(&hctx->rcu_sync.completion);
+>>>> +		destroy_rcu_head(&hctx->rcu_sync.head);
+>>>> +	}
+>>>> +}
+>>>> +EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_async_wait);
+>>>> +
+>>>>    /**
+>>>>     * blk_mq_quiesce_queue() - wait until all ongoing dispatches have finished
+>>>>     * @q: request queue.
+>>>> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+>>>> index 23230c1d031e..5536e434311a 100644
+>>>> --- a/include/linux/blk-mq.h
+>>>> +++ b/include/linux/blk-mq.h
+>>>> @@ -5,6 +5,7 @@
+>>>>    #include <linux/blkdev.h>
+>>>>    #include <linux/sbitmap.h>
+>>>>    #include <linux/srcu.h>
+>>>> +#include <linux/rcupdate_wait.h>
+>>>>    struct blk_mq_tags;
+>>>>    struct blk_flush_queue;
+>>>> @@ -170,6 +171,7 @@ struct blk_mq_hw_ctx {
+>>>>    	 */
+>>>>    	struct list_head	hctx_list;
+>>>> +	struct rcu_synchronize	rcu_sync;
+>>> The above struct takes at least 5 words, and I'd suggest to avoid it,
+>>> and the hctx->srcu should be re-used for waiting BLK_MQ_F_BLOCKING.
+>>> Meantime !BLK_MQ_F_BLOCKING doesn't need it.
+>>
+>> It is at the end and contains exactly what is needed to synchronize. Not
+> 
+> The sync is simply single global synchronize_rcu(), and why bother to add
+> extra >=40bytes for each hctx.
+
+We can use the heap for this, but it will slow down the operation. Not
+sure if this is really meaningful given that it is in the end of the
+struct...
+
+We cannot use the stack, because we do the wait asynchronously.
+
+>> sure what you mean by reuse hctx->srcu?
+> 
+> You already reuses hctx->srcu, but not see reason to add extra rcu_synchronize
+> to each hctx for just simulating one single synchronize_rcu().
+
+That is my preference, I don't want nvme or other drivers to take a
+different route for blocking vs. non-bloking based on
