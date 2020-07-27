@@ -2,109 +2,115 @@ Return-Path: <SRS0=68Kh=BG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17718C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 18:40:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B52C433E5
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 19:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 044E420729
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 18:40:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 473F2207BB
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 19:02:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIpehUOt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729434AbgG0Sk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 14:40:28 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:37505 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728464AbgG0Sk1 (ORCPT
+        id S1728079AbgG0TCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 15:02:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726897AbgG0TCJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 14:40:27 -0400
-Received: by mail-pl1-f194.google.com with SMTP id p1so8574703pls.4
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 11:40:27 -0700 (PDT)
+        Mon, 27 Jul 2020 15:02:09 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511B8C061794;
+        Mon, 27 Jul 2020 12:02:09 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id a19so1986129qvy.3;
+        Mon, 27 Jul 2020 12:02:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=uPEUCGwUhu6gC7effbwPg+v6omwHm9FSYu/MnszzrTw=;
+        b=CIpehUOt0pFLGtZUceSvBaC7bKoxZRO5SIVUlQxu72u1BpL2T7RsEqJZkmlZgbQlNI
+         ytkyQCLn2n1RnVX+H6GtBKDp9qt8SAvZpm+2KnCzJD1HwCKKDqzR1jYaRyopVDaNCv9s
+         wXE2QZvRW2KliOdYmLGCiSjgteZdqeX6yWfWIceG+rdnBhUECimGxWr4I/vf0lIeubN/
+         092IvLfWVygDK6Uzi4Fjb4JPPrGBf2Lz5twZNdFtfUgwfT6lg5vUcDV/tD0uGvNIFGg4
+         QX4TrAF1mhaZZhLCC0oWLJOgeYHHZOlxlDWwZ4ztcNmURs54knHDYuGFLPELdHHT9TCB
+         /K1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rC7Tk0r3xbJ5Oshs2cMtEw58Q2CIxkR3NVrOAGPz33w=;
-        b=YOsZ9w2guMFQEEhuaq+8NNoGncg7mUb8ZAqWrz6dm8gW7lBkAX4FFF1VHE43pl6hj4
-         vLcxS++Bu6+RZVzntXb36FrSjSpg1zoV75/HPEY8rVsd9tC6jSYhiEgmhSiNbF791SEI
-         JNDNvhD0uVBh4lakBeM3prFH6Jfiq1lQwqbHM90s4rxp3kNMlgs8hAFQ7/8hOjUsG6GY
-         KbkD/KG58q2S6en8QEoTjAteBxuRq/BIZxY7X9VRZzYowyLpNZoZjyN/23242BudxAn7
-         8yODhvslqalguq9+ANOK2Re8EPppeNOgSsSuzqOFtK1zss3nVZOHh1NeHfT3eJYK3u5F
-         BtwQ==
-X-Gm-Message-State: AOAM530536qVzebwCgohTNEFvgKrGXaA1TeO7mqJK9B30VgK5wrIOxnx
-        i+A1hukMSbLxUQMVDI1rRTI=
-X-Google-Smtp-Source: ABdhPJw2p7qTeYU2hJoAWFP3Sk8Bc8KLs/DYH7ECspsJSzpvEL0TKMzDwu8WLSFZNDMqB2G/rUFlxg==
-X-Received: by 2002:a17:90a:d195:: with SMTP id fu21mr606720pjb.100.1595875226860;
-        Mon, 27 Jul 2020 11:40:26 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:5d7d:f206:b163:f30b? ([2601:647:4802:9070:5d7d:f206:b163:f30b])
-        by smtp.gmail.com with ESMTPSA id i128sm15685492pfe.74.2020.07.27.11.40.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jul 2020 11:40:26 -0700 (PDT)
-Subject: Re: [PATCH v3 1/2] blk-mq: add async quiesce interface
-To:     Ming Lei <ming.lei@redhat.com>, Chao Leng <lengchao@huawei.com>
-Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        linux-nvme@lists.infradead.org
-References: <20200726002301.145627-1-sagi@grimberg.me>
- <20200726002301.145627-2-sagi@grimberg.me> <20200726093132.GD1110104@T590>
- <9ac5f658-31b3-bb19-e5fe-385a629a7d67@grimberg.me>
- <20200727020803.GC1129253@T590>
- <f9ed3baa-2a83-c483-6ba0-70a84d40f569@huawei.com>
- <20200727035033.GD1129253@T590>
- <79ab699e-3f50-26c0-3c85-1962ae4dedac@huawei.com>
- <20200727063220.GA1144698@T590>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <f23c66b8-8c93-4b4d-56ab-dd17e9ddf4a2@grimberg.me>
-Date:   Mon, 27 Jul 2020 11:40:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=uPEUCGwUhu6gC7effbwPg+v6omwHm9FSYu/MnszzrTw=;
+        b=rprPbP/DjpHBlxj0YU7KVKeAx9NjDNFLD0U2GxPA2+C5/VAnbBNtGcU/f1SIcs/mY/
+         /snB1zAAhaa2i7T4izGz6KXjwVnl934vPN29kJN4CkCaOmBx2f8DZOQckvdNOXKikAgl
+         VmbTBlkLo6b8RDSrnTHlKXboYAmDMIenxHPc2bebwgvW1r1nadNXQuZbUBcTHHTN+qZl
+         on6+5PQhUAmYlzMoik7uf7itj7MYzulEi9laECXRJuPv1dznpmloxTkZYoILzKGtNAtr
+         bfggl0w3SbBEzVbtPtU0qWyIsrs15RL+QuFQGrGFh2mWVZWvqkSaRZOo7220YeRikBfe
+         Bn9Q==
+X-Gm-Message-State: AOAM531Tb+SgLosve1WIsReDQRi+Lw6JgvVozVp/06I1tFcUAC9xtnhZ
+        3q77kJWIPuzqJdtu/D9VdH0l4DqoAg==
+X-Google-Smtp-Source: ABdhPJxl55vKVbiqhnwds/IIJ1yz9AlsuPAU+JHNpS/sdbZCaQOhnqlEjfFyhJfVgvLP1VrKW1oURQ==
+X-Received: by 2002:ad4:4ead:: with SMTP id ed13mr8757280qvb.161.1595876528455;
+        Mon, 27 Jul 2020 12:02:08 -0700 (PDT)
+Received: from localhost.localdomain ([209.94.141.207])
+        by smtp.gmail.com with ESMTPSA id 6sm18964139qkj.134.2020.07.27.12.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jul 2020 12:02:07 -0700 (PDT)
+From:   Peilin Ye <yepeilin.cs@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Peilin Ye <yepeilin.cs@gmail.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [Linux-kernel-mentees] [PATCH v2] block/scsi-ioctl: Prevent kernel-infoleak in scsi_put_cdrom_generic_arg()
+Date:   Mon, 27 Jul 2020 15:00:13 -0400
+Message-Id: <20200727190013.324812-1-yepeilin.cs@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200727161932.322955-1-yepeilin.cs@gmail.com>
+References: <20200727161932.322955-1-yepeilin.cs@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200727063220.GA1144698@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+scsi_put_cdrom_generic_arg() is copying uninitialized stack memory to
+userspace due to the compiler not initializing holes in statically
+allocated structures. Fix it by adding a padding field to `struct
+compat_cdrom_generic_command`.
 
->>>>>> It is at the end and contains exactly what is needed to synchronize. Not
->>>>> The sync is simply single global synchronize_rcu(), and why bother to add
->>>>> extra >=40bytes for each hctx.
->>>>>
->>>>>> sure what you mean by reuse hctx->srcu?
->>>>> You already reuses hctx->srcu, but not see reason to add extra rcu_synchronize
->>>>> to each hctx for just simulating one single synchronize_rcu().
->>>>
->>>> To sync srcu together, the extra bytes must be needed, seperate blocking
->>>> and non blocking queue to two hctx may be a not good choice.
->>>>
->>>> There is two choice: the struct rcu_synchronize is added in hctx or in srcu.
->>>> Though add rcu_synchronize in srcu has a  weakness: the extra bytes is
->>>> not need if which do not need batch sync srcu, I still think it's better
->>>> for the SRCU to provide the batch synchronization interface.
->>>
->>> The 'struct rcu_synchronize' can be allocated from heap or even stack(
->>> if no too many NSs), which is just one shot sync and the API is supposed
->>> to be called in slow path. No need to allocate it as long lifetime variable.
->>> Especially 'struct srcu_struct' has already been too fat.
->>
->> Stack is not suitable, stack can not provide so many space for
-> 
-> Stack is fine if number of NS is small, for example, most of times,
-> there is just one NS.
+Cc: stable@vger.kernel.org
+Fixes: f3ee6e63a9df ("compat_ioctl: move CDROM_SEND_PACKET handling into scsi")
+Suggested-by: Dan Carpenter <dan.carpenter@oracle.com>
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
+---
+Change in v2:
+    - Add a padding field to `struct compat_cdrom_generic_command`,
+      instead of doing memset() on `cgc32`. (Suggested by Jens Axboe
+      <axboe@kernel.dk>)
 
-I prefer a single code-path, so stack is not good.
+ block/scsi_ioctl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->> many name space. Heap maybe a choice, but need to add abnormal treat
->> when alloc memory failed, Thus io pause time can not be ensured.
->> So the extra space may must be needed for batch srcu sync.
-> 
-> In case of allocation failure, you can switch to synchronize_srcu() simply.
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index ef722f04f88a..72108404718f 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -651,6 +651,7 @@ struct compat_cdrom_generic_command {
+ 	compat_int_t	stat;
+ 	compat_caddr_t	sense;
+ 	unsigned char	data_direction;
++	unsigned char	pad[3];
+ 	compat_int_t	quiet;
+ 	compat_int_t	timeout;
+ 	compat_caddr_t	reserved[1];
+-- 
+2.25.1
 
-that is possible, but I still prefer to support both srcu and rcu hctx
-in a single interface so I don't need to have different code paths in
-nvme (or other drivers).
