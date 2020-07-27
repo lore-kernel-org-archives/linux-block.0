@@ -2,144 +2,125 @@ Return-Path: <SRS0=68Kh=BG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 870AAC433E3
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 17:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC652C433E8
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 17:42:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E6E220672
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 17:25:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91E3E2074F
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 17:42:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/Vl/Etv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730690AbgG0RZd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 13:25:33 -0400
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:36578 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726617AbgG0RZd (ORCPT
+        id S1729512AbgG0Rmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 13:42:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53308 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729097AbgG0Rml (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 13:25:33 -0400
-Received: by mail-pj1-f67.google.com with SMTP id ha11so2631191pjb.1;
-        Mon, 27 Jul 2020 10:25:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aNt663yDzifzzB0XK1Rn3vQdJUzIbPRGw9BRhlu+BgI=;
-        b=VicB0PepQcwIzEF73B1eE8t73zu7gGSrVgXVDIhjZkiQqCee3/27vUFZLSX59pwPM+
-         O2uzKLAe2RCZfZNIrNF0OlgaXzSJwI+6AyBos0HDPdSHY5UEVwsVtNLASQ2D1Jf/vFW0
-         CQxpRcyN3g0cnd7qKORFS3mFynoFiR/NOMmc88eOWywJxGGzCmKM22RRBWDKBeF5V2YT
-         /jRfRFLhmFW0isrKV/pXKC4VSoV0mTXBs+HhhJA9vy3Mnbs208h58wY0gyj7oRrbov7p
-         ndGt93BtpTWmTFkzb0rBBDP89JgXWW+sRyKa9DOLOuYAaoJC8tb3EpZM5O9ww8lHcygC
-         smCA==
-X-Gm-Message-State: AOAM531jqvMDeX8wdfYrpyVfFZMoB3qTxgczOl2371aa7GDTFtY+GAKF
-        QZcfXcGhHwzeNevzedNhLio7dFHI
-X-Google-Smtp-Source: ABdhPJwUsW0OrmXzZI8dD+BwqaXmVKJG1zwM2eWYgiCDypR1jFOoZNeU280jcxCdzhCI8GCiXVaXyg==
-X-Received: by 2002:a17:902:bc49:: with SMTP id t9mr9726393plz.20.1595870731350;
-        Mon, 27 Jul 2020 10:25:31 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:5d7d:f206:b163:f30b? ([2601:647:4802:9070:5d7d:f206:b163:f30b])
-        by smtp.gmail.com with ESMTPSA id k23sm15148773pgb.92.2020.07.27.10.25.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jul 2020 10:25:30 -0700 (PDT)
-Subject: Re: [PATCH 1/2] nvme-tcp: use sendpage_ok() to check page for
- kernel_sendpage()
-To:     Coly Li <colyli@suse.de>, philipp.reisner@linbit.com,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-bcache@vger.kernel.org, hch@lst.de
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, Jan Kara <jack@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Vlastimil Babka <vbabka@suse.com>, stable@vger.kernel.org
-References: <20200726135224.107516-1-colyli@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <f6cf7563-9d8c-baa8-e8e7-e41f9b13e787@grimberg.me>
-Date:   Mon, 27 Jul 2020 10:25:29 -0700
+        Mon, 27 Jul 2020 13:42:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595871760;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GPJHj7p2LacY4Ta5KOq4eAi0+Ch16+e8ZHqKKvhaWG4=;
+        b=c/Vl/EtvxBerH1cgYxrhX+lYDSWJgPYFCpr6yjhXx4Alx4q3yw2aJDD/QIBtCTSTmbyDak
+        hP4rUWt0YVodMmClJ5gkLICV0I1rc3DxR+00wksP5cDO/sARerAGXqc2jYy8N6jq+P/srO
+        /fn/szN8xCK1rN1/c92dToRtzy/ce9I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-511-tb2Dog7AOUOfSPJ-dVwPuA-1; Mon, 27 Jul 2020 13:42:36 -0400
+X-MC-Unique: tb2Dog7AOUOfSPJ-dVwPuA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74B1E2D0;
+        Mon, 27 Jul 2020 17:42:34 +0000 (UTC)
+Received: from [10.3.128.8] (unknown [10.3.128.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C3A2A5C1BD;
+        Mon, 27 Jul 2020 17:42:32 +0000 (UTC)
+Reply-To: tasleson@redhat.com
+Subject: Re: [v4 00/11] Add persistent durable identifier to storage log
+ messages
+To:     Hannes Reinecke <hare@suse.de>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, b.zolnierkie@samsung.com,
+        axboe@kernel.dk
+References: <20200724171706.1550403-1-tasleson@redhat.com>
+ <20200726151035.GC20628@infradead.org>
+ <e3184753-bda1-fcfd-5cc2-7aa865d420fd@redhat.com>
+ <bd1fb6dc-9fc1-0ee2-13a4-d221f28442c6@suse.de>
+From:   Tony Asleson <tasleson@redhat.com>
+Organization: Red Hat
+Message-ID: <a67a11dc-1a5a-648a-7ef1-cf36d3a56518@redhat.com>
+Date:   Mon, 27 Jul 2020 12:42:31 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200726135224.107516-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <bd1fb6dc-9fc1-0ee2-13a4-d221f28442c6@suse.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 7/27/20 11:46 AM, Hannes Reinecke wrote:
+> On 7/27/20 5:45 PM, Tony Asleson wrote:
+>> On 7/26/20 10:10 AM, Christoph Hellwig wrote:
+>>> FYI, I think these identifiers are absolutely horrible and have no
+>>> business in dmesg:
+>>
+>> The identifiers are structured data, they're not visible unless you go
+>> looking for them.
+>>
+>> I'm open to other suggestions on how we can positively identify storage
+>> devices over time, across reboots, replacement, and dynamic
+>> reconfiguration.
+>>
+>> My home system has 4 disks, 2 are identical except for serial number.
+>> Even with this simple configuration, it's not trivial to identify which
+>> message goes with which disk across reboots.
+>>
+> Well; the more important bits would be to identify the physical location
+> where these disks reside.
+> If one goes bad it doesn't really help you if have a persistent
+> identification in the OS; what you really need is a physical indicator
+> or a physical location allowing you to identify which disk to pull.
 
+In my use case I have no slot information.  I have no SCSI enclosure
+services to toggle identification LEDs or fault LEDs for the drive sled.
+ For some users the device might be a virtual one in a storage server,
+vpd helps.
 
-On 7/26/20 6:52 AM, Coly Li wrote:
-> Currently nvme_tcp_try_send_data() doesn't use kernel_sendpage() to
-> send slab pages. But for pages allocated by __get_free_pages() without
-> __GFP_COMP, which also have refcount as 0, they are still sent by
-> kernel_sendpage() to remote end, this is problematic.
-> 
-> When bcache uses a remote NVMe SSD via nvme-over-tcp as its cache
-> device, writing meta data e.g. cache_set->disk_buckets to remote SSD may
-> trigger a kernel panic due to the above problem. Bcause the meta data
-> pages for cache_set->disk_buckets are allocated by __get_free_pages()
-> without __GFP_COMP.
-> 
-> This problem should be fixed both in upper layer driver (bcache) and
-> nvme-over-tcp code. This patch fixes the nvme-over-tcp code by checking
-> whether the page refcount is 0, if yes then don't use kernel_sendpage()
-> and call sock_no_sendpage() to send the page into network stack.
-> 
-> Such check is done by macro sendpage_ok() in this patch, which is defined
-> in include/linux/net.h as,
-> 	(!PageSlab(page) && page_count(page) >= 1)
-> If sendpage_ok() returns false, sock_no_sendpage() will handle the page
-> other than kernel_sendpage().
-> 
-> The code comments in this patch is copied and modified from drbd where
-> the similar problem already gets solved by Philipp Reisner. This is the
-> best code comment including my own version.
-> 
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Jan Kara <jack@suse.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
-> Cc: Philipp Reisner <philipp.reisner@linbit.com>
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Cc: Vlastimil Babka <vbabka@suse.com>
-> Cc: stable@vger.kernel.org
-> ---
-> Changelog:
-> v3: introduce a more common name sendpage_ok() for the open coded check
-> v2: fix typo in patch subject.
-> v1: the initial version.
-> 
->   drivers/nvme/host/tcp.c | 13 +++++++++++--
->   include/linux/net.h     |  2 ++
->   2 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 79ef2b8e2b3c..f9952f6d94b9 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -887,8 +887,17 @@ static int nvme_tcp_try_send_data(struct nvme_tcp_request *req)
->   		else
->   			flags |= MSG_MORE | MSG_SENDPAGE_NOTLAST;
->   
-> -		/* can't zcopy slab pages */
-> -		if (unlikely(PageSlab(page))) {
-> +		/*
-> +		 * e.g. XFS meta- & log-data is in slab pages, or bcache meta
-> +		 * data pages, or other high order pages allocated by
-> +		 * __get_free_pages() without __GFP_COMP, which have a page_count
-> +		 * of 0 and/or have PageSlab() set. We cannot use send_page for
-> +		 * those, as that does get_page(); put_page(); and would cause
-> +		 * either a VM_BUG directly, or __page_cache_release a page that
-> +		 * would actually still be referenced by someone, leading to some
-> +		 * obscure delayed Oops somewhere else.
-> +		 */
+In my case the in kernel vpd (WWN) data can be used to correlate with
+the sticker on the disk as the disks have the WWN printed on them.  I
+would think this is true for most disks/storage devices, but obviously I
+can't make that statement with 100% certainty as I have a small sample size.
 
-I was hoping that this comment would move to the helper as well.
+> Which isn't addressed at all with this patchset (nor should it; the
+> physical location it typically found via other means).
+> 
+> And for the other use-cases: We do have persistent device links, do we
+> not?
 
-Agree with Christoph comment as well.
+How does /dev/disk/by-* help when you are looking at the journal from 1
+or more reboots ago and the only thing you have in your journal is
+something like:
+
+blk_update_request: critical medium error, dev sde, sector 43578 op
+0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+
+The links are only valid for right now.
+
+-Tony
+
