@@ -2,88 +2,129 @@ Return-Path: <SRS0=68Kh=BG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFD3C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 15:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19073C433E3
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 16:21:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33E8A20775
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 15:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4D6420719
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 16:21:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0JHIb1R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="juLbmz0+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728970AbgG0Ppj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 11:45:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46796 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728851AbgG0Ppi (ORCPT
+        id S1728364AbgG0QVB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 12:21:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726887AbgG0QVA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 11:45:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595864738;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2ehKZE7hXFk/qNeJii6krvpOJtqjgsejGlg6rhFX8+M=;
-        b=M0JHIb1RazOKNTcC+H13bXeiqc3AJpK3ztzn2bP1Cddx7/sftdpAecIlm2y1VN+FK3QKNX
-        uYHS56aTl5/1+zfs3qhh7yOx8NT7Icqe4xtwm2tRQfnAWaCqanrku815EHcJnTaliYAyFY
-        plQIanMNY0806MBltO9uWIHGX/ioxOA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-ht2TwzmtM9COOM4_UkitGw-1; Mon, 27 Jul 2020 11:45:35 -0400
-X-MC-Unique: ht2TwzmtM9COOM4_UkitGw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55C5D8005B0;
-        Mon, 27 Jul 2020 15:45:34 +0000 (UTC)
-Received: from [10.3.128.8] (unknown [10.3.128.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F077460BF4;
-        Mon, 27 Jul 2020 15:45:32 +0000 (UTC)
-Reply-To: tasleson@redhat.com
-Subject: Re: [v4 00/11] Add persistent durable identifier to storage log
- messages
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, b.zolnierkie@samsung.com,
-        axboe@kernel.dk
-References: <20200724171706.1550403-1-tasleson@redhat.com>
- <20200726151035.GC20628@infradead.org>
-From:   Tony Asleson <tasleson@redhat.com>
-Organization: Red Hat
-Message-ID: <e3184753-bda1-fcfd-5cc2-7aa865d420fd@redhat.com>
-Date:   Mon, 27 Jul 2020 10:45:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Mon, 27 Jul 2020 12:21:00 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEBCC061794;
+        Mon, 27 Jul 2020 09:21:00 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id l64so8967284qkb.8;
+        Mon, 27 Jul 2020 09:21:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aSoHQvLtd5ehDIvkD8A1Zun/yggItMDxrrpLUadcTAw=;
+        b=juLbmz0+JADoY8hY7mPFfnPgqKsiLXa0/ZgsIsQPxwvBK+1zwoDSgnIwXFJhYAR+gC
+         DJHq2rzYTmyPErBh5QLZHYnbsZpKTjOogHny+MBb3CWI982UcI2cTMaYevepp+WCpbwX
+         bbAzsBezBxuV4ay8eJK8XSkYU8EHHTI4hAdStJF8ke/Zl75p5VXt0/uIfeltJCK+1PvZ
+         f2rv+5YAtO+RdeduZ7zZASG2RVdhv1kO4ZJFOmBQzOinPd15qZz+mW/p/SJjkd1R7cJO
+         buFIg6mybDExlZ2tynfPs7QG33RdRIEFrs3ZQzsV5mOJ8lP4u9OhypU8LVxSduhBipAC
+         YFdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aSoHQvLtd5ehDIvkD8A1Zun/yggItMDxrrpLUadcTAw=;
+        b=EfeeER53SGYmgzVo2juW2p18oYNL7kHTJ2Uj9HTtaZMBX19pfrPTbjgSpSqpvH8nif
+         uXdHtuFMm5Bx65huyRT4vSdsVR/cYC5XnCjbtGPtgsKDlI1GRwsNkQ5949jH8qTVNA3z
+         UbxNI0w1rEuQ/ZfuA3A7G8qgIbQPh97bZGP0YevaNaFIQsCXIBLjevrI4eHYo/ZOHivs
+         OSM5Ylh3bH+5jvEPjTrCyQ20CVBELwdzP+owvkt4hhyvolfem0iGPTv82UABdSXj4fkp
+         vKLcx0Zf/ez0hYxs9CSLBszi+LNCkQrUKU9wwbYRoxq1RYBl6RL3QLY1fFSX1pQoj8g2
+         CyaA==
+X-Gm-Message-State: AOAM5314Wn+dGmfVumzFnoQK7DAwZI6rb+q3+gnyHVYppV0/gEEegIKi
+        Mq7NP9YL1qWBTBnufPuokA==
+X-Google-Smtp-Source: ABdhPJymMFQ2ThC0j3BgCcKt/GLFsB37J7SQMX+TN/oVIkqpTBpZ57IPOEMMqcpXXWsqB/0S9Ax25g==
+X-Received: by 2002:a37:ad0a:: with SMTP id f10mr16945474qkm.154.1595866859791;
+        Mon, 27 Jul 2020 09:20:59 -0700 (PDT)
+Received: from localhost.localdomain ([209.94.141.207])
+        by smtp.gmail.com with ESMTPSA id b186sm19081811qkd.28.2020.07.27.09.20.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jul 2020 09:20:59 -0700 (PDT)
+From:   Peilin Ye <yepeilin.cs@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Peilin Ye <yepeilin.cs@gmail.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [Linux-kernel-mentees] [PATCH] block/scsi-ioctl: Prevent kernel-infoleak in scsi_put_cdrom_generic_arg()
+Date:   Mon, 27 Jul 2020 12:19:32 -0400
+Message-Id: <20200727161932.322955-1-yepeilin.cs@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200726151035.GC20628@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/26/20 10:10 AM, Christoph Hellwig wrote:
-> FYI, I think these identifiers are absolutely horrible and have no
-> business in dmesg:
+scsi_put_cdrom_generic_arg() is copying uninitialized stack memory to
+userspace due to the compiler not initializing holes in statically
+allocated structures. Fix it by initializing `cgc32` using memset().
 
-The identifiers are structured data, they're not visible unless you go
-looking for them.
+Cc: stable@vger.kernel.org
+Fixes: f3ee6e63a9df ("compat_ioctl: move CDROM_SEND_PACKET handling into scsi")
+Suggested-by: Dan Carpenter <dan.carpenter@oracle.com>
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
+---
+ block/scsi_ioctl.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-I'm open to other suggestions on how we can positively identify storage
-devices over time, across reboots, replacement, and dynamic reconfiguration.
-
-My home system has 4 disks, 2 are identical except for serial number.
-Even with this simple configuration, it's not trivial to identify which
-message goes with which disk across reboots.
-
--Tony
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index ef722f04f88a..1b7f85634751 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -692,16 +692,19 @@ static int scsi_put_cdrom_generic_arg(const struct cdrom_generic_command *cgc,
+ {
+ #ifdef CONFIG_COMPAT
+ 	if (in_compat_syscall()) {
+-		struct compat_cdrom_generic_command cgc32 = {
+-			.buffer		= (uintptr_t)(cgc->buffer),
+-			.buflen		= cgc->buflen,
+-			.stat		= cgc->stat,
+-			.sense		= (uintptr_t)(cgc->sense),
+-			.data_direction	= cgc->data_direction,
+-			.quiet		= cgc->quiet,
+-			.timeout	= cgc->timeout,
+-			.reserved[0]	= (uintptr_t)(cgc->reserved[0]),
+-		};
++		struct compat_cdrom_generic_command cgc32;
++
++		memset(&cgc32, 0, sizeof(cgc32));
++
++		cgc32.buffer	= (uintptr_t)(cgc->buffer);
++		cgc32.buflen	= cgc->buflen;
++		cgc32.stat	= cgc->stat;
++		cgc32.sense	= (uintptr_t)(cgc->sense);
++		cgc32.data_direction	= cgc->data_direction;
++		cgc32.quiet	= cgc->quiet;
++		cgc32.timeout	= cgc->timeout;
++		cgc32.reserved[0]	= (uintptr_t)(cgc->reserved[0]);
++
+ 		memcpy(&cgc32.cmd, &cgc->cmd, CDROM_PACKET_SIZE);
+ 
+ 		if (copy_to_user(arg, &cgc32, sizeof(cgc32)))
+-- 
+2.25.1
 
