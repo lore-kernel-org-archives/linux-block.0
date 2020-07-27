@@ -1,261 +1,182 @@
-Return-Path: <SRS0=9ghM=BF=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=68Kh=BG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC55C433E1
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 19:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BAFC433E0
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 02:08:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E00122065F
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jul 2020 19:06:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595790404;
-	bh=/edHmQwJxF7VSDcLKho1dwyw+RMjRj29ommSZxGDozM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=e3AN1nxAHJtZhr/z1ukyVI5UooHU0B9HNrG0u1x/2Hq778m15d5BjDRHxIv5odUgN
-	 JR3o7v2jJ+Xti9mm9q4f5V9eptS7AGkHY6yCHTPd8rvfEy5EFUvdpQM+7SHrKfLmoG
-	 tk7nk2MnpYEKBs/gbT0/ojIvLmEMLgoc5ErGjc6s=
+	by mail.kernel.org (Postfix) with ESMTP id 035E02070A
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 02:08:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I7Jep594"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726244AbgGZTGo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jul 2020 15:06:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56506 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726081AbgGZTGo (ORCPT
+        id S1726841AbgG0CIW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jul 2020 22:08:22 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56799 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726072AbgG0CIW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jul 2020 15:06:44 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA3F6C0619D2;
-        Sun, 26 Jul 2020 12:06:43 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id ha11so737308pjb.1;
-        Sun, 26 Jul 2020 12:06:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qhvPLwCPXjMqFU2x4gEnxP4JjTqrO6GiJqIFdd+1yaY=;
-        b=W6kZST4BhAg8j6aAzIOCVIsrh6bIit/0aLvxBm75a4a194r0fukEv3cBdzfg05ZQ+4
-         j1OcMjy52PUg5c4JKaqkPD+rZEHfxs4gV6Cph35S/Vp9IoNA2IXusr5vhlQDRRl0mxxH
-         YKCMl3NIkqx2xS40Phzh9Ri23iauKkDzsvRDB1ibmTHzFYk8DSAsKUgPhvyZHYdgH/Wn
-         3XjC1g4pAaFV4Z1JIz3eqPo4YVgGSUvC64+QgKsm1wQQ10QN/4ZeA9wOMLsCuphEH+t1
-         alc2DXv1K5/JMNntu53Xw/iqRJ3pyzdoBdkk2yXAvGBAM43xCJ3H1SiEIyO0ffrlqSfR
-         KCHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=qhvPLwCPXjMqFU2x4gEnxP4JjTqrO6GiJqIFdd+1yaY=;
-        b=r4x6SI6Jv80lXDXQFIvZOBF/sBuzaCDrm92qAHIGroQ9D5bNfh2JTsZv3nCemqvGTL
-         p4HrX8h+/ZtexVITGmnxiU9m6fgYRQFV6GLQHnueVyR6dkGqDOBO0PZjKJU+vsvqmx+C
-         +vtEt41ipXsTQAdbVAs2gUobuoek+m/NXSn6f2a7Xsx8PFOSdsOC+RSoRDE7PeYKcYdH
-         coIkiApCXO3rmEHNShAtfyyfJceXTcznZ5UEtrJPsA6wHWj+3IgojayGUiOM6UDFkZhT
-         GS23DUHw8kKL29nLvH1HxhZb70Y9TbWBqt1PEOiVpW23U3vI8owEHxAxlvpfl/0dSfRl
-         ZbOg==
-X-Gm-Message-State: AOAM530XBumrW7JH2QBG7Nz3Z3yDt0nhIMZSjEoAr/hMn05CaS3FkxAV
-        D5DZAlIcuTP1gRVVPYIMwD0=
-X-Google-Smtp-Source: ABdhPJzRH4Cwo8GKdnDVU07rflKqs4ddrzgi88E3WWwZnPBfqLP6xNZSSBxRrE9jOOyxKIw1tGTGqg==
-X-Received: by 2002:a17:902:6a82:: with SMTP id n2mr16617932plk.27.1595790403131;
-        Sun, 26 Jul 2020 12:06:43 -0700 (PDT)
-Received: from google.com ([2620:15c:211:1:7220:84ff:fe09:5e58])
-        by smtp.gmail.com with ESMTPSA id o11sm12418242pfp.88.2020.07.26.12.06.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Jul 2020 12:06:41 -0700 (PDT)
-Date:   Sun, 26 Jul 2020 12:06:39 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org
-Subject: Re: [PATCH 10/14] bdi: remove BDI_CAP_SYNCHRONOUS_IO
-Message-ID: <20200726190639.GA560221@google.com>
-References: <20200726150333.305527-1-hch@lst.de>
- <20200726150333.305527-11-hch@lst.de>
+        Sun, 26 Jul 2020 22:08:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595815700;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eHxRyECYtQanh0ezBnPcM1ZXwerag91PJylDaVDzjY4=;
+        b=I7Jep594kWuA+gcrg0yauKOFw0aAVISprWhuSxSXZizlytxMDLilgpV2aO5MtUo1xzKi22
+        x3yTaBZ9/4l3JtwukK1aTGd0HUp3Vz8IaOmVVUdd9Raj0LFDuFbFZKbLTgycxlzAxxFAcd
+        DOkDqyh83+3gBC2HWUGmeIkTht/zCxM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-YJqsOQdjOPqpH92RAWKq1A-1; Sun, 26 Jul 2020 22:08:18 -0400
+X-MC-Unique: YJqsOQdjOPqpH92RAWKq1A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 500DA1005510;
+        Mon, 27 Jul 2020 02:08:16 +0000 (UTC)
+Received: from T590 (ovpn-12-208.pek2.redhat.com [10.72.12.208])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A643A1992D;
+        Mon, 27 Jul 2020 02:08:08 +0000 (UTC)
+Date:   Mon, 27 Jul 2020 10:08:03 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Chao Leng <lengchao@huawei.com>
+Subject: Re: [PATCH v3 1/2] blk-mq: add async quiesce interface
+Message-ID: <20200727020803.GC1129253@T590>
+References: <20200726002301.145627-1-sagi@grimberg.me>
+ <20200726002301.145627-2-sagi@grimberg.me>
+ <20200726093132.GD1110104@T590>
+ <9ac5f658-31b3-bb19-e5fe-385a629a7d67@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200726150333.305527-11-hch@lst.de>
+In-Reply-To: <9ac5f658-31b3-bb19-e5fe-385a629a7d67@grimberg.me>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 26, 2020 at 05:03:29PM +0200, Christoph Hellwig wrote:
-> BDI_CAP_SYNCHRONOUS_IO is only checked in the swap code, and used to
-> decided if ->rw_page can be used on a block device.  Just check up for
-> the method instead.  The only complication is that zram needs a second
-> set of block_device_operations as it can switch between modes that
-> actually support ->rw_page and those who don't.
+On Sun, Jul 26, 2020 at 09:27:56AM -0700, Sagi Grimberg wrote:
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/block/brd.c           |  1 -
->  drivers/block/zram/zram_drv.c | 19 +++++++++++++------
->  drivers/nvdimm/btt.c          |  2 --
->  drivers/nvdimm/pmem.c         |  1 -
->  include/linux/backing-dev.h   |  9 ---------
->  mm/swapfile.c                 |  2 +-
->  6 files changed, 14 insertions(+), 20 deletions(-)
+> > > +void blk_mq_quiesce_queue_async(struct request_queue *q)
+> > > +{
+> > > +	struct blk_mq_hw_ctx *hctx;
+> > > +	unsigned int i;
+> > > +
+> > > +	blk_mq_quiesce_queue_nowait(q);
+> > > +
+> > > +	queue_for_each_hw_ctx(q, hctx, i) {
+> > > +		init_completion(&hctx->rcu_sync.completion);
+> > > +		init_rcu_head(&hctx->rcu_sync.head);
+> > > +		if (hctx->flags & BLK_MQ_F_BLOCKING)
+> > > +			call_srcu(hctx->srcu, &hctx->rcu_sync.head,
+> > > +				wakeme_after_rcu);
+> > > +		else
+> > > +			call_rcu(&hctx->rcu_sync.head,
+> > > +				wakeme_after_rcu);
+> > > +	}
+> > 
+> > Looks not necessary to do anything in case of !BLK_MQ_F_BLOCKING, and single
+> > synchronize_rcu() is OK for all hctx during waiting.
 > 
-> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-> index 2723a70eb85593..cc49a921339f77 100644
-> --- a/drivers/block/brd.c
-> +++ b/drivers/block/brd.c
-> @@ -403,7 +403,6 @@ static struct brd_device *brd_alloc(int i)
->  	disk->flags		= GENHD_FL_EXT_DEVT;
->  	sprintf(disk->disk_name, "ram%d", i);
->  	set_capacity(disk, rd_size * 2);
-> -	brd->brd_queue->backing_dev_info->capabilities |= BDI_CAP_SYNCHRONOUS_IO;
->  
->  	/* Tell the block layer that this is not a rotational device */
->  	blk_queue_flag_set(QUEUE_FLAG_NONROT, brd->brd_queue);
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index 9100ac36670afc..d73ddf018fa65f 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -52,6 +52,9 @@ static unsigned int num_devices = 1;
->   */
->  static size_t huge_class_size;
->  
-> +static const struct block_device_operations zram_devops;
-> +static const struct block_device_operations zram_wb_devops;
-> +
->  static void zram_free_page(struct zram *zram, size_t index);
->  static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
->  				u32 index, int offset, struct bio *bio);
-> @@ -408,8 +411,7 @@ static void reset_bdev(struct zram *zram)
->  	zram->backing_dev = NULL;
->  	zram->old_block_size = 0;
->  	zram->bdev = NULL;
-> -	zram->disk->queue->backing_dev_info->capabilities |=
-> -				BDI_CAP_SYNCHRONOUS_IO;
-> +	zram->disk->fops = &zram_devops;
->  	kvfree(zram->bitmap);
->  	zram->bitmap = NULL;
->  }
-> @@ -528,8 +530,7 @@ static ssize_t backing_dev_store(struct device *dev,
->  	 * freely but in fact, IO is going on so finally could cause
->  	 * use-after-free when the IO is really done.
->  	 */
-> -	zram->disk->queue->backing_dev_info->capabilities &=
-> -			~BDI_CAP_SYNCHRONOUS_IO;
-> +	zram->disk->fops = &zram_wb_devops;
->  	up_write(&zram->init_lock);
+> That's true, but I want a single interface for both. v2 had exactly
+> that, but I decided that this approach is better.
 
-For zram, regardless of BDI_CAP_SYNCHRONOUS_IO, it have used rw_page
-every time on read/write path. This one with next patch will make zram
-use bio instead of rw_page when it's declared !BDI_CAP_SYNCHRONOUS_IO,
-which introduce regression for performance.
+Not sure one new interface is needed, and one simple way is to:
 
-In the swap code, BDI_CAP_SYNCHRONOUS_IO is used to avoid swap cache
-when the page was private. bdev_read_page is not designed to rely on
-synchronous operation. That's why this patch breaks the old behavior.
+1) call blk_mq_quiesce_queue_nowait() for each request queue
 
->  
->  	pr_info("setup backing device %s\n", file_name);
-> @@ -1819,6 +1820,13 @@ static const struct block_device_operations zram_devops = {
->  	.owner = THIS_MODULE
->  };
->  
-> +static const struct block_device_operations zram_wb_devops = {
-> +	.open = zram_open,
-> +	.submit_bio = zram_submit_bio,
-> +	.swap_slot_free_notify = zram_slot_free_notify,
-> +	.owner = THIS_MODULE
-> +};
-> +
->  static DEVICE_ATTR_WO(compact);
->  static DEVICE_ATTR_RW(disksize);
->  static DEVICE_ATTR_RO(initstate);
-> @@ -1946,8 +1954,7 @@ static int zram_add(void)
->  	if (ZRAM_LOGICAL_BLOCK_SIZE == PAGE_SIZE)
->  		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
->  
-> -	zram->disk->queue->backing_dev_info->capabilities |=
-> -			(BDI_CAP_STABLE_WRITES | BDI_CAP_SYNCHRONOUS_IO);
-> +	zram->disk->queue->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
->  	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
->  
->  	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
-> diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
-> index 412d21d8f64351..b4184dc9b41eb4 100644
-> --- a/drivers/nvdimm/btt.c
-> +++ b/drivers/nvdimm/btt.c
-> @@ -1540,8 +1540,6 @@ static int btt_blk_init(struct btt *btt)
->  	btt->btt_disk->private_data = btt;
->  	btt->btt_disk->queue = btt->btt_queue;
->  	btt->btt_disk->flags = GENHD_FL_EXT_DEVT;
-> -	btt->btt_disk->queue->backing_dev_info->capabilities |=
-> -			BDI_CAP_SYNCHRONOUS_IO;
->  
->  	blk_queue_logical_block_size(btt->btt_queue, btt->sector_size);
->  	blk_queue_max_hw_sectors(btt->btt_queue, UINT_MAX);
-> diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-> index 94790e6e0e4ce1..436b83fb24ad61 100644
-> --- a/drivers/nvdimm/pmem.c
-> +++ b/drivers/nvdimm/pmem.c
-> @@ -478,7 +478,6 @@ static int pmem_attach_disk(struct device *dev,
->  	disk->queue		= q;
->  	disk->flags		= GENHD_FL_EXT_DEVT;
->  	disk->private_data	= pmem;
-> -	disk->queue->backing_dev_info->capabilities |= BDI_CAP_SYNCHRONOUS_IO;
->  	nvdimm_namespace_disk_name(ndns, disk->disk_name);
->  	set_capacity(disk, (pmem->size - pmem->pfn_pad - pmem->data_offset)
->  			/ 512);
-> diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-> index 52583b6f2ea05d..860ea33571bce5 100644
-> --- a/include/linux/backing-dev.h
-> +++ b/include/linux/backing-dev.h
-> @@ -122,9 +122,6 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ratio);
->   * BDI_CAP_NO_WRITEBACK:   Don't write pages back
->   * BDI_CAP_NO_ACCT_WB:     Don't automatically account writeback pages
->   * BDI_CAP_STRICTLIMIT:    Keep number of dirty pages below bdi threshold.
-> - *
-> - * BDI_CAP_SYNCHRONOUS_IO: Device is so fast that asynchronous IO would be
-> - *			   inefficient.
->   */
->  #define BDI_CAP_NO_ACCT_DIRTY	0x00000001
->  #define BDI_CAP_NO_WRITEBACK	0x00000002
-> @@ -132,7 +129,6 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ratio);
->  #define BDI_CAP_STABLE_WRITES	0x00000008
->  #define BDI_CAP_STRICTLIMIT	0x00000010
->  #define BDI_CAP_CGROUP_WRITEBACK 0x00000020
-> -#define BDI_CAP_SYNCHRONOUS_IO	0x00000040
->  
->  #define BDI_CAP_NO_ACCT_AND_WRITEBACK \
->  	(BDI_CAP_NO_WRITEBACK | BDI_CAP_NO_ACCT_DIRTY | BDI_CAP_NO_ACCT_WB)
-> @@ -174,11 +170,6 @@ static inline int wb_congested(struct bdi_writeback *wb, int cong_bits)
->  long congestion_wait(int sync, long timeout);
->  long wait_iff_congested(int sync, long timeout);
->  
-> -static inline bool bdi_cap_synchronous_io(struct backing_dev_info *bdi)
-> -{
-> -	return bdi->capabilities & BDI_CAP_SYNCHRONOUS_IO;
-> -}
-> -
->  static inline bool bdi_cap_stable_pages_required(struct backing_dev_info *bdi)
->  {
->  	return bdi->capabilities & BDI_CAP_STABLE_WRITES;
-> diff --git a/mm/swapfile.c b/mm/swapfile.c
-> index 6c26916e95fd4a..18eac97b10e502 100644
-> --- a/mm/swapfile.c
-> +++ b/mm/swapfile.c
-> @@ -3230,7 +3230,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  	if (bdi_cap_stable_pages_required(inode_to_bdi(inode)))
->  		p->flags |= SWP_STABLE_WRITES;
->  
-> -	if (bdi_cap_synchronous_io(inode_to_bdi(inode)))
-> +	if (p->bdev && p->bdev->bd_disk->fops->rw_page)
->  		p->flags |= SWP_SYNCHRONOUS_IO;
->  
->  	if (p->bdev && blk_queue_nonrot(bdev_get_queue(p->bdev))) {
-> -- 
-> 2.27.0
+2) wait in driver specific way
+
+Or just wondering why nvme doesn't use set->tag_list to retrieve NS,
+then you may add per-tagset APIs for the waiting.
+
 > 
+> Also, having the driver call a single synchronize_rcu isn't great
+
+Too many drivers are using synchronize_rcu():
+
+	$ git grep -n synchronize_rcu ./drivers/ | wc
+	    186     524   11384
+
+> layering (as quiesce can possibly use a different mechanism in the future).
+
+What is the different mechanism?
+
+> So drivers assumptions like:
+> 
+>         /*
+>          * SCSI never enables blk-mq's BLK_MQ_F_BLOCKING flag so
+>          * calling synchronize_rcu() once is enough.
+>          */
+>         WARN_ON_ONCE(shost->tag_set.flags & BLK_MQ_F_BLOCKING);
+> 
+>         if (!ret)
+>                 synchronize_rcu();
+> 
+> Are not great...
+
+Both rcu read lock/unlock and synchronize_rcu is global interface, then
+it is reasonable to avoid unnecessary synchronize_rcu().
+
+> 
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_async);
+> > > +
+> > > +void blk_mq_quiesce_queue_async_wait(struct request_queue *q)
+> > > +{
+> > > +	struct blk_mq_hw_ctx *hctx;
+> > > +	unsigned int i;
+> > > +
+> > > +	queue_for_each_hw_ctx(q, hctx, i) {
+> > > +		wait_for_completion(&hctx->rcu_sync.completion);
+> > > +		destroy_rcu_head(&hctx->rcu_sync.head);
+> > > +	}
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_async_wait);
+> > > +
+> > >   /**
+> > >    * blk_mq_quiesce_queue() - wait until all ongoing dispatches have finished
+> > >    * @q: request queue.
+> > > diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> > > index 23230c1d031e..5536e434311a 100644
+> > > --- a/include/linux/blk-mq.h
+> > > +++ b/include/linux/blk-mq.h
+> > > @@ -5,6 +5,7 @@
+> > >   #include <linux/blkdev.h>
+> > >   #include <linux/sbitmap.h>
+> > >   #include <linux/srcu.h>
+> > > +#include <linux/rcupdate_wait.h>
+> > >   struct blk_mq_tags;
+> > >   struct blk_flush_queue;
+> > > @@ -170,6 +171,7 @@ struct blk_mq_hw_ctx {
+> > >   	 */
+> > >   	struct list_head	hctx_list;
+> > > +	struct rcu_synchronize	rcu_sync;
+> > The above struct takes at least 5 words, and I'd suggest to avoid it,
+> > and the hctx->srcu should be re-used for waiting BLK_MQ_F_BLOCKING.
+> > Meantime !BLK_MQ_F_BLOCKING doesn't need it.
+> 
+> It is at the end and contains exactly what is needed to synchronize. Not
+
+The sync is simply single global synchronize_rcu(), and why bother to add
+extra >=40bytes for each hctx.
+
+> sure what you mean by reuse hctx->srcu?
+
+You already reuses hctx->srcu, but not see reason to add extra rcu_synchronize
+to each hctx for just simulating one single synchronize_rcu().
+
+
+Thanks,
+Ming
+
