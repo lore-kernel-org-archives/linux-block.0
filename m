@@ -6,70 +6,65 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B237C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 07:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 133E6C433EA
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 07:58:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0004220738
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 07:35:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1A1F2073E
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 07:58:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727038AbgG0HfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 03:35:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58112 "EHLO mx2.suse.de"
+        id S1726918AbgG0H60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 03:58:26 -0400
+Received: from verein.lst.de ([213.95.11.211]:42430 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726270AbgG0HfR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 03:35:17 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 0D538AC59;
-        Mon, 27 Jul 2020 07:35:26 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id B86141E12C5; Mon, 27 Jul 2020 09:35:15 +0200 (CEST)
-Date:   Mon, 27 Jul 2020 09:35:15 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] bfq: Use only idle IO periods for think time
- calculations
-Message-ID: <20200727073515.GA23179@quack2.suse.cz>
-References: <20200605140837.5394-1-jack@suse.cz>
- <20200605141629.15347-3-jack@suse.cz>
- <934FEB51-BB23-4ACA-BCEC-310E56A910CC@linaro.org>
- <20200611143912.GC19132@quack2.suse.cz>
- <7BE4BFD7-F8C1-49DE-A318-9E038B9A19BC@linaro.org>
+        id S1726183AbgG0H60 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Jul 2020 03:58:26 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 630C468B05; Mon, 27 Jul 2020 09:58:22 +0200 (CEST)
+Date:   Mon, 27 Jul 2020 09:58:22 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        cgroups@vger.kernel.org
+Subject: Re: [PATCH 10/14] bdi: remove BDI_CAP_SYNCHRONOUS_IO
+Message-ID: <20200727075822.GA5355@lst.de>
+References: <20200726150333.305527-1-hch@lst.de> <20200726150333.305527-11-hch@lst.de> <20200726190639.GA560221@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7BE4BFD7-F8C1-49DE-A318-9E038B9A19BC@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200726190639.GA560221@google.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 22-07-20 11:13:28, Paolo Valente wrote:
-> > a) I don't think adding these samples to statistics helps in any way (you
-> > cannot improve the prediction power of the statistics by including in it
-> > some samples that are not directly related to the thing you try to
-> > predict). And think time is used to predict the answer to the question: If
-> > bfq queue becomes idle, how long will it take for new request to arrive? So
-> > second and further requests are simply irrelevant.
-> > 
+On Sun, Jul 26, 2020 at 12:06:39PM -0700, Minchan Kim wrote:
+> > @@ -528,8 +530,7 @@ static ssize_t backing_dev_store(struct device *dev,
+> >  	 * freely but in fact, IO is going on so finally could cause
+> >  	 * use-after-free when the IO is really done.
+> >  	 */
+> > -	zram->disk->queue->backing_dev_info->capabilities &=
+> > -			~BDI_CAP_SYNCHRONOUS_IO;
+> > +	zram->disk->fops = &zram_wb_devops;
+> >  	up_write(&zram->init_lock);
 > 
-> Yes, you are super right in theory.
-> 
-> Unfortunately this may not mean that your patch will do only good, for
-> the concerns in my previous email. 
-> 
-> So, here is a proposal to move forward:
-> 1) I test your patch on my typical set of
->    latency/guaranteed-bandwidth/total-throughput benchmarks
-> 2) You test your patch on a significant set of benchmarks in mmtests
-> 
-> What do you think?
+> For zram, regardless of BDI_CAP_SYNCHRONOUS_IO, it have used rw_page
+> every time on read/write path. This one with next patch will make zram
+> use bio instead of rw_page when it's declared !BDI_CAP_SYNCHRONOUS_IO,
+> which introduce regression for performance.
 
-Sure, I will queue runs for the patches with mmtests :).
+It really should not matter, as the overhead of setting up a bio
+is minimal.  It also is only used in the legacy mpage buffered I/O
+code outside of the swap code, which has so many performance issues on
+its own that even if this made a difference it wouldn't matter.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+If you want magic treatment for your zram swap code you really need
+to integrate it with the swap code instead of burding the block layer
+with all this mess.
