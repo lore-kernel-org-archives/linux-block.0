@@ -2,104 +2,160 @@ Return-Path: <SRS0=68Kh=BG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32131C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 23:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D202C4345E
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 23:24:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B04520809
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 23:10:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A3F7208E4
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jul 2020 23:24:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1595892275;
+	bh=fli9BB9wXWbNaizd57fZ7B9u6zDs9BY1kleIiBJzss0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=RQFO4KftBavFUi1bwe7np8cuGP1g5cNh4UJ2ywwoZkyZCxA1ube3dFb382S2l1jm5
+	 +FZBWMfXUiP90rLf/0OQMfsmVoaIVOnoXHD0/hVKJREhlMvEFEzLLX+TggwsBK8WCs
+	 /4I7QN/E8eM7yWAYnA3so/XnfQxfw6sBbKJGzbks=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbgG0XK3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 19:10:29 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39589 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726183AbgG0XK3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 19:10:29 -0400
-Received: by mail-pf1-f195.google.com with SMTP id z188so2070065pfc.6
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 16:10:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=rhPI1AK8s0t5ZglX+PETgazcv0kHzfPuguyROZL/wxE=;
-        b=R6m/2SOUAqWOqU4/PywqQ7QSJ6fnhSLTISrumIfRKK7tb6TF2ncjPONlomt+RTwQMX
-         G82K9vG6c/fSR/UGsGH5Nf7crSKsZskc3x2rrz+zW4Y9k/XEhprHzRGajx/+aMAObdfK
-         L+XFYme/jPsSQ3dCrbcfLOtthgz+L7Np4EJKKy4Rw7cUCzAslXwltIoRRddFKtwoISMm
-         h/0McIodx3FNuO1k2GJm/zahWWctq5J7zFjbmGUjBcsMOP0cI7jjZDhEk9/n8wX7AUa9
-         ZXwNiI/qR/XJQt+jZFZCpCnedrRwJqL7rXjrL0HiK8MqKogg0xJgv14JF2HwGbi63sm1
-         FPXw==
-X-Gm-Message-State: AOAM533cMks9OzhP8vMqhnUjkhygBi7a5g8tICqVV57g/SIphs45mm4h
-        ILNyOaIIcn+RxPl+BiiKdnw=
-X-Google-Smtp-Source: ABdhPJwN/y5+qq3rd5tJTCca6/CBeuaY47jNx6qXZwnx26i6zeOQ5qwwrsmdbrP74v2FNbHJnC+6AA==
-X-Received: by 2002:a62:7942:: with SMTP id u63mr21722936pfc.54.1595891428381;
-        Mon, 27 Jul 2020 16:10:28 -0700 (PDT)
-Received: from sagi-Latitude-7490.hsd1.ca.comcast.net ([2601:647:4802:9070:5d7d:f206:b163:f30b])
-        by smtp.gmail.com with ESMTPSA id z190sm7407171pfz.67.2020.07.27.16.10.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2020 16:10:27 -0700 (PDT)
-From:   Sagi Grimberg <sagi@grimberg.me>
-To:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lin <mlin@kernel.org>,
-        Chao Leng <lengchao@huawei.com>
-Subject: [PATCH v5 2/2] nvme: use blk_mq_[un]quiesce_tagset
-Date:   Mon, 27 Jul 2020 16:10:22 -0700
-Message-Id: <20200727231022.307602-3-sagi@grimberg.me>
+        id S1728266AbgG0XYc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 19:24:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35526 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728258AbgG0XYb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Jul 2020 19:24:31 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F140B22B40;
+        Mon, 27 Jul 2020 23:24:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595892269;
+        bh=fli9BB9wXWbNaizd57fZ7B9u6zDs9BY1kleIiBJzss0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=abIFjlywKqxecxQsd2dGFPr/9+rRLnkjSbqe1fuDmQktwqtRYhyJ2b8EPAMkDjpGH
+         vBi43GXhXIvqAMFEaWC3PG7LOpRyIj6i5w8rBfuRLJUnQr5MIo5bFA/bqw8rFiqr3D
+         JjtDgL3t8RVir2fIkmALZRoj2Fz6VdQMj8W8LncM=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Sasha Levin <sashal@kernel.org>, linux-scsi@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 07/17] scsi: core: Run queue in case of I/O resource contention failure
+Date:   Mon, 27 Jul 2020 19:24:10 -0400
+Message-Id: <20200727232420.717684-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200727231022.307602-1-sagi@grimberg.me>
-References: <20200727231022.307602-1-sagi@grimberg.me>
+In-Reply-To: <20200727232420.717684-1-sashal@kernel.org>
+References: <20200727232420.717684-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All controller namespaces share the same tagset, so we
-can use this interface which does the optimal operation
-for parallel quiesce based on the tagset type (e.g.
-blocking tagsets and non-blocking tagsets).
+From: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+[ Upstream commit 3f0dcfbcd2e162fc0a11c1f59b7acd42ee45f126 ]
+
+I/O requests may be held in scheduler queue because of resource contention.
+The starvation scenario was handled properly in the regular completion
+path but we failed to account for it during I/O submission. This lead to
+the hang captured below. Make sure we run the queue when resource
+contention is encountered in the submission path.
+
+[   39.054963] scsi 13:0:0:0: rejecting I/O to dead device
+[   39.058700] scsi 13:0:0:0: rejecting I/O to dead device
+[   39.087855] sd 13:0:0:1: [sdd] Synchronizing SCSI cache
+[   39.088909] scsi 13:0:0:1: rejecting I/O to dead device
+[   39.095351] scsi 13:0:0:1: rejecting I/O to dead device
+[   39.096962] scsi 13:0:0:1: rejecting I/O to dead device
+[  247.021859] INFO: task scsi-stress-rem:813 blocked for more than 122 seconds.
+[  247.023258]       Not tainted 5.8.0-rc2 #8
+[  247.024069] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  247.025331] scsi-stress-rem D    0   813    802 0x00004000
+[  247.025334] Call Trace:
+[  247.025354]  __schedule+0x504/0x55f
+[  247.027987]  schedule+0x72/0xa8
+[  247.027991]  blk_mq_freeze_queue_wait+0x63/0x8c
+[  247.027994]  ? do_wait_intr_irq+0x7a/0x7a
+[  247.027996]  blk_cleanup_queue+0x4b/0xc9
+[  247.028000]  __scsi_remove_device+0xf6/0x14e
+[  247.028002]  scsi_remove_device+0x21/0x2b
+[  247.029037]  sdev_store_delete+0x58/0x7c
+[  247.029041]  kernfs_fop_write+0x10d/0x14f
+[  247.031281]  vfs_write+0xa2/0xdf
+[  247.032670]  ksys_write+0x6b/0xb3
+[  247.032673]  do_syscall_64+0x56/0x82
+[  247.034053]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[  247.034059] RIP: 0033:0x7f69f39e9008
+[  247.036330] Code: Bad RIP value.
+[  247.036331] RSP: 002b:00007ffdd8116498 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[  247.037613] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f69f39e9008
+[  247.039714] RDX: 0000000000000002 RSI: 000055cde92a0ab0 RDI: 0000000000000001
+[  247.039715] RBP: 000055cde92a0ab0 R08: 000000000000000a R09: 00007f69f3a79e80
+[  247.039716] R10: 000000000000000a R11: 0000000000000246 R12: 00007f69f3abb780
+[  247.039717] R13: 0000000000000002 R14: 00007f69f3ab6740 R15: 0000000000000002
+
+Link: https://lore.kernel.org/r/20200720025435.812030-1-ming.lei@redhat.com
+Cc: linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/nvme/host/core.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+ drivers/scsi/scsi_lib.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 05aa568a60af..c41df20996d7 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -4557,23 +4557,13 @@ EXPORT_SYMBOL_GPL(nvme_start_freeze);
- 
- void nvme_stop_queues(struct nvme_ctrl *ctrl)
- {
--	struct nvme_ns *ns;
--
--	down_read(&ctrl->namespaces_rwsem);
--	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_quiesce_queue(ns->queue);
--	up_read(&ctrl->namespaces_rwsem);
-+	blk_mq_quiesce_tagset(ctrl->tagset);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 206c9f53e9e7a..e6944e1cba2ba 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -568,6 +568,15 @@ static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
+ 	scsi_del_cmd_from_list(cmd);
  }
- EXPORT_SYMBOL_GPL(nvme_stop_queues);
  
- void nvme_start_queues(struct nvme_ctrl *ctrl)
- {
--	struct nvme_ns *ns;
--
--	down_read(&ctrl->namespaces_rwsem);
--	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_unquiesce_queue(ns->queue);
--	up_read(&ctrl->namespaces_rwsem);
-+	blk_mq_unquiesce_tagset(ctrl->tagset);
- }
- EXPORT_SYMBOL_GPL(nvme_start_queues);
++static void scsi_run_queue_async(struct scsi_device *sdev)
++{
++	if (scsi_target(sdev)->single_lun ||
++	    !list_empty(&sdev->host->starved_list))
++		kblockd_schedule_work(&sdev->requeue_work);
++	else
++		blk_mq_run_hw_queues(sdev->request_queue, true);
++}
++
+ /* Returns false when no more bytes to process, true if there are more */
+ static bool scsi_end_request(struct request *req, blk_status_t error,
+ 		unsigned int bytes)
+@@ -612,11 +621,7 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
  
+ 	__blk_mq_end_request(req, error);
+ 
+-	if (scsi_target(sdev)->single_lun ||
+-	    !list_empty(&sdev->host->starved_list))
+-		kblockd_schedule_work(&sdev->requeue_work);
+-	else
+-		blk_mq_run_hw_queues(q, true);
++	scsi_run_queue_async(sdev);
+ 
+ 	percpu_ref_put(&q->q_usage_counter);
+ 	return false;
+@@ -1729,6 +1734,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		 */
+ 		if (req->rq_flags & RQF_DONTPREP)
+ 			scsi_mq_uninit_cmd(cmd);
++		scsi_run_queue_async(sdev);
+ 		break;
+ 	}
+ 	return ret;
 -- 
 2.25.1
 
