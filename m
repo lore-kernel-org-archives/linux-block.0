@@ -2,37 +2,38 @@ Return-Path: <SRS0=YNow=BH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-25.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19EB0C433EA
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 21:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A868AC433FB
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 21:36:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D57DF20774
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 21:36:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 786AD20775
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 21:36:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Wm9ZHIFe"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="lmOU6mGZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729648AbgG1Vge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jul 2020 17:36:34 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:47202 "EHLO
+        id S1729476AbgG1Vgr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jul 2020 17:36:47 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:47462 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729476AbgG1Vga (ORCPT
+        with ESMTP id S1729620AbgG1Vge (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jul 2020 17:36:30 -0400
+        Tue, 28 Jul 2020 17:36:34 -0400
 Received: from dede-linux-virt.corp.microsoft.com (unknown [131.107.160.54])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 05F5F20B490A;
-        Tue, 28 Jul 2020 14:36:27 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 05F5F20B490A
+        by linux.microsoft.com (Postfix) with ESMTPSA id 0195820B491B;
+        Tue, 28 Jul 2020 14:36:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0195820B491B
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1595972187;
-        bh=Ie+j97yVjb2lXSLGvZxR9igUI8hkvf/M0+8s7kDwch4=;
+        s=default; t=1595972190;
+        bh=TACzQ6spbCVDM9Exp0yBptNkm2/Hw/O7rfya2hBEsU4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Wm9ZHIFeSrQmuD98AjYbaHT/9LAiqNPaMnX6Z9EHqDp5eTEXizBpK8rfm9vcM0QBg
-         SlDULP/prNirfXYStpEqdXpAFBrJWsPOggwE/MuGU28plM0IYgMhAm1Va73CBOUYk0
-         s5I07PRUQTOx0UniWvTZZfi3w6dS6p7TQezvxNjs=
+        b=lmOU6mGZLHuEPcJBrllUQzPov+cRwf3Q8Y0mHySSpX9FnegL6hfc+wfO9JkHgnQPD
+         PHU8wEalQW13VfZEmokxxY1eTRcVlI7WJZDU92Ja1qhSUxzz/9EDo2M/wOzpsORgM+
+         gnlGkCknY0wc3jO8qc1xjWUbzir9E7ZsgHETd5fc=
 From:   Deven Bowers <deven.desai@linux.microsoft.com>
 To:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
         jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
@@ -46,9 +47,9 @@ Cc:     tyhicks@linux.microsoft.com, linux-kernel@vger.kernel.org,
         corbet@lwn.net, sashal@kernel.org,
         jaskarankhurana@linux.microsoft.com, mdsakib@microsoft.com,
         nramas@linux.microsoft.com, pasha.tatashin@soleen.com
-Subject: [RFC PATCH v5 02/11] security: add ipe lsm evaluation loop and audit system
-Date:   Tue, 28 Jul 2020 14:36:02 -0700
-Message-Id: <20200728213614.586312-3-deven.desai@linux.microsoft.com>
+Subject: [RFC PATCH v5 11/12] documentation: add ipe documentation
+Date:   Tue, 28 Jul 2020 14:36:13 -0700
+Message-Id: <20200728213614.586312-14-deven.desai@linux.microsoft.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
 References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
@@ -59,1418 +60,552 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add the core logic of the IPE LSM, the evaluation loop (engine),
-a portion of the audit system, and the skeleton of the policy
-structure.
+Add IPE's documentation to the kernel tree.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+Acked-by: Jonathan Corbet <corbet@lwn.net>
 ---
- MAINTAINERS                      |   1 +
- include/uapi/linux/audit.h       |   4 +
- security/Kconfig                 |  12 +-
- security/Makefile                |   2 +
- security/ipe/.gitignore          |   2 +
- security/ipe/Kconfig             |  44 ++++++
- security/ipe/Makefile            |  25 ++++
- security/ipe/ipe-audit.c         | 231 +++++++++++++++++++++++++++++++
- security/ipe/ipe-audit.h         |  18 +++
- security/ipe/ipe-engine.c        | 205 +++++++++++++++++++++++++++
- security/ipe/ipe-engine.h        |  37 +++++
- security/ipe/ipe-hooks.c         | 149 ++++++++++++++++++++
- security/ipe/ipe-hooks.h         |  61 ++++++++
- security/ipe/ipe-policy.h        |  62 +++++++++
- security/ipe/ipe-prop-internal.h |  37 +++++
- security/ipe/ipe-property.c      | 142 +++++++++++++++++++
- security/ipe/ipe-property.h      |  99 +++++++++++++
- security/ipe/ipe.c               |  67 +++++++++
- security/ipe/ipe.h               |  20 +++
- 19 files changed, 1212 insertions(+), 6 deletions(-)
- create mode 100644 security/ipe/.gitignore
- create mode 100644 security/ipe/Kconfig
- create mode 100644 security/ipe/Makefile
- create mode 100644 security/ipe/ipe-audit.c
- create mode 100644 security/ipe/ipe-audit.h
- create mode 100644 security/ipe/ipe-engine.c
- create mode 100644 security/ipe/ipe-engine.h
- create mode 100644 security/ipe/ipe-hooks.c
- create mode 100644 security/ipe/ipe-hooks.h
- create mode 100644 security/ipe/ipe-policy.h
- create mode 100644 security/ipe/ipe-prop-internal.h
- create mode 100644 security/ipe/ipe-property.c
- create mode 100644 security/ipe/ipe-property.h
- create mode 100644 security/ipe/ipe.c
- create mode 100644 security/ipe/ipe.h
+ Documentation/admin-guide/LSM/index.rst |   1 +
+ Documentation/admin-guide/LSM/ipe.rst   | 508 ++++++++++++++++++++++++
+ MAINTAINERS                             |   1 +
+ 3 files changed, 510 insertions(+)
+ create mode 100644 Documentation/admin-guide/LSM/ipe.rst
 
+diff --git a/Documentation/admin-guide/LSM/index.rst b/Documentation/admin-guide/LSM/index.rst
+index a6ba95fbaa9f..ce63be6d64ad 100644
+--- a/Documentation/admin-guide/LSM/index.rst
++++ b/Documentation/admin-guide/LSM/index.rst
+@@ -47,3 +47,4 @@ subdirectories.
+    tomoyo
+    Yama
+    SafeSetID
++   ipe
+diff --git a/Documentation/admin-guide/LSM/ipe.rst b/Documentation/admin-guide/LSM/ipe.rst
+new file mode 100644
+index 000000000000..2e6610c4a134
+--- /dev/null
++++ b/Documentation/admin-guide/LSM/ipe.rst
+@@ -0,0 +1,508 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++Integrity Policy Enforcement (IPE)
++==================================
++
++Overview
++--------
++
++IPE is a Linux Security Module which allows for a configurable policy
++to enforce integrity requirements on the whole system. It attempts to
++solve the issue of Code Integrity: that any code being executed (or
++files being read), are identical to the version that was built by a
++trusted source.
++
++There are multiple implementations within the Linux kernel that solve
++some measure of integrity verification. For instance, device-mapper
++verity, which ensures integrity for a block device, and fs-verity which
++is a system that ensures integrity for a filesystem. What these
++implementations lack is a measure of run-time verification that binaries
++are sourced from these locations. IPE aims to address this gap.
++
++IPE is separated between two major components: A configurable policy,
++provided by the LSM ("IPE Core"), and deterministic attributes provided
++by the kernel to evaluate files against, ("IPE Properties").
++
++Use Cases
++---------
++
++IPE is designed for use is an embedded device with a specific purpose
++(e.g. network firewall device in a data center), where all software and
++configuration is built and provisioned by the owner.
++
++Ideally, a system which leverages IPE is not intended for general
++purpose computing and does not utilize any software or configuration
++built by a third party. An ideal system to leverage IPE has both mutable
++and immutable components, however, all binary executable code is
++immutable.
++
++For the highest level of security, platform firmware should verify the
++the kernel and optionally the root filesystem (e.g. via U-Boot verified
++boot). This allows the entire system to be integrity verified.
++
++Known Gaps
++----------
++
++IPE cannot verify the integrity of anonymous executable memory, such as
++the trampolines created by gcc closures and libffi, or JIT'd code.
++Unfortunately, as this is dynamically generated code, there is no way
++for IPE to detect that this code has not been tampered with in
++transition from where it was built, to where it is running. As a result,
++IPE is incapable of tackling this problem for dynamically generated
++code.
++
++IPE cannot verify the integrity of interpreted languages' programs when
++these scripts invoked via ``<interpreter> <file>``. This is because the
++way interpreters execute these files, the scripts themselves are not
++evaluated as executable code through one of IPE's hooks. Interpreters
++can be enlightened to the usage of IPE by trying to mmap a file into
++executable memory (+X), after opening the file and responding to the
++error code appropriately. This also applies to included files, or high
++value files, such as configuration files of critical system components.
++This specific gap is planned on being addressed within IPE.
++
++Threat Model
++------------
++
++The threat type addressed by IPE is tampering of executable user-land
++code beyond the initially booted kernel, and the initial verification of
++kernel modules that are loaded in userland through ``modprobe`` or
++``insmod``.
++
++Tampering violates the property of integrity. IPE's role in mitigating
++this threat is to verify the integrity (and authenticity) of all
++executable code and to deny their use if integrity verification fails.
++IPE generates audit logs which may be utilized to detect integrity
++verification failures.
++
++Tampering threat scenarios include modification or replacement of
++executable code by a range of actors including:
++
++-  Insiders with physical access to the hardware
++-  Insiders with local network access to the system
++-  Insiders with access to the deployment system
++-  Compromised internal systems under external control
++-  Malicious end users of the system
++-  Compromised end users of the system
++-  Remote (external) compromise of the system
++
++IPE does not mitigate threats arising from malicious authorized
++developers, or compromised developer tools used by authorized
++developers. Additionally, IPE draws hard security boundary between user
++mode and kernel mode. As a result, IPE does not provide any protections
++against a kernel level exploit, and a kernel-level exploit can disable
++or tamper with IPE's protections.
++
++The root of trust for all of IPE's verifications is the
++``SYSTEM_TRUSTED_KEYRING``.
++
++IPE Core
++--------
++
++IPE Policy
++~~~~~~~~~~
++
++IPE policy is designed to be both forward compatible and backwards
++compatible. There is one required line, at the top of the policy,
++indicating the policy name, and the policy version, for instance::
++
++   policy_name="Ex Policy" policy_version=0.0.0
++
++The policy name is a unique key identifying this policy in a human
++readable name. This is used to create nodes under securityfs as well as
++uniquely identify policies to deploy new policies vs update existing
++policies.
++
++The policy version indicates the current version of the policy (NOT the
++policy syntax version). This is used to prevent roll-back of policy to
++potentially insecure previous versions of the policy.
++
++The next portion of IPE policy, are rules. Rules are formed by key=value
++pairs, known as properties. IPE rules require two properties: "action",
++which determines what IPE does when it encounters a match against the
++rule, and "op", which determines when that rule should be evaluated.
++Thus, a minimal rule is::
++
++   op=EXECUTE action=ALLOW
++
++This example will allow any execution. Additional properties are used to
++restrict attributes about the files being evaluated. These properties
++are intended to be deterministic attributes that are resident in the
++kernel.
++
++Order does not matter for the rule's properties - they can be listed in
++any order, however it is encouraged to have the "op" property be first,
++and the "action" property be last for readability. Rules are evaluated
++top-to-bottom. As a result, any revocation rules, or denies should be
++placed early in the file to ensure that these rules are evaluated before
++as rule with "action=ALLOW" is hit.
++
++IPE policy is designed to be forward compatible and backwards
++compatible, thus any failure to parse a rule will result in the line
++being ignored, and a warning being emitted. If backwards compatibility
++is not required, the kernel command line parameter and sysctl,
++``ipe.strict_parse`` can be enabled, which will cause these warnings to
++be fatal.
++
++IPE policy supports comments. The character '#' will function as a
++comment, ignoring all characters to the right of '#' until the newline.
++
++The default behavior of IPE evaluations can also be expressed in policy,
++through the ``DEFAULT`` statement. This can be done at a global level,
++or a per-operation level::
++
++   # Global
++   DEFAULT action=ALLOW
++
++   # Operation Specific
++   DEFAULT op=EXECUTE action=ALLOW
++
++A default must be set for all known operations in IPE. If you want to
++preserve older policies being compatible with newer kernels that can introduce
++new operations, please set a global default of 'ALLOW', and override the
++defaults on a per-operation basis.
++
++With configurable policy-based LSMs, there's several issues with
++enforcing the configurable policies at startup, around reading and
++parsing the policy:
++
++1. The kernel *should* not read files from userland, so directly reading
++   the policy file is prohibited.
++2. The kernel command line has a character limit, and one kernel module
++   should not reserve the entire character limit for its own
++   configuration.
++3. There are various boot loaders in the kernel ecosystem, so handing
++   off a memory block would be costly to maintain.
++
++As a result, IPE has addressed this problem through a concept of a "boot
++policy". A boot policy is a minimal policy, compiled into the kernel.
++This policy is intended to get the system to a state where userland is
++setup and ready to receive commands, at which point a more complex
++policy ("user policies") can be deployed via securityfs. The boot policy
++can be specified via the Kconfig, ``SECURITY_IPE_BOOT_POLICY``, which
++accepts a path to a plain-text version of the IPE policy to apply. This
++policy will be compiled into the kernel. If not specified, IPE will be
++disabled until a policy is deployed through securityfs, and activated
++through sysfs.
++
++Deploying Policies
++^^^^^^^^^^^^^^^^^^
++
++User policies as explained above, are policies that are deployed from
++userland, through securityfs. These policies are signed to enforce some
++level of authorization of the policies (prohibiting an attacker from
++gaining root, and deploying an "allow all" policy), through the PKCS#7
++enveloped data format. These policies must be signed by a certificate
++that chains to the ``SYSTEM_TRUSTED_KEYRING``. Through openssl, the
++signing can be done via::
++
++   openssl smime -sign -in "$MY_POLICY" -signer "$MY_CERTIFICATE" \
++     -inkey "$MY_PRIVATE_KEY" -binary -outform der -noattr -nodetach \
++     -out "$MY_POLICY.p7s"
++
++Deploying the policies is done through securityfs, through the
++``new_policy`` node. To deploy a policy, simply cat the file into the
++securityfs node::
++
++   cat "$MY_POLICY.p7s" > /sys/kernel/security/ipe/new_policy
++
++Upon success, this will create one subdirectory under
++``/sys/kernel/security/ipe/policies/``. The subdirectory will be the
++``policy_name`` field of the policy deployed, so for the example above,
++the directory will be ``/sys/kernel/security/ipe/policies/Ex\ Policy``.
++Within this directory, there will be four files: ``raw``, ``content``,
++``active``, and ``delete``.
++
++The ``raw`` file is rw, reading will provide the raw PKCS#7 data that
++was provided to the kernel, representing the policy. Writing, will
++deploy an in-place policy update - if this policy is the currently
++running policy, the new updated policy will replace it immediately upon
++success.
++
++The ``content`` file is read only. Reading will provide the PKCS#7 inner
++content of the policy, which will be the plain text policy.
++
++The ``active`` file is used to set a policy as the currently active policy.
++This file is rw, and accepts a value of ``"1"`` to set the policy as active.
++Since only a single policy can be active at one time, all other policies
++will be marked inactive.
++
++Similarly, the ``cat`` command above will result in an error upon
++syntactically invalid or untrusted policies. It will also error if a
++policy already exists with the same ``policy_name``. The write to the
++``raw`` node will error upon syntactically invalid, untrusted policies,
++or if the payload fails the version check. The write will also fail if
++the ``policy_name`` in the payload does not match the existing policy.
++
++Deploying these policies will *not* cause IPE to start enforcing this
++policy. Once deployment is successful, a policy can be marked as active,
++via ``/sys/kernel/security/ipe/$policy_name/active``. IPE will enforce
++whatever policy is marked as active. For our example, we can activate
++the ``Ex Policy`` via::
++
++   echo -n 1 > "/sys/kernel/security/ipe/Ex Policy/active"
++
++At which point, ``Ex Policy`` will now be the enforced policy on the
++system.
++
++.. NOTE::
++
++   The -n parameter is important, as it strips an additional newline.
++
++IPE also provides a way to delete policies. This can be done via the
++``delete`` securityfs node, ``/sys/kernel/security/ipe/$policy_name/delete``.
++Writing ``1`` to that file will delete that node::
++
++   echo -n 1 > "/sys/kernel/security/ipe/$policy_name/delete"
++
++There are two requirements to delete policies:
++
++1. The policy being deleted must not be the active policy.
++2. The policy being deleted must not be the boot policy.
++
++.. NOTE::
++
++   If a MAC system is enabled, all writes to ipe's securityfs nodes require
++   ``CAP_MAC_ADMIN``.
++
++Modes
++~~~~~
++
++IPE supports two modes of operation: permissive (similar to SELinux's
++permissive mode) and enforce. Permissive mode performs the same checks
++as enforce mode, and logs policy violations, but will not enforce the
++policy. This allows users to test policies before enforcing them.
++
++The default mode is enforce, and can be changed via the kernel command
++line parameter ``ipe.enforce=(0|1)``, or the securityfs node
++``/sys/kernel/security/ipe/enforce``. The ability to switch modes can
++be compiled out of the LSM via setting the Kconfig
++``CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH`` to N.
++
++.. NOTE::
++
++   If a MAC system is enabled, all writes to ipe's securityfs nodes require
++   ``CAP_MAC_ADMIN``.
++
++Audit Events
++~~~~~~~~~~~~
++
++Success Auditing
++^^^^^^^^^^^^^^^^
++
++IPE supports success auditing. When enabled, all events that pass IPE
++policy and are not blocked will emit an audit event. This is disabled by
++default, and can be enabled via the kernel command line
++``ipe.success_audit=(0|1)`` or the securityfs node,
++``/sys/kernel/security/ipe/success_audit``.
++
++This is very noisy, as IPE will check every user-mode binary on the
++system, but is useful for debugging policies.
++
++.. NOTE::
++
++   If a MAC system is enabled, all writes to ipe's securityfs nodes require
++   ``CAP_MAC_ADMIN``.
++
++IPE Properties
++--------------
++
++As explained above, IPE properties are ``key=value`` pairs expressed in
++IPE policy. Two properties are built-into the policy parser: 'op' and
++'action'. The other properties are determinstic attributes to express
++across files. Currently those properties are: 'boot_verified',
++'dmverity_signature', 'dmverity_roothash'. A description of all
++properties supported by IPE are listed below:
++
++op
++~~
++
++Indicates the operation for a rule to apply to. Must be in every rule.
++IPE supports the following operations:
++
++Version 1
++^^^^^^^^^
++
++``EXECUTE``
++
++   Pertains to any file attempting to be executed, or loaded as an
++   executable.
++
++``FIRMWARE``:
++
++   Pertains to firmware being loaded via the firmware_class interface.
++   This covers both the preallocated buffer and the firmware file
++   itself.
++
++``KMODULE``:
++
++   Pertains to loading kernel modules via ``modprobe`` or ``insmod``.
++
++``KEXEC_IMAGE``:
++
++   Pertains to kernel images loading via ``kexec``.
++
++``KEXEC_INITRAMFS``
++
++   Pertains to initrd images loading via ``kexec --initrd``.
++
++``POLICY``:
++
++   Controls loading IMA policies through the
++   ``/sys/kernel/security/ima/policy`` securityfs entry.
++
++``X509_CERT``:
++
++   Controls loading IMA certificates through the Kconfigs,
++   ``CONFIG_IMA_X509_PATH`` and ``CONFIG_EVM_X509_PATH``.
++
++``KERNEL_READ``:
++
++   Short hand for all of the following: ``FIRMWARE``, ``KMODULE``,
++   ``KEXEC_IMAGE``, ``KEXEC_INITRAMFS``, ``POLICY``, and ``X509_CERT``.
++
++action
++~~~~~~
++
++Version 1
++^^^^^^^^^
++
++Determines what IPE should do when a rule matches. Must be in every
++rule. Can be one of:
++
++``ALLOW``:
++
++   If the rule matches, explicitly allow the call to proceed without
++   executing any more rules.
++
++``DENY``:
++
++   If the rule matches, explicitly prohibit the call from proceeding
++   without executing any more rules.
++
++boot_verified
++~~~~~~~~~~~~~
++
++Version 1
++^^^^^^^^^
++
++This property can be utilized for authorization of the first super-block
++that executes a file. This is almost always init. Typically this is used
++for systems with an initramfs or other initial disk, where this is unmounted
++before the system becomes available, and is not covered by any other property.
++This property is controlled by the Kconfig, ``CONFIG_IPE_BOOT_PROP``. The
++format of this property is::
++
++       boot_verified=(TRUE|FALSE)
++
++
++.. WARNING::
++
++  This property will trust any disk where the first execution occurs
++  evaluation occurs. If you do not have a startup disk that is
++  unpacked and unmounted (like initramfs), then it will automatically
++  trust the root filesystem and potentially overauthorize the entire
++  disk.
++
++dmverity_roothash
++~~~~~~~~~~~~~~~~~
++
++Version 1
++^^^^^^^^^
++
++This property can be utilized for authorization or revocation of
++specific dm-verity volumes, identified via root hash. It has a
++dependency on the DM_VERITY module. This property is controlled by the
++property: ``CONFIG_IPE_DM_VERITY_ROOTHASH``. The format of this property
++is::
++
++   dmverity_roothash=HashHexDigest
++
++dmverity_signature
++~~~~~~~~~~~~~~~~~~
++
++Version 1
++^^^^^^^^^
++
++This property can be utilized for authorization of all dm-verity volumes
++that have a signed roothash that chains to the system trusted keyring.
++It has a dependency on the ``DM_VERITY_VERIFY_ROOTHASH_SIG`` Kconfig.
++This property is controlled by the Kconfig:
++``CONFIG_IPE_DM_VERITY_SIGNATURE``. The format of this property is::
++
++   dmverity_signature=(TRUE|FALSE)
++
++Policy Examples
++---------------
++
++Allow all
++~~~~~~~~~
++
++::
++
++   policy_name="Allow All" policy_version=0.0.0
++   DEFAULT action=ALLOW
++
++Allow only initial superblock
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++::
++
++   policy_name="Allow All Initial SB" policy_version=0.0.0
++   DEFAULT action=DENY
++
++   op=EXECUTE boot_verified=TRUE action=ALLOW
++
++Allow any signed dm-verity volume and the initial superblock
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++::
++
++   policy_name="AllowSignedAndInitial" policy_version=0.0.0
++   DEFAULT action=DENY
++
++   op=EXECUTE boot_verified=TRUE action=ALLOW
++   op=EXECUTE dmverity_signature=TRUE action=ALLOW
++
++Prohibit execution from a specific dm-verity volume
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++::
++
++   policy_name="AllowSignedAndInitial" policy_version=0.0.0
++   DEFAULT action=DENY
++
++   op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=DENY
++   op=EXECUTE boot_verified=TRUE action=ALLOW
++   op=EXECUTE dmverity_signature=TRUE action=ALLOW
++
++Allow only a specific dm-verity volume
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++::
++
++   policy_name="AllowSignedAndInitial" policy_version=0.0.0
++   DEFAULT action=DENY
++
++   op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
++
++External Information
++--------------------
++
++Please see the github repository at: https://github.com/microsoft/ipe
++
++FAQ
++---
++
++Q: What's the difference between other LSMs which provide integrity
++verification (i.e. IMA)?
++
++A: IPE differs from other LSMs which provide integrity checking, as it
++has no dependency on the filesystem metadata itself. The attributes that
++IPE checks are deterministic properties that exist solely in the kernel.
++Additionally, IPE provides no additional mechanisms of verifying these
++files (e.g. IMA Signatures) - all of the attributes of verifying files
++are existing features within the kernel.
++
++Additionally, IPE is completely restricted to integrity. It offers no
++measurement or attestation features, which IMA addresses.
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 86450be5437b..bed30cc1cfd7 100644
+index 2876c69435d5..492de7bda6b9 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -8584,6 +8584,7 @@ M:	Deven Bowers <deven.desai@linux.microsoft.com>
+@@ -8584,6 +8584,7 @@ INTEGRITY POLICY ENFORCEMENT (IPE)
+ M:	Deven Bowers <deven.desai@linux.microsoft.com>
  L:	linux-integrity@vger.kernel.org
  S:	Supported
++F:	Documentation/admin-guide/LSM/ipe.rst
  F:	scripts/ipe/
-+F:	security/ipe/
+ F:	security/ipe/
  
- INTEL 810/815 FRAMEBUFFER DRIVER
- M:	Antonino Daplas <adaplas@gmail.com>
-diff --git a/include/uapi/linux/audit.h b/include/uapi/linux/audit.h
-index 9b6a973f4cc3..5a634cca1d42 100644
---- a/include/uapi/linux/audit.h
-+++ b/include/uapi/linux/audit.h
-@@ -154,6 +154,10 @@
- #define AUDIT_INTEGRITY_RULE	    1805 /* policy rule */
- #define AUDIT_INTEGRITY_EVM_XATTR   1806 /* New EVM-covered xattr */
- #define AUDIT_INTEGRITY_POLICY_RULE 1807 /* IMA policy rules */
-+#define AUDIT_INTEGRITY_POLICY_LOAD	1808 /* IPE Policy Load */
-+#define AUDIT_INTEGRITY_POLICY_ACTIVATE	1809 /* IPE Policy Activation */
-+#define AUDIT_INTEGRITY_EVENT		1810 /* IPE Evaluation Event */
-+#define AUDIT_INTEGRITY_MODE		1811 /* IPE Mode Switch */
- 
- #define AUDIT_KERNEL		2000	/* Asynchronous audit record. NOT A REQUEST. */
- 
-diff --git a/security/Kconfig b/security/Kconfig
-index cd3cc7da3a55..94924556b637 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -238,6 +238,7 @@ source "security/loadpin/Kconfig"
- source "security/yama/Kconfig"
- source "security/safesetid/Kconfig"
- source "security/lockdown/Kconfig"
-+source "security/ipe/Kconfig"
- 
- source "security/integrity/Kconfig"
- 
-@@ -277,11 +278,11 @@ endchoice
- 
- config LSM
- 	string "Ordered list of enabled LSMs"
--	default "lockdown,yama,loadpin,safesetid,integrity,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
--	default "lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
--	default "lockdown,yama,loadpin,safesetid,integrity,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
--	default "lockdown,yama,loadpin,safesetid,integrity,bpf" if DEFAULT_SECURITY_DAC
--	default "lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf"
-+	default "lockdown,yama,loadpin,ipe,safesetid,integrity,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
-+	default "lockdown,yama,loadpin,ipe,safesetid,integrity,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
-+	default "lockdown,yama,loadpin,ipe,safesetid,integrity,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
-+	default "lockdown,yama,loadpin,ipe,safesetid,integrity,bpf" if DEFAULT_SECURITY_DAC
-+	default "lockdown,yama,loadpin,ipe,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf"
- 	help
- 	  A comma-separated list of LSMs, in initialization order.
- 	  Any LSMs left off this list will be ignored. This can be
-@@ -292,4 +293,3 @@ config LSM
- source "security/Kconfig.hardening"
- 
- endmenu
--
-diff --git a/security/Makefile b/security/Makefile
-index 3baf435de541..48bd063d66e1 100644
---- a/security/Makefile
-+++ b/security/Makefile
-@@ -13,6 +13,7 @@ subdir-$(CONFIG_SECURITY_LOADPIN)	+= loadpin
- subdir-$(CONFIG_SECURITY_SAFESETID)    += safesetid
- subdir-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown
- subdir-$(CONFIG_BPF_LSM)		+= bpf
-+subdir-$(CONFIG_SECURITY_IPE)		+= ipe
- 
- # always enable default capabilities
- obj-y					+= commoncap.o
-@@ -32,6 +33,7 @@ obj-$(CONFIG_SECURITY_SAFESETID)       += safesetid/
- obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
- obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
- obj-$(CONFIG_BPF_LSM)			+= bpf/
-+obj-$(CONFIG_SECURITY_IPE)		+= ipe/
- 
- # Object integrity file lists
- subdir-$(CONFIG_INTEGRITY)		+= integrity
-diff --git a/security/ipe/.gitignore b/security/ipe/.gitignore
-new file mode 100644
-index 000000000000..bbf824e665d7
---- /dev/null
-+++ b/security/ipe/.gitignore
-@@ -0,0 +1,2 @@
-+# Generated Boot Policy
-+ipe-bp.c
-diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
-new file mode 100644
-index 000000000000..7615109a19ca
---- /dev/null
-+++ b/security/ipe/Kconfig
-@@ -0,0 +1,44 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Integrity Policy Enforcement (IPE) configuration
-+#
-+
-+menuconfig SECURITY_IPE
-+	bool "Integrity Policy Enforcement (IPE)"
-+	depends on SECURITY && AUDIT
-+	select SYSTEM_DATA_VERIFICATION
-+	help
-+	  This option enables the Integrity Policy Enforcement subsystem
-+	  allowing systems to enforce integrity having no dependencies
-+	  on filesystem metadata, making its decisions based off of kernel-
-+	  resident features and data structures. A key feature of IPE is a
-+	  customizable policy to allow admins to reconfigure integrity
-+	  requirements on the fly.
-+
-+	  If unsure, answer N.
-+
-+if SECURITY_IPE
-+
-+config SECURITY_IPE_BOOT_POLICY
-+	string "Integrity policy to apply on system startup"
-+	help
-+	  This option specifies a filepath to a IPE policy that is compiled
-+	  into the kernel. This policy will be enforced until a policy update
-+	  is deployed via the $securityfs/ipe/policies/$policy_name/active
-+	  interface.
-+
-+	  If unsure, leave blank.
-+
-+config SECURITY_IPE_PERMISSIVE_SWITCH
-+	bool "Enable the ability to switch IPE to permissive mode"
-+	default y
-+	help
-+	  This option enables two ways of switching IPE to permissive mode,
-+	  a securityfs node, `$securityfs/ipe/enforce`, or a kernel command line
-+	  parameter, `ipe.enforce`. If either of these is set to 0, files
-+	  will be subject to IPE's policy, audit messages will be logged, but
-+	  the policy will not be enforced.
-+
-+	  If unsure, answer Y.
-+
-+endif
-diff --git a/security/ipe/Makefile b/security/ipe/Makefile
-new file mode 100644
-index 000000000000..40565b73fac2
---- /dev/null
-+++ b/security/ipe/Makefile
-@@ -0,0 +1,25 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (C) Microsoft Corporation. All rights reserved.
-+#
-+# Makefile for building the IPE module as part of the kernel tree.
-+#
-+
-+quiet_cmd_polgen  = IPE_POL $(patsubst "%",%,$(2))
-+      cmd_polgen  = scripts/ipe/polgen/polgen security/ipe/ipe-bp.c $(2)
-+
-+$(eval $(call config_filename,SECURITY_IPE_BOOT_POLICY))
-+
-+targets += ipe-bp.c
-+$(obj)/ipe-bp.c: scripts/ipe/polgen/polgen $(SECURITY_IPE_BOOT_POLICY_FILENAME) FORCE
-+	$(call if_changed,polgen,$(SECURITY_IPE_BOOT_POLICY_FILENAME))
-+
-+obj-$(CONFIG_SECURITY_IPE) += \
-+	ipe.o \
-+	ipe-audit.o \
-+	ipe-bp.o \
-+	ipe-engine.o \
-+	ipe-property.o \
-+	ipe-hooks.o \
-+
-+clean-files := ipe-bp.c
-diff --git a/security/ipe/ipe-audit.c b/security/ipe/ipe-audit.c
-new file mode 100644
-index 000000000000..2c754851bd40
---- /dev/null
-+++ b/security/ipe/ipe-audit.c
-@@ -0,0 +1,231 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "ipe-audit.h"
-+#include "ipe-engine.h"
-+#include "ipe-prop-internal.h"
-+
-+#include <linux/types.h>
-+#include <linux/audit.h>
-+#include <linux/rcupdate.h>
-+#include <linux/lsm_audit.h>
-+#include <linux/rbtree.h>
-+#include <crypto/hash.h>
-+#include <crypto/sha1_base.h>
-+
-+#define ACTION_STR(a) ((a) == ipe_action_allow ? "ALLOW" : "DENY")
-+
-+#define IPE_UNKNOWN		"UNKNOWN"
-+
-+/* Keep in sync with ipe_op in ipe-hooks.h */
-+const char *audit_op_names[] = {
-+	IPE_OP_EXECUTE,
-+	IPE_OP_FIRMWARE,
-+	IPE_OP_KEXEC_IMAGE,
-+	IPE_OP_KEXEC_INITRAMFS,
-+	IPE_OP_X509_CERTIFICATE,
-+	IPE_OP_POLICY,
-+	IPE_OP_KMODULE,
-+	IPE_OP_KERNEL_READ,
-+	IPE_UNKNOWN,
-+};
-+
-+/* Keep in sync with ipe_hook in ipe-hooks.h */
-+const char *audit_hook_names[] = {
-+	IPE_HOOK_EXEC,
-+	IPE_HOOK_MMAP,
-+	IPE_HOOK_MPROTECT,
-+	IPE_HOOK_KERNEL_READ,
-+	IPE_HOOK_KERNEL_LOAD,
-+	IPE_UNKNOWN,
-+};
-+
-+/**
-+ * ipe_audit_mode: Emit an audit event indicating what mode IPE is currently
-+ *		   in.
-+ *
-+ * This event is of form "IPE mode=(enforce|audit)"
-+ */
-+void ipe_audit_mode(bool enforcing)
-+{
-+	struct audit_buffer *ab;
-+	const char *mode_str = (enforcing) ? IPE_MODE_ENFORCE :
-+					     IPE_MODE_PERMISSIVE;
-+
-+	ab = audit_log_start(audit_context(), GFP_KERNEL,
-+			     AUDIT_INTEGRITY_MODE);
-+	if (!ab)
-+		return;
-+
-+	audit_log_format(ab, "IPE mode=%s", mode_str);
-+
-+	audit_log_end(ab);
-+}
-+
-+/**
-+ * audit_engine_ctx: Add the string representation of ipe_engine_ctx to the
-+ *		     end of an audit buffer.
-+ * @ab: the audit buffer to append the string representation of @ctx
-+ * @ctx: the ipe_engine_ctx structure to transform into a string
-+ *	 representation
-+ *
-+ * This string representation is of form:
-+ * "ctx_pid=%d ctx_op=%s ctx_hook=%s ctx_comm=%s ctx_audit_pathname=%s ctx_ino=%ld ctx_dev=%s"
-+ *
-+ * Certain fields may be omitted or replaced with ERR(%d).
-+ *
-+ */
-+static void audit_engine_ctx(struct audit_buffer *ab,
-+			     const struct ipe_engine_ctx *ctx)
-+{
-+	audit_log_format(ab, "ctx_pid=%d ctx_op=%s ctx_hook=%s ctx_comm=",
-+			 task_tgid_nr(current),
-+			 audit_op_names[ctx->op],
-+			 audit_hook_names[ctx->hook]);
-+
-+	audit_log_untrustedstring(ab, current->comm);
-+
-+	if (ctx->file) {
-+		if (IS_ERR(ctx->audit_pathname)) {
-+			audit_log_format(ab, " ctx_audit_pathname=ERR(%ld) ",
-+					 PTR_ERR(ctx->audit_pathname));
-+		} else {
-+			audit_log_format(ab, " ctx_audit_pathname=\"%s\" ",
-+					 ctx->audit_pathname);
-+		}
-+
-+		audit_log_format(ab, "ctx_ino=%ld ctx_dev=%s",
-+				 ctx->file->f_inode->i_ino,
-+				 ctx->file->f_inode->i_sb->s_id);
-+	}
-+}
-+
-+struct prop_audit_ctx {
-+	struct audit_buffer *ab;
-+	const struct ipe_engine_ctx *ctx;
-+};
-+
-+/**
-+ * audit_property: callback to print a property, used with ipe_for_each_prop.
-+ * @prop: property to print an audit record for.
-+ * @ctx: context passed to ipe_for_each_prop. In this case, it is of type
-+ *	prop_audit_ctx, containing the audit buffer and engine ctx.
-+ *
-+ * Return:
-+ * 0 - Always
-+ */
-+static int audit_property(const struct ipe_property *prop, void *ctx)
-+{
-+	const struct prop_audit_ctx *aud_ctx = (struct prop_audit_ctx *)ctx;
-+
-+	audit_log_format(aud_ctx->ab, "prop_%s=", prop->property_name);
-+	prop->ctx_audit(aud_ctx->ab, aud_ctx->ctx);
-+	audit_log_format(aud_ctx->ab, " ");
-+
-+	return 0;
-+}
-+
-+/**
-+ * audit_eval_properties: Append the string representation of evaluated
-+ *			  properties to an audit buffer.
-+ * @ab: the audit buffer to append the string representation of the evaluated
-+ *	properties.
-+ * @ctx: the ipe_engine_ctx structure to pass to property audit function.
-+ *
-+ * This string representation is of form:
-+ * "prop_key1=value1 prop_key2=value2 ... "
-+ *
-+ * Certain values may be replaced with ERR(%d). Prop may also be empty,
-+ * and thus omitted entirely.
-+ *
-+ */
-+static inline void audit_eval_properties(struct audit_buffer *ab,
-+					 const struct ipe_engine_ctx *ctx)
-+{
-+	const struct prop_audit_ctx aud_ctx = {
-+		.ab = ab,
-+		.ctx = ctx
-+	};
-+
-+	(void)ipe_for_each_prop(audit_property, (void *)&aud_ctx);
-+}
-+
-+/**
-+ * audit_rule: Add the string representation of a non-default IPE rule to the
-+ *	       end of an audit buffer.
-+ * @ab: the audit buffer to append the string representation of a rule.
-+ * @rule: the ipe_rule structure to transform into a string representation.
-+ *
-+ * This string representation is of form:
-+ * 'rule="op=%s key1=value1 key2=value2 ... action=%s"'
-+ *
-+ * Certain values may be replaced with ERR(%d).
-+ *
-+ */
-+static void audit_rule(struct audit_buffer *ab,
-+		       const struct ipe_rule *rule)
-+{
-+	struct ipe_prop_container *ptr;
-+
-+	audit_log_format(ab, "rule=\"op=%s ", audit_op_names[rule->op]);
-+
-+	list_for_each_entry(ptr, &rule->props, next) {
-+		audit_log_format(ab, "%s=", ptr->prop->property_name);
-+
-+		ptr->prop->rule_audit(ab, ptr->value);
-+
-+		audit_log_format(ab, " ");
-+	}
-+
-+	audit_log_format(ab, "action=%s\"", ACTION_STR(rule->action));
-+}
-+
-+/**
-+ * ipe_audit_match: Emit an audit event indicating that the IPE engine has
-+ *		    determined a match to a rule in IPE policy.
-+ * @ctx: the engine context structure to audit
-+ * @rule: The rule that was matched. If NULL, then assumed to be a default
-+ *	  either operation specific, indicated by table, or global.
-+ * @table: the operation-specific rule table. If NULL, then it assumed
-+ *	   that the global default is matched.
-+ * @match_type: The type of match that the engine used during evaluation
-+ * @action: The action that the engine decided to take
-+ * @rule: The rule that was matched. Must be set if @match_type is
-+ *	  ipe_match_rule and NULL otherwise.
-+ */
-+void ipe_audit_match(const struct ipe_engine_ctx *ctx,
-+		     enum ipe_match match_type, enum ipe_action action,
-+		     const struct ipe_rule *rule)
-+{
-+	struct audit_buffer *ab;
-+
-+	if (!ipe_success_audit && action == ipe_action_allow)
-+		return;
-+
-+	ab = audit_log_start(audit_context(), GFP_ATOMIC | __GFP_NOWARN,
-+			     AUDIT_INTEGRITY_EVENT);
-+	if (!ab)
-+		return;
-+
-+	audit_log_format(ab, "IPE ");
-+
-+	audit_engine_ctx(ab, ctx);
-+
-+	audit_log_format(ab, " ");
-+
-+	audit_eval_properties(ab, ctx);
-+
-+	if (match_type == ipe_match_rule)
-+		audit_rule(ab, rule);
-+	else if (match_type == ipe_match_table)
-+		audit_log_format(ab, "rule=\"DEFAULT op=%s action=%s\"",
-+				 audit_op_names[ctx->op], ACTION_STR(action));
-+	else if (match_type == ipe_match_global)
-+		audit_log_format(ab, "rule=\"DEFAULT action=%s\"",
-+				 ACTION_STR(action));
-+
-+	audit_log_end(ab);
-+}
-diff --git a/security/ipe/ipe-audit.h b/security/ipe/ipe-audit.h
-new file mode 100644
-index 000000000000..e00f415bed2c
---- /dev/null
-+++ b/security/ipe/ipe-audit.h
-@@ -0,0 +1,18 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe-engine.h"
-+#include "ipe-policy.h"
-+
-+#ifndef IPE_AUDIT_H
-+#define IPE_AUDIT_H
-+
-+void ipe_audit_mode(bool enforcing);
-+
-+void ipe_audit_match(const struct ipe_engine_ctx *ctx,
-+		     enum ipe_match match_type, enum ipe_action action,
-+		     const struct ipe_rule *rule);
-+
-+#endif /* IPE_AUDIT_H */
-diff --git a/security/ipe/ipe-engine.c b/security/ipe/ipe-engine.c
-new file mode 100644
-index 000000000000..ac526d4ea5e6
---- /dev/null
-+++ b/security/ipe/ipe-engine.c
-@@ -0,0 +1,205 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "ipe-property.h"
-+#include "ipe-prop-internal.h"
-+#include "ipe-policy.h"
-+#include "ipe-engine.h"
-+#include "ipe-audit.h"
-+
-+#include <linux/types.h>
-+#include <linux/fs.h>
-+#include <linux/list.h>
-+#include <linux/rbtree.h>
-+#include <linux/rcupdate.h>
-+#include <linux/security.h>
-+
-+const struct ipe_policy *ipe_active_policy;
-+
-+/**
-+ * get_audit_pathname: Return the absolute path of the file struct passed in
-+ * @file: file to derive an absolute path from.
-+ *
-+ * This function walks past chroots and mount points.
-+ *
-+ * Return:
-+ * !NULL - OK
-+ * ERR_PTR(-ENOENT) - No File
-+ * ERR_PTR(-ENOMEM) - No Memory
-+ * ERR_PTR(-ENAMETOOLONG) - Path Exceeds PATH_MAX
-+ */
-+static char *get_audit_pathname(const struct file *file)
-+{
-+	int rc = 0;
-+	char *pos = NULL;
-+	char *pathbuf = NULL;
-+	char *temp_path = NULL;
-+
-+	/* No File to get Path From */
-+	if (!file)
-+		return ERR_PTR(-ENOENT);
-+
-+	pathbuf = __getname();
-+	if (!pathbuf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	pos = d_absolute_path(&file->f_path, pathbuf, PATH_MAX);
-+	if (IS_ERR(pos)) {
-+		rc = PTR_ERR(pos);
-+		goto err;
-+	}
-+
-+	temp_path = __getname();
-+	if (!temp_path) {
-+		rc = -ENOMEM;
-+		goto err;
-+	}
-+
-+	strlcpy(temp_path, pos, PATH_MAX);
-+
-+	__putname(pathbuf);
-+
-+	return temp_path;
-+
-+err:
-+	__putname(pathbuf);
-+	return ERR_PTR(rc);
-+}
-+
-+/**
-+ * free_ctx: free a previously allocated ipe_engine_ctx struct
-+ * @ctx: structure to deallocate.
-+ *
-+ */
-+static void free_ctx(struct ipe_engine_ctx *ctx)
-+{
-+	if (IS_ERR_OR_NULL(ctx))
-+		return;
-+
-+	if (!IS_ERR_OR_NULL(ctx->audit_pathname))
-+		__putname(ctx->audit_pathname);
-+
-+	kfree(ctx);
-+}
-+
-+/**
-+ * build_ctx: allocate a new ipe_engine_ctx structure
-+ * @file: File that is being evaluated against IPE policy.
-+ * @op: Operation that the file is being evaluated against.
-+ * @hook: Specific hook that the file is being evaluated through.
-+ *
-+ * Return:
-+ * !NULL - OK
-+ * ERR_PTR(-ENOMEM) - no memory
-+ */
-+static struct ipe_engine_ctx *build_ctx(const struct file *file,
-+					enum ipe_op op, enum ipe_hook hook)
-+{
-+	struct ipe_engine_ctx *local;
-+
-+	local = kzalloc(sizeof(*local), GFP_KERNEL);
-+	if (!local)
-+		return ERR_PTR(-ENOMEM);
-+
-+	/* if there's an error here, it's O.K. */
-+	local->audit_pathname = get_audit_pathname(file);
-+	local->file = file;
-+	local->op = op;
-+	local->hook = hook;
-+
-+	return local;
-+}
-+
-+/**
-+ * evaluate: Process an @ctx against IPE's current active policy.
-+ * @ctx: the engine ctx to perform an evaluation on.
-+ *
-+ * Return:
-+ * -EACCES - A match occurred against a "action=DENY" rule
-+ * -ENOMEM - Out of memory
-+ */
-+static int evaluate(struct ipe_engine_ctx *ctx)
-+{
-+	int rc = 0;
-+	bool match = false;
-+	enum ipe_action action;
-+	enum ipe_match match_type;
-+	const struct ipe_rule *rule;
-+	const struct ipe_policy *pol;
-+	const struct ipe_rule_table *rules;
-+	const struct ipe_prop_container *prop;
-+
-+	if (!rcu_access_pointer(ipe_active_policy))
-+		return rc;
-+
-+	rcu_read_lock();
-+
-+	pol = rcu_dereference(ipe_active_policy);
-+
-+	rules = &pol->ops[ctx->op];
-+
-+	list_for_each_entry(rule, &rules->rules, next) {
-+		match = true;
-+
-+		list_for_each_entry(prop, &rule->props, next)
-+			match = match && prop->prop->eval(ctx, prop->value);
-+
-+		if (match)
-+			break;
-+	}
-+
-+	if (match) {
-+		match_type = ipe_match_rule;
-+		action = rule->action;
-+	} else if (rules->def != ipe_action_unset) {
-+		match_type = ipe_match_table;
-+		action = rules->def;
-+		rule = NULL;
-+	} else {
-+		match_type = ipe_match_global;
-+		action = pol->def;
-+		rule = NULL;
-+	}
-+
-+	ipe_audit_match(ctx, match_type, action, rule);
-+
-+	if (action == ipe_action_deny)
-+		rc = -EACCES;
-+
-+	if (ipe_enforce == 0)
-+		rc = 0;
-+
-+	rcu_read_unlock();
-+	return rc;
-+}
-+
-+/**
-+ * ipe_process_event: Perform an evaluation of @file, @op, and @hook against
-+ *		      IPE's current active policy.
-+ * @file: File that is being evaluated against IPE policy.
-+ * @op: Operation that the file is being evaluated against.
-+ * @hook: Specific hook that the file is being evaluated through.
-+ *
-+ * Return:
-+ * -ENOMEM: (No Memory)
-+ * -EACCES: (A match occurred against a "action=DENY" rule)
-+ */
-+int ipe_process_event(const struct file *file, enum ipe_op op,
-+		      enum ipe_hook hook)
-+{
-+	int rc = 0;
-+	struct ipe_engine_ctx *ctx;
-+
-+	ctx = build_ctx(file, op, hook);
-+	if (IS_ERR(ctx))
-+		goto cleanup;
-+
-+	rc = evaluate(ctx);
-+
-+cleanup:
-+	free_ctx(ctx);
-+	return rc;
-+}
-diff --git a/security/ipe/ipe-engine.h b/security/ipe/ipe-engine.h
-new file mode 100644
-index 000000000000..d9a95674e70d
---- /dev/null
-+++ b/security/ipe/ipe-engine.h
-@@ -0,0 +1,37 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe-hooks.h"
-+
-+#include <linux/types.h>
-+#include <linux/rbtree.h>
-+#include <linux/fs.h>
-+
-+#ifndef IPE_ENGINE_H
-+#define IPE_ENGINE_H
-+
-+struct ipe_engine_ctx {
-+	enum ipe_op op;
-+	enum ipe_hook hook;
-+	const struct file *file;
-+	const char *audit_pathname;
-+};
-+
-+struct ipe_prop_cache {
-+	struct rb_node node;
-+	void *storage;
-+	const struct ipe_property *prop;
-+};
-+
-+enum ipe_match {
-+	ipe_match_rule = 0,
-+	ipe_match_table,
-+	ipe_match_global
-+};
-+
-+int ipe_process_event(const struct file *file, enum ipe_op op,
-+		      enum ipe_hook hook);
-+
-+#endif /* IPE_ENGINE_H */
-diff --git a/security/ipe/ipe-hooks.c b/security/ipe/ipe-hooks.c
-new file mode 100644
-index 000000000000..071c4af23a3d
---- /dev/null
-+++ b/security/ipe/ipe-hooks.c
-@@ -0,0 +1,149 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "ipe-hooks.h"
-+#include "ipe-engine.h"
-+
-+#include <linux/types.h>
-+#include <linux/fs.h>
-+#include <linux/binfmts.h>
-+#include <linux/mount.h>
-+#include <linux/mman.h>
-+#include <linux/mm.h>
-+#include <linux/security.h>
-+
-+/**
-+ * ipe_on_exec: LSM hook called on the exec family of system calls.
-+ * @bprm: A structure to hold arguments that are used when loading binaries,
-+ *	  used to extract the file being executed.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * !0 - see ipe_process_event
-+ */
-+int ipe_on_exec(struct linux_binprm *bprm)
-+{
-+	return ipe_process_event(bprm->file, ipe_op_execute, ipe_hook_exec);
-+}
-+
-+/**
-+ * ipe_on_mmap: LSM hook called on the mmap system call.
-+ * @file: File being mapped into memory.
-+ * @reqprot: Unused.
-+ * @prot: A protection mapping of the memory region, calculated based on
-+ *	  @reqprot, and the system configuration.
-+ * @flags: Unused.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * !0 - see ipe_process_event
-+ */
-+int ipe_on_mmap(struct file *file, unsigned long reqprot, unsigned long prot,
-+		unsigned long flags)
-+{
-+	if (prot & PROT_EXEC)
-+		return ipe_process_event(file, ipe_op_execute, ipe_hook_mmap);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ipe_on_mprotect: LSM hook called on the mprotect system call
-+ * @vma: A structure representing the existing memory region.
-+ * @reqprot: Unused.
-+ * @prot: A protection mapping of the memory region, calculated based on
-+ *	  @reqprot, and the system configuration.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * !0 - see ipe_process_event
-+ */
-+int ipe_on_mprotect(struct vm_area_struct *vma, unsigned long reqprot,
-+		    unsigned long prot)
-+{
-+	if ((prot & PROT_EXEC) && !(vma->vm_flags & VM_EXEC))
-+		return ipe_process_event(vma->vm_file, ipe_op_execute,
-+					 ipe_hook_mprotect);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ipe_on_kernel_read: LSM hook called on kernel_read_file.
-+ * @file: File being read by the hook kernel_read_file.
-+ * @id: Enumeration indicating the type of file being read.
-+ *
-+ * For more information, see the LSM hook, kernel_read_file.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * !0 - see ipe_process_event
-+ */
-+int ipe_on_kernel_read(struct file *file, enum kernel_read_file_id id)
-+{
-+	switch (id) {
-+	case READING_FIRMWARE:
-+	case READING_FIRMWARE_PREALLOC_BUFFER:
-+		return ipe_process_event(file, ipe_op_firmware,
-+					 ipe_hook_kernel_read);
-+	case READING_MODULE:
-+		return ipe_process_event(file, ipe_op_kmodule,
-+					 ipe_hook_kernel_read);
-+	case READING_KEXEC_INITRAMFS:
-+		return ipe_process_event(file, ipe_op_kexec_initramfs,
-+					 ipe_hook_kernel_read);
-+	case READING_KEXEC_IMAGE:
-+		return ipe_process_event(file, ipe_op_kexec_image,
-+					 ipe_hook_kernel_read);
-+	case READING_POLICY:
-+		return ipe_process_event(file, ipe_op_policy,
-+					 ipe_hook_kernel_read);
-+	case READING_X509_CERTIFICATE:
-+		return ipe_process_event(file, ipe_op_x509,
-+					 ipe_hook_kernel_read);
-+	default:
-+		return ipe_process_event(file, ipe_op_kernel_read,
-+					 ipe_hook_kernel_read);
-+	}
-+}
-+
-+/**
-+ * ipe_on_kernel_load_data: LSM hook called on kernel_load_data.
-+ * @id: Enumeration indicating what type of data is being loaded.
-+ *
-+ * For more information, see the LSM hook, kernel_load_data.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * !0 - see ipe_process_event
-+ */
-+int ipe_on_kernel_load_data(enum kernel_load_data_id id)
-+{
-+	switch (id) {
-+	case LOADING_FIRMWARE:
-+	case LOADING_FIRMWARE_PREALLOC_BUFFER:
-+		return ipe_process_event(NULL, ipe_op_firmware,
-+					 ipe_hook_kernel_load);
-+	case LOADING_MODULE:
-+		return ipe_process_event(NULL, ipe_op_kmodule,
-+					 ipe_hook_kernel_load);
-+	case LOADING_KEXEC_INITRAMFS:
-+		return ipe_process_event(NULL, ipe_op_kexec_initramfs,
-+					 ipe_hook_kernel_load);
-+	case LOADING_KEXEC_IMAGE:
-+		return ipe_process_event(NULL, ipe_op_kexec_image,
-+					 ipe_hook_kernel_load);
-+	case LOADING_POLICY:
-+		return ipe_process_event(NULL, ipe_op_policy,
-+					 ipe_hook_kernel_load);
-+	case LOADING_X509_CERTIFICATE:
-+		return ipe_process_event(NULL, ipe_op_x509,
-+					 ipe_hook_kernel_load);
-+	default:
-+		return ipe_process_event(NULL, ipe_op_kernel_read,
-+					 ipe_hook_kernel_load);
-+	}
-+}
-diff --git a/security/ipe/ipe-hooks.h b/security/ipe/ipe-hooks.h
-new file mode 100644
-index 000000000000..806659b7cdbe
---- /dev/null
-+++ b/security/ipe/ipe-hooks.h
-@@ -0,0 +1,61 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include <linux/types.h>
-+#include <linux/fs.h>
-+#include <linux/mount.h>
-+#include <linux/binfmts.h>
-+#include <linux/mman.h>
-+#include <linux/mm.h>
-+#include <linux/security.h>
-+
-+#ifndef IPE_HOOK_H
-+#define IPE_HOOK_H
-+
-+#define IPE_HOOK_EXEC		"EXEC"
-+#define IPE_HOOK_MMAP		"MMAP"
-+#define IPE_HOOK_MPROTECT	"MPROTECT"
-+#define IPE_HOOK_KERNEL_READ	"KERNEL_READ"
-+#define IPE_HOOK_KERNEL_LOAD	"KERNEL_LOAD"
-+
-+enum ipe_hook {
-+	ipe_hook_exec = 0,
-+	ipe_hook_mmap,
-+	ipe_hook_mprotect,
-+	ipe_hook_kernel_read,
-+	ipe_hook_kernel_load,
-+	ipe_hook_max
-+};
-+
-+/*
-+ * The sequence between ipe_op_firmware and ipe_op_kmodule
-+ * must remain the same for ipe_op_kernel read to function
-+ * appropriately.
-+ */
-+enum ipe_op {
-+	ipe_op_execute = 0,
-+	ipe_op_firmware,
-+	ipe_op_kexec_image,
-+	ipe_op_kexec_initramfs,
-+	ipe_op_x509,
-+	ipe_op_policy,
-+	ipe_op_kmodule,
-+	ipe_op_kernel_read,
-+	ipe_op_max
-+};
-+
-+int ipe_on_exec(struct linux_binprm *bprm);
-+
-+int ipe_on_mmap(struct file *file, unsigned long reqprot, unsigned long prot,
-+		unsigned long flags);
-+
-+int ipe_on_mprotect(struct vm_area_struct *vma, unsigned long reqprot,
-+		    unsigned long prot);
-+
-+int ipe_on_kernel_read(struct file *file, enum kernel_read_file_id id);
-+
-+int ipe_on_kernel_load_data(enum kernel_load_data_id id);
-+
-+#endif /* IPE_HOOK_H */
-diff --git a/security/ipe/ipe-policy.h b/security/ipe/ipe-policy.h
-new file mode 100644
-index 000000000000..c0c9f2962c92
---- /dev/null
-+++ b/security/ipe/ipe-policy.h
-@@ -0,0 +1,62 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe-hooks.h"
-+#include "ipe-property.h"
-+
-+#include <linux/types.h>
-+#include <linux/list.h>
-+#include <linux/mutex.h>
-+#include <linux/rcupdate.h>
-+
-+#ifndef IPE_POLICY_H
-+#define IPE_POLICY_H
-+
-+#define IPE_HEADER_POLICY_NAME		"policy_name"
-+#define IPE_HEADER_POLICY_VERSION	"policy_version"
-+
-+extern const char *const ipe_boot_policy;
-+extern const struct ipe_policy *ipe_active_policy;
-+
-+enum ipe_action {
-+	ipe_action_unset = 0,
-+	ipe_action_allow,
-+	ipe_action_deny
-+};
-+
-+struct ipe_prop_container {
-+	struct list_head next;
-+	void *value;
-+	const struct ipe_property *prop;
-+};
-+
-+struct ipe_rule {
-+	struct list_head props;
-+	struct list_head next;
-+	enum ipe_action action;
-+	enum ipe_op op;
-+};
-+
-+struct ipe_rule_table {
-+	struct list_head rules;
-+	enum ipe_action def;
-+};
-+
-+struct ipe_pol_ver {
-+	u16 major;
-+	u16 minor;
-+	u16 rev;
-+};
-+
-+struct ipe_policy {
-+	char *policy_name;
-+	struct ipe_pol_ver policy_version;
-+	enum ipe_action def;
-+
-+	/* KERNEL_READ stores no data itself */
-+	struct ipe_rule_table ops[ipe_op_max - 1];
-+};
-+
-+#endif /* IPE_POLICY_H */
-diff --git a/security/ipe/ipe-prop-internal.h b/security/ipe/ipe-prop-internal.h
-new file mode 100644
-index 000000000000..95a2081e77ee
---- /dev/null
-+++ b/security/ipe/ipe-prop-internal.h
-@@ -0,0 +1,37 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe-property.h"
-+
-+#include <linux/types.h>
-+
-+#ifndef IPE_PROPERTY_INTERNAL_H
-+#define IPE_PROPERTY_INTERNAL_H
-+
-+#define IPE_PROPERTY_OPERATION	"op"
-+#define IPE_PROPERTY_DEFAULT	"DEFAULT"
-+#define IPE_PROPERTY_ACTION	"action"
-+
-+#define IPE_OP_EXECUTE		"EXECUTE"
-+#define IPE_OP_FIRMWARE		"FIRMWARE"
-+#define IPE_OP_KEXEC_IMAGE	"KEXEC_IMAGE"
-+#define IPE_OP_KEXEC_INITRAMFS	"KEXEC_INITRAMFS"
-+#define IPE_OP_X509_CERTIFICATE	"X509_CERT"
-+#define IPE_OP_POLICY		"POLICY"
-+#define IPE_OP_KMODULE		"KMODULE"
-+#define IPE_OP_KERNEL_READ	"KERNEL_READ"
-+
-+struct ipe_prop_reg {
-+	struct rb_node node;
-+	const struct ipe_property *prop;
-+};
-+
-+int ipe_for_each_prop(int (*view)(const struct ipe_property *prop,
-+				  void *ctx),
-+		      void *ctx);
-+
-+const struct ipe_property *ipe_lookup_prop(const char *key);
-+
-+#endif /* IPE_PROPERTY_INTERNAL_H */
-diff --git a/security/ipe/ipe-property.c b/security/ipe/ipe-property.c
-new file mode 100644
-index 000000000000..d4b0283f86bd
---- /dev/null
-+++ b/security/ipe/ipe-property.c
-@@ -0,0 +1,142 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "ipe-prop-internal.h"
-+#include "ipe-property.h"
-+
-+#include <linux/types.h>
-+#include <linux/rbtree.h>
-+#include <linux/slab.h>
-+
-+/* global root containing all registered properties */
-+struct rb_root ipe_registry_root = RB_ROOT;
-+
-+/**
-+ * reg_lookup: Attempt to find a `prop_reg` structure with property_name @key.
-+ * @key: The property_name to look for in the tree.
-+ *
-+ * Return:
-+ * ipe_prop_reg structure - OK
-+ * NULL - No such property exists
-+ */
-+static struct ipe_prop_reg *reg_lookup(const char *key)
-+{
-+	struct rb_node *n = ipe_registry_root.rb_node;
-+
-+	while (n) {
-+		int r;
-+		struct ipe_prop_reg *reg =
-+			container_of(n, struct ipe_prop_reg, node);
-+
-+		r = strcmp(reg->prop->property_name, key);
-+		if (r == 0)
-+			return reg;
-+		else if (r > 0)
-+			n = n->rb_right;
-+		else
-+			n = n->rb_left;
-+	}
-+
-+	return NULL;
-+}
-+
-+/**
-+ * ipe_lookup_prop: Attempt to find a ipe_property structure by name @key.
-+ * @key: The property_name to look for in the tree.
-+ *
-+ * Return:
-+ * ipe_property structure - OK
-+ * NULL - No property exists under @key
-+ */
-+const struct ipe_property *ipe_lookup_prop(const char *key)
-+{
-+	struct ipe_prop_reg *reg = reg_lookup(key);
-+
-+	if (!reg)
-+		return NULL;
-+
-+	return reg->prop;
-+}
-+
-+/**
-+ * ipe_register_property: Insert a property into the registration system.
-+ * @prop: Read-only property structure containing the property_name, as well
-+ *	  as the necessary function pointers for a property.
-+ *
-+ * The caller needs to maintain the lifetime of @prop throughout the life of
-+ * the system, after calling ipe_register_property.
-+ *
-+ * All necessary properties need to be loaded via this method before
-+ * loading a policy, otherwise the properties will be ignored as unknown.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * -EEXIST - A key exists with the name @prop->property_name
-+ * -ENOMEM - Out of Memory
-+ */
-+int ipe_register_property(const struct ipe_property *prop)
-+{
-+	struct rb_node *parent = NULL;
-+	struct ipe_prop_reg *new_data = NULL;
-+	struct rb_node **new = &ipe_registry_root.rb_node;
-+
-+	while (*new) {
-+		int r;
-+		struct ipe_prop_reg *reg =
-+			container_of(*new, struct ipe_prop_reg, node);
-+
-+		parent = *new;
-+
-+		r = strcmp(reg->prop->property_name, prop->property_name);
-+		if (r == 0)
-+			return -EEXIST;
-+		else if (r > 0)
-+			new = &((*new)->rb_right);
-+		else
-+			new = &((*new)->rb_left);
-+	}
-+
-+	new_data = kzalloc(sizeof(*new_data), GFP_KERNEL);
-+	if (!new_data)
-+		return -ENOMEM;
-+
-+	new_data->prop = prop;
-+
-+	rb_link_node(&new_data->node, parent, new);
-+	rb_insert_color(&new_data->node, &ipe_registry_root);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ipe_for_each_prop: Iterate over all currently-registered properties
-+ *	calling @fn on the values, and providing @view @ctx.
-+ * @view: The function to call for each property. This is given the property
-+ *	structure as the first argument, and @ctx as the second.
-+ * @ctx: caller-specified context that is passed to the function. Can be NULL.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * !0 - Proper errno as returned by @view.
-+ */
-+int ipe_for_each_prop(int (*view)(const struct ipe_property *prop,
-+				  void *ctx),
-+		      void *ctx)
-+{
-+	struct rb_node *node;
-+	struct ipe_prop_reg *val;
-+	int rc = 0;
-+
-+	for (node = rb_first(&ipe_registry_root); node; node = rb_next(node)) {
-+		val = container_of(node, struct ipe_prop_reg, node);
-+
-+		rc = view(val->prop, ctx);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	return rc;
-+}
-diff --git a/security/ipe/ipe-property.h b/security/ipe/ipe-property.h
-new file mode 100644
-index 000000000000..cf570d52d0d2
---- /dev/null
-+++ b/security/ipe/ipe-property.h
-@@ -0,0 +1,99 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe-engine.h"
-+
-+#include <linux/types.h>
-+#include <linux/lsm_audit.h>
-+
-+#ifndef IPE_PROPERTY_H
-+#define IPE_PROPERTY_H
-+
-+/**
-+ * ipe_property_evaluator: Determines whether a file subject matches the
-+ *			   property.
-+ * @value: Value to compare against for a match
-+ *
-+ * NOTE: This is done in an rcu read critical section - sleeping
-+ *	 allocations are prohibited.
-+ *
-+ * Return:
-+ * true - The property matches evaluation
-+ * false - The property does not match evaluation
-+ */
-+typedef bool (*ipe_property_evaluator)(const struct ipe_engine_ctx *ctx,
-+				       const void *value);
-+
-+/**
-+ * ipe_property_audit: Transform a rule value into a string representation.
-+ * @ab: Audit buffer to add the string representation of @value to.
-+ * @value: Value to transform into a string representation.
-+ *
-+ * NOTE: This is done in an rcu read critical section - sleeping
-+ *	 allocations are prohibited.
-+ */
-+typedef void (*ipe_property_audit)(struct audit_buffer *ab, const void *value);
-+
-+/**
-+ * ipe_ctx_audit: Called by the auditing to provide the values
-+ *	that were evaluated about the subject, @ctx->file, to determine how
-+ *	a value was evaluated.
-+ *
-+ * NOTE: This is done in an rcu read critical section - sleeping
-+ *	 allocations are prohibited.
-+ *
-+ * @ab: Audit buffer to add the string representation of @value to.
-+ * @value: Value to transform into a string representation.
-+ *
-+ */
-+typedef void (*ipe_ctx_audit)(struct audit_buffer *ab,
-+			     const struct ipe_engine_ctx *ctx);
-+
-+/**
-+ * ipe_parse_value: Transform a string representation of a rule into an
-+ *		    internal ipe data-structure, opaque to the engine.
-+ * @val_str: String-value parsed by the policy parser.
-+ * @value: Valid-pointer indicating address to store parsed value.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * !0 - ERR, use Standard Return Codes
-+ */
-+typedef int(*ipe_parse_value)(const char *val_str, void **value);
-+
-+/**
-+ * ipe_dup_val: Called by the policy parser to make duplicate properties for
-+ *		pseudo-properties like "KERNEL_READ".
-+ * @src:  Value to copy.
-+ * @dest: Pointer to the destination where the value should be copied.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * !0 - ERR, use Standard Return Codes
-+ */
-+typedef int (*ipe_dup_val)(const void *src, void **dest);
-+
-+/**
-+ * ipe_free_value: Free a policy value, created by ipe_parse_value.
-+ * @value: Valid-pointer to the value to be interpreted and
-+ *	   freed by the property.
-+ *
-+ * Optional, can be NULL - in which case, this will not be called.
-+ */
-+typedef void (*ipe_free_value)(void **value);
-+
-+struct ipe_property {
-+	const char			*const property_name;
-+	ipe_property_evaluator		eval;
-+	ipe_property_audit		rule_audit;
-+	ipe_ctx_audit			ctx_audit;
-+	ipe_parse_value			parse;
-+	ipe_dup_val			dup;
-+	ipe_free_value			free_val;
-+};
-+
-+int ipe_register_property(const struct ipe_property *prop);
-+
-+#endif /* IPE_PROPERTY_H */
-diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
-new file mode 100644
-index 000000000000..6e3b9a10813c
---- /dev/null
-+++ b/security/ipe/ipe.c
-@@ -0,0 +1,67 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "ipe-policy.h"
-+#include "ipe-hooks.h"
-+
-+#include <linux/module.h>
-+#include <linux/lsm_hooks.h>
-+#include <linux/sysctl.h>
-+#include <linux/rcupdate.h>
-+#include <linux/fs.h>
-+#include <linux/kernel.h>
-+#include <linux/security.h>
-+
-+static struct security_hook_list ipe_hooks[] __lsm_ro_after_init = {
-+	LSM_HOOK_INIT(bprm_check_security, ipe_on_exec),
-+	LSM_HOOK_INIT(mmap_file, ipe_on_mmap),
-+	LSM_HOOK_INIT(kernel_read_file, ipe_on_kernel_read),
-+	LSM_HOOK_INIT(kernel_load_data, ipe_on_kernel_load_data),
-+	LSM_HOOK_INIT(file_mprotect, ipe_on_mprotect),
-+};
-+
-+/**
-+ * ipe_init: Entry point of IPE.
-+ *
-+ * This is called at LSM init, which happens occurs early during kernel
-+ * start up. During this phase, IPE loads the
-+ * properties compiled into the kernel, and register's IPE's hooks.
-+ * The boot policy is loaded later, during securityfs init, at which point
-+ * IPE will start enforcing its policy.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * -ENOMEM - sysctl registration failed.
-+ */
-+static int __init ipe_init(void)
-+{
-+	pr_info("mode=%s", (ipe_enforce == 1) ? IPE_MODE_ENFORCE :
-+						IPE_MODE_PERMISSIVE);
-+
-+	security_add_hooks(ipe_hooks, ARRAY_SIZE(ipe_hooks), "IPE");
-+
-+	return 0;
-+}
-+
-+DEFINE_LSM(ipe) = {
-+	.name = "ipe",
-+	.init = ipe_init,
-+};
-+
-+bool ipe_enforce = true;
-+bool ipe_success_audit;
-+
-+#ifdef CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH
-+
-+/* Module Parameter for Default Behavior on Boot */
-+module_param_named(enforce, ipe_enforce, bool, 0644);
-+MODULE_PARM_DESC(enforce, "IPE Permissive Switch");
-+
-+#endif /* CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH */
-+
-+/* Module Parameter for Success Audit on Boot */
-+module_param_named(success_audit, ipe_success_audit, bool, 0644);
-+MODULE_PARM_DESC(success_audit, "IPE Audit on Success");
-diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
-new file mode 100644
-index 000000000000..af72bb574f73
---- /dev/null
-+++ b/security/ipe/ipe.h
-@@ -0,0 +1,20 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#ifndef IPE_H
-+#define IPE_H
-+
-+#define pr_fmt(fmt) "IPE " fmt "\n"
-+
-+#include <linux/types.h>
-+#include <linux/fs.h>
-+
-+#define IPE_MODE_ENFORCE	"enforce"
-+#define IPE_MODE_PERMISSIVE	"permissive"
-+
-+extern bool ipe_enforce;
-+extern bool ipe_success_audit;
-+
-+#endif /* IPE_H */
 -- 
 2.27.0
 
