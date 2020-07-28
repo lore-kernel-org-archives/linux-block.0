@@ -2,71 +2,51 @@ Return-Path: <SRS0=YNow=BH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3BFC433E4
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 08:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A66AC433E4
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 08:45:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15B3A2177B
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 08:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1579A208E4
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 08:45:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KjwxtEMA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/T2Re6J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726990AbgG1IB2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jul 2020 04:01:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60322 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727798AbgG1IB1 (ORCPT
+        id S1728183AbgG1Iph (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jul 2020 04:45:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47287 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728170AbgG1Iph (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jul 2020 04:01:27 -0400
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6974C0619D2
-        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2020 01:01:27 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id l64so11038288qkb.8
-        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2020 01:01:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=o7IdoU3GthtJkfIpVkjeEL5SahC9gpK+nOKCUdtMyLA=;
-        b=KjwxtEMA9I7JUPYRUD4voCkD5N/T88FB5uYhvp80eZM5TeofA1tbo+WN+19ZrRdeUk
-         ilGFOGzz9WxqdsLXw3AyXzUD0rY+GNi2PJh0C7dyDWuxH0DFBZ5wDD9zg5zKGqwfP//b
-         omkODedxdxISuIQEyh54T5Gh0RH80qTqlF+8A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=o7IdoU3GthtJkfIpVkjeEL5SahC9gpK+nOKCUdtMyLA=;
-        b=i3KeMGjw/aWec4r+X9pJtLHqxLSKWjhYJde/Qh/jB7i+Cmn2GAxA47rdXTCE4CLJGb
-         OUFq/0Z+GyyllcEGQadONaJQMUrqpRQ7pBg5smivAB7x2wcneuZlJD4l16ZTMWYR6pCx
-         CneyMbsJ5UM6kbDPVnUYEobka0zKmjo8kX5UxHcBnUDkmwe3o3QPWCoBptbhE98JkxTa
-         1N+1mbhXUk/ONA7/IuqrPkEtJXmwJO/YHhrDScxgkPa7hFR3vl+uPMqD2oi2j2zlH8Ok
-         o5U7Rh5ZU5ngehFrBohZJzIsLKk4WvNCwF4nn1fVP5+Zr/8xJOQnz09tKvaC/yBTlFLa
-         CC5g==
-X-Gm-Message-State: AOAM53072JdEuN0RlCoFR/XXfN5hzWJEkCmE+RL7R6PHmCEQ2M128V2e
-        YIY34qvh9k4VmlBwmbd2djy/pRwOgQZbGR4hTAfNYA==
-X-Google-Smtp-Source: ABdhPJw2OmXGrJ6ZFDe0WzmPpXDjucVRdGY9T7sWAlVhud6PWKwelDeoOmTHqUPRT1QWJyFuLkKQ0wLY7Vq20AbXHwo=
-X-Received: by 2002:a37:70c1:: with SMTP id l184mr23039981qkc.70.1595923286478;
- Tue, 28 Jul 2020 01:01:26 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <61299951-97dc-b2be-c66c-024dfbd3a1cb@huawei.com>
- <b49c33ebda36b8f116a51bc5c430eb9d@mail.gmail.com> <13d6b63e-3aa8-68fa-29ab-a4c202024280@huawei.com>
- <34a832717fef4702b143ea21aa12b79e@mail.gmail.com> <1dcf2bb9-142c-7bb8-9207-5a1b792eb3f9@huawei.com>
- <e69dc243174664efd414a4cd0176e59d@mail.gmail.com> <20200721011323.GA833377@T590>
- <c71bbdf2607a8183926430b5f4aa1ae1@mail.gmail.com> <20200722041201.GA912316@T590>
- <f6f05483491c391ce79486b8fb78cb2e@mail.gmail.com> <20200722080409.GB912316@T590>
-In-Reply-To: <20200722080409.GB912316@T590>
-MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQG4aoXNvN1oD1R4AnS848tUiuVMpAL7B1DGAnlvVUMB+lqyDgMys1vsAqc0OTgDU1/61AGRP9A4AkK8P+ECUfpMjQJmEWWiqIX8AyA=
-Date:   Tue, 28 Jul 2020 13:31:23 +0530
-Message-ID: <ce3f1daa9f7399071b801f2ffd3f7ab3@mail.gmail.com>
-Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        Tue, 28 Jul 2020 04:45:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595925935;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EZLFCIDyTMkfzQP0XXawz5q3gUq1NEYSMUB61hST3o0=;
+        b=I/T2Re6JtZsPW/EWcD7YJnXqniq0gj7Jc9Uahq1tqiNDVA3s7ZMk53BZ+yEqVpTS/ymQwV
+        RkibS0Aw+kF7qpu/b77X3+CEJYqnL6t5L7oMbRg+mzbPwj4NMvHCOdC/VhkgxnzCQKu008
+        5wqwW5rRC4VSEe715NYedg0Ii+aoyfA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-85-2bUuV2QsPCWE2ee2SmWIeg-1; Tue, 28 Jul 2020 04:45:31 -0400
+X-MC-Unique: 2bUuV2QsPCWE2ee2SmWIeg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BD6FA30D5;
+        Tue, 28 Jul 2020 08:45:24 +0000 (UTC)
+Received: from T590 (ovpn-12-109.pek2.redhat.com [10.72.12.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 545391036D15;
+        Tue, 28 Jul 2020 08:45:15 +0000 (UTC)
+Date:   Tue, 28 Jul 2020 16:45:11 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Kashyap Desai <kashyap.desai@broadcom.com>, axboe@kernel.dk,
         jejb@linux.ibm.com, martin.petersen@oracle.com,
         don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
         bvanassche@acm.org, hare@suse.com, hch@lst.de,
@@ -75,118 +55,73 @@ Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
         "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+Message-ID: <20200728084511.GA1326626@T590>
+References: <20200721011323.GA833377@T590>
+ <c71bbdf2607a8183926430b5f4aa1ae1@mail.gmail.com>
+ <20200722041201.GA912316@T590>
+ <f6f05483491c391ce79486b8fb78cb2e@mail.gmail.com>
+ <20200722080409.GB912316@T590>
+ <fe7a7acf-d62b-d541-4203-29c1d0403c2a@huawei.com>
+ <20200723140758.GA957464@T590>
+ <f4a896a3-756e-68bb-7700-cab1e5523c81@huawei.com>
+ <20200724024704.GB957464@T590>
+ <6531e06c-9ce2-73e6-46fc-8e97400f07b2@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6531e06c-9ce2-73e6-46fc-8e97400f07b2@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On Wed, Jul 22, 2020 at 11:00:45AM +0530, Kashyap Desai wrote:
-> > > On Tue, Jul 21, 2020 at 12:23:39PM +0530, Kashyap Desai wrote:
-> > > > > > >
-> > > > > > > Perf top (shared host tag. IOPS = 230K)
-> > > > > > >
-> > > > > > > 13.98%  [kernel]        [k] sbitmap_any_bit_set
-> > > > > > >      6.43%  [kernel]        [k] blk_mq_run_hw_queue
-> > > > > >
-> > > > > > blk_mq_run_hw_queue function take more CPU which is called
-from
-> "
-> > > > > > scsi_end_request"
-> > > > >
-> > > > > The problem could be that nr_hw_queues is increased a lot so
-> > > > > that sample
-> > > > on
-> > > > > blk_mq_run_hw_queue() can be observed now.
-> > > >
-> > > > Yes. That is correct.
-> > > >
-> > > > >
-> > > > > > It looks like " blk_mq_hctx_has_pending" handles only elevator
-> > > > > > (scheduler) case. If  queue has ioscheduler=none, we can skip.
-> > > > > > I case of scheduler=none, IO will be pushed to hardware queue
-> > > > > > and it by pass
-> > > > > software queue.
-> > > > > > Based on above understanding, I added below patch and I can
-> > > > > > see performance scale back to expectation.
-> > > > > >
-> > > > > > Ming mentioned that - we cannot remove blk_mq_run_hw_queues()
-> > > from
-> > > > > > IO completion path otherwise we may see IO hang. So I have
-> > > > > > just modified completion path assuming it is only required for
-> > > > > > IO
-> > scheduler
-> > > case.
-> > > > > > https://www.spinics.net/lists/linux-block/msg55049.html
-> > > > > >
-> > > > > > Please review and let me know if this is good or we have to
-> > > > > > address with proper fix.
-> > > > > >
-> > > > > > diff --git a/block/blk-mq.c b/block/blk-mq.c index
-> > > > > > 1be7ac5a4040..b6a5b41b7fc2 100644
-> > > > > > --- a/block/blk-mq.c
-> > > > > > +++ b/block/blk-mq.c
-> > > > > > @@ -1559,6 +1559,9 @@ void blk_mq_run_hw_queues(struct
-> > > > > request_queue
-> > > > > > *q, bool async)
-> > > > > >         struct blk_mq_hw_ctx *hctx;
-> > > > > >         int i;
-> > > > > >
-> > > > > > +       if (!q->elevator)
-> > > > > > +               return;
-> > > > > > +
-> > > > >
-> > > > > This way shouldn't be correct, blk_mq_run_hw_queues() is still
-> > > > > needed
-> > > > for
-> > > > > none because request may not be dispatched successfully by
-> > > > > direct
-> > issue.
-> > > >
-> > > > When block layer attempt posting request to h/w queue directly
-> > > > (for
-> > > > ioscheduler=none) and if it fails, it is calling
-> > > > blk_mq_request_bypass_insert().
-> > > > blk_mq_request_bypass_insert function will start the h/w queue
-> > > > from submission context. Do we still have an issue if we skip
-> > > > running hw queue from completion ?
-> > >
-> > > The thing is that we can't guarantee that direct issue or adding
-> > > request
-> > into
-> > > hctx->dispatch is always done for MQ/none, for example, request
-> > > hctx->still
-> > > can be added to sw queue from blk_mq_flush_plug_list() when mq plug
-> > > is applied.
-> >
-> > I see even blk_mq_sched_insert_requests() from blk_mq_flush_plug_list
-> > make sure it run the h/w queue. If all the submission path which deals
-> > with s/w queue make sure they run h/w queue, can't we remove
-> > blk_mq_run_hw_queues() from scsi_end_request ?
->
-> No, one purpose of blk_mq_run_hw_queues() is for rerun queue in case
-that
-> dispatch budget is running out of in submission path, and
-sdev->device_busy
-> is shared by all hw queues on this scsi device.
->
-> I posted one patch for avoiding it in scsi_end_request() before, looks
-it never
-> lands upstream:
->
-> https://lore.kernel.org/linux-block/20191118100640.3673-1-
-> ming.lei@redhat.com/
+On Tue, Jul 28, 2020 at 08:54:27AM +0100, John Garry wrote:
+> On 24/07/2020 03:47, Ming Lei wrote:
+> > On Thu, Jul 23, 2020 at 06:29:01PM +0100, John Garry wrote:
+> > > > > As I see, since megaraid will have 1:1 mapping of CPU to hw queue, will
+> > > > > there only ever possibly a single bit set in ctx_map? If so, it seems a
+> > > > > waste to always check every sbitmap map. But adding logic for this may
+> > > > > negate any possible gains.
+> > > > 
+> > > > It really depends on min and max cpu id in the map, then sbitmap
+> > > > depth can be reduced to (max - min + 1). I'd suggest to double check that
+> > > > cost of sbitmap_any_bit_set() really matters.
+> > > 
+> > > Hi Ming,
+> > > 
+> > > I'm not sure that reducing the search range would help much, as we still
+> > > need to load some indexes of map[], and at best this may be reduced from 2/3
+> > > -> 1 elements, depending on nr_cpus.
+> > 
+> > I believe you misunderstood my idea, and you have to think it from implementation
+> > viewpoint.
+> > 
+> > The only workable way is to store the min cpu id as 'offset' and set the sbitmap
+> > depth as (max - min + 1), isn't it? Then the actual cpu id can be figured out via
+> > 'offset' + nr_bit. And the whole indexes are just spread on the actual depth. BTW,
+> > max & min is the max / min cpu id in hctx->cpu_map. So we can improve not only on 1:1,
+> > and I guess most of MQ cases can benefit from the change, since it shouldn't be usual
+> > for one ctx_map to cover both 0 & nr_cpu_id - 1.
+> > 
+> > Meantime, we need to allocate the sbitmap dynamically.
+> 
+> OK, so dynamically allocating the sbitmap could be good. I was thinking
+> previously that we still allocate for nr_cpus size, and search a limited
+> range - but this would have heavier runtime overhead.
+> 
+> So if you really think that this may have some value, then let me know, so
+> we can look to take it forward.
 
-Ming - I think above patch will fix the issue of performance on VD.
-I fix some hunk failure and ported to 5.8 kernel -
-I am testing this patch on my setup. If you post V4, I will use that.
+Forget to mention, the in-tree code has been this shape for long
+time, please see sbitmap_resize() called from blk_mq_map_swqueue().
 
-So far looks good.  I have reduced device queue depth so that I hit budget
-busy code path frequently.
-
-Kashyap
+Another update is that V4 of 'scsi: core: only re-run queue in scsi_end_request()
+if device queue is busy' is quite hard to implement since commit b4fd63f42647110c9
+("Revert "scsi: core: run queue if SCSI device queue isn't ready and queue is idle").
 
 
->
-> Thanks,
-> Ming
+Thanks,
+Ming
+
