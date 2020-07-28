@@ -2,93 +2,120 @@ Return-Path: <SRS0=YNow=BH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D94A1C433E3
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 16:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 975CBC433E3
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 17:18:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDB0D2074F
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 16:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75AC520809
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 17:18:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vFZ/vA3h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731638AbgG1Qz3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jul 2020 12:55:29 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:40496 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731504AbgG1Qz2 (ORCPT
+        id S1731792AbgG1RSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jul 2020 13:18:32 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56800 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731791AbgG1RSb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jul 2020 12:55:28 -0400
-Received: by mail-pl1-f193.google.com with SMTP id u10so680129plr.7;
-        Tue, 28 Jul 2020 09:55:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=u6+EWe+OefPWlNaewDc8Nty4sIHeAezZ0qkcJ+zPgXY=;
-        b=PoKQs1wvTl7oceqvP68X/d4U9Cf+/KtPjtX9yWhLM477iZZfWwzOUh1lBlsF5GNTAD
-         jWskz3H+CCduW49FGs9/fd+ZPvhTSU4bccLUZo4t6JN6rxn0PmL/XwOs5b5r6lVZRgLq
-         nO/4lL0WHAVI0/5EiBdwFKd0yrHqp4qQbw6OrK5k4tE6yS1gNjFH1xDnmPUi/sshZ+A8
-         3H6/RhpI+sAn+Geec/DGkP7oSKvz/ZQj/sYBE8S4oPT6lBxuAGs4ZOz/yuGtOv5ZvdVk
-         lhDemg9ix9DjjsxklczF5m/4n0n+WOZIb4kYCuyLdgnwJ/9jpf5rADL3GjQfhrlNwa0Q
-         MEJg==
-X-Gm-Message-State: AOAM533vXxU6/XuSUcEw5kVpwGgejrglcolHAI3RjnM0HY08PNvUrxK0
-        0l5xfaVxHt8gZTpFiHVpDZXsl1q2
-X-Google-Smtp-Source: ABdhPJwAUx97vkeQNmMP3hCbadsOeNsDpzlCvcBDYjWdZV/9kElAlEiQcQVF2YqDlAI0NJxBS1nNqA==
-X-Received: by 2002:a17:902:7484:: with SMTP id h4mr9677382pll.139.1595955327430;
-        Tue, 28 Jul 2020 09:55:27 -0700 (PDT)
-Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id fh14sm3489892pjb.38.2020.07.28.09.55.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Jul 2020 09:55:26 -0700 (PDT)
-Subject: Re: [PATCH v1] block: Remove callback typedefs for blk_mq_ops
-To:     Daniel Wagner <dwagner@suse.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200728162036.118211-1-dwagner@suse.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <ec76f741-2e4b-69bf-dacd-8d917e10533c@acm.org>
-Date:   Tue, 28 Jul 2020 09:55:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200728162036.118211-1-dwagner@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Tue, 28 Jul 2020 13:18:31 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06SHHwMw087461;
+        Tue, 28 Jul 2020 17:18:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2020-01-29; bh=jd54vjPHOXLUbAgjl30uoarVJxhhc8ZOuByEqVSi2Ew=;
+ b=vFZ/vA3hAQjch9Xd0MngobdOyUNmFZWkpuu92gPP4Bqhv0UOOfIDj/SRpQh3AFCpdTpd
+ BLKTL4Oo+OmL5nyuAzT5Pvq0xkBljgge9IKQm0Huk5H0jFI+h/PEn61I9VID04fHPfER
+ ct4oOD6EXiivaEhA8IReuhXFCLGFJdx/Mkd2EHVdRsRMnoZCQsNhXOG3Qoc9Siep00DM
+ lyZ2xKPZh83mzOuIu7aBvpAjvMs0k55F5k9Rv5EnTNobwdW7p81ZPsn9uEXAqvbJSRUQ
+ gkTX/5I1QOOUelBSaiTjJWSVNHRKm2Do3MVyGeKDkDYZquoF9Dm+vSDCwBEpk9fRQaR9 Hg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 32hu1jgtwm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 28 Jul 2020 17:18:28 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06SHChtR081678;
+        Tue, 28 Jul 2020 17:18:27 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 32hu5uf17t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jul 2020 17:18:27 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06SHIQA7007255;
+        Tue, 28 Jul 2020 17:18:26 GMT
+Received: from dhcp-10-159-131-222.vpn.oracle.com (/10.159.131.222)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 28 Jul 2020 10:18:26 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.15\))
+Subject: Re: [PATCH 1/1] block: return BLK_STS_NOTSUPP if operation is not
+ supported
+From:   Ritika Srivastava <RITIKA.SRIVASTAVA@ORACLE.COM>
+In-Reply-To: <20200728072855.GA4774@infradead.org>
+Date:   Tue, 28 Jul 2020 10:18:22 -0700
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <91295B21-661A-416A-A601-AE1671365F72@ORACLE.COM>
+References: <1595608402-16457-1-git-send-email-ritika.srivastava@oracle.com>
+ <20200726151003.GB20628@infradead.org>
+ <1C19DDD2-C7E9-45B5-9FBE-641E7BAB974D@ORACLE.COM>
+ <20200728072855.GA4774@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+X-Mailer: Apple Mail (2.3445.104.15)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9696 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007280127
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9696 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 mlxlogscore=999
+ malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0 phishscore=0
+ suspectscore=3 bulkscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007280127
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-07-28 09:20, Daniel Wagner wrote:
-> No need to define typedefs for the callbacks, because there is not a
-> single user except blk_mq_ops.
 
-Thanks for having done this work.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> On Jul 28, 2020, at 12:28 AM, Christoph Hellwig <hch@infradead.org> =
+wrote:
+>=20
+> On Mon, Jul 27, 2020 at 12:11:19PM -0700, Ritika Srivastava wrote:
+>> Hence block layer issues write zeroes in blkdev_issue_zeroout()
+>>=20
+>> In response, the storage returns the following SCSI error
+>> Sense Key : Illegal Request [current]
+>> Add. Sense: Invalid command operation code
+>>=20
+>> Once this error is received, the write zero capability of the device =
+is disabled and write_zeroes_max_bytes is set to 0.
+>> DM device queue limits are also set to 0 and device-mapper fails the =
+path.
+>> To avoid this, if BLK_STS_NOTSUPP could be returned, then =
+device-mapper would not fail the paths.
+>>=20
+>> Once the write zero capability has been disabled, blk-lib issues =
+zeroes via __blkdev_issue_zero_pages().
+>>=20
+>> Please let me know if I missed something.
+>=20
+> Oh, the stupid SCSI runtime detection case again.  Can you please
+> document this in a comment?
+>=20
+> Also please switch blk_cloned_rq_check_limits to just return the
+> blk_status_t directly.
+
+Sure, I will make these changes and send updated version.
+
+Thanks,
+Ritika
+
