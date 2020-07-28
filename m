@@ -2,83 +2,76 @@ Return-Path: <SRS0=YNow=BH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 893E4C433E5
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 15:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B622C43458
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 15:37:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72AF4206D8
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 15:23:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 760832078E
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 15:37:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="sFeRSbxr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730809AbgG1PXR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jul 2020 11:23:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41320 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730586AbgG1PXQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jul 2020 11:23:16 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 3E589B6D4;
-        Tue, 28 Jul 2020 15:23:26 +0000 (UTC)
-Subject: Re: [PATCH] bcache: use disk_{start,end}_io_acct() to count I/O for
- bcache device
-To:     axboe@kernel.dk, Christoph Hellwig <hch@lst.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20200728135920.4618-1-colyli@suse.de>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <cdf2090a-c2ea-8fab-ca47-f27305be77b6@suse.de>
-Date:   Tue, 28 Jul 2020 23:23:09 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+        id S1730800AbgG1Ph4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jul 2020 11:37:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46208 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730678AbgG1Ph4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Jul 2020 11:37:56 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2164AC061794
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2020 08:37:56 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id j9so13167408ilc.11
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2020 08:37:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=aT/4Vd1KT6gFUEyaURRCi9T5w1JgYeHkaL9/rT+SjdM=;
+        b=sFeRSbxrDGk1FX1/85Qv7FXIlsc76+QGGUWMfOjXNSfVVvdM3ACfzQHLbqezRd6BOd
+         njlEWUrAROEV1+gX5qSdf3MHM7jPnoqMwXb5cEFM2nLDHTljMst2sjQQXNFby+ZwqAhk
+         R5cd4wY1rm3RkLoJTOBDPpBXH7c6O6e7xifxbWYSZm3wPeo3vw+qCfOtEbfezD9F8svX
+         1Yc25TTk0P+oDj7KTqcj48j3GE2pQDex9QiHSCKk1S1XMJStDKHTqzf/m1s7vEB4GtCh
+         zZDwug/yEN0AG/yuDhhY0es8K3VDnFqkIK+L99us7hibyLuSGo/TdKSPjLUigjTH/6OJ
+         YaNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aT/4Vd1KT6gFUEyaURRCi9T5w1JgYeHkaL9/rT+SjdM=;
+        b=LikbncSYHU9BELWGn5V1N6xoDxdoIGP+5Nq8ZrAAtdJyf9rr9lpKkjLqKPnQqkPnx9
+         QuBIcY8Pcc1tZNUjetNqfad/hDMzSpMdO71QAsMkQEiH5+PyFIez3QOJIBW8DXaTCMZC
+         /SAFf0Hl++O6AvLKhbyUGcykmqmHVL8OIRXY+kM5q1z8vjuOR6a7OAuRKPj34gAB/978
+         dfR7+Fn+YZmHZIfOcGrvMWI0LFoSpvua9eyLXMI+KhxSD+PkZIZBxyXW90YyFUVfmFLG
+         61SpvuUtWppHLPWWVpImXHkrZSSiKi0fz24JpP8tjJW/D+hP1R37dMDZF79M0EYqbufs
+         X2CA==
+X-Gm-Message-State: AOAM533vZgxgy1VpSM0mo0SBfyazn+sXm1UiJRMKbyZBG79J7GKWBXiM
+        V4ytzYPNvexRN9qwyCYdL625Xg==
+X-Google-Smtp-Source: ABdhPJwqrM+TwYM3A0LLl4/nqG8Pt+LJGaycrasyS6nUKhqtbIBby3yzfVH1Ro6mIWoOXWDdYhVouw==
+X-Received: by 2002:a92:5e1d:: with SMTP id s29mr14577822ilb.245.1595950675515;
+        Tue, 28 Jul 2020 08:37:55 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id r3sm4772269iov.22.2020.07.28.08.37.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jul 2020 08:37:55 -0700 (PDT)
+Subject: Re: [PATCH] block: Use non _rcu version of list functions for
+ tag_set_list
+To:     Daniel Wagner <dwagner@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+References: <20200728132951.29459-1-dwagner@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <67e31df0-b86c-6a2e-d9da-3e8a7114e42e@kernel.dk>
+Date:   Tue, 28 Jul 2020 09:37:54 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200728135920.4618-1-colyli@suse.de>
+In-Reply-To: <20200728132951.29459-1-dwagner@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -87,29 +80,19 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/7/28 21:59, colyli@suse.de wrote:
-> From: Coly Li <colyli@suse.de>
+On 7/28/20 7:29 AM, Daniel Wagner wrote:
+> tag_set_list is only accessed under the tag_set_lock lock. There is
+> no need for using the _rcu list functions.
 > 
-> This patch is a fix to patch "bcache: fix bio_{start,end}_io_acct with
-> proper device". The previous patch uses a hack to temporarily set
-> bi_disk to bcache device, which is mistaken too.
-> 
-> As Christoph suggests, this patch uses disk_{start,end}_io_acct() to
-> count I/O for bcache device in the correct way.
-> 
-> Fixes: 85750aeb748f ("bcache: use bio_{start,end}_io_acct")
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: stable@vger.kernel.org
+> The _rcu list function were introduced to allow read access to the
+> tag_set_list protected under RCU, see 705cda97ee3a ("blk-mq: Make it
+> safe to use RCU to iterate over blk_mq_tag_set.tag_list") and
+> 05b79413946d ("Revert "blk-mq: don't handle TAG_SHARED in restart"").
+> Those changes got reverted later but the cleanup commit missed a
+> couple of places to undo the changes.
 
+Applied, thanks.
 
-Hi Jens and Christoph,
+-- 
+Jens Axboe
 
-This patch is tested, the I/O counter behavior is displayed by iostat in
-expected way.
-
-Please consider to take it for Linux v5.9.
-
-Thanks in advance.
-
-Coly Li
