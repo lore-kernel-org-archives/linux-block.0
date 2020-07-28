@@ -2,145 +2,105 @@ Return-Path: <SRS0=YNow=BH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6604FC433E3
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 14:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6993FC433E3
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 15:13:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E93A2070B
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 14:28:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 362FF206D8
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 15:13:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6GuduwG"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SjJiTDuO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730375AbgG1O2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jul 2020 10:28:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29441 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730346AbgG1O2H (ORCPT
+        id S1730635AbgG1PNq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jul 2020 11:13:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730767AbgG1PNY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jul 2020 10:28:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595946486;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vk76CkPyZ5T42guo8MQRmFanU+aGvXip0+duA6MP1QY=;
-        b=P6GuduwGET+FzVJNQbQDlfz3GoRMmBuVcPfjreT7NQMASuW5yPIn7yThSvZAlOefT+e+b4
-        ohXeAcgqHboIxWQxDTuDau5BzLRV9h//Oxi89adpmQxh2LXi0l7cAJfI+0/31v15UZbZVc
-        FjaE1eyZhIN8eoNh4UQb3S4yyUYT9Cc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-Jz4k5rM7NTirOgcPGnRijg-1; Tue, 28 Jul 2020 10:28:02 -0400
-X-MC-Unique: Jz4k5rM7NTirOgcPGnRijg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80CAEE91C;
-        Tue, 28 Jul 2020 14:27:58 +0000 (UTC)
-Received: from fedora-32-enviroment (unknown [10.35.206.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EA66F10013C4;
-        Tue, 28 Jul 2020 14:27:42 +0000 (UTC)
-Message-ID: <25011fed186bd8bfd1f25640158fbce60a7ad9ef.camel@redhat.com>
-Subject: Re: [PATCH 02/10] block: virtio-blk: check logical block size
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        "open list:SCSI CDROM DRIVER" <linux-scsi@vger.kernel.org>,
-        Tejun Heo <tj@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Ajay Joshi <ajay.joshi@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "open list:SONY MEMORYSTICK SUBSYSTEM" <linux-mmc@vger.kernel.org>,
-        Satya Tangirala <satyat@google.com>,
-        "open list:NETWORK BLOCK DEVICE (NBD)" <nbd@other.debian.org>,
-        Hou Tao <houtao1@huawei.com>, Jens Axboe <axboe@fb.com>,
-        "open list:VIRTIO CORE AND NET DRIVERS" 
-        <virtualization@lists.linux-foundation.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Alex Dubov <oakad@yahoo.com>
-Date:   Tue, 28 Jul 2020 17:27:41 +0300
-In-Reply-To: <f16aba1020019530564f0869a67951282104a5d2.camel@redhat.com>
-References: <20200721105239.8270-1-mlevitsk@redhat.com>
-         <20200721105239.8270-3-mlevitsk@redhat.com> <20200721151437.GB10620@lst.de>
-         <yq1zh7sfedj.fsf@ca-mkp.ca.oracle.com>
-         <f16aba1020019530564f0869a67951282104a5d2.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+        Tue, 28 Jul 2020 11:13:24 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE79C0619D8
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2020 08:13:24 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id z6so21147890iow.6
+        for <linux-block@vger.kernel.org>; Tue, 28 Jul 2020 08:13:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=HOC0oXvIyvE6KttCDt/CbtN/HJvMFJl4oDpiBuHY7GI=;
+        b=SjJiTDuOZHstMuwXfFYckHeUHNa0ICqOpro1jIfGeyfWiPj19s4EtgU714r7i7Xk42
+         WCe5ViYANBL6RTJ5S/ak/0Q3Y0bPhvOq+CmTRlx3T6+czqGhvV6yJs5XAX75HJkdLZQN
+         QBX/FjPje38PNFKgDKNCNc/1VpvSHCcrNugPg+jZ5XSiSFiHJzG+05nuJCLzhd4JP2oN
+         bz/kbJSwcsB+aDZz+lfB2I5WHaEu3AXNmBk3IisKI7iHAeWgNzMKYIz/fSVSoimSkVZO
+         +ENNFO+WKGwOw2lAmvR/k+5G3Zs3Ksl36+s5xzLQ11Fx+rFJYuN0kHZJtbr8UhEJdY22
+         osgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HOC0oXvIyvE6KttCDt/CbtN/HJvMFJl4oDpiBuHY7GI=;
+        b=h0qcpCE1ZR3SFYdoefuJzzBJnxVnaOz9mB54iRC8F4iLSaA0lecTbfJvnTVnJHHoG1
+         6/fAWRJB/WR7LC4sRyFL7iD8VYka4gT4nWfLE0dm6FsBcNnVhFpn+Sr4s/YGGG0UPUow
+         G/IOVJBahvzXECe9EfU5SO2ReF66oWnP1e5XpeQANg5/kruoP02sv6x8aIk/9gAoYAkT
+         sORDzMDBWAq9CfMSjYZKRrMslqYSXLOQdf/vgVsISnkXMK+rT8+9vuDb3kcn3TnXEiJP
+         yhNB5Rsvr06COlefbvQlxPLIOHA4KPD7VInF+28YzV0wms4mCAu2Po7eomBKbu/FCOdy
+         XD1w==
+X-Gm-Message-State: AOAM531fKlsUZiB/+x7TYS+0lqHtpUx83Ba4v4W7kC1vmZ2Omj0TozMs
+        CnTAYF+G5iXsnORMmX+ZptuZBg==
+X-Google-Smtp-Source: ABdhPJxW+HHdsVIIX/Zc8qBmbj4X32if8/I8c+9DvSvEbcsttgQbGehT7VOxO/KNrM4ZDTIMjBvsYA==
+X-Received: by 2002:a5d:9347:: with SMTP id i7mr29320069ioo.40.1595949203940;
+        Tue, 28 Jul 2020 08:13:23 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id u21sm4135064ili.34.2020.07.28.08.13.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jul 2020 08:13:23 -0700 (PDT)
+Subject: Re: [PATCH 00/25] bcache patches for Linux v5.9
+To:     Coly Li <colyli@suse.de>, Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
+References: <20200725120039.91071-1-colyli@suse.de>
+ <bbc97069-6d8f-d8c5-35b1-d85ccb2566df@kernel.dk>
+ <20200728121407.GA4403@infradead.org>
+ <bcad941d-1505-5934-c0af-2530f8609591@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e799acb0-6494-dca8-9645-f44dc018dbeb@kernel.dk>
+Date:   Tue, 28 Jul 2020 09:13:22 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <bcad941d-1505-5934-c0af-2530f8609591@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2020-07-22 at 12:11 +0300, Maxim Levitsky wrote:
-> On Tue, 2020-07-21 at 22:55 -0400, Martin K. Petersen wrote:
-> > Christoph,
-> > 
-> > > Hmm, I wonder if we should simply add the check and warning to
-> > > blk_queue_logical_block_size and add an error in that case.  Then
-> > > drivers only have to check the error return, which might add a lot
-> > > less boiler plate code.
-> > 
-> > Yep, I agree.
-> > 
+On 7/28/20 6:40 AM, Coly Li wrote:
+> On 2020/7/28 20:14, Christoph Hellwig wrote:
+>> On Sat, Jul 25, 2020 at 07:39:00AM -0600, Jens Axboe wrote:
+>>>> Please take them for your Linux v5.9 block drivers branch.
+>>>
+>>> Thanks, applied.
+>>
+>> Can you please revert "cache: fix bio_{start,end}_io_acct with proper
+>> device" again?  It really is a gross hack making things worse rather
+>> than better.
+>>
 > 
-> I also agree that this would be cleaner (I actually tried to implement
-> this the way you suggest), but let me explain my reasoning for doing
-> it
-> this way.
+> Hi Christoph and Jens,
 > 
-> The problem is that most current users of blk_queue_logical_block_size
-> (43 uses in the tree, out of which only 9 use constant block size)
-> check
-> for the block size relatively early, often store it in some internal
-> struct etc, prior to calling blk_queue_logical_block_size thus making
-> them only to rely on blk_queue_logical_block_size as the check for 
-> block size validity will need non-trivial changes in their code.
-> 
-> Instead of this adding blk_is_valid_logical_block_size allowed me
-> to trivially convert most of the uses.
-> 
-> For RFC I converted only some drivers that I am more familiar with
-> and/or can test but I can remove the driver's own checks in most other
-> drivers with low chance of introducing a bug, even if I can't test the
-> driver.
-> 
-> What do you think?
-> 
-> I can also both make blk_queue_logical_block_size return an error
-> value,
-> and have blk_is_valid_logical_block_size and use either of these
-> checks,
-> depending on the driver with eventual goal of un-exporting
-> blk_is_valid_logical_block_size.
-> 
-> Also note that I did add WARN_ON to blk_queue_logical_block_size.
+> My plan was to submit another fix to current fix. If you plan to revert
+> the original fix, it is OK to me, just generate the patch on different
+> code base.
 
-Any update on this?
+That's fine, just do an incremental so we avoid having a revert.
 
-Best regards,
-	Maxim Levitsky
-
-> 
-> Best regards,
-> 	Maxim Levitsky
+-- 
+Jens Axboe
 
