@@ -2,148 +2,145 @@ Return-Path: <SRS0=YNow=BH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94233C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 14:21:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6604FC433E3
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 14:28:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B73420663
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 14:21:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E93A2070B
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 14:28:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aOMKIQEp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6GuduwG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730093AbgG1OV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jul 2020 10:21:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730064AbgG1OV2 (ORCPT
+        id S1730375AbgG1O2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jul 2020 10:28:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29441 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730346AbgG1O2H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jul 2020 10:21:28 -0400
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50180C061794;
-        Tue, 28 Jul 2020 07:21:28 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id d27so14912282qtg.4;
-        Tue, 28 Jul 2020 07:21:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0a7riHkmcNZX+GUojwCDuOWs6tGpRZUtzm7Jn91Fp0E=;
-        b=aOMKIQEpNlogZ8jiHhzLA/GEKWEn/zHsQjaZvchq/hUuV4/z9G7PYgam7xaPvK+XbC
-         +KZJHQ4LQ4Tgx6xDo3Fv31PeriH5Tmo651RamNk/C2F8C7A5PdTDOmnX41aMFCJNhhja
-         +KYI6gi38WMbm+HfI9xlHgB7F3MwUBAWDnLK8I5RFngm+BkcO6FCR8ZSgv1jUucUGoPz
-         9qz1IY2fipMOicd6bOlYRGokwL8gAQwLcprzyRp9p4ysvGuEoPBbmBLrc+N9m+mxTN50
-         2UZOGYCyhqw7eoUQOutmM6w2src1ou6n87VjBVorI7Z3i/kiJm3bR5kZdF2mgRulmCsz
-         qyWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0a7riHkmcNZX+GUojwCDuOWs6tGpRZUtzm7Jn91Fp0E=;
-        b=oC0MnjcX1OEMlMHOVo7kTweT2wwCM/QKVgN8d+/S8cPAu7qGHYtFeVP3WeAvOusOdD
-         ofltgpwgOk6xc8UaZ/ncVv1Z0FYMK8sbcphpvYWPl27efLB6FycBda9BwHLHdALjjiJc
-         oJuuh5zfFJ7G/hIARbfvymzA7WT/pFNNerAKKJh0VpWiqL7qB0yCIjetQQTz/6dT7Vnp
-         XZDKZCA/VS5QeHAbQ38NO/tU4XCLNuN5gE8psrjjnOMIszO3D3tpc++Ujgvze2YEffUH
-         9QbE8cFs2VR6YcNkWUenQVp2+a4mlgVxCU+BoGSfi9xVzF2A+DF6WcZYQwSJgRbMRky3
-         x8Uw==
-X-Gm-Message-State: AOAM5303ZicSvB4Z8UA/dM7lOnlwvA80nZLMfvBfvTqmK1zhCo58vMSH
-        NFRPkSJHojKX8E7XSOwGoA==
-X-Google-Smtp-Source: ABdhPJzzeiRIQxSjsjqXZ9i0X7fm6CZjBthtL+HGvt4+uWmVX+wcM3G8gwQYvj+9df1rB/Ghk+yOcA==
-X-Received: by 2002:ac8:65d3:: with SMTP id t19mr27140594qto.193.1595946087337;
-        Tue, 28 Jul 2020 07:21:27 -0700 (PDT)
-Received: from localhost.localdomain (c-76-119-149-155.hsd1.ma.comcast.net. [76.119.149.155])
-        by smtp.gmail.com with ESMTPSA id 6sm22142009qkj.134.2020.07.28.07.21.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2020 07:21:26 -0700 (PDT)
-From:   Peilin Ye <yepeilin.cs@gmail.com>
-To:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     Peilin Ye <yepeilin.cs@gmail.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [Linux-kernel-mentees] [PATCH] block/floppy: Prevent kernel-infoleak in raw_cmd_copyout()
-Date:   Tue, 28 Jul 2020 10:19:46 -0400
-Message-Id: <20200728141946.426245-1-yepeilin.cs@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 28 Jul 2020 10:28:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595946486;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Vk76CkPyZ5T42guo8MQRmFanU+aGvXip0+duA6MP1QY=;
+        b=P6GuduwGET+FzVJNQbQDlfz3GoRMmBuVcPfjreT7NQMASuW5yPIn7yThSvZAlOefT+e+b4
+        ohXeAcgqHboIxWQxDTuDau5BzLRV9h//Oxi89adpmQxh2LXi0l7cAJfI+0/31v15UZbZVc
+        FjaE1eyZhIN8eoNh4UQb3S4yyUYT9Cc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-Jz4k5rM7NTirOgcPGnRijg-1; Tue, 28 Jul 2020 10:28:02 -0400
+X-MC-Unique: Jz4k5rM7NTirOgcPGnRijg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80CAEE91C;
+        Tue, 28 Jul 2020 14:27:58 +0000 (UTC)
+Received: from fedora-32-enviroment (unknown [10.35.206.247])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EA66F10013C4;
+        Tue, 28 Jul 2020 14:27:42 +0000 (UTC)
+Message-ID: <25011fed186bd8bfd1f25640158fbce60a7ad9ef.camel@redhat.com>
+Subject: Re: [PATCH 02/10] block: virtio-blk: check logical block size
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        "open list:SCSI CDROM DRIVER" <linux-scsi@vger.kernel.org>,
+        Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "open list:SONY MEMORYSTICK SUBSYSTEM" <linux-mmc@vger.kernel.org>,
+        Satya Tangirala <satyat@google.com>,
+        "open list:NETWORK BLOCK DEVICE (NBD)" <nbd@other.debian.org>,
+        Hou Tao <houtao1@huawei.com>, Jens Axboe <axboe@fb.com>,
+        "open list:VIRTIO CORE AND NET DRIVERS" 
+        <virtualization@lists.linux-foundation.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Alex Dubov <oakad@yahoo.com>
+Date:   Tue, 28 Jul 2020 17:27:41 +0300
+In-Reply-To: <f16aba1020019530564f0869a67951282104a5d2.camel@redhat.com>
+References: <20200721105239.8270-1-mlevitsk@redhat.com>
+         <20200721105239.8270-3-mlevitsk@redhat.com> <20200721151437.GB10620@lst.de>
+         <yq1zh7sfedj.fsf@ca-mkp.ca.oracle.com>
+         <f16aba1020019530564f0869a67951282104a5d2.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-raw_cmd_copyout() is potentially copying uninitialized kernel stack memory
-since it is initializing `cmd` by assignment, which may cause the compiler
-to leave uninitialized holes in this structure. Fix it by using memcpy()
-instead.
+On Wed, 2020-07-22 at 12:11 +0300, Maxim Levitsky wrote:
+> On Tue, 2020-07-21 at 22:55 -0400, Martin K. Petersen wrote:
+> > Christoph,
+> > 
+> > > Hmm, I wonder if we should simply add the check and warning to
+> > > blk_queue_logical_block_size and add an error in that case.  Then
+> > > drivers only have to check the error return, which might add a lot
+> > > less boiler plate code.
+> > 
+> > Yep, I agree.
+> > 
+> 
+> I also agree that this would be cleaner (I actually tried to implement
+> this the way you suggest), but let me explain my reasoning for doing
+> it
+> this way.
+> 
+> The problem is that most current users of blk_queue_logical_block_size
+> (43 uses in the tree, out of which only 9 use constant block size)
+> check
+> for the block size relatively early, often store it in some internal
+> struct etc, prior to calling blk_queue_logical_block_size thus making
+> them only to rely on blk_queue_logical_block_size as the check for 
+> block size validity will need non-trivial changes in their code.
+> 
+> Instead of this adding blk_is_valid_logical_block_size allowed me
+> to trivially convert most of the uses.
+> 
+> For RFC I converted only some drivers that I am more familiar with
+> and/or can test but I can remove the driver's own checks in most other
+> drivers with low chance of introducing a bug, even if I can't test the
+> driver.
+> 
+> What do you think?
+> 
+> I can also both make blk_queue_logical_block_size return an error
+> value,
+> and have blk_is_valid_logical_block_size and use either of these
+> checks,
+> depending on the driver with eventual goal of un-exporting
+> blk_is_valid_logical_block_size.
+> 
+> Also note that I did add WARN_ON to blk_queue_logical_block_size.
 
-Cc: stable@vger.kernel.org
-Fixes: 2145e15e0557 ("floppy: don't write kernel-only members to FDRAWCMD ioctl output")
-Suggested-by: Dan Carpenter <dan.carpenter@oracle.com>
-Suggested-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
----
-$ pahole -C "floppy_raw_cmd" drivers/block/floppy.o
-struct floppy_raw_cmd {
-	unsigned int               flags;                /*     0     4 */
+Any update on this?
 
-	/* XXX 4 bytes hole, try to pack */
+Best regards,
+	Maxim Levitsky
 
-	void *                     data;                 /*     8     8 */
-	char *                     kernel_data;          /*    16     8 */
-	struct floppy_raw_cmd *    next;                 /*    24     8 */
-	long int                   length;               /*    32     8 */
-	long int                   phys_length;          /*    40     8 */
-	int                        buffer_length;        /*    48     4 */
-	unsigned char              rate;                 /*    52     1 */
-	unsigned char              cmd_count;            /*    53     1 */
-	union {
-		struct {
-			unsigned char cmd[16];           /*    54    16 */
-			/* --- cacheline 1 boundary (64 bytes) was 6 bytes ago --- */
-			unsigned char reply_count;       /*    70     1 */
-			unsigned char reply[16];         /*    71    16 */
-		};                                       /*    54    33 */
-		unsigned char      fullcmd[33];          /*    54    33 */
-	};                                               /*    54    33 */
-
-	/* XXX 1 byte hole, try to pack */
-
-	/* --- cacheline 1 boundary (64 bytes) was 24 bytes ago --- */
-	int                        track;                /*    88     4 */
-	int                        resultcode;           /*    92     4 */
-	int                        reserved1;            /*    96     4 */
-	int                        reserved2;            /*   100     4 */
-
-	/* size: 104, cachelines: 2, members: 14 */
-	/* sum members: 99, holes: 2, sum holes: 5 */
-	/* last cacheline: 40 bytes */
-};
-
- drivers/block/floppy.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 09079aee8dc4..b8ea98f7a9cb 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -3126,7 +3126,9 @@ static int raw_cmd_copyout(int cmd, void __user *param,
- 	int ret;
- 
- 	while (ptr) {
--		struct floppy_raw_cmd cmd = *ptr;
-+		struct floppy_raw_cmd cmd;
-+
-+		memcpy(&cmd, ptr, sizeof(cmd));
- 		cmd.next = NULL;
- 		cmd.kernel_data = NULL;
- 		ret = copy_to_user(param, &cmd, sizeof(cmd));
--- 
-2.25.1
+> 
+> Best regards,
+> 	Maxim Levitsky
 
