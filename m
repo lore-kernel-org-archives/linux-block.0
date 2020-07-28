@@ -2,61 +2,61 @@ Return-Path: <SRS0=YNow=BH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A46C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 00:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB702C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 00:54:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1153420786
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 00:12:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B97622173E
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 00:54:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726283AbgG1AMx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 20:12:53 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:39815 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726265AbgG1AMx (ORCPT
+        id S1726194AbgG1AyU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 20:54:20 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53740 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726139AbgG1AyT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 20:12:53 -0400
-Received: by mail-pl1-f193.google.com with SMTP id b9so8999802plx.6
-        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 17:12:52 -0700 (PDT)
+        Mon, 27 Jul 2020 20:54:19 -0400
+Received: by mail-wm1-f65.google.com with SMTP id g8so4552186wmk.3
+        for <linux-block@vger.kernel.org>; Mon, 27 Jul 2020 17:54:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=LfVP1kKblrSBABZwodiPANe16VZ1uWUWSsP7qtO4DEA=;
-        b=nHLn3eqoaSPefvI2FN3EE+jNDi8hRfMYHHTHlbhng4kcIJk+4Azpy1/8QHGAU8kHAt
-         CTZxtTDfOYu2lmdWeIKcwHtKf0wWX2BHUlDhm8jrzqbexCCt5RZBPS79awqsP2xSU9uO
-         a82Y+PNTLe0r6Jl8SESDVRtff1Ad4NDtrXWaV97PZ3G7MVbXYpcBJkczJ+bKCx2WKubS
-         Dl/fEH2y2aKkZx9m8SBo5Fc2UdAfPo+tIH69jVpdcJ+vfgLOaTsrq2vhSQnZdB2znnkU
-         hZr6vNvYbeG3W2XV4Ur7xRNdfr0823VMOGsRTWP0TIZdVS9WiTAQ6+h/lq/H2GqfqUEL
-         kjyw==
-X-Gm-Message-State: AOAM533LUgKeP8VT4yWo86z/cx5zTOdye8hLUSCNuhSbxbvl7528rAr0
-        ZcrRKWp2nFZN9ztqWahEWP7QsiIE
-X-Google-Smtp-Source: ABdhPJzHhR5439Dn4jhOGcw1RPSH9qal5fvG+CP0DRNjI6vTJgIuwRww1QwIiCaEezccXido6gBBnw==
-X-Received: by 2002:a17:90a:a68:: with SMTP id o95mr1687505pjo.148.1595895172505;
-        Mon, 27 Jul 2020 17:12:52 -0700 (PDT)
+        bh=u1gkGeFetF3rGlY8qaDx45rMkpu77Cqvm7xU95VZwvg=;
+        b=Yd7SwTxPbI9UkVhzuBP3eZ/AXahQRHBRdPA0Zqxw719VdLHwWlLnGiiSYCuWAWMf/c
+         McjK9mKPXCxwTkDjOFI08mJ93qq/D4CUWnP9nYoeeLI/fIdSWQ54AFWYDWNr66Mbhcnn
+         JYNTKxF5OwLxswL22xRLUuOEf1bcueN4p+h/M1A9prrvgZzsols1XrMOhZejgaE0oKh8
+         PceYMnSJg53R8XF5HiNNaI2lGXzuzz1Az9AzWBPyzyOU/q27MiEQ9CcTFJtHh0bg6uta
+         jxvH5uDKHUb2TY4kRMS37SfkexmZWJ3sdV9gnKVmw82arwtpVUHmkeuK0dD6hkdcvnFV
+         eWUw==
+X-Gm-Message-State: AOAM533m/v2eYct0LfAGo/Cfpm2jgFjEcI+b7nUKUwG70GKiHtbEJXF5
+        in9zTIISc4Qcn+hBi+0YRns=
+X-Google-Smtp-Source: ABdhPJyqlT5/XpeujbzEqr4rTTyCXKfrzmjXsJxZWao90G/LQ4HFBP9GBDeN4iiyY1+usdLm4YDADw==
+X-Received: by 2002:a1c:9a07:: with SMTP id c7mr1563152wme.147.1595897657677;
+        Mon, 27 Jul 2020 17:54:17 -0700 (PDT)
 Received: from ?IPv6:2601:647:4802:9070:5d7d:f206:b163:f30b? ([2601:647:4802:9070:5d7d:f206:b163:f30b])
-        by smtp.gmail.com with ESMTPSA id j5sm15230788pgi.42.2020.07.27.17.12.50
+        by smtp.gmail.com with ESMTPSA id s14sm14032320wrv.24.2020.07.27.17.54.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jul 2020 17:12:51 -0700 (PDT)
-Subject: Re: [PATCH v5 1/2] blk-mq: add tagset quiesce interface
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Ming Lin <mlin@kernel.org>, Chao Leng <lengchao@huawei.com>
-References: <20200727231022.307602-1-sagi@grimberg.me>
- <20200727231022.307602-2-sagi@grimberg.me>
- <20200727233241.GA797782@dhcp-10-100-145-180.wdl.wdc.com>
+        Mon, 27 Jul 2020 17:54:17 -0700 (PDT)
+Subject: Re: [PATCH v5 2/2] nvme: use blk_mq_[un]quiesce_tagset
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <376f8e3d-a8db-9810-0e5b-a022696a893f@grimberg.me>
-Date:   Mon, 27 Jul 2020 17:12:49 -0700
+To:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lin <mlin@kernel.org>,
+        Chao Leng <lengchao@huawei.com>
+References: <20200727231022.307602-1-sagi@grimberg.me>
+ <20200727231022.307602-3-sagi@grimberg.me>
+Message-ID: <56517f9c-2d4e-0fee-52d6-20ef9be54bc0@grimberg.me>
+Date:   Mon, 27 Jul 2020 17:54:12 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200727233241.GA797782@dhcp-10-100-145-180.wdl.wdc.com>
+In-Reply-To: <20200727231022.307602-3-sagi@grimberg.me>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -66,23 +66,61 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->> +static void blk_mq_quiesce_blocking_queue_async_wait(struct request_queue *q)
->> +{
->> +	struct blk_mq_hw_ctx *hctx;
->> +	unsigned int i;
->> +
->> +	queue_for_each_hw_ctx(q, hctx, i) {
->> +		WARN_ON_ONCE(!(hctx->flags & BLK_MQ_F_BLOCKING));
->> +		if (!hctx->rcu_sync) {
->> +			synchronize_srcu(hctx->srcu);
->> +			continue;
->> +		}
->> +		wait_for_completion(&hctx->rcu_sync->completion);
->> +		destroy_rcu_head(&hctx->rcu_sync->head);
-> 
-> Leaking rcu_sync, and not clearing it across quiesce contexts. Needs:
-> 
-> 		kfree(hctx->rcu_sync);
-> 		hctx->rcu_sync = NULL;
 
-Good catch, will wait for some more review and submit a v6.
+On 7/27/20 4:10 PM, Sagi Grimberg wrote:
+> All controller namespaces share the same tagset, so we
+> can use this interface which does the optimal operation
+> for parallel quiesce based on the tagset type (e.g.
+> blocking tagsets and non-blocking tagsets).
+> 
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>   drivers/nvme/host/core.c | 14 ++------------
+>   1 file changed, 2 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 05aa568a60af..c41df20996d7 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -4557,23 +4557,13 @@ EXPORT_SYMBOL_GPL(nvme_start_freeze);
+>   
+>   void nvme_stop_queues(struct nvme_ctrl *ctrl)
+>   {
+> -	struct nvme_ns *ns;
+> -
+> -	down_read(&ctrl->namespaces_rwsem);
+> -	list_for_each_entry(ns, &ctrl->namespaces, list)
+> -		blk_mq_quiesce_queue(ns->queue);
+> -	up_read(&ctrl->namespaces_rwsem);
+> +	blk_mq_quiesce_tagset(ctrl->tagset);
+
+Rrr.. this one is slightly annoying. We have the connect_q in
+fabrics that we use to issue the connect command which is now
+quiesced too...
+
+If we will use this interface, we can unquiesce it right away,
+but that seems kinda backwards...
+
+--
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 05aa568a60af..70af0ff63e7f 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -4557,23 +4557,15 @@ EXPORT_SYMBOL_GPL(nvme_start_freeze);
+
+  void nvme_stop_queues(struct nvme_ctrl *ctrl)
+  {
+-       struct nvme_ns *ns;
+-
+-       down_read(&ctrl->namespaces_rwsem);
+-       list_for_each_entry(ns, &ctrl->namespaces, list)
+-               blk_mq_quiesce_queue(ns->queue);
+-       up_read(&ctrl->namespaces_rwsem);
++       blk_mq_quiesce_tagset(ctrl->tagset);
++       if (ctrl->connect_q)
++               blk_mq_unquiesce_queue(ctrl->connect_q);
+  }
+  EXPORT_SYMBOL_GPL(nvme_stop_queues);
+--
+
+Thoughts?
