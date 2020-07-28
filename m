@@ -2,113 +2,75 @@ Return-Path: <SRS0=YNow=BH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7005C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 01:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D99C433EB
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 01:50:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACB142083E
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 01:40:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 277C120714
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jul 2020 01:50:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A5GJW9YO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EQh16+tJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726320AbgG1Bkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jul 2020 21:40:55 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26743 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726265AbgG1Bkz (ORCPT
+        id S1726929AbgG1BuK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jul 2020 21:50:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59472 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726196AbgG1BuK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jul 2020 21:40:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595900453;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RCjKpXJyN62/c5yVHzk8RTcp4fhzn/0rYLcwRzNEGIA=;
-        b=A5GJW9YOE8uXZnMoN3yVIr29h6EBm1iJiaPMjdRqwSDUIy8ZR4YODVsSXpez+C8/PPisaF
-        WvIscXrl5kEuyRp601n/8ZGWgKtWma8lYmRl1zjV8pR7HVUTAMTVGeBAzycmBBhRPkpIr0
-        UqryNKBRlrsA4EmLL6iuxRcAR1Ed27c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-IQ4Zp378Nv6c-sGQCI9_0w-1; Mon, 27 Jul 2020 21:40:51 -0400
-X-MC-Unique: IQ4Zp378Nv6c-sGQCI9_0w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 311DC80183C;
-        Tue, 28 Jul 2020 01:40:50 +0000 (UTC)
-Received: from T590 (ovpn-12-109.pek2.redhat.com [10.72.12.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D1CF69323;
-        Tue, 28 Jul 2020 01:40:42 +0000 (UTC)
-Date:   Tue, 28 Jul 2020 09:40:38 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Ming Lin <mlin@kernel.org>,
-        Chao Leng <lengchao@huawei.com>
-Subject: Re: [PATCH v5 1/2] blk-mq: add tagset quiesce interface
-Message-ID: <20200728014038.GA1305646@T590>
-References: <20200727231022.307602-1-sagi@grimberg.me>
- <20200727231022.307602-2-sagi@grimberg.me>
+        Mon, 27 Jul 2020 21:50:10 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 017BAC061794;
+        Mon, 27 Jul 2020 18:50:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=sO5DBW8cKfAwrO4ChCjI6ktCdvfob49E/MQneeyqWGA=; b=EQh16+tJezpBCQzOPoGKRmK7tx
+        rUU9S+ewLhBxfY8sfxvrACb0HgWQEPyDfriXZeY+1Qcy4tXecE1iY6bb6bP9rKhRfcA9karWizDFU
+        X34xVM3QWYJJgdaxRjX7FiNqBbKem5a6KzCdvnt3EDLC43aUe4/uPzlusL2HHlvG7A+4sjD+ArBK9
+        hBhsC+AiRxftL568fyevrFOI6ONxLd//10BOX7rIcO04xzcTZpuTsfRj9Rqgx35X42iaxgXILc+Fm
+        /TZi9plKEEjDqiXHrQYcehpFRjT7NCFWeL1PjxuyH+wPoP9Ax8AkSMVN9NZEoOMb+izFu2nk2kb05
+        uWWJ+D6Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k0Ekh-00070f-DB; Tue, 28 Jul 2020 01:50:00 +0000
+Date:   Tue, 28 Jul 2020 02:49:59 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, bcrl@kvack.org, Damien.LeMoal@wdc.com,
+        asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Subject: Re: [PATCH v4 1/6] fs: introduce FMODE_ZONE_APPEND and
+ IOCB_ZONE_APPEND
+Message-ID: <20200728014959.GO23808@casper.infradead.org>
+References: <1595605762-17010-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200724155258epcas5p1a75b926950a18cd1e6c8e7a047e6c589@epcas5p1.samsung.com>
+ <1595605762-17010-2-git-send-email-joshi.k@samsung.com>
+ <20200726151810.GA25328@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200727231022.307602-2-sagi@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200726151810.GA25328@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 27, 2020 at 04:10:21PM -0700, Sagi Grimberg wrote:
-> drivers that have shared tagsets may need to quiesce potentially a lot
-> of request queues that all share a single tagset (e.g. nvme). Add an interface
-> to quiesce all the queues on a given tagset. This interface is useful because
-> it can speedup the quiesce by doing it in parallel.
-> 
-> For tagsets that have BLK_MQ_F_BLOCKING set, we use call_srcu to all hctxs
-> in parallel such that all of them wait for the same rcu elapsed period with
-> a per-hctx heap allocated rcu_synchronize. for tagsets that don't have
-> BLK_MQ_F_BLOCKING set, we simply call a single synchronize_rcu as this is
-> sufficient.
-> 
-> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-> ---
->  block/blk-mq.c         | 66 ++++++++++++++++++++++++++++++++++++++++++
->  include/linux/blk-mq.h |  4 +++
->  2 files changed, 70 insertions(+)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index abcf590f6238..c37e37354330 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -209,6 +209,42 @@ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
->  }
->  EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
->  
-> +static void blk_mq_quiesce_blocking_queue_async(struct request_queue *q)
-> +{
-> +	struct blk_mq_hw_ctx *hctx;
-> +	unsigned int i;
-> +
-> +	blk_mq_quiesce_queue_nowait(q);
-> +
-> +	queue_for_each_hw_ctx(q, hctx, i) {
-> +		WARN_ON_ONCE(!(hctx->flags & BLK_MQ_F_BLOCKING));
-> +		hctx->rcu_sync = kmalloc(sizeof(*hctx->rcu_sync), GFP_KERNEL);
-> +		if (!hctx->rcu_sync)
-> +			continue;
+On Sun, Jul 26, 2020 at 04:18:10PM +0100, Christoph Hellwig wrote:
+> Zone append is a protocol context that ha not business showing up
+> in a file system interface.  The right interface is a generic way
+> to report the written offset for an append write for any kind of file.
+> So we should pick a better name like FMODE_REPORT_APPEND_OFFSET
+> (not that I particularly like that name, but it is the best I could
+> quickly come up with).
 
-This approach of quiesce/unquiesce tagset is good abstraction.
-
-Just one more thing, please allocate a rcu_sync array because hctx is supposed
-to not store scratch stuff.
-
-
-thanks, 
-Ming
-
+Is it necessarily *append*?  There were a spate of papers about ten
+years ago for APIs that were "write anywhere and I'll tell you where it
+ended up".  So FMODE_ANONYMOUS_WRITE perhaps?
