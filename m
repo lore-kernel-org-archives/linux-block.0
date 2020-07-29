@@ -2,141 +2,97 @@ Return-Path: <SRS0=8JfY=BI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1248BC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 22:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4CEC433DF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 22:37:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E43C020656
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 22:17:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fH5Fy78B"
+	by mail.kernel.org (Postfix) with ESMTP id 417D8207F5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 22:37:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbgG2WRI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jul 2020 18:17:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52180 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726365AbgG2WRI (ORCPT
+        id S1727071AbgG2Whf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jul 2020 18:37:35 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36861 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726365AbgG2Whf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jul 2020 18:17:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596061026;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LtshrYMEcz04cJGpNuNxV74Epfb8iQyV5a6bpTjIkxQ=;
-        b=fH5Fy78BcO1LElfpO9+l2y9QQ1mVI6rsIEOlPdAtj27kNkusjZttHf84l3YlnmzWkCdN8d
-        wiUFwygbgHUTj7ahA6pa7DlabZRvAla2BL9GHOkglTwBz69ZPdYmm4bHX3GgFEKor/hOA/
-        53Gk0b6TNpc3oA6Lo0Qao7KYaXGWfa8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-wj09032ONQCQJ2MNCbrpvQ-1; Wed, 29 Jul 2020 18:17:02 -0400
-X-MC-Unique: wj09032ONQCQJ2MNCbrpvQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50ED5102C7EC;
-        Wed, 29 Jul 2020 22:17:00 +0000 (UTC)
-Received: from T590 (ovpn-12-16.pek2.redhat.com [10.72.12.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 75066619B5;
-        Wed, 29 Jul 2020 22:16:50 +0000 (UTC)
-Date:   Thu, 30 Jul 2020 06:16:46 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
+        Wed, 29 Jul 2020 18:37:35 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 3so4474294wmi.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 15:37:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QvdUYXImQ58NA6zv+esPbk8WyQMuh573WddFfKRbd1M=;
+        b=O7PPgw5R209AtJB0TENvf/e3n3M3s9M6VkWFxI/NEXDTYkKz+emqPmC2weFpvl/d8J
+         89DQaxg4EgDqTuafbi8/ubH/THX9fkIMGkwMZEzPGCu33TWmh76BR8VDshM9zESxu2wT
+         JBiOweYoz+T6NChusaXtOd2yPsPM6yYqFb8a/0wM40jqvf178vP1Tg8I9sYC/BbMHTLk
+         dCVBbYRLR6IDCxCQPvN2T26slFzgZ+EjFRcVXi0EuaXhl6dBaSUfmFahdZy2u8bz+anq
+         kjQ4WmSrw1W/pz0LlG8JGdoQHWhG1nqlf2/OP5JMYmZWsPNLcUgy2mMY3dwmRxCi5mej
+         yqRg==
+X-Gm-Message-State: AOAM532gcnV//eL5Ustn/414PwPEyEn69T+CDVCXuycwGW469dKGQ+gh
+        1xMSTWXbQCEUkhEQr4EHhnI=
+X-Google-Smtp-Source: ABdhPJwB3tBtR/t7ObhTVNaO69MhuhL0FLshyQoP7/xVe2rC2NpLvNpBMsirBxpXwDj7NYsZEE80Lw==
+X-Received: by 2002:a1c:6a05:: with SMTP id f5mr10396970wmc.162.1596062253445;
+        Wed, 29 Jul 2020 15:37:33 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:11db:a722:81b1:7143? ([2601:647:4802:9070:11db:a722:81b1:7143])
+        by smtp.gmail.com with ESMTPSA id k4sm8072024wrd.72.2020.07.29.15.37.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jul 2020 15:37:32 -0700 (PDT)
+Subject: Re: [RFC PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         linux-block@vger.kernel.org,
         Lai Jiangshan <jiangshanlai@gmail.com>,
         "Paul E . McKenney" <paulmck@kernel.org>,
         Josh Triplett <josh@joshtriplett.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [RFC PATCH] blk-mq: implement queue quiesce via percpu_ref for
- BLK_MQ_F_BLOCKING
-Message-ID: <20200729221646.GA1706771@T590>
 References: <20200728134938.1505467-1-ming.lei@redhat.com>
- <20200729161229.GA3136267@dhcp-10-100-145-180.wdl.wdc.com>
+ <20200729102856.GA1563056@T590>
+ <b80fa58d-34f0-cff5-c3f9-7b3d05a8a1ca@grimberg.me>
+ <20200729154957.GD1698748@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <f3ead535-070d-40ec-08b8-56e2c1cd7ba4@grimberg.me>
+Date:   Wed, 29 Jul 2020 15:37:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200729161229.GA3136267@dhcp-10-100-145-180.wdl.wdc.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200729154957.GD1698748@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 29, 2020 at 09:12:29AM -0700, Keith Busch wrote:
-> On Tue, Jul 28, 2020 at 09:49:38PM +0800, Ming Lei wrote:
-> >  void blk_mq_quiesce_queue(struct request_queue *q)
-> >  {
-> > -	struct blk_mq_hw_ctx *hctx;
-> > -	unsigned int i;
-> > -	bool rcu = false;
-> > -
-> >  	blk_mq_quiesce_queue_nowait(q);
-> >  
-> > -	queue_for_each_hw_ctx(q, hctx, i) {
-> > -		if (hctx->flags & BLK_MQ_F_BLOCKING)
-> > -			synchronize_srcu(hctx->srcu);
-> > -		else
-> > -			rcu = true;
-> > -	}
-> > -	if (rcu)
-> > +	if (q->tag_set->flags & BLK_MQ_F_BLOCKING) {
-> > +		percpu_ref_kill(&q->dispatch_counter);
-> > +		wait_event(q->mq_quiesce_wq,
-> > +				percpu_ref_is_zero(&q->dispatch_counter));
-> > +	} else
-> >  		synchronize_rcu();
-> >  }
+
+>>>> In case of BLK_MQ_F_BLOCKING, blk-mq uses SRCU to mark read critical
+>>>> section during dispatching request, then request queue quiesce is based on
+>>>> SRCU. What we want to get is low cost added in fast path.
+>>>>
+>>>> However, from srcu_read_lock/srcu_read_unlock implementation, not see
+>>>> it is quicker than percpu refcount, so use percpu_ref to implement
+>>>> queue quiesce. This usage is cleaner and simpler & enough for implementing
+>>>> queue quiesce. The main requirement is to make sure all read sections to observe
+>>>> QUEUE_FLAG_QUIESCED once blk_mq_quiesce_queue() returns.
+>>>>
+>>>> Also it becomes much easier to add interface of async queue quiesce.
+>>>
+>>> BTW, no obvious IOPS difference is observed with this patch applied when running
+>>> io on null_blk(blocking, submit_queues=32) in one dual-socket, 32cores system.
+>>
+>> Thanks Ming, can you test for non-blocking on the same setup?
 > 
-> 
-> 
-> > +static void hctx_lock(struct blk_mq_hw_ctx *hctx)
-> >  {
-> > -	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
-> > -		/* shut up gcc false positive */
-> > -		*srcu_idx = 0;
-> > +	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
-> >  		rcu_read_lock();
-> > -	} else
-> > -		*srcu_idx = srcu_read_lock(hctx->srcu);
-> > +	else
-> > +		percpu_ref_get(&hctx->queue->dispatch_counter);
-> >  }
-> 
-> percpu_ref_get() will always succeed, even after quiesce kills it.
-> Isn't it possible that 'percpu_ref_is_zero(&q->dispatch_counter))' may
-> never reach 0? We only need to ensure that dispatchers will observe
-> blk_queue_quiesced(). That doesn't require that there are no current
-> dispatchers.
+> OK, I can do that, but this patch supposes to not affect non-blocking,
+> care to share your motivation for testing non-blocking?
 
-IMO it shouldn't be one issue in reality, because:
+I think it will be a significant improvement to have a single code path.
+The code will be more robust and we won't need to face issues that are
+specific for blocking.
 
-- when dispatch can't make progress, the submission side will finally
-  stop because we either run queue from submission side or request
-  completion
- 
-- submission side stops because we always have very limited requests
-
-- completion side stops because requests queued to device is limited
-too
-
-We still can handle this case by not dispatch in case that percpu_ref_tryget()
-returns false, which will change the usage into the following way:
-
-        if (hctx_lock(hctx)) {
-        	blk_mq_sched_dispatch_requests(hctx);
-        	hctx_unlock(hctx);
-		}
-
-And __blk_mq_try_issue_directly() needs a bit special treatment because
-the request has to be inserted to queue after queue becomes quiesced.
-
-
-Thanks,
-Ming
-
+If the cost is negligible, I think the upside is worth it.
