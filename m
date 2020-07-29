@@ -2,47 +2,47 @@ Return-Path: <SRS0=8JfY=BI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 454B9C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 09:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E479C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 09:18:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 253D220838
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 09:07:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0E6120838
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 09:18:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726710AbgG2JH0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jul 2020 05:07:26 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:37669 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726336AbgG2JH0 (ORCPT
+        id S1728124AbgG2JSs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jul 2020 05:18:48 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:38265 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728122AbgG2JSs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jul 2020 05:07:26 -0400
-Received: by mail-lj1-f193.google.com with SMTP id q6so24209786ljp.4;
-        Wed, 29 Jul 2020 02:07:23 -0700 (PDT)
+        Wed, 29 Jul 2020 05:18:48 -0400
+Received: by mail-lf1-f65.google.com with SMTP id 140so12618415lfi.5;
+        Wed, 29 Jul 2020 02:18:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:to:cc:references:from:autocrypt:subject
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=0ixb1jJgq4PcU3Usk6ZmktN5ND8M3VvBo7EWZku4aSU=;
-        b=Apdf3v2D68FwynV5cJZeswSoxaqucrbGWikP0iFCGPdc/1vz5UQeFT0fY8FqtT78Cs
-         3QGyEiRJioMXUUJOhtQ/3ksNQt6w9EGqBJ7+nxDcT7Mwx7ZVO2DIrVZ+EC24HT34tApz
-         sSFuiGeHBCqB1IqjvDtS28u7DXBXa9nPOonIToLOeu6lq4wC462bVmLV6iyeeIpbDYmK
-         ojbES/F03W2LHxmbKAlAXl+UHvVIo+1hJuVO2hkBCrPUVxU3HgVNNGxr0kEXoxbk69zF
-         mFnjjdOngyM94FjGI9TtAVSNFEKdX9fY65oZV9XGa/Js2PPQM79iqNWcrhPhVSNltAko
-         PTZg==
-X-Gm-Message-State: AOAM532Hj6HaDCUicgHMWAEYc7ctu/T9/hUQAojtjFBFlMtKI5d0fRgm
-        yorSy8/WkzaiTX+SdGhFuFqam03hW+0=
-X-Google-Smtp-Source: ABdhPJz9wf5QNR65CUpnlh+TUZNMEDvEXktIZ0HKeeIx2T09rKAAfP4I9f9dvG9YIgjg0Z8Oj+VLrQ==
-X-Received: by 2002:a2e:7601:: with SMTP id r1mr15299166ljc.111.1596013642633;
-        Wed, 29 Jul 2020 02:07:22 -0700 (PDT)
+        bh=5QxkY45+uCy195vrLbQYBt0kHQqjeOPMda3MxmvESpo=;
+        b=U4bsrf5w/dXVIqf1U43Tlu+fGy6n4kXjZo56Qz57a2rSgFglQPNbtnQ9HoECyEoRxQ
+         2xidSDi1ySWiAUJMWOvAfjG78amwBzNBgw6icX0OkZASY89TkOYWl2XITUvAsU9wTXcd
+         hZaua3l8Ad/oj9+4z/YV6dxHUsGiNiMY8xCHSXU25wDhdLAzarXtmg+2S275iHHVzfVn
+         OpMSll1OsWuXq1AZmLh+1bPmJ/5F/rr4oculEqnaSlJilkk34NKzVWivozzmbTCjKd+i
+         Z4mTHa2ps0v7HDwELGKxQmYsWomBzUo+IDFMPfgNwzcWMzuyaG6i6p0dGv/KnWOCifuQ
+         9LIw==
+X-Gm-Message-State: AOAM533obqtluuCH2iWCBZskOjqfbymKRgX2m/YSI4Mjwhw0P1LMaeQt
+        nnU8VMDxFTHa2NchcqmMOck=
+X-Google-Smtp-Source: ABdhPJxUtN4D/kIeSqIdHGZhpYfyQqlo5gDTMNn8jl5XcXrXmDY/FqRDWRKOkx4Y/DYIK6PFs8DkuQ==
+X-Received: by 2002:a05:6512:752:: with SMTP id c18mr16550623lfs.53.1596014324266;
+        Wed, 29 Jul 2020 02:18:44 -0700 (PDT)
 Received: from [10.68.32.147] (broadband-37-110-38-130.ip.moscow.rt.ru. [37.110.38.130])
-        by smtp.gmail.com with ESMTPSA id s2sm272584ljg.84.2020.07.29.02.07.21
+        by smtp.gmail.com with ESMTPSA id d14sm325942lfj.30.2020.07.29.02.18.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jul 2020 02:07:22 -0700 (PDT)
+        Wed, 29 Jul 2020 02:18:43 -0700 (PDT)
 Reply-To: efremov@linux.com
 To:     Peilin Ye <yepeilin.cs@gmail.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
@@ -96,8 +96,8 @@ Autocrypt: addr=efremov@linux.com; keydata=
  ANwvYa1h1dQ36OiTqm1cIxRCGl4wrypOVGx3OjCar7sBLD+NkwO4RaqFvdv0xuuy4x01VnOF
 Subject: Re: [Linux-kernel-mentees] [PATCH] block/floppy: Prevent
  kernel-infoleak in raw_cmd_copyout()
-Message-ID: <40446b2c-3885-1b30-c0b3-5f544a96ed78@linux.com>
-Date:   Wed, 29 Jul 2020 12:07:20 +0300
+Message-ID: <f80acf0f-3e7e-89c5-a00e-d5a89553f0b4@linux.com>
+Date:   Wed, 29 Jul 2020 12:18:42 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
@@ -110,7 +110,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+
 
 On 7/28/20 5:19 PM, Peilin Ye wrote:
 > raw_cmd_copyout() is potentially copying uninitialized kernel stack memory
@@ -120,78 +120,9 @@ On 7/28/20 5:19 PM, Peilin Ye wrote:
 > 
 > Cc: stable@vger.kernel.org
 > Fixes: 2145e15e0557 ("floppy: don't write kernel-only members to FDRAWCMD ioctl output")
+
+Nitpick, I would say this fix is not related to commit 2145e15e0557.
+
 > Suggested-by: Dan Carpenter <dan.carpenter@oracle.com>
 > Suggested-by: Arnd Bergmann <arnd@arndb.de>
 > Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
-
-Reviewed-by: Denis Efremov <efremov@linux.com>
-
-ptr comes from raw_cmd_copyin and it should be ok to use memcpy.
-
-Jens, could you please take this one to your 5.9 branch?
-
-
-> ---
-> $ pahole -C "floppy_raw_cmd" drivers/block/floppy.o
-> struct floppy_raw_cmd {
-> 	unsigned int               flags;                /*     0     4 */
-> 
-> 	/* XXX 4 bytes hole, try to pack */
-> 
-> 	void *                     data;                 /*     8     8 */
-> 	char *                     kernel_data;          /*    16     8 */
-> 	struct floppy_raw_cmd *    next;                 /*    24     8 */
-> 	long int                   length;               /*    32     8 */
-> 	long int                   phys_length;          /*    40     8 */
-> 	int                        buffer_length;        /*    48     4 */
-> 	unsigned char              rate;                 /*    52     1 */
-> 	unsigned char              cmd_count;            /*    53     1 */
-> 	union {
-> 		struct {
-> 			unsigned char cmd[16];           /*    54    16 */
-> 			/* --- cacheline 1 boundary (64 bytes) was 6 bytes ago --- */
-> 			unsigned char reply_count;       /*    70     1 */
-> 			unsigned char reply[16];         /*    71    16 */
-> 		};                                       /*    54    33 */
-> 		unsigned char      fullcmd[33];          /*    54    33 */
-> 	};                                               /*    54    33 */
-> 
-> 	/* XXX 1 byte hole, try to pack */
-> 
-> 	/* --- cacheline 1 boundary (64 bytes) was 24 bytes ago --- */
-> 	int                        track;                /*    88     4 */
-> 	int                        resultcode;           /*    92     4 */
-> 	int                        reserved1;            /*    96     4 */
-> 	int                        reserved2;            /*   100     4 */
-> 
-> 	/* size: 104, cachelines: 2, members: 14 */
-> 	/* sum members: 99, holes: 2, sum holes: 5 */
-> 	/* last cacheline: 40 bytes */
-> };
-> 
-
-It would be nice to add lkml links with discussion on the issue or
-https://www.nccgroup.com/us/about-us/newsroom-and-events/blog/2019/october/padding-the-struct-how-a-compiler-optimization-can-disclose-stack-memory/
-in addition to pahole output.
-
->  drivers/block/floppy.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index 09079aee8dc4..b8ea98f7a9cb 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -3126,7 +3126,9 @@ static int raw_cmd_copyout(int cmd, void __user *param,
->  	int ret;
->  
->  	while (ptr) {
-> -		struct floppy_raw_cmd cmd = *ptr;
-> +		struct floppy_raw_cmd cmd;
-> +
-> +		memcpy(&cmd, ptr, sizeof(cmd))>  		cmd.next = NULL;
->  		cmd.kernel_data = NULL;
->  		ret = copy_to_user(param, &cmd, sizeof(cmd));
-> 
-
-Thanks,
-Denis
