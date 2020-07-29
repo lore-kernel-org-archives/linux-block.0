@@ -2,99 +2,140 @@ Return-Path: <SRS0=8JfY=BI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B9EC433E5
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 00:59:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C2AC433E3
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 01:51:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02A44207E8
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 00:59:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 804CE22BEB
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 01:51:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595984387;
-	bh=inRLNcNir+2HXo5UAjgkF7XPH8Znd3x+ex92gz6b024=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=N5tO639eOlgiZmVq/N2yBhydbmO5EkTWIQA7AC0+2faESpaBp1vGrJW3ShE6TABnn
-	 zcZGXLbajufZgI7OaGknk8s8VkwVKG7Q/S4YTEMREqI29qW5ayVnb2a+tr0oD1/U1m
-	 MkrKpxzLeeSOW3NgemcOqyXMp2kAFIKayk13CxSg=
+	s=default; t=1595987467;
+	bh=HuNGtf+QiT3i3ZfjMR+UMTcddc9pCBYv+A5ANtBYJOo=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=lr8eq98iPJsCYBNxUVyxMYk83AnpbLIxMoKvKOhEAcPLmGsOgSuR7KWdx7nsBTHBA
+	 KSFPA70zlrjFMmtmXrCpS3AqVjet9ir2CqcFA8MVYS+W6E7GxRkkgSu9bjhRk1SXjw
+	 X2eTA8R+cGH3/QyizuxAe7+EfwYl6hnbSO/v4HzY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730909AbgG2A7q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jul 2020 20:59:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34672 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729867AbgG2A7p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jul 2020 20:59:45 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9C13E207FC;
-        Wed, 29 Jul 2020 00:59:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595984385;
-        bh=inRLNcNir+2HXo5UAjgkF7XPH8Znd3x+ex92gz6b024=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sH8OIflDUuu0bNAyqO0ygXSQHjK6EQ3psTuArUDssDeNX46Y+I7YhZBlYqK4Gm3Bx
-         WnvTQ9ivIRjGIozLaJXYseQkoJHtMmx6/CEqDHEjb9zbHEop0UCNtH96hvSKEam7wh
-         9f7/qwT1vh+cT1va3kvDucqsCDVbc/Q24OgPVJsE=
-Date:   Tue, 28 Jul 2020 17:59:42 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     paulmck@kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Chao Leng <lengchao@huawei.com>, Ming Lin <mlin@kernel.org>
-Subject: Re: [PATCH v5 1/2] blk-mq: add tagset quiesce interface
-Message-ID: <20200729005942.GA2729664@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20200727231022.307602-1-sagi@grimberg.me>
- <20200727231022.307602-2-sagi@grimberg.me>
- <20200728071859.GA21629@lst.de>
- <20200728091633.GB1326626@T590>
- <b1e7c2c5-dad5-778c-f397-6530766a0150@grimberg.me>
- <20200728135436.GP9247@paulmck-ThinkPad-P72>
- <d1ba2009-130a-d423-1389-c7af72e25a6a@grimberg.me>
- <20200729003124.GT9247@paulmck-ThinkPad-P72>
- <07c90cf1-bb6f-a343-b0bf-4c91b9acb431@grimberg.me>
+        id S1730736AbgG2BvG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jul 2020 21:51:06 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:40528 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730328AbgG2BvG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Jul 2020 21:51:06 -0400
+Received: by mail-io1-f67.google.com with SMTP id l17so22889925iok.7;
+        Tue, 28 Jul 2020 18:51:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=7Q2EY9e3cTo0JOR4/27Xy901b/9YvW+sJJFfNc7uEPg=;
+        b=T4GWiig56pLW8HRB8E+TR3ocxiqsm1WaoeXUUQ8+uI/UyLPxyQB3vjyaiUhC9DB7xa
+         LhUwkWy2H9qKo2WIgv7na/AINlbG7G9EdIhd2/9ErSzEkqJqspDN6GO1Bm3KABh0FgzH
+         DNibqmUaHrGvwMzu3D31HckwtSquEqjNxLAYyivo0DUTw4gP/usEJbwuvPKdWFggm/xs
+         vUybXLRviwS3b+tVcpq5fOFuUBr3w9LwOALFs7HMvadauiZssrgXup9Wgw45mNSz+aR7
+         zgUxrMGd841ZohCCoIZa6JFZlhajT8p4GeiooTL85dwv+Y/OT+I/intVf6hq+MxbFu7Q
+         zHUg==
+X-Gm-Message-State: AOAM530PooXqtJpBRJzVKQr60hlgYj2xbUYFKP8BBP155reusPYcxGVl
+        bm+SSNK6YnkEjInzlb8k4Aw=
+X-Google-Smtp-Source: ABdhPJz1/m95VGzk/wgnRayACeeYLmHUXNGesxghAXu8giycAYZpIw2852f7wF/1ZHW9++qcPDTHZA==
+X-Received: by 2002:a02:4083:: with SMTP id n125mr35630122jaa.83.1595987465469;
+        Tue, 28 Jul 2020 18:51:05 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id c9sm341219ilm.57.2020.07.28.18.51.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jul 2020 18:51:04 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 3B12240945; Wed, 29 Jul 2020 01:51:03 +0000 (UTC)
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk
+Cc:     bvanassche@acm.org, ming.lei@redhat.com, hch@infradead.org,
+        jack@suse.cz, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH] block: fix possible race on blk_get_queue()
+Date:   Wed, 29 Jul 2020 01:51:01 +0000
+Message-Id: <20200729015101.31534-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.23.0.rc1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <07c90cf1-bb6f-a343-b0bf-4c91b9acb431@grimberg.me>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 28, 2020 at 05:43:02PM -0700, Sagi Grimberg wrote:
-> 
-> > > Dynamically allocating each one is possible but not very scalable.
-> > > 
-> > > The question is if there is some way, we can do this with on-stack
-> > > or a single on-heap rcu_head or equivalent that can achieve the same
-> > > effect.
-> > 
-> > If the hctx structures are guaranteed to stay put, you could count
-> > them and then do a single allocation of an array of rcu_head structures
-> > (or some larger structure containing an rcu_head structure, if needed).
-> > You could then sequence through this array, consuming one rcu_head per
-> > hctx as you processed it.  Once all the callbacks had been invoked,
-> > it would be safe to free the array.
-> > 
-> > Sounds too simple, though.  So what am I missing?
-> 
-> We don't want higher-order allocations...
+The queue can flip to dying after we check if it is dying,
+and then we call __blk_get_queue(). This is a purely
+theoretical race, but just fix it. We do this by
+Using the atomic kobject_get_unless_zero() first, and
+*then* check if the queue is dying *after*.
 
-So:
+This issue was found while doing patch review on the
+recent blktrace fixes [0].
 
-  (1) We don't want to embed the struct in the hctx because we allocate
-  so many of them that this is non-negligable to add for something we
-  typically never use.
+[0] https://lore.kernel.org/linux-block/20200415123434.GU11244@42.do-not-panic.com/
 
-  (2) We don't want to allocate dynamically because it's potentially
-  huge.
+Reported-by: Christoph Hellwig <hch@infradead.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
 
-As long as we're using srcu for blocking hctx's, I think it's "pick your
-poison".
+This goes tested against blktest without finding a regression.
 
-Alternatively, Ming's percpu_ref patch(*) may be worth a look.
+ block/blk-core.c | 14 ++++++++++----
+ block/blk.h      |  5 +++--
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
- * https://www.spinics.net/lists/linux-block/msg56976.html1
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d9d632639bd1..febdd8e8d409 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -605,12 +605,18 @@ EXPORT_SYMBOL(blk_alloc_queue);
+  */
+ bool blk_get_queue(struct request_queue *q)
+ {
+-	if (likely(!blk_queue_dying(q))) {
+-		__blk_get_queue(q);
+-		return true;
++	struct kobject *obj;
++
++	obj = __blk_get_queue(q);
++	if (!obj)
++		return false;
++
++	if (unlikely(blk_queue_dying(q))) {
++		blk_put_queue(q);
++		return false;
+ 	}
+ 
+-	return false;
++	return true;
+ }
+ EXPORT_SYMBOL(blk_get_queue);
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 49e2928a1632..bdbc9b084d5b 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -39,9 +39,10 @@ blk_get_flush_queue(struct request_queue *q, struct blk_mq_ctx *ctx)
+ 	return blk_mq_map_queue(q, REQ_OP_FLUSH, ctx)->fq;
+ }
+ 
+-static inline void __blk_get_queue(struct request_queue *q)
++static inline struct kobject * __must_check
++__blk_get_queue(struct request_queue *q)
+ {
+-	kobject_get(&q->kobj);
++	return kobject_get_unless_zero(&q->kobj);
+ }
+ 
+ static inline bool
+-- 
+2.27.0
+
