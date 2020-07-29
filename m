@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4CEC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 22:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB60BC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 22:43:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 417D8207F5
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 22:37:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C60D42065C
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 22:43:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727071AbgG2Whf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jul 2020 18:37:35 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:36861 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726365AbgG2Whf (ORCPT
+        id S1726709AbgG2WnE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jul 2020 18:43:04 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36346 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726628AbgG2WnD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jul 2020 18:37:35 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 3so4474294wmi.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 15:37:34 -0700 (PDT)
+        Wed, 29 Jul 2020 18:43:03 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 3so4482309wmi.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 15:43:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=QvdUYXImQ58NA6zv+esPbk8WyQMuh573WddFfKRbd1M=;
-        b=O7PPgw5R209AtJB0TENvf/e3n3M3s9M6VkWFxI/NEXDTYkKz+emqPmC2weFpvl/d8J
-         89DQaxg4EgDqTuafbi8/ubH/THX9fkIMGkwMZEzPGCu33TWmh76BR8VDshM9zESxu2wT
-         JBiOweYoz+T6NChusaXtOd2yPsPM6yYqFb8a/0wM40jqvf178vP1Tg8I9sYC/BbMHTLk
-         dCVBbYRLR6IDCxCQPvN2T26slFzgZ+EjFRcVXi0EuaXhl6dBaSUfmFahdZy2u8bz+anq
-         kjQ4WmSrw1W/pz0LlG8JGdoQHWhG1nqlf2/OP5JMYmZWsPNLcUgy2mMY3dwmRxCi5mej
-         yqRg==
-X-Gm-Message-State: AOAM532gcnV//eL5Ustn/414PwPEyEn69T+CDVCXuycwGW469dKGQ+gh
-        1xMSTWXbQCEUkhEQr4EHhnI=
-X-Google-Smtp-Source: ABdhPJwB3tBtR/t7ObhTVNaO69MhuhL0FLshyQoP7/xVe2rC2NpLvNpBMsirBxpXwDj7NYsZEE80Lw==
-X-Received: by 2002:a1c:6a05:: with SMTP id f5mr10396970wmc.162.1596062253445;
-        Wed, 29 Jul 2020 15:37:33 -0700 (PDT)
+        bh=MWjF3HbsC/pVq1Z8mpgu7GI/fnhsgxEX3i7QRsdx17c=;
+        b=h4I/bPcTgfd2e7RnCsmF9+GbypZzPVWxfxllazcULKl6g/Pv53M1m7xESBPfw6+Wlr
+         ZhgpYA/KB3/ifMTaNUlGB4Is82KV2qNWtHdOuYCjO7eSk2umi3qDR6PY/60FMi4pm2nZ
+         zFKC/hGKTff5rT8upsQ0Csj+2Tp/Wp5XB7KTpD1L8L6HyWDd8KHh4ykG5aJLMpEV+95F
+         roLm91cRTiVkEPHEx7cgUBvzZjTf1HVcQmZMXrN/Op3tiCCfEa4MI0TV0hgdQ5TWnQqn
+         kUkYiwQhAxwiA9gZpEtqQLvKHK+WvhZTwZJWPXqIg1fDmnZhfpbITbcHwRK1YndZoAbz
+         1bmA==
+X-Gm-Message-State: AOAM533xg0iM/RAdAbk1hBWcJtCI1jHZXnDpIjuJ5E2ymdZFncQyHMP6
+        i9YZIGc49Tr6NRJcdGFAQhs=
+X-Google-Smtp-Source: ABdhPJzVLpvDifn1j2N4OTLjsOvIoWtha3wdFxOumkZSmLcm8Y7gwXjP6AWCXcY3GtuPvNTJFptqjQ==
+X-Received: by 2002:a1c:5982:: with SMTP id n124mr10692128wmb.77.1596062555026;
+        Wed, 29 Jul 2020 15:42:35 -0700 (PDT)
 Received: from ?IPv6:2601:647:4802:9070:11db:a722:81b1:7143? ([2601:647:4802:9070:11db:a722:81b1:7143])
-        by smtp.gmail.com with ESMTPSA id k4sm8072024wrd.72.2020.07.29.15.37.30
+        by smtp.gmail.com with ESMTPSA id z127sm7148424wme.44.2020.07.29.15.42.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jul 2020 15:37:32 -0700 (PDT)
+        Wed, 29 Jul 2020 15:42:34 -0700 (PDT)
 Subject: Re: [RFC PATCH] blk-mq: implement queue quiesce via percpu_ref for
  BLK_MQ_F_BLOCKING
-To:     Ming Lei <ming.lei@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         linux-block@vger.kernel.org,
         Lai Jiangshan <jiangshanlai@gmail.com>,
@@ -52,16 +52,15 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Josh Triplett <josh@joshtriplett.org>,
         Bart Van Assche <bvanassche@acm.org>
 References: <20200728134938.1505467-1-ming.lei@redhat.com>
- <20200729102856.GA1563056@T590>
- <b80fa58d-34f0-cff5-c3f9-7b3d05a8a1ca@grimberg.me>
- <20200729154957.GD1698748@T590>
+ <20200729161229.GA3136267@dhcp-10-100-145-180.wdl.wdc.com>
+ <20200729221646.GA1706771@T590>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <f3ead535-070d-40ec-08b8-56e2c1cd7ba4@grimberg.me>
-Date:   Wed, 29 Jul 2020 15:37:27 -0700
+Message-ID: <b45fe77d-b09f-3649-8167-37ae13611093@grimberg.me>
+Date:   Wed, 29 Jul 2020 15:42:29 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200729154957.GD1698748@T590>
+In-Reply-To: <20200729221646.GA1706771@T590>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,28 +70,78 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->>>> In case of BLK_MQ_F_BLOCKING, blk-mq uses SRCU to mark read critical
->>>> section during dispatching request, then request queue quiesce is based on
->>>> SRCU. What we want to get is low cost added in fast path.
->>>>
->>>> However, from srcu_read_lock/srcu_read_unlock implementation, not see
->>>> it is quicker than percpu refcount, so use percpu_ref to implement
->>>> queue quiesce. This usage is cleaner and simpler & enough for implementing
->>>> queue quiesce. The main requirement is to make sure all read sections to observe
->>>> QUEUE_FLAG_QUIESCED once blk_mq_quiesce_queue() returns.
->>>>
->>>> Also it becomes much easier to add interface of async queue quiesce.
->>>
->>> BTW, no obvious IOPS difference is observed with this patch applied when running
->>> io on null_blk(blocking, submit_queues=32) in one dual-socket, 32cores system.
+>>>   void blk_mq_quiesce_queue(struct request_queue *q)
+>>>   {
+>>> -	struct blk_mq_hw_ctx *hctx;
+>>> -	unsigned int i;
+>>> -	bool rcu = false;
+>>> -
+>>>   	blk_mq_quiesce_queue_nowait(q);
+>>>   
+>>> -	queue_for_each_hw_ctx(q, hctx, i) {
+>>> -		if (hctx->flags & BLK_MQ_F_BLOCKING)
+>>> -			synchronize_srcu(hctx->srcu);
+>>> -		else
+>>> -			rcu = true;
+>>> -	}
+>>> -	if (rcu)
+>>> +	if (q->tag_set->flags & BLK_MQ_F_BLOCKING) {
+>>> +		percpu_ref_kill(&q->dispatch_counter);
+>>> +		wait_event(q->mq_quiesce_wq,
+>>> +				percpu_ref_is_zero(&q->dispatch_counter));
+>>> +	} else
+>>>   		synchronize_rcu();
+>>>   }
 >>
->> Thanks Ming, can you test for non-blocking on the same setup?
+>>
+>>
+>>> +static void hctx_lock(struct blk_mq_hw_ctx *hctx)
+>>>   {
+>>> -	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+>>> -		/* shut up gcc false positive */
+>>> -		*srcu_idx = 0;
+>>> +	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
+>>>   		rcu_read_lock();
+>>> -	} else
+>>> -		*srcu_idx = srcu_read_lock(hctx->srcu);
+>>> +	else
+>>> +		percpu_ref_get(&hctx->queue->dispatch_counter);
+>>>   }
+>>
+>> percpu_ref_get() will always succeed, even after quiesce kills it.
+>> Isn't it possible that 'percpu_ref_is_zero(&q->dispatch_counter))' may
+>> never reach 0? We only need to ensure that dispatchers will observe
+>> blk_queue_quiesced(). That doesn't require that there are no current
+>> dispatchers.
 > 
-> OK, I can do that, but this patch supposes to not affect non-blocking,
-> care to share your motivation for testing non-blocking?
+> IMO it shouldn't be one issue in reality, because:
+> 
+> - when dispatch can't make progress, the submission side will finally
+>    stop because we either run queue from submission side or request
+>    completion
+>   
+> - submission side stops because we always have very limited requests
+> 
+> - completion side stops because requests queued to device is limited
+> too
 
-I think it will be a significant improvement to have a single code path.
-The code will be more robust and we won't need to face issues that are
-specific for blocking.
+I don't think that any requests should pass after the kill was called,
+otherwise how can we safely quiesce if requests can come in after
+it?
 
-If the cost is negligible, I think the upside is worth it.
+> 
+> We still can handle this case by not dispatch in case that percpu_ref_tryget()
+
+You meant tryget_live right?
+
+> returns false, which will change the usage into the following way:
+> 
+>          if (hctx_lock(hctx)) {
+>          	blk_mq_sched_dispatch_requests(hctx);
+>          	hctx_unlock(hctx);
+> 		}
+> 
+> And __blk_mq_try_issue_directly() needs a bit special treatment because
+> the request has to be inserted to queue after queue becomes quiesced.
+
+Agreed.
