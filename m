@@ -2,89 +2,98 @@ Return-Path: <SRS0=8JfY=BI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B184C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 17:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB44C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 17:29:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4003720809
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 17:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69A0C207F5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 17:29:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qBBef4Sp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iHV+wqoH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726365AbgG2RXE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jul 2020 13:23:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58394 "EHLO
+        id S1726509AbgG2R3R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jul 2020 13:29:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726336AbgG2RXE (ORCPT
+        with ESMTP id S1726336AbgG2R3R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jul 2020 13:23:04 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41019C061794
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 10:23:04 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id b18so14897286ilo.12
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 10:23:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=r5j5Y8oTddaFgghXor3+5c5b1GvGHTVAH7g8aQIrlqQ=;
-        b=qBBef4SpKxzPViluEeCB6LB2Q++UHIqFNLYulCEVR4sdJEvYnoiDPHUzyN/UAWwPmn
-         73tgnHl9SulwuFuR/lBtP479UCSlgz0mYoCuhayDNqzBDgmYGuGlZFVcYrbOYG1niDZe
-         mDHslJ2NYX7/CvL+Oq7qrFmZhGt+KiR3IyTlhe9jntwd76o2XFOJOQ+ZO6X15h0XlwyD
-         /wllqifxvpDutVP3XQ1uEquuahMkkUpgYKXKmcQjNAF/FeBWXvA0jCubOA4mT/Dexall
-         4uYBIQS8WaEI0Bh0F5L8XvQvLRDbaFJpZ8PfKWCb9ECDRCirZk36h2zPVk0TGJQW4dMb
-         yIsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=r5j5Y8oTddaFgghXor3+5c5b1GvGHTVAH7g8aQIrlqQ=;
-        b=sTfJ5jNQjM4FFhtOgMAveh4OY2t/LNhMUiEs/8fN0xBEYnQ9SA3tWPbba8wo/UjZ3/
-         XjsLE4FJGejD+/wmkqKUSp4jATZmNO6BnJQ0ApLayX20TFpsQKo9VdsXA0L/hsvX3FH/
-         GzdeDQYYkFu9P3FvL5fyS0sEq/+efZStnFfUIrJX1osh8dDb+IbQx9IQKG1IRsw7LhuW
-         iA455aX2nWywzhoyCBPj8Uva5+HOPK8EZaaoMIpGCaUzs+d92L9i3YMlh65+hS8/FZY5
-         Zg5NSSDQOho25bHN2GdeU3SielvViUH6EhwKA4MqKMETvxm3+DnByRjc9BjSHVPiIYk7
-         ilEA==
-X-Gm-Message-State: AOAM532a7txrAL8iSOdTfdZerxfzxQhgMn12/2nwGIBvPna0aSkFabHe
-        wzwQRF+OMTefVPxsPSfhgB0aHA==
-X-Google-Smtp-Source: ABdhPJwRgDt8tMkAQyMeDj8Fv5J3WZJQ8JLGe7izO8gvYu3Jx6aPHLYZQO0/9M3q1rFnPnW6VhFHIQ==
-X-Received: by 2002:a92:a04e:: with SMTP id b14mr36056630ilm.261.1596043383642;
-        Wed, 29 Jul 2020 10:23:03 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id s10sm1485481ilh.4.2020.07.29.10.23.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jul 2020 10:23:03 -0700 (PDT)
-Subject: Re: [GIT PULL] nvme updates for 5.9
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Wed, 29 Jul 2020 13:29:17 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40798C061794
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 10:29:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Mu6OJOdC0P3joJmalDqfOgVzBKFyyZYaXiANYfUgff8=; b=iHV+wqoHtT87JKzkyzOf0iC38/
+        DxkhKsBao0zxki6IH1iBE8HiaQvSUfLCtZvHsraFhSz+D5bf69NlwbPMqGqfIceFKBhAhVNcYha6v
+        c5BSc2OYwkJzVUemsqklKunJq/9L8f697IFXnVIwbAbjgfpavDtxOILxvzI9fPqa6cchh9skPESK4
+        qWJvj+FTgUgs6SjTHs0cJZ1URztmrAdbkpj6eeCn/nuAv1V7WdD4xvPikY5QQuIlc6JaD4deeEg4G
+        BPVyuruT6OeYQsG5/IoFW/Eu+ApHz4mhSpZblfxwafouXhS/YWmpWGlTL/wl0UWoJfzlrquFkym8j
+        /xsvO8lQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k0ptC-0003PI-D4; Wed, 29 Jul 2020 17:29:14 +0000
+Date:   Wed, 29 Jul 2020 18:29:14 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
         Sagi Grimberg <sagi@grimberg.me>,
         linux-nvme@lists.infradead.org
-References: <20200729171125.GA21194@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d50ca734-3f52-6399-b62d-7a401a53e320@kernel.dk>
-Date:   Wed, 29 Jul 2020 11:23:02 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+Subject: Re: [GIT PULL] nvme fixes for 5.8
+Message-ID: <20200729172914.GA13002@infradead.org>
+References: <20200729170952.GA21060@infradead.org>
+ <fa539a99-31a0-81cc-0d7b-3952721b2b22@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20200729171125.GA21194@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fa539a99-31a0-81cc-0d7b-3952721b2b22@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/29/20 11:11 AM, Christoph Hellwig wrote:
-> git://git.infradead.org/nvme.git nvme-5.9
+On Wed, Jul 29, 2020 at 11:22:18AM -0600, Jens Axboe wrote:
+> On 7/29/20 11:09 AM, Christoph Hellwig wrote:
+> > The following changes since commit adc99fd378398f4c58798a1c57889872967d56a6:
+> > 
+> >   nvme-tcp: fix possible hang waiting for icresp response (2020-07-26 17:24:27 +0200)
+> > 
+> > are available in the Git repository at:
+> > 
+> >   git://git.infradead.org/nvme.git nvme-5.8
+> > 
+> > for you to fetch changes up to 5bedd3afee8eb01ccd256f0cd2cc0fa6f841417a:
+> > 
+> >   nvme: add a Identify Namespace Identification Descriptor list quirk (2020-07-29 08:05:44 +0200)
+> > 
+> > ----------------------------------------------------------------
+> > Christoph Hellwig (1):
+> >       nvme: add a Identify Namespace Identification Descriptor list quirk
+> > 
+> > Kai-Heng Feng (1):
+> >       nvme-pci: prevent SK hynix PC400 from using Write Zeroes command
+> > 
+> >  drivers/nvme/host/core.c | 15 +++------------
+> >  drivers/nvme/host/nvme.h |  7 +++++++
+> >  drivers/nvme/host/pci.c  |  4 ++++
+> >  3 files changed, 14 insertions(+), 12 deletions(-)
+> 
+> There seems to be more here than what is in the pull request:
+> 
+>  drivers/nvme/host/core.c | 15 +++------------
+>  drivers/nvme/host/nvme.h |  7 +++++++
+>  drivers/nvme/host/pci.c  |  4 ++++
+>  drivers/nvme/host/tcp.c  |  3 +++
+>  4 files changed, 17 insertions(+), 12 deletions(-)
+> 
+> In particular, this one:
+> 
+> nvme-tcp: fix possible hang waiting for icresp response
 
-Pulled, thanks.
-
--- 
-Jens Axboe
-
+Ooops, yes.  I send the PR with the wrong start commit, will resend.
