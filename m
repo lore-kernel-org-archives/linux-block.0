@@ -2,115 +2,219 @@ Return-Path: <SRS0=8JfY=BI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601E2C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 17:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E5FC433DF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 18:31:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FB5620838
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 17:37:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AAC5C2082E
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 18:31:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="TNNmw+zX"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="f7/r/5RL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbgG2Rh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jul 2020 13:37:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60676 "EHLO
+        id S1726497AbgG2Sb1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jul 2020 14:31:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726365AbgG2Rh6 (ORCPT
+        with ESMTP id S1726336AbgG2Sb0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jul 2020 13:37:58 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ABAAC061794
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 10:37:58 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id w12so11792407iom.4
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 10:37:58 -0700 (PDT)
+        Wed, 29 Jul 2020 14:31:26 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96870C061794
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 11:31:26 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id 2so19089402qkf.10
+        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 11:31:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5ShmMwXzkkP7njO5YzqKQMO3gMDOR/zuGA+4L2KDGm4=;
-        b=TNNmw+zXBsq+YBWbnSJi8eLISVP4F/VAiSJWP8uYSltZGIz5hhQUxh4KMQno2sP/Zv
-         D6jicJdBuOYNiDHC5BAtXx1eVhNq73fIBmWFyBWMhFArGHGbJRXqXE8j9HRQ4HrW+Ovb
-         /LkkX1xonPjHdwO6eVcPymEEf8kOW2/VHMchVHBFWbjkUXeQb0vbFV1srwusTpeCc94G
-         0n3fTh+2D5kiIAMEKjIrj4NJ3Iy4NgtsWQ+Sy2+pNPCDr3cCa2TYZWBKy+Zz//00DAWY
-         0nz/gXHMdiLMIuYNSncHnnZ5NEIcOqp+is4Mzd7LWcGziYNRJrhzSbrNQ9hmBktwvuw/
-         4AZQ==
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=pyYdnxXoYtviXWOBeIb8J7LIjti14p/YvqpeLM4RqxU=;
+        b=f7/r/5RLryVxjmFbu+Je4ewLJK0nGeZRZ1I4bzK/oXBBac9ppTRkjjyzoztaP+TZYe
+         WZ4TRvVN6QgqWS9KcGCCimHZh95Gg7YSBRajOK3C690HRUEMeGTdqXnNoVwVYedAPpEw
+         OsplV3b9dNwM/s8fjBM4dmBYC3BR0JGLK71Xk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5ShmMwXzkkP7njO5YzqKQMO3gMDOR/zuGA+4L2KDGm4=;
-        b=NUnSBBy9tapusmXLki1FFubOv+R0L6FCA7hWk2M0L/t+dmdg5Qmk7Q8yNVf7BcPj9h
-         eL10tvJY4SZ1cw9JGk0t5ZkVZyeUnNQ65RccVOc8xHXoDU/xup2Jr7wKOnJX5t7ExNgw
-         /s/q3cSfmUo/167YohXSQ5GuI/KNc2DRjvLxrI1JJEvuPnqzvlT6tUcu4hFS09zHA+vk
-         91OavxdR658p2NCgkWTevyAVJTB9+aUfmR6VGxdri9204KfOg50zkAaZUW4lwXtukJw9
-         t3G5lPMnkcAup/vt6Zf/D7QPxTVop6GKvWPaDOewOTgtJX1PLtx7+6mBLrTfu9vqLnzz
-         DF5w==
-X-Gm-Message-State: AOAM533Thm6lqMFWaSx19cQDN+Pe84k1wmUZMvyGK8zBxSH49e7j1jye
-        4LL899WDPwt7hX+6xLYwUV5CBQ==
-X-Google-Smtp-Source: ABdhPJzruCBTayo9Mb74tmi8U1AaRmn4DDDvgiPjKHcV2/0wWJZjOinznj9QoC18PIZGGvKzu0UfUg==
-X-Received: by 2002:a05:6602:482:: with SMTP id y2mr5603582iov.188.1596044277199;
-        Wed, 29 Jul 2020 10:37:57 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id t7sm838624ili.2.2020.07.29.10.37.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jul 2020 10:37:56 -0700 (PDT)
-Subject: Re: [GIT PULL] nvme fixes for 5.8
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <20200729173010.GA25167@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3e9fbc3a-3e86-5d0e-5473-93485a237963@kernel.dk>
-Date:   Wed, 29 Jul 2020 11:37:55 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=pyYdnxXoYtviXWOBeIb8J7LIjti14p/YvqpeLM4RqxU=;
+        b=ZvLP79UqjZMfAZcHeSnRcSaXnJ/euwHWTW4wKjnbIurTKqzfBYMEv5bzskIlFt3Z4G
+         t/HRKahkxPozUoKTMT/Fdu/Pv9yQzsSMOgtJCzhPWmakEHRg5M336lVsvTLZnlLiNiiq
+         4z6PoaYUIGUR6NXkPgHiDctoKQl1nBbRNc+SOIpQ0Jeea8XYuYhtfGF3BotS67D5Ykij
+         /z8sJNqCycwOTm6uzuBwEjJURa1qGHAweJpeaKyUuq1M2Ciku+l2VMXT2x8ZmGbAl+6e
+         m6E0Bq/r41av8FkGsoPFarUvyoz7DADGWtZtHYMtpTe7XIwJcDkOE2eGVY3FzOhofbHB
+         4yDA==
+X-Gm-Message-State: AOAM531t6fYrVN2TUzizjQJy85ABHUnCw+aIj+5QPMs25tsVZUoliqyf
+        BGWZyrdSL703QTH5f8LNVolXwWMjE1nr8sZaM51igw==
+X-Google-Smtp-Source: ABdhPJx2aNoKqfw5fVGntXgc/RYi1viLbdi6yqObU1P3EtGrONiLeLUzLT1H3RwFSu5YUJG9VJ3G9JQ50YlrAUl5hSo=
+X-Received: by 2002:ae9:e507:: with SMTP id w7mr33994809qkf.264.1596047485412;
+ Wed, 29 Jul 2020 11:31:25 -0700 (PDT)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <20200722041201.GA912316@T590> <f6f05483491c391ce79486b8fb78cb2e@mail.gmail.com>
+ <20200722080409.GB912316@T590> <fe7a7acf-d62b-d541-4203-29c1d0403c2a@huawei.com>
+ <20200723140758.GA957464@T590> <f4a896a3-756e-68bb-7700-cab1e5523c81@huawei.com>
+ <20200724024704.GB957464@T590> <6531e06c-9ce2-73e6-46fc-8e97400f07b2@huawei.com>
+ <20200728084511.GA1326626@T590> <965cf22eea98c00618570da8424d0d94@mail.gmail.com>
+ <20200729153648.GA1698748@T590>
+In-Reply-To: <20200729153648.GA1698748@T590>
 MIME-Version: 1.0
-In-Reply-To: <20200729173010.GA25167@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQJCvD/hZEpycfSbmqCxmdJyJD/+0AJR+kyNAmYRZaIBRnYqfAIxGEBSAFn9B+MBP/jicgD9MwXwAyMjvw0CEOgTfwH/A0ecp7ZdvrA=
+Date:   Thu, 30 Jul 2020 00:01:22 +0530
+Message-ID: <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
+Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        bvanassche@acm.org, hare@suse.com, hch@lst.de,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/29/20 11:30 AM, Christoph Hellwig wrote:
-> The following changes since commit 1f273e255b285282707fa3246391f66e9dc4178f:
-> 
->   Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8 (2020-07-16 08:58:14 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git nvme-5.8
-> 
-> for you to fetch changes up to 5bedd3afee8eb01ccd256f0cd2cc0fa6f841417a:
-> 
->   nvme: add a Identify Namespace Identification Descriptor list quirk (2020-07-29 08:05:44 +0200)
-> 
-> ----------------------------------------------------------------
-> Christoph Hellwig (1):
->       nvme: add a Identify Namespace Identification Descriptor list quirk
-> 
-> Kai-Heng Feng (1):
->       nvme-pci: prevent SK hynix PC400 from using Write Zeroes command
-> 
-> Sagi Grimberg (1):
->       nvme-tcp: fix possible hang waiting for icresp response
-> 
->  drivers/nvme/host/core.c | 15 +++------------
->  drivers/nvme/host/nvme.h |  7 +++++++
->  drivers/nvme/host/pci.c  |  4 ++++
->  drivers/nvme/host/tcp.c  |  3 +++
->  4 files changed, 17 insertions(+), 12 deletions(-)
+> > >
+> > > Another update is that V4 of 'scsi: core: only re-run queue in
+> > > scsi_end_request() if device queue is busy' is quite hard to
+> > > implement
+> > since
+> > > commit b4fd63f42647110c9 ("Revert "scsi: core: run queue if SCSI
+> > > device queue isn't ready and queue is idle").
+> >
+> > Ming -
+> >
+> > Update from my testing. I found only one case of IO stall. I can
+> > discuss this specific topic if you like to send separate patch. It is
+> > too much interleaved discussion in this thread.
+> >
+> > I noted you mentioned that V4 of 'scsi: core: only re-run queue in
+> > scsi_end_request() if device queue is busy' need underlying support of
+> > "scsi: core: run queue if SCSI device queue isn't ready and queue is
+idle"
+> > patch which is already reverted in mainline.
+>
+> Right.
+>
+> > Overall idea of running h/w queues conditionally in your patch " scsi:
+> > core: only re-run queue in scsi_end_request" is still worth. There can
+> > be
+>
+> I agree.
+>
+> > some race if we use this patch and for that you have concern. Am I
+> > correct. ?
+>
+> If the patch of "scsi: core: run queue if SCSI device queue isn't ready
+and queue
+> is idle" is re-added, the approach should work.
+I could not find issue in " scsi: core: only re-run queue in
+scsi_end_request" even though above mentioned patch is reverted.
+There may be some corner cases/race condition in submission path which can
+be fixed doing self-restart of h/w queue.
 
-Thanks, pulled.
+> However, it looks a bit
+> complicated, and I was thinking if one simpler approach can be figured
+out.
 
--- 
-Jens Axboe
+I was thinking your original approach is simple, but if you think some
+other simple approach I can test as part of these series.
+BTW, I am still not getting why you think your original approach is not
+good design.
 
+>
+> >
+> > One of the race I found in my testing is fixed by below patch -
+> >
+> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c index
+> > 54f9015..bcfd33a 100644
+> > --- a/block/blk-mq-sched.c
+> > +++ b/block/blk-mq-sched.c
+> > @@ -173,8 +173,10 @@ static int blk_mq_do_dispatch_ctx(struct
+> > blk_mq_hw_ctx *hctx)
+> >                 if (!sbitmap_any_bit_set(&hctx->ctx_map))
+> >                         break;
+> >
+> > -               if (!blk_mq_get_dispatch_budget(hctx))
+> > +               if (!blk_mq_get_dispatch_budget(hctx)) {
+> > +                       blk_mq_delay_run_hw_queue(hctx,
+> > BLK_MQ_BUDGET_DELAY);
+> >                         break;
+> > +               }
+>
+> Actually all hw queues need to be run, instead of this hctx, cause the
+budget
+> stuff is request queue wide.
+
+
+OK. But I thought all the hctx will see issue independently, if they are
+active and they will restart its own hctx queue.
+BTW, do you think above handling in block layer code make sense
+irrespective of current h/w queue restart logic OR it is just relative
+stuffs ?
+
+>
+> >
+> >                 rq = blk_mq_dequeue_from_ctx(hctx, ctx);
+> >                 if (!rq) {
+> >
+> >
+> > In my test setup, I have your V3 'scsi: core: only re-run queue in
+> > scsi_end_request() if device queue is busy' rebased on 5.8 which does
+> > not have
+> > "scsi: core: run queue if SCSI device queue isn't ready and queue is
+idle"
+> > since it is already reverted in mainline.
+>
+> If you added the above patch, I believe you can remove the run queue in
+> scsi_end_request() unconditionally. However, the delay run queue may
+> degrade io performance.
+
+I understood.  But that performance issue is due to budget contention and
+may impact some old HBA(less queue depth) or emulation HBA.
+That is why I thought your patch of conditional h/w run from completion
+would improve performance.
+
+>
+> Actually the re-run queue in scsi_end_request() is only for dequeuing
+request
+> from sw/scheduler queue. And no such issue if request stays in
+> hctx->dispatch list.
+
+I was not aware of this. Thanks for info.  I will review the code for my
+own understanding.
+>
+> >
+> > I have 24 SAS SSD and I reduced QD = 16 so that I hit budget
+> > contention frequently.  I am running ioscheduler=none.
+> > If hctx0 has 16 IO inflight (All those IO will be posted to h/q queue
+> > directly). Next IO (17th IO) will see budget contention and it will be
+> > queued into s/w queue.
+> > It is expected that queue will be kicked from scsi_end_request. It is
+> > possible that one of the  IO completed and it reduce
+> > sdev->device_busy, but it has not yet reach the code which will kicked
+the
+> h/w queue.
+> > Releasing budget and restarting h/w queue is not atomic. At the same
+> > time, another IO (18th IO) from submission path get the budget and it
+> > will be posted from below path. This IO will reset sdev->restart and
+> > it will not allow h/w queue to be restarted from completion path. This
+> > will lead one
+>
+> Maybe re-run queue is needed before resetting sdev->restart if
+sdev->restart
+> is 1.
+
+Agree.
+
+>
+>
+> Thanks,
+> Ming
