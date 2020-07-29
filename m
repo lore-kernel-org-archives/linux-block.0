@@ -2,95 +2,143 @@ Return-Path: <SRS0=8JfY=BI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADBD1C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 04:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26684C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 04:34:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89EA120768
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 04:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595995806;
-	bh=IKuBNsl4qI263D75wzMMfJxggGK+N6Re79brmEIzMxA=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:List-ID:
-	 From;
-	b=l3iJzkCQPsKHBAhohuX9eC5N71NUYagshMIC6PSWQ8XSU4akS+TX1dfmX/qerHhIa
-	 h8Z7ROvSlR1Y2doVwCxoA4SjcYh7ubawucK3pgixB5G/hpkw/hP/CZR6S9T/GlUz/m
-	 bvQsxgYyLSj0mCD2deWHz0cljAd11gSndSPIYIqg=
+	by mail.kernel.org (Postfix) with ESMTP id 0686F20786
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 04:34:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="MUANNLB3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726391AbgG2EKF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jul 2020 00:10:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33144 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726319AbgG2EKF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jul 2020 00:10:05 -0400
-Received: from paulmck-ThinkPad-P72.home (unknown [50.45.173.55])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EA2C9206D7;
-        Wed, 29 Jul 2020 04:10:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595995805;
-        bh=IKuBNsl4qI263D75wzMMfJxggGK+N6Re79brmEIzMxA=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=OH1QkGNd8OQvbYtYzMt3W9axgOV4KN7144XsAoavF/F84RBlHJJIG75jz/4fq06/Y
-         H347LXh6xgmmQ4rxh0sKnPuqwkgbQGfj+7P7BQFfpaFdX76IwSDQlUcNDQmUxelGKk
-         UM3Go1sN/Nzwhz6ROLO3/Uy3rpGwcDvhQg/VfWjw=
-Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
-        id C7F783522621; Tue, 28 Jul 2020 21:10:04 -0700 (PDT)
-Date:   Tue, 28 Jul 2020 21:10:04 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Chao Leng <lengchao@huawei.com>,
-        Keith Busch <kbusch@kernel.org>, Ming Lin <mlin@kernel.org>
-Subject: Re: [PATCH v5 1/2] blk-mq: add tagset quiesce interface
-Message-ID: <20200729041004.GV9247@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200727231022.307602-1-sagi@grimberg.me>
- <20200727231022.307602-2-sagi@grimberg.me>
- <20200728071859.GA21629@lst.de>
- <20200728091633.GB1326626@T590>
- <b1e7c2c5-dad5-778c-f397-6530766a0150@grimberg.me>
- <20200728135436.GP9247@paulmck-ThinkPad-P72>
- <d1ba2009-130a-d423-1389-c7af72e25a6a@grimberg.me>
- <20200729003124.GT9247@paulmck-ThinkPad-P72>
- <07c90cf1-bb6f-a343-b0bf-4c91b9acb431@grimberg.me>
+        id S1726245AbgG2EeJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jul 2020 00:34:09 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:56020 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726220AbgG2EeI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Jul 2020 00:34:08 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06T4X5NE120312;
+        Wed, 29 Jul 2020 04:33:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=h53xFNPOnAu2za+HlgzOC+33Caul8s3PIGMAjL9zqYc=;
+ b=MUANNLB3paLQES1ITCwvWFQWzJZAFz7rsJkF3D6lhZO3wRENywTiG0r+5okWKkGJ2N2M
+ DaGTv20AHMYg355l9ym2tW1wVzEVZfTRSL7rjD5IUZkPYC+JW5RHvEwNR6deIoJMP3fE
+ vm85fX/uL2WSTVv4X7PydVVBu8Ij9SyFYxJzsk/Qrysb8Kw0RNxxwExX7tquU7glJRud
+ mp56sD5XgSnc/DW+CDlCnIO0jaY7bONl+rx5yQx/tL6inf/00RKjw65HiJjYXxY21VPd
+ VcHpdd/DrGG4sD2M3hwfszIYUQymWQs2xeIiKfHeKOQGZZsJ/pBsWvVANuIeFNVm/GlP 7Q== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 32hu1jb81y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 29 Jul 2020 04:33:22 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06T4XMJD078386;
+        Wed, 29 Jul 2020 04:33:22 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 32hu5u1w9x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 Jul 2020 04:33:11 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06T4X32F028038;
+        Wed, 29 Jul 2020 04:33:03 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 28 Jul 2020 21:33:03 -0700
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        "open list:SCSI CDROM DRIVER" <linux-scsi@vger.kernel.org>,
+        Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "open list:SONY MEMORYSTICK SUBSYSTEM" <linux-mmc@vger.kernel.org>,
+        Satya Tangirala <satyat@google.com>,
+        "open list:NETWORK BLOCK DEVICE (NBD)" <nbd@other.debian.org>,
+        Hou Tao <houtao1@huawei.com>, Jens Axboe <axboe@fb.com>,
+        "open list:VIRTIO CORE AND NET DRIVERS" 
+        <virtualization@lists.linux-foundation.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Alex Dubov <oakad@yahoo.com>
+Subject: Re: [PATCH 02/10] block: virtio-blk: check logical block size
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1bljz7y9q.fsf@ca-mkp.ca.oracle.com>
+References: <20200721105239.8270-1-mlevitsk@redhat.com>
+        <20200721105239.8270-3-mlevitsk@redhat.com>
+        <20200721151437.GB10620@lst.de> <yq1zh7sfedj.fsf@ca-mkp.ca.oracle.com>
+        <f16aba1020019530564f0869a67951282104a5d2.camel@redhat.com>
+Date:   Wed, 29 Jul 2020 00:32:55 -0400
+In-Reply-To: <f16aba1020019530564f0869a67951282104a5d2.camel@redhat.com>
+        (Maxim Levitsky's message of "Wed, 22 Jul 2020 12:11:17 +0300")
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <07c90cf1-bb6f-a343-b0bf-4c91b9acb431@grimberg.me>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9696 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ suspectscore=1 bulkscore=0 malwarescore=0 spamscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007290031
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9696 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 clxscore=1015
+ malwarescore=0 spamscore=0 suspectscore=1 bulkscore=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007290031
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 28, 2020 at 05:43:02PM -0700, Sagi Grimberg wrote:
-> 
-> > > Dynamically allocating each one is possible but not very scalable.
-> > > 
-> > > The question is if there is some way, we can do this with on-stack
-> > > or a single on-heap rcu_head or equivalent that can achieve the same
-> > > effect.
-> > 
-> > If the hctx structures are guaranteed to stay put, you could count
-> > them and then do a single allocation of an array of rcu_head structures
-> > (or some larger structure containing an rcu_head structure, if needed).
-> > You could then sequence through this array, consuming one rcu_head per
-> > hctx as you processed it.  Once all the callbacks had been invoked,
-> > it would be safe to free the array.
-> > 
-> > Sounds too simple, though.  So what am I missing?
-> 
-> We don't want higher-order allocations...
 
-OK, I will bite...  Do multiple lower-order allocations (page size is
-still lower-order, correct?) and link them together.
+Hi Maxim,
 
-Sorry, couldn't resist...
+> Instead of this adding blk_is_valid_logical_block_size allowed me to
+> trivially convert most of the uses.
+>
+> For RFC I converted only some drivers that I am more familiar with
+> and/or can test but I can remove the driver's own checks in most other
+> drivers with low chance of introducing a bug, even if I can't test the
+> driver.
+>
+> What do you think?
+>
+> I can also both make blk_queue_logical_block_size return an error
+> value, and have blk_is_valid_logical_block_size and use either of
+> these checks, depending on the driver with eventual goal of
+> un-exporting blk_is_valid_logical_block_size.
 
-							Thanx, Paul
+My concern is that blk_is_valid_logical_block_size() deviates from the
+regular block layer convention where the function to set a given queue
+limit will either adjust the passed value or print a warning.
+
+I guess I won't entirely object to having the actual check in a helper
+function that drivers with a peculiar initialization pattern can
+use. And then make blk_queue_logical_block_size() call that helper as
+well to validate the lbs.
+
+But I do think that blk_queue_logical_block_size() should be the
+preferred interface and that, where possible, drivers should be updated
+to check the return value of that.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
