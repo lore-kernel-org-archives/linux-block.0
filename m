@@ -2,219 +2,190 @@ Return-Path: <SRS0=8JfY=BI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E5FC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 18:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADCFCC433DF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 19:36:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AAC5C2082E
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 18:31:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 854BF206D4
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jul 2020 19:36:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="f7/r/5RL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="SmB7UulX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbgG2Sb1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jul 2020 14:31:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40734 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726336AbgG2Sb0 (ORCPT
+        id S1726581AbgG2TgX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jul 2020 15:36:23 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:53514 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726509AbgG2TgX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jul 2020 14:31:26 -0400
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96870C061794
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 11:31:26 -0700 (PDT)
-Received: by mail-qk1-x742.google.com with SMTP id 2so19089402qkf.10
-        for <linux-block@vger.kernel.org>; Wed, 29 Jul 2020 11:31:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=pyYdnxXoYtviXWOBeIb8J7LIjti14p/YvqpeLM4RqxU=;
-        b=f7/r/5RLryVxjmFbu+Je4ewLJK0nGeZRZ1I4bzK/oXBBac9ppTRkjjyzoztaP+TZYe
-         WZ4TRvVN6QgqWS9KcGCCimHZh95Gg7YSBRajOK3C690HRUEMeGTdqXnNoVwVYedAPpEw
-         OsplV3b9dNwM/s8fjBM4dmBYC3BR0JGLK71Xk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=pyYdnxXoYtviXWOBeIb8J7LIjti14p/YvqpeLM4RqxU=;
-        b=ZvLP79UqjZMfAZcHeSnRcSaXnJ/euwHWTW4wKjnbIurTKqzfBYMEv5bzskIlFt3Z4G
-         t/HRKahkxPozUoKTMT/Fdu/Pv9yQzsSMOgtJCzhPWmakEHRg5M336lVsvTLZnlLiNiiq
-         4z6PoaYUIGUR6NXkPgHiDctoKQl1nBbRNc+SOIpQ0Jeea8XYuYhtfGF3BotS67D5Ykij
-         /z8sJNqCycwOTm6uzuBwEjJURa1qGHAweJpeaKyUuq1M2Ciku+l2VMXT2x8ZmGbAl+6e
-         m6E0Bq/r41av8FkGsoPFarUvyoz7DADGWtZtHYMtpTe7XIwJcDkOE2eGVY3FzOhofbHB
-         4yDA==
-X-Gm-Message-State: AOAM531t6fYrVN2TUzizjQJy85ABHUnCw+aIj+5QPMs25tsVZUoliqyf
-        BGWZyrdSL703QTH5f8LNVolXwWMjE1nr8sZaM51igw==
-X-Google-Smtp-Source: ABdhPJx2aNoKqfw5fVGntXgc/RYi1viLbdi6yqObU1P3EtGrONiLeLUzLT1H3RwFSu5YUJG9VJ3G9JQ50YlrAUl5hSo=
-X-Received: by 2002:ae9:e507:: with SMTP id w7mr33994809qkf.264.1596047485412;
- Wed, 29 Jul 2020 11:31:25 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <20200722041201.GA912316@T590> <f6f05483491c391ce79486b8fb78cb2e@mail.gmail.com>
- <20200722080409.GB912316@T590> <fe7a7acf-d62b-d541-4203-29c1d0403c2a@huawei.com>
- <20200723140758.GA957464@T590> <f4a896a3-756e-68bb-7700-cab1e5523c81@huawei.com>
- <20200724024704.GB957464@T590> <6531e06c-9ce2-73e6-46fc-8e97400f07b2@huawei.com>
- <20200728084511.GA1326626@T590> <965cf22eea98c00618570da8424d0d94@mail.gmail.com>
- <20200729153648.GA1698748@T590>
-In-Reply-To: <20200729153648.GA1698748@T590>
+        Wed, 29 Jul 2020 15:36:23 -0400
+X-Greylist: delayed 1185 seconds by postgrey-1.27 at vger.kernel.org; Wed, 29 Jul 2020 15:36:23 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=DMu/9cwtHmi0bix+JDlgrcS0fN7h/PuWcrGpUj9X+KI=; b=SmB7UulXmX8eWXCcTcGcEqgK70
+        7ZRvPLKAbaAmUq6OCoufsd7b4Z3BNjxqSiPIx9de+Gt3qGhK8O/nN6S0jJUVvkQoRZbOVMCDavoXy
+        51z1uz7oLa1tX4P0NZRXYJn3O5eb8lepOBB1OuSiC2eBqYNIXYNFHNaL7E+XuEPWd1F71cdwfDqlH
+        zUrZtKvJ2dlY7W9em0MgkSrvpAfPshaSXLGNoftFRozjiSrFi2EhYnLVNLl40ZnyagxrcAzd+0pjI
+        3nUsyggzIbGsLicD6HtMPnAsHYRWeJ/qft9rWRfltVIjisHmo2req3bPjVsz3b6WCpXFcE/jHrEtZ
+        YKm2Q7Xg==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1k0rZ6-0007cQ-Ke; Wed, 29 Jul 2020 13:16:37 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1k0rZ3-0001FC-94; Wed, 29 Jul 2020 13:16:33 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
+        Daniel Wagner <dwagner@suse.de>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Wed, 29 Jul 2020 13:16:28 -0600
+Message-Id: <20200729191628.4741-1-logang@deltatee.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQJCvD/hZEpycfSbmqCxmdJyJD/+0AJR+kyNAmYRZaIBRnYqfAIxGEBSAFn9B+MBP/jicgD9MwXwAyMjvw0CEOgTfwH/A0ecp7ZdvrA=
-Date:   Thu, 30 Jul 2020 00:01:22 +0530
-Message-ID: <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
-Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, axboe@kernel.dk, martin.petersen@oracle.com, javier.gonz@samsung.com, hare@suse.de, dwagner@suse.de, keith.busch@wdc.com, johannes.thumshirn@wdc.com, matias.bjorling@wdc.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH] nvme: Use spin_lock_irqsave() when taking the ctrl->lock
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > >
-> > > Another update is that V4 of 'scsi: core: only re-run queue in
-> > > scsi_end_request() if device queue is busy' is quite hard to
-> > > implement
-> > since
-> > > commit b4fd63f42647110c9 ("Revert "scsi: core: run queue if SCSI
-> > > device queue isn't ready and queue is idle").
-> >
-> > Ming -
-> >
-> > Update from my testing. I found only one case of IO stall. I can
-> > discuss this specific topic if you like to send separate patch. It is
-> > too much interleaved discussion in this thread.
-> >
-> > I noted you mentioned that V4 of 'scsi: core: only re-run queue in
-> > scsi_end_request() if device queue is busy' need underlying support of
-> > "scsi: core: run queue if SCSI device queue isn't ready and queue is
-idle"
-> > patch which is already reverted in mainline.
->
-> Right.
->
-> > Overall idea of running h/w queues conditionally in your patch " scsi:
-> > core: only re-run queue in scsi_end_request" is still worth. There can
-> > be
->
-> I agree.
->
-> > some race if we use this patch and for that you have concern. Am I
-> > correct. ?
->
-> If the patch of "scsi: core: run queue if SCSI device queue isn't ready
-and queue
-> is idle" is re-added, the approach should work.
-I could not find issue in " scsi: core: only re-run queue in
-scsi_end_request" even though above mentioned patch is reverted.
-There may be some corner cases/race condition in submission path which can
-be fixed doing self-restart of h/w queue.
+When locking the ctrl->lock spinlock IRQs need to be disabled to avoid a
+dead lock. The new spin_lock() calls recently added produce the
+following lockdep warning when running the blktest nvme/003:
 
-> However, it looks a bit
-> complicated, and I was thinking if one simpler approach can be figured
-out.
+    ================================
+    WARNING: inconsistent lock state
+    --------------------------------
+    inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+    ksoftirqd/2/22 [HC0[0]:SC1[1]:HE0:SE0] takes:
+    ffff888276a8c4c0 (&ctrl->lock){+.?.}-{2:2}, at: nvme_keep_alive_end_io+0x50/0xc0
+    {SOFTIRQ-ON-W} state was registered at:
+      lock_acquire+0x164/0x500
+      _raw_spin_lock+0x28/0x40
+      nvme_get_effects_log+0x37/0x1c0
+      nvme_init_identify+0x9e4/0x14f0
+      nvme_reset_work+0xadd/0x2360
+      process_one_work+0x66b/0xb70
+      worker_thread+0x6e/0x6c0
+      kthread+0x1e7/0x210
+      ret_from_fork+0x22/0x30
+    irq event stamp: 1449221
+    hardirqs last  enabled at (1449220): [<ffffffff81c58e69>] ktime_get+0xf9/0x140
+    hardirqs last disabled at (1449221): [<ffffffff83129665>] _raw_spin_lock_irqsave+0x25/0x60
+    softirqs last  enabled at (1449210): [<ffffffff83400447>] __do_softirq+0x447/0x595
+    softirqs last disabled at (1449215): [<ffffffff81b489b5>] run_ksoftirqd+0x35/0x50
 
-I was thinking your original approach is simple, but if you think some
-other simple approach I can test as part of these series.
-BTW, I am still not getting why you think your original approach is not
-good design.
+    other info that might help us debug this:
+     Possible unsafe locking scenario:
 
->
-> >
-> > One of the race I found in my testing is fixed by below patch -
-> >
-> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c index
-> > 54f9015..bcfd33a 100644
-> > --- a/block/blk-mq-sched.c
-> > +++ b/block/blk-mq-sched.c
-> > @@ -173,8 +173,10 @@ static int blk_mq_do_dispatch_ctx(struct
-> > blk_mq_hw_ctx *hctx)
-> >                 if (!sbitmap_any_bit_set(&hctx->ctx_map))
-> >                         break;
-> >
-> > -               if (!blk_mq_get_dispatch_budget(hctx))
-> > +               if (!blk_mq_get_dispatch_budget(hctx)) {
-> > +                       blk_mq_delay_run_hw_queue(hctx,
-> > BLK_MQ_BUDGET_DELAY);
-> >                         break;
-> > +               }
->
-> Actually all hw queues need to be run, instead of this hctx, cause the
-budget
-> stuff is request queue wide.
+           CPU0
+           ----
+      lock(&ctrl->lock);
+      <Interrupt>
+        lock(&ctrl->lock);
 
+     *** DEADLOCK ***
 
-OK. But I thought all the hctx will see issue independently, if they are
-active and they will restart its own hctx queue.
-BTW, do you think above handling in block layer code make sense
-irrespective of current h/w queue restart logic OR it is just relative
-stuffs ?
+    no locks held by ksoftirqd/2/22.
 
->
-> >
-> >                 rq = blk_mq_dequeue_from_ctx(hctx, ctx);
-> >                 if (!rq) {
-> >
-> >
-> > In my test setup, I have your V3 'scsi: core: only re-run queue in
-> > scsi_end_request() if device queue is busy' rebased on 5.8 which does
-> > not have
-> > "scsi: core: run queue if SCSI device queue isn't ready and queue is
-idle"
-> > since it is already reverted in mainline.
->
-> If you added the above patch, I believe you can remove the run queue in
-> scsi_end_request() unconditionally. However, the delay run queue may
-> degrade io performance.
+    stack backtrace:
+    CPU: 2 PID: 22 Comm: ksoftirqd/2 Not tainted 5.8.0-rc4-eid-vmlocalyes-dbg-00157-g7236657c6b3a #1450
+    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.12.0-1 04/01/2014
+    Call Trace:
+     dump_stack+0xc8/0x11a
+     print_usage_bug.cold.63+0x235/0x23e
+     mark_lock+0xa9c/0xcf0
+     __lock_acquire+0xd9a/0x2b50
+     lock_acquire+0x164/0x500
+     _raw_spin_lock_irqsave+0x40/0x60
+     nvme_keep_alive_end_io+0x50/0xc0
+     blk_mq_end_request+0x158/0x210
+     nvme_complete_rq+0x146/0x500
+     nvme_loop_complete_rq+0x26/0x30 [nvme_loop]
+     blk_done_softirq+0x187/0x1e0
+     __do_softirq+0x118/0x595
+     run_ksoftirqd+0x35/0x50
+     smpboot_thread_fn+0x1d3/0x310
+     kthread+0x1e7/0x210
+     ret_from_fork+0x22/0x30
 
-I understood.  But that performance issue is due to budget contention and
-may impact some old HBA(less queue depth) or emulation HBA.
-That is why I thought your patch of conditional h/w run from completion
-would improve performance.
+Fixes: be93e87e7802 ("nvme: support for multiple Command Sets Supported and Effects log pages")
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+---
 
->
-> Actually the re-run queue in scsi_end_request() is only for dequeuing
-request
-> from sw/scheduler queue. And no such issue if request stays in
-> hctx->dispatch list.
+Note: this patch may be squashed with the patch noted in the fixes
+tag, currently in nvme-5.9.
 
-I was not aware of this. Thanks for info.  I will review the code for my
-own understanding.
->
-> >
-> > I have 24 SAS SSD and I reduced QD = 16 so that I hit budget
-> > contention frequently.  I am running ioscheduler=none.
-> > If hctx0 has 16 IO inflight (All those IO will be posted to h/q queue
-> > directly). Next IO (17th IO) will see budget contention and it will be
-> > queued into s/w queue.
-> > It is expected that queue will be kicked from scsi_end_request. It is
-> > possible that one of the  IO completed and it reduce
-> > sdev->device_busy, but it has not yet reach the code which will kicked
-the
-> h/w queue.
-> > Releasing budget and restarting h/w queue is not atomic. At the same
-> > time, another IO (18th IO) from submission path get the budget and it
-> > will be posted from below path. This IO will reset sdev->restart and
-> > it will not allow h/w queue to be restarted from completion path. This
-> > will lead one
->
-> Maybe re-run queue is needed before resetting sdev->restart if
-sdev->restart
-> is 1.
+ drivers/nvme/host/core.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Agree.
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 05aa568a60af..ed8872022219 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2971,15 +2971,16 @@ int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp, u8 csi,
+ static struct nvme_cel *nvme_find_cel(struct nvme_ctrl *ctrl, u8 csi)
+ {
+ 	struct nvme_cel *cel, *ret = NULL;
++	unsigned long flags;
 
->
->
-> Thanks,
-> Ming
+-	spin_lock(&ctrl->lock);
++	spin_lock_irqsave(&ctrl->lock, flags);
+ 	list_for_each_entry(cel, &ctrl->cels, entry) {
+ 		if (cel->csi == csi) {
+ 			ret = cel;
+ 			break;
+ 		}
+ 	}
+-	spin_unlock(&ctrl->lock);
++	spin_unlock_irqrestore(&ctrl->lock, flags);
+
+ 	return ret;
+ }
+@@ -2988,6 +2989,7 @@ static int nvme_get_effects_log(struct nvme_ctrl *ctrl, u8 csi,
+ 				struct nvme_effects_log **log)
+ {
+ 	struct nvme_cel *cel = nvme_find_cel(ctrl, csi);
++	unsigned long flags;
+ 	int ret;
+
+ 	if (cel)
+@@ -3006,9 +3008,9 @@ static int nvme_get_effects_log(struct nvme_ctrl *ctrl, u8 csi,
+
+ 	cel->csi = csi;
+
+-	spin_lock(&ctrl->lock);
++	spin_lock_irqsave(&ctrl->lock, flags);
+ 	list_add_tail(&cel->entry, &ctrl->cels);
+-	spin_unlock(&ctrl->lock);
++	spin_unlock_irqrestore(&ctrl->lock, flags);
+ out:
+ 	*log = &cel->log;
+ 	return 0;
+
+base-commit: b6cec06d19d90db5dbcc50034fb33983f6259b8b
+--
+2.20.1
