@@ -2,149 +2,118 @@ Return-Path: <SRS0=0pY0=BJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D89C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 15:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 357FAC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 15:20:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53F802070B
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 15:05:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F8662082E
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 15:20:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XvNn6dE4"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bV+E0PYC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728352AbgG3PFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jul 2020 11:05:48 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42493 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728092AbgG3PFr (ORCPT
+        id S1728447AbgG3PUN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jul 2020 11:20:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34800 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726353AbgG3PUM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jul 2020 11:05:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596121545;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0dRwDR2nuLaN08zYTcVYY2ysEKD657/Mab4Mv3iOGJY=;
-        b=XvNn6dE4/OgskqvVE53v8wdsGKzFCyPOnG739Xp6VSP1vQsN73nUCNrbTC0zsqYxxMMKk6
-        5HXCTR3U77a96d7Dj3cowUCFBCdTfyQ5upyC2Ek2JPFFaXquYgMuRYFD/U55bL+HJl5cEn
-        IeZcjtMXACo4dnSxpVDkgWv8YkeybAE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-B3PdrPmEPRCrBcmHNGothA-1; Thu, 30 Jul 2020 11:05:41 -0400
-X-MC-Unique: B3PdrPmEPRCrBcmHNGothA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC95510B13A7;
-        Thu, 30 Jul 2020 15:05:39 +0000 (UTC)
-Received: from T590 (ovpn-12-33.pek2.redhat.com [10.72.12.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 109175D9D3;
-        Thu, 30 Jul 2020 15:05:35 +0000 (UTC)
-Date:   Thu, 30 Jul 2020 23:05:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [RFC PATCH] blk-mq: implement queue quiesce via percpu_ref for
- BLK_MQ_F_BLOCKING
-Message-ID: <20200730150530.GB1710335@T590>
-References: <20200728134938.1505467-1-ming.lei@redhat.com>
- <20200729161229.GA3136267@dhcp-10-100-145-180.wdl.wdc.com>
- <20200729221646.GA1706771@T590>
- <b45fe77d-b09f-3649-8167-37ae13611093@grimberg.me>
+        Thu, 30 Jul 2020 11:20:12 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C867C061574
+        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2020 08:20:12 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id t15so19662517iob.3
+        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2020 08:20:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=vE/A57ahNtmo2vm8Z4bMXWHDnjf02DfOHnffGnFds1c=;
+        b=bV+E0PYCECvxlfZcjNKMaUrLDxQylLDnUNf2B4x+0ZOqj5i8eerQpXMq8DJBBXsFar
+         5luftlWSVBDA/s616oEqHKo16fm7+MLX/b888GDMpjWW3kFcHdSfDTDzIasZ/NG8vhi4
+         B5bx4BrQQ/9SKZG8rbddvdD5FxSikryOQLJwveFJ/aDDYPdjaAoORsk8+XQ7ACLMyLJA
+         p4K1mTGMpR5t1rVaRgWLaof4crLTMsIdtLh3bLWugxHQHSr6Cwy3BpCyWfcjTLJ/aQel
+         KmN7RTs1oJBzaihf1D+60EMqeynknbv1i8DxVTOTXkMutrWQVfrOwUs+7t80X5yH4Ah6
+         smVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=vE/A57ahNtmo2vm8Z4bMXWHDnjf02DfOHnffGnFds1c=;
+        b=gy9Ip+VWy/+RWaIi2xm6dUNh5WTor5hfm85S+gaCNeCz4sdf97YHQ6ZpkBKoJ7kEiz
+         g7i7IPLkwN2FbJn0I2s4KIQsj7hu/KRcPiUsgpdzA3+YpRhfFZ1PTVE3pfK3FjbJmYYn
+         Jz3Qof6ppzZ/RLDsrIixl96BNEHKzGxpMTTF7TD9BwwBQiVS1lJtH0vTRlRUqP9jJgGF
+         y2jFavypNdgWov2/9zZJLoFyLNukc8pK39UuK9nKdWk62J5DXpMXPbxNANIZfZv/sh9g
+         OCv3Q/G/WJPqOk2bF1e/94o3iIeCVJnsu5nQTKQ2hjHhzdri361YGEh8lVgdi8Xem21/
+         pQzw==
+X-Gm-Message-State: AOAM531olLBzAeH79R3FVADsIXQjN0s+k/a82sotETDPIcAakPb+ELtk
+        gwj7f6UCLKc3aeyHm8KGnQe1hLFUY4w=
+X-Google-Smtp-Source: ABdhPJyMKmMBXM3ydOpkwopx6F6KiYQ5Hnzn7vndXXNFTnirI95ijm3lpY/Gd524r3TNk52g2A1orA==
+X-Received: by 2002:a05:6638:27a:: with SMTP id x26mr3797744jaq.43.1596122411533;
+        Thu, 30 Jul 2020 08:20:11 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id k8sm3232180ilk.11.2020.07.30.08.20.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jul 2020 08:20:11 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.8-rc
+Message-ID: <fdd0107a-a9cf-b7c5-211c-78226f901bf5@kernel.dk>
+Date:   Thu, 30 Jul 2020 09:20:10 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b45fe77d-b09f-3649-8167-37ae13611093@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 29, 2020 at 03:42:29PM -0700, Sagi Grimberg wrote:
-> 
-> > > >   void blk_mq_quiesce_queue(struct request_queue *q)
-> > > >   {
-> > > > -	struct blk_mq_hw_ctx *hctx;
-> > > > -	unsigned int i;
-> > > > -	bool rcu = false;
-> > > > -
-> > > >   	blk_mq_quiesce_queue_nowait(q);
-> > > > -	queue_for_each_hw_ctx(q, hctx, i) {
-> > > > -		if (hctx->flags & BLK_MQ_F_BLOCKING)
-> > > > -			synchronize_srcu(hctx->srcu);
-> > > > -		else
-> > > > -			rcu = true;
-> > > > -	}
-> > > > -	if (rcu)
-> > > > +	if (q->tag_set->flags & BLK_MQ_F_BLOCKING) {
-> > > > +		percpu_ref_kill(&q->dispatch_counter);
-> > > > +		wait_event(q->mq_quiesce_wq,
-> > > > +				percpu_ref_is_zero(&q->dispatch_counter));
-> > > > +	} else
-> > > >   		synchronize_rcu();
-> > > >   }
-> > > 
-> > > 
-> > > 
-> > > > +static void hctx_lock(struct blk_mq_hw_ctx *hctx)
-> > > >   {
-> > > > -	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
-> > > > -		/* shut up gcc false positive */
-> > > > -		*srcu_idx = 0;
-> > > > +	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
-> > > >   		rcu_read_lock();
-> > > > -	} else
-> > > > -		*srcu_idx = srcu_read_lock(hctx->srcu);
-> > > > +	else
-> > > > +		percpu_ref_get(&hctx->queue->dispatch_counter);
-> > > >   }
-> > > 
-> > > percpu_ref_get() will always succeed, even after quiesce kills it.
-> > > Isn't it possible that 'percpu_ref_is_zero(&q->dispatch_counter))' may
-> > > never reach 0? We only need to ensure that dispatchers will observe
-> > > blk_queue_quiesced(). That doesn't require that there are no current
-> > > dispatchers.
-> > 
-> > IMO it shouldn't be one issue in reality, because:
-> > 
-> > - when dispatch can't make progress, the submission side will finally
-> >    stop because we either run queue from submission side or request
-> >    completion
-> > - submission side stops because we always have very limited requests
-> > 
-> > - completion side stops because requests queued to device is limited
-> > too
-> 
-> I don't think that any requests should pass after the kill was called,
-> otherwise how can we safely quiesce if requests can come in after
-> it?
+Hi Linus,
 
-What we guarantee is that no request can be queued to LLD after
-blk_mq_quiesce_queue returns.
-
-With percpu_refcount, once percpu_ref_is_zero(&q->dispatch_counter)
-returns true, all code path can observe the QUIESCED flag reliably just
-like what SRCU does, so no any request can pass to LLD after blk_mq_quiesce_queue
-returns.
-
-> 
-> > 
-> > We still can handle this case by not dispatch in case that percpu_ref_tryget()
-> 
-> You meant tryget_live right?
-
-Both works, but tryget_live could be better.
+Three NVMe fixes that should go into this release. Please pull!
 
 
-Thanks, 
-Ming
+The following changes since commit 1f273e255b285282707fa3246391f66e9dc4178f:
+
+  Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8 (2020-07-16 08:58:14 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.8-2020-07-30
+
+for you to fetch changes up to d6364a867ccbf34a6afe0d57721ff64aa43befcd:
+
+  Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8 (2020-07-29 11:21:14 -0600)
+
+----------------------------------------------------------------
+block-5.8-2020-07-30
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme: add a Identify Namespace Identification Descriptor list quirk
+
+Jens Axboe (1):
+      Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8
+
+Kai-Heng Feng (1):
+      nvme-pci: prevent SK hynix PC400 from using Write Zeroes command
+
+Sagi Grimberg (1):
+      nvme-tcp: fix possible hang waiting for icresp response
+
+ drivers/nvme/host/core.c | 15 +++------------
+ drivers/nvme/host/nvme.h |  7 +++++++
+ drivers/nvme/host/pci.c  |  4 ++++
+ drivers/nvme/host/tcp.c  |  3 +++
+ 4 files changed, 17 insertions(+), 12 deletions(-)
+
+-- 
+Jens Axboe
 
