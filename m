@@ -3,186 +3,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B74D8C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 18:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A709C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 18:19:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A2342083B
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 18:10:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ajUAXfrD"
+	by mail.kernel.org (Postfix) with ESMTP id 4768F2083E
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 18:19:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1596133141;
+	bh=YneOXmfMX/VCJCqOxykrtCNP9BEL/Sppaueh6TQR09A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=CrLFv1NJ5+SOjnm/33Fl+b9/SqmuVksFFbqavdFxKQZVyraCHJqPPDGZtTJtaJlvZ
+	 IOeKnwd2ujsND8P8858mdz5rz89byOgOoDyAJQF2EOT5VuxqHEav2Rb6IR0fvKFxDe
+	 PcwxO1U6TNCD0RAvXCGSKcCH1yDn9/togSaML4ZU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728941AbgG3SKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jul 2020 14:10:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32866 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726495AbgG3SKj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jul 2020 14:10:39 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5334CC061574
-        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2020 11:10:39 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id f9so5277200pju.4
-        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2020 11:10:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=eCWZ0AKDmj5eYAH74+r2M/mKN/7ZXpbrEknxIsef3Yc=;
-        b=ajUAXfrDq0Mb2pI9UhL+Deo64bgfocmrSQ7S3+wN7kirbVua2E3Fo7cLCk9f3YO1UW
-         ySTM5mAzc7dfFuSgMadQN4k6RAqOOA77JKEXrw0mlGAWt0AsYKbmNK/x2KOhQAdYugUz
-         KrLA08z7cNDfrOZbVmzsCMWDpbJywwGPnUhKY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eCWZ0AKDmj5eYAH74+r2M/mKN/7ZXpbrEknxIsef3Yc=;
-        b=KDehAtva5QKkjisOSEvk9zpq0evB6fgni7GwyguLIkcrQhcWuYTBWv5hCNdm7ghdRl
-         quCPucyzSkBT+5oPV27Hby1a49uPxwPma1xJDz3DCpYyJ8y5dELPwA6HSOWOcaTNgOnq
-         EqX7XmzffgFau/PgjzKJis264g4FW20+F/XzV8S9VekmAKVh9U/mHJPj+NtY/j5W/dFU
-         bly9OLeDz1UMRgJGufsUlydySrxoYqd/eclftqUf4hfiCSwfYC/9EfA8JudQMieNGXiC
-         dNl5D/mAQTDDZxIYMlrBd5m9Aok+vJklnOnukc6P0Xe0s9rpRB5mTexKrQ3heWZ115sT
-         662A==
-X-Gm-Message-State: AOAM531v4nvXwz2KjWAQZ9BGDVFpw2F7AedQ36y0jsMWj8Lkg5GEWssV
-        tBVLP5uCJSPRhCfRWPbEuN3jteWoNnU=
-X-Google-Smtp-Source: ABdhPJzJ1U3yCIj3cyycYFAeqg2w0SXGmg6Cxo8SvVZQ1srTSSZywo4dwa9+2kFhFvmNxkh040WAvA==
-X-Received: by 2002:a17:902:8a90:: with SMTP id p16mr373142plo.167.1596132638877;
-        Thu, 30 Jul 2020 11:10:38 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id d24sm6177185pjx.36.2020.07.30.11.10.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2020 11:10:37 -0700 (PDT)
-Date:   Thu, 30 Jul 2020 11:10:36 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Denis Efremov <efremov@linux.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Peilin Ye <yepeilin.cs@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [Linux-kernel-mentees] [PATCH v2] block/floppy: Prevent
- kernel-infoleak in raw_cmd_copyout()
-Message-ID: <202007301056.D3BD1805B0@keescook>
-References: <20200728141946.426245-1-yepeilin.cs@gmail.com>
- <20200729115157.8519-1-yepeilin.cs@gmail.com>
- <20200729125820.GB1840@kadam>
- <f2cf6137-987a-ab41-d88a-6828d46c255f@linux.com>
- <CAK8P3a20SEoYCrp3jOK32oZc9OkiPv+1KTjNZ2GxLbHpY4WexQ@mail.gmail.com>
+        id S1726544AbgG3STA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jul 2020 14:19:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52064 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726495AbgG3STA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Jul 2020 14:19:00 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6131620829;
+        Thu, 30 Jul 2020 18:18:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1596133140;
+        bh=YneOXmfMX/VCJCqOxykrtCNP9BEL/Sppaueh6TQR09A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=vy6DPyJs3aLe1FtXEpFCq753hd1zGpFSeOQwiHZJfvnxCS8i/Giqmqd1dzWxIHsQg
+         q3iBrcz2AVMMAdtKfFq/7EVOFnVap8vQKKSeZaFTI5eP4ZrcR3OKRQMxxq1SXnjPbg
+         2oSpHDg7Dl/ebvdJsdHm+QIi7sVBrw4vf/xHtO8U=
+Date:   Thu, 30 Jul 2020 11:18:57 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [RFC PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+Message-ID: <20200730181857.GA147247@dhcp-10-100-145-180.wdl.wdc.com>
+References: <20200728134938.1505467-1-ming.lei@redhat.com>
+ <20200729102856.GA1563056@T590>
+ <b80fa58d-34f0-cff5-c3f9-7b3d05a8a1ca@grimberg.me>
+ <20200729154957.GD1698748@T590>
+ <f3ead535-070d-40ec-08b8-56e2c1cd7ba4@grimberg.me>
+ <20200730145325.GA1710335@T590>
+ <57689a6d-9e6f-bb28-dd5f-f575988e7cb6@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a20SEoYCrp3jOK32oZc9OkiPv+1KTjNZ2GxLbHpY4WexQ@mail.gmail.com>
+In-Reply-To: <57689a6d-9e6f-bb28-dd5f-f575988e7cb6@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 30, 2020 at 10:11:07AM +0200, Arnd Bergmann wrote:
-> > On Wed, Jul 29, 2020 at 3:22 PM Denis Efremov <efremov@linux.com> wrote:
+On Thu, Jul 30, 2020 at 09:10:48AM -0700, Sagi Grimberg wrote:
+> > > I think it will be a significant improvement to have a single code path.
+> > > The code will be more robust and we won't need to face issues that are
+> > > specific for blocking.
+> > > 
+> > > If the cost is negligible, I think the upside is worth it.
+> > > 
+> > 
+> > rcu_read_lock and rcu_read_unlock has been proved as efficient enough,
+> > and I don't think percpu_refcount is better than it, so I'd suggest to
+> > not switch non-blocking into this way.
 > 
-> > And checked for leaks on x86_64 with the script test.sh
-> > $ cat test.sh
-> > #!/bin/bash
-> >
-> > for i in 4.8 5 6 7 8 9 10
-> > do
-> > ./run_container.sh gcc-$i $(pwd)/src $(pwd)/out bash -c 'gcc test.c; ./a.out'
-> > ./run_container.sh gcc-$i $(pwd)/src $(pwd)/out bash -c 'gcc -O2 test.c; ./a.out'
-> > ./run_container.sh gcc-$i $(pwd)/src $(pwd)/out bash -c 'gcc -O3 test.c; ./a.out'
-> > done
-> >
-> > No leaks reported. Is it really possible this this kind of init, i.e. cmd = *ptr?
-> 
-> The problem is that the behavior is dependent not just on the compiler
-> version but
-> also optimization flags, target architecture and specific structure
-> layouts. Most
-> of the time, both gcc and clang will initialize the whole structure
-> rather than just
-> the individual members, but you still can't be sure that this is true
-> for all configurations
-> that this code runs on, except by using CONFIG_GCC_PLUGIN_STRUCTLEAK.
-> 
-> Kees pointed me to the lib/test_stackinit.c file in the kernel in which he has
-> collected a number of combinations that are known to trigger the problem.
-> 
-> What I see there though are only cases of struct initializers like
-> 
->   struct test_big_hole var = { .one = arg->one, .two=arg->two, .three
-> = arg->three, .four = arg->four };
+> It's not a matter of which is better, its a matter of making the code
+> more robust because it has a single code-path. If moving to percpu_ref
+> is negligible, I would suggest to move both, I don't want to have two
+> completely different mechanism for blocking vs. non-blocking.
 
-test_stackinit.c intended to use six cases (where "full" is in the sense
-of "all members are named", this is intentionally testing the behavior
-of padding hole initialization):
+FWIW, I proposed an hctx percpu_ref over a year ago (but for a
+completely different reason), and it was measured as too costly.
 
-full static initialization:
-
-          = { .one = 0,
-              .two = 0,
-              .three = 0,
-              .four = 0,
-          };
-
-partial static init:
-
-          = { .two = 0, };
-
-full dynamic init:
-
-          = { .one = arg->one,
-              .two = arg->two,
-              .three = arg->three,
-              .four = arg->four,
-          };
-
-partial dynamic init:
-
-          = { .two = arg->two, };
-
-full runtime init:
-
-          var.one = 0;
-          var.two = 0;
-          var.three = 0;
-          memset(&var.four, 0, sizeof(var.four));
-
-partial runtime init:
-
-          var.two = 0;
-
-(It seems in refactoring I botched the "full static initialization"
-case, which I'll go fix separately.)
-
-> but not the syntax used in the floppy driver:
-> 
->    struct test_big_hole var = *arg;
-
-So this one is a "whole structure copy" which I didn't have any tests
-for, since I'd (perhaps inappropriately) assumed would be accomplished
-with memcpy() internally, which means the incoming "*arg"'s padding holes
-would be copied as-is. If the compiler is actually doing per-member copies
-and leaving holes in "var" untouched, that's unexpected, so clearly that
-needs to be added to test_stackinit.c! :)
-
-> or the a constructor like
-> 
->   struct test_big_hole var;
->   var = (struct test_big_hole){ .one = arg->one, .two=arg->two, .three
-> = arg->three, .four = arg->four };
-> 
-> Kees, do you know whether those two would behave differently?
-> Would it make sense to also check for those, or am I perhaps
-> misreading your code and it already gets checked?
-
-I *think* the above constructor would be covered under "full runtime
-init", but it does also seem likely it would be handled similarly to
-the "whole structure copy" in the previous example. I will go add more
-tests...
-
--- 
-Kees Cook
+  https://lore.kernel.org/linux-block/d4a4b6c0-3ea8-f748-85b0-6b39c5023a6f@kernel.dk/
