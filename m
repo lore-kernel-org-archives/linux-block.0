@@ -2,118 +2,210 @@ Return-Path: <SRS0=0pY0=BJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 357FAC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 15:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F25C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 15:59:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F8662082E
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 15:20:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D01B1206F5
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jul 2020 15:59:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bV+E0PYC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I0OErlVk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728447AbgG3PUN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jul 2020 11:20:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34800 "EHLO
+        id S1729885AbgG3P7s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jul 2020 11:59:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726353AbgG3PUM (ORCPT
+        with ESMTP id S1727072AbgG3P7r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jul 2020 11:20:12 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C867C061574
-        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2020 08:20:12 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id t15so19662517iob.3
-        for <linux-block@vger.kernel.org>; Thu, 30 Jul 2020 08:20:12 -0700 (PDT)
+        Thu, 30 Jul 2020 11:59:47 -0400
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3232C061574;
+        Thu, 30 Jul 2020 08:59:46 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id f24so8002355ejx.6;
+        Thu, 30 Jul 2020 08:59:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=vE/A57ahNtmo2vm8Z4bMXWHDnjf02DfOHnffGnFds1c=;
-        b=bV+E0PYCECvxlfZcjNKMaUrLDxQylLDnUNf2B4x+0ZOqj5i8eerQpXMq8DJBBXsFar
-         5luftlWSVBDA/s616oEqHKo16fm7+MLX/b888GDMpjWW3kFcHdSfDTDzIasZ/NG8vhi4
-         B5bx4BrQQ/9SKZG8rbddvdD5FxSikryOQLJwveFJ/aDDYPdjaAoORsk8+XQ7ACLMyLJA
-         p4K1mTGMpR5t1rVaRgWLaof4crLTMsIdtLh3bLWugxHQHSr6Cwy3BpCyWfcjTLJ/aQel
-         KmN7RTs1oJBzaihf1D+60EMqeynknbv1i8DxVTOTXkMutrWQVfrOwUs+7t80X5yH4Ah6
-         smVQ==
+        d=gmail.com; s=20161025;
+        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=wd33f2D/h4PcgaV0nXqpx6aSm+kT8PptW8Hl5mbozss=;
+        b=I0OErlVkq4M4V9d9PqGtUTwFzQlckaRlAv5g5goQ1OWGmpd3mdLo5VdoGTyZEtnBHw
+         YA2jM82jJWn0+xh2h3j+0M06FrU/RrDMUOvEI+ONUMnd4+oHKAPlzsvHwWuBX42ETUz2
+         Rpu46zOORipC9fgep425koBRNg7op90I/UFQ10FzjSNzglY2pyeUv7hkGG49UJ2G5WSd
+         4l+pwX2VnOwWYR0wzXLHUdzizDOFEEkiRXprHZXTuUYUTTgyPtXP8FG4OJ/pwayxTVxR
+         1nnjDDIiChH9mhNJ41MIxjfJSyPQt415Kc4JZUdU9FA2N1MH3adQgjmpTpi67Km9RP2o
+         aghQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=vE/A57ahNtmo2vm8Z4bMXWHDnjf02DfOHnffGnFds1c=;
-        b=gy9Ip+VWy/+RWaIi2xm6dUNh5WTor5hfm85S+gaCNeCz4sdf97YHQ6ZpkBKoJ7kEiz
-         g7i7IPLkwN2FbJn0I2s4KIQsj7hu/KRcPiUsgpdzA3+YpRhfFZ1PTVE3pfK3FjbJmYYn
-         Jz3Qof6ppzZ/RLDsrIixl96BNEHKzGxpMTTF7TD9BwwBQiVS1lJtH0vTRlRUqP9jJgGF
-         y2jFavypNdgWov2/9zZJLoFyLNukc8pK39UuK9nKdWk62J5DXpMXPbxNANIZfZv/sh9g
-         OCv3Q/G/WJPqOk2bF1e/94o3iIeCVJnsu5nQTKQ2hjHhzdri361YGEh8lVgdi8Xem21/
-         pQzw==
-X-Gm-Message-State: AOAM531olLBzAeH79R3FVADsIXQjN0s+k/a82sotETDPIcAakPb+ELtk
-        gwj7f6UCLKc3aeyHm8KGnQe1hLFUY4w=
-X-Google-Smtp-Source: ABdhPJyMKmMBXM3ydOpkwopx6F6KiYQ5Hnzn7vndXXNFTnirI95ijm3lpY/Gd524r3TNk52g2A1orA==
-X-Received: by 2002:a05:6638:27a:: with SMTP id x26mr3797744jaq.43.1596122411533;
-        Thu, 30 Jul 2020 08:20:11 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id k8sm3232180ilk.11.2020.07.30.08.20.10
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=wd33f2D/h4PcgaV0nXqpx6aSm+kT8PptW8Hl5mbozss=;
+        b=CaqmGIMPSEY2rnfFlcoOubw/bl2yvhE3p6TcfA84qVDTLbZbLE91DUPv3lJVblExBz
+         ur+4T+VTFB0oUJFJ99vtFJMXt+ctTlrXoYA/sIKioh8/7qnmk3soV/+99HkC0Ir4eeoz
+         OvfNfk9YGdZ7KhYRW3kibPDVvEGA+Dnjd/kwwFpec8IX8ECwhEuQgxIWQZfwN6f13znK
+         Q12oc/RL2eumvdPPbo4ssBXBF0qVZNE9500ACYlPbQgXVaaVNqvpO6qJwT9fwxh+qpOn
+         KFPtTjll1KdeqSjuCtu1eRbzYp90C1yMrV1PW3hoDs6ZC35b+NAS0uByMPOiB+6XMJTs
+         RttQ==
+X-Gm-Message-State: AOAM532UC0tevfv68bDIMlG+pcf77Fe2lJ2XjnwOrtD89n/uyklNFDzq
+        69Jkklj5kQZoPnyQdT1ap5g=
+X-Google-Smtp-Source: ABdhPJz5eB+KGh2glC/CMjn1WMXD9J6IpdbmzIjCrVaMZrLYoDjmJ/5uKKzl8GKS4Nw6YiIgZZ2lfQ==
+X-Received: by 2002:a17:906:b046:: with SMTP id bj6mr3370177ejb.349.1596124785467;
+        Thu, 30 Jul 2020 08:59:45 -0700 (PDT)
+Received: from [192.168.43.105] ([5.100.193.69])
+        by smtp.gmail.com with ESMTPSA id lc18sm6525610ejb.29.2020.07.30.08.59.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jul 2020 08:20:11 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.8-rc
-Message-ID: <fdd0107a-a9cf-b7c5-211c-78226f901bf5@kernel.dk>
-Date:   Thu, 30 Jul 2020 09:20:10 -0600
+        Thu, 30 Jul 2020 08:59:44 -0700 (PDT)
+To:     Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, bcrl@kvack.org
+Cc:     willy@infradead.org, hch@infradead.org, Damien.LeMoal@wdc.com,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-api@vger.kernel.org,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+References: <1595605762-17010-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200724155350epcas5p3b8f1d59eda7f8fbb38c828f692d42fd6@epcas5p3.samsung.com>
+ <1595605762-17010-7-git-send-email-joshi.k@samsung.com>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
+ 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 bA==
+Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
+Message-ID: <2d3c8287-55cf-0150-acd6-19feb9e85771@gmail.com>
+Date:   Thu, 30 Jul 2020 18:57:47 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.3.0
 MIME-Version: 1.0
+In-Reply-To: <1595605762-17010-7-git-send-email-joshi.k@samsung.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 24/07/2020 18:49, Kanchan Joshi wrote:
+> From: SelvaKumar S <selvakuma.s1@samsung.com>
+> 
+> Repurpose [cqe->res, cqe->flags] into cqe->res64 (signed) to report
+> 64bit written-offset for zone-append. The appending-write which requires
+> reporting written-location (conveyed by IOCB_ZONE_APPEND flag) is
+> ensured not to be a short-write; this avoids the need to report
+> number-of-bytes-copied.
+> append-offset is returned by lower-layer to io-uring via ret2 of
+> ki_complete interface. Make changes to collect it and send to user-space
+> via cqe->res64.
+> 
+> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
+> ---
+>  fs/io_uring.c                 | 49 ++++++++++++++++++++++++++++++++++++-------
+>  include/uapi/linux/io_uring.h |  9 ++++++--
+>  2 files changed, 48 insertions(+), 10 deletions(-)
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 7809ab2..6510cf5 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+...
+> @@ -1244,8 +1254,15 @@ static bool io_cqring_overflow_flush(struct io_ring_ctx *ctx, bool force)
+>  		req->flags &= ~REQ_F_OVERFLOW;
+>  		if (cqe) {
+>  			WRITE_ONCE(cqe->user_data, req->user_data);
+> -			WRITE_ONCE(cqe->res, req->result);
+> -			WRITE_ONCE(cqe->flags, req->cflags);
+> +			if (unlikely(req->flags & REQ_F_ZONE_APPEND)) {
+> +				if (likely(req->result > 0))
+> +					WRITE_ONCE(cqe->res64, req->rw.append_offset);
+> +				else
+> +					WRITE_ONCE(cqe->res64, req->result);
+> +			} else {
+> +				WRITE_ONCE(cqe->res, req->result);
+> +				WRITE_ONCE(cqe->flags, req->cflags);
+> +			}
+>  		} else {
+>  			WRITE_ONCE(ctx->rings->cq_overflow,
+>  				atomic_inc_return(&ctx->cached_cq_overflow));
+> @@ -1284,8 +1301,15 @@ static void __io_cqring_fill_event(struct io_kiocb *req, long res, long cflags)
+>  	cqe = io_get_cqring(ctx);
+>  	if (likely(cqe)) {
+>  		WRITE_ONCE(cqe->user_data, req->user_data);
+> -		WRITE_ONCE(cqe->res, res);
+> -		WRITE_ONCE(cqe->flags, cflags);
+> +		if (unlikely(req->flags & REQ_F_ZONE_APPEND)) {
+> +			if (likely(res > 0))
+> +				WRITE_ONCE(cqe->res64, req->rw.append_offset);
 
-Three NVMe fixes that should go into this release. Please pull!
+1. as I mentioned before, that's not not nice to ignore @cflags
+2. that's not the right place for opcode specific handling
+3. it doesn't work with overflowed reqs, see the final else below
 
+For this scheme, I'd pass @append_offset as an argument. That should
+also remove this extra if from the fast path, which Jens mentioned.
 
-The following changes since commit 1f273e255b285282707fa3246391f66e9dc4178f:
+> +			else
+> +				WRITE_ONCE(cqe->res64, res);
+> +		} else {
+> +			WRITE_ONCE(cqe->res, res);
+> +			WRITE_ONCE(cqe->flags, cflags);
+> +		}
+>  	} else if (ctx->cq_overflow_flushed) {
+>  		WRITE_ONCE(ctx->rings->cq_overflow,
+>  				atomic_inc_return(&ctx->cached_cq_overflow));
+> @@ -1943,7 +1967,7 @@ static inline void req_set_fail_links(struct io_kiocb *req)
+>  		req->flags |= REQ_F_FAIL_LINK;
+>  }
+>  
 
-  Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8 (2020-07-16 08:58:14 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.8-2020-07-30
-
-for you to fetch changes up to d6364a867ccbf34a6afe0d57721ff64aa43befcd:
-
-  Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8 (2020-07-29 11:21:14 -0600)
-
-----------------------------------------------------------------
-block-5.8-2020-07-30
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      nvme: add a Identify Namespace Identification Descriptor list quirk
-
-Jens Axboe (1):
-      Merge branch 'nvme-5.8' of git://git.infradead.org/nvme into block-5.8
-
-Kai-Heng Feng (1):
-      nvme-pci: prevent SK hynix PC400 from using Write Zeroes command
-
-Sagi Grimberg (1):
-      nvme-tcp: fix possible hang waiting for icresp response
-
- drivers/nvme/host/core.c | 15 +++------------
- drivers/nvme/host/nvme.h |  7 +++++++
- drivers/nvme/host/pci.c  |  4 ++++
- drivers/nvme/host/tcp.c  |  3 +++
- 4 files changed, 17 insertions(+), 12 deletions(-)
 
 -- 
-Jens Axboe
-
+Pavel Begunkov
