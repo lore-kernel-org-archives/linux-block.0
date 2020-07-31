@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 298D5C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jul 2020 01:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB68C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jul 2020 01:42:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F296C22CA1
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jul 2020 01:42:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9EEF21D95
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jul 2020 01:42:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="co3ghb39"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bT2D0h0N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731109AbgGaBmu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jul 2020 21:42:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46048 "EHLO
+        id S1731116AbgGaBmz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jul 2020 21:42:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731106AbgGaBmt (ORCPT
+        with ESMTP id S1731126AbgGaBmy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jul 2020 21:42:49 -0400
+        Thu, 30 Jul 2020 21:42:54 -0400
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51352C061574;
-        Thu, 30 Jul 2020 18:42:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1561C061575;
+        Thu, 30 Jul 2020 18:42:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=MFGXvn4NH0QXVaicEnP47nXZHotozTzHnc/uZ6PUbu4=; b=co3ghb39SFO6yUSILUQ3N88wAr
-        QkMw3Ra/8ZiZ+FpA4inV+DdhwqU/eyXP+k/gkqSDIRbDP8TiO9SQCTSk0YmL1WxSMYrTPMgIOhV6d
-        C5ZvOILuSgaFAxWMp35XQjxZ6Q8YqL7jzpGcj8KhJ2sG9yWLE6eQH5my/FNh2PgNDe6N7U2mzrnVd
-        B8UriyLyVL1ACxOUGF7xC77q/OshWDVsOyfY0DqnEXieJjF3O7DMWa8osyt9B4tXBqTgQLXDDZXZj
-        0QfhK15hLMY5MQeknbxS/HWxZjrr88d2ophEczYdvFoRXl1Bo1DlZ8+L966CBAShUAPstksQVWPQq
-        nIAfKKlA==;
+        bh=Ht9aEgGtbxzNRbhRSDyB2yjNtp9N/RM12jUwfQdOb9c=; b=bT2D0h0Ndi1xiOu+RIzvkuZITM
+        MxUP8MM4dE4cSuhek6AMg1fMWlOA7Zfru9ccnvdyzih+Uci4RHdG28j8nD6lkZ2fkdIJdQkv2IIfN
+        fN0FO0yKZp68I02/ad9+KI8bCN4NYzJSE46PLkpUnO8yGXSb4u2zuItBMQLN/DqAvCPPxScZ+ErGu
+        4lbXfOYybzfH+VDfQ2pAVCbMlnLMe71PpxkK9Fs2GgiYBWRFs1Uv8yrolsq1Mft/rhu+rjyVPGfFA
+        hwhedfzyGuAxBI94JKkTt1uvZn6Zc1mCCuccSioY76OT45aX3Vs5UqazHiAdGhv+dEZLedqWGdO24
+        ho0VJ1Zg==;
 Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac] (helo=smtpauth.infradead.org)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1k1K4M-0006bc-UV; Fri, 31 Jul 2020 01:42:47 +0000
+        id 1k1K4R-0006bc-8b; Fri, 31 Jul 2020 01:42:51 +0000
 From:   Randy Dunlap <rdunlap@infradead.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org
-Subject: [PATCH 4/7] block: genhd: delete duplicated words
-Date:   Thu, 30 Jul 2020 18:42:30 -0700
-Message-Id: <20200731014233.6418-5-rdunlap@infradead.org>
+Subject: [PATCH 6/7] block: blk-mq-sched: delete duplicated word
+Date:   Thu, 30 Jul 2020 18:42:32 -0700
+Message-Id: <20200731014233.6418-7-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200731014233.6418-1-rdunlap@infradead.org>
 References: <20200731014233.6418-1-rdunlap@infradead.org>
@@ -55,41 +55,23 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Drop the repeated word "to" in multiple places.
+Drop the repeated word "to".
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 Cc: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
 ---
- block/genhd.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/blk-mq-sched.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- linux-next-20200730.orig/block/genhd.c
-+++ linux-next-20200730/block/genhd.c
-@@ -1773,7 +1773,7 @@ EXPORT_SYMBOL(__alloc_disk_node);
- 
- /**
-  * get_disk_and_module - increments the gendisk and gendisk fops module refcount
-- * @disk: the struct gendisk to to increment the refcount for
-+ * @disk: the struct gendisk to increment the refcount for
+--- linux-next-20200730.orig/block/blk-mq-sched.c
++++ linux-next-20200730/block/blk-mq-sched.c
+@@ -225,7 +225,7 @@ static struct blk_mq_ctx *blk_mq_next_ct
+  * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
   *
-  * This increments the refcount for the struct gendisk, and the gendisk's
-  * fops module owner.
-@@ -1802,7 +1802,7 @@ EXPORT_SYMBOL(get_disk_and_module);
- 
- /**
-  * put_disk - decrements the gendisk refcount
-- * @disk: the struct gendisk to to decrement the refcount for
-+ * @disk: the struct gendisk to decrement the refcount for
-  *
-  * This decrements the refcount for the struct gendisk. When this reaches 0
-  * we'll have disk_release() called.
-@@ -1819,7 +1819,7 @@ EXPORT_SYMBOL(put_disk);
- 
- /**
-  * put_disk_and_module - decrements the module and gendisk refcount
-- * @disk: the struct gendisk to to decrement the refcount for
-+ * @disk: the struct gendisk to decrement the refcount for
-  *
-  * This is a counterpart of get_disk_and_module() and thus also of
-  * get_gendisk().
+  * Returns -EAGAIN if hctx->dispatch was found non-empty and run_work has to
+- * to be run again.  This is necessary to avoid starving flushes.
++ * be run again.  This is necessary to avoid starving flushes.
+  */
+ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ {
