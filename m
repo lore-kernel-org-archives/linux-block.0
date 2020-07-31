@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EF8C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jul 2020 01:43:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F92C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jul 2020 01:43:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EBA72083E
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jul 2020 01:43:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB3F221744
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jul 2020 01:43:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wwhI4gCI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="t7N/7Kpw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731106AbgGaBmx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jul 2020 21:42:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46054 "EHLO
+        id S1731118AbgGaBnM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jul 2020 21:43:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731116AbgGaBmv (ORCPT
+        with ESMTP id S1731098AbgGaBmr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jul 2020 21:42:51 -0400
+        Thu, 30 Jul 2020 21:42:47 -0400
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 734A9C061574;
-        Thu, 30 Jul 2020 18:42:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A600C061574;
+        Thu, 30 Jul 2020 18:42:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=sJun623wP9tiatqkoyf8KZ4hG2tqljak3ONGna65MJc=; b=wwhI4gCIaXYbuMSBuECaMjZN3p
-        CtlT6Cx9HxmNZZpe5tv4w8+poWUoDx2fSYY9L5VSFgYo6ibXrxKiLRHbmUlHMrEq1DlEy1hX301dL
-        F08B/u269RJyVfzHvMuAP/Rc5gqhGvPB9pRQNX6WDoogpdZRj5V6AYrLdJZLuOCFlt0ZcMlSGYm/w
-        /ARy4TyPliCe1w2oJjeUM5O2hvkE2DKc6UTnK90mC/MpGk0pwOYiWxhDDMIV0aD3kY4Ae7sZyOHsp
-        nolAAFfXqDLZcxA7lyUylMlJVIbHaslSKBp5XKQrr3r+L/I/9vRpQuLVlnssQy7mKFei5LaJRHzJE
-        FwQCD2lA==;
+        bh=esxQlXFemcr0J9/J6h/Xl8BkBKuFSpvLIp+w4lZ9qpA=; b=t7N/7KpwTpq5qJx9LprrqN/Kf3
+        Hrze9bqHB3RVdqPZScC522+mOAFrdjNwCQlrF4ZDQjU7U2NmSd9spXtTaXUhDdqz7+lASI07zQeRb
+        +JxfQyhHOdsAKACK5E9HtFcpuQKqNygrIavrHINMuXV5t29AXBG7Zl6Y6Cx1xkSwmBo5azaDWPYzW
+        K6eFxzD9lGGPBggVZnGFsLqVRoT6T94Iq/KpJBsamfc/l8PbeBaH58HxGdYJawM1I5omZXCzh7B5k
+        wuKim94L11iAMn3PHqN5oHSL2VY7fWKkYcHbS7FFowaF0xsCjFovLijN4B2VIXRosgDQtNLqXyBHw
+        f/89Fkrw==;
 Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac] (helo=smtpauth.infradead.org)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1k1K4P-0006bc-39; Fri, 31 Jul 2020 01:42:49 +0000
+        id 1k1K4K-0006bc-Ps; Fri, 31 Jul 2020 01:42:45 +0000
 From:   Randy Dunlap <rdunlap@infradead.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org
-Subject: [PATCH 5/7] block: blk-mq: delete duplicated word
-Date:   Thu, 30 Jul 2020 18:42:31 -0700
-Message-Id: <20200731014233.6418-6-rdunlap@infradead.org>
+Subject: [PATCH 3/7] block: elevator: delete duplicated word and fix typos
+Date:   Thu, 30 Jul 2020 18:42:29 -0700
+Message-Id: <20200731014233.6418-4-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200731014233.6418-1-rdunlap@infradead.org>
 References: <20200731014233.6418-1-rdunlap@infradead.org>
@@ -56,22 +56,25 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Drop the repeated word "the".
+Fix typos of "features" and "specified".
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 Cc: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
 ---
- block/blk-mq.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/elevator.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---- linux-next-20200730.orig/block/blk-mq.c
-+++ linux-next-20200730/block/blk-mq.c
-@@ -388,7 +388,7 @@ retry:
- 		/*
- 		 * Give up the CPU and sleep for a random short time to ensure
- 		 * that thread using a realtime scheduling class are migrated
--		 * off the the CPU, and thus off the hctx that is going away.
-+		 * off the CPU, and thus off the hctx that is going away.
- 		 */
- 		msleep(3);
- 		goto retry;
+--- linux-next-20200730.orig/block/elevator.c
++++ linux-next-20200730/block/elevator.c
+@@ -95,8 +95,8 @@ static inline bool elv_support_features(
+  * @name: Elevator name to test
+  * @required_features: Features that the elevator must provide
+  *
+- * Return true is the elevator @e name matches @name and if @e provides all the
+- * the feratures spcified by @required_features.
++ * Return true if the elevator @e name matches @name and if @e provides all
++ * the features specified by @required_features.
+  */
+ static bool elevator_match(const struct elevator_type *e, const char *name,
+ 			   unsigned int required_features)
