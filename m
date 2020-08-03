@@ -2,44 +2,45 @@ Return-Path: <SRS0=nSht=BN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 797E3C433DF
-	for <linux-block@archiver.kernel.org>; Mon,  3 Aug 2020 06:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D213C433E0
+	for <linux-block@archiver.kernel.org>; Mon,  3 Aug 2020 06:48:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5FAC12075A
-	for <linux-block@archiver.kernel.org>; Mon,  3 Aug 2020 06:48:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BEC120781
+	for <linux-block@archiver.kernel.org>; Mon,  3 Aug 2020 06:48:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725840AbgHCGsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Aug 2020 02:48:45 -0400
-Received: from mail-wr1-f45.google.com ([209.85.221.45]:42276 "EHLO
-        mail-wr1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725946AbgHCGsp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Aug 2020 02:48:45 -0400
-Received: by mail-wr1-f45.google.com with SMTP id r4so30117812wrx.9
-        for <linux-block@vger.kernel.org>; Sun, 02 Aug 2020 23:48:43 -0700 (PDT)
+        id S1725948AbgHCGst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Aug 2020 02:48:49 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:35802 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbgHCGst (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Aug 2020 02:48:49 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 184so14399857wmb.0
+        for <linux-block@vger.kernel.org>; Sun, 02 Aug 2020 23:48:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Ah7+Fdla9BLpnlB5TAyVE+EsnlJ3z0oSf241X879VJg=;
-        b=NXLAgY6wzjqfuUFF26Lrxh17kI8WTgsMTE7fqHOJSnBZcDBi1nXAi5h+Fd864Y+WPs
-         LMbHgICljL+C4IvqhQI2skC9hbHoMxKAGIbAybEq26Q2t2AzB3MfY+dgfueNPCSOuNYU
-         2fzSFQuobG7y0n52Hxh+UITyCzSnKYoovg11WevC3QfV28aD89BfVjKWLb5Y2pzHJ6pP
-         u24X/LlMHiYJy8SGbwPHxPXxB1pv+MWFF4weqN1vWPoyH0Rcqq+r6KVHGcJqY1ttJQax
-         9xQYnX+lciTfJgnEmTZpdj7zLal3WZHi/O1+CZR++EMjXDkM5w93bjswIUxBRLg7dawl
-         f22g==
-X-Gm-Message-State: AOAM532thSeflmO9c7+r+/PfwzlpTYSKLv7CqKvNyz4YCJD0l8hoYUWZ
-        zSvyGcbNUfDPYyzjBUwYd6k=
-X-Google-Smtp-Source: ABdhPJz7q0GMxDdL+HvRPj165/7m7+t+eCym1gpeLsxSz0TlYtAAE8Z3tQOA+YTu8geOkWTip7N82w==
-X-Received: by 2002:adf:9526:: with SMTP id 35mr14576749wrs.326.1596437323137;
-        Sun, 02 Aug 2020 23:48:43 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=RvtTADagnnCiX9G36QO3CyWOxm7jHsOMd2MXrfM8ToI=;
+        b=cqfFsKbxZSYGdLiqmAfE/ROOGacoh2xhPKmY98rpboTR0mf6AAKRWgckQRaZqebvIp
+         8frZI1Q/V/JB5q/GBr6OCxsFjjLO0tXAPSz0lYC11bY+DToBAFLlU+njPFvTkM0woNja
+         IxcvmiYVIIzA+YF1PRDeUkp6Flyk3vBaooguOg8Q0M6HzdjP8SyuzpmwoUfT9kU4dUJg
+         30FUAV4IldMwAxKV4hrKA/VH/lrw5N4OHcYGUIqe9U7mDrDSHyNT7K/ZKBaGzlGK3T9a
+         xDYmRWGxaqzm8lirGggAVCN+3aY2myIqR03Pm2y/2NK+Ya1uN8Q8cRRJz34B1WjyhnIA
+         o/Lg==
+X-Gm-Message-State: AOAM532FB5kll7f7lXA2IZrXEk+hxBBnmUMcZAzwo7BKI8Y9piFw0QYy
+        jtN13EuwFVEbljrlRjPSg2k=
+X-Google-Smtp-Source: ABdhPJx52Md5rJgjGZ8CPbneLqtQGF7YKsMVc8jbC6a0uufWqogdjFNCawJWI2Mk8V2WL9FSenNu0w==
+X-Received: by 2002:a1c:7e12:: with SMTP id z18mr3330246wmc.188.1596437325717;
+        Sun, 02 Aug 2020 23:48:45 -0700 (PDT)
 Received: from localhost.localdomain ([2601:647:4802:9070:6dac:e394:c378:553e])
-        by smtp.gmail.com with ESMTPSA id z6sm23740647wrs.36.2020.08.02.23.48.40
+        by smtp.gmail.com with ESMTPSA id z6sm23740647wrs.36.2020.08.02.23.48.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Aug 2020 23:48:42 -0700 (PDT)
+        Sun, 02 Aug 2020 23:48:45 -0700 (PDT)
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         Omar Sandoval <osandov@osandov.com>,
@@ -47,10 +48,12 @@ To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH rfc 0/6] blktests: Add support to run nvme tests with tcp/rdma transports
-Date:   Sun,  2 Aug 2020 23:48:29 -0700
-Message-Id: <20200803064835.67927-1-sagi@grimberg.me>
+Subject: [PATCH rfc 1/6] nvme: consolidate nvme requirements based on transport type
+Date:   Sun,  2 Aug 2020 23:48:30 -0700
+Message-Id: <20200803064835.67927-2-sagi@grimberg.me>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200803064835.67927-1-sagi@grimberg.me>
+References: <20200803064835.67927-1-sagi@grimberg.me>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -58,59 +61,542 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have a collection of nvme tests, but all run with nvme-loop. This
-is the easiest to run on a standalone machine. However its very much possible
-to run nvme-tcp and nvme-rdma using a loopback network. Add capability to run
-tests with a new environment variable to set the transport type $nvme_trtype.
+Right now, only pci and loop have tests, hence these are
+the only ones that are allowed. The user can pass an env
+variable nvme_trtype and check for the necessary modules.
 
-$ nvme_trtype=[loop|tcp|rdma] ./check test/nvme
+This allows prepares us to support other transport types.
 
-This buys us some nice coverage on some more transport types. We also add
-some transport type specific helpers to mark tests that are relevant only
-for a single transport.
+Note that test 031 is designed to run only with nvme, hence
+it overrides the environment variable to nvme_trtype=pci.
 
-Sagi Grimberg (6):
-  nvme: consolidate nvme requirements based on transport type
-  nvme: consolidate some nvme-cli utility functions
-  nvme: make tests transport type agnostic
-  tests/nvme: restrict tests to specific transports
-  nvme: support nvme-tcp when runinng tests
-  nvme: support rdma transport type
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ tests/nvme/002 |  3 ++-
+ tests/nvme/003 |  3 ++-
+ tests/nvme/004 |  3 ++-
+ tests/nvme/005 |  6 +++---
+ tests/nvme/006 |  4 ++--
+ tests/nvme/007 |  2 +-
+ tests/nvme/008 |  4 ++--
+ tests/nvme/009 |  2 +-
+ tests/nvme/010 |  4 ++--
+ tests/nvme/011 |  4 ++--
+ tests/nvme/012 |  5 +++--
+ tests/nvme/013 |  4 ++--
+ tests/nvme/014 |  4 ++--
+ tests/nvme/015 |  3 ++-
+ tests/nvme/016 |  2 +-
+ tests/nvme/017 |  2 +-
+ tests/nvme/018 |  4 ++--
+ tests/nvme/019 |  4 ++--
+ tests/nvme/020 |  2 +-
+ tests/nvme/021 |  4 ++--
+ tests/nvme/022 |  4 ++--
+ tests/nvme/023 |  4 ++--
+ tests/nvme/024 |  4 ++--
+ tests/nvme/025 |  4 ++--
+ tests/nvme/026 |  4 ++--
+ tests/nvme/027 |  4 ++--
+ tests/nvme/028 |  4 ++--
+ tests/nvme/029 |  4 ++--
+ tests/nvme/030 |  5 ++---
+ tests/nvme/031 |  5 ++---
+ tests/nvme/032 |  4 ++++
+ tests/nvme/rc  | 19 +++++++++++++++++++
+ 32 files changed, 80 insertions(+), 54 deletions(-)
 
- tests/nvme/002 |   8 ++--
- tests/nvme/003 |  10 ++--
- tests/nvme/004 |  12 +++--
- tests/nvme/005 |  15 +++---
- tests/nvme/006 |   7 +--
- tests/nvme/007 |   5 +-
- tests/nvme/008 |  13 +++---
- tests/nvme/009 |  11 +++--
- tests/nvme/010 |  13 +++---
- tests/nvme/011 |  13 +++---
- tests/nvme/012 |  14 +++---
- tests/nvme/013 |  13 +++---
- tests/nvme/014 |  13 +++---
- tests/nvme/015 |  12 +++--
- tests/nvme/016 |   7 +--
- tests/nvme/017 |   7 +--
- tests/nvme/018 |  13 +++---
- tests/nvme/019 |  13 +++---
- tests/nvme/020 |  11 +++--
- tests/nvme/021 |  13 +++---
- tests/nvme/022 |  13 +++---
- tests/nvme/023 |  13 +++---
- tests/nvme/024 |  13 +++---
- tests/nvme/025 |  13 +++---
- tests/nvme/026 |  13 +++---
- tests/nvme/027 |  13 +++---
- tests/nvme/028 |  15 +++---
- tests/nvme/029 |  13 +++---
- tests/nvme/030 |   8 ++--
- tests/nvme/031 |  12 ++---
- tests/nvme/032 |   4 ++
- tests/nvme/rc  | 122 +++++++++++++++++++++++++++++++++++++++++++++----
- 32 files changed, 309 insertions(+), 166 deletions(-)
-
+diff --git a/tests/nvme/002 b/tests/nvme/002
+index 07b7fdae2d39..aaa5ec4d729a 100755
+--- a/tests/nvme/002
++++ b/tests/nvme/002
+@@ -10,7 +10,8 @@
+ DESCRIPTION="create many subsystems and test discovery"
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && _have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/003 b/tests/nvme/003
+index ed0feca3cac7..fd696d9efe2c 100755
+--- a/tests/nvme/003
++++ b/tests/nvme/003
+@@ -11,7 +11,8 @@ DESCRIPTION="test if we're sending keep-alives to a discovery controller"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && _have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/004 b/tests/nvme/004
+index 0debcd9c7049..b841a8d4cd87 100755
+--- a/tests/nvme/004
++++ b/tests/nvme/004
+@@ -12,7 +12,8 @@ DESCRIPTION="test nvme and nvmet UUID NS descriptors"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && _have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/005 b/tests/nvme/005
+index 8c79d234bb1d..df0900b372be 100755
+--- a/tests/nvme/005
++++ b/tests/nvme/005
+@@ -11,9 +11,9 @@ DESCRIPTION="reset local loopback target"
+ QUICK=1
+ 
+ requires() {
+-	_have_modules loop nvme-core nvme-loop nvmet && \
+-		_have_module_param_value nvme_core multipath Y && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop && \
++		_have_module_param_value nvme_core multipath Y
+ }
+ 
+ test() {
+diff --git a/tests/nvme/006 b/tests/nvme/006
+index 6c8e18560264..3f47613d52d2 100755
+--- a/tests/nvme/006
++++ b/tests/nvme/006
+@@ -10,8 +10,8 @@ DESCRIPTION="create an NVMeOF target with a block device-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/007 b/tests/nvme/007
+index 58f4bf8808a1..0902745a4ab2 100755
+--- a/tests/nvme/007
++++ b/tests/nvme/007
+@@ -10,7 +10,7 @@ DESCRIPTION="create an NVMeOF target with a file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules nvme-loop nvmet && _have_configfs
++	_nvme_requires
+ }
+ 
+ test() {
+diff --git a/tests/nvme/008 b/tests/nvme/008
+index 71ff4d962b00..f19de17fefac 100755
+--- a/tests/nvme/008
++++ b/tests/nvme/008
+@@ -10,8 +10,8 @@ DESCRIPTION="create an NVMeOF host with a block device-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/009 b/tests/nvme/009
+index 25c7da2ab854..4afbe62864f6 100755
+--- a/tests/nvme/009
++++ b/tests/nvme/009
+@@ -10,7 +10,7 @@ DESCRIPTION="create an NVMeOF host with a file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules nvme-loop nvmet && _have_configfs
++	_nvme_requires
+ }
+ 
+ test() {
+diff --git a/tests/nvme/010 b/tests/nvme/010
+index 2ed0f4871a30..53b97484615f 100755
+--- a/tests/nvme/010
++++ b/tests/nvme/010
+@@ -10,8 +10,8 @@ DESCRIPTION="run data verification fio job on NVMeOF block device-backed ns"
+ TIMED=1
+ 
+ requires() {
+-	_have_program nvme && _have_fio && \
+-		_have_modules loop nvme-loop nvmet && _have_configfs
++	_nvme_requires
++	_have_fio _have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/011 b/tests/nvme/011
+index 974b33745b99..a54583d5c582 100755
+--- a/tests/nvme/011
++++ b/tests/nvme/011
+@@ -10,8 +10,8 @@ DESCRIPTION="run data verification fio job on NVMeOF file-backed ns"
+ TIMED=1
+ 
+ requires() {
+-	_have_program nvme && _have_fio && _have_configfs && \
+-		_have_modules nvme-loop nvmet
++	_nvme_requires
++	_have_fio
+ }
+ 
+ test() {
+diff --git a/tests/nvme/012 b/tests/nvme/012
+index 27981e903c58..0049c3d8ceb6 100755
+--- a/tests/nvme/012
++++ b/tests/nvme/012
+@@ -10,8 +10,9 @@ DESCRIPTION="run mkfs and data verification fio job on NVMeOF block device-backe
+ TIMED=1
+ 
+ requires() {
+-	_have_program nvme && _have_program mkfs.xfs && _have_program fio && \
+-		_have_modules loop nvme-loop nvmet && _have_configfs
++	_nvme_requires
++	_have_program mkfs.xfs && _have_program fio && \
++		_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/013 b/tests/nvme/013
+index af5f3730a2fc..622706ec4088 100755
+--- a/tests/nvme/013
++++ b/tests/nvme/013
+@@ -10,8 +10,8 @@ DESCRIPTION="run mkfs and data verification fio job on NVMeOF file-backed ns"
+ TIMED=1
+ 
+ requires() {
+-	_have_program nvme && _have_program mkfs.xfs && _have_fio && \
+-		_have_modules nvme-loop nvmet && _have_configfs
++	_nvme_requires
++	_have_program mkfs.xfs && _have_fio
+ }
+ 
+ test() {
+diff --git a/tests/nvme/014 b/tests/nvme/014
+index c255d5f12205..9517230253ab 100755
+--- a/tests/nvme/014
++++ b/tests/nvme/014
+@@ -10,8 +10,8 @@ DESCRIPTION="flush a NVMeOF block device-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/015 b/tests/nvme/015
+index a8497a2ba400..40b850974b43 100755
+--- a/tests/nvme/015
++++ b/tests/nvme/015
+@@ -10,7 +10,8 @@ DESCRIPTION="unit test for NVMe flush for file backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && _have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/016 b/tests/nvme/016
+index f1e383cb441a..e1bad2f81461 100755
+--- a/tests/nvme/016
++++ b/tests/nvme/016
+@@ -9,7 +9,7 @@
+ DESCRIPTION="create/delete many NVMeOF block device-backed ns and test discovery"
+ 
+ requires() {
+-	_have_program nvme && _have_modules nvme-loop nvmet && _have_configfs
++	_nvme_requires
+ }
+ 
+ test() {
+diff --git a/tests/nvme/017 b/tests/nvme/017
+index 6787b5c754ba..2e6d649f9b65 100755
+--- a/tests/nvme/017
++++ b/tests/nvme/017
+@@ -9,7 +9,7 @@
+ DESCRIPTION="create/delete many file-ns and test discovery"
+ 
+ requires() {
+-	_have_program nvme && _have_modules nvme-loop nvmet && _have_configfs
++	_nvme_requires
+ }
+ 
+ test() {
+diff --git a/tests/nvme/018 b/tests/nvme/018
+index 67d89a6f0b24..e39613709c90 100755
+--- a/tests/nvme/018
++++ b/tests/nvme/018
+@@ -11,8 +11,8 @@ DESCRIPTION="unit test NVMe-oF out of range access on a file backend"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/019 b/tests/nvme/019
+index a8b0204ec0eb..86a2a2945b35 100755
+--- a/tests/nvme/019
++++ b/tests/nvme/019
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe DSM Discard command on NVMeOF block-device ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/020 b/tests/nvme/020
+index b480ee1b92d0..ccadec6a5822 100755
+--- a/tests/nvme/020
++++ b/tests/nvme/020
+@@ -10,7 +10,7 @@ DESCRIPTION="test NVMe DSM Discard command on NVMeOF file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules nvme-loop nvmet && _have_configfs
++	_nvme_requires
+ }
+ 
+ test() {
+diff --git a/tests/nvme/021 b/tests/nvme/021
+index bbee54d16ff1..bbcb9d56a350 100755
+--- a/tests/nvme/021
++++ b/tests/nvme/021
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe list command on NVMeOF file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/022 b/tests/nvme/022
+index 9ba07c1cc50f..452e7b3d196c 100755
+--- a/tests/nvme/022
++++ b/tests/nvme/022
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe reset command on NVMeOF file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/023 b/tests/nvme/023
+index ed2a5ad7653f..2714571d16d9 100755
+--- a/tests/nvme/023
++++ b/tests/nvme/023
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe smart-log command on NVMeOF block-device ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/024 b/tests/nvme/024
+index 538580947c5c..1f87bd19ec69 100755
+--- a/tests/nvme/024
++++ b/tests/nvme/024
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe smart-log command on NVMeOF file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/025 b/tests/nvme/025
+index 0039fefa5007..1b9e33351f61 100755
+--- a/tests/nvme/025
++++ b/tests/nvme/025
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe effects-log command on NVMeOF file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/026 b/tests/nvme/026
+index 7e89d840529c..21a265a630ba 100755
+--- a/tests/nvme/026
++++ b/tests/nvme/026
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe ns-descs command on NVMeOF file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/027 b/tests/nvme/027
+index 4d293beb8b47..d7d33796e122 100755
+--- a/tests/nvme/027
++++ b/tests/nvme/027
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe ns-rescan command on NVMeOF file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/028 b/tests/nvme/028
+index 1280107ed5df..1643857437e8 100755
+--- a/tests/nvme/028
++++ b/tests/nvme/028
+@@ -10,8 +10,8 @@ DESCRIPTION="test NVMe list-subsys command on NVMeOF file-backed ns"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/029 b/tests/nvme/029
+index 65eb40031888..9f437285d085 100755
+--- a/tests/nvme/029
++++ b/tests/nvme/029
+@@ -11,8 +11,8 @@ DESCRIPTION="test userspace IO via nvme-cli read/write interface"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+-		_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test_user_io()
+diff --git a/tests/nvme/030 b/tests/nvme/030
+index 94020f47411e..7156cad7b657 100755
+--- a/tests/nvme/030
++++ b/tests/nvme/030
+@@ -10,9 +10,8 @@ DESCRIPTION="ensure the discovery generation counter is updated appropriately"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme &&
+-	_have_modules loop nvme-loop nvmet &&
+-	_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ 
+diff --git a/tests/nvme/031 b/tests/nvme/031
+index 892f20bad9a7..7e7ee7327e62 100755
+--- a/tests/nvme/031
++++ b/tests/nvme/031
+@@ -18,9 +18,8 @@ DESCRIPTION="test deletion of NVMeOF controllers immediately after setup"
+ QUICK=1
+ 
+ requires() {
+-	_have_program nvme &&
+-	_have_modules loop nvme-loop nvmet &&
+-	_have_configfs
++	_nvme_requires
++	_have_modules loop
+ }
+ 
+ test() {
+diff --git a/tests/nvme/032 b/tests/nvme/032
+index 0d0d53b325e6..017d4a339971 100755
+--- a/tests/nvme/032
++++ b/tests/nvme/032
+@@ -11,11 +11,15 @@
+ 
+ . tests/nvme/rc
+ 
++#restrict test to nvme-pci only
++nvme_trtype=pci
++
+ DESCRIPTION="test nvme pci adapter rescan/reset/remove during I/O"
+ QUICK=1
+ CAN_BE_ZONED=1
+ 
+ requires() {
++	_nvme_requires
+ 	_have_fio
+ }
+ 
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 6ffa971b4308..320aa4b2b475 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -6,6 +6,25 @@
+ 
+ . common/rc
+ 
++nvme_trtype=${nvme_trtype:-"loop"}
++
++_nvme_requires() {
++	_have_program nvme
++	case ${nvme_trtype} in
++	loop)
++		_have_modules nvmet nvme-core nvme-loop
++		_have_configfs
++		;;
++	pci)
++		_have_modules nvme nvme-core
++		;;
++	*)
++		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
++		return 1
++	esac
++	return 0
++}
++
+ group_requires() {
+ 	_have_root
+ }
 -- 
 2.25.1
 
