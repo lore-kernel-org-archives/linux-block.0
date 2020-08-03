@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26AC2C433DF
-	for <linux-block@archiver.kernel.org>; Mon,  3 Aug 2020 12:25:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B698FC433EC
+	for <linux-block@archiver.kernel.org>; Mon,  3 Aug 2020 12:29:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04A87204EC
-	for <linux-block@archiver.kernel.org>; Mon,  3 Aug 2020 12:25:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9370A208B3
+	for <linux-block@archiver.kernel.org>; Mon,  3 Aug 2020 12:29:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596457539;
-	bh=Ovjhqwv39e2ikIxzf1AsHlEjRi/VibezVCtApxNyKcw=;
+	s=default; t=1596457796;
+	bh=vuJ+vdrsK92pRbi+okBw0ZX4DDztUCvpyo3YbmCm25U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=iW/HTIK5d6vbtmQSZaB35nhLc0PFX7itpSF8BprEI4WOhsGprY/3QVGomajuyUd4L
-	 5KZMF8Q+oHBhBJMSmWyd2cqLCdCtv+SSG/MFvkXQJZyJuw++IfXzJijlgog+rrjBcM
-	 VLOiR3AZfayUCffny7Ld0gzpj9PyCJlWhqN24968=
+	b=kqqibjR6jVjhi+KgDFBPPKFL7AtwcUP+xT/WRRzY45rZZ6d7zegxd97Vj4GdfU4N2
+	 pNCTF19impg+38xeDRpFJ1ZBGruwYPf564NRlweky6VEQM/9BLo9nvE1E5E9mmTDr4
+	 ufcZWvPi2Zizu9T70IdU51+F6n181IuIt1X1sHBY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728231AbgHCMZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Aug 2020 08:25:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50414 "EHLO mail.kernel.org"
+        id S1728984AbgHCM34 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Aug 2020 08:29:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56616 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727100AbgHCMZe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Aug 2020 08:25:34 -0400
+        id S1728403AbgHCM3v (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Aug 2020 08:29:51 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 95A2E207DF;
-        Mon,  3 Aug 2020 12:25:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 819AD2086A;
+        Mon,  3 Aug 2020 12:29:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596457533;
-        bh=Ovjhqwv39e2ikIxzf1AsHlEjRi/VibezVCtApxNyKcw=;
+        s=default; t=1596457790;
+        bh=vuJ+vdrsK92pRbi+okBw0ZX4DDztUCvpyo3YbmCm25U=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ejM3qLrvSVZyPYtuqIr11JYbmsTKkwKcGgnF27nmy53yBezcPApRq9OBdv9m7B4eQ
-         1e2GQFYSnfZwssZ+CpMi8h4cq+Qe6RRMFf08sd6l7cKUVQFh6bSgkKJsLQhfNkW9rZ
-         JpPF7zK5yOgoi3b3ooTPyEmTeJyTijda0flb60wU=
+        b=BV5/TLjbOmMQPTNnh3rqvm2m9sNtAGgr8Hl5NO1VB2XU82eIzibMKzqlahhxn7c5e
+         z7b3pj5OXfFwURz+MsG/UW3Jw6M/QpwVcahREnVFBHdSpOtDGPQ7VpieQry2hkTsVv
+         zzwTrXlsZUndTLCoptNCU7z6rq5fkgCBqpnWIV9w=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -47,12 +47,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Ming Lei <ming.lei@redhat.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.7 103/120] scsi: core: Run queue in case of I/O resource contention failure
-Date:   Mon,  3 Aug 2020 14:19:21 +0200
-Message-Id: <20200803121907.923220422@linuxfoundation.org>
+Subject: [PATCH 5.4 75/90] scsi: core: Run queue in case of I/O resource contention failure
+Date:   Mon,  3 Aug 2020 14:19:37 +0200
+Message-Id: <20200803121901.242202603@linuxfoundation.org>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200803121902.860751811@linuxfoundation.org>
-References: <20200803121902.860751811@linuxfoundation.org>
+In-Reply-To: <20200803121857.546052424@linuxfoundation.org>
+References: <20200803121857.546052424@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -118,11 +118,11 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index b8b4366f12001..887b6a47f5dac 100644
+index 206c9f53e9e7a..e6944e1cba2ba 100644
 --- a/drivers/scsi/scsi_lib.c
 +++ b/drivers/scsi/scsi_lib.c
-@@ -564,6 +564,15 @@ static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
- 	scsi_uninit_cmd(cmd);
+@@ -568,6 +568,15 @@ static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
+ 	scsi_del_cmd_from_list(cmd);
  }
  
 +static void scsi_run_queue_async(struct scsi_device *sdev)
@@ -137,7 +137,7 @@ index b8b4366f12001..887b6a47f5dac 100644
  /* Returns false when no more bytes to process, true if there are more */
  static bool scsi_end_request(struct request *req, blk_status_t error,
  		unsigned int bytes)
-@@ -608,11 +617,7 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
+@@ -612,11 +621,7 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
  
  	__blk_mq_end_request(req, error);
  
@@ -150,7 +150,7 @@ index b8b4366f12001..887b6a47f5dac 100644
  
  	percpu_ref_put(&q->q_usage_counter);
  	return false;
-@@ -1706,6 +1711,7 @@ out_put_budget:
+@@ -1729,6 +1734,7 @@ out_put_budget:
  		 */
  		if (req->rq_flags & RQF_DONTPREP)
  			scsi_mq_uninit_cmd(cmd);
