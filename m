@@ -2,93 +2,112 @@ Return-Path: <SRS0=uCqz=BO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0459EC433E1
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 17:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4873C433DF
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 17:15:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E97AE207FC
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 17:03:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEC3222B40
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 17:15:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LAl3Qh8c"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728880AbgHDRDm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Aug 2020 13:03:42 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2566 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726925AbgHDRDf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Aug 2020 13:03:35 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id 8CEB3D9EE9533AB18F25;
-        Tue,  4 Aug 2020 18:02:58 +0100 (IST)
-Received: from [127.0.0.1] (10.47.11.189) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 4 Aug 2020
- 18:02:57 +0100
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>,
-        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
-        <don.brace@microsemi.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>, <bvanassche@acm.org>,
-        <hare@suse.com>, <hch@lst.de>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-References: <20200721011323.GA833377@T590>
- <c71bbdf2607a8183926430b5f4aa1ae1@mail.gmail.com>
- <20200722041201.GA912316@T590>
- <f6f05483491c391ce79486b8fb78cb2e@mail.gmail.com>
- <20200722080409.GB912316@T590>
- <fe7a7acf-d62b-d541-4203-29c1d0403c2a@huawei.com>
- <20200723140758.GA957464@T590>
- <f4a896a3-756e-68bb-7700-cab1e5523c81@huawei.com>
- <20200724024704.GB957464@T590>
- <6531e06c-9ce2-73e6-46fc-8e97400f07b2@huawei.com>
- <20200728084511.GA1326626@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <0610dce9-a5d0-ebb8-757f-0c7026891e25@huawei.com>
-Date:   Tue, 4 Aug 2020 18:00:52 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1729022AbgHDRPV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Aug 2020 13:15:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54754 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726580AbgHDRPT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Aug 2020 13:15:19 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 659DAC06174A
+        for <linux-block@vger.kernel.org>; Tue,  4 Aug 2020 10:15:19 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id z17so19766391ill.6
+        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2020 10:15:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=LvVAc3higftpuTNQCEYcbhjK/E4SRXQZoiVYparcCz0=;
+        b=LAl3Qh8cfi6/x34HJhytzP+56VvFuiPeE9QuikOooh9mVi1LOsSbxxg5MHndqXUvaa
+         rjv25l7lH78bkq43mhXTkXwZMQjUgAQfP8z/bhmUR0Y7LYW8mfJxAM+mIbRDRueFe7ZO
+         1ZsHWKZi0iewd9asbj2ZJUtohBJmfwbSdygYzWBC16ZjcjnqPClPyoZwexmKf9baiOZi
+         +uDsB0+SOeKBXSoopyuYCQwzBn0+gkRJ4yC6bVntNtRAjeHAAz00iCk+0yIkSoPSh/OP
+         41XvT2qfeAjXjQcxmPS08QXoskg3BIyUbmijE6X3gkAuAiK3P6Olw3K8FzJa0c6AdOYo
+         xGkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LvVAc3higftpuTNQCEYcbhjK/E4SRXQZoiVYparcCz0=;
+        b=p52EhIZex4zkqyezEhkgiAhypVJ9YP8F/X0RKBCiQD3eMAxojZ8VAUMyx0HdQHE34f
+         z0DNl3fQenfYCaKQL28GfJ1B9iyQOr6/VU861UndaJOyn7axnQwjC5EeD7jKo8BRozxc
+         7skc6sMlE+cGwF7DMCbTKdxFMBbvf6I4GPG6KPeMRYcFDCBFBfM9dTV+NAK/vYq53Dzo
+         8pn+qkThb90Vl9BjVZUwJYllQ2qC9QaN1GsWfDM1Y0zeIuN2gAtv0pjYkvq1jW8fqGbG
+         W9IMYs9UnCKwC7wDUdr0f/bfXDoPrr96F233rqqzIlOLTmmXUKVwsSs+sHtS0KGJPBTW
+         1/Pg==
+X-Gm-Message-State: AOAM533SDWI/J6G2BBvaI/ksz3M+1GTJbR9JUWYeBQgdasiqYONdkZIA
+        XObptJOhET3tBLHlwRgKXUgGfq8pVaI=
+X-Google-Smtp-Source: ABdhPJzKVG+yuakPDy/1iTndB3wNH7/0L/lF2s3F1ndKOvmhn43Xl3piicg96Qv9R+2jV/DR1XEn7g==
+X-Received: by 2002:a92:35da:: with SMTP id c87mr5541076ilf.61.1596561318668;
+        Tue, 04 Aug 2020 10:15:18 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id t18sm10670432ild.46.2020.08.04.10.15.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Aug 2020 10:15:18 -0700 (PDT)
+Subject: Re: [PATCH] fs/io_uring.c: fix null ptr deference in
+ io_send_recvmsg()
+To:     xiao lin <pkfxxxing@gmail.com>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        io-uring <io-uring@vger.kernel.org>
+References: <20200804125637.GA22088@ubuntu>
+ <701640d6-fa20-0b38-f86b-b1eff07597dd@gmail.com>
+ <0350a653-8a3e-2e09-c7fc-15fcea727d8a@kernel.dk>
+ <CAGAoTxzadSphnE2aLsFKS04TjTKYVq2uLFgH9dvLPwWiyqEGEQ@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c7194bbc-06ed-30d1-704a-cb0d9f9e2b8d@kernel.dk>
+Date:   Tue, 4 Aug 2020 11:15:17 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200728084511.GA1326626@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <CAGAoTxzadSphnE2aLsFKS04TjTKYVq2uLFgH9dvLPwWiyqEGEQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.11.189]
-X-ClientProxiedBy: lhreml720-chm.china.huawei.com (10.201.108.71) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/07/2020 09:45, Ming Lei wrote:
->> OK, so dynamically allocating the sbitmap could be good. I was thinking
->> previously that we still allocate for nr_cpus size, and search a limited
->> range - but this would have heavier runtime overhead.
->>
->> So if you really think that this may have some value, then let me know, so
->> we can look to take it forward.
+On 8/4/20 11:02 AM, xiao lin wrote:
+> 在 2020年8月4日星期二，Jens Axboe <axboe@kernel.dk <mailto:axboe@kernel.dk>> 写道：
+> 
+>     On 8/4/20 7:18 AM, Pavel Begunkov wrote:
+>     > On 04/08/2020 15:56, Liu Yong wrote:
+>     >> In io_send_recvmsg(), there is no check for the req->file.
+>     >> User can change the opcode from IORING_OP_NOP to IORING_OP_SENDMSG
+>     >> through competition after the io_req_set_file().
+>     >
+>     > After sqe->opcode is read and copied in io_init_req(), it only uses
+>     > in-kernel req->opcode. Also, io_init_req() should check for req->file
+>     > NULL, so shouldn't happen after.
+>     >
+>     > Do you have a reproducer? What kernel version did you use?
+> 
+>     Was looking at this too, and I'm guessing this is some 5.4 based kernel.
+>     Unfortunately the oops doesn't include that information.
 
-Hi Ming,
+> Sorry, I forgot to mention that the kernel version I am using is 5.4.55.
 
-> Forget to mention, the in-tree code has been this shape for long
-> time, please see sbitmap_resize() called from blk_mq_map_swqueue().
+I think there are two options here:
 
-So after the resize, even if we are only checking a single word and a 
-few bits within that word, we still need 2x 64b loads - 1x for .word and 
-1x for .cleared. Seems a bit inefficient for caching when we have a 1:1 
-mapping or similar. For 1:1 case only, how about a ctx_map per queue for 
-all hctx, with a single bit per hctx? I do realize that it makes the 
-code more complicated, but it could be more efficient.
+1) Backport the series that ensured we only read those important bits once
+2) Make s->sqe a full sqe, and memcpy it in
 
-Another thing to consider is that for ctx_map, we don't do deferred bit 
-clear, so we don't ever really need to check .cleared there. I think.
+-- 
+Jens Axboe
 
-Thanks,
-John
