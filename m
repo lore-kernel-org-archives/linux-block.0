@@ -4,118 +4,305 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 876B9C433DF
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 21:13:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E582C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 21:57:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 648382075A
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 21:13:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE59A207FC
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 21:57:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="NR9wqLbn"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XfjAcfDJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725933AbgHDVNE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Aug 2020 17:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34860 "EHLO
+        id S1728324AbgHDV5f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Aug 2020 17:57:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725863AbgHDVNC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Aug 2020 17:13:02 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E81F6C06174A
-        for <linux-block@vger.kernel.org>; Tue,  4 Aug 2020 14:13:01 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id 17so1036405pfw.9
-        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2020 14:13:00 -0700 (PDT)
+        with ESMTP id S1727015AbgHDV5e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Aug 2020 17:57:34 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C97B1C06174A
+        for <linux-block@vger.kernel.org>; Tue,  4 Aug 2020 14:57:34 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id f5so5961405pgg.10
+        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2020 14:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=YcWRW72y9rn3OaZzk8/kwrQZ9cD8Qzxvl9/btiTdukg=;
-        b=NR9wqLbnfmXve+LKbHXITNOiiR8+HAFfbLrcohUPWgkkT+elrtCB5wp844v/ZSNQWY
-         lPs8v8yIoOyVj4+hstKaqZnki54yyQQnd2lkK5mmyAGaPanJ1fZQG0QZM3LiM8MxLZYQ
-         8jvVOv10a/bN99T8GDfJOJEAhsXJWA+Z5wkzY4vFEXZIMBp9Cng48y5nT/5zEH9lsC84
-         l+bHJE5o/k1QxYup6GFy8pcRAIhV/R1E61ejqIvMrBS3XtLZye2Geje97xRDaO5SAqa4
-         hib3a0H8tlWOHqF4G8pK4Oq9X4hTw/1lOMBU/U8xd4yJ9h8IeB/jAwdCqxuqQTRWjUUg
-         JtBQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Xy+3NszqDm1xAmBR4U/4lOhhfNoJIyxtpkgMKWfCnj4=;
+        b=XfjAcfDJOz8o7ngtMXeU4YGfo9gyv2FU6EqF7b0MuKaeNf3jm0ZOZKdYnTCvN7ojBW
+         zDHLWB7Hck3C3+gNPNLhtqhWe9j5dW1AyYltjWeLgHFTgQEyD4xUvceNOlIbIh0VD9+D
+         J+1fdKssxffERua23ZRKO2LOQX24S3gsHmTxwUuZn7b1KQ3Ds1I/Woj0zrUX1L8kxyYU
+         B111GfUWHG3vx/YrkrfMVd3ETda3GcEsorAdKiultAF4g0GQTu8MvJw3tqL5uvKt6Hsu
+         crAUbAfBfob5+hQ2Fir/cJ86E83icm849CReeBBYIGHMkynyv1xDLfeMb1Riwyc1vbY+
+         LXPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=YcWRW72y9rn3OaZzk8/kwrQZ9cD8Qzxvl9/btiTdukg=;
-        b=kExmuZ/WQp4S/kIwpSEEGYwmp2gKflh8vFSHca/679BP7YC8b0FrQOMTBNjV369woB
-         +3OtR52d3piu1g02kENPUCANTYvKHBKzyLM4RxCkTYFCyavyhTUwpg7etdrZzeVs9OSo
-         fm3Uh7JibZShnvSeLo3GPZlXmtOpO3L1CJbpQXqPm0dMstIbk/a3RCrna5yxXTPWB5+H
-         h74Fe4gYjANuccx+zQUte7/7EhkjHOqsGYHBcPYDyss1Rqgw2v2U4Zr7I6GAgIf6cVNk
-         V8/AP+4KqV77sOB+Gee5UqDDCHIZqpOOoE8nf2KVo7NzgXY8auZV9v3OqnZN6aBG4XBN
-         4qng==
-X-Gm-Message-State: AOAM530FnVd7aSSlWkCagISd5w6d2A7A2EihoG0qUSpPzioWP07Rao1F
-        1klUItGGeSfkjF2sxdxYlWO0QQ==
-X-Google-Smtp-Source: ABdhPJz/sMvYitJ8y/TvoDjKavxZRdU2Jdj5l+aG4WixCVjSnumuy0eeXyQ+cT4UtbsmJ9AZh2WFmg==
-X-Received: by 2002:a63:201f:: with SMTP id g31mr291715pgg.186.1596575580411;
-        Tue, 04 Aug 2020 14:13:00 -0700 (PDT)
-Received: from vader ([2620:10d:c090:400::5:1cba])
-        by smtp.gmail.com with ESMTPSA id 144sm13962332pfu.114.2020.08.04.14.12.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2020 14:12:58 -0700 (PDT)
-Date:   Tue, 4 Aug 2020 14:12:57 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     linux-block@vger.kernel.org, Sebastian.Chlad@suse.com,
-        daniel.wagner@suse.com, hare@suse.com
-Subject: Re: [PATCH] common/multipath-over-rdma: make block scheduler
- directory optional
-Message-ID: <20200804211257.GA8438@vader>
-References: <20200729152113.1250-1-mcgrof@kernel.org>
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Xy+3NszqDm1xAmBR4U/4lOhhfNoJIyxtpkgMKWfCnj4=;
+        b=ba9uAbsvumtIoxBshFjz+4jNCqxpQZBfXupOYLIe4GNXHmmAAlW5qKsYWPOb20qsZ+
+         RtgvWPj2k8kBnzNWYWJLTqsF1D8A2kE61hEdp9NofUz+pyszw6b7c386bXyHCHtKaCmL
+         w46fwH2gGDYWiu/fAaFI3MfIqPXp/f1uH8KkS+STvLFaDuH3J5PImTth63CQfIByCY1w
+         RHU+RSJKz4jPz2RCTtxXQ3EDGXZ5LursEbQBV0xJlpNeM1+LLPhQoDs9oyqI1ja6723L
+         v9gURNhgrMHh+BMObShuyt+7rgL/7t1EfkTCBCTzgdUvaQzQRmoZ4/++/ngZEwaUwN8m
+         xwsg==
+X-Gm-Message-State: AOAM532wwRWEl+3YyjPVUVxc9HQ3hpKFoQbII9PwR3CM7It1IXMeiEJC
+        mM2734sDRC93dR/smxrHlP4Msg==
+X-Google-Smtp-Source: ABdhPJzYv6KoBV5XvdTTpslktXxvcPGsb+uJsuHj0PdM0TpqxAeoMlIzeHSgIumPMxYm94l3tFjzcA==
+X-Received: by 2002:a63:d74c:: with SMTP id w12mr426746pgi.260.1596578254242;
+        Tue, 04 Aug 2020 14:57:34 -0700 (PDT)
+Received: from [172.20.10.2] ([107.72.97.226])
+        by smtp.gmail.com with ESMTPSA id o10sm24323pjo.55.2020.08.04.14.57.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Aug 2020 14:57:33 -0700 (PDT)
+Subject: Re: [PATCH] fs/io_uring.c: fix null ptr deference in
+ io_send_recvmsg()
+From:   Jens Axboe <axboe@kernel.dk>
+To:     xiao lin <pkfxxxing@gmail.com>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        io-uring <io-uring@vger.kernel.org>
+References: <20200804125637.GA22088@ubuntu>
+ <701640d6-fa20-0b38-f86b-b1eff07597dd@gmail.com>
+ <0350a653-8a3e-2e09-c7fc-15fcea727d8a@kernel.dk>
+ <CAGAoTxzadSphnE2aLsFKS04TjTKYVq2uLFgH9dvLPwWiyqEGEQ@mail.gmail.com>
+ <c7194bbc-06ed-30d1-704a-cb0d9f9e2b8d@kernel.dk>
+Message-ID: <f099f7cd-4be8-7bd3-d8af-52257d8e88f1@kernel.dk>
+Date:   Tue, 4 Aug 2020 15:55:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200729152113.1250-1-mcgrof@kernel.org>
+In-Reply-To: <c7194bbc-06ed-30d1-704a-cb0d9f9e2b8d@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 29, 2020 at 03:21:13PM +0000, Luis Chamberlain wrote:
-> We currently fail if the following tests if the directory
-> /lib/modules/$(uname -r)/kernel/block does not exist. Just make
-> this optional. Older distributions won't have this directory.
+On 8/4/20 11:15 AM, Jens Axboe wrote:
+> On 8/4/20 11:02 AM, xiao lin wrote:
+>> 在 2020年8月4日星期二，Jens Axboe <axboe@kernel.dk <mailto:axboe@kernel.dk>> 写道：
+>>
+>>     On 8/4/20 7:18 AM, Pavel Begunkov wrote:
+>>     > On 04/08/2020 15:56, Liu Yong wrote:
+>>     >> In io_send_recvmsg(), there is no check for the req->file.
+>>     >> User can change the opcode from IORING_OP_NOP to IORING_OP_SENDMSG
+>>     >> through competition after the io_req_set_file().
+>>     >
+>>     > After sqe->opcode is read and copied in io_init_req(), it only uses
+>>     > in-kernel req->opcode. Also, io_init_req() should check for req->file
+>>     > NULL, so shouldn't happen after.
+>>     >
+>>     > Do you have a reproducer? What kernel version did you use?
+>>
+>>     Was looking at this too, and I'm guessing this is some 5.4 based kernel.
+>>     Unfortunately the oops doesn't include that information.
 > 
-> srp/001
-> srp/002
-> srp/013
-> srp/014
+>> Sorry, I forgot to mention that the kernel version I am using is 5.4.55.
 > 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->  common/multipath-over-rdma | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+> I think there are two options here:
 > 
-> diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-> index 676d283..f004124 100644
-> --- a/common/multipath-over-rdma
-> +++ b/common/multipath-over-rdma
-> @@ -696,10 +696,13 @@ setup_test() {
->  
->  	# Load the I/O scheduler kernel modules
->  	(
-> -		cd "/lib/modules/$(uname -r)/kernel/block" &&
-> -			for m in *.ko; do
-> -				[ -e "$m" ] && modprobe "${m%.ko}"
-> -			done
-> +		KERNEL_BLOCK="/lib/modules/$(uname -r)/kernel/block"
-> +		if [ -d $KERNEL_BLOCK ]; then
-> +			cd $KERNEL_BLOCK &&
+> 1) Backport the series that ensured we only read those important bits once
+> 2) Make s->sqe a full sqe, and memcpy it in
 
-This has a couple of shellcheck errors about unquoted variables. Fixed
-those up and applied, thanks.
+Something like this should close the ->opcode re-read for 5.4-stable.
 
-> +				for m in *.ko; do
-> +					[ -e "$m" ] && modprobe "${m%.ko}"
-> +				done
-> +		fi
->  	)
->  
->  	if [ -d /sys/kernel/debug/dynamic_debug ]; then
-> -- 
-> 2.27.0
-> 
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index e0200406765c..8bb5e19b7c3c 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -279,6 +279,7 @@ struct sqe_submit {
+ 	bool				has_user;
+ 	bool				needs_lock;
+ 	bool				needs_fixed_file;
++	u8				opcode;
+ };
+ 
+ /*
+@@ -505,7 +506,7 @@ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
+ 	int rw = 0;
+ 
+ 	if (req->submit.sqe) {
+-		switch (req->submit.sqe->opcode) {
++		switch (req->submit.opcode) {
+ 		case IORING_OP_WRITEV:
+ 		case IORING_OP_WRITE_FIXED:
+ 			rw = !(req->rw.ki_flags & IOCB_DIRECT);
+@@ -1254,23 +1255,15 @@ static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
+ }
+ 
+ static ssize_t io_import_iovec(struct io_ring_ctx *ctx, int rw,
+-			       const struct sqe_submit *s, struct iovec **iovec,
++			       struct io_kiocb *req, struct iovec **iovec,
+ 			       struct iov_iter *iter)
+ {
+-	const struct io_uring_sqe *sqe = s->sqe;
++	const struct io_uring_sqe *sqe = req->submit.sqe;
+ 	void __user *buf = u64_to_user_ptr(READ_ONCE(sqe->addr));
+ 	size_t sqe_len = READ_ONCE(sqe->len);
+ 	u8 opcode;
+ 
+-	/*
+-	 * We're reading ->opcode for the second time, but the first read
+-	 * doesn't care whether it's _FIXED or not, so it doesn't matter
+-	 * whether ->opcode changes concurrently. The first read does care
+-	 * about whether it is a READ or a WRITE, so we don't trust this read
+-	 * for that purpose and instead let the caller pass in the read/write
+-	 * flag.
+-	 */
+-	opcode = READ_ONCE(sqe->opcode);
++	opcode = req->submit.opcode;
+ 	if (opcode == IORING_OP_READ_FIXED ||
+ 	    opcode == IORING_OP_WRITE_FIXED) {
+ 		ssize_t ret = io_import_fixed(ctx, rw, sqe, iter);
+@@ -1278,7 +1271,7 @@ static ssize_t io_import_iovec(struct io_ring_ctx *ctx, int rw,
+ 		return ret;
+ 	}
+ 
+-	if (!s->has_user)
++	if (!req->submit.has_user)
+ 		return -EFAULT;
+ 
+ #ifdef CONFIG_COMPAT
+@@ -1425,7 +1418,7 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
+ 	if (unlikely(!(file->f_mode & FMODE_READ)))
+ 		return -EBADF;
+ 
+-	ret = io_import_iovec(req->ctx, READ, s, &iovec, &iter);
++	ret = io_import_iovec(req->ctx, READ, req, &iovec, &iter);
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -1490,7 +1483,7 @@ static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 	if (unlikely(!(file->f_mode & FMODE_WRITE)))
+ 		return -EBADF;
+ 
+-	ret = io_import_iovec(req->ctx, WRITE, s, &iovec, &iter);
++	ret = io_import_iovec(req->ctx, WRITE, req, &iovec, &iter);
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -2109,15 +2102,14 @@ static int io_req_defer(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 			   const struct sqe_submit *s, bool force_nonblock)
+ {
+-	int ret, opcode;
++	int ret;
+ 
+ 	req->user_data = READ_ONCE(s->sqe->user_data);
+ 
+ 	if (unlikely(s->index >= ctx->sq_entries))
+ 		return -EINVAL;
+ 
+-	opcode = READ_ONCE(s->sqe->opcode);
+-	switch (opcode) {
++	switch (req->submit.opcode) {
+ 	case IORING_OP_NOP:
+ 		ret = io_nop(req, req->user_data);
+ 		break;
+@@ -2181,10 +2173,10 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	return 0;
+ }
+ 
+-static struct async_list *io_async_list_from_sqe(struct io_ring_ctx *ctx,
+-						 const struct io_uring_sqe *sqe)
++static struct async_list *io_async_list_from_req(struct io_ring_ctx *ctx,
++						 struct io_kiocb *req)
+ {
+-	switch (sqe->opcode) {
++	switch (req->submit.opcode) {
+ 	case IORING_OP_READV:
+ 	case IORING_OP_READ_FIXED:
+ 		return &ctx->pending_async[READ];
+@@ -2196,12 +2188,10 @@ static struct async_list *io_async_list_from_sqe(struct io_ring_ctx *ctx,
+ 	}
+ }
+ 
+-static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
++static inline bool io_req_needs_user(struct io_kiocb *req)
+ {
+-	u8 opcode = READ_ONCE(sqe->opcode);
+-
+-	return !(opcode == IORING_OP_READ_FIXED ||
+-		 opcode == IORING_OP_WRITE_FIXED);
++	return !(req->submit.opcode == IORING_OP_READ_FIXED ||
++		req->submit.opcode == IORING_OP_WRITE_FIXED);
+ }
+ 
+ static void io_sq_wq_submit_work(struct work_struct *work)
+@@ -2217,7 +2207,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+ 	int ret;
+ 
+ 	old_cred = override_creds(ctx->creds);
+-	async_list = io_async_list_from_sqe(ctx, req->submit.sqe);
++	async_list = io_async_list_from_req(ctx, req);
+ 
+ 	allow_kernel_signal(SIGINT);
+ restart:
+@@ -2239,7 +2229,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+ 		}
+ 
+ 		ret = 0;
+-		if (io_sqe_needs_user(sqe) && !cur_mm) {
++		if (io_req_needs_user(req) && !cur_mm) {
+ 			if (!mmget_not_zero(ctx->sqo_mm)) {
+ 				ret = -EFAULT;
+ 			} else {
+@@ -2387,11 +2377,9 @@ static bool io_add_to_prev_work(struct async_list *list, struct io_kiocb *req)
+ 	return ret;
+ }
+ 
+-static bool io_op_needs_file(const struct io_uring_sqe *sqe)
++static bool io_op_needs_file(struct io_kiocb *req)
+ {
+-	int op = READ_ONCE(sqe->opcode);
+-
+-	switch (op) {
++	switch (req->submit.opcode) {
+ 	case IORING_OP_NOP:
+ 	case IORING_OP_POLL_REMOVE:
+ 	case IORING_OP_TIMEOUT:
+@@ -2419,7 +2407,7 @@ static int io_req_set_file(struct io_ring_ctx *ctx, const struct sqe_submit *s,
+ 	 */
+ 	req->sequence = s->sequence;
+ 
+-	if (!io_op_needs_file(s->sqe))
++	if (!io_op_needs_file(req))
+ 		return 0;
+ 
+ 	if (flags & IOSQE_FIXED_FILE) {
+@@ -2460,7 +2448,7 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 
+ 			s->sqe = sqe_copy;
+ 			memcpy(&req->submit, s, sizeof(*s));
+-			list = io_async_list_from_sqe(ctx, s->sqe);
++			list = io_async_list_from_req(ctx, req);
+ 			if (!io_add_to_prev_work(list, req)) {
+ 				if (list)
+ 					atomic_inc(&list->cnt);
+@@ -2582,7 +2570,7 @@ static void io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 	req->user_data = s->sqe->user_data;
+ 
+ #if defined(CONFIG_NET)
+-	switch (READ_ONCE(s->sqe->opcode)) {
++	switch (req->submit.opcode) {
+ 	case IORING_OP_SENDMSG:
+ 	case IORING_OP_RECVMSG:
+ 		spin_lock(&current->fs->lock);
+@@ -2697,6 +2685,7 @@ static bool io_get_sqring(struct io_ring_ctx *ctx, struct sqe_submit *s)
+ 	if (head < ctx->sq_entries) {
+ 		s->index = head;
+ 		s->sqe = &ctx->sq_sqes[head];
++		s->opcode = READ_ONCE(s->sqe->opcode);
+ 		s->sequence = ctx->cached_sq_head;
+ 		ctx->cached_sq_head++;
+ 		return true;
+
+-- 
+Jens Axboe
+
