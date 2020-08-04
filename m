@@ -2,278 +2,105 @@ Return-Path: <SRS0=uCqz=BO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E132FC433E1
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 09:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E986C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 09:25:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E250F206DA
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 09:08:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E53D2086A
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 09:25:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IpFnu4Gb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mdatIUpX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726948AbgHDJIC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Aug 2020 05:08:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36158 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726166AbgHDJIC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Aug 2020 05:08:02 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFD34C061756
-        for <linux-block@vger.kernel.org>; Tue,  4 Aug 2020 02:08:01 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id cs12so479937qvb.2
-        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2020 02:08:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=2ClGvki7mxFeJmAcabm6PuNo1ff0KvEytd5H+9YuRXs=;
-        b=IpFnu4Gb0wIB9kSW/9H6bgwFmEyNF/r40SgR0CANxB2MHnWWTL/L+2MAqvl5KJpX6R
-         BvTUcFoXnZmWKRKVIQ9Ew4I5I5g3UgNsYC26YSHyj4jbQfaCktqOT2PgyNmmksq8unT3
-         dyu7jldKj7hlDYP9PzRowzWwTQGUBKkCnkgfM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=2ClGvki7mxFeJmAcabm6PuNo1ff0KvEytd5H+9YuRXs=;
-        b=MFWzNiha7pfFzjPV+b4mY0DylLdEZVdgfSF2Myky8gjfWQtI0BCOO3cvSxx1joCN71
-         e+awrxOSe3tdeKvQLC/5qBC6sdaOLAHQ1iiUcVFAfIRkjmgcjRGVY5Hv6+fvRGIlunTz
-         XKh87Sedjkb/Y3zLlEsjO7RgQEI/PoVNok/CG8vTmJjcb+zl6fWb1j1bOhOk2ehSdlPS
-         BQ523I448ZNwtjw8jxAPBpfvVzvPAjqq8wWk68fzpUYkQRHL4VQEZW9/dV9Rv2z4Wjuk
-         FC2q6vs7zRxuOl3btWB/no7MgC/AvzrGIlXnoXq2hL4pqr7drDDwRQ7I5afOOhzsD7A/
-         v1+g==
-X-Gm-Message-State: AOAM533I+HOo6S57HalRXYy+TaGBYIJX47Tx5J2QTdLgQpy47KmgODFu
-        gN2gJxUk5YIE6CLqXtbBDrRKy4Do9JA4dBQquXeTUBf2q1RdbroCVX1Hp13DoklhWaiU9aDtcYk
-        cmE8Br0T2mBlkbBvwvrTEwmQBx/f0FrcvUaeN7XyQ1Q4rBhXHc/MM2ZMQMyCz35WEeEmi1nTgi6
-        b1aRItZ48=
-X-Google-Smtp-Source: ABdhPJwZCk47kwkvODtUgGv8AOXHuhz32wnx1hjKmRu94nOOn1qxq6H0x5MNiDRk0RXLdcHLAAAqeQ==
-X-Received: by 2002:a0c:e906:: with SMTP id a6mr21375318qvo.235.1596532080527;
-        Tue, 04 Aug 2020 02:08:00 -0700 (PDT)
-Received: from localhost.localdomain ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id 65sm19989407qkn.103.2020.08.04.02.07.57
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Aug 2020 02:07:59 -0700 (PDT)
-From:   Muneendra <muneendra.kumar@broadcom.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Cc:     pbonzini@redhat.com, emilne@redhat.com, mkumar@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
-        James Smart <jsmart2021@gmail.com>,
-        Muneendra <muneendra.kumar@broadcom.com>
-Subject: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
-Date:   Tue,  4 Aug 2020 07:43:16 +0530
-Message-Id: <1596507196-27417-17-git-send-email-muneendra.kumar@broadcom.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
-References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
+        id S1725830AbgHDJZJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Aug 2020 05:25:09 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:39028 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725826AbgHDJZJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Aug 2020 05:25:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1596533110; x=1628069110;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=j2qZXIaDd5zM+xru6KZPV4orJE0o/HlpK2J1NxMtGOw=;
+  b=mdatIUpX8J9PCZLcmPicjwJR0OFmeqz7jojf5ob+/Rf5/dqI2pjTaBFY
+   nTtwNq1449SxtFsHnZx41CVMhCgb47CHe2MQOMJ9m8yue1UW7Wte9EEjy
+   F6vrtHKixmpOkG1lQSyQta+VXBoBPxHxI+VCoTn5W6LvkjFPJvXK3iMDZ
+   +vsC0l8zOZNIa6cC0fBqNOrTB5UP0ptXiPyhGj8CF2WGvzf5VvW2BIukW
+   p87WOt/6BU+QSppNXE3CNQoKOLm+wSFsnLrjovR/1yw67fncgaJr9nmrD
+   hTY3n7Rleo/ObPKt7qIGcc2r6NHIbnEFGBytrMZJUHfaGI3LEJTvT+486
+   w==;
+IronPort-SDR: hPXIGYfznK26euuxb/ROnjRKsrW7a2vf6bMFt3OPh0hWFXhNf6hDCE4YPktrZ8GEbAtJ34ddoh
+ wfpckCeIAe6afnJIuvU2+A+Re/sxRzqRGl+JYV0BkIaAVc3O99S8XVomZeinjwJZzjWcBImzH9
+ AtkJgbkeQOPNkt58zhzriSBiyhLIbKXqA3d0lRSZrk4ZqnAHbF/+DCnJaFHj3lZC87zSz24g1Q
+ pvmBK+VW3Dh/KHiVFPgtwQSvFZ83yriEVrUKyGpb0dLpAgn7RuNqrLDp37Rmdkdz+a56KgORSB
+ HRM=
+X-IronPort-AV: E=Sophos;i="5.75,433,1589212800"; 
+   d="scan'208";a="247193504"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Aug 2020 17:25:10 +0800
+IronPort-SDR: 7or6tZHG3cdxlwdWlaeazxQgGFw9GoItKdsf1wDfoHoQE1VvWQAkeZudUH6bP7thopcQ3CqTga
+ YQSJaOCAbBCA==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2020 02:13:09 -0700
+IronPort-SDR: msS9q4U6bq36kCs3sF3lj5wiBOYViz9U57vE+kNCqdCFGhItj7eeuMuVhcwyx6+llRjUPrEr/V
+ xapHunlDYeow==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
+  by uls-op-cesaip02.wdc.com with ESMTP; 04 Aug 2020 02:25:08 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH] dm: don't call report zones for more than the user requested
+Date:   Tue,  4 Aug 2020 18:25:01 +0900
+Message-Id: <20200804092501.7938-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+Don't call report zones for more zones than the user actually requested,
+otherwise this can lead to out-of-bounds accesses in the callback
+functions.
 
-The patch introduces the vmid in the io path. It checks if the vmid is
-enabled and if io belongs to a vm or not and acts accordingly. Other
-supporing APIs are also included in the patch.
+Such a situation can happen if the target's ->report_zones() callback
+function returns 0 because we've reached the end of the target and then
+restart the report zones on the second target.
 
-Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
-Signed-off-by: James Smart <jsmart2021@gmail.com>
-Signed-off-by: Muneendra <muneendra.kumar@broadcom.com>
+We're again calling into ->report_zones() and ultimately into the user
+supplied callback function but when we're not subtracting the number of
+zones already processed this may lead to out-of-bounds accesses in the
+user callbacks.
+
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- drivers/scsi/lpfc/lpfc_scsi.c | 163 ++++++++++++++++++++++++++++++++++
- 1 file changed, 163 insertions(+)
+ drivers/md/dm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/lpfc/lpfc_scsi.c b/drivers/scsi/lpfc/lpfc_scsi.c
-index e5a1056cc575..3c7af8064b12 100644
---- a/drivers/scsi/lpfc/lpfc_scsi.c
-+++ b/drivers/scsi/lpfc/lpfc_scsi.c
-@@ -4624,6 +4624,149 @@ void lpfc_vmid_assign_cs_ctl(struct lpfc_vport *vport, struct lpfc_vmid *vmid)
- 	}
- }
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 5b9de2f71bb0..88b391ff9bea 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -504,7 +504,8 @@ static int dm_blk_report_zones(struct gendisk *disk, sector_t sector,
+ 		}
  
-+/*
-+ * lpfc_vmid_get_appid- get the vmid associated with the uuid
-+ * @vport: The virtual port for which this call is being executed.
-+ * @uuid: uuid associated with the VE
-+ * @cmd: address of scsi cmmd descriptor
-+ * @tag: VMID tag
-+ * Returns status of the function
-+ */
-+static int lpfc_vmid_get_appid(struct lpfc_vport *vport, char *uuid, struct
-+			       scsi_cmnd * cmd, union lpfc_vmid_io_tag *tag)
-+{
-+	struct lpfc_vmid *vmp = NULL;
-+	int hash, len, rc = 1, i;
-+	u8 pending = 0;
-+
-+	/* check if QFPA is complete */
-+	if (lpfc_vmid_is_type_priority_tag(vport) && !(vport->vmid_flag &
-+	      LPFC_VMID_QFPA_CMPL))
-+		return 1;
-+
-+	/* search if the uuid has already been mapped to the vmid */
-+	len = strlen(uuid);
-+	hash = lpfc_vmid_hash_fn(uuid, len);
-+
-+	/* search for the VMID in the table */
-+	read_lock(&vport->vmid_lock);
-+	vmp = lpfc_get_vmid_from_hastable(vport, hash, uuid);
-+	read_unlock(&vport->vmid_lock);
-+
-+	/* if found, check if its already registered  */
-+	if (vmp  && vmp->flag & LPFC_VMID_REGISTERED) {
-+		lpfc_vmid_update_entry(vport, cmd, vmp, tag);
-+		rc = 0;
-+	} else if (vmp && (vmp->flag & LPFC_VMID_REQ_REGISTER ||
-+			   vmp->flag & LPFC_VMID_DE_REGISTER)) {
-+		/* else if register or dereg request has already been sent */
-+		/* Hence vmid tag will not be added for this IO */
-+		rc = 1;
-+	} else {
-+		/* else, start the process to obtain one as per the */
-+		/* switch connected */
-+		write_lock(&vport->vmid_lock);
-+		vmp = lpfc_get_vmid_from_hastable(vport, hash, uuid);
-+
-+		/* while the read lock was released, in case the entry was */
-+		/* added by other context or is in process of being added */
-+		if (vmp && vmp->flag & LPFC_VMID_REGISTERED) {
-+			lpfc_vmid_update_entry(vport, cmd, vmp, tag);
-+			write_unlock(&vport->vmid_lock);
-+			return 0;
-+		} else if (vmp && vmp->flag & LPFC_VMID_REQ_REGISTER) {
-+			write_unlock(&vport->vmid_lock);
-+			return 1;
-+		}
-+
-+		/* else search and allocate a free slot in the hash table */
-+		if (vport->cur_vmid_cnt < vport->max_vmid) {
-+			for (i = 0; i < vport->max_vmid; ++i) {
-+				vmp = vport->vmid + i;
-+				if (vmp->flag == LPFC_VMID_SLOT_FREE) {
-+					vmp = vport->vmid + i;
-+					break;
-+				}
-+			}
-+		} else {
-+			write_unlock(&vport->vmid_lock);
-+			return 1;
-+		}
-+
-+		if (vmp && (vmp->flag == LPFC_VMID_SLOT_FREE)) {
-+			vmp->vmid_len = len;
-+
-+			/* Add the vmid and register  */
-+			memcpy(vmp->host_vmid, uuid, vmp->vmid_len);
-+			vmp->io_rd_cnt = 0;
-+			vmp->io_wr_cnt = 0;
-+			vmp->flag = LPFC_VMID_SLOT_USED;
-+			lpfc_put_vmid_in_hashtable(vport, hash, vmp);
-+
-+			vmp->delete_inactive =
-+			    vport->vmid_inactivity_timeout ? 1 : 0;
-+
-+			/* if type priority tag, get next available vmid */
-+			if (lpfc_vmid_is_type_priority_tag(vport))
-+				lpfc_vmid_assign_cs_ctl(vport, vmp);
-+
-+			/* allocate the per cpu variable for holding */
-+			/* the last access time stamp only if vmid is enabled */
-+			if (!vmp->last_io_time)
-+				vmp->last_io_time =
-+				    __alloc_percpu(sizeof(u64),
-+						   __alignof__(struct
-+							       lpfc_vmid));
-+
-+			/* registration pending */
-+			pending = 1;
-+			rc = 1;
-+		}
-+		write_unlock(&vport->vmid_lock);
-+
-+		/* complete transaction with switch */
-+		if (pending) {
-+			if (lpfc_vmid_is_type_priority_tag(vport))
-+				rc = lpfc_vmid_uvem(vport, vmp, true);
-+			else
-+				rc = lpfc_vmid_cmd(vport,
-+						   SLI_CTAS_RAPP_IDENT,
-+						   vmp);
-+			if (!rc) {
-+				write_lock(&vport->vmid_lock);
-+				vport->cur_vmid_cnt++;
-+				vmp->flag |= LPFC_VMID_REQ_REGISTER;
-+				write_unlock(&vport->vmid_lock);
-+			}
-+		}
-+
-+		/* finally, enable the idle timer once */
-+		if (!(vport->phba->pport->vmid_flag & LPFC_VMID_TIMER_ENBLD)) {
-+			mod_timer(&vport->phba->inactive_vmid_poll,
-+				  jiffies +
-+				  msecs_to_jiffies(1000 * LPFC_VMID_TIMER));
-+			vport->phba->pport->vmid_flag |= LPFC_VMID_TIMER_ENBLD;
-+		}
-+	}
-+	return rc;
-+}
-+
-+/*
-+ * lpfc_is_command_vm_io - get the uuid from blk cgroup
-+ * @cmd:Pointer to scsi_cmnd data structure
-+ * Returns uuid if present if not null
-+ */
-+static char *lpfc_is_command_vm_io(struct scsi_cmnd *cmd)
-+{
-+	char *uuid = NULL;
-+
-+	if (cmd->request) {
-+		if (cmd->request->bio)
-+			uuid = blkcg_get_app_identifier(cmd->request->bio);
-+	}
-+	return uuid;
-+}
-+
- /**
-  * lpfc_queuecommand - scsi_host_template queuecommand entry point
-  * @cmnd: Pointer to scsi_cmnd data structure.
-@@ -4649,6 +4792,7 @@ lpfc_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *cmnd)
- 	int err, idx;
- #ifdef CONFIG_SCSI_LPFC_DEBUG_FS
- 	uint64_t start = 0L;
-+	u8 *uuid = NULL;
- 
- 	if (phba->ktime_on)
- 		start = ktime_get_ns();
-@@ -4772,6 +4916,25 @@ lpfc_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *cmnd)
- 
- 	lpfc_scsi_prep_cmnd(vport, lpfc_cmd, ndlp);
- 
-+	/* check the necessary and sufficient condition to support VMID */
-+	if (lpfc_is_vmid_enabled(phba) &&
-+	    (ndlp->vmid_support ||
-+	     phba->pport->vmid_priority_tagging ==
-+	     LPFC_VMID_PRIO_TAG_ALL_TARGETS)) {
-+		/* is the IO generated by a VM, get the associated virtual */
-+		/* entity id */
-+		uuid = lpfc_is_command_vm_io(cmnd);
-+
-+		if (uuid) {
-+			err = lpfc_vmid_get_appid(vport, uuid, cmnd,
-+				(union lpfc_vmid_io_tag *)
-+					&lpfc_cmd->cur_iocbq.vmid_tag);
-+			if (!err)
-+				lpfc_cmd->cur_iocbq.iocb_flag |= LPFC_IO_VMID;
-+		}
-+	}
-+
-+	atomic_inc(&ndlp->cmd_pending);
- #ifdef CONFIG_SCSI_LPFC_DEBUG_FS
- 	if (unlikely(phba->hdwqstat_on & LPFC_CHECK_SCSI_IO))
- 		this_cpu_inc(phba->sli4_hba.c_stat->xmt_io);
+ 		args.tgt = tgt;
+-		ret = tgt->type->report_zones(tgt, &args, nr_zones);
++		ret = tgt->type->report_zones(tgt, &args,
++					      nr_zones - args.zone_idx);
+ 		if (ret < 0)
+ 			goto out;
+ 	} while (args.zone_idx < nr_zones &&
 -- 
-2.18.2
+2.26.2
 
