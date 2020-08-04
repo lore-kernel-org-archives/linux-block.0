@@ -2,105 +2,211 @@ Return-Path: <SRS0=uCqz=BO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D96FC433E0
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 14:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6D8C433DF
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 14:23:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2168C208A9
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 14:22:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596550920;
-	bh=nuDWiGLqSK4ajFwQHFNbVFvyJTuZkBAQo5NQjDOTtSI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=avdNgxpMUNU1Rt/fDh3aVBaueVNHH9+VCp2g4Q4e2V1QKLXRHDkNr5lN2C65IYAX3
-	 XsHWxN+5f2E3P9QdeGR4HD7pusQoH8DqkvMlBOvH+qteh5iIHzvUiq3LTAAXxFhnPY
-	 QGQjbQvcG0tgzK/LA+IvIIpX9XgEgYHHR1WwKSmI=
+	by mail.kernel.org (Postfix) with ESMTP id 7292722B42
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 14:23:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725932AbgHDOV7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Aug 2020 10:21:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56142 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728595AbgHDOV1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Aug 2020 10:21:27 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 185A4C06174A;
-        Tue,  4 Aug 2020 07:21:26 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id l6so38490054qkc.6;
-        Tue, 04 Aug 2020 07:21:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/O9Z2m9NVf7Cq+pr83lCv6zvyjimEnbIiGFBd4diED8=;
-        b=b3HNOH37/YGGErPa7cIf3CeUvQ3NwSaYogw+asj44Yyl+LHdnN9708DjcGf/+J/mI4
-         7ddhkjVuWI+LqtOlmruIlRt2K0SxVYSMlcRitis+c9WT8JFjpGYByHDkD/daec1ohjsK
-         gQB2U35oaWw+UaD4W4ZZ6GYTS/qSbU3H8HVB5pxZKES5FQIzgWsZZg0xN52B0ekhR24a
-         TSoOkR1ZXmQMqm9W1HVc0ZBMoCRMDRqgFeNBDs3aohL/MAjjjKze/c53+4uJ3ghC3MPP
-         5CBTE23ngN/Ai3lkJpdE8EpPt6ru7pGx4LhydPfCWTvrm3j5BaJ0vPj6eMrws7evMaec
-         5Xvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=/O9Z2m9NVf7Cq+pr83lCv6zvyjimEnbIiGFBd4diED8=;
-        b=O1KF8oq5Jv9BcZJXFPgTaji/frJVu2kfdZNx3kriMvmuW4S5ox5Qe6kbX5XN0l8ByR
-         E7NPMZPwfVfF+HVzV2eLz+xMph7Ua8+dxTaJQBbyGqwGr+n8nrxmaqDYnb+WJwUE3UyJ
-         x0Yh6ykDu/l/BAwpKrgqIYZL6hg/7jMDAHDAk8LFd0h7PDdteegMhvZZpJMEfJSCVD6P
-         Buwq0Fi9tpa19P/qX7Y5k9y4FMRfLl6xgWRDE6KnYKkoAhLmbgBFAkkC0n5Us1osTKF8
-         5mtBJX5VgcNFrjptcjxy/xQ9ivvIBKrEcK6+KwI06R6rkRvMSz22IPd3D66u5tmRl6qs
-         KzdQ==
-X-Gm-Message-State: AOAM530lPep6qr3FinS3Hmz35a8LCLHodh85tVQhl86F05lGJkZDPip3
-        /Ak0W7r3xhYIYSB4E669VXDaJr5M
-X-Google-Smtp-Source: ABdhPJwNwl/b42CwVnrnK5m+KFgnd6uk2qrPihS+gKLqbtK4a3g86uMLIDn2KxH2HORQPaL8pYDsPw==
-X-Received: by 2002:a37:4ca:: with SMTP id 193mr21318549qke.198.1596550885183;
-        Tue, 04 Aug 2020 07:21:25 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1:d024])
-        by smtp.gmail.com with ESMTPSA id e129sm18846554qkf.132.2020.08.04.07.21.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2020 07:21:24 -0700 (PDT)
-Date:   Tue, 4 Aug 2020 10:21:23 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     Muneendra <muneendra.kumar@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        pbonzini@redhat.com, emilne@redhat.com, mkumar@redhat.com
-Subject: Re: [RFC 01/16] blkcg:Introduce blkio.app_identifier knob to blkio
- controller
-Message-ID: <20200804142123.GA4819@mtj.thefacebook.com>
-References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
- <1596507196-27417-2-git-send-email-muneendra.kumar@broadcom.com>
- <20200804113130.qfi5agzilso3mlbp@beryllium.lan>
+        id S1728711AbgHDOXq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Aug 2020 10:23:46 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48070 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728387AbgHDOXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Aug 2020 10:23:45 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id AD2E7B184;
+        Tue,  4 Aug 2020 14:23:59 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-block@vger.kernel.org
+Cc:     linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Coly Li <colyli@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>, Xiao Ni <xni@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Jens Axboe <axboe@kernel.dk>, Evan Green <evgreen@chromium.org>
+Subject: [PATCH] block: tolerate 0 byte discard_granularity in __blkdev_issue_discard()
+Date:   Tue,  4 Aug 2020 22:23:32 +0800
+Message-Id: <20200804142332.29961-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200804113130.qfi5agzilso3mlbp@beryllium.lan>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+When some buggy driver doesn't set its queue->limits.discard_granularity
+(e.g. current loop device driver), discard at LBA 0 on such device will
+trigger a kernel BUG() panic from block/blk-mq.c:563.
 
-On Tue, Aug 04, 2020 at 01:31:30PM +0200, Daniel Wagner wrote:
-> Hi,
-> 
-> [cc Tejun]
-> 
-> On Tue, Aug 04, 2020 at 07:43:01AM +0530, Muneendra wrote:
-> > This Patch added a unique application identifier i.e
-> > blkio.app_identifier knob to  blkio controller which
-> > allows identification of traffic sources at an
-> > individual cgroup based Applications
-> > (ex:virtual machine (VM))level in both host and
-> > fabric infrastructure.
+[  955.565006][   C39] ------------[ cut here ]------------
+[  955.559660][   C39] invalid opcode: 0000 [#1] SMP NOPTI
+[  955.622171][   C39] CPU: 39 PID: 248 Comm: ksoftirqd/39 Tainted: G            E     5.8.0-default+ #40
+[  955.622171][   C39] Hardware name: Lenovo ThinkSystem SR650 -[7X05CTO1WW]-/-[7X05CTO1WW]-, BIOS -[IVE160M-2.70]- 07/17/2020
+[  955.622175][   C39] RIP: 0010:blk_mq_end_request+0x107/0x110
+[  955.622177][   C39] Code: 48 8b 03 e9 59 ff ff ff 48 89 df 5b 5d 41 5c e9 9f ed ff ff 48 8b 35 98 3c f4 00 48 83 c7 10 48 83 c6 19 e8 cb 56 c9 ff eb cb <0f> 0b 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 56 41 54
+[  955.622179][   C39] RSP: 0018:ffffb1288701fe28 EFLAGS: 00010202
+[  955.749277][   C39] RAX: 0000000000000001 RBX: ffff956fffba5080 RCX: 0000000000004003
+[  955.749278][   C39] RDX: 0000000000000003 RSI: 0000000000000000 RDI: 0000000000000000
+[  955.749279][   C39] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+[  955.749279][   C39] R10: ffffb1288701fd28 R11: 0000000000000001 R12: ffffffffa8e05160
+[  955.749280][   C39] R13: 0000000000000004 R14: 0000000000000004 R15: ffffffffa7ad3a1e
+[  955.749281][   C39] FS:  0000000000000000(0000) GS:ffff95bfbda00000(0000) knlGS:0000000000000000
+[  955.749282][   C39] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  955.749282][   C39] CR2: 00007f6f0ef766a8 CR3: 0000005a37012002 CR4: 00000000007606e0
+[  955.749283][   C39] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[  955.749284][   C39] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[  955.749284][   C39] PKRU: 55555554
+[  955.749285][   C39] Call Trace:
+[  955.749290][   C39]  blk_done_softirq+0x99/0xc0
+[  957.550669][   C39]  __do_softirq+0xd3/0x45f
+[  957.550677][   C39]  ? smpboot_thread_fn+0x2f/0x1e0
+[  957.550679][   C39]  ? smpboot_thread_fn+0x74/0x1e0
+[  957.550680][   C39]  ? smpboot_thread_fn+0x14e/0x1e0
+[  957.550684][   C39]  run_ksoftirqd+0x30/0x60
+[  957.550687][   C39]  smpboot_thread_fn+0x149/0x1e0
+[  957.886225][   C39]  ? sort_range+0x20/0x20
+[  957.886226][   C39]  kthread+0x137/0x160
+[  957.886228][   C39]  ? kthread_park+0x90/0x90
+[  957.886231][   C39]  ret_from_fork+0x22/0x30
+[  959.117120][   C39] ---[ end trace 3dacdac97e2ed164 ]---
 
-I'm not sure it makes sense to introduce custom IDs for these given that
-there already are unique per-host cgroup IDs which aren't recycled.
+This is the procedure to reproduce the panic,
+  # modprobe scsi_debug delay=0 dev_size_mb=2048 max_queue=1
+  # losetup -f /dev/nvme0n1 --direct-io=on
+  # blkdiscard /dev/loop0 -o 0 -l 0x200
 
-Thanks.
+This is how the BUG() panic triggered by __blkdev_issue_discard(),
+- For a NVMe SSD backing loop device, the driver does not initialize
+  its queue->limits.discard_granularity and leaves it to 0.
+- When discard on LBA 0 of the loop device, __blkdev_issue_discard()
+  is called before loop device driver code.
+- Inside __blkdev_issue_discard(), when calculating value of
+  granularity_aligned_lba by
+	granularity_aligned_lba = round_up(sector_mapped,
+			q->limits.discard_granularity >> SECTOR_SHIFT);
+  because sector_mapped is 0 (at LBA 0 and no partition offset), and
+  q->limits.discard_granularity is 0 (by the buggy loop driver), the
+  calculated granularity_aligned_lba is 0.
+- The inline function bio_aligned_discard_max_sectors() is defined as
+	return round_down(UINT_MAX, q->limits.discard_granularity) >>
+			SECTOR_SHIFT;
+   when q->limits.discard_granularity is 0 from loop device driver, the
+   above calculation returns value 0.
+- Now granularity_aligned_lba and sctor_mapped are 0, req_sectors is
+  calculated by the following lines in __blkdev_issue_discard(),
+	if (granularity_aligned_lba == sector_mapped)
+		req_sects = min_t(sector_t, nr_sects,
+				  bio_aligned_discard_max_sectors(q));
+  because bio_aligned_discard_max_sectors(q) returns 0, req_sects is
+  calculated as 0.
+- Now a discard bio is mistakenly initialized as a 0 byte bio by,
+	bio->bi_iter.bi_size = req_sects << 9;
+  and sent to loop device driver.
+- This discard request is handled by loop device driver by following
+  code path,
+    loop_handle_cmd => do_req_filebacked => lo_fallocate =>
+    file->f_op->fallocate => blkdev_fallocate => blkdev_issue_zeroout =>
+    __blkdev_issue_write_zeroes
+- Inside __blkdev_issue_write_zeroes(), a 0 byte length discard bio is
+  composed and sent to the backing device of the loop device.
+- In the I/O completion code path, in my case it is,
+    blk_done_softirq => nrq->q->mq_ops->complete => nvme_pci_complete_rq
+    => nvme_complete_rq => blk_mq_end_request
+  inside blk_mq_end_request(), blk_update_request() is called and due to
+  req->bio is NULL in previous step, blk_update_request() returns false
+  then the BUG() panic in blk_mq_end_request() is triggered.
 
+Although the above panic can be fixed in loop device driver, the generic
+__blkdev_issue_discard() should also be fixed to tolerate the incorrect
+0 value from queue->limits.discard_granularity, in case some other buggy
+driver makes such mistake again.
+
+This patch checks whether q->limits.discard_granularity is 0 in
+__blkdev_issue_discard() and bio_aligned_discard_max_sectors(). If it is
+0 from some buggy driver queue, prints a warning oops information and
+set queue_logical_block_size(q) to a local variable discard_granularity.
+This local variable is used in round_up() and round_down() calculation,
+now req_sects won't be 0  and no empty discard request is generated.
+
+Fixes: 9b15d109a6b2 ("block: improve discard bio alignment in __blkdev_issue_discard()")
+Fixes: c52abf563049 ("loop: Better discard support for block devices")
+Reported-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Xiao Ni <xni@redhat.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Enzo Matsumiya <ematsumiya@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Evan Green <evgreen@chromium.org>
+---
+ block/blk-lib.c | 8 +++++++-
+ block/blk.h     | 9 +++++++--
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 019e09bb9c0e..3017e4cba923 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -30,6 +30,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 	struct bio *bio = *biop;
+ 	unsigned int op;
+ 	sector_t bs_mask, part_offset = 0;
++	sector_t discard_granularity;
+ 
+ 	if (!q)
+ 		return -ENXIO;
+@@ -54,6 +55,11 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 	if (!nr_sects)
+ 		return -EINVAL;
+ 
++	discard_granularity = q->limits.discard_granularity;
++	/* In case some buggy driver does not set limits.discard_granularity */
++	if (WARN_ON_ONCE(discard_granularity == 0))
++		discard_granularity = queue_logical_block_size(q);
++
+ 	/* In case the discard request is in a partition */
+ 	if (bdev->bd_partno)
+ 		part_offset = bdev->bd_part->start_sect;
+@@ -63,7 +69,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		sector_t sector_mapped = sector + part_offset;
+ 
+ 		granularity_aligned_lba = round_up(sector_mapped,
+-				q->limits.discard_granularity >> SECTOR_SHIFT);
++				discard_granularity >> SECTOR_SHIFT);
+ 
+ 		/*
+ 		 * Check whether the discard bio starts at a discard_granularity
+diff --git a/block/blk.h b/block/blk.h
+index 49e2928a1632..b52aa7049fb0 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -274,8 +274,13 @@ static inline unsigned int bio_allowed_max_sectors(struct request_queue *q)
+ static inline unsigned int bio_aligned_discard_max_sectors(
+ 					struct request_queue *q)
+ {
+-	return round_down(UINT_MAX, q->limits.discard_granularity) >>
+-			SECTOR_SHIFT;
++	sector_t discard_granularity = q->limits.discard_granularity;
++
++	/* In case some buggy driver doesn't set >limits.discard_granularity */
++	if (WARN_ON_ONCE(discard_granularity == 0))
++		discard_granularity = queue_logical_block_size(q);
++
++	return round_down(UINT_MAX, discard_granularity) >> SECTOR_SHIFT;
+ }
+ 
+ /*
 -- 
-tejun
+2.26.2
+
