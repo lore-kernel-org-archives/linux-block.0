@@ -6,32 +6,36 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA0EC433E0
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 14:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B965C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 14:36:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54AF821744
-	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 14:31:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 372522065C
+	for <linux-block@archiver.kernel.org>; Tue,  4 Aug 2020 14:36:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729126AbgHDOas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Aug 2020 10:30:48 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50734 "EHLO mx2.suse.de"
+        id S1728048AbgHDOfK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Aug 2020 10:35:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53746 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729131AbgHDOaW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Aug 2020 10:30:22 -0400
+        id S1726058AbgHDOeb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Aug 2020 10:34:31 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6AD7CB58D;
-        Tue,  4 Aug 2020 14:30:29 +0000 (UTC)
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Xiao Ni <xni@redhat.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20200804041508.1870113-1-ming.lei@redhat.com>
- <26b64ecb-53ed-9caf-a447-ce795fbba132@suse.de>
- <20200804060108.GA1872155@T590>
- <79b1d428-8897-5dd1-47ca-c61512547045@suse.de>
- <20200804081452.GA1957653@T590>
+        by mx2.suse.de (Postfix) with ESMTP id 34DD0B71B;
+        Tue,  4 Aug 2020 14:34:46 +0000 (UTC)
+Subject: Re: [PATCH] block: tolerate 0 byte discard_granularity in
+ __blkdev_issue_discard()
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>, Xiao Ni <xni@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Jens Axboe <axboe@kernel.dk>, Evan Green <evgreen@chromium.org>
+References: <20200804142332.29961-1-colyli@suse.de>
+ <SN4PR0401MB3598033FF16A5AE1D375EDD69B4A0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 From:   Coly Li <colyli@suse.de>
 Autocrypt: addr=colyli@suse.de; keydata=
  mQINBFYX6S8BEAC9VSamb2aiMTQREFXK4K/W7nGnAinca7MRuFUD4JqWMJ9FakNRd/E0v30F
@@ -76,120 +80,34 @@ Autocrypt: addr=colyli@suse.de; keydata=
  K0Jx4CEZubakJe+894sX6pvNFiI7qUUdB882i5GR3v9ijVPhaMr8oGuJ3kvwBIA8lvRBGVGn
  9xvzkQ8Prpbqh30I4NMp8MjFdkwCN6znBKPHdjNTwE5PRZH0S9J0o67IEIvHfH0eAWAsgpTz
  +jwc7VKH7vkvgscUhq/v1/PEWCAqh9UHy7R/jiUxwzw/288OpgO+i+2l11Y=
-Subject: Re: [PATCH] block: loop: set discard granularity and alignment for
- block device backed loop
-Message-ID: <6f642b8a-648e-8b59-067f-6c9f4cc32fa6@suse.de>
-Date:   Tue, 4 Aug 2020 22:30:05 +0800
+Message-ID: <b469f0ec-0185-c624-b967-5080d805040c@suse.de>
+Date:   Tue, 4 Aug 2020 22:34:25 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
  Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200804081452.GA1957653@T590>
+In-Reply-To: <SN4PR0401MB3598033FF16A5AE1D375EDD69B4A0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/8/4 16:14, Ming Lei wrote:
-> On Tue, Aug 04, 2020 at 03:50:32PM +0800, Coly Li wrote:
->> On 2020/8/4 14:01, Ming Lei wrote:
->>> On Tue, Aug 04, 2020 at 12:29:07PM +0800, Coly Li wrote:
->>>> On 2020/8/4 12:15, Ming Lei wrote:
->>>>> In case of block device backend, if the backend supports discard, the
->>>>> loop device will set queue flag of QUEUE_FLAG_DISCARD.
->>>>>
->>>>> However, limits.discard_granularity isn't setup, and this way is wrong,
->>>>> see the following description in Documentation/ABI/testing/sysfs-block:
->>>>>
->>>>> 	A discard_granularity of 0 means that the device does not support
->>>>> 	discard functionality.
->>>>>
->>>>> Especially 9b15d109a6b2 ("block: improve discard bio alignment in
->>>>> __blkdev_issue_discard()") starts to take q->limits.discard_granularity
->>>>> for computing max discard sectors. And zero discard granularity causes
->>>>> kernel oops[1].
->>>>>
->>>>> Fix the issue by set up discard granularity and alignment.
->>>>>
-
-[snipped]
-
->>>>
->>>> Hi Ming,
->>>>
->>>> I did similar change, it can avoid the panic or 0 length discard bio.
->>>> But yesterday I realize the discard request to loop device should not go
->>>> into __blkdev_issue_discard(). As commit c52abf563049 ("loop: Better
->>>> discard support for block devices") mentioned it should go into
->>>> blkdev_issue_zeroout(), this is why in loop_config_discard() the
->>>> max_discard_sectors is set to backingq->limits.max_write_zeroes_sectors.
->>>
->>> That commit meant REQ_OP_DISCARD on a loop device is translated into
->>> blkdev_issue_zeroout(), because REQ_OP_DISCARD is handled as
->>> file->f_op->fallocate(FALLOC_FL_PUNCH_HOLE), which will cause
->>> "subsequent reads from this range will return zeroes".
->>>
->>>>
->>>> Now I am looking at the problem why discard request on loop device
->>>> doesn't go into blkdev_issue_zeroout().
->>>
->>> No, that is correct behavior, since loop can support discard or zeroout.
->>>
->>> If QUEUE_FLAG_DISCARD is set, either discard_granularity or max discard
->>> sectors shouldn't be zero.
->>>
->>> This patch shouldn't set discard_granularity if limits.max_write_zeroes_sectors
->>> is zero, will fix it in V2.
->>>
->>>>
->>>> With the above change, the discard is very slow on loop device with
->>>> backing device. In my testing, mkfs.xfs on /dev/loop0 does not complete
->>>> in 20 minutes, each discard request is only 4097 sectors.
->>>
->>> I'd suggest you to check the discard related queue limits, and see why
->>> each discard request just sends 4097 sectors.
->>>
->>> Or we need to mirror underlying queue's discard_granularity too? Can you
->>> try the following patch?
->>
->> Can I know the exact command line to reproduce the panic ?
+On 2020/8/4 22:31, Johannes Thumshirn wrote:
+> On 04/08/2020 16:23, Coly Li wrote:
+>> This is the procedure to reproduce the panic,
+>>   # modprobe scsi_debug delay=0 dev_size_mb=2048 max_queue=1
+>>   # losetup -f /dev/nvme0n1 --direct-io=on
+>>   # blkdiscard /dev/loop0 -o 0 -l 0x200
 > 
-> modprobe scsi_debug delay=0 dev_size_mb=2048 max_queue=1
-> 
-> losetup -f /dev/sdc --direct-io=on   #suppose /dev/sdc is the scsi_debug LUN
-> 
-> mkfs.ext4 /dev/loop0				#suppose loop0 is the loop backed by /dev/sdc
-> 
-> mount /dev/loop0 /mnt
-> 
-> cd /mnt
-> dbench -t 20 -s 64
+> losetup -f /dev/sdX isn't it?
 > 
 
-Thanks for the information. With the above command lines, I also find a
-special case that I can see a 0 byte request triggers a similar BUG()
-panic --- when the discard LBA is 0, and loop device driver
-queue->limits.discard_granularity is 0.
+In my case, I use a NVMe SSD as the backing device of the loop device.
+Because I don't have a scsi lun.
 
-> 
->>
->> I try to use blkdiscard, or dbench -D /mount_point_to_loop0, and see all
->> the discard requests go into blkdev_fallocate()=>blkdev_issue_zeroout().
->> No request goes into __blkdev_issue_discard().
-> 
-> The issue isn't related with backend queue, and it is triggered on
-> loop's request.
-
-Yes it is clear to me now. Beside the loop device driver,
-__blkdev_issue_discard() should also be fixed to tolerate the buggy
-queue->limits.discard_granularity, in case some other driver does
-similar mistake, or a unlucky downstream kernel maintainer missing your
-loop device driver fix.
-
-Yes, please post the v2 patch, now I can help to review this patch.
-
-Thanks for your hint :-)
+And loading scsi_debug module seems necessary, otherwise the discard
+process just hang and I cannot see the kernel panic (I don't know why yet).
 
 Coly Li
