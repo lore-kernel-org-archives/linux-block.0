@@ -2,144 +2,117 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04548C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 23:16:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C047C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 23:38:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C83132177B
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 23:16:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B926222CA1
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 23:38:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RedmrbDY"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SUpGuGhy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726005AbgHEXQL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 19:16:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50792 "EHLO
+        id S1725996AbgHEXib (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 19:38:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725779AbgHEXQJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 19:16:09 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 245C3C061574
-        for <linux-block@vger.kernel.org>; Wed,  5 Aug 2020 16:16:09 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id d19so2101928pgl.10
-        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2020 16:16:08 -0700 (PDT)
+        with ESMTP id S1725779AbgHEXi3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 19:38:29 -0400
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA512C061574
+        for <linux-block@vger.kernel.org>; Wed,  5 Aug 2020 16:38:28 -0700 (PDT)
+Received: by mail-qt1-x835.google.com with SMTP id w9so35064971qts.6
+        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2020 16:38:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        d=broadcom.com; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=mX2RQWIeukytd4cMjhvK2ERywuLZIUHHxAhzXb8p2CI=;
-        b=RedmrbDYX8xHeYwBAyAMe59kGo6ejds4t+fKQDTHMHVZoIiRoXnp4eetVKZsqZHvwp
-         bqEa8dXP/bjqtUXZco7PnDuarFsJZZ+0SOLSAkZe6au6PqS/zfZhse/wsReGuyYCDPoZ
-         d/Uh/xAzUKc6Q05Las/S09motL9sXLvpByuOUy+OUqik3Konpp/RoaoMOO5PbFlA06GR
-         2gpNpMxRLB6FIWqnW8q5bysp7XVnQrsC9pPMu0IVvfJIfQn79jx6r94rbbHt4SWz+SGE
-         Ps2M5P4EPLv6QpD0+ajMO5TjQEgHAl4iANb5kH+o9uXBTGe1IWue0N+6UoZ/nVp6B8CJ
-         fXxA==
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=tS465+e6GdpvKXllM7bMAFesYQVtVvr90Wm9oFWZvYA=;
+        b=SUpGuGhyy9MWMCjSY3MQXKQwn2vphZjE9gR1oXTVpRbSBjybhZl3fCgneev4QSO3FI
+         QlhGBfqL62kWE9DYryav6vu02+DI6jPWC9heHagIGcVqUoL+RIlBXokA0JXxecSJmbcl
+         I8nRjS15+WQlEd1BP7F7ojPGi4uYE3afafjqc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mX2RQWIeukytd4cMjhvK2ERywuLZIUHHxAhzXb8p2CI=;
-        b=rfJnAF7Q2FzoD49vv+myLZ8qnn8pj7d3YH94yihur/7SNqfnYV9GkB1zk0JNwS33wQ
-         bisq58W3lMED2EEEZf6bE17D8gyWWQ1YvWcihj1sXbRks/MaqgwjveZ0XD800Ba5IUm7
-         3iXCBh63vtx5IIX4lqgS0JT19Q5Oxs18C17Yj1GZXYTGU1pfTVsGAtOR9mZaV0ohMVFS
-         dqxAe+7eddS2HL83e6PyUPE+LD8A+xrL0//vV2ZAwmKm2dWHZ3tLVe37MSuq7N3qDvEl
-         9R/JauplJuo8sC6qHwIhCsnW4+Yx7iHFXiYudyVFDCBiYYMKkQgOestbEit6B+o7RA9a
-         925A==
-X-Gm-Message-State: AOAM5315lEPo5gbHIwiSaeMLerOQe3CwTaAJJvqHV0h+iNtqFSulDi22
-        BVf+qHiq1nkZvLlklwnOfNp0qQ==
-X-Google-Smtp-Source: ABdhPJxdhapAiWis8V0esUSVfVlcLDvYs+fpc50sa9uce/UQJLnj8/1rVj6gBsGtyKYnT4OhMkVUCw==
-X-Received: by 2002:aa7:9241:: with SMTP id 1mr5877013pfp.188.1596669368189;
-        Wed, 05 Aug 2020 16:16:08 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id e4sm5160490pfd.204.2020.08.05.16.16.06
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=tS465+e6GdpvKXllM7bMAFesYQVtVvr90Wm9oFWZvYA=;
+        b=KRMzU5ktuWOLdVrtMMO1wCN9r4pSMJ9WWNdaBjkGJJHnJw2e2W0ILLckcubplYkYmr
+         7jLtzyc1X7rJDD51sOkdTxo77Ihn789QeQuB/zsv46SPLvJFqTSiZW3YSOSdZTGfQ+2r
+         68YMFIAx8fBG0ZxeQEeZWSYxR2MuZwxNqbk6VWn3VERg2/gc5PxxyFQz6L/CFpo0mFPk
+         6CqvWBsuDtkItsoJUeVYniS3JrAl+LpMIqaCxWzmYOcb+wSSlnYDJ0KpQQOCUXtkzrMw
+         JbcCpeoJA2wu9fPwjLbEDqtXEvlKgm+VJ2fvMCJEkjeUQ8tAya0gjNsdeEm47eHDb830
+         wPig==
+X-Gm-Message-State: AOAM5339Skb0kxYa9ervT2fnBHdlEbDfeNYj24NFCpY52/zBJCQSQ6O6
+        fk/po5XrvCcKzR6f7Q9elWVH8w==
+X-Google-Smtp-Source: ABdhPJz4BHWcX7OF29gUAJUEkfOy/P6pLCcS6qg2O+FjGLpzvm8qQi14ba9FmEVrP9DSIu1QTDXWsA==
+X-Received: by 2002:aed:33e7:: with SMTP id v94mr5922334qtd.18.1596670707359;
+        Wed, 05 Aug 2020 16:38:27 -0700 (PDT)
+Received: from [192.168.1.42] (ip68-5-85-189.oc.oc.cox.net. [68.5.85.189])
+        by smtp.gmail.com with ESMTPSA id t12sm2799399qkt.56.2020.08.05.16.38.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Aug 2020 16:16:07 -0700 (PDT)
-Subject: Re: [PATCH v4] block: check queue's limits.discard_granularity in
- __blkdev_issue_discard()
-To:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org
-Cc:     linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Enzo Matsumiya <ematsumiya@suse.com>,
-        Evan Green <evgreen@chromium.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Xiao Ni <xni@redhat.com>
-References: <20200805172503.45121-1-colyli@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fd22ada6-0ed9-aeed-94a7-561cd923dbbd@kernel.dk>
-Date:   Wed, 5 Aug 2020 17:16:05 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+        Wed, 05 Aug 2020 16:38:26 -0700 (PDT)
+Subject: Re: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
+To:     Hannes Reinecke <hare@suse.de>,
+        Muneendra <muneendra.kumar@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Cc:     pbonzini@redhat.com, emilne@redhat.com, mkumar@redhat.com,
+        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
+        James Smart <jsmart2021@gmail.com>
+References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1596507196-27417-17-git-send-email-muneendra.kumar@broadcom.com>
+ <61d2fd75-84ea-798b-aee9-b07957ac8f1b@suse.de>
+From:   James Smart <james.smart@broadcom.com>
+Message-ID: <08b9825b-6abb-c077-ac0d-bd63f10f2ac2@broadcom.com>
+Date:   Wed, 5 Aug 2020 16:38:20 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200805172503.45121-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <61d2fd75-84ea-798b-aee9-b07957ac8f1b@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/5/20 11:25 AM, Coly Li wrote:
-> If create a loop device with a backing NVMe SSD, current loop device
-> driver doesn't correctly set its  queue's limits.discard_granularity and
-> leaves it as 0. If a discard request at LBA 0 on this loop device, in
-> __blkdev_issue_discard() the calculated req_sects will be 0, and a zero
-> length discard request will trigger a BUG() panic in generic block layer
-> code at block/blk-mq.c:563.
-> 
-> [  955.565006][   C39] ------------[ cut here ]------------
-> [  955.559660][   C39] invalid opcode: 0000 [#1] SMP NOPTI
-> [  955.622171][   C39] CPU: 39 PID: 248 Comm: ksoftirqd/39 Tainted: G            E     5.8.0-default+ #40
-> [  955.622171][   C39] Hardware name: Lenovo ThinkSystem SR650 -[7X05CTO1WW]-/-[7X05CTO1WW]-, BIOS -[IVE160M-2.70]- 07/17/2020
-> [  955.622175][   C39] RIP: 0010:blk_mq_end_request+0x107/0x110
-> [  955.622177][   C39] Code: 48 8b 03 e9 59 ff ff ff 48 89 df 5b 5d 41 5c e9 9f ed ff ff 48 8b 35 98 3c f4 00 48 83 c7 10 48 83 c6 19 e8 cb 56 c9 ff eb cb <0f> 0b 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 56 41 54
-> [  955.622179][   C39] RSP: 0018:ffffb1288701fe28 EFLAGS: 00010202
-> [  955.749277][   C39] RAX: 0000000000000001 RBX: ffff956fffba5080 RCX: 0000000000004003
-> [  955.749278][   C39] RDX: 0000000000000003 RSI: 0000000000000000 RDI: 0000000000000000
-> [  955.749279][   C39] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> [  955.749279][   C39] R10: ffffb1288701fd28 R11: 0000000000000001 R12: ffffffffa8e05160
-> [  955.749280][   C39] R13: 0000000000000004 R14: 0000000000000004 R15: ffffffffa7ad3a1e
-> [  955.749281][   C39] FS:  0000000000000000(0000) GS:ffff95bfbda00000(0000) knlGS:0000000000000000
-> [  955.749282][   C39] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  955.749282][   C39] CR2: 00007f6f0ef766a8 CR3: 0000005a37012002 CR4: 00000000007606e0
-> [  955.749283][   C39] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [  955.749284][   C39] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [  955.749284][   C39] PKRU: 55555554
-> [  955.749285][   C39] Call Trace:
-> [  955.749290][   C39]  blk_done_softirq+0x99/0xc0
-> [  957.550669][   C39]  __do_softirq+0xd3/0x45f
-> [  957.550677][   C39]  ? smpboot_thread_fn+0x2f/0x1e0
-> [  957.550679][   C39]  ? smpboot_thread_fn+0x74/0x1e0
-> [  957.550680][   C39]  ? smpboot_thread_fn+0x14e/0x1e0
-> [  957.550684][   C39]  run_ksoftirqd+0x30/0x60
-> [  957.550687][   C39]  smpboot_thread_fn+0x149/0x1e0
-> [  957.886225][   C39]  ? sort_range+0x20/0x20
-> [  957.886226][   C39]  kthread+0x137/0x160
-> [  957.886228][   C39]  ? kthread_park+0x90/0x90
-> [  957.886231][   C39]  ret_from_fork+0x22/0x30
-> [  959.117120][   C39] ---[ end trace 3dacdac97e2ed164 ]---
-> 
-> This is the procedure to reproduce the panic,
->   # modprobe scsi_debug delay=0 dev_size_mb=2048 max_queue=1
->   # losetup -f /dev/nvme0n1 --direct-io=on
->   # blkdiscard /dev/loop0 -o 0 -l 0x200
-> 
-> This patch fixes the issue by checking q->limits.discard_granularity in
-> __blkdev_issue_discard() before composing the discard bio. If the value
-> is 0, then prints a warning oops information and returns -EOPNOTSUPP to
-> the caller to indicate that this buggy device driver doesn't support
-> discard request.
+On 8/5/2020 12:16 AM, Hannes Reinecke wrote:
+> Well.
+>
+> Creating a VMID in the hotpath with a while() loop will be bogging 
+> down performance to no end.
+> I'd rather have restricted the ->queuecommand() function to a direct 
+> lookup.
+> If that fails (as the VMID isn't registered) we should kicking of a 
+> workqueue for registering the VMID and return BUSY.
+> Or tweak blkcg to register the VMID directly, and reject the command 
+> if the VMID isn't registered :-)
+>
+> Cheers,
+>
+> Hannes
 
-Applied, thanks.
+That's actually what's supposed to be happening. fastpath uses the uuid 
+to look up a vmid tag. If no vmid tag, kick off the fabric traffic that 
+will get one but don't wait for it to complete. Any io issued while that 
+process is occurring will be not be vmid tagged.    I'll circle back on 
+lpfc to make sure this is happening.
 
--- 
-Jens Axboe
+In the mean time - the most important patch to review is the cgroup 
+patch - patch1.
 
+If we wanted to speed the driver's io path up, one thing to consider is 
+adding a driver-settable value on the blkcg structure.  Once the fabric 
+traffic obtained the vmid, the driver would set the blkcg structure with 
+the value.  In this scenario though, as the vmid is destroyed as of link 
+down, the driver needs a way, independent of an io, to reach into the 
+blkcg struct to clear the vmid value.  We also need to be sure the blkcg 
+struct won't be on top of a multipath device or something such that the 
+blkcg struct may be referenced by a different scsi host - I assume we're 
+good in that area.
+
+-- james
