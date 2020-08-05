@@ -2,111 +2,323 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA021C433DF
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 04:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 381DAC433E1
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 04:11:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC39720842
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 04:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F1CF22CA0
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 04:11:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBSPVHd1"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cd48Ttnt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725791AbgHEEAJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 00:00:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40640 "EHLO
+        id S1725920AbgHEELD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 00:11:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725372AbgHEEAI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 00:00:08 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C84CC06174A;
-        Tue,  4 Aug 2020 21:00:08 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id 3so4894841wmi.1;
-        Tue, 04 Aug 2020 21:00:08 -0700 (PDT)
+        with ESMTP id S1725763AbgHEELC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 00:11:02 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30788C06174A
+        for <linux-block@vger.kernel.org>; Tue,  4 Aug 2020 21:11:01 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id 17so1575591pfw.9
+        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2020 21:11:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=j8kN1DrP7Q5xQD+mZ8jsVMJL4BPhkoW5dve/DUvVZCw=;
-        b=aBSPVHd12XR/nwGpA9cLQCwrCmfh1YhgNJI6yZw0v4SaynoCPsEjDYfJ+XE56Tm/p/
-         pzB6lDGguUwobYGx7Myamfy2ehSD69biHTAn26fXUjtEoc1VFDJC/bnxzGzA1M5kQ4WA
-         4TM8d3pIR07w18ohcq/35Y9shEVUHOQNIA6aL8VVQnU30TQ544UGF3tTw+re3kDKM8gZ
-         jNVSxaJ8sLSrFe4Pqj/vHAIa6QQg5z51rroFP83eJJZqPz/9FYRlYsDBpE/9Qr96c9yS
-         fqh7zmP6ZYsWfKJPVrx4VWqfUicZ98Zabuvvofvp32fYvvL/k65hnjf587Zwv1P9LzsC
-         DM8w==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=lunUl32wzRgwn5aZvOtYWR6VUDl5IEXT7W/lJ4DDeSU=;
+        b=cd48TtntHYy6wcuQmwg6doqi/dC48Gnwr8LE8hE/FZQw20PvAhUUEeTUUDlX6Lh2I4
+         vzYe5luL2ePwY56svrG6uFyNRaEJ9AqbrdM4EWTe4Qws3z2N2qYC9y5VC5FQ9ADLLOos
+         TrDKVqUVsHj5g0yoG9hkYD0srSo4WkmyGBw7BJU5y57KWuWUVSjyLwWoVLrlVjRoC2Z9
+         T7m1XR1rK75fJIwsg4HcpfLEaF5iH5jnW89x3oyWwgspqyWCkadzvaxCCNX4F3tNKn9L
+         sx5aZo1qF77fMqRQfOi7wH2Dzt3/XdFO63rrHsVlrAPhgmQybrGQP2AOfjuN2GRxRlR7
+         7Wvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=j8kN1DrP7Q5xQD+mZ8jsVMJL4BPhkoW5dve/DUvVZCw=;
-        b=SLv6EadPB1Sr+hLaXeVnwZHh0/4d/t/WWhMKZ8UtzBEWubNlZYynbZlxk2/BuRccTg
-         WPbe3oKu2M/N3QpW/TrfeEUY1LQbI6jbMahBd8RmBly0uv1Oe83UJgaaGm1faPU4UFEz
-         ZKpk8dcA38C6RQTYJPW7AE+XJ11at3dKVSL0jTpU8+qZhQlhuRMFxrKz2HeliXTDf0KL
-         bAcWU+AoBahDv6KDpQp0Eczq5UNI0DloxG1EZJ6CByPBKaJizWnt8sujj6AZD+P/6XVq
-         IIi6UEmVuvHweQYWzZD82566GnPN4Xtvp/nhjIPTgi/ScAB6GREpSzEH0CdVdSRNF39K
-         vKug==
-X-Gm-Message-State: AOAM532Cj5pAo7Wj+m9LnAmr1hrBf4G0DUDaFo80FMTbhBb+p07xUyl1
-        dL4V1l8uqA68csFjUdo5XAxPCU9mn6ZMtkToelA=
-X-Google-Smtp-Source: ABdhPJyZYKNndT+VJFGzyauzfcbtgvntI1CGDlbTEVJpYr+AAsKOJTkaxcupY5AUo+v0Ea+Lqp0PEYXUB0GkmVr5dCc=
-X-Received: by 2002:a1c:660a:: with SMTP id a10mr1245235wmc.115.1596600007030;
- Tue, 04 Aug 2020 21:00:07 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lunUl32wzRgwn5aZvOtYWR6VUDl5IEXT7W/lJ4DDeSU=;
+        b=aAtQrhVIg5+URJJOGPKy17pOBy7RtRVa3cwrentT6X0znRCQGVSaFZxd0XYQ8n2cKI
+         elnFL4ZHp6RcxoFH0C7aPcfx0bAvlo0cTVFmyFMvUg5uZkHlHqe+/+SzYNHKm3XgSVD0
+         Jpynry0pRngfi4CXJ36YBxgNlMkzNRedCAPMHGgogEbBFfoUlMqobE4ZnGZainDXhR94
+         oaabN/1SKe+feliqunFViLBDYcq15ERasul6pCx+B4LRhUIxkiXR+FAV5uThzehgiUaW
+         RVauoaTdZi5jJx6uthyjZkGpRT9onFCo77ItKCw2PQbegX+Ow2y1/l4M18eOz0FNtNaK
+         QdBQ==
+X-Gm-Message-State: AOAM530X1Lp5/8yXO266tWHy5QTqiiP+IpHym7GG+PaMGkE+EaS6V5m/
+        MKYq0laVBoqOtQEC859EXWgBAg==
+X-Google-Smtp-Source: ABdhPJylOJWNvU9hPAHDUBlPqOaM+Pck33W7vHWso3WhhYe31CFTs545H2FARwgALanSyuOkEg44MA==
+X-Received: by 2002:a62:37c6:: with SMTP id e189mr1475535pfa.207.1596600660484;
+        Tue, 04 Aug 2020 21:11:00 -0700 (PDT)
+Received: from ?IPv6:2600:380:765d:9729:1ba7:dd95:9e44:1487? ([2600:380:765d:9729:1ba7:dd95:9e44:1487])
+        by smtp.gmail.com with ESMTPSA id y4sm1020617pff.44.2020.08.04.21.10.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Aug 2020 21:11:00 -0700 (PDT)
+Subject: Re: [PATCH] fs/io_uring.c: fix null ptr deference in
+ io_send_recvmsg()
+To:     Liu Yong <pkfxxxing@gmail.com>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        =?UTF-8?Q?=e3=80=81_linux-block=40vger=2ekernel=2eorg?= 
+        <linux-block@vger.kernel.org>,
+        =?UTF-8?B?44CBaW8tdXJpbmc=?= <io-uring@vger.kernel.org>
+References: <20200804125637.GA22088@ubuntu>
+ <701640d6-fa20-0b38-f86b-b1eff07597dd@gmail.com>
+ <0350a653-8a3e-2e09-c7fc-15fcea727d8a@kernel.dk>
+ <CAGAoTxzadSphnE2aLsFKS04TjTKYVq2uLFgH9dvLPwWiyqEGEQ@mail.gmail.com>
+ <c7194bbc-06ed-30d1-704a-cb0d9f9e2b8d@kernel.dk>
+ <f099f7cd-4be8-7bd3-d8af-52257d8e88f1@kernel.dk>
+ <20200805034044.GB24925@ubuntu>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <20c1d29b-0e79-c3ed-e6f5-8d61c1f7c4e8@kernel.dk>
+Date:   Tue, 4 Aug 2020 22:10:55 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
- <1596507196-27417-2-git-send-email-muneendra.kumar@broadcom.com>
- <20200804113130.qfi5agzilso3mlbp@beryllium.lan> <20200804142123.GA4819@mtj.thefacebook.com>
- <b35e0e83-eb6c-4282-5142-22d9a996d260@broadcom.com>
-In-Reply-To: <b35e0e83-eb6c-4282-5142-22d9a996d260@broadcom.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Wed, 5 Aug 2020 11:59:55 +0800
-Message-ID: <CACVXFVPVM-xU0d2nETztPrS_EpacMy8A4x8FbShhLYt2iV_ouw@mail.gmail.com>
-Subject: Re: [RFC 01/16] blkcg:Introduce blkio.app_identifier knob to blkio controller
-To:     James Smart <james.smart@broadcom.com>
-Cc:     Tejun Heo <tj@kernel.org>, Daniel Wagner <dwagner@suse.de>,
-        Muneendra <muneendra.kumar@broadcom.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ewan Milne <emilne@redhat.com>, mkumar@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200805034044.GB24925@ubuntu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 5, 2020 at 8:42 AM James Smart <james.smart@broadcom.com> wrote:
->
-> On 8/4/2020 7:21 AM, Tejun Heo wrote:
-> > Hello,
-> >
-> > On Tue, Aug 04, 2020 at 01:31:30PM +0200, Daniel Wagner wrote:
-> >> Hi,
-> >>
-> >> [cc Tejun]
-> >>
-> >> On Tue, Aug 04, 2020 at 07:43:01AM +0530, Muneendra wrote:
-> >>> This Patch added a unique application identifier i.e
-> >>> blkio.app_identifier knob to  blkio controller which
-> >>> allows identification of traffic sources at an
-> >>> individual cgroup based Applications
-> >>> (ex:virtual machine (VM))level in both host and
-> >>> fabric infrastructure.
-> > I'm not sure it makes sense to introduce custom IDs for these given that
-> > there already are unique per-host cgroup IDs which aren't recycled.
-> >
-> > Thanks.
-> >
->
-> If the VM moves to a different host, does the per-host cgroup IDs
-> migrate with the VM ?   If not, we need to have an identifier that moves
-> with the VM and which is independent of what host the VM is residing on.
+On 8/4/20 9:40 PM, Liu Yong wrote:
+> On Tue, Aug 04, 2020 at 03:55:16PM -0600, Jens Axboe wrote:
+>> On 8/4/20 11:15 AM, Jens Axboe wrote:
+>>> On 8/4/20 11:02 AM, xiao lin wrote:
+>>>> 在 2020年8月4日星期二，Jens Axboe <axboe@kernel.dk <mailto:axboe@kernel.dk>> 写道：
+>>>>
+>>>>     On 8/4/20 7:18 AM, Pavel Begunkov wrote:
+>>>>     > On 04/08/2020 15:56, Liu Yong wrote:
+>>>>     >> In io_send_recvmsg(), there is no check for the req->file.
+>>>>     >> User can change the opcode from IORING_OP_NOP to IORING_OP_SENDMSG
+>>>>     >> through competition after the io_req_set_file().
+>>>>     >
+>>>>     > After sqe->opcode is read and copied in io_init_req(), it only uses
+>>>>     > in-kernel req->opcode. Also, io_init_req() should check for req->file
+>>>>     > NULL, so shouldn't happen after.
+>>>>     >
+>>>>     > Do you have a reproducer? What kernel version did you use?
+>>>>
+>>>>     Was looking at this too, and I'm guessing this is some 5.4 based kernel.
+>>>>     Unfortunately the oops doesn't include that information.
+>>>
+>>>> Sorry, I forgot to mention that the kernel version I am using is 5.4.55.
+>>>
+>>> I think there are two options here:
+>>>
+>>> 1) Backport the series that ensured we only read those important bits once
+>>> 2) Make s->sqe a full sqe, and memcpy it in
+>>
+>> Something like this should close the ->opcode re-read for 5.4-stable.
+>>
+>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>> index e0200406765c..8bb5e19b7c3c 100644
+>> --- a/fs/io_uring.c
+>> +++ b/fs/io_uring.c
+>> @@ -279,6 +279,7 @@ struct sqe_submit {
+>>  	bool				has_user;
+>>  	bool				needs_lock;
+>>  	bool				needs_fixed_file;
+>> +	u8				opcode;
+>>  };
+>>  
+>>  /*
+>> @@ -505,7 +506,7 @@ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
+>>  	int rw = 0;
+>>  
+>>  	if (req->submit.sqe) {
+>> -		switch (req->submit.sqe->opcode) {
+>> +		switch (req->submit.opcode) {
+>>  		case IORING_OP_WRITEV:
+>>  		case IORING_OP_WRITE_FIXED:
+>>  			rw = !(req->rw.ki_flags & IOCB_DIRECT);
+>> @@ -1254,23 +1255,15 @@ static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
+>>  }
+>>  
+>>  static ssize_t io_import_iovec(struct io_ring_ctx *ctx, int rw,
+>> -			       const struct sqe_submit *s, struct iovec **iovec,
+>> +			       struct io_kiocb *req, struct iovec **iovec,
+>>  			       struct iov_iter *iter)
+>>  {
+>> -	const struct io_uring_sqe *sqe = s->sqe;
+>> +	const struct io_uring_sqe *sqe = req->submit.sqe;
+>>  	void __user *buf = u64_to_user_ptr(READ_ONCE(sqe->addr));
+>>  	size_t sqe_len = READ_ONCE(sqe->len);
+>>  	u8 opcode;
+>>  
+>> -	/*
+>> -	 * We're reading ->opcode for the second time, but the first read
+>> -	 * doesn't care whether it's _FIXED or not, so it doesn't matter
+>> -	 * whether ->opcode changes concurrently. The first read does care
+>> -	 * about whether it is a READ or a WRITE, so we don't trust this read
+>> -	 * for that purpose and instead let the caller pass in the read/write
+>> -	 * flag.
+>> -	 */
+>> -	opcode = READ_ONCE(sqe->opcode);
+>> +	opcode = req->submit.opcode;
+>>  	if (opcode == IORING_OP_READ_FIXED ||
+>>  	    opcode == IORING_OP_WRITE_FIXED) {
+>>  		ssize_t ret = io_import_fixed(ctx, rw, sqe, iter);
+>> @@ -1278,7 +1271,7 @@ static ssize_t io_import_iovec(struct io_ring_ctx *ctx, int rw,
+>>  		return ret;
+>>  	}
+>>  
+>> -	if (!s->has_user)
+>> +	if (!req->submit.has_user)
+>>  		return -EFAULT;
+>>  
+>>  #ifdef CONFIG_COMPAT
+>> @@ -1425,7 +1418,7 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
+>>  	if (unlikely(!(file->f_mode & FMODE_READ)))
+>>  		return -EBADF;
+>>  
+>> -	ret = io_import_iovec(req->ctx, READ, s, &iovec, &iter);
+>> +	ret = io_import_iovec(req->ctx, READ, req, &iovec, &iter);
+>>  	if (ret < 0)
+>>  		return ret;
+>>  
+>> @@ -1490,7 +1483,7 @@ static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
+>>  	if (unlikely(!(file->f_mode & FMODE_WRITE)))
+>>  		return -EBADF;
+>>  
+>> -	ret = io_import_iovec(req->ctx, WRITE, s, &iovec, &iter);
+>> +	ret = io_import_iovec(req->ctx, WRITE, req, &iovec, &iter);
+>>  	if (ret < 0)
+>>  		return ret;
+>>  
+>> @@ -2109,15 +2102,14 @@ static int io_req_defer(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>>  static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>>  			   const struct sqe_submit *s, bool force_nonblock)
+>>  {
+>> -	int ret, opcode;
+>> +	int ret;
+>>  
+>>  	req->user_data = READ_ONCE(s->sqe->user_data);
+>>  
+>>  	if (unlikely(s->index >= ctx->sq_entries))
+>>  		return -EINVAL;
+>>  
+>> -	opcode = READ_ONCE(s->sqe->opcode);
+>> -	switch (opcode) {
+>> +	switch (req->submit.opcode) {
+>>  	case IORING_OP_NOP:
+>>  		ret = io_nop(req, req->user_data);
+>>  		break;
+>> @@ -2181,10 +2173,10 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>>  	return 0;
+>>  }
+>>  
+>> -static struct async_list *io_async_list_from_sqe(struct io_ring_ctx *ctx,
+>> -						 const struct io_uring_sqe *sqe)
+>> +static struct async_list *io_async_list_from_req(struct io_ring_ctx *ctx,
+>> +						 struct io_kiocb *req)
+>>  {
+>> -	switch (sqe->opcode) {
+>> +	switch (req->submit.opcode) {
+>>  	case IORING_OP_READV:
+>>  	case IORING_OP_READ_FIXED:
+>>  		return &ctx->pending_async[READ];
+>> @@ -2196,12 +2188,10 @@ static struct async_list *io_async_list_from_sqe(struct io_ring_ctx *ctx,
+>>  	}
+>>  }
+>>  
+>> -static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
+>> +static inline bool io_req_needs_user(struct io_kiocb *req)
+>>  {
+>> -	u8 opcode = READ_ONCE(sqe->opcode);
+>> -
+>> -	return !(opcode == IORING_OP_READ_FIXED ||
+>> -		 opcode == IORING_OP_WRITE_FIXED);
+>> +	return !(req->submit.opcode == IORING_OP_READ_FIXED ||
+>> +		req->submit.opcode == IORING_OP_WRITE_FIXED);
+>>  }
+>>  
+>>  static void io_sq_wq_submit_work(struct work_struct *work)
+>> @@ -2217,7 +2207,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+>>  	int ret;
+>>  
+>>  	old_cred = override_creds(ctx->creds);
+>> -	async_list = io_async_list_from_sqe(ctx, req->submit.sqe);
+>> +	async_list = io_async_list_from_req(ctx, req);
+>>  
+>>  	allow_kernel_signal(SIGINT);
+>>  restart:
+>> @@ -2239,7 +2229,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+>>  		}
+>>  
+>>  		ret = 0;
+>> -		if (io_sqe_needs_user(sqe) && !cur_mm) {
+>> +		if (io_req_needs_user(req) && !cur_mm) {
+>>  			if (!mmget_not_zero(ctx->sqo_mm)) {
+>>  				ret = -EFAULT;
+>>  			} else {
+>> @@ -2387,11 +2377,9 @@ static bool io_add_to_prev_work(struct async_list *list, struct io_kiocb *req)
+>>  	return ret;
+>>  }
+>>  
+>> -static bool io_op_needs_file(const struct io_uring_sqe *sqe)
+>> +static bool io_op_needs_file(struct io_kiocb *req)
+>>  {
+>> -	int op = READ_ONCE(sqe->opcode);
+>> -
+>> -	switch (op) {
+>> +	switch (req->submit.opcode) {
+>>  	case IORING_OP_NOP:
+>>  	case IORING_OP_POLL_REMOVE:
+>>  	case IORING_OP_TIMEOUT:
+>> @@ -2419,7 +2407,7 @@ static int io_req_set_file(struct io_ring_ctx *ctx, const struct sqe_submit *s,
+>>  	 */
+>>  	req->sequence = s->sequence;
+>>  
+>> -	if (!io_op_needs_file(s->sqe))
+>> +	if (!io_op_needs_file(req))
+>>  		return 0;
+>>  
+>>  	if (flags & IOSQE_FIXED_FILE) {
+>> @@ -2460,7 +2448,7 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>>  
+>>  			s->sqe = sqe_copy;
+>>  			memcpy(&req->submit, s, sizeof(*s));
+>> -			list = io_async_list_from_sqe(ctx, s->sqe);
+>> +			list = io_async_list_from_req(ctx, req);
+>>  			if (!io_add_to_prev_work(list, req)) {
+>>  				if (list)
+>>  					atomic_inc(&list->cnt);
+>> @@ -2582,7 +2570,7 @@ static void io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+>>  	req->user_data = s->sqe->user_data;
+>>  
+>>  #if defined(CONFIG_NET)
+>> -	switch (READ_ONCE(s->sqe->opcode)) {
+>> +	switch (req->submit.opcode) {
+>>  	case IORING_OP_SENDMSG:
+>>  	case IORING_OP_RECVMSG:
+>>  		spin_lock(&current->fs->lock);
+>> @@ -2697,6 +2685,7 @@ static bool io_get_sqring(struct io_ring_ctx *ctx, struct sqe_submit *s)
+>>  	if (head < ctx->sq_entries) {
+>>  		s->index = head;
+>>  		s->sqe = &ctx->sq_sqes[head];
+>> +		s->opcode = READ_ONCE(s->sqe->opcode);
+>>  		s->sequence = ctx->cached_sq_head;
+>>  		ctx->cached_sq_head++;
+>>  		return true;
+>>
+>> -- 
+>> Jens Axboe
+>>
+> 
+> I think this patch solves similar problems from the root cause.
+> So, Should I submit this commit, or you?
 
-Hello James,
+Thanks for testing, I'll add your tested-by. Probably best if I do it,
+since it's going to 5.4-stable only and it's not from upstream.
 
-Is it possible to reuse VM's mac address or other unique ID for such purpose?
 
+-- 
+Jens Axboe
 
-Thanks,
-Ming Lei
