@@ -2,147 +2,139 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5618C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 19:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F1EC433E0
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 19:25:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 963E8206D4
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 19:24:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DA24206F6
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 19:25:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Uf8WjI/A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728808AbgHER0j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 13:26:39 -0400
-Received: from mx2.suse.de ([195.135.220.15]:51202 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728418AbgHERZs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Aug 2020 13:25:48 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id CE2E8B028;
-        Wed,  5 Aug 2020 17:26:01 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-block@vger.kernel.org
-Cc:     linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Coly Li <colyli@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Enzo Matsumiya <ematsumiya@suse.com>,
-        Evan Green <evgreen@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Xiao Ni <xni@redhat.com>
-Subject: [PATCH v4] block: check queue's limits.discard_granularity in __blkdev_issue_discard()
-Date:   Thu,  6 Aug 2020 01:25:03 +0800
-Message-Id: <20200805172503.45121-1-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
+        id S1728973AbgHETZp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 15:25:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51244 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728750AbgHERPD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 13:15:03 -0400
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3BAC06179E
+        for <linux-block@vger.kernel.org>; Wed,  5 Aug 2020 10:15:02 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id l84so27693342oig.10
+        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2020 10:15:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=jWQQ0cQXaDFSwdvPuv1NHdKGXywtUA2kO7hM0wR/9SI=;
+        b=Uf8WjI/AL0juCYG3MrhkVy1QGS7Yeq11AIhtf9OD3jjDIw/LrH6sMOKctAmvMyPQkk
+         m5Z+OH4gvZfUvpzfaoDMxN2y7JWSX5JlJ4rTVzfvk9DCrh0LvOx0svQrIsMLTw3QioEi
+         zNBBavkTkluAKNfqrCJjB5ZO0BypJ6dYyYJUw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=jWQQ0cQXaDFSwdvPuv1NHdKGXywtUA2kO7hM0wR/9SI=;
+        b=L2nw2Zh/sGwycoDgS4j4ejBx85OHHLB4rGhiZ0Xs7kEqBmMSDMJyWZgJMX3VosohIr
+         buw6tymBsHlv4fBz5Q2nocHBh5aKNsW9cdjao2cajPwjitcD+5fGJPfVuD760OgO+ige
+         uDo9kK0/q3J4s/yZs6ji9oKStomb0k1GBRUoEg25CaPA9Ehuu9LGCIbqXVOBPVHOo2VQ
+         Y/hUi41b/L00cGYK1IaJXpRmVgXnwr8uizsmcQrcW/1lhPVHl9/ZqvXQSEIXo0xu9woG
+         K83pcw3rmVDsAI2FKDMG/9gYNr9RSWxfwNpFmP9q2zC/XTMx3xJk9Jz0CbiXOphsc5Rz
+         p30w==
+X-Gm-Message-State: AOAM532/SQDVGutSpfgOLSRKijdTcFlUyf2tUCYunLBcHDuavrSrLVUN
+        zwEMxlbkOZNmemjXcSW4w1Nn7dVnbLxLRm9BUhV7yQ==
+X-Google-Smtp-Source: ABdhPJzLZdo8qY74/MuhM/+FSNWx/NNtopPEtpMZtcAHj+8nS6gaQUzZcd/IdoV0AZ96iiYdKi1Rm1aHAQIJkKQ5bdE=
+X-Received: by 2002:a54:478f:: with SMTP id o15mr3658717oic.77.1596647700338;
+ Wed, 05 Aug 2020 10:15:00 -0700 (PDT)
+From:   Muneendra Kumar M <muneendra.kumar@broadcom.com>
+References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1596507196-27417-2-git-send-email-muneendra.kumar@broadcom.com>
+ <20200804113130.qfi5agzilso3mlbp@beryllium.lan> <20200804142123.GA4819@mtj.thefacebook.com>
+ <b35e0e83-eb6c-4282-5142-22d9a996d260@broadcom.com> <CACVXFVPVM-xU0d2nETztPrS_EpacMy8A4x8FbShhLYt2iV_ouw@mail.gmail.com>
+ <227c7f27-c6c7-5db1-59ac-2dd428f5a42a@suse.de> <20200805143913.GC4819@mtj.thefacebook.com>
+In-Reply-To: <20200805143913.GC4819@mtj.thefacebook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Mailer: Microsoft Outlook 15.0
+thread-index: AQIDyhmBPqdmqCKUdNTZliBUbPkt/AIVs741AOV8stoBvB2xRwGs7Aj/AfU+Z6cCXn8lCgHQWH25qGqsWhA=
+Date:   Wed, 5 Aug 2020 22:44:56 +0530
+Message-ID: <c40bc34840566366177a84b0d8b7ae90@mail.gmail.com>
+Subject: RE: [RFC 01/16] blkcg:Introduce blkio.app_identifier knob to blkio controller
+To:     Tejun Heo <tj@kernel.org>, Hannes Reinecke <hare@suse.de>
+Cc:     Ming Lei <tom.leiming@gmail.com>,
+        James Smart <james.smart@broadcom.com>,
+        Daniel Wagner <dwagner@suse.de>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ewan Milne <emilne@redhat.com>, mkumar@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If create a loop device with a backing NVMe SSD, current loop device
-driver doesn't correctly set its  queue's limits.discard_granularity and
-leaves it as 0. If a discard request at LBA 0 on this loop device, in
-__blkdev_issue_discard() the calculated req_sects will be 0, and a zero
-length discard request will trigger a BUG() panic in generic block layer
-code at block/blk-mq.c:563.
+Hi Tejun,
+Our main requirement is to track the bio requests coming from different VM
+/container applications  at the blk device layer(fc,scsi,nvme).
+By the time IO request comes to the blk device layer, the context of the
+application is lost and we can't track whose IO this belongs.
 
-[  955.565006][   C39] ------------[ cut here ]------------
-[  955.559660][   C39] invalid opcode: 0000 [#1] SMP NOPTI
-[  955.622171][   C39] CPU: 39 PID: 248 Comm: ksoftirqd/39 Tainted: G            E     5.8.0-default+ #40
-[  955.622171][   C39] Hardware name: Lenovo ThinkSystem SR650 -[7X05CTO1WW]-/-[7X05CTO1WW]-, BIOS -[IVE160M-2.70]- 07/17/2020
-[  955.622175][   C39] RIP: 0010:blk_mq_end_request+0x107/0x110
-[  955.622177][   C39] Code: 48 8b 03 e9 59 ff ff ff 48 89 df 5b 5d 41 5c e9 9f ed ff ff 48 8b 35 98 3c f4 00 48 83 c7 10 48 83 c6 19 e8 cb 56 c9 ff eb cb <0f> 0b 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 56 41 54
-[  955.622179][   C39] RSP: 0018:ffffb1288701fe28 EFLAGS: 00010202
-[  955.749277][   C39] RAX: 0000000000000001 RBX: ffff956fffba5080 RCX: 0000000000004003
-[  955.749278][   C39] RDX: 0000000000000003 RSI: 0000000000000000 RDI: 0000000000000000
-[  955.749279][   C39] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-[  955.749279][   C39] R10: ffffb1288701fd28 R11: 0000000000000001 R12: ffffffffa8e05160
-[  955.749280][   C39] R13: 0000000000000004 R14: 0000000000000004 R15: ffffffffa7ad3a1e
-[  955.749281][   C39] FS:  0000000000000000(0000) GS:ffff95bfbda00000(0000) knlGS:0000000000000000
-[  955.749282][   C39] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  955.749282][   C39] CR2: 00007f6f0ef766a8 CR3: 0000005a37012002 CR4: 00000000007606e0
-[  955.749283][   C39] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  955.749284][   C39] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  955.749284][   C39] PKRU: 55555554
-[  955.749285][   C39] Call Trace:
-[  955.749290][   C39]  blk_done_softirq+0x99/0xc0
-[  957.550669][   C39]  __do_softirq+0xd3/0x45f
-[  957.550677][   C39]  ? smpboot_thread_fn+0x2f/0x1e0
-[  957.550679][   C39]  ? smpboot_thread_fn+0x74/0x1e0
-[  957.550680][   C39]  ? smpboot_thread_fn+0x14e/0x1e0
-[  957.550684][   C39]  run_ksoftirqd+0x30/0x60
-[  957.550687][   C39]  smpboot_thread_fn+0x149/0x1e0
-[  957.886225][   C39]  ? sort_range+0x20/0x20
-[  957.886226][   C39]  kthread+0x137/0x160
-[  957.886228][   C39]  ? kthread_park+0x90/0x90
-[  957.886231][   C39]  ret_from_fork+0x22/0x30
-[  959.117120][   C39] ---[ end trace 3dacdac97e2ed164 ]---
+In our approach we used the block cgroup to achieve this requirement.
+Since Requests also have access to the block cgroup via
+bio->bi_blkg->blkcg, and from there we can get the VM UUID.
+Therefore we added the VM UUID(app_identifier) to struct blkcg and define
+the accessors in blkcg_files and blkcg_legacy_files.
 
-This is the procedure to reproduce the panic,
-  # modprobe scsi_debug delay=0 dev_size_mb=2048 max_queue=1
-  # losetup -f /dev/nvme0n1 --direct-io=on
-  # blkdiscard /dev/loop0 -o 0 -l 0x200
+Could you please let me know is there any another way where we can get the
+VM UUID info with the help of blkcg.
 
-This patch fixes the issue by checking q->limits.discard_granularity in
-__blkdev_issue_discard() before composing the discard bio. If the value
-is 0, then prints a warning oops information and returns -EOPNOTSUPP to
-the caller to indicate that this buggy device driver doesn't support
-discard request.
+Regards,
+Muneendra.
 
-Fixes: 9b15d109a6b2 ("block: improve discard bio alignment in __blkdev_issue_discard()")
-Fixes: c52abf563049 ("loop: Better discard support for block devices")
-Reported-and-suggested-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Darrick J. Wong <darrick.wong@oracle.com>
-Cc: Enzo Matsumiya <ematsumiya@suse.com>
-Cc: Evan Green <evgreen@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Xiao Ni <xni@redhat.com>
----
-Changelog:
-v4: use pr_err_ratelimited(), and add more reviewed-by tags.
-v3: print device name assocated with the buggy driver.
-v2: fix typo of the wrong return error code.
-v1: first version.
 
- block/blk-lib.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 019e09bb9c0e..d3bbb3d9fac3 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -47,6 +47,15 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		op = REQ_OP_DISCARD;
- 	}
- 
-+	/* In case the discard granularity isn't set by buggy device driver */
-+	if (WARN_ON_ONCE(!q->limits.discard_granularity)) {
-+		char dev_name[BDEVNAME_SIZE];
-+
-+		bdevname(bdev, dev_name);
-+		pr_err_ratelimited("%s: Error: discard_granularity is 0.\n", dev_name);
-+		return -EOPNOTSUPP;
-+	}
-+
- 	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
- 	if ((sector | nr_sects) & bs_mask)
- 		return -EINVAL;
--- 
-2.26.2
 
+
+
+-----Original Message-----
+From: Tejun Heo [mailto:htejun@gmail.com] On Behalf Of Tejun Heo
+Sent: Wednesday, August 5, 2020 8:09 PM
+To: Hannes Reinecke <hare@suse.de>
+Cc: Ming Lei <tom.leiming@gmail.com>; James Smart
+<james.smart@broadcom.com>; Daniel Wagner <dwagner@suse.de>; Muneendra
+<muneendra.kumar@broadcom.com>; linux-block <linux-block@vger.kernel.org>;
+Linux SCSI List <linux-scsi@vger.kernel.org>; Paolo Bonzini
+<pbonzini@redhat.com>; Ewan Milne <emilne@redhat.com>; mkumar@redhat.com
+Subject: Re: [RFC 01/16] blkcg:Introduce blkio.app_identifier knob to
+blkio controller
+
+Hello,
+
+On Wed, Aug 05, 2020 at 08:33:19AM +0200, Hannes Reinecke wrote:
+> None of these are guaranteed to be either present or unique.
+> It's not uncommon to have VMs with more than one MAC address, and any
+> other unique identifier like system UUID is not required to be present.
+
+I have a really hard time seeing how this fits into block cgroup
+interface.
+The last time we did something similar (tagging from cgroup interface
+side) was for netcls and it ended poorly. There are basic problems with
+e.g.
+delegation as these things are at odds with everything else sharing the
+interface.
+
+My not-too-well informed suggestions are either building mapping somewhere
+in the stack or at least implement the interface where it fits better so
+that people who don't need app_identifier don't see them and preferably
+can disable them. I don't mind cgroup data structs carrying extra bits for
+stuff which want to make use of the cgroup tree but I'm a pretty firm nack
+on the proposed interface.
+
+Thanks.
+
+--
+tejun
