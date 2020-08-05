@@ -2,192 +2,145 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65483C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 08:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C525C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 08:58:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D79522B40
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 08:41:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F9F522CAD
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 08:58:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YpfDa2hQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IJUxtQWn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725809AbgHEIlC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 04:41:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20698 "EHLO
+        id S1726954AbgHEI6M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 04:58:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41512 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728094AbgHEIk7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 04:40:59 -0400
+        with ESMTP id S1725920AbgHEI6K (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 04:58:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596616857;
+        s=mimecast20190719; t=1596617889;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vCqdC0QayVIHiEIjRosykAcabVSJOwH5cXt4Ri7q9RA=;
-        b=YpfDa2hQ+5zfc8qcE5yHRIOyPrUS97cj+JxuqFIfblUzMEo1jZRhjEJASo6hHxVcc/4dqK
-        QmXOkZwiesartzHFsOSBfvJ7T1aG11ME3e57tbJRlQe/QFUKlb/y3+5wb/Dlx579BwIFo6
-        LlUC8aVN3+g0GvDlgkcj+TskFd7WJq4=
+        bh=knBmS+iunxzbuYmX5BZ4IC/eX147QBBLva8PZl3vxl0=;
+        b=IJUxtQWn5M5w6m1PRWjYPeZrCdQkFWa8JXTfZqVnyHJQhatepqDihf8GuOcgpd57/sm7BE
+        FnM5Hn8oOEqeTN4JmnqKJgK+uq3kdqAphzcs9vGHHg3NwXjXFnPrENF+hLHz6/ZVKsjhcA
+        A8/SQ7f+E0c0OzE6hCfRAToZ66auCOA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-JLox6VvKNkWfmobMcNlDaQ-1; Wed, 05 Aug 2020 04:40:52 -0400
-X-MC-Unique: JLox6VvKNkWfmobMcNlDaQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-236-qEgyeRnYNO2goT5YAXYF6w-1; Wed, 05 Aug 2020 04:58:05 -0400
+X-MC-Unique: qEgyeRnYNO2goT5YAXYF6w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 943A8106B243;
-        Wed,  5 Aug 2020 08:40:50 +0000 (UTC)
-Received: from T590 (ovpn-13-169.pek2.redhat.com [10.72.13.169])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C82655DA6A;
-        Wed,  5 Aug 2020 08:40:37 +0000 (UTC)
-Date:   Wed, 5 Aug 2020 16:40:31 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>
-Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-Message-ID: <20200805084031.GA1995289@T590>
-References: <20200723140758.GA957464@T590>
- <f4a896a3-756e-68bb-7700-cab1e5523c81@huawei.com>
- <20200724024704.GB957464@T590>
- <6531e06c-9ce2-73e6-46fc-8e97400f07b2@huawei.com>
- <20200728084511.GA1326626@T590>
- <965cf22eea98c00618570da8424d0d94@mail.gmail.com>
- <20200729153648.GA1698748@T590>
- <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
- <20200804083625.GA1958244@T590>
- <afe5eb1be7f416a48d7b5d473f3053d0@mail.gmail.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2390E1005504;
+        Wed,  5 Aug 2020 08:58:04 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-115.pek2.redhat.com [10.72.12.115])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 602785C1D2;
+        Wed,  5 Aug 2020 08:57:59 +0000 (UTC)
+Subject: Re: [PATCH rfc 6/6] nvme: support rdma transport type
+To:     Sagi Grimberg <sagi@grimberg.me>
+References: <20200803064835.67927-1-sagi@grimberg.me>
+ <20200803064835.67927-7-sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@osandov.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <6edfbfd4-106e-f200-2783-d59615f0a84c@redhat.com>
+Date:   Wed, 5 Aug 2020 16:57:56 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afe5eb1be7f416a48d7b5d473f3053d0@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200803064835.67927-7-sagi@grimberg.me>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 04, 2020 at 02:57:52PM +0530, Kashyap Desai wrote:
-> > >
-> > > > However, it looks a bit
-> > > > complicated, and I was thinking if one simpler approach can be
-> > > > figured
-> > > out.
-> > >
-> > > I was thinking your original approach is simple, but if you think some
-> > > other simple approach I can test as part of these series.
-> > > BTW, I am still not getting why you think your original approach is
-> > > not good design.
-> >
-> > It is still not straightforward enough or simple enough for proving its
-> > correctness, even though the implementation isn't complicated.
-> 
-> Ming -
-> 
-> I noted your comments.
-> 
-> I have completed testing and this particular latest performance issue on
-> Volume is outstanding.
-> Currently it is 20-25% performance drop in IOPs and we want that to be
-> closed before shared host tag is enabled for <megaraid_sas> driver.
-> Just for my understanding - What will be the next steps on this ?
-> 
-> I can validate any new approach/patch for this issue.
-> 
 
-Hello,
 
-What do you think of the following patch?
+On 8/3/20 2:48 PM, Sagi Grimberg wrote:
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>   tests/nvme/rc | 15 +++++++++++++++
+>   1 file changed, 15 insertions(+)
+>
+> diff --git a/tests/nvme/rc b/tests/nvme/rc
+> index 69ab7d2f3964..31d02fefa70e 100644
+> --- a/tests/nvme/rc
+> +++ b/tests/nvme/rc
+> @@ -5,6 +5,7 @@
+>   # Test specific to NVMe devices
+>   
+>   . common/rc
+> +. common/multipath-over-rdma
+>   
+>   def_traddr="127.0.0.1"
+>   def_adrfam="ipv4"
+> @@ -25,6 +26,12 @@ _nvme_requires() {
+>   		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
+>   		_have_configfs
+>   		;;
+> +	rdma)
+> +		_have_modules nvmet nvme-core nvme-rdma nvmet-rdma
+> +		_have_configfs
+> +		_have_program rdma
+> +		_have_modules rdma_rxe siw
+> +		;;
+>   	*)
+>   		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
+>   		return 1
+> @@ -115,6 +122,9 @@ _cleanup_nvmet() {
+>   		modprobe -r nvmet-${nvme_trtype} 2>/dev/null
+>   	fi
+>   	modprobe -r nvmet 2>/dev/null
+> +	if [[ "${nvme_trtype}" == "rdma" ]]; then
+> +		stop_soft_rdma
+> +	fi
+>   }
+>   
+# nvme_trtype=rdma ./check nvme/030
+nvme/030 (ensure the discovery generation counter is updated appropriately)
+nvme/030 (ensure the discovery generation counter is updated 
+appropriately) [passed]
+     runtime  0.616s  ...  0.520s 460: unload_module: command not found
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index c866a4f33871..49f0fc5c7a63 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -552,8 +552,24 @@ static void scsi_run_queue_async(struct scsi_device *sdev)
- 	if (scsi_target(sdev)->single_lun ||
- 	    !list_empty(&sdev->host->starved_list))
- 		kblockd_schedule_work(&sdev->requeue_work);
--	else
--		blk_mq_run_hw_queues(sdev->request_queue, true);
-+	else {
-+		/*
-+		 * smp_mb() implied in either rq->end_io or blk_mq_free_request
-+		 * is for ordering writing .device_busy in scsi_device_unbusy()
-+		 * and reading sdev->restarts.
-+		 */
-+		int old = atomic_read(&sdev->restarts);
-+
-+		if (old) {
-+			blk_mq_run_hw_queues(sdev->request_queue, true);
-+
-+			/*
-+			 * ->restarts has to be kept as non-zero if there is
-+			 *  new budget contention comes.
-+			 */
-+			atomic_cmpxchg(&sdev->restarts, old, 0);
-+		}
-+	}
- }
- 
- /* Returns false when no more bytes to process, true if there are more */
-@@ -1612,8 +1628,34 @@ static void scsi_mq_put_budget(struct request_queue *q)
- static bool scsi_mq_get_budget(struct request_queue *q)
- {
- 	struct scsi_device *sdev = q->queuedata;
-+	int ret = scsi_dev_queue_ready(q, sdev);
- 
--	return scsi_dev_queue_ready(q, sdev);
-+	if (ret)
-+		return true;
-+
-+	/*
-+	 * If all in-flight requests originated from this LUN are completed
-+	 * before setting .restarts, sdev->device_busy will be observed as
-+	 * zero, then blk_mq_delay_run_hw_queue() will dispatch this request
-+	 * soon. Otherwise, completion of one of these request will observe
-+	 * the .restarts flag, and the request queue will be run for handling
-+	 * this request, see scsi_end_request().
-+	 */
-+	atomic_inc(&sdev->restarts);
-+
-+	/*
-+	 * Order writing .restarts and reading .device_busy, and make sure
-+	 * .restarts is visible to scsi_end_request(). Its pair is implied by
-+	 * __blk_mq_end_request() in scsi_end_request() for ordering
-+	 * writing .device_busy in scsi_device_unbusy() and reading .restarts.
-+	 *
-+	 */
-+	smp_mb__after_atomic();
-+
-+	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
-+				!scsi_device_blocked(sdev)))
-+		blk_mq_delay_run_hw_queues(sdev->request_queue, SCSI_QUEUE_DELAY);
-+	return false;
- }
- 
- static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index bc5909033d13..1a5c9a3df6d6 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -109,6 +109,7 @@ struct scsi_device {
- 	atomic_t device_busy;		/* commands actually active on LLDD */
- 	atomic_t device_blocked;	/* Device returned QUEUE_FULL. */
- 
-+	atomic_t restarts;
- 	spinlock_t list_lock;
- 	struct list_head starved_entry;
- 	unsigned short queue_depth;	/* How deep of a queue we want */
+The unload_module[1] was defined in [2], how about move the definition 
+to [3],
 
-Thanks, 
-Ming
+[1]
+_cleanup_nvmet->stop_soft_rdma->unload_module
+
+[2]
+./tests/nvmeof-mp/rc
+
+[3]
+common/multipath-over-rdma
+
+>   _setup_nvmet() {
+> @@ -124,6 +134,11 @@ _setup_nvmet() {
+>   		modprobe nvmet-${nvme_trtype}
+>   	fi
+>   	modprobe nvme-${nvme_trtype}
+> +	if [[ "${nvme_trtype}" == "rdma" ]]; then
+> +		start_soft_rdma
+> +		rdma_intfs=$(rdma_network_interfaces)
+> +		def_traddr=$(get_ipv4_addr ${rdma_intfs[0]})
+> +	fi
+>   }
+>   
+>   _nvme_disconnect_ctrl() {
 
