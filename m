@@ -2,184 +2,305 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E49AFC433E0
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 19:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5059FC433DF
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 19:49:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C138B22CA0
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 19:48:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22B172250E
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 19:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="B1prvCHa";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="B1prvCHa"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="E5wWzIkH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728391AbgHETsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 15:48:08 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:39006 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728145AbgHEQ6y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Aug 2020 12:58:54 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id D79E28EE1DD;
-        Wed,  5 Aug 2020 08:01:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1596639691;
-        bh=5KjscTjJ2rT9ybNg+PHjihmjqEcOr8OKbSKYiE1mN1I=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=B1prvCHaxEOP6CSKSR0sHnRVt+H7uKCtNBlJKR80V92AyV4g/UjhOaObGhccE1cxU
-         h67RP5SGz6mKGuFNlGpONxtoRbl7VGSuPWAch2yCZ1IyNcoEJYsxbLlHDD3W5DNw4C
-         EiJrjXIJ5VmBGYjtG0XlF6FaVWV2wOa28tr7BgzY=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id FBfBPUShTYhM; Wed,  5 Aug 2020 08:01:31 -0700 (PDT)
-Received: from [153.66.254.194] (unknown [50.35.76.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 3D9978EE0F8;
-        Wed,  5 Aug 2020 08:01:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1596639691;
-        bh=5KjscTjJ2rT9ybNg+PHjihmjqEcOr8OKbSKYiE1mN1I=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=B1prvCHaxEOP6CSKSR0sHnRVt+H7uKCtNBlJKR80V92AyV4g/UjhOaObGhccE1cxU
-         h67RP5SGz6mKGuFNlGpONxtoRbl7VGSuPWAch2yCZ1IyNcoEJYsxbLlHDD3W5DNw4C
-         EiJrjXIJ5VmBGYjtG0XlF6FaVWV2wOa28tr7BgzY=
-Message-ID: <1596639689.3457.17.camel@HansenPartnership.com>
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
- LSM (IPE)
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>
-Cc:     snitzer@redhat.com, zohar@linux.ibm.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com, paul@paul-moore.com,
-        corbet@lwn.net, jmorris@namei.org, nramas@linux.microsoft.com,
-        serge@hallyn.com, pasha.tatashin@soleen.com, jannh@google.com,
-        linux-block@vger.kernel.org, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, mdsakib@microsoft.com,
-        linux-kernel@vger.kernel.org, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Date:   Wed, 05 Aug 2020 08:01:29 -0700
-In-Reply-To: <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
-         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
-         <20200802143143.GB20261@amd>
-         <1596386606.4087.20.camel@HansenPartnership.com>
-         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
+        id S1728871AbgHETs4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 15:48:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47324 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728257AbgHEQzy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 12:55:54 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3594C0F26CE
+        for <linux-block@vger.kernel.org>; Wed,  5 Aug 2020 08:28:11 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id v22so22050683edy.0
+        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2020 08:28:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WYiMx4NDk9rUEN2qZQ+kRohy/PC1z2KSSP3bVJVxU9s=;
+        b=E5wWzIkHoW0anDqePC3nznI476lD2X5Mf8NMhkLLuTyKFgwIOIqvSgs9E3X/rvG/X7
+         SjERqBXaVRUOqURXs2R9peh8wZxjml/GCaTcRfq+JU3B+riadgpFtVkv8/K9O8kcmVix
+         ZBKTIjCTIRruktlGCMLATyrZSzQVYsaaI8ubq4d8OJNI0fvhk5KaZ/l9V/0I/TuXjPNC
+         PtJ528AzVjPLq/PY0lTb25wfEvmitMGyIeR5DUgQVS8NJ4oXPIV/1cvbLWyGHcXAr7xI
+         T/7AUoWyv0nPapdkPlPHmoAWXoH0U5SqHVQD6zLtsH26qNTw2J3gHjSklsHEaYAEz/sW
+         v3Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WYiMx4NDk9rUEN2qZQ+kRohy/PC1z2KSSP3bVJVxU9s=;
+        b=GUcKxfE5AoUpg/z2Rp++PS4PYwL5bbhzCwvw+BXiXbjsFVWoqPMKZ/u7m6jHGzgG8r
+         V9bdgwfGrvFIUcF6YfPfScs6g1Kfev5Tv9yMUZi4xgRN7mNhsjkSWesT9NIYVWmu7Wz7
+         gjQ4V1S+FNSOZNvP6+zAGF0HsqThExF8mdU+b5VzhXtcu+1poLU4N51Jz0FCpaR76JNp
+         LaP7nmmURdykZZgo8nQf7w3xKnemWaFusmlJd6u/H9RgkP6FeH91uhOndZmQiFDFPCfV
+         qK9IApyxgojKkhmIxFeB3qlmyTngEohKz3iCZJiajikt0l9DSPQsk1kJdSuBPpk2JPTE
+         ZYdA==
+X-Gm-Message-State: AOAM531Mji87Wqprd9yjyVIQJgqE+7vW/5Yd/3p7A3s2PmB7FNUdOOck
+        5om9qhbOSebiMgGDeFEskCqmZxb8pMxhs+YCk089AA==
+X-Google-Smtp-Source: ABdhPJwmdZ2+8mfdQhJ9PSx0ahjU+7qJsdI6SdPaOrAiHhlQselIbsOFe1x+72L7IGCw/ETCNE2nW/NNtNjBlbFyg30=
+X-Received: by 2002:a50:e848:: with SMTP id k8mr3402190edn.192.1596641289809;
+ Wed, 05 Aug 2020 08:28:09 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200623172321.GC6578@ziepe.ca> <20200804133759.377950-1-haris.iqbal@cloud.ionos.com>
+ <20200805055712.GE4432@unreal> <CAJpMwygZym8sSiDUdEW3PQTmwsfNdO5bQG7_LWtKmE-tY_mrmg@mail.gmail.com>
+ <20200805090435.GF4432@unreal> <CAJpMwyg8ZQTgGvxCpJMwDnhPTey1+aA56VLh3aKLtJZnk3OSMg@mail.gmail.com>
+ <20200805131239.GI4432@unreal> <CAJpMwyinOtCXXsjQ_JjMeE+haji6m-tegVxuc=nbVyb4-kUAHw@mail.gmail.com>
+ <20200805145528.GK4432@unreal>
+In-Reply-To: <20200805145528.GK4432@unreal>
+From:   Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Date:   Wed, 5 Aug 2020 20:57:59 +0530
+Message-ID: <CAJpMwyjBuadmSJnJ-aDK6SPnePFvXXy+8UBzO++LwbSaTxaGNA@mail.gmail.com>
+Subject: Re: [PATCH v2] RDMA/rtrs-srv: Incorporate ib_register_client into
+ rtrs server init
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
+        dledford@redhat.com, Jason Gunthorpe <jgg@ziepe.ca>,
+        kernel test robot <rong.a.chen@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2020-08-04 at 09:07 -0700, Deven Bowers wrote:
-> On 8/2/2020 9:43 AM, James Bottomley wrote:
-> > On Sun, 2020-08-02 at 16:31 +0200, Pavel Machek wrote:
-> > > On Sun 2020-08-02 10:03:00, Sasha Levin wrote:
-> > > > On Sun, Aug 02, 2020 at 01:55:45PM +0200, Pavel Machek wrote:
-> > > > > Hi!
-> > > > > 
-> > > > > > IPE is a Linux Security Module which allows for a
-> > > > > > configurable policy to enforce integrity requirements on
-> > > > > > the whole system. It attempts to solve the issue of Code
-> > > > > > Integrity: that any code being executed (or files being
-> > > > > > read), are identical to the version that was built by a
-> > > > > > trusted source.
-> > > > > 
-> > > > > How is that different from security/integrity/ima?
-> > > > 
-> > > > Maybe if you would have read the cover letter all the way down
-> > > > to the 5th paragraph which explains how IPE is different from
-> > > > IMA we could avoided this mail exchange...
-> > > 
-> > > "
-> > > IPE differs from other LSMs which provide integrity checking (for
-> > > instance, IMA), as it has no dependency on the filesystem
-> > > metadata itself.
-> > > The attributes that IPE checks are deterministic properties that
-> > > exist solely in the kernel. Additionally, IPE provides no
-> > > additional mechanisms of verifying these files (e.g. IMA
-> > > Signatures) - all of the attributes of verifying files are
-> > > existing features within the kernel, such as dm-verity
-> > > or fsverity.
-> > > "
-> > > 
-> > > That is not really helpful.
-> 
-> Perhaps I can explain (and re-word this paragraph) a bit better.
-> 
-> As James indicates, IPE does try to close the gap of the IMA
-> limitation with xattr. I honestly wasn’t familiar with the appended
-> signatures, which seems fine.
-> 
-> Regardless, this isn’t the larger benefit that IPE provides. The
-> larger benefit of this is how IPE separates _mechanisms_ (properties)
-> to enforce integrity requirements, from _policy_. The LSM provides
-> policy, while things like dm-verity provide mechanism.
+On Wed, Aug 5, 2020 at 8:25 PM Leon Romanovsky <leon@kernel.org> wrote:
+>
+> On Wed, Aug 05, 2020 at 07:23:58PM +0530, Haris Iqbal wrote:
+> > On Wed, Aug 5, 2020 at 6:42 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > >
+> > > On Wed, Aug 05, 2020 at 04:39:16PM +0530, Haris Iqbal wrote:
+> > > > On Wed, Aug 5, 2020 at 2:34 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > > > >
+> > > > > On Wed, Aug 05, 2020 at 01:20:09PM +0530, Haris Iqbal wrote:
+> > > > > > On Wed, Aug 5, 2020 at 11:27 AM Leon Romanovsky <leon@kernel.org> wrote:
+> > > > > > >
+> > > > > > > On Tue, Aug 04, 2020 at 07:07:58PM +0530, Md Haris Iqbal wrote:
+> > > > > > > > The rnbd_server module's communication manager (cm) initialization depends
+> > > > > > > > on the registration of the "network namespace subsystem" of the RDMA CM
+> > > > > > > > agent module. As such, when the kernel is configured to load the
+> > > > > > > > rnbd_server and the RDMA cma module during initialization; and if the
+> > > > > > > > rnbd_server module is initialized before RDMA cma module, a null ptr
+> > > > > > > > dereference occurs during the RDMA bind operation.
+> > > > > > > >
+> > > > > > > > Call trace below,
+> > > > > > > >
+> > > > > > > > [    1.904782] Call Trace:
+> > > > > > > > [    1.904782]  ? xas_load+0xd/0x80
+> > > > > > > > [    1.904782]  xa_load+0x47/0x80
+> > > > > > > > [    1.904782]  cma_ps_find+0x44/0x70
+> > > > > > > > [    1.904782]  rdma_bind_addr+0x782/0x8b0
+> > > > > > > > [    1.904782]  ? get_random_bytes+0x35/0x40
+> > > > > > > > [    1.904782]  rtrs_srv_cm_init+0x50/0x80
+> > > > > > > > [    1.904782]  rtrs_srv_open+0x102/0x180
+> > > > > > > > [    1.904782]  ? rnbd_client_init+0x6e/0x6e
+> > > > > > > > [    1.904782]  rnbd_srv_init_module+0x34/0x84
+> > > > > > > > [    1.904782]  ? rnbd_client_init+0x6e/0x6e
+> > > > > > > > [    1.904782]  do_one_initcall+0x4a/0x200
+> > > > > > > > [    1.904782]  kernel_init_freeable+0x1f1/0x26e
+> > > > > > > > [    1.904782]  ? rest_init+0xb0/0xb0
+> > > > > > > > [    1.904782]  kernel_init+0xe/0x100
+> > > > > > > > [    1.904782]  ret_from_fork+0x22/0x30
+> > > > > > > > [    1.904782] Modules linked in:
+> > > > > > > > [    1.904782] CR2: 0000000000000015
+> > > > > > > > [    1.904782] ---[ end trace c42df88d6c7b0a48 ]---
+> > > > > > > >
+> > > > > > > > All this happens cause the cm init is in the call chain of the module init,
+> > > > > > > > which is not a preferred practice.
+> > > > > > > >
+> > > > > > > > So remove the call to rdma_create_id() from the module init call chain.
+> > > > > > > > Instead register rtrs-srv as an ib client, which makes sure that the
+> > > > > > > > rdma_create_id() is called only when an ib device is added.
+> > > > > > > >
+> > > > > > > > Fixes: 9cb837480424 ("RDMA/rtrs: server: main functionality")
+> > > > > > > > Reported-by: kernel test robot <rong.a.chen@intel.com>
+> > > > > > > > Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+> > > > > > > > ---
+> > > > > > > >  drivers/infiniband/ulp/rtrs/rtrs-srv.c | 77 +++++++++++++++++++++++++-
+> > > > > > > >  drivers/infiniband/ulp/rtrs/rtrs-srv.h |  7 +++
+> > > > > > > >  2 files changed, 81 insertions(+), 3 deletions(-)
+> > > > > > >
+> > > > > > > Please don't send vX patches as reply-to in "git send-email" command.
+> > > > > > >
+> > > > > > > >
+> > > > > > > > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > > > > > > > index 0d9241f5d9e6..916f99464d09 100644
+> > > > > > > > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > > > > > > > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > > > > > > > @@ -16,6 +16,7 @@
+> > > > > > > >  #include "rtrs-srv.h"
+> > > > > > > >  #include "rtrs-log.h"
+> > > > > > > >  #include <rdma/ib_cm.h>
+> > > > > > > > +#include <rdma/ib_verbs.h>
+> > > > > > > >
+> > > > > > > >  MODULE_DESCRIPTION("RDMA Transport Server");
+> > > > > > > >  MODULE_LICENSE("GPL");
+> > > > > > > > @@ -31,6 +32,7 @@ MODULE_LICENSE("GPL");
+> > > > > > > >  static struct rtrs_rdma_dev_pd dev_pd;
+> > > > > > > >  static mempool_t *chunk_pool;
+> > > > > > > >  struct class *rtrs_dev_class;
+> > > > > > > > +static struct rtrs_srv_ib_ctx ib_ctx;
+> > > > > > > >
+> > > > > > > >  static int __read_mostly max_chunk_size = DEFAULT_MAX_CHUNK_SIZE;
+> > > > > > > >  static int __read_mostly sess_queue_depth = DEFAULT_SESS_QUEUE_DEPTH;
+> > > > > > > > @@ -2033,6 +2035,62 @@ static void free_srv_ctx(struct rtrs_srv_ctx *ctx)
+> > > > > > > >       kfree(ctx);
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > > +static int rtrs_srv_add_one(struct ib_device *device)
+> > > > > > > > +{
+> > > > > > > > +     struct rtrs_srv_ctx *ctx;
+> > > > > > > > +     int ret;
+> > > > > > > > +
+> > > > > > > > +     /*
+> > > > > > > > +      * Keep a track on the number of ib devices added
+> > > > > > > > +      */
+> > > > > > > > +     ib_ctx.ib_dev_count++;
+> > > > > > > > +
+> > > > > > > > +     if (!ib_ctx.rdma_init) {
+> > > > > > > > +             /*
+> > > > > > > > +              * Since our CM IDs are NOT bound to any ib device we will create them
+> > > > > > > > +              * only once
+> > > > > > > > +              */
+> > > > > > > > +             ctx = ib_ctx.srv_ctx;
+> > > > > > > > +             ret = rtrs_srv_rdma_init(ctx, ib_ctx.port);
+> > > > > > > > +             if (ret) {
+> > > > > > > > +                     /*
+> > > > > > > > +                      * We errored out here.
+> > > > > > > > +                      * According to the ib code, if we encounter an error here then the
+> > > > > > > > +                      * error code is ignored, and no more calls to our ops are made.
+> > > > > > > > +                      */
+> > > > > > > > +                     pr_err("Failed to initialize RDMA connection");
+> > > > > > > > +                     return ret;
+> > > > > > > > +             }
+> > > > > > > > +             ib_ctx.rdma_init = true;
+> > > > > > >
+> > > > > > > This rdma_init == false is equal to ib_ctx.ib_dev_count == 0 and the
+> > > > > > > logic can be simplified.
+> > > > > >
+> > > > > > Yes, this was the first logic in my head. But I have few thoughts,
+> > > > > > The below suggestions uses "ib_ctx.ib_dev_count" as a marker for
+> > > > > > successful execution of rtrs_srv_rdma_init() and not really an IB
+> > > > > > device count. Meaning if we have multiple calls to add, due to
+> > > > > > multiple devices, our count would stay 1. And while removal we might
+> > > > > > end up calling rdma_destroy_id() on our first remove call even though
+> > > > > > another device is still remaining.
+> > > > > >
+> > > > > > If we increment "ib_ctx.ib_dev_count" every time add is called, even
+> > > > > > before we call rtrs_srv_rdma_init() and irrespective of whether
+> > > > > > rtrs_srv_rdma_init() succeeds or not, then we are keeping a count of
+> > > > > > IB devices added. However, when remove is called, we now know the
+> > > > > > number of devices added, but not whether rtrs_srv_rdma_init() was
+> > > > > > successful or not. We may end up calling rdma_destroy_id() on NULL
+> > > > > > cm_ids
+> > > > > >
+> > > > > > Does this make sense or am I missing something?
+> > > > > >
+> > > > > >
+> > > > > > >
+> > > > > > > if (ib_ctx.ib_dev_count)
+> > > > > > >         return 0;
+> > > >
+> > > > My understanding is, with the above 2 lines, after one add in which
+> > > > rtrs_srv_rdma_init() succeeds, we won't even go below this, and hence
+> > > > subsequent increments will not happen.
+> > >
+> > > Is it better?
+> > >
+> > > if (ib_ctx.ib_dev_count)
+> > >   goto out;
+> > >
+> > > ....
+> > >
+> > > out:
+> > >   ib_ctx.ib_dev_count++;
+> > >   return 0;
+> > >
+> > > You don't need to take the code proposed in the ML as is.
+> >
+> > Yes, hence I posted a theoretical scenario which discussed 2 possible scenarios.
+> >
+> > case 1, single variable tracking only number of devices added.
+> > when remove is called, we now know the
+> > number of devices added, but not whether rtrs_srv_rdma_init() was
+> > successful or not. We may end up calling rdma_destroy_id() on NULL
+> > cm_ids
+>
+> If rtrs_srv_rdma_init() fails to initialize on first attempt, why do you
+> want to continue to load rtrs?
 
-Colour me confused here, but I thought that's exactly what IMA does. 
-The mechanism is the gates and the policy is simply a list of rules
-which are applied when a gate is triggered.  The policy necessarily has
-to be tailored to the information available at the gate (so the bprm
-exec gate knows filesystem things like the inode for instance) but the
-whole thing looks very extensible.
+This does make sense; for the current design in which
+add_client_context() would stop calling add on this client if the
+first add fails.
+The reliance on this is what concerned me to add another explicit
+variable for rdma_init.
 
-> So to speak, IPE acts as the glue for other mechanisms to leverage a
-> customizable, system-wide policy to enforce. While this initial
-> patchset only onboards dm-verity, there’s also potential for MAC
-> labels, fs-verity, authenticated BTRFS, dm-integrity, etc. IPE
-> leverages existing systems in the kernel, while IMA uses its own.
+Also, I am unsure how simple the logic becomes in this case (see
+below) which was the aim of this discussion in the first place.
 
-Is this about who does the measurement?  I think there's no reason at
-all why IMA can't leverage existing measurements, it's just nothing to
-leverage existed when it was created.
+>
+> >
+> > case 2, single variable tracking success of rtrs_srv_rdma_init()
+> > If we have multiple IB devices added, while removal we won't know when
+> > to call rdma_destroy_id(),
+>
+> Your code doesn't know it either, it calls to destroy on last ib_dev.
 
-> Another difference is the general coverage. IMA has some difficulties
-> in covering mprotect[1], IPE doesn’t (the MAP_ANONYMOUS indicated by
-> Jann in that thread would be denied as the file struct would be null,
-> with IPE’s current set of supported mechanisms. mprotect would
-> continue to function as expected if you change to PROT_EXEC).
+It calls destroy on the last ib_dev only if the rdma_init is true,
+meaning rtrs_srv_rdma_init() had succeeded.
 
-I don't really think a debate over who does what and why is productive
-at this stage.  I just note that IMA policy could be updated to deny
-MAP_ANONYMOUS, but no-one's asked for that (probably because of the
-huge application breakage that would ensue).  The policy is a product
-of the use case and the current use case for IMA is working with
-existing filesystem semantics.
++       ib_ctx.ib_dev_count--;
++
++       if (!ib_ctx.ib_dev_count && ib_ctx.rdma_init) {
 
-> > Perhaps the big question is: If we used the existing IMA appended
-> > signature for detached signatures (effectively becoming the
-> > "properties" referred to in the cover letter) and hooked IMA into
-> > device mapper using additional policy terms, would that satisfy all
-> > the requirements this new LSM has?
-> 
-> Well, Mimi, what do you think? Should we integrate all the features
-> of IPE into IMA, or do you think they are sufficiently different in
-> architecture that it would be worth it to keep the code base in
-> separate LSMs?
+>
+> >
+> > >
+> > > >
+> > > > > > >
+> > > > > > > ctx = ib_ctx.srv_ctx;
+> > > > > > > ret = rtrs_srv_rdma_init(ctx, ib_ctx.port);
+> > > > > > > if (ret)
+> > > > > > >         return ret;
+> > > >
+> > > > Also here, when rtrs_srv_rdma_init() fails, we return without
+> > > > incrementing. IMHO, in this logic, we are not using
+> > > > "ib_ctx.ib_dev_count" to track the number of devices, but to mark
+> > > > successful execution of rtrs_srv_rdma_init()
+> > >
+> > > Of course, you should increment in success only.
+> >
+> > I am confused again. What exactly are you suggesting we track with
+> > "ib_ctx.ib_dev_count"?
+> > According to my understanding, we can't possibly track both "number of
+> > devices added" and "success of rtrs_srv_rdma_init()".
+>
+> Why don't you ask your colleagues? They will guide you.
 
-I'll leave Mimi to answer, but really this is exactly the question that
-should have been asked before writing IPE.  However, since we have the
-cart before the horse, let me break the above down into two specific
-questions.
+(from above)
+"ib_ctx.ib_dev_count" is basically tracking the number of IB devices
+added, IF the first call to add succeeds.
 
-   1. Could we implement IPE in IMA (as in would extensions to IMA cover
-      everything).  I think the answers above indicate this is a "yes".
-   2. Should we extend IMA to implement it?  This is really whether from a
-      usability standpoint two seperate LSMs would make sense to cover the
-      different use cases.  I've got to say the least attractive thing
-      about separation is the fact that you now both have a policy parser.
-       You've tried to differentiate yours by making it more Kconfig
-      based, but policy has a way of becoming user space supplied because
-      the distros hate config options, so I think you're going to end up
-      with a policy parser very like IMAs.
 
-James
+>
+> Thanks
 
+
+
+-- 
+
+Regards
+-Haris
