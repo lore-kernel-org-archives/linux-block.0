@@ -2,116 +2,192 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE69BC433DF
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 20:12:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E24C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 20:36:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8454022CAF
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 20:12:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596658332;
-	bh=eNpUFKziZ8BMio9ND8TxOtF+Q/qHv5pmQy9gd3/EBrw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=smCP9amZLdU4xZZJXfdLYkq3+qVi7PKl8ahASByGkes/jG/qf80/XavuFQ17ZBROI
-	 +7kszhKBtEi206OBC7U/saeKO3d/8lO1i27cvm57gSKF09uhjvowiSkb7BKMbcSgmt
-	 4NrnaDwg2U8KRkYL9V9SAKzt7FjU1ox6GT/GlzjY=
+	by mail.kernel.org (Postfix) with ESMTP id 8F3AB206D4
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 20:36:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pKfbdaR1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727019AbgHEUMJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 16:12:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42728 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726398AbgHEQZe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 12:25:34 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34857C00869E;
-        Wed,  5 Aug 2020 07:39:17 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id 6so33840764qtt.0;
-        Wed, 05 Aug 2020 07:39:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3Ygb7Z7BelPPrQe4DRkGVgTQcrO8Cw2RRW2qRF9CXYE=;
-        b=pp6tBE5oK4EXYLhHUerHhczMNOtv0AQryU6E7Oe9CXPImtvcqSnfK2pVeBKYdcc1CC
-         7iFk3ssjwttxDGUiUsDFrVfdvCHnKNaN9gPuOrD/4dmwZPH5bN7mAVNhO9Fi5Y9c0T+3
-         To33H16KJ+KUQ7uvE7dMCY2D096z84QZuhv2W9FJa0UawIL+mIlsQ888VL6aRgeNOKT5
-         SjRHQBvMdgbRimITkdG9T7VPQdtgUv4IMERoZhDt4jT6Ses9mh7jMz6K5VUuRK+Zm7vM
-         y8HjXEPIp4tfKn3y8kWSyef94WF1XiH8pTyGWYXIZDw5g/y+uQMNSGUfIm0DXBxcj7c7
-         YHlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=3Ygb7Z7BelPPrQe4DRkGVgTQcrO8Cw2RRW2qRF9CXYE=;
-        b=TX2cn/HCQ/x0S6LGbXUEXyD2APE04VqqJOXcD4K4tTFP47Hr1n7TDSGdJVXvrTNhq3
-         9fAGYoEwbYflT3zjaqDBQAVGV7OKGcAlTQjs7p0miqMapQBWeMadmb4Ie17nWjTO809e
-         R4UAun6ddHMnWQpf9xyZiNGvlsFGqEB4NGiFlmYZz621JCm4P7lVH0Gx9lum4EucK89I
-         B4MauCLv4Rlr85e2Sv3Bz2QZHXu2EzK0sFIoQElIkBYHVtXOgLeoms0K5IwaUDgN7VwE
-         Zw0ZNpwjLE8ACnxjPDng4Sq3W3XQaTo8eMEjuPranslWvN2meyGBb19z5O5+mWYW0Uy+
-         NIkg==
-X-Gm-Message-State: AOAM530Ljt2802O7qQjNXRroo1+teonoBuQGVmNjUA+P2xMynQkANqx8
-        S6ENlJfaciVV79fGH4aDxxJ2VrPo
-X-Google-Smtp-Source: ABdhPJwAeuq1Gw0g6oZ4EwMvVDPOBUpv5syUd1FNZfEiqH2s0XfPDKOIJt54icu/LvBGC9Z4mj/DrQ==
-X-Received: by 2002:ac8:f73:: with SMTP id l48mr3680579qtk.296.1596638356595;
-        Wed, 05 Aug 2020 07:39:16 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1:fbb7])
-        by smtp.gmail.com with ESMTPSA id f130sm1877609qke.99.2020.08.05.07.39.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2020 07:39:15 -0700 (PDT)
-Date:   Wed, 5 Aug 2020 10:39:13 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Ming Lei <tom.leiming@gmail.com>,
-        James Smart <james.smart@broadcom.com>,
-        Daniel Wagner <dwagner@suse.de>,
-        Muneendra <muneendra.kumar@broadcom.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ewan Milne <emilne@redhat.com>, mkumar@redhat.com
-Subject: Re: [RFC 01/16] blkcg:Introduce blkio.app_identifier knob to blkio
- controller
-Message-ID: <20200805143913.GC4819@mtj.thefacebook.com>
-References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
- <1596507196-27417-2-git-send-email-muneendra.kumar@broadcom.com>
- <20200804113130.qfi5agzilso3mlbp@beryllium.lan>
- <20200804142123.GA4819@mtj.thefacebook.com>
- <b35e0e83-eb6c-4282-5142-22d9a996d260@broadcom.com>
- <CACVXFVPVM-xU0d2nETztPrS_EpacMy8A4x8FbShhLYt2iV_ouw@mail.gmail.com>
- <227c7f27-c6c7-5db1-59ac-2dd428f5a42a@suse.de>
+        id S1728249AbgHEUgF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 16:36:05 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:50790 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728643AbgHEUgD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 16:36:03 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 075FmSsH177468;
+        Wed, 5 Aug 2020 15:48:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=j6PDDC/Mn/spTqWrjmibfzc15MJWahsDJABkuGlXOL8=;
+ b=pKfbdaR1rm6EexkfUXMute1LqT50Jj8as1sABST78bRKCEEgG3nIT0PcMsMSeSWpB2DE
+ vgRfTz2tZ+wUJfFHRK2FLgt1OkjkHQ5yl5ccyEm/t/+y+ZtAZxaLNUN06K6uT1yoi0UR
+ KKIjiYEsN3rSOxgy9Vv4Bhjt9cXL/jLoQlGlg8EjPM/Cir0iTN8zivyH+Z5IzY5cOKmf
+ lZN+cHfyXETqdEOgEL/8leGIVp3cd7RW722uy1OsLV/XVABEHG0ZUsKK/guUoPWM1qsw
+ zHKv7arRrdoOKBxTe25AXv8RkfCTvr9aiS0RWCUUSjCPrGrstJX1prYRmw3vrDxL3/uc bQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 32n11naua7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 05 Aug 2020 15:48:49 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 075FljmT139364;
+        Wed, 5 Aug 2020 15:48:49 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 32qyaa143y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 05 Aug 2020 15:48:49 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 075Fmj4g003269;
+        Wed, 5 Aug 2020 15:48:46 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 05 Aug 2020 08:48:45 -0700
+Date:   Wed, 5 Aug 2020 08:48:43 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Evan Green <evgreen@chromium.org>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Xiao Ni <xni@redhat.com>
+Subject: Re: [PATCH v3] block: check queue's limits.discard_granularity in
+ __blkdev_issue_discard()
+Message-ID: <20200805154843.GB191798@magnolia>
+References: <20200805063150.41037-1-colyli@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <227c7f27-c6c7-5db1-59ac-2dd428f5a42a@suse.de>
+In-Reply-To: <20200805063150.41037-1-colyli@suse.de>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9704 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 suspectscore=1
+ spamscore=0 bulkscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008050128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9704 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 mlxscore=0
+ suspectscore=1 mlxlogscore=999 phishscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008050128
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Wed, Aug 05, 2020 at 02:31:50PM +0800, Coly Li wrote:
+> If create a loop device with a backing NVMe SSD, current loop device
+> driver doesn't correctly set its  queue's limits.discard_granularity and
+> leaves it as 0. If a discard request at LBA 0 on this loop device, in
+> __blkdev_issue_discard() the calculated req_sects will be 0, and a zero
+> length discard request will trigger a BUG() panic in generic block layer
+> code at block/blk-mq.c:563.
+> 
+> [  955.565006][   C39] ------------[ cut here ]------------
+> [  955.559660][   C39] invalid opcode: 0000 [#1] SMP NOPTI
+> [  955.622171][   C39] CPU: 39 PID: 248 Comm: ksoftirqd/39 Tainted: G            E     5.8.0-default+ #40
+> [  955.622171][   C39] Hardware name: Lenovo ThinkSystem SR650 -[7X05CTO1WW]-/-[7X05CTO1WW]-, BIOS -[IVE160M-2.70]- 07/17/2020
+> [  955.622175][   C39] RIP: 0010:blk_mq_end_request+0x107/0x110
+> [  955.622177][   C39] Code: 48 8b 03 e9 59 ff ff ff 48 89 df 5b 5d 41 5c e9 9f ed ff ff 48 8b 35 98 3c f4 00 48 83 c7 10 48 83 c6 19 e8 cb 56 c9 ff eb cb <0f> 0b 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 56 41 54
+> [  955.622179][   C39] RSP: 0018:ffffb1288701fe28 EFLAGS: 00010202
+> [  955.749277][   C39] RAX: 0000000000000001 RBX: ffff956fffba5080 RCX: 0000000000004003
+> [  955.749278][   C39] RDX: 0000000000000003 RSI: 0000000000000000 RDI: 0000000000000000
+> [  955.749279][   C39] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+> [  955.749279][   C39] R10: ffffb1288701fd28 R11: 0000000000000001 R12: ffffffffa8e05160
+> [  955.749280][   C39] R13: 0000000000000004 R14: 0000000000000004 R15: ffffffffa7ad3a1e
+> [  955.749281][   C39] FS:  0000000000000000(0000) GS:ffff95bfbda00000(0000) knlGS:0000000000000000
+> [  955.749282][   C39] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  955.749282][   C39] CR2: 00007f6f0ef766a8 CR3: 0000005a37012002 CR4: 00000000007606e0
+> [  955.749283][   C39] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [  955.749284][   C39] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [  955.749284][   C39] PKRU: 55555554
+> [  955.749285][   C39] Call Trace:
+> [  955.749290][   C39]  blk_done_softirq+0x99/0xc0
+> [  957.550669][   C39]  __do_softirq+0xd3/0x45f
+> [  957.550677][   C39]  ? smpboot_thread_fn+0x2f/0x1e0
+> [  957.550679][   C39]  ? smpboot_thread_fn+0x74/0x1e0
+> [  957.550680][   C39]  ? smpboot_thread_fn+0x14e/0x1e0
+> [  957.550684][   C39]  run_ksoftirqd+0x30/0x60
+> [  957.550687][   C39]  smpboot_thread_fn+0x149/0x1e0
+> [  957.886225][   C39]  ? sort_range+0x20/0x20
+> [  957.886226][   C39]  kthread+0x137/0x160
+> [  957.886228][   C39]  ? kthread_park+0x90/0x90
+> [  957.886231][   C39]  ret_from_fork+0x22/0x30
+> [  959.117120][   C39] ---[ end trace 3dacdac97e2ed164 ]---
+> 
+> This is the procedure to reproduce the panic,
+>   # modprobe scsi_debug delay=0 dev_size_mb=2048 max_queue=1
+>   # losetup -f /dev/nvme0n1 --direct-io=on
+>   # blkdiscard /dev/loop0 -o 0 -l 0x200
+> 
+> This patch fixes the issue by checking q->limits.discard_granularity in
+> __blkdev_issue_discard() before composing the discard bio. If the value
+> is 0, then prints a warning oops information and returns -EOPNOTSUPP to
+> the caller to indicate that this buggy device driver doesn't support
+> discard request.
+> 
+> Fixes: 9b15d109a6b2 ("block: improve discard bio alignment in __blkdev_issue_discard()")
+> Fixes: c52abf563049 ("loop: Better discard support for block devices")
+> Reported-and-suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Enzo Matsumiya <ematsumiya@suse.com>
+> Cc: Evan Green <evgreen@chromium.org>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Xiao Ni <xni@redhat.com>
+> ---
+> Changelog:
+> v3: print device name assocated with the buggy driver.
+> v2: fix typo of the wrong return error code.
+> v1: first version.
+> 
+>  block/blk-lib.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index 019e09bb9c0e..d3bbb3d9fac3 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -47,6 +47,15 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  		op = REQ_OP_DISCARD;
+>  	}
+>  
+> +	/* In case the discard granularity isn't set by buggy device driver */
+> +	if (WARN_ON_ONCE(!q->limits.discard_granularity)) {
+> +		char dev_name[BDEVNAME_SIZE];
+> +
+> +		bdevname(bdev, dev_name);
+> +		pr_err("%s: Error: discard_granularity is 0.\n", dev_name);
 
-On Wed, Aug 05, 2020 at 08:33:19AM +0200, Hannes Reinecke wrote:
-> None of these are guaranteed to be either present or unique.
-> It's not uncommon to have VMs with more than one MAC address, and any other
-> unique identifier like system UUID is not required to be present.
+Hm, you might want to ratelimit this, before some buggy device +
+careless program flood dmesg.
 
-I have a really hard time seeing how this fits into block cgroup interface.
-The last time we did something similar (tagging from cgroup interface side)
-was for netcls and it ended poorly. There are basic problems with e.g.
-delegation as these things are at odds with everything else sharing the
-interface.
+Also, why is it necessary to WARN_ON_ONCE /and/ pr_err the same
+condition?
 
-My not-too-well informed suggestions are either building mapping somewhere
-in the stack or at least implement the interface where it fits better so
-that people who don't need app_identifier don't see them and preferably can
-disable them. I don't mind cgroup data structs carrying extra bits for stuff
-which want to make use of the cgroup tree but I'm a pretty firm nack on the
-proposed interface.
+--D
 
-Thanks.
-
--- 
-tejun
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+>  	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+>  	if ((sector | nr_sects) & bs_mask)
+>  		return -EINVAL;
+> -- 
+> 2.26.2
+> 
