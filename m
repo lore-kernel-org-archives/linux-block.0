@@ -2,354 +2,203 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF9F2C433DF
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 16:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8CAC433E0
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 16:52:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C094A22CF7
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 16:35:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596645314;
-	bh=V05BwQWIw3WholwX0iejUFQJs2dtZxWFqbM83Gjts7w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=AgnhIcNiKOhsV1p24LwoaXRRP5lpfsf1alfct84rLbBwjgbqztcsI6rXh8BKxDj0+
-	 Ddt8caHtcP7AqZ77qlIPiwbNbju5JTH3SFiNXoAk/l+5aoHfuJNEDltiCCNz20BuW6
-	 t4HN/CZEL7PXAp17FSCwjUZDt3QTCdZ72o+yUEPs=
+	by mail.kernel.org (Postfix) with ESMTP id 6A38B22D00
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 16:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727074AbgHEQfD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 12:35:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49778 "EHLO mail.kernel.org"
+        id S1728206AbgHEQwI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 12:52:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37568 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726773AbgHEQcx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Aug 2020 12:32:53 -0400
-Received: from localhost (unknown [213.57.247.131])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5410622D73;
-        Wed,  5 Aug 2020 13:12:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596633164;
-        bh=V05BwQWIw3WholwX0iejUFQJs2dtZxWFqbM83Gjts7w=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UiUy+6rRUO4Az9HWjGqohIocwYSNquTnXShEFv9cFtbZ6EtvPirnjctehhb0HGdsu
-         iAk8vnAL7QweBhMFlClx4CmHCi96+rDNM7nhuNFuEogl6u8zsGfNBJDKPsAbbuCH0d
-         lPYwkctAM94IDn9QTxgZ40a8ze7EnKHr0LeZjtfY=
-Date:   Wed, 5 Aug 2020 16:12:39 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Haris Iqbal <haris.iqbal@cloud.ionos.com>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
-        dledford@redhat.com, Jason Gunthorpe <jgg@ziepe.ca>,
-        kernel test robot <rong.a.chen@intel.com>
-Subject: Re: [PATCH v2] RDMA/rtrs-srv: Incorporate ib_register_client into
- rtrs server init
-Message-ID: <20200805131239.GI4432@unreal>
-References: <20200623172321.GC6578@ziepe.ca>
- <20200804133759.377950-1-haris.iqbal@cloud.ionos.com>
- <20200805055712.GE4432@unreal>
- <CAJpMwygZym8sSiDUdEW3PQTmwsfNdO5bQG7_LWtKmE-tY_mrmg@mail.gmail.com>
- <20200805090435.GF4432@unreal>
- <CAJpMwyg8ZQTgGvxCpJMwDnhPTey1+aA56VLh3aKLtJZnk3OSMg@mail.gmail.com>
+        id S1728150AbgHEQtx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Aug 2020 12:49:53 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 17CC9AC23;
+        Wed,  5 Aug 2020 16:50:06 +0000 (UTC)
+Subject: Re: [PATCH v3] block: check queue's limits.discard_granularity in
+ __blkdev_issue_discard()
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Evan Green <evgreen@chromium.org>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Xiao Ni <xni@redhat.com>
+References: <20200805063150.41037-1-colyli@suse.de>
+ <20200805154843.GB191798@magnolia>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Message-ID: <f018ad35-9b1c-4a31-1499-3da16cd8001b@suse.de>
+Date:   Thu, 6 Aug 2020 00:49:43 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJpMwyg8ZQTgGvxCpJMwDnhPTey1+aA56VLh3aKLtJZnk3OSMg@mail.gmail.com>
+In-Reply-To: <20200805154843.GB191798@magnolia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 05, 2020 at 04:39:16PM +0530, Haris Iqbal wrote:
-> On Wed, Aug 5, 2020 at 2:34 PM Leon Romanovsky <leon@kernel.org> wrote:
-> >
-> > On Wed, Aug 05, 2020 at 01:20:09PM +0530, Haris Iqbal wrote:
-> > > On Wed, Aug 5, 2020 at 11:27 AM Leon Romanovsky <leon@kernel.org> wrote:
-> > > >
-> > > > On Tue, Aug 04, 2020 at 07:07:58PM +0530, Md Haris Iqbal wrote:
-> > > > > The rnbd_server module's communication manager (cm) initialization depends
-> > > > > on the registration of the "network namespace subsystem" of the RDMA CM
-> > > > > agent module. As such, when the kernel is configured to load the
-> > > > > rnbd_server and the RDMA cma module during initialization; and if the
-> > > > > rnbd_server module is initialized before RDMA cma module, a null ptr
-> > > > > dereference occurs during the RDMA bind operation.
-> > > > >
-> > > > > Call trace below,
-> > > > >
-> > > > > [    1.904782] Call Trace:
-> > > > > [    1.904782]  ? xas_load+0xd/0x80
-> > > > > [    1.904782]  xa_load+0x47/0x80
-> > > > > [    1.904782]  cma_ps_find+0x44/0x70
-> > > > > [    1.904782]  rdma_bind_addr+0x782/0x8b0
-> > > > > [    1.904782]  ? get_random_bytes+0x35/0x40
-> > > > > [    1.904782]  rtrs_srv_cm_init+0x50/0x80
-> > > > > [    1.904782]  rtrs_srv_open+0x102/0x180
-> > > > > [    1.904782]  ? rnbd_client_init+0x6e/0x6e
-> > > > > [    1.904782]  rnbd_srv_init_module+0x34/0x84
-> > > > > [    1.904782]  ? rnbd_client_init+0x6e/0x6e
-> > > > > [    1.904782]  do_one_initcall+0x4a/0x200
-> > > > > [    1.904782]  kernel_init_freeable+0x1f1/0x26e
-> > > > > [    1.904782]  ? rest_init+0xb0/0xb0
-> > > > > [    1.904782]  kernel_init+0xe/0x100
-> > > > > [    1.904782]  ret_from_fork+0x22/0x30
-> > > > > [    1.904782] Modules linked in:
-> > > > > [    1.904782] CR2: 0000000000000015
-> > > > > [    1.904782] ---[ end trace c42df88d6c7b0a48 ]---
-> > > > >
-> > > > > All this happens cause the cm init is in the call chain of the module init,
-> > > > > which is not a preferred practice.
-> > > > >
-> > > > > So remove the call to rdma_create_id() from the module init call chain.
-> > > > > Instead register rtrs-srv as an ib client, which makes sure that the
-> > > > > rdma_create_id() is called only when an ib device is added.
-> > > > >
-> > > > > Fixes: 9cb837480424 ("RDMA/rtrs: server: main functionality")
-> > > > > Reported-by: kernel test robot <rong.a.chen@intel.com>
-> > > > > Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
-> > > > > ---
-> > > > >  drivers/infiniband/ulp/rtrs/rtrs-srv.c | 77 +++++++++++++++++++++++++-
-> > > > >  drivers/infiniband/ulp/rtrs/rtrs-srv.h |  7 +++
-> > > > >  2 files changed, 81 insertions(+), 3 deletions(-)
-> > > >
-> > > > Please don't send vX patches as reply-to in "git send-email" command.
-> > > >
-> > > > >
-> > > > > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > > > > index 0d9241f5d9e6..916f99464d09 100644
-> > > > > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > > > > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > > > > @@ -16,6 +16,7 @@
-> > > > >  #include "rtrs-srv.h"
-> > > > >  #include "rtrs-log.h"
-> > > > >  #include <rdma/ib_cm.h>
-> > > > > +#include <rdma/ib_verbs.h>
-> > > > >
-> > > > >  MODULE_DESCRIPTION("RDMA Transport Server");
-> > > > >  MODULE_LICENSE("GPL");
-> > > > > @@ -31,6 +32,7 @@ MODULE_LICENSE("GPL");
-> > > > >  static struct rtrs_rdma_dev_pd dev_pd;
-> > > > >  static mempool_t *chunk_pool;
-> > > > >  struct class *rtrs_dev_class;
-> > > > > +static struct rtrs_srv_ib_ctx ib_ctx;
-> > > > >
-> > > > >  static int __read_mostly max_chunk_size = DEFAULT_MAX_CHUNK_SIZE;
-> > > > >  static int __read_mostly sess_queue_depth = DEFAULT_SESS_QUEUE_DEPTH;
-> > > > > @@ -2033,6 +2035,62 @@ static void free_srv_ctx(struct rtrs_srv_ctx *ctx)
-> > > > >       kfree(ctx);
-> > > > >  }
-> > > > >
-> > > > > +static int rtrs_srv_add_one(struct ib_device *device)
-> > > > > +{
-> > > > > +     struct rtrs_srv_ctx *ctx;
-> > > > > +     int ret;
-> > > > > +
-> > > > > +     /*
-> > > > > +      * Keep a track on the number of ib devices added
-> > > > > +      */
-> > > > > +     ib_ctx.ib_dev_count++;
-> > > > > +
-> > > > > +     if (!ib_ctx.rdma_init) {
-> > > > > +             /*
-> > > > > +              * Since our CM IDs are NOT bound to any ib device we will create them
-> > > > > +              * only once
-> > > > > +              */
-> > > > > +             ctx = ib_ctx.srv_ctx;
-> > > > > +             ret = rtrs_srv_rdma_init(ctx, ib_ctx.port);
-> > > > > +             if (ret) {
-> > > > > +                     /*
-> > > > > +                      * We errored out here.
-> > > > > +                      * According to the ib code, if we encounter an error here then the
-> > > > > +                      * error code is ignored, and no more calls to our ops are made.
-> > > > > +                      */
-> > > > > +                     pr_err("Failed to initialize RDMA connection");
-> > > > > +                     return ret;
-> > > > > +             }
-> > > > > +             ib_ctx.rdma_init = true;
-> > > >
-> > > > This rdma_init == false is equal to ib_ctx.ib_dev_count == 0 and the
-> > > > logic can be simplified.
-> > >
-> > > Yes, this was the first logic in my head. But I have few thoughts,
-> > > The below suggestions uses "ib_ctx.ib_dev_count" as a marker for
-> > > successful execution of rtrs_srv_rdma_init() and not really an IB
-> > > device count. Meaning if we have multiple calls to add, due to
-> > > multiple devices, our count would stay 1. And while removal we might
-> > > end up calling rdma_destroy_id() on our first remove call even though
-> > > another device is still remaining.
-> > >
-> > > If we increment "ib_ctx.ib_dev_count" every time add is called, even
-> > > before we call rtrs_srv_rdma_init() and irrespective of whether
-> > > rtrs_srv_rdma_init() succeeds or not, then we are keeping a count of
-> > > IB devices added. However, when remove is called, we now know the
-> > > number of devices added, but not whether rtrs_srv_rdma_init() was
-> > > successful or not. We may end up calling rdma_destroy_id() on NULL
-> > > cm_ids
-> > >
-> > > Does this make sense or am I missing something?
-> > >
-> > >
-> > > >
-> > > > if (ib_ctx.ib_dev_count)
-> > > >         return 0;
->
-> My understanding is, with the above 2 lines, after one add in which
-> rtrs_srv_rdma_init() succeeds, we won't even go below this, and hence
-> subsequent increments will not happen.
+On 2020/8/5 23:48, Darrick J. Wong wrote:
+> On Wed, Aug 05, 2020 at 02:31:50PM +0800, Coly Li wrote:
+>> If create a loop device with a backing NVMe SSD, current loop device
+>> driver doesn't correctly set its  queue's limits.discard_granularity and
+>> leaves it as 0. If a discard request at LBA 0 on this loop device, in
+>> __blkdev_issue_discard() the calculated req_sects will be 0, and a zero
+>> length discard request will trigger a BUG() panic in generic block layer
+>> code at block/blk-mq.c:563.
+>>
+>> [  955.565006][   C39] ------------[ cut here ]------------
+>> [  955.559660][   C39] invalid opcode: 0000 [#1] SMP NOPTI
+>> [  955.622171][   C39] CPU: 39 PID: 248 Comm: ksoftirqd/39 Tainted: G            E     5.8.0-default+ #40
+>> [  955.622171][   C39] Hardware name: Lenovo ThinkSystem SR650 -[7X05CTO1WW]-/-[7X05CTO1WW]-, BIOS -[IVE160M-2.70]- 07/17/2020
+>> [  955.622175][   C39] RIP: 0010:blk_mq_end_request+0x107/0x110
+>> [  955.622177][   C39] Code: 48 8b 03 e9 59 ff ff ff 48 89 df 5b 5d 41 5c e9 9f ed ff ff 48 8b 35 98 3c f4 00 48 83 c7 10 48 83 c6 19 e8 cb 56 c9 ff eb cb <0f> 0b 0f 1f 80 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 56 41 54
+>> [  955.622179][   C39] RSP: 0018:ffffb1288701fe28 EFLAGS: 00010202
+>> [  955.749277][   C39] RAX: 0000000000000001 RBX: ffff956fffba5080 RCX: 0000000000004003
+>> [  955.749278][   C39] RDX: 0000000000000003 RSI: 0000000000000000 RDI: 0000000000000000
+>> [  955.749279][   C39] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+>> [  955.749279][   C39] R10: ffffb1288701fd28 R11: 0000000000000001 R12: ffffffffa8e05160
+>> [  955.749280][   C39] R13: 0000000000000004 R14: 0000000000000004 R15: ffffffffa7ad3a1e
+>> [  955.749281][   C39] FS:  0000000000000000(0000) GS:ffff95bfbda00000(0000) knlGS:0000000000000000
+>> [  955.749282][   C39] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [  955.749282][   C39] CR2: 00007f6f0ef766a8 CR3: 0000005a37012002 CR4: 00000000007606e0
+>> [  955.749283][   C39] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>> [  955.749284][   C39] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>> [  955.749284][   C39] PKRU: 55555554
+>> [  955.749285][   C39] Call Trace:
+>> [  955.749290][   C39]  blk_done_softirq+0x99/0xc0
+>> [  957.550669][   C39]  __do_softirq+0xd3/0x45f
+>> [  957.550677][   C39]  ? smpboot_thread_fn+0x2f/0x1e0
+>> [  957.550679][   C39]  ? smpboot_thread_fn+0x74/0x1e0
+>> [  957.550680][   C39]  ? smpboot_thread_fn+0x14e/0x1e0
+>> [  957.550684][   C39]  run_ksoftirqd+0x30/0x60
+>> [  957.550687][   C39]  smpboot_thread_fn+0x149/0x1e0
+>> [  957.886225][   C39]  ? sort_range+0x20/0x20
+>> [  957.886226][   C39]  kthread+0x137/0x160
+>> [  957.886228][   C39]  ? kthread_park+0x90/0x90
+>> [  957.886231][   C39]  ret_from_fork+0x22/0x30
+>> [  959.117120][   C39] ---[ end trace 3dacdac97e2ed164 ]---
+>>
+>> This is the procedure to reproduce the panic,
+>>   # modprobe scsi_debug delay=0 dev_size_mb=2048 max_queue=1
+>>   # losetup -f /dev/nvme0n1 --direct-io=on
+>>   # blkdiscard /dev/loop0 -o 0 -l 0x200
+>>
+>> This patch fixes the issue by checking q->limits.discard_granularity in
+>> __blkdev_issue_discard() before composing the discard bio. If the value
+>> is 0, then prints a warning oops information and returns -EOPNOTSUPP to
+>> the caller to indicate that this buggy device driver doesn't support
+>> discard request.
+>>
+>> Fixes: 9b15d109a6b2 ("block: improve discard bio alignment in __blkdev_issue_discard()")
+>> Fixes: c52abf563049 ("loop: Better discard support for block devices")
+>> Reported-and-suggested-by: Ming Lei <ming.lei@redhat.com>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+>> Cc: Bart Van Assche <bvanassche@acm.org>
+>> Cc: Christoph Hellwig <hch@lst.de>
+>> Cc: Enzo Matsumiya <ematsumiya@suse.com>
+>> Cc: Evan Green <evgreen@chromium.org>
+>> Cc: Hannes Reinecke <hare@suse.com>
+>> Cc: Jens Axboe <axboe@kernel.dk>
+>> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+>> Cc: Xiao Ni <xni@redhat.com>
+>> ---
+>> Changelog:
+>> v3: print device name assocated with the buggy driver.
+>> v2: fix typo of the wrong return error code.
+>> v1: first version.
+>>
+>>  block/blk-lib.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/block/blk-lib.c b/block/blk-lib.c
+>> index 019e09bb9c0e..d3bbb3d9fac3 100644
+>> --- a/block/blk-lib.c
+>> +++ b/block/blk-lib.c
+>> @@ -47,6 +47,15 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>>  		op = REQ_OP_DISCARD;
+>>  	}
+>>  
+>> +	/* In case the discard granularity isn't set by buggy device driver */
+>> +	if (WARN_ON_ONCE(!q->limits.discard_granularity)) {
+>> +		char dev_name[BDEVNAME_SIZE];
+>> +
+>> +		bdevname(bdev, dev_name);
+>> +		pr_err("%s: Error: discard_granularity is 0.\n", dev_name);
+> 
+> Hm, you might want to ratelimit this, before some buggy device +
+> careless program flood dmesg.
+> 
 
-Is it better?
+Sure, I will use pr_err_ratelimit() in next version.
 
-if (ib_ctx.ib_dev_count)
-  goto out;
+> Also, why is it necessary to WARN_ON_ONCE /and/ pr_err the same
+> condition?
+> 
 
-....
+The WARN_ON_ONCE() just though the warning message, but does not point
+out which device is buggy. Indeed this is a serious problem, so current
+kernel message is a warning oops info and followed by "loop: Error:
+discard_granularity is 0."
 
-out:
-  ib_ctx.ib_dev_count++;
-  return 0;
+Thanks.
 
-You don't need to take the code proposed in the ML as is.
-
->
-> > > >
-> > > > ctx = ib_ctx.srv_ctx;
-> > > > ret = rtrs_srv_rdma_init(ctx, ib_ctx.port);
-> > > > if (ret)
-> > > >         return ret;
->
-> Also here, when rtrs_srv_rdma_init() fails, we return without
-> incrementing. IMHO, in this logic, we are not using
-> "ib_ctx.ib_dev_count" to track the number of devices, but to mark
-> successful execution of rtrs_srv_rdma_init()
-
-Of course, you should increment in success only.
-
->
-> > > > ib_ctx.ib_dev_count++;
-> > > > return 0;
-> >
-> > You missed the above two lines from my suggestion.
-> >
-> > > >
-> > > > > +     }
-> > > > > +
-> > > > > +     return 0;
-> > > > > +}
-> > > > > +
-> > > > > +static void rtrs_srv_remove_one(struct ib_device *device, void *client_data)
-> > > > > +{
-> > > > > +     struct rtrs_srv_ctx *ctx;
-> > > > > +
-> > > > > +     ib_ctx.ib_dev_count--;
-> >
-> > And this line too.
-> >
-> > > > > +
-> > > > > +     if (!ib_ctx.ib_dev_count && ib_ctx.rdma_init) {
-> > > >
-> > > > It is not kernel coding style.
-> > > > if (ib_ctx.ib_dev_count)
-> > > >         return;
-> > > >
-> > > > ctx = ib_ctx.srv_ctx;
-> > > > rdma_destroy_id(ctx->cm_id_ip);
-> > > > rdma_destroy_id(ctx->cm_id_ib);
-> > > >
-> > > > Thanks
-> > > >
-> > > > > +             /*
-> > > > > +              * Since our CM IDs are NOT bound to any ib device we will remove them
-> > > > > +              * only once, when the last device is removed
-> > > > > +              */
-> > > > > +             ctx = ib_ctx.srv_ctx;
-> > > > > +             rdma_destroy_id(ctx->cm_id_ip);
-> > > > > +             rdma_destroy_id(ctx->cm_id_ib);
-> > > > > +             ib_ctx.rdma_init = false;
-> > > > > +     }
-> > > > > +}
-> > > > > +
-> > > > > +static struct ib_client rtrs_srv_client = {
-> > > > > +     .name   = "rtrs_server",
-> > > > > +     .add    = rtrs_srv_add_one,
-> > > > > +     .remove = rtrs_srv_remove_one
-> > > > > +};
-> > > > > +
-> > > > >  /**
-> > > > >   * rtrs_srv_open() - open RTRS server context
-> > > > >   * @ops:             callback functions
-> > > > > @@ -2051,12 +2109,26 @@ struct rtrs_srv_ctx *rtrs_srv_open(struct rtrs_srv_ops *ops, u16 port)
-> > > > >       if (!ctx)
-> > > > >               return ERR_PTR(-ENOMEM);
-> > > > >
-> > > > > -     err = rtrs_srv_rdma_init(ctx, port);
-> > > > > +     ib_ctx = (struct rtrs_srv_ib_ctx) {
-> > > > > +             .srv_ctx        = ctx,
-> > > > > +             .port           = port,
-> > > > > +     };
-> > > > > +
-> > > > > +     err = ib_register_client(&rtrs_srv_client);
-> > > > >       if (err) {
-> > > > >               free_srv_ctx(ctx);
-> > > > >               return ERR_PTR(err);
-> > > > >       }
-> > > > >
-> > > > > +     /*
-> > > > > +      * Since ib_register_client does not propagate the device add error
-> > > > > +      * we check if the RDMA connection init was successful or not
-> > > > > +      */
-> > > > > +     if (!ib_ctx.rdma_init) {
-> > > > > +             free_srv_ctx(ctx);
-> > > > > +             return NULL;
-> > > > > +     }
-> > > > > +
-> > > > >       return ctx;
-> > > > >  }
-> > > > >  EXPORT_SYMBOL(rtrs_srv_open);
-> > > > > @@ -2090,8 +2162,7 @@ static void close_ctx(struct rtrs_srv_ctx *ctx)
-> > > > >   */
-> > > > >  void rtrs_srv_close(struct rtrs_srv_ctx *ctx)
-> > > > >  {
-> > > > > -     rdma_destroy_id(ctx->cm_id_ip);
-> > > > > -     rdma_destroy_id(ctx->cm_id_ib);
-> > > > > +     ib_unregister_client(&rtrs_srv_client);
-> > > > >       close_ctx(ctx);
-> > > > >       free_srv_ctx(ctx);
-> > > > >  }
-> > > > > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.h b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > > > > index dc95b0932f0d..6e9d9000cd8d 100644
-> > > > > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > > > > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > > > > @@ -118,6 +118,13 @@ struct rtrs_srv_ctx {
-> > > > >       struct list_head srv_list;
-> > > > >  };
-> > > > >
-> > > > > +struct rtrs_srv_ib_ctx {
-> > > > > +     struct rtrs_srv_ctx     *srv_ctx;
-> > > > > +     u16                     port;
-> > > > > +     int                     ib_dev_count;
-> > > > > +     bool                    rdma_init;
-> > > > > +};
-> > > > > +
-> > > > >  extern struct class *rtrs_dev_class;
-> > > > >
-> > > > >  void close_sess(struct rtrs_srv_sess *sess);
-> > > > > --
-> > > > > 2.25.1
-> > > > >
-> > >
-> > >
-> > >
-> > > --
-> > >
-> > > Regards
-> > > -Haris
->
->
->
-> --
->
-> Regards
-> -Haris
+Coly Li
