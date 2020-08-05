@@ -2,97 +2,109 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AAFBC433DF
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 00:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EADC433DF
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 00:40:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4C8B2177B
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 00:28:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3C97206D4
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 00:40:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="En/h5OWr"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aYjVfEoM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726400AbgHEA2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Aug 2020 20:28:51 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:50794 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725864AbgHEA2u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Aug 2020 20:28:50 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0750M03o127467;
-        Wed, 5 Aug 2020 00:28:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=wDDhw4JoPLvk6HVCNBu8vh6YWhhbKaqSASVf9ZusHfo=;
- b=En/h5OWrgjseryX0WtFrf1skAXSUZg0T4UCHBeQ0A9ZW6MBXaL7J/EHQP+Nq1hZw1cGn
- 0Z6v7KjEo9+QzecTn4xA7/73WupPWDSwGBUmMS3mn4AM1AaggyhA3+4Mdw8DF8p2byhi
- iOwWXyL0viu4LA4D7Boe0qVv90udg6CGIQa4/Uc0e6i4SdsaBW76euox1GgxTPZ4ccJR
- sKVPmK6ZMmoOFuV+uw9Ovfg8vWbtj9/sqH8nEa6jAHno81+8szl2TT1V2A/EPQBqidtk
- D8ZM4SVfGpZMx8Sulrf83bwyZNY6jjDiaZNkwV/3jqauQmspSFG4yaveeo+UqYWTJyci xg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 32nc9ynvj7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 05 Aug 2020 00:28:34 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0750N8MJ132754;
-        Wed, 5 Aug 2020 00:28:34 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 32p5gt04g0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 05 Aug 2020 00:28:34 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0750SV4X025572;
-        Wed, 5 Aug 2020 00:28:31 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 04 Aug 2020 17:28:31 -0700
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
-        linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hannes Reinecke <hare@suse.com>, Xiao Ni <xni@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Enzo Matsumiya <ematsumiya@suse.com>,
-        Jens Axboe <axboe@kernel.dk>, Evan Green <evgreen@chromium.org>
-Subject: Re: [PATCH] block: tolerate 0 byte discard_granularity in
- __blkdev_issue_discard()
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq18seu0wdd.fsf@ca-mkp.ca.oracle.com>
-References: <20200804142332.29961-1-colyli@suse.de>
-        <20200804235811.GA1981569@T590>
-Date:   Tue, 04 Aug 2020 20:28:28 -0400
-In-Reply-To: <20200804235811.GA1981569@T590> (Ming Lei's message of "Wed, 5
-        Aug 2020 07:58:11 +0800")
+        id S1726511AbgHEAkF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Aug 2020 20:40:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38266 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726398AbgHEAkE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Aug 2020 20:40:04 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71311C061756
+        for <linux-block@vger.kernel.org>; Tue,  4 Aug 2020 17:40:04 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id a14so39038454wra.5
+        for <linux-block@vger.kernel.org>; Tue, 04 Aug 2020 17:40:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=hJW6wAkuoQDVAepJ5Cv3gWI6qzML2AhmW89J2ZpCvBI=;
+        b=aYjVfEoMZdXH24qlnS3M7VKdM/4CrIuQbZ1Ctm3utrbCjdxibrVgB9Re+wkQQ6Yag3
+         ZE4EkRYx0N2q4Y3A9/bPb9KlY3FK71K9PU7gQgvT1OqdIe57mYFjilbUb0ZM6N4yIUBL
+         O0QRk6O7dPBVXkYu8ztrFsUD2ZboBTjeJ+SAk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=hJW6wAkuoQDVAepJ5Cv3gWI6qzML2AhmW89J2ZpCvBI=;
+        b=ZxC+g9CehJ7vqGvhWzv2XtCQV7RWH5XWvPIr5wZnne23YZ9JVogxKLIDlqiid74mPo
+         4zLIhKYfVszJFsJzTIMnY7oEcVNVAEsQ9mS0lMNpfyMk4C94SiUO/3mOYG9G1J8ISIZu
+         XeMApL4VCSd4VXqBlAWQH+Khm2yWdonmXd4hvLcqkbY69XfbLa8NJ3YT4s8S7o4xoejF
+         HhGMH/ONr2jiwWUaVgoaQLPjIvdk/15HAQsZCqY7MX+ucycvxFan65Z+lGMRdv+DahWx
+         Tj3S8WwKJZhmFVAJeDzCW+AnFajuBe+5d2s4BUBmtZiF7pGQ5gsdeySSmFx43UZHjRbw
+         rrMg==
+X-Gm-Message-State: AOAM531wKqdMvgjJJWO3wf2WejafCm6gWvWG5+ziKLcWkz1ZE6rf4dD6
+        +r6okMrPpbMn6a6ME83pGf9W/A==
+X-Google-Smtp-Source: ABdhPJxKkNX69AKXiUthEHMB6Dol3OWroWIMuU5IyuxNcQhTiTyAkCPxkDdFLyDUt8qOnMHGouuU0A==
+X-Received: by 2002:adf:efcc:: with SMTP id i12mr411064wrp.308.1596588002977;
+        Tue, 04 Aug 2020 17:40:02 -0700 (PDT)
+Received: from [10.230.185.151] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id g188sm608229wma.5.2020.08.04.17.40.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Aug 2020 17:40:02 -0700 (PDT)
+Subject: Re: [RFC 01/16] blkcg:Introduce blkio.app_identifier knob to blkio
+ controller
+To:     Tejun Heo <tj@kernel.org>, Daniel Wagner <dwagner@suse.de>
+Cc:     Muneendra <muneendra.kumar@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        pbonzini@redhat.com, emilne@redhat.com, mkumar@redhat.com
+References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1596507196-27417-2-git-send-email-muneendra.kumar@broadcom.com>
+ <20200804113130.qfi5agzilso3mlbp@beryllium.lan>
+ <20200804142123.GA4819@mtj.thefacebook.com>
+From:   James Smart <james.smart@broadcom.com>
+Message-ID: <b35e0e83-eb6c-4282-5142-22d9a996d260@broadcom.com>
+Date:   Tue, 4 Aug 2020 17:39:57 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9703 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
- phishscore=0 spamscore=0 adultscore=0 suspectscore=1 mlxlogscore=808
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008050001
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9703 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 mlxscore=0
- suspectscore=1 phishscore=0 lowpriorityscore=0 spamscore=0 impostorscore=0
- adultscore=0 clxscore=1011 malwarescore=0 bulkscore=0 mlxlogscore=836
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008050001
+In-Reply-To: <20200804142123.GA4819@mtj.thefacebook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 8/4/2020 7:21 AM, Tejun Heo wrote:
+> Hello,
+>
+> On Tue, Aug 04, 2020 at 01:31:30PM +0200, Daniel Wagner wrote:
+>> Hi,
+>>
+>> [cc Tejun]
+>>
+>> On Tue, Aug 04, 2020 at 07:43:01AM +0530, Muneendra wrote:
+>>> This Patch added a unique application identifier i.e
+>>> blkio.app_identifier knob to  blkio controller which
+>>> allows identification of traffic sources at an
+>>> individual cgroup based Applications
+>>> (ex:virtual machine (VM))level in both host and
+>>> fabric infrastructure.
+> I'm not sure it makes sense to introduce custom IDs for these given that
+> there already are unique per-host cgroup IDs which aren't recycled.
+>
+> Thanks.
+>
 
-Ming,
+If the VM moves to a different host, does the per-host cgroup IDs 
+migrate with the VM ?   If not, we need to have an identifier that moves 
+with the VM and which is independent of what host the VM is residing on.
 
-> What we need to fix is loop driver, if it claims to support discard,
-> q->limits.discard_granularity has to be one valid value.
+-- james
 
-Yep!
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
