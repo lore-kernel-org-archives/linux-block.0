@@ -2,255 +2,319 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DABCC433E3
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 07:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D16C433DF
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 07:50:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A1C422CA1
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 07:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF37C21744
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 07:50:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JVMl5thL";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="PQHLuIJg"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="FI16XBZC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726532AbgHEHfe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 03:35:34 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:65066 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725981AbgHEHfd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 03:35:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1596612932; x=1628148932;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=J+z1I8ZPMmGYjymyRZfVPw5uHnrMEV2dueD1zGfq5Z8=;
-  b=JVMl5thLJSxozDOqCHWCOI9ZKpcRiXUDQzZJc1P3D+pB69/HZ6fXb54c
-   inifkM/vz1zLgitL/CvkhB+PXXC692Gj4W1j4jbYYt/m+nSYa3W0ywxKK
-   NTjug0Z9Q/7FRtQ4FrwSVTrOzJqggZtvkqi9AmCOFW+yp34Ao2pZOU8UV
-   12t+0ilkLhr5njlhlbjxhVDghkvfadXKHzmY6pdPfQt/gordUPZCQI0nK
-   gmWUm/Z53mq6hHvjEtmlf30Mw2FvBoeV4zrlWzRU6Eo6u8E2iQryXKpNi
-   CuJC88G7ll+P0ycWoWOUPUpZZx40oiTvwohXi/iCQNQSQNOYP8SKF/P/9
-   A==;
-IronPort-SDR: PrDjXGuBNoL9LNnDIQa3rEKCTt3Ynw1P0FMHf0wmCYu1Dl0jPQLkpuhygyRIFsPDOo1VGElf8s
- v+Nf/yLB/XosUscWu8DhbVUSbN6kJQg2AvvTPGBp00P/v9HY8FwckHXeytPJu5V/lX6e3JYy8i
- VWn7ULfa/Xiql81KtMiKvb9ECnp2KQ0u97mrVS8NMR18aBOHIMKsvLEwv1z5CJjI6cbfKszlpX
- krlcbzdZC+5bfY8RhwVT10uZRqNAH6568lqIcaALJhQKtbSeWagJCsuggYXr8taV8kgRLCsn45
- HgI=
-X-IronPort-AV: E=Sophos;i="5.75,436,1589212800"; 
-   d="scan'208";a="148494169"
-Received: from mail-bn8nam11lp2171.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.171])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Aug 2020 15:35:30 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iM0Mv9JB7sKepbzK96eaFV0pyacLkNBKbqTtUPQV0SJORhlaX/ZnC7AU3SnPc4dFuGr+bcb2bit/dRruHWfd8NA++jG/NcusrCeowhtiWKAgSOcsGxbRNIvKsHyUCIyoQVOKA0Ake9VMu+VP+rNyTXFSQkDZ77vspPPB/2p6xxIkbRhoJds+6KDA5y/Oofw6nKXnvQh84x4nhXE+Yt8B8Mu4UhoDAUr+NnUkqYIJbT6cZqWYt6rVHAAdme2HPoAKJG6dEl2B6LyiPDGrOUKBsAbJKBX3IcsyqqDS8jO5Kd6hI59bZ0pYpzDlSx4AQH/khiLlYn3+5ssnbPP7HpFOag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eXVU9EEOq/oaekqqkXSh+ZD1Jtgh5ixXb2crzHYN3oA=;
- b=Edp5dgYmqcAs8eWhDGocN0wGvpYcaXsZA+8culSEldxXHQhjCl6pcIElOKZK/wFuJMxIezdcKNqZwYExaSZxo8g/WtoG9lI+FAWjVVLuAYhudLUVQ2Zi3iPhI4fFOKu8AUteTFJR3kZ7gstlWWcw9uc/yf+DqxdcHL7rtt26EylRWgzeN3/CM7Ibc3eS+34zh3Y/6tvoCbkOV+ddckKRWY6RzKXCVAPBLmLrfdfII44EC2biUYdQj8BiTVwyJo9ul3Gnr/0YsOzLCBXGtRm9mpgbYEzCyURvVoR8arw0OFq3JP7g4TRZrqRkuWjPlb8hFN9AMYZZ78oghLrdUtpTAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        id S1726672AbgHEHuX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 03:50:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726209AbgHEHuW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Aug 2020 03:50:22 -0400
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDABDC061756
+        for <linux-block@vger.kernel.org>; Wed,  5 Aug 2020 00:50:21 -0700 (PDT)
+Received: by mail-ed1-x543.google.com with SMTP id a14so14830308edx.7
+        for <linux-block@vger.kernel.org>; Wed, 05 Aug 2020 00:50:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eXVU9EEOq/oaekqqkXSh+ZD1Jtgh5ixXb2crzHYN3oA=;
- b=PQHLuIJgjU57UlMNHABnQCaHs+HETK1Q0W2FdBZ6obLT7yc/8KOBh+14wCh0eUPuHZgtFHeV6ayNpJ0QrZe5fDexwJLAmxiXY9DTx6l2KFYpZMeJ7S2lADDlMUKI/T/Txuk9yqWuIy8vmRcLTMdrw/Vtq9F1uK1JD16kR1AN2B4=
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY1PR04MB2316.namprd04.prod.outlook.com (2a01:111:e400:c618::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.20; Wed, 5 Aug
- 2020 07:35:28 +0000
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::7d15:9936:4b3b:f8a2]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::7d15:9936:4b3b:f8a2%12]) with mapi id 15.20.3239.022; Wed, 5 Aug 2020
- 07:35:28 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     "hch@infradead.org" <hch@infradead.org>
-CC:     Kanchan Joshi <joshiiitr@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>
-Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
-Thread-Topic: [PATCH v4 6/6] io_uring: add support for zone-append
-Thread-Index: AQHWYdbcc0q15qREKECGO7brHi6zEg==
-Date:   Wed, 5 Aug 2020 07:35:28 +0000
-Message-ID: <CY4PR04MB37517D633920E4D31AC6EA0DE74B0@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <CA+1E3rKxZk2CatTuPcQq5d14vXL9_9LVb2_+AfR2m9xn2WTZdg@mail.gmail.com>
- <MWHPR04MB3758DC08EA17780E498E9EC0E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
- <20200731064526.GA25674@infradead.org>
- <MWHPR04MB37581344328A42EA7F5ED13EE74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
- <CA+1E3rLM4G4SwzD6RWsK6Ssp7NmhiPedZDjrqN3kORQr9fxCtw@mail.gmail.com>
- <MWHPR04MB375863C20C1EF2CB27E62703E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
- <20200731091416.GA29634@infradead.org>
- <MWHPR04MB37586D39CA389296CE0252A4E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
- <20200731094135.GA4104@infradead.org>
- <MWHPR04MB3758A4B2967DB1FABAAD9265E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
- <20200731125110.GA11500@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.182.57]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 7c5ee32e-3e2b-4cd0-19a8-08d83912202f
-x-ms-traffictypediagnostic: CY1PR04MB2316:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY1PR04MB2316F28B05308E886B8B0B55E74B0@CY1PR04MB2316.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1mhJCBUHxv+a7bC+ikN2LluOEd9E0Sp8YCBO5OXbLfQj9ZFqaildWPh4H6TuPA9awi+t6AHp6HcETYMHTjIKCb3ZUH9bZXluUvCFbTWkxs1d2e0m4yn0eVhZJ7n0D6j0aaEKYiyDy8/yvrPCRHI1DOGWkVVT5S385RHOBX3gkLj0SB66m3+AEwRS9+vPsGSBoZs/+VyjZoegVHN+64IxlwVmkE9q2zguZqFJ4KGx81ghnITmpKA2FZy0k419z3x5ugy6UD/FKCQ4JxOWXREWqf0VruT7aOCoSASU3QwB/1iR3UtvIz9MMXFiheO+acU1AjxGaGIAufMDzOkYvAM4Ug==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(396003)(376002)(39860400002)(136003)(366004)(91956017)(5660300002)(7416002)(55016002)(76116006)(33656002)(26005)(6506007)(53546011)(86362001)(8936002)(8676002)(6916009)(83380400001)(186003)(316002)(71200400001)(52536014)(66946007)(4326008)(478600001)(7696005)(2906002)(66446008)(66476007)(64756008)(66556008)(54906003)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: e/tPt+QkjW8ESmtNwREqozt7A9IWoLXTCKmtB05H3ZWWrMXGMwhRB6zUGUri7Rqwggp+ZDTf+aWImA8+IIncxn40+EVCSsSApCMR3VxMCdfTYIYTCreeNucPP4/gXY9sH01x7Jw9ytGS4rrdcP1vZMtvODYdU7HX1aO9O6U5OyWQ9AUdTI19tbQtkOOYxuwOMMsn/9+rHrHoIEmy3IKlut2EyH91QPlTNq5pCSWvOE3Jxh8hAIjJRsk2pfEdj8GkUUZTlTo5Ctyy5bypOhiCQjoqqaxCyUpLyG6In0v2edpDaadU3CbBzFnHr9+dynVAf9ZZHfmBX9cSOburm/rqazvboabnivcvqRRoIubUOIT0jlJmEiRbJzffHo+iNYVzRumGdTpAaKY1AUM3BWSrzg5bZH/ta7pKM3dlhNZ42DYDNiyKwoGgiMTZC1McNCA2bTC10tkU2SUakkFr4BuZfQHf4/omvQeQpWW2/LwWVXikPvfwFGJjIF1F56KR617aiJ7DDdqaTAOm2xUd5src5cBipl52KVyiejIhFAUirXWUsLUfSuwvaIo/NXVdh8b8OvqkTkALei1Q0ES0izzEX6iFRg2Ggawrbd0gIQ9GPjva4FLPJWUGJvaYJ59/W4EfHlPyrVefqrMetiQkmeOjwg==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NVITyii4Ab7WJF/rdLuyAWw283bhgzvOCo7RFQUaeJw=;
+        b=FI16XBZCR7RCOfvsPM/3klRLozq0Sasoj9vpyzCdk81V+/OU2jygebMXREPOjG/rAU
+         8NZhaSguRjjRCY/2gRl5t0D7ra8B8VZkgOI3jkf7mFnuKwve5QUDe48/9Z476OYop82F
+         EdNh/wTQy+TS2kgfb4IHyNxGsZYznWDP9R3ltZOo9cDMr1EZHxZQhDkDysl+CG7SocOJ
+         9au+IrLrV8fdm58wXJ/3zWSgYlwQ1l3at09n5n7kChhMd4TVjFGZJ1q+7Qfhr+pdhFiM
+         SEq1IvvAdc/WN31F5CnVN4HNIkxtLm2ZkED6xKdky+adyjtFvz6YqWJ/SaK67cLi7sbo
+         X7Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NVITyii4Ab7WJF/rdLuyAWw283bhgzvOCo7RFQUaeJw=;
+        b=AUnkPiVq9y3NHrjWLRgUw/nBckVSve4V+MJ71FHskcqiNGTNjelqPrp6CMn6ZJprzT
+         vpNnl3+i/lIkkP8HEHQ5BX/xAu7Lbi33hKAWpzHIzwgDELXahlow0L9Ukqpcek8ObbeK
+         yrBSknM8u2MwxUgDjAkovl08gtGybN5Nrd3NpJg8Xrn/cJtnrNb8sGanA9wot4/FCsbP
+         78pEfn92o+zLrb29uTCDbKtXAfx9WP7IWy7zh8BC0vLp6g2lbIlMK8rQK5G8/uGIthEK
+         /6lI+DSsmSD6OrQoO42oE1bXnWbV6eDMzAj6r5+rT30LrXUy93440dJNtlg56agbGNS1
+         Au+w==
+X-Gm-Message-State: AOAM532Pqg97l3CCSTzAM+vMuY8ecVMYbNEOJetGrLGfvSxRwAEO/kiH
+        ikbDA6Zey6ShS9NhJmPJiZYUhqQKJa0ASz1Flm6s2A==
+X-Google-Smtp-Source: ABdhPJz1vltRdOznKcBehMxM83JIxpUmVSeVzBg0Gs191MjPLV9pmVhDUk5VKV3M/SllnemqQ5Dg3kmyjLpcOJU5JfI=
+X-Received: by 2002:a05:6402:1cb3:: with SMTP id cz19mr1542759edb.299.1596613820365;
+ Wed, 05 Aug 2020 00:50:20 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c5ee32e-3e2b-4cd0-19a8-08d83912202f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Aug 2020 07:35:28.4097
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BMpuCMfCv6xEvP9Wgnv2LeoOeK49oqnYXjEUrTXs8ol6jdDZh5ePnHtQ8euwoBHj6wJbj84ST4qzW2TIh3E9dA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2316
+References: <20200623172321.GC6578@ziepe.ca> <20200804133759.377950-1-haris.iqbal@cloud.ionos.com>
+ <20200805055712.GE4432@unreal>
+In-Reply-To: <20200805055712.GE4432@unreal>
+From:   Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Date:   Wed, 5 Aug 2020 13:20:09 +0530
+Message-ID: <CAJpMwygZym8sSiDUdEW3PQTmwsfNdO5bQG7_LWtKmE-tY_mrmg@mail.gmail.com>
+Subject: Re: [PATCH v2] RDMA/rtrs-srv: Incorporate ib_register_client into
+ rtrs server init
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
+        dledford@redhat.com, Jason Gunthorpe <jgg@ziepe.ca>,
+        kernel test robot <rong.a.chen@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/07/31 21:51, hch@infradead.org wrote:=0A=
-> On Fri, Jul 31, 2020 at 10:16:49AM +0000, Damien Le Moal wrote:=0A=
->>>=0A=
->>> Let's keep semantics and implementation separate.  For the case=0A=
->>> where we report the actual offset we need a size imitation and no=0A=
->>> short writes.=0A=
->>=0A=
->> OK. So the name of the flag confused me. The flag name should reflect "D=
-o zone=0A=
->> append and report written offset", right ?=0A=
-> =0A=
-> Well, we already have O_APPEND, which is the equivalent to append to=0A=
-> the write pointer.  The only interesting addition is that we also want=0A=
-> to report where we wrote.  So I'd rather have RWF_REPORT_OFFSET or so.=0A=
-=0A=
-That works for me. But that rules out having the same interface for raw blo=
-ck=0A=
-devices since O_APPEND has no meaning in that case. So for raw block device=
-s, it=0A=
-will have to be through zonefs. That works for me, and I think it was your =
-idea=0A=
-all along. Can you confirm please ?=0A=
-=0A=
->> But I think I am starting to see the picture you are drawing here:=0A=
->> 1) Introduce a fcntl() to get "maximum size for atomic append writes"=0A=
->> 2) Introduce an aio flag specifying "Do atomic append write and report w=
-ritten=0A=
->> offset"=0A=
-> =0A=
-> I think we just need the 'report written offset flag', in fact even for=
-=0A=
-> zonefs with the right locking we can handle unlimited write sizes, just=
-=0A=
-> with lower performance.  E.g.=0A=
-> =0A=
-> 1) check if the write size is larger than the zone append limit=0A=
-> =0A=
-> if no:=0A=
-> =0A=
->  - take the shared lock  and issue a zone append, done=0A=
-> =0A=
-> if yes:=0A=
-> =0A=
->  - take the exclusive per-inode (zone) lock and just issue either normal=
-=0A=
->    writes or zone append at your choice, relying on the lock to=0A=
->    serialize other writers.  For the async case this means we need a=0A=
->    lock than can be release in a different context than it was acquired,=
-=0A=
->    which is a little ugly but can be done.=0A=
-=0A=
-Yes, that would be possible. But likely, this will also need calls to=0A=
-inode_dio_wait() to avoid ending up with a mix of regular write and zone ap=
-pend=0A=
-writes in flight (which likely would result in the regular write failing as=
- the=0A=
-zone append writes would go straight to the device without waiting for the =
-zone=0A=
-write lock like regular writes do).=0A=
-=0A=
-This all sound sensible to me. One last point though, specific to zonefs: i=
-f the=0A=
-user opens a zone file with O_APPEND, I do want to have that necessarily me=
-an=0A=
-"use zone append". And same for the "RWF_REPORT_OFFSET". The point here is =
-that=0A=
-both O_APPEND and RWF_REPORT_OFFSET can be used with both regular writes an=
-d=0A=
-zone append writes, but none of them actually clearly specify if the=0A=
-application/user tolerates writing data to disk in a different order than t=
-he=0A=
-issuing order... So another flag to indicate "atomic out-of-order writes" (=
-=3D=3D=0A=
-zone append) ?=0A=
-=0A=
-Without a new flag, we can only have these cases to enable zone append:=0A=
-=0A=
-1) No O_APPEND: ignore RWF_REPORT_OFFSET and use regular writes using ->aio=
-_ofst=0A=
-=0A=
-2) O_APPEND without RWF_REPORT_OFFSET: use regular write with file size as=
-=0A=
-->aio_ofst (as done today already), do not report the write offset on compl=
-etion.=0A=
-=0A=
-3) O_APPEND with RWF_REPORT_OFFSET: use zone append, implying potentially o=
-ut of=0A=
-order writes.=0A=
-=0A=
-And case (3) is not nice. I would rather prefer something like:=0A=
-=0A=
-3) O_APPEND with RWF_REPORT_OFFSET: use regular write with file size as=0A=
-->aio_ofst (as done today already), report the write offset on completion.=
-=0A=
-=0A=
-4) O_APPEND with RWF_ATOMIC_APPEND: use zone append writes, do not report t=
-he=0A=
-write offset on completion.=0A=
-=0A=
-5) O_APPEND with RWF_ATOMIC_APPEND+RWF_REPORT_OFFSET: use zone append write=
-s,=0A=
-report the write offset on completion.=0A=
-=0A=
-RWF_ATOMIC_APPEND could also always imply RWF_REPORT_OFFSET. ANy aio with=
-=0A=
-RWF_ATOMIC_APPEND that is too large would be failed.=0A=
-=0A=
-Thoughts ?=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On Wed, Aug 5, 2020 at 11:27 AM Leon Romanovsky <leon@kernel.org> wrote:
+>
+> On Tue, Aug 04, 2020 at 07:07:58PM +0530, Md Haris Iqbal wrote:
+> > The rnbd_server module's communication manager (cm) initialization depends
+> > on the registration of the "network namespace subsystem" of the RDMA CM
+> > agent module. As such, when the kernel is configured to load the
+> > rnbd_server and the RDMA cma module during initialization; and if the
+> > rnbd_server module is initialized before RDMA cma module, a null ptr
+> > dereference occurs during the RDMA bind operation.
+> >
+> > Call trace below,
+> >
+> > [    1.904782] Call Trace:
+> > [    1.904782]  ? xas_load+0xd/0x80
+> > [    1.904782]  xa_load+0x47/0x80
+> > [    1.904782]  cma_ps_find+0x44/0x70
+> > [    1.904782]  rdma_bind_addr+0x782/0x8b0
+> > [    1.904782]  ? get_random_bytes+0x35/0x40
+> > [    1.904782]  rtrs_srv_cm_init+0x50/0x80
+> > [    1.904782]  rtrs_srv_open+0x102/0x180
+> > [    1.904782]  ? rnbd_client_init+0x6e/0x6e
+> > [    1.904782]  rnbd_srv_init_module+0x34/0x84
+> > [    1.904782]  ? rnbd_client_init+0x6e/0x6e
+> > [    1.904782]  do_one_initcall+0x4a/0x200
+> > [    1.904782]  kernel_init_freeable+0x1f1/0x26e
+> > [    1.904782]  ? rest_init+0xb0/0xb0
+> > [    1.904782]  kernel_init+0xe/0x100
+> > [    1.904782]  ret_from_fork+0x22/0x30
+> > [    1.904782] Modules linked in:
+> > [    1.904782] CR2: 0000000000000015
+> > [    1.904782] ---[ end trace c42df88d6c7b0a48 ]---
+> >
+> > All this happens cause the cm init is in the call chain of the module init,
+> > which is not a preferred practice.
+> >
+> > So remove the call to rdma_create_id() from the module init call chain.
+> > Instead register rtrs-srv as an ib client, which makes sure that the
+> > rdma_create_id() is called only when an ib device is added.
+> >
+> > Fixes: 9cb837480424 ("RDMA/rtrs: server: main functionality")
+> > Reported-by: kernel test robot <rong.a.chen@intel.com>
+> > Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+> > ---
+> >  drivers/infiniband/ulp/rtrs/rtrs-srv.c | 77 +++++++++++++++++++++++++-
+> >  drivers/infiniband/ulp/rtrs/rtrs-srv.h |  7 +++
+> >  2 files changed, 81 insertions(+), 3 deletions(-)
+>
+> Please don't send vX patches as reply-to in "git send-email" command.
+>
+> >
+> > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > index 0d9241f5d9e6..916f99464d09 100644
+> > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > @@ -16,6 +16,7 @@
+> >  #include "rtrs-srv.h"
+> >  #include "rtrs-log.h"
+> >  #include <rdma/ib_cm.h>
+> > +#include <rdma/ib_verbs.h>
+> >
+> >  MODULE_DESCRIPTION("RDMA Transport Server");
+> >  MODULE_LICENSE("GPL");
+> > @@ -31,6 +32,7 @@ MODULE_LICENSE("GPL");
+> >  static struct rtrs_rdma_dev_pd dev_pd;
+> >  static mempool_t *chunk_pool;
+> >  struct class *rtrs_dev_class;
+> > +static struct rtrs_srv_ib_ctx ib_ctx;
+> >
+> >  static int __read_mostly max_chunk_size = DEFAULT_MAX_CHUNK_SIZE;
+> >  static int __read_mostly sess_queue_depth = DEFAULT_SESS_QUEUE_DEPTH;
+> > @@ -2033,6 +2035,62 @@ static void free_srv_ctx(struct rtrs_srv_ctx *ctx)
+> >       kfree(ctx);
+> >  }
+> >
+> > +static int rtrs_srv_add_one(struct ib_device *device)
+> > +{
+> > +     struct rtrs_srv_ctx *ctx;
+> > +     int ret;
+> > +
+> > +     /*
+> > +      * Keep a track on the number of ib devices added
+> > +      */
+> > +     ib_ctx.ib_dev_count++;
+> > +
+> > +     if (!ib_ctx.rdma_init) {
+> > +             /*
+> > +              * Since our CM IDs are NOT bound to any ib device we will create them
+> > +              * only once
+> > +              */
+> > +             ctx = ib_ctx.srv_ctx;
+> > +             ret = rtrs_srv_rdma_init(ctx, ib_ctx.port);
+> > +             if (ret) {
+> > +                     /*
+> > +                      * We errored out here.
+> > +                      * According to the ib code, if we encounter an error here then the
+> > +                      * error code is ignored, and no more calls to our ops are made.
+> > +                      */
+> > +                     pr_err("Failed to initialize RDMA connection");
+> > +                     return ret;
+> > +             }
+> > +             ib_ctx.rdma_init = true;
+>
+> This rdma_init == false is equal to ib_ctx.ib_dev_count == 0 and the
+> logic can be simplified.
+
+Yes, this was the first logic in my head. But I have few thoughts,
+The below suggestions uses "ib_ctx.ib_dev_count" as a marker for
+successful execution of rtrs_srv_rdma_init() and not really an IB
+device count. Meaning if we have multiple calls to add, due to
+multiple devices, our count would stay 1. And while removal we might
+end up calling rdma_destroy_id() on our first remove call even though
+another device is still remaining.
+
+If we increment "ib_ctx.ib_dev_count" every time add is called, even
+before we call rtrs_srv_rdma_init() and irrespective of whether
+rtrs_srv_rdma_init() succeeds or not, then we are keeping a count of
+IB devices added. However, when remove is called, we now know the
+number of devices added, but not whether rtrs_srv_rdma_init() was
+successful or not. We may end up calling rdma_destroy_id() on NULL
+cm_ids
+
+Does this make sense or am I missing something?
+
+
+>
+> if (ib_ctx.ib_dev_count)
+>         return 0;
+>
+> ctx = ib_ctx.srv_ctx;
+> ret = rtrs_srv_rdma_init(ctx, ib_ctx.port);
+> if (ret)
+>         return ret;
+> ib_ctx.ib_dev_count++;
+> return 0;
+>
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void rtrs_srv_remove_one(struct ib_device *device, void *client_data)
+> > +{
+> > +     struct rtrs_srv_ctx *ctx;
+> > +
+> > +     ib_ctx.ib_dev_count--;
+> > +
+> > +     if (!ib_ctx.ib_dev_count && ib_ctx.rdma_init) {
+>
+> It is not kernel coding style.
+> if (ib_ctx.ib_dev_count)
+>         return;
+>
+> ctx = ib_ctx.srv_ctx;
+> rdma_destroy_id(ctx->cm_id_ip);
+> rdma_destroy_id(ctx->cm_id_ib);
+>
+> Thanks
+>
+> > +             /*
+> > +              * Since our CM IDs are NOT bound to any ib device we will remove them
+> > +              * only once, when the last device is removed
+> > +              */
+> > +             ctx = ib_ctx.srv_ctx;
+> > +             rdma_destroy_id(ctx->cm_id_ip);
+> > +             rdma_destroy_id(ctx->cm_id_ib);
+> > +             ib_ctx.rdma_init = false;
+> > +     }
+> > +}
+> > +
+> > +static struct ib_client rtrs_srv_client = {
+> > +     .name   = "rtrs_server",
+> > +     .add    = rtrs_srv_add_one,
+> > +     .remove = rtrs_srv_remove_one
+> > +};
+> > +
+> >  /**
+> >   * rtrs_srv_open() - open RTRS server context
+> >   * @ops:             callback functions
+> > @@ -2051,12 +2109,26 @@ struct rtrs_srv_ctx *rtrs_srv_open(struct rtrs_srv_ops *ops, u16 port)
+> >       if (!ctx)
+> >               return ERR_PTR(-ENOMEM);
+> >
+> > -     err = rtrs_srv_rdma_init(ctx, port);
+> > +     ib_ctx = (struct rtrs_srv_ib_ctx) {
+> > +             .srv_ctx        = ctx,
+> > +             .port           = port,
+> > +     };
+> > +
+> > +     err = ib_register_client(&rtrs_srv_client);
+> >       if (err) {
+> >               free_srv_ctx(ctx);
+> >               return ERR_PTR(err);
+> >       }
+> >
+> > +     /*
+> > +      * Since ib_register_client does not propagate the device add error
+> > +      * we check if the RDMA connection init was successful or not
+> > +      */
+> > +     if (!ib_ctx.rdma_init) {
+> > +             free_srv_ctx(ctx);
+> > +             return NULL;
+> > +     }
+> > +
+> >       return ctx;
+> >  }
+> >  EXPORT_SYMBOL(rtrs_srv_open);
+> > @@ -2090,8 +2162,7 @@ static void close_ctx(struct rtrs_srv_ctx *ctx)
+> >   */
+> >  void rtrs_srv_close(struct rtrs_srv_ctx *ctx)
+> >  {
+> > -     rdma_destroy_id(ctx->cm_id_ip);
+> > -     rdma_destroy_id(ctx->cm_id_ib);
+> > +     ib_unregister_client(&rtrs_srv_client);
+> >       close_ctx(ctx);
+> >       free_srv_ctx(ctx);
+> >  }
+> > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.h b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
+> > index dc95b0932f0d..6e9d9000cd8d 100644
+> > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.h
+> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
+> > @@ -118,6 +118,13 @@ struct rtrs_srv_ctx {
+> >       struct list_head srv_list;
+> >  };
+> >
+> > +struct rtrs_srv_ib_ctx {
+> > +     struct rtrs_srv_ctx     *srv_ctx;
+> > +     u16                     port;
+> > +     int                     ib_dev_count;
+> > +     bool                    rdma_init;
+> > +};
+> > +
+> >  extern struct class *rtrs_dev_class;
+> >
+> >  void close_sess(struct rtrs_srv_sess *sess);
+> > --
+> > 2.25.1
+> >
+
+
+
+-- 
+
+Regards
+-Haris
