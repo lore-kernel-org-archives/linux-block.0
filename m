@@ -2,107 +2,67 @@ Return-Path: <SRS0=yU/V=BP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 105C3C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 17:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D855DC433E1
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 17:39:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE62C22D00
-	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 17:01:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDFD722D37
+	for <linux-block@archiver.kernel.org>; Wed,  5 Aug 2020 17:39:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728276AbgHERBR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Aug 2020 13:01:17 -0400
-Received: from namei.org ([65.99.196.166]:57602 "EHLO namei.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728217AbgHERAT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Aug 2020 13:00:19 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by namei.org (8.14.4/8.14.4) with ESMTP id 075Gxe6x030131;
-        Wed, 5 Aug 2020 16:59:42 GMT
-Date:   Wed, 5 Aug 2020 09:59:40 -0700 (PDT)
-From:   James Morris <jmorris@namei.org>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-cc:     Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, zohar@linux.ibm.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com, paul@paul-moore.com,
-        corbet@lwn.net, nramas@linux.microsoft.com, serge@hallyn.com,
-        pasha.tatashin@soleen.com, jannh@google.com,
-        linux-block@vger.kernel.org, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, mdsakib@microsoft.com,
-        linux-kernel@vger.kernel.org, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
- LSM (IPE)
-In-Reply-To: <1596639689.3457.17.camel@HansenPartnership.com>
-Message-ID: <alpine.LRH.2.21.2008050934060.28225@namei.org>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>  <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>  <20200802143143.GB20261@amd>  <1596386606.4087.20.camel@HansenPartnership.com>  <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
- <1596639689.3457.17.camel@HansenPartnership.com>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+        id S1728914AbgHERjf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Aug 2020 13:39:35 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:50008 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728916AbgHERed (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Aug 2020 13:34:33 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 4663146D141309B3CA39;
+        Wed,  5 Aug 2020 21:37:19 +0800 (CST)
+Received: from huawei.com (10.175.127.227) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Wed, 5 Aug 2020
+ 21:37:08 +0800
+From:   Zheng Bin <zhengbin13@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>
+CC:     <yi.zhang@huawei.com>, <zhengbin13@huawei.com>
+Subject: [PATCH] block-throttle: set q->td to NULL if blkcg_activate_policy failed
+Date:   Wed, 5 Aug 2020 21:37:20 +0800
+Message-ID: <20200805133720.1008782-1-zhengbin13@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 5 Aug 2020, James Bottomley wrote:
+Otherwise q->td will point to the released memory, although there is
+no access to q->td in the following process, still recommend to do this.
 
-> I'll leave Mimi to answer, but really this is exactly the question that
-> should have been asked before writing IPE.  However, since we have the
-> cart before the horse, let me break the above down into two specific
-> questions.
+Signed-off-by: Zheng Bin <zhengbin13@huawei.com>
+---
+ block/blk-throttle.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The question is valid and it was asked. We decided to first prototype what 
-we needed and then evaluate if it should be integrated with IMA. We 
-discussed this plan in person with Mimi (at LSS-NA in 2019), and presented 
-a more mature version of IPE to LSS-NA in 2020, with the expectation that 
-such a discussion may come up (it did not).
-
-These patches are still part of this process and 'RFC' status.
-
->    1. Could we implement IPE in IMA (as in would extensions to IMA cover
->       everything).  I think the answers above indicate this is a "yes".
-
-It could be done, if needed.
-
->    2. Should we extend IMA to implement it?  This is really whether from a
->       usability standpoint two seperate LSMs would make sense to cover the
->       different use cases.
-
-One issue here is that IMA is fundamentally a measurement & appraisal 
-scheme which has been extended to include integrity enforcement. IPE was 
-designed from scratch to only perform integrity enforcement. As such, it 
-is a cleaner design -- "do one thing and do it well" is a good design 
-pattern.
-
-In our use-case, we utilize _both_ IMA and IPE, for attestation and code 
-integrity respectively. It is useful to be able to separate these 
-concepts. They really are different:
-
-- Code integrity enforcement ensures that code running locally is of known 
-provenance and has not been modified prior to execution.
-
-- Attestation is about measuring the health of a system and having that 
-measurement validated by a remote system. (Local attestation is useless).
-
-I'm not sure there is value in continuing to shoe-horn both of these into 
-IMA.
-
-
->  I've got to say the least attractive thing
->       about separation is the fact that you now both have a policy parser.
->        You've tried to differentiate yours by making it more Kconfig
->       based, but policy has a way of becoming user space supplied because
->       the distros hate config options, so I think you're going to end up
->       with a policy parser very like IMAs.
-
-
--- 
-James Morris
-<jmorris@namei.org>
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index fee3325edf27..05b87516eee9 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2399,6 +2399,7 @@ int blk_throtl_init(struct request_queue *q)
+ 		free_percpu(td->latency_buckets[READ]);
+ 		free_percpu(td->latency_buckets[WRITE]);
+ 		kfree(td);
++		q->td = NULL;
+ 	}
+ 	return ret;
+ }
+--
+2.25.4
 
