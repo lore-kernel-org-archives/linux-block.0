@@ -2,132 +2,119 @@ Return-Path: <SRS0=mumx=BQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CE9C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 17:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB1AC433E1
+	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 17:47:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EF22206C3
-	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 17:38:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 897BE206B2
+	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 17:47:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bMeu9VLD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TYLdMSTN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729685AbgHFRel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Aug 2020 13:34:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39642 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729382AbgHFRbn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Aug 2020 13:31:43 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 076EXCZP003778;
-        Thu, 6 Aug 2020 10:33:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=MrweLZr65tdDL5CZMf8GqFvMQW1Pa0eEhdhRCa8/Rl8=;
- b=bMeu9VLDdOGfRt59JZ1nCfEW4qn+TnVsKMh7ZkE8Rbrz6IK6zZ/7V46qw6msXhAK3x3X
- WjoZCzT0Ehh04xKqenqoLHPKjddYRzPlVLlwo0rvNkJONfmMk9hWFUn3gGoi9qORgbef
- 32sJwQ/xgAERC6vf3KcXSSnnB965i3l14tRIlHRYbOCneBpg7S9UM2Paxc44hy9tP/1b
- pFNra3BULZG4i/NbCagg6W43vHCisfiqrky2Mcd4icM8ZW2zw6zVwKEzYc7YfS/ZtwdJ
- VEY1Kcrpu3t5N+mG7D02qhqDv/Gl7cvl1TlVuzBDna74gIikinGUNqb1lsXYhKz0nv7R JQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32rhhk4k4a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Aug 2020 10:33:33 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 076EXXS5005245;
-        Thu, 6 Aug 2020 10:33:33 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32rhhk4k38-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Aug 2020 10:33:32 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 076EVGC6007671;
-        Thu, 6 Aug 2020 14:33:30 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 32n018bdfn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Aug 2020 14:33:30 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 076EW1RT62521766
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 Aug 2020 14:32:01 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D7DB4A4054;
-        Thu,  6 Aug 2020 14:33:27 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A08B0A405B;
-        Thu,  6 Aug 2020 14:33:22 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.58.181])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  6 Aug 2020 14:33:22 +0000 (GMT)
-Message-ID: <eb7a2f5b5cd22cf9231aa0fd8fdb77c729a83428.camel@linux.ibm.com>
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
- LSM (IPE)
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     James Morris <jmorris@namei.org>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com, paul@paul-moore.com,
-        corbet@lwn.net, nramas@linux.microsoft.com, serge@hallyn.com,
-        pasha.tatashin@soleen.com, jannh@google.com,
-        linux-block@vger.kernel.org, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, mdsakib@microsoft.com,
-        linux-kernel@vger.kernel.org, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Date:   Thu, 06 Aug 2020 10:33:21 -0400
-In-Reply-To: <alpine.LRH.2.21.2008060949410.20084@namei.org>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
-           <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
-           <20200802143143.GB20261@amd>
-           <1596386606.4087.20.camel@HansenPartnership.com>
-           <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
-         <1596639689.3457.17.camel@HansenPartnership.com>
-          <alpine.LRH.2.21.2008050934060.28225@namei.org>
-         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
-         <alpine.LRH.2.21.2008060949410.20084@namei.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-12.el8) 
-Mime-Version: 1.0
+        id S1729028AbgHFRrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Aug 2020 13:47:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25053 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727081AbgHFRrh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Aug 2020 13:47:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596736055;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
+        bh=+6FzmLvlaKV/NtfInk3NuAoke2rpjP5o1HfYuy15BlY=;
+        b=TYLdMSTNuk+vI5yMsahqs5YDPF+HNjUq06fsQQuA0x/6YnQov0ematY9tp3eer64/4NZbF
+        mTZwiNJLU3e3HvEsLTrXtlAsJArj0wHyCe495eQ+5dMQNrLDXL6PYaMqvPT842goTvsa91
+        LZquBkRrLw+UjgNJzWR93/RM7B5inBo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-qUlxRwU6MZKhuMvPMbot_A-1; Thu, 06 Aug 2020 13:47:34 -0400
+X-MC-Unique: qUlxRwU6MZKhuMvPMbot_A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 718601902EAB
+        for <linux-block@vger.kernel.org>; Thu,  6 Aug 2020 17:47:33 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A51F19D7E
+        for <linux-block@vger.kernel.org>; Thu,  6 Aug 2020 17:47:33 +0000 (UTC)
+Received: from zmail17.collab.prod.int.phx2.redhat.com (zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 642591809547
+        for <linux-block@vger.kernel.org>; Thu,  6 Aug 2020 17:47:33 +0000 (UTC)
+Date:   Thu, 6 Aug 2020 13:47:33 -0400 (EDT)
+From:   Jan Stancek <jstancek@redhat.com>
+To:     linux-block@vger.kernel.org
+Message-ID: <1929570063.6965184.1596736053281.JavaMail.zimbra@redhat.com>
+In-Reply-To: <94883604.6936811.1596720770623.JavaMail.zimbra@redhat.com>
+Subject: [bug] mkfs.ext[23] hangs on loop device (aarch64, 5.8+)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-06_09:2020-08-06,2020-08-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 bulkscore=0 impostorscore=0 malwarescore=0 mlxscore=0
- suspectscore=0 mlxlogscore=999 phishscore=0 spamscore=0 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008060104
+X-Originating-IP: [10.40.208.12, 10.4.195.11]
+Thread-Topic: mkfs.ext[23] hangs on loop device (aarch64, 5.8+)
+Thread-Index: vAzUT3U3p2m0D9LErJy2kxg88GiTfw==
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2020-08-06 at 09:51 +1000, James Morris wrote:
-> On Wed, 5 Aug 2020, Mimi Zohar wrote:
-> 
-> > If block layer integrity was enough, there wouldn't have been a need
-> > for fs-verity.   Even fs-verity is limited to read only filesystems,
-> > which makes validating file integrity so much easier.  From the
-> > beginning, we've said that fs-verity signatures should be included in
-> > the measurement list.  (I thought someone signed on to add that support
-> > to IMA, but have not yet seen anything.)
-> > 
-> > Going forward I see a lot of what we've accomplished being incorporated
-> > into the filesystems.  When IMA will be limited to defining a system
-> > wide policy, I'll have completed my job.
-> 
-> What are your thoughts on IPE being a standalone LSM? Would you prefer to 
-> see its functionality integrated into IMA?
+Hi,
 
-Improving the integrity subsystem would be preferred.
+I'm seeing sporadic mkfs.ext[23] hangs on loop device while running various
+LTP tests. It seems to hang indefinitely once in bad state:
+  0 D root       29782   29761  0  80   0 -  1006 rq_qos 15:09 ?        00:00:00             mkfs.ext3 /dev/loop0
 
-Mimi
+[19809.932566] mkfs.ext3       D    0 29782  29761 0x00000000 
+[19809.934000] Call trace: 
+[19809.934624]  __switch_to+0xfc/0x150 
+[19809.935533]  __schedule+0x364/0x828 
+[19809.936432]  schedule+0x58/0xe0 
+[19809.937261]  io_schedule+0x24/0xc0 
+[19809.938144]  rq_qos_wait+0xe4/0x150 
+[19809.939044]  wbt_wait+0x98/0xd8 
+[19809.939864]  __rq_qos_throttle+0x38/0x50 
+[19809.940847]  blk_mq_submit_bio+0x108/0x620 
+[19809.941890]  submit_bio_noacct+0x358/0x3d8 
+[19809.942909]  submit_bio+0x40/0x1a8 
+[19809.943770]  submit_bh_wbc+0x16c/0x1e8 
+[19809.944701]  __block_write_full_page+0x238/0x5c8 
+[19809.945862]  block_write_full_page+0x124/0x138 
+[19809.947000]  blkdev_writepage+0x24/0x30 
+[19809.948031]  __writepage+0x28/0xc8 
+[19809.948905]  write_cache_pages+0x1ac/0x410 
+[19809.949988]  generic_writepages+0x4c/0x88 
+[19809.950947]  blkdev_writepages+0x18/0x28 
+[19809.951934]  do_writepages+0x40/0xe8 
+[19809.952856]  __filemap_fdatawrite_range+0xe0/0x150 
+[19809.954066]  file_write_and_wait_range+0x9c/0x108 
+[19809.955266]  blkdev_fsync+0x24/0x50 
+[19809.956170]  vfs_fsync_range+0x3c/0x88 
+[19809.957126]  do_fsync+0x44/0x90 
+[19809.957925]  __arm64_sys_fsync+0x20/0x30 
+[19809.958961]  el0_svc_common.constprop.0+0x7c/0x188 
+[19809.960242]  do_el0_svc+0x2c/0x98 
+[19809.961028]  el0_sync_handler+0x84/0x110 
+[19809.962003]  el0_sync+0x15c/0x180 
+
+It started happening in recent weeks and appears to be aarch64 exclusive so far.
+
+Affected kernels are at least:
+  v5.8-475-g382625d0d432
+  v5.8-607-gcdc8fcb49905
+  v5.8-rc2-87-g6b7b181b67aa
+  v5.8-rc2-105-g492d76b21566
+
+6b7b181b67aa is the oldest commit I could reproduce it with, but my current
+reproducer (running LTP fgetxattr01 in loop for 30 minutes) doesn't look very
+reliable for bisect. 
+
+Does this ring any bells?
+
+Thanks,
+Jan
 
