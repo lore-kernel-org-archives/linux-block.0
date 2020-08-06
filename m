@@ -2,149 +2,95 @@ Return-Path: <SRS0=mumx=BQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 848B8C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 17:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10289C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 17:36:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E495A2311A
-	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 17:28:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EB6620855
+	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 17:36:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FHoOBE7o"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wi4dRPNx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729958AbgHFR2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Aug 2020 13:28:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44926 "EHLO
+        id S1730357AbgHFRgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Aug 2020 13:36:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729580AbgHFRBX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Aug 2020 13:01:23 -0400
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9197EC0A888C
-        for <linux-block@vger.kernel.org>; Thu,  6 Aug 2020 07:37:43 -0700 (PDT)
-Received: by mail-qk1-x742.google.com with SMTP id p25so4628155qkp.2
-        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2020 07:37:43 -0700 (PDT)
+        with ESMTP id S1730025AbgHFRfY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Aug 2020 13:35:24 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E9CBC008696
+        for <linux-block@vger.kernel.org>; Thu,  6 Aug 2020 08:16:37 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id x6so11713898pgx.12
+        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2020 08:16:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=uofPzPo8/gz5keGiK/hNj2Xy1wAVilpSBR98FKRPkhY=;
-        b=FHoOBE7obGEB61oBI5zKOHvyR/Tx13CR6Xl6YoQBzDOScOx6dS3ZZgpkLm6xhEy9lX
-         oHkqhzTq8LKg0oGXWQSGbz3iUT77UIupmbyJhj/l6TsylziXPT8Z/NpUTLrelfsfBt1u
-         6G6hlEBkxoFVTcb8Obe/9E45WlL/xECEI38Lc=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=lkmeDFCb+vAIp5A4XwAMAJW588/NOgnU33kU5Ds2q8U=;
+        b=wi4dRPNxYEFgOvGpsjjRxtDn2I9IamqHuFJzrb9/BuBRChg/enUxUB6jKiVJyf6FSn
+         OEQMb2RXR2Ht+C6Ju/CpXw+3C8IXjLBhGdgnDRc+0mD42UF2fgmfGBI+NDEQDfVS+FPg
+         8Yte0Alz1AaaMd1lh6L2ptLcnhrBzWalCQR42JDJeAyQD1H9NJDT0b18q5zQqirTk5sw
+         MQTa65RVxamAwTEOlvLR1qATaDfFMPrdnpkmrZ75l2JmkJ2Zy9MPxE1hZyGlCwG5lUWc
+         dMIBO4mmLkijKg2CX5kvhARvLNuj4R+a6FF2AhYbKN6g85KDBnPw2HmOoO1VsmzJJPBe
+         6lpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=uofPzPo8/gz5keGiK/hNj2Xy1wAVilpSBR98FKRPkhY=;
-        b=DcFut4dBkyTDMZT/TeD3y5Oz466c0lW2cEvvCjCd+HcYpwVAdCY8iHpg3uxi4bbUEX
-         22UaAWNmpEs/fmva18nUjT1TtR3NhlaYXuco2OQM3f9s1j2EFy3qY1Znx0U03Vc34eIz
-         hU92V0jeNcMiN7Jh6j9SyHhpf700x9Hpnt/3rgJJ7awSiIQg4/QlXtF0Nq4QtdvKuMVH
-         ScfbSi21g/Tad1xXkJ+eu10MelcKUriZ4fOS4QNGtfOoQRND7FHXoxQrVxxnSxYS/pZ8
-         SgErCwseVwrvI+xW/Gq8tHm/saSNekmtkxpmHIPL1Jnky29IYHRsZLRgEIJSFnr2qNXk
-         mM5w==
-X-Gm-Message-State: AOAM530mcrxcv89RnM3qEnmHVyv2kF/g1pg7172/stGhiCPVsqjJUan4
-        kiVDFxjBFxu0UdZ9t03gdQOO6vyg0k8Xnq8dr4BWiQ==
-X-Google-Smtp-Source: ABdhPJx2s3aCngtA0GA62InvUK4OfjmKQBTtkFInH2OLtfXpz9p9YQ34+Dg8V2LS++ho9T+hfOYkenONUXxzKMkfob4=
-X-Received: by 2002:ae9:e507:: with SMTP id w7mr8719554qkf.264.1596724661604;
- Thu, 06 Aug 2020 07:37:41 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <20200724024704.GB957464@T590> <6531e06c-9ce2-73e6-46fc-8e97400f07b2@huawei.com>
- <20200728084511.GA1326626@T590> <965cf22eea98c00618570da8424d0d94@mail.gmail.com>
- <20200729153648.GA1698748@T590> <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
- <20200804083625.GA1958244@T590> <afe5eb1be7f416a48d7b5d473f3053d0@mail.gmail.com>
- <20200805084031.GA1995289@T590> <5adffdf805179428bdd0dd6c293a4f7d@mail.gmail.com>
- <20200806133819.GA2046861@T590>
-In-Reply-To: <20200806133819.GA2046861@T590>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lkmeDFCb+vAIp5A4XwAMAJW588/NOgnU33kU5Ds2q8U=;
+        b=DXtAJi3ykNhMFC5yJlf7OF0d8SGenocnjpnvku0BnlhV0DilrEfV7ObvT/Y7Ta+U8k
+         j2tTLcVp8jeDKgz1nNMhnFQaUEHMU76RwMnins+bjhS8stdTAmUrcoYsQ3dZRi7Ae5Uz
+         ZAUN2VvWDsYMnKs8gaNHMF96xM7w1ovE1kNZSk3BMheTQWNaxQGtlhWLUp/SGC4qRncK
+         8YObFe1iz5Evwwlf6STRPgDDkPZYaYUFejDvA9qpqtk1UehJFy1k1C2k9O6aM5iFMce9
+         wgmd+2pvAAzVXW2FgI2+NoGCQGou0oQj3GsL44HAeMnP43W2K5IhqrE4tSc+TTNeq9cB
+         2KnQ==
+X-Gm-Message-State: AOAM533YVE2Z7r/XoQlFQ2n0GtGX6cXCb1Ldb5cG8kXjXmq1qwlePpC+
+        0B8PgUR+T7ciDzLEjtFTHmhUwQ==
+X-Google-Smtp-Source: ABdhPJw12jZ3DwVtFWJem2DsB0Vuvxs5W1jsJdh1xkbPJ6eXu/HRB7XOi58ujieN7nBfCOicKddtyw==
+X-Received: by 2002:a63:fd41:: with SMTP id m1mr1061769pgj.12.1596726996234;
+        Thu, 06 Aug 2020 08:16:36 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id b15sm7241610pjo.48.2020.08.06.08.16.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Aug 2020 08:16:35 -0700 (PDT)
+Subject: Re: [PATCH] blkcg: add plugging support for punt bio
+To:     Xianting Tian <xianting_tian@126.com>, tj@kernel.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1596722082-31817-1-git-send-email-xianting_tian@126.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8f84e1fe-9fa5-b7e7-1f2f-b0c4a40614e2@kernel.dk>
+Date:   Thu, 6 Aug 2020 09:16:34 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQE/+OJyWFKAouEWqnJEgB8EdgAUOQD9MwXwAyMjvw0CEOgTfwH/A0ecAffP3/8CJdMLTAMjpyDDAVIktm0BrCL65wHaXRyJqbWyCAA=
-Date:   Thu, 6 Aug 2020 20:07:38 +0530
-Message-ID: <f1ac35dfca34193e6c9bcedbc11911d2@mail.gmail.com>
-Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1596722082-31817-1-git-send-email-xianting_tian@126.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > Hi Ming -
-> >
-> > There is still some race which is not handled.  Take a case of IO is
-> > not able to get budget and it has already marked <restarts> flag.
-> > <restarts> flag will be seen non-zero in completion path and
-> > completion path will attempt h/w queue run. (But this particular IO is
-> > still not in s/w queue.).
-> > Attempt of running h/w queue from completion path will not flush any
-> > IO since there is no IO in s/w queue.
->
-> Then where is the IO to be submitted in case of running out of budget?
+On 8/6/20 7:54 AM, Xianting Tian wrote:
+> Try to merge continuous bio to current task's plug fisrt.
 
-Typical race in your latest patch is - (Lets consider command A,B and C)
-Command A did not receive budget. Command B completed  (which was already
-submitted earlier) at the same time and it make sdev->device_busy = 0 from
-" scsi_finish_command".
-Command B has still not called "scsi_end_request". Command C get the
-budget and it will make sdev->device_busy = 1. Now, Command A set  set
-sdev->restarts flags but will not run h/w queue since sdev->device_busy =
-1.
-Command B run h/w queue (make sdev->restart = 0) from completion path, but
-command -A is still not in the s/w queue. Command-A is in now in s/w
-queue. Command-C completed but it will not run h/w queue because
-sdev->restarts = 0.
+The patch looks fine to me, but I'd really like to see a bit more
+changelog here. The commit message should explain why the change
+is made, rather it's a very brief explanation of what it does.
+
+If the bio list is contiguous, then we do the plugging to improve
+merging at the lower level. You probably ran into a case where
+you saw sub-optimal merging? And now the performance is better
+with the patch? How much?
 
 
->
-> Any IO request which is going to be added to hctx->dispatch, the queue
-will be
-> re-run via blk-mq core.
->
-> Any IO request being issued directly when running out of budget will be
-insert
-> to hctx->dispatch or sw/scheduler queue, will be run in the submission
-path.
+-- 
+Jens Axboe
 
-I have *not* included below changes we discussed in my testing - If I
-include below patch, it is correct that queue will be run in submission
-path (at least the path which is impacted in my testing). You have already
-mentioned that most of the submission path has fix now in latest kernel
-w.r.t running h/w queue from submission path.  Below path is missing for
-running h/w queue from submission path.
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c index
-54f9015..bcfd33a 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -173,8 +173,10 @@ static int blk_mq_do_dispatch_ctx(struct
-blk_mq_hw_ctx *hctx)
-                if (!sbitmap_any_bit_set(&hctx->ctx_map))
-                        break;
-
--               if (!blk_mq_get_dispatch_budget(hctx))
-+               if (!blk_mq_get_dispatch_budget(hctx)) {
-+                       blk_mq_delay_run_hw_queue(hctx,
-+ BLK_MQ_BUDGET_DELAY);
-                        break;
-+               }
-
-                rq = blk_mq_dequeue_from_ctx(hctx, ctx);
-                if (!rq) {
-
-Are you saying above fix should be included along with your latest patch ?
-
->
->
-> Thanks,
-> Ming
