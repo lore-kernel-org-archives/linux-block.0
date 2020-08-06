@@ -2,169 +2,110 @@ Return-Path: <SRS0=mumx=BQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C08C433DF
-	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 16:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7CAC433DF
+	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 16:55:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4387423119
-	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 16:48:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E6dAO0wz"
+	by mail.kernel.org (Postfix) with ESMTP id 07DE32086A
+	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 16:55:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1596732931;
+	bh=PkSDuxH4gMr1p5NNDOd+BJDUZltAi1MaFL/oUyq7+/c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=sbma9XM2zNSr21Q5isxv5aoHtRZRoiBKt+R3cyBtbfF8d/uimekcR1EtCsFfnAzXg
+	 6AQC8RcKl9yORLU93lY7LyuYofIK9JHtIiLxES4TskTYzUBNY2S8NwKOkup8kr4owa
+	 Dap8kcvj3nHedfm1wfCRk5birrzw6gQSBN6mwS4c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728507AbgHFQsZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Aug 2020 12:48:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41786 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729513AbgHFQsM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Aug 2020 12:48:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596732490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=w+3IJDBpKnoEu5uWHtNsifCRebgdQ/7nqjgRKatFRHs=;
-        b=E6dAO0wzpKANDl6c8VY5XlpX9OnCLPnHXvyzSUpLjv2a/AEjuZN3nNKRJuIhBmESnWpyHn
-        26Sqvde3YywIA1XJZjRZDkQgOh+pq11Q43csebJlK77vM+5R87y8ifuVvdhURkRkZuuGbP
-        C+nW3Q/+/+ALRRXEBl/BfgMvFgMb5Gw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-SPqGxKsbMdaDgta-AJRkXw-1; Thu, 06 Aug 2020 11:29:57 -0400
-X-MC-Unique: SPqGxKsbMdaDgta-AJRkXw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE468800476;
-        Thu,  6 Aug 2020 15:29:54 +0000 (UTC)
-Received: from T590 (ovpn-13-169.pek2.redhat.com [10.72.13.169])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D71C60C47;
-        Thu,  6 Aug 2020 15:29:43 +0000 (UTC)
-Date:   Thu, 6 Aug 2020 23:29:39 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>
-Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-Message-ID: <20200806152939.GA2062348@T590>
-References: <20200728084511.GA1326626@T590>
- <965cf22eea98c00618570da8424d0d94@mail.gmail.com>
- <20200729153648.GA1698748@T590>
- <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
- <20200804083625.GA1958244@T590>
- <afe5eb1be7f416a48d7b5d473f3053d0@mail.gmail.com>
- <20200805084031.GA1995289@T590>
- <5adffdf805179428bdd0dd6c293a4f7d@mail.gmail.com>
- <20200806133819.GA2046861@T590>
- <f1ac35dfca34193e6c9bcedbc11911d2@mail.gmail.com>
+        id S1729824AbgHFQz1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Aug 2020 12:55:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44048 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729823AbgHFQzI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Aug 2020 12:55:08 -0400
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE10C0A8899;
+        Thu,  6 Aug 2020 07:48:07 -0700 (PDT)
+Received: by mail-qk1-x744.google.com with SMTP id l6so45138519qkc.6;
+        Thu, 06 Aug 2020 07:48:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=a1xsocRfe6PaWiMuQJu8Lspo4Zh0b85wGXl3XYk8ufs=;
+        b=DMKMT69gRdPULPdCvILu5fKZXK70+z1rgY5ogLdV8VbwGZtnQc8y9cLFan536wfABn
+         DVfDajuB5mXiiAWsvUqlFOQOOO2Qi6SUNGw18/LK7MVJUFjEBIMaxafZZ0sdzknW4xIK
+         pVMGYG0AHuOuOrxCVK2p3JDBg/5z8+RniT8feKgFdZjPiJjl3RkisvxN7YgXaw0naN9n
+         CetqkUtsJOy25/c33/B58UYx4OKSL0nfVRYYW42XMfpAmU0xnXvW+/TpYZsCagafQ9fp
+         PzoMofciAzX6FGzTkgVgsoJeNJyAPJjKQXIO4E1nDKCseuKZoKxXXmgv8iVWc7uHFent
+         ZOsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to;
+        bh=a1xsocRfe6PaWiMuQJu8Lspo4Zh0b85wGXl3XYk8ufs=;
+        b=aTHyqXKUlz1qMSulCcfGVDg2rrgFx1ULJ1/ibSuy7opyIGLf+JkBAJRaFz0WchT3U0
+         9zjeUFXV67b5LucvgDgXJ4lOu42jVAPGjCEOi7dxS1VK8gRAXREfrOMPFaP4ArrzMrNz
+         34ERq5hKqupVTYncjH178p5SJ3PlUa4FfvgTLmJMGLposlZBBXRhecf2bd0tpb5+b461
+         Fn3/xBjYOPQNk8Lz3z/qEUZjE/LOuGZb11cu9TjPSNFQK5n9GDn2797Gh2DS8zWeSqlB
+         V8qnDmEPw2XgOgJTPRmCEYAqozI2YQvJDnbXPvrfFYy8arFEwkFDTxDMIhD5FYNEMP2L
+         81aA==
+X-Gm-Message-State: AOAM531puOaS6GooklbSR5mas+1sy16CFTfbIyGEBxJRzNvHVSxl5PMC
+        vVydTUQ9E20b6xzg0i9jO7Y=
+X-Google-Smtp-Source: ABdhPJzqxqP829yKSm2tdy3vJHzQovc/SVxhj1gDbLQ+qgZ78ZCFwI2dV72KHT0S/yb9vOyw37Et5g==
+X-Received: by 2002:a37:9d53:: with SMTP id g80mr8575302qke.17.1596725286673;
+        Thu, 06 Aug 2020 07:48:06 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:2e8b])
+        by smtp.gmail.com with ESMTPSA id r188sm4380302qkb.122.2020.08.06.07.48.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Aug 2020 07:48:05 -0700 (PDT)
+Date:   Thu, 6 Aug 2020 10:48:04 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Muneendra Kumar M <muneendra.kumar@broadcom.com>,
+        James Smart <james.smart@broadcom.com>,
+        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, emilne@redhat.com, mkumar@redhat.com,
+        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
+        James Smart <jsmart2021@gmail.com>,
+        Ming Lei <tom.leiming@gmail.com>
+Subject: Re: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
+Message-ID: <20200806144804.GD4520@mtj.thefacebook.com>
+References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1596507196-27417-17-git-send-email-muneendra.kumar@broadcom.com>
+ <61d2fd75-84ea-798b-aee9-b07957ac8f1b@suse.de>
+ <08b9825b-6abb-c077-ac0d-bd63f10f2ac2@broadcom.com>
+ <aa595605c2f776148e03a8e5dd69168a@mail.gmail.com>
+ <20200806144135.GC4520@mtj.thefacebook.com>
+ <96930d0f-cb4d-94f4-9cbb-c82d2f0c3840@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <f1ac35dfca34193e6c9bcedbc11911d2@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <96930d0f-cb4d-94f4-9cbb-c82d2f0c3840@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 06, 2020 at 08:07:38PM +0530, Kashyap Desai wrote:
-> > > Hi Ming -
-> > >
-> > > There is still some race which is not handled.  Take a case of IO is
-> > > not able to get budget and it has already marked <restarts> flag.
-> > > <restarts> flag will be seen non-zero in completion path and
-> > > completion path will attempt h/w queue run. (But this particular IO is
-> > > still not in s/w queue.).
-> > > Attempt of running h/w queue from completion path will not flush any
-> > > IO since there is no IO in s/w queue.
-> >
-> > Then where is the IO to be submitted in case of running out of budget?
+On Thu, Aug 06, 2020 at 04:46:45PM +0200, Paolo Bonzini wrote:
+> On 06/08/20 16:41, Tejun Heo wrote:
+> >> 1)	blkcg will have a new field to store driver specific information as
+> >> "blkio_cg_ priv_data"(in the current patch it is app_identifier) as Tejun
+> >> said he doesn’t mind cgroup data structs carrying extra bits for stuff.
+> > 
+> > I'd make it something more specific - lpfc_app_id or something along that
+> > line.
 > 
-> Typical race in your latest patch is - (Lets consider command A,B and C)
-> Command A did not receive budget. Command B completed  (which was already
+> Note that there will be support in other drivers in all likelihood.
 
-Command A doesn't get budget, and A is still in sw/scheduler queue
-because we try to acquire budget before dequeuing request from sw/scheduler queue,
-see __blk_mq_do_dispatch_sched() and blk_mq_do_dispatch_ctx().
+Yeah, make it specific to the scope, whatever that may be. Just avoid names
+like priv which doesn't indicate anything about the scope or usage.
 
-Not consider direct issue, because the hw queue will be run explicitly
-when not getting budget, see __blk_mq_try_issue_directly.
+Thanks.
 
-Not consider command A being added to hctx->dispatch too, because blk-mq will
-re-run the queue, see blk_mq_dispatch_rq_list().
-
-
-> submitted earlier) at the same time and it make sdev->device_busy = 0 from
-> " scsi_finish_command".
-> Command B has still not called "scsi_end_request". Command C get the
-> budget and it will make sdev->device_busy = 1. Now, Command A set  set
-> sdev->restarts flags but will not run h/w queue since sdev->device_busy =
-> 1.
-
-Right.
-
-> Command B run h/w queue (make sdev->restart = 0) from completion path, but
-> command -A is still not in the s/w queue.
-
-Then you didn't answer my question about where A is, did you?
-
-> Command-A is in now in s/w queue. Command-C completed but it will not run h/w queue because
-> sdev->restarts = 0.
-
-Why does command-A become in sw/queue now?
-
-> 
-> 
-> >
-> > Any IO request which is going to be added to hctx->dispatch, the queue
-> will be
-> > re-run via blk-mq core.
-> >
-> > Any IO request being issued directly when running out of budget will be
-> insert
-> > to hctx->dispatch or sw/scheduler queue, will be run in the submission
-> path.
-> 
-> I have *not* included below changes we discussed in my testing - If I
-> include below patch, it is correct that queue will be run in submission
-> path (at least the path which is impacted in my testing). You have already
-> mentioned that most of the submission path has fix now in latest kernel
-> w.r.t running h/w queue from submission path.  Below path is missing for
-> running h/w queue from submission path.
-> 
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c index
-> 54f9015..bcfd33a 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -173,8 +173,10 @@ static int blk_mq_do_dispatch_ctx(struct
-> blk_mq_hw_ctx *hctx)
->                 if (!sbitmap_any_bit_set(&hctx->ctx_map))
->                         break;
-> 
-> -               if (!blk_mq_get_dispatch_budget(hctx))
-> +               if (!blk_mq_get_dispatch_budget(hctx)) {
-> +                       blk_mq_delay_run_hw_queue(hctx,
-> + BLK_MQ_BUDGET_DELAY);
->                         break;
-> +               }
-> 
->                 rq = blk_mq_dequeue_from_ctx(hctx, ctx);
->                 if (!rq) {
-> 
-> Are you saying above fix should be included along with your latest patch ?
-
-No.
-
-
-Thanks,
-Ming
-
+-- 
+tejun
