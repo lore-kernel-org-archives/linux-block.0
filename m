@@ -3,102 +3,109 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C28FC433E0
-	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 16:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B03C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 16:48:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0050204FD
-	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 16:37:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GTjj+zFz"
+	by mail.kernel.org (Postfix) with ESMTP id 427C423119
+	for <linux-block@archiver.kernel.org>; Thu,  6 Aug 2020 16:48:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1596732486;
+	bh=TxcI37xYGlh5VVaGEQ/+kCNChZHrER0jSVM9qEDhED0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=b3Tg62zecoquf9qxPlltA8SZJCmUcKxmi0j9Nu9YrfgIy2+85pePGLPkTdn1ft1wf
+	 aLez1enaN7kCXCXNBRbidOwPP5+dt1SNHXwO5JBTsob/XjaEc0G+Y+2DHv2hGdNbTy
+	 pqsyRT5d7wUV9ZR5ziVhzEA+kWoskFdkTRxxwhyE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728677AbgHFQhB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Aug 2020 12:37:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40950 "EHLO
+        id S1729445AbgHFQri (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Aug 2020 12:47:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728943AbgHFQfo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Aug 2020 12:35:44 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC16C002143
-        for <linux-block@vger.kernel.org>; Thu,  6 Aug 2020 09:26:19 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id b22so17460608oic.8
-        for <linux-block@vger.kernel.org>; Thu, 06 Aug 2020 09:26:19 -0700 (PDT)
+        with ESMTP id S1729199AbgHFQpH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Aug 2020 12:45:07 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B59C0A891E;
+        Thu,  6 Aug 2020 07:59:04 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id m7so13032505qki.12;
+        Thu, 06 Aug 2020 07:59:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=pxu3Wm2r5flCQF4ajF0ZQOQr9hhuPoaoinV7EW0aq9E=;
-        b=GTjj+zFzoQZmBwTymYpv21TWX3X1mPMVhYZYpml3lzqF66dRI9FLoY4OyWywaV9lrk
-         UYCjrudBk2SHIj92TS/Pk2H1caFBjfXCyzrlt1iA5shtbtylSfRorxusYKmCUfleHSxp
-         3fYqJu+Lxe5Jv1d4ipoi91YDs9ffcPHNNEtko=
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=OSIY4n9u4BA5DfE/QAbCFqX+1EU+SI7GkcMuyxTZUpU=;
+        b=qa+mG5KAISvLjomDAKx88uAnxDoBFnbPxWwt9sd16Ldnnf6NTA1X3pvAvqEycm2tgQ
+         2cFSQMDtKgZAuL6yM3MIdZ0ubvZdW6ZgQNmUReKHCM8Cgv2MKbKjSIKQSQ4jY9z/vgb2
+         W2nJAZ2rxSQx6/LZK+dKNI93ySEpowgHAGES2gqjwj+m+5lkXDl73LIyakfKmHf2bcC9
+         d5dpy49e3iXW77FOzS7mB9EfgH6lM5xeOLZZMPq7K+m+VAdVXkY7vbp2P9bx+d++W4jh
+         zUwUt5y/ghIMOlAvVgloP6Fa9zkp2WUuPRlvNYgVw05rLzviLodo260ujKPixtFYCWJQ
+         LMaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=pxu3Wm2r5flCQF4ajF0ZQOQr9hhuPoaoinV7EW0aq9E=;
-        b=es4zuih67ghZIjsHmaAbU7cMM8nY62LpXYyHIlAlwHeH8FPZPM11HNOwKSs4W2KdGm
-         XGvvQdobKwBG+o1jcQPo2NXfgKsbigerhR9BwBJudWjUGYGRmwb1qDhggQdP1E67qdJa
-         PqTyE0sySEldZQcNQqUsPiB5h4gSxS109ZLG9glqNMCzC2tvtJIHjtOQzHnQ+xQNtOl8
-         Ky9jgUki4CXwhmGcR2IehbJIQsBFpWlfxcPSTW/2WBTJrf9wKyn970gzlHzkDLGAKikH
-         f8BRNflGjuLeYSnZ5mUVbPjr4YKLJCJvkaC/QCMmXRU0qD5f4bnmsFLXfe9iAI2OEnnj
-         +8xQ==
-X-Gm-Message-State: AOAM531XofKn3b50KdAegUdFMGUQ0NSSftTKsJm9iDRWfIf+kz5swA5S
-        e/v7lqX6ctWvgJIqYeM71xJC9QRF+AHz5NhkfQn4yZn7Hfg=
-X-Google-Smtp-Source: ABdhPJzsu4+74unJwtfEF/ze3oQ7KrBdkPFX6BkXCd5uVPO+3TnTHDiRsh1vvpROH4ElAbCB7gVogQKaHJuNG8ljioY=
-X-Received: by 2002:aca:b988:: with SMTP id j130mr2741951oif.87.1596731178760;
- Thu, 06 Aug 2020 09:26:18 -0700 (PDT)
-From:   Muneendra Kumar M <muneendra.kumar@broadcom.com>
-References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
- <1596507196-27417-17-git-send-email-muneendra.kumar@broadcom.com>
- <61d2fd75-84ea-798b-aee9-b07957ac8f1b@suse.de> <08b9825b-6abb-c077-ac0d-bd63f10f2ac2@broadcom.com>
- <aa595605c2f776148e03a8e5dd69168a@mail.gmail.com> <227c5ba1-8a9c-3ec9-5a0f-662a4736c66f@redhat.com>
-In-Reply-To: <227c5ba1-8a9c-3ec9-5a0f-662a4736c66f@redhat.com>
-MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-thread-index: AQIDyhmBPqdmqCKUdNTZliBUbPkt/AI5BKetAom9APICL6c0jAMHD3TmAjtZC5OobtwMkA==
-Date:   Thu, 6 Aug 2020 21:56:16 +0530
-Message-ID: <b3350b999d5500ddef49a25aafee2ea6@mail.gmail.com>
-Subject: RE: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=OSIY4n9u4BA5DfE/QAbCFqX+1EU+SI7GkcMuyxTZUpU=;
+        b=FGB54Ad9ETP8dFgbcqqiMcTdgyijDgLZf+zHTJlfa0p8iqeTs3olfyif4H/5V5tt0W
+         CI/n29FD+lQD8ZF9zPqqA7fYZRM05F9IOb2KhpujIBnbejfibw1924Y0Y3KFIBpDqc+c
+         06tJZHb4PIZEgKva1Q7RCib3DKvf6rzYBvGEzOTdR+ncviJfLVYHZyXaxWAt97UMsNA3
+         UG23BA2HcKt+toKBWO4PlIKyydbn75JDYlINNRiXF29/TBvFiajRd124puKM5CwsXGEK
+         W6mkWG3vqZsMqSRzKwpfeIdT+f/eh7Mx92iqLGzFl62pOXISHPQQWw68hirUY76uWmhM
+         xPZw==
+X-Gm-Message-State: AOAM532wrD6w6gsPPaouBjqJMMf+0vOkt4kjcQ/fCvAg4NoPJ4uHpwD3
+        qS1P5jN9p8yzc7RIQHn3wB4=
+X-Google-Smtp-Source: ABdhPJzNW7cq60K1xZdQjUVIROpt6yNINVyPlzyHKbZ1Y+qKLiht41rtiLk/a+t5Dxaz6J59NYSs0w==
+X-Received: by 2002:a37:9e09:: with SMTP id h9mr8738357qke.361.1596725943107;
+        Thu, 06 Aug 2020 07:59:03 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:2e8b])
+        by smtp.gmail.com with ESMTPSA id i7sm4193602qkb.131.2020.08.06.07.59.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Aug 2020 07:59:02 -0700 (PDT)
+Date:   Thu, 6 Aug 2020 10:59:01 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Muneendra Kumar M <muneendra.kumar@broadcom.com>,
         James Smart <james.smart@broadcom.com>,
         Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Cc:     emilne@redhat.com, mkumar@redhat.com,
+        linux-scsi@vger.kernel.org, emilne@redhat.com, mkumar@redhat.com,
         Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
         James Smart <jsmart2021@gmail.com>,
-        Ming Lei <tom.leiming@gmail.com>, Tejun Heo <tj@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Ming Lei <tom.leiming@gmail.com>
+Subject: Re: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
+Message-ID: <20200806145901.GE4520@mtj.thefacebook.com>
+References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1596507196-27417-17-git-send-email-muneendra.kumar@broadcom.com>
+ <61d2fd75-84ea-798b-aee9-b07957ac8f1b@suse.de>
+ <08b9825b-6abb-c077-ac0d-bd63f10f2ac2@broadcom.com>
+ <aa595605c2f776148e03a8e5dd69168a@mail.gmail.com>
+ <20200806144135.GC4520@mtj.thefacebook.com>
+ <96930d0f-cb4d-94f4-9cbb-c82d2f0c3840@redhat.com>
+ <20200806144804.GD4520@mtj.thefacebook.com>
+ <b7fb1e9a-49c4-f639-475a-791a195be46b@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b7fb1e9a-49c4-f639-475a-791a195be46b@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Paolo,
+Hello, Paolo.
 
->3.As part of this interface user/deamon will provide the details of VM such
-> as UUID,PID on VM creation to the transport .
->The VM process, or the container process, is likely to be unprivileged and
->cannot obtain the permissions needed to do this; therefore, you need to
->cope with the situation where there is no PID yet in the cgroup, because
->the tool >that created the VM or container might be initializing the
->cgroup, but it might not have started the VM yet.  In that case there would
->be no PID.
+On Thu, Aug 06, 2020 at 04:54:21PM +0200, Paolo Bonzini wrote:
+> If I understand correctly, your only objection is that you'd rather not
+> have it specified with a file under /sys/kernel/cgroup, and instead you
+> would prefer to have it implemented as a ioctl for a magic file
+> somewhere else in sysfs?  I don't think there is any precedent for this,
+> and I'm not even sure where that sysfs file would be.
 
-Agreed.A
-small doubt. If the VM is started (running)then we can have the PID and   we
-can use the  PID?
+It just doesn't fit in the cgroupfs. I don't know where it should go for
+this specific case. That's for you guys to figure out. There are multiple
+precedences - e.g. how perf or bpf hooks into cgroup and others that I can't
+remember off the top of my head.
 
->Would it be possible to pass a file descriptor for the cgroup directory in
->sysfs, instead of the PID?
-Yes we can do that.
->Also what would the kernel API look like for this?  Would it have to be
->driver-specific?
+Thanks.
 
-The API should be generic and it should not be driver-specific.
-
-
-Regards,
-Muneendra.
+-- 
+tejun
