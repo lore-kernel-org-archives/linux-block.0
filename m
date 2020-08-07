@@ -2,88 +2,82 @@ Return-Path: <SRS0=1XAp=BR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 777E2C433DF
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 16:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CA1C433DF
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 16:41:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5291521744
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 16:37:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9413621744
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 16:41:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725936AbgHGQhW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Aug 2020 12:37:22 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:38775 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725970AbgHGQhU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Aug 2020 12:37:20 -0400
-Received: by mail-pj1-f65.google.com with SMTP id ep8so1162484pjb.3
-        for <linux-block@vger.kernel.org>; Fri, 07 Aug 2020 09:37:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IGOBihw2RaRydNVMv9yxROPAHrRNnsrTubbIJZmiX8U=;
-        b=NqkpApTwS6yDDd/jAwJrcxnp5k4cJ1Wj9igc+280i/USeCEUYg9baP3PXjBPkO+qLz
-         ltXtL61krTv58fA3SDVIBfP6scYxy7nS4wmWIhJzYrhkIlLsemHoMIWP7MKSmL4jqgjl
-         z9446jLoCIToTxBD4BqYNMWj7Zfzf5y3P2XK5F+usgLq0Ul0aMmZM1Gx9nvpEs5c78LR
-         eECexINYvMyJRrl1YClgw5Gn/XeDiuUy/V396oTHVXTNuYYEzn1QWwRFr4bFMhCVgHZV
-         +1a6LTGKoTf2F/TD4JjAv3POLXue5JvE/mOadiTuSMvygWGf9t3v3rOUxq9KGRXseYly
-         ftQQ==
-X-Gm-Message-State: AOAM532ZY2uN+VudsfvYmriqevovhL1VNU7BEH7zBGsARnjS2do4R8dM
-        F9uLXdLD1nSec0qbovN4wtw=
-X-Google-Smtp-Source: ABdhPJwolUnv+/WanlbsWum2u1Pemy3dezf66gK6kzbV1uxvZ/qoLd3mAya3yz/zSaGouUV280Ue5g==
-X-Received: by 2002:a17:90a:f2d7:: with SMTP id gt23mr14578990pjb.0.1596818239526;
-        Fri, 07 Aug 2020 09:37:19 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:d88d:857c:b14c:519a? ([2601:647:4802:9070:d88d:857c:b14c:519a])
-        by smtp.gmail.com with ESMTPSA id l63sm11093432pgl.24.2020.08.07.09.37.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Aug 2020 09:37:18 -0700 (PDT)
-Subject: Re: [PATCH v2 0/3] reduce quiesce time for lots of name spaces
-To:     Ming Lei <ming.lei@redhat.com>, Chao Leng <lengchao@huawei.com>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        kbusch@kernel.org, axboe@fb.com, hch@lst.de
-References: <20200807090559.29582-1-lengchao@huawei.com>
- <20200807134932.GA2122627@T590>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <d3bedf2b-58d5-667c-7f87-6334772a5772@grimberg.me>
-Date:   Fri, 7 Aug 2020 09:37:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726096AbgHGQli (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Aug 2020 12:41:38 -0400
+Received: from namei.org ([65.99.196.166]:57952 "EHLO namei.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725936AbgHGQli (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Aug 2020 12:41:38 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by namei.org (8.14.4/8.14.4) with ESMTP id 077Gf5ki013063;
+        Fri, 7 Aug 2020 16:41:05 GMT
+Date:   Sat, 8 Aug 2020 02:41:05 +1000 (AEST)
+From:   James Morris <jmorris@namei.org>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
+        snitzer@redhat.com, dm-devel@redhat.com,
+        tyhicks@linux.microsoft.com, agk@redhat.com, paul@paul-moore.com,
+        corbet@lwn.net, nramas@linux.microsoft.com, serge@hallyn.com,
+        pasha.tatashin@soleen.com, jannh@google.com,
+        linux-block@vger.kernel.org, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, mdsakib@microsoft.com,
+        linux-kernel@vger.kernel.org, eparis@redhat.com,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
+        jaskarankhurana@linux.microsoft.com
+Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
+ LSM (IPE)
+In-Reply-To: <eb7a2f5b5cd22cf9231aa0fd8fdb77c729a83428.camel@linux.ibm.com>
+Message-ID: <alpine.LRH.2.21.2008080240350.13040@namei.org>
+References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>           <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>           <20200802143143.GB20261@amd>           <1596386606.4087.20.camel@HansenPartnership.com>          
+ <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>         <1596639689.3457.17.camel@HansenPartnership.com>          <alpine.LRH.2.21.2008050934060.28225@namei.org>         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>        
+ <alpine.LRH.2.21.2008060949410.20084@namei.org> <eb7a2f5b5cd22cf9231aa0fd8fdb77c729a83428.camel@linux.ibm.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <20200807134932.GA2122627@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, 6 Aug 2020, Mimi Zohar wrote:
 
->> nvme_stop_queues quiesce queues for all name spaces, now quiesce one by
->> one, if there is lots of name spaces, sync wait long time(more than 10s).
->> Multipath can not fail over to retry quickly, cause io pause long time.
->> This is not expected.
->> To reduce quiesce time, we introduce async mechanism for sync SRCUs
->> and quiesce queue.
->>
+> On Thu, 2020-08-06 at 09:51 +1000, James Morris wrote:
+> > On Wed, 5 Aug 2020, Mimi Zohar wrote:
+> > 
+> > > If block layer integrity was enough, there wouldn't have been a need
+> > > for fs-verity.   Even fs-verity is limited to read only filesystems,
+> > > which makes validating file integrity so much easier.  From the
+> > > beginning, we've said that fs-verity signatures should be included in
+> > > the measurement list.  (I thought someone signed on to add that support
+> > > to IMA, but have not yet seen anything.)
+> > > 
+> > > Going forward I see a lot of what we've accomplished being incorporated
+> > > into the filesystems.  When IMA will be limited to defining a system
+> > > wide policy, I'll have completed my job.
+> > 
+> > What are your thoughts on IPE being a standalone LSM? Would you prefer to 
+> > see its functionality integrated into IMA?
 > 
-> Frankly speaking, I prefer to replace SRCU with percpu_refcount:
+> Improving the integrity subsystem would be preferred.
 > 
-> - percpu_refcount has much less memory footprint than SRCU, so we can simply
-> move percpu_refcount into request_queue, instead of adding more bytes
-> into each hctx by this patch
-> 
-> - percpu_ref_get()/percpu_ref_put() isn't slower than srcu_read_lock()/srcu_read_unlock().
-> 
-> - with percpu_refcount, we can remove 'srcu_idx' from hctx_lock/hctx_unlock()
 
-Ming, I don't have an issue with your preference, but I don't want to
-tie it to what Chao is attempting to fix.
+Are you planning to attend Plumbers? Perhaps we could propose a BoF 
+session on this topic.
 
-So we should either move forward with an srcu approach, or you please
-provide evidence to your claims if you are replacing the fast-path
-synchronization mechanism, as this warrants a very good justification.
+-- 
+James Morris
+<jmorris@namei.org>
+
