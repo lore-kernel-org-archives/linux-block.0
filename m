@@ -2,118 +2,85 @@ Return-Path: <SRS0=1XAp=BR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3B5C433DF
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 20:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94588C433E0
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 23:46:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AC3522CB3
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 20:40:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TGChyWMp"
+	by mail.kernel.org (Postfix) with ESMTP id 759DF20748
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 23:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727063AbgHGUkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Aug 2020 16:40:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46987 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727050AbgHGUkc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Aug 2020 16:40:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596832830;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q/uBji6wCVYsJwjqLVTeMkUOxFAJLI6meIhMywxPJMA=;
-        b=TGChyWMp+XPcKxlaIGjESbLAdgf7rolaPf7ge7EGyJVRknCC0qWmKiBpWlvRbMXUKX/qwj
-        eArAyg363pAYdmieA0WGqe3kJdHFJ9QyOPzwZ7CixduJ4n/kqOVW7k9Go9xoeT1PVKxwx1
-        Ka0qSHH2tuyNVKlHUC/M73tEb/n669w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-zbZ_F5eJORiQ_W9-bNn9Gw-1; Fri, 07 Aug 2020 16:40:26 -0400
-X-MC-Unique: zbZ_F5eJORiQ_W9-bNn9Gw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FE8110059A9;
-        Fri,  7 Aug 2020 20:40:25 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9AFCE1001B2C;
-        Fri,  7 Aug 2020 20:40:16 +0000 (UTC)
-Date:   Fri, 7 Aug 2020 16:40:15 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block <linux-block@vger.kernel.org>,
-        Alasdair G Kergon <agk@redhat.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Ignat Korchagin <ignat@cloudflare.com>,
-        JeongHyeon Lee <jhs2.lee@samsung.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        John Dorminy <jdorminy@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        yangerkun <yangerkun@huawei.com>
-Subject: Re: [git pull] device mapper changes for 5.9
-Message-ID: <20200807204015.GA2178@redhat.com>
-References: <20200807160327.GA977@redhat.com>
- <CAHk-=wiC=g-0yZW6QrEXRH53bUVAwEFgYxd05qgOnDLJYdzzcA@mail.gmail.com>
+        id S1726209AbgHGXq2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Aug 2020 19:46:28 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:45582 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbgHGXq2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Aug 2020 19:46:28 -0400
+Received: by mail-pf1-f193.google.com with SMTP id f193so1946016pfa.12
+        for <linux-block@vger.kernel.org>; Fri, 07 Aug 2020 16:46:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ANban76DzY8YtDad9UPwri3M9KHoqBxXkK+LfTFEkHw=;
+        b=K30H2/eWKlHwQ1MkDm1csINcSIhe+vQjo/20HZP3HHoVzvVEbgLgWIkDWGlhCh8VAG
+         kr3m0RHWqan+NGN2WyAvbCSwqEdBVOOgECciPOosfk7Rsm3VyKkUrecPOQUs7XnqZf26
+         0ukFgXKM6pCnkOxa4IylOPo2ttRWyxsBFEiKLg9Y63cwr9mQYIG0XK5KOlxhZFkEJ9dX
+         zHQpic0ull5i2JxJwCtcFZpuUBRWVDjWseTaN4bcMmDSYA/4cjEvCstRkqQdrPKDnCvv
+         W55juEFhe0IT7/ivEWQAdQnkDXQWcDGLaqQHcplsrSUC3NU5ycr1NKJmOLgShTNeg+lb
+         cDhA==
+X-Gm-Message-State: AOAM530g93HbpU8Fe5wL5rVCXRK5NzuWhFl1ExI2jwLyst9To0yAX/r4
+        aLQ/r77puHpOsg5q2yZIRaY=
+X-Google-Smtp-Source: ABdhPJxGk8DzDCI2jMfpFfN2PpZDpXywuEjdmyN3VN9gaiXej1l879LV58XYz9SgrrcDDG7eFXK9MQ==
+X-Received: by 2002:aa7:8c09:: with SMTP id c9mr15896625pfd.157.1596843987604;
+        Fri, 07 Aug 2020 16:46:27 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:3dec:a6f0:8cde:ad1c? ([2601:647:4802:9070:3dec:a6f0:8cde:ad1c])
+        by smtp.gmail.com with ESMTPSA id v11sm11910347pgs.22.2020.08.07.16.46.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Aug 2020 16:46:26 -0700 (PDT)
+Subject: Re: [PATCH v2 5/7] nvme: support nvme-tcp when runinng tests
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Omar Sandoval <osandov@osandov.com>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+References: <20200806191518.593880-1-sagi@grimberg.me>
+ <20200806191518.593880-6-sagi@grimberg.me>
+ <BYAPR04MB496517FF9B9E262ACD555A2686490@BYAPR04MB4965.namprd04.prod.outlook.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <bd794263-02d2-a723-44de-3a9f63723275@grimberg.me>
+Date:   Fri, 7 Aug 2020 16:46:24 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wiC=g-0yZW6QrEXRH53bUVAwEFgYxd05qgOnDLJYdzzcA@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <BYAPR04MB496517FF9B9E262ACD555A2686490@BYAPR04MB4965.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 07 2020 at  4:11pm -0400,
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-> On Fri, Aug 7, 2020 at 9:03 AM Mike Snitzer <snitzer@redhat.com> wrote:
-> >
-> > - DM crypt improvement to optionally avoid async processing via
-> >   workqueues for reads and/or writes -- via "no_read_workqueue" and
-> >   "no_write_workqueue" features.  This more direct IO processing
-> >   improves latency and throughput with faster storage.  Avoiding
-> >   workqueue IO submission for writes (DM_CRYPT_NO_WRITE_WORKQUEUE) is
-> >   a requirement for adding zoned block device support to DM crypt.
-> 
-> Is there a reason the async workqueue isn't removed entirely if it's not a win?
-> 
-> Or at least made to not be the default.
+>> +	tcp)
+>> +		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
+>> +		_have_configfs
+>> +		;;
+>>    	
+> Same as previous nvme-core nvmet configfs can use a helper.
 
-I haven't assessed it yet.
+So for every trtype instead of having:
 
-There are things like rbtree sorting that is also hooked off async, but
-that is more meaningful for rotational storage.
+	_have_modules nvmet nvme-core <trtype specific>
+	_have_configfs
 
-> Now it seems to be just optionally disabled, which seems the wrong way
-> around to me.
-> 
-> I do not believe async crypto has ever worked or been worth it.
-> Off-loaded crypto in the IO path, yes. Async using a workqueue? Naah.
-> 
-> Or do I misunderstand?
+You will have:
+	_have_nvme_fabrics_common
+	_have_modules <trtype specific>
 
-No, you've got it.
-
-My thinking was to introduce the ability to avoid the workqueue code via
-opt-in and then we can evaluate the difference it has on different
-classes of storage.
-
-More conservative approach that also allows me to not know the end from
-the beginning... this was work driven by others so on this point I
-rolled with what was proposed since I personally don't have the answer
-(yet) on whether workqueue is actually helpful.  Best to _really_ know
-that before removing it.
-
-I'll make a point to try to get more eyes on this to see if it makes
-sense to just eliminate the workqueue code entirely (or invert the
-default).  Will keep you updated.
-
-Mike
-
+Don't see it as an improvement...
