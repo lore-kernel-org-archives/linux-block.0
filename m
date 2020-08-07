@@ -2,116 +2,88 @@ Return-Path: <SRS0=1XAp=BR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C899C433E1
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 16:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 777E2C433DF
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 16:37:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 523F421744
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 16:20:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSKIwXro"
+	by mail.kernel.org (Postfix) with ESMTP id 5291521744
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 16:37:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726030AbgHGQUf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Aug 2020 12:20:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30210 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726013AbgHGQUf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Aug 2020 12:20:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596817233;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jMPDP9XQsj5mXOlGNwxFwliNhcRlrtrFyC5zgNTgfvs=;
-        b=iSKIwXrookUy5r+TQy6qiau40PKF6Dd25FgeaTUImcFE493NlVlKnYhk6wdPU426Ku+K2s
-        uVvO71YKYJ4rWpxinfCGeTEiC/fN8ZSOAU0U+Abg4wL8+oN0IjRH5FhE2nK1sfrv3qt7EA
-        tKzgsoBHzdijVjUg5SmwyK5RYOFI1Mo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-KJFjLhRkOauqD6sVbeStUg-1; Fri, 07 Aug 2020 12:20:32 -0400
-X-MC-Unique: KJFjLhRkOauqD6sVbeStUg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B32B6801A03;
-        Fri,  7 Aug 2020 16:20:30 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C9D321002382;
-        Fri,  7 Aug 2020 16:20:21 +0000 (UTC)
-Date:   Fri, 7 Aug 2020 12:20:21 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Ignat Korchagin <ignat@cloudflare.com>,
-        JeongHyeon Lee <jhs2.lee@samsung.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        John Dorminy <jdorminy@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        yangerkun <yangerkun@huawei.com>
-Subject: Re: [git pull] device mapper changes for 5.9
-Message-ID: <20200807162021.GA1065@redhat.com>
-References: <20200807160327.GA977@redhat.com>
+        id S1725936AbgHGQhW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Aug 2020 12:37:22 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:38775 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725970AbgHGQhU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Aug 2020 12:37:20 -0400
+Received: by mail-pj1-f65.google.com with SMTP id ep8so1162484pjb.3
+        for <linux-block@vger.kernel.org>; Fri, 07 Aug 2020 09:37:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IGOBihw2RaRydNVMv9yxROPAHrRNnsrTubbIJZmiX8U=;
+        b=NqkpApTwS6yDDd/jAwJrcxnp5k4cJ1Wj9igc+280i/USeCEUYg9baP3PXjBPkO+qLz
+         ltXtL61krTv58fA3SDVIBfP6scYxy7nS4wmWIhJzYrhkIlLsemHoMIWP7MKSmL4jqgjl
+         z9446jLoCIToTxBD4BqYNMWj7Zfzf5y3P2XK5F+usgLq0Ul0aMmZM1Gx9nvpEs5c78LR
+         eECexINYvMyJRrl1YClgw5Gn/XeDiuUy/V396oTHVXTNuYYEzn1QWwRFr4bFMhCVgHZV
+         +1a6LTGKoTf2F/TD4JjAv3POLXue5JvE/mOadiTuSMvygWGf9t3v3rOUxq9KGRXseYly
+         ftQQ==
+X-Gm-Message-State: AOAM532ZY2uN+VudsfvYmriqevovhL1VNU7BEH7zBGsARnjS2do4R8dM
+        F9uLXdLD1nSec0qbovN4wtw=
+X-Google-Smtp-Source: ABdhPJwolUnv+/WanlbsWum2u1Pemy3dezf66gK6kzbV1uxvZ/qoLd3mAya3yz/zSaGouUV280Ue5g==
+X-Received: by 2002:a17:90a:f2d7:: with SMTP id gt23mr14578990pjb.0.1596818239526;
+        Fri, 07 Aug 2020 09:37:19 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:d88d:857c:b14c:519a? ([2601:647:4802:9070:d88d:857c:b14c:519a])
+        by smtp.gmail.com with ESMTPSA id l63sm11093432pgl.24.2020.08.07.09.37.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Aug 2020 09:37:18 -0700 (PDT)
+Subject: Re: [PATCH v2 0/3] reduce quiesce time for lots of name spaces
+To:     Ming Lei <ming.lei@redhat.com>, Chao Leng <lengchao@huawei.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, axboe@fb.com, hch@lst.de
+References: <20200807090559.29582-1-lengchao@huawei.com>
+ <20200807134932.GA2122627@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <d3bedf2b-58d5-667c-7f87-6334772a5772@grimberg.me>
+Date:   Fri, 7 Aug 2020 09:37:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200807160327.GA977@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200807134932.GA2122627@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 07 2020 at 12:03pm -0400,
-Mike Snitzer <snitzer@redhat.com> wrote:
 
-> Hi Linus,
+>> nvme_stop_queues quiesce queues for all name spaces, now quiesce one by
+>> one, if there is lots of name spaces, sync wait long time(more than 10s).
+>> Multipath can not fail over to retry quickly, cause io pause long time.
+>> This is not expected.
+>> To reduce quiesce time, we introduce async mechanism for sync SRCUs
+>> and quiesce queue.
+>>
 > 
-> The following changes since commit 11ba468877bb23f28956a35e896356252d63c983:
+> Frankly speaking, I prefer to replace SRCU with percpu_refcount:
 > 
->   Linux 5.8-rc5 (2020-07-12 16:34:50 -0700)
+> - percpu_refcount has much less memory footprint than SRCU, so we can simply
+> move percpu_refcount into request_queue, instead of adding more bytes
+> into each hctx by this patch
 > 
-> are available in the Git repository at:
+> - percpu_ref_get()/percpu_ref_put() isn't slower than srcu_read_lock()/srcu_read_unlock().
 > 
->   git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.9/dm-changes
-> 
-> for you to fetch changes up to a9cb9f4148ef6bb8fabbdaa85c42b2171fbd5a0d:
-> 
->   dm: don't call report zones for more than the user requested (2020-08-04 16:31:12 -0400)
-> 
-> Please pull, thanks!
-> Mike
-> 
-> ----------------------------------------------------------------
-> - DM multipath locking fixes around m->flags tests and improvements to
->   bio-based code so that it follows patterns established by
->   request-based code.
-> 
-> - Request-based DM core improvement to eliminate unnecessary call to
->   blk_mq_queue_stopped().
-> 
-> - Add "panic_on_corruption" error handling mode to DM verity target.
-> 
-> - DM bufio fix to to perform buffer cleanup from a workqueue rather
->   than wait for IO in reclaim context from shrinker.
-> 
-> - DM crypt improvement to optionally avoid async processing via
->   workqueues for reads and/or writes -- via "no_read_workqueue" and
->   "no_write_workqueue" features.  This more direct IO processing
->   improves latency and throughput with faster storage.  Avoiding
->   workqueue IO submission for writes (DM_CRYPT_NO_WRITE_WORKQUEUE) is
->   a requirement for adding zoned block device support to DM crypt.
+> - with percpu_refcount, we can remove 'srcu_idx' from hctx_lock/hctx_unlock()
 
-I forgot to note that you'll get a trivial merge conflict in dm-crypt.c
-due to commit ed00aabd5eb9f (" block: rename generic_make_request to
-submit_bio_noacct").
+Ming, I don't have an issue with your preference, but I don't want to
+tie it to what Chao is attempting to fix.
 
-Mike
-
+So we should either move forward with an srcu approach, or you please
+provide evidence to your claims if you are replacing the fast-path
+synchronization mechanism, as this warrants a very good justification.
