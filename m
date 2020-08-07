@@ -2,147 +2,117 @@ Return-Path: <SRS0=1XAp=BR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB7AC433E3
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 18:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59299C433DF
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 19:02:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EA13214F1
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 18:41:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aTmpZW6U"
+	by mail.kernel.org (Postfix) with ESMTP id 3EF3B22CB3
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 19:02:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgHGSlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Aug 2020 14:41:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25718 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725934AbgHGSla (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Aug 2020 14:41:30 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 077IWcs8138382;
-        Fri, 7 Aug 2020 14:41:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=scLijddAQxxvzyBL250XmvRIuc/rIbbpJTd4TVfs54c=;
- b=aTmpZW6UcTt+igxA2xxD3z7uZIN+1YMeSfR9aDB5dMqapEOJI9SdViQiDfxZnthUx1sz
- tiwCZLxevVjAqzu92IG4Y9weYgbM33UxXHgMFprHsLL8dsEnl+HGPDAzf9aeMP/5Rnsp
- TBeE2GubUqtsqJyRs5tRHZ3Ft8D9HAIxwxf1cjzohk6v92XCZczQbpt+0WHFKrDlnNdB
- vcN/vK4pCRyRTIbpDQQq4DxRss6inhMmlA2WJL9CVCxjLB5BXT6iDhrPYhW9k9paAq8v
- aqvovm0Lp5r7rLXo3y+lZtGDy3kIQbd75LKzqqn1BfTP2gujo6aVavGrFJcAD+48iByt OQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32s06wdce0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Aug 2020 14:41:07 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 077IXkH6142677;
-        Fri, 7 Aug 2020 14:41:06 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32s06wdccq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Aug 2020 14:41:06 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 077IbDhl014236;
-        Fri, 7 Aug 2020 18:41:03 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 32mynh6wxn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Aug 2020 18:41:03 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 077If17q52167164
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 7 Aug 2020 18:41:01 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E59FA4054;
-        Fri,  7 Aug 2020 18:41:01 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE0FAA405B;
-        Fri,  7 Aug 2020 18:40:55 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.67.166])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  7 Aug 2020 18:40:55 +0000 (GMT)
-Message-ID: <268edec96cbe7d2626c9158b806e8865b6b1b8ed.camel@linux.ibm.com>
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
- LSM (IPE)
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     James Morris <jmorris@namei.org>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com, paul@paul-moore.com,
-        corbet@lwn.net, nramas@linux.microsoft.com, serge@hallyn.com,
-        pasha.tatashin@soleen.com, jannh@google.com,
-        linux-block@vger.kernel.org, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, mdsakib@microsoft.com,
-        linux-kernel@vger.kernel.org, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Date:   Fri, 07 Aug 2020 14:40:54 -0400
-In-Reply-To: <4a764c86a824a4b931dd7f130ce7afce7df140e4.camel@linux.ibm.com>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
-         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
-         <20200802143143.GB20261@amd>
-         <1596386606.4087.20.camel@HansenPartnership.com>
-         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
-         <1596639689.3457.17.camel@HansenPartnership.com>
-         <alpine.LRH.2.21.2008050934060.28225@namei.org>
-         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
-         <alpine.LRH.2.21.2008060949410.20084@namei.org>
-         <eb7a2f5b5cd22cf9231aa0fd8fdb77c729a83428.camel@linux.ibm.com>
-         <alpine.LRH.2.21.2008080240350.13040@namei.org>
-         <4a764c86a824a4b931dd7f130ce7afce7df140e4.camel@linux.ibm.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-12.el8) 
-Mime-Version: 1.0
+        id S1726045AbgHGTCe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Aug 2020 15:02:34 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:42897 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726030AbgHGTCe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Aug 2020 15:02:34 -0400
+Received: by mail-pf1-f195.google.com with SMTP id 17so1501918pfw.9;
+        Fri, 07 Aug 2020 12:02:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=e/4L0H4SJbPs3M2E8mZc8AFfRIMo45dy4anV29SuqcE=;
+        b=F4rRx5fxxRap48M+j4AFPEECNvdrXT7+aS336MhbcFfHXsKghxJ5CChf8ZtkULboE6
+         AvjRNbhw/HrCya67ak8mb1wYM3Mbtsst/np2M5bNDhtRao6tGlS30Bapw1w3DG0ZoR+8
+         cjRd396iNaNfnNKDAIAmdkC7JZQMUzbQcQLaYpLtc7Ot1I1J7GNh1LBP83gcR5Fyx7Uu
+         2jX8eq1b5JgOvO+hv+rhJQLbIYhhbLtEtxcalElMn7N+Fy3eOd5Fv/aC0SLOoWOKVZxo
+         sI9A3Bdk8/4u3NvbJQ8wyTg8YFXVzQS4drkskjdFfVri+HVe9TK8H2P4Bynh7fOwd7uc
+         rnDg==
+X-Gm-Message-State: AOAM533xLlNmHx8IMCoCAwvhXnf+tDvTn033tcP9AFR4rh6FNmFuY/nq
+        fm0m6QwAJZD4mhOo0BOEatqYE6CI
+X-Google-Smtp-Source: ABdhPJzhP+lbCK+ZrgyIsiqOeUAhPzeXQG2oBUkxyxdQspWyl2prnnYwJIk7dq7y2EcI8U3Rn8Hrug==
+X-Received: by 2002:a62:7644:: with SMTP id r65mr14291885pfc.271.1596826952786;
+        Fri, 07 Aug 2020 12:02:32 -0700 (PDT)
+Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id t17sm12037827pgu.30.2020.08.07.12.02.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Aug 2020 12:02:31 -0700 (PDT)
+Subject: Re: [PATCH] block: fix get_max_io_size()
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Eric Deal <eric.deal@wdc.com>, stable@vger.kernel.org
+References: <20200806215837.3968445-1-kbusch@kernel.org>
+ <88d4db76-b912-8987-cfac-a2b926fbfe3d@acm.org>
+ <c2275412-5106-e0a3-63db-a7b0ceedd1d3@acm.org>
+ <20200807032437.GC3797376@dhcp-10-100-145-180.wdl.wdc.com>
+ <60baf63a-6264-812e-15e6-b0a28b07329f@acm.org>
+ <20200807171001.GA4155677@dhcp-10-100-145-180.wdl.wdc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <170914cf-b8f3-a262-7679-989d0182d6d0@acm.org>
+Date:   Fri, 7 Aug 2020 12:02:30 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200807171001.GA4155677@dhcp-10-100-145-180.wdl.wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-07_16:2020-08-06,2020-08-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- malwarescore=0 suspectscore=0 phishscore=0 lowpriorityscore=0 bulkscore=0
- impostorscore=0 spamscore=0 mlxscore=0 priorityscore=1501 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008070128
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2020-08-07 at 13:31 -0400, Mimi Zohar wrote:
-> On Sat, 2020-08-08 at 02:41 +1000, James Morris wrote:
-> > On Thu, 6 Aug 2020, Mimi Zohar wrote:
-> > 
-> > > On Thu, 2020-08-06 at 09:51 +1000, James Morris wrote:
-> > > > On Wed, 5 Aug 2020, Mimi Zohar wrote:
-> > > > 
-> > > > > If block layer integrity was enough, there wouldn't have been a need
-> > > > > for fs-verity.   Even fs-verity is limited to read only filesystems,
-> > > > > which makes validating file integrity so much easier.  From the
-> > > > > beginning, we've said that fs-verity signatures should be included in
-> > > > > the measurement list.  (I thought someone signed on to add that support
-> > > > > to IMA, but have not yet seen anything.)
-> > > > > 
-> > > > > Going forward I see a lot of what we've accomplished being incorporated
-> > > > > into the filesystems.  When IMA will be limited to defining a system
-> > > > > wide policy, I'll have completed my job.
-> > > > 
-> > > > What are your thoughts on IPE being a standalone LSM? Would you prefer to 
-> > > > see its functionality integrated into IMA?
-> > > 
-> > > Improving the integrity subsystem would be preferred.
-> > > 
-> > 
-> > Are you planning to attend Plumbers? Perhaps we could propose a BoF 
-> > session on this topic.
+On 2020-08-07 10:10, Keith Busch wrote:
+> On Fri, Aug 07, 2020 at 07:18:49AM -0700, Bart Van Assche wrote:
+>> Hi Keith,
+>>
+>> How about replacing your patch with the (untested) patch below?
 > 
-> That sounds like a good idea.
+> 
+> I believe that should be fine, but I broke the kernel last time I did
+> something like that. I still think it was from incorrect queue_limits,
+> but Linus disagreed.
+> 
+>  * http://lkml.iu.edu/hypermail/linux/kernel/1601.2/03994.html
 
-Other than it is already sold out.
+Hi Keith,
 
-Mimi
+Thanks for the interesting link. Regarding Linus' comments about bio
+splitting: if the last return statement in get_max_io_size() is reached
+then it is guaranteed that sectors < pbs (physical block size). So I think
+that Linus' comment applies to the previous return statement instead of to
+the last ("return max_sectors - start_offset;"). However, I think it is
+already guaranteed that that value is a multiple of the logical block size
+because start_offset is a multiple of the logical block size and because
+of the following statement: "max_sectors &= ~(pbs - 1);".
+
+Bart.
+
 
