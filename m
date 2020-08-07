@@ -5,143 +5,105 @@ X-Spam-Level:
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A46DC433DF
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 08:18:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC53C433E1
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 08:53:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9DF2206B5
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 08:18:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBC44206B5
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 08:53:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQC4hF9p"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="Wh5GOcai"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726428AbgHGISv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Aug 2020 04:18:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36514 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726382AbgHGISv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Aug 2020 04:18:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596788329;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=7pyXpMpwultrhsTRYVTQ9XzKB7Vrf+BItu53IKx9U80=;
-        b=CQC4hF9pvWNkJ57oXOta839mbllpPV80optsT8XSbrchO4hoP1tzRfm9+pqLtOfnvxHAjA
-        swZ5kRe5jPb3A+YTZimJ1eqQq92htnxdtFQGfqteobM8+WsLUq2S+lrx7Fc+MetUEDJU5H
-        OEhasVfugWEu3EKFWjxhDw2UiK8f548=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-l2qv5uu0OfaXTWnVN8PF7Q-1; Fri, 07 Aug 2020 04:18:44 -0400
-X-MC-Unique: l2qv5uu0OfaXTWnVN8PF7Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB176100AA21;
-        Fri,  7 Aug 2020 08:18:42 +0000 (UTC)
-Received: from localhost (ovpn-13-193.pek2.redhat.com [10.72.13.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 223ED65C88;
-        Fri,  7 Aug 2020 08:18:38 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        David Jeffery <djeffery@redhat.com>,
-        kernel test robot <rong.a.chen@intel.com>
-Subject: [PATCH] blk-mq: order adding requests to hctx->dispatch and checking SCHED_RESTART
-Date:   Fri,  7 Aug 2020 16:16:16 +0800
-Message-Id: <20200807081616.2110165-1-ming.lei@redhat.com>
+        id S1726609AbgHGIxP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Aug 2020 04:53:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50414 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727808AbgHGIxO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Aug 2020 04:53:14 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40AA9C061575
+        for <linux-block@vger.kernel.org>; Fri,  7 Aug 2020 01:53:14 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id t6so1365846ljk.9
+        for <linux-block@vger.kernel.org>; Fri, 07 Aug 2020 01:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3FGWnMv3Ra19uyn9AeOMIZCjrthqxBwjXKI+/nqj324=;
+        b=Wh5GOcaifky54Z0qvkUeHFxg4l6hxxPVxyMNzLfFd+JZdNm5kBkLJzYa0vKm3Myz3p
+         p4vxnOG/3h2NE9YQ9plmXzFRsHXZ7qxhVZCPViXuh3oIWgzk3NDoMju0C1bePkzmV3E8
+         9xeCfFbwFn+FiFOeltHwMD+7BeUiz7+76iCbsHcx6cbo62xiAvMi4tebmR4Gm32XqTG3
+         ZzlLefC7wjerYHpaziffpGq6cSxwvFPMu8HoPWuaT9xRoyiFTOdw7glN8ocYZ054vDlh
+         7yq0Cp6ypUXOvVXDDLq9HpGttUu5TGdyKIu/LVwh3hIAxXpryqzAKWguPGrMehIcZJv9
+         Nh3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3FGWnMv3Ra19uyn9AeOMIZCjrthqxBwjXKI+/nqj324=;
+        b=VXAnfDi4Ql9HKw8dbh0wdPEzLB1TuNhLe2+zlJ6Z4pMQDGml7Z0day8tWE3Pbzds9L
+         19o+FSqDMfrFwt3WJXE6E95k0Cr3qdEo//hn1W1ubpDKBJso6rReDDEdpGeP1hovBEEw
+         dQ4k06fXBAPVa6l8TV+jX6EpE8m49u4B60b5Mra60heVr4lgWQRqh6rnSYHY2BoEzDTX
+         ckDD3wDvNLYvB3nmi0qXomTWwRtWvgk4GN0fxdNjbNpjvwujURCaAF2vgiClqK7DICY9
+         vP9K8RzOgBcy+D38xft81HtV073iS2uSgoUuQ2ceBGDHNAJNGVFHhm6/CssYc8MzGSRi
+         ojhg==
+X-Gm-Message-State: AOAM532dxCxwJMNCcTV0xvswI8hmisDmg+Rqoi4qAr0+D6ooFmMCN1xO
+        l8Mog3oJ30t5Xxbw5QBYvtPH5UcDsQSPudJkXTR9AA==
+X-Google-Smtp-Source: ABdhPJwqNVj6y5QwfXGcMVHxInI7wVfNpkbo123V4cqKumR5s4fH+faLV4b2UpJjLlEafDEwwON+Da8q7rwcR8sHcw4=
+X-Received: by 2002:a2e:9913:: with SMTP id v19mr5415222lji.292.1596790392713;
+ Fri, 07 Aug 2020 01:53:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20200806073221.GA219724@gardel-login>
+In-Reply-To: <20200806073221.GA219724@gardel-login>
+From:   Martijn Coenen <maco@android.com>
+Date:   Fri, 7 Aug 2020 10:53:01 +0200
+Message-ID: <CAB0TPYEsRPxiVLS7ieBLJprje_avAo49n7QWExpovuLBJHkOGw@mail.gmail.com>
+Subject: Re: [PATCH] loop: unset GENHD_FL_NO_PART_SCAN on LOOP_CONFIGURE
+To:     Lennart Poettering <mzxreary@0pointer.de>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SCHED_RESTART code path is relied to re-run queue for dispatch requests
-in hctx->dispatch. Meantime the SCHED_RSTART flag is checked when adding
-requests to hctx->dispatch.
+Hi Lennart,
 
-memory barriers have to be used for ordering the following two pair of OPs:
+Thanks again for the patch, I tested it and it looks good to me. I'll
+also add a test case to LTP for this. Two minor nits on the patch:
 
-1) adding requests to hctx->dispatch and checking SCHED_RESTART in
-blk_mq_dispatch_rq_list()
+On Thu, Aug 6, 2020 at 9:32 AM Lennart Poettering <mzxreary@0pointer.de> wrote:
+> Let's correct that and propagate the flag in LOOP_SETSTATUS too.
 
-2) clearing SCHED_RESTART and checking if there is request in hctx->dispatch
-in blk_mq_sched_restart().
+Think you meant LOOP_CONFIGURE.
 
-Without the added memory barrier, either:
+Also, could you add a "Fixes" tag, like:
 
-1) blk_mq_sched_restart() may miss requests added to hctx->dispatch meantime
-blk_mq_dispatch_rq_list() observes SCHED_RESTART, and not run queue in
-dispatch side
+Fixes: 3448914e8cc5("loop: Add LOOP_CONFIGURE ioctl")
 
-or
 
-2) blk_mq_dispatch_rq_list still sees SCHED_RESTART, and not run queue
-in dispatch side, meantime checking if there is request in
-hctx->dispatch from blk_mq_sched_restart() is missed.
-
-IO hang in ltp/fs_fill test is reported by kernel test robot:
-
-	https://lkml.org/lkml/2020/7/26/77
-
-Turns out it is caused by the above out-of-order OPs. And the IO hang
-can't be observed any more after applying this patch.
-
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: David Jeffery <djeffery@redhat.com>
-Reported-by: kernel test robot <rong.a.chen@intel.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 9 +++++++++
- block/blk-mq.c       | 9 +++++++++
- 2 files changed, 18 insertions(+)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index a19cdf159b75..d2790e5b06d1 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -78,6 +78,15 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
- 		return;
- 	clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
- 
-+	/*
-+	 * Order clearing SCHED_RESTART and list_empty_careful(&hctx->dispatch)
-+	 * in blk_mq_run_hw_queue(). Its pair is the barrier in
-+	 * blk_mq_dispatch_rq_list(). So dispatch code won't see SCHED_RESTART,
-+	 * meantime new request added to hctx->dispatch is missed to check in
-+	 * blk_mq_run_hw_queue().
-+	 */
-+	smp_mb();
-+
- 	blk_mq_run_hw_queue(hctx, true);
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0015a1892153..6c1c3ad175a9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1437,6 +1437,15 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 		list_splice_tail_init(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
- 
-+		/*
-+		 * Order adding requests to hctx->dispatch and checking
-+		 * SCHED_RESTART flag. The pair of this smp_mb() is the one
-+		 * in blk_mq_sched_restart(). Avoid restart code path to
-+		 * miss the new added requests to hctx->dispatch, meantime
-+		 * SCHED_RESTART is observed here.
-+		 */
-+		smp_mb();
-+
- 		/*
- 		 * If SCHED_RESTART was set by the caller of this function and
- 		 * it is no longer set that means that it was cleared by another
--- 
-2.25.2
-
+>
+> Signed-off-by: Lennart Poettering <lennart@poettering.net>
+> ---
+>  drivers/block/loop.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index d18160146226..2f137d6ce169 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1171,6 +1171,8 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+>         if (part_shift)
+>                 lo->lo_flags |= LO_FLAGS_PARTSCAN;
+>         partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+> +       if (partscan)
+> +               lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
+>
+>         /* Grab the block_device to prevent its destruction after we
+>          * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+> --
+> 2.26.2
