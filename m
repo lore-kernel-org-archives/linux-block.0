@@ -2,70 +2,90 @@ Return-Path: <SRS0=1XAp=BR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA36C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 17:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6DFC433E0
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 17:14:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C802221E5
-	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 17:10:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596820205;
-	bh=rgL9ZNm0dRaXWXT9kjVHI0taoZ2nlw6y+hXYboEvtqM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=1NLngcyOcALo41pa3gjMR8xnZeuQJUzueA482EZhpQuQ5HWX4qFP/UjEQ5/7sQQkw
-	 /uX10RHIrniwtyzcev8eb7hPBbqvMD9sTvkyORNgXzSF+U9Rr+tcCWwULUHVTJBKlj
-	 AXH9wgIhoX+k0la9t3k/fU8KCffe5MbM6hIYoKWc=
+	by mail.kernel.org (Postfix) with ESMTP id 9805A2086A
+	for <linux-block@archiver.kernel.org>; Fri,  7 Aug 2020 17:14:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726015AbgHGRKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Aug 2020 13:10:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56614 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725893AbgHGRKE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Aug 2020 13:10:04 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B5D292086A;
-        Fri,  7 Aug 2020 17:10:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596820204;
-        bh=rgL9ZNm0dRaXWXT9kjVHI0taoZ2nlw6y+hXYboEvtqM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uUOZ9qiRl9bDEe5ANnN3bNK4uwqlHEiSiAF44VLPa5vDqCbc0qPMVtJtki5dURfDY
-         KBD31xIB2ZW6JrumI28ev7JJ8O3OAQEhDjeGhsAJKsg13i55zIR2g1neUFioQ6pAO9
-         V4K5uYwRZh3MnG7hD9eEYhWyAUSIzHVWD1Jwsjuo=
-Date:   Fri, 7 Aug 2020 10:10:01 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Eric Deal <eric.deal@wdc.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] block: fix get_max_io_size()
-Message-ID: <20200807171001.GA4155677@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20200806215837.3968445-1-kbusch@kernel.org>
- <88d4db76-b912-8987-cfac-a2b926fbfe3d@acm.org>
- <c2275412-5106-e0a3-63db-a7b0ceedd1d3@acm.org>
- <20200807032437.GC3797376@dhcp-10-100-145-180.wdl.wdc.com>
- <60baf63a-6264-812e-15e6-b0a28b07329f@acm.org>
+        id S1725934AbgHGROH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Aug 2020 13:14:07 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:38318 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725893AbgHGROG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Aug 2020 13:14:06 -0400
+Received: by mail-pj1-f68.google.com with SMTP id ep8so1218697pjb.3
+        for <linux-block@vger.kernel.org>; Fri, 07 Aug 2020 10:14:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/WDhvBaZrJnJ4jgZQWWfHB6fNmDXA5JZyzuuiZ8iUSA=;
+        b=Quc2GPdkqN/5VJE3khGDbUbmR7931XHFeTrLj0acXOMiGfIl9+lygDisld1A954drj
+         AEcnwgXCN0vt9q5xJzEhho3IvmQdNJbUSJkoU5xSX/dJh9JW95ETBJgR1jAJAv1vrv9e
+         +Umcg+3eq61STnNpynOXSoBHKJnNdXsqTBKx1uIk1y8PTKXX1nDwMZPEAjahkqO/slCm
+         Y5BaQjsgO5wLioc3YDsr879aC+wJk0SlxMll2EppYztBSWpcacEO5z6Ht1YBw1AW49sw
+         phRFfmln6UkZhHZJWaZ0kio2EnoGeY6XapIYmBLPWstSM+uBa0fvto5cuDFJ2N6nNdGV
+         lItw==
+X-Gm-Message-State: AOAM533XFG3fw4Twdz+RcE+cLZ+NWxrEaNJiSnU3tS9hJLJ3LogalRTc
+        q3Fvr/+/zkgzfb/UIT5ZX3E=
+X-Google-Smtp-Source: ABdhPJxYPYSslV5v0zGDZQCpWSXYntqtbLvPD6nyyOEVMwCjiIr2opMeO0cz2oIrCMcQaQk65/7Xog==
+X-Received: by 2002:a17:902:a611:: with SMTP id u17mr13596173plq.263.1596820445697;
+        Fri, 07 Aug 2020 10:14:05 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:3dec:a6f0:8cde:ad1c? ([2601:647:4802:9070:3dec:a6f0:8cde:ad1c])
+        by smtp.gmail.com with ESMTPSA id s1sm5660681pgh.47.2020.08.07.10.14.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Aug 2020 10:14:05 -0700 (PDT)
+Subject: Re: [PATCH v2 1/7] nvme: consolidate nvme requirements based on
+ transport type
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Omar Sandoval <osandov@osandov.com>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+References: <20200806191518.593880-1-sagi@grimberg.me>
+ <20200806191518.593880-2-sagi@grimberg.me>
+ <BYAPR04MB496546CB79B5F7D4F4B0A54186490@BYAPR04MB4965.namprd04.prod.outlook.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <fc11798d-52aa-01b0-8289-f6e76659e564@grimberg.me>
+Date:   Fri, 7 Aug 2020 10:14:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <60baf63a-6264-812e-15e6-b0a28b07329f@acm.org>
+In-Reply-To: <BYAPR04MB496546CB79B5F7D4F4B0A54186490@BYAPR04MB4965.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 07, 2020 at 07:18:49AM -0700, Bart Van Assche wrote:
-> Hi Keith,
-> 
-> How about replacing your patch with the (untested) patch below?
 
+>> diff --git a/tests/nvme/rc b/tests/nvme/rc
+>> index 6ffa971b4308..320aa4b2b475 100644
+>> --- a/tests/nvme/rc
+>> +++ b/tests/nvme/rc
+>> @@ -6,6 +6,25 @@
+>>    
+>>    . common/rc
+>>    
+>> +nvme_trtype=${nvme_trtype:-"loop"}
+>> +
+>> +_nvme_requires() {
+>> +	_have_program nvme
+>> +	case ${nvme_trtype} in
+>> +	loop)
+>> +		_have_modules nvmet nvme-core nvme-loop
+>> +		_have_configfs
+> We should just move nvmet nvme-core configfs _have_nvme_fabrics_common
+> which are common for all the transports to avoid the duplication.
 
-I believe that should be fine, but I broke the kernel last time I did
-something like that. I still think it was from incorrect queue_limits,
-but Linus disagreed.
-
- * http://lkml.iu.edu/hypermail/linux/kernel/1601.2/03994.html
+That's a minor duplication, not sure it warrants consolidation...
