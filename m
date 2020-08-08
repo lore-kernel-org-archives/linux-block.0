@@ -2,236 +2,177 @@ Return-Path: <SRS0=lwW3=BS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F860C433DF
-	for <linux-block@archiver.kernel.org>; Sat,  8 Aug 2020 17:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B6B0C433E0
+	for <linux-block@archiver.kernel.org>; Sat,  8 Aug 2020 19:05:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EBC720719
-	for <linux-block@archiver.kernel.org>; Sat,  8 Aug 2020 17:47:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1E9220678
+	for <linux-block@archiver.kernel.org>; Sat,  8 Aug 2020 19:05:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P0gAuPQ4"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="W7+tfcNT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbgHHRrx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Aug 2020 13:47:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42038 "EHLO
+        id S1726531AbgHHTF1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Aug 2020 15:05:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726212AbgHHRrw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Aug 2020 13:47:52 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A52C061756;
-        Sat,  8 Aug 2020 10:47:52 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id l15so4411118ils.2;
-        Sat, 08 Aug 2020 10:47:52 -0700 (PDT)
+        with ESMTP id S1726307AbgHHTF0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Aug 2020 15:05:26 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FEB3C061756
+        for <linux-block@vger.kernel.org>; Sat,  8 Aug 2020 12:05:26 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id s23so3833639qtq.12
+        for <linux-block@vger.kernel.org>; Sat, 08 Aug 2020 12:05:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=iAERPz4z58eGuOuIGzzCzTvYKP+G7EsrZYPNaIwIkBM=;
-        b=P0gAuPQ47Tu14WAl0b/RnZ8e7XM1gkyf7C4ycQ3E8cmslLdc3NaUeP+dXiFtRrz/tw
-         prwwEJtevGzqTEWjf4vI39cXT2gtu7vDdjMmD64XXE61xen1gO/P5uzWTUhsAYhvnSSH
-         n3VQ0DabWJifz+ldMjW0lSq9ZP7B56sv1BSPTOTqvRHDneZGtU4fqqANw/9Hc8nMezRz
-         w5CcLd112m/n6WBgMMnOMghbhEJ3l3E3gzRyt4m1SScrD5JBzjr0kJSzFwL+2zpvvtDq
-         72oVdPWv6C75Eh8Q2xRKLhI0Dpazk07OGYNqNyCXwDvP5wzs9vQ+S/i/hMEdXoe0YLIc
-         NHUg==
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=yL2/UZwpI1fKUgMiVTUcG0n2gTeUCe4ep7Qh3IOPQe4=;
+        b=W7+tfcNTadux9ZruydDOwvn25cK3jUiSZFc16ccW/MZfXQpxkZu851dMozMIgBCpXo
+         SmNST2s9nIRlDyg7rGsxUPTOfuPq2hE2FLOc0fQsRwH9eHM67asHmjHVQ0T9eap+rZ33
+         w/F/xIOUjLN1FFkegvRY5W5xjA2N/wZWaQt5E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=iAERPz4z58eGuOuIGzzCzTvYKP+G7EsrZYPNaIwIkBM=;
-        b=CUeZ3VAaMX0JH67jIK++diZ/CFgXwPEcQnJx60WCrV6YDFJOpc58hg1OAT6mLiz/Hv
-         Somi3yWm7XzWqwlhtHOXIi0asdNUO2dx+akfoZVBIXmP4FThykLrQfgDMzGABnDn3Px7
-         2kW1lfYnFHSThlnTjnY19likAGl9g9aOYMnnBDGYheyMvWRvYft5U7yQBPOuQMHYUGXQ
-         CBO/10QrrJgHXb8pQRlq41mLGjrMWbww4rgYt14lx+PD+emp/iM2pig30zdooD0v1KQV
-         4I0a/UfdosF/mKezys1p9TIlJo3zhL6KP+EzOUMPaDx70saGzmdC2chpUBZFIEv6TaUc
-         arkQ==
-X-Gm-Message-State: AOAM5309rAX1LMfzvCL10ZOkD2hdyoIpLcnybcNUZomxtw7PvXXgtvnt
-        233hA24mWOkKzyu6pTQUEac=
-X-Google-Smtp-Source: ABdhPJydDmiI01T5SSyOAkJmMCCoQ+jGkp7ojV9L+HpzqptYX/IPDvH/2YIt/u9cOo0zm++buEz1sw==
-X-Received: by 2002:a92:340d:: with SMTP id b13mr10699165ila.78.1596908871622;
-        Sat, 08 Aug 2020 10:47:51 -0700 (PDT)
-Received: from anon-dhcp-152.1015granger.net (c-68-61-232-219.hsd1.mi.comcast.net. [68.61.232.219])
-        by smtp.gmail.com with ESMTPSA id o74sm1908900ilb.40.2020.08.08.10.47.49
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 08 Aug 2020 10:47:50 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement LSM
- (IPE)
-From:   Chuck Lever <chucklever@gmail.com>
-In-Reply-To: <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
-Date:   Sat, 8 Aug 2020 13:47:48 -0400
-Cc:     Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com,
-        Paul Moore <paul@paul-moore.com>,
-        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
-        serge@hallyn.com, pasha.tatashin@soleen.com,
-        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
-        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
- <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
- <20200802143143.GB20261@amd> <1596386606.4087.20.camel@HansenPartnership.com>
- <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
- <1596639689.3457.17.camel@HansenPartnership.com>
- <alpine.LRH.2.21.2008050934060.28225@namei.org>
- <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
-To:     Mimi Zohar <zohar@linux.ibm.com>, James Morris <jmorris@namei.org>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=yL2/UZwpI1fKUgMiVTUcG0n2gTeUCe4ep7Qh3IOPQe4=;
+        b=k3+yVFpVbLpfzp6brliYU8GCYn2zUMIvQTeEO/V3IyCHAHZ/R5faYzN+RpW2McxRqU
+         4zTe3UG6LLCvIa0oG6PW8RVfnECX/GDYwztQCQcLrlyYt42G9TLQZ9Mp5hz1DXTIXy0q
+         79VXt0qrkv9/+eRX6ZD/UTHfyC1ptSScS3z/7o1usutCW0Hm8LWap3Tg7qbTdnBPWerr
+         xiDUCG5z/ccJRp2aOzfVPNezXCp+uUPtpK/D64vOYuPBlOcPiE94A50Et+zOad3IQD/b
+         7O6T8f5uq8u+HUlIVdZIuuqwVN7swGckmfktYsPcntLPHRSeBrhe7TaVX875i5bIP56O
+         LArA==
+X-Gm-Message-State: AOAM532h82QnYGUCkF+Hgq+2cJ6wg86g6Mx2g+c8+mnT+s4GXNHUvbso
+        lIZxA/Q2FJSEMoCTMBbGy8P+mWrw32eUB8cFFo/Tqg==
+X-Google-Smtp-Source: ABdhPJxSDSvoxmQ/18LDhxUUacOJwztXKNmzsKQZ9/amd5uvd5KoQ8N7La375Ji8nJ7hS9NO5RxU4crYPZSEmZV/AoU=
+X-Received: by 2002:ac8:faf:: with SMTP id b44mr20343687qtk.190.1596913524420;
+ Sat, 08 Aug 2020 12:05:24 -0700 (PDT)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <20200728084511.GA1326626@T590> <965cf22eea98c00618570da8424d0d94@mail.gmail.com>
+ <20200729153648.GA1698748@T590> <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
+ <20200804083625.GA1958244@T590> <afe5eb1be7f416a48d7b5d473f3053d0@mail.gmail.com>
+ <20200805084031.GA1995289@T590> <5adffdf805179428bdd0dd6c293a4f7d@mail.gmail.com>
+ <20200806133819.GA2046861@T590> <f1ac35dfca34193e6c9bcedbc11911d2@mail.gmail.com>
+ <20200806152939.GA2062348@T590>
+In-Reply-To: <20200806152939.GA2062348@T590>
+MIME-Version: 1.0
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQMjI78N3hI4nYPl7m+8RPNdz72u+AIQ6BN/Af8DR5wB98/f/wIl0wtMAyOnIMMBUiS2bQGsIvrnAdpdHIkCtpqGHQEvo/4KpfSfM2A=
+Date:   Sun, 9 Aug 2020 00:35:21 +0530
+Message-ID: <3f35b0f67c73c8c4996fdad80eb6d963@mail.gmail.com>
+Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        bvanassche@acm.org, hare@suse.com, hch@lst.de,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-> On Aug 5, 2020, at 2:15 PM, Mimi Zohar <zohar@linux.ibm.com> wrote:
->=20
-> On Wed, 2020-08-05 at 09:59 -0700, James Morris wrote:
->> On Wed, 5 Aug 2020, James Bottomley wrote:
->>=20
->>> I'll leave Mimi to answer, but really this is exactly the question =
-that
->>> should have been asked before writing IPE.  However, since we have =
-the
->>> cart before the horse, let me break the above down into two specific
->>> questions.
->>=20
->> The question is valid and it was asked. We decided to first prototype =
-what=20
->> we needed and then evaluate if it should be integrated with IMA. We=20=
-
->> discussed this plan in person with Mimi (at LSS-NA in 2019), and =
-presented=20
->> a more mature version of IPE to LSS-NA in 2020, with the expectation =
-that=20
->> such a discussion may come up (it did not).
->=20
-> When we first spoke the concepts weren't fully formulated, at least to
-> me.
->>=20
->> These patches are still part of this process and 'RFC' status.
->>=20
->>>   1. Could we implement IPE in IMA (as in would extensions to IMA =
-cover
->>>      everything).  I think the answers above indicate this is a =
-"yes".
->>=20
->> It could be done, if needed.
->>=20
->>>   2. Should we extend IMA to implement it?  This is really whether =
-from a
->>>      usability standpoint two seperate LSMs would make sense to =
-cover the
->>>      different use cases.
->>=20
->> One issue here is that IMA is fundamentally a measurement & appraisal=20=
-
->> scheme which has been extended to include integrity enforcement. IPE =
-was=20
->> designed from scratch to only perform integrity enforcement. As such, =
-it=20
->> is a cleaner design -- "do one thing and do it well" is a good design=20=
-
->> pattern.
->>=20
->> In our use-case, we utilize _both_ IMA and IPE, for attestation and =
-code=20
->> integrity respectively. It is useful to be able to separate these=20
->> concepts. They really are different:
->>=20
->> - Code integrity enforcement ensures that code running locally is of =
-known=20
->> provenance and has not been modified prior to execution.
-
-My interest is in code integrity enforcement for executables stored
-in NFS files.
-
-My struggle with IPE is that due to its dependence on dm-verity, it
-does not seem to able to protect content that is stored separately
-from its execution environment and accessed via a file access
-protocol (FUSE, SMB, NFS, etc).
-
-
->> - Attestation is about measuring the health of a system and having =
-that=20
->> measurement validated by a remote system. (Local attestation is =
-useless).
->>=20
->> I'm not sure there is value in continuing to shoe-horn both of these =
-into=20
->> IMA.
->=20
-> True, IMA was originally limited to measurement and attestation, but
-> most of the original EVM concepts were subsequently included in IMA.=20=
-
-> (Remember, Reiner Sailer wrote the original IMA, which I inherited.  I
-> was originially working on EVM code integrity.)  =46rom a naming
-> perspective including EVM code integrity in IMA was a mistake.  My
-> thinking at the time was that as IMA was already calculating the file
-> hash, instead of re-calculating the file hash for integrity, calculate
-> the file hash once and re-use it for multiple things - measurement,=20
-> integrity, and audit.   At the same time define a single system wide
-> policy.
->=20
-> When we first started working on IMA, EVM, trusted, and encrypted =
-keys,
-> the general kernel community didn't see a need for any of it.  Thus, a
-> lot of what was accomplished has been accomplished without the backing
-> of the real core filesystem people.
->=20
-> If block layer integrity was enough, there wouldn't have been a need
-> for fs-verity.   Even fs-verity is limited to read only filesystems,
-> which makes validating file integrity so much easier.  =46rom the
-> beginning, we've said that fs-verity signatures should be included in
-> the measurement list.  (I thought someone signed on to add that =
-support
-> to IMA, but have not yet seen anything.)
-
-Mimi, when you and I discussed this during LSS NA 2019, I didn't fully
-understand that you expected me to implement signed Merkle trees for all
-filesystems. At the time, it sounded to me like you wanted signed Merkle
-trees only for NFS files. Is that still the case?
-
-The first priority (for me, anyway) therefore is getting the ability to
-move IMA metadata between NFS clients and servers shoveled into the NFS
-protocol, but that's been blocked for various legal reasons.
-
-IMO we need agreement from everyone (integrity developers, FS
-implementers, and Linux distributors) that a signed Merkle tree IMA
-metadata format, stored in either an xattr or appended to an executable
-file, will be the way forward for IMA in all filesystems.
-
-
-> Going forward I see a lot of what we've accomplished being =
-incorporated
-> into the filesystems.  When IMA will be limited to defining a system
-> wide policy, I'll have completed my job.
->=20
-> Mimi
->=20
->>=20
->>> I've got to say the least attractive thing
->>>      about separation is the fact that you now both have a policy =
-parser.
->>>       You've tried to differentiate yours by making it more Kconfig
->>>      based, but policy has a way of becoming user space supplied =
+> On Thu, Aug 06, 2020 at 08:07:38PM +0530, Kashyap Desai wrote:
+> > > > Hi Ming -
+> > > >
+> > > > There is still some race which is not handled.  Take a case of IO
+> > > > is not able to get budget and it has already marked <restarts>
+flag.
+> > > > <restarts> flag will be seen non-zero in completion path and
+> > > > completion path will attempt h/w queue run. (But this particular
+> > > > IO is still not in s/w queue.).
+> > > > Attempt of running h/w queue from completion path will not flush
+> > > > any IO since there is no IO in s/w queue.
+> > >
+> > > Then where is the IO to be submitted in case of running out of
+budget?
+> >
+> > Typical race in your latest patch is - (Lets consider command A,B and
+> > C) Command A did not receive budget. Command B completed  (which was
+> > already
+>
+> Command A doesn't get budget, and A is still in sw/scheduler queue
 because
->>>      the distros hate config options, so I think you're going to end =
-up
->>>      with a policy parser very like IMAs.
+> we try to acquire budget before dequeuing request from sw/scheduler
+queue,
+> see __blk_mq_do_dispatch_sched() and blk_mq_do_dispatch_ctx().
+>
+> Not consider direct issue, because the hw queue will be run explicitly
+when
+> not getting budget, see __blk_mq_try_issue_directly.
+>
+> Not consider command A being added to hctx->dispatch too, because blk-mq
+> will re-run the queue, see blk_mq_dispatch_rq_list().
 
+Ming -
+
+After going through your comment (I noted your comment and thanks for
+correcting my understanding.) and block layer code, I realize that it is a
+different race condition. My previous explanation was not accurate.
+I debug further and figure out what is actually happening - Consider below
+scenario/sequence -
+
+Thread -1 - Detected budget contention. Set restarts = 1.
+Thread -2 - old restarts = 1. start hw queue.
+Thread -3 - old restarts = 1. start hw queue.
+Thread -2 - move restarts = 0.
+In my testing, I noticed that both thread-2 and thread-3 started h/w queue
+but there was no work for them to do. It is possible because some other
+context of h/w queue run might have done that job.
+It means, IO of thread-1 is already posted.
+Thread -4 - Detected budget contention. Set restart = 1 (because thread-2
+has move restarts=0).
+Thread -3 - move restarts = 0 (because this thread see old value = 1 but
+that is actually updated one more time by thread-4 and theread-4 actually
+wanted to run h/w queues). IO of Thread-4 will not be scheduled.
+
+We have to make sure that completion IO path do atomic_cmpxchng of
+restarts flag before running the h/w queue.  Below code change - (main fix
+is sequence of atomic_cmpxchg and blk_mq_run_hw_queues) fix the issue.
+
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -594,8 +594,27 @@ static bool scsi_end_request(struct request *req,
+blk_status_t error,
+        if (scsi_target(sdev)->single_lun ||
+            !list_empty(&sdev->host->starved_list))
+                kblockd_schedule_work(&sdev->requeue_work);
+-       else
+-               blk_mq_run_hw_queues(q, true);
++       else {
++               /*
++                * smp_mb() implied in either rq->end_io or
+blk_mq_free_request
++                * is for ordering writing .device_busy in
+scsi_device_unbusy()
++                * and reading sdev->restarts.
++                */
++               int old = atomic_read(&sdev->restarts);
++
++               if (old) {
++                       /*
++                        * ->restarts has to be kept as non-zero if there
+is
++                        *  new budget contention comes.
++                        */
++                       atomic_cmpxchg(&sdev->restarts, old, 0);
++
++                       /* run the queue after restarts flag is updated
++                        * to avoid race condition with .get_budget
++                        */
++                       blk_mq_run_hw_queues(sdev->request_queue, true);
++               }
++       }
+
+        percpu_ref_put(&q->q_usage_counter);
+        return false;
+
+Kashyap
