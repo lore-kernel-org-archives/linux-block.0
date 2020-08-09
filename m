@@ -2,81 +2,90 @@ Return-Path: <SRS0=6aiD=BT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63663C433E0
-	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 09:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DACC433DF
+	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 14:25:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2C69205CB
-	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 09:55:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CA9B206B6
+	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 14:25:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="e8/u2cnL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Szz8TMv4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725988AbgHIJzW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Aug 2020 05:55:22 -0400
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:33270 "EHLO
-        forwardcorp1o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725710AbgHIJzV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 9 Aug 2020 05:55:21 -0400
-Received: from vla1-fdfb804fb3f3.qloud-c.yandex.net (vla1-fdfb804fb3f3.qloud-c.yandex.net [IPv6:2a02:6b8:c0d:3199:0:640:fdfb:804f])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id A552F2E148C;
-        Sun,  9 Aug 2020 12:55:17 +0300 (MSK)
-Received: from vla1-81430ab5870b.qloud-c.yandex.net (vla1-81430ab5870b.qloud-c.yandex.net [2a02:6b8:c0d:35a1:0:640:8143:ab5])
-        by vla1-fdfb804fb3f3.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id n4xIVkYFrT-tGwaAA4Z;
-        Sun, 09 Aug 2020 12:55:17 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1596966917; bh=E8e4oWgiV1+dwdEtUwikqO1aLyiC9ELfVoNgv/deRlw=;
-        h=Message-Id:Date:Subject:To:From:Cc;
-        b=e8/u2cnLG/CXeaCG6Ld2vPogpmbRd+hJ4m3yFBrQogDycI0EaWohpldpUWds4CXRa
-         P4Y0rhQ3+F+0WpkOVyP6F4BIOwo5aWcSmtkB6NmVYs+OjKQMhTJ343xRdp2vL6YZCw
-         NHdUXu7If2IZKt8/VKGoWDIDzYUmwfCsgbZqEHAo=
-Authentication-Results: vla1-fdfb804fb3f3.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from 95.108.174.193-red.dhcp.yndx.net (95.108.174.193-red.dhcp.yndx.net [95.108.174.193])
-        by vla1-81430ab5870b.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id EZfCPIauMW-tGmOrI3v;
-        Sun, 09 Aug 2020 12:55:16 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client certificate not present)
-From:   Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
-To:     linux-scsi@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, jejb@linux.ibm.com,
-        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
-Subject: [PATCH] scsi_debugfs: dump allocted field in more convenient format
-Date:   Sun,  9 Aug 2020 09:55:01 +0000
-Message-Id: <20200809095501.23166-1-dmtrmonakhov@yandex-team.ru>
-X-Mailer: git-send-email 2.18.0
+        id S1726199AbgHIOZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Aug 2020 10:25:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32932 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726070AbgHIOZZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Aug 2020 10:25:25 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B81BCC061756;
+        Sun,  9 Aug 2020 07:25:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=c6SFV8Ta3BhV757/++za2izKKvmyWv19dAZeDgn4xos=; b=Szz8TMv4A5c1Y/Gz/gcli9sIKE
+        qoxNWkxlm1xeFztebJWXne0gL+WPRFzhrNSKGweYcsTNP4PTZh4921EINXgDzLaabUq7pHg0Tcuvj
+        DPWyJQpGt6hv55pIDfyXwRV8X/HbtS5M80rFoalK83dCnJN8AfccFo/2ksmSbRB9zMMglW0+tsNhT
+        hlcv5OZwEeuQneMR3LtNdvNpsWcKBH2iEs9C18m0XxCXdslemY0WqFrejIjmR8zw97pTzmcSl3C0F
+        LKLYHmECoXVFyxsOs2fXzFH4vcnmuZiWbqUEadJ/okKjnKnZ5FIdnUO0aYtvwKtWXf0PT5gA2xnYo
+        7xzoh5tQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k4mGI-0000QT-O9; Sun, 09 Aug 2020 14:25:22 +0000
+Date:   Sun, 9 Aug 2020 15:25:22 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: Very slow qemu device access
+Message-ID: <20200809142522.GI17456@casper.infradead.org>
+References: <20200807174416.GF17456@casper.infradead.org>
+ <20200809024005.GC2134904@T590>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200809024005.GC2134904@T590>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All request's data fields are formatted as key=val, the only exception is
-allocated field, which complicates parsing.
+On Sun, Aug 09, 2020 at 10:40:05AM +0800, Ming Lei wrote:
+> Hello Matthew,
+> 
+> On Fri, Aug 07, 2020 at 06:44:16PM +0100, Matthew Wilcox wrote:
+> > 
+> > Everything starts going very slowly after this commit:
+> > 
+> > commit 37f4a24c2469a10a4c16c641671bd766e276cf9f (refs/bisect/bad)
+> > Author: Ming Lei <ming.lei@redhat.com>
+> > Date:   Tue Jun 30 22:03:57 2020 +0800
+> > 
+> >     blk-mq: centralise related handling into blk_mq_get_driver_tag
+> 
+> Yeah, the above is one known bad commit, which is reverted in
+> 4e2f62e566b5 ("Revert "blk-mq: put driver tag when this request is completed")
+> 
+> Finally the fixed patch of 'blk-mq: centralise related handling into blk_mq_get_driver_tag'
+> is merged as 568f27006577 ("blk-mq: centralise related handling into blk_mq_get_driver_tag").
+> 
+> So please test either 4e2f62e566b5 or 568f27006577 and see if there is
+> such issue.
 
-With that patch request looks like follows:
-0000000012a51451 {.op=WRITE, .cmd_flags=SYNC|IDLE, .rq_flags=STARTED|DONTPREP|ELVPRIV|IO_STAT, .state=in_flight, .tag=137, .internal_tag=188, .cmd=opcode=0x2a 2a 00 00 00 45 18 00 00 08 00, .retries=0, .result = 0x0, .flags=TAGGED|INITIALIZED|3, .timeout=30.000, .alloc_age=0.004}
+4e2f62e566b5 is good
+568f27006577 is bad
 
-Signed-off-by: Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
----
- drivers/scsi/scsi_debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+As before, the stack points to the tag code:
 
-diff --git a/drivers/scsi/scsi_debugfs.c b/drivers/scsi/scsi_debugfs.c
-index c19ea7a..6ce22b1 100644
---- a/drivers/scsi/scsi_debugfs.c
-+++ b/drivers/scsi/scsi_debugfs.c
-@@ -45,7 +45,7 @@ void scsi_show_rq(struct seq_file *m, struct request *rq)
- 		   cmd->retries, cmd->result);
- 	scsi_flags_show(m, cmd->flags, scsi_cmd_flags,
- 			ARRAY_SIZE(scsi_cmd_flags));
--	seq_printf(m, ", .timeout=%d.%03d, allocated %d.%03d s ago",
-+	seq_printf(m, ", .timeout=%d.%03d, .alloc_age=%d.%03d",
- 		   timeout_ms / 1000, timeout_ms % 1000,
- 		   alloc_ms / 1000, alloc_ms % 1000);
- }
--- 
-2.7.4
+# cat /proc/9986/stack
+[<0>] blk_mq_get_tag+0x109/0x250
+[<0>] __blk_mq_alloc_request+0x67/0xf0
+[<0>] blk_mq_submit_bio+0xee/0x560
+[<0>] submit_bio_noacct+0x3a3/0x410
+[<0>] submit_bio+0x33/0xf0
 
+It's not nice to leave these little landmines in the git history for
+bisect to fall into ;-(
