@@ -2,90 +2,157 @@ Return-Path: <SRS0=6aiD=BT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DACC433DF
-	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 14:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93201C433DF
+	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 17:17:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CA9B206B6
-	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 14:25:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6DA5C206A2
+	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 17:17:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Szz8TMv4"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OmeQE4ma"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726199AbgHIOZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Aug 2020 10:25:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32932 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726070AbgHIOZZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Aug 2020 10:25:25 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B81BCC061756;
-        Sun,  9 Aug 2020 07:25:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=c6SFV8Ta3BhV757/++za2izKKvmyWv19dAZeDgn4xos=; b=Szz8TMv4A5c1Y/Gz/gcli9sIKE
-        qoxNWkxlm1xeFztebJWXne0gL+WPRFzhrNSKGweYcsTNP4PTZh4921EINXgDzLaabUq7pHg0Tcuvj
-        DPWyJQpGt6hv55pIDfyXwRV8X/HbtS5M80rFoalK83dCnJN8AfccFo/2ksmSbRB9zMMglW0+tsNhT
-        hlcv5OZwEeuQneMR3LtNdvNpsWcKBH2iEs9C18m0XxCXdslemY0WqFrejIjmR8zw97pTzmcSl3C0F
-        LKLYHmECoXVFyxsOs2fXzFH4vcnmuZiWbqUEadJ/okKjnKnZ5FIdnUO0aYtvwKtWXf0PT5gA2xnYo
-        7xzoh5tQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1k4mGI-0000QT-O9; Sun, 09 Aug 2020 14:25:22 +0000
-Date:   Sun, 9 Aug 2020 15:25:22 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: Very slow qemu device access
-Message-ID: <20200809142522.GI17456@casper.infradead.org>
-References: <20200807174416.GF17456@casper.infradead.org>
- <20200809024005.GC2134904@T590>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200809024005.GC2134904@T590>
+        id S1726210AbgHIRQ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Aug 2020 13:16:59 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39118 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726175AbgHIRQ7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 9 Aug 2020 13:16:59 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 079H3DIk149722;
+        Sun, 9 Aug 2020 13:16:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=Y4/CY+X1bLpw0h7ULwkEbRs6wZfUb58vfksYUxmO+cI=;
+ b=OmeQE4maRujd34oSR3XBPZw15i9p001MOKNm6gHiU1w5MUhhwDszEZ3EMk+BYBzC5h3X
+ tX7H0bziDCgaiDdqOmUCT2Z3f9GNNq76+WUD4GS+cXGkdY2W/8BT+jxAE8vGXSQNDLq2
+ pnmAp5LwuGvXkf51LOVJOLG53UNqI/7WmWXYApRYNRMWkvABPw9iHhfNYqRSKqSVPPJX
+ GQEBH9h7BHC0jOfgIYutD5ERSFwihelpvWle/ojdtD2uqO3eEJt2J0yHqI22rOUMtlvO
+ C7X55BfvsNJ+fqZ5BoSdrBHiJIvZ7hv/VwIiJVklB3Eojw7vsFZkyxU/wGRwUc9N5dUS nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32sr4qdvby-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 09 Aug 2020 13:16:32 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 079H3Fog149899;
+        Sun, 9 Aug 2020 13:16:31 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32sr4qdvbj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 09 Aug 2020 13:16:31 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 079HG5EI011619;
+        Sun, 9 Aug 2020 17:16:29 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 32skp81cqv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 09 Aug 2020 17:16:29 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 079HGRT320054392
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 9 Aug 2020 17:16:27 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4105F11C058;
+        Sun,  9 Aug 2020 17:16:27 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B839C11C050;
+        Sun,  9 Aug 2020 17:16:21 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.25.223])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sun,  9 Aug 2020 17:16:21 +0000 (GMT)
+Message-ID: <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
+Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
+ LSM (IPE)
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Chuck Lever <chucklever@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     Deven Bowers <deven.desai@linux.microsoft.com>,
+        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
+        snitzer@redhat.com, dm-devel@redhat.com,
+        tyhicks@linux.microsoft.com, agk@redhat.com,
+        Paul Moore <paul@paul-moore.com>,
+        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
+        serge@hallyn.com, pasha.tatashin@soleen.com,
+        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
+        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        jaskarankhurana@linux.microsoft.com
+Date:   Sun, 09 Aug 2020 13:16:09 -0400
+In-Reply-To: <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
+References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
+         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
+         <20200802143143.GB20261@amd>
+         <1596386606.4087.20.camel@HansenPartnership.com>
+         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
+         <1596639689.3457.17.camel@HansenPartnership.com>
+         <alpine.LRH.2.21.2008050934060.28225@namei.org>
+         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
+         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-12.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-09_09:2020-08-06,2020-08-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ clxscore=1015 malwarescore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 mlxscore=0 suspectscore=0 impostorscore=0
+ mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2008090130
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 09, 2020 at 10:40:05AM +0800, Ming Lei wrote:
-> Hello Matthew,
-> 
-> On Fri, Aug 07, 2020 at 06:44:16PM +0100, Matthew Wilcox wrote:
-> > 
-> > Everything starts going very slowly after this commit:
-> > 
-> > commit 37f4a24c2469a10a4c16c641671bd766e276cf9f (refs/bisect/bad)
-> > Author: Ming Lei <ming.lei@redhat.com>
-> > Date:   Tue Jun 30 22:03:57 2020 +0800
-> > 
-> >     blk-mq: centralise related handling into blk_mq_get_driver_tag
-> 
-> Yeah, the above is one known bad commit, which is reverted in
-> 4e2f62e566b5 ("Revert "blk-mq: put driver tag when this request is completed")
-> 
-> Finally the fixed patch of 'blk-mq: centralise related handling into blk_mq_get_driver_tag'
-> is merged as 568f27006577 ("blk-mq: centralise related handling into blk_mq_get_driver_tag").
-> 
-> So please test either 4e2f62e566b5 or 568f27006577 and see if there is
-> such issue.
+On Sat, 2020-08-08 at 13:47 -0400, Chuck Lever wrote:
+> > On Aug 5, 2020, at 2:15 PM, Mimi Zohar <zohar@linux.ibm.com> wrote:
 
-4e2f62e566b5 is good
-568f27006577 is bad
+<snip>
 
-As before, the stack points to the tag code:
+> > If block layer integrity was enough, there wouldn't have been a need
+> > for fs-verity.   Even fs-verity is limited to read only filesystems,
+> > which makes validating file integrity so much easier.  From the
+> > beginning, we've said that fs-verity signatures should be included in
+> > the measurement list.  (I thought someone signed on to add that support
+> > to IMA, but have not yet seen anything.)
+> 
+> Mimi, when you and I discussed this during LSS NA 2019, I didn't fully
+> understand that you expected me to implement signed Merkle trees for all
+> filesystems. At the time, it sounded to me like you wanted signed Merkle
+> trees only for NFS files. Is that still the case?
 
-# cat /proc/9986/stack
-[<0>] blk_mq_get_tag+0x109/0x250
-[<0>] __blk_mq_alloc_request+0x67/0xf0
-[<0>] blk_mq_submit_bio+0xee/0x560
-[<0>] submit_bio_noacct+0x3a3/0x410
-[<0>] submit_bio+0x33/0xf0
+I definitely do not expect you to support signed Merkle trees for all
+filesystems.  My interested is from an IMA perspective of measuring and
+verifying the fs-verity Merkle tree root (and header info) signature. 
+This is independent of which filesystems support it.
 
-It's not nice to leave these little landmines in the git history for
-bisect to fall into ;-(
+> 
+> The first priority (for me, anyway) therefore is getting the ability to
+> move IMA metadata between NFS clients and servers shoveled into the NFS
+> protocol, but that's been blocked for various legal reasons.
+
+Up to now, verifying remote filesystem file integrity has been out of
+scope for IMA.   With fs-verity file signatures I can at least grasp
+how remote file integrity could possibly work.  I don't understand how
+remote file integrity with existing IMA formats could be supported. You
+might want to consider writing a whitepaper, which could later be used
+as the basis for a patch set cover letter.
+
+Mimi
+
+> 
+> IMO we need agreement from everyone (integrity developers, FS
+> implementers, and Linux distributors) that a signed Merkle tree IMA
+> metadata format, stored in either an xattr or appended to an executable
+> file, will be the way forward for IMA in all filesystems.
+
