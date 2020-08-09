@@ -1,283 +1,325 @@
-Return-Path: <SRS0=lwW3=BS=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=6aiD=BT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2619C433E1
-	for <linux-block@archiver.kernel.org>; Sat,  8 Aug 2020 23:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFA0C433DF
+	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 02:17:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8970420672
-	for <linux-block@archiver.kernel.org>; Sat,  8 Aug 2020 23:51:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596930676;
-	bh=t+bVXdylCAu4wQqJWJCqmHF6xJlMqanJBJbTaWFvrIs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=wcDWfU5HMuhC/FzawPFWm4k0pa3bGvmQKsLW+H1nKc3+yNUjmSSiYJpN9MelwPOjH
-	 UAE1F1Tr3oWceWlWCus2PDDBpWbiwFpRHePHbTx0WntufnpLjopALUyx9kDSTuWo9H
-	 3Xwqco+iZteY5WO7AnrZ+EN3u4JPs9WuR6xD+blk=
+	by mail.kernel.org (Postfix) with ESMTP id 5EE38206B2
+	for <linux-block@archiver.kernel.org>; Sun,  9 Aug 2020 02:17:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QW083Wsz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727855AbgHHXvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Aug 2020 19:51:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48424 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726629AbgHHXgH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 8 Aug 2020 19:36:07 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726050AbgHICRE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Aug 2020 22:17:04 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38675 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726009AbgHICRD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 8 Aug 2020 22:17:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596939421;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mYXQdmzaZ6N4GIvtqoMuI82wQrzXh7PjWvL5d//vkVc=;
+        b=QW083Wsz1eZDTeClEHzpYPpnFuJkNbvCnzY7Fpwh/+UXq1PWUL+/HpQ1GwKoGO07Gf/GTp
+        cYXm+O+RKs1jKtJicM1BnWDnOKFKyZyKhREgvez1cDCgnmZGzzUOOXl4ikZPL4yCMvGhdr
+        DQgwnmArvPnqEAu38d78dnmqKx8Bqhk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-479-6dESzTRyPlCj7ViM1aZSmg-1; Sat, 08 Aug 2020 22:16:57 -0400
+X-MC-Unique: 6dESzTRyPlCj7ViM1aZSmg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CAA49206C3;
-        Sat,  8 Aug 2020 23:36:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596929765;
-        bh=t+bVXdylCAu4wQqJWJCqmHF6xJlMqanJBJbTaWFvrIs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NBlfImxbBhEfTur7DnV8n48wwuYvMm47QZlAiWL7BtxEw4VKQAOGh2frwwrV4ON9E
-         wALOcDUrVqlZ/r7TT7ETS9FaObuSxy8nauF+0xx8yAq0j4OPxk6rdWux3wVV9pfxkl
-         HjRFYsDuVQy4qqKRJmNou5UT2AnOQMHtcelvahJI=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Nicolai Stange <nstange@suse.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        yu kuai <yukuai3@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.8 17/72] blktrace: fix debugfs use after free
-Date:   Sat,  8 Aug 2020 19:34:46 -0400
-Message-Id: <20200808233542.3617339-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200808233542.3617339-1-sashal@kernel.org>
-References: <20200808233542.3617339-1-sashal@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AC751009600;
+        Sun,  9 Aug 2020 02:16:54 +0000 (UTC)
+Received: from T590 (ovpn-12-63.pek2.redhat.com [10.72.12.63])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 19B9B10023A0;
+        Sun,  9 Aug 2020 02:16:38 +0000 (UTC)
+Date:   Sun, 9 Aug 2020 10:16:33 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Kashyap Desai <kashyap.desai@broadcom.com>
+Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        bvanassche@acm.org, hare@suse.com, hch@lst.de,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+Message-ID: <20200809021633.GA2134904@T590>
+References: <20200729153648.GA1698748@T590>
+ <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
+ <20200804083625.GA1958244@T590>
+ <afe5eb1be7f416a48d7b5d473f3053d0@mail.gmail.com>
+ <20200805084031.GA1995289@T590>
+ <5adffdf805179428bdd0dd6c293a4f7d@mail.gmail.com>
+ <20200806133819.GA2046861@T590>
+ <f1ac35dfca34193e6c9bcedbc11911d2@mail.gmail.com>
+ <20200806152939.GA2062348@T590>
+ <3f35b0f67c73c8c4996fdad80eb6d963@mail.gmail.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3f35b0f67c73c8c4996fdad80eb6d963@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luis Chamberlain <mcgrof@kernel.org>
+On Sun, Aug 09, 2020 at 12:35:21AM +0530, Kashyap Desai wrote:
+> > On Thu, Aug 06, 2020 at 08:07:38PM +0530, Kashyap Desai wrote:
+> > > > > Hi Ming -
+> > > > >
+> > > > > There is still some race which is not handled.  Take a case of IO
+> > > > > is not able to get budget and it has already marked <restarts>
+> flag.
+> > > > > <restarts> flag will be seen non-zero in completion path and
+> > > > > completion path will attempt h/w queue run. (But this particular
+> > > > > IO is still not in s/w queue.).
+> > > > > Attempt of running h/w queue from completion path will not flush
+> > > > > any IO since there is no IO in s/w queue.
+> > > >
+> > > > Then where is the IO to be submitted in case of running out of
+> budget?
+> > >
+> > > Typical race in your latest patch is - (Lets consider command A,B and
+> > > C) Command A did not receive budget. Command B completed  (which was
+> > > already
+> >
+> > Command A doesn't get budget, and A is still in sw/scheduler queue
+> because
+> > we try to acquire budget before dequeuing request from sw/scheduler
+> queue,
+> > see __blk_mq_do_dispatch_sched() and blk_mq_do_dispatch_ctx().
+> >
+> > Not consider direct issue, because the hw queue will be run explicitly
+> when
+> > not getting budget, see __blk_mq_try_issue_directly.
+> >
+> > Not consider command A being added to hctx->dispatch too, because blk-mq
+> > will re-run the queue, see blk_mq_dispatch_rq_list().
+> 
+> Ming -
+> 
+> After going through your comment (I noted your comment and thanks for
+> correcting my understanding.) and block layer code, I realize that it is a
+> different race condition. My previous explanation was not accurate.
+> I debug further and figure out what is actually happening - Consider below
+> scenario/sequence -
+> 
+> Thread -1 - Detected budget contention. Set restarts = 1.
+> Thread -2 - old restarts = 1. start hw queue.
+> Thread -3 - old restarts = 1. start hw queue.
+> Thread -2 - move restarts = 0.
+> In my testing, I noticed that both thread-2 and thread-3 started h/w queue
+> but there was no work for them to do. It is possible because some other
+> context of h/w queue run might have done that job.
 
-[ Upstream commit bad8e64fb19d3a0de5e564d9a7271c31bd684369 ]
+It should be true, because there is other run queue somewhere, such as
+blk-mq's restart or delay run queue.
 
-On commit 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
-merged on v4.12 Omar fixed the original blktrace code for request-based
-drivers (multiqueue). This however left in place a possible crash, if you
-happen to abuse blktrace while racing to remove / add a device.
+> It means, IO of thread-1 is already posted.
 
-We used to use asynchronous removal of the request_queue, and with that
-the issue was easier to reproduce. Now that we have reverted to
-synchronous removal of the request_queue, the issue is still possible to
-reproduce, its however just a bit more difficult.
+OK.
 
-We essentially run two instances of break-blktrace which add/remove
-a loop device, and setup a blktrace and just never tear the blktrace
-down. We do this twice in parallel. This is easily reproduced with the
-script run_0004.sh from break-blktrace [0].
+> Thread -4 - Detected budget contention. Set restart = 1 (because thread-2
+> has move restarts=0).
 
-We can end up with two types of panics each reflecting where we
-race, one a failed blktrace setup:
+OK.
 
-[  252.426751] debugfs: Directory 'loop0' with parent 'block' already present!
-[  252.432265] BUG: kernel NULL pointer dereference, address: 00000000000000a0
-[  252.436592] #PF: supervisor write access in kernel mode
-[  252.439822] #PF: error_code(0x0002) - not-present page
-[  252.442967] PGD 0 P4D 0
-[  252.444656] Oops: 0002 [#1] SMP NOPTI
-[  252.446972] CPU: 10 PID: 1153 Comm: break-blktrace Tainted: G            E     5.7.0-rc2-next-20200420+ #164
-[  252.452673] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1 04/01/2014
-[  252.456343] RIP: 0010:down_write+0x15/0x40
-[  252.458146] Code: eb ca e8 ae 22 8d ff cc cc cc cc cc cc cc cc cc cc cc cc
-               cc cc 0f 1f 44 00 00 55 48 89 fd e8 52 db ff ff 31 c0 ba 01 00
-               00 00 <f0> 48 0f b1 55 00 75 0f 48 8b 04 25 c0 8b 01 00 48 89
-               45 08 5d
-[  252.463638] RSP: 0018:ffffa626415abcc8 EFLAGS: 00010246
-[  252.464950] RAX: 0000000000000000 RBX: ffff958c25f0f5c0 RCX: ffffff8100000000
-[  252.466727] RDX: 0000000000000001 RSI: ffffff8100000000 RDI: 00000000000000a0
-[  252.468482] RBP: 00000000000000a0 R08: 0000000000000000 R09: 0000000000000001
-[  252.470014] R10: 0000000000000000 R11: ffff958d1f9227ff R12: 0000000000000000
-[  252.471473] R13: ffff958c25ea5380 R14: ffffffff8cce15f1 R15: 00000000000000a0
-[  252.473346] FS:  00007f2e69dee540(0000) GS:ffff958c2fc80000(0000) knlGS:0000000000000000
-[  252.475225] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  252.476267] CR2: 00000000000000a0 CR3: 0000000427d10004 CR4: 0000000000360ee0
-[  252.477526] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  252.478776] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  252.479866] Call Trace:
-[  252.480322]  simple_recursive_removal+0x4e/0x2e0
-[  252.481078]  ? debugfs_remove+0x60/0x60
-[  252.481725]  ? relay_destroy_buf+0x77/0xb0
-[  252.482662]  debugfs_remove+0x40/0x60
-[  252.483518]  blk_remove_buf_file_callback+0x5/0x10
-[  252.484328]  relay_close_buf+0x2e/0x60
-[  252.484930]  relay_open+0x1ce/0x2c0
-[  252.485520]  do_blk_trace_setup+0x14f/0x2b0
-[  252.486187]  __blk_trace_setup+0x54/0xb0
-[  252.486803]  blk_trace_ioctl+0x90/0x140
-[  252.487423]  ? do_sys_openat2+0x1ab/0x2d0
-[  252.488053]  blkdev_ioctl+0x4d/0x260
-[  252.488636]  block_ioctl+0x39/0x40
-[  252.489139]  ksys_ioctl+0x87/0xc0
-[  252.489675]  __x64_sys_ioctl+0x16/0x20
-[  252.490380]  do_syscall_64+0x52/0x180
-[  252.491032]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> Thread -3 - move restarts = 0 (because this thread see old value = 1 but
+> that is actually updated one more time by thread-4 and theread-4 actually
+> wanted to run h/w queues). IO of Thread-4 will not be scheduled.
 
-And the other on the device removal:
+Right.
 
-[  128.528940] debugfs: Directory 'loop0' with parent 'block' already present!
-[  128.615325] BUG: kernel NULL pointer dereference, address: 00000000000000a0
-[  128.619537] #PF: supervisor write access in kernel mode
-[  128.622700] #PF: error_code(0x0002) - not-present page
-[  128.625842] PGD 0 P4D 0
-[  128.627585] Oops: 0002 [#1] SMP NOPTI
-[  128.629871] CPU: 12 PID: 544 Comm: break-blktrace Tainted: G            E     5.7.0-rc2-next-20200420+ #164
-[  128.635595] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1 04/01/2014
-[  128.640471] RIP: 0010:down_write+0x15/0x40
-[  128.643041] Code: eb ca e8 ae 22 8d ff cc cc cc cc cc cc cc cc cc cc cc cc
-               cc cc 0f 1f 44 00 00 55 48 89 fd e8 52 db ff ff 31 c0 ba 01 00
-               00 00 <f0> 48 0f b1 55 00 75 0f 65 48 8b 04 25 c0 8b 01 00 48 89
-               45 08 5d
-[  128.650180] RSP: 0018:ffffa9c3c05ebd78 EFLAGS: 00010246
-[  128.651820] RAX: 0000000000000000 RBX: ffff8ae9a6370240 RCX: ffffff8100000000
-[  128.653942] RDX: 0000000000000001 RSI: ffffff8100000000 RDI: 00000000000000a0
-[  128.655720] RBP: 00000000000000a0 R08: 0000000000000002 R09: ffff8ae9afd2d3d0
-[  128.657400] R10: 0000000000000056 R11: 0000000000000000 R12: 0000000000000000
-[  128.659099] R13: 0000000000000000 R14: 0000000000000003 R15: 00000000000000a0
-[  128.660500] FS:  00007febfd995540(0000) GS:ffff8ae9afd00000(0000) knlGS:0000000000000000
-[  128.662204] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  128.663426] CR2: 00000000000000a0 CR3: 0000000420042003 CR4: 0000000000360ee0
-[  128.664776] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  128.666022] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  128.667282] Call Trace:
-[  128.667801]  simple_recursive_removal+0x4e/0x2e0
-[  128.668663]  ? debugfs_remove+0x60/0x60
-[  128.669368]  debugfs_remove+0x40/0x60
-[  128.669985]  blk_trace_free+0xd/0x50
-[  128.670593]  __blk_trace_remove+0x27/0x40
-[  128.671274]  blk_trace_shutdown+0x30/0x40
-[  128.671935]  blk_release_queue+0x95/0xf0
-[  128.672589]  kobject_put+0xa5/0x1b0
-[  128.673188]  disk_release+0xa2/0xc0
-[  128.673786]  device_release+0x28/0x80
-[  128.674376]  kobject_put+0xa5/0x1b0
-[  128.674915]  loop_remove+0x39/0x50 [loop]
-[  128.675511]  loop_control_ioctl+0x113/0x130 [loop]
-[  128.676199]  ksys_ioctl+0x87/0xc0
-[  128.676708]  __x64_sys_ioctl+0x16/0x20
-[  128.677274]  do_syscall_64+0x52/0x180
-[  128.677823]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> 
+> We have to make sure that completion IO path do atomic_cmpxchng of
+> restarts flag before running the h/w queue.  Below code change - (main fix
+> is sequence of atomic_cmpxchg and blk_mq_run_hw_queues) fix the issue.
+> 
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -594,8 +594,27 @@ static bool scsi_end_request(struct request *req,
+> blk_status_t error,
+>         if (scsi_target(sdev)->single_lun ||
+>             !list_empty(&sdev->host->starved_list))
+>                 kblockd_schedule_work(&sdev->requeue_work);
+> -       else
+> -               blk_mq_run_hw_queues(q, true);
+> +       else {
+> +               /*
+> +                * smp_mb() implied in either rq->end_io or
+> blk_mq_free_request
+> +                * is for ordering writing .device_busy in
+> scsi_device_unbusy()
+> +                * and reading sdev->restarts.
+> +                */
+> +               int old = atomic_read(&sdev->restarts);
+> +
+> +               if (old) {
+> +                       /*
+> +                        * ->restarts has to be kept as non-zero if there
+> is
+> +                        *  new budget contention comes.
+> +                        */
+> +                       atomic_cmpxchg(&sdev->restarts, old, 0);
+> +
+> +                       /* run the queue after restarts flag is updated
+> +                        * to avoid race condition with .get_budget
+> +                        */
+> +                       blk_mq_run_hw_queues(sdev->request_queue, true);
+> +               }
+> +       }
+> 
 
-The common theme here is:
+I think the above change is right, and this patter is basically same with SCHED_RESTART
+used in blk_mq_sched_restart().
 
-debugfs: Directory 'loop0' with parent 'block' already present
+BTW, could you run your function & performance test against the following new version?
+Then I can include your test result in commit log for moving on.
 
-This crash happens because of how blktrace uses the debugfs directory
-where it places its files. Upon init we always create the same directory
-which would be needed by blktrace but we only do this for make_request
-drivers (multiqueue) block drivers. When you race a removal of these
-devices with a blktrace setup you end up in a situation where the
-make_request recursive debugfs removal will sweep away the blktrace
-files and then later blktrace will also try to remove individual
-dentries which are already NULL. The inverse is also possible and hence
-the two types of use after frees.
 
-We don't create the block debugfs directory on init for these types of
-block devices:
+From 06993ddf5c5dbe0e772cc38342919eb61a57bc50 Mon Sep 17 00:00:00 2001
+From: Ming Lei <ming.lei@redhat.com>
+Date: Wed, 5 Aug 2020 16:35:53 +0800
+Subject: [PATCH] scsi: core: only re-run queue in scsi_end_request() if device
+ queue is busy
 
-  * request-based block driver block devices
-  * every possible partition
-  * scsi-generic
+Now the request queue is run in scsi_end_request() unconditionally if both
+target queue and host queue is ready. We should have re-run request queue
+only after this device queue becomes busy for restarting this LUN only.
 
-And so, this race should in theory only be possible with make_request
-drivers.
+Recently Long Li reported that cost of run queue may be very heavy in
+case of high queue depth. So improve this situation by only running
+the request queue when this LUN is busy.
 
-We can fix the UAF by simply re-using the debugfs directory for
-make_request drivers (multiqueue) and only creating the ephemeral
-directory for the other type of block devices. The new clarifications
-on relying on the q->blk_trace_mutex *and* also checking for q->blk_trace
-*prior* to processing a blktrace ensures the debugfs directories are
-only created if no possible directory name clashes are possible.
-
-This goes tested with:
-
-  o nvme partitions
-  o ISCSI with tgt, and blktracing against scsi-generic with:
-    o block
-    o tape
-    o cdrom
-    o media changer
-  o blktests
-
-This patch is part of the work which disputes the severity of
-CVE-2019-19770 which shows this issue is not a core debugfs issue, but
-a misuse of debugfs within blktace.
-
-Fixes: 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
-Reported-by: syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Hannes Reinecke <hare@suse.de>
 Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Nicolai Stange <nstange@suse.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Michal Hocko <mhocko@kernel.org>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
-Cc: yu kuai <yukuai3@huawei.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Long Li <longli@microsoft.com>
+Reported-by: Long Li <longli@microsoft.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- kernel/trace/blktrace.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+V4:
+	- not clear .restarts in get_budget(), instead clearing it
+	after re-run queue is done; Kashyap figured out we have to
+	update ->restarts before re-run queue in scsi_run_queue_async().
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 5ef0484513ecb..588e8e3960197 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -522,10 +522,18 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	if (!bt->msg_data)
- 		goto err;
+V3:
+	- add one smp_mb() in scsi_mq_get_budget() and comment
+
+V2:
+	- commit log change, no any code change
+	- add reported-by tag
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/scsi_lib.c    | 51 +++++++++++++++++++++++++++++++++++---
+ include/scsi/scsi_device.h |  1 +
+ 2 files changed, 49 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index c866a4f33871..d083250f9518 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -552,8 +552,27 @@ static void scsi_run_queue_async(struct scsi_device *sdev)
+ 	if (scsi_target(sdev)->single_lun ||
+ 	    !list_empty(&sdev->host->starved_list))
+ 		kblockd_schedule_work(&sdev->requeue_work);
+-	else
+-		blk_mq_run_hw_queues(sdev->request_queue, true);
++	else {
++		/*
++		 * smp_mb() implied in either rq->end_io or blk_mq_free_request
++		 * is for ordering writing .device_busy in scsi_device_unbusy()
++		 * and reading sdev->restarts.
++		 */
++		int old = atomic_read(&sdev->restarts);
++
++		if (old) {
++			/*
++			 * ->restarts has to be kept as non-zero if there is
++			 *  new budget contention comes.
++			 *
++			 *  No need to run queue when either another re-run
++			 *  queue wins in updating ->restarts or one new budget
++			 *  contention comes.
++			 */
++			if (atomic_cmpxchg(&sdev->restarts, old, 0) == old)
++				blk_mq_run_hw_queues(sdev->request_queue, true);
++		}
++	}
+ }
  
--	ret = -ENOENT;
--
--	dir = debugfs_lookup(buts->name, blk_debugfs_root);
--	if (!dir)
-+#ifdef CONFIG_BLK_DEBUG_FS
+ /* Returns false when no more bytes to process, true if there are more */
+@@ -1612,8 +1631,34 @@ static void scsi_mq_put_budget(struct request_queue *q)
+ static bool scsi_mq_get_budget(struct request_queue *q)
+ {
+ 	struct scsi_device *sdev = q->queuedata;
++	int ret = scsi_dev_queue_ready(q, sdev);
++
++	if (ret)
++		return true;
++
++	atomic_inc(&sdev->restarts);
+ 
+-	return scsi_dev_queue_ready(q, sdev);
 +	/*
-+	 * When tracing whole make_request drivers (multiqueue) block devices,
-+	 * reuse the existing debugfs directory created by the block layer on
-+	 * init. For request-based block devices, all partitions block devices,
-+	 * and scsi-generic block devices we create a temporary new debugfs
-+	 * directory that will be removed once the trace ends.
++	 * Order writing .restarts and reading .device_busy, and make sure
++	 * .restarts is visible to scsi_end_request(). Its pair is implied by
++	 * __blk_mq_end_request() in scsi_end_request() for ordering
++	 * writing .device_busy in scsi_device_unbusy() and reading .restarts.
++	 *
 +	 */
-+	if (queue_is_mq(q) && bdev && bdev == bdev->bd_contains)
-+		dir = q->debugfs_dir;
-+	else
-+#endif
- 		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
++	smp_mb__after_atomic();
++
++	/*
++	 * If all in-flight requests originated from this LUN are completed
++	 * before setting .restarts, sdev->device_busy will be observed as
++	 * zero, then blk_mq_delay_run_hw_queues() will dispatch this request
++	 * soon. Otherwise, completion of one of these request will observe
++	 * the .restarts flag, and the request queue will be run for handling
++	 * this request, see scsi_end_request().
++	 */
++	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
++				!scsi_device_blocked(sdev)))
++		blk_mq_delay_run_hw_queues(sdev->request_queue, SCSI_QUEUE_DELAY);
++	return false;
+ }
  
- 	bt->dev = dev;
-@@ -563,8 +571,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index bc5909033d13..1a5c9a3df6d6 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -109,6 +109,7 @@ struct scsi_device {
+ 	atomic_t device_busy;		/* commands actually active on LLDD */
+ 	atomic_t device_blocked;	/* Device returned QUEUE_FULL. */
  
- 	ret = 0;
- err:
--	if (dir && !bt->dir)
--		dput(dir);
- 	if (ret)
- 		blk_trace_free(bt);
- 	return ret;
++	atomic_t restarts;
+ 	spinlock_t list_lock;
+ 	struct list_head starved_entry;
+ 	unsigned short queue_depth;	/* How deep of a queue we want */
 -- 
-2.25.1
+2.25.2
+
+
+
+Thanks,
+Ming
 
