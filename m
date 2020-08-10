@@ -2,101 +2,72 @@ Return-Path: <SRS0=DoUd=BU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C4FC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 19:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD251C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 20:29:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7583B22DBF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 19:33:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597088035;
-	bh=3youlaf6F0AG1XD7iY9/Et/KXihs076n7ArGrIQ9mB0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=dG+UhpYgiilbK3CX+WehzxP3HpRCXD1ba0Pjyy2Q2avXhBXNkU55nr/ch/BLnP+vg
-	 pejCHYsE5ViCzGn2nLSnYD9wu6vANg0HlLejA6k9GxKdrAFcuRRiLGr6Y8yEfm0fCi
-	 silDxt1daML7zTlW1xfUKTZpXRtDorNdZ7J7kSoI=
+	by mail.kernel.org (Postfix) with ESMTP id 95872206B5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 20:29:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728330AbgHJTJJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 15:09:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35248 "EHLO mail.kernel.org"
+        id S1726474AbgHJU3u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 16:29:50 -0400
+Received: from namei.org ([65.99.196.166]:58402 "EHLO namei.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728309AbgHJTJI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 15:09:08 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 55CC32078D;
-        Mon, 10 Aug 2020 19:09:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597086548;
-        bh=3youlaf6F0AG1XD7iY9/Et/KXihs076n7ArGrIQ9mB0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZfeRawQfbUYHQGHerVe3LTakW82Wvp78UTh5p4Viov2uS2uo41hKPYqaeSO4ekeOD
-         dxSUolPN4fF5Jk/GeOtCY/FDbUlKXnDFV9YGSvU1DhI8abujMHYyf8Uzs87Ex8q8Ro
-         jNlneSuEb8uzsGEMDWbDg6ANmv/5lbgm0jvmWV8k=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.8 06/64] loop: be paranoid on exit and prevent new additions / removals
-Date:   Mon, 10 Aug 2020 15:08:01 -0400
-Message-Id: <20200810190859.3793319-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200810190859.3793319-1-sashal@kernel.org>
-References: <20200810190859.3793319-1-sashal@kernel.org>
+        id S1726115AbgHJU3u (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Aug 2020 16:29:50 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by namei.org (8.14.4/8.14.4) with ESMTP id 07AKTHpc002600;
+        Mon, 10 Aug 2020 20:29:17 GMT
+Date:   Tue, 11 Aug 2020 06:29:17 +1000 (AEST)
+From:   James Morris <jmorris@namei.org>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
+        snitzer@redhat.com, dm-devel@redhat.com,
+        tyhicks@linux.microsoft.com, agk@redhat.com, paul@paul-moore.com,
+        corbet@lwn.net, nramas@linux.microsoft.com, serge@hallyn.com,
+        pasha.tatashin@soleen.com, jannh@google.com,
+        linux-block@vger.kernel.org, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, mdsakib@microsoft.com,
+        linux-kernel@vger.kernel.org, eparis@redhat.com,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
+        jaskarankhurana@linux.microsoft.com
+Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
+ LSM (IPE)
+In-Reply-To: <268edec96cbe7d2626c9158b806e8865b6b1b8ed.camel@linux.ibm.com>
+Message-ID: <alpine.LRH.2.21.2008110628260.792@namei.org>
+References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>  <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>  <20200802143143.GB20261@amd>  <1596386606.4087.20.camel@HansenPartnership.com>  <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
+  <1596639689.3457.17.camel@HansenPartnership.com>  <alpine.LRH.2.21.2008050934060.28225@namei.org>  <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>  <alpine.LRH.2.21.2008060949410.20084@namei.org>  <eb7a2f5b5cd22cf9231aa0fd8fdb77c729a83428.camel@linux.ibm.com>
+  <alpine.LRH.2.21.2008080240350.13040@namei.org>  <4a764c86a824a4b931dd7f130ce7afce7df140e4.camel@linux.ibm.com> <268edec96cbe7d2626c9158b806e8865b6b1b8ed.camel@linux.ibm.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luis Chamberlain <mcgrof@kernel.org>
+On Fri, 7 Aug 2020, Mimi Zohar wrote:
 
-[ Upstream commit 200f93377220504c5e56754823e7adfea6037f1a ]
+> > > Are you planning to attend Plumbers? Perhaps we could propose a BoF 
+> > > session on this topic.
+> > 
+> > That sounds like a good idea.
+> 
+> Other than it is already sold out.
 
-Be pedantic on removal as well and hold the mutex.
-This should prevent uses of addition while we exit.
+Mimi advised me off-list that she is able to attend, so I've submitted a 
+BoF proposal:
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/loop.c | 4 ++++
- 1 file changed, 4 insertions(+)
+https://www.linuxplumbersconf.org/event/7/abstracts/732/
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 475e1a738560d..776083963ee6c 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2402,6 +2402,8 @@ static void __exit loop_exit(void)
- 
- 	range = max_loop ? max_loop << part_shift : 1UL << MINORBITS;
- 
-+	mutex_lock(&loop_ctl_mutex);
-+
- 	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
- 	idr_destroy(&loop_index_idr);
- 
-@@ -2409,6 +2411,8 @@ static void __exit loop_exit(void)
- 	unregister_blkdev(LOOP_MAJOR, "loop");
- 
- 	misc_deregister(&loop_misc);
-+
-+	mutex_unlock(&loop_ctl_mutex);
- }
- 
- module_init(loop_init);
+
 -- 
-2.25.1
+James Morris
+<jmorris@namei.org>
 
