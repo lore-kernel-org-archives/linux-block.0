@@ -2,129 +2,158 @@ Return-Path: <SRS0=DoUd=BU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B787C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 12:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C75C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 15:35:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 498CD20734
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 12:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5055A22BEA
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 15:35:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Hok0FDmR"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="cVt1iMuK";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="MjwJxpgT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726602AbgHJMNU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 08:13:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34482 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726536AbgHJMNT (ORCPT
+        id S1728783AbgHJPfq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 11:35:46 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:55864 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728752AbgHJPfn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 08:13:19 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC377C061786
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2020 05:13:18 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id q9so7059860oth.5
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2020 05:13:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=w1ivgbrJu4gsu9KGUxQdIOiK4eQfS1uabAcQkR/fEac=;
-        b=Hok0FDmRnSHgEYgIRL4Gii4GqaA3T9IAzokXHw+WE9CV2ePYB+7J+a9gsb5rEYd79q
-         uzSYin7yVhr2wawJCW30LfR5ryxki73iXgWRjrVHmAiatqNzwbA0Iro17aE1yOH5iTBJ
-         /kCFcsjBozCmxUW29tMPoiInRnJApCf9h0r8A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=w1ivgbrJu4gsu9KGUxQdIOiK4eQfS1uabAcQkR/fEac=;
-        b=LYqhR+KGGSsPjMDgJJe3jKH1NqpmGCGkMOVAsGCm6PKqNK4+h2C/rjJz1QqXTW/ffC
-         m/yUYuiwKbaE3yQ0oTHrGMPHuGOOF5doA0Accc3lcLiHh7R20BSNshN6+d4qSNmWCKn6
-         T2Vec34ZxBqapLcOESOmcd0qTPvqx8CxNj3uc8zPdMYvj41gAPzQ8CL28VKkCJDck3kz
-         Qq0SCi0OF9BdXJ94Go9YMdFEYFqoy2NQIyMaqkTp9ur+sKjAZ8Tz5Lsyeg+DjyBRXzn4
-         qarzu8nV+iQitfje6SRXBtAxVbMdSCBdOosP1uXeUppJBmL/islhCrBlndmqUbYw/juq
-         zf9A==
-X-Gm-Message-State: AOAM5309ecXX8kRYRUiH9d0/3SieTPLabQmI1RxYziU23sVcnerckdAC
-        7jABGcC73Q0yTTI4+aAB/cS+HC9yqw78SVow6VKMdg==
-X-Google-Smtp-Source: ABdhPJxyu3OOxEoWJ0mYUuFUkfyi6/pWiMFtS5+NUDwCqqr5KflLWIpUtHhMIxzcd7QLfiPjhEGQGHsgscWHBMMRJPU=
-X-Received: by 2002:a9d:7449:: with SMTP id p9mr442147otk.360.1597061595289;
- Mon, 10 Aug 2020 05:13:15 -0700 (PDT)
-From:   Muneendra Kumar M <muneendra.kumar@broadcom.com>
-References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
- <1596507196-27417-17-git-send-email-muneendra.kumar@broadcom.com>
- <61d2fd75-84ea-798b-aee9-b07957ac8f1b@suse.de> <08b9825b-6abb-c077-ac0d-bd63f10f2ac2@broadcom.com>
- <aa595605c2f776148e03a8e5dd69168a@mail.gmail.com> <227c5ba1-8a9c-3ec9-5a0f-662a4736c66f@redhat.com>
- <b3350b999d5500ddef49a25aafee2ea6@mail.gmail.com> <eec84df0-1cee-e386-c18e-73ac8e0b89a3@redhat.com>
- <e76b12c664057adb51c14bf0663bb2f7@mail.gmail.com> <b471b84f-25e9-39cb-41e0-1cc1af409a8a@redhat.com>
- <7e76e1464e794a79861ea9846e0a5370@mail.gmail.com> <053466c4-7786-38aa-012f-926b68c85c8c@redhat.com>
-In-Reply-To: <053466c4-7786-38aa-012f-926b68c85c8c@redhat.com>
-MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-thread-index: AQIDyhmBPqdmqCKUdNTZliBUbPkt/AI5BKetAom9APICL6c0jAMHD3TmAjtZC5MBe/Ed2QIv9leoAyMPjxIBrC+2XAGG5LXBAnT4Ng+oEQymcA==
-Date:   Mon, 10 Aug 2020 17:43:11 +0530
-Message-ID: <05697e72c1981838c5471e503b28dfc2@mail.gmail.com>
-Subject: RE: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        James Smart <james.smart@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Cc:     emilne@redhat.com, mkumar@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
-        James Smart <jsmart2021@gmail.com>,
-        Ming Lei <tom.leiming@gmail.com>, Tejun Heo <tj@kernel.org>
+        Mon, 10 Aug 2020 11:35:43 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id E27C78EE1DD;
+        Mon, 10 Aug 2020 08:35:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1597073741;
+        bh=H6RkvIzpfXOLSmHTbzR8XGbmPVN5aMmAbFV+0MS/vCw=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=cVt1iMuKWH4Bg+bLnyRSpUB/wXbG1V4IcQrDFdM+He/KopgifO7HNehQkYRafWpR7
+         B7RZHTNO5ffSnIB2urr4t5jxmwSfl4SQgYlbRQkBhgcHt8qoHLUYBwA7Q6vT3o6/tt
+         pW81Sr83Alr3AG3vWPtlKAQ4u+snVOqOmdggu00Q=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id NaS3pjwBelNS; Mon, 10 Aug 2020 08:35:40 -0700 (PDT)
+Received: from [153.66.254.174] (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 490FA8EE12E;
+        Mon, 10 Aug 2020 08:35:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1597073740;
+        bh=H6RkvIzpfXOLSmHTbzR8XGbmPVN5aMmAbFV+0MS/vCw=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=MjwJxpgTQz4M0HQgOVHVrw7HDPZ5iwScXAZ3T0CV5ey1CM8n8Q+96pCZP7NtESu7J
+         Aa755rKZNaN6eMUTRHzcTFugAubBvvES0Y0Tz+SDho/oQczzL4HdAtuVcZFPuzBhG3
+         6CMTxxSQ5umiDNicSAXPubohnY0HnMFKrU59s060=
+Message-ID: <1597073737.3966.12.camel@HansenPartnership.com>
+Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
+ LSM (IPE)
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>,
+        Chuck Lever <chucklever@gmail.com>,
+        James Morris <jmorris@namei.org>
+Cc:     Deven Bowers <deven.desai@linux.microsoft.com>,
+        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
+        snitzer@redhat.com, dm-devel@redhat.com,
+        tyhicks@linux.microsoft.com, agk@redhat.com,
+        Paul Moore <paul@paul-moore.com>,
+        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
+        serge@hallyn.com, pasha.tatashin@soleen.com,
+        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
+        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        jaskarankhurana@linux.microsoft.com
+Date:   Mon, 10 Aug 2020 08:35:37 -0700
+In-Reply-To: <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
+References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
+         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
+         <20200802143143.GB20261@amd>
+         <1596386606.4087.20.camel@HansenPartnership.com>
+         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
+         <1596639689.3457.17.camel@HansenPartnership.com>
+         <alpine.LRH.2.21.2008050934060.28225@namei.org>
+         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
+         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
+         <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> And I was talking about the above PIDS(3627) to be passed to the
-> interface along with UUID.
+On Sun, 2020-08-09 at 13:16 -0400, Mimi Zohar wrote:
+> On Sat, 2020-08-08 at 13:47 -0400, Chuck Lever wrote:
+> > > On Aug 5, 2020, at 2:15 PM, Mimi Zohar <zohar@linux.ibm.com>
+> > > wrote:
+> 
+> <snip>
+> 
+> > > If block layer integrity was enough, there wouldn't have been a
+> > > need for fs-verity.   Even fs-verity is limited to read only
+> > > filesystems, which makes validating file integrity so much
+> > > easier.  From the beginning, we've said that fs-verity signatures
+> > > should be included in the measurement list.  (I thought someone
+> > > signed on to add that support to IMA, but have not yet seen
+> > > anything.)
+> > 
+> > Mimi, when you and I discussed this during LSS NA 2019, I didn't
+> > fully understand that you expected me to implement signed Merkle
+> > trees for all filesystems. At the time, it sounded to me like you
+> > wanted signed Merkle trees only for NFS files. Is that still the
+> > case?
+> 
+> I definitely do not expect you to support signed Merkle trees for all
+> filesystems.  My interested is from an IMA perspective of measuring
+> and verifying the fs-verity Merkle tree root (and header info)
+> signature. This is independent of which filesystems support it.
+> 
+> > 
+> > The first priority (for me, anyway) therefore is getting the
+> > ability to move IMA metadata between NFS clients and servers
+> > shoveled into the NFS protocol, but that's been blocked for various
+> > legal reasons.
+> 
+> Up to now, verifying remote filesystem file integrity has been out of
+> scope for IMA.   With fs-verity file signatures I can at least grasp
+> how remote file integrity could possibly work.  I don't understand
+> how remote file integrity with existing IMA formats could be
+> supported. You might want to consider writing a whitepaper, which
+> could later be used as the basis for a patch set cover letter.
 
->The cgroup exists even before the VM is started and waiting for the PID to
->appear would be racy.  The PID is *not* a representation of the VM, the
->cgroup is (or at least it's the closest thing).
+I think, before this, we can help with the basics (and perhaps we
+should sort them out before we start documenting what we'll do).  The
+first basic is that a merkle tree allows unit at a time verification. 
+First of all we should agree on the unit.  Since we always fault a page
+at a time, I think our merkle tree unit should be a page not a block. 
+Next, we should agree where the check gates for the per page accesses
+should be ... definitely somewhere in readpage, I suspect and finally
+we should agree how the merkle tree is presented at the gate.  I think
+there are three ways:
 
->Using the PID would lead to an API that is easy to misuse.  For example say
->you have a random QEMU process that has not been placed in a cgroup, for
->whatever reason.  If someone doesn't understand that the API uses the PID
-> >just as a proxy for the cgroup, they could end up classifying *all traffic
->from the host* with the VMID.  If the API uses cgroups as the fundamental
->concept instead, it's much harder to make this mistake.
+   1. Ahead of time transfer:  The merkle tree is transferred and verified
+      at some time before the accesses begin, so we already have a
+      verified copy and can compare against the lower leaf.
+   2. Async transfer:  We provide an async mechanism to transfer the
+      necessary components, so when presented with a unit, we check the
+      log n components required to get to the root
+   3. The protocol actually provides the capability of 2 (like the SCSI
+      DIF/DIX), so to IMA all the pieces get presented instead of IMA
+      having to manage the tree
 
-Agreed:
-So from the user we need to provide UUID and the cgroup associated info with
-VM to the kernel interface. Is this correct?
-There is no issues with UUID  passing as one of the arg.
-Coming to the other cgroup associated VM here are the options which we can
-send
+There are also a load of minor things like how we get the head hash,
+which must be presented and verified ahead of time for each of the
+above 3.
 
-1)openfd:
-We need a utility which opens the cgroup path and pass the fd details to the
-interface.
-And we can use the cgroup_get_from_fd() utility to get the associated cgroup
-in the kernel.
-Dependent on utilty.
-
-2)cgroupid:From the  userspace iam not sure if there is any syfs/proc/sytem
-call interface which give us the cgroup id directly.
-Tejun correct me if iam wrong.If there is any such interface please let me
-know so that I can pass the same.
+James
 
 
-3)give the complete cgroup path associated with VM and the kernel interface
-will get the associated blkcg.
-The user needs to pass the path and the uuid info to the sysfs interface
-provided by the fabric interface
-The interface will  write the uuid info in blkcg associated with cgroup path
-with the help of cgroup_get_from_path().
-And there is no dependency on any utility. The user can simply pass the
-details using sysfs.
 
-Need your inputs on the same which one to use (openfd/cgroupid/path) .
-
-
-Regards,
-Muneendra.
