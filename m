@@ -2,200 +2,202 @@ Return-Path: <SRS0=DoUd=BU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F822C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75151C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:36:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04CE42083B
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3408C2076B
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:36:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VDFgkKcG"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tEokO3hI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725869AbgHJQXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 12:23:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32302 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726338AbgHJQXy (ORCPT
+        id S1726845AbgHJQgb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 12:36:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17280 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725873AbgHJQgb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 12:23:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597076632;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=79To6yhBbxnqdoLB/vAGghJg4sifmUnfnr7NL9vQa4k=;
-        b=VDFgkKcGceSCXsXaA7eIym3qk3ltEtiltgsRgesF6KHk0diXgP6WntDwm5fHNe1ISwl1k0
-        h0FZ2hocTBcltT2mSWuPqhnRbvAcCcys3owGQSTGsNYaw+r6lIUynV0H5ElJfevQw1j7WZ
-        q8DvIL+S6txzuwn4WZzi6aV1Q9lOs9M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-XcJe6OeZOEizSKEHRHbt4Q-1; Mon, 10 Aug 2020 12:23:47 -0400
-X-MC-Unique: XcJe6OeZOEizSKEHRHbt4Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F466800474;
-        Mon, 10 Aug 2020 16:23:45 +0000 (UTC)
-Received: from T590 (ovpn-12-105.pek2.redhat.com [10.72.12.105])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CD5C187D6B;
-        Mon, 10 Aug 2020 16:23:38 +0000 (UTC)
-Date:   Tue, 11 Aug 2020 00:23:31 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Mon, 10 Aug 2020 12:36:31 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07AGWeGG019110;
+        Mon, 10 Aug 2020 12:36:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=kMrMRyqWQzI9XLcDnZA9dEhh6Lfjbkrw/za3vv1K64M=;
+ b=tEokO3hIFCI5G2/SkclQWDqPE79KYCiYicfsVRP2w4yIWoGz8r+tZmhAn+zFmzzI20HP
+ bps0Bwlxhp3fMhL0rhZQUUyQo/Uq4seAZGm9UyGjUvJIXK1IkQWB4hhXgfHj9WmhxECF
+ dNfW/AeSaK+JxaSpT7I6+qS+/+NweeicYdT4fimYSilpUo6XOa2i5nMGPGP9sEyzTUyO
+ Pd6vD+jt2nY7jwSPkqIa6w4FaNN05pe6Lu3ULRSg17NyYTiAuFPIH4v+x+R5URwLbwzm
+ cPlrzWNff+PVccW9V908RSH5iWpx5YN4+mWIpVTudzK0ORrrcpuBsRhAg2xUO4QZpEao mA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32src1ja2q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Aug 2020 12:36:07 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07AGYlH3024628;
+        Mon, 10 Aug 2020 12:36:07 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32src1ja1n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Aug 2020 12:36:07 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07AGZZ1H008254;
+        Mon, 10 Aug 2020 16:36:04 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 32skahaf97-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Aug 2020 16:36:04 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07AGa2XL60031394
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Aug 2020 16:36:02 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6000911C04A;
+        Mon, 10 Aug 2020 16:36:02 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA86511C058;
+        Mon, 10 Aug 2020 16:35:56 +0000 (GMT)
+Received: from sig-9-65-241-154.ibm.com (unknown [9.65.241.154])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Aug 2020 16:35:56 +0000 (GMT)
+Message-ID: <4664ab7dc3b324084df323bfa4670d5bfde76e66.camel@linux.ibm.com>
+Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
+ LSM (IPE)
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Chuck Lever <chucklever@gmail.com>,
+        James Morris <jmorris@namei.org>
+Cc:     Deven Bowers <deven.desai@linux.microsoft.com>,
+        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
+        snitzer@redhat.com, dm-devel@redhat.com,
+        tyhicks@linux.microsoft.com, agk@redhat.com,
+        Paul Moore <paul@paul-moore.com>,
+        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
+        serge@hallyn.com, pasha.tatashin@soleen.com,
+        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
         Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, stable@vger.kernel.org
-Subject: Re: [PATCH] block: allow for_each_bvec to support zero len bvec
-Message-ID: <20200810162331.GA2215158@T590>
-References: <20200810031915.2209658-1-ming.lei@redhat.com>
- <db57f8ca-b3c3-76ec-1e49-d8f8161ba78d@i-love.sakura.ne.jp>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db57f8ca-b3c3-76ec-1e49-d8f8161ba78d@i-love.sakura.ne.jp>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
+        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        jaskarankhurana@linux.microsoft.com
+Date:   Mon, 10 Aug 2020 12:35:56 -0400
+In-Reply-To: <1597073737.3966.12.camel@HansenPartnership.com>
+References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
+         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
+         <20200802143143.GB20261@amd>
+         <1596386606.4087.20.camel@HansenPartnership.com>
+         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
+         <1596639689.3457.17.camel@HansenPartnership.com>
+         <alpine.LRH.2.21.2008050934060.28225@namei.org>
+         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
+         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
+         <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
+         <1597073737.3966.12.camel@HansenPartnership.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-12.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-10_12:2020-08-06,2020-08-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ mlxscore=0 impostorscore=0 mlxlogscore=999 clxscore=1015
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 phishscore=0
+ spamscore=0 suspectscore=3 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008100119
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 10, 2020 at 04:52:17PM +0900, Tetsuo Handa wrote:
-> On 2020/08/10 12:19, Ming Lei wrote:
-> > Block layer usually doesn't support or allow zero-length bvec. Since
-> > commit 1bdc76aea115 ("iov_iter: use bvec iterator to implement
-> > iterate_bvec()"), iterate_bvec() switches to bvec iterator. However,
-> > Al mentioned that 'Zero-length segments are not disallowed' in iov_iter.
+On Mon, 2020-08-10 at 08:35 -0700, James Bottomley wrote:
+> On Sun, 2020-08-09 at 13:16 -0400, Mimi Zohar wrote:
+> > On Sat, 2020-08-08 at 13:47 -0400, Chuck Lever wrote:
+> > > > On Aug 5, 2020, at 2:15 PM, Mimi Zohar <zohar@linux.ibm.com>
+> > > > wrote:
 > > 
-> > Fixes for_each_bvec() so that it can move on after seeing one zero
-> > length bvec.
+> > <snip>
 > > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > Link: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2262077.html
-> > Fixes: 1bdc76aea115 ("iov_iter: use bvec iterator to implement iterate_bvec()")
+> > > > If block layer integrity was enough, there wouldn't have been a
+> > > > need for fs-verity.   Even fs-verity is limited to read only
+> > > > filesystems, which makes validating file integrity so much
+> > > > easier.  From the beginning, we've said that fs-verity signatures
+> > > > should be included in the measurement list.  (I thought someone
+> > > > signed on to add that support to IMA, but have not yet seen
+> > > > anything.)
+> > > 
+> > > Mimi, when you and I discussed this during LSS NA 2019, I didn't
+> > > fully understand that you expected me to implement signed Merkle
+> > > trees for all filesystems. At the time, it sounded to me like you
+> > > wanted signed Merkle trees only for NFS files. Is that still the
+> > > case?
+> > 
+> > I definitely do not expect you to support signed Merkle trees for all
+> > filesystems.  My interested is from an IMA perspective of measuring
+> > and verifying the fs-verity Merkle tree root (and header info)
+> > signature. This is independent of which filesystems support it.
+> > 
+> > > The first priority (for me, anyway) therefore is getting the
+> > > ability to move IMA metadata between NFS clients and servers
+> > > shoveled into the NFS protocol, but that's been blocked for various
+> > > legal reasons.
+> > 
+> > Up to now, verifying remote filesystem file integrity has been out of
+> > scope for IMA.   With fs-verity file signatures I can at least grasp
+> > how remote file integrity could possibly work.  I don't understand
+> > how remote file integrity with existing IMA formats could be
+> > supported. You might want to consider writing a whitepaper, which
+> > could later be used as the basis for a patch set cover letter.
 > 
-> Is this Fixes: correct? That commit should be in RHEL8's 4.18 kernel but that kernel
-> does not hit this bug.
+> I think, before this, we can help with the basics (and perhaps we
+> should sort them out before we start documenting what we'll do).
 
-Yeah, it is correct, see the following link:
+I'm not opposed to doing that, but you're taking this discussion in a
+totally different direction.  The current discussion is about NFSv4
+supporting the existing IMA signatures, not only fs-verity signatures. 
+I'd like to understand how that is possible and for the community to
+weigh in on whether it makes sense.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v5.8&id=1bdc76aea1159a750846c2fc98e404403eb7d51c
-
-Commit 1bdc76aea115 was merged to v4.8, so it is definitely in both RHEL8's
-4.18 based kernel and upstream kernel.
-
+> The
+> first basic is that a merkle tree allows unit at a time verification.
+> First of all we should agree on the unit.  Since we always fault a page
+> at a time, I think our merkle tree unit should be a page not a block. 
+> Next, we should agree where the check gates for the per page accesses
+> should be ... definitely somewhere in readpage, I suspect and finally
+> we should agree how the merkle tree is presented at the gate.  I think
+> there are three ways:
 > 
-> Moreover, maybe nobody cares, but behavior of splice() differs when there are only 
-> zero-length pages. With this fix, splice() returns 0 despite there is still pipe writers.
-
-It is another new issue, which isn't related with Commit 1bdc76aea115,
-see below.
-
-> Man page seems to say that splice() returns 0 when there is no pipe writers...
+>    1. Ahead of time transfer:  The merkle tree is transferred and verified
+>       at some time before the accesses begin, so we already have a
+>       verified copy and can compare against the lower leaf.
+>    2. Async transfer:  We provide an async mechanism to transfer the
+>       necessary components, so when presented with a unit, we check the
+>       log n components required to get to the root
+>    3. The protocol actually provides the capability of 2 (like the SCSI
+>       DIF/DIX), so to IMA all the pieces get presented instead of IMA
+>       having to manage the tree
 > 
->     A return value of 0 means end of input.  If fd_in refers to a pipe,
->     then this means that there was no data to transfer, and it would not
->     make sense to block because there are no writers connected to the
->     write end of the pipe.
-> 
-> ----- test case -----
-> #define _GNU_SOURCE
-> #include <stdio.h>
-> #include <sys/types.h>
-> #include <sys/stat.h>
-> #include <fcntl.h>
-> #include <unistd.h>
-> #include <string.h>
-> 
-> int main(int argc, char *argv[])
-> {
->         static char buffer[4096];
->         const int fd = open("/tmp/testfile", O_WRONLY | O_CREAT, 0600);
->         int pipe_fd[2] = { EOF, EOF };
->         pipe(pipe_fd);
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         memset(buffer, 'a', sizeof(buffer));
->         //write(pipe_fd[1], buffer, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         memset(buffer, 'b', sizeof(buffer));
->         //write(pipe_fd[1], buffer, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         memset(buffer, 'c', sizeof(buffer));
->         //write(pipe_fd[1], buffer, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         memset(buffer, 'd', sizeof(buffer));
->         //write(pipe_fd[1], buffer, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         write(pipe_fd[1], NULL, sizeof(buffer));
->         splice(pipe_fd[0], NULL, fd, NULL, 65536, 0);
->         return 0;
-> }
+> There are also a load of minor things like how we get the head hash,
+> which must be presented and verified ahead of time for each of the
+> above 3.
+ 
+I was under the impression that IMA support for fs-verity signatures
+would be limited to including the fs-verity signature in the
+measurement list and verifying the fs-verity signature.   As fs-verity
+is limited to immutable files, this could be done on file open.  fs-
+verity would be responsible for enforcing the block/page data
+integrity.   From a local filesystem perspective, I think that is all
+that is necessary.
 
-The above test doesn't trigger the reported lockup issue, so this patch
-isn't related with the new issue you described.
+In terms of remote file systems,  the main issue is transporting and
+storing the Merkle tree.  As fs-verity is limited to immutable files,
+this could still be done on file open.
 
-> 
-> ----- 4.18.0-193.14.2.el8_2.x86_64 -----
-> openat(AT_FDCWD, "/tmp/testfile", O_WRONLY|O_CREAT, 0600) = 3
-> pipe([4, 5])                            = 0
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> splice(4, NULL, 3, NULL, 65536, 0
-> 
-> ^C)      = ? ERESTARTSYS (To be restarted if SA_RESTART is set)
-> strace: Process 1486 detached
-
-The same behavior can be observed on v4.8 too, both v4.8 and v4.18
-includes 1bdc76aea115. If you apply the fix against v4.8, you can
-observe the same behavior too.
-
-> 
-> ----- linux.git + this fix -----
-
-It should have been linux.git, :-)
-
-I think this new issue may be introduced between v4.18 and v5.8.
-
-> open("/tmp/testfile", O_WRONLY|O_CREAT, 0600) = 3
-> pipe([4, 5])                            = 0
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-> splice(4, NULL, 3, NULL, 65536, 0)      = 0
-> exit_group(0)                           = ?
-> +++ exited with 0 +++
-> 
-> > Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-> 
-> I just forwarded syzbot's report. Thus, credit goes to
-> 
-> Reported-by: syzbot <syzbot+61acc40a49a3e46e25ea@syzkaller.appspotmail.com>
-
-OK.
-
-
-Thanks,
-Ming
+Mimi
 
