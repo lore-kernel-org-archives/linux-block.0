@@ -2,102 +2,163 @@ Return-Path: <SRS0=DoUd=BU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F5EC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 04:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB72C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 07:52:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0409020756
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 04:03:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z3UuBWti"
+	by mail.kernel.org (Postfix) with ESMTP id 93D722065C
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 07:52:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725814AbgHJEDL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 00:03:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37156 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725536AbgHJEDK (ORCPT
+        id S1726448AbgHJHwu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 03:52:50 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:51083 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725894AbgHJHwt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 00:03:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597032188;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p25URfzxNUZWXR7vBUcLK7+cxQ6MStZ/38NJ/Lqbl0g=;
-        b=Z3UuBWti94EJvz1dPxyuQl6FWKUZATcpgvJnZIL3j5ZLFuZ2tbjZyxV+kbRRWYPgiLYR6B
-        E4xlJcTADBh2wZZ4TGE/jBuMkD3g98pPXuMuG+iqi3+p2knxT3vIdzBeIRsBr/aVmDlkeP
-        sIois6cMAIGVPJlhCUkMF6CaY4X3Rbc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-maUD5SuaPryzZVoU7rX1dw-1; Mon, 10 Aug 2020 00:03:06 -0400
-X-MC-Unique: maUD5SuaPryzZVoU7rX1dw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 409671932480;
-        Mon, 10 Aug 2020 04:03:04 +0000 (UTC)
-Received: from T590 (ovpn-13-99.pek2.redhat.com [10.72.13.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 425DF10013D5;
-        Mon, 10 Aug 2020 04:02:56 +0000 (UTC)
-Date:   Mon, 10 Aug 2020 12:02:52 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Al Viro <viro@zeniv.linux.org.uk>, stable@vger.kernel.org
+        Mon, 10 Aug 2020 03:52:49 -0400
+Received: from fsav402.sakura.ne.jp (fsav402.sakura.ne.jp [133.242.250.101])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 07A7qQ44046079;
+        Mon, 10 Aug 2020 16:52:26 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav402.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav402.sakura.ne.jp);
+ Mon, 10 Aug 2020 16:52:26 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav402.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 07A7qH7j045729
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO);
+        Mon, 10 Aug 2020 16:52:26 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
 Subject: Re: [PATCH] block: allow for_each_bvec to support zero len bvec
-Message-ID: <20200810040252.GC2202641@T590>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, stable@vger.kernel.org
 References: <20200810031915.2209658-1-ming.lei@redhat.com>
- <20200810033309.GK17456@casper.infradead.org>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <db57f8ca-b3c3-76ec-1e49-d8f8161ba78d@i-love.sakura.ne.jp>
+Date:   Mon, 10 Aug 2020 16:52:17 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200810033309.GK17456@casper.infradead.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200810031915.2209658-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 10, 2020 at 04:33:09AM +0100, Matthew Wilcox wrote:
-> On Mon, Aug 10, 2020 at 11:19:15AM +0800, Ming Lei wrote:
-> > +++ b/include/linux/bvec.h
-> > @@ -117,11 +117,18 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
-> >  	return true;
-> >  }
-> >  
-> > +static inline void bvec_iter_skip_zero_bvec(struct bvec_iter *iter)
-> > +{
-> > +	iter->bi_bvec_done = 0;
-> > +	iter->bi_idx++;
-> > +}
-> > +
-> >  #define for_each_bvec(bvl, bio_vec, iter, start)			\
-> >  	for (iter = (start);						\
-> >  	     (iter).bi_size &&						\
-> >  		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
-> > -	     bvec_iter_advance((bio_vec), &(iter), (bvl).bv_len))
-> > +	     (bvl).bv_len ? bvec_iter_advance((bio_vec), &(iter),	\
-> > +		     (bvl).bv_len) : bvec_iter_skip_zero_bvec(&(iter)))
-> >  
+On 2020/08/10 12:19, Ming Lei wrote:
+> Block layer usually doesn't support or allow zero-length bvec. Since
+> commit 1bdc76aea115 ("iov_iter: use bvec iterator to implement
+> iterate_bvec()"), iterate_bvec() switches to bvec iterator. However,
+> Al mentioned that 'Zero-length segments are not disallowed' in iov_iter.
 > 
-> What if you have two zero-length bvecs in a row?  Won't this just skip
-> the first one?
-
-The 2nd one will be skipped too when it is observed in next loop.
-
+> Fixes for_each_bvec() so that it can move on after seeing one zero
+> length bvec.
 > 
-> It would seem better to me to put the bv_len test in bvec_iter_advance()
-> instead of making the macro more complicated.
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Link: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2262077.html
+> Fixes: 1bdc76aea115 ("iov_iter: use bvec iterator to implement iterate_bvec()")
 
-The reason is that block layer won't support zero length bvec, and I'd
-not bother bvec_iter_advance() for adding this check.
+Is this Fixes: correct? That commit should be in RHEL8's 4.18 kernel but that kernel
+does not hit this bug.
 
+Moreover, maybe nobody cares, but behavior of splice() differs when there are only 
+zero-length pages. With this fix, splice() returns 0 despite there is still pipe writers.
+Man page seems to say that splice() returns 0 when there is no pipe writers...
 
-Thanks,
-Ming
+    A return value of 0 means end of input.  If fd_in refers to a pipe,
+    then this means that there was no data to transfer, and it would not
+    make sense to block because there are no writers connected to the
+    write end of the pipe.
 
+----- test case -----
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{
+        static char buffer[4096];
+        const int fd = open("/tmp/testfile", O_WRONLY | O_CREAT, 0600);
+        int pipe_fd[2] = { EOF, EOF };
+        pipe(pipe_fd);
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        memset(buffer, 'a', sizeof(buffer));
+        //write(pipe_fd[1], buffer, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        memset(buffer, 'b', sizeof(buffer));
+        //write(pipe_fd[1], buffer, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        memset(buffer, 'c', sizeof(buffer));
+        //write(pipe_fd[1], buffer, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        memset(buffer, 'd', sizeof(buffer));
+        //write(pipe_fd[1], buffer, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        write(pipe_fd[1], NULL, sizeof(buffer));
+        splice(pipe_fd[0], NULL, fd, NULL, 65536, 0);
+        return 0;
+}
+
+----- 4.18.0-193.14.2.el8_2.x86_64 -----
+openat(AT_FDCWD, "/tmp/testfile", O_WRONLY|O_CREAT, 0600) = 3
+pipe([4, 5])                            = 0
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+splice(4, NULL, 3, NULL, 65536, 0
+
+^C)      = ? ERESTARTSYS (To be restarted if SA_RESTART is set)
+strace: Process 1486 detached
+
+----- linux.git + this fix -----
+open("/tmp/testfile", O_WRONLY|O_CREAT, 0600) = 3
+pipe([4, 5])                            = 0
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+splice(4, NULL, 3, NULL, 65536, 0)      = 0
+exit_group(0)                           = ?
++++ exited with 0 +++
+
+> Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+
+I just forwarded syzbot's report. Thus, credit goes to
+
+Reported-by: syzbot <syzbot+61acc40a49a3e46e25ea@syzkaller.appspotmail.com>
+
+> Tested-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+> Cc: Al Viro <viro@zeniv.linux.org.uk>
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: <stable@vger.kernel.org>
