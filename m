@@ -2,137 +2,178 @@ Return-Path: <SRS0=DoUd=BU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C9FC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E39C433E3
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 17:13:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF357207DE
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5C1E207DE
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 17:13:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Jrx/GSu1"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="iYCWO6Kd";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="iYCWO6Kd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726720AbgHJQvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 12:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726845AbgHJQvU (ORCPT
+        id S1728007AbgHJRNL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 13:13:11 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:57290 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725873AbgHJRNK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 12:51:20 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84802C061787
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2020 09:51:20 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id s15so4543176qvv.7
-        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2020 09:51:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=j7Nx7N4OeE4KkW4jW5KoZv1rUhElZ3FsfhltIpm/oPA=;
-        b=Jrx/GSu10mjBSWF2jZr+/m7e/fJA1rnd8TGZPs/A5pZIbFl6YUInjkQ8BOVVmw1aaD
-         JEsc7ZzM8tkQscXbnK8Xls+9V4u0cQElwwTxzPWpc7SOB/Z4NR33t79fwvmuETwXawt6
-         GTeskoGeAxf82hQPzpISEE4d4rxPChp762jC4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=j7Nx7N4OeE4KkW4jW5KoZv1rUhElZ3FsfhltIpm/oPA=;
-        b=gmuYPbCF3FyvZwEiACkNBnasGZpIuxsl5GNp/jhBlrh6WvQj7R+lseR46uG4bhKbLp
-         hp7nPU1CoIZKQmnQTX3DMws76BCP7JjusJUbIP9CbmOX6ZcZyjwdytrQ6VKJ8QHkXBft
-         duCCip6LMp5vpBdnKUtOO/4nRiE8Z8x7XUBkX8lgJjeco5sR+RSeX2uCaGlLPRZ3zhYA
-         D7T2QGUebq+dmfGRqkXQn7hGYu1v0Q5TwdDxN487UBAV5/3T1h0dolNNZ9PjJkW5LAat
-         TQgk28n6zkIZ0D3LM3ms/5PDuBdggOCt8Kxtw+Wo0g6nx4u99xxswIwyjD6yUQY+wCEM
-         l9TQ==
-X-Gm-Message-State: AOAM532/YdgracuEVsChEBNLradxk9cVp+P5zgabjTSteu++LWJa6LPc
-        oLQ4WE1y5+oWXX9z2273pYYuDL4uy74Tcya1bE4lKw==
-X-Google-Smtp-Source: ABdhPJxWwHQ4+VVD7ZA1DPCQQZe2AzFleL9gJSSX1Hdn4b/7UH0mn0IQslmGaUb9LxTFCqnvFHsxdbqVt0Eb+Dy37aM=
-X-Received: by 2002:a0c:d981:: with SMTP id y1mr30169563qvj.124.1597078279461;
- Mon, 10 Aug 2020 09:51:19 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-3-git-send-email-john.garry@huawei.com>
- <20200611025759.GA453671@T590> <6ef76cdf-2fb3-0ce8-5b5a-0d7af0145901@huawei.com>
- <8ef58912-d480-a7e1-f04c-da9bd85ea0ae@huawei.com> <eaf188d5-dac0-da44-1c83-31ff2860d8fa@suse.de>
- e42da0e714c808c80e9a055f3f065e44@mail.gmail.com
-In-Reply-To: e42da0e714c808c80e9a055f3f065e44@mail.gmail.com
-MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQBVjmvxAE7FMYb7GtMRWGcwtMcECgJRJzAeAmYD0J0CUmtFnQMQPP3WAliipVSrhUrmoIBKbxJA
-Date:   Mon, 10 Aug 2020 22:21:16 +0530
-Message-ID: <3b80b46173103c62c2f94e25ff517058@mail.gmail.com>
-Subject: RE: [PATCH RFC v7 02/12] blk-mq: rename blk_mq_update_tag_set_depth()
-To:     Hannes Reinecke <hare@suse.de>, John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com
+        Mon, 10 Aug 2020 13:13:10 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 999ED8EE1C0;
+        Mon, 10 Aug 2020 10:13:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1597079588;
+        bh=ZSUuR8ps3gaheFekbtCVfg8z7Gr1pV6yqoiecRqqW8c=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=iYCWO6Kd4nTdCv5g6xAbDjadaFzWlmhhoNj9TpbEWpJn5ZDHYArz/NgmrHI32upGU
+         CkiiHnu0oDclBoXTkOvdoqyhPba3bX4nZInPWPf1ZhwQLcVm9Mct4z4I7990dd4LBS
+         pGJMM7XnYmkDK80UUVcaInTgnsKlXcycISGTQ5eg=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id kjQAlOlinWBO; Mon, 10 Aug 2020 10:13:08 -0700 (PDT)
+Received: from [153.66.254.174] (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 22EBE8EE12E;
+        Mon, 10 Aug 2020 10:13:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1597079588;
+        bh=ZSUuR8ps3gaheFekbtCVfg8z7Gr1pV6yqoiecRqqW8c=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=iYCWO6Kd4nTdCv5g6xAbDjadaFzWlmhhoNj9TpbEWpJn5ZDHYArz/NgmrHI32upGU
+         CkiiHnu0oDclBoXTkOvdoqyhPba3bX4nZInPWPf1ZhwQLcVm9Mct4z4I7990dd4LBS
+         pGJMM7XnYmkDK80UUVcaInTgnsKlXcycISGTQ5eg=
+Message-ID: <1597079586.3966.34.camel@HansenPartnership.com>
+Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
+ LSM (IPE)
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>,
+        Chuck Lever <chucklever@gmail.com>,
+        James Morris <jmorris@namei.org>
+Cc:     Deven Bowers <deven.desai@linux.microsoft.com>,
+        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
+        snitzer@redhat.com, dm-devel@redhat.com,
+        tyhicks@linux.microsoft.com, agk@redhat.com,
+        Paul Moore <paul@paul-moore.com>,
+        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
+        serge@hallyn.com, pasha.tatashin@soleen.com,
+        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
+        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        jaskarankhurana@linux.microsoft.com
+Date:   Mon, 10 Aug 2020 10:13:06 -0700
+In-Reply-To: <4664ab7dc3b324084df323bfa4670d5bfde76e66.camel@linux.ibm.com>
+References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
+         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
+         <20200802143143.GB20261@amd>
+         <1596386606.4087.20.camel@HansenPartnership.com>
+         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
+         <1596639689.3457.17.camel@HansenPartnership.com>
+         <alpine.LRH.2.21.2008050934060.28225@namei.org>
+         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
+         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
+         <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
+         <1597073737.3966.12.camel@HansenPartnership.com>
+         <4664ab7dc3b324084df323bfa4670d5bfde76e66.camel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > Kashyap, I've also attached an updated patch for the elevator_count
-> > patch; if you agree John can include it in the next version.
->
-> Hannes - Patch looks good.   Header does not include problem statement.
-> How about adding below in header ?
->
-> High CPU utilization on "native_queued_spin_lock_slowpath" due to lock
-> contention is possible in mq-deadline and bfq io scheduler when
-> nr_hw_queues is more than one.
-> It is because kblockd work queue can submit IO from all online CPUs
-> (through
-> blk_mq_run_hw_queues) even though only one hctx has pending commands.
-> Elevator callback "has_work" for mq-deadline and bfq scheduler consider
-> pending work if there are any IOs on request queue and it does not account
-> hctx context.
+On Mon, 2020-08-10 at 12:35 -0400, Mimi Zohar wrote:
+> On Mon, 2020-08-10 at 08:35 -0700, James Bottomley wrote:
+[...]
+> > > Up to now, verifying remote filesystem file integrity has been
+> > > out of scope for IMA.   With fs-verity file signatures I can at
+> > > least grasp how remote file integrity could possibly work.  I
+> > > don't understand how remote file integrity with existing IMA
+> > > formats could be supported. You might want to consider writing a
+> > > whitepaper, which could later be used as the basis for a patch
+> > > set cover letter.
+> > 
+> > I think, before this, we can help with the basics (and perhaps we
+> > should sort them out before we start documenting what we'll do).
+> 
+> I'm not opposed to doing that, but you're taking this discussion in a
+> totally different direction.  The current discussion is about NFSv4
+> supporting the existing IMA signatures, not only fs-verity
+> signatures. I'd like to understand how that is possible and for the
+> community to weigh in on whether it makes sense.
 
-Hannes/John - We need one more correction for below patch -
+Well, I see the NFS problem as being chunk at a time, right, which is
+merkle tree, or is there a different chunk at a time mechanism we want
+to use?  IMA currently verifies signature on open/exec and then
+controls updates.  Since for NFS we only control the client, we can't
+do that on an NFS server, so we really do need verification at read
+time ... unless we're threading IMA back to the NFS server?
 
-https://github.com/hisilicon/kernel-dev/commit/ff631eb80aa0449eaeb78a282fd7eff2a9e42f77
+> > The first basic is that a merkle tree allows unit at a time
+> > verification. First of all we should agree on the unit.  Since we
+> > always fault a page at a time, I think our merkle tree unit should
+> > be a page not a block. Next, we should agree where the check gates
+> > for the per page accesses should be ... definitely somewhere in
+> > readpage, I suspect and finally we should agree how the merkle tree
+> > is presented at the gate.  I think there are three ways:
+> > 
+> >    1. Ahead of time transfer:  The merkle tree is transferred and
+> > verified
+> >       at some time before the accesses begin, so we already have a
+> >       verified copy and can compare against the lower leaf.
+> >    2. Async transfer:  We provide an async mechanism to transfer
+> > the
+> >       necessary components, so when presented with a unit, we check
+> > the
+> >       log n components required to get to the root
+> >    3. The protocol actually provides the capability of 2 (like the
+> > SCSI
+> >       DIF/DIX), so to IMA all the pieces get presented instead of
+> > IMA
+> >       having to manage the tree
+> > 
+> > There are also a load of minor things like how we get the head
+> > hash, which must be presented and verified ahead of time for each
+> > of the above 3.
+> 
+>  
+> I was under the impression that IMA support for fs-verity signatures
+> would be limited to including the fs-verity signature in the
+> measurement list and verifying the fs-verity signature.   As fs-
+> verity is limited to immutable files, this could be done on file
+> open.  fs-verity would be responsible for enforcing the block/page
+> data integrity.   From a local filesystem perspective, I think that
+> is all that is necessary.
 
-I noticed - that elevator_queued count goes negative mainly because there
-are some case where IO was submitted from dispatch queue(not scheduler
-queue) and request still has "RQF_ELVPRIV" flag set.
-In such cases " dd_finish_request" is called without " dd_insert_request". I
-think it is better to decrement counter once it is taken out from dispatched
-queue. (Ming proposed to use dispatch path for decrementing counter, but I
-somehow did not accounted assuming RQF_ELVPRIV will be set only if IO is
-submitted from scheduler queue.)
+The fs-verity use case is a bit of a crippled one because it's
+immutable.  I think NFS represents more the general case where you
+can't rely on immutability and have to verify at chunk read time.  If
+we get chunk at a time working for NFS, it should work also for fs-
+verity and we wouldn't need to have two special paths.
 
-Below is additional change. Can you merge this ?
+I think, even for NFS we would only really need to log the open, so
+same as you imagine for fs-verity.  As long as the chunk read hashes
+match, we can be silent because everything is going OK, so we only need
+to determine what to do and log on mismatch (which isn't expected to
+happen for fs-verity).
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 9d75374..bc413dd 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -385,6 +385,8 @@ static struct request *dd_dispatch_request(struct
-blk_mq_hw_ctx *hctx)
+> In terms of remote file systems,  the main issue is transporting and
+> storing the Merkle tree.  As fs-verity is limited to immutable files,
+> this could still be done on file open.
 
-        spin_lock(&dd->lock);
-        rq = __dd_dispatch_request(dd);
-+       if (rq)
-+               atomic_dec(&rq->mq_hctx->elevator_queued);
-        spin_unlock(&dd->lock);
+Right, I mentioned that in my options ... we need some "supply
+integrity" hook ... or possibly multiple hooks for a variety of
+possible methods.
 
-        return rq;
-@@ -574,7 +576,6 @@ static void dd_finish_request(struct request *rq)
-                        blk_mq_sched_mark_restart_hctx(rq->mq_hctx);
-                spin_unlock_irqrestore(&dd->zone_lock, flags);
-        }
--       atomic_dec(&rq->mq_hctx->elevator_queued);
- }
+James
 
- static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
---
-2.9.5
-
-Kashyap
