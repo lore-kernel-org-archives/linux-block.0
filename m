@@ -2,202 +2,449 @@ Return-Path: <SRS0=DoUd=BU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75151C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D446C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:39:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3408C2076B
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:36:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19DF1207DE
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:39:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tEokO3hI"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NM8UdW0Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726845AbgHJQgb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 12:36:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17280 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725873AbgHJQgb (ORCPT
+        id S1727876AbgHJQjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 12:39:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47076 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725873AbgHJQjE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 12:36:31 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07AGWeGG019110;
-        Mon, 10 Aug 2020 12:36:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=kMrMRyqWQzI9XLcDnZA9dEhh6Lfjbkrw/za3vv1K64M=;
- b=tEokO3hIFCI5G2/SkclQWDqPE79KYCiYicfsVRP2w4yIWoGz8r+tZmhAn+zFmzzI20HP
- bps0Bwlxhp3fMhL0rhZQUUyQo/Uq4seAZGm9UyGjUvJIXK1IkQWB4hhXgfHj9WmhxECF
- dNfW/AeSaK+JxaSpT7I6+qS+/+NweeicYdT4fimYSilpUo6XOa2i5nMGPGP9sEyzTUyO
- Pd6vD+jt2nY7jwSPkqIa6w4FaNN05pe6Lu3ULRSg17NyYTiAuFPIH4v+x+R5URwLbwzm
- cPlrzWNff+PVccW9V908RSH5iWpx5YN4+mWIpVTudzK0ORrrcpuBsRhAg2xUO4QZpEao mA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32src1ja2q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Aug 2020 12:36:07 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07AGYlH3024628;
-        Mon, 10 Aug 2020 12:36:07 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32src1ja1n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Aug 2020 12:36:07 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07AGZZ1H008254;
-        Mon, 10 Aug 2020 16:36:04 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 32skahaf97-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Aug 2020 16:36:04 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07AGa2XL60031394
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Aug 2020 16:36:02 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6000911C04A;
-        Mon, 10 Aug 2020 16:36:02 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EA86511C058;
-        Mon, 10 Aug 2020 16:35:56 +0000 (GMT)
-Received: from sig-9-65-241-154.ibm.com (unknown [9.65.241.154])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Aug 2020 16:35:56 +0000 (GMT)
-Message-ID: <4664ab7dc3b324084df323bfa4670d5bfde76e66.camel@linux.ibm.com>
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
- LSM (IPE)
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Chuck Lever <chucklever@gmail.com>,
-        James Morris <jmorris@namei.org>
-Cc:     Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com,
-        Paul Moore <paul@paul-moore.com>,
-        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
-        serge@hallyn.com, pasha.tatashin@soleen.com,
-        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
-        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Date:   Mon, 10 Aug 2020 12:35:56 -0400
-In-Reply-To: <1597073737.3966.12.camel@HansenPartnership.com>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
-         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
-         <20200802143143.GB20261@amd>
-         <1596386606.4087.20.camel@HansenPartnership.com>
-         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
-         <1596639689.3457.17.camel@HansenPartnership.com>
-         <alpine.LRH.2.21.2008050934060.28225@namei.org>
-         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
-         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
-         <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
-         <1597073737.3966.12.camel@HansenPartnership.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-12.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-10_12:2020-08-06,2020-08-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- mlxscore=0 impostorscore=0 mlxlogscore=999 clxscore=1015
- priorityscore=1501 malwarescore=0 lowpriorityscore=0 phishscore=0
- spamscore=0 suspectscore=3 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008100119
+        Mon, 10 Aug 2020 12:39:04 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F01C061756
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2020 09:39:03 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id b14so8932455qkn.4
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2020 09:39:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=7OISHQ5S7uFDJjSzqApjBijBbbK4ilRz/I7r1jA+1kw=;
+        b=NM8UdW0YBwqfiRxeSJHjaVanrZk2HkWNzIMAinQ7ISfxrBfyr/0J/JcGdTR+m07Hjs
+         HnB1C85Dv9BnaEj8pCZoAqDJfUopVdegoqRnC3Wp5PvgMEUCdqXKzWvXYfumwczLaR5h
+         K+4suADdUCSnrXmCAqBHBvbDdnqhMBI022q00=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=7OISHQ5S7uFDJjSzqApjBijBbbK4ilRz/I7r1jA+1kw=;
+        b=gg8Q/8p1fv4plsBrchMMCmb0sGHg18tfGQYVKyXMGMgbRi+fepHaA2J8f1nZd6RbH5
+         Egs3OrAuhdpTDfTZukRIbQPquwzj5E8Qr7C4Ay7zZvfU30nwzmIqlCD/UbxqP4AVGs7h
+         ziQbKJyFPh5azUtUYmYwVL7Jejw40jUXCTVo5Z3RrRefd+x2/0Y2rFhfDU1om4qMgat6
+         kKMadqDIEr2oqsxA5l4ejG/w0Cc+E3kkGk1qstgWb8a2a31+jD3g9U+kKkMDaB6vGEFC
+         JFI68ppOSaCWslvL2v0SwN5B6AathYC8zsonusaaOo4uGkieqypEHCSiBGMNn3xiGcuL
+         wETw==
+X-Gm-Message-State: AOAM533pr/rB2WAzpBXjjJuEx7/tlqaupVRMB72a/xmwdvI/PyBKvN//
+        xbuBfpq64s3HM3K5QMsHxLtKtGbLG2EqIgJdwrGNSg==
+X-Google-Smtp-Source: ABdhPJzCUG0q/IHd/PForZfJGWJDBkbn/RDJgyVlepvwQfsdov3eRyVm2ndvPxbfBnFZ6ofgWYCxe+evXo6X5wsRqV8=
+X-Received: by 2002:a05:620a:9c6:: with SMTP id y6mr25485316qky.27.1597077542501;
+ Mon, 10 Aug 2020 09:39:02 -0700 (PDT)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <20200729153648.GA1698748@T590> <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
+ <20200804083625.GA1958244@T590> <afe5eb1be7f416a48d7b5d473f3053d0@mail.gmail.com>
+ <20200805084031.GA1995289@T590> <5adffdf805179428bdd0dd6c293a4f7d@mail.gmail.com>
+ <20200806133819.GA2046861@T590> <f1ac35dfca34193e6c9bcedbc11911d2@mail.gmail.com>
+ <20200806152939.GA2062348@T590> <3f35b0f67c73c8c4996fdad80eb6d963@mail.gmail.com>
+ <20200809021633.GA2134904@T590>
+In-Reply-To: <20200809021633.GA2134904@T590>
+MIME-Version: 1.0
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQH/A0eco5N6O5ofbhtFVgRA/dxPrQH3z9//AiXTC0wDI6cgwwFSJLZtAawi+ucB2l0ciQK2moYdAS+j/goBcwPv3wKnjC8NqD+Go4A=
+Date:   Mon, 10 Aug 2020 22:08:59 +0530
+Message-ID: <6f8790811e7a3238f2b0fa35fbb816bc@mail.gmail.com>
+Subject: RE: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        bvanassche@acm.org, hare@suse.com, hch@lst.de,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2020-08-10 at 08:35 -0700, James Bottomley wrote:
-> On Sun, 2020-08-09 at 13:16 -0400, Mimi Zohar wrote:
-> > On Sat, 2020-08-08 at 13:47 -0400, Chuck Lever wrote:
-> > > > On Aug 5, 2020, at 2:15 PM, Mimi Zohar <zohar@linux.ibm.com>
-> > > > wrote:
-> > 
-> > <snip>
-> > 
-> > > > If block layer integrity was enough, there wouldn't have been a
-> > > > need for fs-verity.   Even fs-verity is limited to read only
-> > > > filesystems, which makes validating file integrity so much
-> > > > easier.  From the beginning, we've said that fs-verity signatures
-> > > > should be included in the measurement list.  (I thought someone
-> > > > signed on to add that support to IMA, but have not yet seen
-> > > > anything.)
-> > > 
-> > > Mimi, when you and I discussed this during LSS NA 2019, I didn't
-> > > fully understand that you expected me to implement signed Merkle
-> > > trees for all filesystems. At the time, it sounded to me like you
-> > > wanted signed Merkle trees only for NFS files. Is that still the
-> > > case?
-> > 
-> > I definitely do not expect you to support signed Merkle trees for all
-> > filesystems.  My interested is from an IMA perspective of measuring
-> > and verifying the fs-verity Merkle tree root (and header info)
-> > signature. This is independent of which filesystems support it.
-> > 
-> > > The first priority (for me, anyway) therefore is getting the
-> > > ability to move IMA metadata between NFS clients and servers
-> > > shoveled into the NFS protocol, but that's been blocked for various
-> > > legal reasons.
-> > 
-> > Up to now, verifying remote filesystem file integrity has been out of
-> > scope for IMA.   With fs-verity file signatures I can at least grasp
-> > how remote file integrity could possibly work.  I don't understand
-> > how remote file integrity with existing IMA formats could be
-> > supported. You might want to consider writing a whitepaper, which
-> > could later be used as the basis for a patch set cover letter.
-> 
-> I think, before this, we can help with the basics (and perhaps we
-> should sort them out before we start documenting what we'll do).
+> On Sun, Aug 09, 2020 at 12:35:21AM +0530, Kashyap Desai wrote:
+> > > On Thu, Aug 06, 2020 at 08:07:38PM +0530, Kashyap Desai wrote:
+> > > > > > Hi Ming -
+> > > > > >
+> > > > > > There is still some race which is not handled.  Take a case of
+> > > > > > IO is not able to get budget and it has already marked
+> > > > > > <restarts>
+> > flag.
+> > > > > > <restarts> flag will be seen non-zero in completion path and
+> > > > > > completion path will attempt h/w queue run. (But this
+> > > > > > particular IO is still not in s/w queue.).
+> > > > > > Attempt of running h/w queue from completion path will not
+> > > > > > flush any IO since there is no IO in s/w queue.
+> > > > >
+> > > > > Then where is the IO to be submitted in case of running out of
+> > budget?
+> > > >
+> > > > Typical race in your latest patch is - (Lets consider command A,B
+> > > > and
+> > > > C) Command A did not receive budget. Command B completed  (which
+> > > > was already
+> > >
+> > > Command A doesn't get budget, and A is still in sw/scheduler queue
+> > because
+> > > we try to acquire budget before dequeuing request from sw/scheduler
+> > queue,
+> > > see __blk_mq_do_dispatch_sched() and blk_mq_do_dispatch_ctx().
+> > >
+> > > Not consider direct issue, because the hw queue will be run
+> > > explicitly
+> > when
+> > > not getting budget, see __blk_mq_try_issue_directly.
+> > >
+> > > Not consider command A being added to hctx->dispatch too, because
+> > > blk-mq will re-run the queue, see blk_mq_dispatch_rq_list().
+> >
+> > Ming -
+> >
+> > After going through your comment (I noted your comment and thanks for
+> > correcting my understanding.) and block layer code, I realize that it
+> > is a different race condition. My previous explanation was not
+accurate.
+> > I debug further and figure out what is actually happening - Consider
+> > below scenario/sequence -
+> >
+> > Thread -1 - Detected budget contention. Set restarts = 1.
+> > Thread -2 - old restarts = 1. start hw queue.
+> > Thread -3 - old restarts = 1. start hw queue.
+> > Thread -2 - move restarts = 0.
+> > In my testing, I noticed that both thread-2 and thread-3 started h/w
+> > queue but there was no work for them to do. It is possible because
+> > some other context of h/w queue run might have done that job.
+>
+> It should be true, because there is other run queue somewhere, such as
+blk-
+> mq's restart or delay run queue.
+>
+> > It means, IO of thread-1 is already posted.
+>
+> OK.
+>
+> > Thread -4 - Detected budget contention. Set restart = 1 (because
+> > thread-2 has move restarts=0).
+>
+> OK.
+>
+> > Thread -3 - move restarts = 0 (because this thread see old value = 1
+> > but that is actually updated one more time by thread-4 and theread-4
+> > actually wanted to run h/w queues). IO of Thread-4 will not be
+scheduled.
+>
+> Right.
+>
+> >
+> > We have to make sure that completion IO path do atomic_cmpxchng of
+> > restarts flag before running the h/w queue.  Below code change - (main
+> > fix is sequence of atomic_cmpxchg and blk_mq_run_hw_queues) fix the
+> issue.
+> >
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -594,8 +594,27 @@ static bool scsi_end_request(struct request *req,
+> > blk_status_t error,
+> >         if (scsi_target(sdev)->single_lun ||
+> >             !list_empty(&sdev->host->starved_list))
+> >                 kblockd_schedule_work(&sdev->requeue_work);
+> > -       else
+> > -               blk_mq_run_hw_queues(q, true);
+> > +       else {
+> > +               /*
+> > +                * smp_mb() implied in either rq->end_io or
+> > blk_mq_free_request
+> > +                * is for ordering writing .device_busy in
+> > scsi_device_unbusy()
+> > +                * and reading sdev->restarts.
+> > +                */
+> > +               int old = atomic_read(&sdev->restarts);
+> > +
+> > +               if (old) {
+> > +                       /*
+> > +                        * ->restarts has to be kept as non-zero if
+> > + there
+> > is
+> > +                        *  new budget contention comes.
+> > +                        */
+> > +                       atomic_cmpxchg(&sdev->restarts, old, 0);
+> > +
+> > +                       /* run the queue after restarts flag is
+updated
+> > +                        * to avoid race condition with .get_budget
+> > +                        */
+> > +                       blk_mq_run_hw_queues(sdev->request_queue,
+true);
+> > +               }
+> > +       }
+> >
+>
+> I think the above change is right, and this patter is basically same
+with
+> SCHED_RESTART used in blk_mq_sched_restart().
+>
+> BTW, could you run your function & performance test against the
+following
+> new version?
+> Then I can include your test result in commit log for moving on.
 
-I'm not opposed to doing that, but you're taking this discussion in a
-totally different direction.  The current discussion is about NFSv4
-supporting the existing IMA signatures, not only fs-verity signatures. 
-I'd like to understand how that is possible and for the community to
-weigh in on whether it makes sense.
+Ming  - I completed both functional and performance test.
 
-> The
-> first basic is that a merkle tree allows unit at a time verification.
-> First of all we should agree on the unit.  Since we always fault a page
-> at a time, I think our merkle tree unit should be a page not a block. 
-> Next, we should agree where the check gates for the per page accesses
-> should be ... definitely somewhere in readpage, I suspect and finally
-> we should agree how the merkle tree is presented at the gate.  I think
-> there are three ways:
-> 
->    1. Ahead of time transfer:  The merkle tree is transferred and verified
->       at some time before the accesses begin, so we already have a
->       verified copy and can compare against the lower leaf.
->    2. Async transfer:  We provide an async mechanism to transfer the
->       necessary components, so when presented with a unit, we check the
->       log n components required to get to the root
->    3. The protocol actually provides the capability of 2 (like the SCSI
->       DIF/DIX), so to IMA all the pieces get presented instead of IMA
->       having to manage the tree
-> 
-> There are also a load of minor things like how we get the head hash,
-> which must be presented and verified ahead of time for each of the
-> above 3.
- 
-I was under the impression that IMA support for fs-verity signatures
-would be limited to including the fs-verity signature in the
-measurement list and verifying the fs-verity signature.   As fs-verity
-is limited to immutable files, this could be done on file open.  fs-
-verity would be responsible for enforcing the block/page data
-integrity.   From a local filesystem perspective, I think that is all
-that is necessary.
+System used for the test -
+Manufacturer: Supermicro
+Product Name: X11DPG-QT
 
-In terms of remote file systems,  the main issue is transporting and
-storing the Merkle tree.  As fs-verity is limited to immutable files,
-this could still be done on file open.
+lscpu <snippet>
+CPU(s):                72
+On-line CPU(s) list:   0-71
+Thread(s) per core:    2
+Core(s) per socket:    18
+Socket(s):             2
+NUMA node(s):          2
+Model name:            Intel(R) Xeon(R) Gold 6150 CPU @ 2.70GHz
 
-Mimi
+Controller used -
+MegaRAID 9560-16i
 
+Total 24 SAS driver of model "WDC      WUSTM3240ASS200"
+
+Total 3 VD created each VD consist of 8 SAS Drives.
+
+Performance testing -
+
+Fio script -
+[global]
+ioengine=libaio
+direct=1
+sync=0
+ramp_time=20
+runtime=60
+cpus_allowed=18,19
+bs=4k
+rw=randread
+ioscheduler=none
+iodepth=128
+
+[seqprecon]
+filename=/dev/sdc
+[seqprecon]
+filename=/dev/sdd
+[seqprecon]
+filename=/dev/sde
+
+Without this patch - 602K IOPS. Perf top snippet -(Note - Usage of
+blk_mq_run_hw_queues -> blk_mq_run_hw_queue is very high. It consume more
+CPU which leads to less performance.)
+
+     8.70%  [kernel]        [k] blk_mq_run_hw_queue
+     5.24%  [megaraid_sas]  [k] complete_cmd_fusion
+     4.65%  [kernel]        [k] sbitmap_any_bit_set
+     3.93%  [kernel]        [k] irq_entries_start
+     3.58%  perf            [.] __symbols__insert
+     2.21%  [megaraid_sas]  [k] megasas_build_and_issue_cmd_fusion
+     1.91%  [kernel]        [k] blk_mq_run_hw_queues
+
+With this patch - 1110K IOPS. Perf top snippet -
+
+    8.05%  [megaraid_sas]  [k] complete_cmd_fusion
+     4.10%  [kernel]        [k] irq_entries_start
+     3.71%  [megaraid_sas]  [k] megasas_build_and_issue_cmd_fusion
+     2.85%  [kernel]        [k] read_tsc
+     2.83%  [kernel]        [k] io_submit_one
+     2.26%  [kernel]        [k] entry_SYSCALL_64
+     2.08%  [megaraid_sas]  [k] megasas_queue_command
+
+
+Functional Test -
+
+I cover overnight IO testing using <fio> script which sends 4K rand read,
+read, rand write and write IOs to the 24 SAS JBOD drives.
+Some of the JBOD has ioscheduler=none and some of the JBOD has
+ioscheduler=mq-deadline
+I used additional script which change sdev->queue_depth of each device
+from 2 to 16 range at the interval of 5 seconds.
+I used additional script which toggle "rq_affinity=1" and "rq_affinity=2"
+at the interval of 5 seconds.
+
+I did not noticed any IO hang.
+
+Thanks, Kashyap
+
+>
+>
+> From 06993ddf5c5dbe0e772cc38342919eb61a57bc50 Mon Sep 17 00:00:00
+> 2001
+> From: Ming Lei <ming.lei@redhat.com>
+> Date: Wed, 5 Aug 2020 16:35:53 +0800
+> Subject: [PATCH] scsi: core: only re-run queue in scsi_end_request() if
+device
+> queue is busy
+>
+> Now the request queue is run in scsi_end_request() unconditionally if
+both
+> target queue and host queue is ready. We should have re-run request
+queue
+> only after this device queue becomes busy for restarting this LUN only.
+>
+> Recently Long Li reported that cost of run queue may be very heavy in
+case of
+> high queue depth. So improve this situation by only running the request
+queue
+> when this LUN is busy.
+>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Ewan D. Milne <emilne@redhat.com>
+> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Damien Le Moal <damien.lemoal@wdc.com>
+> Cc: Long Li <longli@microsoft.com>
+> Reported-by: Long Li <longli@microsoft.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V4:
+> 	- not clear .restarts in get_budget(), instead clearing it
+> 	after re-run queue is done; Kashyap figured out we have to
+> 	update ->restarts before re-run queue in scsi_run_queue_async().
+>
+> V3:
+> 	- add one smp_mb() in scsi_mq_get_budget() and comment
+>
+> V2:
+> 	- commit log change, no any code change
+> 	- add reported-by tag
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/scsi/scsi_lib.c    | 51 +++++++++++++++++++++++++++++++++++---
+>  include/scsi/scsi_device.h |  1 +
+>  2 files changed, 49 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c index
+> c866a4f33871..d083250f9518 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -552,8 +552,27 @@ static void scsi_run_queue_async(struct scsi_device
+> *sdev)
+>  	if (scsi_target(sdev)->single_lun ||
+>  	    !list_empty(&sdev->host->starved_list))
+>  		kblockd_schedule_work(&sdev->requeue_work);
+> -	else
+> -		blk_mq_run_hw_queues(sdev->request_queue, true);
+> +	else {
+> +		/*
+> +		 * smp_mb() implied in either rq->end_io or
+> blk_mq_free_request
+> +		 * is for ordering writing .device_busy in
+scsi_device_unbusy()
+> +		 * and reading sdev->restarts.
+> +		 */
+> +		int old = atomic_read(&sdev->restarts);
+> +
+> +		if (old) {
+> +			/*
+> +			 * ->restarts has to be kept as non-zero if there
+is
+> +			 *  new budget contention comes.
+> +			 *
+> +			 *  No need to run queue when either another
+re-run
+> +			 *  queue wins in updating ->restarts or one new
+> budget
+> +			 *  contention comes.
+> +			 */
+> +			if (atomic_cmpxchg(&sdev->restarts, old, 0) ==
+old)
+> +				blk_mq_run_hw_queues(sdev-
+> >request_queue, true);
+> +		}
+> +	}
+>  }
+>
+>  /* Returns false when no more bytes to process, true if there are more
+*/
+> @@ -1612,8 +1631,34 @@ static void scsi_mq_put_budget(struct
+> request_queue *q)  static bool scsi_mq_get_budget(struct request_queue
+*q)
+> {
+>  	struct scsi_device *sdev = q->queuedata;
+> +	int ret = scsi_dev_queue_ready(q, sdev);
+> +
+> +	if (ret)
+> +		return true;
+> +
+> +	atomic_inc(&sdev->restarts);
+>
+> -	return scsi_dev_queue_ready(q, sdev);
+> +	/*
+> +	 * Order writing .restarts and reading .device_busy, and make sure
+> +	 * .restarts is visible to scsi_end_request(). Its pair is implied
+by
+> +	 * __blk_mq_end_request() in scsi_end_request() for ordering
+> +	 * writing .device_busy in scsi_device_unbusy() and reading
+.restarts.
+> +	 *
+> +	 */
+> +	smp_mb__after_atomic();
+> +
+> +	/*
+> +	 * If all in-flight requests originated from this LUN are
+completed
+> +	 * before setting .restarts, sdev->device_busy will be observed as
+> +	 * zero, then blk_mq_delay_run_hw_queues() will dispatch this
+> request
+> +	 * soon. Otherwise, completion of one of these request will
+observe
+> +	 * the .restarts flag, and the request queue will be run for
+handling
+> +	 * this request, see scsi_end_request().
+> +	 */
+> +	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
+> +				!scsi_device_blocked(sdev)))
+> +		blk_mq_delay_run_hw_queues(sdev->request_queue,
+> SCSI_QUEUE_DELAY);
+> +	return false;
+>  }
+>
+>  static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx, diff
+--git
+> a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h index
+> bc5909033d13..1a5c9a3df6d6 100644
+> --- a/include/scsi/scsi_device.h
+> +++ b/include/scsi/scsi_device.h
+> @@ -109,6 +109,7 @@ struct scsi_device {
+>  	atomic_t device_busy;		/* commands actually active on
+LLDD
+> */
+>  	atomic_t device_blocked;	/* Device returned QUEUE_FULL. */
+>
+> +	atomic_t restarts;
+>  	spinlock_t list_lock;
+>  	struct list_head starved_entry;
+>  	unsigned short queue_depth;	/* How deep of a queue we want */
+> --
+> 2.25.2
+>
+>
+>
+> Thanks,
+> Ming
