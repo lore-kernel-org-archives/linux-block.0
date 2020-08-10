@@ -2,163 +2,95 @@ Return-Path: <SRS0=DoUd=BU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB72C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 07:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51719C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 08:04:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93D722065C
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 07:52:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CADF2075D
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 08:04:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="atzowz9S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726448AbgHJHwu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 03:52:50 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:51083 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725894AbgHJHwt (ORCPT
+        id S1726334AbgHJIET (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 04:04:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52934 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726350AbgHJIET (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 03:52:49 -0400
-Received: from fsav402.sakura.ne.jp (fsav402.sakura.ne.jp [133.242.250.101])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 07A7qQ44046079;
-        Mon, 10 Aug 2020 16:52:26 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav402.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav402.sakura.ne.jp);
- Mon, 10 Aug 2020 16:52:26 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav402.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 07A7qH7j045729
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO);
-        Mon, 10 Aug 2020 16:52:26 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH] block: allow for_each_bvec to support zero len bvec
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, stable@vger.kernel.org
-References: <20200810031915.2209658-1-ming.lei@redhat.com>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <db57f8ca-b3c3-76ec-1e49-d8f8161ba78d@i-love.sakura.ne.jp>
-Date:   Mon, 10 Aug 2020 16:52:17 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Mon, 10 Aug 2020 04:04:19 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6793BC061787
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2020 01:04:18 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id w25so8517555ljo.12
+        for <linux-block@vger.kernel.org>; Mon, 10 Aug 2020 01:04:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=t2rGage70Jk5h0hvfFUtPxz+GuGpMqZrJcGzTBL46E8=;
+        b=atzowz9SOphxx0a37O51EcGyBxaCNxJK5KNT8YE/hy6R/h3FcDTmlnk7ANBzGyJt1D
+         WjG02Ed5JdaJ+PVsWHeFbPNl5dy6z72+8K/CJVaCVS9CgWqjF3cSi4HeCpDxbwBf42K0
+         wShtwdqUlQG14UC7OhgJkXC+nUSBWM9/kBKGl/HUsfz+1WKZjaRCY0RWDLmpq+hoIbZq
+         ARPgAGAOf32u/B9ILg4YHZBEnh3huWTJ9QYZ7eLiSGlVJUjI2rg0wA+/toCFJbC6bSsB
+         ii1PERAazUQeO2OfLaFFpfvGNm4hzRg3DnMqh7qg7Zgp3jwTu/yiBJHFxcH0aVmMIEPd
+         TbJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=t2rGage70Jk5h0hvfFUtPxz+GuGpMqZrJcGzTBL46E8=;
+        b=I9RVpmRU9Tlkk00HhOTTvP3IyPQSXfTy3k23LgM/RyJU/A4mD0cO4x/dRMAStMl1zi
+         mbY2qAChVlbIZmDBkWm2CDWordQxS+r65iH2i+U8QnVxTrjqeUCqoGm0V+k9kgwYLA7z
+         g6mHtd/j5dmyFQHongH1usuePVgAC69xEFc8Y23Trca7+m2FcwTbXRw03/jt5vdhUOku
+         f3jN/InvebMKFMBwcKI/Q5NqPASG1jZcuoG+7tBeNxxx3Inhj0SJNPj5iYcqBbLiIJHX
+         tdsHJvS+TtZnC23WCpBonPxj1rWtT25a88Nyx8Uc8oNq69Z9k9EzMm9W+n+dnTHyW2pn
+         0pTw==
+X-Gm-Message-State: AOAM5314E6ivuBRxsy5dvf8bhT2p6dPnaLXA9ERD35xoLu6mitJprS92
+        UqiDOJPIYfnaXitc1cYSN7JMMgO8VmJxIFWhzBs4iA==
+X-Google-Smtp-Source: ABdhPJyers0WzewoH8+10vmN5DZUr86ob+cLHqutbtp3jkGybBSDFsktjvhIBCpkC2iaIFZU2u1mTfZxtrZNW38+MSw=
+X-Received: by 2002:a05:651c:1350:: with SMTP id j16mr11206533ljb.227.1597046656643;
+ Mon, 10 Aug 2020 01:04:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200810031915.2209658-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200806073221.GA219724@gardel-login> <CAB0TPYEsRPxiVLS7ieBLJprje_avAo49n7QWExpovuLBJHkOGw@mail.gmail.com>
+ <20200807153134.GA222272@gardel-login>
+In-Reply-To: <20200807153134.GA222272@gardel-login>
+From:   Martijn Coenen <maco@android.com>
+Date:   Mon, 10 Aug 2020 10:04:05 +0200
+Message-ID: <CAB0TPYGz=GN4x2-Msh4Ras6EgRTkGET6iALnp_v9pGSrGr1KgA@mail.gmail.com>
+Subject: Re: [PATCH] loop: unset GENHD_FL_NO_PART_SCAN on LOOP_CONFIGURE
+To:     Lennart Poettering <mzxreary@0pointer.de>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/08/10 12:19, Ming Lei wrote:
-> Block layer usually doesn't support or allow zero-length bvec. Since
-> commit 1bdc76aea115 ("iov_iter: use bvec iterator to implement
-> iterate_bvec()"), iterate_bvec() switches to bvec iterator. However,
-> Al mentioned that 'Zero-length segments are not disallowed' in iov_iter.
-> 
-> Fixes for_each_bvec() so that it can move on after seeing one zero
-> length bvec.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> Link: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2262077.html
-> Fixes: 1bdc76aea115 ("iov_iter: use bvec iterator to implement iterate_bvec()")
+On Fri, Aug 7, 2020 at 5:31 PM Lennart Poettering <mzxreary@0pointer.de> wrote:
+> Thanks for the review. I'll fix this up and send a v2. Are you OK with
+> me adding your Ack to the patch?
 
-Is this Fixes: correct? That commit should be in RHEL8's 4.18 kernel but that kernel
-does not hit this bug.
+Yeah, sure!
 
-Moreover, maybe nobody cares, but behavior of splice() differs when there are only 
-zero-length pages. With this fix, splice() returns 0 despite there is still pipe writers.
-Man page seems to say that splice() returns 0 when there is no pipe writers...
+> And also should this geta cc for stable?
 
-    A return value of 0 means end of input.  If fd_in refers to a pipe,
-    then this means that there was no data to transfer, and it would not
-    make sense to block because there are no writers connected to the
-    write end of the pipe.
+LOOP_CONFIGURE was just added in v5.8, and stable is v5.7 now, so I
+don't think that's needed.
 
------ test case -----
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
+Thanks,
+Martijn
 
-int main(int argc, char *argv[])
-{
-        static char buffer[4096];
-        const int fd = open("/tmp/testfile", O_WRONLY | O_CREAT, 0600);
-        int pipe_fd[2] = { EOF, EOF };
-        pipe(pipe_fd);
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        memset(buffer, 'a', sizeof(buffer));
-        //write(pipe_fd[1], buffer, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        memset(buffer, 'b', sizeof(buffer));
-        //write(pipe_fd[1], buffer, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        memset(buffer, 'c', sizeof(buffer));
-        //write(pipe_fd[1], buffer, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        memset(buffer, 'd', sizeof(buffer));
-        //write(pipe_fd[1], buffer, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        write(pipe_fd[1], NULL, sizeof(buffer));
-        splice(pipe_fd[0], NULL, fd, NULL, 65536, 0);
-        return 0;
-}
-
------ 4.18.0-193.14.2.el8_2.x86_64 -----
-openat(AT_FDCWD, "/tmp/testfile", O_WRONLY|O_CREAT, 0600) = 3
-pipe([4, 5])                            = 0
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-splice(4, NULL, 3, NULL, 65536, 0
-
-^C)      = ? ERESTARTSYS (To be restarted if SA_RESTART is set)
-strace: Process 1486 detached
-
------ linux.git + this fix -----
-open("/tmp/testfile", O_WRONLY|O_CREAT, 0600) = 3
-pipe([4, 5])                            = 0
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
-splice(4, NULL, 3, NULL, 65536, 0)      = 0
-exit_group(0)                           = ?
-+++ exited with 0 +++
-
-> Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-
-I just forwarded syzbot's report. Thus, credit goes to
-
-Reported-by: syzbot <syzbot+61acc40a49a3e46e25ea@syzkaller.appspotmail.com>
-
-> Tested-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-> Cc: Al Viro <viro@zeniv.linux.org.uk>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: <stable@vger.kernel.org>
+>
+> Thanks,
+>
+> Lennart
+>
+> --
+> Lennart Poettering, Berlin
