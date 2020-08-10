@@ -2,158 +2,200 @@ Return-Path: <SRS0=DoUd=BU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C75C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 15:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F822C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:23:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5055A22BEA
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 15:35:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04CE42083B
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 16:23:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="cVt1iMuK";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="MjwJxpgT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VDFgkKcG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728783AbgHJPfq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 11:35:46 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:55864 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728752AbgHJPfn (ORCPT
+        id S1725869AbgHJQXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 12:23:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32302 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726338AbgHJQXy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 11:35:43 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id E27C78EE1DD;
-        Mon, 10 Aug 2020 08:35:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597073741;
-        bh=H6RkvIzpfXOLSmHTbzR8XGbmPVN5aMmAbFV+0MS/vCw=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=cVt1iMuKWH4Bg+bLnyRSpUB/wXbG1V4IcQrDFdM+He/KopgifO7HNehQkYRafWpR7
-         B7RZHTNO5ffSnIB2urr4t5jxmwSfl4SQgYlbRQkBhgcHt8qoHLUYBwA7Q6vT3o6/tt
-         pW81Sr83Alr3AG3vWPtlKAQ4u+snVOqOmdggu00Q=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id NaS3pjwBelNS; Mon, 10 Aug 2020 08:35:40 -0700 (PDT)
-Received: from [153.66.254.174] (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 10 Aug 2020 12:23:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597076632;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=79To6yhBbxnqdoLB/vAGghJg4sifmUnfnr7NL9vQa4k=;
+        b=VDFgkKcGceSCXsXaA7eIym3qk3ltEtiltgsRgesF6KHk0diXgP6WntDwm5fHNe1ISwl1k0
+        h0FZ2hocTBcltT2mSWuPqhnRbvAcCcys3owGQSTGsNYaw+r6lIUynV0H5ElJfevQw1j7WZ
+        q8DvIL+S6txzuwn4WZzi6aV1Q9lOs9M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-XcJe6OeZOEizSKEHRHbt4Q-1; Mon, 10 Aug 2020 12:23:47 -0400
+X-MC-Unique: XcJe6OeZOEizSKEHRHbt4Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 490FA8EE12E;
-        Mon, 10 Aug 2020 08:35:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597073740;
-        bh=H6RkvIzpfXOLSmHTbzR8XGbmPVN5aMmAbFV+0MS/vCw=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=MjwJxpgTQz4M0HQgOVHVrw7HDPZ5iwScXAZ3T0CV5ey1CM8n8Q+96pCZP7NtESu7J
-         Aa755rKZNaN6eMUTRHzcTFugAubBvvES0Y0Tz+SDho/oQczzL4HdAtuVcZFPuzBhG3
-         6CMTxxSQ5umiDNicSAXPubohnY0HnMFKrU59s060=
-Message-ID: <1597073737.3966.12.camel@HansenPartnership.com>
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
- LSM (IPE)
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Mimi Zohar <zohar@linux.ibm.com>,
-        Chuck Lever <chucklever@gmail.com>,
-        James Morris <jmorris@namei.org>
-Cc:     Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com,
-        Paul Moore <paul@paul-moore.com>,
-        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
-        serge@hallyn.com, pasha.tatashin@soleen.com,
-        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F466800474;
+        Mon, 10 Aug 2020 16:23:45 +0000 (UTC)
+Received: from T590 (ovpn-12-105.pek2.redhat.com [10.72.12.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CD5C187D6B;
+        Mon, 10 Aug 2020 16:23:38 +0000 (UTC)
+Date:   Tue, 11 Aug 2020 00:23:31 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
-        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Date:   Mon, 10 Aug 2020 08:35:37 -0700
-In-Reply-To: <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
-         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
-         <20200802143143.GB20261@amd>
-         <1596386606.4087.20.camel@HansenPartnership.com>
-         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
-         <1596639689.3457.17.camel@HansenPartnership.com>
-         <alpine.LRH.2.21.2008050934060.28225@namei.org>
-         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
-         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
-         <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Matthew Wilcox <willy@infradead.org>, stable@vger.kernel.org
+Subject: Re: [PATCH] block: allow for_each_bvec to support zero len bvec
+Message-ID: <20200810162331.GA2215158@T590>
+References: <20200810031915.2209658-1-ming.lei@redhat.com>
+ <db57f8ca-b3c3-76ec-1e49-d8f8161ba78d@i-love.sakura.ne.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <db57f8ca-b3c3-76ec-1e49-d8f8161ba78d@i-love.sakura.ne.jp>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 2020-08-09 at 13:16 -0400, Mimi Zohar wrote:
-> On Sat, 2020-08-08 at 13:47 -0400, Chuck Lever wrote:
-> > > On Aug 5, 2020, at 2:15 PM, Mimi Zohar <zohar@linux.ibm.com>
-> > > wrote:
-> 
-> <snip>
-> 
-> > > If block layer integrity was enough, there wouldn't have been a
-> > > need for fs-verity.   Even fs-verity is limited to read only
-> > > filesystems, which makes validating file integrity so much
-> > > easier.  From the beginning, we've said that fs-verity signatures
-> > > should be included in the measurement list.  (I thought someone
-> > > signed on to add that support to IMA, but have not yet seen
-> > > anything.)
+On Mon, Aug 10, 2020 at 04:52:17PM +0900, Tetsuo Handa wrote:
+> On 2020/08/10 12:19, Ming Lei wrote:
+> > Block layer usually doesn't support or allow zero-length bvec. Since
+> > commit 1bdc76aea115 ("iov_iter: use bvec iterator to implement
+> > iterate_bvec()"), iterate_bvec() switches to bvec iterator. However,
+> > Al mentioned that 'Zero-length segments are not disallowed' in iov_iter.
 > > 
-> > Mimi, when you and I discussed this during LSS NA 2019, I didn't
-> > fully understand that you expected me to implement signed Merkle
-> > trees for all filesystems. At the time, it sounded to me like you
-> > wanted signed Merkle trees only for NFS files. Is that still the
-> > case?
-> 
-> I definitely do not expect you to support signed Merkle trees for all
-> filesystems.  My interested is from an IMA perspective of measuring
-> and verifying the fs-verity Merkle tree root (and header info)
-> signature. This is independent of which filesystems support it.
-> 
+> > Fixes for_each_bvec() so that it can move on after seeing one zero
+> > length bvec.
 > > 
-> > The first priority (for me, anyway) therefore is getting the
-> > ability to move IMA metadata between NFS clients and servers
-> > shoveled into the NFS protocol, but that's been blocked for various
-> > legal reasons.
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > Link: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2262077.html
+> > Fixes: 1bdc76aea115 ("iov_iter: use bvec iterator to implement iterate_bvec()")
 > 
-> Up to now, verifying remote filesystem file integrity has been out of
-> scope for IMA.   With fs-verity file signatures I can at least grasp
-> how remote file integrity could possibly work.  I don't understand
-> how remote file integrity with existing IMA formats could be
-> supported. You might want to consider writing a whitepaper, which
-> could later be used as the basis for a patch set cover letter.
+> Is this Fixes: correct? That commit should be in RHEL8's 4.18 kernel but that kernel
+> does not hit this bug.
 
-I think, before this, we can help with the basics (and perhaps we
-should sort them out before we start documenting what we'll do).  The
-first basic is that a merkle tree allows unit at a time verification. 
-First of all we should agree on the unit.  Since we always fault a page
-at a time, I think our merkle tree unit should be a page not a block. 
-Next, we should agree where the check gates for the per page accesses
-should be ... definitely somewhere in readpage, I suspect and finally
-we should agree how the merkle tree is presented at the gate.  I think
-there are three ways:
+Yeah, it is correct, see the following link:
 
-   1. Ahead of time transfer:  The merkle tree is transferred and verified
-      at some time before the accesses begin, so we already have a
-      verified copy and can compare against the lower leaf.
-   2. Async transfer:  We provide an async mechanism to transfer the
-      necessary components, so when presented with a unit, we check the
-      log n components required to get to the root
-   3. The protocol actually provides the capability of 2 (like the SCSI
-      DIF/DIX), so to IMA all the pieces get presented instead of IMA
-      having to manage the tree
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v5.8&id=1bdc76aea1159a750846c2fc98e404403eb7d51c
 
-There are also a load of minor things like how we get the head hash,
-which must be presented and verified ahead of time for each of the
-above 3.
+Commit 1bdc76aea115 was merged to v4.8, so it is definitely in both RHEL8's
+4.18 based kernel and upstream kernel.
 
-James
+> 
+> Moreover, maybe nobody cares, but behavior of splice() differs when there are only 
+> zero-length pages. With this fix, splice() returns 0 despite there is still pipe writers.
+
+It is another new issue, which isn't related with Commit 1bdc76aea115,
+see below.
+
+> Man page seems to say that splice() returns 0 when there is no pipe writers...
+> 
+>     A return value of 0 means end of input.  If fd_in refers to a pipe,
+>     then this means that there was no data to transfer, and it would not
+>     make sense to block because there are no writers connected to the
+>     write end of the pipe.
+> 
+> ----- test case -----
+> #define _GNU_SOURCE
+> #include <stdio.h>
+> #include <sys/types.h>
+> #include <sys/stat.h>
+> #include <fcntl.h>
+> #include <unistd.h>
+> #include <string.h>
+> 
+> int main(int argc, char *argv[])
+> {
+>         static char buffer[4096];
+>         const int fd = open("/tmp/testfile", O_WRONLY | O_CREAT, 0600);
+>         int pipe_fd[2] = { EOF, EOF };
+>         pipe(pipe_fd);
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         memset(buffer, 'a', sizeof(buffer));
+>         //write(pipe_fd[1], buffer, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         memset(buffer, 'b', sizeof(buffer));
+>         //write(pipe_fd[1], buffer, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         memset(buffer, 'c', sizeof(buffer));
+>         //write(pipe_fd[1], buffer, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         memset(buffer, 'd', sizeof(buffer));
+>         //write(pipe_fd[1], buffer, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         write(pipe_fd[1], NULL, sizeof(buffer));
+>         splice(pipe_fd[0], NULL, fd, NULL, 65536, 0);
+>         return 0;
+> }
+
+The above test doesn't trigger the reported lockup issue, so this patch
+isn't related with the new issue you described.
+
+> 
+> ----- 4.18.0-193.14.2.el8_2.x86_64 -----
+> openat(AT_FDCWD, "/tmp/testfile", O_WRONLY|O_CREAT, 0600) = 3
+> pipe([4, 5])                            = 0
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> splice(4, NULL, 3, NULL, 65536, 0
+> 
+> ^C)      = ? ERESTARTSYS (To be restarted if SA_RESTART is set)
+> strace: Process 1486 detached
+
+The same behavior can be observed on v4.8 too, both v4.8 and v4.18
+includes 1bdc76aea115. If you apply the fix against v4.8, you can
+observe the same behavior too.
+
+> 
+> ----- linux.git + this fix -----
+
+It should have been linux.git, :-)
+
+I think this new issue may be introduced between v4.18 and v5.8.
+
+> open("/tmp/testfile", O_WRONLY|O_CREAT, 0600) = 3
+> pipe([4, 5])                            = 0
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> write(5, NULL, 4096)                    = -1 EFAULT (Bad address)
+> splice(4, NULL, 3, NULL, 65536, 0)      = 0
+> exit_group(0)                           = ?
+> +++ exited with 0 +++
+> 
+> > Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+> 
+> I just forwarded syzbot's report. Thus, credit goes to
+> 
+> Reported-by: syzbot <syzbot+61acc40a49a3e46e25ea@syzkaller.appspotmail.com>
+
+OK.
 
 
+Thanks,
+Ming
 
