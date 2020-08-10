@@ -6,93 +6,76 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5479EC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 03:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB70DC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 03:33:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A4942065D
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 03:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E456206A5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 03:33:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZDGM8Qth"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CGgNyBVk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbgHJDWw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Aug 2020 23:22:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38332 "EHLO
+        id S1726344AbgHJDdN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Aug 2020 23:33:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726335AbgHJDWv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Aug 2020 23:22:51 -0400
+        with ESMTP id S1726335AbgHJDdN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Aug 2020 23:33:13 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82433C061756;
-        Sun,  9 Aug 2020 20:22:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 097EDC061756;
+        Sun,  9 Aug 2020 20:33:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=uOQ8yZ/DAL78l4x4TeTTcSfJ+LbD3rh0jqrIXRRd/r8=; b=ZDGM8QthpVFD4qWSRe65+sqilB
-        Gzr7WqlbWraI/lCOwKi8OisjDJhUSnMGEF23kEjaH0BZEuas6jGi+3vgwaWgTu7YmG3OKm8wiNwCW
-        7+lHUlabDqO9DHkbRsvrMgBKgs89KADLCTi1/j6suLVxHxb4Hbxm3BvEk/Qz9qbTtP3U848+d8Qqa
-        NZn62WgONP8+195RJrCj9GS7zaRfksgFZgLchAErM+H0pMM7WSauq3d8haYcvchYSfDB3/xjhlnLK
-        W+cLiCyHw1yCB6CXnLv4H9gbqmZdox2rVP0CEAuRsljKXP9t55MYUSWDETN12Cv9mOiaOWPbuw6Rz
-        QAdaoCkQ==;
+        bh=Bnjds8mzMbvLMRp+TUi2KuIrfCsl0UNInymGxiP/wQg=; b=CGgNyBVk2s82Q7v81hPjYkWHfa
+        vaQ0JRMObLYP9EosJmEkY6uWvdefe1rqtK58cBaONumBucT3lDJG6Cc86CETBHcEdJKSZdY94PAeX
+        DWhOUXkvl1RAWTYIZ2/Gv+lTQKCRuOFAoX7Eo5bgqkLbZPhlb2PNktaBBS0g9GKA+dJsYJMj+P77P
+        5D3KY9esqsgSzQ9lKFfzOcv2a7debmxcGXb+H2qZbm41wBAWqN/rNj+ZnP8nBUebGhnnw8MHWqLka
+        ES4NuXCnlWQ4omnH8neUP3Gy7XNHr/UzqC2FlSx5CzaP7OAuuG+wSwxdbd6cFNn/7xG6nPms55F5T
+        t94vUGyg==;
 Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1k4yOd-00071L-Ua; Mon, 10 Aug 2020 03:22:48 +0000
-Date:   Mon, 10 Aug 2020 04:22:47 +0100
+        id 1k4yYf-0007Pu-8n; Mon, 10 Aug 2020 03:33:09 +0000
+Date:   Mon, 10 Aug 2020 04:33:09 +0100
 From:   Matthew Wilcox <willy@infradead.org>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: Very slow qemu device access
-Message-ID: <20200810032247.GJ17456@casper.infradead.org>
-References: <20200807174416.GF17456@casper.infradead.org>
- <20200809024005.GC2134904@T590>
- <20200809142522.GI17456@casper.infradead.org>
- <20200810031049.GA2202641@T590>
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Al Viro <viro@zeniv.linux.org.uk>, stable@vger.kernel.org
+Subject: Re: [PATCH] block: allow for_each_bvec to support zero len bvec
+Message-ID: <20200810033309.GK17456@casper.infradead.org>
+References: <20200810031915.2209658-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200810031049.GA2202641@T590>
+In-Reply-To: <20200810031915.2209658-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 10, 2020 at 11:10:49AM +0800, Ming Lei wrote:
-> On Sun, Aug 09, 2020 at 03:25:22PM +0100, Matthew Wilcox wrote:
-> > On Sun, Aug 09, 2020 at 10:40:05AM +0800, Ming Lei wrote:
-> > > Hello Matthew,
-> > > 
-> > > On Fri, Aug 07, 2020 at 06:44:16PM +0100, Matthew Wilcox wrote:
-> > > > 
-> > > > Everything starts going very slowly after this commit:
-> > > > 
-> > > > commit 37f4a24c2469a10a4c16c641671bd766e276cf9f (refs/bisect/bad)
-> > > > Author: Ming Lei <ming.lei@redhat.com>
-> > > > Date:   Tue Jun 30 22:03:57 2020 +0800
-> > > > 
-> > > >     blk-mq: centralise related handling into blk_mq_get_driver_tag
-> > > 
-> > > Yeah, the above is one known bad commit, which is reverted in
-> > > 4e2f62e566b5 ("Revert "blk-mq: put driver tag when this request is completed")
-> > > 
-> > > Finally the fixed patch of 'blk-mq: centralise related handling into blk_mq_get_driver_tag'
-> > > is merged as 568f27006577 ("blk-mq: centralise related handling into blk_mq_get_driver_tag").
-> > > 
-> > > So please test either 4e2f62e566b5 or 568f27006577 and see if there is
-> > > such issue.
-> > 
-> > 4e2f62e566b5 is good
-> > 568f27006577 is bad
-> 
-> Please try the following patch, and we shouldn't take flush request
-> account into driver tag allocation, because it always shares the
-> data request's tag:
-> 
-> >From d508415eee08940ff9c78efe0eddddf594afdb94 Mon Sep 17 00:00:00 2001
-> From: Ming Lei <ming.lei@redhat.com>
-> Date: Mon, 10 Aug 2020 11:06:15 +0800
-> Subject: [PATCH] block: don't double account of flush request's driver tag
-> 
-> In case of none scheduler, we share data request's driver tag for
-> flush request, so have to mark the flush request as INFLIGHT for
-> avoiding double account of this driver tag.
+On Mon, Aug 10, 2020 at 11:19:15AM +0800, Ming Lei wrote:
+> +++ b/include/linux/bvec.h
+> @@ -117,11 +117,18 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+>  	return true;
+>  }
+>  
+> +static inline void bvec_iter_skip_zero_bvec(struct bvec_iter *iter)
+> +{
+> +	iter->bi_bvec_done = 0;
+> +	iter->bi_idx++;
+> +}
+> +
+>  #define for_each_bvec(bvl, bio_vec, iter, start)			\
+>  	for (iter = (start);						\
+>  	     (iter).bi_size &&						\
+>  		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
+> -	     bvec_iter_advance((bio_vec), &(iter), (bvl).bv_len))
+> +	     (bvl).bv_len ? bvec_iter_advance((bio_vec), &(iter),	\
+> +		     (bvl).bv_len) : bvec_iter_skip_zero_bvec(&(iter)))
+>  
 
-Yes, this fixes the problem.  Thanks!
+What if you have two zero-length bvecs in a row?  Won't this just skip
+the first one?
+
+It would seem better to me to put the bv_len test in bvec_iter_advance()
+instead of making the macro more complicated.
