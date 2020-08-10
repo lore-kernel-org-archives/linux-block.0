@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0143FC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 19:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C4FC433E1
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 19:33:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD4F22080C
-	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 19:29:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7583B22DBF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Aug 2020 19:33:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597087797;
-	bh=UnMzxSx1bFTza18KxTSF0DkGaDImt48XwHIJpKEOgLk=;
+	s=default; t=1597088035;
+	bh=3youlaf6F0AG1XD7iY9/Et/KXihs076n7ArGrIQ9mB0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Vq44dUvgW8Qvt+FBU0SF5mqgto85gVi/ZtdUSz/Fw0gsBcPMr4GZ0ErrV8MUqQksm
-	 78lak12+ONmzudobPwcT5XmNpTXS2J6HLLkHNdk+3c0diAllrqKTVjmimWFxOSoB+E
-	 kDCvULDxPibfK29jpN7jXxJVqN9n40lIp0vhN06Q=
+	b=dG+UhpYgiilbK3CX+WehzxP3HpRCXD1ba0Pjyy2Q2avXhBXNkU55nr/ch/BLnP+vg
+	 pejCHYsE5ViCzGn2nLSnYD9wu6vANg0HlLejA6k9GxKdrAFcuRRiLGr6Y8yEfm0fCi
+	 silDxt1daML7zTlW1xfUKTZpXRtDorNdZ7J7kSoI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729032AbgHJT3e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Aug 2020 15:29:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38058 "EHLO mail.kernel.org"
+        id S1728330AbgHJTJJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Aug 2020 15:09:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35248 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729012AbgHJTKk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Aug 2020 15:10:40 -0400
+        id S1728309AbgHJTJI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Aug 2020 15:09:08 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 71ABE207FF;
-        Mon, 10 Aug 2020 19:10:36 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 55CC32078D;
+        Mon, 10 Aug 2020 19:09:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597086637;
-        bh=UnMzxSx1bFTza18KxTSF0DkGaDImt48XwHIJpKEOgLk=;
+        s=default; t=1597086548;
+        bh=3youlaf6F0AG1XD7iY9/Et/KXihs076n7ArGrIQ9mB0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LLK7MvFVrBEjbi1Oa+ogKOS5xUANGJx3hywgW+isCo+eZyzWzK2YJUT1udMLT0Ai7
-         HaEAAIHz8vxLOAQAjCbIe2sIQBkgozSHoRmOPPPtCyeiKm7VQQJH1dObSuQkrkjRHQ
-         M9INbNY5GCimkI2uBIwSO5Ca6qjEebDUi7mnTBo4=
+        b=ZfeRawQfbUYHQGHerVe3LTakW82Wvp78UTh5p4Viov2uS2uo41hKPYqaeSO4ekeOD
+         dxSUolPN4fF5Jk/GeOtCY/FDbUlKXnDFV9YGSvU1DhI8abujMHYyf8Uzs87Ex8q8Ro
+         jNlneSuEb8uzsGEMDWbDg6ANmv/5lbgm0jvmWV8k=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.7 06/60] loop: be paranoid on exit and prevent new additions / removals
-Date:   Mon, 10 Aug 2020 15:09:34 -0400
-Message-Id: <20200810191028.3793884-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.8 06/64] loop: be paranoid on exit and prevent new additions / removals
+Date:   Mon, 10 Aug 2020 15:08:01 -0400
+Message-Id: <20200810190859.3793319-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200810191028.3793884-1-sashal@kernel.org>
-References: <20200810191028.3793884-1-sashal@kernel.org>
+In-Reply-To: <20200810190859.3793319-1-sashal@kernel.org>
+References: <20200810190859.3793319-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 418bb4621255a..6b36fc2f4edc7 100644
+index 475e1a738560d..776083963ee6c 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -2333,6 +2333,8 @@ static void __exit loop_exit(void)
+@@ -2402,6 +2402,8 @@ static void __exit loop_exit(void)
  
  	range = max_loop ? max_loop << part_shift : 1UL << MINORBITS;
  
@@ -88,7 +88,7 @@ index 418bb4621255a..6b36fc2f4edc7 100644
  	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
  	idr_destroy(&loop_index_idr);
  
-@@ -2340,6 +2342,8 @@ static void __exit loop_exit(void)
+@@ -2409,6 +2411,8 @@ static void __exit loop_exit(void)
  	unregister_blkdev(LOOP_MAJOR, "loop");
  
  	misc_deregister(&loop_misc);
