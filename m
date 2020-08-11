@@ -7,133 +7,123 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AEADC433DF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 23:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E06F3C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 23:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B04220774
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 23:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5E1120756
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 23:45:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FgzP5RtO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PT7LAQgO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726333AbgHKXoy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 19:44:54 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56260 "EHLO
+        id S1726179AbgHKXpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 19:45:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26742 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726143AbgHKXoy (ORCPT
+        by vger.kernel.org with ESMTP id S1726143AbgHKXpA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 19:44:54 -0400
+        Tue, 11 Aug 2020 19:45:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597189492;
+        s=mimecast20190719; t=1597189499;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8qlldUuOqRxxKcsaaFzCdUKLS97dh9RJhLd02RjeJuU=;
-        b=FgzP5RtOCn+rKCpGn48r72MxFu4s29obZVZGxu9eTYNx4eLIQnRpUykJzH+KWJBG4hDvMP
-        hAxhDNpzsxvXDbVTHacnu9U5hnZ2apleKRoF0jEvxs/av17UrljWv00bezebQJkWLO4vqZ
-        42jCywAloVSUriyofItT5N+40jV5HEY=
+        bh=8PfrhpBVlNqe3hz0fln6umwGqTH+TNmMWsIOFhHPDsc=;
+        b=PT7LAQgOiOnjhujrAp89qHlwpOsSOaFk1YM4r1yR6dyZh0efxqo5X7hbSoWBkc7vM0jq1l
+        yy8osR0wuS4vvI0DMY7RdQ6s1LIhXSeOcA+Xb9iyKf7TxIOJ4DFL9REFTCYyHKpEkyGJYW
+        a7q8Rez46RK84B63wiWWlRrAgSUdUL0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-C1qZBALVNX-lKZKw6r-14Q-1; Tue, 11 Aug 2020 19:44:51 -0400
-X-MC-Unique: C1qZBALVNX-lKZKw6r-14Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-147-kTqs6LuAPzeIhwOkdJDSRw-1; Tue, 11 Aug 2020 19:44:57 -0400
+X-MC-Unique: kTqs6LuAPzeIhwOkdJDSRw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE11B102C7ED;
-        Tue, 11 Aug 2020 23:44:49 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 105321005504;
+        Tue, 11 Aug 2020 23:44:56 +0000 (UTC)
 Received: from localhost (ovpn-13-156.pek2.redhat.com [10.72.13.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 39D717C0F5;
-        Tue, 11 Aug 2020 23:44:42 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 903066111F;
+        Tue, 11 Aug 2020 23:44:52 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Changpeng Liu <changpeng.liu@intel.com>,
-        Daniel Verkamp <dverkamp@chromium.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH V2 2/3] block: virtio_blk: fix handling single range discard request
-Date:   Wed, 12 Aug 2020 07:44:19 +0800
-Message-Id: <20200811234420.2297137-3-ming.lei@redhat.com>
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V2 3/3] block: rename blk_discard_mergable as blk_discard_support_multi_range
+Date:   Wed, 12 Aug 2020 07:44:20 +0800
+Message-Id: <20200811234420.2297137-4-ming.lei@redhat.com>
 In-Reply-To: <20200811234420.2297137-1-ming.lei@redhat.com>
 References: <20200811234420.2297137-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-1f23816b8eb8 ("virtio_blk: add discard and write zeroes support") starts
-to support multi-range discard for virtio-blk. However, the virtio-blk
-disk may report max discard segment as 1, at least that is exactly what
-qemu is doing.
+Name of blk_discard_mergable() is very confusing, and this function
+actually means if the queue supports multi_range discard. Also there
+are two kinds of discard merge:
 
-So far, block layer switches to normal request merge if max discard segment
-limit is 1, and multiple bios can be merged to single segment. This way may
-cause memory corruption in virtblk_setup_discard_write_zeroes().
+1) multi range discard, bios in one request won't have to be contiguous,
+and actually each bio is thought as one range
 
-Fix the issue by handling single max discard segment in straightforward
-way.
+2) single range discard, all bios in one request have to be contiguous
+just like normal RW request's merge
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
+Rename blk_discard_mergable() for not confusing people, and avoiding
+to introduce bugs in future.
+
 Cc: Christoph Hellwig <hch@lst.de>
-Cc: Changpeng Liu <changpeng.liu@intel.com>
-Cc: Daniel Verkamp <dverkamp@chromium.org>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/virtio_blk.c | 31 +++++++++++++++++++++++--------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+ block/blk-merge.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 63b213e00b37..b2e48dac1ebd 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -126,16 +126,31 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
- 	if (!range)
- 		return -ENOMEM;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index d18fb88ca8bd..23eb46a99c9d 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -692,8 +692,11 @@ static void blk_account_io_merge_request(struct request *req)
+  * needn't to be contiguous.
+  * Otherwise, the bios/requests will be handled as same as
+  * others which should be contiguous.
++ *
++ * queue_max_discard_segments() is > 1, the queue supports multi range
++ * discard.
+  */
+-static inline bool blk_discard_mergable(struct request *req)
++static inline bool blk_discard_support_multi_range(struct request *req)
+ {
+ 	if (req_op(req) == REQ_OP_DISCARD &&
+ 	    queue_max_discard_segments(req->q) > 1)
+@@ -704,7 +707,7 @@ static inline bool blk_discard_mergable(struct request *req)
+ static enum elv_merge blk_try_req_merge(struct request *req,
+ 					struct request *next)
+ {
+-	if (blk_discard_mergable(req))
++	if (blk_discard_support_multi_range(req))
+ 		return ELEVATOR_DISCARD_MERGE;
+ 	else if (blk_rq_pos(req) + blk_rq_sectors(req) == blk_rq_pos(next))
+ 		return ELEVATOR_BACK_MERGE;
+@@ -790,7 +793,7 @@ static struct request *attempt_merge(struct request_queue *q,
  
--	__rq_for_each_bio(bio, req) {
--		u64 sector = bio->bi_iter.bi_sector;
--		u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
--
--		range[n].flags = cpu_to_le32(flags);
--		range[n].num_sectors = cpu_to_le32(num_sectors);
--		range[n].sector = cpu_to_le64(sector);
--		n++;
-+	/*
-+	 * Single max discard segment means multi-range discard isn't
-+	 * supported, and block layer only runs contiguity merge like
-+	 * normal RW request. So we can't reply on bio for retrieving
-+	 * each range info.
-+	 */
-+	if (queue_max_discard_segments(req->q) == 1) {
-+		range[0].flags = cpu_to_le32(flags);
-+		range[0].num_sectors = cpu_to_le32(blk_rq_sectors(req));
-+		range[0].sector = cpu_to_le64(blk_rq_pos(req));
-+		n = 1;
-+	} else {
-+		__rq_for_each_bio(bio, req) {
-+			u64 sector = bio->bi_iter.bi_sector;
-+			u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-+
-+			range[n].flags = cpu_to_le32(flags);
-+			range[n].num_sectors = cpu_to_le32(num_sectors);
-+			range[n].sector = cpu_to_le64(sector);
-+			n++;
-+		}
- 	}
+ 	req->__data_len += blk_rq_bytes(next);
  
-+	WARN_ON_ONCE(n != segments);
-+
- 	req->special_vec.bv_page = virt_to_page(range);
- 	req->special_vec.bv_offset = offset_in_page(range);
- 	req->special_vec.bv_len = sizeof(*range) * segments;
+-	if (!blk_discard_mergable(req))
++	if (!blk_discard_support_multi_range(req))
+ 		elv_merge_requests(q, req, next);
+ 
+ 	/*
+@@ -886,7 +889,7 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+ 
+ enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
+ {
+-	if (blk_discard_mergable(rq))
++	if (blk_discard_support_multi_range(rq))
+ 		return ELEVATOR_DISCARD_MERGE;
+ 	else if (blk_rq_pos(rq) + blk_rq_sectors(rq) == bio->bi_iter.bi_sector)
+ 		return ELEVATOR_BACK_MERGE;
 -- 
 2.25.2
 
