@@ -7,105 +7,121 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45673C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 09:22:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E65CC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 09:22:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FF4820772
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 09:22:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F1D820772
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 09:22:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="awiG+ov6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ddVNXDvp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728426AbgHKJWC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 05:22:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52269 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728391AbgHKJWC (ORCPT
+        id S1728405AbgHKJWS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 05:22:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49296 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728391AbgHKJWR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 05:22:02 -0400
+        Tue, 11 Aug 2020 05:22:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597137720;
+        s=mimecast20190719; t=1597137735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7k1LVPduC5ouUkXizXIZR9/G1rmKPWMVEq9GWCQlpkI=;
-        b=awiG+ov6bLFaiZVTikB/0VuwAL1WTRMYYkLYRHCZQkF7ww0c8HYsNGazfFLjjjqv69Gw/h
-        JYQ8XaydXdRXJdQV2QMD9GPPi2z+x7qPA09/NZdq1S4K98YaKVtrXuDsJHZgVIUfmnTF+K
-        wmls0mkvyRypIVOgqpKmknHCPCoMSio=
+        bh=UVqfpMDFk/4d/p9ID3knz3EzVfg+BMH2vcJY1OefzbA=;
+        b=ddVNXDvphmq11e0elv0MIGLkUeWyUErQgHxWm6pKu03NjXY2Vk5qtl6uKiLKaS6YUHFY/K
+        u44FeYjubzYFTfyJbU9GkIoaF4FCSYtUPWsopK09PRmmUTM5ecv8qdio9l1yE994glaUjR
+        K7eATygubpV7vqVRF/ZRrdnW5nO6nP8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-f2Wi03k9OleJEx0pxY1OBA-1; Tue, 11 Aug 2020 05:21:58 -0400
-X-MC-Unique: f2Wi03k9OleJEx0pxY1OBA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-381-SiVGq5duMLCn3R567AJnaA-1; Tue, 11 Aug 2020 05:22:12 -0400
+X-MC-Unique: SiVGq5duMLCn3R567AJnaA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 806C71009610;
-        Tue, 11 Aug 2020 09:21:57 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB7DC57;
+        Tue, 11 Aug 2020 09:22:10 +0000 (UTC)
 Received: from localhost (ovpn-13-156.pek2.redhat.com [10.72.13.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DA42D920CA;
-        Tue, 11 Aug 2020 09:21:53 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 596C81002391;
+        Tue, 11 Aug 2020 09:21:59 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/2] block: respect queue limit of max discard segment
-Date:   Tue, 11 Aug 2020 17:21:33 +0800
-Message-Id: <20200811092134.2256095-2-ming.lei@redhat.com>
+        Christoph Hellwig <hch@lst.de>,
+        Changpeng Liu <changpeng.liu@intel.com>,
+        Daniel Verkamp <dverkamp@chromium.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: [PATCH 2/2] block: virtio_blk: fix handling single range discard request
+Date:   Tue, 11 Aug 2020 17:21:34 +0800
+Message-Id: <20200811092134.2256095-3-ming.lei@redhat.com>
 In-Reply-To: <20200811092134.2256095-1-ming.lei@redhat.com>
 References: <20200811092134.2256095-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When queue_max_discard_segments(q) is 1, blk_discard_mergable() will
-return false for discard request, then normal request merge is applied.
-However, only queue_max_segments() is checked, so max discard segment
-limit isn't respected.
+1f23816b8eb8 ("virtio_blk: add discard and write zeroes support") starts
+to support multi-range discard for virtio-blk. However, the virtio-blk
+disk may report max discard segment as 1, at least that is exactly what
+qemu is doing.
 
-Check max discard segment limit in the request merge code for fixing
-the issue.
+So far, block layer switches to normal request merge if max discard segment
+limit is 1, and multiple bios can be merged to single segment. This way may
+cause memory corruption in virtblk_setup_discard_write_zeroes().
 
-Cc: Christoph Hellwig <hch@lst.de>
+Fix the issue by handling single max discard segment in straightforward
+way.
+
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Changpeng Liu <changpeng.liu@intel.com>
+Cc: Daniel Verkamp <dverkamp@chromium.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/blk-merge.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/block/virtio_blk.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 5196dc145270..d18fb88ca8bd 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -533,10 +533,16 @@ int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
- }
- EXPORT_SYMBOL(__blk_rq_map_sg);
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 63b213e00b37..05b01903122b 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -126,14 +126,21 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
+ 	if (!range)
+ 		return -ENOMEM;
  
-+static inline unsigned int blk_rq_get_max_segments(struct request *rq)
-+{
-+	return req_op(rq) == REQ_OP_DISCARD ?
-+		queue_max_discard_segments(rq->q) : queue_max_segments(rq->q);
-+}
+-	__rq_for_each_bio(bio, req) {
+-		u64 sector = bio->bi_iter.bi_sector;
+-		u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
+-
+-		range[n].flags = cpu_to_le32(flags);
+-		range[n].num_sectors = cpu_to_le32(num_sectors);
+-		range[n].sector = cpu_to_le64(sector);
+-		n++;
++	if (queue_max_discard_segments(req->q) == 1) {
++		range[0].flags = cpu_to_le32(flags);
++		range[0].num_sectors = cpu_to_le32(blk_rq_sectors(req));
++		range[0].sector = cpu_to_le64(blk_rq_pos(req));
++		n = 1;
++	} else {
++		__rq_for_each_bio(bio, req) {
++			u64 sector = bio->bi_iter.bi_sector;
++			u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
 +
- static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
- 		unsigned int nr_phys_segs)
- {
--	if (req->nr_phys_segments + nr_phys_segs > queue_max_segments(req->q))
-+	if (req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req))
- 		goto no_merge;
++			range[n].flags = cpu_to_le32(flags);
++			range[n].num_sectors = cpu_to_le32(num_sectors);
++			range[n].sector = cpu_to_le64(sector);
++			n++;
++		}
+ 	}
  
- 	if (blk_integrity_merge_bio(req->q, req, bio) == false)
-@@ -624,7 +630,7 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
- 		return 0;
- 
- 	total_phys_segments = req->nr_phys_segments + next->nr_phys_segments;
--	if (total_phys_segments > queue_max_segments(q))
-+	if (total_phys_segments > blk_rq_get_max_segments(req))
- 		return 0;
- 
- 	if (blk_integrity_merge_rq(q, req, next) == false)
+ 	req->special_vec.bv_page = virt_to_page(range);
 -- 
 2.25.2
 
