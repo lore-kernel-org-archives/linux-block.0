@@ -2,214 +2,200 @@ Return-Path: <SRS0=2P2f=BV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB4CC433DF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 05:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47585C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 06:44:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 099C520756
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 05:43:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24710207DE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 06:44:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="veoZiNzH";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="veoZiNzH"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="MSMl7es5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726559AbgHKFnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 01:43:50 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:35478 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726438AbgHKFnu (ORCPT
+        id S1728261AbgHKGoD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 02:44:03 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:46132 "EHLO
+        forwardcorp1p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727066AbgHKGoD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 01:43:50 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 6E31D8EE1C8;
-        Mon, 10 Aug 2020 22:43:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597124627;
-        bh=6++efxZWUIt1KBjwP+6L/VyAd4UOvuyeY6vy7uK6LLw=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=veoZiNzHc9BFEYlOo5IH5LwkzWLuui4/+g+gnkpk20Y6DEwjRnC/ajnJDlQSxOsEI
-         SDogOn68x90v7SM1UDtO4XGXSKeMSZCoUmqj+iaiAdeIe2VKXtb2YUIw0ZIWhD3gQQ
-         d67Aq3HC3CBffdg/JxnN2JIq2Z/+gMV/XLmEyyTc=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id BX1EFXHll9pB; Mon, 10 Aug 2020 22:43:47 -0700 (PDT)
-Received: from [153.66.254.174] (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id EEC048EE12E;
-        Mon, 10 Aug 2020 22:43:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597124627;
-        bh=6++efxZWUIt1KBjwP+6L/VyAd4UOvuyeY6vy7uK6LLw=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=veoZiNzHc9BFEYlOo5IH5LwkzWLuui4/+g+gnkpk20Y6DEwjRnC/ajnJDlQSxOsEI
-         SDogOn68x90v7SM1UDtO4XGXSKeMSZCoUmqj+iaiAdeIe2VKXtb2YUIw0ZIWhD3gQQ
-         d67Aq3HC3CBffdg/JxnN2JIq2Z/+gMV/XLmEyyTc=
-Message-ID: <1597124623.30793.14.camel@HansenPartnership.com>
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
- LSM (IPE)
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Chuck Lever <chucklever@gmail.com>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>, James Morris <jmorris@namei.org>,
-        Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com,
-        Paul Moore <paul@paul-moore.com>,
-        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
-        serge@hallyn.com, pasha.tatashin@soleen.com,
-        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
-        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Date:   Mon, 10 Aug 2020 22:43:43 -0700
-In-Reply-To: <6E907A22-02CC-42DD-B3CD-11D304F3A1A8@gmail.com>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
-         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
-         <20200802143143.GB20261@amd>
-         <1596386606.4087.20.camel@HansenPartnership.com>
-         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
-         <1596639689.3457.17.camel@HansenPartnership.com>
-         <alpine.LRH.2.21.2008050934060.28225@namei.org>
-         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
-         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
-         <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
-         <1597073737.3966.12.camel@HansenPartnership.com>
-         <6E907A22-02CC-42DD-B3CD-11D304F3A1A8@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 11 Aug 2020 02:44:03 -0400
+Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net (sas1-ec30c78b6c5b.qloud-c.yandex.net [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
+        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 4441D2E1555;
+        Tue, 11 Aug 2020 09:43:55 +0300 (MSK)
+Received: from sas1-9998cec34266.qloud-c.yandex.net (sas1-9998cec34266.qloud-c.yandex.net [2a02:6b8:c14:3a0e:0:640:9998:cec3])
+        by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id ej4ScSBaXq-hrvmMu3I;
+        Tue, 11 Aug 2020 09:43:55 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1597128235; bh=K3MkeTH4e7Fy7e8LzbZR6hh0itMnd/vEFicPLoQ+isk=;
+        h=Message-Id:Date:Subject:To:From:Cc;
+        b=MSMl7es5T0vO+W7PckXJ2eISWksgRL1QGFaU9Wy3/9/KTumXEn63MpWRpTRsNKu+o
+         GUZ6zPMsQ2dNH5xhsvXoA6E5Ic8UBOnWrU0u2LJ4MJXuAuwSjBiJ97a45AHrA29gfw
+         bmzcVy/FUJ07zs1TZv5qAmvD7QECEQzYOC98BmuI=
+Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from 95.108.174.193-red.dhcp.yndx.net (95.108.174.193-red.dhcp.yndx.net [95.108.174.193])
+        by sas1-9998cec34266.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id K1blZNuWdE-hrl8NoMW;
+        Tue, 11 Aug 2020 09:43:53 +0300
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (Client certificate not present)
+From:   Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        paolo.valente@linaro.org, oleksandr@natalenko.name,
+        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
+Subject: [PATCH] bfq: fix blkio cgroup leakage v4
+Date:   Tue, 11 Aug 2020 06:43:40 +0000
+Message-Id: <20200811064340.31284-1-dmtrmonakhov@yandex-team.ru>
+X-Mailer: git-send-email 2.18.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2020-08-10 at 19:36 -0400, Chuck Lever wrote:
-> > On Aug 10, 2020, at 11:35 AM, James Bottomley
-> > <James.Bottomley@HansenPartnership.com> wrote:
-> > On Sun, 2020-08-09 at 13:16 -0400, Mimi Zohar wrote:
-> > > On Sat, 2020-08-08 at 13:47 -0400, Chuck Lever wrote:
-[...]
-> > > > The first priority (for me, anyway) therefore is getting the
-> > > > ability to move IMA metadata between NFS clients and servers
-> > > > shoveled into the NFS protocol, but that's been blocked for
-> > > > various legal reasons.
-> > > 
-> > > Up to now, verifying remote filesystem file integrity has been
-> > > out of scope for IMA.   With fs-verity file signatures I can at
-> > > least grasp how remote file integrity could possibly work.  I
-> > > don't understand how remote file integrity with existing IMA
-> > > formats could be supported. You might want to consider writing a
-> > > whitepaper, which could later be used as the basis for a patch
-> > > set cover letter.
-> > 
-> > I think, before this, we can help with the basics (and perhaps we
-> > should sort them out before we start documenting what we'll do).
-> 
-> Thanks for the help! I just want to emphasize that documentation
-> (eg, a specification) will be critical for remote filesystems.
-> 
-> If any of this is to be supported by a remote filesystem, then we
-> need an unencumbered description of the new metadata format rather
-> than code. GPL-encumbered formats cannot be contributed to the NFS
-> standard, and are probably difficult for other filesystems that are
-> not Linux-native, like SMB, as well.
+Changes from v1:
+    - update commit description with proper ref-accounting justification
 
-I don't understand what you mean by GPL encumbered formats.  The GPL is
-a code licence not a data or document licence.  The way the spec
-process works in Linux is that we implement or evolve a data format
-under a GPL implementaiton, but that implementation doesn't implicate
-the later standardisation of the data format and people are free to
-reimplement under any licence they choose.
+commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
+introduce leak forbfq_group and blkcg_gq objects because of get/put
+imbalance.
+In fact whole idea of original commit is wrong because bfq_group entity
+can not dissapear under us because it is referenced by child bfq_queue's
+entities from here:
+ -> bfq_init_entity()
+    ->bfqg_and_blkg_get(bfqg);
+    ->entity->parent = bfqg->my_entity
 
-> > The first basic is that a merkle tree allows unit at a time
-> > verification. First of all we should agree on the unit.  Since we
-> > always fault a page at a time, I think our merkle tree unit should
-> > be a page not a block.
-> 
-> Remote filesystems will need to agree that the size of that unit is
-> the same everywhere, or the unit size could be stored in the per-file
-> metadata.
-> 
-> 
-> > Next, we should agree where the check gates for the per page
-> > accesses should be ... definitely somewhere in readpage, I suspect
-> > and finally we should agree how the merkle tree is presented at the
-> > gate.  I think there are three ways:
-> > 
-> >   1. Ahead of time transfer:  The merkle tree is transferred and
-> > verified
-> >      at some time before the accesses begin, so we already have a
-> >      verified copy and can compare against the lower leaf.
-> >   2. Async transfer:  We provide an async mechanism to transfer the
-> >      necessary components, so when presented with a unit, we check
-> > the
-> >      log n components required to get to the root
-> >   3. The protocol actually provides the capability of 2 (like the
-> > SCSI
-> >      DIF/DIX), so to IMA all the pieces get presented instead of
-> > IMA
-> >      having to manage the tree
-> 
-> A Merkle tree is potentially large enough that it cannot be stored in
-> an extended attribute. In addition, an extended attribute is not a
-> byte stream that you can seek into or read small parts of, it is
-> retrieved in a single shot.
+ -> bfq_put_queue(bfqq)
+    FINAL_PUT
+    ->bfqg_and_blkg_put(bfqq_group(bfqq))
+    ->kmem_cache_free(bfq_pool, bfqq);
 
-Well you wouldn't store the tree would you, just the head hash.  The
-rest of the tree can be derived from the data.  You need to distinguish
-between what you *must* have to verify integrity (the head hash,
-possibly signed) and what is nice to have to speed up the verification
-process.  The choice for the latter is cache or reconstruct depending
-on the resources available.  If the tree gets cached on the server,
-that would be a server implementation detail invisible to the client.
+So parent entity can not disappear while child entity is in tree,
+and child entities already has proper protection.
+This patch revert commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
 
-> For this reason, the idea was to save only the signature of the
-> tree's root on durable storage. The client would retrieve that
-> signature possibly at open time, and reconstruct the tree at that
-> time.
 
-Right that's the integrity data you must have.
+bfq_group leak trace caused by bad commit:
+-> blkg_alloc
+   -> bfq_pq_alloc
+     -> bfqg_get (+1)
+->bfq_activate_bfqq
+  ->bfq_activate_requeue_entity
+    -> __bfq_activate_entity
+       ->bfq_get_entity
+         ->bfqg_and_blkg_get (+1)  <==== : Note1
+->bfq_del_bfqq_busy
+  ->bfq_deactivate_entity+0x53/0xc0 [bfq]
+    ->__bfq_deactivate_entity+0x1b8/0x210 [bfq]
+      -> bfq_forget_entity(is_in_service = true)
+	 entity->on_st_or_in_serv = false   <=== :Note2
+	 if (is_in_service)
+	     return;  ==> do not touch reference
+-> blkcg_css_offline
+ -> blkcg_destroy_blkgs
+  -> blkg_destroy
+   -> bfq_pd_offline
+    -> __bfq_deactivate_entity
+         if (!entity->on_st_or_in_serv) /* true, because (Note2)
+		return false;
+ -> bfq_pd_free
+    -> bfqg_put() (-1, byt bfqg->ref == 2) because of (Note2)
+So bfq_group and blkcg_gq  will leak forever, see test-case below.
 
-> Or the tree could be partially constructed on-demand at the time each
-> unit is to be checked (say, as part of 2. above).
 
-Whether it's reconstructed or cached can be an implementation detail. 
-You clearly have to reconstruct once, but whether you have to do it
-again depends on the memory available for caching and all the other
-resource calls in the system.
+##TESTCASE_BEGIN:
+#!/bin/bash
 
-> The client would have to reconstruct that tree again if memory
-> pressure caused some or all of the tree to be evicted, so perhaps an
-> on-demand mechanism is preferable.
+max_iters=${1:-100}
+#prep cgroup mounts
+mount -t tmpfs cgroup_root /sys/fs/cgroup
+mkdir /sys/fs/cgroup/blkio
+mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
 
-Right, but I think that's implementation detail.  Probably what we need
-is a way to get the log(N) verification hashes from the server and it's
-up to the client whether it caches them or not.
+# Prepare blkdev
+grep blkio /proc/cgroups
+truncate -s 1M img
+losetup /dev/loop0 img
+echo bfq > /sys/block/loop0/queue/scheduler
 
-> > There are also a load of minor things like how we get the head
-> > hash, which must be presented and verified ahead of time for each
-> > of the above 3.
-> 
-> Also, changes to a file's content and its tree signature are not
-> atomic. If a file is mutable, then there is the period between when
-> the file content has changed and when the signature is updated.
-> Some discussion of how a client is to behave in those situations will
-> be necessary.
+grep blkio /proc/cgroups
+for ((i=0;i<max_iters;i++))
+do
+    mkdir -p /sys/fs/cgroup/blkio/a
+    echo 0 > /sys/fs/cgroup/blkio/a/cgroup.procs
+    dd if=/dev/loop0 bs=4k count=1 of=/dev/null iflag=direct 2> /dev/null
+    echo 0 > /sys/fs/cgroup/blkio/cgroup.procs
+    rmdir /sys/fs/cgroup/blkio/a
+    grep blkio /proc/cgroups
+done
+##TESTCASE_END:
 
-For IMA, if you write to a checked file, it gets rechecked the next
-time the gate (open/exec/mmap) is triggered.  This means you must
-complete the update and have the new integrity data in-place before
-triggering the check.  I think this could apply equally to a merkel
-tree based system.  It's a sort of Doctor, Doctor it hurts when I do
-this situation.
+Signed-off-by: Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
+---
+ block/bfq-cgroup.c  |  2 +-
+ block/bfq-iosched.h |  1 -
+ block/bfq-wf2q.c    | 12 ++----------
+ 3 files changed, 3 insertions(+), 12 deletions(-)
 
-James
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 68882b9..b791e20 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -332,7 +332,7 @@ static void bfqg_put(struct bfq_group *bfqg)
+ 		kfree(bfqg);
+ }
+ 
+-void bfqg_and_blkg_get(struct bfq_group *bfqg)
++static void bfqg_and_blkg_get(struct bfq_group *bfqg)
+ {
+ 	/* see comments in bfq_bic_update_cgroup for why refcounting bfqg */
+ 	bfqg_get(bfqg);
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index cd224aa..7038952 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -986,7 +986,6 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
+ struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
+ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node);
+-void bfqg_and_blkg_get(struct bfq_group *bfqg);
+ void bfqg_and_blkg_put(struct bfq_group *bfqg);
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index eb0e2a6..26776bd 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -533,9 +533,7 @@ static void bfq_get_entity(struct bfq_entity *entity)
+ 		bfqq->ref++;
+ 		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
+ 			     bfqq, bfqq->ref);
+-	} else
+-		bfqg_and_blkg_get(container_of(entity, struct bfq_group,
+-					       entity));
++	}
+ }
+ 
+ /**
+@@ -649,14 +647,8 @@ static void bfq_forget_entity(struct bfq_service_tree *st,
+ 
+ 	entity->on_st_or_in_serv = false;
+ 	st->wsum -= entity->weight;
+-	if (is_in_service)
+-		return;
+-
+-	if (bfqq)
++	if (bfqq && !is_in_service)
+ 		bfq_put_queue(bfqq);
+-	else
+-		bfqg_and_blkg_put(container_of(entity, struct bfq_group,
+-					       entity));
+ }
+ 
+ /**
+-- 
+2.7.4
 
