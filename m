@@ -2,117 +2,119 @@ Return-Path: <SRS0=2P2f=BV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 272A5C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 08:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E174DC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 08:31:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 089D5206C3
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 08:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B940920756
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 08:31:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="PyjA9Amd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728218AbgHKIL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 04:11:56 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2591 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728000AbgHKIL4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 04:11:56 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id C21AA217929DB03DA386;
-        Tue, 11 Aug 2020 09:11:54 +0100 (IST)
-Received: from [127.0.0.1] (10.210.168.126) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 11 Aug
- 2020 09:11:53 +0100
-Subject: Re: [PATCH RFC v7 10/12] megaraid_sas: switch fusion adapters to MQ
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>, <bvanassche@acm.org>,
-        <hare@suse.com>, <hch@lst.de>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-References: <20200729153648.GA1698748@T590>
- <7f94eaf2318cc26ceb64bde88d59d5e2@mail.gmail.com>
- <20200804083625.GA1958244@T590>
- <afe5eb1be7f416a48d7b5d473f3053d0@mail.gmail.com>
- <20200805084031.GA1995289@T590>
- <5adffdf805179428bdd0dd6c293a4f7d@mail.gmail.com>
- <20200806133819.GA2046861@T590>
- <f1ac35dfca34193e6c9bcedbc11911d2@mail.gmail.com>
- <20200806152939.GA2062348@T590>
- <3f35b0f67c73c8c4996fdad80eb6d963@mail.gmail.com>
- <20200809021633.GA2134904@T590>
- <6f8790811e7a3238f2b0fa35fbb816bc@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <2e6e63f0-2a05-c29a-e534-3ecf06eff688@huawei.com>
-Date:   Tue, 11 Aug 2020 09:09:41 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1728426AbgHKIbh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 04:31:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52254 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728253AbgHKIbh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Aug 2020 04:31:37 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0D4C06174A
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 01:31:36 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id a26so12202551ejc.2
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 01:31:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AiEVGPid6fNu3u2/+UVT80DrdCDFGK6L0AEhBU/401w=;
+        b=PyjA9AmdtZwpDwiqa7CWI/1e1+SMXF8+PoPYnxb+EWmtB09hHtqNEQvDJYifVgJe5t
+         0cFPEm+eCxvvj1bsdNVbLfH7NtIIwA3rKYKl2A5FFOCZ4kJiWSg8fVE6INjDmVGJcF1y
+         J2Ga9RGRm1J0z4XX9b7ynr5Hat8fw2XHn3vLBeRcyBeWenHgdYIyFNe1/EeZV8EsdKpE
+         M7BuOEI8RdlOuS6jNIOjmuUIvD4f5PGD9WD8VBBjLcY11WQnzu/4Jfows5e+WrVeq2IA
+         cd5AHJRtDanuK+woC3qPsW5q279EOx7mKRPffQNO/cmfPrYf9bF50ajRtwTdZb9vWn50
+         Y4gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AiEVGPid6fNu3u2/+UVT80DrdCDFGK6L0AEhBU/401w=;
+        b=rbLIJIvnN0RNVhVXW1yZolFaSiCHeCn5/MBVl3LnMFp1ytnJpRBalNMUUjT1xZ3sSE
+         4omhtHehUl13jFV/giElkEE045k4FKIyU6W9iKAxjKbgvC1cWi4wBfiyIqaEgTuqWUpM
+         4iYu/1/yV/PmVTn0rAShlxF+QJEhzSde5fjucy31B+QJhxhnf+HgzHn0NBzln9cQVdwn
+         ALRVvZG5lBFbCEwS4aXfnW8hbAf2caqWvqkxFMOEiDhDutWBbaYle7rQ5w/h0S6zHg5T
+         LxLWBTqELLjY+mxzgeDWSuDbCBj464xxvgh6j4Yfp1D8JMMyumYYuO0mLjr0v10pnffY
+         2aLA==
+X-Gm-Message-State: AOAM530x1jnnp2QKsSf71+trNJU9NJTlUGks7m/oTZqCqNlCmP5Y7mBX
+        w+3ou+ZsQxXC6wGgyJifQtKaJWq09K0MzyPayuxKHg==
+X-Google-Smtp-Source: ABdhPJzG73nvFfk0XHtVcnuCEDIBQb1M84nJWERMU5MRp5HyWBIMdmOdwokCmjSJgOTGZ+wm37iGEylpCzk4+KHjTP0=
+X-Received: by 2002:a17:906:7a16:: with SMTP id d22mr25846663ejo.478.1597134695070;
+ Tue, 11 Aug 2020 01:31:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <6f8790811e7a3238f2b0fa35fbb816bc@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.168.126]
-X-ClientProxiedBy: lhreml730-chm.china.huawei.com (10.201.108.81) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+References: <20200810115049.304118-1-haris.iqbal@cloud.ionos.com>
+In-Reply-To: <20200810115049.304118-1-haris.iqbal@cloud.ionos.com>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Tue, 11 Aug 2020 10:31:24 +0200
+Message-ID: <CAMGffEmN25PjoLVsWPbp7kVrCWpA-T8AMxb32zYtSVs=3Z090Q@mail.gmail.com>
+Subject: Re: [PATCH v2] RDMA/rtrs-srv: Incorporate ib_register_client into
+ rtrs server init
+To:     Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-rdma@vger.kernel.org, Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>, linux-block@vger.kernel.org,
+        kernel test robot <rong.a.chen@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/08/2020 17:38, Kashyap Desai wrote:
-> 
-> Functional Test -
-> 
-> I cover overnight IO testing using <fio> script which sends 4K rand read,
-> read, rand write and write IOs to the 24 SAS JBOD drives.
-> Some of the JBOD has ioscheduler=none and some of the JBOD has
-> ioscheduler=mq-deadline
-> I used additional script which change sdev->queue_depth of each device
-> from 2 to 16 range at the interval of 5 seconds.
-> I used additional script which toggle "rq_affinity=1" and "rq_affinity=2"
-> at the interval of 5 seconds.
-> 
-> I did not noticed any IO hang.
-> 
-> Thanks, Kashyap
-> 
-
-Nice work. I think v8 series can now be prepared, since this final 
-performance issue reported looks resolved. But I still don't know what's 
-going on for "[PATCHv6 00/21] scsi: enable reserved commands for LLDDs", 
-which current hpsa patch relies on for basic functionality :(
-
->>
->>  From 06993ddf5c5dbe0e772cc38342919eb61a57bc50 Mon Sep 17 00:00:00
->> 2001
->> From: Ming Lei<ming.lei@redhat.com>
->> Date: Wed, 5 Aug 2020 16:35:53 +0800
->> Subject: [PATCH] scsi: core: only re-run queue in scsi_end_request() if
-> device
->> queue is busy
-
-Ming, I assume that you will send this directly to SCSI maintainers when 
-the merge window closes.
-
->>
->> Now the request queue is run in scsi_end_request() unconditionally if
-> both
->> target queue and host queue is ready. We should have re-run request
-> queue
->> only after this device queue becomes busy for restarting this LUN only.
->>
->> Recently Long Li reported that cost of run queue may be very heavy in
-> case of
->> high queue depth. So improve this situation by only running the request
-> queue
->> when this LUN is busy.
-
+On Mon, Aug 10, 2020 at 1:51 PM Md Haris Iqbal
+<haris.iqbal@cloud.ionos.com> wrote:
+>
+> The rnbd_server module's communication manager (cm) initialization depends
+> on the registration of the "network namespace subsystem" of the RDMA CM
+> agent module. As such, when the kernel is configured to load the
+> rnbd_server and the RDMA cma module during initialization; and if the
+> rnbd_server module is initialized before RDMA cma module, a null ptr
+> dereference occurs during the RDMA bind operation.
+>
+> Call trace below,
+>
+> [    1.904782] Call Trace:
+> [    1.904782]  ? xas_load+0xd/0x80
+> [    1.904782]  xa_load+0x47/0x80
+> [    1.904782]  cma_ps_find+0x44/0x70
+> [    1.904782]  rdma_bind_addr+0x782/0x8b0
+> [    1.904782]  ? get_random_bytes+0x35/0x40
+> [    1.904782]  rtrs_srv_cm_init+0x50/0x80
+> [    1.904782]  rtrs_srv_open+0x102/0x180
+> [    1.904782]  ? rnbd_client_init+0x6e/0x6e
+> [    1.904782]  rnbd_srv_init_module+0x34/0x84
+> [    1.904782]  ? rnbd_client_init+0x6e/0x6e
+> [    1.904782]  do_one_initcall+0x4a/0x200
+> [    1.904782]  kernel_init_freeable+0x1f1/0x26e
+> [    1.904782]  ? rest_init+0xb0/0xb0
+> [    1.904782]  kernel_init+0xe/0x100
+> [    1.904782]  ret_from_fork+0x22/0x30
+> [    1.904782] Modules linked in:
+> [    1.904782] CR2: 0000000000000015
+> [    1.904782] ---[ end trace c42df88d6c7b0a48 ]---
+>
+> All this happens cause the cm init is in the call chain of the module init,
+> which is not a preferred practice.
+>
+> So remove the call to rdma_create_id() from the module init call chain.
+> Instead register rtrs-srv as an ib client, which makes sure that the
+> rdma_create_id() is called only when an ib device is added.
+>
+> Fixes: 9cb837480424 ("RDMA/rtrs: server: main functionality")
+> Reported-by: kernel test robot <rong.a.chen@intel.com>
+> Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Acked-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+Thanks!
