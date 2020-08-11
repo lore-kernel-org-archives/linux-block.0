@@ -2,68 +2,83 @@ Return-Path: <SRS0=2P2f=BV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E728DC433DF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 11:05:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D57C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 11:13:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3F7D2075D
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 11:05:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597143935;
-	bh=Q0B1lzWvx38Ip797a3S+Ae9E22lZplMZuRM9e/7gLT4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=KRzY5z3N5qTjuEm8JCM4mYaj7GwM4M4DimTC+qvVEix5bmHeZVl4o8BcTOIIHhG9M
-	 0G2I9s9KKnoaZdMLAKNbyIV1K95GKDCh5cFSyYDMKYsk3+w2wEd5fsfXDRjYZFfv/q
-	 4ZBdHpe/Q1g9ocALIK4Gg4cykMEFKYw+A+GeZWPo=
+	by mail.kernel.org (Postfix) with ESMTP id 681B42065C
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 11:13:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="FiXwgcRY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728605AbgHKLFf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 07:05:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40316 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728448AbgHKLFd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 07:05:33 -0400
-Received: from localhost (unknown [213.57.247.131])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 73BD82075D;
-        Tue, 11 Aug 2020 11:05:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597143932;
-        bh=Q0B1lzWvx38Ip797a3S+Ae9E22lZplMZuRM9e/7gLT4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=E6l5X1wkleGv5iecKXGLUW+sY8SOY7Gsxf8KusQ2QeDlLdnVMNUkV73mnNE8Uct9L
-         CEtZ5trZePzLFIxeMtAaIFKb5gUC088Whm8plmxjAbppqH197YR7U200sQ8X8cmoHa
-         dfQdR7vLPNBl2tSINVjGXEL83walJJrNbaZxgZyc=
-Date:   Tue, 11 Aug 2020 14:05:28 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Haris Iqbal <haris.iqbal@cloud.ionos.com>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        linux-rdma@vger.kernel.org, dledford@redhat.com,
-        Jason Gunthorpe <jgg@ziepe.ca>, linux-block@vger.kernel.org,
-        kernel test robot <rong.a.chen@intel.com>
+        id S1728604AbgHKLNf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 07:13:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48876 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728571AbgHKLNf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Aug 2020 07:13:35 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0DAAC061787
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 04:13:34 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id o23so12665184ejr.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 04:13:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Pvkhc8EL8Oqn15OnpFCb9EjXnlFjjhQYHA6dVhmn4a0=;
+        b=FiXwgcRYK13Iys62qQ0tZa5sMHLeMufYECDH/tCSlNYDit1L+fFqpssu6HAF1DeL1m
+         ruLmhWE+rp8IThdyAb2koYgoX7KzIY8UmqDynZw2MPV9EaftikVuAnBJtBZktOYfimxT
+         VisZuEPDkqlGAAMTqgD9HXZ/UE+E5AqJxrpdRM9Qwe8hFuw4PyE1WUw4QuCiDJvmiIuW
+         B9MDs1ECU9W4Zswmx0P0IX/5sArBB+ZGXvJwh+SOInclS7kX6rwwIB19Zt9WE47IE2Om
+         wsezmWtzorRf/r7dpc6Iiq6k6AFg7spcTTXoKuBE5Md/zgzdgqawzavfVnOA7PjJ2aYL
+         HA5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Pvkhc8EL8Oqn15OnpFCb9EjXnlFjjhQYHA6dVhmn4a0=;
+        b=Uxy10RCjjP6vlyhTFrSeX5UT5o0gobrIWTLU1k+4xBO1HSqB0zNatANrepTfe7GSlo
+         PISrUaFZPV2WHnyOMEKRCUqRrmiGVVlCQIB9Cywmwqb3ifwdMKCMvPolPD3C+6TYK0xL
+         Sw1R2CxEAqtxvpk2389UGoLjfVExRs5o9oIkFIT0vewxhBPbKKdE/dTiGsIb5YGisAsd
+         fmNgscKlfQ/7KpInM4ErSVBcz5qKBcOa3hF58Wyan5UlhXMkT9fwAcdNdGJ1nks5HMWC
+         XIycT2Xg2s375FkGv2MJzX82mwicfR4Gla0jrqz2jlnI733Mf1LCPJD00wFJC6WWmPAK
+         Pthw==
+X-Gm-Message-State: AOAM530ZyuRklU3jsJKytSwhSqBdeZsUeE74ZW8PjYMzIwP7QduBAq3W
+        gQrSI4M3VtuaKG8sLOiydfdF7WhTfMcJCZoHOKU/qg==
+X-Google-Smtp-Source: ABdhPJx8+HLFOdZn/Ao79hX8dDxNCqu0EsPSYH0DlJArsRYvNSVvaAhBa9vpHFHr8Cw6OdUppcoPvHEKUXxfMn/8SWI=
+X-Received: by 2002:a17:906:ca5a:: with SMTP id jx26mr24835367ejb.62.1597144413230;
+ Tue, 11 Aug 2020 04:13:33 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200810115049.304118-1-haris.iqbal@cloud.ionos.com>
+ <20200811084544.GB634816@unreal> <CAJpMwyjC+CuSoXD_XEaHS4njnFaHCbegMX+qucMfg-fXVqFD+Q@mail.gmail.com>
+ <20200811104711.GC634816@unreal> <CAJpMwygFuhq-aiiVHz1w=jAjav1ZN-5yMuos67S2=2UX-wb85Q@mail.gmail.com>
+In-Reply-To: <CAJpMwygFuhq-aiiVHz1w=jAjav1ZN-5yMuos67S2=2UX-wb85Q@mail.gmail.com>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Tue, 11 Aug 2020 13:13:22 +0200
+Message-ID: <CAMGffE=NSGsJAFJe5_n8_xfJ=6-kp5rYY3LK5wdcQCDdt6+CkQ@mail.gmail.com>
 Subject: Re: [PATCH v2] RDMA/rtrs-srv: Incorporate ib_register_client into
  rtrs server init
-Message-ID: <20200811110528.GD634816@unreal>
-References: <20200810115049.304118-1-haris.iqbal@cloud.ionos.com>
- <20200811084544.GB634816@unreal>
- <CAJpMwyjC+CuSoXD_XEaHS4njnFaHCbegMX+qucMfg-fXVqFD+Q@mail.gmail.com>
- <20200811104711.GC634816@unreal>
- <CAJpMwygFuhq-aiiVHz1w=jAjav1ZN-5yMuos67S2=2UX-wb85Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJpMwygFuhq-aiiVHz1w=jAjav1ZN-5yMuos67S2=2UX-wb85Q@mail.gmail.com>
+To:     Haris Iqbal <haris.iqbal@cloud.ionos.com>,
+        Leon Romanovsky <leon@kernel.org>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-rdma@vger.kernel.org, Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, linux-block@vger.kernel.org,
+        kernel test robot <rong.a.chen@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 11, 2020 at 04:23:46PM +0530, Haris Iqbal wrote:
+On Tue, Aug 11, 2020 at 12:53 PM Haris Iqbal
+<haris.iqbal@cloud.ionos.com> wrote:
+>
 > On Tue, Aug 11, 2020 at 4:17 PM Leon Romanovsky <leon@kernel.org> wrote:
 > >
 > > On Tue, Aug 11, 2020 at 02:27:12PM +0530, Haris Iqbal wrote:
@@ -253,70 +268,10 @@ On Tue, Aug 11, 2020 at 04:23:46PM +0530, Haris Iqbal wrote:
 > Even if we are talking in generic terms, any module calling the
 > "rtrs_srv_open()" of the rtrs ulp, would want to know if the server
 > open failed or succeeded right?
+I think Leon is right, any success of call to ->add, we have something
+to rtrs_srv_rdma_init,
+we can consider rtrs_srv_open is success instead of an error.
 
-I see no difference between system without ib_devices and failure of rtrs_srv_rdma_init().
-In both cases ib_dev_count == 0 and once new ib_device will come, the
-ib_core will call to client->add() again.
+Thanks Leon for catching this.
 
-ib_register_client() success => rtrs_srv_open() success.
-
-Thanks
-
->
-> >
-> > Thanks
-> >
-> > >
-> > > >
-> > > > Failure to call ->add shouldn't be any different from no-ib-devices situation.
-> > > >
-> > > > Thanks
-> > > >
-> > > > > +
-> > > > >       return ctx;
-> > > > >  }
-> > > > >  EXPORT_SYMBOL(rtrs_srv_open);
-> > > > > @@ -2090,8 +2164,7 @@ static void close_ctx(struct rtrs_srv_ctx *ctx)
-> > > > >   */
-> > > > >  void rtrs_srv_close(struct rtrs_srv_ctx *ctx)
-> > > > >  {
-> > > > > -     rdma_destroy_id(ctx->cm_id_ip);
-> > > > > -     rdma_destroy_id(ctx->cm_id_ib);
-> > > > > +     ib_unregister_client(&rtrs_srv_client);
-> > > > >       close_ctx(ctx);
-> > > > >       free_srv_ctx(ctx);
-> > > > >  }
-> > > > > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.h b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > > > > index dc95b0932f0d..e8f7e99a9a6e 100644
-> > > > > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > > > > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > > > > @@ -118,6 +118,12 @@ struct rtrs_srv_ctx {
-> > > > >       struct list_head srv_list;
-> > > > >  };
-> > > > >
-> > > > > +struct rtrs_srv_ib_ctx {
-> > > > > +     struct rtrs_srv_ctx     *srv_ctx;
-> > > > > +     u16                     port;
-> > > > > +     int                     ib_dev_count;
-> > > > > +};
-> > > > > +
-> > > > >  extern struct class *rtrs_dev_class;
-> > > > >
-> > > > >  void close_sess(struct rtrs_srv_sess *sess);
-> > > > > --
-> > > > > 2.25.1
-> > > > >
-> > >
-> > >
-> > >
-> > > --
-> > >
-> > > Regards
-> > > -Haris
->
->
->
-> --
->
-> Regards
-> -Haris
+Regards!
