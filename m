@@ -2,143 +2,90 @@ Return-Path: <SRS0=2P2f=BV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B98C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 19:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4844C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 19:53:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B62C5206B2
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 19:30:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A941920782
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 19:53:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YUDT7ps6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726023AbgHKTaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 15:30:21 -0400
-Received: from jabberwock.ucw.cz ([46.255.230.98]:55228 "EHLO
-        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725889AbgHKTaU (ORCPT
+        id S1725889AbgHKTxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 15:53:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726329AbgHKTxo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 15:30:20 -0400
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id B4DE61C0BDD; Tue, 11 Aug 2020 21:30:16 +0200 (CEST)
-Date:   Tue, 11 Aug 2020 21:30:16 +0200
-From:   Pavel Machek <pavel@ucw.cz>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     Chuck Lever <chucklever@gmail.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        James Morris <jmorris@namei.org>,
-        Deven Bowers <deven.desai@linux.microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, snitzer@redhat.com,
-        dm-devel@redhat.com, tyhicks@linux.microsoft.com, agk@redhat.com,
-        Paul Moore <paul@paul-moore.com>,
-        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
-        serge@hallyn.com, pasha.tatashin@soleen.com,
-        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
-        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement LSM
- (IPE)
-Message-ID: <20200811193016.bdwh5kq7ci3yeme4@duo.ucw.cz>
-References: <1596639689.3457.17.camel@HansenPartnership.com>
- <alpine.LRH.2.21.2008050934060.28225@namei.org>
- <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
- <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
- <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
- <1597073737.3966.12.camel@HansenPartnership.com>
- <6E907A22-02CC-42DD-B3CD-11D304F3A1A8@gmail.com>
- <1597124623.30793.14.camel@HansenPartnership.com>
- <16C3BF97-A7D3-488A-9D26-7C9B18AD2084@gmail.com>
- <1597159969.4325.21.camel@HansenPartnership.com>
+        Tue, 11 Aug 2020 15:53:44 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36BAC06174A
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 12:53:43 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id c10so1930392pjn.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 12:53:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=HUeEh/Jol5rGLKd9TzkUnIYwPuOB4unmy8/8aW+J2e0=;
+        b=YUDT7ps6SbFFHmJ1K+/R8wkxJgTaatLcNrXU81ChIYwOzlAsXnn9G6G7OWOxjXbiRp
+         698S9grYc8nycWEvZuvIIVIHF52Iyj++hE2twaC0bibYQlkaNStTknDETM/WqTvXkS2Q
+         lYv0HlVYDgTGL4vgaSD4/8cjdyOxeEYQsPfZRV58YcjBiq4EVPx73aV0Fvq5xxAGprkk
+         GcNg9EOL33D6fNEkb2lO1a2CoxVC2UToRnzuc8mCHhIMItyOytBuxG4VYYanRg7CGKnS
+         djOTZ7wr4ClqcjPNKLPDSHLbUf6n/1MSJ/MqVVHDd0yNaTQk9LOwP9FdQunsBvP8vyLr
+         OAeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HUeEh/Jol5rGLKd9TzkUnIYwPuOB4unmy8/8aW+J2e0=;
+        b=GJcv4swDxBDSaYGGSjgO4briZiBHopeRSegJaE5tUx7zX1UzIluBgef+StK4gJqhbs
+         wYymqd0f7F3gpvfZkTCOhCixbH+R3zct6o/uAJk8wpZkAp5hAfBQSqT6Pvp0WZNaE9X9
+         N1ANue87oRbjoYHXPI4ir03hZeGfGhPQYrPf76TIeJzBXwlfYhasx/1YXooewodVccfz
+         YqYwzNc3blCHEOaceLqUb1TsjmKRUFfna3U9bdVykmZ0JcG3qdN3osN6w7g2whQgBdi/
+         qPuEGKY3vSd2XNRbdBF4x+kDTCQJRhICvZCl1n0fT4gJ2Tgj+qptfrrnX8hnV2UJt5k5
+         6eKQ==
+X-Gm-Message-State: AOAM533gpz3kIY1eAwlpDn0MWE+XbEH30EQmke9spiH9tCpZ7xFIT2Gz
+        wXNcYQdn6Fwq1HTAh71r/vV0Mw==
+X-Google-Smtp-Source: ABdhPJy4il2+HtbB8Yg4w4uwqlz+3CWEkFgTd+reqPK0iaAehSLhnpfAfAkqAnZrsTv+94Gd5L6xxA==
+X-Received: by 2002:a17:902:b205:: with SMTP id t5mr2389647plr.7.1597175623227;
+        Tue, 11 Aug 2020 12:53:43 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id f63sm3574034pjk.53.2020.08.11.12.53.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Aug 2020 12:53:42 -0700 (PDT)
+Subject: Re: [PATCH] block: fix double account of flush request's driver tag
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>
+References: <20200810035950.2211549-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <da692df5-6b30-fe02-42b7-adb1c0e30bee@kernel.dk>
+Date:   Tue, 11 Aug 2020 13:53:41 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="x335q3ph5liujtc7"
-Content-Disposition: inline
-In-Reply-To: <1597159969.4325.21.camel@HansenPartnership.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20200810035950.2211549-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 8/9/20 9:59 PM, Ming Lei wrote:
+> In case of none scheduler, we share data request's driver tag for
+> flush request, so have to mark the flush request as INFLIGHT for
+> avoiding double account of this driver tag.
 
---x335q3ph5liujtc7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Applied, thanks.
 
-Hi!
+-- 
+Jens Axboe
 
-> > > > (eg, a specification) will be critical for remote filesystems.
-> > > >=20
-> > > > If any of this is to be supported by a remote filesystem, then we
-> > > > need an unencumbered description of the new metadata format
-> > > > rather than code. GPL-encumbered formats cannot be contributed to
-> > > > the NFS standard, and are probably difficult for other
-> > > > filesystems that are not Linux-native, like SMB, as well.
-> > >=20
-> > > I don't understand what you mean by GPL encumbered formats.  The
-> > > GPL is a code licence not a data or document licence.
-> >=20
-> > IETF contributions occur under a BSD-style license incompatible
-> > with the GPL.
-> >=20
-> > https://trustee.ietf.org/trust-legal-provisions.html
-> >=20
-> > Non-Linux implementers (of OEM storage devices) rely on such
-> > standards processes to indemnify them against licensing claims.
->=20
-> Well, that simply means we won't be contributing the Linux
-> implementation, right? However, IETF doesn't require BSD for all
-> implementations, so that's OK.
->=20
-> > Today, there is no specification for existing IMA metadata formats,
-> > there is only code. My lawyer tells me that because the code that
-> > implements these formats is under GPL, the formats themselves cannot
-> > be contributed to, say, the IETF without express permission from the
-> > authors of that code. There are a lot of authors of the Linux IMA
-> > code, so this is proving to be an impediment to contribution. That
-> > blocks the ability to provide a fully-specified NFS protocol
-> > extension to support IMA metadata formats.
->=20
-> Well, let me put the counterpoint: I can write a book about how
-> linux
-
-You should probably talk to your lawyer.
-
-> device drivers work (which includes describing the data formats), for
-> instance, without having to get permission from all the authors ... or
-> is your lawyer taking the view we should be suing Jonathan Corbet,
-> Alessandro Rubini, and Greg Kroah-Hartman for licence infringement?  In
-> fact do they think we now have a huge class action possibility against
-> O'Reilly  and a host of other publishers ...
-
-Because yes, you can reverse engineer for compatibility reasons --
-doing clean room re-implementation (BIOS binary -> BIOS documentation
--> BIOS sources under different license), but that was only tested in
-the US, is expensive, and I understand people might be uncomfortable
-doing that.
-
-Best regards,
-									Pavel
-
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---x335q3ph5liujtc7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCXzLxyAAKCRAw5/Bqldv6
-8vgbAKCHpxkUI3bT9Vn41Tp5GJNZ+nv/SQCfRg4xUwALTQzmhch9Ig1sF0gdvc0=
-=c2f+
------END PGP SIGNATURE-----
-
---x335q3ph5liujtc7--
