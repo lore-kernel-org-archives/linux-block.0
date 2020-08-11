@@ -2,75 +2,102 @@ Return-Path: <SRS0=2P2f=BV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F21C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 21:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E56BC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 23:44:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08C3120774
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 21:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B9B720782
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 23:44:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VQLdeuOn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726114AbgHKVpQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 17:45:16 -0400
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:32795 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbgHKVpQ (ORCPT
+        id S1726255AbgHKXol (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 19:44:41 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21284 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726143AbgHKXok (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 17:45:16 -0400
-Received: by mail-pj1-f67.google.com with SMTP id i92so2032636pje.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 14:45:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aG2TZSuxwKetVw9WAETDbHNqIj8OwXsHuETcwl47mxg=;
-        b=XFhcQaqy6WQWM5xvmo5hS/DFOWN5Nx+aRpgmqZebWWfQx8UvyOt+eQS6qzVxCt9yH9
-         46u7++QZ6L6/Tklul+BbjZNgBVI3Kyo97i8SinbL7BuPuB2rircA641nUb+pmevDvJGf
-         ReIqfKGI5xaXp/av4lzu0gugzyU/cgIigV3bgS8nqKFl8H1EY4AnBke4JC91beK0RmlN
-         f2YaYMY8mTIYICUjo7iAMsM2wNRI38UqQcaX3J+mDjbhjP272ANUH/arw9xcncxxMePo
-         NzBf7F7igUjiYrAc4L7zWVX8hi+V6e4+zoQBV5KWK28GTFeDhkHmfkHAM18sIl9AawoS
-         TROw==
-X-Gm-Message-State: AOAM530rPTXNNgyqV/3wY0hCJTY5QhCRUVF4HW+kAss4rnbQUoMyZGXK
-        RAfCypV2LzV9j7gEc2nVT/k=
-X-Google-Smtp-Source: ABdhPJw8LIt2gQ6FOkVrUrZ12i+84Mc/CAKsk88WGSaz14Ggq/82u+hhNv2YtYs7btuxoPB1heQPsg==
-X-Received: by 2002:a17:90a:6f85:: with SMTP id e5mr3077388pjk.128.1597182315339;
-        Tue, 11 Aug 2020 14:45:15 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:b58b:5460:6ed2:8ff9? ([2601:647:4802:9070:b58b:5460:6ed2:8ff9])
-        by smtp.gmail.com with ESMTPSA id o16sm32849pfu.188.2020.08.11.14.45.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Aug 2020 14:45:14 -0700 (PDT)
-Subject: Re: [PATCH v3 6/7] common: move module_unload to common
-To:     Bart Van Assche <bvanassche@acm.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Omar Sandoval <osandov@osandov.com>
-Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-References: <20200811210102.194287-1-sagi@grimberg.me>
- <20200811210102.194287-7-sagi@grimberg.me>
- <47900df7-e3be-c200-67ff-c9e099cb8aee@acm.org>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <19e536ca-cb18-68ac-7688-d5c9b788ee99@grimberg.me>
-Date:   Tue, 11 Aug 2020 14:45:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 11 Aug 2020 19:44:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597189479;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AAi7QgDlgwa6vXyUFB2roc4ydwBgYOiEWcbw2Mkt8HA=;
+        b=VQLdeuOn/+J6FGREhN8JslaflPzwweGc0P2kXfKFN/dSYUUPT4V7SkA9ex7uTThkOOiNmt
+        i0BWUKX+gMsBW9K+8Z3q6Yzyxf8T7Lvhxxa6B9B8VUoir2wyZm/t8lTuFrXw2IBGVks+1o
+        03sJ49u0qYW3L4Hf8VJmXASiPxRW7Xs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-QPWel0fLPqK9s7s2pQ0NCQ-1; Tue, 11 Aug 2020 19:44:35 -0400
+X-MC-Unique: QPWel0fLPqK9s7s2pQ0NCQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A34E78017F4;
+        Tue, 11 Aug 2020 23:44:34 +0000 (UTC)
+Received: from localhost (ovpn-13-156.pek2.redhat.com [10.72.13.156])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B98631A92C;
+        Tue, 11 Aug 2020 23:44:25 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Changpeng Liu <changpeng.liu@intel.com>,
+        Daniel Verkamp <dverkamp@chromium.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH V2 0/3] block: fix discard merge for single max discard segment
+Date:   Wed, 12 Aug 2020 07:44:17 +0800
+Message-Id: <20200811234420.2297137-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <47900df7-e3be-c200-67ff-c9e099cb8aee@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
-> Hi Sagi,
-> 
-> I think there is another copy of unload_module() in tests/srp/rc. How about
-> also removing that copy?
+The 1st patch checks max discard segment limit in request merge code,
+and one discard request failure is fixed for virtio_blk.
 
-Yes, this is minor enough to remove when applying, Or I can respin the
-patch set again if Omar prefers it that way.
+The 2nd patch fixes handling of single max discard segment for virtio_blk,
+and potential memory corruption is fixed.
+
+The 3rd patch renames the confusing blk_discard_mergable().
+
+The biggest problem is that virtio_blk handles discard request in
+multi-range style, however it(at least qemu) may claim that multi range
+discard isn't supported by returning 1 for max discard segment.
+
+V2:
+	- add comment
+	- warn on mismatched bios and discard segment number
+	- rename blk_discard_mergable
+
+
+Ming Lei (3):
+  block: respect queue limit of max discard segment
+  block: virtio_blk: fix handling single range discard request
+  block: rename blk_discard_mergable as blk_discard_support_multi_range
+
+ block/blk-merge.c          | 21 +++++++++++++++------
+ drivers/block/virtio_blk.c | 31 +++++++++++++++++++++++--------
+ 2 files changed, 38 insertions(+), 14 deletions(-)
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Changpeng Liu <changpeng.liu@intel.com>
+Cc: Daniel Verkamp <dverkamp@chromium.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>
+-- 
+2.25.2
+
