@@ -2,295 +2,90 @@ Return-Path: <SRS0=2P2f=BV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E57F8C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 08:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C05C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 09:21:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8D7A20678
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 08:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DB8D20772
+	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 09:21:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="PBbjMQ4O"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYgCWHlx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728383AbgHKI50 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 04:57:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56246 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728336AbgHKI5Z (ORCPT
+        id S1728423AbgHKJV4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 05:21:56 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37222 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728391AbgHKJVz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 04:57:25 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C3FC06174A
-        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 01:57:25 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id bo3so12221121ejb.11
-        for <linux-block@vger.kernel.org>; Tue, 11 Aug 2020 01:57:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=eZsDu2D3AQWNCQ2ZG6MtjjJo26r+xt9w714U+QGZebA=;
-        b=PBbjMQ4OlIMtg2zLUb33wr678iDedyaYGyu8ASuVzIfcfWPnROJG2ej69TAPCNWTC/
-         2NFaMu62rNtnDlpke+1bKde8gRMietC8B/Ud54qoNLNMO9KYzDjCWBl38FgoT2MvaU3x
-         qjOFlzXxW3wPYCnuFh6Fz3Rv85YIyONfBT7C5z62sz2WSMrj6Sak6dYcWKU6W9DdpQ6V
-         +R4Jruu3lJH6uyPzYde9PdZTLbYumGrbIOib3KK1CaiZtdwa0jiqLN7MTtlQ09HDn9LE
-         evd6vKHnRFOx3sS0o899Fnc6OE92wuU4bqDD0aLgEGzo8S6LW+DuoU3jHJJLacwLWGUE
-         IXIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eZsDu2D3AQWNCQ2ZG6MtjjJo26r+xt9w714U+QGZebA=;
-        b=lgC8f69iKz+63eOEQj7J3PuAm9OBJUUrPmVR4oP3a4Ml0G/v4OQ/s7p7zTXg2TUrwC
-         ras6AOYkO7/2q4GJx3/zapJWlBer+FrBJmo661u37NxUiwTsJQTBn1hlmwiN1nedmqix
-         lVsbkOBhWSCz7Opa/OB+2Nd2uhurGHJGBvH6Vz396/iMdd6wCjuUtr9921Nonbg+GoEb
-         8KQeDbPvjEThjm8mT+eFScP6QyJK+EGo0xV6R74kEMLCSstWSIOACgjEky1MCFlYkb1n
-         mx4y2SExlrvS9JH4c8jjq1/S1NS27Pjs/r47I/25F3fZqSUrU7K94YNT4UhVZ822KvQ/
-         pKzw==
-X-Gm-Message-State: AOAM533ViKSgAR31UDrM+i6DBKC+0DAVMYNvSJuTsdr2wcD79H8Gb6sI
-        VEgb+0zvmTIDqTcxQ5wl4Uafpo4D3jjOmbYUFD6A1Q==
-X-Google-Smtp-Source: ABdhPJxhhS6gqVWckit3IpnTwDDrr0/aHgT9iuANZZscnrbPkzSY/hvHFgywor/lkk7sj31KKHn1ezEwaT6xK+Xiy+M=
-X-Received: by 2002:a17:906:f0cc:: with SMTP id dk12mr24293284ejb.97.1597136244226;
- Tue, 11 Aug 2020 01:57:24 -0700 (PDT)
+        Tue, 11 Aug 2020 05:21:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597137714;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=HBXcA2/1WmstpEc0cfyfDp7XFyXTxGIWHnUm87bJiQI=;
+        b=JYgCWHlxIHj9w6trv43zV3Ew9CwWOJIhU5rl88J7Cr7sLTy4MoI2YYj614YO0O/vxdy/th
+        J27uqy8ZbE5i5FNXUhySiv8I2xB4+HC6kz18MORlQpdGbBNywcJSQz9MkWbZNznV6QoJzD
+        Z+WWCvxe6MIM+M0Mgv3KaJYGuokpGMg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-mQ7yXy3RNUyemrCLUrgjPQ-1; Tue, 11 Aug 2020 05:21:52 -0400
+X-MC-Unique: mQ7yXy3RNUyemrCLUrgjPQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61B19100960F;
+        Tue, 11 Aug 2020 09:21:51 +0000 (UTC)
+Received: from localhost (ovpn-13-156.pek2.redhat.com [10.72.13.156])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E0A5C5F1EA;
+        Tue, 11 Aug 2020 09:21:41 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Changpeng Liu <changpeng.liu@intel.com>,
+        Daniel Verkamp <dverkamp@chromium.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: [PATCH 0/2] block: fix discard merge for single max discard segment
+Date:   Tue, 11 Aug 2020 17:21:32 +0800
+Message-Id: <20200811092134.2256095-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20200810115049.304118-1-haris.iqbal@cloud.ionos.com> <20200811084544.GB634816@unreal>
-In-Reply-To: <20200811084544.GB634816@unreal>
-From:   Haris Iqbal <haris.iqbal@cloud.ionos.com>
-Date:   Tue, 11 Aug 2020 14:27:12 +0530
-Message-ID: <CAJpMwyjC+CuSoXD_XEaHS4njnFaHCbegMX+qucMfg-fXVqFD+Q@mail.gmail.com>
-Subject: Re: [PATCH v2] RDMA/rtrs-srv: Incorporate ib_register_client into
- rtrs server init
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        linux-rdma@vger.kernel.org, dledford@redhat.com,
-        Jason Gunthorpe <jgg@ziepe.ca>, linux-block@vger.kernel.org,
-        kernel test robot <rong.a.chen@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 11, 2020 at 2:15 PM Leon Romanovsky <leon@kernel.org> wrote:
->
-> On Mon, Aug 10, 2020 at 05:20:49PM +0530, Md Haris Iqbal wrote:
-> > The rnbd_server module's communication manager (cm) initialization depends
-> > on the registration of the "network namespace subsystem" of the RDMA CM
-> > agent module. As such, when the kernel is configured to load the
-> > rnbd_server and the RDMA cma module during initialization; and if the
-> > rnbd_server module is initialized before RDMA cma module, a null ptr
-> > dereference occurs during the RDMA bind operation.
-> >
-> > Call trace below,
-> >
-> > [    1.904782] Call Trace:
-> > [    1.904782]  ? xas_load+0xd/0x80
-> > [    1.904782]  xa_load+0x47/0x80
-> > [    1.904782]  cma_ps_find+0x44/0x70
-> > [    1.904782]  rdma_bind_addr+0x782/0x8b0
-> > [    1.904782]  ? get_random_bytes+0x35/0x40
-> > [    1.904782]  rtrs_srv_cm_init+0x50/0x80
-> > [    1.904782]  rtrs_srv_open+0x102/0x180
-> > [    1.904782]  ? rnbd_client_init+0x6e/0x6e
-> > [    1.904782]  rnbd_srv_init_module+0x34/0x84
-> > [    1.904782]  ? rnbd_client_init+0x6e/0x6e
-> > [    1.904782]  do_one_initcall+0x4a/0x200
-> > [    1.904782]  kernel_init_freeable+0x1f1/0x26e
-> > [    1.904782]  ? rest_init+0xb0/0xb0
-> > [    1.904782]  kernel_init+0xe/0x100
-> > [    1.904782]  ret_from_fork+0x22/0x30
-> > [    1.904782] Modules linked in:
-> > [    1.904782] CR2: 0000000000000015
-> > [    1.904782] ---[ end trace c42df88d6c7b0a48 ]---
-> >
-> > All this happens cause the cm init is in the call chain of the module init,
-> > which is not a preferred practice.
-> >
-> > So remove the call to rdma_create_id() from the module init call chain.
-> > Instead register rtrs-srv as an ib client, which makes sure that the
-> > rdma_create_id() is called only when an ib device is added.
-> >
-> > Fixes: 9cb837480424 ("RDMA/rtrs: server: main functionality")
-> > Reported-by: kernel test robot <rong.a.chen@intel.com>
-> > Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
-> > ---
-> > Change in v2:
-> >         Use only single variable to track number of IB devices and failure
-> >         Change according to kernel coding style
-> >
-> >  drivers/infiniband/ulp/rtrs/rtrs-srv.c | 79 +++++++++++++++++++++++++-
-> >  drivers/infiniband/ulp/rtrs/rtrs-srv.h |  6 ++
-> >  2 files changed, 82 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > index 0d9241f5d9e6..69a37ce73b0c 100644
-> > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > @@ -16,6 +16,7 @@
-> >  #include "rtrs-srv.h"
-> >  #include "rtrs-log.h"
-> >  #include <rdma/ib_cm.h>
-> > +#include <rdma/ib_verbs.h>
-> >
-> >  MODULE_DESCRIPTION("RDMA Transport Server");
-> >  MODULE_LICENSE("GPL");
-> > @@ -31,6 +32,7 @@ MODULE_LICENSE("GPL");
-> >  static struct rtrs_rdma_dev_pd dev_pd;
-> >  static mempool_t *chunk_pool;
-> >  struct class *rtrs_dev_class;
-> > +static struct rtrs_srv_ib_ctx ib_ctx;
-> >
-> >  static int __read_mostly max_chunk_size = DEFAULT_MAX_CHUNK_SIZE;
-> >  static int __read_mostly sess_queue_depth = DEFAULT_SESS_QUEUE_DEPTH;
-> > @@ -2033,6 +2035,64 @@ static void free_srv_ctx(struct rtrs_srv_ctx *ctx)
-> >       kfree(ctx);
-> >  }
-> >
-> > +static int rtrs_srv_add_one(struct ib_device *device)
-> > +{
-> > +     struct rtrs_srv_ctx *ctx;
-> > +     int ret;
-> > +
-> > +     if (ib_ctx.ib_dev_count)
-> > +             goto out;
-> > +
-> > +     /*
-> > +      * Since our CM IDs are NOT bound to any ib device we will create them
-> > +      * only once
-> > +      */
-> > +     ctx = ib_ctx.srv_ctx;
-> > +     ret = rtrs_srv_rdma_init(ctx, ib_ctx.port);
-> > +     if (ret) {
-> > +             /*
-> > +              * We errored out here.
-> > +              * According to the ib code, if we encounter an error here then the
-> > +              * error code is ignored, and no more calls to our ops are made.
-> > +              */
-> > +             pr_err("Failed to initialize RDMA connection");
-> > +             ib_ctx.ib_dev_count = -1;
-> > +             return ret;
-> > +     }
-> > +
-> > +out:
-> > +     /*
-> > +      * Keep a track on the number of ib devices added
-> > +      */
-> > +     ib_ctx.ib_dev_count++;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static void rtrs_srv_remove_one(struct ib_device *device, void *client_data)
-> > +{
-> > +     struct rtrs_srv_ctx *ctx;
-> > +
-> > +     ib_ctx.ib_dev_count--;
-> > +
-> > +     if (ib_ctx.ib_dev_count)
-> > +             return;
-> > +
-> > +     /*
-> > +      * Since our CM IDs are NOT bound to any ib device we will remove them
-> > +      * only once, when the last device is removed
-> > +      */
-> > +     ctx = ib_ctx.srv_ctx;
-> > +     rdma_destroy_id(ctx->cm_id_ip);
-> > +     rdma_destroy_id(ctx->cm_id_ib);
-> > +}
-> > +
-> > +static struct ib_client rtrs_srv_client = {
-> > +     .name   = "rtrs_server",
-> > +     .add    = rtrs_srv_add_one,
-> > +     .remove = rtrs_srv_remove_one
-> > +};
-> > +
-> >  /**
-> >   * rtrs_srv_open() - open RTRS server context
-> >   * @ops:             callback functions
-> > @@ -2051,12 +2111,26 @@ struct rtrs_srv_ctx *rtrs_srv_open(struct rtrs_srv_ops *ops, u16 port)
-> >       if (!ctx)
-> >               return ERR_PTR(-ENOMEM);
-> >
-> > -     err = rtrs_srv_rdma_init(ctx, port);
-> > +     ib_ctx = (struct rtrs_srv_ib_ctx) {
-> > +             .srv_ctx        = ctx,
-> > +             .port           = port,
-> > +     };
-> > +
-> > +     err = ib_register_client(&rtrs_srv_client);
-> >       if (err) {
-> >               free_srv_ctx(ctx);
-> >               return ERR_PTR(err);
-> >       }
-> >
-> > +     /*
-> > +      * Since ib_register_client does not propagate the device add error
-> > +      * we check if .add was called and the RDMA connection init failed
-> > +      */
-> > +     if (ib_ctx.ib_dev_count < 0) {
-> > +             free_srv_ctx(ctx);
-> > +             return ERR_PTR(-ENODEV);
-> > +     }
->
-> I afraid that you overcomplicated here, ib_register_client() doesn't
-> return error if ->add() for specific device failed, it doesn't mean
-> that ->add won't be called again for another device.
->
-> So you don't need to use ib_dev_count == -1, just keep it to be 0 and
-> leave to  rtrs_srv_close() to free srv_ctx.
+Hello,
 
-Leaving it 0 when there is an error is not gonna work. Since when the
-modules are all built-in, a call to ib_register_client() will not
-result in a call to ->add() then and there. So ib_register_client()
-will return after registering the client, but without calling ->add().
-Which means, ib_dev_count would be 0.
+The 1st patch checks max discard segment limit in request merge code,
+and one discard request failure issue is fixed for virtio_blk.
 
->
-> Failure to call ->add shouldn't be any different from no-ib-devices situation.
->
-> Thanks
->
-> > +
-> >       return ctx;
-> >  }
-> >  EXPORT_SYMBOL(rtrs_srv_open);
-> > @@ -2090,8 +2164,7 @@ static void close_ctx(struct rtrs_srv_ctx *ctx)
-> >   */
-> >  void rtrs_srv_close(struct rtrs_srv_ctx *ctx)
-> >  {
-> > -     rdma_destroy_id(ctx->cm_id_ip);
-> > -     rdma_destroy_id(ctx->cm_id_ib);
-> > +     ib_unregister_client(&rtrs_srv_client);
-> >       close_ctx(ctx);
-> >       free_srv_ctx(ctx);
-> >  }
-> > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.h b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > index dc95b0932f0d..e8f7e99a9a6e 100644
-> > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > @@ -118,6 +118,12 @@ struct rtrs_srv_ctx {
-> >       struct list_head srv_list;
-> >  };
-> >
-> > +struct rtrs_srv_ib_ctx {
-> > +     struct rtrs_srv_ctx     *srv_ctx;
-> > +     u16                     port;
-> > +     int                     ib_dev_count;
-> > +};
-> > +
-> >  extern struct class *rtrs_dev_class;
-> >
-> >  void close_sess(struct rtrs_srv_sess *sess);
-> > --
-> > 2.25.1
-> >
+The 2nd patch fixes handling of single max discard segment for
+virtio_blk, and potential memory corruption is fixed.
 
 
+Ming Lei (2):
+  block: respect queue limit of max discard segment
+  block: virtio_blk: fix handling single range discard request
+
+ block/blk-merge.c          | 10 ++++++++--
+ drivers/block/virtio_blk.c | 23 +++++++++++++++--------
+ 2 files changed, 23 insertions(+), 10 deletions(-)
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Changpeng Liu <changpeng.liu@intel.com>
+Cc: Daniel Verkamp <dverkamp@chromium.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
 -- 
+2.25.2
 
-Regards
--Haris
