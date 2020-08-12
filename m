@@ -2,139 +2,70 @@ Return-Path: <SRS0=wHaM=BW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF0FC433E3
-	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 17:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6714DC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 17:50:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8583E20866
-	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 17:07:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PLIfautq"
+	by mail.kernel.org (Postfix) with ESMTP id 52BD72076C
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 17:50:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726529AbgHLRHN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Aug 2020 13:07:13 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:33702 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726459AbgHLRHN (ORCPT
+        id S1726477AbgHLRuR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Aug 2020 13:50:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49200 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726013AbgHLRuR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Aug 2020 13:07:13 -0400
-Received: from [10.137.106.139] (unknown [131.107.174.11])
-        by linux.microsoft.com (Postfix) with ESMTPSA id E097C20B4908;
-        Wed, 12 Aug 2020 10:07:04 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E097C20B4908
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1597252032;
-        bh=SIe2k0peitBjW17yZJXqD0TtHRPmDC1R6Lbe35xyn4c=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=PLIfautqDTtZvkV5njfOIjkAj6r6JznMM7OdDU7PlLhgZqfL4Pe2paFWOZNHYGde0
-         y2m6/Jc5+vr2IziCujXNmDEaBARiGhY57RfU99LHHeOdaXuDYd4ISc2lqnTHN222lU
-         zRHuYBYjX8OqIJoFSc8A8rzTUreTmp+o7KtpdsMg=
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement LSM
- (IPE)
-To:     Chuck Lever <chucklever@gmail.com>,
-        James Morris <jmorris@namei.org>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com,
-        Paul Moore <paul@paul-moore.com>,
-        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
-        serge@hallyn.com, pasha.tatashin@soleen.com,
-        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
-        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
- <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
- <20200802143143.GB20261@amd> <1596386606.4087.20.camel@HansenPartnership.com>
- <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
- <1596639689.3457.17.camel@HansenPartnership.com>
- <alpine.LRH.2.21.2008050934060.28225@namei.org>
- <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
- <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
- <alpine.LRH.2.21.2008120643370.10591@namei.org>
- <70603A4E-A548-4ECB-97D4-D3102CE77701@gmail.com>
-From:   Deven Bowers <deven.desai@linux.microsoft.com>
-Message-ID: <5edd58e3-7f12-10af-ef1c-4c1b32cf99e4@linux.microsoft.com>
-Date:   Wed, 12 Aug 2020 10:07:04 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Wed, 12 Aug 2020 13:50:17 -0400
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 574CCC061383;
+        Wed, 12 Aug 2020 10:50:17 -0700 (PDT)
+Received: from lwn.net (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id 988AD221;
+        Wed, 12 Aug 2020 17:50:12 +0000 (UTC)
+Date:   Wed, 12 Aug 2020 11:50:11 -0600
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Leah Rumancik <leah.rumancik@gmail.com>
+Cc:     bpf@vger.kernel.org, linux-block@vger.kernel.org,
+        orbekk@google.com, harshads@google.com, jasiu@google.com,
+        saranyamohan@google.com, tytso@google.com, bvanassche@google.com
+Subject: Re: [RFC PATCH 3/4] bpf: add eBPF IO filter documentation
+Message-ID: <20200812115011.337c0099@lwn.net>
+In-Reply-To: <20200812163305.545447-4-leah.rumancik@gmail.com>
+References: <20200812163305.545447-1-leah.rumancik@gmail.com>
+        <20200812163305.545447-4-leah.rumancik@gmail.com>
+Organization: LWN.net
 MIME-Version: 1.0
-In-Reply-To: <70603A4E-A548-4ECB-97D4-D3102CE77701@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, 12 Aug 2020 16:33:04 +0000
+Leah Rumancik <leah.rumancik@gmail.com> wrote:
 
+Thanks for documenting this stuff, but...
 
-On 8/12/2020 7:18 AM, Chuck Lever wrote:
-> 
-> 
->> On Aug 11, 2020, at 5:03 PM, James Morris <jmorris@namei.org> wrote:
->>
->> On Sat, 8 Aug 2020, Chuck Lever wrote:
->>
->>> My interest is in code integrity enforcement for executables stored
->>> in NFS files.
->>>
->>> My struggle with IPE is that due to its dependence on dm-verity, it
->>> does not seem to able to protect content that is stored separately
->>> from its execution environment and accessed via a file access
->>> protocol (FUSE, SMB, NFS, etc).
->>
->> It's not dependent on DM-Verity, that's just one possible integrity
->> verification mechanism, and one of two supported in this initial
->> version. The other is 'boot_verified' for a verified or otherwise trusted
->> rootfs. Future versions will support FS-Verity, at least.
->>
->> IPE was designed to be extensible in this way, with a strong separation of
->> mechanism and policy.
-> 
-> I got that, but it looked to me like the whole system relied on having
-> access to the block device under the filesystem. That's not possible
-> for a remote filesystem like Ceph or NFS.
+> +======================
+> +IO Filtering with eBPF
+> +======================
+> +
+> +Bio requests can be filtered with the eBPF IO filter program type (BPF_PROG_TYPE_IO_FILTER). To use this program type, the kernel must be compiled with CONFIG_BPF_IO_FILTER.
+> +
+> +Attachment
+> +==========
+> +
+> +IO filter programs can be attached to disks using the  BPF_BIO_SUBMIT attach type. Up to 64 filter programs can be attached to a single disk. References to the attached programs are stored in the gendisk struct as a bpf_prog_array.
 
-Block device structure no, (though that's what the currently used, to be
-fair). It really has a hard dependency on the file structure,
-specifically the ability to determine whether that file structure can be 
-used to navigate back to the integrity claim provided by the mechanism.
+Please wrap your text to a reasonable column width just like with any
+other kernel file.
 
-In the current world of IPE, the integrity claim is the root-hash or 
-root-hash-signature on the block device, provided by dm-verity's 
-setsecurity hooks (also introduced in this series).
+Thanks,
 
-> 
-> I'm happy to take a closer look if someone can point me the right way.
-> 
-
-Sure, if you look at the 2nd patch, you want to look at the file 
-"security/ipe/ipe-property.h", it defines what methods are required to
-be implemented by a mechanism to work with IPE. It passes the engine
-context which is defined as:
-
-  struct ipe_engine_ctx {
-  	enum ipe_op op;
-  	enum ipe_hook hook;
-  	const struct file *file;
-  	const char *audit_pathname;
-	const struct ipe_bdev_blob *sec_bdev;
-  };
-
-Now, if the security blob existed for the block_device, it would be
-in sec_bdev, but that may be NULL, as well to be fair.
-
-If you want a more worked example of how integration works, patches 8
-and 10 introduce the dm-verity properties mentioned in this patch.
+jon
