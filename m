@@ -2,221 +2,144 @@ Return-Path: <SRS0=wHaM=BW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E510C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 15:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2995DC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 16:33:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6BBA207F7
-	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 15:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA6D720771
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 16:33:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ScQOuqd3";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ScQOuqd3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vbtr8kGX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726477AbgHLPv0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Aug 2020 11:51:26 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:56702 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726226AbgHLPvZ (ORCPT
+        id S1726528AbgHLQdR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Aug 2020 12:33:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37362 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726447AbgHLQdQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Aug 2020 11:51:25 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 72FB68EE1E5;
-        Wed, 12 Aug 2020 08:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597247484;
-        bh=+M44FI+gFzjgWGz17wPIjNuU1mPjCW1F5/zFjc3Nc88=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=ScQOuqd3qNMM6ORoKcpNR3RYVK6vnRaBwQEeiRVrrvTPdjgJmH3DffLpjUmfS5SzE
-         3nIwiQOeQf0V7ZUjoRF2xP65+evu6LLpNfrqKqWkQEPLubR5SFc9CgF/WyDTuOZO8M
-         BkIxrthipgyDGerQmnxKF55e8vLiujMSIDgjmSQ8=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id SMLlUWr0kVGi; Wed, 12 Aug 2020 08:51:24 -0700 (PDT)
-Received: from [153.66.254.174] (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 087128EE0C7;
-        Wed, 12 Aug 2020 08:51:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597247484;
-        bh=+M44FI+gFzjgWGz17wPIjNuU1mPjCW1F5/zFjc3Nc88=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=ScQOuqd3qNMM6ORoKcpNR3RYVK6vnRaBwQEeiRVrrvTPdjgJmH3DffLpjUmfS5SzE
-         3nIwiQOeQf0V7ZUjoRF2xP65+evu6LLpNfrqKqWkQEPLubR5SFc9CgF/WyDTuOZO8M
-         BkIxrthipgyDGerQmnxKF55e8vLiujMSIDgjmSQ8=
-Message-ID: <1597247482.7293.18.camel@HansenPartnership.com>
-Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
- LSM (IPE)
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Chuck Lever <chucklever@gmail.com>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>, James Morris <jmorris@namei.org>,
-        Deven Bowers <deven.desai@linux.microsoft.com>,
-        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
-        snitzer@redhat.com, dm-devel@redhat.com,
-        tyhicks@linux.microsoft.com, agk@redhat.com,
-        Paul Moore <paul@paul-moore.com>,
-        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
-        serge@hallyn.com, pasha.tatashin@soleen.com,
-        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
-        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        jaskarankhurana@linux.microsoft.com
-Date:   Wed, 12 Aug 2020 08:51:22 -0700
-In-Reply-To: <02D551EF-C975-4B91-86CA-356FA0FF515C@gmail.com>
-References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
-         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
-         <20200802143143.GB20261@amd>
-         <1596386606.4087.20.camel@HansenPartnership.com>
-         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
-         <1596639689.3457.17.camel@HansenPartnership.com>
-         <alpine.LRH.2.21.2008050934060.28225@namei.org>
-         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
-         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
-         <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
-         <1597073737.3966.12.camel@HansenPartnership.com>
-         <6E907A22-02CC-42DD-B3CD-11D304F3A1A8@gmail.com>
-         <1597124623.30793.14.camel@HansenPartnership.com>
-         <16C3BF97-A7D3-488A-9D26-7C9B18AD2084@gmail.com>
-         <1597161218.4325.38.camel@HansenPartnership.com>
-         <02D551EF-C975-4B91-86CA-356FA0FF515C@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Wed, 12 Aug 2020 12:33:16 -0400
+Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6256BC061383;
+        Wed, 12 Aug 2020 09:33:16 -0700 (PDT)
+Received: by mail-vs1-xe43.google.com with SMTP id n25so1415180vsq.6;
+        Wed, 12 Aug 2020 09:33:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nDTyV119vCkCoWtmcsmBHI9G6VZxWyQB9uqnHQ2UEJo=;
+        b=Vbtr8kGXGoATutEkcauLlj8wpopiSgewlJiCnFNmllZgiFeLIV2gSoiiPuNtUbJUWs
+         9zhl5OjiBVYwtPL/auDGkI1ifUarolnLedFEruL2MKKiWMRCtC4Cl+pVPzhv9OaaHf0U
+         PsYbuoIdYN7kNukoa+qmqIY1/dTJD2bFJmnMBm1YbCcFTw9Kt67e817nIO0v4H3KtpmH
+         L2wG5YXlE/ChVHOGD/CqbAMt2FDAsUzeqqMDfnJEj9Wc6tCGdyXGCuXl6hT/LOzONOl/
+         16bij7yHbGrNTy/10fZrODQq33mi7q8KDNvE0emieu/C7yDC+h8JrbYnC0xLBiXEVfSV
+         DlwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nDTyV119vCkCoWtmcsmBHI9G6VZxWyQB9uqnHQ2UEJo=;
+        b=VmdHD/u60rGyuW1dvazj47dM7eUWI693Lbqork7ovFFQcQsx7Eq4L1QXvPw13faF81
+         9mHThOow/IeiJK6HIvm2XqSst5Qh//Iw6d2O5afBVee6/4YSyhOTzl6mtdMMwawy7AnZ
+         Ot9UOx8l3mf/aYz1J/VKTcYhGKmsvgTi8lDnERAmz5tsfD90DriAeSnJ1Uy6dlFIO9Jn
+         Zqldv5hzeu3SHewA817DigH03mecahWE0EjGc0snaqRgDLRaCaRU2D4iG+GoTttTVPR8
+         v5LnMe+6c9EPJH3p04FRMNCz1Wcpey4nNqkBemadRQ4oMsDRVIaWTCSERfEqNk6Bb+mN
+         G3+Q==
+X-Gm-Message-State: AOAM530+TMyZH3x6p5zXIwtL0QgL4bX8NskpayvUk7su0dr5/4W6Qj0v
+        iWgYyrUQy5jK1U8ejCxTDUQ5nvp5e7s=
+X-Google-Smtp-Source: ABdhPJxxpEhGeCxWTxJu/t9gT6QxtVYdd5SCor+PxYJ70G9ZOZfNjuUMd58E6M7m9Rs8jNeFrsZFUQ==
+X-Received: by 2002:a05:6102:311a:: with SMTP id e26mr951620vsh.86.1597249994748;
+        Wed, 12 Aug 2020 09:33:14 -0700 (PDT)
+Received: from ebpf-cloudtop.c.googlers.com.com (39.119.74.34.bc.googleusercontent.com. [34.74.119.39])
+        by smtp.googlemail.com with ESMTPSA id e8sm245374uar.11.2020.08.12.09.33.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Aug 2020 09:33:14 -0700 (PDT)
+From:   Leah Rumancik <leah.rumancik@gmail.com>
+To:     bpf@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     leah.rumancik@gmail.com, orbekk@google.com, harshads@google.com,
+        jasiu@google.com, saranyamohan@google.com, tytso@google.com,
+        bvanassche@google.com
+Subject: [RFC PATCH 0/4] block/bpf: add eBPF based block layer IO filtering
+Date:   Wed, 12 Aug 2020 16:33:01 +0000
+Message-Id: <20200812163305.545447-1-leah.rumancik@gmail.com>
+X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2020-08-12 at 10:15 -0400, Chuck Lever wrote:
-> > On Aug 11, 2020, at 11:53 AM, James Bottomley
-> > <James.Bottomley@HansenPartnership.com> wrote:
-> > 
-> > On Tue, 2020-08-11 at 10:48 -0400, Chuck Lever wrote:
-[...]
-> > > > 
-> > > > and what is nice to have to speed up the verification
-> > > > process.  The choice for the latter is cache or reconstruct
-> > > > depending on the resources available.  If the tree gets cached
-> > > > on the server, that would be a server implementation detail
-> > > > invisible to the client.
-> > > 
-> > > We assume that storage targets (for block or file) are not
-> > > trusted. Therefore storage clients cannot rely on intermediate
-> > > results (eg, middle nodes in a Merkle tree) unless those results
-> > > are generated within the client's trust envelope.
-> > 
-> > Yes, they can ... because supplied nodes can be verified.  That's
-> > the whole point of a merkle tree.  As long as I'm sure of the root
-> > hash I can verify all the rest even if supplied by an untrusted
-> > source.  If you consider a simple merkle tree covering 4 blocks:
-> > 
-> >       R
-> >     /   \
-> >  H11     H12
-> >  / \     / \
-> > H21 H22 H23 H24
-> > >    |   |   |
-> > 
-> > B1   B2  B3  B4
-> > 
-> > Assume I have the verified root hash R.  If you supply B3 you also
-> > supply H24 and H11 as proof.  I verify by hashing B3 to produce H23
-> > then hash H23 and H24 to produce H12 and if H12 and your supplied
-> > H11 hash to R the tree is correct and the B3 you supplied must
-> > likewise be correct.
-> 
-> I'm not sure what you are proving here. Obviously this has to work
-> in order for a client to reconstruct the file's Merkle tree given
-> only R and the file content.
+This patch series adds support for a new security mechanism to filter IO
+in the block layer. With this patch series, the policy for IO filtering
+can be programmed into an eBPF program which gets attached to the struct
+gendisk. The filter can either drop or allow IO requests. It cannot modify
+requests. We do not support splitting of IOs, and we do not support
+filtering of IOs that bypass submit_bio (such as SG_IO, NVMe passthrough).
+At Google, we use IO filtering to prevent accidental modification of data.
 
-You implied the server can't be trusted to generate the merkel tree. 
-I'm showing above it can because of the tree path based verification.
+To facilitate this functionality, a new eBPF program type,
+BPF_PROG_TYPE_IO_FILTER, and an associated attach type, BPF_BIO_SUBMIT,
+have been added. The IO filter programs are invoked in submit_bio’s
+make_generic_requests_check() which checks the program’s return value to
+determine if the IO should be dropped or allowed. The program type can
+also be used to monitor IO if the return value is always set to allow IO.
 
-> It's the construction of the tree and verification of the hashes that
-> are potentially expensive. The point of caching intermediate hashes
-> is so that the client verifies them as few times as possible.  I
-> don't see value in caching those hashes on an untrusted server --
-> the client will have to reverify them anyway, and there will be no
-> savings.
+An example of an eBPF program to filter IO is provided below:
 
-I'm not making any claim about server caching, I'm just saying the
-client can request pieces of the tree from the server without having to
-reconstruct the whole thing itself because it can verify their
-correctness.
+SEC("io_filter")
+int run_filter(struct bpf_io_request *io_req)
+{
+	if ( <condition to block io> )
+		return IO_BLOCK;
+	else
+		return IO_ALLOW;
+}
 
-> Cache once, as close as you can to where the data will be used.
-> 
-> 
-> > > So: if the storage target is considered inside the client's trust
-> > > envelope, it can cache or store durably any intermediate parts of
-> > > the verification process. If not, the network and file storage is
-> > > considered untrusted, and the client has to rely on nothing but
-> > > the signed digest of the tree root.
-> > > 
-> > > We could build a scheme around, say, fscache, that might save the
-> > > intermediate results durably and locally.
-> > 
-> > I agree we want caching on the client, but we can always page in
-> > from the remote as long as we page enough to verify up to R, so
-> > we're always sure the remote supplied genuine information.
-> 
-> Agreed.
-> 
-> 
-> > > > > For this reason, the idea was to save only the signature of
-> > > > > the tree's root on durable storage. The client would retrieve
-> > > > > that signature possibly at open time, and reconstruct the
-> > > > > tree at that time.
-> > > > 
-> > > > Right that's the integrity data you must have.
-> > > > 
-> > > > > Or the tree could be partially constructed on-demand at the
-> > > > > time each unit is to be checked (say, as part of 2. above).
-> > > > 
-> > > > Whether it's reconstructed or cached can be an implementation
-> > > > detail. You clearly have to reconstruct once, but whether you
-> > > > have to do it again depends on the memory available for caching
-> > > > and all the other resource calls in the system.
-> > > > 
-> > > > > The client would have to reconstruct that tree again if
-> > > > > memory pressure caused some or all of the tree to be evicted,
-> > > > > so perhaps an on-demand mechanism is preferable.
-> > > > 
-> > > > Right, but I think that's implementation detail.  Probably what
-> > > > we need is a way to get the log(N) verification hashes from the
-> > > > server and it's up to the client whether it caches them or not.
-> > > 
-> > > Agreed, these are implementation details. But see above about the
-> > > trustworthiness of the intermediate hashes. If they are conveyed
-> > > on an untrusted network, then they can't be trusted either.
-> > 
-> > Yes, they can, provided enough of them are asked for to verify.  If
-> > you look at the simple example above, suppose I have cached H11 and
-> > H12, but I've lost the entire H2X layer.  I want to verify B3 so I
-> > also ask you for your copy of H24.  Then I generate H23 from B3 and
-> > Hash H23 and H24.  If this doesn't hash to H12 I know either you
-> > supplied me the wrong block or lied about H24.  However, if it all
-> > hashes correctly I know you supplied me with both the correct B3
-> > and the correct H24.
-> 
-> My point is there is a difference between a trusted cache and an
-> untrusted cache. I argue there is not much value in a cache where
-> the hashes have to be verified again.
+This patchset was created as part of a summer internship project.
 
-And my point isn't about caching, it's about where the tree comes from.
- I claim and you agree the client can get the tree from the server a
-piece at a time (because it can path verify it) and doesn't have to
-generate it itself.  How much of the tree the client has to store and
-whether the server caches, reads it in from somewhere or reconstructs
-it is an implementation detail.
+Leah Rumancik (4):
+  bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
+  bpf: add protect_gpt sample program
+  bpf: add eBPF IO filter documentation
+  bpf: add BPF_PROG_TYPE_LSM to bpftool name array
 
-James
+ Documentation/block/bpf_io_filter.rst         |  28 +++
+ Documentation/block/index.rst                 |   1 +
+ block/Makefile                                |   1 +
+ block/blk-bpf-io-filter.c                     | 209 ++++++++++++++++++
+ block/blk-bpf-io-filter.h                     |  16 ++
+ block/blk-core.c                              |   6 +
+ block/genhd.c                                 |   3 +
+ include/linux/bpf_io_filter.h                 |  23 ++
+ include/linux/bpf_types.h                     |   4 +
+ include/linux/genhd.h                         |   4 +
+ include/uapi/linux/bpf.h                      |  11 +
+ init/Kconfig                                  |   8 +
+ kernel/bpf/syscall.c                          |   9 +
+ kernel/bpf/verifier.c                         |   1 +
+ samples/bpf/Makefile                          |   3 +
+ samples/bpf/protect_gpt_kern.c                |  21 ++
+ samples/bpf/protect_gpt_user.c                | 133 +++++++++++
+ tools/bpf/bpftool/feature.c                   |   2 +
+ tools/bpf/bpftool/main.h                      |   3 +
+ tools/include/uapi/linux/bpf.h                |  11 +
+ tools/lib/bpf/libbpf.c                        |   2 +
+ tools/lib/bpf/libbpf_probes.c                 |   1 +
+ .../selftests/bpf/prog_tests/section_names.c  |   5 +
+ 23 files changed, 505 insertions(+)
+ create mode 100644 Documentation/block/bpf_io_filter.rst
+ create mode 100644 block/blk-bpf-io-filter.c
+ create mode 100644 block/blk-bpf-io-filter.h
+ create mode 100644 include/linux/bpf_io_filter.h
+ create mode 100644 samples/bpf/protect_gpt_kern.c
+ create mode 100644 samples/bpf/protect_gpt_user.c
+
+-- 
+2.28.0.236.gb10cc79966-goog
 
