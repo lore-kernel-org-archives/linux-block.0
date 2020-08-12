@@ -1,114 +1,133 @@
-Return-Path: <SRS0=2P2f=BV=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=wHaM=BW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AD0C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 23:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A635C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 02:07:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB7062073E
-	for <linux-block@archiver.kernel.org>; Tue, 11 Aug 2020 23:48:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ayZaVkWc"
+	by mail.kernel.org (Postfix) with ESMTP id 83F412076C
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 02:07:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726424AbgHKXsd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Aug 2020 19:48:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726143AbgHKXsc (ORCPT
+        id S1726333AbgHLCHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Aug 2020 22:07:18 -0400
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:58993 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726235AbgHLCHS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Aug 2020 19:48:32 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004EEC06174A;
-        Tue, 11 Aug 2020 16:48:31 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id s15so73123pgc.8;
-        Tue, 11 Aug 2020 16:48:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=K6hnkVFy1xwcKEBJMlpv+KBYaHij0G40KOlMLzuv7P8=;
-        b=ayZaVkWcDEMYUXdD2imWZ67GI6Dlv4Kk8fS4TzfMm8L6iNU5fDG8JMvVQ9fMZzACe8
-         EgZObzIUa3AMsPc95uBee68GUvuYWxSqhEM9QyNTJAeVmERtRuTuLUuwj+9VZ59KjPXh
-         BwmtjqmRa9S/e44IMf4aGsAlrluZcn6NXiVwtFjAzRpfwHHNi5VipC6xZ/xqqcUVcnpP
-         j9gBMslqjd0Ae9G0Bp/IHi1WMZLJEVs62fIdTn9TbqM1blaNIUvIj+PY+QToJUcf7Hbc
-         VMfuMT5CgBFQBtlHzq7ZokYbduE2e9XIv7/W5xqp8AEbhX4dDjLVM1VlL4VReD/sF1hL
-         4R1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K6hnkVFy1xwcKEBJMlpv+KBYaHij0G40KOlMLzuv7P8=;
-        b=G5e3tkEuyl//NDWxrttZS992MjjHhMHI95a3QZviI/gw2TYhxQ6p/u0h9VWXccJRdg
-         d7t63XhfRlde1Do8n4ucdx6bIqgJsREDY4RAE7Uiiwdl+Gx5XTaRzMWB77xzyFIRWrCx
-         5q4aQ36c87vVMuCKZh9tZK3LlKsO2uqMhdBrRyY+SlYuHag3e9m4eAOIr94X5pW9SmR8
-         O8X6xqsRzULN4apBPjrdYdKcMATNxTUlMeGRq8VIuACgNB0AY4sbX8gh8cFqsmiIxNjG
-         HATpTi0agMRlwT9HTF8wWppCrI65heA4FCP1d7npzw2oFmZzNFJKN7MLfxywS0KR4rLj
-         1TaQ==
-X-Gm-Message-State: AOAM5327jmfzkVaImFctpbMhEt0d2joGbHhCMzEvXuGVWA0gQKr0ami5
-        Skxu6HVsQtIYTV4dHkoGZmjzHBX3
-X-Google-Smtp-Source: ABdhPJxdYF1epYAD+LHkFwa3cMPsFYHjeugpbI3Lp/4/xlxJEOtsq4MnEGP+9yjt0BERsX4AJBd7Gw==
-X-Received: by 2002:a63:584c:: with SMTP id i12mr2819131pgm.313.1597189711619;
-        Tue, 11 Aug 2020 16:48:31 -0700 (PDT)
-Received: from [10.230.185.151] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id t25sm186797pfl.198.2020.08.11.16.48.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Aug 2020 16:48:30 -0700 (PDT)
-Subject: Re: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
-To:     Muneendra Kumar M <muneendra.kumar@broadcom.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Smart <james.smart@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Cc:     emilne@redhat.com, mkumar@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
-        Ming Lei <tom.leiming@gmail.com>, Tejun Heo <tj@kernel.org>
-References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
- <1596507196-27417-17-git-send-email-muneendra.kumar@broadcom.com>
- <61d2fd75-84ea-798b-aee9-b07957ac8f1b@suse.de>
- <08b9825b-6abb-c077-ac0d-bd63f10f2ac2@broadcom.com>
- <aa595605c2f776148e03a8e5dd69168a@mail.gmail.com>
- <227c5ba1-8a9c-3ec9-5a0f-662a4736c66f@redhat.com>
- <b3350b999d5500ddef49a25aafee2ea6@mail.gmail.com>
-From:   James Smart <jsmart2021@gmail.com>
-Message-ID: <61317e13-195b-0aac-92e8-fd6836155fdb@gmail.com>
-Date:   Tue, 11 Aug 2020 16:48:23 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 11 Aug 2020 22:07:18 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07484;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0U5VxwX6_1597198026;
+Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0U5VxwX6_1597198026)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 12 Aug 2020 10:07:06 +0800
+Date:   Wed, 12 Aug 2020 10:07:06 +0800
+From:   Baolin Wang <baolin.wang@linux.alibaba.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Changpeng Liu <changpeng.liu@intel.com>,
+        Daniel Verkamp <dverkamp@chromium.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH V2 2/3] block: virtio_blk: fix handling single range
+ discard request
+Message-ID: <20200812020706.GA69794@VM20190228-100.tbsite.net>
+Reply-To: Baolin Wang <baolin.wang@linux.alibaba.com>
+References: <20200811234420.2297137-1-ming.lei@redhat.com>
+ <20200811234420.2297137-3-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b3350b999d5500ddef49a25aafee2ea6@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200811234420.2297137-3-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/6/2020 9:26 AM, Muneendra Kumar M wrote:
-> Hi Paolo,
-> 
->> 3.As part of this interface user/deamon will provide the details of VM such
->> as UUID,PID on VM creation to the transport .
->> The VM process, or the container process, is likely to be unprivileged and
->> cannot obtain the permissions needed to do this; therefore, you need to
->> cope with the situation where there is no PID yet in the cgroup, because
->> the tool >that created the VM or container might be initializing the
->> cgroup, but it might not have started the VM yet.  In that case there would
->> be no PID.
-> 
-> Agreed.A
-> small doubt. If the VM is started (running)then we can have the PID and   we
-> can use the  PID?
-Note: I'm not worried about this. The transport/lldd would be fine with 
-the device being used for a while with no blkcg attribute set. When it 
-finally does get set, it would initiate the creation of the 
-corresponding fc wire app_id.  This will be something normal.
+Hi Ming,
 
--- james
+On Wed, Aug 12, 2020 at 07:44:19AM +0800, Ming Lei wrote:
+> 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support") starts
+> to support multi-range discard for virtio-blk. However, the virtio-blk
+> disk may report max discard segment as 1, at least that is exactly what
+> qemu is doing.
+> 
+> So far, block layer switches to normal request merge if max discard segment
+> limit is 1, and multiple bios can be merged to single segment. This way may
+> cause memory corruption in virtblk_setup_discard_write_zeroes().
+> 
+> Fix the issue by handling single max discard segment in straightforward
+> way.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Changpeng Liu <changpeng.liu@intel.com>
+> Cc: Daniel Verkamp <dverkamp@chromium.org>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  drivers/block/virtio_blk.c | 31 +++++++++++++++++++++++--------
+>  1 file changed, 23 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 63b213e00b37..b2e48dac1ebd 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -126,16 +126,31 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
+>  	if (!range)
+>  		return -ENOMEM;
+>  
+> -	__rq_for_each_bio(bio, req) {
+> -		u64 sector = bio->bi_iter.bi_sector;
+> -		u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
+> -
+> -		range[n].flags = cpu_to_le32(flags);
+> -		range[n].num_sectors = cpu_to_le32(num_sectors);
+> -		range[n].sector = cpu_to_le64(sector);
+> -		n++;
+> +	/*
+> +	 * Single max discard segment means multi-range discard isn't
+> +	 * supported, and block layer only runs contiguity merge like
+> +	 * normal RW request. So we can't reply on bio for retrieving
+> +	 * each range info.
+> +	 */
+> +	if (queue_max_discard_segments(req->q) == 1) {
+> +		range[0].flags = cpu_to_le32(flags);
+> +		range[0].num_sectors = cpu_to_le32(blk_rq_sectors(req));
+> +		range[0].sector = cpu_to_le64(blk_rq_pos(req));
+> +		n = 1;
+> +	} else {
+> +		__rq_for_each_bio(bio, req) {
+> +			u64 sector = bio->bi_iter.bi_sector;
+> +			u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
+> +
+> +			range[n].flags = cpu_to_le32(flags);
+> +			range[n].num_sectors = cpu_to_le32(num_sectors);
+> +			range[n].sector = cpu_to_le64(sector);
+> +			n++;
+> +		}
+>  	}
+>  
+> +	WARN_ON_ONCE(n != segments);
 
+I wonder should we return an error if the discard segments are
+incorrect like NVMe did[1]? In case the DMA may do some serious
+damages in this case.
+
+[1]
+https://elixir.bootlin.com/linux/v5.8-rc7/source/drivers/nvme/host/core.c#L638
+
+> +
+>  	req->special_vec.bv_page = virt_to_page(range);
+>  	req->special_vec.bv_offset = offset_in_page(range);
+>  	req->special_vec.bv_len = sizeof(*range) * segments;
+> -- 
+> 2.25.2
