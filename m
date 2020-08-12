@@ -7,138 +7,79 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A37C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 12:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB3AC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 12:47:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C14DB207DA
-	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 12:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AE5622B4B
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 12:47:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LDGeFBnW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q8TH++Ru"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727843AbgHLMQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Aug 2020 08:16:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54266 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726453AbgHLMQz (ORCPT
+        id S1726804AbgHLMr2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Aug 2020 08:47:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56187 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727885AbgHLMr2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Aug 2020 08:16:55 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80736C06174A
-        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2020 05:16:55 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id x24so1741157otp.3
-        for <linux-block@vger.kernel.org>; Wed, 12 Aug 2020 05:16:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=HtTUL4nNsElQLTbbRqmNno/usEQ2WZWXtzv03bulQN8=;
-        b=LDGeFBnW5rdu6GwSJzOWDDfNm6Yf8pJLkrjSBoUNblFidc8r0eo0Ma3zJ5L++HbG1C
-         VI4o6/QZ67SsDXPykr2E3QOfNobVdGXWQG9ARkVrl8+V4HBsYrvQUGbUwbay11PHFUG9
-         NAuS+UlYl6rxBSkGmSlmpsSHnWUK4vaSIChAE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=HtTUL4nNsElQLTbbRqmNno/usEQ2WZWXtzv03bulQN8=;
-        b=aJ+azieDRDuEG2nUR6CMv6RESKfD8ulMuwsDsIF/DViEduP1LDJHJ1S+s/m/iBrMIF
-         bOmNThNv6v/EXSVRKX65TozEcTG/5Iejha0RsdvQBPaUc9rqSD81xe72uJA7TCAUhRt4
-         eKU9iYEeqjcZDyMFxaw52uk340QEOkt/EzK3C6S1XAaXYJPOKqU9pIOAv9SBDbXg2Hl6
-         D60fE8kmzelmiKEwGj+qY8i/5GBCkBAPrKZa4RsAXE+NfZmxE89Jb5gOYYy/3poXJVkB
-         q+VSUbJKHVovRDjPTBssbXjlO0JNbsO2GwU+PnbUYVEFCYWsyDL+rLw35wQRqCjMK2GL
-         uvhA==
-X-Gm-Message-State: AOAM532evSnjRyqHnJnAerQ33ItxYlm6WT7g8YXiSyEiIvU5XjhahhQd
-        zdWQEru5l8rjb309bL5okp3dQdLI97lhagmC6oNAQA==
-X-Google-Smtp-Source: ABdhPJx46uM94ViEYE8Di9+fo0dpKCwJObkdb91bSAqgqgb3DiFi4jU0ZRPdFIFBl6MIyLIMsZZY91LtZ8UL2AdHmDY=
-X-Received: by 2002:a9d:3c6:: with SMTP id f64mr9234877otf.364.1597234614828;
- Wed, 12 Aug 2020 05:16:54 -0700 (PDT)
-From:   Muneendra Kumar M <muneendra.kumar@broadcom.com>
-References: <1596507196-27417-1-git-send-email-muneendra.kumar@broadcom.com>
- <1596507196-27417-17-git-send-email-muneendra.kumar@broadcom.com>
- <61d2fd75-84ea-798b-aee9-b07957ac8f1b@suse.de> <08b9825b-6abb-c077-ac0d-bd63f10f2ac2@broadcom.com>
- <aa595605c2f776148e03a8e5dd69168a@mail.gmail.com> <227c5ba1-8a9c-3ec9-5a0f-662a4736c66f@redhat.com>
- <b3350b999d5500ddef49a25aafee2ea6@mail.gmail.com> <eec84df0-1cee-e386-c18e-73ac8e0b89a3@redhat.com>
- <e76b12c664057adb51c14bf0663bb2f7@mail.gmail.com> <b471b84f-25e9-39cb-41e0-1cc1af409a8a@redhat.com>
- <7e76e1464e794a79861ea9846e0a5370@mail.gmail.com> <053466c4-7786-38aa-012f-926b68c85c8c@redhat.com>
- <05697e72c1981838c5471e503b28dfc2@mail.gmail.com> <a4bf914b-c0ff-5876-890d-f1889308f6ea@redhat.com>
-In-Reply-To: <a4bf914b-c0ff-5876-890d-f1889308f6ea@redhat.com>
+        Wed, 12 Aug 2020 08:47:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597236447;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iJ+bto3hsBFNbeIoX6uybLtb1Yx2r+7qubJDKxuEY7w=;
+        b=Q8TH++Ru7lMUZswIGSHdySwOhVhCYkGmgJtsXPqwBXZdE6RjY3zHbRyGLUYX+pYZGf8CWl
+        8P0PtfwA740Xz1k/Sh56ZuG5EaJDM8NbVOzFfN3b8rsuDGfQR3+tsBccxwTEpQr7RJ0PCV
+        qnJKva6k9ABzQ/JbeZFz2B3h1PRcj1U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-wYCtx2zNM0q_EUiaEFCHhA-1; Wed, 12 Aug 2020 08:47:25 -0400
+X-MC-Unique: wYCtx2zNM0q_EUiaEFCHhA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E23AB107ACCA;
+        Wed, 12 Aug 2020 12:47:23 +0000 (UTC)
+Received: from T590 (ovpn-13-156.pek2.redhat.com [10.72.13.156])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B9193600DA;
+        Wed, 12 Aug 2020 12:47:16 +0000 (UTC)
+Date:   Wed, 12 Aug 2020 20:47:12 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, stable@vger.kernel.org
+Subject: Re: [PATCH] block: allow for_each_bvec to support zero len bvec
+Message-ID: <20200812124712.GA2331687@T590>
+References: <20200810031915.2209658-1-ming.lei@redhat.com>
+ <db57f8ca-b3c3-76ec-1e49-d8f8161ba78d@i-love.sakura.ne.jp>
+ <20200810162331.GA2215158@T590>
+ <20200812090039.GA2317340@T590>
+ <242fc33d-686b-928d-415e-8b519c56a62c@i-love.sakura.ne.jp>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQIDyhmBPqdmqCKUdNTZliBUbPkt/AI5BKetAom9APICL6c0jAMHD3TmAjtZC5MBe/Ed2QIv9leoAyMPjxIBrC+2XAGG5LXBAnT4Ng8CRdBEeAH6rm1zp/JJiLA=
-Date:   Wed, 12 Aug 2020 17:46:51 +0530
-Message-ID: <747480d2533f28e44dcd9a02f6398a60@mail.gmail.com>
-Subject: RE: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        James Smart <james.smart@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Cc:     emilne@redhat.com, mkumar@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
-        James Smart <jsmart2021@gmail.com>,
-        Ming Lei <tom.leiming@gmail.com>, Tejun Heo <tj@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <242fc33d-686b-928d-415e-8b519c56a62c@i-love.sakura.ne.jp>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Paolo/Tejun,
-From the overall conversation the approach will be as below.
-Please let me know if I miss anything or any issue with the same.
+On Wed, Aug 12, 2020 at 07:03:59PM +0900, Tetsuo Handa wrote:
+> On 2020/08/12 18:00, Ming Lei wrote:
+> > BTW, for_each_bvec won't be called in the above splice test code.
+> 
+> Please uncomment the // lines when testing for_each_bvec() case.
 
-1)      blkcg will have a new field fc_app_id to store UUID /driver specifi=
-c
-information.
-2)      scsi transport will provide a new interface(sysfs) as
-register_vm_fabric
-3)      As part of this interface user will provide the details of UUID and
-the  open fd (cgroup associated
- info with VM) to the new interface.
-4)      With VM provided cgroup info we need to find the associated blkcg
-and needs to
-update the UUID info in the fc_app_id.
-5)      Once we update the fc_app_id  all the io=E2=80=99s issued from VM w=
-ill have
-the UUID info as part of blkcg.
+What is the '//' lines?
 
-If this approach is fine then I will make the necessary changes in my next
-version.
+> This is a test case for testing all empty pages.
 
-Regards,
-Muneendra.
+But the case for testing all empty pages is not related with this patch,
+is it?
 
 
------Original Message-----
-From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-Sent: Wednesday, August 12, 2020 1:25 PM
-To: Muneendra Kumar M <muneendra.kumar@broadcom.com>; James Smart
-<james.smart@broadcom.com>; Hannes Reinecke <hare@suse.de>;
-linux-block@vger.kernel.org; linux-scsi@vger.kernel.org
-Cc: emilne@redhat.com; mkumar@redhat.com; Gaurav Srivastava
-<gaurav.srivastava@broadcom.com>; James Smart <jsmart2021@gmail.com>; Ming
-Lei <tom.leiming@gmail.com>; Tejun Heo <tj@kernel.org>
-Subject: Re: [RFC 16/16] lpfc: vmid: Introducing vmid in io path.
+Thanks,
+Ming
 
-
-On 10/08/20 14:13, Muneendra Kumar M wrote:
-> Agreed:
-> So from the user we need to provide UUID and the cgroup associated
-> info with VM to the kernel interface. Is this correct?
-
-Yes.
-
-> There is no issues with UUID  passing as one of the arg.
-> Coming to the other cgroup associated VM here are the options which we
-> can send
->
-> 1)openfd:
-> We need a utility which opens the cgroup path and pass the fd details
-> to the interface.
-> And we can use the cgroup_get_from_fd() utility to get the associated
-> cgroup in the kernel.
-> Dependent on utilty.
-
-This looks good to me.
-
-Paolo
