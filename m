@@ -2,290 +2,119 @@ Return-Path: <SRS0=wHaM=BW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A257C433EA
-	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 16:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4788DC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 17:00:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 683B92076B
-	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 16:33:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hv+/j9Md"
+	by mail.kernel.org (Postfix) with ESMTP id 3015A20774
+	for <linux-block@archiver.kernel.org>; Wed, 12 Aug 2020 17:00:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726510AbgHLQdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Aug 2020 12:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37366 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726518AbgHLQdR (ORCPT
+        id S1726631AbgHLRAi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Aug 2020 13:00:38 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:45296 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725872AbgHLRAh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Aug 2020 12:33:17 -0400
-Received: from mail-vk1-xa42.google.com (mail-vk1-xa42.google.com [IPv6:2607:f8b0:4864:20::a42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57EB6C061385;
-        Wed, 12 Aug 2020 09:33:17 -0700 (PDT)
-Received: by mail-vk1-xa42.google.com with SMTP id k1so638748vkb.7;
-        Wed, 12 Aug 2020 09:33:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=FsV6tN7LcqDEjOofCki0Oq8dlSR26H06wV4vGa5fjaI=;
-        b=hv+/j9MdhYgykHf3BaW4nHKCRtp7AbbGKtZuDN1gScNdKxN57aDrjKMCqZnhNglvwR
-         7ZczlXShBzD6t0ijfV7129P/fm2pptb+tqFPuRAWYdrH8Pf9FVb28O2eFMlG2QWT90aQ
-         sESuxVXnZG5mzzeAPqYfQFEAStc4VNLykqtZdg7TzcHpzuq/FH8ywKyYdQragV5qKBkJ
-         1AZ+K0B1t9kaYzvVODyIHNRoJeIK6J1JhdnVDjCcrD+A9MZ4UnWsut43Gad5jFBshDJd
-         17gnhWPv5yi831HhYDPexZmINYtMAk7GmEf64b3mc4iyzl/haZw/YFrKdnOW0CkMOLoB
-         L+IA==
+        Wed, 12 Aug 2020 13:00:37 -0400
+Received: by mail-pl1-f195.google.com with SMTP id bh1so1369475plb.12;
+        Wed, 12 Aug 2020 10:00:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=FsV6tN7LcqDEjOofCki0Oq8dlSR26H06wV4vGa5fjaI=;
-        b=d/tjRP4yU13APsXbUvpuH6rnxWuEIdb2tTdKciovF3HAWdxix1tBFS8mFAq/KrV7V2
-         4pRaTXIJERdA142YxWSEik9yh36lC5Jx3/9ZvoNbmbdC6gjp4FQi6611G42bYzW3AwT1
-         6hckFlB10GXqva+VGugYzbvrKdrUskjgNmPe6rEgRPi9zFR4/43HOeiX2rlTduq+xT5r
-         +YJpZm4qquOu1TucE0+siyZrHtDKYZS/sEd9u54Xk4EsMpaktm+ZQK82y4qsN+oq62ZW
-         nOv2YBHn09ndgw1Pzf2L73aV1OpdMjmH1PplzUl72B3N0vdl0pRrcrjcuGRpXtTNlk+s
-         ztzw==
-X-Gm-Message-State: AOAM5303vq5ef23D9QpEKxQw6ZovBcgXCsubzlKCMQCXl6h0jp7n8UNT
-        WWPa9aDiLb8ayxIjF64sdU24DvXgLdY=
-X-Google-Smtp-Source: ABdhPJwe/0VfZJOfrIYPbuN7Gm+7OU2KnRrh1bZFF4HL/vA5eA5mBYC8fM034iC2Ew5JvaQruy4snA==
-X-Received: by 2002:a1f:9048:: with SMTP id s69mr191601vkd.73.1597249995853;
-        Wed, 12 Aug 2020 09:33:15 -0700 (PDT)
-Received: from ebpf-cloudtop.c.googlers.com.com (39.119.74.34.bc.googleusercontent.com. [34.74.119.39])
-        by smtp.googlemail.com with ESMTPSA id e8sm245374uar.11.2020.08.12.09.33.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Aug 2020 09:33:15 -0700 (PDT)
-From:   Leah Rumancik <leah.rumancik@gmail.com>
-To:     bpf@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     leah.rumancik@gmail.com, orbekk@google.com, harshads@google.com,
-        jasiu@google.com, saranyamohan@google.com, tytso@google.com,
-        bvanassche@google.com
-Subject: [RFC PATCH 2/4] bpf: add protect_gpt sample program
-Date:   Wed, 12 Aug 2020 16:33:03 +0000
-Message-Id: <20200812163305.545447-3-leah.rumancik@gmail.com>
-X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
-In-Reply-To: <20200812163305.545447-1-leah.rumancik@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=lkrVTld7lAt1xz+QrbSi/yFZ8fFXw8HLzCpe21br17Q=;
+        b=lSgKEWvkbUw0VNmclapJOEVPssru1EOL0Fx3aGDMTDxieI/6t3lF5ucGvbNP6kOKyu
+         xv2pUXmV0M4GiNAPDm7gjTHQIHzm2zxO990NQrMGz50uPv6VwicRrjo9KqAY2sI7u7D3
+         UiJiutIm8N4cv8iYtoT98lJQrmXWp3Ym7gkiCYiDvMbpN2ZT66sl6IRH0kvxNi9OGxgM
+         HvIfLs7VUYCOJW8WPgYEyRX+DcSvXeJkpgMVQGdbKEti1tnh9fTbpQcfplnG8jjZpNCx
+         jHgRGa8NTUXcwKlIMmWX4hRRzk9maIv0xO26UcTIjHVwH3HvN/9sID43jB1hlc7vKox/
+         nTyA==
+X-Gm-Message-State: AOAM5309DSsSKZt4e1mYZfVV7Z4h76vVkSHAPOTE8XpUVHXXG7FYmup8
+        nL78cusJOqumSvLTPh++QYg=
+X-Google-Smtp-Source: ABdhPJzGwQJNRsAMdn0ci0SdEREfKON9YbF+yBmie/37gN6UG4336tBAGcXLZ0fj0Ghy3pK7ezU7bA==
+X-Received: by 2002:a17:902:a70e:: with SMTP id w14mr320233plq.259.1597251636429;
+        Wed, 12 Aug 2020 10:00:36 -0700 (PDT)
+Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id q33sm2500823pgb.2.2020.08.12.10.00.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Aug 2020 10:00:35 -0700 (PDT)
+Subject: Re: [RFC PATCH 4/4] bpf: add BPF_PROG_TYPE_LSM to bpftool name array
+To:     Leah Rumancik <leah.rumancik@gmail.com>, bpf@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     orbekk@google.com, harshads@google.com, jasiu@google.com,
+        saranyamohan@google.com, tytso@google.com, bvanassche@google.com
 References: <20200812163305.545447-1-leah.rumancik@gmail.com>
+ <20200812163305.545447-5-leah.rumancik@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <2a5827e8-3051-f95f-36ac-08399638b43c@acm.org>
+Date:   Wed, 12 Aug 2020 10:00:33 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200812163305.545447-5-leah.rumancik@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sample program to protect GUID partition table. Uses IO filter bpf
-program type.
+On 2020-08-12 09:33, Leah Rumancik wrote:
+> Update prog_type_name[] to include missing entry for BPF_PROG_TYPE_LSM
+> 
+> Signed-off-by: Kjetil Ørbekk <orbekk@google.com>
+> Signed-off-by: Harshad Shirwadkar <harshads@google.com>
+> Signed-off-by: Leah Rumancik <leah.rumancik@gmail.com>
+> ---
+>  tools/bpf/bpftool/main.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
+> index 0607ae6f6d90..ccc6ac9f82c2 100644
+> --- a/tools/bpf/bpftool/main.h
+> +++ b/tools/bpf/bpftool/main.h
+> @@ -86,6 +86,7 @@ static const char * const prog_type_name[] = {
+>  	[BPF_PROG_TYPE_TRACING]			= "tracing",
+>  	[BPF_PROG_TYPE_STRUCT_OPS]		= "struct_ops",
+>  	[BPF_PROG_TYPE_EXT]			= "ext",
+> +	[BPF_PROG_TYPE_LSM]			= "lsm",
+>  	[BPF_PROG_TYPE_IO_FILTER]		= "io_filter",
+>  };
 
-Signed-off-by: Kjetil Ørbekk <orbekk@google.com>
-Signed-off-by: Harshad Shirwadkar <harshads@google.com>
-Signed-off-by: Leah Rumancik <leah.rumancik@gmail.com>
----
- samples/bpf/Makefile           |   3 +
- samples/bpf/protect_gpt_kern.c |  21 ++++++
- samples/bpf/protect_gpt_user.c | 133 +++++++++++++++++++++++++++++++++
- 3 files changed, 157 insertions(+)
- create mode 100644 samples/bpf/protect_gpt_kern.c
- create mode 100644 samples/bpf/protect_gpt_user.c
+Is this perhaps intended as a bug fix for commit fc611f47f218
+("bpf: Introduce BPF_PROG_TYPE_LSM")? If so, please include a Fixes:
+tag, Cc the authors of that patch and move this patch to the start
+of this patch series.
 
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 8403e4762306..f02ae9b2a283 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -53,6 +53,7 @@ tprogs-y += task_fd_query
- tprogs-y += xdp_sample_pkts
- tprogs-y += ibumad
- tprogs-y += hbm
-+tprogs-y += protect_gpt
- 
- # Libbpf dependencies
- LIBBPF = $(TOOLS_PATH)/lib/bpf/libbpf.a
-@@ -109,6 +110,7 @@ task_fd_query-objs := bpf_load.o task_fd_query_user.o $(TRACE_HELPERS)
- xdp_sample_pkts-objs := xdp_sample_pkts_user.o $(TRACE_HELPERS)
- ibumad-objs := bpf_load.o ibumad_user.o $(TRACE_HELPERS)
- hbm-objs := bpf_load.o hbm.o $(CGROUP_HELPERS)
-+protect_gpt-objs := bpf_load.o protect_gpt_user.o $(TRACE_HELPERS)
- 
- # Tell kbuild to always build the programs
- always-y := $(tprogs-y)
-@@ -170,6 +172,7 @@ always-y += ibumad_kern.o
- always-y += hbm_out_kern.o
- always-y += hbm_edt_kern.o
- always-y += xdpsock_kern.o
-+always-y += protect_gpt_kern.o
- 
- ifeq ($(ARCH), arm)
- # Strip all except -D__LINUX_ARM_ARCH__ option needed to handle linux
-diff --git a/samples/bpf/protect_gpt_kern.c b/samples/bpf/protect_gpt_kern.c
-new file mode 100644
-index 000000000000..cc49d66c120a
---- /dev/null
-+++ b/samples/bpf/protect_gpt_kern.c
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/bpf.h>
-+#include <linux/blk_types.h>
-+#include "bpf/bpf_helpers.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+#define GPT_SECTORS 34
-+
-+SEC("gpt_io_filter")
-+int protect_gpt(struct bpf_io_request *io_req)
-+{
-+	/* within GPT and not a read operation */
-+	if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
-+		return IO_BLOCK;
-+
-+	return IO_ALLOW;
-+}
-+
-+
-diff --git a/samples/bpf/protect_gpt_user.c b/samples/bpf/protect_gpt_user.c
-new file mode 100644
-index 000000000000..21ca25bc78af
---- /dev/null
-+++ b/samples/bpf/protect_gpt_user.c
-@@ -0,0 +1,133 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#define _GNU_SOURCE
-+
-+#include <stdio.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <linux/bpf.h>
-+#include <errno.h>
-+#include "trace_helpers.h"
-+#include "bpf_load.h"
-+
-+/*
-+ * user program to load bpf program (protect_gpt_kern) to prevent
-+ * writing to GUID parititon table
-+ *
-+ * argument 1: device where program will be attached (ie. /dev/sda)
-+ * argument 2: name for pinned program
-+ * argument 3: --attach or --detach to attach/detach program
-+ */
-+
-+static int attach(char *dev, char *path)
-+{
-+	struct bpf_object *obj;
-+	int ret, devfd, progfd;
-+
-+	progfd = bpf_obj_get(path);
-+	if (progfd >= 0) {
-+		fprintf(stderr, "Error: object already pinned at given location (%s)\n", path);
-+		return 1;
-+	}
-+
-+	ret = bpf_prog_load("protect_gpt_kern.o",
-+			    BPF_PROG_TYPE_IO_FILTER, &obj, &progfd);
-+	if (ret) {
-+		fprintf(stderr, "Error: failed to load program\n");
-+		return 1;
-+	}
-+
-+	devfd = open(dev, O_RDONLY);
-+	if (devfd == -1) {
-+		fprintf(stderr, "Error: failed to open block device %s\n", dev);
-+		return 1;
-+	}
-+
-+	ret = bpf_prog_attach(progfd, devfd, BPF_BIO_SUBMIT, 0);
-+	if (ret) {
-+		fprintf(stderr, "Error: failed to attach program to device\n");
-+		close(devfd);
-+		return 1;
-+	}
-+
-+	ret = bpf_obj_pin(progfd, path);
-+	if (ret != 0) {
-+		fprintf(stderr, "Error pinning program: %s\n", strerror(errno));
-+		fprintf(stderr, "Detaching program from device\n");
-+
-+		if (bpf_prog_detach2(progfd, devfd, BPF_BIO_SUBMIT))
-+			fprintf(stderr, "Error: failed to detach program\n");
-+
-+		close(devfd);
-+		return 1;
-+	}
-+
-+	close(devfd);
-+	printf("Attached protect_gpt program to device %s.\n", dev);
-+	printf("Program pinned to %s.\n", path);
-+	return 0;
-+}
-+
-+static int detach(char *dev, char *path)
-+{
-+	int ret, devfd, progfd;
-+
-+	progfd = bpf_obj_get(path);
-+	if (progfd < 0) {
-+		fprintf(stderr, "Error: failed to get pinned program from path %s\n", path);
-+		return 1;
-+	}
-+
-+	devfd = open(dev, O_RDONLY);
-+	if (devfd == -1) {
-+		fprintf(stderr, "Error: failed to open block device %s\n", dev);
-+		return 1;
-+	}
-+
-+	ret = bpf_prog_detach2(progfd, devfd, BPF_BIO_SUBMIT);
-+	if (ret) {
-+		fprintf(stderr, "Error: failed to detach program\n");
-+		close(devfd);
-+		return 1;
-+	}
-+
-+	close(devfd);
-+
-+	ret = unlink(path);
-+	if (ret < 0) {
-+		fprintf(stderr, "Error unpinning map at %s: %s\n", path, strerror(errno));
-+		return 1;
-+	}
-+
-+	printf("Detached and unpinned program.\n");
-+	return 0;
-+}
-+
-+static void usage(char *exec)
-+{
-+	printf("Usage:\n");
-+	printf("\t %s <device> <prog name> --attach\n", exec);
-+	printf("\t %s <device> <prog name> --detach\n", exec);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	char path[256];
-+
-+	if (argc != 4) {
-+		usage(argv[0]);
-+		return 1;
-+	}
-+
-+	strcpy(path, "/sys/fs/bpf/");
-+	strcat(path, argv[2]);
-+
-+	if (strcmp(argv[3], "--attach") == 0)
-+		return attach(argv[1], path);
-+	else if (strcmp(argv[3], "--detach") == 0)
-+		return detach(argv[1], path);
-+
-+	fprintf(stderr, "Error: invalid flag, please specify --attach or --detach");
-+	return 1;
-+}
-+
--- 
-2.28.0.236.gb10cc79966-goog
+Thanks,
 
+Bart.
