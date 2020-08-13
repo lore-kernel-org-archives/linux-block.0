@@ -6,57 +6,54 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38AD5C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 15:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C13C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 15:48:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F7C620829
-	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 15:43:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E877F20781
+	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 15:48:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726334AbgHMPno (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Aug 2020 11:43:44 -0400
-Received: from verein.lst.de ([213.95.11.211]:46793 "EHLO verein.lst.de"
+        id S1726167AbgHMPsB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Aug 2020 11:48:01 -0400
+Received: from verein.lst.de ([213.95.11.211]:46812 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726253AbgHMPnn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Aug 2020 11:43:43 -0400
+        id S1726131AbgHMPsA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Aug 2020 11:48:00 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id B397B68AFE; Thu, 13 Aug 2020 17:43:40 +0200 (CEST)
-Date:   Thu, 13 Aug 2020 17:43:40 +0200
+        id 21F4E68AFE; Thu, 13 Aug 2020 17:47:58 +0200 (CEST)
+Date:   Thu, 13 Aug 2020 17:47:57 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Changpeng Liu <changpeng.liu@intel.com>,
-        Daniel Verkamp <dverkamp@chromium.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: [PATCH V2 2/3] block: virtio_blk: fix handling single range
- discard request
-Message-ID: <20200813154340.GB14200@lst.de>
-References: <20200811234420.2297137-1-ming.lei@redhat.com> <20200811234420.2297137-3-ming.lei@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Chao Leng <lengchao@huawei.com>,
+        axboe@fb.com, sagi@grimberg.me, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, kbusch@kernel.org
+Subject: Re: [PATCH 2/3] nvme-core: delete the dependency on blk status
+Message-ID: <20200813154757.GA14486@lst.de>
+References: <20200812081844.22224-1-lengchao@huawei.com> <20200812151035.GB29544@lst.de> <20200812202829.GA586@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200811234420.2297137-3-ming.lei@redhat.com>
+In-Reply-To: <20200812202829.GA586@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 12, 2020 at 07:44:19AM +0800, Ming Lei wrote:
-> 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support") starts
-> to support multi-range discard for virtio-blk. However, the virtio-blk
-> disk may report max discard segment as 1, at least that is exactly what
-> qemu is doing.
+On Wed, Aug 12, 2020 at 04:28:30PM -0400, Mike Snitzer wrote:
+> On Wed, Aug 12 2020 at 11:10am -0400,
+> Christoph Hellwig <hch@lst.de> wrote:
 > 
-> So far, block layer switches to normal request merge if max discard segment
-> limit is 1, and multiple bios can be merged to single segment. This way may
-> cause memory corruption in virtblk_setup_discard_write_zeroes().
+> > On Wed, Aug 12, 2020 at 04:18:44PM +0800, Chao Leng wrote:
+> > > nvme should not depend on blk status, just need check nvme status.
+> > > Just need do translating nvme status to blk status for returning error.
+> > 
+> > While this doesn't look wrong it also doesn't save us a single
+> > instruction and actually adds more lines of code.  Do you have a good
+> > reason for this change?
 > 
-> Fix the issue by handling single max discard segment in straightforward
-> way.
+> It certainly saves nvme_error_status(nvme_req(req)->status if
+> nvme_req_needs_retry().
 
-Looks good,
+Yeah, but the retry path isn't exactly the fast path, is it?
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Not that I really care too much about this one..
