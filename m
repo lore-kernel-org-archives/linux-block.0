@@ -2,93 +2,183 @@ Return-Path: <SRS0=n79e=BX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 648ABC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 14:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DBD4C433E3
+	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 15:10:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 35EA820781
-	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 14:56:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54A5F20855
+	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 15:10:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="2Av2azx9"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="UXxGSZzb";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="x+VnzAVj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbgHMO4f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Aug 2020 10:56:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46586 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726680AbgHMO4e (ORCPT
+        id S1726749AbgHMPKV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Aug 2020 11:10:21 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:40852 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726334AbgHMPKU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Aug 2020 10:56:34 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B62C061383
-        for <linux-block@vger.kernel.org>; Thu, 13 Aug 2020 07:56:34 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id j8so7552632ioe.9
-        for <linux-block@vger.kernel.org>; Thu, 13 Aug 2020 07:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=2N3vz3aoKozJuLd8HhRVAVV0+DlbtHXg7rxrCEwGelY=;
-        b=2Av2azx9MhIvUoXaAZXBnYYlP5YN9u45JAgTOqjgnW9MJlQOpjRtOVGtv6zITH6N20
-         34yQMx+43blJDN9CwZEFY2EGFBSsba0p7OCFNYfgpJSDFcynpdO0ziqX1zJsENMYMkzE
-         /YFiX8ORzlZ5qq/qP0TrVKNgjawRTN2sOsyMErmwsJ1hspoYM3E2/JB38VF7rRMBQALL
-         RK2riwofKiC7kxl4YkPouojYjjgcZLoi3D7TOPvCuSvY39rCq/W9EkN5PFt1Aul+2Z2O
-         Su1r9y0eBcGqgPhekBoedLpDnYcwNO121jDyo36iJnos86vrInbGyoO/LfAa6EhlqzMT
-         G/pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2N3vz3aoKozJuLd8HhRVAVV0+DlbtHXg7rxrCEwGelY=;
-        b=bofJtBuNfnv6XIVeNrTJ4xavdgDsAz8dBDO8apDvfncTJ+zbTeYKOz57wEzvTXgLFV
-         m6rKe4ZLa5WpYEcfb1C21iX9Kg6NFMoj0lwgow7SlSZCbSeJutCmPoT0dHoYy6uul/mM
-         qXYxVhDy1n4cIMC3gydtdLpFZm7xsM2KIBAzZu/xL6t4hKrhs5Fwn89Pk+Eppk3akh9u
-         WUmiw9KjFZ6OACae50NnxCbG0Ce3ncf7lcnznn0m8yvhKh+AtFyLoo2coYZCM1mQfWt7
-         behQpTQIZusNsyaPexzv9wtCZ4fGcvUhCJK27DPs0zy0L2ky8dccSBrRHvYwNXQ8mxpP
-         Qi6Q==
-X-Gm-Message-State: AOAM531Dj2WEcnlxTH1mM+oGhIYC6Ujwq5pTdCJDfEnOR3vg42fSZTCG
-        IAUx4JXwOsbwvDO+RlDvP+S/Bg==
-X-Google-Smtp-Source: ABdhPJw2yxzFwbHDrUKj9GjW5VjBSwwvqRtbrnuWKdCOX0w5kMRjsicXpo2Tt4m8J+or3X1H7vOCdQ==
-X-Received: by 2002:a02:6d5d:: with SMTP id e29mr5296096jaf.139.1597330591852;
-        Thu, 13 Aug 2020 07:56:31 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l2sm2892965ilt.2.2020.08.13.07.56.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Aug 2020 07:56:31 -0700 (PDT)
-Subject: Re: [PATCH] fs/io_uring.c: Fix uninitialized variable is referenced
- in io_submit_sqe
-To:     Liu Yong <pkfxxxing@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-References: <20200813065644.GA91891@ubuntu>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9fd08f8f-8c89-9c59-6d9e-5933ccc65967@kernel.dk>
-Date:   Thu, 13 Aug 2020 08:56:30 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200813065644.GA91891@ubuntu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        Thu, 13 Aug 2020 11:10:20 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 31D6D8EE1E5;
+        Thu, 13 Aug 2020 08:10:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1597331419;
+        bh=3o0Gk5U5c/tgboU6is0RXdqjpM4d/4IJwBiUFG8jMuA=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=UXxGSZzb46QTJOqy/JWeOyqw626U8bbIwuEYbPim6fbMyyL04cdp0qwwJKvmyfbNr
+         UEM7+n2fjQro3OPR+d/0IwaOPThCF0S2IiZVh8i0RvltCmlgynmf81fQxVjRPrZJrD
+         VwN5qGlaATNYTzytjZ828B9lKPRGjJv7sHKFKj4I=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id jxbPeuibIPjQ; Thu, 13 Aug 2020 08:10:19 -0700 (PDT)
+Received: from [153.66.254.174] (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id B99EB8EE0F8;
+        Thu, 13 Aug 2020 08:10:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1597331418;
+        bh=3o0Gk5U5c/tgboU6is0RXdqjpM4d/4IJwBiUFG8jMuA=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=x+VnzAVj+2h2xN4tfyE/FLRLHz0e4JjMHIuRNpMRmGGydOuuD3MXZ92u9QxCCpuy8
+         /P6QJ618zgdYz9/h9V2XOl+QoySrm5cdkOm6q1yiNBqMdfPyKCaoZZignH3VT/LZKu
+         KlGKtuSb51ELidAyvRI6WiT5Zd7nq6+fKNWHN0PQ=
+Message-ID: <1597331416.3708.26.camel@HansenPartnership.com>
+Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement
+ LSM (IPE)
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Chuck Lever <chucklever@gmail.com>
+Cc:     Mimi Zohar <zohar@linux.ibm.com>, James Morris <jmorris@namei.org>,
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
+        snitzer@redhat.com, dm-devel@redhat.com,
+        tyhicks@linux.microsoft.com, agk@redhat.com,
+        Paul Moore <paul@paul-moore.com>,
+        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
+        serge@hallyn.com, pasha.tatashin@soleen.com,
+        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
+        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        jaskarankhurana@linux.microsoft.com
+Date:   Thu, 13 Aug 2020 08:10:16 -0700
+In-Reply-To: <D470BA4B-EF1A-49CA-AFB9-0F7FFC4C6001@gmail.com>
+References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
+         <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
+         <20200802143143.GB20261@amd>
+         <1596386606.4087.20.camel@HansenPartnership.com>
+         <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
+         <1596639689.3457.17.camel@HansenPartnership.com>
+         <alpine.LRH.2.21.2008050934060.28225@namei.org>
+         <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
+         <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
+         <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
+         <1597073737.3966.12.camel@HansenPartnership.com>
+         <6E907A22-02CC-42DD-B3CD-11D304F3A1A8@gmail.com>
+         <1597124623.30793.14.camel@HansenPartnership.com>
+         <16C3BF97-A7D3-488A-9D26-7C9B18AD2084@gmail.com>
+         <1597161218.4325.38.camel@HansenPartnership.com>
+         <02D551EF-C975-4B91-86CA-356FA0FF515C@gmail.com>
+         <1597247482.7293.18.camel@HansenPartnership.com>
+         <D470BA4B-EF1A-49CA-AFB9-0F7FFC4C6001@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/13/20 12:56 AM, Liu Yong wrote:
-> the commit <a4d61e66ee4a> ("<io_uring: prevent re-read of sqe->opcode>") 
-> caused another vulnerability. After io_get_req(), the sqe_submit struct 
-> in req is not initialized, but the following code defaults that 
-> req->submit.opcode is available.
+On Thu, 2020-08-13 at 10:42 -0400, Chuck Lever wrote:
+> > On Aug 12, 2020, at 11:51 AM, James Bottomley <James.Bottomley@Hans
+> > enPartnership.com> wrote:
+> > On Wed, 2020-08-12 at 10:15 -0400, Chuck Lever wrote:
+> > > > On Aug 11, 2020, at 11:53 AM, James Bottomley
+> > > > <James.Bottomley@HansenPartnership.com> wrote:
+> > > > On Tue, 2020-08-11 at 10:48 -0400, Chuck Lever wrote:
+[...]
+> > > > > > > The client would have to reconstruct that tree again if
+> > > > > > > memory pressure caused some or all of the tree to be
+> > > > > > > evicted, so perhaps an on-demand mechanism is preferable.
+> > > > > > 
+> > > > > > Right, but I think that's implementation detail.  Probably
+> > > > > > what we need is a way to get the log(N) verification hashes
+> > > > > > from the server and it's up to the client whether it caches
+> > > > > > them or not.
+> > > > > 
+> > > > > Agreed, these are implementation details. But see above about
+> > > > > the trustworthiness of the intermediate hashes. If they are
+> > > > > conveyed on an untrusted network, then they can't be trusted
+> > > > > either.
+> > > > 
+> > > > Yes, they can, provided enough of them are asked for to
+> > > > verify.  If you look at the simple example above, suppose I
+> > > > have cached H11 and H12, but I've lost the entire H2X layer.  I
+> > > > want to verify B3 so I also ask you for your copy of H24.  Then
+> > > > I generate H23 from B3 and Hash H23 and H24.  If this doesn't
+> > > > hash to H12 I know either you supplied me the wrong block or
+> > > > lied about H24.  However, if it all hashes correctly I know you
+> > > > supplied me with both the correct B3 and the correct H24.
+> > > 
+> > > My point is there is a difference between a trusted cache and an
+> > > untrusted cache. I argue there is not much value in a cache where
+> > > the hashes have to be verified again.
+> > 
+> > And my point isn't about caching, it's about where the tree comes
+> > from. I claim and you agree the client can get the tree from the
+> > server a piece at a time (because it can path verify it) and
+> > doesn't have to generate it itself.
+> 
+> OK, let's focus on where the tree comes from. It is certainly
+> possible to build protocol to exchange parts of a Merkle tree.
 
-Thanks, I'll add this for 5.4-stable, it doesn't affect any kernels newer
-than that.
+Which is what I think we need to extend IMA to do.
 
--- 
-Jens Axboe
+>  The question is how it might be stored on the server.
 
+I think the only thing the server has to guarantee to store is the head
+hash, possibly signed.
+
+>  There are some underlying assumptions about the metadata storage
+> mechanism that should be stated up front.
+> 
+> Current forms of IMA metadata are limited in size and stored in a
+> container that is read and written in a single operation. If we stick
+> with that container format, I don't see a way to store a Merkle tree
+> in there for all file sizes.
+
+Well, I don't think you need to.  The only thing that needs to be
+stored is the head hash.  Everything else can be reconstructed.  If you
+asked me to implement it locally, I'd probably put the head hash in an
+xattr but use a CAM based cache for the merkel trees and construct the
+tree on first access if it weren't already in the cache.
+
+However, the above isn't what fs-verity does: it stores the tree in a
+hidden section of the file.  That's why I don't think we'd mandate
+anything about tree storage.  Just describe the partial retrieval
+properties we'd like and leave the rest as an implementation detail.
+
+> Thus it seems to me that we cannot begin to consider the tree-on-the-
+> server model unless there is a proposed storage mechanism for that
+> whole tree. Otherwise, the client must have the primary role in
+> unpacking and verifying the tree.
+
+Well, as I said,  I don't think you need to store the tree.  You
+certainly could decide to store the entire tree (as fs-verity does) if
+it fitted your use case, but it's not required.  Perhaps even in my
+case I'd make the CAM based cache persistent, like android's dalvik
+cache.
+
+James
+
+
+> Storing only the tree root in the metadata means the metadata format
+> is nicely bounded in size.
