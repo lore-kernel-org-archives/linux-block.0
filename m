@@ -2,138 +2,219 @@ Return-Path: <SRS0=n79e=BX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BF85C433E4
-	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 08:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4012C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 10:18:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 056842080C
-	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 08:13:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FC0A20768
+	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 10:18:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Pk9qIBp2"
+	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="s/s9gcdD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726106AbgHMINS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Aug 2020 04:13:18 -0400
-Received: from mout.gmx.net ([212.227.15.19]:54791 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726044AbgHMINQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Aug 2020 04:13:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1597306394;
-        bh=+pg+gwfBz4Ihl3HJW9sGnGfCOT41Z+9kJFwiu/AzDnY=;
-        h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=Pk9qIBp2EDX4aeqVXiOe1h/LvahobvDOy7+PImaMANPyDwbeL1hSTMaJCCm60GuFt
-         2+IjhUqKj6/3L+VIlAxPxO1MPl7zVihAaf8BB9V+6En9zNvsYt4WMWS201uLsmXw6O
-         DOFEqpe94c42T047OeLffnycV+cwdz+i4rb5WZ38=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls00508.pb.local ([62.217.45.26]) by mail.gmx.com (mrgmx005
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1Mzyya-1krkfE2dHi-00x6KF; Thu, 13
- Aug 2020 10:13:14 +0200
-From:   Guoqing Jiang <guoqing.jiang@gmx.com>
-To:     linux-block@vger.kernel.org, axboe@kernel.dk
-Cc:     jinpu.wang@cloud.ionos.com, danil.kipnis@cloud.ionos.com,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH RFC V3 4/4] block: call blk_additional_{latency,sector} only when io_extra_stats is true
-Date:   Thu, 13 Aug 2020 10:11:27 +0200
-Message-Id: <20200813081127.4914-5-guoqing.jiang@gmx.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200813081127.4914-1-guoqing.jiang@gmx.com>
-References: <20200813081127.4914-1-guoqing.jiang@gmx.com>
-X-Provags-ID: V03:K1:zMZP35KUZnbyRAn3cbxvcKkETieCsoQPgdS8+3jU1fr/gSv8WkX
- 9L4DCi800etQEip1F0GB6gJe6UVKa6NGlVo/c75+EeKN22+vZUVuP0tNFPE+nhbfMQx8lMP
- xZVQ0LmDYSQIPq+8H6tv6BkTyXdgZr3frHg/gYZSwDQYh0c1IqVRUOCDndIXFqjVqjA9cjs
- NVBgTtI/Kz6536C0lTFuQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FQZ/QZweya4=:q4hLh1OyBU1dxwU03PMCI/
- Pc8l+hIoaHaQwdLpdHjhF3vvQanM+uTf6xKUmgbQzZsyiGCJ8NEdg0ihnnrYcbp0DmOPMQDN+
- PKSxGvBm6PqR1hv/UALnQVoGQMY5Ygo0z7msn6zSPiTzizYbD4VwOMAfz7iQ7pNcT3203be+E
- ycOwOm0I87c939LT8badhlWjbKRArRdpVgParrvxJQazl+Gh1NZC8dK46UgKTX6a4v7dOg1nR
- sjk2C9nD7gS1FesOlfLt4r1A70sNAq2eLGqfCgQ307h1w1WXK4raL7wefks0WV35TQiuRVQ8T
- 5VO1CYZpw9j++XnXiiEKF+Honrj6U7gyltOch/XURrxvy9OgXikKJ6T0000eypP8jDYdE4w7u
- /6bInsZk/yIBiUErvuXUxlphqiqx0ldaXaiVnIT/eYbUE+87Yx32QIS2ZpVEzVVw1yuNGY4kF
- wD8u6NDvWL1hzq8yqoD89EXKWSh3XiVxy5yDgKQmG7baA8m2db0w0oTBWOv/fjuAfhqty82Vf
- eI35ObQEctye5y9F3fnLlezlZnzwFmN3QGUnOaRJ0KIAZSvFE5Z7jqTyEBlA7HPrCEFTrSUT+
- oiTVTeRQPqDv8BqfIeLEW1EkapQz4K5jwCXUvB4z8qBTKWKwpAYi7thNsdeQeY14XXUv+0g/0
- 2JaF3po9dRZ5I5p6FG2+C+o6pDpxtzwdG5gVJ9SCXy1QeYk++Wdydlu+Tab2cwYm0LVzXBql4
- bPklwo/56NojFP0HID+1qxoEbnc5RM2uwgs/Cy88vb4ICuCE81kTJ/YCfEJI+CnCy0vJtoUlk
- RAgdPNzidkNuTW7TJ4Ac7ygNgW+nzhPXMZ03FSRwieK3CRTsJv1EO757BZ1hdlPOK7spKk0oy
- uRbDPDxc9EIP7e9Tq1boZSsj4NE7zLYYTEFEMaPdvcaJ8Rr0Ou5pT2EOweRlWCtb69gh+D/QX
- roEaEBK0YFUfbXQBeW7Pv1SfwcY+18J41u3i2iCOfDCmfNj/wL9MWgJkNLr06ZKrYClUU9fnG
- nGxGnZRhFTepjaj2OfWgdm5D2knEMQL8Su1jYdCVEYeDWvpjZk2sFu50b+y8NBSIC4Ehdp/tZ
- 6fD1VGh/tSCFGLPvkCCpP6Ynk5PZyfg+0eHUVKOIY4pzEUh9bNYh66xd5x2hONL46RCNRhg3I
- X4/3lpN3Fh9dD1SGOUudwRJZfK/iCbbVsn9SQ+gVk9ZD9NG9kk1Rza8R69VCsqU+1HEBl8aKV
- 7LZRRuuRk7buBMMr93rIziujwaaZ21AMphQ9ocQ==
-Content-Transfer-Encoding: quoted-printable
+        id S1726072AbgHMKSU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Aug 2020 06:18:20 -0400
+Received: from vulcan.natalenko.name ([104.207.131.136]:36084 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726053AbgHMKSU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Aug 2020 06:18:20 -0400
+Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:fe80::5400:ff:fe0c:dfa0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id BD8457FA229;
+        Thu, 13 Aug 2020 12:18:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1597313892;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oqJo//NoneW7PkB46Igg0Y4AUGFkiADCr7vVI5rxrdU=;
+        b=s/s9gcdDebHxarumTc0n3bOWyHVafTpurL4mfVvIaiZwNZX4qcCSrOIAi+3L6b0OgF9Ci3
+        M7LtKypclvN1rktNfdy/ITQcPpoKmOrnjtlQ0mysqulfcpbS6xzwkyh0lC6zxB49HP0dA9
+        RI8YTUlYnqrllmtSoDRM6d6zH77NtTE=
+MIME-Version: 1.0
+Date:   Thu, 13 Aug 2020 12:18:12 +0200
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk, paolo.valente@linaro.org
+Subject: Re: [PATCH] bfq: fix blkio cgroup leakage v4
+In-Reply-To: <20200811064340.31284-1-dmtrmonakhov@yandex-team.ru>
+References: <20200811064340.31284-1-dmtrmonakhov@yandex-team.ru>
+User-Agent: Roundcube Webmail/1.4.8
+Message-ID: <8b435dd48d245afe2fda82ee711f9457@natalenko.name>
+X-Sender: oleksandr@natalenko.name
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Hello.
 
-If ADDITIONAL_DISKSTAT is enabled carelessly, then it is bad to people
-who don't want the additional overhead.
+On 11.08.2020 08:43, Dmitry Monakhov wrote:
+> Changes from v1:
+>     - update commit description with proper ref-accounting 
+> justification
+> 
+> commit db37a34c563b ("block, bfq: get a ref to a group when adding it
+> to a service tree")
+> introduce leak forbfq_group and blkcg_gq objects because of get/put
+> imbalance.
+> In fact whole idea of original commit is wrong because bfq_group entity
+> can not dissapear under us because it is referenced by child 
+> bfq_queue's
+> entities from here:
+>  -> bfq_init_entity()
+>     ->bfqg_and_blkg_get(bfqg);
+>     ->entity->parent = bfqg->my_entity
+> 
+>  -> bfq_put_queue(bfqq)
+>     FINAL_PUT
+>     ->bfqg_and_blkg_put(bfqq_group(bfqq))
+>     ->kmem_cache_free(bfq_pool, bfqq);
+> 
+> So parent entity can not disappear while child entity is in tree,
+> and child entities already has proper protection.
+> This patch revert commit db37a34c563b ("block, bfq: get a ref to a
+> group when adding it to a service tree")
+> 
+> 
+> bfq_group leak trace caused by bad commit:
+> -> blkg_alloc
+>    -> bfq_pq_alloc
+>      -> bfqg_get (+1)
+> ->bfq_activate_bfqq
+>   ->bfq_activate_requeue_entity
+>     -> __bfq_activate_entity
+>        ->bfq_get_entity
+>          ->bfqg_and_blkg_get (+1)  <==== : Note1
+> ->bfq_del_bfqq_busy
+>   ->bfq_deactivate_entity+0x53/0xc0 [bfq]
+>     ->__bfq_deactivate_entity+0x1b8/0x210 [bfq]
+>       -> bfq_forget_entity(is_in_service = true)
+> 	 entity->on_st_or_in_serv = false   <=== :Note2
+> 	 if (is_in_service)
+> 	     return;  ==> do not touch reference
+> -> blkcg_css_offline
+>  -> blkcg_destroy_blkgs
+>   -> blkg_destroy
+>    -> bfq_pd_offline
+>     -> __bfq_deactivate_entity
+>          if (!entity->on_st_or_in_serv) /* true, because (Note2)
+> 		return false;
+>  -> bfq_pd_free
+>     -> bfqg_put() (-1, byt bfqg->ref == 2) because of (Note2)
+> So bfq_group and blkcg_gq  will leak forever, see test-case below.
+> 
+> 
+> ##TESTCASE_BEGIN:
+> #!/bin/bash
+> 
+> max_iters=${1:-100}
+> #prep cgroup mounts
+> mount -t tmpfs cgroup_root /sys/fs/cgroup
+> mkdir /sys/fs/cgroup/blkio
+> mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
+> 
+> # Prepare blkdev
+> grep blkio /proc/cgroups
+> truncate -s 1M img
+> losetup /dev/loop0 img
+> echo bfq > /sys/block/loop0/queue/scheduler
+> 
+> grep blkio /proc/cgroups
+> for ((i=0;i<max_iters;i++))
+> do
+>     mkdir -p /sys/fs/cgroup/blkio/a
+>     echo 0 > /sys/fs/cgroup/blkio/a/cgroup.procs
+>     dd if=/dev/loop0 bs=4k count=1 of=/dev/null iflag=direct 2> 
+> /dev/null
+>     echo 0 > /sys/fs/cgroup/blkio/cgroup.procs
+>     rmdir /sys/fs/cgroup/blkio/a
+>     grep blkio /proc/cgroups
+> done
+> ##TESTCASE_END:
+> 
+> Signed-off-by: Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
+> ---
+>  block/bfq-cgroup.c  |  2 +-
+>  block/bfq-iosched.h |  1 -
+>  block/bfq-wf2q.c    | 12 ++----------
+>  3 files changed, 3 insertions(+), 12 deletions(-)
+> 
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index 68882b9..b791e20 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -332,7 +332,7 @@ static void bfqg_put(struct bfq_group *bfqg)
+>  		kfree(bfqg);
+>  }
+> 
+> -void bfqg_and_blkg_get(struct bfq_group *bfqg)
+> +static void bfqg_and_blkg_get(struct bfq_group *bfqg)
+>  {
+>  	/* see comments in bfq_bic_update_cgroup for why refcounting bfqg */
+>  	bfqg_get(bfqg);
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index cd224aa..7038952 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -986,7 +986,6 @@ struct bfq_group *bfq_find_set_group(struct 
+> bfq_data *bfqd,
+>  struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
+>  struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+>  struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, 
+> int node);
+> -void bfqg_and_blkg_get(struct bfq_group *bfqg);
+>  void bfqg_and_blkg_put(struct bfq_group *bfqg);
+> 
+>  #ifdef CONFIG_BFQ_GROUP_IOSCHED
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index eb0e2a6..26776bd 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -533,9 +533,7 @@ static void bfq_get_entity(struct bfq_entity 
+> *entity)
+>  		bfqq->ref++;
+>  		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
+>  			     bfqq, bfqq->ref);
+> -	} else
+> -		bfqg_and_blkg_get(container_of(entity, struct bfq_group,
+> -					       entity));
+> +	}
+>  }
+> 
+>  /**
+> @@ -649,14 +647,8 @@ static void bfq_forget_entity(struct 
+> bfq_service_tree *st,
+> 
+>  	entity->on_st_or_in_serv = false;
+>  	st->wsum -= entity->weight;
+> -	if (is_in_service)
+> -		return;
+> -
+> -	if (bfqq)
+> +	if (bfqq && !is_in_service)
+>  		bfq_put_queue(bfqq);
+> -	else
+> -		bfqg_and_blkg_put(container_of(entity, struct bfq_group,
+> -					       entity));
+>  }
+> 
+>  /**
 
-Now add check before call blk_additional_{latency,sector}, which guarntee
-only those who really know about the attribute can account the additional
-data.
+No crashes reported this time, at least so far.
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-=2D--
- block/blk-core.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Thanks.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1a8e508516c9..eafc2b390d99 100644
-=2D-- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1462,7 +1462,8 @@ static void blk_account_io_completion(struct request=
- *req, unsigned int bytes)
-
- 		part_stat_lock();
- 		part =3D req->part;
--		blk_additional_sector(part, sgrp, bytes >> SECTOR_SHIFT);
-+		if (blk_queue_extra_io_stat(req->q))
-+			blk_additional_sector(part, sgrp, bytes >> SECTOR_SHIFT);
- 		part_stat_add(part, sectors[sgrp], bytes >> 9);
- 		part_stat_unlock();
- 	}
-@@ -1484,7 +1485,8 @@ void blk_account_io_done(struct request *req, u64 no=
-w)
- 		part =3D req->part;
-
- 		update_io_ticks(part, jiffies, true);
--		blk_additional_latency(part, sgrp, req, 0);
-+		if (blk_queue_extra_io_stat(req->q))
-+			blk_additional_latency(part, sgrp, req, 0);
- 		part_stat_inc(part, ios[sgrp]);
- 		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
- 		part_stat_unlock();
-@@ -1516,7 +1518,8 @@ unsigned long disk_start_io_acct(struct gendisk *dis=
-k, unsigned int sectors,
- 	update_io_ticks(part, now, false);
- 	part_stat_inc(part, ios[sgrp]);
- 	part_stat_add(part, sectors[sgrp], sectors);
--	blk_additional_sector(part, sgrp, sectors);
-+	if (blk_queue_extra_io_stat(disk->queue))
-+		blk_additional_sector(part, sgrp, sectors);
- 	part_stat_local_inc(part, in_flight[op_is_write(op)]);
- 	part_stat_unlock();
-
-@@ -1534,7 +1537,8 @@ void disk_end_io_acct(struct gendisk *disk, unsigned=
- int op,
-
- 	part_stat_lock();
- 	update_io_ticks(part, now, true);
--	blk_additional_latency(part, sgrp, NULL, start_time);
-+	if (blk_queue_extra_io_stat(disk->queue))
-+		blk_additional_latency(part, sgrp, NULL, start_time);
- 	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
- 	part_stat_local_dec(part, in_flight[op_is_write(op)]);
- 	part_stat_unlock();
-=2D-
-2.17.1
-
+-- 
+   Oleksandr Natalenko (post-factum)
