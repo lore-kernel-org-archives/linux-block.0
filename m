@@ -2,82 +2,102 @@ Return-Path: <SRS0=n79e=BX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9B5C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 04:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4826FC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 06:56:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F8442076C
-	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 04:06:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E68420781
+	for <linux-block@archiver.kernel.org>; Thu, 13 Aug 2020 06:56:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J3nhGCN9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725978AbgHMEGj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Aug 2020 00:06:39 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9277 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725446AbgHMEGi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Aug 2020 00:06:38 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id AEF81B41A5826F961353;
-        Thu, 13 Aug 2020 12:06:35 +0800 (CST)
-Received: from [10.169.42.93] (10.169.42.93) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Thu, 13 Aug 2020
- 12:06:13 +0800
-Subject: Re: [PATCH 3/3] nvme-core: delete the dependency on
- REQ_FAILFAST_TRANSPORT
-To:     Christoph Hellwig <hch@lst.de>
-CC:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <kbusch@kernel.org>, <axboe@fb.com>, <sagi@grimberg.me>,
-        <linux-scsi@vger.kernel.org>
-References: <20200812081855.22277-1-lengchao@huawei.com>
- <20200812151340.GC29544@lst.de>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <f7301c1a-909c-d090-95f9-34af76154547@huawei.com>
-Date:   Thu, 13 Aug 2020 12:06:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726042AbgHMG4w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Aug 2020 02:56:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57380 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725982AbgHMG4w (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Aug 2020 02:56:52 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00BE0C061757;
+        Wed, 12 Aug 2020 23:56:52 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id d4so2314865pjx.5;
+        Wed, 12 Aug 2020 23:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=/ZXQiDU4LoOHXkIBxZCnA2u6rFmi9ElKGT6dxeDUOGg=;
+        b=J3nhGCN9Er4diiB+NQx/QwgQQ8DiZa8+oNuDbBkzJpeZUKy9fExMpuyOK4x57VbA1G
+         CqGccmUrvyrnoSLJl8j6jW9D+cdCju1+mHw4aiSc+dqiZ5U7EGDVmSAUX/ZzWxJm97VV
+         z31CaibZpbeck1mc1y6MLGbRhRY70sFpojzGgWRkFOTW1+3lLV7N0oxDlPXAqvBZ4CJd
+         VbDKv+F4OT/kD1tFKCU4KpREhuP9b11zDQhyUnBoRTC51B4m0gbxCnhc4Y9eccwvAn8R
+         dZn28WWqV9kpfDeWrjtvQOn2dpSv1ugLIS6OkjBQBFYGuT+xWi/0YMSXfGS9UV7p+Gd4
+         Iuwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=/ZXQiDU4LoOHXkIBxZCnA2u6rFmi9ElKGT6dxeDUOGg=;
+        b=iVMy+9Uf0J/kiBYrPG2QdFqtn4QfTof9jEAKEUCXWOuutLtvyPtdBG2//pvRj5gUIo
+         ZTcSMcm4Sxa+hGAwu0z3IiKut5OftvFgWmN/e7Ef5LNlQnG1SZU7BuTKzW1m7ARqTRqx
+         chmTCBrSGw+J5qqskgmvsHaxyoL4jLOm+UwI8KEqa6OejLSc7PT+wTNfDGOo+n+isGnU
+         z7Ry/7LyIopJfJEHOIu/XFgL5dyOqckZstWkg7KQp76s5f34KI1I9BiG99S1gydRtO/g
+         waGvn2beBVAYYC1LMXm34AdkPRmKHWrYSQHpoO9pK90geGDgDvIs3xQngqw0CW+UfAAs
+         LTpQ==
+X-Gm-Message-State: AOAM533yyUBnhC8OtLDZXKax9bLV7YJG9cEWTEPCoXgjh+9gmdVT04pP
+        By4rj2w5fgb0Sjk3CvOPXajSkt4iriU=
+X-Google-Smtp-Source: ABdhPJzKG/UEMBN2JxxT4t5ii5/02WxmsNydw/51vWww31PExP8pCnRm6o8ECoDVDiXRlGMhAh1I2w==
+X-Received: by 2002:a17:90a:fd8c:: with SMTP id cx12mr3574665pjb.157.1597301809728;
+        Wed, 12 Aug 2020 23:56:49 -0700 (PDT)
+Received: from localhost ([104.192.108.9])
+        by smtp.gmail.com with ESMTPSA id a16sm4807925pfr.45.2020.08.12.23.56.47
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 12 Aug 2020 23:56:49 -0700 (PDT)
+Date:   Wed, 12 Aug 2020 23:56:44 -0700
+From:   Liu Yong <pkfxxxing@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH] fs/io_uring.c: Fix uninitialized variable is referenced in
+ io_submit_sqe
+Message-ID: <20200813065644.GA91891@ubuntu>
 MIME-Version: 1.0
-In-Reply-To: <20200812151340.GC29544@lst.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.169.42.93]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+the commit <a4d61e66ee4a> ("<io_uring: prevent re-read of sqe->opcode>") 
+caused another vulnerability. After io_get_req(), the sqe_submit struct 
+in req is not initialized, but the following code defaults that 
+req->submit.opcode is available.
 
+Signed-off-by: Liu Yong <pkfxxxing@gmail.com>
+---
+ fs/io_uring.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 2020/8/12 23:13, Christoph Hellwig wrote:
-> On Wed, Aug 12, 2020 at 04:18:55PM +0800, Chao Leng wrote:
->> REQ_FAILFAST_TRANSPORT may be designed for scsi, because scsi protocol
->> do not difine the local retry mechanism. SCSI implements a fuzzy local
->> retry mechanism, so need the REQ_FAILFAST_TRANSPORT for multipath
->> software, if work with multipath software, ultraPath determines
->> whether to retry and how to retry.
->>
->> Nvme is different with scsi about this. It define local retry mechanism
->> and path error code, so nvme should retry local for non path error.
->> If path related error, whether to retry and how to retry is still
->> determined by ultraPath. REQ_FAILFAST_TRANSPORT just for non nvme
->> multipath software(like dm-multipath), but we do not need return an
->> error for REQ_FAILFAST_TRANSPORT first, because we need retry local
->> for non path error first.
-> 
-> This doesn't look wrong, but these kinds of changes really need to
-> go along with block layer documentation of the intended uses of the
-> flags.  In fact the SCSI usage also looks really confused to me and at
-> very least needs better documentation if not changes.  So I think
-Yes, SCSI do not define local retry, so complex processing logic is
-required.
-> you need to do a lot code archaeology, ping the authors and current
-> maintainers and sort this out as well.
-Now REQ_FAILFAST_TRANSPORT just used for multipath software, the patch
-use the advantages of nvme, looks no bad effect.
-> 
-> More importantly if the above explanation makes sense we really need
-> to kill blk_noretry_request off entirely and replace it with a check
-> of the right set of flags in each caller as well.
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index be3d595a607f..c1aaee061dae 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2559,6 +2559,7 @@ static void io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 		goto err;
+ 	}
+ 
++	memcpy(&req->submit, s, sizeof(*s));
+ 	ret = io_req_set_file(ctx, s, state, req);
+ 	if (unlikely(ret)) {
+ err_req:
+-- 
+2.17.1
+
