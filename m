@@ -2,74 +2,129 @@ Return-Path: <SRS0=DF0J=BY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B93C433E1
-	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 06:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AA2C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 06:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD4F320774
-	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 06:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BF2D20791
+	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 06:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726185AbgHNGEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Aug 2020 02:04:49 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54669 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726151AbgHNGEt (ORCPT
+        id S1726122AbgHNGS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Aug 2020 02:18:27 -0400
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:38955 "EHLO
+        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726110AbgHNGS1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Aug 2020 02:04:49 -0400
-Received: by mail-wm1-f66.google.com with SMTP id d190so6505559wmd.4;
-        Thu, 13 Aug 2020 23:04:48 -0700 (PDT)
+        Fri, 14 Aug 2020 02:18:27 -0400
+Received: by mail-wm1-f53.google.com with SMTP id g75so6960389wme.4
+        for <linux-block@vger.kernel.org>; Thu, 13 Aug 2020 23:18:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=vPALidMW+fF/GY55nQjLH9o8dJ+J86ReCVm/X6/kzsY=;
-        b=CaFaXxQ90asjOIOAWID1M/3mYB//WZE6TXWZS2IVXOnXj6vsl6+yFjKmLukzZe1KPz
-         gOdfdgYDqyGvbxkUbIMqCnUN2LL24YtwQHVZBOv4IvkmtJbAI6muujCHbjYeIkgMpk/o
-         ertwA/xqWRc1XTzsULkbAIbZ+uJO+DwybiBVeHw7BLu6nSokzScipXSl9e5i5HpJLYWv
-         qW3gxaYZNB9grDmxZMF+w/QXUvx7Os2gtXV4NuR1QnZDH3cCMG426+5pSuc1ufhRAfRq
-         XGxT5zLkIqAYoJtQsP+ZgEXlMxY15z5xnl/9g62ddYmu5RcHqeK2GFzDB9baV0d1u24L
-         0ggw==
-X-Gm-Message-State: AOAM5312dQUVzO25PM0uaqJcxgus9bOqh3hVoBsAsdFyF+LU9j36O+GR
-        EUHrPwY/TgTB6BOStWB3hUM=
-X-Google-Smtp-Source: ABdhPJyLfOoJ39cpyJDuUL+tU5wQhF112G02dJXAZioVEhaG5hyPc5D1oW/NxBT9ROo/KumxVB3xQQ==
-X-Received: by 2002:a1c:4b0d:: with SMTP id y13mr1008363wma.6.1597385088054;
-        Thu, 13 Aug 2020 23:04:48 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:51f:3472:bc7:2f4f? ([2601:647:4802:9070:51f:3472:bc7:2f4f])
-        by smtp.gmail.com with ESMTPSA id k4sm14550383wrd.72.2020.08.13.23.04.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Aug 2020 23:04:47 -0700 (PDT)
-Subject: Re: [PATCH v2] nvme: Use spin_lock_irq() when taking the ctrl->lock
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@wdc.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20200812232444.18310-1-logang@deltatee.com>
- <20200813003200.GA1640756@dhcp-10-100-145-180.wdl.wdc.com>
- <829bed01-44c9-cac7-eb1b-9d1ccca7fd47@deltatee.com>
+        bh=+rPYJl+zwBo7bcedu39vEi+OGKsxylV+CZ1OMf5GpV4=;
+        b=AIlPNbcEoS5+Br9f8b3ZJLl5jM9tABtUVPlNGF9pE3BnUAQ53kgoXzN1zcZh0bO7Wn
+         eDUXyLTZi8qpxXxU7T3QvZ8urkDEM1DM2nhC1HFBsXpC6dkkNmORzNNf0WK+TSmhGGfU
+         N/tb2Ycp4W5Vsshar0UbBK8T45i78hUB/94Tv7pWIuGjxC5XyLqMdY+K7jdBTxU+bYXG
+         6HIXsrIp3IgD2BclmfqRBpjNVL0msO3mtYb36+fyZC8LTaFbyYqHpr6tp8pJ2nkoGbUz
+         vaZU0ITYsa8xDD8Zoa5KnfRNBhTdVF1ZMVxUoU50Js1/EiJzf+CEYL4ZqgcZjCEMm73H
+         l0fQ==
+X-Gm-Message-State: AOAM531mOPwT/khP2pu66O/o/SW3SSfcZCKdiISlDYI8OXyYD9DkgGD8
+        r7DjSvFkE6225W0wo8tn8Do=
+X-Google-Smtp-Source: ABdhPJyjydJfKcPmycuYrS140FSMY1IjFNikbpoug3vRzD7Md5IVQ5410WrFCxmmsp5jbZKargZlHA==
+X-Received: by 2002:a1c:9616:: with SMTP id y22mr1077901wmd.100.1597385905332;
+        Thu, 13 Aug 2020 23:18:25 -0700 (PDT)
+Received: from localhost.localdomain ([2601:647:4802:9070:51f:3472:bc7:2f4f])
+        by smtp.gmail.com with ESMTPSA id l21sm12278131wmj.25.2020.08.13.23.18.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Aug 2020 23:18:24 -0700 (PDT)
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <498ea4cf-1edd-e50e-35aa-b5529616337b@grimberg.me>
-Date:   Thu, 13 Aug 2020 23:04:38 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@osandov.com>
+Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCH v4 0/7] blktests: Add support to run nvme tests with tcp/rdma transports
+Date:   Thu, 13 Aug 2020 23:18:08 -0700
+Message-Id: <20200814061815.536540-1-sagi@grimberg.me>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <829bed01-44c9-cac7-eb1b-9d1ccca7fd47@deltatee.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+We have a collection of nvme tests, but all run with nvme-loop. This
+is the easiest to run on a standalone machine. However its very much possible
+to run nvme-tcp and nvme-rdma using a loopback network. Add capability to run
+tests with a new environment variable to set the transport type $nvme_trtype.
 
->> There's an unrelated whitespace change in nvme_init_identify().
->> Otherwise, looks fine.
-> 
-> Oops, sorry. can this be fixed up when it's merged?
+$ nvme_trtype=[loop|tcp|rdma] ./check nvme
 
-Fixed and queued.
+This buys us some nice coverage on some more transport types. We also add
+some transport type specific helpers to mark tests that are relevant only
+for a single transport.
+
+Changes from v3:
+- remove unload_module from tests/srp/rc
+- fixed test run cmd
+Changes from v2:
+- changed patch 6 to move unload_module to common/rc
+- changed helper to be named _require_nvme_trtype_is_fabrics
+Changes from v1:
+- added patch to remove use of module_unload
+- move trtype agnostic logig helpers in patch #3
+
+Sagi Grimberg (7):
+  nvme: consolidate nvme requirements based on transport type
+  nvme: consolidate some nvme-cli utility functions
+  nvme: make tests transport type agnostic
+  tests/nvme: restrict tests to specific transports
+  nvme: support nvme-tcp when runinng tests
+  common: move module_unload to common
+  nvme: support rdma transport type
+
+ common/rc          |  13 +++++
+ tests/nvme/002     |   8 +--
+ tests/nvme/003     |  10 ++--
+ tests/nvme/004     |  12 +++--
+ tests/nvme/005     |  15 +++---
+ tests/nvme/006     |   7 +--
+ tests/nvme/007     |   5 +-
+ tests/nvme/008     |  13 ++---
+ tests/nvme/009     |  11 ++--
+ tests/nvme/010     |  13 ++---
+ tests/nvme/011     |  13 ++---
+ tests/nvme/012     |  14 +++---
+ tests/nvme/013     |  13 ++---
+ tests/nvme/014     |  13 ++---
+ tests/nvme/015     |  12 +++--
+ tests/nvme/016     |   7 +--
+ tests/nvme/017     |   7 +--
+ tests/nvme/018     |  13 ++---
+ tests/nvme/019     |  13 ++---
+ tests/nvme/020     |  11 ++--
+ tests/nvme/021     |  13 ++---
+ tests/nvme/022     |  13 ++---
+ tests/nvme/023     |  13 ++---
+ tests/nvme/024     |  13 ++---
+ tests/nvme/025     |  13 ++---
+ tests/nvme/026     |  13 ++---
+ tests/nvme/027     |  13 ++---
+ tests/nvme/028     |  15 +++---
+ tests/nvme/029     |  13 ++---
+ tests/nvme/030     |   8 +--
+ tests/nvme/031     |  12 ++---
+ tests/nvme/032     |   4 ++
+ tests/nvme/rc      | 122 ++++++++++++++++++++++++++++++++++++++++++---
+ tests/nvmeof-mp/rc |  13 -----
+ tests/srp/rc       |  13 -----
+ 35 files changed, 322 insertions(+), 192 deletions(-)
+
+-- 
+2.25.1
+
