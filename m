@@ -2,130 +2,98 @@ Return-Path: <SRS0=DF0J=BY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 136ADC433E1
-	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 10:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A00CC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 12:04:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF8CD2074D
-	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 10:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29863208A9
+	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 12:04:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DS0D5lax"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="o7pOkJqi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727814AbgHNKtS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Aug 2020 06:49:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48532 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727064AbgHNKtR (ORCPT
+        id S1727909AbgHNMEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Aug 2020 08:04:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43556 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726681AbgHNMEb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Aug 2020 06:49:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597402156;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S6gO1r0QjJIKTJ+TFd84x2tinx9ptMc9O29feUY5X4s=;
-        b=DS0D5laxAN5nw6VvJj2jXYVXT8C7Q2Ok/cwXKFHRt2ipZSwkMWAyPjKXla40a+h86mM5gf
-        BX8iQtqOmd4wsPEYARbw7NLsVWvzSuZ2xpKN7H0J1skXXraA/CX3Vr7L1KrPakfdMrg3EM
-        oF1QSyr19ctIxzkUQy4N4/drU1EYHqM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-ss58aVESOdW_aZr6sKa08Q-1; Fri, 14 Aug 2020 06:49:12 -0400
-X-MC-Unique: ss58aVESOdW_aZr6sKa08Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CCA7E1014DEA;
-        Fri, 14 Aug 2020 10:49:10 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-12-61.pek2.redhat.com [10.72.12.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E017D1014161;
-        Fri, 14 Aug 2020 10:49:06 +0000 (UTC)
-Subject: Re: [PATCH v4 7/7] nvme: support rdma transport type
-To:     Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
-Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-References: <20200814061815.536540-1-sagi@grimberg.me>
- <20200814061815.536540-8-sagi@grimberg.me>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Message-ID: <ffcaf9e2-083c-9601-16bd-054c3bd3b94c@redhat.com>
-Date:   Fri, 14 Aug 2020 18:49:02 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        Fri, 14 Aug 2020 08:04:31 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23294C061384;
+        Fri, 14 Aug 2020 05:04:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zcIN3o7nFZcsDHO6slakDMVz6rP7Gh3OIOKHo+4Ripk=; b=o7pOkJqix8h4n8IfLn2Y+C4bnN
+        NAS93wz3etTRWKWCkhPZYrKM0H+6XReBTPxs5I4XvfRTP7YqjYOZOz/5feL4W/hwVbHSG+Nc3sQba
+        aBdx4NgUvbBWjQhL+bVVSLe21m6KKY3iPx7/UXWq2LqsDkLGKQHuQKIM/aVwmOPvuNqbk9ecxon/A
+        KHTdlymSifqJv36Rwv5TrG7pfDzsJd7y7e/ZwawtyOmoUr6+r7Yi2OQuZfk9Wg+6M/9cqQJ7S0x2Z
+        jK9oog66MXYCVHaRUkfEphDoX8dVWOshqKi0CMQQmaXY2P2yIeQ7o5bNyCqJoR2cap9BEYD7gLNsE
+        osXH/Fcg==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k6YRa-0000ck-NZ; Fri, 14 Aug 2020 12:04:22 +0000
+Date:   Fri, 14 Aug 2020 13:04:22 +0100
+From:   "hch@infradead.org" <hch@infradead.org>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "hch@infradead.org" <hch@infradead.org>,
+        Kanchan Joshi <joshiiitr@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
+Message-ID: <20200814120422.GA1872@infradead.org>
+References: <CA+1E3rLM4G4SwzD6RWsK6Ssp7NmhiPedZDjrqN3kORQr9fxCtw@mail.gmail.com>
+ <MWHPR04MB375863C20C1EF2CB27E62703E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731091416.GA29634@infradead.org>
+ <MWHPR04MB37586D39CA389296CE0252A4E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731094135.GA4104@infradead.org>
+ <MWHPR04MB3758A4B2967DB1FABAAD9265E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731125110.GA11500@infradead.org>
+ <CY4PR04MB37517D633920E4D31AC6EA0DE74B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200814081411.GA16943@infradead.org>
+ <CY4PR04MB3751DE1ECCA4099902AABAA6E7400@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20200814061815.536540-8-sagi@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY4PR04MB3751DE1ECCA4099902AABAA6E7400@CY4PR04MB3751.namprd04.prod.outlook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Aug 14, 2020 at 08:27:13AM +0000, Damien Le Moal wrote:
+> > 
+> > O_APPEND pretty much implies out of order, as there is no way for an
+> > application to know which thread wins the race to write the next chunk.
+> 
+> Yes and no. If the application threads do not synchronize their calls to
+> io_submit(), then yes indeed, things can get out of order. But if the
+> application threads are synchronized, then the offset set for each append AIO
+> will be in sequence of submission, so the user will not see its writes
+> completing at different write offsets than this implied offsets.
 
+Nothing gurantees any kind of ordering for two separate io_submit calls.
+The kernel may delay one of them for any reason.
 
-On 8/14/20 2:18 PM, Sagi Grimberg wrote:
-> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-> ---
->   tests/nvme/rc | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
->
-> diff --git a/tests/nvme/rc b/tests/nvme/rc
-> index 3e97801bbb30..675acbfa7012 100644
-> --- a/tests/nvme/rc
-> +++ b/tests/nvme/rc
-> @@ -5,6 +5,7 @@
->   # Test specific to NVMe devices
->   
->   . common/rc
-> +. common/multipath-over-rdma
->   
->   def_traddr="127.0.0.1"
->   def_adrfam="ipv4"
-> @@ -25,6 +26,12 @@ _nvme_requires() {
->   		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
->   		_have_configfs
->   		;;
-> +	rdma)
-> +		_have_modules nvmet nvme-core nvme-rdma nvmet-rdma
-> +		_have_configfs
-> +		_have_program rdma
-> +		_have_modules rdma_rxe siw
-
-start_soft_rdma can use siw or rdma_rxe(default one) module, but some 
-old distros may not support siw, but suppor rdma_rxe.
-how about:
-_have_modules rdma_rxe || _have_modules siw
-> +		;;
->   	*)
->   		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
->   		return 1
-> @@ -115,6 +122,9 @@ _cleanup_nvmet() {
->   		modprobe -r nvmet-${nvme_trtype} 2>/dev/null
->   	fi
->   	modprobe -r nvmet 2>/dev/null
-> +	if [[ "${nvme_trtype}" == "rdma" ]]; then
-> +		stop_soft_rdma
-> +	fi
->   }
->   
->   _setup_nvmet() {
-> @@ -124,6 +134,11 @@ _setup_nvmet() {
->   		modprobe nvmet-${nvme_trtype}
->   	fi
->   	modprobe nvme-${nvme_trtype}
-> +	if [[ "${nvme_trtype}" == "rdma" ]]; then
-> +		start_soft_rdma
-> +		rdma_intfs=$(rdma_network_interfaces)
-> +		def_traddr=$(get_ipv4_addr ${rdma_intfs[0]})
-> +	fi
->   }
->   
->   _nvme_disconnect_ctrl() {
-
+Now if you are doing two fully synchronous write calls on an
+O_APPEND fd, yes they are serialized.  But using Zone Append won't
+change that.
