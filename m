@@ -2,188 +2,276 @@ Return-Path: <SRS0=DF0J=BY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1740EC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 12:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E59C433E1
+	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 14:21:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8322214F1
-	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 12:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D7DA20885
+	for <linux-block@archiver.kernel.org>; Fri, 14 Aug 2020 14:21:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="TbaUT2ai";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="e6TDlPgo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C5OHUt9h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726270AbgHNMUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Aug 2020 08:20:44 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:28073 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726455AbgHNMUl (ORCPT
+        id S1728016AbgHNOVd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Aug 2020 10:21:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36470 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726185AbgHNOVd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Aug 2020 08:20:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1597407640; x=1628943640;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=SpU33UC7nJ5osmUOvPg8hYf6pn9V/4aszvqU9n1JFvQ=;
-  b=TbaUT2aiUcL+LnP/HiIVVlRfh8LsK6tgAvPI+fONjBWiJAPWInDeV+ID
-   tSBKGEDBjpjlQB9CHofq9SJApu9T2L04mcbUDrl8TzIEidtKCbLOc+FUY
-   7DuQVAzDOWnkMEg7eb4FrxAqVwZo+8j/UYWPtLxjWBh6PwR4p83n8Lhju
-   Y7cjxA7m6zIT0O94vdG62eCIzDOWcb5QuKWJntr9qbasKyODTb1JYUO2f
-   wgeAmLAofjOnN0Ooz/pEYgZQX6NAXrrYlzKwUZj0s3opuEfrMOPIsFKfL
-   TSrieIxCc+iPVLBvNvcyryhPzZZYL1m5SFejmJwYJ6KNE7kaE+CSyLmQw
-   A==;
-IronPort-SDR: j4shW0UZ08ARf5SMTahy3FEb8KJ7PGDhrwbKbpiWD3fmbmLbp/q2hRXUi5JZ3e5YcrLrgopDu0
- zMxp1dgCv19a6FFA0+55z8I3BUMDUPyi5vSuxlxOhYyWg5+L/fXJod4NASSXYUUN77j7jkmvsE
- qBIfxcabP2HrlQhtCGUxkpGJHpoli69y0AfxXgNBxXRUMhqcEPSidOQwccWydhv6cV03VNcpft
- rtolQyXlZO76CxuPTVehWyFz/CYx3HF2/4Ard2Y7ryOiQfD/OzzI5Ad6RoKytqW8+ZrvCcarLM
- e9M=
-X-IronPort-AV: E=Sophos;i="5.76,312,1592841600"; 
-   d="scan'208";a="254359538"
-Received: from mail-sn1nam02lp2054.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.36.54])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Aug 2020 20:20:38 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EyWYmbLhwFCMf2f5Ytq7y8Q/ikg/lKRU2fy2tzpgTX2egiUJaaf/nTmRJTswhK+wF6T77HxOZg4Q1TdP7Gn8XdLuxM/S19L9S4TleCWdiJD4zXc7EV6bu1khwsIjPUJPQnMSW0y+RT/HfYA3zHtA49LFXXG4i54ZT9wj3kx63h4htvXGbE7n+wCxeKlYaaH3FR6THQGrTQqbHLSA3HJjVNJ/qgXCQndU4T44e7dhT23CWKHHS3xC/BoqoZUlxeFJKEnFA71krnTQlTj61fH17/DNJzhv8kFHsDg9bjFQv4r2yxhgP9XMwIOF0GZFf4bGMrB6RNJOu4jhQ3NfFQt/9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uOkfuM6GGqXLNE+Kyh2J35ZVZ48rg0h6dRf5B05rLHg=;
- b=TuwfRcCIHYAiwYCw+QKgmPbtLnsrKBwstlIiHBQlgp2wPlYng+0EtThObcpEQ/Y0iNif2IxnwT4Thd1IApycVtJKGmbMU8cH3Xvm4rzB99aZWwrJotkItz9/p/N0NEs2LdMw9omzwb4zrgq4ebGDOB3BOLzB/s6FgTxRvGvBLEXiERHjJ1SqkyzEj/dHLzBDe6VUVxkIrArLtr8r1A7OYwGtgXQ/ZYbcuAx2JD8m1HQdfEdUmucYuVnpQbjFm5R7SCD5eksQGYjlt4kI1gtzE9cPlkwO0j3Rarl7Qu45Br7r96A5HycBno7p+TfiaxEQV+d3Q1M/mVXobC7p/ZpZNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Fri, 14 Aug 2020 10:21:33 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E149FC061384;
+        Fri, 14 Aug 2020 07:21:32 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id h4so10926543ioe.5;
+        Fri, 14 Aug 2020 07:21:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uOkfuM6GGqXLNE+Kyh2J35ZVZ48rg0h6dRf5B05rLHg=;
- b=e6TDlPgobaoVtGRmmKsL/SuPjL7pL2/nGHIH3WuXuHCvu0V1Xh1IKoNOx7ZG78QiI8OsY1HI2X9LXlw6oiyfx6YjQOSLMD21U37IqEWsqdy1e9hN2WSnrAk/fcPmZwI7FbER8UKWwVVAI3158mwvQPkZRWxs9opQamv2vnkl4zY=
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY4PR04MB3749.namprd04.prod.outlook.com (2603:10b6:903:e8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.16; Fri, 14 Aug
- 2020 12:20:34 +0000
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::7d15:9936:4b3b:f8a2]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::7d15:9936:4b3b:f8a2%12]) with mapi id 15.20.3283.016; Fri, 14 Aug
- 2020 12:20:34 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     "hch@infradead.org" <hch@infradead.org>
-CC:     Kanchan Joshi <joshiiitr@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>
-Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
-Thread-Topic: [PATCH v4 6/6] io_uring: add support for zone-append
-Thread-Index: AQHWYdbcc0q15qREKECGO7brHi6zEg==
-Date:   Fri, 14 Aug 2020 12:20:34 +0000
-Message-ID: <CY4PR04MB37518A2859396BCE0EEF5270E7400@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <CA+1E3rLM4G4SwzD6RWsK6Ssp7NmhiPedZDjrqN3kORQr9fxCtw@mail.gmail.com>
- <MWHPR04MB375863C20C1EF2CB27E62703E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
- <20200731091416.GA29634@infradead.org>
- <MWHPR04MB37586D39CA389296CE0252A4E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
- <20200731094135.GA4104@infradead.org>
- <MWHPR04MB3758A4B2967DB1FABAAD9265E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
- <20200731125110.GA11500@infradead.org>
- <CY4PR04MB37517D633920E4D31AC6EA0DE74B0@CY4PR04MB3751.namprd04.prod.outlook.com>
- <20200814081411.GA16943@infradead.org>
- <CY4PR04MB3751DE1ECCA4099902AABAA6E7400@CY4PR04MB3751.namprd04.prod.outlook.com>
- <20200814120422.GA1872@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:28a1:79eb:9c3c:a78e]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 60a007b8-7631-4937-0298-08d8404c71c1
-x-ms-traffictypediagnostic: CY4PR04MB3749:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR04MB37498277FACF8FA7D74534FCE7400@CY4PR04MB3749.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +8VIX4sxnrCHn1MtFSekaqr3J8hYhB//Kg4lMRRdKxSU3Cd/sZryCB5hGnN5AxnBQeA7N6HvuOKOGZextCB1kYHj0f15UfXeDaDV//K/noHHToziJABtJxaCVtt6WBNLkFLKQG+I9M6kk9m2pcIHbfEwlQOM3llqdn8rH3nw870wrglRrlaZ6CaGGbq4XlKCff8KFk4LnHsO8DhZg30xebKUvzVUEecN7sIphTT06jbA6erdWwyC8vDcatA5HmLT0C0ukNdTRY+bCXw6VDBooYczVuwr8sAkq/cd+hHYVGb6VbYE0f7w3fqc6sbF+yp9MKplRXq5tSIdVjLuIW/jxw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(396003)(39860400002)(366004)(136003)(5660300002)(83380400001)(186003)(7696005)(86362001)(53546011)(66946007)(6506007)(9686003)(8936002)(6916009)(55016002)(76116006)(4326008)(91956017)(33656002)(478600001)(54906003)(7416002)(52536014)(71200400001)(2906002)(8676002)(66446008)(64756008)(66476007)(316002)(66556008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: xNTB23psWOekOB6FuTJOEP0k7JByKq+gzYGWTAtc94yeLwCx+bphDOkWJNGdfEJgYTbrLsPku0ATOvE7qUIUzScNQCkTXVCzAPbMrWgOL9qNstG8YyQE1pjklMIz4yDZbCI/JcCv8hNawRTqURDqMiXEGx5W4slFmK5GFkStGDFD7x2biMevpsahd7FzTfzaY3v9yEzW4heYmoAcQ9PMdjoF+7ZkiUdcgm6cC/+5hpgquLyOZ2XkU0NJ0YnuRUI68MKKLBC61DSQf5Yj4S99FT+phKQRM+gzZAchDJEaZKfOlIiknXvtHsFWpAbVC4T3ILeRiU532003LS898gd+97EomN7ODx1MJej3UTHeod0U5Nei1brknNNG9kwqgrHs7U38IIoGcMHythNbj2m8nhOcytUvbnWHaab5r3dQ+fRFHEUrx9hE4IZDtHH+QR4bFP6tPaSpWIC1f3xDO8peTPM22JomaT59r72XNjhGYnfl/f+nbWcE21hFeEV48saf5clKEhhbOduYeq1Khe57o42mx0D9BGjYe3jZWiDPNprBlStfT23DrWFRKex3fg+WEHxJqcRHYg5qd3oCVAX7t1TMDaU8g4dNGk55iVjrsDBhea5heX/7EARIxbEEqkCHqJSCThy/gLiCZVfRiwd5iknBXT5KIKHgyOr3ilZTi/CNo7PqCL17Tk6fisdUbv4zYnfNjzw91Tu9B0Oy6h+eMQ==
-Content-Type: text/plain; charset="us-ascii"
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=ceuzR87451Cc6ZPbAaw/Ws6GJIlBw8/7uWYzi3GVwJA=;
+        b=C5OHUt9hkrJlft1M32KFKYTyDqxhz82XwvNEyxU/08xkdhL8x2QV8l/0TPiGZYMDuX
+         E5OqS6P3mai/ZNmOTipfn0aw5I/0T/f03dt8iu2Z/RwQZ0K1yokX/8J66TvPLawOhabj
+         7CMGvUcmCnlXl4qLbkHcGTqMo0sE8RKFEGMVxjd7wwN3C1/NN/1Hd7fG5ktpMrNNVWsF
+         nET2RKC6Ijlx4bUbXnQVFrO1NwVR6Rso9e1R2b8hlH0IuK0L9Kgu3cNMhrBSzB7jjSNd
+         Og6a6Xp1G22BiKLdIxIg7iGSMhTUbG7mQo4NPHgpzUuVE42qnZqN0KFkyMfFclNcIbpM
+         krhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=ceuzR87451Cc6ZPbAaw/Ws6GJIlBw8/7uWYzi3GVwJA=;
+        b=crRlRDseBo8b+xuowjQJmmTGdDFChnYTVvS0dKPN0sdpwdsmWfpVSZ3l4TOM23/rit
+         1tsOVhXaA8I26gYBweFjni3PqCKB4A1s8JVV4AH/buo8bfq0QyiZDdyEAVULvEqsomXT
+         kZn96UviRzE4YvBGL3aF0a3qtBHHvX9WOmRNNCNsZhbklA//s1MkdlD+Avknjnxe0ibk
+         f3IsbmZjkRSwrp6+sr0agJsDyl1lPI+nMIvHUzUav6bQp2F/t0iFweyOix3BJMq+5Vqc
+         6Rl+k7lqLv2bJFlV5mF/nNIFR09mDVP3nIRM3QoSKysCkJXJFc0bSG37r3Y+LmOBcLQR
+         7+mw==
+X-Gm-Message-State: AOAM5330TXlvyBsYW87lY6pqA/tJyBi1b91kEUYi+YQY+BEMhRzsHW/r
+        GvAZO6W9bs5Rnl9HmGePUGg=
+X-Google-Smtp-Source: ABdhPJweSZedFvqsUMFWyIpazr8WaDF573/xdtkmOjFpEuaDTmOAqcznkxDaJ7yyQKrPSVkkZ6yu+w==
+X-Received: by 2002:a6b:b74b:: with SMTP id h72mr2392562iof.52.1597414892064;
+        Fri, 14 Aug 2020 07:21:32 -0700 (PDT)
+Received: from anon-dhcp-152.1015granger.net (c-68-61-232-219.hsd1.mi.comcast.net. [68.61.232.219])
+        by smtp.gmail.com with ESMTPSA id c4sm118316ioi.44.2020.08.14.07.21.28
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 14 Aug 2020 07:21:30 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [dm-devel] [RFC PATCH v5 00/11] Integrity Policy Enforcement LSM
+ (IPE)
+From:   Chuck Lever <chucklever@gmail.com>
+In-Reply-To: <1597331416.3708.26.camel@HansenPartnership.com>
+Date:   Fri, 14 Aug 2020 10:21:26 -0400
+Cc:     Mimi Zohar <zohar@linux.ibm.com>, James Morris <jmorris@namei.org>,
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Pavel Machek <pavel@ucw.cz>, Sasha Levin <sashal@kernel.org>,
+        snitzer@redhat.com, dm-devel@redhat.com,
+        tyhicks@linux.microsoft.com, agk@redhat.com,
+        Paul Moore <paul@paul-moore.com>,
+        Jonathan Corbet <corbet@lwn.net>, nramas@linux.microsoft.com,
+        serge@hallyn.com, pasha.tatashin@soleen.com,
+        Jann Horn <jannh@google.com>, linux-block@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, mdsakib@microsoft.com,
+        open list <linux-kernel@vger.kernel.org>, eparis@redhat.com,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        jaskarankhurana@linux.microsoft.com
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60a007b8-7631-4937-0298-08d8404c71c1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2020 12:20:34.2692
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +5lB5ETxnlTMmNcsRFAuY5oTAXWcmN+BospLiwJ1W3wBYasFhBPEOsJWIClPd/jKhd5GlZycOj3x/7h46kkscg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB3749
+Message-Id: <5A966AA7-9E39-4F59-A9B7-4308AF6F3333@gmail.com>
+References: <20200728213614.586312-1-deven.desai@linux.microsoft.com>
+ <20200802115545.GA1162@bug> <20200802140300.GA2975990@sasha-vm>
+ <20200802143143.GB20261@amd> <1596386606.4087.20.camel@HansenPartnership.com>
+ <fb35a1f7-7633-a678-3f0f-17cf83032d2b@linux.microsoft.com>
+ <1596639689.3457.17.camel@HansenPartnership.com>
+ <alpine.LRH.2.21.2008050934060.28225@namei.org>
+ <b08ae82102f35936427bf138085484f75532cff1.camel@linux.ibm.com>
+ <329E8DBA-049E-4959-AFD4-9D118DEB176E@gmail.com>
+ <da6f54d0438ee3d3903b2c75fcfbeb0afdf92dc2.camel@linux.ibm.com>
+ <1597073737.3966.12.camel@HansenPartnership.com>
+ <6E907A22-02CC-42DD-B3CD-11D304F3A1A8@gmail.com>
+ <1597124623.30793.14.camel@HansenPartnership.com>
+ <16C3BF97-A7D3-488A-9D26-7C9B18AD2084@gmail.com>
+ <1597161218.4325.38.camel@HansenPartnership.com>
+ <02D551EF-C975-4B91-86CA-356FA0FF515C@gmail.com>
+ <1597247482.7293.18.camel@HansenPartnership.com>
+ <D470BA4B-EF1A-49CA-AFB9-0F7FFC4C6001@gmail.com>
+ <1597331416.3708.26.camel@HansenPartnership.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/08/14 21:04, hch@infradead.org wrote:=0A=
-> On Fri, Aug 14, 2020 at 08:27:13AM +0000, Damien Le Moal wrote:=0A=
->>>=0A=
->>> O_APPEND pretty much implies out of order, as there is no way for an=0A=
->>> application to know which thread wins the race to write the next chunk.=
-=0A=
->>=0A=
->> Yes and no. If the application threads do not synchronize their calls to=
-=0A=
->> io_submit(), then yes indeed, things can get out of order. But if the=0A=
->> application threads are synchronized, then the offset set for each appen=
-d AIO=0A=
->> will be in sequence of submission, so the user will not see its writes=
-=0A=
->> completing at different write offsets than this implied offsets.=0A=
-> =0A=
-> Nothing gurantees any kind of ordering for two separate io_submit calls.=
-=0A=
-> The kernel may delay one of them for any reason.=0A=
-=0A=
-Ah. Yes. The inode locking is at the single aio issuing level, not the io_s=
-ubmit=0A=
-syscall level... So yes, in the end, the aios offsets and their execution o=
-rder=0A=
-can be anything. I see it now. So O_APPEND implying zone append is fine for=
- zonefs.=0A=
-=0A=
-> =0A=
-> Now if you are doing two fully synchronous write calls on an=0A=
-> O_APPEND fd, yes they are serialized.  But using Zone Append won't=0A=
-> change that.=0A=
-=0A=
-Yep. That zonefs already does.=0A=
-=0A=
-OK. So I think I will send a writeup of the semantic discussed so far. We a=
-lso=0A=
-still need a solution for io_uring interface for the written offset report =
-and=0A=
-we can implement.=0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+
+
+> On Aug 13, 2020, at 11:10 AM, James Bottomley =
+<James.Bottomley@HansenPartnership.com> wrote:
+>=20
+> On Thu, 2020-08-13 at 10:42 -0400, Chuck Lever wrote:
+>>> On Aug 12, 2020, at 11:51 AM, James Bottomley <James.Bottomley@Hans
+>>> enPartnership.com> wrote:
+>>> On Wed, 2020-08-12 at 10:15 -0400, Chuck Lever wrote:
+>>>>> On Aug 11, 2020, at 11:53 AM, James Bottomley
+>>>>> <James.Bottomley@HansenPartnership.com> wrote:
+>>>>> On Tue, 2020-08-11 at 10:48 -0400, Chuck Lever wrote:
+> [...]
+>>>>>>>> The client would have to reconstruct that tree again if
+>>>>>>>> memory pressure caused some or all of the tree to be
+>>>>>>>> evicted, so perhaps an on-demand mechanism is preferable.
+>>>>>>>=20
+>>>>>>> Right, but I think that's implementation detail.  Probably
+>>>>>>> what we need is a way to get the log(N) verification hashes
+>>>>>>> from the server and it's up to the client whether it caches
+>>>>>>> them or not.
+>>>>>>=20
+>>>>>> Agreed, these are implementation details. But see above about
+>>>>>> the trustworthiness of the intermediate hashes. If they are
+>>>>>> conveyed on an untrusted network, then they can't be trusted
+>>>>>> either.
+>>>>>=20
+>>>>> Yes, they can, provided enough of them are asked for to
+>>>>> verify.  If you look at the simple example above, suppose I
+>>>>> have cached H11 and H12, but I've lost the entire H2X layer.  I
+>>>>> want to verify B3 so I also ask you for your copy of H24.  Then
+>>>>> I generate H23 from B3 and Hash H23 and H24.  If this doesn't
+>>>>> hash to H12 I know either you supplied me the wrong block or
+>>>>> lied about H24.  However, if it all hashes correctly I know you
+>>>>> supplied me with both the correct B3 and the correct H24.
+>>>>=20
+>>>> My point is there is a difference between a trusted cache and an
+>>>> untrusted cache. I argue there is not much value in a cache where
+>>>> the hashes have to be verified again.
+>>>=20
+>>> And my point isn't about caching, it's about where the tree comes
+>>> from. I claim and you agree the client can get the tree from the
+>>> server a piece at a time (because it can path verify it) and
+>>> doesn't have to generate it itself.
+>>=20
+>> OK, let's focus on where the tree comes from. It is certainly
+>> possible to build protocol to exchange parts of a Merkle tree.
+>=20
+> Which is what I think we need to extend IMA to do.
+>=20
+>> The question is how it might be stored on the server.
+>=20
+> I think the only thing the server has to guarantee to store is the =
+head
+> hash, possibly signed.
+>=20
+>> There are some underlying assumptions about the metadata storage
+>> mechanism that should be stated up front.
+>>=20
+>> Current forms of IMA metadata are limited in size and stored in a
+>> container that is read and written in a single operation. If we stick
+>> with that container format, I don't see a way to store a Merkle tree
+>> in there for all file sizes.
+>=20
+> Well, I don't think you need to.  The only thing that needs to be
+> stored is the head hash.  Everything else can be reconstructed.  If =
+you
+> asked me to implement it locally, I'd probably put the head hash in an
+> xattr but use a CAM based cache for the merkel trees and construct the
+> tree on first access if it weren't already in the cache.
+
+The contents of the security.ima xattr might be modeled after
+EVM_IMA_DIGSIG:
+
+- a format enumerator (used by all IMA metadata formats)
+- the tree's unit size
+- a fingerprint of the signer's certificate
+  - digest algorithm name and full digest
+- the root hash, always signed
+  - signing algorithm name and signature
+
+The rest of the hash tree is always stored somewhere else or
+constructed on-demand.
+
+My experience of security communities both within and outside the
+IETF is that they would insist on always having a signature.
+
+If one doesn't care about signing, a self-signed certificate can be
+automatically provisioned when ima-evm-utils is installed that can
+be used for those cases. That would make the signature process
+invisible to any administrator who doesn't care about signed
+metadata.
+
+Because storage in NFS would cross trust boundaries, it would have
+to require the use of a signed root hash. I don't want to be in the
+position where copying a file with an unsigned root hash into NFS
+makes it unreadable because of a change in policy.
+
+
+> However, the above isn't what fs-verity does: it stores the tree in a
+> hidden section of the file.  That's why I don't think we'd mandate
+> anything about tree storage.  Just describe the partial retrieval
+> properties we'd like and leave the rest as an implementation detail.
+
+I'm starting to consider how much compatibility with fs-verity is
+required. There are several forms of hash-tree, and a specification
+of the IMA metadata format would need to describe exactly how to
+form the tree root. If we want compatibility with fs-verity, then
+it is reasonable to assume that this IMA metadata format might be
+required to use the same hash tree construction algorithm that
+fs-verity uses.
+
+The original Merkle tree concept was patented 40 years ago. I'm not
+clear yet on whether the patent encumbers the use of Merkle trees
+in any way, but since their usage seems pretty widespread in P2P
+and BitCoin applications, I'm guessing the answer to that is
+favorable. More research needed.
+
+There is an implementation used by several GNU utilities that is
+available as a piece of GPL code. It could be a potential blocker
+if that was the tree algorithm that fs-verity uses -- as discussed
+in the other thread.
+
+Apparently there are some known weaknesses in older hash tree
+algorithms, including at least one CVE. We could choose a recent
+algorithm, but perhaps there needs to be a degree of extensibility
+in case that algorithm needs to be updated due to a subsequent
+security issue.
+
+Tree construction could include a few items besides file content to
+help secure the hash further. For instance the file's size and mtime,
+as well as the depth of the tree, could be included in the signature.
+But that depends on whether it can be done while maintaining
+compatibility with fs-verity.
+
+I would feel better if someone with more domain expertise chimed in.
+
+
+>> Thus it seems to me that we cannot begin to consider the tree-on-the-
+>> server model unless there is a proposed storage mechanism for that
+>> whole tree. Otherwise, the client must have the primary role in
+>> unpacking and verifying the tree.
+>=20
+> Well, as I said,  I don't think you need to store the tree.
+
+We basically agree there.
+
+
+> You certainly could decide to store the entire tree (as fs-verity =
+does) if
+> it fitted your use case, but it's not required.  Perhaps even in my
+> case I'd make the CAM based cache persistent, like android's dalvik
+> cache.
+>=20
+> James
+>=20
+>=20
+>> Storing only the tree root in the metadata means the metadata format
+>> is nicely bounded in size.
+
+--
+Chuck Lever
+chucklever@gmail.com
+
+
+
