@@ -4,40 +4,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5795C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD11C433E1
+	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 902F320658
-	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 270D420657
+	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728855AbgHOWXp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Aug 2020 18:23:45 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37792 "EHLO mx2.suse.de"
+        id S1729430AbgHOWYP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Aug 2020 18:24:15 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37950 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726541AbgHOWXo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Aug 2020 18:23:44 -0400
+        id S1728819AbgHOWXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Aug 2020 18:23:45 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 77BA5AE63;
-        Sat, 15 Aug 2020 07:48:41 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     netdev@vger.kernel.org, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Vlastimil Babka <vbabka@suse.com>
-Subject: [PATCH 1/3] net: introduce helper sendpage_ok() in include/linux/net.h
-Date:   Sat, 15 Aug 2020 15:48:02 +0800
-Message-Id: <20200815074804.46995-1-colyli@suse.de>
+        by mx2.suse.de (Postfix) with ESMTP id 113A1B1CA;
+        Sat, 15 Aug 2020 12:48:25 +0000 (UTC)
+From:   colyli@suse.de
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v1 07/14] bcache: remove useless bucket_pages()
+Date:   Sat, 15 Aug 2020 20:47:36 +0800
+Message-Id: <20200815124743.115270-8-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200815124743.115270-1-colyli@suse.de>
+References: <20200815124743.115270-1-colyli@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -45,64 +39,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The original problem was from nvme-over-tcp code, who mistakenly uses
-kernel_sendpage() to send pages allocated by __get_free_pages() without
-__GFP_COMP flag. Such pages don't have refcount (page_count is 0) on
-tail pages, sending them by kernel_sendpage() may trigger a kernel panic
-from a corrupted kernel heap, because these pages are incorrectly freed
-in network stack as page_count 0 pages.
+From: Coly Li <colyli@suse.de>
 
-This patch introduces a helper sendpage_ok(), it returns true if the
-checking page,
-- is not slab page: PageSlab(page) is false.
-- has page refcount: page_count(page) is not zero
-
-All drivers who want to send page to remote end by kernel_sendpage()
-may use this helper to check whether the page is OK. If the helper does
-not return true, the driver should try other non sendpage method (e.g.
-sock_no_sendpage()) to handle the page.
+It seems alloc_bucket_pages() is the only user of bucket_pages().
+Considering alloc_bucket_pages() is removed from bcache code, it is safe
+to remove the useless macro bucket_pages() now.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Jan Kara <jack@suse.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Vlastimil Babka <vbabka@suse.com>
-Cc: stable@vger.kernel.org
 ---
- include/linux/net.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ drivers/md/bcache/bcache.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/linux/net.h b/include/linux/net.h
-index d48ff1180879..97e8f1a8a427 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -286,6 +286,21 @@ do {									\
- #define net_get_random_once_wait(buf, nbytes)			\
- 	get_random_once_wait((buf), (nbytes))
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 29bec61cafbb..48a2585b6bbb 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -757,7 +757,6 @@ struct bbio {
+ #define btree_default_blocks(c)						\
+ 	((unsigned int) ((PAGE_SECTORS * (c)->btree_pages) >> (c)->block_bits))
  
-+/*
-+ * E.g. XFS meta- & log-data is in slab pages, or bcache meta
-+ * data pages, or other high order pages allocated by
-+ * __get_free_pages() without __GFP_COMP, which have a page_count
-+ * of 0 and/or have PageSlab() set. We cannot use send_page for
-+ * those, as that does get_page(); put_page(); and would cause
-+ * either a VM_BUG directly, or __page_cache_release a page that
-+ * would actually still be referenced by someone, leading to some
-+ * obscure delayed Oops somewhere else.
-+ */
-+static inline bool sendpage_ok(struct page *page)
-+{
-+	return  (!PageSlab(page) && page_count(page) >= 1);
-+}
-+
- int kernel_sendmsg(struct socket *sock, struct msghdr *msg, struct kvec *vec,
- 		   size_t num, size_t len);
- int kernel_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+-#define bucket_pages(c)		((c)->sb.bucket_size / PAGE_SECTORS)
+ #define bucket_bytes(c)		((c)->sb.bucket_size << 9)
+ #define block_bytes(ca)		((ca)->sb.block_size << 9)
+ 
 -- 
 2.26.2
 
