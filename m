@@ -4,37 +4,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52116C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B98C433E4
+	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C17520658
+	by mail.kernel.org (Postfix) with ESMTP id EAC6320658
 	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728398AbgHOWXn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Aug 2020 18:23:43 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37780 "EHLO mx2.suse.de"
+        id S1728819AbgHOWYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Aug 2020 18:24:20 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37810 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726511AbgHOWXn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Aug 2020 18:23:43 -0400
+        id S1728207AbgHOWXo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Aug 2020 18:23:44 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id BA693B65C;
-        Sat, 15 Aug 2020 07:48:52 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     netdev@vger.kernel.org, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 3/3] drbd: code cleanup by using sendpage_ok() to check page for kernel_sendpage()
-Date:   Sat, 15 Aug 2020 15:48:04 +0800
-Message-Id: <20200815074804.46995-3-colyli@suse.de>
+        by mx2.suse.de (Postfix) with ESMTP id A91F1B1CB;
+        Sat, 15 Aug 2020 12:48:26 +0000 (UTC)
+From:   colyli@suse.de
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v1 08/14] bcache: only use bucket_bytes() on struct cache
+Date:   Sat, 15 Aug 2020 20:47:37 +0800
+Message-Id: <20200815124743.115270-9-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200815074804.46995-1-colyli@suse.de>
-References: <20200815074804.46995-1-colyli@suse.de>
+In-Reply-To: <20200815124743.115270-1-colyli@suse.de>
+References: <20200815124743.115270-1-colyli@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -42,39 +39,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In _drbd_send_page() a page is checked by following code before sending
-it by kernel_sendpage(),
-        (page_count(page) < 1) || PageSlab(page)
-If the check is true, this page won't be send by kernel_sendpage() and
-handled by sock_no_sendpage().
+From: Coly Li <colyli@suse.de>
 
-This kind of check is exactly what macro sendpage_ok() does, which is
-introduced into include/linux/net.h to solve a similar send page issue
-in nvme-tcp code.
+Because struct cache_set and struct cache both have struct cache_sb,
+macro bucket_bytes() currently are used on both of them. When removing
+the embedded struct cache_sb from struct cache_set, this macro won't be
+used on struct cache_set anymore.
 
-This patch uses macro sendpage_ok() to replace the open coded checks to
-page type and refcount in _drbd_send_page(), as a code cleanup.
+This patch unifies all bucket_bytes() usage only on struct cache, this is
+one of the preparation to remove the embedded struct cache_sb from
+struct cache_set.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/block/drbd/drbd_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/bcache/bcache.h | 2 +-
+ drivers/md/bcache/sysfs.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index cb687ccdbd96..55dc0c91781e 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -1553,7 +1553,7 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 	 * put_page(); and would cause either a VM_BUG directly, or
- 	 * __page_cache_release a page that would actually still be referenced
- 	 * by someone, leading to some obscure delayed Oops somewhere else. */
--	if (drbd_disable_sendpage || (page_count(page) < 1) || PageSlab(page))
-+	if (drbd_disable_sendpage || !sendpage_ok(page))
- 		return _drbd_no_send_page(peer_device, page, offset, size, msg_flags);
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 48a2585b6bbb..94d4baf4c405 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -757,7 +757,7 @@ struct bbio {
+ #define btree_default_blocks(c)						\
+ 	((unsigned int) ((PAGE_SECTORS * (c)->btree_pages) >> (c)->block_bits))
  
- 	msg_flags |= MSG_NOSIGNAL;
+-#define bucket_bytes(c)		((c)->sb.bucket_size << 9)
++#define bucket_bytes(ca)	((ca)->sb.bucket_size << 9)
+ #define block_bytes(ca)		((ca)->sb.block_size << 9)
+ 
+ static inline unsigned int meta_bucket_pages(struct cache_sb *sb)
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index b9f524ab5cc8..4bfe98faadcc 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -713,7 +713,7 @@ SHOW(__bch_cache_set)
+ 
+ 	sysfs_print(synchronous,		CACHE_SYNC(&c->sb));
+ 	sysfs_print(journal_delay_ms,		c->journal_delay_ms);
+-	sysfs_hprint(bucket_size,		bucket_bytes(c));
++	sysfs_hprint(bucket_size,		bucket_bytes(c->cache));
+ 	sysfs_hprint(block_size,		block_bytes(c->cache));
+ 	sysfs_print(tree_depth,			c->root->level);
+ 	sysfs_print(root_usage_percent,		bch_root_usage(c));
 -- 
 2.26.2
 
