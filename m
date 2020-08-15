@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD11C433E1
-	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37DDBC433DF
+	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 270D420657
-	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 219CF206B2
+	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 22:24:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729430AbgHOWYP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Aug 2020 18:24:15 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37950 "EHLO mx2.suse.de"
+        id S1729062AbgHOWYN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Aug 2020 18:24:13 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37946 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728819AbgHOWXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1728735AbgHOWXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Sat, 15 Aug 2020 18:23:45 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 113A1B1CA;
-        Sat, 15 Aug 2020 12:48:25 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 25828B1CE;
+        Sat, 15 Aug 2020 12:48:32 +0000 (UTC)
 From:   colyli@suse.de
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v1 07/14] bcache: remove useless bucket_pages()
-Date:   Sat, 15 Aug 2020 20:47:36 +0800
-Message-Id: <20200815124743.115270-8-colyli@suse.de>
+Subject: [PATCH v1 11/14] bcache: remove can_attach_cache()
+Date:   Sat, 15 Aug 2020 20:47:40 +0800
+Message-Id: <20200815124743.115270-12-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200815124743.115270-1-colyli@suse.de>
 References: <20200815124743.115270-1-colyli@suse.de>
@@ -41,26 +41,46 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Coly Li <colyli@suse.de>
 
-It seems alloc_bucket_pages() is the only user of bucket_pages().
-Considering alloc_bucket_pages() is removed from bcache code, it is safe
-to remove the useless macro bucket_pages() now.
+After removing the embedded struct cache_sb from struct cache_set, cache
+set will directly reference the in-memory super block of struct cache.
+It is unnecessary to compare block_size, bucket_size and nr_in_set from
+the identical in-memory super block in can_attach_cache().
+
+This is a preparation patch for latter removing cache_set->sb from
+struct cache_set.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/bcache.h | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/md/bcache/super.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 29bec61cafbb..48a2585b6bbb 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -757,7 +757,6 @@ struct bbio {
- #define btree_default_blocks(c)						\
- 	((unsigned int) ((PAGE_SECTORS * (c)->btree_pages) >> (c)->block_bits))
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index cdc1ebee5044..80cfb9dfe93e 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -2112,13 +2112,6 @@ static int run_cache_set(struct cache_set *c)
+ 	return -EIO;
+ }
  
--#define bucket_pages(c)		((c)->sb.bucket_size / PAGE_SECTORS)
- #define bucket_bytes(c)		((c)->sb.bucket_size << 9)
- #define block_bytes(ca)		((ca)->sb.block_size << 9)
+-static bool can_attach_cache(struct cache *ca, struct cache_set *c)
+-{
+-	return ca->sb.block_size	== c->sb.block_size &&
+-		ca->sb.bucket_size	== c->sb.bucket_size &&
+-		ca->sb.nr_in_set	== c->sb.nr_in_set;
+-}
+-
+ static const char *register_cache_set(struct cache *ca)
+ {
+ 	char buf[12];
+@@ -2130,9 +2123,6 @@ static const char *register_cache_set(struct cache *ca)
+ 			if (c->cache)
+ 				return "duplicate cache set member";
+ 
+-			if (!can_attach_cache(ca, c))
+-				return "cache sb does not match set";
+-
+ 			if (!CACHE_SYNC(&ca->sb))
+ 				SET_CACHE_SYNC(&c->sb, false);
  
 -- 
 2.26.2
