@@ -4,31 +4,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C0E0C433E3
-	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 21:44:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D44C433E5
+	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 21:44:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23AE423B45
-	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 21:44:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DA7823B24
+	for <linux-block@archiver.kernel.org>; Sat, 15 Aug 2020 21:44:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726637AbgHOVns (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Aug 2020 17:43:48 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54980 "EHLO mx2.suse.de"
+        id S1726646AbgHOVoN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Aug 2020 17:44:13 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54982 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726545AbgHOVnq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Aug 2020 17:43:46 -0400
+        id S1726593AbgHOVns (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Aug 2020 17:43:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6E6CEB79D;
-        Sat, 15 Aug 2020 04:11:34 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 242BCB795;
+        Sat, 15 Aug 2020 04:11:17 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 09/14] bcache: avoid data copy between cache_set->sb and cache->sb
-Date:   Sat, 15 Aug 2020 12:10:38 +0800
-Message-Id: <20200815041043.45116-10-colyli@suse.de>
+Subject: [PATCH 01/14] bcache: remove 'int n' from parameter list of bch_bucket_alloc_set()
+Date:   Sat, 15 Aug 2020 12:10:30 +0800
+Message-Id: <20200815041043.45116-2-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200815041043.45116-1-colyli@suse.de>
 References: <20200815041043.45116-1-colyli@suse.de>
@@ -39,63 +39,148 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-struct cache_sb embedded in struct cache_set is only partial used and
-not a real copy from cache's in-memory super block. When removing the
-embedded cache_set->sb, it is unncessary to copy data between these two
-in-memory super blocks (cache_set->sb and cache->sb), it is sufficient
-to just use cache->sb.
+The parameter 'int n' from bch_bucket_alloc_set() is not cleared
+defined. From the code comments n is the number of buckets to alloc, but
+from the code itself 'n' is the maximum cache to iterate. Indeed all the
+locations where bch_bucket_alloc_set() is called, 'n' is alwasy 1.
 
-This patch removes the data copy between these two in-memory super
-blocks in bch_cache_set_alloc() and bcache_write_super(). In future
-except for set_uuid, cache's super block will be referenced by cache
-set, no copy any more.
+This patch removes the confused and unnecessary 'int n' from parameter
+list of  bch_bucket_alloc_set(), and explicitly allocates only 1 bucket
+for its caller.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/super.c | 22 +++-------------------
- 1 file changed, 3 insertions(+), 19 deletions(-)
+ drivers/md/bcache/alloc.c  | 35 +++++++++++++++--------------------
+ drivers/md/bcache/bcache.h |  4 ++--
+ drivers/md/bcache/btree.c  |  2 +-
+ drivers/md/bcache/super.c  |  2 +-
+ 4 files changed, 19 insertions(+), 24 deletions(-)
 
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 52035a78d836..4493ff57476d 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -49,7 +49,7 @@
+  *
+  * bch_bucket_alloc() allocates a single bucket from a specific cache.
+  *
+- * bch_bucket_alloc_set() allocates one or more buckets from different caches
++ * bch_bucket_alloc_set() allocates one  bucket from different caches
+  * out of a cache set.
+  *
+  * free_some_buckets() drives all the processes described above. It's called
+@@ -488,34 +488,29 @@ void bch_bucket_free(struct cache_set *c, struct bkey *k)
+ }
+ 
+ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
+-			   struct bkey *k, int n, bool wait)
++			   struct bkey *k, bool wait)
+ {
+-	int i;
++	struct cache *ca;
++	long b;
+ 
+ 	/* No allocation if CACHE_SET_IO_DISABLE bit is set */
+ 	if (unlikely(test_bit(CACHE_SET_IO_DISABLE, &c->flags)))
+ 		return -1;
+ 
+ 	lockdep_assert_held(&c->bucket_lock);
+-	BUG_ON(!n || n > c->caches_loaded || n > MAX_CACHES_PER_SET);
+ 
+ 	bkey_init(k);
+ 
+-	/* sort by free space/prio of oldest data in caches */
+-
+-	for (i = 0; i < n; i++) {
+-		struct cache *ca = c->cache_by_alloc[i];
+-		long b = bch_bucket_alloc(ca, reserve, wait);
++	ca = c->cache_by_alloc[0];
++	b = bch_bucket_alloc(ca, reserve, wait);
++	if (b == -1)
++		goto err;
+ 
+-		if (b == -1)
+-			goto err;
++	k->ptr[0] = MAKE_PTR(ca->buckets[b].gen,
++			     bucket_to_sector(c, b),
++			     ca->sb.nr_this_dev);
+ 
+-		k->ptr[i] = MAKE_PTR(ca->buckets[b].gen,
+-				bucket_to_sector(c, b),
+-				ca->sb.nr_this_dev);
+-
+-		SET_KEY_PTRS(k, i + 1);
+-	}
++	SET_KEY_PTRS(k, 1);
+ 
+ 	return 0;
+ err:
+@@ -525,12 +520,12 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
+ }
+ 
+ int bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
+-			 struct bkey *k, int n, bool wait)
++			 struct bkey *k, bool wait)
+ {
+ 	int ret;
+ 
+ 	mutex_lock(&c->bucket_lock);
+-	ret = __bch_bucket_alloc_set(c, reserve, k, n, wait);
++	ret = __bch_bucket_alloc_set(c, reserve, k, wait);
+ 	mutex_unlock(&c->bucket_lock);
+ 	return ret;
+ }
+@@ -638,7 +633,7 @@ bool bch_alloc_sectors(struct cache_set *c,
+ 
+ 		spin_unlock(&c->data_bucket_lock);
+ 
+-		if (bch_bucket_alloc_set(c, watermark, &alloc.key, 1, wait))
++		if (bch_bucket_alloc_set(c, watermark, &alloc.key, wait))
+ 			return false;
+ 
+ 		spin_lock(&c->data_bucket_lock);
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 4fd03d2496d8..5ff6e9573935 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -994,9 +994,9 @@ void bch_bucket_free(struct cache_set *c, struct bkey *k);
+ 
+ long bch_bucket_alloc(struct cache *ca, unsigned int reserve, bool wait);
+ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
+-			   struct bkey *k, int n, bool wait);
++			   struct bkey *k, bool wait);
+ int bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
+-			 struct bkey *k, int n, bool wait);
++			 struct bkey *k, bool wait);
+ bool bch_alloc_sectors(struct cache_set *c, struct bkey *k,
+ 		       unsigned int sectors, unsigned int write_point,
+ 		       unsigned int write_prio, bool wait);
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 3d8bd0692af3..e2a719fed53b 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -1091,7 +1091,7 @@ struct btree *__bch_btree_node_alloc(struct cache_set *c, struct btree_op *op,
+ 
+ 	mutex_lock(&c->bucket_lock);
+ retry:
+-	if (__bch_bucket_alloc_set(c, RESERVE_BTREE, &k.key, 1, wait))
++	if (__bch_bucket_alloc_set(c, RESERVE_BTREE, &k.key, wait))
+ 		goto err;
+ 
+ 	bkey_put(c, &k.key);
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 748b08ab4f11..05c5a7e867bb 100644
+index 1bbdc410ee3c..7057ec48f3d1 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -350,16 +350,10 @@ void bcache_write_super(struct cache_set *c)
- 	down(&c->sb_write_mutex);
- 	closure_init(cl, &c->cl);
+@@ -486,7 +486,7 @@ static int __uuid_write(struct cache_set *c)
+ 	closure_init_stack(&cl);
+ 	lockdep_assert_held(&bch_register_lock);
  
--	c->sb.seq++;
-+	ca->sb.seq++;
+-	if (bch_bucket_alloc_set(c, RESERVE_BTREE, &k.key, 1, true))
++	if (bch_bucket_alloc_set(c, RESERVE_BTREE, &k.key, true))
+ 		return 1;
  
--	if (c->sb.version > version)
--		version = c->sb.version;
--
--	ca->sb.version		= version;
--	ca->sb.seq		= c->sb.seq;
--	ca->sb.last_mount	= c->sb.last_mount;
--
--	SET_CACHE_SYNC(&ca->sb, CACHE_SYNC(&c->sb));
-+	if (ca->sb.version < version)
-+		ca->sb.version = version;
- 
- 	bio_init(bio, ca->sb_bv, 1);
- 	bio_set_dev(bio, ca->bdev);
-@@ -1860,16 +1854,6 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 	bch_cache_accounting_init(&c->accounting, &c->cl);
- 
- 	memcpy(c->set_uuid, sb->set_uuid, 16);
--	c->sb.block_size	= sb->block_size;
--	c->sb.bucket_size	= sb->bucket_size;
--	c->sb.nr_in_set		= sb->nr_in_set;
--	c->sb.last_mount	= sb->last_mount;
--	c->sb.version		= sb->version;
--	if (c->sb.version >= BCACHE_SB_VERSION_CDEV_WITH_FEATURES) {
--		c->sb.feature_compat = sb->feature_compat;
--		c->sb.feature_ro_compat = sb->feature_ro_compat;
--		c->sb.feature_incompat = sb->feature_incompat;
--	}
- 
- 	c->bucket_bits		= ilog2(sb->bucket_size);
- 	c->block_bits		= ilog2(sb->block_size);
+ 	size =  meta_bucket_pages(&c->sb) * PAGE_SECTORS;
 -- 
 2.26.2
 
