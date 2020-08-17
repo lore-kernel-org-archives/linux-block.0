@@ -2,151 +2,141 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DAC1C433E3
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 20:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0CAEC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 21:47:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1AA702072D
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 20:03:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B1992072E
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 21:47:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aSZhdkNS"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FEP6Bdpk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729462AbgHQUDC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 16:03:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729450AbgHQUCW (ORCPT
+        id S1728721AbgHQVrP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 17:47:15 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:50016 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728689AbgHQVrM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 16:02:22 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41CD2C061345
-        for <linux-block@vger.kernel.org>; Mon, 17 Aug 2020 13:02:22 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id o5so8635096pgb.2
-        for <linux-block@vger.kernel.org>; Mon, 17 Aug 2020 13:02:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=97DJCt1f0pZE/lulXm7MIIWiJdssbmLKs4FWP+jsWew=;
-        b=aSZhdkNSZ87cEFa5bVOxaRgbLX85Ac+f9y0d86ayXObRrHbI44P6QsGc3j0vxCaOtG
-         T2k2WOgfibXFL7wthStQUZ2a3THDVNOGIm8YJURtA34YheOr2MAVAuh07KvbwkyanYJS
-         0EG510E/ggHXtfUb6SqMiyn275eeX4FnCQjVBA0Ynkest98IGBIFATGO7FCiNvsrRbkh
-         fmWOvmbqhkjk1q/XQS+NvaPIgrNKptwTVoidsz8P1vd8W5lrCq8X1NqQRsc/NszaPSZV
-         B+EkeoLweuq1QOusC/DDv9aQ54VFoeSpo/Y8VIPH3trT8rbQk4iBVBt328RQJCy4a+pu
-         mrUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=97DJCt1f0pZE/lulXm7MIIWiJdssbmLKs4FWP+jsWew=;
-        b=RdBFjck+ZjPejjJsnj0mVGTmQ6js+zkkoA+GaG1bU0KG/3OlYbCHi37sraki87lOld
-         guOo/T78y/Oikp7N0hDXMiZsv0EmUSknX+Xb7m0rUZ/BHF6hGgQBYUvpuSxZKqshR9Xp
-         aHKlSXiQ7w4gOlaEFbWxC1PxZn0NLoaj8e49/8BPbkbSxa6V5YF4rdWj+fkRKMxjXGXX
-         K+Nb+XsaiTXURtUlN/M9AcSlsaen4f/QwN2xpuSoPrP+JyF4Kv5Y+4ZB1tuw1epCMl/A
-         cR9MBloS7tzT87xZc3RI/BOLWYbM3i0D4kHX+uOah5uzbWfS8DfayMQHowPLqaST9xaK
-         Ulcw==
-X-Gm-Message-State: AOAM530KWNA5ryNd9OkpaVUETsa6J0yaXiAEr6kCPuomR9ZTCygnF4w/
-        MiNghsnC10M6VnVaIyFtyy13gA==
-X-Google-Smtp-Source: ABdhPJx6fgKnzdqFet7WfKg8Bw76iQ/G91m6PuMxHTNY08ReQtFVhesqdO2JpfqR2BskRMIqTcZ09Q==
-X-Received: by 2002:a63:d143:: with SMTP id c3mr10873272pgj.306.1597694541448;
-        Mon, 17 Aug 2020 13:02:21 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:bd62:5cef:d7f8:5bff? ([2605:e000:100e:8c61:bd62:5cef:d7f8:5bff])
-        by smtp.gmail.com with ESMTPSA id c27sm18199498pgn.86.2020.08.17.13.02.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Aug 2020 13:02:20 -0700 (PDT)
-Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Allen Pais <allen.cryptic@gmail.com>, jdike@addtoit.com,
-        richard@nod.at, anton.ivanov@cambridgegreys.com, 3chas3@gmail.com,
-        stefanr@s5r6.in-berlin.de, airlied@linux.ie, daniel@ffwll.ch,
-        sre@kernel.org, James.Bottomley@HansenPartnership.com,
-        kys@microsoft.com, deller@gmx.de, dmitry.torokhov@gmail.com,
-        jassisinghbrar@gmail.com, shawnguo@kernel.org,
-        s.hauer@pengutronix.de, maximlevitsky@gmail.com, oakad@yahoo.com,
-        ulf.hansson@linaro.org, mporter@kernel.crashing.org,
-        alex.bou9@gmail.com, broonie@kernel.org, martyn@welchs.me.uk,
-        manohar.vanga@gmail.com, mitch@sfgoth.com, davem@davemloft.net,
-        kuba@kernel.org, linux-um@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux1394-devel@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        Allen Pais <allen.lkml@gmail.com>,
-        Romain Perier <romain.perier@gmail.com>
-References: <20200817091617.28119-1-allen.cryptic@gmail.com>
- <20200817091617.28119-2-allen.cryptic@gmail.com>
- <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
- <202008171228.29E6B3BB@keescook>
- <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
- <202008171246.80287CDCA@keescook>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
-Date:   Mon, 17 Aug 2020 13:02:17 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <202008171246.80287CDCA@keescook>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 17 Aug 2020 17:47:12 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07HLgAfk037035;
+        Mon, 17 Aug 2020 21:47:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=eGF5gZpPSLrm1QOo1tikDPVxCmgxjscLD/IBq8LeXcw=;
+ b=FEP6Bdpkps3E4Oy6yn66ECHYPAW6WYrmhA4HreMMv6b3OSBu0VQbFqLq/CWzinbarH7Y
+ LOyY8fRnfRVM5DQmJ375bD+yebBTZW8XfxEA6CJmzdpGh3OJcDTUCooaqUovXa5b5+oo
+ OkOt22SbClqJFEFc2vTryyvEzRecIoe45LqlVaSlw+TQLDr3Kv+SJSRuP3CXPZ7n/pmR
+ 4LKfSnYA2ddoqKMhODo1U3damYs/wXE+8XCkbGGQUGKV8PfGWvwKg4el6xuaXcUy5bQS
+ 7SfdhNk5NQWYlJI0hBOqVici6x5rg7HdW46TQxG+YQPVV234c4eNXoVYEHLghIL0lbpI 3A== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 32x74r1e4h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 17 Aug 2020 21:47:01 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07HLi7w4093155;
+        Mon, 17 Aug 2020 21:47:01 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 32xs9m8h4e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Aug 2020 21:47:00 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07HLl0YW008209;
+        Mon, 17 Aug 2020 21:47:00 GMT
+Received: from rsrivast-us.us.oracle.com (/10.211.44.96)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 17 Aug 2020 14:46:59 -0700
+From:   Ritika Srivastava <ritika.srivastava@oracle.com>
+To:     linux-block@vger.kernel.org, hch@infradead.org
+Cc:     axboe@kernel.dk, ritika.srivastava@oracle.com
+Subject: [PATCH v3 2/2] block: better deal with the delayed not supported case in blk_cloned_rq_check_limits
+Date:   Mon, 17 Aug 2020 14:31:38 -0700
+Message-Id: <1597699898-21157-1-git-send-email-ritika.srivastava@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=999 suspectscore=0 malwarescore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008170147
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 mlxlogscore=999
+ priorityscore=1501 phishscore=0 spamscore=0 mlxscore=0 adultscore=0
+ suspectscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008170147
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/17/20 12:48 PM, Kees Cook wrote:
-> On Mon, Aug 17, 2020 at 12:44:34PM -0700, Jens Axboe wrote:
->> On 8/17/20 12:29 PM, Kees Cook wrote:
->>> On Mon, Aug 17, 2020 at 06:56:47AM -0700, Jens Axboe wrote:
->>>> On 8/17/20 2:15 AM, Allen Pais wrote:
->>>>> From: Allen Pais <allen.lkml@gmail.com>
->>>>>
->>>>> In preparation for unconditionally passing the
->>>>> struct tasklet_struct pointer to all tasklet
->>>>> callbacks, switch to using the new tasklet_setup()
->>>>> and from_tasklet() to pass the tasklet pointer explicitly.
->>>>
->>>> Who came up with the idea to add a macro 'from_tasklet' that is just
->>>> container_of? container_of in the code would be _much_ more readable,
->>>> and not leave anyone guessing wtf from_tasklet is doing.
->>>>
->>>> I'd fix that up now before everything else goes in...
->>>
->>> As I mentioned in the other thread, I think this makes things much more
->>> readable. It's the same thing that the timer_struct conversion did
->>> (added a container_of wrapper) to avoid the ever-repeating use of
->>> typeof(), long lines, etc.
->>
->> But then it should use a generic name, instead of each sub-system using
->> some random name that makes people look up exactly what it does. I'm not
->> huge fan of the container_of() redundancy, but adding private variants
->> of this doesn't seem like the best way forward. Let's have a generic
->> helper that does this, and use it everywhere.
-> 
-> I'm open to suggestions, but as things stand, these kinds of treewide
+If WRITE_ZERO/WRITE_SAME operation is not supported by the storage,
+blk_cloned_rq_check_limits() will return IO error which will cause
+device-mapper to fail the paths.
 
-On naming? Implementation is just as it stands, from_tasklet() is
-totally generic which is why I objected to it. from_member()? Not great
-with naming... But I can see this going further and then we'll suddenly
-have tons of these. It's not good for readability.
+Instead, if the queue limit is set to 0, return BLK_STS_NOTSUPP.
+BLK_STS_NOTSUPP will be ignored by device-mapper and will not fail the
+paths.
 
-> changes end up getting whole-release delays because of the need to have
-> the API in place for everyone before patches to do the changes can be
-> sent to multiple maintainers, etc.
+Suggested-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Ritika Srivastava <ritika.srivastava@oracle.com>
+---
+Changelog:
+v3: Formatting changes and subject updated from previous version
+    -block: return BLK_STS_NOTSUPP if operation is not supported
+v2: Document scenario and SCSI error encountered in a comment in
+    blk_cloned_rq_check_limits().
+---
+ block/blk-core.c | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
-Sure, that's always true of treewide changes like that.
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d241ab8..ea6eae5 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1223,10 +1223,21 @@ blk_qc_t submit_bio(struct bio *bio)
+ static blk_status_t blk_cloned_rq_check_limits(struct request_queue *q,
+ 				      struct request *rq)
+ {
+-	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
++	unsigned int max_sectors = blk_queue_get_max_sectors(q, req_op(rq));
++
++	if (blk_rq_sectors(rq) > max_sectors) {
++		/*
++		 * At least SCSI device does not have a good way to return if
++		 * Write Same/Zero is actually supported. To detect this, first
++		 * try to issue one and if it fails clear the max sectors value.
++		 * If this occurs on the lower device, the right error code
++		 * needs to be propagated to upper layers.
++		 */
++		if (max_sectors == 0)
++			return BLK_STS_NOTSUPP;
++
+ 		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
+-			__func__, blk_rq_sectors(rq),
+-			blk_queue_get_max_sectors(q, req_op(rq)));
++			__func__, blk_rq_sectors(rq), max_sectors);
+ 		return BLK_STS_IOERR;
+ 	}
+ 
+@@ -1253,8 +1264,11 @@ static blk_status_t blk_cloned_rq_check_limits(struct request_queue *q,
+  */
+ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *rq)
+ {
+-	if (blk_cloned_rq_check_limits(q, rq))
+-		return BLK_STS_IOERR;
++	blk_status_t ret;
++
++	ret = blk_cloned_rq_check_limits(q, rq);
++	if (ret != BLK_STS_OK)
++		return ret;
+ 
+ 	if (rq->rq_disk &&
+ 	    should_fail_request(&rq->rq_disk->part0, blk_rq_bytes(rq)))
 -- 
-Jens Axboe
+1.8.3.1
 
