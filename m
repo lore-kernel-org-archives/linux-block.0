@@ -2,151 +2,132 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 411F0C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 08:03:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41004C433E3
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 09:16:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 269FC20758
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 08:03:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EB012080D
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 09:16:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxWi/elP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbgHQIDG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 04:03:06 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2609 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726089AbgHQIC6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 04:02:58 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 69E37DA4AFECB53059E5;
-        Mon, 17 Aug 2020 09:02:55 +0100 (IST)
-Received: from [127.0.0.1] (10.47.8.102) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Mon, 17 Aug
- 2020 09:02:53 +0100
-Subject: Re: [PATCH RFC v7 12/12] hpsa: enable host_tagset and switch to MQ
-To:     <Don.Brace@microchip.com>, <hare@suse.de>,
-        <don.brace@microsemi.com>
-CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <kashyap.desai@broadcom.com>,
-        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
-        <shivasharan.srikanteshwara@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
-        <megaraidlinux.pdl@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-13-git-send-email-john.garry@huawei.com>
- <939891db-a584-1ff7-d6a0-3857e4257d3e@huawei.com>
- <3b3ead84-5d2f-dcf2-33d5-6aa12d5d9f7e@suse.de>
- <4319615a-220b-3629-3bf4-1e7fd2d27b92@huawei.com>
- <SN6PR11MB28489516D2F4E7631A921BD9E14D0@SN6PR11MB2848.namprd11.prod.outlook.com>
- <ccc119c8-4774-2603-fb79-e8c31a1476c6@huawei.com>
- <SN6PR11MB2848F0DD0CB3357541DBDAA9E14A0@SN6PR11MB2848.namprd11.prod.outlook.com>
- <013d4ba6-9173-e791-8e36-8393bde73588@huawei.com>
- <SN6PR11MB2848E10B3322C7186B82F1BCE1400@SN6PR11MB2848.namprd11.prod.outlook.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <6c5c4da7-9fd3-82b0-681f-c113e7fe85b8@huawei.com>
-Date:   Mon, 17 Aug 2020 09:00:35 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
-MIME-Version: 1.0
-In-Reply-To: <SN6PR11MB2848E10B3322C7186B82F1BCE1400@SN6PR11MB2848.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.8.102]
-X-ClientProxiedBy: lhreml744-chm.china.huawei.com (10.201.108.194) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+        id S1726530AbgHQJQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 05:16:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60788 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726297AbgHQJQl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Aug 2020 05:16:41 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D7BC061389;
+        Mon, 17 Aug 2020 02:16:41 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id bh1so7184409plb.12;
+        Mon, 17 Aug 2020 02:16:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=nYi1qCRVXukm3Vys4Ax0zzpvhrxgpQ9/OWRIEzi7jMM=;
+        b=mxWi/elPlQYhLXMLOAt36tJYQ+Hp1VAtd/uz+Kc8cIdiewSdg8n95X+KYxSdWGZJ1y
+         /1rHnM4HvYeEmKOOLXL2wTqM2vSxMsb9VJZkfdrjZ8c8pWQ4rrQImtoKQ977EHgQ+THx
+         Aa919IaWGz3+LC2CnAhGPcCnKZKjEcT2ftL3tbor1l7DdNN51bTmd6wf3G7Uglbn9gd3
+         IvO4ciTbor+qNIHbn5ZnArhfiWQHMjs284hcUdKxz9v7/11dHOTVFY1ki+iFopZAQ166
+         233J/wFqybY2SkuhDb0GHf7Xk3e7tw+qSNZabUjFckMBu8dhIwFr7uUw3BLLKtx0v0Fq
+         3HVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=nYi1qCRVXukm3Vys4Ax0zzpvhrxgpQ9/OWRIEzi7jMM=;
+        b=lrj+uJxdJpEIamwguU3hYqchl9pkUjOg1PwRFi/AX1gdgtnw6PlM/vtlnggvEKimYP
+         lJ+XZ3HSJghOSF5qDeN4B1ACqkEV5jMuhtK/mHWqv4P6mgHfX9DBGjLhpGTteNmGmqFI
+         LHNBD1g8VEsV0vSuz+t7SP73tlHY5zi3X0ddCrPuznKrAKxqpNCKkM1XUxyYV2SUJMfq
+         DXVn4hZCcHO0WOOKf/P46zAgxhEDWHUrIWpEqIbGF9c7U+fVv6v2YYAuNlQvXzZyfkoY
+         4Hurr4n7e/GkpPMPAKiyC72AYOfJ9OPxOAYLnHRS4qHCo2L2wrDsIlmAcPvxWiipKjkb
+         hCGQ==
+X-Gm-Message-State: AOAM531LIru3JgBdpugP33/3Phz8shnEq+JkBrHNCNfS7ygLLjVNKQtv
+        68OA9EMiliiZpLF+p4nKUlo=
+X-Google-Smtp-Source: ABdhPJx+wEvCOSvKZxezpdY6lLs7UvfZeX3QH5NUsgJeM5vKZGxtJnJRJpZ8+dEdqnJdMBLPa9KLfg==
+X-Received: by 2002:a17:902:8495:: with SMTP id c21mr10840498plo.82.1597655800670;
+        Mon, 17 Aug 2020 02:16:40 -0700 (PDT)
+Received: from localhost.localdomain ([49.207.202.98])
+        by smtp.gmail.com with ESMTPSA id r25sm15971028pgv.88.2020.08.17.02.16.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Aug 2020 02:16:39 -0700 (PDT)
+From:   Allen Pais <allen.cryptic@gmail.com>
+To:     jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
+        3chas3@gmail.com, axboe@kernel.dk, stefanr@s5r6.in-berlin.de,
+        airlied@linux.ie, daniel@ffwll.ch, sre@kernel.org,
+        James.Bottomley@HansenPartnership.com, kys@microsoft.com,
+        deller@gmx.de, dmitry.torokhov@gmail.com, jassisinghbrar@gmail.com,
+        shawnguo@kernel.org, s.hauer@pengutronix.de,
+        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
+        mporter@kernel.crashing.org, alex.bou9@gmail.com,
+        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
+        mitch@sfgoth.com, davem@davemloft.net, kuba@kernel.org
+Cc:     keescook@chromium.org, linux-um@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux1394-devel@lists.sourceforge.net,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        Allen Pais <allen.lkml@gmail.com>,
+        Romain Perier <romain.perier@gmail.com>
+Subject: [PATCH] arch: um: convert tasklets to use new tasklet_setup() API
+Date:   Mon, 17 Aug 2020 14:45:55 +0530
+Message-Id: <20200817091617.28119-1-allen.cryptic@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 14/08/2020 22:04, Don.Brace@microchip.com wrote:
+From: Allen Pais <allen.lkml@gmail.com>
 
-Hi Don,
+In preparation for unconditionally passing the
+struct tasklet_struct pointer to all tasklet
+callbacks, switch to using the new tasklet_setup()
+and from_tasklet() to pass the tasklet pointer explicitly.
 
-> I cloned your branch fromhttps://github.com/hisilicon/kernel-dev
->    and checkout branch: origin/private-topic-blk-mq-shared-tags-rfc-v7
-> 
-> By themselves, the branch compiled but the driver did not load.
-> 
-> I cherry-picked the following patches from Hannes:
->    git://git.kernel.org/pub/scm/linux/kernel/git/hare/scsi-devel.git
->    branch: reserved-tags.v6
-> 
-> 6a9d1a96ea41 hpsa: move hpsa_hba_inquiry after scsi_add_host()
-> eeb5cd1fca58 hpsa: use reserved commands
-> 	confict: removal of function hpsa_get_cmd_index,
->                 non-functional issue.
-> 7df7d8382902 hpsa: use scsi_host_busy_iter() to traverse outstanding commands
-> 485881d6d8dc hpsa: drop refcount field from CommandList
-> c4980ad5e5cb scsi: implement reserved command handling
-> 	conflict: drivers/scsi/scsi_lib.c
->                 minor context issue adding comment,
->                 non-functional issue.
-> 34d03fa945c0 scsi: add scsi_{get,put}_internal_cmd() helper
-> 	conflict: drivers/scsi/scsi_lib.c
->                 minor context issue around scsi_get_internal_cmd
->                 when adding new comment,
->                 non-functional issue
-> 4556e50450c8 block: add flag for internal commands
-> 138125f74b25 scsi: hpsa: Lift {BIG_,}IOCTL_Command_struct copy{in,out} into hpsa_ioctl()
-> cb17c1b69b17 scsi: hpsa: Don't bother with vmalloc for BIG_IOCTL_Command_struct
-> 10100ffd5f65 scsi: hpsa: Get rid of compat_alloc_user_space()
-> 06b43f968db5 scsi: hpsa: hpsa_ioctl(): Tidy up a bit
-> a381637f8a6e scsi: use real inquiry data when initialising devices
-> 6e9884aefe66 scsi: Use dummy inquiry data for the host device
-> 77dcb92c31ae scsi: revamp host device handling
-> 
-> After the above patches were applied, the driver loaded and I ran the following tests:
-> insmod/rmmod
-> reboot
-> Ran an I/O stress test consisting of:
-> 	6 SATA HBA disks
-> 	2 SAS HBA disks
-> 	2 RAID 5 volumes using 3 SAS HDDs
-> 	2 RAID 5 volumes using 3 SAS SSDs (ioaccel enabled)
-> 
-> 	1) fio tests to raw disks.
-> 	2) mke2fs tests
-> 	3) mount
-> 	4) fio to file systems
-> 	5) umount
-> 	6) fsck
-> 
-> 	And running reset tests in parallel to the above 6 tests using sg_reset
-> 
-> I ran some performance tests to HBA and LOGICAL VOLUMES and did not find a performance regression.
-> 
+Signed-off-by: Romain Perier <romain.perier@gmail.com>
+Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+---
+ arch/um/drivers/vector_kern.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-ok, thanks for this info. I appreciate it.
-
-> We are also reconsidering changing smartpqi over to use host tags but in some preliminary performance tests, I found a performance regression.
-> Note: I only used your V7 patches for smartpqi.
->        I have not had time to determine what is causing this, but wanted to make note of this.
-
-Thanks. Please note that we have been looking at many performances 
-improvements since v7, and these will be included in v8, so maybe I can 
-still include smartpqi in the v8 series and you can retest if you want.
-
-> 
-> For hpsa:
-> 
-> With all of the patches noted above,
-> Tested-by: Don Brace<don.brace@microsemi.com>
-> 
-> For hpsa specific patches:
-> Reviewed-by: Don Brace<don.brace@microsemi.com>
-
-Thanks. Please also note that I want to drop the RFC tag for v8 series, 
-so I will just have to note that we still depend on Hannes' work for 
-hpsa. We could also change the patch, but let's see how we go.
-
-Cheers,
-John
+diff --git a/arch/um/drivers/vector_kern.c b/arch/um/drivers/vector_kern.c
+index 8735c468230a..06980870ae23 100644
+--- a/arch/um/drivers/vector_kern.c
++++ b/arch/um/drivers/vector_kern.c
+@@ -1196,9 +1196,9 @@ static int vector_net_close(struct net_device *dev)
+ 
+ /* TX tasklet */
+ 
+-static void vector_tx_poll(unsigned long data)
++static void vector_tx_poll(struct tasklet_struct *t)
+ {
+-	struct vector_private *vp = (struct vector_private *)data;
++	struct vector_private *vp = from_tasklet(vp, t, tx_poll);
+ 
+ 	vp->estats.tx_kicks++;
+ 	vector_send(vp->tx_queue);
+@@ -1629,7 +1629,7 @@ static void vector_eth_configure(
+ 	});
+ 
+ 	dev->features = dev->hw_features = (NETIF_F_SG | NETIF_F_FRAGLIST);
+-	tasklet_init(&vp->tx_poll, vector_tx_poll, (unsigned long)vp);
++	tasklet_setup(&vp->tx_poll, vector_tx_poll);
+ 	INIT_WORK(&vp->reset_tx, vector_reset_tx);
+ 
+ 	timer_setup(&vp->tl, vector_timer_expire, 0);
+-- 
+2.17.1
 
