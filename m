@@ -2,122 +2,151 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DD7C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 07:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 411F0C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 08:03:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 313A620772
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 07:57:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eX/IqmDg"
+	by mail.kernel.org (Postfix) with ESMTP id 269FC20758
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 08:03:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726631AbgHQH5l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 03:57:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48182 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726287AbgHQH5k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 03:57:40 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C673C061388;
-        Mon, 17 Aug 2020 00:57:40 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id u128so7838406pfb.6;
-        Mon, 17 Aug 2020 00:57:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sgcMEmFz5a7sMCTpSzKDmtRdo2JPO50vEmzZ5iT3c5k=;
-        b=eX/IqmDgBKGkWhzJxWQru9Re5WUxDkYOOsxDFIY4SDAUKS+qA86iTJZZyjGKHfpDeM
-         Q1gQyQxKZXZq7ZnW/rMG2BbQ5eNZ1LmrifcBbG4wwgdbDTZWPBXO8tjhKF6YDhtR71dr
-         imypRoL2U9ri9esTtELWOWVSh28wV/JYzGam1CcNZHfpI0+DqO3pxOFXTc4uHQcAb0gF
-         69okLt6klykESSxmvVFW1KWlw3ON6FrLXN7xeKT4iaxLIHe5sMiX+P0+HbtrGlczRkQa
-         cwmUqgcMNbHSgwk7v1qCLQebZzoIJTtsoNmtq9r78fvh9imeuwgxR1PJynrU9N1Hf0s6
-         ew6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sgcMEmFz5a7sMCTpSzKDmtRdo2JPO50vEmzZ5iT3c5k=;
-        b=BDDlU2CA3ngfi1MUWUNQ9Z9YpDNOgyLFzOM1COajVhEA3Cxk9qGhxbhZY06ckxHlqH
-         jP92S6LNwmt0xJkJfc8z2/FfAZSvyVziDwrABHPJ+xMxNvrYQgAYc6OjfRDrfN5Zogs9
-         +Kib4tMuZiiNBMqbEQUvTTyRRHBUz0Bl67N6wU+Eq4cdS3RLkW9xaX4pz1Rv4DCIu2ax
-         iYi5RxEGhR7oEYE6bXowKYrrCEnJf8ahM3PPd8nZKlGJyw2aszcSMPz0s6Hrj4Dbf7t3
-         922DOM1fEk0b6l1soh0iC6M6DEuucLGSPVP+O6i7zQl6jLd2QWxIaEfE/esptIIX6Ivm
-         6CEw==
-X-Gm-Message-State: AOAM530p6SjiHVRjwOzMMVgClmyWPKPq6OPehyPCP0TrURralsQoL6FI
-        BcDehcUDzLk/jk13/ktqDhY=
-X-Google-Smtp-Source: ABdhPJxTKNYKpwRNVQy4HgazCr7RIuZmqPyOs2Iv08vRbbmKGVHfnwGU1eMmIpFh7U8yktusCBM3KQ==
-X-Received: by 2002:a63:4b21:: with SMTP id y33mr9312090pga.142.1597651059515;
-        Mon, 17 Aug 2020 00:57:39 -0700 (PDT)
-Received: from gmail.com ([103.105.152.86])
-        by smtp.gmail.com with ESMTPSA id r186sm19781628pfr.162.2020.08.17.00.57.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Aug 2020 00:57:38 -0700 (PDT)
-Date:   Mon, 17 Aug 2020 13:25:56 +0530
-From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Bjorn Helgaas <bjorn@helgaas.com>,
-        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: [PATCH v3 0/3] block: use generic power management
-Message-ID: <20200817075530.GF5869@gmail.com>
-References: <ea5881cdfd4d612193feed646ce89f253a36db69.camel@wdc.com>
- <20200722083335.50068-1-vaibhavgupta40@gmail.com>
+        id S1726718AbgHQIDG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 04:03:06 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2609 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726089AbgHQIC6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Aug 2020 04:02:58 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id 69E37DA4AFECB53059E5;
+        Mon, 17 Aug 2020 09:02:55 +0100 (IST)
+Received: from [127.0.0.1] (10.47.8.102) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Mon, 17 Aug
+ 2020 09:02:53 +0100
+Subject: Re: [PATCH RFC v7 12/12] hpsa: enable host_tagset and switch to MQ
+To:     <Don.Brace@microchip.com>, <hare@suse.de>,
+        <don.brace@microsemi.com>
+CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <kashyap.desai@broadcom.com>,
+        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
+        <shivasharan.srikanteshwara@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
+        <megaraidlinux.pdl@broadcom.com>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-13-git-send-email-john.garry@huawei.com>
+ <939891db-a584-1ff7-d6a0-3857e4257d3e@huawei.com>
+ <3b3ead84-5d2f-dcf2-33d5-6aa12d5d9f7e@suse.de>
+ <4319615a-220b-3629-3bf4-1e7fd2d27b92@huawei.com>
+ <SN6PR11MB28489516D2F4E7631A921BD9E14D0@SN6PR11MB2848.namprd11.prod.outlook.com>
+ <ccc119c8-4774-2603-fb79-e8c31a1476c6@huawei.com>
+ <SN6PR11MB2848F0DD0CB3357541DBDAA9E14A0@SN6PR11MB2848.namprd11.prod.outlook.com>
+ <013d4ba6-9173-e791-8e36-8393bde73588@huawei.com>
+ <SN6PR11MB2848E10B3322C7186B82F1BCE1400@SN6PR11MB2848.namprd11.prod.outlook.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <6c5c4da7-9fd3-82b0-681f-c113e7fe85b8@huawei.com>
+Date:   Mon, 17 Aug 2020 09:00:35 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200722083335.50068-1-vaibhavgupta40@gmail.com>
+In-Reply-To: <SN6PR11MB2848E10B3322C7186B82F1BCE1400@SN6PR11MB2848.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.8.102]
+X-ClientProxiedBy: lhreml744-chm.china.huawei.com (10.201.108.194) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 02:03:32PM +0530, Vaibhav Gupta wrote:
-> Linux Kernel Mentee: Remove Legacy Power Management.
+On 14/08/2020 22:04, Don.Brace@microchip.com wrote:
+
+Hi Don,
+
+> I cloned your branch fromhttps://github.com/hisilicon/kernel-dev
+>    and checkout branch: origin/private-topic-blk-mq-shared-tags-rfc-v7
 > 
-> The purpose of this patch series is to upgrade power management in block
-> drivers. This has been done by upgrading .suspend() and .resume() callbacks.
+> By themselves, the branch compiled but the driver did not load.
 > 
-> The upgrade makes sure that the involvement of PCI Core does not change the
-> order of operations executed in a driver. Thus, does not change its behavior.
+> I cherry-picked the following patches from Hannes:
+>    git://git.kernel.org/pub/scm/linux/kernel/git/hare/scsi-devel.git
+>    branch: reserved-tags.v6
 > 
-> In general, drivers with legacy PM, .suspend() and .resume() make use of PCI
-> helper functions like pci_enable/disable_device_mem(), pci_set_power_state(),
-> pci_save/restore_state(), pci_enable/disable_device(), etc. to complete
-> their job.
+> 6a9d1a96ea41 hpsa: move hpsa_hba_inquiry after scsi_add_host()
+> eeb5cd1fca58 hpsa: use reserved commands
+> 	confict: removal of function hpsa_get_cmd_index,
+>                 non-functional issue.
+> 7df7d8382902 hpsa: use scsi_host_busy_iter() to traverse outstanding commands
+> 485881d6d8dc hpsa: drop refcount field from CommandList
+> c4980ad5e5cb scsi: implement reserved command handling
+> 	conflict: drivers/scsi/scsi_lib.c
+>                 minor context issue adding comment,
+>                 non-functional issue.
+> 34d03fa945c0 scsi: add scsi_{get,put}_internal_cmd() helper
+> 	conflict: drivers/scsi/scsi_lib.c
+>                 minor context issue around scsi_get_internal_cmd
+>                 when adding new comment,
+>                 non-functional issue
+> 4556e50450c8 block: add flag for internal commands
+> 138125f74b25 scsi: hpsa: Lift {BIG_,}IOCTL_Command_struct copy{in,out} into hpsa_ioctl()
+> cb17c1b69b17 scsi: hpsa: Don't bother with vmalloc for BIG_IOCTL_Command_struct
+> 10100ffd5f65 scsi: hpsa: Get rid of compat_alloc_user_space()
+> 06b43f968db5 scsi: hpsa: hpsa_ioctl(): Tidy up a bit
+> a381637f8a6e scsi: use real inquiry data when initialising devices
+> 6e9884aefe66 scsi: Use dummy inquiry data for the host device
+> 77dcb92c31ae scsi: revamp host device handling
 > 
-> The conversion requires the removal of those function calls, change the
-> callbacks' definition accordingly and make use of dev_pm_ops structure.
+> After the above patches were applied, the driver loaded and I ran the following tests:
+> insmod/rmmod
+> reboot
+> Ran an I/O stress test consisting of:
+> 	6 SATA HBA disks
+> 	2 SAS HBA disks
+> 	2 RAID 5 volumes using 3 SAS HDDs
+> 	2 RAID 5 volumes using 3 SAS SSDs (ioaccel enabled)
 > 
-> All patches are compile-tested only.
+> 	1) fio tests to raw disks.
+> 	2) mke2fs tests
+> 	3) mount
+> 	4) fio to file systems
+> 	5) umount
+> 	6) fsck
 > 
-> Test tools:
->     - Compiler: gcc (GCC) 10.1.0
->     - allmodconfig build: make -j$(nproc) W=1 all
+> 	And running reset tests in parallel to the above 6 tests using sg_reset
 > 
-> v3: v2 needed some changes in commit messages.
+> I ran some performance tests to HBA and LOGICAL VOLUMES and did not find a performance regression.
 > 
-> Vaibhav Gupta (3):
->   mtip32xx: use generic power management
->   rsxx: use generic power management
->   skd: use generic power management
+
+ok, thanks for this info. I appreciate it.
+
+> We are also reconsidering changing smartpqi over to use host tags but in some preliminary performance tests, I found a performance regression.
+> Note: I only used your V7 patches for smartpqi.
+>        I have not had time to determine what is causing this, but wanted to make note of this.
+
+Thanks. Please note that we have been looking at many performances 
+improvements since v7, and these will be included in v8, so maybe I can 
+still include smartpqi in the v8 series and you can retest if you want.
+
 > 
->  drivers/block/mtip32xx/mtip32xx.c | 54 +++++++------------------------
->  drivers/block/rsxx/core.c         |  9 ++++--
->  drivers/block/skd_main.c          | 30 +++++------------
->  3 files changed, 27 insertions(+), 66 deletions(-)
+> For hpsa:
 > 
-> -- 
-> 2.27.0
+> With all of the patches noted above,
+> Tested-by: Don Brace<don.brace@microsemi.com>
 > 
+> For hpsa specific patches:
+> Reviewed-by: Don Brace<don.brace@microsemi.com>
+
+Thanks. Please also note that I want to drop the RFC tag for v8 series, 
+so I will just have to note that we still depend on Hannes' work for 
+hpsa. We could also change the patch, but let's see how we go.
+
+Cheers,
+John
+
