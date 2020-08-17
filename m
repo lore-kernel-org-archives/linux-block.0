@@ -7,161 +7,179 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C146C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 10:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30566C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 10:09:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2AE1C2072E
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 10:01:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04A432067C
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 10:09:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1wWfvwM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nl14v4L6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726685AbgHQKBn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 06:01:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60810 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726385AbgHQKBm (ORCPT
+        id S1727006AbgHQKJA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 06:09:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49566 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726275AbgHQKI7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 06:01:42 -0400
+        Mon, 17 Aug 2020 06:08:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597658500;
+        s=mimecast20190719; t=1597658938;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=uQGY4azWMVhl1A9JCsigR5rVMe2Y9DMoiPd6OCny0ew=;
-        b=a1wWfvwM02MxmlY4NwljynEnJLlaVnk4zuPeIHhWqpRW/ha01amJPbUMCScqBBb1/oEh7M
-        JqFOzsqcT+RIF+uMsESesHeWsfozGIyaKp155J8QekJcnR+2WW7jZ1ZFeB+XzHENOzdDnZ
-        iB69PNWh/sN9Td2iil/hNMSreciMzZA=
+        bh=N2yfmasZsglYb0iJRN9ghiYDlWrQBKKHcmazH1TjoVA=;
+        b=Nl14v4L645q5cr123I3Kfz9fbkphFqrSWSbJTS+73YloN5Y6JHJKEbGzfKj5lKZBwKEgvf
+        Dz3jZZ+RPi3lhDFDByPp7BVEhcr8AhSQcFCeZZjr788sOB7QVFUBLNI+2VSoE0t/mINnXb
+        mdTNzU900cU+21oa0XCM0RRvjYEhepA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-k9ljQkJGNZ2ANV9j71SA4w-1; Mon, 17 Aug 2020 06:01:38 -0400
-X-MC-Unique: k9ljQkJGNZ2ANV9j71SA4w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-486-XUl7ElA8PEuxSjtTM1m9Cg-1; Mon, 17 Aug 2020 06:08:54 -0400
+X-MC-Unique: XUl7ElA8PEuxSjtTM1m9Cg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 480F91019658;
-        Mon, 17 Aug 2020 10:01:36 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A901106B820;
+        Mon, 17 Aug 2020 10:08:52 +0000 (UTC)
 Received: from localhost (ovpn-13-146.pek2.redhat.com [10.72.13.146])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 81B995D9F3;
-        Mon, 17 Aug 2020 10:01:35 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4590F78414;
+        Mon, 17 Aug 2020 10:08:47 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Coly Li <colyli@suse.de>, Hannes Reinecke <hare@suse.com>,
-        Xiao Ni <xni@redhat.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Evan Green <evgreen@chromium.org>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-        Christoph Hellwig <hch@lst.de>, stable@vger.kernel.org
-Subject: [PATCH RESEND] block: loop: set discard granularity and alignment for block device backed loop
-Date:   Mon, 17 Aug 2020 18:01:30 +0800
-Message-Id: <20200817100130.2496059-1-ming.lei@redhat.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Long Li <longli@microsoft.com>,
+        John Garry <john.garry@huawei.com>, linux-block@vger.kernel.org
+Subject: [PATCH V4] scsi: core: only re-run queue in scsi_end_request() if device queue is busy
+Date:   Mon, 17 Aug 2020 18:08:40 +0800
+Message-Id: <20200817100840.2496976-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In case of block device backend, if the backend supports write zeros, the
-loop device will set queue flag of QUEUE_FLAG_DISCARD. However,
-limits.discard_granularity isn't setup, and this way is wrong,
-see the following description in Documentation/ABI/testing/sysfs-block:
+Now the request queue is run in scsi_end_request() unconditionally if both
+target queue and host queue is ready. We should have re-run request queue
+only after this device queue becomes busy for restarting this LUN only.
 
-	A discard_granularity of 0 means that the device does not support
-	discard functionality.
+Recently Long Li reported that cost of run queue may be very heavy in
+case of high queue depth. So improve this situation by only running
+the request queue when this LUN is busy.
 
-Especially 9b15d109a6b2 ("block: improve discard bio alignment in
-__blkdev_issue_discard()") starts to take q->limits.discard_granularity
-for computing max discard sectors. And zero discard granularity may cause
-kernel oops, or fail discard request even though the loop queue claims
-discard support via QUEUE_FLAG_DISCARD.
-
-Fix the issue by setup discard granularity and alignment.
-
-Fixes: c52abf563049 ("loop: Better discard support for block devices")
-Acked-by: Coly Li <colyli@suse.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Xiao Ni <xni@redhat.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Evan Green <evgreen@chromium.org>
-Cc: Gwendal Grignou <gwendal@chromium.org>
-Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: <stable@vger.kernel.org>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Long Li <longli@microsoft.com>
+Cc: John Garry <john.garry@huawei.com>
+Cc: linux-block@vger.kernel.org
+Reported-by: Long Li <longli@microsoft.com>
+Tested-by: Kashyap Desai <kashyap.desai@broadcom.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/loop.c | 33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+V4:
+	- fix one race reported by Kashyap, and simplify the implementation
+	a bit; also pass Kashyap's both function and performance test
+V3:
+	- add one smp_mb() in scsi_mq_get_budget() and comment
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 2f137d6ce169..3d7a1901bf28 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -878,6 +878,7 @@ static void loop_config_discard(struct loop_device *lo)
- 	struct file *file = lo->lo_backing_file;
- 	struct inode *inode = file->f_mapping->host;
- 	struct request_queue *q = lo->lo_queue;
-+	u32 granularity, max_discard_sectors;
- 
- 	/*
- 	 * If the backing device is a block device, mirror its zeroing
-@@ -890,11 +891,10 @@ static void loop_config_discard(struct loop_device *lo)
- 		struct request_queue *backingq;
- 
- 		backingq = bdev_get_queue(inode->i_bdev);
--		blk_queue_max_discard_sectors(q,
--			backingq->limits.max_write_zeroes_sectors);
- 
--		blk_queue_max_write_zeroes_sectors(q,
--			backingq->limits.max_write_zeroes_sectors);
-+		max_discard_sectors = backingq->limits.max_write_zeroes_sectors;
-+		granularity = backingq->limits.discard_granularity ?:
-+			queue_physical_block_size(backingq);
- 
- 	/*
- 	 * We use punch hole to reclaim the free space used by the
-@@ -903,23 +903,26 @@ static void loop_config_discard(struct loop_device *lo)
- 	 * useful information.
- 	 */
- 	} else if (!file->f_op->fallocate || lo->lo_encrypt_key_size) {
--		q->limits.discard_granularity = 0;
--		q->limits.discard_alignment = 0;
--		blk_queue_max_discard_sectors(q, 0);
--		blk_queue_max_write_zeroes_sectors(q, 0);
-+		max_discard_sectors = 0;
-+		granularity = 0;
- 
- 	} else {
--		q->limits.discard_granularity = inode->i_sb->s_blocksize;
--		q->limits.discard_alignment = 0;
--
--		blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
--		blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
-+		max_discard_sectors = UINT_MAX >> 9;
-+		granularity = inode->i_sb->s_blocksize;
- 	}
- 
--	if (q->limits.max_write_zeroes_sectors)
-+	if (max_discard_sectors) {
-+		q->limits.discard_granularity = granularity;
-+		blk_queue_max_discard_sectors(q, max_discard_sectors);
-+		blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
- 		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+V2:
+	- commit log change, no any code change
+	- add reported-by tag
+
+ drivers/scsi/scsi_lib.c    | 51 +++++++++++++++++++++++++++++++++++---
+ include/scsi/scsi_device.h |  1 +
+ 2 files changed, 49 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 7c6dd6f75190..a62c29058d26 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -551,8 +551,27 @@ static void scsi_run_queue_async(struct scsi_device *sdev)
+ 	if (scsi_target(sdev)->single_lun ||
+ 	    !list_empty(&sdev->host->starved_list))
+ 		kblockd_schedule_work(&sdev->requeue_work);
 -	else
-+	} else {
-+		q->limits.discard_granularity = 0;
-+		blk_queue_max_discard_sectors(q, 0);
-+		blk_queue_max_write_zeroes_sectors(q, 0);
- 		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
+-		blk_mq_run_hw_queues(sdev->request_queue, true);
++	else {
++		/*
++		 * smp_mb() implied in either rq->end_io or blk_mq_free_request
++		 * is for ordering writing .device_busy in scsi_device_unbusy()
++		 * and reading sdev->restarts.
++		 */
++		int old = atomic_read(&sdev->restarts);
++
++		if (old) {
++			/*
++			 * ->restarts has to be kept as non-zero if there is
++			 *  new budget contention comes.
++			 *
++			 *  No need to run queue when either another re-run
++			 *  queue wins in updating ->restarts or one new budget
++			 *  contention comes.
++			 */
++			if (atomic_cmpxchg(&sdev->restarts, old, 0) == old)
++				blk_mq_run_hw_queues(sdev->request_queue, true);
++		}
 +	}
-+	q->limits.discard_alignment = 0;
  }
  
- static void loop_unprepare_queue(struct loop_device *lo)
+ /* Returns false when no more bytes to process, true if there are more */
+@@ -1611,8 +1630,34 @@ static void scsi_mq_put_budget(struct request_queue *q)
+ static bool scsi_mq_get_budget(struct request_queue *q)
+ {
+ 	struct scsi_device *sdev = q->queuedata;
++	int ret = scsi_dev_queue_ready(q, sdev);
++
++	if (ret)
++		return true;
++
++	atomic_inc(&sdev->restarts);
+ 
+-	return scsi_dev_queue_ready(q, sdev);
++	/*
++	 * Order writing .restarts and reading .device_busy, and make sure
++	 * .restarts is visible to scsi_end_request(). Its pair is implied by
++	 * __blk_mq_end_request() in scsi_end_request() for ordering
++	 * writing .device_busy in scsi_device_unbusy() and reading .restarts.
++	 *
++	 */
++	smp_mb__after_atomic();
++
++	/*
++	 * If all in-flight requests originated from this LUN are completed
++	 * before setting .restarts, sdev->device_busy will be observed as
++	 * zero, then blk_mq_delay_run_hw_queues() will dispatch this request
++	 * soon. Otherwise, completion of one of these request will observe
++	 * the .restarts flag, and the request queue will be run for handling
++	 * this request, see scsi_end_request().
++	 */
++	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
++				!scsi_device_blocked(sdev)))
++		blk_mq_delay_run_hw_queues(sdev->request_queue, SCSI_QUEUE_DELAY);
++	return false;
+ }
+ 
+ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index bc5909033d13..1a5c9a3df6d6 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -109,6 +109,7 @@ struct scsi_device {
+ 	atomic_t device_busy;		/* commands actually active on LLDD */
+ 	atomic_t device_blocked;	/* Device returned QUEUE_FULL. */
+ 
++	atomic_t restarts;
+ 	spinlock_t list_lock;
+ 	struct list_head starved_entry;
+ 	unsigned short queue_depth;	/* How deep of a queue we want */
 -- 
 2.25.2
 
