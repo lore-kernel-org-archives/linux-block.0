@@ -2,52 +2,115 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 773E2C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A50BC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:22:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AF1A207DF
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:22:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64E342072D
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:22:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbgHQGW2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 02:22:28 -0400
-Received: from verein.lst.de ([213.95.11.211]:55170 "EHLO verein.lst.de"
+        id S1726267AbgHQGWb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 02:22:31 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45788 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726235AbgHQGW1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 02:22:27 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0D0A567357; Mon, 17 Aug 2020 08:22:25 +0200 (CEST)
-Date:   Mon, 17 Aug 2020 08:22:24 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Baolin Wang <baolin.wang@linux.alibaba.com>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de,
-        baolin.wang7@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND 2/5] block: Remove redundant
- blk_mq_sched_allow_merge() validation
-Message-ID: <20200817062224.GB12248@lst.de>
-References: <cover.1597637287.git.baolin.wang@linux.alibaba.com> <b9d51f4bc9f0ff4ec3b8fb7fa6dc366afd69290e.1597637287.git.baolin.wang@linux.alibaba.com>
+        id S1726385AbgHQGW3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Aug 2020 02:22:29 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id EA095AD5F;
+        Mon, 17 Aug 2020 06:22:52 +0000 (UTC)
+Subject: Re: [PATCH 09/14] bcache: avoid data copy between cache_set->sb and
+ cache->sb
+To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20200815041043.45116-1-colyli@suse.de>
+ <20200815041043.45116-10-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <041fed5e-f54f-d0eb-a5cc-2a52ded7b623@suse.de>
+Date:   Mon, 17 Aug 2020 08:22:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b9d51f4bc9f0ff4ec3b8fb7fa6dc366afd69290e.1597637287.git.baolin.wang@linux.alibaba.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200815041043.45116-10-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 17, 2020 at 12:09:16PM +0800, Baolin Wang wrote:
-> Only software queue and kyber IO scheduler will call blk_mq_bio_list_merge()
-> to merge a bio, and kyber IO scheduler did not implement the ops->allow_merge().
+On 8/15/20 6:10 AM, Coly Li wrote:
+> struct cache_sb embedded in struct cache_set is only partial used and
+> not a real copy from cache's in-memory super block. When removing the
+> embedded cache_set->sb, it is unncessary to copy data between these two
+> in-memory super blocks (cache_set->sb and cache->sb), it is sufficient
+> to just use cache->sb.
+> 
+> This patch removes the data copy between these two in-memory super
+> blocks in bch_cache_set_alloc() and bcache_write_super(). In future
+> except for set_uuid, cache's super block will be referenced by cache
+> set, no copy any more.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>   drivers/md/bcache/super.c | 22 +++-------------------
+>   1 file changed, 3 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 748b08ab4f11..05c5a7e867bb 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -350,16 +350,10 @@ void bcache_write_super(struct cache_set *c)
+>   	down(&c->sb_write_mutex);
+>   	closure_init(cl, &c->cl);
+>   
+> -	c->sb.seq++;
+> +	ca->sb.seq++;
+>   
+> -	if (c->sb.version > version)
+> -		version = c->sb.version;
+> -
+> -	ca->sb.version		= version;
+> -	ca->sb.seq		= c->sb.seq;
+> -	ca->sb.last_mount	= c->sb.last_mount;
+> -
+> -	SET_CACHE_SYNC(&ca->sb, CACHE_SYNC(&c->sb));
+> +	if (ca->sb.version < version)
+> +		ca->sb.version = version;
+>   
+>   	bio_init(bio, ca->sb_bv, 1);
+>   	bio_set_dev(bio, ca->bdev);
+> @@ -1860,16 +1854,6 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+>   	bch_cache_accounting_init(&c->accounting, &c->cl);
+>   
+>   	memcpy(c->set_uuid, sb->set_uuid, 16);
+> -	c->sb.block_size	= sb->block_size;
+> -	c->sb.bucket_size	= sb->bucket_size;
+> -	c->sb.nr_in_set		= sb->nr_in_set;
+> -	c->sb.last_mount	= sb->last_mount;
+> -	c->sb.version		= sb->version;
+> -	if (c->sb.version >= BCACHE_SB_VERSION_CDEV_WITH_FEATURES) {
+> -		c->sb.feature_compat = sb->feature_compat;
+> -		c->sb.feature_ro_compat = sb->feature_ro_compat;
+> -		c->sb.feature_incompat = sb->feature_incompat;
+> -	}
+>   
+>   	c->bucket_bits		= ilog2(sb->bucket_size);
+>   	c->block_bits		= ilog2(sb->block_size);
+> 
+Please fold it into patch 13, as then it's obvious why we don't need 
+this copy actions anymore.
 
-Please line wrap your changelogs after 73 characters.
+Cheers,
 
-> Thus we can remove the redundant blk_mq_sched_allow_merge() in
-> blk_mq_bio_list_merge() function.
-
-This seems potentially dangerous, and I don't think it really buys
-us much.
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
