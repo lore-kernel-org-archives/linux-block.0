@@ -2,82 +2,73 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A41ACC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 05:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D540BC433E4
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:09:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83430207DF
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 05:45:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEA0A20758
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:09:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbgHQFpm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 01:45:42 -0400
-Received: from verein.lst.de ([213.95.11.211]:55031 "EHLO verein.lst.de"
+        id S1726480AbgHQGIx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 02:08:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42350 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726303AbgHQFpm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 01:45:42 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 69E1767357; Mon, 17 Aug 2020 07:45:38 +0200 (CEST)
-Date:   Mon, 17 Aug 2020 07:45:38 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Cong Wang <xiyou.wangcong@gmail.com>
-Cc:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Vlastimil Babka <vbabka@suse.com>
-Subject: Re: [PATCH v5 1/3] net: introduce helper sendpage_ok() in
- include/linux/net.h
-Message-ID: <20200817054538.GA11705@lst.de>
-References: <20200816071518.6964-1-colyli@suse.de> <CAM_iQpUFtZdrhfUbuYYODNeSVqPOqx8mio6Znp6v3Q5iDZeyqg@mail.gmail.com>
+        id S1726314AbgHQGIu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Aug 2020 02:08:50 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 2425BAD7D;
+        Mon, 17 Aug 2020 06:09:13 +0000 (UTC)
+Subject: Re: [PATCH 01/14] bcache: remove 'int n' from parameter list of
+ bch_bucket_alloc_set()
+To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20200815041043.45116-1-colyli@suse.de>
+ <20200815041043.45116-2-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <30a805bb-d3d6-3501-0f01-0448849e3560@suse.de>
+Date:   Mon, 17 Aug 2020 08:08:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAM_iQpUFtZdrhfUbuYYODNeSVqPOqx8mio6Znp6v3Q5iDZeyqg@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200815041043.45116-2-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 16, 2020 at 10:55:09AM -0700, Cong Wang wrote:
-> On Sun, Aug 16, 2020 at 1:36 AM Coly Li <colyli@suse.de> wrote:
-> >
-> > The original problem was from nvme-over-tcp code, who mistakenly uses
-> > kernel_sendpage() to send pages allocated by __get_free_pages() without
-> > __GFP_COMP flag. Such pages don't have refcount (page_count is 0) on
-> > tail pages, sending them by kernel_sendpage() may trigger a kernel panic
-> > from a corrupted kernel heap, because these pages are incorrectly freed
-> > in network stack as page_count 0 pages.
-> >
-> > This patch introduces a helper sendpage_ok(), it returns true if the
-> > checking page,
-> > - is not slab page: PageSlab(page) is false.
-> > - has page refcount: page_count(page) is not zero
-> >
-> > All drivers who want to send page to remote end by kernel_sendpage()
-> > may use this helper to check whether the page is OK. If the helper does
-> > not return true, the driver should try other non sendpage method (e.g.
-> > sock_no_sendpage()) to handle the page.
+On 8/15/20 6:10 AM, Coly Li wrote:
+> The parameter 'int n' from bch_bucket_alloc_set() is not cleared
+> defined. From the code comments n is the number of buckets to alloc, but
+> from the code itself 'n' is the maximum cache to iterate. Indeed all the
+> locations where bch_bucket_alloc_set() is called, 'n' is alwasy 1.
 > 
-> Can we leave this helper to mm subsystem?
+> This patch removes the confused and unnecessary 'int n' from parameter
+> list of  bch_bucket_alloc_set(), and explicitly allocates only 1 bucket
+> for its caller.
 > 
-> I know it is for sendpage, but its implementation is all about some
-> mm details and its two callers do not belong to net subsystem either.
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>   drivers/md/bcache/alloc.c  | 35 +++++++++++++++--------------------
+>   drivers/md/bcache/bcache.h |  4 ++--
+>   drivers/md/bcache/btree.c  |  2 +-
+>   drivers/md/bcache/super.c  |  2 +-
+>   4 files changed, 19 insertions(+), 24 deletions(-)
 > 
-> Think this in another way: who would fix it if it is buggy? I bet mm people
-> should. ;)
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-No.  This is all about a really unusual imitation in sendpage, which
-is pretty much unexpected.  In fact the best thing would be to make
-sock_sendpage do the right thing and call sock_no_sendpage based
-on this condition, so that driver writers don't have to worry at all.
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
