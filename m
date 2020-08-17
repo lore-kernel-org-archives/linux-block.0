@@ -2,48 +2,75 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 439DFC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65AB6C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:36:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A0F6207DF
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:32:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 456AF20772
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:36:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbgHQGco (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 02:32:44 -0400
-Received: from verein.lst.de ([213.95.11.211]:55205 "EHLO verein.lst.de"
+        id S1726681AbgHQGgy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 02:36:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50190 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726703AbgHQGco (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 02:32:44 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 3436067357; Mon, 17 Aug 2020 08:32:42 +0200 (CEST)
-Date:   Mon, 17 Aug 2020 08:32:41 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Baolin Wang <baolin.wang@linux.alibaba.com>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de,
-        baolin.wang7@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND 5/5] block: Remove __blk_mq_sched_bio_merge()
- helper
-Message-ID: <20200817063241.GE12248@lst.de>
-References: <cover.1597637287.git.baolin.wang@linux.alibaba.com> <4ad0888df567a8bd75676b618ad87147c634d7b0.1597637287.git.baolin.wang@linux.alibaba.com>
+        id S1726308AbgHQGgy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Aug 2020 02:36:54 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 9DEE4ACB0;
+        Mon, 17 Aug 2020 06:37:17 +0000 (UTC)
+Subject: Re: [PATCH 14/14] bcache: move struct cache_sb out of uapi bcache.h
+To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20200815041043.45116-1-colyli@suse.de>
+ <20200815041043.45116-15-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <809bef2f-af92-1071-685d-6454fa93b50c@suse.de>
+Date:   Mon, 17 Aug 2020 08:36:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ad0888df567a8bd75676b618ad87147c634d7b0.1597637287.git.baolin.wang@linux.alibaba.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200815041043.45116-15-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 17, 2020 at 12:09:19PM +0800, Baolin Wang wrote:
-> The blk_mq_sched_bio_merge() just wrap the __blk_mq_sched_bio_merge(), and
-> no other places will use __blk_mq_sched_bio_merge(). Thus we can combine
-> these 2 similar functions into one function.
+On 8/15/20 6:10 AM, Coly Li wrote:
+> struct cache_sb does not exactly map to cache_sb_disk, it is only for
+> in-memory super block and dosn't belong to uapi bcache.h.
+> 
+> This patch moves the struct cache_sb definition and other depending
+> macros and inline routines from include/uapi/linux/bcache.h to
+> drivers/md/bcache/bcache.h, this is the proper location to have them.
+> 
+And that I'm not sure of.
+The 'uapi' directory is there to hold the user-visible kernel API.
+So the real question is whether the bcache superblock is or should be 
+part of the user API or not.
+Hence an alternative way would be to detail out the entire superblock in
+include/uapi/linux/bcache.h, and remove the definitions from
+drivers/md/bcache/bcache.h.
 
-I think the idea was to avoid the function call for the nomerges fast
-path.  Not sure if that is really worth it.
+There doesn't seem to be a consistent policy here; some things like MD 
+have their superblock in the uapi directory, others like btrfs only have 
+the ioctl definitions there.
+
+I'm somewhat in favour of having the superblock definition as part of 
+the uapi, as this would make writing external tools like blkid easier.
+But then the ultimate decision is yours.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
