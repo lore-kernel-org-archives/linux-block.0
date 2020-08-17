@@ -2,93 +2,145 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98074C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 982D3C433E3
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 07:10:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72D9A20772
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:42:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J9cbbCuf"
+	by mail.kernel.org (Postfix) with ESMTP id 799C72072D
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 07:10:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726203AbgHQGmo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 02:42:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36652 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726151AbgHQGmn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 02:42:43 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40CBDC061388;
-        Sun, 16 Aug 2020 23:42:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Zmke6G8N+PgZRa2aKdFidNd4uB0Pqzf1DiitvFCvCuU=; b=J9cbbCufoVG7GnQlnTllpVYRFS
-        xnmN/E/lQoGNfjD9gxwvGVqpakG0w5kIL4+L7m9ciriu4JH8W1ZxNu8ORCPASxnqWk/X1CMn2BvZ/
-        pWpASZXz2WRary7g+yGl0QziI8zpe11PoX/bMVoDZMd9VQosHhqr+Ntm/JT4hP7gueBY4LV+eVWD/
-        1kXjUoRxjnnEkt4zXiIJM+LW2KL+/0QknKChKKctHpzbYVKw5qygt2HLMKm993b6GOSEtmNV7c3Hm
-        arGX4g2yT+FKMZyCeBTGlIV0bRl/zfE2XDkY0H3DrQnj10BoNeL7nCQHgK6OZEz7H3SDC3Gfpvix7
-        DOc366mQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1k7Yqq-00061Q-I1; Mon, 17 Aug 2020 06:42:36 +0000
-Date:   Mon, 17 Aug 2020 07:42:36 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Xianting Tian <xianting_tian@126.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH] block: don't read block device if it's invalid
-Message-ID: <20200817064236.GA22917@infradead.org>
-References: <1597153386-87954-1-git-send-email-xianting_tian@126.com>
+        id S1726165AbgHQHKg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 03:10:36 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60420 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725765AbgHQHKf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Aug 2020 03:10:35 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 47228AD79;
+        Mon, 17 Aug 2020 07:10:58 +0000 (UTC)
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20200815041043.45116-1-colyli@suse.de>
+ <20200815041043.45116-15-colyli@suse.de>
+ <809bef2f-af92-1071-685d-6454fa93b50c@suse.de>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Subject: Re: [PATCH 14/14] bcache: move struct cache_sb out of uapi bcache.h
+Message-ID: <4b5fb2e9-5aae-f156-b680-645de54837e9@suse.de>
+Date:   Mon, 17 Aug 2020 15:10:29 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1597153386-87954-1-git-send-email-xianting_tian@126.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <809bef2f-af92-1071-685d-6454fa93b50c@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 11, 2020 at 09:43:06AM -0400, Xianting Tian wrote:
-> We found several processes in 'D' state after nvme device hot-removed,
-> The call trace as below, we can see process 848 got lock 'bdev->bd_mutex'
-> in blkdev_reread_part(), but scheduled out due to wait for IO done. But
-> the IO won't be completed as the device is hot-removed. Then it caused
-> the lock 'bdev->bd_mutex' can't be unlocked. As a result, it caused
-> other processes, which need to get the same lock 'bdev->bd_mutex',
-> blocked on this lock.
-> 
-> When nvme device hot-removed, kernel will start a thread to handle the
-> task of nvme device removing, as the call trace of process 1111504 shows
-> below. I listed the call trace of nvme_kill_queues() in detail as below,
-> we can see 'NVME_NS_DEAD' is set, then when executing
-> nvme_revalidate_disk(), it found 'NVME_NS_DEAD' is set and
-> 'set_capacity(disk, 0)' will be called to set disk capacity to 0.
->     nvme_kill_queues()
->         if (test_and_set_bit(NVME_NS_DEAD, &ns->flags)) return;
->             revalidate_disk(disk)
->                 disk->fops->revalidate_disk(disk) <=for nvme device, revalidate_disk=nvme_revalidate_disk()
->                      mutex_lock(&bdev->bd_mutex)
-> 
-> This patch is to reduce the probability of such problem. Before getting
-> the lock of 'bdev->bd_mutex' in blkdev_reread_part(), add the code to
-> check if the capacity of the disk is 0, just return. Then we can avoid
-> the happen of the issue:
-> nvme device is hot-removed, and its capacity is alreday set to 0; then
-> if there is process like 848 want to read the device, it will return
-> directly in blkdev_reread_part(), then it will not get the lock
-> "bdev->bd_mutex", which can't be unlocked by the process itself as IO
-> can't be completed.
+On 2020/8/17 14:36, Hannes Reinecke wrote:
+> On 8/15/20 6:10 AM, Coly Li wrote:
+>> struct cache_sb does not exactly map to cache_sb_disk, it is only for
+>> in-memory super block and dosn't belong to uapi bcache.h.
+>>
+>> This patch moves the struct cache_sb definition and other depending
+>> macros and inline routines from include/uapi/linux/bcache.h to
+>> drivers/md/bcache/bcache.h, this is the proper location to have them.
+>>
+> And that I'm not sure of.
+> The 'uapi' directory is there to hold the user-visible kernel API.
+> So the real question is whether the bcache superblock is or should be
+> part of the user API or not.
 
-We need to fix this for real, as you stated at best this reduces the
-window that the race can happen.
+Now the superblock structure divided into two formats,
+- struct cache_sb_disk
+  The exact structure representing on-disk bcache superblock and the
+format is visible and shared with user space tools.
+- struct cache_sb
+  This is in-memory super block only used internal bcache code. It is
+generated and converted from struct cache_sb_disk, but removed some
+unnecessary part for in-memory usage.
 
-I think our main problem is that due to bd_mutex we can't update the
-block device size from arbitrary context.  If we instead add an irqsave
-spinlock just for the size we'd get rid of the limitation and can stop
-papering over the problem.  Give m a little time to try to do that.
+This patch moves the in-memory version: struct cache_sb from the uapi
+header to bcache internal header.
+
+> Hence an alternative way would be to detail out the entire superblock in
+> include/uapi/linux/bcache.h, and remove the definitions from
+> drivers/md/bcache/bcache.h.
+> 
+
+It makes sense to, because the following flags operation indeed is
+related to on-disk format,
+BITMASK(CACHE_SYNC,			struct cache_sb, flags, 0, 1);
+BITMASK(CACHE_DISCARD,			struct cache_sb, flags, 1, 1);
+BITMASK(CACHE_REPLACEMENT,		struct cache_sb, flags, 2, 3);
+
+The suggestion to move struct cache_sb out of the uapi header was from
+hch, which makes sense too because struct cache_sb is not part of uapi
+anymore.
+
+> There doesn't seem to be a consistent policy here; some things like MD
+> have their superblock in the uapi directory, others like btrfs only have
+> the ioctl definitions there.
+> 
+> I'm somewhat in favour of having the superblock definition as part of
+> the uapi, as this would make writing external tools like blkid easier.
+> But then the ultimate decision is yours.
+
+Yes, struct cache_sb_disk is still in uapi hearder, which is 100%
+compatible with the original mixed used struct cache_sb. The "mixed
+used" means it was used for both on-disk and in-memory, and both for
+struct cache_set and struct cache, this is not good IMHO.
+
+Thanks.
+
+Coly Li
+
