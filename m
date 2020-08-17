@@ -2,136 +2,186 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3230AC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 17:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A85C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 18:12:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05A042063A
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 17:35:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7FF22072E
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 18:12:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HaRh2oAr"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NYpPA/AW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729191AbgHQRfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 13:35:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731270AbgHQQcL (ORCPT
+        id S2390477AbgHQSMB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 14:12:01 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:55672 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387727AbgHQSLL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 12:32:11 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A173CC061389;
-        Mon, 17 Aug 2020 09:32:11 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id y6so7795985plt.3;
-        Mon, 17 Aug 2020 09:32:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4fnadU0endxTJrjCWkn0d+ZnsZxebwsBLZgmqhdCClE=;
-        b=HaRh2oAr/28YRXyp84yPvdQicVYQLopK5fqSZzrMK8167NQCYsnWS0IAeeIR601FmP
-         AKxm8nQcKeQ+iEHW1mi1gxR98i9w0hf7EZDqd6RfBrzHhGrehFdH4Qg54g5ORPAdYNB4
-         O00OM9jbl6vZ5PNOZXuijgv3aUd2+4pJ3yGhWI79AmvS7F8EGjE9aEMIDmFh2ZNfbZoG
-         p4yFc4qkXFpmpwUVu/HCbZ2QSM13iWYyS/5YkWs5MwtIwo3BCz4TejvfqZIvPH+yUt2z
-         MiDNjH6bbTWpuap218pmPaZGgiqlhjlWewOQg+xRrEqnSR+pA3rKxvZAi4vZ/f7fKi5P
-         Y0NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4fnadU0endxTJrjCWkn0d+ZnsZxebwsBLZgmqhdCClE=;
-        b=b8DUAHlxkDkenfVOLaZvBXO5g+/0Px+DIWWPVcWg855/2MiO6a/mkq1k8lAfmPmkYz
-         XSyP3bKe0Kv3lPmex1H5ef0WV1FSmi34gh7eVSKrKnSfdBJ2nWDUG3h/PUnS7QTbSoRh
-         1kJIaL+sHXVHnq6zxZpgvl07jZqd5YGp8WiQK7txD/Qz8K+OXa7ghQpg74l+OR7X+Dfl
-         GpHTnYrt433yXje0a0mtz1key2izoOU3Gs3Q7vzDBIcWcU8tnhZAbzz7sezoBgP7tvkN
-         XziMfN69IYC7BX1YLPtY361ITQ3MKWSXjDYqYH1xTwlSsRdb5JDVNlqiTDWmeLioOhhr
-         wjEA==
-X-Gm-Message-State: AOAM533B6/lQZx1Qa4qhvY/ZDDQ5dIRXrOnuILCbc2jAOAAe6Kg1kSbs
-        2iJCJmGb6XNSgZ1biWLYzCw=
-X-Google-Smtp-Source: ABdhPJx255oCAELzmNoOA+p2uz0NUKmytYbiEfpuMZPjaXBxkgLgBp5HvrTzY6V7FkZkq74fXIf+Kg==
-X-Received: by 2002:a17:90a:7345:: with SMTP id j5mr12679271pjs.168.1597681931139;
-        Mon, 17 Aug 2020 09:32:11 -0700 (PDT)
-Received: from ast-mbp.dhcp.thefacebook.com ([2620:10d:c090:400::5:20fd])
-        by smtp.gmail.com with ESMTPSA id t25sm20140404pfe.51.2020.08.17.09.32.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Aug 2020 09:32:10 -0700 (PDT)
-Date:   Mon, 17 Aug 2020 09:32:07 -0700
-From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To:     Bob Liu <bob.liu@oracle.com>
-Cc:     Leah Rumancik <leah.rumancik@gmail.com>, bpf@vger.kernel.org,
-        linux-block@vger.kernel.org, orbekk@google.com,
-        harshads@google.com, jasiu@google.com, saranyamohan@google.com,
-        tytso@google.com, bvanassche@google.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
-Message-ID: <20200817163207.p53guehd7kpxfvat@ast-mbp.dhcp.thefacebook.com>
-References: <20200812163305.545447-1-leah.rumancik@gmail.com>
- <20200812163305.545447-2-leah.rumancik@gmail.com>
- <a0a97488-58c7-1f00-c987-d75e1329159c@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a0a97488-58c7-1f00-c987-d75e1329159c@oracle.com>
+        Mon, 17 Aug 2020 14:11:11 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07HI9D2e161164;
+        Mon, 17 Aug 2020 18:11:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2020-01-29; bh=FkaiITckFOKT6MU6hnK/XlAmoudcjeP+m8deiH8Cc44=;
+ b=NYpPA/AW48DHfwKh9ibBIVjRD59vN8vLw82MXT7DNp4CgKyRz7v5Zbo4Iz8jZoPJoyls
+ f5mnTOguojbH5uN56voTUY74zrjYOThchiKWDhxF8ETP2n+2F20dF9h5xKrlVfr+eC8x
+ XXE5Ms9nqRJwLERc6ay+GFO+9ciRcG9UBd1nTdKiqitXiIcQhgyJvSLIFL2SamrpQDxr
+ l7LtujIlyvx7bloSAm/cpEnhTkllctrF9/Og0nyFbmDoJUN5d/zZXdooGNMlcLj20yro
+ /pGpjryMVcIPWjMsjUAwNz0cssN3Rd2xGkiWIHf9f3w82L2a8RTRk2lqqn0gLRg0hofx qA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 32x7nm8dg3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 17 Aug 2020 18:11:02 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07HHm9AW054323;
+        Mon, 17 Aug 2020 18:11:02 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 32xsfqvt4e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Aug 2020 18:11:02 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07HIB0ON032363;
+        Mon, 17 Aug 2020 18:11:00 GMT
+Received: from dhcp-10-159-128-66.vpn.oracle.com (/10.159.128.66)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 17 Aug 2020 11:11:00 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.15\))
+Subject: Re: [PATCH v2 2/2] block: return BLK_STS_NOTSUPP if operation is not
+ supported
+From:   Ritika Srivastava <RITIKA.SRIVASTAVA@ORACLE.COM>
+In-Reply-To: <20200814063731.GA26356@infradead.org>
+Date:   Mon, 17 Aug 2020 11:10:59 -0700
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C538F917-C318-4006-B2F5-100F5BA206AC@ORACLE.COM>
+References: <1596062878-4238-1-git-send-email-ritika.srivastava@oracle.com>
+ <1596062878-4238-3-git-send-email-ritika.srivastava@oracle.com>
+ <20200814063731.GA26356@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+X-Mailer: Apple Mail (2.3445.104.15)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
+ spamscore=0 suspectscore=3 mlxscore=0 phishscore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008170128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 spamscore=0
+ impostorscore=0 priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008170128
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 17, 2020 at 10:18:47PM +0800, Bob Liu wrote:
-> > +
-> > +/* allows IO by default if no programs attached */
-> > +int io_filter_bpf_run(struct bio *bio)
-> > +{
-> > +	struct bpf_io_request io_req = {
-> > +		.sector_start = bio->bi_iter.bi_sector,
-> > +		.sector_cnt = bio_sectors(bio),
-> > +		.opf = bio->bi_opf,
-> > +	};
-> > +
-> > +	return BPF_PROG_RUN_ARRAY_CHECK(bio->bi_disk->progs, &io_req, BPF_PROG_RUN);
-> 
-> 
-> I think pass "struct bpf_io_request" is not enough, since we may want to do the filter based on
-> some special patterns against the io data.
-> 
-> I used to pass "page_to_virt(bio->bi_io_vec->bv_page)" into ebpf program..
+Hi Christoph,
 
-Bob,
+Thank you for the review.
 
-Just like other bpf uapi structs the bpf_io_request is extensible and
-such pointer can be added later, but I have a different question.
+> On Aug 13, 2020, at 11:37 PM, Christoph Hellwig <hch@infradead.org> =
+wrote:
+>=20
+> The concept looks fine, but some of the formatting especially in the
+> comments is strange.  Also we should not print the message for this
+> case, but just the real error.  Updated version with my suggestions
+> below.
 
-Leah,
+Your suggestions look good to me.
+I will include these changes in updated patch and send it for review.
 
-Do you really need the arguments to be stable?
-If so 'opf' above is not enough.
-sector_start, sector_cnt are clean from uapi pov,
-but 'opf' exposes kernel internals.
-The patch 2 is doing:
-+int protect_gpt(struct bpf_io_request *io_req)
-+{
-+       /* within GPT and not a read operation */
-+       if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
-+               return IO_BLOCK;
+>=20
+> Also don't you need a third patch that makes dm-multipath stop sending
+> Write Same/Zeroes command when this happens?
 
-The way ops are encoded changed quite a bit over the kernel releases.
-First it was REQ_WRITE, then REQ_OP_SHIFT, now REQ_OP_MASK.
-From kernel pov it would be simpler if bpf side didn't impose stability
-requriment on the program arguments. Then the kernel will be free to change
-REG_OP_READ into something else. The progs would break, of course, and would
-have to be adjusted. That's what we've been doing with tools like biosnoop.
-If you're ok with unstable arguments then you wouldn't need to introduce
-new prog type and this patch set.
-You can do this filtering already with should_fail_bio().
-bpf prog can attach to should_fail_bio() and walk all bio arguments
-in unstable way.
-Instead of:
-+       if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
-you'll write:
-  if (bio->bi_iter.bi_sector < GPT_SECTORS && (bio->bi_opf & REQ_OP_MASK) != REQ_OP_READ)
-It will also work on different kernels because libbpf can adjust field offsets and
-check for type matching via CO-RE facility.
-Will that work for you?
+blk-lib takes care of not sending any further Write Zero/Same in =
+blkdev_issue_zeroout().
+If max_write_zeroes_sectors is set to 0 later on, no more Write =
+Zero/Same will be sent.
+>=20
+> ---
+> =46rom c056b0523173f17cd3d8ca77a8cfca4e45fe8cb7 Mon Sep 17 00:00:00 =
+2001
+> From: Ritika Srivastava <ritika.srivastava@oracle.com>
+> Date: Wed, 29 Jul 2020 15:47:58 -0700
+> Subject: block: better deal with the delayed not supported case in
+> blk_cloned_rq_check_limits
+>=20
+> If WRITE_ZERO/WRITE_SAME operation is not supported by the storage,
+> blk_cloned_rq_check_limits() will return IO error which will cause
+> device-mapper to fail the paths.
+>=20
+> Instead, if the queue limit is set to 0, return BLK_STS_NOTSUPP.
+> BLK_STS_NOTSUPP will be ignored by device-mapper and will not fail the
+> paths.
+>=20
+> Suggested-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Signed-off-by: Ritika Srivastava <ritika.srivastava@oracle.com>
+> ---
+> block/blk-core.c | 24 +++++++++++++++++++-----
+> 1 file changed, 19 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index e04ee2c8da2e95..81b830c24b5b4f 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1296,10 +1296,21 @@ EXPORT_SYMBOL(submit_bio);
+> static blk_status_t blk_cloned_rq_check_limits(struct request_queue =
+*q,
+> 				      struct request *rq)
+> {
+> -	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, =
+req_op(rq))) {
+> +	unsigned int max_sectors =3D blk_queue_get_max_sectors(q, =
+req_op(rq));
+> +
+> +	if (blk_rq_sectors(rq) > max_sectors) {
+> +		/*
+> +		 * At least SCSI device do not have a good way to return =
+if
+> +		 * Write Same is actually supported.  So we first try to =
+issue
+> +		 * one and if it fails clear the max sectors value on =
+failure.
+> +		 * If this occurs onthe lower device we need to =
+propagate the
+> +		 * right error code up.
+> +		 */
+> +		if (max_sectors =3D=3D 0)
+> +			return BLK_STS_NOTSUPP;
+> +
+> 		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
+> -			__func__, blk_rq_sectors(rq),
+> -			blk_queue_get_max_sectors(q, req_op(rq)));
+> +			__func__, blk_rq_sectors(rq), max_sectors);
+> 		return BLK_STS_IOERR;
+> 	}
+>=20
+> @@ -1326,8 +1337,11 @@ static blk_status_t =
+blk_cloned_rq_check_limits(struct request_queue *q,
+>  */
+> blk_status_t blk_insert_cloned_request(struct request_queue *q, struct =
+request *rq)
+> {
+> -	if (blk_cloned_rq_check_limits(q, rq))
+> -		return BLK_STS_IOERR;
+> +	blk_status_t ret;
+> +
+> +	ret =3D blk_cloned_rq_check_limits(q, rq);
+> +	if (ret !=3D BLK_STS_OK)
+> +		return ret;
+>=20
+> 	if (rq->rq_disk &&
+> 	    should_fail_request(&rq->rq_disk->part0, blk_rq_bytes(rq)))
+> --=20
+> 2.28.0
+>=20
+
