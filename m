@@ -2,130 +2,118 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C46C433E3
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 19:12:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D39E6C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 19:31:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4ACF02072D
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 19:12:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BAE4E2065D
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 19:31:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvMzuAxS"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Il4/WYWW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389537AbgHQTMd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 15:12:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40464 "EHLO
+        id S1732133AbgHQTbS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 15:31:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730690AbgHQTM0 (ORCPT
+        with ESMTP id S2388419AbgHQT3y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 15:12:26 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C642FC061389;
-        Mon, 17 Aug 2020 12:12:25 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id q14so15501476ilj.8;
-        Mon, 17 Aug 2020 12:12:25 -0700 (PDT)
+        Mon, 17 Aug 2020 15:29:54 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB03FC061346
+        for <linux-block@vger.kernel.org>; Mon, 17 Aug 2020 12:29:49 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id g33so8583494pgb.4
+        for <linux-block@vger.kernel.org>; Mon, 17 Aug 2020 12:29:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NnKCBhQp2Gdr4n0TX2Bi3YpuER7JXpHBIDQP8R6n9AI=;
-        b=GvMzuAxS6elmKSXxwtmwDg4ZABKQ94RBoIywyhmFuxzOvYj70kocfV6jjnvsD6xJUG
-         TDoxSm0valHIzQ+TX5vr9M31BeFGUFSufYX4P6oEOMp0EM+3WgULq2SPTUHCgsOIRxuI
-         fDyMPGMz+v+4byLbGWFj/UVM5255nK7fua7CeNib7oKaPFCl1EXmMDRODEX3VnP75fLd
-         grnlAHLzvu/8yvLB6wGOmLG/dhoY8pJbKuZoJFz1OrzTsTTMBng+mF7Yb3wcndmk68im
-         uw4FgY0JdtfocFKOeNcsRmidTCINPH/bEXdOXIZv0ihpFzBXEJoD1Qtei9Vvrm3Cod6j
-         Eglg==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=IQEFM5eDrlk4uN0cUulgaoouXT3z+FbkNrUscxGEwfY=;
+        b=Il4/WYWWqFE/qAzOwm9kfMC9NOlA004aXkbH1fIy/V7R5qAIiigoyGwSXJeap5fGzZ
+         IAtDk7ThFw+I+uoN3iEBR0k7l7V4G8iWozOPbWwoF8xpj+feXJjxWDmDJxCbi3yVIIz4
+         DcKKycHMZ5M8iGH9xX6OxumCJ3bPk/sESXWCs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NnKCBhQp2Gdr4n0TX2Bi3YpuER7JXpHBIDQP8R6n9AI=;
-        b=VWAHb/g8D5UURwdhTs2KJ3iPt66p3RPHgiSwFuTRl6+q2LEhQVFLlqk1wuR66+8KpB
-         06KL1LRdLwwxwbyLcS8Ou/j4EhmIhrpPt6Qj+dgkNbhT05jBfmtgUqowKE05yA0CgLU1
-         UCA/QDq9ATyXYc/pL1wtA/58rqkilEA+iXOg6BJSk90xA9TS7ljmD44O+2twcekHMG/7
-         iMw4sjqJZx/IhPeWhXKdZrtwMg11nG/VliCxHK22Q3tyYSyiEj5DjVfIQZj5emz1VrEh
-         0Ru2u3M1v1Okae6XLll76NauQa0BlEjMfKiaf4rgBAjakw9WVBrrNoWP9EN88TRC+wYz
-         2FuQ==
-X-Gm-Message-State: AOAM532D8bjdrDJMSznm/TotFkZy+GZH+iJo0LZaFO2okhm+PrnkbpHB
-        YbwIYpQCjFEp8/zW6DfiDf1JiehC0Ps7T5Fv80c=
-X-Google-Smtp-Source: ABdhPJzXgU+DNHNKO8z9tSqkcxA+YPlJ5aCtnpEUqz2sSEapV34xuQepCaVuriNJ1z06vI0ZEuk2ZLoKyfGEp42KQIo=
-X-Received: by 2002:a05:6e02:5c7:: with SMTP id l7mr15394166ils.268.1597691543350;
- Mon, 17 Aug 2020 12:12:23 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=IQEFM5eDrlk4uN0cUulgaoouXT3z+FbkNrUscxGEwfY=;
+        b=g6IZXCBNDHdoeRpct1PzrlBWysg4l+DW6Byn4/VhmmJcCmd2YiSFBEctDa2qV3UhTk
+         /FHrQBuLse3Y1fcB29Ka8NkYy5k4XhgrwNPjYTHjnmwT8NQv5qP8fClvOh7S+c4JI/LE
+         Dozrf9uA/hjLi3+fDhdsdqh/d7SlfZNmLgHPrephUpoV4LpaaFI5fT7uiaaOgewLFDOd
+         FEq+Oxnaqut/1C6fHr7iEfnyZbNieoikHcWuqykm7hHmLqWkr0bpMcLhtPkAfaHhSqrP
+         2hbYLFvq2xRMjIGKQRMKCb7Of9JisN7K9iiG8t+bduRnskN9YagPxW6qznjgX5RXS2Cq
+         43gw==
+X-Gm-Message-State: AOAM532vRYAN58YSCjHi4mnmt2nt6/sIoywsafBAH2m22MQiMUGt8GCn
+        OSCY78OZNNx3j/hZN4ut0Tfaqw==
+X-Google-Smtp-Source: ABdhPJxcba+zdwEuQprcShXltivd2diUYpTiu6P3/hYoUspmLcf/BB1Tt2/E3lFjFEP7byFNgsURlA==
+X-Received: by 2002:a63:2e87:: with SMTP id u129mr11009060pgu.347.1597692589083;
+        Mon, 17 Aug 2020 12:29:49 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id h19sm18737765pjv.41.2020.08.17.12.29.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Aug 2020 12:29:47 -0700 (PDT)
+Date:   Mon, 17 Aug 2020 12:29:46 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Allen Pais <allen.cryptic@gmail.com>, jdike@addtoit.com,
+        richard@nod.at, anton.ivanov@cambridgegreys.com, 3chas3@gmail.com,
+        stefanr@s5r6.in-berlin.de, airlied@linux.ie, daniel@ffwll.ch,
+        sre@kernel.org, James.Bottomley@HansenPartnership.com,
+        kys@microsoft.com, deller@gmx.de, dmitry.torokhov@gmail.com,
+        jassisinghbrar@gmail.com, shawnguo@kernel.org,
+        s.hauer@pengutronix.de, maximlevitsky@gmail.com, oakad@yahoo.com,
+        ulf.hansson@linaro.org, mporter@kernel.crashing.org,
+        alex.bou9@gmail.com, broonie@kernel.org, martyn@welchs.me.uk,
+        manohar.vanga@gmail.com, mitch@sfgoth.com, davem@davemloft.net,
+        kuba@kernel.org, linux-um@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux1394-devel@lists.sourceforge.net,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        Allen Pais <allen.lkml@gmail.com>,
+        Romain Perier <romain.perier@gmail.com>
+Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
+Message-ID: <202008171228.29E6B3BB@keescook>
+References: <20200817091617.28119-1-allen.cryptic@gmail.com>
+ <20200817091617.28119-2-allen.cryptic@gmail.com>
+ <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
 MIME-Version: 1.0
-References: <20200816071518.6964-1-colyli@suse.de> <CAM_iQpUFtZdrhfUbuYYODNeSVqPOqx8mio6Znp6v3Q5iDZeyqg@mail.gmail.com>
- <20200817054538.GA11705@lst.de>
-In-Reply-To: <20200817054538.GA11705@lst.de>
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-Date:   Mon, 17 Aug 2020 12:12:12 -0700
-Message-ID: <CAM_iQpWnzm=cQZvZMcjKXez1L55tSVfWyadP3d0CUaT=D4nOhw@mail.gmail.com>
-Subject: Re: [PATCH v5 1/3] net: introduce helper sendpage_ok() in include/linux/net.h
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, Jan Kara <jack@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Vlastimil Babka <vbabka@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 16, 2020 at 10:45 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Sun, Aug 16, 2020 at 10:55:09AM -0700, Cong Wang wrote:
-> > On Sun, Aug 16, 2020 at 1:36 AM Coly Li <colyli@suse.de> wrote:
-> > >
-> > > The original problem was from nvme-over-tcp code, who mistakenly uses
-> > > kernel_sendpage() to send pages allocated by __get_free_pages() without
-> > > __GFP_COMP flag. Such pages don't have refcount (page_count is 0) on
-> > > tail pages, sending them by kernel_sendpage() may trigger a kernel panic
-> > > from a corrupted kernel heap, because these pages are incorrectly freed
-> > > in network stack as page_count 0 pages.
-> > >
-> > > This patch introduces a helper sendpage_ok(), it returns true if the
-> > > checking page,
-> > > - is not slab page: PageSlab(page) is false.
-> > > - has page refcount: page_count(page) is not zero
-> > >
-> > > All drivers who want to send page to remote end by kernel_sendpage()
-> > > may use this helper to check whether the page is OK. If the helper does
-> > > not return true, the driver should try other non sendpage method (e.g.
-> > > sock_no_sendpage()) to handle the page.
-> >
-> > Can we leave this helper to mm subsystem?
-> >
-> > I know it is for sendpage, but its implementation is all about some
-> > mm details and its two callers do not belong to net subsystem either.
-> >
-> > Think this in another way: who would fix it if it is buggy? I bet mm people
-> > should. ;)
->
-> No.  This is all about a really unusual imitation in sendpage, which
+On Mon, Aug 17, 2020 at 06:56:47AM -0700, Jens Axboe wrote:
+> On 8/17/20 2:15 AM, Allen Pais wrote:
+> > From: Allen Pais <allen.lkml@gmail.com>
+> > 
+> > In preparation for unconditionally passing the
+> > struct tasklet_struct pointer to all tasklet
+> > callbacks, switch to using the new tasklet_setup()
+> > and from_tasklet() to pass the tasklet pointer explicitly.
+> 
+> Who came up with the idea to add a macro 'from_tasklet' that is just
+> container_of? container_of in the code would be _much_ more readable,
+> and not leave anyone guessing wtf from_tasklet is doing.
+> 
+> I'd fix that up now before everything else goes in...
 
-So netdev people will have to understand and support PageSlab() or
-page_count()?
+As I mentioned in the other thread, I think this makes things much more
+readable. It's the same thing that the timer_struct conversion did
+(added a container_of wrapper) to avoid the ever-repeating use of
+typeof(), long lines, etc.
 
-If it is unusual even for mm people, how could netdev people suppose
-to understand this unusual mm bug? At least not any better.
-
-> is pretty much unexpected.  In fact the best thing would be to make
-> sock_sendpage do the right thing and call sock_no_sendpage based
-> on this condition, so that driver writers don't have to worry at all.
-
-Agreed, but kernel_sendpage() still relies on mm to provide a helper
-to make the decision and ensure this helper is always up-to-date.
-
-In short, it is all about ownership.
-
-Thanks.
+-- 
+Kees Cook
