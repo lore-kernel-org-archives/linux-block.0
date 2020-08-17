@@ -2,145 +2,94 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 982D3C433E3
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 07:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D128DC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 07:56:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 799C72072D
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 07:10:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B64D220772
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 07:56:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726165AbgHQHKg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 03:10:36 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60420 "EHLO mx2.suse.de"
+        id S1726265AbgHQH43 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 03:56:29 -0400
+Received: from mga18.intel.com ([134.134.136.126]:62698 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725765AbgHQHKf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 03:10:35 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 47228AD79;
-        Mon, 17 Aug 2020 07:10:58 +0000 (UTC)
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <20200815041043.45116-1-colyli@suse.de>
- <20200815041043.45116-15-colyli@suse.de>
- <809bef2f-af92-1071-685d-6454fa93b50c@suse.de>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Subject: Re: [PATCH 14/14] bcache: move struct cache_sb out of uapi bcache.h
-Message-ID: <4b5fb2e9-5aae-f156-b680-645de54837e9@suse.de>
-Date:   Mon, 17 Aug 2020 15:10:29 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1726089AbgHQH42 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Aug 2020 03:56:28 -0400
+IronPort-SDR: Q1kXtXqJdmQggvM2jQNZh21ddspQAT1gfb08JkKlFx3OLeowNxsuvsIosIYj9P6OXa9jRyHS5L
+ Ayg8HJ76EdVg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9715"; a="142279040"
+X-IronPort-AV: E=Sophos;i="5.76,322,1592895600"; 
+   d="scan'208";a="142279040"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 00:56:27 -0700
+IronPort-SDR: GIV0e/9tzlgXRX2LtHPbhmGQ2CMRs69Hd8rw2avnvcnBmzE/cTsA1VRPY2bJ74sbvq8ueoMHo+
+ 5+7zQN0U0KLg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,322,1592895600"; 
+   d="scan'208";a="440790871"
+Received: from lkp-server02.sh.intel.com (HELO 2f0d8b563e65) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 17 Aug 2020 00:56:25 -0700
+Received: from kbuild by 2f0d8b563e65 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1k7a0H-0000QX-Ax; Mon, 17 Aug 2020 07:56:25 +0000
+Date:   Mon, 17 Aug 2020 15:55:59 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>, axboe@kernel.dk
+Cc:     kbuild-all@lists.01.org, ming.lei@redhat.com, hch@lst.de,
+        baolin.wang@linux.alibaba.com, baolin.wang7@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] block: fix boolconv.cocci warnings
+Message-ID: <20200817075559.GA149398@7edacc24721b>
+References: <5b932aa51fc2b46c381d7b83d591a6ddbf05b199.1597637287.git.baolin.wang@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <809bef2f-af92-1071-685d-6454fa93b50c@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b932aa51fc2b46c381d7b83d591a6ddbf05b199.1597637287.git.baolin.wang@linux.alibaba.com>
+X-Patchwork-Hint: ignore
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/8/17 14:36, Hannes Reinecke wrote:
-> On 8/15/20 6:10 AM, Coly Li wrote:
->> struct cache_sb does not exactly map to cache_sb_disk, it is only for
->> in-memory super block and dosn't belong to uapi bcache.h.
->>
->> This patch moves the struct cache_sb definition and other depending
->> macros and inline routines from include/uapi/linux/bcache.h to
->> drivers/md/bcache/bcache.h, this is the proper location to have them.
->>
-> And that I'm not sure of.
-> The 'uapi' directory is there to hold the user-visible kernel API.
-> So the real question is whether the bcache superblock is or should be
-> part of the user API or not.
+From: kernel test robot <lkp@intel.com>
 
-Now the superblock structure divided into two formats,
-- struct cache_sb_disk
-  The exact structure representing on-disk bcache superblock and the
-format is visible and shared with user space tools.
-- struct cache_sb
-  This is in-memory super block only used internal bcache code. It is
-generated and converted from struct cache_sb_disk, but removed some
-unnecessary part for in-memory usage.
+block/blk-mq-sched.c:404:39-44: WARNING: conversion to bool not needed here
 
-This patch moves the in-memory version: struct cache_sb from the uapi
-header to bcache internal header.
+ Remove unneeded conversion to bool
 
-> Hence an alternative way would be to detail out the entire superblock in
-> include/uapi/linux/bcache.h, and remove the definitions from
-> drivers/md/bcache/bcache.h.
-> 
+Semantic patch information:
+ Relational and logical operators evaluate to bool,
+ explicit conversion is overly verbose and unneeded.
 
-It makes sense to, because the following flags operation indeed is
-related to on-disk format,
-BITMASK(CACHE_SYNC,			struct cache_sb, flags, 0, 1);
-BITMASK(CACHE_DISCARD,			struct cache_sb, flags, 1, 1);
-BITMASK(CACHE_REPLACEMENT,		struct cache_sb, flags, 2, 3);
+Generated by: scripts/coccinelle/misc/boolconv.cocci
 
-The suggestion to move struct cache_sb out of the uapi header was from
-hch, which makes sense too because struct cache_sb is not part of uapi
-anymore.
+CC: Baolin Wang <baolin.wang@linux.alibaba.com>
+Signed-off-by: kernel test robot <lkp@intel.com>
+---
 
-> There doesn't seem to be a consistent policy here; some things like MD
-> have their superblock in the uapi directory, others like btrfs only have
-> the ioctl definitions there.
-> 
-> I'm somewhat in favour of having the superblock definition as part of
-> the uapi, as this would make writing external tools like blkid easier.
-> But then the ultimate decision is yours.
+url:    https://github.com/0day-ci/linux/commits/Baolin-Wang/Some-clean-ups-for-bio-merge/20200817-121114
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
 
-Yes, struct cache_sb_disk is still in uapi hearder, which is 100%
-compatible with the original mixed used struct cache_sb. The "mixed
-used" means it was used for both on-disk and in-memory, and both for
-struct cache_set and struct cache, this is not good IMHO.
+Please take the patch only if it's a positive warning. Thanks!
 
-Thanks.
+ blk-mq-sched.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Coly Li
-
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -401,7 +401,7 @@ bool blk_mq_bio_list_merge(struct reques
+ 		if (merge == BIO_MERGE_NONE)
+ 			continue;
+ 
+-		return merge == BIO_MERGE_OK ? true: false;
++		return merge == BIO_MERGE_OK;
+ 	}
+ 
+ 	return false;
