@@ -2,137 +2,106 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D2BC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 09:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22445C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 09:53:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 731582072E
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 09:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDA3B20738
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 09:53:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cTZNXtt7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVdykIly"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728381AbgHQJUb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 05:20:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726161AbgHQJU3 (ORCPT
+        id S1726617AbgHQJxG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 05:53:06 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43770 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726575AbgHQJxF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 05:20:29 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12C91C061389;
-        Mon, 17 Aug 2020 02:20:29 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id x6so7813804pgx.12;
-        Mon, 17 Aug 2020 02:20:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=QhPrNAdoeJw7hjMh0pGw+sjN4I+tDKGZ699gTXbu9Pc=;
-        b=cTZNXtt7wNfV+e9cJ76fTsPPVQZeYJIEY2TuWXhYA+6rL5+mQtvGCpP7nLFEEHniIY
-         ttRYkgElaSdYzjheNY+aJq+wt2TbwHocg2rHezNcVM8LeXUN8gM2nT5FPn17bkKOZJ/R
-         FpcUeStKvy2IzIoPd11K1+w6c4p381QKwm4Dhy02AfZUx3SzHjBImZSC4gDgffWV6h+v
-         8YTTF/IpemIy0SQFRYOlz4ZDOq/9HJmYTUqHCVWY4C5ejhmLcUfPEpCe73ql4ONWBhLK
-         UZXD9rMiGnEuf0tCOKH/CAPFPO+ziHa24otJgykW+Fa09Aud/a6J7DqgcJ9+cKbuVreV
-         L6OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=QhPrNAdoeJw7hjMh0pGw+sjN4I+tDKGZ699gTXbu9Pc=;
-        b=BdQ4t8woOOOlewDc3FItD8QaSe8WAH2WZ/ysm1DYnHvOeaZcA3+uZS01deuOCtm5qM
-         9CmBeqGO6lGCm8/7TANqgYKChxYpFwr7ZdFdCjxsGVPFRce5FCLOW1p9ud8ONiHzUl4C
-         7t5xrUWdWPGcKrrt+P3RG6xJGwp44sxvI66K6kEqoPZigcg2raeta14ZS38OIgy3F6P/
-         J+iJgZ7nM2b3rTLgp/RNirCYOflpndZZkBHHwL7HZD6OE1Px1OX2Jsjk6hrC5/Yf0k7f
-         AQE3GWZ5yl2AhQfO42qHb8xSibQHRpwsGTs3ne2dp8i5Z+vTu0s3kZtnsmWIm8oxQ+h5
-         hPLw==
-X-Gm-Message-State: AOAM531agWFu0iPCQJ5AN76ECwqqZwx95+kBleCwticXVnspVn8DYdEp
-        FQBL7DwrCUQDwNimzKbLJwg=
-X-Google-Smtp-Source: ABdhPJzDyD/NrPXHKKUPdhhRODzrKgFhi3OcVBh0EqkEsk2AwP8x+cz/Kr8PlDriSCVb6p68quAdVw==
-X-Received: by 2002:a63:4545:: with SMTP id u5mr9191366pgk.229.1597656028627;
-        Mon, 17 Aug 2020 02:20:28 -0700 (PDT)
-Received: from localhost.localdomain ([49.207.202.98])
-        by smtp.gmail.com with ESMTPSA id r25sm15971028pgv.88.2020.08.17.02.20.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Aug 2020 02:20:28 -0700 (PDT)
-From:   Allen Pais <allen.cryptic@gmail.com>
-To:     jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
-        3chas3@gmail.com, axboe@kernel.dk, stefanr@s5r6.in-berlin.de,
-        airlied@linux.ie, daniel@ffwll.ch, sre@kernel.org,
-        James.Bottomley@HansenPartnership.com, kys@microsoft.com,
-        deller@gmx.de, dmitry.torokhov@gmail.com, jassisinghbrar@gmail.com,
-        shawnguo@kernel.org, s.hauer@pengutronix.de,
-        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
-        mporter@kernel.crashing.org, alex.bou9@gmail.com,
-        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
-        mitch@sfgoth.com, davem@davemloft.net, kuba@kernel.org
-Cc:     keescook@chromium.org, linux-um@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux1394-devel@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        Allen Pais <allen.lkml@gmail.com>,
-        Romain Perier <romain.perier@gmail.com>
-Subject: [PATCH] platform: goldfish: convert tasklets to use new tasklet_setup() API
-Date:   Mon, 17 Aug 2020 14:46:12 +0530
-Message-Id: <20200817091617.28119-18-allen.cryptic@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200817091617.28119-1-allen.cryptic@gmail.com>
-References: <20200817091617.28119-1-allen.cryptic@gmail.com>
+        Mon, 17 Aug 2020 05:53:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597657984;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=oh43CEo0ofGGR7FxCKF9mVraJ2WCgZRDWSz4ITdiYj4=;
+        b=TVdykIlyP9ZpS3/irGDJmEz/p9jghRifLQj7SbLeGunIA5yvrOkOy0F3zHbuuJC54Lvzt5
+        T+FNbR6kLwPfUW/8Bt0FAen5Ps9bu+/lXOXZPWBpb2YuYpPZKerXg0sC9/qqU5A4Gqe/Uf
+        U+pu16Jn4IvQ2VX12txHuq+zIMutS6A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-dWmsT77cPrmSTxAZKvEKLA-1; Mon, 17 Aug 2020 05:53:00 -0400
+X-MC-Unique: dWmsT77cPrmSTxAZKvEKLA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8702D81F00F;
+        Mon, 17 Aug 2020 09:52:59 +0000 (UTC)
+Received: from localhost (ovpn-13-146.pek2.redhat.com [10.72.13.146])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4D92E7A21D;
+        Mon, 17 Aug 2020 09:52:49 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Changpeng Liu <changpeng.liu@intel.com>,
+        Daniel Verkamp <dverkamp@chromium.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH V3 0/3] block: fix discard merge for single max discard segment
+Date:   Mon, 17 Aug 2020 17:52:38 +0800
+Message-Id: <20200817095241.2494763-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Allen Pais <allen.lkml@gmail.com>
+Hello,
 
-In preparation for unconditionally passing the
-struct tasklet_struct pointer to all tasklet
-callbacks, switch to using the new tasklet_setup()
-and from_tasklet() to pass the tasklet pointer explicitly.
+The 1st patch checks max discard segment limit in request merge code,
+and one discard request failure is fixed for virtio_blk.
 
-Signed-off-by: Romain Perier <romain.perier@gmail.com>
-Signed-off-by: Allen Pais <allen.lkml@gmail.com>
----
- drivers/platform/goldfish/goldfish_pipe.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+The 2nd patch fixes handling of single max discard segment for virtio_blk,
+and potential memory corruption is fixed.
 
-diff --git a/drivers/platform/goldfish/goldfish_pipe.c b/drivers/platform/goldfish/goldfish_pipe.c
-index 1ab207ec9c94..b9bead07760c 100644
---- a/drivers/platform/goldfish/goldfish_pipe.c
-+++ b/drivers/platform/goldfish/goldfish_pipe.c
-@@ -577,10 +577,10 @@ static struct goldfish_pipe *signalled_pipes_pop_front(
- 	return pipe;
- }
- 
--static void goldfish_interrupt_task(unsigned long dev_addr)
-+static void goldfish_interrupt_task(struct tasklet_struct *t)
- {
- 	/* Iterate over the signalled pipes and wake them one by one */
--	struct goldfish_pipe_dev *dev = (struct goldfish_pipe_dev *)dev_addr;
-+	struct goldfish_pipe_dev *dev = from_tasklet(dev, t, irq_tasklet);
- 	struct goldfish_pipe *pipe;
- 	int wakes;
- 
-@@ -811,8 +811,7 @@ static int goldfish_pipe_device_init(struct platform_device *pdev,
- {
- 	int err;
- 
--	tasklet_init(&dev->irq_tasklet, &goldfish_interrupt_task,
--		     (unsigned long)dev);
-+	tasklet_setup(&dev->irq_tasklet, &goldfish_interrupt_task);
- 
- 	err = devm_request_irq(&pdev->dev, dev->irq,
- 			       goldfish_pipe_interrupt,
+The 3rd patch renames the confusing blk_discard_mergable().
+
+The biggest problem is that virtio_blk handles discard request in
+multi-range style, however it(at least qemu) may claim that multi range
+discard isn't supported by returning 1 for max discard segment.
+
+V3:
+	- one patch style change in patch 1, as suggested by Christoph
+	- add reviewed-by tag
+
+V2:
+	- add comment
+	- warn on mismatched bios and discard segment number
+	- rename blk_discard_mergable
+
+
+Ming Lei (3):
+  block: respect queue limit of max discard segment
+  block: virtio_blk: fix handling single range discard request
+  block: rename blk_discard_mergable as blk_discard_support_multi_range
+
+ block/blk-merge.c          | 22 ++++++++++++++++------
+ drivers/block/virtio_blk.c | 31 +++++++++++++++++++++++--------
+ 2 files changed, 39 insertions(+), 14 deletions(-)
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Changpeng Liu <changpeng.liu@intel.com>
+Cc: Daniel Verkamp <dverkamp@chromium.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>
 -- 
-2.17.1
+2.25.2
 
