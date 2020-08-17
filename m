@@ -2,97 +2,52 @@ Return-Path: <SRS0=fuqo=B3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D5DC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 773E2C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:22:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 730EC207DF
-	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:19:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AF1A207DF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Aug 2020 06:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726662AbgHQGTV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 02:19:21 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45464 "EHLO mx2.suse.de"
+        id S1726443AbgHQGW2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 02:22:28 -0400
+Received: from verein.lst.de ([213.95.11.211]:55170 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726235AbgHQGTV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 02:19:21 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 461A1AD5F;
-        Mon, 17 Aug 2020 06:19:44 +0000 (UTC)
-Subject: Re: [PATCH 08/14] bcache: only use bucket_bytes() on struct cache
-To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20200815041043.45116-1-colyli@suse.de>
- <20200815041043.45116-9-colyli@suse.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <09593577-1bca-f1b4-91ee-7cbfccc451f9@suse.de>
-Date:   Mon, 17 Aug 2020 08:19:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726235AbgHQGW1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Aug 2020 02:22:27 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 0D0A567357; Mon, 17 Aug 2020 08:22:25 +0200 (CEST)
+Date:   Mon, 17 Aug 2020 08:22:24 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de,
+        baolin.wang7@gmail.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND 2/5] block: Remove redundant
+ blk_mq_sched_allow_merge() validation
+Message-ID: <20200817062224.GB12248@lst.de>
+References: <cover.1597637287.git.baolin.wang@linux.alibaba.com> <b9d51f4bc9f0ff4ec3b8fb7fa6dc366afd69290e.1597637287.git.baolin.wang@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <20200815041043.45116-9-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b9d51f4bc9f0ff4ec3b8fb7fa6dc366afd69290e.1597637287.git.baolin.wang@linux.alibaba.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/15/20 6:10 AM, Coly Li wrote:
-> Because struct cache_set and struct cache both have struct cache_sb,
-> macro bucket_bytes() currently are used on both of them. When removing
-> the embedded struct cache_sb from struct cache_set, this macro won't be
-> used on struct cache_set anymore.
-> 
-> This patch unifies all bucket_bytes() usage only on struct cache, this is
-> one of the preparation to remove the embedded struct cache_sb from
-> struct cache_set.
-> 
-> Signed-off-by: Coly Li <colyli@suse.de>
-> ---
->   drivers/md/bcache/bcache.h | 2 +-
->   drivers/md/bcache/sysfs.c  | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-> index 48a2585b6bbb..94d4baf4c405 100644
-> --- a/drivers/md/bcache/bcache.h
-> +++ b/drivers/md/bcache/bcache.h
-> @@ -757,7 +757,7 @@ struct bbio {
->   #define btree_default_blocks(c)						\
->   	((unsigned int) ((PAGE_SECTORS * (c)->btree_pages) >> (c)->block_bits))
->   
-> -#define bucket_bytes(c)		((c)->sb.bucket_size << 9)
-> +#define bucket_bytes(ca)	((ca)->sb.bucket_size << 9)
->   #define block_bytes(ca)		((ca)->sb.block_size << 9)
->   
->   static inline unsigned int meta_bucket_pages(struct cache_sb *sb)
-> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-> index b9f524ab5cc8..4bfe98faadcc 100644
-> --- a/drivers/md/bcache/sysfs.c
-> +++ b/drivers/md/bcache/sysfs.c
-> @@ -713,7 +713,7 @@ SHOW(__bch_cache_set)
->   
->   	sysfs_print(synchronous,		CACHE_SYNC(&c->sb));
->   	sysfs_print(journal_delay_ms,		c->journal_delay_ms);
-> -	sysfs_hprint(bucket_size,		bucket_bytes(c));
-> +	sysfs_hprint(bucket_size,		bucket_bytes(c->cache));
->   	sysfs_hprint(block_size,		block_bytes(c->cache));
->   	sysfs_print(tree_depth,			c->root->level);
->   	sysfs_print(root_usage_percent,		bch_root_usage(c));
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Mon, Aug 17, 2020 at 12:09:16PM +0800, Baolin Wang wrote:
+> Only software queue and kyber IO scheduler will call blk_mq_bio_list_merge()
+> to merge a bio, and kyber IO scheduler did not implement the ops->allow_merge().
 
-Cheers,
+Please line wrap your changelogs after 73 characters.
 
-Hannes
--- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+> Thus we can remove the redundant blk_mq_sched_allow_merge() in
+> blk_mq_bio_list_merge() function.
+
+This seems potentially dangerous, and I don't think it really buys
+us much.
