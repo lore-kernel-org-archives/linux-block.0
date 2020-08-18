@@ -2,113 +2,125 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC507C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 12:43:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D31C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 12:48:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABCB7206B5
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 12:43:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bVRBvpJp"
+	by mail.kernel.org (Postfix) with ESMTP id ECAB4207D3
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 12:48:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726483AbgHRMna (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 08:43:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35100 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726435AbgHRMn0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 08:43:26 -0400
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C5FFC061389;
-        Tue, 18 Aug 2020 05:43:26 -0700 (PDT)
-Received: by mail-qk1-x743.google.com with SMTP id i20so3812175qkk.8;
-        Tue, 18 Aug 2020 05:43:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Lkwb0MC1U017Rc+5srV075yc1RB+zhRumqNLjycHzv0=;
-        b=bVRBvpJp1Jn3uK4vw5rxeYNaki/0jZ+GS2lYPzzIV5OyXDx5QK7LCUwXDm4HV0NE6o
-         TiwR7qCy6OmPidfUP06gFR//msKvhh2t/wcJfhMYjQ5kikNkqq52A/MnK8bJjBQeHFeD
-         89hEQKRV/MGCerWOTPNYyNEOHFoiNZGXfFdooR7eKsrFi0G5RQUvq8W1TD6nsj8o1piV
-         MQCHcS8OwsPucbVPmnclJXx8urib9+VQgJA1bGQ8kRPPMEZ7NPjJoi2nZpLT0v2Vpx8w
-         qGP07cIEq7Mn1tV2MJi9qdwCMJPOvhrJvLpVvd0IwiiJ4xeqffik42fjpO5Qegcc+8CT
-         Z8UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Lkwb0MC1U017Rc+5srV075yc1RB+zhRumqNLjycHzv0=;
-        b=FxMqO/Kctj90Oif71RQzkcKzEfyu/WDku8fSgmJm/i2PwB+FKxStDpVIUmqdL0hUsu
-         1Qqc4NsB2yp6xZoM+JUJjtTgpWZy1QGGKcBPLzqTOUu/SzyImuiOWjvrIaPOGY2J1XbF
-         QpZWsNvjWWfuobi1VAFxAx0QnKA2XHHY9gLprid2cVad7W2RwiD3D2TMDuZi6UNPjHjp
-         NXq8oBaad5joIfGR/nb2xuFZJ2bHgVIVMyqtKFzxZrCKH5khUCoUlgQphMxoO1CFSiXv
-         BEQF9CSs8vrAf1rUMOuiQ1/Q7G0H6vX5TDLOCXkOxdgboPYzE4yENC6OzkoOmbgACcLV
-         nqfQ==
-X-Gm-Message-State: AOAM5316eAyVOarlNmw8bW7YyC9gtqq0AKc+b8AopjP1PBhdBFPOAuld
-        /VHNrQ7RAEZPD+bqW/+QqHMe54ej4SNNlZ20
-X-Google-Smtp-Source: ABdhPJzTrG9BNxDVZf15ZutpPQz8+OfOrVXp0M8eC/IHCYASQVuHRRYCad4iCp+6VqUxQdtC2GOPsg==
-X-Received: by 2002:a37:47cc:: with SMTP id u195mr16979523qka.39.1597754605328;
-        Tue, 18 Aug 2020 05:43:25 -0700 (PDT)
-Received: from [192.168.1.181] (pool-173-75-208-99.phlapa.fios.verizon.net. [173.75.208.99])
-        by smtp.gmail.com with ESMTPSA id y9sm21581828qka.0.2020.08.18.05.43.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Aug 2020 05:43:24 -0700 (PDT)
-Subject: Re: [PATCH] block: rnbd: rnbd-srv: silence uninitialized variable
- warning
-To:     Nathan Chancellor <natechancellor@gmail.com>
-Cc:     danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20200818040317.5926-1-brookebasile@gmail.com>
- <20200818052957.GA2253299@ubuntu-n2-xlarge-x86>
-From:   Brooke Basile <brookebasile@gmail.com>
-Message-ID: <2fd7f9c7-8558-0f81-6a8f-1366f1feb8a2@gmail.com>
-Date:   Tue, 18 Aug 2020 08:43:23 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726761AbgHRMr4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 08:47:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48308 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726635AbgHRMr4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Aug 2020 08:47:56 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 69CAAAD60;
+        Tue, 18 Aug 2020 12:48:19 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        netdev@vger.kernel.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Chris Leech <cleech@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Cong Wang <amwang@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Hannes Reinecke <hare@suse.de>,
+        Ilya Dryomov <idryomov@gmail.com>, Jan Kara <jack@suse.com>,
+        Jeff Layton <jlayton@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Lee Duncan <lduncan@suse.com>,
+        Mike Christie <michaelc@cs.wisc.edu>,
+        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Sagi Grimberg <sagi@grimberg.me>, stable@vger.kernel.org,
+        Vasily Averin <vvs@virtuozzo.com>,
+        Vlastimil Babka <vbabka@suse.com>
+Subject: [PATCH v6 0/6] Introduce sendpage_ok() to detect misused sendpage in network related drivers
+Date:   Tue, 18 Aug 2020 20:47:30 +0800
+Message-Id: <20200818124736.5790-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200818052957.GA2253299@ubuntu-n2-xlarge-x86>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/18/20 1:29 AM, Nathan Chancellor wrote:
-> I don't think this is a proper fix since the root cause of the warning
-> appears to be that we are ignoring the return value of
-> rnbd_bio_map_kern. Should we not set err to that value like this
-> (completely untested)?
-> 
-> Cheers,
-> Nathan
-> 
-> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-> index 0fb94843a495..1b71cb2a885d 100644
-> --- a/drivers/block/rnbd/rnbd-srv.c
-> +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -148,7 +148,8 @@ static int process_rdma(struct rtrs_srv *sess,
->   	/* Generate bio with pages pointing to the rdma buffer */
->   	bio = rnbd_bio_map_kern(data, sess_dev->rnbd_dev->ibd_bio_set, datalen, GFP_KERNEL);
->   	if (IS_ERR(bio)) {
-> -		rnbd_srv_err(sess_dev, "Failed to generate bio, err: %ld\n", PTR_ERR(bio));
-> +		err = PTR_ERR(bio);
-> +		rnbd_srv_err(sess_dev, "Failed to generate bio, err: %ld\n", err);
->   		goto sess_dev_put;
->   	}
->   
-> 
+This series was original by a bug fix in nvme-over-tcp driver which only
+checked whether a page was allocated from slab allcoator, but forgot to
+check its page_count: The page handled by sendpage should be neither a
+Slab page nor 0 page_count page.
 
-Ah, I see what you mean.  Thanks for the fix!
+As Sagi Grimberg suggested, the original fix is refind to a more common
+inline routine:
+    static inline bool sendpage_ok(struct page *page)
+    {
+    	return  (!PageSlab(page) && page_count(page) >= 1);
+    }
+If sendpage_ok() returns true, the checking page can be handled by the
+zero copy sendpage method in network layer.
 
-Best,
-Brooke Basile
+The first patch in this series introduces sendpage_ok() in header file
+include/linux/net.h, the second patch fixes the page checking issue in
+nvme-over-tcp driver, the third patch adds page_count check by using
+sendpage_ok() in do_tcp_sendpages() as Eric Dumazet suggested, and all
+rested patches just replace existing open coded checks with the inline
+sendpage_ok() routine.
+
+Coly Li
+
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc: Chris Leech <cleech@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Cong Wang <amwang@redhat.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Ilya Dryomov <idryomov@gmail.com>
+Cc: Jan Kara <jack@suse.com>
+Cc: Jeff Layton <jlayton@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Lee Duncan <lduncan@suse.com>
+Cc: Mike Christie <michaelc@cs.wisc.edu>
+Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: stable@vger.kernel.org
+Cc: Vasily Averin <vvs@virtuozzo.com>
+Cc: Vlastimil Babka <vbabka@suse.com>
+---
+Changelog:
+v6: fix page check in do_tcp_sendpages(), and replace other open coded
+    checks with sendpage_ok() in libceph, iscsi drivers.
+v5, include linux/mm.h in include/linux/net.h
+v4, change sendpage_ok() as an inline helper, and post it as
+    separate patch.
+v3, introduce a more common sendpage_ok()
+v2, fix typo in patch subject
+v1, the initial version.
+
+Coly Li (6):
+  net: introduce helper sendpage_ok() in include/linux/net.h
+  nvme-tcp: check page by sendpage_ok() before calling kernel_sendpage()
+  tcp: use sendpage_ok() to detect misused .sendpage
+  drbd: code cleanup by using sendpage_ok() to check page for
+    kernel_sendpage()
+  scsi: libiscsi: use sendpage_ok() in iscsi_tcp_segment_map()
+  libceph: use sendpage_ok() in ceph_tcp_sendpage()
+
+ drivers/block/drbd/drbd_main.c |  2 +-
+ drivers/nvme/host/tcp.c        |  7 +++----
+ drivers/scsi/libiscsi_tcp.c    |  2 +-
+ include/linux/net.h            | 16 ++++++++++++++++
+ net/ceph/messenger.c           |  2 +-
+ net/ipv4/tcp.c                 |  3 ++-
+ 6 files changed, 24 insertions(+), 8 deletions(-)
+
+-- 
+2.26.2
+
