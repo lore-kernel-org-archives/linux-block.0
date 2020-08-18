@@ -2,148 +2,130 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B59C433E3
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 12:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 376F7C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 13:13:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8D6720706
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 12:53:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="px6BOetx"
+	by mail.kernel.org (Postfix) with ESMTP id 0A8D42076D
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 13:13:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726611AbgHRMxs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 08:53:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726634AbgHRMxq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 08:53:46 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E922CC061342
-        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 05:53:45 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id ba10so15151253edb.3
-        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 05:53:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=references:user-agent:from:to:cc:subject:in-reply-to:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=ZNHqIo/o5PTzslTmWoWeSNX4Sf55a+mcEE0Ya1Wrqu4=;
-        b=px6BOetxPov2VXZZYWCIwmQJXRiJdu2zYyppgQ4NJ0GFSaVjXYbMaWUeRKZJzvjVVK
-         bQM1szrg0N5zIbrxv4Aw/tfY0Bd9U18IDyG1Znu7edZasCe6ou407EkE8OnjKZM1Z2oE
-         wDUJMG6BbOdP2OKwZ7roQlXrLaCTGu+IZFjqo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject
-         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-        bh=ZNHqIo/o5PTzslTmWoWeSNX4Sf55a+mcEE0Ya1Wrqu4=;
-        b=gJAXl6wsVcEEJ4bO9t0WqVS+G04BrHkxUq3P8MucN9ed+XFsUX+NrEzmuP/EYc2VH9
-         vj82Heb/3h3qNbMq9KTtd2natOPZfpNtlQhIgSA9ARzq/XpbR8bOXRcQhjlX0S7actm+
-         m3RiUT34JKP9t8IVdoMABZEtoAkI5Q6ats1Yloy/ixg8K6EaWz1lYIlMb+JPywuwTo+U
-         77F1OaXztjjrIqdRCbASOTa+xKyrcNOizNeY6il8XyD6xEW+dbVJ9Wy8X05E96eqQBzB
-         lZYsEdxB8p1y9ULiPaZwwAq+mqiTQOgYwwIyMa+kozsj4oGQR+wQjyMfTdkmuIQVXGbJ
-         XBeQ==
-X-Gm-Message-State: AOAM531LfmFsPRqJ5XFd7S6MhXPSU1VO7HrGaa01v4nDz+tFsNUutg4m
-        93lXPZtqc62Vxkbk6992yELOByZVooq+gA==
-X-Google-Smtp-Source: ABdhPJyIhdEd4dxx01MULiiDY53D0MAL/G49AynyKxTBCBWiwvdErSQptzndvDSyYLQHJa0lENC/1A==
-X-Received: by 2002:a05:6402:c81:: with SMTP id cm1mr19000313edb.256.1597755224405;
-        Tue, 18 Aug 2020 05:53:44 -0700 (PDT)
-Received: from cloudflare.com ([2a02:a310:c262:aa00:b35e:8938:2c2a:ba8b])
-        by smtp.gmail.com with ESMTPSA id j1sm15478983edq.58.2020.08.18.05.53.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Aug 2020 05:53:43 -0700 (PDT)
-References: <20200812163305.545447-1-leah.rumancik@gmail.com> <20200812163305.545447-2-leah.rumancik@gmail.com>
-User-agent: mu4e 1.1.0; emacs 26.3
-From:   Jakub Sitnicki <jakub@cloudflare.com>
-To:     Leah Rumancik <leah.rumancik@gmail.com>
-Cc:     bpf@vger.kernel.org, linux-block@vger.kernel.org,
-        orbekk@google.com, harshads@google.com, jasiu@google.com,
-        saranyamohan@google.com, tytso@google.com, bvanassche@google.com
-Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
-In-reply-to: <20200812163305.545447-2-leah.rumancik@gmail.com>
-Date:   Tue, 18 Aug 2020 14:53:42 +0200
-Message-ID: <87mu2sru7d.fsf@cloudflare.com>
+        id S1726593AbgHRNM5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 09:12:57 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33132 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726145AbgHRNM4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Aug 2020 09:12:56 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 5645DB178;
+        Tue, 18 Aug 2020 13:13:20 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        netdev@vger.kernel.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Chris Leech <cleech@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Cong Wang <amwang@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Ilya Dryomov <idryomov@gmail.com>, Jan Kara <jack@suse.com>,
+        Jeff Layton <jlayton@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Lee Duncan <lduncan@suse.com>,
+        Mike Christie <michaelc@cs.wisc.edu>,
+        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Vasily Averin <vvs@virtuozzo.com>,
+        Vlastimil Babka <vbabka@suse.com>
+Subject: [PATCH v7 0/6] Introduce sendpage_ok() to detect misused sendpage in network related drivers
+Date:   Tue, 18 Aug 2020 21:12:21 +0800
+Message-Id: <20200818131227.37020-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 12, 2020 at 06:33 PM CEST, Leah Rumancik wrote:
-> Introducing a new program type BPF_PROG_TYPE_IO_FILTER and a new
-> attach type BPF_BIO_SUBMIT.
->
-> This program type is intended to help filter and monitor IO requests.
->
-> Co-developed-by: Saranya Muruganandam <saranyamohan@google.com>
-> Signed-off-by: Saranya Muruganandam <saranyamohan@google.com>
-> Signed-off-by: Kjetil =C3=98rbekk <orbekk@google.com>
-> Signed-off-by: Harshad Shirwadkar <harshads@google.com>
-> Signed-off-by: Leah Rumancik <leah.rumancik@gmail.com>
-> ---
+This series was original by a bug fix in nvme-over-tcp driver which only
+checked whether a page was allocated from slab allcoator, but forgot to
+check its page_count: The page handled by sendpage should be neither a
+Slab page nor 0 page_count page.
 
-[...]
+As Sagi Grimberg suggested, the original fix is refind to a more common
+inline routine:
+    static inline bool sendpage_ok(struct page *page)
+    {
+        return  (!PageSlab(page) && page_count(page) >= 1);
+    }
+If sendpage_ok() returns true, the checking page can be handled by the
+zero copy sendpage method in network layer.
 
-> diff --git a/block/blk-bpf-io-filter.c b/block/blk-bpf-io-filter.c
-> new file mode 100644
-> index 000000000000..453d6b156bd2
-> --- /dev/null
-> +++ b/block/blk-bpf-io-filter.c
+The first patch in this series introduces sendpage_ok() in header file
+include/linux/net.h, the second patch fixes the page checking issue in
+nvme-over-tcp driver, the third patch adds page_count check by using
+sendpage_ok() in do_tcp_sendpages() as Eric Dumazet suggested, and all
+rested patches just replace existing open coded checks with the inline
+sendpage_ok() routine.
 
-[...]
+Coly Li
 
-> +int io_filter_prog_attach(const union bpf_attr *attr, struct bpf_prog *p=
-rog)
-> +{
-> +	struct gendisk *disk;
-> +	struct fd f;
-> +	struct bpf_prog_array *old_array;
-> +	struct bpf_prog_array *new_array;
-> +	int ret;
-> +
-> +	if (attr->attach_flags)
-> +		return -EINVAL;
-> +
-> +	f =3D fdget(attr->target_fd);
-            ^^^^^
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc: Chris Leech <cleech@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Cong Wang <amwang@redhat.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <eric.dumazet@gmail.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Ilya Dryomov <idryomov@gmail.com>
+Cc: Jan Kara <jack@suse.com>
+Cc: Jeff Layton <jlayton@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Lee Duncan <lduncan@suse.com>
+Cc: Mike Christie <michaelc@cs.wisc.edu>
+Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Vasily Averin <vvs@virtuozzo.com>
+Cc: Vlastimil Babka <vbabka@suse.com>
+---
+Changelog:
+v7: remove outer brackets from the return line of sendpage_ok() as
+    Eric Dumazet suggested.
+v6: fix page check in do_tcp_sendpages(), as Eric Dumazet suggested.
+    replace other open coded checks with sendpage_ok() in libceph,
+    iscsi drivers.
+v5, include linux/mm.h in include/linux/net.h
+v4, change sendpage_ok() as an inline helper, and post it as
+    separate patch, as Christoph Hellwig suggested.
+v3, introduce a more common sendpage_ok() as Sagi Grimberg suggested.
+v2, fix typo in patch subject
+v1, the initial version. 
 
-Missing corresponding fdput?
 
-As per Martin's suggestion, with bpf_link this will become the
-link_create callback, but the comment still stands.
+Coly Li (6):
+  net: introduce helper sendpage_ok() in include/linux/net.h
+  nvme-tcp: check page by sendpage_ok() before calling kernel_sendpage()
+  tcp: use sendpage_ok() to detect misused .sendpage
+  drbd: code cleanup by using sendpage_ok() to check page for
+    kernel_sendpage()
+  scsi: libiscsi: use sendpage_ok() in iscsi_tcp_segment_map()
+  libceph: use sendpage_ok() in ceph_tcp_sendpage()
 
-> +	if (!f.file)
-> +		return -EBADF;
-> +
-> +	disk =3D I_BDEV(f.file->f_mapping->host)->bd_disk;
-> +	if (disk =3D=3D NULL)
-> +		return -ENXIO;
-> +
-> +	ret =3D mutex_lock_interruptible(&disk->io_filter_lock);
-> +	if (ret)
-> +		return ret;
-> +
-> +	old_array =3D io_filter_rcu_dereference_progs(disk);
-> +	if (old_array && bpf_prog_array_length(old_array) >=3D BPF_MAX_PROGS) {
-> +		ret =3D -E2BIG;
-> +		goto unlock;
-> +	}
-> +
-> +	ret =3D bpf_prog_array_copy(old_array, NULL, prog, &new_array);
-> +	if (ret < 0)
-> +		goto unlock;
-> +
-> +	rcu_assign_pointer(disk->progs, new_array);
-> +	bpf_prog_array_free(old_array);
-> +
-> +unlock:
-> +	mutex_unlock(&disk->io_filter_lock);
-> +	return ret;
-> +}
+ drivers/block/drbd/drbd_main.c |  2 +-
+ drivers/nvme/host/tcp.c        |  7 +++----
+ drivers/scsi/libiscsi_tcp.c    |  2 +-
+ include/linux/net.h            | 16 ++++++++++++++++
+ net/ceph/messenger.c           |  2 +-
+ net/ipv4/tcp.c                 |  3 ++-
+ 6 files changed, 24 insertions(+), 8 deletions(-)
 
-[...]
+-- 
+2.26.2
+
