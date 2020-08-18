@@ -2,93 +2,81 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BE8C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 16:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE39C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 17:22:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DEBE207D3
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 16:45:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0AC372078B
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 17:22:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="um9u8CPW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vIKfUHvR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728247AbgHRQpG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 12:45:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45152 "EHLO
+        id S1728483AbgHRRWg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 13:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727061AbgHRQpC (ORCPT
+        with ESMTP id S1728180AbgHRRWe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 12:45:02 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F39FC061389
-        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 09:45:02 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id u10so9475056plr.7
-        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 09:45:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EYH9QFulwc1L9HM0/F/ZkVeSU+OyN7m9DTioie6aqBw=;
-        b=um9u8CPWT2vG3JzJ0O6YmmAwCf5SU9BaVzjyUdm9d5aXPxhYeyIThBfbfm7MOIKFst
-         2JaGKUkAewEX9C7agQwDPPHXupRyvdJElX4MejOjaJ1JCpNAy7doG5YRQhP1Nf9cSAIZ
-         Ar84YjQGI4IpBs3XRKLqC1q/i1jzpU/zmN646j73aT22pMNiIjeuAur03HPhWQg3sikO
-         dXOdQGxEw6+w4xRlkNtUqnckJvTa/d0OVhZHKoEw3Fk7G6P39ucDRSucGImAqdDcBXq0
-         8uyNG7iwvGLPPZT8rAaP7nJ1uiImiw68pLjlsRwRf3Q6TBP4CU+dxD7PY0j7B5GSwrrc
-         F7Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EYH9QFulwc1L9HM0/F/ZkVeSU+OyN7m9DTioie6aqBw=;
-        b=pw85NwY9w8atpP57xzCmDNpBEGo6Yq9Y7y/LVTNOsZ8wIZ5bYUz1RzE/1nWEBpPLvP
-         lNAWhM+AYk1R/nC9ZDBzZcitT+Lpz3vzVktIWDNhTn1Dc0Mw0R5bYAs69psx0rSUZRY5
-         JEp6pfM6Lmpt3pls/Z+W/1+GjSJ7+2PdJtdOHfnn3ha2SFuutbbDPqbhD0hpNtC2VZxV
-         rjVfrMjeiTFjbNO+FRFwJqC+m0I4MJDbvxr9XEovo6fKb2IjEALzuDQ+MbRRQF3ZnH68
-         zRj8Zw1tbN1/ULlW20MXZlmLcL7eQrb0O/+qmfB7M2OHXePZtHLn8AQiEvGOiX3fzGf5
-         CFbg==
-X-Gm-Message-State: AOAM531SqPhcwI9+J6p85g5dysvFHr/tYi6/RULeM+EjD0RmhBWQsG/P
-        7jJeoGKPNWQFYSGkLASFiftqYA==
-X-Google-Smtp-Source: ABdhPJyhHR9ulFLMzLG8a0aTSfejqMZzC2bFrA6G+Y0gxun8N+vMYLa9iHOvXPtVrn/j/pu4QAhieQ==
-X-Received: by 2002:a17:902:ed4a:: with SMTP id y10mr16088246plb.106.1597769102161;
-        Tue, 18 Aug 2020 09:45:02 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:9214:36a5:5cec:a06d? ([2605:e000:100e:8c61:9214:36a5:5cec:a06d])
-        by smtp.gmail.com with ESMTPSA id v78sm26545853pfc.121.2020.08.18.09.45.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Aug 2020 09:45:01 -0700 (PDT)
-Subject: Re: [PATCH] block: fix get_max_io_size()
-To:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org
-Cc:     Eric Deal <eric.deal@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>, stable@vger.kernel.org
-References: <20200806215837.3968445-1-kbusch@kernel.org>
- <20200818163932.GA2674385@dhcp-10-100-145-180.wdl.wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <edcaf8e7-c76f-6ed5-e0e8-080f8fbb7473@kernel.dk>
-Date:   Tue, 18 Aug 2020 09:44:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 18 Aug 2020 13:22:34 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA4F4C061389;
+        Tue, 18 Aug 2020 10:22:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=FmYiny6Y/5Pb9ex+9gFqdnDzd6qjJ/9YMPjKhe0IpLs=; b=vIKfUHvR8qR+mc1Y3Fjx/q0wdX
+        3YPNaWSCjfBBPPOIdcg+F8lKPTsWE3Gso7LDXqquj1HdackjHYKSUk4CxjagslhjORjr1Wvh+xkec
+        u6qSmQ7pSyFLtkDX80qBY4H9T46dn4TGzOY8JpOR0d5Rn9PdRTX9Qg4RpwrZVEJLFIBcmrY2SSMaz
+        Fjg239Kr8MnU0F/hBC0z0aTbcjJtXK+CitsJUz2IXSadkW72AVYIxChgdbxtlnxwTmSpieWjAPSDF
+        e58sdWyUQtfwWKpuDXXIc8hEZ4M8vdRe/pmyC8I16JuN9IJQB8vWVuHbDIf8ktfhw2hrlmY7eDQZb
+        2q12yXPg==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k85Jf-0004wk-68; Tue, 18 Aug 2020 17:22:32 +0000
+Date:   Tue, 18 Aug 2020 18:22:31 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Support for I/O to a bitbucket
+Message-ID: <20200818172231.GU17456@casper.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20200818163932.GA2674385@dhcp-10-100-145-180.wdl.wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/18/20 9:39 AM, Keith Busch wrote:
-> Hi Jens,
-> 
-> The proposed alternatives continue to break with allowable (however
-> unlikely) queue limits, where this should be safe for any possible
-> settings. I think this should be okay to go as-is.
+One of the annoying things in the iomap code is how we handle
+block-misaligned I/Os.  Consider a write to a file on a 4KiB block size
+filesystem (on a 4KiB page size kernel) which starts at byte offset 5000
+and is 4133 bytes long.
 
-OK, let's try this again then. Queued up for 5.9.
+Today, we allocate page 1 and read bytes 4096-8191 of the file into
+it, synchronously.  Then we allocate page 2 and read bytes 8192-12287
+into it, again, synchronously.  Then we copy the user's data into the
+pagecache and mark it dirty.  This is a fairly significant delay for
+the user who normally sees the latency of a memcpy() now has to wait
+for two non-overlapping reads to complete.
 
--- 
-Jens Axboe
+What I'd love to be able to do is allocate pages 1 & 2, copy the user
+data into it and submit one read which targets:
 
+0-903: page 1, offset 0, length 904
+904-5036: bitbucket, length 4133
+5037-8191: page 2, offset 942, length 3155
+
+That way, we don't even need to wait for the read to complete.
+
+I envisage block allocating a bitbucket page to support devices which
+don't have native support for bitbucket descriptors.  We'd also need a
+fallback path for devices which don't support whatever alignment the
+I/O is happening at ... but the block layer already has support for
+bounce-buffering, right?
+
+Anyway, I don't have time to take on this work, but I thought I'd throw
+it out in case anyone's looking for a project.  Or if it's a stupid idea,
+someone can point out why.
