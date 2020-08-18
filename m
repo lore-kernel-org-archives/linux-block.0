@@ -2,101 +2,71 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1C6C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 03:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A147AC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 03:29:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C319206DA
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 03:01:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ORCySYGc"
+	by mail.kernel.org (Postfix) with ESMTP id 82AFE207DE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 03:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726401AbgHRDBP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 23:01:15 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:51028 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726367AbgHRDBO (ORCPT
+        id S1726729AbgHRD3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 23:29:41 -0400
+Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:35293 "EHLO
+        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726429AbgHRD3k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 23:01:14 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07I2qLB3112294;
-        Tue, 18 Aug 2020 03:00:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=fYy/b+dVGKsTMt/VZa3tnk1hVc/HoA/MK3e+u3tVj+8=;
- b=ORCySYGc6efoM38ZKhPyUC7KvEbhObVu2SRdzPlEHrb2RXiZM0UrKkZkxt8oeCXDYbps
- 9PAfX1z6Izs167hzbCbkBWKWjp64bJEovUMHQC54anQgVr6SNtekC/1/P5lnWFkc/x6z
- y4rBrwtK12+zb08Q+f/CFPCQIS35yAsURsritGs5pf4jq3ys5U0k633nSfp65pW3ZMGQ
- hQiHDRpHBbiGz/Ey5kr9wFCI+RW9YEaZP/mvLOJVQA3I0SVZaIMlowqaGnpflh/HJWgp
- /Hpxvl6wN/j/Y8EaJMwhARj+SxSYLD++PQbPFrlMl5+ZB54shSqUpfS7aJFiDfF8etOu 6g== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 32x74r26am-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 18 Aug 2020 03:00:56 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07I2wsrW114873;
-        Tue, 18 Aug 2020 03:00:56 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 32xsmwnwrg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Aug 2020 03:00:56 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07I30oHt014497;
-        Tue, 18 Aug 2020 03:00:50 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 17 Aug 2020 20:00:49 -0700
+        Mon, 17 Aug 2020 23:29:40 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07488;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0U66bqht_1597721377;
+Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0U66bqht_1597721377)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 18 Aug 2020 11:29:37 +0800
+Date:   Tue, 18 Aug 2020 11:29:37 +0800
+From:   Baolin Wang <baolin.wang@linux.alibaba.com>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Hannes Reinecke <hare@suse.com>, Xiao Ni <xni@redhat.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Evan Green <evgreen@chromium.org>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH RESEND] block: loop: set discard granularity and
- alignment for block device backed loop
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq14kp0d5fh.fsf@ca-mkp.ca.oracle.com>
-References: <20200817100130.2496059-1-ming.lei@redhat.com>
-        <20200817101718.GC25336@lst.de>
-Date:   Mon, 17 Aug 2020 23:00:46 -0400
-In-Reply-To: <20200817101718.GC25336@lst.de> (Christoph Hellwig's message of
-        "Mon, 17 Aug 2020 12:17:18 +0200")
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, baolin.wang7@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND 5/5] block: Remove __blk_mq_sched_bio_merge()
+ helper
+Message-ID: <20200818032937.GA46480@VM20190228-100.tbsite.net>
+Reply-To: Baolin Wang <baolin.wang@linux.alibaba.com>
+References: <cover.1597637287.git.baolin.wang@linux.alibaba.com>
+ <4ad0888df567a8bd75676b618ad87147c634d7b0.1597637287.git.baolin.wang@linux.alibaba.com>
+ <20200817063241.GE12248@lst.de>
+ <20200817121408.GD79836@VM20190228-100.tbsite.net>
+ <20200817122608.GB2213@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 bulkscore=0
- mlxlogscore=901 phishscore=0 mlxscore=0 suspectscore=1 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008180021
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 mlxlogscore=902
- priorityscore=1501 phishscore=0 spamscore=0 mlxscore=0 adultscore=0
- suspectscore=1 lowpriorityscore=0 bulkscore=0 malwarescore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008180020
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200817122608.GB2213@lst.de>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Aug 17, 2020 at 02:26:08PM +0200, Christoph Hellwig wrote:
+> On Mon, Aug 17, 2020 at 08:14:08PM +0800, Baolin Wang wrote:
+> > On Mon, Aug 17, 2020 at 08:32:41AM +0200, Christoph Hellwig wrote:
+> > > On Mon, Aug 17, 2020 at 12:09:19PM +0800, Baolin Wang wrote:
+> > > > The blk_mq_sched_bio_merge() just wrap the __blk_mq_sched_bio_merge(), and
+> > > > no other places will use __blk_mq_sched_bio_merge(). Thus we can combine
+> > > > these 2 similar functions into one function.
+> > > 
+> > > I think the idea was to avoid the function call for the nomerges fast
+> > > path.  Not sure if that is really worth it.
+> > 
+> > Um, no places will use __blk_mq_sched_bio_merge(), not sure if it is a
+> > good choice we still keep an unused and similar function?
+> 
+> Well, blk_mq_sched_bio_merge calls __blk_mq_sched_bio_merge, after
+> performing two fast path checks.
 
-Christoph,
+What I mean is blk_mq_sched_bio_merge() just wrap the
+__blk_mq_sched_bio_merge(), and no other users will call
+__blk_mq_sched_bio_merge(). Anyway, I will drop this patch
+as you suggested.
 
-> If you have a few spare cycles, can you kill QUEUE_FLAG_DISCARD and
-> just key off discard support based on checking discard_granularity to
-> avoid problems like this in the future?
-
-Yes, that would be great!
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
