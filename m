@@ -2,176 +2,144 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 372A4C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 08:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16CF4C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 08:35:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14869206B5
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 08:21:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4AFE2067C
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 08:35:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbgHRIV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 04:21:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37892 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726043AbgHRIV0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 04:21:26 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id BD9CEAD9A;
-        Tue, 18 Aug 2020 08:21:49 +0000 (UTC)
-Subject: Re: [PATCH v5 1/3] net: introduce helper sendpage_ok() in
- include/linux/net.h
-To:     Eric Dumazet <eric.dumazet@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Vlastimil Babka <vbabka@suse.com>
-References: <20200816070814.6806-1-colyli@suse.de>
- <66b4f454-dc97-a23e-81d6-0c547dced694@gmail.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <71869abc-c1e1-93a7-0978-b5ce76bb52b1@suse.de>
-Date:   Tue, 18 Aug 2020 16:21:11 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1726451AbgHRIfv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 04:35:51 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2610 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726341AbgHRIfu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Aug 2020 04:35:50 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id C133F7E0E8EBC5D06D85;
+        Tue, 18 Aug 2020 09:35:48 +0100 (IST)
+Received: from [127.0.0.1] (10.210.172.123) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1913.5; Tue, 18 Aug
+ 2020 09:35:47 +0100
+Subject: Re: [PATCH RFC v7 11/12] smartpqi: enable host tagset
+To:     Hannes Reinecke <hare@suse.de>, <don.brace@microsemi.com>,
+        <hare@suse.com>
+CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <kashyap.desai@broadcom.com>,
+        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <hch@lst.de>,
+        <shivasharan.srikanteshwara@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
+        <megaraidlinux.pdl@broadcom.com>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-12-git-send-email-john.garry@huawei.com>
+ <a8afea5c-97f2-ac84-f4b5-155963bebb2c@huawei.com>
+ <f4425d8b-d132-c5c7-c854-2be948795bda@suse.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <7c535e7f-9c32-3d53-cdcc-408e8faee46c@huawei.com>
+Date:   Tue, 18 Aug 2020 09:33:28 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <66b4f454-dc97-a23e-81d6-0c547dced694@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f4425d8b-d132-c5c7-c854-2be948795bda@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.210.172.123]
+X-ClientProxiedBy: lhreml708-chm.china.huawei.com (10.201.108.57) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/8/18 16:08, Eric Dumazet wrote:
-> 
-> 
-> On 8/16/20 12:08 AM, Coly Li wrote:
->> The original problem was from nvme-over-tcp code, who mistakenly uses
->> kernel_sendpage() to send pages allocated by __get_free_pages() without
->> __GFP_COMP flag. Such pages don't have refcount (page_count is 0) on
->> tail pages, sending them by kernel_sendpage() may trigger a kernel panic
->> from a corrupted kernel heap, because these pages are incorrectly freed
->> in network stack as page_count 0 pages.
+On 14/07/2020 15:02, Hannes Reinecke wrote:
+> On 7/14/20 3:16 PM, John Garry wrote:
+>> Hi Hannes,
 >>
->> This patch introduces a helper sendpage_ok(), it returns true if the
->> checking page,
->> - is not slab page: PageSlab(page) is false.
->> - has page refcount: page_count(page) is not zero
+>>>    static struct pqi_io_request *pqi_alloc_io_request(
+>>> -    struct pqi_ctrl_info *ctrl_info)
+>>> +    struct pqi_ctrl_info *ctrl_info, struct scsi_cmnd *scmd)
+>>>    {
+>>>        struct pqi_io_request *io_request;
+>>> +    unsigned int limit = PQI_RESERVED_IO_SLOTS;
+>>>        u16 i = ctrl_info->next_io_request_slot;    /* benignly racy */
+>>>    -    while (1) {
+>>> +    if (scmd) {
+>>> +        u32 blk_tag = blk_mq_unique_tag(scmd->request);
+>>> +
+>>> +        i = blk_mq_unique_tag_to_tag(blk_tag) + limit;
+>>>            io_request = &ctrl_info->io_request_pool[i];
 >>
->> All drivers who want to send page to remote end by kernel_sendpage()
->> may use this helper to check whether the page is OK. If the helper does
->> not return true, the driver should try other non sendpage method (e.g.
->> sock_no_sendpage()) to handle the page.
+>> This looks ok
 >>
+>>> -        if (atomic_inc_return(&io_request->refcount) == 1)
+>>> -            break;
+>>> -        atomic_dec(&io_request->refcount);
+>>> -        i = (i + 1) % ctrl_info->max_io_slots;
+>>> +        if (WARN_ON(atomic_inc_return(&io_request->refcount) > 1)) {
+>>> +            atomic_dec(&io_request->refcount);
+>>> +            return NULL;
+>>> +        }
+>>> +    } else {
+>>> +        while (1) {
+>>> +            io_request = &ctrl_info->io_request_pool[i];
+>>> +            if (atomic_inc_return(&io_request->refcount) == 1)
+>>> +                break;
+>>> +            atomic_dec(&io_request->refcount);
+>>> +            i = (i + 1) % limit;
 >>
+>> To me, the range we use here looks incorrect. I would assume we should
+>> restrict range to [max_io_slots - PQI_RESERVED_IO_SLOTS, max_io_slots).
 >>
->> diff --git a/include/linux/net.h b/include/linux/net.h
->> index d48ff1180879..a807fad31958 100644
->> --- a/include/linux/net.h
->> +++ b/include/linux/net.h
->> @@ -21,6 +21,7 @@
->>  #include <linux/rcupdate.h>
->>  #include <linux/once.h>
->>  #include <linux/fs.h>
->> +#include <linux/mm.h>
->>  #include <linux/sockptr.h>
->>  
->>  #include <uapi/linux/net.h>
->> @@ -286,6 +287,21 @@ do {									\
->>  #define net_get_random_once_wait(buf, nbytes)			\
->>  	get_random_once_wait((buf), (nbytes))
->>  
->> +/*
->> + * E.g. XFS meta- & log-data is in slab pages, or bcache meta
->> + * data pages, or other high order pages allocated by
->> + * __get_free_pages() without __GFP_COMP, which have a page_count
->> + * of 0 and/or have PageSlab() set. We cannot use send_page for
->> + * those, as that does get_page(); put_page(); and would cause
->> + * either a VM_BUG directly, or __page_cache_release a page that
->> + * would actually still be referenced by someone, leading to some
->> + * obscure delayed Oops somewhere else.
->> + */
->> +static inline bool sendpage_ok(struct page *page)
->> +{
->> +	return  (!PageSlab(page) && page_count(page) >= 1);
->> +}
+>> But then your reserved commands support would solve that.
 >>
+> This branch of the 'if' condition will only be taken for internal
+> commands, for which we only allow up to PQI_RESERVED_IO_SLOTS.
+> And we set the 'normal' I/O commands above at an offset, so we're fine here.
 
-Hi Eric,
+Here is the code:
 
-> 
-> return (A);
-> 
-> Can simply be written :
-> 
-> return A;
-> 
-> In this case :
-> 
-> return !PageSlab(page) && page_count(page) >= 1;
+----8<----
+	unsigned int limit = PQI_RESERVED_IO_SLOTS;
+	u16 i = ctrl_info->next_io_request_slot; /* benignly racy */
 
-Sure, I update it in v6 series.
+	if (scmd) {
+		u32 blk_tag = blk_mq_unique_tag(scmd->request);
 
+		i = blk_mq_unique_tag_to_tag(blk_tag) + limit;
+		io_request = &ctrl_info->io_request_pool[i];
+		if (WARN_ON(atomic_inc_return(&io_request->refcount) > 1)) {
+			atomic_dec(&io_request->refcount);
+			return NULL;
+		}
+	} else {
+		while (1) {
+			io_request = &ctrl_info->io_request_pool[i];
+			if (atomic_inc_return(&io_request->refcount) == 1)
+				break;
+			atomic_dec(&io_request->refcount);
+			i = (i + 1) % limit;
+		}
+	}
 
-> 
-> BTW, do you have plans to refine code added with commit a10674bf2406afc2554f9c7d31b2dc65d6a27fd9
-> ("tcp: detecting the misuse of .sendpage for Slab objects")
-> 
+	/* benignly racy */
+	ctrl_info->next_io_request_slot = (i + 1) % ctrl_info->max_io_slots;
 
-Thanks for the hint, I will remove this piece in v6 series.
+---->8----
 
-Coly Li
+Is how we set ctrl_info->next_io_request_slot ok? Should it be:
+
+ctrl_info->next_io_request_slot = (i + 1) % limit;
+
+And also moved into 'else' leg for good measure.
+
+Thanks,
+John
