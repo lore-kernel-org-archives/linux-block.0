@@ -4,79 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6981C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 14:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE49C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 14:51:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 803CB20866
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 14:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67CC020829
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 14:51:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="d3qdQ7UZ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Wi5qTeMd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727816AbgHROt1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 10:49:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55180 "EHLO
+        id S1726932AbgHROu4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 10:50:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726803AbgHROtX (ORCPT
+        with ESMTP id S1726145AbgHROut (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 10:49:23 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1378AC061342
-        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 07:49:23 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id g33so9864049pgb.4
-        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 07:49:23 -0700 (PDT)
+        Tue, 18 Aug 2020 10:50:49 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF1D5C061389
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 07:50:48 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id o13so9881330pgf.0
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 07:50:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=fCviTlz4XSnwg6yVOSQsWhVAGKd364Znuee6QkGLbdc=;
-        b=d3qdQ7UZPKbZ7S+EnT9F/IN+BE6+5jbLchQTYDcmwIEOjBhWvPQznkybbt0H+G6ND1
-         h9mEckYYN5ikynT1ACEykIl6aXlC4E931EuXEHxn+d0KBcy9G6LTrkvXqhpWdNsvl9+h
-         56QZb0lSW0Eml8RJskwKAk8dvVP2RepBw/GMwudC33XqUcLJJQKjXKg+iQrk0q7zBZfJ
-         rEl5ENyQej6T/ZKKd3Sz/roVc2N+L2wqKf8MzYfAwpZgrHIW32iZTUsHMWwD3Ijrbqq9
-         efjH9gdjiE+jXE6V0NJ3mmPkS7GL/FzPbsYk8txCUN1Pxk+7xj+N7Ms3ARuf3p7wZuKr
-         CbzA==
+        bh=AxSVAIDTjxeDoHyUfMnUFBwLfqca7Uti0hu9KCTKI8Q=;
+        b=Wi5qTeMdCinEBvRxNWS2z005O7s98JlKjft0mLpCkReytlGjizsMXO22ZZKs3uV4A7
+         77OxGM9FAysrxvbOgva4uwf0MoVH0qjD9BU9fabU55NGp2Jbogpywpldx6AiqnHqIHcw
+         nSTkkgImJ8cmIAGl3uRJ5qIoVbjNXUtIDSrrXstNr6DbnNaKu/MJclfjwl2jtl7dkDNC
+         KTywk7tU4ZbKllo0bPNa7wPp2jogt8e28FrEveXn425yL89YpFQ5eT6lLjTs6OlM8EEd
+         qcAvOAvMWVuxFhJ7ANXCw9Mq3C9cEYVP+gAkkJlPItBGL24ggPWJ5hUxP+YcXDnRcBJd
+         Ut8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=fCviTlz4XSnwg6yVOSQsWhVAGKd364Znuee6QkGLbdc=;
-        b=WRnk/UH1J8CtcYg784HQmtTkAmgAj3ptM9Jp6c6yHVFOpg2qcJVN6k7E7tdEbBKw4D
-         NEs2KliZYyQdO0j4QkL1E4uDWpzp3muRLaPgODlOkGBgRWchaopwpEf+FnJdoD1JnJas
-         njRbBEv/FQmvNyAOCaSFQHHX4S41UgjgLea67WqT80zbKxrfQhUgqVfhML9RS44T+xRi
-         ak/M1nsJBOj3nxqcRCF8LXHtqVToI9sceMLjypbsRjic9oxLRDAAfhbZowlIHlgBK34Y
-         grZR1tkolmlD5XyyX6ms9aJRwyFFiTm3H5I9+xX7n7pjwHez7dDxwVrpQHK4/+vFiMAL
-         bDrA==
-X-Gm-Message-State: AOAM533PGZpqPPGi4l9Y7fj0oHcebGTHicxy0POup7sna4NIbkcWoCvC
-        iapjPtdzf1sbckm2MGS8feBevw==
-X-Google-Smtp-Source: ABdhPJx0FESruQtVAJ0RygWDB3g1tZOeUssXuc6Oj9ZrdkWXm/c4kZfcWzGKId1IecLreRwWduJRBw==
-X-Received: by 2002:a63:4450:: with SMTP id t16mr13494555pgk.3.1597762162542;
-        Tue, 18 Aug 2020 07:49:22 -0700 (PDT)
+        bh=AxSVAIDTjxeDoHyUfMnUFBwLfqca7Uti0hu9KCTKI8Q=;
+        b=cZNIV6w25uGUCVd8CEtrpO352nGDpPH2QO0DEA/8WecKYFXrxKG4bHmHJhksYDUtGP
+         MZKT+vR62bPZxzsz0vqAq/kQTUTKtmptFIfYo5BNUn0B/JQY7r7g7dABWWOV9FI1UR4v
+         sl2Tc4y3+e03iPDmgy1o1jncrfvOjmpi5g7yinS3TLHPMgCboJy84iCZgOyMQPSpwGLB
+         FyKc5Dd3wrQl8KIP0YD1EmttbIadu+pE5XgTs0Hvg/DK1MtJkWQ3x1xCT2GWfyQwuGMf
+         ZEnqygobTBsJDa64NAyEJNTNTvGJ0EjLTqNt//SLENLvj58KAE+DH8QIJGE1nZ50TfYY
+         Xylg==
+X-Gm-Message-State: AOAM533Yrm0ChEiecw7YJjjKGtiu2NqXPUqCugmRDLp6Wsi0wFVtQz3q
+        dMKiITL2Xs+b+iDI0mxPio10+w==
+X-Google-Smtp-Source: ABdhPJzLsoUyCg4+f+IOnRkrMhZhF6KvnwmN87XSXk2pm6pALuxE0RJFJiBizOUZcvamUulfbZhtVQ==
+X-Received: by 2002:a63:e018:: with SMTP id e24mr13237714pgh.175.1597762248225;
+        Tue, 18 Aug 2020 07:50:48 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:8c61:9214:36a5:5cec:a06d? ([2605:e000:100e:8c61:9214:36a5:5cec:a06d])
-        by smtp.gmail.com with ESMTPSA id fh14sm171070pjb.38.2020.08.18.07.49.21
+        by smtp.gmail.com with ESMTPSA id c17sm24530216pfp.214.2020.08.18.07.50.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Aug 2020 07:49:21 -0700 (PDT)
-Subject: Re: [PATCH] block/rnbd: Ensure err is always initialized in
- process_rdma
-To:     Nathan Chancellor <natechancellor@gmail.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Cc:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Brooke Basile <brookebasile@gmail.com>
-References: <CAMGffE=2m7XOdKS9xG1bNY7MYR2x6AgQm9YZFHm6D4biO860sw@mail.gmail.com>
- <20200818064924.3984068-1-natechancellor@gmail.com>
+        Tue, 18 Aug 2020 07:50:47 -0700 (PDT)
+Subject: Re: [PATCH RESEND] blk-mq: insert request not through ->queue_rq into
+ sw/scheduler queue
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Mike Snitzer <snitzer@redhat.com>
+References: <20200818090728.2696802-1-ming.lei@redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d6c0f92d-6c0c-cad4-24d3-e17f0f59a8c0@kernel.dk>
-Date:   Tue, 18 Aug 2020 07:49:20 -0700
+Message-ID: <92162ee6-0fa0-dafd-69b1-af285ee61044@kernel.dk>
+Date:   Tue, 18 Aug 2020 07:50:46 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200818064924.3984068-1-natechancellor@gmail.com>
+In-Reply-To: <20200818090728.2696802-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -85,33 +81,22 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/17/20 11:49 PM, Nathan Chancellor wrote:
-> Clang warns:
+On 8/18/20 2:07 AM, Ming Lei wrote:
+> c616cbee97ae ("blk-mq: punt failed direct issue to dispatch list") supposed
+> to add request which has been through ->queue_rq() to the hw queue dispatch
+> list, however it adds request running out of budget or driver tag to hw queue
+> too. This way basically bypasses request merge, and causes too many request
+> dispatched to LLD, and system% is unnecessary increased.
 > 
-> drivers/block/rnbd/rnbd-srv.c:150:6: warning: variable 'err' is used
-> uninitialized whenever 'if' condition is true
-> [-Wsometimes-uninitialized]
->         if (IS_ERR(bio)) {
->             ^~~~~~~~~~~
-> drivers/block/rnbd/rnbd-srv.c:177:9: note: uninitialized use occurs here
->         return err;
->                ^~~
-> drivers/block/rnbd/rnbd-srv.c:150:2: note: remove the 'if' if its
-> condition is always false
->         if (IS_ERR(bio)) {
->         ^~~~~~~~~~~~~~~~~~
-> drivers/block/rnbd/rnbd-srv.c:126:9: note: initialize the variable 'err'
-> to silence this warning
->         int err;
->                ^
->                 = 0
-> 1 warning generated.
+> Fixes this issue by adding request not through ->queue_rq into sw/scheduler
+> queue, and this way is safe because no ->queue_rq is called on this request
+> yet.
 > 
-> err is indeed uninitialized when this statement is taken. Ensure that it
-> is assigned the error value of bio before jumping to the error handling
-> label.
+> High %system can be observed on Azure storvsc device, and even soft lock
+> is observed. This patch reduces %system during heavy sequential IO,
+> meantime decreases soft lockup risk.
 
-Applied, thanks.
+Applied, thanks Ming.
 
 -- 
 Jens Axboe
