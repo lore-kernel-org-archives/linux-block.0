@@ -2,173 +2,171 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF8EC433DF
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 09:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 878CFC433E1
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 10:31:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28E662075E
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 09:16:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oAk9KLz4"
+	by mail.kernel.org (Postfix) with ESMTP id 6E0B02075E
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 10:31:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726514AbgHRJQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 05:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58782 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726203AbgHRJQf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 05:16:35 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FF31C061389;
-        Tue, 18 Aug 2020 02:16:35 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id l204so17340888oib.3;
-        Tue, 18 Aug 2020 02:16:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XZ5gSn6/zxDXq0JbeRnX/CK1QRoCv2dl+iqkeCW1pS8=;
-        b=oAk9KLz4zf32ff8AWoLjc9RpJCU0tp2pqYqSeAskrK0ZuvgefHaPfMSjLFyZsdmGPe
-         te4G+1pjgni1LPzEs8ACMIxIUvuyoHAcuLUM0MtETeGVCh8WdwKiKS7tJajtKiiKuEyx
-         nSe+wjaCOjY/H+YXbeH9/w5O+j8asiWzGL7zUumlH8Xb/MaDp1vsFa9oDik3gP5W3Oy7
-         HRujZb5rqlu9TSahSfcAn2YGlPMcHISk8UGHumVZMc/13KMA90JvU03ivC2rMRSghxXu
-         ie9/eP5XbwHCE84n2rwd4SGlM0keNy0vyT0/ZYaZo7htPQZLV5eKfkX6krYhP46i5znY
-         prXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XZ5gSn6/zxDXq0JbeRnX/CK1QRoCv2dl+iqkeCW1pS8=;
-        b=UTo4EPj5RG9tHDXgrFu1W0vkTVu4J4Vy7O6sYuKU7Xv0hiEedXcmRcoCCLUYubO47u
-         ObYdCcnQ+xCkM1JpdAXIg7+ptd0i9JHADwG39PDI10pEijukFyP8rgpJIoyju6RNd944
-         rsC8te1Vs+1UU5YCqy7gq328Zrh7Txx7j8wLbjcuGcYF6JMUqLxQVn6cwP6j6udOYA0n
-         zlOMf+5MKXYbmK0uxBB3GdIeAvilPt1ltNE2sdyWBk9mxWqBRp308+pCn+lx8/KrXA92
-         ONV3oyargdVK7wINdwkkvzarGE90Zi4PfTDFTBLMfpcfVR6MEQkMlxOTikqYK9NbAGpO
-         5azA==
-X-Gm-Message-State: AOAM532YOKsaFrEUqbuDBbzpC7kSQ3AYra3Hru5xbAsjVKnUvW8h37EQ
-        EcP0O8/YmLsVhKbjLtdjWmjGxNITrSPb2xesxmw=
-X-Google-Smtp-Source: ABdhPJzoZrDFJA/sZSMB5eCKUKMwLIoW6MWAoom1GEFglhx9K88XCdrK0saLkhUm1iVXF7PVM6hI174/8O0mwAcreAA=
-X-Received: by 2002:aca:6c6:: with SMTP id 189mr11628018oig.134.1597742194718;
- Tue, 18 Aug 2020 02:16:34 -0700 (PDT)
+        id S1726353AbgHRKby (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 06:31:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59882 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726043AbgHRKby (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Aug 2020 06:31:54 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id C804FAF8E;
+        Tue, 18 Aug 2020 10:32:17 +0000 (UTC)
+Subject: Re: [PATCH 4/4] bcache: use part_[begin|end]_io_acct instead of
+ disk_[begin|end]_io_acct
+To:     Song Liu <songliubraving@fb.com>
+Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org, axboe@kernel.dk, kernel-team@fb.com,
+        song@kernel.org
+References: <20200818070238.1323126-1-songliubraving@fb.com>
+ <20200818070238.1323126-5-songliubraving@fb.com>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Message-ID: <218caa26-3569-dbe4-de89-8849bd6eeb8f@suse.de>
+Date:   Tue, 18 Aug 2020 18:31:44 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200817091617.28119-1-allen.cryptic@gmail.com>
- <20200817091617.28119-3-allen.cryptic@gmail.com> <20200817121514.GE2865@minyard.net>
-In-Reply-To: <20200817121514.GE2865@minyard.net>
-From:   Allen <allen.lkml@gmail.com>
-Date:   Tue, 18 Aug 2020 14:46:23 +0530
-Message-ID: <CAOMdWSJXCn5KYHen4kynH1A5Oixo+yPzs3oathsfa8gtKZGkjg@mail.gmail.com>
-Subject: Re: [PATCH] char: ipmi: convert tasklets to use new tasklet_setup() API
-To:     minyard@acm.org
-Cc:     Allen Pais <allen.cryptic@gmail.com>, jdike@addtoit.com,
-        richard@nod.at, anton.ivanov@cambridgegreys.com, 3chas3@gmail.com,
-        axboe@kernel.dk, stefanr@s5r6.in-berlin.de, airlied@linux.ie,
-        daniel@ffwll.ch, sre@kernel.org,
-        James.Bottomley@hansenpartnership.com, kys@microsoft.com,
-        deller@gmx.de, dmitry.torokhov@gmail.com, jassisinghbrar@gmail.com,
-        shawnguo@kernel.org, s.hauer@pengutronix.de,
-        maximlevitsky@gmail.com, oakad@yahoo.com,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        mporter@kernel.crashing.org, alex.bou9@gmail.com,
-        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
-        mitch@sfgoth.com, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux1394-devel@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        Romain Perier <romain.perier@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200818070238.1323126-5-songliubraving@fb.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> >
-> > Signed-off-by: Romain Perier <romain.perier@gmail.com>
-> > Signed-off-by: Allen Pais <allen.lkml@gmail.com>
->
-> This looks good to me.
->
-> Reviewed-by: Corey Minyard <cminyard@mvista.com>
->
-> Are you planning to push this, or do you want me to take it?  If you
-> want me to take it, what is the urgency?
+On 2020/8/18 15:02, Song Liu wrote:
+> This enables proper statistics in /proc/diskstats for bcache partitions.
+> 
+> Cc: Coly Li <colyli@suse.de>
+> Signed-off-by: Song Liu <songliubraving@fb.com>
 
- Thanks. Well, not hurry, as long as it goes into 5.9 with all other
-changes.
+The code looks good to me. It is fine to submit this bcache patch in
+your submission path.
 
+Reviewed-by: Coly Li <colyli@suse.de>
 
->
-> -corey
->
-> > ---
-> >  drivers/char/ipmi/ipmi_msghandler.c | 13 ++++++-------
-> >  1 file changed, 6 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/drivers/char/ipmi/ipmi_msghandler.c b/drivers/char/ipmi/ipmi_msghandler.c
-> > index 737c0b6b24ea..e1814b6a1225 100644
-> > --- a/drivers/char/ipmi/ipmi_msghandler.c
-> > +++ b/drivers/char/ipmi/ipmi_msghandler.c
-> > @@ -39,7 +39,7 @@
-> >
-> >  static struct ipmi_recv_msg *ipmi_alloc_recv_msg(void);
-> >  static int ipmi_init_msghandler(void);
-> > -static void smi_recv_tasklet(unsigned long);
-> > +static void smi_recv_tasklet(struct tasklet_struct *t);
-> >  static void handle_new_recv_msgs(struct ipmi_smi *intf);
-> >  static void need_waiter(struct ipmi_smi *intf);
-> >  static int handle_one_recv_msg(struct ipmi_smi *intf,
-> > @@ -3430,9 +3430,8 @@ int ipmi_add_smi(struct module         *owner,
-> >       intf->curr_seq = 0;
-> >       spin_lock_init(&intf->waiting_rcv_msgs_lock);
-> >       INIT_LIST_HEAD(&intf->waiting_rcv_msgs);
-> > -     tasklet_init(&intf->recv_tasklet,
-> > -                  smi_recv_tasklet,
-> > -                  (unsigned long) intf);
-> > +     tasklet_setup(&intf->recv_tasklet,
-> > +                  smi_recv_tasklet);
-> >       atomic_set(&intf->watchdog_pretimeouts_to_deliver, 0);
-> >       spin_lock_init(&intf->xmit_msgs_lock);
-> >       INIT_LIST_HEAD(&intf->xmit_msgs);
-> > @@ -4467,10 +4466,10 @@ static void handle_new_recv_msgs(struct ipmi_smi *intf)
-> >       }
-> >  }
-> >
-> > -static void smi_recv_tasklet(unsigned long val)
-> > +static void smi_recv_tasklet(struct tasklet_struct *t)
-> >  {
-> >       unsigned long flags = 0; /* keep us warning-free. */
-> > -     struct ipmi_smi *intf = (struct ipmi_smi *) val;
-> > +     struct ipmi_smi *intf = from_tasklet(intf, t, recv_tasklet);
-> >       int run_to_completion = intf->run_to_completion;
-> >       struct ipmi_smi_msg *newmsg = NULL;
-> >
-> > @@ -4542,7 +4541,7 @@ void ipmi_smi_msg_received(struct ipmi_smi *intf,
-> >               spin_unlock_irqrestore(&intf->xmit_msgs_lock, flags);
-> >
-> >       if (run_to_completion)
-> > -             smi_recv_tasklet((unsigned long) intf);
-> > +             smi_recv_tasklet(&intf->recv_tasklet);
-> >       else
-> >               tasklet_schedule(&intf->recv_tasklet);
-> >  }
-> > --
-> > 2.17.1
-> >
+Thanks.
 
+Coly Li
 
+> ---
+>  drivers/md/bcache/request.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 7de82c67597ce..1d946f601f7eb 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -475,6 +475,7 @@ struct search {
+>  	unsigned int		read_dirty_data:1;
+>  	unsigned int		cache_missed:1;
+>  
+> +	struct hd_struct	*part;
+>  	unsigned long		start_time;
+>  
+>  	struct btree_op		op;
+> @@ -669,7 +670,8 @@ static void bio_complete(struct search *s)
+>  {
+>  	if (s->orig_bio) {
+>  		/* Count on bcache device */
+> -		disk_end_io_acct(s->d->disk, bio_op(s->orig_bio), s->start_time);
+> +		part_end_io_acct(s->part, bio_op(s->orig_bio), s->start_time);
+> +		hd_struct_put(s->part);
+>  
+>  		trace_bcache_request_end(s->d, s->orig_bio);
+>  		s->orig_bio->bi_status = s->iop.status;
+> @@ -731,7 +733,8 @@ static inline struct search *search_alloc(struct bio *bio,
+>  	s->write		= op_is_write(bio_op(bio));
+>  	s->read_dirty_data	= 0;
+>  	/* Count on the bcache device */
+> -	s->start_time		= disk_start_io_acct(d->disk, bio_sectors(bio), bio_op(bio));
+> +	s->part			= disk_map_sector_rcu(d->disk, bio->bi_iter.bi_sector);
+> +	s->start_time		= part_start_io_acct(s->part, bio_sectors(bio), bio_op(bio));
+>  	s->iop.c		= d->c;
+>  	s->iop.bio		= NULL;
+>  	s->iop.inode		= d->id;
+> @@ -1072,6 +1075,7 @@ struct detached_dev_io_private {
+>  	unsigned long		start_time;
+>  	bio_end_io_t		*bi_end_io;
+>  	void			*bi_private;
+> +	struct hd_struct	*part;
+>  };
+>  
+>  static void detached_dev_end_io(struct bio *bio)
+> @@ -1083,7 +1087,8 @@ static void detached_dev_end_io(struct bio *bio)
+>  	bio->bi_private = ddip->bi_private;
+>  
+>  	/* Count on the bcache device */
+> -	disk_end_io_acct(ddip->d->disk, bio_op(bio), ddip->start_time);
+> +	part_end_io_acct(ddip->part, bio_op(bio), ddip->start_time);
+> +	hd_struct_put(ddip->part);
+>  
+>  	if (bio->bi_status) {
+>  		struct cached_dev *dc = container_of(ddip->d,
+> @@ -1109,7 +1114,8 @@ static void detached_dev_do_request(struct bcache_device *d, struct bio *bio)
+>  	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
+>  	ddip->d = d;
+>  	/* Count on the bcache device */
+> -	ddip->start_time = disk_start_io_acct(d->disk, bio_sectors(bio), bio_op(bio));
+> +	ddip->part = disk_map_sector_rcu(d->disk, bio->bi_iter.bi_sector);
+> +	ddip->start_time = part_start_io_acct(ddip->part, bio_sectors(bio), bio_op(bio));
+>  	ddip->bi_end_io = bio->bi_end_io;
+>  	ddip->bi_private = bio->bi_private;
+>  	bio->bi_end_io = detached_dev_end_io;
+> 
 
--- 
-       - Allen
