@@ -2,64 +2,118 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BEFC433E1
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 07:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D78C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 07:03:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF5A82075E
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 07:01:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C197220658
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 07:03:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="AoNwg+se"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726474AbgHRHA4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 03:00:56 -0400
-Received: from verein.lst.de ([213.95.11.211]:60417 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726429AbgHRHAo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 03:00:44 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 20B3A68B02; Tue, 18 Aug 2020 09:00:11 +0200 (CEST)
-Date:   Tue, 18 Aug 2020 09:00:10 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Cong Wang <xiyou.wangcong@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Coly Li <colyli@suse.de>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, Jan Kara <jack@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Vlastimil Babka <vbabka@suse.com>
-Subject: Re: [PATCH v5 1/3] net: introduce helper sendpage_ok() in
- include/linux/net.h
-Message-ID: <20200818070010.GA2365@lst.de>
-References: <20200816071518.6964-1-colyli@suse.de> <CAM_iQpUFtZdrhfUbuYYODNeSVqPOqx8mio6Znp6v3Q5iDZeyqg@mail.gmail.com> <20200817054538.GA11705@lst.de> <CAM_iQpWnzm=cQZvZMcjKXez1L55tSVfWyadP3d0CUaT=D4nOhw@mail.gmail.com>
+        id S1726545AbgHRHDU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 03:03:20 -0400
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:4010 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726365AbgHRHDT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Aug 2020 03:03:19 -0400
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07I73G6T029730
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 00:03:19 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=facebook;
+ bh=Yy34D/NbA5LPKQ3e5rZPbBOItonCgnGr+j0WvmLVOwY=;
+ b=AoNwg+se8uLbny9aeLy4XcddDBFQWfhZCzevuD8ByDTDTwL3hEQCgDV4HYKylE2CemXK
+ Mdri/vIvo1+Fs9I88qkVwtKYZO6sF/ITbgyNkdo7vyfPEcuRACe9lUzMZMCFHTNEk1tN
+ R1HO2PhHgL668Zg8hYb7hibxbY70L0I72WE= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com with ESMTP id 3304p7s6cj-5
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 00:03:18 -0700
+Received: from intmgw002.03.ash8.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:21d::4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1979.3; Tue, 18 Aug 2020 00:02:57 -0700
+Received: by devbig006.ftw2.facebook.com (Postfix, from userid 4523)
+        id 76D5262E54B8; Tue, 18 Aug 2020 00:02:53 -0700 (PDT)
+Smtp-Origin-Hostprefix: devbig
+From:   Song Liu <songliubraving@fb.com>
+Smtp-Origin-Hostname: devbig006.ftw2.facebook.com
+To:     <linux-block@vger.kernel.org>, <linux-raid@vger.kernel.org>,
+        <linux-bcache@vger.kernel.org>
+CC:     <colyli@suse.de>, <axboe@kernel.dk>, <kernel-team@fb.com>,
+        <song@kernel.org>, Song Liu <songliubraving@fb.com>
+Smtp-Origin-Cluster: ftw2c04
+Subject: [PATCH 3/4] md: use part_[begin|end]_io_acct instead of disk_[begin|end]_io_acct
+Date:   Tue, 18 Aug 2020 00:02:37 -0700
+Message-ID: <20200818070238.1323126-4-songliubraving@fb.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200818070238.1323126-1-songliubraving@fb.com>
+References: <20200818070238.1323126-1-songliubraving@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAM_iQpWnzm=cQZvZMcjKXez1L55tSVfWyadP3d0CUaT=D4nOhw@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-18_04:2020-08-18,2020-08-18 signatures=0
+X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 suspectscore=0
+ adultscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=838
+ clxscore=1011 spamscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0
+ phishscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2008180049
+X-FB-Internal: deliver
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 17, 2020 at 12:12:12PM -0700, Cong Wang wrote:
-> 
-> So netdev people will have to understand and support PageSlab() or
-> page_count()?
+This enables proper statistics in /proc/diskstats for md partitions.
 
-Yes.  As they came up with that contrived rule what is acceptable
-for sendpage.  No one else really knows and other subsystems like the
-block layer are perfectly fine with it.
+Signed-off-by: Song Liu <songliubraving@fb.com>
+---
+ drivers/md/md.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-> 
-> If it is unusual even for mm people, how could netdev people suppose
-> to understand this unusual mm bug? At least not any better.
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 6b511c9007d38..00ca65b206d13 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -470,6 +470,7 @@ struct md_io {
+ 	bio_end_io_t *orig_bi_end_io;
+ 	void *orig_bi_private;
+ 	unsigned long start_time;
++	struct hd_struct *part;
+ };
+=20
+ static void md_end_io(struct bio *bio)
+@@ -477,7 +478,8 @@ static void md_end_io(struct bio *bio)
+ 	struct md_io *md_io =3D bio->bi_private;
+ 	struct mddev *mddev =3D md_io->mddev;
+=20
+-	disk_end_io_acct(mddev->gendisk, bio_op(bio), md_io->start_time);
++	part_end_io_acct(md_io->part, bio_op(bio), md_io->start_time);
++	hd_struct_put(md_io->part);
+=20
+ 	bio->bi_end_io =3D md_io->orig_bi_end_io;
+ 	bio->bi_private =3D md_io->orig_bi_private;
+@@ -523,7 +525,9 @@ static blk_qc_t md_submit_bio(struct bio *bio)
+ 		bio->bi_end_io =3D md_end_io;
+ 		bio->bi_private =3D md_io;
+=20
+-		md_io->start_time =3D disk_start_io_acct(mddev->gendisk,
++		md_io->part =3D disk_map_sector_rcu(mddev->gendisk,
++						  bio->bi_iter.bi_sector);
++		md_io->start_time =3D part_start_io_acct(md_io->part,
+ 						       bio_sectors(bio),
+ 						       bio_op(bio));
+ 	}
+--=20
+2.24.1
 
-It is not a mm bug, it is a networking quirk.
