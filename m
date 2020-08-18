@@ -7,151 +7,115 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 427F2C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 20:10:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D35C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 20:40:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F53C207BB
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 20:10:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A738206B5
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 20:40:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XJIRNe3G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ot5G5Gxl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726739AbgHRUKT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 16:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726723AbgHRUKS (ORCPT
+        id S1726682AbgHRUkJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 16:40:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54409 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725554AbgHRUkI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 16:10:18 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8AE5C061389
-        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 13:10:17 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id s14so3760007plp.4
-        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 13:10:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TVHg8iic3jhifLJcBgUbuICf6X+/XJrx7XucziWHTh4=;
-        b=XJIRNe3GC5+ESqXN1Xu3abO5ZefKkTKOYHKBaOfb9ueeT+8D0u27nucOFMVEcVEIlU
-         jmvz6dATQFCtEO6g5yNeaZR33qILQindJ5FbeJ6y98srbza53yHyzyYR5Ae2HVSridP4
-         36Xq5I+k5oTWeayZlqu4WxkJBY7w5Y8AAm/NE=
+        Tue, 18 Aug 2020 16:40:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597783206;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jq7TaraFgdD6GIFln8P44fNHpj56x8PqwtIkHGoyWF8=;
+        b=Ot5G5GxlXv7/YNaw5A8BgeCfdKeQpHpI75VEKT7A2lRNcCeFrdITyMLLUBvuE/b90rR4Pm
+        WrBt5uqKhAZP4iQKbJP0or8A6TsJRGCJKp1dYHZtefoWeHP6SPkU3r9i7I3byTNyYU+w8S
+        Xfq4EGTbC/uzPpNgeCV1p7MgusxsCYE=
+Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
+ [209.85.222.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-mX1AlG8wN927FDWo4KsIhw-1; Tue, 18 Aug 2020 16:40:05 -0400
+X-MC-Unique: mX1AlG8wN927FDWo4KsIhw-1
+Received: by mail-ua1-f71.google.com with SMTP id k5so5047549ual.20
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 13:40:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TVHg8iic3jhifLJcBgUbuICf6X+/XJrx7XucziWHTh4=;
-        b=i/4L1Hm4QAmu9DEOYNmlfSfLXVbrFZdyC1m2usiKotjnbFL9oVFWNlOjFfkJTjK1LP
-         ozeczhzR+C81/ObAi4RfYzwaP3mLGjhLjUVra9PiuKsgo/dcdDQ0B6V6KD5hAtQDyYIH
-         4U87LaZcWntpRKt73p0uR6vl8n5Fo1o3E7GTIiEuskokL7AbG3nKQs8UaUB+6y2V6wHs
-         rD1AOzPWFaVvCx874ayuRybWhYLnNhOlFH75drt8hbXw5DgS58iFfAX1ZVqO9ycNJfqn
-         gjCPYnXv/rk6H2So8UAa+zBKEtRZlAnCvJVrOh1nC3p65ZpxDpniDw8oC6m5APZK0eTR
-         P3VA==
-X-Gm-Message-State: AOAM530lrtYbBh2sYMAWBmCjLX4fEWiFjtImqoZeZq62h9oVz4qJ2fC4
-        TaJ7kpTngj3K5cyWdHvHrp3/oQ==
-X-Google-Smtp-Source: ABdhPJxuNmuIkhrqM6bpbnFGPMCC2Ooxj9YFPlaOufZ98RpuJ8EhlSYOLxahQ/MIWXdKo1mkyqnaIw==
-X-Received: by 2002:a17:902:6b05:: with SMTP id o5mr16351190plk.173.1597781417356;
-        Tue, 18 Aug 2020 13:10:17 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id t25sm26530806pfl.198.2020.08.18.13.10.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Aug 2020 13:10:15 -0700 (PDT)
-Date:   Tue, 18 Aug 2020 13:10:14 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Allen Pais <allen.cryptic@gmail.com>,
-        jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
-        3chas3@gmail.com, stefanr@s5r6.in-berlin.de, airlied@linux.ie,
-        daniel@ffwll.ch, sre@kernel.org, kys@microsoft.com, deller@gmx.de,
-        dmitry.torokhov@gmail.com, jassisinghbrar@gmail.com,
-        shawnguo@kernel.org, s.hauer@pengutronix.de,
-        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
-        mporter@kernel.crashing.org, alex.bou9@gmail.com,
-        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
-        mitch@sfgoth.com, davem@davemloft.net, kuba@kernel.org,
-        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux1394-devel@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        Allen Pais <allen.lkml@gmail.com>,
-        Romain Perier <romain.perier@gmail.com>
-Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
-Message-ID: <202008181309.FD3940A2D5@keescook>
-References: <20200817091617.28119-1-allen.cryptic@gmail.com>
- <20200817091617.28119-2-allen.cryptic@gmail.com>
- <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
- <202008171228.29E6B3BB@keescook>
- <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
- <202008171246.80287CDCA@keescook>
- <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
- <1597780833.3978.3.camel@HansenPartnership.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Jq7TaraFgdD6GIFln8P44fNHpj56x8PqwtIkHGoyWF8=;
+        b=Wkk5PNTx7PXSaSrBpH6czg4Xmlj6T/OwbjOxBhSTRPXZp7wu3KpeW+Jj/f8zs2OLwk
+         l2g18TRE0XTZuKX5OpYgKQDIj7WPwCrxefjvZTfmRTRFmm70UV3MBW1p5+oA7rn+rQSq
+         qHtKdBalZC3vOXCRRYll9hlM7wQQ+/6XvDB2znK5DsvjgNMumOJVnkJ8Wd3KFpWhNKiN
+         C25ndNdbURQOrBCdXhepsUpVcMNieB+/VGHESkI4d62kpXzKtX7PvPZREFRo0iGzOXUA
+         hsbNNyVIybDbWEajLj4z5XJ+ucWl89cXBbhiRiYpTxVG84+QiCpHHIyj1ZeLM5q+Q/B1
+         pQ/A==
+X-Gm-Message-State: AOAM530PCmddMLPLHy8ZAZHwJgZNkUzE9go9XfcIgtzgXVkrOte9ACRw
+        srKhydUOzjnvfeVGMirRKhXtEskactdnGQJC6qd0HyZ2UQCy7w5rsaOc0adWxtUpS2Gz+jWItSY
+        tePNJ2IfIYEP+SHH7C+2jScQihOlIbyklRg8/gtc=
+X-Received: by 2002:ab0:6907:: with SMTP id b7mr11833393uas.127.1597783203989;
+        Tue, 18 Aug 2020 13:40:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwO2C7FcRgLbOrfnCyFGrJ2KcHQLrlvHiTGOCTqJvvy/bHLksOICglYQ+74GqrFOTKDQ3niWHTELNvazWK3X8M=
+X-Received: by 2002:ab0:6907:: with SMTP id b7mr11833377uas.127.1597783203699;
+ Tue, 18 Aug 2020 13:40:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1597780833.3978.3.camel@HansenPartnership.com>
+References: <20200807160327.GA977@redhat.com> <CAHk-=wiC=g-0yZW6QrEXRH53bUVAwEFgYxd05qgOnDLJYdzzcA@mail.gmail.com>
+ <20200807204015.GA2178@redhat.com>
+In-Reply-To: <20200807204015.GA2178@redhat.com>
+From:   John Dorminy <jdorminy@redhat.com>
+Date:   Tue, 18 Aug 2020 16:39:52 -0400
+Message-ID: <CAMeeMh_=M3Z7bLPN3_SD+VxNbosZjXgC_H2mZq1eCeZG0kUx1w@mail.gmail.com>
+Subject: Re: [git pull] device mapper changes for 5.9
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ignat Korchagin <ignat@cloudflare.com>,
+        JeongHyeon Lee <jhs2.lee@samsung.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        yangerkun <yangerkun@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 18, 2020 at 01:00:33PM -0700, James Bottomley wrote:
-> On Mon, 2020-08-17 at 13:02 -0700, Jens Axboe wrote:
-> > On 8/17/20 12:48 PM, Kees Cook wrote:
-> > > On Mon, Aug 17, 2020 at 12:44:34PM -0700, Jens Axboe wrote:
-> > > > On 8/17/20 12:29 PM, Kees Cook wrote:
-> > > > > On Mon, Aug 17, 2020 at 06:56:47AM -0700, Jens Axboe wrote:
-> > > > > > On 8/17/20 2:15 AM, Allen Pais wrote:
-> > > > > > > From: Allen Pais <allen.lkml@gmail.com>
-> > > > > > > 
-> > > > > > > In preparation for unconditionally passing the
-> > > > > > > struct tasklet_struct pointer to all tasklet
-> > > > > > > callbacks, switch to using the new tasklet_setup()
-> > > > > > > and from_tasklet() to pass the tasklet pointer explicitly.
-> > > > > > 
-> > > > > > Who came up with the idea to add a macro 'from_tasklet' that
-> > > > > > is just container_of? container_of in the code would be
-> > > > > > _much_ more readable, and not leave anyone guessing wtf
-> > > > > > from_tasklet is doing.
-> > > > > > 
-> > > > > > I'd fix that up now before everything else goes in...
-> > > > > 
-> > > > > As I mentioned in the other thread, I think this makes things
-> > > > > much more readable. It's the same thing that the timer_struct
-> > > > > conversion did (added a container_of wrapper) to avoid the
-> > > > > ever-repeating use of typeof(), long lines, etc.
-> > > > 
-> > > > But then it should use a generic name, instead of each sub-system 
-> > > > using some random name that makes people look up exactly what it
-> > > > does. I'm not huge fan of the container_of() redundancy, but
-> > > > adding private variants of this doesn't seem like the best way
-> > > > forward. Let's have a generic helper that does this, and use it
-> > > > everywhere.
-> > > 
-> > > I'm open to suggestions, but as things stand, these kinds of
-> > > treewide
-> > 
-> > On naming? Implementation is just as it stands, from_tasklet() is
-> > totally generic which is why I objected to it. from_member()? Not
-> > great with naming... But I can see this going further and then we'll
-> > suddenly have tons of these. It's not good for readability.
-> 
-> Since both threads seem to have petered out, let me suggest in
-> kernel.h:
-> 
-> #define cast_out(ptr, container, member) \
-> 	container_of(ptr, typeof(*container), member)
-> 
-> It does what you want, the argument order is the same as container_of
-> with the only difference being you name the containing structure
-> instead of having to specify its type.
+For what it's worth, I just ran two tests on a machine with dm-crypt
+using the cipher_null:ecb cipher. Results are mixed; not offloading IO
+submission can result in -27% to +23% change in throughput, in a
+selection of three IO patterns HDDs and SSDs.
 
-I like this! Shall I send this to Linus to see if this can land in -rc2
-for use going forward?
+(Note that the IO submission thread also reorders IO to attempt to
+submit it in sector order, so that is an additional difference between
+the two modes -- it's not just "offload writes to another thread" vs
+"don't offload writes".) The summary (for my FIO workloads focused on
+parallelism) is that offloading is useful for high IO depth random
+writes on SSDs, and for long sequential small writes on HDDs.
+Offloading reduced throughput for immensely high IO depths on SSDs,
+where I would guess lock contention is reducing effective IO depth to
+the disk; and for low IO depths of sequential writes on HDDs, where I
+would guess (as it would for a zoned device) preserving submission order
+is better than attempting to reorder before submission.
 
--- 
-Kees Cook
+Two test regimes: randwrite on 7xSamsung SSD 850 PRO 128G, somewhat
+aged, behind a LSI MegaRAID card providing raid0. 6 processors
+(Intel(R) Xeon(R) CPU E5-1650 v2 @ 3.50GHz); 128G RAM; and seqwrite,
+on a software raid0 (512k chunk size) of 4 HDDs on the same machine
+specs. Scheduler 'none' for both. LSI card in writethrough cache mode.
+All data in MB/s.
+
+
+depth    jobs    bs    dflt    no_wq    %chg    raw disk
+----------------randwrite, SSD--------------
+128    1    4k    282    282    0    285
+256    4    4k    251    183    -27    283
+2048    4    4k    266    283    +6    284
+1    4    1m    433    414    -4    403
+----------------seqwrite, HDD---------------
+128    1    4k    87    107    +23    86
+256    4    4k    101    90     -11    91
+2048    4    4k    273    233    -15    249
+1    4    1m    144    146    +1    146
+
