@@ -2,164 +2,122 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF2CFC433E3
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 21:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDDEC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 21:02:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B685205CB
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 21:00:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="Qrj9DcFV";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="D+8/Cr58"
+	by mail.kernel.org (Postfix) with ESMTP id 75519205CB
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 21:02:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1597784568;
+	bh=F9kPz14Ny7HQIlyBfFUu7EXS46q4jlz0biHyP3bbX5I=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=qqR+9Gx8PbEg8ZCIrHprGvYsFU69qGMHZdllJ1gFUEvdiJhBAkv2BtfTYuG7cEo7I
+	 gsgEbeRStebZn/D9zsQKo5F9YvpHJi36+gqOr2Z1mZAKGpIS6gzeSwLAUvfIo/OCSy
+	 TJyTD1o5wkTgqRFYpBL+ah6ysf9AshZ7yel8wSaE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726829AbgHRVAt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 17:00:49 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:56308 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726790AbgHRVAs (ORCPT
+        id S1726306AbgHRVCr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 17:02:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57472 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725554AbgHRVCr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 17:00:48 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id E76FB8EE1A9;
-        Tue, 18 Aug 2020 14:00:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597784444;
-        bh=tbsUcv475+YCZw1GTj2PQ6LvX4vSQZaYxn4zaS+R/4c=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=Qrj9DcFVwfv3LQ3ogFCLogZ3MFRIrVuZOGzCtGnuXEksHbYpCf4MOzhnjK48hnLeJ
-         WBJIwZcuhQRmEISK3OYmfO8zwCeV5WGheC1BlogkcVwtiUSnVqiZDKUeoZ3ftkI0DB
-         8C1HptXhFOQveW6XttTml0y/WCVpA+LP1XIfDIQU=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id yxTvzG0VvDFx; Tue, 18 Aug 2020 14:00:43 -0700 (PDT)
-Received: from [153.66.254.174] (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 3908A8EE17F;
-        Tue, 18 Aug 2020 14:00:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597784443;
-        bh=tbsUcv475+YCZw1GTj2PQ6LvX4vSQZaYxn4zaS+R/4c=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=D+8/Cr58B/oiGrsp2scAFTKzPpwuRrxI0nzk9/FGC1mH6aV1pe7T9eKYXHzydxf7e
-         uxoPDcWpTJmWe7T3PSHxKLwqMdOy0OFGWtWHPKks90yqeWzrewWrtu8v+gZ22+Y9Xp
-         3BintrUiXfYlFbDYGCbt6iSJyrOyqS5V85WlObHk=
-Message-ID: <1597784438.3978.6.camel@HansenPartnership.com>
-Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Allen Pais <allen.cryptic@gmail.com>,
-        jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
-        3chas3@gmail.com, stefanr@s5r6.in-berlin.de, airlied@linux.ie,
-        daniel@ffwll.ch, sre@kernel.org, kys@microsoft.com, deller@gmx.de,
-        dmitry.torokhov@gmail.com, jassisinghbrar@gmail.com,
-        shawnguo@kernel.org, s.hauer@pengutronix.de,
-        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
-        mporter@kernel.crashing.org, alex.bou9@gmail.com,
-        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
-        mitch@sfgoth.com, davem@davemloft.net, kuba@kernel.org,
-        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux1394-devel@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        Allen Pais <allen.lkml@gmail.com>,
-        Romain Perier <romain.perier@gmail.com>
-Date:   Tue, 18 Aug 2020 14:00:38 -0700
-In-Reply-To: <202008181309.FD3940A2D5@keescook>
-References: <20200817091617.28119-1-allen.cryptic@gmail.com>
-         <20200817091617.28119-2-allen.cryptic@gmail.com>
-         <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
-         <202008171228.29E6B3BB@keescook>
-         <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
-         <202008171246.80287CDCA@keescook>
-         <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
-         <1597780833.3978.3.camel@HansenPartnership.com>
-         <202008181309.FD3940A2D5@keescook>
+        Tue, 18 Aug 2020 17:02:47 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAF91C061389
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 14:02:46 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id t6so22978845ljk.9
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 14:02:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QjxDFeJL3uqd+6em4nSwHG/s4baUYfLjhwPDfmfoDEg=;
+        b=Z+wWWf0OzwIjlpxCx6NFBrne2WUrLm57UYNAu3HiEDDDr6SSslBEq92o5mhJ3Rtgm7
+         OtZsK0Gun0ZBQQesa8uDBJonT8LvqRmBlmzKD3alMQd+zUa2MhA58Vg7W5yYG+U41U7m
+         fXVv1SwPc6WFUlILRvJDCUDrNkhe92eRxqdDs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QjxDFeJL3uqd+6em4nSwHG/s4baUYfLjhwPDfmfoDEg=;
+        b=KBWxkePk7ASt37zHM80Xq1tqrk3d6/jPND37pV96JJhT+6VC7I46/Yu8sdRTuplhwI
+         NVk6C/QV6zvXJoMnakMLMnwAHq0Lhc82GMyLRSj8VkCpzi/Ewg72EbfqKzXrbWzyPK1r
+         vvY1NDeZMLMQM375fA0HkGlRR3/Frr/NrnThWtsTtRPQ7QHrT27YVp5Wd9wgRn1J7W5P
+         5hLosEjJWAR9DOu32oVu24hzgxgAi0wxqPul74MDLp4FnLJDGFZb9I4uLRmxLxrfv/97
+         kDIJNO3hiQ/+JUr4b1pZMr4g86AEwP8moOhK6daIamqpCqiQOHGVNfJy7K3gIpl7PDKN
+         3lkw==
+X-Gm-Message-State: AOAM5330f3Mebdk4TOTtt45XGuByZA8DHhvyVE4hp57/qci47dH599uw
+        FFTO5hsCxzbj4zRYQk1ZyYgRmA5TMsPHIg==
+X-Google-Smtp-Source: ABdhPJz13LFoEff1TqW4NeUYJfVcZN/P4dR8dpsf7nptMByLTYTXo0SdJqI+BNDnSrlRsR3GcC4sAA==
+X-Received: by 2002:a2e:8ecc:: with SMTP id e12mr9704371ljl.33.1597784564741;
+        Tue, 18 Aug 2020 14:02:44 -0700 (PDT)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
+        by smtp.gmail.com with ESMTPSA id v1sm6170176ljg.60.2020.08.18.14.02.43
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Aug 2020 14:02:43 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 185so22962020ljj.7
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 14:02:43 -0700 (PDT)
+X-Received: by 2002:a2e:b008:: with SMTP id y8mr9412922ljk.421.1597784563217;
+ Tue, 18 Aug 2020 14:02:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200807160327.GA977@redhat.com> <CAHk-=wiC=g-0yZW6QrEXRH53bUVAwEFgYxd05qgOnDLJYdzzcA@mail.gmail.com>
+ <20200807204015.GA2178@redhat.com> <CAMeeMh_=M3Z7bLPN3_SD+VxNbosZjXgC_H2mZq1eCeZG0kUx1w@mail.gmail.com>
+In-Reply-To: <CAMeeMh_=M3Z7bLPN3_SD+VxNbosZjXgC_H2mZq1eCeZG0kUx1w@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 18 Aug 2020 14:02:27 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjsz_w4zyJMHSL78MuOfxKcjDDfk2GfM2ZpjSjkOfzfwQ@mail.gmail.com>
+Message-ID: <CAHk-=wjsz_w4zyJMHSL78MuOfxKcjDDfk2GfM2ZpjSjkOfzfwQ@mail.gmail.com>
+Subject: Re: [git pull] device mapper changes for 5.9
+To:     John Dorminy <jdorminy@redhat.com>
+Cc:     Mike Snitzer <snitzer@redhat.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ignat Korchagin <ignat@cloudflare.com>,
+        JeongHyeon Lee <jhs2.lee@samsung.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        yangerkun <yangerkun@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2020-08-18 at 13:10 -0700, Kees Cook wrote:
-> On Tue, Aug 18, 2020 at 01:00:33PM -0700, James Bottomley wrote:
-> > On Mon, 2020-08-17 at 13:02 -0700, Jens Axboe wrote:
-> > > On 8/17/20 12:48 PM, Kees Cook wrote:
-> > > > On Mon, Aug 17, 2020 at 12:44:34PM -0700, Jens Axboe wrote:
-> > > > > On 8/17/20 12:29 PM, Kees Cook wrote:
-> > > > > > On Mon, Aug 17, 2020 at 06:56:47AM -0700, Jens Axboe wrote:
-> > > > > > > On 8/17/20 2:15 AM, Allen Pais wrote:
-> > > > > > > > From: Allen Pais <allen.lkml@gmail.com>
-> > > > > > > > 
-> > > > > > > > In preparation for unconditionally passing the
-> > > > > > > > struct tasklet_struct pointer to all tasklet
-> > > > > > > > callbacks, switch to using the new tasklet_setup()
-> > > > > > > > and from_tasklet() to pass the tasklet pointer
-> > > > > > > > explicitly.
-> > > > > > > 
-> > > > > > > Who came up with the idea to add a macro 'from_tasklet'
-> > > > > > > that
-> > > > > > > is just container_of? container_of in the code would be
-> > > > > > > _much_ more readable, and not leave anyone guessing wtf
-> > > > > > > from_tasklet is doing.
-> > > > > > > 
-> > > > > > > I'd fix that up now before everything else goes in...
-> > > > > > 
-> > > > > > As I mentioned in the other thread, I think this makes
-> > > > > > things
-> > > > > > much more readable. It's the same thing that the
-> > > > > > timer_struct
-> > > > > > conversion did (added a container_of wrapper) to avoid the
-> > > > > > ever-repeating use of typeof(), long lines, etc.
-> > > > > 
-> > > > > But then it should use a generic name, instead of each sub-
-> > > > > system 
-> > > > > using some random name that makes people look up exactly what
-> > > > > it
-> > > > > does. I'm not huge fan of the container_of() redundancy, but
-> > > > > adding private variants of this doesn't seem like the best
-> > > > > way
-> > > > > forward. Let's have a generic helper that does this, and use
-> > > > > it
-> > > > > everywhere.
-> > > > 
-> > > > I'm open to suggestions, but as things stand, these kinds of
-> > > > treewide
-> > > 
-> > > On naming? Implementation is just as it stands, from_tasklet() is
-> > > totally generic which is why I objected to it. from_member()? Not
-> > > great with naming... But I can see this going further and then
-> > > we'll
-> > > suddenly have tons of these. It's not good for readability.
-> > 
-> > Since both threads seem to have petered out, let me suggest in
-> > kernel.h:
-> > 
-> > #define cast_out(ptr, container, member) \
-> > 	container_of(ptr, typeof(*container), member)
-> > 
-> > It does what you want, the argument order is the same as
-> > container_of with the only difference being you name the containing
-> > structure instead of having to specify its type.
-> 
-> I like this! Shall I send this to Linus to see if this can land in
-> -rc2 for use going forward?
+On Tue, Aug 18, 2020 at 1:40 PM John Dorminy <jdorminy@redhat.com> wrote:
+>
+>    The summary (for my FIO workloads focused on
+> parallelism) is that offloading is useful for high IO depth random
+> writes on SSDs, and for long sequential small writes on HDDs.
 
-Sure ... he's probably been lurking on this thread anyway ... it's
-about time he got off his arse^Wthe fence and made an executive
-decision ...
+Do we have any non-microbenchmarks that might be somewhat
+representative of something, and might be used to at least set a
+default?
 
-James
+Or can we perhaps - even better - dynamically notice whether to offload or not?
 
+I suspect that offloading is horrible for any latency situation,
+particularly with any modern setup where the SSD is fast enough that
+doing scheduling to another thread is noticeable.
+
+After all, some people are working on polling IO, because the result
+comes back so fast that taking the interrupt is unnecessary extra
+work. Those people admittedly have faster disks than most of us, but
+..
+
+At least from a latency angle, maybe we could have the fairly common
+case of a IO depth of 1 (because synchronous reads) not trigger it.
+
+It looks like you only did throughput benchmarks (like pretty much
+everybody always does, because latency benchmarks are a lot harder to
+do well).
+
+                 Linus
