@@ -2,97 +2,110 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44800C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 03:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A9BC433E1
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 03:43:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C84D2078D
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 03:31:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FEA020706
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 03:43:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JprIIYRj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726632AbgHRDbC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Aug 2020 23:31:02 -0400
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:47372 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726228AbgHRDbC (ORCPT
+        id S1726357AbgHRDnz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Aug 2020 23:43:55 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:35972 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726302AbgHRDny (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Aug 2020 23:31:02 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07484;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0U668IKE_1597721458;
-Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0U668IKE_1597721458)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 18 Aug 2020 11:30:58 +0800
-Date:   Tue, 18 Aug 2020 11:30:58 +0800
-From:   Baolin Wang <baolin.wang@linux.alibaba.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, baolin.wang7@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND 3/5] block: Add a new helper to attempt to merge a
- bio
-Message-ID: <20200818033058.GB46480@VM20190228-100.tbsite.net>
-Reply-To: Baolin Wang <baolin.wang@linux.alibaba.com>
-References: <cover.1597637287.git.baolin.wang@linux.alibaba.com>
- <5b932aa51fc2b46c381d7b83d591a6ddbf05b199.1597637287.git.baolin.wang@linux.alibaba.com>
- <20200817062634.GC12248@lst.de>
- <20200817121002.GB79836@VM20190228-100.tbsite.net>
- <20200817122440.GA2213@lst.de>
+        Mon, 17 Aug 2020 23:43:54 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07I3bbp3076245;
+        Tue, 18 Aug 2020 03:43:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=pl8NDLuQIRm1fzSvBa9qBaJM5sY7n2uPNb+h+0YjSas=;
+ b=JprIIYRjf4xkR7gBk7nAIdGZmgIsMWS8RTJHROubXn5eB1ON/dTmMUUzRHT5fRnAErOq
+ yXQRrZS5wZBi1Cs+xFtFLwVws5T+g96EwP1aY/CUaY0WcdSIh3UlYDbJ4DNpespluLlL
+ 0S0lkcluPEade45CmFCyCVWPnM+mOrKDRfWSwq8gyyB2J4DYI4ZQ1wCyYNoxur+0bTUL
+ QqwFV3x80KtUHW7lCgKpTdyuV3rY5QX3iAHGBeG7a49WRe76VHLzSv4W9Muxgsd4zvnn
+ RC57WUcEKzbBX81ttWaw++UIWtYXaREXujs8RwmHdg65XAfBOWhSZOiTGLbJVUwMurCM 9w== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 32x7nma7rs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 18 Aug 2020 03:43:52 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07I3ctLR035388;
+        Tue, 18 Aug 2020 03:43:51 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 32xsmwpsta-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Aug 2020 03:43:51 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07I3hnWG001890;
+        Tue, 18 Aug 2020 03:43:49 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 17 Aug 2020 20:43:47 -0700
+To:     Ritika Srivastava <ritika.srivastava@oracle.com>
+Cc:     linux-block@vger.kernel.org, hch@infradead.org, axboe@kernel.dk
+Subject: Re: [PATCH v3 2/2] block: better deal with the delayed not
+ supported case in blk_cloned_rq_check_limits
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1tux0bq7e.fsf@ca-mkp.ca.oracle.com>
+References: <1597699898-21157-1-git-send-email-ritika.srivastava@oracle.com>
+Date:   Mon, 17 Aug 2020 23:43:45 -0400
+In-Reply-To: <1597699898-21157-1-git-send-email-ritika.srivastava@oracle.com>
+        (Ritika Srivastava's message of "Mon, 17 Aug 2020 14:31:38 -0700")
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200817122440.GA2213@lst.de>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 bulkscore=0
+ mlxlogscore=999 phishscore=0 mlxscore=0 suspectscore=1 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008180026
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 spamscore=0
+ impostorscore=0 priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008180026
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 17, 2020 at 02:24:40PM +0200, Christoph Hellwig wrote:
-> On Mon, Aug 17, 2020 at 08:10:02PM +0800, Baolin Wang wrote:
-> > On Mon, Aug 17, 2020 at 08:26:34AM +0200, Christoph Hellwig wrote:
-> > > On Mon, Aug 17, 2020 at 12:09:17PM +0800, Baolin Wang wrote:
-> > > > There are lots of duplicated code when trying to merge a bio from
-> > > > plug list and sw queue, we can introduce a new helper to attempt
-> > > > to merge a bio, which can simplify the blk_mq_bio_list_merge()
-> > > > and blk_attempt_plug_merge().
-> > > 
-> > > Looks sensible, but two comments:
-> > > 
-> > > > +enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
-> > > > +					    struct request *rq,
-> > > > +					    struct bio *bio,
-> > > > +					    unsigned int nr_segs)
-> > > > +{
-> > > > +	bool merged = false;
-> > > > +
-> > > > +	if (!blk_rq_merge_ok(rq, bio))
-> > > > +		return BIO_MERGE_NONE;
-> > > > +
-> > > > +	switch (blk_try_merge(rq, bio)) {
-> > > > +	case ELEVATOR_BACK_MERGE:
-> > > > +		merged = bio_attempt_back_merge(rq, bio, nr_segs);
-> > > > +		break;
-> > > > +	case ELEVATOR_FRONT_MERGE:
-> > > > +		merged = bio_attempt_front_merge(rq, bio, nr_segs);
-> > > > +		break;
-> > > > +	case ELEVATOR_DISCARD_MERGE:
-> > > > +		merged = bio_attempt_discard_merge(q, rq, bio);
-> > > > +		break;
-> > > 
-> > > Can't we also switch the bio_attempt_*merge helpers to return
-> > > enum bio_merge_status to simplify this a bit?
-> > 
-> > Yes, will do.
-> > 
-> > > 
-> > > Also I think these helpers can be marked static now, although I didn't
-> > > actually apply your series, so I might have missed something.
-> > 
-> > Cause this function will be used by blk_mq_bio_list_merge() in
-> > blk-mq-sched.c, it should be exported.
-> 
-> Shouldn't blk_mq_bio_list_merge move to blk-merge.c as well?
 
-Yes, I can move it to blk-merge.c and rename to a generic name.
+Ritika,
 
+> +		/*
+> +		 * At least SCSI device does not have a good way to return if
+> +		 * Write Same/Zero is actually supported. To detect this, first
+> +		 * try to issue one and if it fails clear the max sectors value.
+> +		 * If this occurs on the lower device, the right error code
+> +		 * needs to be propagated to upper layers.
+> +		 */
+> +		if (max_sectors == 0)
+> +			return BLK_STS_NOTSUPP;
+
+Maybe we should make it more explicit in the comment that there is a
+window of error where this condition can occur? Something like:
+
+    If a device rejects a non-read/write command (discard, write same,
+    etc.) the low-level device driver will set the relevant queue limit
+    to 0 to prevent blk-lib from issuing more of the offending
+    operations. Commands queued prior to the queue limit being reset
+    need to be completed with BLK_STS_NOTSUPP to avoid I/O errors being
+    propagated to upper layers.
+
+Otherwise looks good.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
