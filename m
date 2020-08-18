@@ -2,127 +2,135 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D17C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 18:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3184C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 18:22:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 867B6206B5
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 18:14:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IhQpPxzC"
+	by mail.kernel.org (Postfix) with ESMTP id BD0F120786
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 18:22:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726541AbgHRSOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 14:14:05 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:59256 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726435AbgHRSOE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 14:14:04 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IHvW6h166096;
-        Tue, 18 Aug 2020 18:13:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2020-01-29; bh=iMksFHQ4jfy225K3CniF9ieExPgWqfav3epP9OsiFJ8=;
- b=IhQpPxzCQKfgji4hBxnknTqAhoQFngOS1ZPyPte+jKs9xvfbQ5XXxXEdc7CvnST21zf6
- +SI3OALgKVRSawxGurgJC/lzWu7cUGIqRjUqVg+lxO7lkZtyAYfmccrIF/VfoROf5NIo
- NHFhkMWuouXHD9bhmX4L11YVdN1rhvG77gmFehH/jQfYVtZkPICft6LKGaw+mc0uhGGn
- WZ1/JmUda/oNBIZZbyzwjQ4lCxo/URB2xHpCe3KfXeF+QlapDun7udcCBzEVcKGI+Z5S
- ytlbdGgUuKp7D0RYaUN7kzzJW2hEpNeBvpWwyowahZFBhh1OsrFrEonp8K+5hn+fQD79 gw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 32x7nmeers-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 18 Aug 2020 18:13:58 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IHwCTM108014;
-        Tue, 18 Aug 2020 18:13:58 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 32xs9n92g7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Aug 2020 18:13:58 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07IIDuvj015544;
-        Tue, 18 Aug 2020 18:13:56 GMT
-Received: from dhcp-10-159-249-73.vpn.oracle.com (/10.159.249.73)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 18 Aug 2020 11:13:56 -0700
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.15\))
-Subject: Re: [PATCH v3 2/2] block: better deal with the delayed not supported
- case in blk_cloned_rq_check_limits
-From:   Ritika Srivastava <RITIKA.SRIVASTAVA@ORACLE.COM>
-In-Reply-To: <yq1tux0bq7e.fsf@ca-mkp.ca.oracle.com>
-Date:   Tue, 18 Aug 2020 11:13:55 -0700
-Cc:     linux-block@vger.kernel.org, hch@infradead.org, axboe@kernel.dk
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <AA28F307-418F-453C-A1FC-533FF54DBCC3@ORACLE.COM>
-References: <1597699898-21157-1-git-send-email-ritika.srivastava@oracle.com>
- <yq1tux0bq7e.fsf@ca-mkp.ca.oracle.com>
-To:     "Martin K. Petersen" <martin.petersen@ORACLE.COM>
-X-Mailer: Apple Mail (2.3445.104.15)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9717 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0 spamscore=0
- mlxscore=0 mlxlogscore=999 suspectscore=3 malwarescore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008180125
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9717 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 spamscore=0
- impostorscore=0 priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 bulkscore=0 phishscore=0 malwarescore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008180125
+        id S1726569AbgHRSWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 14:22:20 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2663 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726435AbgHRSWT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Aug 2020 14:22:19 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id F3AF752DAF59DFAAC3F4;
+        Tue, 18 Aug 2020 19:22:17 +0100 (IST)
+Received: from [127.0.0.1] (10.210.172.123) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1913.5; Tue, 18 Aug
+ 2020 19:22:17 +0100
+From:   John Garry <john.garry@huawei.com>
+Subject: Re: [REPORT] BUG: KASAN: use-after-free in bt_iter+0x80/0xf8
+To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com>
+CC:     Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+Message-ID: <a68379af-48e7-da2b-812c-ff0fa24a41bb@huawei.com>
+Date:   Tue, 18 Aug 2020 19:19:57 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
+MIME-Version: 1.0
+In-Reply-To: <8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.172.123]
+X-ClientProxiedBy: lhreml708-chm.china.huawei.com (10.201.108.57) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Martin,
-Thank you for the review.
-I have addressed the comment changes in the updated version.
+On 18/08/2020 13:03, John Garry wrote:
+> Hi guys,
+> 
+> JFYI, While doing some testing on v5.9-rc1, I stumbled across this:
+
+I bisected to here (hopefully without mistake):
+
+commit 37f4a24c2469a10a4c16c641671bd766e276cf9f
+Author: Ming Lei <ming.lei@redhat.com>
+Date:Tue Jun 30 22:03:57 2020 +0800
+
+  blk-mq: centralise related handling into blk_mq_get_driver_tag
+
+  Move .nr_active update and request assignment into 
+blk_mq_get_driver_tag(),
+  all are good to do during getting driver tag.
+
+  Meantime blk-flush related code is simplified and flush request needn't
+  to update the request table manually any more.
+
+  Signed-off-by: Ming Lei <ming.lei@redhat.com>
+  Cc: Christoph Hellwig <hch@infradead.org>
+  Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+
+I'll verify that tomorrow. I see that there is a fix for that patch 
+included in v5.9-rc1. Bisect log below:
+
+git bisect start
+# bad: [9123e3a74ec7b934a4a099e98af6a61c2f80bbf5] Linux 5.9-rc1
+git bisect bad 9123e3a74ec7b934a4a099e98af6a61c2f80bbf5
+# good: [bcf876870b95592b52519ed4aafcf9d95999bc9c] Linux 5.8
+git bisect good bcf876870b95592b52519ed4aafcf9d95999bc9c
+# good: [bcf876870b95592b52519ed4aafcf9d95999bc9c] Linux 5.8
+git bisect good bcf876870b95592b52519ed4aafcf9d95999bc9c
+# bad: [8186749621ed6b8fc42644c399e8c755a2b6f630] Merge tag 
+'drm-next-2020-08-06' of git://anongit.freedesktop.org/drm/drm
+git bisect bad 8186749621ed6b8fc42644c399e8c755a2b6f630
+# bad: [2324d50d051ec0f14a548e78554fb02513d6dcef] Merge tag 'docs-5.9' 
+of git://git.lwn.net/linux
+git bisect bad 2324d50d051ec0f14a548e78554fb02513d6dcef
+# bad: [92c59e126b21fd212195358a0d296e787e444087] Merge tag 
+'arm-defconfig-5.9' of 
+git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
+git bisect bad 92c59e126b21fd212195358a0d296e787e444087
+# bad: [cdc8fcb49905c0b67e355e027cb462ee168ffaa3] Merge tag 
+'for-5.9/io_uring-20200802' of git://git.kernel.dk/linux-block
+git bisect bad cdc8fcb49905c0b67e355e027cb462ee168ffaa3
+# good: [ab5c60b79ab6cc50b39bbb21b2f9fb55af900b84] Merge branch 'linus' 
+of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
+git bisect good ab5c60b79ab6cc50b39bbb21b2f9fb55af900b84
+# bad: [d958e343bdc3de2643ce25225bed082dc222858d] block: blk-timeout: 
+delete duplicated word
+git bisect bad d958e343bdc3de2643ce25225bed082dc222858d
+# bad: [53042f3cc411adc79811ba3cfbca5d7a42a7b806] ps3vram: stop using 
+->queuedata
+git bisect bad 53042f3cc411adc79811ba3cfbca5d7a42a7b806
+# good: [621c1f42945e76015c3a585e7a9fe6e71665eba0] block: move struct 
+block_device to blk_types.h
+git bisect good 621c1f42945e76015c3a585e7a9fe6e71665eba0
+# good: [36a3df5a4574d5ddf59804fcd0c4e9654c514d9a] blk-mq: put driver 
+tag when this request is completed
+git bisect good 36a3df5a4574d5ddf59804fcd0c4e9654c514d9a
+# good: [570e9b73b0af2e5381ca5343759779b8c1ed20e3] blk-mq: move 
+blk_mq_get_driver_tag into blk-mq.c
+git bisect good 570e9b73b0af2e5381ca5343759779b8c1ed20e3
+# bad: [b5fc1e8bedf8ad2c6381e0df6331ad5686aca425] blk-mq: remove 
+pointless call of list_entry_rq() in hctx_show_busy_rq()
+git bisect bad b5fc1e8bedf8ad2c6381e0df6331ad5686aca425
+# bad: [37f4a24c2469a10a4c16c641671bd766e276cf9f] blk-mq: centralise 
+related handling into blk_mq_get_driver_tag
+git bisect bad 37f4a24c2469a10a4c16c641671bd766e276cf9f
+# good: [723bf178f158abd1ce6069cb049581b3cb003aab] blk-mq: move 
+blk_mq_put_driver_tag() into blk-mq.c
+git bisect good 723bf178f158abd1ce6069cb049581b3cb003aab
+# first bad commit: [37f4a24c2469a10a4c16c641671bd766e276cf9f] blk-mq: 
+centralise related handling into blk_mq_get_driver_tag
+
+BTW, only need to change scheduler and not change nr_requests to trigger 
+this.
 
 Thanks,
-Ritika
-
-> On Aug 17, 2020, at 8:43 PM, Martin K. Petersen =
-<martin.petersen@oracle.com> wrote:
->=20
->=20
-> Ritika,
->=20
->> +		/*
->> +		 * At least SCSI device does not have a good way to =
-return if
->> +		 * Write Same/Zero is actually supported. To detect =
-this, first
->> +		 * try to issue one and if it fails clear the max =
-sectors value.
->> +		 * If this occurs on the lower device, the right error =
-code
->> +		 * needs to be propagated to upper layers.
->> +		 */
->> +		if (max_sectors =3D=3D 0)
->> +			return BLK_STS_NOTSUPP;
->=20
-> Maybe we should make it more explicit in the comment that there is a
-> window of error where this condition can occur? Something like:
->=20
->    If a device rejects a non-read/write command (discard, write same,
->    etc.) the low-level device driver will set the relevant queue limit
->    to 0 to prevent blk-lib from issuing more of the offending
->    operations. Commands queued prior to the queue limit being reset
->    need to be completed with BLK_STS_NOTSUPP to avoid I/O errors being
->    propagated to upper layers.
->=20
-> Otherwise looks good.
->=20
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
->=20
-> --=20
-> Martin K. Petersen	Oracle Linux Engineering
-
+John
