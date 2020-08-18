@@ -2,171 +2,208 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 878CFC433E1
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 10:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC185C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 11:27:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E0B02075E
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 10:31:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A4D720825
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 11:27:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="KHs2JfsW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726353AbgHRKby (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 06:31:54 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59882 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726043AbgHRKby (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 06:31:54 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C804FAF8E;
-        Tue, 18 Aug 2020 10:32:17 +0000 (UTC)
-Subject: Re: [PATCH 4/4] bcache: use part_[begin|end]_io_acct instead of
- disk_[begin|end]_io_acct
-To:     Song Liu <songliubraving@fb.com>
-Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org, axboe@kernel.dk, kernel-team@fb.com,
-        song@kernel.org
-References: <20200818070238.1323126-1-songliubraving@fb.com>
- <20200818070238.1323126-5-songliubraving@fb.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <218caa26-3569-dbe4-de89-8849bd6eeb8f@suse.de>
-Date:   Tue, 18 Aug 2020 18:31:44 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1726357AbgHRL0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 07:26:40 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:38472 "EHLO
+        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726145AbgHRL0I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Aug 2020 07:26:08 -0400
+Received: from myt5-23f0be3aa648.qloud-c.yandex.net (myt5-23f0be3aa648.qloud-c.yandex.net [IPv6:2a02:6b8:c12:3e29:0:640:23f0:be3a])
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 8D6F32E0A3C;
+        Tue, 18 Aug 2020 14:25:48 +0300 (MSK)
+Received: from unknown (unknown [::1])
+        by myt5-23f0be3aa648.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id vHuKOy9zk8-PlvKSqRo;
+        Tue, 18 Aug 2020 14:25:48 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1597749948; bh=ECKQ/Oj2lGJ2TD0a4un2j5uH1GK1lGrY89R5qcKWhKs=;
+        h=Message-Id:Cc:Subject:In-Reply-To:Date:References:To:From;
+        b=KHs2JfsWVq7Ot9pPeYlHlScvHG0FoKkBxDlfpEuWW9KfJR+nTLwK1MCLWh9OPjUOr
+         RcSy5qy5y5ttznUXGC0U6bZPZg/4FdeU3ePfV64uhj3SNq1QRHQrGpoHRWkdeqECeY
+         47CkJhR/Ud5+Fcv7fZzvnpVo65Neoilo9B8dCZKY=
+Authentication-Results: myt5-23f0be3aa648.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+X-Yandex-Sender-Uid: 1120000000084479
+Received: by myt5-25048b11116f.qloud-c.yandex.net with HTTP;
+        Tue, 18 Aug 2020 14:25:47 +0300
+From:   =?utf-8?B?0JTQvNC40YLRgNC40Lkg0JzQvtC90LDRhdC+0LI=?= 
+        <dmtrmonakhov@yandex-team.ru>
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>
+In-Reply-To: <20200811064340.31284-1-dmtrmonakhov@yandex-team.ru>
+References: <20200811064340.31284-1-dmtrmonakhov@yandex-team.ru>
+Subject: Re: [PATCH] bfq: fix blkio cgroup leakage v4
 MIME-Version: 1.0
-In-Reply-To: <20200818070238.1323126-5-songliubraving@fb.com>
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date:   Tue, 18 Aug 2020 14:25:47 +0300
+Message-Id: <167161597749243@mail.yandex-team.ru>
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/8/18 15:02, Song Liu wrote:
-> This enables proper statistics in /proc/diskstats for bcache partitions.
-> 
-> Cc: Coly Li <colyli@suse.de>
-> Signed-off-by: Song Liu <songliubraving@fb.com>
 
-The code looks good to me. It is fine to submit this bcache patch in
-your submission path.
 
-Reviewed-by: Coly Li <colyli@suse.de>
+11.08.2020, 09:43, "Dmitry Monakhov" <dmtrmonakhov@yandex-team.ru>:
+> Changes from v1:
+>     - update commit description with proper ref-accounting justification
+Ping paolo.valente@,  please take a look at the patch proposed, it works fine on our fleet. 
+Current situation is bad, it is impossible to use bfq with cgroup because of blkcg leackage since v5.6.
+IMHO, we definitely have to fix it asap.
 
-Thanks.
-
-Coly Li
-
+>
+> commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
+> introduce leak forbfq_group and blkcg_gq objects because of get/put
+> imbalance.
+> In fact whole idea of original commit is wrong because bfq_group entity
+> can not dissapear under us because it is referenced by child bfq_queue's
+> entities from here:
+>  -> bfq_init_entity()
+>     ->bfqg_and_blkg_get(bfqg);
+>     ->entity->parent = bfqg->my_entity
+>
+>  -> bfq_put_queue(bfqq)
+>     FINAL_PUT
+>     ->bfqg_and_blkg_put(bfqq_group(bfqq))
+>     ->kmem_cache_free(bfq_pool, bfqq);
+>
+> So parent entity can not disappear while child entity is in tree,
+> and child entities already has proper protection.
+> This patch revert commit db37a34c563b ("block, bfq: get a ref to a group when adding it to a service tree")
+>
+> bfq_group leak trace caused by bad commit:
+> -> blkg_alloc
+>    -> bfq_pq_alloc
+>      -> bfqg_get (+1)
+> ->bfq_activate_bfqq
+>   ->bfq_activate_requeue_entity
+>     -> __bfq_activate_entity
+>        ->bfq_get_entity
+>          ->bfqg_and_blkg_get (+1) <==== : Note1
+> ->bfq_del_bfqq_busy
+>   ->bfq_deactivate_entity+0x53/0xc0 [bfq]
+>     ->__bfq_deactivate_entity+0x1b8/0x210 [bfq]
+>       -> bfq_forget_entity(is_in_service = true)
+>          entity->on_st_or_in_serv = false <=== :Note2
+>          if (is_in_service)
+>              return; ==> do not touch reference
+> -> blkcg_css_offline
+>  -> blkcg_destroy_blkgs
+>   -> blkg_destroy
+>    -> bfq_pd_offline
+>     -> __bfq_deactivate_entity
+>          if (!entity->on_st_or_in_serv) /* true, because (Note2)
+>                 return false;
+>  -> bfq_pd_free
+>     -> bfqg_put() (-1, byt bfqg->ref == 2) because of (Note2)
+> So bfq_group and blkcg_gq will leak forever, see test-case below.
+>
+> ##TESTCASE_BEGIN:
+> #!/bin/bash
+>
+> max_iters=${1:-100}
+> #prep cgroup mounts
+> mount -t tmpfs cgroup_root /sys/fs/cgroup
+> mkdir /sys/fs/cgroup/blkio
+> mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
+>
+> # Prepare blkdev
+> grep blkio /proc/cgroups
+> truncate -s 1M img
+> losetup /dev/loop0 img
+> echo bfq > /sys/block/loop0/queue/scheduler
+>
+> grep blkio /proc/cgroups
+> for ((i=0;i<max_iters;i++))
+> do
+>     mkdir -p /sys/fs/cgroup/blkio/a
+>     echo 0 > /sys/fs/cgroup/blkio/a/cgroup.procs
+>     dd if=/dev/loop0 bs=4k count=1 of=/dev/null iflag=direct 2> /dev/null
+>     echo 0 > /sys/fs/cgroup/blkio/cgroup.procs
+>     rmdir /sys/fs/cgroup/blkio/a
+>     grep blkio /proc/cgroups
+> done
+> ##TESTCASE_END:
+>
+> Signed-off-by: Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
 > ---
->  drivers/md/bcache/request.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-> index 7de82c67597ce..1d946f601f7eb 100644
-> --- a/drivers/md/bcache/request.c
-> +++ b/drivers/md/bcache/request.c
-> @@ -475,6 +475,7 @@ struct search {
->  	unsigned int		read_dirty_data:1;
->  	unsigned int		cache_missed:1;
->  
-> +	struct hd_struct	*part;
->  	unsigned long		start_time;
->  
->  	struct btree_op		op;
-> @@ -669,7 +670,8 @@ static void bio_complete(struct search *s)
->  {
->  	if (s->orig_bio) {
->  		/* Count on bcache device */
-> -		disk_end_io_acct(s->d->disk, bio_op(s->orig_bio), s->start_time);
-> +		part_end_io_acct(s->part, bio_op(s->orig_bio), s->start_time);
-> +		hd_struct_put(s->part);
->  
->  		trace_bcache_request_end(s->d, s->orig_bio);
->  		s->orig_bio->bi_status = s->iop.status;
-> @@ -731,7 +733,8 @@ static inline struct search *search_alloc(struct bio *bio,
->  	s->write		= op_is_write(bio_op(bio));
->  	s->read_dirty_data	= 0;
->  	/* Count on the bcache device */
-> -	s->start_time		= disk_start_io_acct(d->disk, bio_sectors(bio), bio_op(bio));
-> +	s->part			= disk_map_sector_rcu(d->disk, bio->bi_iter.bi_sector);
-> +	s->start_time		= part_start_io_acct(s->part, bio_sectors(bio), bio_op(bio));
->  	s->iop.c		= d->c;
->  	s->iop.bio		= NULL;
->  	s->iop.inode		= d->id;
-> @@ -1072,6 +1075,7 @@ struct detached_dev_io_private {
->  	unsigned long		start_time;
->  	bio_end_io_t		*bi_end_io;
->  	void			*bi_private;
-> +	struct hd_struct	*part;
->  };
->  
->  static void detached_dev_end_io(struct bio *bio)
-> @@ -1083,7 +1087,8 @@ static void detached_dev_end_io(struct bio *bio)
->  	bio->bi_private = ddip->bi_private;
->  
->  	/* Count on the bcache device */
-> -	disk_end_io_acct(ddip->d->disk, bio_op(bio), ddip->start_time);
-> +	part_end_io_acct(ddip->part, bio_op(bio), ddip->start_time);
-> +	hd_struct_put(ddip->part);
->  
->  	if (bio->bi_status) {
->  		struct cached_dev *dc = container_of(ddip->d,
-> @@ -1109,7 +1114,8 @@ static void detached_dev_do_request(struct bcache_device *d, struct bio *bio)
->  	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
->  	ddip->d = d;
->  	/* Count on the bcache device */
-> -	ddip->start_time = disk_start_io_acct(d->disk, bio_sectors(bio), bio_op(bio));
-> +	ddip->part = disk_map_sector_rcu(d->disk, bio->bi_iter.bi_sector);
-> +	ddip->start_time = part_start_io_acct(ddip->part, bio_sectors(bio), bio_op(bio));
->  	ddip->bi_end_io = bio->bi_end_io;
->  	ddip->bi_private = bio->bi_private;
->  	bio->bi_end_io = detached_dev_end_io;
-> 
-
+>  block/bfq-cgroup.c | 2 +-
+>  block/bfq-iosched.h | 1 -
+>  block/bfq-wf2q.c | 12 ++----------
+>  3 files changed, 3 insertions(+), 12 deletions(-)
+>
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index 68882b9..b791e20 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -332,7 +332,7 @@ static void bfqg_put(struct bfq_group *bfqg)
+>                  kfree(bfqg);
+>  }
+>
+> -void bfqg_and_blkg_get(struct bfq_group *bfqg)
+> +static void bfqg_and_blkg_get(struct bfq_group *bfqg)
+>  {
+>          /* see comments in bfq_bic_update_cgroup for why refcounting bfqg */
+>          bfqg_get(bfqg);
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index cd224aa..7038952 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -986,7 +986,6 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
+>  struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
+>  struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+>  struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node);
+> -void bfqg_and_blkg_get(struct bfq_group *bfqg);
+>  void bfqg_and_blkg_put(struct bfq_group *bfqg);
+>
+>  #ifdef CONFIG_BFQ_GROUP_IOSCHED
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index eb0e2a6..26776bd 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -533,9 +533,7 @@ static void bfq_get_entity(struct bfq_entity *entity)
+>                  bfqq->ref++;
+>                  bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
+>                               bfqq, bfqq->ref);
+> - } else
+> - bfqg_and_blkg_get(container_of(entity, struct bfq_group,
+> - entity));
+> + }
+>  }
+>
+>  /**
+> @@ -649,14 +647,8 @@ static void bfq_forget_entity(struct bfq_service_tree *st,
+>
+>          entity->on_st_or_in_serv = false;
+>          st->wsum -= entity->weight;
+> - if (is_in_service)
+> - return;
+> -
+> - if (bfqq)
+> + if (bfqq && !is_in_service)
+>                  bfq_put_queue(bfqq);
+> - else
+> - bfqg_and_blkg_put(container_of(entity, struct bfq_group,
+> - entity));
+>  }
+>
+>  /**
+> --
+> 2.7.4
