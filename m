@@ -2,148 +2,127 @@ Return-Path: <SRS0=KeVv=B4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C47B4C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 17:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D17C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 18:14:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1CC82080C
-	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 17:55:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 867B6206B5
+	for <linux-block@archiver.kernel.org>; Tue, 18 Aug 2020 18:14:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bEm1IP/t"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IhQpPxzC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726624AbgHRRzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 13:55:21 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:53620 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726145AbgHRRzU (ORCPT
+        id S1726541AbgHRSOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Aug 2020 14:14:05 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:59256 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726435AbgHRSOE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 13:55:20 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IHr3l8033796;
-        Tue, 18 Aug 2020 17:55:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2020-01-29;
- bh=/FwaGN+wrydZZfTNsKFAkl2WnvJ4DlMNQaGHrGo2l7Q=;
- b=bEm1IP/ttrAkBqk/8coCDkmUE3dKIi8WXTGShbxelKwoSPonM0+Ck2aWUScOQt5+eG7J
- 6MlWD0o3u59qKAvA8x0MeF3HkO/7CTxPrnzTk9c7qImdx1+AVGs2oaoxzDr8kKw9Fc+l
- keyARJ9auEfHlHpHVRkZtyzdJ18b16bNGZVZJQ5d5EHMYKQRpV1/aKasPdUHASW7KQen
- N49oEBxLNSo7VoUL/Gi+OWhHPZZGIm6ZXheHdnG029GdysEgG04pfRhRUx1xyh1v2UHG
- tFrA6jRU2voL6LIb/6bI2O3xa5gMtbXgG/v7GaJdUgN3AjqAD1sSn5DuReEKz5lixxR1 hQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 32x8bn69cy-1
+        Tue, 18 Aug 2020 14:14:04 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IHvW6h166096;
+        Tue, 18 Aug 2020 18:13:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2020-01-29; bh=iMksFHQ4jfy225K3CniF9ieExPgWqfav3epP9OsiFJ8=;
+ b=IhQpPxzCQKfgji4hBxnknTqAhoQFngOS1ZPyPte+jKs9xvfbQ5XXxXEdc7CvnST21zf6
+ +SI3OALgKVRSawxGurgJC/lzWu7cUGIqRjUqVg+lxO7lkZtyAYfmccrIF/VfoROf5NIo
+ NHFhkMWuouXHD9bhmX4L11YVdN1rhvG77gmFehH/jQfYVtZkPICft6LKGaw+mc0uhGGn
+ WZ1/JmUda/oNBIZZbyzwjQ4lCxo/URB2xHpCe3KfXeF+QlapDun7udcCBzEVcKGI+Z5S
+ ytlbdGgUuKp7D0RYaUN7kzzJW2hEpNeBvpWwyowahZFBhh1OsrFrEonp8K+5hn+fQD79 gw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 32x7nmeers-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 18 Aug 2020 17:55:06 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IHlmtd073275;
-        Tue, 18 Aug 2020 17:55:05 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 32xsm3egcw-1
+        Tue, 18 Aug 2020 18:13:58 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IHwCTM108014;
+        Tue, 18 Aug 2020 18:13:58 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 32xs9n92g7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Aug 2020 17:55:05 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07IHt4OE017638;
-        Tue, 18 Aug 2020 17:55:04 GMT
-Received: from rsrivast-us.us.oracle.com (/10.211.44.96)
+        Tue, 18 Aug 2020 18:13:58 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07IIDuvj015544;
+        Tue, 18 Aug 2020 18:13:56 GMT
+Received: from dhcp-10-159-249-73.vpn.oracle.com (/10.159.249.73)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 18 Aug 2020 10:55:04 -0700
-From:   Ritika Srivastava <ritika.srivastava@oracle.com>
-To:     linux-block@vger.kernel.org, axboe@kernel.dk
-Cc:     martin.petersen@oracle.com, hch@infradead.org,
-        ritika.srivastava@oracle.com
-Subject: [PATCH v4 2/2] block: better deal with the delayed not supported case in blk_cloned_rq_check_limits
-Date:   Tue, 18 Aug 2020 10:39:40 -0700
-Message-Id: <1597772380-3034-1-git-send-email-ritika.srivastava@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
+        with ESMTP ; Tue, 18 Aug 2020 11:13:56 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.15\))
+Subject: Re: [PATCH v3 2/2] block: better deal with the delayed not supported
+ case in blk_cloned_rq_check_limits
+From:   Ritika Srivastava <RITIKA.SRIVASTAVA@ORACLE.COM>
+In-Reply-To: <yq1tux0bq7e.fsf@ca-mkp.ca.oracle.com>
+Date:   Tue, 18 Aug 2020 11:13:55 -0700
+Cc:     linux-block@vger.kernel.org, hch@infradead.org, axboe@kernel.dk
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AA28F307-418F-453C-A1FC-533FF54DBCC3@ORACLE.COM>
+References: <1597699898-21157-1-git-send-email-ritika.srivastava@oracle.com>
+ <yq1tux0bq7e.fsf@ca-mkp.ca.oracle.com>
+To:     "Martin K. Petersen" <martin.petersen@ORACLE.COM>
+X-Mailer: Apple Mail (2.3445.104.15)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9717 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
- malwarescore=0 mlxscore=0 phishscore=0 spamscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008180124
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9717 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 lowpriorityscore=0
- impostorscore=0 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
- mlxlogscore=999 priorityscore=1501 bulkscore=0 clxscore=1015 phishscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=999 suspectscore=3 malwarescore=0 bulkscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008180124
+ definitions=main-2008180125
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9717 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 spamscore=0
+ impostorscore=0 priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008180125
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If WRITE_ZERO/WRITE_SAME operation is not supported by the storage,
-blk_cloned_rq_check_limits() will return IO error which will cause
-device-mapper to fail the paths.
+Hi Martin,
+Thank you for the review.
+I have addressed the comment changes in the updated version.
 
-Instead, if the queue limit is set to 0, return BLK_STS_NOTSUPP.
-BLK_STS_NOTSUPP will be ignored by device-mapper and will not fail the
-paths.
+Thanks,
+Ritika
 
-Suggested-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Ritika Srivastava <ritika.srivastava@oracle.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
-Changelog:
-v4: Explain the window of error in the comments.
-    Add reviewed-by tag from Martin
-v3: Formatting changes and subject updated from previous version
-    -block: return BLK_STS_NOTSUPP if operation is not supported
-v2: Document scenario and SCSI error encountered in a comment in
-    blk_cloned_rq_check_limits().
----
- block/blk-core.c | 27 ++++++++++++++++++++++-----
- 1 file changed, 22 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d241ab8..43401d3 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1223,10 +1223,24 @@ blk_qc_t submit_bio(struct bio *bio)
- static blk_status_t blk_cloned_rq_check_limits(struct request_queue *q,
- 				      struct request *rq)
- {
--	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
-+	unsigned int max_sectors = blk_queue_get_max_sectors(q, req_op(rq));
-+
-+	if (blk_rq_sectors(rq) > max_sectors) {
-+		/*
-+		 * SCSI device does not have a good way to return if
-+		 * Write Same/Zero is actually supported. If a device rejects
-+		 * a non-read/write command (discard, write same,etc.) the
-+		 * low-level device driver will set the relevant queue limit to
-+		 * 0 to prevent blk-lib from issuing more of the offending
-+		 * operations. Commands queued prior to the queue limit being
-+		 * reset need to be completed with BLK_STS_NOTSUPP to avoid I/O
-+		 * errors being propagated to upper layers.
-+		 */
-+		if (max_sectors == 0)
-+			return BLK_STS_NOTSUPP;
-+
- 		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
--			__func__, blk_rq_sectors(rq),
--			blk_queue_get_max_sectors(q, req_op(rq)));
-+			__func__, blk_rq_sectors(rq), max_sectors);
- 		return BLK_STS_IOERR;
- 	}
- 
-@@ -1253,8 +1267,11 @@ static blk_status_t blk_cloned_rq_check_limits(struct request_queue *q,
-  */
- blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *rq)
- {
--	if (blk_cloned_rq_check_limits(q, rq))
--		return BLK_STS_IOERR;
-+	blk_status_t ret;
-+
-+	ret = blk_cloned_rq_check_limits(q, rq);
-+	if (ret != BLK_STS_OK)
-+		return ret;
- 
- 	if (rq->rq_disk &&
- 	    should_fail_request(&rq->rq_disk->part0, blk_rq_bytes(rq)))
--- 
-1.8.3.1
+> On Aug 17, 2020, at 8:43 PM, Martin K. Petersen =
+<martin.petersen@oracle.com> wrote:
+>=20
+>=20
+> Ritika,
+>=20
+>> +		/*
+>> +		 * At least SCSI device does not have a good way to =
+return if
+>> +		 * Write Same/Zero is actually supported. To detect =
+this, first
+>> +		 * try to issue one and if it fails clear the max =
+sectors value.
+>> +		 * If this occurs on the lower device, the right error =
+code
+>> +		 * needs to be propagated to upper layers.
+>> +		 */
+>> +		if (max_sectors =3D=3D 0)
+>> +			return BLK_STS_NOTSUPP;
+>=20
+> Maybe we should make it more explicit in the comment that there is a
+> window of error where this condition can occur? Something like:
+>=20
+>    If a device rejects a non-read/write command (discard, write same,
+>    etc.) the low-level device driver will set the relevant queue limit
+>    to 0 to prevent blk-lib from issuing more of the offending
+>    operations. Commands queued prior to the queue limit being reset
+>    need to be completed with BLK_STS_NOTSUPP to avoid I/O errors being
+>    propagated to upper layers.
+>=20
+> Otherwise looks good.
+>=20
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+>=20
+> --=20
+> Martin K. Petersen	Oracle Linux Engineering
 
