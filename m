@@ -2,233 +2,182 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB19C433E3
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB0CC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:30:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F933205CB
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:27:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECB92207BB
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:30:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1597843823;
+	bh=c/KIC1N+AThogXaPD4LYqtNhwTUgeFy5H658qfX3o6Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=2fBoT6l3dozpTdLKxJNUEx/kD/RNWtaWoHG3S1EVcg1jG452i2LKzln5LaF4aUuJ6
+	 KYFf4UnDv8aR0hfat8dBpMd/Pw17QBRsgR98oKnLyLnbYMp7TCmzwyyxJ5yWby7GxL
+	 VdcxMJ02hVLdra+zWpCA8E6zeWEwGlnyKESkqsqI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728022AbgHSNNj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 09:13:39 -0400
-Received: from esa1.mentor.iphmx.com ([68.232.129.153]:2433 "EHLO
-        esa1.mentor.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728467AbgHSNMk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 09:12:40 -0400
-IronPort-SDR: sgnuXoSGnZA8kGpvGIJRHMLbPKb87irF5jERhhiuQ4E53DLWD/wc/7AuVYiuwkD4awUdrM06vS
- +K28wDIOL2VRQ1TT/dxMWXIftGcIVFH9NP9YlzPxgppY2gXfeU2f4kLntSkm3iff3QNp/a+mBP
- bK3rWLvzwSRhI6qrmngYIJhCIfzWDlB9IhpGiroWr28f4bOMLYh9J6U52NNYtmiGw72DT38yVh
- g2pp33Mst8231BvuWs8jAM+HL9rqyDRfSUFH0OnVXkrzZ285gsEnyZE9TCRjf1SdT6ft3prO4K
- XEs=
-X-IronPort-AV: E=Sophos;i="5.76,331,1592899200"; 
-   d="scan'208";a="54241395"
-Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
-  by esa1.mentor.iphmx.com with ESMTP; 19 Aug 2020 05:12:30 -0800
-IronPort-SDR: ESPCdr3PB5nacUlfmLmN0RuCzcFWoXVmFTtIbiTTLRwe7ondCoy5uD3yMmdCR5+pGO962D9+rh
- g/NAgyTcsAK+gOnQy/2cyTDWJAPCaBAtAQmXHnk56xNzuSvZEMLMvxzQ4Vkx4VTdxYOj3Q9S65
- bTq8Lz9NBfWOXVxjnoyT5pyICOxgKsfiOYfFb9+7jeAknZHsMS2WEATQ2qLd+A3tvB7OEOYT+F
- 0N3bL90Mf3vp/LrPQ030ufzyA5F55orpIzuA8SwsZeymuFofeWyPtQAkoa7omoXaWhmiGXfnsK
- ud0=
-Subject: Re: PROBLEM: Long Workqueue delays V2
-From:   Jim Baxter <jim_baxter@mentor.com>
-To:     <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-mm@kvack.org>, <linux-block@vger.kernel.org>
-CC:     "Resch Carsten (CM/ESO6)" <Carsten.Resch@de.bosch.com>,
-        "Rosca, Eugeniu (ADITG/ESB)" <erosca@de.adit-jv.com>
-References: <625615f2-3a6b-3136-35f9-2f2fb3c110cf@mentor.com>
-Message-ID: <066753ec-eddc-d7f6-5cc8-fe282baba6ec@mentor.com>
-Date:   Wed, 19 Aug 2020 14:12:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728204AbgHSNaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 09:30:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41806 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726752AbgHSNaT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 09:30:19 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 42672205CB;
+        Wed, 19 Aug 2020 13:30:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1597843817;
+        bh=c/KIC1N+AThogXaPD4LYqtNhwTUgeFy5H658qfX3o6Y=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ybzJlclj7PKty/unc+4cb9Wd4WHHmVOSQ6smTxURwMsk2udx7+cwI/ct/VWqBRcaK
+         TPHq+CA3SbHrkQu/Yr3Og03gF7ak5urBzCx3tlqFTNnNw+aON11BMaSWgLTxyquPrd
+         2nUrrz+cKds/3opgas5LKByGC0micQy3OPDbdyF4=
+Date:   Wed, 19 Aug 2020 15:30:39 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     ulf.hansson@linaro.org, jassisinghbrar@gmail.com,
+        s.hauer@pengutronix.de, manohar.vanga@gmail.com, airlied@linux.ie,
+        linux-hyperv@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux1394-devel@lists.sourceforge.net,
+        anton.ivanov@cambridgegreys.com, devel@driverdev.osuosl.org,
+        linux-s390@vger.kernel.org, maximlevitsky@gmail.com,
+        richard@nod.at, deller@gmx.de,
+        linux-atm-general@lists.sourceforge.net, 3chas3@gmail.com,
+        linux-input@vger.kernel.org, kuba@kernel.org,
+        mporter@kernel.crashing.org, jdike@addtoit.com,
+        Kees Cook <keescook@chromium.org>, oakad@yahoo.com,
+        intel-gfx@lists.freedesktop.org, linux-um@lists.infradead.org,
+        linux-block@vger.kernel.org, broonie@kernel.org,
+        openipmi-developer@lists.sourceforge.net, mitch@sfgoth.com,
+        linux-arm-kernel@lists.infradead.org, linux-parisc@vger.kernel.org,
+        netdev@vger.kernel.org, martyn@welchs.me.uk,
+        dmitry.torokhov@gmail.com, linux-mmc@vger.kernel.org,
+        Allen Pais <allen.lkml@gmail.com>, linux-spi@vger.kernel.org,
+        alex.bou9@gmail.com, Allen Pais <allen.cryptic@gmail.com>,
+        stefanr@s5r6.in-berlin.de, daniel@ffwll.ch, sre@kernel.org,
+        linux-ntb@googlegroups.com,
+        Romain Perier <romain.perier@gmail.com>, shawnguo@kernel.org,
+        davem@davemloft.net
+Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
+Message-ID: <20200819133039.GA3192753@kroah.com>
+References: <20200817091617.28119-2-allen.cryptic@gmail.com>
+ <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
+ <202008171228.29E6B3BB@keescook>
+ <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
+ <202008171246.80287CDCA@keescook>
+ <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
+ <1597780833.3978.3.camel@HansenPartnership.com>
+ <f3312928-430c-25f3-7112-76f2754df080@kernel.dk>
+ <20200819131158.GA2591006@kroah.com>
+ <4f5a225d-460f-978f-e3cf-3f505140a515@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <625615f2-3a6b-3136-35f9-2f2fb3c110cf@mentor.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: SVR-IES-MBX-08.mgc.mentorg.com (139.181.222.8) To
- SVR-IES-MBX-03.mgc.mentorg.com (139.181.222.3)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4f5a225d-460f-978f-e3cf-3f505140a515@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Added linux-block List which may also be relevant to this issue.
+On Wed, Aug 19, 2020 at 07:17:19AM -0600, Jens Axboe wrote:
+> On 8/19/20 6:11 AM, Greg KH wrote:
+> > On Wed, Aug 19, 2020 at 07:00:53AM -0600, Jens Axboe wrote:
+> >> On 8/18/20 1:00 PM, James Bottomley wrote:
+> >>> On Mon, 2020-08-17 at 13:02 -0700, Jens Axboe wrote:
+> >>>> On 8/17/20 12:48 PM, Kees Cook wrote:
+> >>>>> On Mon, Aug 17, 2020 at 12:44:34PM -0700, Jens Axboe wrote:
+> >>>>>> On 8/17/20 12:29 PM, Kees Cook wrote:
+> >>>>>>> On Mon, Aug 17, 2020 at 06:56:47AM -0700, Jens Axboe wrote:
+> >>>>>>>> On 8/17/20 2:15 AM, Allen Pais wrote:
+> >>>>>>>>> From: Allen Pais <allen.lkml@gmail.com>
+> >>>>>>>>>
+> >>>>>>>>> In preparation for unconditionally passing the
+> >>>>>>>>> struct tasklet_struct pointer to all tasklet
+> >>>>>>>>> callbacks, switch to using the new tasklet_setup()
+> >>>>>>>>> and from_tasklet() to pass the tasklet pointer explicitly.
+> >>>>>>>>
+> >>>>>>>> Who came up with the idea to add a macro 'from_tasklet' that
+> >>>>>>>> is just container_of? container_of in the code would be
+> >>>>>>>> _much_ more readable, and not leave anyone guessing wtf
+> >>>>>>>> from_tasklet is doing.
+> >>>>>>>>
+> >>>>>>>> I'd fix that up now before everything else goes in...
+> >>>>>>>
+> >>>>>>> As I mentioned in the other thread, I think this makes things
+> >>>>>>> much more readable. It's the same thing that the timer_struct
+> >>>>>>> conversion did (added a container_of wrapper) to avoid the
+> >>>>>>> ever-repeating use of typeof(), long lines, etc.
+> >>>>>>
+> >>>>>> But then it should use a generic name, instead of each sub-system 
+> >>>>>> using some random name that makes people look up exactly what it
+> >>>>>> does. I'm not huge fan of the container_of() redundancy, but
+> >>>>>> adding private variants of this doesn't seem like the best way
+> >>>>>> forward. Let's have a generic helper that does this, and use it
+> >>>>>> everywhere.
+> >>>>>
+> >>>>> I'm open to suggestions, but as things stand, these kinds of
+> >>>>> treewide
+> >>>>
+> >>>> On naming? Implementation is just as it stands, from_tasklet() is
+> >>>> totally generic which is why I objected to it. from_member()? Not
+> >>>> great with naming... But I can see this going further and then we'll
+> >>>> suddenly have tons of these. It's not good for readability.
+> >>>
+> >>> Since both threads seem to have petered out, let me suggest in
+> >>> kernel.h:
+> >>>
+> >>> #define cast_out(ptr, container, member) \
+> >>> 	container_of(ptr, typeof(*container), member)
+> >>>
+> >>> It does what you want, the argument order is the same as container_of
+> >>> with the only difference being you name the containing structure
+> >>> instead of having to specify its type.
+> >>
+> >> Not to incessantly bike shed on the naming, but I don't like cast_out,
+> >> it's not very descriptive. And it has connotations of getting rid of
+> >> something, which isn't really true.
+> > 
+> > I agree, if we want to bike shed, I don't like this color either.
+> > 
+> >> FWIW, I like the from_ part of the original naming, as it has some clues
+> >> as to what is being done here. Why not just from_container()? That
+> >> should immediately tell people what it does without having to look up
+> >> the implementation, even before this becomes a part of the accepted
+> >> coding norm.
+> > 
+> > Why are people hating on the well-known and used container_of()?
+> > 
+> > If you really hate to type the type and want a new macro, what about
+> > 'container_from()'?  (noun/verb is nicer to sort symbols by...)
+> > 
+> > But really, why is this even needed?
+> 
+> container_from() or from_container(), either works just fine for me
+> in terms of naming.
+> 
+> I think people are hating on it because it makes for _really_ long
+> lines, and it's arguably cleaner/simpler to just pass in the pointer
+> type instead. Then you end up with lines like this:
+> 
+> 	struct request_queue *q =                                               
+> 		container_of(work, struct request_queue, requeue_work.work);  
+> 
+> But I'm not the one that started this addition of from_tasklet(), my
+> objection was adding a private macro for something that should be
+> generic functionality.
 
--------- Original Message --------
-Subject: PROBLEM: Long Workqueue delays V2
-From: Jim Baxter <jim_baxter@mentor.com>
-To: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-CC: "Resch Carsten (CM/ESO6)" <Carsten.Resch@de.bosch.com>, "Rosca, Eugeniu (ADITG/ESB)" <erosca@de.adit-jv.com>
-Date: Tue, 18 Aug 2020 12:58:13 +0100
+Agreed.
 
-> I am asking this question again to include the fs-devel list.
-> 
-> 
-> We have issues with the workqueue of the kernel overloading the CPU 0 
-> when we we disconnect a USB stick.
-> 
-> This results in other items on the shared workqueue being delayed by
-> around 6.5 seconds with a default kernel configuration and 2.3 seconds
-> on a config tailored for our RCar embedded platform.
-> 
-> 
-> 
-> We first noticed this issue on custom hardware and we have recreated it
-> on an RCar Starter Kit using a test module [1] to replicate the
-> behaviour, the test module outputs any delays of greater then 9ms.
-> 
-> To run the test we have a 4GB random file on a USB stick and perform
-> the following test.
-> The stick is mounted as R/O and we are copying data from the stick:
-> 
-> - Mount the stick.
-> mount -o ro,remount /dev/sda1
-> 
-> - Load the Module:
-> # taskset -c 0 modprobe latency-mon
-> 
-> - Copy large amount of data from the stick:
-> # dd if=/run/media/sda1/sample.txt of=/dev/zero
-> [ 1437.517603] DELAY: 10
-> 8388607+1 records in
-> 8388607+1 records out
-> 
-> 
-> - Disconnect the USB stick:
-> [ 1551.796792] usb 2-1: USB disconnect, device number 2
-> [ 1558.625517] DELAY: 6782
-> 
-> 
-> The Delay output 6782 is in milliseconds.
-> 
-> 
-> 
-> Using umount stops the issue occurring but is unfortunately not guaranteed
-> in our particular system.
-> 
-> 
-> From my analysis the hub_event workqueue kworker/0:1+usb thread uses around
-> 98% of the CPU.
-> 
-> I have traced the workqueue:workqueue_queue_work function while unplugging the USB
-> and there is no particular workqueue function being executed a lot more then the 
-> others for the kworker/0:1+usb thread.
-> 
-> 
-> Using perf I identified the hub_events workqueue was spending a lot of time in
-> invalidate_partition(), I have included a cut down the captured data from perf in
-> [2] which shows the additional functions where the kworker spends most of its time.
-> 
-> 
-> I am aware there will be delays on the shared workqueue, are the delays
-> we are seeing considered normal?
-> 
-> 
-> Is there any way to mitigate or identify where the delay is?
-> I am unsure if this is a memory or filesystem subsystem issue.
-> 
-> 
-> Thank you for you help.
-> 
-> Thanks,
-> Jim Baxter
-> 
-> [1] Test Module:
-> // SPDX-License-Identifier: GPL-2.0
-> /*
->  * Simple WQ latency monitoring
->  *
->  * Copyright (C) 2020 Advanced Driver Information Technology.
->  */
-> 
-> #include <linux/init.h>
-> #include <linux/ktime.h>
-> #include <linux/module.h>
-> 
-> #define PERIOD_MS 100
-> 
-> static struct delayed_work wq;
-> static u64 us_save;
-> 
-> static void wq_cb(struct work_struct *work)
-> {
-> 	u64 us = ktime_to_us(ktime_get());
-> 	u64 us_diff = us - us_save;
-> 	u64 us_print = 0;
-> 
-> 	if (!us_save)
-> 		goto skip_print;
-> 
-> 
-> 	us_print = us_diff / 1000 - PERIOD_MS;
-> 	if (us_print > 9)
-> 		pr_crit("DELAY: %lld\n", us_print);
-> 
-> skip_print:
-> 	us_save = us;
-> 	schedule_delayed_work(&wq, msecs_to_jiffies(PERIOD_MS));
-> }
-> 
-> static int latency_mon_init(void)
-> {
-> 	us_save = 0;
-> 	INIT_DELAYED_WORK(&wq, wq_cb);
-> 	schedule_delayed_work(&wq, msecs_to_jiffies(PERIOD_MS));
-> 
-> 	return 0;
-> }
-> 
-> static void latency_mon_exit(void)
-> {
-> 	cancel_delayed_work_sync(&wq);
-> 	pr_info("%s\n", __func__);
-> }
-> 
-> module_init(latency_mon_init);
-> module_exit(latency_mon_exit);
-> MODULE_AUTHOR("Eugeniu Rosca <erosca@de.adit-jv.com>");
-> MODULE_LICENSE("GPL");
-> 
-> 
-> [2] perf trace:
->     95.22%     0.00%  kworker/0:2-eve  [kernel.kallsyms]
->     |
->     ---ret_from_fork
->        kthread
->        worker_thread
->        |          
->         --95.15%--process_one_work
-> 		  |          
-> 		   --94.99%--hub_event
-> 			 |          
-> 			  --94.99%--usb_disconnect
-> 			  <snip>
-> 				|  
-> 				--94.90%--invalidate_partition
-> 				   __invalidate_device
-> 				   |          
-> 				   |--64.55%--invalidate_bdev
-> 				   |  |          
-> 				   |   --64.13%--invalidate_mapping_pages
-> 				   |     |          
-> 				   |     |--24.09%--invalidate_inode_page
-> 				   |     |   |          
-> 				   |     |   --23.44%--remove_mapping
-> 				   |     |     |          
-> 				   |     |      --23.20%--__remove_mapping
-> 				   |     |        |          
-> 				   |     |         --21.90%--arch_local_irq_restore
-> 				   |     |          
-> 				   |     |--22.44%--arch_local_irq_enable
-> 				   |          
-> 					--30.35%--shrink_dcache_sb 
-> 					<snip>
-> 					  |      
-> 					  --30.17%--truncate_inode_pages_range
-> 
+> Hence I think we either need to provide that, or
+> tell the from_tasklet() folks that they should just use container_of().
+
+Also agreed, thanks.
+
+greg k-h
