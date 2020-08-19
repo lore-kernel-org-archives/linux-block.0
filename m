@@ -2,103 +2,85 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B90DCC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 607AAC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:37:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9562620866
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:32:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ER65C1q9"
+	by mail.kernel.org (Postfix) with ESMTP id 47507204FD
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:37:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727996AbgHSNcl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 09:32:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726209AbgHSNcL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 09:32:11 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2BA1C061757
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 06:32:09 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id nv17so895267pjb.3
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 06:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vMNQ6WK7crIn272Njmors6Hr7L8KSr+wNL70fKp0QVw=;
-        b=ER65C1q9ts0AvzjOkb5ItKsKgaGf+Stame9zTWvpH+W/eE3pfo8xbS5mVPX+ux1tp4
-         NnqiJa1D6gM8lTIj0O0HudUaGnj0E72mbY46MdQo0gUKnYT/X7JR2uBAfGJ6BX73fswg
-         mz+ZnPuT//vA4XteJ1mIJJfslSpiUu/LMXb14SvmTVML0uYnjnbvtvxYQqaHsO+HxWBS
-         IsOX8kKXxfhQyYqVMKMcX58hvz9rTRCncpiIVTpkjkvttRIwOJnxucHhfMfHPPOiYIrs
-         2NppMs6yKeZg/M2sJLG2KbPtsdsP7PKPWqP6giZHx6k1lh8oM+b8D8GrCwmeMnffJjmR
-         2ZTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vMNQ6WK7crIn272Njmors6Hr7L8KSr+wNL70fKp0QVw=;
-        b=OY493Q1rxfKiRSWQiZ3vNuStVnPDJ/Kkb/GWSbQbFXsNPz3qXIuRCbuvu/C0KJv5MT
-         gIa+a2STwdj+SEhPrOpsA0hChB0LuqufVvp++Jt1TYE0RlxsVflBmill5VUwEH3olAn/
-         pVRmJw48ovTT8dE8yXEgy+cPTLqdD2acuEfccYG0pIAcwHOFQAzOvrdvjI4fujeE+SvP
-         wF9cSJUSWKumSxcNtXdgqId+xLuOEghOOWyBAfHM0+LR62YcPDxe6zl5LUECOoo++44i
-         pHfsuoi8mnZ49XTkeYj1exWRKC3PGgUP4tIIt5Wkf1sY51uM4sTB1QFw5fEIRGuw8fit
-         CpgQ==
-X-Gm-Message-State: AOAM532xq8isMxPcrDAQx3eWE8xQTBLkHdp2hDTI1upbIAX0Hh2Nd72P
-        QVAandxNAeyxQUAwfBF5WdJlgw==
-X-Google-Smtp-Source: ABdhPJykv40VOJjwPlf0c0xhI2b3f3WFmQQZcnLGRKru6GMjGBGKeeJCa2+T+ArRdO1dlue8HV8LYw==
-X-Received: by 2002:a17:902:6a8b:: with SMTP id n11mr5310699plk.75.1597843929467;
-        Wed, 19 Aug 2020 06:32:09 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id fa14sm2190486pjb.14.2020.08.19.06.32.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Aug 2020 06:32:08 -0700 (PDT)
-Subject: Re: [PATCH] rbd: Convert to use the preferred fallthrough macro
-To:     Ilya Dryomov <idryomov@gmail.com>
-Cc:     Miaohe Lin <linmiaohe@huawei.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Ceph Development <ceph-devel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200819085304.43653-1-linmiaohe@huawei.com>
- <1968d5b6-3543-a213-4118-9c36f9a48343@kernel.dk>
- <CAOi1vP85Jkc51LStsg9Mz0Q0W-s17LcOmvavc=k_X9KF9ML_2A@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <338ecba5-c0ea-bdc0-1bcb-5b739f90cf9f@kernel.dk>
-Date:   Wed, 19 Aug 2020 07:32:07 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728447AbgHSNh1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 09:37:27 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44308 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728699AbgHSNhZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 09:37:25 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id D40A8D67AE4401AA64B9;
+        Wed, 19 Aug 2020 21:37:15 +0800 (CST)
+Received: from [10.174.179.185] (10.174.179.185) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 19 Aug 2020 21:37:11 +0800
+Subject: Re: [PATCH v2] blkcg: fix memleak for iolatency
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <jbacik@fb.com>, <tj@kernel.org>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>
+References: <20200811022116.1824539-1-yuyufen@huawei.com>
+Message-ID: <21951039-d191-3c1f-3976-f2e2a84c541f@huawei.com>
+Date:   Wed, 19 Aug 2020 21:37:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <CAOi1vP85Jkc51LStsg9Mz0Q0W-s17LcOmvavc=k_X9KF9ML_2A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200811022116.1824539-1-yuyufen@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.185]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/19/20 6:31 AM, Ilya Dryomov wrote:
-> On Wed, Aug 19, 2020 at 3:03 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 8/19/20 1:53 AM, Miaohe Lin wrote:
->>> Convert the uses of fallthrough comments to fallthrough macro.
->>
->> Applied, thanks.
+ping
+
+On 2020/8/11 10:21, Yufen Yu wrote:
+> Normally, blkcg_iolatency_exit() will free related memory in iolatency
+> when cleanup queue. But if blk_throtl_init() return error and queue init
+> fail, blkcg_iolatency_exit() will not do that for us. Then it cause
+> memory leak.
 > 
-> Hi Jens,
+> Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> ---
+>   block/blk-cgroup.c | 8 +++++---
+>   1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> This has already been folded into another patch in ceph-client.git.
-> Please drop it.
-
-Dropped.
-
--- 
-Jens Axboe
-
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 619a79b51068..c195365c9817 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1152,13 +1152,15 @@ int blkcg_init_queue(struct request_queue *q)
+>   	if (preloaded)
+>   		radix_tree_preload_end();
+>   
+> -	ret = blk_iolatency_init(q);
+> +	ret = blk_throtl_init(q);
+>   	if (ret)
+>   		goto err_destroy_all;
+>   
+> -	ret = blk_throtl_init(q);
+> -	if (ret)
+> +	ret = blk_iolatency_init(q);
+> +	if (ret) {
+> +		blk_throtl_exit(q);
+>   		goto err_destroy_all;
+> +	}
+>   	return 0;
+>   
+>   err_destroy_all:
+> 
