@@ -2,96 +2,127 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28908C433E1
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 08:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C190C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 08:59:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 143E6206FA
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 08:56:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07886206FA
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 08:59:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tb740Kdg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727043AbgHSI4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 04:56:12 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9846 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726931AbgHSIyZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 04:54:25 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 67E7A8AE543F7D26D4D6;
-        Wed, 19 Aug 2020 16:54:17 +0800 (CST)
-Received: from huawei.com (10.175.104.175) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Wed, 19 Aug 2020
- 16:54:09 +0800
-From:   Miaohe Lin <linmiaohe@huawei.com>
-To:     <idryomov@gmail.com>, <axboe@kernel.dk>,
-        <dongsheng.yang@easystack.cn>
-CC:     <ceph-devel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linmiaohe@huawei.com>
-Subject: [PATCH] rbd: Convert to use the preferred fallthrough macro
-Date:   Wed, 19 Aug 2020 04:53:04 -0400
-Message-ID: <20200819085304.43653-1-linmiaohe@huawei.com>
-X-Mailer: git-send-email 2.19.1
+        id S1726826AbgHSI67 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 04:58:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42844 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726736AbgHSI66 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 04:58:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597827537;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FmRITmH257tbUw9Gz6jA6YfZV7mLy0QGH/xWvkTSpM8=;
+        b=Tb740KdgssN4Fmd7qS32UDFxRi0xAHGd3ru6gGGprCfwOO97jSaRT3/fic1rezP1+SzHuf
+        6RaJiC6DO3SBc0rdi0G1RA3U13UKBcB7c1ZqDJOelMB4EIeEcqAKho/QzbjOp9o/pKyUPY
+        eoJZEjpTiffiE9Nf04VLFUISQlbjH3M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-lAMrHoj9PK2M0U0Oz6-rvg-1; Wed, 19 Aug 2020 04:58:55 -0400
+X-MC-Unique: lAMrHoj9PK2M0U0Oz6-rvg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62781100CF6F;
+        Wed, 19 Aug 2020 08:58:54 +0000 (UTC)
+Received: from T590 (ovpn-12-56.pek2.redhat.com [10.72.12.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B8355D9E8;
+        Wed, 19 Aug 2020 08:58:47 +0000 (UTC)
+Date:   Wed, 19 Aug 2020 16:58:43 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [REPORT] BUG: KASAN: use-after-free in bt_iter+0x80/0xf8
+Message-ID: <20200819085843.GA2730150@T590>
+References: <8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com>
+ <a68379af-48e7-da2b-812c-ff0fa24a41bb@huawei.com>
+ <20200819000009.GB2712797@T590>
+ <585bb054-2009-4abc-f1e8-802e494ba49b@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.104.175]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <585bb054-2009-4abc-f1e8-802e494ba49b@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert the uses of fallthrough comments to fallthrough macro.
+On Wed, Aug 19, 2020 at 08:43:46AM +0100, John Garry wrote:
+> On 19/08/2020 01:00, Ming Lei wrote:
+> > On Tue, Aug 18, 2020 at 07:19:57PM +0100, John Garry wrote:
+> > > On 18/08/2020 13:03, John Garry wrote:
+> > > > Hi guys,
+> > > > 
+> > > > JFYI, While doing some testing on v5.9-rc1, I stumbled across this:
+> > > 
+> > > I bisected to here (hopefully without mistake):
+> > 
+> > This one is a long-term problem, see the following discussion:
+> > 
+> > https://lore.kernel.org/linux-block/1553492318-1810-1-git-send-email-jianchao.w.wang@oracle.com/
+> > 
+> > 
+> 
+> ah, right. I vaguely remember this. Well, if we didn't have a reliable
+> reproducer before, we do now.
 
-Signed-off-by: Hongxiang Lou <louhongxiang@huawei.com>
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- drivers/block/rbd.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+OK, that is great, please try the following patch:
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index d9c0e7d154f9..011539039693 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -3293,7 +3293,7 @@ static bool rbd_obj_advance_copyup(struct rbd_obj_request *obj_req, int *result)
- 	case __RBD_OBJ_COPYUP_OBJECT_MAPS:
- 		if (!pending_result_dec(&obj_req->pending, result))
- 			return false;
--		/* fall through */
-+		fallthrough;
- 	case RBD_OBJ_COPYUP_OBJECT_MAPS:
- 		if (*result) {
- 			rbd_warn(rbd_dev, "snap object map update failed: %d",
-@@ -3312,7 +3312,7 @@ static bool rbd_obj_advance_copyup(struct rbd_obj_request *obj_req, int *result)
- 	case __RBD_OBJ_COPYUP_WRITE_OBJECT:
- 		if (!pending_result_dec(&obj_req->pending, result))
- 			return false;
--		/* fall through */
-+		fallthrough;
- 	case RBD_OBJ_COPYUP_WRITE_OBJECT:
- 		return true;
- 	default:
-@@ -3399,7 +3399,7 @@ static bool rbd_obj_advance_write(struct rbd_obj_request *obj_req, int *result)
- 	case __RBD_OBJ_WRITE_COPYUP:
- 		if (!rbd_obj_advance_copyup(obj_req, result))
- 			return false;
--		/* fall through */
-+		fallthrough;
- 	case RBD_OBJ_WRITE_COPYUP:
- 		if (*result) {
- 			rbd_warn(rbd_dev, "copyup failed: %d", *result);
-@@ -3592,7 +3592,7 @@ static bool rbd_img_advance(struct rbd_img_request *img_req, int *result)
- 	case __RBD_IMG_OBJECT_REQUESTS:
- 		if (!pending_result_dec(&img_req->pending, result))
- 			return false;
--		/* fall through */
-+		fallthrough;
- 	case RBD_IMG_OBJECT_REQUESTS:
- 		return true;
- 	default:
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 32d82e23b095..f18632c524e9 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -185,19 +185,19 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ {
+ 	struct bt_iter_data *iter_data = data;
+ 	struct blk_mq_hw_ctx *hctx = iter_data->hctx;
+-	struct blk_mq_tags *tags = hctx->tags;
++	struct blk_mq_tags *tags = hctx->sched_tags ?: hctx->tags;
+ 	bool reserved = iter_data->reserved;
+ 	struct request *rq;
+ 
+ 	if (!reserved)
+ 		bitnr += tags->nr_reserved_tags;
+-	rq = tags->rqs[bitnr];
++	rq = tags->static_rqs[bitnr];
+ 
+ 	/*
+ 	 * We can hit rq == NULL here, because the tagging functions
+ 	 * test and set the bit before assigning ->rqs[].
+ 	 */
+-	if (rq && rq->q == hctx->queue)
++	if (rq && rq->tag >= 0 && rq->q == hctx->queue)
+ 		return iter_data->fn(hctx, rq, iter_data->data, reserved);
+ 	return true;
+ }
+@@ -406,7 +406,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		return;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+-		struct blk_mq_tags *tags = hctx->tags;
++		struct blk_mq_tags *tags = hctx->sched_tags ?: hctx->tags;
+ 
+ 		/*
+ 		 * If no software queues are currently mapped to this
+
 -- 
-2.19.1
+Ming
 
