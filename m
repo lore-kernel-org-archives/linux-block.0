@@ -2,128 +2,108 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BF3C433E5
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:00:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E86BC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:16:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D51482083B
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:00:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B85820885
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:16:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="OjUAwUTp";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="OjUAwUTp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eTUoQYU4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727992AbgHSO7x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 10:59:53 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:40860 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727087AbgHSO7x (ORCPT
+        id S1726929AbgHSPQk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 11:16:40 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38532 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728611AbgHSPQk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 10:59:53 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id D115F8EE17F;
-        Wed, 19 Aug 2020 07:59:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597849189;
-        bh=7PMu9izfvJP0Yqog7vxhcEQb9h62GDKPX1If4m+L8R0=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=OjUAwUTp/ItAZSlbV+f5fOCaWVzt9DqIN+w9yoJxaEE0gnHE6rZZVb54+Hz0c5ZZE
-         Hb/3aibCu54t6gcW2aVqbWIIDHBKiOLbR/fOvAY90fW0SUrQP0QkX8+CeCZ+PSzzdQ
-         ViQuLsoRKTFDhSIJnCWv76g7gqa9l4AuHedfCKt8=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id XOU0COqUWmkB; Wed, 19 Aug 2020 07:59:49 -0700 (PDT)
-Received: from [153.66.254.174] (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 19 Aug 2020 11:16:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597850198;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dtDVWY8XOKhIQ4U3Ma2pRAa4BiO6PQTODa+d3hIB028=;
+        b=eTUoQYU4w0PqxebyjdZzMRKFNsm+RFbo0GeMURwvXAX8SLNNBx34cLHnUuJP5UccO80DYJ
+        2oKwt13HCLT6oHOlBsyPybW4VkRuRE7nQtXra84l+6VSJ76iwMRRlq+uccdGnrsfOfAnNf
+        RsJQbV3xqe6QN/TEh/OD9oqwRHxO1U8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-515--sbZrEW0OP6v7eM-itDyxQ-1; Wed, 19 Aug 2020 11:16:36 -0400
+X-MC-Unique: -sbZrEW0OP6v7eM-itDyxQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 6C2C88EE0E9;
-        Wed, 19 Aug 2020 07:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1597849189;
-        bh=7PMu9izfvJP0Yqog7vxhcEQb9h62GDKPX1If4m+L8R0=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=OjUAwUTp/ItAZSlbV+f5fOCaWVzt9DqIN+w9yoJxaEE0gnHE6rZZVb54+Hz0c5ZZE
-         Hb/3aibCu54t6gcW2aVqbWIIDHBKiOLbR/fOvAY90fW0SUrQP0QkX8+CeCZ+PSzzdQ
-         ViQuLsoRKTFDhSIJnCWv76g7gqa9l4AuHedfCKt8=
-Message-ID: <1597849185.3875.7.camel@HansenPartnership.com>
-Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@chromium.org>
-Cc:     Allen Pais <allen.cryptic@gmail.com>, jdike@addtoit.com,
-        richard@nod.at, anton.ivanov@cambridgegreys.com, 3chas3@gmail.com,
-        stefanr@s5r6.in-berlin.de, airlied@linux.ie, daniel@ffwll.ch,
-        sre@kernel.org, kys@microsoft.com, deller@gmx.de,
-        dmitry.torokhov@gmail.com, jassisinghbrar@gmail.com,
-        shawnguo@kernel.org, s.hauer@pengutronix.de,
-        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
-        mporter@kernel.crashing.org, alex.bou9@gmail.com,
-        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
-        mitch@sfgoth.com, davem@davemloft.net, kuba@kernel.org,
-        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux1394-devel@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        Allen Pais <allen.lkml@gmail.com>,
-        Romain Perier <romain.perier@gmail.com>
-Date:   Wed, 19 Aug 2020 07:59:45 -0700
-In-Reply-To: <f3312928-430c-25f3-7112-76f2754df080@kernel.dk>
-References: <20200817091617.28119-1-allen.cryptic@gmail.com>
-         <20200817091617.28119-2-allen.cryptic@gmail.com>
-         <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
-         <202008171228.29E6B3BB@keescook>
-         <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
-         <202008171246.80287CDCA@keescook>
-         <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
-         <1597780833.3978.3.camel@HansenPartnership.com>
-         <f3312928-430c-25f3-7112-76f2754df080@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04D061DDFB;
+        Wed, 19 Aug 2020 15:16:35 +0000 (UTC)
+Received: from dhcp-12-105.nay.redhat.com (dhcp-12-105.nay.redhat.com [10.66.12.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 29E837E304;
+        Wed, 19 Aug 2020 15:16:32 +0000 (UTC)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     linux-block@vger.kernel.org
+Cc:     sagi@grimberg.me, osandov@osandov.com, bvanassche@acm.org
+Subject: [PATCH blktests] common/multipath-over-rdma: fix warning ignored null byte in input
+Date:   Wed, 19 Aug 2020 23:16:01 +0800
+Message-Id: <20200819151601.18526-1-yi.zhang@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2020-08-19 at 07:00 -0600, Jens Axboe wrote:
-> On 8/18/20 1:00 PM, James Bottomley wrote:
-[...]
-> > Since both threads seem to have petered out, let me suggest in
-> > kernel.h:
-> > 
-> > #define cast_out(ptr, container, member) \
-> > 	container_of(ptr, typeof(*container), member)
-> > 
-> > It does what you want, the argument order is the same as
-> > container_of with the only difference being you name the containing
-> > structure instead of having to specify its type.
-> 
-> Not to incessantly bike shed on the naming, but I don't like
-> cast_out, it's not very descriptive. And it has connotations of
-> getting rid of something, which isn't really true.
+[blktests]# nvme_trtype=rdma ./check nvme/004
+nvme/004 (test nvme and nvmet UUID NS descriptors)
+    runtime  1.238s  ...
+nvme/004 (test nvme and nvmet UUID NS descriptors)           [failed]ignored null byte in input
+    runtime  1.238s  ...  1.237s 410: warning: command substitution: ignored null byte in input
+    --- tests/nvme/004.out	2020-08-18 08:11:08.496809985 -0400
+    +++ /root/blktests/results/nodev/nvme/004.out.bad	2020-08-19 10:43:02.193885685 -0400
+    @@ -1,4 +1,5 @@
+     Running nvme/004
+    +common/multipath-over-rdma: line 409: warning: command substitution: ignored null byte in input
+     91fdba0d-f87b-4c25-b80f-db7be1418b9e
+     uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+     NQN:blktests-subsystem-1 disconnected 1 controller(s)
 
-Um, I thought it was exactly descriptive: you're casting to the outer
-container.  I thought about following the C++ dynamic casting style, so
-out_cast(), but that seemed a bit pejorative.  What about outer_cast()?
+manually to reproduce:
+Update one network interface with 15 chars:
+[blktests]# ip a s enp0s29u1u7u3c2
+5: enp0s29u1u7u3c2: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq state DOWN group default qlen 1000
+    link/ether f0:d4:e2:e6:e1:e3 brd ff:ff:ff:ff:ff:ff
+[blktests]# modprobe rdma_rxe
+[blktests]# echo enp0s29u1u7u3c2 >/sys/module/rdma_rxe/parameters/add
+[blktests]# cat /sys/class/infiniband/rxe0/parent
+enp0s29u1u7u3c2[blktests]# f="/sys/class/infiniband/rxe0/parent"
+[blktests]# echo $(<"$f")
+-bash: warning: command substitution: ignored null byte in input
+enp0s29u1u7u3c2
+[blktests]# echo $(tr -d '\0' <"$f")
+enp0s29u1u7u3c2
 
-> FWIW, I like the from_ part of the original naming, as it has some
-> clues as to what is being done here. Why not just from_container()?
-> That should immediately tell people what it does without having to
-> look up the implementation, even before this becomes a part of the
-> accepted coding norm.
+Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+---
+ common/multipath-over-rdma | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm not opposed to container_from() but it seems a little less
-descriptive than outer_cast() but I don't really care.  I always have
-to look up container_of() when I'm using it so this would just be
-another macro of that type ...
-
-James
+diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
+index 355b169..86e7d86 100644
+--- a/common/multipath-over-rdma
++++ b/common/multipath-over-rdma
+@@ -406,7 +406,7 @@ has_rdma_rxe() {
+ 	local f
+ 
+ 	for f in /sys/class/infiniband/*/parent; do
+-		if [ -e "$f" ] && [ "$(<"$f")" = "$1" ]; then
++		if [ -e "$f" ] && [ "$(tr -d '\0' <"$f")" = "$1" ]; then
+ 			return 0
+ 		fi
+ 	done
+-- 
+2.21.0
 
