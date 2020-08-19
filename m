@@ -2,119 +2,144 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D7A8C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 04:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15808C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 04:25:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D346420772
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 04:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E65442083B
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 04:25:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XCcsVzG0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725876AbgHSEWT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 00:22:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44916 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725275AbgHSEWS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 00:22:18 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 2DEBAB7E7;
-        Wed, 19 Aug 2020 04:22:41 +0000 (UTC)
-Subject: Re: [PATCH v7 1/6] net: introduce helper sendpage_ok() in
- include/linux/net.h
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        netdev@vger.kernel.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, Jan Kara <jack@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Vlastimil Babka <vbabka@suse.com>, stable@vger.kernel.org
-References: <20200818131227.37020-1-colyli@suse.de>
- <20200818131227.37020-2-colyli@suse.de> <20200818162404.GA27196@lst.de>
- <217ec0ec-3c5a-a8ed-27d9-c634f0b9a045@suse.de>
- <20200818194930.GA31966@lst.de>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- mQINBFYX6S8BEAC9VSamb2aiMTQREFXK4K/W7nGnAinca7MRuFUD4JqWMJ9FakNRd/E0v30F
- qvZ2YWpidPjaIxHwu3u9tmLKqS+2vnP0k7PRHXBYbtZEMpy3kCzseNfdrNqwJ54A430BHf2S
- GMVRVENiScsnh4SnaYjFVvB8SrlhTsgVEXEBBma5Ktgq9YSoy5miatWmZvHLFTQgFMabCz/P
- j5/xzykrF6yHo0rHZtwzQzF8rriOplAFCECp/t05+OeHHxjSqSI0P/G79Ll+AJYLRRm9til/
- K6yz/1hX5xMToIkYrshDJDrUc8DjEpISQQPhG19PzaUf3vFpmnSVYprcWfJWsa2wZyyjRFkf
- J51S82WfclafNC6N7eRXedpRpG6udUAYOA1YdtlyQRZa84EJvMzW96iSL1Gf+ZGtRuM3k49H
- 1wiWOjlANiJYSIWyzJjxAd/7Xtiy/s3PRKL9u9y25ftMLFa1IljiDG+mdY7LyAGfvdtIkanr
- iBpX4gWXd7lNQFLDJMfShfu+CTMCdRzCAQ9hIHPmBeZDJxKq721CyBiGAhRxDN+TYiaG/UWT
- 7IB7LL4zJrIe/xQ8HhRO+2NvT89o0LxEFKBGg39yjTMIrjbl2ZxY488+56UV4FclubrG+t16
- r2KrandM7P5RjR+cuHhkKseim50Qsw0B+Eu33Hjry7YCihmGswARAQABtBhDb2x5IExpIDxj
- b2x5bGlAc3VzZS5kZT6JAlYEEwEIAEACGyMHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgBYh
- BOo+RS/0+Uhgjej60Mc5B5Nrffj8BQJcR84dBQkY++fuAAoJEMc5B5Nrffj8ixcP/3KAKg1X
- EcoW4u/0z+Ton5rCyb/NpAww8MuRjNW82UBUac7yCi1y3OW7NtLjuBLw5SaVG5AArb7IF3U0
- qTOobqfl5XHsT0o5wFHZaKUrnHb6y7V3SplsJWfkP3JmOooJsQB3z3K96ZTkFelsNb0ZaBRu
- gV+LA4MomhQ+D3BCDR1it1OX/tpvm2uaDF6s/8uFtcDEM9eQeqATN/QAJ49nvU/I8zDSY9rc
- 0x9mP0x+gH4RccbnoPu/rUG6Fm1ZpLrbb6NpaYBBJ/V1BC4lIOjnd24bsoQrQmnJn9dSr60X
- 1MY60XDszIyzRw7vbJcUn6ZzPNFDxFFT9diIb+wBp+DD8ZlD/hnVpl4f921ZbvfOSsXAJrKB
- 1hGY17FPwelp1sPcK2mDT+pfHEMV+OQdZzD2OCKtza/5IYismJJm3oVUYMogb5vDNAw9X2aP
- XgwUuG+FDEFPamFMUwIfzYHcePfqf0mMsaeSgtA/xTxzx/0MLjUJHl46Bc0uKDhv7QUyGz0j
- Ywgr2mHTvG+NWQ/mDeHNGkcnsnp3IY7koDHnN2xMFXzY4bn9m8ctqKo2roqjCzoxD/njoAhf
- KBzdybLHATqJG/yiZSbCxDA1n/J4FzPyZ0rNHUAJ/QndmmVspE9syFpFCKigvvyrzm016+k+
- FJ59Q6RG4MSy/+J565Xj+DNY3/dCuQINBFYX6S8BEADZP+2cl4DRFaSaBms08W8/smc5T2CO
- YhAoygZn71rB7Djml2ZdvrLRjR8Qbn0Q/2L2gGUVc63pJnbrjlXSx2LfAFE0SlfYIJ11aFdF
- 9w7RvqWByQjDJor3Z0fWvPExplNgMvxpD0U0QrVT5dIGTx9hadejCl/ug09Lr6MPQn+a4+qs
- aRWwgCSHaIuDkH3zI1MJXiqXXFKUzJ/Fyx6R72rqiMPHH2nfwmMu6wOXAXb7+sXjZz5Po9GJ
- g2OcEc+rpUtKUJGyeQsnCDxUcqJXZDBi/GnhPCcraQuqiQ7EGWuJfjk51vaI/rW4bZkA9yEP
- B9rBYngbz7cQymUsfxuTT8OSlhxjP3l4ZIZFKIhDaQeZMj8pumBfEVUyiF6KVSfgfNQ/5PpM
- R4/pmGbRqrAAElhrRPbKQnCkGWDr8zG+AjN1KF6rHaFgAIO7TtZ+F28jq4reLkur0N5tQFww
- wFwxzROdeLHuZjL7eEtcnNnzSkXHczLkV4kQ3+vr/7Gm65mQfnVpg6JpwpVrbDYQeOFlxZ8+
- GERY5Dag4KgKa/4cSZX2x/5+KkQx9wHwackw5gDCvAdZ+Q81nm6tRxEYBBiVDQZYqO73stgT
- ZyrkxykUbQIy8PI+g7XMDCMnPiDncQqgf96KR3cvw4wN8QrgA6xRo8xOc2C3X7jTMQUytCz9
- 0MyV1QARAQABiQI8BBgBCAAmAhsMFiEE6j5FL/T5SGCN6PrQxzkHk2t9+PwFAlxHziAFCRj7
- 5/EACgkQxzkHk2t9+PxgfA//cH5R1DvpJPwraTAl24SUcG9EWe+NXyqveApe05nk15zEuxxd
- e4zFEjo+xYZilSveLqYHrm/amvQhsQ6JLU+8N60DZHVcXbw1Eb8CEjM5oXdbcJpXh1/1BEwl
- 4phsQMkxOTns51bGDhTQkv4lsZKvNByB9NiiMkT43EOx14rjkhHw3rnqoI7ogu8OO7XWfKcL
- CbchjJ8t3c2XK1MUe056yPpNAT2XPNF2EEBPG2Y2F4vLgEbPv1EtpGUS1+JvmK3APxjXUl5z
- 6xrxCQDWM5AAtGfM/IswVjbZYSJYyH4BQKrShzMb0rWUjkpXvvjsjt8rEXpZEYJgX9jvCoxt
- oqjCKiVLpwje9WkEe9O9VxljmPvxAhVqJjX62S+TGp93iD+mvpCoHo3+CcvyRcilz+Ko8lfO
- hS9tYT0HDUiDLvpUyH1AR2xW9RGDevGfwGTpF0K6cLouqyZNdhlmNciX48tFUGjakRFsxRmX
- K0Jx4CEZubakJe+894sX6pvNFiI7qUUdB882i5GR3v9ijVPhaMr8oGuJ3kvwBIA8lvRBGVGn
- 9xvzkQ8Prpbqh30I4NMp8MjFdkwCN6znBKPHdjNTwE5PRZH0S9J0o67IEIvHfH0eAWAsgpTz
- +jwc7VKH7vkvgscUhq/v1/PEWCAqh9UHy7R/jiUxwzw/288OpgO+i+2l11Y=
-Message-ID: <04408ff6-f765-8f3e-ead9-aec55043e469@suse.de>
-Date:   Wed, 19 Aug 2020 12:22:05 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1725781AbgHSEZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 00:25:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56271 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725275AbgHSEZj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 00:25:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597811138;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=R5xoXHfY7Hx9a4qXAIGO65sRQTEoqN+pm9vJlgSDX9c=;
+        b=XCcsVzG0Xr0B2HSJgqC0ZZQbKYF88FjCSB49SYNFXV0nIiUuw7iotPfCB5Kx1NrNSsBLN0
+        aasMAh5FKRgYVEkFjd4p+It5adeElrz5jIKRqb4QyMfOPGBir9wWAaLimIYs0YuY8vc2WR
+        J6qco5BXcba8ioSlCWUFklS2hUzJxO0=
+Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
+ [209.85.222.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-546-is5HRDG_ON-FNBmcgckk-A-1; Wed, 19 Aug 2020 00:25:36 -0400
+X-MC-Unique: is5HRDG_ON-FNBmcgckk-A-1
+Received: by mail-ua1-f71.google.com with SMTP id b6so5533817uak.8
+        for <linux-block@vger.kernel.org>; Tue, 18 Aug 2020 21:25:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=R5xoXHfY7Hx9a4qXAIGO65sRQTEoqN+pm9vJlgSDX9c=;
+        b=t+wtaie7wRgN+a5Rk/TPWZk+Ww2YQbpVbZml+D8ggCR97NbzL4ZGvX9SNrUVX9PRxR
+         C4mqT/eAZmjviT6KyLh3ZL+RX7dag9YW3+ne7XwsT147B5bCjhkfmrnL1iULViYAF6jW
+         RufpKtjzhXxbujvQiM/XLT3ZcqE8cj1zqxn1kztaKpmRVnEPbna/f0BsVffGBUQg5gqG
+         nwpalZW4FX6hYCs8Tuonj9H0domwJIV9b6GPh+21LXxmKeor+ovv7tTBpc7hRvO4g88G
+         h4tJnoj53mEVRfAAR7TWZ4H4u9YLFUkTaQqlXSfBPC0Z9xjvnkjXA4D9IsYXx/WpuRLS
+         fMWA==
+X-Gm-Message-State: AOAM530M9PFRJ8DWovLaa70nLrO4xCKf9Cs7GLOcU1lRtqA8BQqAyqNr
+        /Y54EWaJ7pCRIoRgbnexnGrXx5YGpF6T4H4SQNRxxhpzrQiJTDRwobMCb3b6Db0IbgQQKL/0Uxf
+        hU1vPv6X+OdlQ2C1rkH8N0i8XBAfcYtUDH6oRG+I=
+X-Received: by 2002:a67:69c3:: with SMTP id e186mr12369953vsc.20.1597811132284;
+        Tue, 18 Aug 2020 21:25:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxIFPUsE/VWuXb9s9uNGUuCZINz6bavw3tjyGN+MxKJLIhreNrKa3v7D09cqxb/fkrSKNhD003/B44UPM4+fyI=
+X-Received: by 2002:a67:69c3:: with SMTP id e186mr12369946vsc.20.1597811132053;
+ Tue, 18 Aug 2020 21:25:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200818194930.GA31966@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200807160327.GA977@redhat.com> <CAHk-=wiC=g-0yZW6QrEXRH53bUVAwEFgYxd05qgOnDLJYdzzcA@mail.gmail.com>
+ <20200807204015.GA2178@redhat.com> <CAMeeMh_=M3Z7bLPN3_SD+VxNbosZjXgC_H2mZq1eCeZG0kUx1w@mail.gmail.com>
+ <CALrw=nHD81X4YCpuk-Pp9_FSFba6LZEVUwo-YkYh1nL9pEbzpA@mail.gmail.com> <CAHk-=wj95eQxPOEMHe8j3zmpZYHbv8kZ0nz8fUUCO6acENTs0w@mail.gmail.com>
+In-Reply-To: <CAHk-=wj95eQxPOEMHe8j3zmpZYHbv8kZ0nz8fUUCO6acENTs0w@mail.gmail.com>
+From:   John Dorminy <jdorminy@redhat.com>
+Date:   Wed, 19 Aug 2020 00:25:20 -0400
+Message-ID: <CAMeeMh_4j9EyOB3evyHi536d8kocH3egPdGO_FZj+G5iZzkVrQ@mail.gmail.com>
+Subject: Re: [git pull] device mapper changes for 5.9
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Ignat Korchagin <ignat@cloudflare.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        JeongHyeon Lee <jhs2.lee@samsung.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        yangerkun <yangerkun@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/8/19 03:49, Christoph Hellwig wrote:
-> On Wed, Aug 19, 2020 at 12:33:37AM +0800, Coly Li wrote:
->> On 2020/8/19 00:24, Christoph Hellwig wrote:
->>> I think we should go for something simple like this instead:
->>
->> This idea is fine to me. Should a warning message be through here? IMHO
->> the driver still sends an improper page in, fix it in silence is too
->> kind or over nice to the buggy driver(s).
-> 
-> I don't think a warning is a good idea.  An API that does the right
-> thing underneath and doesn't require boiler plate code in most callers
-> is the right API.
-> 
+Your points are good. I don't know a good macrobenchmark at present,
+but at least various latency numbers are easy to get out of fio.
 
-Then I don't have more comment.
+I ran a similar set of tests on an Optane 900P with results below.
+'clat' is, as fio reports, the completion latency, measured in usec.
+'configuration' is [block size], [iodepth], [jobs]; picked to be a
+varied selection that obtained excellent throughput from the drive.
+Table reports average, and 99th percentile, latency times as well as
+throughput. It matches Ignat's report that large block sizes using the
+new option can have worse latency and throughput on top-end drives,
+although that result doesn't make any sense to me.
 
-Thanks.
+Happy to run some more there or elsewhere if there are suggestions.
 
-Coly Li
+devicetype    configuration    MB/s    clat mean    clat 99%
+------------------------------------------------------------------
+nvme base    1m,32,4     2259    59280       67634
+crypt default    1m,32,4     2267    59050       182000
+crypt no_w_wq    1m,32,4     1758    73954.54    84411
+nvme base    64k,1024,1    2273    29500.92    30540
+crypt default    64k,1024,1    2167    29518.89    50594
+crypt no_w_wq    64k,1024,1    2056    31090.23    31327
+nvme base    4k,128,4    2159      924.57    1106
+crypt default    4k,128,4    1256     1663.67    3294
+crypt no_w_wq    4k,128,4    1703     1165.69    1319
+
+Ignat, how do these numbers match up to what you've been seeing?
+
+-John
+
+
+On Tue, Aug 18, 2020 at 5:23 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Tue, Aug 18, 2020 at 2:12 PM Ignat Korchagin <ignat@cloudflare.com> wrote:
+> >
+> > Additionally if one cares about latency
+>
+> I think everybody really deep down cares about latency, they just
+> don't always know it, and the benchmarks are very seldom about it
+> because it's so much harder to measure.
+>
+> > they will not use HDDs for the workflow and HDDs have much higher IO latency than CPU scheduling.
+>
+> I think by now we can just say that anybody who uses HDD's don't care
+> about performance as a primary issue.
+>
+> I don't think they are really interesting as a benchmark target - at
+> least from the standpoint of what the kernel should optimize for.
+>
+> People have HDD's for legacy reasons or because they care much more
+> about capacity than performance.  Why should _we_ then worry about
+> performance that the user doesn't worry about?
+>
+> I'm not saying we should penalize HDD's, but I don't think they are
+> things we should primarily care deeply about any more.
+>
+>                Linus
+>
+
