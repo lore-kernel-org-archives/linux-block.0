@@ -2,85 +2,90 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 607AAC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:37:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE63C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 14:10:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47507204FD
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:37:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF009204FD
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 14:10:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WUs7cZqc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728447AbgHSNh1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 09:37:27 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:44308 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728699AbgHSNhZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 09:37:25 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id D40A8D67AE4401AA64B9;
-        Wed, 19 Aug 2020 21:37:15 +0800 (CST)
-Received: from [10.174.179.185] (10.174.179.185) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 19 Aug 2020 21:37:11 +0800
+        id S1726904AbgHSOKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 10:10:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726703AbgHSOKM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 10:10:12 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 589CAC061383
+        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 07:10:11 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id r11so11730149pfl.11
+        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 07:10:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=nqQSu+naoER2cTg6YN3Ri6AXCYtp5Cq2JF2/Sa6VXWs=;
+        b=WUs7cZqcaS7XW9PpeihbyzUuuMYFyao+SOskgMzUBsUc/ydkUelp7uW76u126hDyqv
+         fcvs8NhILbxyXRbpVwxSBJSdfxyt4emjxx4Eo2wEEdDRwWazrCBGt2Nntxubz0JVblOf
+         3naKv0eitP+uZ4Z6luXkkdtuR/r8c5REWKjED5e1vdTuGFu00+Zz/jl74tTBqo9LTmvi
+         nKIacXsWkLWNO0yLPLyJblHP66I+u0tenxnWiDrahWKYniF+EbkuN8KCxWnitWh1p6/x
+         j1d4f3dQy06eOQTQq7d+9BvAcWIC5Ew/U0NODgD1XvGxqf7b3K5WCOizLzYO6/vocfev
+         YY/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nqQSu+naoER2cTg6YN3Ri6AXCYtp5Cq2JF2/Sa6VXWs=;
+        b=doykvoMo1T0iVmcBT0GuZtyLn/KZJ3K9Upi3jk3FfRNNNc+x3JqLBFiOw9GMcwOPw+
+         Hlc6giJ58xQ2BIr6Nn/42aVPrYZwPr+clW/dbCvG0FJ+M9rzHu+LcxaAtj9nrP7dqkku
+         HPWWvD6OrDYb3z8Yc526Rl0n8HFU3XIJ8TER9bO8u3zT1HNuplqLAibeIHt7ON3vfMbi
+         wWyo+02OZZyqMqFqdoyYquA2cMJLSfzsWhJfhLRQ+uZhpNNkvorCm7T3QtqCgojpYpWZ
+         Z0v9unbhg/cHiZg2KBkHNvUbyznLGcA8Q72TP4NQHVMHBeYzZY8m+VyPVEgSiuFHRVW1
+         w8dg==
+X-Gm-Message-State: AOAM533C2IMl21FVqT2s+eVNY/VeSj18DL1XHFiWinf2AbqsS7UMg6Ee
+        /7cge2LUG0BHqMIpSvEjW6r9YPFpGf2yW/go
+X-Google-Smtp-Source: ABdhPJwf7jTtgPpteLObzewS/SMagnR5kBHF/y9jZOZOVJ0cl9iGTgKfgR2TZ3TdakPBgtjQn4M96g==
+X-Received: by 2002:a62:7acb:: with SMTP id v194mr19099980pfc.302.1597846210729;
+        Wed, 19 Aug 2020 07:10:10 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id h15sm3378093pjf.54.2020.08.19.07.10.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Aug 2020 07:10:10 -0700 (PDT)
 Subject: Re: [PATCH v2] blkcg: fix memleak for iolatency
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <jbacik@fb.com>, <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>
+To:     Yufen Yu <yuyufen@huawei.com>, jbacik@fb.com, tj@kernel.org
+Cc:     linux-block@vger.kernel.org
 References: <20200811022116.1824539-1-yuyufen@huawei.com>
-Message-ID: <21951039-d191-3c1f-3976-f2e2a84c541f@huawei.com>
-Date:   Wed, 19 Aug 2020 21:37:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c6a113d4-c3f3-2921-0e92-53b1513d842d@kernel.dk>
+Date:   Wed, 19 Aug 2020 08:10:08 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
 In-Reply-To: <20200811022116.1824539-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.185]
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ping
-
-On 2020/8/11 10:21, Yufen Yu wrote:
+On 8/10/20 7:21 PM, Yufen Yu wrote:
 > Normally, blkcg_iolatency_exit() will free related memory in iolatency
 > when cleanup queue. But if blk_throtl_init() return error and queue init
 > fail, blkcg_iolatency_exit() will not do that for us. Then it cause
 > memory leak.
-> 
-> Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> ---
->   block/blk-cgroup.c | 8 +++++---
->   1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 619a79b51068..c195365c9817 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -1152,13 +1152,15 @@ int blkcg_init_queue(struct request_queue *q)
->   	if (preloaded)
->   		radix_tree_preload_end();
->   
-> -	ret = blk_iolatency_init(q);
-> +	ret = blk_throtl_init(q);
->   	if (ret)
->   		goto err_destroy_all;
->   
-> -	ret = blk_throtl_init(q);
-> -	if (ret)
-> +	ret = blk_iolatency_init(q);
-> +	if (ret) {
-> +		blk_throtl_exit(q);
->   		goto err_destroy_all;
-> +	}
->   	return 0;
->   
->   err_destroy_all:
-> 
+
+Applied, thanks.
+
+-- 
+Jens Axboe
+
