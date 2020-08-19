@@ -2,29 +2,29 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 951A7C433E3
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F68FC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:27:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7439B208A9
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:26:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EF2C208C7
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:27:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728725AbgHSPZS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728677AbgHSPZS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 19 Aug 2020 11:25:18 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:38870 "EHLO huawei.com"
+Received: from szxga05-in.huawei.com ([45.249.212.191]:9780 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728212AbgHSPZJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 11:25:09 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 88887990BD3CA5378D3B;
-        Wed, 19 Aug 2020 23:24:58 +0800 (CST)
+        id S1727932AbgHSPZI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 11:25:08 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 636322665BD9170CBC7F;
+        Wed, 19 Aug 2020 23:25:03 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 19 Aug 2020 23:24:47 +0800
+ 14.3.487.0; Wed, 19 Aug 2020 23:24:52 +0800
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
@@ -36,10 +36,12 @@ CC:     <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
         <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
         <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>,
         John Garry <john.garry@huawei.com>
-Subject: [PATCH v8 00/18] blk-mq/scsi: Provide hostwide shared tags for SCSI HBAs
-Date:   Wed, 19 Aug 2020 23:20:18 +0800
-Message-ID: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
+Subject: [PATCH v8 14/18] scsi: hisi_sas: Switch v3 hw to MQ
+Date:   Wed, 19 Aug 2020 23:20:32 +0800
+Message-ID: <1597850436-116171-15-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
+References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.69.192.58]
@@ -49,129 +51,236 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+Now that the block layer provides a shared tag, we can switch the driver
+to expose all HW queues.
 
-Here is v8 of the patchset.
+Signed-off-by: John Garry <john.garry@huawei.com>
+---
+ drivers/scsi/hisi_sas/hisi_sas.h       |  3 +-
+ drivers/scsi/hisi_sas/hisi_sas_main.c  | 36 ++++++-----
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c | 87 +++++++++++---------------
+ 3 files changed, 56 insertions(+), 70 deletions(-)
 
-In this version of the series, we keep the shared sbitmap for driver tags,
-and introduce changes to fix up the tag budgeting across request queues.
-We also have a change to count requests per-hctx for when an elevator is
-enabled, as an optimisation. I also dropped the debugfs changes - more on
-that below.
-
-Some performance figures:
-
-Using 12x SAS SSDs on hisi_sas v3 hw. mq-deadline results are included,
-but it is not always an appropriate scheduler to use.
-
-Tag depth 		4000 (default)			260**
-
-Baseline (v5.9-rc1):
-none sched:		2094K IOPS			513K
-mq-deadline sched:	2145K IOPS			1336K
-
-Final, host_tagset=0 in LLDD *, ***:
-none sched:		2120K IOPS			550K
-mq-deadline sched:	2121K IOPS			1309K
-
-Final ***:
-none sched:		2132K IOPS			1185			
-mq-deadline sched:	2145K IOPS			2097	
-
-* this is relevant as this is the performance in supporting but not
-  enabling the feature
-** depth=260 is relevant as some point where we are regularly waiting for
-   tags to be available. Figures were are a bit unstable here.
-*** Included "[PATCH V4] scsi: core: only re-run queue in
-    scsi_end_request() if device queue is busy"
-
-A copy of the patches can be found here:
-https://github.com/hisilicon/kernel-dev/tree/private-topic-blk-mq-shared-tags-v8
-
-The hpsa patch depends on:
-https://lore.kernel.org/linux-scsi/20200430131904.5847-1-hare@suse.de/
-
-And the smartpqi patch is not to be accepted.
-
-Comments (and testing) welcome, thanks!
-
-Differences to v7:
-- Add null_blk and scsi_debug support
-- Drop debugfs tags patch - it's too difficult to be the same between
-hostwide and non-hostwide, as discussed:
-https://lore.kernel.org/linux-scsi/1591810159-240929-1-git-send-email-john.garry@huawei.com/T/#mb3eb462d8be40273718505989abd12f8228c15fd
-And from commit 6bf0eb550452 ("sbitmap: Consider cleared bits in
-sbitmap_bitmap_show()"), I guess not many used this anyway...
-- Add elevator per-hctx request count for optimisation
-- Break up "blk-mq: rename blk_mq_update_tag_set_depth()" into 2x patches
-- Pass flags for avoid per-hq queue tags init/free for hostwide tags
-- Add Don's reviewed-tag and tested-by tags to appropiate patches
-	- (@Don, please let me know if issue with how I did this)
-- Add "scsi: core: Show nr_hw_queues in sysfs"
-- Rework megaraid SAS patch to have module param (Kashyap)
-- rebase
-
-V7 is here for more info:
-https://lore.kernel.org/linux-scsi/1591810159-240929-1-git-send-email-john.garry@huawei.com/T/#t
-
-Hannes Reinecke (5):
-  blk-mq: Rename blk_mq_update_tag_set_depth()
-  blk-mq: Free tags in blk_mq_init_tags() upon error
-  scsi: Add host and host template flag 'host_tagset'
-  hpsa: enable host_tagset and switch to MQ
-  smartpqi: enable host tagset
-
-John Garry (10):
-  blk-mq: Pass flags for tag init/free
-  blk-mq: Use pointers for blk_mq_tags bitmap tags
-  blk-mq: Facilitate a shared sbitmap per tagset
-  blk-mq: Relocate hctx_may_queue()
-  blk-mq: Record nr_active_requests per queue for when using shared
-    sbitmap
-  blk-mq: Record active_queues_shared_sbitmap per tag_set for when using
-    shared sbitmap
-  null_blk: Support shared tag bitmap
-  scsi: core: Show nr_hw_queues in sysfs
-  scsi: hisi_sas: Switch v3 hw to MQ
-  scsi: scsi_debug: Support host tagset
-
-Kashyap Desai (2):
-  blk-mq, elevator: Count requests per hctx to improve performance
-  scsi: megaraid_sas: Added support for shared host tagset for
-    cpuhotplug
-
-Ming Lei (1):
-  blk-mq: Rename BLK_MQ_F_TAG_SHARED as BLK_MQ_F_TAG_QUEUE_SHARED
-
- block/bfq-iosched.c                         |   9 +-
- block/blk-core.c                            |   2 +
- block/blk-mq-debugfs.c                      |  10 +-
- block/blk-mq-sched.c                        |  13 +-
- block/blk-mq-tag.c                          | 149 ++++++++++++++------
- block/blk-mq-tag.h                          |  56 +++-----
- block/blk-mq.c                              |  81 +++++++----
- block/blk-mq.h                              |  76 +++++++++-
- block/kyber-iosched.c                       |   4 +-
- block/mq-deadline.c                         |   6 +
- drivers/block/null_blk_main.c               |   6 +
- drivers/block/rnbd/rnbd-clt.c               |   2 +-
- drivers/scsi/hisi_sas/hisi_sas.h            |   3 +-
- drivers/scsi/hisi_sas/hisi_sas_main.c       |  36 ++---
- drivers/scsi/hisi_sas/hisi_sas_v3_hw.c      |  87 +++++-------
- drivers/scsi/hosts.c                        |   1 +
- drivers/scsi/hpsa.c                         |  44 +-----
- drivers/scsi/hpsa.h                         |   1 -
- drivers/scsi/megaraid/megaraid_sas_base.c   |  39 +++++
- drivers/scsi/megaraid/megaraid_sas_fusion.c |  29 ++--
- drivers/scsi/scsi_debug.c                   |  28 ++--
- drivers/scsi/scsi_lib.c                     |   2 +
- drivers/scsi/scsi_sysfs.c                   |  11 ++
- drivers/scsi/smartpqi/smartpqi_init.c       |  45 ++++--
- include/linux/blk-mq.h                      |  13 +-
- include/linux/blkdev.h                      |   3 +
- include/scsi/scsi_host.h                    |   9 +-
- 27 files changed, 484 insertions(+), 281 deletions(-)
-
+diff --git a/drivers/scsi/hisi_sas/hisi_sas.h b/drivers/scsi/hisi_sas/hisi_sas.h
+index 2bdd64648ef0..e6acbf940712 100644
+--- a/drivers/scsi/hisi_sas/hisi_sas.h
++++ b/drivers/scsi/hisi_sas/hisi_sas.h
+@@ -8,6 +8,8 @@
+ #define _HISI_SAS_H_
+ 
+ #include <linux/acpi.h>
++#include <linux/blk-mq.h>
++#include <linux/blk-mq-pci.h>
+ #include <linux/clk.h>
+ #include <linux/debugfs.h>
+ #include <linux/dmapool.h>
+@@ -431,7 +433,6 @@ struct hisi_hba {
+ 	u32 intr_coal_count;	/* Interrupt count to coalesce */
+ 
+ 	int cq_nvecs;
+-	unsigned int *reply_map;
+ 
+ 	/* bist */
+ 	enum sas_linkrate debugfs_bist_linkrate;
+diff --git a/drivers/scsi/hisi_sas/hisi_sas_main.c b/drivers/scsi/hisi_sas/hisi_sas_main.c
+index 11caa4b0d797..7ed4eaedb7ca 100644
+--- a/drivers/scsi/hisi_sas/hisi_sas_main.c
++++ b/drivers/scsi/hisi_sas/hisi_sas_main.c
+@@ -417,6 +417,7 @@ static int hisi_sas_task_prep(struct sas_task *task,
+ 	struct device *dev = hisi_hba->dev;
+ 	int dlvry_queue_slot, dlvry_queue, rc, slot_idx;
+ 	int n_elem = 0, n_elem_dif = 0, n_elem_req = 0;
++	struct scsi_cmnd *scmd = NULL;
+ 	struct hisi_sas_dq *dq;
+ 	unsigned long flags;
+ 	int wr_q_index;
+@@ -432,10 +433,23 @@ static int hisi_sas_task_prep(struct sas_task *task,
+ 		return -ECOMM;
+ 	}
+ 
+-	if (hisi_hba->reply_map) {
+-		int cpu = raw_smp_processor_id();
+-		unsigned int dq_index = hisi_hba->reply_map[cpu];
++	if (task->uldd_task) {
++		struct ata_queued_cmd *qc;
+ 
++		if (dev_is_sata(device)) {
++			qc = task->uldd_task;
++			scmd = qc->scsicmd;
++		} else {
++			scmd = task->uldd_task;
++		}
++	}
++
++	if (scmd) {
++		unsigned int dq_index;
++		u32 blk_tag;
++
++		blk_tag = blk_mq_unique_tag(scmd->request);
++		dq_index = blk_mq_unique_tag_to_hwq(blk_tag);
+ 		*dq_pointer = dq = &hisi_hba->dq[dq_index];
+ 	} else {
+ 		*dq_pointer = dq = sas_dev->dq;
+@@ -464,21 +478,9 @@ static int hisi_sas_task_prep(struct sas_task *task,
+ 
+ 	if (hisi_hba->hw->slot_index_alloc)
+ 		rc = hisi_hba->hw->slot_index_alloc(hisi_hba, device);
+-	else {
+-		struct scsi_cmnd *scsi_cmnd = NULL;
+-
+-		if (task->uldd_task) {
+-			struct ata_queued_cmd *qc;
++	else
++		rc = hisi_sas_slot_index_alloc(hisi_hba, scmd);
+ 
+-			if (dev_is_sata(device)) {
+-				qc = task->uldd_task;
+-				scsi_cmnd = qc->scsicmd;
+-			} else {
+-				scsi_cmnd = task->uldd_task;
+-			}
+-		}
+-		rc  = hisi_sas_slot_index_alloc(hisi_hba, scsi_cmnd);
+-	}
+ 	if (rc < 0)
+ 		goto err_out_dif_dma_unmap;
+ 
+diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+index 60adf5c32143..b6f75a1764df 100644
+--- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
++++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+@@ -2362,68 +2362,36 @@ static irqreturn_t cq_interrupt_v3_hw(int irq_no, void *p)
+ 	return IRQ_WAKE_THREAD;
+ }
+ 
+-static void setup_reply_map_v3_hw(struct hisi_hba *hisi_hba, int nvecs)
++static int interrupt_preinit_v3_hw(struct hisi_hba *hisi_hba)
+ {
+-	const struct cpumask *mask;
+-	int queue, cpu;
++	int vectors;
++	int max_msi = HISI_SAS_MSI_COUNT_V3_HW, min_msi;
++	struct Scsi_Host *shost = hisi_hba->shost;
++	struct irq_affinity desc = {
++		.pre_vectors = BASE_VECTORS_V3_HW,
++	};
+ 
+-	for (queue = 0; queue < nvecs; queue++) {
+-		struct hisi_sas_cq *cq = &hisi_hba->cq[queue];
++	min_msi = MIN_AFFINE_VECTORS_V3_HW;
++	vectors = pci_alloc_irq_vectors_affinity(hisi_hba->pci_dev,
++						 min_msi, max_msi,
++						 PCI_IRQ_MSI |
++						 PCI_IRQ_AFFINITY,
++						 &desc);
++	if (vectors < 0)
++		return -ENOENT;
+ 
+-		mask = pci_irq_get_affinity(hisi_hba->pci_dev, queue +
+-					    BASE_VECTORS_V3_HW);
+-		if (!mask)
+-			goto fallback;
+-		cq->irq_mask = mask;
+-		for_each_cpu(cpu, mask)
+-			hisi_hba->reply_map[cpu] = queue;
+-	}
+-	return;
+ 
+-fallback:
+-	for_each_possible_cpu(cpu)
+-		hisi_hba->reply_map[cpu] = cpu % hisi_hba->queue_count;
+-	/* Don't clean all CQ masks */
++	hisi_hba->cq_nvecs = vectors - BASE_VECTORS_V3_HW;
++	shost->nr_hw_queues = hisi_hba->cq_nvecs;
++
++	return 0;
+ }
+ 
+ static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
+ {
+ 	struct device *dev = hisi_hba->dev;
+ 	struct pci_dev *pdev = hisi_hba->pci_dev;
+-	int vectors, rc, i;
+-	int max_msi = HISI_SAS_MSI_COUNT_V3_HW, min_msi;
+-
+-	if (auto_affine_msi_experimental) {
+-		struct irq_affinity desc = {
+-			.pre_vectors = BASE_VECTORS_V3_HW,
+-		};
+-
+-		dev_info(dev, "Enable MSI auto-affinity\n");
+-
+-		min_msi = MIN_AFFINE_VECTORS_V3_HW;
+-
+-		hisi_hba->reply_map = devm_kcalloc(dev, nr_cpu_ids,
+-						   sizeof(unsigned int),
+-						   GFP_KERNEL);
+-		if (!hisi_hba->reply_map)
+-			return -ENOMEM;
+-		vectors = pci_alloc_irq_vectors_affinity(hisi_hba->pci_dev,
+-							 min_msi, max_msi,
+-							 PCI_IRQ_MSI |
+-							 PCI_IRQ_AFFINITY,
+-							 &desc);
+-		if (vectors < 0)
+-			return -ENOENT;
+-		setup_reply_map_v3_hw(hisi_hba, vectors - BASE_VECTORS_V3_HW);
+-	} else {
+-		min_msi = max_msi;
+-		vectors = pci_alloc_irq_vectors(hisi_hba->pci_dev, min_msi,
+-						max_msi, PCI_IRQ_MSI);
+-		if (vectors < 0)
+-			return vectors;
+-	}
+-
+-	hisi_hba->cq_nvecs = vectors - BASE_VECTORS_V3_HW;
++	int rc, i;
+ 
+ 	rc = devm_request_irq(dev, pci_irq_vector(pdev, 1),
+ 			      int_phy_up_down_bcast_v3_hw, 0,
+@@ -3072,6 +3040,15 @@ static int debugfs_set_bist_v3_hw(struct hisi_hba *hisi_hba, bool enable)
+ 	return 0;
+ }
+ 
++static int hisi_sas_map_queues(struct Scsi_Host *shost)
++{
++	struct hisi_hba *hisi_hba = shost_priv(shost);
++	struct blk_mq_queue_map *qmap = &shost->tag_set.map[HCTX_TYPE_DEFAULT];
++
++	return blk_mq_pci_map_queues(qmap, hisi_hba->pci_dev,
++				     BASE_VECTORS_V3_HW);
++}
++
+ static struct scsi_host_template sht_v3_hw = {
+ 	.name			= DRV_NAME,
+ 	.proc_name		= DRV_NAME,
+@@ -3082,6 +3059,7 @@ static struct scsi_host_template sht_v3_hw = {
+ 	.slave_configure	= hisi_sas_slave_configure,
+ 	.scan_finished		= hisi_sas_scan_finished,
+ 	.scan_start		= hisi_sas_scan_start,
++	.map_queues		= hisi_sas_map_queues,
+ 	.change_queue_depth	= sas_change_queue_depth,
+ 	.bios_param		= sas_bios_param,
+ 	.this_id		= -1,
+@@ -3098,6 +3076,7 @@ static struct scsi_host_template sht_v3_hw = {
+ 	.shost_attrs		= host_attrs_v3_hw,
+ 	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
+ 	.host_reset             = hisi_sas_host_reset,
++	.host_tagset		= 1,
+ };
+ 
+ static const struct hisi_sas_hw hisi_sas_v3_hw = {
+@@ -3269,6 +3248,10 @@ hisi_sas_v3_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (hisi_sas_debugfs_enable)
+ 		hisi_sas_debugfs_init(hisi_hba);
+ 
++	rc = interrupt_preinit_v3_hw(hisi_hba);
++	if (rc)
++		goto err_out_ha;
++	dev_err(dev, "%d hw queues\n", shost->nr_hw_queues);
+ 	rc = scsi_add_host(shost, dev);
+ 	if (rc)
+ 		goto err_out_ha;
 -- 
 2.26.2
 
