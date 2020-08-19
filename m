@@ -4,27 +4,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72581C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A52AFC433E3
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:27:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5965A208A9
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:27:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F3C4208C7
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:27:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728681AbgHSPZO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 11:25:14 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9782 "EHLO huawei.com"
+        id S1728732AbgHSP07 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 11:26:59 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9851 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728312AbgHSPZI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 11:25:08 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 76875C8A035CB46D41DC;
+        id S1726894AbgHSPZQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 11:25:16 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 97823174EF24E6297F9B;
         Wed, 19 Aug 2020 23:25:03 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 19 Aug 2020 23:24:53 +0800
+ 14.3.487.0; Wed, 19 Aug 2020 23:24:54 +0800
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
@@ -36,9 +36,9 @@ CC:     <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
         <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
         <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>,
         John Garry <john.garry@huawei.com>
-Subject: [PATCH v8 16/18] hpsa: enable host_tagset and switch to MQ
-Date:   Wed, 19 Aug 2020 23:20:34 +0800
-Message-ID: <1597850436-116171-17-git-send-email-john.garry@huawei.com>
+Subject: [PATCH v8 18/18] smartpqi: enable host tagset
+Date:   Wed, 19 Aug 2020 23:20:36 +0800
+Message-ID: <1597850436-116171-19-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
 References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
@@ -53,146 +53,114 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Hannes Reinecke <hare@suse.de>
 
-The smart array HBAs can steer interrupt completion, so this
-patch switches the implementation to use multiqueue and enables
-'host_tagset' as the HBA has a shared host-wide tagset.
+Enable host tagset for smartpqi; with this we can use the request
+tag to look command from the pool avoiding the list iteration in
+the hot path.
 
-Reviewed-by: Don Brace <don.brace@microsemi.com>
 Signed-off-by: Hannes Reinecke <hare@suse.de>
+[jpg: Mod ctrl_info->next_io_request_slot calc]
 Signed-off-by: John Garry <john.garry@huawei.com>
 ---
- drivers/scsi/hpsa.c | 44 +++++++-------------------------------------
- drivers/scsi/hpsa.h |  1 -
- 2 files changed, 7 insertions(+), 38 deletions(-)
+ drivers/scsi/smartpqi/smartpqi_init.c | 45 ++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-index 91794a50b31f..eaddcd3e9caf 100644
---- a/drivers/scsi/hpsa.c
-+++ b/drivers/scsi/hpsa.c
-@@ -984,6 +984,7 @@ static struct scsi_host_template hpsa_driver_template = {
- 	.shost_attrs = hpsa_shost_attrs,
- 	.max_sectors = 2048,
- 	.no_write_same = 1,
+diff --git a/drivers/scsi/smartpqi/smartpqi_init.c b/drivers/scsi/smartpqi/smartpqi_init.c
+index bd38c8cea56e..870ed1400a9e 100644
+--- a/drivers/scsi/smartpqi/smartpqi_init.c
++++ b/drivers/scsi/smartpqi/smartpqi_init.c
+@@ -575,22 +575,33 @@ static inline void pqi_reinit_io_request(struct pqi_io_request *io_request)
+ }
+ 
+ static struct pqi_io_request *pqi_alloc_io_request(
+-	struct pqi_ctrl_info *ctrl_info)
++	struct pqi_ctrl_info *ctrl_info, struct scsi_cmnd *scmd)
+ {
+ 	struct pqi_io_request *io_request;
+-	u16 i = ctrl_info->next_io_request_slot;	/* benignly racy */
++	unsigned int limit = PQI_RESERVED_IO_SLOTS;
++	u16 i;
+ 
+-	while (1) {
++	if (scmd) {
++		u32 blk_tag = blk_mq_unique_tag(scmd->request);
++
++		i = blk_mq_unique_tag_to_tag(blk_tag) + limit;
+ 		io_request = &ctrl_info->io_request_pool[i];
+-		if (atomic_inc_return(&io_request->refcount) == 1)
+-			break;
+-		atomic_dec(&io_request->refcount);
+-		i = (i + 1) % ctrl_info->max_io_slots;
++		if (WARN_ON(atomic_inc_return(&io_request->refcount) > 1)) {
++			atomic_dec(&io_request->refcount);
++			return NULL;
++		}
++	} else {
++		i = ctrl_info->next_io_request_slot;	/* benignly racy */
++		while (1) {
++			io_request = &ctrl_info->io_request_pool[i];
++			if (atomic_inc_return(&io_request->refcount) == 1)
++				break;
++			atomic_dec(&io_request->refcount);
++			i = (i + 1) % limit;
++		}
++		ctrl_info->next_io_request_slot = (i + 1) % limit;
+ 	}
+ 
+-	/* benignly racy */
+-	ctrl_info->next_io_request_slot = (i + 1) % ctrl_info->max_io_slots;
+-
+ 	pqi_reinit_io_request(io_request);
+ 
+ 	return io_request;
+@@ -4075,7 +4086,7 @@ static int pqi_submit_raid_request_synchronous(struct pqi_ctrl_info *ctrl_info,
+ 
+ 	atomic_inc(&ctrl_info->sync_cmds_outstanding);
+ 
+-	io_request = pqi_alloc_io_request(ctrl_info);
++	io_request = pqi_alloc_io_request(ctrl_info, NULL);
+ 
+ 	put_unaligned_le16(io_request->index,
+ 		&(((struct pqi_raid_path_request *)request)->request_id));
+@@ -5032,7 +5043,9 @@ static inline int pqi_raid_submit_scsi_cmd(struct pqi_ctrl_info *ctrl_info,
+ {
+ 	struct pqi_io_request *io_request;
+ 
+-	io_request = pqi_alloc_io_request(ctrl_info);
++	io_request = pqi_alloc_io_request(ctrl_info, scmd);
++	if (!io_request)
++		return SCSI_MLQUEUE_HOST_BUSY;
+ 
+ 	return pqi_raid_submit_scsi_cmd_with_io_request(ctrl_info, io_request,
+ 		device, scmd, queue_group);
+@@ -5230,7 +5243,10 @@ static int pqi_aio_submit_io(struct pqi_ctrl_info *ctrl_info,
+ 	struct pqi_io_request *io_request;
+ 	struct pqi_aio_path_request *request;
+ 
+-	io_request = pqi_alloc_io_request(ctrl_info);
++	io_request = pqi_alloc_io_request(ctrl_info, scmd);
++	if (!io_request)
++		return SCSI_MLQUEUE_HOST_BUSY;
++
+ 	io_request->io_complete_callback = pqi_aio_io_complete;
+ 	io_request->scmd = scmd;
+ 	io_request->raid_bypass = raid_bypass;
+@@ -5657,7 +5673,7 @@ static int pqi_lun_reset(struct pqi_ctrl_info *ctrl_info,
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+ 	struct pqi_task_management_request *request;
+ 
+-	io_request = pqi_alloc_io_request(ctrl_info);
++	io_request = pqi_alloc_io_request(ctrl_info, NULL);
+ 	io_request->io_complete_callback = pqi_lun_reset_complete;
+ 	io_request->context = &wait;
+ 
+@@ -6504,6 +6520,7 @@ static struct scsi_host_template pqi_driver_template = {
+ 	.map_queues = pqi_map_queues,
+ 	.sdev_attrs = pqi_sdev_attrs,
+ 	.shost_attrs = pqi_shost_attrs,
 +	.host_tagset = 1,
  };
  
- static inline u32 next_command(struct ctlr_info *h, u8 q)
-@@ -1148,12 +1149,14 @@ static void dial_up_lockup_detection_on_fw_flash_complete(struct ctlr_info *h,
- static void __enqueue_cmd_and_start_io(struct ctlr_info *h,
- 	struct CommandList *c, int reply_queue)
- {
-+	u32 blk_tag = blk_mq_unique_tag(c->scsi_cmd->request);
-+
- 	dial_down_lockup_detection_during_fw_flash(h, c);
- 	atomic_inc(&h->commands_outstanding);
- 	if (c->device)
- 		atomic_inc(&c->device->commands_outstanding);
- 
--	reply_queue = h->reply_map[raw_smp_processor_id()];
-+	reply_queue = blk_mq_unique_tag_to_hwq(blk_tag);
- 	switch (c->cmd_type) {
- 	case CMD_IOACCEL1:
- 		set_ioaccel1_performant_mode(h, c, reply_queue);
-@@ -5676,8 +5679,6 @@ static int hpsa_scsi_queue_command(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
- 	/* Get the ptr to our adapter structure out of cmd->host. */
- 	h = sdev_to_hba(cmd->device);
- 
--	BUG_ON(cmd->request->tag < 0);
--
- 	dev = cmd->device->hostdata;
- 	if (!dev) {
- 		cmd->result = DID_NO_CONNECT << 16;
-@@ -5853,7 +5854,7 @@ static int hpsa_scsi_host_alloc(struct ctlr_info *h)
- 	sh->hostdata[0] = (unsigned long) h;
- 	sh->irq = pci_irq_vector(h->pdev, 0);
- 	sh->unique_id = sh->irq;
--
-+	sh->nr_hw_queues = h->msix_vectors > 0 ? h->msix_vectors : 1;
- 	h->scsi_host = sh;
- 	return 0;
- }
-@@ -5879,7 +5880,8 @@ static int hpsa_scsi_add_host(struct ctlr_info *h)
-  */
- static int hpsa_get_cmd_index(struct scsi_cmnd *scmd)
- {
--	int idx = scmd->request->tag;
-+	u32 blk_tag = blk_mq_unique_tag(scmd->request);
-+	int idx = blk_mq_unique_tag_to_tag(blk_tag);
- 
- 	if (idx < 0)
- 		return idx;
-@@ -7456,26 +7458,6 @@ static void hpsa_disable_interrupt_mode(struct ctlr_info *h)
- 	h->msix_vectors = 0;
- }
- 
--static void hpsa_setup_reply_map(struct ctlr_info *h)
--{
--	const struct cpumask *mask;
--	unsigned int queue, cpu;
--
--	for (queue = 0; queue < h->msix_vectors; queue++) {
--		mask = pci_irq_get_affinity(h->pdev, queue);
--		if (!mask)
--			goto fallback;
--
--		for_each_cpu(cpu, mask)
--			h->reply_map[cpu] = queue;
--	}
--	return;
--
--fallback:
--	for_each_possible_cpu(cpu)
--		h->reply_map[cpu] = 0;
--}
--
- /* If MSI/MSI-X is supported by the kernel we will try to enable it on
-  * controllers that are capable. If not, we use legacy INTx mode.
-  */
-@@ -7872,9 +7854,6 @@ static int hpsa_pci_init(struct ctlr_info *h)
- 	if (err)
- 		goto clean1;
- 
--	/* setup mapping between CPU and reply queue */
--	hpsa_setup_reply_map(h);
--
- 	err = hpsa_pci_find_memory_BAR(h->pdev, &h->paddr);
- 	if (err)
- 		goto clean2;	/* intmode+region, pci */
-@@ -8613,7 +8592,6 @@ static struct workqueue_struct *hpsa_create_controller_wq(struct ctlr_info *h,
- 
- static void hpda_free_ctlr_info(struct ctlr_info *h)
- {
--	kfree(h->reply_map);
- 	kfree(h);
- }
- 
-@@ -8622,14 +8600,6 @@ static struct ctlr_info *hpda_alloc_ctlr_info(void)
- 	struct ctlr_info *h;
- 
- 	h = kzalloc(sizeof(*h), GFP_KERNEL);
--	if (!h)
--		return NULL;
--
--	h->reply_map = kcalloc(nr_cpu_ids, sizeof(*h->reply_map), GFP_KERNEL);
--	if (!h->reply_map) {
--		kfree(h);
--		return NULL;
--	}
- 	return h;
- }
- 
-diff --git a/drivers/scsi/hpsa.h b/drivers/scsi/hpsa.h
-index 6b87d9815b35..9c6a161f2367 100644
---- a/drivers/scsi/hpsa.h
-+++ b/drivers/scsi/hpsa.h
-@@ -161,7 +161,6 @@ struct bmic_controller_parameters {
- #pragma pack()
- 
- struct ctlr_info {
--	unsigned int *reply_map;
- 	int	ctlr;
- 	char	devname[8];
- 	char    *product_name;
+ static int pqi_register_scsi(struct pqi_ctrl_info *ctrl_info)
 -- 
 2.26.2
 
