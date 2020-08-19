@@ -4,34 +4,35 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CBEC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 08:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28908C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 08:56:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51BF0207FB
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 08:54:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 143E6206FA
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 08:56:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727768AbgHSIyz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 04:54:55 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9845 "EHLO huawei.com"
+        id S1727043AbgHSI4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 04:56:12 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9846 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726794AbgHSIwL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 04:52:11 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 3262A7CE5FA0FD472EB2;
-        Wed, 19 Aug 2020 16:51:57 +0800 (CST)
-Received: from huawei.com (10.175.104.175) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Wed, 19 Aug 2020
- 16:51:49 +0800
+        id S1726931AbgHSIyZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 04:54:25 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 67E7A8AE543F7D26D4D6;
+        Wed, 19 Aug 2020 16:54:17 +0800 (CST)
+Received: from huawei.com (10.175.104.175) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Wed, 19 Aug 2020
+ 16:54:09 +0800
 From:   Miaohe Lin <linmiaohe@huawei.com>
-To:     <axboe@kernel.dk>, <paolo.valente@linaro.org>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linmiaohe@huawei.com>
-Subject: [PATCH] block: Convert to use the preferred fallthrough macro
-Date:   Wed, 19 Aug 2020 04:50:44 -0400
-Message-ID: <20200819085044.41887-1-linmiaohe@huawei.com>
+To:     <idryomov@gmail.com>, <axboe@kernel.dk>,
+        <dongsheng.yang@easystack.cn>
+CC:     <ceph-devel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linmiaohe@huawei.com>
+Subject: [PATCH] rbd: Convert to use the preferred fallthrough macro
+Date:   Wed, 19 Aug 2020 04:53:04 -0400
+Message-ID: <20200819085304.43653-1-linmiaohe@huawei.com>
 X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
@@ -48,73 +49,49 @@ Convert the uses of fallthrough comments to fallthrough macro.
 Signed-off-by: Hongxiang Lou <louhongxiang@huawei.com>
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- block/badblocks.c   | 2 +-
- block/bfq-iosched.c | 4 ++--
- block/blk-wbt.c     | 2 +-
- block/ioprio.c      | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/block/rbd.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/badblocks.c b/block/badblocks.c
-index 2e5f5697db35..d39056630d9c 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -525,7 +525,7 @@ ssize_t badblocks_store(struct badblocks *bb, const char *page, size_t len,
- 	case 3:
- 		if (newline != '\n')
- 			return -EINVAL;
--		/* fall through */
-+		fallthrough;
- 	case 2:
- 		if (length <= 0)
- 			return -EINVAL;
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index a4c0bec920cb..c34b090178a9 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4980,7 +4980,7 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 		pr_err("bdi %s: bfq: bad prio class %d\n",
- 				bdi_dev_name(bfqq->bfqd->queue->backing_dev_info),
- 				ioprio_class);
--		/* fall through */
-+		fallthrough;
- 	case IOPRIO_CLASS_NONE:
- 		/*
- 		 * No prio set, inherit CPU scheduling settings.
-@@ -5112,7 +5112,7 @@ static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
- 		return &bfqg->async_bfqq[0][ioprio];
- 	case IOPRIO_CLASS_NONE:
- 		ioprio = IOPRIO_NORM;
--		/* fall through */
-+		fallthrough;
- 	case IOPRIO_CLASS_BE:
- 		return &bfqg->async_bfqq[1][ioprio];
- 	case IOPRIO_CLASS_IDLE:
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 0fa615eefd52..fd410086fe1d 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -528,7 +528,7 @@ static inline bool wbt_should_throttle(struct rq_wb *rwb, struct bio *bio)
- 		if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) ==
- 		    (REQ_SYNC | REQ_IDLE))
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index d9c0e7d154f9..011539039693 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -3293,7 +3293,7 @@ static bool rbd_obj_advance_copyup(struct rbd_obj_request *obj_req, int *result)
+ 	case __RBD_OBJ_COPYUP_OBJECT_MAPS:
+ 		if (!pending_result_dec(&obj_req->pending, result))
  			return false;
--		/* fallthrough */
+-		/* fall through */
 +		fallthrough;
- 	case REQ_OP_DISCARD:
+ 	case RBD_OBJ_COPYUP_OBJECT_MAPS:
+ 		if (*result) {
+ 			rbd_warn(rbd_dev, "snap object map update failed: %d",
+@@ -3312,7 +3312,7 @@ static bool rbd_obj_advance_copyup(struct rbd_obj_request *obj_req, int *result)
+ 	case __RBD_OBJ_COPYUP_WRITE_OBJECT:
+ 		if (!pending_result_dec(&obj_req->pending, result))
+ 			return false;
+-		/* fall through */
++		fallthrough;
+ 	case RBD_OBJ_COPYUP_WRITE_OBJECT:
  		return true;
  	default:
-diff --git a/block/ioprio.c b/block/ioprio.c
-index 77bcab11dce5..04ebd37966f1 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -71,7 +71,7 @@ int ioprio_check_cap(int ioprio)
- 		case IOPRIO_CLASS_RT:
- 			if (!capable(CAP_SYS_ADMIN))
- 				return -EPERM;
--			/* fall through */
-+			fallthrough;
- 			/* rt has prio field too */
- 		case IOPRIO_CLASS_BE:
- 			if (data >= IOPRIO_BE_NR || data < 0)
+@@ -3399,7 +3399,7 @@ static bool rbd_obj_advance_write(struct rbd_obj_request *obj_req, int *result)
+ 	case __RBD_OBJ_WRITE_COPYUP:
+ 		if (!rbd_obj_advance_copyup(obj_req, result))
+ 			return false;
+-		/* fall through */
++		fallthrough;
+ 	case RBD_OBJ_WRITE_COPYUP:
+ 		if (*result) {
+ 			rbd_warn(rbd_dev, "copyup failed: %d", *result);
+@@ -3592,7 +3592,7 @@ static bool rbd_img_advance(struct rbd_img_request *img_req, int *result)
+ 	case __RBD_IMG_OBJECT_REQUESTS:
+ 		if (!pending_result_dec(&img_req->pending, result))
+ 			return false;
+-		/* fall through */
++		fallthrough;
+ 	case RBD_IMG_OBJECT_REQUESTS:
+ 		return true;
+ 	default:
 -- 
 2.19.1
 
