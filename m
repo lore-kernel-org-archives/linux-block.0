@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81239C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 12:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 023CCC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 12:57:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51ABF20FC3
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 12:55:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C84FD2067C
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 12:57:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="NyjiFBib"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="m9HbE6lZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728191AbgHSMzu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 08:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35544 "EHLO
+        id S1728545AbgHSM44 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 08:56:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728329AbgHSMzZ (ORCPT
+        with ESMTP id S1728477AbgHSMzf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 08:55:25 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0EC6C061757
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 05:55:24 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id f5so10769184plr.9
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 05:55:24 -0700 (PDT)
+        Wed, 19 Aug 2020 08:55:35 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C771C061343
+        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 05:55:33 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id r11so11628641pfl.11
+        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 05:55:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rrbpQDX15p//tPT7UvuN4uevRSDzI+hoTHUn4a3y+a0=;
-        b=NyjiFBib4jG9+dEWoEnnDri1nWuFNmYsX63rP2x/bSpFDl3/E6+Fsey3gIejp1KEl/
-         Zt6SapvAvbK+PGznoa9rvJsaQyrV7llkBKEAbb7QOVpy11/haGw0E1rjga4lLhOK0T3B
-         n1yVM6QnrxYRbd0N+Jt6pZLHvycn/ysJVrHlVIhFSTUQqZQWGogi3CuaV/C7tao2jHcV
-         ZG1V3RDNOQT2b/4Q2xqki4U7M2HHirSA5SONgufGeBgmeI+AAPNi4CjVp1a4T0bn7EHe
-         8iEeDt/VxVc3GT62278Iw8Dr8R69qJZplrKNnbrbs1wqzr/zDu3RcURLPkusNnYLrbQE
-         7qYA==
+        bh=eJyS7BjK7wDUsKL2rCrjdhtuG6HRkdolBIn6enpoXLE=;
+        b=m9HbE6lZJ4RKqfEHA2yd1nXSFEowGn6oCKQcUNU65nF8hQGmOPewZkZ6KGsSzL0RQq
+         KSU3SQrky/XIK8WvGZ6WzlDk+845U83Fd1JJuPUHFU4TZDMneUimIwkT8GLzSxCyiqnb
+         0W2Qlbj2bo4KZXRLlLh41NttK+CYgPuCUHseECCcKLqN8NDiCnJ2UbiGd+vOcdvI0Mco
+         HexL34mg6xmXk4QRqTQ+KTwicqoumgGoMqDgamXuF+GwfIFT2puE5TO0j4INgkVfN6IB
+         RW/9SffGVPFme31bR8J9syJDiIWfeNX2brIrOCPNDQbdMnJsUbOQliFq4sUvQMBY7wmj
+         viSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=rrbpQDX15p//tPT7UvuN4uevRSDzI+hoTHUn4a3y+a0=;
-        b=i/SSrHAqVql3empPNMNCA/NuyvJFCrbw3jL6E13dnBukWakDgu027po2XuXOfciNoD
-         +0LXKYi7eI+9K0M4ju1rYcL6VsWfllTy5dcgHcGD6xn8Dd6qBIPMOKYtnJZ1lFX/pmYs
-         dVufZ0Yuk3wWfigdfZ3qOt8Ttds4wk3Gn0Mxo+h+TA5ythQLf90x0+kdTN665ehuBNLM
-         z/s2t6zBd5dRIwUrUyz9StVLBc83NMnL5NssydLkusvNyRT0+Z8+L0v5E8jUSW4K9xSq
-         LlGwCAtmn2CLhdUCvrrORVR9ZxvvCuUlRyOKtwDFgnJULdolA785U4bcoeFwXcqY4wBV
-         WcHw==
-X-Gm-Message-State: AOAM530WJkwmLRQfJoHUG+GzjAsbJUUgstzZtQzZUw6QJSlh5kx/35yg
-        1ONIEnFIm8XAK/9BrHzcgOXg+dnpAFvJXTCY
-X-Google-Smtp-Source: ABdhPJwt+h/eu259u72qGri6DEmcqEOTbSywiag9NYdAcHMjkxwqLjx5ajBORusqvqeZVyqqzP290Q==
-X-Received: by 2002:a17:90b:4a4e:: with SMTP id lb14mr4061190pjb.228.1597841722879;
-        Wed, 19 Aug 2020 05:55:22 -0700 (PDT)
+        bh=eJyS7BjK7wDUsKL2rCrjdhtuG6HRkdolBIn6enpoXLE=;
+        b=rQ2uZX7F9apsMNmGHTlW38ZlIcj1Vflw8i0tb56sSIpcejee0oTsL5UocqI+pvwMbt
+         jlWyDQCzyM0THYPChFSxkKA0eSWlJbB8Dd3jpqY3lIwtGdt+wdhIuXoGTRbo3exuH/oK
+         Eshu+gij5/sqcmFQ5II953rD6obYt4EiLP1r/yjmVPCzVrqqWLpj/dTbd327Z8YcX3jU
+         MxfW4qgmsG6UGOCvA35n+pZcIWhaE6BAnLueXKKaWRyl8sfC+Jld6S0VFV7TrsDZ+TFZ
+         bcykvrCbWE6n7OG/52Cahoa4Sr4n2p5WPG9ccDE4cOy+sZX9eDfb5s2f++Lw9NgjHc8j
+         3H8g==
+X-Gm-Message-State: AOAM530ZBBayjsIKlLf5zb6MWqTCtvu7h8uEekxkMsky/+BVV+le8aMC
+        SLmGxmpjeaIjW4YVcZ6b8pB8Gw==
+X-Google-Smtp-Source: ABdhPJxvgfFos8NuS842i0OTcagtkYQEtKig33RmRzfeH4z0jn2Ve5ZHEgBBpsdZBttqkSJRo+2UHw==
+X-Received: by 2002:a63:c509:: with SMTP id f9mr16644768pgd.144.1597841732876;
+        Wed, 19 Aug 2020 05:55:32 -0700 (PDT)
 Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id w3sm28975674pff.56.2020.08.19.05.55.21
+        by smtp.gmail.com with ESMTPSA id n12sm29776266pfj.99.2020.08.19.05.55.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Aug 2020 05:55:22 -0700 (PDT)
-Subject: Re: [PATCH v3] block: Make request_queue.rpm_status an enum
+        Wed, 19 Aug 2020 05:55:32 -0700 (PDT)
+Subject: Re: [PATCH v2] MAINTAINERS: Add missing header files to BLOCK LAYER
+ section
 To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200819123403.19136-1-geert+renesas@glider.be>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200819123243.18983-1-geert+renesas@glider.be>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <54e9ec37-00f1-b3a9-ab80-f4be77382aae@kernel.dk>
-Date:   Wed, 19 Aug 2020 06:55:20 -0600
+Message-ID: <fd76fcd0-83b2-cc16-952b-8fb4c960bf28@kernel.dk>
+Date:   Wed, 19 Aug 2020 06:55:31 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200819123403.19136-1-geert+renesas@glider.be>
+In-Reply-To: <20200819123243.18983-1-geert+renesas@glider.be>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,13 +79,10 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/19/20 5:34 AM, Geert Uytterhoeven wrote:
-> request_queue.rpm_status is assigned values of the rpm_status enum only,
-> so reflect that in its type.
-> 
-> Note that including <linux/pm.h> is (currently) a no-op, as it is
-> already included through <linux/genhd.h> and <linux/device.h>, but it is
-> better to play it safe.
+On 8/19/20 5:32 AM, Geert Uytterhoeven wrote:
+> The various <linux/blk*.h> header files are part of the Block Layer.
+> Add them to the corresponding section in the MAINTAINERS file, so
+> scripts/get_maintainer.pl will pick them up.
 
 Applied, thanks.
 
