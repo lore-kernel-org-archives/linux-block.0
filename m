@@ -2,171 +2,140 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4700FC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4325AC433DF
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 16:25:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2AC4A20897
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:27:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2242A20897
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 16:25:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Do1SU13c"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726747AbgHSP1P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 11:27:15 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:38872 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728203AbgHSPZM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 11:25:12 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 60254424BC119C6AF290;
-        Wed, 19 Aug 2020 23:24:58 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 19 Aug 2020 23:24:51 +0800
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
-        <kashyap.desai@broadcom.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <dgilbert@interlog.com>,
-        <paolo.valente@linaro.org>, <hare@suse.de>, <hch@lst.de>
-CC:     <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
-        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>,
-        John Garry <john.garry@huawei.com>
-Subject: [PATCH v8 10/18] blk-mq, elevator: Count requests per hctx to improve performance
-Date:   Wed, 19 Aug 2020 23:20:28 +0800
-Message-ID: <1597850436-116171-11-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
+        id S1726632AbgHSQYt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 12:24:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40036 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726893AbgHSQY3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 12:24:29 -0400
+Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E4EC061757;
+        Wed, 19 Aug 2020 09:24:28 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id l84so21487263oig.10;
+        Wed, 19 Aug 2020 09:24:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HU4eQwextT3u0Vy8pHWyNShnAd/EOsS2z1U17KkaX1w=;
+        b=Do1SU13c8m0ev7rC+aSlATz3YC7HLEYtrWvOJM3hlYx5tibAn4nY6QBTQ6sL63+y1B
+         MMICOhoWO2QuUo7XJXcNmi2U+jZFkCQmxwKcysxTB45P8s8hyGWMfAV/b9TWZwGMUstf
+         eQNrTEk4Md6ORX7QTkn+vE+7QuV40o6StptyB5lbRYfwqel6HisdptT26ZHXxM5fvMgf
+         Hrtd8Cg5JcovJzKRBu4i1OQaNFicedwyX0Gjkgy9VMM/toVIToznUVdAB9xldZ2UK6eB
+         IrMKr2f8qBsOPZBeTcYzlGRInoJUjiFOhM2YCLXROPBSSoWa8KVaeHXHoJOeD+LqB0Ea
+         LpeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HU4eQwextT3u0Vy8pHWyNShnAd/EOsS2z1U17KkaX1w=;
+        b=Vk673JvG3FZvcqkET+q2dOfCV7tl0Vmnb6uqn32Q7mfoynIxDQNrotRIuB0iFOuvz8
+         jTAA9q6UJqA7DhTejMSPx1WPwIOmhuPBLBSuFg8qVQK6Q/DcVN7M7ko9EYt8ZgOBws/X
+         Tbfzp+8kSW1sQVPxjNGd//eItr5KpGE1TXdF7ueZDCxU7JlEK6KOXeDKf4Athd/slow/
+         v4We4EgpiD5V2xfmMq1dXwtIp/PxjikTt1tHqyZSXftELbBzWOGQPi7qjIE1YAB/uYWJ
+         L7ErTqeucMhRgMF6rQ3/LkYoKJ9g/bNU0A+CFMfPOIYYy9w+Xg3cjd/GWCx04ezJdG3D
+         CK8Q==
+X-Gm-Message-State: AOAM531ricpAw54r+NTkoo/oWSgaetltSXb+f/QRh6z0UGGi9WG3cQjF
+        08xyzVxR3jmJ2kS7BEFWG01hSrDzKtbN8nPUfjA=
+X-Google-Smtp-Source: ABdhPJzpfHTlGoLujvQ5GY5n5H9BSvs/wYOUntKm/P0xrLOUSJQWGq951RNy2Mt1jRO58Yz8dbZ6uoLPp4/f2bRhLs0=
+X-Received: by 2002:a05:6808:4c5:: with SMTP id a5mr3863067oie.175.1597854268104;
+ Wed, 19 Aug 2020 09:24:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-CFilter-Loop: Reflected
+References: <20200817091617.28119-1-allen.cryptic@gmail.com>
+ <20200817091617.28119-2-allen.cryptic@gmail.com> <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
+ <202008171228.29E6B3BB@keescook> <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
+ <202008171246.80287CDCA@keescook> <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
+ <1597780833.3978.3.camel@HansenPartnership.com> <f3312928-430c-25f3-7112-76f2754df080@kernel.dk>
+ <1597849185.3875.7.camel@HansenPartnership.com>
+In-Reply-To: <1597849185.3875.7.camel@HansenPartnership.com>
+From:   Allen <allen.lkml@gmail.com>
+Date:   Wed, 19 Aug 2020 21:54:16 +0530
+Message-ID: <CAOMdWSJRR0BhjJK1FxD7UKxNd5sk4ycmEX6TYtJjRNR6UFAj6Q@mail.gmail.com>
+Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
+To:     James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@chromium.org>,
+        Allen Pais <allen.cryptic@gmail.com>, jdike@addtoit.com,
+        richard@nod.at, anton.ivanov@cambridgegreys.com, 3chas3@gmail.com,
+        stefanr@s5r6.in-berlin.de, airlied@linux.ie,
+        Daniel Vetter <daniel@ffwll.ch>, sre@kernel.org,
+        kys@microsoft.com, deller@gmx.de, dmitry.torokhov@gmail.com,
+        jassisinghbrar@gmail.com, shawnguo@kernel.org,
+        s.hauer@pengutronix.de, maximlevitsky@gmail.com, oakad@yahoo.com,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        mporter@kernel.crashing.org, alex.bou9@gmail.com,
+        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
+        mitch@sfgoth.com, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, linux-um@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux1394-devel@lists.sourceforge.net,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        Romain Perier <romain.perier@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Kashyap Desai <kashyap.desai@broadcom.com>
+> [...]
+> > > Since both threads seem to have petered out, let me suggest in
+> > > kernel.h:
+> > >
+> > > #define cast_out(ptr, container, member) \
+> > >     container_of(ptr, typeof(*container), member)
+> > >
+> > > It does what you want, the argument order is the same as
+> > > container_of with the only difference being you name the containing
+> > > structure instead of having to specify its type.
+> >
+> > Not to incessantly bike shed on the naming, but I don't like
+> > cast_out, it's not very descriptive. And it has connotations of
+> > getting rid of something, which isn't really true.
+>
+> Um, I thought it was exactly descriptive: you're casting to the outer
+> container.  I thought about following the C++ dynamic casting style, so
+> out_cast(), but that seemed a bit pejorative.  What about outer_cast()?
+>
+> > FWIW, I like the from_ part of the original naming, as it has some
+> > clues as to what is being done here. Why not just from_container()?
+> > That should immediately tell people what it does without having to
+> > look up the implementation, even before this becomes a part of the
+> > accepted coding norm.
+>
+> I'm not opposed to container_from() but it seems a little less
+> descriptive than outer_cast() but I don't really care.  I always have
+> to look up container_of() when I'm using it so this would just be
+> another macro of that type ...
+>
 
-High CPU utilization on "native_queued_spin_lock_slowpath" due to lock
-contention is possible for mq-deadline and bfq IO schedulers
-when nr_hw_queues is more than one.
+ So far we have a few which have been suggested as replacement
+for from_tasklet()
 
-It is because kblockd work queue can submit IO from all online CPUs
-(through blk_mq_run_hw_queues()) even though only one hctx has pending
-commands.
+- out_cast() or outer_cast()
+- from_member().
+- container_from() or from_container()
 
-The elevator callback .has_work for mq-deadline and bfq scheduler considers
-pending work if there are any IOs on request queue but it does not account
-hctx context.
+from_container() sounds fine, would trimming it a bit work? like from_cont().
 
-Add a per-hctx 'elevator_queued' count to the hctx to avoid triggering
-the elevator even though there are no requests queued.
-
-Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-[jpg: Relocated atomic_dec() in dd_dispatch_request(), update commit message per Kashyap]
-Signed-off-by: John Garry <john.garry@huawei.com>
----
- block/bfq-iosched.c    | 5 +++++
- block/blk-mq.c         | 1 +
- block/mq-deadline.c    | 6 ++++++
- include/linux/blk-mq.h | 4 ++++
- 4 files changed, 16 insertions(+)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 88f0dfa545d7..4650012f1e55 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4640,6 +4640,9 @@ static bool bfq_has_work(struct blk_mq_hw_ctx *hctx)
- {
- 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
- 
-+	if (!atomic_read(&hctx->elevator_queued))
-+		return false;
-+
- 	/*
- 	 * Avoiding lock: a race on bfqd->busy_queues should cause at
- 	 * most a call to dispatch for nothing
-@@ -5554,6 +5557,7 @@ static void bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		rq = list_first_entry(list, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
- 		bfq_insert_request(hctx, rq, at_head);
-+		atomic_inc(&hctx->elevator_queued);
- 	}
- }
- 
-@@ -5933,6 +5937,7 @@ static void bfq_finish_requeue_request(struct request *rq)
- 
- 		bfq_completed_request(bfqq, bfqd);
- 		bfq_finish_requeue_request_body(bfqq);
-+		atomic_dec(&rq->mq_hctx->elevator_queued);
- 
- 		spin_unlock_irqrestore(&bfqd->lock, flags);
- 	} else {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 457b43829a4f..361fb9fe1dc5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2649,6 +2649,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
- 		goto free_hctx;
- 
- 	atomic_set(&hctx->nr_active, 0);
-+	atomic_set(&hctx->elevator_queued, 0);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 	hctx->numa_node = node;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index b57470e154c8..800ac902809b 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -386,6 +386,8 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	spin_lock(&dd->lock);
- 	rq = __dd_dispatch_request(dd);
- 	spin_unlock(&dd->lock);
-+	if (rq)
-+		atomic_dec(&rq->mq_hctx->elevator_queued);
- 
- 	return rq;
- }
-@@ -533,6 +535,7 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		rq = list_first_entry(list, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
- 		dd_insert_request(hctx, rq, at_head);
-+		atomic_inc(&hctx->elevator_queued);
- 	}
- 	spin_unlock(&dd->lock);
- }
-@@ -579,6 +582,9 @@ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
- {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
- 
-+	if (!atomic_read(&hctx->elevator_queued))
-+		return false;
-+
- 	return !list_empty_careful(&dd->dispatch) ||
- 		!list_empty_careful(&dd->fifo_list[0]) ||
- 		!list_empty_careful(&dd->fifo_list[1]);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index a4b35ec60faf..2f3ba31a1658 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -139,6 +139,10 @@ struct blk_mq_hw_ctx {
- 	 * shared across request queues.
- 	 */
- 	atomic_t		nr_active;
-+	/**
-+	 * @elevator_queued: Number of queued requests on hctx.
-+	 */
-+	atomic_t                elevator_queued;
- 
- 	/** @cpuhp_online: List to store request if CPU is going to die */
- 	struct hlist_node	cpuhp_online;
 -- 
-2.26.2
-
+       - Allen
