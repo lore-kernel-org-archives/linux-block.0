@@ -2,123 +2,119 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6FDC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 00:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D7A8C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 04:22:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB16820738
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 00:20:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HIwRppyc"
+	by mail.kernel.org (Postfix) with ESMTP id D346420772
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 04:22:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726444AbgHSAUt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Aug 2020 20:20:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52258 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726367AbgHSAUt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Aug 2020 20:20:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597796446;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Gs2NvF8gnx1vHyD5HoIk+F9hdBlMxJaYiFyBCzuPyas=;
-        b=HIwRppyc7RrAlUnodZ/Z3CEXxR9M2XL6k+96nbu8um2C8G+FaQO4tq6DSifCjrp6Yu8+W1
-        PYd2RHUNw8BWsVfLX/CSbqLiq1vKo7EmTlmt5f3ar7iNHLQvN++BxTQ5lW9EjPDD6eyAaD
-        5sv84ohB5h2/GsoToHU4fQtMjv7m42o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-VCVnQbClMoKN_E8l7s4IHg-1; Tue, 18 Aug 2020 20:20:42 -0400
-X-MC-Unique: VCVnQbClMoKN_E8l7s4IHg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB3391084C82;
-        Wed, 19 Aug 2020 00:20:41 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C751110021AA;
-        Wed, 19 Aug 2020 00:20:36 +0000 (UTC)
-Date:   Tue, 18 Aug 2020 20:20:35 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>, dm-devel@redhat.com
-Subject: Re: [PATCH RESEND] blk-mq: insert request not through ->queue_rq
- into sw/scheduler queue
-Message-ID: <20200819002035.GA9292@redhat.com>
-References: <20200818090728.2696802-1-ming.lei@redhat.com>
- <92162ee6-0fa0-dafd-69b1-af285ee61044@kernel.dk>
- <20200818152022.GB6842@redhat.com>
- <20200818235220.GA2712797@T590>
+        id S1725876AbgHSEWT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 00:22:19 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44916 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725275AbgHSEWS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 00:22:18 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 2DEBAB7E7;
+        Wed, 19 Aug 2020 04:22:41 +0000 (UTC)
+Subject: Re: [PATCH v7 1/6] net: introduce helper sendpage_ok() in
+ include/linux/net.h
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        netdev@vger.kernel.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Hannes Reinecke <hare@suse.de>, Jan Kara <jack@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Vlastimil Babka <vbabka@suse.com>, stable@vger.kernel.org
+References: <20200818131227.37020-1-colyli@suse.de>
+ <20200818131227.37020-2-colyli@suse.de> <20200818162404.GA27196@lst.de>
+ <217ec0ec-3c5a-a8ed-27d9-c634f0b9a045@suse.de>
+ <20200818194930.GA31966@lst.de>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Message-ID: <04408ff6-f765-8f3e-ead9-aec55043e469@suse.de>
+Date:   Wed, 19 Aug 2020 12:22:05 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200818235220.GA2712797@T590>
-eFrom:  Mike Snitzer <snitzer@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200818194930.GA31966@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 18 2020 at  7:52pm -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
-
-> On Tue, Aug 18, 2020 at 11:20:22AM -0400, Mike Snitzer wrote:
-> > On Tue, Aug 18 2020 at 10:50am -0400,
-> > Jens Axboe <axboe@kernel.dk> wrote:
-> > 
-> > > On 8/18/20 2:07 AM, Ming Lei wrote:
-> > > > c616cbee97ae ("blk-mq: punt failed direct issue to dispatch list") supposed
-> > > > to add request which has been through ->queue_rq() to the hw queue dispatch
-> > > > list, however it adds request running out of budget or driver tag to hw queue
-> > > > too. This way basically bypasses request merge, and causes too many request
-> > > > dispatched to LLD, and system% is unnecessary increased.
-> > > > 
-> > > > Fixes this issue by adding request not through ->queue_rq into sw/scheduler
-> > > > queue, and this way is safe because no ->queue_rq is called on this request
-> > > > yet.
-> > > > 
-> > > > High %system can be observed on Azure storvsc device, and even soft lock
-> > > > is observed. This patch reduces %system during heavy sequential IO,
-> > > > meantime decreases soft lockup risk.
-> > > 
-> > > Applied, thanks Ming.
-> > 
-> > Hmm, strikes me as strange that this is occurring given the direct
-> > insertion into blk-mq queue (bypassing scheduler) is meant to avoid 2
-> > layers of IO merging when dm-mulipath is stacked on blk-mq path(s).  The
-> > dm-mpath IO scheduler does all merging and underlying paths' blk-mq
-> > request_queues are meant to just dispatch the top-level's requests.
-> > 
-> > So this change concerns me.  Feels like this design has broken down.
-> > 
+On 2020/8/19 03:49, Christoph Hellwig wrote:
+> On Wed, Aug 19, 2020 at 12:33:37AM +0800, Coly Li wrote:
+>> On 2020/8/19 00:24, Christoph Hellwig wrote:
+>>> I think we should go for something simple like this instead:
+>>
+>> This idea is fine to me. Should a warning message be through here? IMHO
+>> the driver still sends an improper page in, fix it in silence is too
+>> kind or over nice to the buggy driver(s).
 > 
-> 'bypass_insert' is 'true' when blk_insert_cloned_request() is
-> called from device mapper code, so this patch doesn't affect dm.
-
-Great.
- 
-> > Could be that some other entry point was added for the
-> > __blk_mq_try_issue_directly() code?  And it needs to be untangled away
-> > from the dm-multipath use-case?
+> I don't think a warning is a good idea.  An API that does the right
+> thing underneath and doesn't require boiler plate code in most callers
+> is the right API.
 > 
-> __blk_mq_try_issue_directly() can be called from blk-mq directly, that
-> is the case this patch is addressing, if one request can't be queued to
-> LLD because of running out of budget or driver tag, it should be added to
-> scheduler queue for improving io merge, meantime we can avoid too many
-> requests dispatched to hardware.
 
-I see, so if retry is needed best to attempt merge again.
+Then I don't have more comment.
 
-Thanks for the explanation.
+Thanks.
 
-Mike
-
+Coly Li
