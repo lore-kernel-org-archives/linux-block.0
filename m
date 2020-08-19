@@ -2,29 +2,29 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6467EC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADAFAC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:25:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A1F520897
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9949A208A9
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:25:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726187AbgHSPZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 11:25:06 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9781 "EHLO huawei.com"
+        id S1728814AbgHSPZn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 11:25:43 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:40096 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726894AbgHSPZG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 11:25:06 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 6DC731556ACDD80C64D7;
-        Wed, 19 Aug 2020 23:25:03 +0800 (CST)
+        id S1728789AbgHSPZm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 11:25:42 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 5579C411A4F08A245081;
+        Wed, 19 Aug 2020 23:24:58 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 19 Aug 2020 23:24:52 +0800
+ 14.3.487.0; Wed, 19 Aug 2020 23:24:50 +0800
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
@@ -36,9 +36,9 @@ CC:     <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
         <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
         <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>,
         John Garry <john.garry@huawei.com>
-Subject: [PATCH v8 15/18] scsi: scsi_debug: Support host tagset
-Date:   Wed, 19 Aug 2020 23:20:33 +0800
-Message-ID: <1597850436-116171-16-git-send-email-john.garry@huawei.com>
+Subject: [PATCH v8 08/18] blk-mq: Record nr_active_requests per queue for when using shared sbitmap
+Date:   Wed, 19 Aug 2020 23:20:26 +0800
+Message-ID: <1597850436-116171-9-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
 References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
@@ -51,77 +51,122 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When host_max_queue is set (> 0), set the Scsi_Host.host_tagset such that
-blk-mq will use a hostwide tagset over all SCSI host submission queues.
+The per-hctx nr_active value can no longer be used to fairly assign a share
+of tag depth per request queue for when using a shared sbitmap, as it does
+not consider that the tags are shared tags over all hctx's.
 
-This means that we may expose all submission queues and always use the hwq
-chosen by blk-mq.
+For this case, record the nr_active_requests per request_queue, and make
+the judgement based on that value.
 
-And since if sdebug_host_max_queue is set, sdebug_max_queue is fixed to the
-same value, we can simplify how sdebug_driver_template.can_queue is set.
-
+Tested-by: Don Brace<don.brace@microsemi.com> #SCSI resv cmds patches used
+Co-developed-with: Kashyap Desai <kashyap.desai@broadcom.com>
 Signed-off-by: John Garry <john.garry@huawei.com>
 ---
- drivers/scsi/scsi_debug.c | 28 ++++++++++------------------
- 1 file changed, 10 insertions(+), 18 deletions(-)
+ block/blk-core.c       |  2 ++
+ block/blk-mq.c         |  4 ++--
+ block/blk-mq.h         | 26 ++++++++++++++++++++++++--
+ include/linux/blkdev.h |  2 ++
+ 4 files changed, 30 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 064ed680c053..4238baa2b34b 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -4698,19 +4698,14 @@ static int resp_rwp_zone(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- static struct sdebug_queue *get_queue(struct scsi_cmnd *cmnd)
- {
- 	u16 hwq;
-+	u32 tag = blk_mq_unique_tag(cmnd->request);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d9d632639bd1..360975255a2a 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -542,6 +542,8 @@ struct request_queue *blk_alloc_queue(int node_id)
+ 	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
+ 	q->node = node_id;
  
--	if (sdebug_host_max_queue) {
--		/* Provide a simple method to choose the hwq */
--		hwq = smp_processor_id() % submit_queues;
--	} else {
--		u32 tag = blk_mq_unique_tag(cmnd->request);
-+	hwq = blk_mq_unique_tag_to_hwq(tag);
++	atomic_set(&q->nr_active_requests_shared_sbitmap, 0);
++
+ 	timer_setup(&q->backing_dev_info->laptop_mode_wb_timer,
+ 		    laptop_mode_timer_fn, 0);
+ 	timer_setup(&q->timeout, blk_rq_timed_out_timer, 0);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a500d1dfa1bd..ebb72a59b433 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -519,7 +519,7 @@ void blk_mq_free_request(struct request *rq)
  
--		hwq = blk_mq_unique_tag_to_hwq(tag);
-+	pr_debug("tag=%#x, hwq=%d\n", tag, hwq);
-+	if (WARN_ON_ONCE(hwq >= submit_queues))
-+		hwq = 0;
+ 	ctx->rq_completed[rq_is_sync(rq)]++;
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT)
+-		atomic_dec(&hctx->nr_active);
++		__blk_mq_dec_active_requests(hctx);
  
--		pr_debug("tag=%#x, hwq=%d\n", tag, hwq);
--		if (WARN_ON_ONCE(hwq >= submit_queues))
--			hwq = 0;
--	}
- 	return sdebug_q_arr + hwq;
+ 	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
+ 		laptop_io_completion(q->backing_dev_info);
+@@ -1127,7 +1127,7 @@ static bool blk_mq_get_driver_tag(struct request *rq)
+ 	if ((hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) &&
+ 			!(rq->rq_flags & RQF_MQ_INFLIGHT)) {
+ 		rq->rq_flags |= RQF_MQ_INFLIGHT;
+-		atomic_inc(&hctx->nr_active);
++		__blk_mq_inc_active_requests(hctx);
+ 	}
+ 	hctx->tags->rqs[rq->tag] = rq;
+ 	return true;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 56dc37c21908..25ec73078e95 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -199,6 +199,28 @@ static inline bool blk_mq_get_dispatch_budget(struct request_queue *q)
+ 	return true;
  }
  
-@@ -7347,10 +7342,7 @@ static int sdebug_driver_probe(struct device *dev)
++static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx)
++{
++	if (blk_mq_is_sbitmap_shared(hctx->flags))
++		atomic_inc(&hctx->queue->nr_active_requests_shared_sbitmap);
++	else
++		atomic_inc(&hctx->nr_active);
++}
++
++static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx)
++{
++	if (blk_mq_is_sbitmap_shared(hctx->flags))
++		atomic_dec(&hctx->queue->nr_active_requests_shared_sbitmap);
++	else
++		atomic_dec(&hctx->nr_active);
++}
++
++static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
++{
++	if (blk_mq_is_sbitmap_shared(hctx->flags))
++		return atomic_read(&hctx->queue->nr_active_requests_shared_sbitmap);
++	return atomic_read(&hctx->nr_active);
++}
+ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 					   struct request *rq)
+ {
+@@ -207,7 +229,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
  
- 	sdbg_host = to_sdebug_host(dev);
- 
--	if (sdebug_host_max_queue)
--		sdebug_driver_template.can_queue = sdebug_host_max_queue;
--	else
--		sdebug_driver_template.can_queue = sdebug_max_queue;
-+	sdebug_driver_template.can_queue = sdebug_max_queue;
- 	if (!sdebug_clustering)
- 		sdebug_driver_template.dma_boundary = PAGE_SIZE - 1;
- 
-@@ -7367,11 +7359,11 @@ static int sdebug_driver_probe(struct device *dev)
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+ 		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+-		atomic_dec(&hctx->nr_active);
++		__blk_mq_dec_active_requests(hctx);
  	}
- 	/*
- 	 * Decide whether to tell scsi subsystem that we want mq. The
--	 * following should give the same answer for each host. If the host
--	 * has a limit of hostwide max commands, then do not set.
-+	 * following should give the same answer for each host.
- 	 */
--	if (!sdebug_host_max_queue)
--		hpnt->nr_hw_queues = submit_queues;
-+	hpnt->nr_hw_queues = submit_queues;
-+	if (sdebug_host_max_queue)
-+		hpnt->host_tagset = 1;
+ }
  
- 	sdbg_host->shost = hpnt;
- 	*((struct sdebug_host_info **)hpnt->hostdata) = sdbg_host;
+@@ -287,7 +309,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 	 * Allow at least some tags
+ 	 */
+ 	depth = max((bt->sb.depth + users - 1) / users, 4U);
+-	return atomic_read(&hctx->nr_active) < depth;
++	return __blk_mq_active_requests(hctx) < depth;
+ }
+ 
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bb5636cc17b9..1d85235611e1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -484,6 +484,8 @@ struct request_queue {
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 
++	atomic_t		nr_active_requests_shared_sbitmap;
++
+ 	struct list_head	icq_list;
+ #ifdef CONFIG_BLK_CGROUP
+ 	DECLARE_BITMAP		(blkcg_pols, BLKCG_MAX_POLS);
 -- 
 2.26.2
 
