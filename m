@@ -7,71 +7,98 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB96C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D66C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:05:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E02B2054F
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:04:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CEFF206FA
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 13:05:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GHo2+Xcl"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZtDUAent"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728354AbgHSNEQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 09:04:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36960 "EHLO
+        id S1728623AbgHSNFA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 09:05:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728129AbgHSNDx (ORCPT
+        with ESMTP id S1728502AbgHSNBB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 09:03:53 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E50A5C061757
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 06:03:52 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id t11so10795486plr.5
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 06:03:52 -0700 (PDT)
+        Wed, 19 Aug 2020 09:01:01 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C3FC061757
+        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 06:01:00 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id mw10so1087012pjb.2
+        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 06:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xSNMFlLKMxGrhzSOSB0eVoDmjD0XhuL86GrYJiKVF9s=;
-        b=GHo2+XclsexMdeg0w7FyVGIexz5XELUhRHnUFYi4SnpLXT5E1N7oEzYpR8ESQgtniR
-         wnVamMa7081QYZKDuDgIyLiIdkMMLbAKLRYSAGMkSTD8yqB1mcSsQuq9+UfA9E1tbzrC
-         j1Cw6sJd2TwupmTCxK8wYYZgh2FnwZkkXnshSViILSmakfWAHMXRE9k+VBLDMS9la8zb
-         9qzrsVI3w7V9phaJDNQk6u/A7IPGj7R5+M3BksfnHX4Wa2HO+n1VpHS7mHhXu7oDJ4C/
-         LzEi33SzL7tu/LHzIK1SsOYn+7kqGMG9eVk1BnEPgtcKr85GLb1OQNiJjr8hqFM38faL
-         RHTw==
+        bh=qNJVZUa8vOnjh3Y4FbI7cu96rnOZczrpWszoc4OM35E=;
+        b=ZtDUAentzHDOfXLt1WNpX0PqLZgZi3vnfEc6anllVjv7Z89UoKoCCMUiljAdsTAGBL
+         DEVHOWuWzMZeIuJcHwUlptWZjkCaOp1ZUKAoSs/2jyyTPejnx1zCbjPUY7C9na+Ftk+x
+         wpw/pPjI4UYNDosNdy4j7LcDWUJhwNxLapyy4W7f1U00+fT6jVYw1uO8CMpHCStxGd8w
+         JLOisGYqnJmeY5ie8I+x4A4vKZtwoQ6PsaOc8UAPD7eTAFlJwORflpx8o8EPJZR8cuSG
+         1j977OWh0YEI5r2DXie/ItwJ0iuosRobp25OObO0Ld6mXVix+wRg8r73enQ5lMOcXAoG
+         tjpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=xSNMFlLKMxGrhzSOSB0eVoDmjD0XhuL86GrYJiKVF9s=;
-        b=gm9dLXk4iVpzvt1c2QMQ9TXTh9GDV+9ZuwCVbeP8TZDLga2wLNbWzarr3sPINRtYta
-         QxsMabI7708LlD/mmIv8atcpGJiDOkAUdO8nHY17SXW08AlqBQTW8GeTXoqhEC2Y7u4S
-         gJIzWQFFS0qw8Eixae6ydiXuzEtVDcK6DuTNskS3gkGDj0MGwIMQXly4/9u06zBQ+MXl
-         l8Zf91zEtlQQcq8b5bx8al/l8s4clz6AqjZSJgTyKGZB6Iex7KnKFKeDtewAy93D+AFD
-         NBKDWritiqov5QL7ENfqQKTt1biqCIfPZv3sKVs5KKHb7Z7Hoz2YLSFA7t3D0c8A62tO
-         1USQ==
-X-Gm-Message-State: AOAM531OIhafBPrxWq8DNWddY0gtcEF9n/DcVc3IjdnfYTf4ksTsHoM/
-        efMhd3mAc+zCV5wACYdHZszEPA==
-X-Google-Smtp-Source: ABdhPJyAqDKTIKjRMLUlf2JvyMO4Oq4Y9F0jTYUv2JtPFsTI/9cHbkbI6REdfYKzhINRhOdB2CHhWQ==
-X-Received: by 2002:a17:90a:cc14:: with SMTP id b20mr3862322pju.1.1597842232486;
-        Wed, 19 Aug 2020 06:03:52 -0700 (PDT)
+        bh=qNJVZUa8vOnjh3Y4FbI7cu96rnOZczrpWszoc4OM35E=;
+        b=Qoemoe3XCi41NOwMq46qWqHNAPqyTuwSIliQlMxiZ8HVJXF//ycQx1gkwuNaTbxbb3
+         k8qy3NbRFZDolpCdtiMIKF4l/0K7NFXo5g0ciJRQVifYllgQ5NEh2N31C+zScIbxXqyu
+         BYEK/CFcjNQDPJ1csekX73t8iASYGKlWMHshsE9Ai1+BiV5pfnWo8VdPY5muN6GkfcM4
+         Qi1+YvMlbHzzwVkmivvhDPzH7WaKEdrHHBsYZaH8aAb/eTCMiBGWcPNcVmjoQXv8sKNL
+         Q5aaT0Jw9wbNXZiJUz/uIj4wQ4q12Ap31jfzXOHmBEy8l01THjLTcoIyGnvZXuttmoyI
+         +/Fg==
+X-Gm-Message-State: AOAM530H247MhCirJKgf1K4idoxU/oUYTzeKXC08N0Jn1p11MLeUDmm6
+        UYMWybDayPKyZc1uxKdZ+sKcqA==
+X-Google-Smtp-Source: ABdhPJwcWyLwqgVIDq5QVfeKWIJZ1zweeStVncOtMpfxCFFFEuEh0sSa6pW/Ah5NefbMm4I9GwEzLw==
+X-Received: by 2002:a17:90b:285:: with SMTP id az5mr3983315pjb.118.1597842058708;
+        Wed, 19 Aug 2020 06:00:58 -0700 (PDT)
 Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id z23sm24146798pgv.57.2020.08.19.06.03.51
+        by smtp.gmail.com with ESMTPSA id d23sm20502027pgm.11.2020.08.19.06.00.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Aug 2020 06:03:51 -0700 (PDT)
-Subject: Re: [PATCH] rbd: Convert to use the preferred fallthrough macro
-To:     Miaohe Lin <linmiaohe@huawei.com>, idryomov@gmail.com,
-        dongsheng.yang@easystack.cn
-Cc:     ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200819085304.43653-1-linmiaohe@huawei.com>
+        Wed, 19 Aug 2020 06:00:58 -0700 (PDT)
+Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Kees Cook <keescook@chromium.org>
+Cc:     Allen Pais <allen.cryptic@gmail.com>, jdike@addtoit.com,
+        richard@nod.at, anton.ivanov@cambridgegreys.com, 3chas3@gmail.com,
+        stefanr@s5r6.in-berlin.de, airlied@linux.ie, daniel@ffwll.ch,
+        sre@kernel.org, kys@microsoft.com, deller@gmx.de,
+        dmitry.torokhov@gmail.com, jassisinghbrar@gmail.com,
+        shawnguo@kernel.org, s.hauer@pengutronix.de,
+        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
+        mporter@kernel.crashing.org, alex.bou9@gmail.com,
+        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
+        mitch@sfgoth.com, davem@davemloft.net, kuba@kernel.org,
+        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux1394-devel@lists.sourceforge.net,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        Allen Pais <allen.lkml@gmail.com>,
+        Romain Perier <romain.perier@gmail.com>
+References: <20200817091617.28119-1-allen.cryptic@gmail.com>
+ <20200817091617.28119-2-allen.cryptic@gmail.com>
+ <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
+ <202008171228.29E6B3BB@keescook>
+ <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
+ <202008171246.80287CDCA@keescook>
+ <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
+ <1597780833.3978.3.camel@HansenPartnership.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1968d5b6-3543-a213-4118-9c36f9a48343@kernel.dk>
-Date:   Wed, 19 Aug 2020 07:03:50 -0600
+Message-ID: <f3312928-430c-25f3-7112-76f2754df080@kernel.dk>
+Date:   Wed, 19 Aug 2020 07:00:53 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200819085304.43653-1-linmiaohe@huawei.com>
+In-Reply-To: <1597780833.3978.3.camel@HansenPartnership.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,10 +107,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/19/20 1:53 AM, Miaohe Lin wrote:
-> Convert the uses of fallthrough comments to fallthrough macro.
+On 8/18/20 1:00 PM, James Bottomley wrote:
+> On Mon, 2020-08-17 at 13:02 -0700, Jens Axboe wrote:
+>> On 8/17/20 12:48 PM, Kees Cook wrote:
+>>> On Mon, Aug 17, 2020 at 12:44:34PM -0700, Jens Axboe wrote:
+>>>> On 8/17/20 12:29 PM, Kees Cook wrote:
+>>>>> On Mon, Aug 17, 2020 at 06:56:47AM -0700, Jens Axboe wrote:
+>>>>>> On 8/17/20 2:15 AM, Allen Pais wrote:
+>>>>>>> From: Allen Pais <allen.lkml@gmail.com>
+>>>>>>>
+>>>>>>> In preparation for unconditionally passing the
+>>>>>>> struct tasklet_struct pointer to all tasklet
+>>>>>>> callbacks, switch to using the new tasklet_setup()
+>>>>>>> and from_tasklet() to pass the tasklet pointer explicitly.
+>>>>>>
+>>>>>> Who came up with the idea to add a macro 'from_tasklet' that
+>>>>>> is just container_of? container_of in the code would be
+>>>>>> _much_ more readable, and not leave anyone guessing wtf
+>>>>>> from_tasklet is doing.
+>>>>>>
+>>>>>> I'd fix that up now before everything else goes in...
+>>>>>
+>>>>> As I mentioned in the other thread, I think this makes things
+>>>>> much more readable. It's the same thing that the timer_struct
+>>>>> conversion did (added a container_of wrapper) to avoid the
+>>>>> ever-repeating use of typeof(), long lines, etc.
+>>>>
+>>>> But then it should use a generic name, instead of each sub-system 
+>>>> using some random name that makes people look up exactly what it
+>>>> does. I'm not huge fan of the container_of() redundancy, but
+>>>> adding private variants of this doesn't seem like the best way
+>>>> forward. Let's have a generic helper that does this, and use it
+>>>> everywhere.
+>>>
+>>> I'm open to suggestions, but as things stand, these kinds of
+>>> treewide
+>>
+>> On naming? Implementation is just as it stands, from_tasklet() is
+>> totally generic which is why I objected to it. from_member()? Not
+>> great with naming... But I can see this going further and then we'll
+>> suddenly have tons of these. It's not good for readability.
+> 
+> Since both threads seem to have petered out, let me suggest in
+> kernel.h:
+> 
+> #define cast_out(ptr, container, member) \
+> 	container_of(ptr, typeof(*container), member)
+> 
+> It does what you want, the argument order is the same as container_of
+> with the only difference being you name the containing structure
+> instead of having to specify its type.
 
-Applied, thanks.
+Not to incessantly bike shed on the naming, but I don't like cast_out,
+it's not very descriptive. And it has connotations of getting rid of
+something, which isn't really true.
+
+FWIW, I like the from_ part of the original naming, as it has some clues
+as to what is being done here. Why not just from_container()? That
+should immediately tell people what it does without having to look up
+the implementation, even before this becomes a part of the accepted
+coding norm.
 
 -- 
 Jens Axboe
