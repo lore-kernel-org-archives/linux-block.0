@@ -2,231 +2,149 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09C5C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 10:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8605EC433DF
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 10:48:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9ABDA207FB
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 10:30:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 642DE206B5
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 10:48:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="EQg35sJv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SAlnLFGs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgHSKaA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 06:30:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41340 "EHLO
+        id S1728054AbgHSKse (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 06:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726919AbgHSK37 (ORCPT
+        with ESMTP id S1728013AbgHSKs3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 06:29:59 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D65CC061757
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 03:29:59 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id g19so24170516ioh.8
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 03:29:59 -0700 (PDT)
+        Wed, 19 Aug 2020 06:48:29 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910FCC061757;
+        Wed, 19 Aug 2020 03:48:28 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id h22so18666179otq.11;
+        Wed, 19 Aug 2020 03:48:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=vr39J/XKbS/RoFBjsIyOW7Du+Qr/Po99fBfJzCHkCNU=;
-        b=EQg35sJvFT9ZRBfqDrU/aCLUJ3YVQSvbpaJt4SpfZ65Ax50mdYKQ0k4kDNVG4+ITtV
-         W3RYMbIp9mnvhEF1oF7aN11BKyCQZk5PYz5McxWARwIM2vm5TRwJPcPrJddexA4isnwC
-         I+uqd/TaTZOU7H76y2Hy/dCxN/cFH7NAfW1BU=
+        bh=JFCS1wWCaky01GdCrS5KhBNLCXiKvx8eu/9Q1CWY57o=;
+        b=SAlnLFGsaJJ2xUQvXdp6/REunLAQzaLpmNpCPkhdMyKVNOL4zXoJc+uTpvFb1PLXQe
+         nN8aQpwx9KlR0QpjA0U0Eq9qCAcvJ1BkG1Pmvfae+wF16AUCkU8W0GDQheD/o4B1VrUX
+         PelVL5WwDQloIppGpod8O4LcRauK/SLT0vBKv+BhPM4L1DU+6rZBrJ0Dt0oV8Ce4u200
+         wfYajuI8k/buRZ/KOQgJS9xFj6qU+vsS6Mi/Pic5cr7hyqCbNaPaM64dCQ32B92C7zpm
+         twdkgIcY8FJxVqqD5N4bDX/Yu8aavznJiTYE5JD98MkyaozlEe8FkOVjNVcv9NBfu1pV
+         5Fgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=vr39J/XKbS/RoFBjsIyOW7Du+Qr/Po99fBfJzCHkCNU=;
-        b=fTTbxOOLNACThdnkwNtjtrHrZx15JiO5jRNpk5XkWItWyP7Pf17BRu6Pa0nbbDa3By
-         DuSq3atcBOx4dI/ormevidIAdUrfakNHFlwH2zjEM+94EkUV+ovB0ycZkWHOHWGGouIg
-         e2IIk9/Ox5CBhmksniKkS7frt8L/TR51pArGWV6FL9+Amv2YgqT5f3qTbMhMaxEldsSC
-         JUzMAMnku6LWYwNtXu8fU37vawzOzdVjcnmCXdg51GWC9TI9jG0lDKoi1uULYXC83ibA
-         NTx62hSCQa6ggFsa97tVMtJ8M7cE3n5lhrFW2FsZMqwa7KYg+Ffs+tWcoKmW8DH2/14Y
-         LlMA==
-X-Gm-Message-State: AOAM533g52VzdXp0JlhF+CGzhAeToUGLoMJqU+M2QCIOnW3vcUvw6mlY
-        vlh/m7MRdCSrdPSRi6V0+cXXPhfhOCNXQ8qg7FArBQ==
-X-Google-Smtp-Source: ABdhPJx00LQ8IUogjD1/RwoIDu2nicW6xkRWNxK7DHfuMvDJvv6pgzgrYC0UaScXGRItUfxgJ01+1t08OVWMLIWTRvk=
-X-Received: by 2002:a5d:9bd5:: with SMTP id d21mr19627269ion.68.1597832998232;
- Wed, 19 Aug 2020 03:29:58 -0700 (PDT)
+        bh=JFCS1wWCaky01GdCrS5KhBNLCXiKvx8eu/9Q1CWY57o=;
+        b=uV1mk1B8VaF8tL03zX+JPDnTfyoDnCNxK3gH+iz+/rwHDaDH4hm566X1iC7oIitBQH
+         76P+QolpXTnIPEpqoQakVKdpGCMLf9musvyF1ESa7fTgxLvxsLlpc9mPgIglJ6Kdla24
+         N8C0ll+EATzolfkBKVJR3Th4rTUbCZNC/XglL/+byfkSD3y7hRaxWENgiDBdmfdfIh7U
+         Y8u1VPbZ6UuIL0gQsEiUx/i0BCYo7UPKLblql0q/72bOZsBHTbT7d2E3QZ0r9u5OlQ0m
+         V+td2rohBLQWIW0bo8naZ0z3+W9oIiIEvVpYQg8JLKwoORrOSoCIb7L0Ar3cWHzKVTZN
+         wXTA==
+X-Gm-Message-State: AOAM532ZQXvxDI/UlAajImfHfGl6AguDlbcNSDwj79tVy7i26jUl5ncm
+        IzmhgbQKiBsqdofNGeV5Bj3KUQ6wrj+EC22/IMQ=
+X-Google-Smtp-Source: ABdhPJwYTK+IRxToH0hqhLtJ7NIIqDs8lKmtEJkzNzElCKB5MQaF3rOwIOaAYWCB8rMlfnOVuvrNcqGFlbqr+yW4gKM=
+X-Received: by 2002:a9d:128c:: with SMTP id g12mr17527086otg.242.1597834108000;
+ Wed, 19 Aug 2020 03:48:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200807160327.GA977@redhat.com> <CAHk-=wiC=g-0yZW6QrEXRH53bUVAwEFgYxd05qgOnDLJYdzzcA@mail.gmail.com>
- <20200807204015.GA2178@redhat.com> <CAMeeMh_=M3Z7bLPN3_SD+VxNbosZjXgC_H2mZq1eCeZG0kUx1w@mail.gmail.com>
- <CALrw=nHD81X4YCpuk-Pp9_FSFba6LZEVUwo-YkYh1nL9pEbzpA@mail.gmail.com>
- <CAHk-=wj95eQxPOEMHe8j3zmpZYHbv8kZ0nz8fUUCO6acENTs0w@mail.gmail.com>
- <CAMeeMh_4j9EyOB3evyHi536d8kocH3egPdGO_FZj+G5iZzkVrQ@mail.gmail.com> <CY4PR04MB37512740818400616FDB6892E75D0@CY4PR04MB3751.namprd04.prod.outlook.com>
-In-Reply-To: <CY4PR04MB37512740818400616FDB6892E75D0@CY4PR04MB3751.namprd04.prod.outlook.com>
-From:   Ignat Korchagin <ignat@cloudflare.com>
-Date:   Wed, 19 Aug 2020 11:29:46 +0100
-Message-ID: <CALrw=nEZa+H5W3VzsTrGWvQ=KqWXx5BnXsLxLFho6gpGB+Ny=w@mail.gmail.com>
-Subject: Re: [git pull] device mapper changes for 5.9
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        John Dorminy <jdorminy@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Alasdair G Kergon <agk@redhat.com>,
-        JeongHyeon Lee <jhs2.lee@samsung.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        yangerkun <yangerkun@huawei.com>
+References: <20200817091617.28119-1-allen.cryptic@gmail.com>
+ <20200817091617.28119-2-allen.cryptic@gmail.com> <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
+ <202008171228.29E6B3BB@keescook> <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
+ <202008171246.80287CDCA@keescook> <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
+ <1597780833.3978.3.camel@HansenPartnership.com> <202008181309.FD3940A2D5@keescook>
+In-Reply-To: <202008181309.FD3940A2D5@keescook>
+From:   Allen <allen.lkml@gmail.com>
+Date:   Wed, 19 Aug 2020 16:18:16 +0530
+Message-ID: <CAOMdWSLi-aUeKDN8Xn-X2uW_LmWsp2n=NL3dPGiUbQKm_MxcAg@mail.gmail.com>
+Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
+To:     Kees Cook <keescook@chromium.org>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Allen Pais <allen.cryptic@gmail.com>, jdike@addtoit.com,
+        richard@nod.at, anton.ivanov@cambridgegreys.com, 3chas3@gmail.com,
+        stefanr@s5r6.in-berlin.de, airlied@linux.ie, daniel@ffwll.ch,
+        sre@kernel.org, kys@microsoft.com, deller@gmx.de,
+        dmitry.torokhov@gmail.com, jassisinghbrar@gmail.com,
+        shawnguo@kernel.org, s.hauer@pengutronix.de,
+        maximlevitsky@gmail.com, oakad@yahoo.com,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        mporter@kernel.crashing.org, alex.bou9@gmail.com,
+        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
+        mitch@sfgoth.com, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, linux-um@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux1394-devel@lists.sourceforge.net,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        Romain Perier <romain.perier@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thank you John, Damien for extensive measurements. I don't have much
-to add as my measurements are probably just a subset of Damien's and
-repeat their results.
-
-One interesting thing I noticed when experimenting with this: we
-mostly talk about average throughput, but sometimes it is interesting
-to see the instant values (measured over small time slices). For
-example, for 4kb block size, qd=1, 50/50 randrw job for a dm-crypt
-encrypted ramdisk with ecb(cipher_null) cipher I just continuously run
-in the terminal, I can see the instant throughput having somewhat
-bimodal distribution: it reliably jumps between ~120 MiB/s and ~80
-MiB/s medians (the overall average throughput being ~100 MiB/s of
-course). This is for dm-crypt with workqueues. If I disable the
-workqueues the distribution of the instant throughput becomes
-"normal".
-
-Without looking into much detail I wonder if HT has some side-effects
-on dm-crypt processing (I have it enabled), because it seems not all
-"cores" are equal for dm-cypt even on the null cipher.
-
-I might get my hands on an arm64 server soon and curious to see how
-dm-crypt and workques will compare there.
-
-Regards,
-Ignat
-
-
-On Wed, Aug 19, 2020 at 8:10 AM Damien Le Moal <Damien.LeMoal@wdc.com> wrote:
->
-> John,
->
-> On 2020/08/19 13:25, John Dorminy wrote:
-> > Your points are good. I don't know a good macrobenchmark at present,
-> > but at least various latency numbers are easy to get out of fio.
+> > > > > > > >
+> > > > > > > > In preparation for unconditionally passing the
+> > > > > > > > struct tasklet_struct pointer to all tasklet
+> > > > > > > > callbacks, switch to using the new tasklet_setup()
+> > > > > > > > and from_tasklet() to pass the tasklet pointer explicitly.
+> > > > > > >
+> > > > > > > Who came up with the idea to add a macro 'from_tasklet' that
+> > > > > > > is just container_of? container_of in the code would be
+> > > > > > > _much_ more readable, and not leave anyone guessing wtf
+> > > > > > > from_tasklet is doing.
+> > > > > > >
+> > > > > > > I'd fix that up now before everything else goes in...
+> > > > > >
+> > > > > > As I mentioned in the other thread, I think this makes things
+> > > > > > much more readable. It's the same thing that the timer_struct
+> > > > > > conversion did (added a container_of wrapper) to avoid the
+> > > > > > ever-repeating use of typeof(), long lines, etc.
+> > > > >
+> > > > > But then it should use a generic name, instead of each sub-system
+> > > > > using some random name that makes people look up exactly what it
+> > > > > does. I'm not huge fan of the container_of() redundancy, but
+> > > > > adding private variants of this doesn't seem like the best way
+> > > > > forward. Let's have a generic helper that does this, and use it
+> > > > > everywhere.
+> > > >
+> > > > I'm open to suggestions, but as things stand, these kinds of
+> > > > treewide
+> > >
+> > > On naming? Implementation is just as it stands, from_tasklet() is
+> > > totally generic which is why I objected to it. from_member()? Not
+> > > great with naming... But I can see this going further and then we'll
+> > > suddenly have tons of these. It's not good for readability.
 > >
-> > I ran a similar set of tests on an Optane 900P with results below.
-> > 'clat' is, as fio reports, the completion latency, measured in usec.
-> > 'configuration' is [block size], [iodepth], [jobs]; picked to be a
-> > varied selection that obtained excellent throughput from the drive.
-> > Table reports average, and 99th percentile, latency times as well as
-> > throughput. It matches Ignat's report that large block sizes using the
-> > new option can have worse latency and throughput on top-end drives,
-> > although that result doesn't make any sense to me.
+> > Since both threads seem to have petered out, let me suggest in
+> > kernel.h:
 > >
-> > Happy to run some more there or elsewhere if there are suggestions.
+> > #define cast_out(ptr, container, member) \
+> >       container_of(ptr, typeof(*container), member)
 > >
-> > devicetype    configuration    MB/s    clat mean    clat 99%
-> > ------------------------------------------------------------------
-> > nvme base        1m,32,4     2259    59280        67634
-> > crypt default    1m,32,4     2267    59050       182000
-> > crypt no_w_wq    1m,32,4     1758    73954.54     84411
-> > nvme base       64k,1024,1   2273    29500.92     30540
-> > crypt default   64k,1024,1   2167    29518.89     50594
-> > crypt no_w_wq   64k,1024,1   2056    31090.23     31327
-> > nvme base        4k,128,4    2159      924.57      1106
-> > crypt default    4k,128,4    1256     1663.67      3294
-> > crypt no_w_wq    4k,128,4    1703     1165.69      1319
+> > It does what you want, the argument order is the same as container_of
+> > with the only difference being you name the containing structure
+> > instead of having to specify its type.
 >
-> I have been doing a lot of testing recently on dm-crypt, mostly for zoned
-> storage, that is with write workqueue disabled, but also with regular disks to
-> have something to compare to and verify my results. I confirm that I see similar
-> changes in throughput/latency in my tests: disabling workqueues improves
-> throughput for small IO sizes thanks to the lower latency (removed context
-> switch overhead), but the benefits of disabling the workqueues become dubious
-> for large IO sizes, and deep queue depth. See the heat-map attached for more
-> results (nullblk device used for these measurements with 1 job per CPU).
+> I like this! Shall I send this to Linus to see if this can land in -rc2
+> for use going forward?
 >
-> I also pushed things further as my tests as I primarily focused on enterprise
-> systems with a large number of storage devices being used with a single server.
-> To flatten things out and avoid any performance limitations due to the storage
-> devices, PCIe and/or HBA bus speed and memory bus speed, I ended up performing
-> lots of tests using nullblk with different settings:
->
-> 1) SSD like multiqueue setting without "none" scheduler, with irq_mode=0
-> (immediate completion in submission context) and irq_mode=1 for softirq
-> completion (different completion context than submission).
-> 2) HDD like single queue with mq-deadline as the scheduler, and the different
-> irq_mode settings.
->
-> I also played with CPU assignments for the fio jobs and tried various things.
->
-> My observations are as follows, in no particular order:
->
-> 1) Maximum throughput clearly directly depends on the numbers of CPUs involved
-> in the crypto work. The crypto acceleration is limited per core and so the
-> number of issuer contexts (for writes) and or completion contexts (for reads)
-> almost directly determine maximum performance with worqueue disabled. I measured
-> about 1.4GB/s at best on my system with a single writer 128KB/QD=4.
->
-> 2) For a multi drive setup with IO issuers limited to a small set of CPUs,
-> performance does not scale with the number of disks as the crypto engine speed
-> of the CPUs being used is the limiting factor: both write encryption and read
-> decryption happen on that set of CPUs, regardless of the others CPUs load.
->
-> 3) For single queue devices, write performance scales badly with the number of
-> CPUs used for IO issuing: the one CPU that runs the device queue to dispatch
-> commands end up doing a lot of crypto work for requests queued through other
-> CPUs too.
->
-> 4) On a very busy system with a very large number of disks and CPUs used for
-> IOs, the total throughput I get is very close for all settings with workqueues
-> enabled and disabled, about 50GB/s total on my dual socket Xeon system. There
-> was a small advantage for the none scheduler/multiqueue setting that gave up to
-> 56GB/s with workqueues on and 47GB/s with workqueues off. The single
-> queue/mq-deadline case gave 51 GB/s and 48 GB/s with workqueues on/off.
->
-> 5) For the tests with the large number of drives and CPUs, things got
-> interesting with the average latency: I saw about the same average with
-> workqueues on and off. But the p99 latency was about 3 times lower with
-> workqueues off than workqueues on. When all CPUs are busy, reducing overhead by
-> avoiding additional context switches clearly helps.
->
-> 6) With an arguably more realistic workload of 66% read and 34 % writes (read
-> size is 64KB/1MB with a 60%/40% ratio and write size is fixed at 1MB), I ended
-> up with higher total throughput with workqueues disabled (44GB/s) vs enabled
-> (38GB/s). Average write latency was also 30% lower with workqueues disabled
-> without any significant change to the average read latency.
->
-> From all these tests, I am currently considering that for a large system with
-> lots of devices, disabling workqueues is a win, as long as IO issuers are not
-> limited to a small set of CPUs.
->
-> The benefits of disabling workqueues for a desktop like system or a server
-> system with one (or very few) super fast drives are much less clear in my
-> opinion. Average and p99 latency are generally better with workqueues off, but
-> total throughput may significantly suffer if only a small number of IO contexts
-> are involved, that is, a small number of CPUs participate in the crypto
-> processing. Then crypto hardware speed dictates the results and using workqueues
-> to get parallelism between more CPU cores can give better throughput.
->
-> That said, I am thinking that from all this, we can extract some hints to
-> automate decision for using workqueues or not:
-> 1) Small IOs (e.g. 4K) would probably benefit from having workqueue disabled,
-> especially for 4Kn storage devices as such request would be processed as a
-> single block with a single crypto API call.
-> 2) It may be good to process any BIO marked with REQ_HIPRI (polling BIO) without
-> any workqueue, to reduce latency, as intended by the caller.
-> 3) We may want to have read-ahead reads use workqueues, especially for single
-> queue devices (HDDs) to avoid increasing latency for other reads completing
-> together with these read-ahead requests.
->
-> In the end, I am still scratching my head trying to figure out what the best
-> default setup may be.
->
-> Best regards.
->
->
-> --
-> Damien Le Moal
-> Western Digital Research
+
+Cool, I shall wait for it to be accepted and then spin out V2 with cast_out()
+
+-- 
+       - Allen
