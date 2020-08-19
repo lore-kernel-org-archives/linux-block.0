@@ -4,27 +4,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 069A4C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D62C433E3
 	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:26:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E325E208A9
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:26:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABE7C20897
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 15:26:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727932AbgHSPZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 11:25:29 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:39650 "EHLO huawei.com"
+        id S1728836AbgHSP0D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 11:26:03 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:39912 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728758AbgHSPZV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 11:25:21 -0400
+        id S1728776AbgHSPZa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Aug 2020 11:25:30 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id E2FC13F36854AB68B766;
+        by Forcepoint Email with ESMTP id BB1DD5363F1B61B21628;
         Wed, 19 Aug 2020 23:24:58 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 19 Aug 2020 23:24:51 +0800
+ 14.3.487.0; Wed, 19 Aug 2020 23:24:50 +0800
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
@@ -35,11 +35,10 @@ CC:     <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
         <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
         <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
         John Garry <john.garry@huawei.com>
-Subject: [PATCH v8 12/18] scsi: Add host and host template flag 'host_tagset'
-Date:   Wed, 19 Aug 2020 23:20:30 +0800
-Message-ID: <1597850436-116171-13-git-send-email-john.garry@huawei.com>
+Subject: [PATCH v8 09/18] blk-mq: Record active_queues_shared_sbitmap per tag_set for when using shared sbitmap
+Date:   Wed, 19 Aug 2020 23:20:27 +0800
+Message-ID: <1597850436-116171-10-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
 References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
@@ -52,81 +51,146 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.com>
+For when using a shared sbitmap, no longer should the number of active
+request queues per hctx be relied on for when judging how to share the tag
+bitmap.
 
-Add Host and host template flag 'host_tagset' so hostwide tagset can be
-shared on multiple reply queues after the SCSI device's reply queue is
-converted to blk-mq hw queue.
+Instead maintain the number of active request queues per tag_set, and make
+the judgement based on that.
 
 Tested-by: Don Brace<don.brace@microsemi.com> #SCSI resv cmds patches used
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-[jpg: Update comment on .can_queue and add Scsi_Host.host_tagset]
+Originally-from: Kashyap Desai <kashyap.desai@broadcom.com>
 Signed-off-by: John Garry <john.garry@huawei.com>
 ---
- drivers/scsi/hosts.c     | 1 +
- drivers/scsi/scsi_lib.c  | 2 ++
- include/scsi/scsi_host.h | 9 ++++++++-
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ block/blk-mq-tag.c     | 33 +++++++++++++++++++++++++--------
+ block/blk-mq.c         |  2 ++
+ block/blk-mq.h         | 16 +++++++++++++---
+ include/linux/blk-mq.h |  1 +
+ include/linux/blkdev.h |  1 +
+ 5 files changed, 42 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index 37d1c5565d90..2f162603876f 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -421,6 +421,7 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
- 	shost->cmd_per_lun = sht->cmd_per_lun;
- 	shost->unchecked_isa_dma = sht->unchecked_isa_dma;
- 	shost->no_write_same = sht->no_write_same;
-+	shost->host_tagset = sht->host_tagset;
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index c6d7ebc62bdb..c31c4a0478a5 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -23,9 +23,18 @@
+  */
+ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+-	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+-	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+-		atomic_inc(&hctx->tags->active_queues);
++	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
++		struct request_queue *q = hctx->queue;
++		struct blk_mq_tag_set *set = q->tag_set;
++
++		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
++		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
++			atomic_inc(&set->active_queues_shared_sbitmap);
++	} else {
++		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
++		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++			atomic_inc(&hctx->tags->active_queues);
++	}
  
- 	if (shost_eh_deadline == -1 || !sht->eh_host_reset_handler)
- 		shost->eh_deadline = -1;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 7c6dd6f75190..cdef5d1777cb 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1891,6 +1891,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
- 	tag_set->flags |=
- 		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
- 	tag_set->driver_data = shost;
-+	if (shost->host_tagset)
-+		tag_set->flags |= BLK_MQ_F_TAG_HCTX_SHARED;
- 
- 	return blk_mq_alloc_tag_set(tag_set);
+ 	return true;
  }
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 46ef8cccc982..701f178b20ae 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -436,6 +436,9 @@ struct scsi_host_template {
- 	/* True if the controller does not support WRITE SAME */
- 	unsigned no_write_same:1;
- 
-+	/* True if the host uses host-wide tagspace */
-+	unsigned host_tagset:1;
+@@ -47,11 +56,19 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
+ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct blk_mq_tags *tags = hctx->tags;
+-
+-	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+-		return;
+-
+-	atomic_dec(&tags->active_queues);
++	struct request_queue *q = hctx->queue;
++	struct blk_mq_tag_set *set = q->tag_set;
 +
++	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
++		if (!test_and_clear_bit(QUEUE_FLAG_HCTX_ACTIVE,
++					&q->queue_flags))
++			return;
++		atomic_dec(&set->active_queues_shared_sbitmap);
++	} else {
++		if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++			return;
++		atomic_dec(&tags->active_queues);
++	}
+ 
+ 	blk_mq_tag_wakeup_all(tags, false);
+ }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ebb72a59b433..457b43829a4f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3431,6 +3431,8 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 		goto out_free_mq_map;
+ 
+ 	if (blk_mq_is_sbitmap_shared(set->flags)) {
++		atomic_set(&set->active_queues_shared_sbitmap, 0);
++
+ 		if (blk_mq_init_shared_sbitmap(set, set->flags)) {
+ 			ret = -ENOMEM;
+ 			goto out_free_mq_rq_maps;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 25ec73078e95..a52703c98b77 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -292,8 +292,6 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 
+ 	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+ 		return true;
+-	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+-		return true;
+ 
  	/*
- 	 * Countdown for host blocking with no commands outstanding.
- 	 */
-@@ -603,7 +606,8 @@ struct Scsi_Host {
- 	 *
- 	 * Note: it is assumed that each hardware queue has a queue depth of
- 	 * can_queue. In other words, the total queue depth per host
--	 * is nr_hw_queues * can_queue.
-+	 * is nr_hw_queues * can_queue. However, for when host_tagset is set,
-+	 * the total queue depth is can_queue.
- 	 */
- 	unsigned nr_hw_queues;
- 	unsigned active_mode:2;
-@@ -634,6 +638,9 @@ struct Scsi_Host {
- 	/* The controller does not support WRITE SAME */
- 	unsigned no_write_same:1;
+ 	 * Don't try dividing an ant
+@@ -301,7 +299,19 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 	if (bt->sb.depth == 1)
+ 		return true;
  
-+	/* True if the host uses host-wide tagspace */
-+	unsigned host_tagset:1;
+-	users = atomic_read(&hctx->tags->active_queues);
++	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
++		struct request_queue *q = hctx->queue;
++		struct blk_mq_tag_set *set = q->tag_set;
 +
- 	/* Host responded with short (<36 bytes) INQUIRY result */
- 	unsigned short_inquiry:1;
++		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &q->queue_flags))
++			return true;
++		users = atomic_read(&set->active_queues_shared_sbitmap);
++	} else {
++		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++			return true;
++		users = atomic_read(&hctx->tags->active_queues);
++	}
++
+ 	if (!users)
+ 		return true;
  
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 03b1f39d5a72..a4b35ec60faf 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -252,6 +252,7 @@ struct blk_mq_tag_set {
+ 	unsigned int		timeout;
+ 	unsigned int		flags;
+ 	void			*driver_data;
++	atomic_t		active_queues_shared_sbitmap;
+ 
+ 	struct sbitmap_queue	__bitmap_tags;
+ 	struct sbitmap_queue	__breserved_tags;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1d85235611e1..67b39596436c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -617,6 +617,7 @@ struct request_queue {
+ #define QUEUE_FLAG_PCI_P2PDMA	25	/* device supports PCI p2p requests */
+ #define QUEUE_FLAG_ZONE_RESETALL 26	/* supports Zone Reset All */
+ #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
++#define QUEUE_FLAG_HCTX_ACTIVE 28	/* at least one blk-mq hctx is active */
+ 
+ #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP))
 -- 
 2.26.2
 
