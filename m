@@ -2,90 +2,123 @@ Return-Path: <SRS0=HYnl=B5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE63C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 14:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C7E9C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 14:22:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF009204FD
-	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 14:10:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3771220639
+	for <linux-block@archiver.kernel.org>; Wed, 19 Aug 2020 14:22:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WUs7cZqc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ePR6MonR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726904AbgHSOKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Aug 2020 10:10:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726703AbgHSOKM (ORCPT
+        id S1728143AbgHSOWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Aug 2020 10:22:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57077 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726560AbgHSOWF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Aug 2020 10:10:12 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 589CAC061383
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 07:10:11 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id r11so11730149pfl.11
-        for <linux-block@vger.kernel.org>; Wed, 19 Aug 2020 07:10:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=nqQSu+naoER2cTg6YN3Ri6AXCYtp5Cq2JF2/Sa6VXWs=;
-        b=WUs7cZqcaS7XW9PpeihbyzUuuMYFyao+SOskgMzUBsUc/ydkUelp7uW76u126hDyqv
-         fcvs8NhILbxyXRbpVwxSBJSdfxyt4emjxx4Eo2wEEdDRwWazrCBGt2Nntxubz0JVblOf
-         3naKv0eitP+uZ4Z6luXkkdtuR/r8c5REWKjED5e1vdTuGFu00+Zz/jl74tTBqo9LTmvi
-         nKIacXsWkLWNO0yLPLyJblHP66I+u0tenxnWiDrahWKYniF+EbkuN8KCxWnitWh1p6/x
-         j1d4f3dQy06eOQTQq7d+9BvAcWIC5Ew/U0NODgD1XvGxqf7b3K5WCOizLzYO6/vocfev
-         YY/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nqQSu+naoER2cTg6YN3Ri6AXCYtp5Cq2JF2/Sa6VXWs=;
-        b=doykvoMo1T0iVmcBT0GuZtyLn/KZJ3K9Upi3jk3FfRNNNc+x3JqLBFiOw9GMcwOPw+
-         Hlc6giJ58xQ2BIr6Nn/42aVPrYZwPr+clW/dbCvG0FJ+M9rzHu+LcxaAtj9nrP7dqkku
-         HPWWvD6OrDYb3z8Yc526Rl0n8HFU3XIJ8TER9bO8u3zT1HNuplqLAibeIHt7ON3vfMbi
-         wWyo+02OZZyqMqFqdoyYquA2cMJLSfzsWhJfhLRQ+uZhpNNkvorCm7T3QtqCgojpYpWZ
-         Z0v9unbhg/cHiZg2KBkHNvUbyznLGcA8Q72TP4NQHVMHBeYzZY8m+VyPVEgSiuFHRVW1
-         w8dg==
-X-Gm-Message-State: AOAM533C2IMl21FVqT2s+eVNY/VeSj18DL1XHFiWinf2AbqsS7UMg6Ee
-        /7cge2LUG0BHqMIpSvEjW6r9YPFpGf2yW/go
-X-Google-Smtp-Source: ABdhPJwf7jTtgPpteLObzewS/SMagnR5kBHF/y9jZOZOVJ0cl9iGTgKfgR2TZ3TdakPBgtjQn4M96g==
-X-Received: by 2002:a62:7acb:: with SMTP id v194mr19099980pfc.302.1597846210729;
-        Wed, 19 Aug 2020 07:10:10 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id h15sm3378093pjf.54.2020.08.19.07.10.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Aug 2020 07:10:10 -0700 (PDT)
-Subject: Re: [PATCH v2] blkcg: fix memleak for iolatency
-To:     Yufen Yu <yuyufen@huawei.com>, jbacik@fb.com, tj@kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20200811022116.1824539-1-yuyufen@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c6a113d4-c3f3-2921-0e92-53b1513d842d@kernel.dk>
-Date:   Wed, 19 Aug 2020 08:10:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 19 Aug 2020 10:22:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597846922;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a8S5IIUh7GJNHcBmoaRhz2adizeL376P9bqM1NftXwA=;
+        b=ePR6MonRprbzbPVnphrkAROe+d+uYS56Z3dkCwgD5bTCT5gz9QWYJ5FYn0pI3apXyiZV4s
+        8ZjwFy1UQzb80E42lf+qRUIDYYr0S9We0J3YXfo0XDsrwgcJehLG113NuAww3ILNl1ywcY
+        In3AFO0NsvJp17NP0mFrlaX3oxA03xk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-I4p9tKrfP6GoyVXnLuQpxw-1; Wed, 19 Aug 2020 10:22:01 -0400
+X-MC-Unique: I4p9tKrfP6GoyVXnLuQpxw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0EF9425D2;
+        Wed, 19 Aug 2020 14:21:59 +0000 (UTC)
+Received: from T590 (ovpn-12-85.pek2.redhat.com [10.72.12.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 25F5110013C2;
+        Wed, 19 Aug 2020 14:21:51 +0000 (UTC)
+Date:   Wed, 19 Aug 2020 22:21:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [REPORT] BUG: KASAN: use-after-free in bt_iter+0x80/0xf8
+Message-ID: <20200819142147.GA2795390@T590>
+References: <8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com>
+ <a68379af-48e7-da2b-812c-ff0fa24a41bb@huawei.com>
+ <20200819000009.GB2712797@T590>
+ <585bb054-2009-4abc-f1e8-802e494ba49b@huawei.com>
+ <20200819085843.GA2730150@T590>
+ <83de2368-a122-3b9c-db15-63ea442eecd9@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200811022116.1824539-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <83de2368-a122-3b9c-db15-63ea442eecd9@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/20 7:21 PM, Yufen Yu wrote:
-> Normally, blkcg_iolatency_exit() will free related memory in iolatency
-> when cleanup queue. But if blk_throtl_init() return error and queue init
-> fail, blkcg_iolatency_exit() will not do that for us. Then it cause
-> memory leak.
+On Wed, Aug 19, 2020 at 11:14:34AM +0100, John Garry wrote:
+> On 19/08/2020 09:58, Ming Lei wrote:
+> > > ah, right. I vaguely remember this. Well, if we didn't have a reliable
+> > > reproducer before, we do now.
+> > OK, that is great, please try the following patch:
+> > 
+> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> > index 32d82e23b095..f18632c524e9 100644
+> > --- a/block/blk-mq-tag.c
+> > +++ b/block/blk-mq-tag.c
+> > @@ -185,19 +185,19 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+> >   {
+> >   	struct bt_iter_data *iter_data = data;
+> >   	struct blk_mq_hw_ctx *hctx = iter_data->hctx;
+> > -	struct blk_mq_tags *tags = hctx->tags;
+> > +	struct blk_mq_tags *tags = hctx->sched_tags ?: hctx->tags;
+> >   	bool reserved = iter_data->reserved;
+> >   	struct request *rq;
+> >   	if (!reserved)
+> >   		bitnr += tags->nr_reserved_tags;
+> > -	rq = tags->rqs[bitnr];
+> > +	rq = tags->static_rqs[bitnr];
+> >   	/*
+> >   	 * We can hit rq == NULL here, because the tagging functions
+> >   	 * test and set the bit before assigning ->rqs[].
+> >   	 */
+> > -	if (rq && rq->q == hctx->queue)
+> > +	if (rq && rq->tag >= 0 && rq->q == hctx->queue)
+> >   		return iter_data->fn(hctx, rq, iter_data->data, reserved);
+> >   	return true;
+> >   }
+> > @@ -406,7 +406,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+> >   		return;
+> >   	queue_for_each_hw_ctx(q, hctx, i) {
+> > -		struct blk_mq_tags *tags = hctx->tags;
+> > +		struct blk_mq_tags *tags = hctx->sched_tags ?: hctx->tags;
+> >   		/*
+> >   		 * If no software queues are currently mapped to this
+> 
+> I gave it a quick try and it looks to silence KASAN. I'll try to test more
+> over the next day or so.
+> 
+> BTW, I doubt KASAN is even right to complain about this. I'll check that
+> thread you pointed me at to learn more about what was discussed on that.
 
-Applied, thanks.
+I guess that elevator switch may have to be involved in your reproducer, stale
+request which are freed before switching to new elevator can stay in tags->rqs[],
+then these stale requests are retrieved when reading iostat before old request slots in
+tags->rqs[] are reset.
 
--- 
-Jens Axboe
+The patch should fix this issue.
+
+Thanks,
+Ming
 
