@@ -2,103 +2,101 @@ Return-Path: <SRS0=Z7Y6=B6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E884C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 17:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D06EFC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 18:03:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52960208A9
-	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 17:08:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9139020758
+	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 18:03:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bo+7UCzu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJDY1t8E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730418AbgHTRIq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Aug 2020 13:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730445AbgHTRIL (ORCPT
+        id S1726752AbgHTSD6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Aug 2020 14:03:58 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23242 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725819AbgHTSD5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Aug 2020 13:08:11 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D2FDC061388
-        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2020 10:06:57 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id m22so2915475ljj.5
-        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2020 10:06:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=j6WgqePZAKFwWv7oibyf66OC3S+SA0EwtLkT0KHMn7s=;
-        b=bo+7UCzu3XtlLDsIdFcX5T2SOSSTsIkuEKVjv+td78vJUz4Qxj8E6pMzu0KujU0A8E
-         wEY9X0HcNUH4MKDpEJcRCVekv731AB5t41ds1k6HDNgEAnDfiMuAYEd0JBMBCKkPIAls
-         1ofwEbhEVneHVJ6n0purqzcbgSFawo2aR5Qj0bawUT6gizMqMxUdTu5Dax0QynHmnjhd
-         hdB/1ctAxAaeD4O9/Pq7Bw19oxiBt6p7riIhI2gRNppDgxaBqie0QR49HWNaHkfr4pZR
-         PmOswhZhm3v8rhV4eoYr9SX2GbowE+xyG+XqtRWsKplLcBdxMd2TZogrYKHaEzvA8E9/
-         12yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=j6WgqePZAKFwWv7oibyf66OC3S+SA0EwtLkT0KHMn7s=;
-        b=XcWBeJBCgmuCXwhK5ZVBz+JL+4JvTv38V+zOoHOeMRbsRcmN/ELvmrsD1RsA+J3hPZ
-         tS7HVRMD7FaOaYKoYtdUso4ORFhwAraRnxNyIh0k9UU9z/WWKz5EpXnxnMd7u2cnGHv5
-         I/O6NUgg33+Wyx12lGs3Fmnn9uaVw9G7abp2En/WUdoyIJtGx/Lm/Kn/E6w/hH54AzL1
-         /PFAj8j2GzzEpOGLK7RsjhFTFV4w2jlu928G1VP0v+oiGesZJ8MTqeJfmTRxSqMDqP+M
-         bjVjqyfGJl76o5Vng0umcuILoGuwUr+lvkVUttNvWIM4fXMnbPpqxufzdGWmDPyu67rW
-         u9Pw==
-X-Gm-Message-State: AOAM5315uXGqzUSpqyQEewsu2LANyvHEjXBjPeMtCvfK9UClBbkwZH2y
-        H0DxIOXo+eQ+oDrw1ByQn+H1OFlwIbdT+8fzBjDFMQ==
-X-Google-Smtp-Source: ABdhPJziUJGXBSB9o6ksa6wt3btAspt3JpWrpRS8ydIXvVTIxvdXw64pBpOlKiXdI5HRmfJyA09t5CJD1wgjuiuMX0o=
-X-Received: by 2002:a2e:9396:: with SMTP id g22mr2214071ljh.446.1597943215596;
- Thu, 20 Aug 2020 10:06:55 -0700 (PDT)
+        Thu, 20 Aug 2020 14:03:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597946635;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=j+L0uMKvowpmAd1FTiQMgUmXYdMhyZm4XOAPKpC3am4=;
+        b=GJDY1t8EtW5PTe83cInhlHdEwITZJgBZIK/X6ZIWPldyYbfPQNmsCzp1BkbCA0k8Ztjk8x
+        LOjh2efB4xb3RpQf2uUotX8NoVz2lbrjL0CkkKtVOv2zO80ged/AF1Wg+3vwHDMifx2YyJ
+        gvtD9EnPOCZTL89jArac7GS2uqkBqDM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-2lvvEJkpM9iACDsUOXo3kw-1; Thu, 20 Aug 2020 14:03:51 -0400
+X-MC-Unique: 2lvvEJkpM9iACDsUOXo3kw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C11C01074649;
+        Thu, 20 Aug 2020 18:03:49 +0000 (UTC)
+Received: from localhost (ovpn-12-36.pek2.redhat.com [10.72.12.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EE13A7B8F4;
+        Thu, 20 Aug 2020 18:03:44 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        John Garry <john.garry@huawei.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 0/5] blk-mq: fix use-after-free on stale request
+Date:   Fri, 21 Aug 2020 02:03:30 +0800
+Message-Id: <20200820180335.3109216-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20200528135444.11508-1-schatzberg.dan@gmail.com>
-In-Reply-To: <20200528135444.11508-1-schatzberg.dan@gmail.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Thu, 20 Aug 2020 10:06:44 -0700
-Message-ID: <CALvZod655MqFxmzwCf4ZLSh9QU+oLb0HL-Q_yKomh3fb-_W0Vg@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] Charge loop device i/o to issuing cgroup
-To:     Dan Schatzberg <schatzberg.dan@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:FILESYSTEMS (VFS and infrastructure)" 
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 28, 2020 at 6:55 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
->
-> Much of the discussion about this has died down. There's been a
-> concern raised that we could generalize infrastructure across loop,
-> md, etc. This may be possible, in the future, but it isn't clear to me
-> how this would look like. I'm inclined to fix the existing issue with
-> loop devices now (this is a problem we hit at FB) and address
-> consolidation with other cases if and when those need to be addressed.
->
+Hi,
 
-What's the status of this series?
+We can't run allocating driver tag and updating tags->rqs[tag] atomically,
+so stale request may be retrieved from tags->rqs[tag]. More seriously, the
+stale request may have been freed via updating nr_requests or switching
+elevator or other use cases.
+
+It is one long-term issue, and Jianchao previous worked towards using
+static_rqs[] for iterating request, one problem is that it can be hard
+to use when iterating over tagset.
+
+This patchset takes another different approach for fixing the issue: cache
+freed rqs pages and release them until all tags->rqs[] references on these
+pages are gone.
+
+Please review and comment.
+
+[1] https://lore.kernel.org/linux-block/1553492318-1810-1-git-send-email-jianchao.w.wang@oracle.com/
+[2] https://marc.info/?t=154526200600007&r=2&w=2
+
+
+Ming Lei (5):
+  blk-mq: define max_order for allocating rqs pages as macro
+  blk-mq: add helper of blk_mq_get_hw_queue_node
+  blk-mq: add helpers for allocating/freeing pages of request pool
+  blk-mq: cache freed request pool pages
+  blk-mq: check and shrink freed request pool page
+
+ block/blk-mq.c         | 236 +++++++++++++++++++++++++++++++++--------
+ include/linux/blk-mq.h |   4 +
+ 2 files changed, 198 insertions(+), 42 deletions(-)
+
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: John Garry <john.garry@huawei.com>
+Cc: Christoph Hellwig <hch@lst.de>
+-- 
+2.25.2
+
