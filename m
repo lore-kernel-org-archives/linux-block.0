@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 893D2C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 18:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE800C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 18:04:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68ABC20758
-	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 18:04:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA27720758
+	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 18:04:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EobNO1R+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dtL9SLht"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbgHTSEO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Aug 2020 14:04:14 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23113 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726858AbgHTSEJ (ORCPT
+        id S1726935AbgHTSEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Aug 2020 14:04:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29142 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726823AbgHTSET (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Aug 2020 14:04:09 -0400
+        Thu, 20 Aug 2020 14:04:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597946647;
+        s=mimecast20190719; t=1597946658;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ac8F25PYSqJNC3mib8HdWVEUAXFTxNd8kR9bvEu3Ix8=;
-        b=EobNO1R+pg1O94Gs9oWaC/isX2hvCJrGsJq0dluMwV8VVL20u92O1UPRYCQFdZxXsH7uKT
-        dVAD16bgBVkBzGr7QdLAM6aBTd5iBchOetMo517BRTVDsC+bcoF/QFccAZcPu0GgpNBSUB
-        njSHCoj7VGFOB6Q+krrV1odHkn4gXhM=
+        bh=eL10uHVyVHoPAiXMn74Rxzn2yLdMaTQyOhdyA9IG3K4=;
+        b=dtL9SLhtLAUdxBJKXZ2A5ET1pPLBQKlkfRa+9k0fVte/1vkZOqdRwbkbf8KVC16YVzOWs0
+        a0FQE1Pq4IUeO/Jmik/qg3JVgkif0vUjF/A1QVRlq4g0+l8/dTIEeFZc331jr0je9VL7Sx
+        LjssgZyDiZSNTvB1l2Ma7w85nKW//kA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-Mp8j5Eb2PKq7kFekKyNp-A-1; Thu, 20 Aug 2020 14:04:05 -0400
-X-MC-Unique: Mp8j5Eb2PKq7kFekKyNp-A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-269-S7Qj0WbtPOeaiCWVUjO1eg-1; Thu, 20 Aug 2020 14:04:14 -0400
+X-MC-Unique: S7Qj0WbtPOeaiCWVUjO1eg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAD531074649;
-        Thu, 20 Aug 2020 18:04:03 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E35F801ADD;
+        Thu, 20 Aug 2020 18:04:12 +0000 (UTC)
 Received: from localhost (ovpn-12-36.pek2.redhat.com [10.72.12.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4BD4710027AB;
-        Thu, 20 Aug 2020 18:04:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 195265DA30;
+        Thu, 20 Aug 2020 18:04:08 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -51,22 +51,28 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>,
         John Garry <john.garry@huawei.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 3/5] blk-mq: add helpers for allocating/freeing pages of request pool
-Date:   Fri, 21 Aug 2020 02:03:33 +0800
-Message-Id: <20200820180335.3109216-4-ming.lei@redhat.com>
+Subject: [PATCH 5/5] blk-mq: check and shrink freed request pool page
+Date:   Fri, 21 Aug 2020 02:03:35 +0800
+Message-Id: <20200820180335.3109216-6-ming.lei@redhat.com>
 In-Reply-To: <20200820180335.3109216-1-ming.lei@redhat.com>
 References: <20200820180335.3109216-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add two helpers for allocating and freeing pages of request pool.
+request pool pages may take a bit more space, and each request queue may
+hold one unused request pool at most, so memory waste can be big when
+there are lots of request queues.
 
-No function change.
+Schedule a delayed work to check if tags->rqs[] still may refer to
+page in freed request pool page. If no any request in tags->rqs[] refers
+to the freed request pool page, release the page now. Otherwise,
+schedule the delayed work after 10 seconds for check & release the
+pages.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 Cc: Hannes Reinecke <hare@suse.de>
@@ -74,127 +80,107 @@ Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: John Garry <john.garry@huawei.com>
 Cc: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 81 +++++++++++++++++++++++++++++++-------------------
- 1 file changed, 51 insertions(+), 30 deletions(-)
+ block/blk-mq.c         | 55 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 56 insertions(+)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5019d21e7ff8..65f73b8db477 100644
+index c644f5cb1549..2865920086ea 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2275,6 +2275,53 @@ static int blk_mq_get_hw_queue_node(struct blk_mq_tag_set *set,
- 	return node;
+@@ -2365,11 +2365,63 @@ static void blk_mq_release_rqs_page(struct page *page)
+ 	__free_pages(page, blk_mq_rqs_page_order(page));
  }
  
-+static size_t order_to_size(unsigned int order)
-+{
-+	return (size_t)PAGE_SIZE << order;
-+}
++#define SHRINK_RQS_PAGE_DELAY   (10 * HZ)
 +
-+static struct page *blk_mq_alloc_rqs_page(int node, unsigned order,
-+		unsigned min_size)
-+{
-+	struct page *page;
-+	unsigned this_order = order;
-+
-+	do {
-+		page = alloc_pages_node(node,
-+			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
-+			this_order);
-+		if (page)
-+			break;
-+		if (!this_order--)
-+			break;
-+		if (order_to_size(this_order) < min_size)
-+			break;
-+	} while (1);
-+
-+	if (!page)
-+		return NULL;
-+
-+	page->private = this_order;
-+
-+	/*
-+	 * Allow kmemleak to scan these pages as they contain pointers
-+	 * to additional allocations like via ops->init_request().
-+	 */
-+	kmemleak_alloc(page_address(page), order_to_size(this_order), 1, GFP_NOIO);
-+
-+	return page;
-+}
-+
-+static void blk_mq_free_rqs_page(struct page *page)
-+{
-+	/*
-+	 * Remove kmemleak object previously allocated in
-+	 * blk_mq_alloc_rqs().
-+	 */
-+	kmemleak_free(page_address(page));
-+	__free_pages(page, page->private);
-+}
-+
- void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		     unsigned int hctx_idx)
+ static void blk_mq_free_rqs_page(struct blk_mq_tag_set *set, struct page *page)
  {
-@@ -2296,12 +2343,7 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 	while (!list_empty(&tags->page_list)) {
- 		page = list_first_entry(&tags->page_list, struct page, lru);
- 		list_del_init(&page->lru);
--		/*
--		 * Remove kmemleak object previously allocated in
--		 * blk_mq_alloc_rqs().
--		 */
--		kmemleak_free(page_address(page));
--		__free_pages(page, page->private);
-+		blk_mq_free_rqs_page(page);
- 	}
- }
- 
-@@ -2348,11 +2390,6 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	return tags;
- }
- 
--static size_t order_to_size(unsigned int order)
--{
--	return (size_t)PAGE_SIZE << order;
--}
--
- static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 			       unsigned int hctx_idx, int node)
- {
-@@ -2396,30 +2433,14 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		while (this_order && left < order_to_size(this_order - 1))
- 			this_order--;
- 
--		do {
--			page = alloc_pages_node(node,
--				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
--				this_order);
--			if (page)
--				break;
--			if (!this_order--)
--				break;
--			if (order_to_size(this_order) < rq_size)
--				break;
--		} while (1);
--
-+		page = blk_mq_alloc_rqs_page(node, this_order, rq_size);
- 		if (!page)
- 			goto fail;
- 
--		page->private = this_order;
-+		this_order = (int)page->private;
- 		list_add_tail(&page->lru, &tags->page_list);
--
- 		p = page_address(page);
--		/*
--		 * Allow kmemleak to scan these pages as they contain pointers
--		 * to additional allocations like via ops->init_request().
--		 */
--		kmemleak_alloc(p, order_to_size(this_order), 1, GFP_NOIO);
+ 	spin_lock(&set->free_page_list_lock);
+ 	list_add_tail(&page->lru, &set->free_page_list);
+ 	spin_unlock(&set->free_page_list_lock);
 +
- 		entries_per_page = order_to_size(this_order) / rq_size;
- 		to_do = min(entries_per_page, depth - i);
- 		left -= to_do * rq_size;
++	schedule_delayed_work(&set->rqs_page_shrink, SHRINK_RQS_PAGE_DELAY);
++}
++
++static bool blk_mq_can_shrink_rqs_page(struct blk_mq_tag_set *set,
++               struct page *pg)
++{
++	unsigned hctx_idx = blk_mq_rqs_page_hctx_idx(pg);
++	struct blk_mq_tags *tags = set->tags[hctx_idx];
++	unsigned long start = (unsigned long)page_address(pg);
++	unsigned long end = start + order_to_size(blk_mq_rqs_page_order(pg));
++	int i;
++
++	for (i = 0; i < set->queue_depth; i++) {
++		unsigned long rq_addr = (unsigned long)tags->rqs[i];
++		if (rq_addr >= start && rq_addr < end)
++			return false;
++	}
++	return true;
++}
++
++static void blk_mq_rqs_page_shrink_work(struct work_struct *work)
++{
++	struct blk_mq_tag_set *set =
++		container_of(work, struct blk_mq_tag_set, rqs_page_shrink.work);
++	LIST_HEAD(pg_list);
++	struct page *page, *tmp;
++	bool resched;
++
++	spin_lock(&set->free_page_list_lock);
++	list_splice_init(&set->free_page_list, &pg_list);
++	spin_unlock(&set->free_page_list_lock);
++
++	mutex_lock(&set->tag_list_lock);
++	list_for_each_entry_safe(page, tmp, &pg_list, lru) {
++		if (blk_mq_can_shrink_rqs_page(set, page)) {
++			list_del_init(&page->lru);
++			blk_mq_release_rqs_page(page);
++		}
++	}
++	mutex_unlock(&set->tag_list_lock);
++
++	spin_lock(&set->free_page_list_lock);
++	list_splice_init(&pg_list, &set->free_page_list);
++	resched = !list_empty(&set->free_page_list);
++	spin_unlock(&set->free_page_list_lock);
++
++	if (resched)
++		schedule_delayed_work(&set->rqs_page_shrink,
++				SHRINK_RQS_PAGE_DELAY);
+ }
+ 
+ static void blk_mq_release_all_rqs_page(struct blk_mq_tag_set *set)
+@@ -2377,6 +2429,8 @@ static void blk_mq_release_all_rqs_page(struct blk_mq_tag_set *set)
+ 	struct page *page;
+ 	LIST_HEAD(pg_list);
+ 
++	cancel_delayed_work_sync(&set->rqs_page_shrink);
++
+ 	spin_lock(&set->free_page_list_lock);
+ 	list_splice_init(&set->free_page_list, &pg_list);
+ 	spin_unlock(&set->free_page_list_lock);
+@@ -3527,6 +3581,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 
+ 	spin_lock_init(&set->free_page_list_lock);
+ 	INIT_LIST_HEAD(&set->free_page_list);
++	INIT_DELAYED_WORK(&set->rqs_page_shrink, blk_mq_rqs_page_shrink_work);
+ 
+ 	ret = blk_mq_alloc_map_and_requests(set);
+ 	if (ret)
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 4c2b135dbbe1..b2adf99dbbef 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -250,6 +250,7 @@ struct blk_mq_tag_set {
+ 
+ 	spinlock_t		free_page_list_lock;
+ 	struct list_head	free_page_list;
++	struct delayed_work     rqs_page_shrink;
+ };
+ 
+ /**
 -- 
 2.25.2
 
