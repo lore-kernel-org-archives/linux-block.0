@@ -2,185 +2,118 @@ Return-Path: <SRS0=Z7Y6=B6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE800C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 18:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C05C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 19:04:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA27720758
-	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 18:04:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FD5B2075E
+	for <linux-block@archiver.kernel.org>; Thu, 20 Aug 2020 19:04:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dtL9SLht"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="IQ7r/nEK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726935AbgHTSEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Aug 2020 14:04:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29142 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726823AbgHTSET (ORCPT
+        id S1726754AbgHTTD7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Aug 2020 15:03:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32902 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725819AbgHTTD6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Aug 2020 14:04:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597946658;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eL10uHVyVHoPAiXMn74Rxzn2yLdMaTQyOhdyA9IG3K4=;
-        b=dtL9SLhtLAUdxBJKXZ2A5ET1pPLBQKlkfRa+9k0fVte/1vkZOqdRwbkbf8KVC16YVzOWs0
-        a0FQE1Pq4IUeO/Jmik/qg3JVgkif0vUjF/A1QVRlq4g0+l8/dTIEeFZc331jr0je9VL7Sx
-        LjssgZyDiZSNTvB1l2Ma7w85nKW//kA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-S7Qj0WbtPOeaiCWVUjO1eg-1; Thu, 20 Aug 2020 14:04:14 -0400
-X-MC-Unique: S7Qj0WbtPOeaiCWVUjO1eg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E35F801ADD;
-        Thu, 20 Aug 2020 18:04:12 +0000 (UTC)
-Received: from localhost (ovpn-12-36.pek2.redhat.com [10.72.12.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 195265DA30;
-        Thu, 20 Aug 2020 18:04:08 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        John Garry <john.garry@huawei.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 5/5] blk-mq: check and shrink freed request pool page
-Date:   Fri, 21 Aug 2020 02:03:35 +0800
-Message-Id: <20200820180335.3109216-6-ming.lei@redhat.com>
-In-Reply-To: <20200820180335.3109216-1-ming.lei@redhat.com>
-References: <20200820180335.3109216-1-ming.lei@redhat.com>
+        Thu, 20 Aug 2020 15:03:58 -0400
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4062C061385
+        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2020 12:03:57 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id j187so2458157qke.11
+        for <linux-block@vger.kernel.org>; Thu, 20 Aug 2020 12:03:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=IeFPzbP1/2uAC63tpGSICX90ZeHerr1PdZBO6JLKSEc=;
+        b=IQ7r/nEK7QULQRgUruYtViggIk0yrhBkkQm+CAUw5a8EkOnP3Z3Obwe+AO0CkVc/+y
+         ckR7dGWSlFKb29QS0VaoqtV5YPbCz6ErkAeZPa2IRaPAfSWfvMP3eicS9eJsmAbu8gne
+         /7p2ywSqzlkFqVg1j+WcXM5mn+AoWMbN976tyr2/amy+IMQWGtkTs2oeWfEgjtOnZyuR
+         NuMolaRSNG8pjgUGCo2/n4f2E4wCSaTOeyB0PpHm3ee4kLIBtZQSDaWXNvfaJw6vwdYL
+         MOswIkvUu4TrXsqotNQwjrIdVNX6Soz9+HzRrTovFXuxLF6As6m+Yu/UMrlHE78YSkOr
+         cAyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IeFPzbP1/2uAC63tpGSICX90ZeHerr1PdZBO6JLKSEc=;
+        b=TUd4/d7hgbEQ5MMxdTSdu9G6pDAJIuj82D2p0Lk2KxQ1DgkbpqxCFGvh+vs1Q1AuDL
+         DWhhITw01pyxpLQwQdzPIi8spwTNokHHggvb9IeveCyH2Yq8iXlQZ0xlJGtRKHY4+pQi
+         cU9Bom+6rmggNkVzvwde7tSsTK0dRr/PorzP1JdsT/HVFMMiGYG7PlBo5O5Mv+Nc0qM+
+         LyoS3zGyUkz5cPSvej3NMJykJ1DWdnSRvMpxm18LOUklRZvBPY6iOaw86XT+vRNEqIZH
+         YbzfQLfz0dLy5zE0bvW1MBSwX0sS1Xvvyr61IlJwKkqgOrOotf58z3PqkbelabZvv+ih
+         S3Dg==
+X-Gm-Message-State: AOAM533dWB8wjwNE0mZOZGiaiDk+uqMWIfb0gmNAZMjpmyiQuzTheJgk
+        6iJqxd0vyOiXvmyjgAhUzX9eEjXuDZSHPHKG
+X-Google-Smtp-Source: ABdhPJxmqy7dS0O0hH738bLfEgtU0qr9+TxisyoIN9ytnGIneRTmRoQgQqgQOxuELiy3Yqq1QNdKpw==
+X-Received: by 2002:a05:620a:1436:: with SMTP id k22mr3751412qkj.308.1597950236554;
+        Thu, 20 Aug 2020 12:03:56 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c0a8:11d1::113c? ([2620:10d:c091:480::1:2623])
+        by smtp.gmail.com with ESMTPSA id o17sm3740176qtr.13.2020.08.20.12.03.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Aug 2020 12:03:55 -0700 (PDT)
+Subject: Re: [PATCH] nbd: restore default timeout when setting it to zero
+To:     Hou Pu <houpu@bytedance.com>, axboe@kernel.dk, mchristi@redhat.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org
+References: <20200810120044.2152-1-houpu@bytedance.com>
+From:   Josef Bacik <josef@toxicpanda.com>
+Message-ID: <38b9de9e-38fe-3090-cea0-377c605c86d4@toxicpanda.com>
+Date:   Thu, 20 Aug 2020 15:03:54 -0400
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200810120044.2152-1-houpu@bytedance.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-request pool pages may take a bit more space, and each request queue may
-hold one unused request pool at most, so memory waste can be big when
-there are lots of request queues.
+On 8/10/20 8:00 AM, Hou Pu wrote:
+> If we configured io timeout of nbd0 to 100s. Later after we
+> finished using it, we configured nbd0 again and set the io
+> timeout to 0. We expect it would timeout after 30 seconds
+> and keep retry. But in fact we could not change the timeout
+> when we set it to 0. the timeout is still the original 100s.
+> 
+> So change the timeout to default 30s when we set it to zero.
+> It also behaves same as commit 2da22da57348 ("nbd: fix zero
+> cmd timeout handling v2").
+> 
+> It becomes more important if we were reconfigure a nbd device
+> and the io timeout it set to zero. Because it could take 30s
+> to detect the new socket and thus io could be completed more
+> quickly compared to 100s.
+> 
+> Signed-off-by: Hou Pu <houpu@bytedance.com>
+> ---
+>   drivers/block/nbd.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index ce7e9f223b20..bc9dc1f847e1 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1360,6 +1360,8 @@ static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
+>   	nbd->tag_set.timeout = timeout * HZ;
+>   	if (timeout)
+>   		blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
+> +	else
+> +		blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
+>   }
+>   
+>   /* Must be called with config_lock held */
+> 
 
-Schedule a delayed work to check if tags->rqs[] still may refer to
-page in freed request pool page. If no any request in tags->rqs[] refers
-to the freed request pool page, release the page now. Otherwise,
-schedule the delayed work after 10 seconds for check & release the
-pages.
+What about the tag_set.timeout?  Thanks,
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: John Garry <john.garry@huawei.com>
-Cc: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c         | 55 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq.h |  1 +
- 2 files changed, 56 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c644f5cb1549..2865920086ea 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2365,11 +2365,63 @@ static void blk_mq_release_rqs_page(struct page *page)
- 	__free_pages(page, blk_mq_rqs_page_order(page));
- }
- 
-+#define SHRINK_RQS_PAGE_DELAY   (10 * HZ)
-+
- static void blk_mq_free_rqs_page(struct blk_mq_tag_set *set, struct page *page)
- {
- 	spin_lock(&set->free_page_list_lock);
- 	list_add_tail(&page->lru, &set->free_page_list);
- 	spin_unlock(&set->free_page_list_lock);
-+
-+	schedule_delayed_work(&set->rqs_page_shrink, SHRINK_RQS_PAGE_DELAY);
-+}
-+
-+static bool blk_mq_can_shrink_rqs_page(struct blk_mq_tag_set *set,
-+               struct page *pg)
-+{
-+	unsigned hctx_idx = blk_mq_rqs_page_hctx_idx(pg);
-+	struct blk_mq_tags *tags = set->tags[hctx_idx];
-+	unsigned long start = (unsigned long)page_address(pg);
-+	unsigned long end = start + order_to_size(blk_mq_rqs_page_order(pg));
-+	int i;
-+
-+	for (i = 0; i < set->queue_depth; i++) {
-+		unsigned long rq_addr = (unsigned long)tags->rqs[i];
-+		if (rq_addr >= start && rq_addr < end)
-+			return false;
-+	}
-+	return true;
-+}
-+
-+static void blk_mq_rqs_page_shrink_work(struct work_struct *work)
-+{
-+	struct blk_mq_tag_set *set =
-+		container_of(work, struct blk_mq_tag_set, rqs_page_shrink.work);
-+	LIST_HEAD(pg_list);
-+	struct page *page, *tmp;
-+	bool resched;
-+
-+	spin_lock(&set->free_page_list_lock);
-+	list_splice_init(&set->free_page_list, &pg_list);
-+	spin_unlock(&set->free_page_list_lock);
-+
-+	mutex_lock(&set->tag_list_lock);
-+	list_for_each_entry_safe(page, tmp, &pg_list, lru) {
-+		if (blk_mq_can_shrink_rqs_page(set, page)) {
-+			list_del_init(&page->lru);
-+			blk_mq_release_rqs_page(page);
-+		}
-+	}
-+	mutex_unlock(&set->tag_list_lock);
-+
-+	spin_lock(&set->free_page_list_lock);
-+	list_splice_init(&pg_list, &set->free_page_list);
-+	resched = !list_empty(&set->free_page_list);
-+	spin_unlock(&set->free_page_list_lock);
-+
-+	if (resched)
-+		schedule_delayed_work(&set->rqs_page_shrink,
-+				SHRINK_RQS_PAGE_DELAY);
- }
- 
- static void blk_mq_release_all_rqs_page(struct blk_mq_tag_set *set)
-@@ -2377,6 +2429,8 @@ static void blk_mq_release_all_rqs_page(struct blk_mq_tag_set *set)
- 	struct page *page;
- 	LIST_HEAD(pg_list);
- 
-+	cancel_delayed_work_sync(&set->rqs_page_shrink);
-+
- 	spin_lock(&set->free_page_list_lock);
- 	list_splice_init(&set->free_page_list, &pg_list);
- 	spin_unlock(&set->free_page_list_lock);
-@@ -3527,6 +3581,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 
- 	spin_lock_init(&set->free_page_list_lock);
- 	INIT_LIST_HEAD(&set->free_page_list);
-+	INIT_DELAYED_WORK(&set->rqs_page_shrink, blk_mq_rqs_page_shrink_work);
- 
- 	ret = blk_mq_alloc_map_and_requests(set);
- 	if (ret)
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 4c2b135dbbe1..b2adf99dbbef 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -250,6 +250,7 @@ struct blk_mq_tag_set {
- 
- 	spinlock_t		free_page_list_lock;
- 	struct list_head	free_page_list;
-+	struct delayed_work     rqs_page_shrink;
- };
- 
- /**
--- 
-2.25.2
-
+Josef
