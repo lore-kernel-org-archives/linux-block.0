@@ -2,189 +2,502 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2C1C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B14C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:14:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4655720748
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:06:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="Oslhq6o2";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="jp+E+qei"
+	by mail.kernel.org (Postfix) with ESMTP id AF68C207DE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:14:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726370AbgHUUGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 16:06:51 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:15476 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725801AbgHUUGu (ORCPT
+        id S1726337AbgHUUOr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 16:14:47 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:37247 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725938AbgHUUOp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 16:06:50 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07LK0d1o020310;
-        Fri, 21 Aug 2020 13:05:39 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=date : from : to : cc :
- subject : message-id : references : content-type : in-reply-to :
- mime-version; s=facebook; bh=wUAx8CXyWwn0REf5nzJmEo+bX91x9dOeaJe1nMET1Gg=;
- b=Oslhq6o2PIblXvTVmHCjo4SijNPQVmGfKdYoqXQqBHO13WQT047ih0ITfb6U5BueC2mZ
- h9PQnAIRQ4fwj7immsjbjDhvtIorA6GXB01yIWZFYgj80U/8HBMI2D+YCx0K1TfQ0DHW
- Vu4ExOSLjMgiHUrbh4kIFRF0IrM11zFI3yI= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com with ESMTP id 331cuebubw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Fri, 21 Aug 2020 13:05:39 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (100.104.31.183)
- by o365-in.thefacebook.com (100.104.36.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1979.3; Fri, 21 Aug 2020 13:05:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RAm6ailCsAovZ//ENZ9qpIFc0ir4LCKBOzHQn11BJevrvkoeF171ye7riAHEHBjM7bLfqpYBaZQZA3W9Baiv2SCcStJOwes1IJkchXxkZY1qHo60vd3j++8DC9ptllZPUYA66hItS2XSD/R7Py8sagRe3fiFLG7oFKGX66AJ9g8BEXwSHnQnifkOgLXU+7oRCEEdZNkrMU7hnQfG9cQIHptRz2Aq738WayOYnFJz7oJc8jY+uuKfGCPqAJIH/gAvuX5rY/uek9Z1hr8EL+bEB5T+HCTWqJSRmjSm0zbd4twyoq1Hc5DtgaaAfQ/krEwakEbRzg+WU4utbxxaNwkgWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wUAx8CXyWwn0REf5nzJmEo+bX91x9dOeaJe1nMET1Gg=;
- b=h6Ttj1vmTyKPiPHwztlMtgLaC9eiO4z6hWNq3atQndKYF9Ggp6B5GW09Tgad1Rchq15Q+UnLoGCxJ1ej9URX4u8cLsSYVXjakKDYLmtU8RhPFizOXRluYnvtBqt6GIsqXyTW6uZDjw+EiOHFWubWA/PwM7yzn0meuGe0s0aew8pYhuXrX6vsVnx6UDm/cvMQSSPKsMIeikqOIygHrIWjG/HRh3jZ++RpM4MXcVGK9ZxUItpugs66c+RIlLjt6nlOqO2OE4MwrsBgT9XvrA/SFO8GwUXZE4rKbENzd+Cq7UR/QKFRmDZesLgsazHtH1xcp3umgYtfq76IV2PeMKLuJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector2-fb-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wUAx8CXyWwn0REf5nzJmEo+bX91x9dOeaJe1nMET1Gg=;
- b=jp+E+qei1X3icW308uDTJBMcElt7uyh9dQLaB+hbilKeoxNe+iTjXjHaq3IfCQsLeXMFdEvGxziRc8iQtdeoWf+Bk9KyTS1msqvEZewf7/rE9L9cphBdYYbCEQGU8UIRZQ1WZJEZXegOUfh1Lkh+p6TudUsQ4RzaWd1qMHzMtCU=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=fb.com;
-Received: from BYAPR15MB4136.namprd15.prod.outlook.com (2603:10b6:a03:96::24)
- by BYAPR15MB3448.namprd15.prod.outlook.com (2603:10b6:a03:103::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.15; Fri, 21 Aug
- 2020 20:05:34 +0000
-Received: from BYAPR15MB4136.namprd15.prod.outlook.com
- ([fe80::354d:5296:6a28:f55e]) by BYAPR15MB4136.namprd15.prod.outlook.com
- ([fe80::354d:5296:6a28:f55e%6]) with mapi id 15.20.3283.028; Fri, 21 Aug 2020
- 20:05:34 +0000
-Date:   Fri, 21 Aug 2020 13:05:30 -0700
-From:   Roman Gushchin <guro@fb.com>
-To:     Shakeel Butt <shakeelb@google.com>
-CC:     Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:FILESYSTEMS (VFS and infrastructure)" 
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Subject: Re: [PATCH v6 0/4] Charge loop device i/o to issuing cgroup
-Message-ID: <20200821200530.GA2250889@carbon.dhcp.thefacebook.com>
-References: <20200528135444.11508-1-schatzberg.dan@gmail.com>
- <CALvZod655MqFxmzwCf4ZLSh9QU+oLb0HL-Q_yKomh3fb-_W0Vg@mail.gmail.com>
- <20200821150405.GA4137@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
- <20200821160128.GA2233370@carbon.dhcp.thefacebook.com>
- <CALvZod69w5UoCjfWcqVAejpKWzRAUxX7dEPzqDUknHhUFV_XEA@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALvZod69w5UoCjfWcqVAejpKWzRAUxX7dEPzqDUknHhUFV_XEA@mail.gmail.com>
-X-ClientProxiedBy: BYAPR01CA0013.prod.exchangelabs.com (2603:10b6:a02:80::26)
- To BYAPR15MB4136.namprd15.prod.outlook.com (2603:10b6:a03:96::24)
+        Fri, 21 Aug 2020 16:14:45 -0400
+Received: by mail-pj1-f67.google.com with SMTP id mw10so1284218pjb.2
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 13:14:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=faLgJdBzkG9FIKDxfxy2Y68WPY6vw9Aur6g1fJSjBdQ=;
+        b=TfAq/svoRuwpsEPdChhp0XhNG8Dfecd9jD0G3K/P+ydq9kVOi+NjsofFanKIAaHWLg
+         wUrT8b3bRCjEZF7pnh7l6QQ/Zj/3v43lbSZ2ZQl3lqDhatJJR26WeUuYvyy+Zis5Sx0d
+         d1KhJInk3ReC+j+2KPXQux4GWpUo0BxTTGZRub41tnfN9Jg20Z2dNpmVrjX/UH6/cXFX
+         Os++au02K1vpEXnjphEvfRe44FY0kG0x7/Oh9MfQb9G1p9rlC73TCNe9mUv6mQ8t4r5o
+         ME3R0xS5muZugYj9t5Dq4SwbvKzQRJljGBal0ewpoPEObGvtz1WodmY14MT9vG2q74OO
+         ylNQ==
+X-Gm-Message-State: AOAM530UJ0HKgPS0gMPSh4+QIkMGgeE57vEHmBXYX9auF9Wa2Rh5vFPg
+        w4g6SugbpneDuqkouxkptlI=
+X-Google-Smtp-Source: ABdhPJxHp0hnW6NvlMq6i30IZ5FSYcur3PStDsQNIkYTzdQ+YLsAxUJBiy6uoaocQh6JFmUrriQHdg==
+X-Received: by 2002:a17:90a:1955:: with SMTP id 21mr2878308pjh.230.1598040883755;
+        Fri, 21 Aug 2020 13:14:43 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:95a5:8a0f:6e94:b712? ([2601:647:4802:9070:95a5:8a0f:6e94:b712])
+        by smtp.gmail.com with ESMTPSA id c15sm3438098pfo.115.2020.08.21.13.14.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Aug 2020 13:14:43 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <856f6108-2227-67e8-e913-fdef296a2d26@grimberg.me>
+Date:   Fri, 21 Aug 2020 13:14:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from carbon.dhcp.thefacebook.com (2620:10d:c090:400::5:e850) by BYAPR01CA0013.prod.exchangelabs.com (2603:10b6:a02:80::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24 via Frontend Transport; Fri, 21 Aug 2020 20:05:32 +0000
-X-Originating-IP: [2620:10d:c090:400::5:e850]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a211de19-fb67-43d9-130e-08d8460d9038
-X-MS-TrafficTypeDiagnostic: BYAPR15MB3448:
-X-Microsoft-Antispam-PRVS: <BYAPR15MB344897842885D0D812D0D066BE5B0@BYAPR15MB3448.namprd15.prod.outlook.com>
-X-FB-Source: Internal
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fJdGRkhKIOz98v2XjSEpwiQnxKUliWiI/No9wuq7FgIGR6KSmnvvr1IxEQff3xc0InkisNC25MRzpBkO8qqxHCfN8p1iQXKkD8+KjUwaEyGWkqSVuN0uBjvehpam0lzr25+on709GGTN919Q/qeFwgW9Mdixjj45Oe/5033oYPt0eK05qdPPIP2qBgvDFUygQY/+L0EFR7tQ7DibFeklWGDuKRRDV5BXibkKllIU35lVnoDeSAnyaAf+8/xGlh8qJhAbk2dhV5/xbDrygoTqrBtAaDdjrDOwAli2cZELItSZv9prshdMdk5ZHXbhQvrzZ8eR3wa/hv+js+oiwZ9aUaPpiSnp8JaAq1bfnKiXcZWl6pEBgRWsZy3E4Rf3V4ysNgj3STB1xYmBHpymhWBfiA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR15MB4136.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(376002)(396003)(346002)(136003)(39860400002)(316002)(66476007)(66556008)(966005)(86362001)(478600001)(4326008)(7416002)(66946007)(33656002)(54906003)(6916009)(83380400001)(5660300002)(2906002)(8936002)(1076003)(9686003)(55016002)(53546011)(6506007)(8676002)(52116002)(7696005)(186003)(16526019);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData: bLTXYiGEm5fYOApXh7Oq+Wr271vbvfwg0SabdwxBRfWQm0opT857f7dglzrKJ4YG/v07oy8KHqAPK7GvXheL3eBbMANn67+jyUs2AyaKCayOQfXBR+MFy7dkIhWZalKuzlQSmwqnGuMwyBmQfAmTt7QrADuMXyAMub3gn3YanRnFHT9JrgNQPC/R/zC4zlIN+z3uJuHOVvTV9dQKz6PPOsrsc64n7PvssYVEFodBbCc481lWCO7yAfYHQybQfelOddTr+vmFl0+H1UwdBjQFPL6J+te+6pXRqJqAiS6diD4RJ5nwDRF4qEwB2hwuaZCxLVFUeOb3oDy70MMJijBNO1FfsKei/E4I+5idHnpJ3mjRkEhiOYkQEhwcvTTGcMflzcd1XoHNbcRdL8p3O/b7+0oTgnaSx48HPEaqDLUvcnquzhmnmlK/U+h2lrj5o59DZA0mqEdpwK8DJE9gzSdVrGSxv34ISYQu2Yu1b9cQpSCTpZrg1VwmshEQjIF654GU6f5LlkykOuT8kbB7hrC8HGs595Yn5zgT1FWBH9artW3c0CDGC8qQZLcDnDpbM2ZlqBU0e4REWt/WjNAChWZzc9iDstIu58vonJr0DTVKrur8mAmbFHlUtlyQ/Zj27KMlAL9WWpmuVVE73qrxm+qkeCYssMv+xsFqzXf879Nkpio=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a211de19-fb67-43d9-130e-08d8460d9038
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR15MB4136.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2020 20:05:34.6785
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L2A3czRRj6Jcc+cdJT2hRzqyl0AM36LkK/gb3WWIA0uuTBYGo9k3HG4Y2urm8fTW
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR15MB3448
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-21_09:2020-08-21,2020-08-21 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 clxscore=1015
- priorityscore=1501 suspectscore=0 spamscore=0 impostorscore=0 mlxscore=0
- adultscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008210188
-X-FB-Internal: deliver
+In-Reply-To: <20200820030248.2809559-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 21, 2020 at 09:27:56AM -0700, Shakeel Butt wrote:
-> On Fri, Aug 21, 2020 at 9:02 AM Roman Gushchin <guro@fb.com> wrote:
-> >
-> > On Fri, Aug 21, 2020 at 11:04:05AM -0400, Dan Schatzberg wrote:
-> > > On Thu, Aug 20, 2020 at 10:06:44AM -0700, Shakeel Butt wrote:
-> > > > On Thu, May 28, 2020 at 6:55 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
-> > > > >
-> > > > > Much of the discussion about this has died down. There's been a
-> > > > > concern raised that we could generalize infrastructure across loop,
-> > > > > md, etc. This may be possible, in the future, but it isn't clear to me
-> > > > > how this would look like. I'm inclined to fix the existing issue with
-> > > > > loop devices now (this is a problem we hit at FB) and address
-> > > > > consolidation with other cases if and when those need to be addressed.
-> > > > >
-> > > >
-> > > > What's the status of this series?
-> > >
-> > > Thanks for reminding me about this. I haven't got any further
-> > > feedback. I'll bug Jens to take a look and see if he has any concerns
-> > > and if not send a rebased version.
-> >
-> > Just as a note, I stole a patch from this series called
-> > "mm: support nesting memalloc_use_memcg()" to use for the bpf memory accounting.
-> > I rewrote the commit log and rebased to the tot with some trivial changes.
-> >
-> > I just sent it upstream:
-> > https://lore.kernel.org/bpf/20200821150134.2581465-1-guro@fb.com/T/#md7edb6b5b940cee1c4d15e3cef17aa8b07328c2e
-> >
-> > It looks like we need it for two independent sub-systems, so I wonder
-> > if we want to route it first through the mm tree as a standalone patch?
-> >
+
+> In case of BLK_MQ_F_BLOCKING, blk-mq uses SRCU to mark read critical
+> section during dispatching request, then request queue quiesce is based on
+> SRCU. What we want to get is low cost added in fast path.
 > 
-> Another way is to push that patch to 5.9-rc2 linus tree, so both block
-> and mm branches for 5.10 will have it. (Not sure if that's ok.)
+> With percpu-ref, it is cleaner and simpler & enough for implementing queue
+> quiesce. The main requirement is to make sure all read sections to observe
+> QUEUE_FLAG_QUIESCED once blk_mq_quiesce_queue() returns.
+> 
+> Also it becomes much easier to add interface of async queue quiesce.
+> 
+> Meantime memory footprint can be reduced with per-request-queue percpu-ref.
+> 
+>  From implementation viewpoint, in fast path, not see percpu_ref is
+> slower than SRCU, and srcu tree(default option in most distributions)
+> could be slower since memory barrier is required in both lock & unlock,
+> and rcu_read_lock()/rcu_read_unlock() should be much cheap than
+> smp_mb().
+> 
+> 1) percpu_ref just hold the rcu_read_lock, then run a check &
+>     increase/decrease on the percpu variable:
+> 
+>     rcu_read_lock()
+>     if (__ref_is_percpu(ref, &percpu_count))
+> 	this_cpu_inc(*percpu_count);
+>     rcu_read_unlock()
+> 
+> 2) srcu tree:
+>          idx = READ_ONCE(ssp->srcu_idx) & 0x1;
+>          this_cpu_inc(ssp->sda->srcu_lock_count[idx]);
+>          smp_mb(); /* B */  /* Avoid leaking the critical section. */
+> 
+> Also from my test on null_blk(blocking), not observe percpu-ref performs
+> worse than srcu, see the following test:
+> 
+> 1) test steps:
+> 
+> rmmod null_blk > /dev/null 2>&1
+> modprobe null_blk nr_devices=1 submit_queues=1 blocking=1
+> fio --bs=4k --size=512G  --rw=randread --norandommap --direct=1 --ioengine=libaio \
+> 	--iodepth=64 --runtime=60 --group_reporting=1  --name=nullb0 \
+> 	--filename=/dev/nullb0 --numjobs=32
+> 
+> test machine: HP DL380, 16 cpu cores, 2 threads per core, dual
+> sockets/numa, Intel(R) Xeon(R) Silver 4110 CPU @ 2.10GHz
+> 
+> 2) test result:
+> - srcu quiesce: 6063K IOPS
+> - percpu-ref quiesce: 6113K IOPS
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Cc: Lai Jiangshan <jiangshanlai@gmail.com>
+> Cc: Paul E. McKenney <paulmck@kernel.org>
+> Cc: Josh Triplett <josh@joshtriplett.org>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+> Cc: Chao Leng <lengchao@huawei.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> 
+> ---
+> V1:
+> 	- remove SRCU related comment
+> 	- remove RFC
+> 	- not dispatch when the dispatch percpu ref becomes not live
+> 	- add test result on commit log
+> 
+>   block/blk-mq-sysfs.c   |   2 -
+>   block/blk-mq.c         | 104 ++++++++++++++++++++---------------------
+>   block/blk-sysfs.c      |   6 ++-
+>   include/linux/blk-mq.h |   7 ---
+>   include/linux/blkdev.h |   4 ++
+>   5 files changed, 61 insertions(+), 62 deletions(-)
+> 
+> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+> index 062229395a50..799db7937105 100644
+> --- a/block/blk-mq-sysfs.c
+> +++ b/block/blk-mq-sysfs.c
+> @@ -38,8 +38,6 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
+>   
+>   	cancel_delayed_work_sync(&hctx->run_work);
+>   
+> -	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> -		cleanup_srcu_struct(hctx->srcu);
+>   	blk_free_flush_queue(hctx->fq);
+>   	sbitmap_free(&hctx->ctx_map);
+>   	free_cpumask_var(hctx->cpumask);
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 6294fa5c7ed9..e198bd565109 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -220,19 +220,13 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+>    */
+>   void blk_mq_quiesce_queue(struct request_queue *q)
+>   {
+> -	struct blk_mq_hw_ctx *hctx;
+> -	unsigned int i;
+> -	bool rcu = false;
+> -
+>   	blk_mq_quiesce_queue_nowait(q);
+>   
+> -	queue_for_each_hw_ctx(q, hctx, i) {
+> -		if (hctx->flags & BLK_MQ_F_BLOCKING)
+> -			synchronize_srcu(hctx->srcu);
+> -		else
+> -			rcu = true;
+> -	}
+> -	if (rcu)
+> +	if (q->tag_set->flags & BLK_MQ_F_BLOCKING) {
+> +		percpu_ref_kill(&q->dispatch_counter);
+> +		wait_event(q->mq_quiesce_wq,
+> +				percpu_ref_is_zero(&q->dispatch_counter));
 
-Ok, it looks like the patch provides a generally useful API enhancement.
-And we do have at least two potential use cases for it.
-Let me send it as a standalone patch to linux-mm@.
+Looking at the q_usage_counter percpu, it's protected with the
+mq_freeze_lock and mq_freeze_depth, the fact that it's not protected
+here makes this non-nesting, which scares me... We had issues before
+in this area...
 
-Btw, Shakeel, what do you think of s/memalloc_use_memcg()/set_active_memcg() ?
+> +	} else
+>   		synchronize_rcu();
+>   }
+>   EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+> @@ -248,6 +242,9 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+>   {
+>   	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+>   
+> +	if (q->tag_set->flags & BLK_MQ_F_BLOCKING)
+> +		percpu_ref_resurrect(&q->dispatch_counter);
 
-And thank you for reviews!
+Same comment here...
 
-Roman
+> +
+>   	/* dispatch requests which are inserted during quiescing */
+>   	blk_mq_run_hw_queues(q, true);
+>   }
+> @@ -699,24 +696,21 @@ void blk_mq_complete_request(struct request *rq)
+>   }
+>   EXPORT_SYMBOL(blk_mq_complete_request);
+>   
+> -static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
+> -	__releases(hctx->srcu)
+> +static void hctx_unlock(struct blk_mq_hw_ctx *hctx)
+>   {
+>   	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
+>   		rcu_read_unlock();
+>   	else
+> -		srcu_read_unlock(hctx->srcu, srcu_idx);
+> +		percpu_ref_put(&hctx->queue->dispatch_counter);
+>   }
+>   
+> -static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+> -	__acquires(hctx->srcu)
+> +static inline bool hctx_lock(struct blk_mq_hw_ctx *hctx)
+>   {
+>   	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+> -		/* shut up gcc false positive */
+> -		*srcu_idx = 0;
+>   		rcu_read_lock();
+> +		return true;
+>   	} else
+> -		*srcu_idx = srcu_read_lock(hctx->srcu);
+> +		return percpu_ref_tryget_live(&hctx->queue->dispatch_counter);
+>   }
+>   
+>   /**
+> @@ -1495,8 +1489,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+>    */
+>   static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+>   {
+> -	int srcu_idx;
+> -
+>   	/*
+>   	 * We should be running this queue from one of the CPUs that
+>   	 * are mapped to it.
+> @@ -1530,9 +1522,10 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+>   
+>   	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+>   
+> -	hctx_lock(hctx, &srcu_idx);
+> -	blk_mq_sched_dispatch_requests(hctx);
+> -	hctx_unlock(hctx, srcu_idx);
+> +	if (hctx_lock(hctx)) {
+> +		blk_mq_sched_dispatch_requests(hctx);
+> +		hctx_unlock(hctx);
+> +	}
+
+Maybe invert?
+	if (!hctx_lock(hctx))
+		return;
+	blk_mq_sched_dispatch_requests(hctx);
+	hctx_unlock(hctx);
+
+I think we need a comment to why this is OK, both in the change log
+and in the code.
+
+>   }
+>   
+>   static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
+> @@ -1644,7 +1637,6 @@ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+>    */
+>   void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+>   {
+> -	int srcu_idx;
+>   	bool need_run;
+>   
+>   	/*
+> @@ -1655,10 +1647,12 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+>   	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
+>   	 * quiesced.
+>   	 */
+> -	hctx_lock(hctx, &srcu_idx);
+> +	if (!hctx_lock(hctx))
+> +		return;
+> +
+>   	need_run = !blk_queue_quiesced(hctx->queue) &&
+>   		blk_mq_hctx_has_pending(hctx);
+> -	hctx_unlock(hctx, srcu_idx);
+> +	hctx_unlock(hctx);
+>   
+>   	if (need_run)
+>   		__blk_mq_delay_run_hw_queue(hctx, async, 0);
+> @@ -1997,7 +1991,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>   	bool run_queue = true;
+>   
+>   	/*
+> -	 * RCU or SRCU read lock is needed before checking quiesced flag.
+> +	 * hctx_lock() is needed before checking quiesced flag.
+>   	 *
+>   	 * When queue is stopped or quiesced, ignore 'bypass_insert' from
+>   	 * blk_mq_request_issue_directly(), and return BLK_STS_OK to caller,
+> @@ -2045,11 +2039,13 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>   		struct request *rq, blk_qc_t *cookie)
+>   {
+>   	blk_status_t ret;
+> -	int srcu_idx;
+>   
+>   	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+>   
+> -	hctx_lock(hctx, &srcu_idx);
+> +	if (!hctx_lock(hctx)) {
+> +		blk_mq_sched_insert_request(rq, false, false, false);
+> +		return;
+> +	}
+
+I think we want the same flow for both modes. Maybe a preparation patch
+that lifts the checks in __blk_mq_try_issue_directly to do this, and
+then have the same flow with the hctx_lock failure (with a comment
+explaining this).
+
+>   
+>   	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
+>   	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+> @@ -2057,19 +2053,21 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>   	else if (ret != BLK_STS_OK)
+>   		blk_mq_end_request(rq, ret);
+>   
+> -	hctx_unlock(hctx, srcu_idx);
+> +	hctx_unlock(hctx);
+>   }
+>   
+>   blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
+>   {
+>   	blk_status_t ret;
+> -	int srcu_idx;
+>   	blk_qc_t unused_cookie;
+>   	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+>   
+> -	hctx_lock(hctx, &srcu_idx);
+> +	if (!hctx_lock(hctx)) {
+> +		blk_mq_sched_insert_request(rq, false, false, false);
+> +		return BLK_STS_OK;
+> +	}
+
+Same comment here.
+
+>   	ret = __blk_mq_try_issue_directly(hctx, rq, &unused_cookie, true, last);
+> -	hctx_unlock(hctx, srcu_idx);
+> +	hctx_unlock(hctx);
+>   
+>   	return ret;
+>   }
+> @@ -2600,20 +2598,6 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+>   	}
+>   }
+>   
+> -static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
+> -{
+> -	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
+> -
+> -	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
+> -			   __alignof__(struct blk_mq_hw_ctx)) !=
+> -		     sizeof(struct blk_mq_hw_ctx));
+> -
+> -	if (tag_set->flags & BLK_MQ_F_BLOCKING)
+> -		hw_ctx_size += sizeof(struct srcu_struct);
+> -
+> -	return hw_ctx_size;
+> -}
+> -
+>   static int blk_mq_init_hctx(struct request_queue *q,
+>   		struct blk_mq_tag_set *set,
+>   		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
+> @@ -2651,7 +2635,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
+>   	struct blk_mq_hw_ctx *hctx;
+>   	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
+>   
+> -	hctx = kzalloc_node(blk_mq_hw_ctx_size(set), gfp, node);
+> +	hctx = kzalloc_node(sizeof(struct blk_mq_hw_ctx), gfp, node);
+>   	if (!hctx)
+>   		goto fail_alloc_hctx;
+>   
+> @@ -2693,8 +2677,6 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
+>   	if (!hctx->fq)
+>   		goto free_bitmap;
+>   
+> -	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> -		init_srcu_struct(hctx->srcu);
+>   	blk_mq_hctx_kobj_init(hctx);
+>   
+>   	return hctx;
+> @@ -3171,6 +3153,13 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>   	mutex_unlock(&q->sysfs_lock);
+>   }
+>   
+> +static void blk_mq_dispatch_counter_release(struct percpu_ref *ref)
+> +{
+> +	struct request_queue *q = container_of(ref, struct request_queue,
+> +				dispatch_counter);
+> +	wake_up_all(&q->mq_quiesce_wq);
+> +}
+> +
+>   struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>   						  struct request_queue *q,
+>   						  bool elevator_init)
+> @@ -3187,6 +3176,14 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>   	if (blk_mq_alloc_ctxs(q))
+>   		goto err_poll;
+>   
+> +	if (set->flags & BLK_MQ_F_BLOCKING) {
+> +		init_waitqueue_head(&q->mq_quiesce_wq);
+> +		if (percpu_ref_init(&q->dispatch_counter,
+> +					blk_mq_dispatch_counter_release,
+> +					PERCPU_REF_ALLOW_REINIT, GFP_KERNEL))
+> +			goto err_hctxs;
+> +	}
+> +
+>   	/* init q->mq_kobj and sw queues' kobjects */
+>   	blk_mq_sysfs_init(q);
+>   
+> @@ -3195,7 +3192,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>   
+>   	blk_mq_realloc_hw_ctxs(set, q);
+>   	if (!q->nr_hw_queues)
+> -		goto err_hctxs;
+> +		goto err_dispatch_counter;
+>   
+>   	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
+>   	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
+> @@ -3229,6 +3226,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>   
+>   	return q;
+>   
+> +err_dispatch_counter:
+> +	if (set->flags & BLK_MQ_F_BLOCKING)
+> +		percpu_ref_exit(&q->dispatch_counter);
+>   err_hctxs:
+>   	kfree(q->queue_hw_ctx);
+>   	q->nr_hw_queues = 0;
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 7dda709f3ccb..56b6c045e30c 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -941,9 +941,13 @@ static void blk_release_queue(struct kobject *kobj)
+>   
+>   	blk_queue_free_zone_bitmaps(q);
+>   
+> -	if (queue_is_mq(q))
+> +	if (queue_is_mq(q)) {
+>   		blk_mq_release(q);
+>   
+> +		if (q->tag_set->flags & BLK_MQ_F_BLOCKING)
+> +			percpu_ref_exit(&q->dispatch_counter);
+> +	}
+> +
+>   	blk_trace_shutdown(q);
+>   	mutex_lock(&q->debugfs_mutex);
+>   	debugfs_remove_recursive(q->debugfs_dir);
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index 9d2d5ad367a4..ea3461298de5 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -169,13 +169,6 @@ struct blk_mq_hw_ctx {
+>   	 * q->unused_hctx_list.
+>   	 */
+>   	struct list_head	hctx_list;
+> -
+> -	/**
+> -	 * @srcu: Sleepable RCU. Use as lock when type of the hardware queue is
+> -	 * blocking (BLK_MQ_F_BLOCKING). Must be the last member - see also
+> -	 * blk_mq_hw_ctx_size().
+> -	 */
+> -	struct srcu_struct	srcu[];
+>   };
+>   
+>   /**
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index bb5636cc17b9..5fa8bc1bb7a8 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -572,6 +572,10 @@ struct request_queue {
+>   	struct list_head	tag_set_list;
+>   	struct bio_set		bio_split;
+>   
+> +	/* only used for BLK_MQ_F_BLOCKING */
+> +	struct percpu_ref	dispatch_counter;
+
+Can this be moved to be next to the q_usage_counter? they
+will be taken together for blocking drivers...
+
+Also maybe a better name is needed here since it's just
+for blocking hctxs.
+
+> +	wait_queue_head_t	mq_quiesce_wq;
+> +
+>   	struct dentry		*debugfs_dir;
+>   
+>   #ifdef CONFIG_BLK_DEBUG_FS
+> 
+
+What I think is needed here is at a minimum test quiesce/unquiesce loops
+during I/O. code auditing is not enough, there may be driver assumptions
+broken with this change (although I hope there shouldn't be).
