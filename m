@@ -2,137 +2,121 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A99C433E3
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE63C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:59:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 602D92076E
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:14:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A3AC21741
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:59:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="m4fbbuBW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727827AbgHUPOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 11:14:18 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38386 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728021AbgHUPOH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 11:14:07 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 9D7B9AF45;
-        Fri, 21 Aug 2020 15:14:28 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH] bcache: doc: update Documentation/admin-guide/bcache.rst
-Date:   Fri, 21 Aug 2020 23:13:54 +0800
-Message-Id: <20200821151354.16727-1-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
+        id S1727829AbgHUP7C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 11:59:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58246 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727087AbgHUP7A (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Aug 2020 11:59:00 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7590C061573
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:58:59 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id k4so1786393ilr.12
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:58:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=lKr2x91cMtcuwusmmtcHUtjJMQVufzAul6lNCKqAqKU=;
+        b=m4fbbuBWuBCtIM9x0MSfyDP9xrirHaAzb9yrspv71Z0Xh7TThtwNSyNQXu7RcXoZHd
+         /e3ZwwvcPAEZcAZQBOwqGnxGUBMFPZXdDInqY3BXPWZuQr6zKcUcW9B+XSonXsYljvqp
+         ylFJBxdIYkE8mqeeDfJAE3FZS1ihDkPhPFLg7J7z5+/kNLDzV3J0f+pNuKK4DHofigYU
+         DaVYTg4xETgBANbLc38IpyjQ3306lTUxiI74JHUHB5VNEWUapJPeRgt/SMS1TMoppgeX
+         XvNz08dzTP00tlg0Bt8se1JMUgbEynj5O96EuAfUCUSAieQFBGW/Q3+8jl+oEADPbaLU
+         cbkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=lKr2x91cMtcuwusmmtcHUtjJMQVufzAul6lNCKqAqKU=;
+        b=OGz872j5PDI2eQMAH9wKs5urkuBS8UxQhHx5XmcejQeushZ0atAnFV1PY6SEAvR7+3
+         RdXUhMMJV2/XWC98UYdpwBoQlgwTZES1pwuM4+zKKWNmguYDEpbKqu2OI1d3tidIvRpf
+         4m8b5bJULmNgkib9+QeE5wNccg4BgoNzrYuT9quhGBm3GuqLnh52xwDJ5jE8dJYvr9K2
+         IqsJ0GiAe1ZBg7G5Br8d7F5WLTtcNjscisiJTd+g8QMtuY+OJSNNWVWzvrBvbs5qoIAG
+         b1xu57ED9cbVM+hkVNUEu7euMB3B48R9rkM6Pe3FAYUBIohm69k/FLim2qLOM1PjDAa6
+         h80A==
+X-Gm-Message-State: AOAM532hrKW/8RgqyDRLpZwvfNmrqPeaats/WOBc5/FjjhKTOnqvFO41
+        g4+/F/H+iXvql3zx2BpWuLVMUiRIitC7SL53
+X-Google-Smtp-Source: ABdhPJwxkDRTg9Tdpb9O1saPdAEt9kHKHDqeKq++fAnEYawzRC35tL3lKkMLQ+g2cWCJSPkLrJMmpQ==
+X-Received: by 2002:a05:6e02:13b1:: with SMTP id h17mr3215461ilo.259.1598025538629;
+        Fri, 21 Aug 2020 08:58:58 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id k8sm1478614ilk.11.2020.08.21.08.58.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Aug 2020 08:58:58 -0700 (PDT)
+To:     io-uring <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: io_uring and Optane2
+Message-ID: <4af91b50-4a9c-8a16-9470-a51430bd7733@kernel.dk>
+Date:   Fri, 21 Aug 2020 09:58:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bcache.rst is from the original bcache.txt which was merged in mainline
-kernel v3.10. There are a few things changed in the past 7 years. This
-patch updates bache.rst documents in following content,
-- Update bcache-tools git repo to,
-  https://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git/
-- Update bcache kernel tree to mainline kernel tree,
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/
-- make-bcache util is replaced by the unified bcache util,
-  `make-bcache` now can be performed by `bcache make`
+Hi,
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
----
- Documentation/admin-guide/bcache.rst | 31 +++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+One of the key elements for eeking out the very last bit of performance
+with io_uring is being able to test your design and improvements. I had
+a bit of help on that front since Intel got me some Gen2 Optane SSD
+samples a while back, and I've been using those to guide improvements -
+and vice versa, to see which changes end up being detrimental to
+latencies or scalability. I haven't been able to share any numbers on
+that until now. So without further ado, here's some insight into what is
+possible with io_uring, and the Linux IO stack, today.
 
-diff --git a/Documentation/admin-guide/bcache.rst b/Documentation/admin-guide/bcache.rst
-index 1eccf952876d..8d3a2d045c0a 100644
---- a/Documentation/admin-guide/bcache.rst
-+++ b/Documentation/admin-guide/bcache.rst
-@@ -5,11 +5,14 @@ A block layer cache (bcache)
- Say you've got a big slow raid 6, and an ssd or three. Wouldn't it be
- nice if you could use them as cache... Hence bcache.
- 
--Wiki and git repositories are at:
-+The bcache wiki can be found at:
-+  https://bcache.evilpiepirate.org
- 
--  - https://bcache.evilpiepirate.org
--  - http://evilpiepirate.org/git/linux-bcache.git
--  - https://evilpiepirate.org/git/bcache-tools.git
-+This is the git repository of bcache-tools:
-+  https://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git/
-+
-+The latest bcache kernel code can be found from mainline Linux kernel:
-+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/
- 
- It's designed around the performance characteristics of SSDs - it only allocates
- in erase block sized buckets, and it uses a hybrid btree/log to track cached
-@@ -41,17 +44,21 @@ in the cache it first disables writeback caching and waits for all dirty data
- to be flushed.
- 
- Getting started:
--You'll need make-bcache from the bcache-tools repository. Both the cache device
-+You'll need bcache util from the bcache-tools repository. Both the cache device
- and backing device must be formatted before use::
- 
--  make-bcache -B /dev/sdb
--  make-bcache -C /dev/sdc
-+  bcache make -B /dev/sdb
-+  bcache make -C /dev/sdc
- 
--make-bcache has the ability to format multiple devices at the same time - if
-+`bcache make` has the ability to format multiple devices at the same time - if
- you format your backing devices and cache device at the same time, you won't
- have to manually attach::
- 
--  make-bcache -B /dev/sda /dev/sdb -C /dev/sdc
-+  bcache make -B /dev/sda /dev/sdb -C /dev/sdc
-+
-+If your bcache-tools is not updated to latest version and does not have the
-+unified `bcache` utility, you may use the legacy `make-bcache` utility to format
-+bcache device with same -B and -C parameters.
- 
- bcache-tools now ships udev rules, and bcache devices are known to the kernel
- immediately.  Without udev, you can manually register devices like this::
-@@ -188,7 +195,7 @@ D) Recovering data without bcache:
- If bcache is not available in the kernel, a filesystem on the backing
- device is still available at an 8KiB offset. So either via a loopdev
- of the backing device created with --offset 8K, or any value defined by
----data-offset when you originally formatted bcache with `make-bcache`.
-+--data-offset when you originally formatted bcache with `bcache make`.
- 
- For example::
- 
-@@ -210,7 +217,7 @@ E) Wiping a cache device
- 
- After you boot back with bcache enabled, you recreate the cache and attach it::
- 
--	host:~# make-bcache -C /dev/sdh2
-+	host:~# bcache make -C /dev/sdh2
- 	UUID:                   7be7e175-8f4c-4f99-94b2-9c904d227045
- 	Set UUID:               5bc072a8-ab17-446d-9744-e247949913c1
- 	version:                0
-@@ -318,7 +325,7 @@ want for getting the best possible numbers when benchmarking.
- 
-    The default metadata size in bcache is 8k.  If your backing device is
-    RAID based, then be sure to align this by a multiple of your stride
--   width using `make-bcache --data-offset`. If you intend to expand your
-+   width using `bcache make --data-offset`. If you intend to expand your
-    disk array in the future, then multiply a series of primes by your
-    raid stripe size to get the disk multiples that you would like.
- 
+Test setup:
+
+Kernel: 5.9.0-rc1
+System: Intel Ice Lake-SP Next-Gen Xeon (https://www.servethehome.com/intel-ice-lake-sp-next-gen-xeon-architecture-at-hc32/)
+Storage device: Single Gen2 Optane SSD (https://blocksandfiles.com/2020/08/14/intel-gen-2-optane-details/)
+Benchmark: t/io_uring from fio
+Workload: Single thread random 512b O_DIRECT reads
+
+Note that this is utilizing a single core in the system, out of the many
+available. t/io_uring is used for light overhead IO generation, and
+we're using polled IO with io_uring, and registered buffers and files.
+512b IOs are used to keep us well below the bandwidth ceiling.
+Throughput is easy, IOPS and latency are harder. My goal here was to
+demonstrate what is possible today with io_uring in terms of efficiency.
+
+Results
+-----------------------------------------------------------
+QD128 :		2.58M IOPS per core (34.9 usec avg latency)
+QD16  :		2.06M IOPS per core ( 6.9 usec avg latency)
+QD1   :		 290K IOPS per core ( 3.4 usec avg latency)
+
+Outside of showing what's possible with io_uring today, these results
+are also a testament to the general Linux IO stack efficiency. The
+introduction of blk-mq was as much about general efficiency as it was
+about scalability. That was a design criteria for both blk-mq and
+io_uring from day 1. Even if you aren't driving millions of IOPS, or
+using tons of threads/cores, you still care about getting your work done
+in the shortest amount of time, using the fewest amount of wasted
+cycles.
+
+More to come...
+
 -- 
-2.26.2
+Jens Axboe
 
