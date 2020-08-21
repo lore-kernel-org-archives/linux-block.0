@@ -2,155 +2,86 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1449C433E1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 04:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA4DC433E1
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 06:07:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9AE9208DB
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 04:11:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EA8E207DA
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 06:07:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qTzxO5uk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725831AbgHUELW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 00:11:22 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49660 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725268AbgHUELV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 00:11:21 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 8B960B7E9;
-        Fri, 21 Aug 2020 04:11:47 +0000 (UTC)
-Subject: Re: [PATCH 1/1] block: move the PAGE_SECTORS definition into
- <linux/blkdev.h>
-To:     Zhen Lei <thunder.leizhen@huawei.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel <dm-devel@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-bcache <linux-bcache@vger.kernel.org>
-References: <20200821020345.3358-1-thunder.leizhen@huawei.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <b4643e74-aad9-385f-01f2-f8e48ba4dbef@suse.de>
-Date:   Fri, 21 Aug 2020 12:11:13 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1726897AbgHUGHR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 02:07:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50776 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725268AbgHUGHR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Aug 2020 02:07:17 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5694C061385;
+        Thu, 20 Aug 2020 23:07:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=csBfSNWoqycX+qwrSd8VYEM/dpU2DB6oNeP8NG+28Xc=; b=qTzxO5ukJYkNNSGikvE5RnQCsQ
+        +KhwGfIq6hKk3uBbnfLAgUR6FOhqgOt59pJRlc0mbEP8P4TjhIuEZGm4ZoWQ5tHFIPDTLxVx3sE7F
+        7xfpj0y+M3F4xbaUxu+WQAk/K7vicbV335ik6f4aVmA5z0XxD5zPq3ld4vSv42DrYWQMkfC7lXOEC
+        69UtcSsu2hfM4jhvRLl5r/P8l8UgaIOV0jsqM9XRd7i9P//Oowm/NKHFN800e6HDD2igBVHRvF79f
+        8hsaUc3M6hvOlT4S5EGBd2yDs1FLYAilAgstS28qEoeSxvHfcH49rBEXEKfH2ZwQSLRl2YgW+zm76
+        BaSKRdoA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k90Cl-0000M6-0v; Fri, 21 Aug 2020 06:07:11 +0000
+Date:   Fri, 21 Aug 2020 07:07:10 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Anju T Sudhakar <anju@linux.vnet.ibm.com>
+Cc:     hch@infradead.org, darrick.wong@oracle.com,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        riteshh@linux.ibm.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH] iomap: Fix the write_count in iomap_add_to_ioend().
+Message-ID: <20200821060710.GC31091@infradead.org>
+References: <20200819102841.481461-1-anju@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200821020345.3358-1-thunder.leizhen@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200819102841.481461-1-anju@linux.vnet.ibm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/8/21 10:03, Zhen Lei wrote:
-> There are too many PAGE_SECTORS definitions, and all of them are the
-> same. It looks a bit of a mess. So why not move it into <linux/blkdev.h>,
-> to achieve a basic and unique definition.
+On Wed, Aug 19, 2020 at 03:58:41PM +0530, Anju T Sudhakar wrote:
+> From: Ritesh Harjani <riteshh@linux.ibm.com>
 > 
-> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
-
-
-A lazy question about page size > 4KB: currently in bcache code the
-sector size is assumed to be 512 sectors, if kernel page > 4KB, it is
-possible that PAGE_SECTORS in bcache will be a number > 8 ?
-
-Thanks.
-
-Coly Li
-
-
-> ---
->  drivers/block/brd.c           | 1 -
->  drivers/block/null_blk_main.c | 1 -
->  drivers/md/bcache/util.h      | 2 --
->  include/linux/blkdev.h        | 5 +++--
->  include/linux/device-mapper.h | 1 -
->  5 files changed, 3 insertions(+), 7 deletions(-)
+> __bio_try_merge_page() may return same_page = 1 and merged = 0. 
+> This could happen when bio->bi_iter.bi_size + len > UINT_MAX. 
+> Handle this case in iomap_add_to_ioend() by incrementing write_count.
+> This scenario mostly happens where we have too much dirty data accumulated. 
 > 
+> w/o the patch we hit below kernel warning,
 
-[snipped]
+I think this is better fixed in the block layer rather than working
+around the problem in the callers.  Something like this:
 
-> diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
-> index c029f7443190805..55196e0f37c32c6 100644
-> --- a/drivers/md/bcache/util.h
-> +++ b/drivers/md/bcache/util.h
-> @@ -15,8 +15,6 @@
->  
->  #include "closure.h"
->  
-> -#define PAGE_SECTORS		(PAGE_SIZE / 512)
-> -
->  struct closure;
->  
->  #ifdef CONFIG_BCACHE_DEBUG
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index bb5636cc17b91a7..b068dfc5f2ef0ab 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -949,11 +949,12 @@ static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
->   * multiple of 512 bytes. Hence these two constants.
->   */
->  #ifndef SECTOR_SHIFT
-> -#define SECTOR_SHIFT 9
-> +#define SECTOR_SHIFT		9
->  #endif
->  #ifndef SECTOR_SIZE
-> -#define SECTOR_SIZE (1 << SECTOR_SHIFT)
-> +#define SECTOR_SIZE		(1 << SECTOR_SHIFT)
->  #endif
-> +#define PAGE_SECTORS		(PAGE_SIZE / SECTOR_SIZE)
->  
->  /*
->   * blk_rq_pos()			: the current sector
-[snipped]
+diff --git a/block/bio.c b/block/bio.c
+index c63ba04bd62967..ef321cd1072e4e 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -879,8 +879,10 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+ 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+ 
+ 		if (page_is_mergeable(bv, page, len, off, same_page)) {
+-			if (bio->bi_iter.bi_size > UINT_MAX - len)
++			if (bio->bi_iter.bi_size > UINT_MAX - len) {
++				*same_page = false;
+ 				return false;
++			}
+ 			bv->bv_len += len;
+ 			bio->bi_iter.bi_size += len;
+ 			return true;
