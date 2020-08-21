@@ -2,60 +2,64 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA46EC433E1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C603C433E1
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:23:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C857E206DA
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A0D720735
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:23:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726337AbgHUUUt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 16:20:49 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:39609 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725938AbgHUUUr (ORCPT
+        id S1725938AbgHUUXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 16:23:31 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:36707 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725804AbgHUUXb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 16:20:47 -0400
-Received: by mail-pj1-f65.google.com with SMTP id j13so1287818pjd.4
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 13:20:47 -0700 (PDT)
+        Fri, 21 Aug 2020 16:23:31 -0400
+Received: by mail-pl1-f195.google.com with SMTP id y6so1390373plt.3
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 13:23:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=dJMzHfviirM1U8lBLyKGc//MVf+tB6J0uF/OqxxaWTw=;
-        b=tz0maaeziq01K7eg6evDoOVULG4LQ6fLLHGWjZmQFpg/AvKkwaCMcvduZrn0CUxsbq
-         cX+3pW3M1bowbhRYMlZf8LsAzjwqnJbYqdp6y8uslF7391SSDdHIiSU1lu/A+slzIw79
-         /nuLgM2Etjwxi1MU1oSR6QCv1+BQvPl3RPvlWHeX4To2WF3ihDYYqArM2HTulwbTm89N
-         xoGdqsqqpQxFqzxsZs4q9924/BvvRdL4VH0gZ8yf+8oQZuGTN9bev9AJB1/zU93u9kD1
-         lWLempQQ3zLUYYbBjx4GsPUkWJUOgX7fgwRzZhOiSM3vVIrMR+xYozabwnWzcxYrd0iE
-         xJUw==
-X-Gm-Message-State: AOAM531GjraS87NCtIgh4MAWzHDmxe4RgZ/pLnaVBN4rTdic6+e/Kupj
-        z4nEFM4z5hLPEpbIwTxBU2l5cWft6Tv0bQ==
-X-Google-Smtp-Source: ABdhPJxFXJiwnVJXLTG0fTB1XlRaZIzywZpgTA9Id7ObhHVVrknMkK1ybYTt3ImA+BlbNcR1D415UQ==
-X-Received: by 2002:a17:90a:191a:: with SMTP id 26mr3877687pjg.197.1598041246812;
-        Fri, 21 Aug 2020 13:20:46 -0700 (PDT)
+        bh=2gfWQvCm4JA4u/Phnm0jHU35F/XAL1Zg/HIvrShCJXg=;
+        b=D6KBIrJDYccJMBeTk7P0IVgqRbQHlAHlWcmwKKhzltI5W4M4TvAIt4KTAoBpCHut3s
+         ltZIn0hPvZu9Tn7z0TqqhI2YRNK7e3I6kvJVzeYTVvDCPU5KeSGxPb2Kdp/wHAjFnavc
+         PAhVVYAx79oThCvQEUWnRfX5WTKR6bbD+rDpgBJp8mqKiwNuCdEWnQmDhIS4OV3tonuC
+         WrfgCeiFQurcToDmqt15vFFIrFvsdmi8k6PuZppZZNzfDMWft14MFKNUZYt9PBGcns2h
+         9wKaNuRBF+o89yiqtYWZUzUG9TbWHjXCkEoG0QgFtA1dqUsKxoXkbaMjngGDJKcDO7kd
+         2yEA==
+X-Gm-Message-State: AOAM530wx/pvWlI7c1sIQJWG37YxkDZD4+tTb0XJ5aqq30dw5mrf3ZRT
+        3R3pNzAsdDT1kRF+TYW1KQI=
+X-Google-Smtp-Source: ABdhPJyINuNiQe0BP36p529nR8soirHltcatsfn2ZNpAGrkwXR7VyCszxt64JLsmkDSTDtnIPLOIvQ==
+X-Received: by 2002:a17:902:8ec8:: with SMTP id x8mr3701224plo.217.1598041410258;
+        Fri, 21 Aug 2020 13:23:30 -0700 (PDT)
 Received: from ?IPv6:2601:647:4802:9070:95a5:8a0f:6e94:b712? ([2601:647:4802:9070:95a5:8a0f:6e94:b712])
-        by smtp.gmail.com with ESMTPSA id il13sm2583060pjb.0.2020.08.21.13.20.45
+        by smtp.gmail.com with ESMTPSA id b22sm3418646pfb.52.2020.08.21.13.23.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 13:20:46 -0700 (PDT)
-Subject: Re: [PATCH 2/3] nvme-core: fix deadlock when reconnect failed due to
- nvme_set_queue_count timeout
-To:     Christoph Hellwig <hch@lst.de>, Chao Leng <lengchao@huawei.com>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        kbusch@kernel.org, axboe@fb.com
-References: <20200820035406.1720-1-lengchao@huawei.com>
- <20200821075034.GB30216@lst.de>
+        Fri, 21 Aug 2020 13:23:29 -0700 (PDT)
+Subject: Re: [PATCH 1/3] nvme-core: improve avoiding false remove namespace
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@fb.com, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Chao Leng <lengchao@huawei.com>,
+        kbusch@kernel.org
+References: <20200820035357.1634-1-lengchao@huawei.com>
+ <ead8ccd0-d89d-b47e-0a6f-22c976a3b3a6@grimberg.me>
+ <20200820082918.GA12926@lst.de>
+ <0630bc93-539d-df78-c1e8-ec136cb7dd36@grimberg.me>
+ <20200821062538.GD28559@lst.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <dbf66315-9e36-2105-535e-a90352ec5306@grimberg.me>
-Date:   Fri, 21 Aug 2020 13:20:44 -0700
+Message-ID: <75b49877-7740-3bd7-2ae9-385c310d7498@grimberg.me>
+Date:   Fri, 21 Aug 2020 13:23:28 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200821075034.GB30216@lst.de>
+In-Reply-To: <20200821062538.GD28559@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -65,49 +69,60 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->> A deadlock happens When we test nvme over roce with link blink. The
->> reason: link blink will cause error recovery, and then reconnect.If
->> reconnect fail due to nvme_set_queue_count timeout, the reconnect
->> process will set the queue count as 0 and continue , and then
->> nvme_start_ctrl will call nvme_enable_aen, and deadlock happens
->> because the admin queue is quiesced.
+>>> So the one thing I'm not even sure about is if just ignoring the
+>>> errors was a good idea to start with.  They obviously are if we just
+>>> did a rescan and did run into an error while rescanning a namespace
+>>> that didn't change.  But what if it actually did change?
 >>
->> log:
->> Aug  3 22:47:24 localhost kernel: nvme nvme2: I/O 22 QID 0 timeout
->> Aug  3 22:47:24 localhost kernel: nvme nvme2: Could not set queue count
->> (881)
->> stack:
->> root     23848  0.0  0.0      0     0 ?        D    Aug03   0:00
->> [kworker/u12:4+nvme-wq]
->> [<0>] blk_execute_rq+0x69/0xa0
->> [<0>] __nvme_submit_sync_cmd+0xaf/0x1b0 [nvme_core]
->> [<0>] nvme_features+0x73/0xb0 [nvme_core]
->> [<0>] nvme_start_ctrl+0xa4/0x100 [nvme_core]
->> [<0>] nvme_rdma_setup_ctrl+0x438/0x700 [nvme_rdma]
->> [<0>] nvme_rdma_reconnect_ctrl_work+0x22/0x30 [nvme_rdma]
->> [<0>] process_one_work+0x1a7/0x370
->> [<0>] worker_thread+0x30/0x380
->> [<0>] kthread+0x112/0x130
->> [<0>] ret_from_fork+0x35/0x40
->>
->> Many functions which call __nvme_submit_sync_cmd treat error code in two
->> modes: If error code less than 0, treat as command failed. If erroe code
->> more than 0, treat as target not support or other and continue.
->> NVME_SC_HOST_ABORTED_CMD and NVME_SC_HOST_PATH_ERROR both are cancled io
->> by host, is not the real error code return from target. So we need set
->> the flag:NVME_REQ_CANCELLED. Thus __nvme_submit_sync_cmd translate
->> the error to INTR, nvme_set_queue_count will return error, reconnect
->> process will terminate instead of continue.
+>> Right, we don't know, so if we failed without DNR, we assume that
+>> we will retry again and ignore the error. The assumption is that
+>> we will retry when we will reconnect as we don't have a retry mechanism
+>> for these requests.
 > 
-> But we could still race with a real completion.  I suspect the right
-> answer is to translate NVME_SC_HOST_ABORTED_CMD and
-> NVME_SC_HOST_PATH_ERROR to a negative error code in
-> __nvme_submit_sync_cmd.
+> Yes.  And I think for anything related to namespace (re-)scanning
+> we can actually trivially build a sane retry mechanism.  That is give
+> up on the current scan_work, and just rescan one after a short wait.
 
-So the scheme you suggest is:
-- treat any negative status or !DNR as "we never made it to
-the target"
-- Any positive status with DNR is a "controller generated status"
+There is no point in doing that if we are disconnected and will in
+the future reconnect, which will trigger a scan that can actually
+work.
 
-This will need a careful audit of all the call-sites we place such
-assumptions...
+>>> So I think a logic like in this patch kinda makes sense, but I think
+>>> we also need to retry and scan again on these kinds of errors.
+>>
+>> So you are OK with keeping nvme_submit_sync_cmd returning -ENODEV for
+>> cancelled requests and have the scan flow assume that these are
+>> cancelled requests?
+> 
+> How does nvme_submit_sync_cmd return -ENODEV?  As far as I can tell
+> -ENODEV is our special escape for expected-ish errors in namespace
+> scanning.
+
+One of these escapes I guess :)
+
+>> At the very least we need a good comment to say what is going on there.
+> 
+> Absolutely.
+> 
+>>
+>>    Btw,
+>>> did you ever actually see -ENOMEM in practice?  With the small
+>>> allocations that we do it really should not happen normally, so
+>>> special casing for it always felt a little strange.
+>>
+>> Never seen it, it's there just because we have allocations in the path.
+>>
+>>> FYI, I've started rebasing various bits of work I've done to start
+>>> untangling the mess.  Here is my current WIP, which in this form
+>>> is completely untested:
+>>>
+>>> http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/nvme-scanning-cleanup
+>>
+>> This does not yet contain sorting out what is discussed here correct?
+> 
+> No, but all the infrastructure needed to implement my above idead.  Most
+> importanty the crazy revalidate callchains are pretty much gone and we're
+> down to just a few functions with reasonable call chains.
+
+OK, that makes sense. I'm still not convinced the retry makes sense
+though...
