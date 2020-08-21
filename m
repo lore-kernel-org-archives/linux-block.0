@@ -2,104 +2,135 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D58C433E1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 01:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC0F6C433E3
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 02:04:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D16120855
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 01:36:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3EB920738
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 02:04:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbgHUBgF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Aug 2020 21:36:05 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:56900 "EHLO huawei.com"
+        id S1727039AbgHUCEk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Aug 2020 22:04:40 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10247 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725859AbgHUBgF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Aug 2020 21:36:05 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 397FD12346B85F17258D;
-        Fri, 21 Aug 2020 09:36:03 +0800 (CST)
-Received: from [10.169.42.93] (10.169.42.93) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 21 Aug 2020
- 09:36:02 +0800
-Subject: Re: [PATCH 1/3] nvme-core: improve avoiding false remove namespace
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
-CC:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <kbusch@kernel.org>, <axboe@fb.com>
-References: <20200820035357.1634-1-lengchao@huawei.com>
- <ead8ccd0-d89d-b47e-0a6f-22c976a3b3a6@grimberg.me>
- <20200820082918.GA12926@lst.de>
- <0630bc93-539d-df78-c1e8-ec136cb7dd36@grimberg.me>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <e84fed3d-1cb6-a548-9917-7d7dd884d0f9@huawei.com>
-Date:   Fri, 21 Aug 2020 09:36:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726983AbgHUCEj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Aug 2020 22:04:39 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 7CF4D46E9A2671E94ED7;
+        Fri, 21 Aug 2020 10:04:36 +0800 (CST)
+Received: from DESKTOP-C3MD9UG.china.huawei.com (10.174.177.253) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 21 Aug 2020 10:04:27 +0800
+From:   Zhen Lei <thunder.leizhen@huawei.com>
+To:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel <dm-devel@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-bcache <linux-bcache@vger.kernel.org>
+CC:     Zhen Lei <thunder.leizhen@huawei.com>
+Subject: [PATCH 1/1] block: move the PAGE_SECTORS definition into <linux/blkdev.h>
+Date:   Fri, 21 Aug 2020 10:03:45 +0800
+Message-ID: <20200821020345.3358-1-thunder.leizhen@huawei.com>
+X-Mailer: git-send-email 2.26.0.windows.1
 MIME-Version: 1.0
-In-Reply-To: <0630bc93-539d-df78-c1e8-ec136cb7dd36@grimberg.me>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.169.42.93]
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.177.253]
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+There are too many PAGE_SECTORS definitions, and all of them are the
+same. It looks a bit of a mess. So why not move it into <linux/blkdev.h>,
+to achieve a basic and unique definition.
+
+Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+---
+ drivers/block/brd.c           | 1 -
+ drivers/block/null_blk_main.c | 1 -
+ drivers/md/bcache/util.h      | 2 --
+ include/linux/blkdev.h        | 5 +++--
+ include/linux/device-mapper.h | 1 -
+ 5 files changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 2723a70eb855936..24c4687694b9f49 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -26,7 +26,6 @@
+ #include <linux/uaccess.h>
+ 
+ #define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
+-#define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+ 
+ /*
+  * Each block ramdisk device has a radix_tree brd_pages of pages that stores
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 47a9dad880af2aa..0624a26b86453ce 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -12,7 +12,6 @@
+ #include "null_blk.h"
+ 
+ #define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
+-#define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+ #define SECTOR_MASK		(PAGE_SECTORS - 1)
+ 
+ #define FREE_BATCH		16
+diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
+index c029f7443190805..55196e0f37c32c6 100644
+--- a/drivers/md/bcache/util.h
++++ b/drivers/md/bcache/util.h
+@@ -15,8 +15,6 @@
+ 
+ #include "closure.h"
+ 
+-#define PAGE_SECTORS		(PAGE_SIZE / 512)
+-
+ struct closure;
+ 
+ #ifdef CONFIG_BCACHE_DEBUG
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bb5636cc17b91a7..b068dfc5f2ef0ab 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -949,11 +949,12 @@ static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+  * multiple of 512 bytes. Hence these two constants.
+  */
+ #ifndef SECTOR_SHIFT
+-#define SECTOR_SHIFT 9
++#define SECTOR_SHIFT		9
+ #endif
+ #ifndef SECTOR_SIZE
+-#define SECTOR_SIZE (1 << SECTOR_SHIFT)
++#define SECTOR_SIZE		(1 << SECTOR_SHIFT)
+ #endif
++#define PAGE_SECTORS		(PAGE_SIZE / SECTOR_SIZE)
+ 
+ /*
+  * blk_rq_pos()			: the current sector
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 93096e524e43945..ffccce9b700c326 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -143,7 +143,6 @@ typedef size_t (*dm_dax_copy_iter_fn)(struct dm_target *ti, pgoff_t pgoff,
+ 		void *addr, size_t bytes, struct iov_iter *i);
+ typedef int (*dm_dax_zero_page_range_fn)(struct dm_target *ti, pgoff_t pgoff,
+ 		size_t nr_pages);
+-#define PAGE_SECTORS (PAGE_SIZE / 512)
+ 
+ void dm_error(const char *message);
+ 
+-- 
+1.8.3
 
 
-On 2020/8/20 23:44, Sagi Grimberg wrote:
-> 
->>> We really need to take a step back here, I really don't like how
->>> we are growing implicit assumptions on how statuses are interpreted.
->>>
->>> Why don't we remove the -ENODEV error propagation back and instead
->>> take care of it in the specific call-sites where we want to ignore
->>> errors with proper quirks?
->>
->> So the one thing I'm not even sure about is if just ignoring the
->> errors was a good idea to start with.  They obviously are if we just
->> did a rescan and did run into an error while rescanning a namespace
->> that didn't change.  But what if it actually did change?
-> 
-> Right, we don't know, so if we failed without DNR, we assume that
-> we will retry again and ignore the error. The assumption is that
-> we will retry when we will reconnect as we don't have a retry mechanism
-> for these requests.
-Except DNR or ENODEV, we can not know namespace change or not. This is
-a low-probability event. In accordance with the principle of minor
-influence and no suspicion, we assume namespace not change, maybe
-a good choice. If the namespace is changed, the corresponding processing
-is performed during the access, which does not cause any problem.
-> 
->> So I think a logic like in this patch kinda makes sense, but I think
->> we also need to retry and scan again on these kinds of errors.
-> 
-> So you are OK with keeping nvme_submit_sync_cmd returning -ENODEV for
-> cancelled requests and have the scan flow assume that these are
-> cancelled requests?
-> 
-> At the very least we need a good comment to say what is going on there.
-> 
->    Btw,
->> did you ever actually see -ENOMEM in practice?  With the small
->> allocations that we do it really should not happen normally, so
->> special casing for it always felt a little strange.
-Agree.
-Not only ENOMEM, If we do not know namespace change or not, assume
-namespace not change maybe a good choice.
-> 
-> Never seen it, it's there just because we have allocations in the path.
-> 
->> FYI, I've started rebasing various bits of work I've done to start
->> untangling the mess.  Here is my current WIP, which in this form
->> is completely untested:
->>
->> http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/nvme-scanning-cleanup
-> 
-> This does not yet contain sorting out what is discussed here correct?
-> .
