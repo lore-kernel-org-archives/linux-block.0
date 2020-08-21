@@ -2,114 +2,139 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF2FC433E1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4EBC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:05:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD41920578
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:04:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0664120578
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:05:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMyC8odR"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="sS2Hezml"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727049AbgHUPEL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 11:04:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49744 "EHLO
+        id S1726828AbgHUPFN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 11:05:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbgHUPEK (ORCPT
+        with ESMTP id S1725828AbgHUPFM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 11:04:10 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0E8C061573;
-        Fri, 21 Aug 2020 08:04:10 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id j187so1604924qke.11;
-        Fri, 21 Aug 2020 08:04:10 -0700 (PDT)
+        Fri, 21 Aug 2020 11:05:12 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6780DC061573
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:05:11 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id s1so2002469iot.10
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:05:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1FzqZJ6ck6KUzOqSuKnj7ejxM9ufdWSJqP1xoW29qVs=;
-        b=YMyC8odRxwt4e+ebHOdmQFNxzIqRf1A3/okUdcouS+5ljxpc1mDGkbrRKCaOWLMRFr
-         tbYI+SM/yvrHIvogo40z5OqLqYJkChEfGfUzeEtpFZaCRIPZPxYLYEHSc17+Zo/0VE9d
-         TzKI7FDaqtwoQKWX9hUMNi6bHRg3MniqKbnRaJ20ycXK2km/LwmfJw14EqQ2fXHsyxJH
-         0cd8PXp02Ei2m+BYXl573s3GRyAK3iD/xnGq61OQAg6T9ndogxeZFI095Wf2QmPScfjg
-         nermWatu5yNdkT9mlCcjxRIfZTCkdBGzvDieCK0LVBtz3oicHcxtogJkOwk+IkcJnSXu
-         Ya/w==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=oCXEIhO8enmfuquBTHpXrl5mntHYBzmrFCPEFUdX5AY=;
+        b=sS2HezmllAN89PNCHFdxoh+3zxbie556jDIP4QZv70QBd6Iy/0KbmT1YUXc2+kjNwc
+         v2B0IDj9D8jzFi9+E3PWmUzghHl/GsC2nxquqPpNS6nK1TwKL8guMlCG+b+bYdtGhkS2
+         WjAAr5sfiLcrSMD79cIGpMohQCClUqa5riGAWTsfMTnwQXjb2yCWivMHig2jQhztGlZN
+         kfXLX7R4JyUFgx/dDMZ2Cywh4Qpa88H8UwU1xKZzabYATYixX4yfP+4youtez09xrBoX
+         KkFAVGlCQ0ArYSH9mgV/Xwsig1vydJTcJcfA/3YpUu5MD8IQbTJeB1HkVlpYkCGEjBOb
+         LMLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1FzqZJ6ck6KUzOqSuKnj7ejxM9ufdWSJqP1xoW29qVs=;
-        b=iUJkRQeFuIukuRSEOMFErl0LkqrL0GhzAQyEUQlCYB5bVklpS1yEj+XAX66UPrmDuf
-         00YjYkUrT04sHR23bLHQ4Lk9/mfUbjvOe4yFZyp0T/a7KDGy/9/yEPKyRxHIcqM4sBKR
-         rVf5yAF9CBWPWFJk7Ekt+lF99XR3pZczL7zh+YbBmYCeA1/NaJL0iSOHYDoF43RtUnfK
-         Dpo0chkyE6ts3u5DGrkIn4BdE4fdRJVT2yS4Ai5DlGX0Kjf9T0gDdvfplaJjleS78VBZ
-         l1xqJbzaGbxMjIuYH4l3SMF3eLed3qwUj2iEh7eudzn4Ah7SXIQRKXitOzgfex6uJ7EO
-         sb6A==
-X-Gm-Message-State: AOAM530WGpk0dcBgs7pBgxdpKQNKzYBRjKI8hn0kaq82MMkDD9JJ+fEO
-        jPiy0dxR2yG/Fbo9kW0xXgw=
-X-Google-Smtp-Source: ABdhPJyBL+mb4e1OJT95Eq9kjSKGYgP7Np7BlljR/yVQfblx5fKS/WHmWdNwlkY/T6ACOLTj7g3OPw==
-X-Received: by 2002:a05:620a:24c9:: with SMTP id m9mr3122749qkn.487.1598022249324;
-        Fri, 21 Aug 2020 08:04:09 -0700 (PDT)
-Received: from dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com ([2620:10d:c091:480::1:4586])
-        by smtp.gmail.com with ESMTPSA id 65sm1942875qkf.33.2020.08.21.08.04.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Aug 2020 08:04:08 -0700 (PDT)
-Date:   Fri, 21 Aug 2020 11:04:05 -0400
-From:   Dan Schatzberg <schatzberg.dan@gmail.com>
-To:     Shakeel Butt <shakeelb@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:FILESYSTEMS (VFS and infrastructure)" 
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Subject: Re: [PATCH v6 0/4] Charge loop device i/o to issuing cgroup
-Message-ID: <20200821150405.GA4137@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
-References: <20200528135444.11508-1-schatzberg.dan@gmail.com>
- <CALvZod655MqFxmzwCf4ZLSh9QU+oLb0HL-Q_yKomh3fb-_W0Vg@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oCXEIhO8enmfuquBTHpXrl5mntHYBzmrFCPEFUdX5AY=;
+        b=YiaL6m4byLZl7bGDbxLrNa2XPdr60wVPHMD9gwSBr+OGChCJiNW5plGFTw26PaH9lT
+         rUGURk2UWjaWqnKr4whp9PYruoAFLKUTL6dF7qTkkY8IpdVi2Nasea9pHwjZoqVmiqWR
+         MgttSa71O/ZmETAJt/aqwHR/DSoBIT5rwlX4XzODygv+jbih4nBpV2kP8Ksi/AX2VBkH
+         SlhAU2IweaEemNCx+j6Xqr5SYtFWPeKlCwTCaoXZoIt27toC6bxCB56ch9Lp6ofc5JZs
+         d6c1Plea4nv23tZlqfOc9tJhuWYUI9bAbZzA7CLUP9ES2RmR4s7us2ZN1Q+JdCtW/S7w
+         ipcg==
+X-Gm-Message-State: AOAM533aRmXW3BrLMOVyVI4smP5WpU4nU2kg5EJ88YnGDk7zetoNj6xK
+        DTqYrZUuGKBVj1aUXIA1OFHB2g==
+X-Google-Smtp-Source: ABdhPJzMJYnTUMg0svXWw9SZg/uh1ry3LZbP9NkYF0XGYKwJtIASIHJe/yT8xJkl1tce6OFozcQv7g==
+X-Received: by 2002:a5d:88da:: with SMTP id i26mr2669241iol.158.1598022310733;
+        Fri, 21 Aug 2020 08:05:10 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id f18sm1382182ilj.24.2020.08.21.08.05.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Aug 2020 08:05:10 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bdada1a7-2460-7067-d42f-a6dfa94ddaee@kernel.dk>
+Date:   Fri, 21 Aug 2020 09:05:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALvZod655MqFxmzwCf4ZLSh9QU+oLb0HL-Q_yKomh3fb-_W0Vg@mail.gmail.com>
+In-Reply-To: <20200820030248.2809559-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 20, 2020 at 10:06:44AM -0700, Shakeel Butt wrote:
-> On Thu, May 28, 2020 at 6:55 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
-> >
-> > Much of the discussion about this has died down. There's been a
-> > concern raised that we could generalize infrastructure across loop,
-> > md, etc. This may be possible, in the future, but it isn't clear to me
-> > how this would look like. I'm inclined to fix the existing issue with
-> > loop devices now (this is a problem we hit at FB) and address
-> > consolidation with other cases if and when those need to be addressed.
-> >
-> 
-> What's the status of this series?
+On 8/19/20 9:02 PM, Ming Lei wrote:
+> @@ -699,24 +696,21 @@ void blk_mq_complete_request(struct request *rq)
+>  }
+>  EXPORT_SYMBOL(blk_mq_complete_request);
+>  
+> -static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
+> -	__releases(hctx->srcu)
+> +static void hctx_unlock(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
+>  		rcu_read_unlock();
+>  	else
+> -		srcu_read_unlock(hctx->srcu, srcu_idx);
+> +		percpu_ref_put(&hctx->queue->dispatch_counter);
+>  }
+>  
+> -static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+> -	__acquires(hctx->srcu)
+> +static inline bool hctx_lock(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+> -		/* shut up gcc false positive */
+> -		*srcu_idx = 0;
+>  		rcu_read_lock();
+> +		return true;
+>  	} else
+> -		*srcu_idx = srcu_read_lock(hctx->srcu);
+> +		return percpu_ref_tryget_live(&hctx->queue->dispatch_counter);
+>  }
 
-Thanks for reminding me about this. I haven't got any further
-feedback. I'll bug Jens to take a look and see if he has any concerns
-and if not send a rebased version.
+I don't mind the !flags checking, since this is (by far) the hot path.
+I would make it look like:
+
+static inline bool hctx_lock(struct blk_mq_hw_ctx *hctx)
+{
+	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+		rcu_read_lock();
+		return true;
+	}
+
+	return percpu_ref_tryget_live(&hctx->queue->dispatch_counter);
+}
+
+to make that perfectly clear. You can do the same for the unlock side so
+they at least look identical in terms of locking.
+
+Not too many comments on the rest, I think this is a nice cleanup too,
+and getting rid of the srcu usage is a nice win on the BLOCKING side.
+
+-- 
+Jens Axboe
+
