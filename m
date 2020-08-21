@@ -7,72 +7,78 @@ X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A79CC433E3
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 14:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD2FAC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 14:46:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AED820FC3
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 14:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB8ED2075E
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 14:46:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WZPAanfw"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="T1rDKM8e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728034AbgHUOpN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 10:45:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46796 "EHLO
+        id S1727056AbgHUOql (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 10:46:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727898AbgHUOpG (ORCPT
+        with ESMTP id S1727049AbgHUOqk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 10:45:06 -0400
+        Fri, 21 Aug 2020 10:46:40 -0400
 Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EC86C061573
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 07:45:05 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id c6so1566329ilo.13
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 07:45:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D477AC061573
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 07:46:39 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id c6so1571128ilo.13
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 07:46:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=C90nSWF13UnmUXT/t6zouheV3b/caGvmm+rEBKqVpdg=;
-        b=WZPAanfw3FhXa7h3fxpfrymu1+iAfN7jYZZcDC1ZwufOlcLwlqqC5JQ2Jdaa7axmC/
-         AuKMmUn6G9SHn8uiHiSKtQMcKmXt4qJnS6XfrG5tH/F6ZqV3GjPWYDc8S9VMsqwuj4fV
-         6+e5S2jm62HjwvxTNFR+qtMpHYZegRDCQMV3NIelDb+CZcphTnuK8QJcZnufxa59Xgzw
-         6LY26EQ0sduFkqL66yNRVSu0VnzkIRq8w0QDD/s+udlfz3bK6/yqg7LAN3a8nAsf0Nuw
-         +g0YGzid/aIb0K/qP+EjYkCkDGRtudkM4AUj2vRZDEX+cRQXswzarbNLHhDu+3bRbWns
-         eC4w==
+        bh=/iB45LxSFJUxKYmdcuof137g+3Gn7H09VvxLf92jINM=;
+        b=T1rDKM8e3H3CmnDotRzPGNfdbbv6Gciap2veMbOtMaxygcnsYvpbFyZHwGsgLIUKgx
+         W6dHmn0pakIZ3K1NzmafH2/FHNy7AFPh5705M9iuodrrTKNZRxDXG+FLLN2UOfVtmJdS
+         8ULi3dyEbvmfS2LVIMX+Cq/q8PwkXlYxXoTp33FzZqxBNG6rTXHJZ+cHJQ3JmUiSkirf
+         KzWMX5lj3vv5RvsWUVIQwDAYnV1Avd77h1sbO6LUCxLqqvPN9WkHwYtnj5/OfGMY+Mbg
+         r+lZhkcrstJ7xIYxtMzbvuJuRfgVz+HEbqNEqQQ1OmVaMHaDG1JaLuIS86Nq1ZsXyz7x
+         M9bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=C90nSWF13UnmUXT/t6zouheV3b/caGvmm+rEBKqVpdg=;
-        b=M338GC/bOwlYBGvLGcuEbBRP80iicPgYwoBykTbQpM/G+LGhnRXoPyRT0RW/vrMt66
-         jT+h/aCkMJ3qs0ycDfJIqI5XZLC3eY/oSsiUnJlHIvqDr/wCq11/X8HZ0IWHw9/zm7Ox
-         2Dii9+dESTuY5SS0wuZpYYqXk/mYt72E439QXE+Pb1xaiM531yIXVcb+joIXrH+ih1NC
-         OaAI4eK2gJCo6wA8SrGXZGFpADJ+mRIDxaUy/+h0qpE1fKhBWaHUvI2QY6Ei67wP8Fg/
-         mI7wIDJH2o2oZzR1IaybsSyWdvOAGI/P3xzDY/dmGIHAzzyQOfp94swEXtGZp3XmetH/
-         BGpg==
-X-Gm-Message-State: AOAM532AS6s78emt0SgBsE+ft24aNbfR/Em+KGOaa32X9Q0ACz6WbNGG
-        FD0gGq3YEuFKFgDD1sxk8FKtXA==
-X-Google-Smtp-Source: ABdhPJzv5Uro5gqLH9Madfn+I7njnS1pYD1IAyxJA8wxLh1cPMqD/A08/j+1u985vO8tNXtdISywww==
-X-Received: by 2002:a05:6e02:d44:: with SMTP id h4mr2812734ilj.296.1598021104562;
-        Fri, 21 Aug 2020 07:45:04 -0700 (PDT)
+        bh=/iB45LxSFJUxKYmdcuof137g+3Gn7H09VvxLf92jINM=;
+        b=Fs4yqyfavCvETxBkAXIMBpnbevTfeBbPyI4921ORAM9io2j001bepDjaJumRDSkEOt
+         FiSAwUfpmUCaaNReDFY+6qsAwYo2GgDqMKZm82+i83jUBd+QFV2P95UoGsqfbLd9GJKT
+         zBl+vJcYvm8ahGWGGb/w4qLCQgTfxNoUO1c+X1MWeG7XHRY6sboAkvhvKTEbsi2ci2Eg
+         OEVjJJYz8H+DrnneJR7dYP87FDTkmx19Rk3MibisMEUazvK4mbjWoqtnO58kmlF6GHwG
+         +i59azuujYwwsZA6g/xa0Mj2t/60zVa5A2aomhDD6RmDeeQJ1Ws+9feNCi234jZyz1Oi
+         GttQ==
+X-Gm-Message-State: AOAM530CthZRaaZokP8jz+Jz61et5GEBlx9f44gslxypFsTGVbuwyjfj
+        AcPQCf/19vDrFMDdNKC7fnRSbg==
+X-Google-Smtp-Source: ABdhPJxFdYgHUt/zf9twLI7GVwJhIlOOeTSywNd+AKRqPUDVRWitVO1GIqEQkz6Et7gd3J8M2MfNSw==
+X-Received: by 2002:a05:6e02:673:: with SMTP id l19mr2756665ilt.121.1598021199124;
+        Fri, 21 Aug 2020 07:46:39 -0700 (PDT)
 Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id u89sm1313919ili.87.2020.08.21.07.45.03
+        by smtp.gmail.com with ESMTPSA id p7sm1301086ilj.56.2020.08.21.07.46.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 07:45:04 -0700 (PDT)
-Subject: Re: [PATCH] virtio-blk: Use kobj_to_dev() instead of container_of()
-To:     Tian Tao <tiantao6@hisilicon.com>, mst@redhat.com,
-        jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Cc:     linuxarm@huawei.com
-References: <1597972755-60633-1-git-send-email-tiantao6@hisilicon.com>
+        Fri, 21 Aug 2020 07:46:38 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+ <20200821063448.GF28559@lst.de> <20200821101617.GA3125762@T590>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0d6b9b5b-cf44-6d77-8d3c-7a9f6063d457@kernel.dk>
-Date:   Fri, 21 Aug 2020 08:45:03 -0600
+Message-ID: <85b14d60-d5f8-2ae9-8717-2e655fbd16c0@kernel.dk>
+Date:   Fri, 21 Aug 2020 08:46:37 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1597972755-60633-1-git-send-email-tiantao6@hisilicon.com>
+In-Reply-To: <20200821101617.GA3125762@T590>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,10 +87,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/20/20 7:19 PM, Tian Tao wrote:
-> Use kobj_to_dev() instead of container_of()
+On 8/21/20 4:16 AM, Ming Lei wrote:
+> On Fri, Aug 21, 2020 at 08:34:48AM +0200, Christoph Hellwig wrote:
+>>> -static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
+>>> -	__releases(hctx->srcu)
+>>> +static void hctx_unlock(struct blk_mq_hw_ctx *hctx)
+>>>  {
+>>>  	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
+>>>  		rcu_read_unlock();
+>>>  	else
+>>> -		srcu_read_unlock(hctx->srcu, srcu_idx);
+>>> +		percpu_ref_put(&hctx->queue->dispatch_counter);
+>>
+>> While you're at it:  can we avoid the pointless inversion in the if
+>> statement and just do:
+>>
+>>  	if (hctx->flags & BLK_MQ_F_BLOCKING)
+>> 		percpu_ref_put(&hctx->queue->dispatch_counter);
+>> 	else
+>> 		rcu_read_unlock();
+> 
+> OK, will do that, but strictly speaking they don't belong to this patch.
 
-Applied, thanks.
+Yeah let's please not mix up the two.
 
 -- 
 Jens Axboe
