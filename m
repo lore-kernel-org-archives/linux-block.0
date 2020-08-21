@@ -2,128 +2,137 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCCEEC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A99C433E3
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:14:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC34D207DE
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:08:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jP8jPmAI"
+	by mail.kernel.org (Postfix) with ESMTP id 602D92076E
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:14:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727860AbgHUPIZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 11:08:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50402 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727074AbgHUPIV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 11:08:21 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9FF9C061755
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:08:21 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id f75so1375768ilh.3
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=cATovcDF6EIIZdeZ6DTsdMSJEoMk6qL5T5u7Q6ei1rg=;
-        b=jP8jPmAII5A/BaqiPZZXBQ/0nb55IKsHNPaIJCOCI9t3wpmalgbB3xtv+ZoD/sHlfF
-         P+2P1a6l/tNo3CGG6rHSJOb2IyuNmPFeHlVWbqMcSNj1CfYxBRCcIrHXmxjgYLGee9X+
-         U8S1nzS4XZPZ/BE4wN0ErVYadwOoNpmLpOool5rbLR3DdGUsHEPU4tGcNEpum1JuZxOz
-         m+02WpKlWQtfgjk6LTzXRBBSat40NNh3PIKAvsnsTHx+V6B91HpRAinkxOylKxG+3bCN
-         anLuNaN4N8xemHqYfRg4R+bxjkc6kGr5zSL4J420RagQmWnaJQ9IPgk4EFIg6Qw4I3lE
-         eM/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cATovcDF6EIIZdeZ6DTsdMSJEoMk6qL5T5u7Q6ei1rg=;
-        b=A+MLjtvkFF1pGRjSXFTSSydzBJOHSUzFzU0p6r6PtI6kevU2NkxD2CzzPRz1xlpP2C
-         9KPc9bKWgSB7ILJUluZvBnc8LfhlMMhvxySgl/R5HGoCf0gOUOY710MUq9v9p6wsM2oV
-         Y8yYIA2eb8Gz9fn2Gmz14ZMfGNARStTNvfUmmPMluOFaJjt9oqcuR3b5gZB2PN7DsB6i
-         6+U2+J50NNFRlUra8NhNlIOKR5kceqLuhaE1rLGx6IXqqTPkSprG0s6YHgspfEAbM1NO
-         dbVVGwWAPbWu6zD4KYcyZsnHnnA4sKi8tYP8AsRRYXZO2gqI4P6Kmqu8qwGx9Z/TIOV9
-         OLKA==
-X-Gm-Message-State: AOAM533g/Jr0l5lD4kPaNtmlaiIJbAZFHcZlRyTCn7IrPxWE3wTz6q8m
-        W7sUogQDh0YXJ8HJWa5+q3HgLg==
-X-Google-Smtp-Source: ABdhPJz7MRRaC85bkv/XmtISHRlp+BhEJvWp0fMl+7/CE/SMYUH37t/Cy8RTJG/mux9jGrmgdXSbsw==
-X-Received: by 2002:a05:6e02:1352:: with SMTP id k18mr2826675ilr.276.1598022499002;
-        Fri, 21 Aug 2020 08:08:19 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 187sm1388945ile.52.2020.08.21.08.08.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 08:08:18 -0700 (PDT)
-Subject: Re: [PATCH v6 0/4] Charge loop device i/o to issuing cgroup
-To:     Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Shakeel Butt <shakeelb@google.com>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:FILESYSTEMS (VFS and infrastructure)" 
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-References: <20200528135444.11508-1-schatzberg.dan@gmail.com>
- <CALvZod655MqFxmzwCf4ZLSh9QU+oLb0HL-Q_yKomh3fb-_W0Vg@mail.gmail.com>
- <20200821150405.GA4137@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9b55ca3d-cca5-50ae-4085-5a1866f77308@kernel.dk>
-Date:   Fri, 21 Aug 2020 09:08:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727827AbgHUPOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 11:14:18 -0400
+Received: from mx2.suse.de ([195.135.220.15]:38386 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728021AbgHUPOH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Aug 2020 11:14:07 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 9D7B9AF45;
+        Fri, 21 Aug 2020 15:14:28 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH] bcache: doc: update Documentation/admin-guide/bcache.rst
+Date:   Fri, 21 Aug 2020 23:13:54 +0800
+Message-Id: <20200821151354.16727-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200821150405.GA4137@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/21/20 9:04 AM, Dan Schatzberg wrote:
-> On Thu, Aug 20, 2020 at 10:06:44AM -0700, Shakeel Butt wrote:
->> On Thu, May 28, 2020 at 6:55 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
->>>
->>> Much of the discussion about this has died down. There's been a
->>> concern raised that we could generalize infrastructure across loop,
->>> md, etc. This may be possible, in the future, but it isn't clear to me
->>> how this would look like. I'm inclined to fix the existing issue with
->>> loop devices now (this is a problem we hit at FB) and address
->>> consolidation with other cases if and when those need to be addressed.
->>>
->>
->> What's the status of this series?
-> 
-> Thanks for reminding me about this. I haven't got any further
-> feedback. I'll bug Jens to take a look and see if he has any concerns
-> and if not send a rebased version.
+bcache.rst is from the original bcache.txt which was merged in mainline
+kernel v3.10. There are a few things changed in the past 7 years. This
+patch updates bache.rst documents in following content,
+- Update bcache-tools git repo to,
+  https://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git/
+- Update bcache kernel tree to mainline kernel tree,
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/
+- make-bcache util is replaced by the unified bcache util,
+  `make-bcache` now can be performed by `bcache make`
 
-No immediate concerns, I think rebasing and sending one against the
-current tree is probably a good idea. Then we can hopefully get it
-queued up for 5.10.
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+---
+ Documentation/admin-guide/bcache.rst | 31 +++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
+diff --git a/Documentation/admin-guide/bcache.rst b/Documentation/admin-guide/bcache.rst
+index 1eccf952876d..8d3a2d045c0a 100644
+--- a/Documentation/admin-guide/bcache.rst
++++ b/Documentation/admin-guide/bcache.rst
+@@ -5,11 +5,14 @@ A block layer cache (bcache)
+ Say you've got a big slow raid 6, and an ssd or three. Wouldn't it be
+ nice if you could use them as cache... Hence bcache.
+ 
+-Wiki and git repositories are at:
++The bcache wiki can be found at:
++  https://bcache.evilpiepirate.org
+ 
+-  - https://bcache.evilpiepirate.org
+-  - http://evilpiepirate.org/git/linux-bcache.git
+-  - https://evilpiepirate.org/git/bcache-tools.git
++This is the git repository of bcache-tools:
++  https://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git/
++
++The latest bcache kernel code can be found from mainline Linux kernel:
++  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/
+ 
+ It's designed around the performance characteristics of SSDs - it only allocates
+ in erase block sized buckets, and it uses a hybrid btree/log to track cached
+@@ -41,17 +44,21 @@ in the cache it first disables writeback caching and waits for all dirty data
+ to be flushed.
+ 
+ Getting started:
+-You'll need make-bcache from the bcache-tools repository. Both the cache device
++You'll need bcache util from the bcache-tools repository. Both the cache device
+ and backing device must be formatted before use::
+ 
+-  make-bcache -B /dev/sdb
+-  make-bcache -C /dev/sdc
++  bcache make -B /dev/sdb
++  bcache make -C /dev/sdc
+ 
+-make-bcache has the ability to format multiple devices at the same time - if
++`bcache make` has the ability to format multiple devices at the same time - if
+ you format your backing devices and cache device at the same time, you won't
+ have to manually attach::
+ 
+-  make-bcache -B /dev/sda /dev/sdb -C /dev/sdc
++  bcache make -B /dev/sda /dev/sdb -C /dev/sdc
++
++If your bcache-tools is not updated to latest version and does not have the
++unified `bcache` utility, you may use the legacy `make-bcache` utility to format
++bcache device with same -B and -C parameters.
+ 
+ bcache-tools now ships udev rules, and bcache devices are known to the kernel
+ immediately.  Without udev, you can manually register devices like this::
+@@ -188,7 +195,7 @@ D) Recovering data without bcache:
+ If bcache is not available in the kernel, a filesystem on the backing
+ device is still available at an 8KiB offset. So either via a loopdev
+ of the backing device created with --offset 8K, or any value defined by
+---data-offset when you originally formatted bcache with `make-bcache`.
++--data-offset when you originally formatted bcache with `bcache make`.
+ 
+ For example::
+ 
+@@ -210,7 +217,7 @@ E) Wiping a cache device
+ 
+ After you boot back with bcache enabled, you recreate the cache and attach it::
+ 
+-	host:~# make-bcache -C /dev/sdh2
++	host:~# bcache make -C /dev/sdh2
+ 	UUID:                   7be7e175-8f4c-4f99-94b2-9c904d227045
+ 	Set UUID:               5bc072a8-ab17-446d-9744-e247949913c1
+ 	version:                0
+@@ -318,7 +325,7 @@ want for getting the best possible numbers when benchmarking.
+ 
+    The default metadata size in bcache is 8k.  If your backing device is
+    RAID based, then be sure to align this by a multiple of your stride
+-   width using `make-bcache --data-offset`. If you intend to expand your
++   width using `bcache make --data-offset`. If you intend to expand your
+    disk array in the future, then multiply a series of primes by your
+    raid stripe size to get the disk multiples that you would like.
+ 
 -- 
-Jens Axboe
+2.26.2
 
