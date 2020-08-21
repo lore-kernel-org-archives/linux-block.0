@@ -2,92 +2,136 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FORGED_MUA_MOZILLA,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3234DC433E1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 08:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62FE9C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 08:54:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F181D207DF
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 08:35:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4337E208DB
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 08:54:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="xxKI/AoE"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ROGpziHz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbgHUIfl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 04:35:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45786 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726243AbgHUIfh (ORCPT
+        id S1726433AbgHUIyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 04:54:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55564 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726243AbgHUIyG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 04:35:37 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080BBC061385
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 01:35:37 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id y6so576977plt.3
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 01:35:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id;
-        bh=uM8XTPXbXUSgKL+AdmDHI3+bK/7/vjMa5gRmlkFhVPk=;
-        b=xxKI/AoEFClsAFT8hsyc+twgVUDv9WfHZppdkfz7hQpnaSFzoJw51aD1lGH3aFUos5
-         qOreU3P1uSoD8RksQJP5uIZUgYL3WZyxrtugs+jCF66GrOwzXt1RCyYBOxb47oBXwwZ1
-         gjCftCCOxiq3ep/Fis0GTJMvJBShffgzCHNmmg0N0Labm3qrPFMt1+lJJynslVvTxeho
-         OgkkN2/KmmSAwcwRL4Aqodi9NNUijI5aAziGYODVF7OW+uGWt9ltXjCILs3iTnB8l07V
-         e4F5I5jQ9hSa+hLn3A4S+bDeENkVy/xGAYr50aN8OmNdFhtKEmPfSJni+iA60IOEa6M4
-         p45A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=uM8XTPXbXUSgKL+AdmDHI3+bK/7/vjMa5gRmlkFhVPk=;
-        b=ReW8mSkWj5STUfwRTPG6o5/X8KJhkJ/Mk7HpCKpkKOBcArRL9BGbGl7S02j+/xYjrT
-         hmhiobOHzK25YVvcC4rODpCRMrVHLnLUMRkA/hD+S6Mgx1oONqIQ2Rbvuv6XbmoUBtTW
-         aU1qtBR60dS3qGBd3vbhr6J6KTWjJrhmuKXFFFZqqeiuRg1Hg5lLeoNg/BVtRkWHnXHS
-         vmQHV97LU3aj6bw8fjO9nz+Wf/UxIyBptzIod/1CdKwliRLLXHXW6ujfzolTLBrNiF04
-         eH0BDEkKspxqXHl7VvHXoqZHSg7nPk4byar39RtWTBVqI5sJaQK90fsMV220+3wH3gvC
-         p4kg==
-X-Gm-Message-State: AOAM5325ajCmmwr8iE8itaC2NlIOHcIbDga05fgvSbOKI3/nAKvx19MQ
-        9z7gCRJBXE+p58Q4W/ZgwwTZpCxMbwqVzA==
-X-Google-Smtp-Source: ABdhPJwe3evCZLkLzqOeSJedIzZWh93EvT0oQftZfTL+kRpBbEIqu+nIqDFwUgJNk7A5oW7310vybA==
-X-Received: by 2002:a17:90b:384b:: with SMTP id nl11mr1539602pjb.91.1597998936504;
-        Fri, 21 Aug 2020 01:35:36 -0700 (PDT)
-Received: from debian.bytedance.net ([61.120.150.75])
-        by smtp.gmail.com with ESMTPSA id z29sm1657473pfj.182.2020.08.21.01.35.34
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Aug 2020 01:35:35 -0700 (PDT)
-From:   Hou Pu <houpu@bytedance.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Hou Pu <houpu@bytedance.com>
-Subject: [PATCH] null_blk: fix passing of REQ_FUA flag in null_handle_rq
-Date:   Fri, 21 Aug 2020 04:34:42 -0400
-Message-Id: <20200821083442.10268-1-houpu@bytedance.com>
-X-Mailer: git-send-email 2.11.0
+        Fri, 21 Aug 2020 04:54:06 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07L8X7fK072907;
+        Fri, 21 Aug 2020 04:54:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : date : mime-version : in-reply-to : content-type :
+ content-transfer-encoding : message-id; s=pp1;
+ bh=tMpNeTWf65DjC70rS5HyK/935zN2nZFWJAbrMtoWLWM=;
+ b=ROGpziHzLer7q4RxRNMlsIh02QHcsuW4nx++4W55MlAtDvOnm/34MSU8qEoaLAzmD+7w
+ nqAjYrE1XeOtfd8QRjezVGQfBhj6Sd0bbGl7Bo751retTKKsInVQwOhtx9QscBOoaYne
+ 0rY8IHweV1QP7Mo0k7L/MZMzooxmsfqVyBdJlWGwGRiln6UxMRjbz/neUvPF6qZ3bEOw
+ b+HXkegr5fRrIG5z2nG0fwUTDXaduQntoBkSWO+/FFsYVwv1fk59mY/82uYE/hUk4ag0
+ j93qu64MIdTR5+BTPYz1fVQ4QxOhjkqoIS3wfbfGLBovyc+ehlsOaclW4gqGgD8noq7L ng== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33257sshsd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 04:54:02 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07L8q58q025176;
+        Fri, 21 Aug 2020 08:54:00 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 330tbvtupg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 08:54:00 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07L8rwYK65405230
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Aug 2020 08:53:58 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 16D634C044;
+        Fri, 21 Aug 2020 08:53:58 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 93CF64C040;
+        Fri, 21 Aug 2020 08:53:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.199.33.217])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Aug 2020 08:53:56 +0000 (GMT)
+Subject: Re: [PATCH] iomap: Fix the write_count in iomap_add_to_ioend().
+To:     Christoph Hellwig <hch@infradead.org>,
+        Anju T Sudhakar <anju@linux.vnet.ibm.com>,
+        linux-block@vger.kernel.org
+Cc:     darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        willy@infradead.org
+References: <20200819102841.481461-1-anju@linux.vnet.ibm.com>
+ <20200821060710.GC31091@infradead.org>
+From:   Ritesh Harjani <riteshh@linux.ibm.com>
+Date:   Fri, 21 Aug 2020 14:23:55 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <20200821060710.GC31091@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <20200821085356.93CF64C040@d06av22.portsmouth.uk.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-21_06:2020-08-21,2020-08-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ mlxlogscore=840 suspectscore=0 impostorscore=0 mlxscore=0 adultscore=0
+ spamscore=0 clxscore=1011 priorityscore=1501 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008210079
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-REQ_FUA should be checked using rq->cmd_flags instead of req_op().
 
-Signed-off-by: Hou Pu <houpu@bytedance.com>
----
- drivers/block/null_blk_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 87b31f9ca362..8cf13ea11cd2 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1139,7 +1139,7 @@ static int null_handle_rq(struct nullb_cmd *cmd)
- 		len = bvec.bv_len;
- 		err = null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
- 				     op_is_write(req_op(rq)), sector,
--				     req_op(rq) & REQ_FUA);
-+				     rq->cmd_flags & REQ_FUA);
- 		if (err) {
- 			spin_unlock_irq(&nullb->lock);
- 			return err;
--- 
-2.11.0
+On 8/21/20 11:37 AM, Christoph Hellwig wrote:
+> On Wed, Aug 19, 2020 at 03:58:41PM +0530, Anju T Sudhakar wrote:
+>> From: Ritesh Harjani <riteshh@linux.ibm.com>
+>>
+>> __bio_try_merge_page() may return same_page = 1 and merged = 0.
+>> This could happen when bio->bi_iter.bi_size + len > UINT_MAX.
+>> Handle this case in iomap_add_to_ioend() by incrementing write_count.
+>> This scenario mostly happens where we have too much dirty data accumulated.
+>>
+>> w/o the patch we hit below kernel warning,
+> 
+> I think this is better fixed in the block layer rather than working
+> around the problem in the callers.  Something like this:
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index c63ba04bd62967..ef321cd1072e4e 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -879,8 +879,10 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+>   		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+>   
+>   		if (page_is_mergeable(bv, page, len, off, same_page)) {
+> -			if (bio->bi_iter.bi_size > UINT_MAX - len)
+> +			if (bio->bi_iter.bi_size > UINT_MAX - len) {
+> +				*same_page = false;
+>   				return false;
+> +			}
+>   			bv->bv_len += len;
+>   			bio->bi_iter.bi_size += len;
+>   			return true;
+> 
 
+Ya, we had think of that. But what we then thought was, maybe the
+API does return the right thing. Meaning, what API says is, same_page is
+true, but the page couldn't be merged hence it returned ret = false.
+With that thought, we fixed this in the caller.
+
+But agree with you that with ret = false, there is no meaning of
+same_page being true. Ok, so let linux-block comment on whether
+above also looks good. If yes, I can spin out an official patch with
+all details.
+
+-ritesh
