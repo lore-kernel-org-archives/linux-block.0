@@ -7,69 +7,72 @@ X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DF5C433E3
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 14:44:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A79CC433E3
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 14:45:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FFC4207C3
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 14:44:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AED820FC3
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 14:45:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EbAFootx"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WZPAanfw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726709AbgHUOoZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 10:44:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46656 "EHLO
+        id S1728034AbgHUOpN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 10:45:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726176AbgHUOoX (ORCPT
+        with ESMTP id S1727898AbgHUOpG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 10:44:23 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEEBBC061755
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 07:44:22 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id s1so1931933iot.10
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 07:44:22 -0700 (PDT)
+        Fri, 21 Aug 2020 10:45:06 -0400
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EC86C061573
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 07:45:05 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id c6so1566329ilo.13
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 07:45:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=07SNuZIZMdj+HlfU700eUufMj6wvWrIT0da9X3XmX84=;
-        b=EbAFootxi+AvtIXv6g2P8hGW8dI4z3XcWtgPoLhDUq5WeIitkRXCdcFYtNJugKeLRw
-         lxS3M811Y/tkNOQ4kiX5aR0gnI2hQ0LfRDErRMLYiSuw11hXAFbJfzjkw5p8ODKYz8RF
-         M4QKJyTgGz/1mHsEVAxmeoKgoCSd85VjEArlFDpS5OZB19Yf9Mmlsq+OsguwcNUeFTVO
-         7ZBdq5QSYQgcIc6Pw5rJbnbNaEwCnhPH7vuUy3guUHVgf/iUyq/6Cr5kuhZna2MgjjaA
-         C6/nOpQBwH4l1rzKrng1ZHl89V0C/HHclqjSJM9Ak+LBul2oByWdhm3OJEp4sk/Bn3IL
-         qn+Q==
+        bh=C90nSWF13UnmUXT/t6zouheV3b/caGvmm+rEBKqVpdg=;
+        b=WZPAanfw3FhXa7h3fxpfrymu1+iAfN7jYZZcDC1ZwufOlcLwlqqC5JQ2Jdaa7axmC/
+         AuKMmUn6G9SHn8uiHiSKtQMcKmXt4qJnS6XfrG5tH/F6ZqV3GjPWYDc8S9VMsqwuj4fV
+         6+e5S2jm62HjwvxTNFR+qtMpHYZegRDCQMV3NIelDb+CZcphTnuK8QJcZnufxa59Xgzw
+         6LY26EQ0sduFkqL66yNRVSu0VnzkIRq8w0QDD/s+udlfz3bK6/yqg7LAN3a8nAsf0Nuw
+         +g0YGzid/aIb0K/qP+EjYkCkDGRtudkM4AUj2vRZDEX+cRQXswzarbNLHhDu+3bRbWns
+         eC4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=07SNuZIZMdj+HlfU700eUufMj6wvWrIT0da9X3XmX84=;
-        b=mfrlEGFTV+Hn3AbUzaJaG1uVHYiYK34lIEaCvWuixyAmOxnAt1FlZ4h4NazpzJrE84
-         VTOjLr7mCfA4BzRH3+x3csze2CwKDE9O0EVGUB+xq7zheUv/bBzROyt78rTIzhQHS2yt
-         qvReNSKv0mQA3lSkfou51FAcjsEKGtWpu+7Zty1h44/GD/kSJh/Rj6jxiYDOZ8QBbq3k
-         goYR9zQ1n5mdT9xKl/+ogTV8mtv45p5U1o702FnMlPc1+RReUxM08qAno9lLY25iVUbY
-         EzzaYMu7+HeEDCrNfPu1IofaaJ/vwsRvP7iAPpgAJpGXlPIF5UzfLA5MeHdR0NrbrlR7
-         sezQ==
-X-Gm-Message-State: AOAM532ICwtITzhj5ZNIQZcWgkXNmvWQtH6siM6YOAbnMFSZCR1shi4M
-        upzhp1KPYkVzkL0UE2TimzSfWtyZXBD4LpTu
-X-Google-Smtp-Source: ABdhPJw/vRunmrSPtzSvcmhJsOZy4CK4OQgF70nGz18ij1v47XISbNFeYur2Bu/X+InVEMu4ET5cqg==
-X-Received: by 2002:a5d:9a86:: with SMTP id c6mr2708812iom.27.1598021061372;
-        Fri, 21 Aug 2020 07:44:21 -0700 (PDT)
+        bh=C90nSWF13UnmUXT/t6zouheV3b/caGvmm+rEBKqVpdg=;
+        b=M338GC/bOwlYBGvLGcuEbBRP80iicPgYwoBykTbQpM/G+LGhnRXoPyRT0RW/vrMt66
+         jT+h/aCkMJ3qs0ycDfJIqI5XZLC3eY/oSsiUnJlHIvqDr/wCq11/X8HZ0IWHw9/zm7Ox
+         2Dii9+dESTuY5SS0wuZpYYqXk/mYt72E439QXE+Pb1xaiM531yIXVcb+joIXrH+ih1NC
+         OaAI4eK2gJCo6wA8SrGXZGFpADJ+mRIDxaUy/+h0qpE1fKhBWaHUvI2QY6Ei67wP8Fg/
+         mI7wIDJH2o2oZzR1IaybsSyWdvOAGI/P3xzDY/dmGIHAzzyQOfp94swEXtGZp3XmetH/
+         BGpg==
+X-Gm-Message-State: AOAM532AS6s78emt0SgBsE+ft24aNbfR/Em+KGOaa32X9Q0ACz6WbNGG
+        FD0gGq3YEuFKFgDD1sxk8FKtXA==
+X-Google-Smtp-Source: ABdhPJzv5Uro5gqLH9Madfn+I7njnS1pYD1IAyxJA8wxLh1cPMqD/A08/j+1u985vO8tNXtdISywww==
+X-Received: by 2002:a05:6e02:d44:: with SMTP id h4mr2812734ilj.296.1598021104562;
+        Fri, 21 Aug 2020 07:45:04 -0700 (PDT)
 Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id z9sm1348406ioq.52.2020.08.21.07.44.20
+        by smtp.gmail.com with ESMTPSA id u89sm1313919ili.87.2020.08.21.07.45.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 07:44:20 -0700 (PDT)
-Subject: Re: [PATCH] null_blk: fix passing of REQ_FUA flag in null_handle_rq
-To:     Hou Pu <houpu@bytedance.com>
-Cc:     linux-block@vger.kernel.org
-References: <20200821083442.10268-1-houpu@bytedance.com>
+        Fri, 21 Aug 2020 07:45:04 -0700 (PDT)
+Subject: Re: [PATCH] virtio-blk: Use kobj_to_dev() instead of container_of()
+To:     Tian Tao <tiantao6@hisilicon.com>, mst@redhat.com,
+        jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Cc:     linuxarm@huawei.com
+References: <1597972755-60633-1-git-send-email-tiantao6@hisilicon.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <78f21793-99d6-796e-50f6-da7fd8f350f4@kernel.dk>
-Date:   Fri, 21 Aug 2020 08:44:19 -0600
+Message-ID: <0d6b9b5b-cf44-6d77-8d3c-7a9f6063d457@kernel.dk>
+Date:   Fri, 21 Aug 2020 08:45:03 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200821083442.10268-1-houpu@bytedance.com>
+In-Reply-To: <1597972755-60633-1-git-send-email-tiantao6@hisilicon.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,8 +81,8 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/21/20 2:34 AM, Hou Pu wrote:
-> REQ_FUA should be checked using rq->cmd_flags instead of req_op().
+On 8/20/20 7:19 PM, Tian Tao wrote:
+> Use kobj_to_dev() instead of container_of()
 
 Applied, thanks.
 
