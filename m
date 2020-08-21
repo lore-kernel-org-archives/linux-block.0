@@ -2,132 +2,117 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C32CC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 22:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F13AC433E1
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 22:45:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2122E20855
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 22:09:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="euZw+zWT"
+	by mail.kernel.org (Postfix) with ESMTP id 473A3207C3
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 22:45:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598049933;
+	bh=GGTBLKeFVTqDEvCLFOgY0gmU2JTRZNw4K2fiTNtF6oc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=KoO6Huk4g8V3W6GuVJrvzNR9lWsBjvsHQWWMkRatOldzsR4U6xKXtvqXEHrKJ8X00
+	 CF5HEcJCU6/Z3ikALYJvHlxKIsFx36RvKyLv6ghMLLYKbjShtl72jOP1M9koydQRDG
+	 g03rlCK5HuQlb412ksgm1fpxMkKI2IZ8TcSowqcI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726747AbgHUWJ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 18:09:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59344 "EHLO
+        id S1726772AbgHUWpc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 18:45:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726641AbgHUWJ0 (ORCPT
+        with ESMTP id S1726358AbgHUWpc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 18:09:26 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0CD7C061573
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 15:09:26 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id e11so2647970ils.10
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 15:09:26 -0700 (PDT)
+        Fri, 21 Aug 2020 18:45:32 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14300C061573
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 15:45:32 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id h19so3505889ljg.13
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 15:45:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=3JTlKfwYZO54zOTBt8Cq1/9FUYP4Dv7ytu+UorBz3V4=;
-        b=euZw+zWT98+XunedhITkdLE16s+iV35OQOXS9tLU3BriTqpFhk0K7loBGSs3F5noka
-         ynLJfFAxgnmRouTlT7hFqGTPDi0UBEbbnjZW5B+8pdYV9vEL7ZrurlZF1JaYeT3Kz+69
-         uDSUdaVZ8GPaZmPh94dEv80BFp+453LEv5iyVLeFOkhOeK69ljKCcX1cAAiOie7LeB0J
-         t47MDdQ1xhRvFC7aaeKKiY/vBeJPau5Ig43yaMi3Qxbk/vPmeKUe+Ndv+v9e8Jt/XAtJ
-         6IjLCfwuNtIdSc+bpfNXczvVgMhhFuT6rqu+ttaDZmOjKFemwsHuOSYEE2Mb2iLOwHlx
-         cXDg==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pgdPXVu12oC5v4ONKGsQsWpv2R/f2Ol3CcFBY4UQ5tI=;
+        b=XYcqxn4Zu2HM55BSvgZP9HhEzNzK7Itg8Q5XzAY5nBvUwdoqbNLoadFb98YF3K1gVE
+         RylRCyuCkBF0bJ34Ck4QWD6bh66MTUUD+HICvO8G9WIi9e612QSrCjAV7PsndF2TsC6m
+         DLfxfe7Gl022lvCcTJCoJwcPEhzpvjuxX/M/w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3JTlKfwYZO54zOTBt8Cq1/9FUYP4Dv7ytu+UorBz3V4=;
-        b=je2OqgMpa+5rVOFaYoubh3+dpDeM3j3KuqYWV0hEjddqg0hUQDTWBRj+6/nne+36Z0
-         v/RqAMqi5jzTMgIIYRhsn61V0N29CBfKVGrzsJq83pNT9tRPysK1QjdAf9yhUs320WeR
-         5PrNu0n+A7hqUTRUnsQgODK5kG+t6pEYpXKiOi0PrWZ26yeugDD7ZCZlLzC9p8wi3zoa
-         7tKixi9hPHSRVCSoAa1KNfJEsu2tTPRQI2QeuBbxKdkV3l2rc+Wyo8M/O9+tRBKSAIUA
-         c63gqdvlL7dsdyOY+qBJhoxtt9Fcb7UKGQY66QgFPYQmRYVW1y1x4c0cbT54uaJC6ihj
-         VYRg==
-X-Gm-Message-State: AOAM532e7W9Nh+Ej1NIRbJlIvWs76yx9s7/lIccnyBIqL55bs5dhivaG
-        gavNzPqI32lFOEUfXNrXyk3GH9jTS+BYgp9k
-X-Google-Smtp-Source: ABdhPJxgXzHJ19Al7meQdrTHP2xvTvVio8iSeQSkV5LZcpDIF5Uff29UjkdJ8S3YTWmUAktYNnokLA==
-X-Received: by 2002:a92:89cf:: with SMTP id w76mr3816772ilk.215.1598047765602;
-        Fri, 21 Aug 2020 15:09:25 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 3sm2074991ily.31.2020.08.21.15.09.24
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pgdPXVu12oC5v4ONKGsQsWpv2R/f2Ol3CcFBY4UQ5tI=;
+        b=hWPKYENUaiPVmYnv+sg+loceuKIcyMeH7QZEjAFiU2FDGeSB4PpCD56cWpwRmRLS4R
+         quLkh+ZycpNCX0hafDTwr6cJd1abrFkLhq5brxVEKbxUnA3mFkoZJ7uX9lGtJOtdD+z4
+         PoH56GmyLaxKNWcddjgJB5ybuMBjC68gF54KSou7tuoTic56gcq9QFWBFLENhxjyCf5G
+         rdKDJuZegU/OZwEkYEytL0JM69AZiaWsEcmnsRV+Bp0tK++VQTxOpLpiYsok4gRtsR0K
+         1PIDf7EByo9CemhO1MMF2YkZ2cvvB/M3b+Fdi2RITliJBjnClAI1j+TZ4MvkEmUraF9f
+         8uUw==
+X-Gm-Message-State: AOAM5311xmB6NMy5zKKg78ocfr41OsnS3tZoAFYzsfXOxCvUoqz5Cj+I
+        JCcP0MVqAvyOkMdknqG15QJakQbWxoz3NQ==
+X-Google-Smtp-Source: ABdhPJy6EfESsB3wbeLfq+253O7A0KKZ53x14d7l3fKqa5QbE9TspElnqNU6GOzzCOzvCZC7YFFbXg==
+X-Received: by 2002:a05:651c:1213:: with SMTP id i19mr2470384lja.191.1598049930165;
+        Fri, 21 Aug 2020 15:45:30 -0700 (PDT)
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com. [209.85.167.49])
+        by smtp.gmail.com with ESMTPSA id t16sm663759ljo.27.2020.08.21.15.45.29
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 15:09:25 -0700 (PDT)
-Subject: Re: [GIT PULL] Block fixes for 5.9-rc2
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <2e213354-a1f8-cdb6-0f3c-24473a2a2ef8@kernel.dk>
- <CAHk-=wiFwUUEpCQ2FDWxBFb3XSxu=+yODHGfLPncvTQa9BeP9w@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <22fc2c2f-1ab9-6c57-df94-4768a64644e9@kernel.dk>
-Date:   Fri, 21 Aug 2020 16:09:24 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 21 Aug 2020 15:45:29 -0700 (PDT)
+Received: by mail-lf1-f49.google.com with SMTP id i19so1668035lfj.8
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 15:45:29 -0700 (PDT)
+X-Received: by 2002:ac2:58d5:: with SMTP id u21mr2338413lfo.31.1598049928911;
+ Fri, 21 Aug 2020 15:45:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=wiFwUUEpCQ2FDWxBFb3XSxu=+yODHGfLPncvTQa9BeP9w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <2e213354-a1f8-cdb6-0f3c-24473a2a2ef8@kernel.dk>
+ <CAHk-=wiFwUUEpCQ2FDWxBFb3XSxu=+yODHGfLPncvTQa9BeP9w@mail.gmail.com> <22fc2c2f-1ab9-6c57-df94-4768a64644e9@kernel.dk>
+In-Reply-To: <22fc2c2f-1ab9-6c57-df94-4768a64644e9@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 21 Aug 2020 15:45:13 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg=CkBbPHVOjoaFWoACzm+7jWhBBzwmsw7y0EYcmseh0Q@mail.gmail.com>
+Message-ID: <CAHk-=wg=CkBbPHVOjoaFWoACzm+7jWhBBzwmsw7y0EYcmseh0Q@mail.gmail.com>
+Subject: Re: [GIT PULL] Block fixes for 5.9-rc2
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/21/20 3:58 PM, Linus Torvalds wrote:
-> On Fri, Aug 21, 2020 at 1:51 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>
->> Some general fixes, and a bit of late stragglers that missed -rc1 and
->> really should have been there. Nothing major, though. I
-> 
-> Pulled, test-built, and unpulled.
-> 
-> This crap doesn't even compile cleanly.
-> 
-> It is printing out an 'int' using '%ld', so nobody could possibly have
-> compile-tested this.
+On Fri, Aug 21, 2020 at 3:09 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> I had to look for that, because it obviously didn't complain for me.
+> Looks like it's the one in drivers/block/rnbd/rnbd-srv.c which changes
+> from PTR_ERR() to using 'err' which is indeed an int.
 
-I had to look for that, because it obviously didn't complain for me.
-Looks like it's the one in drivers/block/rnbd/rnbd-srv.c which changes
-from PTR_ERR() to using 'err' which is indeed an int.
+You clearly didn't even build the patch you applied.
 
-> And as I've said elsewhere - compile-testing doesn't mean "show it to
-> a compiler".
-> 
-> It means "look at what the compiler says" too. Otherwise it's not
-> compile-testing, it's just throwing it away.
-> 
-> So send me a properly tested and *MINIMAL* pull request. because I
-> will not take this crap, and I will not take anythign that *looks*&
-> like this crap.
-> 
-> Real fixes, and fixes ONLY.
+You can claim it's some odd uninteresting file, but then you damn well
+shouldn't have applied the patch if you can't even be bothered to
+compile-test it.
 
-I think you're overreacting here. I *always* test these pulls, it's run
-through the test box with the tests there, and it's always running on my
-laptop a day or two in advance. Typing it right now from that branch.
-Stop making it sound like it's not being tested at all, according to the
-above it obviously never saw a compiler which is just blatantly untrue.
+It really is that simple - this is not some odd configuration that has
+a build problem because it's esoteric.  That file *will* warn if you
+compile it. I don't think you can avoid it.
 
-I obviously missed a *warning* because I don't have any way to test that
-part and it's not part of my config. Hardly seems like a shootable
-offense. I have to defer to the maintainer there, which did ack this
-patch.
+So it's literally a patch that cannot have been build-tested AT ALL.
 
-This is all fixes and innocous changes otherwise. My suggestion here
-would be:
+I don't see why you even make excuses for it.
 
-1) You pull it, change that rnbd mistake at merge time.
-2) I queue a patch on top with that single change.
+Send me the fixes part of the pull, no new features, and no untested garbage.
 
-Let me know what you prefer, and can we please tone down the aggression
-here?
+And no, I'm not your test build server that you send crap to and then
+when I notice it was broken you try to fix it up.
 
--- 
-Jens Axboe
+So it's your choice. If you want to let it simmer in linux-next for
+better testing and sending it to me for 5.10, I guess that's a choice
+too.
 
+But I'm very very fed up with people sending me stuff that they didn't
+care enough to even check for warnings for. And no, I don't want to
+get some minimal fixup. I want a clean tree.
+
+                      Linus
