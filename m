@@ -2,127 +2,142 @@ Return-Path: <SRS0=euq6=B7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C603C433E1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCDCC433E1
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:23:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A0D720735
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:23:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7C3F20748
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:23:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Iaf2NJFc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725938AbgHUUXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 16:23:31 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:36707 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbgHUUXb (ORCPT
+        id S1726364AbgHUUXg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 16:23:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42932 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725804AbgHUUXf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 16:23:31 -0400
-Received: by mail-pl1-f195.google.com with SMTP id y6so1390373plt.3
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 13:23:30 -0700 (PDT)
+        Fri, 21 Aug 2020 16:23:35 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 683AAC061573
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 13:23:33 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id g6so3196156ljn.11
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 13:23:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3D+TqH2GckoXVS0G3AVPPpXHl/Ts1q0PzrQAkDG5DxU=;
+        b=Iaf2NJFcLLPjJhCFY4NPJilmEIWG1EFZPPdHf4a8cj0cg5EIjHpega0AiSsQdtW2bk
+         gfJ+fc6kt7IQS7SnbVWnC7nVl1NCVvIvAYMA+W7ZX4lygUpP1+w1ZAYWXppaTBAf8FnJ
+         HLiubgJccGNPYTJixoFrXXnbWGuO3t08zDeHSeMZCXjnotaLbkFq91VPkpSg8AOzFma2
+         6iZ7V4Oefj3vBgGenVmlNikMMYEnqUWK1a+A4pNOYTR11AA0IqAS6HeY4XIaHwSMRWmH
+         w3QNtXRLNxeUZuRdcDTgKqZ6ih6/11rJX2eAqK4u7o5a+KWL4L4g4AZjl5yls4ZEKP7/
+         G2Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2gfWQvCm4JA4u/Phnm0jHU35F/XAL1Zg/HIvrShCJXg=;
-        b=D6KBIrJDYccJMBeTk7P0IVgqRbQHlAHlWcmwKKhzltI5W4M4TvAIt4KTAoBpCHut3s
-         ltZIn0hPvZu9Tn7z0TqqhI2YRNK7e3I6kvJVzeYTVvDCPU5KeSGxPb2Kdp/wHAjFnavc
-         PAhVVYAx79oThCvQEUWnRfX5WTKR6bbD+rDpgBJp8mqKiwNuCdEWnQmDhIS4OV3tonuC
-         WrfgCeiFQurcToDmqt15vFFIrFvsdmi8k6PuZppZZNzfDMWft14MFKNUZYt9PBGcns2h
-         9wKaNuRBF+o89yiqtYWZUzUG9TbWHjXCkEoG0QgFtA1dqUsKxoXkbaMjngGDJKcDO7kd
-         2yEA==
-X-Gm-Message-State: AOAM530wx/pvWlI7c1sIQJWG37YxkDZD4+tTb0XJ5aqq30dw5mrf3ZRT
-        3R3pNzAsdDT1kRF+TYW1KQI=
-X-Google-Smtp-Source: ABdhPJyINuNiQe0BP36p529nR8soirHltcatsfn2ZNpAGrkwXR7VyCszxt64JLsmkDSTDtnIPLOIvQ==
-X-Received: by 2002:a17:902:8ec8:: with SMTP id x8mr3701224plo.217.1598041410258;
-        Fri, 21 Aug 2020 13:23:30 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:95a5:8a0f:6e94:b712? ([2601:647:4802:9070:95a5:8a0f:6e94:b712])
-        by smtp.gmail.com with ESMTPSA id b22sm3418646pfb.52.2020.08.21.13.23.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 13:23:29 -0700 (PDT)
-Subject: Re: [PATCH 1/3] nvme-core: improve avoiding false remove namespace
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@fb.com, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Chao Leng <lengchao@huawei.com>,
-        kbusch@kernel.org
-References: <20200820035357.1634-1-lengchao@huawei.com>
- <ead8ccd0-d89d-b47e-0a6f-22c976a3b3a6@grimberg.me>
- <20200820082918.GA12926@lst.de>
- <0630bc93-539d-df78-c1e8-ec136cb7dd36@grimberg.me>
- <20200821062538.GD28559@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <75b49877-7740-3bd7-2ae9-385c310d7498@grimberg.me>
-Date:   Fri, 21 Aug 2020 13:23:28 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3D+TqH2GckoXVS0G3AVPPpXHl/Ts1q0PzrQAkDG5DxU=;
+        b=t3AMuxP0tHfHq2+piRW0yfB2b2EMdniGEoe7uKiXcHa0ec5C+EBnZ3GL++ZrgeHXF5
+         itBUqfdIKYlnL/ESjyGLdCF/laeWm1NfCB5elyD4y6S2Hdm3k14V1YWu3jucjPFZb7y/
+         QNtWXE7OqllX0aQvjZWbv6GWcDkxDaKX/mvJoA5gDqNoac6PY5MldOnaI2HuEn8ty/np
+         KfiVb1rao4SkCnSX5gprrZTryBDiswWsR37hMszAbp9eHgOFStodUx9MOMWaa5icBS73
+         xkC+T+W5qqMg4vDSK5jMEw20spRT0knrzCRXSqv7FpT0wNaduORU9GXId6wKIFBvSwtD
+         FlkQ==
+X-Gm-Message-State: AOAM530hYgbCE/D4GMHjgjKvshUJ9BcDJNujISHZiKIgz/ti6/JKfX0Q
+        2NbMpMQOCkwE9qkb7PxGFOdAiBVVTdZJpC0MrAusNg==
+X-Google-Smtp-Source: ABdhPJxtB3gytKgy43PrfoEOXffDzmegXgekhXTFkNzcg9j+nkrkWcOxp0q7UZtL0bR4N1sDGWoc4+ZBzIS8qEtpwWY=
+X-Received: by 2002:a05:651c:330:: with SMTP id b16mr2290021ljp.77.1598041411383;
+ Fri, 21 Aug 2020 13:23:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200821062538.GD28559@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200528135444.11508-1-schatzberg.dan@gmail.com>
+ <CALvZod655MqFxmzwCf4ZLSh9QU+oLb0HL-Q_yKomh3fb-_W0Vg@mail.gmail.com>
+ <20200821150405.GA4137@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
+ <20200821160128.GA2233370@carbon.dhcp.thefacebook.com> <CALvZod69w5UoCjfWcqVAejpKWzRAUxX7dEPzqDUknHhUFV_XEA@mail.gmail.com>
+ <20200821200530.GA2250889@carbon.dhcp.thefacebook.com>
+In-Reply-To: <20200821200530.GA2250889@carbon.dhcp.thefacebook.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Fri, 21 Aug 2020 13:23:20 -0700
+Message-ID: <CALvZod7mfgOab_NSBegCcJ4jL6pb98CfckUhk7QgNCLsmiB4aQ@mail.gmail.com>
+Subject: Re: [PATCH v6 0/4] Charge loop device i/o to issuing cgroup
+To:     Roman Gushchin <guro@fb.com>
+Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
+        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hugh Dickins <hughd@google.com>,
+        Chris Down <chris@chrisdown.name>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:FILESYSTEMS (VFS and infrastructure)" 
+        <linux-fsdevel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
+        <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Aug 21, 2020 at 1:05 PM Roman Gushchin <guro@fb.com> wrote:
+>
+> On Fri, Aug 21, 2020 at 09:27:56AM -0700, Shakeel Butt wrote:
+> > On Fri, Aug 21, 2020 at 9:02 AM Roman Gushchin <guro@fb.com> wrote:
+> > >
+> > > On Fri, Aug 21, 2020 at 11:04:05AM -0400, Dan Schatzberg wrote:
+> > > > On Thu, Aug 20, 2020 at 10:06:44AM -0700, Shakeel Butt wrote:
+> > > > > On Thu, May 28, 2020 at 6:55 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
+> > > > > >
+> > > > > > Much of the discussion about this has died down. There's been a
+> > > > > > concern raised that we could generalize infrastructure across loop,
+> > > > > > md, etc. This may be possible, in the future, but it isn't clear to me
+> > > > > > how this would look like. I'm inclined to fix the existing issue with
+> > > > > > loop devices now (this is a problem we hit at FB) and address
+> > > > > > consolidation with other cases if and when those need to be addressed.
+> > > > > >
+> > > > >
+> > > > > What's the status of this series?
+> > > >
+> > > > Thanks for reminding me about this. I haven't got any further
+> > > > feedback. I'll bug Jens to take a look and see if he has any concerns
+> > > > and if not send a rebased version.
+> > >
+> > > Just as a note, I stole a patch from this series called
+> > > "mm: support nesting memalloc_use_memcg()" to use for the bpf memory accounting.
+> > > I rewrote the commit log and rebased to the tot with some trivial changes.
+> > >
+> > > I just sent it upstream:
+> > > https://lore.kernel.org/bpf/20200821150134.2581465-1-guro@fb.com/T/#md7edb6b5b940cee1c4d15e3cef17aa8b07328c2e
+> > >
+> > > It looks like we need it for two independent sub-systems, so I wonder
+> > > if we want to route it first through the mm tree as a standalone patch?
+> > >
+> >
+> > Another way is to push that patch to 5.9-rc2 linus tree, so both block
+> > and mm branches for 5.10 will have it. (Not sure if that's ok.)
+>
+> Ok, it looks like the patch provides a generally useful API enhancement.
+> And we do have at least two potential use cases for it.
+> Let me send it as a standalone patch to linux-mm@.
+>
+> Btw, Shakeel, what do you think of s/memalloc_use_memcg()/set_active_memcg() ?
+>
 
->>> So the one thing I'm not even sure about is if just ignoring the
->>> errors was a good idea to start with.  They obviously are if we just
->>> did a rescan and did run into an error while rescanning a namespace
->>> that didn't change.  But what if it actually did change?
->>
->> Right, we don't know, so if we failed without DNR, we assume that
->> we will retry again and ignore the error. The assumption is that
->> we will retry when we will reconnect as we don't have a retry mechanism
->> for these requests.
-> 
-> Yes.  And I think for anything related to namespace (re-)scanning
-> we can actually trivially build a sane retry mechanism.  That is give
-> up on the current scan_work, and just rescan one after a short wait.
-
-There is no point in doing that if we are disconnected and will in
-the future reconnect, which will trigger a scan that can actually
-work.
-
->>> So I think a logic like in this patch kinda makes sense, but I think
->>> we also need to retry and scan again on these kinds of errors.
->>
->> So you are OK with keeping nvme_submit_sync_cmd returning -ENODEV for
->> cancelled requests and have the scan flow assume that these are
->> cancelled requests?
-> 
-> How does nvme_submit_sync_cmd return -ENODEV?  As far as I can tell
-> -ENODEV is our special escape for expected-ish errors in namespace
-> scanning.
-
-One of these escapes I guess :)
-
->> At the very least we need a good comment to say what is going on there.
-> 
-> Absolutely.
-> 
->>
->>    Btw,
->>> did you ever actually see -ENOMEM in practice?  With the small
->>> allocations that we do it really should not happen normally, so
->>> special casing for it always felt a little strange.
->>
->> Never seen it, it's there just because we have allocations in the path.
->>
->>> FYI, I've started rebasing various bits of work I've done to start
->>> untangling the mess.  Here is my current WIP, which in this form
->>> is completely untested:
->>>
->>> http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/nvme-scanning-cleanup
->>
->> This does not yet contain sorting out what is discussed here correct?
-> 
-> No, but all the infrastructure needed to implement my above idead.  Most
-> importanty the crazy revalidate callchains are pretty much gone and we're
-> down to just a few functions with reasonable call chains.
-
-OK, that makes sense. I'm still not convinced the retry makes sense
-though...
+I am fine with it.
