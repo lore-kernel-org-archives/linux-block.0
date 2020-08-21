@@ -7,77 +7,93 @@ X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4EBC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:05:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCCEEC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:08:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0664120578
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:05:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC34D207DE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 15:08:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="sS2Hezml"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jP8jPmAI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726828AbgHUPFN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 11:05:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49912 "EHLO
+        id S1727860AbgHUPIZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 11:08:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbgHUPFM (ORCPT
+        with ESMTP id S1727074AbgHUPIV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 11:05:12 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6780DC061573
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:05:11 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id s1so2002469iot.10
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:05:11 -0700 (PDT)
+        Fri, 21 Aug 2020 11:08:21 -0400
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9FF9C061755
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:08:21 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id f75so1375768ilh.3
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 08:08:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=oCXEIhO8enmfuquBTHpXrl5mntHYBzmrFCPEFUdX5AY=;
-        b=sS2HezmllAN89PNCHFdxoh+3zxbie556jDIP4QZv70QBd6Iy/0KbmT1YUXc2+kjNwc
-         v2B0IDj9D8jzFi9+E3PWmUzghHl/GsC2nxquqPpNS6nK1TwKL8guMlCG+b+bYdtGhkS2
-         WjAAr5sfiLcrSMD79cIGpMohQCClUqa5riGAWTsfMTnwQXjb2yCWivMHig2jQhztGlZN
-         kfXLX7R4JyUFgx/dDMZ2Cywh4Qpa88H8UwU1xKZzabYATYixX4yfP+4youtez09xrBoX
-         KkFAVGlCQ0ArYSH9mgV/Xwsig1vydJTcJcfA/3YpUu5MD8IQbTJeB1HkVlpYkCGEjBOb
-         LMLg==
+        bh=cATovcDF6EIIZdeZ6DTsdMSJEoMk6qL5T5u7Q6ei1rg=;
+        b=jP8jPmAII5A/BaqiPZZXBQ/0nb55IKsHNPaIJCOCI9t3wpmalgbB3xtv+ZoD/sHlfF
+         P+2P1a6l/tNo3CGG6rHSJOb2IyuNmPFeHlVWbqMcSNj1CfYxBRCcIrHXmxjgYLGee9X+
+         U8S1nzS4XZPZ/BE4wN0ErVYadwOoNpmLpOool5rbLR3DdGUsHEPU4tGcNEpum1JuZxOz
+         m+02WpKlWQtfgjk6LTzXRBBSat40NNh3PIKAvsnsTHx+V6B91HpRAinkxOylKxG+3bCN
+         anLuNaN4N8xemHqYfRg4R+bxjkc6kGr5zSL4J420RagQmWnaJQ9IPgk4EFIg6Qw4I3lE
+         eM/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=oCXEIhO8enmfuquBTHpXrl5mntHYBzmrFCPEFUdX5AY=;
-        b=YiaL6m4byLZl7bGDbxLrNa2XPdr60wVPHMD9gwSBr+OGChCJiNW5plGFTw26PaH9lT
-         rUGURk2UWjaWqnKr4whp9PYruoAFLKUTL6dF7qTkkY8IpdVi2Nasea9pHwjZoqVmiqWR
-         MgttSa71O/ZmETAJt/aqwHR/DSoBIT5rwlX4XzODygv+jbih4nBpV2kP8Ksi/AX2VBkH
-         SlhAU2IweaEemNCx+j6Xqr5SYtFWPeKlCwTCaoXZoIt27toC6bxCB56ch9Lp6ofc5JZs
-         d6c1Plea4nv23tZlqfOc9tJhuWYUI9bAbZzA7CLUP9ES2RmR4s7us2ZN1Q+JdCtW/S7w
-         ipcg==
-X-Gm-Message-State: AOAM533aRmXW3BrLMOVyVI4smP5WpU4nU2kg5EJ88YnGDk7zetoNj6xK
-        DTqYrZUuGKBVj1aUXIA1OFHB2g==
-X-Google-Smtp-Source: ABdhPJzMJYnTUMg0svXWw9SZg/uh1ry3LZbP9NkYF0XGYKwJtIASIHJe/yT8xJkl1tce6OFozcQv7g==
-X-Received: by 2002:a5d:88da:: with SMTP id i26mr2669241iol.158.1598022310733;
-        Fri, 21 Aug 2020 08:05:10 -0700 (PDT)
+        bh=cATovcDF6EIIZdeZ6DTsdMSJEoMk6qL5T5u7Q6ei1rg=;
+        b=A+MLjtvkFF1pGRjSXFTSSydzBJOHSUzFzU0p6r6PtI6kevU2NkxD2CzzPRz1xlpP2C
+         9KPc9bKWgSB7ILJUluZvBnc8LfhlMMhvxySgl/R5HGoCf0gOUOY710MUq9v9p6wsM2oV
+         Y8yYIA2eb8Gz9fn2Gmz14ZMfGNARStTNvfUmmPMluOFaJjt9oqcuR3b5gZB2PN7DsB6i
+         6+U2+J50NNFRlUra8NhNlIOKR5kceqLuhaE1rLGx6IXqqTPkSprG0s6YHgspfEAbM1NO
+         dbVVGwWAPbWu6zD4KYcyZsnHnnA4sKi8tYP8AsRRYXZO2gqI4P6Kmqu8qwGx9Z/TIOV9
+         OLKA==
+X-Gm-Message-State: AOAM533g/Jr0l5lD4kPaNtmlaiIJbAZFHcZlRyTCn7IrPxWE3wTz6q8m
+        W7sUogQDh0YXJ8HJWa5+q3HgLg==
+X-Google-Smtp-Source: ABdhPJz7MRRaC85bkv/XmtISHRlp+BhEJvWp0fMl+7/CE/SMYUH37t/Cy8RTJG/mux9jGrmgdXSbsw==
+X-Received: by 2002:a05:6e02:1352:: with SMTP id k18mr2826675ilr.276.1598022499002;
+        Fri, 21 Aug 2020 08:08:19 -0700 (PDT)
 Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id f18sm1382182ilj.24.2020.08.21.08.05.09
+        by smtp.gmail.com with ESMTPSA id 187sm1388945ile.52.2020.08.21.08.08.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 08:05:10 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
- BLK_MQ_F_BLOCKING
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
-References: <20200820030248.2809559-1-ming.lei@redhat.com>
+        Fri, 21 Aug 2020 08:08:18 -0700 (PDT)
+Subject: Re: [PATCH v6 0/4] Charge loop device i/o to issuing cgroup
+To:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Shakeel Butt <shakeelb@google.com>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
+        Chris Down <chris@chrisdown.name>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:FILESYSTEMS (VFS and infrastructure)" 
+        <linux-fsdevel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
+        <linux-mm@kvack.org>
+References: <20200528135444.11508-1-schatzberg.dan@gmail.com>
+ <CALvZod655MqFxmzwCf4ZLSh9QU+oLb0HL-Q_yKomh3fb-_W0Vg@mail.gmail.com>
+ <20200821150405.GA4137@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <bdada1a7-2460-7067-d42f-a6dfa94ddaee@kernel.dk>
-Date:   Fri, 21 Aug 2020 09:05:09 -0600
+Message-ID: <9b55ca3d-cca5-50ae-4085-5a1866f77308@kernel.dk>
+Date:   Fri, 21 Aug 2020 09:08:16 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200820030248.2809559-1-ming.lei@redhat.com>
+In-Reply-To: <20200821150405.GA4137@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -86,54 +102,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/19/20 9:02 PM, Ming Lei wrote:
-> @@ -699,24 +696,21 @@ void blk_mq_complete_request(struct request *rq)
->  }
->  EXPORT_SYMBOL(blk_mq_complete_request);
->  
-> -static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
-> -	__releases(hctx->srcu)
-> +static void hctx_unlock(struct blk_mq_hw_ctx *hctx)
->  {
->  	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
->  		rcu_read_unlock();
->  	else
-> -		srcu_read_unlock(hctx->srcu, srcu_idx);
-> +		percpu_ref_put(&hctx->queue->dispatch_counter);
->  }
->  
-> -static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
-> -	__acquires(hctx->srcu)
-> +static inline bool hctx_lock(struct blk_mq_hw_ctx *hctx)
->  {
->  	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
-> -		/* shut up gcc false positive */
-> -		*srcu_idx = 0;
->  		rcu_read_lock();
-> +		return true;
->  	} else
-> -		*srcu_idx = srcu_read_lock(hctx->srcu);
-> +		return percpu_ref_tryget_live(&hctx->queue->dispatch_counter);
->  }
+On 8/21/20 9:04 AM, Dan Schatzberg wrote:
+> On Thu, Aug 20, 2020 at 10:06:44AM -0700, Shakeel Butt wrote:
+>> On Thu, May 28, 2020 at 6:55 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
+>>>
+>>> Much of the discussion about this has died down. There's been a
+>>> concern raised that we could generalize infrastructure across loop,
+>>> md, etc. This may be possible, in the future, but it isn't clear to me
+>>> how this would look like. I'm inclined to fix the existing issue with
+>>> loop devices now (this is a problem we hit at FB) and address
+>>> consolidation with other cases if and when those need to be addressed.
+>>>
+>>
+>> What's the status of this series?
+> 
+> Thanks for reminding me about this. I haven't got any further
+> feedback. I'll bug Jens to take a look and see if he has any concerns
+> and if not send a rebased version.
 
-I don't mind the !flags checking, since this is (by far) the hot path.
-I would make it look like:
-
-static inline bool hctx_lock(struct blk_mq_hw_ctx *hctx)
-{
-	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
-		rcu_read_lock();
-		return true;
-	}
-
-	return percpu_ref_tryget_live(&hctx->queue->dispatch_counter);
-}
-
-to make that perfectly clear. You can do the same for the unlock side so
-they at least look identical in terms of locking.
-
-Not too many comments on the rest, I think this is a nice cleanup too,
-and getting rid of the srcu usage is a nice win on the BLOCKING side.
+No immediate concerns, I think rebasing and sending one against the
+current tree is probably a good idea. Then we can hopefully get it
+queued up for 5.10.
 
 -- 
 Jens Axboe
