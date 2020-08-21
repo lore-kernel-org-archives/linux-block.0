@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA25C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 17:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A3FC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 17:28:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 801D920738
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 17:20:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F18D22CF7
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 17:28:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598030445;
-	bh=j6+kpJCmaXuZgHM7vd0jKlEkbury+ZMiWRDr6FY1Hkc=;
+	s=default; t=1598030894;
+	bh=su/76TCn6qViBS0aWPpZVwiMsbp5KTmEEehwTuWj/IU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=P45oSeS/FCsniKqABKdRFFpvh6luXjCFdapRpjGGk+0HLBh6I0DNzqImmr+BeukqQ
-	 HuMc0hPvFmz6a/JWcErpNDEU8PhrKNW9CrMH4youL0g2qw96I5p7NwIYEu85ywQGCz
-	 gy+A4Q1wf9xFUGMknfEy+ZEfEkuR5iMo39QgSFfk=
+	b=fatjBAcL4EKx+OOtL8Xt4W1vaXAYhbiLDBubCCztfgnhc/PdPR+/4tsuDBsbQT2V0
+	 Y8WHGn3FIQMfgcW/Wj9MR4ffw48SuJvgxbX679hx6wVdr/3zIvdSngICREMmYtgZTP
+	 BDboXrs3sZaxuzZGW35HgSMCGaxm5WnmM9nwTvNs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728864AbgHURUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 13:20:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48780 "EHLO mail.kernel.org"
+        id S1727031AbgHUR2M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 13:28:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46398 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727998AbgHUQQE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 12:16:04 -0400
+        id S1727017AbgHUQOr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Aug 2020 12:14:47 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 526FE20FC3;
-        Fri, 21 Aug 2020 16:16:03 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D907622B4E;
+        Fri, 21 Aug 2020 16:14:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598026564;
-        bh=j6+kpJCmaXuZgHM7vd0jKlEkbury+ZMiWRDr6FY1Hkc=;
+        s=default; t=1598026482;
+        bh=su/76TCn6qViBS0aWPpZVwiMsbp5KTmEEehwTuWj/IU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bDdi326cSfkClD274YxOfAAyqCo+L8HfMpPDlhsZ/7OG6Eef5l1c48ejbzU8+/S93
-         VpSawb+cOnrmI//rH13CkNdTZ0+viNy3chy8lGa3OeLNo3ht1hBWFoKhhlafM53PrH
-         HdWQSIq8kIqHDJNyByQZ35TtrISCLPkuPBQN620w=
+        b=KhAJ+h1pzHdT2CPaiuJfuOaC8O563nLfJXBFwtDt2up38ZuQaa01U9B6RcbzP7+zh
+         dQz9H0KtCL+qwX6mzQ+RPy5e7YJBBjvcXtNXEAO192GJHyyzNzq4KRUZB0/TAsuWLy
+         LKbQUC+Ef2ktam3NMH363b0jZNdS2atG4qYD3HlU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
@@ -45,12 +45,12 @@ Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.7 15/61] blktrace: ensure our debugfs dir exists
-Date:   Fri, 21 Aug 2020 12:14:59 -0400
-Message-Id: <20200821161545.347622-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.8 15/62] blktrace: ensure our debugfs dir exists
+Date:   Fri, 21 Aug 2020 12:13:36 -0400
+Message-Id: <20200821161423.347071-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200821161545.347622-1-sashal@kernel.org>
-References: <20200821161545.347622-1-sashal@kernel.org>
+In-Reply-To: <20200821161423.347071-1-sashal@kernel.org>
+References: <20200821161423.347071-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -96,10 +96,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 12 insertions(+)
 
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index ac59476c77ae0..f5e49e0deea83 100644
+index 588e8e3960197..1bd6563939e59 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -534,6 +534,18 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+@@ -536,6 +536,18 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
  #endif
  		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
  
