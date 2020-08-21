@@ -4,26 +4,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31AD5C433E3
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 09:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73825C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 09:26:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19B63214F1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 09:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 556C12087D
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 09:26:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727820AbgHUJYW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 05:24:22 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49896 "EHLO mx2.suse.de"
+        id S1728000AbgHUJ0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 05:26:21 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51772 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725806AbgHUJYU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 05:24:20 -0400
+        id S1725806AbgHUJ0V (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Aug 2020 05:26:21 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 1D938AB9F;
-        Fri, 21 Aug 2020 09:24:47 +0000 (UTC)
-Subject: Re: [PATCH 1/2] block: replace bd_set_size with bd_set_nr_sectors
+        by mx2.suse.de (Postfix) with ESMTP id 800CEAC5E;
+        Fri, 21 Aug 2020 09:26:47 +0000 (UTC)
+Subject: Re: [PATCH 2/2] block: fix locking for struct block_device size
+ updates
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
         Josef Bacik <josef@toxicpanda.com>,
@@ -34,7 +35,7 @@ Cc:     Justin Sanders <justin@coraid.com>,
         linux-kernel@vger.kernel.org, nbd@other.debian.org,
         linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org
 References: <20200821085600.2395666-1-hch@lst.de>
- <20200821085600.2395666-2-hch@lst.de>
+ <20200821085600.2395666-3-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -80,12 +81,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <93b6d1f0-84e5-d1b9-ac00-bfb61968e2aa@suse.de>
-Date:   Fri, 21 Aug 2020 11:24:17 +0200
+Message-ID: <4df016bc-570c-d166-47dd-36a9f21fad13@suse.de>
+Date:   Fri, 21 Aug 2020 11:26:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20200821085600.2395666-2-hch@lst.de>
+In-Reply-To: <20200821085600.2395666-3-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -94,19 +95,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/21/20 10:55 AM, Christoph Hellwig wrote:
-> Replace bd_set_size with a version that takes the number of sectors
-> instead, as that fits most of the current and future callers much better.
+On 8/21/20 10:56 AM, Christoph Hellwig wrote:
+> Two different callers use two different mutexes for updating the
+> block device size, which obviously doesn't help to actually protect
+> against concurrent updates from the different callers.  In addition
+> one of the locks, bd_mutex is rather prone to deadlocks with other
+> parts of the block stack that use it for high level synchronization.
 > 
+> Switch to using a new spinlock protecting just the size updates, as
+> that is all we need, and make sure everyone does the update through
+> the proper helper.
+> 
+> This fixeѕ a bug reported with the nvme revalidating disks during a
+> hot removal operation.
+> 
+> Reported-by: Xianting Tian <xianting_tian@126.com>
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  drivers/block/loop.c     |  4 ++--
->  drivers/block/nbd.c      |  7 ++++---
->  drivers/block/pktcdvd.c  |  2 +-
->  drivers/nvme/host/nvme.h |  2 +-
->  fs/block_dev.c           | 10 +++++-----
->  include/linux/genhd.h    |  2 +-
->  6 files changed, 14 insertions(+), 13 deletions(-)
+>  block/partitions/core.c         |  4 ++--
+>  drivers/block/aoe/aoecmd.c      |  4 +---
+>  drivers/md/dm.c                 | 15 ++-------------
+>  drivers/s390/block/dasd_ioctl.c |  9 ++-------
+>  fs/block_dev.c                  | 18 +++++++++---------
+>  include/linux/blk_types.h       |  1 +
+>  6 files changed, 17 insertions(+), 34 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
