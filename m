@@ -6,93 +6,108 @@ X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2028C433E1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA46EC433E1
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:20:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A566D20738
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:17:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C857E206DA
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 20:20:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726187AbgHUURb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 16:17:31 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:41854 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725831AbgHUURa (ORCPT
+        id S1726337AbgHUUUt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 16:20:49 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:39609 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725938AbgHUUUr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 16:17:30 -0400
-Received: by mail-pl1-f193.google.com with SMTP id z23so1375897plo.8
-        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 13:17:30 -0700 (PDT)
+        Fri, 21 Aug 2020 16:20:47 -0400
+Received: by mail-pj1-f65.google.com with SMTP id j13so1287818pjd.4
+        for <linux-block@vger.kernel.org>; Fri, 21 Aug 2020 13:20:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=TvqfbIal1fhViLBt0TJDTBGBgyQJ/PvbcwMzTTzIF3Q=;
-        b=G2oZnOVn3lWX4YNmJ8BPK/K+WitXE6/ma+ApQftPepdxG/D+Lfn2tNYLgi/nP88/tX
-         KtfVoV12TaDVfmUyhrubMmDFJ9lC+smXYZKhV4YhQAm51GcWoySWVKkmm/MRq3OGj4mR
-         erH4AY1vbiHDjzBWsyOFZiT49eTfF0iEbvt4fix/e+Y/TWgaM6gIpP1A68DINxmk0/uD
-         LDGHeJSfdIZhEC/f56MV3vyWo+Yz7NoPMOGeX5+sow4uQrOCIyzlSNtRnDKTh3Pzk7kl
-         kKz0p1e/wAyGjRBlXC5XVLOpQtVIWMBl95LMlCbita1w1GnUlxxLUQCfc2kVn4Zn7W+A
-         qcnQ==
-X-Gm-Message-State: AOAM531E+9FG6wEyM7xNb0zdxR44e1+TXZBn+yHYEml+rqnWSPOl6YQS
-        zA1Uo5E5Tzb1eVVc9f/gXfo=
-X-Google-Smtp-Source: ABdhPJw6iWLIY01PJTBPYf9ddwJiu0zY5IHMSZMFyaax6pEtVMSk+Tx6CkxF6BiShYabwNfo442YPg==
-X-Received: by 2002:a17:90b:4c46:: with SMTP id np6mr3904034pjb.201.1598041049624;
-        Fri, 21 Aug 2020 13:17:29 -0700 (PDT)
+        bh=dJMzHfviirM1U8lBLyKGc//MVf+tB6J0uF/OqxxaWTw=;
+        b=tz0maaeziq01K7eg6evDoOVULG4LQ6fLLHGWjZmQFpg/AvKkwaCMcvduZrn0CUxsbq
+         cX+3pW3M1bowbhRYMlZf8LsAzjwqnJbYqdp6y8uslF7391SSDdHIiSU1lu/A+slzIw79
+         /nuLgM2Etjwxi1MU1oSR6QCv1+BQvPl3RPvlWHeX4To2WF3ihDYYqArM2HTulwbTm89N
+         xoGdqsqqpQxFqzxsZs4q9924/BvvRdL4VH0gZ8yf+8oQZuGTN9bev9AJB1/zU93u9kD1
+         lWLempQQ3zLUYYbBjx4GsPUkWJUOgX7fgwRzZhOiSM3vVIrMR+xYozabwnWzcxYrd0iE
+         xJUw==
+X-Gm-Message-State: AOAM531GjraS87NCtIgh4MAWzHDmxe4RgZ/pLnaVBN4rTdic6+e/Kupj
+        z4nEFM4z5hLPEpbIwTxBU2l5cWft6Tv0bQ==
+X-Google-Smtp-Source: ABdhPJxFXJiwnVJXLTG0fTB1XlRaZIzywZpgTA9Id7ObhHVVrknMkK1ybYTt3ImA+BlbNcR1D415UQ==
+X-Received: by 2002:a17:90a:191a:: with SMTP id 26mr3877687pjg.197.1598041246812;
+        Fri, 21 Aug 2020 13:20:46 -0700 (PDT)
 Received: from ?IPv6:2601:647:4802:9070:95a5:8a0f:6e94:b712? ([2601:647:4802:9070:95a5:8a0f:6e94:b712])
-        by smtp.gmail.com with ESMTPSA id a199sm3042782pfa.201.2020.08.21.13.17.28
+        by smtp.gmail.com with ESMTPSA id il13sm2583060pjb.0.2020.08.21.13.20.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 13:17:29 -0700 (PDT)
-Subject: Re: [PATCH 3/3] nvme-core: fix crash when nvme_enable_aen timeout
+        Fri, 21 Aug 2020 13:20:46 -0700 (PDT)
+Subject: Re: [PATCH 2/3] nvme-core: fix deadlock when reconnect failed due to
+ nvme_set_queue_count timeout
 To:     Christoph Hellwig <hch@lst.de>, Chao Leng <lengchao@huawei.com>
 Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         kbusch@kernel.org, axboe@fb.com
-References: <20200820035413.1790-1-lengchao@huawei.com>
- <fc1efcce-99d9-05cf-5f32-9c454e3b0efe@grimberg.me>
- <820d5867-3e44-a009-d6b5-ea1a3fecd037@huawei.com>
- <20200821074910.GA30216@lst.de>
+References: <20200820035406.1720-1-lengchao@huawei.com>
+ <20200821075034.GB30216@lst.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <ebfa21a4-57a1-f350-8fbc-92f35770dc93@grimberg.me>
-Date:   Fri, 21 Aug 2020 13:17:27 -0700
+Message-ID: <dbf66315-9e36-2105-535e-a90352ec5306@grimberg.me>
+Date:   Fri, 21 Aug 2020 13:20:44 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200821074910.GA30216@lst.de>
+In-Reply-To: <20200821075034.GB30216@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->>>> -static void nvme_enable_aen(struct nvme_ctrl *ctrl)
->>>> +static int nvme_enable_aen(struct nvme_ctrl *ctrl)
->>>>    {
->>>>        u32 result, supported_aens = ctrl->oaes & NVME_AEN_SUPPORTED;
->>>>        int status;
->>>>        if (!supported_aens)
->>>> -        return;
->>>> +        return 0;
->>>>        status = nvme_set_features(ctrl, NVME_FEAT_ASYNC_EVENT, supported_aens,
->>>>                NULL, 0, &result);
->>>> -    if (status)
->>>> +    if (status) {
->>>>            dev_warn(ctrl->device, "Failed to configure AEN (cfg %x)\n",
->>>>                 supported_aens);
->>>> +        if (status < 0)
->>>> +            return status;
->>>
->>> Why do you need to check status < 0, you need to fail it regardless.
+>> A deadlock happens When we test nvme over roce with link blink. The
+>> reason: link blink will cause error recovery, and then reconnect.If
+>> reconnect fail due to nvme_set_queue_count timeout, the reconnect
+>> process will set the queue count as 0 and continue , and then
+>> nvme_start_ctrl will call nvme_enable_aen, and deadlock happens
+>> because the admin queue is quiesced.
 >>
->> agree.
->> Just want to keep the old logic. I guess the old logic: if supported_aens
->> is true, the result of set features can ignore.
+>> log:
+>> Aug  3 22:47:24 localhost kernel: nvme nvme2: I/O 22 QID 0 timeout
+>> Aug  3 22:47:24 localhost kernel: nvme nvme2: Could not set queue count
+>> (881)
+>> stack:
+>> root     23848  0.0  0.0      0     0 ?        D    Aug03   0:00
+>> [kworker/u12:4+nvme-wq]
+>> [<0>] blk_execute_rq+0x69/0xa0
+>> [<0>] __nvme_submit_sync_cmd+0xaf/0x1b0 [nvme_core]
+>> [<0>] nvme_features+0x73/0xb0 [nvme_core]
+>> [<0>] nvme_start_ctrl+0xa4/0x100 [nvme_core]
+>> [<0>] nvme_rdma_setup_ctrl+0x438/0x700 [nvme_rdma]
+>> [<0>] nvme_rdma_reconnect_ctrl_work+0x22/0x30 [nvme_rdma]
+>> [<0>] process_one_work+0x1a7/0x370
+>> [<0>] worker_thread+0x30/0x380
+>> [<0>] kthread+0x112/0x130
+>> [<0>] ret_from_fork+0x35/0x40
 >>
->> If there is no objection to doing so, I will resend the patch later.
+>> Many functions which call __nvme_submit_sync_cmd treat error code in two
+>> modes: If error code less than 0, treat as command failed. If erroe code
+>> more than 0, treat as target not support or other and continue.
+>> NVME_SC_HOST_ABORTED_CMD and NVME_SC_HOST_PATH_ERROR both are cancled io
+>> by host, is not the real error code return from target. So we need set
+>> the flag:NVME_REQ_CANCELLED. Thus __nvme_submit_sync_cmd translate
+>> the error to INTR, nvme_set_queue_count will return error, reconnect
+>> process will terminate instead of continue.
 > 
-> In the past we've dedice to ignore real NVMe errors in various
-> spots as the functionality wasn't deemed critical.  I think that is
-> pretty sloppy and we should only do that where we really have to.
+> But we could still race with a real completion.  I suspect the right
+> answer is to translate NVME_SC_HOST_ABORTED_CMD and
+> NVME_SC_HOST_PATH_ERROR to a negative error code in
+> __nvme_submit_sync_cmd.
 
-Agreed.
+So the scheme you suggest is:
+- treat any negative status or !DNR as "we never made it to
+the target"
+- Any positive status with DNR is a "controller generated status"
+
+This will need a careful audit of all the call-sites we place such
+assumptions...
