@@ -6,66 +6,75 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA34FC433E1
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 07:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B393EC433E3
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 07:50:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CF8820738
-	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 07:49:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93DC52184D
+	for <linux-block@archiver.kernel.org>; Fri, 21 Aug 2020 07:50:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727905AbgHUHtO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Aug 2020 03:49:14 -0400
-Received: from verein.lst.de ([213.95.11.211]:46007 "EHLO verein.lst.de"
+        id S1728226AbgHUHuh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Aug 2020 03:50:37 -0400
+Received: from verein.lst.de ([213.95.11.211]:46018 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726332AbgHUHtO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Aug 2020 03:49:14 -0400
+        id S1727961AbgHUHug (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Aug 2020 03:50:36 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id AA26268AFE; Fri, 21 Aug 2020 09:49:10 +0200 (CEST)
-Date:   Fri, 21 Aug 2020 09:49:10 +0200
+        id 2EB0868C4E; Fri, 21 Aug 2020 09:50:35 +0200 (CEST)
+Date:   Fri, 21 Aug 2020 09:50:34 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Chao Leng <lengchao@huawei.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, kbusch@kernel.org, axboe@fb.com,
-        hch@lst.de
-Subject: Re: [PATCH 3/3] nvme-core: fix crash when nvme_enable_aen timeout
-Message-ID: <20200821074910.GA30216@lst.de>
-References: <20200820035413.1790-1-lengchao@huawei.com> <fc1efcce-99d9-05cf-5f32-9c454e3b0efe@grimberg.me> <820d5867-3e44-a009-d6b5-ea1a3fecd037@huawei.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, axboe@fb.com, hch@lst.de, sagi@grimberg.me
+Subject: Re: [PATCH 2/3] nvme-core: fix deadlock when reconnect failed due
+ to nvme_set_queue_count timeout
+Message-ID: <20200821075034.GB30216@lst.de>
+References: <20200820035406.1720-1-lengchao@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <820d5867-3e44-a009-d6b5-ea1a3fecd037@huawei.com>
+In-Reply-To: <20200820035406.1720-1-lengchao@huawei.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 20, 2020 at 02:43:20PM +0800, Chao Leng wrote:
->>> -static void nvme_enable_aen(struct nvme_ctrl *ctrl)
->>> +static int nvme_enable_aen(struct nvme_ctrl *ctrl)
->>>   {
->>>       u32 result, supported_aens = ctrl->oaes & NVME_AEN_SUPPORTED;
->>>       int status;
->>>       if (!supported_aens)
->>> -        return;
->>> +        return 0;
->>>       status = nvme_set_features(ctrl, NVME_FEAT_ASYNC_EVENT, supported_aens,
->>>               NULL, 0, &result);
->>> -    if (status)
->>> +    if (status) {
->>>           dev_warn(ctrl->device, "Failed to configure AEN (cfg %x)\n",
->>>                supported_aens);
->>> +        if (status < 0)
->>> +            return status;
->>
->> Why do you need to check status < 0, you need to fail it regardless.
->
-> agree.
-> Just want to keep the old logic. I guess the old logic: if supported_aens
-> is true, the result of set features can ignore.
->
-> If there is no objection to doing so, I will resend the patch later.
+On Thu, Aug 20, 2020 at 11:54:06AM +0800, Chao Leng wrote:
+> A deadlock happens When we test nvme over roce with link blink. The
+> reason: link blink will cause error recovery, and then reconnect.If
+> reconnect fail due to nvme_set_queue_count timeout, the reconnect
+> process will set the queue count as 0 and continue , and then
+> nvme_start_ctrl will call nvme_enable_aen, and deadlock happens
+> because the admin queue is quiesced.
+> 
+> log:
+> Aug  3 22:47:24 localhost kernel: nvme nvme2: I/O 22 QID 0 timeout
+> Aug  3 22:47:24 localhost kernel: nvme nvme2: Could not set queue count
+> (881)
+> stack:
+> root     23848  0.0  0.0      0     0 ?        D    Aug03   0:00
+> [kworker/u12:4+nvme-wq]
+> [<0>] blk_execute_rq+0x69/0xa0
+> [<0>] __nvme_submit_sync_cmd+0xaf/0x1b0 [nvme_core]
+> [<0>] nvme_features+0x73/0xb0 [nvme_core]
+> [<0>] nvme_start_ctrl+0xa4/0x100 [nvme_core]
+> [<0>] nvme_rdma_setup_ctrl+0x438/0x700 [nvme_rdma]
+> [<0>] nvme_rdma_reconnect_ctrl_work+0x22/0x30 [nvme_rdma]
+> [<0>] process_one_work+0x1a7/0x370
+> [<0>] worker_thread+0x30/0x380
+> [<0>] kthread+0x112/0x130
+> [<0>] ret_from_fork+0x35/0x40
+> 
+> Many functions which call __nvme_submit_sync_cmd treat error code in two
+> modes: If error code less than 0, treat as command failed. If erroe code
+> more than 0, treat as target not support or other and continue.
+> NVME_SC_HOST_ABORTED_CMD and NVME_SC_HOST_PATH_ERROR both are cancled io
+> by host, is not the real error code return from target. So we need set
+> the flag:NVME_REQ_CANCELLED. Thus __nvme_submit_sync_cmd translate
+> the error to INTR, nvme_set_queue_count will return error, reconnect
+> process will terminate instead of continue.
 
-In the past we've dedice to ignore real NVMe errors in various
-spots as the functionality wasn't deemed critical.  I think that is
-pretty sloppy and we should only do that where we really have to.
+But we could still race with a real completion.  I suspect the right
+answer is to translate NVME_SC_HOST_ABORTED_CMD and
+NVME_SC_HOST_PATH_ERROR to a negative error code in
+__nvme_submit_sync_cmd.
