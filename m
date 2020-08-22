@@ -7,29 +7,29 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC4EC433ED
-	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA41EC433E4
+	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E217820720
-	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA56C20720
+	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727894AbgHVLqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Aug 2020 07:46:02 -0400
+        id S1727929AbgHVLqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Aug 2020 07:46:05 -0400
 Received: from mx2.suse.de ([195.135.220.15]:56750 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727927AbgHVLp7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Aug 2020 07:45:59 -0400
+        id S1727927AbgHVLqE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 Aug 2020 07:46:04 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id BA135AD2C;
-        Sat, 22 Aug 2020 11:46:26 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 9D117AD32;
+        Sat, 22 Aug 2020 11:46:31 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v2 06/12] bcache: remove useless alloc_bucket_pages()
-Date:   Sat, 22 Aug 2020 19:45:30 +0800
-Message-Id: <20200822114536.23491-7-colyli@suse.de>
+Subject: [PATCH v2 08/12] bcache: only use bucket_bytes() on struct cache
+Date:   Sat, 22 Aug 2020 19:45:32 +0800
+Message-Id: <20200822114536.23491-9-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200822114536.23491-1-colyli@suse.de>
 References: <20200822114536.23491-1-colyli@suse.de>
@@ -40,28 +40,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now no one uses alloc_bucket_pages() anymore, remove it from bcache.h.
+Because struct cache_set and struct cache both have struct cache_sb,
+macro bucket_bytes() currently are used on both of them. When removing
+the embedded struct cache_sb from struct cache_set, this macro won't be
+used on struct cache_set anymore.
+
+This patch unifies all bucket_bytes() usage only on struct cache, this is
+one of the preparation to remove the embedded struct cache_sb from
+struct cache_set.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/md/bcache/super.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/md/bcache/bcache.h | 2 +-
+ drivers/md/bcache/sysfs.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 36a538c2e960..28257f11d835 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1832,9 +1832,6 @@ void bch_cache_set_unregister(struct cache_set *c)
- 	bch_cache_set_stop(c);
- }
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 48a2585b6bbb..94d4baf4c405 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -757,7 +757,7 @@ struct bbio {
+ #define btree_default_blocks(c)						\
+ 	((unsigned int) ((PAGE_SECTORS * (c)->btree_pages) >> (c)->block_bits))
  
--#define alloc_bucket_pages(gfp, c)			\
--	((void *) __get_free_pages(__GFP_ZERO|__GFP_COMP|gfp, ilog2(bucket_pages(c))))
--
- #define alloc_meta_bucket_pages(gfp, sb)		\
- 	((void *) __get_free_pages(__GFP_ZERO|__GFP_COMP|gfp, ilog2(meta_bucket_pages(sb))))
+-#define bucket_bytes(c)		((c)->sb.bucket_size << 9)
++#define bucket_bytes(ca)	((ca)->sb.bucket_size << 9)
+ #define block_bytes(ca)		((ca)->sb.block_size << 9)
  
+ static inline unsigned int meta_bucket_pages(struct cache_sb *sb)
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index b9f524ab5cc8..4bfe98faadcc 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -713,7 +713,7 @@ SHOW(__bch_cache_set)
+ 
+ 	sysfs_print(synchronous,		CACHE_SYNC(&c->sb));
+ 	sysfs_print(journal_delay_ms,		c->journal_delay_ms);
+-	sysfs_hprint(bucket_size,		bucket_bytes(c));
++	sysfs_hprint(bucket_size,		bucket_bytes(c->cache));
+ 	sysfs_hprint(block_size,		block_bytes(c->cache));
+ 	sysfs_print(tree_depth,			c->root->level);
+ 	sysfs_print(root_usage_percent,		bch_root_usage(c));
 -- 
 2.26.2
 
