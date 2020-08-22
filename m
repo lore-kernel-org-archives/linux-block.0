@@ -2,33 +2,36 @@ Return-Path: <SRS0=Z6dk=CA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 400FAC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EF5C433E5
 	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EDED2075E
+	by mail.kernel.org (Postfix) with ESMTP id 70B0820720
 	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727864AbgHVLpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Aug 2020 07:45:46 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56610 "EHLO mx2.suse.de"
+        id S1727827AbgHVLpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Aug 2020 07:45:51 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56676 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727087AbgHVLpo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Aug 2020 07:45:44 -0400
+        id S1726920AbgHVLpu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 Aug 2020 07:45:50 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 4DE45AD2C;
-        Sat, 22 Aug 2020 11:46:11 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 87459AEFE;
+        Sat, 22 Aug 2020 11:46:16 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v2 00/12] bcache: remove multiple caches code framework
-Date:   Sat, 22 Aug 2020 19:45:24 +0800
-Message-Id: <20200822114536.23491-1-colyli@suse.de>
+Subject: [PATCH v2 02/12] bcache: explicitly make cache_set only have single cache
+Date:   Sat, 22 Aug 2020 19:45:26 +0800
+Message-Id: <20200822114536.23491-3-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200822114536.23491-1-colyli@suse.de>
+References: <20200822114536.23491-1-colyli@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -36,71 +39,125 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The multiple caches code framework in bcache is to store multiple
-copies of the cached data among multiple caches of the cache set.
-Current code framework just does simple data write to each cache without
-any extra condition handling (e.g. device failure, slow devices). This
-code framework is not and will never be completed. Considering people
-may use md raid1 for same similar data duplication purpose, the multiple
-caches framework is useless dead code indeed.
+Currently although the bcache code has a framework for multiple caches
+in a cache set, but indeed the multiple caches never completed and users
+use md raid1 for multiple copies of the cached data.
 
-Due to the multiple caches code framework, bcache has two data structure
-struct cache and struct cache_set to manage the cache device. Indeed
-since bcache was merged into mainline kernel in Linux v3.10, a cache set
-only has one cache, the unnecessary two level abstraction makes extra
-effort to maintain redundant information between struct cache and struct
-cache set, for examaple the in-memmory super block struct cache_sb.
+This patch does the following change in struct cache_set, to explicitly
+make a cache_set only have single cache,
+- Change pointer array "*cache[MAX_CACHES_PER_SET]" to a single pointer
+  "*cache".
+- Remove pointer array "*cache_by_alloc[MAX_CACHES_PER_SET]".
+- Remove "caches_loaded".
 
-This is the first wave effort to remove multiple caches framework and
-make the code and data structure relation to be more clear. This series
-explicitly make each cache set only have single cache, and remove the
-embedded partial super block in struct cache_set and directly reference
-cache's in-memory super block.
+Now the code looks as exactly what it does in practic: only one cache is
+used in the cache set.
 
-The patch set now passes basic smoking testing, I post this series early
-for your review and comments. More fixes after testing will follow up
-soon.
-
-Thanks in advance.
-
-Coly Li 
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
-Changelog:
-v2: Add reviewed-by from Hannes Reinecke, update patches by suggestion
-    from Hannes and Christoph.
-v1: initial version.
+ drivers/md/bcache/alloc.c  |  2 +-
+ drivers/md/bcache/bcache.h |  8 +++-----
+ drivers/md/bcache/super.c  | 19 ++++++++-----------
+ 3 files changed, 12 insertions(+), 17 deletions(-)
 
-Coly Li (12):
-  bcache: remove 'int n' from parameter list of bch_bucket_alloc_set()
-  bcache: explicitly make cache_set only have single cache
-  bcache: remove for_each_cache()
-  bcache: add set_uuid in struct cache_set
-  bcache: only use block_bytes() on struct cache
-  bcache: remove useless alloc_bucket_pages()
-  bcache: remove useless bucket_pages()
-  bcache: only use bucket_bytes() on struct cache
-  bcache: don't check seq numbers in register_cache_set()
-  bcache: remove can_attach_cache()
-  bcache: check and set sync status on cache's in-memory super block
-  bcache: remove embedded struct cache_sb from struct cache_set
-
- drivers/md/bcache/alloc.c     |  60 ++++-----
- drivers/md/bcache/bcache.h    |  29 ++--
- drivers/md/bcache/btree.c     | 144 ++++++++++----------
- drivers/md/bcache/btree.h     |   2 +-
- drivers/md/bcache/debug.c     |  10 +-
- drivers/md/bcache/extents.c   |   6 +-
- drivers/md/bcache/features.c  |   4 +-
- drivers/md/bcache/io.c        |   2 +-
- drivers/md/bcache/journal.c   | 246 ++++++++++++++++------------------
- drivers/md/bcache/movinggc.c  |  58 ++++----
- drivers/md/bcache/request.c   |   6 +-
- drivers/md/bcache/super.c     | 232 ++++++++++++--------------------
- drivers/md/bcache/sysfs.c     |  10 +-
- drivers/md/bcache/writeback.c |   2 +-
- include/trace/events/bcache.h |   4 +-
- 15 files changed, 352 insertions(+), 463 deletions(-)
-
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 4493ff57476d..3385f6add6df 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -501,7 +501,7 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
+ 
+ 	bkey_init(k);
+ 
+-	ca = c->cache_by_alloc[0];
++	ca = c->cache;
+ 	b = bch_bucket_alloc(ca, reserve, wait);
+ 	if (b == -1)
+ 		goto err;
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 5ff6e9573935..aa112c1adba1 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -519,9 +519,7 @@ struct cache_set {
+ 
+ 	struct cache_sb		sb;
+ 
+-	struct cache		*cache[MAX_CACHES_PER_SET];
+-	struct cache		*cache_by_alloc[MAX_CACHES_PER_SET];
+-	int			caches_loaded;
++	struct cache		*cache;
+ 
+ 	struct bcache_device	**devices;
+ 	unsigned int		devices_max_used;
+@@ -808,7 +806,7 @@ static inline struct cache *PTR_CACHE(struct cache_set *c,
+ 				      const struct bkey *k,
+ 				      unsigned int ptr)
+ {
+-	return c->cache[PTR_DEV(k, ptr)];
++	return c->cache;
+ }
+ 
+ static inline size_t PTR_BUCKET_NR(struct cache_set *c,
+@@ -890,7 +888,7 @@ do {									\
+ /* Looping macros */
+ 
+ #define for_each_cache(ca, cs, iter)					\
+-	for (iter = 0; ca = cs->cache[iter], iter < (cs)->sb.nr_in_set; iter++)
++	for (iter = 0; ca = cs->cache, iter < 1; iter++)
+ 
+ #define for_each_bucket(b, ca)						\
+ 	for (b = (ca)->buckets + (ca)->sb.first_bucket;			\
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 7057ec48f3d1..e9ccfa17beb8 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1675,7 +1675,7 @@ static void cache_set_free(struct closure *cl)
+ 	for_each_cache(ca, c, i)
+ 		if (ca) {
+ 			ca->set = NULL;
+-			c->cache[ca->sb.nr_this_dev] = NULL;
++			c->cache = NULL;
+ 			kobject_put(&ca->kobj);
+ 		}
+ 
+@@ -2166,7 +2166,7 @@ static const char *register_cache_set(struct cache *ca)
+ 
+ 	list_for_each_entry(c, &bch_cache_sets, list)
+ 		if (!memcmp(c->sb.set_uuid, ca->sb.set_uuid, 16)) {
+-			if (c->cache[ca->sb.nr_this_dev])
++			if (c->cache)
+ 				return "duplicate cache set member";
+ 
+ 			if (!can_attach_cache(ca, c))
+@@ -2216,14 +2216,11 @@ static const char *register_cache_set(struct cache *ca)
+ 
+ 	kobject_get(&ca->kobj);
+ 	ca->set = c;
+-	ca->set->cache[ca->sb.nr_this_dev] = ca;
+-	c->cache_by_alloc[c->caches_loaded++] = ca;
++	ca->set->cache = ca;
+ 
+-	if (c->caches_loaded == c->sb.nr_in_set) {
+-		err = "failed to run cache set";
+-		if (run_cache_set(c) < 0)
+-			goto err;
+-	}
++	err = "failed to run cache set";
++	if (run_cache_set(c) < 0)
++		goto err;
+ 
+ 	return NULL;
+ err:
+@@ -2240,8 +2237,8 @@ void bch_cache_release(struct kobject *kobj)
+ 	unsigned int i;
+ 
+ 	if (ca->set) {
+-		BUG_ON(ca->set->cache[ca->sb.nr_this_dev] != ca);
+-		ca->set->cache[ca->sb.nr_this_dev] = NULL;
++		BUG_ON(ca->set->cache != ca);
++		ca->set->cache = NULL;
+ 	}
+ 
+ 	free_pages((unsigned long) ca->disk_buckets, ilog2(meta_bucket_pages(&ca->sb)));
 -- 
 2.26.2
 
