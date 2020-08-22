@@ -2,504 +2,496 @@ Return-Path: <SRS0=Z6dk=CA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8E4DC433DF
-	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 064D5C433E1
+	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 13:40:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C279C207DA
-	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1AD72078D
+	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 13:40:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSiPcFdK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727955AbgHVLqR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Aug 2020 07:46:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56948 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727927AbgHVLqQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Aug 2020 07:46:16 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 47B7FAD2C;
-        Sat, 22 Aug 2020 11:46:41 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v2 12/12] bcache: remove embedded struct cache_sb from struct cache_set
-Date:   Sat, 22 Aug 2020 19:45:36 +0800
-Message-Id: <20200822114536.23491-13-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200822114536.23491-1-colyli@suse.de>
-References: <20200822114536.23491-1-colyli@suse.de>
+        id S1728020AbgHVNkW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Aug 2020 09:40:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37311 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727994AbgHVNkS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 Aug 2020 09:40:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598103615;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IUgcbEqo3OaCczU5QhsHJbekyLWNUhLek3xSpMLNotU=;
+        b=iSiPcFdKCzjdHbsxl571K1/iC7pKYlb3OByOfRTg9mxwPwMuhqVq+HSRK3UXNj3BIRRhBn
+        kKA6Cp07G9V/9OsQ1EUMncBM18Z1zqmv6eXHlBQ8M1DStaegBMZBDDHTW/kxdX0ZQ8H1dj
+        m9KhprO9ycwyiwADRyRNpnesykV4w1Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-12itMRiHM5CNjZMiT1PdVQ-1; Sat, 22 Aug 2020 09:40:13 -0400
+X-MC-Unique: 12itMRiHM5CNjZMiT1PdVQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 170E01885D8F;
+        Sat, 22 Aug 2020 13:40:11 +0000 (UTC)
+Received: from T590 (ovpn-12-54.pek2.redhat.com [10.72.12.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 767D719728;
+        Sat, 22 Aug 2020 13:39:58 +0000 (UTC)
+Date:   Sat, 22 Aug 2020 21:39:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+Message-ID: <20200822133954.GC3189453@T590>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+ <856f6108-2227-67e8-e913-fdef296a2d26@grimberg.me>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <856f6108-2227-67e8-e913-fdef296a2d26@grimberg.me>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since bcache code was merged into mainline kerrnel, each cache set only
-as one single cache in it. The multiple caches framework is here but the
-code is far from completed. Considering the multiple copies of cached
-data can also be stored on e.g. md raid1 devices, it is unnecessary to
-support multiple caches in one cache set indeed.
+On Fri, Aug 21, 2020 at 01:14:41PM -0700, Sagi Grimberg wrote:
+> 
+> > In case of BLK_MQ_F_BLOCKING, blk-mq uses SRCU to mark read critical
+> > section during dispatching request, then request queue quiesce is based on
+> > SRCU. What we want to get is low cost added in fast path.
+> > 
+> > With percpu-ref, it is cleaner and simpler & enough for implementing queue
+> > quiesce. The main requirement is to make sure all read sections to observe
+> > QUEUE_FLAG_QUIESCED once blk_mq_quiesce_queue() returns.
+> > 
+> > Also it becomes much easier to add interface of async queue quiesce.
+> > 
+> > Meantime memory footprint can be reduced with per-request-queue percpu-ref.
+> > 
+> >  From implementation viewpoint, in fast path, not see percpu_ref is
+> > slower than SRCU, and srcu tree(default option in most distributions)
+> > could be slower since memory barrier is required in both lock & unlock,
+> > and rcu_read_lock()/rcu_read_unlock() should be much cheap than
+> > smp_mb().
+> > 
+> > 1) percpu_ref just hold the rcu_read_lock, then run a check &
+> >     increase/decrease on the percpu variable:
+> > 
+> >     rcu_read_lock()
+> >     if (__ref_is_percpu(ref, &percpu_count))
+> > 	this_cpu_inc(*percpu_count);
+> >     rcu_read_unlock()
+> > 
+> > 2) srcu tree:
+> >          idx = READ_ONCE(ssp->srcu_idx) & 0x1;
+> >          this_cpu_inc(ssp->sda->srcu_lock_count[idx]);
+> >          smp_mb(); /* B */  /* Avoid leaking the critical section. */
+> > 
+> > Also from my test on null_blk(blocking), not observe percpu-ref performs
+> > worse than srcu, see the following test:
+> > 
+> > 1) test steps:
+> > 
+> > rmmod null_blk > /dev/null 2>&1
+> > modprobe null_blk nr_devices=1 submit_queues=1 blocking=1
+> > fio --bs=4k --size=512G  --rw=randread --norandommap --direct=1 --ioengine=libaio \
+> > 	--iodepth=64 --runtime=60 --group_reporting=1  --name=nullb0 \
+> > 	--filename=/dev/nullb0 --numjobs=32
+> > 
+> > test machine: HP DL380, 16 cpu cores, 2 threads per core, dual
+> > sockets/numa, Intel(R) Xeon(R) Silver 4110 CPU @ 2.10GHz
+> > 
+> > 2) test result:
+> > - srcu quiesce: 6063K IOPS
+> > - percpu-ref quiesce: 6113K IOPS
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > Cc: Lai Jiangshan <jiangshanlai@gmail.com>
+> > Cc: Paul E. McKenney <paulmck@kernel.org>
+> > Cc: Josh Triplett <josh@joshtriplett.org>
+> > Cc: Sagi Grimberg <sagi@grimberg.me>
+> > Cc: Bart Van Assche <bvanassche@acm.org>
+> > Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+> > Cc: Chao Leng <lengchao@huawei.com>
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > 
+> > ---
+> > V1:
+> > 	- remove SRCU related comment
+> > 	- remove RFC
+> > 	- not dispatch when the dispatch percpu ref becomes not live
+> > 	- add test result on commit log
+> > 
+> >   block/blk-mq-sysfs.c   |   2 -
+> >   block/blk-mq.c         | 104 ++++++++++++++++++++---------------------
+> >   block/blk-sysfs.c      |   6 ++-
+> >   include/linux/blk-mq.h |   7 ---
+> >   include/linux/blkdev.h |   4 ++
+> >   5 files changed, 61 insertions(+), 62 deletions(-)
+> > 
+> > diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+> > index 062229395a50..799db7937105 100644
+> > --- a/block/blk-mq-sysfs.c
+> > +++ b/block/blk-mq-sysfs.c
+> > @@ -38,8 +38,6 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
+> >   	cancel_delayed_work_sync(&hctx->run_work);
+> > -	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> > -		cleanup_srcu_struct(hctx->srcu);
+> >   	blk_free_flush_queue(hctx->fq);
+> >   	sbitmap_free(&hctx->ctx_map);
+> >   	free_cpumask_var(hctx->cpumask);
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 6294fa5c7ed9..e198bd565109 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -220,19 +220,13 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+> >    */
+> >   void blk_mq_quiesce_queue(struct request_queue *q)
+> >   {
+> > -	struct blk_mq_hw_ctx *hctx;
+> > -	unsigned int i;
+> > -	bool rcu = false;
+> > -
+> >   	blk_mq_quiesce_queue_nowait(q);
+> > -	queue_for_each_hw_ctx(q, hctx, i) {
+> > -		if (hctx->flags & BLK_MQ_F_BLOCKING)
+> > -			synchronize_srcu(hctx->srcu);
+> > -		else
+> > -			rcu = true;
+> > -	}
+> > -	if (rcu)
+> > +	if (q->tag_set->flags & BLK_MQ_F_BLOCKING) {
+> > +		percpu_ref_kill(&q->dispatch_counter);
+> > +		wait_event(q->mq_quiesce_wq,
+> > +				percpu_ref_is_zero(&q->dispatch_counter));
+> 
+> Looking at the q_usage_counter percpu, it's protected with the
+> mq_freeze_lock and mq_freeze_depth, the fact that it's not protected
+> here makes this non-nesting, which scares me... We had issues before
+> in this area...
 
-The previous preparation patches fix the dependencies of explicitly
-making a cache set only have single cache. Now we don't have to maintain
-an embedded partial super block in struct cache_set, the in-memory super
-block can be directly referenced from struct cache.
+In theory, percpu_ref_kill() could be called nested, since percpu_ref_switch_lock
+covers it. However, the warning in percpu_ref_kill_and_confirm() may be
+triggered.
 
-This patch removes the embedded struct cache_sb from struct cache_set,
-and fixes all locations where the superb lock was referenced from this
-removed super block by referencing the in-memory super block of struct
-cache.
+So looks we just need one mutex to cover quiesce and unquiesce. If queue
+is being quiesced, return immediately from blk_mq_quiesce_queue().
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
----
- drivers/md/bcache/alloc.c     |  6 ++---
- drivers/md/bcache/bcache.h    |  4 +--
- drivers/md/bcache/btree.c     | 17 +++++++------
- drivers/md/bcache/btree.h     |  2 +-
- drivers/md/bcache/extents.c   |  6 ++---
- drivers/md/bcache/features.c  |  4 +--
- drivers/md/bcache/io.c        |  2 +-
- drivers/md/bcache/journal.c   | 11 ++++----
- drivers/md/bcache/request.c   |  4 +--
- drivers/md/bcache/super.c     | 47 +++++++++++++----------------------
- drivers/md/bcache/writeback.c |  2 +-
- 11 files changed, 46 insertions(+), 59 deletions(-)
+> 
+> > +	} else
+> >   		synchronize_rcu();
+> >   }
+> >   EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+> > @@ -248,6 +242,9 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+> >   {
+> >   	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+> > +	if (q->tag_set->flags & BLK_MQ_F_BLOCKING)
+> > +		percpu_ref_resurrect(&q->dispatch_counter);
+> 
+> Same comment here...
+> 
+> > +
+> >   	/* dispatch requests which are inserted during quiescing */
+> >   	blk_mq_run_hw_queues(q, true);
+> >   }
+> > @@ -699,24 +696,21 @@ void blk_mq_complete_request(struct request *rq)
+> >   }
+> >   EXPORT_SYMBOL(blk_mq_complete_request);
+> > -static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
+> > -	__releases(hctx->srcu)
+> > +static void hctx_unlock(struct blk_mq_hw_ctx *hctx)
+> >   {
+> >   	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
+> >   		rcu_read_unlock();
+> >   	else
+> > -		srcu_read_unlock(hctx->srcu, srcu_idx);
+> > +		percpu_ref_put(&hctx->queue->dispatch_counter);
+> >   }
+> > -static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+> > -	__acquires(hctx->srcu)
+> > +static inline bool hctx_lock(struct blk_mq_hw_ctx *hctx)
+> >   {
+> >   	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+> > -		/* shut up gcc false positive */
+> > -		*srcu_idx = 0;
+> >   		rcu_read_lock();
+> > +		return true;
+> >   	} else
+> > -		*srcu_idx = srcu_read_lock(hctx->srcu);
+> > +		return percpu_ref_tryget_live(&hctx->queue->dispatch_counter);
+> >   }
+> >   /**
+> > @@ -1495,8 +1489,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+> >    */
+> >   static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+> >   {
+> > -	int srcu_idx;
+> > -
+> >   	/*
+> >   	 * We should be running this queue from one of the CPUs that
+> >   	 * are mapped to it.
+> > @@ -1530,9 +1522,10 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+> >   	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+> > -	hctx_lock(hctx, &srcu_idx);
+> > -	blk_mq_sched_dispatch_requests(hctx);
+> > -	hctx_unlock(hctx, srcu_idx);
+> > +	if (hctx_lock(hctx)) {
+> > +		blk_mq_sched_dispatch_requests(hctx);
+> > +		hctx_unlock(hctx);
+> > +	}
+> 
+> Maybe invert?
+> 	if (!hctx_lock(hctx))
+> 		return;
+> 	blk_mq_sched_dispatch_requests(hctx);
+> 	hctx_unlock(hctx);
+> 
+> I think we need a comment to why this is OK, both in the change log
+> and in the code.
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index 65fdbdeb5134..8c371d5eef8e 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -87,7 +87,7 @@ void bch_rescale_priorities(struct cache_set *c, int sectors)
- {
- 	struct cache *ca;
- 	struct bucket *b;
--	unsigned long next = c->nbuckets * c->sb.bucket_size / 1024;
-+	unsigned long next = c->nbuckets * c->cache->sb.bucket_size / 1024;
- 	int r;
- 
- 	atomic_sub(sectors, &c->rescale);
-@@ -583,7 +583,7 @@ static struct open_bucket *pick_data_bucket(struct cache_set *c,
- 					   struct open_bucket, list);
- found:
- 	if (!ret->sectors_free && KEY_PTRS(alloc)) {
--		ret->sectors_free = c->sb.bucket_size;
-+		ret->sectors_free = c->cache->sb.bucket_size;
- 		bkey_copy(&ret->key, alloc);
- 		bkey_init(alloc);
- 	}
-@@ -677,7 +677,7 @@ bool bch_alloc_sectors(struct cache_set *c,
- 				&PTR_CACHE(c, &b->key, i)->sectors_written);
- 	}
- 
--	if (b->sectors_free < c->sb.block_size)
-+	if (b->sectors_free < c->cache->sb.block_size)
- 		b->sectors_free = 0;
- 
- 	/*
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 94d4baf4c405..1d57f48307e6 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -517,8 +517,6 @@ struct cache_set {
- 	atomic_t		idle_counter;
- 	atomic_t		at_max_writeback_rate;
- 
--	struct cache_sb		sb;
--
- 	struct cache		*cache;
- 
- 	struct bcache_device	**devices;
-@@ -799,7 +797,7 @@ static inline sector_t bucket_to_sector(struct cache_set *c, size_t b)
- 
- static inline sector_t bucket_remainder(struct cache_set *c, sector_t s)
- {
--	return s & (c->sb.bucket_size - 1);
-+	return s & (c->cache->sb.bucket_size - 1);
- }
- 
- static inline struct cache *PTR_CACHE(struct cache_set *c,
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index c91b4d58a5b3..d09103cc7da5 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -117,7 +117,7 @@ static void bch_btree_init_next(struct btree *b)
- 
- 	if (b->written < btree_blocks(b))
- 		bch_bset_init_next(&b->keys, write_block(b),
--				   bset_magic(&b->c->sb));
-+				   bset_magic(&b->c->cache->sb));
- 
- }
- 
-@@ -155,7 +155,7 @@ void bch_btree_node_read_done(struct btree *b)
- 	 * See the comment arount cache_set->fill_iter.
- 	 */
- 	iter = mempool_alloc(&b->c->fill_iter, GFP_NOIO);
--	iter->size = b->c->sb.bucket_size / b->c->sb.block_size;
-+	iter->size = b->c->cache->sb.bucket_size / b->c->cache->sb.block_size;
- 	iter->used = 0;
- 
- #ifdef CONFIG_BCACHE_DEBUG
-@@ -178,7 +178,7 @@ void bch_btree_node_read_done(struct btree *b)
- 			goto err;
- 
- 		err = "bad magic";
--		if (i->magic != bset_magic(&b->c->sb))
-+		if (i->magic != bset_magic(&b->c->cache->sb))
- 			goto err;
- 
- 		err = "bad checksum";
-@@ -219,7 +219,7 @@ void bch_btree_node_read_done(struct btree *b)
- 
- 	if (b->written < btree_blocks(b))
- 		bch_bset_init_next(&b->keys, write_block(b),
--				   bset_magic(&b->c->sb));
-+				   bset_magic(&b->c->cache->sb));
- out:
- 	mempool_free(iter, &b->c->fill_iter);
- 	return;
-@@ -423,7 +423,7 @@ void __bch_btree_node_write(struct btree *b, struct closure *parent)
- 
- 	do_btree_node_write(b);
- 
--	atomic_long_add(set_blocks(i, block_bytes(b->c->cache)) * b->c->sb.block_size,
-+	atomic_long_add(set_blocks(i, block_bytes(b->c->cache)) * b->c->cache->sb.block_size,
- 			&PTR_CACHE(b->c, &b->key, 0)->btree_sectors_written);
- 
- 	b->written += set_blocks(i, block_bytes(b->c->cache));
-@@ -738,7 +738,7 @@ void bch_btree_cache_free(struct cache_set *c)
- 	if (c->verify_data)
- 		list_move(&c->verify_data->list, &c->btree_cache);
- 
--	free_pages((unsigned long) c->verify_ondisk, ilog2(meta_bucket_pages(&c->sb)));
-+	free_pages((unsigned long) c->verify_ondisk, ilog2(meta_bucket_pages(&c->cache->sb)));
- #endif
- 
- 	list_splice(&c->btree_cache_freeable,
-@@ -785,7 +785,8 @@ int bch_btree_cache_alloc(struct cache_set *c)
- 	mutex_init(&c->verify_lock);
- 
- 	c->verify_ondisk = (void *)
--		__get_free_pages(GFP_KERNEL|__GFP_COMP, ilog2(meta_bucket_pages(&c->sb)));
-+		__get_free_pages(GFP_KERNEL|__GFP_COMP,
-+				 ilog2(meta_bucket_pages(&c->cache->sb)));
- 	if (!c->verify_ondisk) {
- 		/*
- 		 * Don't worry about the mca_rereserve buckets
-@@ -1108,7 +1109,7 @@ struct btree *__bch_btree_node_alloc(struct cache_set *c, struct btree_op *op,
- 	}
- 
- 	b->parent = parent;
--	bch_bset_init_next(&b->keys, b->keys.set->data, bset_magic(&b->c->sb));
-+	bch_bset_init_next(&b->keys, b->keys.set->data, bset_magic(&b->c->cache->sb));
- 
- 	mutex_unlock(&c->bucket_lock);
- 
-diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
-index 257969980c49..50482107134f 100644
---- a/drivers/md/bcache/btree.h
-+++ b/drivers/md/bcache/btree.h
-@@ -194,7 +194,7 @@ static inline unsigned int bset_block_offset(struct btree *b, struct bset *i)
- 
- static inline void set_gc_sectors(struct cache_set *c)
- {
--	atomic_set(&c->sectors_to_gc, c->sb.bucket_size * c->nbuckets / 16);
-+	atomic_set(&c->sectors_to_gc, c->cache->sb.bucket_size * c->nbuckets / 16);
- }
- 
- void bkey_put(struct cache_set *c, struct bkey *k);
-diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
-index 9162af5bb6ec..f4658a1f37b8 100644
---- a/drivers/md/bcache/extents.c
-+++ b/drivers/md/bcache/extents.c
-@@ -54,7 +54,7 @@ static bool __ptr_invalid(struct cache_set *c, const struct bkey *k)
- 			size_t bucket = PTR_BUCKET_NR(c, k, i);
- 			size_t r = bucket_remainder(c, PTR_OFFSET(k, i));
- 
--			if (KEY_SIZE(k) + r > c->sb.bucket_size ||
-+			if (KEY_SIZE(k) + r > c->cache->sb.bucket_size ||
- 			    bucket <  ca->sb.first_bucket ||
- 			    bucket >= ca->sb.nbuckets)
- 				return true;
-@@ -75,7 +75,7 @@ static const char *bch_ptr_status(struct cache_set *c, const struct bkey *k)
- 			size_t bucket = PTR_BUCKET_NR(c, k, i);
- 			size_t r = bucket_remainder(c, PTR_OFFSET(k, i));
- 
--			if (KEY_SIZE(k) + r > c->sb.bucket_size)
-+			if (KEY_SIZE(k) + r > c->cache->sb.bucket_size)
- 				return "bad, length too big";
- 			if (bucket <  ca->sb.first_bucket)
- 				return "bad, short offset";
-@@ -136,7 +136,7 @@ static void bch_bkey_dump(struct btree_keys *keys, const struct bkey *k)
- 		size_t n = PTR_BUCKET_NR(b->c, k, j);
- 
- 		pr_cont(" bucket %zu", n);
--		if (n >= b->c->sb.first_bucket && n < b->c->sb.nbuckets)
-+		if (n >= b->c->cache->sb.first_bucket && n < b->c->cache->sb.nbuckets)
- 			pr_cont(" prio %i",
- 				PTR_BUCKET(b->c, k, j)->prio);
- 	}
-diff --git a/drivers/md/bcache/features.c b/drivers/md/bcache/features.c
-index 4442df48d28c..6469223f0b77 100644
---- a/drivers/md/bcache/features.c
-+++ b/drivers/md/bcache/features.c
-@@ -30,7 +30,7 @@ static struct feature feature_list[] = {
- 	for (f = &feature_list[0]; f->compat != 0; f++) {		\
- 		if (f->compat != BCH_FEATURE_ ## type)			\
- 			continue;					\
--		if (BCH_HAS_ ## type ## _FEATURE(&c->sb, f->mask)) {	\
-+		if (BCH_HAS_ ## type ## _FEATURE(&c->cache->sb, f->mask)) {	\
- 			if (first) {					\
- 				out += snprintf(out, buf + size - out,	\
- 						"[");	\
-@@ -44,7 +44,7 @@ static struct feature feature_list[] = {
- 									\
- 		out += snprintf(out, buf + size - out, "%s", f->string);\
- 									\
--		if (BCH_HAS_ ## type ## _FEATURE(&c->sb, f->mask))	\
-+		if (BCH_HAS_ ## type ## _FEATURE(&c->cache->sb, f->mask))	\
- 			out += snprintf(out, buf + size - out, "]");	\
- 									\
- 		first = false;						\
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index a14a445618b4..dad71a6b7889 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -26,7 +26,7 @@ struct bio *bch_bbio_alloc(struct cache_set *c)
- 	struct bbio *b = mempool_alloc(&c->bio_meta, GFP_NOIO);
- 	struct bio *bio = &b->bio;
- 
--	bio_init(bio, bio->bi_inline_vecs, meta_bucket_pages(&c->sb));
-+	bio_init(bio, bio->bi_inline_vecs, meta_bucket_pages(&c->cache->sb));
- 
- 	return bio;
- }
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index e2810668ede3..c5526e5087ef 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -666,7 +666,7 @@ static void journal_reclaim(struct cache_set *c)
- 
- 	bkey_init(k);
- 	SET_KEY_PTRS(k, 1);
--	c->journal.blocks_free = c->sb.bucket_size >> c->block_bits;
-+	c->journal.blocks_free = ca->sb.bucket_size >> c->block_bits;
- 
- out:
- 	if (!journal_full(&c->journal))
-@@ -735,7 +735,7 @@ static void journal_write_unlocked(struct closure *cl)
- 	struct journal_write *w = c->journal.cur;
- 	struct bkey *k = &c->journal.key;
- 	unsigned int i, sectors = set_blocks(w->data, block_bytes(ca)) *
--		c->sb.block_size;
-+		ca->sb.block_size;
- 
- 	struct bio *bio;
- 	struct bio_list list;
-@@ -762,7 +762,7 @@ static void journal_write_unlocked(struct closure *cl)
- 	bkey_copy(&w->data->uuid_bucket, &c->uuid_bucket);
- 
- 	w->data->prio_bucket[ca->sb.nr_this_dev] = ca->prio_buckets[0];
--	w->data->magic		= jset_magic(&c->sb);
-+	w->data->magic		= jset_magic(&ca->sb);
- 	w->data->version	= BCACHE_JSET_VERSION;
- 	w->data->last_seq	= last_seq(&c->journal);
- 	w->data->csum		= csum_set(w->data);
-@@ -838,6 +838,7 @@ static struct journal_write *journal_wait_for_write(struct cache_set *c,
- 	size_t sectors;
- 	struct closure cl;
- 	bool wait = false;
-+	struct cache *ca = c->cache;
- 
- 	closure_init_stack(&cl);
- 
-@@ -847,10 +848,10 @@ static struct journal_write *journal_wait_for_write(struct cache_set *c,
- 		struct journal_write *w = c->journal.cur;
- 
- 		sectors = __set_blocks(w->data, w->data->keys + nkeys,
--				       block_bytes(c->cache)) * c->sb.block_size;
-+				       block_bytes(ca)) * ca->sb.block_size;
- 
- 		if (sectors <= min_t(size_t,
--				     c->journal.blocks_free * c->sb.block_size,
-+				     c->journal.blocks_free * ca->sb.block_size,
- 				     PAGE_SECTORS << JSET_BITS))
- 			return w;
- 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 02408fdbf5bb..37e9cf8dbfc1 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -394,8 +394,8 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
- 			goto skip;
- 	}
- 
--	if (bio->bi_iter.bi_sector & (c->sb.block_size - 1) ||
--	    bio_sectors(bio) & (c->sb.block_size - 1)) {
-+	if (bio->bi_iter.bi_sector & (c->cache->sb.block_size - 1) ||
-+	    bio_sectors(bio) & (c->cache->sb.block_size - 1)) {
- 		pr_debug("skipping unaligned io\n");
- 		goto skip;
- 	}
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 18f76d1ea0e3..d06ea4a3e500 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -350,16 +350,10 @@ void bcache_write_super(struct cache_set *c)
- 	down(&c->sb_write_mutex);
- 	closure_init(cl, &c->cl);
- 
--	c->sb.seq++;
-+	ca->sb.seq++;
- 
--	if (c->sb.version > version)
--		version = c->sb.version;
--
--	ca->sb.version		= version;
--	ca->sb.seq		= c->sb.seq;
--	ca->sb.last_mount	= c->sb.last_mount;
--
--	SET_CACHE_SYNC(&ca->sb, CACHE_SYNC(&c->sb));
-+	if (ca->sb.version < version)
-+		ca->sb.version = version;
- 
- 	bio_init(bio, ca->sb_bv, 1);
- 	bio_set_dev(bio, ca->bdev);
-@@ -477,7 +471,7 @@ static int __uuid_write(struct cache_set *c)
- {
- 	BKEY_PADDED(key) k;
- 	struct closure cl;
--	struct cache *ca;
-+	struct cache *ca = c->cache;
- 	unsigned int size;
- 
- 	closure_init_stack(&cl);
-@@ -486,13 +480,12 @@ static int __uuid_write(struct cache_set *c)
- 	if (bch_bucket_alloc_set(c, RESERVE_BTREE, &k.key, true))
- 		return 1;
- 
--	size =  meta_bucket_pages(&c->sb) * PAGE_SECTORS;
-+	size =  meta_bucket_pages(&ca->sb) * PAGE_SECTORS;
- 	SET_KEY_SIZE(&k.key, size);
- 	uuid_io(c, REQ_OP_WRITE, 0, &k.key, &cl);
- 	closure_sync(&cl);
- 
- 	/* Only one bucket used for uuid write */
--	ca = PTR_CACHE(c, &k.key, 0);
- 	atomic_long_add(ca->sb.bucket_size, &ca->meta_sectors_written);
- 
- 	bkey_copy(&c->uuid_bucket, &k.key);
-@@ -1205,7 +1198,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 		return -EINVAL;
- 	}
- 
--	if (dc->sb.block_size < c->sb.block_size) {
-+	if (dc->sb.block_size < c->cache->sb.block_size) {
- 		/* Will die */
- 		pr_err("Couldn't attach %s: block size less than set's block size\n",
- 		       dc->backing_dev_name);
-@@ -1664,6 +1657,9 @@ static void cache_set_free(struct closure *cl)
- 	bch_journal_free(c);
- 
- 	mutex_lock(&bch_register_lock);
-+	bch_bset_sort_state_free(&c->sort);
-+	free_pages((unsigned long) c->uuids, ilog2(meta_bucket_pages(&c->cache->sb)));
-+
- 	ca = c->cache;
- 	if (ca) {
- 		ca->set = NULL;
-@@ -1671,8 +1667,6 @@ static void cache_set_free(struct closure *cl)
- 		kobject_put(&ca->kobj);
- 	}
- 
--	bch_bset_sort_state_free(&c->sort);
--	free_pages((unsigned long) c->uuids, ilog2(meta_bucket_pages(&c->sb)));
- 
- 	if (c->moving_gc_wq)
- 		destroy_workqueue(c->moving_gc_wq);
-@@ -1838,6 +1832,7 @@ void bch_cache_set_unregister(struct cache_set *c)
- struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- {
- 	int iter_size;
-+	struct cache *ca = container_of(sb, struct cache, sb);
- 	struct cache_set *c = kzalloc(sizeof(struct cache_set), GFP_KERNEL);
- 
- 	if (!c)
-@@ -1860,23 +1855,15 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 	bch_cache_accounting_init(&c->accounting, &c->cl);
- 
- 	memcpy(c->set_uuid, sb->set_uuid, 16);
--	c->sb.block_size	= sb->block_size;
--	c->sb.bucket_size	= sb->bucket_size;
--	c->sb.nr_in_set		= sb->nr_in_set;
--	c->sb.last_mount	= sb->last_mount;
--	c->sb.version		= sb->version;
--	if (c->sb.version >= BCACHE_SB_VERSION_CDEV_WITH_FEATURES) {
--		c->sb.feature_compat = sb->feature_compat;
--		c->sb.feature_ro_compat = sb->feature_ro_compat;
--		c->sb.feature_incompat = sb->feature_incompat;
--	}
- 
-+	c->cache		= ca;
-+	c->cache->set		= c;
- 	c->bucket_bits		= ilog2(sb->bucket_size);
- 	c->block_bits		= ilog2(sb->block_size);
--	c->nr_uuids		= meta_bucket_bytes(&c->sb) / sizeof(struct uuid_entry);
-+	c->nr_uuids		= meta_bucket_bytes(sb) / sizeof(struct uuid_entry);
- 	c->devices_max_used	= 0;
- 	atomic_set(&c->attached_dev_nr, 0);
--	c->btree_pages		= meta_bucket_pages(&c->sb);
-+	c->btree_pages		= meta_bucket_pages(sb);
- 	if (c->btree_pages > BTREE_MAX_PAGES)
- 		c->btree_pages = max_t(int, c->btree_pages / 4,
- 				       BTREE_MAX_PAGES);
-@@ -1914,7 +1901,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 
- 	if (mempool_init_kmalloc_pool(&c->bio_meta, 2,
- 			sizeof(struct bbio) +
--			sizeof(struct bio_vec) * meta_bucket_pages(&c->sb)))
-+			sizeof(struct bio_vec) * meta_bucket_pages(sb)))
- 		goto err;
- 
- 	if (mempool_init_kmalloc_pool(&c->fill_iter, 1, iter_size))
-@@ -1924,7 +1911,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER))
- 		goto err;
- 
--	c->uuids = alloc_meta_bucket_pages(GFP_KERNEL, &c->sb);
-+	c->uuids = alloc_meta_bucket_pages(GFP_KERNEL, sb);
- 	if (!c->uuids)
- 		goto err;
- 
-@@ -2104,7 +2091,7 @@ static int run_cache_set(struct cache_set *c)
- 		goto err;
- 
- 	closure_sync(&cl);
--	c->sb.last_mount = (u32)ktime_get_real_seconds();
-+	c->cache->sb.last_mount = (u32)ktime_get_real_seconds();
- 	bcache_write_super(c);
- 
- 	list_for_each_entry_safe(dc, t, &uncached_devices, list)
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 4f4ad6b3d43a..3c74996978da 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -35,7 +35,7 @@ static uint64_t __calc_target_rate(struct cached_dev *dc)
- 	 * This is the size of the cache, minus the amount used for
- 	 * flash-only devices
- 	 */
--	uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
-+	uint64_t cache_sectors = c->nbuckets * c->cache->sb.bucket_size -
- 				atomic_long_read(&c->flash_dev_dirty_sectors);
- 
- 	/*
--- 
-2.26.2
+Fine, it is because hctx_lock() failure can be thought as queue being
+quiesced.
+
+> 
+> >   }
+> >   static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
+> > @@ -1644,7 +1637,6 @@ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+> >    */
+> >   void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+> >   {
+> > -	int srcu_idx;
+> >   	bool need_run;
+> >   	/*
+> > @@ -1655,10 +1647,12 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+> >   	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
+> >   	 * quiesced.
+> >   	 */
+> > -	hctx_lock(hctx, &srcu_idx);
+> > +	if (!hctx_lock(hctx))
+> > +		return;
+> > +
+> >   	need_run = !blk_queue_quiesced(hctx->queue) &&
+> >   		blk_mq_hctx_has_pending(hctx);
+> > -	hctx_unlock(hctx, srcu_idx);
+> > +	hctx_unlock(hctx);
+> >   	if (need_run)
+> >   		__blk_mq_delay_run_hw_queue(hctx, async, 0);
+> > @@ -1997,7 +1991,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> >   	bool run_queue = true;
+> >   	/*
+> > -	 * RCU or SRCU read lock is needed before checking quiesced flag.
+> > +	 * hctx_lock() is needed before checking quiesced flag.
+> >   	 *
+> >   	 * When queue is stopped or quiesced, ignore 'bypass_insert' from
+> >   	 * blk_mq_request_issue_directly(), and return BLK_STS_OK to caller,
+> > @@ -2045,11 +2039,13 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> >   		struct request *rq, blk_qc_t *cookie)
+> >   {
+> >   	blk_status_t ret;
+> > -	int srcu_idx;
+> >   	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+> > -	hctx_lock(hctx, &srcu_idx);
+> > +	if (!hctx_lock(hctx)) {
+> > +		blk_mq_sched_insert_request(rq, false, false, false);
+> > +		return;
+> > +	}
+> 
+> I think we want the same flow for both modes. Maybe a preparation patch
+> that lifts the checks in __blk_mq_try_issue_directly to do this, and
+> then have the same flow with the hctx_lock failure (with a comment
+> explaining this).
+
+Looks a good idea.
+
+> 
+> >   	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
+> >   	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+> > @@ -2057,19 +2053,21 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> >   	else if (ret != BLK_STS_OK)
+> >   		blk_mq_end_request(rq, ret);
+> > -	hctx_unlock(hctx, srcu_idx);
+> > +	hctx_unlock(hctx);
+> >   }
+> >   blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
+> >   {
+> >   	blk_status_t ret;
+> > -	int srcu_idx;
+> >   	blk_qc_t unused_cookie;
+> >   	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+> > -	hctx_lock(hctx, &srcu_idx);
+> > +	if (!hctx_lock(hctx)) {
+> > +		blk_mq_sched_insert_request(rq, false, false, false);
+> > +		return BLK_STS_OK;
+> > +	}
+> 
+> Same comment here.
+> 
+> >   	ret = __blk_mq_try_issue_directly(hctx, rq, &unused_cookie, true, last);
+> > -	hctx_unlock(hctx, srcu_idx);
+> > +	hctx_unlock(hctx);
+> >   	return ret;
+> >   }
+> > @@ -2600,20 +2598,6 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+> >   	}
+> >   }
+> > -static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
+> > -{
+> > -	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
+> > -
+> > -	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
+> > -			   __alignof__(struct blk_mq_hw_ctx)) !=
+> > -		     sizeof(struct blk_mq_hw_ctx));
+> > -
+> > -	if (tag_set->flags & BLK_MQ_F_BLOCKING)
+> > -		hw_ctx_size += sizeof(struct srcu_struct);
+> > -
+> > -	return hw_ctx_size;
+> > -}
+> > -
+> >   static int blk_mq_init_hctx(struct request_queue *q,
+> >   		struct blk_mq_tag_set *set,
+> >   		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
+> > @@ -2651,7 +2635,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
+> >   	struct blk_mq_hw_ctx *hctx;
+> >   	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
+> > -	hctx = kzalloc_node(blk_mq_hw_ctx_size(set), gfp, node);
+> > +	hctx = kzalloc_node(sizeof(struct blk_mq_hw_ctx), gfp, node);
+> >   	if (!hctx)
+> >   		goto fail_alloc_hctx;
+> > @@ -2693,8 +2677,6 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
+> >   	if (!hctx->fq)
+> >   		goto free_bitmap;
+> > -	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> > -		init_srcu_struct(hctx->srcu);
+> >   	blk_mq_hctx_kobj_init(hctx);
+> >   	return hctx;
+> > @@ -3171,6 +3153,13 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+> >   	mutex_unlock(&q->sysfs_lock);
+> >   }
+> > +static void blk_mq_dispatch_counter_release(struct percpu_ref *ref)
+> > +{
+> > +	struct request_queue *q = container_of(ref, struct request_queue,
+> > +				dispatch_counter);
+> > +	wake_up_all(&q->mq_quiesce_wq);
+> > +}
+> > +
+> >   struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> >   						  struct request_queue *q,
+> >   						  bool elevator_init)
+> > @@ -3187,6 +3176,14 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> >   	if (blk_mq_alloc_ctxs(q))
+> >   		goto err_poll;
+> > +	if (set->flags & BLK_MQ_F_BLOCKING) {
+> > +		init_waitqueue_head(&q->mq_quiesce_wq);
+> > +		if (percpu_ref_init(&q->dispatch_counter,
+> > +					blk_mq_dispatch_counter_release,
+> > +					PERCPU_REF_ALLOW_REINIT, GFP_KERNEL))
+> > +			goto err_hctxs;
+> > +	}
+> > +
+> >   	/* init q->mq_kobj and sw queues' kobjects */
+> >   	blk_mq_sysfs_init(q);
+> > @@ -3195,7 +3192,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> >   	blk_mq_realloc_hw_ctxs(set, q);
+> >   	if (!q->nr_hw_queues)
+> > -		goto err_hctxs;
+> > +		goto err_dispatch_counter;
+> >   	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
+> >   	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
+> > @@ -3229,6 +3226,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> >   	return q;
+> > +err_dispatch_counter:
+> > +	if (set->flags & BLK_MQ_F_BLOCKING)
+> > +		percpu_ref_exit(&q->dispatch_counter);
+> >   err_hctxs:
+> >   	kfree(q->queue_hw_ctx);
+> >   	q->nr_hw_queues = 0;
+> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > index 7dda709f3ccb..56b6c045e30c 100644
+> > --- a/block/blk-sysfs.c
+> > +++ b/block/blk-sysfs.c
+> > @@ -941,9 +941,13 @@ static void blk_release_queue(struct kobject *kobj)
+> >   	blk_queue_free_zone_bitmaps(q);
+> > -	if (queue_is_mq(q))
+> > +	if (queue_is_mq(q)) {
+> >   		blk_mq_release(q);
+> > +		if (q->tag_set->flags & BLK_MQ_F_BLOCKING)
+> > +			percpu_ref_exit(&q->dispatch_counter);
+> > +	}
+> > +
+> >   	blk_trace_shutdown(q);
+> >   	mutex_lock(&q->debugfs_mutex);
+> >   	debugfs_remove_recursive(q->debugfs_dir);
+> > diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> > index 9d2d5ad367a4..ea3461298de5 100644
+> > --- a/include/linux/blk-mq.h
+> > +++ b/include/linux/blk-mq.h
+> > @@ -169,13 +169,6 @@ struct blk_mq_hw_ctx {
+> >   	 * q->unused_hctx_list.
+> >   	 */
+> >   	struct list_head	hctx_list;
+> > -
+> > -	/**
+> > -	 * @srcu: Sleepable RCU. Use as lock when type of the hardware queue is
+> > -	 * blocking (BLK_MQ_F_BLOCKING). Must be the last member - see also
+> > -	 * blk_mq_hw_ctx_size().
+> > -	 */
+> > -	struct srcu_struct	srcu[];
+> >   };
+> >   /**
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index bb5636cc17b9..5fa8bc1bb7a8 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -572,6 +572,10 @@ struct request_queue {
+> >   	struct list_head	tag_set_list;
+> >   	struct bio_set		bio_split;
+> > +	/* only used for BLK_MQ_F_BLOCKING */
+> > +	struct percpu_ref	dispatch_counter;
+> 
+> Can this be moved to be next to the q_usage_counter? they
+> will be taken together for blocking drivers...
+
+I don't think it is a good idea, at least hctx->srcu is put at the end
+of hctx, do you want to move it at beginning of hctx?
+
+.q_usage_counter should have been put in the 1st cacheline of
+request queue. If it is moved to the 1st cacheline of request queue,
+we shouldn't put 'dispatch_counter' there, because it may hurt other
+non-blocking drivers.
+
+> 
+> Also maybe a better name is needed here since it's just
+> for blocking hctxs.
+> 
+> > +	wait_queue_head_t	mq_quiesce_wq;
+> > +
+> >   	struct dentry		*debugfs_dir;
+> >   #ifdef CONFIG_BLK_DEBUG_FS
+> > 
+> 
+> What I think is needed here is at a minimum test quiesce/unquiesce loops
+> during I/O. code auditing is not enough, there may be driver assumptions
+> broken with this change (although I hope there shouldn't be).
+
+We have elevator switch / updating nr_request stress test, and both relies
+on quiesce/unquiesce, and I did run such test with this patch.
+
+
+thanks, 
+Ming
 
