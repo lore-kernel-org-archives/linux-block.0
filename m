@@ -4,32 +4,32 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 236C4C433E8
-	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:05 +0000 (UTC)
-Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F176620720
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC4EC433ED
 	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:04 +0000 (UTC)
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by mail.kernel.org (Postfix) with ESMTP id E217820720
+	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727940AbgHVLqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Aug 2020 07:46:03 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56768 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727929AbgHVLqC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727894AbgHVLqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 22 Aug 2020 07:46:02 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56750 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727927AbgHVLp7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 Aug 2020 07:45:59 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id B5572B13D;
-        Sat, 22 Aug 2020 11:46:29 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id BA135AD2C;
+        Sat, 22 Aug 2020 11:46:26 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v2 07/12] bcache: remove useless bucket_pages()
-Date:   Sat, 22 Aug 2020 19:45:31 +0800
-Message-Id: <20200822114536.23491-8-colyli@suse.de>
+Subject: [PATCH v2 06/12] bcache: remove useless alloc_bucket_pages()
+Date:   Sat, 22 Aug 2020 19:45:30 +0800
+Message-Id: <20200822114536.23491-7-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200822114536.23491-1-colyli@suse.de>
 References: <20200822114536.23491-1-colyli@suse.de>
@@ -40,27 +40,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It seems alloc_bucket_pages() is the only user of bucket_pages().
-Considering alloc_bucket_pages() is removed from bcache code, it is safe
-to remove the useless macro bucket_pages() now.
+Now no one uses alloc_bucket_pages() anymore, remove it from bcache.h.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/md/bcache/bcache.h | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/md/bcache/super.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 29bec61cafbb..48a2585b6bbb 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -757,7 +757,6 @@ struct bbio {
- #define btree_default_blocks(c)						\
- 	((unsigned int) ((PAGE_SECTORS * (c)->btree_pages) >> (c)->block_bits))
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 36a538c2e960..28257f11d835 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1832,9 +1832,6 @@ void bch_cache_set_unregister(struct cache_set *c)
+ 	bch_cache_set_stop(c);
+ }
  
--#define bucket_pages(c)		((c)->sb.bucket_size / PAGE_SECTORS)
- #define bucket_bytes(c)		((c)->sb.bucket_size << 9)
- #define block_bytes(ca)		((ca)->sb.block_size << 9)
+-#define alloc_bucket_pages(gfp, c)			\
+-	((void *) __get_free_pages(__GFP_ZERO|__GFP_COMP|gfp, ilog2(bucket_pages(c))))
+-
+ #define alloc_meta_bucket_pages(gfp, sb)		\
+ 	((void *) __get_free_pages(__GFP_ZERO|__GFP_COMP|gfp, ilog2(meta_bucket_pages(sb))))
  
 -- 
 2.26.2
