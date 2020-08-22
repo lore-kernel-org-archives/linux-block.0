@@ -2,34 +2,34 @@ Return-Path: <SRS0=Z6dk=CA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B41ACC433DF
-	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4066FC433E1
+	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BA0220720
-	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1ADD4207CD
+	for <linux-block@archiver.kernel.org>; Sat, 22 Aug 2020 11:46:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727935AbgHVLqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Aug 2020 07:46:02 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56726 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727894AbgHVLp5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727920AbgHVLp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 22 Aug 2020 07:45:57 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56690 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727006AbgHVLpz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 Aug 2020 07:45:55 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 7CA61AEFE;
-        Sat, 22 Aug 2020 11:46:24 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 5754DAD2C;
+        Sat, 22 Aug 2020 11:46:19 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v2 05/12] bcache: only use block_bytes() on struct cache
-Date:   Sat, 22 Aug 2020 19:45:29 +0800
-Message-Id: <20200822114536.23491-6-colyli@suse.de>
+Subject: [PATCH v2 03/12] bcache: remove for_each_cache()
+Date:   Sat, 22 Aug 2020 19:45:27 +0800
+Message-Id: <20200822114536.23491-4-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200822114536.23491-1-colyli@suse.de>
 References: <20200822114536.23491-1-colyli@suse.de>
@@ -40,255 +40,893 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Because struct cache_set and struct cache both have struct cache_sb,
-therefore macro block_bytes() can be used on both of them. When removing
-the embedded struct cache_sb from struct cache_set, this macro won't be
-used on struct cache_set anymore.
-
-This patch unifies all block_bytes() usage only on struct cache, this is
-one of the preparation to remove the embedded struct cache_sb from
-struct cache_set.
+Since now each cache_set explicitly has single cache, for_each_cache()
+is unnecessary. This patch removes this macro, and update all locations
+where it is used, and makes sure all code logic still being consistent.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/md/bcache/bcache.h  |  2 +-
- drivers/md/bcache/btree.c   | 24 ++++++++++++------------
- drivers/md/bcache/debug.c   |  8 ++++----
- drivers/md/bcache/journal.c |  8 ++++----
- drivers/md/bcache/request.c |  2 +-
- drivers/md/bcache/super.c   |  2 +-
- drivers/md/bcache/sysfs.c   |  2 +-
- 7 files changed, 24 insertions(+), 24 deletions(-)
+ drivers/md/bcache/alloc.c    |  17 ++-
+ drivers/md/bcache/bcache.h   |   9 +-
+ drivers/md/bcache/btree.c    | 103 +++++++---------
+ drivers/md/bcache/journal.c  | 229 ++++++++++++++++-------------------
+ drivers/md/bcache/movinggc.c |  58 +++++----
+ drivers/md/bcache/super.c    | 115 ++++++++----------
+ 6 files changed, 237 insertions(+), 294 deletions(-)
 
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 3385f6add6df..1b8310992dd0 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -88,7 +88,6 @@ void bch_rescale_priorities(struct cache_set *c, int sectors)
+ 	struct cache *ca;
+ 	struct bucket *b;
+ 	unsigned long next = c->nbuckets * c->sb.bucket_size / 1024;
+-	unsigned int i;
+ 	int r;
+ 
+ 	atomic_sub(sectors, &c->rescale);
+@@ -104,14 +103,14 @@ void bch_rescale_priorities(struct cache_set *c, int sectors)
+ 
+ 	c->min_prio = USHRT_MAX;
+ 
+-	for_each_cache(ca, c, i)
+-		for_each_bucket(b, ca)
+-			if (b->prio &&
+-			    b->prio != BTREE_PRIO &&
+-			    !atomic_read(&b->pin)) {
+-				b->prio--;
+-				c->min_prio = min(c->min_prio, b->prio);
+-			}
++	ca = c->cache;
++	for_each_bucket(b, ca)
++		if (b->prio &&
++		    b->prio != BTREE_PRIO &&
++		    !atomic_read(&b->pin)) {
++			b->prio--;
++			c->min_prio = min(c->min_prio, b->prio);
++		}
+ 
+ 	mutex_unlock(&c->bucket_lock);
+ }
 diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 94a62acac4fc..29bec61cafbb 100644
+index aa112c1adba1..7ffe6b2d179b 100644
 --- a/drivers/md/bcache/bcache.h
 +++ b/drivers/md/bcache/bcache.h
-@@ -759,7 +759,7 @@ struct bbio {
+@@ -887,9 +887,6 @@ do {									\
  
- #define bucket_pages(c)		((c)->sb.bucket_size / PAGE_SECTORS)
- #define bucket_bytes(c)		((c)->sb.bucket_size << 9)
--#define block_bytes(c)		((c)->sb.block_size << 9)
-+#define block_bytes(ca)		((ca)->sb.block_size << 9)
+ /* Looping macros */
  
- static inline unsigned int meta_bucket_pages(struct cache_sb *sb)
+-#define for_each_cache(ca, cs, iter)					\
+-	for (iter = 0; ca = cs->cache, iter < 1; iter++)
+-
+ #define for_each_bucket(b, ca)						\
+ 	for (b = (ca)->buckets + (ca)->sb.first_bucket;			\
+ 	     b < (ca)->buckets + (ca)->sb.nbuckets; b++)
+@@ -931,11 +928,9 @@ static inline uint8_t bucket_gc_gen(struct bucket *b)
+ 
+ static inline void wake_up_allocators(struct cache_set *c)
  {
+-	struct cache *ca;
+-	unsigned int i;
++	struct cache *ca = c->cache;
+ 
+-	for_each_cache(ca, c, i)
+-		wake_up_process(ca->alloc_thread);
++	wake_up_process(ca->alloc_thread);
+ }
+ 
+ static inline void closure_bio_submit(struct cache_set *c,
 diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 0817ad510d9f..c91b4d58a5b3 100644
+index e2a719fed53b..0817ad510d9f 100644
 --- a/drivers/md/bcache/btree.c
 +++ b/drivers/md/bcache/btree.c
-@@ -104,7 +104,7 @@
- 
- static inline struct bset *write_block(struct btree *b)
+@@ -1167,19 +1167,18 @@ static void make_btree_freeing_key(struct btree *b, struct bkey *k)
+ static int btree_check_reserve(struct btree *b, struct btree_op *op)
  {
--	return ((void *) btree_bset_first(b)) + b->written * block_bytes(b->c);
-+	return ((void *) btree_bset_first(b)) + b->written * block_bytes(b->c->cache);
+ 	struct cache_set *c = b->c;
+-	struct cache *ca;
+-	unsigned int i, reserve = (c->root->level - b->level) * 2 + 1;
++	struct cache *ca = c->cache;
++	unsigned int reserve = (c->root->level - b->level) * 2 + 1;
+ 
+ 	mutex_lock(&c->bucket_lock);
+ 
+-	for_each_cache(ca, c, i)
+-		if (fifo_used(&ca->free[RESERVE_BTREE]) < reserve) {
+-			if (op)
+-				prepare_to_wait(&c->btree_cache_wait, &op->wait,
+-						TASK_UNINTERRUPTIBLE);
+-			mutex_unlock(&c->bucket_lock);
+-			return -EINTR;
+-		}
++	if (fifo_used(&ca->free[RESERVE_BTREE]) < reserve) {
++		if (op)
++			prepare_to_wait(&c->btree_cache_wait, &op->wait,
++					TASK_UNINTERRUPTIBLE);
++		mutex_unlock(&c->bucket_lock);
++		return -EINTR;
++	}
+ 
+ 	mutex_unlock(&c->bucket_lock);
+ 
+@@ -1695,7 +1694,6 @@ static void btree_gc_start(struct cache_set *c)
+ {
+ 	struct cache *ca;
+ 	struct bucket *b;
+-	unsigned int i;
+ 
+ 	if (!c->gc_mark_valid)
+ 		return;
+@@ -1705,14 +1703,14 @@ static void btree_gc_start(struct cache_set *c)
+ 	c->gc_mark_valid = 0;
+ 	c->gc_done = ZERO_KEY;
+ 
+-	for_each_cache(ca, c, i)
+-		for_each_bucket(b, ca) {
+-			b->last_gc = b->gen;
+-			if (!atomic_read(&b->pin)) {
+-				SET_GC_MARK(b, 0);
+-				SET_GC_SECTORS_USED(b, 0);
+-			}
++	ca = c->cache;
++	for_each_bucket(b, ca) {
++		b->last_gc = b->gen;
++		if (!atomic_read(&b->pin)) {
++			SET_GC_MARK(b, 0);
++			SET_GC_SECTORS_USED(b, 0);
+ 		}
++	}
+ 
+ 	mutex_unlock(&c->bucket_lock);
  }
+@@ -1721,7 +1719,8 @@ static void bch_btree_gc_finish(struct cache_set *c)
+ {
+ 	struct bucket *b;
+ 	struct cache *ca;
+-	unsigned int i;
++	unsigned int i, j;
++	uint64_t *k;
  
- static void bch_btree_init_next(struct btree *b)
-@@ -173,7 +173,7 @@ void bch_btree_node_read_done(struct btree *b)
- 			goto err;
+ 	mutex_lock(&c->bucket_lock);
  
- 		err = "bad btree header";
--		if (b->written + set_blocks(i, block_bytes(b->c)) >
-+		if (b->written + set_blocks(i, block_bytes(b->c->cache)) >
- 		    btree_blocks(b))
- 			goto err;
+@@ -1739,7 +1738,6 @@ static void bch_btree_gc_finish(struct cache_set *c)
+ 		struct bcache_device *d = c->devices[i];
+ 		struct cached_dev *dc;
+ 		struct keybuf_key *w, *n;
+-		unsigned int j;
  
-@@ -199,13 +199,13 @@ void bch_btree_node_read_done(struct btree *b)
+ 		if (!d || UUID_FLASH_ONLY(&c->uuids[i]))
+ 			continue;
+@@ -1756,29 +1754,27 @@ static void bch_btree_gc_finish(struct cache_set *c)
+ 	rcu_read_unlock();
  
- 		bch_btree_iter_push(iter, i->start, bset_bkey_last(i));
+ 	c->avail_nbuckets = 0;
+-	for_each_cache(ca, c, i) {
+-		uint64_t *i;
  
--		b->written += set_blocks(i, block_bytes(b->c));
-+		b->written += set_blocks(i, block_bytes(b->c->cache));
+-		ca->invalidate_needs_gc = 0;
++	ca = c->cache;
++	ca->invalidate_needs_gc = 0;
+ 
+-		for (i = ca->sb.d; i < ca->sb.d + ca->sb.keys; i++)
+-			SET_GC_MARK(ca->buckets + *i, GC_MARK_METADATA);
++	for (k = ca->sb.d; k < ca->sb.d + ca->sb.keys; k++)
++		SET_GC_MARK(ca->buckets + *k, GC_MARK_METADATA);
+ 
+-		for (i = ca->prio_buckets;
+-		     i < ca->prio_buckets + prio_buckets(ca) * 2; i++)
+-			SET_GC_MARK(ca->buckets + *i, GC_MARK_METADATA);
++	for (k = ca->prio_buckets;
++	     k < ca->prio_buckets + prio_buckets(ca) * 2; k++)
++		SET_GC_MARK(ca->buckets + *k, GC_MARK_METADATA);
+ 
+-		for_each_bucket(b, ca) {
+-			c->need_gc	= max(c->need_gc, bucket_gc_gen(b));
++	for_each_bucket(b, ca) {
++		c->need_gc	= max(c->need_gc, bucket_gc_gen(b));
+ 
+-			if (atomic_read(&b->pin))
+-				continue;
++		if (atomic_read(&b->pin))
++			continue;
+ 
+-			BUG_ON(!GC_MARK(b) && GC_SECTORS_USED(b));
++		BUG_ON(!GC_MARK(b) && GC_SECTORS_USED(b));
+ 
+-			if (!GC_MARK(b) || GC_MARK(b) == GC_MARK_RECLAIMABLE)
+-				c->avail_nbuckets++;
+-		}
++		if (!GC_MARK(b) || GC_MARK(b) == GC_MARK_RECLAIMABLE)
++			c->avail_nbuckets++;
  	}
  
- 	err = "corrupted btree";
- 	for (i = write_block(b);
- 	     bset_sector_offset(&b->keys, i) < KEY_SIZE(&b->key);
--	     i = ((void *) i) + block_bytes(b->c))
-+	     i = ((void *) i) + block_bytes(b->c->cache))
- 		if (i->seq == b->keys.set[0].data->seq)
- 			goto err;
+ 	mutex_unlock(&c->bucket_lock);
+@@ -1830,12 +1826,10 @@ static void bch_btree_gc(struct cache_set *c)
  
-@@ -347,7 +347,7 @@ static void do_btree_node_write(struct btree *b)
- 
- 	b->bio->bi_end_io	= btree_node_write_endio;
- 	b->bio->bi_private	= cl;
--	b->bio->bi_iter.bi_size	= roundup(set_bytes(i), block_bytes(b->c));
-+	b->bio->bi_iter.bi_size	= roundup(set_bytes(i), block_bytes(b->c->cache));
- 	b->bio->bi_opf		= REQ_OP_WRITE | REQ_META | REQ_FUA;
- 	bch_bio_map(b->bio, i);
- 
-@@ -423,10 +423,10 @@ void __bch_btree_node_write(struct btree *b, struct closure *parent)
- 
- 	do_btree_node_write(b);
- 
--	atomic_long_add(set_blocks(i, block_bytes(b->c)) * b->c->sb.block_size,
-+	atomic_long_add(set_blocks(i, block_bytes(b->c->cache)) * b->c->sb.block_size,
- 			&PTR_CACHE(b->c, &b->key, 0)->btree_sectors_written);
- 
--	b->written += set_blocks(i, block_bytes(b->c));
-+	b->written += set_blocks(i, block_bytes(b->c->cache));
- }
- 
- void bch_btree_node_write(struct btree *b, struct closure *parent)
-@@ -1344,7 +1344,7 @@ static int btree_gc_coalesce(struct btree *b, struct btree_op *op,
- 
- 	if (nodes < 2 ||
- 	    __set_blocks(b->keys.set[0].data, keys,
--			 block_bytes(b->c)) > blocks * (nodes - 1))
-+			 block_bytes(b->c->cache)) > blocks * (nodes - 1))
- 		return 0;
- 
- 	for (i = 0; i < nodes; i++) {
-@@ -1378,7 +1378,7 @@ static int btree_gc_coalesce(struct btree *b, struct btree_op *op,
- 			     k = bkey_next(k)) {
- 				if (__set_blocks(n1, n1->keys + keys +
- 						 bkey_u64s(k),
--						 block_bytes(b->c)) > blocks)
-+						 block_bytes(b->c->cache)) > blocks)
- 					break;
- 
- 				last = k;
-@@ -1394,7 +1394,7 @@ static int btree_gc_coalesce(struct btree *b, struct btree_op *op,
- 			 * though)
- 			 */
- 			if (__set_blocks(n1, n1->keys + n2->keys,
--					 block_bytes(b->c)) >
-+					 block_bytes(b->c->cache)) >
- 			    btree_blocks(new_nodes[i]))
- 				goto out_unlock_nocoalesce;
- 
-@@ -1403,7 +1403,7 @@ static int btree_gc_coalesce(struct btree *b, struct btree_op *op,
- 			last = &r->b->key;
- 		}
- 
--		BUG_ON(__set_blocks(n1, n1->keys + keys, block_bytes(b->c)) >
-+		BUG_ON(__set_blocks(n1, n1->keys + keys, block_bytes(b->c->cache)) >
- 		       btree_blocks(new_nodes[i]));
- 
- 		if (last)
-@@ -2210,7 +2210,7 @@ static int btree_split(struct btree *b, struct btree_op *op,
- 		goto err;
- 
- 	split = set_blocks(btree_bset_first(n1),
--			   block_bytes(n1->c)) > (btree_blocks(b) * 4) / 5;
-+			   block_bytes(n1->c->cache)) > (btree_blocks(b) * 4) / 5;
- 
- 	if (split) {
- 		unsigned int keys = 0;
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 0ccc1b0baa42..b00fd08d696b 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -25,8 +25,8 @@ struct dentry *bcache_debug;
- 	for (i = (start);						\
- 	     (void *) i < (void *) (start) + (KEY_SIZE(&b->key) << 9) &&\
- 	     i->seq == (start)->seq;					\
--	     i = (void *) i + set_blocks(i, block_bytes(b->c)) *	\
--		 block_bytes(b->c))
-+	     i = (void *) i + set_blocks(i, block_bytes(b->c->cache)) *	\
-+		 block_bytes(b->c->cache))
- 
- void bch_btree_verify(struct btree *b)
+ static bool gc_should_run(struct cache_set *c)
  {
-@@ -82,14 +82,14 @@ void bch_btree_verify(struct btree *b)
+-	struct cache *ca;
+-	unsigned int i;
++	struct cache *ca = c->cache;
  
- 		for_each_written_bset(b, ondisk, i) {
- 			unsigned int block = ((void *) i - (void *) ondisk) /
--				block_bytes(b->c);
-+				block_bytes(b->c->cache);
+-	for_each_cache(ca, c, i)
+-		if (ca->invalidate_needs_gc)
+-			return true;
++	if (ca->invalidate_needs_gc)
++		return true;
  
- 			pr_err("*** on disk block %u:\n", block);
- 			bch_dump_bset(&b->keys, i, block);
+ 	if (atomic_read(&c->sectors_to_gc) < 0)
+ 		return true;
+@@ -2081,9 +2075,8 @@ int bch_btree_check(struct cache_set *c)
+ 
+ void bch_initial_gc_finish(struct cache_set *c)
+ {
+-	struct cache *ca;
++	struct cache *ca = c->cache;
+ 	struct bucket *b;
+-	unsigned int i;
+ 
+ 	bch_btree_gc_finish(c);
+ 
+@@ -2098,20 +2091,18 @@ void bch_initial_gc_finish(struct cache_set *c)
+ 	 * This is only safe for buckets that have no live data in them, which
+ 	 * there should always be some of.
+ 	 */
+-	for_each_cache(ca, c, i) {
+-		for_each_bucket(b, ca) {
+-			if (fifo_full(&ca->free[RESERVE_PRIO]) &&
+-			    fifo_full(&ca->free[RESERVE_BTREE]))
+-				break;
++	for_each_bucket(b, ca) {
++		if (fifo_full(&ca->free[RESERVE_PRIO]) &&
++		    fifo_full(&ca->free[RESERVE_BTREE]))
++			break;
+ 
+-			if (bch_can_invalidate_bucket(ca, b) &&
+-			    !GC_MARK(b)) {
+-				__bch_invalidate_one_bucket(ca, b);
+-				if (!fifo_push(&ca->free[RESERVE_PRIO],
+-				   b - ca->buckets))
+-					fifo_push(&ca->free[RESERVE_BTREE],
+-						  b - ca->buckets);
+-			}
++		if (bch_can_invalidate_bucket(ca, b) &&
++		    !GC_MARK(b)) {
++			__bch_invalidate_one_bucket(ca, b);
++			if (!fifo_push(&ca->free[RESERVE_PRIO],
++			   b - ca->buckets))
++				fifo_push(&ca->free[RESERVE_BTREE],
++					  b - ca->buckets);
  		}
+ 	}
  
- 		pr_err("*** block %zu not written\n",
--		       ((void *) i - (void *) ondisk) / block_bytes(b->c));
-+		       ((void *) i - (void *) ondisk) / block_bytes(b->c->cache));
- 
- 		for (j = 0; j < inmemory->keys; j++)
- 			if (inmemory->d[j] != sorted->d[j])
 diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index 027d0f8c4daf..ccd5de0ab0fe 100644
+index 77fbfd52edcf..027d0f8c4daf 100644
 --- a/drivers/md/bcache/journal.c
 +++ b/drivers/md/bcache/journal.c
-@@ -98,7 +98,7 @@ reread:		left = ca->sb.bucket_size - offset;
- 				return ret;
- 			}
+@@ -179,112 +179,109 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
+ 		ret;							\
+ 	})
  
--			blocks = set_blocks(j, block_bytes(ca->set));
-+			blocks = set_blocks(j, block_bytes(ca));
+-	struct cache *ca;
+-	unsigned int iter;
++	struct cache *ca = c->cache;
+ 	int ret = 0;
++	struct journal_device *ja = &ca->journal;
++	DECLARE_BITMAP(bitmap, SB_JOURNAL_BUCKETS);
++	unsigned int i, l, r, m;
++	uint64_t seq;
  
- 			/*
- 			 * Nodes in 'list' are in linear increasing order of
-@@ -734,7 +734,7 @@ static void journal_write_unlocked(struct closure *cl)
- 	struct cache *ca = c->cache;
+-	for_each_cache(ca, c, iter) {
+-		struct journal_device *ja = &ca->journal;
+-		DECLARE_BITMAP(bitmap, SB_JOURNAL_BUCKETS);
+-		unsigned int i, l, r, m;
+-		uint64_t seq;
+-
+-		bitmap_zero(bitmap, SB_JOURNAL_BUCKETS);
+-		pr_debug("%u journal buckets\n", ca->sb.njournal_buckets);
++	bitmap_zero(bitmap, SB_JOURNAL_BUCKETS);
++	pr_debug("%u journal buckets\n", ca->sb.njournal_buckets);
+ 
++	/*
++	 * Read journal buckets ordered by golden ratio hash to quickly
++	 * find a sequence of buckets with valid journal entries
++	 */
++	for (i = 0; i < ca->sb.njournal_buckets; i++) {
+ 		/*
+-		 * Read journal buckets ordered by golden ratio hash to quickly
+-		 * find a sequence of buckets with valid journal entries
++		 * We must try the index l with ZERO first for
++		 * correctness due to the scenario that the journal
++		 * bucket is circular buffer which might have wrapped
+ 		 */
+-		for (i = 0; i < ca->sb.njournal_buckets; i++) {
+-			/*
+-			 * We must try the index l with ZERO first for
+-			 * correctness due to the scenario that the journal
+-			 * bucket is circular buffer which might have wrapped
+-			 */
+-			l = (i * 2654435769U) % ca->sb.njournal_buckets;
++		l = (i * 2654435769U) % ca->sb.njournal_buckets;
+ 
+-			if (test_bit(l, bitmap))
+-				break;
++		if (test_bit(l, bitmap))
++			break;
+ 
+-			if (read_bucket(l))
+-				goto bsearch;
+-		}
++		if (read_bucket(l))
++			goto bsearch;
++	}
+ 
+-		/*
+-		 * If that fails, check all the buckets we haven't checked
+-		 * already
+-		 */
+-		pr_debug("falling back to linear search\n");
++	/*
++	 * If that fails, check all the buckets we haven't checked
++	 * already
++	 */
++	pr_debug("falling back to linear search\n");
+ 
+-		for_each_clear_bit(l, bitmap, ca->sb.njournal_buckets)
+-			if (read_bucket(l))
+-				goto bsearch;
++	for_each_clear_bit(l, bitmap, ca->sb.njournal_buckets)
++		if (read_bucket(l))
++			goto bsearch;
+ 
+-		/* no journal entries on this device? */
+-		if (l == ca->sb.njournal_buckets)
+-			continue;
++	/* no journal entries on this device? */
++	if (l == ca->sb.njournal_buckets)
++		goto out;
+ bsearch:
+-		BUG_ON(list_empty(list));
++	BUG_ON(list_empty(list));
+ 
+-		/* Binary search */
+-		m = l;
+-		r = find_next_bit(bitmap, ca->sb.njournal_buckets, l + 1);
+-		pr_debug("starting binary search, l %u r %u\n", l, r);
++	/* Binary search */
++	m = l;
++	r = find_next_bit(bitmap, ca->sb.njournal_buckets, l + 1);
++	pr_debug("starting binary search, l %u r %u\n", l, r);
+ 
+-		while (l + 1 < r) {
+-			seq = list_entry(list->prev, struct journal_replay,
+-					 list)->j.seq;
++	while (l + 1 < r) {
++		seq = list_entry(list->prev, struct journal_replay,
++				 list)->j.seq;
+ 
+-			m = (l + r) >> 1;
+-			read_bucket(m);
++		m = (l + r) >> 1;
++		read_bucket(m);
+ 
+-			if (seq != list_entry(list->prev, struct journal_replay,
+-					      list)->j.seq)
+-				l = m;
+-			else
+-				r = m;
+-		}
++		if (seq != list_entry(list->prev, struct journal_replay,
++				      list)->j.seq)
++			l = m;
++		else
++			r = m;
++	}
+ 
+-		/*
+-		 * Read buckets in reverse order until we stop finding more
+-		 * journal entries
+-		 */
+-		pr_debug("finishing up: m %u njournal_buckets %u\n",
+-			 m, ca->sb.njournal_buckets);
+-		l = m;
++	/*
++	 * Read buckets in reverse order until we stop finding more
++	 * journal entries
++	 */
++	pr_debug("finishing up: m %u njournal_buckets %u\n",
++		 m, ca->sb.njournal_buckets);
++	l = m;
+ 
+-		while (1) {
+-			if (!l--)
+-				l = ca->sb.njournal_buckets - 1;
++	while (1) {
++		if (!l--)
++			l = ca->sb.njournal_buckets - 1;
+ 
+-			if (l == m)
+-				break;
++		if (l == m)
++			break;
+ 
+-			if (test_bit(l, bitmap))
+-				continue;
++		if (test_bit(l, bitmap))
++			continue;
+ 
+-			if (!read_bucket(l))
+-				break;
+-		}
++		if (!read_bucket(l))
++			break;
++	}
+ 
+-		seq = 0;
++	seq = 0;
+ 
+-		for (i = 0; i < ca->sb.njournal_buckets; i++)
+-			if (ja->seq[i] > seq) {
+-				seq = ja->seq[i];
+-				/*
+-				 * When journal_reclaim() goes to allocate for
+-				 * the first time, it'll use the bucket after
+-				 * ja->cur_idx
+-				 */
+-				ja->cur_idx = i;
+-				ja->last_idx = ja->discard_idx = (i + 1) %
+-					ca->sb.njournal_buckets;
++	for (i = 0; i < ca->sb.njournal_buckets; i++)
++		if (ja->seq[i] > seq) {
++			seq = ja->seq[i];
++			/*
++			 * When journal_reclaim() goes to allocate for
++			 * the first time, it'll use the bucket after
++			 * ja->cur_idx
++			 */
++			ja->cur_idx = i;
++			ja->last_idx = ja->discard_idx = (i + 1) %
++				ca->sb.njournal_buckets;
+ 
+-			}
+-	}
++		}
+ 
++out:
+ 	if (!list_empty(list))
+ 		c->journal.seq = list_entry(list->prev,
+ 					    struct journal_replay,
+@@ -342,12 +339,10 @@ void bch_journal_mark(struct cache_set *c, struct list_head *list)
+ 
+ static bool is_discard_enabled(struct cache_set *s)
+ {
+-	struct cache *ca;
+-	unsigned int i;
++	struct cache *ca = s->cache;
+ 
+-	for_each_cache(ca, s, i)
+-		if (ca->discard)
+-			return true;
++	if (ca->discard)
++		return true;
+ 
+ 	return false;
+ }
+@@ -633,9 +628,10 @@ static void do_journal_discard(struct cache *ca)
+ static void journal_reclaim(struct cache_set *c)
+ {
+ 	struct bkey *k = &c->journal.key;
+-	struct cache *ca;
++	struct cache *ca = c->cache;
+ 	uint64_t last_seq;
+-	unsigned int iter, n = 0;
++	unsigned int next;
++	struct journal_device *ja = &ca->journal;
+ 	atomic_t p __maybe_unused;
+ 
+ 	atomic_long_inc(&c->reclaim);
+@@ -647,46 +643,31 @@ static void journal_reclaim(struct cache_set *c)
+ 
+ 	/* Update last_idx */
+ 
+-	for_each_cache(ca, c, iter) {
+-		struct journal_device *ja = &ca->journal;
+-
+-		while (ja->last_idx != ja->cur_idx &&
+-		       ja->seq[ja->last_idx] < last_seq)
+-			ja->last_idx = (ja->last_idx + 1) %
+-				ca->sb.njournal_buckets;
+-	}
++	while (ja->last_idx != ja->cur_idx &&
++	       ja->seq[ja->last_idx] < last_seq)
++		ja->last_idx = (ja->last_idx + 1) %
++			ca->sb.njournal_buckets;
+ 
+-	for_each_cache(ca, c, iter)
+-		do_journal_discard(ca);
++	do_journal_discard(ca);
+ 
+ 	if (c->journal.blocks_free)
+ 		goto out;
+ 
+-	/*
+-	 * Allocate:
+-	 * XXX: Sort by free journal space
+-	 */
+-
+-	for_each_cache(ca, c, iter) {
+-		struct journal_device *ja = &ca->journal;
+-		unsigned int next = (ja->cur_idx + 1) % ca->sb.njournal_buckets;
++	next = (ja->cur_idx + 1) % ca->sb.njournal_buckets;
++	/* No space available on this device */
++	if (next == ja->discard_idx)
++		goto out;
+ 
+-		/* No space available on this device */
+-		if (next == ja->discard_idx)
+-			continue;
++	ja->cur_idx = next;
++	k->ptr[0] = MAKE_PTR(0,
++			     bucket_to_sector(c, ca->sb.d[ja->cur_idx]),
++			     ca->sb.nr_this_dev);
++	atomic_long_inc(&c->reclaimed_journal_buckets);
+ 
+-		ja->cur_idx = next;
+-		k->ptr[n++] = MAKE_PTR(0,
+-				  bucket_to_sector(c, ca->sb.d[ja->cur_idx]),
+-				  ca->sb.nr_this_dev);
+-		atomic_long_inc(&c->reclaimed_journal_buckets);
+-	}
++	bkey_init(k);
++	SET_KEY_PTRS(k, 1);
++	c->journal.blocks_free = c->sb.bucket_size >> c->block_bits;
+ 
+-	if (n) {
+-		bkey_init(k);
+-		SET_KEY_PTRS(k, n);
+-		c->journal.blocks_free = c->sb.bucket_size >> c->block_bits;
+-	}
+ out:
+ 	if (!journal_full(&c->journal))
+ 		__closure_wake_up(&c->journal.wait);
+@@ -750,7 +731,7 @@ static void journal_write_unlocked(struct closure *cl)
+ 	__releases(c->journal.lock)
+ {
+ 	struct cache_set *c = container_of(cl, struct cache_set, journal.io);
+-	struct cache *ca;
++	struct cache *ca = c->cache;
  	struct journal_write *w = c->journal.cur;
  	struct bkey *k = &c->journal.key;
--	unsigned int i, sectors = set_blocks(w->data, block_bytes(c)) *
-+	unsigned int i, sectors = set_blocks(w->data, block_bytes(ca)) *
- 		c->sb.block_size;
+ 	unsigned int i, sectors = set_blocks(w->data, block_bytes(c)) *
+@@ -780,9 +761,7 @@ static void journal_write_unlocked(struct closure *cl)
+ 	bkey_copy(&w->data->btree_root, &c->root->key);
+ 	bkey_copy(&w->data->uuid_bucket, &c->uuid_bucket);
  
- 	struct bio *bio;
-@@ -754,7 +754,7 @@ static void journal_write_unlocked(struct closure *cl)
+-	for_each_cache(ca, c, i)
+-		w->data->prio_bucket[ca->sb.nr_this_dev] = ca->prio_buckets[0];
+-
++	w->data->prio_bucket[ca->sb.nr_this_dev] = ca->prio_buckets[0];
+ 	w->data->magic		= jset_magic(&c->sb);
+ 	w->data->version	= BCACHE_JSET_VERSION;
+ 	w->data->last_seq	= last_seq(&c->journal);
+diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
+index 5872d6470470..b9c3d27ec093 100644
+--- a/drivers/md/bcache/movinggc.c
++++ b/drivers/md/bcache/movinggc.c
+@@ -196,50 +196,48 @@ static unsigned int bucket_heap_top(struct cache *ca)
+ 
+ void bch_moving_gc(struct cache_set *c)
+ {
+-	struct cache *ca;
++	struct cache *ca = c->cache;
+ 	struct bucket *b;
+-	unsigned int i;
++	unsigned long sectors_to_move, reserve_sectors;
+ 
+ 	if (!c->copy_gc_enabled)
  		return;
+ 
+ 	mutex_lock(&c->bucket_lock);
+ 
+-	for_each_cache(ca, c, i) {
+-		unsigned long sectors_to_move = 0;
+-		unsigned long reserve_sectors = ca->sb.bucket_size *
++	sectors_to_move = 0;
++	reserve_sectors = ca->sb.bucket_size *
+ 			     fifo_used(&ca->free[RESERVE_MOVINGGC]);
+ 
+-		ca->heap.used = 0;
+-
+-		for_each_bucket(b, ca) {
+-			if (GC_MARK(b) == GC_MARK_METADATA ||
+-			    !GC_SECTORS_USED(b) ||
+-			    GC_SECTORS_USED(b) == ca->sb.bucket_size ||
+-			    atomic_read(&b->pin))
+-				continue;
+-
+-			if (!heap_full(&ca->heap)) {
+-				sectors_to_move += GC_SECTORS_USED(b);
+-				heap_add(&ca->heap, b, bucket_cmp);
+-			} else if (bucket_cmp(b, heap_peek(&ca->heap))) {
+-				sectors_to_move -= bucket_heap_top(ca);
+-				sectors_to_move += GC_SECTORS_USED(b);
+-
+-				ca->heap.data[0] = b;
+-				heap_sift(&ca->heap, 0, bucket_cmp);
+-			}
+-		}
++	ca->heap.used = 0;
++
++	for_each_bucket(b, ca) {
++		if (GC_MARK(b) == GC_MARK_METADATA ||
++		    !GC_SECTORS_USED(b) ||
++		    GC_SECTORS_USED(b) == ca->sb.bucket_size ||
++		    atomic_read(&b->pin))
++			continue;
+ 
+-		while (sectors_to_move > reserve_sectors) {
+-			heap_pop(&ca->heap, b, bucket_cmp);
+-			sectors_to_move -= GC_SECTORS_USED(b);
++		if (!heap_full(&ca->heap)) {
++			sectors_to_move += GC_SECTORS_USED(b);
++			heap_add(&ca->heap, b, bucket_cmp);
++		} else if (bucket_cmp(b, heap_peek(&ca->heap))) {
++			sectors_to_move -= bucket_heap_top(ca);
++			sectors_to_move += GC_SECTORS_USED(b);
++
++			ca->heap.data[0] = b;
++			heap_sift(&ca->heap, 0, bucket_cmp);
+ 		}
++	}
+ 
+-		while (heap_pop(&ca->heap, b, bucket_cmp))
+-			SET_GC_MOVE(b, 1);
++	while (sectors_to_move > reserve_sectors) {
++		heap_pop(&ca->heap, b, bucket_cmp);
++		sectors_to_move -= GC_SECTORS_USED(b);
  	}
  
--	c->journal.blocks_free -= set_blocks(w->data, block_bytes(c));
-+	c->journal.blocks_free -= set_blocks(w->data, block_bytes(ca));
++	while (heap_pop(&ca->heap, b, bucket_cmp))
++		SET_GC_MOVE(b, 1);
++
+ 	mutex_unlock(&c->bucket_lock);
  
- 	w->data->btree_level = c->root->level;
- 
-@@ -847,7 +847,7 @@ static struct journal_write *journal_wait_for_write(struct cache_set *c,
- 		struct journal_write *w = c->journal.cur;
- 
- 		sectors = __set_blocks(w->data, w->data->keys + nkeys,
--				       block_bytes(c)) * c->sb.block_size;
-+				       block_bytes(c->cache)) * c->sb.block_size;
- 
- 		if (sectors <= min_t(size_t,
- 				     c->journal.blocks_free * c->sb.block_size,
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index c7cadaafa947..02408fdbf5bb 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -99,7 +99,7 @@ static int bch_keylist_realloc(struct keylist *l, unsigned int u64s,
- 	 * bch_data_insert_keys() will insert the keys created so far
- 	 * and finish the rest when the keylist is empty.
- 	 */
--	if (newsize * sizeof(uint64_t) > block_bytes(c) - sizeof(struct jset))
-+	if (newsize * sizeof(uint64_t) > block_bytes(c->cache) - sizeof(struct jset))
- 		return -ENOMEM;
- 
- 	return __bch_keylist_realloc(l, u64s);
+ 	c->moving_gc_keys.last_scanned = ZERO_KEY;
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 90a419ad6445..36a538c2e960 100644
+index e9ccfa17beb8..91883d5c4b62 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -1528,7 +1528,7 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
+@@ -343,8 +343,9 @@ static void bcache_write_super_unlock(struct closure *cl)
+ void bcache_write_super(struct cache_set *c)
+ {
+ 	struct closure *cl = &c->sb_write;
+-	struct cache *ca;
+-	unsigned int i, version = BCACHE_SB_VERSION_CDEV_WITH_UUID;
++	struct cache *ca = c->cache;
++	struct bio *bio = &ca->sb_bio;
++	unsigned int version = BCACHE_SB_VERSION_CDEV_WITH_UUID;
  
- 	kobject_init(&d->kobj, &bch_flash_dev_ktype);
+ 	down(&c->sb_write_mutex);
+ 	closure_init(cl, &c->cl);
+@@ -354,23 +355,19 @@ void bcache_write_super(struct cache_set *c)
+ 	if (c->sb.version > version)
+ 		version = c->sb.version;
  
--	if (bcache_device_init(d, block_bytes(c), u->sectors,
-+	if (bcache_device_init(d, block_bytes(c->cache), u->sectors,
- 			NULL, &bcache_flash_ops))
- 		goto err;
+-	for_each_cache(ca, c, i) {
+-		struct bio *bio = &ca->sb_bio;
+-
+-		ca->sb.version		= version;
+-		ca->sb.seq		= c->sb.seq;
+-		ca->sb.last_mount	= c->sb.last_mount;
++	ca->sb.version		= version;
++	ca->sb.seq		= c->sb.seq;
++	ca->sb.last_mount	= c->sb.last_mount;
  
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index ac06c0bc3c0a..b9f524ab5cc8 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -714,7 +714,7 @@ SHOW(__bch_cache_set)
- 	sysfs_print(synchronous,		CACHE_SYNC(&c->sb));
- 	sysfs_print(journal_delay_ms,		c->journal_delay_ms);
- 	sysfs_hprint(bucket_size,		bucket_bytes(c));
--	sysfs_hprint(block_size,		block_bytes(c));
-+	sysfs_hprint(block_size,		block_bytes(c->cache));
- 	sysfs_print(tree_depth,			c->root->level);
- 	sysfs_print(root_usage_percent,		bch_root_usage(c));
+-		SET_CACHE_SYNC(&ca->sb, CACHE_SYNC(&c->sb));
++	SET_CACHE_SYNC(&ca->sb, CACHE_SYNC(&c->sb));
+ 
+-		bio_init(bio, ca->sb_bv, 1);
+-		bio_set_dev(bio, ca->bdev);
+-		bio->bi_end_io	= write_super_endio;
+-		bio->bi_private = ca;
++	bio_init(bio, ca->sb_bv, 1);
++	bio_set_dev(bio, ca->bdev);
++	bio->bi_end_io	= write_super_endio;
++	bio->bi_private = ca;
+ 
+-		closure_get(cl);
+-		__write_super(&ca->sb, ca->sb_disk, bio);
+-	}
++	closure_get(cl);
++	__write_super(&ca->sb, ca->sb_disk, bio);
+ 
+ 	closure_return_with_destructor(cl, bcache_write_super_unlock);
+ }
+@@ -772,26 +769,22 @@ static void bcache_device_unlink(struct bcache_device *d)
+ 	lockdep_assert_held(&bch_register_lock);
+ 
+ 	if (d->c && !test_and_set_bit(BCACHE_DEV_UNLINK_DONE, &d->flags)) {
+-		unsigned int i;
+-		struct cache *ca;
++		struct cache *ca = d->c->cache;
+ 
+ 		sysfs_remove_link(&d->c->kobj, d->name);
+ 		sysfs_remove_link(&d->kobj, "cache");
+ 
+-		for_each_cache(ca, d->c, i)
+-			bd_unlink_disk_holder(ca->bdev, d->disk);
++		bd_unlink_disk_holder(ca->bdev, d->disk);
+ 	}
+ }
+ 
+ static void bcache_device_link(struct bcache_device *d, struct cache_set *c,
+ 			       const char *name)
+ {
+-	unsigned int i;
+-	struct cache *ca;
++	struct cache *ca = c->cache;
+ 	int ret;
+ 
+-	for_each_cache(ca, d->c, i)
+-		bd_link_disk_holder(ca->bdev, d->disk);
++	bd_link_disk_holder(ca->bdev, d->disk);
+ 
+ 	snprintf(d->name, BCACHEDEVNAME_SIZE,
+ 		 "%s%u", name, d->id);
+@@ -1663,7 +1656,6 @@ static void cache_set_free(struct closure *cl)
+ {
+ 	struct cache_set *c = container_of(cl, struct cache_set, cl);
+ 	struct cache *ca;
+-	unsigned int i;
+ 
+ 	debugfs_remove(c->debug);
+ 
+@@ -1672,12 +1664,12 @@ static void cache_set_free(struct closure *cl)
+ 	bch_journal_free(c);
+ 
+ 	mutex_lock(&bch_register_lock);
+-	for_each_cache(ca, c, i)
+-		if (ca) {
+-			ca->set = NULL;
+-			c->cache = NULL;
+-			kobject_put(&ca->kobj);
+-		}
++	ca = c->cache;
++	if (ca) {
++		ca->set = NULL;
++		c->cache = NULL;
++		kobject_put(&ca->kobj);
++	}
+ 
+ 	bch_bset_sort_state_free(&c->sort);
+ 	free_pages((unsigned long) c->uuids, ilog2(meta_bucket_pages(&c->sb)));
+@@ -1703,9 +1695,8 @@ static void cache_set_free(struct closure *cl)
+ static void cache_set_flush(struct closure *cl)
+ {
+ 	struct cache_set *c = container_of(cl, struct cache_set, caching);
+-	struct cache *ca;
++	struct cache *ca = c->cache;
+ 	struct btree *b;
+-	unsigned int i;
+ 
+ 	bch_cache_accounting_destroy(&c->accounting);
+ 
+@@ -1730,9 +1721,8 @@ static void cache_set_flush(struct closure *cl)
+ 			mutex_unlock(&b->write_lock);
+ 		}
+ 
+-	for_each_cache(ca, c, i)
+-		if (ca->alloc_thread)
+-			kthread_stop(ca->alloc_thread);
++	if (ca->alloc_thread)
++		kthread_stop(ca->alloc_thread);
+ 
+ 	if (c->journal.cur) {
+ 		cancel_delayed_work_sync(&c->journal.work);
+@@ -1973,16 +1963,14 @@ static int run_cache_set(struct cache_set *c)
+ {
+ 	const char *err = "cannot allocate memory";
+ 	struct cached_dev *dc, *t;
+-	struct cache *ca;
++	struct cache *ca = c->cache;
+ 	struct closure cl;
+-	unsigned int i;
+ 	LIST_HEAD(journal);
+ 	struct journal_replay *l;
+ 
+ 	closure_init_stack(&cl);
+ 
+-	for_each_cache(ca, c, i)
+-		c->nbuckets += ca->sb.nbuckets;
++	c->nbuckets = ca->sb.nbuckets;
+ 	set_gc_sectors(c);
+ 
+ 	if (CACHE_SYNC(&c->sb)) {
+@@ -2002,10 +1990,8 @@ static int run_cache_set(struct cache_set *c)
+ 		j = &list_entry(journal.prev, struct journal_replay, list)->j;
+ 
+ 		err = "IO error reading priorities";
+-		for_each_cache(ca, c, i) {
+-			if (prio_read(ca, j->prio_bucket[ca->sb.nr_this_dev]))
+-				goto err;
+-		}
++		if (prio_read(ca, j->prio_bucket[ca->sb.nr_this_dev]))
++			goto err;
+ 
+ 		/*
+ 		 * If prio_read() fails it'll call cache_set_error and we'll
+@@ -2049,9 +2035,8 @@ static int run_cache_set(struct cache_set *c)
+ 		bch_journal_next(&c->journal);
+ 
+ 		err = "error starting allocator thread";
+-		for_each_cache(ca, c, i)
+-			if (bch_cache_allocator_start(ca))
+-				goto err;
++		if (bch_cache_allocator_start(ca))
++			goto err;
+ 
+ 		/*
+ 		 * First place it's safe to allocate: btree_check() and
+@@ -2070,28 +2055,23 @@ static int run_cache_set(struct cache_set *c)
+ 		if (bch_journal_replay(c, &journal))
+ 			goto err;
+ 	} else {
+-		pr_notice("invalidating existing data\n");
+-
+-		for_each_cache(ca, c, i) {
+-			unsigned int j;
++		unsigned int j;
+ 
+-			ca->sb.keys = clamp_t(int, ca->sb.nbuckets >> 7,
+-					      2, SB_JOURNAL_BUCKETS);
++		pr_notice("invalidating existing data\n");
++		ca->sb.keys = clamp_t(int, ca->sb.nbuckets >> 7,
++					2, SB_JOURNAL_BUCKETS);
+ 
+-			for (j = 0; j < ca->sb.keys; j++)
+-				ca->sb.d[j] = ca->sb.first_bucket + j;
+-		}
++		for (j = 0; j < ca->sb.keys; j++)
++			ca->sb.d[j] = ca->sb.first_bucket + j;
+ 
+ 		bch_initial_gc_finish(c);
+ 
+ 		err = "error starting allocator thread";
+-		for_each_cache(ca, c, i)
+-			if (bch_cache_allocator_start(ca))
+-				goto err;
++		if (bch_cache_allocator_start(ca))
++			goto err;
+ 
+ 		mutex_lock(&c->bucket_lock);
+-		for_each_cache(ca, c, i)
+-			bch_prio_write(ca, true);
++		bch_prio_write(ca, true);
+ 		mutex_unlock(&c->bucket_lock);
+ 
+ 		err = "cannot allocate new UUID bucket";
+@@ -2467,13 +2447,14 @@ static bool bch_is_open_backing(struct block_device *bdev)
+ static bool bch_is_open_cache(struct block_device *bdev)
+ {
+ 	struct cache_set *c, *tc;
+-	struct cache *ca;
+-	unsigned int i;
+ 
+-	list_for_each_entry_safe(c, tc, &bch_cache_sets, list)
+-		for_each_cache(ca, c, i)
+-			if (ca->bdev == bdev)
+-				return true;
++	list_for_each_entry_safe(c, tc, &bch_cache_sets, list) {
++		struct cache *ca = c->cache;
++
++		if (ca->bdev == bdev)
++			return true;
++	}
++
+ 	return false;
+ }
  
 -- 
 2.26.2
