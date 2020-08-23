@@ -2,158 +2,110 @@ Return-Path: <SRS0=Vt9R=CB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAFFC433DF
-	for <linux-block@archiver.kernel.org>; Sun, 23 Aug 2020 14:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C754C433E1
+	for <linux-block@archiver.kernel.org>; Sun, 23 Aug 2020 17:21:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34E142072D
-	for <linux-block@archiver.kernel.org>; Sun, 23 Aug 2020 14:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1E9B204FD
+	for <linux-block@archiver.kernel.org>; Sun, 23 Aug 2020 17:21:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbgHWO5g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 23 Aug 2020 10:57:36 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:51987 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1725887AbgHWO5e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 23 Aug 2020 10:57:34 -0400
-Received: (qmail 304437 invoked by uid 1000); 23 Aug 2020 10:57:33 -0400
-Date:   Sun, 23 Aug 2020 10:57:33 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Martin Kepplinger <martin.kepplinger@puri.sm>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel@puri.sm
-Subject: [PATCH] block: Fix bug in runtime-resume handling
-Message-ID: <20200823145733.GC303967@rowland.harvard.edu>
-References: <9b80ca7c-39f8-e52d-2535-8b0baf93c7d1@puri.sm>
- <425990b3-4b0b-4dcf-24dc-4e7e60d5869d@puri.sm>
- <20200807143002.GE226516@rowland.harvard.edu>
- <b0abab28-880e-4b88-eb3c-9ffd927d1ed9@puri.sm>
- <20200808150542.GB256751@rowland.harvard.edu>
- <d3b6f7b8-5345-1ae1-4f79-5dde226e74f1@puri.sm>
- <20200809152643.GA277165@rowland.harvard.edu>
- <60150284-be13-d373-5448-651b72a7c4c9@puri.sm>
- <20200810141343.GA299045@rowland.harvard.edu>
- <6f0c530f-4309-ab1e-393b-83bf8367f59e@puri.sm>
+        id S1727833AbgHWRV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 23 Aug 2020 13:21:58 -0400
+Received: from smtp.h3c.com ([60.191.123.50]:10247 "EHLO h3cspam02-ex.h3c.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726792AbgHWRV5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 23 Aug 2020 13:21:57 -0400
+X-Greylist: delayed 1504 seconds by postgrey-1.27 at vger.kernel.org; Sun, 23 Aug 2020 13:21:55 EDT
+Received: from h3cspam02-ex.h3c.com (localhost [127.0.0.2] (may be forged))
+        by h3cspam02-ex.h3c.com with ESMTP id 07NFppgo065279
+        for <linux-block@vger.kernel.org>; Sun, 23 Aug 2020 23:51:51 +0800 (GMT-8)
+        (envelope-from tian.xianting@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([10.8.0.66])
+        by h3cspam02-ex.h3c.com with ESMTPS id 07NFphto065235
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Sun, 23 Aug 2020 23:51:43 +0800 (GMT-8)
+        (envelope-from tian.xianting@h3c.com)
+Received: from localhost.localdomain (10.99.212.201) by
+ DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Sun, 23 Aug 2020 23:51:47 +0800
+From:   Xianting Tian <tian.xianting@h3c.com>
+To:     <axboe@kernel.dk>, <ast@kernel.org>, <daniel@iogearbox.net>,
+        <kafai@fb.com>, <songliubraving@fb.com>, <yhs@fb.com>,
+        <andriin@fb.com>, <john.fastabend@gmail.com>,
+        <kpsingh@chromium.org>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Xianting Tian <tian.xianting@h3c.com>
+Subject: [PATCH] blk-mq: use BLK_MQ_NO_TAG for no tag
+Date:   Sun, 23 Aug 2020 23:44:59 +0800
+Message-ID: <20200823154459.40731-1-tian.xianting@h3c.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6f0c530f-4309-ab1e-393b-83bf8367f59e@puri.sm>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.99.212.201]
+X-ClientProxiedBy: BJSMTP01-EX.srv.huawei-3com.com (10.63.20.132) To
+ DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66)
+X-DNSRBL: 
+X-MAIL: h3cspam02-ex.h3c.com 07NFphto065235
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Runtime power-management support in the block layer has somehow gotten
-messed up in the past few years.  This area of code has been through a
-lot of churn and it's not easy to track exactly when the bug addressed
-here was introduced; it was present for a while, then fixed for a
-while, and then it returned.
+Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
 
-At any rate, the problem is that the block layer code thinks that it's
-okay to issue a request with the BLK_MQ_REQ_PREEMPT flag set at any
-time, even when the queue and underlying device are runtime suspended.
-This belief is wrong; the flag merely indicates that it's okay to
-issue the request while the queue and device are in the process of
-suspending or resuming.  When they are actually suspended, no requests
-may be issued.
-
-The symptom of this bug is that a runtime-suspended block device
-doesn't resume as it should.  The request which should cause a runtime
-resume instead gets issued directly, without resuming the device
-first.  Of course the device can't handle it properly, the I/O
-fails, and the device remains suspended.
-
-The problem is fixed by checking that the queue's runtime-PM status
-isn't RPM_SUSPENDED before allowing a request to be issued, and
-queuing a runtime-resume request if it is.  In particular, the inline
-blk_pm_request_resume() routine is renamed blk_pm_resume_queue() and
-the code is unified by merging the surrounding checks into the
-routine.  If the queue isn't set up for runtime PM, or there currently
-is no restriction on allowed requests, the request is allowed.
-Likewise if the BLK_MQ_REQ_PREEMPT flag is set and the status isn't
-RPM_SUSPENDED.  Otherwise a runtime resume is queued and the request
-is blocked until conditions are more suitable.
-
-Reported-and-tested-by: Martin Kepplinger <martin.kepplinger@puri.sm>
-Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
-CC: Bart Van Assche <bvanassche@acm.org>
-CC: <stable@vger.kernel.org> # 5.2
-
+Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
 ---
+ block/blk-core.c       | 4 ++--
+ block/blk-mq-sched.c   | 2 +-
+ include/linux/blk-mq.h | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-The bug goes back way before 5.2, but other changes will prevent the
-patch from applying directly to earlier kernels, so I'm limiting the 
-@stable updates to 5.2 and after.
-
-
-[as1941]
-
-
- block/blk-core.c |    6 +++---
- block/blk-pm.h   |   14 +++++++++-----
- 2 files changed, 12 insertions(+), 8 deletions(-)
-
-Index: usb-devel/block/blk-core.c
-===================================================================
---- usb-devel.orig/block/blk-core.c
-+++ usb-devel/block/blk-core.c
-@@ -423,7 +423,8 @@ int blk_queue_enter(struct request_queue
- 			 * responsible for ensuring that that counter is
- 			 * globally visible before the queue is unfrozen.
- 			 */
--			if (pm || !blk_queue_pm_only(q)) {
-+			if ((pm && q->rpm_status != RPM_SUSPENDED) ||
-+			    !blk_queue_pm_only(q)) {
- 				success = true;
- 			} else {
- 				percpu_ref_put(&q->q_usage_counter);
-@@ -448,8 +449,7 @@ int blk_queue_enter(struct request_queue
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d9d632639..c7eaf7504 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -116,8 +116,8 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+ 	rq->__sector = (sector_t) -1;
+ 	INIT_HLIST_NODE(&rq->hash);
+ 	RB_CLEAR_NODE(&rq->rb_node);
+-	rq->tag = -1;
+-	rq->internal_tag = -1;
++	rq->tag = BLK_MQ_NO_TAG;
++	rq->internal_tag = BLK_MQ_NO_TAG;
+ 	rq->start_time_ns = ktime_get_ns();
+ 	rq->part = NULL;
+ 	refcount_set(&rq->ref, 1);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index a19cdf159..439481f59 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -522,7 +522,7 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 		goto run;
+ 	}
  
- 		wait_event(q->mq_freeze_wq,
- 			   (!q->mq_freeze_depth &&
--			    (pm || (blk_pm_request_resume(q),
--				    !blk_queue_pm_only(q)))) ||
-+			    blk_pm_resume_queue(pm, q)) ||
- 			   blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-Index: usb-devel/block/blk-pm.h
-===================================================================
---- usb-devel.orig/block/blk-pm.h
-+++ usb-devel/block/blk-pm.h
-@@ -6,11 +6,14 @@
- #include <linux/pm_runtime.h>
+-	WARN_ON(e && (rq->tag != -1));
++	WARN_ON(e && (rq->tag != BLK_MQ_NO_TAG));
  
- #ifdef CONFIG_PM
--static inline void blk_pm_request_resume(struct request_queue *q)
-+static inline int blk_pm_resume_queue(const bool pm, struct request_queue *q)
+ 	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
+ 		/*
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 9d2d5ad36..161d8a0e6 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -569,7 +569,7 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
+ static inline blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq)
  {
--	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
--		       q->rpm_status == RPM_SUSPENDING))
--		pm_request_resume(q->dev);
-+	if (!q->dev || !blk_queue_pm_only(q))
-+		return 1;	/* Nothing to do */
-+	if (pm && q->rpm_status != RPM_SUSPENDED)
-+		return 1;	/* Request allowed */
-+	pm_request_resume(q->dev);
-+	return 0;
- }
+-	if (rq->tag != -1)
++	if (rq->tag != BLK_MQ_NO_TAG)
+ 		return rq->tag | (hctx->queue_num << BLK_QC_T_SHIFT);
  
- static inline void blk_pm_mark_last_busy(struct request *rq)
-@@ -44,8 +47,9 @@ static inline void blk_pm_put_request(st
- 		--rq->q->nr_pending;
- }
- #else
--static inline void blk_pm_request_resume(struct request_queue *q)
-+static inline int blk_pm_resume_queue(const bool pm, struct request_queue *q)
- {
-+	return 1;
- }
- 
- static inline void blk_pm_mark_last_busy(struct request *rq)
+ 	return rq->internal_tag | (hctx->queue_num << BLK_QC_T_SHIFT) |
+-- 
+2.17.1
+
