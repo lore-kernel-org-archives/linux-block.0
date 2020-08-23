@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E38EDC433E3
-	for <linux-block@archiver.kernel.org>; Sun, 23 Aug 2020 09:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3BCC433DF
+	for <linux-block@archiver.kernel.org>; Sun, 23 Aug 2020 09:11:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C44E520768
-	for <linux-block@archiver.kernel.org>; Sun, 23 Aug 2020 09:11:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBB7C20768
+	for <linux-block@archiver.kernel.org>; Sun, 23 Aug 2020 09:11:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PBHmhgX3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Jd2+lONk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726086AbgHWJLD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 23 Aug 2020 05:11:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44164 "EHLO
+        id S1726711AbgHWJLJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 23 Aug 2020 05:11:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725912AbgHWJK7 (ORCPT
+        with ESMTP id S1725933AbgHWJLA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 23 Aug 2020 05:10:59 -0400
+        Sun, 23 Aug 2020 05:11:00 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AA2FC061574;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 188D2C061755;
         Sun, 23 Aug 2020 02:10:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=YPbj+jYW6lSNd//SqFpfbe0WS/0uxusHOvL8V2ZlRJE=; b=PBHmhgX3NKK5fsFULhyEkxdAjV
-        lcuLxZeeBDtHkLtVSr+FauH/Uhg6/Cib7sLCpnO32g6qDNrlzXmVZmfVtfpk+9H/ZIBjWDMBmpPLZ
-        aY4KfRVmILHn9aLbdzWIv773n8eTQtoMuFG1abn4VejyUN0fjHqCPi7WYIvBXxMqpui7rMsj4JnLJ
-        mVKZi0VsGgtKf0i9Mz+bJoj+LA5U4Ye4Ya0rRFA0iGsSKX+JHs0uflLrCN0kLhtBFessERgmXbpWs
-        FcYN815nGaIhqgZ1VEeGKGy0QdlTgZwmMWU/mrknMU/raoGtBKjOR8ojSgw6S2OWYbcek3QqYOxC2
-        SunijzaA==;
+        bh=cLc8UFh8Zn6w+mLuoS0pkRz+kyaYfh0fJF4FT3u1x/M=; b=Jd2+lONkz5bk6PvfkHn1D/V7qV
+        Vlyk1nLSCtExUzPZkfp3rBQN8FGPdpX+Dc8Qh9vAHJn5B58Ga8x8AMMYpOa3TvzdEmVEKcpxoTHnu
+        MLLmvRK0jttZWXRBgkaA3irYPQfnRLZ6GcYL/CMHRdfkorYw/m1RKbBo5/+kTHdV59RaC8Pd8wTOi
+        jo7G3URqxr5MEa/A0sGGBefAFTMrljyB2t0TGRiRnHxFeLadzpsnYn1IXU+AOep6iankq8A3pFaMm
+        RP63WcgsCe3jtesgABCd8bNh/Yzk6NUjfZAB48atObBn68zJElrVuLfF5/tyY05ixQmv5umrKt3+i
+        5yixz6Aw==;
 Received: from 171.168.43.195.cust.ip.kpnqwest.it ([195.43.168.171] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1k9m1a-0003LF-G4; Sun, 23 Aug 2020 09:10:50 +0000
+        id 1k9m1V-0003Kk-Dx; Sun, 23 Aug 2020 09:10:47 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -47,10 +47,11 @@ Cc:     Justin Sanders <justin@coraid.com>,
         Stefan Haberland <sth@linux.ibm.com>,
         Jan Hoeppner <hoeppner@linux.ibm.com>,
         linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: [PATCH 3/3] nvme: don't call revalidate_disk from nvme_set_queue_dying
-Date:   Sun, 23 Aug 2020 11:10:43 +0200
-Message-Id: <20200823091043.2600261-4-hch@lst.de>
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 1/3] block: replace bd_set_size with bd_set_nr_sectors
+Date:   Sun, 23 Aug 2020 11:10:41 +0200
+Message-Id: <20200823091043.2600261-2-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200823091043.2600261-1-hch@lst.de>
 References: <20200823091043.2600261-1-hch@lst.de>
@@ -62,108 +63,154 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In nvme_set_queue_dying we really just want to ensure the disk and bdev
-sizes are set to zero.  Going through revalidate_disk leads to a somewhat
-arcance and complex callchain relying on special behavior in a few
-places.  Instead just lift the set_capacity directly to
-nvme_set_queue_dying, and rename and move the nvme_mpath_update_disk_size
-helper so that we can use it in nvme_set_queue_dying to propagate the
-size to the bdev without detours.
+Replace bd_set_size with a version that takes the number of sectors
+instead, as that fits most of the current and future callers much better.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/nvme/host/core.c | 33 +++++++++++++++++++++++----------
- drivers/nvme/host/nvme.h | 13 -------------
- 2 files changed, 23 insertions(+), 23 deletions(-)
+ drivers/block/loop.c     |  4 ++--
+ drivers/block/nbd.c      |  7 ++++---
+ drivers/block/pktcdvd.c  |  2 +-
+ drivers/nvme/host/nvme.h |  2 +-
+ fs/block_dev.c           | 10 +++++-----
+ include/linux/genhd.h    |  2 +-
+ 6 files changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 88cff309d8e4f0..12dea15527f61a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -94,21 +94,34 @@ static void nvme_put_subsystem(struct nvme_subsystem *subsys);
- static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
- 					   unsigned nsid);
- 
-+static void nvme_update_bdev_size(struct gendisk *disk)
-+{
-+	struct block_device *bdev = bdget_disk(disk, 0);
-+
-+	if (bdev) {
-+		bd_set_nr_sectors(bdev, get_capacity(disk));
-+		bdput(bdev);
-+	}
-+}
-+
-+/*
-+ * Prepare a queue for teardown.
-+ *
-+ * This must forcibly unquiesce queues to avoid blocking dispatch, and only set
-+ * the capacity to 0 after that to avoid blocking dispatchers that may be
-+ * holding bd_butex.  This will end buffered writers dirtying pages that can't
-+ * be synced.
-+ */
- static void nvme_set_queue_dying(struct nvme_ns *ns)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 2f137d6ce169d5..7069899a94903e 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -253,7 +253,7 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
  {
--	/*
--	 * Revalidating a dead namespace sets capacity to 0. This will end
--	 * buffered writers dirtying pages that can't be synced.
--	 */
- 	if (test_and_set_bit(NVME_NS_DEAD, &ns->flags))
+ 	struct block_device *bdev = lo->lo_device;
+ 
+-	bd_set_size(bdev, size << SECTOR_SHIFT);
++	bd_set_nr_sectors(bdev, size);
+ 
+ 	set_capacity_revalidate_and_notify(lo->lo_disk, size, false);
+ }
+@@ -1248,7 +1248,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	set_capacity(lo->lo_disk, 0);
+ 	loop_sysfs_exit(lo);
+ 	if (bdev) {
+-		bd_set_size(bdev, 0);
++		bd_set_nr_sectors(bdev, 0);
+ 		/* let user-space know about this change */
+ 		kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
+ 	}
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 3ff4054d6834d2..f07243335472a4 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -300,6 +300,7 @@ static void nbd_size_update(struct nbd_device *nbd)
+ {
+ 	struct nbd_config *config = nbd->config;
+ 	struct block_device *bdev = bdget_disk(nbd->disk, 0);
++	sector_t nr_sectors = config->bytesize >> 9;
+ 
+ 	if (config->flags & NBD_FLAG_SEND_TRIM) {
+ 		nbd->disk->queue->limits.discard_granularity = config->blksize;
+@@ -308,10 +309,10 @@ static void nbd_size_update(struct nbd_device *nbd)
+ 	}
+ 	blk_queue_logical_block_size(nbd->disk->queue, config->blksize);
+ 	blk_queue_physical_block_size(nbd->disk->queue, config->blksize);
+-	set_capacity(nbd->disk, config->bytesize >> 9);
++	set_capacity(nbd->disk, nr_sectors);
+ 	if (bdev) {
+ 		if (bdev->bd_disk) {
+-			bd_set_size(bdev, config->bytesize);
++			bd_set_nr_sectors(bdev, nr_sectors);
+ 			set_blocksize(bdev, config->blksize);
+ 		} else
+ 			bdev->bd_invalidated = 1;
+@@ -1138,7 +1139,7 @@ static void nbd_bdev_reset(struct block_device *bdev)
+ {
+ 	if (bdev->bd_openers > 1)
  		return;
-+
- 	blk_set_queue_dying(ns->queue);
--	/* Forcibly unquiesce queues to avoid blocking dispatch */
- 	blk_mq_unquiesce_queue(ns->queue);
--	/*
--	 * Revalidate after unblocking dispatchers that may be holding bd_butex
--	 */
--	revalidate_disk(ns->disk);
-+
-+	set_capacity(ns->disk, 0);
-+	nvme_update_bdev_size(ns->disk);
+-	bd_set_size(bdev, 0);
++	bd_set_nr_sectors(bdev, 0);
  }
  
- static void nvme_queue_scan(struct nvme_ctrl *ctrl)
-@@ -2083,7 +2096,7 @@ static int __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 		nvme_update_disk_info(ns->head->disk, ns, id);
- 		blk_stack_limits(&ns->head->disk->queue->limits,
- 				 &ns->queue->limits, 0);
--		nvme_mpath_update_disk_size(ns->head->disk);
-+		nvme_update_bdev_size(ns->head->disk);
- 	}
- #endif
- 	return 0;
+ static void nbd_parse_flags(struct nbd_device *nbd)
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 4becc1efe775fc..015fe128fa8a35 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2192,7 +2192,7 @@ static int pkt_open_dev(struct pktcdvd_device *pd, fmode_t write)
+ 
+ 	set_capacity(pd->disk, lba << 2);
+ 	set_capacity(pd->bdev->bd_disk, lba << 2);
+-	bd_set_size(pd->bdev, (loff_t)lba << 11);
++	bd_set_nr_sectors(pd->bdev, lba << 2);
+ 
+ 	q = bdev_get_queue(pd->bdev);
+ 	if (write) {
 diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ae5cad5a08f411..4cadaea9034ae4 100644
+index ebb8c3ed388554..ae5cad5a08f411 100644
 --- a/drivers/nvme/host/nvme.h
 +++ b/drivers/nvme/host/nvme.h
-@@ -659,16 +659,6 @@ static inline void nvme_trace_bio_complete(struct request *req,
- 		trace_block_bio_complete(ns->head->disk->queue, req->bio);
- }
+@@ -664,7 +664,7 @@ static inline void nvme_mpath_update_disk_size(struct gendisk *disk)
+ 	struct block_device *bdev = bdget_disk(disk, 0);
  
--static inline void nvme_mpath_update_disk_size(struct gendisk *disk)
--{
--	struct block_device *bdev = bdget_disk(disk, 0);
--
--	if (bdev) {
--		bd_set_nr_sectors(bdev, get_capacity(disk));
--		bdput(bdev);
--	}
--}
--
- extern struct device_attribute dev_attr_ana_grpid;
- extern struct device_attribute dev_attr_ana_state;
- extern struct device_attribute subsys_attr_iopolicy;
-@@ -744,9 +734,6 @@ static inline void nvme_mpath_wait_freeze(struct nvme_subsystem *subsys)
- static inline void nvme_mpath_start_freeze(struct nvme_subsystem *subsys)
+ 	if (bdev) {
+-		bd_set_size(bdev, get_capacity(disk) << SECTOR_SHIFT);
++		bd_set_nr_sectors(bdev, get_capacity(disk));
+ 		bdput(bdev);
+ 	}
+ }
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 8ae833e004439b..f52597172c8b79 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1371,13 +1371,13 @@ int check_disk_change(struct block_device *bdev)
+ 
+ EXPORT_SYMBOL(check_disk_change);
+ 
+-void bd_set_size(struct block_device *bdev, loff_t size)
++void bd_set_nr_sectors(struct block_device *bdev, sector_t sectors)
  {
+ 	inode_lock(bdev->bd_inode);
+-	i_size_write(bdev->bd_inode, size);
++	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
+ 	inode_unlock(bdev->bd_inode);
  }
--static inline void nvme_mpath_update_disk_size(struct gendisk *disk)
--{
--}
- #endif /* CONFIG_NVME_MULTIPATH */
+-EXPORT_SYMBOL(bd_set_size);
++EXPORT_SYMBOL(bd_set_nr_sectors);
  
- #ifdef CONFIG_BLK_DEV_ZONED
+ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
+ 
+@@ -1514,7 +1514,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, void *holder,
+ 			}
+ 
+ 			if (!ret) {
+-				bd_set_size(bdev,(loff_t)get_capacity(disk)<<9);
++				bd_set_nr_sectors(bdev, get_capacity(disk));
+ 				set_init_blocksize(bdev);
+ 			}
+ 
+@@ -1542,7 +1542,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, void *holder,
+ 				ret = -ENXIO;
+ 				goto out_clear;
+ 			}
+-			bd_set_size(bdev, (loff_t)bdev->bd_part->nr_sects << 9);
++			bd_set_nr_sectors(bdev, bdev->bd_part->nr_sects);
+ 			set_init_blocksize(bdev);
+ 		}
+ 
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 4ab853461dff25..39025dc0397c04 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -375,7 +375,7 @@ void unregister_blkdev(unsigned int major, const char *name);
+ int revalidate_disk(struct gendisk *disk);
+ int check_disk_change(struct block_device *bdev);
+ int __invalidate_device(struct block_device *bdev, bool kill_dirty);
+-void bd_set_size(struct block_device *bdev, loff_t size);
++void bd_set_nr_sectors(struct block_device *bdev, sector_t sectors);
+ 
+ /* for drivers/char/raw.c: */
+ int blkdev_ioctl(struct block_device *, fmode_t, unsigned, unsigned long);
 -- 
 2.28.0
 
