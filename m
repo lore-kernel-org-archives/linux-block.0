@@ -2,122 +2,151 @@ Return-Path: <SRS0=iUg4=CC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4356AC433E3
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 03:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A10EC433E1
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 03:23:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E4542078A
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 03:06:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF72E206BE
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 03:23:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="PyvL2DEN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728050AbgHXDGW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 23 Aug 2020 23:06:22 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:43276 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727999AbgHXDGV (ORCPT
+        id S1726852AbgHXDXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 23 Aug 2020 23:23:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42306 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726684AbgHXDXY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 23 Aug 2020 23:06:21 -0400
-Received: by mail-pg1-f193.google.com with SMTP id d19so3865815pgl.10;
-        Sun, 23 Aug 2020 20:06:20 -0700 (PDT)
+        Sun, 23 Aug 2020 23:23:24 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3EFEC061573
+        for <linux-block@vger.kernel.org>; Sun, 23 Aug 2020 20:23:23 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id h12so3887893pgm.7
+        for <linux-block@vger.kernel.org>; Sun, 23 Aug 2020 20:23:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+JiC0giJA0MYcrcSlbtahDIbX8SVKKSEEk+p4agMCXM=;
+        b=PyvL2DEN6k9wYXpr0eLynqAd6kGdGZ7XKvmJvqWA/7FXrk4nSefuPIxgKEwN92dCNY
+         LpAf7x0teP88TPt/0pj9nPDIa6xCMBrNzwRLc94H0tviRh4wXssoYy9jXMISepe6VFiw
+         /9u9QebEzdPGrpQEgQjSiiS6MJdHu+BaLycV5Ag2wZa/GL16a3DgKSg4LHo01fNby+o9
+         X0xFkHN7XcXc7LseZbS1d1j9NjEXZxNGY6WpHAZg4Te1aKjemZsGCjUPqjVmn9z2STOC
+         XoeIuFE7XdXDZX8PkFC/L5muVsGIE2WIF8Vg3hDLiaabI35BavaTgnyd+aLb0E+OudBO
+         PBnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XWtnYwfG7Oj1F5XxLqbDL44F7TecGCP0D4b991l1F+U=;
-        b=Stu4C++hqk6zbMp45mwUR6U9Pt8Kd+e6zvby12Ikft/ii+DE8+m2HemF8QI2GbJrBx
-         G1SohaTxgyCb9uQ0NxG0iT2LutXUbejnCicQglTtTtObGXMQECFSOCgptsJk4t6wqPWq
-         RRyLcur8V+T2HmsiT4niRnCIATlHIFP75/y+YRZoFsSsjeXqd6Y09ft1QmF7t8V1+C+G
-         VWiI/xAMvqG58t9DcYglJacZS8v4E7yY+p5D8x7QqCcWDiPP+jyxmMlvHmL09glI4GNO
-         eg+TdYYmYPOcrYZSBXwE2VMab6xHwp8NmIkfD8HDZzb9e9gk+Kq5XxbQEbQFe4q95phd
-         GR3A==
-X-Gm-Message-State: AOAM530VTcW3kA3oYyRiDx8yekFyTY/lj64zeR1Ry8YIpgBensgiADeg
-        6/urt38IolRJ5pVaWs2t0JM=
-X-Google-Smtp-Source: ABdhPJyOeJ/dZD7fDjvJYiY/1Zoc4SOwMrUVgvQ05SeXn4tqhTGof91SCUzLgOmiZwuQUm3yJl5d2A==
-X-Received: by 2002:aa7:9dd0:: with SMTP id g16mr2578609pfq.107.1598238379618;
-        Sun, 23 Aug 2020 20:06:19 -0700 (PDT)
-Received: from asus.hsd1.ca.comcast.net (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id ha17sm4022500pjb.6.2020.08.23.20.06.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Aug 2020 20:06:18 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>
-Subject: [PATCH] block: Fix a race in the runtime power management code
-Date:   Sun, 23 Aug 2020 20:06:07 -0700
-Message-Id: <20200824030607.19357-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.28.0
+        bh=+JiC0giJA0MYcrcSlbtahDIbX8SVKKSEEk+p4agMCXM=;
+        b=k5GYgUn1WGMMqLEremBKN9vFvC6FckYAJ00NtZd9A3Sg6u21JrDRLZ61d7hjECRFFa
+         zxalxZ+lXfU8bwurOdPK4CDNCn1sBmzihPeifD9w7wy1N7ANyuMxyZMrkwV9E+NgiVEx
+         m5ygGqUY3+OMZk+XiFTy9hyNWinXj9X+Q0fN8+XTjrbWkYXpc6pO1wwHAw19J5K2Jby+
+         YWlcfX5tcqfDjfovRQxpGvX1DP/OMSrKsAcIyKKZ2KEM/iEfnte8/XLH9PqaiEiwYtCH
+         1mJRpQjZGtJzHqib6/e59jRJzgi2cKdKYiOd3SsE3/Pvfw5drniuDfYpF7VJKUwPEsbV
+         gHog==
+X-Gm-Message-State: AOAM530TycrbMTMIQHzR9tRMxNn3uypmgdTwRkwqhmDltI8sCIMiz2fk
+        GYre9vF6kV4MKQ3UGgsHEuV+nE7KNTlnzw==
+X-Google-Smtp-Source: ABdhPJyoEJnl0jhMrOYWAJqVSAFEPTXmvN2ilNwVpyKxZbf8KCzi5xHACRoNam5jzbEjDPsaqLSLZA==
+X-Received: by 2002:a63:ce15:: with SMTP id y21mr2298850pgf.163.1598239403257;
+        Sun, 23 Aug 2020 20:23:23 -0700 (PDT)
+Received: from houpudeMacBook-Pro.local ([61.120.150.74])
+        by smtp.gmail.com with ESMTPSA id go12sm7815366pjb.2.2020.08.23.20.23.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 23 Aug 2020 20:23:22 -0700 (PDT)
+Subject: Re: [PATCH] nbd: restore default timeout when setting it to zero
+To:     Josef Bacik <josef@toxicpanda.com>, axboe@kernel.dk,
+        mchristi@redhat.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org
+References: <20200810120044.2152-1-houpu@bytedance.com>
+ <38b9de9e-38fe-3090-cea0-377c605c86d4@toxicpanda.com>
+ <4e78e4b3-e75b-7428-703d-d8543bcfe348@bytedance.com>
+ <1accbf37-1a57-f072-7dc4-063fee991189@toxicpanda.com>
+From:   Hou Pu <houpu@bytedance.com>
+Message-ID: <701eaeb7-8b91-baa5-ebba-468f890c4cc5@bytedance.com>
+Date:   Mon, 24 Aug 2020 11:23:18 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <1accbf37-1a57-f072-7dc4-063fee991189@toxicpanda.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the current implementation the following race can happen:
-* blk_pre_runtime_suspend() calls blk_freeze_queue_start() and
-  blk_mq_unfreeze_queue().
-* blk_queue_enter() calls blk_queue_pm_only() and that function returns
-  true.
-* blk_queue_enter() calls blk_pm_request_resume() and that function does
-  not call pm_request_resume() because the queue runtime status is
-  RPM_ACTIVE.
-* blk_pre_runtime_suspend() changes the queue status into RPM_SUSPENDING.
 
-Fix this race by changing the queue runtime status into RPM_SUSPENDING
-before switching q_usage_counter to atomic mode.
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Stanley Chu <stanley.chu@mediatek.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: stable <stable@vger.kernel.org>
-Fixes: 986d413b7c15 ("blk-mq: Enable support for runtime power management")
-Signed-off-by: Can Guo <cang@codeaurora.org>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-pm.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+On 2020/8/21 9:57 PM, Josef Bacik wrote:
+> On 8/21/20 3:21 AM, Hou Pu wrote:
+>>
+>>
+>> On 2020/8/21 3:03 AM, Josef Bacik wrote:
+>>> On 8/10/20 8:00 AM, Hou Pu wrote:
+>>>> If we configured io timeout of nbd0 to 100s. Later after we
+>>>> finished using it, we configured nbd0 again and set the io
+>>>> timeout to 0. We expect it would timeout after 30 seconds
+>>>> and keep retry. But in fact we could not change the timeout
+>>>> when we set it to 0. the timeout is still the original 100s.
+>>>>
+>>>> So change the timeout to default 30s when we set it to zero.
+>>>> It also behaves same as commit 2da22da57348 ("nbd: fix zero
+>>>> cmd timeout handling v2").
+>>>>
+>>>> It becomes more important if we were reconfigure a nbd device
+>>>> and the io timeout it set to zero. Because it could take 30s
+>>>> to detect the new socket and thus io could be completed more
+>>>> quickly compared to 100s.
+>>>>
+>>>> Signed-off-by: Hou Pu <houpu@bytedance.com>
+>>>> ---
+>>>>   drivers/block/nbd.c | 2 ++
+>>>>   1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>>> index ce7e9f223b20..bc9dc1f847e1 100644
+>>>> --- a/drivers/block/nbd.c
+>>>> +++ b/drivers/block/nbd.c
+>>>> @@ -1360,6 +1360,8 @@ static void nbd_set_cmd_timeout(struct 
+>>>> nbd_device *nbd, u64 timeout)
+>>>>       nbd->tag_set.timeout = timeout * HZ;
+>>>>       if (timeout)
+>>>>           blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
+>>>> +    else
+>>>> +        blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
+>>>>   }
+>>>>   /* Must be called with config_lock held */
+>>>>
+>>>
+>>> What about the tag_set.timeout?  Thanks,
+>>
+>> I think user space could set io timeout to 0, thus we set 
+>> tag_set.timeout = 0 here and also we should tell the block layer
+>> to restore 30s timeout in case it is not. tag_set.timeout == 0
+>> imply 30s io timeout and retrying after timeout.
+>>
+>> (Sorry, I am not sure if I understand your question here. Could
+>> you explain a little more if needed?)
+>>
+> 
+> I misunderstood what I was using the tagset timeout for.  We don't want 
+> this here, if we're dropping a config for an nbd device and we want to 
+> reset it to defaults then we need to add this to nbd_config_put().  Thanks,
 
-diff --git a/block/blk-pm.c b/block/blk-pm.c
-index b85234d758f7..17bd020268d4 100644
---- a/block/blk-pm.c
-+++ b/block/blk-pm.c
-@@ -67,6 +67,10 @@ int blk_pre_runtime_suspend(struct request_queue *q)
- 
- 	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
- 
-+	spin_lock_irq(&q->queue_lock);
-+	q->rpm_status = RPM_SUSPENDING;
-+	spin_unlock_irq(&q->queue_lock);
-+
- 	/*
- 	 * Increase the pm_only counter before checking whether any
- 	 * non-PM blk_queue_enter() calls are in progress to avoid that any
-@@ -89,15 +93,14 @@ int blk_pre_runtime_suspend(struct request_queue *q)
- 	/* Switch q_usage_counter back to per-cpu mode. */
- 	blk_mq_unfreeze_queue(q);
- 
--	spin_lock_irq(&q->queue_lock);
--	if (ret < 0)
-+	if (ret < 0) {
-+		spin_lock_irq(&q->queue_lock);
-+		q->rpm_status = RPM_ACTIVE;
- 		pm_runtime_mark_last_busy(q->dev);
--	else
--		q->rpm_status = RPM_SUSPENDING;
--	spin_unlock_irq(&q->queue_lock);
-+		spin_unlock_irq(&q->queue_lock);
- 
--	if (ret)
- 		blk_clear_pm_only(q);
-+	}
- 
- 	return ret;
- }
+AFAIK If we killed a nbd server, then restarted it and reconfigured
+the nbd socket, I think we might not reconfigure IO timeout to 0 since
+nbd_config_put() is not called in such case. So could we still
+restore default timeout here. Or am I missing something?
+
+Thanks,
+Hou
+
+> 
+> Josef
