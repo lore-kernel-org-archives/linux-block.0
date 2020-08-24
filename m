@@ -2,94 +2,90 @@ Return-Path: <SRS0=iUg4=CC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C84C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 19:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47211C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 19:47:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A2A17207DF
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 19:45:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E06B20706
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 19:47:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XFo2LL3y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Es/OR0qt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726306AbgHXTpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 15:45:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55146 "EHLO
+        id S1726119AbgHXTrD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 15:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725904AbgHXTpo (ORCPT
+        with ESMTP id S1725963AbgHXTrC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 15:45:44 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 646FDC061573
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 12:45:44 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id q93so142231pjq.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 12:45:44 -0700 (PDT)
+        Mon, 24 Aug 2020 15:47:02 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD7EAC061573;
+        Mon, 24 Aug 2020 12:47:01 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id u126so9959274iod.12;
+        Mon, 24 Aug 2020 12:47:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=XLzPGl4Eap2WEQDnCBOMpgiVYB87oR4tNzXe04U1Yus=;
-        b=XFo2LL3y7AhxhrbYL3AA5QloXwqCtv51CFv+ivg2vqei/6inK40GT7BuWmfnCoqsag
-         0TB19Ve8hTo23hLyYbP2EB4J627lToJoVqRnzGrN0ziDNgINk1UHHXiIlQxRxVjxoDyO
-         MrfK8UK5FHNIHYSB07msbw8lRemEDR8lfZ74UIMQxiiklijoaS5ZwdC8vGg3NnN/cu9/
-         4aJlQnL7TX1W4yY0mNjKPq+5tV+qzpORVVVTA9X90A8/BN7DIlPfo6iWc5bWHhY20bj+
-         k1SHQTfNN67IP3GLzbkCDC8jlXLCty/OmE3lRGlaYyL/0Ynxx8vKbjUuEIHUWt5FxZJO
-         rKdg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=plOSeJr9JbCX/G7XioOegDbHP0AUWpDmZ+AWPNX08Us=;
+        b=Es/OR0qtgjM2R2DENxTrthzTAgIsD/sruK0Tr3HWZIiM0DoftVL5QVAGhH+k8oaPRN
+         oCycgNP5ueJMyg+Bm6i6qOsxxMJwm1F52m/f1P+l/djMEjADyaFr1L7TnTcJ/zLRB7LK
+         4WkpTkNd/b405luQUa+Y+fAGNHEHXnIdrX2D7+xwwPGaH6YkVLB1IPdQZZRdLu+dEqfC
+         NpCwdxTT4W403uS5yG31z88spS7F2ozRVIzv9VyIISKMPMsm/mU+d0GyPaS/TM3Zzj5I
+         QUUEz23TleayixgylvRtnZUN8WY8Om61UR+xFnwQgMFfoJ78z0QN2mHYXRdRF0jC/+m5
+         mCaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XLzPGl4Eap2WEQDnCBOMpgiVYB87oR4tNzXe04U1Yus=;
-        b=DPXuH/5xGP7T6XWzQ6fRPBYNv11o87OWHal10gyzDQKAs+Ss4to7EIjlZIAY60LBWq
-         WoYmnHd702xmxDo+60ka7FFrT+/u4ZnqBZQr39F5CE0GLbj5WPx3kGM+U2VRbuZsutlz
-         CjcjukGIej9jpGBzKBi0UEz0uDsVdqDPxetAU93KqCl51RcTnuxOxh2fSLSxN7IZseWY
-         F0jUiTZDyq+raV6pJGVYxbBYLwPj9NXJzaPHog/QZ/d5Y5vHfSCVgCvbGcYvzNBxRQFa
-         +el2nau1CzzBlg4x9b90IHgTG0OW9dkTU56sM+XfKZg8Sylht6KvagLuuCqIBFx4NmN3
-         nd5Q==
-X-Gm-Message-State: AOAM5329WTbg+p7xtlDLxPPCrCQSB2GB3ST0moCE6rnFXhtbpgy879HI
-        uKsDx9fwEBWzsgUU0T2b9eKTeg==
-X-Google-Smtp-Source: ABdhPJwS7A/m7RK1cRDv1D4biUVRSI0CtsgcuILfl5254A5JscLQW1n+XDBrmv9+ubuiC+AL2ZrNnQ==
-X-Received: by 2002:a17:90a:ac07:: with SMTP id o7mr702682pjq.194.1598298343792;
-        Mon, 24 Aug 2020 12:45:43 -0700 (PDT)
-Received: from ?IPv6:2620:10d:c085:21e8::193f? ([2620:10d:c090:400::5:b493])
-        by smtp.gmail.com with ESMTPSA id j14sm1880974pgj.3.2020.08.24.12.45.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Aug 2020 12:45:43 -0700 (PDT)
-Subject: Re: [PATCH] rnbd: fix uninitialized variable
-To:     Tong Zhang <ztong0001@gmail.com>, danil.kipnis@cloud.ionos.com,
-        jinpu.wang@cloud.ionos.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200824194322.337375-1-ztong0001@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3b904063-ca08-092d-a861-e1c80d511ab1@kernel.dk>
-Date:   Mon, 24 Aug 2020 13:45:41 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=plOSeJr9JbCX/G7XioOegDbHP0AUWpDmZ+AWPNX08Us=;
+        b=MpE9D3GMlVBWQextK5WcEopJhhUnSYNXC/2S3IP0CJl6pkBo9+PZQkwzXBKi0G9ZtG
+         OV9dtB4CivumP4Pdc3+7Dk+HZziUP9rJWSnF8QrdqGXok0VV8n/Ik1dfPuYsOhzJLx51
+         Io1HYS+sY/5UpbgkAjy4ju6LLob4kjj5lsZtzYrxxSMyYh3EafwCCLUAe2PvC/id+F2o
+         hYIdikWDAy+gs7myq7b1G3AbiYOiXW7Bloll4wUrCZg/nq9JARZb7wNuuvZSOJBbpYuL
+         ht2NZc7C/ExdJ+59SFZjW5/fvxQtIaP3TgFfJr9KgRN/Cxv4XcNwil3STi+5MtzwZmMV
+         BYhw==
+X-Gm-Message-State: AOAM532gtqH1t4Q3xapv10RiXYv8XUgN1eXRwIEw1iHZMk7gCZI3ccUS
+        PPULOgJs0Kxc6EYsDA042loREWiDp5b2jfkZWXQ=
+X-Google-Smtp-Source: ABdhPJxjYySwG9/BUPn1SLcKwSHwTAPktAHj14wvLTMgcIqp2PPtecTZoMb4k1u3VzVGzY5yfm9cDmq/Q2q6QbrRfrc=
+X-Received: by 2002:a02:82c3:: with SMTP id u3mr7153952jag.81.1598298421260;
+ Mon, 24 Aug 2020 12:47:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200824194322.337375-1-ztong0001@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200824194322.337375-1-ztong0001@gmail.com> <3b904063-ca08-092d-a861-e1c80d511ab1@kernel.dk>
+In-Reply-To: <3b904063-ca08-092d-a861-e1c80d511ab1@kernel.dk>
+From:   Tong Zhang <ztong0001@gmail.com>
+Date:   Mon, 24 Aug 2020 15:46:50 -0400
+Message-ID: <CAA5qM4BMSqy=xeJr=qyWHs_TJySpEgoTgg7H66Qu24mkKzwGwQ@mail.gmail.com>
+Subject: Re: [PATCH] rnbd: fix uninitialized variable
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     danil.kipnis@cloud.ionos.com,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/24/20 1:43 PM, Tong Zhang wrote:
-> variable err is uninitialized when bio is an error code
+Got it. Thanks Jens.
 
-It's fixed in Linus's tree:
-
-commit 17bc10300c69bd51b82983cdadafa0a7791f074e
-Author: Nathan Chancellor <natechancellor@gmail.com>
-Date:   Mon Aug 17 23:49:25 2020 -0700
-
-    block/rnbd: Ensure err is always initialized in process_rdma
-
--- 
-Jens Axboe
-
+On Mon, Aug 24, 2020 at 3:45 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 8/24/20 1:43 PM, Tong Zhang wrote:
+> > variable err is uninitialized when bio is an error code
+>
+> It's fixed in Linus's tree:
+>
+> commit 17bc10300c69bd51b82983cdadafa0a7791f074e
+> Author: Nathan Chancellor <natechancellor@gmail.com>
+> Date:   Mon Aug 17 23:49:25 2020 -0700
+>
+>     block/rnbd: Ensure err is always initialized in process_rdma
+>
+> --
+> Jens Axboe
+>
