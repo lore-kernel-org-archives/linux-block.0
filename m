@@ -2,69 +2,91 @@ Return-Path: <SRS0=iUg4=CC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01533C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 18:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80BC2C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 18:56:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0965207CD
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 18:54:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="r4GUC126"
+	by mail.kernel.org (Postfix) with ESMTP id 4E94120738
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 18:56:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598295396;
+	bh=ZYZ5zUCTCO+3YAP8BmXs59JPBP8Qfo12gU2de/2Haf4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=aQQtHa/HhD2vyk9gZPuIOuBo36CDEKCrQ8Nxtu6Ws3gQaUsYdnPHvSIITE87odpkC
+	 mb8zH5CNPqwwGw9pmwE5KNYgxIsF7tpat3RGKBjvcFao9n08qxNERYYAWiVyu8hPMi
+	 CDhnHNNHBIMZYEo1HG0I0RTnTANK4PXyv5EaIHzE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726611AbgHXSyM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 14:54:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47002 "EHLO
+        id S1726306AbgHXS4f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 14:56:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725963AbgHXSyI (ORCPT
+        with ESMTP id S1725904AbgHXS4e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 14:54:08 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A37ECC061573;
-        Mon, 24 Aug 2020 11:54:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/RZ8lu4GLqWgx2SJy7gstpvyOrfX+P6Ib1IzLL5uMvU=; b=r4GUC126jrVcHWcAK7iDriIIMT
-        xQQdHj1FiRNXVRnXsSD5TnlV5iKg0relX2TxVrk5gKJfT+iz/+PelC7p5NpgeOhKHPK4UKVPdj0/1
-        GUO9GYv2mQ9+x0RQ6kElcjX4wwgs8J+qm2KROL3HH2GDwNlQZfghoaGk94YF9b+9a1G2yRa2rKn1H
-        y8OB50lIr/isEArR1LHELITcDAwYBB+aJWzDAphJ64foh07hSD9sdklDUBA4Tbs3Xb5ueEno8/IJK
-        vA1p4/W5ihT0FpBgEYptG6cvRIfeFYw0CSupxEcgVmeG9AfKtWS2YhvdGbdVJBY6jg6Xm+if97dVK
-        3cPWSzDA==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kAHbU-0002Xb-SQ; Mon, 24 Aug 2020 18:54:00 +0000
-Date:   Mon, 24 Aug 2020 19:54:00 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5/5] fs/ceph: use pipe_get_pages_alloc() for pipe
-Message-ID: <20200824185400.GE17456@casper.infradead.org>
-References: <20200822042059.1805541-1-jhubbard@nvidia.com>
- <20200822042059.1805541-6-jhubbard@nvidia.com>
- <048e78f2b440820d936eb67358495cc45ba579c3.camel@kernel.org>
- <c943337b-1c1e-9c85-4ded-39931986c6a3@nvidia.com>
- <af70d334271913a6b09bfd818bc3d81eef5a19b2.camel@kernel.org>
+        Mon, 24 Aug 2020 14:56:34 -0400
+Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F34C061573
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 11:56:33 -0700 (PDT)
+Received: by mail-lf1-x142.google.com with SMTP id v12so4849099lfo.13
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 11:56:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Tm3EEynbk2sQFJXLtEU/waIfg5j0S4RQtFryGKgbTEI=;
+        b=L+vgojworNKXb9HzRx32/knA/5otANw2S6bfUNnHGQc4gaa/mVxwE8BeoaLnWtN6BT
+         WB0KwhgCF9m0dsSUSew8gqb9YAUg40OU3TlQmWXRXj66PEPI7vR37voldgiSau/pE59O
+         SJdfejFuSVmP5lPua50Ot0ePFVB+Oib4BaRRQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Tm3EEynbk2sQFJXLtEU/waIfg5j0S4RQtFryGKgbTEI=;
+        b=FW1rDXpqoNbaoVE1/zMJSE8+gnAHmBN++nfNrFspOjQxn1GpWcxvl6RtUiDE9GbIDp
+         6zr4GxLio//VkG991dNglghO9Ijgg1GCwGC3DXjDh6YhYSKq0qlJcSLVjPxdw/pw//kk
+         5U97XCFdwb1fLbWVNPhAIRUX/FDL9LOh8QwAJnjbdzdEIGebs6KZ9848GJov6QXMcCf0
+         3VgD3C4ZyYOiO2DYrmAPc/+PDUVWwfV1+HxF41BiLb+GbF6S20/2nZfIxgB9Eam+CSD9
+         pf3QT4JOOHMQcFRULQEJrOAEfkns/pOMbOueIBAq7bH+WUcozGRTArIUrpMMCesXceMj
+         KUXw==
+X-Gm-Message-State: AOAM530bhRM3Lk0+afkybdtA9mlFe7+n7tSAf7V5dTGoJTqDbUFHjyY7
+        gIWMw5RY6RgQ8RZCgg1CFQdcUH9ASn7bGw==
+X-Google-Smtp-Source: ABdhPJxa3BG0jtJOLFcGnEakL4HhDC726dblW/qLLQ1Tewy47/fgkJvDM7z8Y76qEqTTJMAgSBOKeA==
+X-Received: by 2002:a05:6512:14d:: with SMTP id m13mr3231909lfo.173.1598295388090;
+        Mon, 24 Aug 2020 11:56:28 -0700 (PDT)
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com. [209.85.208.174])
+        by smtp.gmail.com with ESMTPSA id p1sm2347703lji.93.2020.08.24.11.56.26
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Aug 2020 11:56:27 -0700 (PDT)
+Received: by mail-lj1-f174.google.com with SMTP id w25so10863140ljo.12
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 11:56:26 -0700 (PDT)
+X-Received: by 2002:a2e:b008:: with SMTP id y8mr2829077ljk.421.1598295386631;
+ Mon, 24 Aug 2020 11:56:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af70d334271913a6b09bfd818bc3d81eef5a19b2.camel@kernel.org>
+References: <4945e1c2-a6dd-2827-e7ff-db7aa7ee3bec@kernel.dk>
+In-Reply-To: <4945e1c2-a6dd-2827-e7ff-db7aa7ee3bec@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 24 Aug 2020 11:56:10 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjXzLuN5+koGeDZig6qwabdU3ZG3Ra7TQjSzQr50YPwVw@mail.gmail.com>
+Message-ID: <CAHk-=wjXzLuN5+koGeDZig6qwabdU3ZG3Ra7TQjSzQr50YPwVw@mail.gmail.com>
+Subject: Re: [GIT PULL] Block fixes for 5.9-rc2
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 24, 2020 at 02:47:53PM -0400, Jeff Layton wrote:
-> Ok, I'll plan to pick it up providing no one has issues with exporting that symbol.
+On Sun, Aug 23, 2020 at 12:27 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> io_uring-5.9-2020-08-23
 
-_GPL, perhaps?
+.. you ran the wrong script. Oops.
+
+But it builds cleanly this time.
+
+                Linus
