@@ -2,76 +2,76 @@ Return-Path: <SRS0=iUg4=CC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06EE7C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 15:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E41E6C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 15:40:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFD5C20838
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 15:37:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9BB420866
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 15:40:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRNEANR+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nnLzC/Tb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726967AbgHXPhk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 11:37:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44492 "EHLO
+        id S1727068AbgHXPjz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 11:39:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726803AbgHXPhd (ORCPT
+        with ESMTP id S1725921AbgHXPik (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 11:37:33 -0400
-Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD18C061573;
-        Mon, 24 Aug 2020 08:37:31 -0700 (PDT)
-Received: by mail-qv1-xf41.google.com with SMTP id o2so3898423qvk.6;
-        Mon, 24 Aug 2020 08:37:31 -0700 (PDT)
+        Mon, 24 Aug 2020 11:38:40 -0400
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AB2AC061797;
+        Mon, 24 Aug 2020 08:38:05 -0700 (PDT)
+Received: by mail-qt1-x841.google.com with SMTP id k18so6434062qtm.10;
+        Mon, 24 Aug 2020 08:38:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=R+WnIm5e3oaEHejxIohJMS0+jhs86DYl8gpbwJYmAik=;
-        b=SRNEANR+EJUu/Zk2lbQct/0WbyEkqf2pDiydLArXO1FjTP3+dyQbZb5cme0fCcadXc
-         OiFYofGExGKW448nn7uE+JN14cRscm1+HaD8u86lr15zUszZGT9Pcd+acpXYZV/p+vKL
-         E51D0SLFRHLJcLebrCRFqIuWZCjtfYAl6CMo9rhWPV4MnTmMM7r+aca3EyM64nyOwYT6
-         pDp2BEydP35vDC0pbt3gzjsa9AiW4VqaKmzVoaCLi03yhZe1aL430W3wWlkDKVLHMq8t
-         eIjW/ApOprDE/v2vKEJgj7tOW7L1ZV8eFFsHj6BmSxI13i4G+85BRhLUMHFRq00I05E5
-         Vbug==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=/ckAtjHcJOwaVSUeYgTAhDX9DuJ7NFFHp2LflIRMsvo=;
+        b=nnLzC/Tbu8EG4EQLUh1rQ1oWrrSDBUwLwvqXQZkdi3E75Vr9vGDLW8E3ki69yT2+Hr
+         IB/B2nKt/JANUz1txl8ltQ1BkIn7BCW1uV/c5jsaz2yh6gQj6ZSJO4ypr0T10vHhEDle
+         s5P53ZlmeWinIAcJ0Izp3UgG3C7XMkm1Wl9OzT05ADa7VM1sAbJiBS45gdkgovrth1TR
+         hDfS6OzS7OyNhkVEtQW/5oorykjMRWzFz8gQBesKSb2VmJiLh0Z9c1RnyltHXwJCjAsF
+         i/qJJKHIFfsXoEt34WyaptEakC1unEVUyAU+9dB7OmUBPziBzMpDpg5T5Vsi37IaVUHW
+         5cMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=R+WnIm5e3oaEHejxIohJMS0+jhs86DYl8gpbwJYmAik=;
-        b=J+t/rQymt2BI4crCsI2RvmjNgPeIF++scdBk4OuuaamdPHyXsMTYEMFi6C+zwy/ADa
-         XLQFO9EBIZrTKqEwtMAKvJEZbbCsnYpOD5x8enFIeivO2G5irmZ4n0nN3v7EVwklFdfm
-         YMS1T54lnVecASncJos2vB58KJoqlXzdsDlWrGuhA98veiTfIY3VsplU0uPTJYGMHEN+
-         8seXPyvHMNi4qx5eiQ196QKr0sjGMbrxahLCpWTnvncxzq52jT2RIHo+vPwTSfgvoCeE
-         SPBzZxXllplpgv1DfTd6PUeNC0xEGVIcs5mW/YOSxQg1aZERoH6XilDve/6v4VRfg7Ay
-         4FjQ==
-X-Gm-Message-State: AOAM532SLEIZ8yE4xzoKtKyQUozpjo2K9MphXZazI17kWaccwINWqhNT
-        A92D2Xf+mOcma3ueU6XjEXg=
-X-Google-Smtp-Source: ABdhPJyCkEYCo3MtdQiF5GUBFIBN/888a4pv+196Xxoe+h/IaEsTQWgG71kxxVvbnJOBBJJdhoRpKA==
-X-Received: by 2002:ad4:5812:: with SMTP id dd18mr5401314qvb.23.1598283450715;
-        Mon, 24 Aug 2020 08:37:30 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=/ckAtjHcJOwaVSUeYgTAhDX9DuJ7NFFHp2LflIRMsvo=;
+        b=LTWlWF2RowMe0sHgpqlDrHKzDoJs/57z7As5LqEPNFd/insiTfXIRymANrxwFuAodo
+         0t25Dy53BH6UeGZdtVQv6CrHwN3LegzJA5IK1ROTLGydB/ibIIetCCLdij2oeVkoNDJ2
+         V1daF25fpVZbXYx2uzsUV6/NPd7YUK4gC6PkQiXZ7OmwqF/yqYry2AhAndgRHa3hAiZ/
+         clDTMEHs7wyPACuft9u1Gk8KUjuvE/uOmKM795jZhnAWssXQSdYGEXeA8y7OKWY9SHrT
+         2rICdKMXzl8kv7MinPAczDGoinvci43yucSGqQzfenba/daPJUpViK0WA6mCbq/wl81b
+         BHYA==
+X-Gm-Message-State: AOAM531s+B2X6TZcSVCYjnc+XmY7TsFOLHV0BQAZ24nUdgRR9bt4PI/d
+        xgSb7F8d1pepfe6KqZHOVR4=
+X-Google-Smtp-Source: ABdhPJz1Hwbu5Otr/qHLJUXZggCdoNRReRZhCYBmY+Cl8rQhpiWRbW8QX6AqXd8ZPiUxQrknN2wkxg==
+X-Received: by 2002:ac8:4514:: with SMTP id q20mr5393116qtn.122.1598283484416;
+        Mon, 24 Aug 2020 08:38:04 -0700 (PDT)
 Received: from dschatzberg-fedora-PC0Y6AEN.thefacebook.com ([2620:10d:c091:480::1:dd21])
-        by smtp.gmail.com with ESMTPSA id m17sm10942758qkn.45.2020.08.24.08.37.28
+        by smtp.gmail.com with ESMTPSA id m17sm10942758qkn.45.2020.08.24.08.38.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2020 08:37:29 -0700 (PDT)
+        Mon, 24 Aug 2020 08:38:03 -0700 (PDT)
 From:   Dan Schatzberg <schatzberg.dan@gmail.com>
 Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
         Jens Axboe <axboe@kernel.dk>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
         Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
         Michal Hocko <mhocko@kernel.org>,
         Vladimir Davydov <vdavydov.dev@gmail.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Hugh Dickins <hughd@google.com>,
         Shakeel Butt <shakeelb@google.com>,
         Roman Gushchin <guro@fb.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
         Chris Down <chris@chrisdown.name>,
         Yafang Shao <laoar.shao@gmail.com>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -90,10 +90,12 @@ Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
         cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
         linux-mm@kvack.org (open list:CONTROL GROUP - MEMORY RESOURCE
         CONTROLLER (MEMCG))
-Subject: [PATCH v7 0/4] Charge loop device i/o to issuing cgroup
-Date:   Mon, 24 Aug 2020 11:35:58 -0400
-Message-Id: <20200824153607.6595-1-schatzberg.dan@gmail.com>
+Subject: [PATCH 4/4] loop: Charge i/o to mem and blk cg
+Date:   Mon, 24 Aug 2020 11:36:02 -0400
+Message-Id: <20200824153607.6595-5-schatzberg.dan@gmail.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200824153607.6595-1-schatzberg.dan@gmail.com>
+References: <20200824153607.6595-1-schatzberg.dan@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 To:     unlisted-recipients:; (no To-header on input)
@@ -102,135 +104,242 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Much of the discussion about this has died down. There's been a
-concern raised that we could generalize infrastructure across loop,
-md, etc. This may be possible, in the future, but it isn't clear to me
-how this would look like. I'm inclined to fix the existing issue with
-loop devices now (this is a problem we hit at FB) and address
-consolidation with other cases if and when those need to be addressed.
+The current code only associates with the existing blkcg when aio is
+used to access the backing file. This patch covers all types of i/o to
+the backing file and also associates the memcg so if the backing file is
+on tmpfs, memory is charged appropriately.
 
-Note that patch 2 in this series (mm: support nesting
-memalloc_use_memcg()) has also been submitted by Roman Guschchin to
-the mm tree and can be seen here:
-http://lkml.iu.edu/hypermail/linux/kernel/2008.2/09214.html - I
-include it here for completeness, but this series works with either
-version of the patch.
+This patch also exports cgroup_get_e_css so it can be used by the loop
+module.
 
-Changes since V7:
+Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+---
+ drivers/block/loop.c       | 61 +++++++++++++++++++++++++-------------
+ drivers/block/loop.h       |  3 +-
+ include/linux/memcontrol.h |  6 ++++
+ kernel/cgroup/cgroup.c     |  1 +
+ mm/shmem.c                 |  1 -
+ 5 files changed, 50 insertions(+), 22 deletions(-)
 
-* Rebased against linus's branch
-
-Changes since V6:
-
-* Added separate spinlock for worker synchronization
-* Minor style changes
-
-Changes since V5:
-
-* Fixed a missing css_put when failing to allocate a worker
-* Minor style changes
-
-Changes since V4:
-
-Only patches 1 and 2 have changed.
-
-* Fixed irq lock ordering bug
-* Simplified loop detach
-* Added support for nesting memalloc_use_memcg
-
-Changes since V3:
-
-* Fix race on loop device destruction and deferred worker cleanup
-* Ensure charge on shmem_swapin_page works just like getpage
-* Minor style changes
-
-Changes since V2:
-
-* Deferred destruction of workqueue items so in the common case there
-  is no allocation needed
-
-Changes since V1:
-
-* Split out and reordered patches so cgroup charging changes are
-  separate from kworker -> workqueue change
-
-* Add mem_css to struct loop_cmd to simplify logic
-
-The loop device runs all i/o to the backing file on a separate kworker
-thread which results in all i/o being charged to the root cgroup. This
-allows a loop device to be used to trivially bypass resource limits
-and other policy. This patch series fixes this gap in accounting.
-
-A simple script to demonstrate this behavior on cgroupv2 machine:
-
-'''
-#!/bin/bash
-set -e
-
-CGROUP=/sys/fs/cgroup/test.slice
-LOOP_DEV=/dev/loop0
-
-if [[ ! -d $CGROUP ]]
-then
-    sudo mkdir $CGROUP
-fi
-
-grep oom_kill $CGROUP/memory.events
-
-# Set a memory limit, write more than that limit to tmpfs -> OOM kill
-sudo unshare -m bash -c "
-echo \$\$ > $CGROUP/cgroup.procs;
-echo 0 > $CGROUP/memory.swap.max;
-echo 64M > $CGROUP/memory.max;
-mount -t tmpfs -o size=512m tmpfs /tmp;
-dd if=/dev/zero of=/tmp/file bs=1M count=256" || true
-
-grep oom_kill $CGROUP/memory.events
-
-# Set a memory limit, write more than that limit through loopback
-# device -> no OOM kill
-sudo unshare -m bash -c "
-echo \$\$ > $CGROUP/cgroup.procs;
-echo 0 > $CGROUP/memory.swap.max;
-echo 64M > $CGROUP/memory.max;
-mount -t tmpfs -o size=512m tmpfs /tmp;
-truncate -s 512m /tmp/backing_file
-losetup $LOOP_DEV /tmp/backing_file
-dd if=/dev/zero of=$LOOP_DEV bs=1M count=256;
-losetup -D $LOOP_DEV" || true
-
-grep oom_kill $CGROUP/memory.events
-'''
-
-Naively charging cgroups could result in priority inversions through
-the single kworker thread in the case where multiple cgroups are
-reading/writing to the same loop device. This patch series does some
-minor modification to the loop driver so that each cgroup can make
-forward progress independently to avoid this inversion.
-
-With this patch series applied, the above script triggers OOM kills
-when writing through the loop device as expected.
-
-Dan Schatzberg (3):
-  loop: Use worker per cgroup instead of kworker
-  mm: Charge active memcg when no mm is set
-  loop: Charge i/o to mem and blk cg
-
-Johannes Weiner (1):
-  mm: support nesting memalloc_use_memcg()
-
- drivers/block/loop.c                 | 248 ++++++++++++++++++++++-----
- drivers/block/loop.h                 |  15 +-
- fs/buffer.c                          |   6 +-
- fs/notify/fanotify/fanotify.c        |   5 +-
- fs/notify/inotify/inotify_fsnotify.c |   5 +-
- include/linux/memcontrol.h           |   6 +
- include/linux/sched/mm.h             |  28 +--
- kernel/cgroup/cgroup.c               |   1 +
- mm/memcontrol.c                      |  17 +-
- mm/shmem.c                           |   4 +-
- 10 files changed, 253 insertions(+), 82 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index c8dae53f3914..102d236d1540 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -77,6 +77,7 @@
+ #include <linux/uio.h>
+ #include <linux/ioprio.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/sched/mm.h>
+ 
+ #include "loop.h"
+ 
+@@ -518,8 +519,6 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
+ {
+ 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+ 
+-	if (cmd->css)
+-		css_put(cmd->css);
+ 	cmd->ret = ret;
+ 	lo_rw_aio_do_completion(cmd);
+ }
+@@ -580,8 +579,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	cmd->iocb.ki_complete = lo_rw_aio_complete;
+ 	cmd->iocb.ki_flags = IOCB_DIRECT;
+ 	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
+-	if (cmd->css)
+-		kthread_associate_blkcg(cmd->css);
+ 
+ 	if (rw == WRITE)
+ 		ret = call_write_iter(file, &cmd->iocb, &iter);
+@@ -589,7 +586,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		ret = call_read_iter(file, &cmd->iocb, &iter);
+ 
+ 	lo_rw_aio_do_completion(cmd);
+-	kthread_associate_blkcg(NULL);
+ 
+ 	if (ret != -EIOCBQUEUED)
+ 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
+@@ -929,7 +925,7 @@ struct loop_worker {
+ 	struct list_head cmd_list;
+ 	struct list_head idle_list;
+ 	struct loop_device *lo;
+-	struct cgroup_subsys_state *css;
++	struct cgroup_subsys_state *blkcg_css;
+ 	unsigned long last_ran_at;
+ };
+ 
+@@ -946,7 +942,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 
+ 	spin_lock_irq(&lo->lo_work_lock);
+ 
+-	if (!cmd->css)
++	if (!cmd->blkcg_css)
+ 		goto queue_work;
+ 
+ 	node = &lo->worker_tree.rb_node;
+@@ -954,10 +950,10 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 	while (*node) {
+ 		parent = *node;
+ 		cur_worker = container_of(*node, struct loop_worker, rb_node);
+-		if (cur_worker->css == cmd->css) {
++		if (cur_worker->blkcg_css == cmd->blkcg_css) {
+ 			worker = cur_worker;
+ 			break;
+-		} else if ((long)cur_worker->css < (long)cmd->css) {
++		} else if ((long)cur_worker->blkcg_css < (long)cmd->blkcg_css) {
+ 			node = &(*node)->rb_left;
+ 		} else {
+ 			node = &(*node)->rb_right;
+@@ -969,13 +965,18 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT | __GFP_NOWARN);
+ 	/*
+ 	 * In the event we cannot allocate a worker, just queue on the
+-	 * rootcg worker
++	 * rootcg worker and issue the I/O as the rootcg
+ 	 */
+-	if (!worker)
++	if (!worker) {
++		cmd->blkcg_css = NULL;
++		if (cmd->memcg_css)
++			css_put(cmd->memcg_css);
++		cmd->memcg_css = NULL;
+ 		goto queue_work;
++	}
+ 
+-	worker->css = cmd->css;
+-	css_get(worker->css);
++	worker->blkcg_css = cmd->blkcg_css;
++	css_get(worker->blkcg_css);
+ 	INIT_WORK(&worker->work, loop_workfn);
+ 	INIT_LIST_HEAD(&worker->cmd_list);
+ 	INIT_LIST_HEAD(&worker->idle_list);
+@@ -1301,7 +1302,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 				idle_list) {
+ 		list_del(&worker->idle_list);
+ 		rb_erase(&worker->rb_node, &lo->worker_tree);
+-		css_put(worker->css);
++		css_put(worker->blkcg_css);
+ 		kfree(worker);
+ 	}
+ 	spin_unlock_irq(&lo->lo_work_lock);
+@@ -2102,13 +2103,18 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	}
+ 
+ 	/* always use the first bio's css */
++	cmd->blkcg_css = NULL;
++	cmd->memcg_css = NULL;
+ #ifdef CONFIG_BLK_CGROUP
+-	if (cmd->use_aio && rq->bio && rq->bio->bi_blkg) {
+-		cmd->css = &bio_blkcg(rq->bio)->css;
+-		css_get(cmd->css);
+-	} else
++	if (rq->bio && rq->bio->bi_blkg) {
++		cmd->blkcg_css = &bio_blkcg(rq->bio)->css;
++#ifdef CONFIG_MEMCG
++		cmd->memcg_css =
++			cgroup_get_e_css(cmd->blkcg_css->cgroup,
++					&memory_cgrp_subsys);
++#endif
++	}
+ #endif
+-		cmd->css = NULL;
+ 	loop_queue_work(lo, cmd);
+ 
+ 	return BLK_STS_OK;
+@@ -2120,13 +2126,28 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+ 	const bool write = op_is_write(req_op(rq));
+ 	struct loop_device *lo = rq->q->queuedata;
+ 	int ret = 0;
++	struct mem_cgroup *old_memcg = NULL;
+ 
+ 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
+ 		ret = -EIO;
+ 		goto failed;
+ 	}
+ 
++	if (cmd->blkcg_css)
++		kthread_associate_blkcg(cmd->blkcg_css);
++	if (cmd->memcg_css)
++		old_memcg = memalloc_use_memcg(
++			mem_cgroup_from_css(cmd->memcg_css));
++
+ 	ret = do_req_filebacked(lo, rq);
++
++	if (cmd->blkcg_css)
++		kthread_associate_blkcg(NULL);
++
++	if (cmd->memcg_css) {
++		memalloc_use_memcg(old_memcg);
++		css_put(cmd->memcg_css);
++	}
+  failed:
+ 	/* complete non-aio request */
+ 	if (!cmd->use_aio || ret) {
+@@ -2205,7 +2226,7 @@ static void loop_free_idle_workers(struct timer_list *timer)
+ 			break;
+ 		list_del(&worker->idle_list);
+ 		rb_erase(&worker->rb_node, &lo->worker_tree);
+-		css_put(worker->css);
++		css_put(worker->blkcg_css);
+ 		kfree(worker);
+ 	}
+ 	if (!list_empty(&lo->idle_worker_list))
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 0162b55a68e1..4d6886d9855a 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -75,7 +75,8 @@ struct loop_cmd {
+ 	long ret;
+ 	struct kiocb iocb;
+ 	struct bio_vec *bvec;
+-	struct cgroup_subsys_state *css;
++	struct cgroup_subsys_state *blkcg_css;
++	struct cgroup_subsys_state *memcg_css;
+ };
+ 
+ /* Support for loadable transfer modules */
+diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
+index d0b036123c6a..fceac9f66d96 100644
+--- a/include/linux/memcontrol.h
++++ b/include/linux/memcontrol.h
+@@ -1031,6 +1031,12 @@ static inline struct mem_cgroup *get_mem_cgroup_from_page(struct page *page)
+ 	return NULL;
+ }
+ 
++static inline
++struct mem_cgroup *mem_cgroup_from_css(struct cgroup_subsys_state *css)
++{
++	return NULL;
++}
++
+ static inline void mem_cgroup_put(struct mem_cgroup *memcg)
+ {
+ }
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index dd247747ec14..16d059a89a68 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -580,6 +580,7 @@ struct cgroup_subsys_state *cgroup_get_e_css(struct cgroup *cgrp,
+ 	rcu_read_unlock();
+ 	return css;
+ }
++EXPORT_SYMBOL_GPL(cgroup_get_e_css);
+ 
+ static void cgroup_get_live(struct cgroup *cgrp)
+ {
+diff --git a/mm/shmem.c b/mm/shmem.c
+index 77c908730be4..1139f52ac4ee 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -1696,7 +1696,6 @@ static int shmem_swapin_page(struct inode *inode, pgoff_t index,
+ 	struct address_space *mapping = inode->i_mapping;
+ 	struct shmem_inode_info *info = SHMEM_I(inode);
+ 	struct mm_struct *charge_mm = vma ? vma->vm_mm : NULL;
+-	struct mem_cgroup *memcg;
+ 	struct page *page;
+ 	swp_entry_t swap;
+ 	int error;
 -- 
 2.24.1
 
