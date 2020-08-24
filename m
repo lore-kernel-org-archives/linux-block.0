@@ -2,133 +2,126 @@ Return-Path: <SRS0=iUg4=CC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2896C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 20:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A71EFC433E1
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 20:48:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABFF92067C
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 20:46:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72FEE2067C
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 20:48:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ot9SSfwr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="auEzjtIj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726863AbgHXUqV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 16:46:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36320 "EHLO
+        id S1726863AbgHXUsT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 16:48:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726241AbgHXUqU (ORCPT
+        with ESMTP id S1725904AbgHXUsS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 16:46:20 -0400
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E99CEC061755
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 13:46:19 -0700 (PDT)
-Received: by mail-qt1-x841.google.com with SMTP id d27so7349603qtg.4
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 13:46:19 -0700 (PDT)
+        Mon, 24 Aug 2020 16:48:18 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38430C061574
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 13:48:18 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id t23so7374300qto.3
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 13:48:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=OudTXsGC8UrNFmAXrd4teM7+91cCbKPSxYFV80ypCd0=;
-        b=ot9SSfwrAZSKzxInGVngVCPfNPSEv/2V+vR1K/Hos4xi2HrSwRNCofpHR1oSyoNtoA
-         VZ0gj5JdFSE9relSmpFHAUclZQOby1oq+0HhnP1a+8FYSUGeEOAYrgh/CAi8ZMgrM/L8
-         BQkNDdHeiECpQV0Ro8MggTINiG8B6JFpZVD6ksR6gJiHrXkAL5EFA5og9LEPZ5CMh379
-         p/B6zGAQACsLludXEAemWG0W1OleJbAZ+pL+69yxZQYntPAHNArJcV+6q5uj9eRkoHT1
-         OzNDTvLD7kZAwt0aTS4UXOwhq3Z/v2Cn1eb9XwVvukBsBStdXsn95uGQxHTevayv+SFZ
-         6nPg==
+        bh=qS7GCub16YOXCBI7wY/iB+oxgRAyX2P/zTn3Ms4MIKI=;
+        b=auEzjtIjrt9yNifjUscK8hbsclBxxHrdNk/cPT72zj2Rb+Vxi452PNFgbrT8Irbne0
+         J52US092dIdzT7TxAsn22A2bWDz4hIN3yheHzmf1KcjfdP1I1eQtcTUaq0vXANn7J/4B
+         Q89HDDXvWbWvtma/pj2iBizsvsamyo5KOMMyuVgHbsZ4GlV0FFYM24Gte9SIuiut9kUR
+         MBTWYy4rDObjP4ws9M878G3tun1zxjRIkvwK/kc9u8Eds91eP5DU/+R1yjwAjsOW0KE/
+         c/t8WfBfBnD9Liek7N9cNtH76PgyesRGl5vmFUNA9rJQxzbPjNZ6iVLXMJl0Jy6QZ4Et
+         Tifw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=OudTXsGC8UrNFmAXrd4teM7+91cCbKPSxYFV80ypCd0=;
-        b=C+zbnh8XOAPVjK2E5ly9Yb1FQ+exUaQn99Ue4AKLqz3WCoGxCHTsvpWLKJNnnxQ45f
-         412KtksCKsF1my8WtL87xF6oBjx2ZCw4PDckwkHvslxHVnK/xN+hw41xWK3kRoprAffY
-         Ht5mPxOJ8Xxg6PTp2wnvN/0uPnMKXxL/zZDJbCVs91ks+J9tkypncMpP6Quz97K5IQb7
-         goJTbTa+zimA4RBWO0luTs7uzOSWwwEPE81sxD8iRiqExOd+/scDNWfjFac1URdQilQX
-         tzUMJssy8/vD3LkNvTeYy3x55RJChfQCMweUIRVh4gaBD5CIG/CKV0+oogTkixqnbSRo
-         RXRQ==
-X-Gm-Message-State: AOAM531ybPEK24YMa6kObm2eOmvngZoWPkF2Ca0TMosN3IdMFk+4juFO
-        U2SBFtGtbsaBPOsoAg4h8EE5DjBFEbm9ervnoMw2rHHR/uc=
-X-Google-Smtp-Source: ABdhPJzRolUTn7gzdSjz944oXv3BREgd0xn1TnglIK+xP7wbJAMXq413xvh+KIcMrbO1sZaOCRuZ6WZLKDzZ4ysWeyg=
-X-Received: by 2002:ac8:4652:: with SMTP id f18mr6336945qto.142.1598301978791;
- Mon, 24 Aug 2020 13:46:18 -0700 (PDT)
+        bh=qS7GCub16YOXCBI7wY/iB+oxgRAyX2P/zTn3Ms4MIKI=;
+        b=ETtakhOPbolvrbQjodOC1+jLCjgFlF0M2W1tPayBitlvrMZ5FChAIRa1L+zWCUPIdY
+         8HmbDJcp51WW9CbxCE1VrhTkfDvAQFzuat54liBWJFKSDzAoEz6d6Rjk9eIZ9qXqphGS
+         z98Iifxstv/yqErjtWKVn3vtvrQOo56Y8VcFMv1+/Pry0cyeI0ZlU6h1k+TXdeH5IQxT
+         AiEmXDRPRRZ5cWtX4N0PdJgxHrFU1Xe5Y1onHgRXVE+1Dm+HJ5qLLMYBD57Q/s2lvYqQ
+         A0VCUISk7g3bnhk2gWVDDCvdV/1yKO1o76ZKJj1rJBErAG/g1aH7mCwgY1pV5o340GAB
+         +slw==
+X-Gm-Message-State: AOAM531R81Ghtp7sGNEg5dcrGIjl57OoaoNLIPK9YHTMg4XcghDMVWJD
+        4HC7tbqYSYfTIiKcmps+NcllpRgHeNnzbKpmX7sBpQ==
+X-Google-Smtp-Source: ABdhPJwcsOixxkTv5vVNuzhXuPxECYRzO2S6EH/ImCIblX+d1aHrhrEXN56+g0qRu8t4UjSaMjPITlDuPV4fCldNK6s=
+X-Received: by 2002:aed:20cb:: with SMTP id 69mr6721963qtb.106.1598302097162;
+ Mon, 24 Aug 2020 13:48:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <CACGdZYL_bE2bamw_1uanwWByrCteNF=hmWYLH=VEVm9=R987ew@mail.gmail.com>
- <992ed2ed-f644-a5ad-3239-b38ddeafe28b@acm.org> <b138bc8f-0062-3e0e-5838-bf73c09b40f0@kernel.dk>
-In-Reply-To: <b138bc8f-0062-3e0e-5838-bf73c09b40f0@kernel.dk>
+References: <20200824204501.1707957-1-khazhy@google.com>
+In-Reply-To: <20200824204501.1707957-1-khazhy@google.com>
 From:   Khazhismel Kumykov <khazhy@google.com>
-Date:   Mon, 24 Aug 2020 13:46:07 -0700
-Message-ID: <CACGdZYJEQnw2XVnOZ9YmdNJax8fOQ6CR5O=OBMca=q=ftPHaNw@mail.gmail.com>
-Subject: Re: IOPRIO_CLASS_RT without CAP_SYS_ADMIN?
+Date:   Mon, 24 Aug 2020 13:48:05 -0700
+Message-ID: <CACGdZYK7cEmS=WMAvo5PWv04nFBhTuFm6cbOnQ+xUXqs-9_6xA@mail.gmail.com>
+Subject: Re: [PATCH] block: grant IOPRIO_CLASS_RT to CAP_SYS_NICE
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Bart Van Assche <bvanassche@acm.org>, paolo.valente@linaro.org,
+Cc:     Serge Hallyn <serge@hallyn.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Bart Van Assche <bvanassche@acm.org>,
         linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-security-module@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000ba0ed305ada5adcb"
+        boundary="000000000000c6e64705ada5b471"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000ba0ed305ada5adcb
+--000000000000c6e64705ada5b471
 Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Aug 22, 2020 at 7:14 PM Jens Axboe <axboe@kernel.dk> wrote:
+On Mon, Aug 24, 2020 at 1:45 PM Khazhismel Kumykov <khazhy@google.com> wrote:
 >
-> On 8/22/20 7:58 PM, Bart Van Assche wrote:
-> > On 2020-08-20 17:35, Khazhismel Kumykov wrote:
-> >> It'd be nice to allow a process to send RT requests without granting
-> >> it the wide capabilities of CAP_SYS_ADMIN, and we already have a
-> >> capability which seems to almost fit this priority idea -
-> >> CAP_SYS_NICE? Would this fit there?
-> >>
-> >> Being capable of setting IO priorities on per request or per thread
-> >> basis (be it async submission or w/ thread ioprio_set) is useful
-> >> especially when the userspace has its own prioritization/scheduling
-> >> before hitting the kernel, allowing us to signal to the kernel how to
-> >> order certain IOs, and it'd be nice to separate this from ADMIN for
-> >> non-root processes, in a way that's less error prone than e.g. having
-> >> a trusted launcher ionice the process and then drop priorities for
-> >> everything but prio requests.
-> >
-> > Hi Khazhy,
-> >
-> > In include/uapi/linux/capability.h I found the following:
-> >
-> > /* Allow raising priority and setting priority on other (different
-> >    UID) processes */
-> > /* Allow use of FIFO and round-robin (realtime) scheduling on own
-> >    processes and setting the scheduling algorithm used by another
-> >    process. */
-> > /* Allow setting cpu affinity on other processes */
-> > #define CAP_SYS_NICE         23
-> >
-> > If it is acceptable that every process that has permission to submit
-> > IOPRIO_CLASS_RT I/O also has permission to modify the priority of
-> > other processes then extending CAP_SYS_NICE is an option. Another
-> > possibility is to extend the block cgroup controller such that the
-> > capability to submit IOPRIO_CLASS_RT I/O can be enabled through the
-> > cgroup interface. There may be other approaches. I'm not sure what
-> > the best approach is.
-
-I think it fits well with CAP_SYS_NICE, especially since that
-capability already grants the ability to demote other processes to
-IOPRIO_CLASS_IDLE, etc.
-
+> CAP_SYS_ADMIN is too broad, and ionice fits into CAP_SYS_NICE's grouping.
 >
-> I think CAP_SYS_NICE fits pretty nicely, and I was actually planning on
-> using that for the io_uring SQPOLL side as well. So there is/will be
-> some precedent for tying it into IO related things, too. For this use
-> case, I think it's perfect.
+> Retain CAP_SYS_ADMIN permission for backwards compatibility.
+>
+> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+> ---
+>  block/ioprio.c                  | 2 +-
+>  include/uapi/linux/capability.h | 2 ++
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/ioprio.c b/block/ioprio.c
+> index 77bcab11dce5..4572456430f9 100644
+> --- a/block/ioprio.c
+> +++ b/block/ioprio.c
+> @@ -69,7 +69,7 @@ int ioprio_check_cap(int ioprio)
+>
+>         switch (class) {
+>                 case IOPRIO_CLASS_RT:
+> -                       if (!capable(CAP_SYS_ADMIN))
+> +                       if (!capable(CAP_SYS_ADMIN) || !capable(CAP_SYS_NICE))
+yikes, sorry for the spam
+>                                 return -EPERM;
+>                         /* fall through */
+>                         /* rt has prio field too */
+> diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capability.h
+> index 395dd0df8d08..c6ca33034147 100644
+> --- a/include/uapi/linux/capability.h
+> +++ b/include/uapi/linux/capability.h
+> @@ -288,6 +288,8 @@ struct vfs_ns_cap_data {
+>     processes and setting the scheduling algorithm used by another
+>     process. */
+>  /* Allow setting cpu affinity on other processes */
+> +/* Allow setting realtime ioprio class */
+> +/* Allow setting ioprio class on other processes */
+>
+>  #define CAP_SYS_NICE         23
 >
 > --
-> Jens Axboe
+> 2.28.0.297.g1956fa8f8d-goog
 >
 
---000000000000ba0ed305ada5adcb
+--000000000000c6e64705ada5b471
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -193,13 +186,13 @@ SZrCvtwvCj+zfJSxNqLmOhITBB1uGneHUHjwTEK87WDqGVcm43pwBMHZ8qMziJdVf8MbKPm4w6a9
 NC8D2u/lHre/+I8qQ3tgofQC+AomdFoGhr+nQj+6O1Sv8BKB1ArDiku4umqVMYICYTCCAl0CAQEw
 XzBLMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEhMB8GA1UEAxMYR2xv
 YmFsU2lnbiBTTUlNRSBDQSAyMDE4AhABBw5QEQ1RT42XN3T1kVOEMA0GCWCGSAFlAwQCAQUAoIHU
-MC8GCSqGSIb3DQEJBDEiBCDVWOCcUvnfqiw2yxu4HnC9++TDuITx/ihlcWlIglt76jAYBgkqhkiG
-9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yMDA4MjQyMDQ2MTlaMGkGCSqGSIb3
+MC8GCSqGSIb3DQEJBDEiBCBWBKq8RqkPlI/7iXWOAUxnsI6i06kb7X3mEsafog/RKDAYBgkqhkiG
+9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yMDA4MjQyMDQ4MTdaMGkGCSqGSIb3
 DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcN
 AwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAE
-ggEAoN4EYPKl7UMCQqKvmjJWCCuk3gbmtczqXYmtYQqQzMqyJzucGrKW/wQlY3Nkw/Ohr5mXTvMJ
-cOXuIYUpXVJybt7PdEK7eYRaJ8uLgHqqxfN7aLrnAOdtQvBe867HFqcpJ5m9lOs0jZb26pr00WYp
-h76WYWH1GfMFs2jWPibBEOKGVmldpYDdzljs3aCYwZHBYxgos1sRFgwITFoq09j9+KyKHKDjOd42
-OOfv227+qfCg7gX/lv+OOK6qPsrX47BI+9n/1EORCWoDly/LqjNznOTljGRuJd398smuQyjaL8jC
-zW9naTZ5ycy+FIddrKx66K2f3gvTG0Pi1pHSY3zrCg==
---000000000000ba0ed305ada5adcb--
+ggEAkpt4H4JcBhl8DYOinmZBG6ajppMHs6OcIONbbzUL8B5DTc/F8C29kwJw8wd2cVXxn2oxvmro
+KqAtSOMqmnxiZzMoxtLfnWPPmLxN1zpWtebfBxxoBGYuWlzuU88VIYxhkzgHBwDTaySj4Od4Zc5c
+7SGAA68brkgzGXpytlAEXps4iN9r08OfwkC+Uw0WkL4xmaTk9XeQNz7gN6yo70StFpKKQk+7TVRX
+oyicYWljQU7HNZkhUJRyW2c0hW23H8/XJc4rSfafg/Yd1xlLOltO0gbPUOTfzRv5qiML63T2T/6k
+OE/eOOafIj/WJagycYPSZz5ccn/nTGB80OZBvD0wZA==
+--000000000000c6e64705ada5b471--
