@@ -2,197 +2,138 @@ Return-Path: <SRS0=iUg4=CC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A71EFC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 20:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1A9C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 21:34:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72FEE2067C
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 20:48:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="auEzjtIj"
+	by mail.kernel.org (Postfix) with ESMTP id 65AAC20738
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 21:34:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726863AbgHXUsT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 16:48:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36628 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725904AbgHXUsS (ORCPT
+        id S1726303AbgHXVeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 17:34:10 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:42498 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726090AbgHXVeJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 16:48:18 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38430C061574
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 13:48:18 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id t23so7374300qto.3
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 13:48:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qS7GCub16YOXCBI7wY/iB+oxgRAyX2P/zTn3Ms4MIKI=;
-        b=auEzjtIjrt9yNifjUscK8hbsclBxxHrdNk/cPT72zj2Rb+Vxi452PNFgbrT8Irbne0
-         J52US092dIdzT7TxAsn22A2bWDz4hIN3yheHzmf1KcjfdP1I1eQtcTUaq0vXANn7J/4B
-         Q89HDDXvWbWvtma/pj2iBizsvsamyo5KOMMyuVgHbsZ4GlV0FFYM24Gte9SIuiut9kUR
-         MBTWYy4rDObjP4ws9M878G3tun1zxjRIkvwK/kc9u8Eds91eP5DU/+R1yjwAjsOW0KE/
-         c/t8WfBfBnD9Liek7N9cNtH76PgyesRGl5vmFUNA9rJQxzbPjNZ6iVLXMJl0Jy6QZ4Et
-         Tifw==
+        Mon, 24 Aug 2020 17:34:09 -0400
+Received: by mail-pg1-f194.google.com with SMTP id g1so1492312pgm.9
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 14:34:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qS7GCub16YOXCBI7wY/iB+oxgRAyX2P/zTn3Ms4MIKI=;
-        b=ETtakhOPbolvrbQjodOC1+jLCjgFlF0M2W1tPayBitlvrMZ5FChAIRa1L+zWCUPIdY
-         8HmbDJcp51WW9CbxCE1VrhTkfDvAQFzuat54liBWJFKSDzAoEz6d6Rjk9eIZ9qXqphGS
-         z98Iifxstv/yqErjtWKVn3vtvrQOo56Y8VcFMv1+/Pry0cyeI0ZlU6h1k+TXdeH5IQxT
-         AiEmXDRPRRZ5cWtX4N0PdJgxHrFU1Xe5Y1onHgRXVE+1Dm+HJ5qLLMYBD57Q/s2lvYqQ
-         A0VCUISk7g3bnhk2gWVDDCvdV/1yKO1o76ZKJj1rJBErAG/g1aH7mCwgY1pV5o340GAB
-         +slw==
-X-Gm-Message-State: AOAM531R81Ghtp7sGNEg5dcrGIjl57OoaoNLIPK9YHTMg4XcghDMVWJD
-        4HC7tbqYSYfTIiKcmps+NcllpRgHeNnzbKpmX7sBpQ==
-X-Google-Smtp-Source: ABdhPJwcsOixxkTv5vVNuzhXuPxECYRzO2S6EH/ImCIblX+d1aHrhrEXN56+g0qRu8t4UjSaMjPITlDuPV4fCldNK6s=
-X-Received: by 2002:aed:20cb:: with SMTP id 69mr6721963qtb.106.1598302097162;
- Mon, 24 Aug 2020 13:48:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200824204501.1707957-1-khazhy@google.com>
-In-Reply-To: <20200824204501.1707957-1-khazhy@google.com>
-From:   Khazhismel Kumykov <khazhy@google.com>
-Date:   Mon, 24 Aug 2020 13:48:05 -0700
-Message-ID: <CACGdZYK7cEmS=WMAvo5PWv04nFBhTuFm6cbOnQ+xUXqs-9_6xA@mail.gmail.com>
-Subject: Re: [PATCH] block: grant IOPRIO_CLASS_RT to CAP_SYS_NICE
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Serge Hallyn <serge@hallyn.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8ETIc5uiwZOHIWMR5ZmbncsNV8aJaWv5oMgspdnRmzo=;
+        b=fDCX5cdhugVqSqgETZ/vaT4aqBklFe+slsPRTKabrzY0Tec4EVn1Mp3rRif7INmM+4
+         nFCmJ6tWMOrYR1iCpzt5ZW5+raerGUHOCaKuld/6lRZg5PW+jVvYPdX3ef/ArUQtbHXV
+         qG4o3KTaQDEKmsFZ9nQgY6Cka/ekn8pdUQ5NJzJdhBdrCDoK4V0+Md4VTvkB0iwCxb2a
+         sEwhrAS+bv0Uqa8dcX9Cl9veikPT6rSp2dXgmDIYPmWnuYZHMBdnMPWEI6FpbmQbuWFH
+         GgskkTcQJhYzjyn1o1lqKURd+JS6kjBcfLW0BpBdpTFmj027UyEme24n7FSUe52p58Y8
+         TITQ==
+X-Gm-Message-State: AOAM530HifKVHcmmFrUPMfkbu5wVwr9TUcr7pQCOB1cjebQbvb7jQ9k8
+        t8sy8Brho+RQb42+Z6sCsqs=
+X-Google-Smtp-Source: ABdhPJwaCtk6q7/3ItxGfTLXiza98zdHXweAMxPZ9W4TiyU2dhQxqUCOmUSNBdkc1fMB876gCFl3jg==
+X-Received: by 2002:a62:64d5:: with SMTP id y204mr5306605pfb.83.1598304848712;
+        Mon, 24 Aug 2020 14:34:08 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:cda6:bf68:c972:645d? ([2601:647:4802:9070:cda6:bf68:c972:645d])
+        by smtp.gmail.com with ESMTPSA id m4sm12381116pfh.129.2020.08.24.14.34.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Aug 2020 14:34:08 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
         Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-security-module@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000c6e64705ada5b471"
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+ <856f6108-2227-67e8-e913-fdef296a2d26@grimberg.me>
+ <20200822133954.GC3189453@T590>
+ <619a8d4f-267f-5e21-09bd-16b45af69480@grimberg.me>
+ <20200824104052.GA3210443@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <44160549-0273-b8e6-1599-d54ce84eb47f@grimberg.me>
+Date:   Mon, 24 Aug 2020 14:34:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200824104052.GA3210443@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000c6e64705ada5b471
-Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Aug 24, 2020 at 1:45 PM Khazhismel Kumykov <khazhy@google.com> wrote:
->
-> CAP_SYS_ADMIN is too broad, and ionice fits into CAP_SYS_NICE's grouping.
->
-> Retain CAP_SYS_ADMIN permission for backwards compatibility.
->
-> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
-> ---
->  block/ioprio.c                  | 2 +-
->  include/uapi/linux/capability.h | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/block/ioprio.c b/block/ioprio.c
-> index 77bcab11dce5..4572456430f9 100644
-> --- a/block/ioprio.c
-> +++ b/block/ioprio.c
-> @@ -69,7 +69,7 @@ int ioprio_check_cap(int ioprio)
->
->         switch (class) {
->                 case IOPRIO_CLASS_RT:
-> -                       if (!capable(CAP_SYS_ADMIN))
-> +                       if (!capable(CAP_SYS_ADMIN) || !capable(CAP_SYS_NICE))
-yikes, sorry for the spam
->                                 return -EPERM;
->                         /* fall through */
->                         /* rt has prio field too */
-> diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capability.h
-> index 395dd0df8d08..c6ca33034147 100644
-> --- a/include/uapi/linux/capability.h
-> +++ b/include/uapi/linux/capability.h
-> @@ -288,6 +288,8 @@ struct vfs_ns_cap_data {
->     processes and setting the scheduling algorithm used by another
->     process. */
->  /* Allow setting cpu affinity on other processes */
-> +/* Allow setting realtime ioprio class */
-> +/* Allow setting ioprio class on other processes */
->
->  #define CAP_SYS_NICE         23
->
-> --
-> 2.28.0.297.g1956fa8f8d-goog
->
+>> I'd think it'd be an improvement, yes.
+> 
+> Please see the reason why it is put back of hctx in
+> 073196787727("blk-mq: Reduce blk_mq_hw_ctx size").
 
---000000000000c6e64705ada5b471
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+I know why it is there, just was saying that having an additional
+pointer is fine. But the discussion is moot.
 
-MIIPBgYJKoZIhvcNAQcCoIIO9zCCDvMCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-ggxpMIIEkjCCA3qgAwIBAgINAewckktV4F6Q7sAtGDANBgkqhkiG9w0BAQsFADBMMSAwHgYDVQQL
-ExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMK
-R2xvYmFsU2lnbjAeFw0xODA2MjAwMDAwMDBaFw0yODA2MjAwMDAwMDBaMEsxCzAJBgNVBAYTAkJF
-MRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSEwHwYDVQQDExhHbG9iYWxTaWduIFNNSU1FIENB
-IDIwMTgwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCUeobu8FdB5oJg6Fz6SFf8YsPI
-dNcq4rBSiSDAwqMNYbeTpRrINMBdWuPqVWaBX7WHYMsKQwCOvAF1b7rkD+ROo+CCTJo76EAY25Pp
-jt7TYP/PxoLesLQ+Ld088+BeyZg9pQaf0VK4tn23fOCWbFWoM8hdnF86Mqn6xB6nLsxJcz4CUGJG
-qAhC3iedFiCfZfsIp2RNyiUhzPAqalkrtD0bZQvCgi5aSNJseNyCysS1yA58OuxEyn2e9itZJE+O
-sUeD8VFgz+nAYI5r/dmFEXu5d9npLvTTrSJjrEmw2/ynKn6r6ONueZnCfo6uLmP1SSglhI/SN7dy
-L1rKUCU7R1MjAgMBAAGjggFyMIIBbjAOBgNVHQ8BAf8EBAMCAYYwJwYDVR0lBCAwHgYIKwYBBQUH
-AwIGCCsGAQUFBwMEBggrBgEFBQcDCTASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBRMtwWJ
-1lPNI0Ci6A94GuRtXEzs0jAfBgNVHSMEGDAWgBSP8Et/qC5FJK5NUPpjmove4t0bvDA+BggrBgEF
-BQcBAQQyMDAwLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNvbS9yb290cjMw
-NgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIzLmNybDBn
-BgNVHSAEYDBeMAsGCSsGAQQBoDIBKDAMBgorBgEEAaAyASgKMEEGCSsGAQQBoDIBXzA0MDIGCCsG
-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
-BQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wUQYIKwYBBQUHAQEE
-RTBDMEEGCCsGAQUFBzAChjVodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc3Nt
-aW1lY2EyMDE4LmNydDAfBgNVHSMEGDAWgBRMtwWJ1lPNI0Ci6A94GuRtXEzs0jA/BgNVHR8EODA2
-MDSgMqAwhi5odHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2NhL2dzc21pbWVjYTIwMTguY3JsMA0G
-CSqGSIb3DQEBCwUAA4IBAQAzGsyTMuMEs+rU0JhN7+X62InoLA+QLAozxi+mmLGmfS48HalmbNSM
-50i9IOpsIW0GqjrLgilzP7b04OWA0eGsQ2PzobSd/6yLpFvdU+R52Iyu6/IVcCoEcWj11PYvmtMp
-SZrCvtwvCj+zfJSxNqLmOhITBB1uGneHUHjwTEK87WDqGVcm43pwBMHZ8qMziJdVf8MbKPm4w6a9
-1zewg0bTPT33PFWgCFIsqvTcQPEKoL3Kj8e/DBz1DgFhw4WkwfmzmnLamf93T+t9TU+iQdSESxgT
-NC8D2u/lHre/+I8qQ3tgofQC+AomdFoGhr+nQj+6O1Sv8BKB1ArDiku4umqVMYICYTCCAl0CAQEw
-XzBLMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEhMB8GA1UEAxMYR2xv
-YmFsU2lnbiBTTUlNRSBDQSAyMDE4AhABBw5QEQ1RT42XN3T1kVOEMA0GCWCGSAFlAwQCAQUAoIHU
-MC8GCSqGSIb3DQEJBDEiBCBWBKq8RqkPlI/7iXWOAUxnsI6i06kb7X3mEsafog/RKDAYBgkqhkiG
-9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yMDA4MjQyMDQ4MTdaMGkGCSqGSIb3
-DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcN
-AwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAE
-ggEAkpt4H4JcBhl8DYOinmZBG6ajppMHs6OcIONbbzUL8B5DTc/F8C29kwJw8wd2cVXxn2oxvmro
-KqAtSOMqmnxiZzMoxtLfnWPPmLxN1zpWtebfBxxoBGYuWlzuU88VIYxhkzgHBwDTaySj4Od4Zc5c
-7SGAA68brkgzGXpytlAEXps4iN9r08OfwkC+Uw0WkL4xmaTk9XeQNz7gN6yo70StFpKKQk+7TVRX
-oyicYWljQU7HNZkhUJRyW2c0hW23H8/XJc4rSfafg/Yd1xlLOltO0gbPUOTfzRv5qiML63T2T/6k
-OE/eOOafIj/WJagycYPSZz5ccn/nTGB80OZBvD0wZA==
---000000000000c6e64705ada5b471--
+>>> .q_usage_counter should have been put in the 1st cacheline of
+>>> request queue. If it is moved to the 1st cacheline of request queue,
+>>> we shouldn't put 'dispatch_counter' there, because it may hurt other
+>>> non-blocking drivers.
+>>
+>> q_usage_counter currently there, and the two will always be taken
+>> together, and there are several other stuff that we can remove from
+>> that cacheline without hurting performance for anything.
+>>
+>> And when q_usage_counter is moved to the first cacheline, then I'd
+>> expect that the dispatch_counter also moves to the front (maybe not
+>> the first if it is on the expense of other hot members, but definitely
+>> it should be treated as a hot member).
+>>
+>> Anyways, I think that for now we should place them together.
+> 
+> Then it may hurt non-blocking.
+> 
+> Each hctx has only one run-work, if the hctx is blocked, no other request
+> may be queued to hctx any more. That is basically sync run queue, so I
+> am not sure good enough perf can be expected on blocking.
+
+I don't think that you should assume that a blocking driver will block
+normally, it will only rarely block (very rarely).
+
+> So it may not be worth of putting the added .dispatch_counter together
+> with .q_usage_counter.
+
+I happen to think it would. Not sure why you resist so much given how
+request_queue is arranged currently.
+
+>>>> Also maybe a better name is needed here since it's just
+>>>> for blocking hctxs.
+>>>>
+>>>>> +	wait_queue_head_t	mq_quiesce_wq;
+>>>>> +
+>>>>>     	struct dentry		*debugfs_dir;
+>>>>>     #ifdef CONFIG_BLK_DEBUG_FS
+>>>>>
+>>>>
+>>>> What I think is needed here is at a minimum test quiesce/unquiesce loops
+>>>> during I/O. code auditing is not enough, there may be driver assumptions
+>>>> broken with this change (although I hope there shouldn't be).
+>>>
+>>> We have elevator switch / updating nr_request stress test, and both relies
+>>> on quiesce/unquiesce, and I did run such test with this patch.
+>>
+>> You have a blktest for this? If not, I strongly suggest that one is
+>> added to validate the change also moving forward.
+> 
+> There are lots of blktest tests doing that, such as block/005,
+> block/016, block/021, ...
+
+Good, but I'd also won't want to get this without making sure the async
+quiesce works well on large number of namespaces (the reason why this
+is proposed in the first place). Not sure who is planning to do that...
