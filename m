@@ -2,113 +2,147 @@ Return-Path: <SRS0=iUg4=CC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC98DC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 09:20:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B023C433E3
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 10:41:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A2C9B20738
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 09:20:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28C4A2075B
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 10:41:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="S1z/AmmN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HgfqdASz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726610AbgHXJUh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 05:20:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730496AbgHXJUa (ORCPT
+        id S1726947AbgHXKlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 06:41:18 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43052 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727798AbgHXKlR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 05:20:30 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 281F4C061574
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 02:20:29 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id n3so2949783pjq.1
-        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 02:20:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=KQzdEJUadSVD+lgD6sVSSDMTvkRGkwdel+4+TdgeUE4=;
-        b=S1z/AmmNOCH9afSNr/qrDInALgK0j4q5VYp45vGoszL08gQOq77XWvhovm91maa4+P
-         FqKO0IvQQ1zgFOTeD7xwiYdXCC4eSy866y0i4iOHUdhtIcu9OyTLXqq9sIjITeHIlDP/
-         TqDQL3++BGqzXH8U95cUEVFQg9f7Oyelz1pTusAebmjo7UGy1iK4oNwyu8zu1fDcAfPX
-         nbF7uSCxB/11Zqo85kx55hx/wYlWNGXWIUW2MXqUz8acgYZGRkoKmiKOAMbN76qrQ5Ur
-         CsLY7wA5OwEKSwWBknbMM6OhsOsgmjQ3BQKlOzM52TKrjGMbACD7aubcslrIXV21mpIp
-         D4Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KQzdEJUadSVD+lgD6sVSSDMTvkRGkwdel+4+TdgeUE4=;
-        b=ACGQwWkyFAU9oHr1qBZRTOjAJ8NvROhjbVzg30DsGHvrVP0TFfVqu/+i3+4azQ5Qpp
-         gX1rTOrEI5WKrV1tzD236RM9CH17QIuRLIeg6z8PICKmMGAH/qVN0DZSyT5i1lbkMqsE
-         7aGefyof7Bp96iJKxMXx6hkDnYNBrZSu36l+As9bJtoeUeda563Xp0b5GmF2VOakltXR
-         8quaFsMyJmgpdkVpvIsI97ju+8fQE/xDoRBhZ/rzHGuWZxhZftmRYIbt6Fa4+bSSK/XW
-         nKr0ET0wDL7xgxnmMt0/GnghqCWz7emahMBIpjwymuDB11yGxV3PM0CNe/m7/qynjtG5
-         nE7Q==
-X-Gm-Message-State: AOAM53061unMjGEwLiykHECOAFCgLNdVJQZFKTgQJLlJPhxyoOJIKHBs
-        qBSn4QPYtZzTRoWguQiX3raIRA==
-X-Google-Smtp-Source: ABdhPJyCrZvD6mxlThjGGxFBbEkhy5RNyLB5+uuwXeW5h1XhNu5PQ5mV/pcyDAllrzYkYjEheHn/mA==
-X-Received: by 2002:a17:90a:f994:: with SMTP id cq20mr3717444pjb.229.1598260828641;
-        Mon, 24 Aug 2020 02:20:28 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id x144sm897257pfc.82.2020.08.24.02.20.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Aug 2020 02:20:27 -0700 (PDT)
-Subject: Re: [PATCH 4/5] bio: introduce BIO_FOLL_PIN flag
-To:     Christoph Hellwig <hch@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200822042059.1805541-1-jhubbard@nvidia.com>
- <20200822042059.1805541-5-jhubbard@nvidia.com>
- <20200823062559.GA32480@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d75ce230-6c8d-8623-49a2-500835f6cdfc@kernel.dk>
-Date:   Mon, 24 Aug 2020 03:20:26 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 24 Aug 2020 06:41:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598265672;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XWQlAwsjClgQ9cN28ym8AEnjIMo1h/gbOJX/J2aH6bc=;
+        b=HgfqdASzJws/XC2pRwEwdq9qBH2aRtig+oR8P2qAgOryUzkcCyeecYaxpW4fxOIhXDVX0D
+        ApDE/Pq/8Lp+JOMdOPWzjK8raixBdGiP4N7ZvTCk//oC5UgDe4OA57X8BqLluYfuU/ctPy
+        Gkp8oDZK59t5ZtSJ1FCLOHSkp26CrS4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-C0VTt1blMYejbLWjfgb8ZA-1; Mon, 24 Aug 2020 06:41:08 -0400
+X-MC-Unique: C0VTt1blMYejbLWjfgb8ZA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C7F164087;
+        Mon, 24 Aug 2020 10:41:07 +0000 (UTC)
+Received: from T590 (ovpn-12-133.pek2.redhat.com [10.72.12.133])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A80A15D9EF;
+        Mon, 24 Aug 2020 10:40:57 +0000 (UTC)
+Date:   Mon, 24 Aug 2020 18:40:52 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+Message-ID: <20200824104052.GA3210443@T590>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+ <856f6108-2227-67e8-e913-fdef296a2d26@grimberg.me>
+ <20200822133954.GC3189453@T590>
+ <619a8d4f-267f-5e21-09bd-16b45af69480@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <20200823062559.GA32480@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <619a8d4f-267f-5e21-09bd-16b45af69480@grimberg.me>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/23/20 12:25 AM, Christoph Hellwig wrote:
-> On Fri, Aug 21, 2020 at 09:20:58PM -0700, John Hubbard wrote:
->> Add a new BIO_FOLL_PIN flag to struct bio, whose "short int" flags field
->> was full, thuse triggering an expansion of the field from 16, to 32
->> bits. This allows for a nice assertion in bio_release_pages(), that the
->> bio page release mechanism matches the page acquisition mechanism.
->>
->> Set BIO_FOLL_PIN whenever pin_user_pages_fast() is used, and check for
->> BIO_FOLL_PIN before using unpin_user_page().
+On Mon, Aug 24, 2020 at 01:19:56AM -0700, Sagi Grimberg wrote:
 > 
-> When would the flag not be set when BIO_NO_PAGE_REF is not set?
+> > > > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > > > index bb5636cc17b9..5fa8bc1bb7a8 100644
+> > > > --- a/include/linux/blkdev.h
+> > > > +++ b/include/linux/blkdev.h
+> > > > @@ -572,6 +572,10 @@ struct request_queue {
+> > > >    	struct list_head	tag_set_list;
+> > > >    	struct bio_set		bio_split;
+> > > > +	/* only used for BLK_MQ_F_BLOCKING */
+> > > > +	struct percpu_ref	dispatch_counter;
+> > > 
+> > > Can this be moved to be next to the q_usage_counter? they
+> > > will be taken together for blocking drivers...
+> > 
+> > I don't think it is a good idea, at least hctx->srcu is put at the end
+> > of hctx, do you want to move it at beginning of hctx?
 > 
-> Also I don't think we can't just expand the flags field, but I can send
-> a series to kill off two flags.
+> I'd think it'd be an improvement, yes.
 
-(not relevant to this series as this patch has thankfully already been
-dropped, just in general - but yes, definitely need a *strong* justification
-to bump the bio size).
+Please see the reason why it is put back of hctx in
+073196787727("blk-mq: Reduce blk_mq_hw_ctx size").
 
-Would actually be nice to kill off a few flags, if possible, so the
-flags space isn't totally full.
+> 
+> > .q_usage_counter should have been put in the 1st cacheline of
+> > request queue. If it is moved to the 1st cacheline of request queue,
+> > we shouldn't put 'dispatch_counter' there, because it may hurt other
+> > non-blocking drivers.
+> 
+> q_usage_counter currently there, and the two will always be taken
+> together, and there are several other stuff that we can remove from
+> that cacheline without hurting performance for anything.
+> 
+> And when q_usage_counter is moved to the first cacheline, then I'd
+> expect that the dispatch_counter also moves to the front (maybe not
+> the first if it is on the expense of other hot members, but definitely
+> it should be treated as a hot member).
+> 
+> Anyways, I think that for now we should place them together.
 
--- 
-Jens Axboe
+Then it may hurt non-blocking.
+
+Each hctx has only one run-work, if the hctx is blocked, no other request
+may be queued to hctx any more. That is basically sync run queue, so I
+am not sure good enough perf can be expected on blocking.
+
+So it may not be worth of putting the added .dispatch_counter together
+with .q_usage_counter.
+
+> 
+> > > Also maybe a better name is needed here since it's just
+> > > for blocking hctxs.
+> > > 
+> > > > +	wait_queue_head_t	mq_quiesce_wq;
+> > > > +
+> > > >    	struct dentry		*debugfs_dir;
+> > > >    #ifdef CONFIG_BLK_DEBUG_FS
+> > > > 
+> > > 
+> > > What I think is needed here is at a minimum test quiesce/unquiesce loops
+> > > during I/O. code auditing is not enough, there may be driver assumptions
+> > > broken with this change (although I hope there shouldn't be).
+> > 
+> > We have elevator switch / updating nr_request stress test, and both relies
+> > on quiesce/unquiesce, and I did run such test with this patch.
+> 
+> You have a blktest for this? If not, I strongly suggest that one is
+> added to validate the change also moving forward.
+
+There are lots of blktest tests doing that, such as block/005,
+block/016, block/021, ...
+
+
+Thanks, 
+Ming
 
