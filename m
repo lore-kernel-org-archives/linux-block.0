@@ -2,74 +2,106 @@ Return-Path: <SRS0=iUg4=CC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33A9C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 14:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2713DC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 14:47:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C8732214F1
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 14:42:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fMe0QfTQ"
+	by mail.kernel.org (Postfix) with ESMTP id 066EE206B5
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 14:47:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725890AbgHXOmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 10:42:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35790 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725780AbgHXOmQ (ORCPT
+        id S1726570AbgHXOrw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 10:47:52 -0400
+Received: from netrider.rowland.org ([192.131.102.5]:37163 "HELO
+        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1726037AbgHXOrv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 10:42:16 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDCCBC061573;
-        Mon, 24 Aug 2020 07:42:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Sm/ikGBMT7yXr66/WCvwl+PKMe6pOWKqSkgLkHzx4Lc=; b=fMe0QfTQ4FBKF7HgdD2AKcKJDy
-        jpK1GN1HR/22cjzUb0XYK5lfB6YRhA9AfdqZKo0uLpe7Blh31bdMq37c40i/jLxm2YkB3oSX4/OJj
-        TYv0GzPrdpMG7xkBSyFews/4uSp3ImPuE96kVv3zjIy/ZJFPZYnz7VWg6HULLbJltSIvqekw/b8b9
-        RKFdsxEV8Q7OHuVh4OwAwpT0NBPSZaAQrlwvPHCYOXl7XNO9BQI5IlfSGfYJnUzs81goecyjvlHWy
-        9Qkayszt+5jdBZtaXYqsqcOD0WGuP7wjZvlXkdmYMgkDqfXsDlz962mCjUAE50IjJRRlxUchCKDhL
-        4u3jkxrw==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kADff-00027L-AM; Mon, 24 Aug 2020 14:42:03 +0000
-Date:   Mon, 24 Aug 2020 15:42:03 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 4/5] bio: introduce BIO_FOLL_PIN flag
-Message-ID: <20200824144203.GA8070@infradead.org>
-References: <20200822042059.1805541-1-jhubbard@nvidia.com>
- <20200822042059.1805541-5-jhubbard@nvidia.com>
- <20200823062559.GA32480@infradead.org>
- <d75ce230-6c8d-8623-49a2-500835f6cdfc@kernel.dk>
+        Mon, 24 Aug 2020 10:47:51 -0400
+Received: (qmail 331659 invoked by uid 1000); 24 Aug 2020 10:47:50 -0400
+Date:   Mon, 24 Aug 2020 10:47:50 -0400
+From:   Alan Stern <stern@rowland.harvard.edu>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>
+Subject: Re: [PATCH] block: Fix a race in the runtime power management code
+Message-ID: <20200824144750.GC329866@rowland.harvard.edu>
+References: <20200824030607.19357-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d75ce230-6c8d-8623-49a2-500835f6cdfc@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200824030607.19357-1-bvanassche@acm.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 24, 2020 at 03:20:26AM -0600, Jens Axboe wrote:
-> (not relevant to this series as this patch has thankfully already been
-> dropped, just in general - but yes, definitely need a *strong* justification
-> to bump the bio size).
+On Sun, Aug 23, 2020 at 08:06:07PM -0700, Bart Van Assche wrote:
+> With the current implementation the following race can happen:
+> * blk_pre_runtime_suspend() calls blk_freeze_queue_start() and
+>   blk_mq_unfreeze_queue().
+> * blk_queue_enter() calls blk_queue_pm_only() and that function returns
+>   true.
+> * blk_queue_enter() calls blk_pm_request_resume() and that function does
+>   not call pm_request_resume() because the queue runtime status is
+>   RPM_ACTIVE.
+> * blk_pre_runtime_suspend() changes the queue status into RPM_SUSPENDING.
 > 
-> Would actually be nice to kill off a few flags, if possible, so the
-> flags space isn't totally full.
+> Fix this race by changing the queue runtime status into RPM_SUSPENDING
+> before switching q_usage_counter to atomic mode.
+> 
+> Cc: Alan Stern <stern@rowland.harvard.edu>
+> Cc: Stanley Chu <stanley.chu@mediatek.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: stable <stable@vger.kernel.org>
+> Fixes: 986d413b7c15 ("blk-mq: Enable support for runtime power management")
+> Signed-off-by: Can Guo <cang@codeaurora.org>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-pm.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/blk-pm.c b/block/blk-pm.c
+> index b85234d758f7..17bd020268d4 100644
+> --- a/block/blk-pm.c
+> +++ b/block/blk-pm.c
+> @@ -67,6 +67,10 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+>  
+>  	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
+>  
+> +	spin_lock_irq(&q->queue_lock);
+> +	q->rpm_status = RPM_SUSPENDING;
+> +	spin_unlock_irq(&q->queue_lock);
+> +
+>  	/*
+>  	 * Increase the pm_only counter before checking whether any
+>  	 * non-PM blk_queue_enter() calls are in progress to avoid that any
+> @@ -89,15 +93,14 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+>  	/* Switch q_usage_counter back to per-cpu mode. */
+>  	blk_mq_unfreeze_queue(q);
+>  
+> -	spin_lock_irq(&q->queue_lock);
+> -	if (ret < 0)
+> +	if (ret < 0) {
+> +		spin_lock_irq(&q->queue_lock);
+> +		q->rpm_status = RPM_ACTIVE;
+>  		pm_runtime_mark_last_busy(q->dev);
+> -	else
+> -		q->rpm_status = RPM_SUSPENDING;
+> -	spin_unlock_irq(&q->queue_lock);
+> +		spin_unlock_irq(&q->queue_lock);
+>  
+> -	if (ret)
+>  		blk_clear_pm_only(q);
+> +	}
+>  
+>  	return ret;
+>  }
 
-I have a series to kill two flags that I need to resurrect and post.
+Acked-by: Alan Stern <stern@rowland.harvard.edu>
