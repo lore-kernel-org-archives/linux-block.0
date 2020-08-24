@@ -3,123 +3,124 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2702C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 07:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 761F9C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 08:20:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAC10207DF
-	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 07:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D30F207D3
+	for <linux-block@archiver.kernel.org>; Mon, 24 Aug 2020 08:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726225AbgHXHiD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 03:38:03 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49982 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726635AbgHXHh6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 03:37:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6B2A5AF38;
-        Mon, 24 Aug 2020 07:38:26 +0000 (UTC)
-Subject: Re: [PATCH 3/3] nvme: don't call revalidate_disk from
- nvme_set_queue_dying
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Justin Sanders <justin@coraid.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Xianting Tian <xianting_tian@126.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org
-References: <20200823091043.2600261-1-hch@lst.de>
- <20200823091043.2600261-4-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <bec1889c-5e0f-cd33-f74a-a7d44161a0ee@suse.de>
-Date:   Mon, 24 Aug 2020 09:37:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726370AbgHXIUA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 04:20:00 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:56093 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726354AbgHXIT7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Aug 2020 04:19:59 -0400
+Received: by mail-pj1-f65.google.com with SMTP id 2so3882806pjx.5
+        for <linux-block@vger.kernel.org>; Mon, 24 Aug 2020 01:19:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=05Mv8NGDlOkaCdlHqQEOQS1giktqLGYhCuCEfRGwKF0=;
+        b=K4jRWIIEqrn3RuG5kRsPKUrbBIONvwXoAE1K6bIEzrfbk5c3vPO5NdqrhxBghuKfDv
+         3gTR2L1mF1p7B0IEWuQFuV2QP6w+P733KU5M6CMupVMTP3l7yzDTT5w0VmpnKDxsuzQi
+         UQMsqpvgl4V9IYcSp20F2eGYhfTWmLevvq15cds15Ia51obGufHZ8zLTWvyqOLtrnbmS
+         nNH5NmQ8HtElF6RkiFASsHxSAT6tvYGPxc2CBoskiH950yCpKh6cMaXSrvGELcHQ9jAL
+         2C3MjmXrscBqpAEnyffbwIBlvh0D6awQdkkl9s8eVC5vU/2a4ccpl93p2ChaduSryqY6
+         vQVg==
+X-Gm-Message-State: AOAM532aVfRRIuLYg/zdtmasp53ShYCN7MAuuathhUY2XWSYKK3t+95j
+        sL5p0KEmbJWq8KKGxw/cBy4=
+X-Google-Smtp-Source: ABdhPJy/3mmtd08DhrZ9AdShj82mjofaf9s0xrbMW7wU8mbqftPNgPHc8Z8Xd/x2tw7zGNEQhvM+/A==
+X-Received: by 2002:a17:90a:dc13:: with SMTP id i19mr3413643pjv.161.1598257198530;
+        Mon, 24 Aug 2020 01:19:58 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:cda6:bf68:c972:645d? ([2601:647:4802:9070:cda6:bf68:c972:645d])
+        by smtp.gmail.com with ESMTPSA id z26sm8808398pgc.44.2020.08.24.01.19.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Aug 2020 01:19:57 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+ <856f6108-2227-67e8-e913-fdef296a2d26@grimberg.me>
+ <20200822133954.GC3189453@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <619a8d4f-267f-5e21-09bd-16b45af69480@grimberg.me>
+Date:   Mon, 24 Aug 2020 01:19:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200823091043.2600261-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200822133954.GC3189453@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/23/20 11:10 AM, Christoph Hellwig wrote:
-> In nvme_set_queue_dying we really just want to ensure the disk and bdev
-> sizes are set to zero.  Going through revalidate_disk leads to a somewhat
-> arcance and complex callchain relying on special behavior in a few
-> places.  Instead just lift the set_capacity directly to
-> nvme_set_queue_dying, and rename and move the nvme_mpath_update_disk_size
-> helper so that we can use it in nvme_set_queue_dying to propagate the
-> size to the bdev without detours.
+
+>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>>> index bb5636cc17b9..5fa8bc1bb7a8 100644
+>>> --- a/include/linux/blkdev.h
+>>> +++ b/include/linux/blkdev.h
+>>> @@ -572,6 +572,10 @@ struct request_queue {
+>>>    	struct list_head	tag_set_list;
+>>>    	struct bio_set		bio_split;
+>>> +	/* only used for BLK_MQ_F_BLOCKING */
+>>> +	struct percpu_ref	dispatch_counter;
+>>
+>> Can this be moved to be next to the q_usage_counter? they
+>> will be taken together for blocking drivers...
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/nvme/host/core.c | 33 +++++++++++++++++++++++----------
->  drivers/nvme/host/nvme.h | 13 -------------
->  2 files changed, 23 insertions(+), 23 deletions(-)
+> I don't think it is a good idea, at least hctx->srcu is put at the end
+> of hctx, do you want to move it at beginning of hctx?
+
+I'd think it'd be an improvement, yes.
+
+> .q_usage_counter should have been put in the 1st cacheline of
+> request queue. If it is moved to the 1st cacheline of request queue,
+> we shouldn't put 'dispatch_counter' there, because it may hurt other
+> non-blocking drivers.
+
+q_usage_counter currently there, and the two will always be taken
+together, and there are several other stuff that we can remove from
+that cacheline without hurting performance for anything.
+
+And when q_usage_counter is moved to the first cacheline, then I'd
+expect that the dispatch_counter also moves to the front (maybe not
+the first if it is on the expense of other hot members, but definitely
+it should be treated as a hot member).
+
+Anyways, I think that for now we should place them together.
+
+>> Also maybe a better name is needed here since it's just
+>> for blocking hctxs.
+>>
+>>> +	wait_queue_head_t	mq_quiesce_wq;
+>>> +
+>>>    	struct dentry		*debugfs_dir;
+>>>    #ifdef CONFIG_BLK_DEBUG_FS
+>>>
+>>
+>> What I think is needed here is at a minimum test quiesce/unquiesce loops
+>> during I/O. code auditing is not enough, there may be driver assumptions
+>> broken with this change (although I hope there shouldn't be).
 > 
-YES!
-I've been bitten by this far too often.
+> We have elevator switch / updating nr_request stress test, and both relies
+> on quiesce/unquiesce, and I did run such test with this patch.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+You have a blktest for this? If not, I strongly suggest that one is
+added to validate the change also moving forward.
