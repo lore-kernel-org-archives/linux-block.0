@@ -2,181 +2,189 @@ Return-Path: <SRS0=AIgI=CD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C376C433E3
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 16:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F095CC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 17:30:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23F6820825
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 16:22:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598372544;
-	bh=Ob6Ya4sG/9TFYtRrP6g9VXPseZ2X38wAlcrlrPayfhY=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
-	b=KupWvvew0Ri/bWegXLZ8dLUqVBJZXxG0pFrzEhEvYBNWzeKWycJK1hYN2TzQHr73s
-	 DCgV6rnKp50w9ZjGwoxfO4GwbITu2PQi31iJrQjkolEl0KcGrr39XQJCEfcMkHO5Mm
-	 WqezZmsfdpJfX7A+S2Qe7l3IBrILfI3CCotXs8mA=
+	by mail.kernel.org (Postfix) with ESMTP id C883620706
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 17:30:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="WN5ItWTc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725936AbgHYQWW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 12:22:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54614 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725805AbgHYQWV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 12:22:21 -0400
-Received: from tleilax.poochiereds.net (68-20-15-154.lightspeed.rlghnc.sbcglobal.net [68.20.15.154])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 204672076C;
-        Tue, 25 Aug 2020 16:22:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598372540;
-        bh=Ob6Ya4sG/9TFYtRrP6g9VXPseZ2X38wAlcrlrPayfhY=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=yj+xSLQWrJYsteoxUDzI4203SRM4N7vwTUF/ZLxu3kZZTD61PsVNefCJ2heTYdXez
-         ZjUPhgm7YB7fwVIZoz++Avg+NgquXhY3ARdasGto7IuSRSJT7cNRqt1af9BdF/Zw0o
-         sQQn//fM6Q7RI/4QY5VStkEfy1CYo69EUGd8g2to=
-Message-ID: <578fb1e557d1990f768b7fdf5c6e4505db4c24e6.camel@kernel.org>
-Subject: Re: [PATCH v2] fs/ceph: use pipe_get_pages_alloc() for pipe
-From:   Jeff Layton <jlayton@kernel.org>
-To:     John Hubbard <jhubbard@nvidia.com>, willy@infradead.org
-Cc:     akpm@linux-foundation.org, axboe@kernel.dk,
-        ceph-devel@vger.kernel.org, hch@infradead.org, idryomov@gmail.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, viro@zeniv.linux.org.uk,
-        "Yan, Zheng" <ukernel@gmail.com>
-Date:   Tue, 25 Aug 2020 12:22:17 -0400
-In-Reply-To: <20200825012034.1962362-1-jhubbard@nvidia.com>
-References: <20200824185400.GE17456@casper.infradead.org>
-         <20200825012034.1962362-1-jhubbard@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+        id S1726104AbgHYRaD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 13:30:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726090AbgHYRaD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Aug 2020 13:30:03 -0400
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03A26C061574
+        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 10:30:02 -0700 (PDT)
+Received: by mail-qt1-x841.google.com with SMTP id d27so9550312qtg.4
+        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 10:30:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Wp/i/cC15zgTxV6xOIq8aaZ9yXKH0W8qgN58c/JikW0=;
+        b=WN5ItWTcZkC7BA2xluqGrDp/E16oAlKDvjq1yDroJ/Cag9rxdT9qE313SZojyta6Ke
+         wNGRq60KjY6PsOg8XsYWFgRjqZUwpgGZIXl0toD9ZR3FOaZo5JxoeYqDvIXV6QKh0zuj
+         je4nGL0qHLuztxpcJRi9uBISyYpgOe+m29I3slFWwDdmenXJGlsYsIcknznQ+DmcNXCP
+         X0+lWZ1XfcjjXpH0zTw6kiVpYOeKYJNEESKkwwGDwSrO90sijfBCfSwfdsX15sq6El5M
+         A5o44Cp9YAzE1U2mlT7YTxhxs7Knf3eOcUOYzmErNFSNWrfiqWUH4uKqERhsPIVeAIXB
+         XYgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Wp/i/cC15zgTxV6xOIq8aaZ9yXKH0W8qgN58c/JikW0=;
+        b=ZneRVh07/btTUaXrY6hs/u3qKbyWjeBFlqt8dWQMCkB2jAiEcysrpk7UdD2E4gseez
+         atKdYogcj0W3bLiExvOLuIxCKrz3RcvaEhoQ0u/pmq4hPwnqYwUD7dyySvNzgyQ9wDFw
+         TUBaaXwfDasgrGeWDHDgZogajCGlWg4/Zm64kxikFWxoFUcedQWsX9M1PtszQtadxy8o
+         ROlFpK61THORAloRVAvw0VB7UZ+DomBtrHTghp6Or1WQNlihWlE1eb0fiIhW5yLrMJ22
+         CRV+P8XTbJ+/je6jNGsDjma/Pg2ZQgey4owMxqND/mR1G+5b1HrIJURFylSd3zjNUW/m
+         f4CA==
+X-Gm-Message-State: AOAM533xFTpGcOK3FfrNDLMyEjfeTl48SqtOsXo46ZbtN+QJRk0e/9El
+        E7UdmTqGmggGbm3O+vnawvfRiw==
+X-Google-Smtp-Source: ABdhPJzFCENqN4F/R2IuPx2drXDj403SzuJhNZYR43utinpLPvx2w+76ONAdwCMBmzc37oA2Rd07ZQ==
+X-Received: by 2002:ac8:320b:: with SMTP id x11mr9890437qta.320.1598376601926;
+        Tue, 25 Aug 2020 10:30:01 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c0a8:11e8::1120? ([2620:10d:c091:480::1:4729])
+        by smtp.gmail.com with ESMTPSA id x31sm10202070qtx.97.2020.08.25.10.30.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Aug 2020 10:30:01 -0700 (PDT)
+Subject: Re: [PATCH] nbd: restore default timeout when setting it to zero
+To:     Hou Pu <houpu@bytedance.com>, axboe@kernel.dk
+Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+References: <20200810120044.2152-1-houpu@bytedance.com>
+ <38b9de9e-38fe-3090-cea0-377c605c86d4@toxicpanda.com>
+ <4e78e4b3-e75b-7428-703d-d8543bcfe348@bytedance.com>
+ <1accbf37-1a57-f072-7dc4-063fee991189@toxicpanda.com>
+ <701eaeb7-8b91-baa5-ebba-468f890c4cc5@bytedance.com>
+ <59db0b1d-4b2c-7966-9c38-929083e7b8f1@toxicpanda.com>
+ <6f81b077-e722-1d0e-a506-5507f71540cd@bytedance.com>
+From:   Josef Bacik <josef@toxicpanda.com>
+Message-ID: <27dc0e8c-e13b-4671-b739-30628696db7e@toxicpanda.com>
+Date:   Tue, 25 Aug 2020 13:29:59 -0400
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <6f81b077-e722-1d0e-a506-5507f71540cd@bytedance.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2020-08-24 at 18:20 -0700, John Hubbard wrote:
-> This reduces, by one, the number of callers of iov_iter_get_pages().
-> That's helpful because these calls are being audited and converted over
-> to use iov_iter_pin_user_pages(), where applicable. And this one here is
-> already known by the caller to be only for ITER_PIPE, so let's just
-> simplify it now.
+On 8/25/20 4:27 AM, Hou Pu wrote:
 > 
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
 > 
-> OK, here's a v2 that does EXPORT_SYMBOL_GPL, instead of EXPORT_SYMBOL,
-> that's the only change from v1. That should help give this patch a
-> clear bill of passage. :)
+> On 2020/8/24 10:02 PM, Josef Bacik wrote:
+>> On 8/23/20 11:23 PM, Hou Pu wrote:
+>>>
+>>>
+>>> On 2020/8/21 9:57 PM, Josef Bacik wrote:
+>>>> On 8/21/20 3:21 AM, Hou Pu wrote:
+>>>>>
+>>>>>
+>>>>> On 2020/8/21 3:03 AM, Josef Bacik wrote:
+>>>>>> On 8/10/20 8:00 AM, Hou Pu wrote:
+>>>>>>> If we configured io timeout of nbd0 to 100s. Later after we
+>>>>>>> finished using it, we configured nbd0 again and set the io
+>>>>>>> timeout to 0. We expect it would timeout after 30 seconds
+>>>>>>> and keep retry. But in fact we could not change the timeout
+>>>>>>> when we set it to 0. the timeout is still the original 100s.
+>>>>>>>
+>>>>>>> So change the timeout to default 30s when we set it to zero.
+>>>>>>> It also behaves same as commit 2da22da57348 ("nbd: fix zero
+>>>>>>> cmd timeout handling v2").
+>>>>>>>
+>>>>>>> It becomes more important if we were reconfigure a nbd device
+>>>>>>> and the io timeout it set to zero. Because it could take 30s
+>>>>>>> to detect the new socket and thus io could be completed more
+>>>>>>> quickly compared to 100s.
+>>>>>>>
+>>>>>>> Signed-off-by: Hou Pu <houpu@bytedance.com>
+>>>>>>> ---
+>>>>>>>   drivers/block/nbd.c | 2 ++
+>>>>>>>   1 file changed, 2 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>>>>>> index ce7e9f223b20..bc9dc1f847e1 100644
+>>>>>>> --- a/drivers/block/nbd.c
+>>>>>>> +++ b/drivers/block/nbd.c
+>>>>>>> @@ -1360,6 +1360,8 @@ static void nbd_set_cmd_timeout(struct nbd_device 
+>>>>>>> *nbd, u64 timeout)
+>>>>>>>       nbd->tag_set.timeout = timeout * HZ;
+>>>>>>>       if (timeout)
+>>>>>>>           blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
+>>>>>>> +    else
+>>>>>>> +        blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
+>>>>>>>   }
+>>>>>>>   /* Must be called with config_lock held */
+>>>>>>>
+>>>>>>
+>>>>>> What about the tag_set.timeout?  Thanks,
+>>>>>
+>>>>> I think user space could set io timeout to 0, thus we set tag_set.timeout = 
+>>>>> 0 here and also we should tell the block layer
+>>>>> to restore 30s timeout in case it is not. tag_set.timeout == 0
+>>>>> imply 30s io timeout and retrying after timeout.
+>>>>>
+>>>>> (Sorry, I am not sure if I understand your question here. Could
+>>>>> you explain a little more if needed?)
+>>>>>
+>>>>
+>>>> I misunderstood what I was using the tagset timeout for.  We don't want this 
+>>>> here, if we're dropping a config for an nbd device and we want to reset it 
+>>>> to defaults then we need to add this to nbd_config_put().  Thanks,
+>>>
+>>> AFAIK If we killed a nbd server, then restarted it and reconfigured
+>>> the nbd socket, I think we might not reconfigure IO timeout to 0 since
+>>> nbd_config_put() is not called in such case. So could we still
+>>> restore default timeout here. Or am I missing something?
+>>>
+>>
+>> If you kill the NBD server then the config is going to be dropped and need to 
+>> be reconfigured, so nbd_config_put() will definitely be called. The only case 
+>> it wouldn't be is if you are using the netlink interface, in which case the 
+>> device is going to keep all of its original settings. Are you not seeing the 
+>> final nbd_config_put() being done when you kill the nbd server?  That seems 
+>> like a bug if not, and that should be fixed, and then this timeout thing going 
+>> in there will fix your issue.  Thanks,
 > 
-> thanks,
-> John Hubbard
-> NVIDIA
+> I was using the netlink interface. So I could use the reconnect
+> feature to update the nbd server without impacting the user of
+> nbd device.
 > 
->  fs/ceph/file.c      | 3 +--
->  include/linux/uio.h | 3 ++-
->  lib/iov_iter.c      | 6 +++---
->  3 files changed, 6 insertions(+), 6 deletions(-)
+> I did not see the final nbd_config_put() when I killed the nbd server.
+> After I killed the nbd server, the recv_work() put 1 config_ref.
+> Another ref count is still held by nbd_genl_connect(). I thought it
+> was as expected.
 > 
-> diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-> index d51c3f2fdca0..d3d7dd957390 100644
-> --- a/fs/ceph/file.c
-> +++ b/fs/ceph/file.c
-> @@ -879,8 +879,7 @@ static ssize_t ceph_sync_read(struct kiocb *iocb, struct iov_iter *to,
->  		more = len < iov_iter_count(to);
->  
->  		if (unlikely(iov_iter_is_pipe(to))) {
-> -			ret = iov_iter_get_pages_alloc(to, &pages, len,
-> -						       &page_off);
-> +			ret = pipe_get_pages_alloc(to, &pages, len, &page_off);
->  			if (ret <= 0) {
->  				ceph_osdc_put_request(req);
->  				ret = -ENOMEM;
-> diff --git a/include/linux/uio.h b/include/linux/uio.h
-> index 3835a8a8e9ea..270a4dcf5453 100644
-> --- a/include/linux/uio.h
-> +++ b/include/linux/uio.h
-> @@ -226,7 +226,8 @@ ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
->  ssize_t iov_iter_get_pages_alloc(struct iov_iter *i, struct page ***pages,
->  			size_t maxsize, size_t *start);
->  int iov_iter_npages(const struct iov_iter *i, int maxpages);
-> -
-> +ssize_t pipe_get_pages_alloc(struct iov_iter *i, struct page ***pages,
-> +			     size_t maxsize, size_t *start);
->  const void *dup_iter(struct iov_iter *new, struct iov_iter *old, gfp_t flags);
->  
->  static inline size_t iov_iter_count(const struct iov_iter *i)
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index 5e40786c8f12..6290998df480 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -1355,9 +1355,8 @@ static struct page **get_pages_array(size_t n)
->  	return kvmalloc_array(n, sizeof(struct page *), GFP_KERNEL);
->  }
->  
-> -static ssize_t pipe_get_pages_alloc(struct iov_iter *i,
-> -		   struct page ***pages, size_t maxsize,
-> -		   size_t *start)
-> +ssize_t pipe_get_pages_alloc(struct iov_iter *i, struct page ***pages,
-> +			     size_t maxsize, size_t *start)
->  {
->  	struct page **p;
->  	unsigned int iter_head, npages;
-> @@ -1387,6 +1386,7 @@ static ssize_t pipe_get_pages_alloc(struct iov_iter *i,
->  		kvfree(p);
->  	return n;
->  }
-> +EXPORT_SYMBOL_GPL(pipe_get_pages_alloc);
->  
->  ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
->  		   struct page ***pages, size_t maxsize,
+> Beside in nbd_genl_reconfigure(), it is checked nbd->config_refs should
+> not be zero by:
+>          if (!refcount_inc_not_zero(&nbd->config_refs)) {
+>                  dev_err(nbd_to_dev(nbd),
+>                          "not configured, cannot reconfigure\n");
+>                  nbd_put(nbd);
+>                  return -EINVAL;
+>          }
+> So AFAIK this behavior is as expected.
 
-Thanks. I've got a v1 of this in the ceph-client/testing branch and it
-seems fine so far.
+Ahh ok I see what you're getting at.  Ok I agree, you can add
 
-I'd prefer an ack from Al on one or the other though, since I'm not sure
-he wants to expose this primitive, and in the past he hasn't been
-enamored with EXPORT_SYMBOL_GPL, because its meaning wasn't well
-defined. Maybe that's changed since.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-As a side note, Al also asked privately why ceph special cases
-ITER_PIPE. I wasn't sure either, so I did a bit of git-archaeology. The
-change was added here:
+Thanks,
 
----------------------------8<---------------------------
-commit
-7ce469a53e7106acdaca2e25027941d0f7c12a8e
-Author: Yan, Zheng <zyan@redhat.com>
-Date:   Tue Nov 8 21:54:34 2016 +0800
-
-    ceph: fix splice read for no Fc capability case
-    
-    When iov_iter type is ITER_PIPE, copy_page_to_iter() increases
-    the page's reference and add the page to a pipe_buffer. It also
-    set the pipe_buffer's ops to page_cache_pipe_buf_ops. The comfirm
-    callback in page_cache_pipe_buf_ops expects the page is from page
-    cache and uptodate, otherwise it return error.
-    
-    For ceph_sync_read() case, pages are not from page cache. So we
-    can't call copy_page_to_iter() when iov_iter type is ITER_PIPE.
-    The fix is using iov_iter_get_pages_alloc() to allocate pages
-    for the pipe. (the code is similar to default_file_splice_read)
-    
-    Signed-off-by: Yan, Zheng <zyan@redhat.com>
----------------------------8<---------------------------
-
-If we don't have Fc (FILE_CACHE) caps then the client's not allowed to
-cache data and so we can't use the pagecache. I'm not certain special
-casing pipes in ceph, is the best approach to handle that, but the
-confirm callback still seems to work the same way today.
-
-Cheers,
--- 
-Jeff Layton <jlayton@kernel.org>
-
+Josef
