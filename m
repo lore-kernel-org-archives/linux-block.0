@@ -2,92 +2,101 @@ Return-Path: <SRS0=AIgI=CD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97282C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 14:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B16C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 14:17:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C04E2078D
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 14:11:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEBC52076C
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 14:17:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IKD/k0jS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbgHYOLa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 10:11:30 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:37678 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726090AbgHYOL2 (ORCPT
+        id S1726015AbgHYORw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 10:17:52 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40986 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725893AbgHYORu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 10:11:28 -0400
-Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 07PEAKeX001465
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Aug 2020 10:10:21 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 4DA5542010C; Tue, 25 Aug 2020 10:10:20 -0400 (EDT)
-Date:   Tue, 25 Aug 2020 10:10:20 -0400
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        yebin <yebin10@huawei.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: Re: [PATCH RFC 2/2] block: Do not discard buffers under a mounted
- filesystem
-Message-ID: <20200825141020.GA668551@mit.edu>
-References: <20200825120554.13070-1-jack@suse.cz>
- <20200825120554.13070-3-jack@suse.cz>
- <20200825121616.GA10294@infradead.org>
+        Tue, 25 Aug 2020 10:17:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598365069;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=2njhZJDHANmUjQozxqnnDkGvErdIxf7e72SOXU4WCYc=;
+        b=IKD/k0jSCMdG3lMYXRpz5wyDAXemNCizrzvF1UPiPpY4N2xsop/zYT71L+gz+JueOTRWWY
+        SmXWHUXK7fLmYrKQllEsoYJGorvkKWoHInLzNGyFi5t6diKriNKSvR9HPF8spbXd4bDdEp
+        2npiO0saFijCTynxHOnqSeTw7qsXst8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-Qm8GgjqPO4GmCqfOStLGkw-1; Tue, 25 Aug 2020 10:17:45 -0400
+X-MC-Unique: Qm8GgjqPO4GmCqfOStLGkw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86A141007470;
+        Tue, 25 Aug 2020 14:17:43 +0000 (UTC)
+Received: from localhost (ovpn-13-7.pek2.redhat.com [10.72.13.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9AA4B709D2;
+        Tue, 25 Aug 2020 14:17:39 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V2 0/2] blk-mq: implement queue quiesce via percpu_ref for BLK_MQ_F_BLOCKING
+Date:   Tue, 25 Aug 2020 22:17:32 +0800
+Message-Id: <20200825141734.115879-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200825121616.GA10294@infradead.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-(Adding the OCFS2 maintainers, since my possibly insane idea proposed
-below would definitely impact them!)
+Hi Jens,
 
-On Tue, Aug 25, 2020 at 01:16:16PM +0100, Christoph Hellwig wrote:
-> On Tue, Aug 25, 2020 at 02:05:54PM +0200, Jan Kara wrote:
-> > Discarding blocks and buffers under a mounted filesystem is hardly
-> > anything admin wants to do. Usually it will confuse the filesystem and
-> > sometimes the loss of buffer_head state (including b_private field) can
-> > even cause crashes like:
-> 
-> Doesn't work if the file system uses multiple devices.  I think we
-> just really need to split the fs buffer_head address space from the
-> block device one.  Everything else is just going to cause a huge mess.
+The 1st patch add .mq_quiesce_mutex for serializing quiesce/unquiesce,
+and prepares for replacing srcu with percpu_ref.
 
-I wonder if we should go a step further, and stop using struct
-buffer_head altogether in jbd2 and ext4 (as well as ocfs2).
+The 2nd patch replaces srcu with percpu_ref.
 
-This would involve moving whatever structure elements from the
-buffer_head struct into journal_head, and manage writeback and reads
-requests directly in jbd2.  This would allow us to get detailed write
-errors back, which is currently not possible from the buffer_head
-infrastructure.
+V2:
+	- add .mq_quiesce_lock
+	- add comment on patch 2 wrt. handling hctx_lock() failure
+	- trivial patch style change
 
-The downside is this would be a pretty massive change in terms of LOC,
-since we use struct buffer_head in a *huge* number of places.  If
-we're careful, most of it could be handled by a Coccinelle script to
-rename "struct buffer_head" to "struct journal_head".  Fortunately, we
-don't actually use that much of the fs/buffer_head functions in
-fs/{ext4,ocfs2}/*.c.
 
-One potentially tricky bit is that ocfs2 hasn't been converted to
-using iomap, so it's still using __blockdev_direct_IO.  So it's data
-blocks for DIO would still have to use struct buffer_head (which means
-the Coccinelle script won't really work for fs/ocfs2, without a lot of
-manual rework) --- or ocfs2 would have to switched to use iomap at
-least for DIO support.
+Ming Lei (2):
+  blk-mq: serialize queue quiesce and unquiesce by mutex
+  blk-mq: implement queue quiesce via percpu_ref for BLK_MQ_F_BLOCKING
 
-What do folks think?
+ block/blk-core.c       |   2 +
+ block/blk-mq-sysfs.c   |   2 -
+ block/blk-mq.c         | 125 +++++++++++++++++++++++------------------
+ block/blk-sysfs.c      |   6 +-
+ include/linux/blk-mq.h |   7 ---
+ include/linux/blkdev.h |   6 ++
+ 6 files changed, 82 insertions(+), 66 deletions(-)
 
-						- Ted
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>
+Cc: Paul E. McKenney <paulmck@kernel.org>
+Cc: Josh Triplett <josh@joshtriplett.org>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc: Chao Leng <lengchao@huawei.com>
+Cc: Christoph Hellwig <hch@lst.de>
+-- 
+2.25.2
 
