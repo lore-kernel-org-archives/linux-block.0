@@ -2,123 +2,90 @@ Return-Path: <SRS0=AIgI=CD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DBECC433E3
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 18:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D35ECC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 18:41:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EFEA220825
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 18:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B31C0207DF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 18:41:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RlPZ7hKA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726180AbgHYSYY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 14:24:24 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:53511 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1726104AbgHYSYY (ORCPT
+        id S1726556AbgHYSlU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 14:41:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44592 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726391AbgHYSlT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 14:24:24 -0400
-Received: (qmail 376896 invoked by uid 1000); 25 Aug 2020 14:24:23 -0400
-Date:   Tue, 25 Aug 2020 14:24:23 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Stanley Chu <stanley.chu@mediatek.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>
-Subject: Re: [PATCH] block: Fix a race in the runtime power management code
-Message-ID: <20200825182423.GB375466@rowland.harvard.edu>
-References: <20200824030607.19357-1-bvanassche@acm.org>
- <1598346681.10649.8.camel@mtkswgap22>
+        Tue, 25 Aug 2020 14:41:19 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4073BC061574;
+        Tue, 25 Aug 2020 11:41:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=v1o5EjwkeGZhMaYJqq7UjDrf/EQeIGnJO5LmpUpDa7I=; b=RlPZ7hKAVwzbotlvImDEtjyRuk
+        cybL1i9Ml7SuONIIVQ5eP2y+dONtc9FmV8j5N5aEXjGNjyzy/+/rYg+iLzLrJmJytbXpUq5QiDNBu
+        VGU1UzQJsME1WjHE1P1NhgWkmp5X9dTh+w0k033+GxIMo/D8/X5hgxTM1dwmOuhnYAqE/TMn3xgyk
+        lo+N3FChYJ6c3oNJuJQMatqJrl+MV8kJyOtH5r0G8y/Yk9rUZPu+ZmNM+vh0lcijSyX1Xca1uZB8Y
+        vJpg300AJH9MYi9QcDWs5Ii3/0gU5aJ1xnA5jirY18XIZ+P+BNiINhco9NI80p50PIc0qIekheApU
+        PdQIacoQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kAdsZ-00029p-Nl; Tue, 25 Aug 2020 18:41:07 +0000
+Date:   Tue, 25 Aug 2020 19:41:07 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-fsdevel@vger.kernel.org, yebin <yebin10@huawei.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: Re: [PATCH RFC 2/2] block: Do not discard buffers under a mounted
+ filesystem
+Message-ID: <20200825184107.GP17456@casper.infradead.org>
+References: <20200825120554.13070-1-jack@suse.cz>
+ <20200825120554.13070-3-jack@suse.cz>
+ <20200825121616.GA10294@infradead.org>
+ <20200825141020.GA668551@mit.edu>
+ <20200825151256.GD32298@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1598346681.10649.8.camel@mtkswgap22>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200825151256.GD32298@quack2.suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 25, 2020 at 05:11:21PM +0800, Stanley Chu wrote:
-> Sorry, resend to fix typo.
-> 
-> Hi Bart,
-> 
-> On Sun, 2020-08-23 at 20:06 -0700, Bart Van Assche wrote:
-> > With the current implementation the following race can happen:
-> > * blk_pre_runtime_suspend() calls blk_freeze_queue_start() and
-> >   blk_mq_unfreeze_queue().
-> > * blk_queue_enter() calls blk_queue_pm_only() and that function returns
-> >   true.
-> > * blk_queue_enter() calls blk_pm_request_resume() and that function does
-> >   not call pm_request_resume() because the queue runtime status is
-> >   RPM_ACTIVE.
-> > * blk_pre_runtime_suspend() changes the queue status into RPM_SUSPENDING.
+On Tue, Aug 25, 2020 at 05:12:56PM +0200, Jan Kara wrote:
+> On Tue 25-08-20 10:10:20, Theodore Y. Ts'o wrote:
+> > (Adding the OCFS2 maintainers, since my possibly insane idea proposed
+> > below would definitely impact them!)
 > > 
-> > Fix this race by changing the queue runtime status into RPM_SUSPENDING
-> > before switching q_usage_counter to atomic mode.
+> > On Tue, Aug 25, 2020 at 01:16:16PM +0100, Christoph Hellwig wrote:
+> > > On Tue, Aug 25, 2020 at 02:05:54PM +0200, Jan Kara wrote:
+> > > > Discarding blocks and buffers under a mounted filesystem is hardly
+> > > > anything admin wants to do. Usually it will confuse the filesystem and
+> > > > sometimes the loss of buffer_head state (including b_private field) can
+> > > > even cause crashes like:
+> > > 
+> > > Doesn't work if the file system uses multiple devices.  I think we
+> > > just really need to split the fs buffer_head address space from the
+> > > block device one.  Everything else is just going to cause a huge mess.
 > > 
-> > Cc: Alan Stern <stern@rowland.harvard.edu>
-> > Cc: Stanley Chu <stanley.chu@mediatek.com>
-> > Cc: Ming Lei <ming.lei@redhat.com>
-> > Cc: stable <stable@vger.kernel.org>
-> > Fixes: 986d413b7c15 ("blk-mq: Enable support for runtime power management")
-> > Signed-off-by: Can Guo <cang@codeaurora.org>
-> > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> > ---
-> >  block/blk-pm.c | 15 +++++++++------
-> >  1 file changed, 9 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/block/blk-pm.c b/block/blk-pm.c
-> > index b85234d758f7..17bd020268d4 100644
-> > --- a/block/blk-pm.c
-> > +++ b/block/blk-pm.c
-> > @@ -67,6 +67,10 @@ int blk_pre_runtime_suspend(struct request_queue *q)
-> >  
-> >  	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
-> >  
-> > +	spin_lock_irq(&q->queue_lock);
-> > +	q->rpm_status = RPM_SUSPENDING;
-> > +	spin_unlock_irq(&q->queue_lock);
-> > +
+> > I wonder if we should go a step further, and stop using struct
+> > buffer_head altogether in jbd2 and ext4 (as well as ocfs2).
 > 
-> Has below alternative way been considered that RPM_SUSPENDING is set
-> after blk_freeze_queue_start()?
-> 
-> 	blk_freeze_queue_start(q);
-> 
-> +	spin_lock_irq(&q->queue_lock);
-> +	q->rpm_status = RPM_SUSPENDING;
-> +	spin_unlock_irq(&q->queue_lock);
-> 
-> 
-> Otherwise requests can enter queue while rpm_status is RPM_SUSPENDING
-> during a small window, i.e., before blk_set_pm_only() is invoked. This
-> would make the definition of rpm_status ambiguous.
-> 
-> In this way, the racing could be also solved:
-> 
-> - Before blk_freeze_queue_start(), any requests shall be allowed to
-> enter queue
-> - blk_freeze_queue_start() freezes the queue and blocks all upcoming
-> requests (make them wait_event(q->mq_freeze_wq))
-> - rpm_status is set as RPM_SUSPENDING
-> - blk_mq_unfreeze_queue() wakes up q->mq_freeze_wq and then
-> blk_pm_request_resume() can be executed
+> What about the cache coherency issues I've pointed out in my reply to
+> Christoph?
 
-A very similar question arises concerning the transition from 
-RPM_SUSPENDING to RPM_SUSPENDED.  I am not convinced that the existing 
-synchronization is sufficient.  However, this may not matter because...
+If journal_heads pointed into the page cache as well, then you'd get
+coherency.  These new journal heads would have to be able to cope with
+the page cache being modified underneath them, of course.
 
-A related question concerns the BLK_MQ_REQ_PREEMPT flag.  If it is set 
-then the request is allowed whilel rpm_status is RPM_SUSPENDING.  But in 
-fact, the only requests which should be allowed at that time are those 
-created by the lower-layer driver as part of its runtime-suspend 
-handling; all other requests should be deferred.  The BLK_MQ_REQ_PREEMPT 
-flag doesn't seem like the right way to achieve this.  Should we be 
-using a different flag?
-
-Alan Stern
