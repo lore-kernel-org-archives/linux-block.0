@@ -2,117 +2,183 @@ Return-Path: <SRS0=AIgI=CD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58603C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 07:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB927C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 08:27:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26A0C20578
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 07:20:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F24C2067C
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 08:27:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="MInaNUgn"
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="hBt+v9zD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729279AbgHYHUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 03:20:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50254 "EHLO
+        id S1728080AbgHYI1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 04:27:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729209AbgHYHUl (ORCPT
+        with ESMTP id S1729067AbgHYI1t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 03:20:41 -0400
-Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF93DC061755
-        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 00:20:40 -0700 (PDT)
-Received: by mail-lf1-x142.google.com with SMTP id c15so5855395lfi.3
-        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 00:20:40 -0700 (PDT)
+        Tue, 25 Aug 2020 04:27:49 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74442C061574
+        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 01:27:48 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id nv17so854799pjb.3
+        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 01:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LWvQJmkrnmEIXZZ3m3NQCmqtplrJpyZpyg/o+bfnJmk=;
-        b=MInaNUgnNlhGKEt7t59LrOLAkQfHi07yS38zUrGAb31g5p/yELmauj4uOqNWLb6upQ
-         b2qdgKwN4nz31yW2hNDWVD1nIFK/ItIaHEkA2+9oScyT27YwivO+8RjC4nNikXGov4dp
-         l/lB0aXorQ2lMUV6N2UzILuL1d9x1N0itJEIs0qZQzxL/aUF2jpKrgbHKFfSIJQ+jHd0
-         BCLNefg3RRim+GdWCfwaT1rSo/QqHWs1QIBGRKuCWJZyR51YCsINfRpk8+msMXT5iOiA
-         W7hUUwqghSUGOzWTJCgkKdwTx1rRh2A61TARMB5FTdSH0q+wE6BN+tudmqNy4b1FpFqM
-         Oxww==
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=RhJdvNvU9uCmn7imWEde36CIX6eGUgfB/hc6d4E4XYk=;
+        b=hBt+v9zDaF2gYz90bsYHf2N/LU5F5ifMfd52+C92W/t2q+QnmuVnm9ItnKK3tzJdSz
+         2eJdkxHiSwLhNhHxUSUx1H3sXzsD3MZIT4IorWx0RXkWPKvYTO656naVVZAPR51m1uB8
+         m3zSkHjfRQ04gVJWQvJl323WhTGlPZ+ysYiIdtan5lXe0M/OqLjXEwZctbBsMZtDqdzq
+         qXQNN+1pO4JMPNupCqDzGvXmD8seTJB5tAEjZsHSw3q3WrKauggGASH3IinN6OuTh6Fn
+         IoYzfC2pC9Wy1LkQ+pj0pQY+fF6fGI6DsHsIHcabkujJKByFqiZ2N9aMP/x1XvDoHQ5j
+         Parg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LWvQJmkrnmEIXZZ3m3NQCmqtplrJpyZpyg/o+bfnJmk=;
-        b=t/vTWR+gyX1Oh4Tpdkr4Or5JW7HUMHEnP8K3zqU9S/TBASsXmaAZ8U5erMjafHKMfJ
-         y2LnmX8uuGkNG1QzY85SDYH4iAFT2iOeqcyEiyaF/qiKVxkCgHR3xsXnNuoMFyzyksCh
-         1SzKtH2JMYDBjGpn2Vh0hazVDEIyOVTTAc6pU+gpJOZ8DSeXVL3CANuezbzxA1gn3G0b
-         C4OP/lbA/dkPN4fG1DosVmczbFQKyEBQZbSjGN1bmq4h55QzKO+NdM/ard+XDXtJaEwj
-         oqqyPaUucgE8HBx79VoYo0X7xlomdFxd1Thm2vz5SZ6heCRpl5VRDYR6rkaJwKWDD/ag
-         AexA==
-X-Gm-Message-State: AOAM530nRrW9yZBH3LbqkqYBlIYeqlxWNgIlxdfEiw9K3yylS1a+DayW
-        1hOlTt7KpEdZDjOzXm5HxU8O6xf88ph9lVwo4EWsNA==
-X-Google-Smtp-Source: ABdhPJwGMgG3bBokdb1Jbbca+NQTnmhr+DGZ3ftW+U8vN9vKTcQrR0ZB3M+G2qinwc3/MO2G36kF04shxwMgI0lZ9ao=
-X-Received: by 2002:a19:cb45:: with SMTP id b66mr4279527lfg.179.1598340039088;
- Tue, 25 Aug 2020 00:20:39 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RhJdvNvU9uCmn7imWEde36CIX6eGUgfB/hc6d4E4XYk=;
+        b=Gl5/98WP63z2Lk3rb9HjzwyAEC2yFnnokyfeMHyW80RPxvPlucsqEHWjyrIWTD2DtS
+         LuDceENQqL65Pz2+tfYlzS+5fyeOX6aFmaYA+d9ByBOrzvEsuwP3K064K5v3y5hXO/6k
+         ZYM5P1/ee7DrZHoRGETdbgWokLE21nU1WYbN/pn3wfs2Xsdk3zBY3wuwgZ//xEzAibEp
+         mgRsWjh9PqQ0ncJ+bKwzfiKRZFM6kejtJMWy2E0GF8AvlhdRcCPTDBkKG+vRKBSYs9AJ
+         JpNoFaMxY42P5fdpYxNRC5OVUKpxvHioCYMl+ezkOfMj00chlZBt/iNSOgqH+QdEBh/Z
+         iKJw==
+X-Gm-Message-State: AOAM531VliJiAEVa1Hf9KBL47pFtjUzGxJ1pbtWYQXFoRGr51wXRuAjP
+        OOO16vLiOvNOeCDFb60MhVFuWA==
+X-Google-Smtp-Source: ABdhPJwiXYxxj6vvnAazya7dI89CJt4SYASSSqklq5SCRLqkxSW/5GMt3mWYdLtW7vmMZV6DcCZ26A==
+X-Received: by 2002:a17:90a:ee08:: with SMTP id e8mr739923pjy.86.1598344067968;
+        Tue, 25 Aug 2020 01:27:47 -0700 (PDT)
+Received: from houpudeMacBook-Pro.local ([61.120.150.74])
+        by smtp.gmail.com with ESMTPSA id na14sm1642755pjb.6.2020.08.25.01.27.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Aug 2020 01:27:47 -0700 (PDT)
+Subject: Re: [PATCH] nbd: restore default timeout when setting it to zero
+To:     Josef Bacik <josef@toxicpanda.com>, axboe@kernel.dk
+Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+References: <20200810120044.2152-1-houpu@bytedance.com>
+ <38b9de9e-38fe-3090-cea0-377c605c86d4@toxicpanda.com>
+ <4e78e4b3-e75b-7428-703d-d8543bcfe348@bytedance.com>
+ <1accbf37-1a57-f072-7dc4-063fee991189@toxicpanda.com>
+ <701eaeb7-8b91-baa5-ebba-468f890c4cc5@bytedance.com>
+ <59db0b1d-4b2c-7966-9c38-929083e7b8f1@toxicpanda.com>
+From:   Hou Pu <houpu@bytedance.com>
+Message-ID: <6f81b077-e722-1d0e-a506-5507f71540cd@bytedance.com>
+Date:   Tue, 25 Aug 2020 16:27:40 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200824154436.GA255257@gardel-login> <CAB0TPYEPWALD1iOP_5Rq0NKusJEvc_eOVVkoXRxjPtPTZU2GgA@mail.gmail.com>
-In-Reply-To: <CAB0TPYEPWALD1iOP_5Rq0NKusJEvc_eOVVkoXRxjPtPTZU2GgA@mail.gmail.com>
-From:   Martijn Coenen <maco@android.com>
-Date:   Tue, 25 Aug 2020 09:20:28 +0200
-Message-ID: <CAB0TPYHncOkecsmyypr2LACnbupfML7jn1kEdfR78rbA_w0EfQ@mail.gmail.com>
-Subject: Re: LOOP_CONFIGURE ioctl doesn't work if lo_offset/lo_sizelimit are set
-To:     Lennart Poettering <mzxreary@0pointer.de>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Yang Xu <xuyang2018.jy@cn.fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <59db0b1d-4b2c-7966-9c38-929083e7b8f1@toxicpanda.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-I just sent a patch to fix the issue. The loop device would have
-respected the configuration, but indeed the size of the underlying
-block device was not set correctly, so reading back the size would
-give the wrong result.
 
-Thanks,
-Martijn
+On 2020/8/24 10:02 PM, Josef Bacik wrote:
+> On 8/23/20 11:23 PM, Hou Pu wrote:
+>>
+>>
+>> On 2020/8/21 9:57 PM, Josef Bacik wrote:
+>>> On 8/21/20 3:21 AM, Hou Pu wrote:
+>>>>
+>>>>
+>>>> On 2020/8/21 3:03 AM, Josef Bacik wrote:
+>>>>> On 8/10/20 8:00 AM, Hou Pu wrote:
+>>>>>> If we configured io timeout of nbd0 to 100s. Later after we
+>>>>>> finished using it, we configured nbd0 again and set the io
+>>>>>> timeout to 0. We expect it would timeout after 30 seconds
+>>>>>> and keep retry. But in fact we could not change the timeout
+>>>>>> when we set it to 0. the timeout is still the original 100s.
+>>>>>>
+>>>>>> So change the timeout to default 30s when we set it to zero.
+>>>>>> It also behaves same as commit 2da22da57348 ("nbd: fix zero
+>>>>>> cmd timeout handling v2").
+>>>>>>
+>>>>>> It becomes more important if we were reconfigure a nbd device
+>>>>>> and the io timeout it set to zero. Because it could take 30s
+>>>>>> to detect the new socket and thus io could be completed more
+>>>>>> quickly compared to 100s.
+>>>>>>
+>>>>>> Signed-off-by: Hou Pu <houpu@bytedance.com>
+>>>>>> ---
+>>>>>>   drivers/block/nbd.c | 2 ++
+>>>>>>   1 file changed, 2 insertions(+)
+>>>>>>
+>>>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>>>>> index ce7e9f223b20..bc9dc1f847e1 100644
+>>>>>> --- a/drivers/block/nbd.c
+>>>>>> +++ b/drivers/block/nbd.c
+>>>>>> @@ -1360,6 +1360,8 @@ static void nbd_set_cmd_timeout(struct 
+>>>>>> nbd_device *nbd, u64 timeout)
+>>>>>>       nbd->tag_set.timeout = timeout * HZ;
+>>>>>>       if (timeout)
+>>>>>>           blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
+>>>>>> +    else
+>>>>>> +        blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
+>>>>>>   }
+>>>>>>   /* Must be called with config_lock held */
+>>>>>>
+>>>>>
+>>>>> What about the tag_set.timeout?  Thanks,
+>>>>
+>>>> I think user space could set io timeout to 0, thus we set 
+>>>> tag_set.timeout = 0 here and also we should tell the block layer
+>>>> to restore 30s timeout in case it is not. tag_set.timeout == 0
+>>>> imply 30s io timeout and retrying after timeout.
+>>>>
+>>>> (Sorry, I am not sure if I understand your question here. Could
+>>>> you explain a little more if needed?)
+>>>>
+>>>
+>>> I misunderstood what I was using the tagset timeout for.  We don't 
+>>> want this here, if we're dropping a config for an nbd device and we 
+>>> want to reset it to defaults then we need to add this to 
+>>> nbd_config_put().  Thanks,
+>>
+>> AFAIK If we killed a nbd server, then restarted it and reconfigured
+>> the nbd socket, I think we might not reconfigure IO timeout to 0 since
+>> nbd_config_put() is not called in such case. So could we still
+>> restore default timeout here. Or am I missing something?
+>>
+> 
+> If you kill the NBD server then the config is going to be dropped and 
+> need to be reconfigured, so nbd_config_put() will definitely be called.  
+> The only case it wouldn't be is if you are using the netlink interface, 
+> in which case the device is going to keep all of its original settings.  
+> Are you not seeing the final nbd_config_put() being done when you kill 
+> the nbd server?  That seems like a bug if not, and that should be fixed, 
+> and then this timeout thing going in there will fix your issue.  Thanks,
 
-On Mon, Aug 24, 2020 at 8:24 PM Martijn Coenen <maco@android.com> wrote:
->
-> Hi Lennart,
->
-> Thanks for the report, I'll look into it. FWIW, we've been using
-> LOOP_CONFIGURE on Android with lo_offset/lo_sizelimit without issues,
-> but it may be a particular configuration that's causing issues.
->
-> Thanks,
-> Martijn
->
-> On Mon, Aug 24, 2020 at 5:44 PM Lennart Poettering <mzxreary@0pointer.de> wrote:
-> >
-> > Hi!
-> >
-> > Even with fe6a8fc5ed2f0081f17375ae2005718522c392c6 the LOOP_CONFIGURE
-> > ioctl doesn't work correctly. It gets confused if the
-> > lo_offset/lo_sizelimit fields are set to non-zero.
-> >
-> > In a quick test I ran (on Linux 5.8.3) I call LOOP_CONFIGURE with
-> > .lo_offset=3221204992 and .lo_sizelimit=50331648 and immediately
-> > verify the size of the block device with BLKGETSIZE64. It should of
-> > course return 50331648, but actually returns 3271557120. (the precise
-> > values have no particular relevance, it's just what I happened to use
-> > in my test.) If I instead use LOOP_SET_STATUS64 with the exact same
-> > parameters, everything works correctly. In either case, if I use
-> > LOOP_GET_STATUS64 insted of BLKGETSIZE64 to verify things, everything
-> > looks great.
-> >
-> > My guess is that the new ioctl simply doesn't properly propagate the
-> > size limit into the underlying block device like it should. I didn't
-> > have the time to investigate further though.
-> >
-> > Lennart
+I was using the netlink interface. So I could use the reconnect
+feature to update the nbd server without impacting the user of
+nbd device.
+
+I did not see the final nbd_config_put() when I killed the nbd server.
+After I killed the nbd server, the recv_work() put 1 config_ref.
+Another ref count is still held by nbd_genl_connect(). I thought it
+was as expected.
+
+Beside in nbd_genl_reconfigure(), it is checked nbd->config_refs should
+not be zero by:
+         if (!refcount_inc_not_zero(&nbd->config_refs)) {
+                 dev_err(nbd_to_dev(nbd),
+                         "not configured, cannot reconfigure\n");
+                 nbd_put(nbd);
+                 return -EINVAL;
+         }
+So AFAIK this behavior is as expected.
+
+> 
+> Josef
