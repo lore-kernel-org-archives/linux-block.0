@@ -2,118 +2,162 @@ Return-Path: <SRS0=AIgI=CD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B440CC433DF
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 09:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 122B6C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 09:42:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DAA22074D
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 09:11:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="BL8iCtBL"
+	by mail.kernel.org (Postfix) with ESMTP id EDB332071E
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 09:42:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726149AbgHYJL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 05:11:29 -0400
-Received: from mailgw01.mediatek.com ([210.61.82.183]:17546 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725947AbgHYJL1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 05:11:27 -0400
-X-UUID: 6cbc9302bf5a43d297398539dbe21ee1-20200825
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=PZgvhtmBXbDNGHwDLxYVc6k3rDXTzjehSINrEt1I3V4=;
-        b=BL8iCtBL8zByAV6wMHdmeVwKb7BOf7ZfCYn6td3xdvo4qdvFaLjvc89HpRqtqYoWLT4nkk6FrnfJLExif3Ebg4RDHgI2pssZsS2Tsi8K+xZcLGIaEYJ39rGgZ5tN1kf//voFLqHjV6ZIRMua5nLCBtHIkt+vs2GopbyTXUwg6cI=;
-X-UUID: 6cbc9302bf5a43d297398539dbe21ee1-20200825
-Received: from mtkexhb02.mediatek.inc [(172.21.101.103)] by mailgw01.mediatek.com
-        (envelope-from <stanley.chu@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 1189287998; Tue, 25 Aug 2020 17:11:23 +0800
-Received: from mtkcas07.mediatek.inc (172.21.101.84) by
- mtkmbs02n2.mediatek.inc (172.21.101.101) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Tue, 25 Aug 2020 17:11:19 +0800
-Received: from [172.21.77.33] (172.21.77.33) by mtkcas07.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Tue, 25 Aug 2020 17:11:19 +0800
-Message-ID: <1598346681.10649.8.camel@mtkswgap22>
-Subject: Re: [PATCH] block: Fix a race in the runtime power management code
-From:   Stanley Chu <stanley.chu@mediatek.com>
-To:     Bart Van Assche <bvanassche@acm.org>
+        id S1726000AbgHYJmI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 05:42:08 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:53316 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728377AbgHYJmI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Aug 2020 05:42:08 -0400
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id 9F502DA7BE07D36FD03D;
+        Tue, 25 Aug 2020 17:42:05 +0800 (CST)
+Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Tue, 25 Aug 2020 17:42:05 +0800
+Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
+ (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Tue, 25
+ Aug 2020 17:42:04 +0800
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>
 CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Ming Lei <ming.lei@redhat.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>
-Date:   Tue, 25 Aug 2020 17:11:21 +0800
-In-Reply-To: <20200824030607.19357-1-bvanassche@acm.org>
-References: <20200824030607.19357-1-bvanassche@acm.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.2.3-0ubuntu6 
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        "Josh Triplett" <josh@joshtriplett.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+ <856f6108-2227-67e8-e913-fdef296a2d26@grimberg.me>
+ <20200822133954.GC3189453@T590>
+ <619a8d4f-267f-5e21-09bd-16b45af69480@grimberg.me>
+ <20200824104052.GA3210443@T590>
+ <44160549-0273-b8e6-1599-d54ce84eb47f@grimberg.me>
+ <20200825023212.GA3233087@T590>
+ <a7b87988-4757-b718-511e-3fdf122325c9@grimberg.me>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <399888c3-71e6-625e-3b0d-025ccbad4fd1@huawei.com>
+Date:   Tue, 25 Aug 2020 17:41:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-TM-SNTS-SMTP: 1415DBB965B67A0D6C9019982BE5298E896319063BC075E2D19CCADCCF26DD522000:8
-X-MTK:  N
-Content-Transfer-Encoding: base64
+In-Reply-To: <a7b87988-4757-b718-511e-3fdf122325c9@grimberg.me>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.169.42.93]
+X-ClientProxiedBy: dggeme702-chm.china.huawei.com (10.1.199.98) To
+ dggema772-chm.china.huawei.com (10.1.198.214)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-U29ycnksIHJlc2VuZCB0byBmaXggdHlwby4NCg0KSGkgQmFydCwNCg0KT24gU3VuLCAyMDIwLTA4
-LTIzIGF0IDIwOjA2IC0wNzAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+IFdpdGggdGhlIGN1
-cnJlbnQgaW1wbGVtZW50YXRpb24gdGhlIGZvbGxvd2luZyByYWNlIGNhbiBoYXBwZW46DQo+ICog
-YmxrX3ByZV9ydW50aW1lX3N1c3BlbmQoKSBjYWxscyBibGtfZnJlZXplX3F1ZXVlX3N0YXJ0KCkg
-YW5kDQo+ICAgYmxrX21xX3VuZnJlZXplX3F1ZXVlKCkuDQo+ICogYmxrX3F1ZXVlX2VudGVyKCkg
-Y2FsbHMgYmxrX3F1ZXVlX3BtX29ubHkoKSBhbmQgdGhhdCBmdW5jdGlvbiByZXR1cm5zDQo+ICAg
-dHJ1ZS4NCj4gKiBibGtfcXVldWVfZW50ZXIoKSBjYWxscyBibGtfcG1fcmVxdWVzdF9yZXN1bWUo
-KSBhbmQgdGhhdCBmdW5jdGlvbiBkb2VzDQo+ICAgbm90IGNhbGwgcG1fcmVxdWVzdF9yZXN1bWUo
-KSBiZWNhdXNlIHRoZSBxdWV1ZSBydW50aW1lIHN0YXR1cyBpcw0KPiAgIFJQTV9BQ1RJVkUuDQo+
-ICogYmxrX3ByZV9ydW50aW1lX3N1c3BlbmQoKSBjaGFuZ2VzIHRoZSBxdWV1ZSBzdGF0dXMgaW50
-byBSUE1fU1VTUEVORElORy4NCj4gDQo+IEZpeCB0aGlzIHJhY2UgYnkgY2hhbmdpbmcgdGhlIHF1
-ZXVlIHJ1bnRpbWUgc3RhdHVzIGludG8gUlBNX1NVU1BFTkRJTkcNCj4gYmVmb3JlIHN3aXRjaGlu
-ZyBxX3VzYWdlX2NvdW50ZXIgdG8gYXRvbWljIG1vZGUuDQo+IA0KPiBDYzogQWxhbiBTdGVybiA8
-c3Rlcm5Acm93bGFuZC5oYXJ2YXJkLmVkdT4NCj4gQ2M6IFN0YW5sZXkgQ2h1IDxzdGFubGV5LmNo
-dUBtZWRpYXRlay5jb20+DQo+IENjOiBNaW5nIExlaSA8bWluZy5sZWlAcmVkaGF0LmNvbT4NCj4g
-Q2M6IHN0YWJsZSA8c3RhYmxlQHZnZXIua2VybmVsLm9yZz4NCj4gRml4ZXM6IDk4NmQ0MTNiN2Mx
-NSAoImJsay1tcTogRW5hYmxlIHN1cHBvcnQgZm9yIHJ1bnRpbWUgcG93ZXIgbWFuYWdlbWVudCIp
-DQo+IFNpZ25lZC1vZmYtYnk6IENhbiBHdW8gPGNhbmdAY29kZWF1cm9yYS5vcmc+DQo+IFNpZ25l
-ZC1vZmYtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPg0KPiAtLS0NCj4g
-IGJsb2NrL2Jsay1wbS5jIHwgMTUgKysrKysrKysrLS0tLS0tDQo+ICAxIGZpbGUgY2hhbmdlZCwg
-OSBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2Nr
-L2Jsay1wbS5jIGIvYmxvY2svYmxrLXBtLmMNCj4gaW5kZXggYjg1MjM0ZDc1OGY3Li4xN2JkMDIw
-MjY4ZDQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1wbS5jDQo+ICsrKyBiL2Jsb2NrL2Jsay1w
-bS5jDQo+IEBAIC02Nyw2ICs2NywxMCBAQCBpbnQgYmxrX3ByZV9ydW50aW1lX3N1c3BlbmQoc3Ry
-dWN0IHJlcXVlc3RfcXVldWUgKnEpDQo+ICANCj4gIAlXQVJOX09OX09OQ0UocS0+cnBtX3N0YXR1
-cyAhPSBSUE1fQUNUSVZFKTsNCj4gIA0KPiArCXNwaW5fbG9ja19pcnEoJnEtPnF1ZXVlX2xvY2sp
-Ow0KPiArCXEtPnJwbV9zdGF0dXMgPSBSUE1fU1VTUEVORElORzsNCj4gKwlzcGluX3VubG9ja19p
-cnEoJnEtPnF1ZXVlX2xvY2spOw0KPiArDQoNCkhhcyBiZWxvdyBhbHRlcm5hdGl2ZSB3YXkgYmVl
-biBjb25zaWRlcmVkIHRoYXQgUlBNX1NVU1BFTkRJTkcgaXMgc2V0DQphZnRlciBibGtfZnJlZXpl
-X3F1ZXVlX3N0YXJ0KCk/DQoNCglibGtfZnJlZXplX3F1ZXVlX3N0YXJ0KHEpOw0KDQorCXNwaW5f
-bG9ja19pcnEoJnEtPnF1ZXVlX2xvY2spOw0KKwlxLT5ycG1fc3RhdHVzID0gUlBNX1NVU1BFTkRJ
-Tkc7DQorCXNwaW5fdW5sb2NrX2lycSgmcS0+cXVldWVfbG9jayk7DQoNCg0KT3RoZXJ3aXNlIHJl
-cXVlc3RzIGNhbiBlbnRlciBxdWV1ZSB3aGlsZSBycG1fc3RhdHVzIGlzIFJQTV9TVVNQRU5ESU5H
-DQpkdXJpbmcgYSBzbWFsbCB3aW5kb3csIGkuZS4sIGJlZm9yZSBibGtfc2V0X3BtX29ubHkoKSBp
-cyBpbnZva2VkLiBUaGlzDQp3b3VsZCBtYWtlIHRoZSBkZWZpbml0aW9uIG9mIHJwbV9zdGF0dXMg
-YW1iaWd1b3VzLg0KDQpJbiB0aGlzIHdheSwgdGhlIHJhY2luZyBjb3VsZCBiZSBhbHNvIHNvbHZl
-ZDoNCg0KLSBCZWZvcmUgYmxrX2ZyZWV6ZV9xdWV1ZV9zdGFydCgpLCBhbnkgcmVxdWVzdHMgc2hh
-bGwgYmUgYWxsb3dlZCB0bw0KZW50ZXIgcXVldWUNCi0gYmxrX2ZyZWV6ZV9xdWV1ZV9zdGFydCgp
-IGZyZWV6ZXMgdGhlIHF1ZXVlIGFuZCBibG9ja3MgYWxsIHVwY29taW5nDQpyZXF1ZXN0cyAobWFr
-ZSB0aGVtIHdhaXRfZXZlbnQocS0+bXFfZnJlZXplX3dxKSkNCi0gcnBtX3N0YXR1cyBpcyBzZXQg
-YXMgUlBNX1NVU1BFTkRJTkcNCi0gYmxrX21xX3VuZnJlZXplX3F1ZXVlKCkgd2FrZXMgdXAgcS0+
-bXFfZnJlZXplX3dxIGFuZCB0aGVuDQpibGtfcG1fcmVxdWVzdF9yZXN1bWUoKSBjYW4gYmUgZXhl
-Y3V0ZWQNCg0KVGhhbmtzLA0KDQpTdGFubGV5IENodQ0KDQoNCj4gIAkvKg0KPiAgCSAqIEluY3Jl
-YXNlIHRoZSBwbV9vbmx5IGNvdW50ZXIgYmVmb3JlIGNoZWNraW5nIHdoZXRoZXIgYW55DQo+ICAJ
-ICogbm9uLVBNIGJsa19xdWV1ZV9lbnRlcigpIGNhbGxzIGFyZSBpbiBwcm9ncmVzcyB0byBhdm9p
-ZCB0aGF0IGFueQ0KPiBAQCAtODksMTUgKzkzLDE0IEBAIGludCBibGtfcHJlX3J1bnRpbWVfc3Vz
-cGVuZChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSkNCj4gIAkvKiBTd2l0Y2ggcV91c2FnZV9jb3Vu
-dGVyIGJhY2sgdG8gcGVyLWNwdSBtb2RlLiAqLw0KPiAgCWJsa19tcV91bmZyZWV6ZV9xdWV1ZShx
-KTsNCj4gIA0KPiAtCXNwaW5fbG9ja19pcnEoJnEtPnF1ZXVlX2xvY2spOw0KPiAtCWlmIChyZXQg
-PCAwKQ0KPiArCWlmIChyZXQgPCAwKSB7DQo+ICsJCXNwaW5fbG9ja19pcnEoJnEtPnF1ZXVlX2xv
-Y2spOw0KPiArCQlxLT5ycG1fc3RhdHVzID0gUlBNX0FDVElWRTsNCj4gIAkJcG1fcnVudGltZV9t
-YXJrX2xhc3RfYnVzeShxLT5kZXYpOw0KPiAtCWVsc2UNCj4gLQkJcS0+cnBtX3N0YXR1cyA9IFJQ
-TV9TVVNQRU5ESU5HOw0KPiAtCXNwaW5fdW5sb2NrX2lycSgmcS0+cXVldWVfbG9jayk7DQo+ICsJ
-CXNwaW5fdW5sb2NrX2lycSgmcS0+cXVldWVfbG9jayk7DQo+ICANCj4gLQlpZiAocmV0KQ0KPiAg
-CQlibGtfY2xlYXJfcG1fb25seShxKTsNCj4gKwl9DQo+ICANCj4gIAlyZXR1cm4gcmV0Ow0KPiAg
-fQ0KDQoNCg0KDQoNCg==
 
+
+On 2020/8/25 13:24, Sagi Grimberg wrote:
+> 
+>>>>> Anyways, I think that for now we should place them together.
+>>>>
+>>>> Then it may hurt non-blocking.
+>>>>
+>>>> Each hctx has only one run-work, if the hctx is blocked, no other request
+>>>> may be queued to hctx any more. That is basically sync run queue, so I
+>>>> am not sure good enough perf can be expected on blocking.
+>>>
+>>> I don't think that you should assume that a blocking driver will block
+>>> normally, it will only rarely block (very rarely).
+>>
+>> If nvme-tcp only blocks rarely, just wondering why not switch to non-blocking
+>> which can be done simply with one driver specific wq work? Then nvme-tcp
+>> can be aligned with other nvme drivers.
+> 
+> It used to be this way (and also is that way today in some cases), but
+> some latency recent optimizations revealed that sending the request to
+> the wire from queue_rq (when some conditions are met) instead of
+> incurring a context switch is a win in most cases where latency matters.
+> 
+> Once we call sendpage from queue_rq, we might_sleep, hence we must be
+> blocking. But in practice, sendpage with MSG_DONTWAIT will rarely
+> actually sleep.
+> 
+>>>> So it may not be worth of putting the added .dispatch_counter together
+>>>> with .q_usage_counter.
+>>>
+>>> I happen to think it would. Not sure why you resist so much given how
+>>> request_queue is arranged currently.
+>>
+>> The reason is same with 073196787727("blk-mq: Reduce blk_mq_hw_ctx size").
+> 
+> percpu_ref probably is a quarter of the size of srcu, not sure anyone
+> would have bothered to do that for percpu_ref. You're really
+> exaggerating I think...
+> 
+>> non-blocking is the preferred style for blk-mq driver, so we can just
+>> focus on non-blocking wrt. performance improvement as I mentioned blocking
+>> has big problem of sync run queue.
+>>
+>> It may be contradictory for improving both, for example, if the
+>> added .dispatch_counter is put with .q_usage_cunter together, it will
+>> be fetched to L1 unnecessarily which is definitely not good for
+>> non-blocking.
+> 
+> I'll cease asking you for this, but your resistance is really unclear to me. We can measure what is the penalty/gain later by realigning some
+> items.
+> 
+> Let's stop wasting our time here...
+> 
+>>>>>>> Also maybe a better name is needed here since it's just
+>>>>>>> for blocking hctxs.
+>>>>>>>
+>>>>>>>> +    wait_queue_head_t    mq_quiesce_wq;
+>>>>>>>> +
+>>>>>>>>          struct dentry        *debugfs_dir;
+>>>>>>>>      #ifdef CONFIG_BLK_DEBUG_FS
+>>>>>>>>
+>>>>>>>
+>>>>>>> What I think is needed here is at a minimum test quiesce/unquiesce loops
+>>>>>>> during I/O. code auditing is not enough, there may be driver assumptions
+>>>>>>> broken with this change (although I hope there shouldn't be).
+>>>>>>
+>>>>>> We have elevator switch / updating nr_request stress test, and both relies
+>>>>>> on quiesce/unquiesce, and I did run such test with this patch.
+>>>>>
+>>>>> You have a blktest for this? If not, I strongly suggest that one is
+>>>>> added to validate the change also moving forward.
+>>>>
+>>>> There are lots of blktest tests doing that, such as block/005,
+>>>> block/016, block/021, ...
+>>>
+>>> Good, but I'd also won't want to get this without making sure the async
+>>> quiesce works well on large number of namespaces (the reason why this
+>>> is proposed in the first place). Not sure who is planning to do that...
+>>
+>> That can be added when async quiesce is done.
+> 
+> Chao, are you looking into that? I'd really hate to find out we have an
+> issue there post conversion...
+
+Now we config CONFIG_TREE_SRCU, the size of TREE_SRCU is too big. I
+really appreciate the work of Ming.
+
+I review the patch, I think the patch may work well now, but do extra
+works for exception scenario. Percpu_ref is not disigned for
+serialization which read low cost. If we replace SRCU with percpu_ref,
+the benefit is save memory for blocking queue, the price is limit future
+changes or do more extra works.
+
+I do not think replace SRCU with percpu_ref is a good idea, because it's
+hard to predict how much we'll lose.
