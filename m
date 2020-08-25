@@ -2,183 +2,132 @@ Return-Path: <SRS0=AIgI=CD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB927C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 08:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8876BC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 08:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F24C2067C
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 08:27:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="hBt+v9zD"
+	by mail.kernel.org (Postfix) with ESMTP id 6E2872074D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 08:58:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728080AbgHYI1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 04:27:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60738 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729067AbgHYI1t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 04:27:49 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74442C061574
-        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 01:27:48 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id nv17so854799pjb.3
-        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 01:27:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=RhJdvNvU9uCmn7imWEde36CIX6eGUgfB/hc6d4E4XYk=;
-        b=hBt+v9zDaF2gYz90bsYHf2N/LU5F5ifMfd52+C92W/t2q+QnmuVnm9ItnKK3tzJdSz
-         2eJdkxHiSwLhNhHxUSUx1H3sXzsD3MZIT4IorWx0RXkWPKvYTO656naVVZAPR51m1uB8
-         m3zSkHjfRQ04gVJWQvJl323WhTGlPZ+ysYiIdtan5lXe0M/OqLjXEwZctbBsMZtDqdzq
-         qXQNN+1pO4JMPNupCqDzGvXmD8seTJB5tAEjZsHSw3q3WrKauggGASH3IinN6OuTh6Fn
-         IoYzfC2pC9Wy1LkQ+pj0pQY+fF6fGI6DsHsIHcabkujJKByFqiZ2N9aMP/x1XvDoHQ5j
-         Parg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RhJdvNvU9uCmn7imWEde36CIX6eGUgfB/hc6d4E4XYk=;
-        b=Gl5/98WP63z2Lk3rb9HjzwyAEC2yFnnokyfeMHyW80RPxvPlucsqEHWjyrIWTD2DtS
-         LuDceENQqL65Pz2+tfYlzS+5fyeOX6aFmaYA+d9ByBOrzvEsuwP3K064K5v3y5hXO/6k
-         ZYM5P1/ee7DrZHoRGETdbgWokLE21nU1WYbN/pn3wfs2Xsdk3zBY3wuwgZ//xEzAibEp
-         mgRsWjh9PqQ0ncJ+bKwzfiKRZFM6kejtJMWy2E0GF8AvlhdRcCPTDBkKG+vRKBSYs9AJ
-         JpNoFaMxY42P5fdpYxNRC5OVUKpxvHioCYMl+ezkOfMj00chlZBt/iNSOgqH+QdEBh/Z
-         iKJw==
-X-Gm-Message-State: AOAM531VliJiAEVa1Hf9KBL47pFtjUzGxJ1pbtWYQXFoRGr51wXRuAjP
-        OOO16vLiOvNOeCDFb60MhVFuWA==
-X-Google-Smtp-Source: ABdhPJwiXYxxj6vvnAazya7dI89CJt4SYASSSqklq5SCRLqkxSW/5GMt3mWYdLtW7vmMZV6DcCZ26A==
-X-Received: by 2002:a17:90a:ee08:: with SMTP id e8mr739923pjy.86.1598344067968;
-        Tue, 25 Aug 2020 01:27:47 -0700 (PDT)
-Received: from houpudeMacBook-Pro.local ([61.120.150.74])
-        by smtp.gmail.com with ESMTPSA id na14sm1642755pjb.6.2020.08.25.01.27.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Aug 2020 01:27:47 -0700 (PDT)
-Subject: Re: [PATCH] nbd: restore default timeout when setting it to zero
-To:     Josef Bacik <josef@toxicpanda.com>, axboe@kernel.dk
-Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-References: <20200810120044.2152-1-houpu@bytedance.com>
- <38b9de9e-38fe-3090-cea0-377c605c86d4@toxicpanda.com>
- <4e78e4b3-e75b-7428-703d-d8543bcfe348@bytedance.com>
- <1accbf37-1a57-f072-7dc4-063fee991189@toxicpanda.com>
- <701eaeb7-8b91-baa5-ebba-468f890c4cc5@bytedance.com>
- <59db0b1d-4b2c-7966-9c38-929083e7b8f1@toxicpanda.com>
-From:   Hou Pu <houpu@bytedance.com>
-Message-ID: <6f81b077-e722-1d0e-a506-5507f71540cd@bytedance.com>
-Date:   Tue, 25 Aug 2020 16:27:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1728571AbgHYI6P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 04:58:15 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2690 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728033AbgHYI6P (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Aug 2020 04:58:15 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id 9BFDDC72BE6F3FAB2564;
+        Tue, 25 Aug 2020 09:58:13 +0100 (IST)
+Received: from [127.0.0.1] (10.47.8.13) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1913.5; Tue, 25 Aug
+ 2020 09:58:12 +0100
+Subject: Re: [PATCH 2/5] blk-mq: add helper of blk_mq_get_hw_queue_node
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>
+References: <20200820180335.3109216-1-ming.lei@redhat.com>
+ <20200820180335.3109216-3-ming.lei@redhat.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <f9b37b2e-2e18-99ea-ed3f-b5c857338694@huawei.com>
+Date:   Tue, 25 Aug 2020 09:55:47 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <59db0b1d-4b2c-7966-9c38-929083e7b8f1@toxicpanda.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200820180335.3109216-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.8.13]
+X-ClientProxiedBy: lhreml702-chm.china.huawei.com (10.201.108.51) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2020/8/24 10:02 PM, Josef Bacik wrote:
-> On 8/23/20 11:23 PM, Hou Pu wrote:
->>
->>
->> On 2020/8/21 9:57 PM, Josef Bacik wrote:
->>> On 8/21/20 3:21 AM, Hou Pu wrote:
->>>>
->>>>
->>>> On 2020/8/21 3:03 AM, Josef Bacik wrote:
->>>>> On 8/10/20 8:00 AM, Hou Pu wrote:
->>>>>> If we configured io timeout of nbd0 to 100s. Later after we
->>>>>> finished using it, we configured nbd0 again and set the io
->>>>>> timeout to 0. We expect it would timeout after 30 seconds
->>>>>> and keep retry. But in fact we could not change the timeout
->>>>>> when we set it to 0. the timeout is still the original 100s.
->>>>>>
->>>>>> So change the timeout to default 30s when we set it to zero.
->>>>>> It also behaves same as commit 2da22da57348 ("nbd: fix zero
->>>>>> cmd timeout handling v2").
->>>>>>
->>>>>> It becomes more important if we were reconfigure a nbd device
->>>>>> and the io timeout it set to zero. Because it could take 30s
->>>>>> to detect the new socket and thus io could be completed more
->>>>>> quickly compared to 100s.
->>>>>>
->>>>>> Signed-off-by: Hou Pu <houpu@bytedance.com>
->>>>>> ---
->>>>>>   drivers/block/nbd.c | 2 ++
->>>>>>   1 file changed, 2 insertions(+)
->>>>>>
->>>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->>>>>> index ce7e9f223b20..bc9dc1f847e1 100644
->>>>>> --- a/drivers/block/nbd.c
->>>>>> +++ b/drivers/block/nbd.c
->>>>>> @@ -1360,6 +1360,8 @@ static void nbd_set_cmd_timeout(struct 
->>>>>> nbd_device *nbd, u64 timeout)
->>>>>>       nbd->tag_set.timeout = timeout * HZ;
->>>>>>       if (timeout)
->>>>>>           blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
->>>>>> +    else
->>>>>> +        blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
->>>>>>   }
->>>>>>   /* Must be called with config_lock held */
->>>>>>
->>>>>
->>>>> What about the tag_set.timeout?  Thanks,
->>>>
->>>> I think user space could set io timeout to 0, thus we set 
->>>> tag_set.timeout = 0 here and also we should tell the block layer
->>>> to restore 30s timeout in case it is not. tag_set.timeout == 0
->>>> imply 30s io timeout and retrying after timeout.
->>>>
->>>> (Sorry, I am not sure if I understand your question here. Could
->>>> you explain a little more if needed?)
->>>>
->>>
->>> I misunderstood what I was using the tagset timeout for.  We don't 
->>> want this here, if we're dropping a config for an nbd device and we 
->>> want to reset it to defaults then we need to add this to 
->>> nbd_config_put().  Thanks,
->>
->> AFAIK If we killed a nbd server, then restarted it and reconfigured
->> the nbd socket, I think we might not reconfigure IO timeout to 0 since
->> nbd_config_put() is not called in such case. So could we still
->> restore default timeout here. Or am I missing something?
->>
+On 20/08/2020 19:03, Ming Lei wrote:
+> Add helper of blk_mq_get_hw_queue_node for retrieve hw queue's numa
+> node.
 > 
-> If you kill the NBD server then the config is going to be dropped and 
-> need to be reconfigured, so nbd_config_put() will definitely be called.  
-> The only case it wouldn't be is if you are using the netlink interface, 
-> in which case the device is going to keep all of its original settings.  
-> Are you not seeing the final nbd_config_put() being done when you kill 
-> the nbd server?  That seems like a bug if not, and that should be fixed, 
-> and then this timeout thing going in there will fix your issue.  Thanks,
-
-I was using the netlink interface. So I could use the reconnect
-feature to update the nbd server without impacting the user of
-nbd device.
-
-I did not see the final nbd_config_put() when I killed the nbd server.
-After I killed the nbd server, the recv_work() put 1 config_ref.
-Another ref count is still held by nbd_genl_connect(). I thought it
-was as expected.
-
-Beside in nbd_genl_reconfigure(), it is checked nbd->config_refs should
-not be zero by:
-         if (!refcount_inc_not_zero(&nbd->config_refs)) {
-                 dev_err(nbd_to_dev(nbd),
-                         "not configured, cannot reconfigure\n");
-                 nbd_put(nbd);
-                 return -EINVAL;
-         }
-So AFAIK this behavior is as expected.
-
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: John Garry <john.garry@huawei.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/blk-mq.c | 24 ++++++++++++++----------
+>   1 file changed, 14 insertions(+), 10 deletions(-)
 > 
-> Josef
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index f9da2d803c18..5019d21e7ff8 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2263,6 +2263,18 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
+>   }
+>   EXPORT_SYMBOL_GPL(blk_mq_submit_bio); /* only for request based dm */
+>   
+> +static int blk_mq_get_hw_queue_node(struct blk_mq_tag_set *set,
+> +		unsigned int hctx_idx)
+> +{
+> +	int node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT],
+> +			hctx_idx);
+
+Hi Ming,
+
+Did you consider if we can consolidate all of this to 
+blk_mq_hw_queue_to_node(), by passing the set there also (since we 
+always use HCTX_TYPE_DEFAULT)? Or is that just exceeding remit of 
+blk_mq_hw_queue_to_node()?
+
+I don't think it would affect the other user of 
+blk_mq_hw_queue_to_node(), being blk_mq_realloc_hw_ctxs().
+
+But current change looks ok also.
+
+Thanks
+
+> +
+> +	if (node == NUMA_NO_NODE)
+> +		node = set->numa_node;
+> +
+> +	return node;
+> +}
+> +
+>   void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>   		     unsigned int hctx_idx)
+>   {
+> @@ -2309,11 +2321,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+>   					unsigned int reserved_tags)
+>   {
+>   	struct blk_mq_tags *tags;
+> -	int node;
+> -
+> -	node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], hctx_idx);
+> -	if (node == NUMA_NO_NODE)
+> -		node = set->numa_node;
+> +	int node = blk_mq_get_hw_queue_node(set, hctx_idx);
+>   
+>   	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
+>   				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
+> @@ -2367,11 +2375,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>   {
+>   	unsigned int i, j, entries_per_page;
+>   	size_t rq_size, left;
+> -	int node;
+> -
+> -	node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], hctx_idx);
+> -	if (node == NUMA_NO_NODE)
+> -		node = set->numa_node;
+> +	int node = blk_mq_get_hw_queue_node(set, hctx_idx);
+>   
+>   	INIT_LIST_HEAD(&tags->page_list);
+>   
+> 
+
