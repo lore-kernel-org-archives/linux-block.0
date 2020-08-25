@@ -2,136 +2,70 @@ Return-Path: <SRS0=AIgI=CD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B68C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 06:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F0AC433E1
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 07:15:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD0A52076C
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 06:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0C6C20706
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 07:15:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727095AbgHYGRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 02:17:20 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36940 "EHLO mx2.suse.de"
+        id S1729291AbgHYHPw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 03:15:52 -0400
+Received: from verein.lst.de ([213.95.11.211]:57746 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726015AbgHYGRU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 02:17:20 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id A2351AC61;
-        Tue, 25 Aug 2020 06:17:48 +0000 (UTC)
-Subject: Re: [PATCH v2 02/12] bcache: explicitly make cache_set only have
- single cache
-To:     Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20200822114536.23491-1-colyli@suse.de>
- <20200822114536.23491-3-colyli@suse.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <04a41d67-5591-4ef6-7083-67ae367e63fc@suse.de>
-Date:   Tue, 25 Aug 2020 08:17:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1729194AbgHYHPv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Aug 2020 03:15:51 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 3CA0868BEB; Tue, 25 Aug 2020 09:15:49 +0200 (CEST)
+Date:   Tue, 25 Aug 2020 09:15:48 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, Chao Leng <lengchao@huawei.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, axboe@fb.com
+Subject: Re: [PATCH 2/3] nvme-core: fix deadlock when reconnect failed due
+ to nvme_set_queue_count timeout
+Message-ID: <20200825071548.GG29268@lst.de>
+References: <20200820035406.1720-1-lengchao@huawei.com> <20200821075034.GB30216@lst.de> <dbf66315-9e36-2105-535e-a90352ec5306@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <20200822114536.23491-3-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbf66315-9e36-2105-535e-a90352ec5306@grimberg.me>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/22/20 1:45 PM, Coly Li wrote:
-> Currently although the bcache code has a framework for multiple caches
-> in a cache set, but indeed the multiple caches never completed and users
-> use md raid1 for multiple copies of the cached data.
-> 
-> This patch does the following change in struct cache_set, to explicitly
-> make a cache_set only have single cache,
-> - Change pointer array "*cache[MAX_CACHES_PER_SET]" to a single pointer
->    "*cache".
-> - Remove pointer array "*cache_by_alloc[MAX_CACHES_PER_SET]".
-> - Remove "caches_loaded".
-> 
-> Now the code looks as exactly what it does in practic: only one cache is
-> used in the cache set.
-> 
-> Signed-off-by: Coly Li <colyli@suse.de>
-> ---
->   drivers/md/bcache/alloc.c  |  2 +-
->   drivers/md/bcache/bcache.h |  8 +++-----
->   drivers/md/bcache/super.c  | 19 ++++++++-----------
->   3 files changed, 12 insertions(+), 17 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-> index 4493ff57476d..3385f6add6df 100644
-> --- a/drivers/md/bcache/alloc.c
-> +++ b/drivers/md/bcache/alloc.c
-> @@ -501,7 +501,7 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
->   
->   	bkey_init(k);
->   
-> -	ca = c->cache_by_alloc[0];
-> +	ca = c->cache;
->   	b = bch_bucket_alloc(ca, reserve, wait);
->   	if (b == -1)
->   		goto err;
-> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-> index 5ff6e9573935..aa112c1adba1 100644
-> --- a/drivers/md/bcache/bcache.h
-> +++ b/drivers/md/bcache/bcache.h
-> @@ -519,9 +519,7 @@ struct cache_set {
->   
->   	struct cache_sb		sb;
->   
-> -	struct cache		*cache[MAX_CACHES_PER_SET];
-> -	struct cache		*cache_by_alloc[MAX_CACHES_PER_SET];
-> -	int			caches_loaded;
-> +	struct cache		*cache;
->   
->   	struct bcache_device	**devices;
->   	unsigned int		devices_max_used;
-> @@ -808,7 +806,7 @@ static inline struct cache *PTR_CACHE(struct cache_set *c,
->   				      const struct bkey *k,
->   				      unsigned int ptr)
->   {
-> -	return c->cache[PTR_DEV(k, ptr)];
-> +	return c->cache;
->   }
->   
->   static inline size_t PTR_BUCKET_NR(struct cache_set *c,
-> @@ -890,7 +888,7 @@ do {									\
->   /* Looping macros */
->   
->   #define for_each_cache(ca, cs, iter)					\
-> -	for (iter = 0; ca = cs->cache[iter], iter < (cs)->sb.nr_in_set; iter++)
-> +	for (iter = 0; ca = cs->cache, iter < 1; iter++)
->   
->   #define for_each_bucket(b, ca)						\
->   	for (b = (ca)->buckets + (ca)->sb.first_bucket;			\
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 7057ec48f3d1..e9ccfa17beb8 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -1675,7 +1675,7 @@ static void cache_set_free(struct closure *cl)
->   	for_each_cache(ca, c, i)
->   		if (ca) {
->   			ca->set = NULL;
-> -			c->cache[ca->sb.nr_this_dev] = NULL;
-> +			c->cache = NULL;
->   			kobject_put(&ca->kobj);
->   		}
->   
-Please kill 'for_each_cache()', too, and replace it by an if clause.
+On Fri, Aug 21, 2020 at 01:20:44PM -0700, Sagi Grimberg wrote:
+>>> Many functions which call __nvme_submit_sync_cmd treat error code in two
+>>> modes: If error code less than 0, treat as command failed. If erroe code
+>>> more than 0, treat as target not support or other and continue.
+>>> NVME_SC_HOST_ABORTED_CMD and NVME_SC_HOST_PATH_ERROR both are cancled io
+>>> by host, is not the real error code return from target. So we need set
+>>> the flag:NVME_REQ_CANCELLED. Thus __nvme_submit_sync_cmd translate
+>>> the error to INTR, nvme_set_queue_count will return error, reconnect
+>>> process will terminate instead of continue.
+>>
+>> But we could still race with a real completion.  I suspect the right
+>> answer is to translate NVME_SC_HOST_ABORTED_CMD and
+>> NVME_SC_HOST_PATH_ERROR to a negative error code in
+>> __nvme_submit_sync_cmd.
+>
+> So the scheme you suggest is:
+> - treat any negative status or !DNR as "we never made it to
+> the target"
+> - Any positive status with DNR is a "controller generated status"
+>
+> This will need a careful audit of all the call-sites we place such
+> assumptions...
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+No.  negative error means never made it to the controller, and we need
+to map the magic NVME_SC_HOST_ABORTED_CMD and NVME_SC_HOST_PATH_ERROR
+errors to negative error codes if we want to keep using them (and IIRC
+we started because it solved an issue, by my memory is foggy).  All the
+real NVMe status codes come from the controller, so the commmand must
+have made it there.
