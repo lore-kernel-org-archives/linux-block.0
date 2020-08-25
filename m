@@ -6,25 +6,25 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E130C433E3
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 01:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE0CC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 02:07:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89B9720738
-	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 01:54:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02005204EC
+	for <linux-block@archiver.kernel.org>; Tue, 25 Aug 2020 02:07:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726104AbgHYByt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Aug 2020 21:54:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56100 "EHLO
+        id S1727037AbgHYCHK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Aug 2020 22:07:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725924AbgHYBys (ORCPT
+        with ESMTP id S1725838AbgHYCHG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Aug 2020 21:54:48 -0400
+        Mon, 24 Aug 2020 22:07:06 -0400
 Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E618C061574;
-        Mon, 24 Aug 2020 18:54:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6CAC061574;
+        Mon, 24 Aug 2020 19:07:06 -0700 (PDT)
 Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kAOAO-004EWH-BU; Tue, 25 Aug 2020 01:54:28 +0000
-Date:   Tue, 25 Aug 2020 02:54:28 +0100
+        id 1kAOMW-004EtK-7m; Tue, 25 Aug 2020 02:07:00 +0000
+Date:   Tue, 25 Aug 2020 03:07:00 +0100
 From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     John Hubbard <jhubbard@nvidia.com>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
@@ -35,27 +35,40 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
         linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH 0/5] bio: Direct IO: convert to pin_user_pages_fast()
-Message-ID: <20200825015428.GU1236603@ZenIV.linux.org.uk>
+Message-ID: <20200825020700.GV1236603@ZenIV.linux.org.uk>
 References: <20200822042059.1805541-1-jhubbard@nvidia.com>
+ <20200825015428.GU1236603@ZenIV.linux.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200822042059.1805541-1-jhubbard@nvidia.com>
+In-Reply-To: <20200825015428.GU1236603@ZenIV.linux.org.uk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 21, 2020 at 09:20:54PM -0700, John Hubbard wrote:
-
-> Direct IO behavior:
+On Tue, Aug 25, 2020 at 02:54:28AM +0100, Al Viro wrote:
+> On Fri, Aug 21, 2020 at 09:20:54PM -0700, John Hubbard wrote:
 > 
->     ITER_IOVEC:
->         pin_user_pages_fast();
->         break;
+> > Direct IO behavior:
+> > 
+> >     ITER_IOVEC:
+> >         pin_user_pages_fast();
+> >         break;
+> > 
+> >     ITER_KVEC:    // already elevated page refcount, leave alone
+> >     ITER_BVEC:    // already elevated page refcount, leave alone
+> >     ITER_PIPE:    // just, no :)
 > 
->     ITER_KVEC:    // already elevated page refcount, leave alone
->     ITER_BVEC:    // already elevated page refcount, leave alone
->     ITER_PIPE:    // just, no :)
+> Why?  What's wrong with splice to O_DIRECT file?
 
-Why?  What's wrong with splice to O_DIRECT file?
+Sorry - s/to/from/, obviously.
+
+To spell it out: consider generic_file_splice_read() behaviour when
+the source had been opened with O_DIRECT; you will get a call of
+->read_iter() into ITER_PIPE destination.  And it bloody well
+will hit iov_iter_get_pages() on common filesystems, to pick the
+pages we want to read into.
+
+So... what's wrong with having that "pin" primitive making sure
+the pages are there and referenced by the pipe?
