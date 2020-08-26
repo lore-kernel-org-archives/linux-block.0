@@ -2,198 +2,156 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99B3AC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 01:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E7B9C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 01:51:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55FF1206E3
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 01:51:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 487712075E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 01:51:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="SUdqlK1j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rkPU8zA6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbgHZBvX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 21:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54450 "EHLO
+        id S1726611AbgHZBvu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 21:51:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726611AbgHZBvX (ORCPT
+        with ESMTP id S1726599AbgHZBvs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 21:51:23 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0780EC061574
-        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 18:51:23 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id ls14so140832pjb.3
-        for <linux-block@vger.kernel.org>; Tue, 25 Aug 2020 18:51:23 -0700 (PDT)
+        Tue, 25 Aug 2020 21:51:48 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19FDAC061574;
+        Tue, 25 Aug 2020 18:51:48 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id r15so144621wrp.13;
+        Tue, 25 Aug 2020 18:51:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=D6zd+eMJDrxgksdnuWcDok6ltzheKvzsGPgIwYZuV30=;
-        b=SUdqlK1jq4iKcQCVr3kB7/ZP/dl0cZ1kyr1AiKSpTqTD/bThmL/KGq+pUqxUsJoL0I
-         qGaavHuuHM2JwSZenoTGoCnpjJ9Xh+bVp4DPzTpUIL8mtPzP2NcAuIeMUqxY0ecQXb+R
-         Ktt9mHxPB2e8oJK1yTsMG6Qh3w2AKRSWyB4Hip4x/BDJmInWPGBJQ5EgNBvRzD+Kryqr
-         CzIAyINGnBv2ekhOUv5YH6ev/atvHEoZFFVCoxR4U/jvdfmk6Dz/b/i0ovdd0T1pc8r4
-         thySfGyBz/eEB6xJUd/yyNfjK/dJHBZA1RktDZ55/d50BrqBUFCKtsq7uxU38yVfP0TV
-         MUIg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6lKBXswTrzhA0xBsr6HB8AlB5+bACM8/QHtln5EsmDM=;
+        b=rkPU8zA6FnvPI7YRdwlrF32Z+jufZRPGDhsVbublBxI+2WdfyrQZ4OMYugj2LjMgRs
+         tcBC2iVxYnWeg8Zk6YWzQfE0csZvqLsQKSxRKrpJnxvpSdJ9HVsaxBuVVCZ33a7Fy89F
+         YzL00nv71TEx1KwJewv+LaAx654GeLawZ3dB08BJtkewTW0RxdimmA59/2c32/oJxdK5
+         dSKP0GfmMvAUQJfWlO1JkSN5McliJO+sig5zbM32H0/Kuj9D+O0+2QWE9ikcOBAgMoCE
+         knF+3yVSHzD+dH7rwDtBk3Dij3c2i2NaVRbX/WHThEgypBISYgNE6EdHQjalStrd+n7R
+         ERAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=D6zd+eMJDrxgksdnuWcDok6ltzheKvzsGPgIwYZuV30=;
-        b=SxnotySfHIarrdNl5Ye28F7dkICk8EVfC0nYD5+QQCUkZofGPWDs+1HhUL/Zr83Ot7
-         DcbGrW/X9M8UjyJJ7hqt94SHQjreF+zVSShuurc9blP+iDN2jh1u1KpWJ25ZY/8BtjeK
-         r0bkKsDUcax9QA71qwvJun/Flch16U6uOXvEVRLb2TsGNtujbqwqueZfA0UeS4natZMA
-         BaIzZPBi8139Q2Db18fRtwVAqZn6W4J+vXIDrS5O2+U+gpQxRwQ62e6qtnvcYt8vHNeu
-         k1xKEaO3fOImyJBpNLQmALmivorZicBv9IWgpmkvwgXkYnvjGH5pSQ8m6zle8e1mhiJi
-         Wm1A==
-X-Gm-Message-State: AOAM5337cWr68NyospewiRSah6A3C5Muhifyw/q2V7MhxIo3Hrt9UEww
-        GHiZZ/ufJMoC+wKXn3z6YBZtYg==
-X-Google-Smtp-Source: ABdhPJyrSWTevU8p1J7WmxJzDCq2EOddbWVYtW+8gSEBckB++VadXyTAur6e0RDtH6kD+NI3JKNisA==
-X-Received: by 2002:a17:90a:a10c:: with SMTP id s12mr3941970pjp.32.1598406682385;
-        Tue, 25 Aug 2020 18:51:22 -0700 (PDT)
-Received: from houpudeMacBook-Pro.local ([61.120.150.74])
-        by smtp.gmail.com with ESMTPSA id t10sm579859pfq.52.2020.08.25.18.51.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Aug 2020 18:51:21 -0700 (PDT)
-Subject: Re: [PATCH] nbd: restore default timeout when setting it to zero
-To:     Josef Bacik <josef@toxicpanda.com>, axboe@kernel.dk
-Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-References: <20200810120044.2152-1-houpu@bytedance.com>
- <38b9de9e-38fe-3090-cea0-377c605c86d4@toxicpanda.com>
- <4e78e4b3-e75b-7428-703d-d8543bcfe348@bytedance.com>
- <1accbf37-1a57-f072-7dc4-063fee991189@toxicpanda.com>
- <701eaeb7-8b91-baa5-ebba-468f890c4cc5@bytedance.com>
- <59db0b1d-4b2c-7966-9c38-929083e7b8f1@toxicpanda.com>
- <6f81b077-e722-1d0e-a506-5507f71540cd@bytedance.com>
- <27dc0e8c-e13b-4671-b739-30628696db7e@toxicpanda.com>
-From:   Hou Pu <houpu@bytedance.com>
-Message-ID: <b527a43f-e6eb-6b80-6c61-e96c738a3bbc@bytedance.com>
-Date:   Wed, 26 Aug 2020 09:51:17 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6lKBXswTrzhA0xBsr6HB8AlB5+bACM8/QHtln5EsmDM=;
+        b=Smmunnpt1LjXpGp/N/t0FV0JpDIO+k456WlcUpDewg1p2nTBOA1P67S7CZhYS2eSnR
+         +OOu2WflF/myrmiKXjLyTDaOm9yWRQ/+m8rWhp4lfGRIQPptsKuzcIbQK/gfqzrsmgb2
+         BdQeToImOPECJssEo1/TBCGYzI7wfdeorUnpu7sSaErjF0BZxrIBwxej/FG4QVGmlh2X
+         1BHiv36vlSmis5BKaAtrqFc4MD1qxap9ZHiDz2gBaMW3K4hIGCY8DekMKBubBcRoWA2R
+         RBoRwxM4sCife/uTbJfjeAzX/lJkNnPNGkYKMD/Hi0cHsiYPB61eiVR70QtO+4h+3P/C
+         fPwA==
+X-Gm-Message-State: AOAM530oFG3ifVTPrO+3udsr1xhmkYJh0IEhN4H2KNWhmkrJD+j5JUa9
+        fGPsJZQ/BpxSlrw+43if6fdezIzMsx/vRGp6QYY=
+X-Google-Smtp-Source: ABdhPJyeqlKj5YPc50Em7rO4ODLMTr2DC/m+jfMJDMOpF+XoOI2kKLAaJQ+LNrc4dhPoiuNEDU0+R/Ls8lv1xf0wUss=
+X-Received: by 2002:adf:db43:: with SMTP id f3mr14164955wrj.219.1598406706678;
+ Tue, 25 Aug 2020 18:51:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <27dc0e8c-e13b-4671-b739-30628696db7e@toxicpanda.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200817091617.28119-1-allen.cryptic@gmail.com>
+ <20200817091617.28119-2-allen.cryptic@gmail.com> <b5508ca4-0641-7265-2939-5f03cbfab2e2@kernel.dk>
+ <202008171228.29E6B3BB@keescook> <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
+ <202008171246.80287CDCA@keescook> <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
+ <1597780833.3978.3.camel@HansenPartnership.com> <f3312928-430c-25f3-7112-76f2754df080@kernel.dk>
+ <1597849185.3875.7.camel@HansenPartnership.com> <CAOMdWSJRR0BhjJK1FxD7UKxNd5sk4ycmEX6TYtJjRNR6UFAj6Q@mail.gmail.com>
+ <1597873172.4030.2.camel@HansenPartnership.com>
+In-Reply-To: <1597873172.4030.2.camel@HansenPartnership.com>
+From:   Allen Pais <allen.cryptic@gmail.com>
+Date:   Wed, 26 Aug 2020 07:21:35 +0530
+Message-ID: <CAEogwTCH8qqjAnSpT0GDn+NuAps8dNbfcPVQ9h8kfOWNbzrD0w@mail.gmail.com>
+Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
+To:     James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc:     Allen <allen.lkml@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Kees Cook <keescook@chromium.org>, jdike@addtoit.com,
+        richard@nod.at, anton.ivanov@cambridgegreys.com, 3chas3@gmail.com,
+        stefanr@s5r6.in-berlin.de, airlied@linux.ie,
+        Daniel Vetter <daniel@ffwll.ch>, sre@kernel.org,
+        kys@microsoft.com, deller@gmx.de, dmitry.torokhov@gmail.com,
+        jassisinghbrar@gmail.com, shawnguo@kernel.org,
+        s.hauer@pengutronix.de, maximlevitsky@gmail.com, oakad@yahoo.com,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        mporter@kernel.crashing.org, alex.bou9@gmail.com,
+        broonie@kernel.org, martyn@welchs.me.uk, manohar.vanga@gmail.com,
+        mitch@sfgoth.com, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, linux-um@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux1394-devel@lists.sourceforge.net,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        Romain Perier <romain.perier@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Aug 20, 2020 at 3:09 AM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+>
+> On Wed, 2020-08-19 at 21:54 +0530, Allen wrote:
+> > > [...]
+> > > > > Since both threads seem to have petered out, let me suggest in
+> > > > > kernel.h:
+> > > > >
+> > > > > #define cast_out(ptr, container, member) \
+> > > > >     container_of(ptr, typeof(*container), member)
+> > > > >
+> > > > > It does what you want, the argument order is the same as
+> > > > > container_of with the only difference being you name the
+> > > > > containing structure instead of having to specify its type.
+> > > >
+> > > > Not to incessantly bike shed on the naming, but I don't like
+> > > > cast_out, it's not very descriptive. And it has connotations of
+> > > > getting rid of something, which isn't really true.
+> > >
+> > > Um, I thought it was exactly descriptive: you're casting to the
+> > > outer container.  I thought about following the C++ dynamic casting
+> > > style, so out_cast(), but that seemed a bit pejorative.  What about
+> > > outer_cast()?
+> > >
+> > > > FWIW, I like the from_ part of the original naming, as it has
+> > > > some clues as to what is being done here. Why not just
+> > > > from_container()? That should immediately tell people what it
+> > > > does without having to look up the implementation, even before
+> > > > this becomes a part of the accepted coding norm.
+> > >
+> > > I'm not opposed to container_from() but it seems a little less
+> > > descriptive than outer_cast() but I don't really care.  I always
+> > > have to look up container_of() when I'm using it so this would just
+> > > be another macro of that type ...
+> > >
+> >
+> >  So far we have a few which have been suggested as replacement
+> > for from_tasklet()
+> >
+> > - out_cast() or outer_cast()
+> > - from_member().
+> > - container_from() or from_container()
+> >
+> > from_container() sounds fine, would trimming it a bit work? like
+> > from_cont().
+>
+> I'm fine with container_from().  It's the same form as container_of()
+> and I think we need urgent agreement to not stall everything else so
+> the most innocuous name is likely to get the widest acceptance.
 
+Kees,
 
-On 2020/8/26 1:29 上午, Josef Bacik wrote:
-> On 8/25/20 4:27 AM, Hou Pu wrote:
->>
->>
->> On 2020/8/24 10:02 PM, Josef Bacik wrote:
->>> On 8/23/20 11:23 PM, Hou Pu wrote:
->>>>
->>>>
->>>> On 2020/8/21 9:57 PM, Josef Bacik wrote:
->>>>> On 8/21/20 3:21 AM, Hou Pu wrote:
->>>>>>
->>>>>>
->>>>>> On 2020/8/21 3:03 AM, Josef Bacik wrote:
->>>>>>> On 8/10/20 8:00 AM, Hou Pu wrote:
->>>>>>>> If we configured io timeout of nbd0 to 100s. Later after we
->>>>>>>> finished using it, we configured nbd0 again and set the io
->>>>>>>> timeout to 0. We expect it would timeout after 30 seconds
->>>>>>>> and keep retry. But in fact we could not change the timeout
->>>>>>>> when we set it to 0. the timeout is still the original 100s.
->>>>>>>>
->>>>>>>> So change the timeout to default 30s when we set it to zero.
->>>>>>>> It also behaves same as commit 2da22da57348 ("nbd: fix zero
->>>>>>>> cmd timeout handling v2").
->>>>>>>>
->>>>>>>> It becomes more important if we were reconfigure a nbd device
->>>>>>>> and the io timeout it set to zero. Because it could take 30s
->>>>>>>> to detect the new socket and thus io could be completed more
->>>>>>>> quickly compared to 100s.
->>>>>>>>
->>>>>>>> Signed-off-by: Hou Pu <houpu@bytedance.com>
->>>>>>>> ---
->>>>>>>>   drivers/block/nbd.c | 2 ++
->>>>>>>>   1 file changed, 2 insertions(+)
->>>>>>>>
->>>>>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->>>>>>>> index ce7e9f223b20..bc9dc1f847e1 100644
->>>>>>>> --- a/drivers/block/nbd.c
->>>>>>>> +++ b/drivers/block/nbd.c
->>>>>>>> @@ -1360,6 +1360,8 @@ static void nbd_set_cmd_timeout(struct 
->>>>>>>> nbd_device *nbd, u64 timeout)
->>>>>>>>       nbd->tag_set.timeout = timeout * HZ;
->>>>>>>>       if (timeout)
->>>>>>>>           blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
->>>>>>>> +    else
->>>>>>>> +        blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
->>>>>>>>   }
->>>>>>>>   /* Must be called with config_lock held */
->>>>>>>>
->>>>>>>
->>>>>>> What about the tag_set.timeout?  Thanks,
->>>>>>
->>>>>> I think user space could set io timeout to 0, thus we set 
->>>>>> tag_set.timeout = 0 here and also we should tell the block layer
->>>>>> to restore 30s timeout in case it is not. tag_set.timeout == 0
->>>>>> imply 30s io timeout and retrying after timeout.
->>>>>>
->>>>>> (Sorry, I am not sure if I understand your question here. Could
->>>>>> you explain a little more if needed?)
->>>>>>
->>>>>
->>>>> I misunderstood what I was using the tagset timeout for.  We don't 
->>>>> want this here, if we're dropping a config for an nbd device and we 
->>>>> want to reset it to defaults then we need to add this to 
->>>>> nbd_config_put().  Thanks,
->>>>
->>>> AFAIK If we killed a nbd server, then restarted it and reconfigured
->>>> the nbd socket, I think we might not reconfigure IO timeout to 0 since
->>>> nbd_config_put() is not called in such case. So could we still
->>>> restore default timeout here. Or am I missing something?
->>>>
->>>
->>> If you kill the NBD server then the config is going to be dropped and 
->>> need to be reconfigured, so nbd_config_put() will definitely be 
->>> called. The only case it wouldn't be is if you are using the netlink 
->>> interface, in which case the device is going to keep all of its 
->>> original settings. Are you not seeing the final nbd_config_put() 
->>> being done when you kill the nbd server?  That seems like a bug if 
->>> not, and that should be fixed, and then this timeout thing going in 
->>> there will fix your issue.  Thanks,
->>
->> I was using the netlink interface. So I could use the reconnect
->> feature to update the nbd server without impacting the user of
->> nbd device.
->>
->> I did not see the final nbd_config_put() when I killed the nbd server.
->> After I killed the nbd server, the recv_work() put 1 config_ref.
->> Another ref count is still held by nbd_genl_connect(). I thought it
->> was as expected.
->>
->> Beside in nbd_genl_reconfigure(), it is checked nbd->config_refs should
->> not be zero by:
->>          if (!refcount_inc_not_zero(&nbd->config_refs)) {
->>                  dev_err(nbd_to_dev(nbd),
->>                          "not configured, cannot reconfigure\n");
->>                  nbd_put(nbd);
->>                  return -EINVAL;
->>          }
->> So AFAIK this behavior is as expected.
-> 
-> Ahh ok I see what you're getting at.  Ok I agree, you can add
-> 
-> Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+  Will you be  sending the newly proposed API to Linus? I have V2
+which uses container_from()
+ready to be sent out.
 
-Thanks for your review,
-Hou
-> 
-> Thanks,
-> 
-> Josef
+Thanks.
