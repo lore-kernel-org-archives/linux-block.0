@@ -2,105 +2,103 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C10BC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 04:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8E7C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 04:15:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A3AA20756
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 04:00:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="dfoiU5ro"
+	by mail.kernel.org (Postfix) with ESMTP id A456F20707
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 04:15:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725764AbgHZEAP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 00:00:15 -0400
-Received: from mailgw01.mediatek.com ([210.61.82.183]:23678 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725267AbgHZEAO (ORCPT
+        id S1726034AbgHZEPp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 00:15:45 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:1229 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725294AbgHZEPp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 00:00:14 -0400
-X-UUID: 2128476f42c14117bbdba1fb17b194aa-20200826
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=RBEX1ExJEO1XdJLmf9rWy6KHd2buj+9SjY2A9V9tzWs=;
-        b=dfoiU5roNF+25w0/NUxV9IQ5G1jz4TyrCy6pPAfvGFsXRj8IBDKfi9maXnJuqzrtsE9z15vDDO0h3s8lnFEu7EP6owu5crHnvFWB6Kd5d/1wPaDPBhzwSW25Tpp6KQH5Nz1SpOUJhJhyIkeESvoMUTQRBkSnexTJYKdQ7tTqEFc=;
-X-UUID: 2128476f42c14117bbdba1fb17b194aa-20200826
-Received: from mtkcas08.mediatek.inc [(172.21.101.126)] by mailgw01.mediatek.com
-        (envelope-from <stanley.chu@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 1255619686; Wed, 26 Aug 2020 12:00:08 +0800
-Received: from MTKCAS06.mediatek.inc (172.21.101.30) by
- mtkmbs06n2.mediatek.inc (172.21.101.130) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 26 Aug 2020 12:00:07 +0800
-Received: from [172.21.77.33] (172.21.77.33) by MTKCAS06.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 26 Aug 2020 12:00:06 +0800
-Message-ID: <1598414407.10649.19.camel@mtkswgap22>
-Subject: Re: [PATCH] block: Fix a race in the runtime power management code
-From:   Stanley Chu <stanley.chu@mediatek.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Ming Lei <ming.lei@redhat.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>
-Date:   Wed, 26 Aug 2020 12:00:07 +0800
-In-Reply-To: <ee6b4ab1-d118-ef5d-a075-e13dfdb678a7@acm.org>
-References: <20200824030607.19357-1-bvanassche@acm.org>
-         <1598346681.10649.8.camel@mtkswgap22>
-         <ee6b4ab1-d118-ef5d-a075-e13dfdb678a7@acm.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.2.3-0ubuntu6 
+        Wed, 26 Aug 2020 00:15:45 -0400
+X-IronPort-AV: E=Sophos;i="5.76,354,1592841600"; 
+   d="scan'208";a="98554170"
+Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
+  by heian.cn.fujitsu.com with ESMTP; 26 Aug 2020 12:15:44 +0800
+Received: from G08CNEXMBPEKD04.g08.fujitsu.local (unknown [10.167.33.201])
+        by cn.fujitsu.com (Postfix) with ESMTP id 5376348990C7;
+        Wed, 26 Aug 2020 12:15:43 +0800 (CST)
+Received: from [10.167.220.84] (10.167.220.84) by
+ G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.2; Wed, 26 Aug 2020 12:15:42 +0800
+Subject: Re: [PATCH] loop: Set correct device size when using LOOP_CONFIGURE
+To:     Martijn Coenen <maco@android.com>, <mzxreary@0pointer.de>,
+        <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <hch@lst.de>
+References: <20200825071829.1396235-1-maco@android.com>
+From:   Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Message-ID: <9adbdec2-6e3c-bf3c-4df3-bd205d85ff46@cn.fujitsu.com>
+Date:   Wed, 26 Aug 2020 12:15:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-TM-SNTS-SMTP: E4EE1D1EAAA63A3BDDCA5D4EE31564099D04AA995584F311E8BB4F1DEA09422A2000:8
-X-MTK:  N
-Content-Transfer-Encoding: base64
+In-Reply-To: <20200825071829.1396235-1-maco@android.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.167.220.84]
+X-ClientProxiedBy: G08CNEXCHPEKD06.g08.fujitsu.local (10.167.33.205) To
+ G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201)
+X-yoursite-MailScanner-ID: 5376348990C7.AB16C
+X-yoursite-MailScanner: Found to be clean
+X-yoursite-MailScanner-From: xuyang2018.jy@cn.fujitsu.com
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGkgQmFydCwNCg0KT24gVHVlLCAyMDIwLTA4LTI1IGF0IDE5OjU4IC0wNzAwLCBCYXJ0IFZhbiBB
-c3NjaGUgd3JvdGU6DQo+IE9uIDIwMjAtMDgtMjUgMDI6MTEsIFN0YW5sZXkgQ2h1IHdyb3RlOg0K
-PiA+PiBkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLXBtLmMgYi9ibG9jay9ibGstcG0uYw0KPiA+PiBp
-bmRleCBiODUyMzRkNzU4ZjcuLjE3YmQwMjAyNjhkNCAxMDA2NDQNCj4gPj4gLS0tIGEvYmxvY2sv
-YmxrLXBtLmMNCj4gPj4gKysrIGIvYmxvY2svYmxrLXBtLmMNCj4gPj4gQEAgLTY3LDYgKzY3LDEw
-IEBAIGludCBibGtfcHJlX3J1bnRpbWVfc3VzcGVuZChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSkN
-Cj4gPj4gIA0KPiA+PiAgCVdBUk5fT05fT05DRShxLT5ycG1fc3RhdHVzICE9IFJQTV9BQ1RJVkUp
-Ow0KPiA+PiAgDQo+ID4+ICsJc3Bpbl9sb2NrX2lycSgmcS0+cXVldWVfbG9jayk7DQo+ID4+ICsJ
-cS0+cnBtX3N0YXR1cyA9IFJQTV9TVVNQRU5ESU5HOw0KPiA+PiArCXNwaW5fdW5sb2NrX2lycSgm
-cS0+cXVldWVfbG9jayk7DQo+ID4+ICsNCj4gPiANCj4gPiBIYXMgYmVsb3cgYWx0ZXJuYXRpdmUg
-d2F5IGJlZW4gY29uc2lkZXJlZCB0aGF0IFJQTV9TVVNQRU5ESU5HIGlzIHNldA0KPiA+IGFmdGVy
-IGJsa19mcmVlemVfcXVldWVfc3RhcnQoKT8NCj4gPiANCj4gPiAJYmxrX2ZyZWV6ZV9xdWV1ZV9z
-dGFydChxKTsNCj4gPiANCj4gPiArCXNwaW5fbG9ja19pcnEoJnEtPnF1ZXVlX2xvY2spOw0KPiA+
-ICsJcS0+cnBtX3N0YXR1cyA9IFJQTV9TVVNQRU5ESU5HOw0KPiA+ICsJc3Bpbl91bmxvY2tfaXJx
-KCZxLT5xdWV1ZV9sb2NrKTsNCj4gPiANCj4gPiANCj4gPiBPdGhlcndpc2UgcmVxdWVzdHMgY2Fu
-IGVudGVyIHF1ZXVlIHdoaWxlIHJwbV9zdGF0dXMgaXMgUlBNX1NVU1BFTkRJTkcNCj4gPiBkdXJp
-bmcgYSBzbWFsbCB3aW5kb3csIGkuZS4sIGJlZm9yZSBibGtfc2V0X3BtX29ubHkoKSBpcyBpbnZv
-a2VkLiBUaGlzDQo+ID4gd291bGQgbWFrZSB0aGUgZGVmaW5pdGlvbiBvZiBycG1fc3RhdHVzIGFt
-YmlndW91cy4NCj4gPiANCj4gPiBJbiB0aGlzIHdheSwgdGhlIHJhY2luZyBjb3VsZCBiZSBhbHNv
-IHNvbHZlZDoNCj4gPiANCj4gPiAtIEJlZm9yZSBibGtfZnJlZXplX3F1ZXVlX3N0YXJ0KCksIGFu
-eSByZXF1ZXN0cyBzaGFsbCBiZSBhbGxvd2VkIHRvDQo+ID4gZW50ZXIgcXVldWUNCj4gPiAtIGJs
-a19mcmVlemVfcXVldWVfc3RhcnQoKSBmcmVlemVzIHRoZSBxdWV1ZSBhbmQgYmxvY2tzIGFsbCB1
-cGNvbWluZw0KPiA+IHJlcXVlc3RzIChtYWtlIHRoZW0gd2FpdF9ldmVudChxLT5tcV9mcmVlemVf
-d3EpKQ0KPiA+IC0gcnBtX3N0YXR1cyBpcyBzZXQgYXMgUlBNX1NVU1BFTkRJTkcNCj4gPiAtIGJs
-a19tcV91bmZyZWV6ZV9xdWV1ZSgpIHdha2VzIHVwIHEtPm1xX2ZyZWV6ZV93cSBhbmQgdGhlbg0K
-PiA+IGJsa19wbV9yZXF1ZXN0X3Jlc3VtZSgpIGNhbiBiZSBleGVjdXRlZA0KPiANCj4gSGkgU3Rh
-bmxleSwNCj4gDQo+IEkgcHJlZmVyIHRoZSBvcmRlciBmcm9tIHRoZSBwYXRjaC4gSSB0aGluayBp
-dCBpcyBpbXBvcnRhbnQgdG8gY2hhbmdlDQo+IHEtPnJwbV9zdGF0dXMgaW50byBSUE1fU1VTUEVO
-RElORyBiZWZvcmUgYmxrX3F1ZXVlX2VudGVyKCkgY2FsbHMNCj4gYmxrX3F1ZXVlX3BtX29ubHko
-KS4gT3RoZXJ3aXNlIGl0IGNvdWxkIGhhcHBlbiB0aGF0IGJsa19xdWV1ZV9lbnRlcigpDQo+IGNh
-bGxzIGJsa19wbV9yZXF1ZXN0X3Jlc3VtZSgpIHdoaWxlIHEtPnJwbV9zdGF0dXMgPT0gUlBNX0FD
-VElWRSwgcmVzdWx0aW5nDQo+IGluIGJsa19xdWV1ZV9lbnRlcigpIG5vdCByZXN1bWluZyBhIHF1
-ZXVlIGFsdGhvdWdoIHRoYXQgcXVldWUgc2hvdWxkIGJlDQo+IHJlc3VtZWQuDQoNCkkgc2VlLiBU
-aGFua3MgZm9yIHRoZSBleHBsYW5hdGlvbi4NCg0KQnkgdGhlIG9yZGVyIGZyb20gdGhlIHBhdGNo
-LCBpdCBpcyBndWFyYW50ZWVkIHRoYXQNCmJsa19wbV9yZXF1ZXN0X3Jlc3VtZSgpIHdpbGwgYWx3
-YXlzIHRyaWdnZXIgcnVudGltZSByZXN1bWUgZmxvdyBkdXJpbmcNCmJsa19xdWV1ZV9lbnRlcigp
-IGFmdGVyIGJsa19zZXRfcG1fb25seSgpIGlzIGNhbGxlZCBieSBjb25jdXJyZW50DQpzdXNwZW5k
-IGZsb3csIGkuZS4sIGJsa19wcmVfcnVudGltZV9zdXNwZW5kKCkuDQoNCkhvd2V2ZXIgaXQgd291
-bGQgaGF2ZSBhbiBhbWJpZ3VvdXMgUlBNX1NVU1BFTkRJTkcgcnBtX3N0YXR1cyBldmVuIHRob3Vn
-aA0KaXQgbWF5IG5vdCBjYXVzZSBpc3N1ZXMgb2J2aW91c2x5Lg0KDQpBY2tlZC1CeTogU3Rhbmxl
-eSBDaHUgPHN0YW5sZXkuY2h1QG1lZGlhdGVrLmNvbT4NCg0KDQo=
+Hi Martijn
+
+Look good to me. feel free to add  tested-by tag.
+Also, I have sent a patch to ltp to test this. as below
+https://patchwork.ozlabs.org/project/ltp/patch/1598415126-9703-1-git-send-email-xuyang2018.jy@cn.fujitsu.com/
+
+Best Regards
+Yang Xu
+
+> The device size calculation was done before processing the loop
+> configuration, which meant that the we set the size on the underlying
+> block device incorrectly in case lo_offset/lo_sizelimit were set in the
+> configuration. Delay computing the size until we've setup the device
+> parameters correctly.
+> 
+> Fixes: 3448914e8cc5("loop: Add LOOP_CONFIGURE ioctl")
+> Reported-by: Lennart Poettering <mzxreary@0pointer.de>
+> Signed-off-by: Martijn Coenen <maco@android.com>
+> ---
+>   drivers/block/loop.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 2f137d6ce169..fbda14840d8e 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1111,8 +1111,6 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+>   	mapping = file->f_mapping;
+>   	inode = mapping->host;
+>   
+> -	size = get_loop_size(lo, file);
+> -
+>   	if ((config->info.lo_flags & ~LOOP_CONFIGURE_SETTABLE_FLAGS) != 0) {
+>   		error = -EINVAL;
+>   		goto out_unlock;
+> @@ -1162,6 +1160,8 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+>   	loop_update_rotational(lo);
+>   	loop_update_dio(lo);
+>   	loop_sysfs_init(lo);
+> +
+> +	size = get_loop_size(lo, file);
+>   	loop_set_size(lo, size);
+>   
+>   	set_blocksize(bdev, S_ISBLK(inode->i_mode) ?
+> 
+
 
