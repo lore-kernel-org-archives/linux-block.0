@@ -2,103 +2,124 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6444EC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 11:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA7DC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 12:06:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C32B20897
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 11:44:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HuojoWxG"
+	by mail.kernel.org (Postfix) with ESMTP id 5DA97208A9
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 12:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729096AbgHZLoX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 07:44:23 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:52040 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729028AbgHZLdC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 07:33:02 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07QBTLiO052364;
-        Wed, 26 Aug 2020 11:32:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=HveVLL7EXNCp5m3T5mLVFK08+ceAw2VPDTsyqsD7P2s=;
- b=HuojoWxGluHfAXI1B81euQ1eaen2dTMGgvEHBNQsKv5jq1o1+edR8Hr7ZOV4S5Rqa/7u
- BAiLFIbTnH6NaZU9IfXEaOYY9Pe9T++Qnpatg/JZyn9Nou9kSiQmtm/SKauOfqH1lWRM
- 2+wXl9ADVFYIWRQKPnAa3ZJFmgJqKusuTZ1jZfZG4zo3YKunSPK6zjRkWQFz9tFZaGWL
- isPpOX2rKf7LYKufcU7l1WyptJpRkE8Xz7NpPRhWEf2gDw2xaUh0eYoWpGbI6UTtOADL
- Uqojm1HSf3cwKXI0YOj8D0ik9L8QTCBJ1pZlymOCcOsLfSrZRUIFI7iR7CKxlqEMOaOl WA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 333w6txbnp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 26 Aug 2020 11:32:54 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07QBUiqp138701;
-        Wed, 26 Aug 2020 11:32:53 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 333ru00q01-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Aug 2020 11:32:53 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07QBWp2f021625;
-        Wed, 26 Aug 2020 11:32:51 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 26 Aug 2020 04:32:50 -0700
-Date:   Wed, 26 Aug 2020 14:32:42 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
-        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] rnbd: Fix an error code in process_rdma()
-Message-ID: <20200826113242.GC393664@mwanda>
+        id S1729349AbgHZMGU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 08:06:20 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2693 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729494AbgHZMGG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Aug 2020 08:06:06 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 3C460F36EAB786817D3;
+        Wed, 26 Aug 2020 13:06:05 +0100 (IST)
+Received: from [127.0.0.1] (10.47.10.200) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1913.5; Wed, 26 Aug
+ 2020 13:06:04 +0100
+Subject: Re: [PATCH 0/5] blk-mq: fix use-after-free on stale request
+To:     Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+References: <20200820180335.3109216-1-ming.lei@redhat.com>
+ <accb98d8-8186-2e74-a5c3-e0f09ce2b3ff@acm.org>
+ <20200821024949.GA3110165@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <e42f1c04-eb34-63aa-c9c8-57c58d4b28b0@huawei.com>
+Date:   Wed, 26 Aug 2020 13:03:37 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9724 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
- phishscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008260093
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9724 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 impostorscore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 malwarescore=0 spamscore=0
- priorityscore=1501 clxscore=1011 mlxscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008260093
+In-Reply-To: <20200821024949.GA3110165@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.10.200]
+X-ClientProxiedBy: lhreml707-chm.china.huawei.com (10.201.108.56) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The error code is uninitialized on this error path.
+On 21/08/2020 03:49, Ming Lei wrote:
+> Hello Bart,
+> 
+> On Thu, Aug 20, 2020 at 01:30:38PM -0700, Bart Van Assche wrote:
+>> On 8/20/20 11:03 AM, Ming Lei wrote:
+>>> We can't run allocating driver tag and updating tags->rqs[tag] atomically,
+>>> so stale request may be retrieved from tags->rqs[tag]. More seriously, the
+>>> stale request may have been freed via updating nr_requests or switching
+>>> elevator or other use cases.
+>>>
+>>> It is one long-term issue, and Jianchao previous worked towards using
+>>> static_rqs[] for iterating request, one problem is that it can be hard
+>>> to use when iterating over tagset.
+>>>
+>>> This patchset takes another different approach for fixing the issue: cache
+>>> freed rqs pages and release them until all tags->rqs[] references on these
+>>> pages are gone.
+>>
+>> Hi Ming,
+>>
+>> Is this the only possible solution? Would it e.g. be possible to protect the
+>> code that iterates over all tags with rcu_read_lock() / rcu_read_unlock() and
+>> to free pages that contain request pointers only after an RCU grace period has
+>> expired?
+> 
+> That can't work, tags->rqs[] is host-wide, request pool belongs to scheduler tag
+> and it is owned by request queue actually. When one elevator is switched on this
+> request queue or updating nr_requests, the old request pool of this queue is freed,
+> but IOs are still queued from other request queues in this tagset. Elevator switch
+> or updating nr_requests on one request queue shouldn't or can't other request queues
+> in the same tagset.
+> 
+> Meantime the reference in tags->rqs[] may stay a bit long, and RCU can't cover this
+> case.
+> 
+> Also we can't reset the related tags->rqs[tag] simply somewhere, cause it may
+> race with new driver tag allocation. 
 
-Fixes: 735d77d4fd28 ("rnbd: remove rnbd_dev_submit_io")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- drivers/block/rnbd/rnbd-srv.c | 1 +
- 1 file changed, 1 insertion(+)
+How about iterate all tags->rqs[] for all scheduler tags when exiting 
+the scheduler, etc, and clear any scheduler requests references, like this:
 
-diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index 0fb94843a495..5b69bc56b225 100644
---- a/drivers/block/rnbd/rnbd-srv.c
-+++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -149,6 +149,7 @@ static int process_rdma(struct rtrs_srv *sess,
- 	bio = rnbd_bio_map_kern(data, sess_dev->rnbd_dev->ibd_bio_set, datalen, GFP_KERNEL);
- 	if (IS_ERR(bio)) {
- 		rnbd_srv_err(sess_dev, "Failed to generate bio, err: %ld\n", PTR_ERR(bio));
-+		err = PTR_ERR(bio);
- 		goto sess_dev_put;
- 	}
- 
--- 
-2.28.0
+cmpxchg(&hctx->tags->rqs[tag], scheduler_rq, 0);
+
+So we NULLify any tags->rqs[] entries which contain a scheduler request 
+of concern atomically, cleaning up any references.
+
+I quickly tried it and it looks to work, but maybe not so elegant.
+
+Or some atomic update is required,
+> but obviously extra load is introduced in fast path.
+
+Yes, similar said on this patch:
+https://lore.kernel.org/linux-block/cf524178-c497-373c-37f6-abee13eacf19@kernel.dk/
+
+> 
+>> Would that perhaps result in a simpler solution?
+> 
+> No, that doesn't work actually.
+> 
+> This patchset looks complicated, but the idea is very simple. With this
+> approach, we can extend to support allocating request pool attached to
+> driver tags dynamically. So far, it is always pre-allocated, and never be
+> used for normal single queue disks.
+> 
+
+I'll continue to check this solution, but it seems to me that we should 
+not get as far as the rq->q == hctx->queue check in bt_iter().
+
+Thanks,
+John
 
