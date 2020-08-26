@@ -2,72 +2,84 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE2D4C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 08:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49327C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 08:54:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7EE6206FA
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 08:19:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598429966;
-	bh=9j9S6jD3DxMEcFAPuQIscdiwN8igL/aMRjgg1A+PMWI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=SLwhF0xgxLap9riDe9PZlg4V1QBxeQh45KzkdvVFlXRP9D8IlOVDy6HT4d5Gx4soH
-	 CyVr2R4ugY7A9Zw+vIhTdsrrDDC/5NSSQ9xT5dZ0R+Yd+Jmus/grrdhGwh5Y1mVAnx
-	 oM9uRbAdUFAhMzYQT5BBTSLwfo75M8ooYBCdS1Bc=
+	by mail.kernel.org (Postfix) with ESMTP id F01422071E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 08:54:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K6fiprSo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726923AbgHZITY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 04:19:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40432 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726016AbgHZITX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 04:19:23 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727843AbgHZIyk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 04:54:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46466 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726817AbgHZIyk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Aug 2020 04:54:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598432079;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=56FG6teEw4RSdJiBxs3Vq6wn/n1d8Nwo2AXp7U//4Dg=;
+        b=K6fiprSo0hw8TI7Q6sjgXFMN4fdNgvll/P9ld9XTA6+j1fwvIjKefRUjU9ol1KKA7berZh
+        Q34R4im9Hw5SAY42g7McODOaVMCtv3b+bousl5Ib4vudYJ7IFpF3FgsSw9I7+FniOTJb4L
+        s7D7zvnjBWvwdNyMVrZ9wd4W9DZTNlo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-571-_-5nodMgObCM2vf2Hj8TQw-1; Wed, 26 Aug 2020 04:54:35 -0400
+X-MC-Unique: _-5nodMgObCM2vf2Hj8TQw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8967920678;
-        Wed, 26 Aug 2020 08:19:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598429963;
-        bh=9j9S6jD3DxMEcFAPuQIscdiwN8igL/aMRjgg1A+PMWI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SliejojpEfe07Yb7llCML/KuFhBA5CuWaOBDnXAAuPeT3RDbeIfq1yH2O5BjAzo8w
-         a5nquc6gurtWUlvgN+T+jgYb/QeWe7fMbZukCpYy+G7IdeDRSl8huUt845/IHyWu4d
-         PgM9pcoqPOBnu9HjvJc2vL3l3xZMzULh+6pTnPs8=
-Date:   Wed, 26 Aug 2020 10:19:38 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Denis Efremov <efremov@linux.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org
-Subject: Re: [PATCH 02/19] block: merge drivers/base/map.c into block/genhd.c
-Message-ID: <20200826081938.GC1796103@kroah.com>
-References: <20200826062446.31860-1-hch@lst.de>
- <20200826062446.31860-3-hch@lst.de>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC9C5807332;
+        Wed, 26 Aug 2020 08:54:33 +0000 (UTC)
+Received: from T590 (ovpn-13-178.pek2.redhat.com [10.72.13.178])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE5B119144;
+        Wed, 26 Aug 2020 08:54:27 +0000 (UTC)
+Date:   Wed, 26 Aug 2020 16:54:22 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Chao Leng <lengchao@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Subject: Re: [PATCH V2 1/2] blk-mq: serialize queue quiesce and unquiesce by
+ mutex
+Message-ID: <20200826085422.GB116347@T590>
+References: <20200825141734.115879-1-ming.lei@redhat.com>
+ <20200825141734.115879-2-ming.lei@redhat.com>
+ <751a63a2-9185-ba27-e84a-91b7cdd33ee7@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200826062446.31860-3-hch@lst.de>
+In-Reply-To: <751a63a2-9185-ba27-e84a-91b7cdd33ee7@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 08:24:29AM +0200, Christoph Hellwig wrote:
-> Now that there is just a single user of the kobj_map functionality left,
-> merge it into the user to prepare for additional simplications.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Wed, Aug 26, 2020 at 03:51:25PM +0800, Chao Leng wrote:
+> It doesn't matter. Because the reentry of quiesce&unquiesce queue is not
+> safe, must be avoided by other mechanism. otherwise, exceptions may
+> occur. Introduce mq_quiesce_lock looks saving possible synchronization
+> waits, but it should not happen. If really happen, we need fix it.
 
-YES!!!
+Sagi mentioned there may be nested queue quiesce, so I add .mq_quiesce_lock 
+to make this usage easy to support, meantime avoid percpu_ref warning
+in such usage.
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Anyway, not see any problem with adding .mq_quiesce_lock, so I'd suggest to
+move on with this way.
+
+
+Thanks, 
+Ming
+
