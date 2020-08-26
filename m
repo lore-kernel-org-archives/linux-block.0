@@ -2,347 +2,131 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 795DCC433E4
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 07:02:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1773BC433DF
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 07:26:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55BF0208E4
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 07:02:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HUzISJGW"
+	by mail.kernel.org (Postfix) with ESMTP id F0C6C2071E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 07:26:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726904AbgHZHAm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 03:00:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45434 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726709AbgHZHAG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 03:00:06 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA665C061756;
-        Wed, 26 Aug 2020 00:00:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=Fts/xdyAgLXiHkT6oH53N4wrgx9qxnqqG5ORQ9IwOoI=; b=HUzISJGWLAjwA82k9t12N5J1E9
-        fdxb4+UqdrlHFftWtL4XmszinTr9KfdbSSYdbGtgE/oWp71RQZJKfgOScUGOP0Jg2DH+zGmsK46y/
-        Yx8yQEFHQq/Z037t5ZTC7D0fO3I9vneCDN5vSQjQSZwzOktwz6/ajoqL64xfZ+yiKB7OJ9PvkcFmH
-        VfOqFCSzbirpECt6/BsEDgduuKqbmLVrHV81YbImmBZdM9dwAV9cauV1mMM8dtUnMKMiZaQ4dEgTB
-        KW6w8Ywr98IotI/L/pwK0+XO9XNO9i7GCe/AllfDafzjAJmTCHs0XGHifS3vg1TAsdlpVPtLdteF5
-        UlMGjaVw==;
-Received: from [2001:4bb8:18c:45ba:9892:9e86:5202:32f0] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kApPX-0003ke-5Q; Wed, 26 Aug 2020 06:59:56 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Denis Efremov <efremov@linux.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org
-Subject: [PATCH 16/19] ataflop: use a separate gendisk for each media format
-Date:   Wed, 26 Aug 2020 08:24:43 +0200
-Message-Id: <20200826062446.31860-17-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200826062446.31860-1-hch@lst.de>
-References: <20200826062446.31860-1-hch@lst.de>
+        id S1726698AbgHZH0A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 03:26:00 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3073 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726233AbgHZHZ7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Aug 2020 03:25:59 -0400
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id C36BB5EAC1850D2691ED;
+        Wed, 26 Aug 2020 15:25:57 +0800 (CST)
+Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Wed, 26 Aug 2020 15:25:57 +0800
+Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
+ (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Wed, 26
+ Aug 2020 15:25:56 +0800
+Subject: Re: [PATCH] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        "Josh Triplett" <josh@joshtriplett.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20200820030248.2809559-1-ming.lei@redhat.com>
+ <856f6108-2227-67e8-e913-fdef296a2d26@grimberg.me>
+ <20200822133954.GC3189453@T590>
+ <619a8d4f-267f-5e21-09bd-16b45af69480@grimberg.me>
+ <20200824104052.GA3210443@T590>
+ <44160549-0273-b8e6-1599-d54ce84eb47f@grimberg.me>
+ <20200825023212.GA3233087@T590>
+ <a7b87988-4757-b718-511e-3fdf122325c9@grimberg.me>
+ <399888c3-71e6-625e-3b0d-025ccbad4fd1@huawei.com>
+ <6cef7a24-f19c-a39a-abd8-2f0ea50fb7a2@grimberg.me>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <255fa307-f2e8-4eab-bdbf-8b697b215663@huawei.com>
+Date:   Wed, 26 Aug 2020 15:25:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <6cef7a24-f19c-a39a-abd8-2f0ea50fb7a2@grimberg.me>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.169.42.93]
+X-ClientProxiedBy: dggeme710-chm.china.huawei.com (10.1.199.106) To
+ dggema772-chm.china.huawei.com (10.1.198.214)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The Atari floppy driver usually autodetects the media when used with the
-ormal /dev/fd? devices, which also are the only nodes created by udev.
-But it also supports various aliases that force a given media format.
-That is currently supported using the blk_register_region framework
-which finds the floppy gendisk even for a 'mismatched' dev_t.  The
-problem with this (besides the code complexity) is that it creates
-multiple struct block_device instances for the whole device of a
-single gendisk, which can lead to interesting issues in code not
-aware of that fact.
 
-To fix this just create a separate gendisk for each of the aliases
-if they are accessed.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/ataflop.c | 135 +++++++++++++++++++++++++---------------
- 1 file changed, 86 insertions(+), 49 deletions(-)
+On 2020/8/26 1:38, Sagi Grimberg wrote:
+> 
+>>>>> Good, but I'd also won't want to get this without making sure the async
+>>>>> quiesce works well on large number of namespaces (the reason why this
+>>>>> is proposed in the first place). Not sure who is planning to do that...
+>>>>
+>>>> That can be added when async quiesce is done.
+>>>
+>>> Chao, are you looking into that? I'd really hate to find out we have an
+>>> issue there post conversion...
+>>
+>> Now we config CONFIG_TREE_SRCU, the size of TREE_SRCU is too big. I
+>> really appreciate the work of Ming.
+>>
+>> I review the patch, I think the patch may work well now, but do extra
+>> works for exception scenario. Percpu_ref is not disigned for
+>> serialization which read low cost. If we replace SRCU with percpu_ref,
+>> the benefit is save memory for blocking queue, the price is limit future
+>> changes or do more extra works.
+>>
+>> I do not think replace SRCU with percpu_ref is a good idea, because it's
+>> hard to predict how much we'll lose.
+> 
+> Not sure I understand your point, can you clarify what is the poor
+> design of percpu_ref and for which use-case?
+> .
+1.percpu_ref need introduce fail status for hctc_lock to avoid possible
+long waits for synchronization, need do some extra work for failed hctx_lock .
+Just like this which in the patch:
+@@ -2057,11 +2051,14 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+  		struct request *rq, blk_qc_t *cookie)
+  {
+  	blk_status_t ret;
+-	int srcu_idx;
 
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index a50e13af030526..b5acc85328c329 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -297,7 +297,7 @@ static struct atari_floppy_struct {
- 	unsigned int wpstat;	/* current state of WP signal (for
- 				   disk change detection) */
- 	int flags;		/* flags */
--	struct gendisk *disk;
-+	struct gendisk *disk[NUM_DISK_MINORS];
- 	int ref;
- 	int type;
- 	struct blk_mq_tag_set tag_set;
-@@ -723,12 +723,16 @@ static void fd_error( void )
- 
- static int do_format(int drive, int type, struct atari_format_descr *desc)
- {
--	struct request_queue *q = unit[drive].disk->queue;
-+	struct request_queue *q;
- 	unsigned char	*p;
- 	int sect, nsect;
- 	unsigned long	flags;
- 	int ret;
- 
-+	if (type)
-+		type--;
-+
-+	q = unit[drive].disk[type]->queue;
- 	blk_mq_freeze_queue(q);
- 	blk_mq_quiesce_queue(q);
- 
-@@ -738,7 +742,7 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
- 	local_irq_restore(flags);
- 
- 	if (type) {
--		if (--type >= NUM_DISK_MINORS ||
-+		if (type >= NUM_DISK_MINORS ||
- 		    minor2disktype[type].drive_types > DriveType) {
- 			ret = -EINVAL;
- 			goto out;
-@@ -1154,7 +1158,7 @@ static void fd_rwsec_done1(int status)
- 			    if (SUDT[-1].blocks > ReqBlock) {
- 				/* try another disk type */
- 				SUDT--;
--				set_capacity(unit[SelectedDrive].disk,
-+				set_capacity(unit[SelectedDrive].disk[0],
- 							SUDT->blocks);
- 			    } else
- 				Probing = 0;
-@@ -1169,7 +1173,7 @@ static void fd_rwsec_done1(int status)
- /* record not found, but not probing. Maybe stretch wrong ? Restart probing */
- 			if (SUD.autoprobe) {
- 				SUDT = atari_disk_type + StartDiskType[DriveType];
--				set_capacity(unit[SelectedDrive].disk,
-+				set_capacity(unit[SelectedDrive].disk[0],
- 							SUDT->blocks);
- 				Probing = 1;
- 			}
-@@ -1515,7 +1519,7 @@ static blk_status_t ataflop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		if (!UDT) {
- 			Probing = 1;
- 			UDT = atari_disk_type + StartDiskType[DriveType];
--			set_capacity(floppy->disk, UDT->blocks);
-+			set_capacity(bd->rq->rq_disk, UDT->blocks);
- 			UD.autoprobe = 1;
- 		}
- 	} 
-@@ -1533,7 +1537,7 @@ static blk_status_t ataflop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		}
- 		type = minor2disktype[type].index;
- 		UDT = &atari_disk_type[type];
--		set_capacity(floppy->disk, UDT->blocks);
-+		set_capacity(bd->rq->rq_disk, UDT->blocks);
- 		UD.autoprobe = 0;
- 	}
- 
-@@ -1658,7 +1662,7 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
- 				    printk (KERN_INFO "floppy%d: setting %s %p!\n",
- 				        drive, dtp->name, dtp);
- 				UDT = dtp;
--				set_capacity(floppy->disk, UDT->blocks);
-+				set_capacity(disk, UDT->blocks);
- 
- 				if (cmd == FDDEFPRM) {
- 				  /* save settings as permanent default type */
-@@ -1702,7 +1706,7 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
- 			return -EINVAL;
- 
- 		UDT = dtp;
--		set_capacity(floppy->disk, UDT->blocks);
-+		set_capacity(disk, UDT->blocks);
- 
- 		return 0;
- 	case FDMSGON:
-@@ -1725,7 +1729,7 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
- 		UDT = NULL;
- 		/* MSch: invalidate default_params */
- 		default_params[drive].blocks  = 0;
--		set_capacity(floppy->disk, MAX_DISK_SIZE * 2);
-+		set_capacity(disk, MAX_DISK_SIZE * 2);
- 		fallthrough;
- 	case FDFMTEND:
- 	case FDFLUSH:
-@@ -1961,14 +1965,50 @@ static const struct blk_mq_ops ataflop_mq_ops = {
- 	.commit_rqs = ataflop_commit_rqs,
- };
- 
--static struct kobject *floppy_find(dev_t dev, int *part, void *data)
-+static int ataflop_alloc_disk(unsigned int drive, unsigned int type)
- {
--	int drive = *part & 3;
--	int type  = *part >> 2;
-+	struct gendisk *disk;
-+	int ret;
-+
-+	disk = alloc_disk(1);
-+	if (!disk)
-+		return -ENOMEM;
-+
-+	disk->queue = blk_mq_init_queue(&unit[drive].tag_set);
-+	if (IS_ERR(disk->queue)) {
-+		ret = PTR_ERR(disk->queue);
-+		disk->queue = NULL;
-+		put_disk(disk);
-+		return ret;
-+	}
-+
-+	disk->major = FLOPPY_MAJOR;
-+	disk->first_minor = drive + (type << 2);
-+	sprintf(disk->disk_name, "fd%d", drive);
-+	disk->fops = &floppy_fops;
-+	disk->events = DISK_EVENT_MEDIA_CHANGE;
-+	disk->private_data = &unit[drive];
-+	set_capacity(disk, MAX_DISK_SIZE * 2);
-+
-+	unit[drive].disk[type] = disk;
-+	return 0;
-+}
-+
-+static DEFINE_MUTEX(ataflop_probe_lock);
-+
-+static void ataflop_probe(dev_t dev)
-+{
-+	int drive = MINOR(dev) & 3;
-+	int type  = MINOR(dev) >> 2;
-+
- 	if (drive >= FD_MAX_UNITS || type > NUM_DISK_MINORS)
--		return NULL;
--	*part = 0;
--	return get_disk_and_module(unit[drive].disk);
+  	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+
+-	hctx_lock(hctx, &srcu_idx);
++	/* Insert request to queue in case of being quiesced */
++	if (!hctx_lock(hctx)) {
++		blk_mq_sched_insert_request(rq, false, false, false);
 +		return;
-+	mutex_lock(&ataflop_probe_lock);
-+	if (!unit[drive].disk[type]) {
-+		if (ataflop_alloc_disk(drive, type) == 0)
-+			add_disk(unit[drive].disk[type]);
 +	}
-+	mutex_unlock(&ataflop_probe_lock);
- }
- 
- static int __init atari_floppy_init (void)
-@@ -1980,23 +2020,26 @@ static int __init atari_floppy_init (void)
- 		/* Amiga, Mac, ... don't have Atari-compatible floppy :-) */
- 		return -ENODEV;
- 
--	if (register_blkdev(FLOPPY_MAJOR,"fd"))
--		return -EBUSY;
-+	mutex_lock(&ataflop_probe_lock);
-+	ret = __register_blkdev(FLOPPY_MAJOR, "fd", ataflop_probe);
-+	if (ret)
-+		goto out_unlock;
- 
- 	for (i = 0; i < FD_MAX_UNITS; i++) {
--		unit[i].disk = alloc_disk(1);
--		if (!unit[i].disk) {
--			ret = -ENOMEM;
-+		memset(&unit[i].tag_set, 0, sizeof(unit[i].tag_set));
-+		unit[i].tag_set.ops = &ataflop_mq_ops;
-+		unit[i].tag_set.nr_hw_queues = 1;
-+		unit[i].tag_set.nr_maps = 1;
-+		unit[i].tag_set.queue_depth = 2;
-+		unit[i].tag_set.numa_node = NUMA_NO_NODE;
-+		unit[i].tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-+		ret = blk_mq_alloc_tag_set(&unit[i].tag_set);
-+		if (ret)
- 			goto err;
--		}
- 
--		unit[i].disk->queue = blk_mq_init_sq_queue(&unit[i].tag_set,
--							   &ataflop_mq_ops, 2,
--							   BLK_MQ_F_SHOULD_MERGE);
--		if (IS_ERR(unit[i].disk->queue)) {
--			put_disk(unit[i].disk);
--			ret = PTR_ERR(unit[i].disk->queue);
--			unit[i].disk->queue = NULL;
-+		ret = ataflop_alloc_disk(i, 0);
-+		if (ret) {
-+			blk_mq_free_tag_set(&unit[i].tag_set);
- 			goto err;
- 		}
- 	}
-@@ -2026,19 +2069,9 @@ static int __init atari_floppy_init (void)
- 	for (i = 0; i < FD_MAX_UNITS; i++) {
- 		unit[i].track = -1;
- 		unit[i].flags = 0;
--		unit[i].disk->major = FLOPPY_MAJOR;
--		unit[i].disk->first_minor = i;
--		sprintf(unit[i].disk->disk_name, "fd%d", i);
--		unit[i].disk->fops = &floppy_fops;
--		unit[i].disk->events = DISK_EVENT_MEDIA_CHANGE;
--		unit[i].disk->private_data = &unit[i];
--		set_capacity(unit[i].disk, MAX_DISK_SIZE * 2);
--		add_disk(unit[i].disk);
-+		add_disk(unit[i].disk[0]);
- 	}
- 
--	blk_register_region(MKDEV(FLOPPY_MAJOR, 0), 256, THIS_MODULE,
--				floppy_find, NULL, NULL);
--
- 	printk(KERN_INFO "Atari floppy driver: max. %cD, %strack buffering\n",
- 	       DriveType == 0 ? 'D' : DriveType == 1 ? 'H' : 'E',
- 	       UseTrackbuffer ? "" : "no ");
-@@ -2048,14 +2081,14 @@ static int __init atari_floppy_init (void)
- 
- err:
- 	while (--i >= 0) {
--		struct gendisk *disk = unit[i].disk;
--
--		blk_cleanup_queue(disk->queue);
-+		blk_cleanup_queue(unit[i].disk[0]->queue);
-+		put_disk(unit[i].disk[0]);
- 		blk_mq_free_tag_set(&unit[i].tag_set);
--		put_disk(unit[i].disk);
- 	}
- 
- 	unregister_blkdev(FLOPPY_MAJOR, "fd");
-+out_unlock:
-+	mutex_unlock(&ataflop_probe_lock);
- 	return ret;
- }
- 
-@@ -2100,13 +2133,17 @@ __setup("floppy=", atari_floppy_setup);
- 
- static void __exit atari_floppy_exit(void)
- {
--	int i;
--	blk_unregister_region(MKDEV(FLOPPY_MAJOR, 0), 256);
-+	int i, type;
-+
- 	for (i = 0; i < FD_MAX_UNITS; i++) {
--		del_gendisk(unit[i].disk);
--		blk_cleanup_queue(unit[i].disk->queue);
-+		for (type = 0; type < NUM_DISK_MINORS; type++) {
-+			if (!unit[i].disk[type])
-+				continue;
-+			del_gendisk(unit[i].disk[type]);
-+			blk_cleanup_queue(unit[i].disk[type]->queue);
-+			put_disk(unit[i].disk[type]);
-+		}
- 		blk_mq_free_tag_set(&unit[i].tag_set);
--		put_disk(unit[i].disk);
- 	}
- 	unregister_blkdev(FLOPPY_MAJOR, "fd");
- 
--- 
-2.28.0
+
+Now is simple, the code can work well. If the logic gets complicated,
+it's probably hard to handle.
+For example: for some unkown reason, if we may introduce some mechanism(such
+as check other flag or state) for dispatch or issue requests, we may need do
+more extra works in the branch of failed hctx_lock. perhaps more seriously,
+it may hard to be handled in this branch. If we need do like this
+in __blk_mq_try_issue_directly.
+	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
+		run_queue = false;
+		bypass_insert = false;
+		goto insert;
++	} else if (blk_queue_xxx(q)) {
++		/*do some other things*/
++       }
+Of course, there's a good chance it won't happen.
+
 
