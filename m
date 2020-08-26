@@ -2,84 +2,67 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49327C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 08:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14EE1C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 09:12:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F01422071E
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 08:54:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K6fiprSo"
+	by mail.kernel.org (Postfix) with ESMTP id D1F7A206FA
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 09:12:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727843AbgHZIyk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 04:54:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46466 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726817AbgHZIyk (ORCPT
+        id S1727915AbgHZJMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 05:12:49 -0400
+Received: from smtprelay0204.hostedemail.com ([216.40.44.204]:49552 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727906AbgHZJMs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 04:54:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598432079;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=56FG6teEw4RSdJiBxs3Vq6wn/n1d8Nwo2AXp7U//4Dg=;
-        b=K6fiprSo0hw8TI7Q6sjgXFMN4fdNgvll/P9ld9XTA6+j1fwvIjKefRUjU9ol1KKA7berZh
-        Q34R4im9Hw5SAY42g7McODOaVMCtv3b+bousl5Ib4vudYJ7IFpF3FgsSw9I7+FniOTJb4L
-        s7D7zvnjBWvwdNyMVrZ9wd4W9DZTNlo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-_-5nodMgObCM2vf2Hj8TQw-1; Wed, 26 Aug 2020 04:54:35 -0400
-X-MC-Unique: _-5nodMgObCM2vf2Hj8TQw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC9C5807332;
-        Wed, 26 Aug 2020 08:54:33 +0000 (UTC)
-Received: from T590 (ovpn-13-178.pek2.redhat.com [10.72.13.178])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE5B119144;
-        Wed, 26 Aug 2020 08:54:27 +0000 (UTC)
-Date:   Wed, 26 Aug 2020 16:54:22 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Chao Leng <lengchao@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Subject: Re: [PATCH V2 1/2] blk-mq: serialize queue quiesce and unquiesce by
- mutex
-Message-ID: <20200826085422.GB116347@T590>
-References: <20200825141734.115879-1-ming.lei@redhat.com>
- <20200825141734.115879-2-ming.lei@redhat.com>
- <751a63a2-9185-ba27-e84a-91b7cdd33ee7@huawei.com>
+        Wed, 26 Aug 2020 05:12:48 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay04.hostedemail.com (Postfix) with ESMTP id 5F9B0180A68C8;
+        Wed, 26 Aug 2020 09:12:47 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: field82_4a0e14027063
+X-Filterd-Recvd-Size: 1581
+Received: from XPS-9350.home (unknown [47.151.133.149])
+        (Authenticated sender: joe@perches.com)
+        by omf13.hostedemail.com (Postfix) with ESMTPA;
+        Wed, 26 Aug 2020 09:12:45 +0000 (UTC)
+Message-ID: <8570915f668159f93ba2eb845a3bbc05f8ee3a99.camel@perches.com>
+Subject: Re: [PATCH 17/19] z2ram: reindent
+From:   Joe Perches <joe@perches.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Denis Efremov <efremov@linux.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Song Liu <song@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org
+Date:   Wed, 26 Aug 2020 02:12:43 -0700
+In-Reply-To: <20200826062446.31860-18-hch@lst.de>
+References: <20200826062446.31860-1-hch@lst.de>
+         <20200826062446.31860-18-hch@lst.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <751a63a2-9185-ba27-e84a-91b7cdd33ee7@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 03:51:25PM +0800, Chao Leng wrote:
-> It doesn't matter. Because the reentry of quiesce&unquiesce queue is not
-> safe, must be avoided by other mechanism. otherwise, exceptions may
-> occur. Introduce mq_quiesce_lock looks saving possible synchronization
-> waits, but it should not happen. If really happen, we need fix it.
+On Wed, 2020-08-26 at 08:24 +0200, Christoph Hellwig wrote:
+> reindent the driver using Lident as the code style was far away from
+> normal Linux code.
 
-Sagi mentioned there may be nested queue quiesce, so I add .mq_quiesce_lock 
-to make this usage easy to support, meantime avoid percpu_ref warning
-in such usage.
+Why?  Does anyone use this anymore?
 
-Anyway, not see any problem with adding .mq_quiesce_lock, so I'd suggest to
-move on with this way.
+ ** z2ram - Amiga pseudo-driver to access 16bit-RAM in ZorroII space
+ **         as a block device, to be used as a RAM disk or swap space
+ ** Copyright (C) 1994 by Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
 
 
-Thanks, 
-Ming
 
