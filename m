@@ -2,84 +2,135 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF49EC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 01:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F28C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 02:14:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F1E82074A
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 01:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A06E2074A
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 02:14:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbgHZBwC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Aug 2020 21:52:02 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:55377 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1726599AbgHZBwB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Aug 2020 21:52:01 -0400
-Received: (qmail 387936 invoked by uid 1000); 25 Aug 2020 21:51:59 -0400
-Date:   Tue, 25 Aug 2020 21:51:59 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Stanley Chu <stanley.chu@mediatek.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>
-Subject: Re: [PATCH] block: Fix a race in the runtime power management code
-Message-ID: <20200826015159.GA387575@rowland.harvard.edu>
-References: <20200824030607.19357-1-bvanassche@acm.org>
- <1598346681.10649.8.camel@mtkswgap22>
- <20200825182423.GB375466@rowland.harvard.edu>
- <1f798c21-241f-59f8-5298-a32fffe2ff01@acm.org>
+        id S1726697AbgHZCON (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Aug 2020 22:14:13 -0400
+Received: from smtp.h3c.com ([60.191.123.56]:31932 "EHLO h3cspam01-ex.h3c.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726611AbgHZCOM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Aug 2020 22:14:12 -0400
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([10.8.0.66])
+        by h3cspam01-ex.h3c.com with ESMTPS id 07Q2Ddmm051523
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 26 Aug 2020 10:13:39 +0800 (GMT-8)
+        (envelope-from tian.xianting@h3c.com)
+Received: from localhost.localdomain (10.99.212.201) by
+ DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 26 Aug 2020 10:13:40 +0800
+From:   Xianting Tian <tian.xianting@h3c.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Xianting Tian <tian.xianting@h3c.com>
+Subject: [PATCH] [v2] blk-mq: use BLK_MQ_NO_TAG for no tag
+Date:   Wed, 26 Aug 2020 10:06:51 +0800
+Message-ID: <20200826020651.9856-1-tian.xianting@h3c.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1f798c21-241f-59f8-5298-a32fffe2ff01@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.99.212.201]
+X-ClientProxiedBy: BJSMTP02-EX.srv.huawei-3com.com (10.63.20.133) To
+ DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66)
+X-DNSRBL: 
+X-MAIL: h3cspam01-ex.h3c.com 07Q2Ddmm051523
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 25, 2020 at 03:22:03PM -0700, Bart Van Assche wrote:
-> On 2020-08-25 11:24, Alan Stern wrote:
-> > A related question concerns the BLK_MQ_REQ_PREEMPT flag.  If it is set 
-> > then the request is allowed while rpm_status is RPM_SUSPENDING.  But in 
-> > fact, the only requests which should be allowed at that time are those 
-> > created by the lower-layer driver as part of its runtime-suspend 
-> > handling; all other requests should be deferred.  The BLK_MQ_REQ_PREEMPT 
-> > flag doesn't seem like the right way to achieve this.  Should we be 
-> > using a different flag?
-> 
-> I think there is already a flag that is used to mark power management
-> commands, namely RQF_PM.
-> 
-> My understanding is that the BLK_MQ_REQ_PREEMPT/RQF_PREEMPT flags are used
-> for the following purposes:
-> * In the SCSI core, scsi_execute() sets the BLK_MQ_PREEMPT flag. As a
->   result, SCSI commands submitted with scsi_execute() are processed in
->   the SDEV_QUIESCE SCSI device state. Since scsi_execute() is only used
->   to submit other than medium access commands, in the SDEV_QUIESCE state
->   medium access commands are paused and commands that do not access the
->   storage medium (e.g. START/STOP commands) are processed.
-> * In the IDE-driver, for making one request preempt another request. From
->   an old IDE commit (not sure if this is still relevant):
->   + * If action is ide_preempt, then the rq is queued at the head of
->   + * the request queue, displacing the currently-being-processed
->   + * request and this function returns immediately without waiting
->   + * for the new rq to be completed.  This is VERY DANGEROUS, and is
->   + * intended for careful use by the ATAPI tape/cdrom driver code.
+Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
+And move the definition of BLK_MQ_NO_TAG from 'block/blk-mq-tag.h'
+to 'include/linux/blk-mq.h'
 
-Ah, perfect.  So in blk_queue_enter(), pm should be defined in terms of 
-RQF_PM rather than BLK_MQ_REQ_PREEMPT.
+Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
+---
+ block/blk-core.c       | 4 ++--
+ block/blk-mq-sched.c   | 2 +-
+ block/blk-mq-tag.h     | 6 ------
+ include/linux/blk-mq.h | 8 +++++++-
+ 4 files changed, 10 insertions(+), 10 deletions(-)
 
-The difficulty is that the flags argument is the wrong type; RQF_PM is 
-defined as req_flags_t, not blk_mq_req_flags_t.  It is associated with a 
-particular request after the request has been created, so after 
-blk_queue_enter() has been called.
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d9d632639..c7eaf7504 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -116,8 +116,8 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+ 	rq->__sector = (sector_t) -1;
+ 	INIT_HLIST_NODE(&rq->hash);
+ 	RB_CLEAR_NODE(&rq->rb_node);
+-	rq->tag = -1;
+-	rq->internal_tag = -1;
++	rq->tag = BLK_MQ_NO_TAG;
++	rq->internal_tag = BLK_MQ_NO_TAG;
+ 	rq->start_time_ns = ktime_get_ns();
+ 	rq->part = NULL;
+ 	refcount_set(&rq->ref, 1);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index a19cdf159..439481f59 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -522,7 +522,7 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 		goto run;
+ 	}
+ 
+-	WARN_ON(e && (rq->tag != -1));
++	WARN_ON(e && (rq->tag != BLK_MQ_NO_TAG));
+ 
+ 	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
+ 		/*
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index b1acac518..8fc48aa72 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -45,12 +45,6 @@ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
+ 	return sbq_wait_ptr(bt, &hctx->wait_index);
+ }
+ 
+-enum {
+-	BLK_MQ_NO_TAG		= -1U,
+-	BLK_MQ_TAG_MIN		= 1,
+-	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
+-};
+-
+ extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
+ extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *);
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 9d2d5ad36..2499d8aae 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -209,6 +209,12 @@ enum hctx_type {
+ 	HCTX_MAX_TYPES,
+ };
+ 
++enum {
++	BLK_MQ_NO_TAG		= -1U,
++	BLK_MQ_TAG_MIN		= 1,
++	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
++};
++
+ /**
+  * struct blk_mq_tag_set - tag set that can be shared between request queues
+  * @map:	   One or more ctx -> hctx mappings. One map exists for each
+@@ -569,7 +575,7 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
+ static inline blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq)
+ {
+-	if (rq->tag != -1)
++	if (rq->tag != BLK_MQ_NO_TAG)
+ 		return rq->tag | (hctx->queue_num << BLK_QC_T_SHIFT);
+ 
+ 	return rq->internal_tag | (hctx->queue_num << BLK_QC_T_SHIFT) |
+-- 
+2.17.1
 
-How can we solve this?
-
-Alan Stern
