@@ -2,180 +2,103 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6083BC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 10:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6444EC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 11:44:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4195820786
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 10:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C32B20897
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 11:44:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pHUo6T87"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HuojoWxG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728496AbgHZKB2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 06:01:28 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:33948 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728165AbgHZKBY (ORCPT
+        id S1729096AbgHZLoX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 07:44:23 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52040 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729028AbgHZLdC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 06:01:24 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07Q9rmML110211;
-        Wed, 26 Aug 2020 09:58:06 GMT
+        Wed, 26 Aug 2020 07:33:02 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07QBTLiO052364;
+        Wed, 26 Aug 2020 11:32:54 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=99lx5iUfIkT1H9yGqvvBxJOhPDkHKQlkIHLEmQ8PDXw=;
- b=pHUo6T87aN4HkyoolW4yELYhdaG6ZvSavIkxfBgUOj0Org1O9z1r+ZQOuET12WJ7H5Pc
- xnVCQfyl6qFGmQNX19oW+/bFETNvgM6pF7csHfuvBHB3cwqfsUd0O1/rGIc/5OQTnnFB
- MEojeNBzUtEmGEuqP0gM6P7/G+Nn01P+JHgzxPDBnzH/evLKYOeuFaI9EUmCauKOO4Dv
- zZppw57NrWnHoxtj9wH99M6dzm4GlspA3OSB7TYDhwfTGMPmrp1Qrwutr2AFfwHTZX4W
- mmUMO7IJxJ3uJAsWGpM1c6assMY729yLXVkHlFuUfSzlq1xzAsoVwPIWis3T8JNJMC4u Ng== 
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=HveVLL7EXNCp5m3T5mLVFK08+ceAw2VPDTsyqsD7P2s=;
+ b=HuojoWxGluHfAXI1B81euQ1eaen2dTMGgvEHBNQsKv5jq1o1+edR8Hr7ZOV4S5Rqa/7u
+ BAiLFIbTnH6NaZU9IfXEaOYY9Pe9T++Qnpatg/JZyn9Nou9kSiQmtm/SKauOfqH1lWRM
+ 2+wXl9ADVFYIWRQKPnAa3ZJFmgJqKusuTZ1jZfZG4zo3YKunSPK6zjRkWQFz9tFZaGWL
+ isPpOX2rKf7LYKufcU7l1WyptJpRkE8Xz7NpPRhWEf2gDw2xaUh0eYoWpGbI6UTtOADL
+ Uqojm1HSf3cwKXI0YOj8D0ik9L8QTCBJ1pZlymOCcOsLfSrZRUIFI7iR7CKxlqEMOaOl WA== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 333dbryf24-1
+        by userp2120.oracle.com with ESMTP id 333w6txbnp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 26 Aug 2020 09:58:06 +0000
+        Wed, 26 Aug 2020 11:32:54 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07Q9odrR139540;
-        Wed, 26 Aug 2020 09:56:05 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 333rtywr8n-1
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07QBUiqp138701;
+        Wed, 26 Aug 2020 11:32:53 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 333ru00q01-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Aug 2020 09:56:05 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07Q9tlAJ026067;
-        Wed, 26 Aug 2020 09:55:47 GMT
-Received: from kadam (/41.57.98.10)
+        Wed, 26 Aug 2020 11:32:53 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07QBWp2f021625;
+        Wed, 26 Aug 2020 11:32:51 GMT
+Received: from mwanda (/41.57.98.10)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 26 Aug 2020 02:55:46 -0700
-Date:   Wed, 26 Aug 2020 12:55:28 +0300
+        with ESMTP ; Wed, 26 Aug 2020 04:32:50 -0700
+Date:   Wed, 26 Aug 2020 14:32:42 +0300
 From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Allen Pais <allen.cryptic@gmail.com>
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-atm-general@lists.sourceforge.net, manohar.vanga@gmail.com,
-        airlied@linux.ie, linux-hyperv@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, sre@kernel.org,
-        anton.ivanov@cambridgegreys.com, devel@driverdev.osuosl.org,
-        linux-s390@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        maximlevitsky@gmail.com, richard@nod.at, deller@gmx.de,
-        jassisinghbrar@gmail.com, linux-spi@vger.kernel.org,
-        3chas3@gmail.com, intel-gfx@lists.freedesktop.org,
-        Jakub Kicinski <kuba@kernel.org>, mporter@kernel.crashing.org,
-        jdike@addtoit.com, Kees Cook <keescook@chromium.org>,
-        oakad@yahoo.com, s.hauer@pengutronix.de,
-        linux-input@vger.kernel.org, linux-um@lists.infradead.org,
-        linux-block@vger.kernel.org, broonie@kernel.org,
-        openipmi-developer@lists.sourceforge.net, mitch@sfgoth.com,
-        linux-arm-kernel@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
-        linux-parisc@vger.kernel.org, netdev@vger.kernel.org,
-        martyn@welchs.me.uk, dmitry.torokhov@gmail.com,
-        linux-mmc@vger.kernel.org, Allen <allen.lkml@gmail.com>,
-        linux-kernel@vger.kernel.org, alex.bou9@gmail.com,
-        stefanr@s5r6.in-berlin.de, Daniel Vetter <daniel@ffwll.ch>,
-        linux-ntb@googlegroups.com,
-        Romain Perier <romain.perier@gmail.com>, shawnguo@kernel.org,
-        David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
-Message-ID: <20200826095528.GX1793@kadam>
-References: <202008171228.29E6B3BB@keescook>
- <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
- <202008171246.80287CDCA@keescook>
- <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
- <1597780833.3978.3.camel@HansenPartnership.com>
- <f3312928-430c-25f3-7112-76f2754df080@kernel.dk>
- <1597849185.3875.7.camel@HansenPartnership.com>
- <CAOMdWSJRR0BhjJK1FxD7UKxNd5sk4ycmEX6TYtJjRNR6UFAj6Q@mail.gmail.com>
- <1597873172.4030.2.camel@HansenPartnership.com>
- <CAEogwTCH8qqjAnSpT0GDn+NuAps8dNbfcPVQ9h8kfOWNbzrD0w@mail.gmail.com>
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] rnbd: Fix an error code in process_rdma()
+Message-ID: <20200826113242.GC393664@mwanda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAEogwTCH8qqjAnSpT0GDn+NuAps8dNbfcPVQ9h8kfOWNbzrD0w@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Mailer: git-send-email haha only kidding
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9724 signatures=668679
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
  phishscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
  mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008260078
+ engine=8.12.0-2006250000 definitions=main-2008260093
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9724 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 clxscore=1011
- priorityscore=1501 impostorscore=0 phishscore=0 malwarescore=0
- mlxlogscore=999 spamscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008260079
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 impostorscore=0
+ mlxlogscore=999 suspectscore=0 phishscore=0 malwarescore=0 spamscore=0
+ priorityscore=1501 clxscore=1011 mlxscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008260093
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 07:21:35AM +0530, Allen Pais wrote:
-> On Thu, Aug 20, 2020 at 3:09 AM James Bottomley
-> <James.Bottomley@hansenpartnership.com> wrote:
-> >
-> > On Wed, 2020-08-19 at 21:54 +0530, Allen wrote:
-> > > > [...]
-> > > > > > Since both threads seem to have petered out, let me suggest in
-> > > > > > kernel.h:
-> > > > > >
-> > > > > > #define cast_out(ptr, container, member) \
-> > > > > >     container_of(ptr, typeof(*container), member)
-> > > > > >
-> > > > > > It does what you want, the argument order is the same as
-> > > > > > container_of with the only difference being you name the
-> > > > > > containing structure instead of having to specify its type.
-> > > > >
-> > > > > Not to incessantly bike shed on the naming, but I don't like
-> > > > > cast_out, it's not very descriptive. And it has connotations of
-> > > > > getting rid of something, which isn't really true.
-> > > >
-> > > > Um, I thought it was exactly descriptive: you're casting to the
-> > > > outer container.  I thought about following the C++ dynamic casting
-> > > > style, so out_cast(), but that seemed a bit pejorative.  What about
-> > > > outer_cast()?
-> > > >
-> > > > > FWIW, I like the from_ part of the original naming, as it has
-> > > > > some clues as to what is being done here. Why not just
-> > > > > from_container()? That should immediately tell people what it
-> > > > > does without having to look up the implementation, even before
-> > > > > this becomes a part of the accepted coding norm.
-> > > >
-> > > > I'm not opposed to container_from() but it seems a little less
-> > > > descriptive than outer_cast() but I don't really care.  I always
-> > > > have to look up container_of() when I'm using it so this would just
-> > > > be another macro of that type ...
-> > > >
-> > >
-> > >  So far we have a few which have been suggested as replacement
-> > > for from_tasklet()
-> > >
-> > > - out_cast() or outer_cast()
-> > > - from_member().
-> > > - container_from() or from_container()
-> > >
-> > > from_container() sounds fine, would trimming it a bit work? like
-> > > from_cont().
-> >
-> > I'm fine with container_from().  It's the same form as container_of()
-> > and I think we need urgent agreement to not stall everything else so
-> > the most innocuous name is likely to get the widest acceptance.
-> 
-> Kees,
-> 
->   Will you be  sending the newly proposed API to Linus? I have V2
-> which uses container_from()
-> ready to be sent out.
+The error code is uninitialized on this error path.
 
-I liked that James swapped the first two arguments so that it matches
-container_of().  Plus it's nice that when you have:
+Fixes: 735d77d4fd28 ("rnbd: remove rnbd_dev_submit_io")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+ drivers/block/rnbd/rnbd-srv.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-	struct whatever *foo = container_from(ptr, foo, member);
-
-Then it means that "ptr == &foo->member".
-
-regards,
-dan carpenter
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index 0fb94843a495..5b69bc56b225 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -149,6 +149,7 @@ static int process_rdma(struct rtrs_srv *sess,
+ 	bio = rnbd_bio_map_kern(data, sess_dev->rnbd_dev->ibd_bio_set, datalen, GFP_KERNEL);
+ 	if (IS_ERR(bio)) {
+ 		rnbd_srv_err(sess_dev, "Failed to generate bio, err: %ld\n", PTR_ERR(bio));
++		err = PTR_ERR(bio);
+ 		goto sess_dev_put;
+ 	}
+ 
+-- 
+2.28.0
 
