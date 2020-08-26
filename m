@@ -2,121 +2,110 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE31C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 13:54:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF5E1C433E5
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 13:55:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7537208E4
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 13:54:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E0D0208E4
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 13:55:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598450115;
+	bh=LBQCui/CC2CnVxkz3uprAHZKHFvXAyeXS2ZI6SOp2LI=;
+	h=Date:From:To:To:To:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
+	 References:List-ID:From;
+	b=bngsFaGlUn8+lQM/JVxNDbtm9mVzL6NBNdju3Mdzsdu2iAfTiTE0+G//g9rGLs181
+	 ZOEJ+HGytmYPSTNbbvHJF6RqpoT84Nvio8exlqHyKAoIPV4X0fTH8hUYhACqJ3V6o7
+	 0M5FThYyKb7fD0m3/ByIgBiAtWY1sfsJQK4P2kI4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730541AbgHZNy2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 09:54:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34220 "EHLO mx2.suse.de"
+        id S1730590AbgHZNzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 09:55:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60530 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730530AbgHZNyV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 09:54:21 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id CFFE3AE39;
-        Wed, 26 Aug 2020 13:54:50 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 35C8A1E12AF; Wed, 26 Aug 2020 15:54:19 +0200 (CEST)
-Date:   Wed, 26 Aug 2020 15:54:19 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] bfq: Use only idle IO periods for think time
- calculations
-Message-ID: <20200826135419.GF15126@quack2.suse.cz>
-References: <20200605140837.5394-1-jack@suse.cz>
- <20200605141629.15347-3-jack@suse.cz>
- <934FEB51-BB23-4ACA-BCEC-310E56A910CC@linaro.org>
- <20200611143912.GC19132@quack2.suse.cz>
- <7BE4BFD7-F8C1-49DE-A318-9E038B9A19BC@linaro.org>
- <20200727073515.GA23179@quack2.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200727073515.GA23179@quack2.suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1730383AbgHZNxz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Aug 2020 09:53:55 -0400
+Received: from localhost (unknown [70.37.104.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3A3B022B43;
+        Wed, 26 Aug 2020 13:53:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598450034;
+        bh=LBQCui/CC2CnVxkz3uprAHZKHFvXAyeXS2ZI6SOp2LI=;
+        h=Date:From:To:To:To:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
+         References:From;
+        b=xzhr/5c5S2ZFveFO82S+ikbBleBK+nWoJ/lab7JAroLK0z4r5/CABKpeX0BPw/3X3
+         E9uL2c1iKyUjIPOpqnorjze22j9wzmqdNc6I3x1kNvVE2Rm6Pzm4ms0MOaHyGwLMoD
+         Vkl+grhf1tDPyesWZqtZc+75OmT8YN2fzXdB0PuE=
+Date:   Wed, 26 Aug 2020 13:53:53 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>
+Cc:     David Jeffery <djeffery@redhat.com>
+Cc:     <stable@vger.kernel.org>
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH RESEND] blk-mq: order adding requests to hctx->dispatch and checking SCHED_RESTART
+In-Reply-To: <20200817100115.2495988-1-ming.lei@redhat.com>
+References: <20200817100115.2495988-1-ming.lei@redhat.com>
+Message-Id: <20200826135354.3A3B022B43@mail.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 27-07-20 09:35:15, Jan Kara wrote:
-> On Wed 22-07-20 11:13:28, Paolo Valente wrote:
-> > > a) I don't think adding these samples to statistics helps in any way (you
-> > > cannot improve the prediction power of the statistics by including in it
-> > > some samples that are not directly related to the thing you try to
-> > > predict). And think time is used to predict the answer to the question: If
-> > > bfq queue becomes idle, how long will it take for new request to arrive? So
-> > > second and further requests are simply irrelevant.
-> > > 
-> > 
-> > Yes, you are super right in theory.
-> > 
-> > Unfortunately this may not mean that your patch will do only good, for
-> > the concerns in my previous email. 
-> > 
-> > So, here is a proposal to move forward:
-> > 1) I test your patch on my typical set of
-> >    latency/guaranteed-bandwidth/total-throughput benchmarks
-> > 2) You test your patch on a significant set of benchmarks in mmtests
-> > 
-> > What do you think?
-> 
-> Sure, I will queue runs for the patches with mmtests :).
+Hi
 
-Sorry it took so long but I've hit a couple of technical snags when running
-these tests (plus I was on vacation). So I've run the tests on 4 machines.
-2 with rotational disks with NCQ, 2 with SATA SSD. Results are mostly
-neutral, details are below.
+[This is an automated email]
 
-For dbench, it seems to be generally neutral but the patches do fix
-occasional weird outlier which are IMO caused exactly by bugs in the
-heuristics I'm fixing. Things like (see the outlier for 4 clients
-with vanilla kernel):
+This commit has been processed because it contains a -stable tag.
+The stable tag indicates that it's relevant for the following trees: all
 
-		vanilla			bfq-waker-fixes
-Amean 	1 	32.57	( 0.00%)	32.10	( 1.46%)
-Amean 	2 	34.73	( 0.00%)	34.68	( 0.15%)
-Amean 	4 	199.74	( 0.00%)	45.76	( 77.09%)
-Amean 	8 	65.41	( 0.00%)	65.47	( -0.10%)
-Amean 	16	95.46	( 0.00%)	96.61	( -1.21%)
-Amean 	32	148.07	( 0.00%)	147.66	( 0.27%)
-Amean	64	291.17	( 0.00%)	289.44	( 0.59%)
+The bot has tested the following trees: v5.8.2, v5.7.16, v5.4.59, v4.19.140, v4.14.193, v4.9.232, v4.4.232.
 
-For pgbench and bonnie, patches are neutral for all the machines.
+v5.8.2: Build OK!
+v5.7.16: Build OK!
+v5.4.59: Build OK!
+v4.19.140: Build OK!
+v4.14.193: Failed to apply! Possible dependencies:
+    1f460b63d4b3 ("blk-mq: don't restart queue when .get_budget returns BLK_STS_RESOURCE")
+    358a3a6bccb7 ("blk-mq: don't handle TAG_SHARED in restart")
+    97889f9ac24f ("blk-mq: remove synchronize_rcu() from blk_mq_del_queue_tag_set()")
+    b347689ffbca ("blk-mq-sched: improve dispatching from sw queue")
+    caf8eb0d604a ("blk-mq-sched: move actual dispatching into one helper")
+    de1482974080 ("blk-mq: introduce .get_budget and .put_budget in blk_mq_ops")
 
-For reaim disk workload, patches are mostly neutral, just on one machine
-with SSD they seem to improve XFS results and worsen ext4 results. But
-results look rather noisy on that machine so it may be just a noise...
+v4.9.232: Failed to apply! Possible dependencies:
+    8e8320c9315c ("blk-mq: fix performance regression with shared tags")
+    97889f9ac24f ("blk-mq: remove synchronize_rcu() from blk_mq_del_queue_tag_set()")
+    bd166ef183c2 ("blk-mq-sched: add framework for MQ capable IO schedulers")
+    cf43e6be865a ("block: add scalable completion tracking of requests")
+    e806402130c9 ("block: split out request-only flags into a new namespace")
+    f1ba82616c33 ("blk-mq: pass bio to blk_mq_sched_get_rq_priv")
 
-For parallel dd(1) processes reading from multiple files, results are also
-neutral all machines.
+v4.4.232: Failed to apply! Possible dependencies:
+    511cbce2ff8b ("irq_poll: make blk-iopoll available outside the block layer")
+    6f3b0e8bcf3c ("blk-mq: add a flags parameter to blk_mq_alloc_request")
+    88459642cba4 ("blk-mq: abstract tag allocation out into sbitmap library")
+    8e8320c9315c ("blk-mq: fix performance regression with shared tags")
+    9467f85960a3 ("blk-mq/cpu-notif: Convert to new hotplug state machine")
+    97889f9ac24f ("blk-mq: remove synchronize_rcu() from blk_mq_del_queue_tag_set()")
+    9e0e252a048b ("badblocks: Add core badblock management code")
+    bd166ef183c2 ("blk-mq-sched: add framework for MQ capable IO schedulers")
+    cf43e6be865a ("block: add scalable completion tracking of requests")
+    e57690fe009b ("blk-mq: don't overwrite rq->mq_ctx")
+    f1ba82616c33 ("blk-mq: pass bio to blk_mq_sched_get_rq_priv")
 
-For parallel dd(1) processes reading from a common file, results are also
-neutral except for one machine with SSD on XFS (ext4 was fine) where there
-seems to be consistent regression for 4 and more processes:
 
-		vanilla			bfq-waker-fixes
-Amean 	1 	393.30	( 0.00%)	391.02	( 0.58%)
-Amean 	4 	443.88	( 0.00%)	517.16	( -16.51%)
-Amean 	7 	599.60	( 0.00%)	748.68	( -24.86%)
-Amean 	12	1134.26	( 0.00%)	1255.62	( -10.70%)
-Amean 	21	1940.50	( 0.00%)	2206.29	( -13.70%)
-Amean 	30	2381.08	( 0.00%)	2735.69	( -14.89%)
-Amean 	48	2754.36	( 0.00%)	3258.93	( -18.32%)
+NOTE: The patch will not be queued to stable trees until it is upstream.
 
-I'll try to reproduce this regression and check what's happening...
+How should we proceed with this patch?
 
-So what do you think, are you fine with merging my patches now?
-
-								Honza
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks
+Sasha
