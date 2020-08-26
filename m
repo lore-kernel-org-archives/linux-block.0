@@ -2,88 +2,206 @@ Return-Path: <SRS0=3AMJ=CE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F16B3C433E1
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 07:55:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A68EC433E3
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 08:18:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D09C920707
-	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 07:55:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 092E9206FA
+	for <linux-block@archiver.kernel.org>; Wed, 26 Aug 2020 08:18:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598429933;
+	bh=+vJV+mRF0Lzjjr3fr3A1d25Ht5edbPCfJqUZ9mJTuZc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=VFA+/yDF5vn2rNNx0izEKnhEdJgZHcZRvAJh4NSiXL1V5sjfLUZtzOfsLokPLKmqq
+	 zbqXKKfL/y1DYoECHrVhW577/3MF3QJ5h9wqUwKC1P3mvVlnnH5gbBxUAj7f7R4cbO
+	 a8Qr5WxX8sAPTY5/EDB19lcV4e+kqklcmWfuq2+Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726442AbgHZHzQ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 03:55:16 -0400
-Received: from smtp.h3c.com ([60.191.123.56]:38647 "EHLO h3cspam01-ex.h3c.com"
+        id S1726851AbgHZISw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 04:18:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40140 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726016AbgHZHzP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 03:55:15 -0400
-Received: from h3cspam01-ex.h3c.com (localhost [127.0.0.2] (may be forged))
-        by h3cspam01-ex.h3c.com with ESMTP id 07Q63jcv060453;
-        Wed, 26 Aug 2020 14:03:45 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from DAG2EX08-IDC.srv.huawei-3com.com ([10.8.0.71])
-        by h3cspam01-ex.h3c.com with ESMTPS id 07Q62tCU058786
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 26 Aug 2020 14:02:56 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
- DAG2EX08-IDC.srv.huawei-3com.com (10.8.0.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 26 Aug 2020 14:02:58 +0800
-Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
- by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%7]) with
- mapi id 15.01.1713.004; Wed, 26 Aug 2020 14:02:58 +0800
-From:   Tianxianting <tian.xianting@h3c.com>
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] [v2] blk-mq: use BLK_MQ_NO_TAG for no tag
-Thread-Topic: [PATCH] [v2] blk-mq: use BLK_MQ_NO_TAG for no tag
-Thread-Index: AQHWe06EoNdwEm3z5kubymyHs5tnf6lJRjMAgACeIyA=
-Date:   Wed, 26 Aug 2020 06:02:57 +0000
-Message-ID: <3321aa16ad214cb1a0a5cda1309f0e45@h3c.com>
-References: <20200826020651.9856-1-tian.xianting@h3c.com>
- <20200826042918.GA116347@T590>
-In-Reply-To: <20200826042918.GA116347@T590>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.99.141.128]
-x-sender-location: DAG2
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726016AbgHZISu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Aug 2020 04:18:50 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 23DE520678;
+        Wed, 26 Aug 2020 08:18:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598429929;
+        bh=+vJV+mRF0Lzjjr3fr3A1d25Ht5edbPCfJqUZ9mJTuZc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GEU0Xm/bx8cP15xViHXthdwpTyen+TUGLxiTYu1aQr59txHczphF0iSJ6zUYeHWWX
+         KeG6A4r//Wu1oZzMeekzFUdHP4041f9NyizugHYCE97ojW+tbEj5IjPyO+fOYOD9T4
+         Wjw7xvPDwkn7MCG9zkXnTpGNV75HhW6BJRy8Z9QE=
+Date:   Wed, 26 Aug 2020 10:19:05 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Denis Efremov <efremov@linux.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Song Liu <song@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org
+Subject: Re: [PATCH 01/19] char_dev: replace cdev_map with an xarray
+Message-ID: <20200826081905.GB1796103@kroah.com>
+References: <20200826062446.31860-1-hch@lst.de>
+ <20200826062446.31860-2-hch@lst.de>
 MIME-Version: 1.0
-X-DNSRBL: 
-X-MAIL: h3cspam01-ex.h3c.com 07Q62tCU058786
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200826062446.31860-2-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming Lei
-Thanks for your quick comment.
-As the function request_to_qc_t() in 'include/linux/blk-mq.h ' used the magic '-1',
-Seems it is hard to replace it with BLK_MQ_NO_TAG :(
+On Wed, Aug 26, 2020 at 08:24:28AM +0200, Christoph Hellwig wrote:
+> None of the complicated overlapping regions bits of the kobj_map are
+> required for the character device lookup, so just a trivial xarray
+> instead.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
------Original Message-----
-From: Ming Lei [mailto:ming.lei@redhat.com] 
-Sent: Wednesday, August 26, 2020 12:29 PM
-To: tianxianting (RD) <tian.xianting@h3c.com>
-Cc: axboe@kernel.dk; linux-block@vger.kernel.org; linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [v2] blk-mq: use BLK_MQ_NO_TAG for no tag
+Really?  This is ok to use and just as fast?  If so, wonderful, it would
+be great to clean up kobj_map users.
 
-On Wed, Aug 26, 2020 at 10:06:51AM +0800, Xianting Tian wrote:
-> Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
-> And move the definition of BLK_MQ_NO_TAG from 'block/blk-mq-tag.h'
-> to 'include/linux/blk-mq.h'
+But I don't think you got all of the needed bits here:
 
-All three symbols are supposed for block core internal code only, so looks you shouldn't move them to public header.
+> ---
+>  fs/char_dev.c | 94 +++++++++++++++++++++++++--------------------------
+>  fs/dcache.c   |  1 -
+>  fs/internal.h |  5 ---
+>  3 files changed, 46 insertions(+), 54 deletions(-)
+> 
+> diff --git a/fs/char_dev.c b/fs/char_dev.c
+> index ba0ded7842a779..6c4d6c4938f14b 100644
+> --- a/fs/char_dev.c
+> +++ b/fs/char_dev.c
+> @@ -17,7 +17,6 @@
+>  #include <linux/seq_file.h>
+>  
+>  #include <linux/kobject.h>
+> -#include <linux/kobj_map.h>
+>  #include <linux/cdev.h>
+>  #include <linux/mutex.h>
+>  #include <linux/backing-dev.h>
+> @@ -25,8 +24,7 @@
+>  
+>  #include "internal.h"
+>  
+> -static struct kobj_map *cdev_map;
+> -
+> +static DEFINE_XARRAY(cdev_map);
+>  static DEFINE_MUTEX(chrdevs_lock);
+>  
+>  #define CHRDEV_MAJOR_HASH_SIZE 255
+> @@ -367,6 +365,29 @@ void cdev_put(struct cdev *p)
+>  	}
+>  }
+>  
+> +static struct cdev *cdev_lookup(dev_t dev)
+> +{
+> +	struct cdev *cdev;
+> +
+> +retry:
+> +	mutex_lock(&chrdevs_lock);
+> +	cdev = xa_load(&cdev_map, dev);
+> +	if (!cdev) {
+> +		mutex_unlock(&chrdevs_lock);
+> +
+> +		if (request_module("char-major-%d-%d",
+> +				   MAJOR(dev), MINOR(dev)) > 0)
+> +			/* Make old-style 2.4 aliases work */
+> +			request_module("char-major-%d", MAJOR(dev));
+> +		goto retry;
+> +	}
+> +
+> +	if (!cdev_get(cdev))
+> +		cdev = NULL;
+> +	mutex_unlock(&chrdevs_lock);
+> +	return cdev;
+> +}
+> +
+>  /*
+>   * Called every time a character special file is opened
+>   */
+> @@ -380,13 +401,10 @@ static int chrdev_open(struct inode *inode, struct file *filp)
+>  	spin_lock(&cdev_lock);
+>  	p = inode->i_cdev;
+>  	if (!p) {
+> -		struct kobject *kobj;
+> -		int idx;
+>  		spin_unlock(&cdev_lock);
+> -		kobj = kobj_lookup(cdev_map, inode->i_rdev, &idx);
+> -		if (!kobj)
+> +		new = cdev_lookup(inode->i_rdev);
+> +		if (!new)
+>  			return -ENXIO;
+> -		new = container_of(kobj, struct cdev, kobj);
+>  		spin_lock(&cdev_lock);
+>  		/* Check i_cdev again in case somebody beat us to it while
+>  		   we dropped the lock. */
+> @@ -454,18 +472,6 @@ const struct file_operations def_chr_fops = {
+>  	.llseek = noop_llseek,
+>  };
+>  
+> -static struct kobject *exact_match(dev_t dev, int *part, void *data)
+> -{
+> -	struct cdev *p = data;
+> -	return &p->kobj;
+> -}
+> -
+> -static int exact_lock(dev_t dev, void *data)
+> -{
+> -	struct cdev *p = data;
+> -	return cdev_get(p) ? 0 : -1;
+> -}
+> -
+>  /**
+>   * cdev_add() - add a char device to the system
+>   * @p: the cdev structure for the device
+> @@ -478,7 +484,7 @@ static int exact_lock(dev_t dev, void *data)
+>   */
+>  int cdev_add(struct cdev *p, dev_t dev, unsigned count)
+>  {
+> -	int error;
+> +	int error, i;
+>  
+>  	p->dev = dev;
+>  	p->count = count;
+> @@ -486,14 +492,22 @@ int cdev_add(struct cdev *p, dev_t dev, unsigned count)
+>  	if (WARN_ON(dev == WHITEOUT_DEV))
+>  		return -EBUSY;
+>  
+> -	error = kobj_map(cdev_map, dev, count, NULL,
+> -			 exact_match, exact_lock, p);
+> -	if (error)
+> -		return error;
+> +	mutex_lock(&chrdevs_lock);
+> +	for (i = 0; i < count; i++) {
+> +		error = xa_insert(&cdev_map, dev + i, p, GFP_KERNEL);
+> +		if (error)
+> +			goto out_unwind;
+> +	}
+> +	mutex_unlock(&chrdevs_lock);
+>  
+>  	kobject_get(p->kobj.parent);
 
+Can't you drop this kobject_get() too?
 
-Thanks,
-Ming
+And also the "struct kobj" in struct cdev can be gone as well, as the
+kobj_map was the only "real" user of this structure.  I know some
+drivers liked to touch that field as well, but it never actually did
+anything for them, so it was pointless, but it will take some 'make
+allmodconfig' builds to flush them out.
 
+thanks,
+
+greg k-h
