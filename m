@@ -2,179 +2,101 @@ Return-Path: <SRS0=E5Vf=CF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5940C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 01:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD47EC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 02:39:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83C932074A
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 01:38:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8563F2087C
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 02:39:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I80xaBRJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAbY/egp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726788AbgH0BiC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 21:38:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49800 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726784AbgH0BiA (ORCPT
+        id S1726794AbgH0CjC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 22:39:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22177 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726790AbgH0CjC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 21:38:00 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE32C0617BD;
-        Wed, 26 Aug 2020 18:37:59 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id j18so3306654oig.5;
-        Wed, 26 Aug 2020 18:37:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Rsb5LLd+wEYl5+11BE05ItDTZCXQhjeMW019xM5KW9w=;
-        b=I80xaBRJ50n8a6fI5zGd+zDFXBJzdkM/CYwdFxWUUjYU3c+2p64n4BZ92Q57vwyNvT
-         WA9AXEE5mkmSWs9RicapGSPmYl7SBg2jYYPKSa/nI/+15pdR7K1Y4Cu0DHfnjPwN8yXR
-         icr8tNGeIcQL3s2nHPbJyB6yfauHJDS+gWazTyaRFZfsu6K/xYzwtyDy670Ye8cnRtyg
-         TR/hJM9qLFyVWX5fPwsxGxi/JNo/PLB2M5jflTu50Xv+DnpTnsNDIefohCCH/iR6ipaV
-         nyjrEne62FM9W1doljqrO4mZtREkO1PUraYtOXDLLpGubpcLL1+FWyQrEJDylKkUrU3D
-         wKgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Rsb5LLd+wEYl5+11BE05ItDTZCXQhjeMW019xM5KW9w=;
-        b=qMrmCoI84efbjfMD7KDJeqH7ZE33nfwRRNOEBDAFYAmZ64MsLb0ZHHlmeiS88hcBs/
-         ePZRVD7kvVwt0V3JIeUZNVchFLfCE4W71m3YT4aLSd3nmkquG7Do6CZLFNsoeiMvq/8m
-         7eBMWCRGCjwEEg3kdEiLW7PkKj9deR3HKx29fxqjfr1l6DrDV3B3pcu8x5vRoCQxHULk
-         uKYTS7xg/Ij+dqdeKmaM5a4d1FaO6SFQCwd0X8+YwKI2CMLZKtd68GsCfPuiJgvwKDSr
-         SdQUDJfjvavMsEQhNwg4twUVJjEuCnTOmUfz2lCrFGoLqVcNIFth6Rfm5ezVKMBd8lYx
-         KLeg==
-X-Gm-Message-State: AOAM530nhtFrgOEAHBAa60mRHRHzv4Y1VRGh2sOmswDl1vRN71bxp2Te
-        +GqlxbfzB4/4540wWxRq/8ANkCdXo7Dbv53ePZk=
-X-Google-Smtp-Source: ABdhPJwhCHTUyQeL6NO7VZ9TErlPHSPJaUSJlRG8on4DJcl3XVowSsSaDNvfXk39W2OiRUOfnXZzLQickeYXItlZbbE=
-X-Received: by 2002:aca:ec95:: with SMTP id k143mr5299041oih.76.1598492278869;
- Wed, 26 Aug 2020 18:37:58 -0700 (PDT)
+        Wed, 26 Aug 2020 22:39:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598495940;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uMk+/OgQAe+YJ8Wk6xc8vjC2x6T2CM7SoEWLiSpeoFE=;
+        b=KAbY/egpzbPG78g602/PVjf9GhLVtUSWtNS7YyssmO76QREmpOVtJtpA7hdXLHdP3RgAue
+        hGfde9pYLaSmolibeN3y6dzxZZJY/FmXX8G3xrEyCUcE5QwNPDkIo/+iIGg6brnv0fqnJp
+        nDdAcuvfv96apFgrjSvjkHwtMUcdSHM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-kZsqP06mMLyZeifuQnm9zQ-1; Wed, 26 Aug 2020 22:38:58 -0400
+X-MC-Unique: kZsqP06mMLyZeifuQnm9zQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B16B1007B00;
+        Thu, 27 Aug 2020 02:38:56 +0000 (UTC)
+Received: from T590 (ovpn-12-173.pek2.redhat.com [10.72.12.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C69460C0F;
+        Thu, 27 Aug 2020 02:38:48 +0000 (UTC)
+Date:   Thu, 27 Aug 2020 10:38:44 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Chao Leng <lengchao@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Subject: Re: [PATCH V2 1/2] blk-mq: serialize queue quiesce and unquiesce by
+ mutex
+Message-ID: <20200827023844.GA129685@T590>
+References: <20200825141734.115879-1-ming.lei@redhat.com>
+ <20200825141734.115879-2-ming.lei@redhat.com>
+ <751a63a2-9185-ba27-e84a-91b7cdd33ee7@huawei.com>
+ <20200826085422.GB116347@T590>
+ <20200826153633.GA2151118@dhcp-10-100-145-180.wdl.wdc.com>
 MIME-Version: 1.0
-References: <161b75f1-4e88-dcdf-42e8-b22504d7525c@kernel.dk>
- <202008171246.80287CDCA@keescook> <df645c06-c30b-eafa-4d23-826b84f2ff48@kernel.dk>
- <1597780833.3978.3.camel@HansenPartnership.com> <f3312928-430c-25f3-7112-76f2754df080@kernel.dk>
- <1597849185.3875.7.camel@HansenPartnership.com> <CAOMdWSJRR0BhjJK1FxD7UKxNd5sk4ycmEX6TYtJjRNR6UFAj6Q@mail.gmail.com>
- <1597873172.4030.2.camel@HansenPartnership.com> <CAEogwTCH8qqjAnSpT0GDn+NuAps8dNbfcPVQ9h8kfOWNbzrD0w@mail.gmail.com>
- <20200826095528.GX1793@kadam> <202008260811.1CE425B5C2@keescook>
-In-Reply-To: <202008260811.1CE425B5C2@keescook>
-From:   Allen <allen.lkml@gmail.com>
-Date:   Thu, 27 Aug 2020 07:07:47 +0530
-Message-ID: <CAOMdWSLyacdeoqnZBuLu6z1B6cY-WbtUJQm6+8=WHyE49tVaEg@mail.gmail.com>
-Subject: Re: [PATCH] block: convert tasklets to use new tasklet_setup() API
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Allen Pais <allen.cryptic@gmail.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-atm-general@lists.sourceforge.net, manohar.vanga@gmail.com,
-        airlied@linux.ie, linux-hyperv@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, sre@kernel.org,
-        anton.ivanov@cambridgegreys.com, devel@driverdev.osuosl.org,
-        linux-s390@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        maximlevitsky@gmail.com, richard@nod.at, deller@gmx.de,
-        jassisinghbrar@gmail.com, linux-spi@vger.kernel.org,
-        3chas3@gmail.com, intel-gfx@lists.freedesktop.org,
-        Jakub Kicinski <kuba@kernel.org>, mporter@kernel.crashing.org,
-        jdike@addtoit.com, oakad@yahoo.com, s.hauer@pengutronix.de,
-        linux-input@vger.kernel.org, linux-um@lists.infradead.org,
-        linux-block@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        openipmi-developer@lists.sourceforge.net, mitch@sfgoth.com,
-        linux-arm-kernel@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
-        linux-parisc@vger.kernel.org, netdev@vger.kernel.org,
-        martyn@welchs.me.uk, dmitry.torokhov@gmail.com,
-        linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex.bou9@gmail.com, stefanr@s5r6.in-berlin.de,
-        Daniel Vetter <daniel@ffwll.ch>, linux-ntb@googlegroups.com,
-        Romain Perier <romain.perier@gmail.com>, shawnguo@kernel.org,
-        David Miller <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200826153633.GA2151118@dhcp-10-100-145-180.wdl.wdc.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 8:43 PM Kees Cook <keescook@chromium.org> wrote:
->
-> On Wed, Aug 26, 2020 at 12:55:28PM +0300, Dan Carpenter wrote:
-> > On Wed, Aug 26, 2020 at 07:21:35AM +0530, Allen Pais wrote:
-> > > On Thu, Aug 20, 2020 at 3:09 AM James Bottomley
-> > > <James.Bottomley@hansenpartnership.com> wrote:
-> > > >
-> > > > On Wed, 2020-08-19 at 21:54 +0530, Allen wrote:
-> > > > > > [...]
-> > > > > > > > Since both threads seem to have petered out, let me suggest in
-> > > > > > > > kernel.h:
-> > > > > > > >
-> > > > > > > > #define cast_out(ptr, container, member) \
-> > > > > > > >     container_of(ptr, typeof(*container), member)
-> > > > > > > >
-> > > > > > > > It does what you want, the argument order is the same as
-> > > > > > > > container_of with the only difference being you name the
-> > > > > > > > containing structure instead of having to specify its type.
-> > > > > > >
-> > > > > > > Not to incessantly bike shed on the naming, but I don't like
-> > > > > > > cast_out, it's not very descriptive. And it has connotations of
-> > > > > > > getting rid of something, which isn't really true.
-> > > > > >
-> > > > > > Um, I thought it was exactly descriptive: you're casting to the
-> > > > > > outer container.  I thought about following the C++ dynamic casting
-> > > > > > style, so out_cast(), but that seemed a bit pejorative.  What about
-> > > > > > outer_cast()?
-> > > > > >
-> > > > > > > FWIW, I like the from_ part of the original naming, as it has
-> > > > > > > some clues as to what is being done here. Why not just
-> > > > > > > from_container()? That should immediately tell people what it
-> > > > > > > does without having to look up the implementation, even before
-> > > > > > > this becomes a part of the accepted coding norm.
-> > > > > >
-> > > > > > I'm not opposed to container_from() but it seems a little less
-> > > > > > descriptive than outer_cast() but I don't really care.  I always
-> > > > > > have to look up container_of() when I'm using it so this would just
-> > > > > > be another macro of that type ...
-> > > > > >
-> > > > >
-> > > > >  So far we have a few which have been suggested as replacement
-> > > > > for from_tasklet()
-> > > > >
-> > > > > - out_cast() or outer_cast()
-> > > > > - from_member().
-> > > > > - container_from() or from_container()
-> > > > >
-> > > > > from_container() sounds fine, would trimming it a bit work? like
-> > > > > from_cont().
-> > > >
-> > > > I'm fine with container_from().  It's the same form as container_of()
-> > > > and I think we need urgent agreement to not stall everything else so
-> > > > the most innocuous name is likely to get the widest acceptance.
-> > >
-> > > Kees,
-> > >
-> > >   Will you be  sending the newly proposed API to Linus? I have V2
-> > > which uses container_from()
-> > > ready to be sent out.
-> >
-> > I liked that James swapped the first two arguments so that it matches
-> > container_of().  Plus it's nice that when you have:
-> >
-> >       struct whatever *foo = container_from(ptr, foo, member);
-> >
-> > Then it means that "ptr == &foo->member".
->
-> I'm a bit stalled right now -- the merge window was keeping me busy, and
-> this week is the Linux Plumbers Conference. This is on my list, but I
-> haven't gotten back around to it. If you want, feel free to send the
-> container_from() patch; you might be able to unblock this faster than me
-> right now. :)
->
+On Wed, Aug 26, 2020 at 08:36:33AM -0700, Keith Busch wrote:
+> On Wed, Aug 26, 2020 at 04:54:22PM +0800, Ming Lei wrote:
+> > On Wed, Aug 26, 2020 at 03:51:25PM +0800, Chao Leng wrote:
+> > > It doesn't matter. Because the reentry of quiesce&unquiesce queue is not
+> > > safe, must be avoided by other mechanism. otherwise, exceptions may
+> > > occur. Introduce mq_quiesce_lock looks saving possible synchronization
+> > > waits, but it should not happen. If really happen, we need fix it.
+> > 
+> > Sagi mentioned there may be nested queue quiesce, so I add .mq_quiesce_lock 
+> > to make this usage easy to support, meantime avoid percpu_ref warning
+> > in such usage.
+> > 
+> > Anyway, not see any problem with adding .mq_quiesce_lock, so I'd suggest to
+> > move on with this way.
+> 
+> I'm not sure there really are any nested queue quiesce paths, but if
+> there are, wouldn't we need to track the "depth" like how a queue freeze
+> works?
 
-Sure, Thanks.
+Both atomic 'depth' and .mq_quiesce_lock can work for nested queue
+quiesce since we can avoid unnecessary queue quiesce with the mutex.
+percpu_ref_kill() / percpu_ref_kill_and_confirm() can warn if the
+percpu_ref has been killed, that is why I think Sagi's suggestion is good.
+
+But 'depth' may cause trouble easily, such as unbalanced quiesce/unquiesce,
+however no such issue with mutex, at least we don't require the two to
+be paired strictly so far.
 
 
+Thanks,
+Ming
 
--- 
-       - Allen
