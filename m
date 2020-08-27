@@ -2,145 +2,68 @@ Return-Path: <SRS0=E5Vf=CF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42151C433E3
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 20:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE0B6C433E6
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 21:39:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DC5A20825
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 20:33:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B080920848
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 21:39:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726887AbgH0UdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Aug 2020 16:33:25 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:49887 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1726120AbgH0UdW (ORCPT
+        id S1726147AbgH0VjH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Aug 2020 17:39:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40562 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726234AbgH0VjG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Aug 2020 16:33:22 -0400
-Received: (qmail 450389 invoked by uid 1000); 27 Aug 2020 16:33:21 -0400
-Date:   Thu, 27 Aug 2020 16:33:21 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Stanley Chu <stanley.chu@mediatek.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH] block: Fix a race in the runtime power management code
-Message-ID: <20200827203321.GB449067@rowland.harvard.edu>
-References: <20200824030607.19357-1-bvanassche@acm.org>
- <1598346681.10649.8.camel@mtkswgap22>
- <20200825182423.GB375466@rowland.harvard.edu>
- <1f798c21-241f-59f8-5298-a32fffe2ff01@acm.org>
- <20200826015159.GA387575@rowland.harvard.edu>
- <af1b1f57-59ff-0133-8108-0f3d1e1254e1@acm.org>
+        Thu, 27 Aug 2020 17:39:06 -0400
+Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FECCC061264;
+        Thu, 27 Aug 2020 14:39:06 -0700 (PDT)
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kBPbo-005mLI-VH; Thu, 27 Aug 2020 21:39:01 +0000
+Date:   Thu, 27 Aug 2020 22:39:00 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        yebin <yebin10@huawei.com>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH RFC 2/2] block: Do not discard buffers under a mounted
+ filesystem
+Message-ID: <20200827213900.GG1236603@ZenIV.linux.org.uk>
+References: <20200825120554.13070-1-jack@suse.cz>
+ <20200825120554.13070-3-jack@suse.cz>
+ <20200825121616.GA10294@infradead.org>
+ <20200825145056.GC32298@quack2.suse.cz>
+ <20200827071603.GA25305@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <af1b1f57-59ff-0133-8108-0f3d1e1254e1@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200827071603.GA25305@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 08:35:42PM -0700, Bart Van Assche wrote:
-> On 2020-08-25 18:51, Alan Stern wrote:
-> > Ah, perfect.  So in blk_queue_enter(), pm should be defined in terms of 
-> > RQF_PM rather than BLK_MQ_REQ_PREEMPT.
-> > 
-> > The difficulty is that the flags argument is the wrong type; RQF_PM is 
-> > defined as req_flags_t, not blk_mq_req_flags_t.  It is associated with a 
-> > particular request after the request has been created, so after 
-> > blk_queue_enter() has been called.
-> > 
-> > How can we solve this?
+On Thu, Aug 27, 2020 at 08:16:03AM +0100, Christoph Hellwig wrote:
+> On Tue, Aug 25, 2020 at 04:50:56PM +0200, Jan Kara wrote:
+> > Do you mean that address_space filesystem uses to access its metadata on
+> > /dev/sda will be different from the address_space you will see when reading
+> > say /dev/sda?  Thus these will be completely separate (and incoherent)
+> > caches?
 > 
-> The current code looks a bit weird because my focus when modifying the PM
-> code has been on not breaking any existing code.
+> Yes.
 > 
-> scsi_device_quiesce() relies on blk_queue_enter() processing all PREEMPT
-> requests. A difficulty is that scsi_device_quiesce() is used for two
-> separate purposes:
-> * Runtime power management.
-> * SCSI domain validation. See e.g. https://lwn.net/Articles/75917/.
+> > Although this would be simple it will break userspace I'm afraid.
+> > There are situations where tools read e.g. superblock of a mounted
+> > filesystem from the block device and rely on the data to be reasonably
+> > recent. Even worse e.g. tune2fs or e2fsck can *modify* superblock of a
+> > mounted filesystem through the block device (e.g. to set 'fsck after X
+> > mounts' fields and similar).
 > 
-> I think that modifying blk_queue_enter() such that it only accepts PM
-> requests will require to split scsi_device_quiesce() into two functions:
-> one function that is used by the runtime power management code and another
-> function that is used by the SCSI domain validation code. This may require
-> to introduce new SCSI device states. If new SCSI device states are
-> introduced, that should be done without modifying the state that is
-> reported to user space. See also sdev_states[] and show_state_field in
-> scsi_sysfs.c.
+> We've not had any problems when XFS stopped using the block device
+> address space 9.5 years ago.
 
-It may not need to be that complicated.  what about something like this?
-
-Alan Stern
-
-
-Index: usb-devel/block/blk-core.c
-===================================================================
---- usb-devel.orig/block/blk-core.c
-+++ usb-devel/block/blk-core.c
-@@ -420,11 +420,11 @@ EXPORT_SYMBOL(blk_cleanup_queue);
- /**
-  * blk_queue_enter() - try to increase q->q_usage_counter
-  * @q: request queue pointer
-- * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
-+ * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PM
-  */
- int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- {
--	const bool pm = flags & BLK_MQ_REQ_PREEMPT;
-+	const bool pm = flags & BLK_MQ_REQ_PM;
- 
- 	while (true) {
- 		bool success = false;
-@@ -626,7 +626,8 @@ struct request *blk_get_request(struct r
- 	struct request *req;
- 
- 	WARN_ON_ONCE(op & REQ_NOWAIT);
--	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
-+	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT |
-+			BLK_MQ_REQ_PM));
- 
- 	req = blk_mq_alloc_request(q, op, flags);
- 	if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
-Index: usb-devel/drivers/scsi/scsi_lib.c
-===================================================================
---- usb-devel.orig/drivers/scsi/scsi_lib.c
-+++ usb-devel/drivers/scsi/scsi_lib.c
-@@ -245,11 +245,15 @@ int __scsi_execute(struct scsi_device *s
- {
- 	struct request *req;
- 	struct scsi_request *rq;
-+	blk_mq_req_flags_t mq_req_flags;
- 	int ret = DRIVER_ERROR << 24;
- 
-+	mq_req_flags = BLK_MQ_REQ_PREEMPT;
-+	if (rq_flags & RQF_PM)
-+		mq_req_flags |= BLK_MQ_REQ_PM;
- 	req = blk_get_request(sdev->request_queue,
- 			data_direction == DMA_TO_DEVICE ?
--			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
-+			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, mq_req_flags);
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
-Index: usb-devel/include/linux/blk-mq.h
-===================================================================
---- usb-devel.orig/include/linux/blk-mq.h
-+++ usb-devel/include/linux/blk-mq.h
-@@ -435,6 +435,8 @@ enum {
- 	BLK_MQ_REQ_RESERVED	= (__force blk_mq_req_flags_t)(1 << 1),
- 	/* set RQF_PREEMPT */
- 	BLK_MQ_REQ_PREEMPT	= (__force blk_mq_req_flags_t)(1 << 3),
-+	/* used for power management */
-+	BLK_MQ_REQ_PM		= (__force blk_mq_req_flags_t)(1 << 4),
- };
- 
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
-
+How much writes from fsck use does xfs see, again?
