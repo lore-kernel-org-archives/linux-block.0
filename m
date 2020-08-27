@@ -2,126 +2,131 @@ Return-Path: <SRS0=E5Vf=CF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D7A9C433E3
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 03:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F351C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 03:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C6C820737
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 03:35:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61A2E20786
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 03:59:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="m7IuApWA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbgH0Dfr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Aug 2020 23:35:47 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:53802 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbgH0Dfq (ORCPT
+        id S1726804AbgH0D7r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Aug 2020 23:59:47 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:4830 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726794AbgH0D7r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Aug 2020 23:35:46 -0400
-Received: by mail-pj1-f68.google.com with SMTP id nv17so1902481pjb.3;
-        Wed, 26 Aug 2020 20:35:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=DLj4W2vhUepXhNqbwxvkKgKcWXo+LmOht5KSU3PyXno=;
-        b=CNDuEBG3TZeebeFRiiITJUHlIIvyzkH1AJVox26BEl4Fz7DTRoOz2YsBVZajxz6x7H
-         31XHwgDCNnCbhy8TrDR8e7lIRahN4CJZtzNAThIi2ESfAn5WSFn1omZAcY3rojqB+ntj
-         P6/NJtqPKAJB9k7jI6X6QhJG3vLeClGE06TUE3Z7fUxKhcpAYlSWwLq/lD0Ki9kJOjHZ
-         keWfOAfkfzlhyZ8xtBo6KzA1NgNtijR4OtallNuy6eQijg7L2gUBPbZinQetHZZzC5BN
-         TAXcHxvjKCZkKLkTvpfLN165W9/5vTNCL8TkNPOEqvlxbY5gNdXEzu6Mg0jLVy6Z9JzP
-         WFkw==
-X-Gm-Message-State: AOAM532pBPKAtwKUJcjDy18fmwloiNCFtH7bP317iEPIbU5mDldhbjKz
-        AqbjyULq+BG9W4LoNgNJ/p4=
-X-Google-Smtp-Source: ABdhPJyklio1mpgzNgrsrCHSPZvogO3jiJOroyEAHY0jOBex6B9DucFvtYvn85NN5Ors5xumTTcubg==
-X-Received: by 2002:a17:90b:18e:: with SMTP id t14mr7740779pjs.69.1598499345718;
-        Wed, 26 Aug 2020 20:35:45 -0700 (PDT)
-Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id d23sm504620pjz.44.2020.08.26.20.35.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Aug 2020 20:35:44 -0700 (PDT)
-Subject: Re: [PATCH] block: Fix a race in the runtime power management code
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     Stanley Chu <stanley.chu@mediatek.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20200824030607.19357-1-bvanassche@acm.org>
- <1598346681.10649.8.camel@mtkswgap22>
- <20200825182423.GB375466@rowland.harvard.edu>
- <1f798c21-241f-59f8-5298-a32fffe2ff01@acm.org>
- <20200826015159.GA387575@rowland.harvard.edu>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <af1b1f57-59ff-0133-8108-0f3d1e1254e1@acm.org>
-Date:   Wed, 26 Aug 2020 20:35:42 -0700
+        Wed, 26 Aug 2020 23:59:47 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f472f390001>; Wed, 26 Aug 2020 20:57:45 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Wed, 26 Aug 2020 20:59:47 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Wed, 26 Aug 2020 20:59:47 -0700
+Received: from [10.2.53.36] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 27 Aug
+ 2020 03:59:42 +0000
+Subject: Re: [bio] 37abbdc72e: WARNING:at_block/bio.c:#bio_release_pages
+To:     kernel test robot <lkp@intel.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Ilya Dryomov" <idryomov@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Jeff Layton <jlayton@kernel.org>, <linux-xfs@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <ceph-devel@vger.kernel.org>, <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>, <lkp@lists.01.org>,
+        <ltp@lists.linux.it>
+References: <20200827032518.GO4299@shao2-debian>
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <2d7d45b8-e271-87b2-f772-d1b2232fe351@nvidia.com>
+Date:   Wed, 26 Aug 2020 20:59:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200826015159.GA387575@rowland.harvard.edu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200827032518.GO4299@shao2-debian>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1598500665; bh=+FWH5O9plAx2YA/7/CTPyaQvsDP1bN7Fd3QNB/vKkOA=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:Message-ID:Date:
+         User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=m7IuApWAH6QorQ1B/A53t+ZQioXeC51OPleIyKiBBSIQeqx6r6btSGqLe5OYT/xRa
+         q0aiVhKco2L+zUHOuik21sCCi9lpLaD7th0UqbvYqV7Yxk5CuHxHdrZyYDPGmY2w99
+         QcAVSChYiytbHpKYLlwH41eNLU7pnnR77Zf/fNs5Mhb6KekZZr9/h0A69FMAkiLwxm
+         i8rM0eYVXte4X48P8iMmVlv5EhLeJvFYA5xAujWqeqAEbQBjrzFRIgXGZ0DU5sQHZU
+         KSa8FD6EEqbctof9fPVIgJsFoTkWU0C6lBEFHf1WLRwqRkHphxDoiUOniVb8LAE6/B
+         QO/WHC+GNJAZQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-08-25 18:51, Alan Stern wrote:
-> Ah, perfect.  So in blk_queue_enter(), pm should be defined in terms of 
-> RQF_PM rather than BLK_MQ_REQ_PREEMPT.
+On 8/26/20 8:25 PM, kernel test robot wrote:
+...
+> kern  :warn  : [   59.757746] ------------[ cut here ]------------
+> kern  :warn  : [   59.758325] WARNING: CPU: 3 PID: 2581 at block/bio.c:955 bio_release_pages+0xd7/0xe0
+> kern  :warn  : [   59.758952] Modules linked in: dm_mod netconsole btrfs blake2b_generic xor zstd_compress raid6_pq libcrc32c intel_rapl_msr sd_mod intel_rapl_common t10_pi x86_pkg_temp_thermal sg intel_powerclamp coretemp i915 intel_gtt drm_kms_helper kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel syscopyarea rapl intel_cstate sysfillrect intel_uncore sysimgblt fb_sys_fops drm mei_me ipmi_devintf ahci libahci ipmi_msghandler libata mei joydev ie31200_edac video ip_tables
+> kern  :warn  : [   59.761834] CPU: 3 PID: 2581 Comm: aiodio_sparse Not tainted 5.8.0-10182-g37abbdc72ec00 #1
+> kern  :warn  : [   59.762559] Hardware name: Hewlett-Packard p6-1451cx/2ADA, BIOS 8.15 02/05/2013
+> kern  :warn  : [   59.763295] RIP: 0010:bio_release_pages+0xd7/0xe0
+> kern  :warn  : [   59.763983] Code: e1 89 d5 81 e2 ff 0f 00 00 c1 ed 0c 29 d1 48 c1 e5 06 48 03 28 eb 9c 48 8b 45 08 a8 01 75 c0 48 89 ef e8 8c f0 d2 ff eb b6 c3 <0f> 0b c3 66 0f 1f 44 00 00 0f 1f 44 00 00 41 54 31 c0 55 bd 00 10
+> kern  :warn  : [   59.765596] RSP: 0000:ffffc90000124e68 EFLAGS: 00010246
+> kern  :warn  : [   59.766339] RAX: 0000000000000a00 RBX: ffff888212c3f2a0 RCX: 0000000000000000
+> kern  :warn  : [   59.767124] RDX: fffffffffff41387 RSI: 0000000000000000 RDI: ffff88821fae3000
+> kern  :warn  : [   59.767950] RBP: ffff88821fae3000 R08: ffff88821f1d1c00 R09: 0000000000000000
+> kern  :warn  : [   59.768726] R10: ffff88821f1d1a10 R11: ffff88821faab3b0 R12: 0000000040000001
+> kern  :warn  : [   59.769513] R13: 0000000000000400 R14: 0000000000002c00 R15: 0000000000000000
+> kern  :warn  : [   59.770294] FS:  00007fb0401ef740(0000) GS:ffff88821fb80000(0000) knlGS:0000000000000000
+> kern  :warn  : [   59.771112] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> kern  :warn  : [   59.771908] CR2: 00007ffc3fc11000 CR3: 000000012477e006 CR4: 00000000001706e0
+> kern  :warn  : [   59.772720] Call Trace:
+> kern  :warn  : [   59.773466]  <IRQ>
+> kern  :warn  : [   59.774200]  iomap_dio_bio_end_io+0x5f/0x100
+
+ah, this is self-inflicted, because my new pin_user_page() (which is called
+from iomap_dio_bio_end_io) doesn't set BIO_FOLL_PIN.
+
+Obsolete, now that BIO_FOLL_PIN is not going to happen, but it's good to see
+that the system isn't doing anything unexpected here.
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
+
+> kern  :warn  : [   59.774973]  blk_update_request+0x219/0x3c0
+> kern  :warn  : [   59.775767]  scsi_end_request+0x29/0x140
+> kern  :warn  : [   59.776538]  scsi_io_completion+0x7a/0x520
+> kern  :warn  : [   59.777324]  blk_done_softirq+0x95/0xc0
+> kern  :warn  : [   59.778098]  __do_softirq+0xe8/0x313
+> kern  :warn  : [   59.778887]  asm_call_on_stack+0x12/0x20
+> kern  :warn  : [   59.779662]  </IRQ>
+> kern  :warn  : [   59.780435]  do_softirq_own_stack+0x39/0x60
+> kern  :warn  : [   59.781217]  irq_exit_rcu+0xd2/0xe0
+> kern  :warn  : [   59.782020]  common_interrupt+0x74/0x140
+> kern  :warn  : [   59.782797]  ? asm_common_interrupt+0x8/0x40
+> kern  :warn  : [   59.783594]  asm_common_interrupt+0x1e/0x40
+> kern  :warn  : [   59.784359] RIP: 0033:0x5572c6b47f20
+> kern  :warn  : [   59.785119] Code: 10 00 00 49 01 c4 44 39 fd 0f 8c a2 00 00 00 ba 00 10 00 00 4c 89 ee 44 89 f7 e8 ab f5 ff ff 85 c0 7e d7 89 c2 4c 89 eb eb 09 <48> 83 c3 01 83 ea 01 74 c7 44 0f be 03 45 84 c0 74 ee 83 fa 03 7e
+> kern  :warn  : [   59.786952] RSP: 002b:00007ffc3fc0fed0 EFLAGS: 00000246
+> kern  :warn  : [   59.787836] RAX: 0000000000001000 RBX: 00007ffc3fc11de1 RCX: 00007fb0403c950e
+> kern  :warn  : [   59.788750] RDX: 00000000000000bf RSI: 00007ffc3fc10ea0 RDI: 0000000000000007
+> kern  :warn  : [   59.789647] RBP: 00000000001b5c00 R08: 0000000000000000 R09: 00007ffc3fc0d6b7
+> kern  :warn  : [   59.790550] R10: 0000000000000000 R11: 0000000000000246 R12: 000000000003e000
+> kern  :warn  : [   59.791447] R13: 00007ffc3fc10ea0 R14: 0000000000000007 R15: 000000000003e000
+> kern  :warn  : [   59.792356] ---[ end trace 1c52c540ed6c08e4 ]---
 > 
-> The difficulty is that the flags argument is the wrong type; RQF_PM is 
-> defined as req_flags_t, not blk_mq_req_flags_t.  It is associated with a 
-> particular request after the request has been created, so after 
-> blk_queue_enter() has been called.
-> 
-> How can we solve this?
-
-The current code looks a bit weird because my focus when modifying the PM
-code has been on not breaking any existing code.
-
-scsi_device_quiesce() relies on blk_queue_enter() processing all PREEMPT
-requests. A difficulty is that scsi_device_quiesce() is used for two
-separate purposes:
-* Runtime power management.
-* SCSI domain validation. See e.g. https://lwn.net/Articles/75917/.
-
-I think that modifying blk_queue_enter() such that it only accepts PM
-requests will require to split scsi_device_quiesce() into two functions:
-one function that is used by the runtime power management code and another
-function that is used by the SCSI domain validation code. This may require
-to introduce new SCSI device states. If new SCSI device states are
-introduced, that should be done without modifying the state that is
-reported to user space. See also sdev_states[] and show_state_field in
-scsi_sysfs.c.
-
-Thanks,
-
-Bart.
+> ...
