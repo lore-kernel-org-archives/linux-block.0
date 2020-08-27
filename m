@@ -6,59 +6,61 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC8BC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 09:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80181C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 09:44:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6B78207CD
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 09:39:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 655BB207CD
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 09:44:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726826AbgH0Jjw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Aug 2020 05:39:52 -0400
-Received: from verein.lst.de ([213.95.11.211]:37505 "EHLO verein.lst.de"
+        id S1726157AbgH0JoS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Aug 2020 05:44:18 -0400
+Received: from verein.lst.de ([213.95.11.211]:37523 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726157AbgH0Jjw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Aug 2020 05:39:52 -0400
+        id S1728303AbgH0JoS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Aug 2020 05:44:18 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 386C568B02; Thu, 27 Aug 2020 11:39:48 +0200 (CEST)
-Date:   Thu, 27 Aug 2020 11:39:48 +0200
+        id C109068B02; Thu, 27 Aug 2020 11:44:15 +0200 (CEST)
+Date:   Thu, 27 Aug 2020 11:44:15 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Denis Efremov <efremov@linux.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org
-Subject: Re: [PATCH 01/19] char_dev: replace cdev_map with an xarray
-Message-ID: <20200827093947.GA15976@lst.de>
-References: <20200826062446.31860-1-hch@lst.de> <20200826062446.31860-2-hch@lst.de> <20200826081905.GB1796103@kroah.com> <20200827085353.GA12111@lst.de> <20200827091859.GA393660@kroah.com>
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de,
+        baolin.wang7@gmail.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] block: Add a new helper to attempt to merge a
+ bio
+Message-ID: <20200827094415.GA16058@lst.de>
+References: <cover.1597727255.git.baolin.wang@linux.alibaba.com> <7749d6068b9e5404ef59bacfcb278d604f84af75.1597727255.git.baolin.wang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200827091859.GA393660@kroah.com>
+In-Reply-To: <7749d6068b9e5404ef59bacfcb278d604f84af75.1597727255.git.baolin.wang@linux.alibaba.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 11:18:59AM +0200, Greg Kroah-Hartman wrote:
-> > I looked at it, but it does get registered and shows up in sysfs.
-> 
-> It does?  Where does that happen?  I see a bunch of kobject_init()
-> calls, but nothing that registers it in sysfs that I can see.
+On Tue, Aug 18, 2020 at 01:45:29PM +0800, Baolin Wang wrote:
+> Meanwhile move the blk_mq_bio_list_merge() into blk-merge.c and
+> rename it as a generic name.
 
-Hmm, true.
+That should probably a separate patch.
 
-> 
-> Note, this is not the kobject that shows up in /sys/dev/char/ as a
-> symlink, that comes from the driver core logic and is independent of the
-> cdev code.
-> 
-> The kobject does handle the structure lifetime rules, but that should be
-> able to be replaced with a simple kref instead.
+> +		if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) == BIO_MERGE_OK)
+> +			return true;
 
-Yeah.  I'll let you handle this stuff, as you obviously know the area
-better than I do.
+This adds an overly long line.
+
+> -		if (merged)
+> +		switch (blk_attempt_bio_merge(q, rq, bio, nr_segs, true)) {
+> +		default:
+> +		case BIO_MERGE_NONE:
+> +			continue;
+> +		case BIO_MERGE_OK:
+>  			return true;
+> +		case BIO_MERGE_FAILED:
+> +			return false;
+> +		}
+
+I don't think we need a default statement here as we handle all
+possible values of the enum.
