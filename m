@@ -2,99 +2,145 @@ Return-Path: <SRS0=E5Vf=CF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A9D8C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 20:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42151C433E3
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 20:33:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31F9220825
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 20:29:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DC5A20825
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 20:33:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbgH0U3y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Aug 2020 16:29:54 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:54143 "HELO
+        id S1726887AbgH0UdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Aug 2020 16:33:25 -0400
+Received: from netrider.rowland.org ([192.131.102.5]:49887 "HELO
         netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1726147AbgH0U3y (ORCPT
+        with SMTP id S1726120AbgH0UdW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Aug 2020 16:29:54 -0400
-Received: (qmail 450277 invoked by uid 1000); 27 Aug 2020 16:29:52 -0400
-Date:   Thu, 27 Aug 2020 16:29:52 -0400
+        Thu, 27 Aug 2020 16:33:22 -0400
+Received: (qmail 450389 invoked by uid 1000); 27 Aug 2020 16:33:21 -0400
+Date:   Thu, 27 Aug 2020 16:33:21 -0400
 From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Martin Kepplinger <martin.kepplinger@puri.sm>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel@puri.sm
-Subject: Re: [PATCH] block: Fix bug in runtime-resume handling
-Message-ID: <20200827202952.GA449067@rowland.harvard.edu>
-References: <d3b6f7b8-5345-1ae1-4f79-5dde226e74f1@puri.sm>
- <20200809152643.GA277165@rowland.harvard.edu>
- <60150284-be13-d373-5448-651b72a7c4c9@puri.sm>
- <20200810141343.GA299045@rowland.harvard.edu>
- <6f0c530f-4309-ab1e-393b-83bf8367f59e@puri.sm>
- <20200823145733.GC303967@rowland.harvard.edu>
- <3e5a465e-8fe0-b379-a80e-23e2f588c71a@acm.org>
- <20200824201343.GA344424@rowland.harvard.edu>
- <5152a510-bebf-bf33-f6b3-4549e50386ab@puri.sm>
- <4c636f2d-af7f-bbde-a864-dbeb67c590ec@puri.sm>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Stanley Chu <stanley.chu@mediatek.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] block: Fix a race in the runtime power management code
+Message-ID: <20200827203321.GB449067@rowland.harvard.edu>
+References: <20200824030607.19357-1-bvanassche@acm.org>
+ <1598346681.10649.8.camel@mtkswgap22>
+ <20200825182423.GB375466@rowland.harvard.edu>
+ <1f798c21-241f-59f8-5298-a32fffe2ff01@acm.org>
+ <20200826015159.GA387575@rowland.harvard.edu>
+ <af1b1f57-59ff-0133-8108-0f3d1e1254e1@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4c636f2d-af7f-bbde-a864-dbeb67c590ec@puri.sm>
+In-Reply-To: <af1b1f57-59ff-0133-8108-0f3d1e1254e1@acm.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 07:42:43PM +0200, Martin Kepplinger wrote:
-> On 26.08.20 09:48, Martin Kepplinger wrote:
-> > On 24.08.20 22:13, Alan Stern wrote:
-
-> >> Martin:
-> >>
-> >> (I forgot to ask this question several weeks ago, while you were running 
-> >> your tests.  Better ask it now before I forget again...)
-> >>
-> >> I suspect the old runtime-PM code in the block layer would have worked 
-> >> okay in your SD cardreader test if the BLK_MQ_REQ_PREEMPT flag had not 
-> >> been set.  Do you know why the flag was set, or what line of code caused 
-> >> it to be set?
+On Wed, Aug 26, 2020 at 08:35:42PM -0700, Bart Van Assche wrote:
+> On 2020-08-25 18:51, Alan Stern wrote:
+> > Ah, perfect.  So in blk_queue_enter(), pm should be defined in terms of 
+> > RQF_PM rather than BLK_MQ_REQ_PREEMPT.
 > > 
-> > Correct. if not set, I could handle all I need in the scsi error path.
+> > The difficulty is that the flags argument is the wrong type; RQF_PM is 
+> > defined as req_flags_t, not blk_mq_req_flags_t.  It is associated with a 
+> > particular request after the request has been created, so after 
+> > blk_queue_enter() has been called.
+> > 
+> > How can we solve this?
 > 
-> this thread becomes a bit confusing. I thought about REQ_FAILFAST_DEV
-> but you're talking about something different.
+> The current code looks a bit weird because my focus when modifying the PM
+> code has been on not breaking any existing code.
 > 
-> the only place I see BLK_MQ_REQ_PREEMPT getting passed on is in
-> __scsi_execute() which is the case when mounting/unmounting. At least
-> that about the only place I can find.
-
-Ah yes, I see what you mean.
-
-> I remember *only* your block pm fix would let me mount/unmount, but not
-> use files yet (REQ_FAILFAST_DEV and so on).
+> scsi_device_quiesce() relies on blk_queue_enter() processing all PREEMPT
+> requests. A difficulty is that scsi_device_quiesce() is used for two
+> separate purposes:
+> * Runtime power management.
+> * SCSI domain validation. See e.g. https://lwn.net/Articles/75917/.
 > 
-> When I revert your fix and remove BLK_MQ_REQ_PREEMPT from being passed
-> on to blk_get_request() in __scsi_execute(), that line gets executed
-> exactly once during startup and I'm missing the /dev/sda device from the
-> cardreader then.
-> 
-> Is this what you're asking?
+> I think that modifying blk_queue_enter() such that it only accepts PM
+> requests will require to split scsi_device_quiesce() into two functions:
+> one function that is used by the runtime power management code and another
+> function that is used by the SCSI domain validation code. This may require
+> to introduce new SCSI device states. If new SCSI device states are
+> introduced, that should be done without modifying the state that is
+> reported to user space. See also sdev_states[] and show_state_field in
+> scsi_sysfs.c.
 
-Not quite sure, but it doesn't matter.  Removing BLK_MQ_REQ_PREEMPT in 
-__scsi_execute() is probably not a safe thing to do.
-
-Instead, look at sd_resume().  That routine calls __scsi_execute() 
-indirectly through sd_start_stop_device(), and the only reason it does 
-this is because the sdkp->device->manage_start_stop flag is set.  You 
-ought to be able to clear this flag in sysfs, by writing to 
-/sys/block/sda/device/scsi_disk/*/manage_start_stop.  If you do this 
-before allowing the card reader to go into runtime suspend, does it then 
-resume okay?
-
-(Yes, I know you still won't be able to read it because of the FAILFAST 
-flag.  I just want to know if the runtime resume actually takes place.)
+It may not need to be that complicated.  what about something like this?
 
 Alan Stern
+
+
+Index: usb-devel/block/blk-core.c
+===================================================================
+--- usb-devel.orig/block/blk-core.c
++++ usb-devel/block/blk-core.c
+@@ -420,11 +420,11 @@ EXPORT_SYMBOL(blk_cleanup_queue);
+ /**
+  * blk_queue_enter() - try to increase q->q_usage_counter
+  * @q: request queue pointer
+- * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
++ * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PM
+  */
+ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ {
+-	const bool pm = flags & BLK_MQ_REQ_PREEMPT;
++	const bool pm = flags & BLK_MQ_REQ_PM;
+ 
+ 	while (true) {
+ 		bool success = false;
+@@ -626,7 +626,8 @@ struct request *blk_get_request(struct r
+ 	struct request *req;
+ 
+ 	WARN_ON_ONCE(op & REQ_NOWAIT);
+-	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
++	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT |
++			BLK_MQ_REQ_PM));
+ 
+ 	req = blk_mq_alloc_request(q, op, flags);
+ 	if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
+Index: usb-devel/drivers/scsi/scsi_lib.c
+===================================================================
+--- usb-devel.orig/drivers/scsi/scsi_lib.c
++++ usb-devel/drivers/scsi/scsi_lib.c
+@@ -245,11 +245,15 @@ int __scsi_execute(struct scsi_device *s
+ {
+ 	struct request *req;
+ 	struct scsi_request *rq;
++	blk_mq_req_flags_t mq_req_flags;
+ 	int ret = DRIVER_ERROR << 24;
+ 
++	mq_req_flags = BLK_MQ_REQ_PREEMPT;
++	if (rq_flags & RQF_PM)
++		mq_req_flags |= BLK_MQ_REQ_PM;
+ 	req = blk_get_request(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, mq_req_flags);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+Index: usb-devel/include/linux/blk-mq.h
+===================================================================
+--- usb-devel.orig/include/linux/blk-mq.h
++++ usb-devel/include/linux/blk-mq.h
+@@ -435,6 +435,8 @@ enum {
+ 	BLK_MQ_REQ_RESERVED	= (__force blk_mq_req_flags_t)(1 << 1),
+ 	/* set RQF_PREEMPT */
+ 	BLK_MQ_REQ_PREEMPT	= (__force blk_mq_req_flags_t)(1 << 3),
++	/* used for power management */
++	BLK_MQ_REQ_PM		= (__force blk_mq_req_flags_t)(1 << 4),
+ };
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+
