@@ -2,188 +2,616 @@ Return-Path: <SRS0=E5Vf=CF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D28C0C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 17:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DED1DC433E4
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0BCD2087E
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 17:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1C942087E
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=veeam.com header.i=@veeam.com header.b="eP96DmYt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726243AbgH0Rn0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Aug 2020 13:43:26 -0400
-Received: from comms.puri.sm ([159.203.221.185]:42382 "EHLO comms.puri.sm"
+        id S1726246AbgH0TW4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Aug 2020 15:22:56 -0400
+Received: from mx2.veeam.com ([12.182.39.6]:47842 "EHLO mx2.veeam.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726197AbgH0RnZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Aug 2020 13:43:25 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by comms.puri.sm (Postfix) with ESMTP id D002BE0188;
-        Thu, 27 Aug 2020 10:42:50 -0700 (PDT)
-Received: from comms.puri.sm ([127.0.0.1])
-        by localhost (comms.puri.sm [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id S5hlt-RQYA_f; Thu, 27 Aug 2020 10:42:47 -0700 (PDT)
-Subject: Re: [PATCH] block: Fix bug in runtime-resume handling
-From:   Martin Kepplinger <martin.kepplinger@puri.sm>
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel@puri.sm
-References: <20200807143002.GE226516@rowland.harvard.edu>
- <b0abab28-880e-4b88-eb3c-9ffd927d1ed9@puri.sm>
- <20200808150542.GB256751@rowland.harvard.edu>
- <d3b6f7b8-5345-1ae1-4f79-5dde226e74f1@puri.sm>
- <20200809152643.GA277165@rowland.harvard.edu>
- <60150284-be13-d373-5448-651b72a7c4c9@puri.sm>
- <20200810141343.GA299045@rowland.harvard.edu>
- <6f0c530f-4309-ab1e-393b-83bf8367f59e@puri.sm>
- <20200823145733.GC303967@rowland.harvard.edu>
- <3e5a465e-8fe0-b379-a80e-23e2f588c71a@acm.org>
- <20200824201343.GA344424@rowland.harvard.edu>
- <5152a510-bebf-bf33-f6b3-4549e50386ab@puri.sm>
-Autocrypt: addr=martin.kepplinger@puri.sm; keydata=
- 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
- ekMtxgNYb/8oDry09UFHbGHLsWn6oBo=
-Message-ID: <4c636f2d-af7f-bbde-a864-dbeb67c590ec@puri.sm>
-Date:   Thu, 27 Aug 2020 19:42:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-In-Reply-To: <5152a510-bebf-bf33-f6b3-4549e50386ab@puri.sm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726236AbgH0TW4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Aug 2020 15:22:56 -0400
+X-Greylist: delayed 533 seconds by postgrey-1.27 at vger.kernel.org; Thu, 27 Aug 2020 15:22:53 EDT
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id CEDCF413A9;
+        Thu, 27 Aug 2020 15:13:57 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
+        t=1598555638; bh=YLMeDFdTFm2zg31VhJtBC0YxoCrw3uCbRW9Q0Rocgk0=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=eP96DmYtoRb7613mhyxwcB7HYAVGZTZIUaqodDVilZ5ZYo7LuNe6RKg44N7PQXltI
+         IpEFXrWMjKxJXIjp1Wci6i3++bs0edv9izCHpVopxzEkOji6QbVS+Y3OyRRfY2lx17
+         yyn9X3+TBBK4mlgss/s9g/n3pbXdPGK00mvWdZn8=
+Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
+ prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.595.3;
+ Thu, 27 Aug 2020 21:13:53 +0200
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
+        <axboe@kernel.dk>, <koct9i@gmail.com>, <jack@suse.cz>,
+        <damien.lemoal@wdc.com>, <ming.lei@redhat.com>, <steve@sk2.org>,
+        <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>
+CC:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Subject: [PATCH 1/1] block io layer filters api
+Date:   Thu, 27 Aug 2020 22:13:39 +0300
+Message-ID: <1598555619-14792-2-git-send-email-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1598555619-14792-1-git-send-email-sergei.shtepa@veeam.com>
+References: <1598555619-14792-1-git-send-email-sergei.shtepa@veeam.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.0.172) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29C604D26B607C6A
+X-Veeam-MMEX: True
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx2.veeam.com [172.18.16.6]); Thu, 27 Aug 2020 15:13:58 -0400 (EDT)
+X-Veeam-MailScanner-Information: Please contact email@veeam.com if you have any problems
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 26.08.20 09:48, Martin Kepplinger wrote:
-> On 24.08.20 22:13, Alan Stern wrote:
->> On Mon, Aug 24, 2020 at 10:48:32AM -0700, Bart Van Assche wrote:
->>> On 2020-08-23 07:57, Alan Stern wrote:
->>>> The problem is fixed by checking that the queue's runtime-PM status
->>>> isn't RPM_SUSPENDED before allowing a request to be issued, [ ... ]
->>>
->>> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
->>>
->>> Can, can you help with testing this patch?
->>>
->>> Thanks,
->>>
->>> Bart.
->>
->> Martin:
->>
->> (I forgot to ask this question several weeks ago, while you were running 
->> your tests.  Better ask it now before I forget again...)
->>
->> I suspect the old runtime-PM code in the block layer would have worked 
->> okay in your SD cardreader test if the BLK_MQ_REQ_PREEMPT flag had not 
->> been set.  Do you know why the flag was set, or what line of code caused 
->> it to be set?
-> 
-> Correct. if not set, I could handle all I need in the scsi error path.
+to register a filter a user of the API would call blk_filter_register()
+with blk_filter_ops that would allow it to intercept the following events
+in the system:
+* bio requests
+* addition of a disk
+* removal of a disk
 
-this thread becomes a bit confusing. I thought about REQ_FAILFAST_DEV
-but you're talking about something different.
+to unregister a filter a user of the API would call
+blk_filter_unregister() multiple filters can be stacked at different
+altitudes when bio request is intercepted, it can be passed to filter
+at lower level or it can be sent for completion
 
-the only place I see BLK_MQ_REQ_PREEMPT getting passed on is in
-__scsi_execute() which is the case when mounting/unmounting. At least
-that about the only place I can find.
+Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+---
+ block/Kconfig               |  11 ++
+ block/Makefile              |   1 +
+ block/blk-core.c            |  11 +-
+ block/blk-filter-internal.h |  34 +++++
+ block/blk-filter.c          | 288 ++++++++++++++++++++++++++++++++++++
+ block/genhd.c               |  24 +++
+ include/linux/blk-filter.h  |  41 +++++
+ include/linux/genhd.h       |   2 +
+ 8 files changed, 410 insertions(+), 2 deletions(-)
+ create mode 100644 block/blk-filter-internal.h
+ create mode 100644 block/blk-filter.c
+ create mode 100644 include/linux/blk-filter.h
 
-I remember *only* your block pm fix would let me mount/unmount, but not
-use files yet (REQ_FAILFAST_DEV and so on).
-
-When I revert your fix and remove BLK_MQ_REQ_PREEMPT from being passed
-on to blk_get_request() in __scsi_execute(), that line gets executed
-exactly once during startup and I'm missing the /dev/sda device from the
-cardreader then.
-
-Is this what you're asking?
-
-
-> 
->>
->> As I recall, the request that failed was a read-ahead.  It's not clear 
->> to me why such a request would need to have BLK_MQ_REQ_PREEMPT set.  
->> Although there may be other reasons for having that flag, at this point 
->> we're concerned with requests that are part of the runtime-resume 
->> procedure.  A read-ahead does not fall into that category.
->>
->> Do you think you can find the answer?  Perhaps we should add a separate 
->> BLK_MQ_REQ_PM flag.
-
+diff --git a/block/Kconfig b/block/Kconfig
+index bbad5e8bbffe..a308801b4376 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -204,6 +204,17 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
+ 	  by falling back to the kernel crypto API when inline
+ 	  encryption hardware is not present.
+ 
++config BLK_FILTER
++	bool "Enable support for block layer filters"
++	default y
++	depends on MODULES
++	help
++	  Enabling this lets third-party kernel modules intercept
++	  bio requests for any block device. This allows them to implement
++	  changed block tracking and snapshots without any reconfiguration of
++	  the existing setup. For example, this option allows snapshotting of
++	  a block device without adding it to LVM.
++
+ menu "Partition Types"
+ 
+ source "block/partitions/Kconfig"
+diff --git a/block/Makefile b/block/Makefile
+index 8d841f5f986f..b8ee50b8e031 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -38,3 +38,4 @@ obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
+ obj-$(CONFIG_BLK_PM)		+= blk-pm.o
+ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= keyslot-manager.o blk-crypto.o
+ obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK)	+= blk-crypto-fallback.o
++obj-$(CONFIG_BLK_FILTER)	+= blk-filter.o
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d9d632639bd1..3421ddeb69e5 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -50,6 +50,7 @@
+ #include "blk-mq-sched.h"
+ #include "blk-pm.h"
+ #include "blk-rq-qos.h"
++#include "blk-filter-internal.h"
+ 
+ struct dentry *blk_debugfs_root;
+ 
+@@ -1273,13 +1274,19 @@ blk_qc_t submit_bio(struct bio *bio)
+ 		blk_qc_t ret;
+ 
+ 		psi_memstall_enter(&pflags);
+-		ret = submit_bio_noacct(bio);
++		if (IS_ENABLED(CONFIG_BLK_FILTER))
++			ret = blk_filter_submit_bio(bio);
++		else
++			ret = submit_bio_noacct(bio);
+ 		psi_memstall_leave(&pflags);
+ 
+ 		return ret;
+ 	}
+ 
+-	return submit_bio_noacct(bio);
++	if (IS_ENABLED(CONFIG_BLK_FILTER))
++		return blk_filter_submit_bio(bio);
++	else
++		return submit_bio_noacct(bio);
+ }
+ EXPORT_SYMBOL(submit_bio);
+ 
+diff --git a/block/blk-filter-internal.h b/block/blk-filter-internal.h
+new file mode 100644
+index 000000000000..942066f3fecb
+--- /dev/null
++++ b/block/blk-filter-internal.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++/*
++ *
++ * Block device filters internal declarations
++ */
++
++#ifndef BLK_FILTER_INTERNAL_H
++#define BLK_FILTER_INTERNAL_H
++
++#ifdef CONFIG_BLK_FILTER
++#include <linux/blk-filter.h>
++
++void blk_filter_disk_add(struct gendisk *disk);
++
++void blk_filter_disk_del(struct gendisk *disk);
++
++void blk_filter_disk_release(struct gendisk *disk);
++
++blk_qc_t blk_filter_submit_bio(struct bio *bio);
++
++#else /* CONFIG_BLK_FILTER */
++
++static inline void blk_filter_disk_add(struct gendisk *disk) { }
++
++static inline void blk_filter_disk_del(struct gendisk *disk) { }
++
++static inline void blk_filter_disk_release(struct gendisk *disk) { }
++
++static inline blk_qc_t blk_filter_submit_bio(struct bio *bio) { return 0; }
++
++#endif /* CONFIG_BLK_FILTER */
++
++#endif
+diff --git a/block/blk-filter.c b/block/blk-filter.c
+new file mode 100644
+index 000000000000..edb30f342a3d
+--- /dev/null
++++ b/block/blk-filter.c
+@@ -0,0 +1,288 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <linux/genhd.h>
++#include <linux/bio.h>
++#include <linux/blkdev.h>
++#include "blk-filter-internal.h"
++#include <linux/rwsem.h>
++
++struct blk_filter_ctx {
++	struct blk_filter *filter;
++	/*
++	 * Reserved for extension
++	 */
++};
++
++DECLARE_RWSEM(blk_filter_ctx_list_lock);
++struct blk_filter_ctx *blk_filter_ctx_list[BLK_FILTER_ALTITUDE_MAX] = { 0 };
++
++static inline struct blk_filter_ctx *_get_ctx(size_t altitude)
++{
++	return blk_filter_ctx_list[altitude-1];
++}
++
++static inline void _set_ctx(size_t altitude, struct blk_filter_ctx *ctx)
++{
++	blk_filter_ctx_list[altitude-1] = ctx;
++}
++
++static struct blk_filter_ctx *_blk_ctx_new(struct blk_filter *filter)
++{
++	struct blk_filter_ctx *ctx = kzalloc(sizeof(struct blk_filter_ctx), GFP_KERNEL);
++
++	if (!ctx)
++		return ctx;
++
++	ctx->filter = filter;
++
++	return ctx;
++}
++
++static int _blk_ctx_link(struct blk_filter_ctx *ctx, size_t altitude)
++{
++	int result = 0;
++
++	if (altitude > BLK_FILTER_ALTITUDE_MAX)
++		return -ENOENT;
++
++	down_write(&blk_filter_ctx_list_lock);
++
++	if (_get_ctx(altitude))
++		result = -EEXIST;
++	else
++		_set_ctx(altitude, ctx);
++
++	up_write(&blk_filter_ctx_list_lock);
++
++	return result;
++}
++
++static int _blk_ctx_unlink(struct blk_filter_ctx *ctx)
++{
++	int result = -EEXIST;
++	size_t altitude = BLK_FILTER_ALTITUDE_MIN;
++
++	down_write(&blk_filter_ctx_list_lock);
++
++	for (; altitude <= BLK_FILTER_ALTITUDE_MAX; ++altitude) {
++		if (_get_ctx(altitude) && (_get_ctx(altitude) == ctx)) {
++			_set_ctx(altitude, NULL);
++			result = 0;
++			break;
++		}
++	}
++
++	up_write(&blk_filter_ctx_list_lock);
++
++	return result;
++}
++
++/**
++ * blk_filter_disk_add() - Notify filters when a new disk is added.
++ * @disk: The new disk.
++ */
++void blk_filter_disk_add(struct gendisk *disk)
++{
++	size_t altitude = BLK_FILTER_ALTITUDE_MIN;
++
++	pr_warn("blk-filter: add disk [%s].\n", disk->disk_name);
++
++	down_read(&blk_filter_ctx_list_lock);
++
++	for (; altitude <= BLK_FILTER_ALTITUDE_MAX; ++altitude) {
++		struct blk_filter_ctx *ctx = _get_ctx(altitude);
++
++		if (ctx && ctx->filter->ops && ctx->filter->ops->disk_add)
++			ctx->filter->ops->disk_add(disk);
++	}
++
++	up_read(&blk_filter_ctx_list_lock);
++}
++
++/**
++ * blk_filter_disk_del() - Notify filters when the disk is deleted.
++ * @disk: The disk to delete.
++ */
++void blk_filter_disk_del(struct gendisk *disk)
++{
++	size_t altitude = BLK_FILTER_ALTITUDE_MIN;
++
++	pr_warn("blk-filter: del disk [%s].\n", disk->disk_name);
++
++	down_read(&blk_filter_ctx_list_lock);
++
++	for (; altitude <= BLK_FILTER_ALTITUDE_MAX; ++altitude) {
++		struct blk_filter_ctx *ctx = _get_ctx(altitude);
++
++		if (ctx && ctx->filter->ops && ctx->filter->ops->disk_del)
++			ctx->filter->ops->disk_del(disk);
++	}
++
++	up_read(&blk_filter_ctx_list_lock);
++}
++
++/**
++ * blk_filter_disk_release() - Notify filters when the disk is released.
++ * @disk: The disk to release.
++ */
++void blk_filter_disk_release(struct gendisk *disk)
++{
++	size_t altitude = BLK_FILTER_ALTITUDE_MAX;
++
++	pr_warn("blk-filter: release disk [%s].\n", disk->disk_name);
++
++	down_read(&blk_filter_ctx_list_lock);
++
++	for (; altitude <= BLK_FILTER_ALTITUDE_MIN; --altitude) {
++		struct blk_filter_ctx *ctx = _get_ctx(altitude);
++
++		if (ctx && ctx->filter->ops && ctx->filter->ops->disk_release)
++			ctx->filter->ops->disk_release(disk);
++	}
++
++	up_read(&blk_filter_ctx_list_lock);
++}
++
++/**
++ * blk_filter_submit_bio_altitude() - Send bio for porcessing to specific filter.
++ * @altitude: The filter altitude.
++ * @bio: The new bio for block I/O layer.
++ *
++ * Return: Bio submitting result, like for submit_bio function.
++ */
++blk_qc_t blk_filter_submit_bio_altitude(size_t altitude, struct bio *bio)
++{
++	blk_qc_t ret;
++	bool bypass = true;
++
++	down_read(&blk_filter_ctx_list_lock);
++	while (altitude >= BLK_FILTER_ALTITUDE_MIN) {
++		struct blk_filter_ctx *ctx = _get_ctx(altitude);
++
++		if (ctx && ctx->filter->ops && ctx->filter->ops->submit_bio) {
++			ret = ctx->filter->ops->submit_bio(bio);
++			bypass = false;
++			break;
++		}
++		--altitude;
++	}
++	up_read(&blk_filter_ctx_list_lock);
++
++	if (bypass)
++		ret = submit_bio_noacct(bio);
++
++	return ret;
++}
++
++/**
++ * blk_filter_submit_bio() - Send new bio to filters for processing.
++ * @bio: The new bio for block I/O layer.
++ *
++ * Return: Bio submitting result, like for submit_bio function.
++ */
++blk_qc_t blk_filter_submit_bio(struct bio *bio)
++{
++	return blk_filter_submit_bio_altitude(BLK_FILTER_ALTITUDE_MAX, bio);
++}
++
++/**
++ * blk_filter_register() - Create new block I/O layer filter.
++ * @filter: The filter description structure.
++ *
++ * Return: Zero if the filter was registered successfully or an error code if it failed.
++ */
++int blk_filter_register(struct blk_filter *filter)
++{
++	int result = 0;
++	struct blk_filter_ctx *ctx;
++
++	pr_warn("blk-filter: register filter [%s].\n", filter->name);
++
++	ctx = _blk_ctx_new(filter);
++	if (!ctx)
++		return -ENOMEM;
++
++	result = _blk_ctx_link(ctx, filter->altitude);
++	if (result)
++		goto failed;
++
++	filter->blk_filter_ctx = (void *)ctx;
++	return 0;
++
++failed:
++	kfree(ctx);
++	return result;
++}
++EXPORT_SYMBOL(blk_filter_register);
++
++/**
++ * blk_filter_unregister() - Remove existing block I/O layer filter.
++ * @filter: The filter description structure.
++ *
++ * Return: Zero if the filter was removed successfully or an error code if it failed.
++ */
++int blk_filter_unregister(struct blk_filter *filter)
++{
++	int result = 0;
++	struct blk_filter_ctx *ctx;
++
++	pr_warn("blk-filter: unregister filter [%s].\n", filter->name);
++
++	ctx = (struct blk_filter_ctx *)filter->blk_filter_ctx;
++
++	result = _blk_ctx_unlink(ctx);
++	if (result == 0)
++		kfree(ctx);
++
++	return result;
++}
++EXPORT_SYMBOL(blk_filter_unregister);
++
++/**
++ * blk_filter_check_altitude() - Checking that altitude is free.
++ * @altitude: The filter description structure.
++ *
++ * Return: NULL if the altitude is free or the name of the module registered at this altitude.
++ */
++const char *blk_filter_check_altitude(size_t altitude)
++{
++	struct blk_filter_ctx *ctx = _get_ctx(altitude);
++
++	if (!ctx)
++		return NULL;
++
++	return ctx->filter->name;
++}
++EXPORT_SYMBOL(blk_filter_check_altitude);
++
++static void _attach_fn(struct gendisk *disk, void *_ctx)
++{
++	struct blk_filter *filter = (struct blk_filter *)_ctx;
++
++	if (filter->ops && filter->ops->disk_add)
++		filter->ops->disk_add(disk);
++}
++
++/**
++ * blk_filter_attach_disks() - Enumerate all existing disks and call disk_add callback for each.
++ * @filter: The filter description structure.
++ *
++ * Return: Zero if the existing disks was attached successfully or an error code if it failed.
++ */
++int blk_filter_attach_disks(struct blk_filter *filter)
++{
++	return disk_enumerate(_attach_fn, filter);
++}
++EXPORT_SYMBOL(blk_filter_attach_disks);
++
++/**
++ * blk_filter_submit_bio_next() - Send a bio to the lower filters for processing.
++ * @bio: The bio for block I/O layer.
++ *
++ * Return: Bio submitting result, like for submit_bio function.
++ */
++blk_qc_t blk_filter_submit_bio_next(struct blk_filter *filter, struct bio *bio)
++{
++	return blk_filter_submit_bio_altitude(filter->altitude-1, bio);
++}
++EXPORT_SYMBOL(blk_filter_submit_bio_next);
+diff --git a/block/genhd.c b/block/genhd.c
+index 99c64641c314..c5604415e772 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -25,6 +25,7 @@
+ #include <linux/badblocks.h>
+ 
+ #include "blk.h"
++#include "blk-filter-internal.h"
+ 
+ static DEFINE_MUTEX(block_class_lock);
+ static struct kobject *block_depr;
+@@ -837,6 +838,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	 */
+ 	WARN_ON_ONCE(!blk_get_queue(disk->queue));
+ 
++	blk_filter_disk_add(disk);
+ 	disk_add_events(disk);
+ 	blk_integrity_add(disk);
+ }
+@@ -900,6 +902,7 @@ void del_gendisk(struct gendisk *disk)
+ 
+ 	might_sleep();
+ 
++	blk_filter_disk_del(disk);
+ 	blk_integrity_del(disk);
+ 	disk_del_events(disk);
+ 
+@@ -1562,6 +1565,7 @@ static void disk_release(struct device *dev)
+ 
+ 	might_sleep();
+ 
++	blk_filter_disk_release(disk);
+ 	blk_free_devt(dev->devt);
+ 	disk_release_events(disk);
+ 	kfree(disk->random);
+@@ -2339,3 +2343,23 @@ static void disk_release_events(struct gendisk *disk)
+ 	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
+ 	kfree(disk->ev);
+ }
++
++int disk_enumerate(void (*fn)(struct gendisk *disk, void *ctx), void *ctx)
++{
++	struct class_dev_iter *iter;
++	struct device *dev;
++
++	iter = kmalloc(sizeof(*iter), GFP_KERNEL);
++	if (!iter)
++		return -ENOMEM;
++
++	class_dev_iter_init(iter, &block_class, NULL, &disk_type);
++	dev = class_dev_iter_next(iter);
++	while (dev) {
++		fn(dev_to_disk(dev), ctx);
++		dev = class_dev_iter_next(iter);
++	};
++
++	kfree(iter);
++	return 0;
++}
+diff --git a/include/linux/blk-filter.h b/include/linux/blk-filter.h
+new file mode 100644
+index 000000000000..201613168864
+--- /dev/null
++++ b/include/linux/blk-filter.h
+@@ -0,0 +1,41 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++/*
++ * API declarations for kernel modules utilizing block device filters
++ */
++
++#ifndef BLK_FILTER_H
++#define BLK_FILTER_H
++
++#ifdef CONFIG_BLK_FILTER
++#define BLK_FILTER_ALTITUDE_MAX 4
++#define BLK_FILTER_ALTITUDE_MIN 1
++
++struct blk_filter_ops {
++	void (*disk_add)(struct gendisk *disk);
++	void (*disk_del)(struct gendisk *disk);
++	void (*disk_release)(struct gendisk *disk);
++	blk_qc_t (*submit_bio)(struct bio *bio);
++};
++
++struct blk_filter {
++	const char *name;
++	const struct blk_filter_ops *ops;
++	size_t altitude;
++	void *blk_filter_ctx;
++};
++
++
++int blk_filter_register(struct blk_filter *filter);
++
++int blk_filter_unregister(struct blk_filter *filter);
++
++const char *blk_filter_check_altitude(size_t altitude);
++
++int blk_filter_attach_disks(struct blk_filter *filter);
++
++blk_qc_t blk_filter_submit_bio_next(struct blk_filter *filter, struct bio *bio);
++
++#endif /* CONFIG_BLK_FILTER */
++
++#endif
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 4ab853461dff..5f065f8989b4 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -319,6 +319,8 @@ extern void set_capacity_revalidate_and_notify(struct gendisk *disk,
+ 			sector_t size, bool revalidate);
+ extern unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask);
+ 
++extern int disk_enumerate(void (*fn)(struct gendisk *disk, void *cxt), void *cxt);
++
+ /* drivers/char/random.c */
+ extern void add_disk_randomness(struct gendisk *disk) __latent_entropy;
+ extern void rand_initialize_disk(struct gendisk *disk);
+-- 
+2.20.1
 
