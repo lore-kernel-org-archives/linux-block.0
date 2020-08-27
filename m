@@ -2,569 +2,150 @@ Return-Path: <SRS0=E5Vf=CF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B57CCC433E1
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 14:48:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F8D0C433E4
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 14:50:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CDE322B4B
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 14:48:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 719B622B4B
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 14:50:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="J2YzrWW5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UzPU2o8Z";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="n+X3CoY7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727993AbgH0Osx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Aug 2020 10:48:53 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:7066 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727780AbgH0N6U (ORCPT
+        id S1728218AbgH0OuK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Aug 2020 10:50:10 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:60056 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726894AbgH0Npl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Aug 2020 09:58:20 -0400
+        Thu, 27 Aug 2020 09:45:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1598536701; x=1630072701;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nWNzwf2i2SDo3KX81OQU8foELgzT/Y15wKfMoigYVUQ=;
-  b=J2YzrWW5b6LmkPPsCOGa4Z0WT3Nkdpos9gp7MT910Dz91YB0IR0hkzPo
-   jcbDyjv8MEoqtnHlh8XlXjJAS69ciZ/Z47WP9ei7G/sN36qt0VHnY7yCm
-   tTcNQ4NCns00zTJzF65YG0hVPVW4ETLvqho0NL42gnFWUIfLTUtzHOhlw
-   BZB+Sm0HeZ7zC7QVuV0B7ML268wxuJahN8UIdt0egVaVZ5mtXyiCprDxH
-   cqELjIOiDx+K0frO3GwxVlc/xq3dELqoUCB+X09xiKRDxn4FLB905NqST
-   vL03S/PDUI8jUV9tlEzONaUCFuDClIPRk6H+McvyGYaGEjHZzE+yUTOI9
-   A==;
-IronPort-SDR: L7pdeNwDTYbyK/aOPdyBDvdYlst0HNnWNXmI8xJ6oNUCUkXnsReg19D5ukJ2oAf19rLvvYO96o
- IiBImlEkrC3WgsX2J1ufR40aTUVGHIwV0jDMAFi7ff1eW2Z/Unpqi2PVJMv6RNtEFxjHQKwaaP
- LnR0nOvYghDOUyH5Yw4NGca1Z26tSdqFOEXweAM0efK+a0wDwen1fxh/TOIMO91OlImcqUAdcj
- oEH60u1b7vakpBWhwCZAPOJP6waedKzxeBwPfcH4zhU2SNUsw2dYB0yZpjAaQJXZ/HWw4/VlLz
- vcA=
+  t=1598535941; x=1630071941;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=akviaS+P70RNeG7SwRi/XIf2nVfV/oZr/bJ5NWuUj3o=;
+  b=UzPU2o8ZK9lhE6VFE9JLhllM1Tm3IdjnUwQEPQn4Iu5KVyAgVZi34I88
+   5KWOuqMXRwmmxCBzeLPQLf/IbF3kV05MsdqlPcW5XT5R/4l67JrlPX3io
+   qtMy6413b8GwVdwhWbFC+5vMDxpyJQDQoN/mFL6kfe+qoqswJ/1vfeW6u
+   taTsO4Qvf5NGwrU+RasiBlDqlrxZ3TbxvTvbyJbxkKIVjhUuwFi2DToKi
+   /nn5fj5ia0NTSmmXCQe1umjiq2+SHgcTvCj9NpR07UOEc1FOwSBkqSKUL
+   jujzcNoFxLQ0ysLznNFn1paM8Nj6ZsLkIT2yzAGvCb06VnYo5jo8h2NbJ
+   w==;
+IronPort-SDR: h1IePQS9kqy3peKeDSzTPaGC8Bz8/FRNvXAzPcUgOBmQyOmWXFLKd/BcKwbryePxJD2DuaGuuG
+ /uSfBtpGEnI+D68J/mHz9bcs07yvK2Th8Ve+/spd7HGdmkh+WAUyaRq76SI4dLe2a80WSZzNW9
+ 3FMrCvLip8j8EWyiw1ZUTwgxTzzF6Efo1PSbXlPl/ku04mD6//tCAIE21+u0juZw+aMRaER/5Z
+ x6AjbHMmqmsnbACdIY/8ot8fd5tbnBa7jU3wWervDlFuNZuarpw6IiJA5bsvbqoFzKyn9cQi7R
+ AOQ=
 X-IronPort-AV: E=Sophos;i="5.76,359,1592841600"; 
-   d="scan'208";a="150304894"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Aug 2020 21:50:30 +0800
-IronPort-SDR: 6fOHYBZtzH2WC42EWOL3qqcmBdPGJkFdmNEoor+Gpdnej51ISo9+h/D9hGNJBFTPd7bwYVBmHQ
- gGND1Znswh/w==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2020 06:38:02 -0700
-IronPort-SDR: 09OnLdp1tSe9GhMerQJBYbslIlTFD2/YYCuexs09hrpgfMXfwhzyRR1PKy9kr56ykL+UwCFgkv
- hzO1nwtsqSqw==
-WDCIronportException: Internal
-Received: from us23v6sf2.ad.shared (HELO localhost.hgst.com) ([10.86.59.168])
-  by uls-op-cesaip02.wdc.com with ESMTP; 27 Aug 2020 06:50:26 -0700
-From:   Niklas Cassel <niklas.cassel@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     damien.lemoal@wdc.com, johannes.thumshirn@wdc.com,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] null_blk: add support for max open/active zone limit for zoned devices
-Date:   Thu, 27 Aug 2020 15:50:18 +0200
-Message-Id: <20200827135018.63644-1-niklas.cassel@wdc.com>
-X-Mailer: git-send-email 2.26.2
+   d="scan'208";a="145975570"
+Received: from mail-co1nam11lp2169.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.169])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Aug 2020 21:45:12 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XM43MPI4GTaejlG2AeHikqCH3r4LYTUhjap991ayH3SqRuRW7kjHXenTd+VXW///d7doxtgQAOQcfV2MQ2cn3JOBEOF7Y1y/2hJqBWAZkcvdnEX57lIlyW9N9luL763gF7iZ5iAW3W4iLjfNCm1gvpCGoEoel93tz1lJwOdCCPhGmQMds4wOazBd17bw8Q4kOWwFuGgsSwQJkhzX8B2o2L1+YhYooKAh4VGDsRg/XC438b6n0gMBf9nPD76RBoSIRkYkbxDlIehyIQ2puKjFSjT4Lzt/uuEdQK07Koyiy+FokwQHwVNK9pb2xfWEL354Tk2h1MNLXQRdYOw42CT3FA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=akviaS+P70RNeG7SwRi/XIf2nVfV/oZr/bJ5NWuUj3o=;
+ b=GTE8oENyVlfBXh+rFytd9HBPKigJP0xZ7YhFpK1fgE0lz8cpkqhgPR5r3ra60AtsZhZCWTxwJGOwUZq47VDsuBJquv7ZMcXxwRujvFyF6PHsyWpA2aRVImt/rGWQp2B23MaGVurBiguYPUTseM8M72YzYEs+0IhIfuXbr+GTupM7aL7efT+sbsRoTw1b4sDO8DAxcp5aj3KYJXK5NjjnYX4DNGGRiEMGaho+Ptvmxg4QIlfWGt6Y3T+v9x/3u057w3ghJ+zhAPEXIf4lxUBcXKz6imhgrEd1zw7rEXF9u9U+yYfX5jy8jSyR1tqgzg6v9jnb0XcfDbIejXiU9fqp7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=akviaS+P70RNeG7SwRi/XIf2nVfV/oZr/bJ5NWuUj3o=;
+ b=n+X3CoY7uQ+EG1qDikmYJF5P4p2mRYrc7n5VFdLpD3Cg9Uov0feMEzfoSg+pgR1JG5UZBjCJYPumKfV1qlx65sM2Yd6AXOpSpWDWw70QsuaQqB0i6K3EZJ8PyvUgPtuI2BP05RhqH9u2s9LMOfJTamnCa4IFCzwAjfcOd/qaFw8=
+Received: from BN6PR04MB0724.namprd04.prod.outlook.com (2603:10b6:404:ce::23)
+ by BN6PR04MB0933.namprd04.prod.outlook.com (2603:10b6:405:3e::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Thu, 27 Aug
+ 2020 13:45:11 +0000
+Received: from BN6PR04MB0724.namprd04.prod.outlook.com
+ ([fe80::cd08:5da9:34ed:4ec4]) by BN6PR04MB0724.namprd04.prod.outlook.com
+ ([fe80::cd08:5da9:34ed:4ec4%2]) with mapi id 15.20.3305.032; Thu, 27 Aug 2020
+ 13:45:11 +0000
+From:   Niklas Cassel <Niklas.Cassel@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] null_blk: add support for max open/active zone limit for
+ zoned devices
+Thread-Topic: [PATCH] null_blk: add support for max open/active zone limit for
+ zoned devices
+Thread-Index: AQHWetp4dfc0OXrFHkmHJcJ6rQ91L6lL+tmA
+Date:   Thu, 27 Aug 2020 13:45:11 +0000
+Message-ID: <20200827134509.GA62540@localhost.localdomain>
+References: <20200825122244.126129-1-niklas.cassel@wdc.com>
+ <CY4PR04MB37518DF84867B6E8573A13B0E7570@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <CY4PR04MB3751304895558D34A8EE8DB1E7570@CY4PR04MB3751.namprd04.prod.outlook.com>
+In-Reply-To: <CY4PR04MB3751304895558D34A8EE8DB1E7570@CY4PR04MB3751.namprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [85.224.200.150]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: f0b1b285-2578-4f24-ca99-08d84a8f6b64
+x-ms-traffictypediagnostic: BN6PR04MB0933:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN6PR04MB0933C6018CC1C645B9EDD5B6F2550@BN6PR04MB0933.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: GZpydKrgDcj89+a0MW7v8WlkLiXQ/LEYgIyLjkOMpp2jGuUqKBrlvj01DXy9Lff577q+TPEa+O46INjk+90NqawpCO0zze6PeVKcPQ9S7+/m4QXpkkmMSyxu5QiPc6HeGn8FC9XhEa2rkqymrcFH4OEIsmEsUkk25m+HV+NE4NRrqk+vYJDqaJNtN8vhH4+ML/gvSTzadB37dI08yQop6ARGAPM9/uAnVT5P7vokTXbw8BIvD+ogZE9QmFmntn/W/34C2CLL5VJnUFBLxfGOy7hCFCkcZoCB2emnQdQuTK2gttN+4NWr1vJCFgaAs3+2XAO3g4wWwqa93864W6YIhg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR04MB0724.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(366004)(396003)(376002)(136003)(6512007)(8936002)(8676002)(6862004)(6636002)(76116006)(478600001)(9686003)(5660300002)(64756008)(66556008)(71200400001)(1076003)(6486002)(66946007)(66476007)(66446008)(91956017)(2906002)(4744005)(86362001)(33656002)(316002)(186003)(6506007)(53546011)(26005)(4326008)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: wZt+H5ljt3riQ5BH897XSRXAGbQ6cmuqBg5Tnz8Cpinf4Tmkm7yrW4vdZwZqNEVjkCdcnJiuwvkE8OGbA+428nics8kcdyIMYLPEHMc78cD09X2dSCUwOcPprrYWm5rCalT1TqUywDtY3zMAoL//DAc/y26DKu7s/Sym/TPmX0Bj4WzTXBNajuEd3btByEAEVWuRQxsYjqANuXrHELHYIt1EHl5YPh1yDYtKPHa2NSQzyrnPp0tEFLTVQf8XtiKYu7cVEG1W4ITvzGUnrscIVaZDaWCzoYpOu7j8/TZkYVc3/n3L7aDGiUWx++GybRn3hkLk0un9g/PPU2cKFx292290PP3RE3m4KTtAAuwzZ+eOgYWJmUrMgIXWpqbh3b5MTNdKQ4rzqIaKR+6o46uaaniMJw6rhjmHV/oDydEmqa7hE/E2mTPAKhdGIyZ5sSw2cM+ymAy5mbswrqZwD2S3F8TUitYQP/R48Iab0NSV+pAlXHRnHcMEhd3b7ifVssPCeNWDCejM3o/sdQO0FfaH9p5Q/jAx7TQgdJbnQAfY6vFuosmnwY0pi54VxQf9CQbHh+yAraHuRUUTtZxrNskRxfZFX+VnkHWd+mWp9uDKZ+qL9ko/0SE/sNWOxCyvSJRpmp/Oqt4+ijw+df+NoN/+Mw==
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <B2752D27D41D6A4893B977C6173741CF@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN6PR04MB0724.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0b1b285-2578-4f24-ca99-08d84a8f6b64
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Aug 2020 13:45:11.3292
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KHtKpf5z0xyoc/2mh5oDFSZQ1Aj3mTG5U2LosPo7XnT89zPU1Cp6trQKKoTF4GsHIsQ47U97GwpvQgDCRK1fOg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR04MB0933
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add support for user space to set a max open zone and a max active zone
-limit via configfs. By default, the default values are 0 == no limit.
+On Tue, Aug 25, 2020 at 11:03:58PM +0000, Damien Le Moal wrote:
+> On 2020/08/26 7:52, Damien Le Moal wrote:
+> > On 2020/08/25 21:22, Niklas Cassel wrote:
 
-Call the block layer API functions used for exposing the configured
-limits to sysfs.
+(snip)
 
-Add accounting in null_blk_zoned so that these new limits are respected.
-Performing an operating that would exceed these limits results in a
-standard I/O error.
+> Arg. No, you can't. There is the trace call after the switch. So please i=
+gnore
+> this comment :)
+>=20
+> But you can still avoid repeating the "if (ret !=3D BLK_STS_OK) return re=
+t;" by
+> calling the trace only for BLK_STS_OK and returning ret at the end.
 
-A max open zone limit exists in the ZBC standard.
-While null_blk_zoned is used to test the Zoned Block Device model in
-Linux, when it comes to differences between ZBC and ZNS, null_blk_zoned
-mostly follows ZBC.
+Agreed.
 
-Therefore, implement the manage open zone resources function from ZBC,
-but additionally add support for max active zones.
-This enables user space not only to test against a device with an open
-zone limit, but also to test against a device with an active zone limit.
+Thank you for your review comments, much appreciated.
 
-Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
----
-Changes since v1:
--Fixed review comments by Damien Le Moal.
+Will send out a V2 shortly.
 
- drivers/block/null_blk.h       |   5 +
- drivers/block/null_blk_main.c  |  16 +-
- drivers/block/null_blk_zoned.c | 319 +++++++++++++++++++++++++++------
- 3 files changed, 282 insertions(+), 58 deletions(-)
 
-diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
-index daed4a9c34367..d2e7db43a52a7 100644
---- a/drivers/block/null_blk.h
-+++ b/drivers/block/null_blk.h
-@@ -42,6 +42,9 @@ struct nullb_device {
- 	struct badblocks badblocks;
- 
- 	unsigned int nr_zones;
-+	unsigned int nr_zones_imp_open;
-+	unsigned int nr_zones_exp_open;
-+	unsigned int nr_zones_closed;
- 	struct blk_zone *zones;
- 	sector_t zone_size_sects;
- 
-@@ -51,6 +54,8 @@ struct nullb_device {
- 	unsigned long zone_size; /* zone size in MB if device is zoned */
- 	unsigned long zone_capacity; /* zone capacity in MB if device is zoned */
- 	unsigned int zone_nr_conv; /* number of conventional zones */
-+	unsigned int zone_max_open; /* max number of open zones */
-+	unsigned int zone_max_active; /* max number of active zones */
- 	unsigned int submit_queues; /* number of submission queues */
- 	unsigned int home_node; /* home node for the device */
- 	unsigned int queue_mode; /* block interface */
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index d74443a9c8fa2..53161a418611b 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -208,6 +208,14 @@ static unsigned int g_zone_nr_conv;
- module_param_named(zone_nr_conv, g_zone_nr_conv, uint, 0444);
- MODULE_PARM_DESC(zone_nr_conv, "Number of conventional zones when block device is zoned. Default: 0");
- 
-+static unsigned int g_zone_max_open;
-+module_param_named(zone_max_open, g_zone_max_open, uint, 0444);
-+MODULE_PARM_DESC(zone_max_open, "Maximum number of open zones when block device is zoned. Default: 0 (no limit)");
-+
-+static unsigned int g_zone_max_active;
-+module_param_named(zone_max_active, g_zone_max_active, uint, 0444);
-+MODULE_PARM_DESC(zone_max_active, "Maximum number of active zones when block device is zoned. Default: 0 (no limit)");
-+
- static struct nullb_device *null_alloc_dev(void);
- static void null_free_dev(struct nullb_device *dev);
- static void null_del_dev(struct nullb *nullb);
-@@ -347,6 +355,8 @@ NULLB_DEVICE_ATTR(zoned, bool, NULL);
- NULLB_DEVICE_ATTR(zone_size, ulong, NULL);
- NULLB_DEVICE_ATTR(zone_capacity, ulong, NULL);
- NULLB_DEVICE_ATTR(zone_nr_conv, uint, NULL);
-+NULLB_DEVICE_ATTR(zone_max_open, uint, NULL);
-+NULLB_DEVICE_ATTR(zone_max_active, uint, NULL);
- 
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
- {
-@@ -464,6 +474,8 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_zone_size,
- 	&nullb_device_attr_zone_capacity,
- 	&nullb_device_attr_zone_nr_conv,
-+	&nullb_device_attr_zone_max_open,
-+	&nullb_device_attr_zone_max_active,
- 	NULL,
- };
- 
-@@ -517,7 +529,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
- {
- 	return snprintf(page, PAGE_SIZE,
--			"memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size,zone_capacity,zone_nr_conv\n");
-+			"memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size,zone_capacity,zone_nr_conv,zone_max_open,zone_max_active\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -580,6 +592,8 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->zone_size = g_zone_size;
- 	dev->zone_capacity = g_zone_capacity;
- 	dev->zone_nr_conv = g_zone_nr_conv;
-+	dev->zone_max_open = g_zone_max_open;
-+	dev->zone_max_active = g_zone_max_active;
- 	return dev;
- }
- 
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index 3d25c9ad23831..e7e341e811fbf 100644
---- a/drivers/block/null_blk_zoned.c
-+++ b/drivers/block/null_blk_zoned.c
-@@ -51,6 +51,22 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
- 			dev->zone_nr_conv);
- 	}
- 
-+	/* Max active zones has to be < nbr of seq zones in order to be enforceable */
-+	if (dev->zone_max_active >= dev->nr_zones - dev->zone_nr_conv) {
-+		dev->zone_max_active = 0;
-+		pr_info("zone_max_active limit disabled, limit >= zone count\n");
-+	}
-+
-+	/* Max open zones has to be <= max active zones */
-+	if (dev->zone_max_active && dev->zone_max_open > dev->zone_max_active) {
-+		dev->zone_max_open = dev->zone_max_active;
-+		pr_info("changed the maximum number of open zones to %u\n",
-+			dev->nr_zones);
-+	} else if (dev->zone_max_open >= dev->nr_zones - dev->zone_nr_conv) {
-+		dev->zone_max_open = 0;
-+		pr_info("zone_max_open limit disabled, limit >= zone count\n");
-+	}
-+
- 	for (i = 0; i <  dev->zone_nr_conv; i++) {
- 		struct blk_zone *zone = &dev->zones[i];
- 
-@@ -99,6 +115,8 @@ int null_register_zoned_dev(struct nullb *nullb)
- 	}
- 
- 	blk_queue_max_zone_append_sectors(q, dev->zone_size_sects);
-+	blk_queue_max_open_zones(q, dev->zone_max_open);
-+	blk_queue_max_active_zones(q, dev->zone_max_active);
- 
- 	return 0;
- }
-@@ -159,6 +177,103 @@ size_t null_zone_valid_read_len(struct nullb *nullb,
- 	return (zone->wp - sector) << SECTOR_SHIFT;
- }
- 
-+static blk_status_t null_close_zone(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return BLK_STS_IOERR;
-+
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_CLOSED:
-+		/* close operation on closed is not an error */
-+		return BLK_STS_OK;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		dev->nr_zones_exp_open--;
-+		break;
-+	case BLK_ZONE_COND_EMPTY:
-+	case BLK_ZONE_COND_FULL:
-+	default:
-+		return BLK_STS_IOERR;
-+	}
-+
-+	if (zone->wp == zone->start) {
-+		zone->cond = BLK_ZONE_COND_EMPTY;
-+	} else {
-+		zone->cond = BLK_ZONE_COND_CLOSED;
-+		dev->nr_zones_closed++;
-+	}
-+
-+	return BLK_STS_OK;
-+}
-+
-+static void null_close_first_imp_zone(struct nullb_device *dev)
-+{
-+	unsigned int i;
-+
-+	for (i = dev->zone_nr_conv; i < dev->nr_zones; i++) {
-+		if (dev->zones[i].cond == BLK_ZONE_COND_IMP_OPEN) {
-+			null_close_zone(dev, &dev->zones[i]);
-+			return;
-+		}
-+	}
-+}
-+
-+static bool null_can_set_active(struct nullb_device *dev)
-+{
-+	if (!dev->zone_max_active)
-+		return true;
-+
-+	return dev->nr_zones_exp_open + dev->nr_zones_imp_open +
-+	       dev->nr_zones_closed < dev->zone_max_active;
-+}
-+
-+static bool null_can_open(struct nullb_device *dev)
-+{
-+	if (!dev->zone_max_open)
-+		return true;
-+
-+	if (dev->nr_zones_exp_open + dev->nr_zones_imp_open < dev->zone_max_open)
-+		return true;
-+
-+	if (dev->nr_zones_imp_open && null_can_set_active(dev)) {
-+		null_close_first_imp_zone(dev);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+/*
-+ * This function matches the manage open zone resources function in the ZBC standard,
-+ * with the addition of max active zones support (added in the ZNS standard).
-+ *
-+ * The function determines if a zone can transition to implicit open or explicit open,
-+ * while maintaining the max open zone (and max active zone) limit(s). It may close an
-+ * implicit open zone in order to make additional zone resources available.
-+ *
-+ * ZBC states that an implicit open zone shall be closed only if there is not
-+ * room within the open limit. However, with the addition of an active limit,
-+ * it is not certain that closing an implicit open zone will allow a new zone
-+ * to be opened, since we might already be at the active limit capacity.
-+ */
-+static bool null_manage_zone_resources(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_EMPTY:
-+		if (!null_can_set_active(dev))
-+			return false;
-+		fallthrough;
-+	case BLK_ZONE_COND_CLOSED:
-+		return null_can_open(dev);
-+	default:
-+		/* Should never be called for other states */
-+		WARN_ON(1);
-+		return false;
-+	}
-+}
-+
- static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 				    unsigned int nr_sectors, bool append)
- {
-@@ -177,43 +292,155 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 		/* Cannot write to a full zone */
- 		return BLK_STS_IOERR;
- 	case BLK_ZONE_COND_EMPTY:
-+	case BLK_ZONE_COND_CLOSED:
-+		if (!null_manage_zone_resources(dev, zone))
-+			return BLK_STS_IOERR;
-+		break;
- 	case BLK_ZONE_COND_IMP_OPEN:
- 	case BLK_ZONE_COND_EXP_OPEN:
-+		break;
-+	default:
-+		/* Invalid zone condition */
-+		return BLK_STS_IOERR;
-+	}
-+
-+	/*
-+	 * Regular writes must be at the write pointer position.
-+	 * Zone append writes are automatically issued at the write
-+	 * pointer and the position returned using the request or BIO
-+	 * sector.
-+	 */
-+	if (append) {
-+		sector = zone->wp;
-+		if (cmd->bio)
-+			cmd->bio->bi_iter.bi_sector = sector;
-+		else
-+			cmd->rq->__sector = sector;
-+	} else if (sector != zone->wp) {
-+		return BLK_STS_IOERR;
-+	}
-+
-+	if (zone->wp + nr_sectors > zone->start + zone->capacity)
-+		return BLK_STS_IOERR;
-+
-+	if (zone->cond == BLK_ZONE_COND_CLOSED) {
-+		dev->nr_zones_closed--;
-+		dev->nr_zones_imp_open++;
-+	} else if (zone->cond == BLK_ZONE_COND_EMPTY) {
-+		dev->nr_zones_imp_open++;
-+	}
-+	if (zone->cond != BLK_ZONE_COND_EXP_OPEN)
-+		zone->cond = BLK_ZONE_COND_IMP_OPEN;
-+
-+	ret = null_process_cmd(cmd, REQ_OP_WRITE, sector, nr_sectors);
-+	if (ret != BLK_STS_OK)
-+		return ret;
-+
-+	zone->wp += nr_sectors;
-+	if (zone->wp == zone->start + zone->capacity) {
-+		if (zone->cond == BLK_ZONE_COND_EXP_OPEN)
-+			dev->nr_zones_exp_open--;
-+		else if (zone->cond == BLK_ZONE_COND_IMP_OPEN)
-+			dev->nr_zones_imp_open--;
-+		zone->cond = BLK_ZONE_COND_FULL;
-+	}
-+	return BLK_STS_OK;
-+}
-+
-+static blk_status_t null_open_zone(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return BLK_STS_IOERR;
-+
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		/* open operation on exp open is not an error */
-+		return BLK_STS_OK;
-+	case BLK_ZONE_COND_EMPTY:
-+		if (!null_manage_zone_resources(dev, zone))
-+			return BLK_STS_IOERR;
-+		break;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
- 	case BLK_ZONE_COND_CLOSED:
--		/*
--		 * Regular writes must be at the write pointer position.
--		 * Zone append writes are automatically issued at the write
--		 * pointer and the position returned using the request or BIO
--		 * sector.
--		 */
--		if (append) {
--			sector = zone->wp;
--			if (cmd->bio)
--				cmd->bio->bi_iter.bi_sector = sector;
--			else
--				cmd->rq->__sector = sector;
--		} else if (sector != zone->wp) {
-+		if (!null_manage_zone_resources(dev, zone))
- 			return BLK_STS_IOERR;
--		}
-+		dev->nr_zones_closed--;
-+		break;
-+	case BLK_ZONE_COND_FULL:
-+	default:
-+		return BLK_STS_IOERR;
-+	}
-+
-+	zone->cond = BLK_ZONE_COND_EXP_OPEN;
-+	dev->nr_zones_exp_open++;
- 
--		if (zone->wp + nr_sectors > zone->start + zone->capacity)
-+	return BLK_STS_OK;
-+}
-+
-+static blk_status_t null_finish_zone(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return BLK_STS_IOERR;
-+
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_FULL:
-+		/* finish operation on full is not an error */
-+		return BLK_STS_OK;
-+	case BLK_ZONE_COND_EMPTY:
-+		if (!null_manage_zone_resources(dev, zone))
- 			return BLK_STS_IOERR;
-+		break;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		dev->nr_zones_exp_open--;
-+		break;
-+	case BLK_ZONE_COND_CLOSED:
-+		if (!null_manage_zone_resources(dev, zone))
-+			return BLK_STS_IOERR;
-+		dev->nr_zones_closed--;
-+		break;
-+	default:
-+		return BLK_STS_IOERR;
-+	}
- 
--		if (zone->cond != BLK_ZONE_COND_EXP_OPEN)
--			zone->cond = BLK_ZONE_COND_IMP_OPEN;
-+	zone->cond = BLK_ZONE_COND_FULL;
-+	zone->wp = zone->start + zone->len;
- 
--		ret = null_process_cmd(cmd, REQ_OP_WRITE, sector, nr_sectors);
--		if (ret != BLK_STS_OK)
--			return ret;
-+	return BLK_STS_OK;
-+}
-+
-+static blk_status_t null_reset_zone(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return BLK_STS_IOERR;
- 
--		zone->wp += nr_sectors;
--		if (zone->wp == zone->start + zone->capacity)
--			zone->cond = BLK_ZONE_COND_FULL;
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_EMPTY:
-+		/* reset operation on empty is not an error */
- 		return BLK_STS_OK;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		dev->nr_zones_exp_open--;
-+		break;
-+	case BLK_ZONE_COND_CLOSED:
-+		dev->nr_zones_closed--;
-+		break;
-+	case BLK_ZONE_COND_FULL:
-+		break;
- 	default:
--		/* Invalid zone condition */
- 		return BLK_STS_IOERR;
- 	}
-+
-+	zone->cond = BLK_ZONE_COND_EMPTY;
-+	zone->wp = zone->start;
-+
-+	return BLK_STS_OK;
- }
- 
- static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_opf op,
-@@ -222,56 +449,34 @@ static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_opf op,
- 	struct nullb_device *dev = cmd->nq->dev;
- 	unsigned int zone_no = null_zone_no(dev, sector);
- 	struct blk_zone *zone = &dev->zones[zone_no];
-+	blk_status_t ret = BLK_STS_OK;
- 	size_t i;
- 
- 	switch (op) {
- 	case REQ_OP_ZONE_RESET_ALL:
--		for (i = 0; i < dev->nr_zones; i++) {
--			if (zone[i].type == BLK_ZONE_TYPE_CONVENTIONAL)
--				continue;
--			zone[i].cond = BLK_ZONE_COND_EMPTY;
--			zone[i].wp = zone[i].start;
--		}
-+		for (i = dev->zone_nr_conv; i < dev->nr_zones; i++)
-+			null_reset_zone(dev, &dev->zones[i]);
- 		break;
- 	case REQ_OP_ZONE_RESET:
--		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--			return BLK_STS_IOERR;
--
--		zone->cond = BLK_ZONE_COND_EMPTY;
--		zone->wp = zone->start;
-+		ret = null_reset_zone(dev, zone);
- 		break;
- 	case REQ_OP_ZONE_OPEN:
--		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--			return BLK_STS_IOERR;
--		if (zone->cond == BLK_ZONE_COND_FULL)
--			return BLK_STS_IOERR;
--
--		zone->cond = BLK_ZONE_COND_EXP_OPEN;
-+		ret = null_open_zone(dev, zone);
- 		break;
- 	case REQ_OP_ZONE_CLOSE:
--		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--			return BLK_STS_IOERR;
--		if (zone->cond == BLK_ZONE_COND_FULL)
--			return BLK_STS_IOERR;
--
--		if (zone->wp == zone->start)
--			zone->cond = BLK_ZONE_COND_EMPTY;
--		else
--			zone->cond = BLK_ZONE_COND_CLOSED;
-+		ret = null_close_zone(dev, zone);
- 		break;
- 	case REQ_OP_ZONE_FINISH:
--		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--			return BLK_STS_IOERR;
--
--		zone->cond = BLK_ZONE_COND_FULL;
--		zone->wp = zone->start + zone->len;
-+		ret = null_finish_zone(dev, zone);
- 		break;
- 	default:
- 		return BLK_STS_NOTSUPP;
- 	}
- 
--	trace_nullb_zone_op(cmd, zone_no, zone->cond);
--	return BLK_STS_OK;
-+	if (ret == BLK_STS_OK)
-+		trace_nullb_zone_op(cmd, zone_no, zone->cond);
-+
-+	return ret;
- }
- 
- blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_opf op,
--- 
-2.26.2
-
+Kind regards,
+Niklas=
