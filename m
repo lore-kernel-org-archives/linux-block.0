@@ -2,55 +2,55 @@ Return-Path: <SRS0=E5Vf=CF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22312C433E3
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 14:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D649C433E3
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 14:52:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CFA922CF8
-	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 14:51:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C1132054F
+	for <linux-block@archiver.kernel.org>; Thu, 27 Aug 2020 14:52:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="zJeJtPAj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727864AbgH0OvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Aug 2020 10:51:24 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:62448 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727824AbgH0N2S (ORCPT
+        id S1728020AbgH0Ovr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Aug 2020 10:51:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727906AbgH0Ovq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Aug 2020 09:28:18 -0400
-Received: from fsav402.sakura.ne.jp (fsav402.sakura.ne.jp [133.242.250.101])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 07RDRrPG009820;
-        Thu, 27 Aug 2020 22:27:53 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav402.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav402.sakura.ne.jp);
- Thu, 27 Aug 2020 22:27:53 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav402.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 07RDRqQU009816
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO);
-        Thu, 27 Aug 2020 22:27:53 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH] block: allow for_each_bvec to support zero len bvec
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        David Howells <dhowells@redhat.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-References: <20200810031915.2209658-1-ming.lei@redhat.com>
- <db57f8ca-b3c3-76ec-1e49-d8f8161ba78d@i-love.sakura.ne.jp>
- <20200810162331.GA2215158@T590>
- <4ec1b96f-b23c-6f9c-2dc1-8c3d47689a77@i-love.sakura.ne.jp>
-Message-ID: <cf26a57e-01f4-32a9-0b2c-9102bffe76b2@i-love.sakura.ne.jp>
-Date:   Thu, 27 Aug 2020 22:27:47 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101
+        Thu, 27 Aug 2020 10:51:46 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F02ACC061264;
+        Thu, 27 Aug 2020 07:51:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=CXo1VsNJMnumrlPogWjBzw/zPcnBvymTjxJVEjV9DV8=; b=zJeJtPAjIfwokijM3k3lS2EFrm
+        p9b5Je7DxKqNlk4czOD+QNZUCgF5kKnpUWj0iQiV8X9efsyedLsuRlOLEEIxaRVC3qtB1UZU8eTIo
+        f5FTAHewB3b+83F7e2HolU51i5Hxr25cV7RlGmTPHLJQwLbjOxid5eDC51q5OOmzIrUFiChw+gBl3
+        riyvif8xmDNzt3vRE2YCjf8JJJ51SPyNvpVmOx0TZIVr7JemYwDbUiDS8fCgJfWKa97RtmQtzhius
+        3YQ2HkBL3/4rWTd6I55RDITc7Y2/JJdWKJ4B+7sYH7q56rXJGcqQb7ZHnP1P9Df9IO54dLGAYRJOR
+        v3JnR6og==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kBJFf-0007Dp-1X; Thu, 27 Aug 2020 14:51:43 +0000
+Subject: Re: [PATCH v2] null_blk: add support for max open/active zone limit
+ for zoned devices
+To:     Niklas Cassel <niklas.cassel@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     damien.lemoal@wdc.com, johannes.thumshirn@wdc.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200827135018.63644-1-niklas.cassel@wdc.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <6d9fb163-f9d9-1f2d-d88c-db9d3a6185b4@infradead.org>
+Date:   Thu, 27 Aug 2020 07:51:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <4ec1b96f-b23c-6f9c-2dc1-8c3d47689a77@i-love.sakura.ne.jp>
+In-Reply-To: <20200827135018.63644-1-niklas.cassel@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -59,59 +59,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens or Al, will you pick up
-"[PATCH V2] block: allow for_each_bvec to support zero len bvec"
-( https://lkml.kernel.org/r/20200817100055.2495905-1-ming.lei@redhat.com )
-which needs be backported to 5.5+ kernels in order to avoid DoS attack
-by a local unprivileged user.
+On 8/27/20 6:50 AM, Niklas Cassel wrote:
+> Add support for user space to set a max open zone and a max active zone
+> limit via configfs. By default, the default values are 0 == no limit.
 
-David, is the patch show below (which should be backported to 5.5+ kernels)
-correct? Is splice_from_pipe_next() the better location to check?
-Are there other consumers which needs to do the same thing?
+Hi,
 
-From 60c3e828f9d8279752865d80411c9b19dbe5c35c Mon Sep 17 00:00:00 2001
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Date: Thu, 27 Aug 2020 22:17:02 +0900
-Subject: [PATCH] splice: fix premature end of input detection
+How does a user find out about how to use/set these limits?
 
-splice() from pipe should return 0 when there is no pipe writer. However,
-since commit a194dfe6e6f6f720 ("pipe: Rearrange sequence in pipe_write()
-to preallocate slot") started inserting empty pages, splice() from pipe
-also returns 0 when all ready buffers are empty pages. Since such behavior
-might confuse splice() users, let's fix it by waiting for non-empty pages
-before building the vector.
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Fixes: a194dfe6e6f6f720 ("pipe: Rearrange sequence in pipe_write() to preallocate slot")
-Cc: stable@vger.kernel.org # 5.5+
----
- fs/splice.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+> Call the block layer API functions used for exposing the configured
+> limits to sysfs.
+> 
+> Add accounting in null_blk_zoned so that these new limits are respected.
+> Performing an operating that would exceed these limits results in a
+> standard I/O error.
+> 
+> A max open zone limit exists in the ZBC standard.
+> While null_blk_zoned is used to test the Zoned Block Device model in
+> Linux, when it comes to differences between ZBC and ZNS, null_blk_zoned
+> mostly follows ZBC.
+> 
+> Therefore, implement the manage open zone resources function from ZBC,
+> but additionally add support for max active zones.
+> This enables user space not only to test against a device with an open
+> zone limit, but also to test against a device with an active zone limit.
+> 
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> ---
+> Changes since v1:
+> -Fixed review comments by Damien Le Moal.
+> 
+>  drivers/block/null_blk.h       |   5 +
+>  drivers/block/null_blk_main.c  |  16 +-
+>  drivers/block/null_blk_zoned.c | 319 +++++++++++++++++++++++++++------
+>  3 files changed, 282 insertions(+), 58 deletions(-)
 
-diff --git a/fs/splice.c b/fs/splice.c
-index d7c8a7c4db07..52daa5fea879 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -724,6 +724,19 @@ iter_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
- 		tail = pipe->tail;
- 		mask = pipe->ring_size - 1;
- 
-+		/* dismiss the empty buffers */
-+		while (!pipe_empty(head, tail)) {
-+			struct pipe_buffer *buf = &pipe->bufs[tail & mask];
-+
-+			if (likely(buf->len))
-+				break;
-+			pipe_buf_release(pipe, buf);
-+			pipe->tail = ++tail;
-+		}
-+		/* wait again if all buffers were empty */
-+		if (unlikely(pipe_empty(head, tail)))
-+			continue;
-+
- 		/* build the vector */
- 		left = sd.total_len;
- 		for (n = 0; !pipe_empty(head, tail) && left && n < nbufs; tail++, n++) {
+thanks.
 -- 
-2.18.4
+~Randy
 
