@@ -2,123 +2,163 @@ Return-Path: <SRS0=Mrne=CG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F95C433E2
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 17:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B319C433E2
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 18:01:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF01620B80
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 17:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65C4B2098B
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 18:01:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hR95Cgrd"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="n2SN5LrK";
+	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="MLYGJa5s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726677AbgH1RKY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Aug 2020 13:10:24 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:47448 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726524AbgH1RKY (ORCPT
+        id S1727041AbgH1SBT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Aug 2020 14:01:19 -0400
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:2526 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726010AbgH1SBP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Aug 2020 13:10:24 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07SGtQN5100452;
-        Fri, 28 Aug 2020 17:10:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2020-01-29; bh=vamxKMuvZ3cN/ZFAZ1LYkc6X/ddmGQFVCg25Sq0cwNs=;
- b=hR95Cgrdo883OoUoVl3/d3q8hSnhL0InIpbwRIhUjIQVkJTGwvdB1Otl6SJ4KrjTuZ/C
- 8iS/6S16OzpA8IFtp+dyn4EYAi9vP3bRDqnK6+d9lmFCTCW/XYXw7bdmjogL5CrX15m5
- mGkr49Hn51MO7OXQx+STYULoDyB+5axTPhYW7IZ8rpeAMirain94MEALi4pcLO447G7h
- rhCMo3sZjERNzFPlahGr7mWbnJCC289JtABYn+1BP9+OrwmIgFa2Y17hwsmdzMiObpN5
- aqWPdgdAcMEnRSfjm1TAuy0Rep486wvmJGiznECyI9+X319/kJaylcQiUSw2Yf4XQYC3 bA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 336ht3n5mx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 28 Aug 2020 17:10:21 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07SGpUIG076824;
-        Fri, 28 Aug 2020 17:10:21 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 333r9ptksn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Aug 2020 17:10:20 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07SHAJRI019686;
-        Fri, 28 Aug 2020 17:10:20 GMT
-Received: from dhcp-10-159-135-178.vpn.oracle.com (/10.159.135.178)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 28 Aug 2020 10:10:19 -0700
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.15\))
-Subject: Re: [PATCH 1/2] block: Return blk_status_t instead of errno codes
-From:   Ritika Srivastava <RITIKA.SRIVASTAVA@ORACLE.COM>
-In-Reply-To: <d5c2818f-ed6e-e8ff-709d-ecc4858ff4de@kernel.dk>
-Date:   Fri, 28 Aug 2020 10:10:18 -0700
-Cc:     linux-block@vger.kernel.org
+        Fri, 28 Aug 2020 14:01:15 -0400
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07SI0xcM022220;
+        Fri, 28 Aug 2020 11:01:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type : content-id
+ : content-transfer-encoding : mime-version; s=facebook;
+ bh=npal+0BhmmMN5hR+X8cdbdh7b4qEH9vnJZjPALKATOg=;
+ b=n2SN5LrKF+LeSzsRznTyvIY03Zt6u1Bf0T7lLHhsG/UgtDSGAXP0cuFs+YfXe7EdJ887
+ WwXNQsUZXXeQb4i48EeT2K9y8Dt8+MEksI1xpZWb0/lGc4gRDDVG+5/8bObSefvVe7PI
+ nVEuyIq0qeQQzmvh6Qa6iWRfHLNDjpae7GM= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com with ESMTP id 335up8c8cp-3
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Fri, 28 Aug 2020 11:01:01 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (100.104.98.9) by
+ o365-in.thefacebook.com (100.104.94.199) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1979.3; Fri, 28 Aug 2020 11:00:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bSnYR8suX25SJwXi2pYIXv/0vqPMO9tR+sTXCSi94FAAq89Jkgp8DXxSQjrlzm+0mLhB+8iMyoI6xyu1+JiyxtJ0/xRPNZdx6VUIVh1VwN+CcAgYOwfkpzywLL7vtRxijFqxtuqjhjO+erwMqqpmNmj9D3Eqm1W01GHpXBBs8VChJ4O6BXK2wcQuL2JXuCIP4JbqIhjfAbx6MXLL2Ui7bt7U6285mBUGpLEmJtuD3ZiqeLjNzUqrPpoIa+lUv04HubIKnZPkguGb2CgxTwlwHZFrJf6QSsEHOK+b6JPoZN9yX1lMY11aDnQR6yof0eB5LCvJGXzw5D1RzJmBDvIQfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=npal+0BhmmMN5hR+X8cdbdh7b4qEH9vnJZjPALKATOg=;
+ b=T28vQFKyHHjy7hjvjH3ukS16LMDr8kFn8ejP+J0LDBxGqgJbov5uvfoWHIk6kNQ5bAIDXPhChy9iZOxTCo0YNsoJrtp7ClOSFJJ5n7EUL7jR0bKBUF2hmcNqeIWC+6UnMxJ0XHDMheZvoUrdOwqXMUXcfD3Ml4LCeA0uVFXsXy2MGE/lFPIp2J8xHvV54S1/HrZCbEIChJD5ursHwIcr9s51hRoteNxV/QWFPGIVdlO+of9EmAYap1oXuEl9W12cJkIYQ2UBTEcB8on001gWHlS6UTfGBoY2ciQiNXsdei3hesrjebmDfuJyKLfq3z4+HJY5cdzRgAG+eQgxB/r7pQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
+ header.d=fb.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
+ s=selector2-fb-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=npal+0BhmmMN5hR+X8cdbdh7b4qEH9vnJZjPALKATOg=;
+ b=MLYGJa5s8d4vPokOrn8yZEWWAm+SNdE+koFDXvsnwaaySJPc6aHXI6SejU5TaqWAqptjYs5Im+tCo7t89eQ9dGqdO9jDBhLa6X7WPc3ccg+BNbD/onirRpbF67eGEJCwww1wgEbv5Qzeg29bdxfNNpWZvSlw+cT4E4MhYSuQnFY=
+Received: from BYAPR15MB2999.namprd15.prod.outlook.com (2603:10b6:a03:fa::12)
+ by BYAPR15MB2728.namprd15.prod.outlook.com (2603:10b6:a03:14c::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.21; Fri, 28 Aug
+ 2020 18:00:54 +0000
+Received: from BYAPR15MB2999.namprd15.prod.outlook.com
+ ([fe80::1400:be2f:8b3d:8f4d]) by BYAPR15MB2999.namprd15.prod.outlook.com
+ ([fe80::1400:be2f:8b3d:8f4d%7]) with mapi id 15.20.3326.023; Fri, 28 Aug 2020
+ 18:00:54 +0000
+From:   Song Liu <songliubraving@fb.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+CC:     Coly Li <colyli@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        Kernel Team <Kernel-team@fb.com>, Song Liu <song@kernel.org>
+Subject: Re: [PATCH v2 0/3] block: improve iostat for md/bcache partitions
+Thread-Topic: [PATCH v2 0/3] block: improve iostat for md/bcache partitions
+Thread-Index: AQHWda67Sg7bLs6JS0apFNQ8Go++eKlN3veA
+Date:   Fri, 28 Aug 2020 18:00:53 +0000
+Message-ID: <2A15441E-7812-47FA-A3B4-41E8E38AFBC6@fb.com>
+References: <20200818222645.952219-1-songliubraving@fb.com>
+In-Reply-To: <20200818222645.952219-1-songliubraving@fb.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3608.120.23.2.1)
+authentication-results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=fb.com;
+x-originating-ip: [2620:10d:c090:400::5:858a]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bf89bb87-d089-4312-4e66-08d84b7c4eba
+x-ms-traffictypediagnostic: BYAPR15MB2728:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR15MB27289E870C48096DFD3D5A62B3520@BYAPR15MB2728.namprd15.prod.outlook.com>
+x-fb-source: Internal
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4PwKUzQViTD6sv49EuOH8SAhaVM1SZQXnpZ89jEDW9UPuxF2A1Gx+hU/f+HI7F1a8sOnBdxCMHLwT9E78AmffzP4Nj+yeyp+QcxYDepjSDfPNdm9vcYgFWuY0iVegYo6JN1DPQArzDlfVvHBOVzEw26Zjp5mB6f79UxFcrljENCjnxie0t2bS1lXqpuu5n+9s87xyPM1wPmRk/4simXnqBa/xZebDTsxG6/54ER2ZNoENcWc1EpCGtn8eHPa6YUKi/IeuMkwOaZyb7bENdA/0EIau9wQC74npcB6OqsAwbEcxrVF1R06cs9Zp4aM2517
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR15MB2999.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(136003)(396003)(39860400002)(346002)(376002)(83380400001)(4326008)(2906002)(71200400001)(36756003)(5660300002)(8676002)(316002)(8936002)(66556008)(6486002)(66446008)(64756008)(86362001)(33656002)(66476007)(478600001)(76116006)(186003)(4744005)(6506007)(2616005)(54906003)(6512007)(66946007)(110136005)(53546011);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: L/mGEG2Clu6184z507LIgi6mwOdjj2PzHwSQNPeM3o9FzAlxw1bOhj5APQd9uNg3XkSMSHf9KGu7PDxv/I9h2bkRhzVE5gMdZA7jf/Hqg55SN6mNNdmI69t4pNXd6wNZKWZThrRBQIlLgea+NAkJFECsxBnGwaF9zkwva0JfNAZSCNNDex2wnk0Y9qRfwMcYqC+0Q2DPCp3iBWQ+EN1/vYLhN5RkUS5r9UynJPFACxB5q2F6MjThvEf9ReI1mJq5I9THRmxNgx/p2LzA67AYziDVnTJ8olvI+YELBvqrvnpMv7CpnZZY48gAMxNcLtaIl5/uFwwXBgWHq1HJOuubR16EV/GP+1ZzUE0iNt7wKtx6DgKYRyCITK6IweNfHvJDuywJILtSv1m0WP5TAUQbYcddfQ6nKVQj7XEizuy0B1LumBvlkKEV0Oub/XipQCZ+KE39QuLysgfbL0MT74bAM/QdkjmBNjYMBdDXrDovhb9b1PROOj4LIA5aVOivVUM8xMd/y1TJRxesy9j2Lvf46SEbGNCYSj/xVARgA3owmmPTilkIeNMfHbPbYunAnk3B/wNVpBQLpXD4K3qJuBRwuqZn9DF56Nrjpsis63kBhe0HXsNo0vcJwzX6rhNp74CC1739GEXXg4u9nZ3pq6+eib9gDh8ejETAIP+sDlr0VV7RhJQwP9xRaSJFNC7Dsjxq
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A2765C72E873CF47A27E545E9021D7DD@namprd15.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <67BDE4B3-830C-476F-939F-5AB2634E0F7D@ORACLE.COM>
-References: <1596062878-4238-1-git-send-email-ritika.srivastava@oracle.com>
- <1596062878-4238-2-git-send-email-ritika.srivastava@oracle.com>
- <20200814062620.GA24167@infradead.org>
- <C6F86C38-BE29-422A-8A57-5144E26C4569@ORACLE.COM>
- <de5c94ec-9079-22b7-bbcd-667f3b0fe94e@kernel.dk>
- <A0A0C5C0-957C-44DB-9B42-3EEC473D74C6@ORACLE.COM>
- <3C0C6E56-ECEF-457A-89A1-0944E004DC77@ORACLE.COM>
- <d5c2818f-ed6e-e8ff-709d-ecc4858ff4de@kernel.dk>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.15)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9727 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
- suspectscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008280125
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9727 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 malwarescore=0
- phishscore=0 priorityscore=1501 clxscore=1015 suspectscore=0 spamscore=0
- impostorscore=0 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008280125
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR15MB2999.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf89bb87-d089-4312-4e66-08d84b7c4eba
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2020 18:00:54.0066
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1ZUXsZmOSOUoLc8L27G3FPwBmNhCSX1uhzEAOnqz+yC+JQCzW1+u35jX/g4FVhYE+H6+CuNM2ZyMi9BwnJL6NA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR15MB2728
+X-OriginatorOrg: fb.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-28_12:2020-08-28,2020-08-28 signatures=0
+X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 clxscore=1015 spamscore=0
+ phishscore=0 adultscore=0 impostorscore=0 priorityscore=1501
+ mlxlogscore=882 lowpriorityscore=0 bulkscore=0 mlxscore=0 malwarescore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008280131
+X-FB-Internal: deliver
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks Jens for the update.
-I will look out for 5.10 branch and send the updated patches.
+
+
+> On Aug 18, 2020, at 3:26 PM, Song Liu <songliubraving@fb.com> wrote:
+>=20
+> Currently, devices like md, bcache uses disk_[start|end]_io_acct to repor=
+t
+> iostat. These functions couldn't get proper iostat for partitions on thes=
+e
+> devices.
+>=20
+> This set resolves this issue by introducing part_[begin|end]_io_acct, and
+> using them in md and bcache code.
+>=20
+> Changes v1 =3D> v2:
+> 1. Refactor the code, as suggested by Christoph.
+> 2. Include Coly's Reviewed-by tag.
+>=20
+> Song Liu (3):
+>  block: introduce part_[begin|end]_io_acct
+>  md: use part_[begin|end]_io_acct instead of disk_[begin|end]_io_acct
+>  bcache: use part_[begin|end]_io_acct instead of
+>    disk_[begin|end]_io_acct
+>=20
+> block/blk-core.c            | 39 +++++++++++++++++++++++++++++++------
+> drivers/md/bcache/request.c | 10 ++++++----
+> drivers/md/md.c             |  8 ++++----
+> include/linux/blkdev.h      |  5 +++++
+> 4 files changed, 48 insertions(+), 14 deletions(-)
+
+Hi Christoph,=20
+
+Does this version look good to you?
 
 Thanks,
-Ritika
-
-> On Aug 28, 2020, at 8:52 AM, Jens Axboe <axboe@kernel.dk> wrote:
->=20
-> On 8/28/20 9:52 AM, Ritika Srivastava wrote:
->> Hi Jens,
->>=20
->> The two patches apply on branch block-5.9 in linux-block.git
->>=20
->> I apply the patches using git am xxx.patch.
->>=20
->> $ git log --oneline --decorate -n 5
->> 4d8e990 (HEAD, block59) block: better deal with the delayed not =
-supported case in blk_cloned_rq_check_limits
->> 9a8a3d4 block: Return blk_status_t instead of errno codes
->> a433d72 (origin/block-5.9) Merge branch 'md-fixes' of =
-https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.9
->> 6af10a3 md/raid5: make sure stripe_size as power of two
->> 79e5dc5 loop: Set correct device size when using LOOP_CONFIGURE
->>=20
->> Please let me know if I missed something and should test on another =
-branch?
->=20
-> It doesn't on my 5.10 branch, but I haven't pushed that out yet so =
-can't
-> really fault you for that. I'll get to it in the next day or so.
->=20
-> --=20
-> Jens Axboe
->=20
+Song
 
