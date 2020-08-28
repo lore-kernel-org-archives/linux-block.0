@@ -2,572 +2,180 @@ Return-Path: <SRS0=Mrne=CG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 566C9C433E6
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 10:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 590F1C433E2
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 13:06:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F7FF20B80
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 10:59:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 354B420825
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 13:06:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eGssgXTv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RMA7AibI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728984AbgH1K7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Aug 2020 06:59:11 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:40731 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729180AbgH1K5P (ORCPT
+        id S1726904AbgH1NFw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Aug 2020 09:05:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58074 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729123AbgH1NFq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Aug 2020 06:57:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1598612234; x=1630148234;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=08dZnjJSxk56QE4aNxWpojXO7QOdBoJe4nL0sKUyTCk=;
-  b=eGssgXTvhowkMirYp0Q1Zb1rTB2J2nhJvbV3a55LCLPY49glxqNnPso3
-   g2jOdQjQVz6qdHPECZNuRgoO0oHZev+lfG41CQB0x/IH/7Qgmz0ngStlo
-   6K6Muq3NSiTA4bhDI6jxcYq92AXCxqkASaSTDJy2RsPO6RluGisMzWgmg
-   3492YpFWqYZSuxI7aaATov9OUwC8DAo6MoCoQj/JcGSWeu9H4KaXw4udr
-   o+bbh8GQjNk0gLTOU5Va0o/BUmhe0YazzNup/IYQJmDlesdFT9B+x20wJ
-   ZyWNVtmA5e1HY3f7+k0QO4Di79eOYfTdB0cajrl5Ugticx4sN9eSy3h/q
-   g==;
-IronPort-SDR: T9PF3udIUwc2+CfOhtG5gzJ62iP7zbboBWj5Fpy3kNBM7vp4Ba+GZXzw9ZpRuq16usnY4pVeqn
- hXGFnduOfjonMxzNtPsn4SzrU3rhjGYoCyfLPe/DrNpwUJ1Bf6eL4T4+fzq+BW3A9OGZWu7pMe
- sUndmcPLFR0SHdmBCiO1bWFzot+ey1PG1tIHND1OL1Ux8bAITBoqnZrRVBsEzQpMVcIbrYHNh3
- QwHN50YqthlRLHo3uKziUnpdW1kqRsZrBTJ+amFUB9vKk/LJfvLJ/L5hw8WzSn9rze+mkG+z4c
- wbo=
-X-IronPort-AV: E=Sophos;i="5.76,363,1592841600"; 
-   d="scan'208";a="147270511"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Aug 2020 18:54:27 +0800
-IronPort-SDR: dY8jcC02Dd80UIQbF6H+PhPc3knO7QJWIiEf8SK4e4Ubz88ll5pMnCTQKrxxiCj6R82uIxeHxu
- cq8SicUTjLcg==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2020 03:41:10 -0700
-IronPort-SDR: YsMPcoT4sDLLiP1rXNSsSt/LBgnzFil1t/vnVi2iZ+vgDD1R03qXxYQWIexk/9KyEC9jeX9mDm
- x6uSANsmNsQg==
-WDCIronportException: Internal
-Received: from 3x5d1g2.ad.shared (HELO localhost.hgst.com) ([10.86.59.163])
-  by uls-op-cesaip01.wdc.com with ESMTP; 28 Aug 2020 03:54:24 -0700
-From:   Niklas Cassel <niklas.cassel@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     damien.lemoal@wdc.com, johannes.thumshirn@wdc.com,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3] null_blk: add support for max open/active zone limit for zoned devices
-Date:   Fri, 28 Aug 2020 12:54:00 +0200
-Message-Id: <20200828105400.80893-1-niklas.cassel@wdc.com>
-X-Mailer: git-send-email 2.26.2
+        Fri, 28 Aug 2020 09:05:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598619931;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ecx9k3rvYpru2po9U3jgFYCT/S2916EODCpUn183XNs=;
+        b=RMA7AibIIojZLfe/WFymlZy3GYRdbykto7U3LQlT08Vj6Ra6U9PjCSTopM4ujzNpzDnQuX
+        Fkl6N9x9Dg+sHoVtKukDWdB2v+WphDT3hljG2yKnCYFqeDGW0vM+mYNnxROYncFdX3zr0o
+        OBML8Ze8S8ydGbzDGi7vtzrDhoGznvg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-554-1m2dBXBkMteBDZLfVsXmIA-1; Fri, 28 Aug 2020 09:05:27 -0400
+X-MC-Unique: 1m2dBXBkMteBDZLfVsXmIA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 022B6189E62D;
+        Fri, 28 Aug 2020 13:05:26 +0000 (UTC)
+Received: from T590 (ovpn-13-119.pek2.redhat.com [10.72.13.119])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 13FA97D679;
+        Fri, 28 Aug 2020 13:05:18 +0000 (UTC)
+Date:   Fri, 28 Aug 2020 21:05:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ilya Dryomov <idryomov@gmail.com>
+Cc:     Yufen Yu <yuyufen@huawei.com>, Hou Tao <houtao1@huawei.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: Sleeping while atomic regression around hd_struct_free() in
+ 5.9-rc
+Message-ID: <20200828130514.GA236174@T590>
+References: <CAOi1vP9t1VL-JXj9ETdU_B1kMLjKGcW6wZss6bmxoH5UCAcK7Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOi1vP9t1VL-JXj9ETdU_B1kMLjKGcW6wZss6bmxoH5UCAcK7Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add support for user space to set a max open zone and a max active zone
-limit via configfs. By default, the default values are 0 == no limit.
+Hi Ilya,
 
-Call the block layer API functions used for exposing the configured
-limits to sysfs.
+Thanks for your report!
 
-Add accounting in null_blk_zoned so that these new limits are respected.
-Performing an operation that would exceed these limits results in a
-standard I/O error.
+On Fri, Aug 28, 2020 at 12:32:48PM +0200, Ilya Dryomov wrote:
+> Hi Ming,
+> 
+> There seems to be a sleeping while atomic bug in hd_struct_free():
+> 
+> 288 static void hd_struct_free(struct percpu_ref *ref)
+> 289 {
+> 290         struct hd_struct *part = container_of(ref, struct hd_struct, ref);
+> 291         struct gendisk *disk = part_to_disk(part);
+> 292         struct disk_part_tbl *ptbl =
+> 293                 rcu_dereference_protected(disk->part_tbl, 1);
+> 294
+> 295         rcu_assign_pointer(ptbl->last_lookup, NULL);
+> 296         put_device(disk_to_dev(disk));
+> 297
+> 298         INIT_RCU_WORK(&part->rcu_work, hd_struct_free_work);
+> 299         queue_rcu_work(system_wq, &part->rcu_work);
+> 300 }
+> 
+> hd_struct_free() is a percpu_ref release callback and must not sleep.
+> But put_device() can end up in disk_release(), resulting in anything
+> from "sleeping function called from invalid context" splats to actual
+> lockups if the queue ends up being released:
+> 
+>   BUG: scheduling while atomic: ksoftirqd/3/26/0x00000102
+>   INFO: lockdep is turned off.
+>   CPU: 3 PID: 26 Comm: ksoftirqd/3 Tainted: G        W
+> 5.9.0-rc2-ceph-g2de49bea2ebc #1
+>   Hardware name: Supermicro SYS-5018R-WR/X10SRW-F, BIOS 2.0 12/17/2015
+>   Call Trace:
+>    dump_stack+0x96/0xd0
+>    __schedule_bug.cold+0x64/0x71
+>    __schedule+0x8ea/0xac0
+>    ? wait_for_completion+0x86/0x110
+>    schedule+0x5f/0xd0
+>    schedule_timeout+0x212/0x2a0
+>    ? wait_for_completion+0x86/0x110
+>    wait_for_completion+0xb0/0x110
+>    __wait_rcu_gp+0x139/0x150
+>    synchronize_rcu+0x79/0xf0
+>    ? invoke_rcu_core+0xb0/0xb0
+>    ? rcu_read_lock_any_held+0xb0/0xb0
+>    blk_free_flush_queue+0x17/0x30
+>    blk_mq_hw_sysfs_release+0x32/0x70
+>    kobject_put+0x7d/0x1d0
+>    blk_mq_release+0xbe/0xf0
+>    blk_release_queue+0xb7/0x140
+>    kobject_put+0x7d/0x1d0
+>    disk_release+0xb0/0xc0
+>    device_release+0x25/0x80
+>    kobject_put+0x7d/0x1d0
+>    hd_struct_free+0x4c/0xc0
+>    percpu_ref_switch_to_atomic_rcu+0x1df/0x1f0
+>    rcu_core+0x3fd/0x660
+>    ? rcu_core+0x3cc/0x660
+>    __do_softirq+0xd5/0x45e
+>    ? smpboot_thread_fn+0x26/0x1d0
+>    run_ksoftirqd+0x30/0x60
+>    smpboot_thread_fn+0xfe/0x1d0
+>    ? sort_range+0x20/0x20
+>    kthread+0x11a/0x150
+>    ? kthread_delayed_work_timer_fn+0xa0/0xa0
+>    ret_from_fork+0x1f/0x30
+> 
+> "git blame" points at your commit tb7d6c3033323 ("block: fix
+> use-after-free on cached last_lookup partition"), but there is
+> likely more to it because it went into 5.8 and I haven't seen
+> these lockups until we rebased to 5.9-rc.
 
-A max open zone limit exists in the ZBC standard.
-While null_blk_zoned is used to test the Zoned Block Device model in
-Linux, when it comes to differences between ZBC and ZNS, null_blk_zoned
-mostly follows ZBC.
+The pull-the-trigger commit is actually e8c7d14ac6c3 ("block: revert back to
+synchronous request_queue removal").
 
-Therefore, implement the manage open zone resources function from ZBC,
-but additionally add support for max active zones.
-This enables user space not only to test against a device with an open
-zone limit, but also to test against a device with an active zone limit.
+> 
+> Could you please take a look?
 
-Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
----
-Changes since v2:
--Picked up Damien's Reviewed-by tag.
--Fixed a typo in the commit message.
--Renamed null_manage_zone_resources() to null_has_zone_resources().
+Can you try the following patch?
 
- drivers/block/null_blk.h       |   5 +
- drivers/block/null_blk_main.c  |  16 +-
- drivers/block/null_blk_zoned.c | 319 +++++++++++++++++++++++++++------
- 3 files changed, 282 insertions(+), 58 deletions(-)
-
-diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
-index daed4a9c34367..d2e7db43a52a7 100644
---- a/drivers/block/null_blk.h
-+++ b/drivers/block/null_blk.h
-@@ -42,6 +42,9 @@ struct nullb_device {
- 	struct badblocks badblocks;
- 
- 	unsigned int nr_zones;
-+	unsigned int nr_zones_imp_open;
-+	unsigned int nr_zones_exp_open;
-+	unsigned int nr_zones_closed;
- 	struct blk_zone *zones;
- 	sector_t zone_size_sects;
- 
-@@ -51,6 +54,8 @@ struct nullb_device {
- 	unsigned long zone_size; /* zone size in MB if device is zoned */
- 	unsigned long zone_capacity; /* zone capacity in MB if device is zoned */
- 	unsigned int zone_nr_conv; /* number of conventional zones */
-+	unsigned int zone_max_open; /* max number of open zones */
-+	unsigned int zone_max_active; /* max number of active zones */
- 	unsigned int submit_queues; /* number of submission queues */
- 	unsigned int home_node; /* home node for the device */
- 	unsigned int queue_mode; /* block interface */
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index d74443a9c8fa2..53161a418611b 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -208,6 +208,14 @@ static unsigned int g_zone_nr_conv;
- module_param_named(zone_nr_conv, g_zone_nr_conv, uint, 0444);
- MODULE_PARM_DESC(zone_nr_conv, "Number of conventional zones when block device is zoned. Default: 0");
- 
-+static unsigned int g_zone_max_open;
-+module_param_named(zone_max_open, g_zone_max_open, uint, 0444);
-+MODULE_PARM_DESC(zone_max_open, "Maximum number of open zones when block device is zoned. Default: 0 (no limit)");
-+
-+static unsigned int g_zone_max_active;
-+module_param_named(zone_max_active, g_zone_max_active, uint, 0444);
-+MODULE_PARM_DESC(zone_max_active, "Maximum number of active zones when block device is zoned. Default: 0 (no limit)");
-+
- static struct nullb_device *null_alloc_dev(void);
- static void null_free_dev(struct nullb_device *dev);
- static void null_del_dev(struct nullb *nullb);
-@@ -347,6 +355,8 @@ NULLB_DEVICE_ATTR(zoned, bool, NULL);
- NULLB_DEVICE_ATTR(zone_size, ulong, NULL);
- NULLB_DEVICE_ATTR(zone_capacity, ulong, NULL);
- NULLB_DEVICE_ATTR(zone_nr_conv, uint, NULL);
-+NULLB_DEVICE_ATTR(zone_max_open, uint, NULL);
-+NULLB_DEVICE_ATTR(zone_max_active, uint, NULL);
- 
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index e62a98a8eeb7..b06fc3425802 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -278,6 +278,15 @@ static void hd_struct_free_work(struct work_struct *work)
  {
-@@ -464,6 +474,8 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_zone_size,
- 	&nullb_device_attr_zone_capacity,
- 	&nullb_device_attr_zone_nr_conv,
-+	&nullb_device_attr_zone_max_open,
-+	&nullb_device_attr_zone_max_active,
- 	NULL,
- };
- 
-@@ -517,7 +529,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
- {
- 	return snprintf(page, PAGE_SIZE,
--			"memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size,zone_capacity,zone_nr_conv\n");
-+			"memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size,zone_capacity,zone_nr_conv,zone_max_open,zone_max_active\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -580,6 +592,8 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->zone_size = g_zone_size;
- 	dev->zone_capacity = g_zone_capacity;
- 	dev->zone_nr_conv = g_zone_nr_conv;
-+	dev->zone_max_open = g_zone_max_open;
-+	dev->zone_max_active = g_zone_max_active;
- 	return dev;
- }
- 
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index 3d25c9ad23831..fa0cc70f05e66 100644
---- a/drivers/block/null_blk_zoned.c
-+++ b/drivers/block/null_blk_zoned.c
-@@ -51,6 +51,22 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
- 			dev->zone_nr_conv);
- 	}
- 
-+	/* Max active zones has to be < nbr of seq zones in order to be enforceable */
-+	if (dev->zone_max_active >= dev->nr_zones - dev->zone_nr_conv) {
-+		dev->zone_max_active = 0;
-+		pr_info("zone_max_active limit disabled, limit >= zone count\n");
-+	}
-+
-+	/* Max open zones has to be <= max active zones */
-+	if (dev->zone_max_active && dev->zone_max_open > dev->zone_max_active) {
-+		dev->zone_max_open = dev->zone_max_active;
-+		pr_info("changed the maximum number of open zones to %u\n",
-+			dev->nr_zones);
-+	} else if (dev->zone_max_open >= dev->nr_zones - dev->zone_nr_conv) {
-+		dev->zone_max_open = 0;
-+		pr_info("zone_max_open limit disabled, limit >= zone count\n");
-+	}
-+
- 	for (i = 0; i <  dev->zone_nr_conv; i++) {
- 		struct blk_zone *zone = &dev->zones[i];
- 
-@@ -99,6 +115,8 @@ int null_register_zoned_dev(struct nullb *nullb)
- 	}
- 
- 	blk_queue_max_zone_append_sectors(q, dev->zone_size_sects);
-+	blk_queue_max_open_zones(q, dev->zone_max_open);
-+	blk_queue_max_active_zones(q, dev->zone_max_active);
- 
- 	return 0;
- }
-@@ -159,6 +177,103 @@ size_t null_zone_valid_read_len(struct nullb *nullb,
- 	return (zone->wp - sector) << SECTOR_SHIFT;
- }
- 
-+static blk_status_t null_close_zone(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return BLK_STS_IOERR;
-+
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_CLOSED:
-+		/* close operation on closed is not an error */
-+		return BLK_STS_OK;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		dev->nr_zones_exp_open--;
-+		break;
-+	case BLK_ZONE_COND_EMPTY:
-+	case BLK_ZONE_COND_FULL:
-+	default:
-+		return BLK_STS_IOERR;
-+	}
-+
-+	if (zone->wp == zone->start) {
-+		zone->cond = BLK_ZONE_COND_EMPTY;
-+	} else {
-+		zone->cond = BLK_ZONE_COND_CLOSED;
-+		dev->nr_zones_closed++;
-+	}
-+
-+	return BLK_STS_OK;
-+}
-+
-+static void null_close_first_imp_zone(struct nullb_device *dev)
-+{
-+	unsigned int i;
-+
-+	for (i = dev->zone_nr_conv; i < dev->nr_zones; i++) {
-+		if (dev->zones[i].cond == BLK_ZONE_COND_IMP_OPEN) {
-+			null_close_zone(dev, &dev->zones[i]);
-+			return;
-+		}
-+	}
-+}
-+
-+static bool null_can_set_active(struct nullb_device *dev)
-+{
-+	if (!dev->zone_max_active)
-+		return true;
-+
-+	return dev->nr_zones_exp_open + dev->nr_zones_imp_open +
-+	       dev->nr_zones_closed < dev->zone_max_active;
-+}
-+
-+static bool null_can_open(struct nullb_device *dev)
-+{
-+	if (!dev->zone_max_open)
-+		return true;
-+
-+	if (dev->nr_zones_exp_open + dev->nr_zones_imp_open < dev->zone_max_open)
-+		return true;
-+
-+	if (dev->nr_zones_imp_open && null_can_set_active(dev)) {
-+		null_close_first_imp_zone(dev);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+/*
-+ * This function matches the manage open zone resources function in the ZBC standard,
-+ * with the addition of max active zones support (added in the ZNS standard).
-+ *
-+ * The function determines if a zone can transition to implicit open or explicit open,
-+ * while maintaining the max open zone (and max active zone) limit(s). It may close an
-+ * implicit open zone in order to make additional zone resources available.
-+ *
-+ * ZBC states that an implicit open zone shall be closed only if there is not
-+ * room within the open limit. However, with the addition of an active limit,
-+ * it is not certain that closing an implicit open zone will allow a new zone
-+ * to be opened, since we might already be at the active limit capacity.
-+ */
-+static bool null_has_zone_resources(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_EMPTY:
-+		if (!null_can_set_active(dev))
-+			return false;
-+		fallthrough;
-+	case BLK_ZONE_COND_CLOSED:
-+		return null_can_open(dev);
-+	default:
-+		/* Should never be called for other states */
-+		WARN_ON(1);
-+		return false;
-+	}
-+}
-+
- static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 				    unsigned int nr_sectors, bool append)
- {
-@@ -177,43 +292,155 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 		/* Cannot write to a full zone */
- 		return BLK_STS_IOERR;
- 	case BLK_ZONE_COND_EMPTY:
-+	case BLK_ZONE_COND_CLOSED:
-+		if (!null_has_zone_resources(dev, zone))
-+			return BLK_STS_IOERR;
-+		break;
- 	case BLK_ZONE_COND_IMP_OPEN:
- 	case BLK_ZONE_COND_EXP_OPEN:
-+		break;
-+	default:
-+		/* Invalid zone condition */
-+		return BLK_STS_IOERR;
-+	}
+ 	struct hd_struct *part =
+ 		container_of(to_rcu_work(work), struct hd_struct, rcu_work);
++	struct gendisk *disk = part_to_disk(part);
 +
 +	/*
-+	 * Regular writes must be at the write pointer position.
-+	 * Zone append writes are automatically issued at the write
-+	 * pointer and the position returned using the request or BIO
-+	 * sector.
++	 * Release the reference grabbed in delete_partition, and it should
++	 * have been done in hd_struct_free(), however device's release
++	 * handler can't be done in percpu_ref's ->release() callback
++	 * because it is run via call_rcu().
 +	 */
-+	if (append) {
-+		sector = zone->wp;
-+		if (cmd->bio)
-+			cmd->bio->bi_iter.bi_sector = sector;
-+		else
-+			cmd->rq->__sector = sector;
-+	} else if (sector != zone->wp) {
-+		return BLK_STS_IOERR;
-+	}
-+
-+	if (zone->wp + nr_sectors > zone->start + zone->capacity)
-+		return BLK_STS_IOERR;
-+
-+	if (zone->cond == BLK_ZONE_COND_CLOSED) {
-+		dev->nr_zones_closed--;
-+		dev->nr_zones_imp_open++;
-+	} else if (zone->cond == BLK_ZONE_COND_EMPTY) {
-+		dev->nr_zones_imp_open++;
-+	}
-+	if (zone->cond != BLK_ZONE_COND_EXP_OPEN)
-+		zone->cond = BLK_ZONE_COND_IMP_OPEN;
-+
-+	ret = null_process_cmd(cmd, REQ_OP_WRITE, sector, nr_sectors);
-+	if (ret != BLK_STS_OK)
-+		return ret;
-+
-+	zone->wp += nr_sectors;
-+	if (zone->wp == zone->start + zone->capacity) {
-+		if (zone->cond == BLK_ZONE_COND_EXP_OPEN)
-+			dev->nr_zones_exp_open--;
-+		else if (zone->cond == BLK_ZONE_COND_IMP_OPEN)
-+			dev->nr_zones_imp_open--;
-+		zone->cond = BLK_ZONE_COND_FULL;
-+	}
-+	return BLK_STS_OK;
-+}
-+
-+static blk_status_t null_open_zone(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return BLK_STS_IOERR;
-+
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		/* open operation on exp open is not an error */
-+		return BLK_STS_OK;
-+	case BLK_ZONE_COND_EMPTY:
-+		if (!null_has_zone_resources(dev, zone))
-+			return BLK_STS_IOERR;
-+		break;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
- 	case BLK_ZONE_COND_CLOSED:
--		/*
--		 * Regular writes must be at the write pointer position.
--		 * Zone append writes are automatically issued at the write
--		 * pointer and the position returned using the request or BIO
--		 * sector.
--		 */
--		if (append) {
--			sector = zone->wp;
--			if (cmd->bio)
--				cmd->bio->bi_iter.bi_sector = sector;
--			else
--				cmd->rq->__sector = sector;
--		} else if (sector != zone->wp) {
-+		if (!null_has_zone_resources(dev, zone))
- 			return BLK_STS_IOERR;
--		}
-+		dev->nr_zones_closed--;
-+		break;
-+	case BLK_ZONE_COND_FULL:
-+	default:
-+		return BLK_STS_IOERR;
-+	}
-+
-+	zone->cond = BLK_ZONE_COND_EXP_OPEN;
-+	dev->nr_zones_exp_open++;
++	put_device(disk_to_dev(disk));
  
--		if (zone->wp + nr_sectors > zone->start + zone->capacity)
-+	return BLK_STS_OK;
-+}
-+
-+static blk_status_t null_finish_zone(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return BLK_STS_IOERR;
-+
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_FULL:
-+		/* finish operation on full is not an error */
-+		return BLK_STS_OK;
-+	case BLK_ZONE_COND_EMPTY:
-+		if (!null_has_zone_resources(dev, zone))
- 			return BLK_STS_IOERR;
-+		break;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		dev->nr_zones_exp_open--;
-+		break;
-+	case BLK_ZONE_COND_CLOSED:
-+		if (!null_has_zone_resources(dev, zone))
-+			return BLK_STS_IOERR;
-+		dev->nr_zones_closed--;
-+		break;
-+	default:
-+		return BLK_STS_IOERR;
-+	}
+ 	part->start_sect = 0;
+ 	part->nr_sects = 0;
+@@ -293,7 +302,6 @@ static void hd_struct_free(struct percpu_ref *ref)
+ 		rcu_dereference_protected(disk->part_tbl, 1);
  
--		if (zone->cond != BLK_ZONE_COND_EXP_OPEN)
--			zone->cond = BLK_ZONE_COND_IMP_OPEN;
-+	zone->cond = BLK_ZONE_COND_FULL;
-+	zone->wp = zone->start + zone->len;
+ 	rcu_assign_pointer(ptbl->last_lookup, NULL);
+-	put_device(disk_to_dev(disk));
  
--		ret = null_process_cmd(cmd, REQ_OP_WRITE, sector, nr_sectors);
--		if (ret != BLK_STS_OK)
--			return ret;
-+	return BLK_STS_OK;
-+}
-+
-+static blk_status_t null_reset_zone(struct nullb_device *dev, struct blk_zone *zone)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return BLK_STS_IOERR;
- 
--		zone->wp += nr_sectors;
--		if (zone->wp == zone->start + zone->capacity)
--			zone->cond = BLK_ZONE_COND_FULL;
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_EMPTY:
-+		/* reset operation on empty is not an error */
- 		return BLK_STS_OK;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		dev->nr_zones_imp_open--;
-+		break;
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		dev->nr_zones_exp_open--;
-+		break;
-+	case BLK_ZONE_COND_CLOSED:
-+		dev->nr_zones_closed--;
-+		break;
-+	case BLK_ZONE_COND_FULL:
-+		break;
- 	default:
--		/* Invalid zone condition */
- 		return BLK_STS_IOERR;
- 	}
-+
-+	zone->cond = BLK_ZONE_COND_EMPTY;
-+	zone->wp = zone->start;
-+
-+	return BLK_STS_OK;
- }
- 
- static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_opf op,
-@@ -222,56 +449,34 @@ static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_opf op,
- 	struct nullb_device *dev = cmd->nq->dev;
- 	unsigned int zone_no = null_zone_no(dev, sector);
- 	struct blk_zone *zone = &dev->zones[zone_no];
-+	blk_status_t ret = BLK_STS_OK;
- 	size_t i;
- 
- 	switch (op) {
- 	case REQ_OP_ZONE_RESET_ALL:
--		for (i = 0; i < dev->nr_zones; i++) {
--			if (zone[i].type == BLK_ZONE_TYPE_CONVENTIONAL)
--				continue;
--			zone[i].cond = BLK_ZONE_COND_EMPTY;
--			zone[i].wp = zone[i].start;
--		}
-+		for (i = dev->zone_nr_conv; i < dev->nr_zones; i++)
-+			null_reset_zone(dev, &dev->zones[i]);
- 		break;
- 	case REQ_OP_ZONE_RESET:
--		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--			return BLK_STS_IOERR;
--
--		zone->cond = BLK_ZONE_COND_EMPTY;
--		zone->wp = zone->start;
-+		ret = null_reset_zone(dev, zone);
- 		break;
- 	case REQ_OP_ZONE_OPEN:
--		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--			return BLK_STS_IOERR;
--		if (zone->cond == BLK_ZONE_COND_FULL)
--			return BLK_STS_IOERR;
--
--		zone->cond = BLK_ZONE_COND_EXP_OPEN;
-+		ret = null_open_zone(dev, zone);
- 		break;
- 	case REQ_OP_ZONE_CLOSE:
--		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--			return BLK_STS_IOERR;
--		if (zone->cond == BLK_ZONE_COND_FULL)
--			return BLK_STS_IOERR;
--
--		if (zone->wp == zone->start)
--			zone->cond = BLK_ZONE_COND_EMPTY;
--		else
--			zone->cond = BLK_ZONE_COND_CLOSED;
-+		ret = null_close_zone(dev, zone);
- 		break;
- 	case REQ_OP_ZONE_FINISH:
--		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--			return BLK_STS_IOERR;
--
--		zone->cond = BLK_ZONE_COND_FULL;
--		zone->wp = zone->start + zone->len;
-+		ret = null_finish_zone(dev, zone);
- 		break;
- 	default:
- 		return BLK_STS_NOTSUPP;
- 	}
- 
--	trace_nullb_zone_op(cmd, zone_no, zone->cond);
--	return BLK_STS_OK;
-+	if (ret == BLK_STS_OK)
-+		trace_nullb_zone_op(cmd, zone_no, zone->cond);
-+
-+	return ret;
- }
- 
- blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_opf op,
--- 
-2.26.2
+ 	INIT_RCU_WORK(&part->rcu_work, hd_struct_free_work);
+ 	queue_rcu_work(system_wq, &part->rcu_work);
+
+
+
+Thanks,
+Ming
 
