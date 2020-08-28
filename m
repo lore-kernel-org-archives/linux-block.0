@@ -6,71 +6,70 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9CCDC433E2
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 10:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9235C433E6
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 10:29:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 737E12078A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 10:07:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD1F0208FE
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 10:29:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gG7x+/dJ";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="d4VheTDK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Yr6uAPwB";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="VBAAEN1h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728269AbgH1KHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Aug 2020 06:07:18 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:5452 "EHLO
+        id S1728218AbgH1K3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Aug 2020 06:29:25 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:62179 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728016AbgH1KHP (ORCPT
+        with ESMTP id S1728016AbgH1K3V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Aug 2020 06:07:15 -0400
+        Fri, 28 Aug 2020 06:29:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1598609234; x=1630145234;
+  t=1598610559; x=1630146559;
   h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=tCJZZ1tHj3nYBqaWVLkT2715SEqYLMlE3E0T01uJdPs=;
-  b=gG7x+/dJeONNDmkHuUXcN/zW07QQpOGPKAhgCleHuOfBf/FSHRVPJofs
-   /0RAr0ylijjnSyOeYiWJuJgy3jeGB3ZvlAWe5fF13mygDxL1AFnfwW+fT
-   kB8DS3AbsN+HgSHtFwTEm2in9gX6TBQDeSS6g6gvpPInCoOqvPeC3ydJI
-   7XpOXFh3YYZ5wLa65BDUG5coRkV+U4bK+5zDPOvHMnj4qp/bvVkKELIBJ
-   7hute1LEQQoa7Qammhcb214c+AJaGU+LpbrSqchrKGt78jsvB8Or+A6ex
-   ZZiI/Zf78w03ToU0Jh4Dw5U2NPEmiOVMyN+asYGWAkJRUFpidA4s7BLny
+   content-transfer-encoding:mime-version;
+  bh=YTNLctFP4pX0DEZBklLe354sIUBZmCvqpepS+f6I0Zs=;
+  b=Yr6uAPwB9Ow4Fom2CfN3iDGlP2stZYCnwhaxyFClCyZOXU7oPzrYdYoD
+   MMHgI1qXYvg3v5TD8Wiix3/a+0yfG0k9niPz7d3ooUU2xQDUdmeKrTZF3
+   vHj9nUY6sdWpt4IiXBhfVVIZE8sCNrtJQ3JayzPc/ftvGJCC1HG46GNHV
+   e5EEiATXtTd9lVyAOUY7wyIO5CpS6cMnF39Bg17fJs8mQVpLqjQdbVS1y
+   1Mqlu9NbqUVDQ1oNPMlilYKkzveeU6NQvGBlhcYxeYuAD56h+433wmUH0
+   p3qe3rbHieUJ75TffAdhZpIn2IVdf4cugHR6Fm4PRn3U6oD3w7jYaTMYs
    Q==;
-IronPort-SDR: yNPY6jZyFfpNSS4zOMBUrmhTRql6gtivY1nqHOKKhBzjoT5EBNvHJRJsF6EdPS/Yeg3iJ8VVMS
- X297P6MjuYXEuBizcmxerGpFMH6CMYVjChjplE8TpoWZfpAuB2EWeMb8nPmMJd2wppB3GJUcMs
- rI+OVLKwzUN/jaX/SRqJYFgj+qHH8Lh9Qc/1vMLVUlWi5IvsLTv6dB/eHC66A04qGvdzq1yPjT
- aFOMKliYwGm2GwqWihac2VqmOr5fOOJ3zNnlTKIkp8bzgcBbB9P85LVcPbpKHM6IY3bc/JTI6I
- tZk=
+IronPort-SDR: ZGJPNbtI3I2Myj6BkEhxhGLDMgTOVzld9HMMjz06J4yWtdeSn3SmhVHBuh6miHu8BjvQcmu2jJ
+ kTZkqa4RsYWkeIkMjxJoSKGo4IgM3p19v0eje1guJ24GAg++/WgcjgL5mrE6AydUsW7CWRzwQf
+ P7WG+ijls8D+bAOux8w9FoqoQTLsmKrkR+eoiVhRU8uuEGg8TYyo3X2oQms9wLPYBo0/cOrWGw
+ f72/x+Zd7U5uHD18PutFweaU2WITGDUJeh269L6U3ViNMkVh1mgSdXERAoHRM2cos9bZvHQGCO
+ Y5o=
 X-IronPort-AV: E=Sophos;i="5.76,363,1592841600"; 
-   d="scan'208";a="145991959"
-Received: from mail-mw2nam10lp2108.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.108])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Aug 2020 18:06:59 +0800
+   d="scan'208";a="145993125"
+Received: from mail-bn8nam11lp2170.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.170])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Aug 2020 18:29:18 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N6ZDwQg1r1nEfJfROV/qH4oQlj8+16yH1Ohcgjtr6ZnsMTOVVj2G7uLKecAAdiQt/kBg4Qdx4CJV1FgQ2nFj1CWXW8J/KhfSU1glFvva225GTP96oeCl0mSse6Euf4thwE36HFHi9doJYAY9dzcxP36phNRsia36L9NYK/M7L+OyAJnlJeFXHMj8pKIkV5BWERyGy3EGZcMktnCNroc6ZiI3uxu4ATFwUyjXXg8VEIaXVGYHHoMoyzDlb6rS8W4zWdp1DXPXxdbA72NMWXPtFccb2Vd85YewjCqnIc1ydUwilPDUtJRlXSAp+p7eGScgmKa6xzsAr73Agiq5CiwvBw==
+ b=L57ppxyUJQ1wz8heEvd0K2bkAICE4tyvyGZBSHRI8M9kqRa2HitQl7vCyPpnRLSUQ948AHoNs8SwebRhPjRSxupXl7Mwroad9w6CNNa5gXc8fuCF3Z6ockYNaWf+npWiCmDb/LlJw0SOXnmddTDqrKJGQHmTXdjIGvIuLj23v2XWDd/0PxIP2/5v5Os+3wA3LDFqgDUM5yjs7fKDXzk6NFfh4V1ceA4F0F5m7HAAQbRHWlKEpLlezDRQsGpzuImCQ2LBsKUUwqrxscv00y6hTS30CbMacjB7awb+xVBGli9DAZp1hYRkP1XOigq0WmdmXLJylx6tTdUiF8Gwh2A8lg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tCJZZ1tHj3nYBqaWVLkT2715SEqYLMlE3E0T01uJdPs=;
- b=dHoG3qcDAblsm7w03BymBsZozA2ms3h0J4amS0Uwk213HKJ2oO6kX5eTZ4v6LhgTzAea3V84JYnZUbnunFdTHSjmuA8O1uPJZcCdV8xiXoTuWQCmxa+T/1n4ihAp8zrtIvKoPlp23ttvMQGCpQMG1CgTnRrFaH7jCtdMSRwoZ7PzZUucfMrgEjVf0aKNXnfLV3vIpfwHuVVt/D8mH3Qtuo+QpzUT0GDZEoxQo5d5QglNOijFUmwueHld6ExAzl4NHzkO7ujvfH5t1tS6hswlOgAwQme5x6V6NphDgI7I4x1OLt3D5iL7QNEftBA7ko0/nfl008cBW2GlumuR5NC6nA==
+ bh=YTNLctFP4pX0DEZBklLe354sIUBZmCvqpepS+f6I0Zs=;
+ b=aP8DFL+wWYXoISNnXw40zm1iIpqwzENGBvE5MQyMH7ip21bQ3d59mt5dW3GnY+cyHxvcb5dxfGuqYjxzIcDo7uAQM+Z0sUyOcKjBwwn2xSKzZF95KYPCtLDyEsqc0ZBGBVaP6ZVuthxLZYvNzQPn7/1fFUv+L16nj6iNKbbUdpHH8+7mFiM/LtraL+mLpx/95A2B7ofgm8IHIRkbKJcg8NxjEtci2h6IGp/ImSm0VSiiGrVMhkd2bf05i4lvHjDgdgdEjSg5sbHD8daJVDm/mhXDb16cgryJvmDFtJjsK/rI/2WkTLlHOXX3s1uzERv+Zq4wF7BVgM9zvyY3354Xnw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tCJZZ1tHj3nYBqaWVLkT2715SEqYLMlE3E0T01uJdPs=;
- b=d4VheTDKZPtQjtlkR8vIkRQLXIKeMwF+jesPm1mFuovc6td4W1C7CESaYbgABK8YHKNf0dPjkRiKUb8JG4oYUwyGHB/xARGmR68npOYzwnda67Ospoa0VWIuyXpNna5Nb82utZ2FjqbLBSgPdj++i5BuJsdaQCdXuuK6x/l6asA=
-Received: from BN6PR04MB0724.namprd04.prod.outlook.com (2603:10b6:404:ce::23)
- by BN7PR04MB5204.namprd04.prod.outlook.com (2603:10b6:408:b::29) with
+ bh=YTNLctFP4pX0DEZBklLe354sIUBZmCvqpepS+f6I0Zs=;
+ b=VBAAEN1hwBNTp+evJWvpxOkWgbXc3bSXkdiDGNeYekMoJ7lUeq70M9/V+U8z9s5k1ZIhCf/bSszlqfM0iaoUg0m7lAiVZbDeK8CEq4apYdiJjSpG5DMvhhWpzsHJe1FF2FnCQBvDOZhHn0lbdXL9BkMuRpNMuv6p7Xyxge/wNy4=
+Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
+ by CY4PR0401MB3633.namprd04.prod.outlook.com (2603:10b6:910:94::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19; Fri, 28 Aug
- 2020 10:06:57 +0000
-Received: from BN6PR04MB0724.namprd04.prod.outlook.com
- ([fe80::cd08:5da9:34ed:4ec4]) by BN6PR04MB0724.namprd04.prod.outlook.com
- ([fe80::cd08:5da9:34ed:4ec4%2]) with mapi id 15.20.3305.032; Fri, 28 Aug 2020
- 10:06:57 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Fri, 28 Aug
+ 2020 10:29:18 +0000
+Received: from CY4PR04MB3751.namprd04.prod.outlook.com
+ ([fe80::7d15:9936:4b3b:f8a2]) by CY4PR04MB3751.namprd04.prod.outlook.com
+ ([fe80::7d15:9936:4b3b:f8a2%12]) with mapi id 15.20.3305.032; Fri, 28 Aug
+ 2020 10:29:18 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
 CC:     Jens Axboe <axboe@kernel.dk>,
         Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -79,120 +78,137 @@ Subject: Re: [PATCH v2] null_blk: add support for max open/active zone limit
  for zoned devices
 Thread-Topic: [PATCH v2] null_blk: add support for max open/active zone limit
  for zoned devices
-Thread-Index: AQHWfHkHEFD/cWRr30CMhGnYnEiy+6lNTPiA
-Date:   Fri, 28 Aug 2020 10:06:57 +0000
-Message-ID: <20200828100655.GA71979@localhost.localdomain>
+Thread-Index: AQHWfHkH+20N/yg19E+BQ9ptEBewKg==
+Date:   Fri, 28 Aug 2020 10:29:17 +0000
+Message-ID: <CY4PR04MB375160276B09E980D1B1158AE7520@CY4PR04MB3751.namprd04.prod.outlook.com>
 References: <20200827135018.63644-1-niklas.cassel@wdc.com>
  <CY4PR04MB3751526DC5833902749EBE48E7520@CY4PR04MB3751.namprd04.prod.outlook.com>
-In-Reply-To: <CY4PR04MB3751526DC5833902749EBE48E7520@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200828100655.GA71979@localhost.localdomain>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: wdc.com; dkim=none (message not signed)
  header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [85.224.200.150]
+x-originating-ip: [2400:2411:43c0:6000:1cf:fa0c:32f2:7362]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 257178c7-0ac9-482e-03a3-08d84b3a1960
-x-ms-traffictypediagnostic: BN7PR04MB5204:
+x-ms-office365-filtering-correlation-id: 0fd13f0d-85a3-4d5a-e645-08d84b3d382c
+x-ms-traffictypediagnostic: CY4PR0401MB3633:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN7PR04MB5204599C116378AF19BB25E9F2520@BN7PR04MB5204.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <CY4PR0401MB363314AACEB451F828939A32E7520@CY4PR0401MB3633.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
 x-ms-oob-tlc-oobclassifiers: OLM:3968;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: V2N6JLCnFTdhNw5f8rGS4QfP1vpbeY99C1nGVgKHtWvqXTFuW293df726NGjSpiFGfPcLjjGLSUF+rkMpYiM/9CIeIGaz7HMCZgVLqqkLTpFrI9uq4yUILHsFEkmuEcHzNrlJdI9Pc7QgyHe9IOmboBADIV3zw8fiqRB078QJRlQCzBwOzXWcos18Qdaq7QzXGXFc9Lrd/vvzgg6R/jut3zRtIRivU42e+4EMQSrgnB+U+4C+EavtiIUrr7I2qCj+54CNxWUAkeIl0a5c5mbirlm2QadQsTqOFiS9533cu1frs+vTixP2QzQepbR3pyg5F+il4LJ7chLhEFHkIs6Ww==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR04MB0724.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(39860400002)(136003)(366004)(376002)(54906003)(66556008)(6862004)(64756008)(4326008)(26005)(5660300002)(66946007)(2906002)(6486002)(66476007)(91956017)(76116006)(53546011)(66446008)(6512007)(6506007)(478600001)(83380400001)(316002)(8936002)(9686003)(186003)(33656002)(8676002)(86362001)(6636002)(71200400001)(1076003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: h/AghRQq19sBHwaz7F9wblE8Pa5brdG0vxwMr1o8c5OazIpENeZjaa4AWGT1TPiDBY5dZ1yEQ49OHJYZlRylNFA+KzSukU9VEa4sWhRU68m7VAcmAtDbwzSgS/5tfZoeTOODGoKsnL8cntCJDwbF/c5uz5+5Lx048/W8nqdBc5nZjy7c7+FqmUDKt8dgq78fZfe7B9/mK1IvZ+78y/hGpAMhC9IkoNV5NmXVrJRQhJ/Pxwal4InphdqKofedQB/yE+wg4RI7YBIdYKjtRfwRBZHWVPVekJgWIm5PIxJ6ih6Jgf78gM2UfzHdhkPwwAUrKkmZVIEiwcm4H+UrxL+LhNTcW+1YFbnyu6XIkFa2kqwKQ2dBrBLN1qR3y6/Q3gbmPQ380KypV0BxvKwmAlbeXUBQf/EMeewlbg7o1Py7a5ePMcTK/zGtj+IA60HBZB7QC/MUzWamYJZvxVpUmXLqlqXdYGH3uDJZyRz+fiA0NQpbNj5tPqOL41cWaIGV228zbDBogwchNLCm7L6BXQSJQIYr8CpWAP96OaSare2lCEYQjH/8RkV2B9un0zKwNPczOoKkp4ppFBEqBce8jw2oaImrv3aR85MCjMZoLAQZ1vUcywiAdnfGQ/AO5Xpjj3kusElwYimpszrr1ekn9QwMkw==
+x-microsoft-antispam-message-info: g/xAWQtDtEivOU5YbrXxOmyRBfoKTIaVuxhQVG32gauYQyXjvf/3ZeekOSRXlhR9aCY5oRqk8IWxqLj1G+vncVkfvn4e5+U3rFPwPhfLLoTtjUqQc3MmLXm2IkUgt4gQNo64Ky3BHj1fASotvu+SPGf1X5w+n9BZd1/ZLOCMsWlVSV/UQT0IUHgmJdAf30pVNT2+IUmXt8bF0tM7XkKryxyM/Pbf0hBQgrv7QQrMGyp5F3fDUiCdzcWTmQWKxgO9N6NNs9wuDsq/usD1mXNHgcuKLALeQmCjWXMQw/fle5i3i8qP5s6mIHfy3LRhZ6fPyfwWNZEzb2yMAHfzArHkRA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(39860400002)(396003)(366004)(346002)(2906002)(8676002)(66446008)(86362001)(66476007)(8936002)(91956017)(33656002)(66946007)(83380400001)(64756008)(9686003)(66556008)(76116006)(55016002)(71200400001)(186003)(6862004)(6506007)(54906003)(6636002)(5660300002)(478600001)(53546011)(52536014)(4326008)(316002)(7696005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: 9t/zuncCSbSAshPTVdBffbbA4H8mUj2WB4WyMBzFg/XxZUgM+9eCAoFj4DQ2jaMPAoLAFmwTTBi6Dw6Pb6jXS9OFHVstoyylpH1olWhSNqSUjwdWvZqkNeFRohOwE5BepY9cW/7YhrrWJtkKeMAn08tJ34O+rh6GBF3yZG51IL0d9uJTGsA83xEJmybLWmi7eU6kifSSQNrvML8iSCWmqaT4O11Crs1ph/LhQe6tZXWvQSR9/sE/x5IIjeEoUOAn53mb2grs+DNR/kHMFQU15+n0WkQu0p2dJifX3USjiet5XM4ml6KTiUFykKi97wi0sznEbQv9aVGH9sEy8hYCZgiyhrp+oxynmfL5Iqm6I/uGqgt4NdVG+CJYyhyntQjsCcm1hpOXQyf71H70Fv2q0CVRQQCKugHP3Yn1DeRS2wa44N91tBlamZUDR4CF6H1rUvfJ59r1j0sa+p5RwOjeBYj4MJ4DBxnveluI+dXcBIglKgU0oiXZ3ImmyCeH6NiD5wPHq1MxT6+1ExLw2cSzOUmP7XutX++FNkAaBKQKgv4ePnn8ik4/hRd+i8BFht8t4jPeUTwkCPxJsgDXg/rj5C+hSUEiQlBqht3ii2vexDbp4OPmmdk6Jm8sxJXLflY1ivxmAntgw3aP3piUOOQrL8ZLVaRmhxblR2vmR+Pf3CQz9jPztVlM+Al44pyRQgQXZ+QBab0wT9gkAsZRIfa7Kg==
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2E471980F2C600478E566C98E3404385@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN6PR04MB0724.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 257178c7-0ac9-482e-03a3-08d84b3a1960
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2020 10:06:57.6415
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0fd13f0d-85a3-4d5a-e645-08d84b3d382c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2020 10:29:17.9050
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +BMPKpL5LUp04GzNbeItN7tSaR5ynWEDetDux6adzSrd7kh5VrDyhApkCMWrVKWCZcoOcFFhNzUbUROOGiAHtg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR04MB5204
+X-MS-Exchange-CrossTenant-userprincipalname: 1n+Xvy3wSeVtSbuRxVbh1sAIFKSFEQdZZ9CW4Parf5yIHn1xkYO7akIb2s4zML3FV6U1+QNlMzKf1dMIlJRJVg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0401MB3633
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 28, 2020 at 07:06:26AM +0000, Damien Le Moal wrote:
-> On 2020/08/27 22:50, Niklas Cassel wrote:
-> > Add support for user space to set a max open zone and a max active zone
-> > limit via configfs. By default, the default values are 0 =3D=3D no limi=
-t.
-> >=20
-> > Call the block layer API functions used for exposing the configured
-> > limits to sysfs.
-> >=20
-> > Add accounting in null_blk_zoned so that these new limits are respected=
-.
-> > Performing an operating that would exceed these limits results in a
->=20
-> Performing a write operation that would result in exceeding these...
->=20
-> > standard I/O error.
-> >=20
-
-It is not only a write operation, also e.g. open zone operation.
-However I will s/Performing an operating/Performing an operation/
-
-> > +/*
-> > + * This function matches the manage open zone resources function in th=
-e ZBC standard,
-> > + * with the addition of max active zones support (added in the ZNS sta=
-ndard).
-> > + *
-> > + * The function determines if a zone can transition to implicit open o=
-r explicit open,
-> > + * while maintaining the max open zone (and max active zone) limit(s).=
- It may close an
-> > + * implicit open zone in order to make additional zone resources avail=
-able.
-> > + *
-> > + * ZBC states that an implicit open zone shall be closed only if there=
- is not
-> > + * room within the open limit. However, with the addition of an active=
- limit,
-> > + * it is not certain that closing an implicit open zone will allow a n=
-ew zone
-> > + * to be opened, since we might already be at the active limit capacit=
-y.
-> > + */
-> > +static bool null_manage_zone_resources(struct nullb_device *dev, struc=
-t blk_zone *zone)
->=20
-> I still do not like the name. Since this return a bool, what about
-> null_has_zone_resources() ?
-
-I also don't like the name :)
-
-However, since the ZBC spec, in the descriptions of "Write operation, Finis=
-h
-operation, and Open operation", says that the "manage open zone resources"
-function must be called before each of these operations are performed,
-and that there is a section that defines how the "manage open zone resource=
-s"
-is defined, I was thinking that having a similar name would be of value.
-
-And I agree that it is weird that it returns a bool, but that is how it is
-defined in the standard.
-
-Perhaps it should have exactly the same name as the standard, i.e.
-null_manage_open_zone_resources() ?
-
-However, if you don't think that there is any point of trying to have
-a similar name to the function in ZBC, then I will happily rename it :)
-
-
-Kind regards,
-Niklas=
+On 2020/08/28 19:06, Niklas Cassel wrote:=0A=
+> On Fri, Aug 28, 2020 at 07:06:26AM +0000, Damien Le Moal wrote:=0A=
+>> On 2020/08/27 22:50, Niklas Cassel wrote:=0A=
+>>> Add support for user space to set a max open zone and a max active zone=
+=0A=
+>>> limit via configfs. By default, the default values are 0 =3D=3D no limi=
+t.=0A=
+>>>=0A=
+>>> Call the block layer API functions used for exposing the configured=0A=
+>>> limits to sysfs.=0A=
+>>>=0A=
+>>> Add accounting in null_blk_zoned so that these new limits are respected=
+.=0A=
+>>> Performing an operating that would exceed these limits results in a=0A=
+>>=0A=
+>> Performing a write operation that would result in exceeding these...=0A=
+>>=0A=
+>>> standard I/O error.=0A=
+>>>=0A=
+> =0A=
+> It is not only a write operation, also e.g. open zone operation.=0A=
+> However I will s/Performing an operating/Performing an operation/=0A=
+> =0A=
+>>> +/*=0A=
+>>> + * This function matches the manage open zone resources function in th=
+e ZBC standard,=0A=
+>>> + * with the addition of max active zones support (added in the ZNS sta=
+ndard).=0A=
+>>> + *=0A=
+>>> + * The function determines if a zone can transition to implicit open o=
+r explicit open,=0A=
+>>> + * while maintaining the max open zone (and max active zone) limit(s).=
+ It may close an=0A=
+>>> + * implicit open zone in order to make additional zone resources avail=
+able.=0A=
+>>> + *=0A=
+>>> + * ZBC states that an implicit open zone shall be closed only if there=
+ is not=0A=
+>>> + * room within the open limit. However, with the addition of an active=
+ limit,=0A=
+>>> + * it is not certain that closing an implicit open zone will allow a n=
+ew zone=0A=
+>>> + * to be opened, since we might already be at the active limit capacit=
+y.=0A=
+>>> + */=0A=
+>>> +static bool null_manage_zone_resources(struct nullb_device *dev, struc=
+t blk_zone *zone)=0A=
+>>=0A=
+>> I still do not like the name. Since this return a bool, what about=0A=
+>> null_has_zone_resources() ?=0A=
+> =0A=
+> I also don't like the name :)=0A=
+> =0A=
+> However, since the ZBC spec, in the descriptions of "Write operation, Fin=
+ish=0A=
+> operation, and Open operation", says that the "manage open zone resources=
+"=0A=
+> function must be called before each of these operations are performed,=0A=
+> and that there is a section that defines how the "manage open zone resour=
+ces"=0A=
+> is defined, I was thinking that having a similar name would be of value.=
+=0A=
+> =0A=
+> And I agree that it is weird that it returns a bool, but that is how it i=
+s=0A=
+> defined in the standard.=0A=
+> =0A=
+> Perhaps it should have exactly the same name as the standard, i.e.=0A=
+> null_manage_open_zone_resources() ?=0A=
+> =0A=
+> However, if you don't think that there is any point of trying to have=0A=
+> a similar name to the function in ZBC, then I will happily rename it :)=
+=0A=
+=0A=
+Well, I prefer to prioritize code readability over following a not-so-good =
+name=0A=
+that the standard chose. The function description makes it clear that it is=
+ zone=0A=
+management a-la-ZBC, so a function name clarifying what is being checked is=
+=0A=
+better in my opinion. Not a blocker though. Feel free to chose what to do h=
+ere.=0A=
+=0A=
+Cheers.=0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
