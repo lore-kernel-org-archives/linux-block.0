@@ -2,77 +2,108 @@ Return-Path: <SRS0=Mrne=CG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F255C433E2
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 07:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8971DC433E6
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 07:23:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5628D208C9
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 07:08:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598598508;
-	bh=ZvYOOOLLhxM1hflSpZB75b7Lg8qtxAvJHgbIokXn4jw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=IJCv9fkmyaO4Tq6N4o1tS3LFcxhewEQB6eeoakNLu7bbFvRACndEaH4MJOLBvbCCm
-	 KrcsJ4uMYV2wazDo2BQex9OKIYI3Or2EvjV3lUOJnStLXSr4vwo9ez/veeMob7KfEx
-	 Qdln8eD9NYvVluXKh3W7K//eusqRpgI2ceDi6fBk=
+	by mail.kernel.org (Postfix) with ESMTP id 138B220DD4
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 07:23:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="htl0u7Z3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728355AbgH1HI1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Aug 2020 03:08:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60604 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728320AbgH1HIZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Aug 2020 03:08:25 -0400
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3AF3F208C9;
-        Fri, 28 Aug 2020 07:08:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598598504;
-        bh=ZvYOOOLLhxM1hflSpZB75b7Lg8qtxAvJHgbIokXn4jw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=MrpZP9sPl3pous88EkRmY3yTSpWSvUUC5YeJANAq8ckaIlm1RQmHNUpeakTgx/zAs
-         5bEFHU+SWHVm0l2EZ/LMKJXPnh7FTgP0Pew+/mIYlU84amOdvkW716KOLoF6zlPwr3
-         j4uJ6bxLirJEyq2ci3jNFFAQdZISFl3n4Tb1EYPs=
-Received: by mail-lj1-f172.google.com with SMTP id w14so166663ljj.4;
-        Fri, 28 Aug 2020 00:08:24 -0700 (PDT)
-X-Gm-Message-State: AOAM530nlsvbbLAYKnO43fCqJxhdpxcjdxUavgzzhpca7u3dnjmeK05f
-        uqdl6uICbFs4NQ4SrQb8DwfKYBoHNbakdyUl/O4=
-X-Google-Smtp-Source: ABdhPJwDxwnTegqkGcim7YBtcif4W/XgOp/pZ2Mqt5pw3/OWQc7tRq9NrRCJraTuvVs/Zn6bXxCKz9TpF2uvlyIvdB4=
-X-Received: by 2002:a2e:7504:: with SMTP id q4mr222246ljc.41.1598598502529;
- Fri, 28 Aug 2020 00:08:22 -0700 (PDT)
+        id S1728001AbgH1HXC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Aug 2020 03:23:02 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:35340 "EHLO
+        charlie.dont.surf" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726644AbgH1HXB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Aug 2020 03:23:01 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net [80.167.98.190])
+        by charlie.dont.surf (Postfix) with ESMTPSA id 11AADBF554;
+        Fri, 28 Aug 2020 07:22:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+        s=default; t=1598599379;
+        bh=0hzAo9FTat39DkkPYrYwGvm52R/0SpyDYrV4O9m/u7c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=htl0u7Z35SclLEMyhH4MfeourXPOjtvoZHDyN0JZGfFriXOt+HusIjuIDs54Xsn47
+         nOAoe56SQp0EebyeA3msS0A1AdqKuvm3XaOeo2pL8SlltuQBCt1VNBWmD9OLmeuXjP
+         AKTJ4aPQeEjvQkgTUEGgiafV+uP+rlGJwbqdU9WloM1zN8IaRmKnmG8zRf/BbT0nfS
+         yTwLoSIiIpMxAvbwq0OFoYpqtwMygTn4+k/rLV0zlOuDUf+Ex7NAlZamS7mTLNWDdj
+         INEEONODivSphxl2R6JVW6m3abLeQee6xf70FoJioGHuB+bq2bIsuhfpQCvHZqPSWu
+         Az6aGy7TyXqDA==
+Date:   Fri, 28 Aug 2020 09:22:53 +0200
+From:   Klaus Jensen <its@irrelevant.dk>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] null_blk: add support for max open/active zone limit
+ for zoned devices
+Message-ID: <20200828072253.GA1331347@apples.localdomain>
+References: <20200827135018.63644-1-niklas.cassel@wdc.com>
+ <CY4PR04MB3751526DC5833902749EBE48E7520@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-References: <20200826062446.31860-1-hch@lst.de> <20200826062446.31860-13-hch@lst.de>
-In-Reply-To: <20200826062446.31860-13-hch@lst.de>
-From:   Song Liu <song@kernel.org>
-Date:   Fri, 28 Aug 2020 00:08:11 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW46Wg5Ju6coY73z7U6tr6hzcpnvMbj7tuxmVNsoH9NVxw@mail.gmail.com>
-Message-ID: <CAPhsuW46Wg5Ju6coY73z7U6tr6hzcpnvMbj7tuxmVNsoH9NVxw@mail.gmail.com>
-Subject: Re: [PATCH 12/19] md: use __register_blkdev to allocate devices on demand
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Denis Efremov <efremov@linux.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Al Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-ide@vger.kernel.org, linux-raid <linux-raid@vger.kernel.org>,
-        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="NzB8fVQJ5HfG6fxh"
+Content-Disposition: inline
+In-Reply-To: <CY4PR04MB3751526DC5833902749EBE48E7520@CY4PR04MB3751.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 25, 2020 at 11:53 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> Use the simpler mechanism attached to major_name to allocate a brd device
-> when a currently unregistered minor is accessed.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Acked-by: Song Liu <song@kernel.org>
+--NzB8fVQJ5HfG6fxh
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Aug 28 07:06, Damien Le Moal wrote:
+> On 2020/08/27 22:50, Niklas Cassel wrote:
+> > +static blk_status_t null_finish_zone(struct nullb_device *dev, struct =
+blk_zone *zone)
+> > +{
+> > +	if (zone->type =3D=3D BLK_ZONE_TYPE_CONVENTIONAL)
+> > +		return BLK_STS_IOERR;
+> > +
+> > +	switch (zone->cond) {
+> > +	case BLK_ZONE_COND_FULL:
+> > +		/* finish operation on full is not an error */
+> > +		return BLK_STS_OK;
+> > +	case BLK_ZONE_COND_EMPTY:
+> > +		if (!null_manage_zone_resources(dev, zone))
+>=20
+> OK. So you are hitting a fuzzy case here that is not actually well descri=
+bed in
+> the standards. That is, does finishing an empty zone necessarilly imply a
+> temporary transition through imp open ? Which you are assuming is a yes h=
+ere.
+> Personally, I would say that is not necessary, but no strong feeling eith=
+er way.
+>=20
+
+For ZNS, the spec is pretty clear that ZSE to ZSF is a legal direct
+transition. So I don't think the transition should be allowed to fail
+due to a lack of resources.
+
+--NzB8fVQJ5HfG6fxh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9IsMgACgkQTeGvMW1P
+DekA5Af/SC+I2hGvEBx86dF1Cb0s1pQyVLvhGOADnaCC8Ic1C840NJ/USCBMv7Eo
+8h8/2VmjD/DHttLE/eIAbOWzO2ij7PYJg6Dge4joBEZTg+4yYAt8I+TyfrqRGL5j
+FsNgtIlmnPSOvvjYkzLYrMQ/KHm9mk5q/gZcJIOiu02O7a3TOAI0jXuFWxfjq0s2
+u5v1k936yY01g5Ce4AlR5WSD4cSR4GwkGJNXza9yyu1KjnozCx4ahBVH4acy3xow
+H+tUloNIieacv0u9bAmeqPpKMdRhj+USCZkm9kXEP/SUeF/vPY12QBgSnWVxF9AU
+qd/zt+tcRzfzTzvulSfcpdgm/UtILQ==
+=blqO
+-----END PGP SIGNATURE-----
+
+--NzB8fVQJ5HfG6fxh--
