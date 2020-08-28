@@ -2,180 +2,98 @@ Return-Path: <SRS0=Mrne=CG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 590F1C433E2
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 13:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EFDC433E2
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 13:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 354B420825
-	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 13:06:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3478207DF
+	for <linux-block@archiver.kernel.org>; Fri, 28 Aug 2020 13:54:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RMA7AibI"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YVsUzZaB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726904AbgH1NFw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Aug 2020 09:05:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58074 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729123AbgH1NFq (ORCPT
+        id S1726900AbgH1Nyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Aug 2020 09:54:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50398 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726814AbgH1Nyj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Aug 2020 09:05:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598619931;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ecx9k3rvYpru2po9U3jgFYCT/S2916EODCpUn183XNs=;
-        b=RMA7AibIIojZLfe/WFymlZy3GYRdbykto7U3LQlT08Vj6Ra6U9PjCSTopM4ujzNpzDnQuX
-        Fkl6N9x9Dg+sHoVtKukDWdB2v+WphDT3hljG2yKnCYFqeDGW0vM+mYNnxROYncFdX3zr0o
-        OBML8Ze8S8ydGbzDGi7vtzrDhoGznvg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-1m2dBXBkMteBDZLfVsXmIA-1; Fri, 28 Aug 2020 09:05:27 -0400
-X-MC-Unique: 1m2dBXBkMteBDZLfVsXmIA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 022B6189E62D;
-        Fri, 28 Aug 2020 13:05:26 +0000 (UTC)
-Received: from T590 (ovpn-13-119.pek2.redhat.com [10.72.13.119])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 13FA97D679;
-        Fri, 28 Aug 2020 13:05:18 +0000 (UTC)
-Date:   Fri, 28 Aug 2020 21:05:14 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ilya Dryomov <idryomov@gmail.com>
-Cc:     Yufen Yu <yuyufen@huawei.com>, Hou Tao <houtao1@huawei.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: Sleeping while atomic regression around hd_struct_free() in
- 5.9-rc
-Message-ID: <20200828130514.GA236174@T590>
-References: <CAOi1vP9t1VL-JXj9ETdU_B1kMLjKGcW6wZss6bmxoH5UCAcK7Q@mail.gmail.com>
+        Fri, 28 Aug 2020 09:54:39 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91896C06121B
+        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2020 06:54:38 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id d18so1269629iop.13
+        for <linux-block@vger.kernel.org>; Fri, 28 Aug 2020 06:54:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=WRKo7hiT95deJi9zYbsblqjV9aJcpM8zCpj7qeA/5Zk=;
+        b=YVsUzZaBEQ53O+ALtCXuIdqxzBIDW3EcmfvL2hnfvV5xUF4iMm+B4JlwWitKyKbIs5
+         Yw0rvFpnIGxEH4Myz5gJ2NpALDj3iGTg5Bn4i0Mx0Z/BHbdOY66/TxbgawDTyD1tEMZF
+         rHs1GEtEC3eIlm22ucM6PAACpTOG7ztcIaHojfW5bBDWzs7YEbghB9NncfqparvidAab
+         fiNAvhuG3HfI+TTePV+Q7LwtIXWC558ASRrWY30EUskGYay8UPVXfZrH+i+qGZFjU+qT
+         yDx7ZUz6/KAHy+euxN+huztZr0ivbC6lsw+iSy6QAb6pisSUCmasBPYwlZR9cUZ9YO27
+         iPig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WRKo7hiT95deJi9zYbsblqjV9aJcpM8zCpj7qeA/5Zk=;
+        b=eSm5Y2QGpxBJEacJrbqbMihGTkyQPM4JHDpugLz5AdTlWkmqgWiv1OIYMs7Gu5zUDS
+         da/tymXnn+VV84m2LgOoPx4kEt8/cUen0P4vGfGXe4wxGFZ3gDhVECtfcma5Vs2HVHwq
+         J2ZILO/urnl3E72nsWb++Ox0ITLu6V3Kb3GdMbMvwjIfFn9lEX/9pX5GEBQXBxjZ3omm
+         yUZXUbQV5RY9dk0gNDO6jkEDlxRyHfIbYEr6vaFR3wxYd+Z0k4oI4SXd5n3ianXyMlTd
+         vYf0LjO3nnHRcYzCESAR4NWQ3cDBqlpkjvmYFoYJpTozlYZpudBAQQWkup25kukC2M41
+         xwEg==
+X-Gm-Message-State: AOAM532Lc9SQxZJzrRzMNmvB31i1YwNYF2fWleoYmK0gX8cq+RSlDvvq
+        l2pI0pD9bVKwAVjymBRSUFEhBiRTXFOTIKqp
+X-Google-Smtp-Source: ABdhPJzLdhaDX6/v6n0jKbkwolcavpJW6jj2Pl4fouvQn8W4qE2qcwsgn7Ax+Pg2ygmQWji3jSEYNg==
+X-Received: by 2002:a05:6638:1649:: with SMTP id a9mr1297090jat.115.1598622877380;
+        Fri, 28 Aug 2020 06:54:37 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id l144sm623447ill.6.2020.08.28.06.54.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Aug 2020 06:54:36 -0700 (PDT)
+Subject: Re: [PATCH 0/1] block io layer filters api
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, masahiroy@kernel.org,
+        michal.lkml@markovi.net, koct9i@gmail.com, jack@suse.cz,
+        damien.lemoal@wdc.com, ming.lei@redhat.com, steve@sk2.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <1598555619-14792-1-git-send-email-sergei.shtepa@veeam.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <7a517822-6be2-7d0d-fae3-31472c85f543@kernel.dk>
+Date:   Fri, 28 Aug 2020 07:54:35 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOi1vP9t1VL-JXj9ETdU_B1kMLjKGcW6wZss6bmxoH5UCAcK7Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <1598555619-14792-1-git-send-email-sergei.shtepa@veeam.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ilya,
-
-Thanks for your report!
-
-On Fri, Aug 28, 2020 at 12:32:48PM +0200, Ilya Dryomov wrote:
-> Hi Ming,
+On 8/27/20 1:13 PM, Sergei Shtepa wrote:
+> Hello everyone! Requesting for your comments and suggestions.
 > 
-> There seems to be a sleeping while atomic bug in hd_struct_free():
-> 
-> 288 static void hd_struct_free(struct percpu_ref *ref)
-> 289 {
-> 290         struct hd_struct *part = container_of(ref, struct hd_struct, ref);
-> 291         struct gendisk *disk = part_to_disk(part);
-> 292         struct disk_part_tbl *ptbl =
-> 293                 rcu_dereference_protected(disk->part_tbl, 1);
-> 294
-> 295         rcu_assign_pointer(ptbl->last_lookup, NULL);
-> 296         put_device(disk_to_dev(disk));
-> 297
-> 298         INIT_RCU_WORK(&part->rcu_work, hd_struct_free_work);
-> 299         queue_rcu_work(system_wq, &part->rcu_work);
-> 300 }
-> 
-> hd_struct_free() is a percpu_ref release callback and must not sleep.
-> But put_device() can end up in disk_release(), resulting in anything
-> from "sleeping function called from invalid context" splats to actual
-> lockups if the queue ends up being released:
-> 
->   BUG: scheduling while atomic: ksoftirqd/3/26/0x00000102
->   INFO: lockdep is turned off.
->   CPU: 3 PID: 26 Comm: ksoftirqd/3 Tainted: G        W
-> 5.9.0-rc2-ceph-g2de49bea2ebc #1
->   Hardware name: Supermicro SYS-5018R-WR/X10SRW-F, BIOS 2.0 12/17/2015
->   Call Trace:
->    dump_stack+0x96/0xd0
->    __schedule_bug.cold+0x64/0x71
->    __schedule+0x8ea/0xac0
->    ? wait_for_completion+0x86/0x110
->    schedule+0x5f/0xd0
->    schedule_timeout+0x212/0x2a0
->    ? wait_for_completion+0x86/0x110
->    wait_for_completion+0xb0/0x110
->    __wait_rcu_gp+0x139/0x150
->    synchronize_rcu+0x79/0xf0
->    ? invoke_rcu_core+0xb0/0xb0
->    ? rcu_read_lock_any_held+0xb0/0xb0
->    blk_free_flush_queue+0x17/0x30
->    blk_mq_hw_sysfs_release+0x32/0x70
->    kobject_put+0x7d/0x1d0
->    blk_mq_release+0xbe/0xf0
->    blk_release_queue+0xb7/0x140
->    kobject_put+0x7d/0x1d0
->    disk_release+0xb0/0xc0
->    device_release+0x25/0x80
->    kobject_put+0x7d/0x1d0
->    hd_struct_free+0x4c/0xc0
->    percpu_ref_switch_to_atomic_rcu+0x1df/0x1f0
->    rcu_core+0x3fd/0x660
->    ? rcu_core+0x3cc/0x660
->    __do_softirq+0xd5/0x45e
->    ? smpboot_thread_fn+0x26/0x1d0
->    run_ksoftirqd+0x30/0x60
->    smpboot_thread_fn+0xfe/0x1d0
->    ? sort_range+0x20/0x20
->    kthread+0x11a/0x150
->    ? kthread_delayed_work_timer_fn+0xa0/0xa0
->    ret_from_fork+0x1f/0x30
-> 
-> "git blame" points at your commit tb7d6c3033323 ("block: fix
-> use-after-free on cached last_lookup partition"), but there is
-> likely more to it because it went into 5.8 and I haven't seen
-> these lockups until we rebased to 5.9-rc.
+> We propose new kernel API that should be beneficial for out-of-tree
+> kernel modules of multiple backup vendors: block layer filter API.
 
-The pull-the-trigger commit is actually e8c7d14ac6c3 ("block: revert back to
-synchronous request_queue removal").
+That's just a non-starter, I'm afraid. We generally don't carry
+infrastructure in the kernel for out-of-tree modules, that includes
+even exports of existing code.
 
-> 
-> Could you please take a look?
+If there's a strong use case *in* the kernel, then such functionality
+could be entertained.
 
-Can you try the following patch?
-
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index e62a98a8eeb7..b06fc3425802 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -278,6 +278,15 @@ static void hd_struct_free_work(struct work_struct *work)
- {
- 	struct hd_struct *part =
- 		container_of(to_rcu_work(work), struct hd_struct, rcu_work);
-+	struct gendisk *disk = part_to_disk(part);
-+
-+	/*
-+	 * Release the reference grabbed in delete_partition, and it should
-+	 * have been done in hd_struct_free(), however device's release
-+	 * handler can't be done in percpu_ref's ->release() callback
-+	 * because it is run via call_rcu().
-+	 */
-+	put_device(disk_to_dev(disk));
- 
- 	part->start_sect = 0;
- 	part->nr_sects = 0;
-@@ -293,7 +302,6 @@ static void hd_struct_free(struct percpu_ref *ref)
- 		rcu_dereference_protected(disk->part_tbl, 1);
- 
- 	rcu_assign_pointer(ptbl->last_lookup, NULL);
--	put_device(disk_to_dev(disk));
- 
- 	INIT_RCU_WORK(&part->rcu_work, hd_struct_free_work);
- 	queue_rcu_work(system_wq, &part->rcu_work);
-
-
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
