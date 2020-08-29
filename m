@@ -2,104 +2,68 @@ Return-Path: <SRS0=CCtz=CH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0686BC433E2
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 09:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C464C433E6
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 09:38:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCD1120791
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 09:14:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kdrag0n.dev header.i=@kdrag0n.dev header.b="sERlu4vT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m4+iXbAw"
+	by mail.kernel.org (Postfix) with ESMTP id 5F94220791
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 09:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726464AbgH2JO1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Aug 2020 05:14:27 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:55905 "EHLO
-        out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726405AbgH2JOZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Aug 2020 05:14:25 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id AB40B5C0161;
-        Sat, 29 Aug 2020 05:14:23 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Sat, 29 Aug 2020 05:14:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kdrag0n.dev; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm2; bh=vdgCpwlVAM9JPg+izfOV7VwaHm
-        Ozcnhhr5dI10N741Y=; b=sERlu4vTM9W4o+BsA3vsuG7ET1JJmL4YcqnYXfZwai
-        T5lA1CimLxQwHg1UqUfh0D8fDJMq7k2MV2NPzNsnEwJ8myFfpxIMGAsIZJxADYYv
-        IU1N5kUAMeGl+Yu0WT5wMlxek8XW3gkRYzrWxAXjOrDAZ6oJ7sjWpNOn9V81ELFC
-        xOwdGV3oe9oU7i/B6oMepxQueatQfGVBEGpTsk7ZbQXopyNs4xMqqTf7We95PFBG
-        8yZ49eMHC2U8yQSQeXJmxZrn0uPvpB3E1EKOhfO/Kh8FVmlZVBBgz4ijKXw41lPJ
-        rKO1xmgjOa/qmgNbqE15evoeey3s7wxB2jNqClxC6GcA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=vdgCpwlVAM9JPg+iz
-        fOV7VwaHmOzcnhhr5dI10N741Y=; b=m4+iXbAwXcxgEWvqMT0DZwXLPt8MK/EmM
-        pehXHmVk7E86D58Fihgu6dUqhhhQUeYfENcLa+5AHiAa8GG8hMgx7DqK2hlXSL9C
-        CBSuiHBCjxM/i4LIgS0LgPEH0iDD4/AZVNAwwJ6MxZu/KtFFYqoY2OIHPSfQ5q35
-        2AM6I77K2mVsCiw2yZ0CoCYyzKuZy3SOyfVCNrHx4mNCCwvEq1Igfye3bXFT7UTG
-        BFEGT/UmrRkaFyz+sEx5P9qWbwGpedzz1pKsdwKR7/fh6wNjIYzXrUr2bIrZE4gC
-        xwGobuj8rMpfTj9b00ZdN6wv8Iz0HN87CetiC0r8rKk+pkRGpG+tQ==
-X-ME-Sender: <xms:bxxKX1pPr69mjndIWH6grRgwhsLcAmrTuAOMK10Dhp8QrLycuiKY9w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrudefuddgudefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghnnhihucfn
-    ihhnuceouggrnhhnhieskhgurhgrghdtnhdruggvvheqnecuggftrfgrthhtvghrnhephf
-    eihffglefgudefvdduledvfedvfefgieeuueefgeetffdukeeghfevtdeifeetnecukfhp
-    pedutdegrddvtddtrdduvdelrddvuddvnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepuggrnhhnhieskhgurhgrghdtnhdruggvvh
-X-ME-Proxy: <xmx:bxxKX3rB3ckTgh6fUNE1CirxBSaxhTK73eRbymscTXp37xsBg1fvIg>
-    <xmx:bxxKXyNVF094Vkrwp7dD8pyEArAqgEw8whS0d37Un75OHCby08iY-Q>
-    <xmx:bxxKXw4elL48Xrie--ogZiLdSHo0n9DNduvMNVhPpGTJEcaiAcwd5A>
-    <xmx:bxxKX5jTPuMH-U2rrQRKpN7RuTEKtiIX-Nc6wYbikXqHHZGYX9nZ7Q>
-Received: from pinwheel.localdomain (unknown [104.200.129.212])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 5EB653280060;
-        Sat, 29 Aug 2020 05:14:21 -0400 (EDT)
-From:   Danny Lin <danny@kdrag0n.dev>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Danny Lin <danny@kdrag0n.dev>
-Subject: [PATCH] blk-wbt: Remove obsolete multiqueue I/O scheduling comment
-Date:   Sat, 29 Aug 2020 02:13:53 -0700
-Message-Id: <20200829091353.2923361-1-danny@kdrag0n.dev>
-X-Mailer: git-send-email 2.27.0
+        id S1727022AbgH2Jiy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Aug 2020 05:38:54 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:45636 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727003AbgH2Jix (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 Aug 2020 05:38:53 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 18FB52DB5BFE21E2EF9B;
+        Sat, 29 Aug 2020 17:38:51 +0800 (CST)
+Received: from huawei.com (10.175.104.175) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Sat, 29 Aug 2020
+ 17:38:43 +0800
+From:   Miaohe Lin <linmiaohe@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linmiaohe@huawei.com>
+Subject: [PATCH] block: bio: Trim bio to sensible size in bio_trim()
+Date:   Sat, 29 Aug 2020 05:37:33 -0400
+Message-ID: <20200829093733.45833-1-linmiaohe@huawei.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.104.175]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This comment was added before the multiqueue I/O scheduler framework
-was introduced; multiqueue has support for I/O scheduling now, so this
-obsolete comment can be removed.
+Trim bio to sensible size in bio_trim() or something bad may happen.
 
-Signed-off-by: Danny Lin <danny@kdrag0n.dev>
+Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- block/Kconfig | 2 --
- 1 file changed, 2 deletions(-)
+ block/bio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/Kconfig b/block/Kconfig
-index bbad5e8bbffe..a2297edfdde8 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -161,8 +161,6 @@ config BLK_WBT_MQ
- 	depends on BLK_WBT
- 	help
- 	Enable writeback throttling by default on multiqueue devices.
--	Multiqueue currently doesn't have support for IO scheduling,
--	enabling this option is recommended.
+diff --git a/block/bio.c b/block/bio.c
+index a9931f23d933..94e4f97d3d4e 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1509,7 +1509,8 @@ void bio_trim(struct bio *bio, int offset, int size)
+ 		return;
  
- config BLK_DEBUG_FS
- 	bool "Block layer debugging information in debugfs"
+ 	bio_advance(bio, offset << 9);
+-	bio->bi_iter.bi_size = size;
++	if (likely(bio->bi_iter.bi_size >= size))
++		bio->bi_iter.bi_size = size;
+ 
+ 	if (bio_integrity(bio))
+ 		bio_integrity_trim(bio);
 -- 
-2.27.0
+2.19.1
 
