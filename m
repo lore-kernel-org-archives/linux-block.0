@@ -2,155 +2,104 @@ Return-Path: <SRS0=CCtz=CH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE68C2BBD9
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 08:09:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0686BC433E2
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 09:14:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF12B20776
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 08:09:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCD1120791
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 09:14:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="GeCR42p0"
+	dkim=pass (2048-bit key) header.d=kdrag0n.dev header.i=@kdrag0n.dev header.b="sERlu4vT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m4+iXbAw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727941AbgH2IJB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Aug 2020 04:09:01 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:6667 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727931AbgH2II4 (ORCPT
+        id S1726464AbgH2JO1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Aug 2020 05:14:27 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:55905 "EHLO
+        out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726405AbgH2JOZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Aug 2020 04:08:56 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f4a0c9b0000>; Sat, 29 Aug 2020 01:06:51 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Sat, 29 Aug 2020 01:08:55 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Sat, 29 Aug 2020 01:08:55 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 29 Aug
- 2020 08:08:54 +0000
-Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Sat, 29 Aug 2020 08:08:54 +0000
-Received: from sandstorm.nvidia.com (Not Verified[10.2.50.252]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5f4a0d160001>; Sat, 29 Aug 2020 01:08:54 -0700
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, <linux-xfs@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v2 1/3] mm/gup: introduce pin_user_page()
-Date:   Sat, 29 Aug 2020 01:08:51 -0700
-Message-ID: <20200829080853.20337-2-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200829080853.20337-1-jhubbard@nvidia.com>
-References: <20200829080853.20337-1-jhubbard@nvidia.com>
+        Sat, 29 Aug 2020 05:14:25 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id AB40B5C0161;
+        Sat, 29 Aug 2020 05:14:23 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Sat, 29 Aug 2020 05:14:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kdrag0n.dev; h=
+        from:to:cc:subject:date:message-id:mime-version
+        :content-transfer-encoding; s=fm2; bh=vdgCpwlVAM9JPg+izfOV7VwaHm
+        Ozcnhhr5dI10N741Y=; b=sERlu4vTM9W4o+BsA3vsuG7ET1JJmL4YcqnYXfZwai
+        T5lA1CimLxQwHg1UqUfh0D8fDJMq7k2MV2NPzNsnEwJ8myFfpxIMGAsIZJxADYYv
+        IU1N5kUAMeGl+Yu0WT5wMlxek8XW3gkRYzrWxAXjOrDAZ6oJ7sjWpNOn9V81ELFC
+        xOwdGV3oe9oU7i/B6oMepxQueatQfGVBEGpTsk7ZbQXopyNs4xMqqTf7We95PFBG
+        8yZ49eMHC2U8yQSQeXJmxZrn0uPvpB3E1EKOhfO/Kh8FVmlZVBBgz4ijKXw41lPJ
+        rKO1xmgjOa/qmgNbqE15evoeey3s7wxB2jNqClxC6GcA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=vdgCpwlVAM9JPg+iz
+        fOV7VwaHmOzcnhhr5dI10N741Y=; b=m4+iXbAwXcxgEWvqMT0DZwXLPt8MK/EmM
+        pehXHmVk7E86D58Fihgu6dUqhhhQUeYfENcLa+5AHiAa8GG8hMgx7DqK2hlXSL9C
+        CBSuiHBCjxM/i4LIgS0LgPEH0iDD4/AZVNAwwJ6MxZu/KtFFYqoY2OIHPSfQ5q35
+        2AM6I77K2mVsCiw2yZ0CoCYyzKuZy3SOyfVCNrHx4mNCCwvEq1Igfye3bXFT7UTG
+        BFEGT/UmrRkaFyz+sEx5P9qWbwGpedzz1pKsdwKR7/fh6wNjIYzXrUr2bIrZE4gC
+        xwGobuj8rMpfTj9b00ZdN6wv8Iz0HN87CetiC0r8rKk+pkRGpG+tQ==
+X-ME-Sender: <xms:bxxKX1pPr69mjndIWH6grRgwhsLcAmrTuAOMK10Dhp8QrLycuiKY9w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrudefuddgudefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghnnhihucfn
+    ihhnuceouggrnhhnhieskhgurhgrghdtnhdruggvvheqnecuggftrfgrthhtvghrnhephf
+    eihffglefgudefvdduledvfedvfefgieeuueefgeetffdukeeghfevtdeifeetnecukfhp
+    pedutdegrddvtddtrdduvdelrddvuddvnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepuggrnhhnhieskhgurhgrghdtnhdruggvvh
+X-ME-Proxy: <xmx:bxxKX3rB3ckTgh6fUNE1CirxBSaxhTK73eRbymscTXp37xsBg1fvIg>
+    <xmx:bxxKXyNVF094Vkrwp7dD8pyEArAqgEw8whS0d37Un75OHCby08iY-Q>
+    <xmx:bxxKXw4elL48Xrie--ogZiLdSHo0n9DNduvMNVhPpGTJEcaiAcwd5A>
+    <xmx:bxxKX5jTPuMH-U2rrQRKpN7RuTEKtiIX-Nc6wYbikXqHHZGYX9nZ7Q>
+Received: from pinwheel.localdomain (unknown [104.200.129.212])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 5EB653280060;
+        Sat, 29 Aug 2020 05:14:21 -0400 (EDT)
+From:   Danny Lin <danny@kdrag0n.dev>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Danny Lin <danny@kdrag0n.dev>
+Subject: [PATCH] blk-wbt: Remove obsolete multiqueue I/O scheduling comment
+Date:   Sat, 29 Aug 2020 02:13:53 -0700
+Message-Id: <20200829091353.2923361-1-danny@kdrag0n.dev>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1598688411; bh=nt0PtF6oHhEk4Ehi11ZCG1lTaPX813pQeWdo2szO18M=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=GeCR42p0vG1Y/mcPDPfFg8Jr+t+lxTu2SPIfM2gbW6ioXBlHyDFBEpuWKpukI54u+
-         wsuDo2DHLHKzyLlIOzIMY4I1LBumbthJEXfQmWXbbOStiZGBDqfFygVpB3cAvHtCxJ
-         O7vNWk/2AOqUKjPA6p+gj8ZomZWK4+T5oteaJhEgJEmZcyDIMb4EFnfTlOEIici30Q
-         IBgbsi1Eg0hhZ4Jobh5b6/CjdUvus97FqFJ/WqgEUtSAFqIA33aVOm1GONjDKd6GC3
-         ODte/dvdN6LsXZp/2yOMJiuHmDsUiIwW+lNAgUdH40w5HufWhROtZDg4IwW21uTptn
-         FfBYqJQiWcdAg==
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-pin_user_page() is the FOLL_PIN equivalent of get_page().
+This comment was added before the multiqueue I/O scheduler framework
+was introduced; multiqueue has support for I/O scheduling now, so this
+obsolete comment can be removed.
 
-This was always a missing piece of the pin/unpin API calls (early
-reviewers of pin_user_pages() asked about it, in fact), but until now,
-it just wasn't needed. Finally though, now that the Direct IO pieces in
-block/bio are about to be converted to use FOLL_PIN, it turns out that
-there are some cases in which get_page() and get_user_pages_fast() were
-both used. Converting those sites requires a drop-in replacement for
-get_page(), which this patch supplies.
-
-[1] and [2] provide some background about pin_user_pages() in general.
-
-[1] "Explicit pinning of user-space pages":
-    https://lwn.net/Articles/807108/
-
-[2] Documentation/core-api/pin_user_pages.rst
-
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+Signed-off-by: Danny Lin <danny@kdrag0n.dev>
 ---
- include/linux/mm.h |  2 ++
- mm/gup.c           | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 32 insertions(+)
+ block/Kconfig | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 97c83773b6f0..51c6ae4b63f7 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1152,6 +1152,8 @@ static inline void get_page(struct page *page)
- 	page_ref_inc(page);
- }
-=20
-+void pin_user_page(struct page *page);
-+
- bool __must_check try_grab_page(struct page *page, unsigned int flags);
-=20
- static inline __must_check bool try_get_page(struct page *page)
-diff --git a/mm/gup.c b/mm/gup.c
-index ae096ea7583f..2cae5bbbc862 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -123,6 +123,36 @@ static __maybe_unused struct page *try_grab_compound_h=
-ead(struct page *page,
- 	return NULL;
- }
-=20
-+/*
-+ * pin_user_page() - elevate the page refcount, and mark as FOLL_PIN
-+ *
-+ * This the FOLL_PIN equivalent of get_page(). It is intended for use when=
- the
-+ * page will be released via unpin_user_page().
-+ */
-+void pin_user_page(struct page *page)
-+{
-+	int refs =3D 1;
-+
-+	page =3D compound_head(page);
-+
-+	VM_BUG_ON_PAGE(page_ref_count(page) <=3D 0, page);
-+
-+	if (hpage_pincount_available(page))
-+		hpage_pincount_add(page, 1);
-+	else
-+		refs =3D GUP_PIN_COUNTING_BIAS;
-+
-+	/*
-+	 * Similar to try_grab_compound_head(): even if using the
-+	 * hpage_pincount_add/_sub() routines, be sure to
-+	 * *also* increment the normal page refcount field at least
-+	 * once, so that the page really is pinned.
-+	 */
-+	page_ref_add(page, refs);
-+
-+	mod_node_page_state(page_pgdat(page), NR_FOLL_PIN_ACQUIRED, 1);
-+}
-+
- /**
-  * try_grab_page() - elevate a page's refcount by a flag-dependent amount
-  *
---=20
-2.28.0
+diff --git a/block/Kconfig b/block/Kconfig
+index bbad5e8bbffe..a2297edfdde8 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -161,8 +161,6 @@ config BLK_WBT_MQ
+ 	depends on BLK_WBT
+ 	help
+ 	Enable writeback throttling by default on multiqueue devices.
+-	Multiqueue currently doesn't have support for IO scheduling,
+-	enabling this option is recommended.
+ 
+ config BLK_DEBUG_FS
+ 	bool "Block layer debugging information in debugfs"
+-- 
+2.27.0
 
