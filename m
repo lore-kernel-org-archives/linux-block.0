@@ -2,110 +2,176 @@ Return-Path: <SRS0=CCtz=CH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E76D9C433E2
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 16:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15977C433E6
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 18:56:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3D8B207DA
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 16:55:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="QbRKLoIW"
+	by mail.kernel.org (Postfix) with ESMTP id E8B5C2076D
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 18:56:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728469AbgH2Qzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Aug 2020 12:55:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728410AbgH2Qzn (ORCPT
+        id S1728380AbgH2S4y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Aug 2020 14:56:54 -0400
+Received: from netrider.rowland.org ([192.131.102.5]:43539 "HELO
+        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1728265AbgH2S4y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Aug 2020 12:55:43 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7F6C061236
-        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2020 09:55:42 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id m34so1960958pgl.11
-        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2020 09:55:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=gpCk8VygJk1zZ08Ty15aVZKL4rkUM5lf7IFSkXE+mKM=;
-        b=QbRKLoIW/ndCidQfvSQKq6pdqhlWDnCNAIJWHE1fPzXe9c8+V7UpvHganwEBvpocr8
-         xbJk0tF+BJQ/XtrOPdjlx6PjP9i24tfRlisOC7YlXlHj4lnp8X90mWLmsQ0jaIWH2RyS
-         YMlSI7WKjDoSpIJ2t+MMkeeMvFtTKbzRE1L+Uqm541YgLso2hKVfwbhJ+kHW9Ikb+GWF
-         foe8UwKa7E55gGQGlmCpqrQi8zvRn3SsVi6CK+Fs+1+UZEPtG01pom5JNsOgy46D1Ueu
-         VgBBu6UO+1Y5iSTgnU9lGZHewpj8qN/ER8kD0CZGlTP/1zZZxfotc2AL29KX/sUh+5LK
-         lfMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gpCk8VygJk1zZ08Ty15aVZKL4rkUM5lf7IFSkXE+mKM=;
-        b=JTtyH/9neSjX1uB79hrxl9XWAOn/dvUnqq4sHYCxxz0OFgrCiLfCiiUMd5EQ7POFBq
-         3N1ElE1Kh2Ds2O2gMuvUl2jvOunocbXHe72DvrXpm0YJv7uwtumNSgE6bPI6sLYw2fvz
-         jYp1VTcQ6ETh/Sp+beF/kRBiPCwxx+5cGdanAj4mlJYppLE8EZMHBmB2o7+J6PFVzG/f
-         xHNFALVVyFAqHz3LRf42337yswqsgv6v+xrcHTORkcjgjFJ0rQyrYWlCXeuQia/yil+r
-         vG0o+TvF9zjmENCZtPZgWHF06g3JP2e12lxYYsfFefG/JPtl21Vd+uWf1Yv0xjS0v1fB
-         0MUQ==
-X-Gm-Message-State: AOAM5333u1jy3raxlF83FbHS6MdsJCSyaAtxASQXhsIgTb3eACYPTDZl
-        4CAQZyXdj8WvubmfNDr9EmlPmQ==
-X-Google-Smtp-Source: ABdhPJzpX5e6UXpjfRs8fVs5NiULAPs3P32fOIet9239Y9oMqYW/uFqBsq+B0saHLNIqTBWsY1HdMA==
-X-Received: by 2002:a63:4621:: with SMTP id t33mr3075897pga.32.1598720141968;
-        Sat, 29 Aug 2020 09:55:41 -0700 (PDT)
-Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id a5sm2947812pgb.23.2020.08.29.09.55.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 29 Aug 2020 09:55:41 -0700 (PDT)
-Subject: Re: [GIT PULL] nvme fixes for 5.9 next rc
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-References: <20200829153243.324252-1-sagi@grimberg.me>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <18fdb68f-8747-6f44-de0d-390a3fbd41c3@kernel.dk>
-Date:   Sat, 29 Aug 2020 10:55:39 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Sat, 29 Aug 2020 14:56:54 -0400
+Received: (qmail 502630 invoked by uid 1000); 29 Aug 2020 14:56:53 -0400
+Date:   Sat, 29 Aug 2020 14:56:53 -0400
+From:   Alan Stern <stern@rowland.harvard.edu>
+To:     Martin Kepplinger <martin.kepplinger@puri.sm>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, kernel@puri.sm
+Subject: Re: [PATCH] block: Fix bug in runtime-resume handling
+Message-ID: <20200829185653.GB501978@rowland.harvard.edu>
+References: <6f0c530f-4309-ab1e-393b-83bf8367f59e@puri.sm>
+ <20200823145733.GC303967@rowland.harvard.edu>
+ <3e5a465e-8fe0-b379-a80e-23e2f588c71a@acm.org>
+ <20200824201343.GA344424@rowland.harvard.edu>
+ <5152a510-bebf-bf33-f6b3-4549e50386ab@puri.sm>
+ <4c636f2d-af7f-bbde-a864-dbeb67c590ec@puri.sm>
+ <20200827202952.GA449067@rowland.harvard.edu>
+ <478fdc57-f51e-f480-6fde-f34596394624@puri.sm>
+ <20200829152635.GA498519@rowland.harvard.edu>
+ <6d22ec22-a0c7-6a9d-439e-38ef87b0207c@puri.sm>
 MIME-Version: 1.0
-In-Reply-To: <20200829153243.324252-1-sagi@grimberg.me>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d22ec22-a0c7-6a9d-439e-38ef87b0207c@puri.sm>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/29/20 9:32 AM, Sagi Grimberg wrote:
-> Hey Jens,
+On Sat, Aug 29, 2020 at 06:33:26PM +0200, Martin Kepplinger wrote:
+> On 29.08.20 17:26, Alan Stern wrote:
+> > Hmmm.  I'm wondering about something you wrote back in June 
+> > (https://marc.info/?l=linux-scsi&m=159345778431615&w=2):
+> > 
+> > 	blk_queue_enter() always - especially when sd is runtime 
+> > 	suspended and I try to mount as above - sets success to be true 
+> > 	for me, so never continues down to bkl_pm_request_resume(). All 
+> > 	I see is "PM: Removing info for No Bus:sda1".
+> > 
+> > blk_queue_enter() would always set success to be true because pm 
+> > (derived from the BLK_MQ_REQ_PREEMPT flag) is true.  But why was the 
+> > BLK_MQ_REQ_PREEMPT flag set?  In other words, where was 
+> > blk_queue_enter() called from?
+> > 
+> > Can you get a stack trace (i.e., call dump_stack()) at exactly this 
+> > point, that is, when pm is true and q->rpm_status is RPM_SUSPENDED?  Or 
+> > do you already know the answer?
+> > 
+> >
 > 
-> Some more nvme fixes:
-> - instance leak and io boundary fixes from Keith
-> - fc locking fix from Christophe
-> - various tcp/rdma reset during traffic fixes from Me
-> - pci use-after-free fix from Tong
-> - tcp target null deref fix from Ziye
+> I reverted any scsi/block out-of-tree fixes for this.
 > 
-> Please pull.
+> when I try to mount, pm is TRUE (BLK_MQ_REQ_PREEMT set) and that's the
+> first stack trace I get in this condition, inside of blk_queue_enter():
 > 
-> The following changes since commit a433d7217feab712ff69ef5cc2a86f95ed1aca40:
+> There is more, but I don't know if that's interesting.
 > 
->   Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.9 (2020-08-28 07:52:02 -0600)
+> [   38.642202] CPU: 2 PID: 1522 Comm: mount Not tainted 5.8.0-1-librem5 #487
+> [   38.642207] Hardware name: Purism Librem 5r3 (DT)
+> [   38.642213] Call trace:
+> [   38.642233]  dump_backtrace+0x0/0x210
+> [   38.642242]  show_stack+0x20/0x30
+> [   38.642252]  dump_stack+0xc8/0x128
+> [   38.642262]  blk_queue_enter+0x1b8/0x2d8
+> [   38.642271]  blk_mq_alloc_request+0x54/0xb0
+> [   38.642277]  blk_get_request+0x34/0x78
+> [   38.642286]  __scsi_execute+0x60/0x1c8
+> [   38.642291]  scsi_test_unit_ready+0x88/0x118
+> [   38.642298]  sd_check_events+0x110/0x158
+> [   38.642306]  disk_check_events+0x68/0x188
+> [   38.642312]  disk_clear_events+0x84/0x198
+> [   38.642320]  check_disk_change+0x38/0x90
+> [   38.642325]  sd_open+0x60/0x148
+> [   38.642330]  __blkdev_get+0xcc/0x4c8
+> [   38.642335]  __blkdev_get+0x278/0x4c8
+> [   38.642339]  blkdev_get+0x128/0x1a8
+> [   38.642345]  blkdev_open+0x98/0xb0
+> [   38.642354]  do_dentry_open+0x130/0x3c8
+> [   38.642359]  vfs_open+0x34/0x40
+> [   38.642366]  path_openat+0xa30/0xe40
+> [   38.642372]  do_filp_open+0x84/0x100
+> [   38.642377]  do_sys_openat2+0x1f4/0x2b0
+> [   38.642382]  do_sys_open+0x60/0xa8
+> (...)
 > 
-> are available in the Git repository at:
-> 
->   ssh://git.infradead.org/var/lib/git/nvme.git nvme-5.9-rc
+> and of course it doesn't work and /dev/sda1 disappears, see the initial
+> discussion that led to your fix.
 
-This doesn't look right... I pulled from the usual spot, diffstat and
-changes match up.
+Great!  That's exactly what I was looking for, thank you.
 
-BTW, in the future, can you switch to signed tags? They are nice to use
-in general, but particularly for git repos that are outside the kernel.org
-infrastructure.
+Bart, this is a perfect example of the potential race I've been talking 
+about in the other email thread.  Suppose thread 0 is carrying out a 
+runtime suspend of a SCSI disk and at the same time, thread 1 is opening 
+the disk's block device (as we see in the stack trace here).  Then we 
+could have the following:
 
--- 
-Jens Axboe
+	Thread 0		Thread 1
+	--------		--------
+	Start runtime suspend
+	blk_pre_runtime_suspend calls
+	  blk_set_pm_only and sets
+	  q->rpm_status to RPM_SUSPENDING
 
+				Call sd_open -> ... -> scsi_test_unit_ready
+				  -> __scsi_execute -> ...
+				  -> blk_queue_enter
+				Sees BLK_MQ_REQ_PREEMPT set and
+				  RPM_SUSPENDING queue status, so does 
+				  not postpone the request
+
+	blk_post_runtime_suspend sets
+	  q->rpm_status to RPM_SUSPENDED
+	The drive goes into runtime suspend
+
+				Issues the TEST UNIT READY request
+				Request fails because the drive is suspended
+
+One way to avoid this race is mutual exclusion: We could make sd_open 
+prevent the drive from being runtime suspended until it returns.  
+However I don't like this approach; it would mean tracking down every 
+possible pathway to __scsi_execute and making sure that runtime suspend 
+is blocked.
+
+A more fine-grained approach would be to have __scsi_execute itself call 
+scsi_autopm_get/put_device whenever the rq_flags argument doesn't 
+contain RQF_PM.  This way we wouldn't have to worry about missing any 
+possiible pathways.  But it relies on an implicit assumption that 
+__scsi_execute is the only place where the PREEMPT flag gets set.
+
+A third possibility is the approach I outlined before, adding a 
+BLK_MQ_REQ_PM flag.  But to avoid the deadlock you pointed out, I would 
+make blk_queue_enter smarter about whether to postpone a request.  The 
+logic would go like this:
+
+	If !blk_queue_pm_only:
+		Allow
+	If !BLK_MQ_REQ_PREEMPT:
+		Postpone
+	If q->rpm_status is RPM_ACTIVE:
+		Allow
+	If !BLK_MQ_REQ_PM:
+		Postpone
+	If q->rpm_status is RPM_SUSPENDED:
+		Postpone
+	Else:
+		Allow
+
+The assumption here is that the PREEMPT flag is set whenever the PM flag 
+is.
+
+I believe either the second or third possibility would work.  The second 
+looks to be the simplest
+
+What do you think?
+
+Alan Stern
