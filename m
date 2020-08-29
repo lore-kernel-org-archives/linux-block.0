@@ -2,79 +2,115 @@ Return-Path: <SRS0=CCtz=CH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1CBC433E6
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 15:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E001C433E2
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 15:32:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23E7820BED
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 15:26:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84373208A9
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 15:32:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728305AbgH2P0h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Aug 2020 11:26:37 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:44007 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1728239AbgH2P0h (ORCPT
+        id S1728235AbgH2Pcq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Aug 2020 11:32:46 -0400
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:45800 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728196AbgH2Pcp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Aug 2020 11:26:37 -0400
-Received: (qmail 499010 invoked by uid 1000); 29 Aug 2020 11:26:35 -0400
-Date:   Sat, 29 Aug 2020 11:26:35 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Martin Kepplinger <martin.kepplinger@puri.sm>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Can Guo <cang@codeaurora.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel@puri.sm
-Subject: Re: [PATCH] block: Fix bug in runtime-resume handling
-Message-ID: <20200829152635.GA498519@rowland.harvard.edu>
-References: <60150284-be13-d373-5448-651b72a7c4c9@puri.sm>
- <20200810141343.GA299045@rowland.harvard.edu>
- <6f0c530f-4309-ab1e-393b-83bf8367f59e@puri.sm>
- <20200823145733.GC303967@rowland.harvard.edu>
- <3e5a465e-8fe0-b379-a80e-23e2f588c71a@acm.org>
- <20200824201343.GA344424@rowland.harvard.edu>
- <5152a510-bebf-bf33-f6b3-4549e50386ab@puri.sm>
- <4c636f2d-af7f-bbde-a864-dbeb67c590ec@puri.sm>
- <20200827202952.GA449067@rowland.harvard.edu>
- <478fdc57-f51e-f480-6fde-f34596394624@puri.sm>
+        Sat, 29 Aug 2020 11:32:45 -0400
+Received: by mail-pg1-f171.google.com with SMTP id 67so1896754pgd.12
+        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2020 08:32:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bwBvPhzWsgBMA4B93AZzg5eo/lFdR101ys5gclkTz9k=;
+        b=kPz8JB71zXSaE/2/IJrqGQ3KIBw0U9GYn2y7MVrDoT2VwMfXOn0F8scaqn4cKUO28j
+         1AYSG5NGp7Gz0WW1m64KTIi6XyxMoQNrRwdKGvL3MiHnXLuf4fTbyqZ62wNoXOeHWOY2
+         iteG+vxSZuBwYnIUYuenGOPcX4P/vkl8N5scsuPMf6779m68vWSwPh2Y1fP0MlqyEU6r
+         G5PupmO0yHzWZmpNTySEW6YKutRZVQfbL2bg92PuPcSF7TqBwvYYVCB8bcck6BEkiu+B
+         kcuhNWYKiE6Op5aXdGHeDlVh7Kx/VWM1TfhekKAvRkB2aQ35HdzJoY9xLXHBlSxxkLdU
+         6Ouw==
+X-Gm-Message-State: AOAM5325vI6PePq9lQuG4vU2iEcLm8DhZJWcrZdZCg3Z/1AnZVmuSsSW
+        27ezsirHmSrwU1FBpF2GZe3UGUFppc/mZQ==
+X-Google-Smtp-Source: ABdhPJxlMGWzjpDeG454J8od1jHKSel7r0h1mstGi3paW/6nHqcoi8dnfmlH+/FwwMmJEmkuMqsVmA==
+X-Received: by 2002:a65:4083:: with SMTP id t3mr1500745pgp.201.1598715164916;
+        Sat, 29 Aug 2020 08:32:44 -0700 (PDT)
+Received: from sagi-Latitude-7490.hsd1.ca.comcast.net ([2601:647:4802:9070:b43d:4be3:4cfb:fd9e])
+        by smtp.gmail.com with ESMTPSA id p184sm3182347pfb.47.2020.08.29.08.32.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Aug 2020 08:32:44 -0700 (PDT)
+From:   Sagi Grimberg <sagi@grimberg.me>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+Subject: [GIT PULL] nvme fixes for 5.9 next rc
+Date:   Sat, 29 Aug 2020 08:32:43 -0700
+Message-Id: <20200829153243.324252-1-sagi@grimberg.me>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <478fdc57-f51e-f480-6fde-f34596394624@puri.sm>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 29, 2020 at 09:24:30AM +0200, Martin Kepplinger wrote:
-> On 27.08.20 22:29, Alan Stern wrote:
-> > Instead, look at sd_resume().  That routine calls __scsi_execute() 
-> > indirectly through sd_start_stop_device(), and the only reason it does 
-> > this is because the sdkp->device->manage_start_stop flag is set.  You 
-> > ought to be able to clear this flag in sysfs, by writing to 
-> > /sys/block/sda/device/scsi_disk/*/manage_start_stop.  If you do this 
-> > before allowing the card reader to go into runtime suspend, does it then 
-> > resume okay?
-> 
-> manage_start_stop in sysfs is 0 here.
+Hey Jens,
 
-Hmmm.  I'm wondering about something you wrote back in June 
-(https://marc.info/?l=linux-scsi&m=159345778431615&w=2):
+Some more nvme fixes:
+- instance leak and io boundary fixes from Keith
+- fc locking fix from Christophe
+- various tcp/rdma reset during traffic fixes from Me
+- pci use-after-free fix from Tong
+- tcp target null deref fix from Ziye
 
-	blk_queue_enter() always - especially when sd is runtime 
-	suspended and I try to mount as above - sets success to be true 
-	for me, so never continues down to bkl_pm_request_resume(). All 
-	I see is "PM: Removing info for No Bus:sda1".
+Please pull.
 
-blk_queue_enter() would always set success to be true because pm 
-(derived from the BLK_MQ_REQ_PREEMPT flag) is true.  But why was the 
-BLK_MQ_REQ_PREEMPT flag set?  In other words, where was 
-blk_queue_enter() called from?
+The following changes since commit a433d7217feab712ff69ef5cc2a86f95ed1aca40:
 
-Can you get a stack trace (i.e., call dump_stack()) at exactly this 
-point, that is, when pm is true and q->rpm_status is RPM_SUSPENDED?  Or 
-do you already know the answer?
+  Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.9 (2020-08-28 07:52:02 -0600)
 
-Alan Stern
+are available in the Git repository at:
+
+  ssh://git.infradead.org/var/lib/git/nvme.git nvme-5.9-rc
+
+for you to fetch changes up to 7ad92f656bddff4cf8f641e0e3b1acd4eb9644cb:
+
+  nvme-pci: cancel nvme device request before disabling (2020-08-28 16:43:57 -0700)
+
+----------------------------------------------------------------
+Christophe JAILLET (1):
+      nvmet-fc: Fix a missed _irqsave version of spin_lock in 'nvmet_fc_fod_op_done()'
+
+Keith Busch (2):
+      nvme: fix controller instance leak
+      nvme: only use power of two io boundaries
+
+Sagi Grimberg (9):
+      nvme-fabrics: don't check state NVME_CTRL_NEW for request acceptance
+      nvme: have nvme_wait_freeze_timeout return if it timed out
+      nvme-tcp: serialize controller teardown sequences
+      nvme-tcp: fix timeout handler
+      nvme-tcp: fix reset hang if controller died in the middle of a reset
+      nvme-rdma: serialize controller teardown sequences
+      nvme-rdma: fix timeout handler
+      nvme-rdma: fix reset hang if controller died in the middle of a reset
+      nvme: Fix NULL dereference for pci nvme controllers
+
+Tong Zhang (1):
+      nvme-pci: cancel nvme device request before disabling
+
+Ziye Yang (1):
+      nvmet-tcp: Fix NULL dereference when a connect data comes in h2cdata pdu
+
+ drivers/nvme/host/core.c    | 56 ++++++++++++++++++++++++-------
+ drivers/nvme/host/fabrics.c |  1 -
+ drivers/nvme/host/nvme.h    |  2 +-
+ drivers/nvme/host/pci.c     |  4 +--
+ drivers/nvme/host/rdma.c    | 68 ++++++++++++++++++++++++++++----------
+ drivers/nvme/host/tcp.c     | 80 ++++++++++++++++++++++++++++++++-------------
+ drivers/nvme/target/fc.c    |  4 +--
+ drivers/nvme/target/tcp.c   | 10 +++++-
+ 8 files changed, 167 insertions(+), 58 deletions(-)
