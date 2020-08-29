@@ -2,71 +2,75 @@ Return-Path: <SRS0=CCtz=CH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78531C433E7
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 16:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E76D9C433E2
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 16:55:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59FC920791
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 16:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3D8B207DA
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 16:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BGwJjWcb"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="QbRKLoIW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728442AbgH2QvU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Aug 2020 12:51:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46318 "EHLO
+        id S1728469AbgH2Qzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Aug 2020 12:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726562AbgH2QvO (ORCPT
+        with ESMTP id S1728410AbgH2Qzn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Aug 2020 12:51:14 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A027C061236
-        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2020 09:51:13 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id g6so947665pjl.0
-        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2020 09:51:13 -0700 (PDT)
+        Sat, 29 Aug 2020 12:55:43 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7F6C061236
+        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2020 09:55:42 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id m34so1960958pgl.11
+        for <linux-block@vger.kernel.org>; Sat, 29 Aug 2020 09:55:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=ofhsCOuyJ/vtOSE492SKG55p+pRmR8fZAjetaJSmn18=;
-        b=BGwJjWcbX1U9Fsb75ECfohoQToRniUHzGVs5YPOsMeG3h0jicw6Yk11HxVCB09S1qz
-         /nCR+bLPM8eMttsKtSJeE3DRWTxeoFbcaI+fGtNilj9tcaT0YLuaUo/HPk3OpC75VwSj
-         /dOoQoh92773JVZ/8XsDHYj8FWbSh/OY7p3CsZwHVHVgHFmiJX/3LGUgMQRaJN2MYaiU
-         yDc6JKOSuWihr/qMTGVWlA0OTFQLeN8T93XVroq+nxQgonF51aHii4jR72CIeWrMedML
-         nNlwA7j0NeTs4mDyV3hlHSz1Mxqx/TnSuKzb5ycUVzJWfhYu6Ekrd6KWvfpH+OZ0kePd
-         0ynQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=gpCk8VygJk1zZ08Ty15aVZKL4rkUM5lf7IFSkXE+mKM=;
+        b=QbRKLoIW/ndCidQfvSQKq6pdqhlWDnCNAIJWHE1fPzXe9c8+V7UpvHganwEBvpocr8
+         xbJk0tF+BJQ/XtrOPdjlx6PjP9i24tfRlisOC7YlXlHj4lnp8X90mWLmsQ0jaIWH2RyS
+         YMlSI7WKjDoSpIJ2t+MMkeeMvFtTKbzRE1L+Uqm541YgLso2hKVfwbhJ+kHW9Ikb+GWF
+         foe8UwKa7E55gGQGlmCpqrQi8zvRn3SsVi6CK+Fs+1+UZEPtG01pom5JNsOgy46D1Ueu
+         VgBBu6UO+1Y5iSTgnU9lGZHewpj8qN/ER8kD0CZGlTP/1zZZxfotc2AL29KX/sUh+5LK
+         lfMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=ofhsCOuyJ/vtOSE492SKG55p+pRmR8fZAjetaJSmn18=;
-        b=NjXfcqHmGti+Qju7ZnLPZg68vbNyBTTPkCR36KoSHXEVBqtFZgj8TY9DJwBAvsdMgV
-         eZFu1K1qTm4NymuEmdbiGsj9ziXbkjhZvzpLX6BjPu3fVluU7EmE2rC/liWTILr6iLQH
-         cLeEmTtjNBNEEUmYyIviL1oZPN7yeB+64Ozl7pgDBbpAvsl1+dekNCe37TMzPaMCFY4k
-         ejCR6PmexTk0ICBM2yL+rk+a3R/7453/OazyWPiqi/3rC6oUpueTt54bXcKWh4L7xdEp
-         erq3JFD8f8HfXFtCf4agd6qolmVLycMJmvNrRezcKwRvdcjeqvZvKLApLyUq2Uuvb5Vc
-         CYuA==
-X-Gm-Message-State: AOAM532wKTuqCbAz0juwTLxNahdVdWpbwt4YB/D1izIrDmY7X3a1uYc8
-        BeGzZEpxN218oFjwGRuFz8EuxRylSCwmK1/4
-X-Google-Smtp-Source: ABdhPJwwL6qV5mPMB4yBJcSjs1Kkeb4l3vQbZtO+vOv20DZGMOLKwh4PbQln8Zwvnf9rJhIZbS0ffA==
-X-Received: by 2002:a17:902:ee93:: with SMTP id a19mr3176572pld.172.1598719872754;
-        Sat, 29 Aug 2020 09:51:12 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gpCk8VygJk1zZ08Ty15aVZKL4rkUM5lf7IFSkXE+mKM=;
+        b=JTtyH/9neSjX1uB79hrxl9XWAOn/dvUnqq4sHYCxxz0OFgrCiLfCiiUMd5EQ7POFBq
+         3N1ElE1Kh2Ds2O2gMuvUl2jvOunocbXHe72DvrXpm0YJv7uwtumNSgE6bPI6sLYw2fvz
+         jYp1VTcQ6ETh/Sp+beF/kRBiPCwxx+5cGdanAj4mlJYppLE8EZMHBmB2o7+J6PFVzG/f
+         xHNFALVVyFAqHz3LRf42337yswqsgv6v+xrcHTORkcjgjFJ0rQyrYWlCXeuQia/yil+r
+         vG0o+TvF9zjmENCZtPZgWHF06g3JP2e12lxYYsfFefG/JPtl21Vd+uWf1Yv0xjS0v1fB
+         0MUQ==
+X-Gm-Message-State: AOAM5333u1jy3raxlF83FbHS6MdsJCSyaAtxASQXhsIgTb3eACYPTDZl
+        4CAQZyXdj8WvubmfNDr9EmlPmQ==
+X-Google-Smtp-Source: ABdhPJzpX5e6UXpjfRs8fVs5NiULAPs3P32fOIet9239Y9oMqYW/uFqBsq+B0saHLNIqTBWsY1HdMA==
+X-Received: by 2002:a63:4621:: with SMTP id t33mr3075897pga.32.1598720141968;
+        Sat, 29 Aug 2020 09:55:41 -0700 (PDT)
 Received: from [192.168.1.182] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id n22sm2524228pjq.25.2020.08.29.09.51.11
-        for <linux-block@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id a5sm2947812pgb.23.2020.08.29.09.55.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 29 Aug 2020 09:51:12 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Sat, 29 Aug 2020 09:55:41 -0700 (PDT)
+Subject: Re: [GIT PULL] nvme fixes for 5.9 next rc
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+References: <20200829153243.324252-1-sagi@grimberg.me>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: fix -EAGAIN IOPOLL task/vm accounting
-Message-ID: <d27ff6f0-9347-e880-fa9d-514e993014dc@kernel.dk>
-Date:   Sat, 29 Aug 2020 10:51:11 -0600
+Message-ID: <18fdb68f-8747-6f44-de0d-390a3fbd41c3@kernel.dk>
+Date:   Sat, 29 Aug 2020 10:55:39 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20200829153243.324252-1-sagi@grimberg.me>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,57 +79,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We currently increment the task/vm counts when we first attempt to queue a
-bio. But this isn't necessarily correct - if the request allocation fails
-with -EAGAIN, for example, and the caller retries, then we'll over-account
-by as many retries as are done.
+On 8/29/20 9:32 AM, Sagi Grimberg wrote:
+> Hey Jens,
+> 
+> Some more nvme fixes:
+> - instance leak and io boundary fixes from Keith
+> - fc locking fix from Christophe
+> - various tcp/rdma reset during traffic fixes from Me
+> - pci use-after-free fix from Tong
+> - tcp target null deref fix from Ziye
+> 
+> Please pull.
+> 
+> The following changes since commit a433d7217feab712ff69ef5cc2a86f95ed1aca40:
+> 
+>   Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.9 (2020-08-28 07:52:02 -0600)
+> 
+> are available in the Git repository at:
+> 
+>   ssh://git.infradead.org/var/lib/git/nvme.git nvme-5.9-rc
 
-This can happen for polled IO, where we cannot wait for requests. Hence
-retries can get aggressive, if we're running out of requests. If this
-happens, then watching the IO rates in vmstat are incorrect as they count
-every issue attempt as successful and hence the stats are inflated by
-quite a lot potentially.
+This doesn't look right... I pulled from the usual spot, diffstat and
+changes match up.
 
-Add a bio flag to know if we've done accounting or not. This prevents
-the same bio from being accounted potentially many times, when retried.
+BTW, in the future, can you switch to signed tags? They are nice to use
+in general, but particularly for git repos that are outside the kernel.org
+infrastructure.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d9d632639bd1..ff562a8cd9c9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1236,7 +1236,7 @@ blk_qc_t submit_bio(struct bio *bio)
- 	 * If it's a regular read/write or a barrier with data attached,
- 	 * go through the normal accounting stuff before submission.
- 	 */
--	if (bio_has_data(bio)) {
-+	if (bio_has_data(bio) && !bio_flagged(bio, BIO_ACCOUNTED)) {
- 		unsigned int count;
- 
- 		if (unlikely(bio_op(bio) == REQ_OP_WRITE_SAME))
-@@ -1259,6 +1259,7 @@ blk_qc_t submit_bio(struct bio *bio)
- 				(unsigned long long)bio->bi_iter.bi_sector,
- 				bio_devname(bio, b), count);
- 		}
-+		bio_set_flag(bio, BIO_ACCOUNTED);
- 	}
- 
- 	/*
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 63a39e47fc60..39bcc9326c7a 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -266,6 +266,7 @@ enum {
- 				 * of this bio. */
- 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
- 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
-+	BIO_ACCOUNTED,		/* task/vm stats have been done */
- 	BIO_FLAG_LAST
- };
- 
 -- 
 Jens Axboe
 
