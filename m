@@ -2,172 +2,86 @@ Return-Path: <SRS0=CCtz=CH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B29DC433E7
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 02:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 451C4C433E6
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 06:40:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03BF7208CA
-	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 02:57:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C3CA207BB
+	for <linux-block@archiver.kernel.org>; Sat, 29 Aug 2020 06:40:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hr+xuOKa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726584AbgH2C54 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Aug 2020 22:57:56 -0400
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:34335 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbgH2C5y (ORCPT
+        id S1725929AbgH2Gkt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Aug 2020 02:40:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36872 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725886AbgH2Gkt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Aug 2020 22:57:54 -0400
-Received: by mail-pj1-f67.google.com with SMTP id n3so464331pjq.1;
-        Fri, 28 Aug 2020 19:57:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=OqUGPUYdN7PULuDA/9YzFTy96hztr5ZfPQ1srP/K7ws=;
-        b=q2AGikpOu3FvfRKzSk4kT5gdTtd8qZCQ1OWModG9GveA1N+e3eLiD8C/zz6+GyGA6H
-         izc8q/n+v1F6XpF4BZDmF0vzbHWAAVLoE6p4T9EKtDnDK0rFiOECSFuM5je/0QLRegN4
-         Ek1/EyJQLKThZxcovCRpQJxJVklIeMYL/4ShB10dOEyGntaRBr1I5A49rAmKa+sgFHC9
-         0PNXw9j1wn0d0D0D5EpNlK6BjoSMyHg6Dqg8eTOaAi+8EYH43nrzE1PYHXDHcOSbNvTl
-         GbqSZTO/BHl/Ck+5l/2Vxeapsv59TKXhcgGc0LdBP1x08YnUIIK7CEI3JaAumtkE0La8
-         Fh5g==
-X-Gm-Message-State: AOAM530z5yQ3NbWg2r1taE6KqmnHda0IRlDXfOZCFaG2iBwrEe66Nz5P
-        61wTUjpBCpT3rUnXT3sZyOBDruqXZ3g=
-X-Google-Smtp-Source: ABdhPJzc12rnL+4Y6fTQZ0ErNqLeLKKxhhDYfDr+ujFhlxMtSuQkGAJ9tNTp/t8eMx7hIAWTn/Kg+w==
-X-Received: by 2002:a17:90a:bc48:: with SMTP id t8mr1643027pjv.224.1598669873065;
-        Fri, 28 Aug 2020 19:57:53 -0700 (PDT)
-Received: from [192.168.3.217] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id gv21sm584500pjb.39.2020.08.28.19.57.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Aug 2020 19:57:52 -0700 (PDT)
-Subject: Re: [PATCH] block: Fix a race in the runtime power management code
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     Stanley Chu <stanley.chu@mediatek.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        SCSI development list <linux-scsi@vger.kernel.org>
-References: <20200824030607.19357-1-bvanassche@acm.org>
- <1598346681.10649.8.camel@mtkswgap22>
- <20200825182423.GB375466@rowland.harvard.edu>
- <1f798c21-241f-59f8-5298-a32fffe2ff01@acm.org>
- <20200826015159.GA387575@rowland.harvard.edu>
- <af1b1f57-59ff-0133-8108-0f3d1e1254e1@acm.org>
- <20200827203321.GB449067@rowland.harvard.edu>
- <5da883fe-b5ec-b98d-ae0c-bc053b6e22cb@acm.org>
- <20200828153745.GB470612@rowland.harvard.edu>
- <31d6f204-21ae-88da-dbfc-3d7132f8bc03@acm.org>
- <20200829011203.GA486691@rowland.harvard.edu>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <874cc075-5990-bd37-10e5-6456c1c324ac@acm.org>
-Date:   Fri, 28 Aug 2020 19:57:50 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Sat, 29 Aug 2020 02:40:49 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE917C061236;
+        Fri, 28 Aug 2020 23:40:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=7l+Em9gvBvWd82kjcq938GwighvalU0zZ6jp3z8HlSI=; b=hr+xuOKarpl9EfqKCjkFM5KlYc
+        527XyEupWB/z+YMisYTw5goBiZWS0iGPO/sgBY+bXs1DjcGnz3T7OOlGdsI7LoNswS0GSccwNNI2G
+        T0I5vOvoTFT/i6J3Vu1E/DnFcU47xy2gEHv4ciK1Z2m33LwjaMgahdsR3qLf2mKndFJxZYowODfPx
+        N58VYJzgJsUfm8dIjwu5ydyrTvxqWlgCvzoAhJiYy195VsEtYuxLODFwGqvyrhT6K5LHhpSb1U+MX
+        MA15xXjMyHhNg2neyDtZCz3p6Q6xFaBhdzmoDZu3x9mE/x0dHHkzxMBs/sYQmyuzVet4QGdezQpBf
+        5auA6M4g==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kBuXZ-0007Vf-Rk; Sat, 29 Aug 2020 06:40:41 +0000
+Date:   Sat, 29 Aug 2020 07:40:41 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Andreas Dilger <adilger@dilger.ca>
+Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        yebin <yebin10@huawei.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH RFC 2/2] block: Do not discard buffers under a mounted
+ filesystem
+Message-ID: <20200829064041.GA23205@infradead.org>
+References: <20200825120554.13070-1-jack@suse.cz>
+ <20200825120554.13070-3-jack@suse.cz>
+ <20200825121616.GA10294@infradead.org>
+ <F9505A56-F07B-4308-BE42-F75ED76B4E3C@dilger.ca>
 MIME-Version: 1.0
-In-Reply-To: <20200829011203.GA486691@rowland.harvard.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <F9505A56-F07B-4308-BE42-F75ED76B4E3C@dilger.ca>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-08-28 18:12, Alan Stern wrote:
-> On Fri, Aug 28, 2020 at 05:51:03PM -0700, Bart Van Assche wrote:
->> On 2020-08-28 08:37, Alan Stern wrote:
->>> There may be an even simpler solution: Ensure that SCSI domain 
->>> validation is mutually exclusive with runtime PM.  It's already mutually 
->>> exclusive with system PM, so this makes sense.
->>>
->>> What do you think of the patch below?
->>>
->>> Alan Stern
->>>
->>>
->>> Index: usb-devel/drivers/scsi/scsi_transport_spi.c
->>> ===================================================================
->>> --- usb-devel.orig/drivers/scsi/scsi_transport_spi.c
->>> +++ usb-devel/drivers/scsi/scsi_transport_spi.c
->>> @@ -1001,7 +1001,7 @@ spi_dv_device(struct scsi_device *sdev)
->>>  	 * Because this function and the power management code both call
->>>  	 * scsi_device_quiesce(), it is not safe to perform domain validation
->>>  	 * while suspend or resume is in progress. Hence the
->>> -	 * lock/unlock_system_sleep() calls.
->>> +	 * lock/unlock_system_sleep() and scsi_autopm_get/put_device() calls.
->>>  	 */
->>>  	lock_system_sleep();
->>>  
->>> @@ -1018,10 +1018,13 @@ spi_dv_device(struct scsi_device *sdev)
->>>  	if (unlikely(!buffer))
->>>  		goto out_put;
->>>  
->>> +	if (scsi_autopm_get_device(sdev))
->>> +		goto out_free;
->>> +
->>>  	/* We need to verify that the actual device will quiesce; the
->>>  	 * later target quiesce is just a nice to have */
->>>  	if (unlikely(scsi_device_quiesce(sdev)))
->>> -		goto out_free;
->>> +		goto out_autopm_put;
->>>  
->>>  	scsi_target_quiesce(starget);
->>>  
->>> @@ -1041,6 +1044,8 @@ spi_dv_device(struct scsi_device *sdev)
->>>  
->>>  	spi_initial_dv(starget) = 1;
->>>  
->>> + out_autopm_put:
->>> +	scsi_autopm_put_device(sdev);
->>>   out_free:
->>>  	kfree(buffer);
->>>   out_put:
->>
->> Hi Alan,
->>
->> I think this is only a part of the solution. scsi_target_quiesce() invokes
->> scsi_device_quiesce() and that function in turn calls blk_set_pm_only(). So
->> I think that the above is not sufficient to fix the deadlock mentioned in
->> my previous email.
+On Fri, Aug 28, 2020 at 02:21:29AM -0600, Andreas Dilger wrote:
+> On Aug 25, 2020, at 6:16 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> > 
+> > On Tue, Aug 25, 2020 at 02:05:54PM +0200, Jan Kara wrote:
+> >> Discarding blocks and buffers under a mounted filesystem is hardly
+> >> anything admin wants to do. Usually it will confuse the filesystem and
+> >> sometimes the loss of buffer_head state (including b_private field) can
+> >> even cause crashes like:
+> > 
+> > Doesn't work if the file system uses multiple devices.
 > 
-> Sorry, it sounds like you misinterpreted my preceding email.  I meant to 
-> suggest that the patch above should be considered _instead of_ the patch 
-> that introduced BLK_MQ_REQ_PM.  So blk_queue_enter() would remain 
-> unchanged, using the BLK_MQ_REQ_PREEMPT flag to decide whether or not to 
-> postpone new requests.  Thus the deadlock you're concerned about would 
-> not arise.
+> It's not _worse_ than the current situation of allowing the complete
+> destruction of the mounted filesystem.  It doesn't fix the problem
+> for XFS with realtime devices, or ext4 with a separate journal device,
+> but it fixes the problem for a majority of users with a single device
+> filesystem.
+> 
+> While BLKFLSBUF causing a crash is annoying, BLKDISCARD/BLKSECDISCARD
+> under a mounted filesystem is definitely dangerous and wrong.
+> 
+> What about checking for O_EXCL on the device, indicating that it is
+> currently in use by some higher level?
 
-Hi Alan,
-
-Thanks for the clarification. I agree that the above patch should serialize
-SCSI DV and runtime PM. I'm fine with the above patch.
-
-Thanks,
-
-Bart.
+That actually seems like a much better idea.
