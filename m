@@ -2,191 +2,97 @@ Return-Path: <SRS0=wgWW=CI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 921E9C433E6
-	for <linux-block@archiver.kernel.org>; Sun, 30 Aug 2020 08:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9DFEC433E2
+	for <linux-block@archiver.kernel.org>; Sun, 30 Aug 2020 10:23:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68A422078D
-	for <linux-block@archiver.kernel.org>; Sun, 30 Aug 2020 08:46:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8Lxdr43"
+	by mail.kernel.org (Postfix) with ESMTP id AB97920738
+	for <linux-block@archiver.kernel.org>; Sun, 30 Aug 2020 10:23:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728721AbgH3Iqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Aug 2020 04:46:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52084 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726130AbgH3Iqk (ORCPT
+        id S1726492AbgH3KXm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Aug 2020 06:23:42 -0400
+Received: from mail-pl1-f173.google.com ([209.85.214.173]:40208 "EHLO
+        mail-pl1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726406AbgH3KXl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Aug 2020 04:46:40 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C00C061573
-        for <linux-block@vger.kernel.org>; Sun, 30 Aug 2020 01:46:40 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id d190so2196332iof.3
-        for <linux-block@vger.kernel.org>; Sun, 30 Aug 2020 01:46:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=h3w1yjIrGV5uG9yyuRm0twJT0Zd2/unCCmClMtzDTT0=;
-        b=k8Lxdr43Vtm1djicIG2IEN+ngb6ViU80UdtlefUZ8nd9sDlmFYIhvMlkcB8PYpEiDz
-         cga34VioWrHtaIXIJepyM/Q8TDoCD3avnZfyHgiQKs/JTefpsrztQPLRiwyVk5cV4fnE
-         VT/FD1GTr4agXBEHrzh4J5XG/vf+UAF5IsZZEpCwCUsZTlQWjRbI4BoYEnjANyyOU5gF
-         EEWxb8pyMBILWs5yYL1ixFrWxCY7ORJTjF4dB6IO2xHG0UMuQf+5skrCoJhFvq28QIDP
-         MgNHxS252WPBq5IPpb+jq3TIbbzG5mHldywLSFdqXRgmennLa5E0WxaPL2/EZaR7E+QB
-         xSCw==
+        Sun, 30 Aug 2020 06:23:41 -0400
+Received: by mail-pl1-f173.google.com with SMTP id z15so1669174plo.7
+        for <linux-block@vger.kernel.org>; Sun, 30 Aug 2020 03:23:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=h3w1yjIrGV5uG9yyuRm0twJT0Zd2/unCCmClMtzDTT0=;
-        b=rPmaVgHBEMuQdnt8RVt0KpOXPMUSSkhwfjHOtDlu5Y4Le75upQsjMR2dVfID/Zxc7W
-         7+uPuDNHR1kmT2h44G8vHLPxyBqh8Y37BNaZ1rzDAqXZZHAne0C7mxNWcU2gpFdhNe4B
-         yQdTj2Mjo4MMMq5LiaIA3024ejk114xNbDwHUXOvxLtZ8U9epko3rcS6OBDwFmBokAXH
-         IrYJR69YlSalbBlzuQaT38NleeaEjsrE0gN67531jBV3JpWa9wXgDU42NmtscqwL+AC4
-         cfArgZbMlkEAxc2A0pssondyw2eKLo5uj94Z39DDnZ6X8fpakXfTKTKPYgAkyjDZeypK
-         hwWg==
-X-Gm-Message-State: AOAM531GrrLUQ+WaQV0dS7BvjUlsTUgVWpAheZXukW4StFr64ldXrG6J
-        GEEMGU6c0b7+hJFBY/OTD+hT6szGUHvE0sg33pY=
-X-Google-Smtp-Source: ABdhPJwxEhT56fpWwSuH/cojcWmJfPGV22iXWtOAIOZoqBkgjx9RgGHkQlxRsgiW1ja8GmU7HtN3rNABfxtXvyO5ZMw=
-X-Received: by 2002:a6b:7f0b:: with SMTP id l11mr4788002ioq.182.1598777199331;
- Sun, 30 Aug 2020 01:46:39 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IXZCGHGRFnaeWsgRrshQlWtmfEgzeVg0SXdtn9KGpxU=;
+        b=dUm1G1n/DLPDAgODdxoEz7lwGbcM6FTcnM8QnNolP1sqqpGdink8xrP5iDtt8P69i6
+         zy4VZuXrJErLv1EDBbJljc97tjqlItqnL0NuYdSC/6bb7M5GF3WQAp/uMF5a9T5ZhuMy
+         j41n64o4uqjizANtmoaezW0xl7hGBnNdBRX5+bByu41B6YTqpMcZM3J0Hln733OQCpQG
+         EiaAdOK/wsvA7cNZgG29uXiAKA3gxSMevXRvhjHyISDiC5rRdnc8mSvCiDe9vxbzT/Eb
+         7gyBHh9RjMAD8OLfuXVYRIwMsOjaTcwlyRZlPfmAv+U6TyN+Q0lGlCNf56SIGU9T6Vmn
+         GQtw==
+X-Gm-Message-State: AOAM531v2QR+LHiv1tJk2ZIUXjPIVLUhj23oy53QDjl53/yHJCM14Kt4
+        mUx8vDZx4k5he340UIWF7eFILK+5Q8wvTQ==
+X-Google-Smtp-Source: ABdhPJyrDyA5GQu7ffy0iWOE/cPTtyshaBWaSc9LLlgXI+9vvMtl6QmMTEwtapJgyiyCmyspIg7f4g==
+X-Received: by 2002:a17:90a:aa8e:: with SMTP id l14mr6535431pjq.67.1598783020980;
+        Sun, 30 Aug 2020 03:23:40 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:cc5c:f2a5:487:1dba? ([2601:647:4802:9070:cc5c:f2a5:487:1dba])
+        by smtp.gmail.com with ESMTPSA id e65sm4069788pjk.45.2020.08.30.03.23.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Aug 2020 03:23:40 -0700 (PDT)
+Subject: Re: [GIT PULL] nvme fixes for 5.9 next rc
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+References: <20200829153243.324252-1-sagi@grimberg.me>
+ <18fdb68f-8747-6f44-de0d-390a3fbd41c3@kernel.dk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <c904c8f6-15bd-41a6-aa3b-a17a73f052c5@grimberg.me>
+Date:   Sun, 30 Aug 2020 03:23:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <CAOi1vP9t1VL-JXj9ETdU_B1kMLjKGcW6wZss6bmxoH5UCAcK7Q@mail.gmail.com>
- <20200828130514.GA236174@T590>
-In-Reply-To: <20200828130514.GA236174@T590>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Sun, 30 Aug 2020 10:46:27 +0200
-Message-ID: <CAOi1vP95ZWx1uXvqSJmjS54Wdp-icGNk+OzQ_E9gDhNpfk4sVw@mail.gmail.com>
-Subject: Re: Sleeping while atomic regression around hd_struct_free() in 5.9-rc
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Yufen Yu <yuyufen@huawei.com>, Hou Tao <houtao1@huawei.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <18fdb68f-8747-6f44-de0d-390a3fbd41c3@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 28, 2020 at 3:05 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> Hi Ilya,
->
-> Thanks for your report!
->
-> On Fri, Aug 28, 2020 at 12:32:48PM +0200, Ilya Dryomov wrote:
-> > Hi Ming,
-> >
-> > There seems to be a sleeping while atomic bug in hd_struct_free():
-> >
-> > 288 static void hd_struct_free(struct percpu_ref *ref)
-> > 289 {
-> > 290         struct hd_struct *part = container_of(ref, struct hd_struct, ref);
-> > 291         struct gendisk *disk = part_to_disk(part);
-> > 292         struct disk_part_tbl *ptbl =
-> > 293                 rcu_dereference_protected(disk->part_tbl, 1);
-> > 294
-> > 295         rcu_assign_pointer(ptbl->last_lookup, NULL);
-> > 296         put_device(disk_to_dev(disk));
-> > 297
-> > 298         INIT_RCU_WORK(&part->rcu_work, hd_struct_free_work);
-> > 299         queue_rcu_work(system_wq, &part->rcu_work);
-> > 300 }
-> >
-> > hd_struct_free() is a percpu_ref release callback and must not sleep.
-> > But put_device() can end up in disk_release(), resulting in anything
-> > from "sleeping function called from invalid context" splats to actual
-> > lockups if the queue ends up being released:
-> >
-> >   BUG: scheduling while atomic: ksoftirqd/3/26/0x00000102
-> >   INFO: lockdep is turned off.
-> >   CPU: 3 PID: 26 Comm: ksoftirqd/3 Tainted: G        W
-> > 5.9.0-rc2-ceph-g2de49bea2ebc #1
-> >   Hardware name: Supermicro SYS-5018R-WR/X10SRW-F, BIOS 2.0 12/17/2015
-> >   Call Trace:
-> >    dump_stack+0x96/0xd0
-> >    __schedule_bug.cold+0x64/0x71
-> >    __schedule+0x8ea/0xac0
-> >    ? wait_for_completion+0x86/0x110
-> >    schedule+0x5f/0xd0
-> >    schedule_timeout+0x212/0x2a0
-> >    ? wait_for_completion+0x86/0x110
-> >    wait_for_completion+0xb0/0x110
-> >    __wait_rcu_gp+0x139/0x150
-> >    synchronize_rcu+0x79/0xf0
-> >    ? invoke_rcu_core+0xb0/0xb0
-> >    ? rcu_read_lock_any_held+0xb0/0xb0
-> >    blk_free_flush_queue+0x17/0x30
-> >    blk_mq_hw_sysfs_release+0x32/0x70
-> >    kobject_put+0x7d/0x1d0
-> >    blk_mq_release+0xbe/0xf0
-> >    blk_release_queue+0xb7/0x140
-> >    kobject_put+0x7d/0x1d0
-> >    disk_release+0xb0/0xc0
-> >    device_release+0x25/0x80
-> >    kobject_put+0x7d/0x1d0
-> >    hd_struct_free+0x4c/0xc0
-> >    percpu_ref_switch_to_atomic_rcu+0x1df/0x1f0
-> >    rcu_core+0x3fd/0x660
-> >    ? rcu_core+0x3cc/0x660
-> >    __do_softirq+0xd5/0x45e
-> >    ? smpboot_thread_fn+0x26/0x1d0
-> >    run_ksoftirqd+0x30/0x60
-> >    smpboot_thread_fn+0xfe/0x1d0
-> >    ? sort_range+0x20/0x20
-> >    kthread+0x11a/0x150
-> >    ? kthread_delayed_work_timer_fn+0xa0/0xa0
-> >    ret_from_fork+0x1f/0x30
-> >
-> > "git blame" points at your commit tb7d6c3033323 ("block: fix
-> > use-after-free on cached last_lookup partition"), but there is
-> > likely more to it because it went into 5.8 and I haven't seen
-> > these lockups until we rebased to 5.9-rc.
->
-> The pull-the-trigger commit is actually e8c7d14ac6c3 ("block: revert back to
-> synchronous request_queue removal").
->
-> >
-> > Could you please take a look?
->
-> Can you try the following patch?
->
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index e62a98a8eeb7..b06fc3425802 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -278,6 +278,15 @@ static void hd_struct_free_work(struct work_struct *work)
->  {
->         struct hd_struct *part =
->                 container_of(to_rcu_work(work), struct hd_struct, rcu_work);
-> +       struct gendisk *disk = part_to_disk(part);
-> +
-> +       /*
-> +        * Release the reference grabbed in delete_partition, and it should
-> +        * have been done in hd_struct_free(), however device's release
-> +        * handler can't be done in percpu_ref's ->release() callback
-> +        * because it is run via call_rcu().
-> +        */
-> +       put_device(disk_to_dev(disk));
->
->         part->start_sect = 0;
->         part->nr_sects = 0;
-> @@ -293,7 +302,6 @@ static void hd_struct_free(struct percpu_ref *ref)
->                 rcu_dereference_protected(disk->part_tbl, 1);
->
->         rcu_assign_pointer(ptbl->last_lookup, NULL);
-> -       put_device(disk_to_dev(disk));
->
->         INIT_RCU_WORK(&part->rcu_work, hd_struct_free_work);
->         queue_rcu_work(system_wq, &part->rcu_work);
 
-This patch fixes it for me.
+>> Hey Jens,
+>>
+>> Some more nvme fixes:
+>> - instance leak and io boundary fixes from Keith
+>> - fc locking fix from Christophe
+>> - various tcp/rdma reset during traffic fixes from Me
+>> - pci use-after-free fix from Tong
+>> - tcp target null deref fix from Ziye
+>>
+>> Please pull.
+>>
+>> The following changes since commit a433d7217feab712ff69ef5cc2a86f95ed1aca40:
+>>
+>>    Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.9 (2020-08-28 07:52:02 -0600)
+>>
+>> are available in the Git repository at:
+>>
+>>    ssh://git.infradead.org/var/lib/git/nvme.git nvme-5.9-rc
+> 
+> This doesn't look right... I pulled from the usual spot, diffstat and
+> changes match up.
 
-Thanks,
+Rrr, sorry forgot to fixup this line.
 
-                Ilya
+> BTW, in the future, can you switch to signed tags? They are nice to use
+> in general, but particularly for git repos that are outside the kernel.org
+> infrastructure.
+
+We'll look into that.
+
+Thanks Jens!
