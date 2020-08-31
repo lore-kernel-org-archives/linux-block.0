@@ -2,96 +2,97 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAF3C2BB4D
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CDBDC433E2
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:50:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38D1E207EA
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:39:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="x/p33DHr"
+	by mail.kernel.org (Postfix) with ESMTP id 5D52D20719
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727902AbgHaPjc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 11:39:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
+        id S1728415AbgHaPus (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 11:50:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728655AbgHaPiv (ORCPT
+        with ESMTP id S1728409AbgHaPup (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 11:38:51 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A4AC061573
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 08:38:50 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id q14so1498111ilm.2
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 08:38:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=z4HUQWA3GefTjgAhlZ3zitTeaamVvr6/rpOjMH3aSW8=;
-        b=x/p33DHrbarbMYtfOSZ/rPXjhV4iWSoDg+harqWTLy2UIGFiPfeTkbOY/PY7ogYSX9
-         EzJ26qecDbTSGi22ZgIVLdZUPQmfCiaTCxnaOeyA6fS70oCbLOjVnu4WSR2AdBYURIwX
-         fSDwLOC841MUSoPGG7qVaE9i2r/4oGzorc3j3hbGedV7DZLRKtkT9f9HH4WckfiKoim1
-         Nte/NRF5xebeN0ScjQZv4jXmtxDxMf7h/Xcs9mBLz2scuLl1gZM39SHIOtXdhjMi8Ha4
-         tLe386pgdACwcgAY2Bw4A67WFqvLPFqxhWQqCL2s6GWmFTBrJcjBQT+HJ6REEeQ1NoRK
-         KQMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=z4HUQWA3GefTjgAhlZ3zitTeaamVvr6/rpOjMH3aSW8=;
-        b=r+ulkiU9orxJDGDsaWt8cEao8ExJTgsObSteDjiIEe5X88MxGGptMmQBtb3sZ8sqd1
-         bggcVx55bmzzqZHAMI74op3VH/xv5590quB/n/mEEykSSo9Qr1f36lp4t95g7zYFBslR
-         JFmMCDyDanuDujd4C2FLlmRFRjCtbc9M79MOAPn0OhWcsWODJtWXjivFtp7gnkWFs9o5
-         tl5seG32plXcSvdafNnbBvlQMo7Bely6zt57GO548a6yzZ6a+oSwwE8ZZoRGIykX7Av4
-         y43ic/GZJY0pm6s+aWnx1xLjPKgvVP3JkJtmnQ/pQndHo62MVlbArvfjl4wHHIShdvIp
-         EyqA==
-X-Gm-Message-State: AOAM533XI64zphghdeJTRwvTiyFiGukZRozZXk7b/yMqcnu6TDhqcNyx
-        MGE4mIS2lw8q1i+6LOt+G7/dfCRaFlJwcvTM
-X-Google-Smtp-Source: ABdhPJx+NfdCs8EPJfJliXCwiAxd1dNJgl+vk0APgfT7FvaVuOY1AQfuu59SwssMcJS/hGzNlBRorw==
-X-Received: by 2002:a92:48da:: with SMTP id j87mr1934420ilg.78.1598888329706;
-        Mon, 31 Aug 2020 08:38:49 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 3sm4744495ily.31.2020.08.31.08.38.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Aug 2020 08:38:48 -0700 (PDT)
-Subject: Re: [PATCH 1/2] block: Return blk_status_t instead of errno codes
-To:     Ritika Srivastava <RITIKA.SRIVASTAVA@ORACLE.COM>
-Cc:     linux-block@vger.kernel.org
-References: <1596062878-4238-1-git-send-email-ritika.srivastava@oracle.com>
- <1596062878-4238-2-git-send-email-ritika.srivastava@oracle.com>
- <20200814062620.GA24167@infradead.org>
- <C6F86C38-BE29-422A-8A57-5144E26C4569@ORACLE.COM>
- <de5c94ec-9079-22b7-bbcd-667f3b0fe94e@kernel.dk>
- <A0A0C5C0-957C-44DB-9B42-3EEC473D74C6@ORACLE.COM>
- <3C0C6E56-ECEF-457A-89A1-0944E004DC77@ORACLE.COM>
- <d5c2818f-ed6e-e8ff-709d-ecc4858ff4de@kernel.dk>
- <67BDE4B3-830C-476F-939F-5AB2634E0F7D@ORACLE.COM>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6d864384-2b6c-0a1f-8f85-9ec5acb5b484@kernel.dk>
-Date:   Mon, 31 Aug 2020 09:38:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 31 Aug 2020 11:50:45 -0400
+Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DEE3C061573
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 08:50:45 -0700 (PDT)
+Received: from localhost (unknown [IPv6:2610:98:8005::6b0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: krisman)
+        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id 5749B295208;
+        Mon, 31 Aug 2020 16:50:44 +0100 (BST)
+From:   Gabriel Krisman Bertazi <krisman@collabora.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, kernel@collabora.com,
+        khazhy@google.com
+Subject: Re: [PATCH] block: Fix inflight statistic for MQ submission with !elevator
+Organization: Collabora
+References: <20200831153127.3561733-1-krisman@collabora.com>
+        <7a4669a1-7633-6acc-e06d-86992245dfee@kernel.dk>
+Date:   Mon, 31 Aug 2020 11:50:41 -0400
+In-Reply-To: <7a4669a1-7633-6acc-e06d-86992245dfee@kernel.dk> (Jens Axboe's
+        message of "Mon, 31 Aug 2020 09:33:55 -0600")
+Message-ID: <87sgc2u84u.fsf@collabora.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <67BDE4B3-830C-476F-939F-5AB2634E0F7D@ORACLE.COM>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/28/20 11:10 AM, Ritika Srivastava wrote:
-> Thanks Jens for the update.
-> I will look out for 5.10 branch and send the updated patches.
+Jens Axboe <axboe@kernel.dk> writes:
 
-I pushed it out this morning.
+> On 8/31/20 9:31 AM, Gabriel Krisman Bertazi wrote:
+>> According to Documentation/block/stat.rst, inflight should not include
+>> I/O requests that are in the queue but not yet dispatched to the device,
+>> but blk-mq identifies as inflight any request that has a tag allocated,
+>> which, for queues without elevator, happens at request allocation time
+>> and before it is queued in the ctx (default case in blk_mq_submit_bio).
+>> 
+>> A more precise approach would be to only consider requests with state
+>> MQ_RQ_IN_FLIGHT.
+>
+> We've had some churn here, last change in this area was:
+
+Hi Jens,
+
+Thanks for the quick reply.  I wasn't aware of that patch.
+
+I'm collecting statistics on the queue depth of a NCQ disk, and my end
+goal is to have a time_in_driver clock, which is the time spent by IOs
+in the driver, similarly to what is shown in diskstats, but the latter
+includes the block layer time.  I stumbled this issue with inflight,
+where we noticed a difference between inflight and what was actually
+dispatched to the driver.  The problem is the current behavior doesn't
+seem to match the documentation in Documentation/block/stat.sh.
+
+I went back to history.git and found that this difference in behavior
+from the documentation has always been there for legacy path, unless I
+am misreading the documentation.  The patch I proposed consolidates
+inflight in favor of documentation instead of the legacy patch.
+
+The documentation reads:
+
+"""
+This value counts the number of I/O requests that have been issued to
+the device driver but have not yet completed.  It does not include I/O
+requests that are in the queue but not yet issued to the device driver.
+"""
+
+Should I patch the documentation instead?
+
+Thinking about semantics, it seem more useful to have inflight include
+only the time between dispatching and completion, but if you think there
+is a concern about stable abi here, would you accept a new in_device file
+tracking this metric?
 
 -- 
-Jens Axboe
-
+Gabriel Krisman Bertazi
