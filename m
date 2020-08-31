@@ -2,157 +2,87 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6ABCC433E7
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 07:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0317CC433E6
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 07:48:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 859B52068F
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 07:15:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="AgIKKxMP"
+	by mail.kernel.org (Postfix) with ESMTP id DE2E320BED
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 07:48:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725891AbgHaHPU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 03:15:20 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:1358 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727881AbgHaHOt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 03:14:49 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f4ca3380001>; Mon, 31 Aug 2020 00:14:01 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Mon, 31 Aug 2020 00:14:46 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Mon, 31 Aug 2020 00:14:46 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 31 Aug
- 2020 07:14:45 +0000
-Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 31 Aug 2020 07:14:45 +0000
-Received: from sandstorm.nvidia.com (Not Verified[10.2.61.194]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5f4ca3640001>; Mon, 31 Aug 2020 00:14:45 -0700
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, <linux-xfs@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v3 0/3] bio: Direct IO: convert to pin_user_pages_fast()
-Date:   Mon, 31 Aug 2020 00:14:36 -0700
-Message-ID: <20200831071439.1014766-1-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.28.0
+        id S1725954AbgHaHsr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 03:48:47 -0400
+Received: from mx2.suse.de ([195.135.220.15]:35688 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725829AbgHaHsr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Aug 2020 03:48:47 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 4F1C0AD6B;
+        Mon, 31 Aug 2020 07:49:20 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 5C1F71E12CF; Mon, 31 Aug 2020 09:48:45 +0200 (CEST)
+Date:   Mon, 31 Aug 2020 09:48:45 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Andreas Dilger <adilger@dilger.ca>, Jan Kara <jack@suse.cz>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        yebin <yebin10@huawei.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH RFC 2/2] block: Do not discard buffers under a mounted
+ filesystem
+Message-ID: <20200831074845.GA23389@quack2.suse.cz>
+References: <20200825120554.13070-1-jack@suse.cz>
+ <20200825120554.13070-3-jack@suse.cz>
+ <20200825121616.GA10294@infradead.org>
+ <F9505A56-F07B-4308-BE42-F75ED76B4E3C@dilger.ca>
+ <20200829064041.GA23205@infradead.org>
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1598858041; bh=lyrZ2gUylyRDxgfVzrsrWPEjnlS8I/rM0/dBNY/ekqg=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         MIME-Version:X-NVConfidentiality:Content-Transfer-Encoding:
-         Content-Type;
-        b=AgIKKxMPpvPxMJX1X6WknDKq7jsksqwEJe5FEcBiW0igy4qyYjQ84yGeMTbtq+TWF
-         zTn6BBJbfbTKPXo+7YWdA+YA2fCiYofpXzPA9gyg3abtY4Py9wyzm65QkQvH5d0MgM
-         J35idY/iyfHlBPCGXm/0LYqqmhTzoehWr/2E9D9cnf4LcDr0rP9ocdqym538+ZwzhN
-         OA/mVZs5qZg+OwrNX+rebHjMGMVXa0lrHflwoEV3kbh6gRVMa0DEb7fuowvO2JeBJR
-         hxflPqdMFfa4mjGIpQMOdgm2ZwdC6ypG/z9nDW+l1P6WsXJaoNzBUNJGM8kf/6Uh3m
-         g7wtUVLD5D+6g==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200829064041.GA23205@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio: convert get_user_pages_fast() --> pin_user_pages_fast()
+On Sat 29-08-20 07:40:41, Christoph Hellwig wrote:
+> On Fri, Aug 28, 2020 at 02:21:29AM -0600, Andreas Dilger wrote:
+> > On Aug 25, 2020, at 6:16 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> > > 
+> > > On Tue, Aug 25, 2020 at 02:05:54PM +0200, Jan Kara wrote:
+> > >> Discarding blocks and buffers under a mounted filesystem is hardly
+> > >> anything admin wants to do. Usually it will confuse the filesystem and
+> > >> sometimes the loss of buffer_head state (including b_private field) can
+> > >> even cause crashes like:
+> > > 
+> > > Doesn't work if the file system uses multiple devices.
+> > 
+> > It's not _worse_ than the current situation of allowing the complete
+> > destruction of the mounted filesystem.  It doesn't fix the problem
+> > for XFS with realtime devices, or ext4 with a separate journal device,
+> > but it fixes the problem for a majority of users with a single device
+> > filesystem.
+> > 
+> > While BLKFLSBUF causing a crash is annoying, BLKDISCARD/BLKSECDISCARD
+> > under a mounted filesystem is definitely dangerous and wrong.
 
-Change generic block/bio Direct IO routines, to acquire FOLL_PIN user
-pages via the recently added routines:
+Actually BLKFLSBUF won't cause a crash. That's using invalidate_bdev() -
+i.e., page-reclaim style of eviction and that's fine with the filesystems.
 
-    iov_iter_pin_pages()
-    iov_iter_pin_pages_alloc()
-    pin_page()
+> > What about checking for O_EXCL on the device, indicating that it is
+> > currently in use by some higher level?
+> 
+> That actually seems like a much better idea.
 
-This effectively converts several file systems (ext4, for example) that
-use the common Direct IO routines.
+OK, I'll rework the patch.
 
-Change the corresponding page release calls from put_page() to
-unpin_user_page().
+								Honza
 
-Change bio_release_pages() to handle FOLL_PIN pages. In fact, after this
-patch, that is the *only* type of pages that bio_release_pages()
-handles.
-
-Design notes
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Quite a few approaches have been considered over the years. This one is
-inspired by Christoph Hellwig's July, 2019 observation that there are
-only 5 ITER_ types, and we can simplify handling of them for Direct IO
-[1]. Accordingly, this patch implements the following pseudocode:
-
-Direct IO behavior:
-
-    ITER_IOVEC:
-        pin_user_pages_fast();
-        break;
-
-    ITER_PIPE:
-        for each page:
-             pin_page();
-        break;
-
-    ITER_KVEC:    // already elevated page refcount, leave alone
-    ITER_BVEC:    // already elevated page refcount, leave alone
-    ITER_DISCARD: // discard
-        return -EFAULT or -ENVALID;
-
-...which works for callers that already have sorted out which case they
-are in. Such as, Direct IO in the block/bio layers.
-
-Note that this does leave ITER_KVEC and ITER_BVEC unconverted, for now.
-
-Page acquisition: The iov_iter_get_pages*() routines above are at just
-the right level in the call stack: the callers already know which system
-to use, and so it's a small change to just drop in the replacement
-routines. And it's a fan-in/fan-out point: block/bio call sites for
-Direct IO funnel their page acquisitions through the
-iov_iter_get_pages*() routines, and there are many other callers of
-those. And we can't convert all of the callers at once--too many
-subsystems are involved, and it would be a too large and too risky
-patch.
-
-Page release: there are already separate release routines: put_page()
-vs. unpin_user_page(), so it's already done there.
-
-[1] https://lore.kernel.org/kvm/20190724061750.GA19397@infradead.org/
-
-[2] "Explicit pinning of user-space pages":
-    https://lwn.net/Articles/807108/
-
-
-
-John Hubbard (3):
-  mm/gup: introduce pin_page()
-  iov_iter: introduce iov_iter_pin_pages*() routines
-  bio: convert get_user_pages_fast() --> pin_user_pages_fast()
-
- block/bio.c          |  24 ++++-----
- block/blk-map.c      |   6 +--
- fs/direct-io.c       |  28 +++++------
- fs/iomap/direct-io.c |   2 +-
- include/linux/mm.h   |   2 +
- include/linux/uio.h  |   5 ++
- lib/iov_iter.c       | 113 ++++++++++++++++++++++++++++++++++++++++---
- mm/gup.c             |  33 +++++++++++++
- 8 files changed, 175 insertions(+), 38 deletions(-)
-
---=20
-2.28.0
-
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
