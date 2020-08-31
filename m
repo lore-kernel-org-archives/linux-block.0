@@ -2,115 +2,80 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A182C433E7
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E40C433E7
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:21:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16B002071B
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:18:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gWHfM64w"
+	by mail.kernel.org (Postfix) with ESMTP id 3F71921473
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:21:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728388AbgHaSR7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 14:17:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727058AbgHaSR7 (ORCPT
+        id S1729853AbgHaSUx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 14:20:53 -0400
+Received: from mail.parknet.co.jp ([210.171.160.6]:34002 "EHLO
+        mail.parknet.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729814AbgHaSUw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 14:17:59 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E32E9C061573
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 11:17:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=Q3fAY6+YGidtxRBrrZsqjprNhmHfs9Hw56KK0thIerI=; b=gWHfM64wVy/CGjQA9+pKcKrbjE
-        W1VH+Z4uk5Paorv8lRE5LA+FZT93ayO2k7nGFZWcnVRzJh2VDo88JuZa9d0qAdUyoNDtkmeGadaiC
-        KR0ZfE9LsjiwVU3IjpRfQBe7uWeA+HLphDPItv1FjnFHRNELrq3Ykp6flu+qxd2ZnCrSh8/RIg9L9
-        VLymyTvb7SHwl8YkLOp41U5zi/RuILdqXNqUzI+5sRzcsPAvCL7v85j9J6443ugjdsMg/pYVCTNSf
-        1C1hx8L3Pku0+zlwAftpwhsqlneBwUtoLUDG3ZSxs3rQ3cHo9YU06qHeou5mDridyOyC6HLf5R8wi
-        yBGueCRw==;
-Received: from [2001:4bb8:18c:45ba:9892:9e86:5202:32f0] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kCoNR-0002i5-FN; Mon, 31 Aug 2020 18:17:57 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 7/7] block: remove the unused q argument to part_in_flight and part_in_flight_rw
-Date:   Mon, 31 Aug 2020 20:02:39 +0200
-Message-Id: <20200831180239.2372776-8-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200831180239.2372776-1-hch@lst.de>
-References: <20200831180239.2372776-1-hch@lst.de>
+        Mon, 31 Aug 2020 14:20:52 -0400
+Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
+        by mail.parknet.co.jp (Postfix) with ESMTPSA id 34F5A1B44DF;
+        Tue,  1 Sep 2020 03:20:51 +0900 (JST)
+Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
+        by ibmpc.myhome.or.jp (8.15.2/8.15.2/Debian-20) with ESMTPS id 07VIKndZ367490
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Tue, 1 Sep 2020 03:20:51 +0900
+Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
+        by devron.myhome.or.jp (8.15.2/8.15.2/Debian-20) with ESMTPS id 07VIKnbs3471994
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Tue, 1 Sep 2020 03:20:49 +0900
+Received: (from hirofumi@localhost)
+        by devron.myhome.or.jp (8.15.2/8.15.2/Submit) id 07VIKnLJ3471993;
+        Tue, 1 Sep 2020 03:20:49 +0900
+From:   OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] block: ensure bdi->io_pages is always initialized
+References: <346e5bf5-b08e-84e8-7b0e-c6cb0c814f96@kernel.dk>
+        <878sdu66sa.fsf@mail.parknet.co.jp>
+        <8eb3881a-8ebd-fecb-d88b-3e1d77bc952f@kernel.dk>
+Date:   Tue, 01 Sep 2020 03:20:49 +0900
+In-Reply-To: <8eb3881a-8ebd-fecb-d88b-3e1d77bc952f@kernel.dk> (Jens Axboe's
+        message of "Mon, 31 Aug 2020 12:10:11 -0600")
+Message-ID: <874koi65j2.fsf@mail.parknet.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/genhd.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+Jens Axboe <axboe@kernel.dk> writes:
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 2055b5bf637a80..5fc6d82e6c68c4 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -110,8 +110,7 @@ static void part_stat_read_all(struct hd_struct *part, struct disk_stats *stat)
- 	}
- }
- 
--static unsigned int part_in_flight(struct request_queue *q,
--		struct hd_struct *part)
-+static unsigned int part_in_flight(struct hd_struct *part)
- {
- 	unsigned int inflight = 0;
- 	int cpu;
-@@ -126,8 +125,7 @@ static unsigned int part_in_flight(struct request_queue *q,
- 	return inflight;
- }
- 
--static void part_in_flight_rw(struct request_queue *q, struct hd_struct *part,
--		unsigned int inflight[2])
-+static void part_in_flight_rw(struct hd_struct *part, unsigned int inflight[2])
- {
- 	int cpu;
- 
-@@ -1301,7 +1299,7 @@ ssize_t part_stat_show(struct device *dev,
- 	if (queue_is_mq(q))
- 		inflight = blk_mq_in_flight(q, p);
- 	else
--		inflight = part_in_flight(q, p);
-+		inflight = part_in_flight(p);
- 
- 	return sprintf(buf,
- 		"%8lu %8lu %8llu %8u "
-@@ -1343,7 +1341,7 @@ ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
- 	if (queue_is_mq(q))
- 		blk_mq_in_flight_rw(q, p, inflight);
- 	else
--		part_in_flight_rw(q, p, inflight);
-+		part_in_flight_rw(p, inflight);
- 
- 	return sprintf(buf, "%8u %8u\n", inflight[0], inflight[1]);
- }
-@@ -1623,7 +1621,7 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 		if (queue_is_mq(gp->queue))
- 			inflight = blk_mq_in_flight(gp->queue, hd);
- 		else
--			inflight = part_in_flight(gp->queue, hd);
-+			inflight = part_in_flight(hd);
- 
- 		seq_printf(seqf, "%4d %7d %s "
- 			   "%lu %lu %lu %u "
+> On 8/31/20 11:53 AM, OGAWA Hirofumi wrote:
+>> Jens Axboe <axboe@kernel.dk> writes:
+>> 
+>>> If a driver leaves the limit settings as the defaults, then we don't
+>>> initialize bdi->io_pages. This means that file systems may need to
+>>> work around bdi->io_pages == 0, which is somewhat messy.
+>>>
+>>> Initialize the default value just like we do for ->ra_pages.
+>>>
+>>> Cc: stable@vger.kernel.org
+>>> Reported-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> 
+>> When queued to submit, please let us know to drop fatfs workaround
+>> "fat-avoid-oops-when-bdi-io_pages==0.patch" in akpm series.
+>
+> Will do - planning on submitting it for 5.9, so probably end this
+> week.
+
+OK. Andrew, please drop fat-avoid-oops-when-bdi-io_pages==0.patch.
+
+Thanks.
 -- 
-2.28.0
-
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
