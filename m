@@ -2,320 +2,102 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0525CC433E2
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCE0C433E6
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:38:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0E1120EDD
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:37:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wm313dtO"
+	by mail.kernel.org (Postfix) with ESMTP id 3DDB4207EA
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:38:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598888324;
+	bh=ht+MpGssPKdJ6E3rsvdmycBCNz+RMWwRINpMqFlTCqE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=kN49G/FsA63MRRNask8xuzCKIN1jxuQjzXZUhrIvMelBGchRz/hCZNujp3X8OpcbO
+	 EHpddJ6iedzStihchyhNL2oWYW/XAECC3jP+zSvTrnjZ0PxLgXsENSF5Bo7kBTJMZ4
+	 RRRYYDKDuKN0/bc97//f5Dlo6xeCzrBal0aiuXo0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729337AbgHaPhh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 11:37:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56408 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729080AbgHaPhf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 11:37:35 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A4D4C061575;
-        Mon, 31 Aug 2020 08:37:34 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id n18so5056743qtw.0;
-        Mon, 31 Aug 2020 08:37:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=QsMkC5oXq5WobzdILIB2ScjD9TgMB1liEL21vqR/JC4=;
-        b=Wm313dtOmsFOK8Cnr4/6OmwNiezmSvcB1alZmu82FUIhUMw4n9ArHBcrs42yI+jFhO
-         ojGwxKqq228m4vtsBIC8i1hjYkolf3eU7QyISKNRjRse1u8l0/P92mFL2dUImjKABzMx
-         vOK5UKOfKflYGSjazdqNTY71NxFTd/QwNYkhkuddif0x3yQGh7060uAb2rrZ2VcSQWhL
-         4n8Al5ewZkeUA/Md2dds+tqkZrVfY3S/OLA8ynJFo21LW2dgIVOkGfjcigTeAeJ/yLW1
-         zYqvPcw+UFtdWk4c2DR/OP4bZi2Ct02HTaUZV0WZxWGi7RV4B9COQOTYTW3cMs8p6JHS
-         iEmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=QsMkC5oXq5WobzdILIB2ScjD9TgMB1liEL21vqR/JC4=;
-        b=G/NfcGwHO9kEsQrLVnqwKwxDWxNJ09sKP2GkB9qzQjvCtF3mdczJdYixsieLzmlDAj
-         coxqSD2zvfagmoT0+JYb21/nTs5jFXHXD078JOXmSl+GOncv9jkEd5YMtzAe6Z8TWkas
-         OwV4TPRdSXgmKAnoo4rFvPjRf5N1ygqeGyUru0KGHW/mgUlw2XHYSa8PEFrqFTLjAJm0
-         wDXb7qwmz/ywZnpO8hZLuoQlJzelWpoav41FHjJpS3yQiJ8fnI6CWALflYWFyNabgXSi
-         TuwjPONQOnzwyX4ftAcwz8IOJdB+zgj60SarRvpbqGE/S5nL5zsbvvPIrjy5c8W5BaQJ
-         Ylrg==
-X-Gm-Message-State: AOAM530Tb8DWwqdoJGuQzHtaX9WXmXNi/RDemiXjtbLcQ5LwzMhCTYxz
-        8GusgScjq59n+Mmq5VkJBAc=
-X-Google-Smtp-Source: ABdhPJwNgQwkTvcxQopBySVGrO5u9TYtUYf8WYp5vpq6hvCEiBOZFeiTD9G7XIoFcDAaDwEQhLaH8Q==
-X-Received: by 2002:ac8:1c3:: with SMTP id b3mr1357180qtg.240.1598888253678;
-        Mon, 31 Aug 2020 08:37:33 -0700 (PDT)
-Received: from dschatzberg-fedora-PC0Y6AEN.thefacebook.com ([2620:10d:c091:480::1:2edc])
-        by smtp.gmail.com with ESMTPSA id s5sm9908872qke.120.2020.08.31.08.37.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2020 08:37:32 -0700 (PDT)
-From:   Dan Schatzberg <schatzberg.dan@gmail.com>
-Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Roman Gushchin <guro@fb.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yafang Shao <laoar.shao@gmail.com>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        linux-block@vger.kernel.org (open list:BLOCK LAYER),
-        linux-kernel@vger.kernel.org (open list),
-        cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
-        linux-mm@kvack.org (open list:CONTROL GROUP - MEMORY RESOURCE
-        CONTROLLER (MEMCG))
-Subject: [PATCH 3/3] loop: Charge i/o to mem and blk cg
-Date:   Mon, 31 Aug 2020 11:37:00 -0400
-Message-Id: <20200831153704.16848-4-schatzberg.dan@gmail.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200831153704.16848-1-schatzberg.dan@gmail.com>
-References: <20200831153704.16848-1-schatzberg.dan@gmail.com>
+        id S1728591AbgHaPaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 11:30:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39660 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728584AbgHaPaV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Aug 2020 11:30:21 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id DA7E920767;
+        Mon, 31 Aug 2020 15:30:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598887820;
+        bh=ht+MpGssPKdJ6E3rsvdmycBCNz+RMWwRINpMqFlTCqE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=AP7mPhhIXZomj4o2XoZnzCtfT9p7rI3/XsbrLq4uRX2koZd2g6tmndwdD17I4amDm
+         r7DiKc8GM6BVTEa6SN9P9tvgxcoxPzfkn8Jv65muM0505aw+oeawBfBrLghgjqiTLs
+         GV2M1zDmJXoiE9i3nslbAFVYbjn5Jski6rNMo4RE=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Hou Pu <houpu@bytedance.com>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH AUTOSEL 5.8 31/42] nbd: restore default timeout when setting it to zero
+Date:   Mon, 31 Aug 2020 11:29:23 -0400
+Message-Id: <20200831152934.1023912-31-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200831152934.1023912-1-sashal@kernel.org>
+References: <20200831152934.1023912-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The current code only associates with the existing blkcg when aio is
-used to access the backing file. This patch covers all types of i/o to
-the backing file and also associates the memcg so if the backing file is
-on tmpfs, memory is charged appropriately.
+From: Hou Pu <houpu@bytedance.com>
 
-This patch also exports cgroup_get_e_css so it can be used by the loop
-module.
+[ Upstream commit acb19e17c5134dd78668c429ecba5b481f038e6a ]
 
-Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+If we configured io timeout of nbd0 to 100s. Later after we
+finished using it, we configured nbd0 again and set the io
+timeout to 0. We expect it would timeout after 30 seconds
+and keep retry. But in fact we could not change the timeout
+when we set it to 0. the timeout is still the original 100s.
+
+So change the timeout to default 30s when we set it to zero.
+It also behaves same as commit 2da22da57348 ("nbd: fix zero
+cmd timeout handling v2").
+
+It becomes more important if we were reconfigure a nbd device
+and the io timeout it set to zero. Because it could take 30s
+to detect the new socket and thus io could be completed more
+quickly compared to 100s.
+
+Signed-off-by: Hou Pu <houpu@bytedance.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/loop.c       | 61 +++++++++++++++++++++++++-------------
- drivers/block/loop.h       |  3 +-
- include/linux/memcontrol.h |  6 ++++
- kernel/cgroup/cgroup.c     |  1 +
- 4 files changed, 50 insertions(+), 21 deletions(-)
+ drivers/block/nbd.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 771685a6c259..3da34d454287 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -77,6 +77,7 @@
- #include <linux/uio.h>
- #include <linux/ioprio.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/sched/mm.h>
- 
- #include "loop.h"
- 
-@@ -518,8 +519,6 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
- 
--	if (cmd->css)
--		css_put(cmd->css);
- 	cmd->ret = ret;
- 	lo_rw_aio_do_completion(cmd);
- }
-@@ -580,8 +579,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_complete = lo_rw_aio_complete;
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
- 	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
--	if (cmd->css)
--		kthread_associate_blkcg(cmd->css);
- 
- 	if (rw == WRITE)
- 		ret = call_write_iter(file, &cmd->iocb, &iter);
-@@ -589,7 +586,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		ret = call_read_iter(file, &cmd->iocb, &iter);
- 
- 	lo_rw_aio_do_completion(cmd);
--	kthread_associate_blkcg(NULL);
- 
- 	if (ret != -EIOCBQUEUED)
- 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
-@@ -932,7 +928,7 @@ struct loop_worker {
- 	struct list_head cmd_list;
- 	struct list_head idle_list;
- 	struct loop_device *lo;
--	struct cgroup_subsys_state *css;
-+	struct cgroup_subsys_state *blkcg_css;
- 	unsigned long last_ran_at;
- };
- 
-@@ -949,7 +945,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 
- 	spin_lock_irq(&lo->lo_work_lock);
- 
--	if (!cmd->css)
-+	if (!cmd->blkcg_css)
- 		goto queue_work;
- 
- 	node = &lo->worker_tree.rb_node;
-@@ -957,10 +953,10 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	while (*node) {
- 		parent = *node;
- 		cur_worker = container_of(*node, struct loop_worker, rb_node);
--		if (cur_worker->css == cmd->css) {
-+		if (cur_worker->blkcg_css == cmd->blkcg_css) {
- 			worker = cur_worker;
- 			break;
--		} else if ((long)cur_worker->css < (long)cmd->css) {
-+		} else if ((long)cur_worker->blkcg_css < (long)cmd->blkcg_css) {
- 			node = &(*node)->rb_left;
- 		} else {
- 			node = &(*node)->rb_right;
-@@ -972,13 +968,18 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT | __GFP_NOWARN);
- 	/*
- 	 * In the event we cannot allocate a worker, just queue on the
--	 * rootcg worker
-+	 * rootcg worker and issue the I/O as the rootcg
- 	 */
--	if (!worker)
-+	if (!worker) {
-+		cmd->blkcg_css = NULL;
-+		if (cmd->memcg_css)
-+			css_put(cmd->memcg_css);
-+		cmd->memcg_css = NULL;
- 		goto queue_work;
-+	}
- 
--	worker->css = cmd->css;
--	css_get(worker->css);
-+	worker->blkcg_css = cmd->blkcg_css;
-+	css_get(worker->blkcg_css);
- 	INIT_WORK(&worker->work, loop_workfn);
- 	INIT_LIST_HEAD(&worker->cmd_list);
- 	INIT_LIST_HEAD(&worker->idle_list);
-@@ -1304,7 +1305,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 				idle_list) {
- 		list_del(&worker->idle_list);
- 		rb_erase(&worker->rb_node, &lo->worker_tree);
--		css_put(worker->css);
-+		css_put(worker->blkcg_css);
- 		kfree(worker);
- 	}
- 	spin_unlock_irq(&lo->lo_work_lock);
-@@ -2105,13 +2106,18 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- 	/* always use the first bio's css */
-+	cmd->blkcg_css = NULL;
-+	cmd->memcg_css = NULL;
- #ifdef CONFIG_BLK_CGROUP
--	if (cmd->use_aio && rq->bio && rq->bio->bi_blkg) {
--		cmd->css = &bio_blkcg(rq->bio)->css;
--		css_get(cmd->css);
--	} else
-+	if (rq->bio && rq->bio->bi_blkg) {
-+		cmd->blkcg_css = &bio_blkcg(rq->bio)->css;
-+#ifdef CONFIG_MEMCG
-+		cmd->memcg_css =
-+			cgroup_get_e_css(cmd->blkcg_css->cgroup,
-+					&memory_cgrp_subsys);
-+#endif
-+	}
- #endif
--		cmd->css = NULL;
- 	loop_queue_work(lo, cmd);
- 
- 	return BLK_STS_OK;
-@@ -2123,13 +2129,28 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 	const bool write = op_is_write(req_op(rq));
- 	struct loop_device *lo = rq->q->queuedata;
- 	int ret = 0;
-+	struct mem_cgroup *old_memcg = NULL;
- 
- 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
- 		ret = -EIO;
- 		goto failed;
- 	}
- 
-+	if (cmd->blkcg_css)
-+		kthread_associate_blkcg(cmd->blkcg_css);
-+	if (cmd->memcg_css)
-+		old_memcg = set_active_memcg(
-+			mem_cgroup_from_css(cmd->memcg_css));
-+
- 	ret = do_req_filebacked(lo, rq);
-+
-+	if (cmd->blkcg_css)
-+		kthread_associate_blkcg(NULL);
-+
-+	if (cmd->memcg_css) {
-+		set_active_memcg(old_memcg);
-+		css_put(cmd->memcg_css);
-+	}
-  failed:
- 	/* complete non-aio request */
- 	if (!cmd->use_aio || ret) {
-@@ -2208,7 +2229,7 @@ static void loop_free_idle_workers(struct timer_list *timer)
- 			break;
- 		list_del(&worker->idle_list);
- 		rb_erase(&worker->rb_node, &lo->worker_tree);
--		css_put(worker->css);
-+		css_put(worker->blkcg_css);
- 		kfree(worker);
- 	}
- 	if (!list_empty(&lo->idle_worker_list))
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 0162b55a68e1..4d6886d9855a 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -75,7 +75,8 @@ struct loop_cmd {
- 	long ret;
- 	struct kiocb iocb;
- 	struct bio_vec *bvec;
--	struct cgroup_subsys_state *css;
-+	struct cgroup_subsys_state *blkcg_css;
-+	struct cgroup_subsys_state *memcg_css;
- };
- 
- /* Support for loadable transfer modules */
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index d0b036123c6a..fceac9f66d96 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -1031,6 +1031,12 @@ static inline struct mem_cgroup *get_mem_cgroup_from_page(struct page *page)
- 	return NULL;
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index ce7e9f223b20b..bc9dc1f847e19 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1360,6 +1360,8 @@ static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
+ 	nbd->tag_set.timeout = timeout * HZ;
+ 	if (timeout)
+ 		blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
++	else
++		blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
  }
  
-+static inline
-+struct mem_cgroup *mem_cgroup_from_css(struct cgroup_subsys_state *css)
-+{
-+	return NULL;
-+}
-+
- static inline void mem_cgroup_put(struct mem_cgroup *memcg)
- {
- }
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index dd247747ec14..16d059a89a68 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -580,6 +580,7 @@ struct cgroup_subsys_state *cgroup_get_e_css(struct cgroup *cgrp,
- 	rcu_read_unlock();
- 	return css;
- }
-+EXPORT_SYMBOL_GPL(cgroup_get_e_css);
- 
- static void cgroup_get_live(struct cgroup *cgrp)
- {
+ /* Must be called with config_lock held */
 -- 
-2.24.1
+2.25.1
 
