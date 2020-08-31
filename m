@@ -2,103 +2,79 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A79A7C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D310C433E6
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:12:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 830302083E
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:10:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 035D42083E
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:12:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="N/ZgTait"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Fknm3khb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728341AbgHaSKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 14:10:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52142 "EHLO
+        id S1729586AbgHaSMD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 14:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728203AbgHaSKN (ORCPT
+        with ESMTP id S1729142AbgHaSLY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 14:10:13 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACB8FC061573
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 11:10:13 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id t4so1998537iln.1
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 11:10:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=uRRvPiCxTh0cQCTrfg3Fth4VL9KJPMgKRrLomhiuBtI=;
-        b=N/ZgTaitrtvhgydpuVRs73cHccBD3HThC2WI/5nr2T927O5UHXvvjnmXJuwqM7RGTS
-         m/BWRm4qzmumdQrOkQiEDp9xoLS0KiZXIoNDdO138faEHaa4XRMg6onfj/kEbcuJoWF/
-         nldbEn2OCx+Sdg02Yr9dPjBuYR9lFx5Sy/pRuwHXHOReulRus9UYJ2MncvEjrFTl2YX6
-         MXM4OnbdQMzqopaIjg6gyMzUPD3shWut7xfKs2/eri6IxdLXJ+TXinfy89VQeSRW4EPF
-         FV/yybijFfhePzVomwxlK/sSRtOr2pZsJXPZUbWYVGxGP8+Z3comZb1i7XeVPDq5XAtl
-         3jcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uRRvPiCxTh0cQCTrfg3Fth4VL9KJPMgKRrLomhiuBtI=;
-        b=RK8FXGeMOzekphe07DgXo8dGgJFr/brNdtzbS+gaofC07rYONl/bdf6bRkew1W1xk3
-         ZIsKZYoRV0qiWtjQAdMm7Fg3lZqD5S4ubRjpFR050j+IPpImR4Y6hLqHxVnHvs9m1L2d
-         v+UoEAZBQykyapZ/POvvDeXQBf2CMzf9k31opk9y47a1LUVmBybb/okZXY7dfD9QvgYZ
-         wNXuUDLSd5UuQOlaWEQU3D1bZrJwA8F1rUEZc/G4zN35j0Jrf67pdi6KJOVbuOi8jghY
-         tD50rALCxXNG3KV7HRWRuaK+m7CgStlWbGJOzaw3scwcA2G7tA+GtS9bB9rsE/dxnFOJ
-         c6ew==
-X-Gm-Message-State: AOAM533XY+aFneYAndAnTPJizE4kNtDeET2ez7Y05MC8fJWpxZHtTEqc
-        4Wx2t2PrwglqyfPXwyYDh5sOd8TGgWDViSkS
-X-Google-Smtp-Source: ABdhPJzULLJhGAC9dl6A/WqaG3mzSJWdotfNL3j3qEtXe+9GsyH2uhTDrxRkxEVNIq3a9z0msOy73A==
-X-Received: by 2002:a92:6612:: with SMTP id a18mr2171116ilc.94.1598897412724;
-        Mon, 31 Aug 2020 11:10:12 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id q87sm5040851ili.8.2020.08.31.11.10.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Aug 2020 11:10:12 -0700 (PDT)
-Subject: Re: [PATCH] block: ensure bdi->io_pages is always initialized
-To:     OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <346e5bf5-b08e-84e8-7b0e-c6cb0c814f96@kernel.dk>
- <878sdu66sa.fsf@mail.parknet.co.jp>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8eb3881a-8ebd-fecb-d88b-3e1d77bc952f@kernel.dk>
-Date:   Mon, 31 Aug 2020 12:10:11 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 31 Aug 2020 14:11:24 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB2BC061573
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 11:11:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=C5BnBOHmZC67nL6sYTdu/Z7Lf9QFPOkf2Rs3DgMwiHE=; b=Fknm3khbpvn1P4uwQ9tp7kC4zD
+        YctwTx5/ZIanXTOgNdUcsuJSB4i7oGCc+/tNeKg3HDpK2algJNOizjZiwp88jvV+sZK+mZjawtvPG
+        AhpbWxh2kZa7wfyftHBTHdYdEch4BV25Xv99sb5b/H/cHgDmTN3PhnYQdIC/18IgnbUwNTY7FU8Zx
+        o3HpU6ZIqdxxVxRpJQo1iHGNpSrtM0Js0iSAY57MUM2OzvejQPYFoJ9CmbYrjW2STkxsDntSkPr6p
+        OAjHil3P6OobxnQrDe3qQuHva3vgCJnEiH9gbmIKlqqOCUarPyAISgaAVVH9QvgTmS5415SGDR8jp
+        CsCBzAOg==;
+Received: from 213-225-6-196.nat.highway.a1.net ([213.225.6.196] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kCoH4-0002Fq-Pz; Mon, 31 Aug 2020 18:11:22 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 3/7] block: remove an outdated comment on the bd_dev field
+Date:   Mon, 31 Aug 2020 20:02:35 +0200
+Message-Id: <20200831180239.2372776-4-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200831180239.2372776-1-hch@lst.de>
+References: <20200831180239.2372776-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <878sdu66sa.fsf@mail.parknet.co.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/31/20 11:53 AM, OGAWA Hirofumi wrote:
-> Jens Axboe <axboe@kernel.dk> writes:
-> 
->> If a driver leaves the limit settings as the defaults, then we don't
->> initialize bdi->io_pages. This means that file systems may need to
->> work around bdi->io_pages == 0, which is somewhat messy.
->>
->> Initialize the default value just like we do for ->ra_pages.
->>
->> Cc: stable@vger.kernel.org
->> Reported-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> When queued to submit, please let us know to drop fatfs workaround
-> "fat-avoid-oops-when-bdi-io_pages==0.patch" in akpm series.
+kdev_t is long gone, so we don't need to comment a field isn't one..
 
-Will do - planning on submitting it for 5.9, so probably end this
-week.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/blk_types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 63a39e47fc6047..59d9150165c490 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -20,7 +20,7 @@ typedef void (bio_end_io_t) (struct bio *);
+ struct bio_crypt_ctx;
+ 
+ struct block_device {
+-	dev_t			bd_dev;  /* not a kdev_t - it's a search key */
++	dev_t			bd_dev;
+ 	int			bd_openers;
+ 	struct inode *		bd_inode;	/* will die */
+ 	struct super_block *	bd_super;
 -- 
-Jens Axboe
+2.28.0
 
