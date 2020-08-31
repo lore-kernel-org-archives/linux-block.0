@@ -2,102 +2,96 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCE0C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAF3C2BB4D
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:39:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DDB4207EA
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:38:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598888324;
-	bh=ht+MpGssPKdJ6E3rsvdmycBCNz+RMWwRINpMqFlTCqE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=kN49G/FsA63MRRNask8xuzCKIN1jxuQjzXZUhrIvMelBGchRz/hCZNujp3X8OpcbO
-	 EHpddJ6iedzStihchyhNL2oWYW/XAECC3jP+zSvTrnjZ0PxLgXsENSF5Bo7kBTJMZ4
-	 RRRYYDKDuKN0/bc97//f5Dlo6xeCzrBal0aiuXo0=
+	by mail.kernel.org (Postfix) with ESMTP id 38D1E207EA
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:39:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="x/p33DHr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728591AbgHaPaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 11:30:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39660 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728584AbgHaPaV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 11:30:21 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DA7E920767;
-        Mon, 31 Aug 2020 15:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598887820;
-        bh=ht+MpGssPKdJ6E3rsvdmycBCNz+RMWwRINpMqFlTCqE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AP7mPhhIXZomj4o2XoZnzCtfT9p7rI3/XsbrLq4uRX2koZd2g6tmndwdD17I4amDm
-         r7DiKc8GM6BVTEa6SN9P9tvgxcoxPzfkn8Jv65muM0505aw+oeawBfBrLghgjqiTLs
-         GV2M1zDmJXoiE9i3nslbAFVYbjn5Jski6rNMo4RE=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hou Pu <houpu@bytedance.com>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 5.8 31/42] nbd: restore default timeout when setting it to zero
-Date:   Mon, 31 Aug 2020 11:29:23 -0400
-Message-Id: <20200831152934.1023912-31-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200831152934.1023912-1-sashal@kernel.org>
-References: <20200831152934.1023912-1-sashal@kernel.org>
+        id S1727902AbgHaPjc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 11:39:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728655AbgHaPiv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Aug 2020 11:38:51 -0400
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A4AC061573
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 08:38:50 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id q14so1498111ilm.2
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 08:38:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=z4HUQWA3GefTjgAhlZ3zitTeaamVvr6/rpOjMH3aSW8=;
+        b=x/p33DHrbarbMYtfOSZ/rPXjhV4iWSoDg+harqWTLy2UIGFiPfeTkbOY/PY7ogYSX9
+         EzJ26qecDbTSGi22ZgIVLdZUPQmfCiaTCxnaOeyA6fS70oCbLOjVnu4WSR2AdBYURIwX
+         fSDwLOC841MUSoPGG7qVaE9i2r/4oGzorc3j3hbGedV7DZLRKtkT9f9HH4WckfiKoim1
+         Nte/NRF5xebeN0ScjQZv4jXmtxDxMf7h/Xcs9mBLz2scuLl1gZM39SHIOtXdhjMi8Ha4
+         tLe386pgdACwcgAY2Bw4A67WFqvLPFqxhWQqCL2s6GWmFTBrJcjBQT+HJ6REEeQ1NoRK
+         KQMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=z4HUQWA3GefTjgAhlZ3zitTeaamVvr6/rpOjMH3aSW8=;
+        b=r+ulkiU9orxJDGDsaWt8cEao8ExJTgsObSteDjiIEe5X88MxGGptMmQBtb3sZ8sqd1
+         bggcVx55bmzzqZHAMI74op3VH/xv5590quB/n/mEEykSSo9Qr1f36lp4t95g7zYFBslR
+         JFmMCDyDanuDujd4C2FLlmRFRjCtbc9M79MOAPn0OhWcsWODJtWXjivFtp7gnkWFs9o5
+         tl5seG32plXcSvdafNnbBvlQMo7Bely6zt57GO548a6yzZ6a+oSwwE8ZZoRGIykX7Av4
+         y43ic/GZJY0pm6s+aWnx1xLjPKgvVP3JkJtmnQ/pQndHo62MVlbArvfjl4wHHIShdvIp
+         EyqA==
+X-Gm-Message-State: AOAM533XI64zphghdeJTRwvTiyFiGukZRozZXk7b/yMqcnu6TDhqcNyx
+        MGE4mIS2lw8q1i+6LOt+G7/dfCRaFlJwcvTM
+X-Google-Smtp-Source: ABdhPJx+NfdCs8EPJfJliXCwiAxd1dNJgl+vk0APgfT7FvaVuOY1AQfuu59SwssMcJS/hGzNlBRorw==
+X-Received: by 2002:a92:48da:: with SMTP id j87mr1934420ilg.78.1598888329706;
+        Mon, 31 Aug 2020 08:38:49 -0700 (PDT)
+Received: from [192.168.1.58] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id 3sm4744495ily.31.2020.08.31.08.38.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Aug 2020 08:38:48 -0700 (PDT)
+Subject: Re: [PATCH 1/2] block: Return blk_status_t instead of errno codes
+To:     Ritika Srivastava <RITIKA.SRIVASTAVA@ORACLE.COM>
+Cc:     linux-block@vger.kernel.org
+References: <1596062878-4238-1-git-send-email-ritika.srivastava@oracle.com>
+ <1596062878-4238-2-git-send-email-ritika.srivastava@oracle.com>
+ <20200814062620.GA24167@infradead.org>
+ <C6F86C38-BE29-422A-8A57-5144E26C4569@ORACLE.COM>
+ <de5c94ec-9079-22b7-bbcd-667f3b0fe94e@kernel.dk>
+ <A0A0C5C0-957C-44DB-9B42-3EEC473D74C6@ORACLE.COM>
+ <3C0C6E56-ECEF-457A-89A1-0944E004DC77@ORACLE.COM>
+ <d5c2818f-ed6e-e8ff-709d-ecc4858ff4de@kernel.dk>
+ <67BDE4B3-830C-476F-939F-5AB2634E0F7D@ORACLE.COM>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6d864384-2b6c-0a1f-8f85-9ec5acb5b484@kernel.dk>
+Date:   Mon, 31 Aug 2020 09:38:48 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <67BDE4B3-830C-476F-939F-5AB2634E0F7D@ORACLE.COM>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hou Pu <houpu@bytedance.com>
+On 8/28/20 11:10 AM, Ritika Srivastava wrote:
+> Thanks Jens for the update.
+> I will look out for 5.10 branch and send the updated patches.
 
-[ Upstream commit acb19e17c5134dd78668c429ecba5b481f038e6a ]
+I pushed it out this morning.
 
-If we configured io timeout of nbd0 to 100s. Later after we
-finished using it, we configured nbd0 again and set the io
-timeout to 0. We expect it would timeout after 30 seconds
-and keep retry. But in fact we could not change the timeout
-when we set it to 0. the timeout is still the original 100s.
-
-So change the timeout to default 30s when we set it to zero.
-It also behaves same as commit 2da22da57348 ("nbd: fix zero
-cmd timeout handling v2").
-
-It becomes more important if we were reconfigure a nbd device
-and the io timeout it set to zero. Because it could take 30s
-to detect the new socket and thus io could be completed more
-quickly compared to 100s.
-
-Signed-off-by: Hou Pu <houpu@bytedance.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/nbd.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index ce7e9f223b20b..bc9dc1f847e19 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1360,6 +1360,8 @@ static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
- 	nbd->tag_set.timeout = timeout * HZ;
- 	if (timeout)
- 		blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
-+	else
-+		blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
- }
- 
- /* Must be called with config_lock held */
 -- 
-2.25.1
+Jens Axboe
 
