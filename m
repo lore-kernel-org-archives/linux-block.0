@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD83CC433E6
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B137AC433E2
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:17:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EC42208DB
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:15:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91CFE2071B
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:17:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PueprQvZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cNhQn8mF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728949AbgHaSPr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 14:15:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53008 "EHLO
+        id S1728375AbgHaSR6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 14:17:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727058AbgHaSPq (ORCPT
+        with ESMTP id S1727058AbgHaSR5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 14:15:46 -0400
+        Mon, 31 Aug 2020 14:17:57 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86C94C061573
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 11:15:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75BD0C061573
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 11:17:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=xkbNJ6YZlWHPymEUUJSqRfOzitwcKU/z5DRcesvaD2g=; b=PueprQvZ6ynDcncrEV3LErQ9uK
-        Zq1cjIXRNCpBCg4t3TL4WA+/FWazk1XrHxnEaAyL7Yy9FfY11BRsTLui4Ut+mEDubcpa8CVW5eBjy
-        SFU5Nm6B/rlCN0E7igNbjuNsmrp9/SSgzykxw8nekzK2xneZUAsIsFXHGzXTeV+bSO0US94qZBrUK
-        SjekB2OFdd3AE1ytA5DTqSxfudwPT0UpaQRR5D2L65GJ4v0Zk6DEZQS5/CaAzlcME/DpIxWGoVWy5
-        LBB826j70eVcsUOQxBZxaYXe54UGjwduyCrpbA6U6i8ot3lTBMQC9oT7L75HLBmAZ6lZmLio8v5KU
-        AwBxXGfA==;
+        bh=X6jKtVps3fzP9dWj973FafGo36ZMWx/QitThzlvSeYg=; b=cNhQn8mFCvyu1oVIdbhZ5NpJCQ
+        PtNGT20CWivVI2pvFQTdR0wq5WWEAtuPTLlpHGcEyLdNmVhksO3h8PUJeXa8ds3/P1e0vio25h/lW
+        SDOOeVnteOP+2X8YU7NCdYuEQX1AXbs05SkWzPFZxATA/yDgNWm/58bv6wzrpcgjvgtLmdi/W1zXK
+        bPKNaExpHrqrAErPkJGxwxu76scWwcMAGi76/dXmoQcJHiJTupEbohr+xGdpFUb9swXOOO4UGl+LD
+        Ok3FD0B07vEYvy+gNuhXeh6anvpWEtTSN++mIdLYiHIc232dVN0ci7ObJzn/7mApGyZR+YoHgg8e7
+        eGhc6Thg==;
 Received: from 213-225-6-196.nat.highway.a1.net ([213.225.6.196] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kCoLI-0002bf-UL; Mon, 31 Aug 2020 18:15:45 +0000
+        id 1kCoNQ-0002hh-0C; Mon, 31 Aug 2020 18:17:56 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 5/7] block: cleanup __alloc_disk_node
-Date:   Mon, 31 Aug 2020 20:02:37 +0200
-Message-Id: <20200831180239.2372776-6-hch@lst.de>
+Subject: [PATCH 6/7] block: remove the disk argument to delete_partition
+Date:   Mon, 31 Aug 2020 20:02:38 +0200
+Message-Id: <20200831180239.2372776-7-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200831180239.2372776-1-hch@lst.de>
 References: <20200831180239.2372776-1-hch@lst.de>
@@ -55,101 +55,83 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use early returns and goto-based unwinding to simplify the flow a bit.
+We can trivially derive the gendisk from the hd_struct.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c | 73 +++++++++++++++++++++++++++------------------------
- 1 file changed, 38 insertions(+), 35 deletions(-)
+ block/blk.h             | 2 +-
+ block/genhd.c           | 2 +-
+ block/partitions/core.c | 9 +++++----
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
+diff --git a/block/blk.h b/block/blk.h
+index 49e2928a163299..3e60ffd3f500e5 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -350,7 +350,7 @@ char *disk_name(struct gendisk *hd, int partno, char *buf);
+ #define ADDPART_FLAG_NONE	0
+ #define ADDPART_FLAG_RAID	1
+ #define ADDPART_FLAG_WHOLEDISK	2
+-void delete_partition(struct gendisk *disk, struct hd_struct *part);
++void delete_partition(struct hd_struct *part);
+ int bdev_add_partition(struct block_device *bdev, int partno,
+ 		sector_t start, sector_t length);
+ int bdev_del_partition(struct block_device *bdev, int partno);
 diff --git a/block/genhd.c b/block/genhd.c
-index 99c64641c3148c..055ce9cf18358a 100644
+index 055ce9cf18358a..2055b5bf637a80 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -1729,45 +1729,48 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+@@ -913,7 +913,7 @@ void del_gendisk(struct gendisk *disk)
+ 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
+ 	while ((part = disk_part_iter_next(&piter))) {
+ 		invalidate_partition(disk, part->partno);
+-		delete_partition(disk, part);
++		delete_partition(part);
  	}
+ 	disk_part_iter_exit(&piter);
  
- 	disk = kzalloc_node(sizeof(struct gendisk), GFP_KERNEL, node_id);
--	if (disk) {
--		disk->part0.dkstats = alloc_percpu(struct disk_stats);
--		if (!disk->part0.dkstats) {
--			kfree(disk);
--			return NULL;
--		}
--		init_rwsem(&disk->lookup_sem);
--		disk->node_id = node_id;
--		if (disk_expand_part_tbl(disk, 0)) {
--			free_percpu(disk->part0.dkstats);
--			kfree(disk);
--			return NULL;
--		}
--		ptbl = rcu_dereference_protected(disk->part_tbl, 1);
--		rcu_assign_pointer(ptbl->part[0], &disk->part0);
-+	if (!disk)
-+		return NULL;
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 1150474caca0cf..7af3f8796f0a2c 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -316,8 +316,9 @@ int hd_ref_init(struct hd_struct *part)
+  * Must be called either with bd_mutex held, before a disk can be opened or
+  * after all disk users are gone.
+  */
+-void delete_partition(struct gendisk *disk, struct hd_struct *part)
++void delete_partition(struct hd_struct *part)
+ {
++	struct gendisk *disk = part_to_disk(part);
+ 	struct disk_part_tbl *ptbl =
+ 		rcu_dereference_protected(disk->part_tbl, 1);
  
--		/*
--		 * set_capacity() and get_capacity() currently don't use
--		 * seqcounter to read/update the part0->nr_sects. Still init
--		 * the counter as we can read the sectors in IO submission
--		 * patch using seqence counters.
--		 *
--		 * TODO: Ideally set_capacity() and get_capacity() should be
--		 * converted to make use of bd_mutex and sequence counters.
--		 */
--		hd_sects_seq_init(&disk->part0);
--		if (hd_ref_init(&disk->part0)) {
--			hd_free_part(&disk->part0);
--			kfree(disk);
--			return NULL;
--		}
-+	disk->part0.dkstats = alloc_percpu(struct disk_stats);
-+	if (!disk->part0.dkstats)
-+		goto out_free_disk;
+@@ -325,7 +326,7 @@ void delete_partition(struct gendisk *disk, struct hd_struct *part)
+ 	 * ->part_tbl is referenced in this part's release handler, so
+ 	 *  we have to hold the disk device
+ 	 */
+-	get_device(disk_to_dev(part_to_disk(part)));
++	get_device(disk_to_dev(disk));
+ 	rcu_assign_pointer(ptbl->part[part->partno], NULL);
+ 	kobject_put(part->holder_dir);
+ 	device_del(part_to_dev(part));
+@@ -548,7 +549,7 @@ int bdev_del_partition(struct block_device *bdev, int partno)
+ 	invalidate_bdev(bdevp);
  
--		disk->minors = minors;
--		rand_initialize_disk(disk);
--		disk_to_dev(disk)->class = &block_class;
--		disk_to_dev(disk)->type = &disk_type;
--		device_initialize(disk_to_dev(disk));
-+	init_rwsem(&disk->lookup_sem);
-+	disk->node_id = node_id;
-+	if (disk_expand_part_tbl(disk, 0)) {
-+		free_percpu(disk->part0.dkstats);
-+		goto out_free_disk;
- 	}
-+
-+	ptbl = rcu_dereference_protected(disk->part_tbl, 1);
-+	rcu_assign_pointer(ptbl->part[0], &disk->part0);
-+
-+	/*
-+	 * set_capacity() and get_capacity() currently don't use
-+	 * seqcounter to read/update the part0->nr_sects. Still init
-+	 * the counter as we can read the sectors in IO submission
-+	 * patch using seqence counters.
-+	 *
-+	 * TODO: Ideally set_capacity() and get_capacity() should be
-+	 * converted to make use of bd_mutex and sequence counters.
-+	 */
-+	hd_sects_seq_init(&disk->part0);
-+	if (hd_ref_init(&disk->part0))
-+		goto out_free_part0;
-+
-+	disk->minors = minors;
-+	rand_initialize_disk(disk);
-+	disk_to_dev(disk)->class = &block_class;
-+	disk_to_dev(disk)->type = &disk_type;
-+	device_initialize(disk_to_dev(disk));
- 	return disk;
-+
-+out_free_part0:
-+	hd_free_part(&disk->part0);
-+out_free_disk:
-+	kfree(disk);
-+	return NULL;
- }
- EXPORT_SYMBOL(__alloc_disk_node);
+ 	mutex_lock_nested(&bdev->bd_mutex, 1);
+-	delete_partition(bdev->bd_disk, part);
++	delete_partition(part);
+ 	mutex_unlock(&bdev->bd_mutex);
  
+ 	ret = 0;
+@@ -629,7 +630,7 @@ int blk_drop_partitions(struct block_device *bdev)
+ 
+ 	disk_part_iter_init(&piter, bdev->bd_disk, DISK_PITER_INCL_EMPTY);
+ 	while ((part = disk_part_iter_next(&piter)))
+-		delete_partition(bdev->bd_disk, part);
++		delete_partition(part);
+ 	disk_part_iter_exit(&piter);
+ 
+ 	return 0;
 -- 
 2.28.0
 
