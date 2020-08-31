@@ -2,114 +2,102 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EA3C433E2
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 14:18:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7005CC433E7
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:31:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 265FD208A9
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 14:18:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pq+cgcMZ"
+	by mail.kernel.org (Postfix) with ESMTP id 44BCF214DB
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:31:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598887872;
+	bh=jgGMZKTpMuWZUCumUs3Zf/xRhs6V9jg+7yCewR8BJWo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=eaYj6Xt9lyzcptGpYljOkkjCXS0e+ByoaeU1C2Mn3Gwr8tbET9CMcWZ9RTxUdc+G1
+	 y856ngLlCEvY6RkbGKa+/rFNVRKDbQLuRqtmAuTui9iF1MgQ81VDojyJbuTpHds536
+	 Wqiafne6thhv0SQ4/jtUl+Br4DLWFTMJZ/DsfNvI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726968AbgHaOSw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 10:18:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44196 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726503AbgHaOSv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 10:18:51 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5451C061573
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 07:18:50 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id y2so1197211ilp.7
-        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 07:18:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=dcBn95hQJ2UoUYzqmHsBAJVvbvKhZDwu6OkJdsTclEA=;
-        b=pq+cgcMZJwfi/6GGBoLJDe2lIxTZKkWf/n7icy5HuwrD68cwIKTMQ/yDuW01cHkbcV
-         umOC+J0KsEp9tXQkiN1Pjy5Lx9FK9WYflXi4mMEZ/ZbCLgCn6fU9sa7XE0gd/qTb9X7I
-         pSOfvoeMvMmZTZ8hvY+bW8gngNPRz+agO9ceZzG6/m8wSneflXf/il54Z9g3TJpu8TEq
-         Gef47S2m+CgyzvjIbLqw0icqQquH/wCbrKsba0Iz9OGoCQJxfEIDhoZHtOZU9nhKTne1
-         hxW6vAVPVgqAMO0aXJWDcMCypmbCafF6D0DgrxGU7lQ13knjzw053qR1faMQIab9xe0T
-         flew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dcBn95hQJ2UoUYzqmHsBAJVvbvKhZDwu6OkJdsTclEA=;
-        b=CkxqdnJvR+rU5g9p1YBJcdoJD7zmLiPfDB1xPC1gAVBfajhAstcuvPltJepz7gl8RT
-         nPofWrddgCYCjuNnAXfg3wUQ7xOZcV4wdSHzLNdoIBkhoEBChK056BBPqYH+w37wapBZ
-         E+XhtnPoiSGb24MRQi462fM8CxgiLYpQEioJXeh9Qj/i/s2Zj6ENTg5o8GfwPA7OFsTr
-         Bg6cRG0vo8z1/7PY294z+VMK7MrnORu8wyWdFqEBxCzCZBE9KqA5yMwG4B0ks/N82A0z
-         7bEPfzi0yqMH4XCewYeBlxwNPSqDnG9HfSQhoyQdbBMLaIPI6tUwbhOcKBUvf7ZKJko8
-         b8MQ==
-X-Gm-Message-State: AOAM531Zv1ols5tw4XgMY5D1ntv0kDltsSq/eLe2lmxfYq5OEEuGzcNK
-        wA5dI5Yu8Sc0Q+F/3RO8/UDaw3QWRJiIwLba
-X-Google-Smtp-Source: ABdhPJy+9iVpC4cW6r49EJQjpLrjQpsGTQ9ytqkGXqOsuI+TGsKDjTCzezK7EOdwoJT3FBOwlRpEBQ==
-X-Received: by 2002:a92:498a:: with SMTP id k10mr1416300ilg.246.1598883529711;
-        Mon, 31 Aug 2020 07:18:49 -0700 (PDT)
-Received: from [192.168.1.58] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id z9sm4091521ioq.52.2020.08.31.07.18.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Aug 2020 07:18:49 -0700 (PDT)
-Subject: Re: [PATCH] block: fix -EAGAIN IOPOLL task/vm accounting
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <d27ff6f0-9347-e880-fa9d-514e993014dc@kernel.dk>
- <20200830062624.GA8972@infradead.org>
- <9681be4b-298d-7fcd-ed72-9599e08a26a9@kernel.dk>
- <20200830152800.GA16467@infradead.org>
- <ebdb0929-782c-fb66-e3e9-86c077e3b710@kernel.dk>
- <20200831141237.GA13231@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <57807438-3ba0-e320-b6a5-0ad3f46d8335@kernel.dk>
-Date:   Mon, 31 Aug 2020 08:18:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728813AbgHaPbK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 11:31:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41482 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728795AbgHaPbG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Aug 2020 11:31:06 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A6B972151B;
+        Mon, 31 Aug 2020 15:31:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598887865;
+        bh=jgGMZKTpMuWZUCumUs3Zf/xRhs6V9jg+7yCewR8BJWo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VTb4HRMkVv/CU5czHugWpdQuA/skqeWA+EXheRWa2I20FqzUO6nepn2QaHnVg14Ng
+         XpMukZkPpbFAnSl7uK9CXD0xqCez0te2vSAY9Y8H/2/4NSt8WHz9GhShp3q3xwDmC7
+         qKHcoXcDbZ0BFk7B3sXCpiNMIC7YO9AeQ9bf/R4I=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Hou Pu <houpu@bytedance.com>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH AUTOSEL 5.4 16/23] nbd: restore default timeout when setting it to zero
+Date:   Mon, 31 Aug 2020 11:30:32 -0400
+Message-Id: <20200831153039.1024302-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200831153039.1024302-1-sashal@kernel.org>
+References: <20200831153039.1024302-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200831141237.GA13231@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/31/20 8:12 AM, Christoph Hellwig wrote:
-> On Mon, Aug 31, 2020 at 08:02:43AM -0600, Jens Axboe wrote:
->>>> The use case is async submissions, going through ->read_iter() again.
->>>> Or ->write_iter().
->>>
->>> But how does a bio flag help there?  If we go through the file ops
->>> again the next submission will be a new bio structure.
->>
->> Yeah the patch is garbage, can't work. The previous suggestion is here:
->>
->> https://lore.kernel.org/linux-block/395b4c19-cc80-eebb-f6ab-04687110c84a@kernel.dk/T/
->>
->> which isn't super pretty either, but at least it works. Not sure there's
->> a better solution, outside of marking the iocb as retry and then
->> carrying that flag forward for the bio as well. And that seems a bit
->> much for this case.
-> 
-> We'll still need a flag with the above to skip the submit_bio_noacct
-> bios.  But I think it is the right way to go.  Eventually we'll also
-> need to push the accounting down into the individual bio based drivers.
+From: Hou Pu <houpu@bytedance.com>
 
-For the iocb propagation, we'd really need the caller to mark the iocb
-as IOCB_ACCOUNTED (or whatever) if BIO_ACCOUNTED is set, since we can't
-do that further down the stack as we really don't know if we hit -EAGAIN
-before or after the bio was accounted... Which kind of sucks, as it'll
-be hard to contain in a generic fashion.
+[ Upstream commit acb19e17c5134dd78668c429ecba5b481f038e6a ]
 
+If we configured io timeout of nbd0 to 100s. Later after we
+finished using it, we configured nbd0 again and set the io
+timeout to 0. We expect it would timeout after 30 seconds
+and keep retry. But in fact we could not change the timeout
+when we set it to 0. the timeout is still the original 100s.
+
+So change the timeout to default 30s when we set it to zero.
+It also behaves same as commit 2da22da57348 ("nbd: fix zero
+cmd timeout handling v2").
+
+It becomes more important if we were reconfigure a nbd device
+and the io timeout it set to zero. Because it could take 30s
+to detect the new socket and thus io could be completed more
+quickly compared to 100s.
+
+Signed-off-by: Hou Pu <houpu@bytedance.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/nbd.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 7b61d53ba050e..7c577cabb9c3b 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1349,6 +1349,8 @@ static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
+ 	nbd->tag_set.timeout = timeout * HZ;
+ 	if (timeout)
+ 		blk_queue_rq_timeout(nbd->disk->queue, timeout * HZ);
++	else
++		blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
+ }
+ 
+ /* Must be called with config_lock held */
 -- 
-Jens Axboe
+2.25.1
 
