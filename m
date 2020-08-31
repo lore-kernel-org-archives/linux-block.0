@@ -2,127 +2,78 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F50C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 19:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE1CC433E2
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 20:29:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7556206F0
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 19:48:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bb8HY1CG"
+	by mail.kernel.org (Postfix) with ESMTP id DF67F2087D
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 20:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729767AbgHaTsk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 15:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728273AbgHaTsj (ORCPT
+        id S1728327AbgHaU3I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 16:29:08 -0400
+Received: from mail-il1-f197.google.com ([209.85.166.197]:35517 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728301AbgHaU3H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 15:48:39 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A3EC061573;
-        Mon, 31 Aug 2020 12:48:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=lCbGSkGKUU8F1R9YT3KZ6FWEFaUZVzQp7ByD3Mg/eQQ=; b=bb8HY1CGR7xPK7g0ER8gDDtzKm
-        sKjn7irzf13v6WwDkgC7bZ9M13Lr7/uV57MqN7evtV3T8kIwluG+Nh6586EmE6u4Zl1oe/1g5YwkZ
-        G3BklKMwixfU1DZEB9kuG4WF9UfnokgdHuG1g7RN6dfTOYxdueQ0AA9nwxKZjF3iDZYb/nT1KpRPB
-        eV+DiNM7n6yCr3TzsGzNN9anwQQ2eucwFJM9A2cPRmBGR8v+W2lC49CLKjhYEAFsB5PMjRxyCxFaJ
-        i331AdMA94NOUHyFPg0J75g7EIPdNVzx1yoh/pS6FCNFPRsP4ctt3cCS+9czLdMsuBg+Guh1DK0I5
-        jS6KwdyA==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kCpnB-0000ZU-5D; Mon, 31 Aug 2020 19:48:37 +0000
-Date:   Mon, 31 Aug 2020 20:48:37 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 04/11] block: Add bio_for_each_thp_segment_all
-Message-ID: <20200831194837.GJ14765@casper.infradead.org>
-References: <20200824151700.16097-1-willy@infradead.org>
- <20200824151700.16097-5-willy@infradead.org>
- <20200827084431.GA15909@infradead.org>
+        Mon, 31 Aug 2020 16:29:07 -0400
+Received: by mail-il1-f197.google.com with SMTP id p16so2928715ilp.2
+        for <linux-block@vger.kernel.org>; Mon, 31 Aug 2020 13:29:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=gnKsjgJ5rv+iBjKke+34Do0zneKwGI7SNQuffWwXV30=;
+        b=saTxHdnXRScCcz8kXS49FAGQW/SUIGqWkyq3lHjXZ/16nPxPF36jMVEx1rLYv25OGk
+         oheLhzMkCceS3hoW1l/orlYKtYSxfWeOedaXY6jvK5DIO9D0JdimkFgnFQ5FZOLBdptJ
+         9deOwlofnXLcgM/k+dS6A1lcPcN2SRC8b1sPltVy8pT8MceJ2r9S4xXk6vLwwa8FCOTi
+         4D6oOOp+cprDJJkspOJ1ZAC2g2nXC4x5ojfZsN3bpOB4UI8zZjBgztzNBV/ngG0+mmpK
+         FZvKQUsKGAvxgHHz42PXRtIdoGIhA0RunFx8vmXUpfGESvN6HiZ/TaX7WYpf7aevtbI1
+         vxmg==
+X-Gm-Message-State: AOAM532R/DTfZo67PUyBjwQu6K7efD9rzrmQPjR3s0ZYQNxhJ+S65ZGf
+        U/LVxSZhsdlXGiOKLahRYOJjSk7rWAdqCPreoxcMCo4+RClj
+X-Google-Smtp-Source: ABdhPJwCvxBZTJEsf7HAcCNqGtxUArlv0LeJO8NfG5NM0O/U5K34R5yLEbt3NyLxslkp5VsQxwdtrntanuYjj9jwxim2j2G3q909
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200827084431.GA15909@infradead.org>
+X-Received: by 2002:a05:6602:2b13:: with SMTP id p19mr2800611iov.30.1598905747341;
+ Mon, 31 Aug 2020 13:29:07 -0700 (PDT)
+Date:   Mon, 31 Aug 2020 13:29:07 -0700
+In-Reply-To: <000000000000520ffc05ae2f4fee@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001985dc05ae32417b@google.com>
+Subject: Re: KASAN: use-after-free Read in bdev_del_partition
+From:   syzbot <syzbot+6448f3c229bc52b82f69@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, hch@lst.de, jack@suse.cz,
+        johannes.thumshirn@wdc.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 09:44:31AM +0100, Christoph Hellwig wrote:
-> On Mon, Aug 24, 2020 at 04:16:53PM +0100, Matthew Wilcox (Oracle) wrote:
-> > Iterate once for each THP instead of once for each base page.
-> 
-> FYI, I've always been wondering if bio_for_each_segment_all is the
-> right interface for the I/O completions, because we generally don't
-> need the fake bvecs for each page.  Only the first page can have an
-> offset, and only the last page can be end earlier than the end of
-> the page size.
-> 
-> It would seem way more efficient to just have a helper that extracts
-> the offset and end, and just use that in a loop that does the way
-> cheaper iteration over the physical addresses only.  This might (or
-> might) not be a good time to switch to that model for iomap.
+syzbot has bisected this issue to:
 
-Something like this?
+commit cddae808aeb77e5c29d22a8e0dfbdaed413f9e04
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Tue Apr 14 07:28:54 2020 +0000
 
-static void iomap_read_end_io(struct bio *bio)
-{
-        int i, error = blk_status_to_errno(bio->bi_status);
+    block: pass a hd_struct to delete_partition
 
-        for (i = 0; i < bio->bi_vcnt; i++) {
-                struct bio_vec *bvec = &bio->bi_io_vec[i];
-                size_t offset = bvec->bv_offset;
-                size_t length = bvec->bv_len;
-                struct page *page = bvec->bv_page;
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17fa7656900000
+start commit:   dcc5c6f0 Merge tag 'x86-urgent-2020-08-30' of git://git.ke..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=14067656900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10067656900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=891ca5711a9f1650
+dashboard link: https://syzkaller.appspot.com/bug?extid=6448f3c229bc52b82f69
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=154e2285900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16f6e915900000
 
-                while (length > 0) { 
-                        size_t count = thp_size(page) - offset;
-                        
-                        if (count > length)
-                                count = length;
-                        iomap_read_page_end_io(page, offset, count, error);
-                        page += (offset + count) / PAGE_SIZE;
-                        length -= count;
-                        offset = 0;
-                }
-        }
+Reported-by: syzbot+6448f3c229bc52b82f69@syzkaller.appspotmail.com
+Fixes: cddae808aeb7 ("block: pass a hd_struct to delete_partition")
 
-        bio_put(bio);
-}
-
-Maybe I'm missing something important here, but it's significantly
-simpler code -- iomap_read_end_io() goes down from 816 bytes to 560 bytes
-(256 bytes less!) iomap_read_page_end_io is inlined into it both before
-and after.
-
-There is some weirdness going on with regards to bv_offset that I don't
-quite understand.  In the original bvec_advance:
-
-                bv->bv_page = bvec->bv_page + (bvec->bv_offset >> PAGE_SHIFT);
-                bv->bv_offset = bvec->bv_offset & ~PAGE_MASK;
-
-which I cargo-culted into bvec_thp_advance as:
-
-                bv->bv_page = thp_head(bvec->bv_page +
-                                (bvec->bv_offset >> PAGE_SHIFT));
-                page_size = thp_size(bv->bv_page);
-                bv->bv_offset = bvec->bv_offset -
-                                (bv->bv_page - bvec->bv_page) * PAGE_SIZE;
-
-Is it possible to have a bvec with an offset that is larger than the
-size of bv_page?  That doesn't seem like a useful thing to do, but
-if that needs to be supported, then the code up top doesn't do that.
-We maybe gain a little bit by counting length down to 0 instead of
-counting it up to bv_len.  I dunno; reading the code over now, it
-doesn't seem like that much of a difference.
-
-Maybe you meant something different?
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
