@@ -2,64 +2,69 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 889B7C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 06:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 537A8C433E2
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 06:53:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F36F20738
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 06:26:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 291D020BED
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 06:53:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aG4NIY+5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725949AbgHaG0x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 02:26:53 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3494 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725794AbgHaG0x (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 02:26:53 -0400
-Received: from dggeme752-chm.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id 48F92F51C9D0E10F398D;
-        Mon, 31 Aug 2020 14:26:51 +0800 (CST)
-Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
- dggeme752-chm.china.huawei.com (10.3.19.98) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Mon, 31 Aug 2020 14:26:51 +0800
-Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
- dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1913.007;
- Mon, 31 Aug 2020 14:26:50 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block: bio: Trim bio to sensible size in bio_trim()
-Thread-Topic: [PATCH] block: bio: Trim bio to sensible size in bio_trim()
-Thread-Index: AdZ/REBJJJyCMvddRKS1UF17cHdE3g==
-Date:   Mon, 31 Aug 2020 06:26:50 +0000
-Message-ID: <4772af7044754f96a7e0be4ef93fa2bf@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.178.74]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727065AbgHaGx4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 02:53:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59280 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725794AbgHaGx4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Aug 2020 02:53:56 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2AD3C061573;
+        Sun, 30 Aug 2020 23:53:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=vitTGHyMtyMzA5U8cG1JZv4rmI3Iyvz66qzbnhI/g/4=; b=aG4NIY+5vLeWOkRhrOCK1epw1K
+        96TN2xHBI5OHlq7k3wim8ScfK75Hp0qwG6DG0V/RZUgNueHD0XyFJwkkE/of01ZJ5eIcOMiY8yzfH
+        OyFEKpC4YWzn3j6+fjMgK9mIWOqjfyx28Q4hIrhwUPausv96KaawdTdkgzXRUH4c+EmvP6Uzasmaz
+        wkXb5a+MzsuBZU/q2SeQlX6IBMhvK1/RMp0KE+nPLqru2cU8i9q1t0McUCYF2uhzTwsM1exa2SNMz
+        oK9zWvm/GDQpgHaLLkAuQ0Cyx2Off6GV4daD2E0ZVFI80bS939jalJ20ssGzxjGb+B+pNmkd5dG8N
+        AIY9ThgA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kCdhO-0000h5-13; Mon, 31 Aug 2020 06:53:50 +0000
+Date:   Mon, 31 Aug 2020 07:53:49 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Song Liu <songliubraving@fb.com>
+Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org, colyli@suse.de, axboe@kernel.dk,
+        kernel-team@fb.com, song@kernel.org, hch@infradead.org
+Subject: Re: [PATCH v2 1/3] block: introduce part_[begin|end]_io_acct
+Message-ID: <20200831065349.GA2507@infradead.org>
+References: <20200818222645.952219-1-songliubraving@fb.com>
+ <20200818222645.952219-2-songliubraving@fb.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200818222645.952219-2-songliubraving@fb.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SmVucyBBeGJvZSA8YXhib2VAa2VybmVsLmRrPiB3cm90ZToNCj5PbiA4LzI5LzIwIDM6MzcgQU0s
-IE1pYW9oZSBMaW4gd3JvdGU6DQo+PiBUcmltIGJpbyB0byBzZW5zaWJsZSBzaXplIGluIGJpb190
-cmltKCkgb3Igc29tZXRoaW5nIGJhZCBtYXkgaGFwcGVuLg0KPg0KPlRoaXMgcmVhbGx5IG5lZWRz
-IGEgTE9UIG1vcmUgZGV0YWlsLiBXaGF0IGlzICJzb21ldGhpbmcgYmFkIj8gSG93IGRvZXMgdGhp
-cyBjb25kaXRpb24gdHJpZ2dlciB0byBiZWdpbiB3aXRoPw0KPg0KDQpNYW55IHRoYW5rcyBmb3Ig
-eW91ciByZXBseS4NCg0KSSBkbyB0aGlzIG1haW5seSBieSBjb2RlIHJldmlldywgc28gSSBkaWRu
-J3QgZmluZCB0aGUgY29uZGl0aW9uIHRyaWdnZXIgdG8gYmVnaW4gd2l0aC4gQnV0IEkgdGhpbmsg
-aXQncyBiZXR0ZXINCnRvIGRvIHN1Y2ggYSBjaGVjayBhcyB0aGlzIGlzIGEgZXh0ZXJuYWwgSW50
-ZXJmYWNlLiBBbHNvIElmIGJpb190cmltKCkgc2V0IGJpby0+YmlfaXRlci5iaV9zaXplIHRvIGEg
-dmFsdWUgbGFyZ2VyIHRoYW4gdGhlIG9yaWdpbiBvbmUsDQp3ZSBtYXkgYWNjZXNzIHRoZSBiaW9f
-dmVjIHBhc3QgdGhlIGxhc3Qgb25lIG9mIGJpby0+YmlfaW9fdmVjIGluIGZvcl9lYWNoX2J2ZWMg
-bWFjcm8uDQoNCj4tLQ0KPkplbnMgQXhib2UNCj4NCg==
+On Tue, Aug 18, 2020 at 03:26:43PM -0700, Song Liu wrote:
+> These functions can be used to enable iostat for partitions on devices
+> like md, bcache.
+> 
+> Signed-off-by: Song Liu <songliubraving@fb.com>
+
+EXPORT_SYMBOL_GPL for new block layer functionality, please.
+
+Otherwise this looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
