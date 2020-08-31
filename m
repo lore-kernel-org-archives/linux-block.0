@@ -2,80 +2,101 @@ Return-Path: <SRS0=/PDd=CJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E40C433E7
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 552DEC433E2
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 19:09:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F71921473
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 18:21:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2887820866
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 19:09:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ksPuWCmc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729853AbgHaSUx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 14:20:53 -0400
-Received: from mail.parknet.co.jp ([210.171.160.6]:34002 "EHLO
-        mail.parknet.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729814AbgHaSUw (ORCPT
+        id S1728089AbgHaTJS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 15:09:18 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:10110 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727993AbgHaTJS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 14:20:52 -0400
-Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
-        by mail.parknet.co.jp (Postfix) with ESMTPSA id 34F5A1B44DF;
-        Tue,  1 Sep 2020 03:20:51 +0900 (JST)
-Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
-        by ibmpc.myhome.or.jp (8.15.2/8.15.2/Debian-20) with ESMTPS id 07VIKndZ367490
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-        Tue, 1 Sep 2020 03:20:51 +0900
-Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
-        by devron.myhome.or.jp (8.15.2/8.15.2/Debian-20) with ESMTPS id 07VIKnbs3471994
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-        Tue, 1 Sep 2020 03:20:49 +0900
-Received: (from hirofumi@localhost)
-        by devron.myhome.or.jp (8.15.2/8.15.2/Submit) id 07VIKnLJ3471993;
-        Tue, 1 Sep 2020 03:20:49 +0900
-From:   OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH] block: ensure bdi->io_pages is always initialized
-References: <346e5bf5-b08e-84e8-7b0e-c6cb0c814f96@kernel.dk>
-        <878sdu66sa.fsf@mail.parknet.co.jp>
-        <8eb3881a-8ebd-fecb-d88b-3e1d77bc952f@kernel.dk>
-Date:   Tue, 01 Sep 2020 03:20:49 +0900
-In-Reply-To: <8eb3881a-8ebd-fecb-d88b-3e1d77bc952f@kernel.dk> (Jens Axboe's
-        message of "Mon, 31 Aug 2020 12:10:11 -0600")
-Message-ID: <874koi65j2.fsf@mail.parknet.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
+        Mon, 31 Aug 2020 15:09:18 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f4d4acf0000>; Mon, 31 Aug 2020 12:09:03 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Mon, 31 Aug 2020 12:09:17 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Mon, 31 Aug 2020 12:09:17 -0700
+Received: from [10.2.61.194] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 31 Aug
+ 2020 19:09:13 +0000
+Subject: Re: [PATCH v3 3/3] bio: convert get_user_pages_fast() -->
+ pin_user_pages_fast()
+To:     Ira Weiny <ira.weiny@intel.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Ilya Dryomov" <idryomov@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        <linux-xfs@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20200831071439.1014766-1-jhubbard@nvidia.com>
+ <20200831071439.1014766-4-jhubbard@nvidia.com>
+ <20200831165222.GD1422350@iweiny-DESK2.sc.intel.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <35f751d4-bae4-e91e-d5f1-ddc38e2091ba@nvidia.com>
+Date:   Mon, 31 Aug 2020 12:09:12 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200831165222.GD1422350@iweiny-DESK2.sc.intel.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1598900943; bh=hmlm7qZUmqe8ZIX2tGp4tRD8QX+HOSHwmnTYYOtpD7o=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:Message-ID:Date:
+         User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=ksPuWCmcI3fUby20QQ0e06U1xsnQvObWtkl1QqqrjT6r9MT4nLTq2sY7Hx53H/xPd
+         K3REe7NKoue3je9odo7fYIpnsM1yCMJJf3rC9HFhWsAmclzlYtdLwFD79uiVTEvuhX
+         XuL6fbEr5SFGg1oF85YrW6EnLPMuyfcS2RqoXZk4QG2OZisogf6GaqjWrJ0FuSLKaN
+         cUcfChhysPRi9lDrSsGadFMV82UWrm7C7lBbarJGsVQ7k2/O1iqW7ME46kNkgtrGYw
+         nM0FWNhyHT/Vorx+AlvG7SLjqoagaQ9FLNF9Wemd+xSYuP/9SlVBkZWa3zVhgtXWZW
+         ef492fMyHwtrA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> writes:
+On 8/31/20 9:52 AM, Ira Weiny wrote:
+> On Mon, Aug 31, 2020 at 12:14:39AM -0700, John Hubbard wrote:
+>> @@ -1113,8 +1113,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>>   		} else {
+>>   			if (is_bvec)
+>>   				ret = __bio_iov_bvec_add_pages(bio, iter);
+>> -			else
+>> -				ret = __bio_iov_iter_get_pages(bio, iter);
+>> +		else
+>> +			ret = __bio_iov_iter_get_pages(bio, iter);
+> 
+> Why the white space change?
+> 
 
-> On 8/31/20 11:53 AM, OGAWA Hirofumi wrote:
->> Jens Axboe <axboe@kernel.dk> writes:
->> 
->>> If a driver leaves the limit settings as the defaults, then we don't
->>> initialize bdi->io_pages. This means that file systems may need to
->>> work around bdi->io_pages == 0, which is somewhat messy.
->>>
->>> Initialize the default value just like we do for ->ra_pages.
->>>
->>> Cc: stable@vger.kernel.org
->>> Reported-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
->>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->> 
->> When queued to submit, please let us know to drop fatfs workaround
->> "fat-avoid-oops-when-bdi-io_pages==0.patch" in akpm series.
->
-> Will do - planning on submitting it for 5.9, so probably end this
-> week.
+Yikes, that's an oversight, and...yes, it goes all the way back to v1.
+Thanks for spotting it!
 
-OK. Andrew, please drop fat-avoid-oops-when-bdi-io_pages==0.patch.
+There is not supposed to be any diff at all, in that region of code.
+I'll restore the hunk to its rightful, undisturbed state, in v4.
 
-Thanks.
+
+thanks,
 -- 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+John Hubbard
+NVIDIA
