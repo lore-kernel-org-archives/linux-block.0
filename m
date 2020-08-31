@@ -5,82 +5,83 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 727A2C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0525CC433E2
+	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:37:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34BF1207EA
+	by mail.kernel.org (Postfix) with ESMTP id D0E1120EDD
 	for <linux-block@archiver.kernel.org>; Mon, 31 Aug 2020 15:37:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ChO/LRnu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wm313dtO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728996AbgHaPhd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Aug 2020 11:37:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56384 "EHLO
+        id S1729337AbgHaPhh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Aug 2020 11:37:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728633AbgHaPh1 (ORCPT
+        with ESMTP id S1729080AbgHaPhf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Aug 2020 11:37:27 -0400
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20A5FC061573;
-        Mon, 31 Aug 2020 08:37:27 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id f142so2081092qke.13;
-        Mon, 31 Aug 2020 08:37:27 -0700 (PDT)
+        Mon, 31 Aug 2020 11:37:35 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A4D4C061575;
+        Mon, 31 Aug 2020 08:37:34 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id n18so5056743qtw.0;
+        Mon, 31 Aug 2020 08:37:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=jJN4UPrdfQwv0ztMCA233uhuF+9lN7rNHbCyoNaDXVk=;
-        b=ChO/LRnuoPxGKo81ayT/ISkhJprKPNq9yNhzz4p+wqwDqvQ/J6ABFAODrq20WtO6h4
-         CWNlcipBWO1hzhTo54A3KgH3o1OYXkHYINgYOOAwStE91QFlSz7ZnUnpA3vCZk3QJubZ
-         Rk9BU2q3uusjEDxrWgQFZZyOD1sOlw2fBFMVJA7VtZrg40PJgBv3sMjyo7E+5SD7mmfI
-         0DZDKBQE1Ic+QH6DWsCMKMUEJnrFfQXgQGBKYmM2E27if5T6YOkDE451XmzzUgmr7PP1
-         RhHkmmUrX6PyClrrA4u2wK/QLYMF0Vf3dCwc32xcoLcjqNpL1GGaX2LtpCUMgqjfy2wY
-         5CzA==
+        bh=QsMkC5oXq5WobzdILIB2ScjD9TgMB1liEL21vqR/JC4=;
+        b=Wm313dtOmsFOK8Cnr4/6OmwNiezmSvcB1alZmu82FUIhUMw4n9ArHBcrs42yI+jFhO
+         ojGwxKqq228m4vtsBIC8i1hjYkolf3eU7QyISKNRjRse1u8l0/P92mFL2dUImjKABzMx
+         vOK5UKOfKflYGSjazdqNTY71NxFTd/QwNYkhkuddif0x3yQGh7060uAb2rrZ2VcSQWhL
+         4n8Al5ewZkeUA/Md2dds+tqkZrVfY3S/OLA8ynJFo21LW2dgIVOkGfjcigTeAeJ/yLW1
+         zYqvPcw+UFtdWk4c2DR/OP4bZi2Ct02HTaUZV0WZxWGi7RV4B9COQOTYTW3cMs8p6JHS
+         iEmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jJN4UPrdfQwv0ztMCA233uhuF+9lN7rNHbCyoNaDXVk=;
-        b=pqnmt+Gupx/R7YYYMUWFCYxTBQWMTTjU85a0gwP5WopU96zAMwCh09XlGiAJ0zgBgh
-         lGasrAyJ71ZAjkWljWRUn8PcZL3Wzzp6120wZd1T5wmr3JcuvGQzTAb4UOLLzyjnK/Ly
-         97gfA4o8bC75r5orJaUjpiZrVrF4BLA4QpOwaBYC3rSFsbkI7oVlQLOpE5Fv01KEIzyQ
-         xLXgFU1yXW1tkk2HTo+4wzofMCESOtWKqufajvS3slSpbRX4yWCQcH6A6N+zwE0QO+WQ
-         Eh6tjZ3DYvaRKLBI6clVSltN8ou8uEX5B4VLLycj9znu3qOzq6FUBnuCGIjgihufcPBF
-         5Xzg==
-X-Gm-Message-State: AOAM531DnXvqChPdwr/ml23RRvDMkJiwT8J1lu4//fB7alDX4HjNnGjJ
-        y083CqtFQXFYBidrg9uLrEc=
-X-Google-Smtp-Source: ABdhPJzkFZFrfG4k3npNaRU0YZrCZlsyzC1J97h90jrkIXM4vrJJ6oR5gtZyWbor4meYq13rF+yIJw==
-X-Received: by 2002:a05:620a:6c3:: with SMTP id 3mr1909216qky.426.1598888246282;
-        Mon, 31 Aug 2020 08:37:26 -0700 (PDT)
+        bh=QsMkC5oXq5WobzdILIB2ScjD9TgMB1liEL21vqR/JC4=;
+        b=G/NfcGwHO9kEsQrLVnqwKwxDWxNJ09sKP2GkB9qzQjvCtF3mdczJdYixsieLzmlDAj
+         coxqSD2zvfagmoT0+JYb21/nTs5jFXHXD078JOXmSl+GOncv9jkEd5YMtzAe6Z8TWkas
+         OwV4TPRdSXgmKAnoo4rFvPjRf5N1ygqeGyUru0KGHW/mgUlw2XHYSa8PEFrqFTLjAJm0
+         wDXb7qwmz/ywZnpO8hZLuoQlJzelWpoav41FHjJpS3yQiJ8fnI6CWALflYWFyNabgXSi
+         TuwjPONQOnzwyX4ftAcwz8IOJdB+zgj60SarRvpbqGE/S5nL5zsbvvPIrjy5c8W5BaQJ
+         Ylrg==
+X-Gm-Message-State: AOAM530Tb8DWwqdoJGuQzHtaX9WXmXNi/RDemiXjtbLcQ5LwzMhCTYxz
+        8GusgScjq59n+Mmq5VkJBAc=
+X-Google-Smtp-Source: ABdhPJwNgQwkTvcxQopBySVGrO5u9TYtUYf8WYp5vpq6hvCEiBOZFeiTD9G7XIoFcDAaDwEQhLaH8Q==
+X-Received: by 2002:ac8:1c3:: with SMTP id b3mr1357180qtg.240.1598888253678;
+        Mon, 31 Aug 2020 08:37:33 -0700 (PDT)
 Received: from dschatzberg-fedora-PC0Y6AEN.thefacebook.com ([2620:10d:c091:480::1:2edc])
-        by smtp.gmail.com with ESMTPSA id s5sm9908872qke.120.2020.08.31.08.37.24
+        by smtp.gmail.com with ESMTPSA id s5sm9908872qke.120.2020.08.31.08.37.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2020 08:37:25 -0700 (PDT)
+        Mon, 31 Aug 2020 08:37:32 -0700 (PDT)
 From:   Dan Schatzberg <schatzberg.dan@gmail.com>
 Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
         Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
         Michal Hocko <mhocko@kernel.org>,
         Vladimir Davydov <vdavydov.dev@gmail.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Hugh Dickins <hughd@google.com>,
         Shakeel Butt <shakeelb@google.com>,
         Roman Gushchin <guro@fb.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
         Chris Down <chris@chrisdown.name>,
+        Yafang Shao <laoar.shao@gmail.com>,
         Yang Shi <yang.shi@linux.alibaba.com>,
-        Jakub Kicinski <kuba@kernel.org>,
         linux-block@vger.kernel.org (open list:BLOCK LAYER),
         linux-kernel@vger.kernel.org (open list),
         cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
         linux-mm@kvack.org (open list:CONTROL GROUP - MEMORY RESOURCE
         CONTROLLER (MEMCG))
-Subject: [PATCH 1/3] loop: Use worker per cgroup instead of kworker
-Date:   Mon, 31 Aug 2020 11:36:58 -0400
-Message-Id: <20200831153704.16848-2-schatzberg.dan@gmail.com>
+Subject: [PATCH 3/3] loop: Charge i/o to mem and blk cg
+Date:   Mon, 31 Aug 2020 11:37:00 -0400
+Message-Id: <20200831153704.16848-4-schatzberg.dan@gmail.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200831153704.16848-1-schatzberg.dan@gmail.com>
 References: <20200831153704.16848-1-schatzberg.dan@gmail.com>
@@ -92,367 +93,229 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Existing uses of loop device may have multiple cgroups reading/writing
-to the same device. Simply charging resources for I/O to the backing
-file could result in priority inversion where one cgroup gets
-synchronously blocked, holding up all other I/O to the loop device.
+The current code only associates with the existing blkcg when aio is
+used to access the backing file. This patch covers all types of i/o to
+the backing file and also associates the memcg so if the backing file is
+on tmpfs, memory is charged appropriately.
 
-In order to avoid this priority inversion, we use a single workqueue
-where each work item is a "struct loop_worker" which contains a queue of
-struct loop_cmds to issue. The loop device maintains a tree mapping blk
-css_id -> loop_worker. This allows each cgroup to independently make
-forward progress issuing I/O to the backing file.
-
-There is also a single queue for I/O associated with the rootcg which
-can be used in cases of extreme memory shortage where we cannot allocate
-a loop_worker.
-
-The locking for the tree and queues is fairly heavy handed - we acquire
-a per-loop-device spinlock any time either is accessed. The existing
-implementation serializes all I/O through a single thread anyways, so I
-don't believe this is any worse.
+This patch also exports cgroup_get_e_css so it can be used by the loop
+module.
 
 Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
 ---
- drivers/block/loop.c | 207 ++++++++++++++++++++++++++++++++++++-------
- drivers/block/loop.h |  12 ++-
- 2 files changed, 182 insertions(+), 37 deletions(-)
+ drivers/block/loop.c       | 61 +++++++++++++++++++++++++-------------
+ drivers/block/loop.h       |  3 +-
+ include/linux/memcontrol.h |  6 ++++
+ kernel/cgroup/cgroup.c     |  1 +
+ 4 files changed, 50 insertions(+), 21 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d3394191e168..771685a6c259 100644
+index 771685a6c259..3da34d454287 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -70,7 +70,6 @@
- #include <linux/writeback.h>
- #include <linux/completion.h>
- #include <linux/highmem.h>
--#include <linux/kthread.h>
- #include <linux/splice.h>
- #include <linux/sysfs.h>
- #include <linux/miscdevice.h>
-@@ -83,6 +82,8 @@
+@@ -77,6 +77,7 @@
+ #include <linux/uio.h>
+ #include <linux/ioprio.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/sched/mm.h>
  
- #include <linux/uaccess.h>
+ #include "loop.h"
  
-+#define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
-+
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_ctl_mutex);
- 
-@@ -925,27 +926,83 @@ static void loop_config_discard(struct loop_device *lo)
- 	q->limits.discard_alignment = 0;
- }
- 
--static void loop_unprepare_queue(struct loop_device *lo)
--{
--	kthread_flush_worker(&lo->worker);
--	kthread_stop(lo->worker_task);
--}
-+struct loop_worker {
-+	struct rb_node rb_node;
-+	struct work_struct work;
-+	struct list_head cmd_list;
-+	struct list_head idle_list;
-+	struct loop_device *lo;
-+	struct cgroup_subsys_state *css;
-+	unsigned long last_ran_at;
-+};
- 
--static int loop_kthread_worker_fn(void *worker_ptr)
--{
--	current->flags |= PF_LOCAL_THROTTLE | PF_MEMALLOC_NOIO;
--	return kthread_worker_fn(worker_ptr);
--}
-+static void loop_workfn(struct work_struct *work);
-+static void loop_rootcg_workfn(struct work_struct *work);
-+static void loop_free_idle_workers(struct timer_list *timer);
- 
--static int loop_prepare_queue(struct loop_device *lo)
-+static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+@@ -518,8 +519,6 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
  {
--	kthread_init_worker(&lo->worker);
--	lo->worker_task = kthread_run(loop_kthread_worker_fn,
--			&lo->worker, "loop%d", lo->lo_number);
--	if (IS_ERR(lo->worker_task))
--		return -ENOMEM;
--	set_user_nice(lo->worker_task, MIN_NICE);
--	return 0;
-+	struct rb_node **node = &(lo->worker_tree.rb_node), *parent = NULL;
-+	struct loop_worker *cur_worker, *worker = NULL;
-+	struct work_struct *work;
-+	struct list_head *cmd_list;
-+
-+	spin_lock_irq(&lo->lo_work_lock);
-+
-+	if (!cmd->css)
-+		goto queue_work;
-+
-+	node = &lo->worker_tree.rb_node;
-+
-+	while (*node) {
-+		parent = *node;
-+		cur_worker = container_of(*node, struct loop_worker, rb_node);
-+		if (cur_worker->css == cmd->css) {
-+			worker = cur_worker;
-+			break;
-+		} else if ((long)cur_worker->css < (long)cmd->css) {
-+			node = &(*node)->rb_left;
-+		} else {
-+			node = &(*node)->rb_right;
-+		}
-+	}
-+	if (worker)
-+		goto queue_work;
-+
-+	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT | __GFP_NOWARN);
-+	/*
-+	 * In the event we cannot allocate a worker, just queue on the
-+	 * rootcg worker
-+	 */
-+	if (!worker)
-+		goto queue_work;
-+
-+	worker->css = cmd->css;
-+	css_get(worker->css);
-+	INIT_WORK(&worker->work, loop_workfn);
-+	INIT_LIST_HEAD(&worker->cmd_list);
-+	INIT_LIST_HEAD(&worker->idle_list);
-+	worker->lo = lo;
-+	rb_link_node(&worker->rb_node, parent, node);
-+	rb_insert_color(&worker->rb_node, &lo->worker_tree);
-+queue_work:
-+	if (worker) {
-+		/*
-+		 * We need to remove from the idle list here while
-+		 * holding the lock so that the idle timer doesn't
-+		 * free the worker
-+		 */
-+		if (!list_empty(&worker->idle_list))
-+			list_del_init(&worker->idle_list);
-+		work = &worker->work;
-+		cmd_list = &worker->cmd_list;
-+	} else {
-+		work = &lo->rootcg_work;
-+		cmd_list = &lo->rootcg_cmd_list;
-+	}
-+	list_add_tail(&cmd->list_entry, cmd_list);
-+	queue_work(lo->workqueue, work);
-+	spin_unlock_irq(&lo->lo_work_lock);
+ 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+ 
+-	if (cmd->css)
+-		css_put(cmd->css);
+ 	cmd->ret = ret;
+ 	lo_rw_aio_do_completion(cmd);
  }
+@@ -580,8 +579,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	cmd->iocb.ki_complete = lo_rw_aio_complete;
+ 	cmd->iocb.ki_flags = IOCB_DIRECT;
+ 	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
+-	if (cmd->css)
+-		kthread_associate_blkcg(cmd->css);
  
- static void loop_update_rotational(struct loop_device *lo)
-@@ -1133,12 +1190,27 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	    !file->f_op->write_iter)
- 		lo->lo_flags |= LO_FLAGS_READ_ONLY;
+ 	if (rw == WRITE)
+ 		ret = call_write_iter(file, &cmd->iocb, &iter);
+@@ -589,7 +586,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		ret = call_read_iter(file, &cmd->iocb, &iter);
  
--	error = loop_prepare_queue(lo);
--	if (error)
-+	error = -EFBIG;
-+	size = get_loop_size(lo, file);
-+	if ((loff_t)(sector_t)size != size)
- 		goto out_unlock;
-+	lo->workqueue = alloc_workqueue("loop%d",
-+					WQ_UNBOUND | WQ_FREEZABLE |
-+					WQ_MEM_RECLAIM,
-+					lo->lo_number);
-+	if (!lo->workqueue) {
-+		error = -ENOMEM;
-+		goto out_unlock;
+ 	lo_rw_aio_do_completion(cmd);
+-	kthread_associate_blkcg(NULL);
+ 
+ 	if (ret != -EIOCBQUEUED)
+ 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
+@@ -932,7 +928,7 @@ struct loop_worker {
+ 	struct list_head cmd_list;
+ 	struct list_head idle_list;
+ 	struct loop_device *lo;
+-	struct cgroup_subsys_state *css;
++	struct cgroup_subsys_state *blkcg_css;
+ 	unsigned long last_ran_at;
+ };
+ 
+@@ -949,7 +945,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 
+ 	spin_lock_irq(&lo->lo_work_lock);
+ 
+-	if (!cmd->css)
++	if (!cmd->blkcg_css)
+ 		goto queue_work;
+ 
+ 	node = &lo->worker_tree.rb_node;
+@@ -957,10 +953,10 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 	while (*node) {
+ 		parent = *node;
+ 		cur_worker = container_of(*node, struct loop_worker, rb_node);
+-		if (cur_worker->css == cmd->css) {
++		if (cur_worker->blkcg_css == cmd->blkcg_css) {
+ 			worker = cur_worker;
+ 			break;
+-		} else if ((long)cur_worker->css < (long)cmd->css) {
++		} else if ((long)cur_worker->blkcg_css < (long)cmd->blkcg_css) {
+ 			node = &(*node)->rb_left;
+ 		} else {
+ 			node = &(*node)->rb_right;
+@@ -972,13 +968,18 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT | __GFP_NOWARN);
+ 	/*
+ 	 * In the event we cannot allocate a worker, just queue on the
+-	 * rootcg worker
++	 * rootcg worker and issue the I/O as the rootcg
+ 	 */
+-	if (!worker)
++	if (!worker) {
++		cmd->blkcg_css = NULL;
++		if (cmd->memcg_css)
++			css_put(cmd->memcg_css);
++		cmd->memcg_css = NULL;
+ 		goto queue_work;
 +	}
  
- 	set_device_ro(bdev, (lo->lo_flags & LO_FLAGS_READ_ONLY) != 0);
+-	worker->css = cmd->css;
+-	css_get(worker->css);
++	worker->blkcg_css = cmd->blkcg_css;
++	css_get(worker->blkcg_css);
+ 	INIT_WORK(&worker->work, loop_workfn);
+ 	INIT_LIST_HEAD(&worker->cmd_list);
+ 	INIT_LIST_HEAD(&worker->idle_list);
+@@ -1304,7 +1305,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 				idle_list) {
+ 		list_del(&worker->idle_list);
+ 		rb_erase(&worker->rb_node, &lo->worker_tree);
+-		css_put(worker->css);
++		css_put(worker->blkcg_css);
+ 		kfree(worker);
+ 	}
+ 	spin_unlock_irq(&lo->lo_work_lock);
+@@ -2105,13 +2106,18 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	}
  
-+	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
-+	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
-+	INIT_LIST_HEAD(&lo->idle_worker_list);
-+	lo->worker_tree = RB_ROOT;
-+	timer_setup(&lo->timer, loop_free_idle_workers,
-+		TIMER_DEFERRABLE);
- 	lo->use_dio = lo->lo_flags & LO_FLAGS_DIRECT_IO;
- 	lo->lo_device = bdev;
- 	lo->lo_backing_file = file;
-@@ -1209,6 +1281,7 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 	int err = 0;
- 	bool partscan = false;
- 	int lo_number;
-+	struct loop_worker *pos, *worker;
- 
- 	mutex_lock(&loop_ctl_mutex);
- 	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
-@@ -1225,6 +1298,18 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 	/* freeze request queue during the transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
-+	destroy_workqueue(lo->workqueue);
-+	spin_lock_irq(&lo->lo_work_lock);
-+	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
-+				idle_list) {
-+		list_del(&worker->idle_list);
-+		rb_erase(&worker->rb_node, &lo->worker_tree);
-+		css_put(worker->css);
-+		kfree(worker);
+ 	/* always use the first bio's css */
++	cmd->blkcg_css = NULL;
++	cmd->memcg_css = NULL;
+ #ifdef CONFIG_BLK_CGROUP
+-	if (cmd->use_aio && rq->bio && rq->bio->bi_blkg) {
+-		cmd->css = &bio_blkcg(rq->bio)->css;
+-		css_get(cmd->css);
+-	} else
++	if (rq->bio && rq->bio->bi_blkg) {
++		cmd->blkcg_css = &bio_blkcg(rq->bio)->css;
++#ifdef CONFIG_MEMCG
++		cmd->memcg_css =
++			cgroup_get_e_css(cmd->blkcg_css->cgroup,
++					&memory_cgrp_subsys);
++#endif
 +	}
-+	spin_unlock_irq(&lo->lo_work_lock);
-+	del_timer_sync(&lo->timer);
-+
- 	spin_lock_irq(&lo->lo_lock);
- 	lo->lo_backing_file = NULL;
- 	spin_unlock_irq(&lo->lo_lock);
-@@ -1262,7 +1347,6 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 
- 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN && bdev;
- 	lo_number = lo->lo_number;
--	loop_unprepare_queue(lo);
- out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
- 	if (partscan) {
-@@ -2028,7 +2112,7 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	} else
  #endif
- 		cmd->css = NULL;
--	kthread_queue_work(&lo->worker, &cmd->work);
-+	loop_queue_work(lo, cmd);
+-		cmd->css = NULL;
+ 	loop_queue_work(lo, cmd);
  
  	return BLK_STS_OK;
- }
-@@ -2058,26 +2142,82 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+@@ -2123,13 +2129,28 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+ 	const bool write = op_is_write(req_op(rq));
+ 	struct loop_device *lo = rq->q->queuedata;
+ 	int ret = 0;
++	struct mem_cgroup *old_memcg = NULL;
+ 
+ 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
+ 		ret = -EIO;
+ 		goto failed;
  	}
- }
  
--static void loop_queue_work(struct kthread_work *work)
-+static void loop_set_timer(struct loop_device *lo)
-+{
-+	timer_reduce(&lo->timer, jiffies + LOOP_IDLE_WORKER_TIMEOUT);
-+}
++	if (cmd->blkcg_css)
++		kthread_associate_blkcg(cmd->blkcg_css);
++	if (cmd->memcg_css)
++		old_memcg = set_active_memcg(
++			mem_cgroup_from_css(cmd->memcg_css));
 +
-+static void loop_process_work(struct loop_worker *worker,
-+			struct list_head *cmd_list, struct loop_device *lo)
- {
--	struct loop_cmd *cmd =
--		container_of(work, struct loop_cmd, work);
-+	int orig_flags = current->flags;
-+	struct loop_cmd *cmd;
- 
--	loop_handle_cmd(cmd);
-+	current->flags |= PF_LOCAL_THROTTLE | PF_MEMALLOC_NOIO;
-+	spin_lock_irq(&lo->lo_work_lock);
-+	while (!list_empty(cmd_list)) {
-+		cmd = container_of(
-+			cmd_list->next, struct loop_cmd, list_entry);
-+		list_del(cmd_list->next);
-+		spin_unlock_irq(&lo->lo_work_lock);
+ 	ret = do_req_filebacked(lo, rq);
 +
-+		loop_handle_cmd(cmd);
-+		cond_resched();
++	if (cmd->blkcg_css)
++		kthread_associate_blkcg(NULL);
 +
-+		spin_lock_irq(&lo->lo_work_lock);
++	if (cmd->memcg_css) {
++		set_active_memcg(old_memcg);
++		css_put(cmd->memcg_css);
 +	}
-+
-+	/*
-+	 * We only add to the idle list if there are no pending cmds
-+	 * *and* the worker will not run again which ensures that it
-+	 * is safe to free any worker on the idle list
-+	 */
-+	if (worker && !work_pending(&worker->work)) {
-+		worker->last_ran_at = jiffies;
-+		list_add_tail(&worker->idle_list, &lo->idle_worker_list);
-+		loop_set_timer(lo);
-+	}
-+	spin_unlock_irq(&lo->lo_work_lock);
-+	current->flags = orig_flags;
- }
- 
--static int loop_init_request(struct blk_mq_tag_set *set, struct request *rq,
--		unsigned int hctx_idx, unsigned int numa_node)
-+static void loop_workfn(struct work_struct *work)
- {
--	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
-+	struct loop_worker *worker =
-+		container_of(work, struct loop_worker, work);
-+	loop_process_work(worker, &worker->cmd_list, worker->lo);
-+}
- 
--	kthread_init_work(&cmd->work, loop_queue_work);
--	return 0;
-+static void loop_rootcg_workfn(struct work_struct *work)
-+{
-+	struct loop_device *lo =
-+		container_of(work, struct loop_device, rootcg_work);
-+	loop_process_work(NULL, &lo->rootcg_cmd_list, lo);
-+}
-+
-+static void loop_free_idle_workers(struct timer_list *timer)
-+{
-+	struct loop_device *lo = container_of(timer, struct loop_device, timer);
-+	struct loop_worker *pos, *worker;
-+
-+	spin_lock_irq(&lo->lo_work_lock);
-+	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
-+				idle_list) {
-+		if (time_is_after_jiffies(worker->last_ran_at +
-+						LOOP_IDLE_WORKER_TIMEOUT))
-+			break;
-+		list_del(&worker->idle_list);
-+		rb_erase(&worker->rb_node, &lo->worker_tree);
-+		css_put(worker->css);
-+		kfree(worker);
-+	}
-+	if (!list_empty(&lo->idle_worker_list))
-+		loop_set_timer(lo);
-+	spin_unlock_irq(&lo->lo_work_lock);
- }
- 
- static const struct blk_mq_ops loop_mq_ops = {
- 	.queue_rq       = loop_queue_rq,
--	.init_request	= loop_init_request,
- 	.complete	= lo_complete_rq,
- };
- 
-@@ -2165,6 +2305,7 @@ static int loop_add(struct loop_device **l, int i)
- 	atomic_set(&lo->lo_refcnt, 0);
- 	lo->lo_number		= i;
- 	spin_lock_init(&lo->lo_lock);
-+	spin_lock_init(&lo->lo_work_lock);
- 	disk->major		= LOOP_MAJOR;
- 	disk->first_minor	= i << part_shift;
- 	disk->fops		= &lo_fops;
+  failed:
+ 	/* complete non-aio request */
+ 	if (!cmd->use_aio || ret) {
+@@ -2208,7 +2229,7 @@ static void loop_free_idle_workers(struct timer_list *timer)
+ 			break;
+ 		list_del(&worker->idle_list);
+ 		rb_erase(&worker->rb_node, &lo->worker_tree);
+-		css_put(worker->css);
++		css_put(worker->blkcg_css);
+ 		kfree(worker);
+ 	}
+ 	if (!list_empty(&lo->idle_worker_list))
 diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index af75a5ee4094..0162b55a68e1 100644
+index 0162b55a68e1..4d6886d9855a 100644
 --- a/drivers/block/loop.h
 +++ b/drivers/block/loop.h
-@@ -14,7 +14,6 @@
- #include <linux/blk-mq.h>
- #include <linux/spinlock.h>
- #include <linux/mutex.h>
--#include <linux/kthread.h>
- #include <uapi/linux/loop.h>
- 
- /* Possible states of device */
-@@ -54,8 +53,13 @@ struct loop_device {
- 
- 	spinlock_t		lo_lock;
- 	int			lo_state;
--	struct kthread_worker	worker;
--	struct task_struct	*worker_task;
-+	spinlock_t              lo_work_lock;
-+	struct workqueue_struct *workqueue;
-+	struct work_struct      rootcg_work;
-+	struct list_head        rootcg_cmd_list;
-+	struct list_head        idle_worker_list;
-+	struct rb_root          worker_tree;
-+	struct timer_list       timer;
- 	bool			use_dio;
- 	bool			sysfs_inited;
- 
-@@ -65,7 +69,7 @@ struct loop_device {
+@@ -75,7 +75,8 @@ struct loop_cmd {
+ 	long ret;
+ 	struct kiocb iocb;
+ 	struct bio_vec *bvec;
+-	struct cgroup_subsys_state *css;
++	struct cgroup_subsys_state *blkcg_css;
++	struct cgroup_subsys_state *memcg_css;
  };
  
- struct loop_cmd {
--	struct kthread_work work;
-+	struct list_head list_entry;
- 	bool use_aio; /* use AIO interface to handle I/O */
- 	atomic_t ref; /* only for aio */
- 	long ret;
+ /* Support for loadable transfer modules */
+diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
+index d0b036123c6a..fceac9f66d96 100644
+--- a/include/linux/memcontrol.h
++++ b/include/linux/memcontrol.h
+@@ -1031,6 +1031,12 @@ static inline struct mem_cgroup *get_mem_cgroup_from_page(struct page *page)
+ 	return NULL;
+ }
+ 
++static inline
++struct mem_cgroup *mem_cgroup_from_css(struct cgroup_subsys_state *css)
++{
++	return NULL;
++}
++
+ static inline void mem_cgroup_put(struct mem_cgroup *memcg)
+ {
+ }
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index dd247747ec14..16d059a89a68 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -580,6 +580,7 @@ struct cgroup_subsys_state *cgroup_get_e_css(struct cgroup *cgrp,
+ 	rcu_read_unlock();
+ 	return css;
+ }
++EXPORT_SYMBOL_GPL(cgroup_get_e_css);
+ 
+ static void cgroup_get_live(struct cgroup *cgrp)
+ {
 -- 
 2.24.1
 
