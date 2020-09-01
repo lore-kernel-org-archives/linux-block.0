@@ -2,122 +2,115 @@ Return-Path: <SRS0=kheS=CK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B560C433E2
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 09:59:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F581C433E2
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 10:08:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B389206A5
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 09:59:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13B8A20C56
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 10:08:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oMkIzyFc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OtYKAX3q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726050AbgIAJ7r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 05:59:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59614 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725848AbgIAJ7q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 05:59:46 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE5DC061244
-        for <linux-block@vger.kernel.org>; Tue,  1 Sep 2020 02:59:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=E4iBZUhV5cqi/Ov55CXOrSEBtjwgHJdyBmBgFNWzSPg=; b=oMkIzyFcoXvOHP1Jfqw8q2reXK
-        Gg4XSUgCMCgTxj5Wp7e+fEjU9uvmUl56Jl3djFXF57Y+i35mVtg2AtUuLWK+vhjpXa+5vz83D3FQL
-        kZouBxAQfITGOIR/Ua5YVRyMFZlvox9Q2nlF+3KbqifOPOM86xFOg/uL2kyGE9SOy60jeQIb554Tc
-        k17NkE4aIE44P+rAekvWaB3S0d44KtWPyZUqD8mTMU2aPzryKMLvF0kk3BQgmfBsHnsdc+A0Uabgt
-        92eRc5e7X/VwpNLlSyX0oIWrKLv+yg0avnyamzUvCtXC7OqebEtUTeZd0JKpVy13pch5xH4K8rYY8
-        JbG8UNbA==;
-Received: from [2001:4bb8:18c:45ba:9892:9e86:5202:32f0] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kD34p-0006Fq-L6; Tue, 01 Sep 2020 09:59:44 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org,
-        syzbot+6448f3c229bc52b82f69@syzkaller.appspotmail.com
-Subject: [PATCH] block: fix locking in bdev_del_partition
-Date:   Tue,  1 Sep 2020 11:59:41 +0200
-Message-Id: <20200901095941.2626957-1-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
+        id S1726131AbgIAKIi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 06:08:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21566 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725848AbgIAKHv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 06:07:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598954870;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=B/8gIOrLiThN5d6hKb/lc0wFjVdbh9UG2DsyyOvAFwQ=;
+        b=OtYKAX3qUDieZzFOs4T8cCNl2SvFOfRFxyLcnlAwAWDJeDeWeN9CZxQkKvVDZywMGR/C1Q
+        +V3mrIUXcTnrMmBMPDvAQuiACIRMJ7nC72WknAAow7XcHMSXCGxZGr1zhokLn7OTviLRCl
+        +K4VS8VEwjVU/w6laQ//ZvS7Rypx+bk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-524-SUqX7mEzMEK4YD05iD4yUw-1; Tue, 01 Sep 2020 06:07:49 -0400
+X-MC-Unique: SUqX7mEzMEK4YD05iD4yUw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACC6F18BE166;
+        Tue,  1 Sep 2020 10:07:47 +0000 (UTC)
+Received: from localhost (ovpn-12-80.pek2.redhat.com [10.72.12.80])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1999610027A6;
+        Tue,  1 Sep 2020 10:07:43 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH V2] block: release disk reference in hd_struct_free_work
+Date:   Tue,  1 Sep 2020 18:07:38 +0800
+Message-Id: <20200901100738.317061-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We need to hold the whole device bd_mutex to protect against
-other thread concurrently deleting out partition before we get
-to it, and thus causing a use after free.
+Commit e8c7d14ac6c3 ("block: revert back to synchronous request_queue removal")
+stops to release request queue from wq context because that commit
+supposed all blk_put_queue() is called in context which is allowed
+to sleep. However, this assumption isn't true because we release disk's
+reference in partition's percpu_ref's ->release() which doesn't allow
+to sleep, because the ->release() is run via call_rcu().
 
-Fixes: cddae808aeb7 ("block: pass a hd_struct to delete_partition")
-Reported-by: syzbot+6448f3c229bc52b82f69@syzkaller.appspotmail.com
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Fixes this issue by moving put disk reference into hd_struct_free_work()
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Fixes: e8c7d14ac6c3 ("block: revert back to synchronous request_queue removal")
+Reported-by: Ilya Dryomov <idryomov@gmail.com>
+Tested-by: Ilya Dryomov <idryomov@gmail.com>
+Cc: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
 ---
- block/partitions/core.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+V2:
+	- take Christoph's comment
+
+ block/partitions/core.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/block/partitions/core.c b/block/partitions/core.c
-index e62a98a8eeb750..effaa8fd2ee486 100644
+index e62a98a8eeb7..5a18c8edabbc 100644
 --- a/block/partitions/core.c
 +++ b/block/partitions/core.c
-@@ -524,19 +524,20 @@ int bdev_add_partition(struct block_device *bdev, int partno,
- int bdev_del_partition(struct block_device *bdev, int partno)
+@@ -278,6 +278,15 @@ static void hd_struct_free_work(struct work_struct *work)
  {
- 	struct block_device *bdevp;
--	struct hd_struct *part;
--	int ret = 0;
--
--	part = disk_get_part(bdev->bd_disk, partno);
--	if (!part)
--		return -ENXIO;
-+	struct hd_struct *part = NULL;
-+ 	int ret;
- 
--	ret = -ENOMEM;
--	bdevp = bdget(part_devt(part));
-+	bdevp = bdget_disk(bdev->bd_disk, partno);
- 	if (!bdevp)
--		goto out_put_part;
-+		return -ENOMEM;
- 
- 	mutex_lock(&bdevp->bd_mutex);
-+	mutex_lock_nested(&bdev->bd_mutex, 1);
+ 	struct hd_struct *part =
+ 		container_of(to_rcu_work(work), struct hd_struct, rcu_work);
++	struct gendisk *disk = part_to_disk(part);
 +
-+	ret = -ENXIO;
-+	part = disk_get_part(bdev->bd_disk, partno);
-+	if (!part)
-+		goto out_unlock;
++	/*
++	 * Release the disk reference acquired in delete_partition here.
++	 * We can't release it in hd_struct_free because the final put_device
++	 * needs process context and thus can't be run directly from a
++	 * percpu_ref ->release handler.
++	 */
++	put_device(disk_to_dev(disk));
  
- 	ret = -EBUSY;
- 	if (bdevp->bd_openers)
-@@ -545,16 +546,14 @@ int bdev_del_partition(struct block_device *bdev, int partno)
- 	sync_blockdev(bdevp);
- 	invalidate_bdev(bdevp);
+ 	part->start_sect = 0;
+ 	part->nr_sects = 0;
+@@ -293,7 +302,6 @@ static void hd_struct_free(struct percpu_ref *ref)
+ 		rcu_dereference_protected(disk->part_tbl, 1);
  
--	mutex_lock_nested(&bdev->bd_mutex, 1);
- 	delete_partition(bdev->bd_disk, part);
--	mutex_unlock(&bdev->bd_mutex);
--
- 	ret = 0;
- out_unlock:
-+	mutex_unlock(&bdev->bd_mutex);
- 	mutex_unlock(&bdevp->bd_mutex);
- 	bdput(bdevp);
--out_put_part:
--	disk_put_part(part);
-+	if (part)
-+		disk_put_part(part);
- 	return ret;
- }
+ 	rcu_assign_pointer(ptbl->last_lookup, NULL);
+-	put_device(disk_to_dev(disk));
  
+ 	INIT_RCU_WORK(&part->rcu_work, hd_struct_free_work);
+ 	queue_rcu_work(system_wq, &part->rcu_work);
 -- 
-2.28.0
+2.25.2
 
