@@ -4,72 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CC0C433E6
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE91C433E6
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:55:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ECD072078B
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:55:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44C5320767
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:55:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598986553;
-	bh=yGwj+8iu7furKFCekE3bhMjmZAZ6ErAbyClftPWGO7c=;
+	s=default; t=1598986555;
+	bh=ydN5+Lv6l2x42gZy1sLPoQ6vgOTGexibRy26HXwST5s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=MqcRF68/+HXn2RxkkCI9GimXulzqSEjgx98fjhaGL5e3iLKROlFZo4IraG9dcs5PZ
-	 3y4GwoLcD9ETsSP4qcaWADB/84jO6qChuMnPUOzudXLWiAo8s8NOJ+Zb5O4SstfFbb
-	 6Nc52lIvp17QNGbXZhQm79oSQ1+03TbdYGt6E8vA=
+	b=JP8VM2lbex22Unf3RDQvKZzs9QgQSjrAm7L872SlYYRmrjUyHJF72voaOYSJ1/BuX
+	 Vnlg3E52AiPJ2cmP0Aa1lljma3GgmobdVMM4mpP6ypmdZz0eVcUiLi//+OYD49wg+r
+	 mo1+QLTB58b4/0swcSmQpZOGVAquAfr4wsUr2XRQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731591AbgIASxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 14:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57464 "EHLO
+        id S1726997AbgIASzw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 14:55:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731560AbgIASxa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 14:53:30 -0400
+        with ESMTP id S1731573AbgIASxl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 14:53:41 -0400
 Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00DA3C061244;
-        Tue,  1 Sep 2020 11:53:30 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id v69so1992156qkb.7;
-        Tue, 01 Sep 2020 11:53:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B91C061247;
+        Tue,  1 Sep 2020 11:53:41 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id f142so1984761qke.13;
+        Tue, 01 Sep 2020 11:53:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=/e5PktXRLfAON/oeMdCF9GHjT7JkUKFYrJ6ekTNbMj4=;
-        b=fVMNPf9V07T3Oj0WLXkxJyr2vUryz+0eFnqMy0IfL0m9+flFyBQJkyxPkvXdbI+V5y
-         fp50Dp+/Sw0qfga/3hn/lHcdMLzu9HKS6cbiP8vssRSknZyEF9y2ct3EfuzNb8Kd9fYT
-         YpqpPe51lFRcaFG6N+Lz94nju/FMYSyauWu9TZ70urnuYUS5ZXwJGG7VsmVEajHW9LJ0
-         TQgAB3lwHPjX+rpEDclBOJ3LGs0imUwHCUXFyX3E291U0rRRwKad7A8bW4gty3YipSl7
-         n+loyCrxZg6UQnSEQEsBXo4D3F87fRblhrgP2P3+jfsgHN3ssjLyxgRXh3RHtlsLmwWg
-         At+w==
+        bh=SS4MWJ4/XFRWZ111xGt7boFuHdhcJQ+ioHm3dskasW8=;
+        b=aLzLHjIw3l5Y/zlJrrHpxgwVyA9EN030ZQbfbIo3PBVwwTgPkmMOdf2lHRGRx/2Oi8
+         idOJ3H1mbEU1lLN6LBjA5Mt2jXrmoWPiqxTY4/xh2gpBLDetXWS3s8noEQ1FZqgOrqAB
+         fTNTZWN7xcg6f5w0l1hsm8kqAdUbkzvn9jYJXCiBRsyhPqePSFVTQgy3Rl/hnpzQepp3
+         yLedbrzxfCElwnwJFLppHckD4N0/gnFDQ5y5gwIcV2KKj2aToa89KQ+qtUAGoNI3RxAd
+         RQvW+HLM160JH1h2k9JglmwA5bDn7f0Zm2CT/fibZk3uavdltl7XPsFbK3zAdqYx+vXZ
+         zMlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=/e5PktXRLfAON/oeMdCF9GHjT7JkUKFYrJ6ekTNbMj4=;
-        b=hPj+hH0MG1DLxMQlvrJqj/m7IKtnpEMS5j41I9+/QEnTYWKngfCACnGR2oEeb/1hIm
-         Zhpf4/NpHArV3kX3KsTIEbcrndOS9CA+QOvhH2mR8aa6rG2AH11wnhMwvFW8UvjW3E+N
-         lPhgCHKvqd1RwsQtnY/QHjed5SLfyJtvbj3GGlYcBlVUO7wdNyLQmYdAzgULSc5Qmzog
-         AcZBFFZq0XC9IjylPcecp3rFRlEjFeuswwxzlKpgFmjjrN+TNRhjeFf+MuW5TI9V95t+
-         sb2ORE3/fuSWr0Acr62y7GU99xYiioaeU5Bk7w4WeW8IKwRj8PSm/Nc/Jj/84iu43Xi4
-         Ah5g==
-X-Gm-Message-State: AOAM531mE2IDcq85rMxN9VAbS17zbBlcpLWTAN/3VbDYiz8OvYSmVT0L
-        sBPZPPzon1MGRDGY6JaTB4c=
-X-Google-Smtp-Source: ABdhPJxAdAjHTB/nWBfK3Z41i27byRG6ZciKBOs2oe+3yS5O5HlPuyuBOcg0mbMd1VUxGcSh4HzJ4g==
-X-Received: by 2002:a37:48c7:: with SMTP id v190mr3233750qka.153.1598986409082;
-        Tue, 01 Sep 2020 11:53:29 -0700 (PDT)
+        bh=SS4MWJ4/XFRWZ111xGt7boFuHdhcJQ+ioHm3dskasW8=;
+        b=badvJ9NOx+xtLBQWzobNHJchFcmy2FCL5FVIi6IgugxThLVCXHC+9+by6/SQGEZ8Q/
+         pW/SaNOXUL1dbOdBTYmXjTooJEEw9C9cUPgZ5bYKhcip6eqL2zgOo6aLOKGxSZKbRe6Q
+         XTA8NP8FwSePrEd/k5CvaHSEqaRNcw+BoM6d5mVn6XpDtyfba+zNLSu/6IDLwqIKOQ+7
+         TIUXqN7rXMJO3YVS4/kAqE6pyR4mSm1fWDmEba1XuWTXJr/J3MDPeVJTyG8S4YE+VV6n
+         w2VcQ5EmGHL0LIGM3DkeR6Gg0fj5DkRqaXPxsb1QHmB8OdD1Q6bs8I/jka5sj3nIVJ+j
+         n37Q==
+X-Gm-Message-State: AOAM532tNyrc0O8VrkTO/AP1tcO1vv7LR+dK1uBFj0FEt3ADKwyzrQYe
+        QeraaBSWbtfgEAAfnp9V0sw=
+X-Google-Smtp-Source: ABdhPJzjJyj4e+S5sxOQAJfqqzubtLaQlRtAZU6s2bMQz5FCq1i/3SI5W0JQrGSw9Ihvt8YxoEkOEA==
+X-Received: by 2002:a37:5d43:: with SMTP id r64mr3031347qkb.52.1598986420445;
+        Tue, 01 Sep 2020 11:53:40 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::1:a198])
-        by smtp.gmail.com with ESMTPSA id i65sm2407530qkf.126.2020.09.01.11.53.27
+        by smtp.gmail.com with ESMTPSA id o16sm2577628qkk.114.2020.09.01.11.53.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 11:53:28 -0700 (PDT)
+        Tue, 01 Sep 2020 11:53:39 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org, kernel-team@fb.com, newella@fb.com,
         Tejun Heo <tj@kernel.org>
-Subject: [PATCH 08/27] blk-iocost: s/HWEIGHT_WHOLE/WEIGHT_ONE/g
-Date:   Tue,  1 Sep 2020 14:52:38 -0400
-Message-Id: <20200901185257.645114-9-tj@kernel.org>
+Subject: [PATCH 12/27] blk-iocost: grab ioc->lock for debt handling
+Date:   Tue,  1 Sep 2020 14:52:42 -0400
+Message-Id: <20200901185257.645114-13-tj@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901185257.645114-1-tj@kernel.org>
 References: <20200901185257.645114-1-tj@kernel.org>
@@ -80,96 +80,217 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We're gonna use HWEIGHT_WHOLE for regular weights too. Let's rename it to
-WEIGHT_ONE.
+Currently, debt handling requires only iocg->waitq.lock. In the future, we
+want to adjust and propagate inuse changes depending on debt status. Let's
+grab ioc->lock in debt handling paths in preparation.
 
-Pure rename.
+* Because ioc->lock nests outside iocg->waitq.lock, the decision to grab
+  ioc->lock needs to be made before entering the critical sections.
+
+* Add and use iocg_[un]lock() which handles the conditional double locking.
+
+* Add @pay_debt to iocg_kick_waitq() so that debt payment happens only when
+  the caller grabbed both locks.
+
+This patch is prepatory and the comments contain references to future
+changes.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-iocost.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ block/blk-iocost.c | 92 ++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 73 insertions(+), 19 deletions(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index b2b8dfbeee5a..5e6d56eec1c9 100644
+index f36988657594..23b173e34591 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -68,7 +68,7 @@
-  * gets 300/(100+300) or 75% share, and A0 and A1 equally splits the rest,
-  * 12.5% each.  The distribution mechanism only cares about these flattened
-  * shares.  They're called hweights (hierarchical weights) and always add
-- * upto 1 (HWEIGHT_WHOLE).
-+ * upto 1 (WEIGHT_ONE).
-  *
-  * A given cgroup's vtime runs slower in inverse proportion to its hweight.
-  * For example, with 12.5% weight, A0's time runs 8 times slower (100/12.5)
-@@ -246,7 +246,7 @@ enum {
- 	MIN_VALID_USAGES	= 2,
+@@ -680,6 +680,26 @@ static void iocg_commit_bio(struct ioc_gq *iocg, struct bio *bio, u64 cost)
+ 	atomic64_add(cost, &iocg->vtime);
+ }
  
- 	/* 1/64k is granular enough and can easily be handled w/ u32 */
--	HWEIGHT_WHOLE		= 1 << 16,
-+	WEIGHT_ONE		= 1 << 16,
++static void iocg_lock(struct ioc_gq *iocg, bool lock_ioc, unsigned long *flags)
++{
++	if (lock_ioc) {
++		spin_lock_irqsave(&iocg->ioc->lock, *flags);
++		spin_lock(&iocg->waitq.lock);
++	} else {
++		spin_lock_irqsave(&iocg->waitq.lock, *flags);
++	}
++}
++
++static void iocg_unlock(struct ioc_gq *iocg, bool unlock_ioc, unsigned long *flags)
++{
++	if (unlock_ioc) {
++		spin_unlock(&iocg->waitq.lock);
++		spin_unlock_irqrestore(&iocg->ioc->lock, *flags);
++	} else {
++		spin_unlock_irqrestore(&iocg->waitq.lock, *flags);
++	}
++}
++
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/iocost.h>
+ 
+@@ -1215,11 +1235,17 @@ static int iocg_wake_fn(struct wait_queue_entry *wq_entry, unsigned mode,
+ 	return 0;
+ }
+ 
+-static void iocg_kick_waitq(struct ioc_gq *iocg, struct ioc_now *now)
++/*
++ * Calculate the accumulated budget, pay debt if @pay_debt and wake up waiters
++ * accordingly. When @pay_debt is %true, the caller must be holding ioc->lock in
++ * addition to iocg->waitq.lock.
++ */
++static void iocg_kick_waitq(struct ioc_gq *iocg, bool pay_debt,
++			    struct ioc_now *now)
+ {
+ 	struct ioc *ioc = iocg->ioc;
+ 	struct iocg_wake_ctx ctx = { .iocg = iocg };
+-	u64 vdebt, vshortage, expires, oexpires;
++	u64 vshortage, expires, oexpires;
+ 	s64 vbudget;
+ 	u32 hw_inuse;
+ 
+@@ -1229,25 +1255,39 @@ static void iocg_kick_waitq(struct ioc_gq *iocg, struct ioc_now *now)
+ 	vbudget = now->vnow - atomic64_read(&iocg->vtime);
+ 
+ 	/* pay off debt */
+-	vdebt = abs_cost_to_cost(iocg->abs_vdebt, hw_inuse);
+-	if (vdebt && vbudget > 0) {
++	if (pay_debt && iocg->abs_vdebt && vbudget > 0) {
++		u64 vdebt = abs_cost_to_cost(iocg->abs_vdebt, hw_inuse);
+ 		u64 delta = min_t(u64, vbudget, vdebt);
+ 		u64 abs_delta = min(cost_to_abs_cost(delta, hw_inuse),
+ 				    iocg->abs_vdebt);
+ 
++		lockdep_assert_held(&ioc->lock);
++
+ 		atomic64_add(delta, &iocg->vtime);
+ 		atomic64_add(delta, &iocg->done_vtime);
+ 		iocg->abs_vdebt -= abs_delta;
++		vbudget -= vdebt;
+ 
+ 		iocg_kick_delay(iocg, now);
+ 	}
+ 
++	/*
++	 * Debt can still be outstanding if we haven't paid all yet or the
++	 * caller raced and called without @pay_debt. Shouldn't wake up waiters
++	 * under debt. Make sure @vbudget reflects the outstanding amount and is
++	 * not positive.
++	 */
++	if (iocg->abs_vdebt) {
++		s64 vdebt = abs_cost_to_cost(iocg->abs_vdebt, hw_inuse);
++		vbudget = min_t(s64, 0, vbudget - vdebt);
++	}
++
+ 	/*
+ 	 * Wake up the ones which are due and see how much vtime we'll need
+ 	 * for the next one.
+ 	 */
+ 	ctx.hw_inuse = hw_inuse;
+-	ctx.vbudget = vbudget - vdebt;
++	ctx.vbudget = vbudget;
+ 	__wake_up_locked_key(&iocg->waitq, TASK_NORMAL, &ctx);
+ 	if (!waitqueue_active(&iocg->waitq))
+ 		return;
+@@ -1273,14 +1313,15 @@ static void iocg_kick_waitq(struct ioc_gq *iocg, struct ioc_now *now)
+ static enum hrtimer_restart iocg_waitq_timer_fn(struct hrtimer *timer)
+ {
+ 	struct ioc_gq *iocg = container_of(timer, struct ioc_gq, waitq_timer);
++	bool pay_debt = READ_ONCE(iocg->abs_vdebt);
+ 	struct ioc_now now;
+ 	unsigned long flags;
+ 
+ 	ioc_now(iocg->ioc, &now);
+ 
+-	spin_lock_irqsave(&iocg->waitq.lock, flags);
+-	iocg_kick_waitq(iocg, &now);
+-	spin_unlock_irqrestore(&iocg->waitq.lock, flags);
++	iocg_lock(iocg, pay_debt, &flags);
++	iocg_kick_waitq(iocg, pay_debt, &now);
++	iocg_unlock(iocg, pay_debt, &flags);
+ 
+ 	return HRTIMER_NORESTART;
+ }
+@@ -1396,7 +1437,7 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 
+ 		if (waitqueue_active(&iocg->waitq) || iocg->abs_vdebt) {
+ 			/* might be oversleeping vtime / hweight changes, kick */
+-			iocg_kick_waitq(iocg, &now);
++			iocg_kick_waitq(iocg, true, &now);
+ 		} else if (iocg_is_idle(iocg)) {
+ 			/* no waiter and idle, deactivate */
+ 			iocg->last_inuse = iocg->inuse;
+@@ -1743,6 +1784,8 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+ 	struct iocg_wait wait;
+ 	u32 hw_active, hw_inuse;
+ 	u64 abs_cost, cost, vtime;
++	bool use_debt, ioc_locked;
++	unsigned long flags;
+ 
+ 	/* bypass IOs if disabled or for root cgroup */
+ 	if (!ioc->enabled || !iocg->level)
+@@ -1786,15 +1829,26 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+ 	}
  
  	/*
- 	 * As vtime is used to calculate the cost of each IO, it needs to
-@@ -285,8 +285,8 @@ enum {
- 	 * donate the surplus.
+-	 * We activated above but w/o any synchronization. Deactivation is
+-	 * synchronized with waitq.lock and we won't get deactivated as long
+-	 * as we're waiting or has debt, so we're good if we're activated
+-	 * here. In the unlikely case that we aren't, just issue the IO.
++	 * We're over budget. This can be handled in two ways. IOs which may
++	 * cause priority inversions are punted to @ioc->aux_iocg and charged as
++	 * debt. Otherwise, the issuer is blocked on @iocg->waitq. Debt handling
++	 * requires @ioc->lock, waitq handling @iocg->waitq.lock. Determine
++	 * whether debt handling is needed and acquire locks accordingly.
  	 */
- 	SURPLUS_SCALE_PCT	= 125,			/* * 125% */
--	SURPLUS_SCALE_ABS	= HWEIGHT_WHOLE / 50,	/* + 2% */
--	SURPLUS_MIN_ADJ_DELTA	= HWEIGHT_WHOLE / 33,	/* 3% */
-+	SURPLUS_SCALE_ABS	= WEIGHT_ONE / 50,	/* + 2% */
-+	SURPLUS_MIN_ADJ_DELTA	= WEIGHT_ONE / 33,	/* 3% */
+-	spin_lock_irq(&iocg->waitq.lock);
++	use_debt = bio_issue_as_root_blkg(bio) || fatal_signal_pending(current);
++	ioc_locked = use_debt || READ_ONCE(iocg->abs_vdebt);
  
- 	/* switch iff the conditions are met for longer than this */
- 	AUTOP_CYCLE_NSEC	= 10LLU * NSEC_PER_SEC,
-@@ -491,7 +491,7 @@ struct ioc_gq {
- 	struct hrtimer			waitq_timer;
- 	struct hrtimer			delay_timer;
- 
--	/* usage is recorded as fractions of HWEIGHT_WHOLE */
-+	/* usage is recorded as fractions of WEIGHT_ONE */
- 	int				usage_idx;
- 	u32				usages[NR_USAGE_SLOTS];
- 
-@@ -658,7 +658,7 @@ static struct ioc_cgrp *blkcg_to_iocc(struct blkcg *blkcg)
-  */
- static u64 abs_cost_to_cost(u64 abs_cost, u32 hw_inuse)
- {
--	return DIV64_U64_ROUND_UP(abs_cost * HWEIGHT_WHOLE, hw_inuse);
-+	return DIV64_U64_ROUND_UP(abs_cost * WEIGHT_ONE, hw_inuse);
- }
- 
- /*
-@@ -666,7 +666,7 @@ static u64 abs_cost_to_cost(u64 abs_cost, u32 hw_inuse)
-  */
- static u64 cost_to_abs_cost(u64 cost, u32 hw_inuse)
- {
--	return DIV64_U64_ROUND_UP(cost * hw_inuse, HWEIGHT_WHOLE);
-+	return DIV64_U64_ROUND_UP(cost * hw_inuse, WEIGHT_ONE);
- }
- 
- static void iocg_commit_bio(struct ioc_gq *iocg, struct bio *bio, u64 cost)
-@@ -980,7 +980,7 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
++	iocg_lock(iocg, ioc_locked, &flags);
++
++	/*
++	 * @iocg must stay activated for debt and waitq handling. Deactivation
++	 * is synchronized against both ioc->lock and waitq.lock and we won't
++	 * get deactivated as long as we're waiting or has debt, so we're good
++	 * if we're activated here. In the unlikely cases that we aren't, just
++	 * issue the IO.
++	 */
+ 	if (unlikely(list_empty(&iocg->active_list))) {
+-		spin_unlock_irq(&iocg->waitq.lock);
++		iocg_unlock(iocg, ioc_locked, &flags);
+ 		iocg_commit_bio(iocg, bio, cost);
+ 		return;
+ 	}
+@@ -1816,12 +1870,12 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+ 	 * clear them and leave @iocg inactive w/ dangling use_delay heavily
+ 	 * penalizing the cgroup and its descendants.
  	 */
- 	smp_rmb();
+-	if (bio_issue_as_root_blkg(bio) || fatal_signal_pending(current)) {
++	if (use_debt) {
+ 		iocg->abs_vdebt += abs_cost;
+ 		if (iocg_kick_delay(iocg, &now))
+ 			blkcg_schedule_throttle(rqos->q,
+ 					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
+-		spin_unlock_irq(&iocg->waitq.lock);
++		iocg_unlock(iocg, ioc_locked, &flags);
+ 		return;
+ 	}
  
--	hwa = hwi = HWEIGHT_WHOLE;
-+	hwa = hwi = WEIGHT_ONE;
- 	for (lvl = 0; lvl <= iocg->level - 1; lvl++) {
- 		struct ioc_gq *parent = iocg->ancestors[lvl];
- 		struct ioc_gq *child = iocg->ancestors[lvl + 1];
-@@ -2088,8 +2088,8 @@ static void ioc_pd_init(struct blkg_policy_data *pd)
- 	atomic64_set(&iocg->done_vtime, now.vnow);
- 	atomic64_set(&iocg->active_period, atomic64_read(&ioc->cur_period));
- 	INIT_LIST_HEAD(&iocg->active_list);
--	iocg->hweight_active = HWEIGHT_WHOLE;
--	iocg->hweight_inuse = HWEIGHT_WHOLE;
-+	iocg->hweight_active = WEIGHT_ONE;
-+	iocg->hweight_inuse = WEIGHT_ONE;
+@@ -1845,9 +1899,9 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+ 	wait.committed = false;	/* will be set true by waker */
  
- 	init_waitqueue_head(&iocg->waitq);
- 	hrtimer_init(&iocg->waitq_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+ 	__add_wait_queue_entry_tail(&iocg->waitq, &wait.wait);
+-	iocg_kick_waitq(iocg, &now);
++	iocg_kick_waitq(iocg, ioc_locked, &now);
+ 
+-	spin_unlock_irq(&iocg->waitq.lock);
++	iocg_unlock(iocg, ioc_locked, &flags);
+ 
+ 	while (true) {
+ 		set_current_state(TASK_UNINTERRUPTIBLE);
 -- 
 2.26.2
 
