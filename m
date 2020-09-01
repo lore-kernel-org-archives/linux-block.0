@@ -2,108 +2,232 @@ Return-Path: <SRS0=kheS=CK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BEFC433E2
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 14:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7EAC433E6
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 14:12:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBFC22078B
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 14:05:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 114CE207D3
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 14:12:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hbrvoG+v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728369AbgIAOE4 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 10:04:56 -0400
-Received: from smtp.h3c.com ([60.191.123.50]:1764 "EHLO h3cspam02-ex.h3c.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728272AbgIAOEt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Sep 2020 10:04:49 -0400
-Received: from DAG2EX10-IDC.srv.huawei-3com.com ([10.8.0.73])
-        by h3cspam02-ex.h3c.com with ESMTPS id 081E3IK3046769
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 1 Sep 2020 22:03:19 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
- DAG2EX10-IDC.srv.huawei-3com.com (10.8.0.73) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 1 Sep 2020 22:03:22 +0800
-Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
- by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%7]) with
- mapi id 15.01.1713.004; Tue, 1 Sep 2020 22:03:22 +0800
-From:   Tianxianting <tian.xianting@h3c.com>
-To:     "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] [v3] blk-mq: use BLK_MQ_NO_TAG for no tag
-Thread-Topic: [PATCH] [v3] blk-mq: use BLK_MQ_NO_TAG for no tag
-Thread-Index: AQHWfD0K8koEXAvdJUKfqbC/GaNLZ6lT1/Nw
-Date:   Tue, 1 Sep 2020 14:03:22 +0000
-Message-ID: <465ec9bf9b7b45fb98d7f21498328300@h3c.com>
-References: <20200827063417.35851-1-tian.xianting@h3c.com>
-In-Reply-To: <20200827063417.35851-1-tian.xianting@h3c.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.99.141.128]
-x-sender-location: DAG2
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727902AbgIANPT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 09:15:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727061AbgIANFr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 09:05:47 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE6EC061244;
+        Tue,  1 Sep 2020 06:05:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=3snyZCqcx6nfDLLd1J100WLPuaRed18WUzYLSt3TcWw=; b=hbrvoG+vks0CAtQ3N78qWmX5eX
+        /NQfB0lIwhTw+JIeEG3UTUpEED73WYlkgwy+xZx68o+RkOBAMNP+7v0DFBexLsFKpbTNNJqIkP6Sd
+        H6pciRK1QoYcmLs5njnhEbPp+JKo6UVT0Z2NUYWZ0NZMse5fdbv3S2XuHDf10GHYZZybDqcLfFk/m
+        6Ff6CFmabe6TrkJZ8Igy1YjbGZv8aeXp4VPkCG8+XCmqKf9ApGKGXpb6Ta7X8f9XykbBpBWgS6fzO
+        /NVVDgQQqK3n9YAn9yxLyPSnjhSjdboM3fBHH/AaYwQ2ZCYOiPObZHa/hk33V3BnzVpg0bhQsq0h8
+        +f07oIzA==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kD5yX-0000KA-In; Tue, 01 Sep 2020 13:05:25 +0000
+Date:   Tue, 1 Sep 2020 14:05:25 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 04/11] block: Add bio_for_each_thp_segment_all
+Message-ID: <20200901130525.GK14765@casper.infradead.org>
+References: <20200824151700.16097-1-willy@infradead.org>
+ <20200824151700.16097-5-willy@infradead.org>
+ <20200827084431.GA15909@infradead.org>
+ <20200831194837.GJ14765@casper.infradead.org>
+ <20200901053426.GB24560@infradead.org>
 MIME-Version: 1.0
-X-DNSRBL: 
-X-MAIL: h3cspam02-ex.h3c.com 081E3IK3046769
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200901053426.GB24560@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens
-Could I get the feedback from you whether this patch can be applied? 
-Thanks a lot.
+On Tue, Sep 01, 2020 at 06:34:26AM +0100, Christoph Hellwig wrote:
+> On Mon, Aug 31, 2020 at 08:48:37PM +0100, Matthew Wilcox wrote:
+> > static void iomap_read_end_io(struct bio *bio)
+> > {
+> >         int i, error = blk_status_to_errno(bio->bi_status);
+> > 
+> >         for (i = 0; i < bio->bi_vcnt; i++) {
+> >                 struct bio_vec *bvec = &bio->bi_io_vec[i];
+> 
+> This should probably use bio_for_each_bvec_all instead of directly
+> poking into the bio.  I'd also be tempted to move the loop body into
+> a separate helper, but that's just a slight stylistic preference.
 
------Original Message-----
-From: tianxianting (RD) 
-Sent: Thursday, August 27, 2020 2:34 PM
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org; linux-kernel@vger.kernel.org; tianxianting (RD) <tian.xianting@h3c.com>
-Subject: [PATCH] [v3] blk-mq: use BLK_MQ_NO_TAG for no tag
+Ah, got it.
 
-Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
+> >                 size_t offset = bvec->bv_offset;
+> >                 size_t length = bvec->bv_len;
+> >                 struct page *page = bvec->bv_page;
+> > 
+> >                 while (length > 0) { 
+> >                         size_t count = thp_size(page) - offset;
+> >                         
+> >                         if (count > length)
+> >                                 count = length;
+> >                         iomap_read_page_end_io(page, offset, count, error);
+> >                         page += (offset + count) / PAGE_SIZE;
+> 
+> Shouldn't the page_size here be thp_size?
 
-Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
----
- block/blk-core.c     | 4 ++--
- block/blk-mq-sched.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+No.  Let's suppose we have a 20kB I/O which starts on a page boundary and
+the first page is order-2.  To get from the first head page to the second
+page, we need to add 4, which is 16kB / 4kB, not 16kB / 16kB.
 
-diff --git a/block/blk-core.c b/block/blk-core.c index d9d632639..c7eaf7504 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -116,8 +116,8 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
- 	rq->__sector = (sector_t) -1;
- 	INIT_HLIST_NODE(&rq->hash);
- 	RB_CLEAR_NODE(&rq->rb_node);
--	rq->tag = -1;
--	rq->internal_tag = -1;
-+	rq->tag = BLK_MQ_NO_TAG;
-+	rq->internal_tag = BLK_MQ_NO_TAG;
- 	rq->start_time_ns = ktime_get_ns();
- 	rq->part = NULL;
- 	refcount_set(&rq->ref, 1);
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c index a19cdf159..439481f59 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -522,7 +522,7 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
- 		goto run;
- 	}
+> > Maybe I'm missing something important here, but it's significantly
+> > simpler code -- iomap_read_end_io() goes down from 816 bytes to 560 bytes
+> > (256 bytes less!) iomap_read_page_end_io is inlined into it both before
+> > and after.
+> 
+> Yes, that's exactly why I think avoiding bio_for_each_segment_all is
+> a good idea in general.
+
+I took out all the attempts to cope with insane bv_offset to compare like
+with like and I got the bio_for_each_thp_segment_all() version down to
+656 bytes:
+
+@@ -166,21 +166,15 @@ static inline void bvec_thp_advance(const struct bio_vec *
+bvec,
+                                struct bvec_iter_all *iter_all)
+ {
+        struct bio_vec *bv = &iter_all->bv;
+-       unsigned int page_size;
  
--	WARN_ON(e && (rq->tag != -1));
-+	WARN_ON(e && (rq->tag != BLK_MQ_NO_TAG));
+        if (iter_all->done) {
+                bv->bv_page += thp_nr_pages(bv->bv_page);
+-               page_size = thp_size(bv->bv_page);
+                bv->bv_offset = 0;
+        } else {
+-               bv->bv_page = thp_head(bvec->bv_page +
+-                               (bvec->bv_offset >> PAGE_SHIFT));
+-               page_size = thp_size(bv->bv_page);
+-               bv->bv_offset = bvec->bv_offset -
+-                               (bv->bv_page - bvec->bv_page) * PAGE_SIZE;
+-               BUG_ON(bv->bv_offset >= page_size);
++               bv->bv_page = bvec->bv_page;
++               bv->bv_offset = bvec->bv_offset;
+        }
+-       bv->bv_len = min(page_size - bv->bv_offset,
++       bv->bv_len = min_t(unsigned int, thp_size(bv->bv_page) - bv->bv_offset,
+                         bvec->bv_len - iter_all->done);
+        iter_all->done += bv->bv_len;
+
+> And yes, eventually bv_page and bv_offset should be replaced with a
+> 
+> 	phys_addr_t		bv_phys;
+> 
+> and life would become simpler in many places (and the bvec would
+> shrink for most common setups as well).
+
+I'd very much like to see that.  It causes quite considerable pain for
+our virtualisation people that we need a struct page.  They'd like the
+hypervisor to not have struct pages for the guest's memory, but if they
+don't have them, they can't do I/O to them.  Perhaps I'll try getting
+one of them to work on this.
+
+I'm not entirely sure the bvec would shrink.  On 64-bit systems, it's
+currently 8 bytes for the struct page, 4 bytes for the len and 4 bytes
+for the offset.  Sure, we can get rid of the offset, but the compiler
+will just pad the struct from 12 bytes back to 16.  On 32-bit systems
+with 32-bit phys_addr_t, we go from 12 bytes down to 8, but most 32-bit
+systems have a 64-bit phys_addr_t these days, don't they?
+
+> For now I'd end up with something like:
+> 
+> static void iomap_read_end_bvec(struct page *page, size_t offset,
+> 		size_t length, int error)
+> {
+> 	while (length > 0) {
+> 		size_t page_size = thp_size(page);
+> 		size_t count = min(page_size - offset, length);
+> 
+> 		iomap_read_page_end_io(page, offset, count, error);
+> 
+> 		page += (offset + count) / page_size;
+> 		length -= count;
+> 		offset = 0;
+> 	}
+> }
+> 
+> static void iomap_read_end_io(struct bio *bio)
+> {
+> 	int i, error = blk_status_to_errno(bio->bi_status);
+> 	struct bio_vec *bvec;
+> 
+> 	bio_for_each_bvec_all(bvec, bio, i)
+> 		iomap_read_end_bvec(bvec->bv_page, bvec->bv_offset,
+> 				    bvec->bv_len, error;
+>         bio_put(bio);
+> }
+> 
+> and maybe even merge iomap_read_page_end_io into iomap_read_end_bvec.
+
+The lines start to get a bit long.  Here's what I currently have on
+the write side:
+
+@@ -1104,6 +1117,20 @@ iomap_finish_page_writeback(struct inode *inode, struct p
+age *page,
+                end_page_writeback(page);
+ }
  
- 	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
- 		/*
---
-2.17.1
++static void iomap_finish_bvec_write(struct inode *inode, struct page *page,
++               size_t offset, size_t length, int error)
++{
++       while (length > 0) {
++               size_t count = min(thp_size(page) - offset, length);
++
++               iomap_finish_page_writeback(inode, page, error, count);
++
++               page += (offset + count) / PAGE_SIZE;
++               offset = 0;
++               length -= count;
++       }
++}
++
+ /*
+  * We're now finished for good with this ioend structure.  Update the page
+  * state, release holds on bios, and finally free up memory.  Do not use the
+@@ -1121,7 +1148,7 @@ iomap_finish_ioend(struct iomap_ioend *ioend, int error)
+ 
+        for (bio = &ioend->io_inline_bio; bio; bio = next) {
+                struct bio_vec *bv;
+-               struct bvec_iter_all iter_all;
++               int i;
+ 
+                /*
+                 * For the last bio, bi_private points to the ioend, so we
+@@ -1133,9 +1160,9 @@ iomap_finish_ioend(struct iomap_ioend *ioend, int error)
+                        next = bio->bi_private;
+ 
+                /* walk each page on bio, ending page IO on them */
+-               bio_for_each_thp_segment_all(bv, bio, iter_all)
+-                       iomap_finish_page_writeback(inode, bv->bv_page, error,
+-                                       bv->bv_len);
++               bio_for_each_bvec_all(bv, bio, i)
++                       iomap_finish_bvec_writeback(inode, bv->bv_page,
++                                       bv->bv_offset, bv->bv_len, error);
+                bio_put(bio);
+        }
+        /* The ioend has been freed by bio_put() */
+
+That's a bit more boilerplate than I'd like, but if bio_vec is going to
+lose its bv_page then I don't see a better way.  Unless we come up with
+a different page/offset/length struct that bio_vecs are decomposed into.
 
