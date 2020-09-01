@@ -2,136 +2,122 @@ Return-Path: <SRS0=kheS=CK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A369C433E6
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 20:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD7EC433E6
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 20:33:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 783F52078B
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 20:12:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2AC8208DB
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 20:33:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aE+t+KoG"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gCFFbBRz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726895AbgIAUMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 16:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41456 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726764AbgIAUMi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 16:12:38 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0841C061244
-        for <linux-block@vger.kernel.org>; Tue,  1 Sep 2020 13:12:37 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id s2so1159398pjr.4
-        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2020 13:12:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=e6GgX70OdjL1tqwJUYS3XbI1WRfgqCK//kboQuDHSjM=;
-        b=aE+t+KoG0Wd8K0fWdODEaafawp7uWrxOKVIP5pOq+CaZh5a5QZaU1TKqHqo0IicpIE
-         OKXyjv6Z6jfmVgDwyWYcrdz6KSAEuQG1uEUF2indrcNRycvSHu0RqUeM7aM6dZ0z4MuE
-         L32x8HTrjAkMjBrG0Nqm3QVhk/L67aEZhzwZD9Gm5toLeu3ofg0idQFwnTzXeXb7q2hi
-         0iTswCUa5Og2+6jqmTy11a7IQyDgaHWJXw6s/4Biz0yHTxj3kjvEmU2P5EKA0S3ydPJb
-         3+3dM56syhZBvZ4aEqHMQebqkn59RAW3c9DFTEODXKBjKC55ZMsQOvCkNvxcHx34w/KK
-         HkKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=e6GgX70OdjL1tqwJUYS3XbI1WRfgqCK//kboQuDHSjM=;
-        b=qnizQ2FN1tAgGOXdeNMUzjGrvrTgSgpQOnTGMB8Y4zJB5d3yB02qUvKGQEHfm/ZVSs
-         WeV/jM1KPbATTU48sCda1/PVAJVJB5WgSzk7fKET7TySLOQnVv487kIMUAGTom0o4Qb5
-         zl2FZtPzdoOew7u9TP4WX3rqW41T9EDKfdgm29kYhvcfsKowH6S5quOki7B5BU7FbLqC
-         jUaAmMgpUIdTkyr4xKLnV8be40La7mnu1cp2qTTf8aDfAlV0xPr0fy3nPsj+VqGModzC
-         234EPjA02q916mUB9LZMWSWAxYkFoP5Ud48x/XHG2Jdpkb1SHCQNq9RMREXo525uUnMO
-         T5BQ==
-X-Gm-Message-State: AOAM53063flkTIaquvHc3lx2Ha1LjXCXCX89cyrvd7HOhcMjS/6KWxUc
-        Y7DDr3UZ5ziKgavacpp0qJwKvQ==
-X-Google-Smtp-Source: ABdhPJw5TN1eVTK6zQzkrcnavu2RYPsBE9ZH8OtwjjON+M9+5Ru8nVKNqAhIPbU2RY0Qj3bJJgMMTg==
-X-Received: by 2002:a17:90a:e80f:: with SMTP id i15mr1891990pjy.62.1598991157066;
-        Tue, 01 Sep 2020 13:12:37 -0700 (PDT)
-Received: from [192.168.1.187] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id ih11sm2302448pjb.51.2020.09.01.13.12.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Sep 2020 13:12:36 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: Fix NULL pointer dereference in
- io_sq_wq_submit_work()
-From:   Jens Axboe <axboe@kernel.dk>
-To:     yinxin_1989 <yinxin_1989@aliyun.com>,
-        viro <viro@zeniv.linux.org.uk>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20200901015442.44831-1-yinxin_1989@aliyun.com>
- <ae9f3887-5205-8aa8-afa7-4e01d03921bc@kernel.dk>
- <67f27d17-81fa-43a8-baa9-429b1ccd65d0.yinxin_1989@aliyun.com>
- <4eeefb43-488c-dc90-f47c-10defe6f9278@kernel.dk>
- <98f2cbbf-4f6f-501b-2f4e-1b8b803ce6a6@kernel.dk>
-Message-ID: <1925de10-3c07-0a0b-4434-1049b7ee52c3@kernel.dk>
-Date:   Tue, 1 Sep 2020 14:12:35 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <98f2cbbf-4f6f-501b-2f4e-1b8b803ce6a6@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726559AbgIAUdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 16:33:33 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:40752 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726269AbgIAUda (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 16:33:30 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 081KTh67124032;
+        Tue, 1 Sep 2020 20:33:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
+ bh=P+tHuN2j7ySHCLrFBcgTXmWcfEmvY0ARBZ773+JVuL0=;
+ b=gCFFbBRzAPYjsD7aEnl7FrtBeSxafto3yuhA3iWtR96zq7hWeOuLeDocpx5/KQAdPuab
+ gzqNaKmh7jSfkwChJD4rF67KSvJDWjI/dp3vX0QdWK00PDx6pkETr2+49MXe9mXlFCIu
+ pRKwxwpNYjenF8xLoUAvQAo9ODQ4uIXzMNHDpZt8TW4bGt45ayk9ksbTj2SeTGZ06Ny/
+ Vm8Tqr+AAVQ39qYcTKgAVsUQpwsIc3wjzBL/gCSnQEf2OvUr4ufTepEyz7R5kqlJ+3SN
+ 1xCqXeXaYy1MY1Uoz0j9qMWPeH0XX4EF5zHRVl9b/f5NQiPuLEGnaCkPXyT/1ykK/Tej /w== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 339dmmw73k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 01 Sep 2020 20:33:27 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 081KV1cw152682;
+        Tue, 1 Sep 2020 20:33:27 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 3380ssh10m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 01 Sep 2020 20:33:27 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 081KXQNN008814;
+        Tue, 1 Sep 2020 20:33:26 GMT
+Received: from rsrivast-us.us.oracle.com (/10.211.44.96)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 01 Sep 2020 13:33:25 -0700
+From:   Ritika Srivastava <ritika.srivastava@oracle.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, ritika.srivastava@oracle.com
+Subject: [PATCH 1/2] block: Return blk_status_t instead of errno codes
+Date:   Tue,  1 Sep 2020 13:17:30 -0700
+Message-Id: <1598991451-9655-2-git-send-email-ritika.srivastava@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1598991451-9655-1-git-send-email-ritika.srivastava@oracle.com>
+References: <1598991451-9655-1-git-send-email-ritika.srivastava@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9731 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ phishscore=0 malwarescore=0 mlxscore=0 spamscore=0 bulkscore=0
+ suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009010174
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9731 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 adultscore=0 impostorscore=0 mlxscore=0 suspectscore=1
+ spamscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009010174
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/1/20 2:01 PM, Jens Axboe wrote:
-> On 9/1/20 8:52 AM, Jens Axboe wrote:
->> On 8/31/20 10:59 PM, yinxin_1989 wrote:
->>>
->>>> On 8/31/20 7:54 PM, Xin Yin wrote:
->>>>> the commit <1c4404efcf2c0> ("<io_uring: make sure async workqueue
->>>>> is canceled on exit>") caused a crash in io_sq_wq_submit_work().
->>>>> when io_ring-wq get a req form async_list, which may not have been
->>>>> added to task_list. Then try to delete the req from task_list will caused
->>>>> a "NULL pointer dereference".
->>>>
->>>> Hmm, do you have a reproducer for this?
->>>
->>> I update code to linux5.4.y , and I can reproduce this issue on an arm
->>> board and my x86 pc by fio tools.
->>
->> Right, I figured this was 5.4 stable, as that's the only version that
->> has this patch.
-> 
-> I took a closer look, and I think your patch can basically be boiled down
-> to this single hunk. If you agree, can you resend your patch with the
-> description based on that, then I'll get it queued up for 5.4-stable.
-> Thanks!
+Replace returning legacy errno codes with blk_status_t in
+blk_cloned_rq_check_limits().
 
-Actually, we don't even need the irqsave, this should be enough:
+Signed-off-by: Ritika Srivastava <ritika.srivastava@oracle.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index fada14ee1cdc..2a539b794f3b 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2378,6 +2378,15 @@ static bool io_add_to_prev_work(struct async_list *list, struct io_kiocb *req)
- 		list_del_init(&req->list);
- 		ret = false;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 1028c34..4c1af34 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1144,14 +1144,14 @@ blk_qc_t submit_bio(struct bio *bio)
+  *    limits when retrying requests on other queues. Those requests need
+  *    to be checked against the new queue limits again during dispatch.
+  */
+-static int blk_cloned_rq_check_limits(struct request_queue *q,
++static blk_status_t blk_cloned_rq_check_limits(struct request_queue *q,
+ 				      struct request *rq)
+ {
+ 	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
+ 		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
+ 			__func__, blk_rq_sectors(rq),
+ 			blk_queue_get_max_sectors(q, req_op(rq)));
+-		return -EIO;
++		return BLK_STS_IOERR;
  	}
-+
-+	if (ret) {
-+		struct io_ring_ctx *ctx = req->ctx;
-+
-+		spin_lock_irq(&ctx->task_lock);
-+		list_add(&req->task_list, &ctx->task_list);
-+		req->work_task = NULL;
-+		spin_unlock_irq(&ctx->task_lock);
-+	}
- 	spin_unlock(&list->lock);
- 	return ret;
+ 
+ 	/*
+@@ -1164,10 +1164,10 @@ static int blk_cloned_rq_check_limits(struct request_queue *q,
+ 	if (rq->nr_phys_segments > queue_max_segments(q)) {
+ 		printk(KERN_ERR "%s: over max segments limit. (%hu > %hu)\n",
+ 			__func__, rq->nr_phys_segments, queue_max_segments(q));
+-		return -EIO;
++		return BLK_STS_IOERR;
+ 	}
+ 
+-	return 0;
++	return BLK_STS_OK;
  }
-
+ 
+ /**
 -- 
-Jens Axboe
+1.8.3.1
 
