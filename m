@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F37CC433E6
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 22:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EF0C433E2
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 22:57:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53369206C0
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 22:56:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3083A206C0
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 22:57:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="uYjq6whv"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kx9pMxba"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726269AbgIAW4u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 18:56:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38548 "EHLO
+        id S1726226AbgIAW5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 18:57:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726050AbgIAW4s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 18:56:48 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BAC8C061244
-        for <linux-block@vger.kernel.org>; Tue,  1 Sep 2020 15:56:47 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id h2so1318313plr.0
-        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2020 15:56:47 -0700 (PDT)
+        with ESMTP id S1725949AbgIAW5q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 18:57:46 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC7EC061244
+        for <linux-block@vger.kernel.org>; Tue,  1 Sep 2020 15:57:46 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id w7so1716874pfi.4
+        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2020 15:57:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wdddzQ5ODBbxY93ddYlX64d9dvvfA9bkx38Bc7zOkeQ=;
-        b=uYjq6whviW7disu4Vbxn29EcAQrFTo396f3kyvPnz4btgKnx5cdPG7PUWUp3LfvrwR
-         9aG7JIi01IaysRUw0798gBgHKxj6fASv8SynERW+3LYeeaPjV92YeR4GAybOto1t8L2p
-         P/NsA4SUhznuXjKWvlQKIgSANxtpwNGW5SRz8Rclr7pJP4jCLLktjls3sYBwpgVbz/me
-         mNe5AUAOwzu8Jf2tSyrgLKyZtRo/nmeO00qzJS5RCj0Ov20vqo4IfYCegk5FVhPBt4O3
-         PabY4PIHxj59PRHtmMBmGbgULsNLA2/gjzD1HpBpKFoqOIe6NOjYDkOpReRi8ZqjWSSR
-         pDiw==
+        bh=8SCB1R5S0rIlXAP1gD/42mN3rEFGnClEAzglzWI/f5A=;
+        b=kx9pMxbaG7HxeA/hSNOaElEvYF6zneOI88aycKG6Q8jpxb2w7bV344cmhdkTDMxzM8
+         s4owDu6/DO5Uv9cHyTnKBdmy+nqJhz7wwHz61yAXmFMMhK4Cu789DJwxYjlbPXe0s5+l
+         1eE7XdCSERl8fSlQzYXHj1ACbWfO6xdmj6kFMFBA+oZIO+F0oUEUFwv1qB4zVLOSf3Tb
+         cEm0nPav5qtkrw25Z04awrm9iRz2WofDvEuWX38Z7ApDCYln3CV04pw1ye/mPQ710zxe
+         cuHimPUl3H9I9rn9HJAOO2hqAuXJqTUInl3Y6aiY+aq7bLFN524E3gnv+652wfX5cgO4
+         qCzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=wdddzQ5ODBbxY93ddYlX64d9dvvfA9bkx38Bc7zOkeQ=;
-        b=UypdHhW9+juFZjIRS7kbmKDcbPoT3/Nec3Zb3TaHdeRx+1rIfbetWDyyqUUcbXI17+
-         69qbA89tE8P5Y8dR12LUEiJrQ8rNrMzs3z9XHw7OVjfUvciUfOcI/x77auuF4SRt95E8
-         Q9C85vN8w05RlEeoKWgu/YHMufXLPPz8kQBboQgzw63/ZDVXEOqHDNXxjXz2mH/B/a4c
-         O86ZKdcDYO5CTKYMSk/tJ+OIiTgUtwqAJ/4cX+CQciGJsRzAzXmto9FVW0g6jFrnpley
-         4uvs+ikpi7QW0VhvwsEgOZlUlLwh1Syhdf7Ghdw8uIS56N1wC6laSeslbpU+qODXtPJf
-         2X7A==
-X-Gm-Message-State: AOAM530UvKPLLBa7xggt8EypjEIdTolljADqIA99GLVKBLmwRXDYA7el
-        uaD08EeRLG7konSQqJ1EOkGTYYgb3JGqN73A
-X-Google-Smtp-Source: ABdhPJwX1TPWGfslrMA7Nls+06CcNQ7Qv+XSc9C7Ip0BvXuuzFVvaP0yhZog2Zwbe8a3KmKedhg5PQ==
-X-Received: by 2002:a17:90a:d986:: with SMTP id d6mr3611449pjv.108.1599001005910;
-        Tue, 01 Sep 2020 15:56:45 -0700 (PDT)
+        bh=8SCB1R5S0rIlXAP1gD/42mN3rEFGnClEAzglzWI/f5A=;
+        b=LETpYGc4BdL4jvXZb934d/T4ahgi2FuiNHUGNaryNLlL5KqBkJXL+w0Fj82nFBKN6/
+         lmlrxiiQHSQrPkmHil/5LxEt6I391mZtizAcmsnuXkS21EgtIcHI19P+ui59iEgjiIHz
+         SU+XnHLONl2wbO4FytqgPg2nCpEXFDiB20pywxczUQMkotA4CfSQYLXT/P+SJ0w4NTEW
+         LgUi7Zm9iSab4PRYPFrGQ/mRcFATSR9a5qwXe/bJDZgTowrkyXGNrSj3mYnRPGqA5zqA
+         20C8121ng7BKcdlzBezhl4ie6QY22Lf8sdNyUjldIhtEwc7HY4xXsojE2IY1v1rzG6jL
+         pZig==
+X-Gm-Message-State: AOAM533fKgoBMRfgYI1Kjhktafi2v1ytNxZDgl/StISTUy6liDNlakgo
+        lRUsF8u4VmqLBMtg/Lm32r9yUQ==
+X-Google-Smtp-Source: ABdhPJz7/PuTI6toqDV7Y9ZAOMNodGuUCNOHnU2Zfi3eqQltoMCij8HkSX98gsEIVX42xBTyba1VqA==
+X-Received: by 2002:a63:521c:: with SMTP id g28mr3479485pgb.247.1599001065304;
+        Tue, 01 Sep 2020 15:57:45 -0700 (PDT)
 Received: from [192.168.1.187] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id i1sm3103164pfo.212.2020.09.01.15.56.45
+        by smtp.gmail.com with ESMTPSA id q5sm3122211pfu.16.2020.09.01.15.57.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Sep 2020 15:56:45 -0700 (PDT)
-Subject: Re: Return BLK_STS_NOTSUPP and blk_status_t from
- blk_cloned_rq_check_limits()
-To:     Ritika Srivastava <ritika.srivastava@oracle.com>
-Cc:     linux-block@vger.kernel.org
-References: <1598991451-9655-1-git-send-email-ritika.srivastava@oracle.com>
+        Tue, 01 Sep 2020 15:57:44 -0700 (PDT)
+Subject: Re: [PATCHSET for-5.10/block] blk-iocost: iocost: improve donation,
+ debt and excess handling
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, newella@fb.com
+References: <20200901185257.645114-1-tj@kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9610fd6a-9542-61f9-767b-5f3dbfad199c@kernel.dk>
-Date:   Tue, 1 Sep 2020 16:56:44 -0600
+Message-ID: <cac016f9-ee13-9fd4-22b2-8be0d830f076@kernel.dk>
+Date:   Tue, 1 Sep 2020 16:57:43 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1598991451-9655-1-git-send-email-ritika.srivastava@oracle.com>
+In-Reply-To: <20200901185257.645114-1-tj@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,26 +79,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/1/20 2:17 PM, Ritika Srivastava wrote:
-> Hi Jens,
-> 
-> I applied the following patches on 5.10 branch and there are only line number changes.
-> 
-> [PATCH 1/2] block: Return blk_status_t instead of errno codes
-> [PATCH v4 2/2] block: better deal with the delayed not supported case in blk_cloned_rq_check_limits
-> 
-> I am resending the patches applied on top of 5.10 branch.
-> 
-> $ git log --oneline --decorate -n 5
-> 5749f24 (HEAD, for-5.10/block) block: better deal with the delayed not supported case in blk_cloned_rq_check_limits
-> bb79f6e block: Return blk_status_t instead of errno codes
-> 9493111 (origin/for-5.10/block) block: remove the unused q argument to part_in_flight and part_in_flight_rw
-> 8eeee76 block: remove the disk argument to delete_partition
-> 7f201bc block: cleanup __alloc_disk_node
-
-It failed for me again, but upon looking closer, it's actually b4 that
-isn't pulling in patch #1. Hence #2 obviously fails. I've applied them
-by hand, thanks.
+1-2 applied for 5.9, and the rest for 5.10. Thanks Tejun.
 
 -- 
 Jens Axboe
