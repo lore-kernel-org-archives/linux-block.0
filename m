@@ -2,89 +2,113 @@ Return-Path: <SRS0=kheS=CK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E28C433E6
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 15:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B739EC28E83
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 15:59:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D58320FC3
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 15:12:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 911D5214D8
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 15:59:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PUXtWENM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="a3R6hLNA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728764AbgIAPMg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 11:12:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
+        id S1732141AbgIAP6U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 11:58:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728184AbgIAPMc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 11:12:32 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B232C061244
-        for <linux-block@vger.kernel.org>; Tue,  1 Sep 2020 08:12:32 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id f18so944736pfa.10
-        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2020 08:12:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Cmf60kaJnLulg3nAlNSWgeIZ5TjNS3h/lBYUaqJ+ijw=;
-        b=PUXtWENMVYij/8AtBgV+4W8+/5W2969p/IUR9ILXAOvur9w1a9yuX66ytR5HfSHRK6
-         oQ/1dTamqXUwKXceOL61TXZOEDAJkX5GKHRlXFT8UaZpx/efMtEN1OoIZXvxL6Z2Nwg2
-         F8zV9kv3m1pvIAjpn2xBBBo6B6HFD+oPoGGAH7zjOv77GFwpyZiln1nf49PHwFKLobQj
-         oCWw/WruUY28QerNJaSGhVMg5/EKPSrJpdgxfjuSMnPIrGXFghAWZY3MC/4/rTFDZ+mV
-         bTafXLOggtmKtV/UTSs16opGn6lAsTUtooyMvLlpp4v6RE8kb1Vee8Y53s4HzK1yN225
-         geSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Cmf60kaJnLulg3nAlNSWgeIZ5TjNS3h/lBYUaqJ+ijw=;
-        b=nNPNNMOCSJVyup/3ySQAGnrAkPHItxlczT/2bWXUo6plapTjPmgHAWvMt+twgRBwb8
-         iA6AESmpnEVRIzoW91NvEIH8pAhuDrWY9BnmwKCzhjkIf7b0zhpxB6UproGXCzzcGh4E
-         jpIGeN6UkCBRSCtprd+mGY0UDuB3OcKm9OhcQxmVZzvoLDzT4tskTwlzKbs2GbQoLpu6
-         ulU4UqL1rok9Ol9eoHomd+hvoYii6GwmsAjcPX94d/VRq39OhPNsJpCqgIEQ6TtrI8wy
-         BLEprltlyxfsJf1fx6dHqLL8nRtpoKx45NX0liKQ9YVhLwUz8bM0IVwsEtOd/GuUw+xC
-         V75w==
-X-Gm-Message-State: AOAM531FsBbT1NAI63ZI+8QU0+C3TScfA1V93+X87MXH8qLJrlGPAGu8
-        3+G//pFSfZF6685HSkKdkgwM9NLZ1mHEShof
-X-Google-Smtp-Source: ABdhPJwaSfX8F6fx/bDTrbxrhtb+/nRpHK/9BtWiLlneV1Q6RJn7SVQ/xhXxCBgUasXWdaV9UjS3PQ==
-X-Received: by 2002:aa7:9d8b:: with SMTP id f11mr2266050pfq.5.1598973148416;
-        Tue, 01 Sep 2020 08:12:28 -0700 (PDT)
-Received: from [192.168.1.187] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id p24sm1835504pju.57.2020.09.01.08.12.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Sep 2020 08:12:27 -0700 (PDT)
-Subject: Re: misc cleanups
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20200831180239.2372776-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4c0c026a-7363-0b90-3da2-4b06712fcae8@kernel.dk>
-Date:   Tue, 1 Sep 2020 09:12:26 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S1731348AbgIAP6M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 11:58:12 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16E10C06124F;
+        Tue,  1 Sep 2020 08:58:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=X/wfONNMX9AkocUJrvkgvfoHlYcJ3otMPBdPBvDFSjg=; b=a3R6hLNAfPXw6R8QRXbGznXJl/
+        XYw3Qcp5GUZVdLvYz3g7yZTdhLBPVHDMlSfggoOPLUZWWTlpi4VSyTLAeSxeaGxz4415i0HuxYlHn
+        Rrzp4jXd9c1wB6Wl3fp75EZkwMR2pMOu0V4GqphS42Sy5cwGMmFOYSTu0f0WbNwh1AsqMoTho9gFC
+        RdhXzlE/7Zkah6VP7mUGqtnJKwpPFotBogYpnKN+bSpdkd42Pcgek9fWuBUDFm0apHm4YOMPi1N2y
+        tFJ5Kmb07jMbKgTkS/gXIrjXeu0LFRibRlegC43oSpS4bZjr/7ucSGkobwgV+XWFLT35JhGnmQ+r9
+        HsMdIZtA==;
+Received: from [2001:4bb8:18c:45ba:2f95:e5:ca6b:9b4a] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kD8fX-0004QE-CS; Tue, 01 Sep 2020 15:57:59 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Dan Williams <dan.j.williams@intel.com>, dm-devel@redhat.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        nbd@other.debian.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-raid@vger.kernel.org, linux-nvdimm@lists.01.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH 5/9] block: use revalidate_disk_size in set_capacity_revalidate_and_notify
+Date:   Tue,  1 Sep 2020 17:57:44 +0200
+Message-Id: <20200901155748.2884-6-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200901155748.2884-1-hch@lst.de>
+References: <20200901155748.2884-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20200831180239.2372776-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/31/20 12:02 PM, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this series has a bunch of misc cleanups that didn't fit any other
-> series.
+Only virtio_blk and xen-blkfront set the revalidate argument to true,
+and both do not implement the ->revalidate_disk method.  So switch
+to the helper that just updates the size instead.
 
-Looks good to me, applied.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/genhd.c         | 7 +++----
+ include/linux/genhd.h | 4 ++--
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
+diff --git a/block/genhd.c b/block/genhd.c
+index a2c0ec694918e5..431d4081b50ec7 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -50,14 +50,13 @@ static void disk_release_events(struct gendisk *disk);
+  * zero and will not be set to zero
+  */
+ void set_capacity_revalidate_and_notify(struct gendisk *disk, sector_t size,
+-					bool revalidate)
++					bool update_bdev)
+ {
+ 	sector_t capacity = get_capacity(disk);
+ 
+ 	set_capacity(disk, size);
+-
+-	if (revalidate)
+-		revalidate_disk(disk);
++	if (update_bdev)
++		revalidate_disk_size(disk, true);
+ 
+ 	if (capacity != size && capacity != 0 && size != 0) {
+ 		char *envp[] = { "RESIZE=1", NULL };
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 8e9c9d3a493fae..c340b392452ce6 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -315,8 +315,8 @@ static inline int get_disk_ro(struct gendisk *disk)
+ extern void disk_block_events(struct gendisk *disk);
+ extern void disk_unblock_events(struct gendisk *disk);
+ extern void disk_flush_events(struct gendisk *disk, unsigned int mask);
+-extern void set_capacity_revalidate_and_notify(struct gendisk *disk,
+-			sector_t size, bool revalidate);
++void set_capacity_revalidate_and_notify(struct gendisk *disk, sector_t size,
++		bool update_bdev);
+ extern unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask);
+ 
+ /* drivers/char/random.c */
 -- 
-Jens Axboe
+2.28.0
 
