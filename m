@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0B1C433E6
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A5FC433E2
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:53:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DCDE208CA
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:53:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8817120767
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:53:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598986404;
-	bh=jvJdrpAAo40Nsx3hqA1wXCNYFE9ZPHATEN5rd1230to=;
+	s=default; t=1598986422;
+	bh=BGvj/EP9LSFIYvBUYSS3dsIKkhtKnXvRzA4OfqOEjK4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=PJ6MVSCkYmMKHKQEdYn034gWSh/i53hHidCehRzW7k5MOu+GUVOxkFKs7XEsiDUkV
-	 Few5KUlX94Arkz7SwVDQF/7VmMlcoR07a6LmbA9E3kfbA4tePxfZcdZGw8pc6UNWDK
-	 AtuV7cqOyDtEAJFkCsNtjkXWpqGg3kt6g8Zn1H64=
+	b=UnUtO/2w2w5eUPJ+TwS79O831TmsUF4N678ny5L9Up0B+vg874LEyEjmkNGbqZT6w
+	 yKhvJ2GVi2KuzW7VPY6t61xd+BtZUxaKPai0A6iP4xAjsmUNVdGFexa57JEg8BAGrd
+	 IuWifE35Z5Ryx3kyweyRM0MonkjJk75IAQoQC22g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730462AbgIASxV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 14:53:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57420 "EHLO
+        id S1731329AbgIASxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 14:53:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731366AbgIASxR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 14:53:17 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E52BC061245;
-        Tue,  1 Sep 2020 11:53:16 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id b14so1999428qkn.4;
-        Tue, 01 Sep 2020 11:53:16 -0700 (PDT)
+        with ESMTP id S1731563AbgIASxh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 14:53:37 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EDAC061245;
+        Tue,  1 Sep 2020 11:53:32 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id d27so1739689qtg.4;
+        Tue, 01 Sep 2020 11:53:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Abijl0OmP6VYSflgQEhNpTgXbVq6GxdxWWrhkCH99jc=;
-        b=BYrK0zSLvPdaANXkzCXqODMBDKe5h7ipVdn2xiRVWxu7y4qoGlbLsat7aKgGV2NzAX
-         uA9xTg2W43pbV3T1KFcjp4McIbz8C7Z9y+4lVi0pNw5/4LtQdhb95BWCEs+uWaml2W9j
-         QvwuHJONksBt2KE09l+I1qkK15+vvKFyOd6venv28WwjFQaNa1WW0wUIiCKkvCB1qLG7
-         MIWBSC3WrHgH3Wa2mh62XUb7i74iR0JuJMWm91KrNQIIlLW7d/CPJhKqVvICdX41A4eB
-         UjHfd1CFFydEXixQ5tAReP0xL5GurO/+lMrr530F1YkcYn1cpAO3ght+hgZFzYk4wj5x
-         xFGw==
+        bh=b9CT/Pfaa29kbHcQyFjwoJj23rZzAWWYwFA5TYGSz5M=;
+        b=i/BXrQkgkv7QT7qjcqY0KSGlDoxBJwW4KpDXH82QhKpbGtbdebLOUTjaCUe5b5/nZw
+         rCODKcxJIXdNwj42TeSpSGUushKooNwe0n3mlchxpiyPl8W3/5+zspLkQF/OyPcgR5RS
+         FJV+btITXYPBoXMt3anyJhpBxeVwd5xHqtJEcBZFZK4HWZkN4xQDvh9WMz59KryVmlt5
+         +sAX8KZrcybC1/u2MZn457a/XmuZ2TgsX5GmhJtNKYvATshK2VL+GZPE3iQg/N23x0Fx
+         MLfIT9ZwD1/JbrvEZZaHDcKyfCDIuOLNTUPy0ERi4n1tVf3flcadR1IiAx/rpA1ZZ9rj
+         XjUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=Abijl0OmP6VYSflgQEhNpTgXbVq6GxdxWWrhkCH99jc=;
-        b=LEAWWam4DJRaLQDfj+KeAmzDBzEb3g0wtqDmIuTZLCam26ei5a7mrFORjU4Z8KcVqA
-         U+8+LbF8f+koQIYyFFZ1rOrPdgjmp76iDmHk6OW8jSNeidwFxigCdxVssSxzaDtNkivF
-         J7udIkFEdgzsQyclInZYcYeevuNu1hHh/lD3D7ALyxmHb+Ji29o45J/fFLeXbYwgaKRn
-         /U3RSfO6fkWkacY2Cx18UD9dzUPxw0XCbwFD0D+0UcptQBSUEiOQyEM4lI5n+Brxlnze
-         3/7Z/CCYhjM4NB+PC551uTNM+xtp6glykFzUtuWNWr6EE4pbiScr0Nk/Rx3sRsloBNND
-         39eQ==
-X-Gm-Message-State: AOAM533kUB5osBHtYdwTWt4Z1nZ0uttLrKQon9+zFCIjN42I9uJdwsX+
-        H8EjjD8vyatAQcSX2rwuRTFUjcz/UK84CQ==
-X-Google-Smtp-Source: ABdhPJzlYRM4F4sUXjrbVokCMMwmBNVn4u2vGXfHZMYyyB+m9IRWMAArmA9lx0GWSsYbD7bh8ienXQ==
-X-Received: by 2002:a37:9a13:: with SMTP id c19mr3185912qke.48.1598986395712;
-        Tue, 01 Sep 2020 11:53:15 -0700 (PDT)
+        bh=b9CT/Pfaa29kbHcQyFjwoJj23rZzAWWYwFA5TYGSz5M=;
+        b=cqsCcjHb5mhsuQuz+oYHGXC+ny2Si/C37i1dlC+DTot7YAHHVKf0od563E/j6mi4Vo
+         c80UB3hpabjYXPfZ7XAGJ40jbm0zzHmLnf9H17rcNqGvU7RXryRpbKVjNhQtm7zdDBaF
+         5zkmuUV7ItNxTer4uMTg0eVWlz9p5zNL12IFhwsxIBo9R7wCN8INWr87A3xnDuoRQiTQ
+         cZjDtNhWrTlC3xy9XwGZJBPeKm1uLPOv3izfyDNOFCHLw9XUi/gLerUPl0VBCveEse2M
+         egsa/rC/1Ad+c6cYJBMTn/v4RdhrTRBVFZryotbcqgin67m6tSrjl+SnTwE7zmIxucDJ
+         KYCg==
+X-Gm-Message-State: AOAM530cIrS9kQ4v+0MueOt/kjfz7DvKCpgw6Tg4Q6XisDJpevLdYBZ6
+        TnyNGYSno/FBmBtzVc3e9u86+WTv9tZhCQ==
+X-Google-Smtp-Source: ABdhPJwE7t2uWDiypDRMlzVcJMFvJe6QxLN4rRdw6ZVCIo8dU3IItrGwF39QORSjPGAbfwD9lV5b9g==
+X-Received: by 2002:ac8:c8c:: with SMTP id n12mr3300144qti.226.1598986411316;
+        Tue, 01 Sep 2020 11:53:31 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::1:a198])
-        by smtp.gmail.com with ESMTPSA id k6sm1864377qti.23.2020.09.01.11.53.14
+        by smtp.gmail.com with ESMTPSA id i1sm2585368qkd.58.2020.09.01.11.53.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 11:53:14 -0700 (PDT)
+        Tue, 01 Sep 2020 11:53:30 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org, kernel-team@fb.com, newella@fb.com,
         Tejun Heo <tj@kernel.org>
-Subject: [PATCH 04/27] blk-iocost: rename propagate_active_weights() to propagate_weights()
-Date:   Tue,  1 Sep 2020 14:52:34 -0400
-Message-Id: <20200901185257.645114-5-tj@kernel.org>
+Subject: [PATCH 09/27] blk-iocost: use WEIGHT_ONE based fixed point number for weights
+Date:   Tue,  1 Sep 2020 14:52:39 -0400
+Message-Id: <20200901185257.645114-10-tj@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901185257.645114-1-tj@kernel.org>
 References: <20200901185257.645114-1-tj@kernel.org>
@@ -80,155 +80,103 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It already propagates two weights - active and inuse - and there will be
-another soon. Let's drop the confusing misnomers. Rename
-[__]propagate_active_weights() to [__]propagate_weights() and
-commit_active_weights() to commit_weights().
+To improve weight donations, we want to able to scale inuse with a greater
+accuracy and down below 1. Let's make non-hierarchical weights to use
+WEIGHT_ONE based fixed point numbers too like hierarchical ones.
 
-This is pure rename.
+This doesn't cause any behavior changes yet.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-iocost.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ block/blk-iocost.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index e2266e7692b4..78e6919153d8 100644
+index 5e6d56eec1c9..00c5a3ad2b5b 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -479,7 +479,7 @@ struct ioc_gq {
- 	atomic64_t			active_period;
- 	struct list_head		active_list;
+@@ -984,8 +984,8 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
+ 	for (lvl = 0; lvl <= iocg->level - 1; lvl++) {
+ 		struct ioc_gq *parent = iocg->ancestors[lvl];
+ 		struct ioc_gq *child = iocg->ancestors[lvl + 1];
+-		u32 active_sum = READ_ONCE(parent->child_active_sum);
+-		u32 inuse_sum = READ_ONCE(parent->child_inuse_sum);
++		u64 active_sum = READ_ONCE(parent->child_active_sum);
++		u64 inuse_sum = READ_ONCE(parent->child_inuse_sum);
+ 		u32 active = READ_ONCE(child->active);
+ 		u32 inuse = READ_ONCE(child->inuse);
  
--	/* see __propagate_active_weight() and current_hweight() for details */
-+	/* see __propagate_weights() and current_hweight() for details */
- 	u64				child_active_sum;
- 	u64				child_inuse_sum;
- 	int				hweight_gen;
-@@ -890,7 +890,7 @@ static void ioc_start_period(struct ioc *ioc, struct ioc_now *now)
-  * Update @iocg's `active` and `inuse` to @active and @inuse, update level
-  * weight sums and propagate upwards accordingly.
-  */
--static void __propagate_active_weight(struct ioc_gq *iocg, u32 active, u32 inuse)
-+static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse)
- {
- 	struct ioc *ioc = iocg->ioc;
- 	int lvl;
-@@ -935,7 +935,7 @@ static void __propagate_active_weight(struct ioc_gq *iocg, u32 active, u32 inuse
- 	ioc->weights_updated = true;
- }
+@@ -993,11 +993,11 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
+ 		if (!active_sum || !inuse_sum)
+ 			continue;
  
--static void commit_active_weights(struct ioc *ioc)
-+static void commit_weights(struct ioc *ioc)
- {
- 	lockdep_assert_held(&ioc->lock);
+-		active_sum = max(active, active_sum);
+-		hwa = hwa * active / active_sum;	/* max 16bits * 10000 */
++		active_sum = max_t(u64, active, active_sum);
++		hwa = div64_u64((u64)hwa * active, active_sum);
  
-@@ -947,10 +947,10 @@ static void commit_active_weights(struct ioc *ioc)
+-		inuse_sum = max(inuse, inuse_sum);
+-		hwi = hwi * inuse / inuse_sum;		/* max 16bits * 10000 */
++		inuse_sum = max_t(u64, inuse, inuse_sum);
++		hwi = div64_u64((u64)hwi * inuse, inuse_sum);
  	}
- }
  
--static void propagate_active_weight(struct ioc_gq *iocg, u32 active, u32 inuse)
-+static void propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse)
- {
--	__propagate_active_weight(iocg, active, inuse);
--	commit_active_weights(iocg->ioc);
-+	__propagate_weights(iocg, active, inuse);
-+	commit_weights(iocg->ioc);
- }
- 
- static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep)
-@@ -966,9 +966,9 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
- 		goto out;
- 
- 	/*
--	 * Paired with wmb in commit_active_weights().  If we saw the
--	 * updated hweight_gen, all the weight updates from
--	 * __propagate_active_weight() are visible too.
-+	 * Paired with wmb in commit_weights(). If we saw the updated
-+	 * hweight_gen, all the weight updates from __propagate_weights() are
-+	 * visible too.
- 	 *
- 	 * We can race with weight updates during calculation and get it
- 	 * wrong.  However, hweight_gen would have changed and a future
-@@ -1018,7 +1018,7 @@ static void weight_updated(struct ioc_gq *iocg)
- 
+ 	iocg->hweight_active = max_t(u32, hwa, 1);
+@@ -1022,7 +1022,8 @@ static void weight_updated(struct ioc_gq *iocg)
  	weight = iocg->cfg_weight ?: iocc->dfl_weight;
  	if (weight != iocg->weight && iocg->active)
--		propagate_active_weight(iocg, weight,
-+		propagate_weights(iocg, weight,
- 			DIV64_U64_ROUND_UP(iocg->inuse * weight, iocg->weight));
+ 		propagate_weights(iocg, weight,
+-			DIV64_U64_ROUND_UP(iocg->inuse * weight, iocg->weight));
++				  DIV64_U64_ROUND_UP((u64)iocg->inuse * weight,
++						     iocg->weight));
  	iocg->weight = weight;
  }
-@@ -1090,8 +1090,8 @@ static bool iocg_activate(struct ioc_gq *iocg, struct ioc_now *now)
- 	 */
- 	iocg->hweight_gen = atomic_read(&ioc->hweight_gen) - 1;
- 	list_add(&iocg->active_list, &ioc->active_iocgs);
--	propagate_active_weight(iocg, iocg->weight,
--				iocg->last_inuse ?: iocg->weight);
-+	propagate_weights(iocg, iocg->weight,
-+			  iocg->last_inuse ?: iocg->weight);
  
- 	TRACE_IOCG_PATH(iocg_activate, iocg, now,
- 			last_period, cur_period, vtime);
-@@ -1384,13 +1384,13 @@ static void ioc_timer_fn(struct timer_list *timer)
- 		} else if (iocg_is_idle(iocg)) {
- 			/* no waiter and idle, deactivate */
- 			iocg->last_inuse = iocg->inuse;
--			__propagate_active_weight(iocg, 0, 0);
-+			__propagate_weights(iocg, 0, 0);
- 			list_del_init(&iocg->active_list);
- 		}
+@@ -2050,7 +2051,7 @@ static struct blkcg_policy_data *ioc_cpd_alloc(gfp_t gfp)
+ 	if (!iocc)
+ 		return NULL;
  
- 		spin_unlock(&iocg->waitq.lock);
+-	iocc->dfl_weight = CGROUP_WEIGHT_DFL;
++	iocc->dfl_weight = CGROUP_WEIGHT_DFL * WEIGHT_ONE;
+ 	return &iocc->cpd;
+ }
+ 
+@@ -2136,7 +2137,7 @@ static u64 ioc_weight_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
+ 	struct ioc_gq *iocg = pd_to_iocg(pd);
+ 
+ 	if (dname && iocg->cfg_weight)
+-		seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight);
++		seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight / WEIGHT_ONE);
+ 	return 0;
+ }
+ 
+@@ -2146,7 +2147,7 @@ static int ioc_weight_show(struct seq_file *sf, void *v)
+ 	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
+ 	struct ioc_cgrp *iocc = blkcg_to_iocc(blkcg);
+ 
+-	seq_printf(sf, "default %u\n", iocc->dfl_weight);
++	seq_printf(sf, "default %u\n", iocc->dfl_weight / WEIGHT_ONE);
+ 	blkcg_print_blkgs(sf, blkcg, ioc_weight_prfill,
+ 			  &blkcg_policy_iocost, seq_cft(sf)->private, false);
+ 	return 0;
+@@ -2172,7 +2173,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
+ 			return -EINVAL;
+ 
+ 		spin_lock(&blkcg->lock);
+-		iocc->dfl_weight = v;
++		iocc->dfl_weight = v * WEIGHT_ONE;
+ 		hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
+ 			struct ioc_gq *iocg = blkg_to_iocg(blkg);
+ 
+@@ -2203,7 +2204,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
  	}
--	commit_active_weights(ioc);
-+	commit_weights(ioc);
  
- 	/* calc usages and see whether some weights need to be moved around */
- 	list_for_each_entry(iocg, &ioc->active_iocgs, active_list) {
-@@ -1483,8 +1483,8 @@ static void ioc_timer_fn(struct timer_list *timer)
- 				TRACE_IOCG_PATH(inuse_takeback, iocg, &now,
- 						iocg->inuse, new_inuse,
- 						hw_inuse, new_hwi);
--				__propagate_active_weight(iocg, iocg->weight,
--							  new_inuse);
-+				__propagate_weights(iocg, iocg->weight,
-+						    new_inuse);
- 			}
- 		} else {
- 			/* genuninely out of vtime */
-@@ -1524,11 +1524,11 @@ static void ioc_timer_fn(struct timer_list *timer)
- 			TRACE_IOCG_PATH(inuse_giveaway, iocg, &now,
- 					iocg->inuse, new_inuse,
- 					hw_inuse, new_hwi);
--			__propagate_active_weight(iocg, iocg->weight, new_inuse);
-+			__propagate_weights(iocg, iocg->weight, new_inuse);
- 		}
- 	}
- skip_surplus_transfers:
--	commit_active_weights(ioc);
-+	commit_weights(ioc);
+ 	spin_lock(&iocg->ioc->lock);
+-	iocg->cfg_weight = v;
++	iocg->cfg_weight = v * WEIGHT_ONE;
+ 	weight_updated(iocg);
+ 	spin_unlock(&iocg->ioc->lock);
  
- 	/*
- 	 * If q is getting clogged or we're missing too much, we're issuing
-@@ -1753,7 +1753,7 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
- 		TRACE_IOCG_PATH(inuse_reset, iocg, &now,
- 				iocg->inuse, iocg->weight, hw_inuse, hw_active);
- 		spin_lock_irq(&ioc->lock);
--		propagate_active_weight(iocg, iocg->weight, iocg->weight);
-+		propagate_weights(iocg, iocg->weight, iocg->weight);
- 		spin_unlock_irq(&ioc->lock);
- 		current_hweight(iocg, &hw_active, &hw_inuse);
- 	}
-@@ -2114,7 +2114,7 @@ static void ioc_pd_free(struct blkg_policy_data *pd)
- 	if (ioc) {
- 		spin_lock_irqsave(&ioc->lock, flags);
- 		if (!list_empty(&iocg->active_list)) {
--			propagate_active_weight(iocg, 0, 0);
-+			propagate_weights(iocg, 0, 0);
- 			list_del_init(&iocg->active_list);
- 		}
- 		spin_unlock_irqrestore(&ioc->lock, flags);
 -- 
 2.26.2
 
