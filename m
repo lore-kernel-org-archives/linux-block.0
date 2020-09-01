@@ -2,155 +2,84 @@ Return-Path: <SRS0=kheS=CK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 422DAC433E2
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 05:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B32C433E2
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 05:38:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21DA321527
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 05:34:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57415208CA
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 05:38:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="N0law7Zr"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uQqpnV4Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726102AbgIAFeb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 01:34:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46884 "EHLO
+        id S1726020AbgIAFie (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 01:38:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbgIAFea (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 01:34:30 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F32C7C061290;
-        Mon, 31 Aug 2020 22:34:29 -0700 (PDT)
+        with ESMTP id S1725930AbgIAFid (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 01:38:33 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 661E5C061290;
+        Mon, 31 Aug 2020 22:38:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZSo4Kk3lGyfakbzAOPf8+T3dlZFXdTrrp8cG3ND3CNc=; b=N0law7ZrT/Xc3xr2dooUsCVfPc
-        nZkvh3GnonhgfEn5o5VQ6gOZA65oAMMu5Iz9sI+Z3RWX/372JQxqtjkiXBBGTmgCuugQECYCkv1+u
-        Q7LmtbnpzGMZxpYhvM3KfSmgZwj10w1zrk/m5Njt/q2fKA5CtBErJfDWv5hINfAyY0Jjp2i5p4IIl
-        TGdGrjgtvxwY7t2CGWm+NZWgQVECHmx/gmN1L6VeSNUVJO7IK+bw8FkuDLmi9OG6NkjvXI+zGvW6s
-        ibS07B5cYF8p7v5Dx+gbtRN7Pg7NqvkVqahCgo3F6tehsPKsz9MlrCZmh7kFZ96T8vA4Rt8M1vWk4
-        5439Eg7w==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kCyw6-0007KE-DH; Tue, 01 Sep 2020 05:34:26 +0000
-Date:   Tue, 1 Sep 2020 06:34:26 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 04/11] block: Add bio_for_each_thp_segment_all
-Message-ID: <20200901053426.GB24560@infradead.org>
-References: <20200824151700.16097-1-willy@infradead.org>
- <20200824151700.16097-5-willy@infradead.org>
- <20200827084431.GA15909@infradead.org>
- <20200831194837.GJ14765@casper.infradead.org>
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=74ARs/QLVt0FtIH6XZq1/tIKx5RoEbX/1dBxjgtPyXo=; b=uQqpnV4Z8fohmyamj23JkpBaND
+        7/ZzYrkKs48eP7mR7t/ymk7r5XXIwa+++KZN2Ek4YFgf22uprngL/NZ6HKYpuVFnRH9vukA8l9j7i
+        i98hI2wHyZdADe6Clv3kaIz9+pyBL2zKIl8QN9kplzfy4WXy1pDpDPd7pHXWzrJAODsfCT3Idk3Yq
+        vl18o7tm3wuU9Yu890Avx+cFxmj5bi349JejbPvAmrUWMPqaecJsFaGNSVE18Yvyzqi8q+X+8RZSa
+        dTN7AcxOGbm7U+yqZxRBSsCddIBsVQ+fbxrRpYcZm21f9iI8DS5utnlFoOyfc8t64upZoy7AekpUP
+        8TGxKvMA==;
+Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac] (helo=smtpauth.infradead.org)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kCz01-0000U6-2P; Tue, 01 Sep 2020 05:38:29 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>, Karel Zak <kzak@redhat.com>,
+        Paul Gortmaker <paul.gortmaker@windriver.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Martin Mares <mj@ucw.cz>, linux-video@atrey.karlin.mff.cuni.cz,
+        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
+        linux-doc@vger.kernel.org
+Subject: [RFC PATCH 0/2] Documentation/admin-guide: remove use of "rdev"
+Date:   Mon, 31 Aug 2020 22:38:20 -0700
+Message-Id: <20200901053822.9374-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200831194837.GJ14765@casper.infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 31, 2020 at 08:48:37PM +0100, Matthew Wilcox wrote:
-> static void iomap_read_end_io(struct bio *bio)
-> {
->         int i, error = blk_status_to_errno(bio->bi_status);
-> 
->         for (i = 0; i < bio->bi_vcnt; i++) {
->                 struct bio_vec *bvec = &bio->bi_io_vec[i];
 
-This should probably use bio_for_each_bvec_all instead of directly
-poking into the bio.  I'd also be tempted to move the loop body into
-a separate helper, but that's just a slight stylistic preference.
+Remove mention of using "rdev" to set boot device, video mode,
+or ramdisk information for the booting kernel.
 
->                 size_t offset = bvec->bv_offset;
->                 size_t length = bvec->bv_len;
->                 struct page *page = bvec->bv_page;
-> 
->                 while (length > 0) { 
->                         size_t count = thp_size(page) - offset;
->                         
->                         if (count > length)
->                                 count = length;
->                         iomap_read_page_end_io(page, offset, count, error);
->                         page += (offset + count) / PAGE_SIZE;
+FIX patch 1/2 Subject:
 
-Shouldn't the page_size here be thp_size?
+Cc: Karel Zak <kzak@redhat.com>
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Martin Mares <mj@ucw.cz>
+Cc: linux-video@atrey.karlin.mff.cuni.cz
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-doc@vger.kernel.org
 
-> Maybe I'm missing something important here, but it's significantly
-> simpler code -- iomap_read_end_io() goes down from 816 bytes to 560 bytes
-> (256 bytes less!) iomap_read_page_end_io is inlined into it both before
-> and after.
 
-Yes, that's exactly why I think avoiding bio_for_each_segment_all is
-a good idea in general.
+ [RFC PATCH 1/2] Documentation/admin-guide: README & svga: remove use of "rdev"
+ [RFC PATCH 2/2] Documentation/admin-guide: blockdev/ramdisk: remove use of "rdev"
 
-> There is some weirdness going on with regards to bv_offset that I don't
-> quite understand.  In the original bvec_advance:
-> 
->                 bv->bv_page = bvec->bv_page + (bvec->bv_offset >> PAGE_SHIFT);
->                 bv->bv_offset = bvec->bv_offset & ~PAGE_MASK;
-> 
-> which I cargo-culted into bvec_thp_advance as:
-> 
->                 bv->bv_page = thp_head(bvec->bv_page +
->                                 (bvec->bv_offset >> PAGE_SHIFT));
->                 page_size = thp_size(bv->bv_page);
->                 bv->bv_offset = bvec->bv_offset -
->                                 (bv->bv_page - bvec->bv_page) * PAGE_SIZE;
-> 
-> Is it possible to have a bvec with an offset that is larger than the
-> size of bv_page?  That doesn't seem like a useful thing to do, but
-> if that needs to be supported, then the code up top doesn't do that.
-> We maybe gain a little bit by counting length down to 0 instead of
-> counting it up to bv_len.  I dunno; reading the code over now, it
-> doesn't seem like that much of a difference.
-
-Drivers can absolutely see a bv_offset that is larger due to bio
-splitting.  However the submitting file system should never see one
-unless it creates one, which would be stupid.
-
-And yes, eventually bv_page and bv_offset should be replaced with a
-
-	phys_addr_t		bv_phys;
-
-and life would become simpler in many places (and the bvec would
-shrink for most common setups as well).
-
-For now I'd end up with something like:
-
-static void iomap_read_end_bvec(struct page *page, size_t offset,
-		size_t length, int error)
-{
-	while (length > 0) {
-		size_t page_size = thp_size(page);
-		size_t count = min(page_size - offset, length);
-
-		iomap_read_page_end_io(page, offset, count, error);
-
-		page += (offset + count) / page_size;
-		length -= count;
-		offset = 0;
-	}
-}
-
-static void iomap_read_end_io(struct bio *bio)
-{
-	int i, error = blk_status_to_errno(bio->bi_status);
-	struct bio_vec *bvec;
-
-	bio_for_each_bvec_all(bvec, bio, i)
-		iomap_read_end_bvec(bvec->bv_page, bvec->bv_offset,
-				    bvec->bv_len, error;
-        bio_put(bio);
-}
-
-and maybe even merge iomap_read_page_end_io into iomap_read_end_bvec.
+ Documentation/admin-guide/README.rst            |    6 -
+ Documentation/admin-guide/blockdev/ramdisk.rst  |   70 ++++----------
+ Documentation/admin-guide/kernel-parameters.txt |    9 -
+ Documentation/admin-guide/svga.rst              |    6 -
+ 4 files changed, 33 insertions(+), 58 deletions(-)
