@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C53C433E7
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1015DC433E2
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:56:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA3722065F
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:56:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAE822065F
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:56:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598986600;
-	bh=WmkvbDJV3kLEMgwSnIJuHS45TOkt8O7tRuqHH2svG/w=;
+	s=default; t=1598986608;
+	bh=3s2Yw/bNvP1WTiAnTgIEY8ngBX73M0ZoeCaoNpDReWg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=2MBy9bOmSQYpapAYyCtsNSaujcT/bEpF+jHzUKwjy2jF5jW1/ACd7LPpvGYm9Zwfj
-	 osxJQGqm8Ae8gPKBdNMhH71RF6Hegk7IoAL7X3CpAm02Ov6wcRi5k9qw0pEjekufkw
-	 d577/rrai8CQ7s23n/3JfAMgAqSWKriAxidp/ikg=
+	b=ZnHmT/pmdOWWr+thsvZ7EcFqTU6fdmiDo/ovls7vKA8fhvxEkmYghcnxPbSzmi/qU
+	 xmCUXCjDeWkB4mciBBXCntIEOA3J8jKfOdZIAX6Q0PjpDuvI2NcMKzenxq8X55TC0V
+	 CxZsdLVbyqkwNVj13F/529o7qNZSZ9QrBb3JR+Ng=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731475AbgIASxY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 14:53:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57434 "EHLO
+        id S1731375AbgIASxR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 14:53:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731390AbgIASxV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 14:53:21 -0400
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A106C061246;
-        Tue,  1 Sep 2020 11:53:21 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id u3so1991228qkd.9;
-        Tue, 01 Sep 2020 11:53:21 -0700 (PDT)
+        with ESMTP id S1731329AbgIASxO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 14:53:14 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B55CC061244;
+        Tue,  1 Sep 2020 11:53:14 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id d27so1738848qtg.4;
+        Tue, 01 Sep 2020 11:53:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=a96NqVhWlH/6rbnaJHsSXmoP7NyH4YVeyS7xAuR4Ue8=;
-        b=Rl00dssZUwB0VlBF0vtS3UAVh028ZEmyWDony//gcOYbkr1LyexfkGRr2AguBVNakR
-         K9Ebkf/f1WXdvNiuOuHTGxQxRLnqr3R8Fm7YHS1XMUOlsM758If3x29KbUASRlcqgw30
-         vqtyL+ENveuwJjS5jDfPnVcikKUUEnxCOzWM6HwXiVJ/CZPghydNweK9CflK1x5ZGzrk
-         V2fj/o0wnwORTQvSZYBc3FYl5UTbNxX5tZhJvvqbb3rFrh3GCGYCrH9CnrGOi2q5PrwO
-         d6ktGCGprgljvf9/VpsSttymMRC1kzi+LXId7l4BQgp7cA1tElxDRWhoJafqSIslJER8
-         K1BQ==
+        bh=6GL4H8pij+pmYHNiyj1arTTHlbzqgLGjt59578Jx0II=;
+        b=Xf4/aamsMdEx/yZ2bHoNq1RdPJ9KMsJVCeiC8A/RGlXxqVkMePHHHhDwHH+qzmu/Y3
+         n9Syo9hvtP0Dk/O9OAH0ITX0S0NuKlDdBOMzhcDkbF+DbIoilxy3C+CFtyTCegiXXNMt
+         WYesuWY0HT6/xGbQDx0XwSiLZg9P61eYq+gHpIR0y80Ni8HrJBFwmgIgSMrw/5FWflN7
+         vOrHHnlsVjfz3cMRKdHZiiHy8AISdk3BmWqUmJ0KHnTJAnqNtlkwD3eDoGE5is9G1SGL
+         najP9zacapJk6+8W7bt8Eyk2nPn2jK5rQwhzr4vGDSCt7HI4iRt3uQFAngQACqLdfgV1
+         Up3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=a96NqVhWlH/6rbnaJHsSXmoP7NyH4YVeyS7xAuR4Ue8=;
-        b=aO+ONcOMMKxR8La9MLubJs5cqAn5tX3bbrL2CLWpJ/36L/ABI4hIoCTJKrAG1PNC4C
-         kcHj/UvilOQ4duWZlY00I9D4doI4gWegNmWZrgMdUdlT8sxe4uNe2pCi90n6MnVZXdOj
-         EnrIr038IJ41JXab3kVckZ33ewv2ZOmc9H7lH09TvvNyzrmeulDjrAht13KXKgMDz0wa
-         uCrN6+OYJ5XNxrbmUNo7I9xHIFImLlrZYLjTYCEfY1Kgo31LM1xaRHmY+A+La+ufJBhN
-         DQzN+aeHb93eKbJiFZySK6TN4MnEk71R7yoBsxOB1xG4O3ecewAIPv4Py7yEo5K+OVF8
-         EJtg==
-X-Gm-Message-State: AOAM533AyeJy4XMpAR0Jwfq0h8Acr5zlr35IvtsCCWOt2KB+yuo5wvVe
-        YcbjiEEOioWzg7PSInQf3mY=
-X-Google-Smtp-Source: ABdhPJzqAoMxEp76tyJMpXipznNzMrv+5slAYR8k+HgXrrZ63L+r8iQLKkluRa2/I3WVYJuB3DYV7g==
-X-Received: by 2002:a37:9a13:: with SMTP id c19mr3186201qke.48.1598986400192;
-        Tue, 01 Sep 2020 11:53:20 -0700 (PDT)
+        bh=6GL4H8pij+pmYHNiyj1arTTHlbzqgLGjt59578Jx0II=;
+        b=JJS5pgx+Z+P4dPvLPNDG48hzAqMQZNYDi0rP0mnawCCH3F7ApM4clQrzpGpoHD1g1c
+         GI91mbwLG3oRL5edGB7DrOtyUhGcn9EZ8aw1bGxJbkLdnBgrXEWvIZ55D7awE4DCWfTL
+         JogR515oHgRWNojrXq0ISntL4AvKH3c4LRQzRw8fK9Sj6n4SUqdpuo34vTadW7d9s1Ld
+         bliqEOrbDshDPELVGfDXKHtFBF3gGqWGy932JDbxnF4hgZ+gDNBtvTMsdQ21ky8jkRYs
+         tyC+2rWphwvEj+IN2lJFYJuj1SRu+N1rswJiiuy73Fu2EumJKjyQXQsHoD/2HAwcDg1B
+         nAeQ==
+X-Gm-Message-State: AOAM531LzZTtjP84xCYUekv0RqbGEEAQGUWL3S+xg7iIzW3grGosNsLM
+        1A5Y2uV7jd7A8bkTQDq3X34=
+X-Google-Smtp-Source: ABdhPJwHkifWm2B1bW1JcFTu2RFjKovzm3fFIpUxV9ynAzKVIGr+zS0GUgQjkWHtC3EJ2xRc0xilPQ==
+X-Received: by 2002:aed:2ce5:: with SMTP id g92mr3185524qtd.204.1598986393468;
+        Tue, 01 Sep 2020 11:53:13 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::1:a198])
-        by smtp.gmail.com with ESMTPSA id k3sm2317260qkb.95.2020.09.01.11.53.18
+        by smtp.gmail.com with ESMTPSA id x28sm2340852qki.55.2020.09.01.11.53.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 11:53:19 -0700 (PDT)
+        Tue, 01 Sep 2020 11:53:13 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org, kernel-team@fb.com, newella@fb.com,
         Tejun Heo <tj@kernel.org>
-Subject: [PATCH 05/27] blk-iocost: clamp inuse and skip noops in __propagate_weights()
-Date:   Tue,  1 Sep 2020 14:52:35 -0400
-Message-Id: <20200901185257.645114-6-tj@kernel.org>
+Subject: [PATCH 03/27] blk-iocost: use local[64]_t for percpu stat
+Date:   Tue,  1 Sep 2020 14:52:33 -0400
+Message-Id: <20200901185257.645114-4-tj@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901185257.645114-1-tj@kernel.org>
 References: <20200901185257.645114-1-tj@kernel.org>
@@ -80,35 +80,123 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-__propagate_weights() currently expects the callers to clamp inuse within
-[1, active], which is needlessly fragile. The inuse adjustment logic is
-going to be revamped, in preparation, let's make __propagate_weights() clamp
-inuse on entry.
-
-Also, make it avoid weight updates altogether if neither active or inuse is
-changed.
+blk-iocost has been reading percpu stat counters from remote cpus which on
+some archs can lead to torn reads in really rare occassions. Use local[64]_t
+for those counters.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-iocost.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ block/blk-iocost.c | 37 +++++++++++++++++++++++++++----------
+ 1 file changed, 27 insertions(+), 10 deletions(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 78e6919153d8..8dfe73dde2a8 100644
+index d37b55db2409..e2266e7692b4 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -897,7 +897,10 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse)
+@@ -179,6 +179,8 @@
+ #include <linux/parser.h>
+ #include <linux/sched/signal.h>
+ #include <linux/blk-cgroup.h>
++#include <asm/local.h>
++#include <asm/local64.h>
+ #include "blk-rq-qos.h"
+ #include "blk-stat.h"
+ #include "blk-wbt.h"
+@@ -373,8 +375,8 @@ struct ioc_params {
+ };
  
- 	lockdep_assert_held(&ioc->lock);
+ struct ioc_missed {
+-	u32				nr_met;
+-	u32				nr_missed;
++	local_t				nr_met;
++	local_t				nr_missed;
+ 	u32				last_met;
+ 	u32				last_missed;
+ };
+@@ -382,7 +384,7 @@ struct ioc_missed {
+ struct ioc_pcpu_stat {
+ 	struct ioc_missed		missed[2];
  
--	inuse = min(active, inuse);
-+	inuse = clamp_t(u32, inuse, 1, active);
+-	u64				rq_wait_ns;
++	local64_t			rq_wait_ns;
+ 	u64				last_rq_wait_ns;
+ };
+ 
+@@ -1278,8 +1280,8 @@ static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p
+ 		u64 this_rq_wait_ns;
+ 
+ 		for (rw = READ; rw <= WRITE; rw++) {
+-			u32 this_met = READ_ONCE(stat->missed[rw].nr_met);
+-			u32 this_missed = READ_ONCE(stat->missed[rw].nr_missed);
++			u32 this_met = local_read(&stat->missed[rw].nr_met);
++			u32 this_missed = local_read(&stat->missed[rw].nr_missed);
+ 
+ 			nr_met[rw] += this_met - stat->missed[rw].last_met;
+ 			nr_missed[rw] += this_missed - stat->missed[rw].last_missed;
+@@ -1287,7 +1289,7 @@ static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p
+ 			stat->missed[rw].last_missed = this_missed;
+ 		}
+ 
+-		this_rq_wait_ns = READ_ONCE(stat->rq_wait_ns);
++		this_rq_wait_ns = local64_read(&stat->rq_wait_ns);
+ 		rq_wait_ns += this_rq_wait_ns - stat->last_rq_wait_ns;
+ 		stat->last_rq_wait_ns = this_rq_wait_ns;
+ 	}
+@@ -1908,6 +1910,7 @@ static void ioc_rqos_done_bio(struct rq_qos *rqos, struct bio *bio)
+ static void ioc_rqos_done(struct rq_qos *rqos, struct request *rq)
+ {
+ 	struct ioc *ioc = rqos_to_ioc(rqos);
++	struct ioc_pcpu_stat *ccs;
+ 	u64 on_q_ns, rq_wait_ns, size_nsec;
+ 	int pidx, rw;
+ 
+@@ -1931,13 +1934,17 @@ static void ioc_rqos_done(struct rq_qos *rqos, struct request *rq)
+ 	rq_wait_ns = rq->start_time_ns - rq->alloc_time_ns;
+ 	size_nsec = div64_u64(calc_size_vtime_cost(rq, ioc), VTIME_PER_NSEC);
+ 
++	ccs = get_cpu_ptr(ioc->pcpu_stat);
 +
-+	if (active == iocg->active && inuse == iocg->inuse)
-+		return;
+ 	if (on_q_ns <= size_nsec ||
+ 	    on_q_ns - size_nsec <= ioc->params.qos[pidx] * NSEC_PER_USEC)
+-		this_cpu_inc(ioc->pcpu_stat->missed[rw].nr_met);
++		local_inc(&ccs->missed[rw].nr_met);
+ 	else
+-		this_cpu_inc(ioc->pcpu_stat->missed[rw].nr_missed);
++		local_inc(&ccs->missed[rw].nr_missed);
++
++	local64_add(rq_wait_ns, &ccs->rq_wait_ns);
  
- 	for (lvl = iocg->level - 1; lvl >= 0; lvl--) {
- 		struct ioc_gq *parent = iocg->ancestors[lvl];
+-	this_cpu_add(ioc->pcpu_stat->rq_wait_ns, rq_wait_ns);
++	put_cpu_ptr(ccs);
+ }
+ 
+ static void ioc_rqos_queue_depth_changed(struct rq_qos *rqos)
+@@ -1977,7 +1984,7 @@ static int blk_iocost_init(struct request_queue *q)
+ {
+ 	struct ioc *ioc;
+ 	struct rq_qos *rqos;
+-	int ret;
++	int i, cpu, ret;
+ 
+ 	ioc = kzalloc(sizeof(*ioc), GFP_KERNEL);
+ 	if (!ioc)
+@@ -1989,6 +1996,16 @@ static int blk_iocost_init(struct request_queue *q)
+ 		return -ENOMEM;
+ 	}
+ 
++	for_each_possible_cpu(cpu) {
++		struct ioc_pcpu_stat *ccs = per_cpu_ptr(ioc->pcpu_stat, cpu);
++
++		for (i = 0; i < ARRAY_SIZE(ccs->missed); i++) {
++			local_set(&ccs->missed[i].nr_met, 0);
++			local_set(&ccs->missed[i].nr_missed, 0);
++		}
++		local64_set(&ccs->rq_wait_ns, 0);
++	}
++
+ 	rqos = &ioc->rqos;
+ 	rqos->id = RQ_QOS_COST;
+ 	rqos->ops = &ioc_rqos_ops;
 -- 
 2.26.2
 
