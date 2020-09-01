@@ -2,74 +2,77 @@ Return-Path: <SRS0=kheS=CK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F59C433E2
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0B1C433E6
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:53:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8D3C2078B
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DCDE208CA
+	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 18:53:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598986393;
-	bh=miBk1e3rqyCQgjx7M/wX82iNjjjzxP8l0Zp5anwjEzs=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=jtlUS0xCLvYXkDpVT8qHZNo3VUAEYxxsfiE4DLDXqwrBCqX1er00BwFx2wsPu2pc5
-	 7xnZrvwxcJkQHmlz7xC90y/ixc2gi/JB8ohwLzIoufkJDLCDG7OxFtBxaQx1Oy0Vx7
-	 qHvPuYDVkCsBaQuZK0/nnBpvcw+2diPpbSJhlxag=
+	s=default; t=1598986404;
+	bh=jvJdrpAAo40Nsx3hqA1wXCNYFE9ZPHATEN5rd1230to=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=PJ6MVSCkYmMKHKQEdYn034gWSh/i53hHidCehRzW7k5MOu+GUVOxkFKs7XEsiDUkV
+	 Few5KUlX94Arkz7SwVDQF/7VmMlcoR07a6LmbA9E3kfbA4tePxfZcdZGw8pc6UNWDK
+	 AtuV7cqOyDtEAJFkCsNtjkXWpqGg3kt6g8Zn1H64=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731247AbgIASxJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 14:53:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57366 "EHLO
+        id S1730462AbgIASxV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 14:53:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbgIASxC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 14:53:02 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4753C061244;
-        Tue,  1 Sep 2020 11:53:01 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id z2so1730298qtv.12;
-        Tue, 01 Sep 2020 11:53:01 -0700 (PDT)
+        with ESMTP id S1731366AbgIASxR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 14:53:17 -0400
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E52BC061245;
+        Tue,  1 Sep 2020 11:53:16 -0700 (PDT)
+Received: by mail-qk1-x744.google.com with SMTP id b14so1999428qkn.4;
+        Tue, 01 Sep 2020 11:53:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=aT4PofSSAV/4Uz0nRqbPA+6cW6GzyIGarpofm1HYm5U=;
-        b=KHevFLIoVNyzIYnY/WEmliVjng0ASRrMatTBReOEcDHUqvZHsJHzD5Ck3aWSucz8lx
-         RM7rcSa32POkT5nQ0He0gcJ1/N/Q3F6FSwIFq6QXe1s8nSjpSQKF0QfNKqI5v7DVE3jw
-         dSO3EnndfgS26GQpGbmZOcW5dBRNFNT+/Ye6H+so8vfcxMkRcM2JdAdF2sNZ+oS7L05a
-         utqwa8PmFFQBEFFktZO8vIqnLTXZyhRCYQPZM+5hm5ZohhM6qh+IAzwNa5qnTuW9JEh0
-         tW6ajDIUwUn+spaRZKWHi/za/WAVrousISxNYdlTeZ/etnQz4fbuHGeWSpw5F8h/hJyI
-         TtRw==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Abijl0OmP6VYSflgQEhNpTgXbVq6GxdxWWrhkCH99jc=;
+        b=BYrK0zSLvPdaANXkzCXqODMBDKe5h7ipVdn2xiRVWxu7y4qoGlbLsat7aKgGV2NzAX
+         uA9xTg2W43pbV3T1KFcjp4McIbz8C7Z9y+4lVi0pNw5/4LtQdhb95BWCEs+uWaml2W9j
+         QvwuHJONksBt2KE09l+I1qkK15+vvKFyOd6venv28WwjFQaNa1WW0wUIiCKkvCB1qLG7
+         MIWBSC3WrHgH3Wa2mh62XUb7i74iR0JuJMWm91KrNQIIlLW7d/CPJhKqVvICdX41A4eB
+         UjHfd1CFFydEXixQ5tAReP0xL5GurO/+lMrr530F1YkcYn1cpAO3ght+hgZFzYk4wj5x
+         xFGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=aT4PofSSAV/4Uz0nRqbPA+6cW6GzyIGarpofm1HYm5U=;
-        b=D/ONMeK2RL/jDu9hM47keg0dHlFNgRjA5RrPJZ6/EA2mSFjAaJvNcTtTEwe2GgU9JZ
-         13j+FBEjL8v3lEabfpzHdifSzhuPXlaN/nKoB90fdms0Bfk7tZ9KLeug0l93bmfQwPyl
-         a7/NjWLFX3wZ5Zfqz99KiV7/thCiyzNBy3WRIV8zrjKZc8VcAmfavBdTai0fg502Wn+w
-         ijzp3smqz0V6cRaQ0Ta7hh/FgjSzi5KCWSd8gHaAN5+oDA+Zzv/+ddtx4dpUc6xYROrS
-         s73OYOkzKkH2gCrSxROMPA72vDGBYSMw+zeKJE8xikLLVcGkOuSrD62mEUWBkX+gUjCt
-         8aUw==
-X-Gm-Message-State: AOAM530GUEZWpOIXw5Iwun0RYqRJjm77iKFPignyGNSVXL9rydp7undk
-        EdslgN6PQQfZ8BrD3L6g+PQ=
-X-Google-Smtp-Source: ABdhPJwftTO1H5MJ2Q/tp7NpaXQdBF30yPgiAJF7a86MFb02yazpgx5CsBrq7xNNC0ejcB56zCiWIg==
-X-Received: by 2002:ac8:4747:: with SMTP id k7mr3173654qtp.76.1598986380824;
-        Tue, 01 Sep 2020 11:53:00 -0700 (PDT)
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=Abijl0OmP6VYSflgQEhNpTgXbVq6GxdxWWrhkCH99jc=;
+        b=LEAWWam4DJRaLQDfj+KeAmzDBzEb3g0wtqDmIuTZLCam26ei5a7mrFORjU4Z8KcVqA
+         U+8+LbF8f+koQIYyFFZ1rOrPdgjmp76iDmHk6OW8jSNeidwFxigCdxVssSxzaDtNkivF
+         J7udIkFEdgzsQyclInZYcYeevuNu1hHh/lD3D7ALyxmHb+Ji29o45J/fFLeXbYwgaKRn
+         /U3RSfO6fkWkacY2Cx18UD9dzUPxw0XCbwFD0D+0UcptQBSUEiOQyEM4lI5n+Brxlnze
+         3/7Z/CCYhjM4NB+PC551uTNM+xtp6glykFzUtuWNWr6EE4pbiScr0Nk/Rx3sRsloBNND
+         39eQ==
+X-Gm-Message-State: AOAM533kUB5osBHtYdwTWt4Z1nZ0uttLrKQon9+zFCIjN42I9uJdwsX+
+        H8EjjD8vyatAQcSX2rwuRTFUjcz/UK84CQ==
+X-Google-Smtp-Source: ABdhPJzlYRM4F4sUXjrbVokCMMwmBNVn4u2vGXfHZMYyyB+m9IRWMAArmA9lx0GWSsYbD7bh8ienXQ==
+X-Received: by 2002:a37:9a13:: with SMTP id c19mr3185912qke.48.1598986395712;
+        Tue, 01 Sep 2020 11:53:15 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::1:a198])
-        by smtp.gmail.com with ESMTPSA id d12sm2394189qka.34.2020.09.01.11.52.59
+        by smtp.gmail.com with ESMTPSA id k6sm1864377qti.23.2020.09.01.11.53.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 11:53:00 -0700 (PDT)
+        Tue, 01 Sep 2020 11:53:14 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@fb.com, newella@fb.com
-Subject: [PATCHSET for-5.10/block] blk-iocost: iocost: improve donation, debt and excess handling
-Date:   Tue,  1 Sep 2020 14:52:30 -0400
-Message-Id: <20200901185257.645114-1-tj@kernel.org>
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, newella@fb.com,
+        Tejun Heo <tj@kernel.org>
+Subject: [PATCH 04/27] blk-iocost: rename propagate_active_weights() to propagate_weights()
+Date:   Tue,  1 Sep 2020 14:52:34 -0400
+Message-Id: <20200901185257.645114-5-tj@kernel.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200901185257.645114-1-tj@kernel.org>
+References: <20200901185257.645114-1-tj@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -77,146 +80,155 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+It already propagates two weights - active and inuse - and there will be
+another soon. Let's drop the confusing misnomers. Rename
+[__]propagate_active_weights() to [__]propagate_weights() and
+commit_active_weights() to commit_weights().
 
-This patchset improves iocost in three areas to make iocost internal
-operations more accurate and immediate with the goal of improving work
-conservation and distribution fairness, and removing dependence on vrate
-adjustments for masking work conservation issues. This improves overall
-control quality and allows regulating vrate more tightly for more consistent
-behavior as vrate now only needs to respond to device behavior changes.
+This is pure rename.
 
-1. Donation
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+ block/blk-iocost.c | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
 
-iocost implements work-conservation by making under-utliized cgroups to
-donate unused budgets to saturated cgroups. This approach has the
-significant advantage that calculation or synchronization inaccuracies never
-lead to over utilization of the device while allowing all hot path
-operations to be local to each cgroup - it's inherently safe w/o needing
-system-wide synchronization in hot paths.
-
-However, this approach requires dynamically adjusting weights according to
-the current usage of each cgroup. Given that a cgroup with weight X is using
-only a portion of its hierarchical absoulte share, it needs to scale down X
-so that the share matches the observed usage. With nesting and multiple
-nodes needing adjustments at once, the math is non-trivial. The current
-implementation works around the issue by trying to converge by repeatedly
-under-adjusting the weight of each cgroup.
-
-The innate inaccuracies can lead to significant errors impacting work
-conservation and fairness, and the workarounds around them weigh down the
-rest of the control logic.
-
-Andy Newell devised a method to calculate the exact weight updates given the
-target hierarchical shares which is described in the following pdfs.
-
-  https://drive.google.com/file/d/1PsJwxPFtjUnwOY1QJ5AeICCcsL7BM3bo
-  https://drive.google.com/file/d/1vONz1-fzVO7oY5DXXsLjSxEtYYQbOvsE
-  https://drive.google.com/file/d/1WcrltBOSPN0qXVdBgnKm4mdp9FhuEFQN
-
-This patchset implements Andy's method for precise donation weight
-adjustments on each period timer.
-
-Donation amount is also adjusted during a period if the donor is running out
-of budget. This mechanism used to be very coarse as donation calculations
-weren't accurate to begin with. Now that donation calculations are exact,
-this patchset improves in-period adjustments too.
-
-2. Debt
-
-Some IOs which are attributed to a low priority cgroup can cause severe
-priority inversions when blocked - e.g. swap outs and filesystem metadata
-IOs. These IOs are issued right away even when the cgroup doesn't have
-enough budget. When this happens, the cgroup incurs debt, which the cgroup
-has to pay off before issuing more IOs.
-
-There were several issues around debt handling around how weight is adjusted
-while under debt, how payment is calculated, and how anonymous memory delay
-duration is determined. This patchset fixes and improves debt handling and
-adds debt forgiveness mechanism which avoids extended pathological stalling
-on very slow devices.
-
-3. Excess handling
-
-During a period, each cgroup mostly runs on its own without constantly
-synchronizing with other cgroups. This often leads to excess budget which
-needs to be thrown away at the end of the period, which can have negative
-impact on work conservation. This is somewhat offset by vrate adjustments
-but vrate compensation is delayed and can sometimes be erratic and it
-prevents us from confining vrate for more consistent behavior.
-
-This patchset implements excess vrate compensation where the effective vrate
-is transparently boosted to compensate for excesses without affecting the
-regular latency based vrate adjustment mechanism. This compensates for
-excesses immediately and accurately and allows the regular vrate adjustment
-mechanism to worry only about device behavior changes.
-
-
-This patchset is on top of for-5.10/block (2b64038972e4) and availalbe in
-the following git branch.
-
- git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git iocost-andys
-
-It contains the following 27 patches.
-
- 0001-blk-iocost-ioc_pd_free-shouldn-t-assume-irq-disabled.patch
- 0002-blk-stat-make-q-stats-lock-irqsafe.patch
- 0003-blk-iocost-use-local-64-_t-for-percpu-stat.patch
- 0004-blk-iocost-rename-propagate_active_weights-to-propag.patch
- 0005-blk-iocost-clamp-inuse-and-skip-noops-in-__propagate.patch
- 0006-blk-iocost-move-iocg_kick_delay-above-iocg_kick_wait.patch
- 0007-blk-iocost-make-iocg_kick_waitq-call-iocg_kick_delay.patch
- 0008-blk-iocost-s-HWEIGHT_WHOLE-WEIGHT_ONE-g.patch
- 0009-blk-iocost-use-WEIGHT_ONE-based-fixed-point-number-f.patch
- 0010-blk-iocost-make-ioc_now-now-and-ioc-period_at-64bit.patch
- 0011-blk-iocost-streamline-vtime-margin-and-timer-slack-h.patch
- 0012-blk-iocost-grab-ioc-lock-for-debt-handling.patch
- 0013-blk-iocost-add-absolute-usage-stat.patch
- 0014-blk-iocost-calculate-iocg-usages-from-iocg-local_sta.patch
- 0015-blk-iocost-replace-iocg-has_surplus-with-surplus_lis.patch
- 0016-blk-iocost-decouple-vrate-adjustment-from-surplus-tr.patch
- 0017-blk-iocost-restructure-surplus-donation-logic.patch
- 0018-blk-iocost-implement-Andy-s-method-for-donation-weig.patch
- 0019-blk-iocost-revamp-donation-amount-determination.patch
- 0020-blk-iocost-revamp-in-period-donation-snapbacks.patch
- 0021-blk-iocost-revamp-debt-handling.patch
- 0022-blk-iocost-implement-delay-adjustment-hysteresis.patch
- 0023-blk-iocost-halve-debts-if-device-stays-idle.patch
- 0024-blk-iocost-implement-vtime-loss-compensation.patch
- 0025-blk-iocost-restore-inuse-update-tracepoints.patch
- 0026-blk-iocost-add-three-debug-stat-cost.wait-indebt-and.patch
- 0027-blk-iocost-update-iocost_monitor.py.patch
-
-0001-0002 are fixes w/ stable cc'd.
-
-0003-0012 are prep patches - increasing calculation precision for weights,
-switching some fields to 64bit, code reorganization, locking changes and so
-on.
-
-0013-0014 implement per-cgroup absolute usage tracking so that control
-decisions aren't affected by weight distribution changes.
-
-0015-0017 restructure donation logic to prepare for Andy's weight adjustment
-method.
-
-0018-0020 implement Andy's weight adjustment method, improve donation logic
-both on period and in period.
-
-0021-0023 improve debt and delay handling.
-
-0024 implements budget excess compensation.
-
-0025-0027 update tracepoints, monitoring script, debug stat.
-
-diffstat follows. Thanks.
-
- block/blk-cgroup.c             |   23 
- block/blk-iocost.c             | 1540 +++++++++++++++++++++++++++++++----------
- block/blk-stat.c               |   17 
- include/trace/events/iocost.h  |   26 
- tools/cgroup/iocost_monitor.py |   54 -
- 5 files changed, 1227 insertions(+), 433 deletions(-)
-
---
-tejun
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index e2266e7692b4..78e6919153d8 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -479,7 +479,7 @@ struct ioc_gq {
+ 	atomic64_t			active_period;
+ 	struct list_head		active_list;
+ 
+-	/* see __propagate_active_weight() and current_hweight() for details */
++	/* see __propagate_weights() and current_hweight() for details */
+ 	u64				child_active_sum;
+ 	u64				child_inuse_sum;
+ 	int				hweight_gen;
+@@ -890,7 +890,7 @@ static void ioc_start_period(struct ioc *ioc, struct ioc_now *now)
+  * Update @iocg's `active` and `inuse` to @active and @inuse, update level
+  * weight sums and propagate upwards accordingly.
+  */
+-static void __propagate_active_weight(struct ioc_gq *iocg, u32 active, u32 inuse)
++static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse)
+ {
+ 	struct ioc *ioc = iocg->ioc;
+ 	int lvl;
+@@ -935,7 +935,7 @@ static void __propagate_active_weight(struct ioc_gq *iocg, u32 active, u32 inuse
+ 	ioc->weights_updated = true;
+ }
+ 
+-static void commit_active_weights(struct ioc *ioc)
++static void commit_weights(struct ioc *ioc)
+ {
+ 	lockdep_assert_held(&ioc->lock);
+ 
+@@ -947,10 +947,10 @@ static void commit_active_weights(struct ioc *ioc)
+ 	}
+ }
+ 
+-static void propagate_active_weight(struct ioc_gq *iocg, u32 active, u32 inuse)
++static void propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse)
+ {
+-	__propagate_active_weight(iocg, active, inuse);
+-	commit_active_weights(iocg->ioc);
++	__propagate_weights(iocg, active, inuse);
++	commit_weights(iocg->ioc);
+ }
+ 
+ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep)
+@@ -966,9 +966,9 @@ static void current_hweight(struct ioc_gq *iocg, u32 *hw_activep, u32 *hw_inusep
+ 		goto out;
+ 
+ 	/*
+-	 * Paired with wmb in commit_active_weights().  If we saw the
+-	 * updated hweight_gen, all the weight updates from
+-	 * __propagate_active_weight() are visible too.
++	 * Paired with wmb in commit_weights(). If we saw the updated
++	 * hweight_gen, all the weight updates from __propagate_weights() are
++	 * visible too.
+ 	 *
+ 	 * We can race with weight updates during calculation and get it
+ 	 * wrong.  However, hweight_gen would have changed and a future
+@@ -1018,7 +1018,7 @@ static void weight_updated(struct ioc_gq *iocg)
+ 
+ 	weight = iocg->cfg_weight ?: iocc->dfl_weight;
+ 	if (weight != iocg->weight && iocg->active)
+-		propagate_active_weight(iocg, weight,
++		propagate_weights(iocg, weight,
+ 			DIV64_U64_ROUND_UP(iocg->inuse * weight, iocg->weight));
+ 	iocg->weight = weight;
+ }
+@@ -1090,8 +1090,8 @@ static bool iocg_activate(struct ioc_gq *iocg, struct ioc_now *now)
+ 	 */
+ 	iocg->hweight_gen = atomic_read(&ioc->hweight_gen) - 1;
+ 	list_add(&iocg->active_list, &ioc->active_iocgs);
+-	propagate_active_weight(iocg, iocg->weight,
+-				iocg->last_inuse ?: iocg->weight);
++	propagate_weights(iocg, iocg->weight,
++			  iocg->last_inuse ?: iocg->weight);
+ 
+ 	TRACE_IOCG_PATH(iocg_activate, iocg, now,
+ 			last_period, cur_period, vtime);
+@@ -1384,13 +1384,13 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 		} else if (iocg_is_idle(iocg)) {
+ 			/* no waiter and idle, deactivate */
+ 			iocg->last_inuse = iocg->inuse;
+-			__propagate_active_weight(iocg, 0, 0);
++			__propagate_weights(iocg, 0, 0);
+ 			list_del_init(&iocg->active_list);
+ 		}
+ 
+ 		spin_unlock(&iocg->waitq.lock);
+ 	}
+-	commit_active_weights(ioc);
++	commit_weights(ioc);
+ 
+ 	/* calc usages and see whether some weights need to be moved around */
+ 	list_for_each_entry(iocg, &ioc->active_iocgs, active_list) {
+@@ -1483,8 +1483,8 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 				TRACE_IOCG_PATH(inuse_takeback, iocg, &now,
+ 						iocg->inuse, new_inuse,
+ 						hw_inuse, new_hwi);
+-				__propagate_active_weight(iocg, iocg->weight,
+-							  new_inuse);
++				__propagate_weights(iocg, iocg->weight,
++						    new_inuse);
+ 			}
+ 		} else {
+ 			/* genuninely out of vtime */
+@@ -1524,11 +1524,11 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 			TRACE_IOCG_PATH(inuse_giveaway, iocg, &now,
+ 					iocg->inuse, new_inuse,
+ 					hw_inuse, new_hwi);
+-			__propagate_active_weight(iocg, iocg->weight, new_inuse);
++			__propagate_weights(iocg, iocg->weight, new_inuse);
+ 		}
+ 	}
+ skip_surplus_transfers:
+-	commit_active_weights(ioc);
++	commit_weights(ioc);
+ 
+ 	/*
+ 	 * If q is getting clogged or we're missing too much, we're issuing
+@@ -1753,7 +1753,7 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+ 		TRACE_IOCG_PATH(inuse_reset, iocg, &now,
+ 				iocg->inuse, iocg->weight, hw_inuse, hw_active);
+ 		spin_lock_irq(&ioc->lock);
+-		propagate_active_weight(iocg, iocg->weight, iocg->weight);
++		propagate_weights(iocg, iocg->weight, iocg->weight);
+ 		spin_unlock_irq(&ioc->lock);
+ 		current_hweight(iocg, &hw_active, &hw_inuse);
+ 	}
+@@ -2114,7 +2114,7 @@ static void ioc_pd_free(struct blkg_policy_data *pd)
+ 	if (ioc) {
+ 		spin_lock_irqsave(&ioc->lock, flags);
+ 		if (!list_empty(&iocg->active_list)) {
+-			propagate_active_weight(iocg, 0, 0);
++			propagate_weights(iocg, 0, 0);
+ 			list_del_init(&iocg->active_list);
+ 		}
+ 		spin_unlock_irqrestore(&ioc->lock, flags);
+-- 
+2.26.2
 
