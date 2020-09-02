@@ -2,139 +2,121 @@ Return-Path: <SRS0=rVNK=CL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2167FC433E2
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 18:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4EBC433E7
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 18:20:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC0EB206EB
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 18:02:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XtMa+Ddv"
+	by mail.kernel.org (Postfix) with ESMTP id ADAE020709
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 18:20:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727901AbgIBSCy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Sep 2020 14:02:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727895AbgIBSCv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 14:02:51 -0400
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D3C3C061247
-        for <linux-block@vger.kernel.org>; Wed,  2 Sep 2020 11:02:51 -0700 (PDT)
-Received: by mail-qk1-x742.google.com with SMTP id o5so502649qke.12
-        for <linux-block@vger.kernel.org>; Wed, 02 Sep 2020 11:02:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=vIBmK6vhWxHKs0ESDe7uLeTvdWL4ZGeuqEYmWXXwi70=;
-        b=XtMa+DdvvfIEqcBTjAdt2A/srePqSVhE7u/05tBy2zK091Utupe5n7cJvIaQCWomLm
-         DBnGBCclQpFoFWmfbmraXatp4c7vmdKro6TKJL7r6Q46O8PT55MzTFljP81yRVChOEDL
-         vW0AS+oMhYSt1YxCmtTL4V7AXWfNfGHroJKW42Y1AO9AkQg2M14Ghi4BfnxrWFHoD+/f
-         j6C2oHRMNfs+lvENIsVowmbAHaVchXQMCIHr+2PrenTx0GfnWL9THSf53U1PvjWnUNu1
-         SJ5QtfgloWuQnDSDHexlwmT+K6fePie4sJSijIXgH4eR1AVNJ9oW+l29QwAh4d10K9/G
-         LxUA==
+        id S1726247AbgIBSUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Sep 2020 14:20:41 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:43563 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726948AbgIBSUl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 14:20:41 -0400
+Received: by mail-pg1-f193.google.com with SMTP id d19so71324pgl.10
+        for <linux-block@vger.kernel.org>; Wed, 02 Sep 2020 11:20:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=vIBmK6vhWxHKs0ESDe7uLeTvdWL4ZGeuqEYmWXXwi70=;
-        b=sNatpQTdtpxp1RUR/yXpOC4amKwKDJRwCUZXYHMD0fVkyppntc4fX7j7JE+VMGbi8C
-         oeAewN9r+r5+MoMaHEAW0PFKF3WOHml553nnKzMw/Af9MIrbZMb9NAUO6HMnPotMqIGr
-         eKwmWkuxhMYjc9pbv0DOtxBkwayo2K0/VTueJaW01wgznI4UPhlTTzDynYPl2hKqL/LG
-         KxKF1bbxNUqYYBQ9H/48PuDHIllWGrHb1HLHTNfQtJzmHqqPx2iqoCLoYfqxJpcoa99e
-         TmP+Pp1TlXx6qaHWg1NgfBqcPHJvl2W6Uqm1ghheKM5bMRa3nEWPQqVlcUEqdUL+SVjM
-         gJKw==
-X-Gm-Message-State: AOAM531llffRnjb6CA04Uk5NemeHMYlttboSaQrjKG83X0sBnU9y7ksJ
-        khwrOGg4pF3haw80lv6J+8Y=
-X-Google-Smtp-Source: ABdhPJxh4bvVqdx4jTSEyzKQqDoihYZ1SjWbcCZtlvmyVjXHii7UmKhk8J7z1pGn28RKclTIuz6+Bw==
-X-Received: by 2002:a05:620a:1025:: with SMTP id a5mr8206499qkk.490.1599069770211;
-        Wed, 02 Sep 2020 11:02:50 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id i7sm246793qkb.131.2020.09.02.11.02.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2020 11:02:49 -0700 (PDT)
-Date:   Wed, 2 Sep 2020 14:02:48 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Ye Bin <yebin10@huawei.com>
-Subject: [git pull] device mapper fixes for 5.9-rc4
-Message-ID: <20200902180248.GA32957@lobo>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=V+9Z21nrPIFSzJSNBlRzAi6RLU5IBprT045OWvuPvGE=;
+        b=bDCi2OfnY0u9s7INbwsRpZ4wZuyoEartHJ2QTddiWHHCtjNBDV5mLVHZugwbJF4YP7
+         CCyw7BnoYdpAIJ8/uVDjU1jogdNMyogLfmkv6ew3A8LRcgwxKhciH0ozArci4UXagklY
+         FFVW2LW+Yh6yP47HBOOLe8V4YD8jlitiSoFwLB5b2YBff1ZdaiBrXx6WgzLzSRndCwD5
+         gK1QFhF0h8LIqisww0MKvK8G0bKriu/IcfVMywOhuXWkzBGmySj2wOM5RT8yC4B4wU8G
+         +gjXeQ06/Kg78FfqYEBxJPthkFYrQX/g7CkPU3/kIqC6nYpTIlsAvKo8YHL4K4SWm2JJ
+         7IlA==
+X-Gm-Message-State: AOAM5337KmKKF0I52iAyv9QZL3EWEMIQnX9v8eCU34yzg+uFEM/cIBAi
+        9X6L/jash7HAv2SB7MO1hVA=
+X-Google-Smtp-Source: ABdhPJx6lfzBs/5/BqZ5Uf5ZdpLT5iQb+wO69HVguWWpe1AgmZyc8H8w9UZSZF9iifUMucZKtkVu8w==
+X-Received: by 2002:a63:455d:: with SMTP id u29mr2851809pgk.178.1599070839337;
+        Wed, 02 Sep 2020 11:20:39 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:4025:ed24:701e:8cf3? ([2601:647:4802:9070:4025:ed24:701e:8cf3])
+        by smtp.gmail.com with ESMTPSA id t10sm195824pfq.77.2020.09.02.11.20.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Sep 2020 11:20:38 -0700 (PDT)
+Subject: Re: [PATCH V2 0/2] blk-mq: implement queue quiesce via percpu_ref for
+ BLK_MQ_F_BLOCKING
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+References: <20200825141734.115879-1-ming.lei@redhat.com>
+ <20200902031144.GC317674@T590>
+ <aef6938d-3762-22bc-50c8-877ee0aa5700@kernel.dk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <c33d02c1-5806-94a3-86a8-4e7a6addb36a@grimberg.me>
+Date:   Wed, 2 Sep 2020 11:20:36 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <aef6938d-3762-22bc-50c8-877ee0aa5700@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
 
-The following changes since commit f75aef392f869018f78cfedf3c320a6b3fcfda6b:
+>>> Hi Jens,
+>>>
+>>> The 1st patch add .mq_quiesce_mutex for serializing quiesce/unquiesce,
+>>> and prepares for replacing srcu with percpu_ref.
+>>>
+>>> The 2nd patch replaces srcu with percpu_ref.
+>>>
+>>> V2:
+>>> 	- add .mq_quiesce_lock
+>>> 	- add comment on patch 2 wrt. handling hctx_lock() failure
+>>> 	- trivial patch style change
+>>>
+>>>
+>>> Ming Lei (2):
+>>>    blk-mq: serialize queue quiesce and unquiesce by mutex
+>>>    blk-mq: implement queue quiesce via percpu_ref for BLK_MQ_F_BLOCKING
 
-  Linux 5.9-rc3 (2020-08-30 16:01:54 -0700)
+I thought we agreed to have a little more consolidation for blocking and
+!blocking paths (move fallbacks to common paths).
 
-are available in the Git repository at:
+>>>
+>>>   block/blk-core.c       |   2 +
+>>>   block/blk-mq-sysfs.c   |   2 -
+>>>   block/blk-mq.c         | 125 +++++++++++++++++++++++------------------
+>>>   block/blk-sysfs.c      |   6 +-
+>>>   include/linux/blk-mq.h |   7 ---
+>>>   include/linux/blkdev.h |   6 ++
+>>>   6 files changed, 82 insertions(+), 66 deletions(-)
+>>>
+>>> Cc: Lai Jiangshan <jiangshanlai@gmail.com>
+>>> Cc: Paul E. McKenney <paulmck@kernel.org>
+>>> Cc: Josh Triplett <josh@joshtriplett.org>
+>>> Cc: Sagi Grimberg <sagi@grimberg.me>
+>>> Cc: Bart Van Assche <bvanassche@acm.org>
+>>> Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+>>> Cc: Chao Leng <lengchao@huawei.com>
+>>> Cc: Christoph Hellwig <hch@lst.de>
+>>
+>> Hello Guys,
+>>
+>> Is there any objections on the two patches? If not, I'd suggest to move> on.
+> 
+> Seems like the nested case is one that should either be handled, or at
+> least detected.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.9/dm-fixes
+Personally, I'd like to see the async quiesce piece as well here, which
+is the reason why this change was proposed. Don't see a strong urgency
+to move forward with it before that, especially as this could
+potentially affect various non-trivial reset flows.
 
-for you to fetch changes up to 3a653b205f29b3f9827a01a0c88bfbcb0d169494:
-
-  dm thin metadata: Fix use-after-free in dm_bm_set_read_only (2020-09-02 13:38:40 -0400)
-
-Please pull, thanks!
-Mike
-
-----------------------------------------------------------------
-- DM writecache fix to allow dax_direct_access() to partitioned pmem
-  devices.
-
-- DM multipath fix to avoid any Path Group initialization if
-  'pg_init_in_progress' isn't set.
-
-- DM crypt fix to use DECLARE_CRYPTO_WAIT() for onstack wait
-  structures.
-
-- DM integrity fix to properly check integrity after device creation
-  when in bitmap mode.
-
-- DM thinp and cache target __create_persistent_data_objects() fixes
-  to reset the metadata's dm_block_manager pointer from PTR_ERR to
-  NULL before returning from error path.
-
-- DM persistent-data block manager fix to guard against
-  dm_block_manager NULL pointer dereference in dm_bm_is_read_only()
-  and update various opencoded bm->read_only checks to use
-  dm_bm_is_read_only() instead.
-
-----------------------------------------------------------------
-Damien Le Moal (1):
-      dm crypt: Initialize crypto wait structures
-
-Mike Snitzer (1):
-      dm mpath: fix racey management of PG initialization
-
-Mikulas Patocka (2):
-      dm writecache: handle DAX to partitions on persistent memory correctly
-      dm integrity: fix error reporting in bitmap mode after creation
-
-Ye Bin (3):
-      dm cache metadata: Avoid returning cmd->bm wild pointer on error
-      dm thin metadata:  Avoid returning cmd->bm wild pointer on error
-      dm thin metadata: Fix use-after-free in dm_bm_set_read_only
-
- drivers/md/dm-cache-metadata.c                |  8 ++++++--
- drivers/md/dm-crypt.c                         |  4 ++--
- drivers/md/dm-integrity.c                     | 12 ++++++++++++
- drivers/md/dm-mpath.c                         | 22 +++++++++++++++-------
- drivers/md/dm-thin-metadata.c                 | 10 +++++++---
- drivers/md/dm-writecache.c                    | 12 ++++++++++--
- drivers/md/persistent-data/dm-block-manager.c | 14 ++++++++------
- 7 files changed, 60 insertions(+), 22 deletions(-)
