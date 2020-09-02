@@ -2,120 +2,211 @@ Return-Path: <SRS0=rVNK=CL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 621B3C433E2
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 22:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FADDC433E7
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 22:59:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 242FD20826
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 22:29:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A36E20767
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 22:59:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="qgKms+ZI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726523AbgIBW3R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Sep 2020 18:29:17 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:46764 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726312AbgIBW3P (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 18:29:15 -0400
-Received: by mail-pf1-f195.google.com with SMTP id b124so515656pfg.13
-        for <linux-block@vger.kernel.org>; Wed, 02 Sep 2020 15:29:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Gx1q12zVJNIhyAVIp+ZmJmpBKVYh7KRaZMgKyvq5X5w=;
-        b=HVkiUzg9Z5lCCDdwhpFeAzVs4XBy0t8Tph29EQGkVqtMqzAzmRgdqAZjsZWkWCL5UP
-         VQjuSvkm5mQgwiDX/bZ2+2pw2GEQzOCTKOcwaZlK3zKqEPBlE0NeVD4Ehei44TdSwaig
-         ZXyuQvEWnoUpCkMFvsosf7ZuDExs9aYaxq0UIYfV0uVRkANT1+jW7Tqb/a77tn6UzJPl
-         ltjxw/9QJcbDVjn8CzStGTerNmX841yflZBYB4VPCOxeAKmqBdN2n1VIWlBKRgwhVxep
-         GDkygYc97xmBOPH/ckpJ+X8BmhRYayzngU5rT9g4uxXl1J7MuhIRuV0+ZE3Iw0IFkVo2
-         mS6g==
-X-Gm-Message-State: AOAM532ZFmGmHsU6UsTHEEe1d2n2ncuSdi+Y+bZgDn0uKEGR2ai24+m+
-        GN6F20MObGXURGEypFr46E4IRTsAF0Ze4A==
-X-Google-Smtp-Source: ABdhPJwT3Ui4SNRE/Oj7hBRG6z2Uc68C4MK0oB66V43D1gvmLHsGTpy+42p1vBy2HePa1mJVZgCV3g==
-X-Received: by 2002:a62:7ec2:0:b029:138:8cbc:ebd4 with SMTP id z185-20020a627ec20000b02901388cbcebd4mr586786pfc.2.1599085754389;
-        Wed, 02 Sep 2020 15:29:14 -0700 (PDT)
-Received: from sagi-Latitude-7490.hsd1.ca.comcast.net ([2601:647:4802:9070:4025:ed24:701e:8cf3])
-        by smtp.gmail.com with ESMTPSA id p184sm569293pfb.47.2020.09.02.15.29.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2020 15:29:13 -0700 (PDT)
-From:   Sagi Grimberg <sagi@grimberg.me>
-To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
+        id S1726400AbgIBW7T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Sep 2020 18:59:19 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:54384 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726310AbgIBW7S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 18:59:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
+        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=quAoXGOZ9TuagLz5yREPtszK1n63wnB3+2Jx8/rWjis=; b=qgKms+ZInyhB9Ygo8ZbF4HUXiB
+        IA+kgrwY2x4cGacp69FLnI+xgOoseYz0hvrBakYKjsaVmJCF9YFrPN/wVVK33gD0zzcP6NQPsjcAF
+        OuRrIUx878SjtxgcLsWzy6zXH48qgfuakvooZiXD+6wrLqkm9arVYEk6TtwS7W97hIOlG9sTyYOHC
+        r3g+V1bFgupd5jjovn7AP5ZO7KWtf0dj8MHdh/TowFG9KnQ2RmYV+AX9gSWMWOAwfB2GVRRuSeVpj
+        CPmMLATJP9dc3/dErCDv82IQLkZk/NPTGZ7OS/DzhrsPr1WjFjCeCdQgjy+hjvGYHJsi+DmICy2lf
+        98CgejFQ==;
+Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1kDbil-0002WV-3t; Wed, 02 Sep 2020 16:59:16 -0600
+To:     Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@osandov.com>
 Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH v5 7/7] nvme: support rdma transport type
-Date:   Wed,  2 Sep 2020 15:29:01 -0700
-Message-Id: <20200902222901.408217-8-sagi@grimberg.me>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200902222901.408217-1-sagi@grimberg.me>
 References: <20200902222901.408217-1-sagi@grimberg.me>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <19fe8876-f821-5c71-4eb5-308d2ddd04f9@deltatee.com>
+Date:   Wed, 2 Sep 2020 16:59:14 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200902222901.408217-1-sagi@grimberg.me>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.145.4
+X-SA-Exim-Rcpt-To: Chaitanya.Kulkarni@wdc.com, Johannes.Thumshirn@wdc.com, osandov@osandov.com, linux-block@vger.kernel.org, sagi@grimberg.me
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v5 0/7] blktests: Add support to run nvme tests with
+ tcp/rdma transports
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- tests/nvme/rc | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+Hi Sagi,
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 972bd0019ec4..5f877321565e 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -5,6 +5,7 @@
- # Test specific to NVMe devices
- 
- . common/rc
-+. common/multipath-over-rdma
- 
- def_traddr="127.0.0.1"
- def_adrfam="ipv4"
-@@ -25,6 +26,12 @@ _nvme_requires() {
- 		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
- 		_have_configfs
- 		;;
-+	rdma)
-+		_have_modules nvmet nvme-core nvme-rdma nvmet-rdma
-+		_have_configfs
-+		_have_program rdma
-+		_have_modules rdma_rxe || _have_modules siw
-+		;;
- 	*)
- 		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
- 		return 1
-@@ -115,6 +122,9 @@ _cleanup_nvmet() {
- 		modprobe -r nvmet-${nvme_trtype} 2>/dev/null
- 	fi
- 	modprobe -r nvmet 2>/dev/null
-+	if [[ "${nvme_trtype}" == "rdma" ]]; then
-+		stop_soft_rdma
-+	fi
- }
- 
- _setup_nvmet() {
-@@ -124,6 +134,16 @@ _setup_nvmet() {
- 		modprobe nvmet-${nvme_trtype}
- 	fi
- 	modprobe nvme-${nvme_trtype}
-+	if [[ "${nvme_trtype}" == "rdma" ]]; then
-+		start_soft_rdma
-+		for i in $(rdma_network_interfaces)
-+		do
-+			ipv4_addr=$(get_ipv4_addr "$i")
-+			if [ -n "${ipv4_addr}" ]; then
-+				def_traddr=${ipv4_addr}
-+			fi
-+		done
-+	fi
- }
- 
- _nvme_disconnect_ctrl() {
--- 
-2.25.1
+On 2020-09-02 4:28 p.m., Sagi Grimberg wrote:
+> We have a collection of nvme tests, but all run with nvme-loop. This
+> is the easiest to run on a standalone machine. However its very much possible
+> to run nvme-tcp and nvme-rdma using a loopback network. Add capability to run
+> tests with a new environment variable to set the transport type $nvme_trtype.
+> 
+> $ nvme_trtype=[loop|tcp|rdma] ./check nvme
+> 
+> This buys us some nice coverage on some more transport types. We also add
+> some transport type specific helpers to mark tests that are relevant only
+> for a single transport.
 
+I'm still noticing a bunch of quoting issues in your patches. Make sure
+you run "make check" on them. I see a lot of warnings introduced by
+these (see below).
+
+Logan
+
+--
+
+$ make check
+shellcheck -x -e SC2119 -f gcc check new common/* \
+	tests/*/rc tests/*/[0-9]*[0-9]
+tests/nvme/rc:120:19: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/rc:122:21: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/rc:134:18: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/rc:136:16: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/002:25:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/002:35:17: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/003:33:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/004:26:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/004:37:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/005:26:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/005:37:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/005:46:24: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/006:33:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/007:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/008:35:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/008:38:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/009:31:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/009:34:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/010:35:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/010:38:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/011:33:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/011:36:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/012:39:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/012:42:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/013:36:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/013:39:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/014:35:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/014:38:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/015:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/015:35:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/016:34:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/017:37:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/018:33:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/018:36:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/019:37:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/019:40:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/020:33:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/020:36:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/021:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/021:35:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/022:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/022:35:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/023:35:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/023:38:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/024:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/024:35:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/025:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/025:35:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/026:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/026:35:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/027:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/027:35:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/028:32:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/028:35:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/028:41:46: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/029:68:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/029:71:23: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/030:41:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/031:40:29: note: Double quote to prevent globbing and word
+splitting. [SC2086]
+tests/nvme/031:45:24: note: Double quote to prevent globbing and word
+splitting. [SC2086]
