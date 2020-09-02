@@ -2,102 +2,110 @@ Return-Path: <SRS0=rVNK=CL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 328B1C433E7
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 14:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDABC433E2
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 14:49:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6CD820829
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 14:48:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C4F62087D
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 14:49:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jUHxx6hF"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="DGna4WEY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728035AbgIBOrp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Sep 2020 10:47:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38088 "EHLO
+        id S1726895AbgIBODT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Sep 2020 10:03:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727964AbgIBOMy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 10:12:54 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67061C061246;
-        Wed,  2 Sep 2020 07:12:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=/qlsu7oTYC7Ky6k7tpiA+p9AylNGHSY5Bb3wPIG2HJ8=; b=jUHxx6hFjNMotTFc/lUHdZ1Rb1
-        CJ6ceuzZrzKwofuy3YT4uCfSV3Q4H9Bq5trKK1iWmIfdaXVBWWAsX+M7OhcnoE9qVUhfEQb6QJNeH
-        fzPpgq7wd5olWprO3ne7uDvVx7r/A7lfXDpsvIbmHSyD654S8GXX3r7iTNqq/zIG5ucfrirnJQxpR
-        m8axEnPM98Y99y/iX56LgNH9oD2ubfbKM9bXDZfrX7fbF1Gp0/ofQgc/MJUtsrHDrSlhJxkTy8Hho
-        mFgi/F4rQW+Ztn9WjBXWvR8OBmXlpx7vAmYZmQPweS/7FdkR66BvQ6uUva1M1n7DCM+sDVXtuo5Da
-        L7a+VXIA==;
-Received: from [2001:4bb8:184:af1:6a63:7fdb:a80e:3b0b] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kDTV0-0005di-My; Wed, 02 Sep 2020 14:12:30 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
-        Michal Simek <michal.simek@xilinx.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Finn Thain <fthain@telegraphics.com.au>,
-        Michael Schmitz <schmitzmic@gmail.com>,
-        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: [PATCH 08/19] xsysace: use bdev_check_media_change
-Date:   Wed,  2 Sep 2020 16:12:07 +0200
-Message-Id: <20200902141218.212614-9-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200902141218.212614-1-hch@lst.de>
-References: <20200902141218.212614-1-hch@lst.de>
+        with ESMTP id S1727048AbgIBOCd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 10:02:33 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E90C061244
+        for <linux-block@vger.kernel.org>; Wed,  2 Sep 2020 07:02:33 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id h4so5862739ioe.5
+        for <linux-block@vger.kernel.org>; Wed, 02 Sep 2020 07:02:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=lDkSul+1X+RjRffnEyrjfRLNLhJmksxTsX1AB+/HFZE=;
+        b=DGna4WEYAKm+GxbC4EXVOI19nH3MAqxS8oOklLe6cjf0oCUQy3fZdZnuRNDEm2ryHs
+         4H5pMhYr4q+E31tMFwXx3mGgCMp5FeiLWVzU4oGfFUdZeAxsZ/yAv2H8hd4Q7MlOv9Ir
+         9sVmDlzAp9L7waqE7Mjll9U7E3m7VvNDmcbHGSdv5UBvLlBOUpccX9IobYDxb36t0oBS
+         7/2qcWRfI/DMC3rMFxRfBSQl3yUkMyar18BijK6EWrxdNKnPHtEIdnOZSidxFJyUDn5n
+         gYbGtwYZSogDRv8CnOeKbnuxJy63+EHDxcoUBqqjeQRLKAdASi+x8Uj9+vOj3bHj6bgx
+         qQgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lDkSul+1X+RjRffnEyrjfRLNLhJmksxTsX1AB+/HFZE=;
+        b=arUOuU+tOoqoG1NeNkvtMpJ2+G9gBV0m4UNuGXWdFrCYioTfsjjSCcdorUIM0z37OR
+         e3UeUSeIoUbnyMv+qU2jO+xXjKcGqH1Mdp206YWJgkToqb1aE/MzM/VAr5S88jfNkCsV
+         f/cncujLpQbUILvlpQNy6v6qUI8QqJJF9vYwdQSsz5qnlDn3nA/Li2DTOhszEhq8cekv
+         8JMPYojrmB/8xGcko/u4RFlCRPzwO/ujF+qn5odn2ersvPmct8x4pwUHJR4/grojRTNy
+         2MlXrktwNgn6g55pthepucP9vr+rtBIpZN3GDNDx6NyvRJxMVBDx88t0SKgpC5YIcoWJ
+         trPQ==
+X-Gm-Message-State: AOAM531MvZGjLaU+tjceQLu7p8K+q+5clT5XjA9YLqu97CNSKHwOnXa7
+        5MZSTUYrc0EoK/pRvbcIW3HHPQ==
+X-Google-Smtp-Source: ABdhPJz2H+GfqNyAOWulkP0kGwX7sZTZpsFflW3DrLwTCen2K0siMO2BGfAyARHIbAQRCHZrx3Ln3A==
+X-Received: by 2002:a6b:5804:: with SMTP id m4mr3053243iob.14.1599055352059;
+        Wed, 02 Sep 2020 07:02:32 -0700 (PDT)
+Received: from [192.168.1.57] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id z10sm2037885ioi.13.2020.09.02.07.02.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Sep 2020 07:02:31 -0700 (PDT)
+Subject: Re: [PATCH V2 0/2] percpu_ref & block: reduce memory footprint of
+ percpu_ref in fast path
+To:     Ming Lei <ming.lei@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Tejun Heo <tj@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <20200902122643.634143-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <4ce7b53b-2c42-3814-fa0a-5324aca6aae0@kernel.dk>
+Date:   Wed, 2 Sep 2020 08:02:30 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200902122643.634143-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Switch to use bdev_check_media_change instead of check_disk_change and
-call ace_revalidate_disk manually.  Given that ace_revalidate_disk only
-deals with media change events, the extra call into ->revalidate_disk
-from bdev_disk_changed is not required either, so stop wiring up the
-method.
+On 9/2/20 6:26 AM, Ming Lei wrote:
+> Hi,
+> 
+> The 1st patch removes memory footprint of percpu_ref in fast path
+> from 7 words to 2 words, since it is often used in fast path and
+> embedded in user struct.
+> 
+> The 2nd patch moves .q_usage_counter to 1st cacheline of
+> 'request_queue'.
+> 
+> Simple test on null_blk shows ~2% IOPS boost on one 16cores(two threads
+> per core) machine, dual socket/numa.
+> 
+> V2:
+> 	- pass 'gfp' to kzalloc() for fixing block/027 failure reported by
+> 	kernel test robot
+> 	- protect percpu_ref_is_zero() with destroying percpu-refcount by
+> 	spin lock  
+> 
+> Ming Lei (2):
+>   percpu_ref: reduce memory footprint of percpu_ref in fast path
+>   block: move 'q_usage_counter' into front of 'request_queue'
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/xsysace.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Applied, thanks.
 
-diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
-index 5d8e0ab3f054f5..eefe542f2d9fff 100644
---- a/drivers/block/xsysace.c
-+++ b/drivers/block/xsysace.c
-@@ -922,7 +922,8 @@ static int ace_open(struct block_device *bdev, fmode_t mode)
- 	ace->users++;
- 	spin_unlock_irqrestore(&ace->lock, flags);
- 
--	check_disk_change(bdev);
-+	if (bdev_check_media_change(bdev))
-+		ace_revalidate_disk(bdev->bd_disk);
- 	mutex_unlock(&xsysace_mutex);
- 
- 	return 0;
-@@ -966,7 +967,6 @@ static const struct block_device_operations ace_fops = {
- 	.open = ace_open,
- 	.release = ace_release,
- 	.check_events = ace_check_events,
--	.revalidate_disk = ace_revalidate_disk,
- 	.getgeo = ace_getgeo,
- };
- 
 -- 
-2.28.0
+Jens Axboe
 
