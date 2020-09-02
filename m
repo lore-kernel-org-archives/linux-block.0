@@ -1,86 +1,125 @@
-Return-Path: <SRS0=kheS=CK=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=rVNK=CL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EF0C433E2
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 22:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85CFAC433E6
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 01:06:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3083A206C0
-	for <linux-block@archiver.kernel.org>; Tue,  1 Sep 2020 22:57:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 530BD2068F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 01:06:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kx9pMxba"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/81SfPb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726226AbgIAW5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Sep 2020 18:57:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38698 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725949AbgIAW5q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 18:57:46 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC7EC061244
-        for <linux-block@vger.kernel.org>; Tue,  1 Sep 2020 15:57:46 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id w7so1716874pfi.4
-        for <linux-block@vger.kernel.org>; Tue, 01 Sep 2020 15:57:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=8SCB1R5S0rIlXAP1gD/42mN3rEFGnClEAzglzWI/f5A=;
-        b=kx9pMxbaG7HxeA/hSNOaElEvYF6zneOI88aycKG6Q8jpxb2w7bV344cmhdkTDMxzM8
-         s4owDu6/DO5Uv9cHyTnKBdmy+nqJhz7wwHz61yAXmFMMhK4Cu789DJwxYjlbPXe0s5+l
-         1eE7XdCSERl8fSlQzYXHj1ACbWfO6xdmj6kFMFBA+oZIO+F0oUEUFwv1qB4zVLOSf3Tb
-         cEm0nPav5qtkrw25Z04awrm9iRz2WofDvEuWX38Z7ApDCYln3CV04pw1ye/mPQ710zxe
-         cuHimPUl3H9I9rn9HJAOO2hqAuXJqTUInl3Y6aiY+aq7bLFN524E3gnv+652wfX5cgO4
-         qCzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8SCB1R5S0rIlXAP1gD/42mN3rEFGnClEAzglzWI/f5A=;
-        b=LETpYGc4BdL4jvXZb934d/T4ahgi2FuiNHUGNaryNLlL5KqBkJXL+w0Fj82nFBKN6/
-         lmlrxiiQHSQrPkmHil/5LxEt6I391mZtizAcmsnuXkS21EgtIcHI19P+ui59iEgjiIHz
-         SU+XnHLONl2wbO4FytqgPg2nCpEXFDiB20pywxczUQMkotA4CfSQYLXT/P+SJ0w4NTEW
-         LgUi7Zm9iSab4PRYPFrGQ/mRcFATSR9a5qwXe/bJDZgTowrkyXGNrSj3mYnRPGqA5zqA
-         20C8121ng7BKcdlzBezhl4ie6QY22Lf8sdNyUjldIhtEwc7HY4xXsojE2IY1v1rzG6jL
-         pZig==
-X-Gm-Message-State: AOAM533fKgoBMRfgYI1Kjhktafi2v1ytNxZDgl/StISTUy6liDNlakgo
-        lRUsF8u4VmqLBMtg/Lm32r9yUQ==
-X-Google-Smtp-Source: ABdhPJz7/PuTI6toqDV7Y9ZAOMNodGuUCNOHnU2Zfi3eqQltoMCij8HkSX98gsEIVX42xBTyba1VqA==
-X-Received: by 2002:a63:521c:: with SMTP id g28mr3479485pgb.247.1599001065304;
-        Tue, 01 Sep 2020 15:57:45 -0700 (PDT)
-Received: from [192.168.1.187] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id q5sm3122211pfu.16.2020.09.01.15.57.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Sep 2020 15:57:44 -0700 (PDT)
-Subject: Re: [PATCHSET for-5.10/block] blk-iocost: iocost: improve donation,
- debt and excess handling
-To:     Tejun Heo <tj@kernel.org>
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@fb.com, newella@fb.com
-References: <20200901185257.645114-1-tj@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cac016f9-ee13-9fd4-22b2-8be0d830f076@kernel.dk>
-Date:   Tue, 1 Sep 2020 16:57:43 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726131AbgIBBG2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Sep 2020 21:06:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21332 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726193AbgIBBG2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Sep 2020 21:06:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599008787;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zsRdbWM7f98X5EgxemT6G330tQwn+fiPlPc5hDyvjCw=;
+        b=K/81SfPborkkXs4nH2qPSZ0n7fL3KJsEDz00yx/nUnZG/KiYYRvRHJ2jNDvIdeU3rL3/F6
+        DNZcb9l/E4Taa53fSSIw+u0GpPAtTu5jmJomd2zZ+76wBSmQwStrirXpERgTnFSOoG6d5H
+        vqcNvzFkeKqAXpKb2svtqSvbK1okRwA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-vccdlPmRN7-vEc3WmZS7rA-1; Tue, 01 Sep 2020 21:06:23 -0400
+X-MC-Unique: vccdlPmRN7-vEc3WmZS7rA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 051251888A24;
+        Wed,  2 Sep 2020 01:06:21 +0000 (UTC)
+Received: from T590 (ovpn-12-189.pek2.redhat.com [10.72.12.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 23B1A7C584;
+        Wed,  2 Sep 2020 01:06:13 +0000 (UTC)
+Date:   Wed, 2 Sep 2020 09:06:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        syzbot <syzbot+61acc40a49a3e46e25ea@syzkaller.appspotmail.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, stable@vger.kernel.org
+Subject: Re: [PATCH V2] block: allow for_each_bvec to support zero len bvec
+Message-ID: <20200902010609.GA317674@T590>
+References: <20200817100055.2495905-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200901185257.645114-1-tj@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200817100055.2495905-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-1-2 applied for 5.9, and the rest for 5.10. Thanks Tejun.
+On Mon, Aug 17, 2020 at 06:00:55PM +0800, Ming Lei wrote:
+> Block layer usually doesn't support or allow zero-length bvec. Since
+> commit 1bdc76aea115 ("iov_iter: use bvec iterator to implement
+> iterate_bvec()"), iterate_bvec() switches to bvec iterator. However,
+> Al mentioned that 'Zero-length segments are not disallowed' in iov_iter.
+> 
+> Fixes for_each_bvec() so that it can move on after seeing one zero
+> length bvec.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Link: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2262077.html
+> Fixes: 1bdc76aea115 ("iov_iter: use bvec iterator to implement iterate_bvec()")
+> Reported-by: syzbot <syzbot+61acc40a49a3e46e25ea@syzkaller.appspotmail.com>
+> Tested-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+> Cc: Al Viro <viro@zeniv.linux.org.uk>
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: <stable@vger.kernel.org>
+> ---
+> V2:
+> 	- fix reported-by tag
+> 
+>  include/linux/bvec.h | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index ac0c7299d5b8..9c4fab5f22a7 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -117,11 +117,18 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+>  	return true;
+>  }
+>  
+> +static inline void bvec_iter_skip_zero_bvec(struct bvec_iter *iter)
+> +{
+> +	iter->bi_bvec_done = 0;
+> +	iter->bi_idx++;
+> +}
+> +
+>  #define for_each_bvec(bvl, bio_vec, iter, start)			\
+>  	for (iter = (start);						\
+>  	     (iter).bi_size &&						\
+>  		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
+> -	     bvec_iter_advance((bio_vec), &(iter), (bvl).bv_len))
+> +	     (bvl).bv_len ? bvec_iter_advance((bio_vec), &(iter),	\
+> +		     (bvl).bv_len) : bvec_iter_skip_zero_bvec(&(iter)))
+>  
+>  /* for iterating one bio from start to end */
+>  #define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
+> -- 
+> 2.25.2
+> 
 
--- 
-Jens Axboe
+Hello Jens,
+
+Looks at least two reports can be fixed by this patch, so could you
+take a look?
+
+Thanks,
+Ming
 
