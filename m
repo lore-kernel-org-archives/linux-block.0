@@ -2,102 +2,85 @@ Return-Path: <SRS0=rVNK=CL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 865FEC433E6
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 07:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7F68C433E6
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 08:04:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59B4F207EA
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 07:36:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A3C62084C
+	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 08:04:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="BiSsXtSg"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Ei7Bzzox"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726510AbgIBHgd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Sep 2020 03:36:33 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:40010 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726144AbgIBHgd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 03:36:33 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0827YVaq132581;
-        Wed, 2 Sep 2020 07:36:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=CFB5KRGnCokXP3/5VF5fldTn2QYUdtAGHmKSBBsc5x4=;
- b=BiSsXtSg9FJ8LzjrVSjNenJxMeDyRfVDpiCCRSBUvDuHhF5/LFF3bOxKDCP1wnDu/qyo
- hX/cqYFZgYLnwBP3IEAbQrAq/jzjTxWy2mUsOUOjXkvZdiHdFOEzsv+NfjdldnWUMDLh
- HfxbkYw0g9pNisXOQ/LdJac5mF5cNL89Bx2TsUQS3Py26wxj5cMlfPu1BsIItn+mxKWU
- SM2fYUoVsR9jOSdYZv4qE2XnxOHFvknY9RKPq1hVK24/rc3EcxsxP/nHYIj+yDSCxtFS
- 0kivzTitdHxy8+aX2i5S8j/9TJ5wdBXaYi1Yu8hzm4dJYyLXLKBjmaTNE3Fltj9Obo60 1Q== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 337eym8rxt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 02 Sep 2020 07:36:28 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0827ZClt153970;
-        Wed, 2 Sep 2020 07:36:28 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 3380kpj24m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 02 Sep 2020 07:36:27 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0827aRZo021515;
-        Wed, 2 Sep 2020 07:36:27 GMT
-Received: from [10.191.26.145] (/10.191.26.145)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 02 Sep 2020 00:36:27 -0700
-Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
-To:     Leah Rumancik <leah.rumancik@gmail.com>
-Cc:     bpf@vger.kernel.org, linux-block@vger.kernel.org,
-        orbekk@google.com, harshads@google.com, jasiu@google.com,
-        saranyamohan@google.com, tytso@google.com, bvanassche@google.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20200812163305.545447-1-leah.rumancik@gmail.com>
- <20200812163305.545447-2-leah.rumancik@gmail.com>
- <a0a97488-58c7-1f00-c987-d75e1329159c@oracle.com>
- <20200901165333.GD5599@leah-Ubuntu>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <1ff87708-fe8b-215d-637b-5af5acbef6eb@oracle.com>
-Date:   Wed, 2 Sep 2020 15:36:16 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726426AbgIBIEo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Sep 2020 04:04:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38044 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726140AbgIBIEn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 04:04:43 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4161C061244
+        for <linux-block@vger.kernel.org>; Wed,  2 Sep 2020 01:04:42 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id a17so4178522wrn.6
+        for <linux-block@vger.kernel.org>; Wed, 02 Sep 2020 01:04:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=ITan/zWSkbnHfpsc035XWViobYfAo1iIHcwyiV6vkj4=;
+        b=Ei7BzzoxqD3QGipbXt1TuGH/beBPbo1RAf16/0vRAsw/iy+rXNLeISy72B+5AEtnpu
+         zBNjabWW79SX5ZhUBPwQ8ykTA1sO4KEt17z8lhruVcHxlLYttBqZ/4jf33/tY30WShY1
+         A/LAVnjntmc+pKn4HK0tMTtNxZN4MzL8g9bdWcqpUV18YSgZ47eGmFSRzMsQgDKVT6be
+         ZMfGK5yozLBTj4+wbyfWou5pVSPWYuqvCIrZuWh3Pdoo0GRlCSezl3rmImcJsULSOdkI
+         0SoWVrGywta4MUPG7ffDnHJ1xgrCWvZwFBnCVV0LfSHPuNXPkXtIDYgcnj6yTDS9Kqsb
+         BnPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=ITan/zWSkbnHfpsc035XWViobYfAo1iIHcwyiV6vkj4=;
+        b=gSHVPsFoqjO40mX48djpEhatIYvjiWdGUHNN/ouS9wls3yFIfG70XfareVBThX50ev
+         bIW3PtW77fBSruR8wmqdoRVxptcOtHgEScrrsGVIqsHlCUYy5CdnxDSALqw39zHYcNiN
+         WxlXgKeaJGRI0aqDKRD/p7Ob9tea4Tr11lM1uUsHK8Hj/geBYSl8FfLlKiUjazdJm8rp
+         n3MHcyLLujpo0YG8rP6igfjsKXTfcI71Ilk4FMpwGRQTogh+6KE22l+GFYrDJTzZO794
+         EyOjnmhHdx1jejs+7BlzuX9topFIMS0LGBTRkfZtENnVmG1z5zNcif0YfKey7HizXqzh
+         UDSA==
+X-Gm-Message-State: AOAM530pg0JYcmT3frRJ2DDVZg6v9OjZ/WEohzh0iQJH2hOGa7/92Tht
+        wL2RHKtsRP5TJm2QR5aGEOGKmQRTZeEDpWmftByA
+X-Google-Smtp-Source: ABdhPJwjmZyPbIbsIS0onIVB4/6WhNp5Hwjzy8zBBzVuPFznPgphMCKLBbkBEU9IhwXmGLh7hyv56e86QYxlsUzSGrg=
+X-Received: by 2002:adf:de08:: with SMTP id b8mr5595440wrm.4.1599033881354;
+ Wed, 02 Sep 2020 01:04:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200901165333.GD5599@leah-Ubuntu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9731 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 adultscore=0
- mlxscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009020069
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9731 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009020069
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Wed, 2 Sep 2020 10:04:30 +0200
+Message-ID: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
+Subject: [RFC] Reliable Multicast on top of RTRS
+To:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/2/20 12:53 AM, Leah Rumancik wrote:
-> On Mon, Aug 17, 2020 at 10:18:47PM +0800, Bob Liu wrote:
->> On 8/13/20 12:33 AM, Leah Rumancik wrote:
->>> This program type is intended to help filter and monitor IO requests.
->>>
->>
->> I was also working on similar tasks.
->>
-> 
-> Thanks for the review Bob. What use cases did you have for your
-> implementation?
-> 
+Hi @,
 
-Similar as "At Google, we use IO filtering to prevent accidental modification of data."
-I'm making prototype to turn the old IO-filter way to bpf based so as to get more flexibility.
+RTRS allows for reliable transmission of sg lists between two hosts
+over rdma. It is optimised for block io. One can implement a client
+and a server module on top of RTRS which would allow for reliable
+transmission to a group of hosts.
+
+In the networking world this is called reliable multicast. I think one
+can say that reliable multicast is an equivalent to what is called
+"mirror" in the storage world. There is something called XoR network
+coding which seems to be an equivalent of raid5. There is also Reed
+Solomon network coding.
+
+Having a reliable multicast with coding rdma-based transport layer
+would allow for very flexible and scalable designs of distributed
+replication solutions based on different in-kernel transport, block
+and replication drivers.
+
+What do you think?
+
+Best,
+Danil.
