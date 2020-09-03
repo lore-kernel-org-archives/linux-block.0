@@ -1,114 +1,121 @@
-Return-Path: <SRS0=rVNK=CL=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=kdGS=CM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DADC43461
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 23:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64422C433E7
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 00:36:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D09B120767
-	for <linux-block@archiver.kernel.org>; Wed,  2 Sep 2020 23:07:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27115206EB
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 00:36:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAm7Sj9H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbgIBXHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Sep 2020 19:07:18 -0400
-Received: from mail-pg1-f173.google.com ([209.85.215.173]:45648 "EHLO
-        mail-pg1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726247AbgIBXHR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Sep 2020 19:07:17 -0400
-Received: by mail-pg1-f173.google.com with SMTP id 67so491043pgd.12;
-        Wed, 02 Sep 2020 16:07:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=e7FwOEGGEMeAosXGf3vEt7w+keSrNJPAi/ExRrKOBCU=;
-        b=V4k7+7jchMBPctxWlfKyhAvuidJiYqetIm9pvUiyEgG23v35aQrxzCsSEXW90p4e2I
-         kogls7hYKKvEOmQm5zGyJVQKA6PJyavt4iiV7l/SvWu5xaNtQdoxnMgPgPWcw6XgWrgm
-         5Iz5X/96hHBqOV/tKxwFRxYJvXf9MfVq4pHrqo6Xy0XbYQrZnvgZjLpwai92hbqVrhGX
-         BLVxMOfZB68DlZgrMzmFBsAgkBMuulp0sDTlThC5HL5Kl9FGVg/b8AxCrzBlc6Nhk/M/
-         sNayhplD6geywI6Uot6BwAa2S7n+lm3jrfRngluGnBThBak21WSDtGijYsd57Yhx8X/Q
-         +njQ==
-X-Gm-Message-State: AOAM530GL6ERgfYDjsIyuiblgnybQ1iV42rO0yuOzwqS/P/RjOthWUTH
-        dVICM722I3//fngeeeHYbqG9zSIDTXA=
-X-Google-Smtp-Source: ABdhPJyNwqqk28YnUTSFsctPyYFjKwEJKzMtf3chE0SL+h36TuVZa5+3fkDIsos2ZSLZtqwzZAjlWA==
-X-Received: by 2002:a17:902:bcc2:: with SMTP id o2mr604619pls.87.1599088036436;
-        Wed, 02 Sep 2020 16:07:16 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:56b7:d2c3:23c8:7358? ([2601:647:4000:d7:56b7:d2c3:23c8:7358])
-        by smtp.gmail.com with ESMTPSA id u15sm437742pjx.50.2020.09.02.16.07.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Sep 2020 16:07:15 -0700 (PDT)
-Subject: Re: [RFC] Reliable Multicast on top of RTRS
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
-References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
-Date:   Wed, 2 Sep 2020 16:07:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1727088AbgICAgF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Sep 2020 20:36:05 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42216 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726814AbgICAgF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 2 Sep 2020 20:36:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599093364;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7emPPVo9ZQH8EVB0PNKJWzJRb6TItTFt+XRNcQ2lfVg=;
+        b=SAm7Sj9HqC+Ti7kuQDEdccflumdA64loecdMQstnAfoDPpqksM5g6g26Qej0nmG1qPVMCN
+        SlYPCAY0l0cxWjFutGc6nSSimf0MT/dwha8owT8oRGw94GjLDRfWob85M9gNepjprhM+TF
+        HSyXBia9zSY9FjAB4SHkeG3+o31vZoE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-542-eyX8z8d5Muy5I4p7un5bVQ-1; Wed, 02 Sep 2020 20:36:00 -0400
+X-MC-Unique: eyX8z8d5Muy5I4p7un5bVQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5C351074642;
+        Thu,  3 Sep 2020 00:35:58 +0000 (UTC)
+Received: from T590 (ovpn-12-109.pek2.redhat.com [10.72.12.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 571E95D9CC;
+        Thu,  3 Sep 2020 00:35:49 +0000 (UTC)
+Date:   Thu, 3 Sep 2020 08:35:45 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V2 0/2] blk-mq: implement queue quiesce via percpu_ref
+ for BLK_MQ_F_BLOCKING
+Message-ID: <20200903003545.GA638071@T590>
+References: <20200825141734.115879-1-ming.lei@redhat.com>
+ <20200902031144.GC317674@T590>
+ <aef6938d-3762-22bc-50c8-877ee0aa5700@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aef6938d-3762-22bc-50c8-877ee0aa5700@kernel.dk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-09-02 01:04, Danil Kipnis wrote:
-> RTRS allows for reliable transmission of sg lists between two hosts
-> over rdma. It is optimised for block io. One can implement a client
-> and a server module on top of RTRS which would allow for reliable
-> transmission to a group of hosts.
+On Wed, Sep 02, 2020 at 11:52:59AM -0600, Jens Axboe wrote:
+> On 9/1/20 9:11 PM, Ming Lei wrote:
+> > On Tue, Aug 25, 2020 at 10:17:32PM +0800, Ming Lei wrote:
+> >> Hi Jens,
+> >>
+> >> The 1st patch add .mq_quiesce_mutex for serializing quiesce/unquiesce,
+> >> and prepares for replacing srcu with percpu_ref.
+> >>
+> >> The 2nd patch replaces srcu with percpu_ref.
+> >>
+> >> V2:
+> >> 	- add .mq_quiesce_lock
+> >> 	- add comment on patch 2 wrt. handling hctx_lock() failure
+> >> 	- trivial patch style change
+> >>
+> >>
+> >> Ming Lei (2):
+> >>   blk-mq: serialize queue quiesce and unquiesce by mutex
+> >>   blk-mq: implement queue quiesce via percpu_ref for BLK_MQ_F_BLOCKING
+> >>
+> >>  block/blk-core.c       |   2 +
+> >>  block/blk-mq-sysfs.c   |   2 -
+> >>  block/blk-mq.c         | 125 +++++++++++++++++++++++------------------
+> >>  block/blk-sysfs.c      |   6 +-
+> >>  include/linux/blk-mq.h |   7 ---
+> >>  include/linux/blkdev.h |   6 ++
+> >>  6 files changed, 82 insertions(+), 66 deletions(-)
+> >>
+> >> Cc: Lai Jiangshan <jiangshanlai@gmail.com>
+> >> Cc: Paul E. McKenney <paulmck@kernel.org>
+> >> Cc: Josh Triplett <josh@joshtriplett.org>
+> >> Cc: Sagi Grimberg <sagi@grimberg.me>
+> >> Cc: Bart Van Assche <bvanassche@acm.org>
+> >> Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+> >> Cc: Chao Leng <lengchao@huawei.com>
+> >> Cc: Christoph Hellwig <hch@lst.de>
+> > 
+> > Hello Guys,
+> > 
+> > Is there any objections on the two patches? If not, I'd suggest to move> on.
 > 
-> In the networking world this is called reliable multicast. I think one
-> can say that reliable multicast is an equivalent to what is called
-> "mirror" in the storage world. There is something called XoR network
-> coding which seems to be an equivalent of raid5. There is also Reed
-> Solomon network coding.
-> 
-> Having a reliable multicast with coding rdma-based transport layer
-> would allow for very flexible and scalable designs of distributed
-> replication solutions based on different in-kernel transport, block
-> and replication drivers.
-> 
-> What do you think?
+> Seems like the nested case is one that should either be handled, or at
+> least detected.
 
-How will the resulting software differ from DRBD (other than that it
-uses RDMA)? How will it be guaranteed that the resulting software does
-not suffer from the problems that have been solved by the introduction
-of the DRBD activity log
-(https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
+Yeah, the 1st patch adds mutex for handling nested case correctly and efficiently.
 
 Thanks,
+Ming
 
-Bart.
