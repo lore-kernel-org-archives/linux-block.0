@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8FEC43461
-	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 23:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B505C433E2
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 23:54:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D8C32078E
-	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 23:54:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 471B820797
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 23:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728015AbgICXyF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Sep 2020 19:54:05 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42842 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725782AbgICXyE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Sep 2020 19:54:04 -0400
-Received: by mail-wr1-f66.google.com with SMTP id c18so4919413wrm.9
-        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2020 16:54:03 -0700 (PDT)
+        id S1729498AbgICXyI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Sep 2020 19:54:08 -0400
+Received: from mail-wm1-f54.google.com ([209.85.128.54]:53402 "EHLO
+        mail-wm1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725782AbgICXyH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Sep 2020 19:54:07 -0400
+Received: by mail-wm1-f54.google.com with SMTP id u18so4454523wmc.3
+        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2020 16:54:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=E4766iF8tGytH+Vfs6i3/U2RwWmzQyiBC+bGyaYv3Kg=;
-        b=Kzc9eVbNvCNSB2oh4vDBorE4NEWz9Dh3+rpXE0VdXXoAt+XHNwHMV+m1Lt5LvkTReL
-         y5lAxqmjrUZiAfHpXN2rw0gz2GZZq85KorVIHKD5dk3/Ze0z8SBhMbpD4cRiZl3mSFn7
-         8ndgzBkWF+F95kRbwFGhzLoOrzt5mOL7GUKQ+VfqhlTJYzGXoy0LFOG7Iwijw5jIbfcq
-         UsUx4RGG2JN041hxo3jSD1be5+Xz88JT/+gml7q5CxS233n5zGrosM/ApXlrJ6uZhbAL
-         x1oa+xO3Nmlt359ZVgl6urYDaqXn7PO2avenjCn5dPKB9XM+/S2uQurKNeSywcNIm8aH
-         ZrsQ==
-X-Gm-Message-State: AOAM532/dqFWRZbbSU4XZWnYwyXW5WCbdXKMZH/u5u1MCQVjCjZs+3lR
-        kxhA2FAPqsgLez/y+ea+RgDxPAx6tBRPDA==
-X-Google-Smtp-Source: ABdhPJz9wmNhEgElMHthJYRKXZb/0dVNl4i6PMis1ISMWyfAJycy+sQwiYvzl1r4Q9BtwymoHqNVpQ==
-X-Received: by 2002:adf:db88:: with SMTP id u8mr4752891wri.184.1599177242817;
-        Thu, 03 Sep 2020 16:54:02 -0700 (PDT)
+        bh=ltrSPPPBq2iV3S6trqwPo1lDRT0G76ooyJTQrnxziqc=;
+        b=e65dQfYxVDYKxJE9D5CriK1+ONvQ7mDPn4lDbSw8kqIqr220Zki+wlQnAKZor8kapT
+         /Xefq/4hwp52wRcX1uavC6cUpmF3KpTEl9z1RHpo/rAg88G7MFBTu4gsCG/cCkTBRA6s
+         iMiy/laqtXkIqt5IELpAnVFraxkS43V2uyrNHge0V5oVh7kS1NG3WbqPA2tfok7pN4fs
+         zScCi5veoB+Avzp7LSrCyYwguxuJdRpOcBAcNb5GHorsMmNeP18akw2kowjv7Q6BqxEv
+         uztq/ic0iQL0a0A5gqC9Ix11M+R6RiJVpxmHjVAIf7orO+IvFoRHy4u/naIX/pZwTHiH
+         Nmnw==
+X-Gm-Message-State: AOAM530P49ZgtYbzfRcyo1aZB1QR5OsXnOuBLHzt1utX3kG+vXRgXIAF
+        Y3O18xmZh5B/yOFpF5+Tk7EIa9ny8vFOqA==
+X-Google-Smtp-Source: ABdhPJw7v5uApg6WNJrp3X9k/6FVzz/5nWXQhmx8P+LLD2jwXHGIQXfpMI2sU8EKSHH3jyWD2nu7pw==
+X-Received: by 2002:a1c:5581:: with SMTP id j123mr4881341wmb.11.1599177245452;
+        Thu, 03 Sep 2020 16:54:05 -0700 (PDT)
 Received: from localhost.localdomain ([2601:647:4802:9070:79a5:e112:bd7c:4b29])
-        by smtp.gmail.com with ESMTPSA id u17sm7024992wmm.4.2020.09.03.16.54.00
+        by smtp.gmail.com with ESMTPSA id u17sm7024992wmm.4.2020.09.03.16.54.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Sep 2020 16:54:02 -0700 (PDT)
+        Thu, 03 Sep 2020 16:54:05 -0700 (PDT)
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
 Cc:     linux-nvme@lists.infradead.org,
         Logan Gunthorpe <logang@deltatee.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v7 6/7] common: move module_unload to common
-Date:   Thu,  3 Sep 2020 16:53:36 -0700
-Message-Id: <20200903235337.527880-7-sagi@grimberg.me>
+Subject: [PATCH v7 7/7] nvme: support rdma transport type
+Date:   Thu,  3 Sep 2020 16:53:37 -0700
+Message-Id: <20200903235337.527880-8-sagi@grimberg.me>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200903235337.527880-1-sagi@grimberg.me>
 References: <20200903235337.527880-1-sagi@grimberg.me>
@@ -60,87 +60,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It creates a dependency between multipath-over-rdma and test/nvmeof/rc
-(and test/srp/rc) which is not a natural home for it.
-
-Move it to common helpers.
-
 Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- common/rc          | 13 +++++++++++++
- tests/nvmeof-mp/rc | 13 -------------
- tests/srp/rc       | 13 -------------
- 3 files changed, 13 insertions(+), 26 deletions(-)
+ tests/nvme/rc | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/common/rc b/common/rc
-index 7f02103dc786..cdc0150ea5ea 100644
---- a/common/rc
-+++ b/common/rc
-@@ -291,3 +291,16 @@ _filter_xfs_io_error() {
- _uptime_s() {
- 	awk '{ print int($1) }' /proc/uptime
- }
-+
-+# Arguments: module to unload ($1) and retry count ($2).
-+unload_module() {
-+	local i m=$1 rc=${2:-1}
-+
-+	[ ! -e "/sys/module/$m" ] && return 0
-+	for ((i=rc;i>0;i--)); do
-+		modprobe -r "$m"
-+		[ ! -e "/sys/module/$m" ] && return 0
-+		sleep .1
-+	done
-+	return 1
-+}
-diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
-index b95adf047a2f..d7a7c878fb19 100755
---- a/tests/nvmeof-mp/rc
-+++ b/tests/nvmeof-mp/rc
-@@ -149,19 +149,6 @@ remove_mpath_devs() {
- 	} &>> "$FULL"
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 8df00e7d15d0..4c5b2e8edf0d 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -5,6 +5,7 @@
+ # Test specific to NVMe devices
+ 
+ . common/rc
++. common/multipath-over-rdma
+ 
+ def_traddr="127.0.0.1"
+ def_adrfam="ipv4"
+@@ -25,6 +26,12 @@ _nvme_requires() {
+ 		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
+ 		_have_configfs
+ 		;;
++	rdma)
++		_have_modules nvmet nvme-core nvme-rdma nvmet-rdma
++		_have_configfs
++		_have_program rdma
++		_have_modules rdma_rxe || _have_modules siw
++		;;
+ 	*)
+ 		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
+ 		return 1
+@@ -115,6 +122,9 @@ _cleanup_nvmet() {
+ 		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
+ 	fi
+ 	modprobe -r nvmet 2>/dev/null
++	if [[ "${nvme_trtype}" == "rdma" ]]; then
++		stop_soft_rdma
++	fi
  }
  
--# Arguments: module to unload ($1) and retry count ($2).
--unload_module() {
--	local i m=$1 rc=${2:-1}
--
--	[ ! -e "/sys/module/$m" ] && return 0
--	for ((i=rc;i>0;i--)); do
--		modprobe -r "$m"
--		[ ! -e "/sys/module/$m" ] && return 0
--		sleep .1
--	done
--	return 1
--}
--
- start_nvme_client() {
- 	modprobe nvme-core dyndbg=+pmf &&
- 		modprobe nvme dyndbg=+pmf &&
-diff --git a/tests/srp/rc b/tests/srp/rc
-index 72a3bca3b44d..7fc094b8267f 100755
---- a/tests/srp/rc
-+++ b/tests/srp/rc
-@@ -321,19 +321,6 @@ remove_mpath_devs() {
- 	} &>> "$FULL"
+ _setup_nvmet() {
+@@ -124,6 +134,16 @@ _setup_nvmet() {
+ 		modprobe nvmet-"${nvme_trtype}"
+ 	fi
+ 	modprobe nvme-"${nvme_trtype}"
++	if [[ "${nvme_trtype}" == "rdma" ]]; then
++		start_soft_rdma
++		for i in $(rdma_network_interfaces)
++		do
++			ipv4_addr=$(get_ipv4_addr "$i")
++			if [ -n "${ipv4_addr}" ]; then
++				def_traddr=${ipv4_addr}
++			fi
++		done
++	fi
  }
  
--# Arguments: module to unload ($1) and retry count ($2).
--unload_module() {
--	local i m=$1 rc=${2:-1}
--
--	[ ! -e "/sys/module/$m" ] && return 0
--	for ((i=rc;i>0;i--)); do
--		modprobe -r "$m"
--		[ ! -e "/sys/module/$m" ] && return 0
--		sleep .1
--	done
--	return 1
--}
--
- # Load the SRP initiator driver with kernel module parameters $1..$n.
- start_srp_ini() {
- 	modprobe scsi_transport_srp || return $?
+ _nvme_disconnect_ctrl() {
 -- 
 2.25.1
 
