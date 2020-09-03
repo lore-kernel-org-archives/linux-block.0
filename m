@@ -2,145 +2,84 @@ Return-Path: <SRS0=kdGS=CM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A1FC433E7
-	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 00:42:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEF4C43461
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 05:41:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCFE120786
-	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 00:42:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 334DB2071B
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 05:41:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6feJDG+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iOs4ePOH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727026AbgICAmT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Sep 2020 20:42:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59990 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726586AbgICAmS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Sep 2020 20:42:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599093736;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iTqc+RdQZa+WyNHBM/AD2mO0MhzirVKyE+vmMu7+glQ=;
-        b=h6feJDG+22szPFGpck60qXbhp4E/96rAOirCfGm9iupvQNoPoDCC6PNHLTgwfsp+qmdlVs
-        OF5w6Re+zLn7vuZ6ot/IOB1DwGgM2ltWPdf71jE6tSf9LW6CLOLGaovLZQjt4o7QVsxVF/
-        Xl8t0Dm+IBto4WDqeQ8qEal2x6Ehg/o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-mGpFKBksNeSmCcxu4XUDRw-1; Wed, 02 Sep 2020 20:42:12 -0400
-X-MC-Unique: mGpFKBksNeSmCcxu4XUDRw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D22C1074644;
-        Thu,  3 Sep 2020 00:42:11 +0000 (UTC)
-Received: from T590 (ovpn-12-109.pek2.redhat.com [10.72.12.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AE6D278B20;
-        Thu,  3 Sep 2020 00:42:01 +0000 (UTC)
-Date:   Thu, 3 Sep 2020 08:41:57 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V2 0/2] blk-mq: implement queue quiesce via percpu_ref
- for BLK_MQ_F_BLOCKING
-Message-ID: <20200903004157.GB638071@T590>
-References: <20200825141734.115879-1-ming.lei@redhat.com>
- <20200902031144.GC317674@T590>
- <aef6938d-3762-22bc-50c8-877ee0aa5700@kernel.dk>
- <c33d02c1-5806-94a3-86a8-4e7a6addb36a@grimberg.me>
+        id S1727984AbgICFlN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Sep 2020 01:41:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727004AbgICFlJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Sep 2020 01:41:09 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33960C061245;
+        Wed,  2 Sep 2020 22:41:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=riJwVtK2AUEGowy/fSK/NSeugqK+94BEz4FUf/LJHss=; b=iOs4ePOHKq0RO554D6Q23NPYpM
+        kwtgxb2xzQYHh8cHDRvtLLOM4dAD3ho9sU4MR7rhGZel6Ko+UkaQDih11UE6vIpvieSjfgzD8+vDy
+        Ud7bzdIESe2a4ikxe4yX3drmeTge4pTq9s7qQd4BflpUDgFbaPzO7azWHCe9tJ7JdZRa2KydRDCTo
+        n/Z2QEqHQvIShl/ZNKqz4ZnSGv6LMmCSsxRqP5bp2GtG5+ocEaPhCOc/HHhvfjKCF4DJrf+wPenIH
+        LqwkQ0ylE5E5LkLlLH3rcuAFho96CiQyaoF5EYlJ09nND9cB7hjOLK+Kctrawd838Szt9G0g6IuFt
+        MUFZHS2g==;
+Received: from [2001:4bb8:184:af1:c70:4a89:bc61:2] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kDhzd-0007OB-Dx; Thu, 03 Sep 2020 05:41:05 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     dm-devel@redhat.com, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-ide@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org
+Subject: clean up is partition checks
+Date:   Thu,  3 Sep 2020 07:40:55 +0200
+Message-Id: <20200903054104.228829-1-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c33d02c1-5806-94a3-86a8-4e7a6addb36a@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 02, 2020 at 11:20:36AM -0700, Sagi Grimberg wrote:
-> 
-> > > > Hi Jens,
-> > > > 
-> > > > The 1st patch add .mq_quiesce_mutex for serializing quiesce/unquiesce,
-> > > > and prepares for replacing srcu with percpu_ref.
-> > > > 
-> > > > The 2nd patch replaces srcu with percpu_ref.
-> > > > 
-> > > > V2:
-> > > > 	- add .mq_quiesce_lock
-> > > > 	- add comment on patch 2 wrt. handling hctx_lock() failure
-> > > > 	- trivial patch style change
-> > > > 
-> > > > 
-> > > > Ming Lei (2):
-> > > >    blk-mq: serialize queue quiesce and unquiesce by mutex
-> > > >    blk-mq: implement queue quiesce via percpu_ref for BLK_MQ_F_BLOCKING
-> 
-> I thought we agreed to have a little more consolidation for blocking and
-> !blocking paths (move fallbacks to common paths).
+Hi Jens,
 
-Could you describe the consolidation one more time for the two paths?
+this series add a new helepr to check if a struct block_device represents
+a parition, and removes most direct access to ->bd_contained from
+drivers.
 
-BTW, code will become a little messy if we move queue quiesce handling
-out of __blk_mq_try_issue_directly(), because we have two conditions to
-trigger insert request into scheduler queue:
-
-1) hctx_lock() failure
-
-2) blk_queue_quiesced() or blk_mq_hctx_stopped()
-
-The former doesn't need to unlock hctx, however the latter needs that,
-that is why I don't do the change if that is the consolidation you
-mentioned.
-
-> 
-> > > > 
-> > > >   block/blk-core.c       |   2 +
-> > > >   block/blk-mq-sysfs.c   |   2 -
-> > > >   block/blk-mq.c         | 125 +++++++++++++++++++++++------------------
-> > > >   block/blk-sysfs.c      |   6 +-
-> > > >   include/linux/blk-mq.h |   7 ---
-> > > >   include/linux/blkdev.h |   6 ++
-> > > >   6 files changed, 82 insertions(+), 66 deletions(-)
-> > > > 
-> > > > Cc: Lai Jiangshan <jiangshanlai@gmail.com>
-> > > > Cc: Paul E. McKenney <paulmck@kernel.org>
-> > > > Cc: Josh Triplett <josh@joshtriplett.org>
-> > > > Cc: Sagi Grimberg <sagi@grimberg.me>
-> > > > Cc: Bart Van Assche <bvanassche@acm.org>
-> > > > Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-> > > > Cc: Chao Leng <lengchao@huawei.com>
-> > > > Cc: Christoph Hellwig <hch@lst.de>
-> > > 
-> > > Hello Guys,
-> > > 
-> > > Is there any objections on the two patches? If not, I'd suggest to move> on.
-> > 
-> > Seems like the nested case is one that should either be handled, or at
-> > least detected.
-> 
-> Personally, I'd like to see the async quiesce piece as well here, which
-> is the reason why this change was proposed. Don't see a strong urgency
-> to move forward with it before that, especially as this could
-> potentially affect various non-trivial reset flows.
-
-OK, it shouldn't be easy to add the interface, will do that in next
-version.
-
-
-Thanks, 
-Ming
-
+Diffstat:
+ Documentation/userspace-api/ioctl/hdio.rst |   24 ++++++++++++------------
+ block/blk-lib.c                            |    2 +-
+ block/genhd.c                              |    2 +-
+ block/ioctl.c                              |    4 ++--
+ block/scsi_ioctl.c                         |    2 +-
+ drivers/block/drbd/drbd_main.c             |    2 --
+ drivers/block/drbd/drbd_receiver.c         |    2 +-
+ drivers/block/drbd/drbd_worker.c           |    2 +-
+ drivers/ide/ide-ioctls.c                   |    4 ++--
+ drivers/md/dm-table.c                      |    2 +-
+ drivers/md/md.c                            |    9 ++++-----
+ drivers/md/md.h                            |    2 +-
+ drivers/mmc/core/block.c                   |    2 +-
+ drivers/s390/block/dasd_ioctl.c            |    8 ++++----
+ drivers/target/target_core_iblock.c        |    5 ++---
+ fs/nfsd/blocklayout.c                      |    4 ++--
+ include/linux/blkdev.h                     |    9 +++++++--
+ kernel/trace/blktrace.c                    |    2 +-
+ lib/vsprintf.c                             |    4 ++--
+ 19 files changed, 46 insertions(+), 45 deletions(-)
