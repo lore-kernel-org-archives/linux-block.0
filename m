@@ -2,258 +2,198 @@ Return-Path: <SRS0=kdGS=CM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 774C3C433E2
-	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 19:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B93C433E9
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 19:53:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AF5420C09
-	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 19:29:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DC5A20897
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 19:53:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599162812;
+	bh=K9Il+bfRH7uf5hQ/J/b3mSXBrr5BFL+Un2Ut/dR8TJI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=u7x6ntbgBiU8Porc/hysjVuXvhamR3YhsO4vTwTSB5IyK8LFhr4jCWKY3095raTHr
+	 ylmSjBRUtLgGJdwkBG5fLdpLoRXyTeEzD7ZTVKdt91Tc6OZQXzOG3kjbxn2c3cxR3O
+	 CmPqAcodIYUv+SD92g5DOy0zrcVQIOQiJm4uVPlQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728775AbgICT3D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Sep 2020 15:29:03 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:54426 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728312AbgICT3C (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Sep 2020 15:29:02 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 210B620418E;
-        Thu,  3 Sep 2020 21:28:59 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id bsyRkBUWlmm6; Thu,  3 Sep 2020 21:28:51 +0200 (CEST)
-Received: from [192.168.48.23] (host-45-78-251-166.dyn.295.ca [45.78.251.166])
-        by smtp.infotech.no (Postfix) with ESMTPA id 2B35620417A;
-        Thu,  3 Sep 2020 21:28:47 +0200 (CEST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v8 00/18] blk-mq/scsi: Provide hostwide shared tags for
- SCSI HBAs
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, kashyap.desai@broadcom.com,
-        ming.lei@redhat.com, bvanassche@acm.org, paolo.valente@linaro.org,
-        hare@suse.de, hch@lst.de
-Cc:     sumit.saxena@broadcom.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, megaraidlinux.pdl@broadcom.com,
-        chenxiang66@hisilicon.com, luojiaxing@huawei.com
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <18bdfa01-9e08-60b1-3eb8-cb395d639935@interlog.com>
-Date:   Thu, 3 Sep 2020 15:28:46 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728419AbgICTxb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Sep 2020 15:53:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57892 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727065AbgICTxa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Sep 2020 15:53:30 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A94B0C061244;
+        Thu,  3 Sep 2020 12:53:27 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id b124so3164456pfg.13;
+        Thu, 03 Sep 2020 12:53:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=oPyqrIZuFjAfVFg1FvzT2DAAuw6G4KrBAdUzRSV0jSg=;
+        b=Bm36ZwHnsxFOOlZxZgnFhjnWxM598/edzy7AEd3aDbB8SClOkin956hExLLUMj0kK/
+         2eToLVxF65uGPq9ktxFPZVlPfDb1pWYDzshrNcWW+QfIWNjSemEr4F4CATSo7LF87+8n
+         9BOYhGNkNUA5Fil7LPeggFNMHJtLoECFktmAPCeQuhbmhx+S9kdOwXbBd+Na9/t5sn8E
+         Aj13fSCnOT97hJnDlhLOGED0MoUqeojTWgrCi/QcF6loJmqqOr5twbO869SHNq6wEJkN
+         NggKXrM0GEHgLPoP3//d1Va0GwohzSaLVLtJyM4jX34o5IouUJOz/+z4FHtv5Pqy0NKn
+         L++Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=oPyqrIZuFjAfVFg1FvzT2DAAuw6G4KrBAdUzRSV0jSg=;
+        b=DHF5kXy5N6e6Q50OvakjDuo2TYxdiUmq0Nm4ZIegxRK2mRpE4ke5Q4udj0Z4xVi8jj
+         NemOMDzLKcUl1/8nGxTEK7NFbc9YmTZrPneixZnb73eEP6uS51kn8ffRzE+EJ6uZauO2
+         5pXwUl8g6su86NgWxx+mziHALYx30n5R+JsAK1kWzRixI/XGntFc2FPMFVrxZXvBCQjG
+         ZnOHZhpZm6Ho1qb9EmWlJULvs1OfVXw1NzFYPKzNm/bCo1ZxedTl8+LoBefWtrIXSHYh
+         1J3ce8PC9IeAYLF3DL2I9zQ+TXQxVFbkyvnfq5JRSFyMHCGmAiFdU6IC80QINwZdSqm3
+         oKGQ==
+X-Gm-Message-State: AOAM531NNjVGe12QHTrTGA7EJTiUOV+gCJkmoxf9Bg7vLbcfY3ySvLyK
+        ISieJOBbqVexwhcvvJi4TnI=
+X-Google-Smtp-Source: ABdhPJxY7GI7Xdk0q7NWYVWaCEru5rNbQgIFGF4Kzq86OrjN73P6or5I0cDb4k8Xs1A/GrEeF9Pj8A==
+X-Received: by 2002:a17:902:a58c:: with SMTP id az12mr5516044plb.109.1599162806939;
+        Thu, 03 Sep 2020 12:53:26 -0700 (PDT)
+Received: from google.com ([2620:15c:211:1:7220:84ff:fe09:5e58])
+        by smtp.gmail.com with ESMTPSA id bx18sm3238787pjb.6.2020.09.03.12.53.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Sep 2020 12:53:25 -0700 (PDT)
+Date:   Thu, 3 Sep 2020 12:53:23 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Yi Wang <wang.yi59@zte.com.cn>
+Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, xue.zhihong@zte.com.cn,
+        jiang.xuexin@zte.com.cn, zhanglin <zhang.lin16@zte.com.cn>
+Subject: Re: [PATCH] zram: add restriction on dynamic zram device creation
+Message-ID: <20200903195323.GA2215546@google.com>
+References: <1598942567-33440-1-git-send-email-wang.yi59@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1598942567-33440-1-git-send-email-wang.yi59@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-08-19 11:20 a.m., John Garry wrote:
-> Hi all,
-> 
-> Here is v8 of the patchset.
-> 
-> In this version of the series, we keep the shared sbitmap for driver tags,
-> and introduce changes to fix up the tag budgeting across request queues.
-> We also have a change to count requests per-hctx for when an elevator is
-> enabled, as an optimisation. I also dropped the debugfs changes - more on
-> that below.
-> 
-> Some performance figures:
-> 
-> Using 12x SAS SSDs on hisi_sas v3 hw. mq-deadline results are included,
-> but it is not always an appropriate scheduler to use.
-> 
-> Tag depth 		4000 (default)			260**
-> 
-> Baseline (v5.9-rc1):
-> none sched:		2094K IOPS			513K
-> mq-deadline sched:	2145K IOPS			1336K
-> 
-> Final, host_tagset=0 in LLDD *, ***:
-> none sched:		2120K IOPS			550K
-> mq-deadline sched:	2121K IOPS			1309K
-> 
-> Final ***:
-> none sched:		2132K IOPS			1185			
-> mq-deadline sched:	2145K IOPS			2097	
-> 
-> * this is relevant as this is the performance in supporting but not
->    enabling the feature
-> ** depth=260 is relevant as some point where we are regularly waiting for
->     tags to be available. Figures were are a bit unstable here.
-> *** Included "[PATCH V4] scsi: core: only re-run queue in
->      scsi_end_request() if device queue is busy"
-> 
-> A copy of the patches can be found here:
-> https://github.com/hisilicon/kernel-dev/tree/private-topic-blk-mq-shared-tags-v8
-> 
-> The hpsa patch depends on:
-> https://lore.kernel.org/linux-scsi/20200430131904.5847-1-hare@suse.de/
-> 
-> And the smartpqi patch is not to be accepted.
-> 
-> Comments (and testing) welcome, thanks!
+Hello, Yi,
 
-I tested this v8 patchset on MKP's 5.10/scsi-queue branch together with
-my rewritten sg driver on my laptop and a Ryzen 5 3600 machine. Since I
-don't have same hardware, I use the scsi_debug driver as the target:
-
-    modprobe scsi_debug dev_size_mb=1024 sector_size=512 add_host=7 
-per_host_store=1 ndelay=1000 random=1 submit_queues=12
-
-My test is a script which runs these three commands many times with
-differing parameters:
-
-sg_mrq_dd iflag=random bs=512 of=/dev/sg8 thr=64 time=2
-time to transfer data was 0.312705 secs, 3433.72 MB/sec
-2097152+0 records in
-2097152+0 records out
-
-sg_mrq_dd bpt=256 thr=64 mrq=36 time=2 if=/dev/sg8 bs=512 of=/dev/sg9
-time to transfer data was 0.212090 secs, 5062.67 MB/sec
-2097152+0 records in
-2097152+0 records out
-
-sg_mrq_dd --verify if=/dev/sg8 of=/dev/sg9 bs=512 bpt=256 thr=64 mrq=36 time=2
-Doing verify/cmp rather than copy
-time to transfer data was 0.184563 secs, 5817.75 MB/sec
-2097152+0 records in
-2097152+0 records verified
-
-The above is the output from last section of the my script run on the Ryzen 5.
-
-So the three steps are:
-    1) produce random data on /dev/sg8
-    2) copy /dev/sg8 to /dev/sg9
-    3) verify /dev/sg8 and /dev/sg9 are the same.
-
-The latter step is done with a sequence of READ(/dev/sg8) and
-VERIFY(BYTCHK=1 on /dev/sg9). The "mrq" stands for multiple requests (in
-one invocation; the bsg driver did that before its write(2) command was
-removed.
-The SCSI devices on the Ryzen 5 machine are:
-
-# lsscsi -gs
-[2:0:0:0]  disk    IBM-207x HUSMM8020ASS20   J4B6  /dev/sda   /dev/sg0   200GB
-[2:0:1:0]  disk    SEAGATE  ST200FM0073      0007  /dev/sdb   /dev/sg1   200GB
-[2:0:2:0]  enclosu Areca Te ARC-802801.37.69 0137  -          /dev/sg2       -
-[3:0:0:0]  disk    Linux    scsi_debug       0190  /dev/sdc   /dev/sg3  1.07GB
-[4:0:0:0]  disk    Linux    scsi_debug       0190  /dev/sdd   /dev/sg4  1.07GB
-[5:0:0:0]  disk    Linux    scsi_debug       0190  /dev/sde   /dev/sg5  1.07GB
-[6:0:0:0]  disk    Linux    scsi_debug       0190  /dev/sdf   /dev/sg6  1.07GB
-[7:0:0:0]  disk    Linux    scsi_debug       0190  /dev/sdg   /dev/sg7  1.07GB
-[8:0:0:0]  disk    Linux    scsi_debug       0190  /dev/sdh   /dev/sg8  1.07GB
-[9:0:0:0]  disk    Linux    scsi_debug       0190  /dev/sdi   /dev/sg9  1.07GB
-[N:0:1:1]  disk    WDC WDS250G2B0C-00PXH0__1       /dev/nvme0n1  -      250GB
-
-My script took 17m12 and the highest throughput (on a copy) was 7.5 GB/sec.
-Then I reloaded the scsi_debug module, this time with an additional
-'host_max_queue=128' parameter. The script run time was 5 seconds shorter
-and the maximum throughput was around 7.6 GB/sec. [Average throughput is
-around 4 GB/sec.]
-
-For comparison:
-
-# time liburing/examples/io_uring-cp /dev/sdh /dev/sdi
-real	0m1.542s
-user	0m0.004s
-sys	0m1.027s
-
-Umm, that's less then 1 GB/sec. In its defence io_uring-cp is an
-extremely simple, single threaded, proof-of-concept copy program,
-at least compared to sg_mrq_dd . As used by the sg_mrq_dd the
-rewritten sg driver bypasses moving 1 GB to and from the _user_
-space while doing the above copy and verify steps.
-
-So:
-
-Tested-by: Douglas Gilbert <dgilbert@interlog.com>
-
-> Differences to v7:
-> - Add null_blk and scsi_debug support
-> - Drop debugfs tags patch - it's too difficult to be the same between
-> hostwide and non-hostwide, as discussed:
-> https://lore.kernel.org/linux-scsi/1591810159-240929-1-git-send-email-john.garry@huawei.com/T/#mb3eb462d8be40273718505989abd12f8228c15fd
-> And from commit 6bf0eb550452 ("sbitmap: Consider cleared bits in
-> sbitmap_bitmap_show()"), I guess not many used this anyway...
-> - Add elevator per-hctx request count for optimisation
-> - Break up "blk-mq: rename blk_mq_update_tag_set_depth()" into 2x patches
-> - Pass flags for avoid per-hq queue tags init/free for hostwide tags
-> - Add Don's reviewed-tag and tested-by tags to appropiate patches
-> 	- (@Don, please let me know if issue with how I did this)
-> - Add "scsi: core: Show nr_hw_queues in sysfs"
-> - Rework megaraid SAS patch to have module param (Kashyap)
-> - rebase
+On Tue, Sep 01, 2020 at 02:42:47PM +0800, Yi Wang wrote:
+> From: zhanglin <zhang.lin16@zte.com.cn>
 > 
-> V7 is here for more info:
-> https://lore.kernel.org/linux-scsi/1591810159-240929-1-git-send-email-john.garry@huawei.com/T/#t
+> Add max_num_devices to limit dynamic zram device creation to prevent
+>  potential OOM
 > 
-> Hannes Reinecke (5):
->    blk-mq: Rename blk_mq_update_tag_set_depth()
->    blk-mq: Free tags in blk_mq_init_tags() upon error
->    scsi: Add host and host template flag 'host_tagset'
->    hpsa: enable host_tagset and switch to MQ
->    smartpqi: enable host tagset
+> Signed-off-by: zhanglin <zhang.lin16@zte.com.cn>
+> ---
+>  drivers/block/zram/zram_drv.c | 26 +++++++++++++++++++-------
+>  1 file changed, 19 insertions(+), 7 deletions(-)
 > 
-> John Garry (10):
->    blk-mq: Pass flags for tag init/free
->    blk-mq: Use pointers for blk_mq_tags bitmap tags
->    blk-mq: Facilitate a shared sbitmap per tagset
->    blk-mq: Relocate hctx_may_queue()
->    blk-mq: Record nr_active_requests per queue for when using shared
->      sbitmap
->    blk-mq: Record active_queues_shared_sbitmap per tag_set for when using
->      shared sbitmap
->    null_blk: Support shared tag bitmap
->    scsi: core: Show nr_hw_queues in sysfs
->    scsi: hisi_sas: Switch v3 hw to MQ
->    scsi: scsi_debug: Support host tagset
-> 
-> Kashyap Desai (2):
->    blk-mq, elevator: Count requests per hctx to improve performance
->    scsi: megaraid_sas: Added support for shared host tagset for
->      cpuhotplug
-> 
-> Ming Lei (1):
->    blk-mq: Rename BLK_MQ_F_TAG_SHARED as BLK_MQ_F_TAG_QUEUE_SHARED
-> 
->   block/bfq-iosched.c                         |   9 +-
->   block/blk-core.c                            |   2 +
->   block/blk-mq-debugfs.c                      |  10 +-
->   block/blk-mq-sched.c                        |  13 +-
->   block/blk-mq-tag.c                          | 149 ++++++++++++++------
->   block/blk-mq-tag.h                          |  56 +++-----
->   block/blk-mq.c                              |  81 +++++++----
->   block/blk-mq.h                              |  76 +++++++++-
->   block/kyber-iosched.c                       |   4 +-
->   block/mq-deadline.c                         |   6 +
->   drivers/block/null_blk_main.c               |   6 +
->   drivers/block/rnbd/rnbd-clt.c               |   2 +-
->   drivers/scsi/hisi_sas/hisi_sas.h            |   3 +-
->   drivers/scsi/hisi_sas/hisi_sas_main.c       |  36 ++---
->   drivers/scsi/hisi_sas/hisi_sas_v3_hw.c      |  87 +++++-------
->   drivers/scsi/hosts.c                        |   1 +
->   drivers/scsi/hpsa.c                         |  44 +-----
->   drivers/scsi/hpsa.h                         |   1 -
->   drivers/scsi/megaraid/megaraid_sas_base.c   |  39 +++++
->   drivers/scsi/megaraid/megaraid_sas_fusion.c |  29 ++--
->   drivers/scsi/scsi_debug.c                   |  28 ++--
->   drivers/scsi/scsi_lib.c                     |   2 +
->   drivers/scsi/scsi_sysfs.c                   |  11 ++
->   drivers/scsi/smartpqi/smartpqi_init.c       |  45 ++++--
->   include/linux/blk-mq.h                      |  13 +-
->   include/linux/blkdev.h                      |   3 +
->   include/scsi/scsi_host.h                    |   9 +-
->   27 files changed, 484 insertions(+), 281 deletions(-)
-> 
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index 36d49159140f..4f2c4eef5051 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -43,8 +43,9 @@ static DEFINE_MUTEX(zram_index_mutex);
+>  static int zram_major;
+>  static const char *default_compressor = "lzo-rle";
+>  
+> -/* Module params (documentation at end) */
+>  static unsigned int num_devices = 1;
+> +/* Module params (documentation at end) */
+> +static unsigned int max_num_devices = 8;
 
+It seems 8 is too small to me by default. How about 256?
+Furthemore, I think it would be worth to have in Kconfig.
+
+config ZRAM_DEV_MAX_COUNT
+	int "Number of zram devices to be created"
+	depends on ZRAM
+	default 256
+	help
+	   blah blah
+
+>  /*
+>   * Pages that compress to sizes equals or greater than this are stored
+>   * uncompressed in memory.
+> @@ -2013,10 +2014,16 @@ static ssize_t hot_add_show(struct class *class,
+>  			struct class_attribute *attr,
+>  			char *buf)
+>  {
+> -	int ret;
+> +	int ret = -ENOSPC;
+>  
+>  	mutex_lock(&zram_index_mutex);
+> +	if (num_devices >= max_num_devices) {
+> +		mutex_unlock(&zram_index_mutex);
+> +		return ret;
+> +	}
+>  	ret = zram_add();
+> +	if (ret >= 0)
+> +		num_devices += 1;
+>  	mutex_unlock(&zram_index_mutex);
+>  
+>  	if (ret < 0)
+> @@ -2046,8 +2053,10 @@ static ssize_t hot_remove_store(struct class *class,
+>  	zram = idr_find(&zram_index_idr, dev_id);
+>  	if (zram) {
+>  		ret = zram_remove(zram);
+> -		if (!ret)
+> +		if (!ret) {
+>  			idr_remove(&zram_index_idr, dev_id);
+> +			num_devices -= 1;
+> +		}
+>  	} else {
+>  		ret = -ENODEV;
+>  	}
+> @@ -2089,6 +2098,7 @@ static void destroy_devices(void)
+>  static int __init zram_init(void)
+>  {
+>  	int ret;
+> +	unsigned int i;
+>  
+>  	ret = cpuhp_setup_state_multi(CPUHP_ZCOMP_PREPARE, "block/zram:prepare",
+>  				      zcomp_cpu_up_prepare, zcomp_cpu_dead);
+> @@ -2111,13 +2121,15 @@ static int __init zram_init(void)
+>  		return -EBUSY;
+>  	}
+>  
+> -	while (num_devices != 0) {
+> +	if (num_devices > max_num_devices)
+> +		num_devices = max_num_devices;
+
+I am not sure the overriding is a good idea.
+Just leave it but just return error if user wanted to pre-create
+exceeding max size in configuration.
+
+Thanks.
+
+> +
+> +	for (i = 0; i < num_devices; i++) {
+>  		mutex_lock(&zram_index_mutex);
+>  		ret = zram_add();
+>  		mutex_unlock(&zram_index_mutex);
+>  		if (ret < 0)
+>  			goto out_error;
+> -		num_devices--;
+>  	}
+>  
+>  	return 0;
+> @@ -2135,8 +2147,8 @@ static void __exit zram_exit(void)
+>  module_init(zram_init);
+>  module_exit(zram_exit);
+>  
+> -module_param(num_devices, uint, 0);
+> -MODULE_PARM_DESC(num_devices, "Number of pre-created zram devices");
+> +module_param(max_num_devices, uint, 0);
+> +MODULE_PARM_DESC(max_num_devices, "Max number of created zram devices");
+>  
+>  MODULE_LICENSE("Dual BSD/GPL");
+>  MODULE_AUTHOR("Nitin Gupta <ngupta@vflare.org>");
+> -- 
+> 2.17.1
+> 
