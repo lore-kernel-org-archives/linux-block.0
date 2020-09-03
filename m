@@ -2,154 +2,291 @@ Return-Path: <SRS0=kdGS=CM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28CA8C433E2
-	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 14:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD00DC433E9
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 17:08:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0866206EB
-	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 14:25:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7990020775
+	for <linux-block@archiver.kernel.org>; Thu,  3 Sep 2020 17:08:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGdk0n2B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LlyDjyfO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729179AbgICOZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Sep 2020 10:25:26 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27404 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729285AbgICOWV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Sep 2020 10:22:21 -0400
+        id S1726678AbgICRIH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Sep 2020 13:08:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36206 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726327AbgICRIG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Sep 2020 13:08:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599142921;
+        s=mimecast20190719; t=1599152884;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=We/TRdgYcnvJWpcTJ/cArqFa/cuTeer3D7MGMFuKhD8=;
-        b=GGdk0n2B6DZks/aD7z2j1dpruMdMojDmd0TfHFhhxyAsqrvzI7yatUlrCrVvk2BnwpyZUl
-        MRZir1fvsJlS7uUpIP+0d/H5dtUL6vJPaC8xrjQk5vQ3gTqtbg2KrbtSF4w7xd2qpoZIRS
-        jNwXYyWhhbEEGIT3nUnTm/YpuTXoi2o=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Uwll+xrhXHmqagJeUYIATUjONJftxkpZHtZK69KYT18=;
+        b=LlyDjyfOYvuAMOvJish+t+Tfq+nUUGjKUG5naPwS/EHOkWVrsonqzATwNw8366qIhP6Yk0
+        FT41KeYS9diEohO4UIxLRxt5A3guCn1VjKEOyrBOn93GmvggMXux1N2uBP+32Tqmy85esu
+        CY/k9XBUDizl8B5Cp85AL1+BHyfisio=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-IAO9oyP8PkKsCvdoLFL2OA-1; Thu, 03 Sep 2020 09:11:01 -0400
-X-MC-Unique: IAO9oyP8PkKsCvdoLFL2OA-1
+ us-mta-396-naj4F-ETNNGvh9ri0ZuDQA-1; Thu, 03 Sep 2020 13:08:01 -0400
+X-MC-Unique: naj4F-ETNNGvh9ri0ZuDQA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59735807336;
-        Thu,  3 Sep 2020 13:10:59 +0000 (UTC)
-Received: from T590 (ovpn-12-109.pek2.redhat.com [10.72.12.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EBDD11C4;
-        Thu,  3 Sep 2020 13:10:48 +0000 (UTC)
-Date:   Thu, 3 Sep 2020 21:10:44 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V2 0/2] blk-mq: implement queue quiesce via percpu_ref
- for BLK_MQ_F_BLOCKING
-Message-ID: <20200903131044.GA786177@T590>
-References: <20200825141734.115879-1-ming.lei@redhat.com>
- <20200902031144.GC317674@T590>
- <aef6938d-3762-22bc-50c8-877ee0aa5700@kernel.dk>
- <20200903003545.GA638071@T590>
- <20200903123702.GA2928425@dhcp-10-100-145-180.wdl.wdc.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2CBE427C2;
+        Thu,  3 Sep 2020 17:08:00 +0000 (UTC)
+Received: from [10.131.1.175] (unknown [10.0.117.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DAA057EECB;
+        Thu,  3 Sep 2020 17:07:57 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200903123702.GA2928425@dhcp-10-100-145-180.wdl.wdc.com>
+From:   CKI Project <cki-project@redhat.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: =?utf-8?q?=F0=9F=92=A5?= PANICKED: Test report for kernel
+ 5.9.0-rc3-020ad03.cki (block)
+Date:   Thu, 03 Sep 2020 17:07:57 -0000
+CC:     Changhui Zhong <czhong@redhat.com>
+Message-ID: <cki.538AE6A321.BMB0X5ZYG5@redhat.com>
+X-Gitlab-Pipeline-ID: 613166
+X-Gitlab-Url: https://xci32.lab.eng.rdu2.redhat.com/
+X-Gitlab-Path: /cki-project/cki-pipeline/pipelines/613166
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 03, 2020 at 05:37:02AM -0700, Keith Busch wrote:
-> On Thu, Sep 03, 2020 at 08:35:45AM +0800, Ming Lei wrote:
-> > On Wed, Sep 02, 2020 at 11:52:59AM -0600, Jens Axboe wrote:
-> > > On 9/1/20 9:11 PM, Ming Lei wrote:
-> > > > On Tue, Aug 25, 2020 at 10:17:32PM +0800, Ming Lei wrote:
-> > > >> Hi Jens,
-> > > >>
-> > > >> The 1st patch add .mq_quiesce_mutex for serializing quiesce/unquiesce,
-> > > >> and prepares for replacing srcu with percpu_ref.
-> > > >>
-> > > >> The 2nd patch replaces srcu with percpu_ref.
-> > > >>
-> > > >> V2:
-> > > >> 	- add .mq_quiesce_lock
-> > > >> 	- add comment on patch 2 wrt. handling hctx_lock() failure
-> > > >> 	- trivial patch style change
-> > > >>
-> > > >>
-> > > >> Ming Lei (2):
-> > > >>   blk-mq: serialize queue quiesce and unquiesce by mutex
-> > > >>   blk-mq: implement queue quiesce via percpu_ref for BLK_MQ_F_BLOCKING
-> > > >>
-> > > >>  block/blk-core.c       |   2 +
-> > > >>  block/blk-mq-sysfs.c   |   2 -
-> > > >>  block/blk-mq.c         | 125 +++++++++++++++++++++++------------------
-> > > >>  block/blk-sysfs.c      |   6 +-
-> > > >>  include/linux/blk-mq.h |   7 ---
-> > > >>  include/linux/blkdev.h |   6 ++
-> > > >>  6 files changed, 82 insertions(+), 66 deletions(-)
-> > > >>
-> > > >> Cc: Lai Jiangshan <jiangshanlai@gmail.com>
-> > > >> Cc: Paul E. McKenney <paulmck@kernel.org>
-> > > >> Cc: Josh Triplett <josh@joshtriplett.org>
-> > > >> Cc: Sagi Grimberg <sagi@grimberg.me>
-> > > >> Cc: Bart Van Assche <bvanassche@acm.org>
-> > > >> Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-> > > >> Cc: Chao Leng <lengchao@huawei.com>
-> > > >> Cc: Christoph Hellwig <hch@lst.de>
-> > > > 
-> > > > Hello Guys,
-> > > > 
-> > > > Is there any objections on the two patches? If not, I'd suggest to move> on.
-> > > 
-> > > Seems like the nested case is one that should either be handled, or at
-> > > least detected.
-> > 
-> > Yeah, the 1st patch adds mutex for handling nested case correctly and efficiently.
-> 
-> That doesn't really do anything about handling nested quiesce/unquiesce.
 
-The mutex is required for avoiding warning in percpu_ref_kill_and_confirm() if
-two queue quiesce are nested, and I will comment on this motivation in next
-version.
+Hello,
 
-> It just prevents two threads from doing it at the same time, but anyone
-> can still undo the other's expected queue state. The following on top of
+We ran automated tests on a recent commit from this kernel tree:
 
-Right, the patch itself changes nothing wrt. this point, and it breaks nothing
-too.
+       Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/lin=
+ux-block.git
+            Commit: 020ad0333b03 - Merge branch 'for-5.10/block' into for-next
 
-> your series will at least detect the condition:
-> 
-> ---
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ef6c6fa8dab0..52b53f2bb567 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -249,6 +249,7 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
->  {
->  	mutex_lock(&q->mq_quiesce_lock);
->  
-> +	WARN_ON(!blk_queue_quiesced(q));
+The results of these automated tests are provided below.
 
-We can't do that simply, because queue unquiesce may be called
-unconditionally on un-quiesced queue, such as nvme_dev_remove_admin(),
-nvme_set_queue_dying(), ...
+    Overall result: FAILED (see details below)
+             Merge: OK
+           Compile: OK
+             Tests: PANICKED
+
+All kernel binaries, config files, and logs are available for download here:
+
+  https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefix=3Ddatawa=
+rehouse/2020/09/02/613166
+
+One or more kernel tests failed:
+
+    ppc64le:
+     =F0=9F=92=A5 storage: software RAID testing
+
+    aarch64:
+     =F0=9F=92=A5 storage: software RAID testing
+
+    x86_64:
+     =F0=9F=92=A5 storage: software RAID testing
+
+We hope that these logs can help you find the problem quickly. For the full
+detail on our testing procedures, please scroll to the bottom of this message.
+
+Please reply to this email if you have any questions about the tests that we
+ran or if you have any suggestions on how to make future tests more effective.
+
+        ,-.   ,-.
+       ( C ) ( K )  Continuous
+        `-',-.`-'   Kernel
+          ( I )     Integration
+           `-'
+______________________________________________________________________________
+
+Compile testing
+---------------
+
+We compiled the kernel for 4 architectures:
+
+    aarch64:
+      make options: make -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    ppc64le:
+      make options: make -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    s390x:
+      make options: make -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+
+    x86_64:
+      make options: make -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
 
 
-Thanks,
-Ming
+
+Hardware testing
+----------------
+We booted each kernel and ran the following tests:
+
+  aarch64:
+    Host 1:
+       =E2=9C=85 Boot test
+       =E2=9C=85 ACPI table test
+       =E2=9C=85 LTP
+       =E2=9C=85 Loopdev Sanity
+       =E2=9C=85 Memory function: memfd_create
+       =E2=9C=85 AMTU (Abstract Machine Test Utility)
+       =E2=9C=85 Ethernet drivers sanity
+       =E2=9C=85 storage: SCSI VPD
+       =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+
+    Host 2:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - ext4
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: software RAID testing
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+
+    Host 3:
+       =E2=9C=85 Boot test
+       =E2=9C=85 xfstests - ext4
+       =E2=9C=85 xfstests - xfs
+       =F0=9F=92=A5 storage: software RAID testing
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+
+  ppc64le:
+    Host 1:
+       =E2=9C=85 Boot test
+       =F0=9F=9A=A7 =E2=9C=85 kdump - sysrq-c
+
+    Host 2:
+       =E2=9C=85 Boot test
+       =E2=9C=85 xfstests - ext4
+       =E2=9C=85 xfstests - xfs
+       =F0=9F=92=A5 storage: software RAID testing
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+
+    Host 3:
+
+       =E2=9A=A1 Internal infrastructure issues prevented one or more tests (=
+marked
+       with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this architecture.
+       This is not the fault of the kernel that was tested.
+
+       =E2=9C=85 Boot test
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 LTP
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Loopdev Sanity
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: memfd_create
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 AMTU (Abstract Machine Test Utility)
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 Ethernet drivers sanity
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 POSIX pjd-fstest suites
+
+  s390x:
+    Host 1:
+       =E2=9C=85 Boot test
+       =E2=9C=85 stress: stress-ng
+       =F0=9F=9A=A7 =E2=9C=85 Storage blktests
+
+    Host 2:
+       =E2=9C=85 Boot test
+       =E2=9C=85 LTP
+       =E2=9C=85 Loopdev Sanity
+       =E2=9C=85 Memory function: memfd_create
+       =E2=9C=85 AMTU (Abstract Machine Test Utility)
+       =E2=9C=85 Ethernet drivers sanity
+       =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+
+  x86_64:
+    Host 1:
+       =E2=9C=85 Boot test
+       =E2=9C=85 Storage SAN device stress - qedf driver
+
+    Host 2:
+       =E2=8F=B1  Boot test
+       =E2=8F=B1  Storage SAN device stress - mpt3sas_gen1
+
+    Host 3:
+       =E2=9C=85 Boot test
+       =E2=9C=85 xfstests - ext4
+       =E2=9C=85 xfstests - xfs
+       =F0=9F=92=A5 storage: software RAID testing
+       =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+       =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+
+    Host 4:
+       =E2=9C=85 Boot test
+       =E2=9C=85 Storage SAN device stress - lpfc driver
+
+    Host 5:
+       =E2=9C=85 Boot test
+       =F0=9F=9A=A7 =E2=9C=85 kdump - sysrq-c
+
+    Host 6:
+       =E2=9C=85 Boot test
+       =E2=9C=85 ACPI table test
+       =E2=9C=85 LTP
+       =E2=9C=85 Loopdev Sanity
+       =E2=9C=85 Memory function: memfd_create
+       =E2=9C=85 AMTU (Abstract Machine Test Utility)
+       =E2=9C=85 Ethernet drivers sanity
+       =E2=9C=85 kernel-rt: rt_migrate_test
+       =E2=9C=85 kernel-rt: rteval
+       =E2=9C=85 kernel-rt: sched_deadline
+       =E2=9C=85 kernel-rt: smidetect
+       =E2=9C=85 storage: SCSI VPD
+       =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+       =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+
+    Host 7:
+       =E2=9C=85 Boot test
+       =E2=9C=85 kdump - sysrq-c - megaraid_sas
+
+    Host 8:
+       =E2=9C=85 Boot test
+       =E2=9C=85 Storage SAN device stress - qla2xxx driver
+
+    Host 9:
+       =E2=8F=B1  Boot test
+       =E2=8F=B1  kdump - sysrq-c - mpt3sas_gen1
+
+  Test sources: https://gitlab.com/cki-project/kernel-tests
+    =F0=9F=92=9A Pull requests are welcome for new tests or improvements to e=
+xisting tests!
+
+Aborted tests
+-------------
+Tests that didn't complete running successfully are marked with =E2=9A=A1=E2=
+=9A=A1=E2=9A=A1.
+If this was caused by an infrastructure issue, we try to mark that
+explicitly in the report.
+
+Waived tests
+------------
+If the test run included waived tests, they are marked with =F0=9F=9A=A7. Suc=
+h tests are
+executed but their results are not taken into account. Tests are waived when
+their results are not reliable enough, e.g. when they're just introduced or a=
+re
+being fixed.
+
+Testing timeout
+---------------
+We aim to provide a report within reasonable timeframe. Tests that haven't
+finished running yet are marked with =E2=8F=B1.
 
