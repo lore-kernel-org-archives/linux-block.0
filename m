@@ -2,147 +2,170 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67ECDC433E2
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 05:48:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B96C433E2
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 08:48:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3635120748
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 05:48:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18A1820791
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 08:48:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbgIDFsW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 01:48:22 -0400
-Received: from mail-il1-f197.google.com ([209.85.166.197]:39396 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726360AbgIDFsU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 01:48:20 -0400
-Received: by mail-il1-f197.google.com with SMTP id o1so4078261ilk.6
-        for <linux-block@vger.kernel.org>; Thu, 03 Sep 2020 22:48:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=adSaErrS+NJDZ1sWGnEkBTMPxTpUC1WocPpkg5ogTnk=;
-        b=chZO1vkVHbm8aLbE3MQtZf2uFQdlcRmadJrMQ6W73kYTtvfjjLrCl4G3wmQXfxFOR7
-         xbYp0fG1xwqSSPOc+TESItz7d0S8OUS6rb7msFwj5gaqE6XdNkVCQwaes02Ul+vpCfV6
-         TrKjzH/3CZRQ40ltGt1h9BeEpmJJL1NGQ1mbu2DrJI3snqrA3gt0A0K8YaqTnlfQCOi1
-         HO7IAZV0ZSqlPEOt5UtwQjTOhGbSOpoRCpj3WbnPRKsIj9KzB4f8a+YCJlQfkRp6wwrn
-         Y0oqtBR/GyN04+Oht1KEJy6EyYNIRVA7neqXqAYjpuXhQ21k4Hkyw2Go5AseL7FQHtMu
-         sA5w==
-X-Gm-Message-State: AOAM530VtIY2OtVcA3IChjxFO8Kgwu+ivzyhlqa7xYxRMre+739tT68l
-        AdGjBEBArAZxVGgvYTc1Ns2tt/SWrtPSiCshlZkp74hWFFPG
-X-Google-Smtp-Source: ABdhPJzyUvGdhVGGYWRgQ83jR0N7k+odBtrWn5pX3Pdq4vlCdraGt8u1ZVFoefVHVT6vT2KSCleT0/SItSm+1Fev8iqBUPsbS5MZ
-MIME-Version: 1.0
-X-Received: by 2002:a92:ce44:: with SMTP id a4mr5797266ilr.240.1599198499477;
- Thu, 03 Sep 2020 22:48:19 -0700 (PDT)
-Date:   Thu, 03 Sep 2020 22:48:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007ca0e105ae766a11@google.com>
-Subject: KASAN: null-ptr-deref Read in percpu_ref_exit
-From:   syzbot <syzbot+4264ecfcf0f27a5e4180@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        id S1729858AbgIDIsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 04:48:08 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:15300 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726575AbgIDIsH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Sep 2020 04:48:07 -0400
+Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
+        by Forcepoint Email with ESMTPS id 4E262E4E919A776F1020;
+        Fri,  4 Sep 2020 16:48:04 +0800 (CST)
+Received: from notes_smtp.zte.com.cn (notes_smtp.zte.com.cn [10.30.1.239])
+        by mse-fl2.zte.com.cn with ESMTP id 0848m3UC023235;
+        Fri, 4 Sep 2020 16:48:03 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from fox-host8.localdomain ([10.74.120.8])
+          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
+          with ESMTP id 2020090416483927-4846041 ;
+          Fri, 4 Sep 2020 16:48:39 +0800 
+From:   Yi Wang <wang.yi59@zte.com.cn>
+To:     minchan@kernel.org
+Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, xue.zhihong@zte.com.cn,
+        wang.yi59@zte.com.cn, jiang.xuexin@zte.com.cn,
+        zhanglin <zhang.lin16@zte.com.cn>
+Subject: [PATCH v2] zram: add restriction on dynamic zram device creation
+Date:   Fri, 4 Sep 2020 16:52:10 +0800
+Message-Id: <1599209530-41015-1-git-send-email-wang.yi59@zte.com.cn>
+X-Mailer: git-send-email 1.8.3.1
+X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
+ 21, 2013) at 2020-09-04 16:48:39,
+        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
+ 2020-09-04 16:48:12,
+        Serialize complete at 2020-09-04 16:48:12
+X-MAIL: mse-fl2.zte.com.cn 0848m3UC023235
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+From: zhanglin <zhang.lin16@zte.com.cn>
 
-syzbot found the following issue on:
+Add max_num_devices to limit dynamic zram device creation to prevent
+ potential OOM
 
-HEAD commit:    7a695657 Add linux-next specific files for 20200903
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15ac984e900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=39134fcec6c78e33
-dashboard link: https://syzkaller.appspot.com/bug?extid=4264ecfcf0f27a5e4180
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13709f15900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=147047e9900000
-
-The issue was bisected to:
-
-commit d0c567d60f3730b97050347ea806e1ee06445c78
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Wed Sep 2 12:26:42 2020 +0000
-
-    percpu_ref: reduce memory footprint of percpu_ref in fast path
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17ed5a95900000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=141d5a95900000
-console output: https://syzkaller.appspot.com/x/log.txt?x=101d5a95900000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4264ecfcf0f27a5e4180@syzkaller.appspotmail.com
-Fixes: d0c567d60f37 ("percpu_ref: reduce memory footprint of percpu_ref in fast path")
-
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_read include/linux/instrumented.h:71 [inline]
-BUG: KASAN: null-ptr-deref in atomic64_read include/asm-generic/atomic-instrumented.h:837 [inline]
-BUG: KASAN: null-ptr-deref in atomic_long_read include/asm-generic/atomic-long.h:29 [inline]
-BUG: KASAN: null-ptr-deref in percpu_ref_exit+0x102/0x1f0 lib/percpu-refcount.c:136
-Read of size 8 at addr 0000000000000000 by task syz-executor932/7175
-
-CPU: 0 PID: 7175 Comm: syz-executor932 Not tainted 5.9.0-rc3-next-20200903-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x198/0x1fd lib/dump_stack.c:118
- __kasan_report mm/kasan/report.c:517 [inline]
- kasan_report.cold+0x5/0x37 mm/kasan/report.c:530
- check_memory_region_inline mm/kasan/generic.c:186 [inline]
- check_memory_region+0x13d/0x180 mm/kasan/generic.c:192
- instrument_atomic_read include/linux/instrumented.h:71 [inline]
- atomic64_read include/asm-generic/atomic-instrumented.h:837 [inline]
- atomic_long_read include/asm-generic/atomic-long.h:29 [inline]
- percpu_ref_exit+0x102/0x1f0 lib/percpu-refcount.c:136
- hd_free_part block/partitions/../blk.h:391 [inline]
- part_release+0x9d/0xc0 block/partitions/core.c:262
- device_release+0x9f/0x240 drivers/base/core.c:1802
- kobject_cleanup lib/kobject.c:708 [inline]
- kobject_release lib/kobject.c:739 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x171/0x270 lib/kobject.c:756
- put_device+0x1b/0x30 drivers/base/core.c:3031
- add_partition+0x648/0xb00 block/partitions/core.c:493
- blk_add_partition block/partitions/core.c:685 [inline]
- blk_add_partitions+0x9db/0xe00 block/partitions/core.c:761
- bdev_disk_changed+0x208/0x390 fs/block_dev.c:1417
- loop_reread_partitions+0x29/0x50 drivers/block/loop.c:658
- loop_set_status+0x6da/0x1010 drivers/block/loop.c:1427
- loop_set_status64 drivers/block/loop.c:1547 [inline]
- lo_ioctl+0x900/0x1690 drivers/block/loop.c:1715
- __blkdev_driver_ioctl block/ioctl.c:224 [inline]
- blkdev_ioctl+0x28c/0x700 block/ioctl.c:620
- block_ioctl+0xf9/0x140 fs/block_dev.c:1870
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x446c27
-Code: 48 83 c4 08 48 89 d8 5b 5d c3 66 0f 1f 84 00 00 00 00 00 48 89 e8 48 f7 d8 48 39 c3 0f 92 c0 eb 92 66 90 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 0f 83 6d 07 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007fb6aa64db48 EFLAGS: 00000202 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 0000000000446c27
-RDX: 00007fb6aa64dbe0 RSI: 0000000000004c04 RDI: 0000000000000004
-RBP: 00000000200158a8 R08: fe03f80fe03f80ff R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 00007fb6aa64e6d0
-R13: 0000000000000003 R14: 0000000000000003 R15: 000a00d800050102
-==================================================================
-
-
+Signed-off-by: zhanglin <zhang.lin16@zte.com.cn>
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v1->v2:
+change hard-coded initial max_num_devices into configurable way.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+ drivers/block/zram/Kconfig    |  7 +++++++
+ drivers/block/zram/zram_drv.c | 28 +++++++++++++++++++++-------
+ 2 files changed, 28 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+index fe7a4b7d30cf..54a369932417 100644
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -37,3 +37,10 @@ config ZRAM_MEMORY_TRACKING
+ 	  /sys/kernel/debug/zram/zramX/block_state.
+ 
+ 	  See Documentation/admin-guide/blockdev/zram.rst for more information.
++
++config ZRAM_DEV_MAX_COUNT
++	int "Number of zram devices to be created"
++	depends on ZRAM
++	default 256
++	help
++	  This option specifies the maximum number of zram devices.
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 36d49159140f..d1022f3c04c4 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -43,8 +43,9 @@ static DEFINE_MUTEX(zram_index_mutex);
+ static int zram_major;
+ static const char *default_compressor = "lzo-rle";
+ 
+-/* Module params (documentation at end) */
+ static unsigned int num_devices = 1;
++/* Module params (documentation at end) */
++static unsigned int max_num_devices = CONFIG_ZRAM_DEV_MAX_COUNT;
+ /*
+  * Pages that compress to sizes equals or greater than this are stored
+  * uncompressed in memory.
+@@ -2013,10 +2014,16 @@ static ssize_t hot_add_show(struct class *class,
+ 			struct class_attribute *attr,
+ 			char *buf)
+ {
+-	int ret;
++	int ret = -ENOSPC;
+ 
+ 	mutex_lock(&zram_index_mutex);
++	if (num_devices >= max_num_devices) {
++		mutex_unlock(&zram_index_mutex);
++		return ret;
++	}
+ 	ret = zram_add();
++	if (ret >= 0)
++		num_devices += 1;
+ 	mutex_unlock(&zram_index_mutex);
+ 
+ 	if (ret < 0)
+@@ -2046,8 +2053,10 @@ static ssize_t hot_remove_store(struct class *class,
+ 	zram = idr_find(&zram_index_idr, dev_id);
+ 	if (zram) {
+ 		ret = zram_remove(zram);
+-		if (!ret)
++		if (!ret) {
+ 			idr_remove(&zram_index_idr, dev_id);
++			num_devices -= 1;
++		}
+ 	} else {
+ 		ret = -ENODEV;
+ 	}
+@@ -2089,6 +2098,7 @@ static void destroy_devices(void)
+ static int __init zram_init(void)
+ {
+ 	int ret;
++	unsigned int i;
+ 
+ 	ret = cpuhp_setup_state_multi(CPUHP_ZCOMP_PREPARE, "block/zram:prepare",
+ 				      zcomp_cpu_up_prepare, zcomp_cpu_dead);
+@@ -2111,13 +2121,17 @@ static int __init zram_init(void)
+ 		return -EBUSY;
+ 	}
+ 
+-	while (num_devices != 0) {
++	if (num_devices > max_num_devices) {
++		pr_err("Number of pre-created zram devices over limit\n");
++		goto out_error;
++	}
++
++	for (i = 0; i < num_devices; i++) {
+ 		mutex_lock(&zram_index_mutex);
+ 		ret = zram_add();
+ 		mutex_unlock(&zram_index_mutex);
+ 		if (ret < 0)
+ 			goto out_error;
+-		num_devices--;
+ 	}
+ 
+ 	return 0;
+@@ -2135,8 +2149,8 @@ static void __exit zram_exit(void)
+ module_init(zram_init);
+ module_exit(zram_exit);
+ 
+-module_param(num_devices, uint, 0);
+-MODULE_PARM_DESC(num_devices, "Number of pre-created zram devices");
++module_param(max_num_devices, uint, 0);
++MODULE_PARM_DESC(max_num_devices, "Max number of created zram devices");
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_AUTHOR("Nitin Gupta <ngupta@vflare.org>");
+-- 
+2.17.1
+
