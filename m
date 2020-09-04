@@ -2,319 +2,112 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BBEC43461
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 11:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4CDC433E2
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 11:36:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43CE02087C
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 11:07:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4D3B20BED
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 11:36:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="fgxVF/Ky"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729741AbgIDLGx convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 07:06:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35564 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726171AbgIDLGh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 07:06:37 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-NqmhaGTGO-KN6Ma-LGgdZw-1; Fri, 04 Sep 2020 07:06:26 -0400
-X-MC-Unique: NqmhaGTGO-KN6Ma-LGgdZw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BE241DDE8;
-        Fri,  4 Sep 2020 11:06:25 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 94C7D7FB80;
-        Fri,  4 Sep 2020 11:06:25 +0000 (UTC)
-Received: from zmail19.collab.prod.int.phx2.redhat.com (zmail19.collab.prod.int.phx2.redhat.com [10.5.83.22])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 853AA1832FC1;
-        Fri,  4 Sep 2020 11:06:25 +0000 (UTC)
-Date:   Fri, 4 Sep 2020 07:06:25 -0400 (EDT)
-From:   Veronika Kabatova <vkabatov@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     CKI Project <cki-project@redhat.com>, linux-block@vger.kernel.org,
-        Changhui Zhong <czhong@redhat.com>, axboe@kernel.dk
-Message-ID: <491751.10128377.1599217585366.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20200904010233.GA817918@T590>
-References: <cki.538AE6A321.BMB0X5ZYG5@redhat.com> <20200904010233.GA817918@T590>
-Subject: =?utf-8?Q?Re:_=F0=9F=92=A5_PANICKED:_Test_report_for=09k?=
- =?utf-8?Q?ernel_5.9.0-rc3-020ad03.cki_(block)?=
+        id S1730100AbgIDLgZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 07:36:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33370 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728118AbgIDLf2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 07:35:28 -0400
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9271C061244
+        for <linux-block@vger.kernel.org>; Fri,  4 Sep 2020 04:35:27 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id z9so5784544wmk.1
+        for <linux-block@vger.kernel.org>; Fri, 04 Sep 2020 04:35:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7vXeg97tthpHn3OO05TYv6MMMBFwUPr9qFdp5Cy/4dA=;
+        b=fgxVF/KyrZotODBO6md3qVlmfLr1Yswld4L6UNDdmY8Kz2X24HlOcy5vpRpL4rQ530
+         gSMb7ay6j29f8JitxNubbM84Y0Vy2awUgC9aVsr/VWAgZAPTtFx707gjGuJedrngffk/
+         2rHELETgWgk8HSS6N24wNbk7FnfcXbSluqeNpyXRjqYcdFg0+4vKoB9DJVsSlHdCZKqe
+         qGh43iCNHUEh5ck+UDqey9145ghDrCdoyWzi6zglY0HshYc6vAYNqqkE2hIPYMZsex/H
+         toDwou6nj8xFEiZje4JFCGJNZZXBe5HqIEG4juqJhLHBAg/FxrEvzRxp3YxxOwxCN5Xi
+         DWYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7vXeg97tthpHn3OO05TYv6MMMBFwUPr9qFdp5Cy/4dA=;
+        b=PaouEL3VJEqIMsW8Ibxch8RTYPdIJ3A7CnLOSryMN92Djxy8Mz4oCh6xQE9EX7f190
+         hpttdr1+8BNn/ZCMWZYGRTvJ4WWnt/EqHelF1qzzURc5uaj1DuzoI3jFFlc4s+7FSmyv
+         CmC34CVb2Ah4lyCDRt9C3G+Sanby70YN+Fna9AX8YptT7NzWgblI/oC0v9q1U6PGqOcR
+         Old4X5X9cGoEWy/k80ObZPr41EohgvXCBsMpEqk0EAXC4Wc6Vh6/ioDB/8vgtt/ICMwk
+         Zuq7rcbLeGT1a500+TH0FXAwGwl3oE1oPInUargMRgRzOkiAdLtmAF78uO83r/QKvs6U
+         s6zA==
+X-Gm-Message-State: AOAM532Jp0/ZKYsu21POffcMsUkbGXEiCAnJUQRmu1Titg1xEcWmJ/3U
+        UZo5Oty9U9j3wt9wX2gXYzEIlQw6CtqF30YRtxr6vkVJ07s073A=
+X-Google-Smtp-Source: ABdhPJw5wZGimxTw9n7szYlZ3p5Z+QDtX17dFoRAYKAcnXU2PfEgN70bforC8WZ9Bl4pCtP+K+rlOuQza/laTYmHQ/U=
+X-Received: by 2002:a7b:c7cd:: with SMTP id z13mr7196762wmk.160.1599219326253;
+ Fri, 04 Sep 2020 04:35:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [10.40.192.15, 10.4.195.8]
-Thread-Topic: ? PANICKED: Test report for kernel 5.9.0-rc3-020ad03.cki (block)
-Thread-Index: Ha2jgI6n/BnzVCm/HSupvpvlrqqssw==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
+ <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
+In-Reply-To: <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Fri, 4 Sep 2020 13:35:15 +0200
+Message-ID: <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
+Subject: Re: [RFC] Reliable Multicast on top of RTRS
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2020-09-02 01:04, Danil Kipnis wrote:
+> > RTRS allows for reliable transmission of sg lists between two hosts
+> > over rdma. It is optimised for block io. One can implement a client
+> > and a server module on top of RTRS which would allow for reliable
+> > transmission to a group of hosts.
+> >
+> > In the networking world this is called reliable multicast. I think one
+> > can say that reliable multicast is an equivalent to what is called
+> > "mirror" in the storage world. There is something called XoR network
+> > coding which seems to be an equivalent of raid5. There is also Reed
+> > Solomon network coding.
+> >
+> > Having a reliable multicast with coding rdma-based transport layer
+> > would allow for very flexible and scalable designs of distributed
+> > replication solutions based on different in-kernel transport, block
+> > and replication drivers.
+> >
+> > What do you think?
+>
+> How will the resulting software differ from DRBD (other than that it
+> uses RDMA)?
 
+DRBD replicates disks (a local one with a remote one). The idea here
+would be to replicate on the level of hosts, i.e. to support
+replication inside the transport layer. A reliable mc on top of rtrs
+would be more similar to a stack where an md-raid<x> sits on a client
+on top of two or more imported srp/nvmeof/rnbd devices, but with an
+ability to resync between remote machines directly.
 
------ Original Message -----
-> From: "Ming Lei" <ming.lei@redhat.com>
-> To: "CKI Project" <cki-project@redhat.com>
-> Cc: linux-block@vger.kernel.org, axboe@kernel.dk, "Changhui Zhong" <czhong@redhat.com>
-> Sent: Friday, September 4, 2020 3:02:33 AM
-> Subject: Re: 💥 PANICKED: Test report for	kernel 5.9.0-rc3-020ad03.cki (block)
-> 
-> On Thu, Sep 03, 2020 at 05:07:57PM -0000, CKI Project wrote:
-> > 
-> > Hello,
-> > 
-> > We ran automated tests on a recent commit from this kernel tree:
-> > 
-> >        Kernel repo:
-> >        https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-> >             Commit: 020ad0333b03 - Merge branch 'for-5.10/block' into
-> >             for-next
-> > 
-> > The results of these automated tests are provided below.
-> > 
-> >     Overall result: FAILED (see details below)
-> >              Merge: OK
-> >            Compile: OK
-> >              Tests: PANICKED
-> > 
-> > All kernel binaries, config files, and logs are available for download
-> > here:
-> > 
-> >   https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefix=datawarehouse/2020/09/02/613166
-> > 
-> > One or more kernel tests failed:
-> > 
-> >     ppc64le:
-> >      💥 storage: software RAID testing
-> > 
-> >     aarch64:
-> >      💥 storage: software RAID testing
-> > 
-> >     x86_64:
-> >      💥 storage: software RAID testing
-> > 
-> > We hope that these logs can help you find the problem quickly. For the full
-> > detail on our testing procedures, please scroll to the bottom of this
-> > message.
-> > 
-> > Please reply to this email if you have any questions about the tests that
-> > we
-> > ran or if you have any suggestions on how to make future tests more
-> > effective.
-> > 
-> >         ,-.   ,-.
-> >        ( C ) ( K )  Continuous
-> >         `-',-.`-'   Kernel
-> >           ( I )     Integration
-> >            `-'
-> > ______________________________________________________________________________
-> > 
-> > Compile testing
-> > ---------------
-> > 
-> > We compiled the kernel for 4 architectures:
-> > 
-> >     aarch64:
-> >       make options: make -j30 INSTALL_MOD_STRIP=1 targz-pkg
-> > 
-> >     ppc64le:
-> >       make options: make -j30 INSTALL_MOD_STRIP=1 targz-pkg
-> > 
-> >     s390x:
-> >       make options: make -j30 INSTALL_MOD_STRIP=1 targz-pkg
-> > 
-> >     x86_64:
-> >       make options: make -j30 INSTALL_MOD_STRIP=1 targz-pkg
-> > 
-> > 
-> > 
-> > Hardware testing
-> > ----------------
-> > We booted each kernel and ran the following tests:
-> > 
-> >   aarch64:
-> >     Host 1:
-> >        ✅ Boot test
-> >        ✅ ACPI table test
-> >        ✅ LTP
-> >        ✅ Loopdev Sanity
-> >        ✅ Memory function: memfd_create
-> >        ✅ AMTU (Abstract Machine Test Utility)
-> >        ✅ Ethernet drivers sanity
-> >        ✅ storage: SCSI VPD
-> >        🚧 ✅ CIFS Connectathon
-> >        🚧 ✅ POSIX pjd-fstest suites
-> > 
-> >     Host 2:
-> > 
-> >        ⚡ Internal infrastructure issues prevented one or more tests (marked
-> >        with ⚡⚡⚡) from running on this architecture.
-> >        This is not the fault of the kernel that was tested.
-> > 
-> >        ⚡⚡⚡ Boot test
-> >        ⚡⚡⚡ xfstests - ext4
-> >        ⚡⚡⚡ xfstests - xfs
-> >        ⚡⚡⚡ storage: software RAID testing
-> >        ⚡⚡⚡ stress: stress-ng
-> >        🚧 ⚡⚡⚡ xfstests - btrfs
-> >        🚧 ⚡⚡⚡ Storage blktests
-> > 
-> >     Host 3:
-> >        ✅ Boot test
-> >        ✅ xfstests - ext4
-> >        ✅ xfstests - xfs
-> >        💥 storage: software RAID testing
-> >        ⚡⚡⚡ stress: stress-ng
-> >        🚧 ⚡⚡⚡ xfstests - btrfs
-> >        🚧 ⚡⚡⚡ Storage blktests
-> > 
-> >   ppc64le:
-> >     Host 1:
-> >        ✅ Boot test
-> >        🚧 ✅ kdump - sysrq-c
-> > 
-> >     Host 2:
-> >        ✅ Boot test
-> >        ✅ xfstests - ext4
-> >        ✅ xfstests - xfs
-> >        💥 storage: software RAID testing
-> >        🚧 ⚡⚡⚡ xfstests - btrfs
-> >        🚧 ⚡⚡⚡ Storage blktests
-> > 
-> >     Host 3:
-> > 
-> >        ⚡ Internal infrastructure issues prevented one or more tests (marked
-> >        with ⚡⚡⚡) from running on this architecture.
-> >        This is not the fault of the kernel that was tested.
-> > 
-> >        ✅ Boot test
-> >        ⚡⚡⚡ LTP
-> >        ⚡⚡⚡ Loopdev Sanity
-> >        ⚡⚡⚡ Memory function: memfd_create
-> >        ⚡⚡⚡ AMTU (Abstract Machine Test Utility)
-> >        ⚡⚡⚡ Ethernet drivers sanity
-> >        🚧 ⚡⚡⚡ CIFS Connectathon
-> >        🚧 ⚡⚡⚡ POSIX pjd-fstest suites
-> > 
-> >   s390x:
-> >     Host 1:
-> >        ✅ Boot test
-> >        ✅ stress: stress-ng
-> >        🚧 ✅ Storage blktests
-> > 
-> >     Host 2:
-> >        ✅ Boot test
-> >        ✅ LTP
-> >        ✅ Loopdev Sanity
-> >        ✅ Memory function: memfd_create
-> >        ✅ AMTU (Abstract Machine Test Utility)
-> >        ✅ Ethernet drivers sanity
-> >        🚧 ✅ CIFS Connectathon
-> >        🚧 ✅ POSIX pjd-fstest suites
-> > 
-> >   x86_64:
-> >     Host 1:
-> >        ✅ Boot test
-> >        ✅ Storage SAN device stress - qedf driver
-> > 
-> >     Host 2:
-> >        ⏱  Boot test
-> >        ⏱  Storage SAN device stress - mpt3sas_gen1
-> > 
-> >     Host 3:
-> >        ✅ Boot test
-> >        ✅ xfstests - ext4
-> >        ✅ xfstests - xfs
-> >        💥 storage: software RAID testing
-> >        ⚡⚡⚡ stress: stress-ng
-> >        🚧 ⚡⚡⚡ xfstests - btrfs
-> >        🚧 ⚡⚡⚡ Storage blktests
-> > 
-> >     Host 4:
-> >        ✅ Boot test
-> >        ✅ Storage SAN device stress - lpfc driver
-> > 
-> >     Host 5:
-> >        ✅ Boot test
-> >        🚧 ✅ kdump - sysrq-c
-> > 
-> >     Host 6:
-> >        ✅ Boot test
-> >        ✅ ACPI table test
-> >        ✅ LTP
-> >        ✅ Loopdev Sanity
-> >        ✅ Memory function: memfd_create
-> >        ✅ AMTU (Abstract Machine Test Utility)
-> >        ✅ Ethernet drivers sanity
-> >        ✅ kernel-rt: rt_migrate_test
-> >        ✅ kernel-rt: rteval
-> >        ✅ kernel-rt: sched_deadline
-> >        ✅ kernel-rt: smidetect
-> >        ✅ storage: SCSI VPD
-> >        🚧 ✅ CIFS Connectathon
-> >        🚧 ✅ POSIX pjd-fstest suites
-> > 
-> >     Host 7:
-> >        ✅ Boot test
-> >        ✅ kdump - sysrq-c - megaraid_sas
-> > 
-> >     Host 8:
-> >        ✅ Boot test
-> >        ✅ Storage SAN device stress - qla2xxx driver
-> > 
-> >     Host 9:
-> >        ⏱  Boot test
-> >        ⏱  kdump - sysrq-c - mpt3sas_gen1
-> > 
-> >   Test sources: https://gitlab.com/cki-project/kernel-tests
-> 
-> Hello,
-> 
+> How will it be guaranteed that the resulting software does
+> not suffer from the problems that have been solved by the introduction
+> of the DRBD activity log
+> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
 
-Hi Ming,
+The above would require some kind of activity log also, I'm afraid.
 
-first the good news: Both issues detected by LTP and RAID test are
-officially gone after the revert. There's some x86_64 testing still
-running but the results look good so far!
-
-> Can you share us the exact commands for setting up xfstests over
-> 'software RAID testing' from the above tree?
-> 
-
-It's this test (which seeing your @redhat email, you can also trigger
-via internal Brew testing if you use the "stor" test set):
-
-https://gitlab.com/cki-project/kernel-tests/-/tree/master/storage/swraid/trim
-
-The important part of the test is:
-
-https://gitlab.com/cki-project/kernel-tests/-/blob/master/storage/swraid/trim/main.sh#L27
-
-The test maintainer (Changhui) is cced on this thread in case you need
-any help or have questions about the test.
-
-
-
-I'll just quickly mention, please be careful if you're planning on
-testing LTP/msgstress04 on ppc64le in Beaker, as the conserver overload
-is causing issues to lab owners.
-
-
-Let us know if we can help you with something else,
-Veronika
-
-> BTW I can't reproduce it by running xfstest generic/551 on my simple raid10
-> settings, include raid stop/remove steps.
-> 
+>
 > Thanks,
-> Ming
-> 
-> 
-
+>
+> Bart.
