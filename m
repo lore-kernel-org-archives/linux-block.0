@@ -2,83 +2,97 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08344C433E2
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 09:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D05C433E2
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 09:23:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD74120748
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 09:15:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c161BctU"
+	by mail.kernel.org (Postfix) with ESMTP id 2B47B20770
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 09:23:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729991AbgIDJP6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 05:15:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40046 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729978AbgIDJPz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 05:15:55 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 495F3C061244;
-        Fri,  4 Sep 2020 02:15:53 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a15so7582779ejf.11;
-        Fri, 04 Sep 2020 02:15:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=dxahPGX4Bh5058cW7YZytcQVfwGeo/dvZ/Z3buLNEgI=;
-        b=c161BctUHHXMJf3NH9GGNQWWIJqv5AUGjNOAu6Bx3o5Jlya5vcy/+7WBNuTs/5F6og
-         ljDRVUZEp9f5/lht+DCfor9uGYCQkRc2TyWFIJFCcfFAhv53T6ub3oComBOw0VRdlI1E
-         WVwsomS11BpBOc1jopv8knoO6LlwUjwWZPTBkX2fhvH+shITt1v9JzrVx5C9etCniet/
-         lMkSEJNrMD+q8V9ulQBi5dZmWEvk6U82BoJ+F7XP8OYJHkkkMx2mQKozu3sKTQCCpSx2
-         9EoEURQz+ZOqqwApbhk5GLMOx03wrxIDuyJqPPX7hFX42eyLhQI/26M5IWSZz0m8qPM7
-         5W5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=dxahPGX4Bh5058cW7YZytcQVfwGeo/dvZ/Z3buLNEgI=;
-        b=VqrWevh1TLRcPc341yg/JnSL4n1aGQ39XMS+eca4ZONmXBLHUkGVWLT4fNgmlin++g
-         djlu9ev2zFgg7IpnUt4bJglT8pgvTLoapV8M1suF0fNs4vQboCsCoZSNYJuw+YfgSrvK
-         PkjNTPWbPOOfjBskZQDZfN4vaN74XvOZUchXXjo6C6Vgv7PZW2kq6f0M691QGFah83tr
-         at+Xg1NoIc5Jibv4rFtmzC9aSNg+eA34uXn3X5UjlnD4AYDRY8Dq79NSvMrNSx2dSwe2
-         XVicIry+Y4ADTqVbnN4W9PQTevmlZ/O64jEUQbyplKfi+TFnYCDH1tLhuIQT1J1EFYWQ
-         QaZg==
-X-Gm-Message-State: AOAM532DEai+j4YaNPa/T0BFb8wdMFnKLZqBOvGU6icvHRi6O875aoWe
-        DY8G2CbgJQOMdTIEPcfSwzE9qmnoZIELgA==
-X-Google-Smtp-Source: ABdhPJyNi9OTyZw2VFnPvA+QkvNgnAyrYB3D2Nhm8U0fXkMq+OXyT4UGUEy5kcRB5mjWXCO41/uYlw==
-X-Received: by 2002:a17:906:33ca:: with SMTP id w10mr6841091eja.438.1599210949388;
-        Fri, 04 Sep 2020 02:15:49 -0700 (PDT)
-Received: from localhost.localdomain ([2a01:598:b904:9293:1d41:83f0:a723:a7e3])
-        by smtp.gmail.com with ESMTPSA id a26sm5562066ejk.66.2020.09.04.02.15.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Sep 2020 02:15:48 -0700 (PDT)
-From:   Bean Huo <huobean@gmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     beanhuo@micron.com
-Subject: [PATCH 0/2] use generic_file_buffered_read()
-Date:   Fri,  4 Sep 2020 11:13:39 +0200
-Message-Id: <20200904091341.28756-1-huobean@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S1730019AbgIDJXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 05:23:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39698 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728588AbgIDJXK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Sep 2020 05:23:10 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 899CAB165;
+        Fri,  4 Sep 2020 09:23:08 +0000 (UTC)
+Subject: Re: rework check_disk_change()
+To:     dgilbert@interlog.com, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
+        Michal Simek <michal.simek@xilinx.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Finn Thain <fthain@telegraphics.com.au>,
+        Michael Schmitz <schmitzmic@gmail.com>,
+        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20200902141218.212614-1-hch@lst.de>
+ <730eced4-c804-a78f-3d52-2a448dbd1b84@interlog.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <29ec4708-3a8d-a4f2-5eea-a08908a8d093@suse.de>
+Date:   Fri, 4 Sep 2020 11:23:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <730eced4-c804-a78f-3d52-2a448dbd1b84@interlog.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Bean Huo <beanhuo@micron.com>
+On 9/2/20 5:38 PM, Douglas Gilbert wrote:
+> On 2020-09-02 10:11 a.m., Christoph Hellwig wrote:
+>> Hi Jens,
+>>
+>> this series replaced the not very nice check_disk_change() function with
+>> a new bdev_media_changed that avoids having the ->revalidate_disk call
+>> at its end.  As a result ->revalidate_disk can be removed from a lot of
+>> drivers.
+>>
+> 
+> For over 20 years the sg driver has been carrying this snippet that hangs
+> off the completion callback:
+> 
+>         if (driver_stat & DRIVER_SENSE) {
+>                  struct scsi_sense_hdr ssh;
+> 
+>                  if (scsi_normalize_sense(sbp, sense_len, &ssh)) {
+>                          if (!scsi_sense_is_deferred(&ssh)) {
+>                                  if (ssh.sense_key == UNIT_ATTENTION) {
+>                                          if (sdp->device->removable)
+>                                                  sdp->device->changed = 1;
+>                                  }
+>                          }
+>                  }
+>          }
+> 
+> Is it needed? The unit attention (UA) may not be associated with the
+> device changing. Shouldn't the SCSI mid-level monitor UAs if they
+> impact the state of a scsi_device object?
+> 
+We do; check scsi_io_completion_action() in drivers/scsi/scsi_lib.c
+So I don't think you'd need to keep it in sg.c.
 
+Cheers,
 
-Bean Huo (2):
-  block: use generic_file_buffered_read()
-  fs: isofs: use generic_file_buffered_read()
-
- drivers/block/sunvdc.c | 6 +++---
- fs/isofs/compress.c    | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
+Hannes
 -- 
-2.17.1
-
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
