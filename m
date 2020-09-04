@@ -2,104 +2,147 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 461FAC54F43
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 18:10:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3FFC43461
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 18:50:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1E462534D
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 18:04:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BC8020796
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 18:50:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cx1YgDod"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UB4c4dgv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbgIDRaA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 13:30:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59992 "EHLO
+        id S1726441AbgIDSua (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 14:50:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726842AbgIDR37 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 13:29:59 -0400
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71316C061244;
-        Fri,  4 Sep 2020 10:29:59 -0700 (PDT)
-Received: by mail-io1-xd43.google.com with SMTP id g128so7880944iof.11;
-        Fri, 04 Sep 2020 10:29:59 -0700 (PDT)
+        with ESMTP id S1727776AbgIDSuV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 14:50:21 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C42C061244;
+        Fri,  4 Sep 2020 11:50:20 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id t23so9192784ljc.3;
+        Fri, 04 Sep 2020 11:50:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=iup/BPBU3NZvrPiN2q7hG6ObvdkJkFEtj83NMUIZ1KY=;
-        b=cx1YgDod4rlnCOWPokMbDrqgPNNXfF4RFsY4J24ShFyXyP15fGTYlzrgebtUR9i1qp
-         6T+Qd2yNsBkyETU02VdDXMOJvg4JKkPPTvbTwkMh7g4ttA0CZ0oTrOms0rp5Suvv2hkJ
-         o/Hjuk4phd23HJkGxlFOuDV4sdWzo5BHrfSebz4mZScVqEnROpgkgwsM2JkPY3Urp1PM
-         GJRXa7AtgIJKnnYlakaVajTT7ZONAocnWgzQ0+aF7vaOtNemDnZamR7eRUf1a8lxVVfr
-         Y/iRbX8CvkuJPvuDQHQQcQv4HaYnYGSH/bURHI1rTFONa1+HQE2+YyYjK2BzXPNRWnk0
-         Wt6g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YtKx/BkJtpRlTWwmfq1br0XSeXd7ZgOWgZ7CcNA6fU4=;
+        b=UB4c4dgv5HvkI1cloRBNUnahHpluNnVf7Ci6WUQSTQkAkfbf0rM0GeQP49L0GvGqTY
+         fgh7HiLOU3n/kSes7dmEwuuxI3dGwr3P+qku0qLVnwD+ezBRVPHT8bkGTTAEjNbgNjyp
+         +JD2BgESFH/OqWfQP8HlZ7q3mZ0r50oFCqIZSBSi+btjo6iwJSRxPvtCMFcZp7eNNU7E
+         kRVTkVlL93DLO6GkkLeGZMAhmXaBEMwyMlM/mWTwNqi1ZNgv7PexTrnscnJ1q2eY0ZIF
+         WGwj8Qx3G8s5s42OpMN0qL980ygLXLgNIk4I32eHqRkDJNnUKZ9vyhgm238Ozc8MLsmw
+         pDtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=iup/BPBU3NZvrPiN2q7hG6ObvdkJkFEtj83NMUIZ1KY=;
-        b=jH8QSMHaKm89UgN9aUSxIqCeq0Jf8ZKPOmn3lyl4tuTzmvoeE5Uye+uL+MgxVE0c15
-         /eMT69tPIZVPAaReWKORsfrDvA26xLtpvaRoyGn21i7zlQIgJYqurwc2f/RUwO7avOpB
-         6Je6tN+IVIOoyVwcpGvCMVEboi+M7iZxaUOEUEAXwbyT/Nlo/OH3Na+8o0uG2H3P7v7y
-         4U1ui4bPlGm0B0W+7kmG8i6Qvnrm8lWPsraZljOp8e+1F7PHLV63ykH2ou5oZgByfDcS
-         B+uuxjYR7xatPw9BT2WIjQWI3B1cGXQyjoMTlCdb10005mizqcDQfsPDk4XXXrbn+ArG
-         P60Q==
-X-Gm-Message-State: AOAM5325ravfuXFxTRMjh22yv2sKqRJC10+0VBJzbMjb8VhN6dDpdsjp
-        917fQulocguM6YuJMQrpDKe5ZLloC99p9Dsf
-X-Google-Smtp-Source: ABdhPJzKEGTy0s+XClH8eBd580NUxzaUtvIhCksv0P9Mq6vYEIXPLYR9c9eA7SNTVNW8HoUddRifXg==
-X-Received: by 2002:a6b:e718:: with SMTP id b24mr8734820ioh.9.1599240598271;
-        Fri, 04 Sep 2020 10:29:58 -0700 (PDT)
-Received: from leah-Ubuntu ([2601:4c3:200:c230:e82f:35f2:cc6c:cdf5])
-        by smtp.gmail.com with ESMTPSA id d22sm390633ios.47.2020.09.04.10.29.57
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 04 Sep 2020 10:29:57 -0700 (PDT)
-Date:   Fri, 4 Sep 2020 13:29:55 -0400
-From:   Leah Rumancik <leah.rumancik@gmail.com>
-To:     Jakub Sitnicki <jakub@cloudflare.com>
-Cc:     bpf@vger.kernel.org, linux-block@vger.kernel.org,
-        orbekk@google.com, harshads@google.com, jasiu@google.com,
-        saranyamohan@google.com, tytso@google.com, bvanassche@google.com
-Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
-Message-ID: <20200904172954.GC2048@leah-Ubuntu>
-References: <20200812163305.545447-1-leah.rumancik@gmail.com>
- <20200812163305.545447-2-leah.rumancik@gmail.com>
- <87mu2sru7d.fsf@cloudflare.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YtKx/BkJtpRlTWwmfq1br0XSeXd7ZgOWgZ7CcNA6fU4=;
+        b=Ol/PuGxZ2ScBs92Z36YF3iT1qYPhVROuYAmSgDr2TAcrIzNzri7CrPSS2CfWgygxC8
+         qsAhttJBm+Vui9/7jAvprdFHrIUp3k8Z0IKWU/edJZU3k56S8OXL+K+R9elfnrduudJx
+         M+QnbfIbeeTf+o8WrokIztE/5fai46Nx/ZHwrGXRyXBwQtEA+29LVIZNbwXvXbMaqYrM
+         qjV+/u7V0cBtVC/WQTXYH2j3nK01XTF9Vnx6sqXQ9iS6PL5zOPfyFtQDgAa7ucwoF36V
+         XBNQGyliQ71MOegticFOH/TkxgFGkPa0LJc18gPTUXFzo8opGcoRj8qdJ/sogc2O97ss
+         EVmQ==
+X-Gm-Message-State: AOAM531Ae2+1uXWO0v0Zrd9FgQAYorrt5jAynkkdfXzAZ3dLhRgX4HyL
+        4nvEprt6MQOCRoMOC4uf1pNnuUNE5fywfy+JiClFbtLW
+X-Google-Smtp-Source: ABdhPJyjC2mdiG2BYeodygZPZL0MK5GS6pcPsLA2b9DxuOy5u60byR0+dfXSOQdjCw7F8TCKi4UiXkCaV51eeXVeC5I=
+X-Received: by 2002:a2e:4e09:: with SMTP id c9mr4790625ljb.283.1599245418496;
+ Fri, 04 Sep 2020 11:50:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87mu2sru7d.fsf@cloudflare.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20200812163305.545447-1-leah.rumancik@gmail.com>
+ <20200812163305.545447-2-leah.rumancik@gmail.com> <a0a97488-58c7-1f00-c987-d75e1329159c@oracle.com>
+ <20200817163207.p53guehd7kpxfvat@ast-mbp.dhcp.thefacebook.com> <20200904164605.GB2048@leah-Ubuntu>
+In-Reply-To: <20200904164605.GB2048@leah-Ubuntu>
+From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date:   Fri, 4 Sep 2020 11:50:06 -0700
+Message-ID: <CAADnVQK3VVzUHsteMcZ_iBFqQaoUJc5q-Rx9zxtCMw+-OhTHbA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
+To:     Leah Rumancik <leah.rumancik@gmail.com>
+Cc:     Bob Liu <bob.liu@oracle.com>, bpf <bpf@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?Q?KJ_=C3=98rbekk?= <orbekk@google.com>,
+        Harshad Shirwadkar <harshads@google.com>,
+        Michal Jaszczyk <jasiu@google.com>, saranyamohan@google.com,
+        Theodore Tso <tytso@google.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 18, 2020 at 02:53:42PM +0200, Jakub Sitnicki wrote:
-> On Wed, Aug 12, 2020 at 06:33 PM CEST, Leah Rumancik wrote:
-> > +int io_filter_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+On Fri, Sep 4, 2020 at 9:46 AM Leah Rumancik <leah.rumancik@gmail.com> wrote:
+>
+> On Mon, Aug 17, 2020 at 09:32:07AM -0700, Alexei Starovoitov wrote:
+> > On Mon, Aug 17, 2020 at 10:18:47PM +0800, Bob Liu wrote:
+> > > > +
+> > > > +/* allows IO by default if no programs attached */
+> > > > +int io_filter_bpf_run(struct bio *bio)
+> > > > +{
+> > > > + struct bpf_io_request io_req = {
+> > > > +         .sector_start = bio->bi_iter.bi_sector,
+> > > > +         .sector_cnt = bio_sectors(bio),
+> > > > +         .opf = bio->bi_opf,
+> > > > + };
+> > > > +
+> > > > + return BPF_PROG_RUN_ARRAY_CHECK(bio->bi_disk->progs, &io_req, BPF_PROG_RUN);
+> > >
+> > >
+> > > I think pass "struct bpf_io_request" is not enough, since we may want to do the filter based on
+> > > some special patterns against the io data.
+> > >
+> > > I used to pass "page_to_virt(bio->bi_io_vec->bv_page)" into ebpf program..
+> >
+> > Bob,
+> >
+> > Just like other bpf uapi structs the bpf_io_request is extensible and
+> > such pointer can be added later, but I have a different question.
+> >
+> > Leah,
+> >
+> > Do you really need the arguments to be stable?
+> > If so 'opf' above is not enough.
+> > sector_start, sector_cnt are clean from uapi pov,
+> > but 'opf' exposes kernel internals.
+> > The patch 2 is doing:
+> > +int protect_gpt(struct bpf_io_request *io_req)
 > > +{
-> > +	struct gendisk *disk;
-> > +	struct fd f;
-> > +	struct bpf_prog_array *old_array;
-> > +	struct bpf_prog_array *new_array;
-> > +	int ret;
-> > +
-> > +	if (attr->attach_flags)
-> > +		return -EINVAL;
-> > +
-> > +	f = fdget(attr->target_fd);
->             ^^^^^
-> 
-> Missing corresponding fdput?
-> 
-> As per Martin's suggestion, with bpf_link this will become the
-> link_create callback, but the comment still stands.
+> > +       /* within GPT and not a read operation */
+> > +       if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
+> > +               return IO_BLOCK;
+> >
+> > The way ops are encoded changed quite a bit over the kernel releases.
+> > First it was REQ_WRITE, then REQ_OP_SHIFT, now REQ_OP_MASK.
+> > From kernel pov it would be simpler if bpf side didn't impose stability
+> > requriment on the program arguments. Then the kernel will be free to change
+> > REG_OP_READ into something else. The progs would break, of course, and would
+> > have to be adjusted. That's what we've been doing with tools like biosnoop.
+> > If you're ok with unstable arguments then you wouldn't need to introduce
+> > new prog type and this patch set.
+> > You can do this filtering already with should_fail_bio().
+> > bpf prog can attach to should_fail_bio() and walk all bio arguments
+> > in unstable way.
+> > Instead of:
+> > +       if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
+> > you'll write:
+> >   if (bio->bi_iter.bi_sector < GPT_SECTORS && (bio->bi_opf & REQ_OP_MASK) != REQ_OP_READ)
+> > It will also work on different kernels because libbpf can adjust field offsets and
+> > check for type matching via CO-RE facility.
+> > Will that work for you?
+>
+> Alexei,
+>
+> I need the arguments to be stable. What would be the best way to go
+> about this? Pulling selected information from the opf field and defining
+> my own constants?
 
-Yep, will add.
-
-Thanks,
-Leah
+"stable" in what sense? To run on different kernels ?
+CO-RE already achieves that.
+I think what I proposed above is "stable" enough based on the description
+of what you wanted to achieve.
