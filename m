@@ -2,132 +2,104 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A817C43461
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 17:00:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 461FAC54F43
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 18:10:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E4432074D
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 17:00:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1E462534D
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 18:04:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B5i4BacK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cx1YgDod"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725984AbgIDRA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 13:00:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23644 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725966AbgIDRAZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 13:00:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599238823;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+34/F/wFBWk0EaC+XvS9T37vZfyDZYXKnTuAPksLxCo=;
-        b=B5i4BacKq2vxGkqcQj8XvCALs3TpoZKROVRQt5HuGFDsI9E+m7yV5Bk6sqDcerYN6oND1s
-        JfPYFKtM1uHTnBqRsIMj9Fx6gHpNV2Gj7nx2X8KxsztPmjXA/gejI3cRsgsUbS3n17egRu
-        LJhYAjycsEtzEQHnJd6ypei1uvIxh/8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-J0Jp4bjMO-SazMDGXV11BA-1; Fri, 04 Sep 2020 13:00:22 -0400
-X-MC-Unique: J0Jp4bjMO-SazMDGXV11BA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4784E100854A;
-        Fri,  4 Sep 2020 17:00:20 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-12-92.pek2.redhat.com [10.72.12.92])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A66565D9E8;
-        Fri,  4 Sep 2020 17:00:16 +0000 (UTC)
-Subject: Re: [PATCH v7 7/7] nvme: support rdma transport type
-To:     Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        Omar Sandoval <osandov@osandov.com>
-Cc:     linux-nvme@lists.infradead.org,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-References: <20200903235337.527880-1-sagi@grimberg.me>
- <20200903235337.527880-8-sagi@grimberg.me>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Message-ID: <cd06eee5-d0e7-8dd5-1291-545f6cc0c31f@redhat.com>
-Date:   Sat, 5 Sep 2020 01:00:13 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726853AbgIDRaA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 13:30:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59992 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726842AbgIDR37 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 13:29:59 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71316C061244;
+        Fri,  4 Sep 2020 10:29:59 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id g128so7880944iof.11;
+        Fri, 04 Sep 2020 10:29:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=iup/BPBU3NZvrPiN2q7hG6ObvdkJkFEtj83NMUIZ1KY=;
+        b=cx1YgDod4rlnCOWPokMbDrqgPNNXfF4RFsY4J24ShFyXyP15fGTYlzrgebtUR9i1qp
+         6T+Qd2yNsBkyETU02VdDXMOJvg4JKkPPTvbTwkMh7g4ttA0CZ0oTrOms0rp5Suvv2hkJ
+         o/Hjuk4phd23HJkGxlFOuDV4sdWzo5BHrfSebz4mZScVqEnROpgkgwsM2JkPY3Urp1PM
+         GJRXa7AtgIJKnnYlakaVajTT7ZONAocnWgzQ0+aF7vaOtNemDnZamR7eRUf1a8lxVVfr
+         Y/iRbX8CvkuJPvuDQHQQcQv4HaYnYGSH/bURHI1rTFONa1+HQE2+YyYjK2BzXPNRWnk0
+         Wt6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=iup/BPBU3NZvrPiN2q7hG6ObvdkJkFEtj83NMUIZ1KY=;
+        b=jH8QSMHaKm89UgN9aUSxIqCeq0Jf8ZKPOmn3lyl4tuTzmvoeE5Uye+uL+MgxVE0c15
+         /eMT69tPIZVPAaReWKORsfrDvA26xLtpvaRoyGn21i7zlQIgJYqurwc2f/RUwO7avOpB
+         6Je6tN+IVIOoyVwcpGvCMVEboi+M7iZxaUOEUEAXwbyT/Nlo/OH3Na+8o0uG2H3P7v7y
+         4U1ui4bPlGm0B0W+7kmG8i6Qvnrm8lWPsraZljOp8e+1F7PHLV63ykH2ou5oZgByfDcS
+         B+uuxjYR7xatPw9BT2WIjQWI3B1cGXQyjoMTlCdb10005mizqcDQfsPDk4XXXrbn+ArG
+         P60Q==
+X-Gm-Message-State: AOAM5325ravfuXFxTRMjh22yv2sKqRJC10+0VBJzbMjb8VhN6dDpdsjp
+        917fQulocguM6YuJMQrpDKe5ZLloC99p9Dsf
+X-Google-Smtp-Source: ABdhPJzKEGTy0s+XClH8eBd580NUxzaUtvIhCksv0P9Mq6vYEIXPLYR9c9eA7SNTVNW8HoUddRifXg==
+X-Received: by 2002:a6b:e718:: with SMTP id b24mr8734820ioh.9.1599240598271;
+        Fri, 04 Sep 2020 10:29:58 -0700 (PDT)
+Received: from leah-Ubuntu ([2601:4c3:200:c230:e82f:35f2:cc6c:cdf5])
+        by smtp.gmail.com with ESMTPSA id d22sm390633ios.47.2020.09.04.10.29.57
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 04 Sep 2020 10:29:57 -0700 (PDT)
+Date:   Fri, 4 Sep 2020 13:29:55 -0400
+From:   Leah Rumancik <leah.rumancik@gmail.com>
+To:     Jakub Sitnicki <jakub@cloudflare.com>
+Cc:     bpf@vger.kernel.org, linux-block@vger.kernel.org,
+        orbekk@google.com, harshads@google.com, jasiu@google.com,
+        saranyamohan@google.com, tytso@google.com, bvanassche@google.com
+Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
+Message-ID: <20200904172954.GC2048@leah-Ubuntu>
+References: <20200812163305.545447-1-leah.rumancik@gmail.com>
+ <20200812163305.545447-2-leah.rumancik@gmail.com>
+ <87mu2sru7d.fsf@cloudflare.com>
 MIME-Version: 1.0
-In-Reply-To: <20200903235337.527880-8-sagi@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mu2sru7d.fsf@cloudflare.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Aug 18, 2020 at 02:53:42PM +0200, Jakub Sitnicki wrote:
+> On Wed, Aug 12, 2020 at 06:33 PM CEST, Leah Rumancik wrote:
+> > +int io_filter_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+> > +{
+> > +	struct gendisk *disk;
+> > +	struct fd f;
+> > +	struct bpf_prog_array *old_array;
+> > +	struct bpf_prog_array *new_array;
+> > +	int ret;
+> > +
+> > +	if (attr->attach_flags)
+> > +		return -EINVAL;
+> > +
+> > +	f = fdget(attr->target_fd);
+>             ^^^^^
+> 
+> Missing corresponding fdput?
+> 
+> As per Martin's suggestion, with bpf_link this will become the
+> link_create callback, but the comment still stands.
 
+Yep, will add.
 
-On 9/4/20 7:53 AM, Sagi Grimberg wrote:
-> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-> ---
->   tests/nvme/rc | 20 ++++++++++++++++++++
->   1 file changed, 20 insertions(+)
->
-> diff --git a/tests/nvme/rc b/tests/nvme/rc
-> index 8df00e7d15d0..4c5b2e8edf0d 100644
-> --- a/tests/nvme/rc
-> +++ b/tests/nvme/rc
-> @@ -5,6 +5,7 @@
->   # Test specific to NVMe devices
->   
->   . common/rc
-> +. common/multipath-over-rdma
->   
->   def_traddr="127.0.0.1"
->   def_adrfam="ipv4"
-> @@ -25,6 +26,12 @@ _nvme_requires() {
->   		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
->   		_have_configfs
->   		;;
-> +	rdma)
-> +		_have_modules nvmet nvme-core nvme-rdma nvmet-rdma
-> +		_have_configfs
-> +		_have_program rdma
-> +		_have_modules rdma_rxe || _have_modules siw
-> +		;;
->   	*)
->   		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
->   		return 1
-> @@ -115,6 +122,9 @@ _cleanup_nvmet() {
->   		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
->   	fi
->   	modprobe -r nvmet 2>/dev/null
-> +	if [[ "${nvme_trtype}" == "rdma" ]]; then
-> +		stop_soft_rdma
-> +	fi
->   }
->   
->   _setup_nvmet() {
-> @@ -124,6 +134,16 @@ _setup_nvmet() {
->   		modprobe nvmet-"${nvme_trtype}"
->   	fi
->   	modprobe nvme-"${nvme_trtype}"
-> +	if [[ "${nvme_trtype}" == "rdma" ]]; then
-> +		start_soft_rdma
-> +		for i in $(rdma_network_interfaces)
-> +		do
-> +			ipv4_addr=$(get_ipv4_addr "$i")
-> +			if [ -n "${ipv4_addr}" ]; then
-> +				def_traddr=${ipv4_addr}
-Do we need add break here if ipv4_addr has value?
-
-> +			fi
-> +		done
-> +	fi
->   }
->   
->   _nvme_disconnect_ctrl() {
-
+Thanks,
+Leah
