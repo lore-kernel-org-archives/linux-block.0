@@ -2,112 +2,99 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4CDC433E2
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 11:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3571AC433E2
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 12:46:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4D3B20BED
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 11:36:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA99D2078E
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 12:46:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="fgxVF/Ky"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aImeZQdC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730100AbgIDLgZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 07:36:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33370 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728118AbgIDLf2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 07:35:28 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9271C061244
-        for <linux-block@vger.kernel.org>; Fri,  4 Sep 2020 04:35:27 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id z9so5784544wmk.1
-        for <linux-block@vger.kernel.org>; Fri, 04 Sep 2020 04:35:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7vXeg97tthpHn3OO05TYv6MMMBFwUPr9qFdp5Cy/4dA=;
-        b=fgxVF/KyrZotODBO6md3qVlmfLr1Yswld4L6UNDdmY8Kz2X24HlOcy5vpRpL4rQ530
-         gSMb7ay6j29f8JitxNubbM84Y0Vy2awUgC9aVsr/VWAgZAPTtFx707gjGuJedrngffk/
-         2rHELETgWgk8HSS6N24wNbk7FnfcXbSluqeNpyXRjqYcdFg0+4vKoB9DJVsSlHdCZKqe
-         qGh43iCNHUEh5ck+UDqey9145ghDrCdoyWzi6zglY0HshYc6vAYNqqkE2hIPYMZsex/H
-         toDwou6nj8xFEiZje4JFCGJNZZXBe5HqIEG4juqJhLHBAg/FxrEvzRxp3YxxOwxCN5Xi
-         DWYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7vXeg97tthpHn3OO05TYv6MMMBFwUPr9qFdp5Cy/4dA=;
-        b=PaouEL3VJEqIMsW8Ibxch8RTYPdIJ3A7CnLOSryMN92Djxy8Mz4oCh6xQE9EX7f190
-         hpttdr1+8BNn/ZCMWZYGRTvJ4WWnt/EqHelF1qzzURc5uaj1DuzoI3jFFlc4s+7FSmyv
-         CmC34CVb2Ah4lyCDRt9C3G+Sanby70YN+Fna9AX8YptT7NzWgblI/oC0v9q1U6PGqOcR
-         Old4X5X9cGoEWy/k80ObZPr41EohgvXCBsMpEqk0EAXC4Wc6Vh6/ioDB/8vgtt/ICMwk
-         Zuq7rcbLeGT1a500+TH0FXAwGwl3oE1oPInUargMRgRzOkiAdLtmAF78uO83r/QKvs6U
-         s6zA==
-X-Gm-Message-State: AOAM532Jp0/ZKYsu21POffcMsUkbGXEiCAnJUQRmu1Titg1xEcWmJ/3U
-        UZo5Oty9U9j3wt9wX2gXYzEIlQw6CtqF30YRtxr6vkVJ07s073A=
-X-Google-Smtp-Source: ABdhPJw5wZGimxTw9n7szYlZ3p5Z+QDtX17dFoRAYKAcnXU2PfEgN70bforC8WZ9Bl4pCtP+K+rlOuQza/laTYmHQ/U=
-X-Received: by 2002:a7b:c7cd:: with SMTP id z13mr7196762wmk.160.1599219326253;
- Fri, 04 Sep 2020 04:35:26 -0700 (PDT)
+        id S1730282AbgIDMq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 08:46:27 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52792 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729942AbgIDMqW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 08:46:22 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 084Chih1114038;
+        Fri, 4 Sep 2020 12:44:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=9vGfymTnmHsk7TPLlnrlRO7Y1Sia4j3BTe+tJcTEs1w=;
+ b=aImeZQdCiswCqrKsQJCpBHhiyBIE5/Y/PiACu6re7yNHGKK7h1V4/wJdrG+d2EdvcoUJ
+ fyCLzc/uWLL5K2wOw+97Ui8b4g09tDEe7XaCGB6XyFI7Fv0dC5b2oyK75YdfdI0VYYlq
+ J/zSL3nuoSK0u96cjLXh0vyoDKkv1H8c+UO9yn9jIgPbZuI7eiA5Rrz/GddyGZtnbloX
+ lVQwgJ8U8j23ygK+mq6XNYU8Zuf41x3D+3DZ2ZTGJjBJlGpbj55cdst4bT6UFjDn2veO
+ p438zznOsMxVf+8sm3M4IL6AS+RGBEubLP9keDkc6ZVQeZstiEfXLx7JJ8b5pFemylMf SA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 339dmncqdr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 04 Sep 2020 12:44:55 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 084Cdpko183302;
+        Fri, 4 Sep 2020 12:44:54 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 33b7v2jaqa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 04 Sep 2020 12:44:54 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 084Cih2X020576;
+        Fri, 4 Sep 2020 12:44:44 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 04 Sep 2020 05:44:43 -0700
+To:     John Garry <john.garry@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
+        <kashyap.desai@broadcom.com>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <dgilbert@interlog.com>,
+        <paolo.valente@linaro.org>, <hare@suse.de>, <hch@lst.de>,
+        <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
+        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>
+Subject: Re: [PATCH v8 00/18] blk-mq/scsi: Provide hostwide shared tags for
+ SCSI HBAs
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1363xbtk7.fsf@ca-mkp.ca.oracle.com>
+References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
+        <df6a3bd3-a89e-5f2f-ece1-a12ada02b521@kernel.dk>
+        <379ef8a4-5042-926a-b8a0-2d0a684a0e01@huawei.com>
+Date:   Fri, 04 Sep 2020 08:44:39 -0400
+In-Reply-To: <379ef8a4-5042-926a-b8a0-2d0a684a0e01@huawei.com> (John Garry's
+        message of "Fri, 4 Sep 2020 10:09:27 +0100")
 MIME-Version: 1.0
-References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
- <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
-In-Reply-To: <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Fri, 4 Sep 2020 13:35:15 +0200
-Message-ID: <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
-Subject: Re: [RFC] Reliable Multicast on top of RTRS
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9733 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 spamscore=0
+ mlxlogscore=887 phishscore=0 bulkscore=0 suspectscore=1 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009040114
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9733 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0
+ mlxlogscore=899 adultscore=0 impostorscore=0 mlxscore=0 suspectscore=1
+ spamscore=0 clxscore=1011 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009040115
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2020-09-02 01:04, Danil Kipnis wrote:
-> > RTRS allows for reliable transmission of sg lists between two hosts
-> > over rdma. It is optimised for block io. One can implement a client
-> > and a server module on top of RTRS which would allow for reliable
-> > transmission to a group of hosts.
-> >
-> > In the networking world this is called reliable multicast. I think one
-> > can say that reliable multicast is an equivalent to what is called
-> > "mirror" in the storage world. There is something called XoR network
-> > coding which seems to be an equivalent of raid5. There is also Reed
-> > Solomon network coding.
-> >
-> > Having a reliable multicast with coding rdma-based transport layer
-> > would allow for very flexible and scalable designs of distributed
-> > replication solutions based on different in-kernel transport, block
-> > and replication drivers.
-> >
-> > What do you think?
->
-> How will the resulting software differ from DRBD (other than that it
-> uses RDMA)?
 
-DRBD replicates disks (a local one with a remote one). The idea here
-would be to replicate on the level of hosts, i.e. to support
-replication inside the transport layer. A reliable mc on top of rtrs
-would be more similar to a stack where an md-raid<x> sits on a client
-on top of two or more imported srp/nvmeof/rnbd devices, but with an
-ability to resync between remote machines directly.
+John,
 
-> How will it be guaranteed that the resulting software does
-> not suffer from the problems that have been solved by the introduction
-> of the DRBD activity log
-> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
+> Martin/James may want more review of the SCSI core bits, though.
 
-The above would require some kind of activity log also, I'm afraid.
+I'll take a look later today.
 
->
-> Thanks,
->
-> Bart.
+-- 
+Martin K. Petersen	Oracle Linux Engineering
