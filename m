@@ -2,161 +2,114 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D5DC43461
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 445DBC43461
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 152EF2074D
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:43:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A74120772
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:53:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="af4fMP4N"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="BNQfSmSk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726290AbgIDPnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 11:43:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43410 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726674AbgIDPnP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 11:43:15 -0400
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB70C061244;
-        Fri,  4 Sep 2020 08:43:13 -0700 (PDT)
-Received: by mail-qt1-x841.google.com with SMTP id e5so4923218qth.5;
-        Fri, 04 Sep 2020 08:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=5LB2AUmOyNI3tt+w9oIfbzksgc/XXMTDOB7tUOQMLhE=;
-        b=af4fMP4NwFMBDvGojGkCEZInk/7FBBJVCns+RaQLvd9DwUQJMy5tqAPGN5rNk8vmJd
-         spLbxoa/CdZnb2P/gWg+OhNtmqoVKZ71Wqb/FNcX+6Cpb3oyvPx/1wmXUE+twBqphET6
-         AXxRfeeq6dnFa+jImirlM5Q9OYofzgl6wvgscnBCWANlRnhPPE5pKWJIdg7RLzWtrIOF
-         756+e4dmlPPvxxb4FOdwYu+sAmmtQfJwOQDQUMtpkFwfVoLo0CSIjYmOvCFbm5Y/gD3y
-         dWI7pxLz648g5L0mEoenRxukN6fFzMyjKoMdycYRr4IyFfLrR3GorH790oa9KpSnI3JR
-         Q5tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=5LB2AUmOyNI3tt+w9oIfbzksgc/XXMTDOB7tUOQMLhE=;
-        b=EhSyyB7tg0P8oLcJ21jr3bf5gH02ivP2XEKmvUMZHIo7Kx8ubMCNtrICQWOB3OTEdC
-         5yPxVzwaxlUelsdDXuby5yqapL15uVFNm2nzmpdwR6SiJGKYyug6H602abKh5cFlhGPF
-         e8QMM1LvLJzu9JFL55mIVtX0tY1pEuuW+pimvBQoSexL1MgBihRZGNmxLXNFi7afT6wV
-         80JV0tPdkFPNQCwagthTWtILqYh34mGbU0KqRI2AwkkwuhtV5DVtQQL/PMJSSTJPFXOf
-         01IbI0VInonuAvyQsCsgXzOcNFJfZBg7cFvL7nYLECnbu24+urmYNmnb/iakRBepIyLE
-         sJgQ==
-X-Gm-Message-State: AOAM532mrlhK2oVYWw0uJjdQslkqYpbyVhVIwxh/GIfy+lq1Hgp8tytM
-        8z+/X0nO/fClkK/d5ypMLOo=
-X-Google-Smtp-Source: ABdhPJxwHRFdCIrGN8ZV8+QapOahu3J8vGobkcjgLyQtbWrpLgTUBEdnqp5tI7F/ZdczNTnZNRyBAQ==
-X-Received: by 2002:ac8:743:: with SMTP id k3mr9543641qth.182.1599234193005;
-        Fri, 04 Sep 2020 08:43:13 -0700 (PDT)
-Received: from leah-Ubuntu ([2601:4c3:200:c230:e82f:35f2:cc6c:cdf5])
-        by smtp.gmail.com with ESMTPSA id k64sm4700248qkc.105.2020.09.04.08.43.12
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 04 Sep 2020 08:43:12 -0700 (PDT)
-Date:   Fri, 4 Sep 2020 11:43:10 -0400
-From:   Leah Rumancik <leah.rumancik@gmail.com>
-To:     Martin KaFai Lau <kafai@fb.com>
-Cc:     bpf@vger.kernel.org, linux-block@vger.kernel.org,
-        orbekk@google.com, harshads@google.com, jasiu@google.com,
-        saranyamohan@google.com, tytso@google.com, bvanassche@google.com
-Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
-Message-ID: <20200904154309.GA2048@leah-Ubuntu>
-References: <20200812163305.545447-1-leah.rumancik@gmail.com>
- <20200812163305.545447-2-leah.rumancik@gmail.com>
- <20200813230021.llbkj5ihyadcbuia@kafai-mbp.dhcp.thefacebook.com>
+        id S1726245AbgIDPw7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 11:52:59 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:48748 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726063AbgIDPw6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 11:52:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
+        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=P1djXWMn42vRNOqFDi+hzs5if5OiqHl05S8IjUoubNw=; b=BNQfSmSkjrFR5b9h3T/tVP2ADN
+        RGBUOjLEzXEGTAMiUVE43IuRd3f+LCwIlvnBjwtrYJ/NBdb7Z0bIcDTWOVk6XPcFf7plZV1o3DZyX
+        ThVvZDmf1d0NC1SXB+mj3UV1dlQtwEYo1R7ge2e2IKQqng4el5QXEvMBZPNG+9dN32vLrotiIxnVe
+        Dpld3kW7NMmILNaQ6gkRxX4l7ffoDLuXhE5ZqGSjGtJejddsEUP3S5SVRGc/Q88SUpxG6p3TFzYj0
+        YCFEGd+kKstYJAhbTPKFGCZnOGo+o+W4QQ4Q8iyqyexMnbGxGinwBGnStSqe7oKgX4AI+2LwBTwKE
+        /nyzQRPw==;
+Received: from [172.16.1.162]
+        by ale.deltatee.com with esmtp (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1kEE1E-0007o2-L7; Fri, 04 Sep 2020 09:52:53 -0600
+To:     Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@osandov.com>
+Cc:     linux-nvme@lists.infradead.org,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+References: <20200903235337.527880-1-sagi@grimberg.me>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <862f5256-46ee-c411-425a-8bca27aad35c@deltatee.com>
+Date:   Fri, 4 Sep 2020 09:52:47 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200813230021.llbkj5ihyadcbuia@kafai-mbp.dhcp.thefacebook.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200903235337.527880-1-sagi@grimberg.me>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: hch@lst.de, kbusch@kernel.org, Chaitanya.Kulkarni@wdc.com, linux-nvme@lists.infradead.org, osandov@osandov.com, linux-block@vger.kernel.org, sagi@grimberg.me
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v7 0/7] blktests: Add support to run nvme tests with
+ tcp/rdma transports
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 13, 2020 at 04:00:51PM -0700, Martin KaFai Lau wrote:
-> On Wed, Aug 12, 2020 at 04:33:02PM +0000, Leah Rumancik wrote:
-> > Introducing a new program type BPF_PROG_TYPE_IO_FILTER and a new
-> > attach type BPF_BIO_SUBMIT.
-> > 
-> > This program type is intended to help filter and monitor IO requests.
-> 
-> [ ... ]
-> 
-> > +#define BPF_MAX_PROGS 64
-> > +
-> > +int io_filter_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog)
-> > +{
-> > +	struct gendisk *disk;
-> > +	struct fd f;
-> > +	struct bpf_prog_array *old_array;
-> > +	struct bpf_prog_array *new_array;
-> > +	int ret;
-> > +
-> > +	if (attr->attach_flags)
-> > +		return -EINVAL;
-> > +
-> > +	f = fdget(attr->target_fd);
-> > +	if (!f.file)
-> > +		return -EBADF;
-> > +
-> > +	disk = I_BDEV(f.file->f_mapping->host)->bd_disk;
-> > +	if (disk == NULL)
-> > +		return -ENXIO;
-> > +
-> > +	ret = mutex_lock_interruptible(&disk->io_filter_lock);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	old_array = io_filter_rcu_dereference_progs(disk);
-> > +	if (old_array && bpf_prog_array_length(old_array) >= BPF_MAX_PROGS) {
-> > +		ret = -E2BIG;
-> > +		goto unlock;
-> > +	}
-> > +
-> > +	ret = bpf_prog_array_copy(old_array, NULL, prog, &new_array);
-> > +	if (ret < 0)
-> > +		goto unlock;
-> > +
-> > +	rcu_assign_pointer(disk->progs, new_array);
-> > +	bpf_prog_array_free(old_array);
-> > +
-> > +unlock:
-> > +	mutex_unlock(&disk->io_filter_lock);
-> > +	return ret;
-> > +}
-> bpf link should be used.
-> netns_bpf_link_create() can be used as an example.
-I'll update this, thanks for the example.
 
-> > diff --git a/include/uapi/linux/bpf.h Vb/include/uapi/linux/bpf.h
-> > +struct bpf_io_request {
-> > +	__u64 sector_start;	/* first sector */
-> > +	__u32 sector_cnt;	/* number of sectors */
-> > +	__u32 opf;		/* bio->bi_opf */
-> > +};
-> Is it all that are needed from "struct bio" to do the filtering and monitoring?
-> Please elaborate a few more specific filtering usecases in the comment
-> or even better is to add those usecases to the tests.
-Fields can be added to the bpf_io_request later if needed. I'll add some
-more tests and clarification in comments in the next version.
 
+On 2020-09-03 5:53 p.m., Sagi Grimberg wrote:
+> We have a collection of nvme tests, but all run with nvme-loop. This
+> is the easiest to run on a standalone machine. However its very much possible
+> to run nvme-tcp and nvme-rdma using a loopback network. Add capability to run
+> tests with a new environment variable to set the transport type $nvme_trtype.
 > 
-> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > index 94cead5a43e5..71372e99a722 100644
-> > --- a/kernel/bpf/verifier.c
-> > +++ b/kernel/bpf/verifier.c
-> > @@ -2613,6 +2613,7 @@ static bool may_access_direct_pkt_data(struct bpf_verifier_env *env,
-> >  	case BPF_PROG_TYPE_LWT_SEG6LOCAL:
-> >  	case BPF_PROG_TYPE_SK_REUSEPORT:
-> >  	case BPF_PROG_TYPE_FLOW_DISSECTOR:
-> > +	case BPF_PROG_TYPE_IO_FILTER:
-> Why it is needed?
-Does not look like this is needed. I will remove it.
+> $ nvme_trtype=[loop|tcp|rdma] ./check nvme
+> 
+> This buys us some nice coverage on some more transport types. We also add
+> some transport type specific helpers to mark tests that are relevant only
+> for a single transport.
+> 
+> Changes from v6:
+> - fix _nvme_discover wrong use of subsysnqn that is never passed
+> - move shellcheck fixes to the correct patches (not fix in subsequent patches)
+> Changes from v5:
+> - fix shellcheck errors
+> Changes from v4:
+> - removed extra paranthesis
+> - load either rdma_rxe or siw for rdma transport tests
+> Changes from v3:
+> - remove unload_module from tests/srp/rc
+> - fixed test run cmd
+> Changes from v2:
+> - changed patch 6 to move unload_module to common/rc
+> - changed helper to be named _require_nvme_trtype_is_fabrics
+> Changes from v1:
+> - added patch to remove use of module_unload
+> - move trtype agnostic logig helpers in patch #3
+> 
+> Sagi Grimberg (7):
+>   nvme: consolidate nvme requirements based on transport type
+>   nvme: consolidate some nvme-cli utility functions
+>   nvme: make tests transport type agnostic
+>   tests/nvme: restrict tests to specific transports
+>   nvme: support nvme-tcp when runinng tests
+>   common: move module_unload to common
+>   nvme: support rdma transport type
 
-Thanks for the review,
-Leah
+Looks good to me. For the whole series:
+
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+
+Thanks,
+
+Logan
