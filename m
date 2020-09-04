@@ -2,70 +2,82 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59112C43461
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A66B3C433E2
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:33:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C0C520770
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:24:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="P4MFbXs1"
+	by mail.kernel.org (Postfix) with ESMTP id 841F22074D
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:33:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730249AbgIDPYD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 11:24:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40422 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730220AbgIDPYC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 11:24:02 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E50C061244
-        for <linux-block@vger.kernel.org>; Fri,  4 Sep 2020 08:24:02 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id p37so4504403pgl.3
-        for <linux-block@vger.kernel.org>; Fri, 04 Sep 2020 08:24:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=VFCPhkQw53B8JgJxhDP9y1+TiaTYM1xjKsH4pOPSPHA=;
-        b=P4MFbXs1lmTJ3F013B3PlHJVzn1uQh1uyf7stMg8h0lompDdEWu07HgferDx3afd1O
-         xkjZBBvlP8MMAAZPr5yido5IvcfjygIio9pwEvYPcI8LDfIyV2S94B2RuA4VULhJy9DE
-         60pgOM+HihZoVl9QytQ+HnW0AZCbi+1Q4QBm6mjJkoq3N2cQ8wrGBjfcbeMC81PGZmLj
-         sFRd/17OeUHhC8d+C+iADJ7HcIu9Nmu+xAgy7vXLUvsx73EehC8wM4SGOKnt+B4U70XU
-         OgExVJT3TCCWVy8BnD67SuVL9IBN+vgAKFxgEw/y4J9LchKk87/SuFu0n/LaKDs9OyLb
-         6MMA==
+        id S1726794AbgIDPdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 11:33:20 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:37311 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726213AbgIDPdT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 11:33:19 -0400
+Received: by mail-pf1-f193.google.com with SMTP id w7so4807387pfi.4;
+        Fri, 04 Sep 2020 08:33:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=VFCPhkQw53B8JgJxhDP9y1+TiaTYM1xjKsH4pOPSPHA=;
-        b=jUqXGFOGJ6QZA3q9nGf4zRhvnatjaZXq86JcabhOS8mK0zKVG3dz/fBz+KmLZhcP79
-         1IrL6Uapaa5ZtF3LJW1JMjZSR5VLslNN75v7RjMhhP5/BaBFRfNurT4sHmK00RVGuqoS
-         LUMqu1K+kujyfqxDIC0fyCzcQpUo9UtC7knEsN6PVMNd31ucqyFydVYU0mw6ol2HGFBw
-         SBotm0jUQ5KyIz+yIRB0oNq5HLoKwSkH8cPgD56tloPMey+hDgfjcOBchg63ieXS3m+v
-         qbSliL/F8T0IkwIufZghPKo6NdDvp4hNikkxQRfadIQPjjjJtSkvmF3ewLR5t0nkZBk7
-         /2Fg==
-X-Gm-Message-State: AOAM532GtsemucGii9RjIqHGtbhvIJ8AEjl6lPv72aX5u6mjEj4r8mn7
-        +lUewx/CmybXCh0CG5ZTgHUYMkzg1jMYtXVA
-X-Google-Smtp-Source: ABdhPJycIBmkEq1nZV2icceeKwVrUAeJO8dr47e9oMGq9ICzBoEUk8UaO9AYlNy/znVbVLi/A+UPHg==
-X-Received: by 2002:a62:7789:: with SMTP id s131mr9021768pfc.25.1599233037934;
-        Fri, 04 Sep 2020 08:23:57 -0700 (PDT)
-Received: from ?IPv6:2620:10d:c085:21cf::1188? ([2620:10d:c090:400::5:1a09])
-        by smtp.gmail.com with ESMTPSA id s28sm7102199pfd.111.2020.09.04.08.23.43
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=gXUYbn/sfdIcidvAgaOY7fElSHMNXmLu9syH0Ys00lE=;
+        b=nSXzUzxhuLKQkxVo/sIXfw4FOOF32ha+jkkSPVe2xKhKOvgh+lreRG83pogjnEsusj
+         MhzIbdr1ThY7UqI1fjyhWm5fDH6nuKvTxMNbAhUBgrWz9VPG5xfkhdKFPh6lZU/BPXKG
+         qoQEXguFiqRA2L7xoZBXHadrEZhp9A3c22hoKtQYd3EPnGJLy+NHySz+euZ11z4HBd3y
+         ta/T9oee9kYqdtpLoPGOM9EFCuQd0NojuvmIYTp35RspY8j7KnwzoK5o/6a/4qi5XwJX
+         J1TpOxqMN2nli/XN3TGynBx2RlIP0y7DRQINg954G23ZZvMaGp1dLXop/lj5OudNSoNt
+         EQEA==
+X-Gm-Message-State: AOAM531wUDCClzyApeCoVXH0fjaiAyc/7oWwUmd2AENsTqz8cSqYybwd
+        hntRBM+BAu9LVBJv0htr2XZ2PQM8ZFc=
+X-Google-Smtp-Source: ABdhPJwFpDt7VMTd3xf9bQNGVDLT0PpDecI5rufb23MzUs5nTL7xj5zSYpK4D6AWboHyKynkO5DyDw==
+X-Received: by 2002:a63:7746:: with SMTP id s67mr7488400pgc.228.1599233597966;
+        Fri, 04 Sep 2020 08:33:17 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:69e7:97a3:b129:6db? ([2601:647:4000:d7:69e7:97a3:b129:6db])
+        by smtp.gmail.com with ESMTPSA id v17sm6876327pfn.24.2020.09.04.08.33.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Sep 2020 08:23:44 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.9-rc4
-Message-ID: <48487797-7770-0c9b-2a6f-bd3b3dae86f7@kernel.dk>
-Date:   Fri, 4 Sep 2020 09:23:42 -0600
+        Fri, 04 Sep 2020 08:33:16 -0700 (PDT)
+Subject: Re: [RFC] Reliable Multicast on top of RTRS
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
+References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
+ <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
+ <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org>
+Date:   Fri, 4 Sep 2020 08:33:14 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,101 +86,19 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 2020-09-04 04:35, Danil Kipnis wrote:
+> On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>> How will it be guaranteed that the resulting software does
+>> not suffer from the problems that have been solved by the introduction
+>> of the DRBD activity log
+>> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
+> 
+> The above would require some kind of activity log also, I'm afraid.
 
-A bit larger than usual this week, mostly due to the NVMe fixes arriving
-late for -rc3 and hence didn't make last weeks pull request.
+How about collaborating with the DRBD team? My concern is that otherwise
+we will end up with two drivers in the kernel that implement block device
+replication between servers connected over a network.
 
-- NVMe:
-	- instance leak and io boundary fixes from Keith
-	- fc locking fix from Christophe
-	- various tcp/rdma reset during traffic fixes from Sagi
-	- pci use-after-free fix from Tong
-	- tcp target null deref fix from Ziye
+Thanks,
 
-- Locking fix for partition removal (Christoph)
-
-- Ensure bdi->io_pages is always set (me)
-
-- Fixup for hd struct reference (Ming)
-
-- Fix for zero length bvecs (Ming)
-
-- Two small blk-iocost fixes (Tejun)
-
-Please pull!
-
-
-The following changes since commit a433d7217feab712ff69ef5cc2a86f95ed1aca40:
-
-  Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.9 (2020-08-28 07:52:02 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.9-2020-09-04
-
-for you to fetch changes up to 7e24969022cbd61ddc586f14824fc205661bb124:
-
-  block: allow for_each_bvec to support zero len bvec (2020-09-02 20:59:40 -0600)
-
-----------------------------------------------------------------
-block-5.9-2020-09-04
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      block: fix locking in bdev_del_partition
-
-Christophe JAILLET (1):
-      nvmet-fc: Fix a missed _irqsave version of spin_lock in 'nvmet_fc_fod_op_done()'
-
-Jens Axboe (2):
-      Merge branch 'nvme-5.9-rc' of git://git.infradead.org/nvme into block-5.9
-      block: ensure bdi->io_pages is always initialized
-
-Keith Busch (2):
-      nvme: fix controller instance leak
-      nvme: only use power of two io boundaries
-
-Ming Lei (2):
-      block: release disk reference in hd_struct_free_work
-      block: allow for_each_bvec to support zero len bvec
-
-Sagi Grimberg (9):
-      nvme-fabrics: don't check state NVME_CTRL_NEW for request acceptance
-      nvme: have nvme_wait_freeze_timeout return if it timed out
-      nvme-tcp: serialize controller teardown sequences
-      nvme-tcp: fix timeout handler
-      nvme-tcp: fix reset hang if controller died in the middle of a reset
-      nvme-rdma: serialize controller teardown sequences
-      nvme-rdma: fix timeout handler
-      nvme-rdma: fix reset hang if controller died in the middle of a reset
-      nvme: Fix NULL dereference for pci nvme controllers
-
-Tejun Heo (2):
-      blk-iocost: ioc_pd_free() shouldn't assume irq disabled
-      blk-stat: make q->stats->lock irqsafe
-
-Tong Zhang (1):
-      nvme-pci: cancel nvme device request before disabling
-
-Ziye Yang (1):
-      nvmet-tcp: Fix NULL dereference when a connect data comes in h2cdata pdu
-
- block/blk-core.c            |  1 +
- block/blk-iocost.c          |  5 +--
- block/blk-stat.c            | 17 ++++++----
- block/partitions/core.c     | 37 ++++++++++++---------
- drivers/nvme/host/core.c    | 56 ++++++++++++++++++++++++-------
- drivers/nvme/host/fabrics.c |  1 -
- drivers/nvme/host/nvme.h    |  2 +-
- drivers/nvme/host/pci.c     |  4 +--
- drivers/nvme/host/rdma.c    | 68 ++++++++++++++++++++++++++++----------
- drivers/nvme/host/tcp.c     | 80 ++++++++++++++++++++++++++++++++-------------
- drivers/nvme/target/fc.c    |  4 +--
- drivers/nvme/target/tcp.c   | 10 +++++-
- include/linux/bvec.h        |  9 ++++-
- 13 files changed, 212 insertions(+), 82 deletions(-)
-
--- 
-Jens Axboe
-
+Bart.
