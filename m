@@ -2,147 +2,67 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3FFC43461
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 18:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D866C2BB84
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 20:49:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5BC8020796
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 18:50:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UB4c4dgv"
+	by mail.kernel.org (Postfix) with ESMTP id 0821420C09
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 20:49:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599252569;
+	bh=tYqiK1Xe6f7EYzBcqQfmwIi+i1tWLNxPjSW3UT9wa3Q=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=JTXjXqqJYggcWCNDvxejRQyn3YqO+ILgHaGN1JX6WygMWVq6ShSzJ+3TmL9pHdpsA
+	 fGJ/fcCyqxknrhg6KvDavC3UVz5/5zPrzkYFrd9aeeEYC4VLCGiq1xMM5CTdYXxk+g
+	 qyI1e3ZJMnXF7OXyYSEYz/vyQ8t6sKl8aNYJcUe4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726441AbgIDSua (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 14:50:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44152 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727776AbgIDSuV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 14:50:21 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C42C061244;
-        Fri,  4 Sep 2020 11:50:20 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id t23so9192784ljc.3;
-        Fri, 04 Sep 2020 11:50:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YtKx/BkJtpRlTWwmfq1br0XSeXd7ZgOWgZ7CcNA6fU4=;
-        b=UB4c4dgv5HvkI1cloRBNUnahHpluNnVf7Ci6WUQSTQkAkfbf0rM0GeQP49L0GvGqTY
-         fgh7HiLOU3n/kSes7dmEwuuxI3dGwr3P+qku0qLVnwD+ezBRVPHT8bkGTTAEjNbgNjyp
-         +JD2BgESFH/OqWfQP8HlZ7q3mZ0r50oFCqIZSBSi+btjo6iwJSRxPvtCMFcZp7eNNU7E
-         kRVTkVlL93DLO6GkkLeGZMAhmXaBEMwyMlM/mWTwNqi1ZNgv7PexTrnscnJ1q2eY0ZIF
-         WGwj8Qx3G8s5s42OpMN0qL980ygLXLgNIk4I32eHqRkDJNnUKZ9vyhgm238Ozc8MLsmw
-         pDtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YtKx/BkJtpRlTWwmfq1br0XSeXd7ZgOWgZ7CcNA6fU4=;
-        b=Ol/PuGxZ2ScBs92Z36YF3iT1qYPhVROuYAmSgDr2TAcrIzNzri7CrPSS2CfWgygxC8
-         qsAhttJBm+Vui9/7jAvprdFHrIUp3k8Z0IKWU/edJZU3k56S8OXL+K+R9elfnrduudJx
-         M+QnbfIbeeTf+o8WrokIztE/5fai46Nx/ZHwrGXRyXBwQtEA+29LVIZNbwXvXbMaqYrM
-         qjV+/u7V0cBtVC/WQTXYH2j3nK01XTF9Vnx6sqXQ9iS6PL5zOPfyFtQDgAa7ucwoF36V
-         XBNQGyliQ71MOegticFOH/TkxgFGkPa0LJc18gPTUXFzo8opGcoRj8qdJ/sogc2O97ss
-         EVmQ==
-X-Gm-Message-State: AOAM531Ae2+1uXWO0v0Zrd9FgQAYorrt5jAynkkdfXzAZ3dLhRgX4HyL
-        4nvEprt6MQOCRoMOC4uf1pNnuUNE5fywfy+JiClFbtLW
-X-Google-Smtp-Source: ABdhPJyjC2mdiG2BYeodygZPZL0MK5GS6pcPsLA2b9DxuOy5u60byR0+dfXSOQdjCw7F8TCKi4UiXkCaV51eeXVeC5I=
-X-Received: by 2002:a2e:4e09:: with SMTP id c9mr4790625ljb.283.1599245418496;
- Fri, 04 Sep 2020 11:50:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200812163305.545447-1-leah.rumancik@gmail.com>
- <20200812163305.545447-2-leah.rumancik@gmail.com> <a0a97488-58c7-1f00-c987-d75e1329159c@oracle.com>
- <20200817163207.p53guehd7kpxfvat@ast-mbp.dhcp.thefacebook.com> <20200904164605.GB2048@leah-Ubuntu>
-In-Reply-To: <20200904164605.GB2048@leah-Ubuntu>
-From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date:   Fri, 4 Sep 2020 11:50:06 -0700
-Message-ID: <CAADnVQK3VVzUHsteMcZ_iBFqQaoUJc5q-Rx9zxtCMw+-OhTHbA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
-To:     Leah Rumancik <leah.rumancik@gmail.com>
-Cc:     Bob Liu <bob.liu@oracle.com>, bpf <bpf@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        =?UTF-8?Q?KJ_=C3=98rbekk?= <orbekk@google.com>,
-        Harshad Shirwadkar <harshads@google.com>,
-        Michal Jaszczyk <jasiu@google.com>, saranyamohan@google.com,
-        Theodore Tso <tytso@google.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727923AbgIDUt1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 16:49:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:32952 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728145AbgIDUtV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Sep 2020 16:49:21 -0400
+Subject: Re: [GIT PULL] Block fixes for 5.9-rc4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599252561;
+        bh=tYqiK1Xe6f7EYzBcqQfmwIi+i1tWLNxPjSW3UT9wa3Q=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=AGnXIVIXZW4acZk47rTkiC3k6R6T87nv8S+hOJYTzxh2Y+tX+MZn8IgItLCrhORde
+         VOHAiULo4cLjiwoI2f9Emya/dWGa1HXqVoeCjPSMP4wGRPXYOldsczWhFL0h07YyUW
+         rLbc7a9z6MB3swQ46ofYdwPvS0/Y7wMT8TpsOqyM=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <48487797-7770-0c9b-2a6f-bd3b3dae86f7@kernel.dk>
+References: <48487797-7770-0c9b-2a6f-bd3b3dae86f7@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <48487797-7770-0c9b-2a6f-bd3b3dae86f7@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.9-2020-09-04
+X-PR-Tracked-Commit-Id: 7e24969022cbd61ddc586f14824fc205661bb124
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8075fc3b113dee1531106aaec3dfa19c8158374d
+Message-Id: <159925256140.25529.9506623681970593529.pr-tracker-bot@kernel.org>
+Date:   Fri, 04 Sep 2020 20:49:21 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 4, 2020 at 9:46 AM Leah Rumancik <leah.rumancik@gmail.com> wrote:
->
-> On Mon, Aug 17, 2020 at 09:32:07AM -0700, Alexei Starovoitov wrote:
-> > On Mon, Aug 17, 2020 at 10:18:47PM +0800, Bob Liu wrote:
-> > > > +
-> > > > +/* allows IO by default if no programs attached */
-> > > > +int io_filter_bpf_run(struct bio *bio)
-> > > > +{
-> > > > + struct bpf_io_request io_req = {
-> > > > +         .sector_start = bio->bi_iter.bi_sector,
-> > > > +         .sector_cnt = bio_sectors(bio),
-> > > > +         .opf = bio->bi_opf,
-> > > > + };
-> > > > +
-> > > > + return BPF_PROG_RUN_ARRAY_CHECK(bio->bi_disk->progs, &io_req, BPF_PROG_RUN);
-> > >
-> > >
-> > > I think pass "struct bpf_io_request" is not enough, since we may want to do the filter based on
-> > > some special patterns against the io data.
-> > >
-> > > I used to pass "page_to_virt(bio->bi_io_vec->bv_page)" into ebpf program..
-> >
-> > Bob,
-> >
-> > Just like other bpf uapi structs the bpf_io_request is extensible and
-> > such pointer can be added later, but I have a different question.
-> >
-> > Leah,
-> >
-> > Do you really need the arguments to be stable?
-> > If so 'opf' above is not enough.
-> > sector_start, sector_cnt are clean from uapi pov,
-> > but 'opf' exposes kernel internals.
-> > The patch 2 is doing:
-> > +int protect_gpt(struct bpf_io_request *io_req)
-> > +{
-> > +       /* within GPT and not a read operation */
-> > +       if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
-> > +               return IO_BLOCK;
-> >
-> > The way ops are encoded changed quite a bit over the kernel releases.
-> > First it was REQ_WRITE, then REQ_OP_SHIFT, now REQ_OP_MASK.
-> > From kernel pov it would be simpler if bpf side didn't impose stability
-> > requriment on the program arguments. Then the kernel will be free to change
-> > REG_OP_READ into something else. The progs would break, of course, and would
-> > have to be adjusted. That's what we've been doing with tools like biosnoop.
-> > If you're ok with unstable arguments then you wouldn't need to introduce
-> > new prog type and this patch set.
-> > You can do this filtering already with should_fail_bio().
-> > bpf prog can attach to should_fail_bio() and walk all bio arguments
-> > in unstable way.
-> > Instead of:
-> > +       if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
-> > you'll write:
-> >   if (bio->bi_iter.bi_sector < GPT_SECTORS && (bio->bi_opf & REQ_OP_MASK) != REQ_OP_READ)
-> > It will also work on different kernels because libbpf can adjust field offsets and
-> > check for type matching via CO-RE facility.
-> > Will that work for you?
->
-> Alexei,
->
-> I need the arguments to be stable. What would be the best way to go
-> about this? Pulling selected information from the opf field and defining
-> my own constants?
+The pull request you sent on Fri, 4 Sep 2020 09:23:42 -0600:
 
-"stable" in what sense? To run on different kernels ?
-CO-RE already achieves that.
-I think what I proposed above is "stable" enough based on the description
-of what you wanted to achieve.
+> git://git.kernel.dk/linux-block.git tags/block-5.9-2020-09-04
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8075fc3b113dee1531106aaec3dfa19c8158374d
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
