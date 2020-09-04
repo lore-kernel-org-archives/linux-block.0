@@ -2,95 +2,132 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76ABCC43461
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 16:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A817C43461
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 17:00:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47EC820796
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 16:53:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E4432074D
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 17:00:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Q7CFVqfC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B5i4BacK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727860AbgIDQxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 12:53:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54300 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727850AbgIDQxE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 12:53:04 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12239C061245
-        for <linux-block@vger.kernel.org>; Fri,  4 Sep 2020 09:53:04 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id 67so4604127pgd.12
-        for <linux-block@vger.kernel.org>; Fri, 04 Sep 2020 09:53:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lC0AlfwmZlpXeFpa/LGTAh3XxfRABk0wlmEHVW6V7fE=;
-        b=Q7CFVqfCLCtDBrZDi/ZGTtwMxmb2/Myx2mQsdKxdDh/3t33apZQYU3Iai4UApZLOLW
-         ANYnA2xCpzS7qfDQiff7ZIJKCKfWvTETq897Hgx4W3m3wYLvA721kbBrQIcFinJFuRga
-         yhzH/cAhqels7FptH8Qc5dNmobzyaVmwKNdJJqFVimdyTenmHo+YYiDvxB125mchBoNt
-         XQofTmLKgJfcTn5KPu45URFCUvXiOsa2gAqmhc3BFw4hRYMv4TDp40gXYvVZgyqv28rU
-         UbqLKx37auf+HdwMcqp9Geq4fdyk1NjHYl65+r96KX+LEnCnX8ZRjQa2xGTR+6C6AR62
-         8TNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lC0AlfwmZlpXeFpa/LGTAh3XxfRABk0wlmEHVW6V7fE=;
-        b=X5SEyF4lzBGJs25czihC0I12i/dY4PBfzgcGTd6OkklOa69hkIWaW/Jdwx3UqKiH7i
-         jpVDvZkfip8ymks/VZWhMgs08mQJs7pSkzllNiDWVHM6U9rmvyst7YS5bMU6bfoX2zdr
-         2oB2Bq+EDvlhDrrccVqtceDZtJoJeYnNDHQTrPqBo1tdimJmysQXRy1vG8SMkm0tLvK7
-         4HHSdVFcsg7qpWNeBa9hvbNw5EXPIzaDlovQ5hBhhB8tncf4c2kMMA4Q3LAQwV48zWVe
-         Iu3HswPnq4+PvFp1i9eW/LKLpMVUqNDMvkxWjrB40CpTpKA3vH9cUjcJ1aKvOHiGUMSL
-         cPJw==
-X-Gm-Message-State: AOAM53371OlZmMzB4cKplB/tbvoGN6QEw+xrYgo5jkrzqtabiyYcdkRW
-        VPhAeldtExNxVWKxublmDbnD6PwF72BBoTOA
-X-Google-Smtp-Source: ABdhPJyvhH5BRWXhwxslu96Xy5h5enqyHsLxdiKc2cUiZyDMbeBs0eCAgFOnGT6mOyg9uccQ2aAtbg==
-X-Received: by 2002:a63:4810:: with SMTP id v16mr964781pga.374.1599238383613;
-        Fri, 04 Sep 2020 09:53:03 -0700 (PDT)
-Received: from [192.168.1.11] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 19sm4650788pgz.42.2020.09.04.09.53.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Sep 2020 09:53:03 -0700 (PDT)
-Subject: Re: [PATCH 0/2] use generic_file_buffered_read()
-To:     Bean Huo <huobean@gmail.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     beanhuo@micron.com
-References: <20200904091341.28756-1-huobean@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e857400e-f6e8-9d84-804e-88f3c34edb50@kernel.dk>
-Date:   Fri, 4 Sep 2020 10:53:02 -0600
+        id S1725984AbgIDRA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 13:00:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23644 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725966AbgIDRAZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 13:00:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599238823;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+34/F/wFBWk0EaC+XvS9T37vZfyDZYXKnTuAPksLxCo=;
+        b=B5i4BacKq2vxGkqcQj8XvCALs3TpoZKROVRQt5HuGFDsI9E+m7yV5Bk6sqDcerYN6oND1s
+        JfPYFKtM1uHTnBqRsIMj9Fx6gHpNV2Gj7nx2X8KxsztPmjXA/gejI3cRsgsUbS3n17egRu
+        LJhYAjycsEtzEQHnJd6ypei1uvIxh/8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-435-J0Jp4bjMO-SazMDGXV11BA-1; Fri, 04 Sep 2020 13:00:22 -0400
+X-MC-Unique: J0Jp4bjMO-SazMDGXV11BA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4784E100854A;
+        Fri,  4 Sep 2020 17:00:20 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-92.pek2.redhat.com [10.72.12.92])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A66565D9E8;
+        Fri,  4 Sep 2020 17:00:16 +0000 (UTC)
+Subject: Re: [PATCH v7 7/7] nvme: support rdma transport type
+To:     Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@osandov.com>
+Cc:     linux-nvme@lists.infradead.org,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+References: <20200903235337.527880-1-sagi@grimberg.me>
+ <20200903235337.527880-8-sagi@grimberg.me>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <cd06eee5-d0e7-8dd5-1291-545f6cc0c31f@redhat.com>
+Date:   Sat, 5 Sep 2020 01:00:13 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200904091341.28756-1-huobean@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200903235337.527880-8-sagi@grimberg.me>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/4/20 3:13 AM, Bean Huo wrote:
-> From: Bean Huo <beanhuo@micron.com>
-> 
-> 
-> Bean Huo (2):
->   block: use generic_file_buffered_read()
->   fs: isofs: use generic_file_buffered_read()
 
-The change is fine, but the title/commit message should reflect that
-this is just a comment change. The way it currently reads, it sounds
-like a functional change where something is switched over to using
-generic_file_buffered_read().
 
--- 
-Jens Axboe
+On 9/4/20 7:53 AM, Sagi Grimberg wrote:
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>   tests/nvme/rc | 20 ++++++++++++++++++++
+>   1 file changed, 20 insertions(+)
+>
+> diff --git a/tests/nvme/rc b/tests/nvme/rc
+> index 8df00e7d15d0..4c5b2e8edf0d 100644
+> --- a/tests/nvme/rc
+> +++ b/tests/nvme/rc
+> @@ -5,6 +5,7 @@
+>   # Test specific to NVMe devices
+>   
+>   . common/rc
+> +. common/multipath-over-rdma
+>   
+>   def_traddr="127.0.0.1"
+>   def_adrfam="ipv4"
+> @@ -25,6 +26,12 @@ _nvme_requires() {
+>   		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
+>   		_have_configfs
+>   		;;
+> +	rdma)
+> +		_have_modules nvmet nvme-core nvme-rdma nvmet-rdma
+> +		_have_configfs
+> +		_have_program rdma
+> +		_have_modules rdma_rxe || _have_modules siw
+> +		;;
+>   	*)
+>   		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
+>   		return 1
+> @@ -115,6 +122,9 @@ _cleanup_nvmet() {
+>   		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
+>   	fi
+>   	modprobe -r nvmet 2>/dev/null
+> +	if [[ "${nvme_trtype}" == "rdma" ]]; then
+> +		stop_soft_rdma
+> +	fi
+>   }
+>   
+>   _setup_nvmet() {
+> @@ -124,6 +134,16 @@ _setup_nvmet() {
+>   		modprobe nvmet-"${nvme_trtype}"
+>   	fi
+>   	modprobe nvme-"${nvme_trtype}"
+> +	if [[ "${nvme_trtype}" == "rdma" ]]; then
+> +		start_soft_rdma
+> +		for i in $(rdma_network_interfaces)
+> +		do
+> +			ipv4_addr=$(get_ipv4_addr "$i")
+> +			if [ -n "${ipv4_addr}" ]; then
+> +				def_traddr=${ipv4_addr}
+Do we need add break here if ipv4_addr has value?
+
+> +			fi
+> +		done
+> +	fi
+>   }
+>   
+>   _nvme_disconnect_ctrl() {
 
