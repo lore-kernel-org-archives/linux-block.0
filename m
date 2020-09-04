@@ -2,99 +2,132 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3571AC433E2
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 12:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B45F4C43461
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:06:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA99D2078E
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 12:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 853F02073B
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:06:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aImeZQdC"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="VysYSopE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730282AbgIDMq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 08:46:27 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:52792 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729942AbgIDMqW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 08:46:22 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 084Chih1114038;
-        Fri, 4 Sep 2020 12:44:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=9vGfymTnmHsk7TPLlnrlRO7Y1Sia4j3BTe+tJcTEs1w=;
- b=aImeZQdCiswCqrKsQJCpBHhiyBIE5/Y/PiACu6re7yNHGKK7h1V4/wJdrG+d2EdvcoUJ
- fyCLzc/uWLL5K2wOw+97Ui8b4g09tDEe7XaCGB6XyFI7Fv0dC5b2oyK75YdfdI0VYYlq
- J/zSL3nuoSK0u96cjLXh0vyoDKkv1H8c+UO9yn9jIgPbZuI7eiA5Rrz/GddyGZtnbloX
- lVQwgJ8U8j23ygK+mq6XNYU8Zuf41x3D+3DZ2ZTGJjBJlGpbj55cdst4bT6UFjDn2veO
- p438zznOsMxVf+8sm3M4IL6AS+RGBEubLP9keDkc6ZVQeZstiEfXLx7JJ8b5pFemylMf SA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 339dmncqdr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 04 Sep 2020 12:44:55 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 084Cdpko183302;
-        Fri, 4 Sep 2020 12:44:54 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 33b7v2jaqa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 04 Sep 2020 12:44:54 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 084Cih2X020576;
-        Fri, 4 Sep 2020 12:44:44 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 04 Sep 2020 05:44:43 -0700
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
-        <kashyap.desai@broadcom.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <dgilbert@interlog.com>,
-        <paolo.valente@linaro.org>, <hare@suse.de>, <hch@lst.de>,
-        <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
-        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>
-Subject: Re: [PATCH v8 00/18] blk-mq/scsi: Provide hostwide shared tags for
- SCSI HBAs
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1363xbtk7.fsf@ca-mkp.ca.oracle.com>
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
-        <df6a3bd3-a89e-5f2f-ece1-a12ada02b521@kernel.dk>
-        <379ef8a4-5042-926a-b8a0-2d0a684a0e01@huawei.com>
-Date:   Fri, 04 Sep 2020 08:44:39 -0400
-In-Reply-To: <379ef8a4-5042-926a-b8a0-2d0a684a0e01@huawei.com> (John Garry's
-        message of "Fri, 4 Sep 2020 10:09:27 +0100")
+        id S1730301AbgIDPGy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 11:06:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37756 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730137AbgIDPGy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 11:06:54 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 052BBC061245
+        for <linux-block@vger.kernel.org>; Fri,  4 Sep 2020 08:06:54 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id t7so181078pjd.3
+        for <linux-block@vger.kernel.org>; Fri, 04 Sep 2020 08:06:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=hlEjALJyt1K/75tjEOKRvapkLS2P0DesGjPj2dfwGLo=;
+        b=VysYSopEx+s6Tcr6FJ00Vv6ltUZrQfNwFVPnDWwQwW/WdHv5pLHYwXIgtVvMwDHO4c
+         bsGzBDLE+kQQW2x4NypOyBCaVCAhK6oRxc4pfASp1rCek8SqljYjSAKIiX4DB4BKl8Gz
+         HyD7cyM+fe/eiAyiRlPxqzpYj1a/xheCjcVP5bja4onwMboVG0tPNK4i5PzEQpegBpU+
+         cQdeOpKOsx/iANhI3njgtgkmLT/pyBb0y5g+Y+AxAl6E+NuC65YpUxyiWrimojm1spEL
+         UCZQcLZzk/2STRZu6QUM1VRMo46y0Rr8igYh/7LCC95NW9iPBSd5STEZc+Zm/sUtDwNr
+         aOrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hlEjALJyt1K/75tjEOKRvapkLS2P0DesGjPj2dfwGLo=;
+        b=dYjpwSPEof7s2b7mTfe2yFgqv/C0nMOLxzF4v19MYnbV6DtPNf9sTiaRnxeAW6SsyD
+         r2vaqfQmCXA8d4Fz28YthkWEvyQ7BKnkGpq7nIwGl8j+FiDQh7HGR4EFaZSFouUsPRAU
+         TOymLwoSWZ1+oENLxRqC2U5aIo8h7p4F+CyYxu03NU5sTyy7QtvtAViTU/BniSwFzsZA
+         jWqZj4dwgSkqkYoBkVhqpXA94WHsZJI+eWibYYm3AxpI1l8YruJ/0IqBn0xEJV5/kiTA
+         UCWLHG4c0azgNUaxa+vzx079A5u+WGLZ0wQBqbMVhkfnRDDxTfHLR6bRGaNBAykuwlzA
+         TcBw==
+X-Gm-Message-State: AOAM532XwWmRTtmcCoHH2F2UL0Nz5u6GdIOjSF1Xk31wi+522WoCCn07
+        QtBNDu6KmwK5yNy8W5s4iKe5XQ==
+X-Google-Smtp-Source: ABdhPJyBoZFtPxyA2bnq1XuDpA3JKHAzZ66DVMHoj2ocd7tv29lxL2IJVZge2jlxFadHSDxGjZY6FQ==
+X-Received: by 2002:a17:90a:714b:: with SMTP id g11mr8933468pjs.216.1599232012910;
+        Fri, 04 Sep 2020 08:06:52 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c085:21cf::1188? ([2620:10d:c090:400::5:1a09])
+        by smtp.gmail.com with ESMTPSA id w203sm2568619pff.0.2020.09.04.08.06.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Sep 2020 08:06:52 -0700 (PDT)
+Subject: =?UTF-8?Q?Re=3a_=f0=9f=92=a5_PANICKED=3a_Test_report_for_kernel_5?=
+ =?UTF-8?Q?=2e9=2e0-rc3-020ad03=2ecki_=28block=29?=
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Veronika Kabatova <vkabatov@redhat.com>,
+        CKI Project <cki-project@redhat.com>,
+        linux-block@vger.kernel.org, Changhui Zhong <czhong@redhat.com>,
+        Rachel Sibley <rasibley@redhat.com>,
+        Song Liu <song@kernel.org>, linux-raid@vger.kernel.org
+References: <cki.538AE6A321.BMB0X5ZYG5@redhat.com>
+ <0f92c40e-b234-896c-0810-af36ee95e259@redhat.com>
+ <18db2772-3f37-55a7-d92e-dbcbe92d2cc4@kernel.dk>
+ <ad1bf306-6f23-9b7c-842f-766a6efbda3e@redhat.com>
+ <1300213431.10047993.1599163090152.JavaMail.zimbra@redhat.com>
+ <cc956f4c-9b71-2b02-80be-dd387316dad8@kernel.dk>
+ <20200904032244.GA808936@T590>
+ <9066ba15-f60e-50af-719b-691651449cf4@kernel.dk>
+ <20200904042403.GB808936@T590>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1d26e821-9971-201c-3293-8990bb460a58@kernel.dk>
+Date:   Fri, 4 Sep 2020 09:06:50 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9733 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 spamscore=0
- mlxlogscore=887 phishscore=0 bulkscore=0 suspectscore=1 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009040114
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9733 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0
- mlxlogscore=899 adultscore=0 impostorscore=0 mlxscore=0 suspectscore=1
- spamscore=0 clxscore=1011 malwarescore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009040115
+In-Reply-To: <20200904042403.GB808936@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/3/20 10:24 PM, Ming Lei wrote:
+> On Thu, Sep 03, 2020 at 09:37:40PM -0600, Jens Axboe wrote:
+>> On 9/3/20 9:22 PM, Ming Lei wrote:
+>>> It is one MD's bug, and percpu_ref_exit() may be called on one ref not
+>>> initialized via percpu_ref_init(), and the following patch can fix the
+>>> issue:
+>>
+>> I really (REALLY) think this should be handled by percpu_ref_exit(), if
+> 
+> OK, we can do that by return immediately from percpu_ref_exit() if
+> percpu_count_ptr(ref) is 0 just like before.
 
-John,
+Yep that's going to be a must, also see recent syzbot report that's the
+same issue, just the core block parts instead.
 
-> Martin/James may want more review of the SCSI core bits, though.
+>> it worked before. Otherwise you're just setting yourself up for a world
+>> of pain with other users, and we'll be fixing this fallout for a while.
+>> I don't want to carry that. So let's just make it do the right thing,
+>> needing to do this:
+>>
+>>> +       if (mddev->writes_pending.percpu_count_ptr)
+>>> +               percpu_ref_exit(&mddev->writes_pending);
+>>
+>> is really nasty.
+> 
+> Yeah, it is as mddev_init_writes_pending():
+> 
+>         if (mddev->writes_pending.percpu_count_ptr)
+>                 return 0;
+>         if (percpu_ref_init(&mddev->writes_pending, no_op,
+>                             PERCPU_REF_ALLOW_REINIT, GFP_KERNEL) < 0)
+>                 return -ENOMEM;
 
-I'll take a look later today.
+Indeed, that's another eye sore... No users should need to know about
+these internals. Maybe add a percpu_ref_inited() or something to test
+for it, at least that'd allow us to clean up these bad use cases after
+the fact.
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Jens Axboe
+
