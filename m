@@ -2,114 +2,147 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 445DBC43461
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9A4C43461
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 16:46:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A74120772
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:53:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78CE920772
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 16:46:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="BNQfSmSk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1Om7gP+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726245AbgIDPw7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 11:52:59 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:48748 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726063AbgIDPw6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 11:52:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=P1djXWMn42vRNOqFDi+hzs5if5OiqHl05S8IjUoubNw=; b=BNQfSmSkjrFR5b9h3T/tVP2ADN
-        RGBUOjLEzXEGTAMiUVE43IuRd3f+LCwIlvnBjwtrYJ/NBdb7Z0bIcDTWOVk6XPcFf7plZV1o3DZyX
-        ThVvZDmf1d0NC1SXB+mj3UV1dlQtwEYo1R7ge2e2IKQqng4el5QXEvMBZPNG+9dN32vLrotiIxnVe
-        Dpld3kW7NMmILNaQ6gkRxX4l7ffoDLuXhE5ZqGSjGtJejddsEUP3S5SVRGc/Q88SUpxG6p3TFzYj0
-        YCFEGd+kKstYJAhbTPKFGCZnOGo+o+W4QQ4Q8iyqyexMnbGxGinwBGnStSqe7oKgX4AI+2LwBTwKE
-        /nyzQRPw==;
-Received: from [172.16.1.162]
-        by ale.deltatee.com with esmtp (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1kEE1E-0007o2-L7; Fri, 04 Sep 2020 09:52:53 -0600
-To:     Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        Omar Sandoval <osandov@osandov.com>
-Cc:     linux-nvme@lists.infradead.org,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-References: <20200903235337.527880-1-sagi@grimberg.me>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <862f5256-46ee-c411-425a-8bca27aad35c@deltatee.com>
-Date:   Fri, 4 Sep 2020 09:52:47 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726220AbgIDQqQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 12:46:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53246 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726063AbgIDQqP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 12:46:15 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B81ABC061244;
+        Fri,  4 Sep 2020 09:46:13 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id u126so7724273iod.12;
+        Fri, 04 Sep 2020 09:46:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=dpQ6nvSXQb2Xj+J3gZcbN6uDebmKzL9sxBjJW/LYckg=;
+        b=X1Om7gP+mhlsQhbr4nVkes3gD+XSnwIX25mawKB/yCPnX9ZrKoQfM8ZH+KWmXURG3c
+         S3SSkiylp1qTQeKXQO78bcZoh8drJZMwMgXp0RfX48Bs1rur6FE81N2/a0SR1pmLyKFb
+         qvz7ePjfcnuKoN+QPw3NDxusgQLytCcKbg6aGp9k7MOAfNyp0Jpl8iMXUXYDFVU8kKNA
+         ASm8iJMZL3hPhSPchewYrOPMZKgQCNqfV2jLvRgw2dThMJVEXF8mIdXps72foOMeETky
+         R73c1mzFQTk6PqNc8IheQfP+AujAwmmVGDDGQu/ZLyo07oZzo0zDgWZ7opxXXujvddLL
+         CsYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=dpQ6nvSXQb2Xj+J3gZcbN6uDebmKzL9sxBjJW/LYckg=;
+        b=M4k4hPH3xm75+dHiDCMxgyQBphqvhOfo3wqVUEaTBjq3/1721QKAIWlcgJNLoE5Qez
+         p4dnzgYxfc1FZxgPplYvuNSqNLm1uCNnMe5cl0LwTXHC/y3qNHz1a+LzyQ+TAlATDH8Q
+         5TTP9au7FiGw6trRQupEEqiMDXyrYjZbmfAzfZuL9VrT+j788WfBUmIIB9VkbYw+GS0n
+         vDOWhS98F/CBonrLQavpvzHkUOOE/z8cZH4JafEQ72SSd8uABMLywa0+YZSVrybLopRZ
+         zf9ExyxddXJByWwzmt8BSQtq7JX0ZuBBh4twGf4+6vZL7GrczTz84anHwgFed4c9sTkq
+         r7oA==
+X-Gm-Message-State: AOAM530bZdo7QGsMQUM/JOJi46e2lx6OBJYLxpf2wlMCi9VwO1uKa+ph
+        HYlit/V5aXeYnzbKvEG7fDA=
+X-Google-Smtp-Source: ABdhPJzjDpENyYycFKhxs3HhiQlrOfWZDK7RymkTSxuUXu+4GCH/Prulk2zNhKFwcrKqCBOVvrrz6w==
+X-Received: by 2002:a5d:980f:: with SMTP id a15mr8219405iol.12.1599237969388;
+        Fri, 04 Sep 2020 09:46:09 -0700 (PDT)
+Received: from leah-Ubuntu ([2601:4c3:200:c230:e82f:35f2:cc6c:cdf5])
+        by smtp.gmail.com with ESMTPSA id s6sm2364578ilp.4.2020.09.04.09.46.08
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 04 Sep 2020 09:46:09 -0700 (PDT)
+Date:   Fri, 4 Sep 2020 12:46:06 -0400
+From:   Leah Rumancik <leah.rumancik@gmail.com>
+To:     Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc:     Bob Liu <bob.liu@oracle.com>, bpf@vger.kernel.org,
+        linux-block@vger.kernel.org, orbekk@google.com,
+        harshads@google.com, jasiu@google.com, saranyamohan@google.com,
+        tytso@google.com, bvanassche@google.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
+Message-ID: <20200904164605.GB2048@leah-Ubuntu>
+References: <20200812163305.545447-1-leah.rumancik@gmail.com>
+ <20200812163305.545447-2-leah.rumancik@gmail.com>
+ <a0a97488-58c7-1f00-c987-d75e1329159c@oracle.com>
+ <20200817163207.p53guehd7kpxfvat@ast-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-In-Reply-To: <20200903235337.527880-1-sagi@grimberg.me>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: hch@lst.de, kbusch@kernel.org, Chaitanya.Kulkarni@wdc.com, linux-nvme@lists.infradead.org, osandov@osandov.com, linux-block@vger.kernel.org, sagi@grimberg.me
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v7 0/7] blktests: Add support to run nvme tests with
- tcp/rdma transports
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200817163207.p53guehd7kpxfvat@ast-mbp.dhcp.thefacebook.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2020-09-03 5:53 p.m., Sagi Grimberg wrote:
-> We have a collection of nvme tests, but all run with nvme-loop. This
-> is the easiest to run on a standalone machine. However its very much possible
-> to run nvme-tcp and nvme-rdma using a loopback network. Add capability to run
-> tests with a new environment variable to set the transport type $nvme_trtype.
+On Mon, Aug 17, 2020 at 09:32:07AM -0700, Alexei Starovoitov wrote:
+> On Mon, Aug 17, 2020 at 10:18:47PM +0800, Bob Liu wrote:
+> > > +
+> > > +/* allows IO by default if no programs attached */
+> > > +int io_filter_bpf_run(struct bio *bio)
+> > > +{
+> > > +	struct bpf_io_request io_req = {
+> > > +		.sector_start = bio->bi_iter.bi_sector,
+> > > +		.sector_cnt = bio_sectors(bio),
+> > > +		.opf = bio->bi_opf,
+> > > +	};
+> > > +
+> > > +	return BPF_PROG_RUN_ARRAY_CHECK(bio->bi_disk->progs, &io_req, BPF_PROG_RUN);
+> > 
+> > 
+> > I think pass "struct bpf_io_request" is not enough, since we may want to do the filter based on
+> > some special patterns against the io data.
+> > 
+> > I used to pass "page_to_virt(bio->bi_io_vec->bv_page)" into ebpf program..
 > 
-> $ nvme_trtype=[loop|tcp|rdma] ./check nvme
+> Bob,
 > 
-> This buys us some nice coverage on some more transport types. We also add
-> some transport type specific helpers to mark tests that are relevant only
-> for a single transport.
+> Just like other bpf uapi structs the bpf_io_request is extensible and
+> such pointer can be added later, but I have a different question.
 > 
-> Changes from v6:
-> - fix _nvme_discover wrong use of subsysnqn that is never passed
-> - move shellcheck fixes to the correct patches (not fix in subsequent patches)
-> Changes from v5:
-> - fix shellcheck errors
-> Changes from v4:
-> - removed extra paranthesis
-> - load either rdma_rxe or siw for rdma transport tests
-> Changes from v3:
-> - remove unload_module from tests/srp/rc
-> - fixed test run cmd
-> Changes from v2:
-> - changed patch 6 to move unload_module to common/rc
-> - changed helper to be named _require_nvme_trtype_is_fabrics
-> Changes from v1:
-> - added patch to remove use of module_unload
-> - move trtype agnostic logig helpers in patch #3
+> Leah,
 > 
-> Sagi Grimberg (7):
->   nvme: consolidate nvme requirements based on transport type
->   nvme: consolidate some nvme-cli utility functions
->   nvme: make tests transport type agnostic
->   tests/nvme: restrict tests to specific transports
->   nvme: support nvme-tcp when runinng tests
->   common: move module_unload to common
->   nvme: support rdma transport type
+> Do you really need the arguments to be stable?
+> If so 'opf' above is not enough.
+> sector_start, sector_cnt are clean from uapi pov,
+> but 'opf' exposes kernel internals.
+> The patch 2 is doing:
+> +int protect_gpt(struct bpf_io_request *io_req)
+> +{
+> +       /* within GPT and not a read operation */
+> +       if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
+> +               return IO_BLOCK;
+> 
+> The way ops are encoded changed quite a bit over the kernel releases.
+> First it was REQ_WRITE, then REQ_OP_SHIFT, now REQ_OP_MASK.
+> From kernel pov it would be simpler if bpf side didn't impose stability
+> requriment on the program arguments. Then the kernel will be free to change
+> REG_OP_READ into something else. The progs would break, of course, and would
+> have to be adjusted. That's what we've been doing with tools like biosnoop.
+> If you're ok with unstable arguments then you wouldn't need to introduce
+> new prog type and this patch set.
+> You can do this filtering already with should_fail_bio().
+> bpf prog can attach to should_fail_bio() and walk all bio arguments
+> in unstable way.
+> Instead of:
+> +       if (io_req->sector_start < GPT_SECTORS && (io_req->opf & REQ_OP_MASK) != REQ_OP_READ)
+> you'll write:
+>   if (bio->bi_iter.bi_sector < GPT_SECTORS && (bio->bi_opf & REQ_OP_MASK) != REQ_OP_READ)
+> It will also work on different kernels because libbpf can adjust field offsets and
+> check for type matching via CO-RE facility.
+> Will that work for you?
 
-Looks good to me. For the whole series:
+Alexei,
 
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+I need the arguments to be stable. What would be the best way to go
+about this? Pulling selected information from the opf field and defining
+my own constants?
 
 Thanks,
-
-Logan
+Leah
