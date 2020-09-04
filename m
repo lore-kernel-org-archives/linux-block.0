@@ -2,103 +2,161 @@ Return-Path: <SRS0=BoNv=CN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A66B3C433E2
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D5DC43461
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:43:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 841F22074D
-	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:33:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 152EF2074D
+	for <linux-block@archiver.kernel.org>; Fri,  4 Sep 2020 15:43:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="af4fMP4N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726794AbgIDPdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Sep 2020 11:33:20 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:37311 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726213AbgIDPdT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 11:33:19 -0400
-Received: by mail-pf1-f193.google.com with SMTP id w7so4807387pfi.4;
-        Fri, 04 Sep 2020 08:33:19 -0700 (PDT)
+        id S1726290AbgIDPnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Sep 2020 11:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43410 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726674AbgIDPnP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Sep 2020 11:43:15 -0400
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB70C061244;
+        Fri,  4 Sep 2020 08:43:13 -0700 (PDT)
+Received: by mail-qt1-x841.google.com with SMTP id e5so4923218qth.5;
+        Fri, 04 Sep 2020 08:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=5LB2AUmOyNI3tt+w9oIfbzksgc/XXMTDOB7tUOQMLhE=;
+        b=af4fMP4NwFMBDvGojGkCEZInk/7FBBJVCns+RaQLvd9DwUQJMy5tqAPGN5rNk8vmJd
+         spLbxoa/CdZnb2P/gWg+OhNtmqoVKZ71Wqb/FNcX+6Cpb3oyvPx/1wmXUE+twBqphET6
+         AXxRfeeq6dnFa+jImirlM5Q9OYofzgl6wvgscnBCWANlRnhPPE5pKWJIdg7RLzWtrIOF
+         756+e4dmlPPvxxb4FOdwYu+sAmmtQfJwOQDQUMtpkFwfVoLo0CSIjYmOvCFbm5Y/gD3y
+         dWI7pxLz648g5L0mEoenRxukN6fFzMyjKoMdycYRr4IyFfLrR3GorH790oa9KpSnI3JR
+         Q5tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=gXUYbn/sfdIcidvAgaOY7fElSHMNXmLu9syH0Ys00lE=;
-        b=nSXzUzxhuLKQkxVo/sIXfw4FOOF32ha+jkkSPVe2xKhKOvgh+lreRG83pogjnEsusj
-         MhzIbdr1ThY7UqI1fjyhWm5fDH6nuKvTxMNbAhUBgrWz9VPG5xfkhdKFPh6lZU/BPXKG
-         qoQEXguFiqRA2L7xoZBXHadrEZhp9A3c22hoKtQYd3EPnGJLy+NHySz+euZ11z4HBd3y
-         ta/T9oee9kYqdtpLoPGOM9EFCuQd0NojuvmIYTp35RspY8j7KnwzoK5o/6a/4qi5XwJX
-         J1TpOxqMN2nli/XN3TGynBx2RlIP0y7DRQINg954G23ZZvMaGp1dLXop/lj5OudNSoNt
-         EQEA==
-X-Gm-Message-State: AOAM531wUDCClzyApeCoVXH0fjaiAyc/7oWwUmd2AENsTqz8cSqYybwd
-        hntRBM+BAu9LVBJv0htr2XZ2PQM8ZFc=
-X-Google-Smtp-Source: ABdhPJwFpDt7VMTd3xf9bQNGVDLT0PpDecI5rufb23MzUs5nTL7xj5zSYpK4D6AWboHyKynkO5DyDw==
-X-Received: by 2002:a63:7746:: with SMTP id s67mr7488400pgc.228.1599233597966;
-        Fri, 04 Sep 2020 08:33:17 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:69e7:97a3:b129:6db? ([2601:647:4000:d7:69e7:97a3:b129:6db])
-        by smtp.gmail.com with ESMTPSA id v17sm6876327pfn.24.2020.09.04.08.33.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Sep 2020 08:33:16 -0700 (PDT)
-Subject: Re: [RFC] Reliable Multicast on top of RTRS
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
-References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
- <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
- <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org>
-Date:   Fri, 4 Sep 2020 08:33:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=5LB2AUmOyNI3tt+w9oIfbzksgc/XXMTDOB7tUOQMLhE=;
+        b=EhSyyB7tg0P8oLcJ21jr3bf5gH02ivP2XEKmvUMZHIo7Kx8ubMCNtrICQWOB3OTEdC
+         5yPxVzwaxlUelsdDXuby5yqapL15uVFNm2nzmpdwR6SiJGKYyug6H602abKh5cFlhGPF
+         e8QMM1LvLJzu9JFL55mIVtX0tY1pEuuW+pimvBQoSexL1MgBihRZGNmxLXNFi7afT6wV
+         80JV0tPdkFPNQCwagthTWtILqYh34mGbU0KqRI2AwkkwuhtV5DVtQQL/PMJSSTJPFXOf
+         01IbI0VInonuAvyQsCsgXzOcNFJfZBg7cFvL7nYLECnbu24+urmYNmnb/iakRBepIyLE
+         sJgQ==
+X-Gm-Message-State: AOAM532mrlhK2oVYWw0uJjdQslkqYpbyVhVIwxh/GIfy+lq1Hgp8tytM
+        8z+/X0nO/fClkK/d5ypMLOo=
+X-Google-Smtp-Source: ABdhPJxwHRFdCIrGN8ZV8+QapOahu3J8vGobkcjgLyQtbWrpLgTUBEdnqp5tI7F/ZdczNTnZNRyBAQ==
+X-Received: by 2002:ac8:743:: with SMTP id k3mr9543641qth.182.1599234193005;
+        Fri, 04 Sep 2020 08:43:13 -0700 (PDT)
+Received: from leah-Ubuntu ([2601:4c3:200:c230:e82f:35f2:cc6c:cdf5])
+        by smtp.gmail.com with ESMTPSA id k64sm4700248qkc.105.2020.09.04.08.43.12
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 04 Sep 2020 08:43:12 -0700 (PDT)
+Date:   Fri, 4 Sep 2020 11:43:10 -0400
+From:   Leah Rumancik <leah.rumancik@gmail.com>
+To:     Martin KaFai Lau <kafai@fb.com>
+Cc:     bpf@vger.kernel.org, linux-block@vger.kernel.org,
+        orbekk@google.com, harshads@google.com, jasiu@google.com,
+        saranyamohan@google.com, tytso@google.com, bvanassche@google.com
+Subject: Re: [RFC PATCH 1/4] bpf: add new prog_type BPF_PROG_TYPE_IO_FILTER
+Message-ID: <20200904154309.GA2048@leah-Ubuntu>
+References: <20200812163305.545447-1-leah.rumancik@gmail.com>
+ <20200812163305.545447-2-leah.rumancik@gmail.com>
+ <20200813230021.llbkj5ihyadcbuia@kafai-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200813230021.llbkj5ihyadcbuia@kafai-mbp.dhcp.thefacebook.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-09-04 04:35, Danil Kipnis wrote:
-> On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
->> How will it be guaranteed that the resulting software does
->> not suffer from the problems that have been solved by the introduction
->> of the DRBD activity log
->> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
+On Thu, Aug 13, 2020 at 04:00:51PM -0700, Martin KaFai Lau wrote:
+> On Wed, Aug 12, 2020 at 04:33:02PM +0000, Leah Rumancik wrote:
+> > Introducing a new program type BPF_PROG_TYPE_IO_FILTER and a new
+> > attach type BPF_BIO_SUBMIT.
+> > 
+> > This program type is intended to help filter and monitor IO requests.
 > 
-> The above would require some kind of activity log also, I'm afraid.
+> [ ... ]
+> 
+> > +#define BPF_MAX_PROGS 64
+> > +
+> > +int io_filter_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+> > +{
+> > +	struct gendisk *disk;
+> > +	struct fd f;
+> > +	struct bpf_prog_array *old_array;
+> > +	struct bpf_prog_array *new_array;
+> > +	int ret;
+> > +
+> > +	if (attr->attach_flags)
+> > +		return -EINVAL;
+> > +
+> > +	f = fdget(attr->target_fd);
+> > +	if (!f.file)
+> > +		return -EBADF;
+> > +
+> > +	disk = I_BDEV(f.file->f_mapping->host)->bd_disk;
+> > +	if (disk == NULL)
+> > +		return -ENXIO;
+> > +
+> > +	ret = mutex_lock_interruptible(&disk->io_filter_lock);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	old_array = io_filter_rcu_dereference_progs(disk);
+> > +	if (old_array && bpf_prog_array_length(old_array) >= BPF_MAX_PROGS) {
+> > +		ret = -E2BIG;
+> > +		goto unlock;
+> > +	}
+> > +
+> > +	ret = bpf_prog_array_copy(old_array, NULL, prog, &new_array);
+> > +	if (ret < 0)
+> > +		goto unlock;
+> > +
+> > +	rcu_assign_pointer(disk->progs, new_array);
+> > +	bpf_prog_array_free(old_array);
+> > +
+> > +unlock:
+> > +	mutex_unlock(&disk->io_filter_lock);
+> > +	return ret;
+> > +}
+> bpf link should be used.
+> netns_bpf_link_create() can be used as an example.
+I'll update this, thanks for the example.
 
-How about collaborating with the DRBD team? My concern is that otherwise
-we will end up with two drivers in the kernel that implement block device
-replication between servers connected over a network.
+> > diff --git a/include/uapi/linux/bpf.h Vb/include/uapi/linux/bpf.h
+> > +struct bpf_io_request {
+> > +	__u64 sector_start;	/* first sector */
+> > +	__u32 sector_cnt;	/* number of sectors */
+> > +	__u32 opf;		/* bio->bi_opf */
+> > +};
+> Is it all that are needed from "struct bio" to do the filtering and monitoring?
+> Please elaborate a few more specific filtering usecases in the comment
+> or even better is to add those usecases to the tests.
+Fields can be added to the bpf_io_request later if needed. I'll add some
+more tests and clarification in comments in the next version.
 
-Thanks,
+> 
+> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > index 94cead5a43e5..71372e99a722 100644
+> > --- a/kernel/bpf/verifier.c
+> > +++ b/kernel/bpf/verifier.c
+> > @@ -2613,6 +2613,7 @@ static bool may_access_direct_pkt_data(struct bpf_verifier_env *env,
+> >  	case BPF_PROG_TYPE_LWT_SEG6LOCAL:
+> >  	case BPF_PROG_TYPE_SK_REUSEPORT:
+> >  	case BPF_PROG_TYPE_FLOW_DISSECTOR:
+> > +	case BPF_PROG_TYPE_IO_FILTER:
+> Why it is needed?
+Does not look like this is needed. I will remove it.
 
-Bart.
+Thanks for the review,
+Leah
