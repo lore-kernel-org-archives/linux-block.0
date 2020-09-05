@@ -7,72 +7,121 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B093FC433E2
-	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 09:44:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B46AC433E2
+	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 11:27:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 776F120757
-	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 09:44:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47A372074B
+	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 11:27:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728297AbgIEJoI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Sep 2020 05:44:08 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:49078 "EHLO huawei.com"
+        id S1728503AbgIEL1w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Sep 2020 07:27:52 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:47926 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726372AbgIEJoI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Sep 2020 05:44:08 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 72D8C7F3C0397521918D;
-        Sat,  5 Sep 2020 17:44:06 +0800 (CST)
-Received: from huawei.com (10.175.104.175) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Sat, 5 Sep 2020
- 17:43:58 +0800
-From:   Miaohe Lin <linmiaohe@huawei.com>
+        id S1728472AbgIEL1e (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Sep 2020 07:27:34 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 41F7DFADDC2DB11BBDDD;
+        Sat,  5 Sep 2020 19:26:40 +0800 (CST)
+Received: from code-website.localdomain (10.175.127.227) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 5 Sep 2020 19:26:29 +0800
+From:   yangerkun <yangerkun@huawei.com>
 To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linmiaohe@huawei.com>
-Subject: [PATCH] block: Use helper function blk_mq_sched_needs_restart()
-Date:   Sat, 5 Sep 2020 05:42:33 -0400
-Message-ID: <20200905094233.3888-1-linmiaohe@huawei.com>
-X-Mailer: git-send-email 2.19.1
+CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <hch@lst.de>, <yi.zhang@huawei.com>,
+        <yangerkun@huawei.com>
+Subject: [PATCH v2] blk-mq: call commit_rqs while list empty but error happen
+Date:   Sat, 5 Sep 2020 19:25:56 +0800
+Message-ID: <20200905112556.1735962-1-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.104.175]
+X-Originating-IP: [10.175.127.227]
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use helper function blk_mq_sched_needs_restart() to check if hardware queue
-needs restart.
+Blk-mq should call commit_rqs once 'bd.last != true' and no more
+request will come(so virtscsi can kick the virtqueue, e.g.). We already
+do that in 'blk_mq_dispatch_rq_list/blk_mq_try_issue_list_directly' while
+list not empty and 'queued > 0'. However, we can seen the same scene
+once the last request in list call queue_rq and return error like
+BLK_STS_IOERR which will not requeue the request, and lead that list
+empty but need call commit_rqs too(Or the request for virtscsi will stay
+timeout until other request kick virtqueue).
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+We found this problem by do fsstress test with offline/online virtscsi
+device repeat quickly.
+
+Fixes: d666ba98f849 ("blk-mq: add mq_ops->commit_rqs()")
+Reported-by: zhangyi (F) <yi.zhang@huawei.com>
+Signed-off-by: yangerkun <yangerkun@huawei.com>
 ---
- block/blk-mq-sched.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/blk-mq.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index d2790e5b06d1..dc837fd26e17 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -65,7 +65,7 @@ void blk_mq_sched_assign_ioc(struct request *rq)
-  */
- void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
- {
--	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
-+	if (blk_mq_sched_needs_restart(hctx))
- 		return;
+v1->v2: delete the comment
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b3d2785eefe9..cdced4aca2e8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1412,6 +1412,11 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
  
- 	set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
-@@ -74,7 +74,7 @@ EXPORT_SYMBOL_GPL(blk_mq_sched_mark_restart_hctx);
+ 	hctx->dispatched[queued_to_index(queued)]++;
  
- void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
++	/* If we didn't flush the entire list, we could have told the driver
++	 * there was more coming, but that turned out to be a lie.
++	 */
++	if ((!list_empty(list) || errors) && q->mq_ops->commit_rqs && queued)
++		q->mq_ops->commit_rqs(hctx);
+ 	/*
+ 	 * Any items that need requeuing? Stuff them into hctx->dispatch,
+ 	 * that is where we will continue on next queue run.
+@@ -1425,14 +1430,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 
+ 		blk_mq_release_budgets(q, nr_budgets);
+ 
+-		/*
+-		 * If we didn't flush the entire list, we could have told
+-		 * the driver there was more coming, but that turned out to
+-		 * be a lie.
+-		 */
+-		if (q->mq_ops->commit_rqs && queued)
+-			q->mq_ops->commit_rqs(hctx);
+-
+ 		spin_lock(&hctx->lock);
+ 		list_splice_tail_init(list, &hctx->dispatch);
+ 		spin_unlock(&hctx->lock);
+@@ -2079,6 +2076,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct list_head *list)
  {
--	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
-+	if (!blk_mq_sched_needs_restart(hctx))
- 		return;
- 	clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ 	int queued = 0;
++	int errors = 0;
+ 
+ 	while (!list_empty(list)) {
+ 		blk_status_t ret;
+@@ -2095,6 +2093,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 				break;
+ 			}
+ 			blk_mq_end_request(rq, ret);
++			errors++;
+ 		} else
+ 			queued++;
+ 	}
+@@ -2104,7 +2103,8 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 	 * the driver there was more coming, but that turned out to
+ 	 * be a lie.
+ 	 */
+-	if (!list_empty(list) && hctx->queue->mq_ops->commit_rqs && queued)
++	if ((!list_empty(list) || errors) &&
++	     hctx->queue->mq_ops->commit_rqs && queued)
+ 		hctx->queue->mq_ops->commit_rqs(hctx);
+ }
  
 -- 
-2.19.1
+2.25.4
 
