@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B46AC433E2
-	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 11:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98104C43461
+	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 11:38:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47A372074B
-	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 11:27:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 567DF2078D
+	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 11:38:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728503AbgIEL1w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Sep 2020 07:27:52 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:47926 "EHLO huawei.com"
+        id S1728473AbgIELih (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Sep 2020 07:38:37 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:60780 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728472AbgIEL1e (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Sep 2020 07:27:34 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 41F7DFADDC2DB11BBDDD;
-        Sat,  5 Sep 2020 19:26:40 +0800 (CST)
+        id S1726491AbgIELih (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Sep 2020 07:38:37 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 5FCE681583DB559537E5;
+        Sat,  5 Sep 2020 19:21:41 +0800 (CST)
 Received: from code-website.localdomain (10.175.127.227) by
  DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 5 Sep 2020 19:26:29 +0800
+ 14.3.487.0; Sat, 5 Sep 2020 19:21:35 +0800
 From:   yangerkun <yangerkun@huawei.com>
 To:     <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>,
         <bvanassche@acm.org>, <hch@lst.de>, <yi.zhang@huawei.com>,
         <yangerkun@huawei.com>
-Subject: [PATCH v2] blk-mq: call commit_rqs while list empty but error happen
-Date:   Sat, 5 Sep 2020 19:25:56 +0800
-Message-ID: <20200905112556.1735962-1-yangerkun@huawei.com>
+Subject: [PATCH] blk-mq: call commit_rqs while list empty but error happen
+Date:   Sat, 5 Sep 2020 19:21:01 +0800
+Message-ID: <20200905112101.1734339-1-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
@@ -60,13 +60,11 @@ Fixes: d666ba98f849 ("blk-mq: add mq_ops->commit_rqs()")
 Reported-by: zhangyi (F) <yi.zhang@huawei.com>
 Signed-off-by: yangerkun <yangerkun@huawei.com>
 ---
- block/blk-mq.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-v1->v2: delete the comment
+ block/blk-mq.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b3d2785eefe9..cdced4aca2e8 100644
+index b3d2785eefe9..435199979545 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -1412,6 +1412,11 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
@@ -81,22 +79,16 @@ index b3d2785eefe9..cdced4aca2e8 100644
  	/*
  	 * Any items that need requeuing? Stuff them into hctx->dispatch,
  	 * that is where we will continue on next queue run.
-@@ -1425,14 +1430,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 
- 		blk_mq_release_budgets(q, nr_budgets);
- 
--		/*
--		 * If we didn't flush the entire list, we could have told
--		 * the driver there was more coming, but that turned out to
--		 * be a lie.
--		 */
+@@ -1430,8 +1435,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 		 * the driver there was more coming, but that turned out to
+ 		 * be a lie.
+ 		 */
 -		if (q->mq_ops->commit_rqs && queued)
 -			q->mq_ops->commit_rqs(hctx);
--
+ 
  		spin_lock(&hctx->lock);
  		list_splice_tail_init(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
-@@ -2079,6 +2076,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+@@ -2079,6 +2082,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
  		struct list_head *list)
  {
  	int queued = 0;
@@ -104,7 +96,7 @@ index b3d2785eefe9..cdced4aca2e8 100644
  
  	while (!list_empty(list)) {
  		blk_status_t ret;
-@@ -2095,6 +2093,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+@@ -2095,6 +2099,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
  				break;
  			}
  			blk_mq_end_request(rq, ret);
@@ -112,7 +104,7 @@ index b3d2785eefe9..cdced4aca2e8 100644
  		} else
  			queued++;
  	}
-@@ -2104,7 +2103,8 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+@@ -2104,7 +2109,8 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
  	 * the driver there was more coming, but that turned out to
  	 * be a lie.
  	 */
