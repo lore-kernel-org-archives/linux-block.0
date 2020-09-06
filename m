@@ -2,156 +2,332 @@ Return-Path: <SRS0=+tUj=CP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B47DEC43461
-	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 02:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E46C433E2
+	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 03:19:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 688C020DD4
-	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 02:20:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BF162086A
+	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 03:19:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJhZ8MHT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WroN2i5Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728820AbgIFCUA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Sep 2020 22:20:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53798 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728409AbgIFCT7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Sep 2020 22:19:59 -0400
+        id S1728409AbgIFDTa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Sep 2020 23:19:30 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53327 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728257AbgIFDT3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Sep 2020 23:19:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599358798;
+        s=mimecast20190719; t=1599362366;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rwgA9Jj7sGgW+dDyq44/6RsTApt4e/K2QTwvjlVIbYc=;
-        b=DJhZ8MHTSDsivjdJhYBb1W/8Lz/EK3o66cLwpO2abcL+1NawWx/8Vf85tXB4puXElGN4m+
-        Godqbcza+5T2ei1y2MoBka9V+7KhIfYfLpTWsFBBfEbgH5vWt8xvocsuNIqS2+2g3Gpg+1
-        o3x7NgbIgMcg9nwcZOMGjhFUnsbmUTA=
+        bh=Y7C6/v52JOCoyzXs3EvnyF3sQ6pK3y/ClJ5ONjCN7FI=;
+        b=WroN2i5YNz3PqBmK/lT4jNKx9cunmQ2hH4jWI/bw9Xm/S75mIzXWpTPpY+oZUQ3YniXdZa
+        ComC4hS3MDS3LjhsZ4YRE+qC+xz/TtFogQzjNf22mJioRsBAlkopORAZJMAO99alF+lrSI
+        hGFAiUu5ATze41zCKfI8iLuCFRTD5z8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-Fr-uZJAPNIiTQqMmz1syWA-1; Sat, 05 Sep 2020 22:19:56 -0400
-X-MC-Unique: Fr-uZJAPNIiTQqMmz1syWA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-285-KhKIQCf4NqqSvPtl_yEZNg-1; Sat, 05 Sep 2020 23:19:22 -0400
+X-MC-Unique: KhKIQCf4NqqSvPtl_yEZNg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7D4F1DDEA;
-        Sun,  6 Sep 2020 02:19:54 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CC241DDEA;
+        Sun,  6 Sep 2020 03:19:21 +0000 (UTC)
 Received: from T590 (ovpn-12-73.pek2.redhat.com [10.72.12.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F0D010013C4;
-        Sun,  6 Sep 2020 02:19:47 +0000 (UTC)
-Date:   Sun, 6 Sep 2020 10:19:43 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C96EE6FDB6;
+        Sun,  6 Sep 2020 03:19:12 +0000 (UTC)
+Date:   Sun, 6 Sep 2020 11:19:08 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     yangerkun <yangerkun@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, bvanassche@acm.org,
-        hch@lst.de, yi.zhang@huawei.com
-Subject: Re: [PATCH v2] blk-mq: call commit_rqs while list empty but error
- happen
-Message-ID: <20200906021943.GA894392@T590>
-References: <20200905112556.1735962-1-yangerkun@huawei.com>
+To:     Veronika Kabatova <vkabatov@redhat.com>
+Cc:     CKI Project <cki-project@redhat.com>, linux-block@vger.kernel.org,
+        Changhui Zhong <czhong@redhat.com>, axboe@kernel.dk
+Subject: Re: =?utf-8?B?8J+SpSBQQU5JQ0tFRA==?= =?utf-8?Q?=3A?= Test report
+ for?kernel 5.9.0-rc3-020ad03.cki (block)
+Message-ID: <20200906031908.GB894392@T590>
+References: <cki.538AE6A321.BMB0X5ZYG5@redhat.com>
+ <20200904010233.GA817918@T590>
+ <491751.10128377.1599217585366.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200905112556.1735962-1-yangerkun@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <491751.10128377.1599217585366.JavaMail.zimbra@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 05, 2020 at 07:25:56PM +0800, yangerkun wrote:
-> Blk-mq should call commit_rqs once 'bd.last != true' and no more
-> request will come(so virtscsi can kick the virtqueue, e.g.). We already
-> do that in 'blk_mq_dispatch_rq_list/blk_mq_try_issue_list_directly' while
-> list not empty and 'queued > 0'. However, we can seen the same scene
-> once the last request in list call queue_rq and return error like
-> BLK_STS_IOERR which will not requeue the request, and lead that list
-> empty but need call commit_rqs too(Or the request for virtscsi will stay
-> timeout until other request kick virtqueue).
+Hi Veronika,
 
-It is really one corner case: driver has seen ->last already, so it
-should have handled this case in theory.
-
-However, for scsi, .commit_rqs is called by LLD, and request is failed
-before calling .queuecommand by scsi middle layer, so causes this trouble.
-
-NVMe has similar issue too.
-
+On Fri, Sep 04, 2020 at 07:06:25AM -0400, Veronika Kabatova wrote:
 > 
-> We found this problem by do fsstress test with offline/online virtscsi
-> device repeat quickly.
 > 
-> Fixes: d666ba98f849 ("blk-mq: add mq_ops->commit_rqs()")
-> Reported-by: zhangyi (F) <yi.zhang@huawei.com>
-> Signed-off-by: yangerkun <yangerkun@huawei.com>
-> ---
->  block/blk-mq.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+> ----- Original Message -----
+> > From: "Ming Lei" <ming.lei@redhat.com>
+> > To: "CKI Project" <cki-project@redhat.com>
+> > Cc: linux-block@vger.kernel.org, axboe@kernel.dk, "Changhui Zhong" <czhong@redhat.com>
+> > Sent: Friday, September 4, 2020 3:02:33 AM
+> > Subject: Re: 💥 PANICKED: Test report for	kernel 5.9.0-rc3-020ad03.cki (block)
+> > 
+> > On Thu, Sep 03, 2020 at 05:07:57PM -0000, CKI Project wrote:
+> > > 
+> > > Hello,
+> > > 
+> > > We ran automated tests on a recent commit from this kernel tree:
+> > > 
+> > >        Kernel repo:
+> > >        https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+> > >             Commit: 020ad0333b03 - Merge branch 'for-5.10/block' into
+> > >             for-next
+> > > 
+> > > The results of these automated tests are provided below.
+> > > 
+> > >     Overall result: FAILED (see details below)
+> > >              Merge: OK
+> > >            Compile: OK
+> > >              Tests: PANICKED
+> > > 
+> > > All kernel binaries, config files, and logs are available for download
+> > > here:
+> > > 
+> > >   https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefix=datawarehouse/2020/09/02/613166
+> > > 
+> > > One or more kernel tests failed:
+> > > 
+> > >     ppc64le:
+> > >      💥 storage: software RAID testing
+> > > 
+> > >     aarch64:
+> > >      💥 storage: software RAID testing
+> > > 
+> > >     x86_64:
+> > >      💥 storage: software RAID testing
+> > > 
+> > > We hope that these logs can help you find the problem quickly. For the full
+> > > detail on our testing procedures, please scroll to the bottom of this
+> > > message.
+> > > 
+> > > Please reply to this email if you have any questions about the tests that
+> > > we
+> > > ran or if you have any suggestions on how to make future tests more
+> > > effective.
+> > > 
+> > >         ,-.   ,-.
+> > >        ( C ) ( K )  Continuous
+> > >         `-',-.`-'   Kernel
+> > >           ( I )     Integration
+> > >            `-'
+> > > ______________________________________________________________________________
+> > > 
+> > > Compile testing
+> > > ---------------
+> > > 
+> > > We compiled the kernel for 4 architectures:
+> > > 
+> > >     aarch64:
+> > >       make options: make -j30 INSTALL_MOD_STRIP=1 targz-pkg
+> > > 
+> > >     ppc64le:
+> > >       make options: make -j30 INSTALL_MOD_STRIP=1 targz-pkg
+> > > 
+> > >     s390x:
+> > >       make options: make -j30 INSTALL_MOD_STRIP=1 targz-pkg
+> > > 
+> > >     x86_64:
+> > >       make options: make -j30 INSTALL_MOD_STRIP=1 targz-pkg
+> > > 
+> > > 
+> > > 
+> > > Hardware testing
+> > > ----------------
+> > > We booted each kernel and ran the following tests:
+> > > 
+> > >   aarch64:
+> > >     Host 1:
+> > >        ✅ Boot test
+> > >        ✅ ACPI table test
+> > >        ✅ LTP
+> > >        ✅ Loopdev Sanity
+> > >        ✅ Memory function: memfd_create
+> > >        ✅ AMTU (Abstract Machine Test Utility)
+> > >        ✅ Ethernet drivers sanity
+> > >        ✅ storage: SCSI VPD
+> > >        🚧 ✅ CIFS Connectathon
+> > >        🚧 ✅ POSIX pjd-fstest suites
+> > > 
+> > >     Host 2:
+> > > 
+> > >        ⚡ Internal infrastructure issues prevented one or more tests (marked
+> > >        with ⚡⚡⚡) from running on this architecture.
+> > >        This is not the fault of the kernel that was tested.
+> > > 
+> > >        ⚡⚡⚡ Boot test
+> > >        ⚡⚡⚡ xfstests - ext4
+> > >        ⚡⚡⚡ xfstests - xfs
+> > >        ⚡⚡⚡ storage: software RAID testing
+> > >        ⚡⚡⚡ stress: stress-ng
+> > >        🚧 ⚡⚡⚡ xfstests - btrfs
+> > >        🚧 ⚡⚡⚡ Storage blktests
+> > > 
+> > >     Host 3:
+> > >        ✅ Boot test
+> > >        ✅ xfstests - ext4
+> > >        ✅ xfstests - xfs
+> > >        💥 storage: software RAID testing
+> > >        ⚡⚡⚡ stress: stress-ng
+> > >        🚧 ⚡⚡⚡ xfstests - btrfs
+> > >        🚧 ⚡⚡⚡ Storage blktests
+> > > 
+> > >   ppc64le:
+> > >     Host 1:
+> > >        ✅ Boot test
+> > >        🚧 ✅ kdump - sysrq-c
+> > > 
+> > >     Host 2:
+> > >        ✅ Boot test
+> > >        ✅ xfstests - ext4
+> > >        ✅ xfstests - xfs
+> > >        💥 storage: software RAID testing
+> > >        🚧 ⚡⚡⚡ xfstests - btrfs
+> > >        🚧 ⚡⚡⚡ Storage blktests
+> > > 
+> > >     Host 3:
+> > > 
+> > >        ⚡ Internal infrastructure issues prevented one or more tests (marked
+> > >        with ⚡⚡⚡) from running on this architecture.
+> > >        This is not the fault of the kernel that was tested.
+> > > 
+> > >        ✅ Boot test
+> > >        ⚡⚡⚡ LTP
+> > >        ⚡⚡⚡ Loopdev Sanity
+> > >        ⚡⚡⚡ Memory function: memfd_create
+> > >        ⚡⚡⚡ AMTU (Abstract Machine Test Utility)
+> > >        ⚡⚡⚡ Ethernet drivers sanity
+> > >        🚧 ⚡⚡⚡ CIFS Connectathon
+> > >        🚧 ⚡⚡⚡ POSIX pjd-fstest suites
+> > > 
+> > >   s390x:
+> > >     Host 1:
+> > >        ✅ Boot test
+> > >        ✅ stress: stress-ng
+> > >        🚧 ✅ Storage blktests
+> > > 
+> > >     Host 2:
+> > >        ✅ Boot test
+> > >        ✅ LTP
+> > >        ✅ Loopdev Sanity
+> > >        ✅ Memory function: memfd_create
+> > >        ✅ AMTU (Abstract Machine Test Utility)
+> > >        ✅ Ethernet drivers sanity
+> > >        🚧 ✅ CIFS Connectathon
+> > >        🚧 ✅ POSIX pjd-fstest suites
+> > > 
+> > >   x86_64:
+> > >     Host 1:
+> > >        ✅ Boot test
+> > >        ✅ Storage SAN device stress - qedf driver
+> > > 
+> > >     Host 2:
+> > >        ⏱  Boot test
+> > >        ⏱  Storage SAN device stress - mpt3sas_gen1
+> > > 
+> > >     Host 3:
+> > >        ✅ Boot test
+> > >        ✅ xfstests - ext4
+> > >        ✅ xfstests - xfs
+> > >        💥 storage: software RAID testing
+> > >        ⚡⚡⚡ stress: stress-ng
+> > >        🚧 ⚡⚡⚡ xfstests - btrfs
+> > >        🚧 ⚡⚡⚡ Storage blktests
+> > > 
+> > >     Host 4:
+> > >        ✅ Boot test
+> > >        ✅ Storage SAN device stress - lpfc driver
+> > > 
+> > >     Host 5:
+> > >        ✅ Boot test
+> > >        🚧 ✅ kdump - sysrq-c
+> > > 
+> > >     Host 6:
+> > >        ✅ Boot test
+> > >        ✅ ACPI table test
+> > >        ✅ LTP
+> > >        ✅ Loopdev Sanity
+> > >        ✅ Memory function: memfd_create
+> > >        ✅ AMTU (Abstract Machine Test Utility)
+> > >        ✅ Ethernet drivers sanity
+> > >        ✅ kernel-rt: rt_migrate_test
+> > >        ✅ kernel-rt: rteval
+> > >        ✅ kernel-rt: sched_deadline
+> > >        ✅ kernel-rt: smidetect
+> > >        ✅ storage: SCSI VPD
+> > >        🚧 ✅ CIFS Connectathon
+> > >        🚧 ✅ POSIX pjd-fstest suites
+> > > 
+> > >     Host 7:
+> > >        ✅ Boot test
+> > >        ✅ kdump - sysrq-c - megaraid_sas
+> > > 
+> > >     Host 8:
+> > >        ✅ Boot test
+> > >        ✅ Storage SAN device stress - qla2xxx driver
+> > > 
+> > >     Host 9:
+> > >        ⏱  Boot test
+> > >        ⏱  kdump - sysrq-c - mpt3sas_gen1
+> > > 
+> > >   Test sources: https://gitlab.com/cki-project/kernel-tests
+> > 
+> > Hello,
+> > 
 > 
-> v1->v2: delete the comment
+> Hi Ming,
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index b3d2785eefe9..cdced4aca2e8 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1412,6 +1412,11 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
->  
->  	hctx->dispatched[queued_to_index(queued)]++;
->  
-> +	/* If we didn't flush the entire list, we could have told the driver
-> +	 * there was more coming, but that turned out to be a lie.
-> +	 */
-> +	if ((!list_empty(list) || errors) && q->mq_ops->commit_rqs && queued)
-> +		q->mq_ops->commit_rqs(hctx);
->  	/*
->  	 * Any items that need requeuing? Stuff them into hctx->dispatch,
->  	 * that is where we will continue on next queue run.
-> @@ -1425,14 +1430,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
->  
->  		blk_mq_release_budgets(q, nr_budgets);
->  
-> -		/*
-> -		 * If we didn't flush the entire list, we could have told
-> -		 * the driver there was more coming, but that turned out to
-> -		 * be a lie.
-> -		 */
-> -		if (q->mq_ops->commit_rqs && queued)
-> -			q->mq_ops->commit_rqs(hctx);
-> -
->  		spin_lock(&hctx->lock);
->  		list_splice_tail_init(list, &hctx->dispatch);
->  		spin_unlock(&hctx->lock);
-> @@ -2079,6 +2076,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
->  		struct list_head *list)
->  {
->  	int queued = 0;
-> +	int errors = 0;
->  
->  	while (!list_empty(list)) {
->  		blk_status_t ret;
-> @@ -2095,6 +2093,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
->  				break;
->  			}
->  			blk_mq_end_request(rq, ret);
-> +			errors++;
->  		} else
->  			queued++;
->  	}
-> @@ -2104,7 +2103,8 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
->  	 * the driver there was more coming, but that turned out to
->  	 * be a lie.
->  	 */
-> -	if (!list_empty(list) && hctx->queue->mq_ops->commit_rqs && queued)
-> +	if ((!list_empty(list) || errors) &&
-> +	     hctx->queue->mq_ops->commit_rqs && queued)
->  		hctx->queue->mq_ops->commit_rqs(hctx);
->  }
+> first the good news: Both issues detected by LTP and RAID test are
+> officially gone after the revert. There's some x86_64 testing still
+> running but the results look good so far!
+> 
+> > Can you share us the exact commands for setting up xfstests over
+> > 'software RAID testing' from the above tree?
+> > 
+> 
+> It's this test (which seeing your @redhat email, you can also trigger
+> via internal Brew testing if you use the "stor" test set):
+> 
+> https://gitlab.com/cki-project/kernel-tests/-/tree/master/storage/swraid/trim
+> 
+> The important part of the test is:
+> 
+> https://gitlab.com/cki-project/kernel-tests/-/blob/master/storage/swraid/trim/main.sh#L27
+> 
+> The test maintainer (Changhui) is cced on this thread in case you need
+> any help or have questions about the test.
+> 
+> 
+> 
+> I'll just quickly mention, please be careful if you're planning on
+> testing LTP/msgstress04 on ppc64le in Beaker, as the conserver overload
+> is causing issues to lab owners.
+> 
+> 
+> Let us know if we can help you with something else,
 
-Looks fine:
+I have verified the revised patches does fix kernel oops in 'software
+RAID storage test'. However, I can't reproduce the OOM in LTP/msgstress04.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Could you help to check if LTP/msgstress04 can pass with the following
+tree(top three patches) which is against the latest for-5.10/block:
+
+	https://github.com/ming1/linux/commits/v5.9-rc-block-test
 
 Thanks,
 Ming
