@@ -1,125 +1,110 @@
-Return-Path: <SRS0=kuF4=CO=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=+tUj=CP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8755DC43461
-	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 12:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF73C433E2
+	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 01:22:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E7102072D
-	for <linux-block@archiver.kernel.org>; Sat,  5 Sep 2020 12:52:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XGtHY7HA"
+	by mail.kernel.org (Postfix) with ESMTP id DF9552078E
+	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 01:22:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726302AbgIEMwW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Sep 2020 08:52:22 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:46812 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726261AbgIEMwS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Sep 2020 08:52:18 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 085CnlfC046112;
-        Sat, 5 Sep 2020 12:52:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=6zESj+OzV/BEb7y6Xdu+g+bYS9iPWu7pSQIdAlq9jp0=;
- b=XGtHY7HAT7XCqX5twIPmusk4VKCqiKKIrsC23pO7Ar3yx5wN3wXepNqhFVkDkaiLbtel
- BStaaOTHK29HGERhsGYX/itQyioPwyz82v3+viP/LxOFZijOzNRhZya7SHwdZAeGHAfZ
- uGpSzG/p1dEau+9EEQbHfvL21OXCgz9JN589kHO1+/qB9ahkqOB0fuIVLKYOU6aQidmo
- OpVCDctUPXIdBbBoI8RqKJCDajtDsk9ZexiIE0VV6J2P3RNED8VGmKmCmHvX9ATcg1Yq
- EGV93rXaf43xiBISw8UCrjj3TWoECztUPPmnPNouyDzSc61jPFwTk2li2AATGMVGixS4 7w== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 33c23qh7b3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 05 Sep 2020 12:52:15 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 085CpGFL115484;
-        Sat, 5 Sep 2020 12:52:15 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 33c20hrayb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 05 Sep 2020 12:52:15 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 085CqC0q019757;
-        Sat, 5 Sep 2020 12:52:14 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sat, 05 Sep 2020 05:52:11 -0700
-Date:   Sat, 5 Sep 2020 15:52:06 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: [PATCH] blk-mq: Fix refcounting leak in __blk_mq_register_dev()
-Message-ID: <20200905125206.GE183976@mwanda>
+        id S1728563AbgIFBW2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Sep 2020 21:22:28 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:35222 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728409AbgIFBW1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Sep 2020 21:22:27 -0400
+Received: by mail-pj1-f65.google.com with SMTP id g6so4762187pjl.0;
+        Sat, 05 Sep 2020 18:22:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y8P3mIHd6ojJKrdWs6XRkjCCCxjWTf60yFc1j4m7E/w=;
+        b=W/xnP0fgmvK9XIpahiSk2pOrvz9zRH+zX5TiA+3cSmIqBrghKAzQ83yl9trjRGf752
+         zBqENj7LaHACFFxwNYC/p6W74BJ3soqyZN/DG0jRKAlziLvHGEFvbLtiKjwPmKVipImn
+         m+WjImipaMwfkYm9JO6B5MHdKc1CP7f5ogMfx/D+kZOFh/6P1D1pULIkdVGu2p2AW918
+         q/UOOR8KItmuFHvHeUejnwV6EL0ONIZzdubQQRl3Eo0h542tXYpCOJJVHDzNqnVI/SuQ
+         cjo4BtuSw7efeYprfo8OkV/49BDBxX+0V+aThNaZqTC1UNsW9tAHLKPvI5OfuJl1mN7J
+         4h7w==
+X-Gm-Message-State: AOAM531BCKbWJkMrdh6uF+NAAlkc5uli7nq0Nu1giLvdCIxx4SYeHfis
+        9AXWgD6T4nqbilmkTQ36Ws0=
+X-Google-Smtp-Source: ABdhPJxas14xGh5T55KwWXMiIx7io1GuyxS3OcNkcqQo73B8qM2lruLbEVWsLzBFoxqqG/SV4rQTww==
+X-Received: by 2002:a17:902:e993:: with SMTP id f19mr14625702plb.270.1599355346755;
+        Sat, 05 Sep 2020 18:22:26 -0700 (PDT)
+Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:cd46:435a:ac98:84de])
+        by smtp.gmail.com with ESMTPSA id 25sm3585165pjh.57.2020.09.05.18.22.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Sep 2020 18:22:25 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-scsi@vger.kernel.org, Alan Stern <stern@rowland.harvard.edu>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/9] Rework runtime suspend and SCSI domain validation
+Date:   Sat,  5 Sep 2020 18:22:10 -0700
+Message-Id: <20200906012219.17893-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9734 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0
- mlxlogscore=999 mlxscore=0 spamscore=0 malwarescore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009050123
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9734 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 priorityscore=1501
- mlxlogscore=999 mlxscore=0 bulkscore=0 suspectscore=0 spamscore=0
- malwarescore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009050123
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is a kobject_add() hidden in the call to kobject_add().
+Hi Jens,
 
-	ret = kobject_add(q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
-                                      ^^^^^^^^^^^^^^^^^^^^^^^
+The SCSI runtime suspend and domain validation mechanisms both use
+scsi_device_quiesce(). scsi_device_quiesce() restricts blk_queue_enter() to
+BLK_MQ_REQ_PREEMPT requests. There is a conflict between the requirements
+of runtime suspend and SCSI domain validation: no requests must be sent to
+runtime suspended devices that are in the state RPM_SUSPENDED while
+BLK_MQ_REQ_PREEMPT requests must be processed during SCSI domain
+validation. This conflict is resolved by reworking the SCSI domain
+validation implementation.
 
-It needs to be release on the error path.
+Hybernation and runtime suspend have been retested but SCSI domain
+validation not yet.
 
-Fixes: 320ae51feed5 ("blk-mq: new multi-queue block IO queueing mechanism")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- block/blk-mq-sysfs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Please consider this patch series for kernel v5.10.
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 062229395a50..5a63659163c1 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -321,7 +321,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 
- 	ret = kobject_add(q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
- 	if (ret < 0)
--		goto out;
-+		goto out_kobj;
- 
- 	kobject_uevent(q->mq_kobj, KOBJ_ADD);
- 
-@@ -333,8 +333,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 
- 	q->mq_sysfs_init_done = true;
- 
--out:
--	return ret;
-+	return 0;
- 
- unreg:
- 	while (--i >= 0)
-@@ -342,6 +341,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 
- 	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
- 	kobject_del(q->mq_kobj);
-+out_kobj:
- 	kobject_put(&dev->kobj);
- 	return ret;
- }
--- 
-2.28.0
+Thanks,
+
+Bart.
+
+Alan Stern (1):
+  block: Do not accept any requests while suspended
+
+Bart Van Assche (8):
+  block: Fix a race in the runtime power management code
+  ide: Do not set the RQF_PREEMPT flag for sense requests
+  scsi: Pass a request queue pointer to __scsi_execute()
+  scsi: Rework scsi_mq_alloc_queue()
+  scsi: Do not wait for a request in scsi_eh_lock_door()
+  scsi_transport_spi: Make spi_execute() accept a request queue pointer
+  scsi_transport_spi: Freeze request queues instead of quiescing
+  block, scsi, ide: Only process PM requests if rpm_status != RPM_ACTIVE
+
+ block/blk-core.c                  |  12 +--
+ block/blk-mq-debugfs.c            |   1 -
+ block/blk-mq.c                    |   4 +-
+ block/blk-pm.c                    |  15 ++--
+ block/blk-pm.h                    |  14 +--
+ drivers/ide/ide-atapi.c           |   1 -
+ drivers/ide/ide-io.c              |   3 +-
+ drivers/ide/ide-pm.c              |   2 +-
+ drivers/scsi/scsi_error.c         |   3 +-
+ drivers/scsi/scsi_lib.c           |  73 ++++++++--------
+ drivers/scsi/scsi_priv.h          |   2 +
+ drivers/scsi/scsi_transport_spi.c | 139 +++++++++++++++++-------------
+ include/linux/blk-mq.h            |   4 +-
+ include/linux/blkdev.h            |   6 +-
+ include/scsi/scsi_device.h        |  14 ++-
+ 15 files changed, 158 insertions(+), 135 deletions(-)
 
