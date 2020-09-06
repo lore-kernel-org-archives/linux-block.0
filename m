@@ -2,165 +2,157 @@ Return-Path: <SRS0=+tUj=CP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D91E7C433E2
-	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 01:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B47DEC43461
+	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 02:20:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADAC82078E
-	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 01:22:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 688C020DD4
+	for <linux-block@archiver.kernel.org>; Sun,  6 Sep 2020 02:20:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJhZ8MHT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728896AbgIFBWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Sep 2020 21:22:51 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:44875 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728887AbgIFBWm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Sep 2020 21:22:42 -0400
-Received: by mail-pg1-f196.google.com with SMTP id 7so6267833pgm.11;
-        Sat, 05 Sep 2020 18:22:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vzqwbvuEI0MUhU8xoJagSYikuR6h4EfX4KZRl8Z2nRE=;
-        b=be2d8BktjGVZhGonAXyd9a2BOitu+sTzFq3hUzzRBapiboSZHoN8PiQuU1zh82oYzg
-         Bw0IRcNykhzE5n5b0qCpbqfx4f6V5VAvRiGKqjy8DRILccDbPxWyC0TAmw4+Z5WMb7BI
-         HGvq+9teKv5iaiUxrmWaMXnLciclad7IJRi7VVc2lpqjELHusYzh3IcFNYJuOIvxlZ8h
-         g1mOQB1g/yQldHZ+wEaLjidwEIXrm5PAA6PpAkgC5rwUFks+sVdz6x+oYjE0oChsx7/H
-         yLE4GH1Ney27LbLeols7jopjd8JQrlgnPW+oHvUNJ5JCd+PXk87fcbrQUaoiEwikPi57
-         hjZQ==
-X-Gm-Message-State: AOAM531aOa3TkA+R093Cy7mugz7l9qQeHCSGTNsJRWJ42L8ZvE6fDRM/
-        riCxksP3knLt+EQAsaBiqINMCX/n3WA=
-X-Google-Smtp-Source: ABdhPJwBbiTvZMj3ugSNOtOgzrsTYXIkmvVKxjy29lc9pPmPonlkUE5TKQJwkZ8J+U/xPgtVpK4TQg==
-X-Received: by 2002:a63:a08:: with SMTP id 8mr11182601pgk.300.1599355360874;
-        Sat, 05 Sep 2020 18:22:40 -0700 (PDT)
-Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:cd46:435a:ac98:84de])
-        by smtp.gmail.com with ESMTPSA id 25sm3585165pjh.57.2020.09.05.18.22.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Sep 2020 18:22:40 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        linux-scsi@vger.kernel.org, Alan Stern <stern@rowland.harvard.edu>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Can Guo <cang@codeaurora.org>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Martin Kepplinger <martin.kepplinger@puri.sm>
-Subject: [PATCH 9/9] block: Do not accept any requests while suspended
-Date:   Sat,  5 Sep 2020 18:22:19 -0700
-Message-Id: <20200906012219.17893-10-bvanassche@acm.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200906012219.17893-1-bvanassche@acm.org>
-References: <20200906012219.17893-1-bvanassche@acm.org>
+        id S1728820AbgIFCUA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Sep 2020 22:20:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53798 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728409AbgIFCT7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Sep 2020 22:19:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599358798;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rwgA9Jj7sGgW+dDyq44/6RsTApt4e/K2QTwvjlVIbYc=;
+        b=DJhZ8MHTSDsivjdJhYBb1W/8Lz/EK3o66cLwpO2abcL+1NawWx/8Vf85tXB4puXElGN4m+
+        Godqbcza+5T2ei1y2MoBka9V+7KhIfYfLpTWsFBBfEbgH5vWt8xvocsuNIqS2+2g3Gpg+1
+        o3x7NgbIgMcg9nwcZOMGjhFUnsbmUTA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-Fr-uZJAPNIiTQqMmz1syWA-1; Sat, 05 Sep 2020 22:19:56 -0400
+X-MC-Unique: Fr-uZJAPNIiTQqMmz1syWA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7D4F1DDEA;
+        Sun,  6 Sep 2020 02:19:54 +0000 (UTC)
+Received: from T590 (ovpn-12-73.pek2.redhat.com [10.72.12.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F0D010013C4;
+        Sun,  6 Sep 2020 02:19:47 +0000 (UTC)
+Date:   Sun, 6 Sep 2020 10:19:43 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     yangerkun <yangerkun@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, bvanassche@acm.org,
+        hch@lst.de, yi.zhang@huawei.com
+Subject: Re: [PATCH v2] blk-mq: call commit_rqs while list empty but error
+ happen
+Message-ID: <20200906021943.GA894392@T590>
+References: <20200905112556.1735962-1-yangerkun@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200905112556.1735962-1-yangerkun@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Alan Stern <stern@rowland.harvard.edu>
+On Sat, Sep 05, 2020 at 07:25:56PM +0800, yangerkun wrote:
+> Blk-mq should call commit_rqs once 'bd.last != true' and no more
+> request will come(so virtscsi can kick the virtqueue, e.g.). We already
+> do that in 'blk_mq_dispatch_rq_list/blk_mq_try_issue_list_directly' while
+> list not empty and 'queued > 0'. However, we can seen the same scene
+> once the last request in list call queue_rq and return error like
+> BLK_STS_IOERR which will not requeue the request, and lead that list
+> empty but need call commit_rqs too(Or the request for virtscsi will stay
+> timeout until other request kick virtqueue).
 
-blk_queue_enter() accepts BLK_MQ_REQ_PREEMPT independent of the runtime
-power management state. Since SCSI domain validation no longer depends on
-this behavior, modify the behavior of blk_queue_enter() as follows:
-- Do not accept any requests while suspended.
-- Only process power management requests while suspending or resuming.
+It is really one corner case: driver has seen ->last already, so it
+should have handled this case in theory.
 
-Submitting BLK_MQ_REQ_PREEMPT requests to a device that is runtime-
-suspended causes runtime-suspended block devices not to resume as they
-should. The request which should cause a runtime resume instead gets
-issued directly, without resuming the device first. Of course the device
-can't handle it properly, the I/O fails, and the device remains suspended.
+However, for scsi, .commit_rqs is called by LLD, and request is failed
+before calling .queuecommand by scsi middle layer, so causes this trouble.
 
-The problem is fixed by checking that the queue's runtime-PM status
-isn't RPM_SUSPENDED before allowing a request to be issued, and
-queuing a runtime-resume request if it is.  In particular, the inline
-blk_pm_request_resume() routine is renamed blk_pm_resume_queue() and
-the code is unified by merging the surrounding checks into the
-routine.  If the queue isn't set up for runtime PM, or there currently
-is no restriction on allowed requests, the request is allowed.
-Likewise if the BLK_MQ_REQ_PREEMPT flag is set and the status isn't
-RPM_SUSPENDED.  Otherwise a runtime resume is queued and the request
-is blocked until conditions are more suitable.
+NVMe has similar issue too.
 
-Cc: Can Guo <cang@codeaurora.org>
-Cc: Stanley Chu <stanley.chu@mediatek.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-Reported-and-tested-by: Martin Kepplinger <martin.kepplinger@puri.sm>
-Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-[ bvanassche: modified commit message and removed Cc: stable because without
-  the previous patches from this series this patch would break parallel SCSI
-  domain validation ]
----
- block/blk-core.c |  6 +++---
- block/blk-pm.h   | 14 +++++++++-----
- 2 files changed, 12 insertions(+), 8 deletions(-)
+> 
+> We found this problem by do fsstress test with offline/online virtscsi
+> device repeat quickly.
+> 
+> Fixes: d666ba98f849 ("blk-mq: add mq_ops->commit_rqs()")
+> Reported-by: zhangyi (F) <yi.zhang@huawei.com>
+> Signed-off-by: yangerkun <yangerkun@huawei.com>
+> ---
+>  block/blk-mq.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+> 
+> v1->v2: delete the comment
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index b3d2785eefe9..cdced4aca2e8 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1412,6 +1412,11 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+>  
+>  	hctx->dispatched[queued_to_index(queued)]++;
+>  
+> +	/* If we didn't flush the entire list, we could have told the driver
+> +	 * there was more coming, but that turned out to be a lie.
+> +	 */
+> +	if ((!list_empty(list) || errors) && q->mq_ops->commit_rqs && queued)
+> +		q->mq_ops->commit_rqs(hctx);
+>  	/*
+>  	 * Any items that need requeuing? Stuff them into hctx->dispatch,
+>  	 * that is where we will continue on next queue run.
+> @@ -1425,14 +1430,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+>  
+>  		blk_mq_release_budgets(q, nr_budgets);
+>  
+> -		/*
+> -		 * If we didn't flush the entire list, we could have told
+> -		 * the driver there was more coming, but that turned out to
+> -		 * be a lie.
+> -		 */
+> -		if (q->mq_ops->commit_rqs && queued)
+> -			q->mq_ops->commit_rqs(hctx);
+> -
+>  		spin_lock(&hctx->lock);
+>  		list_splice_tail_init(list, &hctx->dispatch);
+>  		spin_unlock(&hctx->lock);
+> @@ -2079,6 +2076,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  		struct list_head *list)
+>  {
+>  	int queued = 0;
+> +	int errors = 0;
+>  
+>  	while (!list_empty(list)) {
+>  		blk_status_t ret;
+> @@ -2095,6 +2093,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  				break;
+>  			}
+>  			blk_mq_end_request(rq, ret);
+> +			errors++;
+>  		} else
+>  			queued++;
+>  	}
+> @@ -2104,7 +2103,8 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  	 * the driver there was more coming, but that turned out to
+>  	 * be a lie.
+>  	 */
+> -	if (!list_empty(list) && hctx->queue->mq_ops->commit_rqs && queued)
+> +	if ((!list_empty(list) || errors) &&
+> +	     hctx->queue->mq_ops->commit_rqs && queued)
+>  		hctx->queue->mq_ops->commit_rqs(hctx);
+>  }
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c5a2f8173b1f..22c1c6e6c0e1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -436,7 +436,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 			 * responsible for ensuring that that counter is
- 			 * globally visible before the queue is unfrozen.
- 			 */
--			if (pm || !blk_queue_pm_only(q)) {
-+			if ((pm && q->rpm_status != RPM_SUSPENDED) ||
-+			    !blk_queue_pm_only(q)) {
- 				success = true;
- 			} else {
- 				percpu_ref_put(&q->q_usage_counter);
-@@ -461,8 +462,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 
- 		wait_event(q->mq_freeze_wq,
- 			   (!q->mq_freeze_depth &&
--			    (pm || (blk_pm_request_resume(q),
--				    !blk_queue_pm_only(q)))) ||
-+			    blk_pm_resume_queue(pm, q)) ||
- 			   blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-diff --git a/block/blk-pm.h b/block/blk-pm.h
-index ea5507d23e75..a2283cc9f716 100644
---- a/block/blk-pm.h
-+++ b/block/blk-pm.h
-@@ -6,11 +6,14 @@
- #include <linux/pm_runtime.h>
- 
- #ifdef CONFIG_PM
--static inline void blk_pm_request_resume(struct request_queue *q)
-+static inline int blk_pm_resume_queue(const bool pm, struct request_queue *q)
- {
--	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
--		       q->rpm_status == RPM_SUSPENDING))
--		pm_request_resume(q->dev);
-+	if (!q->dev || !blk_queue_pm_only(q))
-+		return 1;	/* Nothing to do */
-+	if (pm && q->rpm_status != RPM_SUSPENDED)
-+		return 1;	/* Request allowed */
-+	pm_request_resume(q->dev);
-+	return 0;
- }
- 
- static inline void blk_pm_mark_last_busy(struct request *rq)
-@@ -44,8 +47,9 @@ static inline void blk_pm_put_request(struct request *rq)
- 		--rq->q->nr_pending;
- }
- #else
--static inline void blk_pm_request_resume(struct request_queue *q)
-+static inline int blk_pm_resume_queue(const bool pm, struct request_queue *q)
- {
-+	return 1;
- }
- 
- static inline void blk_pm_mark_last_busy(struct request *rq)
+Looks fine:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
+
