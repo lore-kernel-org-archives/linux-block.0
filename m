@@ -2,92 +2,66 @@ Return-Path: <SRS0=p3ox=CQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D20C43461
-	for <linux-block@archiver.kernel.org>; Mon,  7 Sep 2020 08:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A12CBC43461
+	for <linux-block@archiver.kernel.org>; Mon,  7 Sep 2020 10:36:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65E5D208C7
-	for <linux-block@archiver.kernel.org>; Mon,  7 Sep 2020 08:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7467820768
+	for <linux-block@archiver.kernel.org>; Mon,  7 Sep 2020 10:36:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727983AbgIGIge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Sep 2020 04:36:34 -0400
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:45936 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727874AbgIGIge (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Sep 2020 04:36:34 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0U88-1PX_1599467791;
-Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0U88-1PX_1599467791)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 07 Sep 2020 16:36:31 +0800
-From:   Baolin Wang <baolin.wang@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     ming.lei@redhat.com, hch@lst.de, baolin.wang@linux.alibaba.com,
-        baolin.wang7@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] block: Remove unused blk_mq_sched_free_hctx_data()
-Date:   Mon,  7 Sep 2020 16:36:17 +0800
-Message-Id: <0b736d64c0546c292ae8f1bcbe9d801c28e12583.1599467604.git.baolin.wang@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1728837AbgIGKf4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Sep 2020 06:35:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42458 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728659AbgIGKfy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Sep 2020 06:35:54 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 1B4C3B13F;
+        Mon,  7 Sep 2020 10:35:51 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id DFD741E12D1; Mon,  7 Sep 2020 12:35:49 +0200 (CEST)
+Date:   Mon, 7 Sep 2020 12:35:49 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        yebin <yebin10@huawei.com>, Andreas Dilger <adilger@dilger.ca>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 0/2 v2] bdev: Avoid discarding buffers under a filesystem
+Message-ID: <20200907103549.GA20428@quack2.suse.cz>
+References: <20200904085852.5639-1-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200904085852.5639-1-jack@suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now we usually free the hctx->sched_data by e->type->ops.exit_hctx(),
-and no users will use blk_mq_sched_free_hctx_data() function.
-Remove it.
+Hello!
 
-Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
----
- block/blk-mq-sched.c | 15 ---------------
- block/blk-mq-sched.h |  3 ---
- 2 files changed, 18 deletions(-)
+On Fri 04-09-20 10:58:50, Jan Kara wrote:
+> this patch set fixes problems when buffer heads are discarded under a
+> live filesystem (which can lead to all sorts of issues like crashes in case
+> of ext4). Patch 1 drops some stale buffer invalidation code, patch 2
+> temporarily gets exclusive access to the block device for the duration of
+> buffer cache handling to avoid interfering with other exclusive bdev user.
+> The patch fixes the problems for me and pass xfstests for ext4.
+> 
+> Changes since v1:
+> * Check for exclusive access to the bdev instead of for the presence of
+>   superblock
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 86d5545..3e95967 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -18,21 +18,6 @@
- #include "blk-mq-tag.h"
- #include "blk-wbt.h"
- 
--void blk_mq_sched_free_hctx_data(struct request_queue *q,
--				 void (*exit)(struct blk_mq_hw_ctx *))
--{
--	struct blk_mq_hw_ctx *hctx;
--	int i;
--
--	queue_for_each_hw_ctx(q, hctx, i) {
--		if (exit && hctx->sched_data)
--			exit(hctx);
--		kfree(hctx->sched_data);
--		hctx->sched_data = NULL;
--	}
--}
--EXPORT_SYMBOL_GPL(blk_mq_sched_free_hctx_data);
--
- void blk_mq_sched_assign_ioc(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 126021f..fe62e7c 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -5,9 +5,6 @@
- #include "blk-mq.h"
- #include "blk-mq-tag.h"
- 
--void blk_mq_sched_free_hctx_data(struct request_queue *q,
--				 void (*exit)(struct blk_mq_hw_ctx *));
--
- void blk_mq_sched_assign_ioc(struct request *rq);
- 
- void blk_mq_sched_request_inserted(struct request *rq);
+Jens, now that Christoph has reviewed the patches (thanks Christoph!), can
+you pick up the patches to your tree please? Thanks!
+
+								Honza
 -- 
-1.8.3.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
