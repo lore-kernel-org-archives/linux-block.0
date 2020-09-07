@@ -2,179 +2,389 @@ Return-Path: <SRS0=p3ox=CQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D4FC2BB84
-	for <linux-block@archiver.kernel.org>; Mon,  7 Sep 2020 16:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27FDDC43461
+	for <linux-block@archiver.kernel.org>; Mon,  7 Sep 2020 18:50:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76520208C7
-	for <linux-block@archiver.kernel.org>; Mon,  7 Sep 2020 16:53:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D014321532
+	for <linux-block@archiver.kernel.org>; Mon,  7 Sep 2020 18:50:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XMrUmzEQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730688AbgIGQxB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Sep 2020 12:53:01 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:42344 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730905AbgIGQwq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Sep 2020 12:52:46 -0400
-Received: by mail-pf1-f194.google.com with SMTP id d6so1827074pfn.9;
-        Mon, 07 Sep 2020 09:52:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=VEvhRokwwqmz0U/HN6F5/kaO/COX6wQ1MLILWEgM7qw=;
-        b=c1n8UGoIdD8MvK6GVQLe+4YlVet3Yum3u+zGg0HC3xsBt+8AArfBbs54RYiP2vtSY4
-         PQ7x3TK6vJpnkIOay1Hi0ZtTb6L/ndcIRmEkSBkG6c9V3RHalgmgYKl2+OpSAeLjHqbp
-         4kuZdeilfbtWQeX6URD55BHAEwAzGy6dmmDqL/WR9SjZu1a+EA/n5BWz/IqPm6rKr6PV
-         IUK/siCayKwwL2MD0/eHXqZv0paT0mFrtMeEuegywOTZEkLcB938cMKy1vTd/R0Giuop
-         AoD6eY7/j2rERAD2xuGXx5j+KTuRo6fiNJGqH3rBQ2KPNMRdI5wStCh1iAKTgjVm0uv1
-         +trQ==
-X-Gm-Message-State: AOAM532yCXxIBYYBTq7acbzhaBUK+X+4xC+kTWBkjRjjgxxg0Jx0ykkW
-        364/09Onpu01v2gStM7IJdlDB4X34fY=
-X-Google-Smtp-Source: ABdhPJyBf0pBXopK7X+LDOPgsPVmhGty9Io1yR27QH5eMM2I+fpOFILXWtZgRKU7CjEk6xUL8IgslQ==
-X-Received: by 2002:a65:68d6:: with SMTP id k22mr16739358pgt.136.1599497564505;
-        Mon, 07 Sep 2020 09:52:44 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:ff58:da99:dd6f:be14? ([2601:647:4000:d7:ff58:da99:dd6f:be14])
-        by smtp.gmail.com with ESMTPSA id ih11sm12898562pjb.51.2020.09.07.09.52.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Sep 2020 09:52:43 -0700 (PDT)
-Subject: Re: [PATCH V5] scsi: core: only re-run queue in scsi_end_request() if
- device queue is busy
-To:     Ming Lei <ming.lei@redhat.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     "Ewan D . Milne" <emilne@redhat.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>, Long Li <longli@microsoft.com>,
-        John Garry <john.garry@huawei.com>, linux-block@vger.kernel.org
-References: <20200907071048.1078838-1-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <4da219e6-7c2b-b93b-c6d0-2e18aa8ce11f@acm.org>
-Date:   Mon, 7 Sep 2020 09:52:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1729296AbgIGSuH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Sep 2020 14:50:07 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58838 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729289AbgIGSuG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Sep 2020 14:50:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599504603;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1tIQjhIHoyYwt6/u/EeCEEvma/4vUXylFvb2lYH0GEc=;
+        b=XMrUmzEQANsrjZ4TYcoAnRPHNv9hgxUrmz+WBQlLCpXHlHkQ8+Af+YMWoagDtmzfqFOYju
+        cu/0r+cIK3eAEAaPmeozoeQEQ70/DWxbwX5/oEZRNHcDDwy61Ti4FVQ3JTAHwlugZHfASj
+        dMw0f1fvNz6faQiZ54mm3r3k9jGOw30=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-HahjjazCPTq_hTvbmPBp4A-1; Mon, 07 Sep 2020 14:50:00 -0400
+X-MC-Unique: HahjjazCPTq_hTvbmPBp4A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DF6E1007461;
+        Mon,  7 Sep 2020 18:49:59 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 16DF9277D3;
+        Mon,  7 Sep 2020 18:49:59 +0000 (UTC)
+Received: from zmail19.collab.prod.int.phx2.redhat.com (zmail19.collab.prod.int.phx2.redhat.com [10.5.83.22])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 04D7879A16;
+        Mon,  7 Sep 2020 18:49:58 +0000 (UTC)
+Date:   Mon, 7 Sep 2020 14:49:58 -0400 (EDT)
+From:   Veronika Kabatova <vkabatov@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        CKI Project <cki-project@redhat.com>,
+        Changhui Zhong <czhong@redhat.com>
+Message-ID: <1786554325.10322949.1599504598742.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20200906031908.GB894392@T590>
+References: <cki.538AE6A321.BMB0X5ZYG5@redhat.com> <20200904010233.GA817918@T590> <491751.10128377.1599217585366.JavaMail.zimbra@redhat.com> <20200906031908.GB894392@T590>
+Subject: =?utf-8?Q?Re:_=F0=9F=92=A5_PANICKED:_Test_report=09for_k?=
+ =?utf-8?Q?ernel_5.9.0-rc3-020ad03.cki_(block)?=
 MIME-Version: 1.0
-In-Reply-To: <20200907071048.1078838-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.40.192.148, 10.4.195.1]
+Thread-Topic: ? PANICKED: Test report for kernel 5.9.0-rc3-020ad03.cki (block)
+Thread-Index: Fnr66l2E8Tg6swWB6RPCcD1HF1IxBg==
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-09-07 00:10, Ming Lei wrote:
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index 7affaaf8b98e..a05e431ee62a 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -551,8 +551,25 @@ static void scsi_run_queue_async(struct scsi_device *sdev)
->  	if (scsi_target(sdev)->single_lun ||
->  	    !list_empty(&sdev->host->starved_list))
->  		kblockd_schedule_work(&sdev->requeue_work);
-> -	else
-> -		blk_mq_run_hw_queues(sdev->request_queue, true);
-> +	else {
 
-Please follow the Linux kernel coding style and balance braces.
 
-> +		/*
-> +		 * smp_mb() implied in either rq->end_io or blk_mq_free_request
-> +		 * is for ordering writing .device_busy in scsi_device_unbusy()
-> +		 * and reading sdev->restarts.
-> +		 */
-> +		int old = atomic_read(&sdev->restarts);
+----- Original Message -----
+> From: "Ming Lei" <ming.lei@redhat.com>
+> To: "Veronika Kabatova" <vkabatov@redhat.com>
+> Cc: linux-block@vger.kernel.org, axboe@kernel.dk, "CKI Project" <cki-proj=
+ect@redhat.com>, "Changhui Zhong"
+> <czhong@redhat.com>
+> Sent: Sunday, September 6, 2020 5:19:08 AM
+> Subject: Re: =F0=9F=92=A5 PANICKED: Test report=09for?kernel 5.9.0-rc3-02=
+0ad03.cki (block)
+>=20
+> Hi Veronika,
+>=20
+> On Fri, Sep 04, 2020 at 07:06:25AM -0400, Veronika Kabatova wrote:
+> >=20
+> >=20
+> > ----- Original Message -----
+> > > From: "Ming Lei" <ming.lei@redhat.com>
+> > > To: "CKI Project" <cki-project@redhat.com>
+> > > Cc: linux-block@vger.kernel.org, axboe@kernel.dk, "Changhui Zhong"
+> > > <czhong@redhat.com>
+> > > Sent: Friday, September 4, 2020 3:02:33 AM
+> > > Subject: Re: =F0=9F=92=A5 PANICKED: Test report for=09kernel 5.9.0-rc=
+3-020ad03.cki
+> > > (block)
+> > >=20
+> > > On Thu, Sep 03, 2020 at 05:07:57PM -0000, CKI Project wrote:
+> > > >=20
+> > > > Hello,
+> > > >=20
+> > > > We ran automated tests on a recent commit from this kernel tree:
+> > > >=20
+> > > >        Kernel repo:
+> > > >        https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-=
+block.git
+> > > >             Commit: 020ad0333b03 - Merge branch 'for-5.10/block' in=
+to
+> > > >             for-next
+> > > >=20
+> > > > The results of these automated tests are provided below.
+> > > >=20
+> > > >     Overall result: FAILED (see details below)
+> > > >              Merge: OK
+> > > >            Compile: OK
+> > > >              Tests: PANICKED
+> > > >=20
+> > > > All kernel binaries, config files, and logs are available for downl=
+oad
+> > > > here:
+> > > >=20
+> > > >   https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefi=
+x=3Ddatawarehouse/2020/09/02/613166
+> > > >=20
+> > > > One or more kernel tests failed:
+> > > >=20
+> > > >     ppc64le:
+> > > >      =F0=9F=92=A5 storage: software RAID testing
+> > > >=20
+> > > >     aarch64:
+> > > >      =F0=9F=92=A5 storage: software RAID testing
+> > > >=20
+> > > >     x86_64:
+> > > >      =F0=9F=92=A5 storage: software RAID testing
+> > > >=20
+> > > > We hope that these logs can help you find the problem quickly. For =
+the
+> > > > full
+> > > > detail on our testing procedures, please scroll to the bottom of th=
+is
+> > > > message.
+> > > >=20
+> > > > Please reply to this email if you have any questions about the test=
+s
+> > > > that
+> > > > we
+> > > > ran or if you have any suggestions on how to make future tests more
+> > > > effective.
+> > > >=20
+> > > >         ,-.   ,-.
+> > > >        ( C ) ( K )  Continuous
+> > > >         `-',-.`-'   Kernel
+> > > >           ( I )     Integration
+> > > >            `-'
+> > > > ___________________________________________________________________=
+___________
+> > > >=20
+> > > > Compile testing
+> > > > ---------------
+> > > >=20
+> > > > We compiled the kernel for 4 architectures:
+> > > >=20
+> > > >     aarch64:
+> > > >       make options: make -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+> > > >=20
+> > > >     ppc64le:
+> > > >       make options: make -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+> > > >=20
+> > > >     s390x:
+> > > >       make options: make -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+> > > >=20
+> > > >     x86_64:
+> > > >       make options: make -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+> > > >=20
+> > > >=20
+> > > >=20
+> > > > Hardware testing
+> > > > ----------------
+> > > > We booted each kernel and ran the following tests:
+> > > >=20
+> > > >   aarch64:
+> > > >     Host 1:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 ACPI table test
+> > > >        =E2=9C=85 LTP
+> > > >        =E2=9C=85 Loopdev Sanity
+> > > >        =E2=9C=85 Memory function: memfd_create
+> > > >        =E2=9C=85 AMTU (Abstract Machine Test Utility)
+> > > >        =E2=9C=85 Ethernet drivers sanity
+> > > >        =E2=9C=85 storage: SCSI VPD
+> > > >        =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+> > > >        =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+> > > >=20
+> > > >     Host 2:
+> > > >=20
+> > > >        =E2=9A=A1 Internal infrastructure issues prevented one or mo=
+re tests
+> > > >        (marked
+> > > >        with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this archi=
+tecture.
+> > > >        This is not the fault of the kernel that was tested.
+> > > >=20
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 Boot test
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - ext4
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: software RAID testing
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+> > > >=20
+> > > >     Host 3:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 xfstests - ext4
+> > > >        =E2=9C=85 xfstests - xfs
+> > > >        =F0=9F=92=A5 storage: software RAID testing
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+> > > >=20
+> > > >   ppc64le:
+> > > >     Host 1:
+> > > >        =E2=9C=85 Boot test
+> > > >        =F0=9F=9A=A7 =E2=9C=85 kdump - sysrq-c
+> > > >=20
+> > > >     Host 2:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 xfstests - ext4
+> > > >        =E2=9C=85 xfstests - xfs
+> > > >        =F0=9F=92=A5 storage: software RAID testing
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+> > > >=20
+> > > >     Host 3:
+> > > >=20
+> > > >        =E2=9A=A1 Internal infrastructure issues prevented one or mo=
+re tests
+> > > >        (marked
+> > > >        with =E2=9A=A1=E2=9A=A1=E2=9A=A1) from running on this archi=
+tecture.
+> > > >        This is not the fault of the kernel that was tested.
+> > > >=20
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 LTP
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 Loopdev Sanity
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: memfd_create
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 AMTU (Abstract Machine Test Util=
+ity)
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 Ethernet drivers sanity
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 CIFS Connectathon
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 POSIX pjd-fstest su=
+ites
+> > > >=20
+> > > >   s390x:
+> > > >     Host 1:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 stress: stress-ng
+> > > >        =F0=9F=9A=A7 =E2=9C=85 Storage blktests
+> > > >=20
+> > > >     Host 2:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 LTP
+> > > >        =E2=9C=85 Loopdev Sanity
+> > > >        =E2=9C=85 Memory function: memfd_create
+> > > >        =E2=9C=85 AMTU (Abstract Machine Test Utility)
+> > > >        =E2=9C=85 Ethernet drivers sanity
+> > > >        =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+> > > >        =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+> > > >=20
+> > > >   x86_64:
+> > > >     Host 1:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 Storage SAN device stress - qedf driver
+> > > >=20
+> > > >     Host 2:
+> > > >        =E2=8F=B1  Boot test
+> > > >        =E2=8F=B1  Storage SAN device stress - mpt3sas_gen1
+> > > >=20
+> > > >     Host 3:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 xfstests - ext4
+> > > >        =E2=9C=85 xfstests - xfs
+> > > >        =F0=9F=92=A5 storage: software RAID testing
+> > > >        =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - btrfs
+> > > >        =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+> > > >=20
+> > > >     Host 4:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 Storage SAN device stress - lpfc driver
+> > > >=20
+> > > >     Host 5:
+> > > >        =E2=9C=85 Boot test
+> > > >        =F0=9F=9A=A7 =E2=9C=85 kdump - sysrq-c
+> > > >=20
+> > > >     Host 6:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 ACPI table test
+> > > >        =E2=9C=85 LTP
+> > > >        =E2=9C=85 Loopdev Sanity
+> > > >        =E2=9C=85 Memory function: memfd_create
+> > > >        =E2=9C=85 AMTU (Abstract Machine Test Utility)
+> > > >        =E2=9C=85 Ethernet drivers sanity
+> > > >        =E2=9C=85 kernel-rt: rt_migrate_test
+> > > >        =E2=9C=85 kernel-rt: rteval
+> > > >        =E2=9C=85 kernel-rt: sched_deadline
+> > > >        =E2=9C=85 kernel-rt: smidetect
+> > > >        =E2=9C=85 storage: SCSI VPD
+> > > >        =F0=9F=9A=A7 =E2=9C=85 CIFS Connectathon
+> > > >        =F0=9F=9A=A7 =E2=9C=85 POSIX pjd-fstest suites
+> > > >=20
+> > > >     Host 7:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 kdump - sysrq-c - megaraid_sas
+> > > >=20
+> > > >     Host 8:
+> > > >        =E2=9C=85 Boot test
+> > > >        =E2=9C=85 Storage SAN device stress - qla2xxx driver
+> > > >=20
+> > > >     Host 9:
+> > > >        =E2=8F=B1  Boot test
+> > > >        =E2=8F=B1  kdump - sysrq-c - mpt3sas_gen1
+> > > >=20
+> > > >   Test sources: https://gitlab.com/cki-project/kernel-tests
+> > >=20
+> > > Hello,
+> > >=20
+> >=20
+> > Hi Ming,
+> >=20
+> > first the good news: Both issues detected by LTP and RAID test are
+> > officially gone after the revert. There's some x86_64 testing still
+> > running but the results look good so far!
+> >=20
+> > > Can you share us the exact commands for setting up xfstests over
+> > > 'software RAID testing' from the above tree?
+> > >=20
+> >=20
+> > It's this test (which seeing your @redhat email, you can also trigger
+> > via internal Brew testing if you use the "stor" test set):
+> >=20
+> > https://gitlab.com/cki-project/kernel-tests/-/tree/master/storage/swrai=
+d/trim
+> >=20
+> > The important part of the test is:
+> >=20
+> > https://gitlab.com/cki-project/kernel-tests/-/blob/master/storage/swrai=
+d/trim/main.sh#L27
+> >=20
+> > The test maintainer (Changhui) is cced on this thread in case you need
+> > any help or have questions about the test.
+> >=20
+> >=20
+> >=20
+> > I'll just quickly mention, please be careful if you're planning on
+> > testing LTP/msgstress04 on ppc64le in Beaker, as the conserver overload
+> > is causing issues to lab owners.
+> >=20
+> >=20
+> > Let us know if we can help you with something else,
+>=20
+> I have verified the revised patches does fix kernel oops in 'software
+> RAID storage test'. However, I can't reproduce the OOM in LTP/msgstress04=
+.
+>=20
+> Could you help to check if LTP/msgstress04 can pass with the following
+> tree(top three patches) which is against the latest for-5.10/block:
+>=20
+> =09https://github.com/ming1/linux/commits/v5.9-rc-block-test
+>=20
 
-scsi_run_queue_async() has two callers: scsi_end_request() and scsi_queue_rq().
-I don't see how ordering between scsi_device_unbusy() and the above atomic_read()
-could be guaranteed if this function is called from scsi_queue_rq()?
+Hi,
 
-Regarding the I/O completion path, my understanding is that the I/O completion
-path is as follows if rq->end_io == NULL:
+I ran the affected ppc64le testing with your new patches and it gives the
+expected results.
 
-scsi_mq_done()
-  blk_mq_complete_request()
-    rq->q->mq_ops->complete(rq) = scsi_softirq_done
-      scsi_finish_command()
-        scsi_device_unbusy()
-        scsi_cmd_to_driver(cmd)->done(cmd)
-        scsi_io_completion()
-          scsi_end_request()
-            blk_update_request()
-            scsi_mq_uninit_cmd()
-            __blk_mq_end_request()
-              blk_mq_free_request()
-                __blk_mq_free_request()
-                  blk_queue_exit()
-            scsi_run_queue_async()
 
-I haven't found any store memory barrier between the .device_busy change in
-scsi_device_unbusy() and the scsi_run_queue_async() call? Did I perhaps overlook
-something?
+We also got in touch with the LTP test maintainers. It looks like there are
+some issues with the msgstress tests as well. These got amplified by the
+patch and the combination caused the conserver overload. The tests
+themselves need to be fixed too.
 
-> +		/*
-> +		 * ->restarts has to be kept as non-zero if there new budget
-> +		 *  contention comes.
+Veronika
 
-Please fix the grammar in the above sentence.
+> Thanks,
+> Ming
+>=20
+>=20
 
-> +	/*
-> +	 * Order writing .restarts and reading .device_busy. Its pair is
-> +	 * implied by __blk_mq_end_request() in scsi_end_request() for
-> +	 * ordering writing .device_busy in scsi_device_unbusy() and
-> +	 * reading .restarts.
-> +	 */
-> +	smp_mb__after_atomic();
-
-What does "its pair is implied" mean? Please make the above comment
-unambiguous.
-
-> +	/*
-> +	 * If all in-flight requests originated from this LUN are completed
-> +	 * before setting .restarts, sdev->device_busy will be observed as
-> +	 * zero, then blk_mq_delay_run_hw_queues() will dispatch this request
-> +	 * soon. Otherwise, completion of one of these request will observe
-> +	 * the .restarts flag, and the request queue will be run for handling
-> +	 * this request, see scsi_end_request().
-> +	 */
-> +	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
-> +				!scsi_device_blocked(sdev)))
-> +		blk_mq_delay_run_hw_queues(sdev->request_queue, SCSI_QUEUE_DELAY);
-> +	return false;
-
-What will happen if all in-flight requests complete after
-scsi_run_queue_async() has read .restarts and before it executes
-atomic_cmpxchg()? Will that cause the queue to be run after a delay
-although it should be run immediately?
-
-Thanks,
-
-Bart.
