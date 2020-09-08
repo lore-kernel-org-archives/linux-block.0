@@ -2,140 +2,206 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15AF1C433E2
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7323C433E2
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:50:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7F512166E
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 907712145D
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:50:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RhCmDFzl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dSTJ7ZeH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731981AbgIHTtK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 15:49:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33978 "EHLO
+        id S1730925AbgIHTsj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 15:48:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731605AbgIHTtG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 15:49:06 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21C3C061573
-        for <linux-block@vger.kernel.org>; Tue,  8 Sep 2020 12:49:05 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id j2so642690ioj.7
-        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2020 12:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=hunciBGEHrTyQWlaX8a60LpGpU2syQhqwCcb0lWbpY8=;
-        b=RhCmDFzlmOovzp/cgEV8Tdi5b5UnFoCcFlrdL0z06Evaju8ZFpb2lLCsQoqoH8xH/x
-         hwEQi4cNbOaOYa980t7gpVkmkflezv2wGYd5RAHfJf2PWVJnJSHMlCj0G55kiFAMiIni
-         tZ2jGR+2aCaiKBBfZ92Qvc+VBqeioQ7oDrhcdoJ/44n6WuXvHQxTMNl3WZlDcgRdpbjv
-         ocnxvL+rhXftlpO8nRtIxg+4JkiJb97TCA8OIQVuPM5YW/ito51eYemRgQxh/Mqweq3h
-         pNVE9QymHny2pKY0qQuH7J3xH2tUgPqvy675WcmoroHewH+kqeh+MTEx/fqDddHkinim
-         IJEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hunciBGEHrTyQWlaX8a60LpGpU2syQhqwCcb0lWbpY8=;
-        b=Rj0464tfHDZycfkMaHUYyJ8QtItpR/lXeJqx6TqctTjmT72uk24Si1vlt5HV5Sxzyq
-         /4s3Khq/bBUTMpeRA/J/Br5AMGmSF3JuDUpTAL3OHgk9NJTiUwlkdpagXUwP9M7D8c31
-         KXKVMV+qikZ1ll02XIOaNzAnrkc1IJ2KuCsz1fgFsA/e5HLOJJVPDr3WYs0naHZS81bc
-         oNp7I2HDtzVslN4QGXPUdj8iC5t7ppceBZPgUquE/kQXpgGRdT0iJPKgLb4Ikw62mgK4
-         6NW5s9mt67Sk1+l5dPpFfkvXgkjaEX0EV9GkwvIk4Qyw8YfJnWpdmBwWs6O66HLAK+6Z
-         Ux9g==
-X-Gm-Message-State: AOAM530cr7bZeSqA/Z0m+sFiiz1UjAn40D1jNi3LJzZ7tY48LlLCtJXj
-        ukhOpE6LFztZRdN/qY9kLPfevw==
-X-Google-Smtp-Source: ABdhPJynwfwcxk2rXYGMk/nuGSlsgauBldB4RUwnFSEnqseAQxFjI8JPDpYHbA2wBoT0bSeWk646Fg==
-X-Received: by 2002:a6b:8d57:: with SMTP id p84mr442932iod.206.1599594544809;
-        Tue, 08 Sep 2020 12:49:04 -0700 (PDT)
-Received: from [192.168.1.10] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id d1sm57038ila.67.2020.09.08.12.49.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Sep 2020 12:49:04 -0700 (PDT)
-Subject: Re: [PATCH] kyber: Fix crash in kyber_finish_request()
-To:     Omar Sandoval <osandov@osandov.com>
-Cc:     Yang Yang <yang.yang@vivo.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, onlyfever@icloud.com
-References: <20200907074346.5383-1-yang.yang@vivo.com>
- <8b714da7-97b2-f8d2-4be7-c192130c33af@kernel.dk>
- <20200908190009.GA142421@relinquished.localdomain>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <51e9345b-7c65-e35b-148f-bc9c5e1f7dcf@kernel.dk>
-Date:   Tue, 8 Sep 2020 13:49:03 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S1730721AbgIHPuw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 11:50:52 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F35DC0A3BF5;
+        Tue,  8 Sep 2020 07:55:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=s3JUZA1FtjTiqtgMGHDLmiQxYMnM63DlyIQ2tpQALUI=; b=dSTJ7ZeHKYCZdlMa4V/IwzP4dn
+        X8z76QDKBLta4UmWt5M4OeL+2m+BbHwrKxd21IDIh12TMJGL6jZIzLBDf9Lytt1OhDh5OhxQuNkXF
+        oNRoFmDWs/a/KluV43OxBc5b7bs5kDvYXMKkxDdPzj7VYfw2uTBTJ4TaBmrQBIINP+wPS3+AyGBi7
+        GspQ5jXcIrwaaJWhmKYpuRPb6OL9IEG8VmIxNeevSsJ3yhc5Wh8Njaxm44ACbmNO07BNawIbARkya
+        jOqti4qtagJZUvIj1d1tQ3Rcv9qjfQebc6eeP3Ptblxy8iJOI3kN6qYMqg+dy05jY+EiOCBmdQ1U6
+        k1BmIj0A==;
+Received: from [2001:4bb8:184:af1:3dc3:9c83:fc6c:e0f] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kFf19-0002z9-C5; Tue, 08 Sep 2020 14:54:43 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
+        Michal Simek <michal.simek@xilinx.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Finn Thain <fthain@telegraphics.com.au>,
+        Michael Schmitz <schmitzmic@gmail.com>,
+        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH 14/19] ide-gd: stop using the disk events mechanism
+Date:   Tue,  8 Sep 2020 16:53:42 +0200
+Message-Id: <20200908145347.2992670-15-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200908145347.2992670-1-hch@lst.de>
+References: <20200908145347.2992670-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20200908190009.GA142421@relinquished.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/8/20 1:00 PM, Omar Sandoval wrote:
-> On Mon, Sep 07, 2020 at 10:41:16AM -0600, Jens Axboe wrote:
->> CC Omar
->>
->> On 9/7/20 1:43 AM, Yang Yang wrote:
->>> Kernel crash when requeue flush request.
->>> It can be reproduced as below:
->>>
->>> [    2.517297] Unable to handle kernel paging request at virtual address ffffffd8071c0b00
->>> ...
->>> [    2.517468] pc : clear_bit+0x18/0x2c
->>> [    2.517502] lr : sbitmap_queue_clear+0x40/0x228
->>> [    2.517503] sp : ffffff800832bc60 pstate : 00c00145
->>> ...
->>> [    2.517599] Process ksoftirqd/5 (pid: 51, stack limit = 0xffffff8008328000)
->>> [    2.517602] Call trace:
->>> [    2.517606]  clear_bit+0x18/0x2c
->>> [    2.517619]  kyber_finish_request+0x74/0x80
->>> [    2.517627]  blk_mq_requeue_request+0x3c/0xc0
->>> [    2.517637]  __scsi_queue_insert+0x11c/0x148
->>> [    2.517640]  scsi_softirq_done+0x114/0x130
->>> [    2.517643]  blk_done_softirq+0x7c/0xb0
->>> [    2.517651]  __do_softirq+0x208/0x3bc
->>> [    2.517657]  run_ksoftirqd+0x34/0x60
->>> [    2.517663]  smpboot_thread_fn+0x1c4/0x2c0
->>> [    2.517667]  kthread+0x110/0x120
->>> [    2.517669]  ret_from_fork+0x10/0x18
->>>
->>> Signed-off-by: Yang Yang <yang.yang@vivo.com>
->>> ---
->>>  block/kyber-iosched.c | 3 +++
->>>  1 file changed, 3 insertions(+)
->>>
->>> diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
->>> index a38c5ab103d1..af73afe7a05c 100644
->>> --- a/block/kyber-iosched.c
->>> +++ b/block/kyber-iosched.c
->>> @@ -611,6 +611,9 @@ static void kyber_finish_request(struct request *rq)
->>>  {
->>>  	struct kyber_queue_data *kqd = rq->q->elevator->elevator_data;
->>>  
->>> +	if (unlikely(!(rq->rq_flags & RQF_ELVPRIV)))
->>> +		return;
->>> +
->>>  	rq_clear_domain_token(kqd, rq);
->>>  }
->>>  
->>>
-> 
-> It looks like BFQ also has this check. Wouldn't it make more sense to
-> check it in blk-mq, like we do for .finish_request() in
-> blk_mq_free_request()? Something along these lines:
+ide-gd is only using the disk events mechanism to be able to force an
+invalidation and partition scan on opening removable media.  Just open
+code the logic without invoving the block layer.
 
-Yeah I think so, that's much better than working around it in the
-consumer of it.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/ide/ide-disk.c   |  5 +----
+ drivers/ide/ide-floppy.c |  2 --
+ drivers/ide/ide-gd.c     | 48 +++++-----------------------------------
+ include/linux/ide.h      |  2 --
+ 4 files changed, 7 insertions(+), 50 deletions(-)
 
+diff --git a/drivers/ide/ide-disk.c b/drivers/ide/ide-disk.c
+index 1d3407d7e095fa..34b9441084f84f 100644
+--- a/drivers/ide/ide-disk.c
++++ b/drivers/ide/ide-disk.c
+@@ -739,12 +739,9 @@ static void ide_disk_setup(ide_drive_t *drive)
+ 	set_wcache(drive, 1);
+ 
+ 	if ((drive->dev_flags & IDE_DFLAG_LBA) == 0 &&
+-	    (drive->head == 0 || drive->head > 16)) {
++	    (drive->head == 0 || drive->head > 16))
+ 		printk(KERN_ERR "%s: invalid geometry: %d physical heads?\n",
+ 			drive->name, drive->head);
+-		drive->dev_flags &= ~IDE_DFLAG_ATTACH;
+-	} else
+-		drive->dev_flags |= IDE_DFLAG_ATTACH;
+ }
+ 
+ static void ide_disk_flush(ide_drive_t *drive)
+diff --git a/drivers/ide/ide-floppy.c b/drivers/ide/ide-floppy.c
+index af7503b47dbe32..f5a2870aaf54bb 100644
+--- a/drivers/ide/ide-floppy.c
++++ b/drivers/ide/ide-floppy.c
+@@ -516,8 +516,6 @@ static void ide_floppy_setup(ide_drive_t *drive)
+ 	(void) ide_floppy_get_capacity(drive);
+ 
+ 	ide_proc_register_driver(drive, floppy->driver);
+-
+-	drive->dev_flags |= IDE_DFLAG_ATTACH;
+ }
+ 
+ static void ide_floppy_flush(ide_drive_t *drive)
+diff --git a/drivers/ide/ide-gd.c b/drivers/ide/ide-gd.c
+index 05c26986637ba3..661e2aa9c96784 100644
+--- a/drivers/ide/ide-gd.c
++++ b/drivers/ide/ide-gd.c
+@@ -225,8 +225,12 @@ static int ide_gd_open(struct block_device *bdev, fmode_t mode)
+ 		 * and the door_lock is irrelevant at this point.
+ 		 */
+ 		drive->disk_ops->set_doorlock(drive, disk, 1);
+-		drive->dev_flags |= IDE_DFLAG_MEDIA_CHANGED;
+-		check_disk_change(bdev);
++		if (__invalidate_device(bdev, true))
++			pr_warn("VFS: busy inodes on changed media %s\n",
++				bdev->bd_disk->disk_name);
++		drive->disk_ops->get_capacity(drive);
++		set_capacity(disk, ide_gd_capacity(drive));
++		set_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
+ 	} else if (drive->dev_flags & IDE_DFLAG_FORMAT_IN_PROGRESS) {
+ 		ret = -EBUSY;
+ 		goto out_put_idkp;
+@@ -284,32 +288,6 @@ static int ide_gd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
+ 	return 0;
+ }
+ 
+-static unsigned int ide_gd_check_events(struct gendisk *disk,
+-					unsigned int clearing)
+-{
+-	struct ide_disk_obj *idkp = ide_drv_g(disk, ide_disk_obj);
+-	ide_drive_t *drive = idkp->drive;
+-	bool ret;
+-
+-	/* do not scan partitions twice if this is a removable device */
+-	if (drive->dev_flags & IDE_DFLAG_ATTACH) {
+-		drive->dev_flags &= ~IDE_DFLAG_ATTACH;
+-		return 0;
+-	}
+-
+-	/*
+-	 * The following is used to force revalidation on the first open on
+-	 * removeable devices, and never gets reported to userland as
+-	 * DISK_EVENT_FLAG_UEVENT isn't set in genhd->event_flags.
+-	 * This is intended as removable ide disk can't really detect
+-	 * MEDIA_CHANGE events.
+-	 */
+-	ret = drive->dev_flags & IDE_DFLAG_MEDIA_CHANGED;
+-	drive->dev_flags &= ~IDE_DFLAG_MEDIA_CHANGED;
+-
+-	return ret ? DISK_EVENT_MEDIA_CHANGE : 0;
+-}
+-
+ static void ide_gd_unlock_native_capacity(struct gendisk *disk)
+ {
+ 	struct ide_disk_obj *idkp = ide_drv_g(disk, ide_disk_obj);
+@@ -320,18 +298,6 @@ static void ide_gd_unlock_native_capacity(struct gendisk *disk)
+ 		disk_ops->unlock_native_capacity(drive);
+ }
+ 
+-static int ide_gd_revalidate_disk(struct gendisk *disk)
+-{
+-	struct ide_disk_obj *idkp = ide_drv_g(disk, ide_disk_obj);
+-	ide_drive_t *drive = idkp->drive;
+-
+-	if (ide_gd_check_events(disk, 0))
+-		drive->disk_ops->get_capacity(drive);
+-
+-	set_capacity(disk, ide_gd_capacity(drive));
+-	return 0;
+-}
+-
+ static int ide_gd_ioctl(struct block_device *bdev, fmode_t mode,
+ 			     unsigned int cmd, unsigned long arg)
+ {
+@@ -364,9 +330,7 @@ static const struct block_device_operations ide_gd_ops = {
+ 	.compat_ioctl		= ide_gd_compat_ioctl,
+ #endif
+ 	.getgeo			= ide_gd_getgeo,
+-	.check_events		= ide_gd_check_events,
+ 	.unlock_native_capacity	= ide_gd_unlock_native_capacity,
+-	.revalidate_disk	= ide_gd_revalidate_disk
+ };
+ 
+ static int ide_gd_probe(ide_drive_t *drive)
+diff --git a/include/linux/ide.h b/include/linux/ide.h
+index a254841bd3156d..62653769509f89 100644
+--- a/include/linux/ide.h
++++ b/include/linux/ide.h
+@@ -490,8 +490,6 @@ enum {
+ 	IDE_DFLAG_NOPROBE		= BIT(9),
+ 	/* need to do check_media_change() */
+ 	IDE_DFLAG_REMOVABLE		= BIT(10),
+-	/* needed for removable devices */
+-	IDE_DFLAG_ATTACH		= BIT(11),
+ 	IDE_DFLAG_FORCED_GEOM		= BIT(12),
+ 	/* disallow setting unmask bit */
+ 	IDE_DFLAG_NO_UNMASK		= BIT(13),
 -- 
-Jens Axboe
+2.28.0
 
