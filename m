@@ -2,45 +2,107 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847EEC2BC11
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 20:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B566C2D0A7
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 20:05:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 553302137B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 20:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A50921919
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 20:05:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Jo4ghawc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732590AbgIHUBY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 16:01:24 -0400
-Received: from verein.lst.de ([213.95.11.211]:53135 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729114AbgIHPfM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Sep 2020 11:35:12 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 43E6168C7B; Tue,  8 Sep 2020 16:27:18 +0200 (CEST)
-Date:   Tue, 8 Sep 2020 16:27:18 +0200
+        id S1731350AbgIHUFO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 16:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47738 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730188AbgIHPWE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 11:22:04 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD68DC0A3BF4;
+        Tue,  8 Sep 2020 07:55:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=XebGuej3xK5XjUIiTqbUvyFcyDyWl1r5Hy6xhDXcn70=; b=Jo4ghawcy8JBg+Rvq73LY38/vm
+        H0E/3JTxgUCzhUOeO6oPYKDq7jMdH0z8pdJiLjtntbizJIeFY7HTlaT+xFliSk4fvXVQUDomQKfPA
+        xJbsw3eb0QZfnCk+QgyEv3caVYnmiw7OGLSn+hJs0xwGElk8VP+tw0kxmVPowxAtzAU1Bgy1JQHmc
+        Hd8BwUSmYB9t/lgMcdPlNhwsynwcum09GA/F41DqA2uku86jqdlDH5sIRTro5NJnEBpBaTJwjbm4R
+        508Zzt5cVLp/Xz02AavSx98OqojF975Rx0eHcnral1/R//khH3OwdlGiu2pymRQTNhe3RCXnbpUVZ
+        IvG6zcGg==;
+Received: from [2001:4bb8:184:af1:3dc3:9c83:fc6c:e0f] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kFf1C-0002zh-Fx; Tue, 08 Sep 2020 14:54:46 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: improve the block queue sysfs helper macros
-Message-ID: <20200908142718.GA7775@lst.de>
-References: <20200903060701.229481-1-hch@lst.de>
+Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
+        Michal Simek <michal.simek@xilinx.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Finn Thain <fthain@telegraphics.com.au>,
+        Michael Schmitz <schmitzmic@gmail.com>,
+        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 16/19] sd: use bdev_check_media_change
+Date:   Tue,  8 Sep 2020 16:53:44 +0200
+Message-Id: <20200908145347.2992670-17-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200908145347.2992670-1-hch@lst.de>
+References: <20200908145347.2992670-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200903060701.229481-1-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 03, 2020 at 08:06:59AM +0200, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this series improves the macros to generate the queue sysfs boilerplate.
+Switch to use bdev_check_media_change instead of check_disk_change and
+call sd_revalidate_disk manually.  As sd also calls sd_revalidate_disk
+manually during probe and open, , the extra call into ->revalidate_disk
+from bdev_disk_changed is not required either, so stop wiring up the
+method.
 
-can you take a look at this series?  I have another pile sitting on top
-of it waiting..
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ drivers/scsi/sd.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 2bec8cd526164d..d020639c28c6ca 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -1381,8 +1381,10 @@ static int sd_open(struct block_device *bdev, fmode_t mode)
+ 	if (!scsi_block_when_processing_errors(sdev))
+ 		goto error_out;
+ 
+-	if (sdev->removable || sdkp->write_prot)
+-		check_disk_change(bdev);
++	if (sdev->removable || sdkp->write_prot) {
++		if (bdev_check_media_change(bdev))
++			sd_revalidate_disk(bdev->bd_disk);
++	}
+ 
+ 	/*
+ 	 * If the drive is empty, just let the open fail.
+@@ -1843,7 +1845,6 @@ static const struct block_device_operations sd_fops = {
+ 	.compat_ioctl		= sd_compat_ioctl,
+ #endif
+ 	.check_events		= sd_check_events,
+-	.revalidate_disk	= sd_revalidate_disk,
+ 	.unlock_native_capacity	= sd_unlock_native_capacity,
+ 	.report_zones		= sd_zbc_report_zones,
+ 	.pr_ops			= &sd_pr_ops,
+-- 
+2.28.0
+
