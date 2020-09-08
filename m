@@ -2,101 +2,97 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1FDC433E2
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1270DC43461
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 18:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C095207DE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A37F8207DE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 18:03:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599588195;
+	bh=2jua/a8ieqTCv1Y0jPNStCYO5RkDB//YzS9CiJgoiuU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=j1WOi73XUrXr9zfb6N5N+Z/M0gUSfwMHu0/PLkf6/GYGcklY0cHoG+2LaZzpLk+6W
+	 9p3hSQSTthBFSTTa35afxmpXoDbr4G0a9nJWbem68Xq7Zohb8c4GZExkJrnBv74A7B
+	 oDErSZVFkDHAyvdMU4fsK6VDVLJjVeBxJ2Z2iJGA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728442AbgIHR4m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 13:56:42 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37441 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731657AbgIHR4Y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 13:56:24 -0400
-Received: by mail-pf1-f194.google.com with SMTP id w7so11609884pfi.4;
-        Tue, 08 Sep 2020 10:56:23 -0700 (PDT)
+        id S1727882AbgIHSDJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 14:03:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45720 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731548AbgIHSDH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 14:03:07 -0400
+Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA05C061573;
+        Tue,  8 Sep 2020 11:03:06 -0700 (PDT)
+Received: by mail-qt1-x843.google.com with SMTP id r8so3388485qtp.13;
+        Tue, 08 Sep 2020 11:03:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=9mmDYx8WrU8rvHetKafuDvQNZNEWur0WVQdCgfEZspw=;
+        b=SPoVuP8Q6WzCw4D9NfkuXnNEptqRql+J4fajBqQc2kYsIhfgOYk0tEnacAbvowX1iH
+         2HgdyOoKtpvck6By0pNhFJcCOunkqWjl1JRzB0GS2+WGlkYvhTBUzobypXqZwLPOYibT
+         xt8Zl3up/YriK4ErSIiCCMeyzZTRfS3d4j3xIaFGJZbVBrYfKR4wOZkZXYMQ1AYpuiU7
+         8b6dAZPZMG5ggCV7UZI9MBPStx8lOwxR0DxqFyfvocgsBQy18+BFgkiSxtRpL4KUFzOM
+         UnZoy5BRkMnhnH5ejxOYYoUIK1COU05dLo0PqODWfSyByRIY7crPD5mm0SSR7OTFb536
+         Vzjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=gOMveLN5kBZQwgZihKiozgHiSqkU32Nr37Ef5vnEGOk=;
-        b=nQxWg5SJcJOScSPUhzRX76KEhfL4sWEcG3pR49XK9gJLz24m6YyI6fwn3BPmHMxjrR
-         lwBNmCiDY61dahG+BFXolH0SiT0Y/6SesG+JsKPlMBN4gnVbpurR6R65EYd/Fyppak3x
-         qNPFmSvXuk7/N2g4yQTeayVap+YJM0DtwH4PqRyEUU1gl/S3own2GJxwP6nwgjPe91sQ
-         km9RgpDbH9fjCmNtyngYdKqt8F19b9Ovc54Y7gG+M515nSY21vPcWvGWVwgMcA6WEh9B
-         /ljoHp8QtTGye9lkuoXlAWOWS9uwOF5462bwHZH6jqzooHBrNoarOc3K4gfOuLZewzKg
-         6jtg==
-X-Gm-Message-State: AOAM533KQmr5O5nVCmD/Oq81D/IWz8KGm/h1f++fg8h9dpcqlvvJDbzJ
-        ysUqDViqPm/lyenlbo7VSj+gvPGMkMo=
-X-Google-Smtp-Source: ABdhPJy/aF6YE7urCDjOKNmzg89DjNVDoGD6VdvuIbjSABrCTTI0dsRRODq+hwOUMukQ9qPXEYOlLA==
-X-Received: by 2002:aa7:80d3:: with SMTP id a19mr25957573pfn.102.1599587783555;
-        Tue, 08 Sep 2020 10:56:23 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:fb09:e536:da63:a7cd? ([2601:647:4000:d7:fb09:e536:da63:a7cd])
-        by smtp.gmail.com with ESMTPSA id m188sm90193pfd.56.2020.09.08.10.56.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Sep 2020 10:56:22 -0700 (PDT)
-Subject: Re: [PATCH] Revert "block: revert back to synchronous request_queue
- removal"
-To:     Ethan Zhao <haifeng.zhao@intel.com>, axboe@kernel.dk,
-        bhelgaas@google.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, mcgrof@kernel.org,
-        ShanshanX.Zhang@intel.com, pei.p.jia@intel.com
-References: <20200908075047.5140-1-haifeng.zhao@intel.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <be547312-c89d-57bf-edec-1e67d3604665@acm.org>
-Date:   Tue, 8 Sep 2020 10:56:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=9mmDYx8WrU8rvHetKafuDvQNZNEWur0WVQdCgfEZspw=;
+        b=YAwCdU41qNSS14LxDKYhMp9OHdRjbLjz+iEOmuQYWmyNkgI0c0BqVLxslf0CLhluTM
+         FuVHV0LOpGgRUmnGMa+5xPRiSAtdepkIHfngGM8R0hKvskjb9TEhtkcVPy7JmRIySx5r
+         Fqz1Wq/BuRtrjeBesIQHBMoaS6XrRKni829dhGlBOwZxi4I6nlaMy2He3+ljHnEWdnAr
+         9FOirRGl2ZsfVOOx5fIy9XfNs4mm/03GQA60fgwvldFMclNBsxARTmpqCBJF/Sz8T5gM
+         tDq8j3ps9la1LX6amJSBn1x9fLQm6keuNZkXuk3anqa1Oaq55Cy0Si3jYl5hjd2D4hwo
+         1WVA==
+X-Gm-Message-State: AOAM532bHMib3VUDjpadu/QHG/oUrqLtOTQlla77LOXzi4nsHxQa5Qmx
+        78az5ZQ//Qv0DmLk8FbSrZY=
+X-Google-Smtp-Source: ABdhPJxZp/BKi4pCSubL4sPpiZCHt5AmUer/L4tlgYku0XHZVMEBaXZZz/rd/r7R8Ru4Z+PNDK1nug==
+X-Received: by 2002:ac8:7388:: with SMTP id t8mr1294476qtp.187.1599588185280;
+        Tue, 08 Sep 2020 11:03:05 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:87d8])
+        by smtp.gmail.com with ESMTPSA id v16sm7627009qkg.37.2020.09.08.11.03.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Sep 2020 11:03:04 -0700 (PDT)
+Date:   Tue, 8 Sep 2020 14:03:02 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Tianxianting <tian.xianting@h3c.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] blkcg: add plugging support for punt bio
+Message-ID: <20200908180302.GE4295@mtj.thefacebook.com>
+References: <1596722082-31817-1-git-send-email-xianting_tian@126.com>
+ <8f84e1fe-9fa5-b7e7-1f2f-b0c4a40614e2@kernel.dk>
+ <42b939c2.e08.173c6f79af9.Coremail.xianting_tian@126.com>
+ <1ded6246.2c67.17458ce4300.Coremail.xianting_tian@126.com>
+ <65e1e040da644ed9a05edd166d06b5e3@h3c.com>
 MIME-Version: 1.0
-In-Reply-To: <20200908075047.5140-1-haifeng.zhao@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65e1e040da644ed9a05edd166d06b5e3@h3c.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-09-08 00:50, Ethan Zhao wrote:
-> From: Ethan Zhao <Haifeng.Zhao@intel.com>
-> 
-> 'commit e8c7d14ac6c3 ("block: revert back to synchronous request_queue
-> removal")' introduced panic issue to NVMe hotplug as following(hit
-> after just 2 times NVMe SSD hotplug under stable 5.9-RC2):
+On Sat, Sep 05, 2020 at 11:25:03AM +0000, Tianxianting wrote:
+> Hi jens,tj
+> Could you share a couple of  minutes to comment it?
+> I really appreciate it
 
-Please fix this in the NVMe driver instead of reverting commit e8c7d14ac6c3.
+The result looks fine to me but can you please summarize that in the commit
+message of the patch?
 
-Thanks,
+Thanks.
 
-Bart.
+-- 
+tejun
