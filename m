@@ -7,194 +7,120 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EFF5C2BBD0
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1E0C43461
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43EBC21D7A
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24B0921D81
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAkda7HQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eBGbRq6I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729709AbgIHIQX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 04:16:23 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36302 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729257AbgIHIQW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Sep 2020 04:16:22 -0400
+        id S1729724AbgIHIQb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 04:16:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35415 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729257AbgIHIQ2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 04:16:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599552980;
+        s=mimecast20190719; t=1599552987;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5CiY4me6KcqTauM52mAmONnBxxbOnACd/4JWb/pzELQ=;
-        b=KAkda7HQly4qbRK67k/o0yV7HOU0l/yemdMYV3LrfISryv6NUHnH/zQw57rA6vN/yp2+yT
-        9Uwm8wxxLxeffmPiEjFPqj2QBCJcNUA64bQ9/KOmr5QVK9Oo3IzQ0qa253NOuOedU3Bt4F
-        mVVMS0+KLrvpuBMd4HYR3q/JMWbJDyQ=
+        bh=e007vtPBUFAe9F4MK9+e2ynjymmngZClUgdLXmqpOAk=;
+        b=eBGbRq6IVQqnKLK8vJ2S7EYwmDq3YxDCnEBpJxYy/S78xW9EZSytuQfhePTA8FMbeHS+YF
+        MKvEnu5p41/IkmVDXOcsj64BfoL8knsDehlDv12cAChEkurrDrdStOxaHroU+4Dyfblh7C
+        lTKT3vyEj+Ld8W2Nv7Pt2bPAPri4xXc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-QJGLgv0uOqe4B7LjcZZ-0Q-1; Tue, 08 Sep 2020 04:16:18 -0400
-X-MC-Unique: QJGLgv0uOqe4B7LjcZZ-0Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-503-2xHk3YeZMhyIJI3VFcUUOA-1; Tue, 08 Sep 2020 04:16:24 -0400
+X-MC-Unique: 2xHk3YeZMhyIJI3VFcUUOA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2817C8018AB;
-        Tue,  8 Sep 2020 08:16:17 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19288801AE5;
+        Tue,  8 Sep 2020 08:16:23 +0000 (UTC)
 Received: from localhost (ovpn-12-217.pek2.redhat.com [10.72.12.217])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8889F702E7;
-        Tue,  8 Sep 2020 08:16:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AB5855D9D3;
+        Tue,  8 Sep 2020 08:16:19 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
         Keith Busch <kbusch@kernel.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
         Bart Van Assche <bvanassche@acm.org>,
         Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chao Leng <lengchao@huawei.com>
-Subject: [PATCH V3 3/4] blk-mq: add tagset quiesce interface
-Date:   Tue,  8 Sep 2020 16:15:37 +0800
-Message-Id: <20200908081538.1434936-4-ming.lei@redhat.com>
+        Chao Leng <lengchao@huawei.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 4/4] nvme: use blk_mq_[un]quiesce_tagset
+Date:   Tue,  8 Sep 2020 16:15:38 +0800
+Message-Id: <20200908081538.1434936-5-ming.lei@redhat.com>
 In-Reply-To: <20200908081538.1434936-1-ming.lei@redhat.com>
 References: <20200908081538.1434936-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-drivers that have shared tagsets may need to quiesce potentially a lot
-of request queues that all share a single tagset (e.g. nvme). Add an interface
-to quiesce all the queues on a given tagset. This interface is useful because
-it can speedup the quiesce by doing it in parallel.
+From: Sagi Grimberg <sagi@grimberg.me>
 
-For tagsets that have BLK_MQ_F_BLOCKING set, we kill request queue's dispatch
-percpu-refcount such that all of them wait for the counter becoming zero. For
-tagsets that don't have BLK_MQ_F_BLOCKING set, we simply call a single
-synchronize_rcu as this is sufficient.
+All controller namespaces share the same tagset, so we
+can use this interface which does the optimal operation
+for parallel quiesce based on the tagset type (e.g.
+blocking tagsets and non-blocking tagsets).
 
-This patch is against Sagi's original post.
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Sagi <ming.lei@redhat.com>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
 Cc: Chao Leng <lengchao@huawei.com>
----
- block/blk-mq.c         | 68 ++++++++++++++++++++++++++++++++----------
- include/linux/blk-mq.h |  2 ++
- 2 files changed, 55 insertions(+), 15 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 60630a720449..49933d7dceba 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -209,16 +209,7 @@ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+Add code to unquiesce ctrl->connect_q in nvme_stop_queues(), meantime
+avoid to call blk_mq_quiesce_tagset()/blk_mq_unquiesce_tagset() if
+this tagset isn't initialized.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/host/core.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index ea1fa41fbba8..a6af8978a3ba 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -4623,23 +4623,22 @@ EXPORT_SYMBOL_GPL(nvme_start_freeze);
  
--/**
-- * blk_mq_quiesce_queue() - wait until all ongoing dispatches have finished
-- * @q: request queue.
-- *
-- * Note: this function does not prevent that the struct request end_io()
-- * callback function is invoked. Once this function is returned, we make
-- * sure no dispatch can happen until the queue is unquiesced via
-- * blk_mq_unquiesce_queue().
-- */
--void blk_mq_quiesce_queue(struct request_queue *q)
-+static void __blk_mq_quiesce_queue(struct request_queue *q, bool wait)
+ void nvme_stop_queues(struct nvme_ctrl *ctrl)
  {
- 	bool blocking = !!(q->tag_set->flags & BLK_MQ_F_BLOCKING);
+-	struct nvme_ns *ns;
++	if (list_empty_careful(&ctrl->namespaces))
++		return;
  
-@@ -230,14 +221,30 @@ void blk_mq_quiesce_queue(struct request_queue *q)
- 			percpu_ref_kill(&q->dispatch_counter);
- 	}
- 
--	if (blocking)
--		wait_event(q->mq_quiesce_wq,
--			   percpu_ref_is_zero(&q->dispatch_counter));
--	else
--		synchronize_rcu();
-+	if (wait) {
-+		if (blocking)
-+			wait_event(q->mq_quiesce_wq,
-+				   percpu_ref_is_zero(&q->dispatch_counter));
-+		else
-+			synchronize_rcu();
-+	}
- 
- 	mutex_unlock(&q->mq_quiesce_lock);
+-	down_read(&ctrl->namespaces_rwsem);
+-	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		blk_mq_quiesce_queue(ns->queue);
+-	up_read(&ctrl->namespaces_rwsem);
++	blk_mq_quiesce_tagset(ctrl->tagset);
++
++	if (ctrl->connect_q)
++		blk_mq_unquiesce_queue(ctrl->connect_q);
  }
-+
-+/**
-+ * blk_mq_quiesce_queue() - wait until all ongoing dispatches have finished
-+ * @q: request queue.
-+ *
-+ * Note: this function does not prevent that the struct request end_io()
-+ * callback function is invoked. Once this function is returned, we make
-+ * sure no dispatch can happen until the queue is unquiesced via
-+ * blk_mq_unquiesce_queue().
-+ */
-+void blk_mq_quiesce_queue(struct request_queue *q)
-+{
-+	__blk_mq_quiesce_queue(q, true);
-+}
- EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+ EXPORT_SYMBOL_GPL(nvme_stop_queues);
  
- /*
-@@ -265,6 +272,37 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
- 
-+void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set)
-+{
-+	struct request_queue *q;
-+
-+	mutex_lock(&set->tag_list_lock);
-+	list_for_each_entry(q, &set->tag_list, tag_set_list)
-+		__blk_mq_quiesce_queue(q, false);
-+
-+	/* wait until all queues' quiesce is done */
-+	if (set->flags & BLK_MQ_F_BLOCKING) {
-+		list_for_each_entry(q, &set->tag_list, tag_set_list)
-+			wait_event(q->mq_quiesce_wq,
-+				   percpu_ref_is_zero(&q->dispatch_counter));
-+	} else {
-+		synchronize_rcu();
-+	}
-+	mutex_unlock(&set->tag_list_lock);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_quiesce_tagset);
-+
-+void blk_mq_unquiesce_tagset(struct blk_mq_tag_set *set)
-+{
-+	struct request_queue *q;
-+
-+	mutex_lock(&set->tag_list_lock);
-+	list_for_each_entry(q, &set->tag_list, tag_set_list)
-+		blk_mq_unquiesce_queue(q);
-+	mutex_unlock(&set->tag_list_lock);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_unquiesce_tagset);
-+
- void blk_mq_wake_waiters(struct request_queue *q)
+ void nvme_start_queues(struct nvme_ctrl *ctrl)
  {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index df642055f02c..90da3582b91d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -519,6 +519,8 @@ int blk_mq_map_queues(struct blk_mq_queue_map *qmap);
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
+-	struct nvme_ns *ns;
++	if (list_empty_careful(&ctrl->namespaces))
++		return;
  
- void blk_mq_quiesce_queue_nowait(struct request_queue *q);
-+void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set);
-+void blk_mq_unquiesce_tagset(struct blk_mq_tag_set *set);
- 
- unsigned int blk_mq_rq_cpu(struct request *rq);
+-	down_read(&ctrl->namespaces_rwsem);
+-	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		blk_mq_unquiesce_queue(ns->queue);
+-	up_read(&ctrl->namespaces_rwsem);
++	blk_mq_unquiesce_tagset(ctrl->tagset);
+ }
+ EXPORT_SYMBOL_GPL(nvme_start_queues);
  
 -- 
 2.25.2
