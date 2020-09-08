@@ -4,53 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B839CC433E2
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:55:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1FDC433E2
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:56:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7DF8D2074B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:55:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C095207DE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:56:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732154AbgIHRyY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 13:54:24 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37120 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731590AbgIHRyR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 13:54:17 -0400
-Received: by mail-pg1-f193.google.com with SMTP id 5so93265pgl.4
-        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2020 10:54:17 -0700 (PDT)
+        id S1728442AbgIHR4m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 13:56:42 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:37441 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731657AbgIHR4Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 13:56:24 -0400
+Received: by mail-pf1-f194.google.com with SMTP id w7so11609884pfi.4;
+        Tue, 08 Sep 2020 10:56:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=cBTvIhJcHXVYn/Psbin1MuPoVps99Y51xyc6PCUNeBs=;
-        b=Wk0VJrwN9btLHwzrt4P2ca84Q04k0WsDvmrNDvBFYBd8ycfBVQ67wN8pL0Aj7sy/i8
-         STTLrlmKQjpJW/jCudTDSZKvt1EYOMDNoGXgfRncXsSB+pzEIOAwVHKDpmfL/753GWuU
-         yVad0cs+SpivDYWAbNC3mkD4EIfEtCObieZKH5oxHl6or/doHTA2X2f/KNmqW0Oxmbci
-         4HdQHCXbHObGKCE+lilCvOcG2A1RZmacphYvWEUaUDH0zC+JuvOTA0YZVXdTrTuOo3f7
-         MMH8ZoiF+dwlKn8uklvoAFI1Cqw3cz0K//MTwvst/y62Hoz26n0bWLAX8ucEl+zH6ayy
-         anLg==
-X-Gm-Message-State: AOAM533akq65jkNoFveYDFfW7uqT/NP8Y8YDVlkpXShlXo6VTkxQIpyA
-        MlJ9ClWnob1hzZwv19LqxZE=
-X-Google-Smtp-Source: ABdhPJzQ5uDDhvKRVEsDZ0KdoJBATv/6i6yPhqxvJhpfUJDybvOcwxCT8S6xUIxR+zI+43JOJhT+NA==
-X-Received: by 2002:a63:a54a:: with SMTP id r10mr21415495pgu.5.1599587656769;
-        Tue, 08 Sep 2020 10:54:16 -0700 (PDT)
+        bh=gOMveLN5kBZQwgZihKiozgHiSqkU32Nr37Ef5vnEGOk=;
+        b=nQxWg5SJcJOScSPUhzRX76KEhfL4sWEcG3pR49XK9gJLz24m6YyI6fwn3BPmHMxjrR
+         lwBNmCiDY61dahG+BFXolH0SiT0Y/6SesG+JsKPlMBN4gnVbpurR6R65EYd/Fyppak3x
+         qNPFmSvXuk7/N2g4yQTeayVap+YJM0DtwH4PqRyEUU1gl/S3own2GJxwP6nwgjPe91sQ
+         km9RgpDbH9fjCmNtyngYdKqt8F19b9Ovc54Y7gG+M515nSY21vPcWvGWVwgMcA6WEh9B
+         /ljoHp8QtTGye9lkuoXlAWOWS9uwOF5462bwHZH6jqzooHBrNoarOc3K4gfOuLZewzKg
+         6jtg==
+X-Gm-Message-State: AOAM533KQmr5O5nVCmD/Oq81D/IWz8KGm/h1f++fg8h9dpcqlvvJDbzJ
+        ysUqDViqPm/lyenlbo7VSj+gvPGMkMo=
+X-Google-Smtp-Source: ABdhPJy/aF6YE7urCDjOKNmzg89DjNVDoGD6VdvuIbjSABrCTTI0dsRRODq+hwOUMukQ9qPXEYOlLA==
+X-Received: by 2002:aa7:80d3:: with SMTP id a19mr25957573pfn.102.1599587783555;
+        Tue, 08 Sep 2020 10:56:23 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:fb09:e536:da63:a7cd? ([2601:647:4000:d7:fb09:e536:da63:a7cd])
-        by smtp.gmail.com with ESMTPSA id j19sm88376pfi.51.2020.09.08.10.54.15
+        by smtp.gmail.com with ESMTPSA id m188sm90193pfd.56.2020.09.08.10.56.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Sep 2020 10:54:16 -0700 (PDT)
-Subject: Re: [PATCH V3 1/4] blk-mq: serialize queue quiesce and unquiesce by
- mutex
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chao Leng <lengchao@huawei.com>
-References: <20200908081538.1434936-1-ming.lei@redhat.com>
- <20200908081538.1434936-2-ming.lei@redhat.com>
+        Tue, 08 Sep 2020 10:56:22 -0700 (PDT)
+Subject: Re: [PATCH] Revert "block: revert back to synchronous request_queue
+ removal"
+To:     Ethan Zhao <haifeng.zhao@intel.com>, axboe@kernel.dk,
+        bhelgaas@google.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, mcgrof@kernel.org,
+        ShanshanX.Zhang@intel.com, pei.p.jia@intel.com
+References: <20200908075047.5140-1-haifeng.zhao@intel.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -75,12 +74,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <8e040e37-d1df-ea5f-8a63-f4067d092b72@acm.org>
-Date:   Tue, 8 Sep 2020 10:54:14 -0700
+Message-ID: <be547312-c89d-57bf-edec-1e67d3604665@acm.org>
+Date:   Tue, 8 Sep 2020 10:56:21 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200908081538.1434936-2-ming.lei@redhat.com>
+In-Reply-To: <20200908075047.5140-1-haifeng.zhao@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -89,23 +88,14 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-09-08 01:15, Ming Lei wrote:
->  void blk_mq_unquiesce_queue(struct request_queue *q)
->  {
-> +	mutex_lock(&q->mq_quiesce_lock);
-> +
->  	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
->  
->  	/* dispatch requests which are inserted during quiescing */
->  	blk_mq_run_hw_queues(q, true);
-> +
-> +	mutex_unlock(&q->mq_quiesce_lock);
->  }
-Has the sunvdc driver been retested? It calls blk_mq_unquiesce_queue()
-with a spinlock held. As you know calling mutex_lock() while holding a
-spinlock is not allowed.
+On 2020-09-08 00:50, Ethan Zhao wrote:
+> From: Ethan Zhao <Haifeng.Zhao@intel.com>
+> 
+> 'commit e8c7d14ac6c3 ("block: revert back to synchronous request_queue
+> removal")' introduced panic issue to NVMe hotplug as following(hit
+> after just 2 times NVMe SSD hotplug under stable 5.9-RC2):
 
-There may be other drivers than the sunvdc driver that do this.
+Please fix this in the NVMe driver instead of reverting commit e8c7d14ac6c3.
 
 Thanks,
 
