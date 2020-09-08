@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC3CC433E2
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D1CC43461
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:46:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7DAFC215A4
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:46:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB48D2166E
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730108AbgIHIqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 04:46:03 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33602 "EHLO mx2.suse.de"
+        id S1730125AbgIHIq2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 04:46:28 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33834 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729993AbgIHIqA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Sep 2020 04:46:00 -0400
+        id S1730020AbgIHIqZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Sep 2020 04:46:25 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id E31ACACA3;
-        Tue,  8 Sep 2020 08:45:59 +0000 (UTC)
-Subject: Re: [PATCH V3 3/4] blk-mq: add tagset quiesce interface
+        by mx2.suse.de (Postfix) with ESMTP id 571B1ACA3;
+        Tue,  8 Sep 2020 08:46:24 +0000 (UTC)
+Subject: Re: [PATCH V3 4/4] nvme: use blk_mq_[un]quiesce_tagset
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
@@ -32,7 +32,7 @@ Cc:     Sagi Grimberg <sagi@grimberg.me>,
         Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
         Chao Leng <lengchao@huawei.com>
 References: <20200908081538.1434936-1-ming.lei@redhat.com>
- <20200908081538.1434936-4-ming.lei@redhat.com>
+ <20200908081538.1434936-5-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -78,12 +78,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <0df7da22-b822-8a70-406d-677ecd95f5d3@suse.de>
-Date:   Tue, 8 Sep 2020 10:45:58 +0200
+Message-ID: <785e8bc6-99c7-b65b-df89-a41057a11241@suse.de>
+Date:   Tue, 8 Sep 2020 10:46:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20200908081538.1434936-4-ming.lei@redhat.com>
+In-Reply-To: <20200908081538.1434936-5-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -93,30 +93,27 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 9/8/20 10:15 AM, Ming Lei wrote:
-> drivers that have shared tagsets may need to quiesce potentially a lot
-> of request queues that all share a single tagset (e.g. nvme). Add an interface
-> to quiesce all the queues on a given tagset. This interface is useful because
-> it can speedup the quiesce by doing it in parallel.
+> From: Sagi Grimberg <sagi@grimberg.me>
 > 
-> For tagsets that have BLK_MQ_F_BLOCKING set, we kill request queue's dispatch
-> percpu-refcount such that all of them wait for the counter becoming zero. For
-> tagsets that don't have BLK_MQ_F_BLOCKING set, we simply call a single
-> synchronize_rcu as this is sufficient.
+> All controller namespaces share the same tagset, so we
+> can use this interface which does the optimal operation
+> for parallel quiesce based on the tagset type (e.g.
+> blocking tagsets and non-blocking tagsets).
 > 
-> This patch is against Sagi's original post.
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Sagi <ming.lei@redhat.com>
 > Cc: Sagi Grimberg <sagi@grimberg.me>
 > Cc: Bart Van Assche <bvanassche@acm.org>
 > Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
 > Cc: Chao Leng <lengchao@huawei.com>
-> ---
->  block/blk-mq.c         | 68 ++++++++++++++++++++++++++++++++----------
->  include/linux/blk-mq.h |  2 ++
->  2 files changed, 55 insertions(+), 15 deletions(-)
 > 
-Makes one wonder for which devices we _do not_ have a shared tagset :-)
-
+> Add code to unquiesce ctrl->connect_q in nvme_stop_queues(), meantime
+> avoid to call blk_mq_quiesce_tagset()/blk_mq_unquiesce_tagset() if
+> this tagset isn't initialized.
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>  drivers/nvme/host/core.c | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
+> 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
