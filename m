@@ -7,24 +7,23 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54697C433E2
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC3CC433E2
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:46:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B72C215A4
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:44:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DAFC215A4
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 08:46:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729911AbgIHIoo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 04:44:44 -0400
-Received: from mx2.suse.de ([195.135.220.15]:32868 "EHLO mx2.suse.de"
+        id S1730108AbgIHIqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 04:46:03 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33602 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729390AbgIHIon (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Sep 2020 04:44:43 -0400
+        id S1729993AbgIHIqA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Sep 2020 04:46:00 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 3054BAEE9;
-        Tue,  8 Sep 2020 08:44:42 +0000 (UTC)
-Subject: Re: [PATCH V3 2/4] blk-mq: implement queue quiesce via percpu_ref for
- BLK_MQ_F_BLOCKING
+        by mx2.suse.de (Postfix) with ESMTP id E31ACACA3;
+        Tue,  8 Sep 2020 08:45:59 +0000 (UTC)
+Subject: Re: [PATCH V3 3/4] blk-mq: add tagset quiesce interface
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
@@ -33,7 +32,7 @@ Cc:     Sagi Grimberg <sagi@grimberg.me>,
         Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
         Chao Leng <lengchao@huawei.com>
 References: <20200908081538.1434936-1-ming.lei@redhat.com>
- <20200908081538.1434936-3-ming.lei@redhat.com>
+ <20200908081538.1434936-4-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -79,12 +78,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <54fce956-4e8f-6e4b-0ae1-e0905a06f3e4@suse.de>
-Date:   Tue, 8 Sep 2020 10:44:40 +0200
+Message-ID: <0df7da22-b822-8a70-406d-677ecd95f5d3@suse.de>
+Date:   Tue, 8 Sep 2020 10:45:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20200908081538.1434936-3-ming.lei@redhat.com>
+In-Reply-To: <20200908081538.1434936-4-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -94,68 +93,30 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 9/8/20 10:15 AM, Ming Lei wrote:
-> In case of BLK_MQ_F_BLOCKING, blk-mq uses SRCU to mark read critical
-> section during dispatching request, then request queue quiesce is based on
-> SRCU. What we want to get is low cost added in fast path.
+> drivers that have shared tagsets may need to quiesce potentially a lot
+> of request queues that all share a single tagset (e.g. nvme). Add an interface
+> to quiesce all the queues on a given tagset. This interface is useful because
+> it can speedup the quiesce by doing it in parallel.
 > 
-> With percpu-ref, it is cleaner and simpler & enough for implementing queue
-> quiesce. The main requirement is to make sure all read sections to observe
-> QUEUE_FLAG_QUIESCED once blk_mq_quiesce_queue() returns.
+> For tagsets that have BLK_MQ_F_BLOCKING set, we kill request queue's dispatch
+> percpu-refcount such that all of them wait for the counter becoming zero. For
+> tagsets that don't have BLK_MQ_F_BLOCKING set, we simply call a single
+> synchronize_rcu as this is sufficient.
 > 
-> Also it becomes much easier to add interface of async queue quiesce.
-> 
-> Meantime memory footprint can be reduced with per-request-queue percpu-ref.
-> 
-> From implementation viewpoint, in fast path, not see percpu_ref is
-> slower than SRCU, and srcu tree(default option in most distributions)
-> could be slower since memory barrier is required in both lock & unlock,
-> and rcu_read_lock()/rcu_read_unlock() should be much cheap than
-> smp_mb().
-> 
-> 1) percpu_ref just hold the rcu_read_lock, then run a check &
->    increase/decrease on the percpu variable:
-> 
->    rcu_read_lock()
->    if (__ref_is_percpu(ref, &percpu_count))
-> 	this_cpu_inc(*percpu_count);
->    rcu_read_unlock()
-> 
-> 2) srcu tree:
->         idx = READ_ONCE(ssp->srcu_idx) & 0x1;
->         this_cpu_inc(ssp->sda->srcu_lock_count[idx]);
->         smp_mb(); /* B */  /* Avoid leaking the critical section. */
-> 
-> Also from my test on null_blk(blocking), not observe percpu-ref performs
-> worse than srcu, see the following test:
-> 
-> 1) test steps:
-> 
-> rmmod null_blk > /dev/null 2>&1
-> modprobe null_blk nr_devices=1 submit_queues=1 blocking=1
-> fio --bs=4k --size=512G  --rw=randread --norandommap --direct=1 --ioengine=libaio \
-> 	--iodepth=64 --runtime=60 --group_reporting=1  --name=nullb0 \
-> 	--filename=/dev/nullb0 --numjobs=32
-> 
-> test machine: HP DL380, 16 cpu cores, 2 threads per core, dual
-> sockets/numa, Intel(R) Xeon(R) Silver 4110 CPU @ 2.10GHz
-> 
-> 2) test result:
-> - srcu quiesce: 6063K IOPS
-> - percpu-ref quiesce: 6113K IOPS
-> 
+> This patch is against Sagi's original post.
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Sagi <ming.lei@redhat.com>
 > Cc: Sagi Grimberg <sagi@grimberg.me>
 > Cc: Bart Van Assche <bvanassche@acm.org>
 > Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
 > Cc: Chao Leng <lengchao@huawei.com>
 > ---
->  block/blk-mq-sysfs.c   |   2 -
->  block/blk-mq.c         | 130 +++++++++++++++++++++--------------------
->  block/blk-sysfs.c      |   6 +-
->  include/linux/blk-mq.h |   8 ---
->  include/linux/blkdev.h |   4 ++
->  5 files changed, 77 insertions(+), 73 deletions(-)
+>  block/blk-mq.c         | 68 ++++++++++++++++++++++++++++++++----------
+>  include/linux/blk-mq.h |  2 ++
+>  2 files changed, 55 insertions(+), 15 deletions(-)
 > 
+Makes one wonder for which devices we _do not_ have a shared tagset :-)
+
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
