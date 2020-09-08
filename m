@@ -2,190 +2,271 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFB9C43461
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE6CBC43461
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:37:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A87420C09
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:13:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QR8WQn/L"
+	by mail.kernel.org (Postfix) with ESMTP id 9097D2137B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:37:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731580AbgIHTNS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 15:13:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30197 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731556AbgIHTNI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Sep 2020 15:13:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599592387;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bcfVJwdzfFexrOio9oZWYIWlgfNjTYXVJ1Kpad3V6TU=;
-        b=QR8WQn/LMH01bzwJehakkMmmovhbWdrQT69APr6kuTfYi6eEKn6TPw8pScdHIIgYbLx/6f
-        3HWRGowuutFZbdaY/RAKimSVMdE3c1k9Bl8FRUlh0+nIyWGBOYBHK4Dvynd9dROTGgk95b
-        0kAqHX1zt3cnX6FwMzz6rHHULNEVYUg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-rGDQmpUoP5q9r1Va7zZsig-1; Tue, 08 Sep 2020 15:13:05 -0400
-X-MC-Unique: rGDQmpUoP5q9r1Va7zZsig-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5AE018BA283;
-        Tue,  8 Sep 2020 19:13:03 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-112-153.rdu2.redhat.com [10.10.112.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 23F3B1002D49;
-        Tue,  8 Sep 2020 19:13:03 +0000 (UTC)
-Subject: Re: panic happened on 5.8.6-rc2-650d8f2
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Jianlin Shi <jishi@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-References: <CABE0yyhP+MSNM4-GJ7hDN+kNMg=LWrg9eze5zFt3S6jCN9P7_Q@mail.gmail.com>
- <CABE0yyj4YBD+DQumY6a3uvahfqY+4D4AAUs2Ja3+JGMfxPQxfQ@mail.gmail.com>
- <7fe5bdcc-b366-2139-01f3-da613323eaba@kernel.dk>
- <D322EAC5-3C07-4752-A171-3FF74A766F5C@linaro.org>
-From:   Rachel Sibley <rasibley@redhat.com>
-Message-ID: <02908944-62fe-0f1a-0dc1-d8c11c43742d@redhat.com>
-Date:   Tue, 8 Sep 2020 15:13:02 -0400
+        id S1731359AbgIHThu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 15:37:50 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48792 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730849AbgIHPzp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Sep 2020 11:55:45 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id E7EC8B603;
+        Tue,  8 Sep 2020 15:54:18 +0000 (UTC)
+Subject: Re: PROBLEM: Long Workqueue delays V2
+To:     Jim Baxter <jim_baxter@mentor.com>, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Cc:     linux-usb@vger.kernel.org,
+        "Frkuska, Joshua" <Joshua_Frkuska@mentor.com>,
+        "Resch Carsten (CM/ESO6)" <Carsten.Resch@de.bosch.com>,
+        "Rosca, Eugeniu (ADITG/ESB)" <erosca@de.adit-jv.com>,
+        "Craske, Mark" <Mark_Craske@mentor.com>,
+        "Brown, Michael" <michael_brown@mentor.com>
+References: <625615f2-3a6b-3136-35f9-2f2fb3c110cf@mentor.com>
+ <066753ec-eddc-d7f6-5cc8-fe282baba6ec@mentor.com>
+ <bf3d7f89-e652-a26b-bb27-c6dbef08e28c@mentor.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+Message-ID: <335b22f6-e579-5ff1-5353-7ab14ca43662@suse.cz>
+Date:   Tue, 8 Sep 2020 17:54:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <D322EAC5-3C07-4752-A171-3FF74A766F5C@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <bf3d7f89-e652-a26b-bb27-c6dbef08e28c@mentor.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 9/7/20 3:05 AM, Paolo Valente wrote:
-> Hi Jianlin,
-> given the stack trace and the goal of commit
-> 2de791ab4918969d8108f15238a701968375f235 ("bfq: fix blkio cgroup
-> leakage v4"), this failure might be related to that commit.  Could you
-> please try reverting that commit and report back?
-
-Hi Paolo/Jianlin,
-
-I cloned the original job and was unable to reproduce the panic, I also don't see it
-for any previous or succeeding pipeline for stable tree. I setup a check to automatically
-tag the related pipeline in case we're able to reproduce it. We can also work on testing
-with the patch reverted, if we see it again we'll follow up in this thread.
-
-Thank you,
-Rachel
-
+On 8/27/20 2:06 PM, Jim Baxter wrote:
+> Has anyone any ideas of how to investigate this delay further?
 > 
-> Thanks,
-> Paolo
+> Comparing the perf output for unplugging the USB stick and using umount
+> which does not cause these delays in other workqueues the main difference
+
+I don't have that much insight in this, but isn't it that in case of umount, the
+exactly same work is done in the umount process context and not workqueues? So
+it might take the same time and cpu, stress the same paths, but as it's
+attributed to the process, there are no workqueue delays reported? Or does your
+measurements suggest otherwise?
+
+> is that the problem case is executing the code in invalidate_mapping_pages()
+> and a large part of that arch_local_irq_restore() which is part of
+> releasing a lock, I would usually expect that requesting a lock would be
+> where delays may occur.
 > 
->> Il giorno 7 set 2020, alle ore 04:02, Jens Axboe <axboe@kernel.dk> ha scritto:
->>
->> CC Paolo
->>
->>
->> On 9/6/20 6:36 PM, Jianlin Shi wrote:
->>> Hi,
+> 	--94.90%--invalidate_partition
+> 	   __invalidate_device
+> 	   |          
+> 	   |--64.55%--invalidate_bdev
+> 	   |  |          
+> 	   |   --64.13%--invalidate_mapping_pages
+> 	   |     |          
+> 	   |     |--24.09%--invalidate_inode_page
+> 	   |     |   |          
+> 	   |     |   --23.44%--remove_mapping
+> 	   |     |     |          
+> 	   |     |      --23.20%--__remove_mapping
+> 	   |     |        |          
+> 	   |     |         --21.90%--arch_local_irq_restore
+> 	   |     |          
+> 	   |     |--22.44%--arch_local_irq_enable
+> 
+> Best regards,
+> Jim
+> 
+> -------- Original Message --------
+> Subject: Re: PROBLEM: Long Workqueue delays V2
+> From: Jim Baxter <jim_baxter@mentor.com>
+> To: 
+> Date: Wed Aug 19 2020 14:12:24 GMT+0100 (British Summer Time)
+> 
+>> Added linux-block List which may also be relevant to this issue.
+>> 
+>> -------- Original Message --------
+>> Subject: PROBLEM: Long Workqueue delays V2
+>> From: Jim Baxter <jim_baxter@mentor.com>
+>> To: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+>> CC: "Resch Carsten (CM/ESO6)" <Carsten.Resch@de.bosch.com>, "Rosca, Eugeniu (ADITG/ESB)" <erosca@de.adit-jv.com>
+>> Date: Tue, 18 Aug 2020 12:58:13 +0100
+>> 
+>>> I am asking this question again to include the fs-devel list.
 >>>
->>> panic happened when we run jobs on 5.8.6-rc2-650d8f2:
->>> https://beaker.engineering.redhat.com/recipes/8756377#task115008997
 >>>
->>> and the core trace is as follows, have you ever seen this before?
+>>> We have issues with the workqueue of the kernel overloading the CPU 0 
+>>> when we we disconnect a USB stick.
 >>>
->>> [ 7522.385926] BUG: kernel NULL pointer dereference, address: 0000000000000000
->>> [ 7522.393694] #PF: supervisor read access in kernel mode
->>> [ 7522.399425] #PF: error_code(0x0000) - not-present page
->>> [ 7522.405154] PGD 0 P4D 0
->>> [ 7522.407977] Oops: 0000 [#1] SMP PTI
->>> [ 7522.411866] CPU: 14 PID: 668 Comm: kworker/14:1H Kdump: loaded
->>> Tainted: G             L    5.8.6-rc2-650d8f2.cki #1
->>> [ 7522.423510] Hardware name: Dell Inc. PowerEdge R630/0CNCJW, BIOS
->>> 1.2.10 03/09/2015
->>> [ 7522.431959] Workqueue: kblockd blk_mq_run_work_fn
->>> [ 7522.437206] RIP: 0010:__list_del_entry_valid+0x2d/0x4c
->>> [ 7522.442936] Code: 4c 8b 47 08 48 b8 00 01 00 00 00 00 ad de 48 39
->>> c2 0f 84 71 00 00 00 48 b8 22 01 00 00 00 00 ad de 49 39 c0 0f 84 91
->>> 00 00 00 <49> 8b 30 48 39 fe 0f 85 71 00 00 00 48 8b 52 08 48 39 f2 0f
->>> 85 56
->>> [ 7522.463891] RSP: 0018:ffffa5b9009dfcd8 EFLAGS: 00010017
->>> [ 7522.469719] RAX: dead000000000122 RBX: ffff8b458d4c9950 RCX:
->>> 0000000000000000
->>> [ 7522.477680] RDX: 0000000000000000 RSI: 0000000000000000 RDI:
->>> ffff8b448a753938
->>> [ 7522.485640] RBP: ffff8b448a753898 R08: 0000000000000000 R09:
->>> ffff8b45bb6bb32c
->>> [ 7522.493600] R10: 0000000000000018 R11: 0000000000000018 R12:
->>> ffff8b448a753810
->>> [ 7522.501560] R13: ffff8b44993e2800 R14: 0000000000000000 R15:
->>> ffff8b458d07c900
->>> [ 7522.509520] FS:  0000000000000000(0000) GS:ffff8b45bfd80000(0000)
->>> knlGS:0000000000000000
->>> [ 7522.518548] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>> [ 7522.524957] CR2: 0000000000000000 CR3: 0000000875570005 CR4:
->>> 00000000001606e0
->>> [ 7522.532917] Call Trace:
->>> [ 7522.535647]  bfq_idle_extract+0x52/0xb0
->>> [ 7522.539926]  bfq_put_idle_entity+0x12/0x60
->>> [ 7522.544494]  bfq_bfqq_served+0xb0/0x190
->>> [ 7522.548770]  bfq_dispatch_request+0x2c2/0x1070
->>> [ 7522.553727]  blk_mq_do_dispatch_sched+0xa4/0x140
->>> [ 7522.558879]  ? newidle_balance+0x1c0/0x390
->>> [ 7522.563446]  __blk_mq_sched_dispatch_requests+0x159/0x160
->>> [ 7522.569467]  blk_mq_sched_dispatch_requests+0x30/0x60
->>> [ 7522.575102]  __blk_mq_run_hw_queue+0x49/0x110
->>> [ 7522.579962]  process_one_work+0x1b4/0x370
->>> [ 7522.584434]  worker_thread+0x53/0x3e0
->>> [ 7522.588517]  ? process_one_work+0x370/0x370
->>> [ 7522.593180]  kthread+0x119/0x140
->>> [ 7522.596779]  ? __kthread_bind_mask+0x60/0x60
->>> [ 7522.601541]  ret_from_fork+0x22/0x30
->>> [ 7522.605528] Modules linked in: scsi_transport_iscsi crypto_user
->>> can_bcm pptp gre l2tp_ip6 l2tp_ip l2tp_core ip6_udp_tunnel udp_tunnel
->>> rfcomm can_raw hidp bnep nfc af_key mpls_router ip_tunnel
->>> vsock_loopback vmw_vsock_virtio_transport_common
->>> vmw_vsock_vmci_transport vsock vmw_vmci kcm ieee802154_socket
->>> ieee802154 bluetooth ecdh_generic ecc fcrypt pcbc rxrpc pppoe pppox
->>> smc ib_core atm can mlx4_en mlx4_core n_gsm pps_ldisc slcan
->>> ppp_synctty n_hdlc mkiss ax25 ppp_async ppp_generic slip slhc nls_utf8
->>> isofs minix binfmt_misc nfsv3 nfs_acl rds brd exfat vfat fat loop sctp
->>> tun xt_multiport xt_nat xt_addrtype xt_mark xt_conntrack xt_MASQUERADE
->>> nft_counter xt_comment nft_compat nft_chain_nat nf_nat nf_conntrack
->>> nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink overlay fuse
->>> rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache
->>> rfkill intel_rapl_msr intel_rapl_common sb_edac x86_pkg_temp_thermal
->>> intel_powerclamp coretemp iTCO_wdt intel_pmc_bxt iTCO_vendor_support
->>> sunrpc dcdbas
->>> [ 7522.605556]  kvm_intel kvm irqbypass rapl intel_cstate
->>> intel_uncore pcspkr ipmi_ssif lpc_ich mei_me mei igb dca ipmi_si
->>> ipmi_devintf ipmi_msghandler acpi_power_meter ip_tables xfs mgag200
->>> lpfc drm_vram_helper drm_kms_helper cec nvmet_fc drm_ttm_helper nvmet
->>> ttm crct10dif_pclmul nvme_fc crc32_pclmul crc32c_intel nvme_fabrics
->>> drm ghash_clmulni_intel i2c_algo_bit nvme_core megaraid_sas
->>> scsi_transport_fc wmi [last unloaded: dummy]
->>> [ 7522.744918] CR2: 0000000000000000
->>> [ 7522.748613] ---[ end trace ed34032a61d7e2a6 ]---
+>>> This results in other items on the shared workqueue being delayed by
+>>> around 6.5 seconds with a default kernel configuration and 2.3 seconds
+>>> on a config tailored for our RCar embedded platform.
 >>>
->>> Thanks & Best Regards,
 >>>
->>> Jianlin Shi
 >>>
->>
->>
->> -- 
->> Jens Axboe
->>
+>>> We first noticed this issue on custom hardware and we have recreated it
+>>> on an RCar Starter Kit using a test module [1] to replicate the
+>>> behaviour, the test module outputs any delays of greater then 9ms.
+>>>
+>>> To run the test we have a 4GB random file on a USB stick and perform
+>>> the following test.
+>>> The stick is mounted as R/O and we are copying data from the stick:
+>>>
+>>> - Mount the stick.
+>>> mount -o ro,remount /dev/sda1
+>>>
+>>> - Load the Module:
+>>> # taskset -c 0 modprobe latency-mon
+>>>
+>>> - Copy large amount of data from the stick:
+>>> # dd if=/run/media/sda1/sample.txt of=/dev/zero
+>>> [ 1437.517603] DELAY: 10
+>>> 8388607+1 records in
+>>> 8388607+1 records out
+>>>
+>>>
+>>> - Disconnect the USB stick:
+>>> [ 1551.796792] usb 2-1: USB disconnect, device number 2
+>>> [ 1558.625517] DELAY: 6782
+>>>
+>>>
+>>> The Delay output 6782 is in milliseconds.
+>>>
+>>>
+>>>
+>>> Using umount stops the issue occurring but is unfortunately not guaranteed
+>>> in our particular system.
+>>>
+>>>
+>>> From my analysis the hub_event workqueue kworker/0:1+usb thread uses around
+>>> 98% of the CPU.
+>>>
+>>> I have traced the workqueue:workqueue_queue_work function while unplugging the USB
+>>> and there is no particular workqueue function being executed a lot more then the 
+>>> others for the kworker/0:1+usb thread.
+>>>
+>>>
+>>> Using perf I identified the hub_events workqueue was spending a lot of time in
+>>> invalidate_partition(), I have included a cut down the captured data from perf in
+>>> [2] which shows the additional functions where the kworker spends most of its time.
+>>>
+>>>
+>>> I am aware there will be delays on the shared workqueue, are the delays
+>>> we are seeing considered normal?
+>>>
+>>>
+>>> Is there any way to mitigate or identify where the delay is?
+>>> I am unsure if this is a memory or filesystem subsystem issue.
+>>>
+>>>
+>>> Thank you for you help.
+>>>
+>>> Thanks,
+>>> Jim Baxter
+>>>
+>>> [1] Test Module:
+>>> // SPDX-License-Identifier: GPL-2.0
+>>> /*
+>>>  * Simple WQ latency monitoring
+>>>  *
+>>>  * Copyright (C) 2020 Advanced Driver Information Technology.
+>>>  */
+>>>
+>>> #include <linux/init.h>
+>>> #include <linux/ktime.h>
+>>> #include <linux/module.h>
+>>>
+>>> #define PERIOD_MS 100
+>>>
+>>> static struct delayed_work wq;
+>>> static u64 us_save;
+>>>
+>>> static void wq_cb(struct work_struct *work)
+>>> {
+>>> 	u64 us = ktime_to_us(ktime_get());
+>>> 	u64 us_diff = us - us_save;
+>>> 	u64 us_print = 0;
+>>>
+>>> 	if (!us_save)
+>>> 		goto skip_print;
+>>>
+>>>
+>>> 	us_print = us_diff / 1000 - PERIOD_MS;
+>>> 	if (us_print > 9)
+>>> 		pr_crit("DELAY: %lld\n", us_print);
+>>>
+>>> skip_print:
+>>> 	us_save = us;
+>>> 	schedule_delayed_work(&wq, msecs_to_jiffies(PERIOD_MS));
+>>> }
+>>>
+>>> static int latency_mon_init(void)
+>>> {
+>>> 	us_save = 0;
+>>> 	INIT_DELAYED_WORK(&wq, wq_cb);
+>>> 	schedule_delayed_work(&wq, msecs_to_jiffies(PERIOD_MS));
+>>>
+>>> 	return 0;
+>>> }
+>>>
+>>> static void latency_mon_exit(void)
+>>> {
+>>> 	cancel_delayed_work_sync(&wq);
+>>> 	pr_info("%s\n", __func__);
+>>> }
+>>>
+>>> module_init(latency_mon_init);
+>>> module_exit(latency_mon_exit);
+>>> MODULE_AUTHOR("Eugeniu Rosca <erosca@de.adit-jv.com>");
+>>> MODULE_LICENSE("GPL");
+>>>
+>>>
+>>> [2] perf trace:
+>>>     95.22%     0.00%  kworker/0:2-eve  [kernel.kallsyms]
+>>>     |
+>>>     ---ret_from_fork
+>>>        kthread
+>>>        worker_thread
+>>>        |          
+>>>         --95.15%--process_one_work
+>>> 		  |          
+>>> 		   --94.99%--hub_event
+>>> 			 |          
+>>> 			  --94.99%--usb_disconnect
+>>> 			  <snip>
+>>> 				|  
+>>> 				--94.90%--invalidate_partition
+>>> 				   __invalidate_device
+>>> 				   |          
+>>> 				   |--64.55%--invalidate_bdev
+>>> 				   |  |          
+>>> 				   |   --64.13%--invalidate_mapping_pages
+>>> 				   |     |          
+>>> 				   |     |--24.09%--invalidate_inode_page
+>>> 				   |     |   |          
+>>> 				   |     |   --23.44%--remove_mapping
+>>> 				   |     |     |          
+>>> 				   |     |      --23.20%--__remove_mapping
+>>> 				   |     |        |          
+>>> 				   |     |         --21.90%--arch_local_irq_restore
+>>> 				   |     |          
+>>> 				   |     |--22.44%--arch_local_irq_enable
+>>> 				   |          
+>>> 					--30.35%--shrink_dcache_sb 
+>>> 					<snip>
+>>> 					  |      
+>>> 					  --30.17%--truncate_inode_pages_range
+>>>
 > 
 
