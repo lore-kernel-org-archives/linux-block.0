@@ -2,105 +2,193 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A69FC2BB84
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 01:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A06C433E2
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 01:47:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4A0421941
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 01:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4346420C09
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 01:47:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GtIJnbRI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOc3DDat"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728185AbgIHBY0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Sep 2020 21:24:26 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21193 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728307AbgIHBYZ (ORCPT
+        id S1728129AbgIHBra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Sep 2020 21:47:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38070 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728088AbgIHBr3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Sep 2020 21:24:25 -0400
+        Mon, 7 Sep 2020 21:47:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599528264;
+        s=mimecast20190719; t=1599529646;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=8kHLShDIjtW+nOie5lwVauvpaW35ekCPOUCvTdPotmg=;
-        b=GtIJnbRIjKFtZ+whdOcG3uLQRNC5xDjP/7p+FNFenxpVc+X5BpNRikvOF1Z4dav6yWwphT
-        Z9O9Y+y68YrCixNpwwECBr/iI+98Qf49zmYgGEdoqz22WXkGc8dSt3Ut45nbPANwfsgD9B
-        0cJ1w7jGgUrzG4QbaPkUVBpp23Ijr/A=
+        bh=8hiCj61KJfeUl7LkibCfArDkGhNR0/4KrqJWXopzPs4=;
+        b=gOc3DDat/vn50MiPRg6aYIMyKOX71bvpO+omW+aqnYsmRKe5Y01i66VZ0ii5EexK1UskTv
+        Naf/U4sZUpN0D+ZCcum1hMPWMvTv045W8BumNfhD5yCgN6vgcAUeSvTdSgHMZ0XtfFr8ZS
+        fvk2sQDVmIWnQMxx4DjDR9VSj5DOp60=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-9IaXVxyTNOaOU7nkF5Qf_Q-1; Mon, 07 Sep 2020 21:24:21 -0400
-X-MC-Unique: 9IaXVxyTNOaOU7nkF5Qf_Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-507-cJpZMPPkPeKTRUH_nTysew-1; Mon, 07 Sep 2020 21:47:23 -0400
+X-MC-Unique: cJpZMPPkPeKTRUH_nTysew-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FB91185A0E5;
-        Tue,  8 Sep 2020 01:24:20 +0000 (UTC)
-Received: from localhost (ovpn-12-217.pek2.redhat.com [10.72.12.217])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD15927C29;
-        Tue,  8 Sep 2020 01:24:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51FDA801AC2;
+        Tue,  8 Sep 2020 01:47:21 +0000 (UTC)
+Received: from T590 (ovpn-12-217.pek2.redhat.com [10.72.12.217])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AE2B910013D7;
+        Tue,  8 Sep 2020 01:47:12 +0000 (UTC)
+Date:   Tue, 8 Sep 2020 09:47:08 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Veronika Kabatova <vkabatov@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, Tejun Heo <tj@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V3 3/3] block: move 'q_usage_counter' into front of 'request_queue'
-Date:   Tue,  8 Sep 2020 09:23:51 +0800
-Message-Id: <20200908012351.1092986-4-ming.lei@redhat.com>
-In-Reply-To: <20200908012351.1092986-1-ming.lei@redhat.com>
-References: <20200908012351.1092986-1-ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Hannes Reinecke <hare@suse.de>, Long Li <longli@microsoft.com>,
+        John Garry <john.garry@huawei.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH V5] scsi: core: only re-run queue in scsi_end_request()
+ if device queue is busy
+Message-ID: <20200908014708.GA1091256@T590>
+References: <20200907071048.1078838-1-ming.lei@redhat.com>
+ <4da219e6-7c2b-b93b-c6d0-2e18aa8ce11f@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4da219e6-7c2b-b93b-c6d0-2e18aa8ce11f@acm.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The field of 'q_usage_counter' is always fetched in fast path of every
-block driver, and move it into front of 'request_queue', so it can be
-fetched into 1st cacheline of 'request_queue' instance.
+On Mon, Sep 07, 2020 at 09:52:42AM -0700, Bart Van Assche wrote:
+> On 2020-09-07 00:10, Ming Lei wrote:
+> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > index 7affaaf8b98e..a05e431ee62a 100644
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -551,8 +551,25 @@ static void scsi_run_queue_async(struct scsi_device *sdev)
+> >  	if (scsi_target(sdev)->single_lun ||
+> >  	    !list_empty(&sdev->host->starved_list))
+> >  		kblockd_schedule_work(&sdev->requeue_work);
+> > -	else
+> > -		blk_mq_run_hw_queues(sdev->request_queue, true);
+> > +	else {
+> 
+> Please follow the Linux kernel coding style and balance braces.
 
-Tested-by: Veronika Kabatova <vkabatov@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Could you provide one document about such style? The patch does pass
+checkpatch, or I am happy to follow your suggestion if checkpatch is
+updated to this way.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 7d82959e7b86..7b1e53084799 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -397,6 +397,8 @@ struct request_queue {
- 	struct request		*last_merge;
- 	struct elevator_queue	*elevator;
- 
-+	struct percpu_ref	q_usage_counter;
-+
- 	struct blk_queue_stats	*stats;
- 	struct rq_qos		*rq_qos;
- 
-@@ -569,7 +571,6 @@ struct request_queue {
- 	 * percpu_ref_kill() and percpu_ref_reinit().
- 	 */
- 	struct mutex		mq_freeze_lock;
--	struct percpu_ref	q_usage_counter;
- 
- 	struct blk_mq_tag_set	*tag_set;
- 	struct list_head	tag_set_list;
--- 
-2.25.2
+> 
+> > +		/*
+> > +		 * smp_mb() implied in either rq->end_io or blk_mq_free_request
+> > +		 * is for ordering writing .device_busy in scsi_device_unbusy()
+> > +		 * and reading sdev->restarts.
+> > +		 */
+> > +		int old = atomic_read(&sdev->restarts);
+> 
+> scsi_run_queue_async() has two callers: scsi_end_request() and scsi_queue_rq().
+> I don't see how ordering between scsi_device_unbusy() and the above atomic_read()
+> could be guaranteed if this function is called from scsi_queue_rq()?
+> 
+> Regarding the I/O completion path, my understanding is that the I/O completion
+> path is as follows if rq->end_io == NULL:
+> 
+> scsi_mq_done()
+>   blk_mq_complete_request()
+>     rq->q->mq_ops->complete(rq) = scsi_softirq_done
+>       scsi_finish_command()
+>         scsi_device_unbusy()
+
+scsi_device_unbusy()
+	atomic_dec(&sdev->device_busy);
+
+>         scsi_cmd_to_driver(cmd)->done(cmd)
+>         scsi_io_completion()
+>           scsi_end_request()
+>             blk_update_request()
+>             scsi_mq_uninit_cmd()
+>             __blk_mq_end_request()
+>               blk_mq_free_request()
+>                 __blk_mq_free_request()
+
+__blk_mq_free_request()
+	blk_mq_put_tag
+		smp_mb__after_atomic()
+
+>                   blk_queue_exit()
+>             scsi_run_queue_async()
+> 
+> I haven't found any store memory barrier between the .device_busy change in
+> scsi_device_unbusy() and the scsi_run_queue_async() call? Did I perhaps overlook
+> something?
+> 
+> > +		/*
+> > +		 * ->restarts has to be kept as non-zero if there new budget
+> > +		 *  contention comes.
+> 
+> Please fix the grammar in the above sentence.
+
+OK.
+
+> 
+> > +	/*
+> > +	 * Order writing .restarts and reading .device_busy. Its pair is
+> > +	 * implied by __blk_mq_end_request() in scsi_end_request() for
+> > +	 * ordering writing .device_busy in scsi_device_unbusy() and
+> > +	 * reading .restarts.
+> > +	 */
+> > +	smp_mb__after_atomic();
+> 
+> What does "its pair is implied" mean? Please make the above comment
+> unambiguous.
+
+See comment in scsi_run_queue_async().
+
+> 
+> > +	/*
+> > +	 * If all in-flight requests originated from this LUN are completed
+> > +	 * before setting .restarts, sdev->device_busy will be observed as
+> > +	 * zero, then blk_mq_delay_run_hw_queues() will dispatch this request
+> > +	 * soon. Otherwise, completion of one of these request will observe
+> > +	 * the .restarts flag, and the request queue will be run for handling
+> > +	 * this request, see scsi_end_request().
+> > +	 */
+> > +	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
+> > +				!scsi_device_blocked(sdev)))
+> > +		blk_mq_delay_run_hw_queues(sdev->request_queue, SCSI_QUEUE_DELAY);
+> > +	return false;
+> 
+> What will happen if all in-flight requests complete after
+> scsi_run_queue_async() has read .restarts and before it executes
+> atomic_cmpxchg()?
+
+One of these completions will run atomic_cmpxchg() successfully, and the
+queue is re-run immediately from scsi_run_queue_async().
+
+> Will that cause the queue to be run after a delay
+> although it should be run immediately?
+
+Yeah, blk_mq_delay_run_hw_queues() will be called, however:
+
+If scsi_run_queue_async() has scheduled run queue already, this code path
+won't queue a dwork successfully. On the other hand, if
+blk_mq_delay_run_hw_queues(SCSI_QUEUE_DELAY) has queued a dwork,
+scsi_run_queue_async() still can queue the dwork successfully, since the delay
+timer can be deactivated easily, see try_to_grab_pending(). In short, the case
+you described is an extremely unlikely event. Even though it happens,
+forward progress is still guaranteed.
+
+
+Thanks,
+Ming
 
