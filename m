@@ -2,232 +2,367 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6863DC43461
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 03:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8BA0C2D0A7
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 07:53:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2262D2145D
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 03:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A689820C09
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 07:53:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728472AbgIHDpj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Sep 2020 23:45:39 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45554 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728327AbgIHDpi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Sep 2020 23:45:38 -0400
-Received: by mail-pf1-f194.google.com with SMTP id k15so9806745pfc.12;
-        Mon, 07 Sep 2020 20:45:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=TuLKe93KPLY6WBrd7Iwq3wSAjEhzyElprgeAGdDDDAg=;
-        b=GWeYq+TpopAsJZ40RzV4cfCBvbZ2oQq4/qAwux3j7TCQzoNLGiP7YaoowHP0P+EnO+
-         W/xU7JyeszmNgLfrPQ2ioHME5GYSnPtflk7t9o3vTcY7OzBAnP27TEp8SxAFAj3Buolf
-         xAKyBoDLKOAZJm9pv/0wifXQvEh0DQdIQhts1GWW9fDWWG5DlWW5Fl0XC3N6u/EfGD2+
-         TM8jIlNNBDA2DT7nQXH7o4s4WgUDluXVPEMYaAEVrlIoaFrfjBVDPA8hv+yLSPJkypBC
-         UhiugHy/S9DNRHLsh1+pyrJLMnudm5KoDi3MCUZ5ZA42MVQ9k1ywlOfcGDVx438ZvcMj
-         Thrg==
-X-Gm-Message-State: AOAM531k1tpsH42cS4tld4gjQXnWLtMfcArFsdO+53GqMNs3DygKc1p4
-        CHW/tRTNgO2FtZ+DSJOzbuyTgi/FuIY=
-X-Google-Smtp-Source: ABdhPJySipkimenrVklLdli6vNNBw0VO4Ec4szUopH0rvZh58EfMBup1MKk+AFPU3b8bLxAgBJSe+w==
-X-Received: by 2002:a62:e40a:: with SMTP id r10mr23328984pfh.52.1599536735249;
-        Mon, 07 Sep 2020 20:45:35 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:ff58:da99:dd6f:be14? ([2601:647:4000:d7:ff58:da99:dd6f:be14])
-        by smtp.gmail.com with ESMTPSA id z4sm1302479pfr.197.2020.09.07.20.45.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Sep 2020 20:45:33 -0700 (PDT)
-Subject: Re: [PATCH V5] scsi: core: only re-run queue in scsi_end_request() if
- device queue is busy
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>, Long Li <longli@microsoft.com>,
-        John Garry <john.garry@huawei.com>, linux-block@vger.kernel.org
-References: <20200907071048.1078838-1-ming.lei@redhat.com>
- <4da219e6-7c2b-b93b-c6d0-2e18aa8ce11f@acm.org>
- <20200908014708.GA1091256@T590>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <a51b0af4-219c-4cfc-f224-0cfff3d07ec3@acm.org>
-Date:   Mon, 7 Sep 2020 20:45:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20200908014708.GA1091256@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1729670AbgIHHxe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 03:53:34 -0400
+Received: from mga05.intel.com ([192.55.52.43]:24972 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729626AbgIHHxa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Sep 2020 03:53:30 -0400
+IronPort-SDR: 0YjoJs1hM9DwdiruAnPIvwo0WlEpJGiLNxpX8KGbpUJ3fcCfOzchnB9OBoOeDDWWYCg7s2LTUF
+ 6gehLUXyB5dg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9737"; a="242904894"
+X-IronPort-AV: E=Sophos;i="5.76,405,1592895600"; 
+   d="scan'208";a="242904894"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2020 00:53:28 -0700
+IronPort-SDR: BuFM1i5Y5AkbylUyRAM+bpBZfIGnMaYUAyO3gG00kQKKYBasWA45z0GI4xmsjLj4+SSm9G2t+4
+ pNI/MXoVKXKA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,405,1592895600"; 
+   d="scan'208";a="479917057"
+Received: from shskylake.sh.intel.com ([10.239.48.137])
+  by orsmga005.jf.intel.com with ESMTP; 08 Sep 2020 00:53:21 -0700
+From:   Ethan Zhao <haifeng.zhao@intel.com>
+To:     axboe@kernel.dk, bhelgaas@google.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, mcgrof@kernel.org,
+        ShanshanX.Zhang@intel.com, pei.p.jia@intel.com,
+        Ethan Zhao <Haifeng.Zhao@intel.com>
+Subject: [PATCH] Revert "block: revert back to synchronous request_queue removal"
+Date:   Tue,  8 Sep 2020 03:50:48 -0400
+Message-Id: <20200908075047.5140-1-haifeng.zhao@intel.com>
+X-Mailer: git-send-email 2.18.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-09-07 18:47, Ming Lei wrote:
-> On Mon, Sep 07, 2020 at 09:52:42AM -0700, Bart Van Assche wrote:
->> On 2020-09-07 00:10, Ming Lei wrote:
->>> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
->>> index 7affaaf8b98e..a05e431ee62a 100644
->>> --- a/drivers/scsi/scsi_lib.c
->>> +++ b/drivers/scsi/scsi_lib.c
->>> @@ -551,8 +551,25 @@ static void scsi_run_queue_async(struct scsi_device *sdev)
->>>  	if (scsi_target(sdev)->single_lun ||
->>>  	    !list_empty(&sdev->host->starved_list))
->>>  		kblockd_schedule_work(&sdev->requeue_work);
->>> -	else
->>> -		blk_mq_run_hw_queues(sdev->request_queue, true);
->>> +	else {
->>
->> Please follow the Linux kernel coding style and balance braces.
-> 
-> Could you provide one document about such style? The patch does pass
-> checkpatch, or I am happy to follow your suggestion if checkpatch is
-> updated to this way.
+From: Ethan Zhao <Haifeng.Zhao@intel.com>
 
-Apparently the checkpatch script only warns about unbalanced braces with the
-option --strict. From commit e4c5babd32f9 ("checkpatch: notice unbalanced
-else braces in a patch") # v4.11:
+'commit e8c7d14ac6c3 ("block: revert back to synchronous request_queue
+removal")' introduced panic issue to NVMe hotplug as following(hit
+after just 2 times NVMe SSD hotplug under stable 5.9-RC2):
 
-    checkpatch: notice unbalanced else braces in a patch
+BUG: sleeping function called from invalid context at block/genhd.c:1563
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 0, name: swapper/30
+INFO: lockdep is turned off.
+CPU: 30 PID: 0 Comm: swapper/30 Tainted: G S      W         5.9.0-RC2 #3
+Hardware name: Intel Corporation xxxxxxxx
+Call Trace:
+<IRQ>
+dump_stack+0x9d/0xe0
+___might_sleep.cold.79+0x17f/0x1af
+disk_release+0x26/0x200
+device_release+0x6d/0x1c0
+kobject_put+0x14d/0x430
+hd_struct_free+0xfb/0x260
+percpu_ref_switch_to_atomic_rcu+0x3d1/0x580
+? rcu_nocb_unlock_irqrestore+0xb6/0xf0
+? trace_hardirqs_on+0x20/0x1b5
+? rcu_do_batch+0x3ff/0xb50
+rcu_do_batch+0x47c/0xb50
+? rcu_accelerate_cbs+0xa9/0x740
+? rcu_spawn_one_nocb_kthread+0x3d0/0x3d0
+rcu_core+0x945/0xd90
+? __do_softirq+0x182/0xac0
+__do_softirq+0x1ca/0xac0
+asm_call_on_stack+0xf/0x20
+</IRQ>
+do_softirq_own_stack+0x7f/0x90
+irq_exit_rcu+0x1e3/0x230
+sysvec_apic_timer_interrupt+0x48/0xb0
+asm_sysvec_apic_timer_interrupt+0x12/0x20
+RIP: 0010:cpuidle_enter_state+0x116/0xe90
+Code: 00 31 ff e8 ac c8 a4 fe 80 7c 24 10 00 74 12 9c 58 f6 c4 02
+ 0f 85 7e 08 00 00 31 ff e8 43 ca be fe e8 ae a3 d5 fe fb 45 85 ed
+ <0f> 88 4e 05 00 00 4d 63 f5 49 83 fe 09 0f 87 29 0b 00 00 4b 8d 04
+RSP: 0018:ff110001040dfd78 EFLAGS: 00000206
+RAX: 0000000000000007 RBX: ffd1fff7b1a01e00 RCX: 000000000000001f
+RDX: 0000000000000000 RSI: 0000000040000000 RDI: ffffffffb7c5c0f2
+RBP: ffffffffb9a416a0 R08: 0000000000000000 R09: 0000000000000000
+R10: ff110001040d0007 R11: ffe21c002081a000 R12: 0000000000000003
+R13: 0000000000000003 R14: 0000000000000138
+... ...
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+PGD 0
+Oops: 0010 [#1] SMP KASAN NOPTI
+CPU: 30 PID: 500 Comm: irq/124-pciehp Tainted: G S  W  5.9.0-RC2 #3
+Hardware name: Intel Corporation xxxxxxxx
+RIP: 0010:0x0
+Code: Bad RIP value.
+RSP: 0018:ff110007d5ba75e8 EFLAGS: 00010096
+RAX: 0000000000000000 RBX: ff110001040d0000 RCX: ff110007d5ba7668
+RDX: 0000000000000009 RSI: ff110001040d0000 RDI: ff110008119f59c0
+RBP: ff110008119f59c0 R08: fffffbfff73f7b4d R09: fffffbfff73f7b4d
+R10: ffffffffb9fbda67 R11: fffffbfff73f7b4c R12: 0000000000000000
+R13: ff110007d5ba7668 R14: ff110001040d0000 R15: ff110008119f59c0
+FS:  0000000000000000(0000) GS:ff11000811800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffffffffffffd6 CR3: 00000007cea16002 CR4: 0000000000771ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ttwu_do_activate+0xd3/0x160
+try_to_wake_up+0x652/0x1850
+? migrate_swap_stop+0xad0/0xad0
+? lock_contended+0xd70/0xd70
+? rcu_read_unlock+0x50/0x50
+? rcu_do_batch+0x3ff/0xb50
+swake_up_locked+0x85/0x1c0
+complete+0x4d/0x70
+rcu_do_batch+0x47c/0xb50
+? rcu_spawn_one_nocb_kthread+0x3d0/0x3d0
+rcu_core+0x945/0xd90
+? __do_softirq+0x182/0xac0
+__do_softirq+0x1ca/0xac0
+irq_exit_rcu+0x1e3/0x230
+sysvec_apic_timer_interrupt+0x48/0xb0
+asm_sysvec_apic_timer_interrupt+0x12/0x20
+RIP: 0010:_raw_spin_unlock_irqrestore+0x40/0x50
+Code: e8 35 ad 36 fe 48 89 ef e8 cd ce 37 fe f6 c7 02 75 11 53 9d
+ e8 91 1f 5c fe 65 ff 0d ba af c2 47 5b 5d c3 e8 d2 22 5c fe 53 9d
+ <eb> ed 0f 1f 40 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 53
+RSP: 0018:ff110007d5ba79d0 EFLAGS: 00000293
+RAX: 0000000000000007 RBX: 0000000000000293 RCX: ffffffffb67710d4
+RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffffffffb83f41ce
+RBP: ffffffffbb77e740 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffffbb77e743 R11: fffffbfff76efce8 R12: 000000000000198e
+R13: ff11001031d7a0b0 R14: ffffffffbb77e740 R15: ffffffffbb77e788
+? do_raw_spin_unlock+0x54/0x230
+? _raw_spin_unlock_irqrestore+0x3e/0x50
+dma_debug_device_change+0x150/0x5e0
+notifier_call_chain+0x90/0x160
+__blocking_notifier_call_chain+0x6d/0xa0
+device_release_driver_internal+0x37d/0x490
+pci_stop_bus_device+0x123/0x190
+pci_stop_and_remove_bus_device+0xe/0x20
+pciehp_unconfigure_device+0x17e/0x330
+? pciehp_configure_device+0x3e0/0x3e0
+? trace_hardirqs_on+0x20/0x1b5
+pciehp_disable_slot+0x101/0x360
+? pme_is_native.cold.2+0x29/0x29
+pciehp_handle_presence_or_link_change+0x1ac/0xee0
+? pciehp_handle_disable_request+0x110/0x110
+pciehp_ist.cold.11+0x39/0x54
+? pciehp_set_indicators+0x190/0x190
+? alloc_desc+0x510/0xa30
+? irq_set_affinity_notifier+0x380/0x380
+? pciehp_set_indicators+0x190/0x190
+? irq_thread+0x137/0x420
+irq_thread_fn+0x86/0x150
+irq_thread+0x21f/0x420
+? irq_forced_thread_fn+0x170/0x170
+? irq_thread_check_affinity+0x210/0x210
+? __kthread_parkme+0x52/0x1a0
+? lockdep_hardirqs_on_prepare+0x33e/0x4e0
+? _raw_spin_unlock_irqrestore+0x3e/0x50
+? trace_hardirqs_on+0x20/0x1b5
+? wake_threads_waitq+0x40/0x40
+? __kthread_parkme+0xd1/0x1a0
+? irq_thread_check_affinity+0x210/0x210
+kthread+0x36a/0x430
+? kthread_create_worker_on_cpu+0xc0/0xc0
+ret_from_fork+0x1f/0x30
+... ...
+CR2: 0000000000000000
+---[ end trace cedc4047ef91d2ec ]---
 
-    Patches that add or modify code like
+Seems scheduling happened within hardware interrupt context, after
+reverted this patch, stable 5.9-RC4 build was tested with more than 20
+times NVMe SSD hotplug, no panic found.
 
-            } else
-                    <foo>
-    or
-            else {
-                    <bar>
+This reverts commit e8c7d14ac6c37c173ec606907d38802b00302988.
 
-    where one branch appears to have a brace and the other branch does not
-    have a brace should emit a --strict style message.
+Tested-by: Shanshan Zhang <ShanshanX.Zhang@intel.com>
+Signed-off-by: Ethan Zhao <Haifeng.Zhao@intel.com>
+---
+ block/blk-core.c       |  8 --------
+ block/blk-sysfs.c      | 43 +++++++++++++++++++++---------------------
+ block/genhd.c          | 17 -----------------
+ include/linux/blkdev.h |  2 ++
+ 4 files changed, 23 insertions(+), 47 deletions(-)
 
-[ ... ]
-
-+# check for single line unbalanced braces
-+		if ($sline =~ /.\s*\}\s*else\s*$/ ||
-+		    $sline =~ /.\s*else\s*\{\s*$/) {
-+			CHK("BRACES", "Unbalanced braces around else statement\n" . $herecurr);
-+		}
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 10c08ac50697..1b18a0ef5db1 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -325,9 +325,6 @@ EXPORT_SYMBOL_GPL(blk_clear_pm_only);
+  *
+  * Decrements the refcount of the request_queue kobject. When this reaches 0
+  * we'll have blk_release_queue() called.
+- *
+- * Context: Any context, but the last reference must not be dropped from
+- *          atomic context.
+  */
+ void blk_put_queue(struct request_queue *q)
+ {
+@@ -360,14 +357,9 @@ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
+  *
+  * Mark @q DYING, drain all pending requests, mark @q DEAD, destroy and
+  * put it.  All future requests will be failed immediately with -ENODEV.
+- *
+- * Context: can sleep
+  */
+ void blk_cleanup_queue(struct request_queue *q)
+ {
+-	/* cannot be called from atomic context */
+-	might_sleep();
+-
+ 	WARN_ON_ONCE(blk_queue_registered(q));
+ 
+ 	/* mark @q DYING, no new request or merges will be allowed afterwards */
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 7dda709f3ccb..eb347cbe0f93 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -901,32 +901,22 @@ static void blk_exit_queue(struct request_queue *q)
+ 	bdi_put(q->backing_dev_info);
+ }
+ 
 +
+ /**
+- * blk_release_queue - releases all allocated resources of the request_queue
+- * @kobj: pointer to a kobject, whose container is a request_queue
+- *
+- * This function releases all allocated resources of the request queue.
+- *
+- * The struct request_queue refcount is incremented with blk_get_queue() and
+- * decremented with blk_put_queue(). Once the refcount reaches 0 this function
+- * is called.
+- *
+- * For drivers that have a request_queue on a gendisk and added with
+- * __device_add_disk() the refcount to request_queue will reach 0 with
+- * the last put_disk() called by the driver. For drivers which don't use
+- * __device_add_disk() this happens with blk_cleanup_queue().
++ * __blk_release_queue - release a request queue
++ * @work: pointer to the release_work member of the request queue to be released
+  *
+- * Drivers exist which depend on the release of the request_queue to be
+- * synchronous, it should not be deferred.
+- *
+- * Context: can sleep
++ * Description:
++ *     This function is called when a block device is being unregistered. The
++ *     process of releasing a request queue starts with blk_cleanup_queue, which
++ *     set the appropriate flags and then calls blk_put_queue, that decrements
++ *     the reference counter of the request queue. Once the reference counter
++ *     of the request queue reaches zero, blk_release_queue is called to release
++ *     all allocated resources of the request queue.
+  */
+-static void blk_release_queue(struct kobject *kobj)
++static void __blk_release_queue(struct work_struct *work)
+ {
+-	struct request_queue *q =
+-		container_of(kobj, struct request_queue, kobj);
+-
+-	might_sleep();
++	struct request_queue *q = container_of(work, typeof(*q), release_work);
+ 
+ 	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
+ 		blk_stat_remove_callback(q, q->poll_cb);
+@@ -958,6 +948,15 @@ static void blk_release_queue(struct kobject *kobj)
+ 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
+ }
+ 
++static void blk_release_queue(struct kobject *kobj)
++{
++	struct request_queue *q =
++		container_of(kobj, struct request_queue, kobj);
++
++	INIT_WORK(&q->release_work, __blk_release_queue);
++	schedule_work(&q->release_work);
++}
++
+ static const struct sysfs_ops queue_sysfs_ops = {
+ 	.show	= queue_attr_show,
+ 	.store	= queue_attr_store,
+diff --git a/block/genhd.c b/block/genhd.c
+index 99c64641c314..7e2edf388c8a 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -887,19 +887,12 @@ static void invalidate_partition(struct gendisk *disk, int partno)
+  * The final removal of the struct gendisk happens when its refcount reaches 0
+  * with put_disk(), which should be called after del_gendisk(), if
+  * __device_add_disk() was used.
+- *
+- * Drivers exist which depend on the release of the gendisk to be synchronous,
+- * it should not be deferred.
+- *
+- * Context: can sleep
+  */
+ void del_gendisk(struct gendisk *disk)
+ {
+ 	struct disk_part_iter piter;
+ 	struct hd_struct *part;
+ 
+-	might_sleep();
+-
+ 	blk_integrity_del(disk);
+ 	disk_del_events(disk);
+ 
+@@ -1553,15 +1546,11 @@ int disk_expand_part_tbl(struct gendisk *disk, int partno)
+  * drivers we also call blk_put_queue() for them, and we expect the
+  * request_queue refcount to reach 0 at this point, and so the request_queue
+  * will also be freed prior to the disk.
+- *
+- * Context: can sleep
+  */
+ static void disk_release(struct device *dev)
+ {
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 
+-	might_sleep();
+-
+ 	blk_free_devt(dev->devt);
+ 	disk_release_events(disk);
+ 	kfree(disk->random);
+@@ -1806,9 +1795,6 @@ EXPORT_SYMBOL(get_disk_and_module);
+  *
+  * This decrements the refcount for the struct gendisk. When this reaches 0
+  * we'll have disk_release() called.
+- *
+- * Context: Any context, but the last reference must not be dropped from
+- *          atomic context.
+  */
+ void put_disk(struct gendisk *disk)
+ {
+@@ -1823,9 +1809,6 @@ EXPORT_SYMBOL(put_disk);
+  *
+  * This is a counterpart of get_disk_and_module() and thus also of
+  * get_gendisk().
+- *
+- * Context: Any context, but the last reference must not be dropped from
+- *          atomic context.
+  */
+ void put_disk_and_module(struct gendisk *disk)
+ {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bb5636cc17b9..59fe9de342e0 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -583,6 +583,8 @@ struct request_queue {
+ 
+ 	size_t			cmd_size;
+ 
++	struct work_struct	release_work;
++
+ #define BLK_MAX_WRITE_HINTS	5
+ 	u64			write_hints[BLK_MAX_WRITE_HINTS];
+ };
+-- 
+2.18.4
 
-Anyway, I think the following output makes it clear that there are many more
-balanced than non-balanced else statements:
-
-$ git grep -c "} else {" | awk 'BEGIN {FS=":"} {total+=$2} END {print total}'
-66944
-$ git grep -Ec "$(printf "\t")else \{|\} else$" | awk 'BEGIN {FS=":"} {total+=$2} END {print total}'
-12289
-
->>> +		/*
->>> +		 * smp_mb() implied in either rq->end_io or blk_mq_free_request
->>> +		 * is for ordering writing .device_busy in scsi_device_unbusy()
->>> +		 * and reading sdev->restarts.
->>> +		 */
->>> +		int old = atomic_read(&sdev->restarts);
->>
->> scsi_run_queue_async() has two callers: scsi_end_request() and scsi_queue_rq().
->> I don't see how ordering between scsi_device_unbusy() and the above atomic_read()
->> could be guaranteed if this function is called from scsi_queue_rq()?
->>
->> Regarding the I/O completion path, my understanding is that the I/O completion
->> path is as follows if rq->end_io == NULL:
->>
->> scsi_mq_done()
->>   blk_mq_complete_request()
->>     rq->q->mq_ops->complete(rq) = scsi_softirq_done
->>       scsi_finish_command()
->>         scsi_device_unbusy()
-> 
-> scsi_device_unbusy()
-> 	atomic_dec(&sdev->device_busy);
-> 
->>         scsi_cmd_to_driver(cmd)->done(cmd)
->>         scsi_io_completion()
->>           scsi_end_request()
->>             blk_update_request()
->>             scsi_mq_uninit_cmd()
->>             __blk_mq_end_request()
->>               blk_mq_free_request()
->>                 __blk_mq_free_request()
-> 
-> __blk_mq_free_request()
-> 	blk_mq_put_tag
-> 		smp_mb__after_atomic()
-> 
-
-Thanks for the clarification. How about changing the text "implied in either
-rq->end_io or blk_mq_free_request" into "present in sbitmap_queue_clear()"
-such that the person who reads the comment does not have to look up where
-the barrier occurs?
-
->>
->>> +	/*
->>> +	 * Order writing .restarts and reading .device_busy. Its pair is
->>> +	 * implied by __blk_mq_end_request() in scsi_end_request() for
->>> +	 * ordering writing .device_busy in scsi_device_unbusy() and
->>> +	 * reading .restarts.
->>> +	 */
->>> +	smp_mb__after_atomic();
->>
->> What does "its pair is implied" mean? Please make the above comment
->> unambiguous.
-> 
-> See comment in scsi_run_queue_async().
-
-How about making the above comment more by changing it into the following?
-/*
- * Orders atomic_inc(&sdev->restarts) and atomic_read(&sdev->device_busy).
- * .restarts must be incremented before .device_busy is read because the code
- * in scsi_run_queue_async() depends on the order of these operations.
- */
-
->> Will that cause the queue to be run after a delay
->> although it should be run immediately?
-> 
-> Yeah, blk_mq_delay_run_hw_queues() will be called, however:
-> 
-> If scsi_run_queue_async() has scheduled run queue already, this code path
-> won't queue a dwork successfully. On the other hand, if
-> blk_mq_delay_run_hw_queues(SCSI_QUEUE_DELAY) has queued a dwork,
-> scsi_run_queue_async() still can queue the dwork successfully, since the delay
-> timer can be deactivated easily, see try_to_grab_pending(). In short, the case
-> you described is an extremely unlikely event. Even though it happens,
-> forward progress is still guaranteed.
-
-I think I would sleep better if that race would be fixed. I'm concerned
-that sooner or later someone will run a workload that triggers that scenario
-systematically ...
-
-Thanks,
-
-Bart.
