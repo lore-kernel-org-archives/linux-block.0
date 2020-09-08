@@ -2,383 +2,151 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3463FC43461
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 20:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A5AC43461
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 20:46:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCC0121741
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 20:12:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA4282166E
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 20:46:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tO/onPvc"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="k9tL+OK2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729614AbgIHUMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 16:12:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46794 "EHLO
+        id S1726699AbgIHUqv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 16:46:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730085AbgIHPLR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 11:11:17 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D146C08C5EC;
-        Tue,  8 Sep 2020 07:21:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MPwAIvnP40BQ87EjqZR+JTSVrA6ypmXnTLqQLqznNVs=; b=tO/onPvc8bfM24T/VKAXSEcpeX
-        1XQVoYcwieAKL9wiX7084FOfl2fcmh0JTqxOM+bYbbPciFDsvcExuDE+yaoZKr9ruZbezgzKGfXCM
-        OFwjcq1xvJmhlcr0H8b8nkNdFNK2ZXS5KSCvbUpTcpKWseGC3Vyu80iKxadc7q7P6PyHeLowuxNNO
-        ixrHAWonqTBlddycvk6XR9T+LgQgoMVorlwRHsYqKIGv2lB1Q9vgiivoAQhZyyiue8s6yTrJ0emO9
-        f1xdNC1autNRkagwkbdwbzn4fdy+8yYFBhmKe8O5NGVHd+9/8JaGdPW74/gmLCEtaOMvneGjFsBYr
-        3JuvedCQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kFeUy-0001HL-DW; Tue, 08 Sep 2020 14:21:28 +0000
-Date:   Tue, 8 Sep 2020 15:21:28 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ethan Zhao <haifeng.zhao@intel.com>
-Cc:     axboe@kernel.dk, bhelgaas@google.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        mcgrof@kernel.org, ShanshanX.Zhang@intel.com, pei.p.jia@intel.com,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH] Revert "block: revert back to synchronous request_queue
- removal"
-Message-ID: <20200908142128.GA3463@infradead.org>
-References: <20200908075047.5140-1-haifeng.zhao@intel.com>
+        with ESMTP id S1726340AbgIHUqu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 16:46:50 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC294C061573
+        for <linux-block@vger.kernel.org>; Tue,  8 Sep 2020 13:46:49 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id t14so379059pgl.10
+        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2020 13:46:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iq8WFFrjCkQJ1nlVaRK9H+9ActveZxtO8gIQ2OH3USM=;
+        b=k9tL+OK2Y5Ejx16Xj15HgZdKnBvjU9QiTXOoVM2loy3op4Hq3hqVQK2rRLrhh1kbH2
+         NWO42qMowqH2G/KeybjFWItRsVAJGt1ZP8VWhSiT5qkQpL+VKX5bavw/uL66d0MMyNEb
+         ktA2goXwGyhkc65TZXk10++XrvRN5CiAk8j5Yd4/B6LnosCbK7gXH+QbBH0eHR4U55wr
+         0BfIlySbXBSyzbFe7bDj9W0RCWfS6AsrnEzOVM1I8Fq3yo6Am5LCZJVJqj2833EP730B
+         aL+NqXVgnFRPEGb/kt7zmNoK6lMsxhAvJKpvoJ4Xa9AQVOMIDP1Gx3r46AU2zdpYpGm9
+         baJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iq8WFFrjCkQJ1nlVaRK9H+9ActveZxtO8gIQ2OH3USM=;
+        b=PBA5Ss94CC8j9WNhvbNU0/9qnIh1iggRvhe9zB4RelcjcCi3s7Iwy/zCzxmaOE8Ieo
+         qfCPJctPP64P9Es4uRtXQkoTzhHZ156+mmLXNE0mdKqiJJ6uWmicfIJMUu6xMYwmik8d
+         EHR0Fcmc5OyCnmzG2VcUvzr38yxdSv1pJbEtDGPUj3uOc60vdRs7dN5AJdMpzvFaJx3j
+         5k3Lnb5Fpn+2cu8YKjewcfr2JHhyFkh6f8QT09s3incAnNFb/GyO4MCtyd/7+Ic8uToe
+         QCUZg9V8CaKL9NTeVwoJNR6hItLSi5FCic/ZMB7e2ApgE4RPy7FBQv/FQu3Dfn+kIbP9
+         kI4w==
+X-Gm-Message-State: AOAM532xvHFJpZ7VWnuBneWOBRRdIsJg9uOMDorxXCG+xk2gUkbOa03h
+        JUsuVGm6NDp6lFLx6UHlg1q5suFyMi71jA==
+X-Google-Smtp-Source: ABdhPJyzm6QeVDfV/1V9L7NLwj72wwT6GRy8YQSqQ1x28q05qLHjvcH/YVUjCu3hVX7zWkeUOYs0gA==
+X-Received: by 2002:a62:17cd:0:b029:13c:1611:652b with SMTP id 196-20020a6217cd0000b029013c1611652bmr760080pfx.11.1599598006841;
+        Tue, 08 Sep 2020 13:46:46 -0700 (PDT)
+Received: from relinquished.tfbnw.net ([2620:10d:c090:400::5:ec83])
+        by smtp.gmail.com with ESMTPSA id 63sm300611pfw.42.2020.09.08.13.46.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Sep 2020 13:46:45 -0700 (PDT)
+From:   Omar Sandoval <osandov@osandov.com>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, kernel-team@fb.com,
+        Yang Yang <yang.yang@vivo.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH] block: only call sched requeue_request() for scheduled requests
+Date:   Tue,  8 Sep 2020 13:46:37 -0700
+Message-Id: <80b64d8a0408e7c8c30b363aaf6d39e735521c1d.1599597940.git.osandov@osandov.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200908075047.5140-1-haifeng.zhao@intel.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 08, 2020 at 03:50:48AM -0400, Ethan Zhao wrote:
-> From: Ethan Zhao <Haifeng.Zhao@intel.com>
-> 
-> 'commit e8c7d14ac6c3 ("block: revert back to synchronous request_queue
-> removal")' introduced panic issue to NVMe hotplug as following(hit
-> after just 2 times NVMe SSD hotplug under stable 5.9-RC2):
+From: Omar Sandoval <osandov@fb.com>
 
-I'm pretty sure Ming has already fixed this by not calling put_device
-from the rcu callbackm which is the real issue here.
+Yang Yang reported the following crash caused by requeueing a flush
+request in Kyber:
 
-And even if that wasn't the case we generally try to fix bugs instead of
-going to a blind revert without much analysis.
+  [    2.517297] Unable to handle kernel paging request at virtual address ffffffd8071c0b00
+  ...
+  [    2.517468] pc : clear_bit+0x18/0x2c
+  [    2.517502] lr : sbitmap_queue_clear+0x40/0x228
+  [    2.517503] sp : ffffff800832bc60 pstate : 00c00145
+  ...
+  [    2.517599] Process ksoftirqd/5 (pid: 51, stack limit = 0xffffff8008328000)
+  [    2.517602] Call trace:
+  [    2.517606]  clear_bit+0x18/0x2c
+  [    2.517619]  kyber_finish_request+0x74/0x80
+  [    2.517627]  blk_mq_requeue_request+0x3c/0xc0
+  [    2.517637]  __scsi_queue_insert+0x11c/0x148
+  [    2.517640]  scsi_softirq_done+0x114/0x130
+  [    2.517643]  blk_done_softirq+0x7c/0xb0
+  [    2.517651]  __do_softirq+0x208/0x3bc
+  [    2.517657]  run_ksoftirqd+0x34/0x60
+  [    2.517663]  smpboot_thread_fn+0x1c4/0x2c0
+  [    2.517667]  kthread+0x110/0x120
+  [    2.517669]  ret_from_fork+0x10/0x18
 
-> 
-> BUG: sleeping function called from invalid context at block/genhd.c:1563
-> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 0, name: swapper/30
-> INFO: lockdep is turned off.
-> CPU: 30 PID: 0 Comm: swapper/30 Tainted: G S      W         5.9.0-RC2 #3
-> Hardware name: Intel Corporation xxxxxxxx
-> Call Trace:
-> <IRQ>
-> dump_stack+0x9d/0xe0
-> ___might_sleep.cold.79+0x17f/0x1af
-> disk_release+0x26/0x200
-> device_release+0x6d/0x1c0
-> kobject_put+0x14d/0x430
-> hd_struct_free+0xfb/0x260
-> percpu_ref_switch_to_atomic_rcu+0x3d1/0x580
-> ? rcu_nocb_unlock_irqrestore+0xb6/0xf0
-> ? trace_hardirqs_on+0x20/0x1b5
-> ? rcu_do_batch+0x3ff/0xb50
-> rcu_do_batch+0x47c/0xb50
-> ? rcu_accelerate_cbs+0xa9/0x740
-> ? rcu_spawn_one_nocb_kthread+0x3d0/0x3d0
-> rcu_core+0x945/0xd90
-> ? __do_softirq+0x182/0xac0
-> __do_softirq+0x1ca/0xac0
-> asm_call_on_stack+0xf/0x20
-> </IRQ>
-> do_softirq_own_stack+0x7f/0x90
-> irq_exit_rcu+0x1e3/0x230
-> sysvec_apic_timer_interrupt+0x48/0xb0
-> asm_sysvec_apic_timer_interrupt+0x12/0x20
-> RIP: 0010:cpuidle_enter_state+0x116/0xe90
-> Code: 00 31 ff e8 ac c8 a4 fe 80 7c 24 10 00 74 12 9c 58 f6 c4 02
->  0f 85 7e 08 00 00 31 ff e8 43 ca be fe e8 ae a3 d5 fe fb 45 85 ed
->  <0f> 88 4e 05 00 00 4d 63 f5 49 83 fe 09 0f 87 29 0b 00 00 4b 8d 04
-> RSP: 0018:ff110001040dfd78 EFLAGS: 00000206
-> RAX: 0000000000000007 RBX: ffd1fff7b1a01e00 RCX: 000000000000001f
-> RDX: 0000000000000000 RSI: 0000000040000000 RDI: ffffffffb7c5c0f2
-> RBP: ffffffffb9a416a0 R08: 0000000000000000 R09: 0000000000000000
-> R10: ff110001040d0007 R11: ffe21c002081a000 R12: 0000000000000003
-> R13: 0000000000000003 R14: 0000000000000138
-> ... ...
-> BUG: kernel NULL pointer dereference, address: 0000000000000000
-> PGD 0
-> Oops: 0010 [#1] SMP KASAN NOPTI
-> CPU: 30 PID: 500 Comm: irq/124-pciehp Tainted: G S  W  5.9.0-RC2 #3
-> Hardware name: Intel Corporation xxxxxxxx
-> RIP: 0010:0x0
-> Code: Bad RIP value.
-> RSP: 0018:ff110007d5ba75e8 EFLAGS: 00010096
-> RAX: 0000000000000000 RBX: ff110001040d0000 RCX: ff110007d5ba7668
-> RDX: 0000000000000009 RSI: ff110001040d0000 RDI: ff110008119f59c0
-> RBP: ff110008119f59c0 R08: fffffbfff73f7b4d R09: fffffbfff73f7b4d
-> R10: ffffffffb9fbda67 R11: fffffbfff73f7b4c R12: 0000000000000000
-> R13: ff110007d5ba7668 R14: ff110001040d0000 R15: ff110008119f59c0
-> FS:  0000000000000000(0000) GS:ff11000811800000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: ffffffffffffffd6 CR3: 00000007cea16002 CR4: 0000000000771ee0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
-> ttwu_do_activate+0xd3/0x160
-> try_to_wake_up+0x652/0x1850
-> ? migrate_swap_stop+0xad0/0xad0
-> ? lock_contended+0xd70/0xd70
-> ? rcu_read_unlock+0x50/0x50
-> ? rcu_do_batch+0x3ff/0xb50
-> swake_up_locked+0x85/0x1c0
-> complete+0x4d/0x70
-> rcu_do_batch+0x47c/0xb50
-> ? rcu_spawn_one_nocb_kthread+0x3d0/0x3d0
-> rcu_core+0x945/0xd90
-> ? __do_softirq+0x182/0xac0
-> __do_softirq+0x1ca/0xac0
-> irq_exit_rcu+0x1e3/0x230
-> sysvec_apic_timer_interrupt+0x48/0xb0
-> asm_sysvec_apic_timer_interrupt+0x12/0x20
-> RIP: 0010:_raw_spin_unlock_irqrestore+0x40/0x50
-> Code: e8 35 ad 36 fe 48 89 ef e8 cd ce 37 fe f6 c7 02 75 11 53 9d
->  e8 91 1f 5c fe 65 ff 0d ba af c2 47 5b 5d c3 e8 d2 22 5c fe 53 9d
->  <eb> ed 0f 1f 40 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 53
-> RSP: 0018:ff110007d5ba79d0 EFLAGS: 00000293
-> RAX: 0000000000000007 RBX: 0000000000000293 RCX: ffffffffb67710d4
-> RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffffffffb83f41ce
-> RBP: ffffffffbb77e740 R08: 0000000000000000 R09: 0000000000000000
-> R10: ffffffffbb77e743 R11: fffffbfff76efce8 R12: 000000000000198e
-> R13: ff11001031d7a0b0 R14: ffffffffbb77e740 R15: ffffffffbb77e788
-> ? do_raw_spin_unlock+0x54/0x230
-> ? _raw_spin_unlock_irqrestore+0x3e/0x50
-> dma_debug_device_change+0x150/0x5e0
-> notifier_call_chain+0x90/0x160
-> __blocking_notifier_call_chain+0x6d/0xa0
-> device_release_driver_internal+0x37d/0x490
-> pci_stop_bus_device+0x123/0x190
-> pci_stop_and_remove_bus_device+0xe/0x20
-> pciehp_unconfigure_device+0x17e/0x330
-> ? pciehp_configure_device+0x3e0/0x3e0
-> ? trace_hardirqs_on+0x20/0x1b5
-> pciehp_disable_slot+0x101/0x360
-> ? pme_is_native.cold.2+0x29/0x29
-> pciehp_handle_presence_or_link_change+0x1ac/0xee0
-> ? pciehp_handle_disable_request+0x110/0x110
-> pciehp_ist.cold.11+0x39/0x54
-> ? pciehp_set_indicators+0x190/0x190
-> ? alloc_desc+0x510/0xa30
-> ? irq_set_affinity_notifier+0x380/0x380
-> ? pciehp_set_indicators+0x190/0x190
-> ? irq_thread+0x137/0x420
-> irq_thread_fn+0x86/0x150
-> irq_thread+0x21f/0x420
-> ? irq_forced_thread_fn+0x170/0x170
-> ? irq_thread_check_affinity+0x210/0x210
-> ? __kthread_parkme+0x52/0x1a0
-> ? lockdep_hardirqs_on_prepare+0x33e/0x4e0
-> ? _raw_spin_unlock_irqrestore+0x3e/0x50
-> ? trace_hardirqs_on+0x20/0x1b5
-> ? wake_threads_waitq+0x40/0x40
-> ? __kthread_parkme+0xd1/0x1a0
-> ? irq_thread_check_affinity+0x210/0x210
-> kthread+0x36a/0x430
-> ? kthread_create_worker_on_cpu+0xc0/0xc0
-> ret_from_fork+0x1f/0x30
-> ... ...
-> CR2: 0000000000000000
-> ---[ end trace cedc4047ef91d2ec ]---
-> 
-> Seems scheduling happened within hardware interrupt context, after
-> reverted this patch, stable 5.9-RC4 build was tested with more than 20
-> times NVMe SSD hotplug, no panic found.
-> 
-> This reverts commit e8c7d14ac6c37c173ec606907d38802b00302988.
-> 
-> Tested-by: Shanshan Zhang <ShanshanX.Zhang@intel.com>
-> Signed-off-by: Ethan Zhao <Haifeng.Zhao@intel.com>
-> ---
->  block/blk-core.c       |  8 --------
->  block/blk-sysfs.c      | 43 +++++++++++++++++++++---------------------
->  block/genhd.c          | 17 -----------------
->  include/linux/blkdev.h |  2 ++
->  4 files changed, 23 insertions(+), 47 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 10c08ac50697..1b18a0ef5db1 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -325,9 +325,6 @@ EXPORT_SYMBOL_GPL(blk_clear_pm_only);
->   *
->   * Decrements the refcount of the request_queue kobject. When this reaches 0
->   * we'll have blk_release_queue() called.
-> - *
-> - * Context: Any context, but the last reference must not be dropped from
-> - *          atomic context.
->   */
->  void blk_put_queue(struct request_queue *q)
->  {
-> @@ -360,14 +357,9 @@ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
->   *
->   * Mark @q DYING, drain all pending requests, mark @q DEAD, destroy and
->   * put it.  All future requests will be failed immediately with -ENODEV.
-> - *
-> - * Context: can sleep
->   */
->  void blk_cleanup_queue(struct request_queue *q)
->  {
-> -	/* cannot be called from atomic context */
-> -	might_sleep();
-> -
->  	WARN_ON_ONCE(blk_queue_registered(q));
->  
->  	/* mark @q DYING, no new request or merges will be allowed afterwards */
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 7dda709f3ccb..eb347cbe0f93 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -901,32 +901,22 @@ static void blk_exit_queue(struct request_queue *q)
->  	bdi_put(q->backing_dev_info);
->  }
->  
-> +
->  /**
-> - * blk_release_queue - releases all allocated resources of the request_queue
-> - * @kobj: pointer to a kobject, whose container is a request_queue
-> - *
-> - * This function releases all allocated resources of the request queue.
-> - *
-> - * The struct request_queue refcount is incremented with blk_get_queue() and
-> - * decremented with blk_put_queue(). Once the refcount reaches 0 this function
-> - * is called.
-> - *
-> - * For drivers that have a request_queue on a gendisk and added with
-> - * __device_add_disk() the refcount to request_queue will reach 0 with
-> - * the last put_disk() called by the driver. For drivers which don't use
-> - * __device_add_disk() this happens with blk_cleanup_queue().
-> + * __blk_release_queue - release a request queue
-> + * @work: pointer to the release_work member of the request queue to be released
->   *
-> - * Drivers exist which depend on the release of the request_queue to be
-> - * synchronous, it should not be deferred.
-> - *
-> - * Context: can sleep
-> + * Description:
-> + *     This function is called when a block device is being unregistered. The
-> + *     process of releasing a request queue starts with blk_cleanup_queue, which
-> + *     set the appropriate flags and then calls blk_put_queue, that decrements
-> + *     the reference counter of the request queue. Once the reference counter
-> + *     of the request queue reaches zero, blk_release_queue is called to release
-> + *     all allocated resources of the request queue.
->   */
-> -static void blk_release_queue(struct kobject *kobj)
-> +static void __blk_release_queue(struct work_struct *work)
->  {
-> -	struct request_queue *q =
-> -		container_of(kobj, struct request_queue, kobj);
-> -
-> -	might_sleep();
-> +	struct request_queue *q = container_of(work, typeof(*q), release_work);
->  
->  	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
->  		blk_stat_remove_callback(q, q->poll_cb);
-> @@ -958,6 +948,15 @@ static void blk_release_queue(struct kobject *kobj)
->  	call_rcu(&q->rcu_head, blk_free_queue_rcu);
->  }
->  
-> +static void blk_release_queue(struct kobject *kobj)
-> +{
-> +	struct request_queue *q =
-> +		container_of(kobj, struct request_queue, kobj);
-> +
-> +	INIT_WORK(&q->release_work, __blk_release_queue);
-> +	schedule_work(&q->release_work);
-> +}
-> +
->  static const struct sysfs_ops queue_sysfs_ops = {
->  	.show	= queue_attr_show,
->  	.store	= queue_attr_store,
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 99c64641c314..7e2edf388c8a 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -887,19 +887,12 @@ static void invalidate_partition(struct gendisk *disk, int partno)
->   * The final removal of the struct gendisk happens when its refcount reaches 0
->   * with put_disk(), which should be called after del_gendisk(), if
->   * __device_add_disk() was used.
-> - *
-> - * Drivers exist which depend on the release of the gendisk to be synchronous,
-> - * it should not be deferred.
-> - *
-> - * Context: can sleep
->   */
->  void del_gendisk(struct gendisk *disk)
->  {
->  	struct disk_part_iter piter;
->  	struct hd_struct *part;
->  
-> -	might_sleep();
-> -
->  	blk_integrity_del(disk);
->  	disk_del_events(disk);
->  
-> @@ -1553,15 +1546,11 @@ int disk_expand_part_tbl(struct gendisk *disk, int partno)
->   * drivers we also call blk_put_queue() for them, and we expect the
->   * request_queue refcount to reach 0 at this point, and so the request_queue
->   * will also be freed prior to the disk.
-> - *
-> - * Context: can sleep
->   */
->  static void disk_release(struct device *dev)
->  {
->  	struct gendisk *disk = dev_to_disk(dev);
->  
-> -	might_sleep();
-> -
->  	blk_free_devt(dev->devt);
->  	disk_release_events(disk);
->  	kfree(disk->random);
-> @@ -1806,9 +1795,6 @@ EXPORT_SYMBOL(get_disk_and_module);
->   *
->   * This decrements the refcount for the struct gendisk. When this reaches 0
->   * we'll have disk_release() called.
-> - *
-> - * Context: Any context, but the last reference must not be dropped from
-> - *          atomic context.
->   */
->  void put_disk(struct gendisk *disk)
->  {
-> @@ -1823,9 +1809,6 @@ EXPORT_SYMBOL(put_disk);
->   *
->   * This is a counterpart of get_disk_and_module() and thus also of
->   * get_gendisk().
-> - *
-> - * Context: Any context, but the last reference must not be dropped from
-> - *          atomic context.
->   */
->  void put_disk_and_module(struct gendisk *disk)
->  {
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index bb5636cc17b9..59fe9de342e0 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -583,6 +583,8 @@ struct request_queue {
->  
->  	size_t			cmd_size;
->  
-> +	struct work_struct	release_work;
-> +
->  #define BLK_MAX_WRITE_HINTS	5
->  	u64			write_hints[BLK_MAX_WRITE_HINTS];
->  };
-> -- 
-> 2.18.4
-> 
----end quoted text---
+This happens because Kyber doesn't track flush requests, so
+kyber_finish_request() reads a garbage domain token. Only call the
+scheduler's requeue_request() hook if RQF_ELVPRIV is set (like we do for
+the finish_request() hook in blk_mq_free_request()). Now that we're
+handling it in blk-mq, also remove the check from BFQ.
+
+Reported-by: Yang Yang <yang.yang@vivo.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ block/bfq-iosched.c  | 12 ------------
+ block/blk-mq-sched.h |  2 +-
+ 2 files changed, 1 insertion(+), 13 deletions(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index a4c0bec920cb..ee767fa000e4 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5895,18 +5895,6 @@ static void bfq_finish_requeue_request(struct request *rq)
+ 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
+ 	struct bfq_data *bfqd;
+ 
+-	/*
+-	 * Requeue and finish hooks are invoked in blk-mq without
+-	 * checking whether the involved request is actually still
+-	 * referenced in the scheduler. To handle this fact, the
+-	 * following two checks make this function exit in case of
+-	 * spurious invocations, for which there is nothing to do.
+-	 *
+-	 * First, check whether rq has nothing to do with an elevator.
+-	 */
+-	if (unlikely(!(rq->rq_flags & RQF_ELVPRIV)))
+-		return;
+-
+ 	/*
+ 	 * rq either is not associated with any icq, or is an already
+ 	 * requeued request that has not (yet) been re-inserted into
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 126021fc3a11..e81ca1bf6e10 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -66,7 +66,7 @@ static inline void blk_mq_sched_requeue_request(struct request *rq)
+ 	struct request_queue *q = rq->q;
+ 	struct elevator_queue *e = q->elevator;
+ 
+-	if (e && e->type->ops.requeue_request)
++	if ((rq->rq_flags & RQF_ELVPRIV) && e && e->type->ops.requeue_request)
+ 		e->type->ops.requeue_request(rq);
+ }
+ 
+-- 
+2.28.0
+
