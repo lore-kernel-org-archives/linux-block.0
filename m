@@ -2,122 +2,73 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B54C43461
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 16:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DC7C433E2
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:48:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 251DB206E7
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 16:42:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="georDWjw"
+	by mail.kernel.org (Postfix) with ESMTP id 59DFF2064B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:48:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732084AbgIHQlV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 12:41:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60574 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732039AbgIHQhP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 12:37:15 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E79C0A3BF9;
-        Tue,  8 Sep 2020 07:56:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=qhhv9Hm93hbrEWUTmerzcHfYJ5eCRp8QXVw+0H+lRDo=; b=georDWjwq0N5HilZmlDSCDWJeZ
-        f8oJjOYDfJUCfRFx5Z3VmT+Tlcdr6V8JfV/pMKw9EmaZ5huEBNXFbahQXQvMIbjPhEcMP8y+TcPt0
-        M/rYM8SI7fm/88ci7wbJMgZSasAoiMbM45H8jf2XImil3qlEHlK2UPgwxyr/WGWZT0Jpn96MTcHit
-        ePM6bzVpuje/sMhrk6ZMN8IWgjqYDJB12fDjKAoitSvlVk1R74pfQHirCs4B2wFPop2jiUUJtrHxp
-        Mp+8BmLcmIlGy34HnXzw00JG+emkTXiqd6ripTWqqFlPmj704iX0t4bdzllFnZ3aSVoRY+JDkk0nB
-        uEHP9pqA==;
-Received: from [2001:4bb8:184:af1:3dc3:9c83:fc6c:e0f] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kFf1Q-00031Z-Bh; Tue, 08 Sep 2020 14:55:01 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
-        Michal Simek <michal.simek@xilinx.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Finn Thain <fthain@telegraphics.com.au>,
-        Michael Schmitz <schmitzmic@gmail.com>,
-        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 19/19] block: remove check_disk_change
-Date:   Tue,  8 Sep 2020 16:53:47 +0200
-Message-Id: <20200908145347.2992670-20-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200908145347.2992670-1-hch@lst.de>
-References: <20200908145347.2992670-1-hch@lst.de>
+        id S1726272AbgIHRsF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 13:48:05 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2797 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731982AbgIHRsC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Sep 2020 13:48:02 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id C8C77FFD658B0BA32181;
+        Tue,  8 Sep 2020 14:41:22 +0100 (IST)
+Received: from [127.0.0.1] (10.47.6.45) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 8 Sep 2020
+ 14:41:21 +0100
+Subject: Re: [PATCH v8 00/18] blk-mq/scsi: Provide hostwide shared tags for
+ SCSI HBAs
+To:     Hannes Reinecke <hare@suse.de>, <axboe@kernel.dk>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <don.brace@microsemi.com>, <kashyap.desai@broadcom.com>,
+        <ming.lei@redhat.com>, <bvanassche@acm.org>,
+        <dgilbert@interlog.com>, <paolo.valente@linaro.org>, <hch@lst.de>
+CC:     <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
+        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>
+References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
+ <cef0e816-1b30-dd62-0f39-2842df766298@suse.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <51a599a0-0952-ced1-ad78-89012c46f5eb@huawei.com>
+Date:   Tue, 8 Sep 2020 14:38:43 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <cef0e816-1b30-dd62-0f39-2842df766298@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.6.45]
+X-ClientProxiedBy: lhreml727-chm.china.huawei.com (10.201.108.78) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the now unused check_disk_change helper.
+On 08/09/2020 13:46, Hannes Reinecke wrote:
+> Now that Jens merged the block bits in his tree, wouldn't it be better
+> to re-send the SCSI bits only, thereby avoiding a potential merge error
+> later on?
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- fs/block_dev.c        | 20 --------------------
- include/linux/genhd.h |  1 -
- 2 files changed, 21 deletions(-)
+Anything which I resend would need to be against Jens' tree (and not 
+Martin's), assuming Jens will carry them also. So I am not sure how that 
+will help.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index c6ac0bd22eca70..0b34955b9e360f 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1368,26 +1368,6 @@ void revalidate_disk_size(struct gendisk *disk, bool verbose)
- }
- EXPORT_SYMBOL(revalidate_disk_size);
- 
--/*
-- * This routine checks whether a removable media has been changed,
-- * and invalidates all buffer-cache-entries in that case. This
-- * is a relatively slow routine, so we have to try to minimize using
-- * it. Thus it is called only upon a 'mount' or 'open'. This
-- * is the best way of combining speed and utility, I think.
-- * People changing diskettes in the middle of an operation deserve
-- * to lose :-)
-- */
--int check_disk_change(struct block_device *bdev)
--{
--	if (!bdev_check_media_change(bdev))
--		return 0;
--	if (bdev->bd_disk->fops->revalidate_disk)
--		bdev->bd_disk->fops->revalidate_disk(bdev->bd_disk);
--	return 1;
--}
--
--EXPORT_SYMBOL(check_disk_change);
--
- void bd_set_nr_sectors(struct block_device *bdev, sector_t sectors)
- {
- 	spin_lock(&bdev->bd_size_lock);
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 322d48a207728a..1c97cf84f011a7 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -370,7 +370,6 @@ int register_blkdev(unsigned int major, const char *name);
- void unregister_blkdev(unsigned int major, const char *name);
- 
- void revalidate_disk_size(struct gendisk *disk, bool verbose);
--int check_disk_change(struct block_device *bdev);
- bool bdev_check_media_change(struct block_device *bdev);
- int __invalidate_device(struct block_device *bdev, bool kill_dirty);
- void bd_set_nr_sectors(struct block_device *bdev, sector_t sectors);
--- 
-2.28.0
+JFYI, I just tested against today's linux-next, and the SCSI parts (hpsa 
+and smartpqi omitted) still apply there without conflict.
 
+Thanks,
+John
