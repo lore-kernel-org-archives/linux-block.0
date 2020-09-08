@@ -5,38 +5,38 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03AC7C43461
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9126BC43461
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:45:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C57B4207DE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:45:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56BD320768
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 19:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fToRuRTL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O86Gx79j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731791AbgIHTpM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 15:45:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52770 "EHLO
+        id S1730755AbgIHTp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 15:45:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730776AbgIHPvm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 11:51:42 -0400
+        with ESMTP id S1730785AbgIHPux (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 11:50:53 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB37C0A3BF7;
-        Tue,  8 Sep 2020 07:55:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B47C0A3BF3;
+        Tue,  8 Sep 2020 07:55:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=fs8KDvUlBtih+JNIUNQobEQslvMWHTx5fiB3hsIGlEU=; b=fToRuRTLBzkwhKm/TBMIAObCfx
-        47SjRyodcVFkso9Pdp1Z4yO8OZ3afLCOAU2HivmVTsp3tP1Bs88OMnOZB7haSutu6gHet6t4VM3wp
-        yw1Wa+3VlMgjCzG1XqrEZAep3+D15GDpvLTW/mHCdv6Urlj/XZbc1Mi4vvIbLWP2FZPmjUyJsZ1Vv
-        yi0qc4NmeefS23wziWDUVQUXwMIwfzTbyLWpaBN3N8hJtzG+iTWHHG4AwwJjrYLudG25EJeXDoso9
-        RVK0YroYrfuP2PbYDLdLaevlsiDgFf5Jm5RM70YkGXbQXegJusJEa/ZMQ6NYGQUa1p9Yi1HBUDqt/
-        tlSbZePw==;
+        bh=2GZkfuA3+QyfRSiQ2N97BGanWRbnzEKE1BjaKC2IVN0=; b=O86Gx79j7ucuqz3TrvYr5EhBje
+        C/oXMrJ4WKO+yXmV5+sEymlVehTXk5/DJHhU56HU8sZwFYJkVImwpqAIkpHP+4EWRYPElWZiHYOM6
+        JTZMo9BmExshb9Jf6gNZS9KtEWre2XgSZfWpPVMZiBKs6/L5nAKx7wUjaCgd0ReBO4AGXHH3GPk+g
+        Yz+CuWAi3DCOsLerWzlAbZQl8BRFgPaDjM/RU99uFzag9/3bWPk0BA7PL1ADUFQSlb4n4zKqFMNm8
+        9AkDGdP+jy2+m0yoDmziq8oEchHj71jWkTkYxD1oRD5cXAhb772Yh2Q2AyPOONiMgMtwmoVZ165dU
+        ycWvFAhw==;
 Received: from [2001:4bb8:184:af1:3dc3:9c83:fc6c:e0f] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kFf1I-00030J-0O; Tue, 08 Sep 2020 14:54:58 +0000
+        id 1kFf17-0002yr-30; Tue, 08 Sep 2020 14:54:42 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
@@ -52,9 +52,9 @@ Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
         linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
         linux-fsdevel@vger.kernel.org,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 18/19] sr: simplify sr_block_revalidate_disk
-Date:   Tue,  8 Sep 2020 16:53:46 +0200
-Message-Id: <20200908145347.2992670-19-hch@lst.de>
+Subject: [PATCH 13/19] ide-cd: remove idecd_revalidate_disk
+Date:   Tue,  8 Sep 2020 16:53:41 +0200
+Message-Id: <20200908145347.2992670-14-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200908145347.2992670-1-hch@lst.de>
 References: <20200908145347.2992670-1-hch@lst.de>
@@ -66,91 +66,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Both callers have a valid CD struture available, so rely on that instead
-of getting another reference.  Also move the function to avoid a forward
-declaration.
+Just merge the trivial function into its only caller.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- drivers/scsi/sr.c | 36 +++++++++++++-----------------------
- 1 file changed, 13 insertions(+), 23 deletions(-)
+ drivers/ide/ide-cd.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index 34be94b62523fa..2b43c0f97442d4 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -86,7 +86,6 @@ static int sr_remove(struct device *);
- static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt);
- static int sr_done(struct scsi_cmnd *);
- static int sr_runtime_suspend(struct device *dev);
--static int sr_block_revalidate_disk(struct gendisk *disk);
+diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
+index 6a38cbc80aea0d..25d2d88e82ada0 100644
+--- a/drivers/ide/ide-cd.c
++++ b/drivers/ide/ide-cd.c
+@@ -56,7 +56,6 @@ static DEFINE_MUTEX(ide_cd_mutex);
+ static DEFINE_MUTEX(idecd_ref_mutex);
  
- static const struct dev_pm_ops sr_pm_ops = {
- 	.runtime_suspend	= sr_runtime_suspend,
-@@ -518,6 +517,17 @@ static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
- 	return ret;
- }
+ static void ide_cd_release(struct device *);
+-static int idecd_revalidate_disk(struct gendisk *disk);
  
-+static void sr_revalidate_disk(struct scsi_cd *cd)
-+{
-+	struct scsi_sense_hdr sshdr;
-+
-+	/* if the unit is not ready, nothing more to do */
-+	if (scsi_test_unit_ready(cd->device, SR_TIMEOUT, MAX_RETRIES, &sshdr))
-+		return;
-+	sr_cd_check(&cd->cdi);
-+	get_sectorsize(cd);
-+}
-+
- static int sr_block_open(struct block_device *bdev, fmode_t mode)
+ static struct cdrom_info *ide_cd_get(struct gendisk *disk)
  {
- 	struct scsi_cd *cd;
-@@ -531,7 +541,7 @@ static int sr_block_open(struct block_device *bdev, fmode_t mode)
- 	sdev = cd->device;
- 	scsi_autopm_get_device(sdev);
- 	if (bdev_check_media_change(bdev))
--		sr_block_revalidate_disk(bdev->bd_disk);
-+		sr_revalidate_disk(cd);
+@@ -1612,8 +1611,11 @@ static int idecd_open(struct block_device *bdev, fmode_t mode)
+ 	struct cdrom_info *info;
+ 	int rc = -ENXIO;
  
- 	mutex_lock(&cd->lock);
- 	ret = cdrom_open(&cd->cdi, bdev, mode);
-@@ -660,26 +670,6 @@ static unsigned int sr_block_check_events(struct gendisk *disk,
- 	return ret;
+-	if (bdev_check_media_change(bdev))
+-		idecd_revalidate_disk(bdev->bd_disk);
++	if (bdev_check_media_change(bdev)) {
++		info = ide_drv_g(bdev->bd_disk, cdrom_info);
++
++		ide_cd_read_toc(info->drive);
++	}
+ 
+ 	mutex_lock(&ide_cd_mutex);
+ 	info = ide_cd_get(bdev->bd_disk);
+@@ -1755,15 +1757,6 @@ static unsigned int idecd_check_events(struct gendisk *disk,
+ 	return cdrom_check_events(&info->devinfo, clearing);
  }
  
--static int sr_block_revalidate_disk(struct gendisk *disk)
+-static int idecd_revalidate_disk(struct gendisk *disk)
 -{
--	struct scsi_sense_hdr sshdr;
--	struct scsi_cd *cd;
+-	struct cdrom_info *info = ide_drv_g(disk, cdrom_info);
 -
--	cd = scsi_cd_get(disk);
--	if (!cd)
--		return -ENXIO;
+-	ide_cd_read_toc(info->drive);
 -
--	/* if the unit is not ready, nothing more to do */
--	if (scsi_test_unit_ready(cd->device, SR_TIMEOUT, MAX_RETRIES, &sshdr))
--		goto out;
--
--	sr_cd_check(&cd->cdi);
--	get_sectorsize(cd);
--out:
--	scsi_cd_put(cd);
--	return 0;
+-	return  0;
 -}
 -
- static const struct block_device_operations sr_bdops =
- {
- 	.owner		= THIS_MODULE,
-@@ -803,7 +793,7 @@ static int sr_probe(struct device *dev)
- 
- 	dev_set_drvdata(dev, cd);
- 	disk->flags |= GENHD_FL_REMOVABLE;
--	sr_block_revalidate_disk(disk);
-+	sr_revalidate_disk(cd);
- 	device_add_disk(&sdev->sdev_gendev, disk, NULL);
- 
- 	sdev_printk(KERN_DEBUG, sdev,
+ static const struct block_device_operations idecd_ops = {
+ 	.owner			= THIS_MODULE,
+ 	.open			= idecd_open,
 -- 
 2.28.0
 
