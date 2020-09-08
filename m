@@ -2,75 +2,85 @@ Return-Path: <SRS0=nGx8=CR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2ECC433E2
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B839CC433E2
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:55:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F5182074B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:54:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="05bWWGmp"
+	by mail.kernel.org (Postfix) with ESMTP id 7DF8D2074B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Sep 2020 17:55:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732134AbgIHRx5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 13:53:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56710 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731384AbgIHQMt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 12:12:49 -0400
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81E1AC08C5EB
-        for <linux-block@vger.kernel.org>; Tue,  8 Sep 2020 07:19:02 -0700 (PDT)
-Received: by mail-io1-xd43.google.com with SMTP id r9so17277005ioa.2
-        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2020 07:19:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DemIwnZBOAelJc9ndnKzywBy6oDjyjMd6qeSuxjV6/Y=;
-        b=05bWWGmpTiYPIGyxq61v7vr4QS2c4zYxlISMCZeCw2r8FT8FELBeaLJ4iLGUaq2mDv
-         K7MoPl6/Tw9vqYEpcIaHSaIVuBXEDr/df/SAsR7AIiWTWpwfXsvZYPc2htDsoD2u6Xbt
-         lkY9/ny34iIa26HSoA5ADdRauF70ra8e2+cmWwqNMiJCMs9pwBysVvpWB1ta5EfqPsHI
-         UN24o3XhohWojNjqGJQsY75IqnF/O34A0FfUJTFa9VpWnPTets56jYv7RglTFlZhunvx
-         nurAEORS+IsBtNCU/0p8T572fmYpHrtGh3+DCGYozkK7yhRbZXjPHkUuhDnQzKrrZ+LP
-         nZ6w==
+        id S1732154AbgIHRyY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 13:54:24 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:37120 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731590AbgIHRyR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Sep 2020 13:54:17 -0400
+Received: by mail-pg1-f193.google.com with SMTP id 5so93265pgl.4
+        for <linux-block@vger.kernel.org>; Tue, 08 Sep 2020 10:54:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DemIwnZBOAelJc9ndnKzywBy6oDjyjMd6qeSuxjV6/Y=;
-        b=M7t6YYw31q28xuyZjBsUSOK2fLWwrA1LTtSAicePMsfb/L6VjMfB1K/cXHHIoj+46a
-         aVgShacL+5pe6WW+r5zjoD700GP/x3jHwGe5vNBots0ozob63xcTU0mnwfuqcTfZUWZ4
-         5EaFTCN8QAoA9yiVsP8SZKBO2MPTvr7wlF+XIQKZ3vcq0etkb1sifuSC2yfZFmdDKEax
-         b/jBJr7U6q1qRdkDyiCRcrte2zNE4N+ZgQIa3+LFROslg63EWU1OAKt4xP4vgPrJdG36
-         959kg2Wpj2u9ElPcKZc+q6r+JODLSo2YWSrPfy1oedrO8lFGCCXBb7jsJRMUxdSWRJQF
-         HtqQ==
-X-Gm-Message-State: AOAM530t8Hqn0IR5u24ex7bQy16he3JsDFi1HUbJBjml0aNANYTp6vlL
-        mY+WNaup8wVV4pCcEwigd9V0HQ==
-X-Google-Smtp-Source: ABdhPJyDRTODxDtwAm8U1Xo7FPEaOc3DYhFgy3Lj7hzraxP7yYhKY0YjO8CZ85BHYZ7+Dwn2/9YdZQ==
-X-Received: by 2002:a6b:7f41:: with SMTP id m1mr20938987ioq.62.1599574741852;
-        Tue, 08 Sep 2020 07:19:01 -0700 (PDT)
-Received: from [192.168.1.10] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id x24sm10399566ilk.82.2020.09.08.07.19.00
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=cBTvIhJcHXVYn/Psbin1MuPoVps99Y51xyc6PCUNeBs=;
+        b=Wk0VJrwN9btLHwzrt4P2ca84Q04k0WsDvmrNDvBFYBd8ycfBVQ67wN8pL0Aj7sy/i8
+         STTLrlmKQjpJW/jCudTDSZKvt1EYOMDNoGXgfRncXsSB+pzEIOAwVHKDpmfL/753GWuU
+         yVad0cs+SpivDYWAbNC3mkD4EIfEtCObieZKH5oxHl6or/doHTA2X2f/KNmqW0Oxmbci
+         4HdQHCXbHObGKCE+lilCvOcG2A1RZmacphYvWEUaUDH0zC+JuvOTA0YZVXdTrTuOo3f7
+         MMH8ZoiF+dwlKn8uklvoAFI1Cqw3cz0K//MTwvst/y62Hoz26n0bWLAX8ucEl+zH6ayy
+         anLg==
+X-Gm-Message-State: AOAM533akq65jkNoFveYDFfW7uqT/NP8Y8YDVlkpXShlXo6VTkxQIpyA
+        MlJ9ClWnob1hzZwv19LqxZE=
+X-Google-Smtp-Source: ABdhPJzQ5uDDhvKRVEsDZ0KdoJBATv/6i6yPhqxvJhpfUJDybvOcwxCT8S6xUIxR+zI+43JOJhT+NA==
+X-Received: by 2002:a63:a54a:: with SMTP id r10mr21415495pgu.5.1599587656769;
+        Tue, 08 Sep 2020 10:54:16 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:fb09:e536:da63:a7cd? ([2601:647:4000:d7:fb09:e536:da63:a7cd])
+        by smtp.gmail.com with ESMTPSA id j19sm88376pfi.51.2020.09.08.10.54.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Sep 2020 07:19:01 -0700 (PDT)
-Subject: Re: [PATCH] block: restore a specific error code in
- bdev_del_partition
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org,
-        kernel test robot <rong.a.chen@intel.com>
-References: <20200908141506.2894221-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <71fd3136-e5ca-2f16-7fb6-790f11274356@kernel.dk>
-Date:   Tue, 8 Sep 2020 08:19:00 -0600
+        Tue, 08 Sep 2020 10:54:16 -0700 (PDT)
+Subject: Re: [PATCH V3 1/4] blk-mq: serialize queue quiesce and unquiesce by
+ mutex
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>
+References: <20200908081538.1434936-1-ming.lei@redhat.com>
+ <20200908081538.1434936-2-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <8e040e37-d1df-ea5f-8a63-f4067d092b72@acm.org>
+Date:   Tue, 8 Sep 2020 10:54:14 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200908141506.2894221-1-hch@lst.de>
+In-Reply-To: <20200908081538.1434936-2-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,13 +89,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/8/20 8:15 AM, Christoph Hellwig wrote:
-> mdadm relies on the fact that deleting an invalid partition returns
-> -ENXIO or -ENOTTY to detect if a block device is a partition or a
-> whole device.
+On 2020-09-08 01:15, Ming Lei wrote:
+>  void blk_mq_unquiesce_queue(struct request_queue *q)
+>  {
+> +	mutex_lock(&q->mq_quiesce_lock);
+> +
+>  	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+>  
+>  	/* dispatch requests which are inserted during quiescing */
+>  	blk_mq_run_hw_queues(q, true);
+> +
+> +	mutex_unlock(&q->mq_quiesce_lock);
+>  }
+Has the sunvdc driver been retested? It calls blk_mq_unquiesce_queue()
+with a spinlock held. As you know calling mutex_lock() while holding a
+spinlock is not allowed.
 
-Applied, thanks.
+There may be other drivers than the sunvdc driver that do this.
 
--- 
-Jens Axboe
+Thanks,
 
+Bart.
