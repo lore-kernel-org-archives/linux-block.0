@@ -2,122 +2,131 @@ Return-Path: <SRS0=1Rjj=CS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D84C433E2
-	for <linux-block@archiver.kernel.org>; Wed,  9 Sep 2020 07:05:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47796C433E2
+	for <linux-block@archiver.kernel.org>; Wed,  9 Sep 2020 07:09:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AC9821741
-	for <linux-block@archiver.kernel.org>; Wed,  9 Sep 2020 07:05:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D902621919
+	for <linux-block@archiver.kernel.org>; Wed,  9 Sep 2020 07:09:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jDteIycs";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="FfZjxtxp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728197AbgIIG7t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Sep 2020 02:59:49 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54826 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726426AbgIIG7j (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Sep 2020 02:59:39 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id B1372AD77;
-        Wed,  9 Sep 2020 06:59:34 +0000 (UTC)
-Subject: Re: [PATCH 01/19] block: add a bdev_check_media_change helper
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
-        Michal Simek <michal.simek@xilinx.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Finn Thain <fthain@telegraphics.com.au>,
-        Michael Schmitz <schmitzmic@gmail.com>,
-        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20200908145347.2992670-1-hch@lst.de>
- <20200908145347.2992670-2-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <55971456-47ca-221a-51c6-a9665c6c0f8f@suse.de>
-Date:   Wed, 9 Sep 2020 08:59:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20200908145347.2992670-2-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+        id S1726169AbgIIHJw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Sep 2020 03:09:52 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:26303 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727880AbgIIHJs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Sep 2020 03:09:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1599635403; x=1631171403;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=dO/7jErUwDdx79D3jC++WEIADfSjog9VHfqdz8/50Eg=;
+  b=jDteIycsfVbC6vJ7/hB9pLlroBgQ6IT0hrDivQa9wFK37xx8ya0W9tUs
+   Y5QEUNXZwnNpsndfKHz7qSBy4YC0huZuH3PWa9F6ox+5uYtxYsbYNfh+x
+   NY2BPkgBT6j3iJlX4657LCC8fV6R3Li5O2XcsK27Kpw9W35OZtUOjg4vy
+   IqqK0OjzrPfmJXYAsnNRI8NrPZfHb0lAjMJlleI112bJGGxpno5lzqU+D
+   SysS5TyjQlNkyi4CoZiphDSnA0SlBB+CRSJkaxPNmapTQFJ9KAGBTdvQp
+   hC73PZbD9AOCjbcDetCuUZM/D+Uv/y/zbzmDDhzKcSuKTxwAScCGOhzLp
+   w==;
+IronPort-SDR: oPEyws/G8pNkXxt4p3xdeDTVEd68aaE5CLd066Df/LHoHVWcJAODiRtknEjeaYksTnY9VBNmtc
+ uzCemk5MkK3JkDerYgcbM9QyCobv9MGPdS+5RaRpw6s/r8ixCSTftHb1Dl8Q0tlSj17NTFLSxp
+ V17eafywZIDvxgA1CFUPqJpktwhvhQaX+1JrB/XUzVQA//IodT8K2/rzbQmonxxvFft4nWOWll
+ klucVgrrnHMZVuh0exj3gWMzfNOBzPGi/oALrwKlEVqBJsBt1wazZwkHh8t0VbC64cdKZ/V/QK
+ iao=
+X-IronPort-AV: E=Sophos;i="5.76,408,1592841600"; 
+   d="scan'208";a="250201995"
+Received: from mail-bn3nam04lp2058.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.58])
+  by ob1.hgst.iphmx.com with ESMTP; 09 Sep 2020 15:09:59 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ntiLihPuvN0cRoWPOvED02Y2P0hIwFUcLvYnYKDTLAswpiQrr00joiLaT+99yfmVqYnugR4BI2eoeGYsKZPHnFwKSswpT9yzUWXPzjEV8JDDD5zgHUh3qlpGUiNgVsg7LjsKYorp4AM/yQYPXLzWQA1pak4Pkq1uMnOQ5NYnWyiPIw6B72Frhyszt7/UQE/urnoP4iKnk6BvZ3YmKhQf9gVB/x+f9+NnYB+hb1NW7Mx6SUpyP8dImF5bs4YtY0lTQlKZa9wZj12CD3dMcMktSibrEtBPGoZQ6cnpxM46s4Zc+W/EN84g+VpZ0AVh49f/gA4uGXA+Pmeb8+1VpRxM5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dO/7jErUwDdx79D3jC++WEIADfSjog9VHfqdz8/50Eg=;
+ b=j9bcsueRtQEkyQFZ6vKvcoZPOYui6Ou9TIhRoRLVLOABq9nvK5MpB7i9fZCNFtHzS5obMFn3+gyS0YoVMUhxneFHjjCWLxN+jeptC1xTdAOHnjITZPGYMO7yjub92xuCzganWnC68PHd6Z2ajQTCxiMXwvfwWje2edV+GA2Mtv6aWKip5Mf4G0kgTvZhu5IX8D7Qnx+Fu+2QiAiufW+7frdFH0qjQqTc09xS+aCKNpyI9Cg1M7kzbKtYcWcSdKeljEqVHDoeGDF2i14BLs+NRuFM2TNBcn7i7cYkTn0U/K2RR5Mh1j51uqj22OO02tSt8o3gYEe2doGamjgsnAvSjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dO/7jErUwDdx79D3jC++WEIADfSjog9VHfqdz8/50Eg=;
+ b=FfZjxtxpEYVbahStzi/GVVW975caPrTT2rvYXY0b7QbXLMjO3HeRi7ql6WZVVImebG3QuloRifeGumUZWh/vnS5w61fsnfZugJ+XTwsO/rnjRPjWyYnsEBZTt8fbtRqVqh4QA2a229BAdBjAPWwhvKt/weN1x8/psMSVjt6z8jI=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN6PR04MB4157.namprd04.prod.outlook.com
+ (2603:10b6:805:37::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.17; Wed, 9 Sep
+ 2020 07:09:43 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::457e:5fe9:2ae3:e738]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::457e:5fe9:2ae3:e738%7]) with mapi id 15.20.3348.019; Wed, 9 Sep 2020
+ 07:09:43 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Miaohe Lin <linmiaohe@huawei.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "hare@suse.de" <hare@suse.de>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: Fix potential page reference leak in
+ __bio_iov_append_get_pages()
+Thread-Topic: [PATCH] block: Fix potential page reference leak in
+ __bio_iov_append_get_pages()
+Thread-Index: AQHWg2i/1CaIpgFNnUmvex8bQJvNOQ==
+Date:   Wed, 9 Sep 2020 07:09:43 +0000
+Message-ID: <SN4PR0401MB359839DF2BDDBA6BC08ECA369B260@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20200905094006.1925-1-linmiaohe@huawei.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: huawei.com; dkim=none (message not signed)
+ header.d=none;huawei.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [62.216.205.181]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: c247e210-9cfb-43b9-c597-08d8548f53d4
+x-ms-traffictypediagnostic: SN6PR04MB4157:
+x-microsoft-antispam-prvs: <SN6PR04MB4157C61A32CF3F30618533E59B260@SN6PR04MB4157.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: amCYkkIoKvdGe81MBHpxprdkdN5+2IWlWEdq9bxNXmZ5eyU2uw0k6iYSF48eU8Cy5v54wX//YpW4ovO12nDfW0Y/zIiZp3RPpfBFu2KJVbvxZ8EenZbAYmwQRLlzRKjj+6OcJ6i6p7Vc0AcU2hh8d/4/kxQ3cgyvFnbw5Q1kK+m0nEcIE8nLBEFvFYZZXeve2aIeEZrVjbehvaWMwMr+ge3NqcA4UqEutcvox6mtMJFMaklzEG4QouAWRxu87U9njgoAaJ6NeBY5kGHn/zdj8HwG4iYQ+0QSu60AJBGZnzO4ydMaWSuEaXlbO2Jr2sBbEazr0l3nubsoF42rWxzY4A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(396003)(136003)(366004)(346002)(376002)(9686003)(316002)(7696005)(8676002)(5660300002)(66946007)(71200400001)(66556008)(66446008)(91956017)(2906002)(76116006)(66476007)(64756008)(4326008)(52536014)(33656002)(110136005)(54906003)(53546011)(558084003)(6506007)(26005)(186003)(55016002)(8936002)(86362001)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: 4zQC5pphrpijZv8m/GbcYhvcMFFB/ST+kuUA0mbE6oY+ndDaam/XUo9XjJKvHRgAuevLraCOyS1430oq9Qkooa9SwRjcVwcyG3lDB8QPMAYdZVZ/g9177WG7T7sdE6wv3ukHeFvyHep3ZiULnyPGHuTSM/N+KR2QejvUmASJgMT5ck4FdK+yoImDaGN8X5RS37yuA5KvXT+6RGRaBJ5RLEiZe8v/7Zakr+/whcwpSMVhaHdcGFYxiHE14dpw6GQCIYdN0b+LJxupLxdRnaQlqUg4K9rWv4YnUe6aTc6Y9ZVfU0MNFDdvc5zowL/CXlebYCkj3Dqaf+CD99ZLOdp6jujOD9+a/UCjOVYgyJIAOHfbjns2S4ZQDx478TuXckgBgJ044+ylu1IEsTFXT9HevyA2aTCB5/r780wnCMrHlI/Z4Ka9oN/PMhEakLrcbbtmJYqouGvKdimCINZcMoY4c63ELMslT0GDGl+j7h55wcLUcRxoM69T7S5aEYKtxCsCxiC+KZ5hi6uymeItattnEgek7YzQMZoW/Z/bUrC0xSF0TaUl1ygNZIgTOW2XEf01lx0x32Zjw2JBiu3nDrquF0VW86szjPhyY/81ZMSA4dbIDhFg6GBZT/S2SkbiEsWCeY0a9RyBYXjXFvWL9TyqFw==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c247e210-9cfb-43b9-c597-08d8548f53d4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Sep 2020 07:09:43.4995
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4pSAijLWni1YfWNoJM/o0qFZEMNEVz3mD2gxnt16ujIC2jprBpi59fIKJYgoVPJ0Yd66tUt72Rh6ATos7rXgu2YItiW3T/7K1OUZPiY7bxY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4157
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/8/20 4:53 PM, Christoph Hellwig wrote:
-> Like check_disk_changed, except that it does not call ->revalidate_disk
-> but leaves that to the caller.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
->  block/genhd.c         | 29 ++++++++++++++++++++++++++++-
->  fs/block_dev.c        | 17 +++--------------
->  include/linux/genhd.h |  2 +-
->  3 files changed, 32 insertions(+), 16 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+On 05/09/2020 11:41, Miaohe Lin wrote:=0A=
+> When bio_add_hw_page() failed, we left page reference still held in pages=
+.=0A=
+=0A=
+I'd add "from iov_iter_get_pages()" to the above sentence.=0A=
+=0A=
+Otherwise=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
