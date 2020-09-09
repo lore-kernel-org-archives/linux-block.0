@@ -2,93 +2,87 @@ Return-Path: <SRS0=1Rjj=CS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 667B1C433E2
-	for <linux-block@archiver.kernel.org>; Wed,  9 Sep 2020 01:19:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E61EC433E2
+	for <linux-block@archiver.kernel.org>; Wed,  9 Sep 2020 01:22:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17F26218AC
-	for <linux-block@archiver.kernel.org>; Wed,  9 Sep 2020 01:19:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eJq9fp+n"
+	by mail.kernel.org (Postfix) with ESMTP id 59130216C4
+	for <linux-block@archiver.kernel.org>; Wed,  9 Sep 2020 01:22:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbgIIBTe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Sep 2020 21:19:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40669 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726002AbgIIBTe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Sep 2020 21:19:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599614373;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Gf75B6Udqf9iPOzPF2w9rijRVVDFIq7lsR+ojBwz+4k=;
-        b=eJq9fp+nYhAbk4mR9vYT/DT1bs8snBCuFGPKatk+mbC3WMaEk+obb1wSmrPYRRyeG095HZ
-        WCdDIkRGptirKDyhwthGwJn2k3gBBG0P60J7rlug7vwlbBfs2jkOXoHOitZYqJ6daYAWHm
-        V76qoD45U3nEE7VQMs7gLM2ocgyA94k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-Ceczz7n6PMSNJVVC4SLU4A-1; Tue, 08 Sep 2020 21:19:29 -0400
-X-MC-Unique: Ceczz7n6PMSNJVVC4SLU4A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8B7D109106A;
-        Wed,  9 Sep 2020 01:19:27 +0000 (UTC)
-Received: from T590 (ovpn-12-76.pek2.redhat.com [10.72.12.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EDF91002D5A;
-        Wed,  9 Sep 2020 01:19:19 +0000 (UTC)
-Date:   Wed, 9 Sep 2020 09:19:16 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chao Leng <lengchao@huawei.com>
-Subject: Re: [PATCH V3 2/4] blk-mq: implement queue quiesce via percpu_ref
- for BLK_MQ_F_BLOCKING
-Message-ID: <20200909011916.GB1465199@T590>
-References: <20200908081538.1434936-1-ming.lei@redhat.com>
- <20200908081538.1434936-3-ming.lei@redhat.com>
- <20200908153108.GA3341002@dhcp-10-100-145-180.wdl.wdc.com>
+        id S1726605AbgIIBWy convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Sep 2020 21:22:54 -0400
+Received: from smtp.h3c.com ([60.191.123.50]:42705 "EHLO h3cspam02-ex.h3c.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726369AbgIIBWx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Sep 2020 21:22:53 -0400
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([10.8.0.66])
+        by h3cspam02-ex.h3c.com with ESMTPS id 0891MPH1090231
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 9 Sep 2020 09:22:25 +0800 (GMT-8)
+        (envelope-from tian.xianting@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 9 Sep 2020 09:22:26 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%7]) with
+ mapi id 15.01.1713.004; Wed, 9 Sep 2020 09:22:26 +0800
+From:   Tianxianting <tian.xianting@h3c.com>
+To:     Tejun Heo <tj@kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] blkcg: add plugging support for punt bio
+Thread-Topic: [PATCH] blkcg: add plugging support for punt bio
+Thread-Index: AQHWgqvNplY6FxgLP0eXXhL4lx8KdKlYUnqQgAGV3qCABKDKAIABAF5w
+Date:   Wed, 9 Sep 2020 01:22:26 +0000
+Message-ID: <a819f736609e44b6a75b7b877901b270@h3c.com>
+References: <1596722082-31817-1-git-send-email-xianting_tian@126.com>
+ <8f84e1fe-9fa5-b7e7-1f2f-b0c4a40614e2@kernel.dk>
+ <42b939c2.e08.173c6f79af9.Coremail.xianting_tian@126.com>
+ <1ded6246.2c67.17458ce4300.Coremail.xianting_tian@126.com>
+ <65e1e040da644ed9a05edd166d06b5e3@h3c.com>
+ <20200908180302.GE4295@mtj.thefacebook.com>
+In-Reply-To: <20200908180302.GE4295@mtj.thefacebook.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.99.141.128]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200908153108.GA3341002@dhcp-10-100-145-180.wdl.wdc.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-DNSRBL: 
+X-MAIL: h3cspam02-ex.h3c.com 0891MPH1090231
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 08, 2020 at 08:31:08AM -0700, Keith Busch wrote:
-> On Tue, Sep 08, 2020 at 04:15:36PM +0800, Ming Lei wrote:
-> >  void blk_mq_quiesce_queue(struct request_queue *q)
-> >  {
-> > -	struct blk_mq_hw_ctx *hctx;
-> > -	unsigned int i;
-> > -	bool rcu = false;
-> > +	bool blocking = !!(q->tag_set->flags & BLK_MQ_F_BLOCKING);
-> >  
-> >  	mutex_lock(&q->mq_quiesce_lock);
-> >  
-> > -	if (blk_queue_quiesced(q))
-> > -		goto exit;
-> 
-> Why remove the 'goto exit' on this condition? There shouldn't be a need
-> to synchronize dispatch again if a previous quiesce already did so.
+Thanks TJ and your previous guide to me.
+I will summarize and resubmit the patch.
 
-Hammm, this change is supposed to be done in next patch of 'blk-mq: add tagset
-quiesce interface'. The tagset quiesce interface starts to apply async quiesce,
-so synchronize dispatch has to be done in blk_mq_quiesce_queue().
+-----Original Message-----
+From: Tejun Heo [mailto:htejun@gmail.com] On Behalf Of Tejun Heo
+Sent: Wednesday, September 09, 2020 2:03 AM
+To: tianxianting (RD) <tian.xianting@h3c.com>
+Cc: axboe@kernel.dk; cgroups@vger.kernel.org; linux-block@vger.kernel.org; linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blkcg: add plugging support for punt bio
 
-thanks,
-Ming
+On Sat, Sep 05, 2020 at 11:25:03AM +0000, Tianxianting wrote:
+> Hi jens,tj
+> Could you share a couple of  minutes to comment it?
+> I really appreciate it
 
+The result looks fine to me but can you please summarize that in the commit message of the patch?
+
+Thanks.
+
+--
+tejun
