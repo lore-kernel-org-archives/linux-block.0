@@ -2,89 +2,107 @@ Return-Path: <SRS0=/Scz=CT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AA0C43461
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 08:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D944C43461
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 09:29:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6822621D7E
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 08:56:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D203A21556
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 09:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727820AbgIJI4J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Sep 2020 04:56:09 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:37740 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730361AbgIJIzO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Sep 2020 04:55:14 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id C72DC8F70750B2E79B9A;
-        Thu, 10 Sep 2020 16:55:07 +0800 (CST)
-Received: from huawei.com (10.175.104.175) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Thu, 10 Sep 2020
- 16:54:57 +0800
-From:   Miaohe Lin <linmiaohe@huawei.com>
-To:     <axboe@kernel.dk>, <martin.petersen@oracle.com>,
-        <kbusch@kernel.org>, <johannes.thumshirn@wdc.com>, <hare@suse.de>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linmiaohe@huawei.com>
-Subject: [PATCH v2] block: Fix potential page reference leak in __bio_iov_append_get_pages()
-Date:   Thu, 10 Sep 2020 04:53:42 -0400
-Message-ID: <20200910085342.61200-1-linmiaohe@huawei.com>
-X-Mailer: git-send-email 2.19.1
+        id S1730177AbgIJJ2X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Sep 2020 05:28:23 -0400
+Received: from verein.lst.de ([213.95.11.211]:60174 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728936AbgIJJ2R (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Sep 2020 05:28:17 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C27726736F; Thu, 10 Sep 2020 11:28:13 +0200 (CEST)
+Date:   Thu, 10 Sep 2020 11:28:13 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, martin.petersen@oracle.com,
+        Hans de Goede <hdegoede@redhat.com>,
+        Song Liu <song@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, Minchan Kim <minchan@kernel.org>,
+        dm-devel@redhat.com, linux-mtd@lists.infradead.org,
+        linux-mm@kvack.org, drbd-dev@tron.linbit.com,
+        cgroups@vger.kernel.org
+Subject: Re: [PATCH 06/14] block: lift setting the readahead size into the
+ block layer
+Message-ID: <20200910092813.GA27229@lst.de>
+References: <20200726150333.305527-1-hch@lst.de> <20200726150333.305527-7-hch@lst.de> <20200826220737.GA25613@redhat.com> <20200902151144.GA1738@lst.de> <20200902162007.GB5513@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.104.175]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200902162007.GB5513@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When bio_add_hw_page() failed, we left page reference still held in pages
-from iov_iter_get_pages(). Release these references and also advance the
-iov_iter according to what we have done successfully yet.
+On Wed, Sep 02, 2020 at 12:20:07PM -0400, Mike Snitzer wrote:
+> On Wed, Sep 02 2020 at 11:11am -0400,
+> Christoph Hellwig <hch@lst.de> wrote:
+> 
+> > On Wed, Aug 26, 2020 at 06:07:38PM -0400, Mike Snitzer wrote:
+> > > On Sun, Jul 26 2020 at 11:03am -0400,
+> > > Christoph Hellwig <hch@lst.de> wrote:
+> > > 
+> > > > Drivers shouldn't really mess with the readahead size, as that is a VM
+> > > > concept.  Instead set it based on the optimal I/O size by lifting the
+> > > > algorithm from the md driver when registering the disk.  Also set
+> > > > bdi->io_pages there as well by applying the same scheme based on
+> > > > max_sectors.
+> > > > 
+> > > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > > > ---
+> > > >  block/blk-settings.c         |  5 ++---
+> > > >  block/blk-sysfs.c            |  1 -
+> > > >  block/genhd.c                | 13 +++++++++++--
+> > > >  drivers/block/aoe/aoeblk.c   |  2 --
+> > > >  drivers/block/drbd/drbd_nl.c | 12 +-----------
+> > > >  drivers/md/bcache/super.c    |  4 ----
+> > > >  drivers/md/dm-table.c        |  3 ---
+> > > >  drivers/md/raid0.c           | 16 ----------------
+> > > >  drivers/md/raid10.c          | 24 +-----------------------
+> > > >  drivers/md/raid5.c           | 13 +------------
+> > > >  10 files changed, 16 insertions(+), 77 deletions(-)
+> > > 
+> > > 
+> > > In general these changes need a solid audit relative to stacking
+> > > drivers.  That is, the limits stacking methods (blk_stack_limits)
+> > > vs lower level allocation methods (__device_add_disk).
+> > > 
+> > > You optimized for lowlevel __device_add_disk establishing the bdi's
+> > > ra_pages and io_pages.  That is at the beginning of disk allocation,
+> > > well before any build up of stacking driver's queue_io_opt() -- which
+> > > was previously done in disk_stack_limits or driver specific methods
+> > > (e.g. dm_table_set_restrictions) that are called _after_ all the limits
+> > > stacking occurs.
+> > > 
+> > > By inverting the setting of the bdi's ra_pages and io_pages to be done
+> > > so early in __device_add_disk it'll break properly setting these values
+> > > for at least DM afaict.
+> > 
+> > ra_pages never got inherited by stacking drivers, check it by modifying
+> > it on an underlying device and then creating a trivial dm or md one.
+> 
+> Sure, not saying that it did.  But if the goal is to set ra_pages based
+> on io_opt then to do that correctly on stacking drivers it must be done
+> in terms of limits stacking right?  Or at least done at a location that
+> is after the limits stacking has occurred?  So should DM just open-code
+> setting ra_pages like it did for io_pages?
+> 
+> Because setting ra_pages in __device_add_disk() is way too early for DM
+> -- given it uses device_add_disk_no_queue_reg via add_disk_no_queue_reg
+> at DM device creation (before stacking all underlying devices' limits).
 
-Fixes: 0512a75b98f8 ("block: Introduce REQ_OP_ZONE_APPEND")
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- block/bio.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index e113073958cb..a323a5446221 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1080,7 +1080,7 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
- 		len = min_t(size_t, PAGE_SIZE - offset, left);
- 		if (bio_add_hw_page(q, bio, page, len, offset,
- 				max_append_sectors, &same_page) != len)
--			return -EINVAL;
-+			goto put_pages;
- 		if (same_page)
- 			put_page(page);
- 		offset = 0;
-@@ -1088,6 +1088,16 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
- 
- 	iov_iter_advance(iter, size);
- 	return 0;
-+put_pages:
-+	iov_iter_advance(iter, size - left);
-+	for (; left > 0; left -= len, i++) {
-+		struct page *page = pages[i];
-+
-+		len = min_t(size_t, PAGE_SIZE - offset, left);
-+		put_page(page);
-+		offset = 0;
-+	}
-+	return -EINVAL;
- }
- 
- /**
--- 
-2.19.1
-
+I'll move it to blk_register_queue, which should work just fine.
