@@ -2,134 +2,85 @@ Return-Path: <SRS0=/Scz=CT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DD2C433E2
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 14:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DB8C43461
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 15:58:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF25D207FB
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 14:56:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599749781;
-	bh=PHydTs//1Z0WBTdqTTnUXRZ2vHkm9CK82ppdHxvRuEo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=GNaFrgowE5PYWz+is99UuGkVF4vE6aKlFZqsRLmPX4E1OQigi2+x0nKg8nGePF+Kz
-	 7Z0XSh+Vejc0wCDpbPFZH/zyovdXBktazMbO4Zb5ptvMKDKq3S1fobxLga9aSEkTXe
-	 hNtPQ+gZJZJA7UdZVcTIunGf7nXNHNOiHsSf4Id0=
+	by mail.kernel.org (Postfix) with ESMTP id C05C520BED
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 15:58:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bITux9EF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731016AbgIJO4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Sep 2020 10:56:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33598 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730863AbgIJOzV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Sep 2020 10:55:21 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 55D6F207FB;
-        Thu, 10 Sep 2020 14:55:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599749721;
-        bh=PHydTs//1Z0WBTdqTTnUXRZ2vHkm9CK82ppdHxvRuEo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=f8jVqRVYdCaqZSptWgC5AD+FsuYiHbFCLi2QJ2FG82xlRMGt5aZlQHtLJtb2wqXRx
-         UDSizF6QenG+Rr50GwG2SxV0CSDrVWOtlFNueV8lIESqmSziXBKP0o18pOGQy58MNd
-         9fHkrv0FS4BLUqetoSc1kY34QVRluuVgmXeeIz+8=
-Date:   Thu, 10 Sep 2020 07:55:18 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chao Leng <lengchao@huawei.com>, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH V4 2/4] blk-mq: implement queue quiesce via percpu_ref
- for BLK_MQ_F_BLOCKING
-Message-ID: <20200910145518.GB3446191@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20200909104116.1674592-1-ming.lei@redhat.com>
- <20200909104116.1674592-3-ming.lei@redhat.com>
- <20200909160409.GA3356175@dhcp-10-100-145-180.wdl.wdc.com>
- <20200910015321.GA7420@T590>
+        id S1731455AbgIJP5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Sep 2020 11:57:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41456 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731536AbgIJP5H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Sep 2020 11:57:07 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA7BC061796
+        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2020 08:57:00 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id m17so7659323ioo.1
+        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2020 08:57:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Lw00I39tMMHoHHOPSgKttYErvt005RuGUQAb9q20a8A=;
+        b=bITux9EFWpfNdlM5j2+5LAzN74905Ih29yvwShF2RYD0rdrq4WVzARSbVJuvSmQPWY
+         j+to5gM/LtwviynJuV6Xw/wsJke0MBYGFTvqAsfHMn62ENDQNHKZLFd0IqeGy/YXQAkv
+         VzQea9i8kja5dzDE6N1RmEiA7mq7G6VZefYJanQOq9PYYyXW+7SVTKtT7DLY3JQQ6Yaf
+         +LznXIrys7f2IeFYvBnmS1Ki0TO452S54+EFTgcsHoySCF2Om2MslpGe1shaUybTvJ4Z
+         NYXD4pbGxmghN4rFbQnUMh+SSZHjhXFnidMaDDjLyfrIe/7fFBBzJAix6vpXnIjh1sFh
+         cB7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Lw00I39tMMHoHHOPSgKttYErvt005RuGUQAb9q20a8A=;
+        b=Rtbx2dhTMmWWsaSfWQxThbyuWbo0F+1N5NQY4DbXlOFVDLoyKGn5MsiLjrO+dSspl0
+         HfSI8Kq1VPHtC2fnKwK2KWnjiSEEMR2SujHH0p1UKf/rsKcBjfs/dAhx1ZXk9Kpf+LSI
+         Jc83BLp/VVuj5+lkMpIe3zf62dubruy5rXHJLTbQYm2Sqaknmm9vu3Kwv/0jEkleStlV
+         ixS8MRyR6IpfHuh9cODvbq37V6mp5X0EsNmgY7K9PrkDOdeRpiAJyb/sXjDlJBAMRJnn
+         NufnHaWoGyZZT2H4wWY+ZNAnN9Dsdig4V9um4P63zy3h+fjiu7mheo58ymkFop6lECcO
+         E6Dg==
+X-Gm-Message-State: AOAM5338JV7QLd7kO2hYYqnZnWKfpRJ936Iba1Srk7/3cTzdnYDp4CLP
+        3esdH8MbHiNB+hmVyeDJ4X3kaqWVde0+K6WS
+X-Google-Smtp-Source: ABdhPJwLFvlr74/NHaaMQeIpR+L/bjIZVmaEteWtsH6Bm9x6kvp/ngajFsz8dvwqEASUe60lfJ+Ljw==
+X-Received: by 2002:a05:6638:1448:: with SMTP id l8mr9177707jad.83.1599753418617;
+        Thu, 10 Sep 2020 08:56:58 -0700 (PDT)
+Received: from [192.168.1.10] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id m12sm3225470ilg.55.2020.09.10.08.56.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Sep 2020 08:56:58 -0700 (PDT)
+Subject: Re: [PATCH] [v2] blkcg: add plugging support for punt bio
+To:     Xianting Tian <tian.xianting@h3c.com>, tj@kernel.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200910061506.45704-1-tian.xianting@h3c.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2bf5a5c3-1f1f-6ed1-8871-6e9d3e7b80d4@kernel.dk>
+Date:   Thu, 10 Sep 2020 09:56:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910015321.GA7420@T590>
+In-Reply-To: <20200910061506.45704-1-tian.xianting@h3c.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 09:53:21AM +0800, Ming Lei wrote:
-> On Wed, Sep 09, 2020 at 09:04:09AM -0700, Keith Busch wrote:
-> > On Wed, Sep 09, 2020 at 06:41:14PM +0800, Ming Lei wrote:
-> > >  void blk_mq_quiesce_queue(struct request_queue *q)
-> > >  {
-> > > -	struct blk_mq_hw_ctx *hctx;
-> > > -	unsigned int i;
-> > > -	bool rcu = false;
-> > > +	bool blocking = !!(q->tag_set->flags & BLK_MQ_F_BLOCKING);
-> > > +	bool was_quiesced =__blk_mq_quiesce_queue_nowait(q);
-> > >  
-> > > -	__blk_mq_quiesce_queue_nowait(q);
-> > > +	if (!was_quiesced && blocking)
-> > > +		percpu_ref_kill(&q->dispatch_counter);
-> > >  
-> > > -	queue_for_each_hw_ctx(q, hctx, i) {
-> > > -		if (hctx->flags & BLK_MQ_F_BLOCKING)
-> > > -			synchronize_srcu(hctx->srcu);
-> > > -		else
-> > > -			rcu = true;
-> > > -	}
-> > > -	if (rcu)
-> > > +	if (blocking)
-> > > +		wait_event(q->mq_quiesce_wq,
-> > > +				percpu_ref_is_zero(&q->dispatch_counter));
-> > > +	else
-> > >  		synchronize_rcu();
-> > >  }
-> > 
-> > In the previous version, you had ensured no thread can unquiesce a queue
-> > while another is waiting for quiescence. Now that the locking is gone,
-> > a thread could unquiesce the queue before percpu_ref reaches zero, so
-> > the wait_event() may never complete on the resurrected percpu_ref.
-> > 
-> > I don't think any drivers do such a thing today, but it just looks like
-> > the implementation leaves open the possibility.
-> 
-> This driver can cause bigger trouble if it unquiesces its queue which is
-> being quiesced and still not done.
-> 
-> However, we can avoid that by the following delta change:
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 7669fe815cf9..5632727d71fa 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -225,9 +225,16 @@ static void __blk_mq_quiesce_queue(struct request_queue *q, bool wait)
->  	if (!wait)
->  		return;
->  
-> +	/*
-> +	 * In case of F_BLOCKING, if driver unquiesces its queue which is being
-> +	 * quiesced and still not done, it can cause bigger trouble, and we simply
-> +	 * return & warn once for avoiding hang here.
-> +	 */
->  	if (blocking)
->  		wait_event(q->mq_quiesce_wq,
-> -				percpu_ref_is_zero(&q->dispatch_counter));
-> +				percpu_ref_is_zero(&q->dispatch_counter) ||
-> +				WARN_ON_ONCE(!percpu_ref_is_dying(
-> +						&q->dispatch_counter)));
->  	else
->  		synchronize_rcu();
->  }
+Applied, thanks.
 
-Yeah, I'm okay with this. A warning and return should be good to
-indicate driver sequence errors. So if you just want to fold the above
-into this patch, then I don't think I have any remaining concerns.
+-- 
+Jens Axboe
 
-The other race condition is if unquiesce resurrects the ref before
-quiesce kills it, and there's already a warning there too.
