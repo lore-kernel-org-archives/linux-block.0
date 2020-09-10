@@ -2,108 +2,89 @@ Return-Path: <SRS0=/Scz=CT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7257CC43461
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 08:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AA0C43461
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 08:56:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21D2620770
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 08:36:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6822621D7E
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 08:56:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730225AbgIJIgk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Sep 2020 04:36:40 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2803 "EHLO huawei.com"
+        id S1727820AbgIJI4J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Sep 2020 04:56:09 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:37740 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730172AbgIJIfx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Sep 2020 04:35:53 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id DE293607B043E8409500;
-        Thu, 10 Sep 2020 09:35:50 +0100 (IST)
-Received: from [127.0.0.1] (10.47.1.235) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Thu, 10 Sep
- 2020 09:35:49 +0100
-Subject: Re: [PATCH v8 13/18] scsi: core: Show nr_hw_queues in sysfs
-To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
-        <kashyap.desai@broadcom.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <dgilbert@interlog.com>,
-        <paolo.valente@linaro.org>, <hare@suse.de>, <hch@lst.de>
-CC:     <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
-        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
- <1597850436-116171-14-git-send-email-john.garry@huawei.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <7b9a1f0e-04c4-e473-0ff8-4843e0f1af34@huawei.com>
-Date:   Thu, 10 Sep 2020 09:33:07 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1730361AbgIJIzO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Sep 2020 04:55:14 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id C72DC8F70750B2E79B9A;
+        Thu, 10 Sep 2020 16:55:07 +0800 (CST)
+Received: from huawei.com (10.175.104.175) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Thu, 10 Sep 2020
+ 16:54:57 +0800
+From:   Miaohe Lin <linmiaohe@huawei.com>
+To:     <axboe@kernel.dk>, <martin.petersen@oracle.com>,
+        <kbusch@kernel.org>, <johannes.thumshirn@wdc.com>, <hare@suse.de>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linmiaohe@huawei.com>
+Subject: [PATCH v2] block: Fix potential page reference leak in __bio_iov_append_get_pages()
+Date:   Thu, 10 Sep 2020 04:53:42 -0400
+Message-ID: <20200910085342.61200-1-linmiaohe@huawei.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-In-Reply-To: <1597850436-116171-14-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.1.235]
-X-ClientProxiedBy: lhreml723-chm.china.huawei.com (10.201.108.74) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.104.175]
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19/08/2020 16:20, John Garry wrote:
-> So that we don't use a value of 0 for when Scsi_Host.nr_hw_queues is unset,
-> use the tag_set->nr_hw_queues (which holds 1 for this case).
-> 
-> Signed-off-by: John Garry <john.garry@huawei.com>
+When bio_add_hw_page() failed, we left page reference still held in pages
+from iov_iter_get_pages(). Release these references and also advance the
+iov_iter according to what we have done successfully yet.
 
-Note that there has been no review on this patch yet.
+Fixes: 0512a75b98f8 ("block: Introduce REQ_OP_ZONE_APPEND")
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+---
+ block/bio.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-It's not strictly necessary, but I see it as useful. The same info can 
-be derived indirectly from block debugfs, but that's not always 
-available (debugfs, that is).
-
-Thanks,
-john
-
-> ---
->   drivers/scsi/scsi_sysfs.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
-> 
-> diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-> index 163dbcb741c1..d6e344fa33ad 100644
-> --- a/drivers/scsi/scsi_sysfs.c
-> +++ b/drivers/scsi/scsi_sysfs.c
-> @@ -393,6 +393,16 @@ show_use_blk_mq(struct device *dev, struct device_attribute *attr, char *buf)
->   }
->   static DEVICE_ATTR(use_blk_mq, S_IRUGO, show_use_blk_mq, NULL);
->   
-> +static ssize_t
-> +show_nr_hw_queues(struct device *dev, struct device_attribute *attr, char *buf)
-> +{
-> +	struct Scsi_Host *shost = class_to_shost(dev);
-> +	struct blk_mq_tag_set *tag_set = &shost->tag_set;
-> +
-> +	return snprintf(buf, 20, "%d\n", tag_set->nr_hw_queues);
-> +}
-> +static DEVICE_ATTR(nr_hw_queues, S_IRUGO, show_nr_hw_queues, NULL);
-> +
->   static struct attribute *scsi_sysfs_shost_attrs[] = {
->   	&dev_attr_use_blk_mq.attr,
->   	&dev_attr_unique_id.attr,
-> @@ -411,6 +421,7 @@ static struct attribute *scsi_sysfs_shost_attrs[] = {
->   	&dev_attr_prot_guard_type.attr,
->   	&dev_attr_host_reset.attr,
->   	&dev_attr_eh_deadline.attr,
-> +	&dev_attr_nr_hw_queues.attr,
->   	NULL
->   };
->   
-> 
+diff --git a/block/bio.c b/block/bio.c
+index e113073958cb..a323a5446221 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1080,7 +1080,7 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
+ 		len = min_t(size_t, PAGE_SIZE - offset, left);
+ 		if (bio_add_hw_page(q, bio, page, len, offset,
+ 				max_append_sectors, &same_page) != len)
+-			return -EINVAL;
++			goto put_pages;
+ 		if (same_page)
+ 			put_page(page);
+ 		offset = 0;
+@@ -1088,6 +1088,16 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
+ 
+ 	iov_iter_advance(iter, size);
+ 	return 0;
++put_pages:
++	iov_iter_advance(iter, size - left);
++	for (; left > 0; left -= len, i++) {
++		struct page *page = pages[i];
++
++		len = min_t(size_t, PAGE_SIZE - offset, left);
++		put_page(page);
++		offset = 0;
++	}
++	return -EINVAL;
+ }
+ 
+ /**
+-- 
+2.19.1
 
