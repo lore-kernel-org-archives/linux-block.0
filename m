@@ -2,103 +2,172 @@ Return-Path: <SRS0=/Scz=CT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94107C433E2
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 19:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D45B2C43461
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 19:30:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 533B420BED
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 19:15:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8604E21D91
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 19:30:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dJRG8Qmp"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="uFfkhAqV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726588AbgIJTPl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Sep 2020 15:15:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41100 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731426AbgIJPyr (ORCPT
+        id S1726898AbgIJTaY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Sep 2020 15:30:24 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56988 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727010AbgIJT3z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Sep 2020 11:54:47 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119E0C0617A0
-        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2020 08:54:35 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id h11so6088476ilj.11
-        for <linux-block@vger.kernel.org>; Thu, 10 Sep 2020 08:54:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=OZHxSy9GxPtwL4FPXTEL4wHPxBFDa6n0iEKloHdc+dY=;
-        b=dJRG8Qmps859QERXNYLJxi55QI15qf+NmhuQCnsZM3tzSEE4XDm6akhiZPmfFP2D5L
-         noKfGQmOG//ogqGq6MHNPrBzfyTsSRYDDvmU4HpGKt2M3+VX34Rn11vzjMP7dWCeXtL7
-         peTBqP2XxuoNfSrqxocG1z0zzHqFPkd4E6mCLjflVUpkyfeWBoxTosdtHT8O3weuXwoU
-         tQ9lPzZrLFElRA5AiEu/B7dHsjPFnIljwQ7uqXHEHqGd8+4jBMrrg/VTkfD3IGCBJS5B
-         tsG5z+xzaGHBSxD5B1GWK+wIELg2uX73o8AHY/LKWaXB7jjiscV+sTvRU/rMsZateAut
-         mn4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OZHxSy9GxPtwL4FPXTEL4wHPxBFDa6n0iEKloHdc+dY=;
-        b=Tfdg7MriFsBvaI50Vstppy3uaKsU3calK6tpJYZe+4ilrJfBES8UQ2CawmTkZdQB+/
-         ckGpdOwJy/ex0WHnT1CDksnHKOzDt3/ahzAPDNKVdjgmR/tCvNFRAlQHxdxCoVc0ZG4H
-         quRZJL+Vx75ZfqxYe7E6y2j8wDddILxQfkr9Aqx5AWdD1X4UlrRq/kAGMSJxwUWlPN2j
-         YfkWT78w2wAgez9/sC6oetjlS/o+Zhgw2m/d9wcDK8e7yTuDM7eA7EaD4pyB3f+5GeZH
-         s8detTit+SHvoO+ZxNgkUhhAjNDTkWoGSP8WrB1rkVPJDlFJmQnakwrqmfmKGnEhvCnV
-         xSfw==
-X-Gm-Message-State: AOAM532CjVBfJOMbbzrKyvA91S/SU2C3KoQjLvVo+vqFgxgXS2zpZ8hj
-        7FARIGvDUXA1SLnpDSk4XvjGlQ==
-X-Google-Smtp-Source: ABdhPJxHvxNIiZ7YNxR9PEQ5wMasrzeeVlpwNZVmQsRSVIQZmYnp6kGKrBV3BTGdMbs3dPcZtBZnXQ==
-X-Received: by 2002:a92:b309:: with SMTP id p9mr6758105ilh.125.1599753274952;
-        Thu, 10 Sep 2020 08:54:34 -0700 (PDT)
-Received: from [192.168.1.10] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id z15sm3315413ilb.73.2020.09.10.08.54.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Sep 2020 08:54:34 -0700 (PDT)
-Subject: Re: rework check_disk_change() v2
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Denis Efremov <efremov@linux.com>, Tim Waugh <tim@cyberelk.net>,
-        Michal Simek <michal.simek@xilinx.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Finn Thain <fthain@telegraphics.com.au>,
-        Michael Schmitz <schmitzmic@gmail.com>,
-        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-References: <20200908145347.2992670-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b5e51c24-b9a6-979f-8fe0-f762f113bba3@kernel.dk>
-Date:   Thu, 10 Sep 2020 09:54:33 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 10 Sep 2020 15:29:55 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08AJO3dK188331;
+        Thu, 10 Sep 2020 19:29:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=K1QbJiCJUXRd9frfClKInO01DMENCng/7fwYBJX5YFs=;
+ b=uFfkhAqVPRENf+NiejhgWgzXkL1Q8U43X7C9HcdYGLRTOg+YrW2PlHMntAyYgpveFup5
+ YRJjfYDwPYQF2lscT9/0ZgGZa0+TxfZD+ypbRxbexhsD/a+izRCElYD6O4jDNt8tZHFc
+ YDDhoyy8V2HOCfu03aMaDDO6q/z4mWMjL2QcqaMTiiUW2c59w+6aueuqVusjPpYDm2X6
+ GnTIzqTEvHTtwMlisLFM/fnoLyAZqSH+1Mz7J3DJSG4qgQo7VEMI8Y5NwCn2x3S2Y8pe
+ K4cA09Wv9kLN0K5BpBOt0/y0VyR+wcGZKH9UriNuySY5GvQ3G0deW8+EURqlZr6n7Ryu aw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 33c3ana368-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 10 Sep 2020 19:29:51 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08AJP9oH135955;
+        Thu, 10 Sep 2020 19:29:50 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 33cmkajt7a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Sep 2020 19:29:50 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08AJTnSN018042;
+        Thu, 10 Sep 2020 19:29:49 GMT
+Received: from [10.191.236.131] (/10.191.236.131)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 10 Sep 2020 12:29:48 -0700
+Subject: Re: Revert "dm: always call blk_queue_split() in dm_process_bio()"
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        RAMANAN_GOVINDARAJAN <ramanan.govindarajan@oracle.com>,
+        Somu Krishnasamy <somasundaram.krishnasamy@oracle.com>
+References: <529c2394-1b58-b9d8-d462-1f3de1b78ac8@oracle.com>
+ <20200910142438.GA21919@redhat.com>
+From:   Vijayendra Suman <vijayendra.suman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <5261af10-bf5c-f768-dbeb-2e784a5823f9@oracle.com>
+Date:   Fri, 11 Sep 2020 00:59:43 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200908145347.2992670-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200910142438.GA21919@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9740 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009100177
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9740 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 priorityscore=1501
+ clxscore=1011 bulkscore=0 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=999 suspectscore=0 adultscore=0 mlxscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009100177
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/8/20 8:53 AM, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this series replaced the not very nice check_disk_change() function with
-> a new bdev_media_changed that avoids having the ->revalidate_disk call
-> at its end.  As a result ->revalidate_disk can be removed from a lot of
-> drivers.
+Hello Mike,
 
-Applied, thanks.
+I checked with upstream, performance measurement is similar and shows 
+performance improvement when 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 is 
+reverted.
 
--- 
-Jens Axboe
-
+On 9/10/2020 7:54 PM, Mike Snitzer wrote:
+> [cc'ing dm-devel and linux-block because this is upstream concern too]
+>
+> On Wed, Sep 09 2020 at  1:00pm -0400,
+> Vijayendra Suman <vijayendra.suman@oracle.com> wrote:
+>
+>>     Hello Mike,
+>>
+>>     While Running pgbench tool with  5.4.17 kernel build
+>>
+>>     Following performance degrade is found out
+>>
+>>     buffer read/write metric : -17.2%
+>>     cache read/write metric : -18.7%
+>>     disk read/write metric : -19%
+>>
+>>     buffer
+>>     number of transactions actually processed: 840972
+>>     latency average = 24.013 ms
+>>     tps = 4664.153934 (including connections establishing)
+>>     tps = 4664.421492 (excluding connections establishing)
+>>
+>>     cache
+>>     number of transactions actually processed: 551345
+>>     latency average = 36.949 ms
+>>     tps = 3031.223905 (including connections establishing)
+>>     tps = 3031.402581 (excluding connections establishing)
+>>
+>>     After revert of Commit
+>>     2892100bc85ae446088cebe0c00ba9b194c0ac9d ( Revert "dm: always call
+>>     blk_queue_split() in dm_process_bio()")
+> I assume 2892100bc85ae446088cebe0c00ba9b194c0ac9d is 5.4-stable's
+> backport of upstream commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 ?
+Yes
+>>     Performance is Counter measurement
+>>
+>>     buffer ->
+>>     number of transactions actually processed: 1135735
+>>     latency average = 17.799 ms
+>>     tps = 6292.586749 (including connections establishing)
+>>     tps = 6292.875089 (excluding connections establishing)
+>>
+>>     cache ->
+>>     number of transactions actually processed: 648177
+>>     latency average = 31.217 ms
+>>     tps = 3587.755975 (including connections establishing)
+>>     tps = 3587.966359 (excluding connections establishing)
+>>
+>>     Following is your commit
+>>
+>>     diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+>>     index cf71a2277d60..1e6e0c970e19 100644
+>>     --- a/drivers/md/dm.c
+>>     +++ b/drivers/md/dm.c
+>>     @@ -1760,8 +1760,9 @@ static blk_qc_t dm_process_bio(struct mapped_device
+>>     *md,
+>>              * won't be imposed.
+>>              */
+>>             if (current->bio_list) {
+>>     -               blk_queue_split(md->queue, &bio);
+>>     -               if (!is_abnormal_io(bio))
+>>     +               if (is_abnormal_io(bio))
+>>     +                       blk_queue_split(md->queue, &bio);
+>>     +               else
+>>                             dm_queue_split(md, ti, &bio);
+>>             }
+>>
+>>     Could you have a look if it is safe to revert this commit.
+> No, it really isn't a good idea given what was documented in the commit
+> header for commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 -- the
+> excessive splitting is not conducive to performance either.
+>
+> So I think we need to identify _why_ reverting this commit is causing
+> such a performance improvement.  Why is calling blk_queue_split() before
+> dm_queue_split() benefiting your pgbench workload?
+Let me know if you want to check some patch.
+>
+> Thanks,
+> Mike
+>
