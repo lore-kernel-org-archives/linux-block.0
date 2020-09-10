@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23377C43461
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 20:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F37C43461
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 20:57:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC4FE2080A
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 20:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3101E20829
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 20:57:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JyR2faOd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="p/a/cIBT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726731AbgIJU4z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726879AbgIJU4z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 10 Sep 2020 16:56:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58990 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731155AbgIJOtO (ORCPT
+        with ESMTP id S1730168AbgIJOtO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 10 Sep 2020 10:49:14 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA81DC061756;
-        Thu, 10 Sep 2020 07:48:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E26C0617A3;
+        Thu, 10 Sep 2020 07:48:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=x3mXocVSE1Ebx6CKr4ScPVOkg1E0gmJHqtGLnjlzrp0=; b=JyR2faOdOafTeMYH/eo+WcbIBC
-        7g+pcV8tPXxPXK5fTzyK0UvjDb9hX+ZsGlihd6PNSeAEcrd6/F0PKw+J/MZyRNqC3swShhX5Hcs6p
-        IJgJ6wjjuOo6uHHos0BtN0Gb4MGKL6AeyuMpgv5cHWB/qykJwCGcnqI5LogBbnPB/bYCkSF5A0u/o
-        o/rsXAHmOpVdy4BP3SIQCeEOoJ/v7txgXEsYdeZr3Kz6nSWE2YxQ8T4SwIhLyY1/BpTKVFESoCjM1
-        sl1PjMR+PX6pHDiUCcs0TGqQ9Q2rYCUp21Shuqfv5MJ7nYG6PS28uXxFE+LgCIrljCmxgqsvJHQ4q
-        EWUWT1jg==;
+        bh=7ulqiSDL0ogF88UJRGSXYrWIBhfsEtKnjgdPpH8j7+E=; b=p/a/cIBTVNCnq9FDSFOgQ+do5P
+        XPs27m0/+6NZHzFP53ZY3wJJbA3lM5k+4VejJQFaewDhWokK3wBtFr3zoGPoQVydI+8s/v7cthkEC
+        2Zbhs8WXwY5yZ9n+cC23LGTQarTHwbnsiawp72UUt4MDzxhYGycrPYUGUFM22EiSm8SGWxmMCzVsv
+        HMlK5E7sf+3SIFm+y7VAkdhpCxCzZUJjdIW/7fyYnmaevN33DugSw41ov/gVrznyzWrp++HMlJVNT
+        E7XBGlzTNesfBKvxZZxJOz3C4N9eBaexaIT7CGzd35CncAEK6zUozHSaRnTEjHUWWlH0K0zgnQsSv
+        P3VZCdNA==;
 Received: from [2001:4bb8:184:af1:3ecc:ac5b:136f:434a] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kGNsT-0006wo-G5; Thu, 10 Sep 2020 14:48:45 +0000
+        id 1kGNsP-0006wG-5g; Thu, 10 Sep 2020 14:48:41 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
@@ -47,11 +47,10 @@ Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 07/12] bdi: remove BDI_CAP_CGROUP_WRITEBACK
-Date:   Thu, 10 Sep 2020 16:48:27 +0200
-Message-Id: <20200910144833.742260-8-hch@lst.de>
+        cgroups@vger.kernel.org, David Sterba <dsterba@suse.com>
+Subject: [PATCH 04/12] bdi: initialize ->ra_pages and ->io_pages in bdi_init
+Date:   Thu, 10 Sep 2020 16:48:24 +0200
+Message-Id: <20200910144833.742260-5-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200910144833.742260-1-hch@lst.de>
 References: <20200910144833.742260-1-hch@lst.de>
@@ -63,76 +62,170 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just checking SB_I_CGROUPWB for cgroup writeback support is enough.
-Either the file system allocates its own bdi (e.g. btrfs), in which case
-it is known to support cgroup writeback, or the bdi comes from the block
-layer, which always supports cgroup writeback.
+Set up a readahead size by default, as very few users have a good
+reason to change it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Acked-by: David Sterba <dsterba@suse.com> [btrfs]
+Acked-by: Richard Weinberger <richard@nod.at> [ubifs, mtd]
 ---
- block/blk-core.c            | 1 -
- fs/btrfs/disk-io.c          | 1 -
- include/linux/backing-dev.h | 8 +++-----
- 3 files changed, 3 insertions(+), 7 deletions(-)
+ block/blk-core.c      | 2 --
+ drivers/mtd/mtdcore.c | 2 ++
+ fs/9p/vfs_super.c     | 6 ++++--
+ fs/afs/super.c        | 1 -
+ fs/btrfs/disk-io.c    | 1 -
+ fs/fuse/inode.c       | 1 -
+ fs/nfs/super.c        | 9 +--------
+ fs/ubifs/super.c      | 2 ++
+ fs/vboxsf/super.c     | 2 ++
+ mm/backing-dev.c      | 2 ++
+ 10 files changed, 13 insertions(+), 15 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 18c092f8d69175..d81ee511ec8b01 100644
+index 093649bd252e71..18c092f8d69175 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -538,7 +538,6 @@ struct request_queue *blk_alloc_queue(int node_id)
+@@ -538,8 +538,6 @@ struct request_queue *blk_alloc_queue(int node_id)
  	if (!q->stats)
  		goto fail_stats;
  
--	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
+-	q->backing_dev_info->ra_pages = VM_READAHEAD_PAGES;
+-	q->backing_dev_info->io_pages = VM_READAHEAD_PAGES;
+ 	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
  	q->node = node_id;
  
- 	atomic_set(&q->nr_active_requests_shared_sbitmap, 0);
+diff --git a/drivers/mtd/mtdcore.c b/drivers/mtd/mtdcore.c
+index 7d930569a7dfb7..b5e5d3140f578e 100644
+--- a/drivers/mtd/mtdcore.c
++++ b/drivers/mtd/mtdcore.c
+@@ -2196,6 +2196,8 @@ static struct backing_dev_info * __init mtd_bdi_init(char *name)
+ 	bdi = bdi_alloc(NUMA_NO_NODE);
+ 	if (!bdi)
+ 		return ERR_PTR(-ENOMEM);
++	bdi->ra_pages = 0;
++	bdi->io_pages = 0;
+ 
+ 	/*
+ 	 * We put '-0' suffix to the name to get the same name format as we
+diff --git a/fs/9p/vfs_super.c b/fs/9p/vfs_super.c
+index 74df32be4c6a52..e34fa20acf612e 100644
+--- a/fs/9p/vfs_super.c
++++ b/fs/9p/vfs_super.c
+@@ -80,8 +80,10 @@ v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
+ 	if (ret)
+ 		return ret;
+ 
+-	if (v9ses->cache)
+-		sb->s_bdi->ra_pages = VM_READAHEAD_PAGES;
++	if (!v9ses->cache) {
++		sb->s_bdi->ra_pages = 0;
++		sb->s_bdi->io_pages = 0;
++	}
+ 
+ 	sb->s_flags |= SB_ACTIVE | SB_DIRSYNC;
+ 	if (!v9ses->cache)
+diff --git a/fs/afs/super.c b/fs/afs/super.c
+index b552357b1d1379..3a40ee752c1e3f 100644
+--- a/fs/afs/super.c
++++ b/fs/afs/super.c
+@@ -456,7 +456,6 @@ static int afs_fill_super(struct super_block *sb, struct afs_fs_context *ctx)
+ 	ret = super_setup_bdi(sb);
+ 	if (ret)
+ 		return ret;
+-	sb->s_bdi->ra_pages	= VM_READAHEAD_PAGES;
+ 
+ 	/* allocate the root inode and dentry */
+ 	if (as->dyn_root) {
 diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 047934cea25efa..e24927bddd5829 100644
+index f6bba7eb1fa171..047934cea25efa 100644
 --- a/fs/btrfs/disk-io.c
 +++ b/fs/btrfs/disk-io.c
-@@ -3091,7 +3091,6 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
- 		goto fail_sb_buffer;
+@@ -3092,7 +3092,6 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
  	}
  
--	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
+ 	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
+-	sb->s_bdi->ra_pages = VM_READAHEAD_PAGES;
  	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
  	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
  
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 0b06b2d26c9aa3..52583b6f2ea05d 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -123,7 +123,6 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ratio);
-  * BDI_CAP_NO_ACCT_WB:     Don't automatically account writeback pages
-  * BDI_CAP_STRICTLIMIT:    Keep number of dirty pages below bdi threshold.
-  *
-- * BDI_CAP_CGROUP_WRITEBACK: Supports cgroup-aware writeback.
-  * BDI_CAP_SYNCHRONOUS_IO: Device is so fast that asynchronous IO would be
-  *			   inefficient.
-  */
-@@ -233,9 +232,9 @@ int inode_congested(struct inode *inode, int cong_bits);
-  * inode_cgwb_enabled - test whether cgroup writeback is enabled on an inode
-  * @inode: inode of interest
-  *
-- * cgroup writeback requires support from both the bdi and filesystem.
-- * Also, both memcg and iocg have to be on the default hierarchy.  Test
-- * whether all conditions are met.
-+ * Cgroup writeback requires support from the filesystem.  Also, both memcg and
-+ * iocg have to be on the default hierarchy.  Test whether all conditions are
-+ * met.
-  *
-  * Note that the test result may change dynamically on the same inode
-  * depending on how memcg and iocg are configured.
-@@ -247,7 +246,6 @@ static inline bool inode_cgwb_enabled(struct inode *inode)
- 	return cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
- 		cgroup_subsys_on_dfl(io_cgrp_subsys) &&
- 		bdi_cap_account_dirty(bdi) &&
--		(bdi->capabilities & BDI_CAP_CGROUP_WRITEBACK) &&
- 		(inode->i_sb->s_iflags & SB_I_CGROUPWB);
- }
+diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
+index bba747520e9b08..17b00670fb539e 100644
+--- a/fs/fuse/inode.c
++++ b/fs/fuse/inode.c
+@@ -1049,7 +1049,6 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
+ 	if (err)
+ 		return err;
  
+-	sb->s_bdi->ra_pages = VM_READAHEAD_PAGES;
+ 	/* fuse does it's own writeback accounting */
+ 	sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
+ 
+diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+index 7a70287f21a2c1..f943e37853fa25 100644
+--- a/fs/nfs/super.c
++++ b/fs/nfs/super.c
+@@ -1200,13 +1200,6 @@ static void nfs_get_cache_cookie(struct super_block *sb,
+ }
+ #endif
+ 
+-static void nfs_set_readahead(struct backing_dev_info *bdi,
+-			      unsigned long iomax_pages)
+-{
+-	bdi->ra_pages = VM_READAHEAD_PAGES;
+-	bdi->io_pages = iomax_pages;
+-}
+-
+ int nfs_get_tree_common(struct fs_context *fc)
+ {
+ 	struct nfs_fs_context *ctx = nfs_fc2context(fc);
+@@ -1251,7 +1244,7 @@ int nfs_get_tree_common(struct fs_context *fc)
+ 					     MINOR(server->s_dev));
+ 		if (error)
+ 			goto error_splat_super;
+-		nfs_set_readahead(s->s_bdi, server->rpages);
++		s->s_bdi->io_pages = server->rpages;
+ 		server->super = s;
+ 	}
+ 
+diff --git a/fs/ubifs/super.c b/fs/ubifs/super.c
+index a2420c900275a8..fbddb2a1c03f5e 100644
+--- a/fs/ubifs/super.c
++++ b/fs/ubifs/super.c
+@@ -2177,6 +2177,8 @@ static int ubifs_fill_super(struct super_block *sb, void *data, int silent)
+ 				   c->vi.vol_id);
+ 	if (err)
+ 		goto out_close;
++	sb->s_bdi->ra_pages = 0;
++	sb->s_bdi->io_pages = 0;
+ 
+ 	sb->s_fs_info = c;
+ 	sb->s_magic = UBIFS_SUPER_MAGIC;
+diff --git a/fs/vboxsf/super.c b/fs/vboxsf/super.c
+index 8fe03b4a0d2b03..8e3792177a8523 100644
+--- a/fs/vboxsf/super.c
++++ b/fs/vboxsf/super.c
+@@ -167,6 +167,8 @@ static int vboxsf_fill_super(struct super_block *sb, struct fs_context *fc)
+ 	err = super_setup_bdi_name(sb, "vboxsf-%d", sbi->bdi_id);
+ 	if (err)
+ 		goto fail_free;
++	sb->s_bdi->ra_pages = 0;
++	sb->s_bdi->io_pages = 0;
+ 
+ 	/* Turn source into a shfl_string and map the folder */
+ 	size = strlen(fc->source) + 1;
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 8e8b00627bb2d8..2dac3be6127127 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -746,6 +746,8 @@ struct backing_dev_info *bdi_alloc(int node_id)
+ 		kfree(bdi);
+ 		return NULL;
+ 	}
++	bdi->ra_pages = VM_READAHEAD_PAGES;
++	bdi->io_pages = VM_READAHEAD_PAGES;
+ 	return bdi;
+ }
+ EXPORT_SYMBOL(bdi_alloc);
 -- 
 2.28.0
 
