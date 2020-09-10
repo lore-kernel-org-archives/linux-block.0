@@ -2,216 +2,120 @@ Return-Path: <SRS0=/Scz=CT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8714DC433E2
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 06:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B7AC43461
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 08:04:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42D56207EA
-	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 06:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65EB1206B8
+	for <linux-block@archiver.kernel.org>; Thu, 10 Sep 2020 08:04:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B7AUs+v7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726945AbgIJGWm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Sep 2020 02:22:42 -0400
-Received: from smtp.h3c.com ([60.191.123.56]:42091 "EHLO h3cspam01-ex.h3c.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725971AbgIJGWh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Sep 2020 02:22:37 -0400
-Received: from DAG2EX03-BASE.srv.huawei-3com.com ([10.8.0.66])
-        by h3cspam01-ex.h3c.com with ESMTPS id 08A6Lve4044174
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 10 Sep 2020 14:21:57 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from localhost.localdomain (10.99.212.201) by
- DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 10 Sep 2020 14:21:59 +0800
-From:   Xianting Tian <tian.xianting@h3c.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Xianting Tian <tian.xianting@h3c.com>
-Subject: [PATCH] [v2] blkcg: add plugging support for punt bio
-Date:   Thu, 10 Sep 2020 14:15:06 +0800
-Message-ID: <20200910061506.45704-1-tian.xianting@h3c.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726961AbgIJIEA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Sep 2020 04:04:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26235 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729296AbgIJID7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Sep 2020 04:03:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599725037;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SoH5gZb9aZEHYWTTPdo+ibKytr1EsY2lWTBxjA404Zo=;
+        b=B7AUs+v7S6751woIU8AEGgnKdb+hZQg3+dwjAXtOPf4HXmc3PDzA6AiD01AqyqsxOT6ats
+        +Motb4kyRtpSngoVe1opUF4W7r84seLXAIT7GC1T0slkGqzUdFOmkLQ4WGdf/JDaO2xtkv
+        Pu23PwpJ7Tazdx64d9WSa6M4/d4YMDI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-515-DC3XShtrNyeuG1BVu56zSQ-1; Thu, 10 Sep 2020 04:03:53 -0400
+X-MC-Unique: DC3XShtrNyeuG1BVu56zSQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B17580ED92;
+        Thu, 10 Sep 2020 08:03:51 +0000 (UTC)
+Received: from T590 (ovpn-12-146.pek2.redhat.com [10.72.12.146])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DAEC7E8F1;
+        Thu, 10 Sep 2020 08:03:42 +0000 (UTC)
+Date:   Thu, 10 Sep 2020 16:03:37 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chao Leng <lengchao@huawei.com>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V4 2/4] blk-mq: implement queue quiesce via percpu_ref
+ for BLK_MQ_F_BLOCKING
+Message-ID: <20200910080337.GC31286@T590>
+References: <20200909104116.1674592-1-ming.lei@redhat.com>
+ <20200909104116.1674592-3-ming.lei@redhat.com>
+ <20200909160409.GA3356175@dhcp-10-100-145-180.wdl.wdc.com>
+ <dae73b2c-c191-c8a6-4287-838ab4962467@grimberg.me>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.99.212.201]
-X-ClientProxiedBy: BJSMTP02-EX.srv.huawei-3com.com (10.63.20.133) To
- DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66)
-X-DNSRBL: 
-X-MAIL: h3cspam01-ex.h3c.com 08A6Lve4044174
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dae73b2c-c191-c8a6-4287-838ab4962467@grimberg.me>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The test and the explaination of the patch as bellow.
+On Wed, Sep 09, 2020 at 01:53:30PM -0700, Sagi Grimberg wrote:
+> 
+> > >   void blk_mq_quiesce_queue(struct request_queue *q)
+> > >   {
+> > > -	struct blk_mq_hw_ctx *hctx;
+> > > -	unsigned int i;
+> > > -	bool rcu = false;
+> > > +	bool blocking = !!(q->tag_set->flags & BLK_MQ_F_BLOCKING);
+> > > +	bool was_quiesced =__blk_mq_quiesce_queue_nowait(q);
+> > > -	__blk_mq_quiesce_queue_nowait(q);
+> > > +	if (!was_quiesced && blocking)
+> > > +		percpu_ref_kill(&q->dispatch_counter);
+> > > -	queue_for_each_hw_ctx(q, hctx, i) {
+> > > -		if (hctx->flags & BLK_MQ_F_BLOCKING)
+> > > -			synchronize_srcu(hctx->srcu);
+> > > -		else
+> > > -			rcu = true;
+> > > -	}
+> > > -	if (rcu)
+> > > +	if (blocking)
+> > > +		wait_event(q->mq_quiesce_wq,
+> > > +				percpu_ref_is_zero(&q->dispatch_counter));
+> > > +	else
+> > >   		synchronize_rcu();
+> > >   }
+> > 
+> > In the previous version, you had ensured no thread can unquiesce a queue
+> > while another is waiting for quiescence. Now that the locking is gone,
+> > a thread could unquiesce the queue before percpu_ref reaches zero, so
+> > the wait_event() may never complete on the resurrected percpu_ref.
+> 
+> Yea, where did that go?
 
-Before test we added more debug code in blkg_async_bio_workfn():
-	int count = 0
-	if (bios.head && bios.head->bi_next) {
-		need_plug = true;
-		blk_start_plug(&plug);
-	}
-	while ((bio = bio_list_pop(&bios))) {
-		/*io_punt is a sysctl user interface to control the print*/
-		if(io_punt) {
-			printk("[%s:%d] bio start,size:%llu,%d count=%d plug?%d\n",
-				current->comm, current->pid, bio->bi_iter.bi_sector,
-				(bio->bi_iter.bi_size)>>9, count++, need_plug);
-		}
-		submit_bio(bio);
-	}
-	if (need_plug)
-		blk_finish_plug(&plug);
+The mutex is removed because:
 
-Steps that need to be set to trigger *PUNT* io before testing:
-	mount -t btrfs -o compress=lzo /dev/sda6 /btrfs
-	mount -t cgroup2 nodev /cgroup2
-	mkdir /cgroup2/cg3
-	echo "+io" > /cgroup2/cgroup.subtree_control
-	echo "8:0 wbps=1048576000" > /cgroup2/cg3/io.max #1000M/s
-	echo $$ > /cgroup2/cg3/cgroup.procs
+1) As Bart mentioned, blk_mq_quiesce_queue() may be called in context
+which doesn't allow sleep.
 
-Then use dd command to test btrfs PUNT io in current shell:
-	dd if=/dev/zero of=/btrfs/file bs=64K count=100000
+2) Both percpu_ref_kill() and percpu_ref_resurrect() have been protected by
+one global spinlock, so both two can be run concurrently.
 
-Test hardware environment as below:
-	[root@localhost btrfs]# lscpu
-	Architecture:          x86_64
-	CPU op-mode(s):        32-bit, 64-bit
-	Byte Order:            Little Endian
-	CPU(s):                32
-	On-line CPU(s) list:   0-31
-	Thread(s) per core:    2
-	Core(s) per socket:    8
-	Socket(s):             2
-	NUMA node(s):          2
-	Vendor ID:             GenuineIntel
+3) warning may be triggered when percpu_ref_kill() is run on one DEAD
+percpu-refcount, or when percpu_ref_resurrect() is run on one live
+percpu-refcount. We can avoid the warning with test_and_{clear|test}_bit
+exactly by running the actual quiesce/unquiesce action only once.
 
-With above debug code, test command and test environment, I did the
-tests under 3 different system loads, which are triggered by stress:
-1, Run 64 threads by command "stress -c 64 &"
-	[53615.975974] [kworker/u66:18:1490] bio start,size:45583056,8 count=0 plug?1
-	[53615.975980] [kworker/u66:18:1490] bio start,size:45583064,8 count=1 plug?1
-	[53615.975984] [kworker/u66:18:1490] bio start,size:45583072,8 count=2 plug?1
-	[53615.975987] [kworker/u66:18:1490] bio start,size:45583080,8 count=3 plug?1
-	[53615.975990] [kworker/u66:18:1490] bio start,size:45583088,8 count=4 plug?1
-	[53615.975993] [kworker/u66:18:1490] bio start,size:45583096,8 count=5 plug?1
-	... ...
-	[53615.977041] [kworker/u66:18:1490] bio start,size:45585480,8 count=303 plug?1
-	[53615.977044] [kworker/u66:18:1490] bio start,size:45585488,8 count=304 plug?1
-	[53615.977047] [kworker/u66:18:1490] bio start,size:45585496,8 count=305 plug?1
-	[53615.977050] [kworker/u66:18:1490] bio start,size:45585504,8 count=306 plug?1
-	[53615.977053] [kworker/u66:18:1490] bio start,size:45585512,8 count=307 plug?1
-	[53615.977056] [kworker/u66:18:1490] bio start,size:45585520,8 count=308 plug?1
-	[53615.977058] [kworker/u66:18:1490] bio start,size:45585528,8 count=309 plug?1
 
-2, Run 32 threads by command "stress -c 32 &"
-	[50586.290521] [kworker/u66:6:32351] bio start,size:45806496,8 count=0 plug?1
-	[50586.290526] [kworker/u66:6:32351] bio start,size:45806504,8 count=1 plug?1
-	[50586.290529] [kworker/u66:6:32351] bio start,size:45806512,8 count=2 plug?1
-	[50586.290531] [kworker/u66:6:32351] bio start,size:45806520,8 count=3 plug?1
-	[50586.290533] [kworker/u66:6:32351] bio start,size:45806528,8 count=4 plug?1
-	[50586.290535] [kworker/u66:6:32351] bio start,size:45806536,8 count=5 plug?1
-	... ...
-	[50586.299640] [kworker/u66:5:32350] bio start,size:45808576,8 count=252 plug?1
-	[50586.299643] [kworker/u66:5:32350] bio start,size:45808584,8 count=253 plug?1
-	[50586.299646] [kworker/u66:5:32350] bio start,size:45808592,8 count=254 plug?1
-	[50586.299649] [kworker/u66:5:32350] bio start,size:45808600,8 count=255 plug?1
-	[50586.299652] [kworker/u66:5:32350] bio start,size:45808608,8 count=256 plug?1
-	[50586.299663] [kworker/u66:5:32350] bio start,size:45808616,8 count=257 plug?1
-	[50586.299665] [kworker/u66:5:32350] bio start,size:45808624,8 count=258 plug?1
-	[50586.299668] [kworker/u66:5:32350] bio start,size:45808632,8 count=259 plug?1
-
-3, Don't run thread by stress
-	[50861.355246] [kworker/u66:19:32376] bio start,size:13544504,8 count=0 plug?0
-	[50861.355288] [kworker/u66:19:32376] bio start,size:13544512,8 count=0 plug?0
-	[50861.355322] [kworker/u66:19:32376] bio start,size:13544520,8 count=0 plug?0
-	[50861.355353] [kworker/u66:19:32376] bio start,size:13544528,8 count=0 plug?0
-	[50861.355392] [kworker/u66:19:32376] bio start,size:13544536,8 count=0 plug?0
-	[50861.355431] [kworker/u66:19:32376] bio start,size:13544544,8 count=0 plug?0
-	[50861.355468] [kworker/u66:19:32376] bio start,size:13544552,8 count=0 plug?0
-	[50861.355499] [kworker/u66:19:32376] bio start,size:13544560,8 count=0 plug?0
-	[50861.355532] [kworker/u66:19:32376] bio start,size:13544568,8 count=0 plug?0
-	[50861.355575] [kworker/u66:19:32376] bio start,size:13544576,8 count=0 plug?0
-	[50861.355618] [kworker/u66:19:32376] bio start,size:13544584,8 count=0 plug?0
-	[50861.355659] [kworker/u66:19:32376] bio start,size:13544592,8 count=0 plug?0
-	[50861.355740] [kworker/u66:0:32346] bio start,size:13544600,8 count=0 plug?1
-	[50861.355748] [kworker/u66:0:32346] bio start,size:13544608,8 count=1 plug?1
-	[50861.355962] [kworker/u66:2:32347] bio start,size:13544616,8 count=0 plug?0
-	[50861.356272] [kworker/u66:7:31962] bio start,size:13544624,8 count=0 plug?0
-	[50861.356446] [kworker/u66:7:31962] bio start,size:13544632,8 count=0 plug?0
-	[50861.356567] [kworker/u66:7:31962] bio start,size:13544640,8 count=0 plug?0
-	[50861.356707] [kworker/u66:19:32376] bio start,size:13544648,8 count=0 plug?0
-	[50861.356748] [kworker/u66:15:32355] bio start,size:13544656,8 count=0 plug?0
-	[50861.356825] [kworker/u66:17:31970] bio start,size:13544664,8 count=0 plug?0
-
-Analysis of above 3 test results with different system load:
-From above test, we can see more and more continuous bios can be plugged
-with system load increasing. When run "stress -c 64 &", 310 continuous
-bios are plugged; When run "stress -c 32 &", 260 continuous bios are
-plugged; When don't run stress, at most only 2 continuous bios are
-plugged, in most cases, bio_list only contains one single bio.
-
-How to explain above phenomenon:
-We know, in submit_bio(), if the bio is a REQ_CGROUP_PUNT io, it will
-queue a work to workqueue blkcg_punt_bio_wq. But when the workqueue is
-scheduled, it depends on the system load.  When system load is low, the
-workqueue will be quickly scheduled, and the bio in bio_list will be
-quickly processed in blkg_async_bio_workfn(), so there is less chance
-that the same io submit thread can add multiple continuous bios to
-bio_list before workqueue is scheduled to run. The analysis aligned with
-above test "3".
-When system load is high, there is some delay before the workqueue can
-be scheduled to run, the higher the system load the greater the delay.
-So there is more chance that the same io submit thread can add multiple
-continuous bios to bio_list. Then when the workqueue is scheduled to run,
-there are more continuous bios in bio_list, which will be processed in
-blkg_async_bio_workfn(). The analysis aligned with above test "1" and "2".
-
-According to test, we can get io performance improved with the patch,
-especially when system load is higher. Another optimazition is to use
-the plug only when bio_list contains at least 2 bios.
-
-Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
----
- block/blk-cgroup.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index c195365c9..f35a205d5 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -119,6 +119,8 @@ static void blkg_async_bio_workfn(struct work_struct *work)
- 					     async_bio_work);
- 	struct bio_list bios = BIO_EMPTY_LIST;
- 	struct bio *bio;
-+	struct blk_plug plug;
-+	bool need_plug = false;
- 
- 	/* as long as there are pending bios, @blkg can't go away */
- 	spin_lock_bh(&blkg->async_bio_lock);
-@@ -126,8 +128,15 @@ static void blkg_async_bio_workfn(struct work_struct *work)
- 	bio_list_init(&blkg->async_bios);
- 	spin_unlock_bh(&blkg->async_bio_lock);
- 
-+	/* start plug only when bio_list contains at least 2 bios */
-+	if (bios.head && bios.head->bi_next) {
-+		need_plug = true;
-+		blk_start_plug(&plug);
-+	}
- 	while ((bio = bio_list_pop(&bios)))
- 		submit_bio(bio);
-+	if (need_plug)
-+		blk_finish_plug(&plug);
- }
- 
- /**
--- 
-2.17.1
+Thanks,
+Ming
 
