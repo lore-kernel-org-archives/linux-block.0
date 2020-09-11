@@ -2,142 +2,152 @@ Return-Path: <SRS0=ap3D=CU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 471E4C433E2
-	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 11:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B695C43461
+	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 12:22:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 030B122207
-	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 11:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D38EB2078D
+	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 12:22:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="clNuHtu+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725828AbgIKLrU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Sep 2020 07:47:20 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:2678 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725823AbgIKLrO (ORCPT
+        id S1725859AbgIKMWi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Sep 2020 08:22:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26127 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725897AbgIKMU5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Sep 2020 07:47:14 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0U8bJp5S_1599824775;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0U8bJp5S_1599824775)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 11 Sep 2020 19:46:15 +0800
-Subject: Re: [RFC] block: enqueue splitted bios into same cpu
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
-References: <20200911032958.125068-1-jefflexu@linux.alibaba.com>
- <20200911110101.GA143560@T590>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <1aa96d2b-adf3-19f2-73db-99b16cfb4f8a@linux.alibaba.com>
-Date:   Fri, 11 Sep 2020 19:46:15 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+        Fri, 11 Sep 2020 08:20:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599826856;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JwoyS6QMH/briMphc95UxR4fltJG2KYwdSXrFg/50vg=;
+        b=clNuHtu+pvXP7L4BsEkxvRaiw21gte6b3hmVcP7+J7I1VyHcQ0smT2NnahSyAotNze5Ikh
+        Uw1ZrhDLcpVviKT20ozZ0oeQ7YGV+L68NGWioPCO29t3Ff1B1hepj1HTpzwBpbjeS3Jk/O
+        4+VCKy1x6RHHxm9Hh3DdjNbhARP+8aY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-ORHW6Un4PdqYKPlG95k3Iw-1; Fri, 11 Sep 2020 08:20:54 -0400
+X-MC-Unique: ORHW6Un4PdqYKPlG95k3Iw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D757F1084C82;
+        Fri, 11 Sep 2020 12:20:53 +0000 (UTC)
+Received: from T590 (ovpn-13-69.pek2.redhat.com [10.72.13.69])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B641C5D9E8;
+        Fri, 11 Sep 2020 12:20:42 +0000 (UTC)
+Date:   Fri, 11 Sep 2020 20:20:38 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Vijayendra Suman <vijayendra.suman@oracle.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: Revert "dm: always call blk_queue_split() in dm_process_bio()"
+Message-ID: <20200911122038.GA167338@T590>
+References: <529c2394-1b58-b9d8-d462-1f3de1b78ac8@oracle.com>
+ <20200910142438.GA21919@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200911110101.GA143560@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200910142438.GA21919@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for replying. ;)
+On Thu, Sep 10, 2020 at 10:24:39AM -0400, Mike Snitzer wrote:
+> [cc'ing dm-devel and linux-block because this is upstream concern too]
+> 
+> On Wed, Sep 09 2020 at  1:00pm -0400,
+> Vijayendra Suman <vijayendra.suman@oracle.com> wrote:
+> 
+> >    Hello Mike,
+> > 
+> >    While Running pgbench tool with  5.4.17 kernel build
+> > 
+> >    Following performance degrade is found out
+> > 
+> >    buffer read/write metric : -17.2%
+> >    cache read/write metric : -18.7%
+> >    disk read/write metric : -19%
+> > 
+> >    buffer
+> >    number of transactions actually processed: 840972
+> >    latency average = 24.013 ms
+> >    tps = 4664.153934 (including connections establishing)
+> >    tps = 4664.421492 (excluding connections establishing)
+> > 
+> >    cache
+> >    number of transactions actually processed: 551345
+> >    latency average = 36.949 ms
+> >    tps = 3031.223905 (including connections establishing)
+> >    tps = 3031.402581 (excluding connections establishing)
+> > 
+> >    After revert of Commit
+> >    2892100bc85ae446088cebe0c00ba9b194c0ac9d ( Revert "dm: always call
+> >    blk_queue_split() in dm_process_bio()")
+> 
+> I assume 2892100bc85ae446088cebe0c00ba9b194c0ac9d is 5.4-stable's
+> backport of upstream commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 ?
+> 
+> >    Performance is Counter measurement
+> > 
+> >    buffer ->
+> >    number of transactions actually processed: 1135735
+> >    latency average = 17.799 ms
+> >    tps = 6292.586749 (including connections establishing)
+> >    tps = 6292.875089 (excluding connections establishing)
+> > 
+> >    cache ->
+> >    number of transactions actually processed: 648177
+> >    latency average = 31.217 ms
+> >    tps = 3587.755975 (including connections establishing)
+> >    tps = 3587.966359 (excluding connections establishing)
+> > 
+> >    Following is your commit
+> > 
+> >    diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> >    index cf71a2277d60..1e6e0c970e19 100644
+> >    --- a/drivers/md/dm.c
+> >    +++ b/drivers/md/dm.c
+> >    @@ -1760,8 +1760,9 @@ static blk_qc_t dm_process_bio(struct mapped_device
+> >    *md,
+> >             * won't be imposed.
+> >             */
+> >            if (current->bio_list) {
+> >    -               blk_queue_split(md->queue, &bio);
+> >    -               if (!is_abnormal_io(bio))
+> >    +               if (is_abnormal_io(bio))
+> >    +                       blk_queue_split(md->queue, &bio);
+> >    +               else
+> >                            dm_queue_split(md, ti, &bio);
+> >            }
+> > 
+> >    Could you have a look if it is safe to revert this commit.
+> 
+> No, it really isn't a good idea given what was documented in the commit
+> header for commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 -- the
+> excessive splitting is not conducive to performance either.
+> 
+> So I think we need to identify _why_ reverting this commit is causing
+> such a performance improvement.  Why is calling blk_queue_split() before
+> dm_queue_split() benefiting your pgbench workload?
 
+blk_queue_split() takes every queue's limit into account, and dm_queue_split()
+only splits bio according to max len(offset, chunk size), so the
+splitted bio may not be optimal one from device viewpoint.
 
-On 9/11/20 7:01 PM, Ming Lei wrote:
-> On Fri, Sep 11, 2020 at 11:29:58AM +0800, Jeffle Xu wrote:
->> Splitted bios of one source bio can be enqueued into different CPU since
->> the submit_bio() routine can be preempted or fall asleep. However this
->> behaviour can't work well with iopolling.
-> Do you have user visible problem wrt. io polling? If yes, can you
-> provide more details?
-
-No, there's no practical example yet. It's only a hint from the code base.
-
-
->
->> Currently block iopolling only polls the hardwar queue of the input bio.
->> If one bio is splitted to several bios, one (bio 1) of which is enqueued
->> into CPU A, while the others enqueued into CPU B, then the polling of bio 1
->> will cotinuously poll the hardware queue of CPU A, though the other
->> splitted bios may be in other hardware queues.
-> If it is guaranteed that the returned cookie is from bio 1, poll is
-> supposed to work as expected, since bio 1 is the chained head of these
-> bios, and the whole fs bio can be thought as done when bio1 .end_bio
-> is called.
-Yes, it is, thanks for your explanation. But except for polling if the 
-input bio has completed, one of the
-
-important work of polling logic is to reap the completion queue. Let's 
-say one bio is split into
-
-two bios, bio 1 and bio 2, both of which are enqueued into the same 
-hardware queue.When polling bio1,
-
-though we have no idea about bio2 at all, the polling logic itself is 
-still reaping the completion queue of
-
-this hardware queue repeatedly, in which case the polling logic still 
-stimulates reaping bio2.
-
-
-Then what if these two split bios enqueued into two different hardware 
-queue? Let's say bio1 is enqueued
-
-into hardware queue A, while bio2 is enqueued into hardware queue B. 
-When polling bio1, though the polling
-
-logic is repeatedly reaping the completion queue of hardware queue A, it 
-doesn't help reap bio2. bio2 is reaped
-
-by IRQ as usual. This certainly works currently, but this behavior may 
-deviate the polling design? I'm not sure.
-
-
-In other words, if we can ensure that all split bios are enqueued into 
-the same hardware queue, then the polling
-
-logic *may* be faster.
-
-
->
->> The iopolling logic has no idea if the input bio is splitted bio, or if
->> it has other splitted siblings. Thus ensure that all splitted bios are
->> enqueued into one CPU at the beginning.
-> Yeah, that is why io poll can't work on DM.
-
-Exactly I'm interested in dm polling. The polling of bio to dm device 
-can be mapped into the polling of the
-
-several underlying device. Except for the the design of the cookie, 
-currently I have not found other blocking
-
-points technically. Please let me know if I missed something.
->
->> This is only one RFC patch and it is not complete since dm/mq-scheduler
->> have not been considered yet. Please let me know if it is on the correct
->> direction or not.
->>
->> Besides I have one question on the split routine. Why the split routine
->> is implemented in a recursive style? Why we can't split the bio one time
->> and then submit the *already splitted* bios one by one?
-> Forward progress has to be provided on new splitted bio allocation which
-> is from same bio_set.
-Sorry I can't understand this. Is this a suggestion on how to improving 
-this patch, or a reply to the question
-
-why the split routine is implemented in a recursive style? Would you 
-please provide more details?
->
->
-> Thanks,
-> Ming
+Maybe DM can switch to blk_queue_split() if 'chunk_sectors' limit is power-2
+aligned.
 
 
 Thanks,
-
-Jeffle
+Ming
 
