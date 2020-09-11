@@ -2,120 +2,164 @@ Return-Path: <SRS0=ap3D=CU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C4DC43461
-	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 02:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5494C43461
+	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 02:41:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B01C420829
-	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 02:41:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF47320829
+	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 02:41:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VzyUSJUp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OT++2fAU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725306AbgIKClj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Sep 2020 22:41:39 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56190 "EHLO
+        id S1725355AbgIKClp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Sep 2020 22:41:45 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47105 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725300AbgIKClj (ORCPT
+        by vger.kernel.org with ESMTP id S1725300AbgIKClo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Sep 2020 22:41:39 -0400
+        Thu, 10 Sep 2020 22:41:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599792096;
+        s=mimecast20190719; t=1599792103;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=bVVS/8jxO4+7B26dWJY61L8dhrjgBeOPArvoEpC97D0=;
-        b=VzyUSJUpQLHGsGGMxreXsOCN0ZT2/IfA+HGo/+vA/3Ivf08dWbMP0AxgfdOSAxSe9bLA1L
-        GtIsSzfBNr905xnJ1yF0afLxl2SAiTBROY2aDDbGG2srHJmxNvEPgEFMb5WeRn9wzdgznT
-        A/uhpdG7AZU5YaEvK0jfNUBlki7ivaA=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vtW9z6VONijS6LPAknM89jI7EAQ7BLxNeobi2PCAEUU=;
+        b=OT++2fAU1PxH62Sra6EOtz/Ep7ecifZfT7EIQr3jsqHy9tONfgYA3pycwh0Mr9AxMJiRDc
+        Ag0TD5lizUlqQUGV3XDDtVgsSZ1OZ1H9QxiESQieredRsIlp60w1+dVZlhFHUKwyIK6OJt
+        IlMVSbUeP65QKSWudDkvsZr9FHlERYc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-eKgi8pfHPDm1139Bc8xNUw-1; Thu, 10 Sep 2020 22:41:32 -0400
-X-MC-Unique: eKgi8pfHPDm1139Bc8xNUw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-331-MBLu1NgfOgGFEc_nkQap-Q-1; Thu, 10 Sep 2020 22:41:39 -0400
+X-MC-Unique: MBLu1NgfOgGFEc_nkQap-Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 951918030DD;
-        Fri, 11 Sep 2020 02:41:30 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7189B8018A3;
+        Fri, 11 Sep 2020 02:41:37 +0000 (UTC)
 Received: from localhost (ovpn-13-69.pek2.redhat.com [10.72.13.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 739B15D9CA;
-        Fri, 11 Sep 2020 02:41:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6DDE219C66;
+        Fri, 11 Sep 2020 02:41:33 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
         Keith Busch <kbusch@kernel.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
+Cc:     Ming Lei <ming.lei@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
         Bart Van Assche <bvanassche@acm.org>,
         Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
         Chao Leng <lengchao@huawei.com>
-Subject: [PATCH V5 0/4] blk-mq: implement queue quiesce via percpu_ref for BLK_MQ_F_BLOCKING
-Date:   Fri, 11 Sep 2020 10:41:13 +0800
-Message-Id: <20200911024117.62480-1-ming.lei@redhat.com>
+Subject: [PATCH V5 1/4] block: use test_and_{clear|test}_bit to set/clear QUEUE_FLAG_QUIESCED
+Date:   Fri, 11 Sep 2020 10:41:14 +0800
+Message-Id: <20200911024117.62480-2-ming.lei@redhat.com>
+In-Reply-To: <20200911024117.62480-1-ming.lei@redhat.com>
+References: <20200911024117.62480-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Prepare for replacing srcu with percpu-refcount for implementing queue
+quiesce.
 
-The 1st patch add .mq_quiesce_mutex for serializing quiesce/unquiesce,
-and prepares for replacing srcu with percpu_ref.
+The following patch needs to avoid duplicated quiesce action for
+BLK_MQ_F_BLOCKING, so use test_and_{clear|test}_bit to set/clear
+QUEUE_FLAG_QUIESCED.
 
-The 2nd patch replaces srcu with percpu_ref.
-
-The 3rd patch adds tagset quiesce interface.
-
-The 4th patch applies tagset quiesce interface for NVMe subsystem.
-
-V5:
-	- warn once in case that driver unquiesces its queue being
-	  quiesce and not done, only patch 2 is modified
-
-V4:
-	- remove .mq_quiesce_mutex, and switch to test_and_[set|clear] for
-	avoiding duplicated quiesce action
-	- pass blktests(block, nvme)
-
-V3:
-	- add tagset quiesce interface
-	- apply tagset quiesce interface for NVMe
-	- pass blktests(block, nvme)
-
-V2:
-	- add .mq_quiesce_lock
-	- add comment on patch 2 wrt. handling hctx_lock() failure
-	- trivial patch style change
-
-Ming Lei (3):
-  block: use test_and_{clear|test}_bit to set/clear QUEUE_FLAG_QUIESCED
-  blk-mq: implement queue quiesce via percpu_ref for BLK_MQ_F_BLOCKING
-  blk-mq: add tagset quiesce interface
-
-Sagi Grimberg (1):
-  nvme: use blk_mq_[un]quiesce_tagset
-
- block/blk-core.c         |  13 +++
- block/blk-mq-sysfs.c     |   2 -
- block/blk-mq.c           | 182 +++++++++++++++++++++++++--------------
- block/blk-sysfs.c        |   6 +-
- block/blk.h              |   2 +
- drivers/nvme/host/core.c |  19 ++--
- include/linux/blk-mq.h   |  10 +--
- include/linux/blkdev.h   |   4 +
- 8 files changed, 154 insertions(+), 84 deletions(-)
-
-Cc: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
 Cc: Chao Leng <lengchao@huawei.com>
+---
+ block/blk-core.c | 13 +++++++++++++
+ block/blk-mq.c   | 11 ++++++++---
+ block/blk.h      |  2 ++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 093649bd252e..de440733609c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -107,6 +107,19 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_queue_flag_test_and_set);
+ 
++/**
++ * blk_queue_flag_test_and_clear - atomically test and clear a queue flag
++ * @flag: flag to be clear
++ * @q: request queue
++ *
++ * Returns the previous value of @flag - 0 if the flag was not set and 1 if
++ * the flag was set.
++ */
++bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q)
++{
++	return test_and_clear_bit(flag, &q->queue_flags);
++}
++
+ void blk_rq_init(struct request_queue *q, struct request *rq)
+ {
+ 	memset(rq, 0, sizeof(*rq));
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4abb71459f94..efd17a80fcdf 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -199,13 +199,18 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
+ 
++static bool __blk_mq_quiesce_queue_nowait(struct request_queue *q)
++{
++	return blk_queue_flag_test_and_set(QUEUE_FLAG_QUIESCED, q);
++}
++
+ /*
+  * FIXME: replace the scsi_internal_device_*block_nowait() calls in the
+  * mpt3sas driver such that this function can be removed.
+  */
+ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
+ {
+-	blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
++	__blk_mq_quiesce_queue_nowait(q);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+ 
+@@ -224,7 +229,7 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+ 	unsigned int i;
+ 	bool rcu = false;
+ 
+-	blk_mq_quiesce_queue_nowait(q);
++	__blk_mq_quiesce_queue_nowait(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (hctx->flags & BLK_MQ_F_BLOCKING)
+@@ -246,7 +251,7 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+  */
+ void blk_mq_unquiesce_queue(struct request_queue *q)
+ {
+-	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
++	blk_queue_flag_test_and_clear(QUEUE_FLAG_QUIESCED, q);
+ 
+ 	/* dispatch requests which are inserted during quiescing */
+ 	blk_mq_run_hw_queues(q, true);
+diff --git a/block/blk.h b/block/blk.h
+index c08762e10b04..312a060ea2a2 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -448,4 +448,6 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
+ 		struct page *page, unsigned int len, unsigned int offset,
+ 		unsigned int max_sectors, bool *same_page);
+ 
++bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
++
+ #endif /* BLK_INTERNAL_H */
 -- 
 2.25.2
 
