@@ -2,106 +2,112 @@ Return-Path: <SRS0=ap3D=CU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC52C43461
-	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 22:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1FFC43461
+	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 22:44:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9967122207
-	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 22:43:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xKBpO0c7"
+	by mail.kernel.org (Postfix) with ESMTP id D56C22220A
+	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 22:44:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599864291;
+	bh=hmViW3o0wQM8mEFEloTha0K8xeKJOT06en4y8TM031E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=LmRDKC93QAkYJtGkXH2YGUQNeBC+K/TFuLZYwgr9mYaJ3ZFMC+02B2CkDBFFfTMaj
+	 94zEg6gtfBN9kP4cuNLF65H5OuBVjy6byGS8VE4gFWwcdZ6nrQLRzSIGxuu6AUDnTo
+	 OlDP3c4SKggxd16kYX/kUuUCjsNQpA0U2//9SCiY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725909AbgIKWnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Sep 2020 18:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45390 "EHLO
+        id S1725870AbgIKWot (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Sep 2020 18:44:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725873AbgIKWnW (ORCPT
+        with ESMTP id S1725893AbgIKWor (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Sep 2020 18:43:22 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844C7C061573
-        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2020 15:43:22 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id n14so8390542pff.6
-        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2020 15:43:22 -0700 (PDT)
+        Fri, 11 Sep 2020 18:44:47 -0400
+Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49220C061573;
+        Fri, 11 Sep 2020 15:44:47 -0700 (PDT)
+Received: by mail-qv1-xf42.google.com with SMTP id h1so6025279qvo.9;
+        Fri, 11 Sep 2020 15:44:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=V4dnIXk3uASFKmAsRylpgs6PaxAQ2I8kA/uiE395NMo=;
-        b=xKBpO0c7GRfYDlEvLIcuNo7cRQKOSRBWiJnlgrExH6GawCClKntMGl+YgUGmo44diD
-         hVelwgwdl8uGB6WpaSdNINPmC+FAW+U5a8iu9cXUDZ64bb7PgTxsVdn0EVVo5jzk8sTL
-         p0ethGOksPgsdk/nQTW+OAR+zST8OuXiaWDh856pqqP+RQsPxz/U2veX7DhRRRUDpikB
-         2fmlhmtzOOSamIyWoTaqagyl76oQZuf5XRaDm/gsI3gppuiS5MvVp4YHjMRpBEOlTw4k
-         +DEkeaQNS2WeLJ6OLV9t1UFRRxPRfSv6ZFwnnulpSP8Yy3TOCl+kyeJLFvQUXrKrFfae
-         d78A==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=u+WhBADY6qVJWkQ3xRM3bDy/SBlYQIzy5ZdNwaCGMPo=;
+        b=Vd6T5UxRIdx5jTi/U0KU/8IsFPJn+d/lu1Rm2NRQqLFvakL1U7maewPdM/lewBZIBf
+         3JlMLhMrGiLuqhfjC65xkDCyKXeVytlPJRK7J9HAiMm+TJRRlqOh/2R5NiUtCSLvaJT3
+         OX9MD+J6eZXUr4IsDcH8JIThEv6bGpk9DePXSYqgZ0fFHA2XzxH5/EzeFwS12bSgIban
+         T08PKKO3K2bSfLHbeNo9gH9hE41A48jpwozy4ttMKVyIvb+/HLVMTpx4JvRk9+nDgf9B
+         24/5RuG4MXhn2RwEKraI50vOGj06UnXe33AFayZdWAj1277lIwCEUDN7UFQUtNdRLJDq
+         7fww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=V4dnIXk3uASFKmAsRylpgs6PaxAQ2I8kA/uiE395NMo=;
-        b=HWHYLJGe8rZzrg11AO/H/LwOkpO9mKg7Y7+FTE2d0iGOzD8g+c9rFdbELca2GvWj1C
-         8/32pVIo/EfFCvsL6UQ9DxIu4SDy8IyaP/f1Q/mIrnLtMgLimQWcf6Y5Nos+9scyQhld
-         nMJVtQLwLP9c1WpWg4fD9G1mfI6gaiu4dFuY35R0UWxxVwQ22a56OIbon3NScyIA2smX
-         BC4Xp5nm9avTl1aI0r9T0ZOgG/0piQdRTHF4mk98OyAg756jMb48gMNj/TpVCdFN6a0B
-         YetT7wnIkKIvxsZl0D7ppXkIl0CjqoBA9QBG/ject4UdRxZ3LSUTL6cBY9U4zLUTPmSx
-         AOuA==
-X-Gm-Message-State: AOAM53148aRGUp0tM5ufXVO5P5hOjsfJFgDCZT8ePKmQ8LOgURg/jsyM
-        SUUGJ6cvLSLxBe9P0yKT3BAIEQ==
-X-Google-Smtp-Source: ABdhPJyFM5VCvQ9wgag86nKFAph92fcH4OJjuMFJOFcQihZDKQd0xTwdWGH6BphZfULMmmBWq14Cbg==
-X-Received: by 2002:a63:2250:: with SMTP id t16mr3185165pgm.303.1599864202018;
-        Fri, 11 Sep 2020 15:43:22 -0700 (PDT)
-Received: from ?IPv6:2600:380:4955:1abc:b8c:928e:5fe6:fb78? ([2600:380:4955:1abc:b8c:928e:5fe6:fb78])
-        by smtp.gmail.com with ESMTPSA id l7sm2500221pjz.56.2020.09.11.15.43.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Sep 2020 15:43:21 -0700 (PDT)
-Subject: Re: [PATCH v2 block/for-next] blk-iocost: fix divide-by-zero in
- transfer_surpluses()
-To:     Tejun Heo <tj@kernel.org>
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=u+WhBADY6qVJWkQ3xRM3bDy/SBlYQIzy5ZdNwaCGMPo=;
+        b=AOfWNZHNCNCW/2g4fQyAW+Ls9E8oUcG591Ijb3dwp0fpUyeSw4Jj2agZdyNp1/sC5n
+         eN+TtV4I+t9JeTvzBljvqY14JDy1M7u/vNuGP8lX3rhSOVk2I5JpPBW35PlmuanRXJ4D
+         bmhA5gYr1vHBlEDBWaTWLh8LImj+qihn98LrxjdxAnVdsymJsFjwV8T7YWyC5xpYyDgn
+         LTrrWVdbiqCXwm8j5FuqcHCLZfTQn12st1LE3VP+v6kHBG1/H4rnGpb++YTo/+UHGNQO
+         DCSwyQet/uGPZr/Ydh2FH0V3c/shLo0B4XSTKfA+LI3J9fc3yAdp+kLmIKcNsEltAvRP
+         Kt5Q==
+X-Gm-Message-State: AOAM532hi2SFqhzaY5jsKIKNcviszXDwNpJAUBAv9vQ0Fz2/unfv5vyy
+        xHYqCMOvgVemCijit5rAr4PNlarpYRtqvw==
+X-Google-Smtp-Source: ABdhPJwRT7UYaX3oxQFSIVPMf7caj4RAt8NBOJcw930XJ0jTaCEv1EdpSyMs6kiSJ2DLVqor7+/55A==
+X-Received: by 2002:a0c:fa07:: with SMTP id q7mr4218336qvn.41.1599864286486;
+        Fri, 11 Sep 2020 15:44:46 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:95ac])
+        by smtp.gmail.com with ESMTPSA id j31sm4681290qtc.33.2020.09.11.15.44.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2020 15:44:45 -0700 (PDT)
+Date:   Fri, 11 Sep 2020 18:44:44 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel-team@fb.com, cgroups@vger.kernel.org
+Subject: Re: [PATCH v2 block/for-next] blk-iocost: fix divide-by-zero in
+ transfer_surpluses()
+Message-ID: <20200911224444.GB865564@mtj.thefacebook.com>
 References: <20200911170746.GG4295@mtj.thefacebook.com>
  <ff46ca79-433e-3279-a8eb-35156639be7b@kernel.dk>
  <20200911224049.GA865564@mtj.thefacebook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <59987f54-47fc-766f-0667-5a90daca0b1a@kernel.dk>
-Date:   Fri, 11 Sep 2020 16:43:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <59987f54-47fc-766f-0667-5a90daca0b1a@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20200911224049.GA865564@mtj.thefacebook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59987f54-47fc-766f-0667-5a90daca0b1a@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/11/20 4:40 PM, Tejun Heo wrote:
-> Conceptually, root_iocg->hweight_donating must be less than WEIGHT_ONE but
-> all hweight calculations round up and thus it may end up >= WEIGHT_ONE
-> triggering divide-by-zero and other issues. Bound the value to avoid
-> surprises.
+On Fri, Sep 11, 2020 at 04:43:18PM -0600, Jens Axboe wrote:
+> On 9/11/20 4:40 PM, Tejun Heo wrote:
+> > Conceptually, root_iocg->hweight_donating must be less than WEIGHT_ONE but
+> > all hweight calculations round up and thus it may end up >= WEIGHT_ONE
+> > triggering divide-by-zero and other issues. Bound the value to avoid
+> > surprises.
+> > 
+> > Signed-off-by: Tejun Heo <tj@kernel.org>
+> > Fixes: e08d02aa5fc9 ("blk-iocost: implement Andy's method for donation weight updates")
+> > 
+> > Signed-off-by: Tejun Heo <tj@kernel.org>
+> > ---
+> > Jens, I was flipping between doing max_t(, 1) over the whole divider and
+> > doing min_t(, WEIGHT_ONE - 1) for hweight_donating. I thought that I as
+> > testing after the last change but it obviously wasn't and the previous patch
+> > doesn't compile due to missing type argument. Can you please apply this
+> > patch instead? I can send an incremental patch if that'd be better. My
+> > apologies.
 > 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> Fixes: e08d02aa5fc9 ("blk-iocost: implement Andy's method for donation weight updates")
-> 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> ---
-> Jens, I was flipping between doing max_t(, 1) over the whole divider and
-> doing min_t(, WEIGHT_ONE - 1) for hweight_donating. I thought that I as
-> testing after the last change but it obviously wasn't and the previous patch
-> doesn't compile due to missing type argument. Can you please apply this
-> patch instead? I can send an incremental patch if that'd be better. My
-> apologies.
+> Sure, I replaced it. BTW, you had two signed-off-by's in there.
 
-Sure, I replaced it. BTW, you had two signed-off-by's in there.
+Yeah, sloppy all around. Sorry about that. Gotta slow down more when posting
+oh-shit-I-fucked-up stuff.
+
+Thanks.
 
 -- 
-Jens Axboe
-
+tejun
