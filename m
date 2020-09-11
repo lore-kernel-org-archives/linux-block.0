@@ -2,112 +2,123 @@ Return-Path: <SRS0=ap3D=CU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F8FC43461
-	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 21:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B4BC2BC11
+	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 21:53:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9CD622207
-	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 21:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBF0C22208
+	for <linux-block@archiver.kernel.org>; Fri, 11 Sep 2020 21:53:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u8Hc3bO6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmMBvAQP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725883AbgIKVxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Sep 2020 17:53:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37702 "EHLO
+        id S1725884AbgIKVxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Sep 2020 17:53:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725856AbgIKVxl (ORCPT
+        with ESMTP id S1725873AbgIKVxm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Sep 2020 17:53:41 -0400
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F6F3C061573
-        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2020 14:53:41 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id v123so11363434qkd.9
-        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2020 14:53:41 -0700 (PDT)
+        Fri, 11 Sep 2020 17:53:42 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F3F0C061757
+        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2020 14:53:42 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id v54so9094619qtj.7
+        for <linux-block@vger.kernel.org>; Fri, 11 Sep 2020 14:53:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to;
-        bh=G04JF2pKkU3Et5jfoho48Oyq+62stIClH7lP76/hVsw=;
-        b=u8Hc3bO6hTpnM+tfLZxmYjhnExEcrXozdC25ScvC2Wf1o0z4S4zouUuzyqPvjhZH+F
-         //cq3am06Zz1RgVKgSN9tO1Ux96F/uVTTw/NgRWs61LNYFaMYy221II2B1ZYO7QSyFtx
-         cL/ejewuR42BHBT7kb1AMWKeR6IIR8GUL1LXA1ZtX//63WzYEuqtylPlguffzwi5x4hn
-         o/ioWhVbxONbPy6XSiOiDWSCF9pYTk3YcjpFdhdKHFvlZvnF+Ti3JtDKeq0QeOmFPD01
-         /Dr6Xe6msSCWwfgB8ByYzLtwU7gPAj3IzLVrq9u1UzFO/sX7hiT9kFNkc+5X1uL6uEx2
-         azkA==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=p0AgwegfJk6uZfD0nMSn2ocvdLTNtvY1TgQDTCc+R4g=;
+        b=BmMBvAQPizWki1G9HXUVUOlvXIGF0lmWAr2CbUYPi/d58Ea2Gcl/WtD13S79GTXBx2
+         2EYxZTrkk3pXR3NxxPMr5KuGlLCtFYpaKoxjdliXWXdcTG4xFQPzbDsQ2tFi7Sq3WoDn
+         CVawx9RFhwrde5+fnspvZ675TwYbfzibmqOaoH/3vMd6Xj3zzCTxyr7oUxy7CaIn/3jY
+         iHkfw3dS2dUnfCfl6GZhWeV3EVA6UMzNimKXflCBJzy9acfCgzx80GBqqj8t2zMObgZo
+         pljPIgwGIS+o5aelun3NVWRcmUjTpLn/Em8FLQbKo9J5DEuIKy5KXPwLo9CwovEqD21x
+         gQDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to;
-        bh=G04JF2pKkU3Et5jfoho48Oyq+62stIClH7lP76/hVsw=;
-        b=dMGM337sdNqW8z5hhAqPYbbG19akQw5jD8TXJxb2fjZfynaJFFCwinO/epKXh4nAzH
-         tS5+bERB1OQUmZF5mFVq/pnU1AQy9cKzZ556yfnzrReu+vz3gevorp5SwfI/3juv1Ti/
-         8qXh9sVlVPEYBKXb0CF8D0HoiJviFDLi6M+F/jX95ZWxlA1xhnFUk28RNzFFOZamsHog
-         tES3tez6B+7SeMqwRdulhSAbYQO57uZurDazgMYJQKLt2SNZBUiyEYYCgc+pv0e5hpLB
-         eX9pVM8PSMpzyzUvTBVKjhUkUa+muSsL0s8gM4QJ0JK7blmU9g27tUx4sYuZIhIDxlDU
-         txuA==
-X-Gm-Message-State: AOAM530WA2BMGit5RFE+m5pGzg59iVnBqGdVDBUqPrMOvtLndjbOA7Ac
-        7Fd7+cF+ObJV1bJ8BruF9i4=
-X-Google-Smtp-Source: ABdhPJwgeLTfsIYVaPcyQ/WJS01DI4mJwHCJud4bXvtWVHuZMRNibqENkQ6mSYR4El/4hTD1wVzw8w==
-X-Received: by 2002:a37:b347:: with SMTP id c68mr3462124qkf.430.1599861220463;
-        Fri, 11 Sep 2020 14:53:40 -0700 (PDT)
+         :in-reply-to:references;
+        bh=p0AgwegfJk6uZfD0nMSn2ocvdLTNtvY1TgQDTCc+R4g=;
+        b=Os/0zJkveTL39dQeMcgJG8SteCOWG7Zdn3vpKPH/1HGtHMRj33jjXgPHUzeGsqvl33
+         E2GEU6pajSOndLq3DZAMS2S4NbAPvFdb8inamKMo8uO0fuc7BaDXVdwvGZPgwmUNvThB
+         puPgkXD2XlRZfmz+3JKqbouSNSbBKXsZMYq2fM+UwIjzTFWmteAZ+8Mr0DcmAfEsD5+z
+         daQqXafx2QhLEoacvD7x7guJo9Kad6WTdK50zzf1wfI3yz2rhcQ8i8h7df+gzSmFbU67
+         35rXpogq6ez1UddYP4i3Quikls0EzcQf4FAtBW8WlB7UjJt7TTIAOyZfhnz+/XYhYY87
+         t72w==
+X-Gm-Message-State: AOAM531XFwpMVZ/gvC51ZWR5Iii25lP990kt2lmLsLRz4R5nzLjtQ3Jb
+        sk7GhUmxNXHGL0YYtj56niU=
+X-Google-Smtp-Source: ABdhPJxS62mFnmJmeEU6DtwZij4rhz+l6eaC1J9f8aEST+av5WDf61y6CcNxX10pGo483sQiSfl21w==
+X-Received: by 2002:aed:2555:: with SMTP id w21mr4007348qtc.132.1599861221854;
+        Fri, 11 Sep 2020 14:53:41 -0700 (PDT)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id r42sm4488262qtk.29.2020.09.11.14.53.39
+        by smtp.gmail.com with ESMTPSA id g203sm4551960qkb.51.2020.09.11.14.53.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2020 14:53:39 -0700 (PDT)
+        Fri, 11 Sep 2020 14:53:41 -0700 (PDT)
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Vijayendra Suman <vijayendra.suman@oracle.com>,
         dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 0/3] block: a few chunk_sectors fixes/improvements
-Date:   Fri, 11 Sep 2020 17:53:35 -0400
-Message-Id: <20200911215338.44805-1-snitzer@redhat.com>
+Subject: [PATCH 1/3] block: fix blk_rq_get_max_sectors() to flow more carefully
+Date:   Fri, 11 Sep 2020 17:53:36 -0400
+Message-Id: <20200911215338.44805-2-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
-In-Reply-To: <20200911161344.GA28614@redhat.com>
+In-Reply-To: <20200911215338.44805-1-snitzer@redhat.com>
+References: <20200911215338.44805-1-snitzer@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+blk_queue_get_max_sectors() has been trained for REQ_OP_WRITE_SAME and
+REQ_OP_WRITE_ZEROES yet blk_rq_get_max_sectors() didn't call it for
+those operations.
 
-Here are some changes that seem needed but that stop short of fixing the
-initial report (of DM pgbench regression).  Would be nice if you could
-review these block patches since they stand on their own.
+Also, there is no need to avoid blk_max_size_offset() if
+'chunk_sectors' isn't set because it falls back to 'max_sectors'.
 
-I still have to look closer at how to get blk_queue_split() the info DM
-has (in ti->max_io_len). Ideally a variant of blk_queue_split() could be
-created that allows a 'chunk_sectors' override to be passed in, e.g.:
-dm_process_bio() would call: blk_queue_split(&bio, ti->max_io_len);
-And the provided ti->max_io_len would be used instead of a global (one
-size fits all) q->limits.chunk_sectors.  The reason why this is
-needed/ideal is due to DM's stacked nature.  Different offsets into a DM
-device could yield entirely different max_io_len (or chunk_sectors)
-settings.
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+---
+ include/linux/blkdev.h | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-BUT short of standing up a new variant of blk_queue_split() with per bio
-override for 'chunk_sectors' (which is likely a non-starter for a few
-reasons, recurssive nature of bio_split being the biggest): I'll need to
-update all DM targets that call dm_set_target_max_io_len() to also do
-this in each target's .io_hints hook:
-  limits->chunk_sectors = lcm_not_zero(ti->max_io_len, limits->chunk_sectors);
-Won't be perfect for some stacked devices (given it'll constrain
-chunk_sectors to be less optimal as the IO limits are stacked) but it
-should be an improvment -- and hopefully fix this pgbench regression.
-
-Thanks,
-Mike
-
-Mike Snitzer (3):
-  block: fix blk_rq_get_max_sectors() to flow more carefully
-  block: use lcm_not_zero() when stacking chunk_sectors
-  block: allow 'chunk_sectors' to be non-power-of-2
-
- block/blk-settings.c   | 22 ++++++++++++----------
- include/linux/blkdev.h | 31 ++++++++++++++++++++++---------
- 2 files changed, 34 insertions(+), 19 deletions(-)
-
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bb5636cc17b9..453a3d735d66 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1070,17 +1070,24 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
+ 						  sector_t offset)
+ {
+ 	struct request_queue *q = rq->q;
++	int op;
++	unsigned int max_sectors;
+ 
+ 	if (blk_rq_is_passthrough(rq))
+ 		return q->limits.max_hw_sectors;
+ 
+-	if (!q->limits.chunk_sectors ||
+-	    req_op(rq) == REQ_OP_DISCARD ||
+-	    req_op(rq) == REQ_OP_SECURE_ERASE)
+-		return blk_queue_get_max_sectors(q, req_op(rq));
++	op = req_op(rq);
++	max_sectors = blk_queue_get_max_sectors(q, op);
+ 
+-	return min(blk_max_size_offset(q, offset),
+-			blk_queue_get_max_sectors(q, req_op(rq)));
++	switch (op) {
++	case REQ_OP_DISCARD:
++	case REQ_OP_SECURE_ERASE:
++	case REQ_OP_WRITE_SAME:
++	case REQ_OP_WRITE_ZEROES:
++		return max_sectors;
++	}
++
++	return min(blk_max_size_offset(q, offset), max_sectors);
+ }
+ 
+ static inline unsigned int blk_rq_count_bios(struct request *rq)
 -- 
 2.15.0
 
