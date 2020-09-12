@@ -7,118 +7,134 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7183C433E2
-	for <linux-block@archiver.kernel.org>; Sat, 12 Sep 2020 13:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE61C433E2
+	for <linux-block@archiver.kernel.org>; Sat, 12 Sep 2020 14:07:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6519920855
-	for <linux-block@archiver.kernel.org>; Sat, 12 Sep 2020 13:58:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54C4B208B3
+	for <linux-block@archiver.kernel.org>; Sat, 12 Sep 2020 14:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FVGV0svF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISgc92OY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725854AbgILN6q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 12 Sep 2020 09:58:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26995 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725848AbgILN6o (ORCPT
+        id S1725846AbgILOH0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 12 Sep 2020 10:07:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32795 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725848AbgILOHB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 12 Sep 2020 09:58:44 -0400
+        Sat, 12 Sep 2020 10:07:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599919122;
+        s=mimecast20190719; t=1599919610;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=sIS0z+OSHzxyt/gsTVJl97Jrp1M6RO4hEABRwxQ0KH8=;
-        b=FVGV0svFjybEeGzLunzjnayDNkD0oze0G1oBF25EcUiojzQIWNnM+cT3BY9awBNt3fGrXt
-        vHj0BGBTJeP2YEiIb5Pw7D6AJ1i54x8efROYqgCWKGrfhUZl35AhhYotzeNiYe4uliP4tX
-        p5j/UTw229tZSGKVi+NEnORFC678/d0=
+        bh=jPwQiHvAv7wsXej8Zd/nygKO59cvFZQB1hoT7gIn9bg=;
+        b=ISgc92OY0u2n3PbSbIYQX1XZ4VRc5WzrMykeEx2pXJl96wadQHX/blJNPamZblXdd9eHu7
+        O8RFTMt23+kpRYVFVHtXx9gXugNoT4Am9A9npul3lZGzjmhE6b6r7ZEKfiZQ80qKDVnK3p
+        LK34oxbbC9LGzA3KyjOSH/ldWPfhblo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-TEfeQITjOAWjHYtgOtea4w-1; Sat, 12 Sep 2020 09:58:38 -0400
-X-MC-Unique: TEfeQITjOAWjHYtgOtea4w-1
+ us-mta-443-wMp-Q_XtPX2Tx9YlJrmDJw-1; Sat, 12 Sep 2020 10:06:48 -0400
+X-MC-Unique: wMp-Q_XtPX2Tx9YlJrmDJw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF2A58797DD;
-        Sat, 12 Sep 2020 13:58:37 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55A9D640B7;
+        Sat, 12 Sep 2020 14:06:47 +0000 (UTC)
 Received: from T590 (ovpn-12-84.pek2.redhat.com [10.72.12.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C6CEB75129;
-        Sat, 12 Sep 2020 13:58:26 +0000 (UTC)
-Date:   Sat, 12 Sep 2020 21:58:22 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C30175141;
+        Sat, 12 Sep 2020 14:06:35 +0000 (UTC)
+Date:   Sat, 12 Sep 2020 22:06:30 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Mike Snitzer <snitzer@redhat.com>
 Cc:     Vijayendra Suman <vijayendra.suman@oracle.com>,
         dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/3] block: use lcm_not_zero() when stacking chunk_sectors
-Message-ID: <20200912135822.GB210077@T590>
+Subject: Re: [PATCH 3/3] block: allow 'chunk_sectors' to be non-power-of-2
+Message-ID: <20200912140630.GC210077@T590>
 References: <20200911215338.44805-1-snitzer@redhat.com>
- <20200911215338.44805-3-snitzer@redhat.com>
+ <20200911215338.44805-4-snitzer@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200911215338.44805-3-snitzer@redhat.com>
+In-Reply-To: <20200911215338.44805-4-snitzer@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 11, 2020 at 05:53:37PM -0400, Mike Snitzer wrote:
-> Like 'io_opt', blk_stack_limits() should stack 'chunk_sectors' using
-> lcm_not_zero() rather than min_not_zero() -- otherwise the final
-> 'chunk_sectors' could result in sub-optimal alignment of IO to
-> component devices in the IO stack.
+On Fri, Sep 11, 2020 at 05:53:38PM -0400, Mike Snitzer wrote:
+> It is possible for a block device to use a non power-of-2 for chunk
+> size which results in a full-stripe size that is also a non
+> power-of-2.
 > 
-> Also, if 'chunk_sectors' isn't a multiple of 'physical_block_size'
-> then it is a bug in the driver and the device should be flagged as
-> 'misaligned'.
+> Update blk_queue_chunk_sectors() and blk_max_size_offset() to
+> accommodate drivers that need a non power-of-2 chunk_sectors.
 > 
 > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 > ---
->  block/blk-settings.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+>  block/blk-settings.c   | 10 ++++------
+>  include/linux/blkdev.h | 12 +++++++++---
+>  2 files changed, 13 insertions(+), 9 deletions(-)
 > 
 > diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 76a7e03bcd6c..b09642d5f15e 100644
+> index b09642d5f15e..e40a162cc946 100644
 > --- a/block/blk-settings.c
 > +++ b/block/blk-settings.c
-> @@ -534,6 +534,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  
->  	t->io_min = max(t->io_min, b->io_min);
->  	t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
-> +	t->chunk_sectors = lcm_not_zero(t->chunk_sectors, b->chunk_sectors);
->  
->  	/* Physical block size a multiple of the logical block size? */
->  	if (t->physical_block_size & (t->logical_block_size - 1)) {
-> @@ -556,6 +557,13 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  		ret = -1;
->  	}
->  
-> +	/* chunk_sectors a multiple of the physical block size? */
-> +	if (t->chunk_sectors & (t->physical_block_size - 1)) {
-> +		t->chunk_sectors = 0;
-> +		t->misaligned = 1;
-> +		ret = -1;
-> +	}
-> +
->  	t->raid_partial_stripes_expensive =
->  		max(t->raid_partial_stripes_expensive,
->  		    b->raid_partial_stripes_expensive);
-> @@ -594,10 +602,6 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  			t->discard_granularity;
->  	}
->  
-> -	if (b->chunk_sectors)
-> -		t->chunk_sectors = min_not_zero(t->chunk_sectors,
-> -						b->chunk_sectors);
-> -
->  	t->zoned = max(t->zoned, b->zoned);
->  	return ret;
+> @@ -172,15 +172,13 @@ EXPORT_SYMBOL(blk_queue_max_hw_sectors);
+>   *
+>   * Description:
+>   *    If a driver doesn't want IOs to cross a given chunk size, it can set
+> - *    this limit and prevent merging across chunks. Note that the chunk size
+> - *    must currently be a power-of-2 in sectors. Also note that the block
+> - *    layer must accept a page worth of data at any offset. So if the
+> - *    crossing of chunks is a hard limitation in the driver, it must still be
+> - *    prepared to split single page bios.
+> + *    this limit and prevent merging across chunks. Note that the block layer
+> + *    must accept a page worth of data at any offset. So if the crossing of
+> + *    chunks is a hard limitation in the driver, it must still be prepared
+> + *    to split single page bios.
+>   **/
+>  void blk_queue_chunk_sectors(struct request_queue *q, unsigned int chunk_sectors)
+>  {
+> -	BUG_ON(!is_power_of_2(chunk_sectors));
+>  	q->limits.chunk_sectors = chunk_sectors;
 >  }
+>  EXPORT_SYMBOL(blk_queue_chunk_sectors);
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 453a3d735d66..e72bcce22143 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1059,11 +1059,17 @@ static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
+>  static inline unsigned int blk_max_size_offset(struct request_queue *q,
+>  					       sector_t offset)
+>  {
+> -	if (!q->limits.chunk_sectors)
+> +	unsigned int chunk_sectors = q->limits.chunk_sectors;
+> +
+> +	if (!chunk_sectors)
+>  		return q->limits.max_sectors;
+>  
+> -	return min(q->limits.max_sectors, (unsigned int)(q->limits.chunk_sectors -
+> -			(offset & (q->limits.chunk_sectors - 1))));
+> +	if (is_power_of_2(chunk_sectors))
+> +		chunk_sectors -= (offset & (chunk_sectors - 1));
+> +	else
+> +		chunk_sectors -= sector_div(offset, chunk_sectors);
+> +
+> +	return min(q->limits.max_sectors, chunk_sectors);
+>  }
+>  
+>  static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
+> -- 
+> 2.15.0
+> 
 
-Looks fine:
+is_power_of_2() is cheap enough for fast path, so looks fine to support
+non-power-of-2 chunk sectors.
+
+Maybe NVMe PCI can remove the power_of_2() limit too.
 
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
 
 Thanks,
 Ming
