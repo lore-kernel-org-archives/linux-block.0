@@ -2,215 +2,114 @@ Return-Path: <SRS0=/NTj=CW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E0DC43461
-	for <linux-block@archiver.kernel.org>; Sun, 13 Sep 2020 06:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFECC433E2
+	for <linux-block@archiver.kernel.org>; Sun, 13 Sep 2020 07:05:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA3442098B
-	for <linux-block@archiver.kernel.org>; Sun, 13 Sep 2020 06:03:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19B8021655
+	for <linux-block@archiver.kernel.org>; Sun, 13 Sep 2020 07:05:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BMrL7GgI"
+	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="O/V13iVt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725899AbgIMGDX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Sep 2020 02:03:23 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:60247 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725909AbgIMGDM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Sep 2020 02:03:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1599976991; x=1631512991;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jxd9y2JXL2aUJ7WYNs3dtOces+LIigDvq1lvki3gPVk=;
-  b=BMrL7GgIcedUlE/mgI18JitShiPyKlFS9IYwvM998U5S4zjPGVE/WFh8
-   fNE+BcyTPw2TfDy+qHtKGUZNoTSPcPpl0ElgFZiaLne9jZ9xJr6GzuXhN
-   ZskcpprfOKTReMcAgMDyrw84Q4yWNBkCBabXZOmVrkBgAp6uWL1FJ9hXs
-   GZzjOKy7ETyirRF5DL5S4XhEtFCEVJ034fmqTyIdkiZ2dPUPG4rp2bs7B
-   sv5its/sEzxbCIUiYtdAXLusb3gprx9I0GIADVxnUqUsk4y9TC5KrGcPx
-   W0WmlrlmM8RCNgTqsJM97P3WrpZvSP7EwZa6e4Rw6LKj58nQmWv51ugVq
-   g==;
-IronPort-SDR: Qfbojx1AjKVSvhP35JPtdgsvAmIR3SLBZ4R71P0btHxakHpG7DQWDZpSZBxEKQ899egDBWawYB
- W7CEjBYxr91sB5xtIIgMUJPrOPEvl4f1QYtDttBGZcWzdovzxTusZPFYyGwaTsA8lo2QCMNEuF
- wAIP91JzjoQ2vQBjSvG51XU9jw4R02sTSQJv4snFSq3OEdVDe3fYCMBhqrOBftW4R6V0I4OEZ1
- iS/eWsKHth/13AxHYreNspr8PvQq2hFzPbZwJ4t9FQdBl5Si+QKO+MyIRnlyZ0qoLaqIUEAXo/
- Ht8=
-X-IronPort-AV: E=Sophos;i="5.76,421,1592841600"; 
-   d="scan'208";a="148458736"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Sep 2020 14:03:11 +0800
-IronPort-SDR: ZbusAnwiNjm6KS07uwyzwB4ys857MwGOc1WL9FS5wDZIYs7ILGwHz7CWIG29+IXf3sBBLYvi/5
- f+7pzP4x+UCg==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2020 22:49:29 -0700
-IronPort-SDR: NtwP2buxnEKly/SpYwBfPl0DoYL9CswEBrsbgvIb4Us04KZ6H0knJi77SNHEtXJEnPve8iypHT
- 1YG+X+AwAo/w==
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 12 Sep 2020 23:03:10 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-scsi@vger.kernel.org,
+        id S1725899AbgIMHFU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Sep 2020 03:05:20 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:50918 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725878AbgIMHFT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 13 Sep 2020 03:05:19 -0400
+Received: from zn.tnic (p200300ec2f290b00e66ccb465e44ee87.dip0.t-ipconnect.de [IPv6:2003:ec:2f29:b00:e66c:cb46:5e44:ee87])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DA5051EC0501;
+        Sun, 13 Sep 2020 09:05:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1599980717;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=e914e8whMVmGW7aK1X34dlD6tHZkjqgsV/4kJ55/P7o=;
+        b=O/V13iVt2p0xPpHzk/GRBfdatRwzoT9Wa0wS2vgdZJJ1xtFMiRz54TiqNaZFJdkXREMKQ/
+        zjJMhsav4whZwyZflsfCQJk42nqv/Fz+VUxbpJx/qyRWFqpCJrH2/vhfOrV5Brl252e8pg
+        6VqExBImCtD0ZPqCeJMXcr6l1kKHjBM=
+Date:   Sun, 13 Sep 2020 09:05:06 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 2/2] scsi: Fix ZBC disk initialization
-Date:   Sun, 13 Sep 2020 15:03:04 +0900
-Message-Id: <20200913060304.294898-3-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200913060304.294898-1-damien.lemoal@wdc.com>
+Subject: Re: [PATCH 0/2] Fix handling of host-aware ZBC disks
+Message-ID: <20200913070506.GA5213@zn.tnic>
 References: <20200913060304.294898-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200913060304.294898-1-damien.lemoal@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make sure to call sd_zbc_init_disk() when the sdkp->zoned field is
-known, that is, once sd_read_block_characteristics() is executed in
-sd_revalidate_disk(), so that host-aware disks also get initialized.
-To do so, move sd_zbc_init_disk() call in sd_zbc_revalidate_zones() and
-make sure to execute it for all zoned disks, including for host-aware
-disks used as regular disks as these disk zoned model may be changed
-back to BLK_ZONED_HA when partitions are deleted.
+Mornin',
 
-Reported-by: Borislav Petkov <bp@alien8.de>
-Fixes: 5795eb443060 ("scsi: sd_zbc: emulate ZONE_APPEND commands")
-Cc: <stable@vger.kernel.org> # v5.8+
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+On Sun, Sep 13, 2020 at 03:03:02PM +0900, Damien Le Moal wrote:
+> I tested all this. I could recreate the hang you are seeing with
+> CONFIG_BLK_DEV_ZONED disabled. The cause for this hang was that
+> good_bytes always ended up being 0 for all IOs to the host-aware disk.
+> The fix for this is in the first patch.
+> If you could test this (on top of 5.9-rc), it would be great. Thanks !
+
+Sure, below is the diff of both boot dmesgs, with CONFIG_BLK_DEV_ZONED
+and without it. So for both:
+
+Tested-by: Borislav Petkov <bp@suse.de>
+
+Thanks Damien and sorry for ruining your weekend.
+
 ---
- drivers/scsi/sd.c     |  4 ---
- drivers/scsi/sd.h     |  6 -----
- drivers/scsi/sd_zbc.c | 60 +++++++++++++++++++++++++------------------
- 3 files changed, 35 insertions(+), 35 deletions(-)
+--- 09-rc4+.CONFIG_BLK_DEV_ZONED	2020-09-13 08:36:13.423999302 +0200
++++ 09-rc4+.CONFIG_BLK_DEV_ZONED.off	2020-09-13 08:43:45.371999496 +0200
+@@ -825,28 +825,26 @@ input: DATACOMP SteelS쀁̄Љ̒DATA Cons
+ hid-generic 0003:04B4:0101.0002: input,hidraw1: USB HID v1.00 Device [DATACOMP SteelS쀁̄Љ̒DATA] on usb-0000:03:00.0-12/input1
+ usb 1-13: new low-speed USB device number 3 using xhci_hcd
+ usb 1-13: New USB device found, idVendor=046d, idProduct=c018, bcdDevice=43.01
+-ata4: SATA link up 6.0 Gbps (SStatus 133 SControl 300)
+ usb 1-13: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+-ata4.00: NCQ Send/Recv Log not supported
+ usb 1-13: Product: USB Optical Mouse
+ usb 1-13: Manufacturer: Logitech
++ata4: SATA link up 6.0 Gbps (SStatus 133 SControl 300)
++ata4.00: NCQ Send/Recv Log not supported
+ ata4.00: ATA-10: ST8000AS0022-1WL17Z, SN01, max UDMA/133
+-ata4.00: 15628053168 sectors, multi 16: LBA48 NCQ (depth 32), AA
+ input: Logitech USB Optical Mouse as /devices/pci0000:00/0000:00:01.3/0000:03:00.0/usb1/1-13/1-13:1.0/0003:046D:C018.0003/input/input5
++ata4.00: 15628053168 sectors, multi 16: LBA48 NCQ (depth 32), AA
+ ata4.00: NCQ Send/Recv Log not supported
+ hid-generic 0003:046D:C018.0003: input,hidraw2: USB HID v1.11 Mouse [Logitech USB Optical Mouse] on usb-0000:03:00.0-13/input0
+ ata4.00: configured for UDMA/133
+ scsi 3:0:0:0: Direct-Access     ATA      ST8000AS0022-1WL SN01 PQ: 0 ANSI: 5
+ sd 3:0:0:0: Attached scsi generic sg1 type 0
+-sd 3:0:0:0: [sdb] Host-aware zoned block device
++sd 3:0:0:0: [sdb] Host-aware SMR disk used as regular disk
+ sd 3:0:0:0: [sdb] 15628053168 512-byte logical blocks: (8.00 TB/7.28 TiB)
+ sd 3:0:0:0: [sdb] 4096-byte physical blocks
+ sd 3:0:0:0: [sdb] Write Protect is off
+ sd 3:0:0:0: [sdb] Mode Sense: 00 3a 00 00
+ sd 3:0:0:0: [sdb] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+-sd 3:0:0:0: [sdb] 29808 zones of 524288 logical blocks + 1 runt zone
+  sdb: sdb1
+-sdb: disabling host aware zoned block device support due to partitions
+ sd 3:0:0:0: [sdb] Attached SCSI disk
+ ata5: failed to resume link (SControl 0)
+ ata5: SATA link down (SStatus 0 SControl 0)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 7f0371185a45..3d2cffb8e9aa 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3418,10 +3418,6 @@ static int sd_probe(struct device *dev)
- 	sdkp->first_scan = 1;
- 	sdkp->max_medium_access_timeouts = SD_MAX_MEDIUM_TIMEOUTS;
- 
--	error = sd_zbc_init_disk(sdkp);
--	if (error)
--		goto out_free_index;
--
- 	sd_revalidate_disk(gd);
- 
- 	gd->flags = GENHD_FL_EXT_DEVT;
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 7251434100e6..a3aad608bc38 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -215,7 +215,6 @@ static inline int sd_is_zoned(struct scsi_disk *sdkp)
- 
- #ifdef CONFIG_BLK_DEV_ZONED
- 
--int sd_zbc_init_disk(struct scsi_disk *sdkp);
- void sd_zbc_release_disk(struct scsi_disk *sdkp);
- int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buffer);
- int sd_zbc_revalidate_zones(struct scsi_disk *sdkp);
-@@ -231,11 +230,6 @@ blk_status_t sd_zbc_prepare_zone_append(struct scsi_cmnd *cmd, sector_t *lba,
- 
- #else /* CONFIG_BLK_DEV_ZONED */
- 
--static inline int sd_zbc_init_disk(struct scsi_disk *sdkp)
--{
--	return 0;
--}
--
- static inline void sd_zbc_release_disk(struct scsi_disk *sdkp) {}
- 
- static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index a739456dea02..cf07b7f93579 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -651,6 +651,28 @@ static void sd_zbc_print_zones(struct scsi_disk *sdkp)
- 			  sdkp->zone_blocks);
- }
- 
-+static int sd_zbc_init_disk(struct scsi_disk *sdkp)
-+{
-+	sdkp->zones_wp_offset = NULL;
-+	spin_lock_init(&sdkp->zones_wp_offset_lock);
-+	sdkp->rev_wp_offset = NULL;
-+	mutex_init(&sdkp->rev_mutex);
-+	INIT_WORK(&sdkp->zone_wp_offset_work, sd_zbc_update_wp_offset_workfn);
-+	sdkp->zone_wp_update_buf = kzalloc(SD_BUF_SIZE, GFP_KERNEL);
-+	if (!sdkp->zone_wp_update_buf)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+void sd_zbc_release_disk(struct scsi_disk *sdkp)
-+{
-+	kvfree(sdkp->zones_wp_offset);
-+	sdkp->zones_wp_offset = NULL;
-+	kfree(sdkp->zone_wp_update_buf);
-+	sdkp->zone_wp_update_buf = NULL;
-+}
-+
- static void sd_zbc_revalidate_zones_cb(struct gendisk *disk)
- {
- 	struct scsi_disk *sdkp = scsi_disk(disk);
-@@ -667,6 +689,19 @@ int sd_zbc_revalidate_zones(struct scsi_disk *sdkp)
- 	u32 max_append;
- 	int ret = 0;
- 
-+	/*
-+	 * For all zoned disks, initialize zone append emulation data if not
-+	 * already done. This is necessary also for host-aware disks used as
-+	 * regular disks due to the presence of partitions as these partitions
-+	 * may be deleted and the disk zoned model changed back from
-+	 * BLK_ZONED_NONE to BLK_ZONED_HA.
-+	 */
-+	if (sd_is_zoned(sdkp) && !sdkp->zone_wp_update_buf) {
-+		ret = sd_zbc_init_disk(sdkp);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * There is nothing to do for regular disks, including host-aware disks
- 	 * that have partitions.
-@@ -768,28 +803,3 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 
- 	return ret;
- }
--
--int sd_zbc_init_disk(struct scsi_disk *sdkp)
--{
--	if (!sd_is_zoned(sdkp))
--		return 0;
--
--	sdkp->zones_wp_offset = NULL;
--	spin_lock_init(&sdkp->zones_wp_offset_lock);
--	sdkp->rev_wp_offset = NULL;
--	mutex_init(&sdkp->rev_mutex);
--	INIT_WORK(&sdkp->zone_wp_offset_work, sd_zbc_update_wp_offset_workfn);
--	sdkp->zone_wp_update_buf = kzalloc(SD_BUF_SIZE, GFP_KERNEL);
--	if (!sdkp->zone_wp_update_buf)
--		return -ENOMEM;
--
--	return 0;
--}
--
--void sd_zbc_release_disk(struct scsi_disk *sdkp)
--{
--	kvfree(sdkp->zones_wp_offset);
--	sdkp->zones_wp_offset = NULL;
--	kfree(sdkp->zone_wp_update_buf);
--	sdkp->zone_wp_update_buf = NULL;
--}
 -- 
-2.26.2
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
