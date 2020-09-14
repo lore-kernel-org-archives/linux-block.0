@@ -2,145 +2,203 @@ Return-Path: <SRS0=j3P0=CX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6A9C433E2
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 23:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA0E6C433E2
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 23:29:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75A0320897
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 23:26:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 895492193E
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 23:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VWIYFrV0";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ENd6lgXr"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="T4urjDOM";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="kzgbdrQ7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725999AbgINX05 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Sep 2020 19:26:57 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:16399 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725953AbgINX0z (ORCPT
+        id S1726028AbgINX3C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Sep 2020 19:29:02 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:49391 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726079AbgINX2w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Sep 2020 19:26:55 -0400
+        Mon, 14 Sep 2020 19:28:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1600126016; x=1631662016;
+  t=1600126131; x=1631662131;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=ThS0bbPrJUkkRl8xIG9xN2JkPOVtqz+686v78VwK8e8=;
-  b=VWIYFrV0Sk0/gRbbltNHBViKUH7Kt/h9jRmjd7iqqFCPTt3UHW8txFUS
-   0xk+KmQMjwz86cNiEGCH9VdrUq2jAGJjfspoIfjMFj1EFekxhsW/0P40H
-   Dqe5bY9x6bc6Ty0OYb5wbwSJHTcU2dc783/GH3Obxzi7AqSQFeQpTItOn
-   cjFTt36anuRuO20w5ewgOwBDZHMnJVJiyts1UWelnHH/SbiNK7a2jkzc5
-   tLL1uVv45a4uE9S863wio74mE+d4eSoQul8V6c18SnNruDdj+98Sfrvjt
-   Dn3pcg35Wxt4Jrlf4gHPpcRF1zOhKxKGUqzMXshEOp1nQDnuzF4hzZwNy
-   Q==;
-IronPort-SDR: fSqBlPOmPvQEo6NG1bfICC50C50tv2kgZZvNYqIAGN+X85HRYuvg94YztUJToTa7r1kvNvRaUA
- r4syCVgohoCEmbeGM4b1eIEl8xGE9ifr3PqEQmboHG/NtrLOHo94g7mFWAO5RwgGb2EWrg9nvB
- yzwRdREASPl2hDi703h4BAoGmgDo5juuNfT/joHYXWDwTfHNjmU1NOWJPc2A/agFvj6LMF/WOl
- iIZP9g7ZYp/zcGsWiATuzzbz4LSHZceSQ9DBloOvRPS7cSmOeTHDdJJl08CW6VqjItMpB6mMJ4
- 7YU=
+  bh=PIO23R52jveVpoyyZ7V2+vQf8TwUU2sRwXXC7LFelmM=;
+  b=T4urjDOMK3ojt2Sjnq8+ufuJPdneDbaM1p+B5wpBD/55M5m/h9odqeBg
+   msHfe9K+lgjWItMmuMOjp5Ifk6e0SBbXp3jR/53+2yDlmYBpPJNxXnEuI
+   KBFuLzxqT7c/CJZnVGb2xANeundtJG4DduIQ76d99d6CXEZ0olYhPWwc3
+   3h4E+8wI7xz9d0HLKt0iuCcDC5VK+iv6FtIr2tWPa6ouoYnzDoatOMVYT
+   ypt/xn8gj3sU306AU4IhVPJpOojPvnygBOVZ3Y4Su+INtvgrSUgbQHoUL
+   fQtdAnpcaeiTmUN3u81PZHuDoFcriMqintTZ5f253nCBEhe0rrIQfQfr3
+   w==;
+IronPort-SDR: HJ72lekkjC3w+lNIE18vrjcp932yaAbpDkBpRSCZocEiajGv7lpRuhE3W40X9j1We2x6T7HFPe
+ lzyXeMEieilLP30oounVNDFzQxzrT23OdtFEmN9c6rRlDJFWzweNE6URizLTGJY6wPBjAD3pej
+ mm0owS4V6M0aexIMCT1DMJckaS3S/ba+o+9/MFXA0tLC51enM5Tdv7Ojekk6a0woC2QeCNlgfs
+ gq9Zkzl5jtDHhjZprtFYRgtDDloCoLbSYDIqsHck5DWpOvdxX6O66gh5zQkvTdY6h2K2IW/SX4
+ mX4=
 X-IronPort-AV: E=Sophos;i="5.76,427,1592841600"; 
-   d="scan'208";a="148588180"
-Received: from mail-bn8nam12lp2170.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.170])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Sep 2020 07:26:54 +0800
+   d="scan'208";a="151719348"
+Received: from mail-dm6nam11lp2168.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.168])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Sep 2020 07:28:50 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YU/BusqN6xhIATQTYjl83PKief0CZ/xXZPoyEcgJXgY1MOEM9cWhTFWBk8EffX3X1kYfN5cUK6X+xzae6G+ZmRwsumvI4Ggt9Pb27Cvw4HGbjDeEiddXqihrDljHkFK3rceiCKOw+oQGFz+prYttNl8e0tyO3FMzY8l3gMRaeUps/rVXDE2xmCsgJQyRdb2TE11pMu4PTmgJOUTioxwF4K3ZPVllqHwLPADSpn+u8nerd5eLD8ifI11Wt0C3c0LWpRIwjMAmKV26Mxcczk8yxdCcPN2fgPtcQdqdRWFH/Pt0knc7ZX/45itL3rhMq87hoOaWgLTEp1dMAvaX5BYmgw==
+ b=LmI0L8dW5oHv3uGpKGbFT5/3elyFBAujPiqjPIZ4DHGaspN3Q1DvE/aLbI1WJemDBH96SPFpXXdSRy4Mu+s2P2VotCA6xw/idhhuBDglJsvxrW3uEzT2hDO7ed2cpv+NvglbWcvscrwr8hVBpFhdRQpRc4KkCnQIvmibREAc4JPfEuBxbkKR/CtlhLTltIGrz5m0xWGml/9aVh2D+LoPKioq2yESls7syQrae/7umHKnpGmehxCganEkcgaFOtVjXPPjeI1EOACjYOVBXrGoutUYaydk4abQk+lJ9YZ4vXA5xPNj0hK6G7jjPWq3E1Qdh6ggJ2Vj1uYz2TM8FJflBA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mzKbayRPs18oR+jb803Y6m5Df4jbl1yA7T0/hvelJm4=;
- b=HjIuSypZGMcm31/ubNR2Mjt90kWulOu/TzEjNIM+KPIYXx79mmpMeRkDRDCpQ8zS5bPLwd6DpqeDFEhiFIufgPkttweLWmt9OrZM707N8bPlI6AJYZMKegzl5eeBEFZyHSZSCL7Bcz5XiB3LkyIXOtg/qw8EuzqTyM6EYwwHQTudtB5sFZ2DTJedd2GeupsYCDFw6D6ivRxYP9LguPwLzLcwb+5Lz4evIkZQLI1aQ7m/hTcod5YK4T2/WPLTP/D7ZLXmM+n7zLUxGbNVUcOYj3wonhL1QLD64K+J5/SRiKf3NbPhZr09V3bbDyYLg4lrUseWbHPg+qXljK8PUHd0zQ==
+ bh=O+LYwmbuv2UEErq0FF9w79ta+mmmGN38RJHK3Nu8wtQ=;
+ b=KJfKDJ3fmvcQnSDDo/CrfhpEoG+EfqdDSbG0sf3mGUsqlrW8RCxBirdDgGLL+NcdRMoRRmHpfh6H0xc5xzp6hxW0+lDuoqml0Iyc0mFxvXCFk7Rut35U5SyKi1O19GKtLYqNurrieLsSE15cBRc+f4Dmud07SMCz7ky2TP4ujdRM8I9g64iMnQq4GgqibgHqQLgoCGhAV0g3y7kKGZl5XT9rBJSjYQMGFy+1y2PCGY70rKK4Lpeohe9piNBdtQfICLe2jGL+Q70xd0uMISjqv77OgicqRLGKYA4KmU4xSU2DsyMsLGeLWZGIkr+Kyl1/q+wiAaL8SLbQYkEfri+gAQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mzKbayRPs18oR+jb803Y6m5Df4jbl1yA7T0/hvelJm4=;
- b=ENd6lgXroF/3UkQcXgjNgIW/DnO+rYKS4OLGbj2MY4mS+cZux0WgJEjPLvlRsgUkXUfgrQVO1eMm8IT9X5XQ/VPIYYL/T2Y7Hc9hp5I3aOJnAFZwvpH0P6bmnd8R/BlTgfXDYFSY9zHewDZ9ekWXXttvrijdZQvb5odb/Y3/wZE=
+ bh=O+LYwmbuv2UEErq0FF9w79ta+mmmGN38RJHK3Nu8wtQ=;
+ b=kzgbdrQ7uEr8Jc3QkpEAc7ETHFjlo/JutjiMusYaTTDKJfSGuenvzQkLEBnwQdTK8qnT5ZfGHm1ZYCsIYJyyFXYd8Su1FW8ndKKqLoemMnCVfsl3oqU3TLNK2zR9k9vHsK7XRnO7NzuyjMO1lohHQtmruLqItTxCYzbjseVdD2I=
 Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
  by CY4PR0401MB3588.namprd04.prod.outlook.com (2603:10b6:910:90::35) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.19; Mon, 14 Sep
- 2020 23:26:52 +0000
+ 2020 23:28:48 +0000
 Received: from CY4PR04MB3751.namprd04.prod.outlook.com
  ([fe80::9124:2453:fe9c:9a7]) by CY4PR04MB3751.namprd04.prod.outlook.com
  ([fe80::9124:2453:fe9c:9a7%12]) with mapi id 15.20.3370.019; Mon, 14 Sep 2020
- 23:26:52 +0000
+ 23:28:48 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     "hch@infradead.org" <hch@infradead.org>
-CC:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Borislav Petkov <bp@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Subject: Re: [PATCH v2 1/2] scsi: Fix handling of host-aware ZBC disks
-Thread-Topic: [PATCH v2 1/2] scsi: Fix handling of host-aware ZBC disks
-Thread-Index: AQHWii7iTImXf29o1UGELyu7sFgFmg==
-Date:   Mon, 14 Sep 2020 23:26:52 +0000
-Message-ID: <CY4PR04MB37511EBECA19B80C57FC459EE7230@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <20200914003448.471624-1-damien.lemoal@wdc.com>
- <20200914003448.471624-2-damien.lemoal@wdc.com>
- <20200914072034.GA25808@infradead.org>
- <CY4PR04MB3751877C568C7F8B3E458960E7230@CY4PR04MB3751.namprd04.prod.outlook.com>
- <20200914142011.GA30097@infradead.org>
+To:     Mike Snitzer <snitzer@redhat.com>
+CC:     Ming Lei <ming.lei@redhat.com>,
+        Vijayendra Suman <vijayendra.suman@oracle.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/3] block: fix blk_rq_get_max_sectors() to flow more
+ carefully
+Thread-Topic: [PATCH 1/3] block: fix blk_rq_get_max_sectors() to flow more
+ carefully
+Thread-Index: AQHWiIYMLoBPwOGRnUWZi2d6qpID+A==
+Date:   Mon, 14 Sep 2020 23:28:48 +0000
+Message-ID: <CY4PR04MB37516F6F0DBA96CE512A4AFFE7230@CY4PR04MB3751.namprd04.prod.outlook.com>
+References: <20200911215338.44805-1-snitzer@redhat.com>
+ <20200911215338.44805-2-snitzer@redhat.com> <20200912135252.GA210077@T590>
+ <CY4PR04MB3751DAB758BAF8EB8A792FD2E7230@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200914145209.GB14410@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=wdc.com;
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=wdc.com;
 x-originating-ip: [2400:2411:43c0:6000:f58c:fb44:b59e:e65e]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: caee3350-8d10-4aab-c738-08d85905a989
+x-ms-office365-filtering-correlation-id: 07592fb8-e8a9-4cde-b2e1-08d85905ee6f
 x-ms-traffictypediagnostic: CY4PR0401MB3588:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR0401MB35889B8DD7345ABDDD8637CBE7230@CY4PR0401MB3588.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <CY4PR0401MB358848E70D8F9DF03BA2EFABE7230@CY4PR0401MB3588.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9ebjbNVd7iwwLPr2sDmWEVxP65VggnbC6RsSSAi6kl7FOyz0pUTK9m3xKED64FoyVQ7gPoMlE4TEbGu0mNxxVKG/2QiZqAIlosjLeVeWYkTStyJNoKk+aW6DH9y2ZQT/sg5qcGRLUplOne28B7O0ZWiyywwaOKj/0rqocbbnfDw2QxaR5MINZyxTP+WAnQFQyDQUYRIcAtrq/5NIXTF1p1uuE5Ois8XHRiaRPazI/8o+PIOJ6TXFxblNGoGvfEr0DHjlK8Ss0cVOXEYRlase7Bm/YcudKPwUhWN8Wntp03OuZuvzEerJM683FtBNXk8HBzAprz1RYqZNnCIvriEWsVIrY7UZBdmZveZOTDlQn451Z2hBml3N5AWAWKOtxsjp
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(346002)(396003)(39860400002)(366004)(66446008)(478600001)(7696005)(71200400001)(6506007)(53546011)(54906003)(316002)(4326008)(186003)(4744005)(86362001)(9686003)(55016002)(6916009)(8676002)(2906002)(33656002)(64756008)(66556008)(66476007)(91956017)(66946007)(76116006)(52536014)(5660300002)(8936002)(3714002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: 1tQ0R2b2IJy/z3e1aFuA1eRoJwYD4/7DuckcFD8yK6Ms6DSFVgKUlzMiDayJA2Ih8ZvxajEMYQaWS//mdg5iio5sl3qv0EQCNLV0tEKhXo3hoPUxICacli/aD5WNBLS9s8CR6uPCoLBQfQYg/695UoVvmayFGTQXr2JWz67tm2B4INdOHEy+zifgR892akvhkWfk4AHbEGkGp9/oobFJnPj8UPo2Yct2MTrm95aXu6D2gAZBkFB1QrlK0AZ1Evd+Ean72OgAIojQlQZ35Jox3tdaEJM5nxgm/FIyZb1BZ1+OE6U1APjyVAENPrkC5hO4uKov37kUGcDLnsGs1XRlcQFEu/h0GtfjQ5+7N81CfuaqA0bfcXX9idee8FWRIhEChXqviF/2K+OAPBkLUIoBwr7IV3GEqFojvv6pU1U9eOAihsMKOMR7o0/F4O53tU4rJXPcZwT/zm+NClJJdK04QO5z7Xc4pfZs1tSw2ThtCJXK//qxdS9cej0+x6+BtPa0pTw8rsEKtvWlA0S0nWNq6T7XGEd1vrT4FKYWMBlrx2Lro50u3RorzBEEimqVnWT/JeLdIU51yjEw2mb5sSgUru6uI8KWDXofvOowzOOJ5FMykrz3NZ7JCOVjhoYCF7c7DTl09Fl10r+I25nUeCxt6V6qIFudXXSfHuPmdfKlK0sF2KvaTmMRa/9Y7rTDOquA7BZ0aHnP5DSF6set3H1U5g==
+x-microsoft-antispam-message-info: lwoiT6ahLbhft73oW7wCJK+UHfkXpeuNbxDxWUaEXUg/JXqhZdF1frxbCAHgTsda/466q1NWtwlanwEgGJR+8OCvFlqZOY4Z4MIO4LvzefqsU2kR5nRm6R+GzxFK9jXkcFlpUEZ5M+A0SUiZrta+bRQBUcqyNUS24es+K2RZ0qUWrTC9/0SxglAzjZ17WKZWpWDpo4oBmUKwY11Sjrxl9jFAXGcZ5Aq57lcyNJv4K+BywcM2Y07VmEHw/znd7SDMTTmLBv5F8r8Lq+5KpvU+rWI+EGSOtQG756oZqS+lvkJlVznrpFjg42mZTEBols3Ak9Xpek9rn6MGLAMg6wP19g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(346002)(396003)(39860400002)(366004)(66446008)(478600001)(7696005)(71200400001)(6506007)(53546011)(54906003)(316002)(4326008)(186003)(86362001)(9686003)(55016002)(6916009)(8676002)(83380400001)(2906002)(33656002)(64756008)(66556008)(66476007)(91956017)(66946007)(76116006)(52536014)(5660300002)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: UYVSQw0gZtxXEqbM0IBiz66VC3KVTkUbpEsubmsjU1m+F/KJRM2K5oju5FDgs+hf8clb6mVHajqCXXLccqIG2YTQOKNEXJgxIEimzylDRmjmEICwoA5jivpJDQp+NgZHWRW76xyz6tllQSc009b7I6o59ZM+TfUppMvImgthCIbCU/uJRfJOZfaEbbmKTWf+gZMmZNMrczmcR9H7chLMUAKP5/XLgzCpeHwb7ro7C/l25WRCEhS5TGcall6zgOSHk2L3t9W9H0mReMqOUXM44QDfaHPpYJTxv68pJ4tit7xV/cG+Yddt3MRacN7uZZ0Ow5OXTOwuzbCk7rX9OwPa9SmyG/jo+zOb0BkPp4edU5M0WWvWJQpAQSo7muNM3vgalBuZgQBzxm+m6hNRh0LyNvR9uGNsGaraFLeUBxoSlGEC3iT/XLvuN5CJkEHp86Ldu4Ymeb3gMBD/1t6oyLXl6J5yVFjOzajOg4o4Kd1gcJnBxl4m6hXBIoi80bP382eqLxAdFuElujRlXsZ2H/6IoDBJVNy7u4XXnieG2aZbDNohbwezL/i5dfXCQH36JK5alGlIhBudhhrxZzPFgMTe2kBa236JFXBb+2thTUH1bHj5NeunBCaXrxz8INUl0AMKy6gsrN6KYkxxZaRY2hKKyr4Es6kYJLCE4JWKHdItBaGKsdl2Y/gJSyTy3kO5CTOeEr6b+C1476LHcsz5N0po9w==
+x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: caee3350-8d10-4aab-c738-08d85905a989
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Sep 2020 23:26:52.5833
+X-MS-Exchange-CrossTenant-Network-Message-Id: 07592fb8-e8a9-4cde-b2e1-08d85905ee6f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Sep 2020 23:28:48.2691
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4VyxjMk2pDbf4IH7DE70ihn7TK0ijEreEkzYlvVFEWVAj9i2g+HLfovof05Tj52pNF0YzIOJpNq9PVuZ1aispw==
+X-MS-Exchange-CrossTenant-userprincipalname: ZOGvImA+P/s747yz6vdvQHcHOPRWLbutF3WeRoAkJpgF0Yr8UCB+153FinWNtMJHkw6JYHoR/HvwyqkSRVzBJw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0401MB3588
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/09/14 23:20, hch@infradead.org wrote:=0A=
-> On Mon, Sep 14, 2020 at 09:03:49AM +0000, Damien Le Moal wrote:=0A=
->> Yes, that's nice. Will send something along these lines. But since this =
-is a bug=0A=
->> fix for the current cycle & stable, we probably should keep the patch as=
- is and=0A=
->> add the improvement on top for 5.10, no ?=0A=
+On 2020/09/14 23:52, Mike Snitzer wrote:=0A=
+> On Sun, Sep 13 2020 at  8:43pm -0400,=0A=
+> Damien Le Moal <Damien.LeMoal@wdc.com> wrote:=0A=
 > =0A=
-> I'd much rather also add the trivial helper for 5.9 - otherwise we'll=0A=
-> need to pull current mainline into the for-5.10 tree and create=0A=
-> all kinds of mess.  And just adding the helper and using it for sd=0A=
-> only will have no side effects elsewhere.=0A=
-> =0A=
+>> On 2020/09/12 22:53, Ming Lei wrote:=0A=
+>>> On Fri, Sep 11, 2020 at 05:53:36PM -0400, Mike Snitzer wrote:=0A=
+>>>> blk_queue_get_max_sectors() has been trained for REQ_OP_WRITE_SAME and=
 =0A=
-OK. Sending a v3 with this added.=0A=
+>>>> REQ_OP_WRITE_ZEROES yet blk_rq_get_max_sectors() didn't call it for=0A=
+>>>> those operations.=0A=
+>>>=0A=
+>>> Actually WRITE_SAME & WRITE_ZEROS are handled by the following if=0A=
+>>> chunk_sectors is set:=0A=
+>>>=0A=
+>>>         return min(blk_max_size_offset(q, offset),=0A=
+>>>                         blk_queue_get_max_sectors(q, req_op(rq)));=0A=
+>>>  =0A=
+>>>> Also, there is no need to avoid blk_max_size_offset() if=0A=
+>>>> 'chunk_sectors' isn't set because it falls back to 'max_sectors'.=0A=
+>>>>=0A=
+>>>> Signed-off-by: Mike Snitzer <snitzer@redhat.com>=0A=
+>>>> ---=0A=
+>>>>  include/linux/blkdev.h | 19 +++++++++++++------=0A=
+>>>>  1 file changed, 13 insertions(+), 6 deletions(-)=0A=
+>>>>=0A=
+>>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
+>>>> index bb5636cc17b9..453a3d735d66 100644=0A=
+>>>> --- a/include/linux/blkdev.h=0A=
+>>>> +++ b/include/linux/blkdev.h=0A=
+>>>> @@ -1070,17 +1070,24 @@ static inline unsigned int blk_rq_get_max_sect=
+ors(struct request *rq,=0A=
+>>>>  						  sector_t offset)=0A=
+>>>>  {=0A=
+>>>>  	struct request_queue *q =3D rq->q;=0A=
+>>>> +	int op;=0A=
+>>>> +	unsigned int max_sectors;=0A=
+>>>>  =0A=
+>>>>  	if (blk_rq_is_passthrough(rq))=0A=
+>>>>  		return q->limits.max_hw_sectors;=0A=
+>>>>  =0A=
+>>>> -	if (!q->limits.chunk_sectors ||=0A=
+>>>> -	    req_op(rq) =3D=3D REQ_OP_DISCARD ||=0A=
+>>>> -	    req_op(rq) =3D=3D REQ_OP_SECURE_ERASE)=0A=
+>>>> -		return blk_queue_get_max_sectors(q, req_op(rq));=0A=
+>>>> +	op =3D req_op(rq);=0A=
+>>>> +	max_sectors =3D blk_queue_get_max_sectors(q, op);=0A=
+>>>>  =0A=
+>>>> -	return min(blk_max_size_offset(q, offset),=0A=
+>>>> -			blk_queue_get_max_sectors(q, req_op(rq)));=0A=
+>>>> +	switch (op) {=0A=
+>>>> +	case REQ_OP_DISCARD:=0A=
+>>>> +	case REQ_OP_SECURE_ERASE:=0A=
+>>>> +	case REQ_OP_WRITE_SAME:=0A=
+>>>> +	case REQ_OP_WRITE_ZEROES:=0A=
+>>>> +		return max_sectors;=0A=
+>>>> +	}>> +=0A=
+>>>> +	return min(blk_max_size_offset(q, offset), max_sectors);=0A=
+>>>>  }=0A=
+>>>=0A=
+>>> It depends if offset & chunk_sectors limit for WRITE_SAME & WRITE_ZEROS=
+=0A=
+>>> needs to be considered.=0A=
+>>=0A=
+>> That limit is needed for zoned block devices to ensure that *any* write =
+request,=0A=
+>> no matter the command, do not cross zone boundaries. Otherwise, the writ=
+e would=0A=
+>> be immediately failed by the device.=0A=
+> =0A=
+> Thanks for the additional context, sorry to make you so concerned! ;)=0A=
+=0A=
+No worries :)=0A=
+=0A=
+=0A=
 =0A=
 -- =0A=
 Damien Le Moal=0A=
