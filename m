@@ -2,72 +2,140 @@ Return-Path: <SRS0=j3P0=CX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A870C43461
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 14:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B89C43461
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 14:42:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93770206A5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 14:20:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UsnAEsCe"
+	by mail.kernel.org (Postfix) with ESMTP id 7C097207EA
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 14:42:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600094537;
+	bh=Uox0Mw/hPEWcP5BEoQnhTdAVlwYXQ+URXE9EsGe4ogg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=lffbfOFPcdKAe7snc2aF8BCx0/e4SvFVNhYXTXaL/EP7t9IHzxiwy5/M+UnwFZ3j4
+	 stMDcZvKOC7R03pyK5i7QO3P2FiyiH5UEEi2mSacT8tMlUu+E/OtfJ8UfmqF/Hx3hD
+	 Ga3pCsmCP7hr4H5574ssARM/0Sby7+uvd73NMW74=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726795AbgINOU1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Sep 2020 10:20:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36378 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726667AbgINOUP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Sep 2020 10:20:15 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88160C06174A;
-        Mon, 14 Sep 2020 07:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=9YKXruRD1GIGI2F0NMKyLvaAHDHfv6h+lQaAljDhid8=; b=UsnAEsCe93yuk5c3QewEY3LcSl
-        c3SrZ7WE8/sGqb4cVrjgBnRp2H9lJL4WTsWBv/seDYieRvaPydti1y4IWZi4/rNiMqOGKnocZD+WN
-        EIjbTjp/JhdHoCmj4VSf7jIpdJp4cdbgT4y7uoIHy9QGA+JwH67t6kr+aYWJ4B+wikhpGyVaOGVxE
-        k1bd226UB4ciP7baY/351tLVFiW+ph+QroxMPEn46IZXniT7La2xuNE/ZMjPJEC+/gLFdz3X5kl23
-        epLc4c4zuCyZ3cJQGhb+TIFvvPjonHPMv9X1WzhF2hwAlH9kdK9V1dTpc45jcccQs6pmQft5V9enR
-        S+qi2n7Q==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kHpL1-0007y3-Qt; Mon, 14 Sep 2020 14:20:11 +0000
-Date:   Mon, 14 Sep 2020 15:20:11 +0100
-From:   "hch@infradead.org" <hch@infradead.org>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     "hch@infradead.org" <hch@infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Borislav Petkov <bp@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Subject: Re: [PATCH v2 1/2] scsi: Fix handling of host-aware ZBC disks
-Message-ID: <20200914142011.GA30097@infradead.org>
-References: <20200914003448.471624-1-damien.lemoal@wdc.com>
- <20200914003448.471624-2-damien.lemoal@wdc.com>
- <20200914072034.GA25808@infradead.org>
- <CY4PR04MB3751877C568C7F8B3E458960E7230@CY4PR04MB3751.namprd04.prod.outlook.com>
+        id S1726633AbgINOmL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Sep 2020 10:42:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:32952 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726639AbgINNFm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Sep 2020 09:05:42 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A2B3B22242;
+        Mon, 14 Sep 2020 13:04:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600088694;
+        bh=Uox0Mw/hPEWcP5BEoQnhTdAVlwYXQ+URXE9EsGe4ogg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=SA3QLqx5sEyjATdMzdewsXR3n+p8c+qU/1SyRcTxGfTMNu4l2CNzpGiqCuorPJXS2
+         OFQrpqqPM0+W3ENa7ZPia+FK8ImNkhF7H5wEXkWqN6OEzw89+/jXDWNW5GrwdXTINa
+         0z1viUNHB3SKxf8DOuoM0YAbILH/oXJH2SGKJ8wM=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Omar Sandoval <osandov@fb.com>, Yang Yang <yang.yang@vivo.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 16/22] block: only call sched requeue_request() for scheduled requests
+Date:   Mon, 14 Sep 2020 09:04:28 -0400
+Message-Id: <20200914130434.1804478-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200914130434.1804478-1-sashal@kernel.org>
+References: <20200914130434.1804478-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY4PR04MB3751877C568C7F8B3E458960E7230@CY4PR04MB3751.namprd04.prod.outlook.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 14, 2020 at 09:03:49AM +0000, Damien Le Moal wrote:
-> Yes, that's nice. Will send something along these lines. But since this is a bug
-> fix for the current cycle & stable, we probably should keep the patch as is and
-> add the improvement on top for 5.10, no ?
+From: Omar Sandoval <osandov@fb.com>
 
-I'd much rather also add the trivial helper for 5.9 - otherwise we'll
-need to pull current mainline into the for-5.10 tree and create
-all kinds of mess.  And just adding the helper and using it for sd
-only will have no side effects elsewhere.
+[ Upstream commit e8a8a185051a460e3eb0617dca33f996f4e31516 ]
+
+Yang Yang reported the following crash caused by requeueing a flush
+request in Kyber:
+
+  [    2.517297] Unable to handle kernel paging request at virtual address ffffffd8071c0b00
+  ...
+  [    2.517468] pc : clear_bit+0x18/0x2c
+  [    2.517502] lr : sbitmap_queue_clear+0x40/0x228
+  [    2.517503] sp : ffffff800832bc60 pstate : 00c00145
+  ...
+  [    2.517599] Process ksoftirqd/5 (pid: 51, stack limit = 0xffffff8008328000)
+  [    2.517602] Call trace:
+  [    2.517606]  clear_bit+0x18/0x2c
+  [    2.517619]  kyber_finish_request+0x74/0x80
+  [    2.517627]  blk_mq_requeue_request+0x3c/0xc0
+  [    2.517637]  __scsi_queue_insert+0x11c/0x148
+  [    2.517640]  scsi_softirq_done+0x114/0x130
+  [    2.517643]  blk_done_softirq+0x7c/0xb0
+  [    2.517651]  __do_softirq+0x208/0x3bc
+  [    2.517657]  run_ksoftirqd+0x34/0x60
+  [    2.517663]  smpboot_thread_fn+0x1c4/0x2c0
+  [    2.517667]  kthread+0x110/0x120
+  [    2.517669]  ret_from_fork+0x10/0x18
+
+This happens because Kyber doesn't track flush requests, so
+kyber_finish_request() reads a garbage domain token. Only call the
+scheduler's requeue_request() hook if RQF_ELVPRIV is set (like we do for
+the finish_request() hook in blk_mq_free_request()). Now that we're
+handling it in blk-mq, also remove the check from BFQ.
+
+Reported-by: Yang Yang <yang.yang@vivo.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/bfq-iosched.c  | 12 ------------
+ block/blk-mq-sched.h |  2 +-
+ 2 files changed, 1 insertion(+), 13 deletions(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 88497bff1135f..ba32adaeefdd0 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5890,18 +5890,6 @@ static void bfq_finish_requeue_request(struct request *rq)
+ 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
+ 	struct bfq_data *bfqd;
+ 
+-	/*
+-	 * Requeue and finish hooks are invoked in blk-mq without
+-	 * checking whether the involved request is actually still
+-	 * referenced in the scheduler. To handle this fact, the
+-	 * following two checks make this function exit in case of
+-	 * spurious invocations, for which there is nothing to do.
+-	 *
+-	 * First, check whether rq has nothing to do with an elevator.
+-	 */
+-	if (unlikely(!(rq->rq_flags & RQF_ELVPRIV)))
+-		return;
+-
+ 	/*
+ 	 * rq either is not associated with any icq, or is an already
+ 	 * requeued request that has not (yet) been re-inserted into
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 126021fc3a11f..e81ca1bf6e10b 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -66,7 +66,7 @@ static inline void blk_mq_sched_requeue_request(struct request *rq)
+ 	struct request_queue *q = rq->q;
+ 	struct elevator_queue *e = q->elevator;
+ 
+-	if (e && e->type->ops.requeue_request)
++	if ((rq->rq_flags & RQF_ELVPRIV) && e && e->type->ops.requeue_request)
+ 		e->type->ops.requeue_request(rq);
+ }
+ 
+-- 
+2.25.1
+
