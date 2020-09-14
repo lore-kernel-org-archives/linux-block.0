@@ -2,140 +2,149 @@ Return-Path: <SRS0=j3P0=CX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA94C2BC11
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 17:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB28C43461
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 17:43:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 277C7206DC
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 17:05:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600103157;
-	bh=jyDJds9Pn2QLe5k6ZDtSQyStUbTcJpabXAVatAV8e9I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=yOVBysox9SycUxemr9WQbOz7ucjESfBg5V/8qliLnwKpxTnPIDIWt6U/PsgJ9FFxu
-	 UENyT/REcGdzJ2dBUXTGcpts21SOXhXGJf+YEw6TZK05453hRcnP/VHPntZbOhXxpE
-	 yuafz/YQkSp8x6ZpYW3+6F+F4Tkorw6UHgVHRTSs=
+	by mail.kernel.org (Postfix) with ESMTP id D558120759
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 17:43:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XR3MGsF8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726301AbgINRFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Sep 2020 13:05:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60276 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726608AbgINNFV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Sep 2020 09:05:21 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8ECC32220E;
-        Mon, 14 Sep 2020 13:04:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600088665;
-        bh=jyDJds9Pn2QLe5k6ZDtSQyStUbTcJpabXAVatAV8e9I=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LgF9K1IXdRVo7tKzOQ8qEDB+8bMsz8V/PVkEM87NCA/a7qQXkG/qciTdlyzAbN9Lk
-         0ZAe5Srij9f/YSFh7iUri7+pnaEkaTRWrc5LvPt/8kaRXbu2bV1OBvZCX6gM3MZxRK
-         Q84Y1KEtfzifaxTbeBkpWQQqhcMD+ThLW/swjnoA=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Omar Sandoval <osandov@fb.com>, Yang Yang <yang.yang@vivo.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.8 22/29] block: only call sched requeue_request() for scheduled requests
-Date:   Mon, 14 Sep 2020 09:03:51 -0400
-Message-Id: <20200914130358.1804194-22-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200914130358.1804194-1-sashal@kernel.org>
-References: <20200914130358.1804194-1-sashal@kernel.org>
+        id S1726148AbgINRnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Sep 2020 13:43:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3874 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726180AbgINMRQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Sep 2020 08:17:16 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08EBWsjW161884;
+        Mon, 14 Sep 2020 07:56:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=7wuOUPm/sjHl+NmTypGhAvRmwj23r9kM+KqHBJ0iPMU=;
+ b=XR3MGsF8W0Tv+JexWqUEnFObdtAObaWkAcQ/m//2dzuJrjlg4h3mUyZSEhM+06GyFMhO
+ xyjKF5P4OImPUYiy1cIohmHcmOMO4dRB0EFeBBgcqJFHtUsVUIalMhO3MFsFpbdbflvu
+ ikmgN5E5sekGePct8YdTp+CN++4KibECl8sOsJc6cSiRzERSjeOkEi1q5piTtz/iyLJq
+ MLeDHvgC9QqjxdsNUipsyjHNBVNITlepAmNy8E8lWGXFUifb1JuSoqnTKbcrI3F7xN8U
+ wIISsn5qXTYp3lg9s+fx38j2ixKir5tDZPMpqJjkNJxHvYLURM6x1xpYNLPbzZRRJU70 WQ== 
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33j656u8u6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Sep 2020 07:56:53 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08EBtL4g026040;
+        Mon, 14 Sep 2020 11:56:51 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma02fra.de.ibm.com with ESMTP id 33gny814wt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Sep 2020 11:56:51 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08EBum2Z23855416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Sep 2020 11:56:48 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 32DAFA405B;
+        Mon, 14 Sep 2020 11:56:48 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1E0C0A405F;
+        Mon, 14 Sep 2020 11:56:48 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 14 Sep 2020 11:56:48 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id A33B9E0287; Mon, 14 Sep 2020 13:56:47 +0200 (CEST)
+From:   Stefan Haberland <sth@linux.ibm.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
+        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com
+Subject: [PATCH 1/1] s390/dasd: Fix zero write for FBA devices
+Date:   Mon, 14 Sep 2020 13:56:47 +0200
+Message-Id: <20200914115647.94062-2-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200914115647.94062-1-sth@linux.ibm.com>
+References: <20200914115647.94062-1-sth@linux.ibm.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-14_02:2020-09-10,2020-09-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ priorityscore=1501 mlxscore=0 spamscore=0 lowpriorityscore=0
+ mlxlogscore=999 suspectscore=3 bulkscore=0 clxscore=1015 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009140094
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+From: Jan Höppner <hoeppner@linux.ibm.com>
 
-[ Upstream commit e8a8a185051a460e3eb0617dca33f996f4e31516 ]
+A discard request that writes zeros using the global kernel internal
+ZERO_PAGE will fail for machines with more than 2GB of memory due to the
+location of the ZERO_PAGE.
 
-Yang Yang reported the following crash caused by requeueing a flush
-request in Kyber:
+Fix this by using a driver owned global zero page allocated with GFP_DMA
+flag set.
 
-  [    2.517297] Unable to handle kernel paging request at virtual address ffffffd8071c0b00
-  ...
-  [    2.517468] pc : clear_bit+0x18/0x2c
-  [    2.517502] lr : sbitmap_queue_clear+0x40/0x228
-  [    2.517503] sp : ffffff800832bc60 pstate : 00c00145
-  ...
-  [    2.517599] Process ksoftirqd/5 (pid: 51, stack limit = 0xffffff8008328000)
-  [    2.517602] Call trace:
-  [    2.517606]  clear_bit+0x18/0x2c
-  [    2.517619]  kyber_finish_request+0x74/0x80
-  [    2.517627]  blk_mq_requeue_request+0x3c/0xc0
-  [    2.517637]  __scsi_queue_insert+0x11c/0x148
-  [    2.517640]  scsi_softirq_done+0x114/0x130
-  [    2.517643]  blk_done_softirq+0x7c/0xb0
-  [    2.517651]  __do_softirq+0x208/0x3bc
-  [    2.517657]  run_ksoftirqd+0x34/0x60
-  [    2.517663]  smpboot_thread_fn+0x1c4/0x2c0
-  [    2.517667]  kthread+0x110/0x120
-  [    2.517669]  ret_from_fork+0x10/0x18
-
-This happens because Kyber doesn't track flush requests, so
-kyber_finish_request() reads a garbage domain token. Only call the
-scheduler's requeue_request() hook if RQF_ELVPRIV is set (like we do for
-the finish_request() hook in blk_mq_free_request()). Now that we're
-handling it in blk-mq, also remove the check from BFQ.
-
-Reported-by: Yang Yang <yang.yang@vivo.com>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: 28b841b3a7cb ("s390/dasd: Add discard support for FBA devices")
+Cc: <stable@vger.kernel.org> # 4.14+
+Signed-off-by: Jan Höppner <hoeppner@linux.ibm.com>
+Reviewed-by: Stefan Haberland <sth@linux.ibm.com>
 ---
- block/bfq-iosched.c  | 12 ------------
- block/blk-mq-sched.h |  2 +-
- 2 files changed, 1 insertion(+), 13 deletions(-)
+ drivers/s390/block/dasd_fba.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 50c8f034c01c5..caa4fa7f42b84 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5895,18 +5895,6 @@ static void bfq_finish_requeue_request(struct request *rq)
- 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
- 	struct bfq_data *bfqd;
+diff --git a/drivers/s390/block/dasd_fba.c b/drivers/s390/block/dasd_fba.c
+index cbb770824226..1a44e321b54e 100644
+--- a/drivers/s390/block/dasd_fba.c
++++ b/drivers/s390/block/dasd_fba.c
+@@ -40,6 +40,7 @@
+ MODULE_LICENSE("GPL");
  
--	/*
--	 * Requeue and finish hooks are invoked in blk-mq without
--	 * checking whether the involved request is actually still
--	 * referenced in the scheduler. To handle this fact, the
--	 * following two checks make this function exit in case of
--	 * spurious invocations, for which there is nothing to do.
--	 *
--	 * First, check whether rq has nothing to do with an elevator.
--	 */
--	if (unlikely(!(rq->rq_flags & RQF_ELVPRIV)))
--		return;
--
- 	/*
- 	 * rq either is not associated with any icq, or is an already
- 	 * requeued request that has not (yet) been re-inserted into
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 126021fc3a11f..e81ca1bf6e10b 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -66,7 +66,7 @@ static inline void blk_mq_sched_requeue_request(struct request *rq)
- 	struct request_queue *q = rq->q;
- 	struct elevator_queue *e = q->elevator;
+ static struct dasd_discipline dasd_fba_discipline;
++static void *dasd_fba_zero_page;
  
--	if (e && e->type->ops.requeue_request)
-+	if ((rq->rq_flags & RQF_ELVPRIV) && e && e->type->ops.requeue_request)
- 		e->type->ops.requeue_request(rq);
+ struct dasd_fba_private {
+ 	struct dasd_fba_characteristics rdc_data;
+@@ -270,7 +271,7 @@ static void ccw_write_zero(struct ccw1 *ccw, int count)
+ 	ccw->cmd_code = DASD_FBA_CCW_WRITE;
+ 	ccw->flags |= CCW_FLAG_SLI;
+ 	ccw->count = count;
+-	ccw->cda = (__u32) (addr_t) page_to_phys(ZERO_PAGE(0));
++	ccw->cda = (__u32) (addr_t) dasd_fba_zero_page;
  }
  
+ /*
+@@ -830,6 +831,11 @@ dasd_fba_init(void)
+ 	int ret;
+ 
+ 	ASCEBC(dasd_fba_discipline.ebcname, 4);
++
++	dasd_fba_zero_page = (void *)get_zeroed_page(GFP_KERNEL | GFP_DMA);
++	if (!dasd_fba_zero_page)
++		return -ENOMEM;
++
+ 	ret = ccw_driver_register(&dasd_fba_driver);
+ 	if (!ret)
+ 		wait_for_device_probe();
+@@ -841,6 +847,7 @@ static void __exit
+ dasd_fba_cleanup(void)
+ {
+ 	ccw_driver_unregister(&dasd_fba_driver);
++	free_page((unsigned long)dasd_fba_zero_page);
+ }
+ 
+ module_init(dasd_fba_init);
 -- 
-2.25.1
+2.17.1
 
