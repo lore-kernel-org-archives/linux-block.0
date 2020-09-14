@@ -2,217 +2,199 @@ Return-Path: <SRS0=j3P0=CX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC56AC433E2
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 00:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AEEDC433E2
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 00:43:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC2CD21D1A
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 00:35:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AF3721897
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 00:43:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Z5rvHxUE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oAdZY5DC";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="c0sBVpoE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725989AbgINAe5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Sep 2020 20:34:57 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:19482 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725975AbgINAez (ORCPT
+        id S1725965AbgINAnN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Sep 2020 20:43:13 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:20151 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725962AbgINAnL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Sep 2020 20:34:55 -0400
+        Sun, 13 Sep 2020 20:43:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1600043693; x=1631579693;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=U9ANooNdVZ0JoKvrQwRumtEGDJMK0r+b8SPDTW2yODM=;
-  b=Z5rvHxUEmLQHC1jNJ+ceZcWj+xrjTXG5Q92RSRKV4cXIhiNT4svPkud+
-   6Hurou6x5j61MhQtAJQPJhdLEc7pImGev+UFjNAl9or29ytiPzbVNMjZZ
-   8z0iUJ34duwP7niWN2WoNsamo6fI7bS1l5sLBZnEr6DBRPFXXTKiYaUAC
-   CPeocLA6un/A4H60p283PYcW7LWLyhsetcp+6LSB7CIlweESA4SSCQQIg
-   2caZgbip9AYIa9HJ3GztHIZpn3DaMufMCueiLsG96iw5ft0b8gkYSbK3Y
-   wsdCjNftb1gIfTwho8wGqTZ9J6Ci5DwUrxWciPuUDuv+tvDYIZ4i9sZ7Y
-   Q==;
-IronPort-SDR: M8uep3SuGi4tjfZEAH8eJJqgWmXaaZrWqyXBUduL+TtQtOI3zJau6Mew15Omw4a1vfLiKrmRov
- 0N64rH/wffEM/fZu+OELPFKKXmURVk9dj6vrBtkzU8lwutjZDxEiPHpW9yskbrRRsBiDIzbrxD
- v98bTzmKT97QLhACeBQcpcNsSPGZUxRwnI4Ke1AK3WEBH2iFenth5BuIVHY1geyk1FLtG9NwuC
- pOBFJ7VyldGOSLHXC1+tBDipHLHwoBS668kis6heQyix1SYA2rmqFp088Oo1enYZwlffd9wW7Q
- 1rI=
+  t=1600044190; x=1631580190;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=/kO55hRvWTJxwSt9m9RiOxiwiRU4NwmOE6XioX28yX8=;
+  b=oAdZY5DCkMsaBMeJse3op1tbhJ68fyiw+AMoucrK57kzABi3Cmp3aOWg
+   UAPadTbYvgDddMlANLn5JWK0QoydAQs1J5aw+hvUowvAT+bgMDAmQRr60
+   pPiZ0eqjikk3HWjOd9GToF2NCIKhStKM8nqlgtqtoFhff7jNDUNRmgWX7
+   XisZY8k+Cr9grkXPNKiAR/Xuf+cUKb4MV8lhIlKL4LtFs330tlsJHpWMf
+   eJniOnhPiki0IkwZo0SCIey9vFJUu5j884COFvruIapk7jWwu81I/mQ2E
+   6DqJSGStyykj/2kvxmvhWI1ibgY6hVMThs5UnPMBSxC89u4hGfl5N0L4k
+   g==;
+IronPort-SDR: uQFIIRBR20Suf0po47g6+A8J2FhvpjiWa8QMkLOM83kGujEgivYZ1XqqFz3rKlGZN5N3US3cf3
+ 43mY776NSVPw+YIYKsocoTYn8ZuXaRIpQyC3HnEcnFsEhDLU8AT0T4+Z0YGuIcG6K9qgPVxBUJ
+ PwHHErmY5W0GTZJGhozTfh0J0VBhXy5ciO8VZuHja+8DUhZ+n8qKEqXdBPqZ50FKTogugOUmCb
+ AOrozvDfvWyk+FDZmaOJoBE11xOTX9biVzmZiHNZBVxP6abIvpPGw9CJT1Kb0ATulxYD3EmWuF
+ bro=
 X-IronPort-AV: E=Sophos;i="5.76,424,1592841600"; 
-   d="scan'208";a="256887865"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Sep 2020 08:34:53 +0800
-IronPort-SDR: e+vMWiGV8qn6GSjeOSrXQOZXsYiJoax2PENuB3LgWj+KmwS2zNamTVV+GKgTQfwnFQcqoU378w
- Z4HAZ90Tucpg==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2020 17:21:11 -0700
-IronPort-SDR: bgPaFOSPEX5XL74iL2tBHoNQYWFICuQ6k447hq3Pg/w5bq8sWlu7nUAp4wHRhwSlu8To0qxquu
- 1qUSaLugz3fw==
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 13 Sep 2020 17:34:52 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Borislav Petkov <bp@suse.de>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH v2 2/2] scsi: Fix ZBC disk initialization
-Date:   Mon, 14 Sep 2020 09:34:48 +0900
-Message-Id: <20200914003448.471624-3-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200914003448.471624-1-damien.lemoal@wdc.com>
-References: <20200914003448.471624-1-damien.lemoal@wdc.com>
+   d="scan'208";a="148496945"
+Received: from mail-dm6nam11lp2177.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.177])
+  by ob1.hgst.iphmx.com with ESMTP; 14 Sep 2020 08:43:09 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g/HeaUfELYKCKb2q4t5mtmXk23DogKoQH0SUAizM67fzb5uUjg8WK1f+jfEg0t++nEkaJP9AO1jXlUVav0mWLs1yjq4Zm9zWtyqQomcNhO/kvcAAx7AEyGx1rDQyoVcpZ9LKX7bCm3UAviWM3ubTo7MxvCj2lzhg1BqiYzkJQ2tQMaRbYrkOnJkW6d74WindRgz/DB5qmM6eCyBwtnYZlOOn1XKFvKVFy3w14QYlpYBPJHAY6Oi/6IS2IXw8+b6lWgRCYgGJBK2XZNyhYAyFb2gsVLR9+TS4MkLZ0vW0yGhSZr419CqrL2GyA4UQh3h5zBhvrn8ukdSUIPb1aNKzBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jvdyyA/B5+UzEhwcyusRyIGDw/iY5Ehy6RQV9e0M5iA=;
+ b=DyHC7MD0MRoPqhv4Fq0zRfpDUbmUdevapoKa4r3dV3DvAfd+rp3WZ/6fEzs5gGQ4fJl9xa9HSzO/qXwNDjUh4YSbS22Py4GsdE6JcrPm/bAgSDWZX4zpdcBoezRYV8GnJ+wdwNY/dw3WgCaz/LfK1t9nYxpq5LkmrQwwCoEwKQhcbBGrSeKztFfDaUkg8c81eo/gh9X62LpfhfBSiPmAyPBArmIZf4tvxDypZIcfDXwHaMWxWKJ7aFeJC2F9imrvq/JaRmcAqXG9nHtOJWtnKnjoVDpH6mpeMsxI0qwpyjEdopasNT8T17IuwD9GTntiJ8evCSzeGO608srtwEhScg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jvdyyA/B5+UzEhwcyusRyIGDw/iY5Ehy6RQV9e0M5iA=;
+ b=c0sBVpoE/8lVlfo3TICkyrhOfNyqX2l+0I07ZxI13L8i6lWoPQjpeZP0aKW+2Nbvf+vyv4uPbG1NlTy4YZg/yNU59Yeeu1Q2H33xLfZy4NeN4WiHvHisuAI8TzBP/Ktcm5FW2wKc7u+gFSpU2Sdvqhcg/ci3a3XXVElinf2G5tA=
+Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
+ by CY4PR04MB0374.namprd04.prod.outlook.com (2603:10b6:903:bb::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Mon, 14 Sep
+ 2020 00:43:07 +0000
+Received: from CY4PR04MB3751.namprd04.prod.outlook.com
+ ([fe80::9124:2453:fe9c:9a7]) by CY4PR04MB3751.namprd04.prod.outlook.com
+ ([fe80::9124:2453:fe9c:9a7%12]) with mapi id 15.20.3370.019; Mon, 14 Sep 2020
+ 00:43:07 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     Ming Lei <ming.lei@redhat.com>, Mike Snitzer <snitzer@redhat.com>
+CC:     Vijayendra Suman <vijayendra.suman@oracle.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/3] block: fix blk_rq_get_max_sectors() to flow more
+ carefully
+Thread-Topic: [PATCH 1/3] block: fix blk_rq_get_max_sectors() to flow more
+ carefully
+Thread-Index: AQHWiIYMLoBPwOGRnUWZi2d6qpID+A==
+Date:   Mon, 14 Sep 2020 00:43:06 +0000
+Message-ID: <CY4PR04MB3751DAB758BAF8EB8A792FD2E7230@CY4PR04MB3751.namprd04.prod.outlook.com>
+References: <20200911215338.44805-1-snitzer@redhat.com>
+ <20200911215338.44805-2-snitzer@redhat.com> <20200912135252.GA210077@T590>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2400:2411:43c0:6000:f58c:fb44:b59e:e65e]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 4f042f29-efdc-4a03-9058-08d8584725b4
+x-ms-traffictypediagnostic: CY4PR04MB0374:
+x-microsoft-antispam-prvs: <CY4PR04MB03743F0DEBAF8AA0FEE07FE8E7230@CY4PR04MB0374.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2v4IZLy/IFRBCz+rPCOX/Ujoh3qcWDZmeBZ3YWA8LYS/8KH2hBeVTqpPzCA9lXk680pH8rJtXKJgXxer2fm3QWahCjyaLGMUKMCsjdUAKfd8+Kf8xj0q0fk5PANDas4dX2lJyd3QiX0prKr0QC7oCaBmhYk/KuKSrWA2VluP+sNI2/2F1IBwNaSuy+enlw9hcD3AXJ5dCbidr7fCh2MA+rkPbP5hxDWc3IS6Rskjy/mtyteSL4sPxKqde66wlh9okBWn+KreBv6xD7zmOX2uzhgNMgNeVG+3AejghAtB82716Gf/fOjVfZTUxuzw/sFJ6OVNorzzgN5q92hP9uW4JQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(396003)(366004)(136003)(376002)(5660300002)(110136005)(478600001)(55016002)(83380400001)(71200400001)(33656002)(7696005)(54906003)(186003)(9686003)(66946007)(64756008)(6506007)(66446008)(76116006)(91956017)(52536014)(53546011)(66476007)(66556008)(8936002)(86362001)(316002)(2906002)(4326008)(8676002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: b+RXRtKbOG6cE8+TCcJuZhFJ4tIPDROZLmkOoA1yZeqYfNgS4sPY9L71lahIQakxfyQ8c4OBFuYeSfJP4nvthWshH0xftvuNih2MZlsbdD7q/ffRdS6AR3e4sDC8hgA2bWh1qKXJ2g3dHkXWeP9+17zo585fLI3CFVvIlxZtufuDMDpJEdb24nS+EQA3P6AMTRQxwSKdofpilpG3oeaAbwf/rTcSY/JfxRADHpYmYsifOn1xQBwRJWC2xX5e/ro/bxKULqSrvkWs4zjqh4snFYxKm4bsVnuxaeJ+GYrT8UseviNKwh4x03I9++a4PdS0oZWCyEXn5/SyUAPhgbwSTQZq5bI8D0Iim/9z/60X2KxdprI0uVldit0NA+OuPWMgEdEzx8XpF/jJQEZjU8H/wVLTrcKOCEVR7Agc20s7LNgJKOX7EYDBngWDWYqy8Oe3EOPaX6X4hl3KIWD+ntbEYtW6CGhqC6wnOhUuRuIXuXw8S7zehyPJ873lJFkRNt1rMXvoiy8TYydsb8Cxa4i8uUTDxrDxWjvFY2BsX1l1b/v2BzsYjHYaB3BV5F/aWE8iJEQC+PdEIs92+dWvKXg5rTHcPig0pT0dKlNWCy2Fn6dcg30UJszxMidksHDc3NyzkCgUrrxHdn+DKZW0QOVlcBroLClIgEPVhWRmQaKUVGyvZJ5JUNIkc4tYAqicNSKP8jlMGyVeae8jXZphFj+ibg==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f042f29-efdc-4a03-9058-08d8584725b4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Sep 2020 00:43:06.9798
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hDxpjyaqf1Gt6R7VaJnDJUPD+YbjG3WgIBye4b1iKcol2reY9WJ824XJqXv32PxH+dnloWqySoYYfIP5bU/uXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB0374
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make sure to call sd_zbc_init_disk() when the sdkp->zoned field is
-known, that is, once sd_read_block_characteristics() is executed in
-sd_revalidate_disk(), so that host-aware disks also get initialized.
-To do so, move sd_zbc_init_disk() call in sd_zbc_revalidate_zones() and
-make sure to execute it for all zoned disks, including for host-aware
-disks used as regular disks as these disk zoned model may be changed
-back to BLK_ZONED_HA when partitions are deleted.
-
-Reported-by: Borislav Petkov <bp@alien8.de>
-Fixes: 5795eb443060 ("scsi: sd_zbc: emulate ZONE_APPEND commands")
-Cc: <stable@vger.kernel.org> # v5.8+
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Tested-by: Borislav Petkov <bp@suse.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- drivers/scsi/sd.c     |  4 ---
- drivers/scsi/sd.h     |  6 -----
- drivers/scsi/sd_zbc.c | 60 +++++++++++++++++++++++++------------------
- 3 files changed, 35 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index e99f57bfeff4..b3c80fa47c79 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3420,10 +3420,6 @@ static int sd_probe(struct device *dev)
- 	sdkp->first_scan = 1;
- 	sdkp->max_medium_access_timeouts = SD_MAX_MEDIUM_TIMEOUTS;
- 
--	error = sd_zbc_init_disk(sdkp);
--	if (error)
--		goto out_free_index;
--
- 	sd_revalidate_disk(gd);
- 
- 	gd->flags = GENHD_FL_EXT_DEVT;
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 7251434100e6..a3aad608bc38 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -215,7 +215,6 @@ static inline int sd_is_zoned(struct scsi_disk *sdkp)
- 
- #ifdef CONFIG_BLK_DEV_ZONED
- 
--int sd_zbc_init_disk(struct scsi_disk *sdkp);
- void sd_zbc_release_disk(struct scsi_disk *sdkp);
- int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buffer);
- int sd_zbc_revalidate_zones(struct scsi_disk *sdkp);
-@@ -231,11 +230,6 @@ blk_status_t sd_zbc_prepare_zone_append(struct scsi_cmnd *cmd, sector_t *lba,
- 
- #else /* CONFIG_BLK_DEV_ZONED */
- 
--static inline int sd_zbc_init_disk(struct scsi_disk *sdkp)
--{
--	return 0;
--}
--
- static inline void sd_zbc_release_disk(struct scsi_disk *sdkp) {}
- 
- static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index a739456dea02..cf07b7f93579 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -651,6 +651,28 @@ static void sd_zbc_print_zones(struct scsi_disk *sdkp)
- 			  sdkp->zone_blocks);
- }
- 
-+static int sd_zbc_init_disk(struct scsi_disk *sdkp)
-+{
-+	sdkp->zones_wp_offset = NULL;
-+	spin_lock_init(&sdkp->zones_wp_offset_lock);
-+	sdkp->rev_wp_offset = NULL;
-+	mutex_init(&sdkp->rev_mutex);
-+	INIT_WORK(&sdkp->zone_wp_offset_work, sd_zbc_update_wp_offset_workfn);
-+	sdkp->zone_wp_update_buf = kzalloc(SD_BUF_SIZE, GFP_KERNEL);
-+	if (!sdkp->zone_wp_update_buf)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+void sd_zbc_release_disk(struct scsi_disk *sdkp)
-+{
-+	kvfree(sdkp->zones_wp_offset);
-+	sdkp->zones_wp_offset = NULL;
-+	kfree(sdkp->zone_wp_update_buf);
-+	sdkp->zone_wp_update_buf = NULL;
-+}
-+
- static void sd_zbc_revalidate_zones_cb(struct gendisk *disk)
- {
- 	struct scsi_disk *sdkp = scsi_disk(disk);
-@@ -667,6 +689,19 @@ int sd_zbc_revalidate_zones(struct scsi_disk *sdkp)
- 	u32 max_append;
- 	int ret = 0;
- 
-+	/*
-+	 * For all zoned disks, initialize zone append emulation data if not
-+	 * already done. This is necessary also for host-aware disks used as
-+	 * regular disks due to the presence of partitions as these partitions
-+	 * may be deleted and the disk zoned model changed back from
-+	 * BLK_ZONED_NONE to BLK_ZONED_HA.
-+	 */
-+	if (sd_is_zoned(sdkp) && !sdkp->zone_wp_update_buf) {
-+		ret = sd_zbc_init_disk(sdkp);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * There is nothing to do for regular disks, including host-aware disks
- 	 * that have partitions.
-@@ -768,28 +803,3 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 
- 	return ret;
- }
--
--int sd_zbc_init_disk(struct scsi_disk *sdkp)
--{
--	if (!sd_is_zoned(sdkp))
--		return 0;
--
--	sdkp->zones_wp_offset = NULL;
--	spin_lock_init(&sdkp->zones_wp_offset_lock);
--	sdkp->rev_wp_offset = NULL;
--	mutex_init(&sdkp->rev_mutex);
--	INIT_WORK(&sdkp->zone_wp_offset_work, sd_zbc_update_wp_offset_workfn);
--	sdkp->zone_wp_update_buf = kzalloc(SD_BUF_SIZE, GFP_KERNEL);
--	if (!sdkp->zone_wp_update_buf)
--		return -ENOMEM;
--
--	return 0;
--}
--
--void sd_zbc_release_disk(struct scsi_disk *sdkp)
--{
--	kvfree(sdkp->zones_wp_offset);
--	sdkp->zones_wp_offset = NULL;
--	kfree(sdkp->zone_wp_update_buf);
--	sdkp->zone_wp_update_buf = NULL;
--}
--- 
-2.26.2
-
+On 2020/09/12 22:53, Ming Lei wrote:=0A=
+> On Fri, Sep 11, 2020 at 05:53:36PM -0400, Mike Snitzer wrote:=0A=
+>> blk_queue_get_max_sectors() has been trained for REQ_OP_WRITE_SAME and=
+=0A=
+>> REQ_OP_WRITE_ZEROES yet blk_rq_get_max_sectors() didn't call it for=0A=
+>> those operations.=0A=
+> =0A=
+> Actually WRITE_SAME & WRITE_ZEROS are handled by the following if=0A=
+> chunk_sectors is set:=0A=
+> =0A=
+>         return min(blk_max_size_offset(q, offset),=0A=
+>                         blk_queue_get_max_sectors(q, req_op(rq)));=0A=
+>  =0A=
+>> Also, there is no need to avoid blk_max_size_offset() if=0A=
+>> 'chunk_sectors' isn't set because it falls back to 'max_sectors'.=0A=
+>>=0A=
+>> Signed-off-by: Mike Snitzer <snitzer@redhat.com>=0A=
+>> ---=0A=
+>>  include/linux/blkdev.h | 19 +++++++++++++------=0A=
+>>  1 file changed, 13 insertions(+), 6 deletions(-)=0A=
+>>=0A=
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
+>> index bb5636cc17b9..453a3d735d66 100644=0A=
+>> --- a/include/linux/blkdev.h=0A=
+>> +++ b/include/linux/blkdev.h=0A=
+>> @@ -1070,17 +1070,24 @@ static inline unsigned int blk_rq_get_max_sector=
+s(struct request *rq,=0A=
+>>  						  sector_t offset)=0A=
+>>  {=0A=
+>>  	struct request_queue *q =3D rq->q;=0A=
+>> +	int op;=0A=
+>> +	unsigned int max_sectors;=0A=
+>>  =0A=
+>>  	if (blk_rq_is_passthrough(rq))=0A=
+>>  		return q->limits.max_hw_sectors;=0A=
+>>  =0A=
+>> -	if (!q->limits.chunk_sectors ||=0A=
+>> -	    req_op(rq) =3D=3D REQ_OP_DISCARD ||=0A=
+>> -	    req_op(rq) =3D=3D REQ_OP_SECURE_ERASE)=0A=
+>> -		return blk_queue_get_max_sectors(q, req_op(rq));=0A=
+>> +	op =3D req_op(rq);=0A=
+>> +	max_sectors =3D blk_queue_get_max_sectors(q, op);=0A=
+>>  =0A=
+>> -	return min(blk_max_size_offset(q, offset),=0A=
+>> -			blk_queue_get_max_sectors(q, req_op(rq)));=0A=
+>> +	switch (op) {=0A=
+>> +	case REQ_OP_DISCARD:=0A=
+>> +	case REQ_OP_SECURE_ERASE:=0A=
+>> +	case REQ_OP_WRITE_SAME:=0A=
+>> +	case REQ_OP_WRITE_ZEROES:=0A=
+>> +		return max_sectors;=0A=
+>> +	}>> +=0A=
+>> +	return min(blk_max_size_offset(q, offset), max_sectors);=0A=
+>>  }=0A=
+> =0A=
+> It depends if offset & chunk_sectors limit for WRITE_SAME & WRITE_ZEROS=
+=0A=
+> needs to be considered.=0A=
+=0A=
+That limit is needed for zoned block devices to ensure that *any* write req=
+uest,=0A=
+no matter the command, do not cross zone boundaries. Otherwise, the write w=
+ould=0A=
+be immediately failed by the device.=0A=
+=0A=
+> =0A=
+> =0A=
+> Thanks,=0A=
+> Ming=0A=
+> =0A=
+> =0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
