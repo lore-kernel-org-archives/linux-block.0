@@ -2,146 +2,101 @@ Return-Path: <SRS0=j3P0=CX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF51C433E2
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 07:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2F8C43461
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 07:22:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22D3120663
-	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 07:20:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vVyXz8A5"
+	by mail.kernel.org (Postfix) with ESMTP id 02FE621548
+	for <linux-block@archiver.kernel.org>; Mon, 14 Sep 2020 07:22:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725961AbgINHUh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Sep 2020 03:20:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56092 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725951AbgINHUg (ORCPT
+        id S1725951AbgINHWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Sep 2020 03:22:07 -0400
+Received: from mail-m1271.qiye.163.com ([115.236.127.1]:26868 "EHLO
+        mail-m1271.qiye.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725944AbgINHWG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Sep 2020 03:20:36 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 615F3C06174A;
-        Mon, 14 Sep 2020 00:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MUWAlEmi/MuXlGVqQDqzK1uzCCg4uLG6hzsyDRuaup4=; b=vVyXz8A5FVQbR+FFyW4UP/3z3s
-        uS6Yr9tXqEHUBM5wNkK1C8Y6KNoPfhvRsoLFNfe90Den0gXMddkupFZY1XFkhXd1F16Ztz77WIrUL
-        SeUwbbhnH8i7Pl3VuE66TOwFZlgYw+a0bJMpICtj7Q8mNTzPeJQXXuxJYxP50N0fjbeXIRJJF4but
-        G3Vh8DEKbu9byWpoFjzuAqXwCUK7FV16MP/vOq6RN/cANuQ1pqemL5xZVvgOGqbcIvdDQSALgeeC6
-        o9vwL9JDPPFwSk3L3v7vYY1UyXvDc107T81qMb0fOGol5iANfkz0q1/8ykaEawaw04rlxkT+4ri9g
-        1/kJz4Kg==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kHimw-0007Ou-4g; Mon, 14 Sep 2020 07:20:34 +0000
-Date:   Mon, 14 Sep 2020 08:20:34 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Borislav Petkov <bp@suse.de>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH v2 1/2] scsi: Fix handling of host-aware ZBC disks
-Message-ID: <20200914072034.GA25808@infradead.org>
-References: <20200914003448.471624-1-damien.lemoal@wdc.com>
- <20200914003448.471624-2-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200914003448.471624-2-damien.lemoal@wdc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        Mon, 14 Sep 2020 03:22:06 -0400
+Received: from ubuntu.localdomain (unknown [157.0.31.125])
+        by mail-m1271.qiye.163.com (Hmail) with ESMTPA id C338D5822EA;
+        Mon, 14 Sep 2020 15:21:54 +0800 (CST)
+From:   Yang Yang <yang.yang@vivo.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     onlyfever@icloud.com, yang.yang@vivo.com
+Subject: [PATCH] blk-mq: fix hang issue in blk_queue_enter()
+Date:   Mon, 14 Sep 2020 00:19:03 -0700
+Message-Id: <20200914071903.65704-1-yang.yang@vivo.com>
+X-Mailer: git-send-email 2.17.1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZS1VLWVdZKFlBSE83V1ktWUFJV1kPCR
+        oVCBIfWUFZSU1JSB1OSU9MT0gdVkpNS0tLTUNKSk9CQ0lVEwETFhoSFyQUDg9ZV1kWGg8SFR0UWU
+        FZVUtZBg++
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6NhQ6Exw5OT8qTxBDCB44Ng9J
+        AQ9PCxpVSlVKTUtLS01DSkpOSE5JVTMWGhIXVQIaFRxVAhoVHDsNEg0UVRgUFkVZV1kSC1lBWUpO
+        TFVLVUhKVUpJTllXWQgBWUFJQ05MNwY+
+X-HM-Tid: 0a748b7dd9c798b6kuuuc338d5822ea
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 14, 2020 at 09:34:47AM +0900, Damien Le Moal wrote:
-> When CONFIG_BLK_DEV_ZONED is disabled, allow using host-aware ZBC
-> disks as regular disks. In this case, ensure that command completion
-> is correctly executed by changing sd_zbc_complete() to return good_bytes
-> instead of 0, causing a hang during device probe (endless retries).
-> 
-> When CONFIG_BLK_DEV_ZONED is enabled and a host-aware disk is detected
-> to have partitions, it will be used as a regular disk. In this case,
-> make sure to not do anything in sd_zbc_revalidate_zones() as that
-> triggers warnings.
-> 
-> Reported-by: Borislav Petkov <bp@alien8.de>
-> Fixes: b72053072c0b ("block: allow partitions on host aware zone devices")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Tested-by: Borislav Petkov <bp@suse.de>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
->  drivers/scsi/sd.c     | 28 ++++++++++++++++++++++------
->  drivers/scsi/sd.h     |  2 +-
->  drivers/scsi/sd_zbc.c |  6 +++++-
->  3 files changed, 28 insertions(+), 8 deletions(-)
-> 
->  	} else {
->  		sdkp->zoned = (buffer[8] >> 4) & 3;
->  		if (sdkp->zoned == 1 && !disk_has_partitions(sdkp->disk)) {
-> +			/*
-> +			 * Host-aware disk without partition: use the disk as
-> +			 * such if support for zoned block devices is enabled.
-> +			 * Otherwise, use it as a regular disk.
-> +			 */
-> +			if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
-> +				q->limits.zoned = BLK_ZONED_HA;
-> +			else
-> +				q->limits.zoned = BLK_ZONED_NONE;
->  		} else {
->  			/*
->  			 * Treat drive-managed devices and host-aware devices
->  			 * with partitions as regular block devices.
->  			 */
->  			q->limits.zoned = BLK_ZONED_NONE;
->  		}
+There is a race between blk_queue_enter() and block layer's runtime
+suspend.
 
-I think we need to lift much of this into a block layer helper,
-as the logic is way subtile.  Something like this (written in the MUA
-editor, not even compile tested).
+ CPU0                                CPU1
+ ---------------------------------   -------------------------------
+ blk_pre_runtime_suspend(q) {        blk_queue_enter() {
+   /* q->rpm_status=RPM_ACTIVE */
+   blk_set_pm_only(q)
+   /* q->pm_only=1 */
+   blk_freeze_queue_start(q)
+   blk_mq_unfreeze_queue(q)
+                                       if (percpu_ref_tryget_live()) {
+                                         /* pm=0 && q->pm_only=1 */
+                                         if (pm || !blk_queue_pm_only(q)) {
+                                         } else {
+                                           percpu_ref_put()
+                                         }
+                                       }
+                                       wait_event(q->mq_freeze_wq,
+                                         (!q->mq_freeze_depth &&
+                                         /* q->rpm_status=RPM_ACTIVE
+                                            q->pm_only=1 */
+                                         (pm || (blk_pm_request_resume(q),
+                                          !blk_queue_pm_only(q)))) ||
+                                          blk_queue_dying(q))
+                                     }
+   spin_lock_irq(&q->queue_lock)
+   q->rpm_status = RPM_SUSPENDING
+   spin_unlock_irq(&q->queue_lock)
+ }
 
-static inline void blk_queue_set_zoned(struct gendisk *disk,
-		enum blk_zoned_model model)
-{
-	switch (model) {
-	case BLK_ZONED_HM:
-		WARN_ON_ONCE(!IS_ENABLED(CONFIG_BLK_DEV_ZONED));
-		break;
-	/*
-	 * Host aware drivers are neither fish nor fowl.  We can either
-	 * treat them like a drive managed devices, in which case they
-	 * aren't different from a normal block device, or we can try
-	 * to take advantage of the Zone command set, but in that case
-	 * we need to treat them like a host managed device.  We try
-	 * the latter if there are not partitions and zoned block device
-	 * set support is enabled, else we do nothing special as far as
-	 * the block layer is concerned.
-	 */
-	case BLK_ZONED_HA:
-		if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) ||
-		    disk_has_partitions(disk)) {
-			model = BLK_ZONED_NONE;
-		break;
-	default:
-		break;
+At this point blk_pm_request_resume() missed the chance to resume the
+queue, so blk_queue_enter() may wait here forever.
+The solution is to wake up the mq_freeze_wq after runtime suspend
+completed, make blk_pm_request_resume() reexamine the q->rpm_status flag.
 
-	disk->queue->limits.zoned = model;
-}
+Signed-off-by: Yang Yang <yang.yang@vivo.com>
+---
+ block/blk-pm.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Then in sd do:
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index b85234d758f7..dec7d0aef606 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -132,6 +132,8 @@ void blk_post_runtime_suspend(struct request_queue *q, int err)
+ 
+ 	if (err)
+ 		blk_clear_pm_only(q);
++	else
++		wake_up_all(&q->mq_freeze_wq);
+ }
+ EXPORT_SYMBOL(blk_post_runtime_suspend);
+ 
+-- 
+2.17.1
 
-	if (sdkp->device->type == TYPE_ZBC) {
-		blk_queue_set_zoned(sdkp->disk, BLK_ZONED_HM);
-	} else {
-		sdkp->zoned = (buffer[8] >> 4) & 3;
-		if (sdkp->zoned == 1)
-			blk_queue_set_zoned(sdkp->disk, BLK_ZONED_HA);
-		else
-			blk_queue_set_zoned(sdkp->disk, BLK_ZONED_NONE);
-	}
