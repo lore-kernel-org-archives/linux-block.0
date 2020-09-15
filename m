@@ -2,330 +2,236 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1731BC433E2
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 19:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A0DC43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 19:53:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F77C2078E
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 19:51:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEACD2078D
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 19:53:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UvWHbrpw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czvFoZGO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbgIOTt4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 15:49:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59354 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727837AbgIORKu (ORCPT
+        id S1727788AbgIORHa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 13:07:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20580 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727428AbgIORGk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 13:10:50 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B24C061354;
-        Tue, 15 Sep 2020 08:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=huSs9qw2inwsNt5ve2+SoDXSweZxKtrgL1ml0rolyNE=; b=UvWHbrpwXjSyXAw3Qq56MFLLh6
-        E84oL9sbAQBMT2Kj1+t2tpNCWMZUqGwdnYKFAj5RQbC3o1y4DqVLuXGg35Uq50O7rJHGpV7ngt+Ah
-        drWitRmifPmJHY+4HDKBvD2HqvWug5ygDsBHdVzJhhCn2/PLT1KWF6clJC5moedvWIWLeZb/Rk2iw
-        SzIRfqVkKgUJhJCNrWopHMa5an6JysjOC9F+VkGS99CMAeBceFFdIlzh3uDKWpMnO0otQ9prXF4br
-        SmUtC/fSom6LxyRlxjwjb+Z0tIhURsL4N9ULL6tDBeZZvK7Fet7Z9JlFcJz88sD9V9Fpv+aLQJEMb
-        myWh+aGQ==;
-Received: from 089144214092.atnat0023.highway.a1.net ([89.144.214.92] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kICxq-0001qR-5r; Tue, 15 Sep 2020 15:33:50 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 06/12] block: lift setting the readahead size into the block layer
-Date:   Tue, 15 Sep 2020 17:18:23 +0200
-Message-Id: <20200915151829.1767176-7-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200915151829.1767176-1-hch@lst.de>
-References: <20200915151829.1767176-1-hch@lst.de>
+        Tue, 15 Sep 2020 13:06:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600189567;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iaAIY3trIyVJDCQ4cdD1VjusVArdzvlkB+UMbdJlbPw=;
+        b=czvFoZGOdAqHd1GLoqfpHe9+UhmjFMe63Os05jtI2eLLy7gOqESjQsBHSoloT43twoAb2o
+        Y5ci7QhJt5ecE4VU8MgdIlLqMeFNYteR7HVPcS7D89/QpGTsHsB3vx8Bnq6zdlFvz7F8M2
+        YvoZnZTHtj1RhL2WiNzWu1xp/iQXYuU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-dFrDnAaCMwGdMtYKDyf-1g-1; Tue, 15 Sep 2020 13:04:00 -0400
+X-MC-Unique: dFrDnAaCMwGdMtYKDyf-1g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 715B910074D8;
+        Tue, 15 Sep 2020 17:03:34 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A4F275145;
+        Tue, 15 Sep 2020 17:03:34 +0000 (UTC)
+Date:   Tue, 15 Sep 2020 13:03:33 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Vijayendra Suman <vijayendra.suman@oracle.com>
+Cc:     linux-block@vger.kernel.org,
+        Somu Krishnasamy <somasundaram.krishnasamy@oracle.com>,
+        dm-devel@redhat.com,
+        RAMANAN_GOVINDARAJAN <ramanan.govindarajan@oracle.com>
+Subject: Re: Revert "dm: always call blk_queue_split() in dm_process_bio()"
+Message-ID: <20200915170333.GA20998@redhat.com>
+References: <529c2394-1b58-b9d8-d462-1f3de1b78ac8@oracle.com>
+ <20200910142438.GA21919@redhat.com>
+ <5261af10-bf5c-f768-dbeb-2e784a5823f9@oracle.com>
+ <20200915013308.GA14877@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200915013308.GA14877@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Drivers shouldn't really mess with the readahead size, as that is a VM
-concept.  Instead set it based on the optimal I/O size by lifting the
-algorithm from the md driver when registering the disk.  Also set
-bdi->io_pages there as well by applying the same scheme based on
-max_sectors.
+On Mon, Sep 14 2020 at  9:33pm -0400,
+Mike Snitzer <snitzer@redhat.com> wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- block/blk-settings.c         |  5 ++---
- block/blk-sysfs.c            | 10 +++++++++-
- block/genhd.c                |  5 +++--
- drivers/block/aoe/aoeblk.c   |  2 --
- drivers/block/drbd/drbd_nl.c | 12 +-----------
- drivers/md/bcache/super.c    |  4 ----
- drivers/md/raid0.c           | 16 ----------------
- drivers/md/raid10.c          | 24 +-----------------------
- drivers/md/raid5.c           | 13 +------------
- 9 files changed, 17 insertions(+), 74 deletions(-)
+> On Thu, Sep 10 2020 at  3:29pm -0400,
+> Vijayendra Suman <vijayendra.suman@oracle.com> wrote:
+> 
+> > Hello Mike,
+> > 
+> > I checked with upstream, performance measurement is similar and
+> > shows performance improvement when
+> > 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 is reverted.
+> > 
+> > On 9/10/2020 7:54 PM, Mike Snitzer wrote:
+> > >[cc'ing dm-devel and linux-block because this is upstream concern too]
+> > >
+> > >On Wed, Sep 09 2020 at  1:00pm -0400,
+> > >Vijayendra Suman <vijayendra.suman@oracle.com> wrote:
+> > >
+> > >>    Hello Mike,
+> > >>
+> > >>    While Running pgbench tool with  5.4.17 kernel build
+> > >>
+> > >>    Following performance degrade is found out
+> > >>
+> > >>    buffer read/write metric : -17.2%
+> > >>    cache read/write metric : -18.7%
+> > >>    disk read/write metric : -19%
+> > >>
+> > >>    buffer
+> > >>    number of transactions actually processed: 840972
+> > >>    latency average = 24.013 ms
+> > >>    tps = 4664.153934 (including connections establishing)
+> > >>    tps = 4664.421492 (excluding connections establishing)
+> > >>
+> > >>    cache
+> > >>    number of transactions actually processed: 551345
+> > >>    latency average = 36.949 ms
+> > >>    tps = 3031.223905 (including connections establishing)
+> > >>    tps = 3031.402581 (excluding connections establishing)
+> > >>
+> > >>    After revert of Commit
+> > >>    2892100bc85ae446088cebe0c00ba9b194c0ac9d ( Revert "dm: always call
+> > >>    blk_queue_split() in dm_process_bio()")
+> > >
+> > >I assume 2892100bc85ae446088cebe0c00ba9b194c0ac9d is 5.4-stable's
+> > >backport of upstream commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 ?
+> >
+> > Yes
+> >
+> > >>    Performance is Counter measurement
+> > >>
+> > >>    buffer ->
+> > >>    number of transactions actually processed: 1135735
+> > >>    latency average = 17.799 ms
+> > >>    tps = 6292.586749 (including connections establishing)
+> > >>    tps = 6292.875089 (excluding connections establishing)
+> > >>
+> > >>    cache ->
+> > >>    number of transactions actually processed: 648177
+> > >>    latency average = 31.217 ms
+> > >>    tps = 3587.755975 (including connections establishing)
+> > >>    tps = 3587.966359 (excluding connections establishing)
+> > >>
+> > >>    Following is your commit
+> > >>
+> > >>    diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > >>    index cf71a2277d60..1e6e0c970e19 100644
+> > >>    --- a/drivers/md/dm.c
+> > >>    +++ b/drivers/md/dm.c
+> > >>    @@ -1760,8 +1760,9 @@ static blk_qc_t dm_process_bio(struct mapped_device
+> > >>    *md,
+> > >>             * won't be imposed.
+> > >>             */
+> > >>            if (current->bio_list) {
+> > >>    -               blk_queue_split(md->queue, &bio);
+> > >>    -               if (!is_abnormal_io(bio))
+> > >>    +               if (is_abnormal_io(bio))
+> > >>    +                       blk_queue_split(md->queue, &bio);
+> > >>    +               else
+> > >>                            dm_queue_split(md, ti, &bio);
+> > >>            }
+> > >>
+> > >>    Could you have a look if it is safe to revert this commit.
+> > >No, it really isn't a good idea given what was documented in the commit
+> > >header for commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 -- the
+> > >excessive splitting is not conducive to performance either.
+> > >
+> > >So I think we need to identify _why_ reverting this commit is causing
+> > >such a performance improvement.  Why is calling blk_queue_split() before
+> > >dm_queue_split() benefiting your pgbench workload?
+> >
+> > Let me know if you want to check some patch.
+> 
+> Hi,
+> 
+> Could you please test this branch?:
+> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.10
+> (or apply at least the first 4 patches, commit 63f85d97be69^..b6a80963621fa)
+> 
+> So far I've done various DM regression testing.  But I haven't tested
+> with pgbench or with the misaaligned IO scenario documented in the
+> header for commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74.  But I'll
+> test that scenario tomorrow.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 76a7e03bcd6cac..01049e9b998f1d 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -452,6 +452,8 @@ EXPORT_SYMBOL(blk_limits_io_opt);
- void blk_queue_io_opt(struct request_queue *q, unsigned int opt)
- {
- 	blk_limits_io_opt(&q->limits, opt);
-+	q->backing_dev_info->ra_pages =
-+		max(queue_io_opt(q) * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
- }
- EXPORT_SYMBOL(blk_queue_io_opt);
- 
-@@ -628,9 +630,6 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
- 		printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
- 		       top, bottom);
- 	}
--
--	t->backing_dev_info->io_pages =
--		t->limits.max_sectors >> (PAGE_SHIFT - 9);
- }
- EXPORT_SYMBOL(disk_stack_limits);
- 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 81722cdcf0cb21..95eb35324e1a61 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -245,7 +245,6 @@ queue_max_sectors_store(struct request_queue *q, const char *page, size_t count)
- 
- 	spin_lock_irq(&q->queue_lock);
- 	q->limits.max_sectors = max_sectors_kb << 1;
--	q->backing_dev_info->io_pages = max_sectors_kb >> (PAGE_SHIFT - 10);
- 	spin_unlock_irq(&q->queue_lock);
- 
- 	return ret;
-@@ -854,6 +853,15 @@ int blk_register_queue(struct gendisk *disk)
- 		percpu_ref_switch_to_percpu(&q->q_usage_counter);
- 	}
- 
-+	/*
-+	 * For read-ahead of large files to be effective, we need to read ahead
-+	 * at least twice the optimal I/O size.
-+	 */
-+	q->backing_dev_info->ra_pages =
-+		max(queue_io_opt(q) * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
-+	q->backing_dev_info->io_pages =
-+		queue_max_sectors(q) >> (PAGE_SHIFT - 9);
-+
- 	ret = blk_trace_init_sysfs(dev);
- 	if (ret)
- 		return ret;
-diff --git a/block/genhd.c b/block/genhd.c
-index 9d060e79eb31d8..ed0b976644faac 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -772,6 +772,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 			      const struct attribute_group **groups,
- 			      bool register_queue)
- {
-+	struct request_queue *q = disk->queue;
- 	dev_t devt;
- 	int retval;
- 
-@@ -782,7 +783,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 	 * registration.
- 	 */
- 	if (register_queue)
--		elevator_init_mq(disk->queue);
-+		elevator_init_mq(q);
- 
- 	/* minors == 0 indicates to use ext devt from part0 and should
- 	 * be accompanied with EXT_DEVT flag.  Make sure all
-@@ -812,7 +813,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 		disk->flags |= GENHD_FL_SUPPRESS_PARTITION_INFO;
- 		disk->flags |= GENHD_FL_NO_PART_SCAN;
- 	} else {
--		struct backing_dev_info *bdi = disk->queue->backing_dev_info;
-+		struct backing_dev_info *bdi = q->backing_dev_info;
- 		struct device *dev = disk_to_dev(disk);
- 		int ret;
- 
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index 5ca7216e9e01f3..89b33b402b4e52 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -347,7 +347,6 @@ aoeblk_gdalloc(void *vp)
- 	mempool_t *mp;
- 	struct request_queue *q;
- 	struct blk_mq_tag_set *set;
--	enum { KB = 1024, MB = KB * KB, READ_AHEAD = 2 * MB, };
- 	ulong flags;
- 	int late = 0;
- 	int err;
-@@ -407,7 +406,6 @@ aoeblk_gdalloc(void *vp)
- 	WARN_ON(d->gd);
- 	WARN_ON(d->flags & DEVFL_UP);
- 	blk_queue_max_hw_sectors(q, BLK_DEF_MAX_SECTORS);
--	q->backing_dev_info->ra_pages = READ_AHEAD / PAGE_SIZE;
- 	d->bufpool = mp;
- 	d->blkq = gd->queue = q;
- 	q->queuedata = d;
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index aaff5bde391506..f8fb1c9b1bb6c1 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -1360,18 +1360,8 @@ static void drbd_setup_queue_param(struct drbd_device *device, struct drbd_backi
- 	decide_on_discard_support(device, q, b, discard_zeroes_if_aligned);
- 	decide_on_write_same_support(device, q, b, o, disable_write_same);
- 
--	if (b) {
-+	if (b)
- 		blk_stack_limits(&q->limits, &b->limits, 0);
--
--		if (q->backing_dev_info->ra_pages !=
--		    b->backing_dev_info->ra_pages) {
--			drbd_info(device, "Adjusting my ra_pages to backing device's (%lu -> %lu)\n",
--				 q->backing_dev_info->ra_pages,
--				 b->backing_dev_info->ra_pages);
--			q->backing_dev_info->ra_pages =
--						b->backing_dev_info->ra_pages;
--		}
--	}
- 	fixup_discard_if_not_supported(q);
- 	fixup_write_zeroes(device, q);
- }
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 1bbdc410ee3c51..ff2101d56cd7f1 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1427,10 +1427,6 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
- 	if (ret)
- 		return ret;
- 
--	dc->disk.disk->queue->backing_dev_info->ra_pages =
--		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
--		    q->backing_dev_info->ra_pages);
--
- 	atomic_set(&dc->io_errors, 0);
- 	dc->io_disable = false;
- 	dc->error_limit = DEFAULT_CACHED_DEV_ERROR_LIMIT;
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index f54a449f97aa79..aa2d7279176880 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -410,22 +410,6 @@ static int raid0_run(struct mddev *mddev)
- 		 mdname(mddev),
- 		 (unsigned long long)mddev->array_sectors);
- 
--	if (mddev->queue) {
--		/* calculate the max read-ahead size.
--		 * For read-ahead of large files to be effective, we need to
--		 * readahead at least twice a whole stripe. i.e. number of devices
--		 * multiplied by chunk size times 2.
--		 * If an individual device has an ra_pages greater than the
--		 * chunk size, then we will not drive that device as hard as it
--		 * wants.  We consider this a configuration error: a larger
--		 * chunksize should be used in that case.
--		 */
--		int stripe = mddev->raid_disks *
--			(mddev->chunk_sectors << 9) / PAGE_SIZE;
--		if (mddev->queue->backing_dev_info->ra_pages < 2* stripe)
--			mddev->queue->backing_dev_info->ra_pages = 2* stripe;
--	}
--
- 	dump_zones(mddev);
- 
- 	ret = md_integrity_register(mddev);
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 9956a04ac13bd6..5d1bdee313ec33 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3873,19 +3873,6 @@ static int raid10_run(struct mddev *mddev)
- 	mddev->resync_max_sectors = size;
- 	set_bit(MD_FAILFAST_SUPPORTED, &mddev->flags);
- 
--	if (mddev->queue) {
--		int stripe = conf->geo.raid_disks *
--			((mddev->chunk_sectors << 9) / PAGE_SIZE);
--
--		/* Calculate max read-ahead size.
--		 * We need to readahead at least twice a whole stripe....
--		 * maybe...
--		 */
--		stripe /= conf->geo.near_copies;
--		if (mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
--			mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
--	}
--
- 	if (md_integrity_register(mddev))
- 		goto out_free_conf;
- 
-@@ -4723,17 +4710,8 @@ static void end_reshape(struct r10conf *conf)
- 	conf->reshape_safe = MaxSector;
- 	spin_unlock_irq(&conf->device_lock);
- 
--	/* read-ahead size must cover two whole stripes, which is
--	 * 2 * (datadisks) * chunksize where 'n' is the number of raid devices
--	 */
--	if (conf->mddev->queue) {
--		int stripe = conf->geo.raid_disks *
--			((conf->mddev->chunk_sectors << 9) / PAGE_SIZE);
--		stripe /= conf->geo.near_copies;
--		if (conf->mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
--			conf->mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
-+	if (conf->mddev->queue)
- 		raid10_set_io_opt(conf);
--	}
- 	conf->fullsync = 0;
- }
- 
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index 9a7d1250894ef1..7ace1f76b14736 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7522,8 +7522,6 @@ static int raid5_run(struct mddev *mddev)
- 		int data_disks = conf->previous_raid_disks - conf->max_degraded;
- 		int stripe = data_disks *
- 			((mddev->chunk_sectors << 9) / PAGE_SIZE);
--		if (mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
--			mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
- 
- 		chunk_size = mddev->chunk_sectors << 9;
- 		blk_queue_io_min(mddev->queue, chunk_size);
-@@ -8111,17 +8109,8 @@ static void end_reshape(struct r5conf *conf)
- 		spin_unlock_irq(&conf->device_lock);
- 		wake_up(&conf->wait_for_overlap);
- 
--		/* read-ahead size must cover two whole stripes, which is
--		 * 2 * (datadisks) * chunksize where 'n' is the number of raid devices
--		 */
--		if (conf->mddev->queue) {
--			int data_disks = conf->raid_disks - conf->max_degraded;
--			int stripe = data_disks * ((conf->chunk_sectors << 9)
--						   / PAGE_SIZE);
--			if (conf->mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
--				conf->mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
-+		if (conf->mddev->queue)
- 			raid5_set_io_opt(conf);
--		}
- 	}
- }
- 
--- 
-2.28.0
+Training DM core to set chunk_sectors and always use blk_queue_split
+resolves the inefficient splitting documented in the header for
+commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74.
+
+xfs_io -d -c 'pread -b 2m 224s 4072s' /dev/mapper/stripe_dev
+
+before, so with commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74:
+
+253,2    5        1     0.000000000  4382  Q   R 224 + 2064 [xfs_io]
+253,2    5        2     0.000003414  4382  X   R 224 / 256 [xfs_io]
+253,2    5        3     0.000017838  4382  X   R 256 / 512 [xfs_io]
+253,2    5        4     0.000019852  4382  X   R 512 / 768 [xfs_io]
+253,2    5        5     0.000031316  4382  X   R 768 / 1024 [xfs_io]
+253,2    5        6     0.000034333  4382  X   R 1024 / 1280 [xfs_io]
+253,2    5        7     0.000037684  4382  X   R 1280 / 1536 [xfs_io]
+253,2    5        8     0.000041011  4382  X   R 1536 / 1792 [xfs_io]
+253,2    5        9     0.000043962  4382  X   R 1792 / 2048 [xfs_io]
+253,2    5       10     0.000074765  4382  Q   R 2288 + 2008 [xfs_io]
+253,2    5       11     0.000075020  4382  X   R 2288 / 2304 [xfs_io]
+253,2    5       12     0.000077009  4382  X   R 2304 / 2560 [xfs_io]
+253,2    5       13     0.000080509  4382  X   R 2560 / 2816 [xfs_io]
+253,2    5       14     0.000084182  4382  X   R 2816 / 3072 [xfs_io]
+253,2    5       15     0.000087274  4382  X   R 3072 / 3328 [xfs_io]
+253,2    5       16     0.000090342  4382  X   R 3328 / 3584 [xfs_io]
+253,2    5       17     0.000095348  4382  X   R 3584 / 3840 [xfs_io]
+253,2    5       18     0.000097776  4382  X   R 3840 / 4096 [xfs_io]
+
+after, so with 'dm-5.10' branch refernced above, meaning dm_process_bio
+w/ unconditional blk_queue_split (w/ chunk_sectors):
+
+253,2   17        1     0.000000000  2176  Q   R 224 + 2280 [xfs_io]
+253,2   17        2     0.000001978  2176  X   R 224 / 256 [xfs_io]
+253,2   17        3     0.000017882  2176  X   R 256 / 512 [xfs_io]
+253,2   17        4     0.000020406  2176  X   R 512 / 768 [xfs_io]
+253,2   17        5     0.000031298  2176  X   R 768 / 1024 [xfs_io]
+253,2   17        6     0.000034654  2176  X   R 1024 / 1280 [xfs_io]
+253,2   17        7     0.000038474  2176  X   R 1280 / 1536 [xfs_io]
+253,2   17        8     0.000042299  2176  X   R 1536 / 1792 [xfs_io]
+253,2   17        9     0.000054088  2176  X   R 1792 / 2048 [xfs_io]
+253,2   17       10     0.000057884  2176  X   R 2048 / 2304 [xfs_io]
+253,2   17       11     0.000081358  2176  Q   R 2504 + 1792 [xfs_io]
+253,2   17       12     0.000081778  2176  X   R 2504 / 2560 [xfs_io]
+253,2   17       13     0.000083496  2176  X   R 2560 / 2816 [xfs_io]
+253,2   17       14     0.000085301  2176  X   R 2816 / 3072 [xfs_io]
+253,2   17       15     0.000092374  2176  X   R 3072 / 3328 [xfs_io]
+253,2   17       16     0.000094774  2176  X   R 3328 / 3584 [xfs_io]
+253,2   17       17     0.000097977  2176  X   R 3584 / 3840 [xfs_io]
+253,2   17       18     0.000100094  2176  X   R 3840 / 4096 [xfs_io]
+
+> Any chance you could provide some hints on how you're running pgbench
+> just so I can try to test/reproduce/verify locally?
+
+I'm going to defer to you on pgbench testing.
+
+What is your underlying storage?
+
+Could it be that DM using unconditional blk_queue_split() is helping
+your pgbench workload because it splits IO more (so smaller IO, lower
+latency per IO)?
+
+Do you have comparison blktrace data?
+
+Mike
 
