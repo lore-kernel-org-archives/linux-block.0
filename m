@@ -2,102 +2,127 @@ Return-Path: <SRS0=dDIv=CZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B92C433E2
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 00:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D052CC31E5C
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 00:36:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EBA12078E
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 00:35:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97AA3207DE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 00:36:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bHtAaTr3"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wJ3w9dq4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726835AbgIPAfX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 20:35:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52904 "EHLO
+        id S1726136AbgIPAgt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 20:36:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726653AbgIONaG (ORCPT
+        with ESMTP id S1726562AbgIONZn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 09:30:06 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F17CC061797;
-        Tue, 15 Sep 2020 06:17:16 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id j3so1663376qvi.7;
-        Tue, 15 Sep 2020 06:17:16 -0700 (PDT)
+        Tue, 15 Sep 2020 09:25:43 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE282C061221
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 06:25:32 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id d189so3775100oig.12
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 06:25:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mj8HXSmsSNxeIujwIa30VgbpWrvEiO598UuHVl/xxe8=;
-        b=bHtAaTr37msJEOPArN+wAyZqyi+U84EK+yg4FLU29U2WT5F3NlMFrKlYx15Lnaxg35
-         iaNPqo/ZxTk/LX/RZnuY/izI4rNZpq49NOCFW9BcuhcGWeHQEDUSoem1gXprIhbFX+SV
-         SQTYidbu2wTV31dg+ncvB3lHATpumuzCVfSLqGdvJwTz4cSlB8PXEFApb9c1lioGJx/A
-         wS5DGSV88GR5e6EV1Cov4IosxuDQsd8o1JSCiNIrHw2I8/uFj4/5sNQUknmu1iYGzZkC
-         Y75UfxyNyHIgV3Xgx0uKearTwlBb5DeGypy6vOVUJ7pI4NnK9SKmHc4r0U7cexNLjH1Y
-         Enew==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=RyVHdR8jBIwQ3BNbRllUCCgf0qrcLoJK+x7C0viR1NE=;
+        b=wJ3w9dq4WGkHLAVxY7n5TllVUvXWKHAsTyiAO1zqRGvpG1/0nZAGylkQCAEkc30qw0
+         sdRrx5LKXaDqGtVMa+2D75ZbOI2t2+gIYrfrD+JFMDZXZk+wW33LRqi/N0X7ftX00gHR
+         zu70x//BFqUKOIYBIZcbdJ3p7YDhBXfQIwWM5NSmVOgKEVYm9OBLpso5+qMI2Vltexgx
+         t+qr5+7omoFBf619m7FZRQzPawASQ+AxYaBSngl6IQwlIR94WTkzqGO4YxLl+VoVkBZ4
+         wajpohE424xoFqEvGlfZ1HIQaCRMAqUoep6zE6jZCSXLbApL4P/Q0Bab4L65D/a6NOua
+         i9DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mj8HXSmsSNxeIujwIa30VgbpWrvEiO598UuHVl/xxe8=;
-        b=gTs2kiJduiPWluoFIK8suXdeP+C2votC6z6HZYVTqxOfJ0zwfQHaaag8YLBba51D+z
-         XQyayuy8HFYz/Lx0cXX/mpZ/+h5BzOtij1G4NXU+2YG6ZT8D3XiVNu4V910D9POHaQYs
-         M05nv+baxdbM7I8uAyGG+gfAE5K8h5njLqjT2XwTi0DvK2t/tf+vsliWy0VTZfBo1VZv
-         AvVUZ4SNYD3kKZSzZqgvx7p6CDGfpOmJ4k4vHRnePgHKiAs9Sf4fh3auiyFO/d4VjGbe
-         sjEE+G0eeJZzFY+XP0esmfVSDOFVBzEZRSMQGc0xlUgPKvVBkDWiadZsPkgwvO8KUoBP
-         vHUg==
-X-Gm-Message-State: AOAM533hzauiV9MzmvAdqTenkbfzYEcRhN/UZM9gfjficPESCWc3dSN6
-        YWTV0DxKdaZ2v+aksctH/eY=
-X-Google-Smtp-Source: ABdhPJyt+1tHPPWQMeQyLwsAJynKK7E0Iunn6FqtUfwe6yHrM7dqmGItWAk2AT1ny975BBdYx33Qaw==
-X-Received: by 2002:a05:6214:d6b:: with SMTP id 11mr17952599qvs.30.1600175835673;
-        Tue, 15 Sep 2020 06:17:15 -0700 (PDT)
-Received: from dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com ([2620:10d:c091:480::1:8e32])
-        by smtp.gmail.com with ESMTPSA id b13sm16918676qkl.46.2020.09.15.06.17.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2020 06:17:14 -0700 (PDT)
-Date:   Tue, 15 Sep 2020 09:17:12 -0400
-From:   Dan Schatzberg <schatzberg.dan@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Roman Gushchin <guro@fb.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Subject: Re: [PATCH v8 0/3] Charge loop device i/o to issuing cgroup
-Message-ID: <20200915131712.GA50425@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
-References: <20200831153704.16848-1-schatzberg.dan@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RyVHdR8jBIwQ3BNbRllUCCgf0qrcLoJK+x7C0viR1NE=;
+        b=cyNzfle5nLG4FyepVw42xLx6gj7zjXzfvMYI39X8V2/YqE4CHtQtRn0sLFuJqVd7qz
+         JDLWm7yGdJ4uQu1nrQ57bc0U7pOTE1FE5OjrLaBaTc2uAhEtFG5VkRw33jMbBcTtS6Uq
+         aYZjKsrAoz97ueKpoKmI4Pm0itgZdOE+httwTGDToDMl1O0+EosDxWU72COXq3r8pBO5
+         ocH5nIw1nch25IydLgk9GqFkPPJav0S5mNl5/ec+ACHcJu9M+K++Na00Hw8Bcvg7J/RP
+         86YMvOtkb/SW9/KqWkAxBRzsvNTbzESOzlqNNdhpwbLnUo1DIVJ6BIAArrAGRQ5n3LPG
+         dzbg==
+X-Gm-Message-State: AOAM533UbrIubbO3zoB7dfKcrdSMEKzWC0ydmWdWPRw55CiT/yKQv+JK
+        tU+5Ieloa4NbT6FwwlTnuN5O/g==
+X-Google-Smtp-Source: ABdhPJyT4YjSfQSBOA7Rk1epa+cHZnD91VxCDph4qsIf8187cA0apiSIFtK2ee4KGS1Y+lHtVJRWIg==
+X-Received: by 2002:a05:6808:aa5:: with SMTP id r5mr3180890oij.90.1600176331905;
+        Tue, 15 Sep 2020 06:25:31 -0700 (PDT)
+Received: from [192.168.1.10] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id l136sm6362088oig.7.2020.09.15.06.25.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Sep 2020 06:25:31 -0700 (PDT)
+Subject: Re: [PATCH] io_uring: fix the bug of child process can't do io task
+To:     Yinyin Zhu <zhuyinyin@bytedance.com>, viro@zeniv.linux.org.uk
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200915130245.89585-1-zhuyinyin@bytedance.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e206f1b4-1f22-c3f5-21a6-cec498d9c830@kernel.dk>
+Date:   Tue, 15 Sep 2020 07:25:30 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200831153704.16848-1-schatzberg.dan@gmail.com>
+In-Reply-To: <20200915130245.89585-1-zhuyinyin@bytedance.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens,
+On 9/15/20 7:02 AM, Yinyin Zhu wrote:
+> when parent process setup a io_uring_instance, the ctx->sqo_mm was
+> assigned of parent process'mm. Then it fork a child
+> process. So the child process inherits the io_uring_instance fd from
+> parent process. Then the child process submit a io task to the io_uring
+> instance. The kworker will do the io task actually, and use
+> the ctx->sqo_mm as its mm, but this ctx->sqo_mm is parent process's mm,
+> not the child process's mm. so child do the io task unsuccessfully. To
+> fix this bug, when a process submit a io task to the kworker, assign the
+> ctx->sqo_mm with this process's mm.
 
-How would you like to resolve this patch series? Roman's patch that
-this is based off of just made it into linux-next:
+Hmm, what's the test case for this? There's a 5.9 regression where we
+don't always grab the right context for certain linked cases, below
+is the fix. Does that fix your case?
 
-https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next/+/928776957ea4e1c35b1c4c35b8fe7203354fbae3
 
-I suppose you can pull that into the block tree and have git merge
-resolve it when it all goes to linus. Another option would be routing
-this through Andrew's -mm tree (which already has that commit). Up to
-you which you prefer.
+commit 202700e18acbed55970dbb9d4d518ac59b1172c8
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Sat Sep 12 13:18:10 2020 -0600
+
+    io_uring: grab any needed state during defer prep
+    
+    Always grab work environment for deferred links. The assumption that we
+    will be running it always from the task in question is false, as exiting
+    tasks may mean that we're deferring this one to a thread helper. And at
+    that point it's too late to grab the work environment.
+    
+    Fixes: debb85f496c9 ("io_uring: factor out grab_env() from defer_prep()")
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 175fb647d099..be9d628e7854 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -5449,6 +5449,8 @@ static int io_req_defer_prep(struct io_kiocb *req,
+ 	if (unlikely(ret))
+ 		return ret;
+ 
++	io_prep_async_work(req);
++
+ 	switch (req->opcode) {
+ 	case IORING_OP_NOP:
+ 		break;
+
+-- 
+Jens Axboe
+
