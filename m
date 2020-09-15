@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C239EC43461
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 15:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F148BC43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 17:02:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7264520770
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 15:34:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 877A921974
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 17:02:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QuquWALy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gzAWZQBX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727388AbgIOP2Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 11:28:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43138 "EHLO
+        id S1727527AbgIORBA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 13:01:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727398AbgIOP1W (ORCPT
+        with ESMTP id S1727798AbgIOQun (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 11:27:22 -0400
+        Tue, 15 Sep 2020 12:50:43 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CC1C061797;
-        Tue, 15 Sep 2020 08:25:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5240CC06121E;
+        Tue, 15 Sep 2020 08:36:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=RXt5uY93CeNpmXcpasT+yQQlaTOE/frmzO1PH2TPYYU=; b=QuquWALypxtZa4d/TzijS9gtw8
-        OMQtEqN382McMdWUwtk9BdaXKEOweAqTxpAoMfsCKgdO2D3IF8kZWKRezBCdCxWR1NJGLVd6So1B5
-        c+2GsrCdpvhDiILYQFsQzdsZd1DGs1SfyEWINPa702Bo52XWkZpTSHOaD7iks/95Nz+Q0OwUuLgPL
-        1d/IJSqFMXo2KPpp6+DUFdpzIG8J2dBWSVhYHtRGMKpnYmRj92L1S53lxQ8GZdxniuEBBJRTiaa5E
-        tlC6TO+uOWuDmbD72jwipnSiG7Snxm/YBq1HMC35CiuS8Kf0Cb3zQ+jF7viuQNxRf8WGiGZr/zvZF
-        +ulYOBJg==;
+        bh=0GTh7/oz6MJJ/leTjv6ZPfgdSyXwNjIPMnPsQbVzJYc=; b=gzAWZQBXfwu/NBHz5XlfXhr1mc
+        McOuGCZUAkjTQhGXXdmUEvWiDHXiQArl6u2Z0N39fj6edcjTJV4+teowK4jjzJ4n9wXMeyhTmmekG
+        hZje9bhyAx8R9ZFjK3QWK+MDJOU5n+rk1gqTY9RAWZz7whVbDbMLCp9GyjqrZ9OsGMD2BxwAPqCws
+        z3PPoLlJ3DlqkWH/0nkPQpfz98GYa+OX97F3dXae61ZZ/yHbaEG9SaEhpkDtIXcUOFrgOsplf2qyV
+        fLiSE/tOiyj98OWUcMZjdiT3ZWheSU7nIL2c4hbODSYrSJ4nG6Gj2DDSjNcOAlxTt4jHKEkko26P8
+        QDACDuNA==;
 Received: from 089144214092.atnat0023.highway.a1.net ([89.144.214.92] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kICpL-0001JA-QH; Tue, 15 Sep 2020 15:25:04 +0000
+        id 1kICzx-00023R-8x; Tue, 15 Sep 2020 15:36:01 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
@@ -50,9 +50,9 @@ Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         cgroups@vger.kernel.org,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 02/12] drbd: remove dead code in device_to_statistics
-Date:   Tue, 15 Sep 2020 17:18:19 +0200
-Message-Id: <20200915151829.1767176-3-hch@lst.de>
+Subject: [PATCH 07/12] bdi: remove BDI_CAP_CGROUP_WRITEBACK
+Date:   Tue, 15 Sep 2020 17:18:24 +0200
+Message-Id: <20200915151829.1767176-8-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200915151829.1767176-1-hch@lst.de>
 References: <20200915151829.1767176-1-hch@lst.de>
@@ -64,40 +64,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ever since the switch to blk-mq, a lower device not used for VM
-writeback will not be marked congested, so the check will never
-trigger.
+Just checking SB_I_CGROUPWB for cgroup writeback support is enough.
+Either the file system allocates its own bdi (e.g. btrfs), in which case
+it is known to support cgroup writeback, or the bdi comes from the block
+layer, which always supports cgroup writeback.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- drivers/block/drbd/drbd_nl.c | 6 ------
- 1 file changed, 6 deletions(-)
+ block/blk-core.c            | 1 -
+ fs/btrfs/disk-io.c          | 1 -
+ include/linux/backing-dev.h | 8 +++-----
+ 3 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index 43c8ae4d9fca81..aaff5bde391506 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -3370,7 +3370,6 @@ static void device_to_statistics(struct device_statistics *s,
- 	if (get_ldev(device)) {
- 		struct drbd_md *md = &device->ldev->md;
- 		u64 *history_uuids = (u64 *)s->history_uuids;
--		struct request_queue *q;
- 		int n;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 865d39e5be2b28..1cc4fa6bc7fe1f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -538,7 +538,6 @@ struct request_queue *blk_alloc_queue(int node_id)
+ 	if (!q->stats)
+ 		goto fail_stats;
  
- 		spin_lock_irq(&md->uuid_lock);
-@@ -3384,11 +3383,6 @@ static void device_to_statistics(struct device_statistics *s,
- 		spin_unlock_irq(&md->uuid_lock);
+-	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
+ 	q->node = node_id;
  
- 		s->dev_disk_flags = md->flags;
--		q = bdev_get_queue(device->ldev->backing_bdev);
--		s->dev_lower_blocked =
--			bdi_congested(q->backing_dev_info,
--				      (1 << WB_async_congested) |
--				      (1 << WB_sync_congested));
- 		put_ldev(device);
+ 	atomic_set(&q->nr_active_requests_shared_sbitmap, 0);
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index 047934cea25efa..e24927bddd5829 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -3091,7 +3091,6 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
+ 		goto fail_sb_buffer;
  	}
- 	s->dev_size = drbd_get_capacity(device->this_bdev);
+ 
+-	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
+ 	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
+ 	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
+ 
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 0b06b2d26c9aa3..52583b6f2ea05d 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -123,7 +123,6 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ratio);
+  * BDI_CAP_NO_ACCT_WB:     Don't automatically account writeback pages
+  * BDI_CAP_STRICTLIMIT:    Keep number of dirty pages below bdi threshold.
+  *
+- * BDI_CAP_CGROUP_WRITEBACK: Supports cgroup-aware writeback.
+  * BDI_CAP_SYNCHRONOUS_IO: Device is so fast that asynchronous IO would be
+  *			   inefficient.
+  */
+@@ -233,9 +232,9 @@ int inode_congested(struct inode *inode, int cong_bits);
+  * inode_cgwb_enabled - test whether cgroup writeback is enabled on an inode
+  * @inode: inode of interest
+  *
+- * cgroup writeback requires support from both the bdi and filesystem.
+- * Also, both memcg and iocg have to be on the default hierarchy.  Test
+- * whether all conditions are met.
++ * Cgroup writeback requires support from the filesystem.  Also, both memcg and
++ * iocg have to be on the default hierarchy.  Test whether all conditions are
++ * met.
+  *
+  * Note that the test result may change dynamically on the same inode
+  * depending on how memcg and iocg are configured.
+@@ -247,7 +246,6 @@ static inline bool inode_cgwb_enabled(struct inode *inode)
+ 	return cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
+ 		cgroup_subsys_on_dfl(io_cgrp_subsys) &&
+ 		bdi_cap_account_dirty(bdi) &&
+-		(bdi->capabilities & BDI_CAP_CGROUP_WRITEBACK) &&
+ 		(inode->i_sb->s_iflags & SB_I_CGROUPWB);
+ }
+ 
 -- 
 2.28.0
 
