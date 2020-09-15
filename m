@@ -2,138 +2,122 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F148BC43461
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 17:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 750ADC43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 18:31:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 877A921974
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 17:02:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32BBB2145D
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 18:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gzAWZQBX"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oMdFH0qe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727527AbgIORBA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 13:01:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56190 "EHLO
+        id S1727861AbgIOSaG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 14:30:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727798AbgIOQun (ORCPT
+        with ESMTP id S1727685AbgIOSSd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 12:50:43 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5240CC06121E;
-        Tue, 15 Sep 2020 08:36:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=0GTh7/oz6MJJ/leTjv6ZPfgdSyXwNjIPMnPsQbVzJYc=; b=gzAWZQBXfwu/NBHz5XlfXhr1mc
-        McOuGCZUAkjTQhGXXdmUEvWiDHXiQArl6u2Z0N39fj6edcjTJV4+teowK4jjzJ4n9wXMeyhTmmekG
-        hZje9bhyAx8R9ZFjK3QWK+MDJOU5n+rk1gqTY9RAWZz7whVbDbMLCp9GyjqrZ9OsGMD2BxwAPqCws
-        z3PPoLlJ3DlqkWH/0nkPQpfz98GYa+OX97F3dXae61ZZ/yHbaEG9SaEhpkDtIXcUOFrgOsplf2qyV
-        fLiSE/tOiyj98OWUcMZjdiT3ZWheSU7nIL2c4hbODSYrSJ4nG6Gj2DDSjNcOAlxTt4jHKEkko26P8
-        QDACDuNA==;
-Received: from 089144214092.atnat0023.highway.a1.net ([89.144.214.92] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kICzx-00023R-8x; Tue, 15 Sep 2020 15:36:01 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 07/12] bdi: remove BDI_CAP_CGROUP_WRITEBACK
-Date:   Tue, 15 Sep 2020 17:18:24 +0200
-Message-Id: <20200915151829.1767176-8-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200915151829.1767176-1-hch@lst.de>
-References: <20200915151829.1767176-1-hch@lst.de>
+        Tue, 15 Sep 2020 14:18:33 -0400
+Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0451BC061788
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 11:17:59 -0700 (PDT)
+Received: by mail-oo1-xc44.google.com with SMTP id o20so1007341ook.1
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 11:17:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=bTTRD0/irNQCd03woygzg2YIc3JV44oMGNS2xdYHnuY=;
+        b=oMdFH0qeR7ktNNSHnOFu0cnxSyqibVe5Xfhe2tBaiWKuUcg1GDfeVU/qMzK149v5K+
+         iK0oQoF39aDYeONrDyDjZS59ruDFyIryDGNrD04kboLa7s9/T2DfrPvNZ5mWtnsUkKVL
+         wGRPpofseOHZAXio+PZGs0lAxHmN2RrQUMM55FmC4GuBfqFk6vs/rdl67En8WyxSWjxW
+         3H3o+eCZ/0wMTcov8J54w+bE6IFxngx5LeFTF0V4ivTjpkp8ZfjwQtktOH8V2XBotEpH
+         qQPHM+S0mkUvPlV3hkhPxbpIp5SEt/s2xbVoAaBbZYT9AHlf2HEqGHcTeYP3nfBbEY13
+         w2SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bTTRD0/irNQCd03woygzg2YIc3JV44oMGNS2xdYHnuY=;
+        b=JUfZhzTam5/IkE2hDOv5RbHBKhlmwbKLNHX5oWJOj9xP/+PePoZ5o4rFrxVqCI3O1p
+         cJUVcZrDqQeQbHYOp8Ijt5HNjcqEbXMJe1IFAiP6lbEbRC5zjw6/IBXe/u+8VEBmcIA2
+         N0aceYbifNVYVe1IioS4oUkzRyS2uHhecOjk5KlFPtzVaWU1+yYS/ZgOHqBC0qcrQwOv
+         y4lYJ4KL0QVxpbEAp92s5ThQg0FovJiYt+epVLSc/xFeFDLRZVwQdxoZdFlV2vOPdYO5
+         WW8EjPbViw9uLWaC6/jiQVw/2HUuVXLrmFZopeTnmzXFnP32IyTVI821vP8bmSKpDhvU
+         v+kg==
+X-Gm-Message-State: AOAM533VBBDUNL49UK++6YZusgmbADHdnAAFGNs8uuKqg1IGVXBAaGRF
+        l+ZADM+RorBsly6u70j308LU1A==
+X-Google-Smtp-Source: ABdhPJyQ+e6vnFc7oLm3XND80yl17hzMcTnTiY2uZpb1xItEL9ivt+KBWm5ZF0JxQskTaOcMWGW7nA==
+X-Received: by 2002:a4a:5896:: with SMTP id f144mr665883oob.49.1600193878720;
+        Tue, 15 Sep 2020 11:17:58 -0700 (PDT)
+Received: from [192.168.1.10] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id 9sm6876327ois.10.2020.09.15.11.17.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Sep 2020 11:17:58 -0700 (PDT)
+Subject: Re: [PATCH 0/5] Some improvements for blk-throttle
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc:     tj@kernel.org, baolin.wang7@gmail.com, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1599458244.git.baolin.wang@linux.alibaba.com>
+ <822998a7-4cc7-88ee-8b3f-e8e7660a5b0a@kernel.dk>
+ <20200915085926.GA122937@VM20190228-100.tbsite.net>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c36a1c1b-ca46-13c8-42eb-94e63ff845d1@kernel.dk>
+Date:   Tue, 15 Sep 2020 12:17:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200915085926.GA122937@VM20190228-100.tbsite.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just checking SB_I_CGROUPWB for cgroup writeback support is enough.
-Either the file system allocates its own bdi (e.g. btrfs), in which case
-it is known to support cgroup writeback, or the bdi comes from the block
-layer, which always supports cgroup writeback.
+On 9/15/20 2:59 AM, Baolin Wang wrote:
+> Hi Jens,
+> 
+> On Mon, Sep 14, 2020 at 07:37:53PM -0600, Jens Axboe wrote:
+>> On 9/7/20 2:10 AM, Baolin Wang wrote:
+>>> Hi All,
+>>>
+>>> This patch set did some clean-ups, as well as removing some unnecessary
+>>> bps/iops limitation calculation when checking if can dispatch a bio or
+>>> not for a tg. Please help to review. Thanks.
+>>>
+>>> Baolin Wang (5):
+>>>   blk-throttle: Fix some comments' typos
+>>>   blk-throttle: Use readable READ/WRITE macros
+>>>   blk-throttle: Define readable macros instead of static variables
+>>>   blk-throttle: Avoid calculating bps/iops limitation repeatedly
+>>>   blk-throttle: Avoid checking bps/iops limitation if bps or iops is    
+>>>     unlimited
+>>>
+>>>  block/blk-throttle.c | 59 ++++++++++++++++++++++++++++++++--------------------
+>>>  1 file changed, 36 insertions(+), 23 deletions(-)
+>>
+>> Looks reasonable to me, I've applied it.
+> 
+> Thanks.
+> 
+>>
+>> Out of curiosity, are you using blk-throttle in production, or are these
+>> just fixes/cleanups that you came across?
+> 
+> Yes, we're using it in some old products, and I am trying to do some
+> cleanups and optimizaiton when testing it.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- block/blk-core.c            | 1 -
- fs/btrfs/disk-io.c          | 1 -
- include/linux/backing-dev.h | 8 +++-----
- 3 files changed, 3 insertions(+), 7 deletions(-)
+Gotcha. Reason I ask is I've been considering deprecating it, but when
+fixes come in for something, that always makes me think that some folks
+are actually using it.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 865d39e5be2b28..1cc4fa6bc7fe1f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -538,7 +538,6 @@ struct request_queue *blk_alloc_queue(int node_id)
- 	if (!q->stats)
- 		goto fail_stats;
- 
--	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
- 	q->node = node_id;
- 
- 	atomic_set(&q->nr_active_requests_shared_sbitmap, 0);
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 047934cea25efa..e24927bddd5829 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -3091,7 +3091,6 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
- 		goto fail_sb_buffer;
- 	}
- 
--	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
- 	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
- 	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
- 
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 0b06b2d26c9aa3..52583b6f2ea05d 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -123,7 +123,6 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ratio);
-  * BDI_CAP_NO_ACCT_WB:     Don't automatically account writeback pages
-  * BDI_CAP_STRICTLIMIT:    Keep number of dirty pages below bdi threshold.
-  *
-- * BDI_CAP_CGROUP_WRITEBACK: Supports cgroup-aware writeback.
-  * BDI_CAP_SYNCHRONOUS_IO: Device is so fast that asynchronous IO would be
-  *			   inefficient.
-  */
-@@ -233,9 +232,9 @@ int inode_congested(struct inode *inode, int cong_bits);
-  * inode_cgwb_enabled - test whether cgroup writeback is enabled on an inode
-  * @inode: inode of interest
-  *
-- * cgroup writeback requires support from both the bdi and filesystem.
-- * Also, both memcg and iocg have to be on the default hierarchy.  Test
-- * whether all conditions are met.
-+ * Cgroup writeback requires support from the filesystem.  Also, both memcg and
-+ * iocg have to be on the default hierarchy.  Test whether all conditions are
-+ * met.
-  *
-  * Note that the test result may change dynamically on the same inode
-  * depending on how memcg and iocg are configured.
-@@ -247,7 +246,6 @@ static inline bool inode_cgwb_enabled(struct inode *inode)
- 	return cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
- 		cgroup_subsys_on_dfl(io_cgrp_subsys) &&
- 		bdi_cap_account_dirty(bdi) &&
--		(bdi->capabilities & BDI_CAP_CGROUP_WRITEBACK) &&
- 		(inode->i_sb->s_iflags & SB_I_CGROUPWB);
- }
- 
 -- 
-2.28.0
+Jens Axboe
 
