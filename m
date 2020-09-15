@@ -2,120 +2,111 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C61DAC433E2
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 07:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E92C43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 07:34:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76B7920897
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 07:33:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1470B20731
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 07:34:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4ShjBX4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="LkRvE2gH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726134AbgIOHdV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 03:33:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59760 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726095AbgIOHdU (ORCPT
+        id S1726139AbgIOHd6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 03:33:58 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:12669 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726087AbgIOHdx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 03:33:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600155199;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NuL3Yd8/YXcGgFrD3H7Mh6oQlLO0y8IzzOlQqEaeDeQ=;
-        b=C4ShjBX400DPbZKxq0py5yRgJQGzJBuMxiY4XmJE9OV/2U+1DAIseprCtemna6tUhC7eK1
-        3ilO1pF6QhdjDmbBKCz4zxpr+yWxkvmCaH7S7tslVZfbFcaMSVp7GgtuDGRxQ2lH+Ug8SC
-        IFj+hun0caYkBqkVUYPlG0TtZJ43R2A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-9MikSqX5MaGF-B7lPqIxig-1; Tue, 15 Sep 2020 03:33:17 -0400
-X-MC-Unique: 9MikSqX5MaGF-B7lPqIxig-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C4CB10199AA;
-        Tue, 15 Sep 2020 07:33:15 +0000 (UTC)
-Received: from T590 (ovpn-12-38.pek2.redhat.com [10.72.12.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9675060E1C;
-        Tue, 15 Sep 2020 07:33:08 +0000 (UTC)
-Date:   Tue, 15 Sep 2020 15:33:03 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-Message-ID: <20200915073303.GA754106@T590>
-References: <990cc101-d4a1-f346-fe78-0fb5b963b406@kernel.dk>
- <20c844c8-b649-3250-ff5b-b7420f72ff38@kernel.dk>
- <20200822143326.GC199705@mit.edu>
- <aff250ad-4c31-15c2-fa1d-3f3945cb7aa5@kernel.dk>
- <7f0e2d99-5da2-237e-a894-0afddc0ace1e@kernel.dk>
- <049a97db-c362-bcfb-59e5-4b1d2df59383@kernel.dk>
- <5140ba6c-779c-2a71-b7f2-3c3220cdf19c@kernel.dk>
- <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
- <20200904035528.GE558530@mit.edu>
- <20200915044519.GA38283@mit.edu>
+        Tue, 15 Sep 2020 03:33:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1600155234; x=1631691234;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FarJKh3x0In5BY3dfnVbiccgbo1sWfg8Yc3MSgdQfvY=;
+  b=LkRvE2gHylnwnKGT8MVjnqLijXuwuB2guQI0p2Pzu/uSCRGYs5/GJ9sJ
+   v4JoNMY63ZAVjMEFkHd9rLMUcsEoyXUy17YGo0zwV+XHn7phSZ8X2ybgH
+   DDWlVgYx9RXwy4uXGfZjAibves92yXk3J3M9U+QjJLgGEQOHrmEyJ9ifP
+   /ERqTQG6BnNmS4Gv5oZHHPnay2kVJ1ALbZo73/NRY6IW0qIVmJXJ5giU6
+   yoWvQrCXajq526kGZaOQ0NsRkbzeea1QFhNEMHvNMPfV4lplCpcXwaZSQ
+   XWFKB5qqOKIoR0uvXfXiQw/PxXyQsnr/DQTTX0Oi7G4qcIjpnh8yfjPpC
+   g==;
+IronPort-SDR: NgWhtLidm76GMnT8CO2dxmchBLuUoCXDo986olFWEmPI51KXNixlGxEh4w2Dzd2WBnojw/eZli
+ M5Oild3r+GKT+mT/E/oilOtnMUyiqJSeRocf9ctzdxocj05fSy93kVTHVBLJc1dPFmB12ys3cU
+ xkFyMRPvXffir2kCZ9hAhU5UCkhhgf40tArWrW+id6E+Q8r08gk7O9qeFTVu4aUHxhQVUoqZBV
+ G46nMajg0Xj+HV6yEP0e//FV51fY7pcTSiHe1Kk1ZkBDdz9NJoU+ADS7UWJ+Ubk1zgOMxlYlSO
+ eMQ=
+X-IronPort-AV: E=Sophos;i="5.76,429,1592841600"; 
+   d="scan'208";a="147405117"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Sep 2020 15:33:52 +0800
+IronPort-SDR: W6RvQwcbocZVw2Be8Qc9S5sHnxtTveFjoZmVcVMbMXBOb6nwDcnAvDYaGiSUG8/K5UneOhKPk5
+ d61G/X3jvcjg==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 00:21:02 -0700
+IronPort-SDR: YXjMHLq15wGZZgZURDn6+rP+8sqcxZSMvCzjsb1x46aHwffmodbopeWsgZaBXlaPREEKx4HKbv
+ Zrb8z90TCLCg==
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 15 Sep 2020 00:33:50 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Borislav Petkov <bp@suse.de>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v3 0/2] Fix handling of host-aware ZBC disks
+Date:   Tue, 15 Sep 2020 16:33:45 +0900
+Message-Id: <20200915073347.832424-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200915044519.GA38283@mit.edu>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Theodore,
+Martin,
 
-On Tue, Sep 15, 2020 at 12:45:19AM -0400, Theodore Y. Ts'o wrote:
-> On Thu, Sep 03, 2020 at 11:55:28PM -0400, Theodore Y. Ts'o wrote:
-> > Worse, right now, -rc1 and -rc2 is causing random crashes in my
-> > gce-xfstests framework.  Sometimes it happens before we've run even a
-> > single xfstests; sometimes it happens after we have successfully
-> > completed all of the tests, and we're doing a shutdown of the VM under
-> > test.  Other times it happens in the middle of a test run.  Given that
-> > I'm seeing this at -rc1, which is before my late ext4 pull request to
-> > Linus, it's probably not an ext4 related bug.  But it also means that
-> > I'm partially blind in terms of my kernel testing at the moment.  So I
-> > can't even tell Linus that I've run lots of tests and I'm 100%
-> > confident your one-line change is 100% safe.
-> 
-> I was finally able to bisect it down to the commit:
-> 
-> 37f4a24c2469: blk-mq: centralise related handling into blk_mq_get_driver_tag
+Two patches for this cycle (with a cc stable) to fix handling of
+host-aware ZBC disks that have partitions, that is, used as regular
+disks.
 
-37f4a24c2469 has been reverted in:
+The first patch fixes host-aware disk initialization and command
+completion processing. It also enables the use of host-aware disks as
+regular disks when CONFIG_BLK_DEV_ZONED is disabled.
 
-	4e2f62e566b5 Revert "blk-mq: put driver tag when this request is completed"
+The second patch fixes the CONFIG_BLK_DEV_ZONED enabled configuration
+so that zone append emulation is not initialized for host-aware disks
+with partitions/used as regular disks. While at it, this patch also
+removes a problem with sd_zbc_init_disk() error handling in
+sd_revalidate_disk() by moving this function execution inside
+sd_zbc_revalidate_zones().
 
-And later the patch is committed as the following after being fixed:
+Borislav tested the previous version of this series and confirmed that
+it solves his problem (thanks Borislav !)
 
-	568f27006577 blk-mq: centralise related handling into blk_mq_get_driver_tag
+Changes from v2:
+* Introduce blk_queue_set_zoned() helper function
 
-So can you reproduce the issue by running kernel of commit 568f27006577?
-If yes, can the issue be fixed by reverting 568f27006577?
+Changes from v1:
+* Rebased on rc5
+* Use "if (IS_DEFINED())" instead of #ifdef in patch 1
 
-> 
-> (See below for [1] Bisect log.)
-> 
-> The previous commit allows the tests to run to completion.  With
-> commit 37f4a24c2469 and later all 11 test scenarios (4k blocks, 1k
-> blocks, ext3 compat, ext4 w/ fscrypt, nojournal mode, data=journal,
-> bigalloc, etc.) the VM will get stuck.
+Damien Le Moal (2):
+  scsi: Fix handling of host-aware ZBC disks
+  scsi: Fix ZBC disk initialization
 
-Can you share the exact mount command line for setup the environment?
-and the exact xfstest item?
+ block/blk-settings.c   | 46 +++++++++++++++++++++++++++++
+ drivers/scsi/sd.c      | 34 ++++++++++++----------
+ drivers/scsi/sd.h      |  8 +----
+ drivers/scsi/sd_zbc.c  | 66 +++++++++++++++++++++++++-----------------
+ include/linux/blkdev.h |  2 ++
+ 5 files changed, 107 insertions(+), 49 deletions(-)
 
-
-
-Thanks,
-Ming
+-- 
+2.26.2
 
