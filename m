@@ -2,364 +2,192 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE107C43461
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B37F4C433E2
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:46:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 715FE20872
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:40:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AOe5obOu"
+	by mail.kernel.org (Postfix) with ESMTP id 6E79C20795
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727567AbgIOQAs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 12:00:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48068 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727501AbgIOP5x (ORCPT
+        id S1727629AbgIOWqR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 18:46:17 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:39918 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727582AbgIOWpz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 11:57:53 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8E1C061788;
-        Tue, 15 Sep 2020 08:47:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=u+PjVn2iYv8vGBp3/U/FpUBxU+1ybYDlmuDi1nd7xKA=; b=AOe5obOuKb42rxAHU0QIHLXO+M
-        B+yvvdR630CDcTRAMzyOtj5AZ4J4J76yA78HlqT0RfDxzHzkigIvUDigf4ZsHOHBfMsgSDtg+i1v1
-        RkcAFzt7V/6Ueh/4tkkNM7Rn3k4OnzDTTMLHR/yV1JDlpimjS68tMR02nXOQx6MaAtfm04Rve036y
-        3gpt8If62eCLEywi+5r9F3nypWqMGz93UFfiPGr+I9kW4QGbhG7QB14fHEH55wQrsYPwKIzWY2ajV
-        +Dw584z0qMAeGzAMDC+Z0RRNa7VuKR8ra3aHpb8PL09A4D0y/8tSXV4arzNlu4tmbgyD7GUjDtKPP
-        cIakDnYQ==;
-Received: from 089144214092.atnat0023.highway.a1.net ([89.144.214.92] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kIDAW-0002nn-JP; Tue, 15 Sep 2020 15:46:56 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 12/12] bdi: replace BDI_CAP_NO_{WRITEBACK,ACCT_DIRTY} with a single flag
-Date:   Tue, 15 Sep 2020 17:18:29 +0200
-Message-Id: <20200915151829.1767176-13-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200915151829.1767176-1-hch@lst.de>
-References: <20200915151829.1767176-1-hch@lst.de>
+        Tue, 15 Sep 2020 18:45:55 -0400
+Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 08FMjf7x012451
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Sep 2020 18:45:42 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id CE27C42004D; Tue, 15 Sep 2020 18:45:41 -0400 (EDT)
+Date:   Tue, 15 Sep 2020 18:45:41 -0400
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+Message-ID: <20200915224541.GB38283@mit.edu>
+References: <20c844c8-b649-3250-ff5b-b7420f72ff38@kernel.dk>
+ <20200822143326.GC199705@mit.edu>
+ <aff250ad-4c31-15c2-fa1d-3f3945cb7aa5@kernel.dk>
+ <7f0e2d99-5da2-237e-a894-0afddc0ace1e@kernel.dk>
+ <049a97db-c362-bcfb-59e5-4b1d2df59383@kernel.dk>
+ <5140ba6c-779c-2a71-b7f2-3c3220cdf19c@kernel.dk>
+ <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
+ <20200904035528.GE558530@mit.edu>
+ <20200915044519.GA38283@mit.edu>
+ <20200915073303.GA754106@T590>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200915073303.GA754106@T590>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace the two negative flags that are always used together with a
-single positive flag that indicates the writeback capability instead
-of two related non-capabilities.  Also remove the pointless wrappers
-to just check the flag.
+On Tue, Sep 15, 2020 at 03:33:03PM +0800, Ming Lei wrote:
+> Hi Theodore,
+> 
+> On Tue, Sep 15, 2020 at 12:45:19AM -0400, Theodore Y. Ts'o wrote:
+> > On Thu, Sep 03, 2020 at 11:55:28PM -0400, Theodore Y. Ts'o wrote:
+> > > Worse, right now, -rc1 and -rc2 is causing random crashes in my
+> > > gce-xfstests framework.  Sometimes it happens before we've run even a
+> > > single xfstests; sometimes it happens after we have successfully
+> > > completed all of the tests, and we're doing a shutdown of the VM under
+> > > test.  Other times it happens in the middle of a test run.  Given that
+> > > I'm seeing this at -rc1, which is before my late ext4 pull request to
+> > > Linus, it's probably not an ext4 related bug.  But it also means that
+> > > I'm partially blind in terms of my kernel testing at the moment.  So I
+> > > can't even tell Linus that I've run lots of tests and I'm 100%
+> > > confident your one-line change is 100% safe.
+> > 
+> > I was finally able to bisect it down to the commit:
+> > 
+> > 37f4a24c2469: blk-mq: centralise related handling into blk_mq_get_driver_tag
+> 
+> 37f4a24c2469 has been reverted in:
+> 
+> 	4e2f62e566b5 Revert "blk-mq: put driver tag when this request is completed"
+> 
+> And later the patch is committed as the following after being fixed:
+> 
+> 	568f27006577 blk-mq: centralise related handling into blk_mq_get_driver_tag
+> 
+> So can you reproduce the issue by running kernel of commit 568f27006577?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- fs/9p/vfs_file.c            |  2 +-
- fs/fs-writeback.c           |  7 +++---
- include/linux/backing-dev.h | 48 ++++++++-----------------------------
- mm/backing-dev.c            |  6 ++---
- mm/filemap.c                |  4 ++--
- mm/memcontrol.c             |  2 +-
- mm/memory-failure.c         |  2 +-
- mm/migrate.c                |  2 +-
- mm/mmap.c                   |  2 +-
- mm/page-writeback.c         | 12 +++++-----
- 10 files changed, 29 insertions(+), 58 deletions(-)
+Yes.  And things work fine if I try 4e2f62e566b5.
 
-diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
-index 3576123d82990e..6ecf863bfa2f4b 100644
---- a/fs/9p/vfs_file.c
-+++ b/fs/9p/vfs_file.c
-@@ -625,7 +625,7 @@ static void v9fs_mmap_vm_close(struct vm_area_struct *vma)
- 
- 	inode = file_inode(vma->vm_file);
- 
--	if (!mapping_cap_writeback_dirty(inode->i_mapping))
-+	if (!mapping_can_writeback(inode->i_mapping))
- 		wbc.nr_to_write = 0;
- 
- 	might_sleep();
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 149227160ff0b0..d4f84a2fe0878e 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -2321,7 +2321,7 @@ void __mark_inode_dirty(struct inode *inode, int flags)
- 
- 			wb = locked_inode_to_wb_and_lock_list(inode);
- 
--			WARN(bdi_cap_writeback_dirty(wb->bdi) &&
-+			WARN((wb->bdi->capabilities & BDI_CAP_WRITEBACK) &&
- 			     !test_bit(WB_registered, &wb->state),
- 			     "bdi-%s not registered\n", bdi_dev_name(wb->bdi));
- 
-@@ -2346,7 +2346,8 @@ void __mark_inode_dirty(struct inode *inode, int flags)
- 			 * to make sure background write-back happens
- 			 * later.
- 			 */
--			if (bdi_cap_writeback_dirty(wb->bdi) && wakeup_bdi)
-+			if (wakeup_bdi &&
-+			    (wb->bdi->capabilities & BDI_CAP_WRITEBACK))
- 				wb_wakeup_delayed(wb);
- 			return;
- 		}
-@@ -2581,7 +2582,7 @@ int write_inode_now(struct inode *inode, int sync)
- 		.range_end = LLONG_MAX,
- 	};
- 
--	if (!mapping_cap_writeback_dirty(inode->i_mapping))
-+	if (!mapping_can_writeback(inode->i_mapping))
- 		wbc.nr_to_write = 0;
- 
- 	might_sleep();
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index b217344a2c63be..44df4fcef65c1e 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -110,27 +110,14 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ratio);
- /*
-  * Flags in backing_dev_info::capability
-  *
-- * The first three flags control whether dirty pages will contribute to the
-- * VM's accounting and whether writepages() should be called for dirty pages
-- * (something that would not, for example, be appropriate for ramfs)
-- *
-- * WARNING: these flags are closely related and should not normally be
-- * used separately.  The BDI_CAP_NO_ACCT_AND_WRITEBACK combines these
-- * three flags into a single convenience macro.
-- *
-- * BDI_CAP_NO_ACCT_DIRTY:  Dirty pages shouldn't contribute to accounting
-- * BDI_CAP_NO_WRITEBACK:   Don't write pages back
-- * BDI_CAP_WRITEBACK_ACCT: Automatically account writeback pages
-- * BDI_CAP_STRICTLIMIT:    Keep number of dirty pages below bdi threshold.
-+ * BDI_CAP_WRITEBACK:		Supports dirty page writeback, and dirty pages
-+ *				should contribute to accounting
-+ * BDI_CAP_WRITEBACK_ACCT:	Automatically account writeback pages
-+ * BDI_CAP_STRICTLIMIT:		Keep number of dirty pages below bdi threshold
-  */
--#define BDI_CAP_NO_ACCT_DIRTY	0x00000001
--#define BDI_CAP_NO_WRITEBACK	0x00000002
--#define BDI_CAP_WRITEBACK_ACCT	0x00000004
--#define BDI_CAP_STRICTLIMIT	0x00000010
--#define BDI_CAP_CGROUP_WRITEBACK 0x00000020
--
--#define BDI_CAP_NO_ACCT_AND_WRITEBACK \
--	(BDI_CAP_NO_WRITEBACK | BDI_CAP_NO_ACCT_DIRTY)
-+#define BDI_CAP_WRITEBACK		(1 << 0)
-+#define BDI_CAP_WRITEBACK_ACCT		(1 << 1)
-+#define BDI_CAP_STRICTLIMIT		(1 << 2)
- 
- extern struct backing_dev_info noop_backing_dev_info;
- 
-@@ -169,24 +156,9 @@ static inline int wb_congested(struct bdi_writeback *wb, int cong_bits)
- long congestion_wait(int sync, long timeout);
- long wait_iff_congested(int sync, long timeout);
- 
--static inline bool bdi_cap_writeback_dirty(struct backing_dev_info *bdi)
--{
--	return !(bdi->capabilities & BDI_CAP_NO_WRITEBACK);
--}
--
--static inline bool bdi_cap_account_dirty(struct backing_dev_info *bdi)
--{
--	return !(bdi->capabilities & BDI_CAP_NO_ACCT_DIRTY);
--}
--
--static inline bool mapping_cap_writeback_dirty(struct address_space *mapping)
--{
--	return bdi_cap_writeback_dirty(inode_to_bdi(mapping->host));
--}
--
--static inline bool mapping_cap_account_dirty(struct address_space *mapping)
-+static inline bool mapping_can_writeback(struct address_space *mapping)
- {
--	return bdi_cap_account_dirty(inode_to_bdi(mapping->host));
-+	return inode_to_bdi(mapping->host)->capabilities & BDI_CAP_WRITEBACK;
- }
- 
- static inline int bdi_sched_wait(void *word)
-@@ -223,7 +195,7 @@ static inline bool inode_cgwb_enabled(struct inode *inode)
- 
- 	return cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
- 		cgroup_subsys_on_dfl(io_cgrp_subsys) &&
--		bdi_cap_account_dirty(bdi) &&
-+		(bdi->capabilities & BDI_CAP_WRITEBACK) &&
- 		(inode->i_sb->s_iflags & SB_I_CGROUPWB);
- }
- 
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index ab0415dde5c66c..5d0991e75ca337 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -14,9 +14,7 @@
- #include <linux/device.h>
- #include <trace/events/writeback.h>
- 
--struct backing_dev_info noop_backing_dev_info = {
--	.capabilities	= BDI_CAP_NO_ACCT_AND_WRITEBACK,
--};
-+struct backing_dev_info noop_backing_dev_info;
- EXPORT_SYMBOL_GPL(noop_backing_dev_info);
- 
- static struct class *bdi_class;
-@@ -744,7 +742,7 @@ struct backing_dev_info *bdi_alloc(int node_id)
- 		kfree(bdi);
- 		return NULL;
- 	}
--	bdi->capabilities = BDI_CAP_WRITEBACK_ACCT;
-+	bdi->capabilities = BDI_CAP_WRITEBACK | BDI_CAP_WRITEBACK_ACCT;
- 	bdi->ra_pages = VM_READAHEAD_PAGES;
- 	bdi->io_pages = VM_READAHEAD_PAGES;
- 	return bdi;
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 1aaea26556cc7e..6c2a0139e22fa3 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -414,7 +414,7 @@ int __filemap_fdatawrite_range(struct address_space *mapping, loff_t start,
- 		.range_end = end,
- 	};
- 
--	if (!mapping_cap_writeback_dirty(mapping) ||
-+	if (!mapping_can_writeback(mapping) ||
- 	    !mapping_tagged(mapping, PAGECACHE_TAG_DIRTY))
- 		return 0;
- 
-@@ -1702,7 +1702,7 @@ struct page *pagecache_get_page(struct address_space *mapping, pgoff_t index,
- no_page:
- 	if (!page && (fgp_flags & FGP_CREAT)) {
- 		int err;
--		if ((fgp_flags & FGP_WRITE) && mapping_cap_account_dirty(mapping))
-+		if ((fgp_flags & FGP_WRITE) && mapping_can_writeback(mapping))
- 			gfp_mask |= __GFP_WRITE;
- 		if (fgp_flags & FGP_NOFS)
- 			gfp_mask &= ~__GFP_FS;
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index b807952b4d431b..d2352f76d6519f 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -5643,7 +5643,7 @@ static int mem_cgroup_move_account(struct page *page,
- 		if (PageDirty(page)) {
- 			struct address_space *mapping = page_mapping(page);
- 
--			if (mapping_cap_account_dirty(mapping)) {
-+			if (mapping_can_writeback(mapping)) {
- 				__mod_lruvec_state(from_vec, NR_FILE_DIRTY,
- 						   -nr_pages);
- 				__mod_lruvec_state(to_vec, NR_FILE_DIRTY,
-diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-index f1aa6433f40416..a1e73943445e77 100644
---- a/mm/memory-failure.c
-+++ b/mm/memory-failure.c
-@@ -1006,7 +1006,7 @@ static bool hwpoison_user_mappings(struct page *p, unsigned long pfn,
- 	 */
- 	mapping = page_mapping(hpage);
- 	if (!(flags & MF_MUST_KILL) && !PageDirty(hpage) && mapping &&
--	    mapping_cap_writeback_dirty(mapping)) {
-+	    mapping_can_writeback(mapping)) {
- 		if (page_mkclean(hpage)) {
- 			SetPageDirty(hpage);
- 		} else {
-diff --git a/mm/migrate.c b/mm/migrate.c
-index 34a842a8eb6a7b..9d2f42a3a16294 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -503,7 +503,7 @@ int migrate_page_move_mapping(struct address_space *mapping,
- 			__dec_lruvec_state(old_lruvec, NR_SHMEM);
- 			__inc_lruvec_state(new_lruvec, NR_SHMEM);
- 		}
--		if (dirty && mapping_cap_account_dirty(mapping)) {
-+		if (dirty && mapping_can_writeback(mapping)) {
- 			__dec_node_state(oldzone->zone_pgdat, NR_FILE_DIRTY);
- 			__dec_zone_state(oldzone, NR_ZONE_WRITE_PENDING);
- 			__inc_node_state(newzone->zone_pgdat, NR_FILE_DIRTY);
-diff --git a/mm/mmap.c b/mm/mmap.c
-index 40248d84ad5fbd..1fc0e92be4ba9b 100644
---- a/mm/mmap.c
-+++ b/mm/mmap.c
-@@ -1666,7 +1666,7 @@ int vma_wants_writenotify(struct vm_area_struct *vma, pgprot_t vm_page_prot)
- 
- 	/* Can the mapping track the dirty pages? */
- 	return vma->vm_file && vma->vm_file->f_mapping &&
--		mapping_cap_account_dirty(vma->vm_file->f_mapping);
-+		mapping_can_writeback(vma->vm_file->f_mapping);
- }
- 
- /*
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 0139f9622a92da..358d6f28c627b7 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -1882,7 +1882,7 @@ void balance_dirty_pages_ratelimited(struct address_space *mapping)
- 	int ratelimit;
- 	int *p;
- 
--	if (!bdi_cap_account_dirty(bdi))
-+	if (!(bdi->capabilities & BDI_CAP_WRITEBACK))
- 		return;
- 
- 	if (inode_cgwb_enabled(inode))
-@@ -2423,7 +2423,7 @@ void account_page_dirtied(struct page *page, struct address_space *mapping)
- 
- 	trace_writeback_dirty_page(page, mapping);
- 
--	if (mapping_cap_account_dirty(mapping)) {
-+	if (mapping_can_writeback(mapping)) {
- 		struct bdi_writeback *wb;
- 
- 		inode_attach_wb(inode, page);
-@@ -2450,7 +2450,7 @@ void account_page_dirtied(struct page *page, struct address_space *mapping)
- void account_page_cleaned(struct page *page, struct address_space *mapping,
- 			  struct bdi_writeback *wb)
- {
--	if (mapping_cap_account_dirty(mapping)) {
-+	if (mapping_can_writeback(mapping)) {
- 		dec_lruvec_page_state(page, NR_FILE_DIRTY);
- 		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
- 		dec_wb_stat(wb, WB_RECLAIMABLE);
-@@ -2513,7 +2513,7 @@ void account_page_redirty(struct page *page)
- {
- 	struct address_space *mapping = page->mapping;
- 
--	if (mapping && mapping_cap_account_dirty(mapping)) {
-+	if (mapping && mapping_can_writeback(mapping)) {
- 		struct inode *inode = mapping->host;
- 		struct bdi_writeback *wb;
- 		struct wb_lock_cookie cookie = {};
-@@ -2625,7 +2625,7 @@ void __cancel_dirty_page(struct page *page)
- {
- 	struct address_space *mapping = page_mapping(page);
- 
--	if (mapping_cap_account_dirty(mapping)) {
-+	if (mapping_can_writeback(mapping)) {
- 		struct inode *inode = mapping->host;
- 		struct bdi_writeback *wb;
- 		struct wb_lock_cookie cookie = {};
-@@ -2665,7 +2665,7 @@ int clear_page_dirty_for_io(struct page *page)
- 
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
- 
--	if (mapping && mapping_cap_account_dirty(mapping)) {
-+	if (mapping && mapping_can_writeback(mapping)) {
- 		struct inode *inode = mapping->host;
- 		struct bdi_writeback *wb;
- 		struct wb_lock_cookie cookie = {};
--- 
-2.28.0
+> If yes, can the issue be fixed by reverting 568f27006577?
 
+The problem is it's a bit tricky to revert 568f27006577, since there
+is a merge conflict in blk_kick_flush().  I attempted to do the bisect
+manually here, but it's clearly not right since the kernel is not
+booting after the revert:
+
+https://github.com/tytso/ext4/commit/1e67516382a33da2c9d483b860ac4ec2ad390870
+
+branch:
+
+https://github.com/tytso/ext4/tree/manual-revert-of-568f27006577
+
+Can you send me a patch which correctly reverts 568f27006577?  I can
+try it against -rc1 .. -rc4, whichever is most convenient.
+
+> Can you share the exact mount command line for setup the environment?
+> and the exact xfstest item?
+
+It's a variety of mount command lines, since I'm using gce-xfstests[1][2]
+using a variety of file system scenarios --- but the basic one, which
+is ext4 using the default 4k block size is failing (they all are failing).
+
+[1] https://thunk.org/gce-xfstests
+[2] https://github.com/tytso/xfstests-bld/blob/master/Documentation/gce-xfstests.md
+
+It's also not one consistent xfstests which is failing, but it does
+tend to be tests which are loading up the storage stack with a lot of
+small random read/writes, especially involving metadata blocks/writes.
+(For example, tests which run fsstress.)
+
+Since this reliably triggers for me, and other people running
+kvm-xfstests or are running xfstests on their own test environments
+aren't seeing it, I'm assuming it must be some kind of interesting
+interaction between virtio-scsi, perhaps with how Google Persistent
+Disk is behaving (maybe timing related?  who knows?).  Darrick Wong
+did say he saw something like it once using Oracle's Cloud
+infrastructure, but as far as I know it hasn't reproduced since.  On
+Google Compute Engine VM's, it reproduces *extremely* reliably.
+
+I expect that if you were to set up gce-xfstests, get a free GCE
+account with the initial $300 free credits, you could run
+"gce-xfstests -c ext4/4k -g auto" and it would reproduce within an
+hour or so.  (So under a dollar's worth of VM credits, so long as you
+notice that it's hung and shut down the VM after gathering debugging
+data.)
+
+The instructions are at [2], and the image xfstests-202008311554 in
+the xfstests-cloud project is a public copy of the VM test appliance I
+was using.
+
+% gcloud compute images describe --project xfstests-cloud xfstests-202008311554
+archiveSizeBytes: '1720022528'
+creationTimestamp: '2020-09-15T15:09:30.544-07:00'
+description: Linux Kernel File System Test Appliance
+diskSizeGb: '10'
+family: xfstests
+guestOsFeatures:
+- type: VIRTIO_SCSI_MULTIQUEUE
+- type: UEFI_COMPATIBLE
+id: '1558420969906537845'
+kind: compute#image
+labelFingerprint: V-2Qgcxt2uw=
+labels:
+  blktests: g8a75bed
+  e2fsprogs: v1_45_6
+  fio: fio-3_22
+  fsverity: v1_2
+  ima-evm-utils: v1_3_1
+  nvme-cli: v1_12
+  quota: g13bb8c2
+  util-linux: v2_36
+  xfsprogs: v5_8_0-rc1
+  xfstests: linux-v3_8-2838-geb439bf2
+  xfstests-bld: gb5085ab
+licenseCodes:
+- '5543610867827062957'
+licenses:
+- https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-10-buster
+name: xfstests-202008311554
+selfLink: https://www.googleapis.com/compute/v1/projects/xfstests-cloud/global/images/xfstests-202008311554
+sourceDisk: https://www.googleapis.com/compute/v1/projects/xfstests-cloud/zones/us-east1-d/disks/temp-xfstests-202008311554
+sourceDiskId: '5824762850044577124'
+sourceType: RAW
+status: READY
+storageLocations:
+- us
+
+Cheers,
+
+					- Ted
+
+P.S.  As you can see, I can also easily run blktests using this VM
+Test Appliance.  If you think it would be helpful for me to try
+running one or more of the blktests test groups, I can do that.
+
+I've been focusing on using xfstests mainly because this is my primary
+way of running regression tests, and I'm blocked on ext4 testing until
+I can figure out this particular problem.  Which is why a proper
+revert of 568f27006577 would be extremely helpful, if only so I can
+apply that on top of the ext4 git tree temporarily so I can run my
+file system regression tests.
