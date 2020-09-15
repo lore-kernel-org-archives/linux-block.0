@@ -2,174 +2,112 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0143FC43461
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 01:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F0EC43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 01:34:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEB6920829
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 01:33:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB3BD212CC
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 01:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VDHZLi6P"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="j8RWSxHV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726069AbgIOBdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Sep 2020 21:33:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38052 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726024AbgIOBdV (ORCPT
+        id S1726024AbgIOBe1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Sep 2020 21:34:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56034 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726123AbgIOBeT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Sep 2020 21:33:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600133599;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=05KugUf1ZLMiv3KVgeD3PrmciWvgAl/Dm1NjOmE5L64=;
-        b=VDHZLi6PhNcJ9b96KnN1dERlgJVGzVicKLL3Z599yXiYafc8L578Yyk26DNgCDSIX5zF/G
-        Ud2n+GdXDQZtECjB5UCb9n5+V6EsjQjl54yqtnnrQQYRvdvIKepNnv1EuDHjErdGPD0rjM
-        uMq20VYUKxY8G3jF9cj3kApFxRAnsDo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-P19Sq5k6PgaSlBLuUc298Q-1; Mon, 14 Sep 2020 21:33:17 -0400
-X-MC-Unique: P19Sq5k6PgaSlBLuUc298Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A3638018A7;
-        Tue, 15 Sep 2020 01:33:12 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 59CD278482;
-        Tue, 15 Sep 2020 01:33:09 +0000 (UTC)
-Date:   Mon, 14 Sep 2020 21:33:08 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Vijayendra Suman <vijayendra.suman@oracle.com>
-Cc:     linux-block@vger.kernel.org,
-        Somu Krishnasamy <somasundaram.krishnasamy@oracle.com>,
-        dm-devel@redhat.com,
-        RAMANAN_GOVINDARAJAN <ramanan.govindarajan@oracle.com>
-Subject: Re: Revert "dm: always call blk_queue_split() in dm_process_bio()"
-Message-ID: <20200915013308.GA14877@redhat.com>
-References: <529c2394-1b58-b9d8-d462-1f3de1b78ac8@oracle.com>
- <20200910142438.GA21919@redhat.com>
- <5261af10-bf5c-f768-dbeb-2e784a5823f9@oracle.com>
+        Mon, 14 Sep 2020 21:34:19 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44481C061788
+        for <linux-block@vger.kernel.org>; Mon, 14 Sep 2020 18:34:18 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id z19so978251pfn.8
+        for <linux-block@vger.kernel.org>; Mon, 14 Sep 2020 18:34:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5cRkQqsd5/nMJvkAtEIwXedLifA/J5I9RA/QsRwT0Po=;
+        b=j8RWSxHVCSsQ5pqbMPqEVtC7X7eF2Q1w5+mbUuzLiRgEr75GCf+uQsRl5dI7Xhxci3
+         vxyXnRMyp36UXCTA2xl5nvwyJDrXlJCd1q1bK+YOSP1RfWbqkJg45GtJMT0NIcUcji0m
+         9lPsXoOMx1r3PXCVwproLMabG54qKCpAxSxOD+R86DXRAnPWKOqNYIxDzpzcRszdCIti
+         1dQa3CKIi8yCk+2sqNBHIcU2Tk41FgkYTWSP1wX7q5eHJfzmswHjMFABq0cCGCEK6Kbb
+         j+2uwygE9QXefQ32j9VvU1X3TouI1yxkwcA43/mqJsFb/A8Vc3Cy5HEbmJPriiihM1ZA
+         ZB/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5cRkQqsd5/nMJvkAtEIwXedLifA/J5I9RA/QsRwT0Po=;
+        b=dAPD3j0bZFy9dDJLcG+t1vxd71gKXZS3aMnjoH1m4oBARzxtoz++tvEp3L9OVq9fsP
+         RifdA1OuMCqHt2SIDvME3qBHUexrCStVSTEO1JJc86Jg1wAXOS2S7SqAcrMSroGMZkjX
+         YJDPOHi0ZmBG7/dovEzazrtaWf+RpEWkvpvrpsSRFfrXg+zwh1Nw5J7wvmGKfHgq/5EX
+         ecXvL9AoV7mbki5n6XbNO2XJHLk0+9UfbjvYl2MECir2sQGMj1m/RW11MdfseziSBi9X
+         Aj6ika+GTEf6YbTNoJ3Qn4xCh9kfTrfNPzawnziPWr5aBPZlqJfmkVwP7R3OtbhEz/bY
+         7MqQ==
+X-Gm-Message-State: AOAM532DWEF+sOpY+PqqQYq+62KZHTCaD/iWYh7lAlWxrsnvVqxErL0n
+        YPKzjKTgKAEj+7QqjXjwKAF6sM73OnXb+OmT
+X-Google-Smtp-Source: ABdhPJxe6as0KiEIkzbsDttTiaOolP7z3p4kBXo77bQNMz5IrueN1c0m2cjTLDv1Oas4El51uieGgA==
+X-Received: by 2002:aa7:8051:0:b029:13e:d13d:a0f7 with SMTP id y17-20020aa780510000b029013ed13da0f7mr14960610pfm.19.1600133657429;
+        Mon, 14 Sep 2020 18:34:17 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id w195sm11500229pff.74.2020.09.14.18.34.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Sep 2020 18:34:16 -0700 (PDT)
+Subject: Re: [PATCH] tools/io_uring: fix compile breakage
+To:     Douglas Gilbert <dgilbert@interlog.com>,
+        linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20200914213609.141577-1-dgilbert@interlog.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <fa89c176-df34-8e96-f273-4dd52882a070@kernel.dk>
+Date:   Mon, 14 Sep 2020 19:34:15 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5261af10-bf5c-f768-dbeb-2e784a5823f9@oracle.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200914213609.141577-1-dgilbert@interlog.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 10 2020 at  3:29pm -0400,
-Vijayendra Suman <vijayendra.suman@oracle.com> wrote:
-
-> Hello Mike,
+On 9/14/20 3:36 PM, Douglas Gilbert wrote:
+> It would seem none of the kernel continuous integration does this:
+>     $ cd tools/io_uring
+>     $ make
 > 
-> I checked with upstream, performance measurement is similar and
-> shows performance improvement when
-> 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 is reverted.
+> Otherwise it may have noticed:
+>    cc -Wall -Wextra -g -D_GNU_SOURCE   -c -o io_uring-bench.o
+> 	 io_uring-bench.c
+> io_uring-bench.c:133:12: error: static declaration of ‘gettid’
+> 	 follows non-static declaration
+>   133 | static int gettid(void)
+>       |            ^~~~~~
+> In file included from /usr/include/unistd.h:1170,
+>                  from io_uring-bench.c:27:
+> /usr/include/x86_64-linux-gnu/bits/unistd_ext.h:34:16: note:
+> 	 previous declaration of ‘gettid’ was here
+>    34 | extern __pid_t gettid (void) __THROW;
+>       |                ^~~~~~
+> make: *** [<builtin>: io_uring-bench.o] Error 1
 > 
-> On 9/10/2020 7:54 PM, Mike Snitzer wrote:
-> >[cc'ing dm-devel and linux-block because this is upstream concern too]
-> >
-> >On Wed, Sep 09 2020 at  1:00pm -0400,
-> >Vijayendra Suman <vijayendra.suman@oracle.com> wrote:
-> >
-> >>    Hello Mike,
-> >>
-> >>    While Running pgbench tool with  5.4.17 kernel build
-> >>
-> >>    Following performance degrade is found out
-> >>
-> >>    buffer read/write metric : -17.2%
-> >>    cache read/write metric : -18.7%
-> >>    disk read/write metric : -19%
-> >>
-> >>    buffer
-> >>    number of transactions actually processed: 840972
-> >>    latency average = 24.013 ms
-> >>    tps = 4664.153934 (including connections establishing)
-> >>    tps = 4664.421492 (excluding connections establishing)
-> >>
-> >>    cache
-> >>    number of transactions actually processed: 551345
-> >>    latency average = 36.949 ms
-> >>    tps = 3031.223905 (including connections establishing)
-> >>    tps = 3031.402581 (excluding connections establishing)
-> >>
-> >>    After revert of Commit
-> >>    2892100bc85ae446088cebe0c00ba9b194c0ac9d ( Revert "dm: always call
-> >>    blk_queue_split() in dm_process_bio()")
-> >
-> >I assume 2892100bc85ae446088cebe0c00ba9b194c0ac9d is 5.4-stable's
-> >backport of upstream commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 ?
->
-> Yes
->
-> >>    Performance is Counter measurement
-> >>
-> >>    buffer ->
-> >>    number of transactions actually processed: 1135735
-> >>    latency average = 17.799 ms
-> >>    tps = 6292.586749 (including connections establishing)
-> >>    tps = 6292.875089 (excluding connections establishing)
-> >>
-> >>    cache ->
-> >>    number of transactions actually processed: 648177
-> >>    latency average = 31.217 ms
-> >>    tps = 3587.755975 (including connections establishing)
-> >>    tps = 3587.966359 (excluding connections establishing)
-> >>
-> >>    Following is your commit
-> >>
-> >>    diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> >>    index cf71a2277d60..1e6e0c970e19 100644
-> >>    --- a/drivers/md/dm.c
-> >>    +++ b/drivers/md/dm.c
-> >>    @@ -1760,8 +1760,9 @@ static blk_qc_t dm_process_bio(struct mapped_device
-> >>    *md,
-> >>             * won't be imposed.
-> >>             */
-> >>            if (current->bio_list) {
-> >>    -               blk_queue_split(md->queue, &bio);
-> >>    -               if (!is_abnormal_io(bio))
-> >>    +               if (is_abnormal_io(bio))
-> >>    +                       blk_queue_split(md->queue, &bio);
-> >>    +               else
-> >>                            dm_queue_split(md, ti, &bio);
-> >>            }
-> >>
-> >>    Could you have a look if it is safe to revert this commit.
-> >No, it really isn't a good idea given what was documented in the commit
-> >header for commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74 -- the
-> >excessive splitting is not conducive to performance either.
-> >
-> >So I think we need to identify _why_ reverting this commit is causing
-> >such a performance improvement.  Why is calling blk_queue_split() before
-> >dm_queue_split() benefiting your pgbench workload?
->
-> Let me know if you want to check some patch.
+> The problem on Ubuntu 20.04 (with lk 5.9.0-rc5) is that unistd.h
+> already defines gettid(). So prefix the local definition with
+> "lk_".
 
-Hi,
+Thanks Doug - I haven't really been maintaining the examples in
+the kernel, only in liburing. I'll apply this one, and hopefully
+sync them up for 5.10 in general.
 
-Could you please test this branch?:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.10
-(or apply at least the first 4 patches, commit 63f85d97be69^..b6a80963621fa)
 
-So far I've done various DM regression testing.  But I haven't tested
-with pgbench or with the misaaligned IO scenario documented in the
-header for commit 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74.  But I'll
-test that scenario tomorrow.
-
-Any chance you could provide some hints on how you're running pgbench
-just so I can try to test/reproduce/verify locally?
-
-Thanks,
-Mike
+-- 
+Jens Axboe
 
