@@ -2,72 +2,120 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2502AC433E2
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 07:07:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C61DAC433E2
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 07:33:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E412621D1B
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 07:07:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76B7920897
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 07:33:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4ShjBX4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726200AbgIOHHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 03:07:03 -0400
-Received: from verein.lst.de ([213.95.11.211]:46699 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726073AbgIOHGO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 03:06:14 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9B14E68AFE; Tue, 15 Sep 2020 09:05:22 +0200 (CEST)
-Date:   Tue, 15 Sep 2020 09:05:22 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, martin.petersen@oracle.com,
-        Hans de Goede <hdegoede@redhat.com>,
-        Song Liu <song@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org, Minchan Kim <minchan@kernel.org>,
-        dm-devel@redhat.com, linux-mtd@lists.infradead.org,
-        linux-mm@kvack.org, drbd-dev@tron.linbit.com,
-        cgroups@vger.kernel.org
-Subject: Re: [PATCH 06/14] block: lift setting the readahead size into the
- block layer
-Message-ID: <20200915070522.GA19974@lst.de>
-References: <20200726150333.305527-1-hch@lst.de> <20200726150333.305527-7-hch@lst.de> <20200826220737.GA25613@redhat.com> <20200902151144.GA1738@lst.de> <20200902162007.GB5513@redhat.com> <20200910092813.GA27229@lst.de> <20200910171541.GB21919@redhat.com>
+        id S1726134AbgIOHdV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 03:33:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59760 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726095AbgIOHdU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Sep 2020 03:33:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600155199;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NuL3Yd8/YXcGgFrD3H7Mh6oQlLO0y8IzzOlQqEaeDeQ=;
+        b=C4ShjBX400DPbZKxq0py5yRgJQGzJBuMxiY4XmJE9OV/2U+1DAIseprCtemna6tUhC7eK1
+        3ilO1pF6QhdjDmbBKCz4zxpr+yWxkvmCaH7S7tslVZfbFcaMSVp7GgtuDGRxQ2lH+Ug8SC
+        IFj+hun0caYkBqkVUYPlG0TtZJ43R2A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-9MikSqX5MaGF-B7lPqIxig-1; Tue, 15 Sep 2020 03:33:17 -0400
+X-MC-Unique: 9MikSqX5MaGF-B7lPqIxig-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C4CB10199AA;
+        Tue, 15 Sep 2020 07:33:15 +0000 (UTC)
+Received: from T590 (ovpn-12-38.pek2.redhat.com [10.72.12.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9675060E1C;
+        Tue, 15 Sep 2020 07:33:08 +0000 (UTC)
+Date:   Tue, 15 Sep 2020 15:33:03 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+Message-ID: <20200915073303.GA754106@T590>
+References: <990cc101-d4a1-f346-fe78-0fb5b963b406@kernel.dk>
+ <20c844c8-b649-3250-ff5b-b7420f72ff38@kernel.dk>
+ <20200822143326.GC199705@mit.edu>
+ <aff250ad-4c31-15c2-fa1d-3f3945cb7aa5@kernel.dk>
+ <7f0e2d99-5da2-237e-a894-0afddc0ace1e@kernel.dk>
+ <049a97db-c362-bcfb-59e5-4b1d2df59383@kernel.dk>
+ <5140ba6c-779c-2a71-b7f2-3c3220cdf19c@kernel.dk>
+ <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
+ <20200904035528.GE558530@mit.edu>
+ <20200915044519.GA38283@mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200910171541.GB21919@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200915044519.GA38283@mit.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 01:15:41PM -0400, Mike Snitzer wrote:
-> > I'll move it to blk_register_queue, which should work just fine.
-> 
-> That'll work for initial DM table load as part of DM device creation
-> (dm_setup_md_queue).  But it won't account for DM table reloads that
-> might change underlying devices on a live DM device (done using
-> __bind).
-> 
-> Both dm_setup_md_queue() and __bind() call dm_table_set_restrictions()
-> to set/update queue_limits.  It feels like __bind() will need to call a
-> new block helper to set/update parts of queue_limits (e.g. ra_pages and
-> io_pages).
-> 
-> Any chance you're open to factoring out that block function as an
-> exported symbol for use by blk_register_queue() and code like DM's
-> __bind()?
+Hi Theodore,
 
-I agree with the problem statement.  OTOH adding an exported helper
-for two trivial assignments seems a little silly..
+On Tue, Sep 15, 2020 at 12:45:19AM -0400, Theodore Y. Ts'o wrote:
+> On Thu, Sep 03, 2020 at 11:55:28PM -0400, Theodore Y. Ts'o wrote:
+> > Worse, right now, -rc1 and -rc2 is causing random crashes in my
+> > gce-xfstests framework.  Sometimes it happens before we've run even a
+> > single xfstests; sometimes it happens after we have successfully
+> > completed all of the tests, and we're doing a shutdown of the VM under
+> > test.  Other times it happens in the middle of a test run.  Given that
+> > I'm seeing this at -rc1, which is before my late ext4 pull request to
+> > Linus, it's probably not an ext4 related bug.  But it also means that
+> > I'm partially blind in terms of my kernel testing at the moment.  So I
+> > can't even tell Linus that I've run lots of tests and I'm 100%
+> > confident your one-line change is 100% safe.
+> 
+> I was finally able to bisect it down to the commit:
+> 
+> 37f4a24c2469: blk-mq: centralise related handling into blk_mq_get_driver_tag
 
-For now I'll just keep the open coded ->io_pages assignment in
-dm.  Note that dm doesn't currently update the ->ra_pages value
-based on the underlying devices, so an incremental patch to do that
-might be useful as well.
+37f4a24c2469 has been reverted in:
+
+	4e2f62e566b5 Revert "blk-mq: put driver tag when this request is completed"
+
+And later the patch is committed as the following after being fixed:
+
+	568f27006577 blk-mq: centralise related handling into blk_mq_get_driver_tag
+
+So can you reproduce the issue by running kernel of commit 568f27006577?
+If yes, can the issue be fixed by reverting 568f27006577?
+
+> 
+> (See below for [1] Bisect log.)
+> 
+> The previous commit allows the tests to run to completion.  With
+> commit 37f4a24c2469 and later all 11 test scenarios (4k blocks, 1k
+> blocks, ext3 compat, ext4 w/ fscrypt, nojournal mode, data=journal,
+> bigalloc, etc.) the VM will get stuck.
+
+Can you share the exact mount command line for setup the environment?
+and the exact xfstest item?
+
+
+
+Thanks,
+Ming
+
