@@ -2,122 +2,96 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 750ADC43461
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 18:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6046EC43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 18:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32BBB2145D
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 18:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15F78206E6
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 18:51:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oMdFH0qe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SK7DSLbW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727861AbgIOSaG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 14:30:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41766 "EHLO
+        id S1727864AbgIOSts (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 14:49:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727685AbgIOSSd (ORCPT
+        with ESMTP id S1727833AbgIORZO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 14:18:33 -0400
-Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0451BC061788
-        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 11:17:59 -0700 (PDT)
-Received: by mail-oo1-xc44.google.com with SMTP id o20so1007341ook.1
-        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 11:17:59 -0700 (PDT)
+        Tue, 15 Sep 2020 13:25:14 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DD2C06174A
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 10:23:59 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id z2so3745325qtv.12
+        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 10:23:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=bTTRD0/irNQCd03woygzg2YIc3JV44oMGNS2xdYHnuY=;
-        b=oMdFH0qeR7ktNNSHnOFu0cnxSyqibVe5Xfhe2tBaiWKuUcg1GDfeVU/qMzK149v5K+
-         iK0oQoF39aDYeONrDyDjZS59ruDFyIryDGNrD04kboLa7s9/T2DfrPvNZ5mWtnsUkKVL
-         wGRPpofseOHZAXio+PZGs0lAxHmN2RrQUMM55FmC4GuBfqFk6vs/rdl67En8WyxSWjxW
-         3H3o+eCZ/0wMTcov8J54w+bE6IFxngx5LeFTF0V4ivTjpkp8ZfjwQtktOH8V2XBotEpH
-         qQPHM+S0mkUvPlV3hkhPxbpIp5SEt/s2xbVoAaBbZYT9AHlf2HEqGHcTeYP3nfBbEY13
-         w2SQ==
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=2hqoRFYX4/RLa6tKmbcUnG/L6B7zQSKyUsPW11aTc3A=;
+        b=SK7DSLbWANHGcpF7n6P7domaDQaWsd2y/XihDFOlfxaJnz6x3JmAqQivxK+d17hzY/
+         1p5nQ6WZY/cVRvN1CIh4DlmzobA/xwK8eylVTk4my39zSTH3wQwMPTsCd+Hwnx2BEi9u
+         glYqbhEsDLARAkmy1BkT9TMqOkb0bFOW+KCGwrn1OgRwp4sn0v7FsGTbm0KWYGgn+8ri
+         6oT5nPvgyJot3zYUgQy64YlLLHA0RTQ8DhGxa+9c9Qc+S7DkG3c2CpR/l6aizUpEwD+h
+         5O+mUEO5LmY3vOvNbvkHKsjIa3UMTikODX95eIsB7Wza1mSOYGDXkeKWvNpLRo7hcS1v
+         3rMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bTTRD0/irNQCd03woygzg2YIc3JV44oMGNS2xdYHnuY=;
-        b=JUfZhzTam5/IkE2hDOv5RbHBKhlmwbKLNHX5oWJOj9xP/+PePoZ5o4rFrxVqCI3O1p
-         cJUVcZrDqQeQbHYOp8Ijt5HNjcqEbXMJe1IFAiP6lbEbRC5zjw6/IBXe/u+8VEBmcIA2
-         N0aceYbifNVYVe1IioS4oUkzRyS2uHhecOjk5KlFPtzVaWU1+yYS/ZgOHqBC0qcrQwOv
-         y4lYJ4KL0QVxpbEAp92s5ThQg0FovJiYt+epVLSc/xFeFDLRZVwQdxoZdFlV2vOPdYO5
-         WW8EjPbViw9uLWaC6/jiQVw/2HUuVXLrmFZopeTnmzXFnP32IyTVI821vP8bmSKpDhvU
-         v+kg==
-X-Gm-Message-State: AOAM533VBBDUNL49UK++6YZusgmbADHdnAAFGNs8uuKqg1IGVXBAaGRF
-        l+ZADM+RorBsly6u70j308LU1A==
-X-Google-Smtp-Source: ABdhPJyQ+e6vnFc7oLm3XND80yl17hzMcTnTiY2uZpb1xItEL9ivt+KBWm5ZF0JxQskTaOcMWGW7nA==
-X-Received: by 2002:a4a:5896:: with SMTP id f144mr665883oob.49.1600193878720;
-        Tue, 15 Sep 2020 11:17:58 -0700 (PDT)
-Received: from [192.168.1.10] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 9sm6876327ois.10.2020.09.15.11.17.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Sep 2020 11:17:58 -0700 (PDT)
-Subject: Re: [PATCH 0/5] Some improvements for blk-throttle
-To:     Baolin Wang <baolin.wang@linux.alibaba.com>
-Cc:     tj@kernel.org, baolin.wang7@gmail.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1599458244.git.baolin.wang@linux.alibaba.com>
- <822998a7-4cc7-88ee-8b3f-e8e7660a5b0a@kernel.dk>
- <20200915085926.GA122937@VM20190228-100.tbsite.net>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c36a1c1b-ca46-13c8-42eb-94e63ff845d1@kernel.dk>
-Date:   Tue, 15 Sep 2020 12:17:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200915085926.GA122937@VM20190228-100.tbsite.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=2hqoRFYX4/RLa6tKmbcUnG/L6B7zQSKyUsPW11aTc3A=;
+        b=RLQUThUO+EmxPs/1FMvGgCw1PgZqg+ZwVmCYXzAS/9/DUDQE7mvbE+NyCdVbRxudme
+         Caz0BqpP33y0NPi5e331j0S4UXeDEAoa1HIjg4h61uugJU9v+BdTWQcePdSgyiraiUKg
+         m5xkTSqVDTAroY3u8y/6G+t1FaJLPXTqqq1IivqEZnH0jpdjmZAhoGdIG3CWuS8y55V1
+         1eoCljAWTRD7S2Xhbf/ZuZr/axo3gHDEJXH3vp0r98m58DiaSQvPhCfkn0CRfc3hFF9I
+         iKzGzYwggyuonoVVBq6WaHwGr31/NP11w02DA1WgcPCuHv+mRtt0F4VxU5wqCVdcPkr0
+         z+kw==
+X-Gm-Message-State: AOAM532ZOd1OdVEJjljQqkivumsd9vxJQr2iIe7TNnDMjKI+NCkR0Wbn
+        c1he4gKzrbAfK/JM1Es5F0o=
+X-Google-Smtp-Source: ABdhPJzZDP79Xa1eA9O3rLpFxo16n8Rt8qBfBiXWHYs06WJdGl0dSfSX70HgwPO0HKeXuPrEQLG+4A==
+X-Received: by 2002:ac8:424a:: with SMTP id r10mr18525300qtm.211.1600190638803;
+        Tue, 15 Sep 2020 10:23:58 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id n11sm17088902qkk.105.2020.09.15.10.23.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2020 10:23:57 -0700 (PDT)
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Vijayendra Suman <vijayendra.suman@oracle.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH v2 0/4] block: a couple chunk_sectors fixes/improvements
+Date:   Tue, 15 Sep 2020 13:23:53 -0400
+Message-Id: <20200915172357.83215-1-snitzer@redhat.com>
+X-Mailer: git-send-email 2.15.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/15/20 2:59 AM, Baolin Wang wrote:
-> Hi Jens,
-> 
-> On Mon, Sep 14, 2020 at 07:37:53PM -0600, Jens Axboe wrote:
->> On 9/7/20 2:10 AM, Baolin Wang wrote:
->>> Hi All,
->>>
->>> This patch set did some clean-ups, as well as removing some unnecessary
->>> bps/iops limitation calculation when checking if can dispatch a bio or
->>> not for a tg. Please help to review. Thanks.
->>>
->>> Baolin Wang (5):
->>>   blk-throttle: Fix some comments' typos
->>>   blk-throttle: Use readable READ/WRITE macros
->>>   blk-throttle: Define readable macros instead of static variables
->>>   blk-throttle: Avoid calculating bps/iops limitation repeatedly
->>>   blk-throttle: Avoid checking bps/iops limitation if bps or iops is    
->>>     unlimited
->>>
->>>  block/blk-throttle.c | 59 ++++++++++++++++++++++++++++++++--------------------
->>>  1 file changed, 36 insertions(+), 23 deletions(-)
->>
->> Looks reasonable to me, I've applied it.
-> 
-> Thanks.
-> 
->>
->> Out of curiosity, are you using blk-throttle in production, or are these
->> just fixes/cleanups that you came across?
-> 
-> Yes, we're using it in some old products, and I am trying to do some
-> cleanups and optimizaiton when testing it.
+Hi,
 
-Gotcha. Reason I ask is I've been considering deprecating it, but when
-fixes come in for something, that always makes me think that some folks
-are actually using it.
+This v2 drops a patch from v1 and fixes the chunk_sectprs check added to
+blk_stack_limits to convert chubk_sectors to bytes before comparing with
+physical_block_size.
+
+Jens, please feel free to pick up patches 1 and 2.
+
+DM patches 3 and 4 are provided just to give context for how DM will be
+updated to use chunk_sectors.
+
+Mike Snitzer (4):
+  block: use lcm_not_zero() when stacking chunk_sectors
+  block: allow 'chunk_sectors' to be non-power-of-2
+  dm table: stack 'chunk_sectors' limit to account for target-specific splitting
+  dm: unconditionally call blk_queue_split() in dm_process_bio()
+
+ block/blk-settings.c   | 22 ++++++++++++----------
+ drivers/md/dm-table.c  |  5 +++++
+ drivers/md/dm.c        | 45 +--------------------------------------------
+ include/linux/blkdev.h | 12 +++++++++---
+ 4 files changed, 27 insertions(+), 57 deletions(-)
 
 -- 
-Jens Axboe
+2.15.0
 
