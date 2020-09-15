@@ -2,124 +2,294 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE945C43461
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE258C43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 23:10:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEA1320770
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:58:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85F1B212CC
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 23:10:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eFCUS2ss";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="KI3pVV+f"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EnnYxoOt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727104AbgIOW5g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 18:57:36 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:6029 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727306AbgIOPUk (ORCPT
+        id S1727414AbgIOXK0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 19:10:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26404 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727301AbgIOXKU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 11:20:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1600183239; x=1631719239;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=MJGwv+fCDObMkEUlfKjrxxaUaD24OYnOha2OLOFVHug=;
-  b=eFCUS2ssHe8RLp89tnZbg+ks+CeUxhhPyAiUy8MfNocOFMXZZ+RENQEo
-   AMWB1dv6sofvRW+WoPWTXO0EaHa87fitDr4Ta7e7+o2IWE6fiNMDkGAAb
-   tgLpbxOgjikDcm0Dmrf0TggPQPw3QFccYdIZPvgVb8o7qVXJhps2F5yLY
-   9LyJc/Je8CUKHx1iZyw89KvIwVMBoyX+LrKTgh6GhDdNijogaVsfGtns+
-   JV8jyVuBxcof+NJOGFWcc1XkQ9TJIpS0tXKENDT90fBAhfmd+s9K5rb+C
-   LlTMKmum4mF7gUNjwm+3secC7VbkcCVPZQHVQn2N7dug3iUlNpG2G8ZLI
-   A==;
-IronPort-SDR: j3rGxcLur7LlqvKyrOylGnPS6dt3Q+bMZVMB/Dsr5T7gXhd97MUpL87fLfaNPUOVXs1o1z9Tvo
- axQqeCqqwi9RiPpsxQ0qWx65MTLg+c+pzcklEwSw9adHc69p0eB4blDPM2SsN2TJ0Vy4uOjyYU
- GyyLaSUce5RFH4DGiHQ/JfndPQDkuCRI4imFXejGYlqTAdc+UKcDHs5W4ZXrntPNuAd875CHDQ
- iUVKusRvslida5GdgVqhSdPqW7CxNX46dA5Hqs3ZAxm52pxhmElVghbV5BjCyVVlJXd+3kBwMz
- AGk=
-X-IronPort-AV: E=Sophos;i="5.76,430,1592841600"; 
-   d="scan'208";a="147353704"
-Received: from mail-bn7nam10lp2104.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.104])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Sep 2020 23:20:34 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HdUUNloN14En/OzoVlR2pVhUrV7I0EHwnD1v9jpLVRGCN68JK2tNeSMJdZEw/h8pdACTA/ly9D5L3cLyEVoas9lJsz9WU8ST6CDz+sdMbf6/LNlYNpM+nS+eqxgexZGQnt2vE2g0Y+VxMBkR4LDQnD+Zrdjal0XKykbfqN/qsZZCONf+UsvDKNSdm685yj3sBz7Fy+12BcGyFW+asHaeDlI2RrxwMnH7GM8VDZflnLG0OfwNd+7qL8FtlKr1Ae8GxLUHDzAGHbwPraKSHVVN8qxnbzjUDfvE/K8ID+cThA1Z714QNZjSNC9ekrGDdhslKRJ2NwKkz9tLgq4RfvC5oA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MJGwv+fCDObMkEUlfKjrxxaUaD24OYnOha2OLOFVHug=;
- b=VAwEMQLOFKoz4Ks7HTT3hegx1mCysz8/IPsaruq0qsFoUNhuBhahP2ez+SdiH6NCNbYkzB2v3FOE4gMW4h6LJHU7Gx+Xg2ZiK+OGE/AsomCosrZRd/xgw/AsfNdOHij7so0uFEqG0bfIK8T1mv419A8CE6aPvuQCRV1hFj4Vh+MJ948CR4oCdkKIS0CWHJEwZd+S1vOTy4B35/W19fLznyynZpDlAqLogq+1EM8ywG4kB+GlQ7PqlingzFiswArTZRt36aHh/UScap1PJOFfIaFZguKiwLaI2XcO26gmFyPyN1PkmCOqLvbzmklgHW3w2iODldugzLazXXFp/rylYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MJGwv+fCDObMkEUlfKjrxxaUaD24OYnOha2OLOFVHug=;
- b=KI3pVV+fXhdXTKBwYTnsyEMkLsJJrrpxIMAeLcbgJQz7qg5kyF03/Y06EEeHo8AxQZJANe/nYAGBqssAbMC2EYnhkt3Kj1pWLWSAsdU6Vy7NHR1cO+49TpNXnV2arkB/hVfHUu+lgWfJdHiGvtKymeQH2UUhx/wdWu5T1+8MBmo=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN6PR04MB3887.namprd04.prod.outlook.com
- (2603:10b6:805:49::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 15 Sep
- 2020 15:20:33 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::457e:5fe9:2ae3:e738]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::457e:5fe9:2ae3:e738%7]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
- 15:20:33 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Borislav Petkov <bp@suse.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v3 1/2] scsi: Fix handling of host-aware ZBC disks
-Thread-Topic: [PATCH v3 1/2] scsi: Fix handling of host-aware ZBC disks
-Thread-Index: AQHWizKQecPKfPPtxEyTOURisQm1hQ==
-Date:   Tue, 15 Sep 2020 15:20:33 +0000
-Message-ID: <SN4PR0401MB3598867907382F25F39317569B200@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200915073347.832424-1-damien.lemoal@wdc.com>
- <20200915073347.832424-2-damien.lemoal@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2001:a62:1460:3d01:38cf:f1ce:e1ec:d261]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 3ab42785-ce80-4990-d92b-08d8598ae3e2
-x-ms-traffictypediagnostic: SN6PR04MB3887:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN6PR04MB388772A7E65F40BD3497A1619B200@SN6PR04MB3887.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2276;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: uXEoCBYBs/Xlq+LDPJKL4eq2meKLINW5CvMYpB/Rew2uGfbVLOmt0mzULQ2x+WXDyHTpE1x4xtOMI6o6ld8/J9mk2Wb9HPrAGMu5mD7sHtVqX0MHlFnPfe4Gnxlfw61RRjvYIP4U4te0uWir21FbQS0tEI9vI0P1zMY8ztpZVIRP7fWyNtUcPqNOnzfNrIzwP+r47m5aDXf21W8DReju39SUJTY6x9GAmnJSvjl7Y/8wLq8LlcdIKtFdWBul4f8j+dD6BVepXuHZQ74GlHnMKo5+GTZ0O7QRnNBI3Fudbj0fEtsA3OCC9nqXd19CJVszjpzuwUrbh0kDJkBaGZMDBkPkZy4xEm/cjqj30nKB6lCxXBH9Yejw1eC1SkNXzuyh
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(346002)(396003)(376002)(366004)(4270600006)(33656002)(66476007)(558084003)(66446008)(64756008)(7696005)(66556008)(54906003)(86362001)(316002)(52536014)(66946007)(76116006)(91956017)(71200400001)(55016002)(9686003)(6506007)(5660300002)(110136005)(186003)(4326008)(478600001)(2906002)(8676002)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: p4zyyJhJZACehfiFU47N8tF2W04i+UIkQQY80pMGDaAJqjTsrzITpfRjVphuCa/c0gKN9dWWAfV6C3xS2CVZnveE5esx4Ws29w9UwbYm6lhlsmKoYzPieXhQuFqVLlLAHTeZr7HHbLp/Sa5TfN1qe1nTElZbbKCqXz1cfIBCcXboqgWLyO/C0/jJzbeIk2siOpwUsUPI+IVy9ozS/l54gcr0NP+aIa+jDwpARjrUvm2mGYyMyprKzASzRihpXJGhJF8mtMKxV/ZQL9JiuT74OlaorQQFaiFd2mwlxlYWyaMpEepJ9fez/P+ffTomX+14v3GAagjMVDZN9JOIsekkhxSnNhwVCPnekLHOc3t73HNML6CkrayCRG6C0MxIBaHs+TWiKebkiplhjzxJ0TBMvxFEVhNdgvG7P0nqree7gojbhQgm0jjnnkhI4hT+VIW5RS8Vi+XJHvZOTXpxSVzusfrba/ImGnGdGpQrlbNv7gFmHYIVWl7Qe+O0dba+thtYl+519szIaodaa52Kqn5Rq48p2Mo8Vy16+1mRZLi+mIp6pxxMgmFt9drJ/O1kI4xrQsm1WuVARouh+0eJZj9tRj4beo9M7fOCV0g4tSfsPwPMrg7kL8RepUQEjnsye8gKH95Mb9DqW5Tc5HBp5hmFt+xfx8GQiimtSrmQMVMULFTPeilsUUEeK6nW30QKiXLWgqUJDH9coliXdQPWi/oUtw==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 15 Sep 2020 19:10:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600211403;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uWKYiEAPj6B80xN73l3vGOeVXB3aKVd90dDHnSd2jCM=;
+        b=EnnYxoOtkRnJ5NEBoXvulxlYlNnoyMgnNG4Dvsj0169VQWdKT92gds+jd22aV9T7//vUXY
+        cV5zJREZ8GSsxzS5Iw6cWXjWnFE5OvA0PmxACGZfeHvia61hKH6xK6f33MbJqUM7gJASRj
+        4MTiGQ/1pd7rmGsaAHaGsFyQh+AhkPw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-3dInkon8OGiQEyPC67N2Zg-1; Tue, 15 Sep 2020 19:09:59 -0400
+X-MC-Unique: 3dInkon8OGiQEyPC67N2Zg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC2CB1074648;
+        Tue, 15 Sep 2020 23:09:57 +0000 (UTC)
+Received: from T590 (ovpn-12-18.pek2.redhat.com [10.72.12.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C10A60E1C;
+        Tue, 15 Sep 2020 23:09:51 +0000 (UTC)
+Date:   Wed, 16 Sep 2020 07:09:41 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+Message-ID: <20200915230941.GA791425@T590>
+References: <20200822143326.GC199705@mit.edu>
+ <aff250ad-4c31-15c2-fa1d-3f3945cb7aa5@kernel.dk>
+ <7f0e2d99-5da2-237e-a894-0afddc0ace1e@kernel.dk>
+ <049a97db-c362-bcfb-59e5-4b1d2df59383@kernel.dk>
+ <5140ba6c-779c-2a71-b7f2-3c3220cdf19c@kernel.dk>
+ <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
+ <20200904035528.GE558530@mit.edu>
+ <20200915044519.GA38283@mit.edu>
+ <20200915073303.GA754106@T590>
+ <20200915224541.GB38283@mit.edu>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ab42785-ce80-4990-d92b-08d8598ae3e2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Sep 2020 15:20:33.5119
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ksC8U01Pkzm8QjwCJ5+g/E0LkgudRWnBlss6v90pb8HbICzb47zxNmPtVPvUJiaJE7K2zjA9/6u7zFVUBKOFmvv9C2qMlW6YY0XEfgMZYWE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB3887
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200915224541.GB38283@mit.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Whoops forgot to reply,=0A=
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+On Tue, Sep 15, 2020 at 06:45:41PM -0400, Theodore Y. Ts'o wrote:
+> On Tue, Sep 15, 2020 at 03:33:03PM +0800, Ming Lei wrote:
+> > Hi Theodore,
+> > 
+> > On Tue, Sep 15, 2020 at 12:45:19AM -0400, Theodore Y. Ts'o wrote:
+> > > On Thu, Sep 03, 2020 at 11:55:28PM -0400, Theodore Y. Ts'o wrote:
+> > > > Worse, right now, -rc1 and -rc2 is causing random crashes in my
+> > > > gce-xfstests framework.  Sometimes it happens before we've run even a
+> > > > single xfstests; sometimes it happens after we have successfully
+> > > > completed all of the tests, and we're doing a shutdown of the VM under
+> > > > test.  Other times it happens in the middle of a test run.  Given that
+> > > > I'm seeing this at -rc1, which is before my late ext4 pull request to
+> > > > Linus, it's probably not an ext4 related bug.  But it also means that
+> > > > I'm partially blind in terms of my kernel testing at the moment.  So I
+> > > > can't even tell Linus that I've run lots of tests and I'm 100%
+> > > > confident your one-line change is 100% safe.
+> > > 
+> > > I was finally able to bisect it down to the commit:
+> > > 
+> > > 37f4a24c2469: blk-mq: centralise related handling into blk_mq_get_driver_tag
+> > 
+> > 37f4a24c2469 has been reverted in:
+> > 
+> > 	4e2f62e566b5 Revert "blk-mq: put driver tag when this request is completed"
+> > 
+> > And later the patch is committed as the following after being fixed:
+> > 
+> > 	568f27006577 blk-mq: centralise related handling into blk_mq_get_driver_tag
+> > 
+> > So can you reproduce the issue by running kernel of commit 568f27006577?
+> 
+> Yes.  And things work fine if I try 4e2f62e566b5.
+> 
+> > If yes, can the issue be fixed by reverting 568f27006577?
+> 
+> The problem is it's a bit tricky to revert 568f27006577, since there
+> is a merge conflict in blk_kick_flush().  I attempted to do the bisect
+> manually here, but it's clearly not right since the kernel is not
+> booting after the revert:
+> 
+> https://github.com/tytso/ext4/commit/1e67516382a33da2c9d483b860ac4ec2ad390870
+> 
+> branch:
+> 
+> https://github.com/tytso/ext4/tree/manual-revert-of-568f27006577
+> 
+> Can you send me a patch which correctly reverts 568f27006577?  I can
+> try it against -rc1 .. -rc4, whichever is most convenient.
+
+Please test the following revert patch against -rc4.
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 53abb5c73d99..24c208d21793 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -219,6 +219,7 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 	struct request *rq, *n;
+ 	unsigned long flags = 0;
+ 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
++	struct blk_mq_hw_ctx *hctx;
+ 
+ 	blk_account_io_flush(flush_rq);
+ 
+@@ -234,11 +235,13 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 	if (fq->rq_status != BLK_STS_OK)
+ 		error = fq->rq_status;
+ 
++	hctx = flush_rq->mq_hctx;
+ 	if (!q->elevator) {
+-		flush_rq->tag = BLK_MQ_NO_TAG;
++		blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
++		flush_rq->tag = -1;
+ 	} else {
+ 		blk_mq_put_driver_tag(flush_rq);
+-		flush_rq->internal_tag = BLK_MQ_NO_TAG;
++		flush_rq->internal_tag = -1;
+ 	}
+ 
+ 	running = &fq->flush_queue[fq->flush_running_idx];
+@@ -309,16 +312,12 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
+ 	flush_rq->mq_hctx = first_rq->mq_hctx;
+ 
+ 	if (!q->elevator) {
++		fq->orig_rq = first_rq;
+ 		flush_rq->tag = first_rq->tag;
+-
+-		/*
+-		 * We borrow data request's driver tag, so have to mark
+-		 * this flush request as INFLIGHT for avoiding double
+-		 * account of this driver tag
+-		 */
+-		flush_rq->rq_flags |= RQF_MQ_INFLIGHT;
+-	} else
++		blk_mq_tag_set_rq(flush_rq->mq_hctx, first_rq->tag, flush_rq);
++	} else {
+ 		flush_rq->internal_tag = first_rq->internal_tag;
++	}
+ 
+ 	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
+ 	flush_rq->cmd_flags |= (flags & REQ_DRV) | (flags & REQ_FAILFAST_MASK);
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index b1acac518c4e..3945c7f5b944 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -101,6 +101,18 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 	return atomic_read(&hctx->nr_active) < depth;
+ }
+ 
++/*
++ * This helper should only be used for flush request to share tag
++ * with the request cloned from, and both the two requests can't be
++ * in flight at the same time. The caller has to make sure the tag
++ * can't be freed.
++ */
++static inline void blk_mq_tag_set_rq(struct blk_mq_hw_ctx *hctx,
++		unsigned int tag, struct request *rq)
++{
++	hctx->tags->rqs[tag] = rq;
++}
++
+ static inline bool blk_mq_tag_is_reserved(struct blk_mq_tags *tags,
+ 					  unsigned int tag)
+ {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b3d2785eefe9..feb3d5c0a1c6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -277,20 +277,26 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ {
+ 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+ 	struct request *rq = tags->static_rqs[tag];
++	req_flags_t rq_flags = 0;
+ 
+ 	if (data->q->elevator) {
+ 		rq->tag = BLK_MQ_NO_TAG;
+ 		rq->internal_tag = tag;
+ 	} else {
++		if (data->hctx->flags & BLK_MQ_F_TAG_SHARED) {
++			rq_flags = RQF_MQ_INFLIGHT;
++			atomic_inc(&data->hctx->nr_active);
++		}
+ 		rq->tag = tag;
+ 		rq->internal_tag = BLK_MQ_NO_TAG;
++		data->hctx->tags->rqs[rq->tag] = rq;
+ 	}
+ 
+ 	/* csd/requeue_work/fifo_time is initialized before use */
+ 	rq->q = data->q;
+ 	rq->mq_ctx = data->ctx;
+ 	rq->mq_hctx = data->hctx;
+-	rq->rq_flags = 0;
++	rq->rq_flags = rq_flags;
+ 	rq->cmd_flags = data->cmd_flags;
+ 	if (data->flags & BLK_MQ_REQ_PREEMPT)
+ 		rq->rq_flags |= RQF_PREEMPT;
+@@ -1098,10 +1104,9 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+ {
+ 	struct sbitmap_queue *bt = &rq->mq_hctx->tags->bitmap_tags;
+ 	unsigned int tag_offset = rq->mq_hctx->tags->nr_reserved_tags;
++	bool shared = blk_mq_tag_busy(rq->mq_hctx);
+ 	int tag;
+ 
+-	blk_mq_tag_busy(rq->mq_hctx);
+-
+ 	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) {
+ 		bt = &rq->mq_hctx->tags->breserved_tags;
+ 		tag_offset = 0;
+@@ -1114,23 +1119,19 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+ 		return false;
+ 
+ 	rq->tag = tag + tag_offset;
++	if (shared) {
++		rq->rq_flags |= RQF_MQ_INFLIGHT;
++		atomic_inc(&rq->mq_hctx->nr_active);
++	}
++	rq->mq_hctx->tags->rqs[rq->tag] = rq;
+ 	return true;
+ }
+ 
+ static bool blk_mq_get_driver_tag(struct request *rq)
+ {
+-	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+-
+-	if (rq->tag == BLK_MQ_NO_TAG && !__blk_mq_get_driver_tag(rq))
+-		return false;
+-
+-	if ((hctx->flags & BLK_MQ_F_TAG_SHARED) &&
+-			!(rq->rq_flags & RQF_MQ_INFLIGHT)) {
+-		rq->rq_flags |= RQF_MQ_INFLIGHT;
+-		atomic_inc(&hctx->nr_active);
+-	}
+-	hctx->tags->rqs[rq->tag] = rq;
+-	return true;
++	if (rq->tag != BLK_MQ_NO_TAG)
++		return true;
++	return __blk_mq_get_driver_tag(rq);
+ }
+ 
+ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+diff --git a/block/blk.h b/block/blk.h
+index 49e2928a1632..5ed35a02bc7f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -25,6 +25,11 @@ struct blk_flush_queue {
+ 	struct list_head	flush_data_in_flight;
+ 	struct request		*flush_rq;
+ 
++	/*
++	 * flush_rq shares tag with this rq, both can't be active
++	 * at the same time
++	 */
++	struct request		*orig_rq;
+ 	struct lock_class_key	key;
+ 	spinlock_t		mq_flush_lock;
+ };
+
+
+thanks, 
+Ming
+
