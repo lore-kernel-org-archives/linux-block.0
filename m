@@ -2,192 +2,168 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B37F4C433E2
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95545C43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:48:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E79C20795
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A8CF20B1F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:48:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nWyXGSDH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727629AbgIOWqR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 18:46:17 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:39918 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727582AbgIOWpz (ORCPT
+        id S1727629AbgIOWsB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 18:48:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46026 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727486AbgIOPox (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 18:45:55 -0400
-Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 08FMjf7x012451
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Sep 2020 18:45:42 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id CE27C42004D; Tue, 15 Sep 2020 18:45:41 -0400 (EDT)
-Date:   Tue, 15 Sep 2020 18:45:41 -0400
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-Message-ID: <20200915224541.GB38283@mit.edu>
-References: <20c844c8-b649-3250-ff5b-b7420f72ff38@kernel.dk>
- <20200822143326.GC199705@mit.edu>
- <aff250ad-4c31-15c2-fa1d-3f3945cb7aa5@kernel.dk>
- <7f0e2d99-5da2-237e-a894-0afddc0ace1e@kernel.dk>
- <049a97db-c362-bcfb-59e5-4b1d2df59383@kernel.dk>
- <5140ba6c-779c-2a71-b7f2-3c3220cdf19c@kernel.dk>
- <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
- <20200904035528.GE558530@mit.edu>
- <20200915044519.GA38283@mit.edu>
- <20200915073303.GA754106@T590>
+        Tue, 15 Sep 2020 11:44:53 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB112C06178B;
+        Tue, 15 Sep 2020 08:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=OuuyUbl6fRpyPuVA1h48uJIc/QfDHGM8Hj5cvHozx6E=; b=nWyXGSDHZdAP1YdTj9zwyd0An3
+        MlMyHu4EDE7/jPKWVYoR4f3clD4hD7rNBWZsPW6grmE89shWB506PIGrbQrJxLCW559zwrIu/R78o
+        CqR2JnObX2DO6f1pGA8X1IEkYGkbDjYrUq4at0c9bffQ3I7A2NyG4UXAyIhEY9JEDNNKdxrR8J6Is
+        bqrbID/SSL25EpVj8LoJXQcl31wEfR0gi5DIahn3m1JJy+w0gB5eQBPPLNYsjQa7naDGwYWcbPgAl
+        x03Ia1RtPhUSY1FHGhsoihUMlDW77O0vznKUCI3oPbR/jcyIgV7IIxqSKu2p0UQcMLjuOMp8CUIMX
+        b3uHkfyQ==;
+Received: from 089144214092.atnat0023.highway.a1.net ([89.144.214.92] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kID8P-0002cx-H9; Tue, 15 Sep 2020 15:44:45 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        cgroups@vger.kernel.org,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 11/12] bdi: invert BDI_CAP_NO_ACCT_WB
+Date:   Tue, 15 Sep 2020 17:18:28 +0200
+Message-Id: <20200915151829.1767176-12-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200915151829.1767176-1-hch@lst.de>
+References: <20200915151829.1767176-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200915073303.GA754106@T590>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 15, 2020 at 03:33:03PM +0800, Ming Lei wrote:
-> Hi Theodore,
-> 
-> On Tue, Sep 15, 2020 at 12:45:19AM -0400, Theodore Y. Ts'o wrote:
-> > On Thu, Sep 03, 2020 at 11:55:28PM -0400, Theodore Y. Ts'o wrote:
-> > > Worse, right now, -rc1 and -rc2 is causing random crashes in my
-> > > gce-xfstests framework.  Sometimes it happens before we've run even a
-> > > single xfstests; sometimes it happens after we have successfully
-> > > completed all of the tests, and we're doing a shutdown of the VM under
-> > > test.  Other times it happens in the middle of a test run.  Given that
-> > > I'm seeing this at -rc1, which is before my late ext4 pull request to
-> > > Linus, it's probably not an ext4 related bug.  But it also means that
-> > > I'm partially blind in terms of my kernel testing at the moment.  So I
-> > > can't even tell Linus that I've run lots of tests and I'm 100%
-> > > confident your one-line change is 100% safe.
-> > 
-> > I was finally able to bisect it down to the commit:
-> > 
-> > 37f4a24c2469: blk-mq: centralise related handling into blk_mq_get_driver_tag
-> 
-> 37f4a24c2469 has been reverted in:
-> 
-> 	4e2f62e566b5 Revert "blk-mq: put driver tag when this request is completed"
-> 
-> And later the patch is committed as the following after being fixed:
-> 
-> 	568f27006577 blk-mq: centralise related handling into blk_mq_get_driver_tag
-> 
-> So can you reproduce the issue by running kernel of commit 568f27006577?
+Replace BDI_CAP_NO_ACCT_WB with a positive BDI_CAP_WRITEBACK_ACCT to
+make the checks more obvious.  Also remove the pointless
+bdi_cap_account_writeback wrapper that just obsfucates the check.
 
-Yes.  And things work fine if I try 4e2f62e566b5.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ fs/fuse/inode.c             |  3 ++-
+ include/linux/backing-dev.h | 13 +++----------
+ mm/backing-dev.c            |  1 +
+ mm/page-writeback.c         |  4 ++--
+ 4 files changed, 8 insertions(+), 13 deletions(-)
 
-> If yes, can the issue be fixed by reverting 568f27006577?
+diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
+index 17b00670fb539e..581329203d6860 100644
+--- a/fs/fuse/inode.c
++++ b/fs/fuse/inode.c
+@@ -1050,7 +1050,8 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
+ 		return err;
+ 
+ 	/* fuse does it's own writeback accounting */
+-	sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
++	sb->s_bdi->capabilities &= ~BDI_CAP_WRITEBACK_ACCT;
++	sb->s_bdi->capabilities |= BDI_CAP_STRICTLIMIT;
+ 
+ 	/*
+ 	 * For a single fuse filesystem use max 1% of dirty +
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 5da4ea3dd0cc5c..b217344a2c63be 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -120,17 +120,17 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_ratio);
+  *
+  * BDI_CAP_NO_ACCT_DIRTY:  Dirty pages shouldn't contribute to accounting
+  * BDI_CAP_NO_WRITEBACK:   Don't write pages back
+- * BDI_CAP_NO_ACCT_WB:     Don't automatically account writeback pages
++ * BDI_CAP_WRITEBACK_ACCT: Automatically account writeback pages
+  * BDI_CAP_STRICTLIMIT:    Keep number of dirty pages below bdi threshold.
+  */
+ #define BDI_CAP_NO_ACCT_DIRTY	0x00000001
+ #define BDI_CAP_NO_WRITEBACK	0x00000002
+-#define BDI_CAP_NO_ACCT_WB	0x00000004
++#define BDI_CAP_WRITEBACK_ACCT	0x00000004
+ #define BDI_CAP_STRICTLIMIT	0x00000010
+ #define BDI_CAP_CGROUP_WRITEBACK 0x00000020
+ 
+ #define BDI_CAP_NO_ACCT_AND_WRITEBACK \
+-	(BDI_CAP_NO_WRITEBACK | BDI_CAP_NO_ACCT_DIRTY | BDI_CAP_NO_ACCT_WB)
++	(BDI_CAP_NO_WRITEBACK | BDI_CAP_NO_ACCT_DIRTY)
+ 
+ extern struct backing_dev_info noop_backing_dev_info;
+ 
+@@ -179,13 +179,6 @@ static inline bool bdi_cap_account_dirty(struct backing_dev_info *bdi)
+ 	return !(bdi->capabilities & BDI_CAP_NO_ACCT_DIRTY);
+ }
+ 
+-static inline bool bdi_cap_account_writeback(struct backing_dev_info *bdi)
+-{
+-	/* Paranoia: BDI_CAP_NO_WRITEBACK implies BDI_CAP_NO_ACCT_WB */
+-	return !(bdi->capabilities & (BDI_CAP_NO_ACCT_WB |
+-				      BDI_CAP_NO_WRITEBACK));
+-}
+-
+ static inline bool mapping_cap_writeback_dirty(struct address_space *mapping)
+ {
+ 	return bdi_cap_writeback_dirty(inode_to_bdi(mapping->host));
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index f9a2842bd81c3d..ab0415dde5c66c 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -744,6 +744,7 @@ struct backing_dev_info *bdi_alloc(int node_id)
+ 		kfree(bdi);
+ 		return NULL;
+ 	}
++	bdi->capabilities = BDI_CAP_WRITEBACK_ACCT;
+ 	bdi->ra_pages = VM_READAHEAD_PAGES;
+ 	bdi->io_pages = VM_READAHEAD_PAGES;
+ 	return bdi;
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index e9c36521461aaa..0139f9622a92da 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2738,7 +2738,7 @@ int test_clear_page_writeback(struct page *page)
+ 		if (ret) {
+ 			__xa_clear_mark(&mapping->i_pages, page_index(page),
+ 						PAGECACHE_TAG_WRITEBACK);
+-			if (bdi_cap_account_writeback(bdi)) {
++			if (bdi->capabilities & BDI_CAP_WRITEBACK_ACCT) {
+ 				struct bdi_writeback *wb = inode_to_wb(inode);
+ 
+ 				dec_wb_stat(wb, WB_WRITEBACK);
+@@ -2791,7 +2791,7 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
+ 						   PAGECACHE_TAG_WRITEBACK);
+ 
+ 			xas_set_mark(&xas, PAGECACHE_TAG_WRITEBACK);
+-			if (bdi_cap_account_writeback(bdi))
++			if (bdi->capabilities & BDI_CAP_WRITEBACK_ACCT)
+ 				inc_wb_stat(inode_to_wb(inode), WB_WRITEBACK);
+ 
+ 			/*
+-- 
+2.28.0
 
-The problem is it's a bit tricky to revert 568f27006577, since there
-is a merge conflict in blk_kick_flush().  I attempted to do the bisect
-manually here, but it's clearly not right since the kernel is not
-booting after the revert:
-
-https://github.com/tytso/ext4/commit/1e67516382a33da2c9d483b860ac4ec2ad390870
-
-branch:
-
-https://github.com/tytso/ext4/tree/manual-revert-of-568f27006577
-
-Can you send me a patch which correctly reverts 568f27006577?  I can
-try it against -rc1 .. -rc4, whichever is most convenient.
-
-> Can you share the exact mount command line for setup the environment?
-> and the exact xfstest item?
-
-It's a variety of mount command lines, since I'm using gce-xfstests[1][2]
-using a variety of file system scenarios --- but the basic one, which
-is ext4 using the default 4k block size is failing (they all are failing).
-
-[1] https://thunk.org/gce-xfstests
-[2] https://github.com/tytso/xfstests-bld/blob/master/Documentation/gce-xfstests.md
-
-It's also not one consistent xfstests which is failing, but it does
-tend to be tests which are loading up the storage stack with a lot of
-small random read/writes, especially involving metadata blocks/writes.
-(For example, tests which run fsstress.)
-
-Since this reliably triggers for me, and other people running
-kvm-xfstests or are running xfstests on their own test environments
-aren't seeing it, I'm assuming it must be some kind of interesting
-interaction between virtio-scsi, perhaps with how Google Persistent
-Disk is behaving (maybe timing related?  who knows?).  Darrick Wong
-did say he saw something like it once using Oracle's Cloud
-infrastructure, but as far as I know it hasn't reproduced since.  On
-Google Compute Engine VM's, it reproduces *extremely* reliably.
-
-I expect that if you were to set up gce-xfstests, get a free GCE
-account with the initial $300 free credits, you could run
-"gce-xfstests -c ext4/4k -g auto" and it would reproduce within an
-hour or so.  (So under a dollar's worth of VM credits, so long as you
-notice that it's hung and shut down the VM after gathering debugging
-data.)
-
-The instructions are at [2], and the image xfstests-202008311554 in
-the xfstests-cloud project is a public copy of the VM test appliance I
-was using.
-
-% gcloud compute images describe --project xfstests-cloud xfstests-202008311554
-archiveSizeBytes: '1720022528'
-creationTimestamp: '2020-09-15T15:09:30.544-07:00'
-description: Linux Kernel File System Test Appliance
-diskSizeGb: '10'
-family: xfstests
-guestOsFeatures:
-- type: VIRTIO_SCSI_MULTIQUEUE
-- type: UEFI_COMPATIBLE
-id: '1558420969906537845'
-kind: compute#image
-labelFingerprint: V-2Qgcxt2uw=
-labels:
-  blktests: g8a75bed
-  e2fsprogs: v1_45_6
-  fio: fio-3_22
-  fsverity: v1_2
-  ima-evm-utils: v1_3_1
-  nvme-cli: v1_12
-  quota: g13bb8c2
-  util-linux: v2_36
-  xfsprogs: v5_8_0-rc1
-  xfstests: linux-v3_8-2838-geb439bf2
-  xfstests-bld: gb5085ab
-licenseCodes:
-- '5543610867827062957'
-licenses:
-- https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-10-buster
-name: xfstests-202008311554
-selfLink: https://www.googleapis.com/compute/v1/projects/xfstests-cloud/global/images/xfstests-202008311554
-sourceDisk: https://www.googleapis.com/compute/v1/projects/xfstests-cloud/zones/us-east1-d/disks/temp-xfstests-202008311554
-sourceDiskId: '5824762850044577124'
-sourceType: RAW
-status: READY
-storageLocations:
-- us
-
-Cheers,
-
-					- Ted
-
-P.S.  As you can see, I can also easily run blktests using this VM
-Test Appliance.  If you think it would be helpful for me to try
-running one or more of the blktests test groups, I can do that.
-
-I've been focusing on using xfstests mainly because this is my primary
-way of running regression tests, and I'm blocked on ext4 testing until
-I can figure out this particular problem.  Which is why a proper
-revert of 568f27006577 would be extremely helpful, if only so I can
-apply that on top of the ext4 git tree temporarily so I can run my
-file system regression tests.
