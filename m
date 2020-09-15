@@ -2,139 +2,124 @@ Return-Path: <SRS0=t3nT=CY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FBC5C43461
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE945C43461
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:58:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3C4F20872
-	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:56:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEA1320770
+	for <linux-block@archiver.kernel.org>; Tue, 15 Sep 2020 22:58:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="e+3jk+59"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eFCUS2ss";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="KI3pVV+f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727400AbgIOPVn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 11:21:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42286 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727047AbgIOPU5 (ORCPT
+        id S1727104AbgIOW5g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 18:57:36 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:6029 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727306AbgIOPUk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 11:20:57 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FDE9C06178A;
-        Tue, 15 Sep 2020 08:20:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=WgQU+DROBiFXSU4XRLi15Ig7DnwkeQul1eu0RWtmaDw=; b=e+3jk+59mxpACTbbZjvM84YGj4
-        ceZbnJEyNbo2sMobiL9SoJ/Wml/TfR7ZxGNJ2SmU+0KOtNugocfDQjsanQudzdZwG8tMW2iGt2Dbh
-        5mQmfr9qjUufz+t8XYePond1pxsq56FWF3eh/QXzn34d7rxr8btIOElj7CGNBYepyUHlm89BAuMWW
-        FTRFUOsqtFqEL6dBsoD8pHkZEwTfg+xJKDiQK18DDhC6neKQnJnR54JJ1XBA0dPWp6V1bYeExdck6
-        hrhjpYhRMs5GVJSKvJV5yRYrE8qRMuWvyKp0uETm2uGjmbQ8U96hYfS5T23/uXLzXtXL5lfc40b7j
-        JVXhJ3JQ==;
-Received: from 089144214092.atnat0023.highway.a1.net ([89.144.214.92] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kICl8-0000xV-0W; Tue, 15 Sep 2020 15:20:42 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org
-Subject: bdi cleanups v5
-Date:   Tue, 15 Sep 2020 17:18:17 +0200
-Message-Id: <20200915151829.1767176-1-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
+        Tue, 15 Sep 2020 11:20:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1600183239; x=1631719239;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=MJGwv+fCDObMkEUlfKjrxxaUaD24OYnOha2OLOFVHug=;
+  b=eFCUS2ssHe8RLp89tnZbg+ks+CeUxhhPyAiUy8MfNocOFMXZZ+RENQEo
+   AMWB1dv6sofvRW+WoPWTXO0EaHa87fitDr4Ta7e7+o2IWE6fiNMDkGAAb
+   tgLpbxOgjikDcm0Dmrf0TggPQPw3QFccYdIZPvgVb8o7qVXJhps2F5yLY
+   9LyJc/Je8CUKHx1iZyw89KvIwVMBoyX+LrKTgh6GhDdNijogaVsfGtns+
+   JV8jyVuBxcof+NJOGFWcc1XkQ9TJIpS0tXKENDT90fBAhfmd+s9K5rb+C
+   LlTMKmum4mF7gUNjwm+3secC7VbkcCVPZQHVQn2N7dug3iUlNpG2G8ZLI
+   A==;
+IronPort-SDR: j3rGxcLur7LlqvKyrOylGnPS6dt3Q+bMZVMB/Dsr5T7gXhd97MUpL87fLfaNPUOVXs1o1z9Tvo
+ axQqeCqqwi9RiPpsxQ0qWx65MTLg+c+pzcklEwSw9adHc69p0eB4blDPM2SsN2TJ0Vy4uOjyYU
+ GyyLaSUce5RFH4DGiHQ/JfndPQDkuCRI4imFXejGYlqTAdc+UKcDHs5W4ZXrntPNuAd875CHDQ
+ iUVKusRvslida5GdgVqhSdPqW7CxNX46dA5Hqs3ZAxm52pxhmElVghbV5BjCyVVlJXd+3kBwMz
+ AGk=
+X-IronPort-AV: E=Sophos;i="5.76,430,1592841600"; 
+   d="scan'208";a="147353704"
+Received: from mail-bn7nam10lp2104.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.104])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Sep 2020 23:20:34 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HdUUNloN14En/OzoVlR2pVhUrV7I0EHwnD1v9jpLVRGCN68JK2tNeSMJdZEw/h8pdACTA/ly9D5L3cLyEVoas9lJsz9WU8ST6CDz+sdMbf6/LNlYNpM+nS+eqxgexZGQnt2vE2g0Y+VxMBkR4LDQnD+Zrdjal0XKykbfqN/qsZZCONf+UsvDKNSdm685yj3sBz7Fy+12BcGyFW+asHaeDlI2RrxwMnH7GM8VDZflnLG0OfwNd+7qL8FtlKr1Ae8GxLUHDzAGHbwPraKSHVVN8qxnbzjUDfvE/K8ID+cThA1Z714QNZjSNC9ekrGDdhslKRJ2NwKkz9tLgq4RfvC5oA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MJGwv+fCDObMkEUlfKjrxxaUaD24OYnOha2OLOFVHug=;
+ b=VAwEMQLOFKoz4Ks7HTT3hegx1mCysz8/IPsaruq0qsFoUNhuBhahP2ez+SdiH6NCNbYkzB2v3FOE4gMW4h6LJHU7Gx+Xg2ZiK+OGE/AsomCosrZRd/xgw/AsfNdOHij7so0uFEqG0bfIK8T1mv419A8CE6aPvuQCRV1hFj4Vh+MJ948CR4oCdkKIS0CWHJEwZd+S1vOTy4B35/W19fLznyynZpDlAqLogq+1EM8ywG4kB+GlQ7PqlingzFiswArTZRt36aHh/UScap1PJOFfIaFZguKiwLaI2XcO26gmFyPyN1PkmCOqLvbzmklgHW3w2iODldugzLazXXFp/rylYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MJGwv+fCDObMkEUlfKjrxxaUaD24OYnOha2OLOFVHug=;
+ b=KI3pVV+fXhdXTKBwYTnsyEMkLsJJrrpxIMAeLcbgJQz7qg5kyF03/Y06EEeHo8AxQZJANe/nYAGBqssAbMC2EYnhkt3Kj1pWLWSAsdU6Vy7NHR1cO+49TpNXnV2arkB/hVfHUu+lgWfJdHiGvtKymeQH2UUhx/wdWu5T1+8MBmo=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN6PR04MB3887.namprd04.prod.outlook.com
+ (2603:10b6:805:49::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 15 Sep
+ 2020 15:20:33 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::457e:5fe9:2ae3:e738]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::457e:5fe9:2ae3:e738%7]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
+ 15:20:33 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Borislav Petkov <bp@suse.de>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v3 1/2] scsi: Fix handling of host-aware ZBC disks
+Thread-Topic: [PATCH v3 1/2] scsi: Fix handling of host-aware ZBC disks
+Thread-Index: AQHWizKQecPKfPPtxEyTOURisQm1hQ==
+Date:   Tue, 15 Sep 2020 15:20:33 +0000
+Message-ID: <SN4PR0401MB3598867907382F25F39317569B200@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20200915073347.832424-1-damien.lemoal@wdc.com>
+ <20200915073347.832424-2-damien.lemoal@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2001:a62:1460:3d01:38cf:f1ce:e1ec:d261]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 3ab42785-ce80-4990-d92b-08d8598ae3e2
+x-ms-traffictypediagnostic: SN6PR04MB3887:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN6PR04MB388772A7E65F40BD3497A1619B200@SN6PR04MB3887.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:2276;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uXEoCBYBs/Xlq+LDPJKL4eq2meKLINW5CvMYpB/Rew2uGfbVLOmt0mzULQ2x+WXDyHTpE1x4xtOMI6o6ld8/J9mk2Wb9HPrAGMu5mD7sHtVqX0MHlFnPfe4Gnxlfw61RRjvYIP4U4te0uWir21FbQS0tEI9vI0P1zMY8ztpZVIRP7fWyNtUcPqNOnzfNrIzwP+r47m5aDXf21W8DReju39SUJTY6x9GAmnJSvjl7Y/8wLq8LlcdIKtFdWBul4f8j+dD6BVepXuHZQ74GlHnMKo5+GTZ0O7QRnNBI3Fudbj0fEtsA3OCC9nqXd19CJVszjpzuwUrbh0kDJkBaGZMDBkPkZy4xEm/cjqj30nKB6lCxXBH9Yejw1eC1SkNXzuyh
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(346002)(396003)(376002)(366004)(4270600006)(33656002)(66476007)(558084003)(66446008)(64756008)(7696005)(66556008)(54906003)(86362001)(316002)(52536014)(66946007)(76116006)(91956017)(71200400001)(55016002)(9686003)(6506007)(5660300002)(110136005)(186003)(4326008)(478600001)(2906002)(8676002)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: p4zyyJhJZACehfiFU47N8tF2W04i+UIkQQY80pMGDaAJqjTsrzITpfRjVphuCa/c0gKN9dWWAfV6C3xS2CVZnveE5esx4Ws29w9UwbYm6lhlsmKoYzPieXhQuFqVLlLAHTeZr7HHbLp/Sa5TfN1qe1nTElZbbKCqXz1cfIBCcXboqgWLyO/C0/jJzbeIk2siOpwUsUPI+IVy9ozS/l54gcr0NP+aIa+jDwpARjrUvm2mGYyMyprKzASzRihpXJGhJF8mtMKxV/ZQL9JiuT74OlaorQQFaiFd2mwlxlYWyaMpEepJ9fez/P+ffTomX+14v3GAagjMVDZN9JOIsekkhxSnNhwVCPnekLHOc3t73HNML6CkrayCRG6C0MxIBaHs+TWiKebkiplhjzxJ0TBMvxFEVhNdgvG7P0nqree7gojbhQgm0jjnnkhI4hT+VIW5RS8Vi+XJHvZOTXpxSVzusfrba/ImGnGdGpQrlbNv7gFmHYIVWl7Qe+O0dba+thtYl+519szIaodaa52Kqn5Rq48p2Mo8Vy16+1mRZLi+mIp6pxxMgmFt9drJ/O1kI4xrQsm1WuVARouh+0eJZj9tRj4beo9M7fOCV0g4tSfsPwPMrg7kL8RepUQEjnsye8gKH95Mb9DqW5Tc5HBp5hmFt+xfx8GQiimtSrmQMVMULFTPeilsUUEeK6nW30QKiXLWgqUJDH9coliXdQPWi/oUtw==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ab42785-ce80-4990-d92b-08d8598ae3e2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Sep 2020 15:20:33.5119
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ksC8U01Pkzm8QjwCJ5+g/E0LkgudRWnBlss6v90pb8HbICzb47zxNmPtVPvUJiaJE7K2zjA9/6u7zFVUBKOFmvv9C2qMlW6YY0XEfgMZYWE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB3887
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
-
-this series contains a bunch of different BDI cleanups.  The biggest item
-is to isolate block drivers from the BDI in preparation of changing the
-lifetime of the block device BDI in a follow up series.
-
-Changes since v4:
- - add a back a prematurely removed assignment in dm-table.c
- - pick up a few reviews from Johannes that got lost
-
-Changes since v3:
- - rebased on the lasted block tree, which has some of the prep
-   changes merged
- - extend the ->ra_pages changes to ->io_pages
- - move initializing ->ra_pages and ->io_pages for block devices to
-   blk_register_queue
-
-Changes since v2:
- - fix a rw_page return value check
- - fix up various changelogs
-
-Changes since v1:
- - rebased to the for-5.9/block-merge branch
- - explicitly set the readahead to 0 for ubifs, vboxsf and mtd
- - split the zram block_device operations
- - let rw_page users fall back to bios in swap_readpage
-
-
-Diffstat:
- block/blk-core.c              |    3 -
- block/blk-integrity.c         |    4 +-
- block/blk-mq-debugfs.c        |    1 
- block/blk-settings.c          |    5 +-
- block/blk-sysfs.c             |    4 +-
- block/genhd.c                 |   13 +++++--
- drivers/block/aoe/aoeblk.c    |    2 -
- drivers/block/brd.c           |    1 
- drivers/block/drbd/drbd_nl.c  |   18 ---------
- drivers/block/drbd/drbd_req.c |    4 --
- drivers/block/rbd.c           |    2 -
- drivers/block/zram/zram_drv.c |   19 +++++++---
- drivers/md/bcache/super.c     |    4 --
- drivers/md/dm-table.c         |    9 +---
- drivers/md/raid0.c            |   16 --------
- drivers/md/raid10.c           |   46 ++++++++----------------
- drivers/md/raid5.c            |   31 +++++++---------
- drivers/mmc/core/queue.c      |    3 -
- drivers/mtd/mtdcore.c         |    2 +
- drivers/nvdimm/btt.c          |    2 -
- drivers/nvdimm/pmem.c         |    1 
- drivers/nvme/host/core.c      |    3 -
- drivers/nvme/host/multipath.c |   10 +----
- drivers/scsi/iscsi_tcp.c      |    4 +-
- fs/9p/vfs_file.c              |    2 -
- fs/9p/vfs_super.c             |    6 ++-
- fs/afs/super.c                |    1 
- fs/btrfs/disk-io.c            |    2 -
- fs/fs-writeback.c             |    7 ++-
- fs/fuse/inode.c               |    4 +-
- fs/namei.c                    |    4 +-
- fs/nfs/super.c                |    9 ----
- fs/super.c                    |    2 +
- fs/ubifs/super.c              |    2 +
- fs/vboxsf/super.c             |    2 +
- include/linux/backing-dev.h   |   78 +++++++-----------------------------------
- include/linux/blkdev.h        |    3 +
- include/linux/drbd.h          |    1 
- include/linux/fs.h            |    2 -
- mm/backing-dev.c              |   13 +++----
- mm/filemap.c                  |    4 +-
- mm/memcontrol.c               |    2 -
- mm/memory-failure.c           |    2 -
- mm/migrate.c                  |    2 -
- mm/mmap.c                     |    2 -
- mm/page-writeback.c           |   18 ++++-----
- mm/page_io.c                  |   18 +++++----
- mm/swapfile.c                 |    4 +-
- 48 files changed, 144 insertions(+), 253 deletions(-)
+Whoops forgot to reply,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
