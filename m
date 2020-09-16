@@ -2,136 +2,74 @@ Return-Path: <SRS0=dDIv=CZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A726AC433E2
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 08:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71469C43461
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 09:29:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6869A21974
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 08:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DA1E22210
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 09:29:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726161AbgIPIXv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Sep 2020 04:23:51 -0400
-Received: from alexa-out.qualcomm.com ([129.46.98.28]:38139 "EHLO
-        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726149AbgIPIXu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Sep 2020 04:23:50 -0400
-Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
-  by alexa-out.qualcomm.com with ESMTP; 16 Sep 2020 01:23:50 -0700
-Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
-  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 16 Sep 2020 01:23:48 -0700
-Received: from hydcbspbld03.qualcomm.com ([10.242.221.48])
-  by ironmsg01-blr.qualcomm.com with ESMTP; 16 Sep 2020 13:53:35 +0530
-Received: by hydcbspbld03.qualcomm.com (Postfix, from userid 2304101)
-        id 2E9F220EAA; Wed, 16 Sep 2020 13:53:34 +0530 (IST)
-From:   Pradeep P V K <ppvk@codeaurora.org>
-To:     axboe@kernel.dk, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, stummala@codeaurora.org,
-        sayalil@codeaurora.org, Pradeep P V K <ppvk@codeaurora.org>
-Subject: [PATCH V3] block: Fix use-after-free issue while accessing ioscheduler lock
-Date:   Wed, 16 Sep 2020 13:53:31 +0530
-Message-Id: <1600244611-55554-1-git-send-email-ppvk@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        id S1726491AbgIPJ3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Sep 2020 05:29:25 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43094 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726129AbgIPJ3X (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Sep 2020 05:29:23 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 5A4AFABD1;
+        Wed, 16 Sep 2020 09:29:37 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 0C0D8DA7C7; Wed, 16 Sep 2020 11:28:09 +0200 (CEST)
+Date:   Wed, 16 Sep 2020 11:28:09 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        drbd-dev@tron.linbit.com, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        cgroups@vger.kernel.org,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: Re: [PATCH 07/12] bdi: remove BDI_CAP_CGROUP_WRITEBACK
+Message-ID: <20200916092809.GJ1791@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>, linux-mtd@lists.infradead.org,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@tron.linbit.com,
+        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, cgroups@vger.kernel.org,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+References: <20200910144833.742260-1-hch@lst.de>
+ <20200910144833.742260-8-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200910144833.742260-8-hch@lst.de>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Observes below crash while accessing (use-after-free) lock member
-of bfq data.
+On Thu, Sep 10, 2020 at 04:48:27PM +0200, Christoph Hellwig wrote:
+> Just checking SB_I_CGROUPWB for cgroup writeback support is enough.
+> Either the file system allocates its own bdi (e.g. btrfs), in which case
+> it is known to support cgroup writeback, or the bdi comes from the block
+> layer, which always supports cgroup writeback.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-context#1			context#2
-				process_one_work()
-kthread()			blk_mq_run_work_fn()
-worker_thread()			 ->__blk_mq_run_hw_queue()
-process_one_work()		  ->blk_mq_sched_dispatch_requests()
-__blk_release_queue()		    ->blk_mq_do_dispatch_sched()
-->__elevator_exit()
-  ->blk_mq_exit_sched()
-    ->exit_sched()
-      ->kfree()
-				       ->bfq_dispatch_request()
-				         ->spin_unlock_irq(&bfqd->lock)
-
-This is because of the kblockd delayed work that might got scheduled
-around blk_release_queue() and accessed use-after-free member of
-bfq_data.
-
-240.212359:   <2> Unable to handle kernel paging request at
-virtual address ffffffee2e33ad70
-...
-240.212637:   <2> Workqueue: kblockd blk_mq_run_work_fn
-240.212649:   <2> pstate: 00c00085 (nzcv daIf +PAN +UAO)
-240.212666:   <2> pc : queued_spin_lock_slowpath+0x10c/0x2e0
-240.212677:   <2> lr : queued_spin_lock_slowpath+0x84/0x2e0
-...
-Call trace:
-240.212865:   <2>  queued_spin_lock_slowpath+0x10c/0x2e0
-240.212876:   <2>  do_raw_spin_lock+0xf0/0xf4
-240.212890:   <2>  _raw_spin_lock_irq+0x74/0x94
-240.212906:   <2>  bfq_dispatch_request+0x4c/0xd60
-240.212918:   <2>  blk_mq_do_dispatch_sched+0xe0/0x1f0
-240.212927:   <2>  blk_mq_sched_dispatch_requests+0x130/0x194
-240.212940:   <2>  __blk_mq_run_hw_queue+0x100/0x158
-240.212950:   <2>  blk_mq_run_work_fn+0x1c/0x28
-240.212963:   <2>  process_one_work+0x280/0x460
-240.212973:   <2>  worker_thread+0x27c/0x4dc
-240.212986:   <2>  kthread+0x160/0x170
-
-Fix this by cancelling the delayed work if any before elevator exits.
-
-Changes since V2:
-- Retained the code logic and Reviewed-by signoff from V1 Patch
-  as per Ming comments.
-- Moved the new local variables into queue_is_mq() branch.
-- Removed 'cancel_delayed_work_sync' from blk_mq_hw_sysfs_release()
-
-Changes since V1:
-- Moved the logic into blk_cleanup_queue() as per Ming comments.
-
-Signed-off-by: Pradeep P V K <ppvk@codeaurora.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sysfs.c | 1 -
- block/blk-sysfs.c    | 8 ++++++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 06222939..24bc9cc 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -36,7 +36,6 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
- 	struct blk_mq_hw_ctx *hctx = container_of(kobj, struct blk_mq_hw_ctx,
- 						  kobj);
- 
--	cancel_delayed_work_sync(&hctx->run_work);
- 
- 	if (hctx->flags & BLK_MQ_F_BLOCKING)
- 		cleanup_srcu_struct(hctx->srcu);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 81722cd..73a2137 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -788,9 +788,13 @@ static void blk_release_queue(struct kobject *kobj)
- 
- 	blk_free_queue_stats(q->stats);
- 
--	if (queue_is_mq(q))
-+	if (queue_is_mq(q)) {
-+		struct blk_mq_hw_ctx *hctx;
-+		int i;
- 		cancel_delayed_work_sync(&q->requeue_work);
--
-+		queue_for_each_hw_ctx(q, hctx, i)
-+			cancel_delayed_work_sync(&hctx->run_work);
-+	}
- 	blk_exit_queue(q);
- 
- 	blk_queue_free_zone_bitmaps(q);
--- 
-2.7.4
-
+Acked-by: David Sterba <dsterba@suse.com>
