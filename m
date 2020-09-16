@@ -2,241 +2,228 @@ Return-Path: <SRS0=dDIv=CZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C97CC2D0E3
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 03:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDD6C43461
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 03:54:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 007C7221E5
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 03:54:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="khkMPzqB"
+	by mail.kernel.org (Postfix) with ESMTP id 36F69221E3
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 03:54:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600228463;
+	bh=gkyBV96JQe05ZTIpHO/yhCZume0/K4OfWBC+0QarbAE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=DJ7jZFU9a7vX/KlBR2DZ7i49IUcVEgPPdmqVOGYfFzoFotdWliwu/WitAPEm0fLWU
+	 Qes092azgGE+BMrdM9G969JzP+HoySuzPaympFUTAMJUoWqYaV91lxfFmOcpKH4027
+	 kiksivJmIPY1eUwqrgHkcneSIF+cRuJSACyy/pK0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726152AbgIPDyN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726136AbgIPDyN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 15 Sep 2020 23:54:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46838 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726134AbgIPDyH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+Received: from mail.kernel.org ([198.145.29.99]:50374 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726119AbgIPDyH (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Tue, 15 Sep 2020 23:54:07 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49473C06178A
-        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 20:54:07 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id g96so5353457otb.12
-        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 20:54:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ewL7YiyUTu91D6uwYAgYAQEEe0RdVJXS9Py9EiB4OJY=;
-        b=khkMPzqBl2YoARJNUZ1/oqNsz5wOstgp6fnfN7pZHuaEofGslZ0sZGCos39bhH5/YL
-         Qy1zMpLNquwbqdmaxj7DL3oYRpJ2WjWG4Nn5qDNMDomJM+bOcwC2ysScgUaPPtmgUkxH
-         3diZARKyf+CT0jJjtBWCXYXCFKOh+7GTAw2uObWgdtHfBW7iWynCZuaEUaNvkHv2+z/8
-         6EkMTVBO0ZCI1jI1PxdASY0JxevqkvY+XH8baxFsr99K1Wt48tjuycWJVq49xFInWUQW
-         Nrc7qBbTGWrq8RevKoNLjNcjGl+13nAea9YNfpUNxfQ/JHP5lC6QTxRc6CMapBNaj5hq
-         RbcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ewL7YiyUTu91D6uwYAgYAQEEe0RdVJXS9Py9EiB4OJY=;
-        b=dq9/fRoNBsx4ED/vXB/Of47kXv7f2e33kdt9ATAe4BbRWbR2qeSXKPtO52MWmbDx6U
-         ztHUyYS5EHUCOvFEPO6yg1WuYYvmS9NulKBmsSmSXdLt1hWrKoJDPl7A7m070eJ6UO18
-         ZHKus+V0PalZEy9x8qXcPDmtWuO9gwfzTh8TCy/OLzvogj+zsW5zNKrOqPN+ELcfnmrI
-         US8FjCWbO47jUREqmrD3Ux7/Db071cMHN6Jjk50NXwxHHBrusHMnvpZ9T8xt7gR1H4eC
-         o2JOmg3+b8iOyheXj8/tP3pJNkJhXlGEzjnHhk0odJXCYtZulRSuM18H38KjD72t0LIp
-         GTHA==
-X-Gm-Message-State: AOAM53229RnYdRbbVzZOnEqu0nijWqxpcwwd5T5GKT1nTn1aX9jPKOST
-        RuY4Gq2COQZiq4nVgY5DDrmHCcHJudbqAyry2jsRRQ==
-X-Google-Smtp-Source: ABdhPJxZd0RR0PZLGpqVoV4CPOA7BB6SF3WnFq1dvEd8jWtopskPWWySU9JLig0FPuPZYaGh3cZgxFsx/Iqs3zVQKi0=
-X-Received: by 2002:a05:6830:10c4:: with SMTP id z4mr14475449oto.263.1600228446425;
- Tue, 15 Sep 2020 20:54:06 -0700 (PDT)
+Received: from sol.attlocal.net (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7385A221E3;
+        Wed, 16 Sep 2020 03:54:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600228446;
+        bh=gkyBV96JQe05ZTIpHO/yhCZume0/K4OfWBC+0QarbAE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=nGT1plsjhxPd2lZmB1uTSE51w+k1bJWhkoFfS2OleyELN0/9eH71rWlWLsuxKWKRZ
+         1akoka6Z/z+KDjhf0Sc0mYu5K37oYvxyHm5bqHwCGSYPp94zNh7r3cx7TloNqhzHO8
+         /hdFMp52Wk5a68l6M1xb8qmUOb+tqH5F9Ypcelxo=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     dm-devel@redhat.com, Satya Tangirala <satyat@google.com>,
+        Miaohe Lin <linmiaohe@huawei.com>
+Subject: [PATCH v2 1/3] block: make bio_crypt_clone() able to fail
+Date:   Tue, 15 Sep 2020 20:53:13 -0700
+Message-Id: <20200916035315.34046-2-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200916035315.34046-1-ebiggers@kernel.org>
+References: <20200916035315.34046-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-References: <20200915130245.89585-1-zhuyinyin@bytedance.com>
- <e206f1b4-1f22-c3f5-21a6-cec498d9c830@kernel.dk> <0d66eabc-3b8b-2f84-05b7-981c2b6fe5dd@kernel.dk>
-In-Reply-To: <0d66eabc-3b8b-2f84-05b7-981c2b6fe5dd@kernel.dk>
-From:   =?UTF-8?B?5pyx5a+F5a+F?= <zhuyinyin@bytedance.com>
-Date:   Wed, 16 Sep 2020 11:53:55 +0800
-Message-ID: <CAMwFJjVrY+eygYbgQWeCyeavx_nyzc2nmJw8qah-Go2KNHHELw@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH] io_uring: fix the bug of child process
- can't do io task
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?B?5a6L54mn5pil?= <songmuchun@bytedance.com>,
-        duanxiongchun <duanxiongchun@bytedance.com>,
-        =?UTF-8?B?5pyx5a+F5a+F?= <zhuyinyin@bytedance.com>
-Content-Type: multipart/mixed; boundary="0000000000001c10f105af66384a"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---0000000000001c10f105af66384a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Eric Biggers <ebiggers@google.com>
 
-Dear Jens Axboe:
+bio_crypt_clone() assumes its gfp_mask argument always includes
+__GFP_DIRECT_RECLAIM, so that the mempool_alloc() will always succeed.
 
-  Thanks for your reply.  Yeah=EF=BC=8CMy approach indeed has a problem as =
-you
-said. Yours is obviously better than mine.
-But I think your approach is not perfect , still has a problem. Think
-that same case I mentioned before, when parent
-process Setup an io_uring instance with the flag of
-IORING_SETUP_SQPOLL, means the sqo_thread is created,
-and ctx->sqo_mm is assigned to the parent process's mm. Then the
-parent process forks a child process. Of course ,
-the child process inherits the fd of io_uring instance.
+However, bio_crypt_clone() might be called with GFP_ATOMIC via
+setup_clone() in drivers/md/dm-rq.c, or with GFP_NOWAIT via
+kcryptd_io_read() in drivers/md/dm-crypt.c.
 
-  Then the child process submits  an io task without ever context
-switching into kernel. So the sqo_thead even doesn't
-know whether the parent process has submit the io task or the child
-one,  it just use the ctx->sqo_mm as its mm,
-but ctx->sqo_mm is the parent process's, not child process's,  so the
-problem occurred again.
+Neither case is currently reachable with a bio that actually has an
+encryption context.  However, it's fragile to rely on this.  Just make
+bio_crypt_clone() able to fail, analogous to bio_integrity_clone().
 
-Two more things=EF=BC=9A
-  1=E3=80=81I think 5.9 also has this problem  -- "sqo_thread doesn't know =
-who
-has submit the io task, it will use wrong mm"
+Reported-by: Miaohe Lin <linmiaohe@huawei.com>
+Cc: Satya Tangirala <satyat@google.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ block/bio.c                | 20 +++++++++-----------
+ block/blk-crypto.c         |  5 ++++-
+ block/bounce.c             | 19 +++++++++----------
+ drivers/md/dm.c            |  7 ++++---
+ include/linux/blk-crypto.h | 20 ++++++++++++++++----
+ 5 files changed, 42 insertions(+), 29 deletions(-)
 
-  2=E3=80=81Attachment of this mail is the test application. If the child
-process exits quickly, the problem is occured.
+diff --git a/block/bio.c b/block/bio.c
+index a9931f23d9332..b42e046b12eb3 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -713,20 +713,18 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
+ 
+ 	__bio_clone_fast(b, bio);
+ 
+-	bio_crypt_clone(b, bio, gfp_mask);
++	if (bio_crypt_clone(b, bio, gfp_mask) < 0)
++		goto err_put;
+ 
+-	if (bio_integrity(bio)) {
+-		int ret;
+-
+-		ret = bio_integrity_clone(b, bio, gfp_mask);
+-
+-		if (ret < 0) {
+-			bio_put(b);
+-			return NULL;
+-		}
+-	}
++	if (bio_integrity(bio) &&
++	    bio_integrity_clone(b, bio, gfp_mask) < 0)
++		goto err_put;
+ 
+ 	return b;
++
++err_put:
++	bio_put(b);
++	return NULL;
+ }
+ EXPORT_SYMBOL(bio_clone_fast);
+ 
+diff --git a/block/blk-crypto.c b/block/blk-crypto.c
+index 2d5e60023b08b..a3f27a19067c9 100644
+--- a/block/blk-crypto.c
++++ b/block/blk-crypto.c
+@@ -95,10 +95,13 @@ void __bio_crypt_free_ctx(struct bio *bio)
+ 	bio->bi_crypt_context = NULL;
+ }
+ 
+-void __bio_crypt_clone(struct bio *dst, struct bio *src, gfp_t gfp_mask)
++int __bio_crypt_clone(struct bio *dst, struct bio *src, gfp_t gfp_mask)
+ {
+ 	dst->bi_crypt_context = mempool_alloc(bio_crypt_ctx_pool, gfp_mask);
++	if (!dst->bi_crypt_context)
++		return -ENOMEM;
+ 	*dst->bi_crypt_context = *src->bi_crypt_context;
++	return 0;
+ }
+ EXPORT_SYMBOL_GPL(__bio_crypt_clone);
+ 
+diff --git a/block/bounce.c b/block/bounce.c
+index 431be88a02405..162a6eee89996 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -267,22 +267,21 @@ static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,
+ 		break;
+ 	}
+ 
+-	bio_crypt_clone(bio, bio_src, gfp_mask);
++	if (bio_crypt_clone(bio, bio_src, gfp_mask) < 0)
++		goto err_put;
+ 
+-	if (bio_integrity(bio_src)) {
+-		int ret;
+-
+-		ret = bio_integrity_clone(bio, bio_src, gfp_mask);
+-		if (ret < 0) {
+-			bio_put(bio);
+-			return NULL;
+-		}
+-	}
++	if (bio_integrity(bio_src) &&
++	    bio_integrity_clone(bio, bio_src, gfp_mask) < 0)
++		goto err_put;
+ 
+ 	bio_clone_blkg_association(bio, bio_src);
+ 	blkcg_bio_issue_init(bio);
+ 
+ 	return bio;
++
++err_put:
++	bio_put(bio);
++	return NULL;
+ }
+ 
+ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 3dedd9cc4fb65..5487c3ff74b51 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1326,14 +1326,15 @@ static int clone_bio(struct dm_target_io *tio, struct bio *bio,
+ 		     sector_t sector, unsigned len)
+ {
+ 	struct bio *clone = &tio->clone;
++	int r;
+ 
+ 	__bio_clone_fast(clone, bio);
+ 
+-	bio_crypt_clone(clone, bio, GFP_NOIO);
++	r = bio_crypt_clone(clone, bio, GFP_NOIO);
++	if (r < 0)
++		return r;
+ 
+ 	if (bio_integrity(bio)) {
+-		int r;
+-
+ 		if (unlikely(!dm_target_has_integrity(tio->ti->type) &&
+ 			     !dm_target_passes_integrity(tio->ti->type))) {
+ 			DMWARN("%s: the target %s doesn't support integrity data.",
+diff --git a/include/linux/blk-crypto.h b/include/linux/blk-crypto.h
+index e82342907f2b1..69b24fe92cbf1 100644
+--- a/include/linux/blk-crypto.h
++++ b/include/linux/blk-crypto.h
+@@ -112,12 +112,24 @@ static inline bool bio_has_crypt_ctx(struct bio *bio)
+ 
+ #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
+ 
+-void __bio_crypt_clone(struct bio *dst, struct bio *src, gfp_t gfp_mask);
+-static inline void bio_crypt_clone(struct bio *dst, struct bio *src,
+-				   gfp_t gfp_mask)
++int __bio_crypt_clone(struct bio *dst, struct bio *src, gfp_t gfp_mask);
++/**
++ * bio_crypt_clone - clone bio encryption context
++ * @dst: destination bio
++ * @src: source bio
++ * @gfp_mask: memory allocation flags
++ *
++ * If @src has an encryption context, clone it to @dst.
++ *
++ * Return: 0 on success, -ENOMEM if out of memory.  -ENOMEM is only possible if
++ *	   @gfp_mask doesn't include %__GFP_DIRECT_RECLAIM.
++ */
++static inline int bio_crypt_clone(struct bio *dst, struct bio *src,
++				  gfp_t gfp_mask)
+ {
+ 	if (bio_has_crypt_ctx(src))
+-		__bio_crypt_clone(dst, src, gfp_mask);
++		return __bio_crypt_clone(dst, src, gfp_mask);
++	return 0;
+ }
+ 
+ #endif /* __LINUX_BLK_CRYPTO_H */
+-- 
+2.28.0
 
-
-On Tue, Sep 15, 2020 at 9:36 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 9/15/20 7:25 AM, Jens Axboe wrote:
-> > On 9/15/20 7:02 AM, Yinyin Zhu wrote:
-> >> when parent process setup a io_uring_instance, the ctx->sqo_mm was
-> >> assigned of parent process'mm. Then it fork a child
-> >> process. So the child process inherits the io_uring_instance fd from
-> >> parent process. Then the child process submit a io task to the io_urin=
-g
-> >> instance. The kworker will do the io task actually, and use
-> >> the ctx->sqo_mm as its mm, but this ctx->sqo_mm is parent process's mm=
-,
-> >> not the child process's mm. so child do the io task unsuccessfully. To
-> >> fix this bug, when a process submit a io task to the kworker, assign t=
-he
-> >> ctx->sqo_mm with this process's mm.
-> >
-> > Hmm, what's the test case for this? There's a 5.9 regression where we
-> > don't always grab the right context for certain linked cases, below
-> > is the fix. Does that fix your case?
->
-> Ah hang on, you're on the 5.4 code base... I think this is a better
-> approach. Any chance you can test it?
->
-> The problem with yours is that you can have multiple pending async
-> ones, and you can't just re-assign ctx->sqo_mm. That one should only
-> be used by the SQPOLL thread.
->
->
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 2a539b794f3b..e8a4b4ae7006 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -514,7 +514,7 @@ static inline void io_queue_async_work(struct io_ring=
-_ctx *ctx,
->                 }
->         }
->
-> -       req->task =3D current;
-> +       req->task =3D get_task_struct(current);
->
->         spin_lock_irqsave(&ctx->task_lock, flags);
->         list_add(&req->task_list, &ctx->task_list);
-> @@ -1832,6 +1832,7 @@ static void io_poll_complete_work(struct work_struc=
-t *work)
->         spin_unlock_irq(&ctx->completion_lock);
->
->         io_cqring_ev_posted(ctx);
-> +       put_task_struct(req->task);
->         io_put_req(req);
->  out:
->         revert_creds(old_cred);
-> @@ -2234,11 +2235,11 @@ static void io_sq_wq_submit_work(struct work_stru=
-ct *work)
->
->                 ret =3D 0;
->                 if (io_req_needs_user(req) && !cur_mm) {
-> -                       if (!mmget_not_zero(ctx->sqo_mm)) {
-> +                       if (!mmget_not_zero(req->task->mm)) {
->                                 ret =3D -EFAULT;
->                                 goto end_req;
->                         } else {
-> -                               cur_mm =3D ctx->sqo_mm;
-> +                               cur_mm =3D req->task->mm;
->                                 use_mm(cur_mm);
->                                 old_fs =3D get_fs();
->                                 set_fs(USER_DS);
-> @@ -2275,6 +2276,7 @@ static void io_sq_wq_submit_work(struct work_struct=
- *work)
->                 }
->
->                 /* drop submission reference */
-> +               put_task_struct(req->task);
->                 io_put_req(req);
->
->                 if (ret) {
->
-> --
-> Jens Axboe
->
-
---0000000000001c10f105af66384a
-Content-Type: text/plain; charset="US-ASCII"; name="test_fork.txt"
-Content-Disposition: attachment; filename="test_fork.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kf4ulgtv0>
-X-Attachment-Id: f_kf4ulgtv0
-
-LyogU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IE1JVCAqLwovKgogKiBTaW1wbGUgdGVzdCBjYXNl
-IHNob3dpbmcgdXNpbmcgc2VuZG1zZyBhbmQgcmVjdm1zZyB0aHJvdWdoIGlvX3VyaW5nCiAqLwoj
-aW5jbHVkZSA8c3RkaW8uaD4KI2luY2x1ZGUgPHN0ZGxpYi5oPgojaW5jbHVkZSA8c3RyaW5nLmg+
-CiNpbmNsdWRlIDx1bmlzdGQuaD4KI2luY2x1ZGUgPGVycm5vLmg+CiNpbmNsdWRlIDxhcnBhL2lu
-ZXQuaD4KI2luY2x1ZGUgPHN5cy90eXBlcy5oPgojaW5jbHVkZSA8c3lzL3NvY2tldC5oPgojaW5j
-bHVkZSA8cHRocmVhZC5oPgojaW5jbHVkZSAibGlidXJpbmcuaCIKc3RhdGljIGNvbnN0IGNoYXIg
-KnN0ciA9ICJUaGlzIGlzIGEgdGVzdCBvZiBzZW5kbXNnIGFuZCByZWN2bXNnIG92ZXIgaW9fdXJp
-bmchIjsKI2RlZmluZSBNQVhfTVNHIDEyOAojZGVmaW5lIFBPUlQgICAgMTAyMDAKI2RlZmluZSBI
-T1NUICAgICIxMjcuMC4wLjEiCgoKc3RhdGljIGludCByZWN2X3ByZXAoc3RydWN0IGlvX3VyaW5n
-ICpyaW5nLCBzdHJ1Y3QgaW92ZWMgKmlvdikKewogICAgc3RydWN0IHNvY2thZGRyX2luIHNhZGRy
-OwogICAgc3RydWN0IG1zZ2hkciBtc2c7CiAgICBzdHJ1Y3QgaW9fdXJpbmdfc3FlICpzcWUgPSBO
-VUxMOwogICAgaW50IHNvY2tmZCwgcmV0OwogICAgaW50IHZhbCA9IDE7CiAgICBtZW1zZXQoJnNh
-ZGRyLCAwLCBzaXplb2Yoc2FkZHIpKTsKICAgIHNhZGRyLnNpbl9mYW1pbHkgPSBBRl9JTkVUOwog
-ICAgc2FkZHIuc2luX2FkZHIuc19hZGRyID0gaHRvbmwoSU5BRERSX0FOWSk7CiAgICBzYWRkci5z
-aW5fcG9ydCA9IGh0b25zKFBPUlQpOwogICAgc29ja2ZkID0gc29ja2V0KEFGX0lORVQsIFNPQ0tf
-REdSQU0sIDApOwogICAgaWYgKHNvY2tmZCA8IDApIHsKICAgICAgICBwZXJyb3IoInNvY2tldCIp
-OwogICAgICAgIHJldHVybiAxOwogICAgfQogICAgdmFsID0gMTsKICAgIHNldHNvY2tvcHQoc29j
-a2ZkLCBTT0xfU09DS0VULCBTT19SRVVTRVBPUlQsICZ2YWwsIHNpemVvZih2YWwpKTsKICAgIHNl
-dHNvY2tvcHQoc29ja2ZkLCBTT0xfU09DS0VULCBTT19SRVVTRUFERFIsICZ2YWwsIHNpemVvZih2
-YWwpKTsKICAgIHJldCA9IGJpbmQoc29ja2ZkLCAoc3RydWN0IHNvY2thZGRyICopJnNhZGRyLCBz
-aXplb2Yoc2FkZHIpKTsKICAgIGlmIChyZXQgPCAwKSB7CiAgICAgICAgcGVycm9yKCJiaW5kIik7
-CiAgICAgICAgZ290byBlcnI7CiAgICB9CiAgICBtZW1zZXQoJm1zZywgMCwgc2l6ZW9mKG1zZykp
-OwogICAgICAgIG1zZy5tc2dfbmFtZWxlbiA9IHNpemVvZihzdHJ1Y3Qgc29ja2FkZHJfaW4pOwog
-ICAgbXNnLm1zZ19pb3YgPSBpb3Y7CiAgICBtc2cubXNnX2lvdmxlbiA9IDE7CiAgICBzcWUgPSBp
-b191cmluZ19nZXRfc3FlKHJpbmcpOwogICAgaWYgKCFzcWUpCgkgICAgcHJpbnRmKCJzcWUgaXMg
-bnVsbCBcclxuIik7CiAgICBpb191cmluZ19wcmVwX3JlY3Ztc2coc3FlLCBzb2NrZmQsICZtc2cs
-IDApOwoKICAgIHJldCA9IGlvX3VyaW5nX3N1Ym1pdF9hbmRfd2FpdChyaW5nLCAxKTsKICAgIGlm
-IChyZXQgPD0gMCkgewogICAgICAgIHByaW50Zigic3VibWl0IGZhaWxlZDogJWRcbiIsIHJldCk7
-CiAgICAgICAgZ290byBlcnI7CiAgICB9CiAgICBwcmludGYoInJldCBpcyAlZFxyXG4iLCByZXQp
-OwogICAgY2xvc2Uoc29ja2ZkKTsKICAgIHJldHVybiAwOwplcnI6CiAgICBjbG9zZShzb2NrZmQp
-OwogICAgcmV0dXJuIDE7Cn0KCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCnsKICAg
-IHBpZF90IHA7CiAgICBjaGFyIGJ1ZltNQVhfTVNHICsgMV07CiAgICBzdHJ1Y3QgaW92ZWMgaW92
-ID0gewogICAgICAgIC5pb3ZfYmFzZSA9IGJ1ZiwKICAgICAgICAuaW92X2xlbiA9IHNpemVvZihi
-dWYpIC0gMSwKICAgIH07CiAgICBzdHJ1Y3QgaW9fdXJpbmdfc3FlICpzcWU7CiAgICBzdHJ1Y3Qg
-aW9fdXJpbmdfY3FlICpjcWU7CiAgICBzdHJ1Y3QgaW9fdXJpbmcgcmluZzsKICAgIGludCByZXQ7
-CiAgICByZXQgPSBpb191cmluZ19xdWV1ZV9pbml0KDEsICZyaW5nLCAwKTsKICAgIGlmIChyZXQp
-IHsKICAgICAgICBwcmludGYoInF1ZXVlIGluaXQgZmFpbGVkOiAlZFxuIiwgcmV0KTsKICAgICAg
-ICByZXR1cm4gMDsKICAgIH0KCiAgICBwID0gZm9yaygpOwogICAgc3dpdGNoIChwKSB7CiAgICBj
-YXNlIC0xOgogICAgICAgIHBlcnJvcigiZm9yayIpOwogICAgICAgIGV4aXQoMik7CiAgICBjYXNl
-IDA6IHsvL2NoaWxkCiAgICAgICAgcmVjdl9wcmVwKCZyaW5nLCAmaW92KTsKICAgICAgICAvL3Ns
-ZWVwKDUwMDAwMCk7CglicmVhazsKICAgICAgICB9CiAgICBkZWZhdWx0OgoJcHJpbnRmKCJwaWQ6
-ICVkXG4iLCBwKTsKCS8vcmVjdl9wcmVwKCZyaW5nLCAmaW92KTsKICAgICAgICBzbGVlcCg1MDAw
-MCk7CiAgICAgICAgcmV0dXJuIDA7CgogICAgfQp9Cg==
---0000000000001c10f105af66384a--
