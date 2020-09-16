@@ -2,165 +2,154 @@ Return-Path: <SRS0=dDIv=CZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EA5C43461
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 00:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC69C433E2
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 01:08:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D08C320715
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 00:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC565207DE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 01:08:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="slc8Bflm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GxIXbvHT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726069AbgIPA7B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Sep 2020 20:59:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726068AbgIPA7A (ORCPT
+        id S1726130AbgIPBIl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Sep 2020 21:08:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35151 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726039AbgIPBIj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Sep 2020 20:59:00 -0400
-Received: from mail-yb1-xb44.google.com (mail-yb1-xb44.google.com [IPv6:2607:f8b0:4864:20::b44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34DAAC06174A
-        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 17:59:00 -0700 (PDT)
-Received: by mail-yb1-xb44.google.com with SMTP id v60so4075989ybi.10
-        for <linux-block@vger.kernel.org>; Tue, 15 Sep 2020 17:59:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+GumsKctWdK1GViBxPek+KPM/MIvDLDzdzrfgCE5hWs=;
-        b=slc8Bflm37ZjTIx0pABw+CTUSsp9Y4BZuheSgEBbtB9DbkR+fIiIxcKCC93tvruDyb
-         ZYq7zmdAym1mO/Bvmo3nPGbDfveRM1q088ke1nHp/lyYFDwls0uEjXmbV+YxfwH3XaEY
-         K5kT+CIP7q6/93oIWXuBnb8/WxmGIc7nr2U9nhoqYRs++D2VfOml86tCQOYCHZatGphm
-         WqKQ4wJ2ytXP5JYe0u6SYnJt90CDF3w7XKwCZIY80u79Xruxjo0dj3dl1trHOdxvjQQ2
-         5syodf64br1duI4wF0ZEJyJUAJ9hN2P5hl52nPWb8TRtT1IgyQSU/uN1BoriEdWE6uRk
-         7naA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+GumsKctWdK1GViBxPek+KPM/MIvDLDzdzrfgCE5hWs=;
-        b=ZboZ9fMxfdNzM9j/kU10eZB5wVz+UB+dQM+pERIbKxxcW1EPw4iBYMZhP/QuTpC+bx
-         ViBaTevJCDu5p9SEyBJF60H/O8THwlev7YoPh1X2jrCCC5x96UVSDcfDUI2a9sFpnlAC
-         0XaEj9kCd3BRxbHYst0e2+EwWyTYKg1TrSerSesqZIoP5bBXA5C/yqFUOlE6iADts05B
-         KW/r9dKg3y51ljG/5lAlj1I7VzeFuKTXzar/9bprW+UKwCgL4Evkb/cZULk1sEPY7wNl
-         OfLukt+B/V7OWQR7qBRxOsdD337NdEKTb8vKvp6I42iq6ApCpHCapfmmSX56TZ2rnmll
-         /gPw==
-X-Gm-Message-State: AOAM530N6pJX61MXn4aCI4BxqjAPtQpJsxnplPD2qbiZNftqO9GMwLYA
-        MVppoKNvoqupijC18b2bnwm7vVv0iNvsNqGnlIM=
-X-Google-Smtp-Source: ABdhPJzerd/Exq95HwbFI6kX4dwKcMhD0viojBdSwj7wIjIfdbGbNlLCuP3F2tIs36M2Eoz8lLD5Jll/BNzX76BQEFg=
-X-Received: by 2002:a5b:287:: with SMTP id x7mr31350023ybl.144.1600217939536;
- Tue, 15 Sep 2020 17:58:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <1600092759-17779-1-git-send-email-ppvk@codeaurora.org>
-In-Reply-To: <1600092759-17779-1-git-send-email-ppvk@codeaurora.org>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Wed, 16 Sep 2020 08:58:48 +0800
-Message-ID: <CACVXFVMiyEs_4nReSQvupih58LU9++C-APYcfmRQarr6bUZgxA@mail.gmail.com>
-Subject: Re: [PATCH V1] block: Fix use-after-free issue while accessing
- ioscheduler lock
-To:     Pradeep P V K <ppvk@codeaurora.org>
+        Tue, 15 Sep 2020 21:08:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600218517;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=URc34NYXSy405fZU2twwSDaX3QMOE0h+Hi5zs6IuztA=;
+        b=GxIXbvHTiEi7lQjgoJfQ/ChkGWBtg39+TOfPcsx2pzJnjh/39YjWT3gjwF059ugu1v7PUp
+        KzQYlgJFJbz8AVo80AyQNTujoxtfvk7h9dHrlkn5UgWXLcI6vjjiKCSxrEZsmDCyhGn3F1
+        OQgseo5BdpknsLFHhTqguypsm/N738o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-xSuLBh47PT6iZkRN8gB1GA-1; Tue, 15 Sep 2020 21:08:35 -0400
+X-MC-Unique: xSuLBh47PT6iZkRN8gB1GA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CEA9100746C;
+        Wed, 16 Sep 2020 01:08:34 +0000 (UTC)
+Received: from T590 (ovpn-12-18.pek2.redhat.com [10.72.12.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EC775FC36;
+        Wed, 16 Sep 2020 01:08:21 +0000 (UTC)
+Date:   Wed, 16 Sep 2020 09:08:17 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        stummala@codeaurora.org, sayalil@codeaurora.org
-Content-Type: text/plain; charset="UTF-8"
+        Vijayendra Suman <vijayendra.suman@oracle.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] dm: unconditionally call blk_queue_split() in
+ dm_process_bio()
+Message-ID: <20200916010817.GB791425@T590>
+References: <20200915172357.83215-1-snitzer@redhat.com>
+ <20200915172357.83215-5-snitzer@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200915172357.83215-5-snitzer@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 14, 2020 at 10:14 PM Pradeep P V K <ppvk@codeaurora.org> wrote:
->
-> Observes below crash while accessing (use-after-free) lock member
-> of bfq data.
->
-> context#1                       context#2
->                                 process_one_work()
-> kthread()                       blk_mq_run_work_fn()
-> worker_thread()                  ->__blk_mq_run_hw_queue()
-> process_one_work()                ->blk_mq_sched_dispatch_requests()
-> __blk_release_queue()               ->blk_mq_do_dispatch_sched()
-> ->__elevator_exit()
->   ->blk_mq_exit_sched()
->     ->exit_sched()
->       ->kfree()
->                                        ->bfq_dispatch_request()
->                                          ->spin_unlock_irq(&bfqd->lock)
->
-> This is because of the kblockd delayed work that might got scheduled
-> around blk_release_queue() and accessed use-after-free member of
-> bfq_data.
->
-> 240.212359:   <2> Unable to handle kernel paging request at
-> virtual address ffffffee2e33ad70
-> ...
-> 240.212637:   <2> Workqueue: kblockd blk_mq_run_work_fn
-> 240.212649:   <2> pstate: 00c00085 (nzcv daIf +PAN +UAO)
-> 240.212666:   <2> pc : queued_spin_lock_slowpath+0x10c/0x2e0
-> 240.212677:   <2> lr : queued_spin_lock_slowpath+0x84/0x2e0
-> ...
-> Call trace:
-> 240.212865:   <2>  queued_spin_lock_slowpath+0x10c/0x2e0
-> 240.212876:   <2>  do_raw_spin_lock+0xf0/0xf4
-> 240.212890:   <2>  _raw_spin_lock_irq+0x74/0x94
-> 240.212906:   <2>  bfq_dispatch_request+0x4c/0xd60
-> 240.212918:   <2>  blk_mq_do_dispatch_sched+0xe0/0x1f0
-> 240.212927:   <2>  blk_mq_sched_dispatch_requests+0x130/0x194
-> 240.212940:   <2>  __blk_mq_run_hw_queue+0x100/0x158
-> 240.212950:   <2>  blk_mq_run_work_fn+0x1c/0x28
-> 240.212963:   <2>  process_one_work+0x280/0x460
-> 240.212973:   <2>  worker_thread+0x27c/0x4dc
-> 240.212986:   <2>  kthread+0x160/0x170
->
-> Fix this by cancelling the delayed work if any before elevator exits.
->
-> Signed-off-by: Pradeep P V K <ppvk@codeaurora.org>
+On Tue, Sep 15, 2020 at 01:23:57PM -0400, Mike Snitzer wrote:
+> blk_queue_split() has become compulsory from .submit_bio -- regardless
+> of whether it is recursing.  Update DM core to always call
+> blk_queue_split().
+> 
+> dm_queue_split() is removed because __split_and_process_bio() handles
+> splitting as needed.
+> 
+> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 > ---
->  block/blk-sysfs.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 81722cd..e4a9aac 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -779,6 +779,8 @@ static void blk_release_queue(struct kobject *kobj)
->  {
->         struct request_queue *q =
->                 container_of(kobj, struct request_queue, kobj);
-> +       struct blk_mq_hw_ctx *hctx;
-> +       int i;
-
-Please move the above two lines to the branch of 'if (queue_is_mq(q)) '.
-
->
->         might_sleep();
->
-> @@ -788,9 +790,11 @@ static void blk_release_queue(struct kobject *kobj)
->
->         blk_free_queue_stats(q->stats);
->
-> -       if (queue_is_mq(q))
-> +       if (queue_is_mq(q)) {
->                 cancel_delayed_work_sync(&q->requeue_work);
+>  drivers/md/dm.c | 45 +--------------------------------------------
+>  1 file changed, 1 insertion(+), 44 deletions(-)
+> 
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index fb0255d25e4b..0bae9f26dc8e 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -1530,22 +1530,6 @@ static int __send_write_zeroes(struct clone_info *ci, struct dm_target *ti)
+>  	return __send_changing_extent_only(ci, ti, get_num_write_zeroes_bios(ti));
+>  }
+>  
+> -static bool is_abnormal_io(struct bio *bio)
+> -{
+> -	bool r = false;
 > -
-> +               queue_for_each_hw_ctx(q, hctx, i)
-> +                       cancel_delayed_work_sync(&hctx->run_work);
-> +       }
+> -	switch (bio_op(bio)) {
+> -	case REQ_OP_DISCARD:
+> -	case REQ_OP_SECURE_ERASE:
+> -	case REQ_OP_WRITE_SAME:
+> -	case REQ_OP_WRITE_ZEROES:
+> -		r = true;
+> -		break;
+> -	}
+> -
+> -	return r;
+> -}
+> -
+>  static bool __process_abnormal_io(struct clone_info *ci, struct dm_target *ti,
+>  				  int *result)
+>  {
+> @@ -1723,23 +1707,6 @@ static blk_qc_t __process_bio(struct mapped_device *md, struct dm_table *map,
+>  	return ret;
+>  }
+>  
+> -static void dm_queue_split(struct mapped_device *md, struct dm_target *ti, struct bio **bio)
+> -{
+> -	unsigned len, sector_count;
+> -
+> -	sector_count = bio_sectors(*bio);
+> -	len = min_t(sector_t, max_io_len((*bio)->bi_iter.bi_sector, ti), sector_count);
+> -
+> -	if (sector_count > len) {
+> -		struct bio *split = bio_split(*bio, len, GFP_NOIO, &md->queue->bio_split);
+> -
+> -		bio_chain(split, *bio);
+> -		trace_block_split(md->queue, split, (*bio)->bi_iter.bi_sector);
+> -		submit_bio_noacct(*bio);
+> -		*bio = split;
+> -	}
+> -}
+> -
+>  static blk_qc_t dm_process_bio(struct mapped_device *md,
+>  			       struct dm_table *map, struct bio *bio)
+>  {
+> @@ -1759,17 +1726,7 @@ static blk_qc_t dm_process_bio(struct mapped_device *md,
+>  		}
+>  	}
+>  
+> -	/*
+> -	 * If in ->queue_bio we need to use blk_queue_split(), otherwise
+> -	 * queue_limits for abnormal requests (e.g. discard, writesame, etc)
+> -	 * won't be imposed.
+> -	 */
+> -	if (current->bio_list) {
+> -		if (is_abnormal_io(bio))
+> -			blk_queue_split(&bio);
+> -		else
+> -			dm_queue_split(md, ti, &bio);
+> -	}
+> +	blk_queue_split(&bio);
 
-Now the 'cancel_delayed_work_sync' from blk_mq_hw_sysfs_release() can
-be killed meantime.
+In max_io_len(), target boundary is taken into account when figuring out
+the max io len. However, this info won't be used any more after
+switching to blk_queue_split(). Is that one potential problem?
 
-We have to call cancel_delayed_work_sync when reqeuest queue's
-refcount drops to zero, otherwise
-new run queue may be started somewhere, so feel free to add the
-reviewed-by after the above two
-comments are addressed.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+thanks,
+Ming
 
-Thanks,
-Ming Lei
