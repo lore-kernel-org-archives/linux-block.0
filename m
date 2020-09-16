@@ -2,210 +2,136 @@ Return-Path: <SRS0=dDIv=CZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 528A2C433E2
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 07:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A726AC433E2
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 08:23:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA15B2083B
-	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 07:51:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gVXGzrKV"
+	by mail.kernel.org (Postfix) with ESMTP id 6869A21974
+	for <linux-block@archiver.kernel.org>; Wed, 16 Sep 2020 08:23:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbgIPHv1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Sep 2020 03:51:27 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28743 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726189AbgIPHv0 (ORCPT
+        id S1726161AbgIPIXv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Sep 2020 04:23:51 -0400
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:38139 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726149AbgIPIXu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Sep 2020 03:51:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600242684;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UFi2B0KaLkABCKLDXpUvKh4Fn/AsBr0crMD5xGUWakU=;
-        b=gVXGzrKVnMwgBykwrug9lJXuFt+LrI6LGl7Zb91DXTjd8FmBElKWG/AhmcH8QcohZ2Fh2B
-        sHEs5cGpT+XkU6Im9wcwK8iumyuIm45qYgh/p+RSQHwh9EkhjSV8wpZxYYAOK6WYTfTwpL
-        1qHfMf2bxMRyJyuahNb6Zzr8xfXE74Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-552-7k9A5DHwOWmd3aWkTbpUsw-1; Wed, 16 Sep 2020 03:51:20 -0400
-X-MC-Unique: 7k9A5DHwOWmd3aWkTbpUsw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28E268015FD;
-        Wed, 16 Sep 2020 07:51:19 +0000 (UTC)
-Received: from T590 (ovpn-12-18.pek2.redhat.com [10.72.12.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C53F767CFF;
-        Wed, 16 Sep 2020 07:51:06 +0000 (UTC)
-Date:   Wed, 16 Sep 2020 15:51:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Vijayendra Suman <vijayendra.suman@oracle.com>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] dm: unconditionally call blk_queue_split() in
- dm_process_bio()
-Message-ID: <20200916075102.GD791425@T590>
-References: <20200915172357.83215-1-snitzer@redhat.com>
- <20200915172357.83215-5-snitzer@redhat.com>
- <20200916010817.GB791425@T590>
- <20200916012813.GA23236@redhat.com>
- <20200916014802.GC791425@T590>
- <20200916033946.GB23236@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200916033946.GB23236@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        Wed, 16 Sep 2020 04:23:50 -0400
+Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
+  by alexa-out.qualcomm.com with ESMTP; 16 Sep 2020 01:23:50 -0700
+Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
+  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 16 Sep 2020 01:23:48 -0700
+Received: from hydcbspbld03.qualcomm.com ([10.242.221.48])
+  by ironmsg01-blr.qualcomm.com with ESMTP; 16 Sep 2020 13:53:35 +0530
+Received: by hydcbspbld03.qualcomm.com (Postfix, from userid 2304101)
+        id 2E9F220EAA; Wed, 16 Sep 2020 13:53:34 +0530 (IST)
+From:   Pradeep P V K <ppvk@codeaurora.org>
+To:     axboe@kernel.dk, ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, stummala@codeaurora.org,
+        sayalil@codeaurora.org, Pradeep P V K <ppvk@codeaurora.org>
+Subject: [PATCH V3] block: Fix use-after-free issue while accessing ioscheduler lock
+Date:   Wed, 16 Sep 2020 13:53:31 +0530
+Message-Id: <1600244611-55554-1-git-send-email-ppvk@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 15, 2020 at 11:39:46PM -0400, Mike Snitzer wrote:
-> On Tue, Sep 15 2020 at  9:48pm -0400,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > On Tue, Sep 15, 2020 at 09:28:14PM -0400, Mike Snitzer wrote:
-> > > On Tue, Sep 15 2020 at  9:08pm -0400,
-> > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > 
-> > > > On Tue, Sep 15, 2020 at 01:23:57PM -0400, Mike Snitzer wrote:
-> > > > > blk_queue_split() has become compulsory from .submit_bio -- regardless
-> > > > > of whether it is recursing.  Update DM core to always call
-> > > > > blk_queue_split().
-> > > > > 
-> > > > > dm_queue_split() is removed because __split_and_process_bio() handles
-> > > > > splitting as needed.
-> > > > > 
-> > > > > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> > > > > ---
-> > > > >  drivers/md/dm.c | 45 +--------------------------------------------
-> > > > >  1 file changed, 1 insertion(+), 44 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > > > > index fb0255d25e4b..0bae9f26dc8e 100644
-> > > > > --- a/drivers/md/dm.c
-> > > > > +++ b/drivers/md/dm.c
-> > > > > @@ -1530,22 +1530,6 @@ static int __send_write_zeroes(struct clone_info *ci, struct dm_target *ti)
-> > > > >  	return __send_changing_extent_only(ci, ti, get_num_write_zeroes_bios(ti));
-> > > > >  }
-> > > > >  
-> > > > > -static bool is_abnormal_io(struct bio *bio)
-> > > > > -{
-> > > > > -	bool r = false;
-> > > > > -
-> > > > > -	switch (bio_op(bio)) {
-> > > > > -	case REQ_OP_DISCARD:
-> > > > > -	case REQ_OP_SECURE_ERASE:
-> > > > > -	case REQ_OP_WRITE_SAME:
-> > > > > -	case REQ_OP_WRITE_ZEROES:
-> > > > > -		r = true;
-> > > > > -		break;
-> > > > > -	}
-> > > > > -
-> > > > > -	return r;
-> > > > > -}
-> > > > > -
-> > > > >  static bool __process_abnormal_io(struct clone_info *ci, struct dm_target *ti,
-> > > > >  				  int *result)
-> > > > >  {
-> > > > > @@ -1723,23 +1707,6 @@ static blk_qc_t __process_bio(struct mapped_device *md, struct dm_table *map,
-> > > > >  	return ret;
-> > > > >  }
-> > > > >  
-> > > > > -static void dm_queue_split(struct mapped_device *md, struct dm_target *ti, struct bio **bio)
-> > > > > -{
-> > > > > -	unsigned len, sector_count;
-> > > > > -
-> > > > > -	sector_count = bio_sectors(*bio);
-> > > > > -	len = min_t(sector_t, max_io_len((*bio)->bi_iter.bi_sector, ti), sector_count);
-> > > > > -
-> > > > > -	if (sector_count > len) {
-> > > > > -		struct bio *split = bio_split(*bio, len, GFP_NOIO, &md->queue->bio_split);
-> > > > > -
-> > > > > -		bio_chain(split, *bio);
-> > > > > -		trace_block_split(md->queue, split, (*bio)->bi_iter.bi_sector);
-> > > > > -		submit_bio_noacct(*bio);
-> > > > > -		*bio = split;
-> > > > > -	}
-> > > > > -}
-> > > > > -
-> > > > >  static blk_qc_t dm_process_bio(struct mapped_device *md,
-> > > > >  			       struct dm_table *map, struct bio *bio)
-> > > > >  {
-> > > > > @@ -1759,17 +1726,7 @@ static blk_qc_t dm_process_bio(struct mapped_device *md,
-> > > > >  		}
-> > > > >  	}
-> > > > >  
-> > > > > -	/*
-> > > > > -	 * If in ->queue_bio we need to use blk_queue_split(), otherwise
-> > > > > -	 * queue_limits for abnormal requests (e.g. discard, writesame, etc)
-> > > > > -	 * won't be imposed.
-> > > > > -	 */
-> > > > > -	if (current->bio_list) {
-> > > > > -		if (is_abnormal_io(bio))
-> > > > > -			blk_queue_split(&bio);
-> > > > > -		else
-> > > > > -			dm_queue_split(md, ti, &bio);
-> > > > > -	}
-> > > > > +	blk_queue_split(&bio);
-> > > > 
-> > > > In max_io_len(), target boundary is taken into account when figuring out
-> > > > the max io len. However, this info won't be used any more after
-> > > > switching to blk_queue_split(). Is that one potential problem?
-> > > 
-> > > Thanks for your review.  But no, as the patch header says:
-> > > "dm_queue_split() is removed because __split_and_process_bio() handles
-> > > splitting as needed."
-> > > 
-> > > (__split_and_process_non_flush calls max_io_len, as does
-> > > __process_abnormal_io by calling __send_changing_extent_only)
-> > > 
-> > > SO the blk_queue_split() bio will be further split if needed (due to
-> > > DM target boundary, etc).
-> > 
-> > Thanks for your explanation.
-> > 
-> > Then looks there is double split issue since both blk_queue_split()
-> > and __split_and_process_non_flush() may split bio from same bioset(md->queue->bio_split),
-> > and this way may cause deadlock, see comment of bio_alloc_bioset(), especially
-> > the paragraph of 'callers must never allocate more than 1 bio at a time
-> > from this pool.'
-> 
-> Next sentence is:
-> "Callers that need to allocate more than 1 bio must always submit the
-> previously allocated bio for IO before attempting to allocate a new
-> one."
+Observes below crash while accessing (use-after-free) lock member
+of bfq data.
 
-Yeah, I know that. This sentence actually means that the previous
-submission should make forward progress, then the bio may be completed &
-freed, so that new allocation can move on.
+context#1			context#2
+				process_one_work()
+kthread()			blk_mq_run_work_fn()
+worker_thread()			 ->__blk_mq_run_hw_queue()
+process_one_work()		  ->blk_mq_sched_dispatch_requests()
+__blk_release_queue()		    ->blk_mq_do_dispatch_sched()
+->__elevator_exit()
+  ->blk_mq_exit_sched()
+    ->exit_sched()
+      ->kfree()
+				       ->bfq_dispatch_request()
+				         ->spin_unlock_irq(&bfqd->lock)
 
-However, in this situation, __split_and_process_non_flush() doesn't
-provide such forward progress, see below.
+This is because of the kblockd delayed work that might got scheduled
+around blk_release_queue() and accessed use-after-free member of
+bfq_data.
 
-> 
-> __split_and_process_non_flush -> __map_bio -> submit_bio_noacct
-> bio_split
-> submit_bio_noacct
+240.212359:   <2> Unable to handle kernel paging request at
+virtual address ffffffee2e33ad70
+...
+240.212637:   <2> Workqueue: kblockd blk_mq_run_work_fn
+240.212649:   <2> pstate: 00c00085 (nzcv daIf +PAN +UAO)
+240.212666:   <2> pc : queued_spin_lock_slowpath+0x10c/0x2e0
+240.212677:   <2> lr : queued_spin_lock_slowpath+0x84/0x2e0
+...
+Call trace:
+240.212865:   <2>  queued_spin_lock_slowpath+0x10c/0x2e0
+240.212876:   <2>  do_raw_spin_lock+0xf0/0xf4
+240.212890:   <2>  _raw_spin_lock_irq+0x74/0x94
+240.212906:   <2>  bfq_dispatch_request+0x4c/0xd60
+240.212918:   <2>  blk_mq_do_dispatch_sched+0xe0/0x1f0
+240.212927:   <2>  blk_mq_sched_dispatch_requests+0x130/0x194
+240.212940:   <2>  __blk_mq_run_hw_queue+0x100/0x158
+240.212950:   <2>  blk_mq_run_work_fn+0x1c/0x28
+240.212963:   <2>  process_one_work+0x280/0x460
+240.212973:   <2>  worker_thread+0x27c/0x4dc
+240.212986:   <2>  kthread+0x160/0x170
 
-Yeah, the above submission is done on clone bio & underlying queue. What
-matters is if the submission can make forward progress. After
-__split_and_process_non_flush() returns, the splitted 'bio'(original bio)
-can't be done by previous submission because this bio won't be freed until
-dec_pending() from __split_and_process_bio() returns.
+Fix this by cancelling the delayed work if any before elevator exits.
 
-So when ci.sector_count doesn't become zero, bio_split() is called again from
-the same bio_set for allocating new bio, the allocation may never be made because
-the original bio allocated from the same bio_set can't be freed during bio_split().
+Changes since V2:
+- Retained the code logic and Reviewed-by signoff from V1 Patch
+  as per Ming comments.
+- Moved the new local variables into queue_is_mq() branch.
+- Removed 'cancel_delayed_work_sync' from blk_mq_hw_sysfs_release()
 
-Thanks, 
-Ming
+Changes since V1:
+- Moved the logic into blk_cleanup_queue() as per Ming comments.
+
+Signed-off-by: Pradeep P V K <ppvk@codeaurora.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sysfs.c | 1 -
+ block/blk-sysfs.c    | 8 ++++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 06222939..24bc9cc 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -36,7 +36,6 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
+ 	struct blk_mq_hw_ctx *hctx = container_of(kobj, struct blk_mq_hw_ctx,
+ 						  kobj);
+ 
+-	cancel_delayed_work_sync(&hctx->run_work);
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+ 		cleanup_srcu_struct(hctx->srcu);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 81722cd..73a2137 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -788,9 +788,13 @@ static void blk_release_queue(struct kobject *kobj)
+ 
+ 	blk_free_queue_stats(q->stats);
+ 
+-	if (queue_is_mq(q))
++	if (queue_is_mq(q)) {
++		struct blk_mq_hw_ctx *hctx;
++		int i;
+ 		cancel_delayed_work_sync(&q->requeue_work);
+-
++		queue_for_each_hw_ctx(q, hctx, i)
++			cancel_delayed_work_sync(&hctx->run_work);
++	}
+ 	blk_exit_queue(q);
+ 
+ 	blk_queue_free_zone_bitmaps(q);
+-- 
+2.7.4
 
