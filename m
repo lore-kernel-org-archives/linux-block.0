@@ -2,91 +2,98 @@ Return-Path: <SRS0=JXuJ=C2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82CDFC433E2
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 18:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B225C433E2
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 18:09:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E44921D92
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 18:06:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29DCE21D92
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 18:09:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sNvZ85ZJ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Gm/aiQSY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726358AbgIQSGX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 14:06:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60396 "EHLO
+        id S1726411AbgIQSJk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 14:09:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726473AbgIQRjQ (ORCPT
+        with ESMTP id S1726481AbgIQRa6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 13:39:16 -0400
+        Thu, 17 Sep 2020 13:30:58 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25AABC061788
-        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2020 10:39:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE849C06174A;
+        Thu, 17 Sep 2020 10:28:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=cVjYCdQq6oWYwx7BQKEnoBv/QOUczwpDqncGM7xXaZo=; b=sNvZ85ZJgoDRaVw19sn7RIawZi
-        mmwlFqyBej05oqFFfOQUralWYX3+8PuNo6+2nKM5j7mGOU/0zw88zoVDfzcuGC3QuHV4YquTT19kU
-        uMzEtoCjD7eTvXX57aG5PSQ3ANQcLmYshkOoS2MtdwDqPQNq9VxvPqI23riUZTvmBw+K8AOvbcAUm
-        FPXzsXjKRYDfye0ym08rmDzb2ZIiJAAvRNChQmj0GZRYSTOzOGlPcs6eC4WGe4NXFw/L9SZk6XB5i
-        rnelzRxTOuRj+eHpnzCi4OvzTHbnW5bSUDl7fVTcLRFfpEjE1VB2dr+YiMmOIADfXPNFoXrGkhJ0z
-        Qakz6frQ==;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=Vy+i14rdw+4hEhmBKTGutehzr8kV3l2y359HNYmPy6s=; b=Gm/aiQSY8U+jiHppzEQUoEzwep
+        cqGvY+jq384xbJGVBnfbwko8D5JZ0BGFns3s46sJKWmlyvr6Rprp6SB2EJM4tA5ZWwGgXjtq63029
+        6fca9dZX058BRWvIB7FVHM7gYriRdj93U6YriX8r4ysa1mBIe4YAaix4s1MqxQOLS42Oh2oGaQFEH
+        l/uG3rNoPBAWon9nPGtcQpTAFKhd3wMIPRsfkZGuARLiy2dYO81b/IGG1NmtVn1x1xE8tIT2y9NUm
+        dqXKBMMk9FcsMdibx/rdw78P0a5PJ/TlNM8r+Vr1v1L7claUCM+evzRzabhvPxLbjhmoPgUKFwgyF
+        nVKxc99Q==;
 Received: from 089144214092.atnat0023.highway.a1.net ([89.144.214.92] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kIxsA-0003Bm-C5; Thu, 17 Sep 2020 17:39:06 +0000
-Date:   Thu, 17 Sep 2020 19:36:54 +0200
-From:   Christoph Hellwig <hch@infradead.org>
+        id 1kIxhM-0002QQ-Le; Thu, 17 Sep 2020 17:27:56 +0000
+From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [GIT PULL] nvme fixes for 5.9
-Message-ID: <20200917173654.GA3311729@infradead.org>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        linux-pm@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 13/14] PM: mm: cleanup swsusp_swap_check
+Date:   Thu, 17 Sep 2020 18:57:19 +0200
+Message-Id: <20200917165720.3285256-14-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200917165720.3285256-1-hch@lst.de>
+References: <20200917165720.3285256-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 709192d531e5b0a91f20aa14abfe2fc27ddd47af:
+Use blkdev_get_by_dev instead of bdget + blkdev_get.
 
-  s390/dasd: Fix zero write for FBA devices (2020-09-14 19:40:21 -0600)
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ kernel/power/swap.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-are available in the Git repository at:
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index 9d3ffbfe08dbf6..71385bedcc3a49 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -343,12 +343,10 @@ static int swsusp_swap_check(void)
+ 		return res;
+ 	root_swap = res;
+ 
+-	hib_resume_bdev = bdget(swsusp_resume_device);
+-	if (!hib_resume_bdev)
+-		return -ENOMEM;
+-	res = blkdev_get(hib_resume_bdev, FMODE_WRITE, NULL);
+-	if (res)
+-		return res;
++	hib_resume_bdev = blkdev_get_by_dev(swsusp_resume_device, FMODE_WRITE,
++			NULL);
++	if (IS_ERR(hib_resume_bdev))
++		return PTR_ERR(hib_resume_bdev);
+ 
+ 	res = set_blocksize(hib_resume_bdev, PAGE_SIZE);
+ 	if (res < 0)
+-- 
+2.28.0
 
-  git://git.infradead.org/nvme.git tags/nvme-5.9-2020-09-17
-
-for you to fetch changes up to 3a6b076168e20a50289d71f601f1dd02be0f8e88:
-
-  nvmet: get transport reference for passthru ctrl (2020-09-17 10:36:25 +0200)
-
-----------------------------------------------------------------
-nvme fixes for 5.9
-
- - another quirk for the controller from hell (David Milburn)
- - fix a Kconfig dependency (Necip Fazil Yildiran)
- - char devices / passthrough refcount fixes (Chaitanya Kulkarni)
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (1):
-      nvme-core: get/put ctrl and transport module in nvme_dev_open/release()
-
-Christoph Hellwig (1):
-      nvmet: get transport reference for passthru ctrl
-
-David Milburn (1):
-      nvme-pci: disable the write zeros command for Intel 600P/P3100
-
-Necip Fazil Yildiran (1):
-      nvme-tcp: fix kconfig dependency warning when !CRYPTO
-
- drivers/nvme/host/Kconfig      |  1 +
- drivers/nvme/host/core.c       | 15 +++++++++++++++
- drivers/nvme/host/pci.c        |  3 ++-
- drivers/nvme/target/passthru.c |  2 ++
- 4 files changed, 20 insertions(+), 1 deletion(-)
