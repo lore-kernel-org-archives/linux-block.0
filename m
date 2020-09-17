@@ -2,63 +2,75 @@ Return-Path: <SRS0=JXuJ=C2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D397AC433E2
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 13:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D03C433E2
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 16:21:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D53621582
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 13:57:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A551208E4
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 16:21:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600359682;
+	bh=BJVv41PsQaV2DI/hWvqliPmjwjUkY1Qatzku6yaG6fQ=;
+	h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
+	 List-ID:From;
+	b=HfnMXxtpmSx7Vz1tnqmZW6kpR8iWnyKQWaJYMd4tw4poiuZqAptc9elBX6zZh0uyX
+	 EWcwtw+eihrB/TbM3YjqC+t+mpssZNgbxWI/DVQzlGutySJH0UMOXtI0+yUenvjbUm
+	 aF1xcWqFzJJBWFThD29Lx1rEvVjeR86dF88m1fOQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727199AbgIQN5r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 09:57:47 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2879 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726843AbgIQN5F (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 09:57:05 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id EB2F675E2715E024F0FF;
-        Thu, 17 Sep 2020 14:56:58 +0100 (IST)
-Received: from [127.0.0.1] (10.210.165.75) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Thu, 17 Sep
- 2020 14:56:58 +0100
-From:   John Garry <john.garry@huawei.com>
-Subject: [blktests] About CPU hotplug test
-To:     Omar Sandoval <osandov@fb.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <02152473-3664-d758-7270-871fa4159203@huawei.com>
-Date:   Thu, 17 Sep 2020 14:54:11 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.165.75]
-X-ClientProxiedBy: lhreml745-chm.china.huawei.com (10.201.108.195) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+        id S1728403AbgIQQVL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 12:21:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37234 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728451AbgIQQVA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Sep 2020 12:21:00 -0400
+Received: from localhost (unknown [70.37.104.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 19CBF21D24;
+        Thu, 17 Sep 2020 15:53:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600358015;
+        bh=BJVv41PsQaV2DI/hWvqliPmjwjUkY1Qatzku6yaG6fQ=;
+        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
+        b=ijZx6nH/gNYE8tTWFEnj6DqoV4qAMKgjBtQ2EqDnmHN7I6bK22S2EAoM38/mGUUNZ
+         yAC3BB3JWY0XJPJEFK3xmjBs2gIrmI08rYLTr40UGtiJvij8G8ggQIW93eBt+nwRFA
+         ib0/HQMZ5BNtxBRJyw3VPEkmTwGyNBfw1+Of610c=
+Date:   Thu, 17 Sep 2020 15:53:34 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-scsi@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     <stable@vger.kernel.org>
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] scsi: Fix handling of host-aware ZBC disks
+In-Reply-To: <20200915073347.832424-2-damien.lemoal@wdc.com>
+References: <20200915073347.832424-2-damien.lemoal@wdc.com>
+Message-Id: <20200917155335.19CBF21D24@mail.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Omar,
+Hi
 
-In kernel commit bf0beec0607d ("blk-mq: drain I/O when all CPUs in a 
-hctx are offline"), we added support to ensure CPU hotplug works safely 
-for devices with managed interrupts.
+[This is an automated email]
 
-I was using my own script to test this, and I wanted to add something to 
-blktests for this same thing - however I see block/008 is for that 
-purpose. However, it does not seem effective for testing the above 
-commit, as it just hot-unplugs and replugs random CPUs quickly, and does 
-reliably ensure a specific group of CPUs are disabled for such a period 
-that we would see IO timeouts (or not).
+This commit has been processed because it contains a "Fixes:" tag
+fixing commit: b72053072c0b ("block: allow partitions on host aware zone devices").
 
-Anyway, would you suggest a whole new test for this?
+The bot has tested the following trees: v5.8.9.
 
-Cheers,
-John
+v5.8.9: Failed to apply! Possible dependencies:
+    a3d8a2573687 ("scsi: sd_zbc: Improve zone revalidation")
+
+
+NOTE: The patch will not be queued to stable trees until it is upstream.
+
+How should we proceed with this patch?
+
+-- 
+Thanks
+Sasha
