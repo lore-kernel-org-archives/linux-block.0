@@ -2,188 +2,113 @@ Return-Path: <SRS0=JXuJ=C2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B7FC433E2
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 02:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C93EC433E2
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 04:39:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1511120770
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 02:38:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E32A22078D
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 04:39:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zu+r+K0G"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="uZc1SkBA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726047AbgIQCiG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Sep 2020 22:38:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49496 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726153AbgIQCiF (ORCPT
+        id S1725858AbgIQEjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 00:39:05 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:43034 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725267AbgIQEjE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Sep 2020 22:38:05 -0400
-X-Greylist: delayed 594 seconds by postgrey-1.27 at vger.kernel.org; Wed, 16 Sep 2020 22:38:03 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600310282;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=589jv5dcEXFCuXf0aJXsqiIdxN7TBSpdb/yY5Un5eFk=;
-        b=Zu+r+K0GaDGs+DMF/OwhqD8L2feB2RXcRZE4dmENnnWanDylOnw22tmvQEQ+5XXXfEdoox
-        V3z1feFqCj+WEayFCrbMQhHizMP7TQ9chhPfVY7vnm4K3r0yJhs3cOCsXsweKZS0Q40hri
-        9/VZfUM2rF/XicmdIsWoJPcWJgCZ9O8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-CXovhrWkPt2pdtFB99xyIg-1; Wed, 16 Sep 2020 22:21:03 -0400
-X-MC-Unique: CXovhrWkPt2pdtFB99xyIg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6588D807355;
-        Thu, 17 Sep 2020 02:21:02 +0000 (UTC)
-Received: from T590 (ovpn-12-180.pek2.redhat.com [10.72.12.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E0CB1992F;
-        Thu, 17 Sep 2020 02:20:55 +0000 (UTC)
-Date:   Thu, 17 Sep 2020 10:20:51 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-Message-ID: <20200917022051.GA1004828@T590>
-References: <7f0e2d99-5da2-237e-a894-0afddc0ace1e@kernel.dk>
- <049a97db-c362-bcfb-59e5-4b1d2df59383@kernel.dk>
- <5140ba6c-779c-2a71-b7f2-3c3220cdf19c@kernel.dk>
- <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
- <20200904035528.GE558530@mit.edu>
- <20200915044519.GA38283@mit.edu>
- <20200915073303.GA754106@T590>
- <20200915224541.GB38283@mit.edu>
- <20200915230941.GA791425@T590>
- <20200916202026.GC38283@mit.edu>
+        Thu, 17 Sep 2020 00:39:04 -0400
+X-Greylist: delayed 12460 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 00:39:03 EDT
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08H18u4d003589;
+        Thu, 17 Sep 2020 01:10:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=tjZQK6ULcGr0MkqRNUv7sTRb+fPh/vA/4XgPl7/esnU=;
+ b=uZc1SkBAODgzfsLj2OPNti3MoEtuZff14d/u5deKYcez5I5bUXV6l1GRgD8v9aAqoWWF
+ aoWxyHjJpY3uRmg2w05ePcz2Bl+yp/sx5usZMeb2KS/iBxVU/yBolS5VKGk6iOOHfhRl
+ V0/2w7NV7nzDthXnmf53BurvV7ue7WfT7Ul2Y1lTy8HRkddi1ktgOXDxYbmAAAowBOox
+ YDF8fP99qn2smWUtFSLrwTF466/GZvfxvMVlbVuULHEQ4atFpXMi+3ngjd6hNM2/Gz2p
+ HDFMw6mI06RFIt4bptHT1hcmomM64fnFztwTacD/edpx7NvjwbAw91UJIca/3DhdJCca Xw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 33gp9me6ej-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 17 Sep 2020 01:10:52 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08H19te4010994;
+        Thu, 17 Sep 2020 01:10:51 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 33hm33v1s6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Sep 2020 01:10:51 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08H1AedG009064;
+        Thu, 17 Sep 2020 01:10:40 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 17 Sep 2020 01:10:39 +0000
+To:     John Garry <john.garry@huawei.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <don.brace@microsemi.com>, <kashyap.desai@broadcom.com>,
+        <ming.lei@redhat.com>, <bvanassche@acm.org>,
+        <dgilbert@interlog.com>, <paolo.valente@linaro.org>,
+        <hare@suse.de>, <hch@lst.de>, <sumit.saxena@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
+        <megaraidlinux.pdl@broadcom.com>, <chenxiang66@hisilicon.com>,
+        <luojiaxing@huawei.com>
+Subject: Re: [PATCH v8 00/18] blk-mq/scsi: Provide hostwide shared tags for
+ SCSI HBAs
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1imcdw6ni.fsf@ca-mkp.ca.oracle.com>
+References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
+        <df6a3bd3-a89e-5f2f-ece1-a12ada02b521@kernel.dk>
+        <379ef8a4-5042-926a-b8a0-2d0a684a0e01@huawei.com>
+        <yq1363xbtk7.fsf@ca-mkp.ca.oracle.com>
+        <32def143-911f-e497-662e-a2a41572fe4f@huawei.com>
+Date:   Wed, 16 Sep 2020 21:10:36 -0400
+In-Reply-To: <32def143-911f-e497-662e-a2a41572fe4f@huawei.com> (John Garry's
+        message of "Wed, 16 Sep 2020 08:21:25 +0100")
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200916202026.GC38283@mit.edu>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9746 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 mlxlogscore=999
+ malwarescore=0 mlxscore=0 phishscore=0 adultscore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009170005
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9746 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999
+ adultscore=0 malwarescore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
+ spamscore=0 priorityscore=1501 suspectscore=1 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009170005
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 16, 2020 at 04:20:26PM -0400, Theodore Y. Ts'o wrote:
-> On Wed, Sep 16, 2020 at 07:09:41AM +0800, Ming Lei wrote:
-> > > The problem is it's a bit tricky to revert 568f27006577, since there
-> > > is a merge conflict in blk_kick_flush().  I attempted to do the bisect
-> > > manually here, but it's clearly not right since the kernel is not
-> > > booting after the revert:
-> > > 
-> > > https://github.com/tytso/ext4/commit/1e67516382a33da2c9d483b860ac4ec2ad390870
-> > > 
-> > > branch:
-> > > 
-> > > https://github.com/tytso/ext4/tree/manual-revert-of-568f27006577
-> > > 
-> > > Can you send me a patch which correctly reverts 568f27006577?  I can
-> > > try it against -rc1 .. -rc4, whichever is most convenient.
-> > 
-> > Please test the following revert patch against -rc4.
-> 
-> Unfortunately the results of the revert is... wierd.
-> 
-> With -rc4, *all* of the VM's are failing --- reliably.  With rc4 with
-> the revert, *some* of the VM's are able to complete the tests, but
-> over half are still locking up or failing with some kind of oops.  So
-> that seems to imply that there is some kind of timing issue going on,
-> or maybe there are multiple bugs in play?
 
-Obviously there is other more serious issue, since 568f27006577 is
-completely reverted in your test, and you still see list corruption
-issue.
+John,
 
-So I'd suggest to find the big issue first. Once it is fixed, maybe
-everything becomes fine.
+> Have you had a chance to check these outstanding SCSI patches?
+>
+> scsi: megaraid_sas: Added support for shared host tagset for cpuhotplug
+> scsi: scsi_debug: Support host tagset
+> scsi: hisi_sas: Switch v3 hw to MQ
+> scsi: core: Show nr_hw_queues in sysfs
+> scsi: Add host and host template flag 'host_tagset'
 
-......
+These look good to me.
 
-> 
-> v5.9-rc4 with the revert of 568f27006577: we're seeing a similar
-> 	number of VM failures, but the failure signature is different.
-> 	The most common failure is:
-> 
-> 	[  390.023691] ------------[ cut here ]------------
-> 	[  390.028614] list_del corruption, ffffe1c241b00408->next is LIST_POISON1 (dead000000000100)
-> 	[  390.037040] WARNING: CPU: 1 PID: 5948 at lib/list_debug.c:47 __list_del_entry_valid+0x4e/0x90
-> 	[  390.045684] CPU: 1 PID: 5948 Comm: umount Not tainted 5.9.0-rc4-xfstests-00001-g6fdef015feba #11
-> 	[  390.054581] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> 	[  390.063943] RIP: 0010:__list_del_entry_valid+0x4e/0x90
-> 	[  390.069731] Code: 2e 48 8b 32 48 39 fe 75 3a 48 8b 50 08 48 39 f2 75 48 b8 01 00 00 00 c3 48 89 fe 48 89 c2 48 c7 c7 10 13 12 9b e8 30 2f 8c ff <0f> 0b 31 c0 c3 48 89 fe 48 c7 c7 48 13 12 9b e8 1c 2f 8c ff 0f 0b
-> 	[  390.088615] RSP: 0018:ffffae95c6ddba28 EFLAGS: 00010082
-> 	[  390.094079] RAX: 0000000000000000 RBX: ffffce95bfc007d0 RCX: 0000000000000027
-> 	[  390.101338] RDX: 0000000000000027 RSI: ffffa0c9d93d7dc0 RDI: ffffa0c9d93d7dc8
-> 	[  390.108659] RBP: ffffe1c241b00408 R08: 0000006ba6bff7dc R09: 0000000000000000
-> 	[  390.115925] R10: ffffa0c9d3f444c0 R11: 0000000000000046 R12: ffffa0c9d8041180
-> 	[  390.123186] R13: ffffa0c86c010e00 R14: ffffe1c241b00400 R15: ffffa0c9d8042240
-> 	[  390.130637] FS:  00007fb227580080(0000) GS:ffffa0c9d9200000(0000) knlGS:0000000000000000
-> 	[  390.138860] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> 	[  390.144721] CR2: 00007ff72d2dfe74 CR3: 00000001cdbb8002 CR4: 00000000003706e0
-> 	[  390.152022] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> 	[  390.159314] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> 	[  390.166569] Call Trace:
-> 	[  390.169148]  free_block+0xec/0x270
-> 	[  390.173100]  ___cache_free+0x488/0x6b0
-> 	[  390.177062]  kfree+0xc9/0x1d0
-> 	[  390.181202]  kmem_freepages+0xa0/0xf0
-> 	[  390.185009]  slab_destroy+0x19/0x50
-> 	[  390.188653]  slabs_destroy+0x6d/0x90
-> 	[  390.192339]  ___cache_free+0x4a3/0x6b0
-> 	[  390.196477]  kfree+0xc9/0x1d0
-> 	[  390.199651]  kmem_freepages+0xa0/0xf0
-> 	[  390.203459]  slab_destroy+0x19/0x50
-> 	[  390.207060]  slabs_destroy+0x6d/0x90
-> 	[  390.210784]  ___cache_free+0x4a3/0x6b0
-> 	[  390.214672]  ? lockdep_hardirqs_on_prepare+0xe7/0x180
-> 	[  390.219845]  kfree+0xc9/0x1d0
-> 	[  390.222928]  put_crypt_info+0xe3/0x100
-> 	[  390.226801]  fscrypt_put_encryption_info+0x15/0x30
-> 	[  390.231721]  ext4_clear_inode+0x80/0x90
-> 	[  390.235774]  ext4_evict_inode+0x6d/0x630
-> 	[  390.239960]  evict+0xd0/0x1a0
-> 	[  390.243049]  dispose_list+0x51/0x80
-> 	[  390.246659]  evict_inodes+0x15b/0x1b0
-> 	[  390.250526]  generic_shutdown_super+0x37/0x100
-> 	[  390.255094]  kill_block_super+0x21/0x50
-> 	[  390.259066]  deactivate_locked_super+0x2f/0x70
-> 	[  390.263638]  cleanup_mnt+0xb8/0x140
-> 	[  390.267248]  task_work_run+0x73/0xc0
-> 	[  390.270953]  exit_to_user_mode_prepare+0x197/0x1a0
-> 	[  390.277333]  syscall_exit_to_user_mode+0x3c/0x210
-> 	[  390.282171]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> 	[  390.287348] RIP: 0033:0x7fb2279a6507
-> 	[  390.291128] Code: 19 0c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 31 f6 e9 09 00 00 00 66 0f 1f 84 00 00 00 00 00 b8 a6 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 59 19 0c 00 f7 d8 64 89 01 48
-> 	[  390.310018] RSP: 002b:00007ffd41391c08 EFLAGS: 00000246 ORIG_RAX: 00000000000000a6
-> 	[  390.317711] RAX: 0000000000000000 RBX: 000055b889e1f970 RCX: 00007fb2279a6507
-> 	[  390.324969] RDX: 0000000000000001 RSI: 0000000000000000 RDI: 000055b889e24f00
-> 	[  390.332300] RBP: 0000000000000000 R08: 000055b889e24f20 R09: 00007fb227a27e80
-> 	[  390.339543] R10: 0000000000000000 R11: 0000000000000246 R12: 000055b889e24f00
-> 	[  390.346818] R13: 00007fb227acc1c4 R14: 000055b889e1fa68 R15: 000055b889e1fb80
-> 	[  390.354075] irq event stamp: 3176310
-> 	[  390.357762] hardirqs last  enabled at (3176309): [<ffffffff9a090df2>] kfree+0x132/0x1d0
-> 	[  390.365891] hardirqs last disabled at (3176310): [<ffffffff9a090df9>] kfree+0x139/0x1d0
-> 	[  390.374021] softirqs last  enabled at (3174992): [<ffffffff9ac00347>] __do_softirq+0x347/0x45f
-> 	[  390.382762] softirqs last disabled at (3174535): [<ffffffff9aa00f72>] asm_call_on_stack+0x12/0x20
-> 	[  390.391742] ---[ end trace 8fb872d4de3e00ed ]---
+Jens, feel free to merge.
 
-Looks it is more like a memory corruption issue, is there any helpful log
-dumped when running kernel with kasan?
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-BTW, I have kvm/qumu auto test which runs blktest/xfstest over virtio-blk/virito-scsi/loop/nvme
-with xfs/ext4 every two days, and not see such failure recently, but the kernel config is based
-rhel8's config.
-
-
-thanks,
-Ming
-
+-- 
+Martin K. Petersen	Oracle Linux Engineering
