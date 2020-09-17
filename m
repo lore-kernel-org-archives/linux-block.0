@@ -2,75 +2,93 @@ Return-Path: <SRS0=JXuJ=C2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D03C433E2
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 16:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF684C43461
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 16:59:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A551208E4
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 16:21:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600359682;
-	bh=BJVv41PsQaV2DI/hWvqliPmjwjUkY1Qatzku6yaG6fQ=;
-	h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
-	 List-ID:From;
-	b=HfnMXxtpmSx7Vz1tnqmZW6kpR8iWnyKQWaJYMd4tw4poiuZqAptc9elBX6zZh0uyX
-	 EWcwtw+eihrB/TbM3YjqC+t+mpssZNgbxWI/DVQzlGutySJH0UMOXtI0+yUenvjbUm
-	 aF1xcWqFzJJBWFThD29Lx1rEvVjeR86dF88m1fOQ=
+	by mail.kernel.org (Postfix) with ESMTP id 606EA206A4
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 16:59:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vGDEFPJ7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728403AbgIQQVL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 12:21:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37234 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728451AbgIQQVA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 12:21:00 -0400
-Received: from localhost (unknown [70.37.104.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 19CBF21D24;
-        Thu, 17 Sep 2020 15:53:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600358015;
-        bh=BJVv41PsQaV2DI/hWvqliPmjwjUkY1Qatzku6yaG6fQ=;
-        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=ijZx6nH/gNYE8tTWFEnj6DqoV4qAMKgjBtQ2EqDnmHN7I6bK22S2EAoM38/mGUUNZ
-         yAC3BB3JWY0XJPJEFK3xmjBs2gIrmI08rYLTr40UGtiJvij8G8ggQIW93eBt+nwRFA
-         ib0/HQMZ5BNtxBRJyw3VPEkmTwGyNBfw1+Of610c=
-Date:   Thu, 17 Sep 2020 15:53:34 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-scsi@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     <stable@vger.kernel.org>
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] scsi: Fix handling of host-aware ZBC disks
-In-Reply-To: <20200915073347.832424-2-damien.lemoal@wdc.com>
-References: <20200915073347.832424-2-damien.lemoal@wdc.com>
-Message-Id: <20200917155335.19CBF21D24@mail.kernel.org>
+        id S1728830AbgIQQ7t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 12:59:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728789AbgIQQ7r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Sep 2020 12:59:47 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E947EC06174A;
+        Thu, 17 Sep 2020 09:59:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=HSelo8V/K+50+NYuLpI9PLlnsmvIK7gx8VI0Sz6V4PU=; b=vGDEFPJ707ptXPX4+9i9781old
+        xsNpeVCD4XZDVGcYjA+MbX7KhnFmO2+Yd5n3Vf0yEESEKcsLUbPxWwT15jA3buY1zl2MK6FfS0ROG
+        DZUMm0K5g0YSc9P06hadFGy4ElAsekq4P3uCLR9redzUX1H6V5ppdPeHjga6HRevxK+UAaYumvD8o
+        R5K7DdkgyGf6GvPxLtWtBVeQWFoLGRZBOJTo44ytDXTkLWYOsxYjrnPmoMNQVn2ULA+FN5FXWvO3M
+        cN0C195atpvFDiNWRYEw+cffFy3bh6UD8Gmx+H0YzX1600akIqtqGsy5vnbcTdZL0KnAsu+TLFfRq
+        x88nyRIw==;
+Received: from 089144214092.atnat0023.highway.a1.net ([89.144.214.92] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kIxFq-0000Af-QF; Thu, 17 Sep 2020 16:59:31 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        linux-pm@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: remove blkdev_get as a public API
+Date:   Thu, 17 Sep 2020 18:57:06 +0200
+Message-Id: <20200917165720.3285256-1-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+Hi Jens,
 
-[This is an automated email]
+this series removes blkdev_get as a public API, leaving it as just an
+implementation detail of blkdev_get_by_path and blkdev_get_by_dev.  The
+reason for that is that blkdev_get is a very confusing API that requires
+a struct block_device to be fed in, but then actually consumes the
+reference.  And it turns out just using the two above mentioned APIs
+actually significantly simplifies the code as well.
 
-This commit has been processed because it contains a "Fixes:" tag
-fixing commit: b72053072c0b ("block: allow partitions on host aware zone devices").
-
-The bot has tested the following trees: v5.8.9.
-
-v5.8.9: Failed to apply! Possible dependencies:
-    a3d8a2573687 ("scsi: sd_zbc: Improve zone revalidation")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
-
--- 
-Thanks
-Sasha
+Diffstat:
+ block/genhd.c                   |   11 ++--
+ block/ioctl.c                   |   13 ++---
+ drivers/block/nbd.c             |    8 +--
+ drivers/block/pktcdvd.c         |   92 +++++-----------------------------------
+ drivers/block/zram/zram_drv.c   |    7 +--
+ drivers/char/raw.c              |   51 ++++++++--------------
+ drivers/ide/ide-gd.c            |    2 
+ drivers/s390/block/dasd_genhd.c |   13 +----
+ fs/block_dev.c                  |   12 ++---
+ fs/ocfs2/cluster/heartbeat.c    |   28 ++++--------
+ include/linux/blk_types.h       |    4 -
+ include/linux/blkdev.h          |    1 
+ include/linux/genhd.h           |    2 
+ include/linux/suspend.h         |    4 -
+ include/linux/swap.h            |    3 -
+ kernel/power/swap.c             |   21 +++------
+ kernel/power/user.c             |   26 +++--------
+ mm/swapfile.c                   |   45 ++++++++++---------
+ 18 files changed, 119 insertions(+), 224 deletions(-)
