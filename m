@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0849C43463
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C32C43466
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:18:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BA13214D8
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:18:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E2602137B
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:18:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600384733;
-	bh=77Kxgapl7no1WFV+APUmjan4i/QFUqqtiSGZHbU3iiw=;
+	s=default; t=1600384734;
+	bh=jfma3X7pilb5Fg1ZcDsNgNV8kAHXdod6ppTdWMc8RNo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=vblnfNgwtkVctwlDrPv1fSekdpcNN36R1Mtc1hF4IZ4ek5X5WDl/NReQWLxorwmhK
-	 J6v/VHknVf/Y6LX0OfCcdzUJaI6qUKsV3ogbodMsc+81JPdIr/OD4fTKVS8enVXOaa
-	 1xJQMNouCAwFi6zUhgvPuwW/wHRPSu95v2s9f6uc=
+	b=00b/fwVRYO7hXhX4KaT51rSiq62P7DI8STUj9OygjAwJ5E5O3i8Y33LKDzbsJ4COv
+	 KedWD+aq5LzBC7RBIEpWLA5hAjUOfMTeXl61Rc9pLGnKLb7hmWuGTfH7+OGOn1R4yS
+	 nshBReet5SkXhNtHsHm+DX4doYw0WQ3biESKQfXE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726121AbgIQXSx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726104AbgIQXSx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 17 Sep 2020 19:18:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55796 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:55840 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726101AbgIQXSu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 19:18:50 -0400
+        id S1725886AbgIQXSv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Sep 2020 19:18:51 -0400
 Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1AD7F2085B;
+        by mail.kernel.org (Postfix) with ESMTPSA id F1AE220870;
         Thu, 17 Sep 2020 23:18:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600384729;
-        bh=77Kxgapl7no1WFV+APUmjan4i/QFUqqtiSGZHbU3iiw=;
+        s=default; t=1600384730;
+        bh=jfma3X7pilb5Fg1ZcDsNgNV8kAHXdod6ppTdWMc8RNo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=xgARRf/p6wEOxHhwhBCLO0XlmncVbS/ukJgatHNihHqKcoibRDz0GhonhhBNAnHPk
-         +JYnn89vlJrTp+rImd9ua3+oCQVVnYsjMeIOLbErV+rNqwr4E5A/ZJ7hLx2WENUGGf
-         GQalqNEQGbSDwM3l6RJ5vfxE/YtjRtruu6UGq9I4=
+        b=Ofz0qOD3l9X33Kcfw7NbvkmdAyr24FL7eNh/2umKkDo7vHaNwKCCu0+iFKD8h2wNN
+         36u5GrK1w/S4OPQHLsi1N9JHIKO9Pg+tALI2DeGR/KyyAGRpEYQ7yyMd8+5cnDwtfN
+         16HgroN2pOrrI7GYatIf4qGod2C4B5iTNqEaiskU=
 From:   Keith Busch <kbusch@kernel.org>
 To:     linux-nvme@lists.infradead.org, sagi@grimberg.me, hch@lst.de,
         linux-block@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     axboe@kernel.dk, linux-scsi@vger.kernel.org,
         martin.petersen@oracle.com, Keith Busch <kbusch@kernel.org>,
         Damien Le Moal <Damien.LeMoal@wdc.com>,
         Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Subject: [PATCHv3 1/4] block: add zone specific block statuses
-Date:   Thu, 17 Sep 2020 16:18:38 -0700
-Message-Id: <20200917231841.4029747-2-kbusch@kernel.org>
+Subject: [PATCHv3 2/4] nvme: translate zone resource errors
+Date:   Thu, 17 Sep 2020 16:18:39 -0700
+Message-Id: <20200917231841.4029747-3-kbusch@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200917231841.4029747-1-kbusch@kernel.org>
 References: <20200917231841.4029747-1-kbusch@kernel.org>
@@ -57,93 +57,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A zoned device with limited resources to open or activate zones may
-return an error when the host exceeds those limits. The same command may
-be successful if retried later, but the host needs to wait for specific
-zone states before it should retry. Have the block layer provide an
-appropriate status for these conditions so applications can distinuguish
-this error for special handling.
+Translate zoned resource errors to the appropriate blk_status_t.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Damien Le Moal <Damien.LeMoal@wdc.com>
 Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- Documentation/block/queue-sysfs.rst |  8 ++++++++
- block/blk-core.c                    |  4 ++++
- include/linux/blk_types.h           | 18 ++++++++++++++++++
- 3 files changed, 30 insertions(+)
+ drivers/nvme/host/core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-index f261a5c84170..2638d3446b79 100644
---- a/Documentation/block/queue-sysfs.rst
-+++ b/Documentation/block/queue-sysfs.rst
-@@ -124,6 +124,10 @@ For zoned block devices (zoned attribute indicating "host-managed" or
- EXPLICIT OPEN, IMPLICIT OPEN or CLOSED, is limited by this value.
- If this value is 0, there is no limit.
- 
-+If the host attempts to exceed this limit, the driver should report this error
-+with BLK_STS_ZONE_ACTIVE_RESOURCE, which user space may see as the EOVERFLOW
-+errno.
-+
- max_open_zones (RO)
- -------------------
- For zoned block devices (zoned attribute indicating "host-managed" or
-@@ -131,6 +135,10 @@ For zoned block devices (zoned attribute indicating "host-managed" or
- EXPLICIT OPEN or IMPLICIT OPEN, is limited by this value.
- If this value is 0, there is no limit.
- 
-+If the host attempts to exceed this limit, the driver should report this error
-+with BLK_STS_ZONE_OPEN_RESOURCE, which user space may see as the ETOOMANYREFS
-+errno.
-+
- max_sectors_kb (RW)
- -------------------
- This is the maximum number of kilobytes that the block layer will allow
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 10c08ac50697..8bffc7732e37 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -186,6 +186,10 @@ static const struct {
- 	/* device mapper special case, should not leak out: */
- 	[BLK_STS_DM_REQUEUE]	= { -EREMCHG, "dm internal retry" },
- 
-+	/* zone device specific errors */
-+	[BLK_STS_ZONE_OPEN_RESOURCE]	= { -ETOOMANYREFS, "open zones exceeded" },
-+	[BLK_STS_ZONE_ACTIVE_RESOURCE]	= { -EOVERFLOW, "active zones exceeded" },
-+
- 	/* everything else not covered above: */
- 	[BLK_STS_IOERR]		= { -EIO,	"I/O" },
- };
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 4ecf4fed171f..8603fc5f86a3 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -103,6 +103,24 @@ typedef u8 __bitwise blk_status_t;
-  */
- #define BLK_STS_ZONE_RESOURCE	((__force blk_status_t)14)
- 
-+/*
-+ * BLK_STS_ZONE_OPEN_RESOURCE is returned from the driver in the completion
-+ * path if the device returns a status indicating that too many zone resources
-+ * are currently open. The same command should be successful if resubmitted
-+ * after the number of open zones decreases below the device's limits, which is
-+ * reported in the request_queue's max_open_zones.
-+ */
-+#define BLK_STS_ZONE_OPEN_RESOURCE	((__force blk_status_t)15)
-+
-+/*
-+ * BLK_STS_ZONE_ACTIVE_RESOURCE is returned from the driver in the completion
-+ * path if the device returns a status indicating that too many zone resources
-+ * are currently active. The same command should be successful if resubmitted
-+ * after the number of active zones decreases below the device's limits, which
-+ * is reported in the request_queue's max_active_zones.
-+ */
-+#define BLK_STS_ZONE_ACTIVE_RESOURCE	((__force blk_status_t)16)
-+
- /**
-  * blk_path_error - returns true if error may be path related
-  * @error: status the request was completed with
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 614cd455836b..a0d26fcbf923 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -236,6 +236,10 @@ static blk_status_t nvme_error_status(u16 status)
+ 		return BLK_STS_NEXUS;
+ 	case NVME_SC_HOST_PATH_ERROR:
+ 		return BLK_STS_TRANSPORT;
++	case NVME_SC_ZONE_TOO_MANY_ACTIVE:
++		return BLK_STS_ZONE_ACTIVE_RESOURCE;
++	case NVME_SC_ZONE_TOO_MANY_OPEN:
++		return BLK_STS_ZONE_OPEN_RESOURCE;
+ 	default:
+ 		return BLK_STS_IOERR;
+ 	}
 -- 
 2.24.1
 
