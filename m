@@ -2,110 +2,84 @@ Return-Path: <SRS0=JXuJ=C2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4B6C43464
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF8EBC43463
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:18:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C3212083B
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:09:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZcKYikLq"
+	by mail.kernel.org (Postfix) with ESMTP id 8E5E220853
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:18:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600384730;
+	bh=o6h0uQcYxT8hDqeNxh4o4wx37bxZ8o2tWkPFDlaL3Zg=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=wVN2MMtmNOFMqqWNjx2G/ieAe9RLgoVuREYxtHUDZILky7pnY9ro9SB0fCt4nrAKL
+	 vtNB5hNA8Fd8luqWGavsZHRahSQAXFautNYKlNFaWmtl6awHZ1IweQ4abKxk7Q6SGn
+	 DlFEzwNP7HELeH8FoJ0iED8b1NMleIPMh8uexmL4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726040AbgIQXI7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 19:08:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33775 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725858AbgIQXI7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 19:08:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600384138;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uzfwQDrkfORvWeEWQ/DT80gvpbqXcqJubxjDGJKPNLI=;
-        b=ZcKYikLqug1Id/n/rJB3efIgxGGK4oa8QtAKzr3EiB+dNHrJGT5dTO1xH7R1yVDe7uxZgJ
-        MEQ9Z8s/ZOQpGh947XlqE0Bnb5dEbk/iAcHnElo2Vg7HYJ/X9+4Tro/bOGqBR6EkFhB1nf
-        PbBmGLYQqgDrk+LalSbOEkOpdBF3GjA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-euwv-xhLMlWa5iZ5HdKl-w-1; Thu, 17 Sep 2020 19:08:56 -0400
-X-MC-Unique: euwv-xhLMlWa5iZ5HdKl-w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726055AbgIQXSt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 19:18:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55782 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725886AbgIQXSt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Sep 2020 19:18:49 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C25F01882FB0;
-        Thu, 17 Sep 2020 23:08:54 +0000 (UTC)
-Received: from T590 (ovpn-12-51.pek2.redhat.com [10.72.12.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C42D055769;
-        Thu, 17 Sep 2020 23:08:46 +0000 (UTC)
-Date:   Fri, 18 Sep 2020 07:08:42 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-Message-ID: <20200917230842.GA1139137@T590>
-References: <5140ba6c-779c-2a71-b7f2-3c3220cdf19c@kernel.dk>
- <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
- <20200904035528.GE558530@mit.edu>
- <20200915044519.GA38283@mit.edu>
- <20200915073303.GA754106@T590>
- <20200915224541.GB38283@mit.edu>
- <20200915230941.GA791425@T590>
- <20200916202026.GC38283@mit.edu>
- <20200917022051.GA1004828@T590>
- <20200917143012.GF38283@mit.edu>
+        by mail.kernel.org (Postfix) with ESMTPSA id 525CE20838;
+        Thu, 17 Sep 2020 23:18:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600384728;
+        bh=o6h0uQcYxT8hDqeNxh4o4wx37bxZ8o2tWkPFDlaL3Zg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Uc7H8rbAxkFA478xseYdETekhlX/hB2v82QZ4iNoLiXGkRD11mrqAaabA2QiKquuY
+         8VwmF3jiTF6zasq2aqtiK2ORXVhES/zwYqzg7b/ebE+E0TeKoaSiderK9l9+WVx5nk
+         YYC6vVoWY9YnPfiXa2bLzF/W5nmmI4QgV64adKtk=
+From:   Keith Busch <kbusch@kernel.org>
+To:     linux-nvme@lists.infradead.org, sagi@grimberg.me, hch@lst.de,
+        linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv3 0/4] zoned block device specific errors
+Date:   Thu, 17 Sep 2020 16:18:37 -0700
+Message-Id: <20200917231841.4029747-1-kbusch@kernel.org>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200917143012.GF38283@mit.edu>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 17, 2020 at 10:30:12AM -0400, Theodore Y. Ts'o wrote:
-> On Thu, Sep 17, 2020 at 10:20:51AM +0800, Ming Lei wrote:
-> > 
-> > Obviously there is other more serious issue, since 568f27006577 is
-> > completely reverted in your test, and you still see list corruption
-> > issue.
-> > 
-> > So I'd suggest to find the big issue first. Once it is fixed, maybe
-> > everything becomes fine.
-> > ...
-> > Looks it is more like a memory corruption issue, is there any helpful log
-> > dumped when running kernel with kasan?
-> 
-> Last night, I ran six VM's using -rc4 with and without KASAN; without
-> Kasan, half of them hung.  With KASAN enabled, all of the test VM's
-> ran to completion.
+Zone block devices may have some limits that require special handling.
+This series provides a way for drivers to notify of these conditions.
 
-From your last email, when you run -rc4 with revert of 568f27006577, you
-can observe list corruption easily.
+v2->v3:
 
-So can you enable KASAN on -rc4 with revert of 568f27006577 and see if
-it makes a difference?
+  Split status for max open vs max active errors (Christoph)
 
-> 
-> This strongly suggests whatever the problem is, it's timing related.
-> I'll run a larger set of test runs to see if this pattern is confirmed
-> today.
+  Include scsi use for the new status (Damien)
 
-Looks you enable lots of other debug options, such a lockdep, which has
-much much heavy runtime load. Maybe you can disable all non-KASAN debug
-option(non-KASAN memory debug options, lockdep, ...) and keep KASAN
-debug only and see if you are lucky.
+  Update documentation for the new status inline with the request_queue
+  properties they relate to
 
+Damien Le Moal (2):
+  scsi: update additional sense codes list
+  scsi: handle zone resources errors
 
-Thanks, 
-Ming
+Keith Busch (2):
+  block: add zone specific block statuses
+  nvme: translate zone resource errors
+
+ Documentation/block/queue-sysfs.rst |  8 +++++
+ block/blk-core.c                    |  4 +++
+ drivers/nvme/host/core.c            |  4 +++
+ drivers/scsi/scsi_lib.c             |  9 +++++
+ drivers/scsi/sense_codes.h          | 54 ++++++++++++++++++++++++++++-
+ include/linux/blk_types.h           | 18 ++++++++++
+ 6 files changed, 96 insertions(+), 1 deletion(-)
+
+-- 
+2.24.1
 
