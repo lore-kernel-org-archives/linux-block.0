@@ -2,125 +2,110 @@ Return-Path: <SRS0=JXuJ=C2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B69C43463
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 22:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4B6C43464
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:09:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DCEE2137B
-	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 22:26:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C3212083B
+	for <linux-block@archiver.kernel.org>; Thu, 17 Sep 2020 23:09:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bwJ7dusR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZcKYikLq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726064AbgIQW0L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 18:26:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48216 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725886AbgIQW0L (ORCPT
+        id S1726040AbgIQXI7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 19:08:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33775 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725858AbgIQXI7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 18:26:11 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B18FC06174A
-        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2020 15:26:11 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id x123so2124860pfc.7
-        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2020 15:26:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Q77gUSamNF92wlJ+lR4GPQtw23AEZMyMYEOoR6N4qAA=;
-        b=bwJ7dusRdoaGoe73/6PvH1xWcDBr9oe6pV9ceE97DlYZVpQrDnvIVP8VUp9gLRz5xw
-         Gowkk+P9HLv5hrDpz+RwygwAKBAV+5ixzvVCMb0ExJBq+LTa1jBnbl7Cgs0EF9PCH7Sq
-         1bMOslpKFSXif/oJJehVHIZhX2M5oGeWLUw0k7cusm6FPXqHDRpgbG5iM7PwFTW/XrGE
-         tFTH+R70V6sAE/vl8shVNLpFQgUBZeWV40qHcvRaY1AHBXCszdJslS3w2Hg0pe0I4fVW
-         yYfvHBFT51ftNXIvAiBaKQ79MmUNVHI6kd9pY1G0TJQCKFRKyed9tMECspszouLpF2dy
-         C7mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Q77gUSamNF92wlJ+lR4GPQtw23AEZMyMYEOoR6N4qAA=;
-        b=gAyEm288YDwHAHofM7xojKuW138tAWYSrpMgPebNBjOnmvmDmdW2ElBov4ujA26Wzj
-         541jzirFicthsAnuzEc8PNaiUC1ojS1ikJFweI7m8zFiX6HeUelGcpi4yAcESZWo4JpJ
-         43QH8Z5M1nuUC0AUQd8fKZYB6F1MuA0erkUoW8GYdekcPnpgGVm1wtHQzouTzYAoHZpw
-         A+de/ZD26yKpYOiZNxGxkUvdMVu8MSAQi2LPbEUBWqXDfr0gHvBtz7wEDEj7ETpiP1h4
-         l/wdwOCrVQdvch3FGnwq3CKvThqOfXGHa4jNZgJFa8q2Ml4b/000D8AZEsyPjSFuE9l+
-         btBQ==
-X-Gm-Message-State: AOAM532n+6thJDHEMQjpfxksIq2GXzgCwa3cFQHKwQqKd4x/Q4/UoM1i
-        Jrd4zeAWHHk2jIge6axLUeBTiA==
-X-Google-Smtp-Source: ABdhPJydTfNwtlMrd82NIkSVsPt/owVM7ehmZAjCmZBjvbBuEggXWuRHybUb74uWQNjYQwGD4UeW5Q==
-X-Received: by 2002:a63:5952:: with SMTP id j18mr25156407pgm.317.1600381570500;
-        Thu, 17 Sep 2020 15:26:10 -0700 (PDT)
-Received: from google.com (124.190.199.35.bc.googleusercontent.com. [35.199.190.124])
-        by smtp.gmail.com with ESMTPSA id b10sm616516pgm.64.2020.09.17.15.26.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Sep 2020 15:26:10 -0700 (PDT)
-Date:   Thu, 17 Sep 2020 22:26:06 +0000
-From:   Satya Tangirala <satyat@google.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        dm-devel@redhat.com, Miaohe Lin <linmiaohe@huawei.com>
-Subject: Re: [PATCH v2 3/3] block: warn if !__GFP_DIRECT_RECLAIM in
- bio_crypt_set_ctx()
-Message-ID: <20200917222606.GC421296@google.com>
-References: <20200916035315.34046-1-ebiggers@kernel.org>
- <20200916035315.34046-4-ebiggers@kernel.org>
+        Thu, 17 Sep 2020 19:08:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600384138;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uzfwQDrkfORvWeEWQ/DT80gvpbqXcqJubxjDGJKPNLI=;
+        b=ZcKYikLqug1Id/n/rJB3efIgxGGK4oa8QtAKzr3EiB+dNHrJGT5dTO1xH7R1yVDe7uxZgJ
+        MEQ9Z8s/ZOQpGh947XlqE0Bnb5dEbk/iAcHnElo2Vg7HYJ/X9+4Tro/bOGqBR6EkFhB1nf
+        PbBmGLYQqgDrk+LalSbOEkOpdBF3GjA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-561-euwv-xhLMlWa5iZ5HdKl-w-1; Thu, 17 Sep 2020 19:08:56 -0400
+X-MC-Unique: euwv-xhLMlWa5iZ5HdKl-w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C25F01882FB0;
+        Thu, 17 Sep 2020 23:08:54 +0000 (UTC)
+Received: from T590 (ovpn-12-51.pek2.redhat.com [10.72.12.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C42D055769;
+        Thu, 17 Sep 2020 23:08:46 +0000 (UTC)
+Date:   Fri, 18 Sep 2020 07:08:42 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+Message-ID: <20200917230842.GA1139137@T590>
+References: <5140ba6c-779c-2a71-b7f2-3c3220cdf19c@kernel.dk>
+ <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
+ <20200904035528.GE558530@mit.edu>
+ <20200915044519.GA38283@mit.edu>
+ <20200915073303.GA754106@T590>
+ <20200915224541.GB38283@mit.edu>
+ <20200915230941.GA791425@T590>
+ <20200916202026.GC38283@mit.edu>
+ <20200917022051.GA1004828@T590>
+ <20200917143012.GF38283@mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200916035315.34046-4-ebiggers@kernel.org>
+In-Reply-To: <20200917143012.GF38283@mit.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 15, 2020 at 08:53:15PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Thu, Sep 17, 2020 at 10:30:12AM -0400, Theodore Y. Ts'o wrote:
+> On Thu, Sep 17, 2020 at 10:20:51AM +0800, Ming Lei wrote:
+> > 
+> > Obviously there is other more serious issue, since 568f27006577 is
+> > completely reverted in your test, and you still see list corruption
+> > issue.
+> > 
+> > So I'd suggest to find the big issue first. Once it is fixed, maybe
+> > everything becomes fine.
+> > ...
+> > Looks it is more like a memory corruption issue, is there any helpful log
+> > dumped when running kernel with kasan?
 > 
-> bio_crypt_set_ctx() assumes its gfp_mask argument always includes
-> __GFP_DIRECT_RECLAIM, so that the mempool_alloc() will always succeed.
-> 
-> For now this assumption is still fine, since no callers violate it.
-> Making bio_crypt_set_ctx() able to fail would add unneeded complexity.
-> 
-> However, if a caller didn't use __GFP_DIRECT_RECLAIM, it would be very
-> hard to notice the bug.  Make it easier by adding a WARN_ON_ONCE().
-> 
-> Cc: Miaohe Lin <linmiaohe@huawei.com>
-> Cc: Satya Tangirala <satyat@google.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  block/blk-crypto.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-> index bbe7974fd74f0..5da43f0973b46 100644
-> --- a/block/blk-crypto.c
-> +++ b/block/blk-crypto.c
-> @@ -81,7 +81,15 @@ subsys_initcall(bio_crypt_ctx_init);
->  void bio_crypt_set_ctx(struct bio *bio, const struct blk_crypto_key *key,
->  		       const u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE], gfp_t gfp_mask)
->  {
-> -	struct bio_crypt_ctx *bc = mempool_alloc(bio_crypt_ctx_pool, gfp_mask);
-> +	struct bio_crypt_ctx *bc;
-> +
-> +	/*
-> +	 * The caller must use a gfp_mask that contains __GFP_DIRECT_RECLAIM so
-> +	 * that the mempool_alloc() can't fail.
-> +	 */
-> +	WARN_ON_ONCE(!(gfp_mask & __GFP_DIRECT_RECLAIM));
-> +
-> +	bc = mempool_alloc(bio_crypt_ctx_pool, gfp_mask);
->  
->  	bc->bc_key = key;
->  	memcpy(bc->bc_dun, dun, sizeof(bc->bc_dun));
-> -- 
-Looks good!
+> Last night, I ran six VM's using -rc4 with and without KASAN; without
+> Kasan, half of them hung.  With KASAN enabled, all of the test VM's
+> ran to completion.
 
-Reviewed-by: Satya Tangirala <satyat@google.com>
+From your last email, when you run -rc4 with revert of 568f27006577, you
+can observe list corruption easily.
 
-> 2.28.0
+So can you enable KASAN on -rc4 with revert of 568f27006577 and see if
+it makes a difference?
+
 > 
+> This strongly suggests whatever the problem is, it's timing related.
+> I'll run a larger set of test runs to see if this pattern is confirmed
+> today.
+
+Looks you enable lots of other debug options, such a lockdep, which has
+much much heavy runtime load. Maybe you can disable all non-KASAN debug
+option(non-KASAN memory debug options, lockdep, ...) and keep KASAN
+debug only and see if you are lucky.
+
+
+Thanks, 
+Ming
+
