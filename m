@@ -7,20 +7,20 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEBEC43466
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55115C43467
 	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 01:47:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F134220872
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 01:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B3E1208C3
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 01:47:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726093AbgIRBre (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726151AbgIRBre (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 17 Sep 2020 21:47:34 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13280 "EHLO huawei.com"
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13249 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726151AbgIRBrd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 21:47:33 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 60180F3F6DBA07D70061;
+        id S1726187AbgIRBre (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Sep 2020 21:47:34 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 905CC8BBC7C06C9190FE;
         Fri, 18 Sep 2020 09:47:31 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS410-HUB.china.huawei.com
  (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Fri, 18 Sep 2020
@@ -29,9 +29,9 @@ From:   Yufen Yu <yuyufen@huawei.com>
 To:     <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>, <hch@lst.de>,
         <yuyufen@huawei.com>
-Subject: [PATCH 2/4] block: use common interface blk_queue_registered()
-Date:   Thu, 17 Sep 2020 21:47:04 -0400
-Message-ID: <20200918014706.1962485-3-yuyufen@huawei.com>
+Subject: [PATCH 3/4] block: fix comment and add lockdep assert
+Date:   Thu, 17 Sep 2020 21:47:05 -0400
+Message-ID: <20200918014706.1962485-4-yuyufen@huawei.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200918014706.1962485-1-yuyufen@huawei.com>
 References: <20200918014706.1962485-1-yuyufen@huawei.com>
@@ -44,41 +44,55 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have defined common interface blk_queue_registered() to
-test QUEUE_FLAG_REGISTERED. Just use it.
+After commit b89f625e28d4 ("block: don't release queue's sysfs
+lock during switching elevator"), whole elevator register and
+unregister function are covered by sysfs_lock. So, remove wrong
+comment and add lockdep assert.
 
 Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 ---
- block/blk-iocost.c | 2 +-
- block/elevator.c   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ block/elevator.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index d37b55db2409..073624f54bc9 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -618,7 +618,7 @@ static struct ioc *q_to_ioc(struct request_queue *q)
- 
- static const char *q_name(struct request_queue *q)
- {
--	if (test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
-+	if (test_bit(blk_queue_registered(q)))
- 		return kobject_name(q->kobj.parent);
- 	else
- 		return "<unknown>";
 diff --git a/block/elevator.c b/block/elevator.c
-index b506895b34c7..431a2a1c896e 100644
+index 431a2a1c896e..293c5c81397a 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -672,7 +672,7 @@ void elevator_init_mq(struct request_queue *q)
- 	if (!elv_support_iosched(q))
- 		return;
+@@ -479,16 +479,13 @@ static struct kobj_type elv_ktype = {
+ 	.release	= elevator_release,
+ };
  
--	WARN_ON_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags));
-+	WARN_ON_ONCE(blk_queue_registered(q));
+-/*
+- * elv_register_queue is called from either blk_register_queue or
+- * elevator_switch, elevator switch is prevented from being happen
+- * in the two paths, so it is safe to not hold q->sysfs_lock.
+- */
+ int elv_register_queue(struct request_queue *q, bool uevent)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 	int error;
  
- 	if (unlikely(q->elevator))
- 		return;
++	lockdep_assert_held(&q->sysfs_lock);
++
+ 	error = kobject_add(&e->kobj, &q->kobj, "%s", "iosched");
+ 	if (!error) {
+ 		struct elv_fs_entry *attr = e->type->elevator_attrs;
+@@ -507,13 +504,10 @@ int elv_register_queue(struct request_queue *q, bool uevent)
+ 	return error;
+ }
+ 
+-/*
+- * elv_unregister_queue is called from either blk_unregister_queue or
+- * elevator_switch, elevator switch is prevented from being happen
+- * in the two paths, so it is safe to not hold q->sysfs_lock.
+- */
+ void elv_unregister_queue(struct request_queue *q)
+ {
++	lockdep_assert_held(&q->sysfs_lock);
++
+ 	if (q) {
+ 		struct elevator_queue *e = q->elevator;
+ 
 -- 
 2.25.4
 
