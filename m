@@ -2,130 +2,114 @@ Return-Path: <SRS0=GCUE=C3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 994DAC43464
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 02:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 292E2C43463
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 06:10:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66033214D8
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 02:42:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC4482100A
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 06:10:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="k70brCoN";
+	dkim=temperror (0-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IV3Aswkv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729263AbgIRCl6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 22:41:58 -0400
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:54714 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728575AbgIRCLO (ORCPT
+        id S1726168AbgIRGKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Sep 2020 02:10:51 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:39707 "EHLO
+        out5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725886AbgIRGKv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:11:14 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0U9Gue2N_1600395067;
-Received: from JosephdeMacBook-Pro.local(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0U9Gue2N_1600395067)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 18 Sep 2020 10:11:07 +0800
-Subject: Re: [PATCH 09/14] ocfs2: cleanup o2hb_region_dev_store
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        linux-pm@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-References: <20200917165720.3285256-1-hch@lst.de>
- <20200917165720.3285256-10-hch@lst.de>
-From:   Joseph Qi <joseph.qi@linux.alibaba.com>
-Message-ID: <1c8a3a5a-aa59-f30e-4865-6777436c4225@linux.alibaba.com>
-Date:   Fri, 18 Sep 2020 10:11:07 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+        Fri, 18 Sep 2020 02:10:51 -0400
+X-Greylist: delayed 406 seconds by postgrey-1.27 at vger.kernel.org; Fri, 18 Sep 2020 02:10:50 EDT
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id 5B5A75C0976;
+        Fri, 18 Sep 2020 02:04:04 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Fri, 18 Sep 2020 02:04:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm1; bh=tO8sfYfyaMGPwY+gdcAPKVHFv/X
+        3WFOA+xB/VRYT8OU=; b=k70brCoNl3dxJWxNKWz+bk18FWo8Pm97i2viBzOJndO
+        TSor2LNxpRHPmpN+iuQi7dqdBhvHCwGwd7YdI4EMywWL297SFB65jGNVafGLJBZC
+        ml3aCSdwjvKEsxKvs/b6EEwvEr2Ni4hb6HE0qv2OepgnLtYNtbZEXDWHqDnwVw3x
+        nfoSs+lgIlH4Y8yEB0Xmmkj14mXXwJVUzzj7YR5LWoqhf+F15N0Hyu/HPRzgqtCa
+        bn+x2Ipvi/v4uMMIg64wGiQ+Ml4xhiVA2EiG+eZ/j2yrRzLco2TgtoeyO+6dBmkK
+        aj/AOm+IPH066pQa1b2P3+I3c4ZjnUdc9F+RCUgLNDQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=tO8sfY
+        fyaMGPwY+gdcAPKVHFv/X3WFOA+xB/VRYT8OU=; b=IV3Aswkvo83ZppYC3FWsV7
+        bol+flk+84aaDARaLEy7zWFk3OKOr/JunEeeArI4Ywr1wRy07p5krHr+hI97+Iuj
+        5XmrmPbW6rRLw6irSmlYmjatSnz0OWakY8qYYAskN2bAbkxNLFxI890bozrq5UsM
+        P8PkqVMNiZ1JW3eZwA4AkQ49hXbbvkbC03t1kVGK5ru3mDZpH2DStOixS84MYrCV
+        rEgXQD432aSWqsfoGj3sakTvasE/89I84g48ZddaHPGxH5Qrqw+N69SxrLFoPWCb
+        s11OVny4xq7vQEnQUQ8LLpKm2NUuuMuICluHPtHPydOlibNiRR3h2ZzrjBGF8tpA
+        ==
+X-ME-Sender: <xms:001kX9hDJsoOmPHWlqREdHla9R_3LsMbdrjZ4gXKA5BUMDTmSIbGKA>
+    <xme:001kXyAPVZYCf-aE8uiLIQ6VuU3cKL1urdk9JwC4nL3Att9cHkgjkhVpi3-AJ3GIf
+    AO358qO4EO4ZA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrtdehgddutdefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeevueehje
+    fgfffgiedvudekvdektdelleelgefhleejieeugeegveeuuddukedvteenucfkphepkeef
+    rdekiedrjeegrdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
+    hlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
+X-ME-Proxy: <xmx:001kX9GIrhYKQnsqsyoQ424zlQhYGZN4eXhKOxko3HA0KnYpsUcNhA>
+    <xmx:001kXyRzyxouK5ceJiRRdStB7IJFQf3CjV3NBj-7C2o_r4Av7TtFig>
+    <xmx:001kX6wihst8KcOlWhdWND0OP8C4Nta5CgWtXDdcneXi-h3MdsAslA>
+    <xmx:1E1kX-9w9idjMpvDbo33iKtOepQ2z3ZxxBh1sYgeNAVB0qQQWDYmgw>
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 84B793280059;
+        Fri, 18 Sep 2020 02:04:03 -0400 (EDT)
+Date:   Fri, 18 Sep 2020 08:04:00 +0200
+From:   Greg KH <greg@kroah.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Sasha Levin <sashal@kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH v3 1/2] scsi: Fix handling of host-aware ZBC disks
+Message-ID: <20200918060400.GA58093@kroah.com>
+References: <20200915073347.832424-2-damien.lemoal@wdc.com>
+ <20200917155335.19CBF21D24@mail.kernel.org>
+ <CY4PR04MB3751FEC907B8C0FD50B53624E73E0@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20200917165720.3285256-10-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY4PR04MB3751FEC907B8C0FD50B53624E73E0@CY4PR04MB3751.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2020/9/18 00:57, Christoph Hellwig wrote:
-> Use blkdev_get_by_dev instead of igrab (aka open coded bdgrab) +
-> blkdev_get.
+On Thu, Sep 17, 2020 at 11:50:44PM +0000, Damien Le Moal wrote:
+> On 2020/09/18 0:53, Sasha Levin wrote:
+> > Hi
+> > 
+> > [This is an automated email]
+> > 
+> > This commit has been processed because it contains a "Fixes:" tag
+> > fixing commit: b72053072c0b ("block: allow partitions on host aware zone devices").
+> > 
+> > The bot has tested the following trees: v5.8.9.
+> > 
+> > v5.8.9: Failed to apply! Possible dependencies:
+> >     a3d8a2573687 ("scsi: sd_zbc: Improve zone revalidation")
+> > 
+> > 
+> > NOTE: The patch will not be queued to stable trees until it is upstream.
+> > 
+> > How should we proceed with this patch?
+> > 
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Usually, I wait for Greg's bots to ping me and then I send a fixed up backported
+> patch for stable. Would that work ? I can backport now if needed.
 
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+That works, no worries, thanks.
 
-> ---
->  fs/ocfs2/cluster/heartbeat.c | 28 ++++++++++------------------
->  1 file changed, 10 insertions(+), 18 deletions(-)
-> 
-> diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
-> index 89d13e0705fe7b..0179a73a3fa2c4 100644
-> --- a/fs/ocfs2/cluster/heartbeat.c
-> +++ b/fs/ocfs2/cluster/heartbeat.c
-> @@ -1766,7 +1766,6 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
->  	int sectsize;
->  	char *p = (char *)page;
->  	struct fd f;
-> -	struct inode *inode;
->  	ssize_t ret = -EINVAL;
->  	int live_threshold;
->  
-> @@ -1793,20 +1792,16 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
->  	    reg->hr_block_bytes == 0)
->  		goto out2;
->  
-> -	inode = igrab(f.file->f_mapping->host);
-> -	if (inode == NULL)
-> +	if (!S_ISBLK(f.file->f_mapping->host->i_mode))
->  		goto out2;
->  
-> -	if (!S_ISBLK(inode->i_mode))
-> -		goto out3;
-> -
-> -	reg->hr_bdev = I_BDEV(f.file->f_mapping->host);
-> -	ret = blkdev_get(reg->hr_bdev, FMODE_WRITE | FMODE_READ, NULL);
-> -	if (ret) {
-> +	reg->hr_bdev = blkdev_get_by_dev(f.file->f_mapping->host->i_rdev,
-> +					 FMODE_WRITE | FMODE_READ, NULL);
-> +	if (IS_ERR(reg->hr_bdev)) {
-> +		ret = PTR_ERR(reg->hr_bdev);
->  		reg->hr_bdev = NULL;
-> -		goto out3;
-> +		goto out2;
->  	}
-> -	inode = NULL;
->  
->  	bdevname(reg->hr_bdev, reg->hr_dev_name);
->  
-> @@ -1909,16 +1904,13 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
->  		       config_item_name(&reg->hr_item), reg->hr_dev_name);
->  
->  out3:
-> -	iput(inode);
-> +	if (ret < 0) {
-> +		blkdev_put(reg->hr_bdev, FMODE_READ | FMODE_WRITE);
-> +		reg->hr_bdev = NULL;
-> +	}
->  out2:
->  	fdput(f);
->  out:
-> -	if (ret < 0) {
-> -		if (reg->hr_bdev) {
-> -			blkdev_put(reg->hr_bdev, FMODE_READ|FMODE_WRITE);
-> -			reg->hr_bdev = NULL;
-> -		}
-> -	}
->  	return ret;
->  }
->  
-> 
+greg k-h
