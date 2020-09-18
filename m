@@ -2,111 +2,130 @@ Return-Path: <SRS0=GCUE=C3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53140C43465
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 08:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD3A6C43463
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 08:52:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE0DE21D43
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 08:18:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7322E208C3
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 08:52:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="JXeByUkw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/z/lqMI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbgIRISj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Sep 2020 04:18:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54970 "EHLO
+        id S1726477AbgIRIw6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Sep 2020 04:52:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726321AbgIRISj (ORCPT
+        with ESMTP id S1726009AbgIRIw6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Sep 2020 04:18:39 -0400
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAA84C061756
-        for <linux-block@vger.kernel.org>; Fri, 18 Sep 2020 01:18:38 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id gr14so6990017ejb.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Sep 2020 01:18:38 -0700 (PDT)
+        Fri, 18 Sep 2020 04:52:58 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8562C06174A;
+        Fri, 18 Sep 2020 01:52:57 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id n25so4442122ljj.4;
+        Fri, 18 Sep 2020 01:52:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0cOuj0tyTgGzllb+rK+TK1g8Ercqsw8ImNlq73xmLCc=;
-        b=JXeByUkwnBkyD2bWF4IYm7XAKW3prSqWTC7zlC5UjdKQq71KARjqXm7kqA7PE1so1a
-         aCw668UG867Nk86rHr2JDraUCR45YFjfIf1Wxl6YFwi1ld9pML8CO6BtTVsEu0srzPcS
-         7C+iR4EVIW5wMPAgbeEPskGxN61FKfbr743jJMhD8sFBsNiMqCC4cH1dYZ+mo/wdl90w
-         UiO+2kCCkhH76z40BVpf9yRdIdMnjP4wJun9Yiox5OGGQ/dKafI9bXDZ3t/pRorWmj07
-         9otx9HTgVq0KHLDbeUFTHM+uUlWKJ8dxGAxRamDiE6TFJXKSS8TVu9kkSx0eigqXkK9G
-         2jSg==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:organization:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=asjClMEVQUugwRnuiCaRpILyUTB6qCyLua353zU0XaA=;
+        b=W/z/lqMIRm38/rH5hoC1y6v6zRQO1N/LODV5dyUEiJu3Z0Ysqlp/3+8L1e9rLDMk2m
+         sBItJh8qIyGYm03eIK0hTdBoxXVBw4cghdDiPSwhWAZoWgfzs33gNea15pJClLwx2PyP
+         hHZXDHkjh03U3WZVcKBTqEHufGASOVouVB4m7BE5RIoKEh2joN3kIYcDTDJq0Chrbk2i
+         J/NdgDEshJe1yWvUgaAnM4jfYus4kL1oPcAFg4fuHOSe5l7mwswJJ6COScNBGhNcGGPN
+         q/gR4vXJlWd2ZXlKnLgsRNsC12UFA86our5/zZc8O5yxXBZ6W0BJN8M0aPB9fejtttXs
+         Ecww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0cOuj0tyTgGzllb+rK+TK1g8Ercqsw8ImNlq73xmLCc=;
-        b=jNRaSZfWM2+J68Ig6rZIfEoB5YRbPSV1m1gP4zlBaZzBkDWv245HxJg2w5mVvVpZm8
-         F74V/exWb8scqDIqT4M2rtuSd3M1NifYCPNaMr6eMorrRbXxbOVjA5i82wRnDmwjCqfH
-         YiJW0xcqqo5fhe1RiYALuWwydLwRrH0zKZp60X+J7/JSTvYsCMPePII8UQ3ikTG2vCyY
-         pVibw5ludBwEuy0X/ZeF0d7CohL/xXdZ7cUU+ySk7UE1MLEOjEmjFpyZHPk+fGynH98S
-         L7hiUOiZW4+54gMSWM8avdruJi2DQlzjxttux12tFVMXKaeDwL9aqUULqzn/3jfZJdBy
-         hL4A==
-X-Gm-Message-State: AOAM533i/JFU5MKF3Umeu7+VB1O9bRibDIm2+YCdgxIVKFM/Tvh+UnNX
-        SDSSLINtvCsNYYS985WOYjdD21nZIXCyc0XZ0tePESAE4T9a0Q==
-X-Google-Smtp-Source: ABdhPJw6VWUK5Pg/GCbLk8kKltR4keE7ppDBjX/WCZZE3i9DqdLelttt012uN0GzqbM2e/Giw1EQ7XrOOU2yTjmSkyc=
-X-Received: by 2002:a17:906:dbf5:: with SMTP id yd21mr33923911ejb.521.1600417117347;
- Fri, 18 Sep 2020 01:18:37 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=asjClMEVQUugwRnuiCaRpILyUTB6qCyLua353zU0XaA=;
+        b=bPGMdLSNGpN+eR9u0Fl1QDq/0v79LoG8B97Tw1jVC8CNpOvFs8jWZuY4atGcXXcyfe
+         s+OFC8sn/4DOnzifzBczsa9rC7ZwEf7pMNEbAN545w2VVBbQbqwPGMPw2t4clTNFPw5I
+         eQFp30PFhmnGQGoa0vKzhwfFyH1HhmjcEdSXBonhaAF8IrA82MvORwueUdl9vvZKpt+4
+         YY47lzll5sQ8CMO78s7UKjRthA9CvUd9hfOmHfZzOaxIZwHekwL0HnjFhhv0xEAnO32k
+         H8XAs3VNwCgraBWmrfu1RUgQoavdjfXdg8P0DEen5FuWug1pLvdKHJbrmIibj1Oxp8hh
+         hStg==
+X-Gm-Message-State: AOAM531X8clfpj3CiIKTNYJmczYVSI3k8dz6gF1VICKfVCd9QRKmjQNq
+        xV7PQ9i9jXLH3TM78Jk8AEo1eJ2NV4BV+A==
+X-Google-Smtp-Source: ABdhPJy1RlFuj0xDkan2bS2ZV4OPmRHWdA9YyD0WopBAfX+NGu2O9O4BkfmuLbcTQkb9zURbzOO0Aw==
+X-Received: by 2002:a2e:a48c:: with SMTP id h12mr12544381lji.221.1600419176113;
+        Fri, 18 Sep 2020 01:52:56 -0700 (PDT)
+Received: from ?IPv6:2a00:1fa0:44fb:767f:35b0:3244:6cdc:c4a2? ([2a00:1fa0:44fb:767f:35b0:3244:6cdc:c4a2])
+        by smtp.gmail.com with ESMTPSA id u1sm459692lfu.24.2020.09.18.01.52.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Sep 2020 01:52:55 -0700 (PDT)
+Subject: Re: [PATCH 02/14] block: switch register_disk to use
+ blkdev_get_by_dev
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        linux-pm@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+References: <20200917165720.3285256-1-hch@lst.de>
+ <20200917165720.3285256-3-hch@lst.de>
+From:   Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Organization: Brain-dead Software
+Message-ID: <091931b1-eb9c-e45e-c9e8-501554618508@gmail.com>
+Date:   Fri, 18 Sep 2020 11:52:39 +0300
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-References: <20200918072356.10331-1-gi-oh.kim@clous.ionos.com>
-In-Reply-To: <20200918072356.10331-1-gi-oh.kim@clous.ionos.com>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Fri, 18 Sep 2020 10:18:26 +0200
-Message-ID: <CAMGffEn79RE=JbTPR0AzW+3EZO0MwemwTLwkc-LTnK8f06dKWA@mail.gmail.com>
-Subject: Re: [PATCH] block/rnbd: send_msg_close if any error occurs after send_msg_open
-To:     Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200917165720.3285256-3-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 18, 2020 at 9:24 AM Gioh Kim <gi-oh.kim@cloud.ionos.com> wrote:
->
-> From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
->
-> After send_msg_open is done, send_msg_close should be done
-> if any error occurs and it is necessary to recover
-> what has been done.
->
-> Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Looks good to me!
-Thanks!
-Acked-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+Hello!
+
+On 17.09.2020 19:57, Christoph Hellwig wrote:
+
+> Use blkdev_get_by_dev instead of open coding it using bdget_disk +
+> blkdev_get.
+
+    I don't see where you are removing bdget_disk() call (situated just before
+the below code?)...
+
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  drivers/block/rnbd/rnbd-clt.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-> index cc6a4e2587ae..4a24603d5224 100644
-> --- a/drivers/block/rnbd/rnbd-clt.c
-> +++ b/drivers/block/rnbd/rnbd-clt.c
-> @@ -1520,7 +1520,7 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
->                               "map_device: Failed to configure device, err: %d\n",
->                               ret);
->                 mutex_unlock(&dev->lock);
-> -               goto del_dev;
-> +               goto send_close;
->         }
->
->         rnbd_clt_info(dev,
-> @@ -1539,6 +1539,8 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
->
->         return dev;
->
-> +send_close:
-> +       send_msg_close(dev, dev->device_id, WAIT);
->  del_dev:
->         delete_dev(dev);
->  put_dev:
-> --
-> 2.20.1
->
+>   block/genhd.c | 7 +++----
+>   1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 7b56203c90a303..f778716fac6cde 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -732,10 +732,9 @@ static void register_disk(struct device *parent, struct gendisk *disk,
+>   		goto exit;
+>   
+>   	set_bit(GD_NEED_PART_SCAN, &disk->state);
+> -	err = blkdev_get(bdev, FMODE_READ, NULL);
+> -	if (err < 0)
+> -		goto exit;
+> -	blkdev_put(bdev, FMODE_READ);
+> +	bdev = blkdev_get_by_dev(disk_devt(disk), FMODE_READ, NULL);
+> +	if (!IS_ERR(bdev))
+> +		blkdev_put(bdev, FMODE_READ);
+>   
+>   exit:
+>   	/* announce disk after possible partitions are created */
+
+MBR, Sergei
