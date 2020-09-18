@@ -2,129 +2,103 @@ Return-Path: <SRS0=GCUE=C3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76F7FC43463
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 14:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C5BC43464
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 14:46:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FACC21D42
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 14:04:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C57A21D7B
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 14:46:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600440387;
+	bh=Ujby03RawZFbaBolJ4HLl3xztbQz8b8kH5bKPGGs9LY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=2ZgJSJfVJ/6EJBuzLtI6QnD2NTko4rlj0jG1k2l2b3f+/riOJboGszCxYuQYeRkrG
+	 PTD47qRCZX0kVmAogEoAkDGO16UxHR8xo/uret75mvlMcUJaHSMkCVPzMWJlC/o8PV
+	 P+rwGtgPe91Q9H5fzoldvNJULxa4DFcBxafsmc1k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726721AbgIROE6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Sep 2020 10:04:58 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:43833 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726633AbgIROE6 (ORCPT
+        id S1726728AbgIROq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Sep 2020 10:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58662 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726588AbgIROq0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Sep 2020 10:04:58 -0400
-X-Greylist: delayed 306 seconds by postgrey-1.27 at vger.kernel.org; Fri, 18 Sep 2020 10:04:56 EDT
-Received: from mail-qv1-f41.google.com ([209.85.219.41]) by
- mrelayeu.kundenserver.de (mreue011 [212.227.15.129]) with ESMTPSA (Nemesis)
- id 1MlNYj-1kkrOA2cLF-00lmqY; Fri, 18 Sep 2020 15:59:47 +0200
-Received: by mail-qv1-f41.google.com with SMTP id db4so2894478qvb.4;
-        Fri, 18 Sep 2020 06:59:46 -0700 (PDT)
-X-Gm-Message-State: AOAM533TJj5xT1n4e1bGgoqAoKlLC4z2QSZZqgUFd8vCugbyjSOe/IMS
-        LVJQfW9Jog9OO5NB/Qqhi5Sm/YLe2Qbzf4Y/Ous=
-X-Google-Smtp-Source: ABdhPJyPq7mySMvROlaNxuZFtqLj9tUV6q55niOILmDEkx6ztioH5FRFrOH6npOQU7X7q9Cy/nZY2UELvp9CUKm70dc=
-X-Received: by 2002:a0c:b39a:: with SMTP id t26mr2701457qve.19.1600437585347;
- Fri, 18 Sep 2020 06:59:45 -0700 (PDT)
+        Fri, 18 Sep 2020 10:46:26 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9E52C0613CE;
+        Fri, 18 Sep 2020 07:46:26 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id 67so3590314pgd.12;
+        Fri, 18 Sep 2020 07:46:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=O2gKBbjWeOUkcv+S6dyzsOFS6GQkgFkqNOlDLf528KI=;
+        b=PRyXB/v06JWW/jjQrBtLKBRDF5ULq3jwiUkJXCc+xg9NWxBsgS2p6S8riGC2VtVb0T
+         4+umuO0rdo/OJYloVdJ0Vn/8HarelyIPzMI/ok4RDRdQ07C9h/2vWyR451p0Z3CAh3l3
+         MGbdammsOH3hOHr+ZBeId/pu2B4YQwaLYPRLA/RF5sOciTQFjOzhVcvgWQQD3/Y9zOtF
+         WDrTGfKemfvpkFH67pJGX/VTyFju7j/f8CoxG6h5K/P3ZeTETBb8lo2ToT16Buj74hbG
+         VL1+ku4i2qa0/t7ThPXuFwaWPtkfCIQTkParrQJkCi6rFj8HR5isExBdeLdl2i3YseoW
+         QyCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=O2gKBbjWeOUkcv+S6dyzsOFS6GQkgFkqNOlDLf528KI=;
+        b=maXgEWkg1DDIQfEruvf60DxlH8ZtM/6xycT08VvF/tfwBO2wqFrPPc35miT/sHVu2r
+         IvWW2OeewRxw6eCdRPYmuLbe1wkmElk8A99gjqyHxBRqv4OgogXPVYCu2XAkV4WCVGv9
+         xHpgP8RyL6vRsL03YYgirHLxjjarstnq8pTwJBXf+Wy0xjQKyxEahACxOCh+FL/DMqPo
+         xuHYV9rgqAZ3Ak4A2kw6WfMuwS1BXFUfq9RstRmNegikZe6QuwQ3mjPBGdCAXnrDnUcQ
+         Ds8qIvSUL3YhE8iwr+FNlDf2tH2b8651H3TuZxfzcVl4pQfh0a3v2vCSTRaB0A9t/nHn
+         Dy4Q==
+X-Gm-Message-State: AOAM532kOXdAYWAgG+3DmnnWlOCugOMkop2k+V5Hbd//go3oDUEl7gca
+        4S0SchrijM0EQHEcree+eN0=
+X-Google-Smtp-Source: ABdhPJz4CI4TCh/puGQapmXeVYctrnDdDOVVqoI68FbGBp0ftdovIvo6SkLSDQNG4grnPI9Tp23Fcw==
+X-Received: by 2002:aa7:9635:0:b029:142:2501:3980 with SMTP id r21-20020aa796350000b029014225013980mr16298544pfg.69.1600440386234;
+        Fri, 18 Sep 2020 07:46:26 -0700 (PDT)
+Received: from google.com ([2620:15c:211:1:7220:84ff:fe09:5e58])
+        by smtp.gmail.com with ESMTPSA id e16sm3397040pgv.81.2020.09.18.07.46.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Sep 2020 07:46:24 -0700 (PDT)
+Date:   Fri, 18 Sep 2020 07:46:23 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Douglas Anderson <dianders@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        sonnyrao@chromium.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] zram: Failing to decompress is WARN_ON worthy
+Message-ID: <20200918144623.GA748396@google.com>
+References: <20200917174059.1.If09c882545dbe432268f7a67a4d4cfcb6caace4f@changeid>
 MIME-Version: 1.0
-References: <20200918124533.3487701-1-hch@lst.de> <20200918124533.3487701-2-hch@lst.de>
- <20200918134012.GY3421308@ZenIV.linux.org.uk> <20200918134406.GA17064@lst.de>
-In-Reply-To: <20200918134406.GA17064@lst.de>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Fri, 18 Sep 2020 15:59:29 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a3_DL0T33e7CAuyRxgpRy8LaJO9h1sER7sebcX26hVVjA@mail.gmail.com>
-Message-ID: <CAK8P3a3_DL0T33e7CAuyRxgpRy8LaJO9h1sER7sebcX26hVVjA@mail.gmail.com>
-Subject: Re: [PATCH 1/9] kernel: add a PF_FORCE_COMPAT flag
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        David Howells <dhowells@redhat.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Parisc List <linux-parisc@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        linux-aio <linux-aio@kvack.org>, io-uring@vger.kernel.org,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        Networking <netdev@vger.kernel.org>, keyrings@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:5bsXb+NC+lllYzcUOGgsO10SuiSw9kHorG4pcD07lr3QFbCWqJR
- Hd2vOtRjq6zM6dfC422gwtrcI3R5GCUojEo3h2z2kZfRtoDGJYgYE+Le/OiYLQ+AfYeJUc7
- KH3vEAyJZtGCUGYSkFwn1WnE2X3RbGV559CUsPqRgam5BOOvyh/QhpykfzE/YedWzwiNxtY
- wiICue+oltyvAbFBEi/NQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:sk+r83jP25A=:/SIkK1K6onTr3J0pNT14Tr
- NsrESH7tuKshtxaIzIHnGtmqrA5sQHG1trQWYkwG1rTNMaQ2B9TIKtC3ChQJa84t1Wf2e8BTE
- tkUmn7RPRuVl01dc9wzJKFl+9hupsoq9xF7QU+YN9J2u4KJIZLTW2sLbE+WWDAxOs8qzpAkCC
- ch3gmHGBxM5uZPG4LzNatfRYhJZWSq4ggBYsVgzbAsKVKrvSnJJShXH1ZuoLKLa45AfnkJIpH
- 000HBaSbuUonwu4iks7bopTIfIv/PNliOeuaqyNdIKM21qto71vZ9xXsJ83MNll4syaoHZrqv
- BQMihP6Evajn/ZfKb7ffmAp+JPOFFbvwFxobbT9OSHvEoWXk6V1cHvm2R8QL0ba285m6q2wvY
- x9Iobt2uEbmqWyjhYh1V7Ss6t53IcxevRQIdl0PoI3TIQY6Z4sflorSpFPBGa3+si37D8CDan
- 5yVg6ojNHxarpmZZKYoQmupKN/S6Uxnjd6BqfLhns8I5/n//YqlDQkpTZREOx76E3xF9mtm/S
- O3OLOBwO2ILft4yH20aJ8P7ZiApX67gHJyjtDAdDIN2ZzxkEIyb/DIUOJNNNzAHhBOYjdQbXG
- VhIr7/k+Lbpb8uRMTXrpKzfKcLGJDWVsZM7rnxR6xwEesmL/8RZT9OyqlLAgG1IpsJq8SmQLU
- qudEdrwlal82xZWcv7D0s2v4lbIEAnF9K4J8NXbed/fIcfrMDvuviGIzx6G8Qw3WU/Ne8dTb2
- 1kTBk9kYRC/sEaBsEqbjh5tZ8es/W8USlkc/Lja/DFhALH+GO8Vu4rjRrvmxYxuoTKcv8cIR1
- wyPvIx8EQ+Dcu7nx9d8J+KlpsO4mgZOwb+4M3yyOYLXVQCjoTPkzoem0Ol4DOoJgilpyLPvp1
- A+miM4jr98V6l5mDqMw9Rzs8yW+cRJnkTTJUmMFHYNBfhGhRa2aj9emK9eS3xMKq0LtMjwA4g
- yAMK1P3EU2bRwJyY4bJdPVN4UpGzUy/hwrP9YBlozT7uA44iNdrl/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200917174059.1.If09c882545dbe432268f7a67a4d4cfcb6caace4f@changeid>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 18, 2020 at 3:44 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Fri, Sep 18, 2020 at 02:40:12PM +0100, Al Viro wrote:
-> > >     /* Vector 0x110 is LINUX_32BIT_SYSCALL_TRAP */
-> > > -   return pt_regs_trap_type(current_pt_regs()) == 0x110;
-> > > +   return pt_regs_trap_type(current_pt_regs()) == 0x110 ||
-> > > +           (current->flags & PF_FORCE_COMPAT);
-> >
-> > Can't say I like that approach ;-/  Reasoning about the behaviour is much
-> > harder when it's controlled like that - witness set_fs() shite...
->
-> I don't particularly like it either.  But do you have a better idea
-> how to deal with io_uring vs compat tasks?
-
-Do we need to worry about something other than the compat_iovec
-struct for now? Regarding the code in io_import_iovec(), it would
-seem that can easily be handled by exposing an internal helper.
-Instead of
-
-#ifdef CONFIG_COMPAT
-     if (req->ctx->compat)
-            return compat_import_iovec(rw, buf, sqe_len, UIO_FASTIOV,
-iovec, iter);
-#endif
-        return import_iovec(rw, buf, sqe_len, UIO_FASTIOV, iovec, iter);
-
-This could do
-
-    __import_iovec(rw, buf, sqe_len, UIO_FASTIOV, iovec,
-                     iter, req->ctx->compat);
-
-With the normal import_iovec() becoming a trivial wrapper around
-the same thing:
-
-ssize_t import_iovec(int type, const struct iovec __user * uvector,
-                 unsigned nr_segs, unsigned fast_segs,
-                 struct iovec **iov, struct iov_iter *i)
-{
-     return __import_iovec(type, uvector, nr_segs, fast_segs, iov,
-              i, in_compat_syscall());
-}
-
-
-         Arnd
+On Thu, Sep 17, 2020 at 05:41:20PM -0700, Douglas Anderson wrote:
+> If we fail to decompress in zram it's a pretty serious problem.  We
+> were entrusted to be able to decompress the old data but we failed.
+> Either we've got some crazy bug in the compression code or we've got
+> memory corruption.
+> 
+> At the moment, when this happens the log looks like this:
+> 
+>   ERR kernel: [ 1833.099861] zram: Decompression failed! err=-22, page=336112
+>   ERR kernel: [ 1833.099881] zram: Decompression failed! err=-22, page=336112
+>   ALERT kernel: [ 1833.099886] Read-error on swap-device (253:0:2688896)
+> 
+> It is true that we have an "ALERT" level log in there, but (at least
+> to me) it feels like even this isn't enough to impart the seriousness
+> of this error.  Let's convert to a WARN_ON.  Note that WARN_ON is
+> automatically "unlikely" so we can simply replace the old annotation
+> with the new one.
+> 
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Acked-by: Minchan Kim <minchan@kernel.org>
