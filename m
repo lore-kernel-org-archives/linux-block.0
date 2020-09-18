@@ -2,136 +2,95 @@ Return-Path: <SRS0=GCUE=C3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF95C43463
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 18:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73819C43464
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 19:41:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A87521534
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 18:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3621C206A4
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 19:41:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600454492;
-	bh=2ySdKpNv4H3xjExvqcqBkdQV6ayk69DC/t/KNpodubc=;
+	s=default; t=1600458060;
+	bh=IwIR6aotZiZz6If768azZzVDumAWo05x1JcIldWd4Bg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=H0PkoxfcqZYNpVRq1zaVlFfMFcYas8FVzRW7oaltXLCrLIcPBZAYxZLE1AiQrzNi1
-	 tibmy85EYKr1OEC4PKSxc9JqJv/QtkgNr+u1l+6wJ30mwIVYZrMUSHcAQ2txucurAg
-	 sHE4Dvlmm/+sQqic8xc4Jhj7H66MvK9A/tOir4gE=
+	b=PC/CLbOXNGUofDpwJ9ZJ0uuCWYEYtMUo3juAwaoc2cRdXww/tby7nP5SN1VPeQCqO
+	 hyh1vta5tAkseeENetsU+KtEsf6Ck0NyyMVns/Odqy8ENAf7NsP/RJXi0jpFs6veMi
+	 mwLvtEQeH6Z9GCWy3Gm4wCDvuRo6BWUDWbm6B31A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726192AbgIRSla (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Sep 2020 14:41:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38348 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726115AbgIRSla (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Sep 2020 14:41:30 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B19FC0613CF;
-        Fri, 18 Sep 2020 11:41:30 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id db4so3483752qvb.4;
-        Fri, 18 Sep 2020 11:41:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RyuK5UieZne+pKhpGinbT1xLnPtjZ4n2yvvqOQQR/RM=;
-        b=bijR7TvXbgX48PfH9waDRVC/Tbn3PSFLH/s/gHvqLfGFatnCdUy9xUMEhd8hR+12c6
-         bM4G7PDeskHdUznZLA0Y1RXttv8Zf5Kc4gWb0xfOf7BiW2JvYcY8zQoWk/EWjxWDr9Co
-         F6lzPp0d/WanDs+PEy5McGVjmqp9J4aOu1Mj6fu/oo7Zb28uMf6HGPvK3eQekiroIocI
-         qgnEXOWua96Vs6spW1iBrlpEY1kxchcSzIEAAer60R4lQGVJsXv55z2V/a4PjsGPbf7R
-         0pHxW2in/M7Xd1ZBpmWUarETt52ESRjqTDHazLcEMmOk0JD1lIYUj0mqE7Idd144OnLF
-         94sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=RyuK5UieZne+pKhpGinbT1xLnPtjZ4n2yvvqOQQR/RM=;
-        b=R6Igt2pcSBpeIJSiGiK++72Kc+2hfNI7Gg0GMRG5pf1EY9BccHzgEmZViiPJhpfnIk
-         +nc05zhCbC5CJKOJB1BksU/7MretGyaNRH9Nd5Jtsx8HqrB6+bvqTl2QN6Kyl8bvBxBz
-         npDzEm5wmjQOCJO5oXA1iYKgkOB/RCDllEnGghlPViOlkb1csyq0Uq3u7HIGNATUG03m
-         Oh2EIuwQTEHzrySAQ8mexQhzX8N7qs3s5KxMRqKmXKXHPw01EoOy8AMLSgmh7l76OJdZ
-         YNbNY7NCkPNkG+2g9/zVZdkkXPENbUlWNR9DvKDUgBJfSL7FCopkwoSaeEBYjhH9h9op
-         VAOg==
-X-Gm-Message-State: AOAM530IL2qpZuoziGyMoUB62AHLxPC7F6wWpjbSY9d5+HfHgQBvQKFA
-        poh6GX6GoTsrtOL9W35iDn0=
-X-Google-Smtp-Source: ABdhPJyrfE5zh7qVv/Ct8VYZ7c9haa82D17TT639IsPr+2OBmTZj5Zp7at5HyuG8X09vdAQnQQeKVQ==
-X-Received: by 2002:a0c:8ec6:: with SMTP id y6mr23235555qvb.24.1600454489667;
-        Fri, 18 Sep 2020 11:41:29 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1:602a])
-        by smtp.gmail.com with ESMTPSA id 18sm2584248qkd.120.2020.09.18.11.41.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2020 11:41:29 -0700 (PDT)
-Date:   Fri, 18 Sep 2020 14:41:27 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel-team@fb.com, linux-kernel@vger.kernel.org
-Subject: [PATCH 6/5] iocost: consider iocgs with active delays for debt
- forgiveness
-Message-ID: <20200918184127.GB4247@mtj.thefacebook.com>
-References: <20200918004456.593983-1-tj@kernel.org>
+        id S1726389AbgIRTk7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Sep 2020 15:40:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40942 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726315AbgIRTk7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Sep 2020 15:40:59 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 40A7D206A2;
+        Fri, 18 Sep 2020 19:40:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600458058;
+        bh=IwIR6aotZiZz6If768azZzVDumAWo05x1JcIldWd4Bg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hTB6MaJ8vlmyVCvLqDBkbU8PBPOgkTv2XnpdEREalwm0Del+ztISIfApVnQiZ+n0i
+         /gmvpgIHh8RnIf1PGE4Cgfm7QGlcSWS7qeR1pQU5hMFU06jjMXhHhgKRjkBJKgQiIJ
+         A8fgE/ddk2LfXs6XsMYUijB9nGsNKI4dMVxsX80Y=
+Date:   Fri, 18 Sep 2020 12:40:56 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCHv3 1/4] block: add zone specific block statuses
+Message-ID: <20200918194056.GB4030837@dhcp-10-100-145-180.wdl.wdc.com>
+References: <20200917231841.4029747-1-kbusch@kernel.org>
+ <20200917231841.4029747-2-kbusch@kernel.org>
+ <SN4PR0401MB35983DBC8B0B97A4083CDF8B9B3F0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200918004456.593983-1-tj@kernel.org>
+In-Reply-To: <SN4PR0401MB35983DBC8B0B97A4083CDF8B9B3F0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-An iocg may have 0 debt but non-zero delay. The current debt forgiveness
-logic doesn't act on such iocgs. This can lead to unexpected behaviors - an
-iocg with a little bit of debt will have its delay canceled through debt
-forgiveness but one w/o any debt but active delay will have to wait out
-until its delay decays out.
+On Fri, Sep 18, 2020 at 01:31:44PM +0000, Johannes Thumshirn wrote:
+> On 18/09/2020 01:18, Keith Busch wrote:
+> > diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
+> > index f261a5c84170..2638d3446b79 100644
+> > --- a/Documentation/block/queue-sysfs.rst
+> > +++ b/Documentation/block/queue-sysfs.rst
+> > @@ -124,6 +124,10 @@ For zoned block devices (zoned attribute indicating "host-managed" or
+> >  EXPLICIT OPEN, IMPLICIT OPEN or CLOSED, is limited by this value.
+> >  If this value is 0, there is no limit.
+> >  
+> > +If the host attempts to exceed this limit, the driver should report this error
+> > +with BLK_STS_ZONE_ACTIVE_RESOURCE, which user space may see as the EOVERFLOW
+> > +errno.
+> > +
+> >  max_open_zones (RO)
+> >  -------------------
+> >  For zoned block devices (zoned attribute indicating "host-managed" or
+> > @@ -131,6 +135,10 @@ For zoned block devices (zoned attribute indicating "host-managed" or
+> >  EXPLICIT OPEN or IMPLICIT OPEN, is limited by this value.
+> >  If this value is 0, there is no limit.
+> >  
+> > +If the host attempts to exceed this limit, the driver should report this error
+> > +with BLK_STS_ZONE_OPEN_RESOURCE, which user space may see as the ETOOMANYREFS
+> > +errno.
+> 
+> Don't we also need to update some man pages in section 2?
 
-This patch updates the debt handling logic so that it treats delays the same
-as debts. If either debt or delay is active, debt forgiveness logic kicks in
-and acts on both the same way.
+Yes, good point. Those updates need to come from this repo
 
-Also, avoid turning the debt and delay directly to zero as that can confuse
-state transitions.
+  https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
-Jens, a follow up patch to the series. The git tree is also updated.
-
-Thanks.
-
- block/blk-iocost.c |   11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2048,7 +2048,7 @@ static void ioc_forgive_debts(struct ioc
- 	list_for_each_entry(iocg, &ioc->active_iocgs, active_list) {
- 		u64 __maybe_unused old_debt, __maybe_unused old_delay;
- 
--		if (!iocg->abs_vdebt)
-+		if (!iocg->abs_vdebt && !iocg->delay)
- 			continue;
- 
- 		spin_lock(&iocg->waitq.lock);
-@@ -2056,8 +2056,11 @@ static void ioc_forgive_debts(struct ioc
- 		old_debt = iocg->abs_vdebt;
- 		old_delay = iocg->delay;
- 
--		iocg->abs_vdebt >>= nr_cycles;
--		iocg->delay = 0; /* kick_waitq will recalc */
-+		if (iocg->abs_vdebt)
-+			iocg->abs_vdebt = iocg->abs_vdebt >> nr_cycles ?: 1;
-+		if (iocg->delay)
-+			iocg->delay = iocg->delay >> nr_cycles ?: 1;
-+
- 		iocg_kick_waitq(iocg, true, now);
- 
- 		TRACE_IOCG_PATH(iocg_forgive_debt, iocg, now, usage_pct,
-@@ -2129,7 +2132,7 @@ static void ioc_timer_fn(struct timer_li
- 		    iocg->delay) {
- 			/* might be oversleeping vtime / hweight changes, kick */
- 			iocg_kick_waitq(iocg, true, &now);
--			if (iocg->abs_vdebt)
-+			if (iocg->abs_vdebt || iocg->delay)
- 				nr_debtors++;
- 		} else if (iocg_is_idle(iocg)) {
- 			/* no waiter and idle, deactivate */
+right? If so, I can send updates there once it looks like this is the
+form that will be committed.
