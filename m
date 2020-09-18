@@ -2,110 +2,150 @@ Return-Path: <SRS0=GCUE=C3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF28C43463
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 00:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80658C43465
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 00:45:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 86DAC20838
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 00:45:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47C0020838
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 00:45:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600389901;
-	bh=RDiNbKKGW8G1pZpUOrU2qELYa3bbrS/9vkl36Jx/dmc=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=A9/99CwseT5Et4gG/M9XSBbe8m2cY0XhDE0OWIbr+eQ0V1bHeKWYLWAxtgyEHZjrW
-	 4Po4EE/QeEXKAdWpzuXxCc/B+hEGo4u8XfqMlNEF/wjL/7ZW2tZOPQlE5oZUq5JUEt
-	 fGkX6C/g7XlKAc5Fyys6LhG0xpIWuAfUWe9ZAjSo=
+	s=default; t=1600389910;
+	bh=gcI9x8qnm7aJusu+RAjLffERO7PHORt+Dc+DwTrhx/U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=LitAX+M5o2CAEyswsHJNr4cIVZEfAwvRj2UtmKp5RTh20zkHEL4MdBk7PtSCq8wIN
+	 4rs84utzmhubdCJFAuGy0uGcP9vX5pRRc8Sb4R395lPw3oW86s7QMGs+5tPkxuYQ3l
+	 aaUrNqy7TCOylSLF5ddaznACzf+ChfxeLtDyRRvw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726055AbgIRApB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 20:45:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41304 "EHLO
+        id S1726245AbgIRApF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 20:45:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726007AbgIRApA (ORCPT
+        with ESMTP id S1726007AbgIRApF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 20:45:00 -0400
-Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B3FC06174A;
-        Thu, 17 Sep 2020 17:45:00 -0700 (PDT)
-Received: by mail-qv1-xf42.google.com with SMTP id cv8so1999846qvb.12;
-        Thu, 17 Sep 2020 17:45:00 -0700 (PDT)
+        Thu, 17 Sep 2020 20:45:05 -0400
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE42C06174A;
+        Thu, 17 Sep 2020 17:45:05 -0700 (PDT)
+Received: by mail-qk1-x744.google.com with SMTP id w12so4366434qki.6;
+        Thu, 17 Sep 2020 17:45:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=I4g8oZaM4I1PTgkVQKRiJNIBO3rGE09QsJ8U+iD020Q=;
-        b=oqR+7x5dJyQcBEwZDtu1PVnUg0zlf4DCuy1Zp8tZ2FigjcnKMuj2pg78JL2AbnBQLM
-         lpNqq/FRqu/ytyo8P0ug/B0NXdeHsnftsBfGkIM6w01ef/dTfOFlrd8uvz0wYDofxW2j
-         XG2W1jvJ1QCpUQjZYlT3L7Y/KLFvXTba2Foj+z6KNYngQWofDOXSMuS9OfxiwO+OkcXo
-         ngQeOqW5OMDzeAazkPzJ+x3uqMA5U3+dI26Nu8OaD8VY+C0DSbIWFjjQuaQDxENVb17v
-         W8e68mbdDldx+0xBYRKbuIFe5WVgXpXmEniOLKGUU2XkHCRJE3SDflzZRT653J+gyPdT
-         yMGw==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=j/zKXBEr6TfdKAVuGNBQ0JBMHe4IOIVvKgYa0IBCbeM=;
+        b=V+eukaeBQ9EymY1UpurIpKChUF9k/7A5HpI5/TyACkajuXTHx7jxGZYyFFS4HHakSz
+         nZTlahmQZU2BrlkbxdryiyrNSNTZYN4Q3cS8mMllkeSjCt7+ygWZm+WBsRa96E22GKe5
+         xwSeNq6ftFaRDQL7gHjJLdFHKBTbIBQVfGKbckFdEYSDxBglwYcWuQKTeYHWD088XX0S
+         gMX2DCEaHHGym14WixlbHcyFItlTD+EccCdxeRR0xJrR0LL6iCVD/CPf6FbLcnIIm7sN
+         FGQH5TccRjAysF7Tn9HalVYbLkFf/Mp6HIuH1N2SbQevxwTI9QZPdSBR/24ktpX2WpAk
+         SkPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=I4g8oZaM4I1PTgkVQKRiJNIBO3rGE09QsJ8U+iD020Q=;
-        b=fij2JfqxIU0h0hqxh6f/kLhTL6TkLLCjJ6pOdO4ucbSi4EEOJVdFep57EYqYDpwp+q
-         ApvMaY536ZVJYnzJIooW8ucKQNm+VAtm86WEUGoz+W5+uPyAdGyp6AbPMdJ3pyDk1sqe
-         gL7ddc08sPloEkNYfKjI2UJoR/rw4OqkfPF5KYx+g2rMidN/E739a2KOEN/e/orWDCGy
-         QpD2YkuEPlwydHc198Py5lhgSbynDL42UYDYUPEBFDg5cB98b/9IBtLlA8EOegVm3cH8
-         /jiwncANM8VYcbAXtZxqdOWYJmkeDtq9QKgPGPuyTSIzduIFeM3DR35njjKBdB06GPkx
-         D/Fw==
-X-Gm-Message-State: AOAM531FvIYP3qK4FJ6SXQKZFMSt4/oPl/nuD7c4q1slT4zf4MOHkPAR
-        ca0CA1SBz2OqHq63TC2OZnBHtQNtLCeJiQ==
-X-Google-Smtp-Source: ABdhPJyn2pmKBLJDKQFFGWpimDyrVIFq6Efh5yAXczEBVLkltpvJg6VKFJcu0xaZIpkehLhIddMH3Q==
-X-Received: by 2002:ad4:4594:: with SMTP id x20mr31706024qvu.4.1600389899750;
-        Thu, 17 Sep 2020 17:44:59 -0700 (PDT)
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=j/zKXBEr6TfdKAVuGNBQ0JBMHe4IOIVvKgYa0IBCbeM=;
+        b=YhSGKQ91xp8v2EKIywIbasQYArAtkXEYnzvMwX+ipCckuTZQFAOdLn+Q9C92vCr8MT
+         EGAaC2wo/uRG5uwD/Ujh7u6vZACt2GTZYiiBgaKG1mZ5K9SXeO37P/sv4BeUSFkbCwpx
+         rCaRzuMRj/Lxwhoa31q99DWKdJz1cIY13sNSVP/ZbfNVRdHkgYUwSTR/MU2E4ul/MxW8
+         NglweU7R0w0+ZLaIh6CPbjSALa9cMaVgzJVV5qhcW5OH6Kuc0dmeMGbJAkaLrh+BGARw
+         rj98krtKY2vQEdmEtj/XyBSH2X6QFL8FoMMw/eOwQyJIF6//iZtG3elDWjE8W+Kka7Aq
+         6Ugg==
+X-Gm-Message-State: AOAM533+ksn1rUl3itBRXC/A+8bEtPCaZp5CC0dLSz0dAJjMEQO0GCua
+        A7ghUvu7KgwkI7f4l4kNlpE=
+X-Google-Smtp-Source: ABdhPJx9F4osQFUKiKrsAy9zgGKkumTulERLM/MfTr25TsVyTtPN0lvPXXRmQ2S5tVuJqsJqx7wr0A==
+X-Received: by 2002:a37:52c1:: with SMTP id g184mr8650621qkb.425.1600389904204;
+        Thu, 17 Sep 2020 17:45:04 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::1:6893])
-        by smtp.gmail.com with ESMTPSA id v131sm1064791qkb.15.2020.09.17.17.44.58
+        by smtp.gmail.com with ESMTPSA id 85sm1032669qkn.64.2020.09.17.17.45.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Sep 2020 17:44:59 -0700 (PDT)
+        Thu, 17 Sep 2020 17:45:03 -0700 (PDT)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel-team@fb.com, linux-kernel@vger.kernel.org
-Subject: [PATCHSET for-5.10/block] iocost: improve debt forgiveness logic
-Date:   Thu, 17 Sep 2020 20:44:51 -0400
-Message-Id: <20200918004456.593983-1-tj@kernel.org>
+        kernel-team@fb.com, linux-kernel@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>
+Subject: [PATCH 2/5] iocost: replace nr_shortages cond in ioc_forgive_debts() with busy_level one
+Date:   Thu, 17 Sep 2020 20:44:53 -0400
+Message-Id: <20200918004456.593983-3-tj@kernel.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200918004456.593983-1-tj@kernel.org>
+References: <20200918004456.593983-1-tj@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Debt reduction was blocked if any iocg was short on budget in the past
+period to avoid reducing debts while some iocgs are saturated. However, this
+ends up unnecessarily blocking debt reduction due to temporary local
+imbalances when the device is generally being underutilized, while also
+failing to block when the underlying device is overwhelmed and the usage
+becomes low from high latency.
 
-Debt reduction logic was recently added by dda1315f1853 ("blk-iocost: halve
-debts if device stays idle"). While it was effective at avoiding
-pathological cases where some iocgs were kept delayed while the device was
-most idle, it wasn't very effective at addressing more complex conditions
-and could leave low priority cgroups unnecessarily harshly throttled under
-moderate load.
+Given that debt accumulation mostly happens with swapout bursts which can
+significantly deteriorate the underlying device's latency response, the
+current logic is not great.
 
-This patchset improves the debt forgiveness logic so that it's more
-effective at reducing such unnecessary throttling. This patchset contains
-the following five patches:
+Let's replace it with ioc->busy_level based condition so that we block debt
+reduction when the underlying device is being saturated. ioc_forgive_debts()
+call is moved after busy_level determination.
 
- 0001-iocost-factor-out-ioc_forgive_debts.patch
- 0002-iocost-replace-nr_shortages-cond-in-ioc_forgive_debt.patch
- 0003-iocost-recalculate-delay-after-debt-reduction.patch
- 0004-iocost-reimplement-debt-forgiveness-using-average-us.patch
- 0005-iocost-add-iocg_forgive_debt-tracepoint.patch
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+ block/blk-iocost.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-and is also available in the following git tree:
-
- git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git iocost-debt-forgiveness
-
-diffstat follows. Thanks.
-
- block/blk-iocost.c            |  141 +++++++++++++++++++++++++++++-------------
- include/trace/events/iocost.h |   41 ++++++++++++
- 2 files changed, 141 insertions(+), 41 deletions(-)
-
---
-tejun
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index bbf30bb06c07..c0499c294da9 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -287,10 +287,7 @@ enum {
+ 	MIN_DELAY		= 250,
+ 	MAX_DELAY		= 250 * USEC_PER_MSEC,
+ 
+-	/*
+-	 * Halve debts if total usage keeps staying under 25% w/o any shortages
+-	 * for over 100ms.
+-	 */
++	/* halve debts if total usage keeps staying under 25% for over 100ms */
+ 	DEBT_BUSY_USAGE_PCT	= 25,
+ 	DEBT_REDUCTION_IDLE_DUR	= 100 * USEC_PER_MSEC,
+ 
+@@ -1990,9 +1987,9 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
+  * sufficiently idle for a while, the debts are halved.
+  */
+ static void ioc_forgive_debts(struct ioc *ioc, u64 usage_us_sum, int nr_debtors,
+-			      int nr_shortages, struct ioc_now *now)
++			      struct ioc_now *now)
+ {
+-	if (nr_shortages ||
++	if (ioc->busy_level < 0 ||
+ 	    div64_u64(100 * usage_us_sum, now->now - ioc->period_at) >=
+ 	    DEBT_BUSY_USAGE_PCT)
+ 		ioc->debt_busy_at = now->now;
+@@ -2205,8 +2202,6 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 	list_for_each_entry_safe(iocg, tiocg, &surpluses, surplus_list)
+ 		list_del_init(&iocg->surplus_list);
+ 
+-	ioc_forgive_debts(ioc, usage_us_sum, nr_debtors, nr_shortages, &now);
+-
+ 	/*
+ 	 * If q is getting clogged or we're missing too much, we're issuing
+ 	 * too much IO and should lower vtime rate.  If we're not missing
+@@ -2301,6 +2296,8 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 
+ 	ioc_refresh_params(ioc, false);
+ 
++	ioc_forgive_debts(ioc, usage_us_sum, nr_debtors, &now);
++
+ 	/*
+ 	 * This period is done.  Move onto the next one.  If nothing's
+ 	 * going on with the device, stop the timer.
+-- 
+2.26.2
 
