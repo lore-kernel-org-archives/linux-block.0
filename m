@@ -2,83 +2,130 @@ Return-Path: <SRS0=GCUE=C3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 459F5C43464
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 01:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 994DAC43464
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 02:42:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FEC92137B
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 01:57:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XtrrMENT"
+	by mail.kernel.org (Postfix) with ESMTP id 66033214D8
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 02:42:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726201AbgIRB4v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 21:56:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52392 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726009AbgIRB4v (ORCPT
+        id S1729263AbgIRCl6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 22:41:58 -0400
+Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:54714 "EHLO
+        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728575AbgIRCLO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 21:56:51 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119A6C06174A;
-        Thu, 17 Sep 2020 18:56:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=qwswkVb/gVqgiIAtdm2FTegz/K5eZaLDiC4kOkN2Ga0=; b=XtrrMENTo5BIYv3NzpfHh/rBxM
-        ybPwFxkh4tQ7Lzvd9ecUH4sUV7zpxV4a9KoCqxzI3bun1m1GkQDDcPLaWBaLF4hLD395QrROLt9NK
-        nONyBCfsa3Xds1ywXSFyOCgrsGwzSISRIcwHH5h8GMYRmfxco4yH2HLrn8wfoC1c8NsCKrGrOoTqS
-        0UPqgu0DmBeBQ4Gv9IUFRPb/ZBe7at6ZsiH4XIDEK/+KsS8nbTq59WqjJb9cObbY59pq512bPentD
-        8VsaiI4cPxPG/8Yo7eWZyr/8W27wQ1HeEKMFNCjRsRBkIut5MFdGFNfBlZ/1YwnIp0gRbaWBCvQCt
-        jD3CLlvw==;
-Received: from [2601:1c0:6280:3f0::19c2] (helo=smtpauth.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kJ5dl-0007g2-4o; Fri, 18 Sep 2020 01:56:45 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>, Karel Zak <kzak@redhat.com>,
-        Paul Gortmaker <paul.gortmaker@windriver.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Martin Mares <mj@ucw.cz>, linux-video@atrey.karlin.mff.cuni.cz,
-        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
-        linux-doc@vger.kernel.org
-Subject: [RFC PATCH v2 0/2] Documentation/admin-guide: remove use of "rdev"
-Date:   Thu, 17 Sep 2020 18:56:38 -0700
-Message-Id: <20200918015640.8439-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.26.2
+        Thu, 17 Sep 2020 22:11:14 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0U9Gue2N_1600395067;
+Received: from JosephdeMacBook-Pro.local(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0U9Gue2N_1600395067)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 18 Sep 2020 10:11:07 +0800
+Subject: Re: [PATCH 09/14] ocfs2: cleanup o2hb_region_dev_store
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        linux-pm@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+References: <20200917165720.3285256-1-hch@lst.de>
+ <20200917165720.3285256-10-hch@lst.de>
+From:   Joseph Qi <joseph.qi@linux.alibaba.com>
+Message-ID: <1c8a3a5a-aa59-f30e-4865-6777436c4225@linux.alibaba.com>
+Date:   Fri, 18 Sep 2020 10:11:07 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200917165720.3285256-10-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-Remove mention of using "rdev" to set boot device, video mode,
-or ramdisk information for the booting kernel.
 
+On 2020/9/18 00:57, Christoph Hellwig wrote:
+> Use blkdev_get_by_dev instead of igrab (aka open coded bdgrab) +
+> blkdev_get.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Cc: Karel Zak <kzak@redhat.com>
-Cc: Paul Gortmaker <paul.gortmaker@windriver.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Martin Mares <mj@ucw.cz>
-Cc: linux-video@atrey.karlin.mff.cuni.cz
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: linux-doc@vger.kernel.org
+Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
 
-
- [RFC PATCH 1/2] Documentation/admin-guide: README & svga: remove use of "rdev"
- [RFC PATCH 2/2] Documentation/admin-guide: blockdev/ramdisk: remove use of "rdev"
-
- Documentation/admin-guide/README.rst            |    6 -
- Documentation/admin-guide/blockdev/ramdisk.rst  |   70 ++++----------
- Documentation/admin-guide/kernel-parameters.txt |    9 -
- Documentation/admin-guide/svga.rst              |    6 -
- 4 files changed, 33 insertions(+), 58 deletions(-)
+> ---
+>  fs/ocfs2/cluster/heartbeat.c | 28 ++++++++++------------------
+>  1 file changed, 10 insertions(+), 18 deletions(-)
+> 
+> diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
+> index 89d13e0705fe7b..0179a73a3fa2c4 100644
+> --- a/fs/ocfs2/cluster/heartbeat.c
+> +++ b/fs/ocfs2/cluster/heartbeat.c
+> @@ -1766,7 +1766,6 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
+>  	int sectsize;
+>  	char *p = (char *)page;
+>  	struct fd f;
+> -	struct inode *inode;
+>  	ssize_t ret = -EINVAL;
+>  	int live_threshold;
+>  
+> @@ -1793,20 +1792,16 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
+>  	    reg->hr_block_bytes == 0)
+>  		goto out2;
+>  
+> -	inode = igrab(f.file->f_mapping->host);
+> -	if (inode == NULL)
+> +	if (!S_ISBLK(f.file->f_mapping->host->i_mode))
+>  		goto out2;
+>  
+> -	if (!S_ISBLK(inode->i_mode))
+> -		goto out3;
+> -
+> -	reg->hr_bdev = I_BDEV(f.file->f_mapping->host);
+> -	ret = blkdev_get(reg->hr_bdev, FMODE_WRITE | FMODE_READ, NULL);
+> -	if (ret) {
+> +	reg->hr_bdev = blkdev_get_by_dev(f.file->f_mapping->host->i_rdev,
+> +					 FMODE_WRITE | FMODE_READ, NULL);
+> +	if (IS_ERR(reg->hr_bdev)) {
+> +		ret = PTR_ERR(reg->hr_bdev);
+>  		reg->hr_bdev = NULL;
+> -		goto out3;
+> +		goto out2;
+>  	}
+> -	inode = NULL;
+>  
+>  	bdevname(reg->hr_bdev, reg->hr_dev_name);
+>  
+> @@ -1909,16 +1904,13 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
+>  		       config_item_name(&reg->hr_item), reg->hr_dev_name);
+>  
+>  out3:
+> -	iput(inode);
+> +	if (ret < 0) {
+> +		blkdev_put(reg->hr_bdev, FMODE_READ | FMODE_WRITE);
+> +		reg->hr_bdev = NULL;
+> +	}
+>  out2:
+>  	fdput(f);
+>  out:
+> -	if (ret < 0) {
+> -		if (reg->hr_bdev) {
+> -			blkdev_put(reg->hr_bdev, FMODE_READ|FMODE_WRITE);
+> -			reg->hr_bdev = NULL;
+> -		}
+> -	}
+>  	return ret;
+>  }
+>  
+> 
