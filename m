@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3453C43466
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 08:03:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2DFC43463
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 08:03:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7283221D42
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 08:03:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D15221481
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 08:03:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726199AbgIRIDH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Sep 2020 04:03:07 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:40138 "EHLO huawei.com"
+        id S1726148AbgIRIDL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Sep 2020 04:03:11 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:51560 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726359AbgIRIDG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Sep 2020 04:03:06 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 17909B96E35FEF4DFAC6;
-        Fri, 18 Sep 2020 16:03:05 +0800 (CST)
+        id S1726359AbgIRIDL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Sep 2020 04:03:11 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id B8826B6BD335332BD1F0;
+        Fri, 18 Sep 2020 16:03:09 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS406-HUB.china.huawei.com
  (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Fri, 18 Sep 2020
- 16:02:57 +0800
+ 16:02:59 +0800
 From:   Yufen Yu <yuyufen@huawei.com>
 To:     <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>, <hch@lst.de>,
         <andy.lavr@gmail.com>, <yuyufen@huawei.com>
-Subject: [PATCH v2 1/4] block: invoke blk_mq_exit_sched no matter whether have .exit_sched
-Date:   Fri, 18 Sep 2020 04:03:05 -0400
-Message-ID: <20200918080308.2787773-2-yuyufen@huawei.com>
+Subject: [PATCH v2 4/4] block: get rid of unnecessary local variable
+Date:   Fri, 18 Sep 2020 04:03:08 -0400
+Message-ID: <20200918080308.2787773-5-yuyufen@huawei.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200918080308.2787773-1-yuyufen@huawei.com>
 References: <20200918080308.2787773-1-yuyufen@huawei.com>
@@ -44,47 +44,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We will register debugfs for scheduler no matter whether it have
-defined callback funciton .exit_sched. So, blk_mq_exit_sched()
-is always needed to unregister debugfs. Also, q->elevator should
-be set as NULL after exiting scheduler.
-
-For now, since all register scheduler have defined .exit_sched,
-it will not cause any actual problem. But It will be more reasonable
-to do this change.
+Since whole elevator register is protectd by sysfs_lock, we
+don't need extras 'has_elevator'. Just use q->elevator directly.
 
 Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 ---
- block/blk-sysfs.c | 1 -
- block/elevator.c  | 3 +--
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ block/blk-sysfs.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 7dda709f3ccb..ee2cd4d1054c 100644
+index ee2cd4d1054c..d13a70ed39bf 100644
 --- a/block/blk-sysfs.c
 +++ b/block/blk-sysfs.c
-@@ -883,7 +883,6 @@ static void blk_exit_queue(struct request_queue *q)
- 	if (q->elevator) {
- 		ioc_clear_queue(q);
- 		__elevator_exit(q, q->elevator);
--		q->elevator = NULL;
+@@ -976,7 +976,6 @@ int blk_register_queue(struct gendisk *disk)
+ 	int ret;
+ 	struct device *dev = disk_to_dev(disk);
+ 	struct request_queue *q = disk->queue;
+-	bool has_elevator = false;
+ 
+ 	if (WARN_ON(!q))
+ 		return -ENXIO;
+@@ -1040,7 +1039,6 @@ int blk_register_queue(struct gendisk *disk)
+ 			kobject_put(&dev->kobj);
+ 			return ret;
+ 		}
+-		has_elevator = true;
  	}
  
- 	/*
-diff --git a/block/elevator.c b/block/elevator.c
-index 6e775bd4af66..b506895b34c7 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -191,8 +191,7 @@ static void elevator_release(struct kobject *kobj)
- void __elevator_exit(struct request_queue *q, struct elevator_queue *e)
- {
- 	mutex_lock(&e->sysfs_lock);
--	if (e->type->ops.exit_sched)
--		blk_mq_exit_sched(q, e);
-+	blk_mq_exit_sched(q, e);
- 	mutex_unlock(&e->sysfs_lock);
+ 	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+@@ -1049,7 +1047,7 @@ int blk_register_queue(struct gendisk *disk)
  
- 	kobject_put(&e->kobj);
+ 	/* Now everything is ready and send out KOBJ_ADD uevent */
+ 	kobject_uevent(&q->kobj, KOBJ_ADD);
+-	if (has_elevator)
++	if (q->elevator)
+ 		kobject_uevent(&q->elevator->kobj, KOBJ_ADD);
+ 	mutex_unlock(&q->sysfs_lock);
+ 
 -- 
 2.25.4
 
