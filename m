@@ -2,111 +2,110 @@ Return-Path: <SRS0=GCUE=C3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3ECC43463
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 00:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF28C43463
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 00:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3205720838
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 00:41:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="k6rbRnnX"
+	by mail.kernel.org (Postfix) with ESMTP id 86DAC20838
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 00:45:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600389901;
+	bh=RDiNbKKGW8G1pZpUOrU2qELYa3bbrS/9vkl36Jx/dmc=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=A9/99CwseT5Et4gG/M9XSBbe8m2cY0XhDE0OWIbr+eQ0V1bHeKWYLWAxtgyEHZjrW
+	 4Po4EE/QeEXKAdWpzuXxCc/B+hEGo4u8XfqMlNEF/wjL/7ZW2tZOPQlE5oZUq5JUEt
+	 fGkX6C/g7XlKAc5Fyys6LhG0xpIWuAfUWe9ZAjSo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726109AbgIRAl1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Sep 2020 20:41:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40754 "EHLO
+        id S1726055AbgIRApB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Sep 2020 20:45:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726009AbgIRAl1 (ORCPT
+        with ESMTP id S1726007AbgIRApA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Sep 2020 20:41:27 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 587FAC061756
-        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2020 17:41:27 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id d9so2330546pfd.3
-        for <linux-block@vger.kernel.org>; Thu, 17 Sep 2020 17:41:27 -0700 (PDT)
+        Thu, 17 Sep 2020 20:45:00 -0400
+Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B3FC06174A;
+        Thu, 17 Sep 2020 17:45:00 -0700 (PDT)
+Received: by mail-qv1-xf42.google.com with SMTP id cv8so1999846qvb.12;
+        Thu, 17 Sep 2020 17:45:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=sa4f3KUKbFfHC9H+o6K9qCWAfNguS2M+cMh+58HiehE=;
-        b=k6rbRnnXtRLDdzxYrZuxmN6E9EH7w5EMuBK9NUM7xUYbL99v6WmllVGt9Mqs/4A5sG
-         NPeHr8XzNBMhovyvB8BhXw6ZsL1TQaBgijSwCjPRq2wKuRU4AZEdCI+aflBK0HBIN/32
-         sDg1BSUWCeMXA2eRgLE28nU/55zr2i3TgqR24=
+        bh=I4g8oZaM4I1PTgkVQKRiJNIBO3rGE09QsJ8U+iD020Q=;
+        b=oqR+7x5dJyQcBEwZDtu1PVnUg0zlf4DCuy1Zp8tZ2FigjcnKMuj2pg78JL2AbnBQLM
+         lpNqq/FRqu/ytyo8P0ug/B0NXdeHsnftsBfGkIM6w01ef/dTfOFlrd8uvz0wYDofxW2j
+         XG2W1jvJ1QCpUQjZYlT3L7Y/KLFvXTba2Foj+z6KNYngQWofDOXSMuS9OfxiwO+OkcXo
+         ngQeOqW5OMDzeAazkPzJ+x3uqMA5U3+dI26Nu8OaD8VY+C0DSbIWFjjQuaQDxENVb17v
+         W8e68mbdDldx+0xBYRKbuIFe5WVgXpXmEniOLKGUU2XkHCRJE3SDflzZRT653J+gyPdT
+         yMGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sa4f3KUKbFfHC9H+o6K9qCWAfNguS2M+cMh+58HiehE=;
-        b=pWmqrG/8TDozMH4eYQBjy7Z0Zcz3GKW9V9NoqCBWXx5G2J5eOMY/4fgTXhEH9qWrS9
-         SVd3vXJRayZvC7v8K5QzR3Rs7KaDK/DURYky+Km/J/ylo/xOgwMRC2HorUWdHsV9Pz5f
-         JqHK4ATcboVchvkJaXlVrgp1VYV4sfHdjOP0v4goJ627WaQHfoCSVYIoYEhkCdJFK1Pk
-         Z8qjhRMN/TRR3AlTMlGr3zbsywYPVPdKWtORzq57BfYjsP13CoMuP/3ilpxjGJGejWq8
-         /c6V871ClHwjQge3Z1QgsaaSMUa+XM2O/a/nhz9NZd1unb3puaiDMStJcV7BwXLj5M+6
-         05ug==
-X-Gm-Message-State: AOAM5310BqGSh3sE0FauAbgqwSEnpM+NQOdfUjnvHnqtusKZy/wl4FTV
-        obrx3gxgsDMXwJm6fFaOclNepQ==
-X-Google-Smtp-Source: ABdhPJwBVfRjKls8EFDAVBlMgl2WqaXPUU8sgH89J6w0jiNm3tnyvZBRW0KpSYh7CUlcwHAaZKV8eQ==
-X-Received: by 2002:a63:d04b:: with SMTP id s11mr24273845pgi.241.1600389686843;
-        Thu, 17 Sep 2020 17:41:26 -0700 (PDT)
-Received: from tictac2.mtv.corp.google.com ([2620:15c:202:1:42b0:34ff:fe3d:58e6])
-        by smtp.gmail.com with ESMTPSA id c9sm833613pfn.78.2020.09.17.17.41.25
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=I4g8oZaM4I1PTgkVQKRiJNIBO3rGE09QsJ8U+iD020Q=;
+        b=fij2JfqxIU0h0hqxh6f/kLhTL6TkLLCjJ6pOdO4ucbSi4EEOJVdFep57EYqYDpwp+q
+         ApvMaY536ZVJYnzJIooW8ucKQNm+VAtm86WEUGoz+W5+uPyAdGyp6AbPMdJ3pyDk1sqe
+         gL7ddc08sPloEkNYfKjI2UJoR/rw4OqkfPF5KYx+g2rMidN/E739a2KOEN/e/orWDCGy
+         QpD2YkuEPlwydHc198Py5lhgSbynDL42UYDYUPEBFDg5cB98b/9IBtLlA8EOegVm3cH8
+         /jiwncANM8VYcbAXtZxqdOWYJmkeDtq9QKgPGPuyTSIzduIFeM3DR35njjKBdB06GPkx
+         D/Fw==
+X-Gm-Message-State: AOAM531FvIYP3qK4FJ6SXQKZFMSt4/oPl/nuD7c4q1slT4zf4MOHkPAR
+        ca0CA1SBz2OqHq63TC2OZnBHtQNtLCeJiQ==
+X-Google-Smtp-Source: ABdhPJyn2pmKBLJDKQFFGWpimDyrVIFq6Efh5yAXczEBVLkltpvJg6VKFJcu0xaZIpkehLhIddMH3Q==
+X-Received: by 2002:ad4:4594:: with SMTP id x20mr31706024qvu.4.1600389899750;
+        Thu, 17 Sep 2020 17:44:59 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:6893])
+        by smtp.gmail.com with ESMTPSA id v131sm1064791qkb.15.2020.09.17.17.44.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Sep 2020 17:41:26 -0700 (PDT)
-From:   Douglas Anderson <dianders@chromium.org>
-To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Cc:     sonnyrao@chromium.org, Douglas Anderson <dianders@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] zram: Failing to decompress is WARN_ON worthy
-Date:   Thu, 17 Sep 2020 17:41:20 -0700
-Message-Id: <20200917174059.1.If09c882545dbe432268f7a67a4d4cfcb6caace4f@changeid>
-X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
+        Thu, 17 Sep 2020 17:44:59 -0700 (PDT)
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel-team@fb.com, linux-kernel@vger.kernel.org
+Subject: [PATCHSET for-5.10/block] iocost: improve debt forgiveness logic
+Date:   Thu, 17 Sep 2020 20:44:51 -0400
+Message-Id: <20200918004456.593983-1-tj@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we fail to decompress in zram it's a pretty serious problem.  We
-were entrusted to be able to decompress the old data but we failed.
-Either we've got some crazy bug in the compression code or we've got
-memory corruption.
+Hello,
 
-At the moment, when this happens the log looks like this:
+Debt reduction logic was recently added by dda1315f1853 ("blk-iocost: halve
+debts if device stays idle"). While it was effective at avoiding
+pathological cases where some iocgs were kept delayed while the device was
+most idle, it wasn't very effective at addressing more complex conditions
+and could leave low priority cgroups unnecessarily harshly throttled under
+moderate load.
 
-  ERR kernel: [ 1833.099861] zram: Decompression failed! err=-22, page=336112
-  ERR kernel: [ 1833.099881] zram: Decompression failed! err=-22, page=336112
-  ALERT kernel: [ 1833.099886] Read-error on swap-device (253:0:2688896)
+This patchset improves the debt forgiveness logic so that it's more
+effective at reducing such unnecessary throttling. This patchset contains
+the following five patches:
 
-It is true that we have an "ALERT" level log in there, but (at least
-to me) it feels like even this isn't enough to impart the seriousness
-of this error.  Let's convert to a WARN_ON.  Note that WARN_ON is
-automatically "unlikely" so we can simply replace the old annotation
-with the new one.
+ 0001-iocost-factor-out-ioc_forgive_debts.patch
+ 0002-iocost-replace-nr_shortages-cond-in-ioc_forgive_debt.patch
+ 0003-iocost-recalculate-delay-after-debt-reduction.patch
+ 0004-iocost-reimplement-debt-forgiveness-using-average-us.patch
+ 0005-iocost-add-iocg_forgive_debt-tracepoint.patch
 
-Signed-off-by: Douglas Anderson <dianders@chromium.org>
----
+and is also available in the following git tree:
 
- drivers/block/zram/zram_drv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git iocost-debt-forgiveness
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 9100ac36670a..a6e2f0980aff 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1268,7 +1268,7 @@ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
- 	zram_slot_unlock(zram, index);
- 
- 	/* Should NEVER happen. Return bio error if it does. */
--	if (unlikely(ret))
-+	if (WARN_ON(ret))
- 		pr_err("Decompression failed! err=%d, page=%u\n", ret, index);
- 
- 	return ret;
--- 
-2.28.0.681.g6f77f65b4e-goog
+diffstat follows. Thanks.
+
+ block/blk-iocost.c            |  141 +++++++++++++++++++++++++++++-------------
+ include/trace/events/iocost.h |   41 ++++++++++++
+ 2 files changed, 141 insertions(+), 41 deletions(-)
+
+--
+tejun
 
