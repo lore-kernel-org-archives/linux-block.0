@@ -2,111 +2,136 @@ Return-Path: <SRS0=GCUE=C3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73477C43465
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 16:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF95C43463
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 18:41:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27C922388E
-	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 16:02:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A87521534
+	for <linux-block@archiver.kernel.org>; Fri, 18 Sep 2020 18:41:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600444936;
-	bh=uFY2Z4rDMFVgVfrtk/yGyKngm39+CPRRFFq+wyIxitM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=u6288kMbuFvclRIxEuZLcinbB363U71PXevT928T6BJjQyQakU5HEw2Wb15IYxaUu
-	 8j564UKqH60HX+hwvOFlenr+JxlVc1iC1dJqr98U4hi8/4ZtzrkQ3QSikM1IhNFfVq
-	 tF/fNQGIvoLCRbboXKz7qrqtZ665K9+7PRC9rH6E=
+	s=default; t=1600454492;
+	bh=2ySdKpNv4H3xjExvqcqBkdQV6ayk69DC/t/KNpodubc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=H0PkoxfcqZYNpVRq1zaVlFfMFcYas8FVzRW7oaltXLCrLIcPBZAYxZLE1AiQrzNi1
+	 tibmy85EYKr1OEC4PKSxc9JqJv/QtkgNr+u1l+6wJ30mwIVYZrMUSHcAQ2txucurAg
+	 sHE4Dvlmm/+sQqic8xc4Jhj7H66MvK9A/tOir4gE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726361AbgIRQCM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Sep 2020 12:02:12 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:33602 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726115AbgIRQCL (ORCPT
+        id S1726192AbgIRSla (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Sep 2020 14:41:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38348 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726115AbgIRSla (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Sep 2020 12:02:11 -0400
-Received: by mail-oi1-f196.google.com with SMTP id m7so7616436oie.0;
-        Fri, 18 Sep 2020 09:02:11 -0700 (PDT)
+        Fri, 18 Sep 2020 14:41:30 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B19FC0613CF;
+        Fri, 18 Sep 2020 11:41:30 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id db4so3483752qvb.4;
+        Fri, 18 Sep 2020 11:41:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RyuK5UieZne+pKhpGinbT1xLnPtjZ4n2yvvqOQQR/RM=;
+        b=bijR7TvXbgX48PfH9waDRVC/Tbn3PSFLH/s/gHvqLfGFatnCdUy9xUMEhd8hR+12c6
+         bM4G7PDeskHdUznZLA0Y1RXttv8Zf5Kc4gWb0xfOf7BiW2JvYcY8zQoWk/EWjxWDr9Co
+         F6lzPp0d/WanDs+PEy5McGVjmqp9J4aOu1Mj6fu/oo7Zb28uMf6HGPvK3eQekiroIocI
+         qgnEXOWua96Vs6spW1iBrlpEY1kxchcSzIEAAer60R4lQGVJsXv55z2V/a4PjsGPbf7R
+         0pHxW2in/M7Xd1ZBpmWUarETt52ESRjqTDHazLcEMmOk0JD1lIYUj0mqE7Idd144OnLF
+         94sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CLWLadygFzbacUrStlzsUwiQts54prWGYIH+pDEwe0A=;
-        b=dYrQVj2rSXLlWEWNr3I6U+LMUuW6xJDLNKqC4E7FszQEKpmQFodheM4yINYXSj//4h
-         NM1YRX+jum28PBQ41gM6/AMWC6ktoTFS+vbC0ZsBf0C4IZ81/JqC5U2qN3teCiFXUYF5
-         aMclzO4ylo+9ObumQp7O9zxoLga6nGnBAjVLRmBYZpb/W4WDJqFpCAqekLFudl8uIdrm
-         iZUoM+rZjj0dL8lXgqx86r2BiWszlUMFR0hF+gMXinVjoY1ajYGpU2/qz0vmVrtWtfIe
-         8vjRzXOjFrQek3EfiMKb3Z/THPKF02ZimCEIjh1aIrjZpTT3i80ps+NArBlU9whzMuCi
-         Hx5A==
-X-Gm-Message-State: AOAM532srrIyMv6hz9hJYp9Xi/nPRaCXHbVFToX9G1562zLHtuxhlyrr
-        u1M6ZZNVFkSe2LSw/75VDYwvB4h7zT4a159QT1I=
-X-Google-Smtp-Source: ABdhPJygTxTyjBXaRmjiZjnzUB9+LiiCBE3DDYWxmdEXB/AZO3s12ola6t96FwD5p8jaLrRmcTTRjtSYPzdoh/tzvoc=
-X-Received: by 2002:aca:df84:: with SMTP id w126mr10401882oig.103.1600444930764;
- Fri, 18 Sep 2020 09:02:10 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=RyuK5UieZne+pKhpGinbT1xLnPtjZ4n2yvvqOQQR/RM=;
+        b=R6Igt2pcSBpeIJSiGiK++72Kc+2hfNI7Gg0GMRG5pf1EY9BccHzgEmZViiPJhpfnIk
+         +nc05zhCbC5CJKOJB1BksU/7MretGyaNRH9Nd5Jtsx8HqrB6+bvqTl2QN6Kyl8bvBxBz
+         npDzEm5wmjQOCJO5oXA1iYKgkOB/RCDllEnGghlPViOlkb1csyq0Uq3u7HIGNATUG03m
+         Oh2EIuwQTEHzrySAQ8mexQhzX8N7qs3s5KxMRqKmXKXHPw01EoOy8AMLSgmh7l76OJdZ
+         YNbNY7NCkPNkG+2g9/zVZdkkXPENbUlWNR9DvKDUgBJfSL7FCopkwoSaeEBYjhH9h9op
+         VAOg==
+X-Gm-Message-State: AOAM530IL2qpZuoziGyMoUB62AHLxPC7F6wWpjbSY9d5+HfHgQBvQKFA
+        poh6GX6GoTsrtOL9W35iDn0=
+X-Google-Smtp-Source: ABdhPJyrfE5zh7qVv/Ct8VYZ7c9haa82D17TT639IsPr+2OBmTZj5Zp7at5HyuG8X09vdAQnQQeKVQ==
+X-Received: by 2002:a0c:8ec6:: with SMTP id y6mr23235555qvb.24.1600454489667;
+        Fri, 18 Sep 2020 11:41:29 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:602a])
+        by smtp.gmail.com with ESMTPSA id 18sm2584248qkd.120.2020.09.18.11.41.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Sep 2020 11:41:29 -0700 (PDT)
+Date:   Fri, 18 Sep 2020 14:41:27 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel-team@fb.com, linux-kernel@vger.kernel.org
+Subject: [PATCH 6/5] iocost: consider iocgs with active delays for debt
+ forgiveness
+Message-ID: <20200918184127.GB4247@mtj.thefacebook.com>
+References: <20200918004456.593983-1-tj@kernel.org>
 MIME-Version: 1.0
-References: <20200917165720.3285256-1-hch@lst.de> <20200917165720.3285256-14-hch@lst.de>
-In-Reply-To: <20200917165720.3285256-14-hch@lst.de>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Fri, 18 Sep 2020 18:01:59 +0200
-Message-ID: <CAJZ5v0jAQnEHedZs7kQmfHx4KTw9G1wrObuEpid_m5uVk5qoJQ@mail.gmail.com>
-Subject: Re: [PATCH 13/14] PM: mm: cleanup swsusp_swap_check
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        nbd@other.debian.org,
-        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
-        <linux-ide@vger.kernel.org>, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200918004456.593983-1-tj@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 17, 2020 at 7:39 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> Use blkdev_get_by_dev instead of bdget + blkdev_get.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+An iocg may have 0 debt but non-zero delay. The current debt forgiveness
+logic doesn't act on such iocgs. This can lead to unexpected behaviors - an
+iocg with a little bit of debt will have its delay canceled through debt
+forgiveness but one w/o any debt but active delay will have to wait out
+until its delay decays out.
 
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+This patch updates the debt handling logic so that it treats delays the same
+as debts. If either debt or delay is active, debt forgiveness logic kicks in
+and acts on both the same way.
 
-> ---
->  kernel/power/swap.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
->
-> diff --git a/kernel/power/swap.c b/kernel/power/swap.c
-> index 9d3ffbfe08dbf6..71385bedcc3a49 100644
-> --- a/kernel/power/swap.c
-> +++ b/kernel/power/swap.c
-> @@ -343,12 +343,10 @@ static int swsusp_swap_check(void)
->                 return res;
->         root_swap = res;
->
-> -       hib_resume_bdev = bdget(swsusp_resume_device);
-> -       if (!hib_resume_bdev)
-> -               return -ENOMEM;
-> -       res = blkdev_get(hib_resume_bdev, FMODE_WRITE, NULL);
-> -       if (res)
-> -               return res;
-> +       hib_resume_bdev = blkdev_get_by_dev(swsusp_resume_device, FMODE_WRITE,
-> +                       NULL);
-> +       if (IS_ERR(hib_resume_bdev))
-> +               return PTR_ERR(hib_resume_bdev);
->
->         res = set_blocksize(hib_resume_bdev, PAGE_SIZE);
->         if (res < 0)
-> --
-> 2.28.0
->
+Also, avoid turning the debt and delay directly to zero as that can confuse
+state transitions.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+Jens, a follow up patch to the series. The git tree is also updated.
+
+Thanks.
+
+ block/blk-iocost.c |   11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2048,7 +2048,7 @@ static void ioc_forgive_debts(struct ioc
+ 	list_for_each_entry(iocg, &ioc->active_iocgs, active_list) {
+ 		u64 __maybe_unused old_debt, __maybe_unused old_delay;
+ 
+-		if (!iocg->abs_vdebt)
++		if (!iocg->abs_vdebt && !iocg->delay)
+ 			continue;
+ 
+ 		spin_lock(&iocg->waitq.lock);
+@@ -2056,8 +2056,11 @@ static void ioc_forgive_debts(struct ioc
+ 		old_debt = iocg->abs_vdebt;
+ 		old_delay = iocg->delay;
+ 
+-		iocg->abs_vdebt >>= nr_cycles;
+-		iocg->delay = 0; /* kick_waitq will recalc */
++		if (iocg->abs_vdebt)
++			iocg->abs_vdebt = iocg->abs_vdebt >> nr_cycles ?: 1;
++		if (iocg->delay)
++			iocg->delay = iocg->delay >> nr_cycles ?: 1;
++
+ 		iocg_kick_waitq(iocg, true, now);
+ 
+ 		TRACE_IOCG_PATH(iocg_forgive_debt, iocg, now, usage_pct,
+@@ -2129,7 +2132,7 @@ static void ioc_timer_fn(struct timer_li
+ 		    iocg->delay) {
+ 			/* might be oversleeping vtime / hweight changes, kick */
+ 			iocg_kick_waitq(iocg, true, &now);
+-			if (iocg->abs_vdebt)
++			if (iocg->abs_vdebt || iocg->delay)
+ 				nr_debtors++;
+ 		} else if (iocg_is_idle(iocg)) {
+ 			/* no waiter and idle, deactivate */
