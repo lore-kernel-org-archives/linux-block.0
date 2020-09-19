@@ -7,33 +7,31 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAAF5C43463
-	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 02:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9866AC43463
+	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 02:51:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBDA2207FF
-	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 02:15:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68856208DB
+	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 02:51:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726222AbgISCPd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Sep 2020 22:15:33 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:44392 "EHLO huawei.com"
+        id S1726293AbgISCvT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Sep 2020 22:51:19 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:13320 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726009AbgISCPd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Sep 2020 22:15:33 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id A10CE5A7B70B5E082F60;
-        Sat, 19 Sep 2020 10:15:31 +0800 (CST)
+        id S1726009AbgISCvT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Sep 2020 22:51:19 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 6CD1AF5C343726E64B09;
+        Sat, 19 Sep 2020 10:51:17 +0800 (CST)
 Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 19 Sep 2020 10:15:21 +0800
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 19 Sep 2020 10:51:07 +0800
 From:   Qinglang Miao <miaoqinglang@huawei.com>
-To:     Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>
+To:     Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         "Qinglang Miao" <miaoqinglang@huawei.com>
-Subject: [PATCH -next v2] rsxx: Convert to DEFINE_SHOW_ATTRIBUTE
-Date:   Sat, 19 Sep 2020 10:15:52 +0800
-Message-ID: <20200919021552.189712-1-miaoqinglang@huawei.com>
+Subject: [PATCH -next v2] block: aoe: Convert to DEFINE_SHOW_ATTRIBUTE
+Date:   Sat, 19 Sep 2020 10:51:39 +0800
+Message-ID: <20200919025139.16921-1-miaoqinglang@huawei.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
@@ -51,70 +49,48 @@ Signed-off-by: Qinglang Miao <miaoqinglang@huawei.com>
 v2: based on linux-next(20200917), and can be applied to
     mainline cleanly now.
 
- drivers/block/rsxx/core.c | 31 ++++---------------------------
- 1 file changed, 4 insertions(+), 27 deletions(-)
+ drivers/block/aoe/aoeblk.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-index 8799e3bab..7d580965f 100644
---- a/drivers/block/rsxx/core.c
-+++ b/drivers/block/rsxx/core.c
-@@ -150,16 +150,6 @@ static int rsxx_attr_stats_show(struct seq_file *m, void *p)
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 5ca7216e9..3502a8325 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -110,7 +110,7 @@ static ssize_t aoedisk_show_payload(struct device *dev,
+ 	return snprintf(page, PAGE_SIZE, "%lu\n", d->maxbcnt);
+ }
+ 
+-static int aoedisk_debugfs_show(struct seq_file *s, void *ignored)
++static int aoe_debugfs_show(struct seq_file *s, void *ignored)
+ {
+ 	struct aoedev *d;
+ 	struct aoetgt **t, **te;
+@@ -154,10 +154,7 @@ static int aoedisk_debugfs_show(struct seq_file *s, void *ignored)
  	return 0;
  }
  
--static int rsxx_attr_stats_open(struct inode *inode, struct file *file)
+-static int aoe_debugfs_open(struct inode *inode, struct file *file)
 -{
--	return single_open(file, rsxx_attr_stats_show, inode->i_private);
+-	return single_open(file, aoedisk_debugfs_show, inode->i_private);
 -}
--
--static int rsxx_attr_pci_regs_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, rsxx_attr_pci_regs_show, inode->i_private);
--}
--
- static ssize_t rsxx_cram_read(struct file *fp, char __user *ubuf,
- 			      size_t cnt, loff_t *ppos)
- {
-@@ -206,21 +196,8 @@ static const struct file_operations debugfs_cram_fops = {
- 	.write		= rsxx_cram_write,
++DEFINE_SHOW_ATTRIBUTE(aoe_debugfs);
+ 
+ static DEVICE_ATTR(state, 0444, aoedisk_show_state, NULL);
+ static DEVICE_ATTR(mac, 0444, aoedisk_show_mac, NULL);
+@@ -186,13 +183,6 @@ static const struct attribute_group *aoe_attr_groups[] = {
+ 	NULL,
  };
  
--static const struct file_operations debugfs_stats_fops = {
--	.owner		= THIS_MODULE,
--	.open		= rsxx_attr_stats_open,
--	.read		= seq_read,
--	.llseek		= seq_lseek,
--	.release	= single_release,
+-static const struct file_operations aoe_debugfs_fops = {
+-	.open = aoe_debugfs_open,
+-	.read = seq_read,
+-	.llseek = seq_lseek,
+-	.release = single_release,
 -};
 -
--static const struct file_operations debugfs_pci_regs_fops = {
--	.owner		= THIS_MODULE,
--	.open		= rsxx_attr_pci_regs_open,
--	.read		= seq_read,
--	.llseek		= seq_lseek,
--	.release	= single_release,
--};
-+DEFINE_SHOW_ATTRIBUTE(rsxx_attr_stats);
-+DEFINE_SHOW_ATTRIBUTE(rsxx_attr_pci_regs);
- 
- static void rsxx_debugfs_dev_new(struct rsxx_cardinfo *card)
+ static void
+ aoedisk_add_debugfs(struct aoedev *d)
  {
-@@ -234,13 +211,13 @@ static void rsxx_debugfs_dev_new(struct rsxx_cardinfo *card)
- 
- 	debugfs_stats = debugfs_create_file("stats", 0444,
- 					    card->debugfs_dir, card,
--					    &debugfs_stats_fops);
-+					    &rsxx_attr_stats_fops);
- 	if (IS_ERR_OR_NULL(debugfs_stats))
- 		goto failed_debugfs_stats;
- 
- 	debugfs_pci_regs = debugfs_create_file("pci_regs", 0444,
- 					       card->debugfs_dir, card,
--					       &debugfs_pci_regs_fops);
-+					       &rsxx_attr_pci_regs_fops);
- 	if (IS_ERR_OR_NULL(debugfs_pci_regs))
- 		goto failed_debugfs_pci_regs;
- 
 -- 
 2.23.0
 
