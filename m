@@ -4,61 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF37C43464
-	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 05:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46106C43464
+	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 06:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E572E2311B
-	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 05:15:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1148B21D42
+	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 06:51:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726119AbgISFP0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Sep 2020 01:15:26 -0400
-Received: from verein.lst.de ([213.95.11.211]:34874 "EHLO verein.lst.de"
+        id S1726129AbgISGvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Sep 2020 02:51:32 -0400
+Received: from verein.lst.de ([213.95.11.211]:35048 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726054AbgISFP0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Sep 2020 01:15:26 -0400
+        id S1726112AbgISGvc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 19 Sep 2020 02:51:32 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 811BE68BEB; Sat, 19 Sep 2020 07:15:20 +0200 (CEST)
-Date:   Sat, 19 Sep 2020 07:15:20 +0200
+        id 2740768BFE; Sat, 19 Sep 2020 08:51:27 +0200 (CEST)
+Date:   Sat, 19 Sep 2020 08:51:26 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Sergei Shtylyov <sergei.shtylyov@gmail.com>
+To:     Jan Kara <jack@suse.cz>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
+        Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
         Minchan Kim <minchan@kernel.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        linux-pm@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 02/14] block: switch register_disk to use
- blkdev_get_by_dev
-Message-ID: <20200919051520.GA7070@lst.de>
-References: <20200917165720.3285256-1-hch@lst.de> <20200917165720.3285256-3-hch@lst.de> <091931b1-eb9c-e45e-c9e8-501554618508@gmail.com>
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        cgroups@vger.kernel.org
+Subject: Re: [PATCH 10/12] bdi: replace BDI_CAP_STABLE_WRITES with a queue
+ and a sb flag
+Message-ID: <20200919065126.GA8048@lst.de>
+References: <20200910144833.742260-1-hch@lst.de> <20200910144833.742260-11-hch@lst.de> <20200917092524.GC7347@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <091931b1-eb9c-e45e-c9e8-501554618508@gmail.com>
+In-Reply-To: <20200917092524.GC7347@quack2.suse.cz>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 18, 2020 at 11:52:39AM +0300, Sergei Shtylyov wrote:
-> Hello!
->
-> On 17.09.2020 19:57, Christoph Hellwig wrote:
->
->> Use blkdev_get_by_dev instead of open coding it using bdget_disk +
->> blkdev_get.
->
->    I don't see where you are removing bdget_disk() call (situated just before
-> the below code?)...
+On Thu, Sep 17, 2020 at 11:25:24AM +0200, Jan Kara wrote:
+> On Thu 10-09-20 16:48:30, Christoph Hellwig wrote:
+> > The BDI_CAP_STABLE_WRITES is one of the few bits of information in the
+> > backing_dev_info shared between the block drivers and the writeback code.
+> > To help untangling the dependency replace it with a queue flag and a
+> > superblock flag derived from it.  This also helps with the case of e.g.
+> > a file system requiring stable writes due to its own checksumming, but
+> > not forcing it on other users of the block device like the swap code.
+> > 
+> > One downside is that we can't support the stable_pages_required bdi
+> > attribute in sysfs anymore.  It is replaced with a queue attribute, that
+> > can also be made writable for easier testing.
+>   ^^^^^^^^^^^^^^^^
+>   is also made
+> 
+> For a while I was confused thinking that the new attribute is not writeable
+> but when I checked the code I saw that it is.
+> 
+> Not supporting stable_pages_required attribute is not nice but probably it
+> isn't widely used. Maybe the deprecation message can even mention to use
+> the queue attribute? Otherwise the patch looks good to me so feel free to
+> add:
+> 
+> Reviewed-by: Jan Kara <jack@suse.cz>
 
-Indeed.  That's what you get for a messy last minute rebase.. :(
+Thanks.  I've fixed the commit log and changed the warning to:
+
+	dev_warn_once(dev, 
+                 "the stable_pages_required attribute has been removed. Use the
+		 stable_writes queue attribute instead.\n");
