@@ -3,112 +3,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DDFC43463
-	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 07:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E98FC43464
+	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 09:13:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8449221D43
-	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 07:31:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C28821741
+	for <linux-block@archiver.kernel.org>; Sat, 19 Sep 2020 09:13:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726159AbgISHbt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Sep 2020 03:31:49 -0400
-Received: from verein.lst.de ([213.95.11.211]:35136 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726112AbgISHbt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Sep 2020 03:31:49 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 544E068BEB; Sat, 19 Sep 2020 09:31:45 +0200 (CEST)
-Date:   Sat, 19 Sep 2020 09:31:45 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Song Liu <song@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
+        id S1726200AbgISJN1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Sep 2020 05:13:27 -0400
+Received: from jabberwock.ucw.cz ([46.255.230.98]:38948 "EHLO
+        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726170AbgISJN1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 19 Sep 2020 05:13:27 -0400
+X-Greylist: delayed 421 seconds by postgrey-1.27 at vger.kernel.org; Sat, 19 Sep 2020 05:13:25 EDT
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 692B51C0B85; Sat, 19 Sep 2020 11:06:22 +0200 (CEST)
+Date:   Sat, 19 Sep 2020 11:06:22 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
         Minchan Kim <minchan@kernel.org>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        cgroups@vger.kernel.org
-Subject: Re: [PATCH 06/12] block: lift setting the readahead size into the
- block layer
-Message-ID: <20200919073145.GA8514@lst.de>
-References: <20200910144833.742260-1-hch@lst.de> <20200910144833.742260-7-hch@lst.de> <20200917103540.GL7347@quack2.suse.cz>
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        linux-pm@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 11/14] PM: rewrite is_hibernate_resume_dev to not require
+ an inode
+Message-ID: <20200919090622.GA12294@duo.ucw.cz>
+References: <20200917165720.3285256-1-hch@lst.de>
+ <20200917165720.3285256-12-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="9jxsPFA5p3P2qPhR"
 Content-Disposition: inline
-In-Reply-To: <20200917103540.GL7347@quack2.suse.cz>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200917165720.3285256-12-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 17, 2020 at 12:35:40PM +0200, Jan Kara wrote:
-> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > index 81722cdcf0cb21..95eb35324e1a61 100644
-> > --- a/block/blk-sysfs.c
-> > +++ b/block/blk-sysfs.c
-> > @@ -245,7 +245,6 @@ queue_max_sectors_store(struct request_queue *q, const char *page, size_t count)
-> >  
-> >  	spin_lock_irq(&q->queue_lock);
-> >  	q->limits.max_sectors = max_sectors_kb << 1;
-> > -	q->backing_dev_info->io_pages = max_sectors_kb >> (PAGE_SHIFT - 10);
-> >  	spin_unlock_irq(&q->queue_lock);
-> 
-> So do I get it right that readahead won't now be limited if you store lower
-> value to max_sectors? Why? I'd consider io_pages a "cached value" of
-> max_sectors and thus expect it to change together with max_sectors...
 
-Most to start untangling the bdi from the queue.  But I had to peddle
-back on that in the follow on series anyway, so I can add this back.
+--9jxsPFA5p3P2qPhR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > @@ -812,7 +813,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
-> >  		disk->flags |= GENHD_FL_SUPPRESS_PARTITION_INFO;
-> >  		disk->flags |= GENHD_FL_NO_PART_SCAN;
-> >  	} else {
-> > -		struct backing_dev_info *bdi = disk->queue->backing_dev_info;
-> > +		struct backing_dev_info *bdi = q->backing_dev_info;
-> >  		struct device *dev = disk_to_dev(disk);
-> >  		int ret;
-> 
-> Not sure how/why these changes got here... Not that I care too much :)
+On Thu 2020-09-17 18:57:17, Christoph Hellwig wrote:
+> Just check the dev_t to help simplifying the code.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Because more changes in this area in earlier versions of the patches.
-But yes, this shouldn't be here, so I'll drop it.
+Acked-by: Pavel Machek <pavel@ucw.cz>
 
-> > @@ -407,7 +406,6 @@ aoeblk_gdalloc(void *vp)
-> >  	WARN_ON(d->gd);
-> >  	WARN_ON(d->flags & DEVFL_UP);
-> >  	blk_queue_max_hw_sectors(q, BLK_DEF_MAX_SECTORS);
-> > -	q->backing_dev_info->ra_pages = READ_AHEAD / PAGE_SIZE;
-> >  	d->bufpool = mp;
-> >  	d->blkq = gd->queue = q;
-> >  	q->queuedata = d;
-> 
-> Shouldn't AOE set 2MB optimal IO size so that readahead is equivalent to
-> previous behavior?
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
 
-Sure, I'll add a separate patch just for that.
+--9jxsPFA5p3P2qPhR
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> > diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> > index 1bbdc410ee3c51..ff2101d56cd7f1 100644
-> > --- a/drivers/md/bcache/super.c
-> > +++ b/drivers/md/bcache/super.c
-> > @@ -1427,10 +1427,6 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
-> >  	if (ret)
-> >  		return ret;
-> >  
-> > -	dc->disk.disk->queue->backing_dev_info->ra_pages =
-> > -		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
-> > -		    q->backing_dev_info->ra_pages);
-> > -
-> 
-> So bcache is basically stacking readahead here on top of underlying cache
-> device. I don't see this being replicated by your patch so it is lost now?
-> Probably this should be replaced by properly inheriting optimal IO size?
+-----BEGIN PGP SIGNATURE-----
 
-Yes, I'll add another patch.
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCX2XKDgAKCRAw5/Bqldv6
+8iT+AKCdeHs2MkV4o38Cq3BJ5Qkr4r6UYACfUFtBKvg5a5MldciJ6HjtHFepxI8=
+=mDoa
+-----END PGP SIGNATURE-----
+
+--9jxsPFA5p3P2qPhR--
