@@ -2,135 +2,62 @@ Return-Path: <SRS0=iZfY=C5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D432C43463
-	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 15:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C39C43465
+	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 15:04:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB8B020870
-	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 15:03:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2AD420870
+	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 15:04:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726314AbgITPC6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Sep 2020 11:02:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51552 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726267AbgITPC6 (ORCPT
+        id S1726311AbgITPEg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Sep 2020 11:04:36 -0400
+Received: from nikam.ms.mff.cuni.cz ([195.113.20.16]:50472 "EHLO
+        nikam.ms.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726285AbgITPEf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Sep 2020 11:02:58 -0400
-Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77085C061755;
-        Sun, 20 Sep 2020 08:02:58 -0700 (PDT)
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kK0rT-002VoG-Vd; Sun, 20 Sep 2020 15:02:44 +0000
-Date:   Sun, 20 Sep 2020 16:02:43 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        David Howells <dhowells@redhat.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Parisc List <linux-parisc@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        linux-aio <linux-aio@kvack.org>, io-uring@vger.kernel.org,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        Networking <netdev@vger.kernel.org>, keyrings@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>
-Subject: Re: [PATCH 1/9] kernel: add a PF_FORCE_COMPAT flag
-Message-ID: <20200920150243.GM3421308@ZenIV.linux.org.uk>
-References: <20200918124533.3487701-1-hch@lst.de>
- <20200918124533.3487701-2-hch@lst.de>
- <20200918134012.GY3421308@ZenIV.linux.org.uk>
- <20200918134406.GA17064@lst.de>
- <20200918135822.GZ3421308@ZenIV.linux.org.uk>
- <20200918151615.GA23432@lst.de>
- <20200919220920.GI3421308@ZenIV.linux.org.uk>
- <CAK8P3a3QApj3isPu3TkLahArsfb5jaABb7DJ7EKMxey1T1YPbA@mail.gmail.com>
+        Sun, 20 Sep 2020 11:04:35 -0400
+Received: by nikam.ms.mff.cuni.cz (Postfix, from userid 2587)
+        id D18C92810CD; Sun, 20 Sep 2020 16:55:42 +0200 (CEST)
+Date:   Sun, 20 Sep 2020 16:55:42 +0200
+From:   Martin =?utf-8?B?TWFyZcWh?= <mj@ucw.cz>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, Karel Zak <kzak@redhat.com>,
+        Paul Gortmaker <paul.gortmaker@windriver.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-video@atrey.karlin.mff.cuni.cz,
+        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
+        linux-doc@vger.kernel.org
+Subject: Re: [RFC PATCH v2 1/2] Documentation/admin-guide: README & svga:
+ remove use of "rdev"
+Message-ID: <mj+md-20200920.145511.9167.nikam@ucw.cz>
+References: <20200918015640.8439-1-rdunlap@infradead.org>
+ <20200918015640.8439-2-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a3QApj3isPu3TkLahArsfb5jaABb7DJ7EKMxey1T1YPbA@mail.gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200918015640.8439-2-rdunlap@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Sep 20, 2020 at 03:55:47PM +0200, Arnd Bergmann wrote:
-> On Sun, Sep 20, 2020 at 12:09 AM Al Viro <viro@zeniv.linux.org.uk> wrote:
-> > On Fri, Sep 18, 2020 at 05:16:15PM +0200, Christoph Hellwig wrote:
-> > > On Fri, Sep 18, 2020 at 02:58:22PM +0100, Al Viro wrote:
-> > > > Said that, why not provide a variant that would take an explicit
-> > > > "is it compat" argument and use it there?  And have the normal
-> > > > one pass in_compat_syscall() to that...
-> > >
-> > > That would help to not introduce a regression with this series yes.
-> > > But it wouldn't fix existing bugs when io_uring is used to access
-> > > read or write methods that use in_compat_syscall().  One example that
-> > > I recently ran into is drivers/scsi/sg.c.
-> >
-> > So screw such read/write methods - don't use them with io_uring.
-> > That, BTW, is one of the reasons I'm sceptical about burying the
-> > decisions deep into the callchain - we don't _want_ different
-> > data layouts on read/write depending upon the 32bit vs. 64bit
-> > caller, let alone the pointer-chasing garbage that is /dev/sg.
+Hello!
+
+> "rdev" is considered antiquated, ancient, archaic, obsolete, deprecated
+> {choose any or all}.
 > 
-> Would it be too late to limit what kind of file descriptors we allow
-> io_uring to read/write on?
-> 
-> If io_uring can get changed to return -EINVAL on trying to
-> read/write something other than S_IFREG file descriptors,
-> that particular problem space gets a lot simpler, but this
-> is of course only possible if nobody actually relies on it yet.
+> Remove use of "rdev" and "vidmode" (a symlink to rdev) in
+> admin-guide/README.rst and admin-guide/svga.rst.
 
-S_IFREG is almost certainly too heavy as a restriction.  Looking through
-the stuff sensitive to 32bit/64bit, we seem to have
-	* /dev/sg - pointer-chasing horror
-	* sysfs files for efivar - different layouts for compat and native,
-shitty userland ABI design (
-struct efi_variable {
-        efi_char16_t  VariableName[EFI_VAR_NAME_LEN/sizeof(efi_char16_t)];
-        efi_guid_t    VendorGuid;
-        unsigned long DataSize;
-        __u8          Data[1024];
-        efi_status_t  Status;
-        __u32         Attributes;
-} __attribute__((packed));
-) is the piece of crap in question; 'DataSize' is where the headache comes
-from.  Regular files, BTW...
-	* uhid - character device, milder pointer-chasing horror.  Trouble
-comes from this:
-/* Obsolete! Use UHID_CREATE2. */
-struct uhid_create_req {
-        __u8 name[128];
-        __u8 phys[64];
-        __u8 uniq[64];
-        __u8 __user *rd_data;
-        __u16 rd_size;
+Acked-by: Martin Mares <mj@ucw.cz>
 
-        __u16 bus;
-        __u32 vendor;
-        __u32 product;
-        __u32 version;
-        __u32 country;
-} __attribute__((__packed__));
-and suggested replacement doesn't do any pointer-chasing (rd_data is an
-embedded array in the end of struct uhid_create2_req).
-	* evdev, uinput - bitness-sensitive layout, due to timestamps
-	* /proc/bus/input/devices - weird crap with printing bitmap, different
-_text_ layouts seen by 32bit and 64bit readers.  Binary structures are PITA,
-but with sufficient effort you can screw the text just as hard...  Oh, and it's
-a regular file.
-	* similar in sysfs analogue
-
-And AFAICS, that's it for read/write-related method instances.
+				Have a nice fortnight
+-- 
+Martin `MJ' Mareš                        <mj@ucw.cz>   http://mj.ucw.cz/
+United Computer Wizards, Prague, Czech Republic, Europe, Earth, Universe
+Press any key to quit or any other key to continue
