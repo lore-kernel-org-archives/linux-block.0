@@ -2,70 +2,56 @@ Return-Path: <SRS0=iZfY=C5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFF1C43465
-	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 05:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FE0C43465
+	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 09:10:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E6EF20709
-	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 05:45:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80AAF20EDD
+	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 09:10:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726192AbgITFp6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Sep 2020 01:45:58 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:43396 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726174AbgITFp6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Sep 2020 01:45:58 -0400
-X-Greylist: delayed 578 seconds by postgrey-1.27 at vger.kernel.org; Sun, 20 Sep 2020 01:45:57 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 62DC820419A;
-        Sun, 20 Sep 2020 07:36:17 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id QmwB39jA3PkQ; Sun, 20 Sep 2020 07:36:11 +0200 (CEST)
-Received: from xtwo70.bingwo.ca (host-45-78-251-166.dyn.295.ca [45.78.251.166])
-        by smtp.infotech.no (Postfix) with ESMTPA id D6E3720417C;
-        Sun, 20 Sep 2020 07:36:10 +0200 (CEST)
-From:   Douglas Gilbert <dgilbert@interlog.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: [PATCH] sgl_alloc_order: memory leak
-Date:   Sun, 20 Sep 2020 01:36:07 -0400
-Message-Id: <20200920053607.35002-1-dgilbert@interlog.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726293AbgITJKd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Sep 2020 05:10:33 -0400
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:55548 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726247AbgITJKd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 20 Sep 2020 05:10:33 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0U9TXAYI_1600593030;
+Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0U9TXAYI_1600593030)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sun, 20 Sep 2020 17:10:31 +0800
+From:   Baolin Wang <baolin.wang@linux.alibaba.com>
+To:     tj@kernel.org, axboe@kernel.dk
+Cc:     baolin.wang@linux.alibaba.com, baolin.wang7@gmail.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] Some improvements for blk throttle
+Date:   Sun, 20 Sep 2020 17:10:17 +0800
+Message-Id: <cover.1600592693.git.baolin.wang@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Noticed that when sgl_alloc_order() failed with order > 0 that
-free memory on my machine shrank. That function shouldn't call
-sgl_free() on its error path since that is only correct when
-order==0 .
+Hi,
 
-Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
----
- lib/scatterlist.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch set did some improvements for blk throttle, please
+help to review. Thanks.
 
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index 5d63a8857f36..c448642e0f78 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -514,7 +514,7 @@ struct scatterlist *sgl_alloc_order(unsigned long long length,
- 		elem_len = min_t(u64, length, PAGE_SIZE << order);
- 		page = alloc_pages(gfp, order);
- 		if (!page) {
--			sgl_free(sgl);
-+			sgl_free_order(sgl, order);
- 			return NULL;
- 		}
- 
+Baolin Wang (4):
+  blk-throttle: Remove a meaningless parameter for
+    throtl_downgrade_state()
+  blk-throttle: Avoid getting the current time if tg->last_finish_time
+    is 0
+  blk-throttle: Avoid tracking latency if low limit is invalid
+  blk-throttle: Fix IO hang for a corner case
+
+ block/blk-throttle.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
+
 -- 
-2.25.1
+1.8.3.1
 
