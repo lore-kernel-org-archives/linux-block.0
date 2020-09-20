@@ -2,99 +2,78 @@ Return-Path: <SRS0=iZfY=C5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDFCC43469
-	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 19:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C95A8C43463
+	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 19:35:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E30AF20866
-	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 19:28:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600630117;
-	bh=MvoJlqBNzeGMhQj08qmauzE2jefx91WtS5O4xpiUc2w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=lPNl88bTzFIGc9KXHPwlvC9MXEWEBmsf8Y5tk3L9BgNUdSlPMdkQpP0TAr6DH8YyX
-	 eUze8fUDUN8KLDoWpZgg3RbV4aIAtC6CwKTAASa49OwmtKHJbxLlTBBwp+qKucu7D5
-	 DPafpnDKooMLs/9ehmzo+JgfT7DCFwPcddQzpAUc=
+	by mail.kernel.org (Postfix) with ESMTP id 7C98F2084C
+	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 19:35:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbgITT2f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Sep 2020 15:28:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34194 "EHLO mail.kernel.org"
+        id S1726148AbgITTfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Sep 2020 15:35:30 -0400
+Received: from smtp.infotech.no ([82.134.31.41]:44920 "EHLO smtp.infotech.no"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726156AbgITT2f (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Sep 2020 15:28:35 -0400
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D8A8323447
-        for <linux-block@vger.kernel.org>; Sun, 20 Sep 2020 19:28:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600630114;
-        bh=MvoJlqBNzeGMhQj08qmauzE2jefx91WtS5O4xpiUc2w=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=JjkWdzs8l4VG7axJD8j1N7zsDNyHx01VvIoenQP0XrkbTc8PSIPFDC+ocOwK5vc2K
-         RrxibNtkQ6Bu2l0c6FA8qAmsm6Zk+9gHRRr0jrtaswknN6/RVSUvSl9tUHIGyxATeV
-         mD5rOKF8ZZ6lwaLYgtTds2laysQr8iIjXXnAGF54=
-Received: by mail-wr1-f53.google.com with SMTP id j2so10573064wrx.7
-        for <linux-block@vger.kernel.org>; Sun, 20 Sep 2020 12:28:33 -0700 (PDT)
-X-Gm-Message-State: AOAM532CpboMkgzDGEDIY+3aT/NgyYN6drKmudM9ljqCp/sq4S/Q58mS
-        zx9pmdNxGtVTmLbLKD+yKpgduO0aUaeWU7UgfJpH5Q==
-X-Google-Smtp-Source: ABdhPJyGRJyXPIIAcXrNp8ibkDlg/u7fNSqAcKhSzeIjm5dJtxkt9PxOngbofryv0JcZUoQWH7pgaf1q3lhvPecaOZc=
-X-Received: by 2002:a5d:6a47:: with SMTP id t7mr48111800wrw.75.1600630112287;
- Sun, 20 Sep 2020 12:28:32 -0700 (PDT)
+        id S1726109AbgITTfa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 20 Sep 2020 15:35:30 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 9DDD020424C;
+        Sun, 20 Sep 2020 21:35:28 +0200 (CEST)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id iBvNNGn0a9mC; Sun, 20 Sep 2020 21:35:22 +0200 (CEST)
+Received: from [192.168.48.23] (host-45-78-251-166.dyn.295.ca [45.78.251.166])
+        by smtp.infotech.no (Postfix) with ESMTPA id 38CFD204172;
+        Sun, 20 Sep 2020 21:35:20 +0200 (CEST)
+Reply-To: dgilbert@interlog.com
+Subject: Re: [PATCH] lib/scatterlist: Fix memory leak in sgl_alloc_order()
+To:     Markus Elfring <Markus.Elfring@web.de>, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <e69e9865-a599-5bd9-95b1-7d57c7e2e90c@web.de>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Message-ID: <1608a0b7-6960-afce-aa39-6785036b01e0@interlog.com>
+Date:   Sun, 20 Sep 2020 15:35:18 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200918124533.3487701-1-hch@lst.de> <20200918124533.3487701-2-hch@lst.de>
- <20200920151510.GS32101@casper.infradead.org> <20200920180742.GN3421308@ZenIV.linux.org.uk>
- <20200920190159.GT32101@casper.infradead.org> <20200920191031.GQ3421308@ZenIV.linux.org.uk>
- <20200920192259.GU32101@casper.infradead.org>
-In-Reply-To: <20200920192259.GU32101@casper.infradead.org>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Sun, 20 Sep 2020 12:28:20 -0700
-X-Gmail-Original-Message-ID: <CALCETrXVtBkxNJcMxf9myaKT9snHKbCWUenKHGRfp8AOtORBPg@mail.gmail.com>
-Message-ID: <CALCETrXVtBkxNJcMxf9myaKT9snHKbCWUenKHGRfp8AOtORBPg@mail.gmail.com>
-Subject: Re: [PATCH 1/9] kernel: add a PF_FORCE_COMPAT flag
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        David Howells <dhowells@redhat.com>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Parisc List <linux-parisc@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-aio <linux-aio@kvack.org>, io-uring@vger.kernel.org,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        Network Development <netdev@vger.kernel.org>,
-        keyrings@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <e69e9865-a599-5bd9-95b1-7d57c7e2e90c@web.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Sep 20, 2020 at 12:23 PM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Sun, Sep 20, 2020 at 08:10:31PM +0100, Al Viro wrote:
-> > IMO it's much saner to mark those and refuse to touch them from io_uring...
->
-> Simpler solution is to remove io_uring from the 32-bit syscall list.
-> If you're a 32-bit process, you don't get to use io_uring.  Would
-> any real users actually care about that?
+On 2020-09-20 1:09 p.m., Markus Elfring wrote:
+>> Noticed that when sgl_alloc_order() failed with order > 0 that
+>> free memory on my machine shrank. That function shouldn't call
+>> sgl_free() on its error path since that is only correct when
+>> order==0 .
+> 
+> * Would an imperative wording become helpful for the change description?
 
-We could go one step farther and declare that we're done adding *any*
-new compat syscalls :)
+No passive tense there. Or do you mean usage like: "Go to hell" or
+"Fix memory leak in ..."? I studied French and Latin at school; at a
+guess, my mother tongue got its grammar from the former. My mother
+taught English grammar and the term "imperative wording" rings no
+bells in my grammatical education. Google agrees with me.
+Please define: "imperative wording".
+> * How do you think about to add the tag “Fixes” to the commit message?r
 
+In the workflow I'm used to, others (closer to LT) make that decision.
+Why waste my time?
 
+> * Will an other patch subject be more appropriate?
 
--- 
-Andy Lutomirski
-AMA Capital Management, LLC
+Twas testing a 6 GB allocation with said function on my 8 GB laptop.
+It failed and free told me 5 GB had disappeared (and
+'cat /sys/kernel/debug/kmemleak' told me _nothing_). Umm, it is
+potentially a HUGE f@#$ing memory LEAK! Best to call a spade a spade.
+
+Doug Gilbert
+
