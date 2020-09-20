@@ -2,56 +2,76 @@ Return-Path: <SRS0=iZfY=C5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FE0C43465
-	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 09:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE99C43465
+	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 09:10:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80AAF20EDD
-	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 09:10:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9ADBD20EDD
+	for <linux-block@archiver.kernel.org>; Sun, 20 Sep 2020 09:10:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726293AbgITJKd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Sep 2020 05:10:33 -0400
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:55548 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726247AbgITJKd (ORCPT
+        id S1726353AbgITJKf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Sep 2020 05:10:35 -0400
+Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:37040 "EHLO
+        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726280AbgITJKf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Sep 2020 05:10:33 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0U9TXAYI_1600593030;
-Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0U9TXAYI_1600593030)
+        Sun, 20 Sep 2020 05:10:35 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0U9TmHbH_1600593031;
+Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0U9TmHbH_1600593031)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Sun, 20 Sep 2020 17:10:31 +0800
+          Sun, 20 Sep 2020 17:10:32 +0800
 From:   Baolin Wang <baolin.wang@linux.alibaba.com>
 To:     tj@kernel.org, axboe@kernel.dk
 Cc:     baolin.wang@linux.alibaba.com, baolin.wang7@gmail.com,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] Some improvements for blk throttle
-Date:   Sun, 20 Sep 2020 17:10:17 +0800
-Message-Id: <cover.1600592693.git.baolin.wang@linux.alibaba.com>
+Subject: [PATCH 2/4] blk-throttle: Avoid getting the current time if tg->last_finish_time is 0
+Date:   Sun, 20 Sep 2020 17:10:19 +0800
+Message-Id: <534c289866f74d1587806f7818baac789b49c484.1600592693.git.baolin.wang@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1600592693.git.baolin.wang@linux.alibaba.com>
+References: <cover.1600592693.git.baolin.wang@linux.alibaba.com>
+In-Reply-To: <cover.1600592693.git.baolin.wang@linux.alibaba.com>
+References: <cover.1600592693.git.baolin.wang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+We only update the tg->last_finish_time when the low limitaion is
+enabled, so we can move the tg->last_finish_time validation a little
+forward to avoid getting the unnecessary current time stamp if the
+the low limitation is not enabled.
 
-This patch set did some improvements for blk throttle, please
-help to review. Thanks.
+Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
+---
+ block/blk-throttle.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Baolin Wang (4):
-  blk-throttle: Remove a meaningless parameter for
-    throtl_downgrade_state()
-  blk-throttle: Avoid getting the current time if tg->last_finish_time
-    is 0
-  blk-throttle: Avoid tracking latency if low limit is invalid
-  blk-throttle: Fix IO hang for a corner case
-
- block/blk-throttle.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 4007b26..7e72102 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2077,10 +2077,14 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
+ 
+ static void blk_throtl_update_idletime(struct throtl_grp *tg)
+ {
+-	unsigned long now = ktime_get_ns() >> 10;
++	unsigned long now;
+ 	unsigned long last_finish_time = tg->last_finish_time;
+ 
+-	if (now <= last_finish_time || last_finish_time == 0 ||
++	if (last_finish_time == 0)
++		return;
++
++	now = ktime_get_ns() >> 10;
++	if (now <= last_finish_time ||
+ 	    last_finish_time == tg->checked_last_finish_time)
+ 		return;
+ 
 -- 
 1.8.3.1
 
