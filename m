@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F77C43463
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 555E7C4346E
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:20:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B4FCB2085B
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:20:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 096BD20BED
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:20:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fSYHFcPs"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WNqTBIMO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726496AbgIUHUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 03:20:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59338 "EHLO
+        id S1726540AbgIUHUQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 03:20:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726297AbgIUHUD (ORCPT
+        with ESMTP id S1726489AbgIUHUH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 03:20:03 -0400
+        Mon, 21 Sep 2020 03:20:07 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57681C0613CE;
-        Mon, 21 Sep 2020 00:20:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D64ACC0613D0;
+        Mon, 21 Sep 2020 00:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=ezfq9/HhvT27qSext7o43eb8FqswuribWTEc7lyTkRU=; b=fSYHFcPs1xBTx6DlCTN+c0UOeW
-        9H7k/RWEK8Imd0eiA48EYchqL7yNYPMiHKCsGVCNike9dWCd8Trtri0xrUaSxBkBVyR91kWkFBMJP
-        SslT8GEhgCitfbLj8S1wkOXVSko+xuILWy+zENOdi8z7ABVwnxZyBztMC+Vh7nXE/Ovsa2kK5eTbW
-        rcgqLt/aebYwHsQLXZXX4nqeYcNLJ3CudJnCesUM6qNboCepBAZZdf90bSJd4700MmetfjtIQpqzc
-        F6HDqTV+dK3ORWhs3RoEfO2rxovqjq44xjGAS/hsB6GuhKXHtLZb7HEpdZHOmvEWet+2+9N+qm9yy
-        HCVlLMNA==;
+        bh=mK3IFrmKleYuDfPBu63jJazzBdauHkYdgkU6Y/JSZC8=; b=WNqTBIMOPCX7jPmyxhZHIGiZXL
+        X54zbFtIGp1EVhQ0T70mguh6oWP0ez2yzi/MA8sErwgmZKhWKjhNfpIasBHAK6pOyrxLzXh5dLDed
+        hHyxLf2UMs3aVvew5jXcOZXfHtUMRir0ynh0FWAK3sgBLb2vU7a3vJ5mEDSY4zf/UmB8fTV48QiiP
+        E9QXiNAcnkn+pTjR+OOX5NcmvHGzRE4bTYyb0hL2mbmAB6GgkAIvbo2449VSsxVo3+am0Od1lwrAz
+        nPQPR6C81/DDuFEDaH/6J7TasFFjQEPr0RbNfzfhGelHwt9w0t36aYqNCX5Hf8+sik2SFxHeJz0YQ
+        uYgPc5rQ==;
 Received: from p4fdb0c34.dip0.t-ipconnect.de ([79.219.12.52] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kKG74-0003EH-OZ; Mon, 21 Sep 2020 07:19:50 +0000
+        id 1kKG79-0003Em-H2; Mon, 21 Sep 2020 07:19:55 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Josef Bacik <josef@toxicpanda.com>,
@@ -53,9 +53,9 @@ Cc:     Josef Bacik <josef@toxicpanda.com>,
         linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
         linux-pm@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 01/14] block: move the NEED_PART_SCAN flag to struct gendisk
-Date:   Mon, 21 Sep 2020 09:19:45 +0200
-Message-Id: <20200921071958.307589-2-hch@lst.de>
+Subject: [PATCH 05/14] pktcdvd: use blkdev_get_by_dev instead of open coding it
+Date:   Mon, 21 Sep 2020 09:19:49 +0200
+Message-Id: <20200921071958.307589-6-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200921071958.307589-1-hch@lst.de>
 References: <20200921071958.307589-1-hch@lst.de>
@@ -66,162 +66,90 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We can only scan for partitions on the whole disk, so move the flag
-from struct block_device to struct gendisk.
+Replace bdget + blkdev_get by blkdev_get_by_dev.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c             | 4 ++--
- drivers/block/nbd.c       | 8 ++++----
- drivers/ide/ide-gd.c      | 2 +-
- fs/block_dev.c            | 7 +++----
- include/linux/blk_types.h | 4 +---
- include/linux/genhd.h     | 2 ++
- 6 files changed, 13 insertions(+), 14 deletions(-)
+ drivers/block/pktcdvd.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 9d060e79eb31d8..7b56203c90a303 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -731,7 +731,7 @@ static void register_disk(struct device *parent, struct gendisk *disk,
- 	if (!bdev)
- 		goto exit;
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index bc870a5f15f77b..467dbd06b7cdb1 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2110,16 +2110,18 @@ static int pkt_open_dev(struct pktcdvd_device *pd, fmode_t write)
+ 	int ret;
+ 	long lba;
+ 	struct request_queue *q;
++	struct block_device *bdev;
  
--	set_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
-+	set_bit(GD_NEED_PART_SCAN, &disk->state);
- 	err = blkdev_get(bdev, FMODE_READ, NULL);
- 	if (err < 0)
- 		goto exit;
-@@ -2112,7 +2112,7 @@ bool bdev_check_media_change(struct block_device *bdev)
- 	if (__invalidate_device(bdev, true))
- 		pr_warn("VFS: busy inodes on changed media %s\n",
- 			bdev->bd_disk->disk_name);
--	set_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
-+	set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
- 	return true;
- }
- EXPORT_SYMBOL(bdev_check_media_change);
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 15eed210feeff4..2dca0aab0a9a25 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -315,7 +315,7 @@ static void nbd_size_update(struct nbd_device *nbd)
- 			bd_set_nr_sectors(bdev, nr_sectors);
- 			set_blocksize(bdev, config->blksize);
- 		} else
--			set_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
-+			set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
- 		bdput(bdev);
- 	}
- 	kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
-@@ -1322,7 +1322,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
- 		return ret;
+ 	/*
+ 	 * We need to re-open the cdrom device without O_NONBLOCK to be able
+ 	 * to read/write from/to it. It is already opened in O_NONBLOCK mode
+-	 * so bdget() can't fail.
++	 * so open should not fail.
+ 	 */
+-	bdget(pd->bdev->bd_dev);
+-	ret = blkdev_get(pd->bdev, FMODE_READ | FMODE_EXCL, pd);
+-	if (ret)
++	bdev = blkdev_get_by_dev(pd->bdev->bd_dev, FMODE_READ | FMODE_EXCL, pd);
++	if (IS_ERR(bdev)) {
++		ret = PTR_ERR(bdev);
+ 		goto out;
++	}
  
- 	if (max_part)
--		set_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
-+		set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
- 	mutex_unlock(&nbd->config_lock);
- 	ret = wait_event_interruptible(config->recv_wq,
- 					 atomic_read(&config->recv_threads) == 0);
-@@ -1500,9 +1500,9 @@ static int nbd_open(struct block_device *bdev, fmode_t mode)
- 		refcount_set(&nbd->config_refs, 1);
- 		refcount_inc(&nbd->refs);
- 		mutex_unlock(&nbd->config_lock);
--		set_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
-+		set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
- 	} else if (nbd_disconnected(nbd->config)) {
--		set_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
-+		set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
- 	}
+ 	ret = pkt_get_last_written(pd, &lba);
+ 	if (ret) {
+@@ -2163,7 +2165,7 @@ static int pkt_open_dev(struct pktcdvd_device *pd, fmode_t write)
+ 	return 0;
+ 
+ out_putdev:
+-	blkdev_put(pd->bdev, FMODE_READ | FMODE_EXCL);
++	blkdev_put(bdev, FMODE_READ | FMODE_EXCL);
  out:
- 	mutex_unlock(&nbd_index_mutex);
-diff --git a/drivers/ide/ide-gd.c b/drivers/ide/ide-gd.c
-index 661e2aa9c96784..e2b6c82586ce8b 100644
---- a/drivers/ide/ide-gd.c
-+++ b/drivers/ide/ide-gd.c
-@@ -230,7 +230,7 @@ static int ide_gd_open(struct block_device *bdev, fmode_t mode)
- 				bdev->bd_disk->disk_name);
- 		drive->disk_ops->get_capacity(drive);
- 		set_capacity(disk, ide_gd_capacity(drive));
--		set_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
-+		set_bit(GD_NEED_PART_SCAN, &disk->state);
- 	} else if (drive->dev_flags & IDE_DFLAG_FORMAT_IN_PROGRESS) {
- 		ret = -EBUSY;
- 		goto out_put_idkp;
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 0b34955b9e360f..1a9325f4315769 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -910,7 +910,6 @@ struct block_device *bdget(dev_t dev)
- 		bdev->bd_super = NULL;
- 		bdev->bd_inode = inode;
- 		bdev->bd_part_count = 0;
--		bdev->bd_flags = 0;
- 		inode->i_mode = S_IFBLK;
- 		inode->i_rdev = dev;
- 		inode->i_bdev = bdev;
-@@ -1385,7 +1384,7 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 	return ret;
+ }
+@@ -2500,7 +2502,6 @@ static int pkt_seq_show(struct seq_file *m, void *p)
+ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
+ {
+ 	int i;
+-	int ret = 0;
+ 	char b[BDEVNAME_SIZE];
+ 	struct block_device *bdev;
  
- 	lockdep_assert_held(&bdev->bd_mutex);
+@@ -2523,12 +2524,9 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
+ 		}
+ 	}
  
--	clear_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags);
-+	clear_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
+-	bdev = bdget(dev);
+-	if (!bdev)
+-		return -ENOMEM;
+-	ret = blkdev_get(bdev, FMODE_READ | FMODE_NDELAY, NULL);
+-	if (ret)
+-		return ret;
++	bdev = blkdev_get_by_dev(dev, FMODE_READ | FMODE_NDELAY, NULL);
++	if (IS_ERR(bdev))
++		return PTR_ERR(bdev);
+ 	if (!blk_queue_scsi_passthrough(bdev_get_queue(bdev))) {
+ 		blkdev_put(bdev, FMODE_READ | FMODE_NDELAY);
+ 		return -EINVAL;
+@@ -2546,7 +2544,6 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
+ 	pd->cdrw.thread = kthread_run(kcdrwd, pd, "%s", pd->name);
+ 	if (IS_ERR(pd->cdrw.thread)) {
+ 		pkt_err(pd, "can't start kernel thread\n");
+-		ret = -ENOMEM;
+ 		goto out_mem;
+ 	}
  
- rescan:
- 	ret = blk_drop_partitions(bdev);
-@@ -1509,7 +1508,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, void *holder,
- 			 * The latter is necessary to prevent ghost
- 			 * partitions on a removed medium.
- 			 */
--			if (test_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags) &&
-+			if (test_bit(GD_NEED_PART_SCAN, &disk->state) &&
- 			    (!ret || ret == -ENOMEDIUM))
- 				bdev_disk_changed(bdev, ret == -ENOMEDIUM);
+@@ -2558,7 +2555,7 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
+ 	blkdev_put(bdev, FMODE_READ | FMODE_NDELAY);
+ 	/* This is safe: open() is still holding a reference. */
+ 	module_put(THIS_MODULE);
+-	return ret;
++	return -ENOMEM;
+ }
  
-@@ -1539,7 +1538,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, void *holder,
- 			if (bdev->bd_disk->fops->open)
- 				ret = bdev->bd_disk->fops->open(bdev, mode);
- 			/* the same as first opener case, read comment there */
--			if (test_bit(BDEV_NEED_PART_SCAN, &bdev->bd_flags) &&
-+			if (test_bit(GD_NEED_PART_SCAN, &disk->state) &&
- 			    (!ret || ret == -ENOMEDIUM))
- 				bdev_disk_changed(bdev, ret == -ENOMEDIUM);
- 			if (ret)
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 6ffa783e16335e..eb20e28184ab19 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -19,8 +19,6 @@ struct cgroup_subsys_state;
- typedef void (bio_end_io_t) (struct bio *);
- struct bio_crypt_ctx;
- 
--#define BDEV_NEED_PART_SCAN		0
--
- struct block_device {
- 	dev_t			bd_dev;
- 	int			bd_openers;
-@@ -39,7 +37,7 @@ struct block_device {
- 	struct hd_struct *	bd_part;
- 	/* number of times partitions within this device have been opened. */
- 	unsigned		bd_part_count;
--	unsigned long		bd_flags;
-+
- 	spinlock_t		bd_size_lock; /* for bd_inode->i_size updates */
- 	struct gendisk *	bd_disk;
- 	struct backing_dev_info *bd_bdi;
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 1c97cf84f011a7..38f23d75701379 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -191,6 +191,8 @@ struct gendisk {
- 	void *private_data;
- 
- 	int flags;
-+	unsigned long state;
-+#define GD_NEED_PART_SCAN		0
- 	struct rw_semaphore lookup_sem;
- 	struct kobject *slave_dir;
- 
+ static int pkt_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd, unsigned long arg)
 -- 
 2.28.0
 
