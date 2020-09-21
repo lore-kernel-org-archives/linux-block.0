@@ -2,97 +2,80 @@ Return-Path: <SRS0=nPog=C6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F0AC43468
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 11:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B38C43463
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 13:11:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C1F72151B
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 11:11:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3143021789
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 13:11:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726701AbgIULL2 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 07:11:28 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:20040 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726709AbgIULL1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 07:11:27 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-233-9UYq0ao9O6ejB4ujVxtO9g-1; Mon, 21 Sep 2020 12:11:22 +0100
-X-MC-Unique: 9UYq0ao9O6ejB4ujVxtO9g-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Mon, 21 Sep 2020 12:11:21 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Mon, 21 Sep 2020 12:11:21 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Christoph Hellwig' <hch@lst.de>
-CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        David Howells <dhowells@redhat.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Subject: RE: let import_iovec deal with compat_iovecs as well
-Thread-Topic: let import_iovec deal with compat_iovecs as well
-Thread-Index: AQHWjbnKEn35LxofhEeT1lmdzdUiWqlwBNiwgAJx3YCAAH2K4A==
-Date:   Mon, 21 Sep 2020 11:11:21 +0000
-Message-ID: <ac8a3691c4f5442f908c51298260ca0e@AcuMS.aculab.com>
-References: <20200918124533.3487701-1-hch@lst.de>
- <2c7bf42ee4314484ae0177280cd8f5f3@AcuMS.aculab.com>
- <20200921044125.GA16522@lst.de>
-In-Reply-To: <20200921044125.GA16522@lst.de>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        id S1727449AbgIUNKx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 09:10:53 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:43170 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727426AbgIUNKp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Sep 2020 09:10:45 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id EA8FCE349BEBA8CD73F2;
+        Mon, 21 Sep 2020 21:10:42 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 21 Sep 2020 21:10:35 +0800
+From:   Qinglang Miao <miaoqinglang@huawei.com>
+To:     Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Qinglang Miao" <miaoqinglang@huawei.com>
+Subject: [PATCH -next] rsxx: simplify the return expression of rsxx_save_config()
+Date:   Mon, 21 Sep 2020 21:10:59 +0800
+Message-ID: <20200921131059.92987-1-miaoqinglang@huawei.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-Content-Language: en-US
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.25]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On Sat, Sep 19, 2020 at 02:24:10PM +0000, David Laight wrote:
-> > I thought about that change while writing my import_iovec() => iovec_import()
-> > patch - and thought that the io_uring code would (as usual) cause grief.
-> >
-> > Christoph - did you see those patches?
+Simplify the return expression.
 
-Link to cover email.
+Signed-off-by: Qinglang Miao <miaoqinglang@huawei.com>
+---
+ drivers/block/rsxx/config.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-https://lkml.org/lkml/2020/9/15/661
-
+diff --git a/drivers/block/rsxx/config.c b/drivers/block/rsxx/config.c
+index 11ed1d964..c6de88186 100644
+--- a/drivers/block/rsxx/config.c
++++ b/drivers/block/rsxx/config.c
+@@ -84,7 +84,6 @@ static void config_data_cpu_to_le(struct rsxx_card_cfg *cfg)
+ static int rsxx_save_config(struct rsxx_cardinfo *card)
+ {
+ 	struct rsxx_card_cfg cfg;
+-	int st;
+ 
+ 	memcpy(&cfg, &card->config, sizeof(cfg));
+ 
+@@ -107,11 +106,7 @@ static int rsxx_save_config(struct rsxx_cardinfo *card)
+ 	config_data_swab(&cfg);
+ 	config_hdr_cpu_to_be(&cfg.hdr);
+ 
+-	st = rsxx_creg_write(card, CREG_ADD_CONFIG, sizeof(cfg), &cfg, 1);
+-	if (st)
+-		return st;
 -
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+-	return 0;
++	return rsxx_creg_write(card, CREG_ADD_CONFIG, sizeof(cfg), &cfg, 1);
+ }
+ 
+ int rsxx_load_config(struct rsxx_cardinfo *card)
+-- 
+2.23.0
 
