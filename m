@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B65C4346E
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 08:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18773C43464
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 08:09:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1164220BED
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 08:09:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9FF820EDD
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 08:09:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OKzekSWM"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EQwu/cR2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgIUII4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 04:08:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38558 "EHLO
+        id S1726718AbgIUIJ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 04:09:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726457AbgIUIH5 (ORCPT
+        with ESMTP id S1726324AbgIUIH4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 04:07:57 -0400
+        Mon, 21 Sep 2020 04:07:56 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDFBBC0613D1;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 221B3C061755;
         Mon, 21 Sep 2020 01:07:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=H8hk1GyqLuto/InuvfMfeFX2w3KpymgO3wY2UL3PIN8=; b=OKzekSWMOFLiy8XYn1TMxhALGt
-        kRwgcpt0XYJtc4V7goE8WN4kaWcf7VsU/DFo/mAkua8a7pws37JcPIVTkuFw2WkZBdIyHBHyRZ2Hl
-        efRKIiqeDB2TDhhWi8CpKEpSfJyRPhs8UcqISd/axMnNchEUg9Cm8+7G67A7XD4cU96M5jjfVZ/rt
-        XcgN1XSNDcvDP2Y3SPnOwN7Wyx21+TVNlmtFsfVJqcKtPOVAX69npI5mrRWRG84EPrfggMTd0PcmE
-        zWYXkKH0EXUeKsXkGTTY+M1S2w8T9sJxZ/00RwrunzS6vvZ+Za1E42Whoh3pbBv9UzNVjlvdDW4Mv
-        BzaU75ZA==;
+        bh=1Wl4CR3g3QHDQhZ33f8Oe6qI9aP7fMZeE5hKlObwJ0M=; b=EQwu/cR2LodCQaFHG05hYNpozm
+        U++iiQM/OeP2AkVo1WTUpU+dI2Dxy9PU9SMGZkQIchixHl5Jx7a0QZk5QjsM3mKR+reWMYdC5dYVn
+        1/RyKrVkK9YLy3fmeQEtMZdYZZY5sO+JS6B15u1VfcYsZYeIJhvelBd9tWQF1KMWdpSxOaOX7AQ3C
+        wizDdm3VvY8FkkLVnDPzz1aL3YJazDYKgNWRltE/h20ULbz8zDeUg/9HS2R2SkDzVSLHKIMcr5zcW
+        Ycx/mTaN0ejniWyn1jkIqStX3tT5JOPuH+P5WFBTHwcT/t8jMI83iRyfSIeaANZdLu8MwdwI6fNNq
+        LsuftJjQ==;
 Received: from p4fdb0c34.dip0.t-ipconnect.de ([79.219.12.52] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kKGrL-0006XE-BX; Mon, 21 Sep 2020 08:07:41 +0000
+        id 1kKGrD-0006WA-MD; Mon, 21 Sep 2020 08:07:32 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
@@ -49,11 +49,10 @@ Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
         linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, cgroups@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 06/13] md: update the optimal I/O size on reshape
-Date:   Mon, 21 Sep 2020 10:07:27 +0200
-Message-Id: <20200921080734.452759-7-hch@lst.de>
+        linux-mm@kvack.org, cgroups@vger.kernel.org
+Subject: [PATCH 03/13] bcache: inherit the optimal I/O size
+Date:   Mon, 21 Sep 2020 10:07:24 +0200
+Message-Id: <20200921080734.452759-4-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200921080734.452759-1-hch@lst.de>
 References: <20200921080734.452759-1-hch@lst.de>
@@ -64,109 +63,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The raid5 and raid10 drivers currently update the read-ahead size,
-but not the optimal I/O size on reshape.  To prepare for deriving the
-read-ahead size from the optimal I/O size make sure it is updated
-as well.
+Inherit the optimal I/O size setting just like the readahead window,
+as any reason to do larger I/O does not apply to just readahead.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Song Liu <song@kernel.org>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- drivers/md/raid10.c | 22 ++++++++++++++--------
- drivers/md/raid5.c  | 10 ++++++++--
- 2 files changed, 22 insertions(+), 10 deletions(-)
+ drivers/md/bcache/super.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index e8fa327339171c..9956a04ac13bd6 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3703,10 +3703,20 @@ static struct r10conf *setup_conf(struct mddev *mddev)
- 	return ERR_PTR(err);
- }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 1bbdc410ee3c51..48113005ed86ad 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1430,6 +1430,8 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+ 	dc->disk.disk->queue->backing_dev_info->ra_pages =
+ 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
+ 		    q->backing_dev_info->ra_pages);
++	blk_queue_io_opt(dc->disk.disk->queue,
++		max(queue_io_opt(dc->disk.disk->queue), queue_io_opt(q)));
  
-+static void raid10_set_io_opt(struct r10conf *conf)
-+{
-+	int raid_disks = conf->geo.raid_disks;
-+
-+	if (!(conf->geo.raid_disks % conf->geo.near_copies))
-+		raid_disks /= conf->geo.near_copies;
-+	blk_queue_io_opt(conf->mddev->queue, (conf->mddev->chunk_sectors << 9) *
-+			 raid_disks);
-+}
-+
- static int raid10_run(struct mddev *mddev)
- {
- 	struct r10conf *conf;
--	int i, disk_idx, chunk_size;
-+	int i, disk_idx;
- 	struct raid10_info *disk;
- 	struct md_rdev *rdev;
- 	sector_t size;
-@@ -3742,18 +3752,13 @@ static int raid10_run(struct mddev *mddev)
- 	mddev->thread = conf->thread;
- 	conf->thread = NULL;
- 
--	chunk_size = mddev->chunk_sectors << 9;
- 	if (mddev->queue) {
- 		blk_queue_max_discard_sectors(mddev->queue,
- 					      mddev->chunk_sectors);
- 		blk_queue_max_write_same_sectors(mddev->queue, 0);
- 		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
--		blk_queue_io_min(mddev->queue, chunk_size);
--		if (conf->geo.raid_disks % conf->geo.near_copies)
--			blk_queue_io_opt(mddev->queue, chunk_size * conf->geo.raid_disks);
--		else
--			blk_queue_io_opt(mddev->queue, chunk_size *
--					 (conf->geo.raid_disks / conf->geo.near_copies));
-+		blk_queue_io_min(mddev->queue, mddev->chunk_sectors << 9);
-+		raid10_set_io_opt(conf);
- 	}
- 
- 	rdev_for_each(rdev, mddev) {
-@@ -4727,6 +4732,7 @@ static void end_reshape(struct r10conf *conf)
- 		stripe /= conf->geo.near_copies;
- 		if (conf->mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
- 			conf->mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
-+		raid10_set_io_opt(conf);
- 	}
- 	conf->fullsync = 0;
- }
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index 225380efd1e24f..9a7d1250894ef1 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7232,6 +7232,12 @@ static int only_parity(int raid_disk, int algo, int raid_disks, int max_degraded
- 	return 0;
- }
- 
-+static void raid5_set_io_opt(struct r5conf *conf)
-+{
-+	blk_queue_io_opt(conf->mddev->queue, (conf->chunk_sectors << 9) *
-+			 (conf->raid_disks - conf->max_degraded));
-+}
-+
- static int raid5_run(struct mddev *mddev)
- {
- 	struct r5conf *conf;
-@@ -7521,8 +7527,7 @@ static int raid5_run(struct mddev *mddev)
- 
- 		chunk_size = mddev->chunk_sectors << 9;
- 		blk_queue_io_min(mddev->queue, chunk_size);
--		blk_queue_io_opt(mddev->queue, chunk_size *
--				 (conf->raid_disks - conf->max_degraded));
-+		raid5_set_io_opt(conf);
- 		mddev->queue->limits.raid_partial_stripes_expensive = 1;
- 		/*
- 		 * We can only discard a whole stripe. It doesn't make sense to
-@@ -8115,6 +8120,7 @@ static void end_reshape(struct r5conf *conf)
- 						   / PAGE_SIZE);
- 			if (conf->mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
- 				conf->mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
-+			raid5_set_io_opt(conf);
- 		}
- 	}
- }
+ 	atomic_set(&dc->io_errors, 0);
+ 	dc->io_disable = false;
 -- 
 2.28.0
 
