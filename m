@@ -2,137 +2,141 @@ Return-Path: <SRS0=nPog=C6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A2AEC43464
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 08:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B7C3C43466
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 09:55:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E41DF207BC
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 08:45:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UWXytXWm"
+	by mail.kernel.org (Postfix) with ESMTP id 4E78821D7A
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 09:55:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726347AbgIUIpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 04:45:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44472 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726236AbgIUIpz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 04:45:55 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB354C061755;
-        Mon, 21 Sep 2020 01:45:54 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id k25so10354629ljg.9;
-        Mon, 21 Sep 2020 01:45:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:organization:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CZmaZ187zMFdVdjh+DfPERuCP3WU0wLxzZIFDgqpQhQ=;
-        b=UWXytXWmkq8pXmYqB0sXkFrf5u7O8zADyv3pKBcOd43273LrLEK/6dwQie7xrTzsFY
-         om+1pH6WEDJNAT2FC5RZEXob/KRC6BhuELwRQTtlvWyS36FiytI4T13PRHgaPvhqTOmm
-         JnxMoCogivVva8Xm2cqsnuYpJ5d7lJj6ft92HDVD4p/9uEForZYyO+gdHPYZMAUq++Qq
-         M1rqpVX3Vnj2KoBKnqSQr5mA55K3Ux9Svkrgvl7128w9LytJpLCirpoWpIfX+fiWXgLN
-         hfRQHGkBqoDrOX6dl6WzzpJsP4xUBo+tICCmmkS34li8nJVViMd6ZQnNGiU/epbwh+QT
-         3mDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=CZmaZ187zMFdVdjh+DfPERuCP3WU0wLxzZIFDgqpQhQ=;
-        b=gc9RUqGvyZasbDWoF4cPdreyGZ031WAIpkLUduqMMRRniCMMkwpVk5KvGYxDFH9m4v
-         rW+dq6/DxaCWTma9T+PrhAECJnC7hTrMzUNhFOaHiSx1W+ShFSgbyRA43fu6aVmIV6u3
-         TndqpvwrDhnnfALh+tWxXrWvl3afy0g6AJslOXwj0Fy9gYEmmJWq+p33z7RvWjonDbN2
-         BOMGulKRFCra9UbEAGXL3yzp80InYxcEIqk1u4FuJFouAZGdwMPe11yvCmuuiZTBSAq7
-         9WfFEKNhJuxTgoVX9rYR7LCMW5I3x8X7Nj3Ob7kf3CjJBflt4cWrRqvYAwLL912TG/gY
-         8LDw==
-X-Gm-Message-State: AOAM530G0V/N9EdGhIVxXZPdKH6PFRm8PfqpG4GbAp0VsSZiina+dCuo
-        79Rr2NICPia7oQ4GClgZVusiJC/uu0eFEA==
-X-Google-Smtp-Source: ABdhPJx5mav1W62IiUmXTaMhqLWi6f2dGUFFf8sbUeC0z4e5MZ82zAxsAmryelg6X6Izw+2IGouZSQ==
-X-Received: by 2002:a2e:2c0e:: with SMTP id s14mr15080290ljs.174.1600677953001;
-        Mon, 21 Sep 2020 01:45:53 -0700 (PDT)
-Received: from ?IPv6:2a00:1fa0:485b:5520:1d32:5ffa:5dce:483f? ([2a00:1fa0:485b:5520:1d32:5ffa:5dce:483f])
-        by smtp.gmail.com with ESMTPSA id u14sm2551614lji.83.2020.09.21.01.45.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Sep 2020 01:45:52 -0700 (PDT)
-Subject: Re: [PATCH 08/14] dasd: cleanup dasd_scan_partitions
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
+        id S1726460AbgIUJzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 05:55:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:32820 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726375AbgIUJzJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Sep 2020 05:55:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 2A091AF0B;
+        Mon, 21 Sep 2020 09:55:43 +0000 (UTC)
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
         Minchan Kim <minchan@kernel.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        linux-pm@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-References: <20200921071958.307589-1-hch@lst.de>
- <20200921071958.307589-9-hch@lst.de>
-From:   Sergei Shtylyov <sergei.shtylyov@gmail.com>
-Organization: Brain-dead Software
-Message-ID: <28f7f012-2787-2959-394e-cda480786ea9@gmail.com>
-Date:   Mon, 21 Sep 2020 11:45:46 +0300
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Justin Sanders <justin@coraid.com>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, cgroups@vger.kernel.org
+References: <20200921080734.452759-1-hch@lst.de>
+ <20200921080734.452759-4-hch@lst.de>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Subject: Re: [PATCH 03/13] bcache: inherit the optimal I/O size
+Message-ID: <b547a1b6-ab03-0520-012d-86d112c83d92@suse.de>
+Date:   Mon, 21 Sep 2020 17:54:59 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200921071958.307589-9-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200921080734.452759-4-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello!
-
-On 21.09.2020 10:19, Christoph Hellwig wrote:
-
-> Use blkdev_get_by_dev instead of bdget_disk + blkdev_get.
+On 2020/9/21 16:07, Christoph Hellwig wrote:
+> Inherit the optimal I/O size setting just like the readahead window,
+> as any reason to do larger I/O does not apply to just readahead.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   drivers/s390/block/dasd_genhd.c | 15 ++++-----------
->   1 file changed, 4 insertions(+), 11 deletions(-)
+>  drivers/md/bcache/super.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
-> index af5b0ecb8f8923..a9698fba9b76ce 100644
-> --- a/drivers/s390/block/dasd_genhd.c
-> +++ b/drivers/s390/block/dasd_genhd.c
-> @@ -101,18 +101,11 @@ int dasd_scan_partitions(struct dasd_block *block)
->   	struct block_device *bdev;
->   	int rc;
->   
-> -	bdev = bdget_disk(block->gdp, 0);
-> -	if (!bdev) {
-> -		DBF_DEV_EVENT(DBF_ERR, block->base, "%s",
-> -			      "scan partitions error, bdget returned NULL");
-> -		return -ENODEV;
-> -	}
-> -
-> -	rc = blkdev_get(bdev, FMODE_READ, NULL);
-> -	if (rc < 0) {
-> +	bdev = blkdev_get_by_dev(disk_devt(block->gdp), FMODE_READ, NULL);
-> +	if (IS_ERR(bdev)) {
->   		DBF_DEV_EVENT(DBF_ERR, block->base,
-> -			      "scan partitions error, blkdev_get returned %d",
-> -			      rc);
-> +			      "scan partitions error, blkdev_get returned %ld",
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 1bbdc410ee3c51..48113005ed86ad 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -1430,6 +1430,8 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+>  	dc->disk.disk->queue->backing_dev_info->ra_pages =
+>  		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
+>  		    q->backing_dev_info->ra_pages);
+> +	blk_queue_io_opt(dc->disk.disk->queue,
+> +		max(queue_io_opt(dc->disk.disk->queue), queue_io_opt(q)));
+>  
 
-    blkdev_get_by_dev() now?
+Hi Christoph,
 
-> +			      PTR_ERR(bdev));
->   		return -ENODEV;
->   	}
->   
+I am not sure whether virtual bcache device's optimal request size can
+be simply set like this.
 
-MBR, Sergei
+Most of time inherit backing device's optimal request size is fine, but
+there are two exceptions,
+- Read request hits on cache device
+- User sets sequential_cuttoff as 0, all writing may go into cache
+device firstly.
+For the above two conditions, all I/Os goes into cache device, using
+optimal request size of backing device might be improper.
+
+Just a guess, is it OK to set the optimal request size of the virtual
+bcache device as the least common multiple of cache device's and backing
+device's optimal request sizes ?
+
+
+[snipped]
+
+Thanks.
+
+Coly Li
+
