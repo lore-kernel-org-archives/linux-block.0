@@ -2,80 +2,66 @@ Return-Path: <SRS0=nPog=C6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B38C43463
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 13:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B76AC43465
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 14:00:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3143021789
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 13:11:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5EBF20866
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 14:00:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727449AbgIUNKx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 09:10:53 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:43170 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727426AbgIUNKp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 09:10:45 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id EA8FCE349BEBA8CD73F2;
-        Mon, 21 Sep 2020 21:10:42 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 21 Sep 2020 21:10:35 +0800
-From:   Qinglang Miao <miaoqinglang@huawei.com>
-To:     Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Qinglang Miao" <miaoqinglang@huawei.com>
-Subject: [PATCH -next] rsxx: simplify the return expression of rsxx_save_config()
-Date:   Mon, 21 Sep 2020 21:10:59 +0800
-Message-ID: <20200921131059.92987-1-miaoqinglang@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        id S1727251AbgIUOAR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 10:00:17 -0400
+Received: from verein.lst.de ([213.95.11.211]:40145 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727289AbgIUOAR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Sep 2020 10:00:17 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id A75DA68AFE; Mon, 21 Sep 2020 16:00:11 +0200 (CEST)
+Date:   Mon, 21 Sep 2020 16:00:10 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Coly Li <colyli@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Justin Sanders <justin@coraid.com>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, cgroups@vger.kernel.org
+Subject: Re: [PATCH 03/13] bcache: inherit the optimal I/O size
+Message-ID: <20200921140010.GA14672@lst.de>
+References: <20200921080734.452759-1-hch@lst.de> <20200921080734.452759-4-hch@lst.de> <b547a1b6-ab03-0520-012d-86d112c83d92@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b547a1b6-ab03-0520-012d-86d112c83d92@suse.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Simplify the return expression.
+On Mon, Sep 21, 2020 at 05:54:59PM +0800, Coly Li wrote:
+> I am not sure whether virtual bcache device's optimal request size can
+> be simply set like this.
+> 
+> Most of time inherit backing device's optimal request size is fine, but
+> there are two exceptions,
+> - Read request hits on cache device
+> - User sets sequential_cuttoff as 0, all writing may go into cache
+> device firstly.
+> For the above two conditions, all I/Os goes into cache device, using
+> optimal request size of backing device might be improper.
+> 
+> Just a guess, is it OK to set the optimal request size of the virtual
+> bcache device as the least common multiple of cache device's and backing
+> device's optimal request sizes ?
 
-Signed-off-by: Qinglang Miao <miaoqinglang@huawei.com>
----
- drivers/block/rsxx/config.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
-
-diff --git a/drivers/block/rsxx/config.c b/drivers/block/rsxx/config.c
-index 11ed1d964..c6de88186 100644
---- a/drivers/block/rsxx/config.c
-+++ b/drivers/block/rsxx/config.c
-@@ -84,7 +84,6 @@ static void config_data_cpu_to_le(struct rsxx_card_cfg *cfg)
- static int rsxx_save_config(struct rsxx_cardinfo *card)
- {
- 	struct rsxx_card_cfg cfg;
--	int st;
- 
- 	memcpy(&cfg, &card->config, sizeof(cfg));
- 
-@@ -107,11 +106,7 @@ static int rsxx_save_config(struct rsxx_cardinfo *card)
- 	config_data_swab(&cfg);
- 	config_hdr_cpu_to_be(&cfg.hdr);
- 
--	st = rsxx_creg_write(card, CREG_ADD_CONFIG, sizeof(cfg), &cfg, 1);
--	if (st)
--		return st;
--
--	return 0;
-+	return rsxx_creg_write(card, CREG_ADD_CONFIG, sizeof(cfg), &cfg, 1);
- }
- 
- int rsxx_load_config(struct rsxx_cardinfo *card)
--- 
-2.23.0
-
+Well, if the optimal I/O size is wrong, the read ahead size also is
+wrong.  Can we just drop the setting?
