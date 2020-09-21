@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE752C43468
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9C3C43466
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:20:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB908206B2
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:20:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6151220809
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:20:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="abFdUakM"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="P+xH+vZ5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726583AbgIUHUS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 03:20:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59388 "EHLO
+        id S1726265AbgIUHUw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 03:20:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726531AbgIUHUQ (ORCPT
+        with ESMTP id S1726582AbgIUHUS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 03:20:16 -0400
+        Mon, 21 Sep 2020 03:20:18 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64D55C0613D4;
-        Mon, 21 Sep 2020 00:20:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E4EC061755;
+        Mon, 21 Sep 2020 00:20:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=Kr2+p2HR1nssIehKr/ZTjYDHrW6/Q4oBo+Y/OmGsqnM=; b=abFdUakMHuXEUxMyAnaArSfxcl
-        ZWyR5P68nfjx1L8srsfXmjbadYr0atK34Ljowl563xZnCJysFzV+1dmtRYxOUSxjJc6xSytnetpAK
-        5fC8PfB7oVL5CHmCtYoRdG6+empRE9Suocw6s9cksbEf4vzn6hUN3ms/gxj+ZEdeJv0X7v64zLpEc
-        rVpKEzhTDw0iryrwwMAZoJ4r1UBKlYhIr3Ty8kKpDbyFdkPH7bvJdVQ3mEq2cZxMFoa4grUlf++VK
-        Rd8sc1pwogP72aR3OQLMl/xXoOPGMJVDeBao+tAwI1/wyHklSihXxRlDVkTOv8GOjbHlfxEVczsKQ
-        5VFg74NQ==;
+        bh=blabZPmWXgG0cxcX0iPoG2CU0yB/dn2E6XMr7wtvOlU=; b=P+xH+vZ5WozDW/mPdPOoeSIebG
+        XZS2jbwOYrOnTthQk0Uhm2SN87yRyDUn+1hDAtJuRjjVe/XicpMadZaTTfDzItsqRxP8o2qV2xw+J
+        wgYD2nLuTxeNFRAUjWM1VtY3PaSm5zVdGYXpcad8hFndoD1AZSe2iSlkKP1/tdil7vhDgqkhDxwQS
+        E4kZzfmz7B2OoGgbvaA3W/YOA3nGsZTkMQbjCf6TCyC+pOZeLaPcFY/tOyz9SKH45tfIIXYTwB611
+        bGDDyetv66m9+BQacOd9O8B2x2ftPjyj+cyfGSSLbX1LbAlrCntf+ngFdzLp9viVESfnCMpXnZkw+
+        bqJgUGMA==;
 Received: from p4fdb0c34.dip0.t-ipconnect.de ([79.219.12.52] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kKG7D-0003FX-9O; Mon, 21 Sep 2020 07:19:59 +0000
+        id 1kKG7I-0003Hv-7w; Mon, 21 Sep 2020 07:20:04 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Josef Bacik <josef@toxicpanda.com>,
@@ -52,10 +52,11 @@ Cc:     Josef Bacik <josef@toxicpanda.com>,
         linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
         linux-pm@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 09/14] ocfs2: cleanup o2hb_region_dev_store
-Date:   Mon, 21 Sep 2020 09:19:53 +0200
-Message-Id: <20200921071958.307589-10-hch@lst.de>
+        linux-block@vger.kernel.org,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
+Subject: [PATCH 13/14] PM: mm: cleanup swsusp_swap_check
+Date:   Mon, 21 Sep 2020 09:19:57 +0200
+Message-Id: <20200921071958.307589-14-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200921071958.307589-1-hch@lst.de>
 References: <20200921071958.307589-1-hch@lst.de>
@@ -66,75 +67,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use blkdev_get_by_dev instead of igrab (aka open coded bdgrab) +
-blkdev_get.
+Use blkdev_get_by_dev instead of bdget + blkdev_get.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 ---
- fs/ocfs2/cluster/heartbeat.c | 28 ++++++++++------------------
- 1 file changed, 10 insertions(+), 18 deletions(-)
+ kernel/power/swap.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
-index 89d13e0705fe7b..0179a73a3fa2c4 100644
---- a/fs/ocfs2/cluster/heartbeat.c
-+++ b/fs/ocfs2/cluster/heartbeat.c
-@@ -1766,7 +1766,6 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
- 	int sectsize;
- 	char *p = (char *)page;
- 	struct fd f;
--	struct inode *inode;
- 	ssize_t ret = -EINVAL;
- 	int live_threshold;
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index 9d3ffbfe08dbf6..71385bedcc3a49 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -343,12 +343,10 @@ static int swsusp_swap_check(void)
+ 		return res;
+ 	root_swap = res;
  
-@@ -1793,20 +1792,16 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
- 	    reg->hr_block_bytes == 0)
- 		goto out2;
+-	hib_resume_bdev = bdget(swsusp_resume_device);
+-	if (!hib_resume_bdev)
+-		return -ENOMEM;
+-	res = blkdev_get(hib_resume_bdev, FMODE_WRITE, NULL);
+-	if (res)
+-		return res;
++	hib_resume_bdev = blkdev_get_by_dev(swsusp_resume_device, FMODE_WRITE,
++			NULL);
++	if (IS_ERR(hib_resume_bdev))
++		return PTR_ERR(hib_resume_bdev);
  
--	inode = igrab(f.file->f_mapping->host);
--	if (inode == NULL)
-+	if (!S_ISBLK(f.file->f_mapping->host->i_mode))
- 		goto out2;
- 
--	if (!S_ISBLK(inode->i_mode))
--		goto out3;
--
--	reg->hr_bdev = I_BDEV(f.file->f_mapping->host);
--	ret = blkdev_get(reg->hr_bdev, FMODE_WRITE | FMODE_READ, NULL);
--	if (ret) {
-+	reg->hr_bdev = blkdev_get_by_dev(f.file->f_mapping->host->i_rdev,
-+					 FMODE_WRITE | FMODE_READ, NULL);
-+	if (IS_ERR(reg->hr_bdev)) {
-+		ret = PTR_ERR(reg->hr_bdev);
- 		reg->hr_bdev = NULL;
--		goto out3;
-+		goto out2;
- 	}
--	inode = NULL;
- 
- 	bdevname(reg->hr_bdev, reg->hr_dev_name);
- 
-@@ -1909,16 +1904,13 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
- 		       config_item_name(&reg->hr_item), reg->hr_dev_name);
- 
- out3:
--	iput(inode);
-+	if (ret < 0) {
-+		blkdev_put(reg->hr_bdev, FMODE_READ | FMODE_WRITE);
-+		reg->hr_bdev = NULL;
-+	}
- out2:
- 	fdput(f);
- out:
--	if (ret < 0) {
--		if (reg->hr_bdev) {
--			blkdev_put(reg->hr_bdev, FMODE_READ|FMODE_WRITE);
--			reg->hr_bdev = NULL;
--		}
--	}
- 	return ret;
- }
- 
+ 	res = set_blocksize(hib_resume_bdev, PAGE_SIZE);
+ 	if (res < 0)
 -- 
 2.28.0
 
