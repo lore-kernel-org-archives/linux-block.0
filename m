@@ -7,58 +7,57 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1108C43468
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 417C5C43463
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 08:07:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 979D6207DE
-	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 07:21:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2659214F1
+	for <linux-block@archiver.kernel.org>; Mon, 21 Sep 2020 08:07:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="h1Wymipw"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n3T38Jnn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726699AbgIUHVN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 03:21:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59352 "EHLO
+        id S1726347AbgIUIHz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 04:07:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726486AbgIUHUH (ORCPT
+        with ESMTP id S1726324AbgIUIHy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 03:20:07 -0400
+        Mon, 21 Sep 2020 04:07:54 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A3C5C0613CE;
-        Mon, 21 Sep 2020 00:20:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B019C061755;
+        Mon, 21 Sep 2020 01:07:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=kKrnsk0G0+/53OYcI1nKBJAYP0PP2drQYHczMU8H8l8=; b=h1WymipwzsfQg6HGoHFnSqm2lG
-        lSXGTKndViTtD3Wqt+Prxiv9pPXKbXQhDojOLblOFVeTB6V5u0uTDKJccl4Yuj8auFwmoVkRVu8Ph
-        OC4Ld6W8CSLSh8alUcRHew6l5j5n/oheWAmJxIkUZrGkDuwMeXX7eQvBUwlquYOi6qEXAmIBthDJO
-        rxUP7OtZoBoTroj/4cKed9bAf5MrfY7nVCYa+Rzutl1yvPIkC83ZFIAFrBRPUAmEJoV6Fu4GmaHpe
-        VHMSAXpnpQAkXRZxUjr+0vzqQmstuZnM2+5oSlYyMisXcqZC8c2nK5u9kpyXtAeJtWD6QgWv2dOwk
-        Anv6OZNQ==;
+        bh=ZzPx71qgJF0jC0ikEBgBKShPtgyqvHrdfndjbCu7C3c=; b=n3T38Jnns58og0olaG188os3c6
+        Lqj80wazOFLuBqb6DzzvWszbXA3+Y15Uoi5riSG12LmSHnndvS7DaBM4xo1E5BBmnAcRUioV80H7i
+        ubGonqQbO7YqgiSd26ZSWF6leHSlOm7o8Rv4r2ifY88yPIwirX3JDzu5Fmf3oz+Uvo8cF94Mgf/1K
+        cdFMnud/GADnfbAT+/WPp8SvrxpdL9BIrrG+BHlakN27jgHbJVoT1L4RghwZ97/jlT3SfoAvy7zb1
+        IikTWnCDbjKELovIrEKqR41ryOwAAP0TTY1wN4/C7kLMRUqhd2nwEKQd1mi56LJqFv5s7vUVwt+HB
+        CeVbO78g==;
 Received: from p4fdb0c34.dip0.t-ipconnect.de ([79.219.12.52] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kKG7A-0003Ex-FW; Mon, 21 Sep 2020 07:19:56 +0000
+        id 1kKGr8-0006Vv-SC; Mon, 21 Sep 2020 08:07:27 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
+Cc:     Song Liu <song@kernel.org>, Hans de Goede <hdegoede@redhat.com>,
+        Coly Li <colyli@suse.de>, Richard Weinberger <richard@nod.at>,
         Minchan Kim <minchan@kernel.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        linux-ide@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        linux-pm@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 06/14] zram: cleanup backing_dev_store
-Date:   Mon, 21 Sep 2020 09:19:50 +0200
-Message-Id: <20200921071958.307589-7-hch@lst.de>
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Justin Sanders <justin@coraid.com>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, cgroups@vger.kernel.org,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 01/13] fs: remove the unused SB_I_MULTIROOT flag
+Date:   Mon, 21 Sep 2020 10:07:22 +0200
+Message-Id: <20200921080734.452759-2-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200921071958.307589-1-hch@lst.de>
-References: <20200921071958.307589-1-hch@lst.de>
+In-Reply-To: <20200921080734.452759-1-hch@lst.de>
+References: <20200921080734.452759-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -66,31 +65,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use blkdev_get_by_dev instead of bdgrab + blkdev_get.
+The last user of SB_I_MULTIROOT is disappeared with commit f2aedb713c28
+("NFS: Add fs_context support.")
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- drivers/block/zram/zram_drv.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ fs/namei.c         | 4 ++--
+ include/linux/fs.h | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index a356275605b104..91ccfe444525b4 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -491,9 +491,10 @@ static ssize_t backing_dev_store(struct device *dev,
- 		goto out;
- 	}
+diff --git a/fs/namei.c b/fs/namei.c
+index e99e2a9da0f7de..f1eb8ccd2be958 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -568,8 +568,8 @@ static bool path_connected(struct vfsmount *mnt, struct dentry *dentry)
+ {
+ 	struct super_block *sb = mnt->mnt_sb;
  
--	bdev = bdgrab(I_BDEV(inode));
--	err = blkdev_get(bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL, zram);
--	if (err < 0) {
-+	bdev = blkdev_get_by_dev(inode->i_rdev,
-+			FMODE_READ | FMODE_WRITE | FMODE_EXCL, zram);
-+	if (IS_ERR(bdev)) {
-+		err = PTR_ERR(bdev);
- 		bdev = NULL;
- 		goto out;
- 	}
+-	/* Bind mounts and multi-root filesystems can have disconnected paths */
+-	if (!(sb->s_iflags & SB_I_MULTIROOT) && (mnt->mnt_root == sb->s_root))
++	/* Bind mounts can have disconnected paths */
++	if (mnt->mnt_root == sb->s_root)
+ 		return true;
+ 
+ 	return is_subdir(dentry, mnt->mnt_root);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 7519ae003a082c..fbd74df5ce5f34 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1385,7 +1385,6 @@ extern int send_sigurg(struct fown_struct *fown);
+ #define SB_I_CGROUPWB	0x00000001	/* cgroup-aware writeback enabled */
+ #define SB_I_NOEXEC	0x00000002	/* Ignore executables on this fs */
+ #define SB_I_NODEV	0x00000004	/* Ignore devices on this fs */
+-#define SB_I_MULTIROOT	0x00000008	/* Multiple roots to the dentry tree */
+ 
+ /* sb->s_iflags to limit user namespace mounts */
+ #define SB_I_USERNS_VISIBLE		0x00000010 /* fstype already mounted */
 -- 
 2.28.0
 
