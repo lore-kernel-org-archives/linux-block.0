@@ -2,103 +2,126 @@ Return-Path: <SRS0=ZsbB=C7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93AF0C4727D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 09:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E66C4727F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 09:13:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5287C20C09
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 09:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6E512086A
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 09:13:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726353AbgIVJGd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Sep 2020 05:06:33 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2909 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726424AbgIVJGd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Sep 2020 05:06:33 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 5CB0065EB2E2E364E660;
-        Tue, 22 Sep 2020 10:06:31 +0100 (IST)
-Received: from [127.0.0.1] (10.210.166.41) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 22 Sep
- 2020 10:06:30 +0100
-Subject: Re: [PATCH v8 00/18] blk-mq/scsi: Provide hostwide shared tags for
- SCSI HBAs
-From:   John Garry <john.garry@huawei.com>
-To:     <Don.Brace@microchip.com>, <martin.petersen@oracle.com>
-CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>, <don.brace@microsemi.com>,
-        <kashyap.desai@broadcom.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <dgilbert@interlog.com>,
-        <paolo.valente@linaro.org>, <hare@suse.de>, <hch@lst.de>,
-        <sumit.saxena@broadcom.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <megaraidlinux.pdl@broadcom.com>,
-        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
- <df6a3bd3-a89e-5f2f-ece1-a12ada02b521@kernel.dk>
- <379ef8a4-5042-926a-b8a0-2d0a684a0e01@huawei.com>
- <yq1363xbtk7.fsf@ca-mkp.ca.oracle.com>
- <32def143-911f-e497-662e-a2a41572fe4f@huawei.com>
- <yq1imcdw6ni.fsf@ca-mkp.ca.oracle.com>
- <7e90cb73-632c-ad37-699f-cb40044029ee@huawei.com>
- <SN6PR11MB2848BF85607B18D23EC40B9BE13A0@SN6PR11MB2848.namprd11.prod.outlook.com>
- <33612fc2-b70d-268e-5059-aadadf0c5dca@huawei.com>
-Message-ID: <655385f6-ac59-da3b-11f9-1f8382e5c35b@huawei.com>
-Date:   Tue, 22 Sep 2020 10:03:40 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726558AbgIVJNR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Sep 2020 05:13:17 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58278 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726341AbgIVJNR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Sep 2020 05:13:17 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 3198DAEEF;
+        Tue, 22 Sep 2020 09:13:51 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 1C2AD1E12E3; Tue, 22 Sep 2020 11:13:14 +0200 (CEST)
+Date:   Tue, 22 Sep 2020 11:13:14 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Coly Li <colyli@suse.de>, Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Justin Sanders <justin@coraid.com>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, cgroups@vger.kernel.org
+Subject: Re: [PATCH 07/13] block: lift setting the readahead size into the
+ block layer
+Message-ID: <20200922091314.GD16464@quack2.suse.cz>
+References: <20200921080734.452759-1-hch@lst.de>
+ <20200921080734.452759-8-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <33612fc2-b70d-268e-5059-aadadf0c5dca@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.210.166.41]
-X-ClientProxiedBy: lhreml753-chm.china.huawei.com (10.201.108.203) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200921080734.452759-8-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/09/2020 23:15, John Garry wrote:
-> On 21/09/2020 22:35, Don.Brace@microchip.com wrote:
->>>> I'm waiting on the hpsa and smartpqi patches >>update, so please 
->>>> kindly merge only those >>patches, above.
->>>> Thanks!
->> John, the hpsa driver crashes, the  or more patches to allow internal 
->> commands from Hannas seem to be missing.
->>
->> I'll let you know exactly which ones soon.
->>
+On Mon 21-09-20 10:07:28, Christoph Hellwig wrote:
+> Drivers shouldn't really mess with the readahead size, as that is a VM
+> concept.  Instead set it based on the optimal I/O size by lifting the
+> algorithm from the md driver when registering the disk.  Also set
+> bdi->io_pages there as well by applying the same scheme based on
+> max_sectors.
 > 
-> Hi Don,
-> 
-> Right, that branch did not include Hannes patches as they did not apply 
-> cleanly, but I think that you need the same patches as before. I can 
-> create a branch for you to test which does include those tomorrow - let 
-> me know.
-> 
-> Alternatively I think that we could create a hpsa patch which does not 
-> rely on that series, like I mentioned here [0], but it would not be as 
-> clean.
-> 
-> Cheers,
-> John
-> 
-> https://lore.kernel.org/linux-scsi/dc0e72d8-7076-060c-3cd3-3d51ac7e6de8@huawei.com/ 
-> 
-> .
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+...
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 76a7e03bcd6cac..01049e9b998f1d 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -452,6 +452,8 @@ EXPORT_SYMBOL(blk_limits_io_opt);
+>  void blk_queue_io_opt(struct request_queue *q, unsigned int opt)
+>  {
+>  	blk_limits_io_opt(&q->limits, opt);
+> +	q->backing_dev_info->ra_pages =
+> +		max(queue_io_opt(q) * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
+>  }
+>  EXPORT_SYMBOL(blk_queue_io_opt);
+>  
+> @@ -628,9 +630,6 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
+>  		printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
+>  		       top, bottom);
+>  	}
+> -
+> -	t->backing_dev_info->io_pages =
+> -		t->limits.max_sectors >> (PAGE_SHIFT - 9);
+>  }
+>  EXPORT_SYMBOL(disk_stack_limits);
 
-JFYI, I put the reserved command v6 patchset and $subject patchset on 
-this branch:
+One thing I've noticed is that blk_stack_limits() does not use
+blk_queue_io_opt() to set new optimal limit. That means that ra_pages won't
+be updated for the new queue. E.g. your DRDB change below will result in
+ra_pages not being properly updated AFAICT.
 
-https://github.com/hisilicon/kernel-dev/commits/private-topic-blk-mq-shared-tags-rfc-v8-resv-v6-baseline
+Similarly it isn't clear to me how io_pages would get updated after
+blk_stack_limits() updates max_hw_sectors...
 
-I don't have HW to test hpsa or smartpqi.
+Otherwise the patch looks good.
 
-Thanks,
-John
+								Honza
+
+> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+> index aaff5bde391506..f8fb1c9b1bb6c1 100644
+> --- a/drivers/block/drbd/drbd_nl.c
+> +++ b/drivers/block/drbd/drbd_nl.c
+> @@ -1360,18 +1360,8 @@ static void drbd_setup_queue_param(struct drbd_device *device, struct drbd_backi
+>  	decide_on_discard_support(device, q, b, discard_zeroes_if_aligned);
+>  	decide_on_write_same_support(device, q, b, o, disable_write_same);
+>  
+> -	if (b) {
+> +	if (b)
+>  		blk_stack_limits(&q->limits, &b->limits, 0);
+> -
+> -		if (q->backing_dev_info->ra_pages !=
+> -		    b->backing_dev_info->ra_pages) {
+> -			drbd_info(device, "Adjusting my ra_pages to backing device's (%lu -> %lu)\n",
+> -				 q->backing_dev_info->ra_pages,
+> -				 b->backing_dev_info->ra_pages);
+> -			q->backing_dev_info->ra_pages =
+> -						b->backing_dev_info->ra_pages;
+> -		}
+> -	}
+>  	fixup_discard_if_not_supported(q);
+>  	fixup_write_zeroes(device, q);
+>  }
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
