@@ -2,130 +2,121 @@ Return-Path: <SRS0=ZsbB=C7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4141DC2D0E2
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 07:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 005A8C2D0E2
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 07:24:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFF5120888
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 07:18:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="bbIOHY+N"
+	by mail.kernel.org (Postfix) with ESMTP id A8FBC21548
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 07:24:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729838AbgIVHSI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Sep 2020 03:18:08 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52688 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729586AbgIVHSI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Sep 2020 03:18:08 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1600759086;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TwSXYB3yBaaHs8kEF7Qgm7/JHKCd5+0qrfjd7HktPc8=;
-        b=bbIOHY+NVQZY9mBhhRLvhsbkScTSwLr0LAYX8KY11ZYRhoeKPo4sIoy4lXgMzYqc938qzU
-        h87KFyMOpZpFVAm+awMD7Ge0y3sE0fx3xc5MHvZAXqbFw5RBmc13X/NJ3Vzee9DE/dbeXk
-        4lNGdmSbE7c+5YshhXpsCQcrlYnBMb8=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id AD668AB54;
-        Tue, 22 Sep 2020 07:18:42 +0000 (UTC)
-Subject: Re: [PATCH] xen-blkback: add a parameter for disabling of persistent
- grants
-To:     SeongJae Park <sjpark@amazon.com>, konrad.wilk@oracle.com,
-        roger.pau@citrix.com
-Cc:     SeongJae Park <sjpark@amazon.de>, axboe@kernel.dk,
-        aliguori@amazon.com, amit@kernel.org, mheyne@amazon.de,
-        linux-block@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-kernel@vger.kernel.org
-References: <20200922070125.27251-1-sjpark@amazon.com>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <5fd34475-c296-c4f3-2bac-180c166449fe@suse.com>
-Date:   Tue, 22 Sep 2020 09:18:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1729843AbgIVHX7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Sep 2020 03:23:59 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:49235 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729735AbgIVHX7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Sep 2020 03:23:59 -0400
+Received: from mail-qv1-f46.google.com ([209.85.219.46]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.129]) with ESMTPSA (Nemesis)
+ id 1MgzWP-1kwjIH0sNp-00hNUS; Tue, 22 Sep 2020 09:23:56 +0200
+Received: by mail-qv1-f46.google.com with SMTP id cy2so9001474qvb.0;
+        Tue, 22 Sep 2020 00:23:54 -0700 (PDT)
+X-Gm-Message-State: AOAM530Ji4p6SqJlsqlAIhXa/mehEohMOm/qYFKdMQf1jU7KsXMjThoF
+        zhEaydElHAkD1HY8suM9/IFXSKaiuthCjdj0j8g=
+X-Google-Smtp-Source: ABdhPJx2+lYoTA/KUzOktg9GCEROrxWzhLaiei0nYKlXvAWkeVBXqnjogbknJct+KWfdqdHtsSEC4gKbjbjELvczheY=
+X-Received: by 2002:ad4:4594:: with SMTP id x20mr4471122qvu.4.1600759433835;
+ Tue, 22 Sep 2020 00:23:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200922070125.27251-1-sjpark@amazon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CAK8P3a2Mi+1yttyGk4k7HxRVrMtmFqJewouVhynqUL0PJycmog@mail.gmail.com>
+ <D0791499-1190-4C3F-A984-0A313ECA81C7@amacapital.net> <563138b5-7073-74bc-f0c5-b2bad6277e87@gmail.com>
+ <486c92d0-0f2e-bd61-1ab8-302524af5e08@gmail.com> <CALCETrW3rwGsgfLNnu_0JAcL5jvrPVTLTWM3JpbB5P9Hye6Fdw@mail.gmail.com>
+ <d5c6736a-2cb4-4e22-78da-a667bda5c05a@gmail.com> <CALCETrUEC81va8-fuUXG1uA5rbKxnKDYsDOXC70_HtKD4LAeAg@mail.gmail.com>
+ <e0a1b4d1-ff47-18d1-d535-c62812cb3105@gmail.com>
+In-Reply-To: <e0a1b4d1-ff47-18d1-d535-c62812cb3105@gmail.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Tue, 22 Sep 2020 09:23:37 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a2-6JNS38EbZcLrk=cTT526oP=Rf0aoqWNSJ-k4XTYehQ@mail.gmail.com>
+Message-ID: <CAK8P3a2-6JNS38EbZcLrk=cTT526oP=Rf0aoqWNSJ-k4XTYehQ@mail.gmail.com>
+Subject: Re: [PATCH 1/9] kernel: add a PF_FORCE_COMPAT flag
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Andy Lutomirski <luto@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        David Howells <dhowells@redhat.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-aio <linux-aio@kvack.org>, io-uring@vger.kernel.org,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        Network Development <netdev@vger.kernel.org>,
+        keyrings@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:AjHYUanKdOfbecE9w+B9Z4N6BZ2b/6C3GC/ZT1GJo80TVMT1TiT
+ B7v2YHekGwErZe59Y8I5SN6nA+wzRAtAzQV1alKD4cIBzMUtp+uCtDl7yXziqEx66eHXl+8
+ 5YaL/7KLJywdo7o6ruzdrm03FhbTCMOpxp+6Gjsv8I+DI1w9YYa5HKbByc2HjGMgB5rmpQw
+ GI2KocTAr9puH1Zbmwgvw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9U7HyB6Ug10=:7VkgnZRSuXPXxCph3JiICU
+ vGLCkcH/ucwoA0af9e3nwxzDrSU4qHHl5LbVNZE9fwRlf3BxRnIxChhoUWY/pbGK9kbUMnPn6
+ iOxC7987sYhrLc/wR5FOOl9AmSFlJBCSkq0ECTVJJpJ1zAxFuSujqohHO71ms6fcLmkaP+68S
+ a0y2dx03p+yQJTxCFfxZOllLfzHK80WYos1HroZHejUrF2/VDsLfCxxtFN6y520PH/aUVeNvX
+ l/r1mWP7DXSVu7yUeClrfFvYtyE6idWsIDiC+H5wv241L9aUyE9A1wYt26cS3oRTT1aDX3vMZ
+ lF5PgAd9+uS16D5p+mk7jnRYYYSNrgwHLffuwCYE2JUBFqA2ujr4MluvOT2GRH9b6unq2dzUt
+ 517RcTi/d6VNGTxLnkFU+xqDBgZ1yVXhchRfVaiepT1jCj8BgkHRkV9OoGDBdyP1nmyz0sll2
+ VQ2xFLSS96OSw2POSPIhQsLbgTDcNO1bJhekhO3rGilcenA0dj9a+7SWVb/8O+ZUaB/SmF73C
+ H3ua4oRbYBwYWG4ccj0SutXeHYh6UzX5exeOaMAbrFEBOHq90MPJxZr9OpBKopwpfZg7TSiRi
+ zSapc09tG64gvk/y30gK+i9n1y1+Z0hVsj881DVR15Z8IRzOaiwsXHPRYtDWn/5Id1OXfXYUM
+ GQLtid6DrtgYOV0t1yQLdUOtxCEHIcKjbkyzeUWon4rvW/O2PJ+LPGuX+cT3Y0mJX/3TaOO54
+ m56BSGeq93F8uHja3JT2cGnNBOb+bVlrVofywZOAznpqgdVcbwKfyV9CySRC23EhkF1Ux3+P4
+ ZUOrZnEIgtbSpmA2VFcNm2AcUo/kCY3kPrBkDXiWyRHUmv7uuCFJ1dmKR0zxr3hNe7SRSUTeV
+ e6nWK/ehurPAIaliTaLQ6/+QvEa//1a77RtpYjE1Mq+j6mZVIEO8F7N+t+EVsiOGMFjG5zlvk
+ 7US7In7QKaLgmPwktYFz4b9g/6ZdT94cvaUrc7hXk0N9in6iyc/wh
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 22.09.20 09:01, SeongJae Park wrote:
-> From: SeongJae Park <sjpark@amazon.de>
-> 
-> Persistent grants feature provides high scalability.  On some small
-> systems, however, it could incur data copy overhead[1] and thus it is
-> required to be disabled.  But, there is no option to disable it.  For
-> the reason, this commit adds a module parameter for disabling of the
-> feature.
-> 
-> [1] https://wiki.xen.org/wiki/Xen_4.3_Block_Protocol_Scalability
-> 
-> Signed-off-by: Anthony Liguori <aliguori@amazon.com>
-> Signed-off-by: SeongJae Park <sjpark@amazon.de>
-> ---
->   .../ABI/testing/sysfs-driver-xen-blkback        |  8 ++++++++
->   drivers/block/xen-blkback/xenbus.c              | 17 ++++++++++++++---
->   2 files changed, 22 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> index ecb7942ff146..0c42285c75ee 100644
-> --- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> +++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> @@ -35,3 +35,11 @@ Description:
->                   controls the duration in milliseconds that blkback will not
->                   cache any page not backed by a grant mapping.
->                   The default is 10ms.
-> +
-> +What:           /sys/module/xen_blkback/parameters/feature_persistent
-> +Date:           September 2020
-> +KernelVersion:  5.10
-> +Contact:        SeongJae Park <sjpark@amazon.de>
-> +Description:
-> +                Whether to enable the persistent grants feature or not.
-> +                The default is 1 (enable).
-> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> index b9aa5d1ac10b..9c03d70469f4 100644
-> --- a/drivers/block/xen-blkback/xenbus.c
-> +++ b/drivers/block/xen-blkback/xenbus.c
-> @@ -879,6 +879,12 @@ static void reclaim_memory(struct xenbus_device *dev)
->   
->   /* ** Connection ** */
->   
-> +/* Enable the persistent grants feature. */
-> +static unsigned int feature_persistent = 1;
+On Tue, Sep 22, 2020 at 8:32 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+> On 22/09/2020 03:58, Andy Lutomirski wrote:
+> > On Mon, Sep 21, 2020 at 5:24 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+> > I may be looking at a different kernel than you, but aren't you
+> > preventing creating an io_uring regardless of whether SQPOLL is
+> > requested?
+>
+> I diffed a not-saved file on a sleepy head, thanks for noticing.
+> As you said, there should be an SQPOLL check.
+>
+> ...
+> if (ctx->compat && (p->flags & IORING_SETUP_SQPOLL))
+>         goto err;
 
-Use bool, please.
+Wouldn't that mean that now 32-bit containers behave differently
+between compat and native execution?
 
-> +module_param_named(feature_persistent, feature_persistent, int, 0644);
+I think if you want to prevent 32-bit applications from using SQPOLL,
+it needs to be done the same way on both to be consistent:
 
-module_param()
+   if ((!IS_ENABLED(CONFIG_64BIT) || ctx->compat) &&
+        (p->flags & IORING_SETUP_SQPOLL))
+            goto err;
 
-> +MODULE_PARM_DESC(feature_persistent,
-> +		"Enables the persistent grants feature");
-> +
->   /*
->    * Write the physical details regarding the block device to the store, and
->    * switch to Connected state.
-> @@ -906,7 +912,8 @@ static void connect(struct backend_info *be)
->   
->   	xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
->   
-> -	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u", 1);
-> +	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
-> +			feature_persistent ? 1 : 0);
+I don't really see how taking away SQPOLL from 32-bit tasks is
+any better than just preventing access to the known-broken files
+as Al suggested, or adding the hack to make it work as in
+Christoph's original patch.
 
-Using bool above should allow to just use the value of
-feature_persistent here.
+Can we expect all existing and future user space to have a sane
+fallback when IORING_SETUP_SQPOLL fails?
 
-
-Juergen
+      Arnd
