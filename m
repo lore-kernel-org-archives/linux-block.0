@@ -2,89 +2,179 @@ Return-Path: <SRS0=ZsbB=C7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0095DC2D0E2
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 10:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 293B4C2D0E2
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 11:13:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 829C32396D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 10:52:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4C9222206
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 11:13:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="OEKlQRT7"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Pmm01SNr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726577AbgIVKw5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Sep 2020 06:52:57 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:30357 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726483AbgIVKw5 (ORCPT
+        id S1726533AbgIVLNK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Sep 2020 07:13:10 -0400
+Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:4514 "EHLO
+        esa4.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726454AbgIVLNK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Sep 2020 06:52:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1600771977; x=1632307977;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=o7irTIbRXOJQafppIl9QY5dF6CNyW4qaMo6zKmMJeVI=;
-  b=OEKlQRT7CVLleMg6gHeMvBDjQrPE0UIqMsYk4NcwpE6Fv2iAZvKYOnS9
-   qiBsTdZcitYWZemVaJG1tIfoqjNGH6bkMFlUZ4nFZr6rnuRUoT1PprQGz
-   J7vfpfFvU2nNJmx8hgpgMieLuwkizmOtaxnkfWGNOocODBDjg57dyxiDe
-   k=;
-X-IronPort-AV: E=Sophos;i="5.77,290,1596499200"; 
-   d="scan'208";a="70055190"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-a70de69e.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 22 Sep 2020 10:52:55 +0000
-Received: from EX13D31EUA004.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-1e-a70de69e.us-east-1.amazon.com (Postfix) with ESMTPS id 99DC9A1F35;
-        Tue, 22 Sep 2020 10:52:52 +0000 (UTC)
-Received: from u3f2cd687b01c55.ant.amazon.com (10.43.162.35) by
- EX13D31EUA004.ant.amazon.com (10.43.165.161) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 22 Sep 2020 10:52:46 +0000
-From:   SeongJae Park <sjpark@amazon.com>
-To:     <konrad.wilk@oracle.com>, <roger.pau@citrix.com>, <jgross@suse.com>
-CC:     SeongJae Park <sjpark@amazon.de>, <axboe@kernel.dk>,
+        Tue, 22 Sep 2020 07:13:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1600773189;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IQMCrguX0Zu48XQzFFouyUahameKH6iitE40YxYZ2Ck=;
+  b=Pmm01SNrBwJUbQoeKYaL6SkpoAdnXGtc9Ahi6nubaM8ORkYALv0RSApW
+   LXawgGYPeXRPWIXVrBKNblMl3mUVYW76uPSxtTyZc+u02WSG7yEO5CDNb
+   JWRo9sy76/qT2pS6ruZhXXPLFdN0+Jm3DpV3WIteKHEgHZrPtDB4aUPuw
+   0=;
+Authentication-Results: esa4.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none
+IronPort-SDR: BACWPl6ota1d6f9w/PF7Fb0srce6p1w5a0LPM2qpw0Nh3JdwIjbv4W5m581fIlPGTtRhFT1BOu
+ I6S6aMcVO8UljCouABphIkOT8Yh5G4dWhmKkhDLGehqv/aF0euEaiJC4GNx/zByi+Dd/PwTwlJ
+ BVfr4wg/YLI/HagCZMmRo9D4usP1LXdaKeqdnV7meEsAZweT0EmMW4PqbKXkO8MLUTM+QlW9Ko
+ 3XCvEMs5I0KCnA5V9SaRdoeA3+z16mCwaYKo/yRu0g2sFIuFC6WtPRkIvz6M3xxNKRyD3TlSvv
+ hAs=
+X-SBRS: 2.7
+X-MesageID: 28235081
+X-Ironport-Server: esa4.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.77,290,1596513600"; 
+   d="scan'208";a="28235081"
+Date:   Tue, 22 Sep 2020 13:12:59 +0200
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     SeongJae Park <sjpark@amazon.com>
+CC:     <konrad.wilk@oracle.com>, <jgross@suse.com>,
+        SeongJae Park <sjpark@amazon.de>, <axboe@kernel.dk>,
         <aliguori@amazon.com>, <amit@kernel.org>, <mheyne@amazon.de>,
         <pdurrant@amazon.co.uk>, <linux-block@vger.kernel.org>,
         <xen-devel@lists.xenproject.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 3/3] xen-blkfront: Apply changed parameter name to the document
-Date:   Tue, 22 Sep 2020 12:52:09 +0200
-Message-ID: <20200922105209.5284-4-sjpark@amazon.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200922105209.5284-1-sjpark@amazon.com>
+Subject: Re: [PATCH v2 1/3] xen-blkback: add a parameter for disabling of
+ persistent grants
+Message-ID: <20200922111259.GJ19254@Air-de-Roger>
 References: <20200922105209.5284-1-sjpark@amazon.com>
+ <20200922105209.5284-2-sjpark@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.162.35]
-X-ClientProxiedBy: EX13D14UWB003.ant.amazon.com (10.43.161.162) To
- EX13D31EUA004.ant.amazon.com (10.43.165.161)
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20200922105209.5284-2-sjpark@amazon.com>
+X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
+ FTLPEX02CL06.citrite.net (10.13.108.179)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: SeongJae Park <sjpark@amazon.de>
+On Tue, Sep 22, 2020 at 12:52:07PM +0200, SeongJae Park wrote:
+> From: SeongJae Park <sjpark@amazon.de>
+> 
+> Persistent grants feature provides high scalability.  On some small
+> systems, however, it could incur data copy overheads[1] and thus it is
+> required to be disabled.  But, there is no option to disable it.  For
+> the reason, this commit adds a module parameter for disabling of the
+> feature.
+> 
+> [1] https://wiki.xen.org/wiki/Xen_4.3_Block_Protocol_Scalability
+> 
+> Signed-off-by: Anthony Liguori <aliguori@amazon.com>
+> Signed-off-by: SeongJae Park <sjpark@amazon.de>
+> ---
+>  .../ABI/testing/sysfs-driver-xen-blkback      |  9 ++++++
+>  drivers/block/xen-blkback/xenbus.c            | 28 ++++++++++++++-----
+>  2 files changed, 30 insertions(+), 7 deletions(-)
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
+> index ecb7942ff146..ac2947b98950 100644
+> --- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
+> +++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
+> @@ -35,3 +35,12 @@ Description:
+>                  controls the duration in milliseconds that blkback will not
+>                  cache any page not backed by a grant mapping.
+>                  The default is 10ms.
+> +
+> +What:           /sys/module/xen_blkback/parameters/feature_persistent
+> +Date:           September 2020
+> +KernelVersion:  5.10
+> +Contact:        SeongJae Park <sjpark@amazon.de>
+> +Description:
+> +                Whether to enable the persistent grants feature or not.  Note
+> +                that this option only takes effect on newly created backends.
+> +                The default is Y (enable).
+> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> index b9aa5d1ac10b..8a95ddd08b13 100644
+> --- a/drivers/block/xen-blkback/xenbus.c
+> +++ b/drivers/block/xen-blkback/xenbus.c
+> @@ -879,6 +879,12 @@ static void reclaim_memory(struct xenbus_device *dev)
+>  
+>  /* ** Connection ** */
+>  
+> +/* Enable the persistent grants feature. */
+> +static bool feature_persistent = true;
+> +module_param(feature_persistent, bool, 0644);
+> +MODULE_PARM_DESC(feature_persistent,
+> +		"Enables the persistent grants feature");
+> +
+>  /*
+>   * Write the physical details regarding the block device to the store, and
+>   * switch to Connected state.
+> @@ -906,11 +912,15 @@ static void connect(struct backend_info *be)
+>  
+>  	xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
+>  
+> -	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u", 1);
+> -	if (err) {
+> -		xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
+> -				 dev->nodename);
+> -		goto abort;
+> +	if (feature_persistent) {
+> +		err = xenbus_printf(xbt, dev->nodename, "feature-persistent",
+> +				"%u", feature_persistent);
+> +		if (err) {
+> +			xenbus_dev_fatal(dev, err,
+> +					"writing %s/feature-persistent",
+> +					dev->nodename);
+> +			goto abort;
+> +		}
+>  	}
+>  
+>  	err = xenbus_printf(xbt, dev->nodename, "sectors", "%llu",
+> @@ -1093,8 +1103,12 @@ static int connect_ring(struct backend_info *be)
+>  		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
+>  		return -ENOSYS;
+>  	}
+> -	pers_grants = xenbus_read_unsigned(dev->otherend, "feature-persistent",
+> -					   0);
+> +	if (feature_persistent)
+> +		pers_grants = xenbus_read_unsigned(dev->otherend,
+> +				"feature-persistent", 0);
+> +	else
+> +		pers_grants = 0;
+> +
 
-Commit 14e710fe7897 ("xen-blkfront: rename indirect descriptor
-parameter") changed the name of the module parameter for the maximum
-amount of segments in indirect requests but missed updating the
-document.  This commit updates the document.
+Sorry for not realizing earlier, but looking at it again I think you
+need to cache the value of feature_persistent when it's first used in
+the blkback state data, so that it's consistent.
 
-Signed-off-by: SeongJae Park <sjpark@amazon.de>
----
- Documentation/ABI/testing/sysfs-driver-xen-blkfront | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+What would happen for example with the following flow (assume a
+persistent grants enabled frontend):
 
-diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkfront b/Documentation/ABI/testing/sysfs-driver-xen-blkfront
-index 9c31334cb2e6..28008905615f 100644
---- a/Documentation/ABI/testing/sysfs-driver-xen-blkfront
-+++ b/Documentation/ABI/testing/sysfs-driver-xen-blkfront
-@@ -1,4 +1,4 @@
--What:           /sys/module/xen_blkfront/parameters/max
-+What:           /sys/module/xen_blkfront/parameters/max_indirect_segments
- Date:           June 2013
- KernelVersion:  3.11
- Contact:        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
--- 
-2.17.1
+feature_persistent = false
 
+connect(...)
+feature-persistent is not written to xenstore
+
+User changes feature_persistent = true
+
+connect_ring(...)
+pers_grants = true, because feature-persistent is set unconditionally
+by the frontend and feature_persistent variable is now true.
+
+Then blkback will try to use persistent grants and the whole
+connection will malfunction because the frontend won't.
+
+The other option is to prevent changing the variable when there are
+blkback instances already running.
+
+Thanks, Roger.
