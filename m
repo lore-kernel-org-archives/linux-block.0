@@ -2,101 +2,153 @@ Return-Path: <SRS0=ZsbB=C7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A38C2D0E2
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 13:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBDDC4363D
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 14:16:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00F002396D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 13:17:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56CB12395C
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 14:16:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="yy2bl6Hy"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="tSGRoKdz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726566AbgIVNRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Sep 2020 09:17:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54830 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726563AbgIVNRT (ORCPT
+        id S1726673AbgIVOQa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Sep 2020 10:16:30 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:25964 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726605AbgIVOQa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Sep 2020 09:17:19 -0400
-Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154D8C061755
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2020 06:17:19 -0700 (PDT)
-Received: by mail-qv1-xf41.google.com with SMTP id db4so9471220qvb.4
-        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2020 06:17:19 -0700 (PDT)
+        Tue, 22 Sep 2020 10:16:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=y7hBRDL7D6Os8jd/ujBfUgL9LgsIqC36Ea7y4QNnNwA=;
-        b=yy2bl6Hywwn6atQQyV2G+5KhajzE8adC57JKYyO5qlSR6pM4IYuB6FZgr2Ll4TJsc2
-         W0IPwRUfm18BUiFxMnTFwVqlAIbQNnsYVndZDjuF/qzpIkNARg/hFwRvEW4xHWSAi058
-         hWFfJwDgGgLG+OgdXgib5RqvCUseRQ1wZFD7ZdXE7i3TcvZMVRIBF/zqQbwZS6I4aua4
-         3wILroqhMyw8qSTVsuCJcKBYAdMZQLWgksgRCimFzC7XavG72jEKYh+laBjdkBEh7YrQ
-         Oq3GuCIj2vHWE59D1ZdZn5dzWhZ0pOl42QuDbJqKrVuFn5riMVzt016oIyUFLSJApNHT
-         yTXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=y7hBRDL7D6Os8jd/ujBfUgL9LgsIqC36Ea7y4QNnNwA=;
-        b=ZREcIzZ8YKIevquv2+zG24bHgiXKkX/f6HESUdcRMNPoF4SWwLDxNkUgm/UYBot8ek
-         wIf2WhoANLJM2yYWZp6DrruoKJfApkQ0UY9DgDTLRCTQdp1a57xJEFVgqxLgL13VFkeR
-         RlN9WERGCtFfzRKUKqFcjYrKQCZoTG4IBOjnOdRUVnjZaYCudWAp0PkFFAsCoPKLc6NL
-         LA+HFo9yR7pAYP6/iw7f9Je0i4yPfEfDo8Vne8uI9acX0Wop8Pif2g+EPwGOVE2kBCyv
-         R+gSGVHDYJR6rNxbFkHpvywOUNjPQ9Xm0IUdTO5hWSmZr16JYYizsfoGbZQmlOG4TpYV
-         QwTg==
-X-Gm-Message-State: AOAM531jZqaaR3dgGCLjbxauf9n64uvXQzVPu+ea7pMeJHDMysPVr8PD
-        Du/BHJaCMvGer7MY0PxcGUvlXg==
-X-Google-Smtp-Source: ABdhPJwZakf/ID6zTVvXKm89xV38c1oiFCba0j711DtvgOMif1ocu0KVL2Pz9lwN8fy6w9TlPobDsQ==
-X-Received: by 2002:a0c:a95e:: with SMTP id z30mr5836737qva.58.1600780638198;
-        Tue, 22 Sep 2020 06:17:18 -0700 (PDT)
-Received: from [192.168.1.45] (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id f76sm11133910qke.19.2020.09.22.06.17.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Sep 2020 06:17:17 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] nbd: introduce a client flag to do zero timeout
- handling
-To:     Hou Pu <houpu@bytedance.com>, axboe@kernel.dk
-Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-References: <20200922033457.46227-1-houpu@bytedance.com>
- <20200922033457.46227-3-houpu@bytedance.com>
-From:   Josef Bacik <josef@toxicpanda.com>
-Message-ID: <4a81b066-86d2-8532-f540-31ef9830e26b@toxicpanda.com>
-Date:   Tue, 22 Sep 2020 09:17:16 -0400
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.2
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1600784189; x=1632320189;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version;
+  bh=I6FWFRPKOvHgCEvGqE3sI6rE2eUEbK6ToJxGZZYg2sI=;
+  b=tSGRoKdzq48Eus/u0ZmdM2tk8rKJO20CgKd1MNUbvtlNPyRKMCWWP0ZV
+   XViq0aPnnE50DKlMs6iRZg5crJGqTgyggyOmI7Q+DzBKLb1XR4NyEGXYI
+   /hjZlqQ45sr3EnSqvDWmL0dbQOqnBIg6tNS3avD3bUnoReqzrJxREMfRS
+   A=;
+X-IronPort-AV: E=Sophos;i="5.77,291,1596499200"; 
+   d="scan'208";a="55537286"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-c300ac87.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 22 Sep 2020 14:16:26 +0000
+Received: from EX13D31EUA004.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-c300ac87.us-west-2.amazon.com (Postfix) with ESMTPS id B6EBFA1800;
+        Tue, 22 Sep 2020 14:16:25 +0000 (UTC)
+Received: from u3f2cd687b01c55.ant.amazon.com (10.43.160.137) by
+ EX13D31EUA004.ant.amazon.com (10.43.165.161) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 22 Sep 2020 14:16:19 +0000
+From:   SeongJae Park <sjpark@amazon.com>
+To:     <konrad.wilk@oracle.com>, <roger.pau@citrix.com>, <jgross@suse.com>
+CC:     SeongJae Park <sjpark@amazon.de>, <axboe@kernel.dk>,
+        <aliguori@amazon.com>, <amit@kernel.org>, <mheyne@amazon.de>,
+        <pdurrant@amazon.co.uk>, <linux-block@vger.kernel.org>,
+        <xen-devel@lists.xenproject.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3 2/3] xen-blkfront: add a parameter for disabling of persistent grants
+Date:   Tue, 22 Sep 2020 16:15:48 +0200
+Message-ID: <20200922141549.26154-3-sjpark@amazon.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200922141549.26154-1-sjpark@amazon.com>
+References: <20200922141549.26154-1-sjpark@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922033457.46227-3-houpu@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.43.160.137]
+X-ClientProxiedBy: EX13D12UWC001.ant.amazon.com (10.43.162.78) To
+ EX13D31EUA004.ant.amazon.com (10.43.165.161)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/21/20 11:34 PM, Hou Pu wrote:
-> Introduce a dedicated client flag NBD_RT_WAIT_ON_TIMEOUT to reset
-> timer in nbd_xmit_timer instead of depending on tag_set.timeout == 0.
-> So that the timeout value could be configured by the user to
-> whatever they like instead of the default 30s. A smaller timeout
-> value allow us to detect if a new socket is reconfigured in a
-> shorter time. Thus the io could be requeued more quickly.
-> 
-> In multiple sockets configuration, the user could also disable
-> dropping the socket in timeout by setting this flag.
-> 
-> The tag_set.timeout == 0 setting still works like before.
-> 
-> Signed-off-by: Hou Pu <houpu@bytedance.com>
+From: SeongJae Park <sjpark@amazon.de>
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Persistent grants feature provides high scalability.  On some small
+systems, however, it could incur data copy overheads[1] and thus it is
+required to be disabled.  It can be disabled from blkback side using a
+module parameter, 'feature_persistent'.  But, it is impossible from
+blkfront side.  For the reason, this commit adds a blkfront module
+parameter for disabling of the feature.
 
-Thanks,
+[1] https://wiki.xen.org/wiki/Xen_4.3_Block_Protocol_Scalability
 
-Josef
+Signed-off-by: SeongJae Park <sjpark@amazon.de>
+---
+ .../ABI/testing/sysfs-driver-xen-blkfront     |  9 +++++++++
+ drivers/block/xen-blkfront.c                  | 20 ++++++++++++++-----
+ 2 files changed, 24 insertions(+), 5 deletions(-)
+
+diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkfront b/Documentation/ABI/testing/sysfs-driver-xen-blkfront
+index c0a6cb7eb314..9c31334cb2e6 100644
+--- a/Documentation/ABI/testing/sysfs-driver-xen-blkfront
++++ b/Documentation/ABI/testing/sysfs-driver-xen-blkfront
+@@ -8,3 +8,12 @@ Description:
+                 is 32 - higher value means more potential throughput but more
+                 memory usage. The backend picks the minimum of the frontend
+                 and its default backend value.
++
++What:           /sys/module/xen_blkfront/parameters/feature_persistent
++Date:           September 2020
++KernelVersion:  5.10
++Contact:        SeongJae Park <sjpark@amazon.de>
++Description:
++                Whether to enable the persistent grants feature or not.  Note
++                that this option only takes effect on newly created frontends.
++                The default is Y (enable).
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 91de2e0755ae..b2d3b1262404 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -1866,8 +1866,8 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 		message = "writing protocol";
+ 		goto abort_transaction;
+ 	}
+-	err = xenbus_printf(xbt, dev->nodename,
+-			    "feature-persistent", "%u", 1);
++	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
++			info->feature_persistent);
+ 	if (err)
+ 		dev_warn(&dev->dev,
+ 			 "writing persistent grants feature to xenbus");
+@@ -1941,6 +1941,13 @@ static int negotiate_mq(struct blkfront_info *info)
+ 	}
+ 	return 0;
+ }
++
++/* Enable the persistent grants feature. */
++static bool feature_persistent = true;
++module_param(feature_persistent, bool, 0644);
++MODULE_PARM_DESC(feature_persistent,
++		"Enables the persistent grants feature");
++
+ /**
+  * Entry point to this code when a new device is created.  Allocate the basic
+  * structures and the ring buffer for communication with the backend, and
+@@ -2007,6 +2014,8 @@ static int blkfront_probe(struct xenbus_device *dev,
+ 	info->vdevice = vdevice;
+ 	info->connected = BLKIF_STATE_DISCONNECTED;
+ 
++	info->feature_persistent = feature_persistent ? 1 : 0;
++
+ 	/* Front end dir is a number, which is used as the id. */
+ 	info->handle = simple_strtoul(strrchr(dev->nodename, '/')+1, NULL, 0);
+ 	dev_set_drvdata(&dev->dev, info);
+@@ -2316,9 +2325,10 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
+ 	if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
+ 		blkfront_setup_discard(info);
+ 
+-	info->feature_persistent =
+-		!!xenbus_read_unsigned(info->xbdev->otherend,
+-				       "feature-persistent", 0);
++	if (info->feature_persistent)
++		info->feature_persistent =
++			!!xenbus_read_unsigned(info->xbdev->otherend,
++					       "feature-persistent", 0);
+ 
+ 	indirect_segments = xenbus_read_unsigned(info->xbdev->otherend,
+ 					"feature-max-indirect-segments", 0);
+-- 
+2.17.1
+
