@@ -2,197 +2,155 @@ Return-Path: <SRS0=ZsbB=C7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF96C2D0E2
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 12:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 309B2C2D0E2
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 12:11:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23A08239D2
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 12:08:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC76F2396D
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 12:11:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CXKxGxyZ"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="jaFs8q2x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbgIVMIp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Sep 2020 08:08:45 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:64716 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726531AbgIVMIp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Sep 2020 08:08:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1600776524; x=1632312524;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   in-reply-to:content-transfer-encoding;
-  bh=Iu17TnezrR9cCfm/mX2pd36Twy2NLDZBTF2SbIDH3UQ=;
-  b=CXKxGxyZTYCTm4WIambZmZP50xwAdBYJjY00gOwelHXkA/MSGkzG4ELL
-   Oyk4p4kIe+82c8JMID3z6/25CBr8tznq3qLdG1BzM0tqbB0eVG97umGnA
-   hVsy9WQvaLc2kdobhEWYgATiD0GT/a2636KDrDZj4GzgEbSoT6Qzf6CD7
-   g=;
-X-IronPort-AV: E=Sophos;i="5.77,290,1596499200"; 
-   d="scan'208";a="70077461"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 22 Sep 2020 12:08:43 +0000
-Received: from EX13D31EUA004.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com (Postfix) with ESMTPS id 216E3A227B;
-        Tue, 22 Sep 2020 12:08:43 +0000 (UTC)
-Received: from u3f2cd687b01c55.ant.amazon.com (10.43.162.43) by
- EX13D31EUA004.ant.amazon.com (10.43.165.161) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 22 Sep 2020 12:08:36 +0000
-From:   SeongJae Park <sjpark@amazon.com>
-To:     =?UTF-8?q?J=C3=BCrgen=20Gro=C3=9F?= <jgross@suse.com>
-CC:     SeongJae Park <sjpark@amazon.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        <konrad.wilk@oracle.com>, SeongJae Park <sjpark@amazon.de>,
-        <axboe@kernel.dk>, <aliguori@amazon.com>, <amit@kernel.org>,
-        <mheyne@amazon.de>, <pdurrant@amazon.co.uk>,
-        <linux-block@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] xen-blkback: add a parameter for disabling of persistent grants
-Date:   Tue, 22 Sep 2020 14:08:20 +0200
-Message-ID: <20200922120820.24978-1-sjpark@amazon.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726541AbgIVMLg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Sep 2020 08:11:36 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50162 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726505AbgIVMLf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Sep 2020 08:11:35 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1600776693;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5SAy2ca2q3L9EB+unO167nKo1fIg4hrYmsfk4Zg1pow=;
+        b=jaFs8q2xDCD9SVtqdDERHGzFf/DLQqfUWQxyKAdZtU46tzLG3E0u0MuYOIWseAzbuZ0vGO
+        asz2z7MgJtLCrXknt9zxubRAGffXzHd9ctK6Dh8ffDARFZH8nI+BwA1bw04Pt4FN0KwjXy
+        6RhgSwWDPoMWaJky8MiX4GqGKwhIpNA=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 584FCB330;
+        Tue, 22 Sep 2020 12:12:10 +0000 (UTC)
+Subject: Re: [PATCH v2 2/3] xen-blkfront: add a parameter for disabling of
+ persistent grants
+To:     SeongJae Park <sjpark@amazon.com>, konrad.wilk@oracle.com,
+        roger.pau@citrix.com
+Cc:     SeongJae Park <sjpark@amazon.de>, axboe@kernel.dk,
+        aliguori@amazon.com, amit@kernel.org, mheyne@amazon.de,
+        pdurrant@amazon.co.uk, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-kernel@vger.kernel.org
+References: <20200922105209.5284-1-sjpark@amazon.com>
+ <20200922105209.5284-3-sjpark@amazon.com>
+From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Message-ID: <fdbaf955-0b92-d356-2792-21b27ea1087d@suse.com>
+Date:   Tue, 22 Sep 2020 14:11:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <33a8d880-d8ce-0cf7-d115-ca6938889f27@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.43.162.43]
-X-ClientProxiedBy: EX13D50UWC002.ant.amazon.com (10.43.162.189) To
- EX13D31EUA004.ant.amazon.com (10.43.165.161)
+In-Reply-To: <20200922105209.5284-3-sjpark@amazon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 22 Sep 2020 13:35:30 +0200 "Jürgen Groß" <jgross@suse.com> wrote:
-
-> On 22.09.20 13:26, SeongJae Park wrote:
-> > On Tue, 22 Sep 2020 13:12:59 +0200 "Roger Pau Monné" <roger.pau@citrix.com> wrote:
-> > 
-> >> On Tue, Sep 22, 2020 at 12:52:07PM +0200, SeongJae Park wrote:
-> >>> From: SeongJae Park <sjpark@amazon.de>
-> >>>
-> >>> Persistent grants feature provides high scalability.  On some small
-> >>> systems, however, it could incur data copy overheads[1] and thus it is
-> >>> required to be disabled.  But, there is no option to disable it.  For
-> >>> the reason, this commit adds a module parameter for disabling of the
-> >>> feature.
-> >>>
-> >>> [1] https://wiki.xen.org/wiki/Xen_4.3_Block_Protocol_Scalability
-> >>>
-> >>> Signed-off-by: Anthony Liguori <aliguori@amazon.com>
-> >>> Signed-off-by: SeongJae Park <sjpark@amazon.de>
-> >>> ---
-> >>>   .../ABI/testing/sysfs-driver-xen-blkback      |  9 ++++++
-> >>>   drivers/block/xen-blkback/xenbus.c            | 28 ++++++++++++++-----
-> >>>   2 files changed, 30 insertions(+), 7 deletions(-)
-> >>>
-> >>> diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> >>> index ecb7942ff146..ac2947b98950 100644
-> >>> --- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> >>> +++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> >>> @@ -35,3 +35,12 @@ Description:
-> >>>                   controls the duration in milliseconds that blkback will not
-> >>>                   cache any page not backed by a grant mapping.
-> >>>                   The default is 10ms.
-> >>> +
-> >>> +What:           /sys/module/xen_blkback/parameters/feature_persistent
-> >>> +Date:           September 2020
-> >>> +KernelVersion:  5.10
-> >>> +Contact:        SeongJae Park <sjpark@amazon.de>
-> >>> +Description:
-> >>> +                Whether to enable the persistent grants feature or not.  Note
-> >>> +                that this option only takes effect on newly created backends.
-> >>> +                The default is Y (enable).
-> >>> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> >>> index b9aa5d1ac10b..8a95ddd08b13 100644
-> >>> --- a/drivers/block/xen-blkback/xenbus.c
-> >>> +++ b/drivers/block/xen-blkback/xenbus.c
-> >>> @@ -879,6 +879,12 @@ static void reclaim_memory(struct xenbus_device *dev)
-> >>>   
-> >>>   /* ** Connection ** */
-> >>>   
-> >>> +/* Enable the persistent grants feature. */
-> >>> +static bool feature_persistent = true;
-> >>> +module_param(feature_persistent, bool, 0644);
-> >>> +MODULE_PARM_DESC(feature_persistent,
-> >>> +		"Enables the persistent grants feature");
-> >>> +
-> >>>   /*
-> >>>    * Write the physical details regarding the block device to the store, and
-> >>>    * switch to Connected state.
-> >>> @@ -906,11 +912,15 @@ static void connect(struct backend_info *be)
-> >>>   
-> >>>   	xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
-> >>>   
-> >>> -	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u", 1);
-> >>> -	if (err) {
-> >>> -		xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
-> >>> -				 dev->nodename);
-> >>> -		goto abort;
-> >>> +	if (feature_persistent) {
-> >>> +		err = xenbus_printf(xbt, dev->nodename, "feature-persistent",
-> >>> +				"%u", feature_persistent);
-> >>> +		if (err) {
-> >>> +			xenbus_dev_fatal(dev, err,
-> >>> +					"writing %s/feature-persistent",
-> >>> +					dev->nodename);
-> >>> +			goto abort;
-> >>> +		}
-> >>>   	}
-> >>>   
-> >>>   	err = xenbus_printf(xbt, dev->nodename, "sectors", "%llu",
-> >>> @@ -1093,8 +1103,12 @@ static int connect_ring(struct backend_info *be)
-> >>>   		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
-> >>>   		return -ENOSYS;
-> >>>   	}
-> >>> -	pers_grants = xenbus_read_unsigned(dev->otherend, "feature-persistent",
-> >>> -					   0);
-> >>> +	if (feature_persistent)
-> >>> +		pers_grants = xenbus_read_unsigned(dev->otherend,
-> >>> +				"feature-persistent", 0);
-> >>> +	else
-> >>> +		pers_grants = 0;
-> >>> +
-> >>
-> >> Sorry for not realizing earlier, but looking at it again I think you
-> >> need to cache the value of feature_persistent when it's first used in
-> >> the blkback state data, so that it's consistent.
-> >>
-> >> What would happen for example with the following flow (assume a
-> >> persistent grants enabled frontend):
-> >>
-> >> feature_persistent = false
-> >>
-> >> connect(...)
-> >> feature-persistent is not written to xenstore
-> >>
-> >> User changes feature_persistent = true
-> >>
-> >> connect_ring(...)
-> >> pers_grants = true, because feature-persistent is set unconditionally
-> >> by the frontend and feature_persistent variable is now true.
-> >>
-> >> Then blkback will try to use persistent grants and the whole
-> >> connection will malfunction because the frontend won't.
-> > 
-> > Ah, you're right.  I should also catch this before but didn't, sorry.
-> > 
-> >>
-> >> The other option is to prevent changing the variable when there are
-> >> blkback instances already running.
-> > 
-> > I think storing the option value in xenstore would be simpler.  That said, if
-> > you prefer this way, please let me know.
+On 22.09.20 12:52, SeongJae Park wrote:
+> From: SeongJae Park <sjpark@amazon.de>
 > 
-> No, Xenstore isn't the right place for that. This is a local
-> implementation detail of blkback and shouldn't be exported to Xenstore.
+> Persistent grants feature provides high scalability.  On some small
+> systems, however, it could incur data copy overheads[1] and thus it is
+> required to be disabled.  It can be disabled from blkback side using a
+> module parameter, 'feature_persistent'.  But, it is impossible from
+> blkfront side.  For the reason, this commit adds a blkfront module
+> parameter for disabling of the feature.
+> 
+> [1] https://wiki.xen.org/wiki/Xen_4.3_Block_Protocol_Scalability
+> 
+> Signed-off-by: SeongJae Park <sjpark@amazon.de>
+> ---
+>   .../ABI/testing/sysfs-driver-xen-blkfront     |  9 ++++++
+>   drivers/block/xen-blkfront.c                  | 28 +++++++++++++------
+>   2 files changed, 29 insertions(+), 8 deletions(-)
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkfront b/Documentation/ABI/testing/sysfs-driver-xen-blkfront
+> index c0a6cb7eb314..9c31334cb2e6 100644
+> --- a/Documentation/ABI/testing/sysfs-driver-xen-blkfront
+> +++ b/Documentation/ABI/testing/sysfs-driver-xen-blkfront
+> @@ -8,3 +8,12 @@ Description:
+>                   is 32 - higher value means more potential throughput but more
+>                   memory usage. The backend picks the minimum of the frontend
+>                   and its default backend value.
+> +
+> +What:           /sys/module/xen_blkfront/parameters/feature_persistent
+> +Date:           September 2020
+> +KernelVersion:  5.10
+> +Contact:        SeongJae Park <sjpark@amazon.de>
+> +Description:
+> +                Whether to enable the persistent grants feature or not.  Note
+> +                that this option only takes effect on newly created frontends.
+> +                The default is Y (enable).
+> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> index 91de2e0755ae..49c324f377de 100644
+> --- a/drivers/block/xen-blkfront.c
+> +++ b/drivers/block/xen-blkfront.c
+> @@ -149,6 +149,13 @@ static unsigned int xen_blkif_max_ring_order;
+>   module_param_named(max_ring_page_order, xen_blkif_max_ring_order, int, 0444);
+>   MODULE_PARM_DESC(max_ring_page_order, "Maximum order of pages to be used for the shared ring");
+>   
+> +/* Enable the persistent grants feature. */
+> +static bool feature_persistent = true;
+> +module_param(feature_persistent, bool, 0644);
+> +MODULE_PARM_DESC(feature_persistent,
+> +		"Enables the persistent grants feature");
+> +
+> +
+>   #define BLK_RING_SIZE(info)	\
+>   	__CONST_RING_SIZE(blkif, XEN_PAGE_SIZE * (info)->nr_ring_pages)
+>   
+> @@ -1866,11 +1873,13 @@ static int talk_to_blkback(struct xenbus_device *dev,
+>   		message = "writing protocol";
+>   		goto abort_transaction;
+>   	}
+> -	err = xenbus_printf(xbt, dev->nodename,
+> -			    "feature-persistent", "%u", 1);
+> -	if (err)
+> -		dev_warn(&dev->dev,
+> -			 "writing persistent grants feature to xenbus");
+> +	if (feature_persistent) {
+> +		err = xenbus_printf(xbt, dev->nodename,
+> +				    "feature-persistent", "%u", 1);
+> +		if (err)
+> +			dev_warn(&dev->dev,
+> +				 "writing persistent grants feature to xenbus");
+> +	}
+>   
+>   	err = xenbus_transaction_end(xbt, 0);
+>   	if (err) {
+> @@ -2316,9 +2325,12 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
+>   	if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
+>   		blkfront_setup_discard(info);
+>   
+> -	info->feature_persistent =
+> -		!!xenbus_read_unsigned(info->xbdev->otherend,
+> -				       "feature-persistent", 0);
+> +	if (feature_persistent)
+> +		info->feature_persistent =
+> +			!!xenbus_read_unsigned(info->xbdev->otherend,
+> +					       "feature-persistent", 0);
+> +	else
+> +		info->feature_persistent = 0;
+>   
+>   	indirect_segments = xenbus_read_unsigned(info->xbdev->otherend,
+>   					"feature-max-indirect-segments", 0);
+> 
 
-Agreed.  I will try using the 'feature_gnt_persistent' as Roger recommended.
+Here you have the same problem as in blkback: feature_persistent could
+change its value between the two tests.
 
 
-Thanks,
-SeongJae Park
+Juergen
