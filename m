@@ -2,184 +2,203 @@ Return-Path: <SRS0=ZsbB=C7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE70CC4363D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 03:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D43C4363D
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 04:43:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C74F23A32
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 03:35:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="QyobmZ6y"
+	by mail.kernel.org (Postfix) with ESMTP id 36D5323A34
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 04:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728780AbgIVDfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 23:35:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49678 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728634AbgIVDfR (ORCPT
+        id S1728039AbgIVEnm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Sep 2020 00:43:42 -0400
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:53401 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727724AbgIVEnm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 23:35:17 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB48DC061755
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 20:35:16 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id k8so11193925pfk.2
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 20:35:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=URq/xhP9+fAfE1goafcar9I+Snu4Kh15c5GaXKmgMX0=;
-        b=QyobmZ6y/WZK9DKhHrqjYkY7TxUeEvUTW/Wdbpp+CdU/igbpd3c6YEn715Exl1ZLXL
-         0X4G1B9bAntz87g9YLBEvA7/UnSnLafOxGJLI6pgItnoYjx2Jz/OD9j3RjbztyHMrKF6
-         ae+0IVjz0w8SkMq+XGoZm6v4IeF/YYHAhCJFZY4lp1tssGaO8b2JV7NgVEKFzRNlBMPP
-         e+HzTIxf9oOP03VMhF8lSlMT/vSBaCwYuruTostMD6Fu4aCB54zJKVZLrFb4Cw7yApRS
-         k4ueXYDFI1DWBXmv7YDew6Yjht83aQkop9tLR5vzcW6wz0b33cU1gyeZRrDKmheSsKTl
-         0Vog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=URq/xhP9+fAfE1goafcar9I+Snu4Kh15c5GaXKmgMX0=;
-        b=YS3qI6BQ54lQfv1D2eNjyON2rVT5LR/8Z/tt17JqpBZhqv+UEcRHL+rCeWKVfZMFkM
-         RA5Jmpb71lru1/CbOrJdJyxaD49STPaRUufCAI3kaoQy4ipaC8+9rcwtltzfpDfyoy7N
-         3NT7Qo9p6+chl3qXfIFQyQe4+k5ztLEIspaDFytrRojpsTg19RPVKXVeYbu7oziuVCsO
-         +B80aztZv8n+pBJA9p7TD8RjZWaTCaG4HIT7FRGKsqIePfWnDUBF5EoycQ2fnJh0j/mj
-         hmLh0Kmc5oKQrYU3R9S023JwqmPJSpfg5JZatMClUJMsJ9jAihCm/CLN9jMx0qS8dWTW
-         VoZQ==
-X-Gm-Message-State: AOAM533vQxYcWM2cm6lXvBeKMu8Ci18xoBCMMf9MSPUBCmdeaVkq22w4
-        qoi+sdmBR8LUwa7re2j+jhp1uw==
-X-Google-Smtp-Source: ABdhPJyAkdf0DsTCkYk9SBqH6P0qqTA0k5xGM1xE1IgtyvbIPAYbOyFHYIAuLvMPAFN1zdaQAU+huA==
-X-Received: by 2002:aa7:961b:0:b029:13e:d13d:a140 with SMTP id q27-20020aa7961b0000b029013ed13da140mr2423868pfg.40.1600745716484;
-        Mon, 21 Sep 2020 20:35:16 -0700 (PDT)
-Received: from box.bytedance.net ([61.120.150.73])
-        by smtp.gmail.com with ESMTPSA id mp3sm714859pjb.33.2020.09.21.20.35.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2020 20:35:15 -0700 (PDT)
-From:   Hou Pu <houpu@bytedance.com>
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, Hou Pu <houpu@bytedance.com>
-Subject: [PATCH v2 2/2] nbd: introduce a client flag to do zero timeout handling
-Date:   Tue, 22 Sep 2020 11:34:57 +0800
-Message-Id: <20200922033457.46227-3-houpu@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200922033457.46227-1-houpu@bytedance.com>
-References: <20200922033457.46227-1-houpu@bytedance.com>
+        Tue, 22 Sep 2020 00:43:42 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0U9jvbgr_1600749817;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0U9jvbgr_1600749817)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 22 Sep 2020 12:43:37 +0800
+Subject: Re: [RFC] block: enqueue splitted bios into same cpu
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+References: <20200911032958.125068-1-jefflexu@linux.alibaba.com>
+ <20200911110101.GA143560@T590>
+ <e787faa8-d31f-04e7-f722-5013a52dc8ab@linux.alibaba.com>
+ <20200913140017.GA230984@T590>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <c709e970-c711-11b7-e897-c66a12be454e@linux.alibaba.com>
+Date:   Tue, 22 Sep 2020 12:43:37 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200913140017.GA230984@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce a dedicated client flag NBD_RT_WAIT_ON_TIMEOUT to reset
-timer in nbd_xmit_timer instead of depending on tag_set.timeout == 0.
-So that the timeout value could be configured by the user to
-whatever they like instead of the default 30s. A smaller timeout
-value allow us to detect if a new socket is reconfigured in a
-shorter time. Thus the io could be requeued more quickly.
+Thanks for replying. Comments embedded below.
 
-In multiple sockets configuration, the user could also disable
-dropping the socket in timeout by setting this flag.
 
-The tag_set.timeout == 0 setting still works like before.
+On 9/13/20 10:00 PM, Ming Lei wrote:
+> On Fri, Sep 11, 2020 at 07:40:14PM +0800, JeffleXu wrote:
+>> Thanks for replying ;)
+>>
+>>
+>> On 9/11/20 7:01 PM, Ming Lei wrote:
+>>> On Fri, Sep 11, 2020 at 11:29:58AM +0800, Jeffle Xu wrote:
+>>>> Splitted bios of one source bio can be enqueued into different CPU since
+>>>> the submit_bio() routine can be preempted or fall asleep. However this
+>>>> behaviour can't work well with iopolling.
+>>> Do you have user visible problem wrt. io polling? If yes, can you
+>>> provide more details?
+>> No, there's no practical example yet. It's only a hint from the code base.
+>>
+>>
+>>>> Currently block iopolling only polls the hardwar queue of the input bio.
+>>>> If one bio is splitted to several bios, one (bio 1) of which is enqueued
+>>>> into CPU A, while the others enqueued into CPU B, then the polling of bio 1
+>>>> will cotinuously poll the hardware queue of CPU A, though the other
+>>>> splitted bios may be in other hardware queues.
+>>> If it is guaranteed that the returned cookie is from bio 1, poll is
+>>> supposed to work as expected, since bio 1 is the chained head of these
+>>> bios, and the whole fs bio can be thought as done when bio1 .end_bio
+>>> is called.
+>> Yes, it is, thanks for your explanation. But except for polling if the input
+>> bio has completed, one of the
+>>
+>> important work of polling logic is to reap the completion queue. Let's say
+>> one bio is split into
+>>
+>> two bios, bio 1 and bio 2, both of which are enqueued into the same hardware
+>> queue.When polling bio1,
+>>
+>> though we have no idea about bio2 at all, the polling logic itself is still
+>> reaping the completion queue of
+>>
+>> this hardware queue repeatedly, in which case the polling logic still
+>> stimulates reaping bio2.
+>>
+>>
+>> Then what if these two split bios enqueued into two different hardware
+>> queue? Let's say bio1 is enqueued
+>>
+>> into hardware queue A, while bio2 is enqueued into hardware queue B. When
+>> polling bio1, though the polling
+>>
+>> logic is repeatedly reaping the completion queue of hardware queue A, it
+>> doesn't help reap bio2. bio2 is reaped
+>>
+>> by IRQ as usual. This certainly works currently, but this behavior may
+>> deviate the polling design? I'm not sure.
+>>
+>>
+>> In other words, if we can ensure that all split bios are enqueued into the
+>> same hardware queue, then the polling
+>>
+>> logic *may* be faster.
+> __submit_bio_noacct_mq() returns cookie from the last bio in current->bio_list, and
+> this bio should be the bio passed to __submit_bio_noacct_mq() when bio splitting happens.
+>
+> Suppose CPU migration happens during bio splitting, the last bio should be
+> submitted to LLD much late than other bios, so when blk_poll() finds
+> completion on the hw queue of the last bio, usually other bios should
+> be completed already most of times.
+>
+> Also CPU migration itself causes much bigger latency, so it is reasonable to
+> not expect good IO performance when CPU migration is involved. And CPU migration
+> on IO task shouldn't have been done frequently. That said it should be
+> fine to miss the poll in this situation.
 
-Signed-off-by: Hou Pu <houpu@bytedance.com>
----
- drivers/block/nbd.c      | 27 ++++++++++++++++++++++-----
- include/uapi/linux/nbd.h |  4 ++++
- 2 files changed, 26 insertions(+), 5 deletions(-)
+Yes you're right. After diving into the code of nvme driver, currently 
+nvme driver indeed allocate interrupt for polling queues,
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 538e9dcf5bf2..2d32e31b7b96 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -80,6 +80,7 @@ struct link_dead_args {
- #define NBD_RT_BOUND			5
- #define NBD_RT_DESTROY_ON_DISCONNECT	6
- #define NBD_RT_DISCONNECT_ON_CLOSE	7
-+#define NBD_RT_WAIT_ON_TIMEOUT		8
- 
- #define NBD_DESTROY_ON_DISCONNECT	0
- #define NBD_DISCONNECT_REQUESTED	1
-@@ -378,6 +379,16 @@ static u32 req_to_nbd_cmd_type(struct request *req)
- 	}
- }
- 
-+static inline bool wait_on_timeout(struct nbd_device *nbd,
-+				   struct nbd_config *config)
-+{
-+	if (test_bit(NBD_RT_WAIT_ON_TIMEOUT, &config->runtime_flags) ||
-+	    (config->num_connections == 1 && nbd->tag_set.timeout == 0))
-+		return true;
-+	else
-+		return false;
-+}
-+
- static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 						 bool reserved)
- {
-@@ -400,8 +411,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	    nbd->tag_set.timeout)
- 		goto error_out;
- 
--	if (config->num_connections > 1 ||
--	    (config->num_connections == 1 && nbd->tag_set.timeout)) {
-+	if (!wait_on_timeout(nbd, config)) {
- 		dev_err_ratelimited(nbd_to_dev(nbd),
- 				    "Connection timed out, retrying (%d/%d alive)\n",
- 				    atomic_read(&config->live_connections),
-@@ -432,9 +442,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 			nbd_config_put(nbd);
- 			return BLK_EH_DONE;
- 		}
--	}
--
--	if (!nbd->tag_set.timeout) {
-+	} else {
- 		/*
- 		 * Userspace sets timeout=0 to disable socket disconnection,
- 		 * so just warn and reset the timer.
-@@ -1956,6 +1964,9 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 			set_bit(NBD_RT_DISCONNECT_ON_CLOSE,
- 				&config->runtime_flags);
- 		}
-+		if (flags & NBD_CFLAG_WAIT_ON_TIMEOUT)
-+			set_bit(NBD_RT_WAIT_ON_TIMEOUT,
-+				&config->runtime_flags);
- 	}
- 
- 	if (info->attrs[NBD_ATTR_SOCKETS]) {
-@@ -2139,6 +2150,12 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 			clear_bit(NBD_RT_DISCONNECT_ON_CLOSE,
- 					&config->runtime_flags);
- 		}
-+		if (flags & NBD_CFLAG_WAIT_ON_TIMEOUT)
-+			set_bit(NBD_RT_WAIT_ON_TIMEOUT,
-+				&config->runtime_flags);
-+		else
-+			clear_bit(NBD_RT_WAIT_ON_TIMEOUT,
-+				  &config->runtime_flags);
- 	}
- 
- 	if (info->attrs[NBD_ATTR_SOCKETS]) {
-diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-index 20d6cc91435d..cc3abfb92de5 100644
---- a/include/uapi/linux/nbd.h
-+++ b/include/uapi/linux/nbd.h
-@@ -56,6 +56,10 @@ enum {
- #define NBD_CFLAG_DISCONNECT_ON_CLOSE (1 << 1) /* disconnect the nbd device on
- 						*  close by last opener.
- 						*/
-+#define NBD_CFLAG_WAIT_ON_TIMEOUT (1 << 2) /* do not fallback to other sockets
-+					    * in io timeout, instead just reset
-+					    * timer and wait.
-+					    */
- 
- /* userspace doesn't need the nbd_device structure */
- 
--- 
-2.11.0
+that is, reusing the interrupt used by admin queue.
+
+Jens had ever said that the interrupt may be disabled for queues working 
+in polling mode someday (from my colleague). If
+
+that is true, then this may become an issue. But at least now this 
+indeed works.
+
+
+>
+> Also the following part of your patch may not work reliably:
+>
+> @@ -370,7 +370,8 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+>          }
+>
+>   retry:
+> -       data->ctx = blk_mq_get_ctx(q);
+> +       cpu = (data->cpu_hint != -1) ? data->cpu_hint : raw_smp_processor_id();
+> +       data->ctx = __blk_mq_get_ctx(q, cpu);
+>          data->hctx = blk_mq_map_queue(q, data->cmd_flags, data->ctx);
+>          if (!e)
+>                  blk_mq_tag_busy(data->hctx);
+>
+> If the cpu of data->cpu_hint is becoming offline, the above retry may
+> never be finished. Also I really don't like this way to allocate request
+> on specified cpu or ctx.
+>
+>>
+>>>> The iopolling logic has no idea if the input bio is splitted bio, or if
+>>>> it has other splitted siblings. Thus ensure that all splitted bios are
+>>>> enqueued into one CPU at the beginning.
+>>> Yeah, that is why io poll can't work on DM.
+>> Exactly I'm interested in dm polling. The polling of bio to dm device can be
+>> mapped into the polling of the
+>>
+>> several underlying device. Except for the the design of the cookie,
+>> currently I have not found other blocking
+>>
+>> points technically. Please let me know if I missed something.
+> At least dm(except for dm-mpath) doesn't use blk-mq , so far io poll is
+> based on blk-mq. Not mention it could be hard to return the expected
+> cookie.
+
+Polling mode is important if we want to use io-uring on dm.
+
+
+I want to refactor the cookie to u64 from unsigned int, thus the u64 
+cookie can be a pointer to some structure for device
+
+mapper, e.g. struct dm_io, and all cookies from underlying devices can 
+be stored in this structure (struct dm_io).
+
+This need to refactor the io polling framework somehow, and I'm not sure 
+if the community likes this idea.
+
+
+>
+>>
+>>>> This is only one RFC patch and it is not complete since dm/mq-scheduler
+>>>> have not been considered yet. Please let me know if it is on the correct
+>>>> direction or not.
+>>>>
+>>>> Besides I have one question on the split routine. Why the split routine
+>>>> is implemented in a recursive style? Why we can't split the bio one time
+>>>> and then submit the *already splitted* bios one by one?
+>>> Forward progress has to be provided on new splitted bio allocation which
+>>> is from same bio_set.
+>> Sorry I can't understand this. Is this a suggestion on how to improving this
+>> patch, or a reply to the question
+>>
+>> why the split routine is implemented in a recursive style? Would you please
+>> provide more details?
+> It is for preventing stack overflows.
+>
+> Please take a close look at bio_alloc_bioset's comment and understand
+> why 'callers must never allocate more than 1 bio at a time from this pool'
+
+Thanks.
+
+Jeffle
 
