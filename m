@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69131C4363D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 02:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3064EC4346E
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 02:33:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A1C421D91
+	by mail.kernel.org (Postfix) with ESMTP id E6AA52193E
 	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 02:33:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbCTFiiK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qTJJWSxl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729711AbgIVCc7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 22:32:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40098 "EHLO
+        id S1729714AbgIVCdA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 22:33:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729379AbgIVCc7 (ORCPT
+        with ESMTP id S1729379AbgIVCdA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 22:32:59 -0400
-Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85188C061755
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 19:32:58 -0700 (PDT)
-Received: by mail-qt1-x843.google.com with SMTP id b2so14383675qtp.8
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 19:32:58 -0700 (PDT)
+        Mon, 21 Sep 2020 22:33:00 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEF59C061755
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 19:32:59 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id n10so14419902qtv.3
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 19:32:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Kx5MVQ6xbvL7SHYiOkls0hYmmDYxo6c0riPFgM+lrnY=;
-        b=DbCTFiiKgwYTisI7zwDF25LFzr/TNByZUa+MYb1qTBrQcTqQm4ORV5/O9lfA+UJQGz
-         +auGPrV8++8UwJrFvrctpmCmIWMmLl3M0sfKXJ7xOudTfk+vRw96qPBDZzdUBuT5jhIG
-         EQfVZurfX8DpkhBD0em1XYsAyJk64++OkH78YJR/eQi8BfC6SJAkpkXqBJc419B/5CoQ
-         ic0xIubgR9lJWVcBTLIMu3KB4wOTAZDCN24k0XLV17LRYGuxu+HNO16G1yGaU5vmtIoV
-         JgX/mWKmSq6dCWB8ZtG62+KIyDnGTpTJL1xhDxB9fW3wikEiga2a6o5hfJS/XPiM+oCy
-         R7Cw==
+        bh=FPyxJTEfNz4t6PoD6vTT7hbbizqhBOkxQ4lCpIxAUdw=;
+        b=qTJJWSxlwxSXXROpFetAkvGXbASVGP8SEQb5QZGJkQNzZToy8R+w5DayRqqH4OkP7m
+         yLcUtq6po8GjUb55FlYNuxp1msA5K4YwIaKuqM8LuqSGbi4ZCWNnt/MFpVj65LzlHbMp
+         ukI6xEX4CVCB9DjLfUsrCBnKhwi76mxQYDxGm3jBdpDs00SIdslQYnwnGKE1/uGhXdwF
+         GaZH8x4sVM7sTbgagfXdv1SOTxSacfwn3nszp3ndARzaqvzkWL1LFxxMgPDZ/va+eedw
+         92HHKYhBPoKbLsy/xDTuf8aRUOVH/YH1t1Metw6vWj2Xeibl9YXBaT14QrdhwrNWCB+R
+         4TJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=Kx5MVQ6xbvL7SHYiOkls0hYmmDYxo6c0riPFgM+lrnY=;
-        b=dNUDssoLXdENPmH2jWPG8Bne6vVlp9tKRyBMBSIAQYuX9e0w2IXpugqBZuoXBz67rK
-         NhKruMukO7mE/nzCJDTvjNfKQB2r5PJD1Tt3inY+Vl5wDQxRTbMP62CHp4hHkNhnKzXt
-         ibSwfPtIZLh9KOPlJoZTHAKF4Q0pi9SuOZ8xYbPHVLbMKczIGoDkgP/xAUVKOjocQJ/c
-         Rlivbanq/l0wodZDXTTyRxGBm3/nQw6+nIKsiMUTJWHwiNhFKp8SHIuWGOYEiuAmROg7
-         7nknxxoMvRCj3T5yYOyn2CmIOqAFDi0kAd468uuxWr4ciWSqapcJlvKIpmN/DHdrrD7v
-         GGKA==
-X-Gm-Message-State: AOAM530D5NzhmOD+dKQsZSqZ9d2kDF7VNCQANnRs+uBMFfChF4ibBDdv
-        PsmLZXDnCr/OOTtt0i80jhY=
-X-Google-Smtp-Source: ABdhPJwRDDrM3bVoPqW8HIr2Xj7UzfZ1I3ZNuN8k4ylYbPXjcOuy7Qmicr1i6OuGmq6x2BBeJENvSw==
-X-Received: by 2002:ac8:d01:: with SMTP id q1mr2768872qti.276.1600741977737;
-        Mon, 21 Sep 2020 19:32:57 -0700 (PDT)
+        bh=FPyxJTEfNz4t6PoD6vTT7hbbizqhBOkxQ4lCpIxAUdw=;
+        b=S8a829DYRxgPoxucArxEK8H9I3Airh1i95aN90Z8e8jyDqxL7Bf70/YjHjmY/mfuRi
+         DajCPNmxlPsbBXJ7FIhsACeQuFd2uFSvU2xNxdAzd3oPhz8zdNUek1VCqYwipkreEqXl
+         Gw07QENqKAoDLzD+DU9lYUvPPOzvXPKK2+bFDScXcazxSG0nJ+vpiD+DzJotCXwwhfON
+         54+5rCoeQZ7cr74+Y3esjl/S4LoD7atjKvQgBHuo5w28tpzmSJt7B54i59qLqNBHG6/D
+         JBh58XNKYBHbhzPR5cj5QuM/BFyXBW9H8FWU20j78qitrcAGjMsgxZbOvQDad+14g2cn
+         sSfA==
+X-Gm-Message-State: AOAM533fwzSqB//OP2dNK6EtI2mIRmdrA/zt10TMHXQ8qv7ddhq0E587
+        AZQbuUGpKR8xzo0B3TtIp6I=
+X-Google-Smtp-Source: ABdhPJwA7XzwPgQjajmIKJUINJYBRbVON+qScRpOurSH9hVDi4qKTD8l6xVe/lcnpeUv0u/RnRLQfA==
+X-Received: by 2002:ac8:3fdd:: with SMTP id v29mr2599290qtk.383.1600741979177;
+        Mon, 21 Sep 2020 19:32:59 -0700 (PDT)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id d10sm10397116qkk.1.2020.09.21.19.32.56
+        by smtp.gmail.com with ESMTPSA id r24sm11240605qtm.70.2020.09.21.19.32.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2020 19:32:57 -0700 (PDT)
+        Mon, 21 Sep 2020 19:32:58 -0700 (PDT)
 Sender: Mike Snitzer <snitzer@gmail.com>
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ming Lei <ming.lei@redhat.com>,
         Vijayendra Suman <vijayendra.suman@oracle.com>,
         dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH v3 3/6] block: use lcm_not_zero() when stacking chunk_sectors
-Date:   Mon, 21 Sep 2020 22:32:48 -0400
-Message-Id: <20200922023251.47712-4-snitzer@redhat.com>
+Subject: [PATCH v3 4/6] block: allow 'chunk_sectors' to be non-power-of-2
+Date:   Mon, 21 Sep 2020 22:32:49 -0400
+Message-Id: <20200922023251.47712-5-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20200922023251.47712-1-snitzer@redhat.com>
 References: <20200922023251.47712-1-snitzer@redhat.com>
@@ -73,58 +73,73 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Like 'io_opt', blk_stack_limits() should stack 'chunk_sectors' using
-lcm_not_zero() rather than min_not_zero() -- otherwise the final
-'chunk_sectors' could result in sub-optimal alignment of IO to
-component devices in the IO stack.
+It is possible, albeit more unlikely, for a block device to have a non
+power-of-2 for chunk_sectors (e.g. 10+2 RAID6 with 128K chunk_sectors,
+which results in a full-stripe size of 1280K. This causes the RAID6's
+io_opt to be advertised as 1280K, and a stacked device _could_ then be
+made to use a blocksize, aka chunk_sectors, that matches non power-of-2
+io_opt of underlying RAID6 -- resulting in stacked device's
+chunk_sectors being a non power-of-2).
 
-Also, if 'chunk_sectors' isn't a multiple of 'physical_block_size'
-then it is a bug in the driver and the device should be flagged as
-'misaligned'.
+Update blk_queue_chunk_sectors() and blk_max_size_offset() to
+accommodate drivers that need a non power-of-2 chunk_sectors.
 
 Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-settings.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ block/blk-settings.c   | 10 ++++------
+ include/linux/blkdev.h | 12 +++++++++---
+ 2 files changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 76a7e03bcd6c..b2e1a929a6db 100644
+index b2e1a929a6db..5ea3de48afba 100644
 --- a/block/blk-settings.c
 +++ b/block/blk-settings.c
-@@ -534,6 +534,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 
- 	t->io_min = max(t->io_min, b->io_min);
- 	t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
-+	t->chunk_sectors = lcm_not_zero(t->chunk_sectors, b->chunk_sectors);
- 
- 	/* Physical block size a multiple of the logical block size? */
- 	if (t->physical_block_size & (t->logical_block_size - 1)) {
-@@ -556,6 +557,13 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 		ret = -1;
- 	}
- 
-+	/* chunk_sectors a multiple of the physical block size? */
-+	if ((t->chunk_sectors << 9) & (t->physical_block_size - 1)) {
-+		t->chunk_sectors = 0;
-+		t->misaligned = 1;
-+		ret = -1;
-+	}
-+
- 	t->raid_partial_stripes_expensive =
- 		max(t->raid_partial_stripes_expensive,
- 		    b->raid_partial_stripes_expensive);
-@@ -594,10 +602,6 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 			t->discard_granularity;
- 	}
- 
--	if (b->chunk_sectors)
--		t->chunk_sectors = min_not_zero(t->chunk_sectors,
--						b->chunk_sectors);
--
- 	t->zoned = max(t->zoned, b->zoned);
- 	return ret;
+@@ -172,15 +172,13 @@ EXPORT_SYMBOL(blk_queue_max_hw_sectors);
+  *
+  * Description:
+  *    If a driver doesn't want IOs to cross a given chunk size, it can set
+- *    this limit and prevent merging across chunks. Note that the chunk size
+- *    must currently be a power-of-2 in sectors. Also note that the block
+- *    layer must accept a page worth of data at any offset. So if the
+- *    crossing of chunks is a hard limitation in the driver, it must still be
+- *    prepared to split single page bios.
++ *    this limit and prevent merging across chunks. Note that the block layer
++ *    must accept a page worth of data at any offset. So if the crossing of
++ *    chunks is a hard limitation in the driver, it must still be prepared
++ *    to split single page bios.
+  **/
+ void blk_queue_chunk_sectors(struct request_queue *q, unsigned int chunk_sectors)
+ {
+-	BUG_ON(!is_power_of_2(chunk_sectors));
+ 	q->limits.chunk_sectors = chunk_sectors;
  }
+ EXPORT_SYMBOL(blk_queue_chunk_sectors);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bb5636cc17b9..51d98a595943 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1059,11 +1059,17 @@ static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
+ static inline unsigned int blk_max_size_offset(struct request_queue *q,
+ 					       sector_t offset)
+ {
+-	if (!q->limits.chunk_sectors)
++	unsigned int chunk_sectors = q->limits.chunk_sectors;
++
++	if (!chunk_sectors)
+ 		return q->limits.max_sectors;
+ 
+-	return min(q->limits.max_sectors, (unsigned int)(q->limits.chunk_sectors -
+-			(offset & (q->limits.chunk_sectors - 1))));
++	if (likely(is_power_of_2(chunk_sectors)))
++		chunk_sectors -= offset & (chunk_sectors - 1);
++	else
++		chunk_sectors -= sector_div(offset, chunk_sectors);
++
++	return min(q->limits.max_sectors, chunk_sectors);
+ }
+ 
+ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
 -- 
 2.15.0
 
