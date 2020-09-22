@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B18C4727C
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 02:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2305C4346E
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 02:33:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A9802193E
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 02:33:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63A102145D
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 02:33:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UKnm8Z19"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eo/c9gLF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729718AbgIVCdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 22:33:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40106 "EHLO
+        id S1729720AbgIVCdC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 22:33:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729379AbgIVCdB (ORCPT
+        with ESMTP id S1729379AbgIVCdC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 22:33:01 -0400
-Received: from mail-qv1-xf44.google.com (mail-qv1-xf44.google.com [IPv6:2607:f8b0:4864:20::f44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BE0BC061755
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 19:33:01 -0700 (PDT)
-Received: by mail-qv1-xf44.google.com with SMTP id cr8so8724660qvb.10
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 19:33:01 -0700 (PDT)
+        Mon, 21 Sep 2020 22:33:02 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF84C061755
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 19:33:02 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id ef16so8733368qvb.8
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 19:33:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=f+wJtsaJ4ki6kX0/25dbRuxCZ8RWAvelZliZZZPY1wA=;
-        b=UKnm8Z19ZZN+3X9eVnBVY9zx4xSYf4Wca1Fk5DB5m/l7WOQ0aGNEkhcIVeyCwcyPO3
-         Yw+gHvJQ+qXYZ88D6ywbDPNpbhQ7ZD8i8IGkb0SoZA+SIH2yuHYKmb1VHSgi7nWvxxOz
-         +HRqgn0zGaWZkPQ5v2kiQ+kYFZ0A2/JUU43e50eHzOvDCOmRLnCyyFK85Z2wxzTF6i/8
-         qUWBDTpTKcl/nN2DG/byLbZxXh6yScybrIXvBrRsYZ/JjjAL09ltiTUop5Uq8abe9qs/
-         scEQ12RRdS2ytVSPB6LghSTqJXnFgOoj7hNn8/cWNIVk6xOC0A/0Igt1XJtzQA18ZcSd
-         x5iw==
+        bh=NtWlq/47WlrxDfVxu0B44CPpyCD9vao2Nu3MMDC0MmU=;
+        b=Eo/c9gLFowJNZLtWG08NnllCNEhxoXXcTsM2WEtV1BiQDZsj2A6l5KvqSum1jKYPxW
+         HXPfDzWJcmgJ5sMNghmoxhfeNw2FQ5S3fJm4iKrcnLlHVkXm/YZRcqLP0QBBJdIHSXvu
+         MmJv+SAfNu7phAnu2mVQz3e51kRJxf49w//rgCU/Q0HTXhGuhar+KeqXSNXSzU0/ALE9
+         1MwVwA5koPlDH0cMfVShop/oBZNUbKx5yRErKoFMSnTgbOsEpAvdyVLkVe1twwwln2a9
+         ZLoqDu19nc/PrzEYY3pJTYNuwIFYQ2bzCrX/GtA1ICGi2Xp4F+OgF0Pxxl/G2Ys2QGM+
+         JeQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=f+wJtsaJ4ki6kX0/25dbRuxCZ8RWAvelZliZZZPY1wA=;
-        b=f3N5p+9mHgbd5+3QnZ3ZeNkSRtk+1QzQDWlc3KuKwLsTrbglkvHkGkFqnqStLYujCD
-         RB34Ym7AVnjT0tUxT6U3k8hDBvxxEd18s7zTKTFFjtqX+L42FPTbYLJF12fE7cOW08SU
-         pl8B8+Z5XZufJ1gqoKbLRzGBvLcBaDxawEJNGrrT7DtJ9x3mIXbG/cS4jPIwgnGghBvK
-         n/NGUX7IWqaQkEz0jRO74mavjtmHEG6/K+bOO36/1HbIrUuxPUUXzsrClpAusg9urCGR
-         Z8tG0t3HrJPMKOgu16D0hnF8CFlQthVjGUeq8BnF+HorxDFvOz6GJh50NpcmGZenPHkf
-         bQ2w==
-X-Gm-Message-State: AOAM531pzKcUKLv3D73UVSZO1t9lgmPg6SYVIfyxf+bPw1tPDJ2C4j0y
-        ylT8itg+OgKi2CTZdIOcW24=
-X-Google-Smtp-Source: ABdhPJybaXDHibBnryCpvlu+eGdLlFYEy/iKvGW8mgApZ21WrhLkuUCAuLFUgOC/psmohYQMDaM4ag==
-X-Received: by 2002:ad4:500c:: with SMTP id s12mr3583015qvo.7.1600741980589;
-        Mon, 21 Sep 2020 19:33:00 -0700 (PDT)
+        bh=NtWlq/47WlrxDfVxu0B44CPpyCD9vao2Nu3MMDC0MmU=;
+        b=PjvQzK5RoPAoYKYvBrinGQimzboOxcACWJtk65/KmIu56Mvvo6CLMt6qOlv28pB5ml
+         V9dsEJ0PxXVUF95/3B326iiErJtbv4gzOuQkQtVuGBqAB3u04QMD1BBwVUHmY+U4l9qC
+         iIdf1gGYZybM2pDpDJGOYGvfcV5PQgQgdl3n510zvK7FBhkH694oAS4MwLJoMV49VIBv
+         QEyaKewJCCyXc54tR1o4KuXtdjuzk+rGeL1A/brNr9DWR8Q8bm6MApdKJ8DCZO7J3ge6
+         TYHcTSKIU4gLcRXda+p6ChjflHQ6o4/pB75PuVQUrAK3DvOHF9ah0Rs5Bv5b19sAlfMY
+         yGvg==
+X-Gm-Message-State: AOAM532F3gmPcJEoXkJGxS8mvd03Nso52dSszuScd8x1t/iNGXzRINYC
+        0C69Zet6uy6mpbN+tatwVbM=
+X-Google-Smtp-Source: ABdhPJwstwVK6opMvdpCo+BnKDX6pHoZtowyEX6H2tPqAhqWRAaCcm28GxGYEq4JsEtXWaht8CgOYw==
+X-Received: by 2002:a0c:d443:: with SMTP id r3mr3613860qvh.20.1600741981873;
+        Mon, 21 Sep 2020 19:33:01 -0700 (PDT)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id 16sm10783248qks.102.2020.09.21.19.32.59
+        by smtp.gmail.com with ESMTPSA id m10sm11779149qti.46.2020.09.21.19.33.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2020 19:32:59 -0700 (PDT)
+        Mon, 21 Sep 2020 19:33:01 -0700 (PDT)
 Sender: Mike Snitzer <snitzer@gmail.com>
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ming Lei <ming.lei@redhat.com>,
         Vijayendra Suman <vijayendra.suman@oracle.com>,
         dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH v3 5/6] dm table: stack 'chunk_sectors' limit to account for target-specific splitting
-Date:   Mon, 21 Sep 2020 22:32:50 -0400
-Message-Id: <20200922023251.47712-6-snitzer@redhat.com>
+Subject: [PATCH v3 6/6] dm: change max_io_len() to use blk_max_size_offset()
+Date:   Mon, 21 Sep 2020 22:32:51 -0400
+Message-Id: <20200922023251.47712-7-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20200922023251.47712-1-snitzer@redhat.com>
 References: <20200922023251.47712-1-snitzer@redhat.com>
@@ -73,41 +73,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If target set ti->max_io_len it must be used when stacking
-DM device's queue_limits to establish a 'chunk_sectors' that is
-compatible with the IO stack.
-
-By using lcm_not_zero() care is taken to avoid blindly overriding the
-chunk_sectors limit stacked up by blk_stack_limits().
+Using blk_max_size_offset() enables DM core's splitting to impose
+ti->max_io_len (via q->limits.chunk_sectors) and also fallback to
+respecting q->limits.max_sectors if chunk_sectors isn't set.
 
 Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- drivers/md/dm-table.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/md/dm.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 229f461e7def..3f4e7c7912a2 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -18,6 +18,7 @@
- #include <linux/mutex.h>
- #include <linux/delay.h>
- #include <linux/atomic.h>
-+#include <linux/lcm.h>
- #include <linux/blk-mq.h>
- #include <linux/mount.h>
- #include <linux/dax.h>
-@@ -1506,6 +1507,10 @@ int dm_calculate_queue_limits(struct dm_table *table,
- 			zone_sectors = ti_limits.chunk_sectors;
- 		}
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 6ed05ca65a0f..3982012b1309 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1051,22 +1051,18 @@ static sector_t max_io_len_target_boundary(sector_t sector, struct dm_target *ti
+ static sector_t max_io_len(sector_t sector, struct dm_target *ti)
+ {
+ 	sector_t len = max_io_len_target_boundary(sector, ti);
+-	sector_t offset, max_len;
++	sector_t max_len;
  
-+		/* Stack chunk_sectors if target-specific splitting is required */
-+		if (ti->max_io_len)
-+			ti_limits.chunk_sectors = lcm_not_zero(ti->max_io_len,
-+							       ti_limits.chunk_sectors);
- 		/* Set I/O hints portion of queue limits */
- 		if (ti->type->io_hints)
- 			ti->type->io_hints(ti, &ti_limits);
+ 	/*
+ 	 * Does the target need to split even further?
++	 * - q->limits.chunk_sectors reflects ti->max_io_len so
++	 *   blk_max_size_offset() provides required splitting.
++	 * - blk_max_size_offset() also respects q->limits.max_sectors
+ 	 */
+-	if (ti->max_io_len) {
+-		offset = dm_target_offset(ti, sector);
+-		if (unlikely(ti->max_io_len & (ti->max_io_len - 1)))
+-			max_len = sector_div(offset, ti->max_io_len);
+-		else
+-			max_len = offset & (ti->max_io_len - 1);
+-		max_len = ti->max_io_len - max_len;
+-
+-		if (len > max_len)
+-			len = max_len;
+-	}
++	max_len = blk_max_size_offset(dm_table_get_md(ti->table)->queue,
++				      dm_target_offset(ti, sector));
++	if (len > max_len)
++		len = max_len;
+ 
+ 	return len;
+ }
 -- 
 2.15.0
 
