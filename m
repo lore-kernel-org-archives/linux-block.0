@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851E9C4346E
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 03:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F51C4346E
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 03:16:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48D5523A52
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 03:14:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC05723A52
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 03:16:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="Z+SpVVb7"
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="O2cQ4DuQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728260AbgIVDOs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 23:14:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46544 "EHLO
+        id S1728379AbgIVDQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 23:16:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728245AbgIVDOs (ORCPT
+        with ESMTP id S1728374AbgIVDQy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 23:14:48 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB5BC061755
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 20:14:48 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id f18so11141409pfa.10
-        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 20:14:48 -0700 (PDT)
+        Mon, 21 Sep 2020 23:16:54 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE0C7C0613CF
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 20:16:53 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id k14so10764172pgi.9
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 20:16:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4YXVximMVBk4Q6UzqjVcDGCl1/Wd0o9kuGFpPERfHQI=;
-        b=Z+SpVVb7Ij+Y8UgdGhnnLcMTZiwFcxCcyvE7Byzj6qfh76qUkM++CVmQYT1fx22cJy
-         nNFVtRFF28PFYk/9CFscq9z7//ZQvZ9uRNn8P8bBfY3TlhcVSrV8LVdzhFsF7EMYmm/C
-         zrhLkGttmamKTFKtxNgLCqn8iABzKBl3mXbFSyiXI7J2PQuxjvkWHpzmYfV6vQWXuaTv
-         Ra8XtuFx+lL8wiyGZsen4f+VjPXV7PiX0Rm1VgMjx4aGNk6kGVVxtVINfgwuGH1Tp4Yj
-         1WjZZ90W9wZqToa8ZbEpOtKxYU6p56mh5asK8HpsrfZBYXdhcdv6CZnUYNC7MTWx8lNK
-         FnGQ==
+        bh=W+JMCm/7C+eeBdc2FIHlSoejawqCGvJ6dxmgCl2tchk=;
+        b=O2cQ4DuQFGwDIsmWH+MPBntdlaKVB5sGKnDSKhLwEaoCVAmR1/+xDefyCnfSM9CalR
+         RGxywuecGkTavwgZyXNHLkaOp2Uxmhq+WQWEupDzFWeuovcobTJJ5BngSMqjPjEuDKkq
+         xnrqAZKNhyxNcOg6aQRgmcM4/O2XFuvEe8U1/gWvtcFiYHh6aaMQxJJdXdkHYuXDr7+d
+         ZB7HdlvOZLfSiJCViFn6sW7JpCekP28P8ethSgEHluv5M26yHaP0XvSz880ODnv4GlrJ
+         eLnF2iDg4r//QPNDxdWtGlUNACajBu9kzMkDbAGMLm/qAd5eQXQ3hC+aGFJ5HUgzvST0
+         +lbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=4YXVximMVBk4Q6UzqjVcDGCl1/Wd0o9kuGFpPERfHQI=;
-        b=OA5FSFDxt21Cs0fWfDqd3pc8nKq7CS56zjDrgku3o/VoQqVymjD9QTilj0z5M54Ly3
-         wrvRDFLyK7ALpE2Mj6ReaqcJOd4WW1M+co1eGzw7gmHxnOGz3s3BugRCocJSxLASe5g6
-         2dNBiEb1h2cQ9Vxd6A2EuW8M6HqXvwfEEdQb5rXmY9LtBV0DbTpRUNHppNJ5kDUzrdeS
-         B7CxJD/ndqTMT6C+KcH9VpvkdegSZCN7hZs0f/wwIeNv5pnhKuRcN5JAAYe4L++Qc60r
-         xlzK4gne7gkRpxbJpwIbUDixhQw11AZkHDNTsG9U57l4cgziJOgZvLrc7BhV1h/qVEhX
-         CZew==
-X-Gm-Message-State: AOAM530oAIQgg82vsyiKdff4nDLNzcA7ldgrlie5crqgBFpmiVi/DsjO
-        SjeJjrYs5QQqq2sXgBYaZ/vB/Fj1Kh5mlEAR
-X-Google-Smtp-Source: ABdhPJy6DP8TrYoPxogFHwh1oyuiWXMB3U0lGvHgdorQR4n8kCfVq556Xs6gZDR4Sc+ZYsUkpVV7cQ==
-X-Received: by 2002:a63:4a43:: with SMTP id j3mr2045193pgl.42.1600744487410;
-        Mon, 21 Sep 2020 20:14:47 -0700 (PDT)
+        bh=W+JMCm/7C+eeBdc2FIHlSoejawqCGvJ6dxmgCl2tchk=;
+        b=WF2un9eNzQ8BSjV2qDdifoLGdJWJb9/DAKc/oQEMOYirVz7KCMo7xl4RX5qmvBDXQB
+         dP9vhMV2nFfWyuGvcbBnDb1BJjbfDJQAPB/TogmZXiZqM2VYaQHHNwUvpgmxfhdvZNYQ
+         PY2quizIqxjyYeBggKPQztzaLIP2I4wRZEUyRXu3GAuqpOQVc9ONiSXQPAFmxFgOzqi5
+         V3wAhwBCKF4EcbeegKKnmQp5co/AkbO0ymADPNY85T0kTS97r0Aja4HEdsLESS7wmycA
+         HsBQaECWroNEdZp4nrS8aDYhmUHG2JN01XlJTPjcUfkYtcqrpfD6vl9Y0OIcKmcMpUhs
+         FufQ==
+X-Gm-Message-State: AOAM533Eq6EbV+3P5iHJqNyhpU3T3mtqiExPlpt0ifJ7qyzAQEhdEK0i
+        kFOdK3fUJeiso5HuMYgQx3ocXg==
+X-Google-Smtp-Source: ABdhPJymm4UXc37ailVQHPxR98BCoUrBmrkycwOCv+TeTYnwdT13RT5KwoAilUXQMgs71DGPTyjbsQ==
+X-Received: by 2002:a63:fe49:: with SMTP id x9mr1937157pgj.446.1600744613159;
+        Mon, 21 Sep 2020 20:16:53 -0700 (PDT)
 Received: from houpudeMacBook-Pro.local ([61.120.150.74])
-        by smtp.gmail.com with ESMTPSA id l78sm13145241pfd.26.2020.09.21.20.14.44
+        by smtp.gmail.com with ESMTPSA id ep4sm675369pjb.39.2020.09.21.20.16.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Sep 2020 20:14:46 -0700 (PDT)
-Subject: Re: [PATCH 2/3] nbd: unify behavior in timeout no matter how many
- sockets is configured
+        Mon, 21 Sep 2020 20:16:52 -0700 (PDT)
+Subject: Re: [PATCH 3/3] nbd: introduce a client flag to do zero timeout
+ handling
 To:     Josef Bacik <josef@toxicpanda.com>, axboe@kernel.dk
 Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
         nbd@other.debian.org
 References: <20200921105718.29006-1-houpu@bytedance.com>
- <20200921105718.29006-3-houpu@bytedance.com>
- <7f56fc84-5fbd-cf4a-e1d7-c6a75396a6bf@toxicpanda.com>
+ <20200921105718.29006-4-houpu@bytedance.com>
+ <7f680bff-a19e-3aff-c91e-98b2933826a9@toxicpanda.com>
 From:   Hou Pu <houpu@bytedance.com>
-Message-ID: <b451f14d-3ed1-e746-21c3-8dcf766ec91a@bytedance.com>
-Date:   Tue, 22 Sep 2020 11:14:41 +0800
+Message-ID: <516e86aa-42d7-1820-600e-fba8d2e05882@bytedance.com>
+Date:   Tue, 22 Sep 2020 11:16:47 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
  Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <7f56fc84-5fbd-cf4a-e1d7-c6a75396a6bf@toxicpanda.com>
+In-Reply-To: <7f680bff-a19e-3aff-c91e-98b2933826a9@toxicpanda.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -83,42 +83,94 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2020/9/22 2:01 AM, Josef Bacik wrote:
+On 2020/9/22 2:03 AM, Josef Bacik wrote:
 > On 9/21/20 6:57 AM, Hou Pu wrote:
->> When an nbd device is configured with multiple sockets, the request
->> is requeued to an active socket in xmit_timeout, the original socket
->> is closed if not.
+>> Introduce a dedicated client flag NBD_RT_WAIT_ON_TIMEOUT to reset
+>> timer in nbd_xmit_timer instead of depending on tag_set.timeout == 0.
+>> So that the timeout value could be configured by the user to
+>> whatever they like instead of the default 30s. A smaller timeout
+>> value allow us to detect if a new socket is reconfigured in a
+>> shorter time. Thus the io could be requeued more quickly.
 >>
->> Some time, the backend nbd server hang, thus all sockets will be
->> dropped and the nbd device is not usable. It would be better to have an
->> option to wait for more time (just reset timer in nbd_xmit_timeout).
->> Like what we do if we only have one socket. This patch allows it.
+>> The tag_set.timeout == 0 setting still works like before.
 >>
 >> Signed-off-by: Hou Pu <houpu@bytedance.com>
->> ---
->>   drivers/block/nbd.c | 7 ++-----
->>   1 file changed, 2 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index 538e9dcf5bf2..4c0bbb981cbc 100644
->> --- a/drivers/block/nbd.c
->> +++ b/drivers/block/nbd.c
->> @@ -400,8 +400,7 @@ static enum blk_eh_timer_return 
->> nbd_xmit_timeout(struct request *req,
->>           nbd->tag_set.timeout)
->>           goto error_out;
->> -    if (config->num_connections > 1 ||
->> -        (config->num_connections == 1 && nbd->tag_set.timeout)) {
->> +    if (nbd->tag_set.timeout) {
 > 
-> So now if you don't set a .timeout and have num_connections > 1 we don't 
-> close the socket, so this won't work.  Thanks,
-> 
-> Josef
-
-OK, will keep the behavior same as before when we don't set a .timeout
-and num_connections > 1. And there is not need to keep this patch.
-Will remove it in v2.
+> I like this idea in general, just a few comments below.
 
 Thanks,
 Hou
+
+> 
+>> ---
+>>   drivers/block/nbd.c      | 25 ++++++++++++++++++++++++-
+>>   include/uapi/linux/nbd.h |  4 ++++
+>>   2 files changed, 28 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index 4c0bbb981cbc..1d7a9de7bdcc 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -80,6 +80,7 @@ struct link_dead_args {
+>>   #define NBD_RT_BOUND            5
+>>   #define NBD_RT_DESTROY_ON_DISCONNECT    6
+>>   #define NBD_RT_DISCONNECT_ON_CLOSE    7
+>> +#define NBD_RT_WAIT_ON_TIMEOUT        8
+>>   #define NBD_DESTROY_ON_DISCONNECT    0
+>>   #define NBD_DISCONNECT_REQUESTED    1
+>> @@ -378,6 +379,16 @@ static u32 req_to_nbd_cmd_type(struct request *req)
+>>       }
+>>   }
+>> +static inline bool wait_on_timeout(struct nbd_device *nbd,
+>> +                   struct nbd_config *config)
+>> +{
+>> +    if (test_bit(NBD_RT_WAIT_ON_TIMEOUT, &config->runtime_flags) ||
+>> +        nbd->tag_set.timeout == 0)
+>> +        return true;
+>> +    else
+>> +        return false;
+>> +}
+>> +
+> 
+> This obviously needs to be updated to match my comments from the 
+> previous patch.
+
+Thanks. Please see v2 latter.
+
+> 
+>>   static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+>>                            bool reserved)
+>>   {
+>> @@ -400,7 +411,7 @@ static enum blk_eh_timer_return 
+>> nbd_xmit_timeout(struct request *req,
+>>           nbd->tag_set.timeout)
+>>           goto error_out;
+>> -    if (nbd->tag_set.timeout) {
+>> +    if (!wait_on_timeout(nbd, config)) {
+>>           dev_err_ratelimited(nbd_to_dev(nbd),
+>>                       "Connection timed out, retrying (%d/%d alive)\n",
+>>                       atomic_read(&config->live_connections),
+>> @@ -1953,6 +1964,10 @@ static int nbd_genl_connect(struct sk_buff 
+>> *skb, struct genl_info *info)
+>>               set_bit(NBD_RT_DISCONNECT_ON_CLOSE,
+>>                   &config->runtime_flags);
+>>           }
+>> +        if (flags & NBD_CFLAG_WAIT_ON_TIMEOUT) {
+>> +            set_bit(NBD_RT_WAIT_ON_TIMEOUT,
+>> +                &config->runtime_flags);
+>> +        }
+> 
+> Documentation/process/coding-style.rst
+> 
+> "Do not unnecessarily use braces where a single statement will do."
+> 
+> same goes for below.  Thanks,
+> 
+> Josef
+
+Thanks. Will fix this in v2.
+
+
+Thanks,
+Hou
+
