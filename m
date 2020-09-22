@@ -2,133 +2,204 @@ Return-Path: <SRS0=ZsbB=C7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5FEC4727D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 00:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 474ACC4727D
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 00:58:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEEBD23A7B
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 00:49:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 144F123A79
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 00:58:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600735753;
-	bh=Bm28/D0KyWoChkiZqtfuQGAXW2tkHfhCWau4UGSFpTA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=W4QpLnBAVuviRMPyL1d+wBF0XjIMDN3+ixLQIfqKUL/fW89LbIaZs44rIR4F62uQU
-	 A15dH8DWSYGWpS6wvcSpg0mkfBCttx9OdDgFj9C5QS5wvL+/pXxV5Kx9T1kfiNJtZi
-	 w+OVExm6BTdSZJ9BHoaUsqpQ0rNMKiGmJSN1Grf8=
+	s=default; t=1600736325;
+	bh=mO4DYr7N0RLjWZa37eU/VgHJpvS4aRf2iPegAH0iEtc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=nRi9h4SUNCwdgsicmT9OBTIXSXdMSWUccUTRvQZ9ePQni8d9zM9bq11Zq6xaJ0CoB
+	 eX85EmC4vNhwD1xpMu38lIWHflb+2gznuMKiyxiPyjGZwx027ccOXroX8jH3DdkbJm
+	 tB7+2L7HVgRTlKCjtClp40umr58lS2ud8SDZEsk0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728701AbgIVAtM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Sep 2020 20:49:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47360 "EHLO mail.kernel.org"
+        id S1729404AbgIVA6n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Sep 2020 20:58:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51040 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728497AbgIVAtM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Sep 2020 20:49:12 -0400
-Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1729413AbgIVA6f (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Sep 2020 20:58:35 -0400
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B64BD23A61;
-        Tue, 22 Sep 2020 00:49:11 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4209723AA3
+        for <linux-block@vger.kernel.org>; Tue, 22 Sep 2020 00:58:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600735751;
-        bh=Bm28/D0KyWoChkiZqtfuQGAXW2tkHfhCWau4UGSFpTA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DgbQa1a5vEKJkEvTCKylzsNtWfPYSQs8nT7iQWmcRiIvEBQ30PELF6SeQU6b9/lVx
-         UPCmnVKV94vC6v+awa1Z+PLphLwvdnSgJEgJiJlEqa1MrPlSByRxT7HKfPkei/5bCS
-         Rg0sl5C5YZL8di/L7RXUEBit2xt+fNJC5aX3tIWA=
-Date:   Mon, 21 Sep 2020 17:49:10 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Subject: Re: [PATCH 3/3] dm: enable may_passthrough_inline_crypto on some
- targets
-Message-ID: <20200922004910.GD32959@sol.localdomain>
-References: <20200909234422.76194-1-satyat@google.com>
- <20200909234422.76194-4-satyat@google.com>
+        s=default; t=1600736314;
+        bh=mO4DYr7N0RLjWZa37eU/VgHJpvS4aRf2iPegAH0iEtc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=ZvsltSwjMQQjZiYWUVNiO25TW5AUeBh08HcndWK7Xe35RS/hY9lrzTe2a+eWc93Vs
+         W63+BpGaM0/hEmj0H5NNiiF+B4Dto3ZfhGCuYSg/VL/ifmFADrmP21pnAjqQPEbpTf
+         GPIWfRyXGAJ/aoCVrG5ZycMOv5bit2MDE6Nn2vFw=
+Received: by mail-wm1-f41.google.com with SMTP id b79so1600430wmb.4
+        for <linux-block@vger.kernel.org>; Mon, 21 Sep 2020 17:58:34 -0700 (PDT)
+X-Gm-Message-State: AOAM532Ky49icbGdBFjS4VcjTdVlDacooQRVAIN822WMtFilRd66XzuV
+        zkdVtQl4fcMmTReClV6gMLlRnrO4N+T4ysZ6BqMr1Q==
+X-Google-Smtp-Source: ABdhPJzzXZz8FGhOqJIy3SOg0uhFjle8bEWKILqBSG3M41u7cJLjsHkjpP4JLeSfHDUPrx8gGM2D3rP9PVKnU83D0i8=
+X-Received: by 2002:a1c:740c:: with SMTP id p12mr1761323wmc.176.1600736312695;
+ Mon, 21 Sep 2020 17:58:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200909234422.76194-4-satyat@google.com>
+References: <CAK8P3a2Mi+1yttyGk4k7HxRVrMtmFqJewouVhynqUL0PJycmog@mail.gmail.com>
+ <D0791499-1190-4C3F-A984-0A313ECA81C7@amacapital.net> <563138b5-7073-74bc-f0c5-b2bad6277e87@gmail.com>
+ <486c92d0-0f2e-bd61-1ab8-302524af5e08@gmail.com> <CALCETrW3rwGsgfLNnu_0JAcL5jvrPVTLTWM3JpbB5P9Hye6Fdw@mail.gmail.com>
+ <d5c6736a-2cb4-4e22-78da-a667bda5c05a@gmail.com>
+In-Reply-To: <d5c6736a-2cb4-4e22-78da-a667bda5c05a@gmail.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 21 Sep 2020 17:58:20 -0700
+X-Gmail-Original-Message-ID: <CALCETrUEC81va8-fuUXG1uA5rbKxnKDYsDOXC70_HtKD4LAeAg@mail.gmail.com>
+Message-ID: <CALCETrUEC81va8-fuUXG1uA5rbKxnKDYsDOXC70_HtKD4LAeAg@mail.gmail.com>
+Subject: Re: [PATCH 1/9] kernel: add a PF_FORCE_COMPAT flag
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        David Howells <dhowells@redhat.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-aio <linux-aio@kvack.org>, io-uring@vger.kernel.org,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        Network Development <netdev@vger.kernel.org>,
+        keyrings@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 09, 2020 at 11:44:22PM +0000, Satya Tangirala wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> dm-linear and dm-flakey obviously can pass through inline crypto support.
-> 
-> dm-zero should declare that it passes through inline crypto support, since
-> any reads from dm-zero should return zeroes, and blk-crypto should not
-> attempt to decrypt data returned from dm-zero.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> Co-developed-by: Satya Tangirala <satyat@google.com>
-> Signed-off-by: Satya Tangirala <satyat@google.com>
-> ---
->  drivers/md/dm-flakey.c | 1 +
->  drivers/md/dm-linear.c | 1 +
->  drivers/md/dm-zero.c   | 1 +
->  3 files changed, 3 insertions(+)
-> 
-> diff --git a/drivers/md/dm-flakey.c b/drivers/md/dm-flakey.c
-> index a2cc9e45cbba..655286dacc35 100644
-> --- a/drivers/md/dm-flakey.c
-> +++ b/drivers/md/dm-flakey.c
-> @@ -253,6 +253,7 @@ static int flakey_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  	ti->num_discard_bios = 1;
->  	ti->per_io_data_size = sizeof(struct per_bio_data);
->  	ti->private = fc;
-> +	ti->may_passthrough_inline_crypto = true;
->  	return 0;
->  
->  bad:
-> diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
-> index e1db43446327..6d81878e2ca8 100644
-> --- a/drivers/md/dm-linear.c
-> +++ b/drivers/md/dm-linear.c
-> @@ -62,6 +62,7 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  	ti->num_secure_erase_bios = 1;
->  	ti->num_write_same_bios = 1;
->  	ti->num_write_zeroes_bios = 1;
-> +	ti->may_passthrough_inline_crypto = true;
->  	ti->private = lc;
->  	return 0;
->  
-> diff --git a/drivers/md/dm-zero.c b/drivers/md/dm-zero.c
-> index b65ca8dcfbdc..07e02f3a9cd1 100644
-> --- a/drivers/md/dm-zero.c
-> +++ b/drivers/md/dm-zero.c
-> @@ -26,6 +26,7 @@ static int zero_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  	 * Silently drop discards, avoiding -EOPNOTSUPP.
->  	 */
->  	ti->num_discard_bios = 1;
-> +	ti->may_passthrough_inline_crypto = true;
->  
->  	return 0;
->  }
+On Mon, Sep 21, 2020 at 5:24 PM Pavel Begunkov <asml.silence@gmail.com> wro=
+te:
+>
+>
+>
+> On 22/09/2020 02:51, Andy Lutomirski wrote:
+> > On Mon, Sep 21, 2020 at 9:15 AM Pavel Begunkov <asml.silence@gmail.com>=
+ wrote:
+> >>
+> >> On 21/09/2020 19:10, Pavel Begunkov wrote:
+> >>> On 20/09/2020 01:22, Andy Lutomirski wrote:
+> >>>>
+> >>>>> On Sep 19, 2020, at 2:16 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> >>>>>
+> >>>>> =EF=BB=BFOn Sat, Sep 19, 2020 at 6:21 PM Andy Lutomirski <luto@kern=
+el.org> wrote:
+> >>>>>>> On Fri, Sep 18, 2020 at 8:16 AM Christoph Hellwig <hch@lst.de> wr=
+ote:
+> >>>>>>> On Fri, Sep 18, 2020 at 02:58:22PM +0100, Al Viro wrote:
+> >>>>>>>> Said that, why not provide a variant that would take an explicit
+> >>>>>>>> "is it compat" argument and use it there?  And have the normal
+> >>>>>>>> one pass in_compat_syscall() to that...
+> >>>>>>>
+> >>>>>>> That would help to not introduce a regression with this series ye=
+s.
+> >>>>>>> But it wouldn't fix existing bugs when io_uring is used to access
+> >>>>>>> read or write methods that use in_compat_syscall().  One example =
+that
+> >>>>>>> I recently ran into is drivers/scsi/sg.c.
+> >>>>>
+> >>>>> Ah, so reading /dev/input/event* would suffer from the same issue,
+> >>>>> and that one would in fact be broken by your patch in the hypotheti=
+cal
+> >>>>> case that someone tried to use io_uring to read /dev/input/event on=
+ x32...
+> >>>>>
+> >>>>> For reference, I checked the socket timestamp handling that has a
+> >>>>> number of corner cases with time32/time64 formats in compat mode,
+> >>>>> but none of those appear to be affected by the problem.
+> >>>>>
+> >>>>>> Aside from the potentially nasty use of per-task variables, one th=
+ing
+> >>>>>> I don't like about PF_FORCE_COMPAT is that it's one-way.  If we're
+> >>>>>> going to have a generic mechanism for this, shouldn't we allow a f=
+ull
+> >>>>>> override of the syscall arch instead of just allowing forcing comp=
+at
+> >>>>>> so that a compat syscall can do a non-compat operation?
+> >>>>>
+> >>>>> The only reason it's needed here is that the caller is in a kernel
+> >>>>> thread rather than a system call. Are there any possible scenarios
+> >>>>> where one would actually need the opposite?
+> >>>>>
+> >>>>
+> >>>> I can certainly imagine needing to force x32 mode from a kernel thre=
+ad.
+> >>>>
+> >>>> As for the other direction: what exactly are the desired bitness/arc=
+h semantics of io_uring?  Is the operation bitness chosen by the io_uring c=
+reation or by the io_uring_enter() bitness?
+> >>>
+> >>> It's rather the second one. Even though AFAIR it wasn't discussed
+> >>> specifically, that how it works now (_partially_).
+> >>
+> >> Double checked -- I'm wrong, that's the former one. Most of it is base=
+d
+> >> on a flag that was set an creation.
+> >>
+> >
+> > Could we get away with making io_uring_enter() return -EINVAL (or
+> > maybe -ENOTTY?) if you try to do it with bitness that doesn't match
+> > the io_uring?  And disable SQPOLL in compat mode?
+>
+> Something like below. If PF_FORCE_COMPAT or any other solution
+> doesn't lend by the time, I'll take a look whether other io_uring's
+> syscalls need similar checks, etc.
+>
+>
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 0458f02d4ca8..aab20785fa9a 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -8671,6 +8671,10 @@ SYSCALL_DEFINE6(io_uring_enter, unsigned int, fd, =
+u32, to_submit,
+>         if (ctx->flags & IORING_SETUP_R_DISABLED)
+>                 goto out;
+>
+> +       ret =3D -EINVAl;
+> +       if (ctx->compat !=3D in_compat_syscall())
+> +               goto out;
+> +
 
-Isn't it wrong to set may_passthrough_inline_crypto on dm-zero?  First, there's
-no actual underlying device associated with dm-zero, so the idea of dm-zero
-"passing through" anything is strange.
+This seems entirely reasonable to me.  Sharing an io_uring ring
+between programs with different ABIs seems a bit nutty.
 
-Second, inline encryption is supposed to semantically operate on the original
-bio.  I.e. if someone reads some data from dm-zero and they use a bio_crypt_ctx
-that indicates the data should be decrypted, then I'd expect that either the bio
-would fail, *or* it would return back data which is equal to the decryption of
-the all-zeroes ciphertexts.
+>         /*
+>          * For SQ polling, the thread will do all submissions and complet=
+ions.
+>          * Just return the requested submit count, and wake the thread if
+> @@ -9006,6 +9010,10 @@ static int io_uring_create(unsigned entries, struc=
+t io_uring_params *p,
+>         if (ret)
+>                 goto err;
+>
+> +       ret =3D -EINVAL;
+> +       if (ctx->compat)
+> +               goto err;
+> +
 
-may_passthrough_inline_crypto=false would give that behavior.  Whereas with
-may_passthrough_inline_crypto=true, the bio's encryption context may just be
-ignored and reads will return all zeroes.
+I may be looking at a different kernel than you, but aren't you
+preventing creating an io_uring regardless of whether SQPOLL is
+requested?
 
-Of course, setting an encryption context for I/O to/from dm-zero isn't really
-something that people would do anyway...  But it seems we shouldn't bother
-setting may_passthrough_inline_crypto on it when it seems wrong.
-
-- Eric
+>         /* Only gets the ring fd, doesn't install it in the file table */
+>         fd =3D io_uring_get_fd(ctx, &file);
+>         if (fd < 0) {
+> --
+> Pavel Begunkov
