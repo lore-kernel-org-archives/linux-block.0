@@ -2,237 +2,135 @@ Return-Path: <SRS0=ZsbB=C7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C69C2D0E2
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 08:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65975C4727E
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 09:01:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A75442085B
-	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 08:50:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33BB623A1E
+	for <linux-block@archiver.kernel.org>; Tue, 22 Sep 2020 09:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726514AbgIVIt6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Sep 2020 04:49:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54648 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726098AbgIVIt5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Sep 2020 04:49:57 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 01CA2AF16;
-        Tue, 22 Sep 2020 08:50:32 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id EA6C01E12E3; Tue, 22 Sep 2020 10:49:54 +0200 (CEST)
-Date:   Tue, 22 Sep 2020 10:49:54 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Coly Li <colyli@suse.de>, Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Justin Sanders <justin@coraid.com>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, cgroups@vger.kernel.org,
-        David Sterba <dsterba@suse.com>
-Subject: Re: [PATCH 05/13] bdi: initialize ->ra_pages and ->io_pages in
- bdi_init
-Message-ID: <20200922084954.GC16464@quack2.suse.cz>
-References: <20200921080734.452759-1-hch@lst.de>
- <20200921080734.452759-6-hch@lst.de>
+        id S1726494AbgIVJB4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Sep 2020 05:01:56 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:48239 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726353AbgIVJBz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Sep 2020 05:01:55 -0400
+Received: from mail-qk1-f174.google.com ([209.85.222.174]) by
+ mrelayeu.kundenserver.de (mreue108 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1M8QJq-1kP1tX30wS-004R66; Tue, 22 Sep 2020 11:01:51 +0200
+Received: by mail-qk1-f174.google.com with SMTP id 16so18290762qkf.4;
+        Tue, 22 Sep 2020 02:01:50 -0700 (PDT)
+X-Gm-Message-State: AOAM531+93v+0pc6Wi7zIypNe7Vgpz/NCT5EEwScNq/ES31+DcqqIzIF
+        wjBHiQJRNRN0efUxhQeFDvY1TrHFTG/Dy6uuW7w=
+X-Google-Smtp-Source: ABdhPJyRqkNrv5vljO58DCgwZZgH8gYzn8Pg1f10DkzXAekHvwLoBvZT9T4MCMOwP2QMtNaCPo1tGJEV8E4gZYbkeUE=
+X-Received: by 2002:ae9:c30d:: with SMTP id n13mr3794670qkg.138.1600765309262;
+ Tue, 22 Sep 2020 02:01:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200921080734.452759-6-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <CAK8P3a2Mi+1yttyGk4k7HxRVrMtmFqJewouVhynqUL0PJycmog@mail.gmail.com>
+ <D0791499-1190-4C3F-A984-0A313ECA81C7@amacapital.net> <563138b5-7073-74bc-f0c5-b2bad6277e87@gmail.com>
+ <486c92d0-0f2e-bd61-1ab8-302524af5e08@gmail.com> <CALCETrW3rwGsgfLNnu_0JAcL5jvrPVTLTWM3JpbB5P9Hye6Fdw@mail.gmail.com>
+ <d5c6736a-2cb4-4e22-78da-a667bda5c05a@gmail.com> <CALCETrUEC81va8-fuUXG1uA5rbKxnKDYsDOXC70_HtKD4LAeAg@mail.gmail.com>
+ <e0a1b4d1-ff47-18d1-d535-c62812cb3105@gmail.com> <CAK8P3a2-6JNS38EbZcLrk=cTT526oP=Rf0aoqWNSJ-k4XTYehQ@mail.gmail.com>
+ <f25b4708-eba6-78d6-03f9-5bfb04e07627@gmail.com>
+In-Reply-To: <f25b4708-eba6-78d6-03f9-5bfb04e07627@gmail.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Tue, 22 Sep 2020 11:01:32 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a39jN+t2hhLg0oKZnbYATQXmYE2-Z1JkmFyc1EPdg1HXw@mail.gmail.com>
+Message-ID: <CAK8P3a39jN+t2hhLg0oKZnbYATQXmYE2-Z1JkmFyc1EPdg1HXw@mail.gmail.com>
+Subject: Re: [PATCH 1/9] kernel: add a PF_FORCE_COMPAT flag
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Andy Lutomirski <luto@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        David Howells <dhowells@redhat.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-aio <linux-aio@kvack.org>, io-uring@vger.kernel.org,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        Network Development <netdev@vger.kernel.org>,
+        keyrings@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:8U3QhqUgQssKpQivIurx1QhO0HcizCTbv9FM2dYjR7qI/BYtgBT
+ aXnBt+gH3i7BkW4ORLrCt4H46/pNjWBK/mpqCyumcjcVfj1/zotel3weBob9uElfz3DwR7K
+ SD73O72POJ3pwjD8gWBnHZGyAwt1MpkpQv9XkBHvto4Q+XAgPzYoa4EjGe8Z/x39gDR9cGO
+ QujCKw+EEJbaSeenNDMzw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lxgMs8VhhiM=:l+UfaADbxVKseh338rQzK0
+ QfABKRk1uOM8j+TCS6sCwMVp7ftwkOoJIGxGdG6L6VzI7cEX/MhwRXSQNk8YlDVPqekFAwqsJ
+ K748wMagnWb5anQxTXdEkOBo0uWtUSAEwztEdQ2OBKdjwEG1J6pIlrCcDyitdMMoAz861eF0u
+ z2iEwNTG7KaprxuPyh3LpnSFr4t9fNgbzFOS7H+wEZEnC9CeAWNx5wP0L6sE37HsEVzBj0klw
+ rCdMwj/xQX550kfGtz5Tst5P+5qFFcpSycGh7yxzuA7IfUTo0Jtcxxq8Nsoy2hdLMsRB5AeEU
+ hTJ1KV0t+ZNP/UDzzsqu7H5kqZnJRYF/Z8Ji6rftWofkhI6uKJJ8Cfjq8tWrO/UeP3XIf9v2i
+ DQj5nXdMHge7GHqPvPrsVFMyAkUL1J4r8j1ePLIXjlpNWnjVBfzHviGfTGbMYidP8nHyfMUv4
+ hEG02hwSHv9Zn7QmlN72PGM4XbtnD7nIM85CCGS+B86CUtmOfBWj5gRwwocYygk0Mfzi0STau
+ 9lBglupWtfGYz14JMgT+7eEGaMn3WNy19TESYPhKMsyiDYRSSu38/SERTgtuUQo8ptjsjNOMw
+ hMWuBgTKGkOX+0SeCUD2zOGOi/+ubpkvRVlttuUSAIEUl1xdqDzZNS6siOVdInCDtDO3VcOwL
+ tz/kxsgWRCy7enDEmiF8nZGkmBV+bcNr8kAHKqyZDkcgcSxHstfrPlSvQ8eU70sysdob1c6pH
+ o6m1IdiLADPf36SBZ2b/E1EXaXU5wEKpga7xW5vj4MkINkTWIONy6jvzXbTYJ5RaLNmyXl2Xq
+ CcmZaAJaQnOwp55YtAfNvehwZlUtix7GjXWpSVDKul5QTnf8MdHSUm66q7etTCD1nugbL5krf
+ nX96T+FtWTicJ8P6Rd2wiUyg+fLf10H8SOm4BOpcrhYne4qDBpHCkC3Wl4ydqivn66oeOEyJ9
+ sHgF+76xRs7ep05tWnMmeiHdPlcAupShCEbkpfyQnpooyIq1sTbAL
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 21-09-20 10:07:26, Christoph Hellwig wrote:
-> Set up a readahead size by default, as very few users have a good
-> reason to change it.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: David Sterba <dsterba@suse.com> [btrfs]
-> Acked-by: Richard Weinberger <richard@nod.at> [ubifs, mtd]
+On Tue, Sep 22, 2020 at 9:59 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+> On 22/09/2020 10:23, Arnd Bergmann wrote:
+> > On Tue, Sep 22, 2020 at 8:32 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+> >> On 22/09/2020 03:58, Andy Lutomirski wrote:
+> >>> On Mon, Sep 21, 2020 at 5:24 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+> >>> I may be looking at a different kernel than you, but aren't you
+> >>> preventing creating an io_uring regardless of whether SQPOLL is
+> >>> requested?
+> >>
+> >> I diffed a not-saved file on a sleepy head, thanks for noticing.
+> >> As you said, there should be an SQPOLL check.
+> >>
+> >> ...
+> >> if (ctx->compat && (p->flags & IORING_SETUP_SQPOLL))
+> >>         goto err;
+> >
+> > Wouldn't that mean that now 32-bit containers behave differently
+> > between compat and native execution?
+> >
+> > I think if you want to prevent 32-bit applications from using SQPOLL,
+> > it needs to be done the same way on both to be consistent:
+>
+> The intention was to disable only compat not native 32-bit.
 
-The patch looks good to me. You can add:
+I'm not following why that would be considered a valid option,
+as that clearly breaks existing users that update from a 32-bit
+kernel to a 64-bit one.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Taking away the features from users that are still on 32-bit kernels
+already seems questionable to me, but being inconsistent
+about it seems much worse, in particular when the regression
+is on the upgrade path.
 
-I'd just prefer if the changelog explicitely mentioned that this patch
-results in enabling readahead for coda, ecryptfs, and orangefs... Just in
-case someone bisects some issue down to this patch :).
+> > Can we expect all existing and future user space to have a sane
+> > fallback when IORING_SETUP_SQPOLL fails?
+>
+> SQPOLL has a few differences with non-SQPOLL modes, but it's easy
+> to convert between them. Anyway, SQPOLL is a privileged special
+> case that's here for performance/latency reasons, I don't think
+> there will be any non-accidental users of it.
 
-								Honza
+Ok, so the behavior of 32-bit tasks would be the same as running
+the same application as unprivileged 64-bit tasks, with applications
+already having to implement that fallback, right?
 
-> ---
->  block/blk-core.c      | 2 --
->  drivers/mtd/mtdcore.c | 2 ++
->  fs/9p/vfs_super.c     | 6 ++++--
->  fs/afs/super.c        | 1 -
->  fs/btrfs/disk-io.c    | 1 -
->  fs/fuse/inode.c       | 1 -
->  fs/nfs/super.c        | 9 +--------
->  fs/ubifs/super.c      | 2 ++
->  fs/vboxsf/super.c     | 2 ++
->  mm/backing-dev.c      | 2 ++
->  10 files changed, 13 insertions(+), 15 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index ca3f0f00c9435f..865d39e5be2b28 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -538,8 +538,6 @@ struct request_queue *blk_alloc_queue(int node_id)
->  	if (!q->stats)
->  		goto fail_stats;
->  
-> -	q->backing_dev_info->ra_pages = VM_READAHEAD_PAGES;
-> -	q->backing_dev_info->io_pages = VM_READAHEAD_PAGES;
->  	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
->  	q->node = node_id;
->  
-> diff --git a/drivers/mtd/mtdcore.c b/drivers/mtd/mtdcore.c
-> index 7d930569a7dfb7..b5e5d3140f578e 100644
-> --- a/drivers/mtd/mtdcore.c
-> +++ b/drivers/mtd/mtdcore.c
-> @@ -2196,6 +2196,8 @@ static struct backing_dev_info * __init mtd_bdi_init(char *name)
->  	bdi = bdi_alloc(NUMA_NO_NODE);
->  	if (!bdi)
->  		return ERR_PTR(-ENOMEM);
-> +	bdi->ra_pages = 0;
-> +	bdi->io_pages = 0;
->  
->  	/*
->  	 * We put '-0' suffix to the name to get the same name format as we
-> diff --git a/fs/9p/vfs_super.c b/fs/9p/vfs_super.c
-> index 74df32be4c6a52..e34fa20acf612e 100644
-> --- a/fs/9p/vfs_super.c
-> +++ b/fs/9p/vfs_super.c
-> @@ -80,8 +80,10 @@ v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
->  	if (ret)
->  		return ret;
->  
-> -	if (v9ses->cache)
-> -		sb->s_bdi->ra_pages = VM_READAHEAD_PAGES;
-> +	if (!v9ses->cache) {
-> +		sb->s_bdi->ra_pages = 0;
-> +		sb->s_bdi->io_pages = 0;
-> +	}
->  
->  	sb->s_flags |= SB_ACTIVE | SB_DIRSYNC;
->  	if (!v9ses->cache)
-> diff --git a/fs/afs/super.c b/fs/afs/super.c
-> index b552357b1d1379..3a40ee752c1e3f 100644
-> --- a/fs/afs/super.c
-> +++ b/fs/afs/super.c
-> @@ -456,7 +456,6 @@ static int afs_fill_super(struct super_block *sb, struct afs_fs_context *ctx)
->  	ret = super_setup_bdi(sb);
->  	if (ret)
->  		return ret;
-> -	sb->s_bdi->ra_pages	= VM_READAHEAD_PAGES;
->  
->  	/* allocate the root inode and dentry */
->  	if (as->dyn_root) {
-> diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-> index f6bba7eb1fa171..047934cea25efa 100644
-> --- a/fs/btrfs/disk-io.c
-> +++ b/fs/btrfs/disk-io.c
-> @@ -3092,7 +3092,6 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
->  	}
->  
->  	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
-> -	sb->s_bdi->ra_pages = VM_READAHEAD_PAGES;
->  	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
->  	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
->  
-> diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
-> index bba747520e9b08..17b00670fb539e 100644
-> --- a/fs/fuse/inode.c
-> +++ b/fs/fuse/inode.c
-> @@ -1049,7 +1049,6 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
->  	if (err)
->  		return err;
->  
-> -	sb->s_bdi->ra_pages = VM_READAHEAD_PAGES;
->  	/* fuse does it's own writeback accounting */
->  	sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
->  
-> diff --git a/fs/nfs/super.c b/fs/nfs/super.c
-> index 7a70287f21a2c1..f943e37853fa25 100644
-> --- a/fs/nfs/super.c
-> +++ b/fs/nfs/super.c
-> @@ -1200,13 +1200,6 @@ static void nfs_get_cache_cookie(struct super_block *sb,
->  }
->  #endif
->  
-> -static void nfs_set_readahead(struct backing_dev_info *bdi,
-> -			      unsigned long iomax_pages)
-> -{
-> -	bdi->ra_pages = VM_READAHEAD_PAGES;
-> -	bdi->io_pages = iomax_pages;
-> -}
-> -
->  int nfs_get_tree_common(struct fs_context *fc)
->  {
->  	struct nfs_fs_context *ctx = nfs_fc2context(fc);
-> @@ -1251,7 +1244,7 @@ int nfs_get_tree_common(struct fs_context *fc)
->  					     MINOR(server->s_dev));
->  		if (error)
->  			goto error_splat_super;
-> -		nfs_set_readahead(s->s_bdi, server->rpages);
-> +		s->s_bdi->io_pages = server->rpages;
->  		server->super = s;
->  	}
->  
-> diff --git a/fs/ubifs/super.c b/fs/ubifs/super.c
-> index a2420c900275a8..fbddb2a1c03f5e 100644
-> --- a/fs/ubifs/super.c
-> +++ b/fs/ubifs/super.c
-> @@ -2177,6 +2177,8 @@ static int ubifs_fill_super(struct super_block *sb, void *data, int silent)
->  				   c->vi.vol_id);
->  	if (err)
->  		goto out_close;
-> +	sb->s_bdi->ra_pages = 0;
-> +	sb->s_bdi->io_pages = 0;
->  
->  	sb->s_fs_info = c;
->  	sb->s_magic = UBIFS_SUPER_MAGIC;
-> diff --git a/fs/vboxsf/super.c b/fs/vboxsf/super.c
-> index 8fe03b4a0d2b03..8e3792177a8523 100644
-> --- a/fs/vboxsf/super.c
-> +++ b/fs/vboxsf/super.c
-> @@ -167,6 +167,8 @@ static int vboxsf_fill_super(struct super_block *sb, struct fs_context *fc)
->  	err = super_setup_bdi_name(sb, "vboxsf-%d", sbi->bdi_id);
->  	if (err)
->  		goto fail_free;
-> +	sb->s_bdi->ra_pages = 0;
-> +	sb->s_bdi->io_pages = 0;
->  
->  	/* Turn source into a shfl_string and map the folder */
->  	size = strlen(fc->source) + 1;
-> diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-> index 8e8b00627bb2d8..2dac3be6127127 100644
-> --- a/mm/backing-dev.c
-> +++ b/mm/backing-dev.c
-> @@ -746,6 +746,8 @@ struct backing_dev_info *bdi_alloc(int node_id)
->  		kfree(bdi);
->  		return NULL;
->  	}
-> +	bdi->ra_pages = VM_READAHEAD_PAGES;
-> +	bdi->io_pages = VM_READAHEAD_PAGES;
->  	return bdi;
->  }
->  EXPORT_SYMBOL(bdi_alloc);
-> -- 
-> 2.28.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+      Arnd
