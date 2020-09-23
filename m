@@ -2,150 +2,111 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A8C2C2D0A8
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 11:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3053FC2D0A8
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 12:53:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01CF9235FD
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 11:45:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFE4321D43
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 12:53:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="jUElUNR/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="X10kQhDh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbgIWLpM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 07:45:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36332 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726703AbgIWLpA (ORCPT
+        id S1726648AbgIWMxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 08:53:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59202 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726606AbgIWMxK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 07:45:00 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2274C0613D1
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 04:45:00 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id j7so6687227plk.11
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 04:45:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=nPkmLEjjOLqKd/lOoAyA8z7n9dUCjwGzd+W0L3DZgSM=;
-        b=jUElUNR/aCuC47FTFhG+ItffqFmwJg58kuZUnBmtNmUSCv3QmjsuHGiNubphfVCWwo
-         f5WVv+EXIx5PHxtWQ5Cqy4gRLqc8pAx6KV4ryb3N5QIky0xU8+dpfa9TZXTpzsopQtNH
-         NojmKG9IHrIQbClrFWFgmUAb2cJg5x3l3EfYOGaHLnQ0fYSGZ3kF5EaCe59e0l7SUBY9
-         O80XINHl/CvqKhEnwJ4SqQp/hX2tuJMg5gW3bto/N+744BSwhaZg9fWIPZtEKPydO3D0
-         N9EXzRXiEVHTEF2BfD5A7SJjfZn9I6fJt0E60wHquNb0j/Uj5imwTOzJcOu1FCUADHe1
-         qsAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nPkmLEjjOLqKd/lOoAyA8z7n9dUCjwGzd+W0L3DZgSM=;
-        b=gRawkxSTnjuB0WLWMqVFwMphIZX+kUfJJjItZZ+7PGvePb8r9j2kWqZOmfy/x3oB5h
-         rlkbusTfzfc8xVIIjSwyzfvUU4oOc5WADeJlOIo86tmGVEtbRHTkqQHAvxXU2KA9alDL
-         NPlLyiYILUw0AyXLwjJi4GqIsRBzl7NindwFGrPWGj3duIhiLN9R2GLdjdAj9XBlfue7
-         TeeyJOPY7T0ShKl3InDZGHkQK+J6AGzdK1fV8uClR752dThMRvjoZA7sn8jtXGjDw1rp
-         r/Vj/dDvRDjlwRQTOTZ7pZsJ8Jq6Cwr84szpYvSP9UJtklnSY8EsbXC9RyM0GWSJPF9s
-         Xb8g==
-X-Gm-Message-State: AOAM530HcL01Is9dfU8TtdWFlp3bJ+l5lP9KAv4HVjtchuI4aIENg4r0
-        dN0dFzRz2F7SlXjrvQ8jCIbrAA==
-X-Google-Smtp-Source: ABdhPJynCqLc4R0uR3z+mm+2RmWHC4eyIwG+zcF5oGEc0p73c69eYffchw07KnbDQyeAvZgLntwxfQ==
-X-Received: by 2002:a17:90b:3c1:: with SMTP id go1mr7987568pjb.192.1600861500197;
-        Wed, 23 Sep 2020 04:45:00 -0700 (PDT)
-Received: from Smcdef-MBP.local.net ([103.136.220.72])
-        by smtp.gmail.com with ESMTPSA id a13sm17632155pfl.184.2020.09.23.04.44.56
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Sep 2020 04:44:59 -0700 (PDT)
-From:   Muchun Song <songmuchun@bytedance.com>
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zhuyinyin@bytedance.com,
-        Muchun Song <songmuchun@bytedance.com>,
-        Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>
-Subject: [PATCH v2 5/5] io_uring: Fix double list add in io_queue_async_work()
-Date:   Wed, 23 Sep 2020 19:44:19 +0800
-Message-Id: <20200923114419.71218-6-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.21.0 (Apple Git-122)
-In-Reply-To: <20200923114419.71218-1-songmuchun@bytedance.com>
-References: <20200923114419.71218-1-songmuchun@bytedance.com>
+        Wed, 23 Sep 2020 08:53:10 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08NCWvgP155709;
+        Wed, 23 Sep 2020 08:53:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type; s=pp1;
+ bh=Z8mPk36VOce+KlKDpk8jJO4I7+ATiLIwcpb4W6Wl/mQ=;
+ b=X10kQhDhAVJx9QlHu9KXpP16n0+0avj7fF2vo2AxUZva6aFKGF83CwVdIv9cuj6djNc6
+ BtYzYGS23UamJ4SP4pX0oRSRlapYUQlX+9/b/mnj7fWwjADhK5xjHr2jRxAtG4h+dDnl
+ lAMZya9iXkFMW36DvyA6ky8vdSi1gUIDM8I8QwRmz19I9T1Vk5giql7c6jXYME3SZvPT
+ twpJ/MTPEozK2tJ7cQNNkucnrnBThh3x/Jscgc3wqLrxbYuoDk84fG8/sCplztzH22Id
+ lVrcxt7+BAhxPKyKEsv028mmvhpt9SpdGsyElu5Yv6Krk6SgcAPCXlVla1fchPyv+xue 9A== 
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33r5dy2p90-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Sep 2020 08:53:06 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08NChkh9019993;
+        Wed, 23 Sep 2020 12:53:04 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 33n9m7t5bh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Sep 2020 12:53:04 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08NCr1XF23068940
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Sep 2020 12:53:01 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E14642047;
+        Wed, 23 Sep 2020 12:53:01 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7BAC94203F;
+        Wed, 23 Sep 2020 12:53:00 +0000 (GMT)
+Received: from marcibm (unknown [9.145.64.218])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 23 Sep 2020 12:53:00 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Block Mailing List <linux-block@vger.kernel.org>,
+        Linux SCSI Mailing List <linux-scsi@vger.kernel.org>
+Subject: linux-next: possible bug in 'block: remove the BIO_NULL_MAPPED flag'
+Date:   Wed, 23 Sep 2020 14:52:59 +0200
+Message-ID: <87tuvo8xjo.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-23_07:2020-09-23,2020-09-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
+ impostorscore=0 clxscore=1011 phishscore=0 bulkscore=0 malwarescore=0
+ suspectscore=1 priorityscore=1501 adultscore=0 lowpriorityscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009230098
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we queue work in io_poll_wake(), it will leads to list double
-add. So we should add the list when the callback func is the
-io_sq_wq_submit_work.
+Hi Christoph, Jens,
 
-The following oops was seen:
+I found an interesting bug in my KVM guest (tested on s390x). The guest
+uses a virtio-scsi disk and the current linux-next kernel. The problem
+is that I cannot get the SCSI ID of the attached SCSI disk. Running the
+command `lsscsi --scsi_id` in the guest returns:
 
-    list_add double add: new=ffff9ca6a8f1b0e0, prev=ffff9ca62001cee8,
-    next=ffff9ca6a8f1b0e0.
-    ------------[ cut here ]------------
-    kernel BUG at lib/list_debug.c:31!
-    Call Trace:
-     <IRQ>
-     io_poll_wake+0xf3/0x230
-     __wake_up_common+0x91/0x170
-     __wake_up_common_lock+0x7a/0xc0
-     io_commit_cqring+0xea/0x280
-     ? blkcg_iolatency_done_bio+0x2b/0x610
-     io_cqring_add_event+0x3e/0x60
-     io_complete_rw+0x58/0x80
-     dio_complete+0x106/0x250
-     blk_update_request+0xa0/0x3b0
-     blk_mq_end_request+0x1a/0x110
-     blk_mq_complete_request+0xd0/0xe0
-     nvme_irq+0x129/0x270 [nvme]
-     __handle_irq_event_percpu+0x7b/0x190
-     handle_irq_event_percpu+0x30/0x80
-     handle_irq_event+0x3c/0x60
-     handle_edge_irq+0x91/0x1e0
-     do_IRQ+0x4d/0xd0
-     common_interrupt+0xf/0xf
+root@qemus390x:~# lsscsi --scsi_id
+[0:0:0:0]    disk    Linux    scsi_debug       0190  /dev/sda   -
 
-Fixes: 1c4404efcf2c ("io_uring: make sure async workqueue is canceled on exit")
-Reported-by: Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
----
- fs/io_uring.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+but the expected result is something like:
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index c65f78f395655..a7cfe976480d8 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -513,12 +513,14 @@ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
- 		}
- 	}
- 
--	req->files = current->files;
-+	if (req->work.func == io_sq_wq_submit_work) {
-+		req->files = current->files;
- 
--	spin_lock_irqsave(&ctx->task_lock, flags);
--	list_add(&req->task_list, &ctx->task_list);
--	req->work_task = NULL;
--	spin_unlock_irqrestore(&ctx->task_lock, flags);
-+		spin_lock_irqsave(&ctx->task_lock, flags);
-+		list_add(&req->task_list, &ctx->task_list);
-+		req->work_task = NULL;
-+		spin_unlock_irqrestore(&ctx->task_lock, flags);
-+	}
- 
- 	queue_work(ctx->sqo_wq[rw], &req->work);
- }
-@@ -667,6 +669,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
- 		state->cur_req++;
- 	}
- 
-+	INIT_LIST_HEAD(&req->task_list);
- 	req->file = NULL;
- 	req->ctx = ctx;
- 	req->flags = 0;
--- 
-2.11.0
+root@qemus390x:~# lsscsi --scsi_id
+[0:0:0:0]    disk    Linux    scsi_debug       0190  /dev/sda   33333333000002710
 
+Also there is no /dev/disk/by-id/scsi-* path created. I bisected the
+problem to...
+
+commit f3256075ba49d80835b601bfbff350a2140b2924 (HEAD, refs/bisect/bad)
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Thu Aug 27 17:37:45 2020 +0200
+
+    block: remove the BIO_NULL_MAPPED flag
+
+When I reverted this commit the problem was gone. Any ideas what the
+problem is? Thanks in advance.
+
+Best regards,
+ Marc
