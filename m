@@ -2,88 +2,114 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90AAC4363D
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68278C4363D
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:22:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9254D21D43
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:19:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C78E2220D
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:22:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="i0FGPy10"
+	dkim=pass (2048-bit key) header.d=reintjes.nrw header.i=@reintjes.nrw header.b="mKq3yxzI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbgIWPTG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 11:19:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41018 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726603AbgIWPTF (ORCPT
+        id S1726862AbgIWPWn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 11:22:43 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:34512 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726687AbgIWPWm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 11:19:05 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D13C0613CE
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 08:19:05 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id g29so14603976pgl.2
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 08:19:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=JxMbv0bKZur8W2kgZao1ChaI90AFzrPU3hLq2OR4FJs=;
-        b=i0FGPy10wNZUK6rDF/WoX7aMiyYHtcPoSp15TZ1GxDBEeFBXpk1BEq5AhmMWtNe/rD
-         e+IBI27sWrn3syjkZi6cmjcMvSjWVNP3ncr8RCJI0pf2YM+6UeJNfEsPnP8Q8KKmWbnK
-         L1Au+EuYL/XMB/bQk272JNmmJ8irST9bSY0g9SWUzby+DnNGdSL0vnheHw0RKZoRBhe7
-         ptpBhqWPYM8QgQAN3OiQ0EaYCQaFLn8ZvfqSMC56DFwiPCt3VPz4BRzQJ0jqVpEujn5F
-         /pOwSvuSFnF90nh0yXOif5Hf+0UfVswgeXrhFnxJEGOicxqCvXeB1/xpQf7awQYP2Jiv
-         7dFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JxMbv0bKZur8W2kgZao1ChaI90AFzrPU3hLq2OR4FJs=;
-        b=Hr0RaMIbs2QFay4r5tzHKhHwfmXnU8s2wcXlUTLjc9eFd6pn3lb2e3OjFZ2wVYcaqo
-         kA3hj6q/64aXwNBomMneakIVIfRR3Vcs1t5Sz6/SlGjlRW2HOIM+7w9dEKhHU8c9kwwk
-         RdzoyPrXKf7WXWh9Thwt3BKtHtUWXqchOrUX3r35rEZWPy+08EwSUlAAF9Pq+D/7HD2q
-         qUuT9bTl5eF2pzRUC9v5/AwVXnZx9YSxIUNkQIyIGV0f0ArTrU3lqLUXdF0N+dg+3Jue
-         rWGElYZALTr4WNBpTzZaQ1zX9JzDT7y+BrHMfQOSL1DphyAytC4lxtfFx8xOb16ipXFB
-         lYgA==
-X-Gm-Message-State: AOAM531UhrtFwALeyPlZBxHFHGJb4u0QOusyAQlDb54KwM9p/ivQ+sKK
-        3HKhGE9nTEd+H6xaBLF2CjmgygAgdjw7Zg==
-X-Google-Smtp-Source: ABdhPJy6F2wYauSNMevS7UB5eHpBDtBn8/bYNiKyb+RgxAP29/EHmvHXR5YxJmFnFYMhtWIhhY7Ahw==
-X-Received: by 2002:a63:c1e:: with SMTP id b30mr189963pgl.345.1600874345007;
-        Wed, 23 Sep 2020 08:19:05 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id f3sm242236pgf.32.2020.09.23.08.19.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 08:19:04 -0700 (PDT)
-Subject: Re: [PATCH] block: fix bmd->is_null_mapped initialization
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     mhartmay@linux.ibm.com, linux-block@vger.kernel.org
-References: <20200923150713.416286-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9fbcf981-7cbb-00d3-2534-2b9d597e22cb@kernel.dk>
-Date:   Wed, 23 Sep 2020 09:19:03 -0600
+        Wed, 23 Sep 2020 11:22:42 -0400
+X-Greylist: delayed 713 seconds by postgrey-1.27 at vger.kernel.org; Wed, 23 Sep 2020 11:22:39 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1600874558;
+        s=strato-dkim-0002; d=reintjes.nrw;
+        h=In-Reply-To:Date:Message-ID:From:References:Cc:To:Subject:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=R7hI6d/NmZuNcg1vUXN4expafaD5dS9k1NOlJgVsfQ0=;
+        b=mKq3yxzIBoK6eXKDjSaCRr3BwBIqpDKeJr75f5YQmPBPRRn9qdkRISKeudlw+eJUaN
+        i9j0YoD7Nd07ieGLh8UqSmYZ1Ccml4PGsZ2Mglopdz9Hz5rLCJkN670J1l7AKyk9w16x
+        a5x5cVcgZWQk6FXpa0G8mlW7WSJEKPFpozzrnE9Mqlay09jPyJDrOXyUKIYtt6nlhpnO
+        Iws66XTKRoaWIH3voDt0xHa2loKeKKkr2KuI9gRfjll43rW7LApn0Q1chdN5eLyO3daW
+        Z1KVrRhdU65Y8/6yfAJtnadI1+vhAkdCKhH0qGquacG5znElBXtRT3qPa76R5ygpIUbq
+        FhJQ==
+X-RZG-AUTH: ":IGUXYVP6Ne1lB7nQNv+YSUx4qaxF0YAcTeeZr8criwvl+4OoAsy1YB7b8FzONHo5ckdw3KGGkZZ/Zu8="
+X-RZG-CLASS-ID: mo00
+Received: from [192.168.0.198]
+        by smtp.strato.de (RZmta 46.10.7 DYNA|AUTH)
+        with ESMTPSA id Y04b60w8NFAYy22
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Wed, 23 Sep 2020 17:10:34 +0200 (CEST)
+Subject: Re: [PATCH 00/14] drop double zeroing
+To:     Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
+        Julia Lawall <Julia.Lawall@inria.fr>
+Cc:     linux-serial@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-block@vger.kernel.org,
+        Yossi Leybovich <sleybo@amazon.com>,
+        linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-rdma@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        rds-devel@oss.oracle.com
+References: <1600601186-7420-1-git-send-email-Julia.Lawall@inria.fr>
+ <160070750168.56292.17961674601916397869.b4-ty@kernel.org>
+From:   Rolf Reintjes <lists2.rolf@reintjes.nrw>
+Message-ID: <c3b33526-936d-ffa4-c301-4d0485822be1@reintjes.nrw>
+Date:   Wed, 23 Sep 2020 17:10:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200923150713.416286-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <160070750168.56292.17961674601916397869.b4-ty@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/23/20 9:07 AM, Christoph Hellwig wrote:
-> bmd is allocated using kmalloc in bio_alloc_map_data, so make sure
-> is_null_mapped is properly initialized to false for the !null_mapped
-> case.
+Hello Mark,
 
-Applied, thanks.
+On 21.09.20 18:58, Mark Brown wrote:
+> On Sun, 20 Sep 2020 13:26:12 +0200, Julia Lawall wrote:
+>> sg_init_table zeroes its first argument, so the allocation of that argument
+>> doesn't have to.
+> 
+> Applied to
+> 
+>     https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git for-next
+> 
+> Thanks!
 
--- 
-Jens Axboe
+I do not understand which of the 14 patches you applied. Your mail 
+responds to the 00/14 mail.
+
+Rolf
+
+> 
+> [1/1] spi/topcliff-pch: drop double zeroing
+>        commit: ca03dba30f2b8ff45a2972c6691e4c96d8c52b3b
+> 
+> All being well this means that it will be integrated into the linux-next
+> tree (usually sometime in the next 24 hours) and sent to Linus during
+> the next merge window (or sooner if it is a bug fix), however if
+> problems are discovered then the patch may be dropped or reverted.
+> 
+> You may get further e-mails resulting from automated or manual testing
+> and review of the tree, please engage with people reporting problems and
+> send followup patches addressing any issues that are reported if needed.
+> 
+> If any updates are required or you are submitting further changes they
+> should be sent as incremental updates against current git, existing
+> patches will not be replaced.
+> 
+> Please add any relevant lists and maintainers to the CCs when replying
+> to this mail.
+> 
+> Thanks,
+> Mark
+> 
 
