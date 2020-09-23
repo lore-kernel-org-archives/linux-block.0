@@ -2,318 +2,367 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9973C4727D
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 01:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66501C47425
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 06:06:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 842B0238A1
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 01:35:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 174E320739
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 06:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XwFCKdf/"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LSzmcHCG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727049AbgIWBfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Sep 2020 21:35:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50875 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727045AbgIWBfH (ORCPT
+        id S1726774AbgIWGGN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 02:06:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40814 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726752AbgIWGGH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Sep 2020 21:35:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600824905;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=roOG+1E/eqc6waohZKCYYe4Di6qKCKi4CaFIdS9glHw=;
-        b=XwFCKdf/7uQ8Gz/ynxoa+7LQunQlu9MskcPe0pBp/ZbRBdO7LlO9VEff0oSbEkt2P3kSLG
-        xYcYL5+IT6UDKPUL8g2XKSATIY5kF45814MH1vBXhnL4/VwNUcprVKmgyV5e+oQ/kj4OKy
-        oZ8VgJECcxdG2cIchPpCHA8kM4culaY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-vplUJUzhOaKu4-1QpoQNVw-1; Tue, 22 Sep 2020 21:35:00 -0400
-X-MC-Unique: vplUJUzhOaKu4-1QpoQNVw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1B1A80EF8C;
-        Wed, 23 Sep 2020 01:34:58 +0000 (UTC)
-Received: from localhost (ovpn-12-168.pek2.redhat.com [10.72.12.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3CEC310023A5;
-        Wed, 23 Sep 2020 01:34:54 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V3 for 5.11 12/12] scsi: replace sdev->device_busy with sbitmap
-Date:   Wed, 23 Sep 2020 09:33:39 +0800
-Message-Id: <20200923013339.1621784-13-ming.lei@redhat.com>
-In-Reply-To: <20200923013339.1621784-1-ming.lei@redhat.com>
-References: <20200923013339.1621784-1-ming.lei@redhat.com>
+        Wed, 23 Sep 2020 02:06:07 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42DB9C0613D4;
+        Tue, 22 Sep 2020 23:06:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=eYbWukmAQycX34XyKxavvEXuiIqEnCTZ/Qp+bmFekjs=; b=LSzmcHCG8vLc86FANTaqKkMcP9
+        rUaqV5+8gRBov8+UBZLLENrs8z2250GIauvkxoUvaIST6NzKCuNWiO8TM05jstF6fTS56mFq2Hinl
+        wcSks4RcRw5wQMIueprZKoWGUhC5bc9HkxYKNWIw38szF1N5NyyIcsEJPgIvtLNB7EvGb1V+q4Dkt
+        LrUGBUc++O8kOoL/I+4rZZqRfhtW9Fa6AoF44X8eJK5vnQDXFcmIraM4O3Qw7LmRs7AgmoBDhUz/E
+        DIrQZ9TL6b79ghKNWA7T05nTCvkeCkJcJHEDBUuLdscM0RLEODhtZuAJs/PTbThwe1QZupTmWvOYJ
+        kuUrOraA==;
+Received: from p4fdb0c34.dip0.t-ipconnect.de ([79.219.12.52] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kKxug-0003U1-3M; Wed, 23 Sep 2020 06:05:58 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Alexander Viro <viro@zeniv.linux.org.uk>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        David Laight <David.Laight@aculab.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-mm@kvack.org,
+        netdev@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH 6/9] fs: remove the compat readv/writev syscalls
+Date:   Wed, 23 Sep 2020 08:05:44 +0200
+Message-Id: <20200923060547.16903-7-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200923060547.16903-1-hch@lst.de>
+References: <20200923060547.16903-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-scsi requires one global atomic variable to track queue depth for each LUN/
-request queue, meantime blk-mq tracks queue depth for each hctx. This SCSI's
-requirement can't be implemented in blk-mq easily, cause it is a bigger &
-harder problem to spread the device or request queue's depth among all hw
-queues.
+Now that import_iovec handles compat iovecs, the native readv and writev
+syscalls can be used for the compat case as well.
 
-The current approach by using atomic variable can't scale well when there
-is lots of CPU cores and the disk is very fast and IO are submitted to this
-device concurrently. It has been observed that IOPS is affected a lot by
-tracking queue depth via sdev->device_busy in IO path.
-
-So replace the atomic variable sdev->device_busy with sbitmap for
-tracking scsi device queue depth.
-
-It is observed that IOPS is improved ~30% by this patchset in the
-following test:
-
-1) test machine(32 logical CPU cores)
-	Thread(s) per core:  2
-	Core(s) per socket:  8
-	Socket(s):           2
-	NUMA node(s):        2
-	Model name:          Intel(R) Xeon(R) Silver 4110 CPU @ 2.10GHz
-
-2) setup scsi_debug:
-modprobe scsi_debug virtual_gb=128 max_luns=1 submit_queues=32 delay=0 max_queue=256
-
-3) fio script:
-fio --rw=randread --size=128G --direct=1 --ioengine=libaio --iodepth=2048 \
-	--numjobs=32 --bs=4k --group_reporting=1 --group_reporting=1 --runtime=60 \
-	--loops=10000 --name=job1 --filename=/dev/sdN
-
-[1] https://lore.kernel.org/linux-block/20200119071432.18558-6-ming.lei@redhat.com/
-
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-Cc: Ewan D. Milne <emilne@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/scsi.c        |  2 ++
- drivers/scsi/scsi_lib.c    | 33 +++++++++++++++------------------
- drivers/scsi/scsi_priv.h   |  1 +
- drivers/scsi/scsi_scan.c   | 22 ++++++++++++++++++++--
- drivers/scsi/scsi_sysfs.c  |  2 ++
- include/scsi/scsi_device.h |  5 +++--
- 6 files changed, 43 insertions(+), 22 deletions(-)
+ arch/arm64/include/asm/unistd32.h                  |  4 ++--
+ arch/mips/kernel/syscalls/syscall_n32.tbl          |  4 ++--
+ arch/mips/kernel/syscalls/syscall_o32.tbl          |  4 ++--
+ arch/parisc/kernel/syscalls/syscall.tbl            |  4 ++--
+ arch/powerpc/kernel/syscalls/syscall.tbl           |  4 ++--
+ arch/s390/kernel/syscalls/syscall.tbl              |  4 ++--
+ arch/sparc/kernel/syscalls/syscall.tbl             |  4 ++--
+ arch/x86/entry/syscall_x32.c                       |  2 ++
+ arch/x86/entry/syscalls/syscall_32.tbl             |  4 ++--
+ arch/x86/entry/syscalls/syscall_64.tbl             |  4 ++--
+ fs/read_write.c                                    | 14 --------------
+ include/linux/compat.h                             |  4 ----
+ include/uapi/asm-generic/unistd.h                  |  4 ++--
+ tools/include/uapi/asm-generic/unistd.h            |  4 ++--
+ tools/perf/arch/powerpc/entry/syscalls/syscall.tbl |  4 ++--
+ tools/perf/arch/s390/entry/syscalls/syscall.tbl    |  4 ++--
+ tools/perf/arch/x86/entry/syscalls/syscall_64.tbl  |  4 ++--
+ 17 files changed, 30 insertions(+), 46 deletions(-)
 
-diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
-index cc6ff1ae8c16..d0d23d295260 100644
---- a/drivers/scsi/scsi.c
-+++ b/drivers/scsi/scsi.c
-@@ -233,6 +233,8 @@ int scsi_change_queue_depth(struct scsi_device *sdev, int depth)
- 	if (sdev->request_queue)
- 		blk_set_queue_depth(sdev->request_queue, depth);
- 
-+	sbitmap_resize(&sdev->budget_map, sdev->queue_depth);
-+
- 	return sdev->queue_depth;
- }
- EXPORT_SYMBOL(scsi_change_queue_depth);
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index e5b336847852..f16bf3118f9a 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -342,7 +342,7 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
- 	if (starget->can_queue > 0)
- 		atomic_dec(&starget->target_busy);
- 
--	atomic_dec(&sdev->device_busy);
-+	sbitmap_put(&sdev->budget_map, cmd->budget_token);
- 	cmd->budget_token = -1;
- }
- 
-@@ -1282,19 +1282,17 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
- }
- 
- /*
-- * scsi_dev_queue_ready: if we can send requests to sdev, return 1 else
-- * return 0.
-- *
-- * Called with the queue_lock held.
-+ * scsi_dev_queue_ready: if we can send requests to sdev, assign one token
-+ * and return the token else return -1.
+diff --git a/arch/arm64/include/asm/unistd32.h b/arch/arm64/include/asm/unistd32.h
+index 734860ac7cf9d5..4a236493dca5b9 100644
+--- a/arch/arm64/include/asm/unistd32.h
++++ b/arch/arm64/include/asm/unistd32.h
+@@ -301,9 +301,9 @@ __SYSCALL(__NR_flock, sys_flock)
+ #define __NR_msync 144
+ __SYSCALL(__NR_msync, sys_msync)
+ #define __NR_readv 145
+-__SYSCALL(__NR_readv, compat_sys_readv)
++__SYSCALL(__NR_readv, sys_readv)
+ #define __NR_writev 146
+-__SYSCALL(__NR_writev, compat_sys_writev)
++__SYSCALL(__NR_writev, sys_writev)
+ #define __NR_getsid 147
+ __SYSCALL(__NR_getsid, sys_getsid)
+ #define __NR_fdatasync 148
+diff --git a/arch/mips/kernel/syscalls/syscall_n32.tbl b/arch/mips/kernel/syscalls/syscall_n32.tbl
+index f9df9edb67a407..c99a92646f8ee9 100644
+--- a/arch/mips/kernel/syscalls/syscall_n32.tbl
++++ b/arch/mips/kernel/syscalls/syscall_n32.tbl
+@@ -25,8 +25,8 @@
+ 15	n32	ioctl				compat_sys_ioctl
+ 16	n32	pread64				sys_pread64
+ 17	n32	pwrite64			sys_pwrite64
+-18	n32	readv				compat_sys_readv
+-19	n32	writev				compat_sys_writev
++18	n32	readv				sys_readv
++19	n32	writev				sys_writev
+ 20	n32	access				sys_access
+ 21	n32	pipe				sysm_pipe
+ 22	n32	_newselect			compat_sys_select
+diff --git a/arch/mips/kernel/syscalls/syscall_o32.tbl b/arch/mips/kernel/syscalls/syscall_o32.tbl
+index 195b43cf27c848..075064d10661bf 100644
+--- a/arch/mips/kernel/syscalls/syscall_o32.tbl
++++ b/arch/mips/kernel/syscalls/syscall_o32.tbl
+@@ -156,8 +156,8 @@
+ 142	o32	_newselect			sys_select			compat_sys_select
+ 143	o32	flock				sys_flock
+ 144	o32	msync				sys_msync
+-145	o32	readv				sys_readv			compat_sys_readv
+-146	o32	writev				sys_writev			compat_sys_writev
++145	o32	readv				sys_readv
++146	o32	writev				sys_writev
+ 147	o32	cacheflush			sys_cacheflush
+ 148	o32	cachectl			sys_cachectl
+ 149	o32	sysmips				__sys_sysmips
+diff --git a/arch/parisc/kernel/syscalls/syscall.tbl b/arch/parisc/kernel/syscalls/syscall.tbl
+index def64d221cd4fb..192abde0001d9d 100644
+--- a/arch/parisc/kernel/syscalls/syscall.tbl
++++ b/arch/parisc/kernel/syscalls/syscall.tbl
+@@ -159,8 +159,8 @@
+ 142	common	_newselect		sys_select			compat_sys_select
+ 143	common	flock			sys_flock
+ 144	common	msync			sys_msync
+-145	common	readv			sys_readv			compat_sys_readv
+-146	common	writev			sys_writev			compat_sys_writev
++145	common	readv			sys_readv
++146	common	writev			sys_writev
+ 147	common	getsid			sys_getsid
+ 148	common	fdatasync		sys_fdatasync
+ 149	common	_sysctl			sys_ni_syscall
+diff --git a/arch/powerpc/kernel/syscalls/syscall.tbl b/arch/powerpc/kernel/syscalls/syscall.tbl
+index c2d737ff2e7bec..6f1e2ecf0edad9 100644
+--- a/arch/powerpc/kernel/syscalls/syscall.tbl
++++ b/arch/powerpc/kernel/syscalls/syscall.tbl
+@@ -193,8 +193,8 @@
+ 142	common	_newselect			sys_select			compat_sys_select
+ 143	common	flock				sys_flock
+ 144	common	msync				sys_msync
+-145	common	readv				sys_readv			compat_sys_readv
+-146	common	writev				sys_writev			compat_sys_writev
++145	common	readv				sys_readv
++146	common	writev				sys_writev
+ 147	common	getsid				sys_getsid
+ 148	common	fdatasync			sys_fdatasync
+ 149	nospu	_sysctl				sys_ni_syscall
+diff --git a/arch/s390/kernel/syscalls/syscall.tbl b/arch/s390/kernel/syscalls/syscall.tbl
+index 10456bc936fb09..6101cf2e004cb4 100644
+--- a/arch/s390/kernel/syscalls/syscall.tbl
++++ b/arch/s390/kernel/syscalls/syscall.tbl
+@@ -134,8 +134,8 @@
+ 142  64		select			sys_select			-
+ 143  common	flock			sys_flock			sys_flock
+ 144  common	msync			sys_msync			sys_msync
+-145  common	readv			sys_readv			compat_sys_readv
+-146  common	writev			sys_writev			compat_sys_writev
++145  common	readv			sys_readv			sys_readv
++146  common	writev			sys_writev			sys_writev
+ 147  common	getsid			sys_getsid			sys_getsid
+ 148  common	fdatasync		sys_fdatasync			sys_fdatasync
+ 149  common	_sysctl			-				-
+diff --git a/arch/sparc/kernel/syscalls/syscall.tbl b/arch/sparc/kernel/syscalls/syscall.tbl
+index 4af114e84f2022..a87ddb282ab16f 100644
+--- a/arch/sparc/kernel/syscalls/syscall.tbl
++++ b/arch/sparc/kernel/syscalls/syscall.tbl
+@@ -149,8 +149,8 @@
+ 117	common	getrusage		sys_getrusage			compat_sys_getrusage
+ 118	common	getsockopt		sys_getsockopt			sys_getsockopt
+ 119	common	getcwd			sys_getcwd
+-120	common	readv			sys_readv			compat_sys_readv
+-121	common	writev			sys_writev			compat_sys_writev
++120	common	readv			sys_readv
++121	common	writev			sys_writev
+ 122	common	settimeofday		sys_settimeofday		compat_sys_settimeofday
+ 123	32	fchown			sys_fchown16
+ 123	64	fchown			sys_fchown
+diff --git a/arch/x86/entry/syscall_x32.c b/arch/x86/entry/syscall_x32.c
+index 1583831f61a9df..aa321444a41f63 100644
+--- a/arch/x86/entry/syscall_x32.c
++++ b/arch/x86/entry/syscall_x32.c
+@@ -12,6 +12,8 @@
+  * Reuse the 64-bit entry points for the x32 versions that occupy different
+  * slots in the syscall table.
   */
- static inline int scsi_dev_queue_ready(struct request_queue *q,
- 				  struct scsi_device *sdev)
- {
--	unsigned int busy;
-+	int token;
++#define __x32_sys_readv		__x64_sys_readv
++#define __x32_sys_writev	__x64_sys_writev
+ #define __x32_sys_getsockopt	__x64_sys_getsockopt
+ #define __x32_sys_setsockopt	__x64_sys_setsockopt
  
--	busy = atomic_inc_return(&sdev->device_busy) - 1;
-+	token = sbitmap_get(&sdev->budget_map);
- 	if (atomic_read(&sdev->device_blocked)) {
--		if (busy)
-+		if (token >= 0)
- 			goto out_dec;
- 
- 		/*
-@@ -1306,13 +1304,11 @@ static inline int scsi_dev_queue_ready(struct request_queue *q,
- 				   "unblocking device at zero depth\n"));
- 	}
- 
--	if (busy >= sdev->queue_depth)
--		goto out_dec;
+diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
+index 9d11028736661b..54ab4beb517f25 100644
+--- a/arch/x86/entry/syscalls/syscall_32.tbl
++++ b/arch/x86/entry/syscalls/syscall_32.tbl
+@@ -156,8 +156,8 @@
+ 142	i386	_newselect		sys_select			compat_sys_select
+ 143	i386	flock			sys_flock
+ 144	i386	msync			sys_msync
+-145	i386	readv			sys_readv			compat_sys_readv
+-146	i386	writev			sys_writev			compat_sys_writev
++145	i386	readv			sys_readv
++146	i386	writev			sys_writev
+ 147	i386	getsid			sys_getsid
+ 148	i386	fdatasync		sys_fdatasync
+ 149	i386	_sysctl			sys_ni_syscall
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index f30d6ae9a6883c..b1e59957c5c51c 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -371,8 +371,8 @@
+ 512	x32	rt_sigaction		compat_sys_rt_sigaction
+ 513	x32	rt_sigreturn		compat_sys_x32_rt_sigreturn
+ 514	x32	ioctl			compat_sys_ioctl
+-515	x32	readv			compat_sys_readv
+-516	x32	writev			compat_sys_writev
++515	x32	readv			sys_readv
++516	x32	writev			sys_writev
+ 517	x32	recvfrom		compat_sys_recvfrom
+ 518	x32	sendmsg			compat_sys_sendmsg
+ 519	x32	recvmsg			compat_sys_recvmsg
+diff --git a/fs/read_write.c b/fs/read_write.c
+index eab427b7cc0a3f..6c13f744c34a38 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -1074,13 +1074,6 @@ SYSCALL_DEFINE6(pwritev2, unsigned long, fd, const struct iovec __user *, vec,
+  * in_compat_syscall().
+  */
+ #ifdef CONFIG_COMPAT
+-COMPAT_SYSCALL_DEFINE3(readv, compat_ulong_t, fd,
+-		const struct iovec __user *, vec,
+-		compat_ulong_t, vlen)
+-{
+-	return do_readv(fd, vec, vlen, 0);
+-}
 -
--	return 1;
-+	return token;
- out_dec:
--	atomic_dec(&sdev->device_busy);
--	return 0;
-+	if (token >= 0)
-+		sbitmap_put(&sdev->budget_map, token);
-+	return -1;
+ #ifdef __ARCH_WANT_COMPAT_SYS_PREADV64
+ COMPAT_SYSCALL_DEFINE4(preadv64, unsigned long, fd,
+ 		const struct iovec __user *, vec,
+@@ -1122,13 +1115,6 @@ COMPAT_SYSCALL_DEFINE6(preadv2, compat_ulong_t, fd,
+ 	return do_preadv(fd, vec, vlen, pos, flags);
  }
  
- /*
-@@ -1625,15 +1621,16 @@ static void scsi_mq_put_budget(struct request_queue *q, int budget_token)
- {
- 	struct scsi_device *sdev = q->queuedata;
+-COMPAT_SYSCALL_DEFINE3(writev, compat_ulong_t, fd,
+-		const struct iovec __user *, vec,
+-		compat_ulong_t, vlen)
+-{
+-	return do_writev(fd, vec, vlen, 0);
+-}
+-
+ #ifdef __ARCH_WANT_COMPAT_SYS_PWRITEV64
+ COMPAT_SYSCALL_DEFINE4(pwritev64, unsigned long, fd,
+ 		const struct iovec __user *, vec,
+diff --git a/include/linux/compat.h b/include/linux/compat.h
+index b930de791ff16b..fa39b7a5488d70 100644
+--- a/include/linux/compat.h
++++ b/include/linux/compat.h
+@@ -545,10 +545,6 @@ asmlinkage long compat_sys_getdents(unsigned int fd,
  
--	atomic_dec(&sdev->device_busy);
-+	sbitmap_put(&sdev->budget_map, budget_token);
- }
- 
- static int scsi_mq_get_budget(struct request_queue *q)
- {
- 	struct scsi_device *sdev = q->queuedata;
-+	int token = scsi_dev_queue_ready(q, sdev);
- 
--	if (scsi_dev_queue_ready(q, sdev))
--		return 0;
-+	if (token >= 0)
-+		return token;
- 
- 	atomic_inc(&sdev->restarts);
- 
-@@ -1742,7 +1739,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		break;
- 	case BLK_STS_RESOURCE:
- 	case BLK_STS_ZONE_RESOURCE:
--		if (atomic_read(&sdev->device_busy) ||
-+		if (sbitmap_any_bit_set(&sdev->budget_map) ||
- 		    scsi_device_blocked(sdev))
- 			ret = BLK_STS_DEV_RESOURCE;
- 		break;
-diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
-index d12ada035961..69145a50a5fa 100644
---- a/drivers/scsi/scsi_priv.h
-+++ b/drivers/scsi/scsi_priv.h
-@@ -5,6 +5,7 @@
- #include <linux/device.h>
- #include <linux/async.h>
- #include <scsi/scsi_device.h>
-+#include <linux/sbitmap.h>
- 
- struct request_queue;
- struct request;
-diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-index f2437a7570ce..f674a6ee0a7d 100644
---- a/drivers/scsi/scsi_scan.c
-+++ b/drivers/scsi/scsi_scan.c
-@@ -215,6 +215,7 @@ static void scsi_unlock_floptical(struct scsi_device *sdev,
- static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
- 					   u64 lun, void *hostdata)
- {
-+	unsigned int depth;
- 	struct scsi_device *sdev;
- 	int display_failure_msg = 1, ret;
- 	struct Scsi_Host *shost = dev_to_shost(starget->dev.parent);
-@@ -276,8 +277,24 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
- 	WARN_ON_ONCE(!blk_get_queue(sdev->request_queue));
- 	sdev->request_queue->queuedata = sdev;
- 
--	scsi_change_queue_depth(sdev, sdev->host->cmd_per_lun ?
--					sdev->host->cmd_per_lun : 1);
-+	depth = sdev->host->cmd_per_lun ?: 1;
-+
-+	/*
-+	 * Use .can_queue as budget map's depth because we have to
-+	 * support adjusting queue depth from sysfs. Meantime use
-+	 * default device queue depth to figure out sbitmap shift
-+	 * since we use this queue depth most of times.
-+	 */
-+	if (sbitmap_init_node(&sdev->budget_map, sdev->host->can_queue,
-+				sbitmap_calculate_shift(depth),
-+				GFP_KERNEL, sdev->request_queue->node,
-+				false, true)) {
-+		put_device(&starget->dev);
-+		kfree(sdev);
-+		goto out;
-+	}
-+
-+	scsi_change_queue_depth(sdev, depth);
- 
- 	scsi_sysfs_device_initialize(sdev);
- 
-@@ -979,6 +996,7 @@ static int scsi_add_lun(struct scsi_device *sdev, unsigned char *inq_result,
- 		scsi_attach_vpd(sdev);
- 
- 	sdev->max_queue_depth = sdev->queue_depth;
-+	WARN_ON_ONCE(sdev->max_queue_depth > sdev->budget_map.depth);
- 	sdev->sdev_bflags = *bflags;
- 
- 	/*
-diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-index 6a51827a4e81..396b0307d979 100644
---- a/drivers/scsi/scsi_sysfs.c
-+++ b/drivers/scsi/scsi_sysfs.c
-@@ -466,6 +466,8 @@ static void scsi_device_dev_release_usercontext(struct work_struct *work)
- 	/* NULL queue means the device can't be used */
- 	sdev->request_queue = NULL;
- 
-+	sbitmap_free(&sdev->budget_map);
-+
- 	mutex_lock(&sdev->inquiry_mutex);
- 	vpd_pg0 = rcu_replace_pointer(sdev->vpd_pg0, vpd_pg0,
- 				       lockdep_is_held(&sdev->inquiry_mutex));
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index dd0b9f690a26..05c7c320ef32 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -8,6 +8,7 @@
- #include <linux/blkdev.h>
- #include <scsi/scsi.h>
- #include <linux/atomic.h>
-+#include <linux/sbitmap.h>
- 
- struct device;
- struct request_queue;
-@@ -106,7 +107,7 @@ struct scsi_device {
- 	struct list_head    siblings;   /* list of all devices on this host */
- 	struct list_head    same_target_siblings; /* just the devices sharing same target id */
- 
--	atomic_t device_busy;		/* commands actually active on LLDD */
-+	struct sbitmap budget_map;
- 	atomic_t device_blocked;	/* Device returned QUEUE_FULL. */
- 
- 	atomic_t restarts;
-@@ -592,7 +593,7 @@ static inline int scsi_device_supports_vpd(struct scsi_device *sdev)
- 
- static inline int scsi_device_busy(struct scsi_device *sdev)
- {
--	return atomic_read(&sdev->device_busy);
-+	return sbitmap_weight(&sdev->budget_map);
- }
- 
- #define MODULE_ALIAS_SCSI_DEVICE(type) \
+ /* fs/read_write.c */
+ asmlinkage long compat_sys_lseek(unsigned int, compat_off_t, unsigned int);
+-asmlinkage ssize_t compat_sys_readv(compat_ulong_t fd,
+-		const struct compat_iovec __user *vec, compat_ulong_t vlen);
+-asmlinkage ssize_t compat_sys_writev(compat_ulong_t fd,
+-		const struct compat_iovec __user *vec, compat_ulong_t vlen);
+ /* No generic prototype for pread64 and pwrite64 */
+ asmlinkage ssize_t compat_sys_preadv(compat_ulong_t fd,
+ 		const struct compat_iovec __user *vec,
+diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
+index 995b36c2ea7d8a..211c9eacbda6eb 100644
+--- a/include/uapi/asm-generic/unistd.h
++++ b/include/uapi/asm-generic/unistd.h
+@@ -207,9 +207,9 @@ __SYSCALL(__NR_read, sys_read)
+ #define __NR_write 64
+ __SYSCALL(__NR_write, sys_write)
+ #define __NR_readv 65
+-__SC_COMP(__NR_readv, sys_readv, compat_sys_readv)
++__SC_COMP(__NR_readv, sys_readv, sys_readv)
+ #define __NR_writev 66
+-__SC_COMP(__NR_writev, sys_writev, compat_sys_writev)
++__SC_COMP(__NR_writev, sys_writev, sys_writev)
+ #define __NR_pread64 67
+ __SC_COMP(__NR_pread64, sys_pread64, compat_sys_pread64)
+ #define __NR_pwrite64 68
+diff --git a/tools/include/uapi/asm-generic/unistd.h b/tools/include/uapi/asm-generic/unistd.h
+index 995b36c2ea7d8a..211c9eacbda6eb 100644
+--- a/tools/include/uapi/asm-generic/unistd.h
++++ b/tools/include/uapi/asm-generic/unistd.h
+@@ -207,9 +207,9 @@ __SYSCALL(__NR_read, sys_read)
+ #define __NR_write 64
+ __SYSCALL(__NR_write, sys_write)
+ #define __NR_readv 65
+-__SC_COMP(__NR_readv, sys_readv, compat_sys_readv)
++__SC_COMP(__NR_readv, sys_readv, sys_readv)
+ #define __NR_writev 66
+-__SC_COMP(__NR_writev, sys_writev, compat_sys_writev)
++__SC_COMP(__NR_writev, sys_writev, sys_writev)
+ #define __NR_pread64 67
+ __SC_COMP(__NR_pread64, sys_pread64, compat_sys_pread64)
+ #define __NR_pwrite64 68
+diff --git a/tools/perf/arch/powerpc/entry/syscalls/syscall.tbl b/tools/perf/arch/powerpc/entry/syscalls/syscall.tbl
+index 3ca6fe057a0b1f..46be68029587f9 100644
+--- a/tools/perf/arch/powerpc/entry/syscalls/syscall.tbl
++++ b/tools/perf/arch/powerpc/entry/syscalls/syscall.tbl
+@@ -189,8 +189,8 @@
+ 142	common	_newselect			sys_select			compat_sys_select
+ 143	common	flock				sys_flock
+ 144	common	msync				sys_msync
+-145	common	readv				sys_readv			compat_sys_readv
+-146	common	writev				sys_writev			compat_sys_writev
++145	common	readv				sys_readv
++146	common	writev				sys_writev
+ 147	common	getsid				sys_getsid
+ 148	common	fdatasync			sys_fdatasync
+ 149	nospu	_sysctl				sys_ni_syscall
+diff --git a/tools/perf/arch/s390/entry/syscalls/syscall.tbl b/tools/perf/arch/s390/entry/syscalls/syscall.tbl
+index 6a0bbea225db0d..fb5e61ce9d5838 100644
+--- a/tools/perf/arch/s390/entry/syscalls/syscall.tbl
++++ b/tools/perf/arch/s390/entry/syscalls/syscall.tbl
+@@ -134,8 +134,8 @@
+ 142  64		select			sys_select			-
+ 143  common	flock			sys_flock			sys_flock
+ 144  common	msync			sys_msync			compat_sys_msync
+-145  common	readv			sys_readv			compat_sys_readv
+-146  common	writev			sys_writev			compat_sys_writev
++145  common	readv			sys_readv
++146  common	writev			sys_writev
+ 147  common	getsid			sys_getsid			sys_getsid
+ 148  common	fdatasync		sys_fdatasync			sys_fdatasync
+ 149  common	_sysctl			-				-
+diff --git a/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl b/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
+index f30d6ae9a6883c..b1e59957c5c51c 100644
+--- a/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -371,8 +371,8 @@
+ 512	x32	rt_sigaction		compat_sys_rt_sigaction
+ 513	x32	rt_sigreturn		compat_sys_x32_rt_sigreturn
+ 514	x32	ioctl			compat_sys_ioctl
+-515	x32	readv			compat_sys_readv
+-516	x32	writev			compat_sys_writev
++515	x32	readv			sys_readv
++516	x32	writev			sys_writev
+ 517	x32	recvfrom		compat_sys_recvfrom
+ 518	x32	sendmsg			compat_sys_sendmsg
+ 519	x32	recvmsg			compat_sys_recvmsg
 -- 
-2.25.2
+2.28.0
 
