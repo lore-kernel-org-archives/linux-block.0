@@ -2,99 +2,105 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 050F4C2D0A8
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 16:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A596AC4727D
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 16:38:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EA30208E4
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 16:38:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="appXkNzP"
+	by mail.kernel.org (Postfix) with ESMTP id 78C41208E4
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 16:38:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726381AbgIWQi3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 12:38:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53286 "EHLO
+        id S1726572AbgIWQin (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 12:38:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbgIWQi2 (ORCPT
+        with ESMTP id S1726419AbgIWQin (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 12:38:28 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA46AC0613CE
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 09:38:28 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id z18so28561pfg.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 09:38:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vq5QEJTZb/1RH43/N7JqAL2lDhT92d3iZlvsTjPK+o4=;
-        b=appXkNzPIJlso3EN8c3hpX3MeyK8Zn5VFyYdIQNPfJy8P7MYfheVC0wfTbOTCoCp5k
-         MpfDm+0UVvSJkhQbs5IctYhMsf7UCGjDRlKu4SOpzSEa5RXh+0Je3oSptmc70I12ZAqA
-         XUzPBS5OHBftVtb+/ZJ16Gh9u4g9x7vprK7W3aphD223UGcFwkpkMoZ51tyj4qPdbwmo
-         bITG9cJQfKiHfSe6e/ebGNuLuM1AHkw+MUCIMyB4Jt9OjfX2d/bd/yS/44WrRzUUTvOm
-         jQ08fRAXX5BS18BXaxYS6gV2GeAs7fVG+buPKwmYAA3TjbgKawMhi5aeYzd1X22wR0ZG
-         7feQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vq5QEJTZb/1RH43/N7JqAL2lDhT92d3iZlvsTjPK+o4=;
-        b=S8IWKgLhdtzRB5jKcxFfRtCNSowswvuCluEjYK2BsPkYWowzTGFv2LgoiQw6hB994M
-         w6c+NL3LFF6C9XvMY6VNs+0xRsWws2N9qPrIqj2Og0d3j4+aEZ8eezXxegMdHds6K+NY
-         sEc8baiD20NgSb4guWKZUeU6gYZF3QLMYoxrCLtTRcbjCher0uqr27uSTCBbBj4LA0Uf
-         r5f3bvo1QYLKA1rhKny2RFbQpD/rxQOKhRAmqaK7IYC/rrV36ivJvNbZKz8POOJ/MI7t
-         EE2fvlyVCDuJloNDVklrZNIX8vAInAeLLpmZ9Se52VAg6qFwjBGuEOZ55vzGql54YVvn
-         dP1Q==
-X-Gm-Message-State: AOAM533mfKEcpZdxxTe5bi8CStA+rdmDOTigyGJCjds0de/dcP6W2S0E
-        +FWmgz5UuvehSb48qMgni6RLqbBHSGhmvQ==
-X-Google-Smtp-Source: ABdhPJzPyvcRrFapP4Pc8Inl/z95tkGtouO+7e2AlRhXiuH9O8dzDK2TbVvj6LfzAtXmHQyrSwJWLQ==
-X-Received: by 2002:a62:6044:0:b029:151:1a04:895 with SMTP id u65-20020a6260440000b02901511a040895mr721835pfb.34.1600879107970;
-        Wed, 23 Sep 2020 09:38:27 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id y6sm120224pjl.9.2020.09.23.09.38.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 09:38:27 -0700 (PDT)
-Subject: Re: [PATCH v3 0/6] dm: fix then improve bio splitting
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Vijayendra Suman <vijayendra.suman@oracle.com>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org
-References: <20200922023251.47712-1-snitzer@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <bc988bfa-5f81-3d04-82e8-489943143355@kernel.dk>
-Date:   Wed, 23 Sep 2020 10:38:26 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 23 Sep 2020 12:38:43 -0400
+Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C33F6C0613CE;
+        Wed, 23 Sep 2020 09:38:42 -0700 (PDT)
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kL7mp-004f4D-Mx; Wed, 23 Sep 2020 16:38:31 +0000
+Date:   Wed, 23 Sep 2020 17:38:31 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        David Laight <David.Laight@aculab.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-mm@kvack.org,
+        netdev@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH 5/9] fs: remove various compat readv/writev helpers
+Message-ID: <20200923163831.GO3421308@ZenIV.linux.org.uk>
+References: <20200923060547.16903-1-hch@lst.de>
+ <20200923060547.16903-6-hch@lst.de>
+ <20200923142549.GK3421308@ZenIV.linux.org.uk>
+ <20200923143251.GA14062@lst.de>
+ <20200923145901.GN3421308@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20200922023251.47712-1-snitzer@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200923145901.GN3421308@ZenIV.linux.org.uk>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/21/20 8:32 PM, Mike Snitzer wrote:
-> Hi,
-> 
-> Patches 1 and 2 are queued for me to send to Linus later this week.
-> 
-> Patches 3 and 4 are block core and should get picked up for 5.10.
-> Jens, please pick them up. I revised the header for patch 4 to give
-> better context for use-case where non power-of-2 chunk_sectors
-> occurs. Patch 4 enables DM to switch to using blk_max_size_offset() in
-> Patch 6.
-> 
-> Patches 5 and 6 just show how DM will be enhanced for 5.10 once
-> patches 3 and 4 land in the block tree.
+On Wed, Sep 23, 2020 at 03:59:01PM +0100, Al Viro wrote:
 
-Applied 3-4 for 5.10, thanks.
+> > That's a very good question.  But it does not just compile but actually
+> > works.  Probably because all the syscall wrappers mean that we don't
+> > actually generate the normal names.  I just tried this:
+> > 
+> > --- a/include/linux/syscalls.h
+> > +++ b/include/linux/syscalls.h
+> > @@ -468,7 +468,7 @@ asmlinkage long sys_lseek(unsigned int fd, off_t offset,
+> >  asmlinkage long sys_read(unsigned int fd, char __user *buf, size_t count);
+> >  asmlinkage long sys_write(unsigned int fd, const char __user *buf,
+> >                             size_t count);
+> > -asmlinkage long sys_readv(unsigned long fd,
+> > +asmlinkage long sys_readv(void *fd,
+> > 
+> > for fun, and the compiler doesn't care either..
+> 
+> Try to build it for sparc or ppc...
 
--- 
-Jens Axboe
+FWIW, declarations in syscalls.h used to serve 4 purposes:
+	1) syscall table initializers needed symbols declared
+	2) direct calls needed the same
+	3) catching mismatches between the declarations and definitions
+	4) centralized list of all syscalls
 
+(2) has been (thankfully) reduced for some time; in any case, ksys_... is
+used for the remaining ones.
+
+(1) and (3) are served by syscalls.h in architectures other than x86, arm64
+and s390.  On those 3 (1) is done otherwise (near the syscall table initializer)
+and (3) is not done at all.
+
+I wonder if we should do something like
+
+SYSCALL_DECLARE3(readv, unsigned long, fd, const struct iovec __user *, vec,
+		 unsigned long, vlen);
+in syscalls.h instead, and not under that ifdef.
+
+Let it expand to declaration of sys_...() in generic case and, on x86, into
+__do_sys_...() and __ia32_sys_...()/__x64_sys_...(), with types matching
+what SYSCALL_DEFINE ends up using.
+
+Similar macro would cover compat_sys_...() declarations.  That would
+restore mismatch checking for x86 and friends.  AFAICS, the cost wouldn't
+be terribly high - cpp would have more to chew through in syscalls.h,
+but it shouldn't be all that costly.  Famous last words, of course...
+
+Does anybody see fundamental problems with that?
