@@ -2,69 +2,100 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3621FC4363D
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 456D2C4363D
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:17:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F396A21D43
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:16:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7ADC2075B
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:17:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600874245;
+	bh=/QQofHRADGAYxOtJIce3d38QkMvme+6u661AK0sTIww=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=hLpg/2SKdGWjYkPgUClQVnG6PxEcFgq30YKu01GnRRahSy4tvk8MF8kf2+mL2t/Rh
+	 ijFAkHY/4g/iQzKGwRI5Z2sXVBaA0u8lo4tvpDhcPLkJQJJ1385tuE6AAsuSQdXBWk
+	 1fr9iIEQ7VKOuXvJdM2KAuIoh8HS9Se9UHlNCujw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726647AbgIWPQS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 11:16:18 -0400
-Received: from verein.lst.de ([213.95.11.211]:48859 "EHLO verein.lst.de"
+        id S1726864AbgIWPRQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 11:17:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60766 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726518AbgIWPQN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 11:16:13 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id D31FF6736F; Wed, 23 Sep 2020 17:16:06 +0200 (CEST)
-Date:   Wed, 23 Sep 2020 17:16:06 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Song Liu <song@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Coly Li <colyli@suse.de>, Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Justin Sanders <justin@coraid.com>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, cgroups@vger.kernel.org,
-        David Sterba <dsterba@suse.com>
-Subject: Re: [PATCH 05/13] bdi: initialize ->ra_pages and ->io_pages in
- bdi_init
-Message-ID: <20200923151606.GB16073@lst.de>
-References: <20200921080734.452759-1-hch@lst.de> <20200921080734.452759-6-hch@lst.de> <20200922084954.GC16464@quack2.suse.cz>
+        id S1726156AbgIWPRP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Sep 2020 11:17:15 -0400
+Received: from localhost (fw-tnat.cambridge.arm.com [217.140.96.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6077C2075B;
+        Wed, 23 Sep 2020 15:17:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600874234;
+        bh=/QQofHRADGAYxOtJIce3d38QkMvme+6u661AK0sTIww=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qaL+99AxNSM+PUkApT/4Pupcbe3cWXnIOAQs/ZT35oiBfgpa53MHX/m6TMpBock3a
+         fQSnODIgnUVdnSkWJ0pBplNyHoTqkHuo7hhaFUgOEQ4u+Awe/y3f+CYmaRRBSsJrRv
+         ycipz9I2nQvfISAkNRMDRLNIxu8SAq09SP1ymhKs=
+Date:   Wed, 23 Sep 2020 16:16:20 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Rolf Reintjes <lists2.rolf@reintjes.nrw>
+Cc:     linux-spi@vger.kernel.org, Julia Lawall <Julia.Lawall@inria.fr>,
+        linux-serial@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-block@vger.kernel.org,
+        Yossi Leybovich <sleybo@amazon.com>,
+        linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-rdma@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        rds-devel@oss.oracle.com
+Subject: Re: [PATCH 00/14] drop double zeroing
+Message-ID: <20200923151620.GC5707@sirena.org.uk>
+References: <1600601186-7420-1-git-send-email-Julia.Lawall@inria.fr>
+ <160070750168.56292.17961674601916397869.b4-ty@kernel.org>
+ <c3b33526-936d-ffa4-c301-4d0485822be1@reintjes.nrw>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="NU0Ex4SbNnrxsi6C"
 Content-Disposition: inline
-In-Reply-To: <20200922084954.GC16464@quack2.suse.cz>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <c3b33526-936d-ffa4-c301-4d0485822be1@reintjes.nrw>
+X-Cookie: This report is filled with omissions.
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 22, 2020 at 10:49:54AM +0200, Jan Kara wrote:
-> On Mon 21-09-20 10:07:26, Christoph Hellwig wrote:
-> > Set up a readahead size by default, as very few users have a good
-> > reason to change it.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > Acked-by: David Sterba <dsterba@suse.com> [btrfs]
-> > Acked-by: Richard Weinberger <richard@nod.at> [ubifs, mtd]
-> 
-> The patch looks good to me. You can add:
-> 
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> 
-> I'd just prefer if the changelog explicitely mentioned that this patch
-> results in enabling readahead for coda, ecryptfs, and orangefs... Just in
-> case someone bisects some issue down to this patch :).
 
-Ok, I've updated the changelog.
+--NU0Ex4SbNnrxsi6C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Wed, Sep 23, 2020 at 05:10:33PM +0200, Rolf Reintjes wrote:
+> On 21.09.20 18:58, Mark Brown wrote:
+
+> I do not understand which of the 14 patches you applied. Your mail responds
+> to the 00/14 mail.
+
+As the mail you're replying to says:
+
+> > [1/1] spi/topcliff-pch: drop double zeroing
+> >        commit: ca03dba30f2b8ff45a2972c6691e4c96d8c52b3b
+
+--NU0Ex4SbNnrxsi6C
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl9rZsMACgkQJNaLcl1U
+h9AxAgf/UlZBlBEQmArmMghyqM+HNmgNqZcFWWNnNQSmBBrgl8128+pLwAgIeZLw
+0l6J3hL0JAr1ozAMpm1RGS/xj2CD8a6QFiRw+9wAgL9eY3DAdognRwtwLJlW6zq3
+nj2VF+7+R6LhZGxqub8TnxUZLSdlop3wn9ZuAnTRZjjhPq2iidr4iYPWYsGqo+j5
+svVy+eYILC3/Y6X31PpT2OXujQXkrrCGlONZz2ieOMTLSLNQhL8pZh8tkJB9s/F5
+U60+SPDeI7yrVh6k5/iCldI5JHQyjXAmHza4R6BzKTc6kgSDvUlzrVOZxw1aaGy+
+EFLE4qdwQYEPaeRMZ+XVpSUbf3dGUw==
+=Rrao
+-----END PGP SIGNATURE-----
+
+--NU0Ex4SbNnrxsi6C--
