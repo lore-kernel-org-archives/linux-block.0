@@ -2,167 +2,108 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FABC2D0A8
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 20:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB4D9C4727E
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 21:30:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A76E02376F
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 20:08:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nDpnjPAZ"
+	by mail.kernel.org (Postfix) with ESMTP id A72F921D43
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 21:30:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbgIWUIO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 16:08:14 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:36272 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726199AbgIWUIN (ORCPT
+        id S1726684AbgIWVaf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 17:30:35 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:32576 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726460AbgIWVaa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 16:08:13 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08NK5MeX162814;
-        Wed, 23 Sep 2020 20:08:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=+bF0Y3pJwQVU206msgY0xGA4jeQnQf6Jy5Yw7gSqLJg=;
- b=nDpnjPAZ4irr7f9Pomk4/IlIzLCGNqLrYrAIa5nEetyA6SdyH15WtYIkVfA9xZIIjTtU
- xtLKV+oUfhvmO6sdyC0CLq+hweMxtS2sUBdEXV/uleNyVfK2V+MPkuR1o5BkSqAm7+bO
- vVGQfRm5wUoVmBNcYEkKfXYKY5kueUMIwTgB9tBwrjQbID4wPHh6iob5lqmIQ4bqoNEp
- /2h4NQ4dWpWvCre/eTlbpuz12YJq/dkhcXetwbdsqypM48T8ZQMagOfpahQJSxymFNgY
- UcjX1DKPdtrbQASefbu2AOdZqatLKcKtgsjkffmRR97kki18YqXDJZaZvLNIkb9RJeD0 Yg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 33q5rgjxu0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 23 Sep 2020 20:08:05 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08NK67LD055477;
-        Wed, 23 Sep 2020 20:08:05 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 33r28w39s2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Sep 2020 20:08:04 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08NK831j014560;
-        Wed, 23 Sep 2020 20:08:03 GMT
-Received: from char.us.oracle.com (/10.152.32.25)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 23 Sep 2020 13:08:03 -0700
-Received: by char.us.oracle.com (Postfix, from userid 1000)
-        id C365A6A0109; Wed, 23 Sep 2020 16:09:30 -0400 (EDT)
-Date:   Wed, 23 Sep 2020 16:09:30 -0400
-From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To:     SeongJae Park <sjpark@amazon.com>
-Cc:     roger.pau@citrix.com, SeongJae Park <sjpark@amazon.de>,
-        axboe@kernel.dk, aliguori@amazon.com, amit@kernel.org,
-        mheyne@amazon.de, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] xen-blkback: add a parameter for disabling of persistent
- grants
-Message-ID: <20200923200930.GB11767@char.us.oracle.com>
-References: <20200922070125.27251-1-sjpark@amazon.com>
+        Wed, 23 Sep 2020 17:30:30 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-222-k0JZSzTkPJOZPjS-rTcoJw-1; Wed, 23 Sep 2020 22:30:26 +0100
+X-MC-Unique: k0JZSzTkPJOZPjS-rTcoJw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Wed, 23 Sep 2020 22:30:25 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Wed, 23 Sep 2020 22:30:25 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Arnd Bergmann' <arnd@arndb.de>, Al Viro <viro@zeniv.linux.org.uk>
+CC:     Christoph Hellwig <hch@lst.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        David Howells <dhowells@redhat.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+        linux-aio <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        Networking <netdev@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>
+Subject: RE: [PATCH 5/9] fs: remove various compat readv/writev helpers
+Thread-Topic: [PATCH 5/9] fs: remove various compat readv/writev helpers
+Thread-Index: AQHWkdnPrERbulCBlEyrFz5+sRsKWql2urog
+Date:   Wed, 23 Sep 2020 21:30:25 +0000
+Message-ID: <2e11ea867c644c5d96f8e4930e5c730d@AcuMS.aculab.com>
+References: <20200923060547.16903-1-hch@lst.de>
+ <20200923060547.16903-6-hch@lst.de>
+ <20200923142549.GK3421308@ZenIV.linux.org.uk> <20200923143251.GA14062@lst.de>
+ <20200923145901.GN3421308@ZenIV.linux.org.uk>
+ <20200923163831.GO3421308@ZenIV.linux.org.uk>
+ <CAK8P3a3nkLUOkR+jwz2_2LcYTUTqdVf8JOtZqKWbtEDotNhFZA@mail.gmail.com>
+In-Reply-To: <CAK8P3a3nkLUOkR+jwz2_2LcYTUTqdVf8JOtZqKWbtEDotNhFZA@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200922070125.27251-1-sjpark@amazon.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
- suspectscore=0 adultscore=0 bulkscore=0 malwarescore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009230150
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 impostorscore=0
- clxscore=1011 suspectscore=0 phishscore=0 malwarescore=0
- priorityscore=1501 mlxlogscore=999 adultscore=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009230150
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 22, 2020 at 09:01:25AM +0200, SeongJae Park wrote:
-> From: SeongJae Park <sjpark@amazon.de>
-> 
-> Persistent grants feature provides high scalability.  On some small
-> systems, however, it could incur data copy overhead[1] and thus it is
-> required to be disabled.  But, there is no option to disable it.  For
-> the reason, this commit adds a module parameter for disabling of the
-> feature.
+RnJvbTogQXJuZCBCZXJnbWFubg0KPiBTZW50OiAyMyBTZXB0ZW1iZXIgMjAyMCAxOTo0Ng0KLi4u
+DQo+IFJlZ2FyZGxlc3Mgb2YgdGhhdCwgYW5vdGhlciBhZHZhbnRhZ2Ugb2YgaGF2aW5nIHRoZSBT
+WVNDQUxMX0RFQ0xBUkV4KCkNCj4gd291bGQgYmUgdGhlIGFiaWxpdHkgdG8gaW5jbHVkZSB0aGF0
+IGhlYWRlciBmaWxlIGZyb20gZWxzZXdoZXJlIHdpdGggYSBkaWZmZXJlbnQNCj4gbWFjcm8gZGVm
+aW5pdGlvbiB0byBjcmVhdGUgYSBtYWNoaW5lLXJlYWRhYmxlIHZlcnNpb24gb2YgdGhlIGludGVy
+ZmFjZSB3aGVuDQo+IGNvbWJpbmVkIHdpdGggdGhlIHN5c2NhbGwudGJsIGZpbGVzLiBUaGlzIGNv
+dWxkIGJlIHVzZWQgdG8gY3JlYXRlIGEgdXNlcg0KPiBzcGFjZSBzdHViIGZvciBjYWxsaW5nIGlu
+dG8gdGhlIGxvdy1sZXZlbCBzeXNjYWxsIHJlZ2FyZGxlc3Mgb2YgdGhlDQo+IGxpYmMgaW50ZXJm
+YWNlcywNCj4gb3IgZm9yIHN5bmNocm9uaXppbmcgdGhlIGludGVyZmFjZXMgd2l0aCBzdHJhY2Us
+IHFlbXUtdXNlciwgb3IgYW55dGhpbmcgdGhhdA0KPiBuZWVkcyB0byBkZWFsIHdpdGggdGhlIGxv
+dy1sZXZlbCBpbnRlcmZhY2UuDQoNCkEgc2ltaWxhciAndHJpY2snICh0aGF0IHByb2JhYmx5IHdv
+bid0IHdvcmsgaGVyZSkgaXMgdG8gcGFzcw0KdGhlIG5hbWUgb2YgYSAjZGVmaW5lIGZ1bmN0aW9u
+IGFzIGEgcGFyYW1ldGVyIHRvIGFub3RoZXIgZGVmaW5lLg0KVXNlZnVsIGZvciBkZWZpbmluZyBj
+b25zdGFudHMgYW5kIGVycm9yIHN0cmluZ3MgdG9nZXRoZXIuIGVnOg0KI2RlZmluZSBUUkFGRklD
+X0xJR0hUUyh4KSBcDQoJeChSRUQsIDAsICJSZWQiKSBcDQoJeChZRUxMT1csIDEsICJZZWxsb3cp
+IFwNCgl4KEdSRUVOLCAyLCAiR1JFRU4pDQoNCllvdSBjYW4gdGhlbiBkbyB0aGluZyBsaWtlOg0K
+I2RlZmluZSB4KHRva2VuLCB2YWx1ZSwgc3RyaW5nKSB0b2tlbiA9IHZhbHVlLA0KZW51bSB7VFJB
+RkZJQ19MSUdIVFMoeCkgTlVNX0xJR0hUU307DQojdW5kZWYgeA0KI2RlZmluZSB4KHRva2VuLCB2
+YWx1ZSwgc3RyaW5nKSBbdmFsdWVdID0gc3RyaW5nLA0KY29uc3QgY2hhciAqY29sb3Vyc1tdID0g
+e1RSQUZGSUNfTElHSFRTKHgpfTsNCiN1bmRlZiB4DQp0byBpbml0aWFsaXNlIGNvbnN0YW50cyBh
+bmQgYSBuYW1lIHRhYmxlIHRoYXQgYXJlIGFsd2F5cyBpbiBzeW5jLg0KDQpJdCBpcyBhbHNvIGEg
+Z29vZCB3YXkgdG8gZ2VuZXJhdGUgc291cmNlIGxpbmVzIHRoYXQgYXJlIG92ZXIgMU1CLg0KDQoJ
+RGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1v
+dW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEz
+OTczODYgKFdhbGVzKQ0K
 
-Would it be better suited to have it per guest?
-> 
-> [1] https://wiki.xen.org/wiki/Xen_4.3_Block_Protocol_Scalability
-> 
-> Signed-off-by: Anthony Liguori <aliguori@amazon.com>
-> Signed-off-by: SeongJae Park <sjpark@amazon.de>
-> ---
->  .../ABI/testing/sysfs-driver-xen-blkback        |  8 ++++++++
->  drivers/block/xen-blkback/xenbus.c              | 17 ++++++++++++++---
->  2 files changed, 22 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> index ecb7942ff146..0c42285c75ee 100644
-> --- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> +++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> @@ -35,3 +35,11 @@ Description:
->                  controls the duration in milliseconds that blkback will not
->                  cache any page not backed by a grant mapping.
->                  The default is 10ms.
-> +
-> +What:           /sys/module/xen_blkback/parameters/feature_persistent
-> +Date:           September 2020
-> +KernelVersion:  5.10
-> +Contact:        SeongJae Park <sjpark@amazon.de>
-> +Description:
-> +                Whether to enable the persistent grants feature or not.
-> +                The default is 1 (enable).
-> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> index b9aa5d1ac10b..9c03d70469f4 100644
-> --- a/drivers/block/xen-blkback/xenbus.c
-> +++ b/drivers/block/xen-blkback/xenbus.c
-> @@ -879,6 +879,12 @@ static void reclaim_memory(struct xenbus_device *dev)
->  
->  /* ** Connection ** */
->  
-> +/* Enable the persistent grants feature. */
-> +static unsigned int feature_persistent = 1;
-> +module_param_named(feature_persistent, feature_persistent, int, 0644);
-> +MODULE_PARM_DESC(feature_persistent,
-> +		"Enables the persistent grants feature");
-> +
->  /*
->   * Write the physical details regarding the block device to the store, and
->   * switch to Connected state.
-> @@ -906,7 +912,8 @@ static void connect(struct backend_info *be)
->  
->  	xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
->  
-> -	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u", 1);
-> +	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
-> +			feature_persistent ? 1 : 0);
->  	if (err) {
->  		xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
->  				 dev->nodename);
-> @@ -1093,8 +1100,12 @@ static int connect_ring(struct backend_info *be)
->  		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
->  		return -ENOSYS;
->  	}
-> -	pers_grants = xenbus_read_unsigned(dev->otherend, "feature-persistent",
-> -					   0);
-> +	if (feature_persistent)
-> +		pers_grants = xenbus_read_unsigned(dev->otherend,
-> +				"feature-persistent", 0);
-> +	else
-> +		pers_grants = 0;
-> +
->  	blkif->vbd.feature_gnt_persistent = pers_grants;
->  	blkif->vbd.overflow_max_grants = 0;
->  
-> -- 
-> 2.17.1
-> 
