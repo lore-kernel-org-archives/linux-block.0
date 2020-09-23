@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAA3C4727E
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 11:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A8C2C2D0A8
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 11:45:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBA8D23787
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 11:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01CF9235FD
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 11:45:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="YvKeBCRW"
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="jUElUNR/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726665AbgIWLo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 07:44:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36302 "EHLO
+        id S1726550AbgIWLpM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 07:45:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726638AbgIWLox (ORCPT
+        with ESMTP id S1726703AbgIWLpA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 07:44:53 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38EC4C0613D3
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 04:44:53 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id f1so6682082plo.13
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 04:44:53 -0700 (PDT)
+        Wed, 23 Sep 2020 07:45:00 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2274C0613D1
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 04:45:00 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id j7so6687227plk.11
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 04:45:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=9itEseAD+a+MBY3AfvJv+oRl5Fh7iHmbspsMNgiBQ8I=;
-        b=YvKeBCRWp8yZc41o0eMSB8UggT0lNlhX9n/s6kiLonLBDwzHc1vJjz799Jatl8GLLC
-         6N1DNrlPQCsphlq3gd5f9HDgeOmTUAWDWDjOLOAgtCK7Kzry1XXCNk8IlsmRg93vGW7E
-         5tg2AH7Dv++QCOAHINDuQAhNHlgXO45E41R9aUboCHc55TNusZ/gnDiUxZQGy4M1+nA9
-         br3CU5TT1DDHHx48gH1KIlgAVPITQTtSfhF8WoSMq3NDAlgmR7yMz8LiS+/p9O34Y03F
-         HPUXGlFZmGeEf5+vWD7vIprFInNSnie+66zDIOAKeKkNp536kIo00KLzPN76oJb4a2hs
-         Z4mA==
+        bh=nPkmLEjjOLqKd/lOoAyA8z7n9dUCjwGzd+W0L3DZgSM=;
+        b=jUElUNR/aCuC47FTFhG+ItffqFmwJg58kuZUnBmtNmUSCv3QmjsuHGiNubphfVCWwo
+         f5WVv+EXIx5PHxtWQ5Cqy4gRLqc8pAx6KV4ryb3N5QIky0xU8+dpfa9TZXTpzsopQtNH
+         NojmKG9IHrIQbClrFWFgmUAb2cJg5x3l3EfYOGaHLnQ0fYSGZ3kF5EaCe59e0l7SUBY9
+         O80XINHl/CvqKhEnwJ4SqQp/hX2tuJMg5gW3bto/N+744BSwhaZg9fWIPZtEKPydO3D0
+         N9EXzRXiEVHTEF2BfD5A7SJjfZn9I6fJt0E60wHquNb0j/Uj5imwTOzJcOu1FCUADHe1
+         qsAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=9itEseAD+a+MBY3AfvJv+oRl5Fh7iHmbspsMNgiBQ8I=;
-        b=ugIGlQB9TClRJFCzy2xmztCe6VIoTcKEn/Xoej7fIvTLntQw5cP6ta2P2QnaP0xmtF
-         BUF/iJ9Ykao5Ye2n8um7nNGUVR1oD0M2r39bLlXAOBZJ705mStX6nr3E+S623grcfxxz
-         YooNAHA219oBEcs8S0ei4KPUyM+s9tym92M5CxnqhCCNyL05kSTgcXNV5no62VF2dRKj
-         06drAL2Z8aow0EgHV/pr495x6Mj/zXDnugmz1jZBYEDFGU5opiUlt89rGMjmzeYvs0YD
-         va/ofefpLtNZMprKAJ/l7Hdhvnm9W4n76948igsmDPgUnQQejKE5ekbyOZWLE5voNeKO
-         wemQ==
-X-Gm-Message-State: AOAM5302PiG9g+SimTP/c1H3HzgfaAFxXgK+lVYaa3hvRSm9B+APFL2D
-        zj+0qRP1eX54huZewYuLdVWYkw==
-X-Google-Smtp-Source: ABdhPJzbDjZyLMX7GEC8J08bKLOJ6wgTzVSs5DFKee7t3ShM5SM9T0nNlvhDV6m5e2q8u58tqQMycg==
-X-Received: by 2002:a17:90a:e2cc:: with SMTP id fr12mr7955245pjb.125.1600861492822;
-        Wed, 23 Sep 2020 04:44:52 -0700 (PDT)
+        bh=nPkmLEjjOLqKd/lOoAyA8z7n9dUCjwGzd+W0L3DZgSM=;
+        b=gRawkxSTnjuB0WLWMqVFwMphIZX+kUfJJjItZZ+7PGvePb8r9j2kWqZOmfy/x3oB5h
+         rlkbusTfzfc8xVIIjSwyzfvUU4oOc5WADeJlOIo86tmGVEtbRHTkqQHAvxXU2KA9alDL
+         NPlLyiYILUw0AyXLwjJi4GqIsRBzl7NindwFGrPWGj3duIhiLN9R2GLdjdAj9XBlfue7
+         TeeyJOPY7T0ShKl3InDZGHkQK+J6AGzdK1fV8uClR752dThMRvjoZA7sn8jtXGjDw1rp
+         r/Vj/dDvRDjlwRQTOTZ7pZsJ8Jq6Cwr84szpYvSP9UJtklnSY8EsbXC9RyM0GWSJPF9s
+         Xb8g==
+X-Gm-Message-State: AOAM530HcL01Is9dfU8TtdWFlp3bJ+l5lP9KAv4HVjtchuI4aIENg4r0
+        dN0dFzRz2F7SlXjrvQ8jCIbrAA==
+X-Google-Smtp-Source: ABdhPJynCqLc4R0uR3z+mm+2RmWHC4eyIwG+zcF5oGEc0p73c69eYffchw07KnbDQyeAvZgLntwxfQ==
+X-Received: by 2002:a17:90b:3c1:: with SMTP id go1mr7987568pjb.192.1600861500197;
+        Wed, 23 Sep 2020 04:45:00 -0700 (PDT)
 Received: from Smcdef-MBP.local.net ([103.136.220.72])
-        by smtp.gmail.com with ESMTPSA id a13sm17632155pfl.184.2020.09.23.04.44.49
+        by smtp.gmail.com with ESMTPSA id a13sm17632155pfl.184.2020.09.23.04.44.56
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Sep 2020 04:44:52 -0700 (PDT)
+        Wed, 23 Sep 2020 04:44:59 -0700 (PDT)
 From:   Muchun Song <songmuchun@bytedance.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk
 Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, zhuyinyin@bytedance.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: [PATCH v2 3/5] io_uring: Fix remove irrelevant req from the task_list
-Date:   Wed, 23 Sep 2020 19:44:17 +0800
-Message-Id: <20200923114419.71218-4-songmuchun@bytedance.com>
+        Muchun Song <songmuchun@bytedance.com>,
+        Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>
+Subject: [PATCH v2 5/5] io_uring: Fix double list add in io_queue_async_work()
+Date:   Wed, 23 Sep 2020 19:44:19 +0800
+Message-Id: <20200923114419.71218-6-songmuchun@bytedance.com>
 X-Mailer: git-send-email 2.21.0 (Apple Git-122)
 In-Reply-To: <20200923114419.71218-1-songmuchun@bytedance.com>
 References: <20200923114419.71218-1-songmuchun@bytedance.com>
@@ -75,71 +76,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the process 0 has been initialized io_uring is complete, and
-then fork process 1. If process 1 exits and it leads to delete
-all reqs from the task_list. If we kill process 0. We will not
-send SIGINT signal to the kworker. So we can not remove the req
-from the task_list. The io_sq_wq_submit_work() can do that for
-us.
+If we queue work in io_poll_wake(), it will leads to list double
+add. So we should add the list when the callback func is the
+io_sq_wq_submit_work.
+
+The following oops was seen:
+
+    list_add double add: new=ffff9ca6a8f1b0e0, prev=ffff9ca62001cee8,
+    next=ffff9ca6a8f1b0e0.
+    ------------[ cut here ]------------
+    kernel BUG at lib/list_debug.c:31!
+    Call Trace:
+     <IRQ>
+     io_poll_wake+0xf3/0x230
+     __wake_up_common+0x91/0x170
+     __wake_up_common_lock+0x7a/0xc0
+     io_commit_cqring+0xea/0x280
+     ? blkcg_iolatency_done_bio+0x2b/0x610
+     io_cqring_add_event+0x3e/0x60
+     io_complete_rw+0x58/0x80
+     dio_complete+0x106/0x250
+     blk_update_request+0xa0/0x3b0
+     blk_mq_end_request+0x1a/0x110
+     blk_mq_complete_request+0xd0/0xe0
+     nvme_irq+0x129/0x270 [nvme]
+     __handle_irq_event_percpu+0x7b/0x190
+     handle_irq_event_percpu+0x30/0x80
+     handle_irq_event+0x3c/0x60
+     handle_edge_irq+0x91/0x1e0
+     do_IRQ+0x4d/0xd0
+     common_interrupt+0xf/0xf
 
 Fixes: 1c4404efcf2c ("io_uring: make sure async workqueue is canceled on exit")
+Reported-by: Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>
 Signed-off-by: Muchun Song <songmuchun@bytedance.com>
 ---
- fs/io_uring.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ fs/io_uring.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index c80c37ef38513..12e68ea00a543 100644
+index c65f78f395655..a7cfe976480d8 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -2277,13 +2277,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
- 					break;
- 				cond_resched();
- 			} while (1);
--end_req:
--			if (!list_empty(&req->task_list)) {
--				spin_lock_irq(&ctx->task_lock);
--				list_del_init(&req->task_list);
--				spin_unlock_irq(&ctx->task_lock);
--			}
+@@ -513,12 +513,14 @@ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
  		}
-+end_req:
-+		spin_lock_irq(&ctx->task_lock);
-+		list_del_init(&req->task_list);
-+		spin_unlock_irq(&ctx->task_lock);
- 
- 		/* drop submission reference */
- 		io_put_req(req);
-@@ -3725,15 +3723,16 @@ static int io_uring_fasync(int fd, struct file *file, int on)
- static void io_cancel_async_work(struct io_ring_ctx *ctx,
- 				 struct files_struct *files)
- {
-+	struct io_kiocb *req;
-+
- 	if (list_empty(&ctx->task_list))
- 		return;
- 
- 	spin_lock_irq(&ctx->task_lock);
--	while (!list_empty(&ctx->task_list)) {
--		struct io_kiocb *req;
- 
--		req = list_first_entry(&ctx->task_list, struct io_kiocb, task_list);
--		list_del_init(&req->task_list);
-+	list_for_each_entry(req, &ctx->task_list, task_list) {
-+		if (files && req->files != files)
-+			continue;
- 
- 		/*
- 		 * The below executes an smp_mb(), which matches with the
-@@ -3743,7 +3742,7 @@ static void io_cancel_async_work(struct io_ring_ctx *ctx,
- 		 */
- 		smp_store_mb(req->flags, req->flags | REQ_F_CANCEL); /* B */
- 
--		if (req->work_task && (!files || req->files == files))
-+		if (req->work_task)
- 			send_sig(SIGINT, req->work_task, 1);
  	}
- 	spin_unlock_irq(&ctx->task_lock);
+ 
+-	req->files = current->files;
++	if (req->work.func == io_sq_wq_submit_work) {
++		req->files = current->files;
+ 
+-	spin_lock_irqsave(&ctx->task_lock, flags);
+-	list_add(&req->task_list, &ctx->task_list);
+-	req->work_task = NULL;
+-	spin_unlock_irqrestore(&ctx->task_lock, flags);
++		spin_lock_irqsave(&ctx->task_lock, flags);
++		list_add(&req->task_list, &ctx->task_list);
++		req->work_task = NULL;
++		spin_unlock_irqrestore(&ctx->task_lock, flags);
++	}
+ 
+ 	queue_work(ctx->sqo_wq[rw], &req->work);
+ }
+@@ -667,6 +669,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
+ 		state->cur_req++;
+ 	}
+ 
++	INIT_LIST_HEAD(&req->task_list);
+ 	req->file = NULL;
+ 	req->ctx = ctx;
+ 	req->flags = 0;
 -- 
 2.11.0
 
