@@ -2,108 +2,111 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F72C4727D
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 19:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4905C2D0A8
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 20:06:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AF0421D43
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 19:53:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70754206DB
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 20:06:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gZb1qKvx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726419AbgIWTxJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 15:53:09 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:49141 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726199AbgIWTxJ (ORCPT
+        id S1726265AbgIWUGy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 16:06:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726199AbgIWUGy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 15:53:09 -0400
-Received: from mail-qk1-f175.google.com ([209.85.222.175]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1Mof1D-1knLhY1WDR-00p1Cg; Wed, 23 Sep 2020 21:53:05 +0200
-Received: by mail-qk1-f175.google.com with SMTP id c62so1009747qke.1;
-        Wed, 23 Sep 2020 12:53:03 -0700 (PDT)
-X-Gm-Message-State: AOAM530ZlfmksSqecWKDQ3DFtZU062m1eW50TJHuAOM1NehNCZNSs1hi
-        XGsSJeH6U+rOX7g6WJ5h3KiEI72zgD5M/7gTGgc=
-X-Google-Smtp-Source: ABdhPJw80vxbxwT0bQ4Vkw0aE+k6Uuv2/dRNGRP/PGmAg2m3M1syddgA8VQgAKVqDM0S7SkWa6ZTkZVQ5JNt1c0Eq1g=
-X-Received: by 2002:a37:5d8:: with SMTP id 207mr1587539qkf.352.1600890783036;
- Wed, 23 Sep 2020 12:53:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200923060547.16903-1-hch@lst.de> <20200923060547.16903-6-hch@lst.de>
- <20200923142549.GK3421308@ZenIV.linux.org.uk> <20200923143251.GA14062@lst.de>
- <20200923145901.GN3421308@ZenIV.linux.org.uk> <20200923163831.GO3421308@ZenIV.linux.org.uk>
- <CAK8P3a3nkLUOkR+jwz2_2LcYTUTqdVf8JOtZqKWbtEDotNhFZA@mail.gmail.com> <20200923194755.GR3421308@ZenIV.linux.org.uk>
-In-Reply-To: <20200923194755.GR3421308@ZenIV.linux.org.uk>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 23 Sep 2020 21:52:47 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a1VPh0ufiUMbcRuj9wrpqojzQ_8mO68Vjc8yzLGxVNkpw@mail.gmail.com>
-Message-ID: <CAK8P3a1VPh0ufiUMbcRuj9wrpqojzQ_8mO68Vjc8yzLGxVNkpw@mail.gmail.com>
-Subject: Re: [PATCH 5/9] fs: remove various compat readv/writev helpers
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        David Howells <dhowells@redhat.com>,
-        David Laight <David.Laight@aculab.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Parisc List <linux-parisc@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        linux-aio <linux-aio@kvack.org>, io-uring@vger.kernel.org,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        Networking <netdev@vger.kernel.org>, keyrings@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:FcOmYEc7S70x327+yC5nQPBEM0rt3a6h0aY4XmvYdCQO/8YHm6L
- kQ4zWoMsMiqUpkNCuPq40vpPiey/pLiaKIbN7QkQudHxc4Jh3awCIgTkZ9zYNjIGusQwsP4
- 1f1B0nElrTF0UDKdAoVLxWVksyAkcP1rgW6OWMr1s5U6Ho/SuN3wPdE/qoJwLEFRspiRqUj
- yq6+or7yQpPXAv/J1caXQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WeZ7mFq3nUo=:ejU75HdVaJwErPbl07WyY/
- SzJqUDCrQEJB1WeBXC2y8Ssm/xYmjapzEBN2ahXTydur/hOzj69Kg2Qzgtoc3VNc8XFmw919o
- ESSsgSfQzPzPrlX3MgopJwOnkQ3I4bvWzTa2ZlS7YrZa/AyhvFw4gd4FCpGxRi6WmPfp76f1e
- myF7aStZTXsarPDA2STRNrZOIUYyDueuimX9V2S7rv5BW/onorUna7NOsEwkE7aU0mJt+v0Hl
- HIA6IfIR05QbpoKPI/OpdgJEact/NAJX3zC1ZJXh62ABmy+E/nnChSTV1nsGJIXjNhCuBVdFk
- bQBjXBaT8FGfl83RztO1RmQ3bqsqk8ku9XIaqGrmQ9i5OX6DAQHK7c30Vm+EMZDuan5IKUoxh
- cYHDHFlB37P7T0CXow6euG48MwQQRXwNWG94LigYmIKrGfCNIQ4DHyCeRw1+68wkbtADxLVH8
- CB0nRpMe7rUrmHGpqYNqt8wLM0pJKHM0tsjdDP650XCTmpPS3/NlStYy3mgCJIW9hqkuS7w7A
- GkIBYy2IUu1bbRxzL8ypcn4Cp96IkenTf/tXQXtLAggbQEk+CIKr/QP9S6AMOum8srwv1+VKM
- ORMh1sY7JkDqzxIAYpvgHUPA1mej8HF4555mPWMlPk7ICBIsJDcaGzkmlBgB6B23rbiKuCCsr
- iyC89P2nxjFi+GzaaYFHYRrz399DxPlViaNhzrAVJsWX0gM3VD02wi37/y8AW5K3d0vI6p/7f
- DV1q85DyULmO6ez5MisWBBUBROpFlvx1IghlxiINd/QvCa5H+comengpnbWjgMe/VluZszkB9
- P0Qk+w+vd9NiE3WeN+I42nTS8gMPYeMp7/0S9Nib8gESVnNDFc2shVtY2bhFcaVX6Tkq2thRH
- 4RYELGgsPV/p/jHf0yA1sgT5WRYlN6txBoLIeSX9HQ3uUovY6j9F6HIzPfzzcZCcKlkVPUElJ
- DqEhYfcAAh7V0lJVm7vBtu55QYk5+o4wTMvTEFkCyMYNWNypOQGY7
+        Wed, 23 Sep 2020 16:06:54 -0400
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E155C0613CE
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 13:06:54 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id 16so1024690qkf.4
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 13:06:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=DcI9qzORAmpASB52sXLs4QqTzINHknlH96I3Bxuml6Y=;
+        b=gZb1qKvxEy5Mbj+toIRPI5hK1aS5CEqsDpft3SLOrcTSRJ2aeWFiO3iuq7B5KRd8Aa
+         OuG3316SQBKN5j3Wb3T/+JBdq5T/AQc5WdPlKEYwuA7VO/6H9dfIyvIu8XdNSRrfphvC
+         EqdJyRm8FTT8pzgO9kETKLrA4u6jzutGXqkw3VcluQLQHKVac+pxBCYvdaV0WAdYBBVm
+         Crm/PwwCm7L6QdIXC9dzM+11Mkhuc1HIPdqbgwCKQD8mxlDSmNI9rY527r8diNnjOj/n
+         aB/UuaiHw9RksXNqwn5eNQ58suJqw2QtzR7+Cein01JO4hUrtaKMN2CYOuvsRObgPV1L
+         JVpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=DcI9qzORAmpASB52sXLs4QqTzINHknlH96I3Bxuml6Y=;
+        b=UgKoCJFEjZfRul5b/DqN/5j+KvSznzIrZ9X2vCm+jmOIG9sCcY4nczOEcpI45MFPmI
+         5qGeSGngo5S1LN2r3IHhjhzXA8e9ZUeYWMBLGpsG9mW7OQ6nQPl+AYR0diUIueSZjCfN
+         wct17U6C8bewFW2nimw91FkLiS2IKKxHajw1iEjcjF6zwMgTsOvwBZevnoGCPaUVf/pH
+         jrRvCYbXqV2CW5eVzye3S6YOsgAO7ZY1sPv9wSZo6kGprh7yLkSkmzq3KInbyHQVnHSY
+         EcH7TDTnN7wurnFE8bBtbnghoE42YqKyzZBRzkgTZLW3HhJtiEu5BVdWqQui3qGRnSQr
+         mzow==
+X-Gm-Message-State: AOAM532aPALqeLGRtnXHF+VjQqYiQdXG8hfgCcFijm4RV67Xbd8KH2Pv
+        kLQbz/i1fGIG1br6Bihy93k=
+X-Google-Smtp-Source: ABdhPJxjk1Sp228tEBGNnm6jJLqzdkYXuLuQ3XUPPHsTMISElcknjzIthwkbM/aOpzptN9icZDPNJw==
+X-Received: by 2002:a37:a548:: with SMTP id o69mr1584707qke.113.1600891613443;
+        Wed, 23 Sep 2020 13:06:53 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id m97sm604091qte.55.2020.09.23.13.06.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2020 13:06:52 -0700 (PDT)
+Sender: Mike Snitzer <snitzer@gmail.com>
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, hch@lst.de,
+        dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH 0/2] block/dm: add REQ_NOWAIT support for bio-based 
+Date:   Wed, 23 Sep 2020 16:06:50 -0400
+Message-Id: <20200923200652.11082-1-snitzer@redhat.com>
+X-Mailer: git-send-email 2.15.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 23, 2020 at 9:48 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
-> FWIW, after playing with that for a while...  Do we really want the
-> compat_sys_...() declarations to live in linux/compat.h?  Most of
-> the users of that file don't want those; why not move them to
-> linux/syscalls.h?
+Hi,
 
-Sure, let's do that. The trend overall is to integrate the compat stuff
-more closely into where the native implementation lives, so this
-would just follow that trend.
+I got guilted into this by this Twitter exchange:
+https://twitter.com/axboe/status/1308778488011337728
 
-I think with Christoph's latest patches, about half of them are
-going away as well.
+Started with this patchset from June and revised it:
+https://patchwork.kernel.org/project/dm-devel/list/?series=297693
+(dropped MD patch while doing so_.
 
-> Reason: there's a lot more users of linux/compat.h than those of
-> linux/syscalls.h - it's pulled by everything in the networking stack,
-> for starters...
+Tested these changes with this test Jens provided:
 
-Right, the network headers pull in almost everything else through
-multiple indirect inclusions, anything we can do to reduce that
-helps.
+[mikes-test-job]
+filename=/dev/dm-0
+rw=randread
+buffered=1
+ioengine=io_uring
+iodepth=16
+norandommap
 
-     Arnd
+Jens, please feel free to pickup both patches, I don't have any
+conflicting DM changes for 5.10.
+
+Thanks,
+Mike
+
+Konstantin Khlebnikov (1):
+  dm: add support for REQ_NOWAIT and enable it for linear target
+
+Mike Snitzer (1):
+  block: add QUEUE_FLAG_NOWAIT
+
+ block/blk-core.c              |  4 ++--
+ drivers/md/dm-linear.c        |  5 +++--
+ drivers/md/dm-table.c         | 32 ++++++++++++++++++++++++++++++++
+ drivers/md/dm.c               |  4 +++-
+ include/linux/blkdev.h        |  7 +++++--
+ include/linux/device-mapper.h |  6 ++++++
+ 6 files changed, 51 insertions(+), 7 deletions(-)
+
+-- 
+2.15.0
+
