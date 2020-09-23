@@ -2,100 +2,105 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 456D2C4363D
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:17:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C74C4363D
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:18:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7ADC2075B
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:17:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600874245;
-	bh=/QQofHRADGAYxOtJIce3d38QkMvme+6u661AK0sTIww=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=hLpg/2SKdGWjYkPgUClQVnG6PxEcFgq30YKu01GnRRahSy4tvk8MF8kf2+mL2t/Rh
-	 ijFAkHY/4g/iQzKGwRI5Z2sXVBaA0u8lo4tvpDhcPLkJQJJ1385tuE6AAsuSQdXBWk
-	 1fr9iIEQ7VKOuXvJdM2KAuIoh8HS9Se9UHlNCujw=
+	by mail.kernel.org (Postfix) with ESMTP id 6074421D43
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 15:18:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="UwYPfCHC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726864AbgIWPRQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 11:17:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60766 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726156AbgIWPRP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 11:17:15 -0400
-Received: from localhost (fw-tnat.cambridge.arm.com [217.140.96.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6077C2075B;
-        Wed, 23 Sep 2020 15:17:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600874234;
-        bh=/QQofHRADGAYxOtJIce3d38QkMvme+6u661AK0sTIww=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qaL+99AxNSM+PUkApT/4Pupcbe3cWXnIOAQs/ZT35oiBfgpa53MHX/m6TMpBock3a
-         fQSnODIgnUVdnSkWJ0pBplNyHoTqkHuo7hhaFUgOEQ4u+Awe/y3f+CYmaRRBSsJrRv
-         ycipz9I2nQvfISAkNRMDRLNIxu8SAq09SP1ymhKs=
-Date:   Wed, 23 Sep 2020 16:16:20 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Rolf Reintjes <lists2.rolf@reintjes.nrw>
-Cc:     linux-spi@vger.kernel.org, Julia Lawall <Julia.Lawall@inria.fr>,
-        linux-serial@vger.kernel.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-block@vger.kernel.org,
-        Yossi Leybovich <sleybo@amazon.com>,
-        linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-rdma@vger.kernel.org,
-        Dan Williams <dan.j.williams@intel.com>,
-        rds-devel@oss.oracle.com
-Subject: Re: [PATCH 00/14] drop double zeroing
-Message-ID: <20200923151620.GC5707@sirena.org.uk>
+        id S1726671AbgIWPSa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 11:18:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40924 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726516AbgIWPSa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Sep 2020 11:18:30 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38DE4C0613D1
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 08:18:30 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id 34so14573412pgo.13
+        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 08:18:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=nsm/SLpnI1gdm4X4OKozNS3TNzCBnlqB2Om83wtrvTM=;
+        b=UwYPfCHCkuZSpIeCGStKHAWyo1CDDFErhXwN/nKs+DtOMuKzWm3Ru4fAVyK2uJC8qt
+         c1kchVce3LxG5k62yYPWGhxExhYubU1CmUlYTQs+vNFL99vt1MJw8R6n85S3UwyCvQxm
+         GohP7WvEJNxqNh7ABOo7NUNhVLiVdZIWF6rVjgqQRQSZAlj9IrtU5El4ZrugnG+jnJNS
+         VSKqmHHY2rgXz4kgHYPDhS9Es4HiK1Icm9gmTPraFvc18zLU6JNSPy5h7SSON2ToEhBj
+         rXI/A07vNJ4Fe0k24pgT3/8KclQsNFK1HEPN24YeSopnBbytHL3kp3YFTw7dulvBdWSN
+         SBYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nsm/SLpnI1gdm4X4OKozNS3TNzCBnlqB2Om83wtrvTM=;
+        b=WPxj9BZ6m5baJirrC31qZqUcDFdaY+cuY7Xb/AtS1EDC/g1/mWoCDYLhnqCKvW1zL1
+         4yFnkDXI7/I22Pbp8szk7+JnE7ogRb42dvSuZFdngo/6N7KGXhhMqJE9HsILmc8U4F5c
+         yr3DebJvZbHqEaY3qTl8MJvon33LexK5oxvCpkejtcMcq/PRV4j4Yo15N0F+cPsfXoio
+         u7qNqHrK+17VUX9XgcQuvOTq/H55+oJ4duT6MXbFfUfgvTwi78gPQ0hIKyd1Hfqpcumj
+         tQu4TrS3McK9NFFiAldNPT9aXHEKEJ0BkNBr5/FHN//IrspChWvShT3/Sy82BGOQAicS
+         RXtQ==
+X-Gm-Message-State: AOAM5305LCpicIlNTA27VbdRFWfnCBEcVmrIBnKdPEcBw5c4BdwF0VRY
+        8gFko7fSDiwj5/2+OcNIJ8HzpQ==
+X-Google-Smtp-Source: ABdhPJzJ/ejg9GYFqB77f/Yk8KzNOg6TdYV6IGyGBQKLmXK/daOda5tYkOU0zVvC/ZDIxC6p+dcLzA==
+X-Received: by 2002:a63:580c:: with SMTP id m12mr188720pgb.99.1600874309643;
+        Wed, 23 Sep 2020 08:18:29 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id 22sm288302pgh.18.2020.09.23.08.18.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Sep 2020 08:18:29 -0700 (PDT)
+Subject: Re: [PATCH 06/14] block: drop double zeroing
+To:     Julia Lawall <Julia.Lawall@inria.fr>
+Cc:     kernel-janitors@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 References: <1600601186-7420-1-git-send-email-Julia.Lawall@inria.fr>
- <160070750168.56292.17961674601916397869.b4-ty@kernel.org>
- <c3b33526-936d-ffa4-c301-4d0485822be1@reintjes.nrw>
+ <1600601186-7420-7-git-send-email-Julia.Lawall@inria.fr>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b71efcfb-4ffd-d125-0ef7-ed5ab6b03892@kernel.dk>
+Date:   Wed, 23 Sep 2020 09:18:28 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="NU0Ex4SbNnrxsi6C"
-Content-Disposition: inline
-In-Reply-To: <c3b33526-936d-ffa4-c301-4d0485822be1@reintjes.nrw>
-X-Cookie: This report is filled with omissions.
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1600601186-7420-7-git-send-email-Julia.Lawall@inria.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/20/20 5:26 AM, Julia Lawall wrote:
+> sg_init_table zeroes its first argument, so the allocation of that argument
+> doesn't have to.
+> 
+> the semantic patch that makes this change is as follows:
+> (http://coccinelle.lip6.fr/)
+> 
+> // <smpl>
+> @@
+> expression x;
+> @@
+> 
+> x =
+> - kzalloc
+> + kmalloc
+>  (...)
+> ...
+> sg_init_table(x,...)
+> // </smpl>
 
---NU0Ex4SbNnrxsi6C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Applied for 5.10, thanks.
 
-On Wed, Sep 23, 2020 at 05:10:33PM +0200, Rolf Reintjes wrote:
-> On 21.09.20 18:58, Mark Brown wrote:
+-- 
+Jens Axboe
 
-> I do not understand which of the 14 patches you applied. Your mail responds
-> to the 00/14 mail.
-
-As the mail you're replying to says:
-
-> > [1/1] spi/topcliff-pch: drop double zeroing
-> >        commit: ca03dba30f2b8ff45a2972c6691e4c96d8c52b3b
-
---NU0Ex4SbNnrxsi6C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl9rZsMACgkQJNaLcl1U
-h9AxAgf/UlZBlBEQmArmMghyqM+HNmgNqZcFWWNnNQSmBBrgl8128+pLwAgIeZLw
-0l6J3hL0JAr1ozAMpm1RGS/xj2CD8a6QFiRw+9wAgL9eY3DAdognRwtwLJlW6zq3
-nj2VF+7+R6LhZGxqub8TnxUZLSdlop3wn9ZuAnTRZjjhPq2iidr4iYPWYsGqo+j5
-svVy+eYILC3/Y6X31PpT2OXujQXkrrCGlONZz2ieOMTLSLNQhL8pZh8tkJB9s/F5
-U60+SPDeI7yrVh6k5/iCldI5JHQyjXAmHza4R6BzKTc6kgSDvUlzrVOZxw1aaGy+
-EFLE4qdwQYEPaeRMZ+XVpSUbf3dGUw==
-=Rrao
------END PGP SIGNATURE-----
-
---NU0Ex4SbNnrxsi6C--
