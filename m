@@ -2,114 +2,122 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7EDCC4727D
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 18:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE31C4727F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 18:46:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AAD52220D
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 18:08:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="S46VDRbL"
+	by mail.kernel.org (Postfix) with ESMTP id ECA42235FD
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 18:46:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbgIWSI6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 14:08:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39152 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726234AbgIWSI6 (ORCPT
+        id S1726988AbgIWSqO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 14:46:14 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:35555 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726665AbgIWSqO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 14:08:58 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B566C0613CE
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 11:08:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=H9e307+src3+CqxQxRVqFOAFuCBWoUAf5W/mH1UEQ/k=; b=S46VDRbLoF9smEweTG2wzgrM3x
-        9LCW7QWgh+gUlYgMfCQCiZv2m6SU57njr9xmNbpH9yhxAsC7t3JDGn7+ZnRc1mMQj//SK5SJTheay
-        QxUMu6x/cTzz12YkuAKE4ZwY4xuSPUHaTFJoCKlctanVi1MV83BWHVFeW8A96qiUXG2VoMV56lccb
-        qaVZkKBoBDoL2yP5DsW7mnuAemnxF/LsAPTWUhtTNpQ7dTBo/xzL22YzVBULLuZZyu2L7yxKQ5e9G
-        2E5UREDkHrpZpsiFRiOLZ+JyW+758jhCChUPIVptZZ5kKYTKq5jO7rpStujdny8S+xHSQLgnGGIe4
-        H37Y5wNw==;
-Received: from p4fdb0c34.dip0.t-ipconnect.de ([79.219.12.52] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kL9CI-0001ZL-HL; Wed, 23 Sep 2020 18:08:54 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     ztong0001@gmail.com, linux-block@vger.kernel.org
-Subject: [PATCH] block: fix potential double free during probe failure
-Date:   Wed, 23 Sep 2020 20:08:53 +0200
-Message-Id: <20200923180853.505641-1-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
+        Wed, 23 Sep 2020 14:46:14 -0400
+Received: from mail-qt1-f182.google.com ([209.85.160.182]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.129]) with ESMTPSA (Nemesis)
+ id 1M89P1-1kOi931zbn-005Hlb; Wed, 23 Sep 2020 20:46:10 +0200
+Received: by mail-qt1-f182.google.com with SMTP id a4so831862qth.0;
+        Wed, 23 Sep 2020 11:46:09 -0700 (PDT)
+X-Gm-Message-State: AOAM531B6RKNkGQC/NDN1KVy6L7ZJDh/eTh8x/vyn/fCGays+viehdTH
+        kYMDsdGq5j5wMlrpbikXGrM/muVRkR5VaFZOmUo=
+X-Google-Smtp-Source: ABdhPJwsvaOBWtaZA0D/OVEHB/gCWu247kr3QZZFrdP10NBc4wqx9Hcp+T5ZYDolhQMYUd20W7JjEkRUKsdbgp0ivyQ=
+X-Received: by 2002:ac8:64a:: with SMTP id e10mr1527617qth.142.1600886767946;
+ Wed, 23 Sep 2020 11:46:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+References: <20200923060547.16903-1-hch@lst.de> <20200923060547.16903-6-hch@lst.de>
+ <20200923142549.GK3421308@ZenIV.linux.org.uk> <20200923143251.GA14062@lst.de>
+ <20200923145901.GN3421308@ZenIV.linux.org.uk> <20200923163831.GO3421308@ZenIV.linux.org.uk>
+In-Reply-To: <20200923163831.GO3421308@ZenIV.linux.org.uk>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 23 Sep 2020 20:45:51 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a3nkLUOkR+jwz2_2LcYTUTqdVf8JOtZqKWbtEDotNhFZA@mail.gmail.com>
+Message-ID: <CAK8P3a3nkLUOkR+jwz2_2LcYTUTqdVf8JOtZqKWbtEDotNhFZA@mail.gmail.com>
+Subject: Re: [PATCH 5/9] fs: remove various compat readv/writev helpers
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        David Howells <dhowells@redhat.com>,
+        David Laight <David.Laight@aculab.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+        linux-aio <linux-aio@kvack.org>, io-uring@vger.kernel.org,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        Networking <netdev@vger.kernel.org>, keyrings@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:mMkQRAJUWfdk4a4PEkmTkMjSEPbcbr4OqrN3fUr4LQ2AQqlPl0n
+ bOWryggRLru9T6JJoTMuOGI9kvl/I6BtMLB/VbJVDYLH2lraHpn3UOgXAQiZMVZJ9Wt6/3q
+ dgtI834LPxJGojFQwlbq6VqcE61sUtAzG9Asu4SnN3A1f/GYReptJqFvli47ZUGxJu1McD6
+ wXqFv/2sZdtXtrzvqb6Gw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ARXrn3BJvHg=:OaZDrHRji4s3F+Z4R525Bn
+ agD8Hjw3INq7irUQDHIrs31n4HiItPG1qRH9sCOQsBDzKfQ2GBPxOe8cQiCUK6etjcRZgS5uz
+ ltu+yxAg8SdJB7S6UrMx8x4gZIRJZNx/h1Pd359G8hRQEWUkB77c3Uu7iX6+oWPogrXiRLcyE
+ Ay+LH2roCsVe74rsugu9p8r/jxgEYoo6ke7HkJiyLsrJx77n+/GWpX9PQTbGXJGYCmPKo03Dx
+ 7rZxQHvz4lzlsQGvZ22Lw1H85lBROKXGp/T1YCWt7CkiGs0Y/R3V3UonSnBX41Bf98v3feicD
+ RYBnkyjEcAUUQRR5u9cw067xVVV2JdvUKInxkNdutFVn0CM66u/fDJxueg1uLRW9RPYp7DjVs
+ Mx/HRUmO0wQonj6taqWhVCgSUthPIg1jpw3qykbSoDJ96MDdaz8DcUt+7qpkA5t/+tGOD+rWW
+ Bn0ajxwLkORS0R61/JXIJExhw4SvyLBTVKDr7LI7QuYFV9tfgKH3fZzLZmBkdPEqiGd2kyAMe
+ 0agELAyDb5Rehyc/3jcYzTGZyQ9nlXuD/YYv4vEmC1CRzjxWF4KIZFY6D3HWoeuUMlzvMCijI
+ ue6FAYnnAerqxzrTow74a1x9I80VfvnWRTz0xYpnoiGRegiq0P5uWv1YSyriRyFortckburp8
+ xW1/xnziTC/+/JUjrApbsItKfFZpj/Vffo23zPwOLXvOArj8zkutkvZ9h8hGYgo934l9OKJGu
+ P5NJw1LlqSAdgmNcPhTbFVxjnCSs1G9+5tq34fiY8XA66+2tLlwvaAnYp+zv5HOWn5OOwlMar
+ YndfSM38x1BkZ1kFiYikEr51lnNKUep3VIupblSMr1ljcWZWbNW0XzKu+xNzfuUJBnp9WMfFy
+ 7T3ELZ0Iq8IWSMYb0u7TCVmN4B9t5+iKBzUQ+0CqaqKkDuOmWY7NnBHAU/IZ6fceZMEkzvN4O
+ Id5+SP2sVY8Io6R5XqdC6M9inrRybKQ1OIWUL/7Bpv8x4eU8nqVGM
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-disk_release drops the reference on the request_queue if disk->queue
-is set.  But many drivers set the pointer early, which means they
-have to clear it before calling put_disk during a probe failure,
-which is often forgotten.  Even worse for drivers that refcount their
-per-disk structure like nvme the path for a real teardown vs probe
-failure can be shared.  Fix all this by setting a gendisk flag only
-when add_disk has acquired a request_queue reference, and only drop
-the reference when the flag was set.  Also make sure add_disk always
-grabs a reference, even if the queue is marked dying, as we expect
-the reference.
+On Wed, Sep 23, 2020 at 6:38 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+>
+> I wonder if we should do something like
+>
+> SYSCALL_DECLARE3(readv, unsigned long, fd, const struct iovec __user *, vec,
+>                  unsigned long, vlen);
+> in syscalls.h instead, and not under that ifdef.
+>
+> Let it expand to declaration of sys_...() in generic case and, on x86, into
+> __do_sys_...() and __ia32_sys_...()/__x64_sys_...(), with types matching
+> what SYSCALL_DEFINE ends up using.
+>
+> Similar macro would cover compat_sys_...() declarations.  That would
+> restore mismatch checking for x86 and friends.  AFAICS, the cost wouldn't
+> be terribly high - cpp would have more to chew through in syscalls.h,
+> but it shouldn't be all that costly.  Famous last words, of course...
+>
+> Does anybody see fundamental problems with that?
 
-This patch fixes a potential use after free during nvme probe failure.
-The fact that nvme can call add_disk on a dying queue is another bug
-in the nvme code that we'll fix separatel.
+I've had some ideas along those lines in the past and I think it should work.
 
-Reported-by: Tong Zhang <ztong0001@gmail.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/genhd.c         | 6 ++++--
- include/linux/genhd.h | 1 +
- 2 files changed, 5 insertions(+), 2 deletions(-)
+As a variation of this, the SYSCALL_DEFINEx() macros could go away
+entirely, leaving only the macro instantiations from the header to
+require that syntax. It would require first changing the remaining
+architectures to build the syscall table from C code instead of
+assembler though.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 9d060e79eb31d8..ef2784c69d59ee 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -832,7 +832,9 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 	 * Take an extra ref on queue which will be put on disk_release()
- 	 * so that it sticks around as long as @disk is there.
- 	 */
--	WARN_ON_ONCE(!blk_get_queue(disk->queue));
-+	WARN_ON_ONCE(blk_queue_dying(disk->queue));
-+	__blk_get_queue(disk->queue);
-+	disk->flags |= GENHD_FL_QUEUE_REF;
- 
- 	disk_add_events(disk);
- 	blk_integrity_add(disk);
-@@ -1564,7 +1566,7 @@ static void disk_release(struct device *dev)
- 	kfree(disk->random);
- 	disk_replace_part_tbl(disk, NULL);
- 	hd_free_part(&disk->part0);
--	if (disk->queue)
-+	if (disk->flags & GENHD_FL_QUEUE_REF)
- 		blk_put_queue(disk->queue);
- 	kfree(disk);
- }
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 1c97cf84f011a7..822a619924e3b5 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -133,6 +133,7 @@ struct hd_struct {
- #define GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE	0x0100
- #define GENHD_FL_NO_PART_SCAN			0x0200
- #define GENHD_FL_HIDDEN				0x0400
-+#define GENHD_FL_QUEUE_REF			0x0800
- 
- enum {
- 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
--- 
-2.28.0
+Regardless of that, another advantage of having the SYSCALL_DECLAREx()
+would be the ability to include that header file from elsewhere with a different
+macro definition to create a machine-readable version of the interface when
+combined with the syscall.tbl files. This could be used to create a user
+space stub for calling into the low-level syscall regardless of the
+libc interfaces,
+or for synchronizing the interfaces with strace, qemu-user, or anything that
+needs to deal with the low-level interface.
 
+      Arnd
