@@ -2,193 +2,167 @@ Return-Path: <SRS0=LQCZ=DA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC60C2D0A8
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 20:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FABC2D0A8
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 20:08:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 528A72376E
-	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 20:06:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A76E02376F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Sep 2020 20:08:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cSy1srwJ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nDpnjPAZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726466AbgIWUG5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Sep 2020 16:06:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57390 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726199AbgIWUG5 (ORCPT
+        id S1726476AbgIWUIO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Sep 2020 16:08:14 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:36272 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726199AbgIWUIN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Sep 2020 16:06:57 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61948C0613CE
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 13:06:57 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id v54so1008612qtj.7
-        for <linux-block@vger.kernel.org>; Wed, 23 Sep 2020 13:06:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=HONrzBdI9DpoxCRFwugtgwBfWYcioGP4sYYVCknfP9M=;
-        b=cSy1srwJHqdcgGc14NoMdSzlu7sMxVXF5+2cjgrDXOhDCPciKB7gw6XjmG65PXrb1c
-         zCLlFWoB08wL//p3BCTkHJw8LFuEmGc9jaPJM5tvKBjQmGqa0wlm3WMtraJo+BraWLYr
-         Twi4Ai8YggIdwNzDjhXW4vJnks0+vVCqU++2NsV0v546DjLjzoK7+sl9b/aYee4A7vNS
-         /2PE2qj+u+4CJkqOWZOxnJq9uAO8t+owuPNJcRQ0u2sg23JSXyOoUgbcw2Q2CNPe2hj3
-         HuI/oXR6O1XTbS6ToQ+Pv1hUQJx+c3Tc0kBxhHyGmE7QGu8tmd7BSf98aobmlaWm4dg1
-         o6Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=HONrzBdI9DpoxCRFwugtgwBfWYcioGP4sYYVCknfP9M=;
-        b=O4+SWvSMxoZIqcPpEY04sOa++gmYXRhHfcsOMYJWcyXejq7A752yDOHsAJyF3ggWTg
-         pHON0rNK/NUP7ZCgrlDk5l+nizpGJzrKgDGWzKuyOt/FvniT4uBjAHFa+RCh8rVAv2F7
-         iJyqBdxVkeO1GLq5VTUoTe+zLY2BQSDt9f9WZqzVq8b77g4ARQczURlP0sJtRc6IRpsQ
-         j7mGJOOu7/pD95SZoR77iwlAtuRLSYR23BELXhEm5H5mMnmWhHJqPk9xL+l3KqqhF4o9
-         gvILkAJguwz+m/XbdPc03ls/dDiqjUzWjntqPi/aGHdFL0Y1iEPsTmd0kcdgM9p1el0W
-         issA==
-X-Gm-Message-State: AOAM532ECUandK2A8zUhfjFkTRjfueOIpKRDcxASrwbfnH5dy+Jrqgh2
-        1fynNY6LfiaQ/AUJN5nk6QNqh/oouS9nr4E7
-X-Google-Smtp-Source: ABdhPJwpLw9FIyba3sFP5Emu/a5Qy5slUFAK7OpphUveSgDQP2azOPSP+DLQfimaU0DBD9qMPynDgg==
-X-Received: by 2002:ac8:44a7:: with SMTP id a7mr1883594qto.173.1600891616592;
-        Wed, 23 Sep 2020 13:06:56 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id p20sm623842qtk.21.2020.09.23.13.06.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2020 13:06:55 -0700 (PDT)
-Sender: Mike Snitzer <snitzer@gmail.com>
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, hch@lst.de,
-        dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 2/2] dm: add support for REQ_NOWAIT and enable it for linear target
-Date:   Wed, 23 Sep 2020 16:06:52 -0400
-Message-Id: <20200923200652.11082-3-snitzer@redhat.com>
-X-Mailer: git-send-email 2.15.0
-In-Reply-To: <20200923200652.11082-1-snitzer@redhat.com>
-References: <20200923200652.11082-1-snitzer@redhat.com>
+        Wed, 23 Sep 2020 16:08:13 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08NK5MeX162814;
+        Wed, 23 Sep 2020 20:08:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=+bF0Y3pJwQVU206msgY0xGA4jeQnQf6Jy5Yw7gSqLJg=;
+ b=nDpnjPAZ4irr7f9Pomk4/IlIzLCGNqLrYrAIa5nEetyA6SdyH15WtYIkVfA9xZIIjTtU
+ xtLKV+oUfhvmO6sdyC0CLq+hweMxtS2sUBdEXV/uleNyVfK2V+MPkuR1o5BkSqAm7+bO
+ vVGQfRm5wUoVmBNcYEkKfXYKY5kueUMIwTgB9tBwrjQbID4wPHh6iob5lqmIQ4bqoNEp
+ /2h4NQ4dWpWvCre/eTlbpuz12YJq/dkhcXetwbdsqypM48T8ZQMagOfpahQJSxymFNgY
+ UcjX1DKPdtrbQASefbu2AOdZqatLKcKtgsjkffmRR97kki18YqXDJZaZvLNIkb9RJeD0 Yg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 33q5rgjxu0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 23 Sep 2020 20:08:05 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08NK67LD055477;
+        Wed, 23 Sep 2020 20:08:05 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 33r28w39s2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Sep 2020 20:08:04 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08NK831j014560;
+        Wed, 23 Sep 2020 20:08:03 GMT
+Received: from char.us.oracle.com (/10.152.32.25)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 23 Sep 2020 13:08:03 -0700
+Received: by char.us.oracle.com (Postfix, from userid 1000)
+        id C365A6A0109; Wed, 23 Sep 2020 16:09:30 -0400 (EDT)
+Date:   Wed, 23 Sep 2020 16:09:30 -0400
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     SeongJae Park <sjpark@amazon.com>
+Cc:     roger.pau@citrix.com, SeongJae Park <sjpark@amazon.de>,
+        axboe@kernel.dk, aliguori@amazon.com, amit@kernel.org,
+        mheyne@amazon.de, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] xen-blkback: add a parameter for disabling of persistent
+ grants
+Message-ID: <20200923200930.GB11767@char.us.oracle.com>
+References: <20200922070125.27251-1-sjpark@amazon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200922070125.27251-1-sjpark@amazon.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
+ suspectscore=0 adultscore=0 bulkscore=0 malwarescore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009230150
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 impostorscore=0
+ clxscore=1011 suspectscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 mlxlogscore=999 adultscore=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009230150
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+On Tue, Sep 22, 2020 at 09:01:25AM +0200, SeongJae Park wrote:
+> From: SeongJae Park <sjpark@amazon.de>
+> 
+> Persistent grants feature provides high scalability.  On some small
+> systems, however, it could incur data copy overhead[1] and thus it is
+> required to be disabled.  But, there is no option to disable it.  For
+> the reason, this commit adds a module parameter for disabling of the
+> feature.
 
-Add DM target feature flag DM_TARGET_NOWAIT which advertises that
-target works with REQ_NOWAIT bios.
-
-Add dm_table_supports_nowait() and update dm_table_set_restrictions()
-to set/clear QUEUE_FLAG_NOWAIT accordingly.
-
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- drivers/md/dm-linear.c        |  5 +++--
- drivers/md/dm-table.c         | 32 ++++++++++++++++++++++++++++++++
- drivers/md/dm.c               |  4 +++-
- include/linux/device-mapper.h |  6 ++++++
- 4 files changed, 44 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
-index e1db43446327..00774b5d7668 100644
---- a/drivers/md/dm-linear.c
-+++ b/drivers/md/dm-linear.c
-@@ -228,10 +228,11 @@ static struct target_type linear_target = {
- 	.name   = "linear",
- 	.version = {1, 4, 0},
- #ifdef CONFIG_BLK_DEV_ZONED
--	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_ZONED_HM,
-+	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_NOWAIT |
-+		    DM_TARGET_ZONED_HM,
- 	.report_zones = linear_report_zones,
- #else
--	.features = DM_TARGET_PASSES_INTEGRITY,
-+	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_NOWAIT,
- #endif
- 	.module = THIS_MODULE,
- 	.ctr    = linear_ctr,
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index acba92500c12..17fb9b96d18e 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1719,6 +1719,33 @@ static bool dm_table_supports_write_zeroes(struct dm_table *t)
- 	return true;
- }
- 
-+static int device_not_nowait_capable(struct dm_target *ti, struct dm_dev *dev,
-+				     sector_t start, sector_t len, void *data)
-+{
-+	struct request_queue *q = bdev_get_queue(dev->bdev);
-+
-+	return q && !blk_queue_nowait(q);
-+}
-+
-+static bool dm_table_supports_nowait(struct dm_table *t)
-+{
-+	struct dm_target *ti;
-+	unsigned i = 0;
-+
-+	while (i < dm_table_get_num_targets(t)) {
-+		ti = dm_table_get_target(t, i++);
-+
-+		if (!dm_target_supports_nowait(ti->type))
-+			return false;
-+
-+		if (!ti->type->iterate_devices ||
-+		    ti->type->iterate_devices(ti, device_not_nowait_capable, NULL))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- static int device_not_discard_capable(struct dm_target *ti, struct dm_dev *dev,
- 				      sector_t start, sector_t len, void *data)
- {
-@@ -1821,6 +1848,11 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	 */
- 	q->limits = *limits;
- 
-+	if (dm_table_supports_nowait(t))
-+		blk_queue_flag_set(QUEUE_FLAG_NOWAIT, q);
-+	else
-+		blk_queue_flag_clear(QUEUE_FLAG_NOWAIT, q);
-+
- 	if (!dm_table_supports_discards(t)) {
- 		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
- 		/* Must also clear discard limits... */
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index b110b5eb99a5..3ad4a8da8b15 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1733,7 +1733,9 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
- 	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
- 		dm_put_live_table(md, srcu_idx);
- 
--		if (!(bio->bi_opf & REQ_RAHEAD))
-+		if (bio->bi_opf & REQ_NOWAIT)
-+			bio_wouldblock_error(bio);
-+		else if (!(bio->bi_opf & REQ_RAHEAD))
- 			queue_io(md, bio);
- 		else
- 			bio_io_error(bio);
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index 57610fc3013e..ba3b0979e09f 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -252,6 +252,12 @@ struct target_type {
- #define DM_TARGET_ZONED_HM		0x00000040
- #define dm_target_supports_zoned_hm(type) ((type)->features & DM_TARGET_ZONED_HM)
- 
-+/*
-+ * A target handles REQ_NOWAIT
-+ */
-+#define DM_TARGET_NOWAIT		0x00000080
-+#define dm_target_supports_nowait(type) ((type)->features & DM_TARGET_NOWAIT)
-+
- struct dm_target {
- 	struct dm_table *table;
- 	struct target_type *type;
--- 
-2.15.0
-
+Would it be better suited to have it per guest?
+> 
+> [1] https://wiki.xen.org/wiki/Xen_4.3_Block_Protocol_Scalability
+> 
+> Signed-off-by: Anthony Liguori <aliguori@amazon.com>
+> Signed-off-by: SeongJae Park <sjpark@amazon.de>
+> ---
+>  .../ABI/testing/sysfs-driver-xen-blkback        |  8 ++++++++
+>  drivers/block/xen-blkback/xenbus.c              | 17 ++++++++++++++---
+>  2 files changed, 22 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
+> index ecb7942ff146..0c42285c75ee 100644
+> --- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
+> +++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
+> @@ -35,3 +35,11 @@ Description:
+>                  controls the duration in milliseconds that blkback will not
+>                  cache any page not backed by a grant mapping.
+>                  The default is 10ms.
+> +
+> +What:           /sys/module/xen_blkback/parameters/feature_persistent
+> +Date:           September 2020
+> +KernelVersion:  5.10
+> +Contact:        SeongJae Park <sjpark@amazon.de>
+> +Description:
+> +                Whether to enable the persistent grants feature or not.
+> +                The default is 1 (enable).
+> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> index b9aa5d1ac10b..9c03d70469f4 100644
+> --- a/drivers/block/xen-blkback/xenbus.c
+> +++ b/drivers/block/xen-blkback/xenbus.c
+> @@ -879,6 +879,12 @@ static void reclaim_memory(struct xenbus_device *dev)
+>  
+>  /* ** Connection ** */
+>  
+> +/* Enable the persistent grants feature. */
+> +static unsigned int feature_persistent = 1;
+> +module_param_named(feature_persistent, feature_persistent, int, 0644);
+> +MODULE_PARM_DESC(feature_persistent,
+> +		"Enables the persistent grants feature");
+> +
+>  /*
+>   * Write the physical details regarding the block device to the store, and
+>   * switch to Connected state.
+> @@ -906,7 +912,8 @@ static void connect(struct backend_info *be)
+>  
+>  	xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
+>  
+> -	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u", 1);
+> +	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
+> +			feature_persistent ? 1 : 0);
+>  	if (err) {
+>  		xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
+>  				 dev->nodename);
+> @@ -1093,8 +1100,12 @@ static int connect_ring(struct backend_info *be)
+>  		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
+>  		return -ENOSYS;
+>  	}
+> -	pers_grants = xenbus_read_unsigned(dev->otherend, "feature-persistent",
+> -					   0);
+> +	if (feature_persistent)
+> +		pers_grants = xenbus_read_unsigned(dev->otherend,
+> +				"feature-persistent", 0);
+> +	else
+> +		pers_grants = 0;
+> +
+>  	blkif->vbd.feature_gnt_persistent = pers_grants;
+>  	blkif->vbd.overflow_max_grants = 0;
+>  
+> -- 
+> 2.17.1
+> 
