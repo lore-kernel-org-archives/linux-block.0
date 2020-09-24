@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C70AC4346E
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 07:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E9BC4346E
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 07:48:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBF8023787
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 07:38:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5932A23787
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 07:48:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z1qNiD11"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G6+bSVvx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727227AbgIXHis (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Sep 2020 03:38:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50778 "EHLO
+        id S1727211AbgIXHsP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Sep 2020 03:48:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727109AbgIXHir (ORCPT
+        with ESMTP id S1727101AbgIXHsP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Sep 2020 03:38:47 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B58C0613D3
-        for <linux-block@vger.kernel.org>; Thu, 24 Sep 2020 00:38:47 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id w7so1377315pfi.4
-        for <linux-block@vger.kernel.org>; Thu, 24 Sep 2020 00:38:47 -0700 (PDT)
+        Thu, 24 Sep 2020 03:48:15 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764D8C0613D3
+        for <linux-block@vger.kernel.org>; Thu, 24 Sep 2020 00:48:15 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id z18so1406662pfg.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Sep 2020 00:48:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=/QqvBiEw9Gt+P3YHgYr+bWtezmhdKPwP2m5Qq1GcsHU=;
-        b=Z1qNiD110OoTBunaz5mH/lzfaFLDg7xI1pk48kUrTkDdgKD+LwlEBxfuijD9u/v8Zh
-         sKsLhHFZ/OAmWhbgFBZpDRWrsRPB9bcJ7o/Ri6hQo1gksLg9QWkuOKr5wZt5FcSC+jjT
-         jIXc2hbjlU+X6idHsYaNi/Y4Y/B14HtcpONxvbHA7xmhAU/77Cx9XGBom8e0ceGtDSHM
-         KH+ohR79tHOM9+Ldj+WzhE2h3YpTs+uE+JN4xFgBxBR0fy58mbpZWgMdBfCeqVrz7fEp
-         swX3Yfh/zr9DYukBcTQZJr4/sY9CZbwMZzDyBDZjcl+FavL5gJ0+3nG66xJtHt7oUthE
-         QQ+g==
+        bh=tK+cnu137uKn+/oEzjr3wNwYrT9PGTUO1Zz9Fsslk94=;
+        b=G6+bSVvxw/c6725lYnz2rnFFdQSI7oUiaYE1aJwvxPiLyROiJIfKORi8VK3P8a73gn
+         yPR7hkuQBpudEzEzjatdeECQkxo/A6C6O3/uz97CYdc1U6kWeA32PJtMdBpI2kOuRnjW
+         0VjIrQCtsL1miITy/Rq6nDD4k0vs1JpolIaA9NQvKfmrvTU7jmbgrjfg3yLVMZzDpFrP
+         j1yHa1iJAcAP70tVLGoFmquSBectX66hlRUt7inRKQaoz+3YrdGtHE7Xnx3WCkT0paj9
+         xpTuqDf3Fq9V14USHdf32fG20WjrANKcFmS/vC0BJLvBqQTXs+nXu5e1rB/3vbFxdozi
+         5/dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=/QqvBiEw9Gt+P3YHgYr+bWtezmhdKPwP2m5Qq1GcsHU=;
-        b=KT0A24u0yNkQdy/pyNUdPtuN7t2jIv+mer7QZplJZMAVqDbPl33RvWovOfahVfZ/Rh
-         4lG8F6MJlMbcmhGqDx9c/h6IFuXyIg7QZ8UmxmL9uXaJtdL0dtbhMkHtzHfHPnOa/Y4E
-         a0NMX+rzDjQ6+7jhSIkzGtxV4OWdi16OjHAixxMBKXNEB0TnJo1aYHSVOhuC1NhlmOE7
-         91oA5hnl5RnyDBMsBt/OiTnekrHd00Gl9W6ee8LHy6crkkzUt0NK34MvtTkzjURfNRpt
-         DHU71wq3kYJ7Z07COwICbVddVU0Wkd80BzsVTJ5TasmqeZozBrYpr4p8ty0kCIngdf+d
-         6Prw==
-X-Gm-Message-State: AOAM531jQsVVWbU917pEePAD6bXyPcAZ2VFPvBEZzIJkjcplq/g/K3NJ
-        hsuC5mc66iXjiOGQLKvtZnQepw==
-X-Google-Smtp-Source: ABdhPJz6VQDT9+FEnimOkDrUbrnKtYN7Qcf2KHw/RUrvRZQCLUJOFfiid//U4dfanjU96NpT9qIOWw==
-X-Received: by 2002:a05:6a00:14cb:b029:142:2501:34eb with SMTP id w11-20020a056a0014cbb0290142250134ebmr3234176pfu.68.1600933126956;
-        Thu, 24 Sep 2020 00:38:46 -0700 (PDT)
+        bh=tK+cnu137uKn+/oEzjr3wNwYrT9PGTUO1Zz9Fsslk94=;
+        b=rrg8PZm9ZPy02ZpUha1ZGm3Gls66UZoCN4AcHieUnjXOQG+L7p2fReIyu6cj8DGjm4
+         1J0Ph9tBq+UfoQVPH3stRpFwESP1L+Ysm90ZxvoEFtUr8R+y53/dMBEbsXcD+IbiAvIb
+         piWm8+ZezlgdHrMKFXp9yjBaOvzhrEFvcFCZqPSUvOxtB1TeaVx0EZ39hbWPTkbRI2LN
+         4hgwYhVngy3ZFg6uVvmko6Cg0Vk3hbrBfS0bVUmvfokoslxDiXWDRq8ial0DE5A6lN1h
+         ElYVvHOLrNbUhLIFbb7HvpQYQDNsnW4hRcE0F+qLyVdXfaElfgarIWdKubQ9UDv2OJTd
+         QUQg==
+X-Gm-Message-State: AOAM5323FXlU8d7YQoXnTyBfufthEfRNdgqdAGkSfCloDyqoq5krmO2y
+        e+uP09LAoN5GL7A2Z3YgLWLhNQ==
+X-Google-Smtp-Source: ABdhPJzZ9dlXrvCeps8DBV2ed64Pll2vOIuQNZbqGrIU+/FbJUTMQILoJxC1DNy9TOSVXvj2nO5H4g==
+X-Received: by 2002:a62:4ed6:0:b029:142:2501:35ec with SMTP id c205-20020a624ed60000b0290142250135ecmr3557932pfb.76.1600933694696;
+        Thu, 24 Sep 2020 00:48:14 -0700 (PDT)
 Received: from google.com (124.190.199.35.bc.googleusercontent.com. [35.199.190.124])
-        by smtp.gmail.com with ESMTPSA id 9sm1926053pgx.76.2020.09.24.00.38.46
+        by smtp.gmail.com with ESMTPSA id w206sm1892054pfc.1.2020.09.24.00.48.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2020 00:38:46 -0700 (PDT)
-Date:   Thu, 24 Sep 2020 07:38:42 +0000
+        Thu, 24 Sep 2020 00:48:14 -0700 (PDT)
+Date:   Thu, 24 Sep 2020 07:48:10 +0000
 From:   Satya Tangirala <satyat@google.com>
 To:     Mike Snitzer <snitzer@redhat.com>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -67,7 +67,7 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Eric Biggers <ebiggers@google.com>
 Subject: Re: [PATCH 2/3] dm: add support for passing through inline crypto
  support
-Message-ID: <20200924073842.GA1894729@google.com>
+Message-ID: <20200924074810.GB1894729@google.com>
 References: <20200909234422.76194-1-satyat@google.com>
  <20200909234422.76194-3-satyat@google.com>
  <20200924012103.GE10500@redhat.com>
@@ -196,6 +196,12 @@ On Wed, Sep 23, 2020 at 09:21:03PM -0400, Mike Snitzer wrote:
 > >  	atomic_t open_count;
 > 
 > Any reason you placed the ksm member where you did?
+As in, any reason why it's placed right after the struct request_queue
+*queue? The ksm is going to be set up in the request_queue and is a part
+of the request_queue is some sense, so it seemed reasonable to me to
+group them together....but I don't think there's any reason it *has* to
+be there, if you think it should be put elsewhere (or maybe I'm
+misunderstanding your question :) ).
 > 
 > Looking at 'struct blk_keyslot_manager' I'm really hating adding that
 > bloat to every DM device for a feature that really won't see much broad
@@ -204,12 +210,6 @@ On Wed, Sep 23, 2020 at 09:21:03PM -0400, Mike Snitzer wrote:
 > Any chance you could allocate 'struct blk_keyslot_manager' as needed so
 > that most users of DM would only be carrying 1 extra pointer (set to
 > NULL)?
-I don't think there's any technical problem with doing that - the only
-other thing that would need addressing is that the patch uses
-"container_of" on that blk_keyslot_manager in dm_keyslot_evict() to get
-a pointer to the struct mapped_device. I could try adding a "private"
-field to struct blk_keyslot_manager and store a pointer to the struct
-mapped_device there).
 > 
 > Thanks,
 > Mike
