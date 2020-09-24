@@ -2,158 +2,336 @@ Return-Path: <SRS0=VsgY=DB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09CA6C4727E
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 14:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B704CC47423
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 14:53:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD2C22311A
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 14:34:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71F5E23741
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 14:53:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728321AbgIXOeC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Sep 2020 10:34:02 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:45115 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728088AbgIXOeC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Sep 2020 10:34:02 -0400
-Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 08OEXjYB007803
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Sep 2020 10:33:45 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 1FBFD42003C; Thu, 24 Sep 2020 10:33:45 -0400 (EDT)
-Date:   Thu, 24 Sep 2020 10:33:45 -0400
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-Message-ID: <20200924143345.GD482521@mit.edu>
-References: <68510957-c887-8e26-4a1a-a7a93488586a@kernel.dk>
- <20200904035528.GE558530@mit.edu>
- <20200915044519.GA38283@mit.edu>
- <20200915073303.GA754106@T590>
- <20200915224541.GB38283@mit.edu>
- <20200915230941.GA791425@T590>
- <20200916202026.GC38283@mit.edu>
- <20200917022051.GA1004828@T590>
- <20200917143012.GF38283@mit.edu>
- <20200924005901.GB1806978@T590>
+        id S1728252AbgIXOxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Sep 2020 10:53:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45024 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727859AbgIXOxw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Sep 2020 10:53:52 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 1FAE0ACCF;
+        Thu, 24 Sep 2020 14:53:48 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 992521E12DD; Thu, 24 Sep 2020 16:53:46 +0200 (CEST)
+Date:   Thu, 24 Sep 2020 16:53:46 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Coly Li <colyli@suse.de>, Richard Weinberger <richard@nod.at>,
+        Minchan Kim <minchan@kernel.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Justin Sanders <justin@coraid.com>,
+        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, cgroups@vger.kernel.org
+Subject: Re: [PATCH 07/13] block: lift setting the readahead size into the
+ block layer
+Message-ID: <20200924145346.GA3361@quack2.suse.cz>
+References: <20200924065140.726436-1-hch@lst.de>
+ <20200924065140.726436-8-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200924005901.GB1806978@T590>
+In-Reply-To: <20200924065140.726436-8-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 08:59:01AM +0800, Ming Lei wrote:
+On Thu 24-09-20 08:51:34, Christoph Hellwig wrote:
+> Drivers shouldn't really mess with the readahead size, as that is a VM
+> concept.  Instead set it based on the optimal I/O size by lifting the
+> algorithm from the md driver when registering the disk.  Also set
+> bdi->io_pages there as well by applying the same scheme based on
+> max_sectors.  To ensure the limits work well for stacking drivers a
+> new helper is added to update the readahead limits from the block
+> limits, which is also called from disk_stack_limits.
 > 
-> The list corruption issue can be reproduced on kvm/qumu guest too when
-> running xfstests(ext4) generic/038.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Coly Li <colyli@suse.de>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+
+The patch looks good to me now. You can add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  block/blk-settings.c         | 18 ++++++++++++++++--
+>  block/blk-sysfs.c            |  2 ++
+>  drivers/block/aoe/aoeblk.c   |  1 -
+>  drivers/block/drbd/drbd_nl.c | 10 +---------
+>  drivers/md/bcache/super.c    |  3 ---
+>  drivers/md/dm-table.c        |  3 +--
+>  drivers/md/raid0.c           | 16 ----------------
+>  drivers/md/raid10.c          | 24 +-----------------------
+>  drivers/md/raid5.c           | 13 +------------
+>  drivers/nvme/host/core.c     |  1 +
+>  include/linux/blkdev.h       |  1 +
+>  11 files changed, 24 insertions(+), 68 deletions(-)
 > 
-> However, the issue may become not reproduced when adding or removing memory
-> debug options, such as adding KASAN.
-
-Can you reliably reprodue this crash?  And if so, with what config and
-what kernel version.
-
-One of the reasons why I had gone silent on this bug is that I've been
-trying many, many configurations and configurations which reliably
-reproduced on say, -rc4 would not reproduce on -rc5, and then I would
-get a completely different set of results on -rc6.  So I've been
-trying to run a lot of different experiments to try to understand what
-might be going on, since it seems pretty clear this must be a very
-timing-sensitive failure.
-
-I also found that the re-occrance went down significantly if I enabled
-KASAN, and while it didn't go away, I wasn't able to get a KASAN
-failure to trigger, either.  Turning off CONFIG_PROVE_LOCKING and a
-*lot* of other debugging configs made the problem vanish in -rc4, but
-that trick didn't work with -rc5 or -rc6.
-
-Each time I discovered one of these things, I was about to post to the
-e-mail thread, only to have a confirmation test run on a different
-kernel version make the problem go away.  In particular, your revert
-helped with -rc4 and -rc6 IIRC, but it didn't help in -rc5.....
-
-HOWEVER, thanks to a hint from a colleague at $WORK, and realizing
-that one of the stack traces had virtio balloon in the trace, I
-realized that when I switched the GCE VM type from e1-standard-2 to
-n1-standard-2 (where e1 VM's are cheaper because they use
-virtio-balloon to better manage host OS memory utilization), problem
-has become, much, *much* rarer (and possibly has gone away, although
-I'm going to want to run a lot more tests before I say that
-conclusively) on my test setup.  At the very least, using an n1 VM
-(which doesn't have virtio-balloon enabled in the hypervisor) is
-enough to unblock ext4 development.
-
-Any chance your kvm/qemu configuration might have been using
-virtio-ballon?  Because other ext4 developers who have been using
-kvm-xftests have not had any problems....
-
-> When I enable PAGE_POISONING, double free on kmalloc(192) is captured:
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 5ea3de48afba22..4f6eb4bb17236a 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -372,6 +372,19 @@ void blk_queue_alignment_offset(struct request_queue *q, unsigned int offset)
+>  }
+>  EXPORT_SYMBOL(blk_queue_alignment_offset);
+>  
+> +void blk_queue_update_readahead(struct request_queue *q)
+> +{
+> +	/*
+> +	 * For read-ahead of large files to be effective, we need to read ahead
+> +	 * at least twice the optimal I/O size.
+> +	 */
+> +	q->backing_dev_info->ra_pages =
+> +		max(queue_io_opt(q) * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
+> +	q->backing_dev_info->io_pages =
+> +		queue_max_sectors(q) >> (PAGE_SHIFT - 9);
+> +}
+> +EXPORT_SYMBOL_GPL(blk_queue_update_readahead);
+> +
+>  /**
+>   * blk_limits_io_min - set minimum request size for a device
+>   * @limits: the queue limits
+> @@ -450,6 +463,8 @@ EXPORT_SYMBOL(blk_limits_io_opt);
+>  void blk_queue_io_opt(struct request_queue *q, unsigned int opt)
+>  {
+>  	blk_limits_io_opt(&q->limits, opt);
+> +	q->backing_dev_info->ra_pages =
+> +		max(queue_io_opt(q) * 2 / PAGE_SIZE, VM_READAHEAD_PAGES);
+>  }
+>  EXPORT_SYMBOL(blk_queue_io_opt);
+>  
+> @@ -631,8 +646,7 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
+>  		       top, bottom);
+>  	}
+>  
+> -	t->backing_dev_info->io_pages =
+> -		t->limits.max_sectors >> (PAGE_SHIFT - 9);
+> +	blk_queue_update_readahead(disk->queue);
+>  }
+>  EXPORT_SYMBOL(disk_stack_limits);
+>  
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 81722cdcf0cb21..869ed21a9edcab 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -854,6 +854,8 @@ int blk_register_queue(struct gendisk *disk)
+>  		percpu_ref_switch_to_percpu(&q->q_usage_counter);
+>  	}
+>  
+> +	blk_queue_update_readahead(q);
+> +
+>  	ret = blk_trace_init_sysfs(dev);
+>  	if (ret)
+>  		return ret;
+> diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+> index d8cfc233e64b93..c34e71b0c4a98c 100644
+> --- a/drivers/block/aoe/aoeblk.c
+> +++ b/drivers/block/aoe/aoeblk.c
+> @@ -406,7 +406,6 @@ aoeblk_gdalloc(void *vp)
+>  	WARN_ON(d->gd);
+>  	WARN_ON(d->flags & DEVFL_UP);
+>  	blk_queue_max_hw_sectors(q, BLK_DEF_MAX_SECTORS);
+> -	q->backing_dev_info->ra_pages = SZ_2M / PAGE_SIZE;
+>  	blk_queue_io_opt(q, SZ_2M);
+>  	d->bufpool = mp;
+>  	d->blkq = gd->queue = q;
+> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+> index aaff5bde391506..54a4930c04fe07 100644
+> --- a/drivers/block/drbd/drbd_nl.c
+> +++ b/drivers/block/drbd/drbd_nl.c
+> @@ -1362,15 +1362,7 @@ static void drbd_setup_queue_param(struct drbd_device *device, struct drbd_backi
+>  
+>  	if (b) {
+>  		blk_stack_limits(&q->limits, &b->limits, 0);
+> -
+> -		if (q->backing_dev_info->ra_pages !=
+> -		    b->backing_dev_info->ra_pages) {
+> -			drbd_info(device, "Adjusting my ra_pages to backing device's (%lu -> %lu)\n",
+> -				 q->backing_dev_info->ra_pages,
+> -				 b->backing_dev_info->ra_pages);
+> -			q->backing_dev_info->ra_pages =
+> -						b->backing_dev_info->ra_pages;
+> -		}
+> +		blk_queue_update_readahead(q);
+>  	}
+>  	fixup_discard_if_not_supported(q);
+>  	fixup_write_zeroes(device, q);
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 48113005ed86ad..6bfa771673623e 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -1427,9 +1427,6 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+>  	if (ret)
+>  		return ret;
+>  
+> -	dc->disk.disk->queue->backing_dev_info->ra_pages =
+> -		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
+> -		    q->backing_dev_info->ra_pages);
+>  	blk_queue_io_opt(dc->disk.disk->queue,
+>  		max(queue_io_opt(dc->disk.disk->queue), queue_io_opt(q)));
+>  
+> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> index 5edc3079e7c199..ef2757012f59d5 100644
+> --- a/drivers/md/dm-table.c
+> +++ b/drivers/md/dm-table.c
+> @@ -1925,8 +1925,7 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+>  	}
+>  #endif
+>  
+> -	/* Allow reads to exceed readahead limits */
+> -	q->backing_dev_info->io_pages = limits->max_sectors >> (PAGE_SHIFT - 9);
+> +	blk_queue_update_readahead(q);
+>  }
+>  
+>  unsigned int dm_table_get_num_targets(struct dm_table *t)
+> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
+> index f54a449f97aa79..aa2d7279176880 100644
+> --- a/drivers/md/raid0.c
+> +++ b/drivers/md/raid0.c
+> @@ -410,22 +410,6 @@ static int raid0_run(struct mddev *mddev)
+>  		 mdname(mddev),
+>  		 (unsigned long long)mddev->array_sectors);
+>  
+> -	if (mddev->queue) {
+> -		/* calculate the max read-ahead size.
+> -		 * For read-ahead of large files to be effective, we need to
+> -		 * readahead at least twice a whole stripe. i.e. number of devices
+> -		 * multiplied by chunk size times 2.
+> -		 * If an individual device has an ra_pages greater than the
+> -		 * chunk size, then we will not drive that device as hard as it
+> -		 * wants.  We consider this a configuration error: a larger
+> -		 * chunksize should be used in that case.
+> -		 */
+> -		int stripe = mddev->raid_disks *
+> -			(mddev->chunk_sectors << 9) / PAGE_SIZE;
+> -		if (mddev->queue->backing_dev_info->ra_pages < 2* stripe)
+> -			mddev->queue->backing_dev_info->ra_pages = 2* stripe;
+> -	}
+> -
+>  	dump_zones(mddev);
+>  
+>  	ret = md_integrity_register(mddev);
+> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+> index 9956a04ac13bd6..5d1bdee313ec33 100644
+> --- a/drivers/md/raid10.c
+> +++ b/drivers/md/raid10.c
+> @@ -3873,19 +3873,6 @@ static int raid10_run(struct mddev *mddev)
+>  	mddev->resync_max_sectors = size;
+>  	set_bit(MD_FAILFAST_SUPPORTED, &mddev->flags);
+>  
+> -	if (mddev->queue) {
+> -		int stripe = conf->geo.raid_disks *
+> -			((mddev->chunk_sectors << 9) / PAGE_SIZE);
+> -
+> -		/* Calculate max read-ahead size.
+> -		 * We need to readahead at least twice a whole stripe....
+> -		 * maybe...
+> -		 */
+> -		stripe /= conf->geo.near_copies;
+> -		if (mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
+> -			mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
+> -	}
+> -
+>  	if (md_integrity_register(mddev))
+>  		goto out_free_conf;
+>  
+> @@ -4723,17 +4710,8 @@ static void end_reshape(struct r10conf *conf)
+>  	conf->reshape_safe = MaxSector;
+>  	spin_unlock_irq(&conf->device_lock);
+>  
+> -	/* read-ahead size must cover two whole stripes, which is
+> -	 * 2 * (datadisks) * chunksize where 'n' is the number of raid devices
+> -	 */
+> -	if (conf->mddev->queue) {
+> -		int stripe = conf->geo.raid_disks *
+> -			((conf->mddev->chunk_sectors << 9) / PAGE_SIZE);
+> -		stripe /= conf->geo.near_copies;
+> -		if (conf->mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
+> -			conf->mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
+> +	if (conf->mddev->queue)
+>  		raid10_set_io_opt(conf);
+> -	}
+>  	conf->fullsync = 0;
+>  }
+>  
+> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+> index 9a7d1250894ef1..7ace1f76b14736 100644
+> --- a/drivers/md/raid5.c
+> +++ b/drivers/md/raid5.c
+> @@ -7522,8 +7522,6 @@ static int raid5_run(struct mddev *mddev)
+>  		int data_disks = conf->previous_raid_disks - conf->max_degraded;
+>  		int stripe = data_disks *
+>  			((mddev->chunk_sectors << 9) / PAGE_SIZE);
+> -		if (mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
+> -			mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
+>  
+>  		chunk_size = mddev->chunk_sectors << 9;
+>  		blk_queue_io_min(mddev->queue, chunk_size);
+> @@ -8111,17 +8109,8 @@ static void end_reshape(struct r5conf *conf)
+>  		spin_unlock_irq(&conf->device_lock);
+>  		wake_up(&conf->wait_for_overlap);
+>  
+> -		/* read-ahead size must cover two whole stripes, which is
+> -		 * 2 * (datadisks) * chunksize where 'n' is the number of raid devices
+> -		 */
+> -		if (conf->mddev->queue) {
+> -			int data_disks = conf->raid_disks - conf->max_degraded;
+> -			int stripe = data_disks * ((conf->chunk_sectors << 9)
+> -						   / PAGE_SIZE);
+> -			if (conf->mddev->queue->backing_dev_info->ra_pages < 2 * stripe)
+> -				conf->mddev->queue->backing_dev_info->ra_pages = 2 * stripe;
+> +		if (conf->mddev->queue)
+>  			raid5_set_io_opt(conf);
+> -		}
+>  	}
+>  }
+>  
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index ea1fa41fbba8df..741c9bfa8e14c7 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -2147,6 +2147,7 @@ static int __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+>  		nvme_update_disk_info(ns->head->disk, ns, id);
+>  		blk_stack_limits(&ns->head->disk->queue->limits,
+>  				 &ns->queue->limits, 0);
+> +		blk_queue_update_readahead(ns->head->disk->queue);
+>  		nvme_update_bdev_size(ns->head->disk);
+>  	}
+>  #endif
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index be5ef6f4ba1905..282f5ca424f14a 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1140,6 +1140,7 @@ extern void blk_queue_max_zone_append_sectors(struct request_queue *q,
+>  extern void blk_queue_physical_block_size(struct request_queue *, unsigned int);
+>  extern void blk_queue_alignment_offset(struct request_queue *q,
+>  				       unsigned int alignment);
+> +void blk_queue_update_readahead(struct request_queue *q);
+>  extern void blk_limits_io_min(struct queue_limits *limits, unsigned int min);
+>  extern void blk_queue_io_min(struct request_queue *q, unsigned int min);
+>  extern void blk_limits_io_opt(struct queue_limits *limits, unsigned int opt);
+> -- 
+> 2.28.0
 > 
-> [ 1198.317139] slab: double free detected in cache 'kmalloc-192', objp ffff89ada7584300^M
-> [ 1198.326651] ------------[ cut here ]------------^M
-> [ 1198.327969] kernel BUG at mm/slab.c:2535!^M
-> [ 1198.329129] invalid opcode: 0000 [#1] SMP PTI^M
-> [ 1198.333776] CPU: 1 PID: 0 Comm: swapper/1 Not tainted 5.9.0-rc4_quiesce_srcu-xfstests #102^M
-> [ 1198.336085] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-48-gd9c812dda519-prebuilt.qemu.org 04/01/2014^M
-> [ 1198.339826] RIP: 0010:free_block.cold.92+0x13/0x15^M
-> [ 1198.341472] Code: 8d 44 05 f0 eb d0 48 63 83 e0 00 00 00 48 8d 54 05 f8 e9 4b 81 ff ff 48 8b 73 58 48 89 ea 48 c7 c7 98 e7 4a 9c e8 20 c3 eb ff <0f> 0b 48 8b 73 58 48 c7 c2 20 e8 4a 9c 48 c7 c7 70 32 22 9c e8 19^M
-> [ 1198.347331] RSP: 0018:ffff982e40710be8 EFLAGS: 00010046^M
-> [ 1198.349091] RAX: 0000000000000048 RBX: ffff89adb6441400 RCX: 0000000000000000^M
-> [ 1198.351839] RDX: 0000000000000000 RSI: ffff89adbaa97800 RDI: ffff89adbaa97800^M
-> [ 1198.354572] RBP: ffff89ada7584300 R08: 0000000000000417 R09: 0000000000000057^M
-> [ 1198.357150] R10: 0000000000000001 R11: ffff982e40710aa5 R12: ffff89adbaaae598^M
-> [ 1198.359067] R13: ffffe7bc819d6108 R14: ffffe7bc819d6100 R15: ffff89adb6442280^M
-> [ 1198.360975] FS:  0000000000000000(0000) GS:ffff89adbaa80000(0000) knlGS:0000000000000000^M
-> [ 1198.363202] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
-> [ 1198.365986] CR2: 000055f6a3811318 CR3: 000000017adca005 CR4: 0000000000770ee0^M
-> [ 1198.368679] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000^M
-> [ 1198.371386] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400^M
-> [ 1198.374203] PKRU: 55555554^M
-> [ 1198.375174] Call Trace:^M
-> [ 1198.376165]  <IRQ>^M
-> [ 1198.376908]  ___cache_free+0x56d/0x770^M
-> [ 1198.378355]  ? kmem_freepages+0xa0/0xf0^M
-> [ 1198.379814]  kfree+0x91/0x120^M
-> [ 1198.382121]  kmem_freepages+0xa0/0xf0^M
-> [ 1198.383474]  slab_destroy+0x9f/0x120^M
-> [ 1198.384779]  slabs_destroy+0x6d/0x90^M
-> [ 1198.386110]  ___cache_free+0x632/0x770^M
-> [ 1198.387547]  ? kmem_freepages+0xa0/0xf0^M
-> [ 1198.389016]  kfree+0x91/0x120^M
-> [ 1198.390160]  kmem_freepages+0xa0/0xf0^M
-> [ 1198.391551]  slab_destroy+0x9f/0x120^M
-> [ 1198.392964]  slabs_destroy+0x6d/0x90^M
-> [ 1198.394439]  ___cache_free+0x632/0x770^M
-> [ 1198.395896]  kmem_cache_free.part.75+0x19/0x70^M
-> [ 1198.397791]  rcu_core+0x1eb/0x6b0^M
-> [ 1198.399829]  ? ktime_get+0x37/0xa0^M
-> [ 1198.401343]  __do_softirq+0xdf/0x2c5^M
-> [ 1198.403010]  asm_call_on_stack+0x12/0x20^M
-> [ 1198.404847]  </IRQ>^M
-> [ 1198.405799]  do_softirq_own_stack+0x39/0x50^M
-> [ 1198.407621]  irq_exit_rcu+0x97/0xa0^M
-> [ 1198.409127]  sysvec_apic_timer_interrupt+0x2c/0x80^M
-> [ 1198.410608]  asm_sysvec_apic_timer_interrupt+0x12/0x20^M
-> [ 1198.411883] RIP: 0010:default_idle+0x13/0x20^M
-> [ 1198.412994] Code: 89 44 24 20 48 83 c0 22 48 89 44 24 28 eb c7 e8 03 93 ff ff cc cc cc 0f 1f 44 00 00 e9 07 00 00 00 0f 00 2d 11 ec 55 00 fb f4 <c3> 66 66 2e 0f 1f 84 00 00 00 00 00 90 0f 1f 44 00 00 65 48 8b 04^M
-
-Hmm, so that this looks like some kind of RCU involvement?  Some kind
-of object that had been scheduled to be freed via RCU, but then got
-freed before RCU cleanup happened?
-
-The question then is what subsystem the object involved came from.
-
-    	     	     	  	    	       - Ted
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
