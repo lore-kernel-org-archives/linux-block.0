@@ -2,152 +2,129 @@ Return-Path: <SRS0=VsgY=DB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FEBC4363D
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 16:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 766BDC47420
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 17:20:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 206602395C
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 16:57:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600966654;
-	bh=JNiJdDRQsrPnbeS7IK9+G/bFB5hGKoZITwaUtsAZbH0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=hnX68RePngPsmAdfGYjqJ72UX2TSb/D7Unbrzw78tjf/+pvQRSFHX1/OmeHQr7OXX
-	 b80vHgGFDA8hYGHt6M4UJIEAwjX19xDH7FHZYQG23mmHbM/GuDzRPJWBohFVrUuJPD
-	 Bejpmg/mgQ05VXuozR/fbpiJGlf36KUwP8RcNGoA=
+	by mail.kernel.org (Postfix) with ESMTP id 2955F2395C
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 17:20:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qNlQD2VU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727058AbgIXQ5d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Sep 2020 12:57:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53396 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726458AbgIXQ5d (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Sep 2020 12:57:33 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4537D2311A;
-        Thu, 24 Sep 2020 16:57:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600966652;
-        bh=JNiJdDRQsrPnbeS7IK9+G/bFB5hGKoZITwaUtsAZbH0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lLJMRSPRXNQpBy6MpCRUPNVcZlvb7Ii/52Iwmk9hYjDZuKapjwutazBuwHQVH57rt
-         aHFaZueFZ55NCbuBf3qvo0malxcF4sFiVNpuKbI7uUL3Rp/db5ImVMIu+VqZawx5Im
-         V9WOuYfP4EUhH+SJqOq2EFhQa9ieD/XLtmsxbhaM=
-Date:   Thu, 24 Sep 2020 09:57:30 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Satya Tangirala <satyat@google.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH 2/3] dm: add support for passing through inline crypto
- support
-Message-ID: <20200924165730.GA2865480@gmail.com>
-References: <20200909234422.76194-1-satyat@google.com>
- <20200909234422.76194-3-satyat@google.com>
- <20200922003255.GC32959@sol.localdomain>
- <20200924011438.GD10500@redhat.com>
- <20200924071721.GA1883346@google.com>
- <20200924134649.GB13849@redhat.com>
- <20200924154550.GA1266@sol.localdomain>
- <20200924161624.GC14369@redhat.com>
+        id S1728613AbgIXRT4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Sep 2020 13:19:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56076 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727216AbgIXRT4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Sep 2020 13:19:56 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E3EBC0613CE;
+        Thu, 24 Sep 2020 10:19:56 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id s12so4661299wrw.11;
+        Thu, 24 Sep 2020 10:19:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kAbZd3vS2mRaNP4IzKbD5ITPH51zcyuJzcimZuIDrHU=;
+        b=qNlQD2VUwuZlfp3QTbChXLwkrg3TPs4FW/cPGjFxkYsyIdgolpsVHCzK+JtmhzuOVy
+         pdi0dktqgCnXlIOv5hDbMPTnXdMBVdkZQoe7O2BW6Bbczk9+1s2DIwD9PrSuK6v+sEaF
+         DI5dYuyUqGJB5Cqg0RJ5MGE9wp6SI2DQKTHm83cS8wjNJQ+D8i9i22W5Wc0KAEJPt/lI
+         lMqIAU3dAoFQknurRyITwbWpD/XwQwQH7f+RMIfkHbp/eYOroyMTFqQ42nmLRTZ0AFEs
+         ZImi//w1eD9Vr/kJD930rSvZA6+0qyZXWvUYBdxkM9YPx/4j22h5EaLNGpyTSrXMbCwO
+         YKUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kAbZd3vS2mRaNP4IzKbD5ITPH51zcyuJzcimZuIDrHU=;
+        b=V21uYvRbHZmmTSh3fWjo8BfbaL41yrIXH/LzNGG90j0d+TEjVPxei13O3cZ/CpZi+w
+         dsQ5Rxqv8mfkZ3D/pKzhGpeonQs2ixAtmuCBguC+xWnAICRlXSDVEll/jQrmPgCJYruh
+         KllSIWPU7j23jrqZi4AFt2/qZBce5bWkFU9a3e9ODDq1/ml3Fk0EI1QgXibidClGM8OI
+         ncDnarO0V5INSytdvFJnjZ4G59CJnm48s5WRI3gvbqYIF7dbkiI5xB80SlFjVubtCGSU
+         P9GYtyPCCG2iA5FhX7sSPkgXvlcTSlbcqbHQoXP3lT1DLMkkOzOkXMFH0cm0Akxu2jQv
+         TrMw==
+X-Gm-Message-State: AOAM530qgixWz+BMK83Ty3+x2kopAJJW9TEPB6zrRV56pBTp1V6WUU8e
+        VJqic41txBqV6JiPJvkwadNM0DDkiCM0YaRmwXf1XTevHy6UDYEwhJE=
+X-Google-Smtp-Source: ABdhPJxhIbv58SUHooN6WEjrkYW8U18ujKGcxnMYrWPH1bVWcmnQmjph4Yyi6hSpgSDoFyjg4oEh0yHOb+QZtev8xNw=
+X-Received: by 2002:adf:dd51:: with SMTP id u17mr834011wrm.355.1600967994708;
+ Thu, 24 Sep 2020 10:19:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200924161624.GC14369@redhat.com>
+References: <CA+1E3rLM4G4SwzD6RWsK6Ssp7NmhiPedZDjrqN3kORQr9fxCtw@mail.gmail.com>
+ <MWHPR04MB375863C20C1EF2CB27E62703E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731091416.GA29634@infradead.org> <MWHPR04MB37586D39CA389296CE0252A4E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731094135.GA4104@infradead.org> <MWHPR04MB3758A4B2967DB1FABAAD9265E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731125110.GA11500@infradead.org> <CY4PR04MB37517D633920E4D31AC6EA0DE74B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200814081411.GA16943@infradead.org> <CA+1E3r+WXC_MK5Zf2OZEv17ddJDjtXbhpRFoeDns4F341xMhow@mail.gmail.com>
+ <20200908151801.GA16742@infradead.org>
+In-Reply-To: <20200908151801.GA16742@infradead.org>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Thu, 24 Sep 2020 22:49:28 +0530
+Message-ID: <CA+1E3r+MSEW=-SL8L+pquq+cFAu+nQOULQ+HZoQsCvdjKMkrNw@mail.gmail.com>
+Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
+To:     "hch@infradead.org" <hch@infradead.org>
+Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 12:16:24PM -0400, Mike Snitzer wrote:
-> On Thu, Sep 24 2020 at 11:45am -0400,
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> 
-> > On Thu, Sep 24, 2020 at 09:46:49AM -0400, Mike Snitzer wrote:
-> > > > > Can you help me better understand the expected consumer of this code?
-> > > > > If you have something _real_ please be explicit.  It makes justifying
-> > > > > supporting niche code like this more tolerable.
-> > > >
-> > > > So the motivation for this code was that Android currently uses a device
-> > > > mapper target on top of a phone's disk for user data. On many phones,
-> > > > that disk has inline encryption support, and it'd be great to be able to
-> > > > make use of that. The DM device configuration isn't changed at runtime.
-> > > 
-> > > OK, which device mapper target is used?
-> > 
-> > There are several device-mapper targets that Android can require for the
-> > "userdata" partition -- potentially in a stack of more than one:
-> > 
-> > dm-linear: required for Dynamic System Updates
-> > (https://developer.android.com/topic/dsu)
-> > 
-> > dm-bow: required for User Data Checkpoints on ext4
-> > (https://source.android.com/devices/tech/ota/user-data-checkpoint)
-> > (https://patchwork.kernel.org/patch/10838743/)
-> > 
-> > dm-default-key: required for metadata encryption
-> > (https://source.android.com/security/encryption/metadata)
-> 
-> Please work with all google stakeholders to post the latest code for the
-> dm-bow and dm-default-key targets and I'll work through them.
-> 
-> I think the more code we have to inform DM core's implementation the
-> better off we'll be in the long run.  Could also help improve these
-> targets as a side-effect of additional review.
-> 
-> I know I largely ignored dm-bow before but that was more to do with
-> competing tasks, etc.  I'll try my best...
+On Tue, Sep 8, 2020 at 8:48 PM hch@infradead.org <hch@infradead.org> wrote:
+>
+> On Mon, Sep 07, 2020 at 12:31:42PM +0530, Kanchan Joshi wrote:
+> > But there are use-cases which benefit from supporting zone-append on
+> > raw block-dev path.
+> > Certain user-space log-structured/cow FS/DB will use the device that
+> > way. Aerospike is one example.
+> > Pass-through is synchronous, and we lose the ability to use io-uring.
+>
+> So use zonefs, which is designed exactly for that use case.
 
-I'm not sure what happened with dm-bow; I'll check with the person maintaining
-it.
+Not specific to zone-append, but in general it may not be good to lock
+new features/interfaces to ZoneFS alone, given that direct-block
+interface has its own merits.
+Mapping one file to a one zone is good for some use-cases, but
+limiting for others.
+Some user-space FS/DBs would be more efficient (less meta, indirection)
+with the freedom to decide file-to-zone mapping/placement.
+- Rocksdb and those LSM style DBs would map SSTable to zone, but
+SSTable file may be two small (initially) and may become too large
+(after compaction) for a zone.
+- The internal parallelism of a single zone is a design-choice, and
+depends on the drive. Writing multiple zones parallely (striped/raid
+way) can give better performance than writing on one. In that case one
+would want to file that seamlessly combines multiple-zones in a
+striped fashion.
 
-We expect that dm-default-key would be controversial, since it's sort of a
-layering violation; metadata encryption really should be a filesystem-level
-thing.  Satya has been investigating implementing it in filesystems instead.
-I think we need to see how that turns out first.
+Also it seems difficult (compared to block dev) to fit simple-copy TP
+in ZoneFS. The new
+command needs: one NVMe drive, list of source LBAs and one destination
+LBA. In ZoneFS, we would deal with N+1 file-descriptors (N source zone
+file, and one destination zone file) for that. While with block
+interface, we do not need  more than one file-descriptor representing
+the entire device. With more zone-files, we face open/close overhead too.
 
-> > We're already carrying this patchset in the Android common kernels since late
-> > last year, as it's required for inline encryption to work when any of the above
-> > is used.  So this is something that is needed and is already being used.
-> > 
-> > Now, you don't have to "count" dm-bow and dm-default-key since they aren't
-> > upstream; that leaves dm-linear.  But hopefully the others at least show that
-> > architecturally, dm-linear is just the initial use case, and this patchset also
-> > makes it easy to pass through inline crypto on any other target that can support
-> > it (basically, anything that doesn't change the data itself as it goes through).
-> 
-> Sure, that context really helps.
-> 
-> About "basically, anything that doesn't change the data itself as it
-> goes through": could you be a bit more precise?  Very few DM targets
-> actually change the data as associated bios are remapped.
-> 
-> I'm just wondering if your definition of "doesn't change the data"
-> includes things more subtle than the data itself?
-
-The semantics expected by upper layers (e.g. filesystems) are that a "write" bio
-that has an encryption context is equivalent to a "write" bio with no encryption
-context that contains the data already encrypted.  Similarly, a "read" bio with
-an encryption context is equivalent to submitting a "read" bio with no
-encryption context, then decrypting the resulting data.
-
-blk-crypto-fallback obviously works in that way.  However, when actual inline
-encryption hardware is used, the encryption/decryption actually happens at the
-lowest level in the stack.
-
-To maintain the semantics in that case, the data can't be modified anywhere in
-the stack.  For example, if the data also passes through a dm-crypt target that
-encrypted/decrypted the data (again) in software, that would break things.
-
-You're right that it's a bit more than that, though.  The targets also have to
-behave the same way regardless of whether the data is already encrypted or not.
-So if e.g. a target hashes the data, then it can't set
-may_passthrough_inline_crypto, even if it doesn't change the data.  It can't
-sometimes be hashing the plaintext data and sometimes the ciphertext data.
-(And also, storing hashes of the plaintext on-disk would be insecure, as it
-would leak information that encryption is meant to protect.)
-
-- Eric
+-- 
+Joshi
