@@ -2,92 +2,97 @@ Return-Path: <SRS0=VsgY=DB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FCFC4363D
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:03:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA45C4346E
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:45:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 032C42311B
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:03:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IKbUluUB"
+	by mail.kernel.org (Postfix) with ESMTP id 99F662344C
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:45:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600962355;
+	bh=HpgA4t7U4Z9EnRNWOupT0nHkmf0YJ69c11DT/ilOQkE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=jbhH+b2C9V2Ribp/Ry9BFA1YFZERu2iojYkSgOOW5qnoVQoW1RApujkhWb8ZkT5M2
+	 ZjY2EKH+vUD9qejssP0kdBzO9ej3T9Np0R7JxX85ZWS+ECsKr428/9CNFj7TbZg1KQ
+	 Yp3+EY20zbfbyi9ljWa5PY2lo1xO+Ii21qMNFbQ8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728292AbgIXPDb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Sep 2020 11:03:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27473 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728240AbgIXPDa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Sep 2020 11:03:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600959809;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CuPbzvXQosIYzpsTmyDB+PWCFgx3pRZznwdDq166LWs=;
-        b=IKbUluUBlNINh996O+RKMbH4p1TuesSGuv2sE3xB98vIqE3nYLAdyw9+kt7iDm7BAzNJ1K
-        CG+M8f5Oy9fI5yvidOYu/UJ2xvA9Rs8lEvfXIs77/dUGkBzMkCINAatJAIYR2s8jTfm89t
-        g28a2lipLgQdQp9Rd2uoPMfINmJHzRc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-iUJ3YX6mN1eUqjWHfNMFxw-1; Thu, 24 Sep 2020 11:03:27 -0400
-X-MC-Unique: iUJ3YX6mN1eUqjWHfNMFxw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1728373AbgIXPpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Sep 2020 11:45:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55802 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728139AbgIXPpx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Sep 2020 11:45:53 -0400
+Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C924802B75;
-        Thu, 24 Sep 2020 15:03:24 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 92FD35C1D7;
-        Thu, 24 Sep 2020 15:03:19 +0000 (UTC)
-Date:   Thu, 24 Sep 2020 11:03:19 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-raid@vger.kernel.org,
-        Hans de Goede <hdegoede@redhat.com>,
-        Justin Sanders <justin@coraid.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        cgroups@vger.kernel.org, linux-bcache@vger.kernel.org,
-        Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
-        Song Liu <song@kernel.org>, dm-devel@redhat.com,
-        linux-mtd@lists.infradead.org, Richard Weinberger <richard@nod.at>,
-        drbd-dev@tron.linbit.com, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 07/13] block: lift setting the readahead size into the
- block layer
-Message-ID: <20200924150318.GE13849@redhat.com>
-References: <20200924065140.726436-1-hch@lst.de>
- <20200924065140.726436-8-hch@lst.de>
+        by mail.kernel.org (Postfix) with ESMTPSA id 48A352220C;
+        Thu, 24 Sep 2020 15:45:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600962352;
+        bh=HpgA4t7U4Z9EnRNWOupT0nHkmf0YJ69c11DT/ilOQkE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=DnOAY6GRHn6dLZz5fydeqEsHe0EzdNDeZFd0K5h2uaQXZHwyLUmZ+LXTxOs/tSiQy
+         TSKXqWcMOeGZbfaQpSsE/LOUCLmfOeJWCnWcqsOvztQJZYu1obLZ8v1cLcvKkPBb9b
+         tU0hjvJw3t7T0tDdf2fyG3mvW/pTmeDezPFpqgBI=
+Date:   Thu, 24 Sep 2020 08:45:50 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Satya Tangirala <satyat@google.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH 2/3] dm: add support for passing through inline crypto
+ support
+Message-ID: <20200924154550.GA1266@sol.localdomain>
+References: <20200909234422.76194-1-satyat@google.com>
+ <20200909234422.76194-3-satyat@google.com>
+ <20200922003255.GC32959@sol.localdomain>
+ <20200924011438.GD10500@redhat.com>
+ <20200924071721.GA1883346@google.com>
+ <20200924134649.GB13849@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200924065140.726436-8-hch@lst.de>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200924134649.GB13849@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 24 2020 at  2:51am -0400,
-Christoph Hellwig <hch@lst.de> wrote:
-
-> Drivers shouldn't really mess with the readahead size, as that is a VM
-> concept.  Instead set it based on the optimal I/O size by lifting the
-> algorithm from the md driver when registering the disk.  Also set
-> bdi->io_pages there as well by applying the same scheme based on
-> max_sectors.  To ensure the limits work well for stacking drivers a
-> new helper is added to update the readahead limits from the block
-> limits, which is also called from disk_stack_limits.
+On Thu, Sep 24, 2020 at 09:46:49AM -0400, Mike Snitzer wrote:
+> > > Can you help me better understand the expected consumer of this code?
+> > > If you have something _real_ please be explicit.  It makes justifying
+> > > supporting niche code like this more tolerable.
+> >
+> > So the motivation for this code was that Android currently uses a device
+> > mapper target on top of a phone's disk for user data. On many phones,
+> > that disk has inline encryption support, and it'd be great to be able to
+> > make use of that. The DM device configuration isn't changed at runtime.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Coly Li <colyli@suse.de>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> OK, which device mapper target is used?
 
-Thanks for adding blk_queue_update_readahead()
+There are several device-mapper targets that Android can require for the
+"userdata" partition -- potentially in a stack of more than one:
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+dm-linear: required for Dynamic System Updates
+(https://developer.android.com/topic/dsu)
 
+dm-bow: required for User Data Checkpoints on ext4
+(https://source.android.com/devices/tech/ota/user-data-checkpoint)
+(https://patchwork.kernel.org/patch/10838743/)
+
+dm-default-key: required for metadata encryption
+(https://source.android.com/security/encryption/metadata)
+
+We're already carrying this patchset in the Android common kernels since late
+last year, as it's required for inline encryption to work when any of the above
+is used.  So this is something that is needed and is already being used.
+
+Now, you don't have to "count" dm-bow and dm-default-key since they aren't
+upstream; that leaves dm-linear.  But hopefully the others at least show that
+architecturally, dm-linear is just the initial use case, and this patchset also
+makes it easy to pass through inline crypto on any other target that can support
+it (basically, anything that doesn't change the data itself as it goes through).
+
+- Eric
