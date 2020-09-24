@@ -2,108 +2,98 @@ Return-Path: <SRS0=VsgY=DB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA13C2D0E2
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 446A0C4346E
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:58:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51E90238E3
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:57:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0151A238E3
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="td1+RxKd"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Wm/rY2eE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728521AbgIXP5t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Sep 2020 11:57:49 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:58118 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728139AbgIXP5t (ORCPT
+        id S1728485AbgIXP62 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Sep 2020 11:58:28 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:59964 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728381AbgIXP62 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Sep 2020 11:57:49 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OFYNF4187938;
-        Thu, 24 Sep 2020 15:57:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=coGfpNEvHw1Ww6VMM3AUAr95WYwBGdMfGxQAq7Ut3Eo=;
- b=td1+RxKdoLOO2t63uF4zlGVrGlzNX/kncvf9CRu1+Q/Z185II6vOPY7OYVmR00lwbBvB
- oI39qsaxEsXuhrFRnhPNYadRAzid4vpFVH1DnNrCOUVZGKGLshblg06fbzYwGPztgdZo
- Z/fUTCgCP16jQ550PJt+VWDuquf6GdVURF+vw2dk3HUNxhFcamf3ZH2BVw0ZfMpJ+5yZ
- mxpIgUdAVm3QXDHsXihsvYimVL4XmoOEGm2cGgSqGvu3D9jELBR6iVkzSAWn9+LAYCfl
- ZfTFRr7HESquQPnKqBx6g1RyXHnWraO8Kxaud9pk648QpJJgQ9L9MM7dy9P+I69dS8p3 Iw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 33qcpu62rn-1
+        Thu, 24 Sep 2020 11:58:28 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OFZKWg125745;
+        Thu, 24 Sep 2020 15:58:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=TItLMSlmVedz8D60wT2v3Gzregj/492Cx/940qop2ac=;
+ b=Wm/rY2eE0euQtNye+YNcOppYVF/IIE0kfCnCnw/ed0fVYmhBz+y8s7IeNNcVaQKYwNpu
+ CB96VViQBWoWtr7cwThuzxIhFun6tQrrBzdJVpTmfIC+MPaeFTMNwvWijxQzKxFiRiwn
+ GGYwaRBzuTvd5MYZGKgXq5UEY8i0+Wb8YRkuhne6BU8XGZ/daibUwAaUv2nqx1dA/5Iu
+ 2C/k8b32RIS3BqkIpFAuOvKsXMFFWZJ3pSqSRfc6zczBOmqvJOiWRq205e46K+Ty7ra5
+ UVJVd0lGq9bHapx+ylptn1mjqKBmIfZBtGTGawaKWsECQRQGWbb2W6vC/mPTyqSplBcO DQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 33q5rgqgp7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 24 Sep 2020 15:57:21 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OFUVZ4083297;
-        Thu, 24 Sep 2020 15:57:21 GMT
+        Thu, 24 Sep 2020 15:58:19 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OFVSk0126419;
+        Thu, 24 Sep 2020 15:58:18 GMT
 Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 33nujr3a74-1
+        by userp3030.oracle.com with ESMTP id 33nux303cj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Sep 2020 15:57:21 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08OFvJrj021930;
-        Thu, 24 Sep 2020 15:57:19 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        Thu, 24 Sep 2020 15:58:18 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08OFwGRO022527;
+        Thu, 24 Sep 2020 15:58:16 GMT
+Received: from char.us.oracle.com (/10.152.32.25)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 24 Sep 2020 08:57:19 -0700
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Coly Li <colyli@suse.de>, Richard Weinberger <richard@nod.at>,
-        Minchan Kim <minchan@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Justin Sanders <justin@coraid.com>,
-        linux-mtd@lists.infradead.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-kernel@vger.kernel.org, drbd-dev@tron.linbit.com,
-        linux-raid@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, cgroups@vger.kernel.org
-Subject: Re: [PATCH 07/13] block: lift setting the readahead size into the
- block layer
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1y2kzkw1h.fsf@ca-mkp.ca.oracle.com>
-References: <20200924065140.726436-1-hch@lst.de>
-        <20200924065140.726436-8-hch@lst.de>
-Date:   Thu, 24 Sep 2020 11:57:14 -0400
-In-Reply-To: <20200924065140.726436-8-hch@lst.de> (Christoph Hellwig's message
-        of "Thu, 24 Sep 2020 08:51:34 +0200")
+        with ESMTP ; Thu, 24 Sep 2020 08:58:16 -0700
+Received: by char.us.oracle.com (Postfix, from userid 1000)
+        id 86D976A0109; Thu, 24 Sep 2020 11:59:46 -0400 (EDT)
+Date:   Thu, 24 Sep 2020 11:59:46 -0400
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Cc:     SeongJae Park <sjpark@amazon.com>,
+        SeongJae Park <sjpark@amazon.de>, axboe@kernel.dk,
+        aliguori@amazon.com, amit@kernel.org, mheyne@amazon.de,
+        linux-block@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] xen-blkback: add a parameter for disabling of persistent
+ grants
+Message-ID: <20200924155946.GB6370@char.us.oracle.com>
+References: <20200924101344.GN19254@Air-de-Roger>
+ <20200924102714.28141-1-sjpark@amazon.com>
+ <20200924104720.GO19254@Air-de-Roger>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200924104720.GO19254@Air-de-Roger>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 adultscore=0 spamscore=0 suspectscore=1
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009240118
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=999
- adultscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
- phishscore=0 spamscore=0 malwarescore=0 clxscore=1015 impostorscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 adultscore=0
+ bulkscore=0 mlxlogscore=941 phishscore=0 suspectscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2009240118
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 impostorscore=0
+ clxscore=1015 suspectscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 mlxlogscore=954 adultscore=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009240118
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+.snip..
+> > For the reason, I'd like to suggest to keep this as is for now and expand it
+> > with the 'exceptions list' idea or something better, if a real use case comes
+> > out later.
+> 
+> I agree. I'm happy to take patches to implement more fine grained
+> control, but that shouldn't prevent us from having a global policy if
+> that's useful to users.
 
-Christoph,
-
-> Drivers shouldn't really mess with the readahead size, as that is a VM
-> concept.  Instead set it based on the optimal I/O size by lifting the
-> algorithm from the md driver when registering the disk.  Also set
-> bdi->io_pages there as well by applying the same scheme based on
-> max_sectors.  To ensure the limits work well for stacking drivers a
-> new helper is added to update the readahead limits from the block
-> limits, which is also called from disk_stack_limits.
-
-Looks good!
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+<nods>
