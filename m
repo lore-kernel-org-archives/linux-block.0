@@ -4,96 +4,128 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 446A0C4346E
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64488C4727E
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 16:16:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0151A238E3
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 15:58:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09ADD2311B
+	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 16:16:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Wm/rY2eE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZptJvB+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728485AbgIXP62 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Sep 2020 11:58:28 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:59964 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728381AbgIXP62 (ORCPT
+        id S1726868AbgIXQQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Sep 2020 12:16:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50154 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726697AbgIXQQd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Sep 2020 11:58:28 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OFZKWg125745;
-        Thu, 24 Sep 2020 15:58:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=TItLMSlmVedz8D60wT2v3Gzregj/492Cx/940qop2ac=;
- b=Wm/rY2eE0euQtNye+YNcOppYVF/IIE0kfCnCnw/ed0fVYmhBz+y8s7IeNNcVaQKYwNpu
- CB96VViQBWoWtr7cwThuzxIhFun6tQrrBzdJVpTmfIC+MPaeFTMNwvWijxQzKxFiRiwn
- GGYwaRBzuTvd5MYZGKgXq5UEY8i0+Wb8YRkuhne6BU8XGZ/daibUwAaUv2nqx1dA/5Iu
- 2C/k8b32RIS3BqkIpFAuOvKsXMFFWZJ3pSqSRfc6zczBOmqvJOiWRq205e46K+Ty7ra5
- UVJVd0lGq9bHapx+ylptn1mjqKBmIfZBtGTGawaKWsECQRQGWbb2W6vC/mPTyqSplBcO DQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 33q5rgqgp7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 24 Sep 2020 15:58:19 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OFVSk0126419;
-        Thu, 24 Sep 2020 15:58:18 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 33nux303cj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Sep 2020 15:58:18 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08OFwGRO022527;
-        Thu, 24 Sep 2020 15:58:16 GMT
-Received: from char.us.oracle.com (/10.152.32.25)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 24 Sep 2020 08:58:16 -0700
-Received: by char.us.oracle.com (Postfix, from userid 1000)
-        id 86D976A0109; Thu, 24 Sep 2020 11:59:46 -0400 (EDT)
-Date:   Thu, 24 Sep 2020 11:59:46 -0400
-From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To:     Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-Cc:     SeongJae Park <sjpark@amazon.com>,
-        SeongJae Park <sjpark@amazon.de>, axboe@kernel.dk,
-        aliguori@amazon.com, amit@kernel.org, mheyne@amazon.de,
-        linux-block@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] xen-blkback: add a parameter for disabling of persistent
- grants
-Message-ID: <20200924155946.GB6370@char.us.oracle.com>
-References: <20200924101344.GN19254@Air-de-Roger>
- <20200924102714.28141-1-sjpark@amazon.com>
- <20200924104720.GO19254@Air-de-Roger>
+        Thu, 24 Sep 2020 12:16:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600964191;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8EfF16bCe0njopv3EGBmqLVMqnHunaWFKN8Yz67AbYg=;
+        b=SZptJvB+pQlcd8YjUUqMlwenVsqSUxMuO+75CO6TJJPp2HagDGhNzOWU1FSlXs0AGN9WOg
+        0BDFZEPuLr8eEAs3qh0GKUaT5+Ad/wYr4my5antAmLTmrC4hDU/VQfDwv9F3DmFV4QMO3C
+        WapHhgOXl4rQ9xypYuGnHQ2RmZF+8oU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-536-lKHT9NflMrW8m7cD-KYijw-1; Thu, 24 Sep 2020 12:16:29 -0400
+X-MC-Unique: lKHT9NflMrW8m7cD-KYijw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D521100746C;
+        Thu, 24 Sep 2020 16:16:28 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DA2C455785;
+        Thu, 24 Sep 2020 16:16:24 +0000 (UTC)
+Date:   Thu, 24 Sep 2020 12:16:24 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Satya Tangirala <satyat@google.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH 2/3] dm: add support for passing through inline crypto
+ support
+Message-ID: <20200924161624.GC14369@redhat.com>
+References: <20200909234422.76194-1-satyat@google.com>
+ <20200909234422.76194-3-satyat@google.com>
+ <20200922003255.GC32959@sol.localdomain>
+ <20200924011438.GD10500@redhat.com>
+ <20200924071721.GA1883346@google.com>
+ <20200924134649.GB13849@redhat.com>
+ <20200924154550.GA1266@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200924104720.GO19254@Air-de-Roger>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 adultscore=0
- bulkscore=0 mlxlogscore=941 phishscore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009240118
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9753 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 impostorscore=0
- clxscore=1015 suspectscore=0 phishscore=0 malwarescore=0
- priorityscore=1501 mlxlogscore=954 adultscore=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009240118
+In-Reply-To: <20200924154550.GA1266@sol.localdomain>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-.snip..
-> > For the reason, I'd like to suggest to keep this as is for now and expand it
-> > with the 'exceptions list' idea or something better, if a real use case comes
-> > out later.
-> 
-> I agree. I'm happy to take patches to implement more fine grained
-> control, but that shouldn't prevent us from having a global policy if
-> that's useful to users.
+On Thu, Sep 24 2020 at 11:45am -0400,
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-<nods>
+> On Thu, Sep 24, 2020 at 09:46:49AM -0400, Mike Snitzer wrote:
+> > > > Can you help me better understand the expected consumer of this code?
+> > > > If you have something _real_ please be explicit.  It makes justifying
+> > > > supporting niche code like this more tolerable.
+> > >
+> > > So the motivation for this code was that Android currently uses a device
+> > > mapper target on top of a phone's disk for user data. On many phones,
+> > > that disk has inline encryption support, and it'd be great to be able to
+> > > make use of that. The DM device configuration isn't changed at runtime.
+> > 
+> > OK, which device mapper target is used?
+> 
+> There are several device-mapper targets that Android can require for the
+> "userdata" partition -- potentially in a stack of more than one:
+> 
+> dm-linear: required for Dynamic System Updates
+> (https://developer.android.com/topic/dsu)
+> 
+> dm-bow: required for User Data Checkpoints on ext4
+> (https://source.android.com/devices/tech/ota/user-data-checkpoint)
+> (https://patchwork.kernel.org/patch/10838743/)
+> 
+> dm-default-key: required for metadata encryption
+> (https://source.android.com/security/encryption/metadata)
+
+Please work with all google stakeholders to post the latest code for the
+dm-bow and dm-default-key targets and I'll work through them.
+
+I think the more code we have to inform DM core's implementation the
+better off we'll be in the long run.  Could also help improve these
+targets as a side-effect of additional review.
+
+I know I largely ignored dm-bow before but that was more to do with
+competing tasks, etc.  I'll try my best...
+
+> We're already carrying this patchset in the Android common kernels since late
+> last year, as it's required for inline encryption to work when any of the above
+> is used.  So this is something that is needed and is already being used.
+> 
+> Now, you don't have to "count" dm-bow and dm-default-key since they aren't
+> upstream; that leaves dm-linear.  But hopefully the others at least show that
+> architecturally, dm-linear is just the initial use case, and this patchset also
+> makes it easy to pass through inline crypto on any other target that can support
+> it (basically, anything that doesn't change the data itself as it goes through).
+
+Sure, that context really helps.
+
+About "basically, anything that doesn't change the data itself as it
+goes through": could you be a bit more precise?  Very few DM targets
+actually change the data as associated bios are remapped.
+
+I'm just wondering if your definition of "doesn't change the data"
+includes things more subtle than the data itself?
+
+Thanks,
+Mike
+
