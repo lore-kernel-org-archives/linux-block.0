@@ -2,193 +2,135 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D0FC4727E
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 21:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16467C4727F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 21:19:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD94420BED
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 21:03:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B00BA21D7F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 21:19:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="x/2Q/KRt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eNZv88uT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726626AbgIYVDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 17:03:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58656 "EHLO
+        id S1728869AbgIYVTC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 17:19:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727569AbgIYVDg (ORCPT
+        with ESMTP id S1727423AbgIYVTB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 17:03:36 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32F7C0613E7
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 12:26:01 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id kk9so38800pjb.2
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 12:26:01 -0700 (PDT)
+        Fri, 25 Sep 2020 17:19:01 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48DD2C0613D5
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 14:19:01 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id b12so4315514lfp.9
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 14:19:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CU6ZoY19qNew+bacQz7VRCDPOd80ooSB94ZtPhhMDDo=;
-        b=x/2Q/KRtrT3AG0fWovV2R4PZtZswFHFXlfJTyUxV4Oc9vB0J42p5vxPtBzEANB+PIy
-         iN1hZPCqnzrFyZ7JBM3XnshEvqaS2apL/ywpSAc6UJdF1+bYpER8ES8PKB2/zEtWv3qi
-         g9VBamYBmmy6vmsPaZXunwZ5TzTAiw0Aaaaop65lLzsBnPLWJWV/tLIm8qq162sR5fq+
-         Ovht6uCrbOTZmvJMkW5/PwidWsVclA1PE7LVG5NuOC6Cv9/02Qz6ZqYTURFEu+Cbrj6r
-         f+VwZX4LWuuCyavET9Rmf3rtKFpGm5z6bsxfb9ozLsb9H2BkkX4iE/yvoIxeq3/5BKkR
-         KY3A==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BAZC5WdsihBei8ZEYFA5ibD70o4Yn/tMBPfbhpwMzrw=;
+        b=eNZv88uTD+H0687sCNUjErQN0ou7Br7/82NHVBB4WbSsMLa6Xv+b6Py7dIwago8+oV
+         LVTgsWVWUV0AfVW3zTJ2+BPeF/2CRbdZ5mh6o59MNoQ8Os2KF2lKb1rUuBeXIczq23h9
+         gAwf6yQbAUadJ4ve7LCZdZFcw2mMfQTUgRC19MgdwFfnqyYGhRVeG5L6ZpEdPBplhIsF
+         kZZvxrpjdnCLAqObXL+OsCdWoPpV1aD42X9YJXAQN3Y/byVqUSwl7dhz+C1N/NGxqKve
+         UFJ+q2IfH/66yw4Iib1An5JHeYd5cCNdqIuigSrwMSdO6gjXfmKxrulbrZdU03sEjUkF
+         Q3Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CU6ZoY19qNew+bacQz7VRCDPOd80ooSB94ZtPhhMDDo=;
-        b=S3q3cL6C1kjwRaYzXfFOCqwppE7Y899fKxN0aedz/PNQlDkZaMu4YpAY406NOdNd0E
-         fmrxX4gv8qI69Ix0FYZ1j0GXK0q1n5+69DtQjkCQnPutPXmMjwSdyP1f4AbcBYJ+r+D1
-         YrbnpTnFyE/lLta2WRrB+Xi7uaPZfHRjKnle8M+yK7I6SMp98F46uTAJm7Zew9Ct2dDk
-         R6XBeyoRfhDlhm8YSp0XXj9r3arvQ+sbxHFW/k2JChXokNTzHcSWhY9XBae8mqrwdtCF
-         xBCT4OT18Qbzny0lzop9r/ybEsUaTGEL3pJdxlK35LRW+j52o6YhAS+IYC6eCihVrxy0
-         mfFQ==
-X-Gm-Message-State: AOAM531yvVlvRvWl23+WLhe6eijVKjmmNC74i2KsI/vPrunj6jWPW1Rs
-        499Jba9tR26c1s9TFm+vIOLxMrFQdFnrVA==
-X-Google-Smtp-Source: ABdhPJzuRIAde0XkdTJMcVQqs0/gYS4ilV0UQDlaks4rICRq07WDXiVNwzG7rudI1Nde6MNN2hQ5Jw==
-X-Received: by 2002:a17:90a:4cc6:: with SMTP id k64mr82968pjh.103.1601061961083;
-        Fri, 25 Sep 2020 12:26:01 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 134sm3434605pfa.93.2020.09.25.12.25.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Sep 2020 12:26:00 -0700 (PDT)
-Subject: Re: [PATCH] [v2] blk-mq: add cond_resched() in
- __blk_mq_alloc_rq_maps()
-To:     Xianting Tian <tian.xianting@h3c.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200917081311.11428-1-tian.xianting@h3c.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c55b365d-c6b0-6207-f326-6d58dd113d18@kernel.dk>
-Date:   Fri, 25 Sep 2020 13:25:58 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BAZC5WdsihBei8ZEYFA5ibD70o4Yn/tMBPfbhpwMzrw=;
+        b=ZOVzQrwTgDlsrxnOW9f9kh/nPIEx1rSuYD7eqsjkmlkhXLYu4OADdOqk0zq5rJGdVH
+         2hE18vr8FGYEl9hFU2CuYlECWVhiVYgvmXd1ydukNzsaVdlKhzR2mYkIcguLmrjaPBF6
+         r5BRVETnEx6WaD7bgCUbuJ+rv9+oBTxZSh84e23jp59pSHpv1w06sGrYL3+B4yTRARN2
+         VLVJo+vyXXDQp505sCARglmDhgWQBwRpTg4TArAL8JUz3q73z+QrKIpGTcIImTaoBfCh
+         kKX7LSQiQyq2uI3kvCrrWCL0uICWWJKce0ukDQUtJ31VKpBmRews32DGAql8ahs34d1Y
+         MBSQ==
+X-Gm-Message-State: AOAM5315rS34p6u39QYLg1rpv9jVdghZCpSmA1JYWZtfKHLVB5CZF3rR
+        iXYgY0SbfMwaMeRqibxB/oKWyZBm9XfEt04IRoC6XQ==
+X-Google-Smtp-Source: ABdhPJxUEE37WPkdJrc9HedFYru6tI6b/9DtnLDZsC2ZOqMgNlXO3m98KYOozN9brJWAwI+Hjol/pci4CGZ7tcktK4w=
+X-Received: by 2002:ac2:4315:: with SMTP id l21mr254323lfh.494.1601068739382;
+ Fri, 25 Sep 2020 14:18:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200917081311.11428-1-tian.xianting@h3c.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CALvZod5pERERkxWAJcBrZHpcWQH75kXkys2gUg__qM9OL+MmtQ@mail.gmail.com>
+ <20200925191902.543953-1-shakeelb@google.com> <20200925205604.GA2228989@carbon.dhcp.thefacebook.com>
+In-Reply-To: <20200925205604.GA2228989@carbon.dhcp.thefacebook.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Fri, 25 Sep 2020 14:18:48 -0700
+Message-ID: <CALvZod5ETbjn7Y0A619Sd+sFO_9QCnUDC-_pBXPgq9AkAK0LRQ@mail.gmail.com>
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+To:     Roman Gushchin <guro@fb.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>, Jens Axboe <axboe@kernel.dk>,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/17/20 2:13 AM, Xianting Tian wrote:
-> We found it takes more time of blk_mq_alloc_rq_maps() in kernel space when
-> testing nvme hot-plugging. The test and anlysis as below.
-> 
-> Debug code,
-> 1, blk_mq_alloc_rq_maps():
->         u64 start, end;
->         depth = set->queue_depth;
->         start = ktime_get_ns();
->         pr_err("[%d:%s switch:%ld,%ld] queue depth %d, nr_hw_queues %d\n",
->                         current->pid, current->comm, current->nvcsw, current->nivcsw,
->                         set->queue_depth, set->nr_hw_queues);
->         do {
->                 err = __blk_mq_alloc_rq_maps(set);
->                 if (!err)
->                         break;
-> 
->                 set->queue_depth >>= 1;
->                 if (set->queue_depth < set->reserved_tags + BLK_MQ_TAG_MIN) {
->                         err = -ENOMEM;
->                         break;
->                 }
->         } while (set->queue_depth);
->         end = ktime_get_ns();
->         pr_err("[%d:%s switch:%ld,%ld] all hw queues init cost time %lld ns\n",
->                         current->pid, current->comm,
->                         current->nvcsw, current->nivcsw, end - start);
-> 
-> 2, __blk_mq_alloc_rq_maps():
->         u64 start, end;
->         for (i = 0; i < set->nr_hw_queues; i++) {
->                 start = ktime_get_ns();
->                 if (!__blk_mq_alloc_rq_map(set, i))
->                         goto out_unwind;
->                 end = ktime_get_ns();
->                 pr_err("hw queue %d init cost time %lld\n", i, end - start);
->         }
-> 
-> Test nvme hot-plugging with above debug code, we found it totally cost more
-> than 3ms in kernel space without being scheduled out when alloc rqs for all
-> 16 hw queues with depth 1024, each hw queue cost about 140-250us. The time
-> cost will be increased with hw queue number and queue depth increasing. And
-> if __blk_mq_alloc_rq_maps() returns -ENOMEM, it will try "queue_depth >>= 1",
-> more time will be consumed.
-> 	[  428.428771] nvme nvme0: pci function 10000:01:00.0
-> 	[  428.428798] nvme 10000:01:00.0: enabling device (0000 -> 0002)
-> 	[  428.428806] pcieport 10000:00:00.0: can't derive routing for PCI INT A
-> 	[  428.428809] nvme 10000:01:00.0: PCI INT A: no GSI
-> 	[  432.593374] [4688:kworker/u33:8 switch:663,2] queue depth 30, nr_hw_queues 1
-> 	[  432.593404] hw queue 0 init cost time 22883 ns
-> 	[  432.593408] [4688:kworker/u33:8 switch:663,2] all hw queues init cost time 35960 ns
-> 	[  432.595953] nvme nvme0: 16/0/0 default/read/poll queues
-> 	[  432.595958] [4688:kworker/u33:8 switch:700,2] queue depth 1023, nr_hw_queues 16
-> 	[  432.596203] hw queue 0 init cost time 242630 ns
-> 	[  432.596441] hw queue 1 init cost time 235913 ns
-> 	[  432.596659] hw queue 2 init cost time 216461 ns
-> 	[  432.596877] hw queue 3 init cost time 215851 ns
-> 	[  432.597107] hw queue 4 init cost time 228406 ns
-> 	[  432.597336] hw queue 5 init cost time 227298 ns
-> 	[  432.597564] hw queue 6 init cost time 224633 ns
-> 	[  432.597785] hw queue 7 init cost time 219954 ns
-> 	[  432.597937] hw queue 8 init cost time 150930 ns
-> 	[  432.598082] hw queue 9 init cost time 143496 ns
-> 	[  432.598231] hw queue 10 init cost time 147261 ns
-> 	[  432.598397] hw queue 11 init cost time 164522 ns
-> 	[  432.598542] hw queue 12 init cost time 143401 ns
-> 	[  432.598692] hw queue 13 init cost time 148934 ns
-> 	[  432.598841] hw queue 14 init cost time 147194 ns
-> 	[  432.598991] hw queue 15 init cost time 148942 ns
-> 	[  432.598993] [4688:kworker/u33:8 switch:700,2] all hw queues init cost time 3035099 ns
-> 	[  432.602611]  nvme0n1: p1
-> 
-> So use this patch to trigger schedule between each hw queue init, to avoid
-> other threads getting stuck. We call cond_resched() only when
-> "queue depth >= 512". We are not in atomic context when executing
-> __blk_mq_alloc_rq_maps(), so it is safe to call cond_resched().
-> 
-> Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
-> ---
->  block/blk-mq.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index b3d2785ee..5a71fe53a 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3255,11 +3255,16 @@ void blk_mq_exit_queue(struct request_queue *q)
->  static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
->  {
->  	int i;
-> +	unsigned int depth = set->queue_depth;
->  
-> -	for (i = 0; i < set->nr_hw_queues; i++)
-> +	for (i = 0; i < set->nr_hw_queues; i++) {
->  		if (!__blk_mq_alloc_map_and_request(set, i))
->  			goto out_unwind;
->  
-> +		if (depth >= 512)
-> +			cond_resched();
-> +	}
-> +
->  	return 0;
+On Fri, Sep 25, 2020 at 1:56 PM Roman Gushchin <guro@fb.com> wrote:
+>
+> On Fri, Sep 25, 2020 at 12:19:02PM -0700, Shakeel Butt wrote:
+> > On Fri, Sep 25, 2020 at 10:58 AM Shakeel Butt <shakeelb@google.com>
+> > wrote:
+> > >
+> > [snip]
+> > >
+> > > I don't think you can ignore the flushing. The __free_once() in
+> > > ___cache_free() assumes there is a space available.
+> > >
+> > > BTW do_drain() also have the same issue.
+> > >
+> > > Why not move slabs_destroy() after we update ac->avail and memmove()?
+> >
+> > Ming, can you please try the following patch?
+> >
+> >
+> > From: Shakeel Butt <shakeelb@google.com>
+> >
+> > [PATCH] mm: slab: fix potential infinite recursion in ___cache_free
+> >
+> > With the commit 10befea91b61 ("mm: memcg/slab: use a single set of
+> > kmem_caches for all allocations"), it becomes possible to call kfree()
+> > from the slabs_destroy(). However if slabs_destroy() is being called for
+> > the array_cache of the local CPU then this opens the potential scenario
+> > of infinite recursion because kfree() called from slabs_destroy() can
+> > call slabs_destroy() with the same array_cache of the local CPU. Since
+> > the array_cache of the local CPU is not updated before calling
+> > slabs_destroy(), it will try to free the same pages.
+> >
+> > To fix the issue, simply update the cache before calling
+> > slabs_destroy().
+> >
+> > Signed-off-by: Shakeel Butt <shakeelb@google.com>
+>
+> I like the patch and I think it should fix the problem.
+>
+> However the description above should be likely asjusted a bit.
+> It seems that the problem is not necessary caused by an infinite recursion,
+> it can be even simpler.
+>
+> In cache_flusharray() we rely on the state of ac, which is described
+> by ac->avail. In particular we rely on batchcount < ac->avail,
+> as we shift the batchcount number of pointers by memmove.
+> But if slabs_destroy() is called before and leaded to a change of the
+> ac state, it can lead to a memory corruption.
+>
+> Also, unconditionally resetting ac->avail to 0 in do_drain() after calling
+> to slab_destroy() seems to be wrong.
+> It explains double free BUGs we've seen in stacktraces.
+>
 
-I generally dislike
-
-if (some_num)
-	cond_resched();
-
-particularly when it's not a true hot path. How about just making the
-cond_resched() unconditional? I suspect that will be just fine.
-
--- 
-Jens Axboe
-
+Yes, you are right. Let's first get this patch tested and after
+confirmation we can update the commit message.
