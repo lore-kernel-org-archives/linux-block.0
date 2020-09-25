@@ -2,156 +2,108 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDBEC4727F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF48C4727E
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A7502086A
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:38:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 753F921D42
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:54:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fl2TaMkw"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="t0qzyxZi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728894AbgIYUig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 16:38:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728678AbgIYUif (ORCPT
+        id S1727269AbgIYUyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 16:54:38 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:44806 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725272AbgIYUyh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 16:38:35 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD21EC0613DF
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 12:19:22 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id k9so3037398pgq.19
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 12:19:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=c9CDfynf/KUxdFh8n3XOljSdCkgSvr8lNgdQYSCmCYk=;
-        b=fl2TaMkw1JkltuSEzdvWcmFU9+d3U4yl5mjSBoCcGilxxYeoBy74RE52xS+Ln6YSrb
-         xEy+4y7Pvmsv+LwnX76eQOdXe30Zv3CtkS1gl6iEVW5MN4l1N785IqZoKriNLCcNC9FH
-         S6ibrfOLkK/rrw2nucf69VVUnqeUM5DO82RikP4ZH6i98QBEDjsRVRwnsKvdBMAVvYHv
-         DhwgdImhtYWhDpVVoh5yX/JxpO7VW+ob3jvyRoDZ0/Lk1tvwArMtjiZtmef7yqZsuXkh
-         nuhyhbn0O68fp167oKpymHn64S0FLQIdUGSCx8xSoq+lBpM5IcgZULlrvNq0/945p8Zx
-         OOGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=c9CDfynf/KUxdFh8n3XOljSdCkgSvr8lNgdQYSCmCYk=;
-        b=gy+i/4Ky65UUF9SDyhwCULsA0o13w6frTlaZx39x5GZAGWi6nHtdBxxtN2ipBDhEyZ
-         BCYI/QSeuIRZJpgcSlbCN8r599V6tg2MzE5GdKRLkkbcrM1NRqb5vie0a8oDkUl9/Un9
-         lqAcz8Fpjqf1spAlNmkWNgZDQ93/8TCBO1iAaTnrV6JL+8oBIWEObaZ1g/D79sjUOZeC
-         EmyymgSdmAQ8Qo/jeSBw1MCdeDwtHhlKx8UYAS+ZFg0C1YXG9QA8HC5SjZrk9IUSK07w
-         q4/lyCqvCHrKjmmfO623rMC4J1+wOmMFxyUQJjjLKnO+42Oqy6dg2g5cgJTtnn9l6gZH
-         TQmw==
-X-Gm-Message-State: AOAM531Eqba8+n0OS10IGVUhMoACzn4/ioPgxqnebA/JUd0FL4leKj+M
-        PvJMfRIx5aN15RkMfQWGYKanb2cIw7BNew==
-X-Google-Smtp-Source: ABdhPJyLFbH0nTn+I3Lwc3lBcbpV1gXP2gky2AKFlBb1OO3GB1kXpbwWnmfIuyJwos/1CTeA/XwLjOz7K97s6w==
-Sender: "shakeelb via sendgmr" <shakeelb@shakeelb.svl.corp.google.com>
-X-Received: from shakeelb.svl.corp.google.com ([2620:15c:2cd:202:a28c:fdff:fee8:36f0])
- (user=shakeelb job=sendgmr) by 2002:a17:90a:4cc6:: with SMTP id
- k64mr62957pjh.103.1601061562249; Fri, 25 Sep 2020 12:19:22 -0700 (PDT)
-Date:   Fri, 25 Sep 2020 12:19:02 -0700
-In-Reply-To: <CALvZod5pERERkxWAJcBrZHpcWQH75kXkys2gUg__qM9OL+MmtQ@mail.gmail.com>
-Message-Id: <20200925191902.543953-1-shakeelb@google.com>
-Mime-Version: 1.0
-References: <CALvZod5pERERkxWAJcBrZHpcWQH75kXkys2gUg__qM9OL+MmtQ@mail.gmail.com>
-X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-From:   Shakeel Butt <shakeelb@google.com>
-To:     Roman Gushchin <guro@fb.com>, Ming Lei <ming.lei@redhat.com>
-Cc:     Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>, Jens Axboe <axboe@kernel.dk>,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Shakeel Butt <shakeelb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 25 Sep 2020 16:54:37 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08PKn2cc039197;
+        Fri, 25 Sep 2020 20:54:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=KE/6frUW0qLJ4yGqJjxsOBztcMMvJKPi7N6S9765s1A=;
+ b=t0qzyxZi0dl+YKzXtuDuHrMGqOKgH5fIMmpwIJWVMm/U3dTu+P1SS3kJTlx79mD5uwMC
+ A2Edf31HXh7Zjrho5JXRQeOv1ImV1hVmEUYsbtNFLoJL4bYLIxAyhjP+J/0Zp7ifDQzk
+ 3Nx9/VbQNAqiGj7LS7WXYR2mfogIVEGEDnYRbjzFJkRbq3WNPTTAj2pLS3zagmxoYMTV
+ iw0TWXITzP/XF5OpedI74kVNFQzbK4Xkz4lunnpJPRW1Rg6Stg2474URqb04tp+XNqiJ
+ CwLxCCi7uoZ8T0Vakvb3aUzZrxZh3Nt0KvQ9mrqnvOxELTIQV/CUCoVWCkaNPXyc2d99 Xw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 33ndnuysne-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 25 Sep 2020 20:54:14 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08PKoEmv040658;
+        Fri, 25 Sep 2020 20:54:13 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 33r28yufem-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Sep 2020 20:54:13 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08PKsBj6030876;
+        Fri, 25 Sep 2020 20:54:11 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 25 Sep 2020 13:54:10 -0700
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        netdev@vger.kernel.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vasily Averin <vvs@virtuozzo.com>,
+        Cong Wang <amwang@redhat.com>,
+        Mike Christie <michaelc@cs.wisc.edu>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v8 6/7] scsi: libiscsi: use sendpage_ok() in
+ iscsi_tcp_segment_map()
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq18scxinmw.fsf@ca-mkp.ca.oracle.com>
+References: <20200925150119.112016-1-colyli@suse.de>
+        <20200925150119.112016-7-colyli@suse.de>
+Date:   Fri, 25 Sep 2020 16:54:07 -0400
+In-Reply-To: <20200925150119.112016-7-colyli@suse.de> (Coly Li's message of
+        "Fri, 25 Sep 2020 23:01:18 +0800")
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9755 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=845
+ suspectscore=1 adultscore=0 bulkscore=0 malwarescore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009250150
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9755 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 suspectscore=1 bulkscore=0
+ clxscore=1011 impostorscore=0 mlxlogscore=827 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009250150
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 10:58 AM Shakeel Butt <shakeelb@google.com>
-wrote:
+
+Coly,
+
+> In iscsci driver, iscsi_tcp_segment_map() uses the following code to
+> check whether the page should or not be handled by sendpage:
+>     if (!recv && page_count(sg_page(sg)) >= 1 && !PageSlab(sg_page(sg)))
 >
-[snip]
+> The "page_count(sg_page(sg)) >= 1 && !PageSlab(sg_page(sg)" part is to
+> make sure the page can be sent to network layer's zero copy path. This
+> part is exactly what sendpage_ok() does.
 >
-> I don't think you can ignore the flushing. The __free_once() in
-> ___cache_free() assumes there is a space available.
->
-> BTW do_drain() also have the same issue.
->
-> Why not move slabs_destroy() after we update ac->avail and memmove()?
+> This patch uses  use sendpage_ok() in iscsi_tcp_segment_map() to replace
+> the original open coded checks.
 
-Ming, can you please try the following patch?
+Looks fine to me.
 
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-From: Shakeel Butt <shakeelb@google.com>
-
-[PATCH] mm: slab: fix potential infinite recursion in ___cache_free
-
-With the commit 10befea91b61 ("mm: memcg/slab: use a single set of
-kmem_caches for all allocations"), it becomes possible to call kfree()
-from the slabs_destroy(). However if slabs_destroy() is being called for
-the array_cache of the local CPU then this opens the potential scenario
-of infinite recursion because kfree() called from slabs_destroy() can
-call slabs_destroy() with the same array_cache of the local CPU. Since
-the array_cache of the local CPU is not updated before calling
-slabs_destroy(), it will try to free the same pages.
-
-To fix the issue, simply update the cache before calling
-slabs_destroy().
-
-Signed-off-by: Shakeel Butt <shakeelb@google.com>
----
- mm/slab.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/mm/slab.c b/mm/slab.c
-index 3160dff6fd76..f658e86ec8ce 100644
---- a/mm/slab.c
-+++ b/mm/slab.c
-@@ -1632,6 +1632,10 @@ static void slab_destroy(struct kmem_cache *cachep, struct page *page)
- 		kmem_cache_free(cachep->freelist_cache, freelist);
- }
- 
-+/*
-+ * Update the size of the caches before calling slabs_destroy as it may
-+ * recursively call kfree.
-+ */
- static void slabs_destroy(struct kmem_cache *cachep, struct list_head *list)
- {
- 	struct page *page, *n;
-@@ -2153,8 +2157,8 @@ static void do_drain(void *arg)
- 	spin_lock(&n->list_lock);
- 	free_block(cachep, ac->entry, ac->avail, node, &list);
- 	spin_unlock(&n->list_lock);
--	slabs_destroy(cachep, &list);
- 	ac->avail = 0;
-+	slabs_destroy(cachep, &list);
- }
- 
- static void drain_cpu_caches(struct kmem_cache *cachep)
-@@ -3402,9 +3406,9 @@ static void cache_flusharray(struct kmem_cache *cachep, struct array_cache *ac)
- 	}
- #endif
- 	spin_unlock(&n->list_lock);
--	slabs_destroy(cachep, &list);
- 	ac->avail -= batchcount;
- 	memmove(ac->entry, &(ac->entry[batchcount]), sizeof(void *)*ac->avail);
-+	slabs_destroy(cachep, &list);
- }
- 
- /*
 -- 
-2.28.0.681.g6f77f65b4e-goog
-
+Martin K. Petersen	Oracle Linux Engineering
