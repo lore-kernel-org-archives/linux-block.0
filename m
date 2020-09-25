@@ -2,113 +2,167 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D35AC4727F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 07:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D73C4363D
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 10:11:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EBDE235FA
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 07:32:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6BKYLoe"
+	by mail.kernel.org (Postfix) with ESMTP id C047421741
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 10:11:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727044AbgIYHcE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 03:32:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55794 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727201AbgIYHcE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 03:32:04 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601019122;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OAW0t8KRUC4c7xqD0bS+SqinnFap8rpYlqZ1QIeslGs=;
-        b=e6BKYLoeq2TUsBR/uSrcalCDcbFRrDDpN9E0PL/0RcSohKxA/vzLW1ah6LKvSHmG7Wvtyi
-        qJAoS1v/UmlGAoCOYbbTAcCtVBqIygwjxzvzuwsDPagpjERYZOKnFHQRxlRHch/N0/Tinw
-        bw+jubdM1qSajQvm6d64qM0rmALqWgI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-f8TCAxi5Ni-7JRU_QYwxdg-1; Fri, 25 Sep 2020 03:32:00 -0400
-X-MC-Unique: f8TCAxi5Ni-7JRU_QYwxdg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A47B11DE1B;
-        Fri, 25 Sep 2020 07:31:58 +0000 (UTC)
-Received: from T590 (ovpn-12-168.pek2.redhat.com [10.72.12.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D1E4B1A918;
-        Fri, 25 Sep 2020 07:31:49 +0000 (UTC)
-Date:   Fri, 25 Sep 2020 15:31:45 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-mm@kvack.org
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-Message-ID: <20200925073145.GC2388140@T590>
-References: <20200915044519.GA38283@mit.edu>
- <20200915073303.GA754106@T590>
- <20200915224541.GB38283@mit.edu>
- <20200915230941.GA791425@T590>
- <20200916202026.GC38283@mit.edu>
- <20200917022051.GA1004828@T590>
- <20200917143012.GF38283@mit.edu>
- <20200924005901.GB1806978@T590>
- <20200924143345.GD482521@mit.edu>
- <20200925011311.GJ482521@mit.edu>
+        id S1727324AbgIYKLn convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 06:11:43 -0400
+Received: from smtp.h3c.com ([60.191.123.56]:10004 "EHLO h3cspam01-ex.h3c.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727132AbgIYKLm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Sep 2020 06:11:42 -0400
+Received: from DAG2EX08-IDC.srv.huawei-3com.com ([10.8.0.71])
+        by h3cspam01-ex.h3c.com with ESMTPS id 08PABJ8p029846
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 25 Sep 2020 18:11:20 +0800 (GMT-8)
+        (envelope-from tian.xianting@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX08-IDC.srv.huawei-3com.com (10.8.0.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 25 Sep 2020 18:11:23 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%7]) with
+ mapi id 15.01.1713.004; Fri, 25 Sep 2020 18:11:23 +0800
+From:   Tianxianting <tian.xianting@h3c.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] [v2] blk-mq: add cond_resched() in
+ __blk_mq_alloc_rq_maps()
+Thread-Topic: [PATCH] [v2] blk-mq: add cond_resched() in
+ __blk_mq_alloc_rq_maps()
+Thread-Index: AQHWjMtkn2n+ezztLkuMBSittKHg9Kl5LeiA
+Date:   Fri, 25 Sep 2020 10:11:22 +0000
+Message-ID: <7ea73e3f24c9429993357a6e48db5a6b@h3c.com>
+References: <20200917081311.11428-1-tian.xianting@h3c.com>
+In-Reply-To: <20200917081311.11428-1-tian.xianting@h3c.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.99.141.128]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200925011311.GJ482521@mit.edu>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-DNSRBL: 
+X-MAIL: h3cspam01-ex.h3c.com 08PABJ8p029846
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 09:13:11PM -0400, Theodore Y. Ts'o wrote:
-> On Thu, Sep 24, 2020 at 10:33:45AM -0400, Theodore Y. Ts'o wrote:
-> > HOWEVER, thanks to a hint from a colleague at $WORK, and realizing
-> > that one of the stack traces had virtio balloon in the trace, I
-> > realized that when I switched the GCE VM type from e1-standard-2 to
-> > n1-standard-2 (where e1 VM's are cheaper because they use
-> > virtio-balloon to better manage host OS memory utilization), problem
-> > has become, much, *much* rarer (and possibly has gone away, although
-> > I'm going to want to run a lot more tests before I say that
-> > conclusively) on my test setup.  At the very least, using an n1 VM
-> > (which doesn't have virtio-balloon enabled in the hypervisor) is
-> > enough to unblock ext4 development.
-> 
-> .... and I spoke too soon.  A number of runs using -rc6 are now
-> failing even with the n1-standard-2 VM, so virtio-ballon may not be an
-> indicator.
-> 
-> This is why debugging this is frustrating; it is very much a heisenbug
-> --- although 5.8 seems to work completely reliably, as does commits
-> before 37f4a24c2469.  Anything after that point will show random
-> failures.  :-(
+Hi Jens
+Could I get your comments for the issue? Whether it is a problem?
+Maybe my understanding is superficial, highly appreciated if you can comment a bit.
 
-It does not make sense to mention 37f4a24c2469, which is reverted in
-4e2f62e566b5. Later the patch in 37f4a24c2469 is fixed and re-commited
-as 568f27006577.
+-----Original Message-----
+From: tianxianting (RD) 
+Sent: Thursday, September 17, 2020 4:13 PM
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org; linux-kernel@vger.kernel.org; tianxianting (RD) <tian.xianting@h3c.com>
+Subject: [PATCH] [v2] blk-mq: add cond_resched() in __blk_mq_alloc_rq_maps()
 
-However, I can _not_ reproduce the issue by running the same test on
-kernel built from 568f27006577 directly.
+We found it takes more time of blk_mq_alloc_rq_maps() in kernel space when testing nvme hot-plugging. The test and anlysis as below.
 
-Also you have confirmed that the issue can't be fixed after reverting
-568f27006577 against v5.9-rc4.
+Debug code,
+1, blk_mq_alloc_rq_maps():
+        u64 start, end;
+        depth = set->queue_depth;
+        start = ktime_get_ns();
+        pr_err("[%d:%s switch:%ld,%ld] queue depth %d, nr_hw_queues %d\n",
+                        current->pid, current->comm, current->nvcsw, current->nivcsw,
+                        set->queue_depth, set->nr_hw_queues);
+        do {
+                err = __blk_mq_alloc_rq_maps(set);
+                if (!err)
+                        break;
 
-Looks the real issue(slab list corruption) should be introduced between
-568f27006577 and v5.9-rc4.
+                set->queue_depth >>= 1;
+                if (set->queue_depth < set->reserved_tags + BLK_MQ_TAG_MIN) {
+                        err = -ENOMEM;
+                        break;
+                }
+        } while (set->queue_depth);
+        end = ktime_get_ns();
+        pr_err("[%d:%s switch:%ld,%ld] all hw queues init cost time %lld ns\n",
+                        current->pid, current->comm,
+                        current->nvcsw, current->nivcsw, end - start);
 
+2, __blk_mq_alloc_rq_maps():
+        u64 start, end;
+        for (i = 0; i < set->nr_hw_queues; i++) {
+                start = ktime_get_ns();
+                if (!__blk_mq_alloc_rq_map(set, i))
+                        goto out_unwind;
+                end = ktime_get_ns();
+                pr_err("hw queue %d init cost time %lld\n", i, end - start);
+        }
 
-thanks,
-Ming
+Test nvme hot-plugging with above debug code, we found it totally cost more than 3ms in kernel space without being scheduled out when alloc rqs for all
+16 hw queues with depth 1024, each hw queue cost about 140-250us. The time cost will be increased with hw queue number and queue depth increasing. And if __blk_mq_alloc_rq_maps() returns -ENOMEM, it will try "queue_depth >>= 1", more time will be consumed.
+	[  428.428771] nvme nvme0: pci function 10000:01:00.0
+	[  428.428798] nvme 10000:01:00.0: enabling device (0000 -> 0002)
+	[  428.428806] pcieport 10000:00:00.0: can't derive routing for PCI INT A
+	[  428.428809] nvme 10000:01:00.0: PCI INT A: no GSI
+	[  432.593374] [4688:kworker/u33:8 switch:663,2] queue depth 30, nr_hw_queues 1
+	[  432.593404] hw queue 0 init cost time 22883 ns
+	[  432.593408] [4688:kworker/u33:8 switch:663,2] all hw queues init cost time 35960 ns
+	[  432.595953] nvme nvme0: 16/0/0 default/read/poll queues
+	[  432.595958] [4688:kworker/u33:8 switch:700,2] queue depth 1023, nr_hw_queues 16
+	[  432.596203] hw queue 0 init cost time 242630 ns
+	[  432.596441] hw queue 1 init cost time 235913 ns
+	[  432.596659] hw queue 2 init cost time 216461 ns
+	[  432.596877] hw queue 3 init cost time 215851 ns
+	[  432.597107] hw queue 4 init cost time 228406 ns
+	[  432.597336] hw queue 5 init cost time 227298 ns
+	[  432.597564] hw queue 6 init cost time 224633 ns
+	[  432.597785] hw queue 7 init cost time 219954 ns
+	[  432.597937] hw queue 8 init cost time 150930 ns
+	[  432.598082] hw queue 9 init cost time 143496 ns
+	[  432.598231] hw queue 10 init cost time 147261 ns
+	[  432.598397] hw queue 11 init cost time 164522 ns
+	[  432.598542] hw queue 12 init cost time 143401 ns
+	[  432.598692] hw queue 13 init cost time 148934 ns
+	[  432.598841] hw queue 14 init cost time 147194 ns
+	[  432.598991] hw queue 15 init cost time 148942 ns
+	[  432.598993] [4688:kworker/u33:8 switch:700,2] all hw queues init cost time 3035099 ns
+	[  432.602611]  nvme0n1: p1
+
+So use this patch to trigger schedule between each hw queue init, to avoid other threads getting stuck. We call cond_resched() only when "queue depth >= 512". We are not in atomic context when executing __blk_mq_alloc_rq_maps(), so it is safe to call cond_resched().
+
+Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
+---
+ block/blk-mq.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c index b3d2785ee..5a71fe53a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3255,11 +3255,16 @@ void blk_mq_exit_queue(struct request_queue *q)  static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)  {
+ 	int i;
++	unsigned int depth = set->queue_depth;
+ 
+-	for (i = 0; i < set->nr_hw_queues; i++)
++	for (i = 0; i < set->nr_hw_queues; i++) {
+ 		if (!__blk_mq_alloc_map_and_request(set, i))
+ 			goto out_unwind;
+ 
++		if (depth >= 512)
++			cond_resched();
++	}
++
+ 	return 0;
+ 
+ out_unwind:
+--
+2.17.1
 
