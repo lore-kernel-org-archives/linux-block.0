@@ -2,106 +2,132 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B32C4741F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 18:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F164C4727F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:17:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0C3420878
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 18:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 446DA21D42
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:17:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WcXKUonk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729614AbgIYSic (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 14:38:32 -0400
-Received: from jabberwock.ucw.cz ([46.255.230.98]:54234 "EHLO
-        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727201AbgIYSic (ORCPT
+        id S1727015AbgIYUR2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 16:17:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47064 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725273AbgIYUP2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 14:38:32 -0400
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id CA3DF1C0B77; Fri, 25 Sep 2020 20:38:28 +0200 (CEST)
-Date:   Fri, 25 Sep 2020 20:38:28 +0200
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Minho Ban <mhban@samsung.com>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH 2/2] PM/hibernate: remove the bogus call to get_gendisk
- in software_resume
-Message-ID: <20200925183828.GC7253@duo.ucw.cz>
-References: <20200925161447.1486883-1-hch@lst.de>
- <20200925161447.1486883-3-hch@lst.de>
+        Fri, 25 Sep 2020 16:15:28 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601064926;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kEmnlmchPR9vS1orvoNm0OXoq6QCMFirGMz7PpRHNOE=;
+        b=WcXKUonkMaXc+dgKBP7kzoSikhAngVqio6cDmIjbg1pbAeQcLBodW+4xWJZxrjKVkiLotF
+        jzYJAMeN6rI9QjY1REZWTjw7ntt5dvlFv+GOgwndHtyIWZbyBZqq2CnRZ7M3GCLdL7exi+
+        yqKnR0g1DRHZUoGss5NPkiECQy/Sk88=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-GAvbEu2YM96RiYpkhr_MNw-1; Fri, 25 Sep 2020 16:15:22 -0400
+X-MC-Unique: GAvbEu2YM96RiYpkhr_MNw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EDDBAD503;
+        Fri, 25 Sep 2020 20:15:20 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 446D95C1BB;
+        Fri, 25 Sep 2020 20:15:13 +0000 (UTC)
+Date:   Fri, 25 Sep 2020 16:15:12 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Cc:     Mike Christie <michael.christie@oracle.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        "ssudhakarp@gmail.com" <ssudhakarp@gmail.com>,
+        "dm-crypt@saout.de" <dm-crypt@saout.de>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Shirley Ma <shirley.ma@oracle.com>,
+        Martin Petersen <martin.petersen@oracle.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        "agk@redhat.com" <agk@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, mst@redhat.com
+Subject: Re: [RFC PATCH 0/2] dm crypt: Allow unaligned buffer lengths for
+ skcipher devices
+Message-ID: <20200925201512.GA6025@redhat.com>
+References: <20200924012732.GA10766@redhat.com>
+ <20200924051419.GA16103@sol.localdomain>
+ <252587bb-c0b7-47c9-a97b-91422f8f9c47@default>
+ <alpine.LRH.2.02.2009241314280.28814@file01.intranet.prod.int.rdu2.redhat.com>
+ <7b6fdfd5-0160-4bcf-b7ed-d0e51553c678@default>
+ <alpine.LRH.2.02.2009241345370.4229@file01.intranet.prod.int.rdu2.redhat.com>
+ <fd512a7d-c064-4812-a794-5274c10687db@default>
+ <alpine.LRH.2.02.2009241421170.8544@file01.intranet.prod.int.rdu2.redhat.com>
+ <eb43742e-bdfe-4567-8240-1d8e083d76a2@default>
+ <MWHPR04MB37588DF8C3FFF4BD0C3CD543E7360@MWHPR04MB3758.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="eRtJSFbw+EEWtPj3"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200925161447.1486883-3-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <MWHPR04MB37588DF8C3FFF4BD0C3CD543E7360@MWHPR04MB3758.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Sep 24 2020 at  9:09pm -0400,
+Damien Le Moal <Damien.LeMoal@wdc.com> wrote:
 
---eRtJSFbw+EEWtPj3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 2020/09/25 4:14, Sudhakar Panneerselvam wrote:
+> >>
+> >> On Thu, 24 Sep 2020, Sudhakar Panneerselvam wrote:
+> >>
+> >>>> By copying it to a temporary aligned buffer and issuing I/O on this
+> >>>> buffer.
+> >>>
+> >>> I don't like this idea. Because, you need to allocate additional pages
+> >>> for the entire I/O size(for the misaligned case, if you think through
+> >>
+> >> You can break the I/O to smaller pieces. You can use mempool for
+> >> pre-allocation of the pages.
+> > 
+> > Assuming we do this, how is this code simpler(based on your
+> > comment below) than the fix in dm-crypt? In fact, this approach 
+> > would make the code change look bad in vhost, at the same time
+> > having performance penalty. By doing this, we are just moving the 
+> > responsibility to other unrelated component.
+> 
+> Because vhost is at the top of the block-io food chain. Fixing the unaligned
+> segments there will ensure that it does not matter what device is under it. It
+> will work.
 
-Hi!
+Right, I agree. This should be addressed in vhost-scsi.  And vhost-scsi
+probably needs to be interfacing through block core to submit IO that
+respects the limits of its underlying block device.
 
-> get_gendisk grabs a reference on the disk and file operation, so this
-> code will leak both of them while having absolutely no use for the
-> gendisk itself.
->=20
-> This effectively reverts commit 2df83fa4bce421f
-> ("PM / Hibernate: Use get_gendisk to verify partition if resume_file is i=
-nteger format")
->=20
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  kernel/power/hibernate.c | 11 -----------
->  1 file changed, 11 deletions(-)
->=20
-> diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-> index e7aa57fb2fdc33..7d0b99d2e69631 100644
-> --- a/kernel/power/hibernate.c
-> +++ b/kernel/power/hibernate.c
-> @@ -948,17 +948,6 @@ static int software_resume(void)
-> =20
->  	/* Check if the device is there */
->  	swsusp_resume_device =3D name_to_dev_t(resume_file);
-> -
-> -	/*
-> -	 * name_to_dev_t is ineffective to verify parition if resume_file is in
-> -	 * integer format. (e.g. major:minor)
-> -	 */
-> -	if (isdigit(resume_file[0]) && resume_wait) {
-> -		int partno;
-> -		while (!get_gendisk(swsusp_resume_device, &partno))
-> -			msleep(10);
-> -	}
+So please lift your proposed dm-crypt changes to vhost-scsi:
+https://patchwork.kernel.org/patch/11781207/
+https://patchwork.kernel.org/patch/11781053/
 
-I believe point of this code was to wait for resume device to appear
--- see the resume_wait condition. It should not be simply removed.
+Maybe work with vhost-scsi maintainers to see about making the code
+reusable in block core; so that any future unaligned application IO is
+dealt in other drivers using the same common code.
 
-Best regards,
-								Pavel
---=20
-DENX Software Engineering GmbH,      Managing Director: Wolfgang Denk
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+But I'm not interested in taking these changes into dm-crypt:
 
---eRtJSFbw+EEWtPj3
-Content-Type: application/pgp-signature; name="signature.asc"
+NAK
 
------BEGIN PGP SIGNATURE-----
+> I am still baffled that the unaligned segments go through in the first place...
+> Do we have something missing in the BIO code ?
 
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCX245JAAKCRAw5/Bqldv6
-8nqrAJ9qEdwnZpnNgalnaGH1r71lg+ujCQCfdWZzlCzS9I0pHUwKmZCAgAYm75o=
-=9GW2
------END PGP SIGNATURE-----
+Cc'ing linux-block, could be.
 
---eRtJSFbw+EEWtPj3--
+Thanks,
+Mike
+
