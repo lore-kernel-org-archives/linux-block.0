@@ -2,61 +2,59 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C326C4727D
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 15:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C191AC4363D
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 16:06:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D8D120878
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 15:23:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73F8721D7A
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 16:06:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Dce1miEU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729185AbgIYPXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 11:23:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34026 "EHLO
+        id S1727324AbgIYQG3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 12:06:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728678AbgIYPXz (ORCPT
+        with ESMTP id S1727151AbgIYQG3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 11:23:55 -0400
-Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9894C0613CE;
-        Fri, 25 Sep 2020 08:23:54 -0700 (PDT)
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kLpZZ-0065RN-42; Fri, 25 Sep 2020 15:23:45 +0000
-Date:   Fri, 25 Sep 2020 16:23:45 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        David Howells <dhowells@redhat.com>,
-        David Laight <David.Laight@aculab.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-aio@kvack.org, io-uring@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-mm@kvack.org,
-        netdev@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: let import_iovec deal with compat_iovecs as well v4
-Message-ID: <20200925152345.GX3421308@ZenIV.linux.org.uk>
-References: <20200925045146.1283714-1-hch@lst.de>
+        Fri, 25 Sep 2020 12:06:29 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ABDEC0613CE;
+        Fri, 25 Sep 2020 09:06:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=9fMaPbhzAtLsK4GqLf9UO/jqtWV45pALgS6VDR5Ex6g=; b=Dce1miEU6M5xuTkIphPHY2C711
+        054xElroFEhbrHjROV4X2jynnOLXPd0zHs086v8oNlq3wQXKy5Egstt5ur4pIjb2nDyNKaCBuMWtw
+        THpLx0YSF2ala+gUPUUifRv7YCYharUg8P4HOJKD1e0MQoT6i60yUFfFxI/26DS0TOWoKTvs2YJIU
+        Xi2HTY3yaS4dES1qiZFFuGeVaIhcGyh4ceRJ43jWkA7DJ+SC/N+8dj1eglSyOYIAQiEjA+yb4XufM
+        g2KOMwNW+mxe1OXq+cBeIUYpfyZZhjal7PqKCZpnX0mPgs9YMhXTU6AH8ybjhhQCXj9v9cjDBppwE
+        lVwVb2Tw==;
+Received: from [213.208.157.35] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kLqEs-0003Nz-Tw; Fri, 25 Sep 2020 16:06:27 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        drbd-dev@lists.linbit.com
+Subject: remove bdget() as a public API
+Date:   Fri, 25 Sep 2020 18:06:16 +0200
+Message-Id: <20200925160618.1481450-1-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200925045146.1283714-1-hch@lst.de>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 06:51:37AM +0200, Christoph Hellwig wrote:
-> Hi Al,
-> 
-> this series changes import_iovec to transparently deal with compat iovec
-> structures, and then cleanups up a lot of code dupliation.
+Hi Jens,
 
-OK, I can live with that.  Applied, let's see if it passes smoke tests
-into -next it goes.
+this series first cleans up the somewhat odd size handling in
+drbd, and then kill off bdget() as a public API.
