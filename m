@@ -1,102 +1,82 @@
-Return-Path: <SRS0=VsgY=DB=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C98BEC4363D
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 20:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7F7C4727E
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 01:13:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E0F72396E
-	for <linux-block@archiver.kernel.org>; Thu, 24 Sep 2020 20:53:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600980821;
-	bh=TjZ/h/RB5ENBHC8z4Y+xgQryaV4G3HwztlJFGYzWI5s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ZK38aknCrkEue60h45DYaOFDw135iVp53J6nXcjFmFiXGyRy98/l22U7byczO2Bxv
-	 DR+Yo6/7fOfjykutPYNdxkZfUvNefb62Yu22HDGTd5ZpuozTuVfZwSnYLFCYde2aze
-	 Smo1xyOQnG2q+ytswmpmva+JcgQu8neU2EyDGGzM=
+	by mail.kernel.org (Postfix) with ESMTP id 08D0D20791
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 01:13:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbgIXUxi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Sep 2020 16:53:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45922 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726614AbgIXUxi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Sep 2020 16:53:38 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6C542239CF;
-        Thu, 24 Sep 2020 20:53:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600980818;
-        bh=TjZ/h/RB5ENBHC8z4Y+xgQryaV4G3HwztlJFGYzWI5s=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZDvOMvrwNw/XuF6F2CX6aUa9gg7WrJUWG2LvHs5+7kRSnZS16OyH3eILgSuf7mHEB
-         ud2Miar6qUIa/cDNPnMtvdrw9Yro0kl5Zsf87JJOlMu1v2X2lkNSHZTwbnSXDRNT+5
-         1gpsN9i2QSDJ8N8ZDWjI07s0pEynF0+EFfPzlBNA=
-From:   Keith Busch <kbusch@kernel.org>
-To:     axboe@kernel.dk
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, hch@lst.de,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv4 3/3] scsi: handle zone resources errors
-Date:   Thu, 24 Sep 2020 13:53:30 -0700
-Message-Id: <20200924205330.4043232-4-kbusch@kernel.org>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200924205330.4043232-1-kbusch@kernel.org>
-References: <20200924205330.4043232-1-kbusch@kernel.org>
+        id S1726704AbgIYBNS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Sep 2020 21:13:18 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:35721 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726700AbgIYBNS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Sep 2020 21:13:18 -0400
+Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 08P1DBpp010998
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Sep 2020 21:13:12 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 80C2E42003C; Thu, 24 Sep 2020 21:13:11 -0400 (EDT)
+Date:   Thu, 24 Sep 2020 21:13:11 -0400
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+Message-ID: <20200925011311.GJ482521@mit.edu>
+References: <20200904035528.GE558530@mit.edu>
+ <20200915044519.GA38283@mit.edu>
+ <20200915073303.GA754106@T590>
+ <20200915224541.GB38283@mit.edu>
+ <20200915230941.GA791425@T590>
+ <20200916202026.GC38283@mit.edu>
+ <20200917022051.GA1004828@T590>
+ <20200917143012.GF38283@mit.edu>
+ <20200924005901.GB1806978@T590>
+ <20200924143345.GD482521@mit.edu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200924143345.GD482521@mit.edu>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+On Thu, Sep 24, 2020 at 10:33:45AM -0400, Theodore Y. Ts'o wrote:
+> HOWEVER, thanks to a hint from a colleague at $WORK, and realizing
+> that one of the stack traces had virtio balloon in the trace, I
+> realized that when I switched the GCE VM type from e1-standard-2 to
+> n1-standard-2 (where e1 VM's are cheaper because they use
+> virtio-balloon to better manage host OS memory utilization), problem
+> has become, much, *much* rarer (and possibly has gone away, although
+> I'm going to want to run a lot more tests before I say that
+> conclusively) on my test setup.  At the very least, using an n1 VM
+> (which doesn't have virtio-balloon enabled in the hypervisor) is
+> enough to unblock ext4 development.
 
-ZBC or ZAC disks that have a limit on the number of open zones may fail
-a zone open command or a write to a zone that is not already implicitly
-or explicitly open if the total number of open zones is already at the
-maximum allowed.
+.... and I spoke too soon.  A number of runs using -rc6 are now
+failing even with the n1-standard-2 VM, so virtio-ballon may not be an
+indicator.
 
-For these operations, instead of returning the generic BLK_STS_IOERR,
-return BLK_STS_ZONE_OPEN_RESOURCE which is returned as -ETOOMANYREFS to
-the I/O issuer, allowing the device user to act appropriately on these
-relatively benign zone resource errors.
+This is why debugging this is frustrating; it is very much a heisenbug
+--- although 5.8 seems to work completely reliably, as does commits
+before 37f4a24c2469.  Anything after that point will show random
+failures.  :-(
 
-Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/scsi/scsi_lib.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+						- Ted
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 7affaaf8b98e..c129ac6666da 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -758,6 +758,15 @@ static void scsi_io_completion_action(struct scsi_cmnd *cmd, int result)
- 			/* See SSC3rXX or current. */
- 			action = ACTION_FAIL;
- 			break;
-+		case DATA_PROTECT:
-+			action = ACTION_FAIL;
-+			if ((sshdr.asc == 0x0C && sshdr.ascq == 0x12) ||
-+			    (sshdr.asc == 0x55 &&
-+			     (sshdr.ascq == 0x0E || sshdr.ascq == 0x0F))) {
-+				/* Insufficient zone resources */
-+				blk_stat = BLK_STS_ZONE_OPEN_RESOURCE;
-+			}
-+			break;
- 		default:
- 			action = ACTION_FAIL;
- 			break;
--- 
-2.24.1
+
 
