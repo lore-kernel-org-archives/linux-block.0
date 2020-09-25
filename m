@@ -2,219 +2,106 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C67C4363D
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 17:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B32C4741F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 18:38:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D080235FD
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 17:59:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a2q4z7Yr"
+	by mail.kernel.org (Postfix) with ESMTP id C0C3420878
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 18:38:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729690AbgIYR7E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 13:59:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58228 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729121AbgIYR7E (ORCPT
+        id S1729614AbgIYSic (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 14:38:32 -0400
+Received: from jabberwock.ucw.cz ([46.255.230.98]:54234 "EHLO
+        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727201AbgIYSic (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 13:59:04 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF826C0613D3
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 10:59:03 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id 77so3790349lfj.0
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 10:59:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kefvEdlj7ax425quXuy8w7lDixQ/9oR1/8w2lyEDoxg=;
-        b=a2q4z7Yr0bdROmjf/MrINA675Wl3B/OB6CVouLzBltplLpi8U3qWAwE4xbe3hCTaAM
-         Eiktzce3ER+xeMDht2b1mb0VNU4dWNHbCXZlkqcFExAGLrAErQNLwpxPiJ5dAqYUnqdd
-         3253Gs1ZKg73FBKHom7QQgvIgwLMj5kF4nO9NiUj8JoaErtWxam5dnRITfqvGUCqYdGk
-         ZZPBtuOIa+QjyR7sQz1Gslczb765PWTkFAZFT0fDlUWRK2jyWu+covhjxAKWc0M4IkhT
-         CNB0LeSKDP2SRsX7ZhMSfN6FmxwpbWk5AvebEu8EfM3c08Eut2pIZN5yjVA5JdO/3xJN
-         0hHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kefvEdlj7ax425quXuy8w7lDixQ/9oR1/8w2lyEDoxg=;
-        b=ithlk2M59GJnnglVPEmL3JbKkFJ9oCTJlT1w61bu4YCvRkssIWIOgUQEGB7FguXFEf
-         UcMNR3os+t/zCeqaTJq1rUE7B+NKS4wdwaskoTX9kJinvLLljy7PwWQ+RAoo+BckgExB
-         vm1o7R0XBzbnVB3Bv9fOyExI+cZeCetOIiP+475vuL/zhWcPGo6gbDNMKMmyaB97BFCE
-         NhkoCc0xZNZ7jdiptaGE0YU6nyxiPBBVQPsexvT0EvtPUgcyGtBDxEOnI4q+4PW/2XRP
-         RP+snUTQhPaA4TGayb8Rx/Z6Iy2FJldNItV91qTL8uNQurMEapxkVCNUpinxfYCPqr6+
-         4xGw==
-X-Gm-Message-State: AOAM532V/2eR5GpQJVU6+21cHHp9FjhoKGESXrBqxpNN1RKf0ycZXwdL
-        tiMuKXsUhkn0mI36eHuOT2skfsqV++pQnqzY95gQUg==
-X-Google-Smtp-Source: ABdhPJxpHHte2JGUkx5xwJf3o11AU5UbVFEJVHEACHGiZE6J6+2/TExBzQ20x9ep2Ob/62Yb/p8IQ/rrhSlhbVtIpDs=
-X-Received: by 2002:ac2:4315:: with SMTP id l21mr13992lfh.494.1601056741842;
- Fri, 25 Sep 2020 10:59:01 -0700 (PDT)
+        Fri, 25 Sep 2020 14:38:32 -0400
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id CA3DF1C0B77; Fri, 25 Sep 2020 20:38:28 +0200 (CEST)
+Date:   Fri, 25 Sep 2020 20:38:28 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, Minho Ban <mhban@samsung.com>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: [PATCH 2/2] PM/hibernate: remove the bogus call to get_gendisk
+ in software_resume
+Message-ID: <20200925183828.GC7253@duo.ucw.cz>
+References: <20200925161447.1486883-1-hch@lst.de>
+ <20200925161447.1486883-3-hch@lst.de>
 MIME-Version: 1.0
-References: <20200917022051.GA1004828@T590> <20200917143012.GF38283@mit.edu>
- <20200924005901.GB1806978@T590> <20200924143345.GD482521@mit.edu>
- <20200925011311.GJ482521@mit.edu> <20200925073145.GC2388140@T590>
- <20200925161918.GD2388140@T590> <CAHk-=whAe_n6JDyu40A15vnWs5PTU0QYX6t6-TbNeefanau6MA@mail.gmail.com>
- <CALvZod4+ucJfr4gR60mM1gRoc7NKWydPY-JQ757q+n8hOdmrvA@mail.gmail.com>
- <CALvZod4Wc23o09KXb+s=VJGs6X+8juuDXWfyfJuMH5DCksLtAQ@mail.gmail.com> <20200925174740.GA2211131@carbon.dhcp.thefacebook.com>
-In-Reply-To: <20200925174740.GA2211131@carbon.dhcp.thefacebook.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Fri, 25 Sep 2020 10:58:50 -0700
-Message-ID: <CALvZod5pERERkxWAJcBrZHpcWQH75kXkys2gUg__qM9OL+MmtQ@mail.gmail.com>
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-To:     Roman Gushchin <guro@fb.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Jens Axboe <axboe@kernel.dk>,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="eRtJSFbw+EEWtPj3"
+Content-Disposition: inline
+In-Reply-To: <20200925161447.1486883-3-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 10:48 AM Roman Gushchin <guro@fb.com> wrote:
->
-> On Fri, Sep 25, 2020 at 10:35:03AM -0700, Shakeel Butt wrote:
-> > On Fri, Sep 25, 2020 at 10:22 AM Shakeel Butt <shakeelb@google.com> wrote:
-> > >
-> > > On Fri, Sep 25, 2020 at 10:17 AM Linus Torvalds
-> > > <torvalds@linux-foundation.org> wrote:
-> > > >
-> > > > On Fri, Sep 25, 2020 at 9:19 AM Ming Lei <ming.lei@redhat.com> wrote:
-> > > > >
-> > > > > git bisect shows the first bad commit:
-> > > > >
-> > > > >         [10befea91b61c4e2c2d1df06a2e978d182fcf792] mm: memcg/slab: use a single set of
-> > > > >                 kmem_caches for all allocations
-> > > > >
-> > > > > And I have double checked that the above commit is really the first bad
-> > > > > commit for the list corruption issue of 'list_del corruption, ffffe1c241b00408->next
-> > > > > is LIST_POISON1 (dead000000000100)',
-> > > >
-> > > > Thet commit doesn't revert cleanly, but I think that's purely because
-> > > > we'd also need to revert
-> > > >
-> > > >   849504809f86 ("mm: memcg/slab: remove unused argument by charge_slab_page()")
-> > > >   74d555bed5d0 ("mm: slab: rename (un)charge_slab_page() to
-> > > > (un)account_slab_page()")
-> > > >
-> > > > too.
-> > > >
-> > > > Can you verify that a
-> > > >
-> > > >     git revert 74d555bed5d0 849504809f86 10befea91b61
-> > > >
-> > > > on top of current -git makes things work for you again?
-> > > >
-> > > > I'm going to do an rc8 this release simply because we have another VM
-> > > > issue that I hope to get fixed - but there we know what the problem
-> > > > and the fix _is_, it just needs some care.
-> > > >
-> > > > So if Roman (or somebody else) can see what's wrong and we can fix
-> > > > this quickly, we don't need to go down the revert path, but ..
-> > > >
-> > >
-> > > I think I have a theory. The issue is happening due to the potential
-> > > infinite recursion:
-> > >
-> > > [ 5060.124412]  ___cache_free+0x488/0x6b0
-> > > *****Second recursion
-> > > [ 5060.128666]  kfree+0xc9/0x1d0
-> > > [ 5060.131947]  kmem_freepages+0xa0/0xf0
-> > > [ 5060.135746]  slab_destroy+0x19/0x50
-> > > [ 5060.139577]  slabs_destroy+0x6d/0x90
-> > > [ 5060.143379]  ___cache_free+0x4a3/0x6b0
-> > > *****First recursion
-> > > [ 5060.147896]  kfree+0xc9/0x1d0
-> > > [ 5060.151082]  kmem_freepages+0xa0/0xf0
-> > > [ 5060.155121]  slab_destroy+0x19/0x50
-> > > [ 5060.159028]  slabs_destroy+0x6d/0x90
-> > > [ 5060.162920]  ___cache_free+0x4a3/0x6b0
-> > > [ 5060.167097]  kfree+0xc9/0x1d0
-> > >
-> > > ___cache_free() is calling cache_flusharray() to flush the local cpu
-> > > array_cache if the cache has more elements than the limit (ac->avail
-> > > >= ac->limit).
-> > >
-> > > cache_flusharray() is removing batchcount number of element from local
-> > > cpu array_cache and pass it slabs_destroy (if the node shared cache is
-> > > also full).
-> > >
-> > > Note that we have not updated local cpu array_cache size yet and
-> > > called slabs_destroy() which can call kfree() through
-> > > unaccount_slab_page().
-> > >
-> > > We are on the same CPU and this recursive kfree again check the
-> > > (ac->avail >= ac->limit) and call cache_flusharray() again and recurse
-> > > indefinitely.
->
-> It's a coll theory! And it explains why we haven't seen it with SLUB.
->
-> >
-> > I can see two possible fixes. We can either do async kfree of
-> > page_obj_cgroups(page) or we can update the local cpu array_cache's
-> > size before slabs_destroy().
->
-> I wonder if something like this can fix the problem?
-> (completely untested).
->
-> --
->
-> diff --git a/mm/slab.c b/mm/slab.c
-> index 684ebe5b0c7a..c94b9ccfb803 100644
-> --- a/mm/slab.c
-> +++ b/mm/slab.c
-> @@ -186,6 +186,7 @@ struct array_cache {
->         unsigned int limit;
->         unsigned int batchcount;
->         unsigned int touched;
-> +       bool flushing;
->         void *entry[];  /*
->                          * Must have this definition in here for the proper
->                          * alignment of array_cache. Also simplifies accessing
-> @@ -526,6 +527,7 @@ static void init_arraycache(struct array_cache *ac, int limit, int batch)
->                 ac->limit = limit;
->                 ac->batchcount = batch;
->                 ac->touched = 0;
-> +               ac->flushing = false;
->         }
->  }
->
-> @@ -3368,6 +3370,11 @@ static void cache_flusharray(struct kmem_cache *cachep, struct array_cache *ac)
->         int node = numa_mem_id();
->         LIST_HEAD(list);
->
-> +       if (ac->flushing)
-> +               return;
-> +
-> +       ac->flushing = true;
-> +
->         batchcount = ac->batchcount;
->
->         check_irq_off();
-> @@ -3404,6 +3411,7 @@ static void cache_flusharray(struct kmem_cache *cachep, struct array_cache *ac)
->         spin_unlock(&n->list_lock);
->         slabs_destroy(cachep, &list);
->         ac->avail -= batchcount;
-> +       ac->flushing = false;
->         memmove(ac->entry, &(ac->entry[batchcount]), sizeof(void *)*ac->avail);
->  }
->
 
-I don't think you can ignore the flushing. The __free_once() in
-___cache_free() assumes there is a space available.
+--eRtJSFbw+EEWtPj3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-BTW do_drain() also have the same issue.
+Hi!
 
-Why not move slabs_destroy() after we update ac->avail and memmove()?
+> get_gendisk grabs a reference on the disk and file operation, so this
+> code will leak both of them while having absolutely no use for the
+> gendisk itself.
+>=20
+> This effectively reverts commit 2df83fa4bce421f
+> ("PM / Hibernate: Use get_gendisk to verify partition if resume_file is i=
+nteger format")
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  kernel/power/hibernate.c | 11 -----------
+>  1 file changed, 11 deletions(-)
+>=20
+> diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+> index e7aa57fb2fdc33..7d0b99d2e69631 100644
+> --- a/kernel/power/hibernate.c
+> +++ b/kernel/power/hibernate.c
+> @@ -948,17 +948,6 @@ static int software_resume(void)
+> =20
+>  	/* Check if the device is there */
+>  	swsusp_resume_device =3D name_to_dev_t(resume_file);
+> -
+> -	/*
+> -	 * name_to_dev_t is ineffective to verify parition if resume_file is in
+> -	 * integer format. (e.g. major:minor)
+> -	 */
+> -	if (isdigit(resume_file[0]) && resume_wait) {
+> -		int partno;
+> -		while (!get_gendisk(swsusp_resume_device, &partno))
+> -			msleep(10);
+> -	}
+
+I believe point of this code was to wait for resume device to appear
+-- see the resume_wait condition. It should not be simply removed.
+
+Best regards,
+								Pavel
+--=20
+DENX Software Engineering GmbH,      Managing Director: Wolfgang Denk
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+
+--eRtJSFbw+EEWtPj3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCX245JAAKCRAw5/Bqldv6
+8nqrAJ9qEdwnZpnNgalnaGH1r71lg+ujCQCfdWZzlCzS9I0pHUwKmZCAgAYm75o=
+=9GW2
+-----END PGP SIGNATURE-----
+
+--eRtJSFbw+EEWtPj3--
