@@ -2,402 +2,114 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0929C49EBE
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 04:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40134C4363D
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 04:55:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9207621D7F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 04:53:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ltDau4pr"
+	by mail.kernel.org (Postfix) with ESMTP id EF7F521D7F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 04:55:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727090AbgIYEwB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 00:52:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49402 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726983AbgIYEwA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 00:52:00 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A49AC0613D3;
-        Thu, 24 Sep 2020 21:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=XLI4wWnTND6XjkdS+V7znPEFtJ3sYq4EUOFrFZbEOM4=; b=ltDau4prtIYwpMEhyb+cdqxWTK
-        GQAYP8faWYGCeQ5y9rXhu4VrSOuWAm8vpUTAaftV7VWf+gl59R8pGUhMazJ6EwpoQ++j9Ib+x6ibK
-        S6A7SODjHRYDevm7+f3DVFp2RheB04CY4/1cAtKGPpyqv8WK+Kgxef40BUZwoQwL5r7/pIT1j9rou
-        AOawdNyXcs7aXV/ZSST8iyc7ZCAA4+Ogm3x1GnUgJhgy9bAcFVkJ0cMiOO7TyZJwAo94yS2SU3UeL
-        AobxOj3YCPWJwKilFg5y8sTwcEZ8UObu76Bj3XdaY9tnU/TNtGH5YipPXhrIj7eTT7jQnIkdj0D6J
-        vVvtSS7Q==;
-Received: from p4fdb0c34.dip0.t-ipconnect.de ([79.219.12.52] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kLfi6-0002qp-CZ; Fri, 25 Sep 2020 04:51:54 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        David Howells <dhowells@redhat.com>,
-        David Laight <David.Laight@aculab.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-aio@kvack.org, io-uring@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-mm@kvack.org,
-        netdev@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: [PATCH 5/9] fs: remove various compat readv/writev helpers
-Date:   Fri, 25 Sep 2020 06:51:42 +0200
-Message-Id: <20200925045146.1283714-6-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200925045146.1283714-1-hch@lst.de>
-References: <20200925045146.1283714-1-hch@lst.de>
+        id S1727092AbgIYEzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 00:55:18 -0400
+Received: from smtp.infotech.no ([82.134.31.41]:55993 "EHLO smtp.infotech.no"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726908AbgIYEzR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Sep 2020 00:55:17 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 15E7420418F;
+        Fri, 25 Sep 2020 06:55:16 +0200 (CEST)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id y7jVirbaeaYR; Fri, 25 Sep 2020 06:55:09 +0200 (CEST)
+Received: from [192.168.48.23] (host-45-78-251-166.dyn.295.ca [45.78.251.166])
+        by smtp.infotech.no (Postfix) with ESMTPA id E3BC6204179;
+        Fri, 25 Sep 2020 06:55:08 +0200 (CEST)
+Reply-To: dgilbert@interlog.com
+Subject: Re: lib/scatterlist.c : sgl_alloc_order promises more than it
+ delivers
+To:     Bart Van Assche <bvanassche@acm.org>,
+        SCSI development list <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     "Martin K. Petersen" <martin.petersen@ORACLE.COM>,
+        USB list <linux-usb@vger.kernel.org>
+References: <b9f5c065-7662-30e0-8cbd-27a77d28611e@interlog.com>
+ <d9513f73-fa18-4b71-fabf-be0b9e1614fd@acm.org>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Message-ID: <d487005a-ef6c-549f-7006-c7056cf3f36d@interlog.com>
+Date:   Fri, 25 Sep 2020 00:55:07 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <d9513f73-fa18-4b71-fabf-be0b9e1614fd@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that import_iovec handles compat iovecs as well, all the duplicated
-code in the compat readv/writev helpers is not needed.  Remove them
-and switch the compat syscall handlers to use the native helpers.
+On 2020-09-24 10:34 p.m., Bart Van Assche wrote:
+> On 2020-09-24 18:46, Douglas Gilbert wrote:
+>>          /* Check for integer overflow */
+>>          if (length > (nent << (PAGE_SHIFT + order)))
+>>                  return NULL;
+>>
+>> Well _integers_ don't wrap, but that pedantic point aside, 'nent' is an
+>> unsigned int which means the rhs expression cannot represent 2^32 or
+>> higher. So if length >= 2^32 the function fails (i.e. returns NULL).
+>>
+>> On 8 GiB and 16 GiB machines I can easily build 6 or 12 GiB sgl_s (with
+>> scsi_debug) but only if no single allocation is >= 4 GiB due to the
+>> above check.
+>>
+>> So is the above check intended to do that or is it a bug?
+> 
+> The above check verifies that nent << (PAGE_SHIFT + order) ==
+> (uint64_t)nent << (PAGE_SHIFT + order). So I think it does what the
+> comment says it does.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/read_write.c        | 179 +++++++----------------------------------
- include/linux/compat.h |  20 ++---
- 2 files changed, 40 insertions(+), 159 deletions(-)
+I modified sgl_alloc_order() like this:
 
-diff --git a/fs/read_write.c b/fs/read_write.c
-index 0a68037580b455..eab427b7cc0a3f 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -1068,226 +1068,107 @@ SYSCALL_DEFINE6(pwritev2, unsigned long, fd, const struct iovec __user *, vec,
- 	return do_pwritev(fd, vec, vlen, pos, flags);
- }
- 
-+/*
-+ * Various compat syscalls.  Note that they all pretend to take a native
-+ * iovec - import_iovec will properly treat those as compat_iovecs based on
-+ * in_compat_syscall().
-+ */
- #ifdef CONFIG_COMPAT
--static size_t compat_readv(struct file *file,
--			   const struct compat_iovec __user *vec,
--			   unsigned long vlen, loff_t *pos, rwf_t flags)
--{
--	struct iovec iovstack[UIO_FASTIOV];
--	struct iovec *iov = iovstack;
--	struct iov_iter iter;
--	ssize_t ret;
--
--	ret = import_iovec(READ, (const struct iovec __user *)vec, vlen,
--			   UIO_FASTIOV, &iov, &iter);
--	if (ret >= 0) {
--		ret = do_iter_read(file, &iter, pos, flags);
--		kfree(iov);
--	}
--	if (ret > 0)
--		add_rchar(current, ret);
--	inc_syscr(current);
--	return ret;
--}
--
--static size_t do_compat_readv(compat_ulong_t fd,
--				 const struct compat_iovec __user *vec,
--				 compat_ulong_t vlen, rwf_t flags)
--{
--	struct fd f = fdget_pos(fd);
--	ssize_t ret;
--	loff_t pos;
--
--	if (!f.file)
--		return -EBADF;
--	pos = f.file->f_pos;
--	ret = compat_readv(f.file, vec, vlen, &pos, flags);
--	if (ret >= 0)
--		f.file->f_pos = pos;
--	fdput_pos(f);
--	return ret;
--
--}
--
- COMPAT_SYSCALL_DEFINE3(readv, compat_ulong_t, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *, vec,
- 		compat_ulong_t, vlen)
- {
--	return do_compat_readv(fd, vec, vlen, 0);
--}
--
--static long do_compat_preadv64(unsigned long fd,
--				  const struct compat_iovec __user *vec,
--				  unsigned long vlen, loff_t pos, rwf_t flags)
--{
--	struct fd f;
--	ssize_t ret;
--
--	if (pos < 0)
--		return -EINVAL;
--	f = fdget(fd);
--	if (!f.file)
--		return -EBADF;
--	ret = -ESPIPE;
--	if (f.file->f_mode & FMODE_PREAD)
--		ret = compat_readv(f.file, vec, vlen, &pos, flags);
--	fdput(f);
--	return ret;
-+	return do_readv(fd, vec, vlen, 0);
- }
- 
- #ifdef __ARCH_WANT_COMPAT_SYS_PREADV64
- COMPAT_SYSCALL_DEFINE4(preadv64, unsigned long, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *, vec,
- 		unsigned long, vlen, loff_t, pos)
- {
--	return do_compat_preadv64(fd, vec, vlen, pos, 0);
-+	return do_preadv(fd, vec, vlen, pos, 0);
- }
- #endif
- 
- COMPAT_SYSCALL_DEFINE5(preadv, compat_ulong_t, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *, vec,
- 		compat_ulong_t, vlen, u32, pos_low, u32, pos_high)
- {
- 	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
- 
--	return do_compat_preadv64(fd, vec, vlen, pos, 0);
-+	return do_preadv(fd, vec, vlen, pos, 0);
- }
- 
- #ifdef __ARCH_WANT_COMPAT_SYS_PREADV64V2
- COMPAT_SYSCALL_DEFINE5(preadv64v2, unsigned long, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *, vec,
- 		unsigned long, vlen, loff_t, pos, rwf_t, flags)
- {
- 	if (pos == -1)
--		return do_compat_readv(fd, vec, vlen, flags);
--
--	return do_compat_preadv64(fd, vec, vlen, pos, flags);
-+		return do_readv(fd, vec, vlen, flags);
-+	return do_preadv(fd, vec, vlen, pos, flags);
- }
- #endif
- 
- COMPAT_SYSCALL_DEFINE6(preadv2, compat_ulong_t, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *, vec,
- 		compat_ulong_t, vlen, u32, pos_low, u32, pos_high,
- 		rwf_t, flags)
- {
- 	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
- 
- 	if (pos == -1)
--		return do_compat_readv(fd, vec, vlen, flags);
--
--	return do_compat_preadv64(fd, vec, vlen, pos, flags);
--}
--
--static size_t compat_writev(struct file *file,
--			    const struct compat_iovec __user *vec,
--			    unsigned long vlen, loff_t *pos, rwf_t flags)
--{
--	struct iovec iovstack[UIO_FASTIOV];
--	struct iovec *iov = iovstack;
--	struct iov_iter iter;
--	ssize_t ret;
--
--	ret = import_iovec(WRITE, (const struct iovec __user *)vec, vlen,
--			   UIO_FASTIOV, &iov, &iter);
--	if (ret >= 0) {
--		file_start_write(file);
--		ret = do_iter_write(file, &iter, pos, flags);
--		file_end_write(file);
--		kfree(iov);
--	}
--	if (ret > 0)
--		add_wchar(current, ret);
--	inc_syscw(current);
--	return ret;
--}
--
--static size_t do_compat_writev(compat_ulong_t fd,
--				  const struct compat_iovec __user* vec,
--				  compat_ulong_t vlen, rwf_t flags)
--{
--	struct fd f = fdget_pos(fd);
--	ssize_t ret;
--	loff_t pos;
--
--	if (!f.file)
--		return -EBADF;
--	pos = f.file->f_pos;
--	ret = compat_writev(f.file, vec, vlen, &pos, flags);
--	if (ret >= 0)
--		f.file->f_pos = pos;
--	fdput_pos(f);
--	return ret;
-+		return do_readv(fd, vec, vlen, flags);
-+	return do_preadv(fd, vec, vlen, pos, flags);
- }
- 
- COMPAT_SYSCALL_DEFINE3(writev, compat_ulong_t, fd,
--		const struct compat_iovec __user *, vec,
-+		const struct iovec __user *, vec,
- 		compat_ulong_t, vlen)
- {
--	return do_compat_writev(fd, vec, vlen, 0);
--}
--
--static long do_compat_pwritev64(unsigned long fd,
--				   const struct compat_iovec __user *vec,
--				   unsigned long vlen, loff_t pos, rwf_t flags)
--{
--	struct fd f;
--	ssize_t ret;
--
--	if (pos < 0)
--		return -EINVAL;
--	f = fdget(fd);
--	if (!f.file)
--		return -EBADF;
--	ret = -ESPIPE;
--	if (f.file->f_mode & FMODE_PWRITE)
--		ret = compat_writev(f.file, vec, vlen, &pos, flags);
--	fdput(f);
--	return ret;
-+	return do_writev(fd, vec, vlen, 0);
- }
- 
- #ifdef __ARCH_WANT_COMPAT_SYS_PWRITEV64
- COMPAT_SYSCALL_DEFINE4(pwritev64, unsigned long, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *, vec,
- 		unsigned long, vlen, loff_t, pos)
- {
--	return do_compat_pwritev64(fd, vec, vlen, pos, 0);
-+	return do_pwritev(fd, vec, vlen, pos, 0);
- }
- #endif
- 
- COMPAT_SYSCALL_DEFINE5(pwritev, compat_ulong_t, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *,vec,
- 		compat_ulong_t, vlen, u32, pos_low, u32, pos_high)
- {
- 	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
- 
--	return do_compat_pwritev64(fd, vec, vlen, pos, 0);
-+	return do_pwritev(fd, vec, vlen, pos, 0);
- }
- 
- #ifdef __ARCH_WANT_COMPAT_SYS_PWRITEV64V2
- COMPAT_SYSCALL_DEFINE5(pwritev64v2, unsigned long, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *, vec,
- 		unsigned long, vlen, loff_t, pos, rwf_t, flags)
- {
- 	if (pos == -1)
--		return do_compat_writev(fd, vec, vlen, flags);
--
--	return do_compat_pwritev64(fd, vec, vlen, pos, flags);
-+		return do_writev(fd, vec, vlen, flags);
-+	return do_pwritev(fd, vec, vlen, pos, flags);
- }
- #endif
- 
- COMPAT_SYSCALL_DEFINE6(pwritev2, compat_ulong_t, fd,
--		const struct compat_iovec __user *,vec,
-+		const struct iovec __user *,vec,
- 		compat_ulong_t, vlen, u32, pos_low, u32, pos_high, rwf_t, flags)
- {
- 	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
- 
- 	if (pos == -1)
--		return do_compat_writev(fd, vec, vlen, flags);
--
--	return do_compat_pwritev64(fd, vec, vlen, pos, flags);
-+		return do_writev(fd, vec, vlen, flags);
-+	return do_pwritev(fd, vec, vlen, pos, flags);
- }
--
--#endif
-+#endif /* CONFIG_COMPAT */
- 
- static ssize_t do_sendfile(int out_fd, int in_fd, loff_t *ppos,
- 		  	   size_t count, loff_t max)
-diff --git a/include/linux/compat.h b/include/linux/compat.h
-index b930de791ff16b..306ea7e1172d8d 100644
---- a/include/linux/compat.h
-+++ b/include/linux/compat.h
-@@ -546,25 +546,25 @@ asmlinkage long compat_sys_getdents(unsigned int fd,
- /* fs/read_write.c */
- asmlinkage long compat_sys_lseek(unsigned int, compat_off_t, unsigned int);
- asmlinkage ssize_t compat_sys_readv(compat_ulong_t fd,
--		const struct compat_iovec __user *vec, compat_ulong_t vlen);
-+		const struct iovec __user *vec, compat_ulong_t vlen);
- asmlinkage ssize_t compat_sys_writev(compat_ulong_t fd,
--		const struct compat_iovec __user *vec, compat_ulong_t vlen);
-+		const struct iovec __user *vec, compat_ulong_t vlen);
- /* No generic prototype for pread64 and pwrite64 */
- asmlinkage ssize_t compat_sys_preadv(compat_ulong_t fd,
--		const struct compat_iovec __user *vec,
-+		const struct iovec __user *vec,
- 		compat_ulong_t vlen, u32 pos_low, u32 pos_high);
- asmlinkage ssize_t compat_sys_pwritev(compat_ulong_t fd,
--		const struct compat_iovec __user *vec,
-+		const struct iovec __user *vec,
- 		compat_ulong_t vlen, u32 pos_low, u32 pos_high);
- #ifdef __ARCH_WANT_COMPAT_SYS_PREADV64
- asmlinkage long compat_sys_preadv64(unsigned long fd,
--		const struct compat_iovec __user *vec,
-+		const struct iovec __user *vec,
- 		unsigned long vlen, loff_t pos);
- #endif
- 
- #ifdef __ARCH_WANT_COMPAT_SYS_PWRITEV64
- asmlinkage long compat_sys_pwritev64(unsigned long fd,
--		const struct compat_iovec __user *vec,
-+		const struct iovec __user *vec,
- 		unsigned long vlen, loff_t pos);
- #endif
- 
-@@ -800,20 +800,20 @@ asmlinkage long compat_sys_execveat(int dfd, const char __user *filename,
- 		     const compat_uptr_t __user *argv,
- 		     const compat_uptr_t __user *envp, int flags);
- asmlinkage ssize_t compat_sys_preadv2(compat_ulong_t fd,
--		const struct compat_iovec __user *vec,
-+		const struct iovec __user *vec,
- 		compat_ulong_t vlen, u32 pos_low, u32 pos_high, rwf_t flags);
- asmlinkage ssize_t compat_sys_pwritev2(compat_ulong_t fd,
--		const struct compat_iovec __user *vec,
-+		const struct iovec __user *vec,
- 		compat_ulong_t vlen, u32 pos_low, u32 pos_high, rwf_t flags);
- #ifdef __ARCH_WANT_COMPAT_SYS_PREADV64V2
- asmlinkage long  compat_sys_preadv64v2(unsigned long fd,
--		const struct compat_iovec __user *vec,
-+		const struct iovec __user *vec,
- 		unsigned long vlen, loff_t pos, rwf_t flags);
- #endif
- 
- #ifdef __ARCH_WANT_COMPAT_SYS_PWRITEV64V2
- asmlinkage long compat_sys_pwritev64v2(unsigned long fd,
--		const struct compat_iovec __user *vec,
-+		const struct iovec __user *vec,
- 		unsigned long vlen, loff_t pos, rwf_t flags);
- #endif
- 
--- 
-2.28.0
+         /* Check for integer overflow */
+         if (length > (nent << (PAGE_SHIFT + order)))
+{
+pr_info("%s: (length > (nent << (PAGE_SHIFT + order))\n", __func__);
+                 return NULL;
+}
+	...
+
+Then I tried starting scsi_debug with dev_size_mb=4096
+
+This is what I saw in the log:
+
+scsi_debug:scsi_debug_init: fixing max submit queue depth to host max queue 
+depth, 32
+sgl_alloc_order: (length > (nent << (PAGE_SHIFT + order))
+message repeated 2 times: [sgl_alloc_order: (length > (nent << (PAGE_SHIFT + 
+order))]
+scsi_debug:sdeb_store_sgat: sdeb_store_sgat: unable to obtain 4096 MiB, last 
+element size: 256 kiB
+scsi_debug:sdebug_add_store: sgat: user data oom
+scsi_debug:sdebug_add_store: sdebug_add_store: failed, errno=12
+
+
+My code steps down from 1024 KiB elements on failure to 512 KiB and if that
+fails it tries 256 KiB. Then it gives up. The log output is consistent with
+my analysis. So your stated equality is an inequality when length >= 4 GiB.
+There is no promotion of unsigned int nent to uint64_t .
+
+You can write your own test harness if you don't believe me. The test machine
+doesn't need much ram. Without the call to sgl_free() corrected, if it really
+did try to get that much ram and failed toward the end, then (partially)
+freed up what it had obtained, then you would see a huge memory leak ...
+
+
+Now your intention seems to be that a 4 GiB sgl should be valid. Correct?
+Can that check just be dropped?
+
+Doug Gilbert
 
