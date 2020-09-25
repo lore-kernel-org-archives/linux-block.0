@@ -7,74 +7,70 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDE3C4727C
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 14:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D576C4363D
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 14:20:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF6AC21741
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 14:19:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5F2F20936
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 14:20:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="QZx7q7gI"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kGFSLFPE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727290AbgIYOTL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 10:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52120 "EHLO
+        id S1728575AbgIYOUV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 10:20:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728875AbgIYOTL (ORCPT
+        with ESMTP id S1728431AbgIYOUV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 10:19:11 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3038AC0613D6
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 07:19:11 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id g29so2727456pgl.2
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 07:19:11 -0700 (PDT)
+        Fri, 25 Sep 2020 10:20:21 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102EAC0613CE
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 07:20:21 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id x123so3333305pfc.7
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 07:20:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Izvn14aXCOd8rlHi8gt8/prckjwG/92/E8+p6vMMqzM=;
-        b=QZx7q7gI1poaxI+iNpfTHOEPysawBMN6ILpWj8VDRHvig1MWbXDH9Q/Ejh/VGdMY6V
-         XhsSRSgLJ3vyBUW4G6v5lGczlnBrfrfGUTY6Io4kTHSOwwPeeq67+GUlO0pvSbpcSc8G
-         UQSaYijRBt6BeZMDv8AdtAKiNqO1VevLatKGi1HCrNW5g8jU/dNWe2se7vKcQ5smC1Kh
-         pE6mdkVNLv/zO4pT+cJM9rz/VL4qgjegnLWF0CSvnNA3YX8nzt9KdJQrxarNDFpNgyxb
-         mdM7GAKDG1dsnTN8AV+yDCM9QF/vXMl36U6209JvGiLAPdEQelB4a/A4/bJ7gb2XykBg
-         PFCQ==
+        bh=E/Cgz17cLyD0MSQK14hl7iUyBkqVrB5po7hyqcxRBDo=;
+        b=kGFSLFPE8mp0aEH5oAk7nraSruDlhCRRacMEOOLP+UVNgGUJXHtnYa+WXULeJumUqQ
+         qZGhSE5D/zbdlbfzYqQTQ8BA33vPDn9sYq05ZLFwZ224rEGtNje6pnIhENdn/2O9SfVO
+         INMvI2U5y+WRjmMC8YadGEpVSrqmGP40VNcbf0EVz92PwSQysM5J/U6KRfW7zKcLXFiQ
+         p2kNt+pjqj/iMEbWZ3/cPONhdPOyQIdJ4pbzU+9HL0p2jaS6EXfrpHLyNg1ZzzxeMwBr
+         6yB1QvxQNdUT0bgeFRVwud8i0ZqjMnCEvfCGOpeGGz1eFf1GHVJmlkNnmXArLVcuZQbe
+         0hrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Izvn14aXCOd8rlHi8gt8/prckjwG/92/E8+p6vMMqzM=;
-        b=XDIu5D47s4T4BHyh4mg2h9xje3zQ5QpXZFeJrqWPIcJD98912HdX8Rz644l4XqL6Mf
-         IBeJM3TiShKqhPXkpqADXiwVTrNCELDLqFywHkFanE5LDihJMKNKD2I9NWJWQk2i0fXg
-         KWPaeA/h1QORW9GIjmap8RwQ+xMTCROBFKLdaVzUWU635CDO+gLIIYty7c+DIeV/LThQ
-         EUp4WHMFs1L1k5vqdHJoLDgRsHhK7y3S/nOHpSkRiR7N9aL9Wlw50XLnqdztCqrl/KcF
-         p9Oh/yRzX/TfRviyEKSgOhpgL+TgjlDWUgHbsHBD89xSRmSxCRjO2gv9hdwkfr2gDNqO
-         nvww==
-X-Gm-Message-State: AOAM530PFnWmwKTsjD4GV5zfkfXs9sdsJVN9r1p6da0ELCMd3w0hfVkA
-        1RWVcry8SVEq8Wtau6UEhzowPw==
-X-Google-Smtp-Source: ABdhPJwRr/FwQpe7dKk8pmg8H/cUjDmWIFuRPHGSosKhPuxMlj+z/HBIhpQTLB9cSGSc+hfMahv5og==
-X-Received: by 2002:a63:e057:: with SMTP id n23mr213338pgj.87.1601043550492;
-        Fri, 25 Sep 2020 07:19:10 -0700 (PDT)
+        bh=E/Cgz17cLyD0MSQK14hl7iUyBkqVrB5po7hyqcxRBDo=;
+        b=dSO+Dfzp+GTww0k6Ea9itwkyoMlyiymtxBwXaOgHByNoiC04pVlQ0bMxborV0NV3CP
+         OrxGaqQM+S+qkKJgO7QzZZNnkLkSVS/A6+i4ASDQNDr3IBuEP9I9ev9XYu2UR1i3NNLW
+         59zN822sCbLMeusKpYuXEaqNI/J2aT720RFBjQQhjPhqoFFstLjBotHrLgMa8fXHME+9
+         Mt8inv5JddXxa+blczJvMx9e4hRWqo1yOVVXAHNbvaFvmeK03Bq88X+iw2AityCq117m
+         qzxQtjt0PU6kbrjszB6TFJ5haVTLGRstuoLPMgb0QBjljFRJBuvk1QCFsJiGYuxpj/5T
+         SXlg==
+X-Gm-Message-State: AOAM530FbwZjl398gtTMyHY1IeAwVTY0aVTt0gd1T9ppbgQUKPy5qDtz
+        gUtoBNLKn4alv4m8tyGYIiPDqZykbY7a+g==
+X-Google-Smtp-Source: ABdhPJzjLyrDphzZGw97pOcptA6NpA+iljbIgqNxU7CuI0SsW4LbOTMxXHN1kVGXgDjpbNBZ6QOn0Q==
+X-Received: by 2002:a62:d456:0:b029:13c:1611:66c2 with SMTP id u22-20020a62d4560000b029013c161166c2mr4213234pfl.13.1601043620286;
+        Fri, 25 Sep 2020 07:20:20 -0700 (PDT)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id j19sm2930829pfe.108.2020.09.25.07.19.08
+        by smtp.gmail.com with ESMTPSA id t6sm2430962pgj.86.2020.09.25.07.20.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Sep 2020 07:19:09 -0700 (PDT)
-Subject: Re: clean up is partition checks
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     dm-devel@redhat.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-ide@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org
-References: <20200903054104.228829-1-hch@lst.de>
+        Fri, 25 Sep 2020 07:20:19 -0700 (PDT)
+Subject: Re: [PATCH 0/2] block/dm: add REQ_NOWAIT support for bio-based
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, hch@lst.de,
+        dm-devel@redhat.com, linux-block@vger.kernel.org
+References: <20200923200652.11082-1-snitzer@redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7a0600d8-d886-c546-378c-5298a16e979c@kernel.dk>
-Date:   Fri, 25 Sep 2020 08:19:08 -0600
+Message-ID: <1a406078-7652-f8eb-e29c-bc4851b23dde@kernel.dk>
+Date:   Fri, 25 Sep 2020 08:20:18 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200903054104.228829-1-hch@lst.de>
+In-Reply-To: <20200923200652.11082-1-snitzer@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,14 +78,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/2/20 11:40 PM, Christoph Hellwig wrote:
-> Hi Jens,
+On 9/23/20 2:06 PM, Mike Snitzer wrote:
+> Hi,
 > 
-> this series add a new helepr to check if a struct block_device represents
-> a parition, and removes most direct access to ->bd_contained from
-> drivers.
+> I got guilted into this by this Twitter exchange:
+> https://twitter.com/axboe/status/1308778488011337728
+> 
+> Started with this patchset from June and revised it:
+> https://patchwork.kernel.org/project/dm-devel/list/?series=297693
+> (dropped MD patch while doing so_.
+> 
+> Tested these changes with this test Jens provided:
+> 
+> [mikes-test-job]
+> filename=/dev/dm-0
+> rw=randread
+> buffered=1
+> ioengine=io_uring
+> iodepth=16
+> norandommap
+> 
+> Jens, please feel free to pickup both patches, I don't have any
+> conflicting DM changes for 5.10.
 
-Applied, thanks.
+Thanks Mike! Applied.
 
 -- 
 Jens Axboe
