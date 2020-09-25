@@ -2,210 +2,276 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4020C4741F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 02:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3841C4727E
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 02:52:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79DA720BED
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 02:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C3D52137B
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 02:52:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BIA57tSb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QPKHphyR";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ofuMjJ/B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726448AbgIYCet (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Sep 2020 22:34:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47613 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726706AbgIYCeq (ORCPT
+        id S1726676AbgIYCwv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Sep 2020 22:52:51 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:47250 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726669AbgIYCwv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Sep 2020 22:34:46 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601001284;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p4Otes/aB3TptUk2VNMI14FEqR4kwIN9vrjWhaUuPz4=;
-        b=BIA57tSbn1Si7mfmJphKbBK83VYtbVowvl/Z+JBdMJ27EEcUjM4ibWeMoLKuhFGQh9xJUh
-        x9YskZDdiNxKpmswwULZ7RUlWQXCKgp+HmkgfEV0cA+mhnTaVp8VdMgJmzjg9kXeg2PBoz
-        zRd1ajETB2RKv5BHLQKBrUf6fJeTAJw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-z03vvjgJOA6uFNhqF5EzAg-1; Thu, 24 Sep 2020 22:34:40 -0400
-X-MC-Unique: z03vvjgJOA6uFNhqF5EzAg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BECBA80734F;
-        Fri, 25 Sep 2020 02:34:38 +0000 (UTC)
-Received: from T590 (ovpn-12-168.pek2.redhat.com [10.72.12.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B5F22634D;
-        Fri, 25 Sep 2020 02:34:32 +0000 (UTC)
-Date:   Fri, 25 Sep 2020 10:34:27 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-ext4@vger.kernel.org,
+        Thu, 24 Sep 2020 22:52:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1601002370; x=1632538370;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=18SQ0G1YpXb3pkcs5CP9xC7lBAzkKN5ZI6TjyfXbJ2U=;
+  b=QPKHphyR5U1n0p0D0sKvoOhvVyv/wCBJyQ8F/1KKVNlte6jukqARSdom
+   /pauds7YMdUnLxxb1i8oql10X2n5bGd9dMa3Nnkt12a0WPYM2x4XpSnL3
+   XNrnb2jU5Ae7AXQtAB1KEOZXK28Bt0WH8eCFB5i3iIpuCxBivGMrQmpEs
+   nRXrbkbnu2bau6XBqcR5BDsQgExCXZYjg6yAfQNc3QGadYpZ1K2PDQwb/
+   srOW7JQT4wS6hEgQIlhLKfx+5tajMZenA+82BMSsmwQebRhEzEP0b4PYe
+   uxmyIIf8kGXKRRvao0Df6zJ8+YWh1F9S3lh98fYza1fiviRTjdvnZWoA8
+   g==;
+IronPort-SDR: apmrPU3XlbZkWZkyH4Oo9ZJnLsxVDhqd7mYsg7EqPNvuzIEC0IVeFCiqbBYP3mFFSOrdIKeBL1
+ /vq66CWXm6uZg3D9833mWzCpIew4Q1sCRRoP/oaZiabQeZ8sgPPxAbwR8ghbrbjwCj+jrXtSXP
+ ZKtK2TQLXz1bEqVuqCQgfXl6W47EX/kzBDumdlXucQGYu5eE3iEOKOHBoKuC2ERjFtPzf+RQZm
+ W5Cr4dnmguKvihylIEWW+GEWH2C8HifaI0mcX6cpbv3ncdW1W/04AFeqb2HmyYV+VIoc7fUySS
+ TbU=
+X-IronPort-AV: E=Sophos;i="5.77,300,1596470400"; 
+   d="scan'208";a="257948027"
+Received: from mail-dm6nam12lp2176.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.176])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Sep 2020 10:52:49 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Jj7s86LZl1kq5JzlBkgrss8h9BUuU2A8Mm8Uci+Ch7BnPepNMxkVjnIiHdzliuFD6+lSw9kMB8/tVDTPHzHJVS8ie7v2EHIazrt9pp407cZDOBtsWoIK6jYXhtA7ZOWBdwqJROhkWbcl3zaOABmJtxjGntRK5Mx982y7bClJn3gUAUbrxe4Udj0sZ/0oO3oM5DUmwXgxN5rAV48JecZI28Ep99EX8LCWetMxv/r+JfJjQAtVdJm9tqe2vTlBLRVIhUG1p/JXVfqTNAuaPKgNst4k2uk2Mlae+qs750x9yN9proZOh8KjK3Dz/5rPVEqF9KXNNzvbz7NjL8m1DR7Y5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U+PcJoikJ62zQjjfYccg+O2GcJQygmhxhLlIQ4QxluA=;
+ b=TnC4FRheec4f9dIe89bkUv12emfSOePZqBFO9V7NJa+Gk30b6PIpWP47QJIG57tN7xgCMI8EiNqiwQjNAEYxx1l2VXRAlZoxfcfQHI/smyZzbPdv+XLbSVbNrJ9rOsPlOfzOXpVHaK/VlN7hzBo6hev9wwZX2S+vqs8BUgFw6VkMC4mbd5XNrc9SSPlC86I5Ys18Gyl8XketQyntF1ebTGl5THvO2f8Lhan3pmcjjsgUMnqFw7qqdSV77JnyE32uInzgatw9Spqwl5eBweKkam+yEmcbvGlODwzp3xpYEwAkdP56QaC3nRXMuEitvO8mJmnSuePjZhy8XbuMF2UHTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U+PcJoikJ62zQjjfYccg+O2GcJQygmhxhLlIQ4QxluA=;
+ b=ofuMjJ/BnIJAHduiI3O/j2jLiu2rrtvXhDLsKvf2OHdiZImjSbeVGT7GGS6ts0tefPWvU8V3K1Qjp4MbGXP96IVLmDDd2jdcRcv4sIw+CEz0Zj0xBQ+5+QnWSllan+EDxOAhfoyHKULR852TvwzuJS+ENlo8b2BQQRTbVHHKYxg=
+Received: from MWHPR04MB3758.namprd04.prod.outlook.com (2603:10b6:300:fb::8)
+ by MWHPR04MB0369.namprd04.prod.outlook.com (2603:10b6:300:70::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14; Fri, 25 Sep
+ 2020 02:52:48 +0000
+Received: from MWHPR04MB3758.namprd04.prod.outlook.com
+ ([fe80::30a6:9f87:e223:6468]) by MWHPR04MB3758.namprd04.prod.outlook.com
+ ([fe80::30a6:9f87:e223:6468%6]) with mapi id 15.20.3412.021; Fri, 25 Sep 2020
+ 02:52:48 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     Kanchan Joshi <joshiiitr@gmail.com>,
+        "hch@infradead.org" <hch@infradead.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-Message-ID: <20200925023427.GB2388140@T590>
-References: <20200915044519.GA38283@mit.edu>
- <20200915073303.GA754106@T590>
- <20200915224541.GB38283@mit.edu>
- <20200915230941.GA791425@T590>
- <20200916202026.GC38283@mit.edu>
- <20200917022051.GA1004828@T590>
- <20200917143012.GF38283@mit.edu>
- <20200924005901.GB1806978@T590>
- <20200924143345.GD482521@mit.edu>
- <20200925011416.GA2388140@T590>
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
+Thread-Topic: [PATCH v4 6/6] io_uring: add support for zone-append
+Thread-Index: AQHWYdbcc0q15qREKECGO7brHi6zEg==
+Date:   Fri, 25 Sep 2020 02:52:47 +0000
+Message-ID: <MWHPR04MB3758A78AFAED3543F8D38266E7360@MWHPR04MB3758.namprd04.prod.outlook.com>
+References: <CA+1E3rLM4G4SwzD6RWsK6Ssp7NmhiPedZDjrqN3kORQr9fxCtw@mail.gmail.com>
+ <MWHPR04MB375863C20C1EF2CB27E62703E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731091416.GA29634@infradead.org>
+ <MWHPR04MB37586D39CA389296CE0252A4E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731094135.GA4104@infradead.org>
+ <MWHPR04MB3758A4B2967DB1FABAAD9265E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731125110.GA11500@infradead.org>
+ <CY4PR04MB37517D633920E4D31AC6EA0DE74B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200814081411.GA16943@infradead.org>
+ <CA+1E3r+WXC_MK5Zf2OZEv17ddJDjtXbhpRFoeDns4F341xMhow@mail.gmail.com>
+ <20200908151801.GA16742@infradead.org>
+ <CA+1E3r+MSEW=-SL8L+pquq+cFAu+nQOULQ+HZoQsCvdjKMkrNw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2400:2411:43c0:6000:61d4:c443:7ba:718]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: e261d011-e004-447a-82c3-08d860fe161c
+x-ms-traffictypediagnostic: MWHPR04MB0369:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR04MB03699AE76B5D2E4BA1AEF23BE7360@MWHPR04MB0369.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: T+U3gwRB1AYK19h6liB6rsuZRUjomEK9FAJ0IhrIpRoKLYAWizTthPZqcvffS2snkd9tgT5U7KtM/ZyAZu7898bjCzwEr5TaAn8C7m7StZRPqbEdcdHT7ft1/YUKKlKgbICXpS1NIUWbFz6rUY/tCGgnSsk1VmCejv16oilWvesfVq6leb9q6/3su+FPmmYZUQgU0tN7MTdLGyi/iJu6xO6YMm3d42ePNtgEeeYetLWRfnE06X4NEbQv8sw6toSdGDqnk3vfnBJ6frpmtAbJT8fOGc6lyndyr+PGQV5Cbw+JqyZWOOrDfP7P1Ve9fz+fJHmXhDdPtGr2axedmg2FE6glIIYCPD1Sc3hX86Lw32CFjOGxNnfnPjBb1d9K07AK
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR04MB3758.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(39860400002)(136003)(396003)(366004)(5660300002)(54906003)(186003)(316002)(4326008)(33656002)(66946007)(110136005)(8936002)(6506007)(8676002)(71200400001)(66446008)(76116006)(7696005)(53546011)(7416002)(91956017)(478600001)(66476007)(83380400001)(52536014)(2906002)(55016002)(86362001)(66556008)(9686003)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: JOpDsIdi+mJDrNAR7sqQwfMHSq5GlkEKr84A7U8MEelb/64sUSwS0RZOd+aUVy029nNuBOC8ybaGdnMf20k86fudJzzfNQCjhUwvfLfXwjwSrMn+yxHHoPOqDmzp8ZzNsg/GeaRlHvyRyGNXGtP3x48+diOt3N3Sp3S31JbvTBlt6GUNtZ1tF8SFY+ec/6inXGelv1ziFSIgzoY7uvYEonCEvvxGTFukYvJtaVgozHtPebagSSOa4AGiwzjpilfMmL3rJs8A3LDyNgUcLsvFIhBw5uDtABg+xkJplsrnAa0RYc0mcqPJs1cBjgT70tDep24YvUJWxUeCXG/sGF7yQUGAJeOXLxB6Ze6CZycy1AHAsD3lxEMrceUNtNC7REJdDtrRzF9v7nU4inrigzmoVucU/6LM9kLav1kNuICbJpqcKa4pshS3OiS/u34rwBZ5t24ddiVHbyyIEtjzPKJc0MLYVLD8QQwVrE3OOWCl43Zg0ftmVN5heHHUmXJzTM7Ekbyi4xMXpZgjDdLEMx2wh/zWpZun6LkVrqh/eMG1QbTDtBq0ClDZ9qBWnlmOloIQjtmRm4DcCugxlLhlO7Dplhj/08kAy7qWlKnfCkkaqeeopY8l84esSbangGW0NnXE+kRj2Wj4llLFe+6oHrZrX0JqgQYquluQbFMEkv+oYgUvT3H+PnzlcpGxoGf0efj4nYcbsGCF8LwqvEfZRfN9nA==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200925011416.GA2388140@T590>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR04MB3758.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e261d011-e004-447a-82c3-08d860fe161c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2020 02:52:48.0182
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5ggSE7SrYqdR+YW1kI6XE5qJq8dEm7o/OTOg2oEOZ2t9Gc+OFH/9DCkZf/0FxvO6nTlUSL+62Bv7z3OXsJGAbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR04MB0369
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 09:14:16AM +0800, Ming Lei wrote:
-> On Thu, Sep 24, 2020 at 10:33:45AM -0400, Theodore Y. Ts'o wrote:
-> > On Thu, Sep 24, 2020 at 08:59:01AM +0800, Ming Lei wrote:
-> > > 
-> > > The list corruption issue can be reproduced on kvm/qumu guest too when
-> > > running xfstests(ext4) generic/038.
-> > > 
-> > > However, the issue may become not reproduced when adding or removing memory
-> > > debug options, such as adding KASAN.
-> > 
-> > Can you reliably reprodue this crash?  And if so, with what config and
-> > what kernel version.
-> 
-> Yeah, it can be reproduced reliably by running xfstests(ext4)
-> generic/038 over virtio-scsi(test device)/virtio-blk(scratch device).
-> 
-> The kernel is -rc4, and not test -rc5 yet.
-> 
-> It is exactly the config you provided, and I just enabled CDROM & ISOFS
-> against your config for passing cloud-init data via cdrom to VM.
-> 
-> > One of the reasons why I had gone silent on this bug is that I've been
-> > trying many, many configurations and configurations which reliably
-> > reproduced on say, -rc4 would not reproduce on -rc5, and then I would
-> > get a completely different set of results on -rc6.  So I've been
-> > trying to run a lot of different experiments to try to understand what
-> > might be going on, since it seems pretty clear this must be a very
-> > timing-sensitive failure.
-> > 
-> > I also found that the re-occrance went down significantly if I enabled
-> > KASAN, and while it didn't go away, I wasn't able to get a KASAN
-> > failure to trigger, either.  Turning off CONFIG_PROVE_LOCKING and a
-> > *lot* of other debugging configs made the problem vanish in -rc4, but
-> > that trick didn't work with -rc5 or -rc6.
-> 
-> The issue can be reproduced reliably in my environment after
-> disabling LOCKDEP only for disabling KMEMLEAK only.
-> 
-> But after disabling DEBUG_OBJECTS, it becomes hard to trigger.
-> 
-> > 
-> > Each time I discovered one of these things, I was about to post to the
-> > e-mail thread, only to have a confirmation test run on a different
-> > kernel version make the problem go away.  In particular, your revert
-> > helped with -rc4 and -rc6 IIRC, but it didn't help in -rc5.....
-> > 
-> > HOWEVER, thanks to a hint from a colleague at $WORK, and realizing
-> > that one of the stack traces had virtio balloon in the trace, I
-> > realized that when I switched the GCE VM type from e1-standard-2 to
-> > n1-standard-2 (where e1 VM's are cheaper because they use
-> > virtio-balloon to better manage host OS memory utilization), problem
-> > has become, much, *much* rarer (and possibly has gone away, although
-> > I'm going to want to run a lot more tests before I say that
-> > conclusively) on my test setup.  At the very least, using an n1 VM
-> > (which doesn't have virtio-balloon enabled in the hypervisor) is
-> > enough to unblock ext4 development.
-> > 
-> > Any chance your kvm/qemu configuration might have been using
-> > virtio-ballon?  Because other ext4 developers who have been using
-> > kvm-xftests have not had any problems....
-> 
-> I don't setup virtio-ballon, see the attached script for setting the VM.
-> 
-> > 
-> > > When I enable PAGE_POISONING, double free on kmalloc(192) is captured:
-> > > 
-> > > [ 1198.317139] slab: double free detected in cache 'kmalloc-192', objp ffff89ada7584300^M
-> > > [ 1198.326651] ------------[ cut here ]------------^M
-> > > [ 1198.327969] kernel BUG at mm/slab.c:2535!^M
-> > > [ 1198.329129] invalid opcode: 0000 [#1] SMP PTI^M
-> > > [ 1198.333776] CPU: 1 PID: 0 Comm: swapper/1 Not tainted 5.9.0-rc4_quiesce_srcu-xfstests #102^M
-> > > [ 1198.336085] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-48-gd9c812dda519-prebuilt.qemu.org 04/01/2014^M
-> > > [ 1198.339826] RIP: 0010:free_block.cold.92+0x13/0x15^M
-> > > [ 1198.341472] Code: 8d 44 05 f0 eb d0 48 63 83 e0 00 00 00 48 8d 54 05 f8 e9 4b 81 ff ff 48 8b 73 58 48 89 ea 48 c7 c7 98 e7 4a 9c e8 20 c3 eb ff <0f> 0b 48 8b 73 58 48 c7 c2 20 e8 4a 9c 48 c7 c7 70 32 22 9c e8 19^M
-> > > [ 1198.347331] RSP: 0018:ffff982e40710be8 EFLAGS: 00010046^M
-> > > [ 1198.349091] RAX: 0000000000000048 RBX: ffff89adb6441400 RCX: 0000000000000000^M
-> > > [ 1198.351839] RDX: 0000000000000000 RSI: ffff89adbaa97800 RDI: ffff89adbaa97800^M
-> > > [ 1198.354572] RBP: ffff89ada7584300 R08: 0000000000000417 R09: 0000000000000057^M
-> > > [ 1198.357150] R10: 0000000000000001 R11: ffff982e40710aa5 R12: ffff89adbaaae598^M
-> > > [ 1198.359067] R13: ffffe7bc819d6108 R14: ffffe7bc819d6100 R15: ffff89adb6442280^M
-> > > [ 1198.360975] FS:  0000000000000000(0000) GS:ffff89adbaa80000(0000) knlGS:0000000000000000^M
-> > > [ 1198.363202] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
-> > > [ 1198.365986] CR2: 000055f6a3811318 CR3: 000000017adca005 CR4: 0000000000770ee0^M
-> > > [ 1198.368679] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000^M
-> > > [ 1198.371386] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400^M
-> > > [ 1198.374203] PKRU: 55555554^M
-> > > [ 1198.375174] Call Trace:^M
-> > > [ 1198.376165]  <IRQ>^M
-> > > [ 1198.376908]  ___cache_free+0x56d/0x770^M
-> > > [ 1198.378355]  ? kmem_freepages+0xa0/0xf0^M
-> > > [ 1198.379814]  kfree+0x91/0x120^M
-> > > [ 1198.382121]  kmem_freepages+0xa0/0xf0^M
-> > > [ 1198.383474]  slab_destroy+0x9f/0x120^M
-> > > [ 1198.384779]  slabs_destroy+0x6d/0x90^M
-> > > [ 1198.386110]  ___cache_free+0x632/0x770^M
-> > > [ 1198.387547]  ? kmem_freepages+0xa0/0xf0^M
-> > > [ 1198.389016]  kfree+0x91/0x120^M
-> > > [ 1198.390160]  kmem_freepages+0xa0/0xf0^M
-> > > [ 1198.391551]  slab_destroy+0x9f/0x120^M
-> > > [ 1198.392964]  slabs_destroy+0x6d/0x90^M
-> > > [ 1198.394439]  ___cache_free+0x632/0x770^M
-> > > [ 1198.395896]  kmem_cache_free.part.75+0x19/0x70^M
-> > > [ 1198.397791]  rcu_core+0x1eb/0x6b0^M
-> > > [ 1198.399829]  ? ktime_get+0x37/0xa0^M
-> > > [ 1198.401343]  __do_softirq+0xdf/0x2c5^M
-> > > [ 1198.403010]  asm_call_on_stack+0x12/0x20^M
-> > > [ 1198.404847]  </IRQ>^M
-> > > [ 1198.405799]  do_softirq_own_stack+0x39/0x50^M
-> > > [ 1198.407621]  irq_exit_rcu+0x97/0xa0^M
-> > > [ 1198.409127]  sysvec_apic_timer_interrupt+0x2c/0x80^M
-> > > [ 1198.410608]  asm_sysvec_apic_timer_interrupt+0x12/0x20^M
-> > > [ 1198.411883] RIP: 0010:default_idle+0x13/0x20^M
-> > > [ 1198.412994] Code: 89 44 24 20 48 83 c0 22 48 89 44 24 28 eb c7 e8 03 93 ff ff cc cc cc 0f 1f 44 00 00 e9 07 00 00 00 0f 00 2d 11 ec 55 00 fb f4 <c3> 66 66 2e 0f 1f 84 00 00 00 00 00 90 0f 1f 44 00 00 65 48 8b 04^M
-> > 
-> > Hmm, so that this looks like some kind of RCU involvement?  Some kind
-> > of object that had been scheduled to be freed via RCU, but then got
-> > freed before RCU cleanup happened?
-> > 
-> > The question then is what subsystem the object involved came from.
-> 
-> Right now, I don't get time to investigate further. It shouldn't be
-> hard to locate where the 192 slab allocation is from, together with RCU
-> involved.
-> 
-> BTW, the double free is triggered by the following change on your
-> config:
-> 
-> - disable lockdep
-> - disable kmemleak
-> - enable PAGE_POISONING
-
-oops, double free is captured by enabling CONFIG_DEBUG_SLAB instead of
-PAGE_POISONING, looks it is triggered reliably too.
-
-Thanks,
-Ming
-
+On 2020/09/25 2:20, Kanchan Joshi wrote:=0A=
+> On Tue, Sep 8, 2020 at 8:48 PM hch@infradead.org <hch@infradead.org> wrot=
+e:=0A=
+>>=0A=
+>> On Mon, Sep 07, 2020 at 12:31:42PM +0530, Kanchan Joshi wrote:=0A=
+>>> But there are use-cases which benefit from supporting zone-append on=0A=
+>>> raw block-dev path.=0A=
+>>> Certain user-space log-structured/cow FS/DB will use the device that=0A=
+>>> way. Aerospike is one example.=0A=
+>>> Pass-through is synchronous, and we lose the ability to use io-uring.=
+=0A=
+>>=0A=
+>> So use zonefs, which is designed exactly for that use case.=0A=
+> =0A=
+> Not specific to zone-append, but in general it may not be good to lock=0A=
+> new features/interfaces to ZoneFS alone, given that direct-block=0A=
+> interface has its own merits.=0A=
+> Mapping one file to a one zone is good for some use-cases, but=0A=
+> limiting for others.=0A=
+> Some user-space FS/DBs would be more efficient (less meta, indirection)=
+=0A=
+> with the freedom to decide file-to-zone mapping/placement.=0A=
+=0A=
+There is no metadata in zonefs. One file =3D=3D one zone and the mapping be=
+tween=0A=
+zonefs files and zones is static, determined at mount time simply using rep=
+ort=0A=
+zones. Zonefs files cannot be renamed nor deleted in anyway. Choosing a zon=
+efs=0A=
+file *is* the same as choosing a zone. Zonfes is *not* a POSIX file system =
+doing=0A=
+dynamic block allocation to files. The backing storage of files in zonefs i=
+s=0A=
+static and fixed to the zone they represent. The difference between zonefs =
+vs=0A=
+raw zoned block device is the API that has to be used by the application, t=
+hat=0A=
+is, file descriptor representing the entire disk for raw disk vs file descr=
+iptor=0A=
+representing one zone in zonefs. Note that the later has *a lot* of advanta=
+ges=0A=
+over the former: enables O_APPEND use, protects against bugs with user writ=
+e=0A=
+offsets mistakes, adds consistency of cached data against zone resets, and =
+more.=0A=
+=0A=
+> - Rocksdb and those LSM style DBs would map SSTable to zone, but=0A=
+> SSTable file may be two small (initially) and may become too large=0A=
+> (after compaction) for a zone.=0A=
+=0A=
+You are contradicting yourself here. If a SSTable is mapped to a zone, then=
+ its=0A=
+size cannot exceed the zone capacity, regardless of the interface used to a=
+ccess=0A=
+the zones. And except for L0 tables which can be smaller (and are in memory=
+=0A=
+anyway), all levels tables have the same maximum size, which for zoned driv=
+es=0A=
+must be the zone capacity. In any case, solving any problem in this area do=
+es=0A=
+not depend in any way on zonefs vs raw disk interface. The implementation w=
+ill=0A=
+differ depending on the chosen interface, but what needs to be done to map=
+=0A=
+SSTables to zones is the same in both cases.=0A=
+=0A=
+> - The internal parallelism of a single zone is a design-choice, and=0A=
+> depends on the drive. Writing multiple zones parallely (striped/raid=0A=
+> way) can give better performance than writing on one. In that case one=0A=
+> would want to file that seamlessly combines multiple-zones in a=0A=
+> striped fashion.=0A=
+=0A=
+Then write a FS for that... Or have a library do it in user space. For the=
+=0A=
+library case, the implementation will differ for zonefs vs raw disk due to =
+the=0A=
+different API (regular file vs block devicer file), but the principles to f=
+ollow=0A=
+for stripping zones into a single storage object remain the same.=0A=
+=0A=
+> Also it seems difficult (compared to block dev) to fit simple-copy TP=0A=
+> in ZoneFS. The new=0A=
+> command needs: one NVMe drive, list of source LBAs and one destination=0A=
+> LBA. In ZoneFS, we would deal with N+1 file-descriptors (N source zone=0A=
+> file, and one destination zone file) for that. While with block=0A=
+> interface, we do not need  more than one file-descriptor representing=0A=
+> the entire device. With more zone-files, we face open/close overhead too.=
+=0A=
+=0A=
+Are you expecting simple-copy to allow requests that are not zone aligned ?=
+ I do=0A=
+not think that will ever happen. Otherwise, the gotcha cases for it would b=
+e far=0A=
+too numerous. Simple-copy is essentially an optimized regular write command=
+.=0A=
+Similarly to that command, it will not allow copies over zone boundaries an=
+d=0A=
+will need the destination LBA to be aligned to the destination zone WP. I h=
+ave=0A=
+not checked the TP though and given the NVMe NDA, I will stop the discussio=
+n here.=0A=
+=0A=
+filesend() could be used as the interface for simple-copy. Implementing tha=
+t in=0A=
+zonefs would not be that hard. What is your plan for simple-copy interface =
+for=0A=
+raw block device ? An  ioctl ? filesend() too ? As as with any other user l=
+evel=0A=
+API, we should not be restricted to a particular device type if we can avoi=
+d it,=0A=
+so in-kernel emulation of the feature is needed for devices that do not hav=
+e=0A=
+simple-copy or scsi extended copy. filesend() seems to me like the best cho=
+ice=0A=
+since all of that is already implemented there.=0A=
+=0A=
+As for the open()/close() overhead for zonefs, may be some use cases may su=
+ffer=0A=
+from it, but my tests with LevelDB+zonefs did not show any significant=0A=
+difference. zonefs open()/close() operations are way faster than for a regu=
+lar=0A=
+file system since there is no metadata and all inodes always exist in-memor=
+y.=0A=
+And zonefs() now supports MAR/MOR limits for O_WRONLY open(). That can simp=
+lify=0A=
+things for the user.=0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
