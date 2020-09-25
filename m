@@ -2,132 +2,156 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F164C4727F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDBEC4727F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:38:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 446DA21D42
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:17:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A7502086A
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 20:38:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WcXKUonk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fl2TaMkw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727015AbgIYUR2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 16:17:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47064 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725273AbgIYUP2 (ORCPT
+        id S1728894AbgIYUig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 16:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54736 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728678AbgIYUif (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 16:15:28 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601064926;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kEmnlmchPR9vS1orvoNm0OXoq6QCMFirGMz7PpRHNOE=;
-        b=WcXKUonkMaXc+dgKBP7kzoSikhAngVqio6cDmIjbg1pbAeQcLBodW+4xWJZxrjKVkiLotF
-        jzYJAMeN6rI9QjY1REZWTjw7ntt5dvlFv+GOgwndHtyIWZbyBZqq2CnRZ7M3GCLdL7exi+
-        yqKnR0g1DRHZUoGss5NPkiECQy/Sk88=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-GAvbEu2YM96RiYpkhr_MNw-1; Fri, 25 Sep 2020 16:15:22 -0400
-X-MC-Unique: GAvbEu2YM96RiYpkhr_MNw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EDDBAD503;
-        Fri, 25 Sep 2020 20:15:20 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 446D95C1BB;
-        Fri, 25 Sep 2020 20:15:13 +0000 (UTC)
-Date:   Fri, 25 Sep 2020 16:15:12 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
-Cc:     Mike Christie <michael.christie@oracle.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        "ssudhakarp@gmail.com" <ssudhakarp@gmail.com>,
-        "dm-crypt@saout.de" <dm-crypt@saout.de>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Shirley Ma <shirley.ma@oracle.com>,
-        Martin Petersen <martin.petersen@oracle.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        "agk@redhat.com" <agk@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, mst@redhat.com
-Subject: Re: [RFC PATCH 0/2] dm crypt: Allow unaligned buffer lengths for
- skcipher devices
-Message-ID: <20200925201512.GA6025@redhat.com>
-References: <20200924012732.GA10766@redhat.com>
- <20200924051419.GA16103@sol.localdomain>
- <252587bb-c0b7-47c9-a97b-91422f8f9c47@default>
- <alpine.LRH.2.02.2009241314280.28814@file01.intranet.prod.int.rdu2.redhat.com>
- <7b6fdfd5-0160-4bcf-b7ed-d0e51553c678@default>
- <alpine.LRH.2.02.2009241345370.4229@file01.intranet.prod.int.rdu2.redhat.com>
- <fd512a7d-c064-4812-a794-5274c10687db@default>
- <alpine.LRH.2.02.2009241421170.8544@file01.intranet.prod.int.rdu2.redhat.com>
- <eb43742e-bdfe-4567-8240-1d8e083d76a2@default>
- <MWHPR04MB37588DF8C3FFF4BD0C3CD543E7360@MWHPR04MB3758.namprd04.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MWHPR04MB37588DF8C3FFF4BD0C3CD543E7360@MWHPR04MB3758.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        Fri, 25 Sep 2020 16:38:35 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD21EC0613DF
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 12:19:22 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id k9so3037398pgq.19
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 12:19:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=c9CDfynf/KUxdFh8n3XOljSdCkgSvr8lNgdQYSCmCYk=;
+        b=fl2TaMkw1JkltuSEzdvWcmFU9+d3U4yl5mjSBoCcGilxxYeoBy74RE52xS+Ln6YSrb
+         xEy+4y7Pvmsv+LwnX76eQOdXe30Zv3CtkS1gl6iEVW5MN4l1N785IqZoKriNLCcNC9FH
+         S6ibrfOLkK/rrw2nucf69VVUnqeUM5DO82RikP4ZH6i98QBEDjsRVRwnsKvdBMAVvYHv
+         DhwgdImhtYWhDpVVoh5yX/JxpO7VW+ob3jvyRoDZ0/Lk1tvwArMtjiZtmef7yqZsuXkh
+         nuhyhbn0O68fp167oKpymHn64S0FLQIdUGSCx8xSoq+lBpM5IcgZULlrvNq0/945p8Zx
+         OOGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=c9CDfynf/KUxdFh8n3XOljSdCkgSvr8lNgdQYSCmCYk=;
+        b=gy+i/4Ky65UUF9SDyhwCULsA0o13w6frTlaZx39x5GZAGWi6nHtdBxxtN2ipBDhEyZ
+         BCYI/QSeuIRZJpgcSlbCN8r599V6tg2MzE5GdKRLkkbcrM1NRqb5vie0a8oDkUl9/Un9
+         lqAcz8Fpjqf1spAlNmkWNgZDQ93/8TCBO1iAaTnrV6JL+8oBIWEObaZ1g/D79sjUOZeC
+         EmyymgSdmAQ8Qo/jeSBw1MCdeDwtHhlKx8UYAS+ZFg0C1YXG9QA8HC5SjZrk9IUSK07w
+         q4/lyCqvCHrKjmmfO623rMC4J1+wOmMFxyUQJjjLKnO+42Oqy6dg2g5cgJTtnn9l6gZH
+         TQmw==
+X-Gm-Message-State: AOAM531Eqba8+n0OS10IGVUhMoACzn4/ioPgxqnebA/JUd0FL4leKj+M
+        PvJMfRIx5aN15RkMfQWGYKanb2cIw7BNew==
+X-Google-Smtp-Source: ABdhPJyLFbH0nTn+I3Lwc3lBcbpV1gXP2gky2AKFlBb1OO3GB1kXpbwWnmfIuyJwos/1CTeA/XwLjOz7K97s6w==
+Sender: "shakeelb via sendgmr" <shakeelb@shakeelb.svl.corp.google.com>
+X-Received: from shakeelb.svl.corp.google.com ([2620:15c:2cd:202:a28c:fdff:fee8:36f0])
+ (user=shakeelb job=sendgmr) by 2002:a17:90a:4cc6:: with SMTP id
+ k64mr62957pjh.103.1601061562249; Fri, 25 Sep 2020 12:19:22 -0700 (PDT)
+Date:   Fri, 25 Sep 2020 12:19:02 -0700
+In-Reply-To: <CALvZod5pERERkxWAJcBrZHpcWQH75kXkys2gUg__qM9OL+MmtQ@mail.gmail.com>
+Message-Id: <20200925191902.543953-1-shakeelb@google.com>
+Mime-Version: 1.0
+References: <CALvZod5pERERkxWAJcBrZHpcWQH75kXkys2gUg__qM9OL+MmtQ@mail.gmail.com>
+X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+From:   Shakeel Butt <shakeelb@google.com>
+To:     Roman Gushchin <guro@fb.com>, Ming Lei <ming.lei@redhat.com>
+Cc:     Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>, Jens Axboe <axboe@kernel.dk>,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Shakeel Butt <shakeelb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 24 2020 at  9:09pm -0400,
-Damien Le Moal <Damien.LeMoal@wdc.com> wrote:
+On Fri, Sep 25, 2020 at 10:58 AM Shakeel Butt <shakeelb@google.com>
+wrote:
+>
+[snip]
+>
+> I don't think you can ignore the flushing. The __free_once() in
+> ___cache_free() assumes there is a space available.
+>
+> BTW do_drain() also have the same issue.
+>
+> Why not move slabs_destroy() after we update ac->avail and memmove()?
 
-> On 2020/09/25 4:14, Sudhakar Panneerselvam wrote:
-> >>
-> >> On Thu, 24 Sep 2020, Sudhakar Panneerselvam wrote:
-> >>
-> >>>> By copying it to a temporary aligned buffer and issuing I/O on this
-> >>>> buffer.
-> >>>
-> >>> I don't like this idea. Because, you need to allocate additional pages
-> >>> for the entire I/O size(for the misaligned case, if you think through
-> >>
-> >> You can break the I/O to smaller pieces. You can use mempool for
-> >> pre-allocation of the pages.
-> > 
-> > Assuming we do this, how is this code simpler(based on your
-> > comment below) than the fix in dm-crypt? In fact, this approach 
-> > would make the code change look bad in vhost, at the same time
-> > having performance penalty. By doing this, we are just moving the 
-> > responsibility to other unrelated component.
-> 
-> Because vhost is at the top of the block-io food chain. Fixing the unaligned
-> segments there will ensure that it does not matter what device is under it. It
-> will work.
+Ming, can you please try the following patch?
 
-Right, I agree. This should be addressed in vhost-scsi.  And vhost-scsi
-probably needs to be interfacing through block core to submit IO that
-respects the limits of its underlying block device.
 
-So please lift your proposed dm-crypt changes to vhost-scsi:
-https://patchwork.kernel.org/patch/11781207/
-https://patchwork.kernel.org/patch/11781053/
+From: Shakeel Butt <shakeelb@google.com>
 
-Maybe work with vhost-scsi maintainers to see about making the code
-reusable in block core; so that any future unaligned application IO is
-dealt in other drivers using the same common code.
+[PATCH] mm: slab: fix potential infinite recursion in ___cache_free
 
-But I'm not interested in taking these changes into dm-crypt:
+With the commit 10befea91b61 ("mm: memcg/slab: use a single set of
+kmem_caches for all allocations"), it becomes possible to call kfree()
+from the slabs_destroy(). However if slabs_destroy() is being called for
+the array_cache of the local CPU then this opens the potential scenario
+of infinite recursion because kfree() called from slabs_destroy() can
+call slabs_destroy() with the same array_cache of the local CPU. Since
+the array_cache of the local CPU is not updated before calling
+slabs_destroy(), it will try to free the same pages.
 
-NAK
+To fix the issue, simply update the cache before calling
+slabs_destroy().
 
-> I am still baffled that the unaligned segments go through in the first place...
-> Do we have something missing in the BIO code ?
+Signed-off-by: Shakeel Butt <shakeelb@google.com>
+---
+ mm/slab.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Cc'ing linux-block, could be.
-
-Thanks,
-Mike
+diff --git a/mm/slab.c b/mm/slab.c
+index 3160dff6fd76..f658e86ec8ce 100644
+--- a/mm/slab.c
++++ b/mm/slab.c
+@@ -1632,6 +1632,10 @@ static void slab_destroy(struct kmem_cache *cachep, struct page *page)
+ 		kmem_cache_free(cachep->freelist_cache, freelist);
+ }
+ 
++/*
++ * Update the size of the caches before calling slabs_destroy as it may
++ * recursively call kfree.
++ */
+ static void slabs_destroy(struct kmem_cache *cachep, struct list_head *list)
+ {
+ 	struct page *page, *n;
+@@ -2153,8 +2157,8 @@ static void do_drain(void *arg)
+ 	spin_lock(&n->list_lock);
+ 	free_block(cachep, ac->entry, ac->avail, node, &list);
+ 	spin_unlock(&n->list_lock);
+-	slabs_destroy(cachep, &list);
+ 	ac->avail = 0;
++	slabs_destroy(cachep, &list);
+ }
+ 
+ static void drain_cpu_caches(struct kmem_cache *cachep)
+@@ -3402,9 +3406,9 @@ static void cache_flusharray(struct kmem_cache *cachep, struct array_cache *ac)
+ 	}
+ #endif
+ 	spin_unlock(&n->list_lock);
+-	slabs_destroy(cachep, &list);
+ 	ac->avail -= batchcount;
+ 	memmove(ac->entry, &(ac->entry[batchcount]), sizeof(void *)*ac->avail);
++	slabs_destroy(cachep, &list);
+ }
+ 
+ /*
+-- 
+2.28.0.681.g6f77f65b4e-goog
 
