@@ -2,90 +2,162 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D2CCC4363D
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 17:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B244EC4363D
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 17:35:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B81B21D7A
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 17:32:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53E2721D42
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 17:35:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="kxdUTQL9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m4O7tYfi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727751AbgIYRcl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 13:32:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54164 "EHLO
+        id S1727495AbgIYRfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 13:35:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727521AbgIYRcl (ORCPT
+        with ESMTP id S1727290AbgIYRfQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 13:32:41 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D738C0613CE
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 10:32:41 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id l126so3840507pfd.5
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 10:32:41 -0700 (PDT)
+        Fri, 25 Sep 2020 13:35:16 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2189CC0613CE
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 10:35:16 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id r24so3143974ljm.3
+        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 10:35:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7JdZOwNajZADBhYXXebotkbVCE8Ql50yJYKIetU2JdY=;
-        b=kxdUTQL9oNaNJ2afy7XPuZXlK0JNgyl3hxKSlwh9zImhE5Phr44nqY7Yr0+xQ46mLM
-         DJ+YelM5S2ikDFYWEsFPmvGjdjAPCfY1eBbnZnf2U0mBptNRl63eRhtj3Xm9oe6Ry9LY
-         ZmTtf6vBdxCC1p4agjkggjqc3W6pY4C1kl1VZibBuAhHRQw9xT5Zl+4HdQnM0zLYREhG
-         UMfzZWQ+KlxwwlCLDgd68I+m8MSDIkR1fHvRlR8dON9T19Toe277PpKfqjIuklbk8M9x
-         lkxTz5L8ImPi9/g6s+Xl01CrOn54u8h5XUBgcrwwPS2KJAY/UyUFSo+GJ6DN/rvSJvVc
-         tgqw==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Qur/7fLUQQ7M8HcyXzGgRmzT/BT3EA18MOp9o+vXhw4=;
+        b=m4O7tYfi+LCjjaX259cRmfSEkU9ANtBCnhcXbGdDSAkoly60jiLCi3EeKpG07gAcoW
+         +Wto5sbywnY6Hd66eKnVr3ouoFUsth7BsWjZYIJTqVpk4I8cS2V1j/q86ygavcMJNQX3
+         idQuds9V3xtHdlbaZYzJGZOujmPv3rLVOM7yFglYVXB+MepKm8MjBNp7GqumbzT0sPrJ
+         OHe7/vkjySw4w2L+dMdYgr9lmY49rg1gOXR3EWsnNwU9hXQfzTuiJGcli65em57braNw
+         qCFaNtwvdf0aS2TLIVDD4uaKRkr0qoBHQPspRmjgtvhgPKLiVBAHC4uV/xoDn64Yaa6e
+         y7IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7JdZOwNajZADBhYXXebotkbVCE8Ql50yJYKIetU2JdY=;
-        b=uaZoFz2l5MYEQfAeKYNm2Q6wKaW5WuRyddyjDLEJ5WihWnACC7xj2xkqWaeJXl4bzQ
-         tFVHGzoZATqmxBB94JjpI+8utaPEDqDrZ3ciP9DFcTwcBRYVieRhEJtmLzrCN8O8aj0Y
-         K+DJ+O/QszvI6ln2JTa8XtsyAmE7hzuaYxPX0PVlzarV9pUoi50kzUl2bnN63f7/bOCQ
-         FZQXclMl1AvSeF8V7/jFM6obEUXgNtb/kZyDkdBPnbhCgxMngWjCI54dFGr9zW1AdPDb
-         JthjvzY1bFv9aLclFInIRU88qsOohEYdAkqGmgsvjE8IuSvPHYw2hKRCIxnW3t/zIgB6
-         k0Eg==
-X-Gm-Message-State: AOAM5338C4t3SmYMqhNDvJXjpYDJzHyzyNlVOBbvF5akh8aIQE9Vmc2Z
-        VdPuWXBS22gcxh9yRhs8XQ+0DC2LnEX3PQ==
-X-Google-Smtp-Source: ABdhPJzR7YQNVEEAc2HT8n4yCPTCkr4G67Y6chFZL1QNvJurmre0xRXB1OWT1h56sR2amsyG+tVM2g==
-X-Received: by 2002:a63:2443:: with SMTP id k64mr23171pgk.259.1601055160821;
-        Fri, 25 Sep 2020 10:32:40 -0700 (PDT)
-Received: from relinquished.localdomain ([2620:10d:c090:400::5:77e2])
-        by smtp.gmail.com with ESMTPSA id g21sm3390931pfh.30.2020.09.25.10.32.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Sep 2020 10:32:39 -0700 (PDT)
-Date:   Fri, 25 Sep 2020 10:32:37 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v7 0/7] blktests: Add support to run nvme tests with
- tcp/rdma transports
-Message-ID: <20200925173237.GA689191@relinquished.localdomain>
-References: <20200903235337.527880-1-sagi@grimberg.me>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Qur/7fLUQQ7M8HcyXzGgRmzT/BT3EA18MOp9o+vXhw4=;
+        b=acH7H94pZxT8lsc6ntUD+jJ2i+UypdD1lu8pMqJw/HcSnY6/WZ1CA5fYZy2HET/DLs
+         ovNWzMa7auyMWwWpZa5lRelLjq0eXhAhav6z7cpycwZedaloitDAFIuSAZysRCX+lV0v
+         EEijXZT1QgND7YiXd3vN6lerZrbIuIB3AVoQy41+Ln+DQCo2BoT3ZrZ0PEG4E6juHM/7
+         fZaaYKC/t5vNZFxzI1POdKicp8bEhCJGBYRjYnpZ00aVxdYiOyrkpm/gqU2DMXp/DX1k
+         HbhdmKEO+zR3zQ/SahU3VCO0+k8HL/QD9qkS9tGhyo/Yl/DfHMrZSLr4vxheXxOcUpIA
+         vx0g==
+X-Gm-Message-State: AOAM5338ZIKSBStpUJz1IijVyATrWuFd/lscD2Zms2JZlkjTD5QtrBrW
+        Z8a8UknhrKu1o3Q5z4bNn/r2miz1Qj+YZkuSgzU+Eg==
+X-Google-Smtp-Source: ABdhPJww9rGC7xLbm/a5AUCqZn+u7vM4jrVP8ohJ3SXGjFK55/Cin/pgBfqfgrAVY0ajf7iXLZcHF33PReQm1QIMLPc=
+X-Received: by 2002:a2e:7c09:: with SMTP id x9mr1585757ljc.192.1601055314188;
+ Fri, 25 Sep 2020 10:35:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200903235337.527880-1-sagi@grimberg.me>
+References: <20200915073303.GA754106@T590> <20200915224541.GB38283@mit.edu>
+ <20200915230941.GA791425@T590> <20200916202026.GC38283@mit.edu>
+ <20200917022051.GA1004828@T590> <20200917143012.GF38283@mit.edu>
+ <20200924005901.GB1806978@T590> <20200924143345.GD482521@mit.edu>
+ <20200925011311.GJ482521@mit.edu> <20200925073145.GC2388140@T590>
+ <20200925161918.GD2388140@T590> <CAHk-=whAe_n6JDyu40A15vnWs5PTU0QYX6t6-TbNeefanau6MA@mail.gmail.com>
+ <CALvZod4+ucJfr4gR60mM1gRoc7NKWydPY-JQ757q+n8hOdmrvA@mail.gmail.com>
+In-Reply-To: <CALvZod4+ucJfr4gR60mM1gRoc7NKWydPY-JQ757q+n8hOdmrvA@mail.gmail.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Fri, 25 Sep 2020 10:35:03 -0700
+Message-ID: <CALvZod4Wc23o09KXb+s=VJGs6X+8juuDXWfyfJuMH5DCksLtAQ@mail.gmail.com>
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jens Axboe <axboe@kernel.dk>,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>, Roman Gushchin <guro@fb.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Vlastimil Babka <vbabka@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 03, 2020 at 04:53:30PM -0700, Sagi Grimberg wrote:
-> We have a collection of nvme tests, but all run with nvme-loop. This
-> is the easiest to run on a standalone machine. However its very much possible
-> to run nvme-tcp and nvme-rdma using a loopback network. Add capability to run
-> tests with a new environment variable to set the transport type $nvme_trtype.
-> 
-> $ nvme_trtype=[loop|tcp|rdma] ./check nvme
-> 
-> This buys us some nice coverage on some more transport types. We also add
-> some transport type specific helpers to mark tests that are relevant only
-> for a single transport.
+On Fri, Sep 25, 2020 at 10:22 AM Shakeel Butt <shakeelb@google.com> wrote:
+>
+> On Fri, Sep 25, 2020 at 10:17 AM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> > On Fri, Sep 25, 2020 at 9:19 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > >
+> > > git bisect shows the first bad commit:
+> > >
+> > >         [10befea91b61c4e2c2d1df06a2e978d182fcf792] mm: memcg/slab: use a single set of
+> > >                 kmem_caches for all allocations
+> > >
+> > > And I have double checked that the above commit is really the first bad
+> > > commit for the list corruption issue of 'list_del corruption, ffffe1c241b00408->next
+> > > is LIST_POISON1 (dead000000000100)',
+> >
+> > Thet commit doesn't revert cleanly, but I think that's purely because
+> > we'd also need to revert
+> >
+> >   849504809f86 ("mm: memcg/slab: remove unused argument by charge_slab_page()")
+> >   74d555bed5d0 ("mm: slab: rename (un)charge_slab_page() to
+> > (un)account_slab_page()")
+> >
+> > too.
+> >
+> > Can you verify that a
+> >
+> >     git revert 74d555bed5d0 849504809f86 10befea91b61
+> >
+> > on top of current -git makes things work for you again?
+> >
+> > I'm going to do an rc8 this release simply because we have another VM
+> > issue that I hope to get fixed - but there we know what the problem
+> > and the fix _is_, it just needs some care.
+> >
+> > So if Roman (or somebody else) can see what's wrong and we can fix
+> > this quickly, we don't need to go down the revert path, but ..
+> >
+>
+> I think I have a theory. The issue is happening due to the potential
+> infinite recursion:
+>
+> [ 5060.124412]  ___cache_free+0x488/0x6b0
+> *****Second recursion
+> [ 5060.128666]  kfree+0xc9/0x1d0
+> [ 5060.131947]  kmem_freepages+0xa0/0xf0
+> [ 5060.135746]  slab_destroy+0x19/0x50
+> [ 5060.139577]  slabs_destroy+0x6d/0x90
+> [ 5060.143379]  ___cache_free+0x4a3/0x6b0
+> *****First recursion
+> [ 5060.147896]  kfree+0xc9/0x1d0
+> [ 5060.151082]  kmem_freepages+0xa0/0xf0
+> [ 5060.155121]  slab_destroy+0x19/0x50
+> [ 5060.159028]  slabs_destroy+0x6d/0x90
+> [ 5060.162920]  ___cache_free+0x4a3/0x6b0
+> [ 5060.167097]  kfree+0xc9/0x1d0
+>
+> ___cache_free() is calling cache_flusharray() to flush the local cpu
+> array_cache if the cache has more elements than the limit (ac->avail
+> >= ac->limit).
+>
+> cache_flusharray() is removing batchcount number of element from local
+> cpu array_cache and pass it slabs_destroy (if the node shared cache is
+> also full).
+>
+> Note that we have not updated local cpu array_cache size yet and
+> called slabs_destroy() which can call kfree() through
+> unaccount_slab_page().
+>
+> We are on the same CPU and this recursive kfree again check the
+> (ac->avail >= ac->limit) and call cache_flusharray() again and recurse
+> indefinitely.
 
-Applied, thanks Sagi.
+I can see two possible fixes. We can either do async kfree of
+page_obj_cgroups(page) or we can update the local cpu array_cache's
+size before slabs_destroy().
+
+Shakeel
