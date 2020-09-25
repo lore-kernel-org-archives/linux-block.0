@@ -2,53 +2,56 @@ Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0959EC4741F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 16:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96109C4727C
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 16:19:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5E6022B2D
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 16:19:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50DB720809
+	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 16:19:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHSk8VfZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1XU8uol"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729476AbgIYQTk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 12:19:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44984 "EHLO
+        id S1729498AbgIYQTn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 12:19:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55585 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729374AbgIYQTj (ORCPT
+        by vger.kernel.org with ESMTP id S1729471AbgIYQTk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 12:19:39 -0400
+        Fri, 25 Sep 2020 12:19:40 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601050777;
+        s=mimecast20190719; t=1601050778;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=CZzTv3hBY/mUlwQevJcuf6ALk7r9I6yfAL5YgetwTXE=;
-        b=EHSk8VfZlnUH+4kmlcdpLibi3yEbwohYl4/Bsf+GGwNhWrxxsJzVGLuabkwDRWylbCTwJu
-        zo4tusmV+ozw4W1UmOa/f4aDzxZl15B5pshRbhAyvCC4oYRbmbN2dU36WPTpvTGA50Ey7c
-        EuFBInjwF6y40zsznyvUKitYNjNTrWg=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I8nvqUGVqAwMorQosWtn1/SwIepEf1j+KL4FD6RqP0c=;
+        b=Z1XU8uolsY5vaAsSn7NUydYMBU/wzpcui/H3Vrbx3wSnhLXNZO3PWbkgLVXseD3W2ZBLm7
+        L0vpkgraCNUOOOfabANj846rx0rMv/uH3OFnKqNW1G+8B8/eqNEkFrgaM4wqo8ZMn2u9jn
+        e73UUp2bWBbSn25q/zEnd4XlvwJkfF0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-ITFCUEKKPZ6J5olKVgEi9g-1; Fri, 25 Sep 2020 12:19:32 -0400
-X-MC-Unique: ITFCUEKKPZ6J5olKVgEi9g-1
+ us-mta-590-3_Q53fmcNXCUjYOrAROw0w-1; Fri, 25 Sep 2020 12:19:36 -0400
+X-MC-Unique: 3_Q53fmcNXCUjYOrAROw0w-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37A3010BBECF;
-        Fri, 25 Sep 2020 16:19:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D371104FC89;
+        Fri, 25 Sep 2020 16:19:35 +0000 (UTC)
 Received: from sulaco.redhat.com (unknown [10.10.110.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E3035D9DC;
-        Fri, 25 Sep 2020 16:19:30 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CED4A5D9DC;
+        Fri, 25 Sep 2020 16:19:34 +0000 (UTC)
 From:   Tony Asleson <tasleson@redhat.com>
 To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
         linux-ide@vger.kernel.org
-Subject: [v5 00/12] Add persistent durable identifier to storage log messages
-Date:   Fri, 25 Sep 2020 11:19:17 -0500
-Message-Id: <20200925161929.1136806-1-tasleson@redhat.com>
+Subject: [v5 04/12] scsi: Add durable_name for dev_printk
+Date:   Fri, 25 Sep 2020 11:19:21 -0500
+Message-Id: <20200925161929.1136806-5-tasleson@redhat.com>
+In-Reply-To: <20200925161929.1136806-1-tasleson@redhat.com>
+References: <20200925161929.1136806-1-tasleson@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
@@ -56,160 +59,139 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Today users have no easy way to correlate kernel log messages for storage
-devices across reboots, device dynamic add/remove, or when the device is
-physically or logically moved from from system to system.  This is due
-to the existing log IDs which identify how the device is attached and not
-a unique ID of what is attached.  Additionally, even when the attachment
-hasn't changed, it's not always obvious which messages belong to the
-device as the different areas in the storage stack use different
-identifiers, eg. (sda, sata1.00, sd 0:0:0:0).
+Add the needed functions to fill out the durable_name function
+call back for scsi based storage devices.  This allows calls
+into dev_printk for scsi devices to have a persistent id
+associated with them.
 
-This change addresses this by adding a unique ID to each log
-message.  It couples the existing structured key/value logging capability
-and VPD 0x83 device identification.  The structured key/value data is not
-visible in normal viewing and is not seen in the dmesg output or journal
-output unless you go looking for it by dumping the output as JSON.
-
-Some examples of logs filtered for a specific device utilizing this patch
-series.
-
-$ journalctl -b  _KERNEL_DURABLE_NAME="`cat /sys/block/sdb/device/wwid`" 
-| cut -c 25- | fmt -t
-l: scsi 1:0:0:0: Attached scsi generic sg1 type 0
-l: sd 1:0:0:0: [sdb] 209715200 512-byte logical blocks: (107 GB/100 GiB)
-l: sd 1:0:0:0: [sdb] Write Protect is off
-l: sd 1:0:0:0: [sdb] Mode Sense: 00 3a 00 00
-l: sd 1:0:0:0: [sdb] Write cache: enabled, read cache: enabled, doesn't
-   support DPO or FUA
-l: sd 1:0:0:0: [sdb] Attached SCSI disk
-l: ata2.00: exception Emask 0x0 SAct 0x8 SErr 0x8 action 0x6 frozen
-l: ata2.00: failed command: READ FPDMA QUEUED
-l: ata2.00: cmd 60/01:18:10:27:00/00:00:00:00:00/40 tag 3 ncq dma 512
-            in res 40/00:00:00:00:00/00:00:00:00:00/00 Emask 0x4 (timeout)
-l: ata2.00: status: { DRDY }
-l: ata2.00: configured for UDMA/100
-l: ata2.00: device reported invalid CHS sector 0
-l: ata2.00: exception Emask 0x0 SAct 0x4000 SErr 0x4000 action 0x6 frozen
-l: ata2.00: failed command: READ FPDMA QUEUED
-l: ata2.00: cmd 60/01:70:10:27:00/00:00:00:00:00/40 tag 14 ncq dma 512
-            in res 40/00:00:00:00:00/00:00:00:00:00/00 Emask 0x4 (timeout)
-l: ata2.00: status: { DRDY }
-l: ata2.00: configured for UDMA/100
-l: ata2.00: device reported invalid CHS sector 0
-l: ata2.00: exception Emask 0x0 SAct 0x80000000 SErr 0x80000000 action
-            0x6 frozen
-l: ata2.00: failed command: READ FPDMA QUEUED
-l: ata2.00: cmd 60/01:f8:10:27:00/00:00:00:00:00/40 tag 31 ncq dma 512
-            in res 40/00:ff:00:00:00/00:00:00:00:00/00 Emask 0x4 (timeout)
-l: ata2.00: status: { DRDY }
-l: ata2.00: configured for UDMA/100
-l: ata2.00: NCQ disabled due to excessive errors
-l: ata2.00: exception Emask 0x0 SAct 0x40000 SErr 0x40000 action 0x6
-            frozen
-l: ata2.00: failed command: READ FPDMA QUEUED
-l: ata2.00: cmd 60/01:90:10:27:00/00:00:00:00:00/40 tag 18 ncq dma 512
-            in res 40/00:01:00:00:00/00:00:00:00:00/00 Emask 0x4 (timeout)
-l: ata2.00: status: { DRDY }
-l: ata2.00: configured for UDMA/100
-
-$ journalctl -b  _KERNEL_DURABLE_NAME="`cat /sys/block/nvme0n1/wwid`" 
-| cut -c 25- | fmt -t
-l: blk_update_request: critical medium error, dev nvme0n1, sector 10000
-   op 0x0:(READ) flags 0x80700 phys_seg 4 prio class 0
-l: blk_update_request: critical medium error, dev nvme0n1, sector 10000
-   op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-l: Buffer I/O error on dev nvme0n1, logical block 1250, async page read
-
-$ journalctl -b  _KERNEL_DURABLE_NAME="`cat /sys/block/sdc/device/wwid`"
-| cut -c 25- | fmt -t
-l: sd 8:0:0:0: Power-on or device reset occurred
-l: sd 8:0:0:0: [sdc] 16777216 512-byte logical blocks: (8.59 GB/8.00 GiB)
-l: sd 8:0:0:0: Attached scsi generic sg2 type 0
-l: sd 8:0:0:0: [sdc] Write Protect is off
-l: sd 8:0:0:0: [sdc] Mode Sense: 63 00 00 08
-l: sd 8:0:0:0: [sdc] Write cache: enabled, read cache: enabled, doesn't
-   support DPO or FUA
-l: sd 8:0:0:0: [sdc] Attached SCSI disk
-l: sd 8:0:0:0: [sdc] tag#255 FAILED Result: hostbyte=DID_OK
-   driverbyte=DRIVER_SENSE cmd_age=0s
-l: sd 8:0:0:0: [sdc] tag#255 Sense Key : Medium Error [current]
-l: sd 8:0:0:0: [sdc] tag#255 Add. Sense: Unrecovered read error
-l: sd 8:0:0:0: [sdc] tag#255 CDB: Read(10) 28 00 00 00 27 10 00 00 01 00
-l: blk_update_request: critical medium error, dev sdc, sector 10000 op
-   0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-
-There should be no changes to the log message content with this patch series.
-I ran release kernel and this patch series and did a compare while forcing the
-kernel through the same errors paths to verify.
-
-The first 6 commits in the patch series utilize changes needed for dev_printk
-code path.  The last 6 commits in the patch add the needed changes to utilize
-durable_name_printk.  The function durable_name_printk is nothing more than
-a printk that adds structured key/value durable name to unmodified printk
-output.  I structured it this way so only a subset of the patch series could
-be theoretically applied if we cannot get agreement on complete patch series.
-
-v2:
-- Incorporated changes suggested by James Bottomley
-- Removed string function which removed leading/trailing/duplicate adjacent
-  spaces from generated id, value matches /sys/block/<device>/device/wwid
-- Remove xfs patch, limiting changes to lower block layers
-- Moved callback from struct device_type to struct device.  Struct device_type
-  is typically static const and with a number of different areas using shared
-  implementation of genhd unable to modify for each of the different areas.
-
-v3:
-- Increase the size of the buffers for NVMe id generation and
-  dev_vprintk_emit
-  
-v4:
-- Back out dev_printk for those locations that weren't using it before, so that
-  we don't change the content of the user visible log message by using a
-  function durable_name_printk.
-- Remove RFC from patch series.
-
-v5:
-- Reduced stack usage for nvme wwid
-- Make function ata_scsi_durable_name static, found by kernel test robot
-- Incorporated suggested changes from Andy Shevchenko and Sergei Shtylyov
-  * Remove unneeded line spacing
-  * Correct spelling
-  * Remove unneeded () in conditional operator
-  * Re-worked expressions to follow common kernel patterns, added
-    function dev_to_scsi_device
-- Re-based for v5.8 branch
-
-Tony Asleson (12):
-  struct device: Add function callback durable_name
-  create_syslog_header: Add durable name
-  dev_vprintk_emit: Increase hdr size
-  scsi: Add durable_name for dev_printk
-  nvme: Add durable name for dev_printk
-  libata: Add ata_scsi_durable_name
-  libata: Make ata_scsi_durable_name static
-  Add durable_name_printk
-  libata: use durable_name_printk
-  Add durable_name_printk_ratelimited
-  print_req_error: Use durable_name_printk_ratelimited
-  buffer_io_error: Use durable_name_printk_ratelimited
-
- block/blk-core.c           |  5 ++++-
- drivers/ata/libata-core.c  | 17 +++++++-------
- drivers/ata/libata-scsi.c  | 18 ++++++++++++---
- drivers/base/core.c        | 46 +++++++++++++++++++++++++++++++++++++-
- drivers/nvme/host/core.c   | 18 +++++++++++++++
- drivers/scsi/scsi_lib.c    |  9 ++++++++
- drivers/scsi/scsi_sysfs.c  | 35 +++++++++++++++++++++++------
+Signed-off-by: Tony Asleson <tasleson@redhat.com>
+---
+ drivers/scsi/scsi_lib.c    |  9 +++++++++
+ drivers/scsi/scsi_sysfs.c  | 35 ++++++++++++++++++++++++++++-------
  drivers/scsi/sd.c          |  2 ++
- fs/buffer.c                | 15 +++++++++----
- include/linux/dev_printk.h | 14 ++++++++++++
- include/linux/device.h     |  4 ++++
  include/scsi/scsi_device.h |  3 +++
- 12 files changed, 162 insertions(+), 24 deletions(-)
+ 4 files changed, 42 insertions(+), 7 deletions(-)
 
-
-base-commit: bcf876870b95592b52519ed4aafcf9d95999bc9c
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 06056e9ec333..aa5601733763 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -3151,3 +3151,12 @@ int scsi_vpd_tpg_id(struct scsi_device *sdev, int *rel_id)
+ 	return group_id;
+ }
+ EXPORT_SYMBOL(scsi_vpd_tpg_id);
++
++int scsi_durable_name(struct scsi_device *sdev, char *buf, size_t len)
++{
++	int vpd_len = scsi_vpd_lun_id(sdev, buf, len);
++	if (vpd_len > 0 && vpd_len < len)
++		return vpd_len + 1;
++	return 0;
++}
++EXPORT_SYMBOL(scsi_durable_name);
+diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
+index 163dbcb741c1..c4840bc80b47 100644
+--- a/drivers/scsi/scsi_sysfs.c
++++ b/drivers/scsi/scsi_sysfs.c
+@@ -504,15 +504,19 @@ static struct class sdev_class = {
+ 	.dev_release	= scsi_device_cls_release,
+ };
+ 
++static struct scsi_device *dev_to_scsi_device(const struct device *dev)
++{
++	return dev->type == &scsi_dev_type ? to_scsi_device(dev) : NULL;
++}
++
+ /* all probing is done in the individual ->probe routines */
+ static int scsi_bus_match(struct device *dev, struct device_driver *gendrv)
+ {
+-	struct scsi_device *sdp;
++	struct scsi_device *sdp = dev_to_scsi_device(dev);
+ 
+-	if (dev->type != &scsi_dev_type)
++	if (!sdp)
+ 		return 0;
+ 
+-	sdp = to_scsi_device(dev);
+ 	if (sdp->no_uld_attach)
+ 		return 0;
+ 	return (sdp->inq_periph_qual == SCSI_INQ_PQ_CON)? 1: 0;
+@@ -520,13 +524,11 @@ static int scsi_bus_match(struct device *dev, struct device_driver *gendrv)
+ 
+ static int scsi_bus_uevent(struct device *dev, struct kobj_uevent_env *env)
+ {
+-	struct scsi_device *sdev;
++	struct scsi_device *sdev = dev_to_scsi_device(dev);
+ 
+-	if (dev->type != &scsi_dev_type)
++	if (!sdev)
+ 		return 0;
+ 
+-	sdev = to_scsi_device(dev);
+-
+ 	add_uevent_var(env, "MODALIAS=" SCSI_DEVICE_MODALIAS_FMT, sdev->type);
+ 	return 0;
+ }
+@@ -1582,6 +1584,24 @@ static struct device_type scsi_dev_type = {
+ 	.groups =	scsi_sdev_attr_groups,
+ };
+ 
++int dev_to_scsi_durable_name(const struct device *dev, char *buf, size_t len)
++{
++	/*
++	 * When we go through dev_printk in the scsi layer, dev is embedded
++	 * in a struct scsi_device.  When we go through the block layer,
++	 * dev is embedded in struct genhd, thus we need different paths to
++	 * retrieve the struct scsi_device to call scsi_durable_name.
++	 */
++	struct scsi_device *sdev = dev_to_scsi_device(dev);
++	if (!sdev)
++		sdev = dev_to_scsi_device(dev->parent);
++	if (!sdev)
++		return 0;
++
++	return scsi_durable_name(sdev, buf, len);
++}
++EXPORT_SYMBOL(dev_to_scsi_durable_name);
++
+ void scsi_sysfs_device_initialize(struct scsi_device *sdev)
+ {
+ 	unsigned long flags;
+@@ -1591,6 +1611,7 @@ void scsi_sysfs_device_initialize(struct scsi_device *sdev)
+ 	device_initialize(&sdev->sdev_gendev);
+ 	sdev->sdev_gendev.bus = &scsi_bus_type;
+ 	sdev->sdev_gendev.type = &scsi_dev_type;
++	sdev->sdev_gendev.durable_name = dev_to_scsi_durable_name;
+ 	dev_set_name(&sdev->sdev_gendev, "%d:%d:%d:%llu",
+ 		     sdev->host->host_no, sdev->channel, sdev->id, sdev->lun);
+ 
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index d90fefffe31b..69ff339fa5ea 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3386,6 +3386,8 @@ static int sd_probe(struct device *dev)
+ 	gd->private_data = &sdkp->driver;
+ 	gd->queue = sdkp->device->request_queue;
+ 
++	disk_to_dev(gd)->durable_name = dev_to_scsi_durable_name;
++
+ 	/* defaults, until the device tells us otherwise */
+ 	sdp->sector_size = 512;
+ 	sdkp->capacity = 0;
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index bc5909033d13..7b6cff11d502 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -464,6 +464,9 @@ extern void sdev_disable_disk_events(struct scsi_device *sdev);
+ extern void sdev_enable_disk_events(struct scsi_device *sdev);
+ extern int scsi_vpd_lun_id(struct scsi_device *, char *, size_t);
+ extern int scsi_vpd_tpg_id(struct scsi_device *, int *);
++extern int dev_to_scsi_durable_name(const struct device *dev, char *buf,
++					size_t len);
++extern int scsi_durable_name(struct scsi_device *sdev, char *buf, size_t len);
+ 
+ #ifdef CONFIG_PM
+ extern int scsi_autopm_get_device(struct scsi_device *);
 -- 
 2.26.2
 
