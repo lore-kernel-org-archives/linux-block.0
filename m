@@ -1,136 +1,149 @@
-Return-Path: <SRS0=r6We=DC=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=UEoe=DD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16467C4727F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 21:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC25C4727D
+	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 01:43:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B00BA21D7F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Sep 2020 21:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5CAE20936
+	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 01:43:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eNZv88uT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MK8vsURS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728869AbgIYVTC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Sep 2020 17:19:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32852 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727423AbgIYVTB (ORCPT
+        id S1729685AbgIZBnq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Sep 2020 21:43:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56168 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729426AbgIZBnq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Sep 2020 17:19:01 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48DD2C0613D5
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 14:19:01 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id b12so4315514lfp.9
-        for <linux-block@vger.kernel.org>; Fri, 25 Sep 2020 14:19:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BAZC5WdsihBei8ZEYFA5ibD70o4Yn/tMBPfbhpwMzrw=;
-        b=eNZv88uTD+H0687sCNUjErQN0ou7Br7/82NHVBB4WbSsMLa6Xv+b6Py7dIwago8+oV
-         LVTgsWVWUV0AfVW3zTJ2+BPeF/2CRbdZ5mh6o59MNoQ8Os2KF2lKb1rUuBeXIczq23h9
-         gAwf6yQbAUadJ4ve7LCZdZFcw2mMfQTUgRC19MgdwFfnqyYGhRVeG5L6ZpEdPBplhIsF
-         kZZvxrpjdnCLAqObXL+OsCdWoPpV1aD42X9YJXAQN3Y/byVqUSwl7dhz+C1N/NGxqKve
-         UFJ+q2IfH/66yw4Iib1An5JHeYd5cCNdqIuigSrwMSdO6gjXfmKxrulbrZdU03sEjUkF
-         Q3Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BAZC5WdsihBei8ZEYFA5ibD70o4Yn/tMBPfbhpwMzrw=;
-        b=ZOVzQrwTgDlsrxnOW9f9kh/nPIEx1rSuYD7eqsjkmlkhXLYu4OADdOqk0zq5rJGdVH
-         2hE18vr8FGYEl9hFU2CuYlECWVhiVYgvmXd1ydukNzsaVdlKhzR2mYkIcguLmrjaPBF6
-         r5BRVETnEx6WaD7bgCUbuJ+rv9+oBTxZSh84e23jp59pSHpv1w06sGrYL3+B4yTRARN2
-         VLVJo+vyXXDQp505sCARglmDhgWQBwRpTg4TArAL8JUz3q73z+QrKIpGTcIImTaoBfCh
-         kKX7LSQiQyq2uI3kvCrrWCL0uICWWJKce0ukDQUtJ31VKpBmRews32DGAql8ahs34d1Y
-         MBSQ==
-X-Gm-Message-State: AOAM5315rS34p6u39QYLg1rpv9jVdghZCpSmA1JYWZtfKHLVB5CZF3rR
-        iXYgY0SbfMwaMeRqibxB/oKWyZBm9XfEt04IRoC6XQ==
-X-Google-Smtp-Source: ABdhPJxUEE37WPkdJrc9HedFYru6tI6b/9DtnLDZsC2ZOqMgNlXO3m98KYOozN9brJWAwI+Hjol/pci4CGZ7tcktK4w=
-X-Received: by 2002:ac2:4315:: with SMTP id l21mr254323lfh.494.1601068739382;
- Fri, 25 Sep 2020 14:18:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <CALvZod5pERERkxWAJcBrZHpcWQH75kXkys2gUg__qM9OL+MmtQ@mail.gmail.com>
- <20200925191902.543953-1-shakeelb@google.com> <20200925205604.GA2228989@carbon.dhcp.thefacebook.com>
-In-Reply-To: <20200925205604.GA2228989@carbon.dhcp.thefacebook.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Fri, 25 Sep 2020 14:18:48 -0700
-Message-ID: <CALvZod5ETbjn7Y0A619Sd+sFO_9QCnUDC-_pBXPgq9AkAK0LRQ@mail.gmail.com>
-Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
- into blk_mq_get_driver_tag
-To:     Roman Gushchin <guro@fb.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
+        Fri, 25 Sep 2020 21:43:46 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601084625;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=anuXvW7DT2NGfM0wi3fUi3pbzDhxv6S3wuJYHpV9+T8=;
+        b=MK8vsURStodYRTIUEnifXPsI3pvDdpOygNS2CVJRB17OR4tp38QG3+HD0OJjXKOTHwxXN9
+        JkbtKzh4uNE6WcsbUTlwQsnZTlwt0n3TJUDIFvQrAcYlmvZbKZWM0tjMer0lSmYc480BsK
+        S/eiE69NmwM7yiSh15WYIvtablD+Lpk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-53-3ub8DGkqMci6FOxNU-m3_g-1; Fri, 25 Sep 2020 21:43:41 -0400
+X-MC-Unique: 3ub8DGkqMci6FOxNU-m3_g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFBE910066FC;
+        Sat, 26 Sep 2020 01:43:38 +0000 (UTC)
+Received: from T590 (ovpn-12-20.pek2.redhat.com [10.72.12.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E771373662;
+        Sat, 26 Sep 2020 01:43:29 +0000 (UTC)
+Date:   Sat, 26 Sep 2020 09:43:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shakeel Butt <shakeelb@google.com>
+Cc:     Roman Gushchin <guro@fb.com>, Johannes Weiner <hannes@cmpxchg.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         "Theodore Y . Ts'o" <tytso@mit.edu>, Jens Axboe <axboe@kernel.dk>,
         Ext4 Developers List <linux-ext4@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Vlastimil Babka <vbabka@suse.cz>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: REGRESSION: 37f4a24c2469: blk-mq: centralise related handling
+ into blk_mq_get_driver_tag
+Message-ID: <20200926014325.GA2516054@T590>
+References: <CALvZod5pERERkxWAJcBrZHpcWQH75kXkys2gUg__qM9OL+MmtQ@mail.gmail.com>
+ <20200925191902.543953-1-shakeelb@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200925191902.543953-1-shakeelb@google.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 1:56 PM Roman Gushchin <guro@fb.com> wrote:
->
-> On Fri, Sep 25, 2020 at 12:19:02PM -0700, Shakeel Butt wrote:
-> > On Fri, Sep 25, 2020 at 10:58 AM Shakeel Butt <shakeelb@google.com>
-> > wrote:
-> > >
-> > [snip]
-> > >
-> > > I don't think you can ignore the flushing. The __free_once() in
-> > > ___cache_free() assumes there is a space available.
-> > >
-> > > BTW do_drain() also have the same issue.
-> > >
-> > > Why not move slabs_destroy() after we update ac->avail and memmove()?
+On Fri, Sep 25, 2020 at 12:19:02PM -0700, Shakeel Butt wrote:
+> On Fri, Sep 25, 2020 at 10:58 AM Shakeel Butt <shakeelb@google.com>
+> wrote:
 > >
-> > Ming, can you please try the following patch?
+> [snip]
 > >
+> > I don't think you can ignore the flushing. The __free_once() in
+> > ___cache_free() assumes there is a space available.
 > >
-> > From: Shakeel Butt <shakeelb@google.com>
+> > BTW do_drain() also have the same issue.
 > >
-> > [PATCH] mm: slab: fix potential infinite recursion in ___cache_free
-> >
-> > With the commit 10befea91b61 ("mm: memcg/slab: use a single set of
-> > kmem_caches for all allocations"), it becomes possible to call kfree()
-> > from the slabs_destroy(). However if slabs_destroy() is being called for
-> > the array_cache of the local CPU then this opens the potential scenario
-> > of infinite recursion because kfree() called from slabs_destroy() can
-> > call slabs_destroy() with the same array_cache of the local CPU. Since
-> > the array_cache of the local CPU is not updated before calling
-> > slabs_destroy(), it will try to free the same pages.
-> >
-> > To fix the issue, simply update the cache before calling
-> > slabs_destroy().
-> >
-> > Signed-off-by: Shakeel Butt <shakeelb@google.com>
->
-> I like the patch and I think it should fix the problem.
->
-> However the description above should be likely asjusted a bit.
-> It seems that the problem is not necessary caused by an infinite recursion,
-> it can be even simpler.
->
-> In cache_flusharray() we rely on the state of ac, which is described
-> by ac->avail. In particular we rely on batchcount < ac->avail,
-> as we shift the batchcount number of pointers by memmove.
-> But if slabs_destroy() is called before and leaded to a change of the
-> ac state, it can lead to a memory corruption.
->
-> Also, unconditionally resetting ac->avail to 0 in do_drain() after calling
-> to slab_destroy() seems to be wrong.
-> It explains double free BUGs we've seen in stacktraces.
->
+> > Why not move slabs_destroy() after we update ac->avail and memmove()?
+> 
+> Ming, can you please try the following patch?
+> 
+> 
+> From: Shakeel Butt <shakeelb@google.com>
+> 
+> [PATCH] mm: slab: fix potential infinite recursion in ___cache_free
+> 
+> With the commit 10befea91b61 ("mm: memcg/slab: use a single set of
+> kmem_caches for all allocations"), it becomes possible to call kfree()
+> from the slabs_destroy(). However if slabs_destroy() is being called for
+> the array_cache of the local CPU then this opens the potential scenario
+> of infinite recursion because kfree() called from slabs_destroy() can
+> call slabs_destroy() with the same array_cache of the local CPU. Since
+> the array_cache of the local CPU is not updated before calling
+> slabs_destroy(), it will try to free the same pages.
+> 
+> To fix the issue, simply update the cache before calling
+> slabs_destroy().
+> 
+> Signed-off-by: Shakeel Butt <shakeelb@google.com>
+> ---
+>  mm/slab.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/mm/slab.c b/mm/slab.c
+> index 3160dff6fd76..f658e86ec8ce 100644
+> --- a/mm/slab.c
+> +++ b/mm/slab.c
+> @@ -1632,6 +1632,10 @@ static void slab_destroy(struct kmem_cache *cachep, struct page *page)
+>  		kmem_cache_free(cachep->freelist_cache, freelist);
+>  }
+>  
+> +/*
+> + * Update the size of the caches before calling slabs_destroy as it may
+> + * recursively call kfree.
+> + */
+>  static void slabs_destroy(struct kmem_cache *cachep, struct list_head *list)
+>  {
+>  	struct page *page, *n;
+> @@ -2153,8 +2157,8 @@ static void do_drain(void *arg)
+>  	spin_lock(&n->list_lock);
+>  	free_block(cachep, ac->entry, ac->avail, node, &list);
+>  	spin_unlock(&n->list_lock);
+> -	slabs_destroy(cachep, &list);
+>  	ac->avail = 0;
+> +	slabs_destroy(cachep, &list);
+>  }
+>  
+>  static void drain_cpu_caches(struct kmem_cache *cachep)
+> @@ -3402,9 +3406,9 @@ static void cache_flusharray(struct kmem_cache *cachep, struct array_cache *ac)
+>  	}
+>  #endif
+>  	spin_unlock(&n->list_lock);
+> -	slabs_destroy(cachep, &list);
+>  	ac->avail -= batchcount;
+>  	memmove(ac->entry, &(ac->entry[batchcount]), sizeof(void *)*ac->avail);
+> +	slabs_destroy(cachep, &list);
+>  }
 
-Yes, you are right. Let's first get this patch tested and after
-confirmation we can update the commit message.
+The issue can't be reproduced after applying this patch:
+
+Tested-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
+
