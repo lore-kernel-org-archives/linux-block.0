@@ -2,118 +2,66 @@ Return-Path: <SRS0=UEoe=DD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F12C7C47420
-	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 16:05:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D0EC2D0A8
+	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 18:23:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A5B820882
-	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 16:05:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="IvR1YD+w";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="XDmM+lLW"
+	by mail.kernel.org (Postfix) with ESMTP id 347A72151B
+	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 18:23:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1601144638;
+	bh=D0N9HyNUe+A7FCELht4oV3ouTy4AvqMneYdq4HFweiw=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=Kn1hYsStIkkBoCYnJRNWQZM79mdyl+BJ63GKnqZh6rIvbnqysKsdpduzQQ9RC+dux
+	 P/L5AZSfN1dpykSrNcPGYKthDmDbLBdCn0ZVSiB7zV3T593bPU0vNkSWbjT0mth7pF
+	 bSla16BVQV67+M7EJkYbGVuhY0ThCXKwjsKMjZMY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729363AbgIZQFc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Sep 2020 12:05:32 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:60234 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728017AbgIZQFc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Sep 2020 12:05:32 -0400
-X-Greylist: delayed 465 seconds by postgrey-1.27 at vger.kernel.org; Sat, 26 Sep 2020 12:05:32 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 2864B8EE1D2;
-        Sat, 26 Sep 2020 08:57:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1601135867;
-        bh=rD4REDTiuYYtn4sZscXqF7OKu/aHoA0CpXICd7Rlb+8=;
-        h=Subject:From:To:Date:In-Reply-To:References:From;
-        b=IvR1YD+wbRSM9AxOBwZgdL8vB6t+sc9f0GVP4GCk0rWy2KPWj6C0jGfSX7EJVtyuw
-         rNywjatu34vyvt7AbK9xrDLOn16qngm61c6C0YnVVaqJdepxttcs5YQ0aa7viUg4F1
-         plhBugB/Uswftur0cObBix3gB02Tf2G0ZFFHVehA=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id L2978SdLCTSe; Sat, 26 Sep 2020 08:57:46 -0700 (PDT)
-Received: from jarvis (c-73-35-198-56.hsd1.wa.comcast.net [73.35.198.56])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 3619A8EE1C0;
-        Sat, 26 Sep 2020 08:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1601135865;
-        bh=rD4REDTiuYYtn4sZscXqF7OKu/aHoA0CpXICd7Rlb+8=;
-        h=Subject:From:To:Date:In-Reply-To:References:From;
-        b=XDmM+lLWAyILBACvf/HBLkipxECuaKl04XFVID7G4ihpyHkemqlklEg54CBQW58xM
-         s9QYgif0KmEXoX/cVQN6rIhw6M/zfAOt3aHi8FvYAQWuO7pSmDNO2ElA5VnldRw35w
-         bt41ZCraxtqvJh6vkIoojZ9/n/7PiU1VGcjahdI8=
-Message-ID: <eb1216d26b3baaf1bea2562ae772f968c36f52ba.camel@HansenPartnership.com>
-Subject: Re: [v5 07/12] libata: Make ata_scsi_durable_name static
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     tasleson@redhat.com, Sergei Shtylyov <sergei.shtylyov@gmail.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org
-Date:   Sat, 26 Sep 2020 08:57:42 -0700
-In-Reply-To: <b95e0b6f-dcc1-8032-ebcd-29ae594fcbaf@redhat.com>
-References: <20200925161929.1136806-1-tasleson@redhat.com>
-         <20200925161929.1136806-8-tasleson@redhat.com>
-         <ec0479bf-e5ac-58f1-248a-2d4c29ae3efa@gmail.com>
-         <b95e0b6f-dcc1-8032-ebcd-29ae594fcbaf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1729272AbgIZSX5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Sep 2020 14:23:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34182 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730001AbgIZSXx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Sep 2020 14:23:53 -0400
+Subject: Re: [GIT PULL] block fixes for 5.9-rc
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1601144633;
+        bh=D0N9HyNUe+A7FCELht4oV3ouTy4AvqMneYdq4HFweiw=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=1ElZhItgrRQ04RhqahR+y6refZr0SfzePz6eYTG4ZFaDzDBd+XYAJ/3bRpNNJV82y
+         qA6jAou9NEylSKZFR/zb5/3QbEpMXnGR4x0AJFh9EfXC5gBA8+QLKxFKmjf6w5orsc
+         9u/iF/AAXOR7k5Vy7RMHDTH3qUZofelf8et8Rxj4=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <a43f5477-7da2-f4b1-bb61-3c1b613da334@kernel.dk>
+References: <a43f5477-7da2-f4b1-bb61-3c1b613da334@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <a43f5477-7da2-f4b1-bb61-3c1b613da334@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.9-2020-09-25
+X-PR-Tracked-Commit-Id: 3aab91774bbd8e571cfaddaf839aafd07718333c
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 9d2fbaefb3b049772b468447ed427204789ea9a5
+Message-Id: <160114463355.21242.4236001132235807478.pr-tracker-bot@kernel.org>
+Date:   Sat, 26 Sep 2020 18:23:53 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 2020-09-26 at 09:17 -0500, Tony Asleson wrote:
-> On 9/26/20 3:40 AM, Sergei Shtylyov wrote:
-> > Hello!
-> > 
-> > On 25.09.2020 19:19, Tony Asleson wrote:
-> > 
-> > > Signed-off-by: Tony Asleson <tasleson@redhat.com>
-> > > Signed-off-by: kernel test robot <lkp@intel.com>
-> > > ---
-> > >   drivers/ata/libata-scsi.c | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-
-> > > scsi.c
-> > > index 194dac7dbdca..13a58ed7184c 100644
-> > > --- a/drivers/ata/libata-scsi.c
-> > > +++ b/drivers/ata/libata-scsi.c
-> > > @@ -1086,7 +1086,7 @@ int ata_scsi_dev_config(struct scsi_device
-> > > *sdev, struct ata_device *dev)
-> > >       return 0;
-> > >   }
-> > >   -int ata_scsi_durable_name(const struct device *dev, char *buf,
-> > > size_t len)
-> > > +static int ata_scsi_durable_name(const struct device *dev, char
-> > > *buf,
-> > > size_t len)
-> > 
-> >    Why not do it in patch #6 -- when introducing the function?
-> 
-> This issue was found by the intel kernel test robot in v4 patch
-> series. I thought it was better to have a separate commit with the
-> correction that matched it's signed off.  Maybe that's not the
-> correct approach?
+The pull request you sent on Fri, 25 Sep 2020 20:23:42 -0600:
 
-No ... while a patch is being reviewed the purpose of review is to make
-it better by folding in all the comments.  It then gets a changelog put
-below the 
+> git://git.kernel.dk/linux-block.git tags/block-5.9-2020-09-25
 
----
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/9d2fbaefb3b049772b468447ed427204789ea9a5
 
-v5: made X function static
+Thank you!
 
-So people can follow how it has evolved.  This is all actually
-described in Documentation/submitting-patches.
-
-James
-
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
