@@ -2,161 +2,116 @@ Return-Path: <SRS0=UEoe=DD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE520C2D0A8
-	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 04:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E551BC2D0A8
+	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 04:32:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB94E2075E
-	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 04:32:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A53982078B
+	for <linux-block@archiver.kernel.org>; Sat, 26 Sep 2020 04:32:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730012AbgIZEcS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Sep 2020 00:32:18 -0400
-Received: from smtp.h3c.com ([60.191.123.56]:16492 "EHLO h3cspam01-ex.h3c.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729926AbgIZEcS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Sep 2020 00:32:18 -0400
-Received: from h3cspam01-ex.h3c.com (localhost [127.0.0.2] (may be forged))
-        by h3cspam01-ex.h3c.com with ESMTP id 08Q2qvAW066971;
-        Sat, 26 Sep 2020 10:52:57 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from DAG2EX03-BASE.srv.huawei-3com.com ([10.8.0.66])
-        by h3cspam01-ex.h3c.com with ESMTPS id 08Q2qn2G066930
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 26 Sep 2020 10:52:49 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
- DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Sat, 26 Sep 2020 10:52:50 +0800
-Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
- by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%7]) with
- mapi id 15.01.1713.004; Sat, 26 Sep 2020 10:52:50 +0800
-From:   Tianxianting <tian.xianting@h3c.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] [v2] blk-mq: add cond_resched() in
- __blk_mq_alloc_rq_maps()
-Thread-Topic: [PATCH] [v2] blk-mq: add cond_resched() in
- __blk_mq_alloc_rq_maps()
-Thread-Index: AQHWjMtkn2n+ezztLkuMBSittKHg9Kl5Q7AAgAEBwjA=
-Date:   Sat, 26 Sep 2020 02:52:50 +0000
-Message-ID: <ffd885d363074710b1ada87701619c0d@h3c.com>
-References: <20200917081311.11428-1-tian.xianting@h3c.com>
- <c55b365d-c6b0-6207-f326-6d58dd113d18@kernel.dk>
-In-Reply-To: <c55b365d-c6b0-6207-f326-6d58dd113d18@kernel.dk>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.99.141.128]
-x-sender-location: DAG2
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1730033AbgIZEcq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Sep 2020 00:32:46 -0400
+Received: from mail-pg1-f182.google.com ([209.85.215.182]:45474 "EHLO
+        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729231AbgIZEcq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Sep 2020 00:32:46 -0400
+Received: by mail-pg1-f182.google.com with SMTP id y14so4136439pgf.12;
+        Fri, 25 Sep 2020 21:32:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=4shQRsIdT17fWbtG5QC54RWuUlCCAfeGrv+BSHQqrZY=;
+        b=EdRlomje7/dffht2Jy+9aced8mz+WQG91B0AXH9kRdDVG65ZzS7bon5xaYHofj7hum
+         6/5pTPMQz5LO30CRjeXo4eZZ4FW5vB53ZaA0c7vP37JiZOXxDvaNmH7DvrH90rsG0Hcw
+         DuhcNd/y39IPoUpmu0iKjoQKSDaFUWYZOBhk3gPaHsAC0YDI0Fpu5NoFp+KxfZYbMY/z
+         /gnL0C4unmWeoi0rSNSlfr9xi9YEe8G7sDF5Phc+8r8Ql8l1qNmEETTFvNnXbY6VO0gG
+         +z+fMCQjsFBYVNrSbSec81LnSnNbagXQM0/XTPzpPtuTFbMl9ADmExmNNWH8BDrHOnxf
+         sMwg==
+X-Gm-Message-State: AOAM530+Jx+Q3WepyRzJVdStDc6RDhvd6thkulZbE8NGK2hiOVlo9G4U
+        7JMTmD/JID4L+E/b/mPJKEQTXxanVec=
+X-Google-Smtp-Source: ABdhPJy16DWvqbbX2aZ2nD9wG4dk0ksmFpiO8s8jNedWL1wGpnxeYLX0c1BN3VZS6wXl/m1nDGhVaw==
+X-Received: by 2002:a63:c00d:: with SMTP id h13mr1663256pgg.358.1601094765247;
+        Fri, 25 Sep 2020 21:32:45 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:8ee4:7db:d6f2:5686? ([2601:647:4000:d7:8ee4:7db:d6f2:5686])
+        by smtp.gmail.com with ESMTPSA id m13sm572576pjl.45.2020.09.25.21.32.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Sep 2020 21:32:44 -0700 (PDT)
+Subject: Re: lib/scatterlist.c : sgl_alloc_order promises more than it
+ delivers
+To:     dgilbert@interlog.com,
+        SCSI development list <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     "Martin K. Petersen" <martin.petersen@ORACLE.COM>,
+        USB list <linux-usb@vger.kernel.org>
+References: <b9f5c065-7662-30e0-8cbd-27a77d28611e@interlog.com>
+ <d9513f73-fa18-4b71-fabf-be0b9e1614fd@acm.org>
+ <d487005a-ef6c-549f-7006-c7056cf3f36d@interlog.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <da346d8f-b27e-7880-10e8-f2617e0ec7ff@acm.org>
+Date:   Fri, 25 Sep 2020 21:32:43 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-X-DNSRBL: 
-X-MAIL: h3cspam01-ex.h3c.com 08Q2qn2G066930
+In-Reply-To: <d487005a-ef6c-549f-7006-c7056cf3f36d@interlog.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGkgSmVucw0KVGhhbmtzIGEgbG90IGZvciB0aGUgY29tbWVudHMsDQpJIHRoaW5rIGl0IGlzIG5v
-dCBob3QgcGF0aCwgaXQgaXMgb25seSBjYWxsZWQgd2hlbiBzeXN0ZW0gc3RhcnR1cCBvciBkZXZp
-Y2UgaG90LXBsdWdnaW5nLg0KU28gSSBzdWJtaXR0ZWQgVjMgcGF0Y2ggZm9yIHlvdSByZXZpZXdp
-bmcgOikNCmh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDIwLzkvMjUvMTU0MyANCg0KLS0tLS1Pcmln
-aW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEplbnMgQXhib2UgW21haWx0bzpheGJvZUBrZXJuZWwu
-ZGtdIA0KU2VudDogU2F0dXJkYXksIFNlcHRlbWJlciAyNiwgMjAyMCAzOjI2IEFNDQpUbzogdGlh
-bnhpYW50aW5nIChSRCkgPHRpYW4ueGlhbnRpbmdAaDNjLmNvbT4NCkNjOiBsaW51eC1ibG9ja0B2
-Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJl
-OiBbUEFUQ0hdIFt2Ml0gYmxrLW1xOiBhZGQgY29uZF9yZXNjaGVkKCkgaW4gX19ibGtfbXFfYWxs
-b2NfcnFfbWFwcygpDQoNCk9uIDkvMTcvMjAgMjoxMyBBTSwgWGlhbnRpbmcgVGlhbiB3cm90ZToN
-Cj4gV2UgZm91bmQgaXQgdGFrZXMgbW9yZSB0aW1lIG9mIGJsa19tcV9hbGxvY19ycV9tYXBzKCkg
-aW4ga2VybmVsIHNwYWNlIA0KPiB3aGVuIHRlc3RpbmcgbnZtZSBob3QtcGx1Z2dpbmcuIFRoZSB0
-ZXN0IGFuZCBhbmx5c2lzIGFzIGJlbG93Lg0KPiANCj4gRGVidWcgY29kZSwNCj4gMSwgYmxrX21x
-X2FsbG9jX3JxX21hcHMoKToNCj4gICAgICAgICB1NjQgc3RhcnQsIGVuZDsNCj4gICAgICAgICBk
-ZXB0aCA9IHNldC0+cXVldWVfZGVwdGg7DQo+ICAgICAgICAgc3RhcnQgPSBrdGltZV9nZXRfbnMo
-KTsNCj4gICAgICAgICBwcl9lcnIoIlslZDolcyBzd2l0Y2g6JWxkLCVsZF0gcXVldWUgZGVwdGgg
-JWQsIG5yX2h3X3F1ZXVlcyAlZFxuIiwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgY3VycmVu
-dC0+cGlkLCBjdXJyZW50LT5jb21tLCBjdXJyZW50LT5udmNzdywgY3VycmVudC0+bml2Y3N3LA0K
-PiAgICAgICAgICAgICAgICAgICAgICAgICBzZXQtPnF1ZXVlX2RlcHRoLCBzZXQtPm5yX2h3X3F1
-ZXVlcyk7DQo+ICAgICAgICAgZG8gew0KPiAgICAgICAgICAgICAgICAgZXJyID0gX19ibGtfbXFf
-YWxsb2NfcnFfbWFwcyhzZXQpOw0KPiAgICAgICAgICAgICAgICAgaWYgKCFlcnIpDQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiANCj4gICAgICAgICAgICAgICAgIHNldC0+cXVl
-dWVfZGVwdGggPj49IDE7DQo+ICAgICAgICAgICAgICAgICBpZiAoc2V0LT5xdWV1ZV9kZXB0aCA8
-IHNldC0+cmVzZXJ2ZWRfdGFncyArIEJMS19NUV9UQUdfTUlOKSB7DQo+ICAgICAgICAgICAgICAg
-ICAgICAgICAgIGVyciA9IC1FTk9NRU07DQo+ICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFr
-Ow0KPiAgICAgICAgICAgICAgICAgfQ0KPiAgICAgICAgIH0gd2hpbGUgKHNldC0+cXVldWVfZGVw
-dGgpOw0KPiAgICAgICAgIGVuZCA9IGt0aW1lX2dldF9ucygpOw0KPiAgICAgICAgIHByX2Vycigi
-WyVkOiVzIHN3aXRjaDolbGQsJWxkXSBhbGwgaHcgcXVldWVzIGluaXQgY29zdCB0aW1lICVsbGQg
-bnNcbiIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgIGN1cnJlbnQtPnBpZCwgY3VycmVudC0+
-Y29tbSwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgY3VycmVudC0+bnZjc3csIGN1cnJlbnQt
-Pm5pdmNzdywgZW5kIC0gc3RhcnQpOw0KPiANCj4gMiwgX19ibGtfbXFfYWxsb2NfcnFfbWFwcygp
-Og0KPiAgICAgICAgIHU2NCBzdGFydCwgZW5kOw0KPiAgICAgICAgIGZvciAoaSA9IDA7IGkgPCBz
-ZXQtPm5yX2h3X3F1ZXVlczsgaSsrKSB7DQo+ICAgICAgICAgICAgICAgICBzdGFydCA9IGt0aW1l
-X2dldF9ucygpOw0KPiAgICAgICAgICAgICAgICAgaWYgKCFfX2Jsa19tcV9hbGxvY19ycV9tYXAo
-c2V0LCBpKSkNCj4gICAgICAgICAgICAgICAgICAgICAgICAgZ290byBvdXRfdW53aW5kOw0KPiAg
-ICAgICAgICAgICAgICAgZW5kID0ga3RpbWVfZ2V0X25zKCk7DQo+ICAgICAgICAgICAgICAgICBw
-cl9lcnIoImh3IHF1ZXVlICVkIGluaXQgY29zdCB0aW1lICVsbGRcbiIsIGksIGVuZCAtIHN0YXJ0
-KTsNCj4gICAgICAgICB9DQo+IA0KPiBUZXN0IG52bWUgaG90LXBsdWdnaW5nIHdpdGggYWJvdmUg
-ZGVidWcgY29kZSwgd2UgZm91bmQgaXQgdG90YWxseSBjb3N0IA0KPiBtb3JlIHRoYW4gM21zIGlu
-IGtlcm5lbCBzcGFjZSB3aXRob3V0IGJlaW5nIHNjaGVkdWxlZCBvdXQgd2hlbiBhbGxvYyANCj4g
-cnFzIGZvciBhbGwNCj4gMTYgaHcgcXVldWVzIHdpdGggZGVwdGggMTAyNCwgZWFjaCBodyBxdWV1
-ZSBjb3N0IGFib3V0IDE0MC0yNTB1cy4gVGhlIA0KPiB0aW1lIGNvc3Qgd2lsbCBiZSBpbmNyZWFz
-ZWQgd2l0aCBodyBxdWV1ZSBudW1iZXIgYW5kIHF1ZXVlIGRlcHRoIA0KPiBpbmNyZWFzaW5nLiBB
-bmQgaWYgX19ibGtfbXFfYWxsb2NfcnFfbWFwcygpIHJldHVybnMgLUVOT01FTSwgaXQgd2lsbCAN
-Cj4gdHJ5ICJxdWV1ZV9kZXB0aCA+Pj0gMSIsIG1vcmUgdGltZSB3aWxsIGJlIGNvbnN1bWVkLg0K
-PiAJWyAgNDI4LjQyODc3MV0gbnZtZSBudm1lMDogcGNpIGZ1bmN0aW9uIDEwMDAwOjAxOjAwLjAN
-Cj4gCVsgIDQyOC40Mjg3OThdIG52bWUgMTAwMDA6MDE6MDAuMDogZW5hYmxpbmcgZGV2aWNlICgw
-MDAwIC0+IDAwMDIpDQo+IAlbICA0MjguNDI4ODA2XSBwY2llcG9ydCAxMDAwMDowMDowMC4wOiBj
-YW4ndCBkZXJpdmUgcm91dGluZyBmb3IgUENJIElOVCBBDQo+IAlbICA0MjguNDI4ODA5XSBudm1l
-IDEwMDAwOjAxOjAwLjA6IFBDSSBJTlQgQTogbm8gR1NJDQo+IAlbICA0MzIuNTkzMzc0XSBbNDY4
-ODprd29ya2VyL3UzMzo4IHN3aXRjaDo2NjMsMl0gcXVldWUgZGVwdGggMzAsIG5yX2h3X3F1ZXVl
-cyAxDQo+IAlbICA0MzIuNTkzNDA0XSBodyBxdWV1ZSAwIGluaXQgY29zdCB0aW1lIDIyODgzIG5z
-DQo+IAlbICA0MzIuNTkzNDA4XSBbNDY4ODprd29ya2VyL3UzMzo4IHN3aXRjaDo2NjMsMl0gYWxs
-IGh3IHF1ZXVlcyBpbml0IGNvc3QgdGltZSAzNTk2MCBucw0KPiAJWyAgNDMyLjU5NTk1M10gbnZt
-ZSBudm1lMDogMTYvMC8wIGRlZmF1bHQvcmVhZC9wb2xsIHF1ZXVlcw0KPiAJWyAgNDMyLjU5NTk1
-OF0gWzQ2ODg6a3dvcmtlci91MzM6OCBzd2l0Y2g6NzAwLDJdIHF1ZXVlIGRlcHRoIDEwMjMsIG5y
-X2h3X3F1ZXVlcyAxNg0KPiAJWyAgNDMyLjU5NjIwM10gaHcgcXVldWUgMCBpbml0IGNvc3QgdGlt
-ZSAyNDI2MzAgbnMNCj4gCVsgIDQzMi41OTY0NDFdIGh3IHF1ZXVlIDEgaW5pdCBjb3N0IHRpbWUg
-MjM1OTEzIG5zDQo+IAlbICA0MzIuNTk2NjU5XSBodyBxdWV1ZSAyIGluaXQgY29zdCB0aW1lIDIx
-NjQ2MSBucw0KPiAJWyAgNDMyLjU5Njg3N10gaHcgcXVldWUgMyBpbml0IGNvc3QgdGltZSAyMTU4
-NTEgbnMNCj4gCVsgIDQzMi41OTcxMDddIGh3IHF1ZXVlIDQgaW5pdCBjb3N0IHRpbWUgMjI4NDA2
-IG5zDQo+IAlbICA0MzIuNTk3MzM2XSBodyBxdWV1ZSA1IGluaXQgY29zdCB0aW1lIDIyNzI5OCBu
-cw0KPiAJWyAgNDMyLjU5NzU2NF0gaHcgcXVldWUgNiBpbml0IGNvc3QgdGltZSAyMjQ2MzMgbnMN
-Cj4gCVsgIDQzMi41OTc3ODVdIGh3IHF1ZXVlIDcgaW5pdCBjb3N0IHRpbWUgMjE5OTU0IG5zDQo+
-IAlbICA0MzIuNTk3OTM3XSBodyBxdWV1ZSA4IGluaXQgY29zdCB0aW1lIDE1MDkzMCBucw0KPiAJ
-WyAgNDMyLjU5ODA4Ml0gaHcgcXVldWUgOSBpbml0IGNvc3QgdGltZSAxNDM0OTYgbnMNCj4gCVsg
-IDQzMi41OTgyMzFdIGh3IHF1ZXVlIDEwIGluaXQgY29zdCB0aW1lIDE0NzI2MSBucw0KPiAJWyAg
-NDMyLjU5ODM5N10gaHcgcXVldWUgMTEgaW5pdCBjb3N0IHRpbWUgMTY0NTIyIG5zDQo+IAlbICA0
-MzIuNTk4NTQyXSBodyBxdWV1ZSAxMiBpbml0IGNvc3QgdGltZSAxNDM0MDEgbnMNCj4gCVsgIDQz
-Mi41OTg2OTJdIGh3IHF1ZXVlIDEzIGluaXQgY29zdCB0aW1lIDE0ODkzNCBucw0KPiAJWyAgNDMy
-LjU5ODg0MV0gaHcgcXVldWUgMTQgaW5pdCBjb3N0IHRpbWUgMTQ3MTk0IG5zDQo+IAlbICA0MzIu
-NTk4OTkxXSBodyBxdWV1ZSAxNSBpbml0IGNvc3QgdGltZSAxNDg5NDIgbnMNCj4gCVsgIDQzMi41
-OTg5OTNdIFs0Njg4Omt3b3JrZXIvdTMzOjggc3dpdGNoOjcwMCwyXSBhbGwgaHcgcXVldWVzIGlu
-aXQgY29zdCB0aW1lIDMwMzUwOTkgbnMNCj4gCVsgIDQzMi42MDI2MTFdICBudm1lMG4xOiBwMQ0K
-PiANCj4gU28gdXNlIHRoaXMgcGF0Y2ggdG8gdHJpZ2dlciBzY2hlZHVsZSBiZXR3ZWVuIGVhY2gg
-aHcgcXVldWUgaW5pdCwgdG8gDQo+IGF2b2lkIG90aGVyIHRocmVhZHMgZ2V0dGluZyBzdHVjay4g
-V2UgY2FsbCBjb25kX3Jlc2NoZWQoKSBvbmx5IHdoZW4gDQo+ICJxdWV1ZSBkZXB0aCA+PSA1MTIi
-LiBXZSBhcmUgbm90IGluIGF0b21pYyBjb250ZXh0IHdoZW4gZXhlY3V0aW5nIA0KPiBfX2Jsa19t
-cV9hbGxvY19ycV9tYXBzKCksIHNvIGl0IGlzIHNhZmUgdG8gY2FsbCBjb25kX3Jlc2NoZWQoKS4N
-Cj4gDQo+IFNpZ25lZC1vZmYtYnk6IFhpYW50aW5nIFRpYW4gPHRpYW4ueGlhbnRpbmdAaDNjLmNv
-bT4NCj4gLS0tDQo+ICBibG9jay9ibGstbXEuYyB8IDcgKysrKysrLQ0KPiAgMSBmaWxlIGNoYW5n
-ZWQsIDYgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Js
-b2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMgaW5kZXggDQo+IGIzZDI3ODVlZS4uNWE3MWZl
-NTNhIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9ibGstbXEuYw0KPiArKysgYi9ibG9jay9ibGstbXEu
-Yw0KPiBAQCAtMzI1NSwxMSArMzI1NSwxNiBAQCB2b2lkIGJsa19tcV9leGl0X3F1ZXVlKHN0cnVj
-dCByZXF1ZXN0X3F1ZXVlIA0KPiAqcSkgIHN0YXRpYyBpbnQgX19ibGtfbXFfYWxsb2NfcnFfbWFw
-cyhzdHJ1Y3QgYmxrX21xX3RhZ19zZXQgKnNldCkgIHsNCj4gIAlpbnQgaTsNCj4gKwl1bnNpZ25l
-ZCBpbnQgZGVwdGggPSBzZXQtPnF1ZXVlX2RlcHRoOw0KPiAgDQo+IC0JZm9yIChpID0gMDsgaSA8
-IHNldC0+bnJfaHdfcXVldWVzOyBpKyspDQo+ICsJZm9yIChpID0gMDsgaSA8IHNldC0+bnJfaHdf
-cXVldWVzOyBpKyspIHsNCj4gIAkJaWYgKCFfX2Jsa19tcV9hbGxvY19tYXBfYW5kX3JlcXVlc3Qo
-c2V0LCBpKSkNCj4gIAkJCWdvdG8gb3V0X3Vud2luZDsNCj4gIA0KPiArCQlpZiAoZGVwdGggPj0g
-NTEyKQ0KPiArCQkJY29uZF9yZXNjaGVkKCk7DQo+ICsJfQ0KPiArDQo+ICAJcmV0dXJuIDA7DQoN
-CkkgZ2VuZXJhbGx5IGRpc2xpa2UNCg0KaWYgKHNvbWVfbnVtKQ0KCWNvbmRfcmVzY2hlZCgpOw0K
-DQpwYXJ0aWN1bGFybHkgd2hlbiBpdCdzIG5vdCBhIHRydWUgaG90IHBhdGguIEhvdyBhYm91dCBq
-dXN0IG1ha2luZyB0aGUNCmNvbmRfcmVzY2hlZCgpIHVuY29uZGl0aW9uYWw/IEkgc3VzcGVjdCB0
-aGF0IHdpbGwgYmUganVzdCBmaW5lLg0KDQotLQ0KSmVucyBBeGJvZQ0KDQo=
+On 2020-09-24 21:55, Douglas Gilbert wrote:
+> My code steps down from 1024 KiB elements on failure to 512 KiB and if that
+> fails it tries 256 KiB. Then it gives up. The log output is consistent with
+> my analysis. So your stated equality is an inequality when length >= 4 GiB.
+> There is no promotion of unsigned int nent to uint64_t .
+> 
+> You can write your own test harness if you don't believe me. The test machine
+> doesn't need much ram. Without the call to sgl_free() corrected, if it really
+> did try to get that much ram and failed toward the end, then (partially)
+> freed up what it had obtained, then you would see a huge memory leak ...> 
+> 
+> Now your intention seems to be that a 4 GiB sgl should be valid. Correct?
+> Can that check just be dropped?
+
+Hi Doug,
+
+When I wrote that code, I did not expect that anyone would try to allocate
+4 GiB or more as a single scatterlist. Are there any use cases for which a
+4 GiB scatterlist works better than two or more smaller scatterlists?
+
+Do you agree that many hardware DMA engines do not support transferring
+4 GiB or more at once?
+
+Thanks,
+
+Bart.
