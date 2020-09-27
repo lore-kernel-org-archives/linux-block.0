@@ -2,80 +2,201 @@ Return-Path: <SRS0=7dNq=DE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED282C4727E
-	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 19:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA545C4727F
+	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 19:56:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C484321531
-	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 19:55:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A3CF21D95
+	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 19:56:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726714AbgI0Tzu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Sep 2020 15:55:50 -0400
+        id S1726751AbgI0T4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Sep 2020 15:56:06 -0400
 Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:10039
         "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726600AbgI0Tzq (ORCPT
+        by vger.kernel.org with ESMTP id S1726369AbgI0TzS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Sep 2020 15:55:46 -0400
+        Sun, 27 Sep 2020 15:55:18 -0400
 X-IronPort-AV: E=Sophos;i="5.77,311,1596492000"; 
-   d="scan'208";a="360169506"
+   d="scan'208";a="360169486"
 Received: from palace.rsr.lip6.fr (HELO palace.lip6.fr) ([132.227.105.202])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/AES256-SHA256; 27 Sep 2020 21:55:15 +0200
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/AES256-SHA256; 27 Sep 2020 21:55:11 +0200
 From:   Julia Lawall <Julia.Lawall@inria.fr>
-To:     Philipp Reisner <philipp.reisner@linbit.com>
+To:     linux-iio@vger.kernel.org
 Cc:     =?UTF-8?q?Valdis=20Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
         Joe Perches <joe@perches.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         kernel-janitors@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 18/18] drbd: use semicolons rather than commas to separate statements
-Date:   Sun, 27 Sep 2020 21:12:28 +0200
-Message-Id: <1601233948-11629-19-git-send-email-Julia.Lawall@inria.fr>
+        David Lechner <david@lechnology.com>,
+        linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-crypto@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Neil Armstrong <narmstrong@baylibre.com>,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        linux-amlogic@lists.infradead.org, linux-acpi@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH 00/18] use semicolons rather than commas to separate statements
+Date:   Sun, 27 Sep 2020 21:12:10 +0200
+Message-Id: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
 X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
-References: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace commas with semicolons.  What is done is essentially described by
-the following Coccinelle semantic patch (http://coccinelle.lip6.fr/):
+These patches replace commas by semicolons.  This was done using the
+Coccinelle semantic patch (http://coccinelle.lip6.fr/) shown below.
+
+This semantic patch ensures that commas inside for loop headers will not be
+transformed.  It also doesn't touch macro definitions.
+
+Coccinelle ensures that braces are added as needed when a single-statement
+branch turns into a multi-statement one.
+
+This semantic patch has a few false positives, for variable delcarations
+such as:
+
+LIST_HEAD(x), *y;
+
+The semantic patch could be improved to avoid these, but for the moment
+they have been removed manually (2 occurrences).
 
 // <smpl>
-@@ expression e1,e2; @@
-e1
--,
+@initialize:ocaml@
+@@
+
+let infunction p =
+  (* avoid macros *)
+  (List.hd p).current_element <> "something_else"
+
+let combined p1 p2 =
+  (List.hd p1).line_end = (List.hd p2).line ||
+  (((List.hd p1).line_end < (List.hd p2).line) &&
+   ((List.hd p1).col < (List.hd p2).col))
+
+@bad@
+statement S;
+declaration d;
+position p;
+@@
+
+S@p
+d
+
+// special cases where newlines are needed (hope for no more than 5)
+@@
+expression e1,e2;
+statement S;
+position p != bad.p;
+position p1;
+position p2 :
+    script:ocaml(p1) { infunction p1 && combined p1 p2 };
+@@
+
+- e1@p1,@S@p e2@p2;
++ e1; e2;
+
+@@
+expression e1,e2;
+statement S;
+position p != bad.p;
+position p1;
+position p2 :
+    script:ocaml(p1) { infunction p1 && combined p1 p2 };
+@@
+
+- e1@p1,@S@p e2@p2;
++ e1; e2;
+
+@@
+expression e1,e2;
+statement S;
+position p != bad.p;
+position p1;
+position p2 :
+    script:ocaml(p1) { infunction p1 && combined p1 p2 };
+@@
+
+- e1@p1,@S@p e2@p2;
++ e1; e2;
+
+@@
+expression e1,e2;
+statement S;
+position p != bad.p;
+position p1;
+position p2 :
+    script:ocaml(p1) { infunction p1 && combined p1 p2 };
+@@
+
+- e1@p1,@S@p e2@p2;
++ e1; e2;
+
+@@
+expression e1,e2;
+statement S;
+position p != bad.p;
+position p1;
+position p2 :
+    script:ocaml(p1) { infunction p1 && combined p1 p2 };
+@@
+
+- e1@p1,@S@p e2@p2;
++ e1; e2;
+
+@r@
+expression e1,e2;
+statement S;
+position p != bad.p;
+@@
+
+e1 ,@S@p e2;
+
+@@
+expression e1,e2;
+position p1;
+position p2 :
+    script:ocaml(p1) { infunction p1 && not(combined p1 p2) };
+statement S;
+position r.p;
+@@
+
+e1@p1
+-,@S@p
 +;
-e2
+e2@p2
 ... when any
 // </smpl>
 
-Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
-
 ---
- drivers/block/drbd/drbd_receiver.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 422363daa618..87f732fb5456 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -111,8 +111,10 @@ static struct page *page_chain_tail(struct page *page, int *len)
- {
- 	struct page *tmp;
- 	int i = 1;
--	while ((tmp = page_chain_next(page)))
--		++i, page = tmp;
-+	while ((tmp = page_chain_next(page))) {
-+		++i;
-+		page = tmp;
-+	}
- 	if (len)
- 		*len = i;
- 	return page;
-
+ drivers/acpi/processor_idle.c               |    4 +++-
+ drivers/ata/pata_icside.c                   |   21 +++++++++++++--------
+ drivers/base/regmap/regmap-debugfs.c        |    2 +-
+ drivers/bcma/driver_pci_host.c              |    4 ++--
+ drivers/block/drbd/drbd_receiver.c          |    6 ++++--
+ drivers/char/agp/amd-k7-agp.c               |    2 +-
+ drivers/char/agp/nvidia-agp.c               |    2 +-
+ drivers/char/agp/sworks-agp.c               |    2 +-
+ drivers/char/hw_random/iproc-rng200.c       |    8 ++++----
+ drivers/char/hw_random/mxc-rnga.c           |    6 +++---
+ drivers/char/hw_random/stm32-rng.c          |    8 ++++----
+ drivers/char/ipmi/bt-bmc.c                  |    6 +++---
+ drivers/clk/meson/meson-aoclk.c             |    2 +-
+ drivers/clk/mvebu/ap-cpu-clk.c              |    2 +-
+ drivers/clk/uniphier/clk-uniphier-cpugear.c |    2 +-
+ drivers/clk/uniphier/clk-uniphier-mux.c     |    2 +-
+ drivers/clocksource/mps2-timer.c            |    6 +++---
+ drivers/clocksource/timer-armada-370-xp.c   |    8 ++++----
+ drivers/counter/ti-eqep.c                   |    2 +-
+ drivers/crypto/amcc/crypto4xx_alg.c         |    2 +-
+ drivers/crypto/atmel-tdes.c                 |    2 +-
+ drivers/crypto/hifn_795x.c                  |    4 ++--
+ drivers/crypto/talitos.c                    |    8 ++++----
+ 23 files changed, 60 insertions(+), 51 deletions(-)
