@@ -2,119 +2,114 @@ Return-Path: <SRS0=7dNq=DE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3CEFC2D0A8
-	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 00:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FE4C4346E
+	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 06:27:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 92F502388E
-	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 00:03:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 376CF23A05
+	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 06:27:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="agElJtWK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728585AbgI0ADz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Sep 2020 20:03:55 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:36539 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726242AbgI0ADy (ORCPT
+        id S1729291AbgI0G1R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Sep 2020 02:27:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38637 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730429AbgI0G1L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Sep 2020 20:03:54 -0400
-Received: by mail-pg1-f195.google.com with SMTP id x16so4524853pgj.3;
-        Sat, 26 Sep 2020 17:03:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=c+v/1vhUED7NCVLTHCvDvlN3BK3YOaivzMidjWkUkwM=;
-        b=GbtlLNa2HUF/bKCuLx593HAbBETxJByxOquddkt83muyskoBCgRECZtGMpl86QH0Pf
-         cav9GopyhjrOm/O4oPHiqGrVD4k0x68JukUNi4UH6rrKRlkHCLWAX8RmGpX3E1pfEJYR
-         aUOJ4K1tEN977Dcs8v0K/WxgjLA2ONUZ61vqB85GDZiuMl8hEew9ohcUikAbTojy4GTT
-         FqtanIUhtivqchwkcq5onyDBVJXEHhfXq/VUuNnc/5rjNW2b/p270lGoGLfOM3P0lgLQ
-         XyR/JJQR6cfB9xTY7he4IEKGvAJHNAVwp25QWkeyJ+cRIeJQC8juc3jJCvnvtMIqr/ub
-         z3Sw==
-X-Gm-Message-State: AOAM533JiQewdNZCM5EC8EC6lGikP2CyJEAu5sPiH+SFdZ5V58PeajMu
-        HzPcoATVnPtayVssdy7xUS8+ANfr3Pg=
-X-Google-Smtp-Source: ABdhPJwVYpgeeAo5D1PiHzFK0TMHdpQVx8TfRfbKfSZHMpgOIsj0YseHpsvQZpPRnOJGdAbsdGe6JQ==
-X-Received: by 2002:a63:4b14:: with SMTP id y20mr4220253pga.203.1601165033177;
-        Sat, 26 Sep 2020 17:03:53 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:9c9b:4523:362b:c165? ([2601:647:4000:d7:9c9b:4523:362b:c165])
-        by smtp.gmail.com with ESMTPSA id g23sm6628924pfh.133.2020.09.26.17.03.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 26 Sep 2020 17:03:52 -0700 (PDT)
-Subject: Re: [RFC] Reliable Multicast on top of RTRS
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
-References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
- <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
- <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
- <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org>
- <CAHg0HuxJ-v7WgqbU62zkihquN9Kyc9nPzGhcung+UyFOG7LECQ@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <a1446914-1388-40af-4204-5ef8b7618b42@acm.org>
-Date:   Sat, 26 Sep 2020 17:03:51 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        Sun, 27 Sep 2020 02:27:11 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601188030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=s0QJrlkrbBeq+eVwaFFCQP+CMSNcINM05HMlBIsX0V8=;
+        b=agElJtWKbH5ue0DEtMH/BIK7ddUWCky/KF1uApapJPOhx51TEhYZKWu6pOEkAfc/rg8yp7
+        REZzEeXZ504uuKJNYHe9zcVyFdWpJEXXPCwVa2KKeJFqqKXKH5/UlUz9Ov+zB9ku5g19vW
+        yHYnlyxISh4EWhTDMdOxxbXcx1aenkI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-TJuJ8QZDO5WC0GTCfTVHMw-1; Sun, 27 Sep 2020 02:27:06 -0400
+X-MC-Unique: TJuJ8QZDO5WC0GTCfTVHMw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C148910059A9;
+        Sun, 27 Sep 2020 06:27:04 +0000 (UTC)
+Received: from localhost (ovpn-12-180.pek2.redhat.com [10.72.12.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0EC4D7368F;
+        Sun, 27 Sep 2020 06:26:59 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Veronika Kabatova <vkabatov@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>, Tejun Heo <tj@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH V5 0/3] percpu_ref & block: reduce memory footprint of percpu_ref in fast path
+Date:   Sun, 27 Sep 2020 14:26:51 +0800
+Message-Id: <20200927062654.2750277-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHg0HuxJ-v7WgqbU62zkihquN9Kyc9nPzGhcung+UyFOG7LECQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-09-09 04:42, Danil Kipnis wrote:
-> On Fri, Sep 4, 2020 at 5:33 PM Bart Van Assche <bvanassche@acm.org> wrote:
->> On 2020-09-04 04:35, Danil Kipnis wrote:
->>> On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
->>>> How will it be guaranteed that the resulting software does
->>>> not suffer from the problems that have been solved by the introduction
->>>> of the DRBD activity log
->>>> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
->>>
->>> The above would require some kind of activity log also, I'm afraid.
->>
->> How about collaborating with the DRBD team? My concern is that otherwise
->> we will end up with two drivers in the kernel that implement block device
->> replication between servers connected over a network.
-> 
-> I have two general understanding questions:
-> - What is the conceptual difference between DRBD and an md-raid1 with
-> one local leg and one remote (imported over srp/nvmeof/rnbd)?
+Hi,
 
-I'm not sure there is a conceptual difference. But there will be a big
-difference in recovery speed after a temporary network outage (assuming that
-the md-raid write intent bitmap has been disabled).
+The 1st patch removes memory footprint of percpu_ref in fast path
+from 7 words to 2 words, since it is often used in fast path and
+embedded in user struct.
 
-> - Is this possible to setup an md-raid1 on a client sitting on top of
-> two remote DRBD devices, which are configured in "active-active" mode?
+The 2nd patch moves .q_usage_counter to 1st cacheline of
+'request_queue'.
 
-I don't think that DRBD supports this. From the DRBD source code:
-"this code path is to recover from a situation that "should not happen":
-concurrent writes in multi-primary setup."
+Simple test on null_blk shows ~2% IOPS boost on one 16cores(two threads
+per core) machine, dual socket/numa.
 
-Bart.
+V5:
+	- fix memory leak on ref->data, only percpu_ref_exit() of patch 2
+	is modified.
+
+V4:
+	- rename percpu_ref_inited as percpu_ref_is_initialized
+
+V3:
+	- fix kernel oops on MD
+	- add patch for avoiding to use percpu-refcount internal from md
+	  code
+	- pass Red Hat CKI test which is done by Veronika Kabatova
+
+V2:
+	- pass 'gfp' to kzalloc() for fixing block/027 failure reported by
+	kernel test robot
+	- protect percpu_ref_is_zero() with destroying percpu-refcount by
+	spin lock  
+
+
+Ming Lei (3):
+  percpu_ref: add percpu_ref_is_initialized for MD
+  percpu_ref: reduce memory footprint of percpu_ref in fast path
+  block: move 'q_usage_counter' into front of 'request_queue'
+
+ drivers/infiniband/sw/rdmavt/mr.c |   2 +-
+ drivers/md/md.c                   |   2 +-
+ include/linux/blkdev.h            |   3 +-
+ include/linux/percpu-refcount.h   |  46 ++++------
+ lib/percpu-refcount.c             | 137 +++++++++++++++++++++++-------
+ 5 files changed, 126 insertions(+), 64 deletions(-)
+
+Cc: Veronika Kabatova <vkabatov@redhat.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <bvanassche@acm.org>
+-- 
+2.25.2
+
