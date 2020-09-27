@@ -2,151 +2,80 @@ Return-Path: <SRS0=7dNq=DE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C76AC47420
-	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 12:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE1DAC4346E
+	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 13:13:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F10AA23718
-	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 12:21:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601209271;
-	bh=FdSjEiIOfosty1A1hNpYjx+LCe0c93peV/xVsFD6r/o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=YwCSbZqLYGBMi46JVv01Xz91umTnlaogDrpDlFu1c453vqCWVflVFYcjf8qc5rzve
-	 opUIwnfg3GPB2zkA4BAHhocSu52LPidB/3iNDk5NYxCTQqLigRulV1Ddqg3eHAWzY5
-	 DQCInF5A4/tOR4ctC218X6rqY7y3086MtDBnAWEg=
+	by mail.kernel.org (Postfix) with ESMTP id 5E3DC23976
+	for <linux-block@archiver.kernel.org>; Sun, 27 Sep 2020 13:13:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbgI0MVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Sep 2020 08:21:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36964 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726185AbgI0MVG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Sep 2020 08:21:06 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 74316208FE;
-        Sun, 27 Sep 2020 12:21:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601209265;
-        bh=FdSjEiIOfosty1A1hNpYjx+LCe0c93peV/xVsFD6r/o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FtJG2gRJohbsXmjTGZLvssQG1XF1/EDPa+Sxt7uDN386HN/YFfrvpzrv4+5S2OGee
-         WwgbRJn5W6gVfWdvXi4OwSNypTgoQvpwd2ypZNN7rw+jr66jN5W1yoJ984HbBn313O
-         5EwO+4+ECjBUiIjNR1+7fPf+BlbKDjiL9nYij4XI=
-Date:   Sun, 27 Sep 2020 14:21:15 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        netdev@vger.kernel.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Vlastimil Babka <vbabka@suse.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v8 1/7] net: introduce helper sendpage_ok() in
- include/linux/net.h
-Message-ID: <20200927122115.GA178781@kroah.com>
-References: <20200925150119.112016-1-colyli@suse.de>
- <20200925150119.112016-2-colyli@suse.de>
- <20200925151812.GA3182427@kroah.com>
- <7b0d4f63-2fe5-9032-3b88-97619d8c5081@suse.de>
+        id S1726185AbgI0NNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Sep 2020 09:13:01 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:58298 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726149AbgI0NNB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 27 Sep 2020 09:13:01 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 91A3627846F6F203A2D7;
+        Sun, 27 Sep 2020 21:12:59 +0800 (CST)
+Received: from [10.174.179.185] (10.174.179.185) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.487.0; Sun, 27 Sep 2020 21:12:57 +0800
+Subject: Re: [PATCH] block: remove redundant mq check
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>
+References: <20200916111712.4011701-1-yuyufen@huawei.com>
+Message-ID: <7024794c-18a9-4fb4-42dd-2e20dd616dda@huawei.com>
+Date:   Sun, 27 Sep 2020 21:12:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b0d4f63-2fe5-9032-3b88-97619d8c5081@suse.de>
+In-Reply-To: <20200916111712.4011701-1-yuyufen@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.185]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 26, 2020 at 09:28:03PM +0800, Coly Li wrote:
-> On 2020/9/25 23:18, Greg KH wrote:
-> > On Fri, Sep 25, 2020 at 11:01:13PM +0800, Coly Li wrote:
-> >> The original problem was from nvme-over-tcp code, who mistakenly uses
-> >> kernel_sendpage() to send pages allocated by __get_free_pages() without
-> >> __GFP_COMP flag. Such pages don't have refcount (page_count is 0) on
-> >> tail pages, sending them by kernel_sendpage() may trigger a kernel panic
-> >> from a corrupted kernel heap, because these pages are incorrectly freed
-> >> in network stack as page_count 0 pages.
-> >>
-> >> This patch introduces a helper sendpage_ok(), it returns true if the
-> >> checking page,
-> >> - is not slab page: PageSlab(page) is false.
-> >> - has page refcount: page_count(page) is not zero
-> >>
-> >> All drivers who want to send page to remote end by kernel_sendpage()
-> >> may use this helper to check whether the page is OK. If the helper does
-> >> not return true, the driver should try other non sendpage method (e.g.
-> >> sock_no_sendpage()) to handle the page.
-> >>
-> >> Signed-off-by: Coly Li <colyli@suse.de>
-> >> Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> >> Cc: Christoph Hellwig <hch@lst.de>
-> >> Cc: Hannes Reinecke <hare@suse.de>
-> >> Cc: Jan Kara <jack@suse.com>
-> >> Cc: Jens Axboe <axboe@kernel.dk>
-> >> Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
-> >> Cc: Philipp Reisner <philipp.reisner@linbit.com>
-> >> Cc: Sagi Grimberg <sagi@grimberg.me>
-> >> Cc: Vlastimil Babka <vbabka@suse.com>
-> >> Cc: stable@vger.kernel.org
-> >> ---
-> >>  include/linux/net.h | 16 ++++++++++++++++
-> >>  1 file changed, 16 insertions(+)
-> >>
-> >> diff --git a/include/linux/net.h b/include/linux/net.h
-> >> index d48ff1180879..05db8690f67e 100644
-> >> --- a/include/linux/net.h
-> >> +++ b/include/linux/net.h
-> >> @@ -21,6 +21,7 @@
-> >>  #include <linux/rcupdate.h>
-> >>  #include <linux/once.h>
-> >>  #include <linux/fs.h>
-> >> +#include <linux/mm.h>
-> >>  #include <linux/sockptr.h>
-> >>  
-> >>  #include <uapi/linux/net.h>
-> >> @@ -286,6 +287,21 @@ do {									\
-> >>  #define net_get_random_once_wait(buf, nbytes)			\
-> >>  	get_random_once_wait((buf), (nbytes))
-> >>  
-> >> +/*
-> >> + * E.g. XFS meta- & log-data is in slab pages, or bcache meta
-> >> + * data pages, or other high order pages allocated by
-> >> + * __get_free_pages() without __GFP_COMP, which have a page_count
-> >> + * of 0 and/or have PageSlab() set. We cannot use send_page for
-> >> + * those, as that does get_page(); put_page(); and would cause
-> >> + * either a VM_BUG directly, or __page_cache_release a page that
-> >> + * would actually still be referenced by someone, leading to some
-> >> + * obscure delayed Oops somewhere else.
-> >> + */
-> >> +static inline bool sendpage_ok(struct page *page)
-> >> +{
-> >> +	return  !PageSlab(page) && page_count(page) >= 1;
-> > 
-> > Do you have one extra ' ' after "return" there?
-> 
-> It should be fixed in next version.
-> 
-> > 
-> > And this feels like a mm thing, why put it in net.h and not mm.h?
-> 
-> This check is specific for kernel_sendpage(), so I want to place it
-> closer to where kernel_sendpage() is declared.
-> 
-> And indeed there was similar discussion about why this helper is not in
-> mm code in v5 series. Christoph supported to place sendpage_ok() in
-> net.h, an uncompleted piece of his opinion was "It is not a mm bug, it
-> is a networking quirk."
+Gently ping.
 
-Ah, nevermind then, sorry for the noise :)
-
-greg k-h
+On 2020/9/16 19:17, Yufen Yu wrote:
+> elv_support_iosched() will check queue_is_mq() for us. So, remove
+> the redundant check to clean code.
+> 
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> ---
+>   block/elevator.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/elevator.c b/block/elevator.c
+> index f0db80fec5a4..b564129a9f2d 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -616,7 +616,7 @@ int elevator_switch_mq(struct request_queue *q,
+>   
+>   static inline bool elv_support_iosched(struct request_queue *q)
+>   {
+> -	if (!q->mq_ops ||
+> +	if (!queue_is_mq(q) ||
+>   	    (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED)))
+>   		return false;
+>   	return true;
+> @@ -764,7 +764,7 @@ ssize_t elv_iosched_store(struct request_queue *q, const char *name,
+>   {
+>   	int ret;
+>   
+> -	if (!queue_is_mq(q) || !elv_support_iosched(q))
+> +	if (!elv_support_iosched(q))
+>   		return count;
+>   
+>   	ret = __elevator_change(q, name);
+> 
