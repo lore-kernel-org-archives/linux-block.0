@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D85C47427
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86282C4741F
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0573121548
+	by mail.kernel.org (Postfix) with ESMTP id 07AD22100A
 	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="Bx1Jp8nd"
+	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="x3RZKOKt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726953AbgI1Qrx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Sep 2020 12:47:53 -0400
-Received: from mail-eopbgr770050.outbound.protection.outlook.com ([40.107.77.50]:19366
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        id S1726651AbgI1Qrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Sep 2020 12:47:51 -0400
+Received: from mail-bn8nam11on2061.outbound.protection.outlook.com ([40.107.236.61]:62304
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726852AbgI1Qrd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Sep 2020 12:47:33 -0400
+        id S1726746AbgI1Qrn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Sep 2020 12:47:43 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jDZ2N+SjNYXQZUG5k/0p567bYGQSY/03eIaiiSFcpiQBgQj869kP3oaZY2NFOwbgGvEBNZL3ROAtzc3VrmMhaakChwRJpcHLketx78Bwv4PifKIAtDQFGAOBPbtxA/nOC4gUfjpBc93iRhIo0iSgID2XwhcrH4bFOIWvPHcYSY6X6V/QVaTmmd2EIaocUhrS12hGngdLZme00fnVQsqSl3XzboR+F9FA+O8G1El53WySIndRB/Df6EW/s7jYJXLhraLUEKNUGxD3OjKRnZqiYN+RMrGuNcrunekJFtLtbhg8/dslAgI+OQa7bRHOl2AujotQuVfDsr/a2lOFmR9xmg==
+ b=VjlUDOWt/uNFQO5GvUcr19I1M2NWoBRzzEa2av9IfTSqgkUnXC/hmfX3hC584GO4rxY6uhd7QnkXoRxP23bvoADE85jX44RQyliDupp/Sln1WckQfyYQe2aWlZ/vbdXqkxTWJYvvrD1zeBwrgjAQrPx7a/XBwz0QkSHauVHOeFvcw7APJ4CFR4SfvdXSuCWjojrV0CD/cnoK/kRD8iVA/3yWGTqZm40l1PXscVb3OsmZ/HWwPsPmVdK5DDn7y9QKTVUlRv33JlObBjNDZqjDqGRE6AKAIKdMBeKNSbZz8ieayOszOiSxN3b+0ME6XIBhyfSFPyIXuGYPM/yQffZBfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g3AHN/M7HgjTxtgdmSf1/n6pC28a1p0tV7pfc1+eKUo=;
- b=gWznpt+VlNYHbano/90x1BTCxCL3RjMnP82dGDwt0Xyv0CxtJ1DpVFPpsizqmL7IpAURnZppKmym8sgfC/hJW1s4Yfg+x5R8tEWcyrpQ3I7923TidiMJLSAb52RU4echbKNFb+Pf3C4Zmc30gQadnE03a1lCwF5fbk5Lgsy7No/yVxm3cHbqwHdei/MCTjFKgvy8Uh9pvc6vScEKElhZkxKYUjszAopAiecqbbZGLkUAgrfRAJDCKukqygyDYknKqMsoqY+vSyrNUXPuO0dT88GvIIOQLc+J84nJgPwV1XA6hGgxVQ8JpX9t1r0gXEBnQZYuNt5ZOSYAZE+VKaEeJg==
+ bh=G656wqYXI2xEMLP6DOu/NyrzqPNJEO9irilpV2pa7Rg=;
+ b=is1XeK54HNTDaHXcxOpyVfSTPEYb19Y75xsbyr5WQTpJXfns83zio76sD8F6mI6xxxCiiiw0/qDg7fby2i76ZqcLQJgntGshHhgrmSIZyMxVs9hhzD07OCXlTDbD93OeNPCBU3AnvM6ly6E/jnuQxJRozl/x5ryLT8GAt0PtPWsKNrR+KX3si5s4SNYlyp4mqRfeb2UslNSgg2j+jd5v6DHWG91X/ERgYf3IvzzB6vlcLx+Cv88TUQ0iUsqo4BUhrh94g/lgXaCVE8fJkQ9NEW2a4ZHTvNaJy4GYFAUtnChhoX+qLbAzgod8iwxSHhxRPLGw0Ru6R5+Xu7oBBEMQVg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  137.201.242.130) smtp.rcpttodomain=kvack.org smtp.mailfrom=micron.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=micron.com;
@@ -36,18 +36,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g3AHN/M7HgjTxtgdmSf1/n6pC28a1p0tV7pfc1+eKUo=;
- b=Bx1Jp8ndl2MkZ6UJgO6EOIIkOaVZvOegqw1nF28VQHYj0uU1nAKSIgMVuKvJms38r5R6xQWtY8Jpmn5nn2CMTg1l2OyFB8dek2zKd+dyXy9u0f0QeAcSG4rqPvZZVHxTWa/ND2Jl0PF8kthZVZ+oIyjn7QTjjd4o8S6qG/UvHV4=
-Received: from BN6PR13CA0036.namprd13.prod.outlook.com (2603:10b6:404:13e::22)
- by DM6PR08MB5723.namprd08.prod.outlook.com (2603:10b6:5:155::25) with
+ bh=G656wqYXI2xEMLP6DOu/NyrzqPNJEO9irilpV2pa7Rg=;
+ b=x3RZKOKt7rBte7yfkSIOBOUu0qfWg3f/EFtEMHyY1GQEsCraMBsch1HZe+ojcZMx8EZ46qT7Ky1+d+rsReS1riU4epHj2y1UZHBEUYX28JTrp9cV0ZRkSFkt8gB+V7+q2nrAjxQpwiD3UxrORDPy3JkdE+pE3ND1hLkRf2MpcKU=
+Received: from BN6PR17CA0034.namprd17.prod.outlook.com (2603:10b6:405:75::23)
+ by DM6PR08MB5372.namprd08.prod.outlook.com (2603:10b6:5:fb::33) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.29; Mon, 28 Sep
- 2020 16:47:21 +0000
-Received: from BN3NAM01FT028.eop-nam01.prod.protection.outlook.com
- (2603:10b6:404:13e:cafe::4) by BN6PR13CA0036.outlook.office365.com
- (2603:10b6:404:13e::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.17 via Frontend
- Transport; Mon, 28 Sep 2020 16:47:21 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.25; Mon, 28 Sep
+ 2020 16:47:10 +0000
+Received: from BN3NAM01FT020.eop-nam01.prod.protection.outlook.com
+ (2603:10b6:405:75:cafe::ed) by BN6PR17CA0034.outlook.office365.com
+ (2603:10b6:405:75::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20 via Frontend
+ Transport; Mon, 28 Sep 2020 16:47:10 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 137.201.242.130)
  smtp.mailfrom=micron.com; kvack.org; dkim=none (message not signed)
  header.d=none;kvack.org; dmarc=pass action=none header.from=micron.com;
@@ -55,21 +55,21 @@ Received-SPF: Pass (protection.outlook.com: domain of micron.com designates
  137.201.242.130 as permitted sender) receiver=protection.outlook.com;
  client-ip=137.201.242.130; helo=mail.micron.com;
 Received: from mail.micron.com (137.201.242.130) by
- BN3NAM01FT028.mail.protection.outlook.com (10.152.67.96) with Microsoft SMTP
+ BN3NAM01FT020.mail.protection.outlook.com (10.152.67.227) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3412.21 via Frontend Transport; Mon, 28 Sep 2020 16:47:21 +0000
+ 15.20.3412.21 via Frontend Transport; Mon, 28 Sep 2020 16:47:10 +0000
 Received: from micron.com (10.114.5.55) by bowex17c.micron.com
  (137.201.21.211) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 28 Sep
- 2020 10:47:16 -0600
+ 2020 10:47:05 -0600
 From:   <nmeeramohide@micron.com>
 To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-mm@kvack.org>,
         <linux-nvdimm@lists.01.org>
 CC:     <smoyer@micron.com>, <gbecker@micron.com>, <plabat@micron.com>,
         <jgroves@micron.com>, Nabeel M Mohamed <nmeeramohide@micron.com>
-Subject: [PATCH 20/22] mpool: add support to proactively evict cached mblock data from the page-cache
-Date:   Mon, 28 Sep 2020 11:45:32 -0500
-Message-ID: <20200928164534.48203-21-nmeeramohide@micron.com>
+Subject: [PATCH 08/22] mpool: add pool metadata routines to manage object lifecycle and IO
+Date:   Mon, 28 Sep 2020 11:45:20 -0500
+Message-ID: <20200928164534.48203-9-nmeeramohide@micron.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20200928164534.48203-1-nmeeramohide@micron.com>
 References: <20200928164534.48203-1-nmeeramohide@micron.com>
@@ -78,70 +78,74 @@ Content-Type: text/plain
 X-ClientProxiedBy: bowex17d.micron.com (137.201.21.212) To bowex17c.micron.com
  (137.201.21.211)
 X-TM-AS-Product-Ver: SMEX-12.0.0.1782-8.200.1013-24646.005
-X-TM-AS-Result: No--7.484900-0.000000-31
-X-TM-AS-MatchedID: 700076-702928-704804-702719-847298-703651-702083-703863-7
-        03812-705223-704807-703357-704418-705140-105630-705161-704031-700010-702203
-        -701757-705041-700335-700025-704960-704965-704278-704524-701480-701809-7030
-        17-702395-188019-704397-703279-701270-704477-704318-700351-702619-702837-70
-        4793-702898-702617-702914-701964-700071-704806-703330-703215-701274-704926-
-        700069-703744-300015-703213-703880-702102-106470-705244-703904-700488-12136
-        7-701342-702415-704127-702433-703140-121336-701105-704673-703967-703901-702
-        665-702754-186102-704792-702259-705220-702887-701194-702171-139630-702177-1
-        21270-702960-705173-186035-704264-703993-700535-148004-148036-42000-42003
+X-TM-AS-Result: No--12.113900-0.000000-31
+X-TM-AS-MatchedID: 703812-705244-703226-701073-700028-704502-701761-702688-7
+        80039-701342-703215-121104-704499-703967-105630-704397-702876-702770-702298
+        -703851-702782-700958-704228-704500-700071-701969-703408-702501-702686-8475
+        75-847298-702558-703956-701480-701809-703017-702395-188019-703027-704318-70
+        2299-704477-300015-701590-703140-703213-121336-701105-704673-702415-701275-
+        703815-702754-700351-705220-702962-704959-704053-702619-702444-704841-70327
+        9-705279-106420-701919-700700-700863-121270-703173-701744-702617-701104-700
+        335-703904-702700-703563-703385-701803-704714-700069-700926-701475-700717-7
+        04418-704264-700163-704401-704060-704475-700714-148004-148036-42000-42003-1
+        90014
 X-TM-AS-User-Approved-Sender: Yes
 X-TM-AS-User-Blocked-Sender: No
 X-MT-Whitelisted: matched
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2e731e6c-bafe-4a61-ccfe-08d863ce2b2d
-X-MS-TrafficTypeDiagnostic: DM6PR08MB5723:
-X-Microsoft-Antispam-PRVS: <DM6PR08MB572339F46F6D10A69566E76BB3350@DM6PR08MB5723.namprd08.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 1f2e1c14-6715-4645-74fe-08d863ce24c9
+X-MS-TrafficTypeDiagnostic: DM6PR08MB5372:
+X-Microsoft-Antispam-PRVS: <DM6PR08MB53721FCECEDD29247CDD90DFB3350@DM6PR08MB5372.namprd08.prod.outlook.com>
 X-MS-Exchange-Transport-Forked: True
 X-EXT-ByPass: 1
 X-MT-RULE-Whitelisted: Triggered
-X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-MS-Oob-TLC-OOBClassifiers: OLM:127;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wRuvTOoEWKXliDKF6iRmV9jrjA/NTtQGBZnnnrnJy4GKnC0f8Y63ygevncgvNwNrrh+MTP5fq+E4wnaydu+oFUnoGxlt0koff8L6g3IV321tB2BfAcW7NUE3ynnablpQro0V802+URO9rcbCnqSU5qtqI3dhQxOLhA4l0fGpogu/p0AzUNBirAJgoKFl9gyTIz1LyyJRyux8bgLNUg1q+k63TlwpMbYyUc4jW8Lq4+uj51tQhs0itSq2Ck52KuuyTSmbIXbsEmIaBN5Rf14W50/RAaxBCUe1JDTU+TcLrEraMBENum58gSADmDLzw9AD4oFZrQ/9UGwH0RBZzgN4+n3z+SIvvMV38RcRsmMf12VTSOAJ0pfPHFhZXEy3xHH+zuxHvz2kize5W2YqDIEFIgkI8cCgF1CC8ne3iILzpSLXPfw+NnDJs37MRzO+pkcvZ2LdTmXTxARfbpsfaUtYViTi08gSilB/CwEyuyI2pHFDBMzE8qebfSj073Mvgj3WvCBqpB3VbHcClhdLC+1MeQ==
-X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(39860400002)(346002)(376002)(136003)(396003)(46966005)(6666004)(82740400003)(7696005)(186003)(82310400003)(70206006)(33310700002)(356005)(83380400001)(336012)(478600001)(316002)(86362001)(54906003)(47076004)(36756003)(70586007)(110136005)(4326008)(26005)(55016002)(426003)(2906002)(2616005)(2876002)(1076003)(30864003)(7636003)(5660300002)(8936002)(107886003)(6286002)(8676002)(2101003)(305334003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: rSLsTNJIL4zzXFrJBo46h/tfyKj+K6VMDaOH7MfN6D/jJs/k7DMS+TVH1R1d6Zozj0T6Cm8yicJiuOFaAzRI6vYRk2vn+H2384dkqFoFqrNICzrKgOnH8fr6X941+pEN3e6495xZzs+kQrZCCSvJyUT31bSh4now+0E+UpjWzJ7JZiYWyGOAf+XgyL8t50EmEksQ/VWAkljuxUH/i+CdXn+ndKMzX9512zhbBkh6CdpY+NMG1u1oP+RZL1sSaCu5B0VVeYYTrFWXBsYH0nJCqhU5qMfIsVQlXhkuobaYjBOHOYiWey4aRsngDS40z0Rtd1tIn14/zluOby8D5Dpv2F/h865LLm2RmIr6u51qHN2N8Z3B7DkLKGykN57Ce7/KjqYaR+q6lunu3DCDNAkLMqcSfraxmqzejElhO5iPwjYMWliDHr4fYDrCdSnx+CORUFqp0iAR+prlqiqoB5aY/ymiFYdkD946dV/XcQtnLt1wdqYlrPNyhFtinn0u0vVL
+X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(346002)(136003)(39860400002)(396003)(376002)(46966005)(2616005)(8936002)(336012)(316002)(82310400003)(2906002)(110136005)(6286002)(54906003)(82740400003)(83380400001)(356005)(7636003)(5660300002)(186003)(26005)(33310700002)(426003)(30864003)(70206006)(70586007)(4326008)(1076003)(6666004)(45080400002)(478600001)(86362001)(2876002)(47076004)(107886003)(7696005)(8676002)(55016002)(36756003)(2101003)(579004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: micron.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2020 16:47:21.0180
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2020 16:47:10.2851
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e731e6c-bafe-4a61-ccfe-08d863ce2b2d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f2e1c14-6715-4645-74fe-08d863ce24c9
 X-MS-Exchange-CrossTenant-Id: f38a5ecd-2813-4862-b11b-ac1d563c806f
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f38a5ecd-2813-4862-b11b-ac1d563c806f;Ip=[137.201.242.130];Helo=[mail.micron.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN3NAM01FT028.eop-nam01.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN3NAM01FT020.eop-nam01.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR08MB5723
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR08MB5372
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 From: Nabeel M Mohamed <nmeeramohide@micron.com>
 
-This adds a mechanism to track object-level usage metrics and use
-that metrics to proactively evict mblock data from the page cache.
+Metadata manager interface to allocate, commit, abort, erase, read,
+write, and destroy objects.
 
-The proactive reaping is employed just before the onset of memory
-pressure, which greatly improves throughput and reduces tail
-latencies for read and memory intensive workloads.
+Metadata containers (MDC-1 through MDC-255) store the metadata for
+accessing client allocated objects (mblocks and mlogs). An object
+identifier for an mblock or mlog encodes the MDC storing its
+metadata for faster lookup.
 
-The reaper component tracks residency of pages from specified xvms
-and weighs the memory used against system free memory. The reaper
-begins evicting pages from the specified xvm when the free memory
-falls below a predetermined low watermark, stopping when the free
-memory rises above a high watermark.
+The layout descriptor (struct pmd_layout) is the in-memory
+representation of an object. It is a refcounted structure storing
+the object ID, state, device ID, zone start address and the number
+of consecutive zones, and a rw sempahore protecting the layout
+fields.
 
-The reaper maintains several lists of xvms and cycles through them
-in a round-robin fashion to select pages to evict. Each xvm is
-comprised of one or more contiguous virtual subranges of pages,
-where each subrange is delineated by an mblock. Each mblock has an
-associated access time which is updated on each page fault to any
-page in the mblock.  The reaper leverages the atime to decide
-whether or not to evict all the pages in the subrange based upon
-the current TTL, where the current TTL grows shorter as the urgency
-to evict pages grows stronger.
+An object is in uncommitted state on allocation with its storage
+reserved from the free space map. An uncommitted object lives only
+in memory, i.e., no metadata records are logged. An object's
+metadata is persisted in the metadata container only at commit
+time. The uncommitted and committed objects are tracked using
+separate rbtrees stored in each metadata container. Support for
+object persistence is added in a future patch.
+
+The metadata manager interfaces with the PD layer to discard the
+zones at object abort/delete, flush the device cache at object
+commit and issue read/write requests to the block layer.
 
 Co-developed-by: Greg Becker <gbecker@micron.com>
 Signed-off-by: Greg Becker <gbecker@micron.com>
@@ -151,1032 +155,1643 @@ Co-developed-by: John Groves <jgroves@micron.com>
 Signed-off-by: John Groves <jgroves@micron.com>
 Signed-off-by: Nabeel M Mohamed <nmeeramohide@micron.com>
 ---
- drivers/mpool/mcache.c |  43 +++
- drivers/mpool/mcache.h |   8 +
- drivers/mpool/mpctl.c  |  15 +
- drivers/mpool/mpctl.h  |   6 +
- drivers/mpool/reaper.c | 692 +++++++++++++++++++++++++++++++++++++++++
- drivers/mpool/reaper.h |  71 +++++
- 6 files changed, 835 insertions(+)
- create mode 100644 drivers/mpool/reaper.c
- create mode 100644 drivers/mpool/reaper.h
+ drivers/mpool/init.c    |    8 +
+ drivers/mpool/omf.c     |    2 -
+ drivers/mpool/pmd_obj.c | 1577 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 1585 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/mpool/pmd_obj.c
 
-diff --git a/drivers/mpool/mcache.c b/drivers/mpool/mcache.c
-index b93ef85b300f..7201252292eb 100644
---- a/drivers/mpool/mcache.c
-+++ b/drivers/mpool/mcache.c
-@@ -17,6 +17,7 @@
- #include "assert.h"
+diff --git a/drivers/mpool/init.c b/drivers/mpool/init.c
+index 261ce67e94dd..eb1217f63746 100644
+--- a/drivers/mpool/init.c
++++ b/drivers/mpool/init.c
+@@ -10,6 +10,7 @@
+ #include "omf_if.h"
+ #include "pd.h"
+ #include "smap.h"
++#include "pmd_obj.h"
+ #include "sb.h"
  
- #include "mpctl.h"
-+#include "reaper.h"
+ /*
+@@ -25,6 +26,7 @@ MODULE_PARM_DESC(chunk_size_kb, "Chunk size (in KiB) for device I/O");
  
- #ifndef lru_to_page
- #define lru_to_page(_head)  (list_entry((_head)->prev, struct page, lru))
-@@ -62,6 +63,7 @@ const struct address_space_operations mpc_aops_default;
- 
- static struct workqueue_struct *mpc_wq_trunc __read_mostly;
- static struct workqueue_struct *mpc_wq_rav[4] __read_mostly;
-+struct mpc_reap *mpc_reap __read_mostly;
- 
- static size_t mpc_xvm_cachesz[2] __read_mostly;
- static struct kmem_cache *mpc_xvm_cache[2] __read_mostly;
-@@ -107,6 +109,10 @@ void mpc_rgnmap_flush(struct mpc_rgnmap *rm)
- 		head = xvm->xvm_next;
- 		mpc_xvm_put(xvm);
- 	}
-+
-+	/* Wait for reaper to prune its lists... */
-+	while (atomic_read(&rm->rm_rgncnt) > 0)
-+		usleep_range(100000, 150000);
- }
- 
- static struct mpc_xvm *mpc_xvm_lookup(struct mpc_rgnmap *rm, uint key)
-@@ -127,6 +133,22 @@ void mpc_xvm_free(struct mpc_xvm *xvm)
- 	struct mpc_rgnmap *rm;
- 
- 	ASSERT((u32)(uintptr_t)xvm == xvm->xvm_magic);
-+	ASSERT(atomic_read(&xvm->xvm_reapref) > 0);
-+
-+again:
-+	mpc_reap_xvm_evict(xvm);
-+
-+	if (atomic_dec_return(&xvm->xvm_reapref) > 0) {
-+		atomic_inc(xvm->xvm_freedp);
-+		return;
-+	}
-+
-+	if (atomic64_read(&xvm->xvm_nrpages) > 0) {
-+		atomic_cmpxchg(&xvm->xvm_evicting, 1, 0);
-+		atomic_inc(&xvm->xvm_reapref);
-+		usleep_range(10000, 30000);
-+		goto again;
-+	}
- 
- 	rm = xvm->xvm_rgnmap;
- 
-@@ -335,6 +357,8 @@ static vm_fault_t mpc_vm_fault_impl(struct vm_area_struct *vma, struct vm_fault
- 	/* Page is locked with a ref. */
- 	vmf->page = page;
- 
-+	mpc_reap_xvm_touch(vma->vm_private_data, page->index);
-+
- 	return vmfrc | VM_FAULT_LOCKED;
- }
- 
-@@ -532,6 +556,9 @@ static int mpc_readpages(struct file *file, struct address_space *mapping,
- 	gfp = mapping_gfp_mask(mapping) & GFP_KERNEL;
- 	wq = mpc_rgn2wq(xvm->xvm_rgn);
- 
-+	if (mpc_reap_xvm_duress(xvm))
-+		nr_pages = min_t(uint, nr_pages, 8);
-+
- 	nr_pages = min_t(uint, nr_pages, ra_pages_max);
- 
- 	for (i = 0; i < nr_pages; ++i) {
-@@ -601,6 +628,8 @@ static int mpc_readpages(struct file *file, struct address_space *mapping,
-  * @gfp:
-  *
-  * The function is added as part of tracking incoming and outgoing pages.
-+ * When the number of pages owned exceeds the limit (if defined) reap function
-+ * will get invoked to trim down the usage.
-  */
- static int mpc_releasepage(struct page *page, gfp_t gfp)
+ static void mpool_exit_impl(void)
  {
-@@ -696,6 +725,8 @@ int mpc_mmap(struct file *fp, struct vm_area_struct *vma)
- 
- 	fp->f_ra.ra_pages = unit->un_ra_pages_max;
- 
-+	mpc_reap_xvm_add(unit->un_ds_reap, xvm);
-+
- 	return 0;
- }
- 
-@@ -769,6 +800,9 @@ int mpioc_xvm_create(struct mpc_unit *unit, struct mpool_descriptor *mp, struct
- 	xvm->xvm_cache = cache;
- 	atomic_set(&xvm->xvm_opened, 0);
- 
-+	INIT_LIST_HEAD(&xvm->xvm_list);
-+	atomic_set(&xvm->xvm_evicting, 0);
-+	atomic_set(&xvm->xvm_reapref, 1);
- 	atomic64_set(&xvm->xvm_nrpages, 0);
- 	atomic_set(&xvm->xvm_rabusy, 0);
- 
-@@ -878,6 +912,8 @@ int mpioc_xvm_purge(struct mpc_unit *unit, struct mpioc_vma *ioc)
- 	if (!xvm)
- 		return -ENOENT;
- 
-+	mpc_reap_xvm_evict(xvm);
-+
- 	mpc_xvm_put(xvm);
- 
- 	return 0;
-@@ -942,6 +978,12 @@ int mcache_init(void)
++	pmd_exit();
+ 	smap_exit();
+ 	sb_exit();
+ 	omf_exit();
+@@ -60,6 +62,12 @@ static __init int mpool_init(void)
  		goto errout;
  	}
  
-+	rc = mpc_reap_create(&mpc_reap);
++	rc = pmd_init();
 +	if (rc) {
-+		mp_pr_err("reap create failed", rc);
++		errmsg = "pmd init failed";
 +		goto errout;
 +	}
 +
- 	for (i = 0; i < ARRAY_SIZE(mpc_wq_rav); ++i) {
- 		int     maxactive = 16;
- 		char    name[16];
-@@ -973,6 +1015,7 @@ void mcache_exit(void)
- 		mpc_wq_rav[i] = NULL;
- 	}
- 
-+	mpc_reap_destroy(mpc_reap);
- 	if (mpc_wq_trunc)
- 		destroy_workqueue(mpc_wq_trunc);
- 	kmem_cache_destroy(mpc_xvm_cache[1]);
-diff --git a/drivers/mpool/mcache.h b/drivers/mpool/mcache.h
-index 46c11d0ce5c9..9197fde3d858 100644
---- a/drivers/mpool/mcache.h
-+++ b/drivers/mpool/mcache.h
-@@ -47,12 +47,19 @@ struct mpc_xvm {
- 	atomic64_t                 *xvm_hcpagesp;
- 	struct address_space       *xvm_mapping;
- 	struct mpc_rgnmap          *xvm_rgnmap;
-+	struct mpc_reap            *xvm_reap;
- 
- 	enum mpc_vma_advice         xvm_advice;
- 	atomic_t                    xvm_opened;
- 	struct kmem_cache          *xvm_cache;
- 	struct mpc_xvm             *xvm_next;
- 
-+	____cacheline_aligned
-+	struct list_head            xvm_list;
-+	atomic_t                    xvm_evicting;
-+	atomic_t                    xvm_reapref;
-+	atomic_t                   *xvm_freedp;
-+
- 	____cacheline_aligned
- 	atomic64_t                  xvm_nrpages;
- 	atomic_t                    xvm_rabusy;
-@@ -62,6 +69,7 @@ struct mpc_xvm {
- 	struct mpc_mbinfo           xvm_mbinfov[];
- };
- 
-+extern struct mpc_reap *mpc_reap;
- extern const struct address_space_operations mpc_aops_default;
- 
- void mpc_rgnmap_flush(struct mpc_rgnmap *rm);
-diff --git a/drivers/mpool/mpctl.c b/drivers/mpool/mpctl.c
-index 961078205c5e..5c1a71572c4c 100644
---- a/drivers/mpool/mpctl.c
-+++ b/drivers/mpool/mpctl.c
-@@ -39,6 +39,7 @@
- #include "mp.h"
- #include "mpctl.h"
- #include "sysfs.h"
-+#include "reaper.h"
- #include "init.h"
- 
- 
-@@ -188,6 +189,10 @@ static int mpc_params_register(struct mpc_unit *unit, int cnt)
- 	if (mpc_unit_ismpooldev(unit))
- 		mpc_mpool_params_add(dattr);
- 
-+	/* Common parameters */
-+	if (mpc_unit_isctldev(unit))
-+		mpc_reap_params_add(dattr);
-+
- 	rc = mpc_attr_group_create(attr);
+ errout:
  	if (rc) {
- 		mpc_attr_destroy(attr);
-@@ -2382,6 +2387,7 @@ static int mpc_open(struct inode *ip, struct file *fp)
- 	mpc_bdi_save(unit, ip);
- 
- 	unit->un_mapping = fp->f_mapping;
-+	unit->un_ds_reap = mpc_reap;
- 
- 	inode_lock(ip);
- 	i_size_write(ip, 1ul << 63);
-@@ -2431,6 +2437,7 @@ static int mpc_release(struct inode *ip, struct file *fp)
- 	if (mpc_unit_ismpooldev(unit)) {
- 		mpc_rgnmap_flush(&unit->un_rgnmap);
- 
-+		unit->un_ds_reap = NULL;
- 		unit->un_mapping = NULL;
- 
- 		mpc_bdi_restore(unit, ip);
-@@ -2768,6 +2775,14 @@ int mpctl_init(void)
- 		goto errout;
+ 		mp_pr_err("%s", rc, errmsg);
+diff --git a/drivers/mpool/omf.c b/drivers/mpool/omf.c
+index 0bb6d239982b..e1c6c0db1ccf 100644
+--- a/drivers/mpool/omf.c
++++ b/drivers/mpool/omf.c
+@@ -584,10 +584,8 @@ static int omf_pmd_layout_unpack_letoh(struct mpool_descriptor *mp, struct omf_m
+ 		return rc;
  	}
  
-+	/* The reaper component has already been initialized before mpctl. */
-+	ctlunit->un_ds_reap = mpc_reap;
-+	rc = mpc_params_register(ctlunit, MPC_REAP_PARAMS_CNT);
-+	if (rc) {
-+		errmsg = "cannot register common parameters";
-+		goto errout;
-+	}
-+
- 	mutex_lock(&ss->ss_lock);
- 	idr_replace(&ss->ss_unitmap, ctlunit, MINOR(ctlunit->un_devno));
- 	mutex_unlock(&ss->ss_lock);
-diff --git a/drivers/mpool/mpctl.h b/drivers/mpool/mpctl.h
-index 8c926eef837c..6b6f12d7787f 100644
---- a/drivers/mpool/mpctl.h
-+++ b/drivers/mpool/mpctl.h
-@@ -30,6 +30,7 @@ struct mpc_unit {
- 	const struct mpc_uinfo     *un_uinfo;
- 	struct mpc_mpool           *un_mpool;
- 	struct address_space       *un_mapping;
-+	struct mpc_reap            *un_ds_reap;
- 	struct device              *un_device;
- 	struct backing_dev_info    *un_saved_bdi;
- 	struct mpc_attr            *un_attr;
-@@ -47,6 +48,11 @@ static inline struct mpc_unit *dev_to_unit(struct device *dev)
- 	return dev_get_drvdata(dev);
- }
- 
-+static inline struct mpc_reap *dev_to_reap(struct device *dev)
-+{
-+	return dev_to_unit(dev)->un_ds_reap;
-+}
-+
- int mpctl_init(void) __cold;
- void mpctl_exit(void) __cold;
- 
-diff --git a/drivers/mpool/reaper.c b/drivers/mpool/reaper.c
+-#ifdef COMP_PMD_ENABLED
+ 	ecl = pmd_layout_alloc(&cdr->u.obj.omd_uuid, cdr->u.obj.omd_objid, cdr->u.obj.omd_gen,
+ 			       cdr->u.obj.omd_mblen, cdr->u.obj.omd_old.ol_zcnt);
+-#endif
+ 	if (!ecl) {
+ 		rc = -ENOMEM;
+ 		mp_pr_err("mpool %s, unpacking layout failed, could not allocate layout structure",
+diff --git a/drivers/mpool/pmd_obj.c b/drivers/mpool/pmd_obj.c
 new file mode 100644
-index 000000000000..2a1be946e874
+index 000000000000..8966fc0abd0e
 --- /dev/null
-+++ b/drivers/mpool/reaper.c
-@@ -0,0 +1,692 @@
++++ b/drivers/mpool/pmd_obj.c
+@@ -0,0 +1,1577 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
++
 +/*
-+ * The reaper subsystem tracks residency of pages from specified VMAs and
-+ * weighs the memory used against system free memory.  Should the relative
-+ * residency vs free memory fall below a predetermined low watermark the
-+ * reaper begins evicting pages from the specified VMAs, stopping when free
-+ * memory rises above a high watermark that is slightly higher than the low
-+ * watermark.
++ * DOC: Module info.
 + *
-+ * The reaper maintains several lists of VMAs and cycles through them in a
-+ * round-robin fashion to select pages to evict.  Each VMA is comprised of
-+ * one or more contiguous virtual subranges of pages, where each subrange
-+ * is delineated by an mblock (typically no larger than 32M).  Each mblock
-+ * has an associated access time which is updated on each page fault to any
-+ * page in the mblock.  The reaper leverages the atime to decide whether or
-+ * not to evict all the pages in the subrange based upon the current TTL,
-+ * where the current TTL grows shorter as the urgency to evict pages grows
-+ * stronger.
++ * Pool metadata (pmd) module.
++ *
++ * Defines functions for probing, reading, and writing drives in an mpool.
++ *
 + */
 +
-+#include <linux/kernel.h>
-+#include <linux/fs.h>
-+#include <linux/mm.h>
-+#include <linux/delay.h>
-+#include <linux/sched.h>
 +#include <linux/slab.h>
-+#include <linux/sched/clock.h>
++#include <linux/workqueue.h>
++#include <linux/mutex.h>
++#include <linux/rwsem.h>
++#include <linux/atomic.h>
++#include <linux/delay.h>
 +
 +#include "mpool_printk.h"
++#include "uuid.h"
 +#include "assert.h"
 +
-+#include "sysfs.h"
-+#include "mpctl.h"
-+#include "reaper.h"
++#include "pd.h"
++#include "omf_if.h"
++#include "sb.h"
++#include "mclass.h"
++#include "smap.h"
++#include "mpcore.h"
++#include "pmd.h"
 +
-+#define REAP_ELEM_MAX       3
++static struct kmem_cache *pmd_obj_erase_work_cache __read_mostly;
++static struct kmem_cache *pmd_layout_priv_cache __read_mostly;
++static struct kmem_cache *pmd_layout_cache __read_mostly;
 +
-+/**
-+ * struct mpc_reap_elem -
-+ * @reap_lock:      lock to protect reap_list
-+ * @reap_list:      list of inodes
-+ * @reap_active:    reaping in progress
-+ * @reap_hpages:    total hot pages which are mapped
-+ * @reap_cpages:    total coldpages which are mapped
-+ */
-+struct mpc_reap_elem {
-+	struct mutex            reap_lock;
-+	struct list_head        reap_list;
++static int pmd_mdc0_meta_update(struct mpool_descriptor *mp, struct pmd_layout *layout);
++static struct pmd_layout *pmd_layout_find(struct rb_root *root, u64 key);
++static struct pmd_layout *pmd_layout_insert(struct rb_root *root, struct pmd_layout *item);
 +
-+	____cacheline_aligned
-+	atomic_t                reap_running;
-+	struct work_struct      reap_work;
-+	struct mpc_reap        *reap_reap;
-+
-+	____cacheline_aligned
-+	atomic64_t              reap_hpages;
-+	atomic_t                reap_nfreed;
-+
-+	____cacheline_aligned
-+	atomic64_t              reap_wpages;
-+
-+	____cacheline_aligned
-+	atomic64_t              reap_cpages;
-+};
-+
-+/**
-+ * struct mpc_reap -
-+ * @reap_lwm:     Low water mark
-+ * @reap_ttl_cur: Current time-to-live
-+ * @reap_wq:
-+ *
-+ * @reap_hdr:     sysctl table header
-+ * @reap_tab:     sysctl table components
-+ * @reap_mempct:
-+ * @reap_ttl:
-+ * @reap_debug:
-+ *
-+ * @reap_eidx:    Pruner element index
-+ * @reap_emit:    Pruner debug message control
-+ * @reap_dwork:
-+ * @reap_elem:    Array of reaper lists (reaper pool)
-+ */
-+struct mpc_reap {
-+	atomic_t                    reap_lwm;
-+	atomic_t                    reap_ttl_cur;
-+	struct workqueue_struct    *reap_wq;
-+
-+	____cacheline_aligned
-+	unsigned int                reap_mempct;
-+	unsigned int                reap_ttl;
-+	unsigned int                reap_debug;
-+
-+	____cacheline_aligned
-+	atomic_t                    reap_eidx;
-+	atomic_t                    reap_emit;
-+	struct delayed_work         reap_dwork;
-+
-+	struct mpc_reap_elem        reap_elem[REAP_ELEM_MAX];
-+};
-+
-+/**
-+ * mpc_reap_meminfo() - Get current system-wide memory usage
-+ * @freep:    ptr to return bytes of free memory
-+ * @availp:   ptr to return bytes of available memory
-+ * @shift:    shift results by %shift bits
-+ *
-+ * %mpc_reap_meminfo() returns current free and available memory
-+ * sizes obtained from /proc/meminfo in userland and si_meminfo()
-+ * in the kernel.  The resulting sizes are in bytes, but the
-+ * caller can supply a non-zero %shift argment to obtain results
-+ * in different units (e.g., for MiB shift=20, for GiB shift=30).
-+ *
-+ * %freep and/or %availp may be NULL.
-+ */
-+static void mpc_reap_meminfo(ulong *freep, ulong *availp, uint shift)
++/* Committed object tree operations... */
++void pmd_co_rlock(struct pmd_mdc_info *cinfo, u8 slot)
 +{
-+	struct sysinfo si;
-+
-+	si_meminfo(&si);
-+
-+	if (freep)
-+		*freep = (si.freeram * si.mem_unit) >> shift;
-+
-+	if (availp)
-+		*availp = (si_mem_available() * si.mem_unit) >> shift;
++	down_read_nested(&cinfo->mmi_co_lock, slot > 0 ? PMD_MDC_NORMAL : PMD_MDC_ZERO);
 +}
 +
-+static void mpc_reap_evict_vma(struct mpc_xvm *xvm)
++void pmd_co_runlock(struct pmd_mdc_info *cinfo)
 +{
-+	struct address_space *mapping = xvm->xvm_mapping;
-+	struct mpc_reap *reap = xvm->xvm_reap;
-+	pgoff_t off, bktsz, len;
-+	u64 ttl, xtime, now;
-+	int i;
++	up_read(&cinfo->mmi_co_lock);
++}
 +
-+	bktsz = xvm->xvm_bktsz >> PAGE_SHIFT;
-+	off = mpc_xvm_pgoff(xvm);
++static void pmd_co_wlock(struct pmd_mdc_info *cinfo, u8 slot)
++{
++	down_write_nested(&cinfo->mmi_co_lock, slot > 0 ? PMD_MDC_NORMAL : PMD_MDC_ZERO);
++}
 +
-+	ttl = atomic_read(&reap->reap_ttl_cur) * 1000ul;
-+	now = local_clock();
++static void pmd_co_wunlock(struct pmd_mdc_info *cinfo)
++{
++	up_write(&cinfo->mmi_co_lock);
++}
 +
-+	for (i = 0; i < xvm->xvm_mbinfoc; ++i, off += bktsz) {
-+		struct mpc_mbinfo *mbinfo = xvm->xvm_mbinfov + i;
++struct pmd_layout *pmd_co_find(struct pmd_mdc_info *cinfo, u64 objid)
++{
++	return pmd_layout_find(&cinfo->mmi_co_root, objid);
++}
 +
-+		xtime = now - (ttl * mbinfo->mbmult);
-+		len = mbinfo->mblen >> PAGE_SHIFT;
++struct pmd_layout *pmd_co_insert(struct pmd_mdc_info *cinfo, struct pmd_layout *layout)
++{
++	return pmd_layout_insert(&cinfo->mmi_co_root, layout);
++}
 +
-+		if (atomic64_read(&mbinfo->mbatime) > xtime)
-+			continue;
++struct pmd_layout *pmd_co_remove(struct pmd_mdc_info *cinfo, struct pmd_layout *layout)
++{
++	struct pmd_layout *found;
 +
-+		atomic64_set(&mbinfo->mbatime, U64_MAX);
++	found = pmd_co_find(cinfo, layout->eld_objid);
++	if (found)
++		rb_erase(&found->eld_nodemdc, &cinfo->mmi_co_root);
 +
-+		invalidate_inode_pages2_range(mapping, off, off + len);
++	return found;
++}
 +
-+		if (atomic64_read(&xvm->xvm_nrpages) < 32)
-+			break;
++/* Uncommitted object tree operations... */
++static void pmd_uc_lock(struct pmd_mdc_info *cinfo, u8 slot)
++{
++	mutex_lock_nested(&cinfo->mmi_uc_lock, slot > 0 ? PMD_MDC_NORMAL : PMD_MDC_ZERO);
++}
 +
-+		if (need_resched())
-+			cond_resched();
++static void pmd_uc_unlock(struct pmd_mdc_info *cinfo)
++{
++	mutex_unlock(&cinfo->mmi_uc_lock);
++}
 +
-+		ttl = atomic_read(&reap->reap_ttl_cur) * 1000ul;
-+		now = local_clock();
++static struct pmd_layout *pmd_uc_find(struct pmd_mdc_info *cinfo, u64 objid)
++{
++	return pmd_layout_find(&cinfo->mmi_uc_root, objid);
++}
++
++static struct pmd_layout *pmd_uc_insert(struct pmd_mdc_info *cinfo, struct pmd_layout *layout)
++{
++	return pmd_layout_insert(&cinfo->mmi_uc_root, layout);
++}
++
++static struct pmd_layout *pmd_uc_remove(struct pmd_mdc_info *cinfo, struct pmd_layout *layout)
++{
++	struct pmd_layout *found;
++
++	found = pmd_uc_find(cinfo, layout->eld_objid);
++	if (found)
++		rb_erase(&found->eld_nodemdc, &cinfo->mmi_uc_root);
++
++	return found;
++}
++
++/*
++ * General object operations for both internal and external callers...
++ *
++ * See pmd.h for the various nesting levels for a locking class.
++ */
++void pmd_obj_rdlock(struct pmd_layout *layout)
++{
++	enum pmd_lock_class lc __maybe_unused = PMD_MDC_NORMAL;
++
++#ifdef CONFIG_DEBUG_LOCK_ALLOC
++	if (objid_slot(layout->eld_objid))
++		lc = PMD_OBJ_CLIENT;
++	else if (objid_mdc0log(layout->eld_objid))
++		lc = PMD_MDC_ZERO;
++#endif
++
++	down_read_nested(&layout->eld_rwlock, lc);
++}
++
++void pmd_obj_rdunlock(struct pmd_layout *layout)
++{
++	up_read(&layout->eld_rwlock);
++}
++
++void pmd_obj_wrlock(struct pmd_layout *layout)
++{
++	enum pmd_lock_class lc __maybe_unused = PMD_MDC_NORMAL;
++
++#ifdef CONFIG_DEBUG_LOCK_ALLOC
++	if (objid_slot(layout->eld_objid))
++		lc = PMD_OBJ_CLIENT;
++	else if (objid_mdc0log(layout->eld_objid))
++		lc = PMD_MDC_ZERO;
++#endif
++
++	down_write_nested(&layout->eld_rwlock, lc);
++}
++
++void pmd_obj_wrunlock(struct pmd_layout *layout)
++{
++	up_write(&layout->eld_rwlock);
++}
++
++/*
++ * Alloc and init object layout; non-arg fields and all strip descriptor
++ * fields are set to 0/UNDEF/NONE; no auxiliary object info is allocated.
++ *
++ * Returns NULL if allocation fails.
++ */
++struct pmd_layout *pmd_layout_alloc(struct mpool_uuid *uuid, u64 objid,
++				    u64 gen, u64 mblen, u32 zcnt)
++{
++	struct kmem_cache *cache = pmd_layout_cache;
++	struct pmd_layout *layout;
++
++	if (pmd_objid_type(objid) == OMF_OBJ_MLOG)
++		cache = pmd_layout_priv_cache;
++
++	layout = kmem_cache_zalloc(cache, GFP_KERNEL);
++	if (!layout)
++		return NULL;
++
++	layout->eld_objid     = objid;
++	layout->eld_gen       = gen;
++	layout->eld_mblen     = mblen;
++	layout->eld_ld.ol_zcnt = zcnt;
++	kref_init(&layout->eld_ref);
++	init_rwsem(&layout->eld_rwlock);
++
++	if (pmd_objid_type(objid) == OMF_OBJ_MLOG)
++		mpool_uuid_copy(&layout->eld_uuid, uuid);
++
++	return layout;
++}
++
++/*
++ * Deallocate all memory associated with object layout.
++ */
++void pmd_layout_release(struct kref *refp)
++{
++	struct kmem_cache *cache = pmd_layout_cache;
++	struct pmd_layout *layout;
++
++	layout = container_of(refp, typeof(*layout), eld_ref);
++
++	ASSERT(layout->eld_objid > 0);
++	ASSERT(kref_read(&layout->eld_ref) == 0);
++
++	if (pmd_objid_type(layout->eld_objid) == OMF_OBJ_MLOG)
++		cache = pmd_layout_priv_cache;
++
++	layout->eld_objid = 0;
++
++	kmem_cache_free(cache, layout);
++}
++
++static struct pmd_layout *pmd_layout_find(struct rb_root *root, u64 key)
++{
++	struct rb_node *node = root->rb_node;
++	struct pmd_layout *this;
++
++	while (node) {
++		this = rb_entry(node, typeof(*this), eld_nodemdc);
++
++		if (key < this->eld_objid)
++			node = node->rb_left;
++		else if (key > this->eld_objid)
++			node = node->rb_right;
++		else
++			return this;
 +	}
++
++	return NULL;
 +}
 +
-+/**
-+ * mpc_reap_evict() - Evict "cold" pages from the given XVMs
-+ * @process:    A list of one of more XVMs to be reaped
-+ */
-+static void mpc_reap_evict(struct list_head *process)
++static struct pmd_layout *pmd_layout_insert(struct rb_root *root, struct pmd_layout *item)
 +{
-+	struct mpc_xvm *xvm, *next;
-+
-+	list_for_each_entry_safe(xvm, next, process, xvm_list) {
-+		if (atomic_read(&xvm->xvm_reap->reap_lwm))
-+			mpc_reap_evict_vma(xvm);
-+
-+		atomic_cmpxchg(&xvm->xvm_evicting, 1, 0);
-+	}
-+}
-+
-+/**
-+ * mpc_reap_scan() - Scan for pages to purge
-+ * @elem:
-+ * @idx:    reap list index
-+ */
-+static void mpc_reap_scan(struct mpc_reap_elem *elem)
-+{
-+	struct list_head *list, process;
-+	struct mpc_xvm *xvm, *next;
-+	u64 nrpages, n;
-+
-+	INIT_LIST_HEAD(&process);
-+
-+	mutex_lock(&elem->reap_lock);
-+	list = &elem->reap_list;
-+	n = 0;
-+
-+	list_for_each_entry_safe(xvm, next, list, xvm_list) {
-+		nrpages = atomic64_read(&xvm->xvm_nrpages);
-+
-+		if (nrpages < 32)
-+			continue;
-+
-+		if (atomic_read(&xvm->xvm_reapref) == 1)
-+			continue;
-+
-+		if (atomic_cmpxchg(&xvm->xvm_evicting, 0, 1))
-+			continue;
-+
-+		list_del(&xvm->xvm_list);
-+		list_add(&xvm->xvm_list, &process);
-+
-+		if (++n > 4)
-+			break;
-+	}
-+	mutex_unlock(&elem->reap_lock);
-+
-+	mpc_reap_evict(&process);
-+
-+	mutex_lock(&elem->reap_lock);
-+	list_splice_tail(&process, list);
-+	mutex_unlock(&elem->reap_lock);
-+
-+	usleep_range(300, 700);
-+}
-+
-+static void mpc_reap_run(struct work_struct *work)
-+{
-+	struct mpc_reap_elem *elem;
-+	struct mpc_reap *reap;
-+
-+	elem = container_of(work, struct mpc_reap_elem, reap_work);
-+	reap = elem->reap_reap;
-+
-+	while (atomic_read(&reap->reap_lwm))
-+		mpc_reap_scan(elem);
-+
-+	atomic_cmpxchg(&elem->reap_running, 1, 0);
-+}
-+
-+/**
-+ * mpc_reap_tune() - Dynamic tuning of reap knobs.
-+ * @reap:
-+ */
-+static void mpc_reap_tune(struct mpc_reap *reap)
-+{
-+	ulong total_pages, hpages, wpages, cpages, mfree;
-+	uint freepct, hwm, lwm, ttl, debug, i;
-+
-+	hpages = wpages = cpages = 0;
++	struct rb_node **pos = &root->rb_node, *parent = NULL;
++	struct pmd_layout *this;
 +
 +	/*
-+	 * Take a live snapshot of the current memory usage.  Disable
-+	 * preemption so that the result is reasonably accurate.
++	 * Figure out where to insert given layout, or return the colliding
++	 * layout if there's already a layout in the tree with the given ID.
 +	 */
-+	preempt_disable();
-+	mpc_reap_meminfo(&mfree, NULL, PAGE_SHIFT);
++	while (*pos) {
++		this = rb_entry(*pos, typeof(*this), eld_nodemdc);
++		parent = *pos;
 +
-+	for (i = 0; i < REAP_ELEM_MAX; ++i) {
-+		struct mpc_reap_elem *elem = &reap->reap_elem[i];
-+
-+		hpages += atomic64_read(&elem->reap_hpages);
-+		wpages += atomic64_read(&elem->reap_wpages);
-+		cpages += atomic64_read(&elem->reap_cpages);
-+	}
-+	preempt_enable();
-+
-+	total_pages = mfree + hpages + wpages + cpages;
-+
-+	/*
-+	 * Determine the current percentage of free memory relative to the
-+	 * number of hot+warm+cold pages tracked by the reaper.  freepct,
-+	 * lwm, and hwm are scaled to 10000 for finer resolution.
-+	 */
-+	freepct = ((hpages + wpages + cpages) * 10000) / total_pages;
-+	freepct = 10000 - freepct;
-+
-+	lwm = (100 - reap->reap_mempct) * 100;
-+	hwm = (lwm * 10300) / 10000;
-+	hwm = min_t(u32, hwm, 9700);
-+	ttl = reap->reap_ttl;
-+
-+	if (freepct >= hwm) {
-+		if (atomic_read(&reap->reap_ttl_cur) != ttl)
-+			atomic_set(&reap->reap_ttl_cur, ttl);
-+		if (atomic_read(&reap->reap_lwm))
-+			atomic_set(&reap->reap_lwm, 0);
-+	} else if (freepct < lwm || atomic_read(&reap->reap_lwm) > 0) {
-+		ulong x = 10000 - (freepct * 10000) / hwm;
-+
-+		if (atomic_read(&reap->reap_lwm) != x) {
-+			atomic_set(&reap->reap_lwm, x);
-+
-+			x = (ttl * (500ul * 500)) / (x * x);
-+			if (x > ttl)
-+				x = ttl;
-+
-+			atomic_set(&reap->reap_ttl_cur, x);
-+		}
++		if (item->eld_objid < this->eld_objid)
++			pos = &(*pos)->rb_left;
++		else if (item->eld_objid > this->eld_objid)
++			pos = &(*pos)->rb_right;
++		else
++			return this;
 +	}
 +
-+	debug = reap->reap_debug;
-+	if (!debug || (debug == 1 && freepct > hwm))
++	/* Add new node and rebalance tree. */
++	rb_link_node(&item->eld_nodemdc, parent, pos);
++	rb_insert_color(&item->eld_nodemdc, root);
++
++	return NULL;
++}
++
++static void pmd_layout_unprovision(struct mpool_descriptor *mp, struct pmd_layout *layout)
++{
++	int rc;
++	u16 pdh;
++
++	pdh = layout->eld_ld.ol_pdh;
++
++	/* smap_free() should never fail */
++
++	rc = smap_free(mp, pdh, layout->eld_ld.ol_zaddr, layout->eld_ld.ol_zcnt);
++	if (rc)
++		mp_pr_err("releasing %s drive %s space for layout failed, objid 0x%lx",
++			  rc, mp->pds_name, mp->pds_pdv[pdh].pdi_name, (ulong)layout->eld_objid);
++
++	/* Drop birth reference... */
++	pmd_obj_put(layout);
++}
++
++static void pmd_layout_calculate(struct mpool_descriptor *mp, struct pmd_obj_capacity *ocap,
++				 struct media_class *mc, u64 *zcnt)
++{
++	u32 zonepg;
++
++	if (!ocap->moc_captgt) {
++		/* Obj capacity not specified; use one zone. */
++		*zcnt = 1;
 +		return;
-+
-+	if (atomic_inc_return(&reap->reap_emit) % REAP_ELEM_MAX > 0)
-+		return;
-+
-+	mp_pr_info(
-+		"%lu %lu, hot %lu, warm %lu, cold %lu, freepct %u, lwm %u, hwm %u, %2u, ttl %u",
-+		mfree >> (20 - PAGE_SHIFT), total_pages >> (20 - PAGE_SHIFT),
-+		hpages >> (20 - PAGE_SHIFT), wpages >> (20 - PAGE_SHIFT),
-+		cpages >> (20 - PAGE_SHIFT), freepct, lwm, hwm,
-+		atomic_read(&reap->reap_lwm), atomic_read(&reap->reap_ttl_cur) / 1000);
-+}
-+
-+static void mpc_reap_prune(struct work_struct *work)
-+{
-+	struct mpc_reap_elem *elem;
-+	struct mpc_xvm *xvm, *next;
-+	struct mpc_reap *reap;
-+	struct list_head freeme;
-+	uint nfreed, eidx;
-+	ulong delay;
-+
-+	reap = container_of(work, struct mpc_reap, reap_dwork.work);
-+
-+	/*
-+	 * First, assesss the current memory situation.  If free
-+	 * memory is below the low watermark then try to start a
-+	 * reaper to evict some pages.
-+	 */
-+	mpc_reap_tune(reap);
-+
-+	if (atomic_read(&reap->reap_lwm)) {
-+		eidx = atomic_read(&reap->reap_eidx) % REAP_ELEM_MAX;
-+		elem = reap->reap_elem + eidx;
-+
-+		if (!atomic_cmpxchg(&elem->reap_running, 0, 1))
-+			queue_work(reap->reap_wq, &elem->reap_work);
 +	}
 +
-+	/* Next, advance to the next elem and prune VMAs that have been freed. */
-+	eidx = atomic_inc_return(&reap->reap_eidx) % REAP_ELEM_MAX;
-+
-+	elem = reap->reap_elem + eidx;
-+	INIT_LIST_HEAD(&freeme);
-+
-+	nfreed = atomic_read(&elem->reap_nfreed);
-+
-+	if (nfreed && mutex_trylock(&elem->reap_lock)) {
-+		struct list_head   *list = &elem->reap_list;
-+		uint                npruned = 0;
-+
-+		list_for_each_entry_safe(xvm, next, list, xvm_list) {
-+			if (atomic_read(&xvm->xvm_reapref) > 1)
-+				continue;
-+
-+			list_del(&xvm->xvm_list);
-+			list_add_tail(&xvm->xvm_list, &freeme);
-+
-+			if (++npruned >= nfreed)
-+				break;
-+		}
-+		mutex_unlock(&elem->reap_lock);
-+
-+		list_for_each_entry_safe(xvm, next, &freeme, xvm_list)
-+			mpc_xvm_free(xvm);
-+
-+		atomic_sub(npruned, &elem->reap_nfreed);
-+	}
-+
-+	delay = reap->reap_mempct < 100 ? 1000 / REAP_ELEM_MAX : 1000;
-+	delay = msecs_to_jiffies(delay);
-+
-+	queue_delayed_work(reap->reap_wq, &reap->reap_dwork, delay);
-+}
-+
-+#define REAP_MEMPCT_MIN    5
-+#define REAP_MEMPCT_MAX    100
-+#define REAP_TTL_MIN       100
-+#define REAP_DEBUG_MAX     3
-+
-+static ssize_t mpc_reap_mempct_show(struct device *dev, struct device_attribute *da, char *buf)
-+{
-+	return scnprintf(buf, PAGE_SIZE, "%d\n", dev_to_reap(dev)->reap_mempct);
-+}
-+
-+static ssize_t mpc_reap_mempct_store(struct device *dev, struct device_attribute *da,
-+				     const char *buf, size_t count)
-+{
-+	struct mpc_reap *reap;
-+	unsigned int val;
-+	int rc;
-+
-+	rc = kstrtouint(buf, 10, &val);
-+	if (rc || (val < REAP_MEMPCT_MIN || val > REAP_MEMPCT_MAX))
-+		return -EINVAL;
-+
-+	reap = dev_to_reap(dev);
-+	reap->reap_mempct = val;
-+
-+	return count;
-+}
-+
-+static ssize_t mpc_reap_debug_show(struct device *dev, struct device_attribute *da, char *buf)
-+{
-+	return scnprintf(buf, PAGE_SIZE, "%d\n", dev_to_reap(dev)->reap_debug);
-+}
-+
-+static ssize_t mpc_reap_debug_store(struct device *dev, struct device_attribute *da,
-+				    const char *buf, size_t count)
-+{
-+	struct mpc_reap *reap;
-+	unsigned int val;
-+	int rc;
-+
-+	rc = kstrtouint(buf, 10, &val);
-+	if (rc || val > REAP_DEBUG_MAX)
-+		return -EINVAL;
-+
-+	reap = dev_to_reap(dev);
-+	reap->reap_debug = val;
-+
-+	return count;
-+}
-+
-+static ssize_t mpc_reap_ttl_show(struct device *dev, struct device_attribute *da, char *buf)
-+{
-+	return scnprintf(buf, PAGE_SIZE, "%d\n", dev_to_reap(dev)->reap_ttl);
-+}
-+
-+static ssize_t mpc_reap_ttl_store(struct device *dev, struct device_attribute *da,
-+				  const char *buf, size_t count)
-+{
-+	struct mpc_reap *reap;
-+	unsigned int val;
-+	int rc;
-+
-+	rc = kstrtouint(buf, 10, &val);
-+	if (rc || val < REAP_TTL_MIN)
-+		return -EINVAL;
-+
-+	reap = dev_to_reap(dev);
-+	reap->reap_ttl = val;
-+
-+	return count;
-+}
-+
-+void mpc_reap_params_add(struct device_attribute *dattr)
-+{
-+	MPC_ATTR_RW(dattr++, reap_mempct);
-+	MPC_ATTR_RW(dattr++, reap_debug);
-+	MPC_ATTR_RW(dattr, reap_ttl);
-+}
-+
-+static void mpc_reap_mempct_init(struct mpc_reap *reap)
-+{
-+	ulong mavail;
-+	uint pct = 60;
-+
-+	mpc_reap_meminfo(NULL, &mavail, 30);
-+
-+	if (mavail > 256)
-+		pct = 10;
-+	else if (mavail > 128)
-+		pct = 13;
-+	else if (mavail > 64)
-+		pct = 25;
-+	else if (mavail > 32)
-+		pct = 40;
-+
-+	reap->reap_mempct = clamp_t(unsigned int, 100 - pct, 1, 100);
++	zonepg = mp->pds_pdv[mc->mc_pdmc].pdi_parm.dpr_zonepg;
++	*zcnt = 1 + ((ocap->moc_captgt - 1) / (zonepg << PAGE_SHIFT));
 +}
 +
 +/**
-+ * mpc_reap_create() - Allocate and initialize reap data strctures
-+ * @reapout: Initialized reap structure.
-+ *
-+ * Returns -ENOMEM if the allocation fails.
++ * pmd_layout_provision() - provision storage for the given layout
++ * @mp:
++ * @ocap:
++ * @otype:
++ * @layoutp:
++ * @mc:		media class
++ * @zcnt:
 + */
-+int mpc_reap_create(struct mpc_reap **reapp)
++static int pmd_layout_provision(struct mpool_descriptor *mp, struct pmd_obj_capacity *ocap,
++				struct pmd_layout *layout, struct media_class *mc, u64 zcnt)
 +{
-+	struct mpc_reap_elem *elem;
-+	struct mpc_reap *reap;
-+	uint flags, i;
++	enum smap_space_type spctype;
++	struct mc_smap_parms mcsp;
++	u64 zoneaddr, align;
++	u8 pdh;
++	int rc;
 +
-+	flags = WQ_UNBOUND | WQ_HIGHPRI | WQ_CPU_INTENSIVE;
-+	*reapp = NULL;
++	spctype = SMAP_SPC_USABLE_ONLY;
++	if (ocap->moc_spare)
++		spctype = SMAP_SPC_SPARE_2_USABLE;
 +
-+	reap = kzalloc(roundup_pow_of_two(sizeof(*reap)), GFP_KERNEL);
-+	if (!reap)
-+		return -ENOMEM;
++	/* To reduce/eliminate fragmenation, make sure the alignment is a power of 2. */
++	rc = mc_smap_parms_get(&mp->pds_mc[mc->mc_parms.mcp_classp], &mp->pds_params, &mcsp);
++	if (rc)
++		return rc;
 +
-+	reap->reap_wq = alloc_workqueue("mpc_reap", flags, REAP_ELEM_MAX + 1);
-+	if (!reap->reap_wq) {
-+		kfree(reap);
-+		return -ENOMEM;
-+	}
++	align = min_t(u64, zcnt, mcsp.mcsp_align);
++	align = roundup_pow_of_two(align);
 +
-+	atomic_set(&reap->reap_lwm, 0);
-+	atomic_set(&reap->reap_ttl_cur, 0);
-+	atomic_set(&reap->reap_eidx, 0);
-+	atomic_set(&reap->reap_emit, 0);
++	pdh = mc->mc_pdmc;
++	rc = smap_alloc(mp, pdh, zcnt, spctype, &zoneaddr, align);
++	if (rc)
++		return rc;
 +
-+	for (i = 0; i < REAP_ELEM_MAX; ++i) {
-+		elem = &reap->reap_elem[i];
-+
-+		mutex_init(&elem->reap_lock);
-+		INIT_LIST_HEAD(&elem->reap_list);
-+
-+		INIT_WORK(&elem->reap_work, mpc_reap_run);
-+		atomic_set(&elem->reap_running, 0);
-+		elem->reap_reap = reap;
-+
-+		atomic64_set(&elem->reap_hpages, 0);
-+		atomic64_set(&elem->reap_wpages, 0);
-+		atomic64_set(&elem->reap_cpages, 0);
-+		atomic_set(&elem->reap_nfreed, 0);
-+	}
-+
-+	reap->reap_ttl   = 10 * 1000 * 1000;
-+	reap->reap_debug = 0;
-+	mpc_reap_mempct_init(reap);
-+
-+	INIT_DELAYED_WORK(&reap->reap_dwork, mpc_reap_prune);
-+	queue_delayed_work(reap->reap_wq, &reap->reap_dwork, 1);
-+
-+	*reapp = reap;
++	layout->eld_ld.ol_pdh = pdh;
++	layout->eld_ld.ol_zaddr = zoneaddr;
 +
 +	return 0;
 +}
 +
-+void mpc_reap_destroy(struct mpc_reap *reap)
++int pmd_layout_rw(struct mpool_descriptor *mp, struct pmd_layout *layout,
++		  const struct kvec *iov, int iovcnt, u64 boff, int flags, u8 rw)
 +{
-+	struct mpc_reap_elem *elem;
-+	int i;
++	struct mpool_dev_info *pd;
++	u64 zaddr;
++	int rc;
 +
-+	if (!reap)
-+		return;
++	if (!mp || !layout || !iov)
++		return -EINVAL;
 +
-+	cancel_delayed_work_sync(&reap->reap_dwork);
++	if (rw != MPOOL_OP_READ && rw != MPOOL_OP_WRITE)
++		return -EINVAL;
 +
-+	/*
-+	 * There shouldn't be any reapers running at this point,
-+	 * but perform a flush/wait for good measure...
-+	 */
-+	atomic_set(&reap->reap_lwm, 0);
++	pd = &mp->pds_pdv[layout->eld_ld.ol_pdh];
++	if (mpool_pd_status_get(pd) != PD_STAT_ONLINE)
++		return -EIO;
 +
-+	if (reap->reap_wq)
-+		flush_workqueue(reap->reap_wq);
++	if (iovcnt == 0)
++		return 0;
 +
-+	for (i = 0; i < REAP_ELEM_MAX; ++i) {
-+		elem = &reap->reap_elem[i];
++	zaddr = layout->eld_ld.ol_zaddr;
++	if (rw == MPOOL_OP_READ)
++		rc = pd_zone_preadv(&pd->pdi_parm, iov, iovcnt, zaddr, boff);
++	else
++		rc = pd_zone_pwritev(&pd->pdi_parm, iov, iovcnt, zaddr, boff, flags);
 +
-+		ASSERT(atomic64_read(&elem->reap_hpages) == 0);
-+		ASSERT(atomic64_read(&elem->reap_wpages) == 0);
-+		ASSERT(atomic64_read(&elem->reap_cpages) == 0);
-+		ASSERT(atomic_read(&elem->reap_nfreed) == 0);
-+		ASSERT(list_empty(&elem->reap_list));
++	if (rc)
++		mpool_pd_status_set(pd, PD_STAT_OFFLINE);
 +
-+		mutex_destroy(&elem->reap_lock);
++	return rc;
++}
++
++int pmd_layout_erase(struct mpool_descriptor *mp, struct pmd_layout *layout)
++{
++	struct mpool_dev_info *pd;
++	int rc;
++
++	if (!mp || !layout)
++		return -EINVAL;
++
++	pd = &mp->pds_pdv[layout->eld_ld.ol_pdh];
++	if (mpool_pd_status_get(pd) != PD_STAT_ONLINE)
++		return -EIO;
++
++	rc = pd_zone_erase(&pd->pdi_parm, layout->eld_ld.ol_zaddr, layout->eld_ld.ol_zcnt,
++			   pmd_objid_type(layout->eld_objid) == OMF_OBJ_MLOG);
++	if (rc)
++		mpool_pd_status_set(pd, PD_STAT_OFFLINE);
++
++	return rc;
++}
++
++u64 pmd_layout_cap_get(struct mpool_descriptor *mp, struct pmd_layout *layout)
++{
++	enum obj_type_omf otype = pmd_objid_type(layout->eld_objid);
++	u32 zonepg;
++
++	switch (otype) {
++	case OMF_OBJ_MBLOCK:
++	case OMF_OBJ_MLOG:
++		zonepg = mp->pds_pdv[layout->eld_ld.ol_pdh].pdi_parm.dpr_zonepg;
++		return ((u64)zonepg * layout->eld_ld.ol_zcnt) << PAGE_SHIFT;
++
++	case OMF_OBJ_UNDEF:
++		break;
 +	}
 +
-+	if (reap->reap_wq)
-+		destroy_workqueue(reap->reap_wq);
-+	kfree(reap);
++	mp_pr_warn("mpool %s objid 0x%lx, undefined object type %d",
++		   mp->pds_name, (ulong)layout->eld_objid, otype);
++
++	return 0;
 +}
 +
-+void mpc_reap_xvm_add(struct mpc_reap *reap, struct mpc_xvm *xvm)
++struct mpool_dev_info *pmd_layout_pd_get(struct mpool_descriptor *mp, struct pmd_layout *layout)
 +{
-+	struct mpc_reap_elem *elem;
-+	uint idx, mult;
-+
-+	if (!reap || !xvm)
-+		return;
-+
-+	if (xvm->xvm_advice == MPC_VMA_PINNED)
-+		return;
-+
-+	mult = 1;
-+	if (xvm->xvm_advice == MPC_VMA_WARM)
-+		mult = 10;
-+	else if (xvm->xvm_advice == MPC_VMA_HOT)
-+		mult = 30;
-+
-+	/* Acquire a reference on xvm for the reaper... */
-+	atomic_inc(&xvm->xvm_reapref);
-+	xvm->xvm_reap = reap;
-+
-+	idx = (get_cycles() >> 1) % REAP_ELEM_MAX;
-+
-+	elem = &reap->reap_elem[idx];
-+
-+	mutex_lock(&elem->reap_lock);
-+	xvm->xvm_freedp = &elem->reap_nfreed;
-+
-+	if (xvm->xvm_advice == MPC_VMA_HOT)
-+		xvm->xvm_hcpagesp = &elem->reap_hpages;
-+	else if (xvm->xvm_advice == MPC_VMA_WARM)
-+		xvm->xvm_hcpagesp = &elem->reap_wpages;
-+	else
-+		xvm->xvm_hcpagesp = &elem->reap_cpages;
-+
-+	list_add_tail(&xvm->xvm_list, &elem->reap_list);
-+	mutex_unlock(&elem->reap_lock);
++	return &mp->pds_pdv[layout->eld_ld.ol_pdh];
 +}
 +
-+void mpc_reap_xvm_evict(struct mpc_xvm *xvm)
++int pmd_smap_insert(struct mpool_descriptor *mp, struct pmd_layout *layout)
 +{
-+	pgoff_t start, end, bktsz;
++	int rc;
++	u16 pdh;
 +
-+	if (atomic_cmpxchg(&xvm->xvm_evicting, 0, 1))
-+		return;
++	pdh = layout->eld_ld.ol_pdh;
 +
-+	start = mpc_xvm_pgoff(xvm);
-+	end = mpc_xvm_pglen(xvm) + start;
-+	bktsz = xvm->xvm_bktsz >> PAGE_SHIFT;
++	/* Insert should never fail */
 +
-+	if (bktsz < 1024)
-+		bktsz = end - start;
++	rc = smap_insert(mp, pdh, layout->eld_ld.ol_zaddr, layout->eld_ld.ol_zcnt);
++	if (rc)
++		mp_pr_err("mpool %s, allocating drive %s space for layout failed, objid 0x%lx",
++			  rc, mp->pds_name, mp->pds_pdv[pdh].pdi_name, (ulong)layout->eld_objid);
 +
-+	/* Evict in chunks to improve mmap_sem interleaving... */
-+	for (; start < end; start += bktsz)
-+		invalidate_inode_pages2_range(xvm->xvm_mapping, start, start + bktsz);
-+
-+	atomic_cmpxchg(&xvm->xvm_evicting, 1, 0);
++	return rc;
 +}
 +
-+void mpc_reap_xvm_touch(struct mpc_xvm *xvm, int index)
++struct pmd_layout *pmd_obj_find_get(struct mpool_descriptor *mp, u64 objid, int which)
 +{
-+	struct mpc_reap *reap;
-+	atomic64_t *atimep;
-+	uint mbnum, lwm;
-+	pgoff_t offset;
-+	ulong delay;
-+	u64 now;
++	struct pmd_mdc_info *cinfo;
++	struct pmd_layout *found;
++	u8 cslot;
 +
-+	reap = xvm->xvm_reap;
-+	if (!reap)
-+		return;
++	if (!objtype_user(objid_type(objid)))
++		return NULL;
 +
-+	offset = (index << PAGE_SHIFT) % (1ul << xvm_size_max);
-+	mbnum = offset / xvm->xvm_bktsz;
-+
-+	atimep = &xvm->xvm_mbinfov[mbnum].mbatime;
-+	now = local_clock();
++	cslot = objid_slot(objid);
++	cinfo = &mp->pds_mda.mdi_slotv[cslot];
++	found = NULL;
 +
 +	/*
-+	 * Don't update atime too frequently.  If we set atime to
-+	 * U64_MAX in mpc_reap_evict_vma() then the addition here
-+	 * will roll over and atime will be updated.
++	 * which < 0  - search uncommitted tree only
++	 * which > 0  - search tree only
++	 * which == 0 - search both trees
 +	 */
-+	if (atomic64_read(atimep) + (10 * USEC_PER_SEC) < now)
-+		atomic64_set(atimep, now);
++	if (which <= 0) {
++		pmd_uc_lock(cinfo, cslot);
++		found = pmd_uc_find(cinfo, objid);
++		if (found)
++			kref_get(&found->eld_ref);
++		pmd_uc_unlock(cinfo);
++	}
 +
-+	/* Sleep a bit if the reaper is having trouble meeting the free memory target. */
-+	lwm = atomic_read(&reap->reap_lwm);
-+	if (lwm < 3333)
++	if (!found && which >= 0) {
++		pmd_co_rlock(cinfo, cslot);
++		found = pmd_co_find(cinfo, objid);
++		if (found)
++			kref_get(&found->eld_ref);
++		pmd_co_runlock(cinfo);
++	}
++
++	return found;
++}
++
++int pmd_obj_alloc(struct mpool_descriptor *mp, enum obj_type_omf otype,
++		  struct pmd_obj_capacity *ocap, enum mp_media_classp mclassp,
++		  struct pmd_layout **layoutp)
++{
++	return pmd_obj_alloc_cmn(mp, 0, otype, ocap, mclassp, 0, true, layoutp);
++}
++
++int pmd_obj_realloc(struct mpool_descriptor *mp, u64 objid, struct pmd_obj_capacity *ocap,
++		    enum mp_media_classp mclassp, struct pmd_layout **layoutp)
++{
++	if (!pmd_objid_isuser(objid)) {
++		*layoutp = NULL;
++		return -EINVAL;
++	}
++
++	return pmd_obj_alloc_cmn(mp, objid, objid_type(objid), ocap, mclassp, 1, true, layoutp);
++}
++
++int pmd_obj_commit(struct mpool_descriptor *mp, struct pmd_layout *layout)
++{
++	struct pmd_mdc_info *cinfo;
++	struct pmd_layout *found;
++	int rc;
++	u8 cslot;
++
++	if (!objtype_user(objid_type(layout->eld_objid)))
++		return -EINVAL;
++
++	pmd_obj_wrlock(layout);
++	if (layout->eld_state & PMD_LYT_COMMITTED) {
++		pmd_obj_wrunlock(layout);
++		return 0;
++	}
++
++	/*
++	 * must log create before marking object committed to guarantee it will
++	 * exist after a crash; must hold cinfo.compactclock while log create,
++	 * update layout.state, and add to list of committed objects to prevent
++	 * a race with mdc compaction
++	 */
++	cslot = objid_slot(layout->eld_objid);
++	cinfo = &mp->pds_mda.mdi_slotv[cslot];
++
++	pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
++
++#ifdef OBJ_PERSISTENCE_ENABLED
++	rc = pmd_log_create(mp, layout);
++#endif
++	if (!rc) {
++		pmd_uc_lock(cinfo, cslot);
++		found = pmd_uc_remove(cinfo, layout);
++		pmd_uc_unlock(cinfo);
++
++		pmd_co_wlock(cinfo, cslot);
++		found = pmd_co_insert(cinfo, layout);
++		if (!found)
++			layout->eld_state |= PMD_LYT_COMMITTED;
++		pmd_co_wunlock(cinfo);
++
++		if (found) {
++			rc = -EEXIST;
++
++			/*
++			 * if objid exists in committed object list this is a
++			 * SERIOUS bug; need to log a warning message; should
++			 * never happen. Note in this case we are stuck because
++			 * we just logged a second create for an existing
++			 * object.  If mdc compaction runs before a restart this
++			 * extraneous create record will be eliminated,
++			 * otherwise pmd_objs_load() will see the conflict and
++			 * fail the next mpool activation.  We could make
++			 * pmd_objs_load() tolerate this but for now it is
++			 * better to get an activation failure so that
++			 * it's obvious this bug occurred. Best we can do is put
++			 * the layout back in the uncommitted object list so the
++			 * caller can abort after getting the commit failure.
++			 */
++			mp_pr_crit("mpool %s, obj 0x%lx collided during commit",
++				   rc, mp->pds_name, (ulong)layout->eld_objid);
++
++			/* Put the object back in the uncommitted objects tree */
++			pmd_uc_lock(cinfo, cslot);
++			pmd_uc_insert(cinfo, layout);
++			pmd_uc_unlock(cinfo);
++		} else {
++			atomic_inc(&cinfo->mmi_pco_cnt.pcc_cr);
++			atomic_inc(&cinfo->mmi_pco_cnt.pcc_cobj);
++		}
++	}
++
++	pmd_mdc_unlock(&cinfo->mmi_compactlock);
++	pmd_obj_wrunlock(layout);
++
++	if (!rc)
++		pmd_update_obj_stats(mp, layout, cinfo, PMD_OBJ_COMMIT);
++
++	return rc;
++}
++
++static void pmd_obj_erase_cb(struct work_struct *work)
++{
++	struct pmd_obj_erase_work *oef;
++	struct mpool_descriptor *mp;
++	struct pmd_layout *layout;
++
++	oef = container_of(work, struct pmd_obj_erase_work, oef_wqstruct);
++	mp = oef->oef_mp;
++	layout = oef->oef_layout;
++
++	pmd_layout_erase(mp, layout);
++
++	if (oef->oef_cache)
++		kmem_cache_free(oef->oef_cache, oef);
++
++	pmd_layout_unprovision(mp, layout);
++}
++
++static void pmd_obj_erase_start(struct mpool_descriptor *mp, struct pmd_layout *layout)
++{
++	struct pmd_obj_erase_work oefbuf, *oef;
++	bool async = true;
++
++	oef = kmem_cache_zalloc(pmd_obj_erase_work_cache, GFP_KERNEL);
++	if (!oef) {
++		oef = &oefbuf;
++		async = false;
++	}
++
++	/* If async oef will be freed in pmd_obj_erase_and_free() */
++	oef->oef_mp = mp;
++	oef->oef_layout = layout;
++	oef->oef_cache = async ? pmd_obj_erase_work_cache : NULL;
++	INIT_WORK(&oef->oef_wqstruct, pmd_obj_erase_cb);
++
++	queue_work(mp->pds_erase_wq, &oef->oef_wqstruct);
++
++	if (!async)
++		flush_work(&oef->oef_wqstruct);
++}
++
++int pmd_obj_abort(struct mpool_descriptor *mp, struct pmd_layout *layout)
++{
++	struct pmd_mdc_info *cinfo;
++	struct pmd_layout *found;
++	long refcnt;
++	u8 cslot;
++
++	if (!objtype_user(objid_type(layout->eld_objid)))
++		return -EINVAL;
++
++	cslot = objid_slot(layout->eld_objid);
++	cinfo = &mp->pds_mda.mdi_slotv[cslot];
++	found = NULL;
++
++	pmd_obj_wrlock(layout);
++
++	pmd_uc_lock(cinfo, cslot);
++	refcnt = kref_read(&layout->eld_ref);
++	if (refcnt == 2) {
++		found = pmd_uc_remove(cinfo, layout);
++		if (found)
++			found->eld_state |= PMD_LYT_REMOVED;
++	}
++	pmd_uc_unlock(cinfo);
++
++	pmd_obj_wrunlock(layout);
++
++	if (!found)
++		return (refcnt > 2) ? -EBUSY : -EINVAL;
++
++	pmd_update_obj_stats(mp, layout, cinfo, PMD_OBJ_ABORT);
++	pmd_obj_erase_start(mp, layout);
++
++	/* Drop caller's reference... */
++	pmd_obj_put(layout);
++
++	return 0;
++}
++
++int pmd_obj_delete(struct mpool_descriptor *mp, struct pmd_layout *layout)
++{
++	struct pmd_mdc_info *cinfo;
++	struct pmd_layout *found;
++	long refcnt;
++	u64 objid;
++	u8 cslot;
++	int rc;
++
++	if (!objtype_user(objid_type(layout->eld_objid)))
++		return -EINVAL;
++
++	objid = layout->eld_objid;
++	cslot = objid_slot(objid);
++	cinfo = &mp->pds_mda.mdi_slotv[cslot];
++	found = NULL;
++
++	/*
++	 * Must log delete record before removing object for crash recovery.
++	 * Must hold cinfo.compactlock while logging delete record and
++	 * removing object from the list of committed objects to prevent
++	 * race with MDC compaction
++	 */
++	pmd_obj_wrlock(layout);
++	pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
++
++	refcnt = kref_read(&layout->eld_ref);
++	if (refcnt != 2) {
++		pmd_mdc_unlock(&cinfo->mmi_compactlock);
++		pmd_obj_wrunlock(layout);
++
++		return (refcnt > 2) ? -EBUSY : -EINVAL;
++	}
++
++#ifdef OBJ_PERSISTENCE_ENABLED
++	rc = pmd_log_delete(mp, objid);
++#endif
++	if (!rc) {
++		pmd_co_wlock(cinfo, cslot);
++		found = pmd_co_remove(cinfo, layout);
++		if (found)
++			found->eld_state |= PMD_LYT_REMOVED;
++		pmd_co_wunlock(cinfo);
++	}
++
++	pmd_mdc_unlock(&cinfo->mmi_compactlock);
++	pmd_obj_wrunlock(layout);
++
++	if (!found) {
++		mp_pr_rl("mpool %s, objid 0x%lx, pmd_log_del failed",
++			 rc, mp->pds_name, (ulong)objid);
++		return rc;
++	}
++
++	atomic_inc(&cinfo->mmi_pco_cnt.pcc_del);
++	atomic_dec(&cinfo->mmi_pco_cnt.pcc_cobj);
++	pmd_update_obj_stats(mp, layout, cinfo, PMD_OBJ_DELETE);
++	pmd_obj_erase_start(mp, layout);
++
++	/* Drop caller's reference... */
++	pmd_obj_put(layout);
++
++	return 0;
++}
++
++int pmd_obj_erase(struct mpool_descriptor *mp, struct pmd_layout *layout, u64 gen)
++{
++	u64 objid = layout->eld_objid;
++	int rc;
++
++	if ((pmd_objid_type(objid) != OMF_OBJ_MLOG) ||
++	     (!(layout->eld_state & PMD_LYT_COMMITTED)) ||
++	     (layout->eld_state & PMD_LYT_REMOVED) || (gen <= layout->eld_gen)) {
++		mp_pr_warn("mpool %s, object erase failed to start, objid 0x%lx state 0x%x gen %lu",
++			   mp->pds_name, (ulong)objid, layout->eld_state, (ulong)gen);
++
++		return -EINVAL;
++	}
++
++	/*
++	 * Must log the higher gen number for the old active mlog before
++	 * updating object state (layout->eld_gen of the old active mlog).
++	 * It is to guarantee that a activate after crash will know which is the
++	 * new active mlog.
++	 */
++
++	if (objid_mdc0log(objid)) {
++		/* Compact lock is held by the caller */
++
++		/*
++		 * Change MDC0 metadata image in RAM
++		 */
++		if (objid == MDC0_OBJID_LOG1)
++			mp->pds_sbmdc0.osb_mdc01gen = gen;
++		else
++			mp->pds_sbmdc0.osb_mdc02gen = gen;
++
++		/*
++		 * Write the updated MDC0 metadata in the super blocks of the
++		 * drives holding MDC0 metadata.
++		 * Note: for 1.0, there is only one drive.
++		 */
++		rc = pmd_mdc0_meta_update(mp, layout);
++		if (!rc)
++			/*
++			 * Update in-memory eld_gen, only if on-media
++			 * gen gets successfully updated
++			 */
++			layout->eld_gen = gen;
++	} else {
++		struct pmd_mdc_info *cinfo;
++		u8                   cslot;
++
++		/*
++		 * Take the MDC0 (or mlog MDCi for user MDC) compact lock to
++		 * avoid a race with MDC0 (or mlog MDCi) compaction).
++		 */
++		cslot = objid_slot(layout->eld_objid);
++		cinfo = &mp->pds_mda.mdi_slotv[cslot];
++
++		pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
++
++#ifdef OBJ_PERSISTENCE_ENABLED
++		rc = pmd_log_erase(mp, layout->eld_objid, gen);
++#endif
++		if (!rc) {
++			layout->eld_gen = gen;
++			if (cslot)
++				atomic_inc(&cinfo->mmi_pco_cnt.pcc_er);
++
++		}
++		pmd_mdc_unlock(&cinfo->mmi_compactlock);
++	}
++
++	return rc;
++}
++
++/**
++ * pmd_alloc_idgen() - generate an id for an allocated object.
++ * @mp:
++ * @otype:
++ * @objid: outpout
++ *
++ * Does a round robin on the MDC1/255 avoiding the ones that are candidate
++ * for pre compaction.
++ *
++ * The round robin has a bias toward the MDCs with the smaller number of
++ * objects. This is to recover from rare and very big allocation bursts.
++ * During an allocation, the MDC[s] candidate for pre compaction are avoided.
++ * If the allocation is a big burst, the result is that these MDC[s] have much
++ * less objects in them as compared to the other ones.
++ * After the burst if a relatively constant allocation rate takes place, the
++ * deficit in objects of the MDCs avoided during the burst, is never recovered.
++ * The bias in the round robin allows to recover. After a while all MDCs ends
++ * up again with about the same number of objects.
++ */
++static int pmd_alloc_idgen(struct mpool_descriptor *mp, enum obj_type_omf otype, u64 *objid)
++{
++	struct pmd_mdc_info *cinfo = NULL;
++	int rc = 0;
++	u8 cslot;
++	u32 tidx;
++
++	if (mp->pds_mda.mdi_slotvcnt < 2) {
++		/* No mdc available to assign object to; cannot use mdc0 */
++		rc = -ENOSPC;
++		mp_pr_err("mpool %s, no MDCi with i>0", rc, mp->pds_name);
++		*objid = 0;
++		return rc;
++	}
++
++	/* Get next mdc for allocation */
++	tidx = atomic_inc_return(&mp->pds_mda.mdi_sel.mds_tbl_idx) % MDC_TBL_SZ;
++	ASSERT(tidx <= MDC_TBL_SZ);
++
++	cslot = mp->pds_mda.mdi_sel.mds_tbl[tidx];
++	cinfo = &mp->pds_mda.mdi_slotv[cslot];
++
++	pmd_mdc_lock(&cinfo->mmi_uqlock, cslot);
++	*objid = objid_make(cinfo->mmi_luniq + 1, otype, cslot);
++	if (objid_ckpt(*objid)) {
++
++		/*
++		 * Must checkpoint objid before assigning it to an object
++		 * to guarantee it will not reissue objid after a crash.
++		 * Must hold cinfo.compactlock while log checkpoint to mdc
++		 * to prevent a race with mdc compaction.
++		 */
++		pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
++#ifdef OBJ_PERSISTENCE_ENABLED
++		rc = pmd_log_idckpt(mp, *objid);
++#endif
++		if (!rc)
++			cinfo->mmi_lckpt = *objid;
++		pmd_mdc_unlock(&cinfo->mmi_compactlock);
++	}
++
++	if (!rc)
++		cinfo->mmi_luniq = cinfo->mmi_luniq + 1;
++	pmd_mdc_unlock(&cinfo->mmi_uqlock);
++
++	if (rc) {
++		mp_pr_rl("mpool %s, checkpoint append for objid 0x%lx failed",
++			 rc, mp->pds_name, (ulong)*objid);
++		*objid = 0;
++		return rc;
++	}
++
++	return 0;
++}
++
++static int pmd_realloc_idvalidate(struct mpool_descriptor *mp, u64 objid)
++{
++	struct pmd_mdc_info *cinfo = NULL;
++	u8 cslot = objid_slot(objid);
++	u64 uniq = objid_uniq(objid);
++	int rc = 0;
++
++	/* We never realloc objects in mdc0 */
++	if (!cslot) {
++		rc = -EINVAL;
++		mp_pr_err("mpool %s, can't re-allocate an object 0x%lx associated to MDC0",
++			  rc, mp->pds_name, (ulong)objid);
++		return rc;
++	}
++
++	spin_lock(&mp->pds_mda.mdi_slotvlock);
++	if (cslot >= mp->pds_mda.mdi_slotvcnt)
++		rc = -EINVAL;
++	spin_unlock(&mp->pds_mda.mdi_slotvlock);
++
++	if (rc) {
++		mp_pr_err("mpool %s, realloc failed, slot number %u is too big %u 0x%lx",
++			  rc, mp->pds_name, cslot, mp->pds_mda.mdi_slotvcnt, (ulong)objid);
++	} else {
++		cinfo = &mp->pds_mda.mdi_slotv[cslot];
++
++		pmd_mdc_lock(&cinfo->mmi_uqlock, cslot);
++		if (uniq > cinfo->mmi_luniq)
++			rc = -EINVAL;
++		pmd_mdc_unlock(&cinfo->mmi_uqlock);
++
++		if (rc) {
++			mp_pr_err("mpool %s, realloc failed, unique id %lu too big %lu 0x%lx",
++				  rc, mp->pds_name, (ulong)uniq,
++				  (ulong)cinfo->mmi_luniq, (ulong)objid);
++		}
++	}
++
++	return rc;
++}
++
++/**
++ * pmd_alloc_argcheck() -
++ * @mp:      Mpool descriptor
++ * @objid:   Object ID
++ * @otype:   Object type
++ * @mclassp: Media class
++ */
++static int pmd_alloc_argcheck(struct mpool_descriptor *mp, u64 objid,
++			      enum obj_type_omf otype, enum mp_media_classp mclassp)
++{
++	int rc = -EINVAL;
++
++	if (!mp)
++		return rc;
++
++	if (!objtype_user(otype) || !mclass_isvalid(mclassp)) {
++		mp_pr_err("mpool %s, unknown object type or media class %d %d",
++			  rc, mp->pds_name, otype, mclassp);
++		return rc;
++	}
++
++	if (objid && objid_type(objid) != otype) {
++		mp_pr_err("mpool %s, unknown object type mismatch %d %d",
++			  rc, mp->pds_name, objid_type(objid), otype);
++		return rc;
++	}
++
++	return 0;
++}
++
++int pmd_obj_alloc_cmn(struct mpool_descriptor *mp, u64 objid, enum obj_type_omf otype,
++		      struct pmd_obj_capacity *ocap, enum mp_media_classp mclass,
++		      int realloc, bool needref, struct pmd_layout **layoutp)
++{
++	struct pmd_mdc_info *cinfo;
++	struct media_class *mc;
++	struct pmd_layout *layout;
++	struct mpool_uuid uuid;
++	int retries, flush, rc;
++	u64 zcnt = 0;
++	u8  cslot;
++
++	*layoutp = NULL;
++
++	rc = pmd_alloc_argcheck(mp, objid, otype, mclass);
++	if (rc)
++		return rc;
++
++	if (!objid) {
++		/*
++		 * alloc: generate objid, checkpoint as needed to
++		 * support realloc of uncommitted objects after crash and to
++		 * guarantee objids never reuse
++		 */
++		rc = pmd_alloc_idgen(mp, otype, &objid);
++	} else if (realloc) {
++		/* realloc: validate objid */
++		rc = pmd_realloc_idvalidate(mp, objid);
++	}
++	if (rc)
++		return rc;
++
++	if (otype == OMF_OBJ_MLOG)
++		mpool_generate_uuid(&uuid);
++
++	/*
++	 * Retry from 128 to 256ms with a flush every 1/8th of the retries.
++	 * This is a workaround for the async mblock trim problem.
++	 */
++	retries = 1024;
++	flush   = retries >> 3;
++
++retry:
++	down_read(&mp->pds_pdvlock);
++
++	mc = &mp->pds_mc[mclass];
++	if (mc->mc_pdmc < 0) {
++		up_read(&mp->pds_pdvlock);
++		return -ENOENT;
++	}
++
++	/* Calculate the height (zcnt) of layout. */
++	pmd_layout_calculate(mp, ocap, mc, &zcnt);
++
++	layout = pmd_layout_alloc(&uuid, objid, 0, 0, zcnt);
++	if (!layout) {
++		up_read(&mp->pds_pdvlock);
++		return -ENOMEM;
++	}
++
++	/* Try to allocate zones from drives in media class */
++	rc = pmd_layout_provision(mp, ocap, layout, mc, zcnt);
++	up_read(&mp->pds_pdvlock);
++
++	if (rc) {
++		pmd_obj_put(layout);
++
++		/* TODO: Retry only if mperasewq is busy... */
++		if (retries-- > 0) {
++			usleep_range(128, 256);
++
++			if (flush && (retries % flush == 0))
++				flush_workqueue(mp->pds_erase_wq);
++
++			goto retry;
++		}
++
++		mp_pr_rl("mpool %s, layout alloc failed: objid 0x%lx %lu %u",
++			 rc, mp->pds_name, (ulong)objid, (ulong)zcnt, otype);
++
++		return rc;
++	}
++
++	cslot = objid_slot(objid);
++	cinfo = &mp->pds_mda.mdi_slotv[cslot];
++
++	pmd_update_obj_stats(mp, layout, cinfo, PMD_OBJ_ALLOC);
++
++	if (needref)
++		kref_get(&layout->eld_ref);
++
++	/*
++	 * If realloc, we MUST confirm (while holding the uncommitted obj
++	 * tree lock) that objid is not in the committed obj tree in order
++	 * to protect against an invalid *_realloc() call.
++	 */
++	pmd_uc_lock(cinfo, cslot);
++	if (realloc) {
++		pmd_co_rlock(cinfo, cslot);
++		if (pmd_co_find(cinfo, objid))
++			rc = -EEXIST;
++		pmd_co_runlock(cinfo);
++	}
++
++	/*
++	 * For both alloc and realloc, confirm that objid is not in the
++	 * uncommitted obj tree and insert it.  Note that a reallocated
++	 * objid can collide, but a generated objid should never collide.
++	 */
++	if (!rc && pmd_uc_insert(cinfo, layout))
++		rc = -EEXIST;
++	pmd_uc_unlock(cinfo);
++
++	if (rc) {
++		mp_pr_err("mpool %s, %sallocated obj 0x%lx should not be in the %scommitted tree",
++			  rc, mp->pds_name, realloc ? "re-" : "",
++			  (ulong)objid, realloc ? "" : "un");
++
++		if (needref)
++			pmd_obj_put(layout);
++
++		/*
++		 * Since object insertion failed, we need to undo the
++		 * per-mdc stats update we did earlier in this routine
++		 */
++		pmd_update_obj_stats(mp, layout, cinfo, PMD_OBJ_ABORT);
++		pmd_layout_unprovision(mp, layout);
++		layout = NULL;
++	}
++
++	*layoutp = layout;
++
++	return rc;
++}
++
++void pmd_mpool_usage(struct mpool_descriptor *mp, struct mpool_usage *usage)
++{
++	int sidx;
++	u16 slotvcnt;
++
++	/*
++	 * Get a local copy of MDC count (slotvcnt), and then drop the lock
++	 * It's okay another MDC is added concurrently, since pds_ds_info
++	 * is always stale by design
++	 */
++	spin_lock(&mp->pds_mda.mdi_slotvlock);
++	slotvcnt = mp->pds_mda.mdi_slotvcnt;
++	spin_unlock(&mp->pds_mda.mdi_slotvlock);
++
++	for (sidx = 1; sidx < slotvcnt; sidx++) {
++		struct pmd_mdc_stats *pms;
++		struct pmd_mdc_info *cinfo;
++
++		cinfo = &mp->pds_mda.mdi_slotv[sidx];
++		pms   = &cinfo->mmi_stats;
++
++		mutex_lock(&cinfo->mmi_stats_lock);
++		usage->mpu_mblock_alen += pms->pms_mblock_alen;
++		usage->mpu_mblock_wlen += pms->pms_mblock_wlen;
++		usage->mpu_mlog_alen   += pms->pms_mlog_alen;
++		usage->mpu_mblock_cnt  += pms->pms_mblock_cnt;
++		usage->mpu_mlog_cnt    += pms->pms_mlog_cnt;
++		mutex_unlock(&cinfo->mmi_stats_lock);
++	}
++
++	if (slotvcnt < 2)
 +		return;
 +
-+	delay = 500000 / (10001 - lwm) - (500000 / 10001);
-+	delay = min_t(ulong, delay, 3000);
-+
-+	usleep_range(delay, delay * 2);
++	usage->mpu_alen = (usage->mpu_mblock_alen + usage->mpu_mlog_alen);
++	usage->mpu_wlen = (usage->mpu_mblock_wlen + usage->mpu_mlog_alen);
 +}
 +
-+bool mpc_reap_xvm_duress(struct mpc_xvm *xvm)
++/**
++ * pmd_mdc0_meta_update_update() - update on media the MDC0 metadata.
++ * @mp:
++ * @layout: Used to know on which drives to write the MDC0 metadata.
++ *
++ * For now write the whole super block, but only the MDC0 metadata needs
++ * to be updated, the rest of the superblock doesn't change.
++ *
++ * In 1.0 the MDC0 metadata is replicated on the 4 superblocks of the drive.
++ * In case of failure, the SBs of a same drive may end up having different
++ * values for the MDC0 metadata.
++ * To address this situation voting could be used along with the SB gen number
++ * psb_gen. But for 1.0 a simpler approach is taken: SB gen number is not used
++ * and SB0 is the authoritative replica. The other 3 replicas of MDC0 metadata
++ * are not used when the mpool activates.
++ */
++static int pmd_mdc0_meta_update(struct mpool_descriptor *mp, struct pmd_layout *layout)
 +{
-+	struct mpc_reap *reap;
-+	uint lwm;
++	struct omf_sb_descriptor *sb;
++	struct mpool_dev_info *pd;
++	struct mc_parms mc_parms;
++	int rc;
 +
-+	if (xvm->xvm_advice == MPC_VMA_HOT)
-+		return false;
++	pd = &(mp->pds_pdv[layout->eld_ld.ol_pdh]);
++	if (mpool_pd_status_get(pd) != PD_STAT_ONLINE) {
++		rc = -EIO;
++		mp_pr_err("%s: pd %s unavailable or offline, status %d",
++			  rc, mp->pds_name, pd->pdi_name, mpool_pd_status_get(pd));
++		return rc;
++	}
 +
-+	reap = xvm->xvm_reap;
-+	if (!reap)
-+		return false;
++	sb = kzalloc(sizeof(*sb), GFP_KERNEL);
++	if (!sb)
++		return -ENOMEM;
 +
-+	lwm = atomic_read(&reap->reap_lwm);
-+	if (lwm < 1500)
-+		return false;
++	/*
++	 * set superblock values common to all new drives in pool
++	 * (new or extant)
++	 */
++	sb->osb_magic = OMF_SB_MAGIC;
++	strlcpy((char *) sb->osb_name, mp->pds_name, sizeof(sb->osb_name));
++	sb->osb_vers = OMF_SB_DESC_VER_LAST;
++	mpool_uuid_copy(&sb->osb_poolid, &mp->pds_poolid);
++	sb->osb_gen = 1;
 +
-+	if (lwm > 3000)
-+		return true;
++	/* Set superblock values specific to this drive */
++	mpool_uuid_copy(&sb->osb_parm.odp_devid, &pd->pdi_devid);
++	sb->osb_parm.odp_devsz = pd->pdi_parm.dpr_devsz;
++	sb->osb_parm.odp_zonetot = pd->pdi_parm.dpr_zonetot;
++	mc_pd_prop2mc_parms(&pd->pdi_parm.dpr_prop, &mc_parms);
++	mc_parms2omf_devparm(&mc_parms, &sb->osb_parm);
 +
-+	return (xvm->xvm_advice == MPC_VMA_COLD);
++	sbutil_mdc0_copy(sb, &mp->pds_sbmdc0);
++
++	mp_pr_debug("MDC0 compaction gen1 %lu gen2 %lu",
++		    0, (ulong)sb->osb_mdc01gen, (ulong)sb->osb_mdc02gen);
++
++	/*
++	 * sb_write_update() succeeds if at least SB0 is written. It is
++	 * not a problem to have SB1 not written because the authoritative
++	 * MDC0 metadata replica is the one in SB0.
++	 */
++	rc = sb_write_update(&pd->pdi_parm, sb);
++	if (rc)
++		mp_pr_err("compacting %s MDC0, writing superblock on drive %s failed",
++			  rc, mp->pds_name, pd->pdi_name);
++
++	kfree(sb);
++	return rc;
 +}
-diff --git a/drivers/mpool/reaper.h b/drivers/mpool/reaper.h
-new file mode 100644
-index 000000000000..d3af6aef918d
---- /dev/null
-+++ b/drivers/mpool/reaper.h
-@@ -0,0 +1,71 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
++
++/**
++ * pmd_update_obj_stats() - update per-MDC space usage
++ * @mp:
++ * @layout:
++ * @cinfo:
++ * @op: object opcode
++ */
++void pmd_update_obj_stats(struct mpool_descriptor *mp, struct pmd_layout *layout,
++			  struct pmd_mdc_info *cinfo, enum pmd_obj_op op)
++{
++	struct pmd_mdc_stats *pms;
++	enum obj_type_omf otype;
++	u64 cap;
++
++	otype = pmd_objid_type(layout->eld_objid);
++
++	mutex_lock(&cinfo->mmi_stats_lock);
++	pms = &cinfo->mmi_stats;
++
++	/* Update space usage and mblock/mlog count */
++	switch (op) {
++	case PMD_OBJ_LOAD:
++		if (otype == OMF_OBJ_MBLOCK)
++			pms->pms_mblock_wlen += layout->eld_mblen;
++		fallthrough;
++
++	case PMD_OBJ_ALLOC:
++		cap = pmd_layout_cap_get(mp, layout);
++		if (otype == OMF_OBJ_MLOG) {
++			pms->pms_mlog_cnt++;
++			pms->pms_mlog_alen += cap;
++		} else if (otype == OMF_OBJ_MBLOCK) {
++			pms->pms_mblock_cnt++;
++			pms->pms_mblock_alen += cap;
++		}
++		break;
++
++	case PMD_OBJ_COMMIT:
++		if (otype == OMF_OBJ_MBLOCK)
++			pms->pms_mblock_wlen += layout->eld_mblen;
++		break;
++
++	case PMD_OBJ_DELETE:
++		if (otype == OMF_OBJ_MBLOCK)
++			pms->pms_mblock_wlen -= layout->eld_mblen;
++		fallthrough;
++
++	case PMD_OBJ_ABORT:
++		cap = pmd_layout_cap_get(mp, layout);
++		if (otype == OMF_OBJ_MLOG) {
++			pms->pms_mlog_cnt--;
++			pms->pms_mlog_alen -= cap;
++		} else if (otype == OMF_OBJ_MBLOCK) {
++			pms->pms_mblock_cnt--;
++			pms->pms_mblock_alen -= cap;
++		}
++		break;
++
++	default:
++		ASSERT(0);
++		break;
++	}
++
++	mutex_unlock(&cinfo->mmi_stats_lock);
++}
++
++/**
++ * pmd_compare_free_space() - compare free space between MDCs
++ * @f:  First  MDC
++ * @s:  Second MDC
++ *
++ * Arrange MDCs in descending order of free space
++ */
++static int pmd_compare_free_space(const void *first, const void *second)
++{
++	const struct pmd_mdc_info *f = *(const struct pmd_mdc_info **)first;
++	const struct pmd_mdc_info *s = *(const struct pmd_mdc_info **)second;
++
++	/* return < 0 - first member should be ahead for second */
++	if (f->mmi_credit.ci_free > s->mmi_credit.ci_free)
++		return -1;
++
++	/* return > 0 - first member should be after second */
++	if (f->mmi_credit.ci_free < s->mmi_credit.ci_free)
++		return 1;
++
++	return 0;
++
++}
++
++/**
++ * pmd_update_ms_tbl() - udpates mds_tlb with MDC slot numbers
++ * @mp:  mpool descriptor
++ * @slotnum:  array of slot numbers
++ *
++ * This function creates an array of mdc slot and credit sets by interleaving
++ * MDC slots. Interleave maximize the interval at which the slots appear in
++ * the mds_tbl.
++ *
++ * The first set in the array is reference set with only 1 member and has max
++ * assigned credits. Subsequent sets are formed to match the reference set and
++ * may contain one or more member such that total credit of the set will match
++ * the reference set. The last set may have fewer credit than the reference set
++ *
++ * Locking: no lock need to be held when calling this function.
++ *
++ */
++static void pmd_update_mds_tbl(struct mpool_descriptor *mp, u8 num_mdc, u8 *slotnum)
++{
++	struct mdc_credit_set *cset, *cs;
++	struct pmd_mdc_info *cinfo;
++	u16 refcredit, neededcredit, tidx, totalcredit = 0;
++	u8 csidx, csmidx, num_cset, i;
++
++	cset = kcalloc(num_mdc, sizeof(*cset), GFP_KERNEL);
++	if (!cset)
++		return;
++
++	cinfo = &mp->pds_mda.mdi_slotv[slotnum[0]];
++	refcredit = cinfo->mmi_credit.ci_credit;
++
++	csidx = 0; /* creditset index */
++	i     = 0; /* slotnum index   */
++	while (i < num_mdc) {
++		cs = &cset[csidx++];
++		neededcredit = refcredit;
++
++		csmidx = 0;
++		/* Setup members of the credit set */
++		while (csmidx < MPOOL_MDC_SET_SZ  && i < num_mdc) {
++			/* slot 0 should never be there */
++			ASSERT(slotnum[i] != 0);
++
++			cinfo = &mp->pds_mda.mdi_slotv[slotnum[i]];
++			cs->cs_num_csm = csmidx + 1;
++			cs->csm[csmidx].m_slot = slotnum[i];
++
++			if (neededcredit <= cinfo->mmi_credit.ci_credit) {
++				/*
++				 * More than required credit is available,
++				 * leftover will be assigned to the next set.
++				 */
++				cs->csm[csmidx].m_credit    += neededcredit;
++				cinfo->mmi_credit.ci_credit -= neededcredit;
++				totalcredit += neededcredit; /* Debug */
++				neededcredit = 0;
++
++				/* Some credit available stay at this mdc */
++				if (cinfo->mmi_credit.ci_credit == 0)
++					i++;
++				break;
++			}
++
++			/*
++			 * Available credit is < needed, assign all
++			 * the available credit and move to the next
++			 * mdc slot.
++			 */
++			cs->csm[csmidx].m_credit += cinfo->mmi_credit.ci_credit;
++			neededcredit -= cinfo->mmi_credit.ci_credit;
++			totalcredit  += cinfo->mmi_credit.ci_credit;
++			cinfo->mmi_credit.ci_credit = 0;
++
++			/* Move to the next mdcslot and set member */
++			i++;
++			csmidx++;
++		}
++	}
++
++	ASSERT(totalcredit == MDC_TBL_SZ);
++	num_cset = csidx;
++
++	tidx  = 0;
++	csidx = 0;
++	while (tidx < MDC_TBL_SZ) {
++		cs = &cset[csidx];
++		if (cs->cs_idx < cs->cs_num_csm) {
++			csmidx = cs->cs_idx;
++			if (cs->csm[csmidx].m_credit) {
++				cs->csm[csmidx].m_credit--;
++				mp->pds_mda.mdi_sel.mds_tbl[tidx] = cs->csm[csmidx].m_slot;
++				totalcredit--;
++
++				if (cs->csm[csmidx].m_credit == 0)
++					cs->cs_idx += 1;
++
++				tidx++;
++			}
++		}
++		/* Loop over the sets */
++		csidx = (csidx + 1) % num_cset;
++	}
++
++	ASSERT(totalcredit == 0);
++
++	kfree(cset);
++}
++
++/**
++ * pmd_update_credit() - udpates MDC credit if new MDCs should be created
++ * @mp:  mpool descriptor
++ *
++ * Credits are assigned as a ratio between MDC such that MDC with least free
++ * space will fill up at the same time as other MDC.
++ *
++ * Locking: no lock need to be held when calling this function.
++ */
++void pmd_update_credit(struct mpool_descriptor *mp)
++{
++	struct pre_compact_ctrs *pco_cnt;
++	struct pmd_mdc_info *cinfo;
++	u64 cap, used, free, nmtoc;
++	u16 credit, cslot;
++	u8 sidx, nidx, num_mdc;
++	u8 *slotnum;
++	void **sarray = mp->pds_mda.mdi_sel.mds_smdc;
++	u32 nbnoalloc = (u32)mp->pds_params.mp_pconbnoalloc;
++
++	if (mp->pds_mda.mdi_slotvcnt < 2) {
++		mp_pr_warn("Not enough MDCn %u", mp->pds_mda.mdi_slotvcnt - 1);
++		return;
++	}
++
++	slotnum = kcalloc(MDC_SLOTS, sizeof(*slotnum), GFP_KERNEL);
++	if (!slotnum)
++		return;
++
++	nmtoc = atomic_read(&mp->pds_pco.pco_nmtoc);
++	nmtoc = nmtoc % (mp->pds_mda.mdi_slotvcnt - 1) + 1;
++
++	/*
++	 * slotvcnt includes MDC 0 and MDCn that are in precompaction
++	 * list and should be excluded. If there are less than (nbnoalloc
++	 * +2) MDCs exclusion is not possible. 2 is added to account for
++	 * MDC0 and the MDC pointed to by pco_nmtoc.
++	 *
++	 * MDC that is in pre-compacting state and two MDCs that follows
++	 * are excluded from allocation. This is done to prevent stall/
++	 * delays for a sync that follows an allocation as both
++	 * take a compaction lock.
++	 */
++	if (mp->pds_mda.mdi_slotvcnt < (nbnoalloc + 2)) {
++		num_mdc = mp->pds_mda.mdi_slotvcnt - 1;
++		cslot  = 1;
++		mp_pr_debug("MDCn cnt %u, cannot skip %u num_mdc %u",
++			    0, mp->pds_mda.mdi_slotvcnt - 1, (u32)nmtoc, num_mdc);
++	} else {
++		num_mdc = mp->pds_mda.mdi_slotvcnt - (nbnoalloc + 2);
++		cslot = (nmtoc + nbnoalloc) % (mp->pds_mda.mdi_slotvcnt - 1);
++	}
++
++
++	/* Walkthrough all MDCs and exclude MDCs that are almost full */
++	for (nidx = 0, sidx = 0; nidx < num_mdc; nidx++) {
++		cslot = cslot % (mp->pds_mda.mdi_slotvcnt - 1) + 1;
++
++		if (cslot == 0)
++			cslot = 1;
++
++		cinfo = &mp->pds_mda.mdi_slotv[cslot];
++		pco_cnt = &(cinfo->mmi_pco_cnt);
++
++		cap  = atomic64_read(&pco_cnt->pcc_cap);
++		used = atomic64_read(&pco_cnt->pcc_len);
++
++		if ((cap - used) < (cap / 400)) {
++			/* Consider < .25% free space as full */
++			mp_pr_warn("MDC slot %u almost full", cslot);
++			continue;
++		}
++		sarray[sidx++] = cinfo;
++		cinfo->mmi_credit.ci_free = cap - used;
++	}
++
++	/* Sort the array with decreasing order of space */
++	sort((void *)sarray, sidx, sizeof(sarray[0]), pmd_compare_free_space, NULL);
++	num_mdc = sidx;
++
++	/* Calculate total free space across the chosen MDC set */
++	for (sidx = 0, free = 0; sidx < num_mdc; sidx++) {
++		cinfo = sarray[sidx];
++		free += cinfo->mmi_credit.ci_free;
++		slotnum[sidx] = cinfo->mmi_credit.ci_slot;
++	}
++
++	/*
++	 * Assign credit to MDCs in the MDC set. Credit is relative and
++	 * will not exceed the total slots in mds_tbl
++	 */
++	for (sidx = 0, credit = 0; sidx < num_mdc; sidx++) {
++		cinfo = &mp->pds_mda.mdi_slotv[slotnum[sidx]];
++		cinfo->mmi_credit.ci_credit = (MDC_TBL_SZ * cinfo->mmi_credit.ci_free) / free;
++		credit += cinfo->mmi_credit.ci_credit;
++	}
++
++	ASSERT(credit <= MDC_TBL_SZ);
++
++	/*
++	 * If the credit is not equal to the table size, assign
++	 * credits so table can be filled all the way.
++	 */
++	if (credit < MDC_TBL_SZ) {
++		credit = MDC_TBL_SZ - credit;
++
++		sidx = 0;
++		while (credit > 0) {
++			sidx = (sidx % num_mdc);
++			cinfo = &mp->pds_mda.mdi_slotv[slotnum[sidx]];
++			cinfo->mmi_credit.ci_credit += 1;
++			sidx++;
++			credit--;
++		}
++	}
++
++	pmd_update_mds_tbl(mp, num_mdc, slotnum);
++
++	kfree(slotnum);
++}
++
 +/*
-+ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
++ * pmd_mlogid2cslot() - Given an mlog object ID which makes one of the mpool
++ *	core MDCs (MDCi with i >0), it returns i.
++ *	Given an client created object ID (mblock or mlog), it returns -1.
++ * @mlogid:
 + */
++static int pmd_mlogid2cslot(u64 mlogid)
++{
++	u64 uniq;
 +
-+#ifndef MPOOL_REAPER_H
-+#define MPOOL_REAPER_H
++	if (pmd_objid_type(mlogid) != OMF_OBJ_MLOG)
++		return -1;
++	if (objid_slot(mlogid))
++		return -1;
++	uniq = objid_uniq(mlogid);
++	if (uniq > (2 * MDC_SLOTS) - 1)
++		return -1;
 +
-+#define MPC_REAP_PARAMS_CNT    3
++	return(uniq/2);
++}
 +
-+struct mpc_reap;
-+struct mpc_xvm;
++void pmd_precompact_alsz(struct mpool_descriptor *mp, u64 objid, u64 len, u64 cap)
++{
++	struct pre_compact_ctrs *pco_cnt;
++	struct pmd_mdc_info *cinfo;
++	int ret;
++	u8 cslot;
 +
-+/**
-+ * mpc_reap_create() - Allocate and initialize reap data strctures
-+ * @reapp: Ptr to initialized reap structure.
-+ *
-+ * Return: -ENOMEM if the allocaiton fails.
-+ */
-+int mpc_reap_create(struct mpc_reap **reapp);
++	ret = pmd_mlogid2cslot(objid);
++	if (ret <= 0)
++		return;
 +
-+/**
-+ * mpc_reap_destroy() - Destroy the given reaper
-+ * @reap:
-+ */
-+void mpc_reap_destroy(struct mpc_reap *reap);
++	cslot = ret;
++	cinfo = &mp->pds_mda.mdi_slotv[cslot];
++	pco_cnt = &(cinfo->mmi_pco_cnt);
++	atomic64_set(&pco_cnt->pcc_len, len);
++	atomic64_set(&pco_cnt->pcc_cap, cap);
++}
 +
-+/**
-+ * mpc_reap_xvm_add() - Add an extended VMA to the reap list
-+ * @xvm: extended VMA
-+ */
-+void mpc_reap_xvm_add(struct mpc_reap *reap, struct mpc_xvm *xvm);
++int pmd_init(void)
++{
++	int rc = 0;
 +
-+/**
-+ * mpc_reap_xvm_evict() - Evict all pages of given extended VMA
-+ * @xvm: extended VMA
-+ */
-+void mpc_reap_xvm_evict(struct mpc_xvm *xvm);
++	/* Initialize the slab caches. */
++	pmd_layout_cache = kmem_cache_create("mpool_pmd_layout", sizeof(struct pmd_layout),
++					     0, SLAB_HWCACHE_ALIGN | SLAB_POISON, NULL);
++	if (!pmd_layout_cache) {
++		rc = -ENOMEM;
++		mp_pr_err("kmem_cache_create(pmd_layout, %zu) failed",
++			  rc, sizeof(struct pmd_layout));
++		goto errout;
++	}
 +
-+/**
-+ * mpc_reap_xvm_touch() - Update extended VMA mblock atime
-+ * @xvm:    extended VMA
-+ * @index:  valid page index within the extended VMA
-+ *
-+ * Update the access time stamp of the mblock given by the valid
-+ * page %index within the VMA.  Might sleep for some number of
-+ * microseconds if the reaper is under duress (i.e., the more
-+ * urgent the duress the longer the sleep).
-+ *
-+ * This function is called only by mpc_vm_fault_impl(), once
-+ * for each successful page fault.
-+ */
-+void mpc_reap_xvm_touch(struct mpc_xvm *xvm, int index);
++	pmd_layout_priv_cache = kmem_cache_create("mpool_pmd_layout_priv",
++				sizeof(struct pmd_layout) + sizeof(union pmd_layout_priv),
++				0, SLAB_HWCACHE_ALIGN | SLAB_POISON, NULL);
++	if (!pmd_layout_priv_cache) {
++		rc = -ENOMEM;
++		mp_pr_err("kmem_cache_create(pmd priv, %zu) failed",
++			  rc, sizeof(union pmd_layout_priv));
++		goto errout;
++	}
 +
-+/**
-+ * mpc_reap_xvm_duress() - Check to see if reaper is under duress
-+ * @xvm:   extended VMA
-+ *
-+ * Return: %false if the VMA is marked MPC_XVM_HOT.
-+ * Return: %false if reaper is not enabled nor under duress.
-+ * Return: %true depending upon the urgency of duress and the
-+ * VMA advice (MPC_XVM_WARM or MPC_XVM_COLD).
-+ *
-+ * This function is called only by mpc_readpages() to decide whether
-+ * or not to reduce the size of a speculative readahead request.
-+ */
-+bool mpc_reap_xvm_duress(struct mpc_xvm *xvm);
++	pmd_obj_erase_work_cache = kmem_cache_create("mpool_pmd_obj_erase_work",
++						     sizeof(struct pmd_obj_erase_work),
++						     0, SLAB_HWCACHE_ALIGN | SLAB_POISON, NULL);
++	if (!pmd_obj_erase_work_cache) {
++		rc = -ENOMEM;
++		mp_pr_err("kmem_cache_create(pmd_obj_erase, %zu) failed",
++			  rc, sizeof(struct pmd_obj_erase_work));
++		goto errout;
++	}
 +
-+void mpc_reap_params_add(struct device_attribute *dattr);
++errout:
++	if (rc)
++		pmd_exit();
 +
-+#endif /* MPOOL_REAPER_H */
++	return rc;
++}
++
++void pmd_exit(void)
++{
++	kmem_cache_destroy(pmd_obj_erase_work_cache);
++	kmem_cache_destroy(pmd_layout_priv_cache);
++	kmem_cache_destroy(pmd_layout_cache);
++
++	pmd_obj_erase_work_cache = NULL;
++	pmd_layout_priv_cache = NULL;
++	pmd_layout_cache = NULL;
++}
 -- 
 2.17.2
 
