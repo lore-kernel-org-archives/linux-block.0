@@ -2,94 +2,99 @@ Return-Path: <SRS0=cicp=DF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08B1C2D0A8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 15:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 886B0C4741F
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 15:52:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66AA121D95
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 15:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46E0A2100A
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 15:52:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="C44J497K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aBmR6K3o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726477AbgI1PDl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Sep 2020 11:03:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45330 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726348AbgI1PDl (ORCPT
+        id S1726420AbgI1PwZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Sep 2020 11:52:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44685 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726424AbgI1PwZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Sep 2020 11:03:41 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6536AC061755
-        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2020 08:03:41 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id l14so1561632ilj.7
-        for <linux-block@vger.kernel.org>; Mon, 28 Sep 2020 08:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Xh1VP/VnNfBNF4YXtIYhq/tFvDo4NDnupoPdqgecyK0=;
-        b=C44J497KcQDvfvdsBiKn3FKLvi7DWom6fq6+zvhppAhQO+2k3qW03pQuuBa9raLnyj
-         XOsSohcs970v9YbXtchrMOvvMxjACSEwZN3qlonyK/qwpMK11YJxko8/WoE4398/Pomt
-         Sb+nRjd4WIgBKG/4s5rV1ep5aVSds1ClLeTYgZvsKoWjq8r1e/sKVuHOwnhqkALOs/JK
-         KzG3ZqDWvbANLj/yOlcEq2t1XN10KDS8U2SF/U6ASr6NxJW7wLrD6TQ6JcIAERf1oBMQ
-         uO9Ml5btBlA/z7og3i4v+eXBFvghUTYa3D7On9l0nMo81cvJxGxd1W1z8btVhUsL7TBL
-         DWmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Xh1VP/VnNfBNF4YXtIYhq/tFvDo4NDnupoPdqgecyK0=;
-        b=pDvdsPhvqj3ykRAwB6pgSoxLnYGIMDyffstJ7E9DYs7C7UQVHBF/zOn7ovr7Ke3pl/
-         CvmDPCB3RYngmPqvE2roJsNygQ64SSXD6QhR0Po8R378GnYgOCiuaGSIVbESAl3SJqKj
-         uRUIyKBJ87XI5Eti+i1383atUzuZ/3q5D6uYgXF/bZ+DrJaMzXwOzlhuB2GAf04S+n6r
-         sYKnrd1K48F0vJ9p2B1ziuoB0UieQJBTB3ATV039wK3BFbBLVE97L6eIzBBl0ACcpchJ
-         o2xbOJ1epNY+BwnW6SHdFO1jfaQ8bUp/ZwXFUx02MyNoj5OXM3o1XfRmsg5CLPVIMzN5
-         iDzQ==
-X-Gm-Message-State: AOAM531KA2CwSxGbpUvaAdDsidgDmHfcP35ekbDqhcCFzjyBRAlZtJOv
-        0/dAdJbLKjCZBXcOFZhlAt18mA==
-X-Google-Smtp-Source: ABdhPJxPxQcFv/QNjIea1RXUeViyDl6Wyoxfixl5JT0Sgq3nvWzkIMmovI+VTHNg143wGUAryHA0ng==
-X-Received: by 2002:a05:6e02:1066:: with SMTP id q6mr1391611ilj.12.1601305420673;
-        Mon, 28 Sep 2020 08:03:40 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id m18sm736338ila.27.2020.09.28.08.03.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Sep 2020 08:03:39 -0700 (PDT)
-Subject: Re: [GIT PULL] nvme updates for 5.10
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <20200927072343.GA381603@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f724198e-fd0b-765f-a089-2b03dab899cc@kernel.dk>
-Date:   Mon, 28 Sep 2020 09:03:39 -0600
+        Mon, 28 Sep 2020 11:52:25 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601308344;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kgXIn4BQsJnN5L6cWcBOBBCKst9r4t6llgxKEXMltS8=;
+        b=aBmR6K3okzYl7aIJvzDoOUH+rM4BxHi8HPg+bLD4z4pcWIGWvYHCz6NJwhZwMuvHVuOzIb
+        JNWBI8dUcnrdj3tbky4RJGiYK5m9C0MMRHUA+Mg9ubZjLipQkyLd4yaljPNzLdH3jikgTQ
+        K/Eu9wHWqoNKdmexe7k0Fdt8ALB545o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-590-FSkicAZFOaugcgPTujJ50Q-1; Mon, 28 Sep 2020 11:52:22 -0400
+X-MC-Unique: FSkicAZFOaugcgPTujJ50Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 232E5801F9B;
+        Mon, 28 Sep 2020 15:52:21 +0000 (UTC)
+Received: from [10.10.110.11] (unknown [10.10.110.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 277EF5D9CC;
+        Mon, 28 Sep 2020 15:52:19 +0000 (UTC)
+Reply-To: tasleson@redhat.com
+Subject: Re: [v5 08/12] Add durable_name_printk
+To:     Randy Dunlap <rdunlap@infradead.org>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org
+References: <20200925161929.1136806-1-tasleson@redhat.com>
+ <20200925161929.1136806-9-tasleson@redhat.com>
+ <fbd1b019-04ee-5fda-11c8-95fecf031113@infradead.org>
+From:   Tony Asleson <tasleson@redhat.com>
+Organization: Red Hat
+Message-ID: <0e091001-a260-856c-1e6c-9b6fb7350d26@redhat.com>
+Date:   Mon, 28 Sep 2020 10:52:19 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200927072343.GA381603@infradead.org>
+In-Reply-To: <fbd1b019-04ee-5fda-11c8-95fecf031113@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/27/20 1:23 AM, Christoph Hellwig wrote:
-> The following changes since commit 163090c14a42778c3ccfbdaf39133129bea68632:
+On 9/26/20 6:53 PM, Randy Dunlap wrote:
+> I suggest that these 2 new function names should be
+> 	printk_durable_name()
+> and
+> 	printk_durable_name_ratelimited()
 > 
->   Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.10/drivers (2020-09-25 07:48:20 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-5.10-2020-09-27
+> Those names would be closer to the printk* family of
+> function names.  Of course, you can find exceptions to this,
+> like dev_printk(), but that is in the dev_*() family of
+> function names.
 
-Pulled, thanks.
+durable_name_printk has the same argument signature as dev_printk with
+it's intention that in the future it might be a candidate to get changed
+to dev_printk.  The reason I'm not using dev_printk is to avoid changing
+the content of the message users see.
 
--- 
-Jens Axboe
+With this clarification, do you still suggest the rename or maybe
+suggest something different?
+
+dev_id_printk
+id_printk
+...
+
+I'm also thinking that maybe we should add a new function do everything
+dev_printk does, but without prepending the device driver name and
+device name to the message.  So we can get the metadata adds without
+having the content of the message change.
+
+Thanks
 
