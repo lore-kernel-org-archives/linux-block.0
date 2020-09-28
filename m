@@ -5,30 +5,30 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B30C47423
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E6BCC4742F
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 30A7C20717
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE3832073A
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="gltQyKoj"
+	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="dLVvuACU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726840AbgI1QrW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Sep 2020 12:47:22 -0400
-Received: from mail-dm6nam10on2050.outbound.protection.outlook.com ([40.107.93.50]:3968
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        id S1726864AbgI1QrY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Sep 2020 12:47:24 -0400
+Received: from mail-dm6nam12on2042.outbound.protection.outlook.com ([40.107.243.42]:45972
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726565AbgI1QrT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Sep 2020 12:47:19 -0400
+        id S1726789AbgI1QrV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Sep 2020 12:47:21 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jGqO1wZNTIb/KiUwZXhkyx7wcz2erio9gZ0B7e5H7avMgIKua/bZNgyLfZAy0Kw2KI2lLSL/vDQKmSRVyB227kobLAv//LNjSOw/4r04WaV6BXpxzZ0nDMMrnxXDQx/sPJ9vqiPVt7vCxRDVQXFuIKTHOww1Lr4BOfGZBH51Xd7gkRwK/1yB+8J0ISvT4H6f5s4iHLZnOCijb/prbgzLslq/F5YGP0NNW1rgRQdQYMh5HBUJwJzbJ8GQhannqs10TcnO9FBTGwaNFvzkl7EwyYV5DU3LRi8wpgsLfgQnxAtULerm1qlHuEb+8kbnX7eTpG4EWAULzpyNfa1nuLpW5g==
+ b=EtCC92ARPPfcpqR1dzlFGByVOWHkxuoNXnsnWIoeyNzM2znlf5NwOaW5sEMJMIpNxw3a8HrsodjdoBI0In+KnAf3fyiY6gYHW2RzpUShNvhFGd2bhs/JaHW61dolw5fLzYSNaXEhDgk2Gt2xU9QYaN16O0Lxw+elhhKy6RQkz/Urx6oKBCedmKhvVQ/9YlcBgdZz9qqUnuYrsDSWZbp8Aod8/Yk/5Jg/50D1UQl+NWNJ5FODKaEOPit8n8YBNPnriUC+P7sGo63oJM9nMI3qTcL+qS2C0+WEVXIAlMpYWeEFlnTByksykp2mfWGbSTHDiQCYifeAaAT3ZovknKYrfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tIlBAETom3bLDm0FkXsU59NJb1/nq6FazhMqqkvWe/k=;
- b=ehbzqd5De2z6jpCJCRbDoNVY6yYRzqxQzthZr3fCdGPhMSoVJt+brjmN4I+QEG3wR6sZxXErug0RciCxy+E50oJ2fB239k7QYJ4oYwATlWKnWg5+2NkG9SnOC649TNux0C3A+/R3B7UTV68w6MR7O9mTp17sM7mHiL/2jLl66hEojuwYa0u5AdanK2DbP7IltlsHou/91h0j+9lCGV3YGJzrJEnoGRXIeSALHWC0gVVAadeN42tkUuuwSnFuV5S/VABGqTjHuOb2ViQHu1+th9BYdePl36eSC0IXy51FCA42TXKOBlO053TPt3Wuuqn2EJYtTvZvrWZNmtpgI/SY6A==
+ bh=QAKKfvORnGotFJyve2DtMFNoiL/gMzGI2rxg0no78qA=;
+ b=IdO6fjgZowQtsC4XvtO3G20pZTV33hkgE+DbOZFcJttWA6rzfarIirG/Bs+5lBMgvaTJkiqSlG0k7MpSXfHsuFMGzk+sWx4EjFdrrYkseBD92Ja7fwpQrxcYUqHRSpZs2xs6v1uY93vaofvp2ID7jjpuEjFCJaQX+Q3zFggl4kCoGwk0sjXfsyED0+nyySp1sEt+BJOsFHWJ1zGK1mdJOWVr4MUwQQu5qct14XUF9ITelhDM2rQ9et0SjShcu+mk/MnjrrHraKQy1UxxlmVHkiD67HPbp5u2931xm8VkdtG2yiaCg4TYoMAZsnyC5YdO/WBPuouIkaPDliAqX9P9+Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  137.201.242.130) smtp.rcpttodomain=kvack.org smtp.mailfrom=micron.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=micron.com;
@@ -36,17 +36,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tIlBAETom3bLDm0FkXsU59NJb1/nq6FazhMqqkvWe/k=;
- b=gltQyKojFEmi+i9bPh12ZBFcREU6tT1PKajLromxk2LBMrAVdkJ0sYqXg5jQxpAdSm9wlnCyHGS4Cex8WJ105ZopfxdjEHVfDB6U8xdRtpXWkg/FeK2NlezeQjt1B2dbtQcWMadsltQXAVeng1Y8y0xhjkGTdvkNTcFhjt/fOg8=
-Received: from BN6PR17CA0044.namprd17.prod.outlook.com (2603:10b6:405:75::33)
- by BYAPR08MB4245.namprd08.prod.outlook.com (2603:10b6:a03::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3412.29; Mon, 28 Sep 2020 16:47:11 +0000
+ bh=QAKKfvORnGotFJyve2DtMFNoiL/gMzGI2rxg0no78qA=;
+ b=dLVvuACUraQ6N73CVZJgsg/SG6Tavt6LtuNXOtNPw5mon2Nomc27y9Yt1Q9UeIj2KJImYd9nN6QP2+Gtb8vl4p1w8xfKq7imvwLc+C60/CtehjVZDOTynBE19mKTBecWGFinVZMTW2XvqxS9TDI4aSbrIGWCWQdnriinGgpMDHA=
+Received: from BN6PR17CA0049.namprd17.prod.outlook.com (2603:10b6:405:75::38)
+ by BY5PR08MB6311.namprd08.prod.outlook.com (2603:10b6:a03:1e1::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20; Mon, 28 Sep
+ 2020 16:47:16 +0000
 Received: from BN3NAM01FT020.eop-nam01.prod.protection.outlook.com
- (2603:10b6:405:75:cafe::3b) by BN6PR17CA0044.outlook.office365.com
- (2603:10b6:405:75::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20 via Frontend
- Transport; Mon, 28 Sep 2020 16:47:11 +0000
+ (2603:10b6:405:75:cafe::db) by BN6PR17CA0049.outlook.office365.com
+ (2603:10b6:405:75::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.21 via Frontend
+ Transport; Mon, 28 Sep 2020 16:47:16 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 137.201.242.130)
  smtp.mailfrom=micron.com; kvack.org; dkim=none (message not signed)
  header.d=none;kvack.org; dmarc=pass action=none header.from=micron.com;
@@ -56,19 +57,19 @@ Received-SPF: Pass (protection.outlook.com: domain of micron.com designates
 Received: from mail.micron.com (137.201.242.130) by
  BN3NAM01FT020.mail.protection.outlook.com (10.152.67.227) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3412.21 via Frontend Transport; Mon, 28 Sep 2020 16:47:10 +0000
+ 15.20.3412.21 via Frontend Transport; Mon, 28 Sep 2020 16:47:16 +0000
 Received: from micron.com (10.114.5.55) by bowex17c.micron.com
  (137.201.21.211) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 28 Sep
- 2020 10:47:06 -0600
+ 2020 10:47:12 -0600
 From:   <nmeeramohide@micron.com>
 To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-mm@kvack.org>,
         <linux-nvdimm@lists.01.org>
 CC:     <smoyer@micron.com>, <gbecker@micron.com>, <plabat@micron.com>,
         <jgroves@micron.com>, Nabeel M Mohamed <nmeeramohide@micron.com>
-Subject: [PATCH 09/22] mpool: add mblock lifecycle management and IO routines
-Date:   Mon, 28 Sep 2020 11:45:21 -0500
-Message-ID: <20200928164534.48203-10-nmeeramohide@micron.com>
+Subject: [PATCH 16/22] mpool: add mpool control plane utility routines
+Date:   Mon, 28 Sep 2020 11:45:28 -0500
+Message-ID: <20200928164534.48203-17-nmeeramohide@micron.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20200928164534.48203-1-nmeeramohide@micron.com>
 References: <20200928164534.48203-1-nmeeramohide@micron.com>
@@ -77,63 +78,63 @@ Content-Type: text/plain
 X-ClientProxiedBy: bowex17d.micron.com (137.201.21.212) To bowex17c.micron.com
  (137.201.21.211)
 X-TM-AS-Product-Ver: SMEX-12.0.0.1782-8.200.1013-24646.005
-X-TM-AS-Result: No--14.586700-0.000000-31
-X-TM-AS-MatchedID: 702732-703812-705244-701073-702751-703115-704949-704585-7
-        01844-704318-701656-703966-704499-704397-700335-705161-113230-701480-701809
-        -703017-703140-702395-188019-703213-121336-701105-704673-703967-703027-7024
-        15-701275-703815-702754-704895-702688-701964-780039-701880-105250-705018-70
-        1744-703534-704002-704477-703694-700714-851458-700958-704401-700717-702779-
-        702960-702874-701919-704749-701847-847575-703080-703215-704714-700286-70281
-        2-702719-703286-703953-701723-825159-703357-702914-703958-705247-121270-704
-        264-703816-703954-700863-704418-701698-703904-704001-702525-700698-704718-7
-        03117-702558-701032-701724-148004-148036-42000-42003
+X-TM-AS-Result: No--14.691100-0.000000-31
+X-TM-AS-MatchedID: 700076-703504-702422-704714-704926-701342-701478-703215-7
+        03967-704983-704929-701330-703027-701480-701809-703017-702395-188019-703812
+        -702914-704318-121224-702299-704477-300015-703140-703213-121336-701105-7046
+        73-702754-702617-702433-705022-703173-702298-105700-702876-703285-700863-12
+        1367-139504-703279-701270-704978-703904-703534-701919-704949-703932-700064-
+        702877-701510-703865-704239-117072-701750-700050-702853-106420-704960-70400
+        2-701964-703405-703160-700716-700714-700512-703532-703080-704061-701628-701
+        963-703357-702415-702490-704718-700069-703878-703347-701443-704397-704127-1
+        88199-702102-148004-148036-42000-42003
 X-TM-AS-User-Approved-Sender: Yes
 X-TM-AS-User-Blocked-Sender: No
 X-MT-Whitelisted: matched
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 530afe5f-7fd9-4b46-230f-08d863ce2523
-X-MS-TrafficTypeDiagnostic: BYAPR08MB4245:
-X-Microsoft-Antispam-PRVS: <BYAPR08MB42457F50959E6E53CB4BA223B3350@BYAPR08MB4245.namprd08.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 506a84fc-6d57-4582-9d6e-08d863ce283b
+X-MS-TrafficTypeDiagnostic: BY5PR08MB6311:
+X-Microsoft-Antispam-PRVS: <BY5PR08MB6311A752554229FD06F3F284B3350@BY5PR08MB6311.namprd08.prod.outlook.com>
 X-MS-Exchange-Transport-Forked: True
 X-EXT-ByPass: 1
 X-MT-RULE-Whitelisted: Triggered
-X-MS-Oob-TLC-OOBClassifiers: OLM:104;
+X-MS-Oob-TLC-OOBClassifiers: OLM:348;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lm7Rgw3g9SobWsydA3TOC5PsPqYMm3fnIVjHf1yW4c9blH6w406EX6eryNMyrCP9wRy7bBr3WZ/ZTLv6MUuYXpzOs23RVGeFGFh3GF/ieFczcUy6ndIMS4vIPXn/cVCTyb42KBCVI2iLyuXpbGl0XDYouL4UmTUcbbuCkL5xax9lNMYJ0z83Sb36F7N2PbmnDUolTVsy7qjjjvBNCQ2A3tU7Ua5MK0guW/2gLELD/cEBS0BO9jSGU9pNhCr/h5fnXZdL+plN4l9Iu+IfW3LZB0oXphK/OwuO3hmtvlQg5FnS2kj3iQipyd4b6s4oqXtfIt0V7xvJTxt1AADbUznfIpL05cizsXAwYbIIw+Nxxty9R4+0wBpLfS5Ex7HOxRiNERr28wEoG/VZredRxUbueZEFolkL4F8/p2Gx5YQ76gsa3Ce4alTpv8z57sav3tVLDBGHTl6ia1irMYZuX9VVTondzI3JgGoCSVS13Tvc3wWX0aEFvGPa/lukxp8TWAGY
-X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(376002)(346002)(136003)(39860400002)(396003)(46966005)(2616005)(36756003)(7696005)(26005)(6666004)(186003)(8936002)(8676002)(316002)(110136005)(426003)(2906002)(54906003)(336012)(55016002)(2876002)(5660300002)(107886003)(82310400003)(86362001)(6286002)(70206006)(70586007)(1076003)(82740400003)(7636003)(478600001)(356005)(47076004)(83380400001)(4326008)(30864003)(33310700002)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: HrycJmhehAkd3nEUNdHXtAxAIXWTbND7G/hGAUYYFDcCbv3BaPCPDZyGxAYqTQgrUpV+JGhSWrF6IDTVovMF5hNHGn0rxAg3rQvW2G059NrPJFIziXOZ7uuGuKOp9pKPZOAvJWs+NDJws4Fv51tic1k9W1eE6eHh8V8Z8MG60M+pO2vg81dbCqvyA3y7wMP/cEu5E2hvpZFMVhRR51dlGMNrRJuwsOdUFSDnuibKyZpRtTXKQI2VIaJVNHkgGICnYyvfc2f1hLxlPmtROBINZHzDPuc2sUM9c9evKLjeexHbutyBCcGbF0ZTiLcJMjn0eP69MmMUjGgjxjeAzO+OB2wt3Fuecoay2YCHPNia7Rap0DOiaLhzOo74pLW6zvpzwZB6ixlAjyVkfHNhWaAi6a87XzV6yA0HZXcTnNeEYll5m9AmS4B1iCXEdo26GJ55h2JMSO72/TmJ52cqM6IYR8Ky3HAWO47yYH4/Us2QS61VIvODf2R5er7eHLltXgiF
+X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(376002)(346002)(396003)(39860400002)(136003)(46966005)(8676002)(478600001)(1076003)(54906003)(316002)(110136005)(6286002)(83380400001)(86362001)(356005)(33310700002)(7636003)(70586007)(70206006)(82310400003)(82740400003)(7696005)(36756003)(2616005)(6666004)(2876002)(4326008)(5660300002)(8936002)(2906002)(426003)(107886003)(26005)(186003)(55016002)(30864003)(336012)(47076004)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: micron.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2020 16:47:10.8798
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2020 16:47:16.0644
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 530afe5f-7fd9-4b46-230f-08d863ce2523
+X-MS-Exchange-CrossTenant-Network-Message-Id: 506a84fc-6d57-4582-9d6e-08d863ce283b
 X-MS-Exchange-CrossTenant-Id: f38a5ecd-2813-4862-b11b-ac1d563c806f
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f38a5ecd-2813-4862-b11b-ac1d563c806f;Ip=[137.201.242.130];Helo=[mail.micron.com]
 X-MS-Exchange-CrossTenant-AuthSource: BN3NAM01FT020.eop-nam01.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR08MB4245
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR08MB6311
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 From: Nabeel M Mohamed <nmeeramohide@micron.com>
 
-Implements the mblock lifecycle management functions: allocate,
-commit, abort, read, write, destroy etc.
+This adds the mpool control plane infrastructure to manage
+mpools.
 
-Mblocks are containers comprising a linear sequence of bytes that
-can be written exactly once, are immutable after writing, and can
-be read in whole or in part as needed until deleted.
+There is a unit object instance for each device object
+created by the mpool driver. A minor number is reserved
+for each unit object.
 
-Mpool currently supports only fixed size mblocks whose size is the
-same as the zone size and is established at mpool create.
+The mpool control device (/dev/mpoolctl) gets a minor
+number of 0. An mpool device (/dev/mpool/<mpool_name>)
+gets a minor number > 0. Utility routines exist to lookup
+an mpool unit given its minor number or name.
 
-Mblock API uses the metadata manager interface to reserve storage
-space at allocation time, store metadata for the mblock in its
-associated MDC-K when committing it, record end-of-life for the
-mblock in its associated MDC-K when deleting it and read/write
-mblock data.
+All units are born with a reference count of two -
+one for the caller and a birth reference that can be released
+only by either destroying the unit or unloading the module.
 
 Co-developed-by: Greg Becker <gbecker@micron.com>
 Signed-off-by: Greg Becker <gbecker@micron.com>
@@ -143,617 +144,717 @@ Co-developed-by: John Groves <jgroves@micron.com>
 Signed-off-by: John Groves <jgroves@micron.com>
 Signed-off-by: Nabeel M Mohamed <nmeeramohide@micron.com>
 ---
- drivers/mpool/mblock.c | 432 +++++++++++++++++++++++++++++++++++++++++
- drivers/mpool/mblock.h | 161 +++++++++++++++
- 2 files changed, 593 insertions(+)
- create mode 100644 drivers/mpool/mblock.c
- create mode 100644 drivers/mpool/mblock.h
+ drivers/mpool/init.c  |  20 ++
+ drivers/mpool/init.h  |   3 +
+ drivers/mpool/mpctl.c | 466 ++++++++++++++++++++++++++++++++++++++++++
+ drivers/mpool/mpctl.h |  50 +++++
+ drivers/mpool/sysfs.c |  48 +++++
+ drivers/mpool/sysfs.h |  48 +++++
+ 6 files changed, 635 insertions(+)
+ create mode 100644 drivers/mpool/mpctl.c
+ create mode 100644 drivers/mpool/mpctl.h
+ create mode 100644 drivers/mpool/sysfs.c
+ create mode 100644 drivers/mpool/sysfs.h
 
-diff --git a/drivers/mpool/mblock.c b/drivers/mpool/mblock.c
+diff --git a/drivers/mpool/init.c b/drivers/mpool/init.c
+index eb1217f63746..126c6c7142b5 100644
+--- a/drivers/mpool/init.c
++++ b/drivers/mpool/init.c
+@@ -12,10 +12,23 @@
+ #include "smap.h"
+ #include "pmd_obj.h"
+ #include "sb.h"
++#include "mpctl.h"
+ 
+ /*
+  * Module params...
+  */
++unsigned int maxunits __read_mostly = 1024;
++module_param(maxunits, uint, 0444);
++MODULE_PARM_DESC(maxunits, " max mpools");
++
++unsigned int rwsz_max_mb __read_mostly = 32;
++module_param(rwsz_max_mb, uint, 0444);
++MODULE_PARM_DESC(rwsz_max_mb, " max mblock/mlog r/w size (mB)");
++
++unsigned int rwconc_max __read_mostly = 8;
++module_param(rwconc_max, uint, 0444);
++MODULE_PARM_DESC(rwconc_max, " max mblock/mlog large r/w concurrency");
++
+ unsigned int rsvd_bios_max __read_mostly = 16;
+ module_param(rsvd_bios_max, uint, 0444);
+ MODULE_PARM_DESC(rsvd_bios_max, "max reserved bios in mpool bioset");
+@@ -26,6 +39,7 @@ MODULE_PARM_DESC(chunk_size_kb, "Chunk size (in KiB) for device I/O");
+ 
+ static void mpool_exit_impl(void)
+ {
++	mpctl_exit();
+ 	pmd_exit();
+ 	smap_exit();
+ 	sb_exit();
+@@ -68,6 +82,12 @@ static __init int mpool_init(void)
+ 		goto errout;
+ 	}
+ 
++	rc = mpctl_init();
++	if (rc) {
++		errmsg = "mpctl init failed";
++		goto errout;
++	}
++
+ errout:
+ 	if (rc) {
+ 		mp_pr_err("%s", rc, errmsg);
+diff --git a/drivers/mpool/init.h b/drivers/mpool/init.h
+index e02a9672e727..3d8f809a5e45 100644
+--- a/drivers/mpool/init.h
++++ b/drivers/mpool/init.h
+@@ -6,6 +6,9 @@
+ #ifndef MPOOL_INIT_H
+ #define MPOOL_INIT_H
+ 
++extern unsigned int maxunits;
++extern unsigned int rwsz_max_mb;
++extern unsigned int rwconc_max;
+ extern unsigned int rsvd_bios_max;
+ extern int chunk_size_kb;
+ 
+diff --git a/drivers/mpool/mpctl.c b/drivers/mpool/mpctl.c
 new file mode 100644
-index 000000000000..10c47ec74ff6
+index 000000000000..4f3600840ff0
 --- /dev/null
-+++ b/drivers/mpool/mblock.c
-@@ -0,0 +1,432 @@
++++ b/drivers/mpool/mpctl.c
+@@ -0,0 +1,466 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
 +
-+/*
-+ * DOC: Module info.
-+ *
-+ * Mblock module.
-+ *
-+ * Defines functions for writing, reading, and managing the lifecycle
-+ * of mblocks.
-+ *
-+ */
-+
-+#include <linux/vmalloc.h>
-+#include <linux/blk_types.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/device.h>
++#include <linux/cdev.h>
++#include <linux/log2.h>
++#include <linux/idr.h>
++#include <linux/fs.h>
 +#include <linux/mm.h>
++#include <linux/blkdev.h>
++#include <linux/vmalloc.h>
++#include <linux/memcontrol.h>
++#include <linux/pagemap.h>
++#include <linux/kobject.h>
++#include <linux/mm_inline.h>
++#include <linux/version.h>
++#include <linux/kref.h>
++
++#include <linux/backing-dev.h>
++#include <linux/spinlock.h>
++#include <linux/list.h>
++#include <linux/rbtree.h>
++#include <linux/migrate.h>
++#include <linux/delay.h>
++#include <linux/ctype.h>
++#include <linux/uio.h>
++#include <linux/prefetch.h>
 +
 +#include "mpool_printk.h"
 +#include "assert.h"
 +
-+#include "pd.h"
-+#include "pmd_obj.h"
-+#include "mpcore.h"
-+#include "mblock.h"
++#include "mpool_ioctl.h"
++#include "mlog.h"
++#include "mp.h"
++#include "mpctl.h"
++#include "sysfs.h"
++#include "init.h"
++
++
++#define NODEV               MKDEV(0, 0)    /* Non-existent device */
++
++/* mpc pseudo-driver instance data (i.e., all globals live here). */
++struct mpc_softstate {
++	struct mutex        ss_lock;        /* Protects ss_unitmap */
++	struct idr          ss_unitmap;     /* minor-to-unit map */
++
++	____cacheline_aligned
++	struct semaphore    ss_op_sema;     /* Serialize mgmt. ops */
++	dev_t               ss_devno;       /* Control device devno */
++	struct cdev         ss_cdev;
++	struct class       *ss_class;
++	bool                ss_inited;
++};
++
++/* Unit-type specific information. */
++struct mpc_uinfo {
++	const char     *ui_typename;
++	const char     *ui_subdirfmt;
++};
++
++/* One mpc_mpool object per mpool. */
++struct mpc_mpool {
++	struct kref                 mp_ref;
++	struct rw_semaphore         mp_lock;
++	struct mpool_descriptor    *mp_desc;
++	struct mp_mdc              *mp_mdc;
++	uint                        mp_dpathc;
++	char                      **mp_dpathv;
++	char                        mp_name[];
++};
++
++/* The following structures are initialized at the end of this file. */
++static const struct file_operations mpc_fops_default;
++
++static struct mpc_softstate mpc_softstate;
++
++static unsigned int mpc_ctl_uid __read_mostly;
++static unsigned int mpc_ctl_gid __read_mostly = 6;
++static unsigned int mpc_ctl_mode __read_mostly = 0664;
++
++static const struct mpc_uinfo mpc_uinfo_ctl = {
++	.ui_typename = "mpoolctl",
++	.ui_subdirfmt = "%s",
++};
++
++static const struct mpc_uinfo mpc_uinfo_mpool = {
++	.ui_typename = "mpool",
++	.ui_subdirfmt = "mpool/%s",
++};
++
++static inline bool mpc_unit_isctldev(const struct mpc_unit *unit)
++{
++	return (unit->un_uinfo == &mpc_uinfo_ctl);
++}
++
++static inline bool mpc_unit_ismpooldev(const struct mpc_unit *unit)
++{
++	return (unit->un_uinfo == &mpc_uinfo_mpool);
++}
++
++static inline uid_t mpc_current_uid(void)
++{
++	return from_kuid(current_user_ns(), current_uid());
++}
++
++static inline gid_t mpc_current_gid(void)
++{
++	return from_kgid(current_user_ns(), current_gid());
++}
 +
 +/**
-+ * mblock2layout() - convert opaque mblock handle to pmd_layout
-+ *
-+ * This function converts the opaque handle (mblock_descriptor) used by
-+ * clients to the internal representation (pmd_layout).  The
-+ * conversion is a simple cast, followed by a sanity check to verify the
-+ * layout object is an mblock object.  If the validation fails, a NULL
-+ * pointer is returned.
++ * mpc_mpool_release() - release kref handler for mpc_mpool object
++ * @refp:  kref pointer
 + */
-+static struct pmd_layout *mblock2layout(struct mblock_descriptor *mbh)
++static void mpc_mpool_release(struct kref *refp)
 +{
-+	struct pmd_layout *layout = (void *)mbh;
-+
-+	if (!layout)
-+		return NULL;
-+
-+	ASSERT(layout->eld_objid > 0);
-+	ASSERT(kref_read(&layout->eld_ref) >= 2);
-+
-+	return mblock_objid(layout->eld_objid) ? layout : NULL;
-+}
-+
-+static u32 mblock_optimal_iosz_get(struct mpool_descriptor *mp, struct pmd_layout *layout)
-+{
-+	struct mpool_dev_info *pd = pmd_layout_pd_get(mp, layout);
-+
-+	return pd->pdi_optiosz;
-+}
-+
-+/**
-+ * layout2mblock() - convert pmd_layout to opaque mblock_descriptor
-+ *
-+ * This function converts the internally used pmd_layout to
-+ * the externally used opaque mblock_descriptor.
-+ */
-+static struct mblock_descriptor *layout2mblock(struct pmd_layout *layout)
-+{
-+	return (struct mblock_descriptor *)layout;
-+}
-+
-+static void mblock_getprops_cmn(struct mpool_descriptor *mp, struct pmd_layout *layout,
-+				struct mblock_props *prop)
-+{
-+	struct mpool_dev_info *pd;
-+
-+	pd = pmd_layout_pd_get(mp, layout);
-+
-+	prop->mpr_objid = layout->eld_objid;
-+	prop->mpr_alloc_cap = pmd_layout_cap_get(mp, layout);
-+	prop->mpr_write_len = layout->eld_mblen;
-+	prop->mpr_optimal_wrsz = mblock_optimal_iosz_get(mp, layout);
-+	prop->mpr_mclassp = pd->pdi_mclass;
-+	prop->mpr_iscommitted = layout->eld_state & PMD_LYT_COMMITTED;
-+}
-+
-+static int mblock_alloc_cmn(struct mpool_descriptor *mp, u64 objid,
-+			    enum mp_media_classp mclassp, bool spare,
-+			    struct mblock_props *prop, struct mblock_descriptor **mbh)
-+{
-+	struct pmd_obj_capacity ocap = { .moc_spare = spare };
-+	struct pmd_layout *layout = NULL;
++	struct mpc_mpool *mpool = container_of(refp, struct mpc_mpool, mp_ref);
 +	int rc;
 +
-+	if (!mp)
-+		return -EINVAL;
-+
-+	*mbh = NULL;
-+
-+	if (!objid) {
-+		rc = pmd_obj_alloc(mp, OMF_OBJ_MBLOCK, &ocap, mclassp, &layout);
++	if (mpool->mp_desc) {
++		rc = mpool_deactivate(mpool->mp_desc);
 +		if (rc)
-+			return rc;
-+	} else {
-+		rc = pmd_obj_realloc(mp, objid, &ocap, mclassp, &layout);
-+		if (rc) {
-+			if (rc != -ENOENT)
-+				mp_pr_err("mpool %s, re-allocating mblock 0x%lx failed",
-+					  rc, mp->pds_name, (ulong)objid);
-+			return rc;
-+		}
++			mp_pr_err("mpool %s deactivate failed", rc, mpool->mp_name);
 +	}
 +
-+	if (!layout)
-+		return -ENOTRECOVERABLE;
++	kfree(mpool->mp_dpathv);
++	kfree(mpool);
 +
-+	if (prop) {
-+		pmd_obj_rdlock(layout);
-+		mblock_getprops_cmn(mp, layout, prop);
-+		pmd_obj_rdunlock(layout);
-+	}
-+
-+	*mbh = layout2mblock(layout);
-+
-+	return 0;
++	module_put(THIS_MODULE);
 +}
 +
-+int mblock_alloc(struct mpool_descriptor *mp, enum mp_media_classp mclassp, bool spare,
-+		 struct mblock_descriptor **mbh, struct mblock_props *prop)
++static void mpc_mpool_put(struct mpc_mpool *mpool)
 +{
-+	return mblock_alloc_cmn(mp, 0, mclassp, spare, prop, mbh);
-+}
-+
-+int mblock_find_get(struct mpool_descriptor *mp, u64 objid, int which,
-+		    struct mblock_props *prop, struct mblock_descriptor **mbh)
-+{
-+	struct pmd_layout *layout;
-+
-+	*mbh = NULL;
-+
-+	if (!mblock_objid(objid))
-+		return -EINVAL;
-+
-+	layout = pmd_obj_find_get(mp, objid, which);
-+	if (!layout)
-+		return -ENOENT;
-+
-+	if (prop) {
-+		pmd_obj_rdlock(layout);
-+		mblock_getprops_cmn(mp, layout, prop);
-+		pmd_obj_rdunlock(layout);
-+	}
-+
-+	*mbh = layout2mblock(layout);
-+
-+	return 0;
-+}
-+
-+void mblock_put(struct mblock_descriptor *mbh)
-+{
-+	struct pmd_layout *layout;
-+
-+	layout = mblock2layout(mbh);
-+	if (layout)
-+		pmd_obj_put(layout);
-+}
-+
-+/*
-+ * Helper function to log a message that many functions need to log:
-+ */
-+#define mp_pr_layout_not_found(_mp, _mbh)				\
-+do {									\
-+	static unsigned long state;					\
-+	uint dly = msecs_to_jiffies(1000);				\
-+									\
-+	if (printk_timed_ratelimit(&state, dly)) {			\
-+		mp_pr_warn("mpool %s, layout not found: mbh %p",	\
-+			   (_mp)->pds_name, (_mbh));			\
-+		dump_stack();						\
-+	}								\
-+} while (0)
-+
-+int mblock_commit(struct mpool_descriptor *mp, struct mblock_descriptor *mbh)
-+{
-+	struct mpool_dev_info *pd;
-+	struct pmd_layout *layout;
-+	int rc;
-+
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	pd = pmd_layout_pd_get(mp, layout);
-+	if (!pd->pdi_fua) {
-+		rc = pd_dev_flush(&pd->pdi_parm);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	/* Commit will fail with EBUSY if aborting flag set. */
-+	rc = pmd_obj_commit(mp, layout);
-+	if (rc) {
-+		mp_pr_rl("mpool %s, committing mblock 0x%lx failed",
-+			 rc, mp->pds_name, (ulong)layout->eld_objid);
-+		return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+int mblock_abort(struct mpool_descriptor *mp, struct mblock_descriptor *mbh)
-+{
-+	struct pmd_layout *layout;
-+	int rc;
-+
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	rc = pmd_obj_abort(mp, layout);
-+	if (rc) {
-+		mp_pr_err("mpool %s, aborting mblock 0x%lx failed",
-+			  rc, mp->pds_name, (ulong)layout->eld_objid);
-+		return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+int mblock_delete(struct mpool_descriptor *mp, struct mblock_descriptor *mbh)
-+{
-+	struct pmd_layout *layout;
-+
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	return pmd_obj_delete(mp, layout);
++	kref_put(&mpool->mp_ref, mpc_mpool_release);
 +}
 +
 +/**
-+ * mblock_rw_argcheck() - Validate mblock_write() and mblock_read().
-+ * @mp:      Mpool descriptor
-+ * @layout:  Layout of the mblock
-+ * @iov:     iovec array
-+ * @iovcnt:  iovec count
-+ * @boff:    Byte offset into the layout.  Must be equal to layout->eld_mblen for write
-+ * @rw:      MPOOL_OP_READ or MPOOL_OP_WRITE
-+ * @len:     number of bytes in iov list
++ * mpc_unit_create() - Create and install a unit object
++ * @path:         device path under "/dev/" to create
++ * @mpool:        mpool ptr
++ * @unitp:        unit ptr
 + *
-+ * Returns: 0 if successful, -errno otherwise
++ * Create a unit object and install a NULL ptr for it in the units map,
++ * thereby reserving a minor number.  The unit cannot be found by any
++ * of the lookup routines until the NULL ptr is replaced by the actual
++ * ptr to the unit.
 + *
-+ * Note: be aware that there are checks in this function that prevent illegal
-+ * arguments in lower level functions (lower level functions should assert the
-+ * requirements but not otherwise check them)
++ * A unit maps an mpool device (.e.g., /dev/mpool/foo)  to an mpool object
++ * created by mpool_create().
++ *
++ * All units are born with two references, one for the caller and one that
++ * can only be released by destroying the unit or unloading the module.
++ *
++ * Return:  Returns 0 if successful and sets *unitp.
++ *          Returns -errno on error.
 + */
-+static int mblock_rw_argcheck(struct mpool_descriptor *mp, struct pmd_layout *layout,
-+			      loff_t boff, int rw, size_t len)
++static int mpc_unit_create(const char *name, struct mpc_mpool *mpool, struct mpc_unit **unitp)
 +{
-+	u64 opt_iosz;
-+	u32 mblock_cap;
-+	int rc;
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpc_unit *unit;
++	size_t unitsz;
++	int minor;
 +
-+	mblock_cap = pmd_layout_cap_get(mp, layout);
-+	opt_iosz = mblock_optimal_iosz_get(mp, layout);
++	if (!ss || !name || !unitp)
++		return -EINVAL;
 +
-+	if (rw == MPOOL_OP_READ) {
-+		/* boff must be a multiple of the OS page size */
-+		if (!PAGE_ALIGNED(boff)) {
-+			rc = -EINVAL;
-+			mp_pr_err("mpool %s, read offset 0x%lx is not multiple of OS page size",
-+				  rc, mp->pds_name, (ulong) boff);
-+			return rc;
-+		}
++	unitsz = sizeof(*unit) + strlen(name) + 1;
 +
-+		/* Check that boff is not past end of mblock capacity. */
-+		if (mblock_cap <= boff) {
-+			rc = -EINVAL;
-+			mp_pr_err("mpool %s, read offset 0x%lx >= mblock capacity 0x%x",
-+				  rc, mp->pds_name, (ulong)boff, mblock_cap);
-+			return rc;
-+		}
++	unit = kzalloc(unitsz, GFP_KERNEL);
++	if (!unit)
++		return -ENOMEM;
 +
-+		/*
-+		 * Check that the request does not extend past the data
-+		 * written.  Don't record an error if this appears to
-+		 * be an mcache readahead request.
-+		 *
-+		 * TODO: Use (len != MCACHE_RA_PAGES_MAX)
-+		 */
-+		if (boff + len > layout->eld_mblen)
-+			return -EINVAL;
-+	} else {
-+		/* Write boff required to match eld_mblen */
-+		if (boff != layout->eld_mblen) {
-+			rc = -EINVAL;
-+			mp_pr_err("mpool %s write boff (%ld) != eld_mblen (%d)",
-+				  rc, mp->pds_name, (ulong)boff, layout->eld_mblen);
-+			return rc;
-+		}
++	strcpy(unit->un_name, name);
 +
-+		/* Writes must be optimal iosz aligned */
-+		if (boff % opt_iosz) {
-+			rc = -EINVAL;
-+			mp_pr_err("mpool %s, write not optimal iosz aligned, offset 0x%lx",
-+				  rc, mp->pds_name, (ulong)boff);
-+			return rc;
-+		}
++	sema_init(&unit->un_open_lock, 1);
++	unit->un_open_excl = false;
++	unit->un_open_cnt = 0;
++	unit->un_devno = NODEV;
++	kref_init(&unit->un_ref);
++	unit->un_mpool = mpool;
 +
-+		/* Check for write past end of allocated space (!) */
-+		if ((len + boff) > mblock_cap) {
-+			rc = -EINVAL;
-+			mp_pr_err("(write): len %lu + boff %lu > mblock_cap %lu",
-+				  rc, (ulong)len, (ulong)boff, (ulong)mblock_cap);
-+			return rc;
-+		}
++	mutex_lock(&ss->ss_lock);
++	minor = idr_alloc(&ss->ss_unitmap, NULL, 0, -1, GFP_KERNEL);
++	mutex_unlock(&ss->ss_lock);
++
++	if (minor < 0) {
++		kfree(unit);
++		return minor;
 +	}
++
++	kref_get(&unit->un_ref); /* acquire additional ref for the caller */
++
++	unit->un_devno = MKDEV(MAJOR(ss->ss_cdev.dev), minor);
++	*unitp = unit;
 +
 +	return 0;
 +}
 +
-+int mblock_write(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+		 const struct kvec *iov, int iovcnt, size_t len)
++/**
++ * mpc_unit_release() - Destroy a unit object created by mpc_unit_create().
++ * @unit:
++ */
++static void mpc_unit_release(struct kref *refp)
 +{
-+	struct pmd_layout *layout;
-+	loff_t boff;
-+	u8 state;
-+	int rc;
++	struct mpc_unit *unit = container_of(refp, struct mpc_unit, un_ref);
++	struct mpc_softstate *ss = &mpc_softstate;
 +
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
++	mutex_lock(&ss->ss_lock);
++	idr_remove(&ss->ss_unitmap, MINOR(unit->un_devno));
++	mutex_unlock(&ss->ss_lock);
 +
-+	rc = mblock_rw_argcheck(mp, layout, layout->eld_mblen, MPOOL_OP_WRITE, len);
-+	if (rc) {
-+		mp_pr_debug("mblock write argcheck failed ", rc);
-+		return rc;
-+	}
++	if (unit->un_mpool)
++		mpc_mpool_put(unit->un_mpool);
 +
-+	if (len == 0)
-+		return 0;
++	if (unit->un_device)
++		device_destroy(ss->ss_class, unit->un_devno);
 +
-+	boff = layout->eld_mblen;
-+
-+	ASSERT(PAGE_ALIGNED(len));
-+	ASSERT(PAGE_ALIGNED(boff));
-+	ASSERT(iovcnt == (len >> PAGE_SHIFT));
-+
-+	pmd_obj_wrlock(layout);
-+	state = layout->eld_state;
-+	if (!(state & PMD_LYT_COMMITTED)) {
-+		struct mpool_dev_info *pd = pmd_layout_pd_get(mp, layout);
-+		int flags = 0;
-+
-+		if (pd->pdi_fua)
-+			flags = REQ_FUA;
-+
-+		rc = pmd_layout_rw(mp, layout, iov, iovcnt, boff, flags, MPOOL_OP_WRITE);
-+		if (!rc)
-+			layout->eld_mblen += len;
-+	}
-+	pmd_obj_wrunlock(layout);
-+
-+	return !(state & PMD_LYT_COMMITTED) ? rc : -EALREADY;
++	kfree(unit);
 +}
 +
-+int mblock_read(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+		const struct kvec *iov, int iovcnt, loff_t boff, size_t len)
++static void mpc_unit_put(struct mpc_unit *unit)
 +{
-+	struct pmd_layout *layout;
-+	u8 state;
++	if (unit)
++		kref_put(&unit->un_ref, mpc_unit_release);
++}
++
++/**
++ * mpc_unit_setup() - Create a device unit object and special file
++ * @uinfo:
++ * @name:
++ * @cfg:
++ * @mpool:
++ * @unitp: unitp can be NULL. *unitp is updated only if unitp is not NULL
++ *	and no error is returned.
++ *
++ * If successful, this function adopts mpool.  On failure, mpool
++ * remains the responsibility of the caller.
++ *
++ * All units are born with two references, one for the caller and one
++ * that can only be released by destroying the unit or unloading the
++ * module. If the caller passes in nil for unitp then this function
++ * will drop the caller's "caller reference" on his behalf.
++ *
++ * Return:  Returns 0 on success, -errno otherwise...
++ */
++static int mpc_unit_setup(const struct mpc_uinfo *uinfo, const char *name,
++			  const struct mpool_config *cfg, struct mpc_mpool *mpool,
++			  struct mpc_unit **unitp)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpc_unit *unit;
++	struct device *device;
 +	int rc;
 +
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
++	if (!ss || !uinfo || !name || !name[0] || !cfg || !unitp)
 +		return -EINVAL;
-+	}
 +
-+	rc = mblock_rw_argcheck(mp, layout, boff, MPOOL_OP_READ, len);
-+	if (rc) {
-+		mp_pr_debug("mblock read argcheck failed ", rc);
-+		return rc;
-+	}
++	if (cfg->mc_uid == -1 || cfg->mc_gid == -1 || cfg->mc_mode == -1)
++		return -EINVAL;
 +
-+	if (len == 0)
-+		return 0;
++	if (!capable(CAP_MKNOD))
++		return -EPERM;
 +
-+	ASSERT(PAGE_ALIGNED(len));
-+	ASSERT(PAGE_ALIGNED(boff));
-+	ASSERT(iovcnt == (len >> PAGE_SHIFT));
++	if (cfg->mc_uid != mpc_current_uid() && !capable(CAP_CHOWN))
++		return -EPERM;
++
++	if (cfg->mc_gid != mpc_current_gid() && !capable(CAP_CHOWN))
++		return -EPERM;
++
++	if (mpool && strcmp(mpool->mp_name, name))
++		return -EINVAL;
++
++	*unitp = NULL;
++	unit = NULL;
 +
 +	/*
-+	 * Read lock the mblock layout; mblock reads can proceed concurrently;
-+	 * Mblock writes are serialized but concurrent with reads
++	 * Try to create a new unit object.  If successful, then all error
++	 * handling beyond this point must route through the errout label
++	 * to ensure the unit is fully destroyed.
 +	 */
-+	pmd_obj_rdlock(layout);
-+	state = layout->eld_state;
-+	if (state & PMD_LYT_COMMITTED)
-+		rc = pmd_layout_rw(mp, layout, iov, iovcnt, boff, 0, MPOOL_OP_READ);
-+	pmd_obj_rdunlock(layout);
++	rc = mpc_unit_create(name, mpool, &unit);
++	if (rc)
++		return rc;
 +
-+	return (state & PMD_LYT_COMMITTED) ? rc : -EAGAIN;
-+}
++	unit->un_uid = cfg->mc_uid;
++	unit->un_gid = cfg->mc_gid;
++	unit->un_mode = cfg->mc_mode;
 +
-+int mblock_get_props_ex(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+			struct mblock_props_ex *prop)
-+{
-+	struct pmd_layout *layout;
++	unit->un_mdc_captgt = cfg->mc_captgt;
++	memcpy(&unit->un_utype, &cfg->mc_utype, sizeof(unit->un_utype));
++	strlcpy(unit->un_label, cfg->mc_label, sizeof(unit->un_label));
++	unit->un_ds_oidv[0] = cfg->mc_oid1;
++	unit->un_ds_oidv[1] = cfg->mc_oid2;
++	unit->un_ra_pages_max = cfg->mc_ra_pages_max;
 +
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
++	device = device_create(ss->ss_class, NULL, unit->un_devno, unit, uinfo->ui_subdirfmt, name);
++	if (IS_ERR(device)) {
++		rc = PTR_ERR(device);
++		mp_pr_err("device_create %s failed", rc, name);
++		goto errout;
 +	}
 +
-+	pmd_obj_rdlock(layout);
-+	prop->mbx_zonecnt = layout->eld_ld.ol_zcnt;
-+	mblock_getprops_cmn(mp, layout, &prop->mbx_props);
-+	pmd_obj_rdunlock(layout);
++	unit->un_device = device;
++	unit->un_uinfo = uinfo;
++
++	dev_info(unit->un_device, "minor %u, uid %u, gid %u, mode 0%02o",
++		 MINOR(unit->un_devno), cfg->mc_uid, cfg->mc_gid, cfg->mc_mode);
++
++	*unitp = unit;
++
++errout:
++	if (rc) {
++		/*
++		 * Acquire an additional reference on mpool so that it is not
++		 * errantly destroyed along with the unit, then release both
++		 * the unit's birth and caller's references which should
++		 * destroy the unit.
++		 */
++		kref_get(&mpool->mp_ref);
++		mpc_unit_put(unit);
++		mpc_unit_put(unit);
++	}
++
++	return rc;
++}
++
++/**
++ * mpc_uevent() - Hook to intercept and modify uevents before they're posted to udev
++ * @dev:    mpc driver device
++ * @env:
++ *
++ * See man 7 udev for more info.
++ */
++static int mpc_uevent(struct device *dev, struct kobj_uevent_env *env)
++{
++	struct mpc_unit *unit = dev_get_drvdata(dev);
++
++	if (unit) {
++		add_uevent_var(env, "DEVMODE=%#o", unit->un_mode);
++		add_uevent_var(env, "DEVUID=%u", unit->un_uid);
++		add_uevent_var(env, "DEVGID=%u", unit->un_gid);
++	}
 +
 +	return 0;
 +}
 +
-+bool mblock_objid(u64 objid)
++static int mpc_exit_unit(int minor, void *item, void *arg)
 +{
-+	return objid && (pmd_objid_type(objid) == OMF_OBJ_MBLOCK);
++	mpc_unit_put(item);
++
++	return ITERCB_NEXT;
 +}
-diff --git a/drivers/mpool/mblock.h b/drivers/mpool/mblock.h
++
++/**
++ * mpctl_exit() - Tear down and unload the mpool control module.
++ */
++void mpctl_exit(void)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++
++	if (ss->ss_inited) {
++		idr_for_each(&ss->ss_unitmap, mpc_exit_unit, NULL);
++		idr_destroy(&ss->ss_unitmap);
++
++		if (ss->ss_devno != NODEV) {
++			if (ss->ss_class) {
++				if (ss->ss_cdev.ops)
++					cdev_del(&ss->ss_cdev);
++				class_destroy(ss->ss_class);
++			}
++			unregister_chrdev_region(ss->ss_devno, maxunits);
++		}
++
++		ss->ss_inited = false;
++	}
++}
++
++/**
++ * mpctl_init() - Load and initialize the mpool control module.
++ */
++int mpctl_init(void)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpool_config *cfg = NULL;
++	struct mpc_unit *ctlunit;
++	const char *errmsg = NULL;
++	int rc;
++
++	if (ss->ss_inited)
++		return -EBUSY;
++
++	ctlunit = NULL;
++
++	maxunits = clamp_t(uint, maxunits, 8, 8192);
++
++	cdev_init(&ss->ss_cdev, &mpc_fops_default);
++	ss->ss_cdev.owner = THIS_MODULE;
++
++	mutex_init(&ss->ss_lock);
++	idr_init(&ss->ss_unitmap);
++	ss->ss_class = NULL;
++	ss->ss_devno = NODEV;
++	sema_init(&ss->ss_op_sema, 1);
++	ss->ss_inited = true;
++
++	rc = alloc_chrdev_region(&ss->ss_devno, 0, maxunits, "mpool");
++	if (rc) {
++		errmsg = "cannot allocate control device major";
++		ss->ss_devno = NODEV;
++		goto errout;
++	}
++
++	ss->ss_class = class_create(THIS_MODULE, module_name(THIS_MODULE));
++	if (IS_ERR(ss->ss_class)) {
++		errmsg = "class_create() failed";
++		rc = PTR_ERR(ss->ss_class);
++		ss->ss_class = NULL;
++		goto errout;
++	}
++
++	ss->ss_class->dev_uevent = mpc_uevent;
++
++	rc = cdev_add(&ss->ss_cdev, ss->ss_devno, maxunits);
++	if (rc) {
++		errmsg = "cdev_add() failed";
++		ss->ss_cdev.ops = NULL;
++		goto errout;
++	}
++
++	cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
++	if (!cfg) {
++		errmsg = "cfg alloc failed";
++		rc = -ENOMEM;
++		goto errout;
++	}
++
++	cfg->mc_uid = mpc_ctl_uid;
++	cfg->mc_gid = mpc_ctl_gid;
++	cfg->mc_mode = mpc_ctl_mode;
++
++	rc = mpc_unit_setup(&mpc_uinfo_ctl, MPC_DEV_CTLNAME, cfg, NULL, &ctlunit);
++	if (rc) {
++		errmsg = "cannot create control device";
++		goto errout;
++	}
++
++	mutex_lock(&ss->ss_lock);
++	idr_replace(&ss->ss_unitmap, ctlunit, MINOR(ctlunit->un_devno));
++	mutex_unlock(&ss->ss_lock);
++
++	mpc_unit_put(ctlunit);
++
++errout:
++	if (rc) {
++		mp_pr_err("%s", rc, errmsg);
++		mpctl_exit();
++	}
++
++	kfree(cfg);
++
++	return rc;
++}
+diff --git a/drivers/mpool/mpctl.h b/drivers/mpool/mpctl.h
 new file mode 100644
-index 000000000000..2a5435875a92
+index 000000000000..ff3ec9fc24a9
 --- /dev/null
-+++ b/drivers/mpool/mblock.h
-@@ -0,0 +1,161 @@
++++ b/drivers/mpool/mpctl.h
+@@ -0,0 +1,50 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
 +
++#ifndef MPOOL_MPCTL_H
++#define MPOOL_MPCTL_H
++
++#include <linux/rbtree.h>
++#include <linux/kref.h>
++#include <linux/device.h>
++#include <linux/semaphore.h>
++
++#define ITERCB_NEXT     (0)
++#define ITERCB_DONE     (1)
++
++/* There is one unit object for each device object created by the driver. */
++struct mpc_unit {
++	struct kref                 un_ref;
++	int                         un_open_cnt;    /* Unit open count */
++	struct semaphore            un_open_lock;   /* Protects un_open_* */
++	bool                        un_open_excl;   /* Unit exclusively open */
++	uid_t                       un_uid;
++	gid_t                       un_gid;
++	mode_t                      un_mode;
++	dev_t                       un_devno;
++	const struct mpc_uinfo     *un_uinfo;
++	struct mpc_mpool           *un_mpool;
++	struct address_space       *un_mapping;
++	struct device              *un_device;
++	struct backing_dev_info    *un_saved_bdi;
++	struct mpc_attr            *un_attr;
++	uint                        un_rawio;       /* log2(max_mblock_size) */
++	u64                         un_ds_oidv[2];
++	u32                         un_ra_pages_max;
++	u64                         un_mdc_captgt;
++	uuid_le                     un_utype;
++	u8                          un_label[MPOOL_LABELSZ_MAX];
++	char                        un_name[];
++};
++
++static inline struct mpc_unit *dev_to_unit(struct device *dev)
++{
++	return dev_get_drvdata(dev);
++}
++
++int mpctl_init(void) __cold;
++void mpctl_exit(void) __cold;
++
++#endif /* MPOOL_MPCTL_H */
+diff --git a/drivers/mpool/sysfs.c b/drivers/mpool/sysfs.c
+new file mode 100644
+index 000000000000..638106a77669
+--- /dev/null
++++ b/drivers/mpool/sysfs.c
+@@ -0,0 +1,48 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * DOC: Module info.
-+ *
-+ * Defines functions for writing, reading, and managing the lifecycle of mlogs.
-+ *
++ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
 +
-+#ifndef MPOOL_MBLOCK_H
-+#define MPOOL_MBLOCK_H
++#include <linux/slab.h>
 +
-+#include <linux/uio.h>
++#include "sysfs.h"
 +
-+#include "mpool_ioctl.h"
++struct mpc_attr *mpc_attr_create(struct device *dev, const char *name, int acnt)
++{
++	struct mpc_attr *attr;
++	int i;
++
++	attr = kzalloc(sizeof(*attr) + acnt * sizeof(*attr->a_dattr) +
++		       (acnt + 1) * sizeof(*attr->a_attrs), GFP_KERNEL);
++	if (!attr)
++		return NULL;
++
++	attr->a_kobj = &dev->kobj;
++
++	attr->a_dattr = (void *)(attr + 1);
++
++	attr->a_attrs = (void *)(attr->a_dattr + acnt);
++	for (i = 0; i < acnt; i++)
++		attr->a_attrs[i] = &attr->a_dattr[i].attr;
++	attr->a_attrs[i] = NULL;
++
++	attr->a_group.attrs = attr->a_attrs;
++	attr->a_group.name = name;
++
++	return attr;
++}
++
++void mpc_attr_destroy(struct mpc_attr *attr)
++{
++	kfree(attr);
++}
++
++int mpc_attr_group_create(struct mpc_attr *attr)
++{
++	return sysfs_create_group(attr->a_kobj, &attr->a_group);
++}
++
++void mpc_attr_group_destroy(struct mpc_attr *attr)
++{
++	sysfs_remove_group(attr->a_kobj, &attr->a_group);
++}
+diff --git a/drivers/mpool/sysfs.h b/drivers/mpool/sysfs.h
+new file mode 100644
+index 000000000000..b161eceec75f
+--- /dev/null
++++ b/drivers/mpool/sysfs.h
+@@ -0,0 +1,48 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * Opaque handles for clients
-+ */
-+struct mpool_descriptor;
-+struct mblock_descriptor;
-+struct mpool_obj_layout;
-+
-+/*
-+ * mblock API functions
++ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
 +
-+/**
-+ * mblock_alloc() - Allocate an mblock.
-+ * @mp:         mpool descriptor
-+ * @capreq:     mblock capacity requested
-+ * @mclassp:    media class
-+ * @mbh:        mblock handle returned
-+ * @prop:       mblock properties returned
-+ *
-+ * Allocate mblock with erasure code and capacity params as specified in
-+ * ecparm and capreq on drives in a media class mclassp;
-+ * if successful mbh is a handle for the mblock and prop contains its
-+ * properties.
-+ * Note: mblock is not persistent until committed; allocation can be aborted.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+int mblock_alloc(struct mpool_descriptor *mp, enum mp_media_classp mclassp, bool spare,
-+		 struct mblock_descriptor **mbh, struct mblock_props *prop);
++#ifndef MPOOL_SYSFS_H
++#define MPOOL_SYSFS_H
 +
-+/**
-+ * mblock_find_get() - Get handle and properties for existing mblock with specified objid.
-+ * @mp:
-+ * @objid:
-+ * @which:
-+ * @prop:
-+ * @mbh:
-+ *
-+ * If successful, the caller holds a ref on the mblock (which must be put eventually).
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+int mblock_find_get(struct mpool_descriptor *mp, u64 objid, int which,
-+		    struct mblock_props *prop, struct mblock_descriptor **mbh);
++#include <linux/device.h>
++#include <linux/sysfs.h>
 +
-+/**
-+ * mblock_put() - Put (release) a ref on an mblock
-+ * @mbh:
-+ *
-+ * Put a ref on a known mblock.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+void mblock_put(struct mblock_descriptor *mbh);
 +
-+/**
-+ * mblock_commit() - Make allocated mblock persistent
-+ * @mp:
-+ * @mbh:
-+ *
-+ * if fails mblock still exists in an
-+ * uncommitted state so can retry commit or abort except as noted.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ * EBUSY if must abort
-+ */
-+int mblock_commit(struct mpool_descriptor *mp, struct mblock_descriptor *mbh);
++#define MPC_ATTR(_da, _name, _mode)                \
++	(_da)->attr.name = __stringify(_name);     \
++	(_da)->attr.mode = (_mode);                \
++	(_da)->show      = mpc_##_name##_show      \
 +
-+/**
-+ * mblock_abort() - Discard uncommitted mblock
-+ * @mp:
-+ * @mbh:
-+ *
-+ * If successful mbh is invalid after call.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ *
-+ */
-+int mblock_abort(struct mpool_descriptor *mp, struct mblock_descriptor *mbh);
++#define MPC_ATTR_RO(_dattr, _name)                 \
++	do {                                       \
++		__typeof(_dattr) da = (_dattr);    \
++		MPC_ATTR(da, _name, 0444);         \
++		da->store = NULL;                  \
++	} while (0)
 +
-+/**
-+ * mblock_delete() - Delete committed mblock
-+ * @mp:
-+ * @mbh:
-+ *
-+ * If successful mbh is invalid after call.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+int mblock_delete(struct mpool_descriptor *mp, struct mblock_descriptor *mbh);
++#define MPC_ATTR_RW(_dattr, _name)                 \
++	do {                                       \
++		__typeof(_dattr) da = (_dattr);    \
++		MPC_ATTR(da, _name, 0644);         \
++		da->store = mpc_##_name##_store;   \
++	} while (0)
 +
-+/**
-+ * mblock_write() - Write iov to mblock
-+ * @mp:
-+ * @mbh:
-+ * @iov:
-+ * @iovcnt:
-+ * @len:
-+ *
-+ * Mblocks can be written until they are committed, or
-+ * until they are full.  If a caller needs to issue more than one write call
-+ * to the same mblock, all but the last write call must be optimal write size aligned.
-+ * The mpr_optimal_wrsz field in struct mblock_props gives the optimal write size.
-+ *
-+ * Return: %0 if success, -errno otherwise...
-+ */
-+int mblock_write(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+		 const struct kvec *iov, int iovcnt, size_t len);
 +
-+/**
-+ * mblock_read() - Read data from mblock mbnum in committed mblock into iov
-+ * @mp:
-+ * @mbh:
-+ * @iov:
-+ * @iovcnt:
-+ * @boff:
-+ * @len:
-+ *
-+ * Read data from mblock mbnum in committed mblock into iov starting at
-+ * byte offset boff; boff and iov buffers must be a multiple of OS page
-+ * size for the mblock.
-+ *
-+ * If fails can call mblock_get_props() to confirm mblock was written.
-+ *
-+ * Return: 0 if successful, -errno otherwise...
-+ */
-+int mblock_read(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+		const struct kvec *iov, int iovcnt, loff_t boff, size_t len);
++struct mpc_attr {
++	struct attribute_group       a_group;
++	struct kobject              *a_kobj;
++	struct device_attribute     *a_dattr;
++	struct attribute           **a_attrs;
++};
 +
-+/**
-+ * mblock_get_props_ex() - Return extended mblock properties in prop
-+ * @mp:
-+ * @mbh:
-+ * @prop:
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+int mblock_get_props_ex(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+			struct mblock_props_ex *prop);
++struct mpc_attr *mpc_attr_create(struct device *d, const char *name, int acnt);
 +
-+bool mblock_objid(u64 objid);
++void mpc_attr_destroy(struct mpc_attr *attr);
 +
-+#endif /* MPOOL_MBLOCK_H */
++int mpc_attr_group_create(struct mpc_attr *attr);
++
++void mpc_attr_group_destroy(struct mpc_attr *attr);
++
++#endif /* MPOOL_SYSFS_H */
 -- 
 2.17.2
 
