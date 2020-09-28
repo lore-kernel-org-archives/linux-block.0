@@ -2,225 +2,230 @@ Return-Path: <SRS0=cicp=DF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A43F5C4741F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 10:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09EDAC2D0A8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 11:06:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4702D239E5
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 10:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD7182080A
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 11:06:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="aQs2M36T";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="h1goPYvW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMYFoifk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726634AbgI1KMC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Sep 2020 06:12:02 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:14008 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726497AbgI1KMC (ORCPT
+        id S1726500AbgI1LGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Sep 2020 07:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36846 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726420AbgI1LGH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Sep 2020 06:12:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1601287922; x=1632823922;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=Jvww9mfAPeQqATEYnXqp9bzQtb/hSplg4cctvkYJj9E=;
-  b=aQs2M36TSgiMgwW45HHy4wM9teapzugAfStCpb/KVVkK5ECZBJ18nhRv
-   OgR+HokciZ/Ji3cxWO1afO0AqZg1b7ikdK5+ofhz/5fua65NT8TYMSsrv
-   sNSMwxfaRB46hT4gHaPdArDqCp7IewN+fSctGnTGMvVyEkCDYff8T3hUs
-   UGb1cQlnMQpHkXp95k5I0PPn1nsyHV+V2H0BnhQiwMUI2V2GAkp6Cgc17
-   N5u9XmyxNr/hbDBLwTGmLK3HVrG3dSNU/wZrdYKJET8PyCJ/TNIkblOdO
-   0KLPQH15EKKX2AeeA789mqVTsnCdsSd5UhGGWPyL8T8CsfcBOmEXN6dwb
-   g==;
-IronPort-SDR: Z14eaFcGH99rOUTDeArLataOAYr/c6sc/5jidefN90lyk2m1xKY+BxMFDyJPuyquHZLxm1gOC5
- 2PcLlfdPFI87qRYQN1+3CzGVy/3ZTdRwA+jUlpUQ03Y3t5+93jQYl3MvdpjytHp6BFD1n+f2mH
- jRhgSKUZmcBHVqhQymGmyc+Ho2fFlWwJO9gb+MHGn/jYo1MtTki/aZ/4r/ynxxjlorX4iI9PsI
- KYZttSSFVepzKkPetBSqtOW8eoJxbag7afTTTjKNBSJJV6XM2kkrdLQlppDuXZIK57J8s7bCPL
- Pfo=
-X-IronPort-AV: E=Sophos;i="5.77,313,1596470400"; 
-   d="scan'208";a="152798716"
-Received: from mail-bn8nam08lp2048.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.48])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Sep 2020 18:12:00 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A99btcbALIoSWqJAJk0gr7dmwvOn6J2FczBgX+3GApdT7BOCEdjhG0iNWGv/HFZ25gvoBwyukCFZGsfctdkeKU1zaEeTDitrlvFUmFXn2pbtlilZ8I2Xhtv4RhT9g4lOHzqqRKTv4vTUFAhkggvnUzcYzVes9DBJSJJAkAW9HtHTxtMPr/OFyVjVT2qyaCyPf1WX8l5DfQMDSJzKp32x/BeoujxAh7YIsjlE6uwr4h3OMrDA+3DAUB+rkHCjoQpA99AaHKWgc0oh7sJ8CPTXf5gr0os0gf8SndzuPy0nQl4vun3jXqWPIEWL5Dkd8dqr2UrehTQEgWP8zEaFzgrVrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4jPfxcHa6iTWq9WXm+WSc5oJJypqOCZ4GVMz5uodCt8=;
- b=h6nBAVufUARBAbbNUEV8kSYcgqlyXYeaFm8xZDdNFa2HonKm5MQ4H1gH7Wj7AQL7dUJP+cBYsocggFN90NJ5fDGmpNK7ntue9SuOKXO9D3rTIxkQnMPvM35qxqZJwDxroYmpV577w/4yJNAZqjR7up6NYQC0+CrrwPPb0OnbpWQdsze6OONg9kepPMH5wVPPLNl2IDgyVqxcJf9H59Bw7Qft2dZ8PAKKiEKwgy/ccBxYCWHcUaebULKbWB45xjf++pdERdnQLb9ndrNviPFLInqL8rzHubH2wDdlpd1KF5tmp0XK59bm84rFhaMnwhZUGKgEe7VTW/1ETc0Gy+EaWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Mon, 28 Sep 2020 07:06:07 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D7EBC061755;
+        Mon, 28 Sep 2020 04:06:07 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id j2so817927eds.9;
+        Mon, 28 Sep 2020 04:06:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4jPfxcHa6iTWq9WXm+WSc5oJJypqOCZ4GVMz5uodCt8=;
- b=h1goPYvWIsBeSlLSkL0cj7Opp3qgfp+xg0LAj8eedFw5InJl0Q4aqljz176Nzsz9voEgU3EIH0smrfGaH5pfOgHZ2jYavr77pJwqF12uwAvhRjEe5lj5cIkYOhZK2pd70Tss2434Ik5gPYcvA0iNKI/KaPuk+Z3tRQ2UhmkH1zA=
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY4PR0401MB3633.namprd04.prod.outlook.com (2603:10b6:910:94::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Mon, 28 Sep
- 2020 10:11:58 +0000
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::9124:2453:fe9c:9a7]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::9124:2453:fe9c:9a7%12]) with mapi id 15.20.3412.029; Mon, 28 Sep 2020
- 10:11:58 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Kanchan Joshi <joshi.k@samsung.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "javier.gonz@samsung.com" <javier.gonz@samsung.com>
-Subject: Re: [PATCH v2 1/1] null_blk: synchronization fix for zoned device
-Thread-Topic: [PATCH v2 1/1] null_blk: synchronization fix for zoned device
-Thread-Index: AQHWlX4IaLdglWyy80qXrKErMeNvWA==
-Date:   Mon, 28 Sep 2020 10:11:57 +0000
-Message-ID: <CY4PR04MB37511C151D0F37DC62BB4CE6E7350@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <20200928095549.184510-1-joshi.k@samsung.com>
- <CGME20200928095914epcas5p1beae8d5a201c35b598fde8288532d58d@epcas5p1.samsung.com>
- <20200928095549.184510-2-joshi.k@samsung.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samsung.com; dkim=none (message not signed)
- header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:809d:4e2f:7912:1e64]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 5562aceb-aa40-40af-2fba-08d86396ef18
-x-ms-traffictypediagnostic: CY4PR0401MB3633:
-x-microsoft-antispam-prvs: <CY4PR0401MB36332F348A65151DF2A5D60FE7350@CY4PR0401MB3633.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2399;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: E74JP0ZDjlz2zPZoY+4IxNRr4mon5QohLw7Ajsu/SyL2dv2cY7RA0V6iyfn6Qv9YXL/GZuM8pehC0/z2OzhXDYiZpGDFJP9HlYwl8gpi+v1f58CdOiPZakpkYqlqxSpBD/JeQn/iPbteaiEDxWsA68kQNSw/Ee78woL3Qr0KH141ssPveHdqgBYzbyhnn5ifMmDzC4DTfGzgx2rtfe1gVblerk8mlRZ3H8SmjYQBMQqqB6/GLn95fOK0HJR30VP0FfhB5trpdIZ2gSdR8SxDqltt80hacuKNNnzpG1PYXvGhA61l9oTyu6p224Rl+Jd+dSs520X0qM3WW9Rb5IGNa2tlgFBNWd7zLjD1R3SiugV6F11+5WsBmOOm+dA6DNOf
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(346002)(136003)(366004)(376002)(66446008)(54906003)(4326008)(186003)(316002)(110136005)(2906002)(478600001)(8676002)(8936002)(55016002)(53546011)(6506007)(9686003)(86362001)(33656002)(7696005)(52536014)(71200400001)(66476007)(64756008)(76116006)(66556008)(91956017)(66946007)(5660300002)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: PFzfwDaJAppLdE1OJ/c5LjlWTOUjCV37BIcKALM4JZBvrD8LFm/YP4+l7lZ0MO3V9B50ZStVn+G+g/I4ieBTFev5oliVqgLe/Xi0TM9e2U/wmgZ0Ekypv+/NQRAJ/srQiFZJ+2lUAnjCzwnCKgCNhQHoIrXim3mkDuGmEE/CtuHgk+xWF97TPsfWXqj+tNVYyE7W9iimVBLzUlMAqApew/CcvcMpQZgbG8+TOX/una8YN4JXmJkH26ozoaicWMIDLoc/69bQKm70uLqhl3hBnRR+lIibvLo7OhuuuJlypEEmhpE3U9PIpItOmLU4vQEFJAp6Zy6Yi6vyZTO1uDuO/bJO5jjY4N//TIqTYcgPs5IdFFUatMMvTYrEhz7SOeIrQWCll2G5efXClXtvDQ84bi3SPs/zziuP7aDE6Jlnn0UU9cFKhurHMzMVyR+Wxdq3XVrdSD3AzQ7MpeHn1L96FZTfLGHrgpV7ABoBFkfpL4LvL1/wiLH4xsYJGCl1C2zzhe+uTZNzG4QtmuOKYlMh2HQp14a+FXS/6WXwdl3aOGk1Z15zE6xIjS0iVppN6BOWjoHw55Z1O+fg5PltxmR+j+95AKMKpvcxDl+L+ZKBDdF62fMNv3cJAUwxXzH9YhQJePhnF6thdHKDjtGvotj8pDnCYxVjKJX1qP4FscROdnigpmYXNAU+CrrTucdFv14m9x3RyxYXvrqpFaKrYM5iDw==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=zmRNc4An8EyDOMtea3peb6h9QyFwPP8MpY42ocop9rA=;
+        b=hMYFoifk1kYv0MKY5pOwwCCcQrjIvVCgDv9blzQ4wN5rTrbrhLIOJgc/B6LcEkUlcJ
+         E22KfY/FfB5866R8XtMlEpoWfpdzVZlU2ghgmSvrpqP/uOUz+pxuHfixBNqV4YGft6Pv
+         Eoenvzi6DRV1n+Xe8iezoe3NzDQQ+XURHatMRR/riHkcqX6HbwvGj44f7+2Y6x7qjOY6
+         7JFTzXYSLvW3B801OT+1Ur/2jFFE4CB9LrDFU17NMgXkUtT60NyDCw5kd05pivODmLCH
+         M0wkF9T03Tdl+m1ntUTt0XFOz2FwDM3AIF8rxqaG8Rtb4LhqYqOnvGg0wIMf3VMUi9aN
+         wbfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=zmRNc4An8EyDOMtea3peb6h9QyFwPP8MpY42ocop9rA=;
+        b=kpBLcJFK69NVMUVAmZageVe0nS9HS/3D4yj0Q5YSnTWkZYY/98rNX3z7DgKJT5OkhR
+         7xh1kPtyW8NLpAD3395tSVUnyZD5+i2TSsP9rSijgL+0QrFu2kci/0ELyakCJE0VAxAh
+         mBVtmMBYDd2JlcYxZLuW7eMgwYS6AW7KPQeafzfE1aDa8wJq8LIN9hbknXrif3U4fV3N
+         lVNSHGCgx1vl7KWJJjJo3Yj18zaX+9iEtaIQdx0T0NQjL/DI9XuuYaNSgq+C+Q7YEQVl
+         F5QgSuktdF3BqmGJQ68zf+KvMxk4L0jjdPEoYqPVFv0EjtavOrbpMVqh5hnsOf9nUP7+
+         UwfQ==
+X-Gm-Message-State: AOAM532Rbq7lA+gXQqQ63dIvSHny/XWRVSM/BBHk1BjHXDx9779BIMew
+        93YMpXAe/W17B6cYmA50pF4=
+X-Google-Smtp-Source: ABdhPJyUvwgcWFuM1/ZAL2oEjX72VcqbT8HT/4JCVbHnqa3YJNqX9EIMYgwZA4O71AkgCjTLyqcmfw==
+X-Received: by 2002:a50:a6c2:: with SMTP id f2mr1059960edc.227.1601291166165;
+        Mon, 28 Sep 2020 04:06:06 -0700 (PDT)
+Received: from [10.10.0.8] ([141.98.255.143])
+        by smtp.googlemail.com with ESMTPSA id l21sm862925ejg.124.2020.09.28.04.06.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Sep 2020 04:06:05 -0700 (PDT)
+Subject: Re: Deadlock under load with Linux 5.9 and other recent kernels
+To:     Christian Hewitt <christianshewitt@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, furkan@fkardame.com,
+        Brad Harper <bjharper@gmail.com>
+References: <5878AC01-8A1B-4F39-B4BD-BDDEFAECFAA2@gmail.com>
+ <4a51f6d8-486b-73ee-0585-f2154aa90a83@kernel.dk>
+ <EE8C801E-0AD8-43E2-9C65-92CD512904BE@gmail.com>
+ <c431ae48-6913-acc0-dc0a-b52065e9eaed@kernel.dk>
+ <91886A80-8164-4699-8662-E7D3444A4F12@gmail.com>
+ <BA41AA25-8647-474E-87E6-64D4F030E590@gmail.com>
+From:   Patrik Nilsson <nipatriknilsson@gmail.com>
+Message-ID: <c05ae5ee-535d-ad2a-ce7e-137c428eb83b@gmail.com>
+Date:   Mon, 28 Sep 2020 13:06:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5562aceb-aa40-40af-2fba-08d86396ef18
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2020 10:11:57.8530
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 68CeXxX9Ne7/kImQN7VoFBFPSdmgTT2S+dpnYYb06NXP4PK0PxcaoTK3AUA2I16c+RBMVc1g0+mDn3ha30l9ZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0401MB3633
+In-Reply-To: <BA41AA25-8647-474E-87E6-64D4F030E590@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/09/28 18:59, Kanchan Joshi wrote:=0A=
-> Parallel write,read,zone-mgmt operations accessing/altering zone state=0A=
-> and write-pointer may get into race. Avoid the situation by using a new=
-=0A=
-> spinlock for zoned device.=0A=
-> Concurrent zone-appends (on a zone) returning same write-pointer issue=0A=
-> is also avoided using this lock.=0A=
-> =0A=
-> Fixes: e0489ed5daeb ("null_blk: Support REQ_OP_ZONE_APPEND")=0A=
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>=0A=
-> ---=0A=
->  drivers/block/null_blk.h       |  1 +=0A=
->  drivers/block/null_blk_zoned.c | 22 ++++++++++++++++++----=0A=
->  2 files changed, 19 insertions(+), 4 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h=0A=
-> index daed4a9c3436..28099be50395 100644=0A=
-> --- a/drivers/block/null_blk.h=0A=
-> +++ b/drivers/block/null_blk.h=0A=
-> @@ -44,6 +44,7 @@ struct nullb_device {=0A=
->  	unsigned int nr_zones;=0A=
->  	struct blk_zone *zones;=0A=
->  	sector_t zone_size_sects;=0A=
-> +	spinlock_t zone_lock;=0A=
->  =0A=
->  	unsigned long size; /* device size in MB */=0A=
->  	unsigned long completion_nsec; /* time in ns to complete a request */=
-=0A=
-> diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zone=
-d.c=0A=
-> index 3d25c9ad2383..e8d8b13aaa5a 100644=0A=
-> --- a/drivers/block/null_blk_zoned.c=0A=
-> +++ b/drivers/block/null_blk_zoned.c=0A=
-> @@ -45,6 +45,7 @@ int null_init_zoned_dev(struct nullb_device *dev, struc=
-t request_queue *q)=0A=
->  	if (!dev->zones)=0A=
->  		return -ENOMEM;=0A=
->  =0A=
-> +	spin_lock_init(&dev->zone_lock);=0A=
->  	if (dev->zone_nr_conv >=3D dev->nr_zones) {=0A=
->  		dev->zone_nr_conv =3D dev->nr_zones - 1;=0A=
->  		pr_info("changed the number of conventional zones to %u",=0A=
-> @@ -131,8 +132,11 @@ int null_report_zones(struct gendisk *disk, sector_t=
- sector,=0A=
->  		 * So use a local copy to avoid corruption of the device zone=0A=
->  		 * array.=0A=
->  		 */=0A=
-> +		spin_lock_irq(&dev->zone_lock);=0A=
->  		memcpy(&zone, &dev->zones[first_zone + i],=0A=
->  		       sizeof(struct blk_zone));=0A=
-> +		spin_unlock_irq(&dev->zone_lock);=0A=
-> +=0A=
->  		error =3D cb(&zone, i, data);=0A=
->  		if (error)=0A=
->  			return error;=0A=
-> @@ -277,18 +281,28 @@ static blk_status_t null_zone_mgmt(struct nullb_cmd=
- *cmd, enum req_opf op,=0A=
->  blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_opf =
-op,=0A=
->  				    sector_t sector, sector_t nr_sectors)=0A=
->  {=0A=
-> +	blk_status_t sts;=0A=
-> +	struct nullb_device *dev =3D cmd->nq->dev;=0A=
-> +=0A=
-> +	spin_lock_irq(&dev->zone_lock);=0A=
->  	switch (op) {=0A=
->  	case REQ_OP_WRITE:=0A=
-> -		return null_zone_write(cmd, sector, nr_sectors, false);=0A=
-> +		sts =3D null_zone_write(cmd, sector, nr_sectors, false);=0A=
-> +		break;=0A=
->  	case REQ_OP_ZONE_APPEND:=0A=
-> -		return null_zone_write(cmd, sector, nr_sectors, true);=0A=
-> +		sts =3D null_zone_write(cmd, sector, nr_sectors, true);=0A=
-> +		break;=0A=
->  	case REQ_OP_ZONE_RESET:=0A=
->  	case REQ_OP_ZONE_RESET_ALL:=0A=
->  	case REQ_OP_ZONE_OPEN:=0A=
->  	case REQ_OP_ZONE_CLOSE:=0A=
->  	case REQ_OP_ZONE_FINISH:=0A=
-> -		return null_zone_mgmt(cmd, op, sector);=0A=
-> +		sts =3D null_zone_mgmt(cmd, op, sector);=0A=
-> +		break;=0A=
->  	default:=0A=
-> -		return null_process_cmd(cmd, op, sector, nr_sectors);=0A=
-> +		sts =3D null_process_cmd(cmd, op, sector, nr_sectors);=0A=
->  	}=0A=
-> +	spin_unlock_irq(&dev->zone_lock);=0A=
-> +=0A=
-> +	return sts;=0A=
->  }=0A=
-> =0A=
-=0A=
-Looks good.=0A=
-=0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+Hi!
+
+To me this bug description is very similar to what I'm struggling with 
+on an amd64-platform.
+
+When I get too much data sent via usb, it seems as the usb controlmsg is 
+delayed so it times out and unmounts the block device.
+
+I have been working on my related bug for long to get it easily 
+reproducible, but failed. It is there all the time. New hardware is on 
+its way so I can continue my testing.
+
+Maybe you can test the patch I'm using to see if it works better for you?
+
+In the meanwhile here is my description of my bug:
+
+> I have stress tested the usb system. To the USB is now seven 
+> mechanical hard disks and two ssd disks connected. Six processes are 
+> at the same time writing random data to the disks. One of them is to 
+> the ssd disk I couldn't write data to before without it failed. Also 
+> the other usb-ssd disk is my root partition.
+>
+> Before I applied the patch, my root partition sometimes failed to be 
+> kept mounted. Now I have not had any crashes.
+>
+> This is a quick fix for hard disks, but working. It continued to work 
+> when I started three virtualbox guests and let them also do work. The 
+> guests' hard disks is on my usb-root partition.
+>
+> It doesn't work if I also use my usb2ethernet adapter (ID 2001:4a00 
+> D-Link Corp.), although my root partition and two randomize tests 
+> survived. Maybe a much larger timeout in this case will help? But this 
+> I don't find as a good solution.
+>
+> The behavior is the same on the other (much slower) computer with a 
+> different usb hub. I have also tested it with exactly the same setup 
+> as earlier, with no mechanical hard disks, and it works with the patch 
+> and not without it.
+
+Best regards,
+Patrik
+
+---start of diff---
+diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
+index 5b768b80d1ee..3c550934815c 100644
+--- a/drivers/usb/core/hub.c
++++ b/drivers/usb/core/hub.c
+@@ -105,7 +105,7 @@ MODULE_PARM_DESC(use_both_schemes,
+  DECLARE_RWSEM(ehci_cf_port_reset_rwsem);
+  EXPORT_SYMBOL_GPL(ehci_cf_port_reset_rwsem);
+
+-#define HUB_DEBOUNCE_TIMEOUT    2000
++#define HUB_DEBOUNCE_TIMEOUT    10000
+  #define HUB_DEBOUNCE_STEP      25
+  #define HUB_DEBOUNCE_STABLE     100
+
+diff --git a/include/linux/usb.h b/include/linux/usb.h
+index 20c555db4621..e64d441bb78f 100644
+--- a/include/linux/usb.h
++++ b/include/linux/usb.h
+@@ -1841,8 +1841,8 @@ extern int usb_set_configuration(struct usb_device 
+*dev, int configuration);
+   * USB identifies 5 second timeouts, maybe more in a few cases, and a few
+   * slow devices (like some MGE Ellipse UPSes) actually push that limit.
+   */
+-#define USB_CTRL_GET_TIMEOUT    5000
+-#define USB_CTRL_SET_TIMEOUT    5000
++#define USB_CTRL_GET_TIMEOUT    10000
++#define USB_CTRL_SET_TIMEOUT    10000
+
+
+  /**
+---end of diff---
+
+
+On 28/09/2020 03:37, Christian Hewitt wrote:
+>> On 26 Sep 2020, at 4:28 pm, Christian Hewitt <christianshewitt@gmail.com> wrote:
+>>
+>>> On 26 Sep 2020, at 4:13 pm, Jens Axboe <axboe@kernel.dk> wrote:
+>>>
+>>> On 9/26/20 5:55 AM, Christian Hewitt wrote:
+>>>>> On 26 Sep 2020, at 2:51 pm, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>
+>>>>> On 9/26/20 1:55 AM, Christian Hewitt wrote:
+>>>>>> I am using an ARM SBC device with Amlogic S922X chip (Beelink
+>>>>>> GS-King-X, an Android STB) to boot the Kodi mediacentre distro
+>>>>>> LibreELEC (which I work on) although the issue is also reproducible
+>>>>>> with Manjaro and Armbian on the same hardware, and with the GT-King
+>>>>>> and GT-King Pro devices from the same vendor - all three devices are
+>>>>>> using a common dtsi:
+>>>>>>
+>>>>>> https://github.com/chewitt/linux/blob/amlogic-5.9-integ/arch/arm64/boot/dts/amlogic/meson-g12b-gsking-x.dts
+>>>>>> https://github.com/chewitt/linux/blob/amlogic-5.9-integ/arch/arm64/boot/dts/amlogic/meson-g12b-gtking-pro.dts
+>>>>>> https://github.com/chewitt/linux/blob/amlogic-5.9-integ/arch/arm64/boot/dts/amlogic/meson-g12b-gtking.dts
+>>>>>> https://github.com/chewitt/linux/blob/amlogic-5.9-integ/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
+>>>>>>
+>>>>>> I have schematics for the devices, but can only share those privately
+>>>>>> on request.
+>>>>>>
+>>>>>> For testing I am booting LibreELEC from SD card. The box has a 4TB
+>>>>>> SATA drive internally connected with a USB > SATA bridge, see dmesg:
+>>>>>> http://ix.io/2yLh and I connect a USB stick with a 4GB ISO file that I
+>>>>>> copy to the internal SATA drive. Within 10-20 seconds of starting the
+>>>>>> copy the box deadlocks needing a hard power cycle to recover. The
+>>>>>> timing of the deadlock is variable but the device _always_ deadlocks.
+>>>>>> Although I am using a simple copy use-case, there are similar reports
+>>>>>> in Armbian forums performing tasks like installs/updates that involve
+>>>>>> I/O loads.
+>>>>>>
+>>>>>> Following advice in the #linux-amlogic IRC channel I added
+>>>>>> CONFIG_SOFTLOCKUP_DETECTOR and CONFIG_DETECT_HUNG_TASK and was able to
+>>>>>> get output on the HDMI screen (it is not possible to connect to UART
+>>>>>> pins without destroying the box case). If you advance the following
+>>>>>> video frame by frame in VLC you can see the output:
+>>>>>>
+>>>>>> https://www.dropbox.com/s/klvcizim8cs5lze/lockup_clip.mov?dl=0
+>>>>> Try with this patch:
+>>>>>
+>>>>> https://lore.kernel.org/linux-block/20200925191902.543953-1-shakeelb@google.com/
+>>>> It still locks up approx. 25 seconds into the copy operation. Here’s the output in video again (a little blurry):
+>>>>
+>>>> https://www.dropbox.com/s/3j2czaq509arg6g/lockup_clip2.mov?dl=0
+>>> Can you try and set CONFIG_SLUB in your .config instead of CONFIG_SLAB?
+>> CONFIG_SLUB is already set, here’s the full defconfig http://paste.ubuntu.com/p/5BNdZv6J3c/
+>>
+>> # dmesg | grep -i slub
+>> [    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=6, Nodes=1
+>>
+>>> Also, just take a picture, should be easier to get readable than a video.
+>>> And the static trace is all that is needed.
+>> This is from a GT-King Pro which someone reminded me has a large RS232 port on the rear:
+>>
+>> https://pastebin.com/raw/sGtzgreN
+> from 5.9—rc7 https://pastebin.com/raw/nbHJmrqe
+>
+> Christian
+>
+>
+>
+>
+-- 
+PGP-key fingerprint: 1B30 7F61 AF9E 538A FCD6  2BE7 CED7 B0E4 3BF9 8D6C
+
