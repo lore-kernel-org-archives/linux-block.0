@@ -2,79 +2,69 @@ Return-Path: <SRS0=cicp=DF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A43BC2D0A8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 05:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDB4C2D0A8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 06:03:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B954239EE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 05:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA20C20809
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 06:03:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="J1vchcQf"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UNIoczlf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726393AbgI1FCV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Sep 2020 01:02:21 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42548 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726380AbgI1FCV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Sep 2020 01:02:21 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1601269340;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9rxnAUlcW+c8s9Zamrhw0M/6zu/bkDouk22bA14g5DY=;
-        b=J1vchcQfxzo7NWAx2bYIFRLbsBRDxS8XoVmiLTJQmmI00QuDugwAPI9VNLDd70kxoJx8d/
-        ZVCTxdgTUVwhtIhPbEC66wZ5bshbM58A+7ch2hBGIDZYDsC8FkeSQRyi9wpym1jr45esQ7
-        sC8B6s3Gbg1uynjQRyOkoaFatX9+YZM=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 3CEE6AD73;
-        Mon, 28 Sep 2020 05:02:20 +0000 (UTC)
-Subject: Re: Kernel panic on 'floppy' module load, Xen HVM, since 4.19.143
-To:     =?UTF-8?Q?Marek_Marczykowski-G=c3=b3recki?= 
-        <marmarek@invisiblethingslab.com>,
-        Denis Efremov <efremov@linux.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     xen-devel <xen-devel@lists.xenproject.org>,
-        Roman Shaposhnik <roman@zededa.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-References: <20200927111405.GJ3962@mail-itl>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <26fe7920-d6a8-fb8a-b97c-59565410eff4@suse.com>
-Date:   Mon, 28 Sep 2020 07:02:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1725308AbgI1GDl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Sep 2020 02:03:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725290AbgI1GDl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Sep 2020 02:03:41 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8137C0613CE
+        for <linux-block@vger.kernel.org>; Sun, 27 Sep 2020 23:03:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=H1jCAJMm4J8LmBRHVdZbbYlzCjgFbz5dqsdyvaDkPKY=; b=UNIoczlfB/KWNLph2sfsB+HeYn
+        yQr5ThHJmagmUubfYlw5aSwJ4wVNbQbrzL0o9hgzRjU85p5fC6VNj8m2YtmHKhFXuionDHxs6FwHZ
+        uWIl4a1e/syqb96cpUnx99effABKPl71VtLxgtuWMXxZrFCxHYBgyoZkymu3oqlwLt1J9HzQz1+hM
+        GUWPtxSNMceEGOtD7r25C2qUwxw628r0bKUoKr1Y7Vn7JyLqXiP1xKOpVedeCjO66dcGfW3tLBNbU
+        uF4L8BhZLvh0iiI5C4PORqnVBAuW9vsQTQm2RlDi9IKPajxryP2zbiv1Wg4jjPTtkw2vx2HWW2TxK
+        3fCiugAg==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kMmG5-0002DK-Fh; Mon, 28 Sep 2020 06:03:33 +0000
+Date:   Mon, 28 Sep 2020 07:03:33 +0100
+From:   "hch@infradead.org" <hch@infradead.org>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "hch@infradead.org" <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [GIT PULL] nvme updates for 5.10
+Message-ID: <20200928060333.GA7431@infradead.org>
+References: <20200927072343.GA381603@infradead.org>
+ <CY4PR04MB3751593431168AD25F312A1CE7350@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20200927111405.GJ3962@mail-itl>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY4PR04MB3751593431168AD25F312A1CE7350@CY4PR04MB3751.namprd04.prod.outlook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27.09.20 13:14, Marek Marczykowski-Górecki wrote:
-> Hi all,
+On Mon, Sep 28, 2020 at 01:53:46AM +0000, Damien Le Moal wrote:
+> >  - support ZNS in nvmet passthrough mode (Chaitanya Kulkarni)
+> >  - fix nvme_ns_report_zones (me)
 > 
-> I get kernel panic on 'floppy' module load. If I blacklist the module,
-> then everything works.
-> The issue happens in Xen HVM, other virtualization modes (PV, PVH) works
-> fine. PV dom0 works too. I haven't tried bare metal, but I assume it
-> works fine too.
+> Shouldn't this one go into 5.9-rc7 as a fix ?
 
-Could you please try bare metal?
+It is a fix, but not a critical one given that ZNS has just shown up
+and does not have any real products yet.  I'd still go for 5.9 if we
+didn't have dependencies on it that are going to shop up for 5.10.
 
-Working in PV and PVH mode, but not in HVM, is pointing towards either
-an issue in IRQ handling (not Xen specific) or in qemu.
-
-It might be that Xen is advertising a rarely used APIC mode. In case
-bare metal is working it might be helpful to have APIC related boot
-message differences between HVM guest and bare metal.
-
-
-Juergen
+So 5.10 for now. 5.9-stable pretty soon.
