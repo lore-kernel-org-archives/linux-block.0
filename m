@@ -2,99 +2,107 @@ Return-Path: <SRS0=cicp=DF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6359C47420
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 17:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC9EC2D0A8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 17:47:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67971208D5
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 17:32:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 679342083B
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 17:47:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Y6SArI91"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X76xYhd3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726460AbgI1Rct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Sep 2020 13:32:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40244 "EHLO
+        id S1726578AbgI1RrX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Sep 2020 13:47:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726393AbgI1Rcs (ORCPT
+        with ESMTP id S1726565AbgI1RrX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Sep 2020 13:32:48 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A0C8C061755;
-        Mon, 28 Sep 2020 10:32:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
-        Reply-To:Cc:Content-ID:Content-Description;
-        bh=iUaPMsxKFJbBK6PNihcbdt4xuWt8lQ7QQ63bF1TVpO8=; b=Y6SArI91fVZTs8vTp80WZZUBdL
-        ZzAqTOyuF16BcgpyE6KTxcA5DdQ48QwnRrY0M/PJyNfeuYIzIR9ijI+drslyHwhuhQLPIAZKb83zJ
-        /CZgiBzK6Sr2Liq5zeZIOupPvY5HWMOv4AZP1yoJ2V++Ev2pT+DfWlvVGjhyT3qNi91+XSFWs8co9
-        jSvlafo4X4nJRwCqICL9k6oSfoM0qQgmxidbfY9o3PV0juuJUwfy8H+qfjGY4UdYdrZG0ciFtXMeA
-        DfPT20ZEmhQ1uS29NtvA5rCjlRDJ/HNo+/vRZN3ASFyf2Mr8RQoDMXKPcFc4oiDUG21xH1Fa+/YBw
-        QPzb+hiA==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kMx14-0008Nt-GX; Mon, 28 Sep 2020 17:32:46 +0000
-Subject: Re: [v5 08/12] Add durable_name_printk
-To:     tasleson@redhat.com, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org
-References: <20200925161929.1136806-1-tasleson@redhat.com>
- <20200925161929.1136806-9-tasleson@redhat.com>
- <fbd1b019-04ee-5fda-11c8-95fecf031113@infradead.org>
- <0e091001-a260-856c-1e6c-9b6fb7350d26@redhat.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <4349d3b5-1ae7-cc11-4fde-33aa27039a88@infradead.org>
-Date:   Mon, 28 Sep 2020 10:32:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        Mon, 28 Sep 2020 13:47:23 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5396C061755;
+        Mon, 28 Sep 2020 10:47:22 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id j2so2299911wrx.7;
+        Mon, 28 Sep 2020 10:47:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/xC7sVHcrGN898jvMxBaTyGhFlsYYmV8IqAwKCr7ZRU=;
+        b=X76xYhd3KRTbRwTGgCMGcp5w+6fynAQyONy4JxAdpZLdFts8jyvyqy24e25xd62OLW
+         bXh3WC80JwOIuG6yDk/pKVffBWEoijaVHqq/eutJsgQprp9A8pL9nvFVdrybd5GjxPnD
+         WBHAUi+F2Y8BzPBLa9HNqHKG44yaC1YsRRd4eQsgmn4BXV1ccl2zJ+IlaylH+k2Tghym
+         /dMddaO53BkB6tdFR9rh0eBqq5Gt7kKslAB44podqTRX9yM+Vuh2uzNsatcZ3YQxmclP
+         6fWl2Nj8FfhtHyCa8Z+RYUe+6s9SgAeGtg4FlhxdL7cmvqU/mhgOmNeywVui/AIwBgsE
+         LwQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/xC7sVHcrGN898jvMxBaTyGhFlsYYmV8IqAwKCr7ZRU=;
+        b=ZkVNJ9mxk+aVJMquWop/z2H0ipRW8ML1YSPpera6hiT0ReM5tjcXXqifJJ98KNzPha
+         v3bW257aR5TL777pSsfu7wFEfiKbHHbepOv84PHxFwZpqOhXYNJbhCdjetXy28JiNBLj
+         Pl3PCyMj4WWJ3hgabCj+tIjpxM6mGnlNqokMq6/5oiK3SL0KuZ0vDFzQIhtuW0SO86zP
+         f3b5PvDJCPSn+I5QhpzaQt3vUhdP/B60MK6Kohz8Rp+t7D1uqzC/G3y95RoxcIW/GhHH
+         yq9CzMrUZo8ilq35i/yB6PaIDHgAdSThunohBokzHiAaXAhoO9399RUsqxo5Syjgv74R
+         qNIg==
+X-Gm-Message-State: AOAM533txVF66dK3ZCnoa9Yv3cOGylEn8+RzSilbnLji16x9rHnBskmk
+        h2m6/OeChrJ56cuj6eSP06JZ+Q1qc9vfgmTBWZZcNqSKzSKOxA==
+X-Google-Smtp-Source: ABdhPJx96v0ZgUBrLgFUbFXE7T0XgggFSabVgtJyLhF55ex8gUwVYGVjuiecada1ajgSx01ecXIIvnOKHaUaymBd4Pc=
+X-Received: by 2002:a5d:630a:: with SMTP id i10mr2821633wru.137.1601315241434;
+ Mon, 28 Sep 2020 10:47:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0e091001-a260-856c-1e6c-9b6fb7350d26@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CGME20200928095910epcas5p2226ab95a8e4fbd3cfe3f48afb1a58c40@epcas5p2.samsung.com>
+ <20200928095549.184510-1-joshi.k@samsung.com> <20200928121136.GA661041@kroah.com>
+In-Reply-To: <20200928121136.GA661041@kroah.com>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Mon, 28 Sep 2020 23:16:55 +0530
+Message-ID: <CA+1E3rLzwkqwn09mzi7-112ZYyBU_mU_9Nszb0=aymm3H2sGpA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/1] concurrency handling for zoned null-blk
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        stable@vger.kernel.org, Selvakumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/28/20 8:52 AM, Tony Asleson wrote:
-> On 9/26/20 6:53 PM, Randy Dunlap wrote:
->> I suggest that these 2 new function names should be
->> 	printk_durable_name()
->> and
->> 	printk_durable_name_ratelimited()
->>
->> Those names would be closer to the printk* family of
->> function names.  Of course, you can find exceptions to this,
->> like dev_printk(), but that is in the dev_*() family of
->> function names.
-> 
-> durable_name_printk has the same argument signature as dev_printk with
-> it's intention that in the future it might be a candidate to get changed
-> to dev_printk.  The reason I'm not using dev_printk is to avoid changing
-> the content of the message users see.
-> 
-> With this clarification, do you still suggest the rename or maybe
-> suggest something different?
+On Mon, Sep 28, 2020 at 5:42 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Mon, Sep 28, 2020 at 03:25:48PM +0530, Kanchan Joshi wrote:
+> > Changes since v1:
+> > - applied the refactoring suggested by Damien
+> >
+> > Kanchan Joshi (1):
+> >   null_blk: synchronization fix for zoned device
+> >
+> >  drivers/block/null_blk.h       |  1 +
+> >  drivers/block/null_blk_zoned.c | 22 ++++++++++++++++++----
+> >  2 files changed, 19 insertions(+), 4 deletions(-)
+> >
+> > --
+> > 2.25.1
+> >
+>
+>
+> <formletter>
+>
+> This is not the correct way to submit patches for inclusion in the
+> stable kernel tree.  Please read:
+>     https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+> for how to do this properly.
+>
+> </formletter>
+I'm sorry for the goof-up, Greg.
 
-Since you seem to bring it up, "durable_name" is a bit long IMO.
-
-But yes, I still prefer printk_durable_name() etc. The other order seems
-backwards to me. But that's still just an opinion.
 
 
-> dev_id_printk
-> id_printk
-> ...
-> 
-> I'm also thinking that maybe we should add a new function do everything
-> dev_printk does, but without prepending the device driver name and
-> device name to the message.  So we can get the metadata adds without
-> having the content of the message change.
-
-thanks.
--- 
-~Randy
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
+--
+Joshi
