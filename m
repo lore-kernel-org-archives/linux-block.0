@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1EBC47428
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D85C47427
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C83372100A
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0573121548
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 16:47:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="iZd4Dh6O"
+	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="Bx1Jp8nd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726861AbgI1QrX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Sep 2020 12:47:23 -0400
-Received: from mail-eopbgr760077.outbound.protection.outlook.com ([40.107.76.77]:62395
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        id S1726953AbgI1Qrx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Sep 2020 12:47:53 -0400
+Received: from mail-eopbgr770050.outbound.protection.outlook.com ([40.107.77.50]:19366
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726696AbgI1QrR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Sep 2020 12:47:17 -0400
+        id S1726852AbgI1Qrd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Sep 2020 12:47:33 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q6FpZ0tUMMjF2XYaUvaOS0Mc0bPJUU6ZWDXcYfbYfq9dvATFT66rCftc4Sbh21hIvtfcpkJZiV3s4yJfC8vncm1/tqsWNMUmTz1j/Scco/6kWX55sDIfLNwKb1wQxgzIfE3E34rQvb3HbJVjCJZnjuxh78jV9Mfx9oayCwRpMjaAaqKoHXpmr7DneIbsHOzcmNgKmCAH9SasAVLGN4LHAy5iHrA8ONZndWGK2KXsGblWF1/+yX3CC5vauqPm2lmglOPquv1Ah0IPzXuC59meSbLfFhDDb3enZx5MfYJDzpfPy9sM7eGihPAJAWr7cavhu30vdYa6mUJVQVYKf+1EaA==
+ b=jDZ2N+SjNYXQZUG5k/0p567bYGQSY/03eIaiiSFcpiQBgQj869kP3oaZY2NFOwbgGvEBNZL3ROAtzc3VrmMhaakChwRJpcHLketx78Bwv4PifKIAtDQFGAOBPbtxA/nOC4gUfjpBc93iRhIo0iSgID2XwhcrH4bFOIWvPHcYSY6X6V/QVaTmmd2EIaocUhrS12hGngdLZme00fnVQsqSl3XzboR+F9FA+O8G1El53WySIndRB/Df6EW/s7jYJXLhraLUEKNUGxD3OjKRnZqiYN+RMrGuNcrunekJFtLtbhg8/dslAgI+OQa7bRHOl2AujotQuVfDsr/a2lOFmR9xmg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YI10lmjwcR+Yh5uI3Act68Ja+sfAK1MIEFHKyneH0l0=;
- b=ipw1nf1zB1RzFcOWAv3vOMVoyJbCBOM+rc3JbeEQoggnB8cAc3Qxdl9X++Bn6w9ZqvrxH9PErlbUdYu66/HhsCQrCBuDRC1yQxykASrUb5yROurT/RMMdG7bXwvtRxjNHY27ESwVFzG62Qng4VypuezPp/7fax9r5bjyXJIQ8KhNVGjlK186tnmqMKBlwY3l8GrMUH01gXGLKl2b/JNRFL9wRDGbElPOlPdLZEmZY3jS43dzHWT1SlsOLZdkhXdwqSy41uWacZi8r+1JBwXa6w+KVimF5FRuwfy2dO3C6uFog3sBzFG4zLIY8eIJy2d6cvUDuKgeNaOhxxQ/AZGIxw==
+ bh=g3AHN/M7HgjTxtgdmSf1/n6pC28a1p0tV7pfc1+eKUo=;
+ b=gWznpt+VlNYHbano/90x1BTCxCL3RjMnP82dGDwt0Xyv0CxtJ1DpVFPpsizqmL7IpAURnZppKmym8sgfC/hJW1s4Yfg+x5R8tEWcyrpQ3I7923TidiMJLSAb52RU4echbKNFb+Pf3C4Zmc30gQadnE03a1lCwF5fbk5Lgsy7No/yVxm3cHbqwHdei/MCTjFKgvy8Uh9pvc6vScEKElhZkxKYUjszAopAiecqbbZGLkUAgrfRAJDCKukqygyDYknKqMsoqY+vSyrNUXPuO0dT88GvIIOQLc+J84nJgPwV1XA6hGgxVQ8JpX9t1r0gXEBnQZYuNt5ZOSYAZE+VKaEeJg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  137.201.242.130) smtp.rcpttodomain=kvack.org smtp.mailfrom=micron.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=micron.com;
@@ -36,18 +36,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YI10lmjwcR+Yh5uI3Act68Ja+sfAK1MIEFHKyneH0l0=;
- b=iZd4Dh6O2uYVl8ry5X1Luqair1WkVjr0y6JuinQ8Wn1kjLeYRqQ0LHVNefnNmrJU73hGh29aCDzB806rAOtzc1rRThWr3pNrp77cOaIBPyo+sV4oreC+aOHHqszBI5NRPEJq4NS9mIv53jkQJEJxd3JSLkCp6kxZW6qFNOUMhIM=
-Received: from BN6PR17CA0035.namprd17.prod.outlook.com (2603:10b6:405:75::24)
- by MWHPR08MB2430.namprd08.prod.outlook.com (2603:10b6:300:13::21) with
+ bh=g3AHN/M7HgjTxtgdmSf1/n6pC28a1p0tV7pfc1+eKUo=;
+ b=Bx1Jp8ndl2MkZ6UJgO6EOIIkOaVZvOegqw1nF28VQHYj0uU1nAKSIgMVuKvJms38r5R6xQWtY8Jpmn5nn2CMTg1l2OyFB8dek2zKd+dyXy9u0f0QeAcSG4rqPvZZVHxTWa/ND2Jl0PF8kthZVZ+oIyjn7QTjjd4o8S6qG/UvHV4=
+Received: from BN6PR13CA0036.namprd13.prod.outlook.com (2603:10b6:404:13e::22)
+ by DM6PR08MB5723.namprd08.prod.outlook.com (2603:10b6:5:155::25) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.22; Mon, 28 Sep
- 2020 16:47:08 +0000
-Received: from BN3NAM01FT020.eop-nam01.prod.protection.outlook.com
- (2603:10b6:405:75:cafe::4) by BN6PR17CA0035.outlook.office365.com
- (2603:10b6:405:75::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20 via Frontend
- Transport; Mon, 28 Sep 2020 16:47:07 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.29; Mon, 28 Sep
+ 2020 16:47:21 +0000
+Received: from BN3NAM01FT028.eop-nam01.prod.protection.outlook.com
+ (2603:10b6:404:13e:cafe::4) by BN6PR13CA0036.outlook.office365.com
+ (2603:10b6:404:13e::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.17 via Frontend
+ Transport; Mon, 28 Sep 2020 16:47:21 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 137.201.242.130)
  smtp.mailfrom=micron.com; kvack.org; dkim=none (message not signed)
  header.d=none;kvack.org; dmarc=pass action=none header.from=micron.com;
@@ -55,21 +55,21 @@ Received-SPF: Pass (protection.outlook.com: domain of micron.com designates
  137.201.242.130 as permitted sender) receiver=protection.outlook.com;
  client-ip=137.201.242.130; helo=mail.micron.com;
 Received: from mail.micron.com (137.201.242.130) by
- BN3NAM01FT020.mail.protection.outlook.com (10.152.67.227) with Microsoft SMTP
+ BN3NAM01FT028.mail.protection.outlook.com (10.152.67.96) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3412.21 via Frontend Transport; Mon, 28 Sep 2020 16:47:07 +0000
+ 15.20.3412.21 via Frontend Transport; Mon, 28 Sep 2020 16:47:21 +0000
 Received: from micron.com (10.114.5.55) by bowex17c.micron.com
  (137.201.21.211) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 28 Sep
- 2020 10:47:02 -0600
+ 2020 10:47:16 -0600
 From:   <nmeeramohide@micron.com>
 To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-mm@kvack.org>,
         <linux-nvdimm@lists.01.org>
 CC:     <smoyer@micron.com>, <gbecker@micron.com>, <plabat@micron.com>,
         <jgroves@micron.com>, Nabeel M Mohamed <nmeeramohide@micron.com>
-Subject: [PATCH 05/22] mpool: add space map component which manages free space on mpool devices
-Date:   Mon, 28 Sep 2020 11:45:17 -0500
-Message-ID: <20200928164534.48203-6-nmeeramohide@micron.com>
+Subject: [PATCH 20/22] mpool: add support to proactively evict cached mblock data from the page-cache
+Date:   Mon, 28 Sep 2020 11:45:32 -0500
+Message-ID: <20200928164534.48203-21-nmeeramohide@micron.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20200928164534.48203-1-nmeeramohide@micron.com>
 References: <20200928164534.48203-1-nmeeramohide@micron.com>
@@ -78,77 +78,70 @@ Content-Type: text/plain
 X-ClientProxiedBy: bowex17d.micron.com (137.201.21.212) To bowex17c.micron.com
  (137.201.21.211)
 X-TM-AS-Product-Ver: SMEX-12.0.0.1782-8.200.1013-24646.005
-X-TM-AS-Result: No--16.293800-0.000000-31
-X-TM-AS-MatchedID: 155760-702686-105630-704397-702876-700863-705063-702877-7
-        05161-700060-703812-700095-703226-701342-703342-704806-702615-703956-701413
-        -704714-704228-703878-703700-704318-702619-703215-704418-704792-704401-7045
-        85-703542-780052-703953-701480-701809-701280-703017-702395-188019-703027-70
-        2299-704477-300015-703213-703140-121336-701105-704673-703967-139504-702754-
-        701772-704183-701590-700809-700163-847298-701475-704053-702700-702444-70356
-        3-703385-701803-701750-700069-704841-700926-702415-188199-704402-702798-700
-        864-702908-700077-700786-701007-700954-704264-704090-704612-700737-701270-7
-        04959-700512-703532-704173-703434-702216-702298-148004-148036-29997-42000-4
-        2003
+X-TM-AS-Result: No--7.484900-0.000000-31
+X-TM-AS-MatchedID: 700076-702928-704804-702719-847298-703651-702083-703863-7
+        03812-705223-704807-703357-704418-705140-105630-705161-704031-700010-702203
+        -701757-705041-700335-700025-704960-704965-704278-704524-701480-701809-7030
+        17-702395-188019-704397-703279-701270-704477-704318-700351-702619-702837-70
+        4793-702898-702617-702914-701964-700071-704806-703330-703215-701274-704926-
+        700069-703744-300015-703213-703880-702102-106470-705244-703904-700488-12136
+        7-701342-702415-704127-702433-703140-121336-701105-704673-703967-703901-702
+        665-702754-186102-704792-702259-705220-702887-701194-702171-139630-702177-1
+        21270-702960-705173-186035-704264-703993-700535-148004-148036-42000-42003
 X-TM-AS-User-Approved-Sender: Yes
 X-TM-AS-User-Blocked-Sender: No
 X-MT-Whitelisted: matched
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: caf60202-6d60-4059-5f38-08d863ce2334
-X-MS-TrafficTypeDiagnostic: MWHPR08MB2430:
-X-Microsoft-Antispam-PRVS: <MWHPR08MB2430B9559DAA8E3E671F86F1B3350@MWHPR08MB2430.namprd08.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 2e731e6c-bafe-4a61-ccfe-08d863ce2b2d
+X-MS-TrafficTypeDiagnostic: DM6PR08MB5723:
+X-Microsoft-Antispam-PRVS: <DM6PR08MB572339F46F6D10A69566E76BB3350@DM6PR08MB5723.namprd08.prod.outlook.com>
 X-MS-Exchange-Transport-Forked: True
 X-EXT-ByPass: 1
 X-MT-RULE-Whitelisted: Triggered
-X-MS-Oob-TLC-OOBClassifiers: OLM:2733;
+X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ELsDugfgN88mMI7GBf96TSzKDNJQT3fWLQ/tEBr5UIWSo0iXs05TvIbShsLsmpBVqswIwjsy2VpO0bn2m4cZ3r4DF/Ii63EAusa1iKIL8ZsP6hbKfgWBBqDxtV813F05R7b/3PYJlt306Zttn4gfoCmmkTeyWuYudeFf1//PDvuS7hgojhOu7jaolx0uf9/o81bjJ4We6KtoqPwiIr2gKUw6hiFg015jkVsmMLdcclSD7Glgd0+oGfvMT2/MhCmO+e+VwiFZyAXyzXRP/pJuh9zWMis7FdzfDRIaB9T3t3k4Qt9PLfBR6NrUa/55xdViCHMxXnw82wvpVGhWmynWS4qt+qS056RZQPdhmjHWgyFMfsCpmqgHZ4vXOlOxwbSL5Cg8/tWoX2Y8kQHHBPTNa2Fa46o7LvLGcjvRbhMKXEvxtBhao3q0aIXKMYy2qxlgkoFGLtHbciKfa55iIwGbaGHaaLNu0LPMeGYiZqHDecRrhYECMirPGEmSJy+xq7j1
-X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(39860400002)(396003)(346002)(136003)(376002)(46966005)(1076003)(26005)(8676002)(107886003)(47076004)(2906002)(83380400001)(54906003)(7636003)(70206006)(70586007)(33310700002)(478600001)(82740400003)(86362001)(55016002)(356005)(6666004)(2876002)(186003)(7696005)(8936002)(36756003)(30864003)(336012)(110136005)(426003)(5660300002)(4326008)(316002)(6286002)(2616005)(82310400003)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: wRuvTOoEWKXliDKF6iRmV9jrjA/NTtQGBZnnnrnJy4GKnC0f8Y63ygevncgvNwNrrh+MTP5fq+E4wnaydu+oFUnoGxlt0koff8L6g3IV321tB2BfAcW7NUE3ynnablpQro0V802+URO9rcbCnqSU5qtqI3dhQxOLhA4l0fGpogu/p0AzUNBirAJgoKFl9gyTIz1LyyJRyux8bgLNUg1q+k63TlwpMbYyUc4jW8Lq4+uj51tQhs0itSq2Ck52KuuyTSmbIXbsEmIaBN5Rf14W50/RAaxBCUe1JDTU+TcLrEraMBENum58gSADmDLzw9AD4oFZrQ/9UGwH0RBZzgN4+n3z+SIvvMV38RcRsmMf12VTSOAJ0pfPHFhZXEy3xHH+zuxHvz2kize5W2YqDIEFIgkI8cCgF1CC8ne3iILzpSLXPfw+NnDJs37MRzO+pkcvZ2LdTmXTxARfbpsfaUtYViTi08gSilB/CwEyuyI2pHFDBMzE8qebfSj073Mvgj3WvCBqpB3VbHcClhdLC+1MeQ==
+X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(39860400002)(346002)(376002)(136003)(396003)(46966005)(6666004)(82740400003)(7696005)(186003)(82310400003)(70206006)(33310700002)(356005)(83380400001)(336012)(478600001)(316002)(86362001)(54906003)(47076004)(36756003)(70586007)(110136005)(4326008)(26005)(55016002)(426003)(2906002)(2616005)(2876002)(1076003)(30864003)(7636003)(5660300002)(8936002)(107886003)(6286002)(8676002)(2101003)(305334003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: micron.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2020 16:47:07.6373
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2020 16:47:21.0180
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: caf60202-6d60-4059-5f38-08d863ce2334
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2e731e6c-bafe-4a61-ccfe-08d863ce2b2d
 X-MS-Exchange-CrossTenant-Id: f38a5ecd-2813-4862-b11b-ac1d563c806f
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f38a5ecd-2813-4862-b11b-ac1d563c806f;Ip=[137.201.242.130];Helo=[mail.micron.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN3NAM01FT020.eop-nam01.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN3NAM01FT028.eop-nam01.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR08MB2430
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR08MB5723
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 From: Nabeel M Mohamed <nmeeramohide@micron.com>
 
-The smap layer implements a free space map for each media class
-volume in an active mpool.
+This adds a mechanism to track object-level usage metrics and use
+that metrics to proactively evict mblock data from the page cache.
 
-Free space maps are maintained in memory only. When an mpool is
-activated, the free space map is reconstructed from the object
-metadata read from media. This approach has the following
-advantages:
-- Objects can be allocated or freed without any space map device IO
-- No overhead of tracking both the allocated and free space,
-  and keeping them synchronized
+The proactive reaping is employed just before the onset of memory
+pressure, which greatly improves throughput and reduces tail
+latencies for read and memory intensive workloads.
 
-The LBA space of a media class volume is subdivided into regions.
-Allocation requests for a volume are distributed across these
-regions. There's a separate space map per region which is
-protected by a region mutex 'pdi_rmlock'.
+The reaper component tracks residency of pages from specified xvms
+and weighs the memory used against system free memory. The reaper
+begins evicting pages from the specified xvm when the free memory
+falls below a predetermined low watermark, stopping when the free
+memory rises above a high watermark.
 
-Each region is further subdivided into zones. The zone size is
-determined at mpool create time, and it defaults to 32MiB.
-The free space in each region is represented by a rbtree,
-where the key is a zone number and the value is the length of
-the free space specified as a zone count.
-
-A configurable percentage of the total zones on a given volume
-are marked as spare zones, and the rest are marked as usable
-zones. The smap supports different allocation policies which
-determine which zone type is used to satisfy an allocation
-request - usable or spare or usable then spare or
-spare then usable.
+The reaper maintains several lists of xvms and cycles through them
+in a round-robin fashion to select pages to evict. Each xvm is
+comprised of one or more contiguous virtual subranges of pages,
+where each subrange is delineated by an mblock. Each mblock has an
+associated access time which is updated on each page fault to any
+page in the mblock.  The reaper leverages the atime to decide
+whether or not to evict all the pages in the subrange based upon
+the current TTL, where the current TTL grows shorter as the urgency
+to evict pages grows stronger.
 
 Co-developed-by: Greg Becker <gbecker@micron.com>
 Signed-off-by: Greg Becker <gbecker@micron.com>
@@ -158,1203 +151,1032 @@ Co-developed-by: John Groves <jgroves@micron.com>
 Signed-off-by: John Groves <jgroves@micron.com>
 Signed-off-by: Nabeel M Mohamed <nmeeramohide@micron.com>
 ---
- drivers/mpool/init.c   |   17 +-
- drivers/mpool/mclass.c |  103 ++++
- drivers/mpool/smap.c   | 1031 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 1150 insertions(+), 1 deletion(-)
- create mode 100644 drivers/mpool/mclass.c
- create mode 100644 drivers/mpool/smap.c
+ drivers/mpool/mcache.c |  43 +++
+ drivers/mpool/mcache.h |   8 +
+ drivers/mpool/mpctl.c  |  15 +
+ drivers/mpool/mpctl.h  |   6 +
+ drivers/mpool/reaper.c | 692 +++++++++++++++++++++++++++++++++++++++++
+ drivers/mpool/reaper.h |  71 +++++
+ 6 files changed, 835 insertions(+)
+ create mode 100644 drivers/mpool/reaper.c
+ create mode 100644 drivers/mpool/reaper.h
 
-diff --git a/drivers/mpool/init.c b/drivers/mpool/init.c
-index 294cf3cbbaa7..031408815b48 100644
---- a/drivers/mpool/init.c
-+++ b/drivers/mpool/init.c
-@@ -8,6 +8,7 @@
- #include "mpool_printk.h"
+diff --git a/drivers/mpool/mcache.c b/drivers/mpool/mcache.c
+index b93ef85b300f..7201252292eb 100644
+--- a/drivers/mpool/mcache.c
++++ b/drivers/mpool/mcache.c
+@@ -17,6 +17,7 @@
+ #include "assert.h"
  
- #include "pd.h"
-+#include "smap.h"
+ #include "mpctl.h"
++#include "reaper.h"
  
- /*
-  * Module params...
-@@ -22,16 +23,30 @@ MODULE_PARM_DESC(chunk_size_kb, "Chunk size (in KiB) for device I/O");
+ #ifndef lru_to_page
+ #define lru_to_page(_head)  (list_entry((_head)->prev, struct page, lru))
+@@ -62,6 +63,7 @@ const struct address_space_operations mpc_aops_default;
  
- static void mpool_exit_impl(void)
- {
-+	smap_exit();
- 	pd_exit();
+ static struct workqueue_struct *mpc_wq_trunc __read_mostly;
+ static struct workqueue_struct *mpc_wq_rav[4] __read_mostly;
++struct mpc_reap *mpc_reap __read_mostly;
+ 
+ static size_t mpc_xvm_cachesz[2] __read_mostly;
+ static struct kmem_cache *mpc_xvm_cache[2] __read_mostly;
+@@ -107,6 +109,10 @@ void mpc_rgnmap_flush(struct mpc_rgnmap *rm)
+ 		head = xvm->xvm_next;
+ 		mpc_xvm_put(xvm);
+ 	}
++
++	/* Wait for reaper to prune its lists... */
++	while (atomic_read(&rm->rm_rgncnt) > 0)
++		usleep_range(100000, 150000);
  }
  
- static __init int mpool_init(void)
- {
-+	const char *errmsg = NULL;
- 	int rc;
+ static struct mpc_xvm *mpc_xvm_lookup(struct mpc_rgnmap *rm, uint key)
+@@ -127,6 +133,22 @@ void mpc_xvm_free(struct mpc_xvm *xvm)
+ 	struct mpc_rgnmap *rm;
  
- 	rc = pd_init();
- 	if (rc) {
--		mp_pr_err("pd init failed", rc);
-+		errmsg = "pd init failed";
-+		goto errout;
+ 	ASSERT((u32)(uintptr_t)xvm == xvm->xvm_magic);
++	ASSERT(atomic_read(&xvm->xvm_reapref) > 0);
++
++again:
++	mpc_reap_xvm_evict(xvm);
++
++	if (atomic_dec_return(&xvm->xvm_reapref) > 0) {
++		atomic_inc(xvm->xvm_freedp);
++		return;
 +	}
 +
-+	rc = smap_init();
-+	if (rc) {
-+		errmsg = "smap init failed";
-+		goto errout;
++	if (atomic64_read(&xvm->xvm_nrpages) > 0) {
++		atomic_cmpxchg(&xvm->xvm_evicting, 1, 0);
++		atomic_inc(&xvm->xvm_reapref);
++		usleep_range(10000, 30000);
++		goto again;
 +	}
+ 
+ 	rm = xvm->xvm_rgnmap;
+ 
+@@ -335,6 +357,8 @@ static vm_fault_t mpc_vm_fault_impl(struct vm_area_struct *vma, struct vm_fault
+ 	/* Page is locked with a ref. */
+ 	vmf->page = page;
+ 
++	mpc_reap_xvm_touch(vma->vm_private_data, page->index);
 +
-+errout:
-+	if (rc) {
-+		mp_pr_err("%s", rc, errmsg);
- 		mpool_exit_impl();
+ 	return vmfrc | VM_FAULT_LOCKED;
+ }
+ 
+@@ -532,6 +556,9 @@ static int mpc_readpages(struct file *file, struct address_space *mapping,
+ 	gfp = mapping_gfp_mask(mapping) & GFP_KERNEL;
+ 	wq = mpc_rgn2wq(xvm->xvm_rgn);
+ 
++	if (mpc_reap_xvm_duress(xvm))
++		nr_pages = min_t(uint, nr_pages, 8);
++
+ 	nr_pages = min_t(uint, nr_pages, ra_pages_max);
+ 
+ 	for (i = 0; i < nr_pages; ++i) {
+@@ -601,6 +628,8 @@ static int mpc_readpages(struct file *file, struct address_space *mapping,
+  * @gfp:
+  *
+  * The function is added as part of tracking incoming and outgoing pages.
++ * When the number of pages owned exceeds the limit (if defined) reap function
++ * will get invoked to trim down the usage.
+  */
+ static int mpc_releasepage(struct page *page, gfp_t gfp)
+ {
+@@ -696,6 +725,8 @@ int mpc_mmap(struct file *fp, struct vm_area_struct *vma)
+ 
+ 	fp->f_ra.ra_pages = unit->un_ra_pages_max;
+ 
++	mpc_reap_xvm_add(unit->un_ds_reap, xvm);
++
+ 	return 0;
+ }
+ 
+@@ -769,6 +800,9 @@ int mpioc_xvm_create(struct mpc_unit *unit, struct mpool_descriptor *mp, struct
+ 	xvm->xvm_cache = cache;
+ 	atomic_set(&xvm->xvm_opened, 0);
+ 
++	INIT_LIST_HEAD(&xvm->xvm_list);
++	atomic_set(&xvm->xvm_evicting, 0);
++	atomic_set(&xvm->xvm_reapref, 1);
+ 	atomic64_set(&xvm->xvm_nrpages, 0);
+ 	atomic_set(&xvm->xvm_rabusy, 0);
+ 
+@@ -878,6 +912,8 @@ int mpioc_xvm_purge(struct mpc_unit *unit, struct mpioc_vma *ioc)
+ 	if (!xvm)
+ 		return -ENOENT;
+ 
++	mpc_reap_xvm_evict(xvm);
++
+ 	mpc_xvm_put(xvm);
+ 
+ 	return 0;
+@@ -942,6 +978,12 @@ int mcache_init(void)
+ 		goto errout;
  	}
  
-diff --git a/drivers/mpool/mclass.c b/drivers/mpool/mclass.c
++	rc = mpc_reap_create(&mpc_reap);
++	if (rc) {
++		mp_pr_err("reap create failed", rc);
++		goto errout;
++	}
++
+ 	for (i = 0; i < ARRAY_SIZE(mpc_wq_rav); ++i) {
+ 		int     maxactive = 16;
+ 		char    name[16];
+@@ -973,6 +1015,7 @@ void mcache_exit(void)
+ 		mpc_wq_rav[i] = NULL;
+ 	}
+ 
++	mpc_reap_destroy(mpc_reap);
+ 	if (mpc_wq_trunc)
+ 		destroy_workqueue(mpc_wq_trunc);
+ 	kmem_cache_destroy(mpc_xvm_cache[1]);
+diff --git a/drivers/mpool/mcache.h b/drivers/mpool/mcache.h
+index 46c11d0ce5c9..9197fde3d858 100644
+--- a/drivers/mpool/mcache.h
++++ b/drivers/mpool/mcache.h
+@@ -47,12 +47,19 @@ struct mpc_xvm {
+ 	atomic64_t                 *xvm_hcpagesp;
+ 	struct address_space       *xvm_mapping;
+ 	struct mpc_rgnmap          *xvm_rgnmap;
++	struct mpc_reap            *xvm_reap;
+ 
+ 	enum mpc_vma_advice         xvm_advice;
+ 	atomic_t                    xvm_opened;
+ 	struct kmem_cache          *xvm_cache;
+ 	struct mpc_xvm             *xvm_next;
+ 
++	____cacheline_aligned
++	struct list_head            xvm_list;
++	atomic_t                    xvm_evicting;
++	atomic_t                    xvm_reapref;
++	atomic_t                   *xvm_freedp;
++
+ 	____cacheline_aligned
+ 	atomic64_t                  xvm_nrpages;
+ 	atomic_t                    xvm_rabusy;
+@@ -62,6 +69,7 @@ struct mpc_xvm {
+ 	struct mpc_mbinfo           xvm_mbinfov[];
+ };
+ 
++extern struct mpc_reap *mpc_reap;
+ extern const struct address_space_operations mpc_aops_default;
+ 
+ void mpc_rgnmap_flush(struct mpc_rgnmap *rm);
+diff --git a/drivers/mpool/mpctl.c b/drivers/mpool/mpctl.c
+index 961078205c5e..5c1a71572c4c 100644
+--- a/drivers/mpool/mpctl.c
++++ b/drivers/mpool/mpctl.c
+@@ -39,6 +39,7 @@
+ #include "mp.h"
+ #include "mpctl.h"
+ #include "sysfs.h"
++#include "reaper.h"
+ #include "init.h"
+ 
+ 
+@@ -188,6 +189,10 @@ static int mpc_params_register(struct mpc_unit *unit, int cnt)
+ 	if (mpc_unit_ismpooldev(unit))
+ 		mpc_mpool_params_add(dattr);
+ 
++	/* Common parameters */
++	if (mpc_unit_isctldev(unit))
++		mpc_reap_params_add(dattr);
++
+ 	rc = mpc_attr_group_create(attr);
+ 	if (rc) {
+ 		mpc_attr_destroy(attr);
+@@ -2382,6 +2387,7 @@ static int mpc_open(struct inode *ip, struct file *fp)
+ 	mpc_bdi_save(unit, ip);
+ 
+ 	unit->un_mapping = fp->f_mapping;
++	unit->un_ds_reap = mpc_reap;
+ 
+ 	inode_lock(ip);
+ 	i_size_write(ip, 1ul << 63);
+@@ -2431,6 +2437,7 @@ static int mpc_release(struct inode *ip, struct file *fp)
+ 	if (mpc_unit_ismpooldev(unit)) {
+ 		mpc_rgnmap_flush(&unit->un_rgnmap);
+ 
++		unit->un_ds_reap = NULL;
+ 		unit->un_mapping = NULL;
+ 
+ 		mpc_bdi_restore(unit, ip);
+@@ -2768,6 +2775,14 @@ int mpctl_init(void)
+ 		goto errout;
+ 	}
+ 
++	/* The reaper component has already been initialized before mpctl. */
++	ctlunit->un_ds_reap = mpc_reap;
++	rc = mpc_params_register(ctlunit, MPC_REAP_PARAMS_CNT);
++	if (rc) {
++		errmsg = "cannot register common parameters";
++		goto errout;
++	}
++
+ 	mutex_lock(&ss->ss_lock);
+ 	idr_replace(&ss->ss_unitmap, ctlunit, MINOR(ctlunit->un_devno));
+ 	mutex_unlock(&ss->ss_lock);
+diff --git a/drivers/mpool/mpctl.h b/drivers/mpool/mpctl.h
+index 8c926eef837c..6b6f12d7787f 100644
+--- a/drivers/mpool/mpctl.h
++++ b/drivers/mpool/mpctl.h
+@@ -30,6 +30,7 @@ struct mpc_unit {
+ 	const struct mpc_uinfo     *un_uinfo;
+ 	struct mpc_mpool           *un_mpool;
+ 	struct address_space       *un_mapping;
++	struct mpc_reap            *un_ds_reap;
+ 	struct device              *un_device;
+ 	struct backing_dev_info    *un_saved_bdi;
+ 	struct mpc_attr            *un_attr;
+@@ -47,6 +48,11 @@ static inline struct mpc_unit *dev_to_unit(struct device *dev)
+ 	return dev_get_drvdata(dev);
+ }
+ 
++static inline struct mpc_reap *dev_to_reap(struct device *dev)
++{
++	return dev_to_unit(dev)->un_ds_reap;
++}
++
+ int mpctl_init(void) __cold;
+ void mpctl_exit(void) __cold;
+ 
+diff --git a/drivers/mpool/reaper.c b/drivers/mpool/reaper.c
 new file mode 100644
-index 000000000000..a81ee5ee9468
+index 000000000000..2a1be946e874
 --- /dev/null
-+++ b/drivers/mpool/mclass.c
-@@ -0,0 +1,103 @@
++++ b/drivers/mpool/reaper.c
+@@ -0,0 +1,692 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
-+
 +/*
-+ * This file contains the media class accessor functions.
-+ */
-+
-+#include <linux/errno.h>
-+
-+#include "omf_if.h"
-+#include "pd.h"
-+#include "params.h"
-+#include "mclass.h"
-+
-+void mc_init_class(struct media_class *mc, struct mc_parms *mc_parms, struct mc_smap_parms *mcsp)
-+{
-+	memcpy(&(mc->mc_parms), mc_parms, sizeof(*mc_parms));
-+	mc->mc_uacnt = 0;
-+	mc->mc_sparms = *mcsp;
-+}
-+
-+void mc_omf_devparm2mc_parms(struct omf_devparm_descriptor *omf_devparm, struct mc_parms *mc_parms)
-+{
-+	/* Zeroes mc_ parms because memcmp() may be used on it later. */
-+	memset(mc_parms, 0, sizeof(*mc_parms));
-+	mc_parms->mcp_classp   = omf_devparm->odp_mclassp;
-+	mc_parms->mcp_zonepg   = omf_devparm->odp_zonepg;
-+	mc_parms->mcp_sectorsz = omf_devparm->odp_sectorsz;
-+	mc_parms->mcp_devtype  = omf_devparm->odp_devtype;
-+	mc_parms->mcp_features = omf_devparm->odp_features;
-+}
-+
-+void mc_parms2omf_devparm(struct mc_parms *mc_parms, struct omf_devparm_descriptor *omf_devparm)
-+{
-+	omf_devparm->odp_mclassp  = mc_parms->mcp_classp;
-+	omf_devparm->odp_zonepg   = mc_parms->mcp_zonepg;
-+	omf_devparm->odp_sectorsz = mc_parms->mcp_sectorsz;
-+	omf_devparm->odp_devtype  = mc_parms->mcp_devtype;
-+	omf_devparm->odp_features = mc_parms->mcp_features;
-+}
-+
-+int mc_cmp_omf_devparm(struct omf_devparm_descriptor *omfd1, struct omf_devparm_descriptor *omfd2)
-+{
-+	struct mc_parms mc_parms1;
-+	struct mc_parms mc_parms2;
-+
-+	mc_omf_devparm2mc_parms(omfd1, &mc_parms1);
-+	mc_omf_devparm2mc_parms(omfd2, &mc_parms2);
-+
-+	return memcmp(&mc_parms1, &mc_parms2, sizeof(mc_parms1));
-+}
-+
-+void mc_pd_prop2mc_parms(struct pd_prop *pd_prop, struct mc_parms *mc_parms)
-+{
-+	/* Zeroes mc_ parms because memcmp() may be used on it later. */
-+	memset(mc_parms, 0, sizeof(*mc_parms));
-+	mc_parms->mcp_classp	= pd_prop->pdp_mclassp;
-+	mc_parms->mcp_zonepg	= pd_prop->pdp_zparam.dvb_zonepg;
-+	mc_parms->mcp_sectorsz	= PD_SECTORSZ(pd_prop);
-+	mc_parms->mcp_devtype	= pd_prop->pdp_devtype;
-+	mc_parms->mcp_features	= OMF_MC_FEAT_MBLOCK_TGT;
-+
-+	if (pd_prop->pdp_cmdopt & PD_CMD_SECTOR_UPDATABLE)
-+		mc_parms->mcp_features |= OMF_MC_FEAT_MLOG_TGT;
-+	if (pd_prop->pdp_cmdopt & PD_CMD_DIF_ENABLED)
-+		mc_parms->mcp_features |= OMF_MC_FEAT_CHECKSUM;
-+}
-+
-+int mc_set_spzone(struct media_class *mc, u8 spzone)
-+{
-+	if (!mc)
-+		return -EINVAL;
-+
-+	if (mc->mc_pdmc < 0)
-+		return -ENOENT;
-+
-+	mc->mc_sparms.mcsp_spzone = spzone;
-+
-+	return 0;
-+}
-+
-+static void mc_smap_parms_get_internal(struct mpcore_params *params, struct mc_smap_parms *mcsp)
-+{
-+	mcsp->mcsp_spzone = params->mp_spare;
-+	mcsp->mcsp_rgnc = params->mp_smaprgnc;
-+	mcsp->mcsp_align = params->mp_smapalign;
-+}
-+
-+int mc_smap_parms_get(struct media_class *mc, struct mpcore_params *params,
-+		      struct mc_smap_parms *mcsp)
-+{
-+	if (!mc || !mcsp)
-+		return -EINVAL;
-+
-+	if (mc->mc_pdmc >= 0)
-+		*mcsp = mc->mc_sparms;
-+	else
-+		mc_smap_parms_get_internal(params, mcsp);
-+
-+	return 0;
-+}
-diff --git a/drivers/mpool/smap.c b/drivers/mpool/smap.c
-new file mode 100644
-index 000000000000..a62aaa2f0113
---- /dev/null
-+++ b/drivers/mpool/smap.c
-@@ -0,0 +1,1031 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
-+ */
-+/*
-+ * Space map module.
++ * The reaper subsystem tracks residency of pages from specified VMAs and
++ * weighs the memory used against system free memory.  Should the relative
++ * residency vs free memory fall below a predetermined low watermark the
++ * reaper begins evicting pages from the specified VMAs, stopping when free
++ * memory rises above a high watermark that is slightly higher than the low
++ * watermark.
 + *
-+ * Implements space maps for managing free space on drives.
++ * The reaper maintains several lists of VMAs and cycles through them in a
++ * round-robin fashion to select pages to evict.  Each VMA is comprised of
++ * one or more contiguous virtual subranges of pages, where each subrange
++ * is delineated by an mblock (typically no larger than 32M).  Each mblock
++ * has an associated access time which is updated on each page fault to any
++ * page in the mblock.  The reaper leverages the atime to decide whether or
++ * not to evict all the pages in the subrange based upon the current TTL,
++ * where the current TTL grows shorter as the urgency to evict pages grows
++ * stronger.
 + */
 +
-+#include <linux/log2.h>
++#include <linux/kernel.h>
++#include <linux/fs.h>
++#include <linux/mm.h>
 +#include <linux/delay.h>
++#include <linux/sched.h>
 +#include <linux/slab.h>
++#include <linux/sched/clock.h>
 +
-+#include "assert.h"
 +#include "mpool_printk.h"
++#include "assert.h"
 +
-+#include "pd.h"
-+#include "sb.h"
-+#include "mclass.h"
-+#include "smap.h"
-+#include "mpcore.h"
++#include "sysfs.h"
++#include "mpctl.h"
++#include "reaper.h"
 +
-+static struct kmem_cache  *smap_zone_cache __read_mostly;
++#define REAP_ELEM_MAX       3
 +
-+static int smap_drive_alloc(struct mpool_descriptor *mp, struct mc_smap_parms *mcsp, u16 pdh);
-+static int smap_drive_sballoc(struct mpool_descriptor *mp, u16 pdh);
-+
-+/*
-+ * smap API functions
++/**
++ * struct mpc_reap_elem -
++ * @reap_lock:      lock to protect reap_list
++ * @reap_list:      list of inodes
++ * @reap_active:    reaping in progress
++ * @reap_hpages:    total hot pages which are mapped
++ * @reap_cpages:    total coldpages which are mapped
 + */
++struct mpc_reap_elem {
++	struct mutex            reap_lock;
++	struct list_head        reap_list;
 +
-+static struct smap_zone *smap_zone_find(struct rb_root *root, u64 key)
++	____cacheline_aligned
++	atomic_t                reap_running;
++	struct work_struct      reap_work;
++	struct mpc_reap        *reap_reap;
++
++	____cacheline_aligned
++	atomic64_t              reap_hpages;
++	atomic_t                reap_nfreed;
++
++	____cacheline_aligned
++	atomic64_t              reap_wpages;
++
++	____cacheline_aligned
++	atomic64_t              reap_cpages;
++};
++
++/**
++ * struct mpc_reap -
++ * @reap_lwm:     Low water mark
++ * @reap_ttl_cur: Current time-to-live
++ * @reap_wq:
++ *
++ * @reap_hdr:     sysctl table header
++ * @reap_tab:     sysctl table components
++ * @reap_mempct:
++ * @reap_ttl:
++ * @reap_debug:
++ *
++ * @reap_eidx:    Pruner element index
++ * @reap_emit:    Pruner debug message control
++ * @reap_dwork:
++ * @reap_elem:    Array of reaper lists (reaper pool)
++ */
++struct mpc_reap {
++	atomic_t                    reap_lwm;
++	atomic_t                    reap_ttl_cur;
++	struct workqueue_struct    *reap_wq;
++
++	____cacheline_aligned
++	unsigned int                reap_mempct;
++	unsigned int                reap_ttl;
++	unsigned int                reap_debug;
++
++	____cacheline_aligned
++	atomic_t                    reap_eidx;
++	atomic_t                    reap_emit;
++	struct delayed_work         reap_dwork;
++
++	struct mpc_reap_elem        reap_elem[REAP_ELEM_MAX];
++};
++
++/**
++ * mpc_reap_meminfo() - Get current system-wide memory usage
++ * @freep:    ptr to return bytes of free memory
++ * @availp:   ptr to return bytes of available memory
++ * @shift:    shift results by %shift bits
++ *
++ * %mpc_reap_meminfo() returns current free and available memory
++ * sizes obtained from /proc/meminfo in userland and si_meminfo()
++ * in the kernel.  The resulting sizes are in bytes, but the
++ * caller can supply a non-zero %shift argment to obtain results
++ * in different units (e.g., for MiB shift=20, for GiB shift=30).
++ *
++ * %freep and/or %availp may be NULL.
++ */
++static void mpc_reap_meminfo(ulong *freep, ulong *availp, uint shift)
 +{
-+	struct rb_node *node = root->rb_node;
-+	struct smap_zone *elem;
++	struct sysinfo si;
 +
-+	while (node) {
-+		elem = rb_entry(node, typeof(*elem), smz_node);
++	si_meminfo(&si);
 +
-+		if (key < elem->smz_key)
-+			node = node->rb_left;
-+		else if (key > elem->smz_key)
-+			node = node->rb_right;
-+		else
-+			return elem;
-+	}
++	if (freep)
++		*freep = (si.freeram * si.mem_unit) >> shift;
 +
-+	return NULL;
++	if (availp)
++		*availp = (si_mem_available() * si.mem_unit) >> shift;
 +}
 +
-+static int smap_zone_insert(struct rb_root *root, struct smap_zone *item)
++static void mpc_reap_evict_vma(struct mpc_xvm *xvm)
 +{
-+	struct rb_node **pos = &root->rb_node, *parent = NULL;
-+	struct smap_zone *this;
++	struct address_space *mapping = xvm->xvm_mapping;
++	struct mpc_reap *reap = xvm->xvm_reap;
++	pgoff_t off, bktsz, len;
++	u64 ttl, xtime, now;
++	int i;
 +
-+	/* Figure out where to put new node */
-+	while (*pos) {
-+		this = rb_entry(*pos, typeof(*this), smz_node);
-+		parent = *pos;
++	bktsz = xvm->xvm_bktsz >> PAGE_SHIFT;
++	off = mpc_xvm_pgoff(xvm);
 +
-+		if (item->smz_key < this->smz_key)
-+			pos = &(*pos)->rb_left;
-+		else if (item->smz_key > this->smz_key)
-+			pos = &(*pos)->rb_right;
-+		else
-+			return false;
-+	}
++	ttl = atomic_read(&reap->reap_ttl_cur) * 1000ul;
++	now = local_clock();
 +
-+	/* Add new node and rebalance tree. */
-+	rb_link_node(&item->smz_node, parent, pos);
-+	rb_insert_color(&item->smz_node, root);
++	for (i = 0; i < xvm->xvm_mbinfoc; ++i, off += bktsz) {
++		struct mpc_mbinfo *mbinfo = xvm->xvm_mbinfov + i;
 +
-+	return true;
-+}
++		xtime = now - (ttl * mbinfo->mbmult);
++		len = mbinfo->mblen >> PAGE_SHIFT;
 +
-+int smap_mpool_init(struct mpool_descriptor *mp)
-+{
-+	struct mpool_dev_info *pd = NULL;
-+	struct media_class *mc;
-+	u64 pdh = 0;
-+	int rc = 0;
-+
-+	for (pdh = 0; pdh < mp->pds_pdvcnt; pdh++) {
-+		struct mc_smap_parms   mcsp;
-+
-+		pd = &mp->pds_pdv[pdh];
-+		mc = &mp->pds_mc[pd->pdi_mclass];
-+		rc = mc_smap_parms_get(&mp->pds_mc[mc->mc_parms.mcp_classp],
-+				       &mp->pds_params, &mcsp);
-+		if (rc)
-+			break;
-+
-+		rc = smap_drive_init(mp, &mcsp, pdh);
-+		if (rc) {
-+			mp_pr_err("smap(%s, %s): drive init failed",
-+				  rc, mp->pds_name, pd->pdi_name);
-+			break;
-+		}
-+	}
-+
-+	if (rc)
-+		smap_mpool_free(mp);
-+
-+	return rc;
-+}
-+
-+void smap_mpool_free(struct mpool_descriptor *mp)
-+{
-+	u64 pdh = 0;
-+
-+	for (pdh = 0; pdh < mp->pds_pdvcnt; pdh++)
-+		smap_drive_free(mp, pdh);
-+}
-+
-+void smap_mpool_usage(struct mpool_descriptor *mp, u8 mclass, struct mpool_usage *usage)
-+{
-+	if (mclass == MP_MED_ALL) {
-+		u32 i;
-+
-+		for (i = 0; i < MP_MED_NUMBER; i++)
-+			smap_mclass_usage(mp, i, usage);
-+	} else {
-+		smap_mclass_usage(mp, mclass, usage);
-+	}
-+}
-+
-+int smap_drive_spares(struct mpool_descriptor *mp, enum mp_media_classp mclassp, u8 spzone)
-+{
-+	struct mpool_dev_info *pd = NULL;
-+	struct media_class *mc;
-+	int rc;
-+	u8 i;
-+
-+	if (!mclass_isvalid(mclassp) || spzone > 100) {
-+		rc = -EINVAL;
-+		mp_pr_err("smap mpool %s: smap drive spares failed mclassp %d spzone %u",
-+			  rc, mp->pds_name, mclassp, spzone);
-+		return rc;
-+	}
-+
-+	/* Loop on all classes matching mclassp. */
-+	for (i = 0; i < MP_MED_NUMBER; i++) {
-+		mc = &mp->pds_mc[i];
-+		if (mc->mc_parms.mcp_classp != mclassp || mc->mc_pdmc < 0)
++		if (atomic64_read(&mbinfo->mbatime) > xtime)
 +			continue;
 +
-+		pd = &mp->pds_pdv[mc->mc_pdmc];
++		atomic64_set(&mbinfo->mbatime, U64_MAX);
 +
-+		spin_lock(&pd->pdi_ds.sda_dalock);
-+		/* Adjust utgt but not uact; possible for uact > utgt due to spzone change. */
-+		pd->pdi_ds.sda_utgt = (pd->pdi_ds.sda_zoneeff * (100 - spzone)) / 100;
-+		/* Adjust stgt and sact maintaining invariant that sact <= stgt */
-+		pd->pdi_ds.sda_stgt = pd->pdi_ds.sda_zoneeff - pd->pdi_ds.sda_utgt;
-+		if (pd->pdi_ds.sda_sact > pd->pdi_ds.sda_stgt) {
-+			pd->pdi_ds.sda_uact += (pd->pdi_ds.sda_sact - pd->pdi_ds.sda_stgt);
-+			pd->pdi_ds.sda_sact = pd->pdi_ds.sda_stgt;
-+		}
-+		spin_unlock(&pd->pdi_ds.sda_dalock);
++		invalidate_inode_pages2_range(mapping, off, off + len);
 +
-+	}
-+	return 0;
-+}
-+
-+/*
-+ * Compute zone stats for drive pd per comments in smap_dev_alloc.
-+ */
-+static void smap_calc_znstats(struct mpool_dev_info *pd, struct smap_dev_znstats *zones)
-+{
-+	zones->sdv_total = pd->pdi_parm.dpr_zonetot;
-+	zones->sdv_avail = pd->pdi_ds.sda_zoneeff;
-+	zones->sdv_usable = pd->pdi_ds.sda_utgt;
-+
-+	if (pd->pdi_ds.sda_utgt > pd->pdi_ds.sda_uact)
-+		zones->sdv_fusable = pd->pdi_ds.sda_utgt - pd->pdi_ds.sda_uact;
-+	else
-+		zones->sdv_fusable = 0;
-+
-+	zones->sdv_spare = pd->pdi_ds.sda_stgt;
-+	zones->sdv_fspare = pd->pdi_ds.sda_stgt - pd->pdi_ds.sda_sact;
-+	zones->sdv_used = pd->pdi_ds.sda_uact;
-+}
-+
-+int smap_drive_usage(struct mpool_descriptor *mp, u16 pdh, struct mpool_devprops *dprop)
-+{
-+	struct mpool_dev_info *pd = &mp->pds_pdv[pdh];
-+	struct smap_dev_znstats zones;
-+	u32 zonepg = 0;
-+
-+	zonepg = pd->pdi_parm.dpr_zonepg;
-+
-+	spin_lock(&pd->pdi_ds.sda_dalock);
-+	smap_calc_znstats(pd, &zones);
-+	spin_unlock(&pd->pdi_ds.sda_dalock);
-+
-+	dprop->pdp_total = (zones.sdv_total * zonepg) << PAGE_SHIFT;
-+	dprop->pdp_avail = (zones.sdv_avail * zonepg) << PAGE_SHIFT;
-+	dprop->pdp_spare = (zones.sdv_spare * zonepg) << PAGE_SHIFT;
-+	dprop->pdp_fspare = (zones.sdv_fspare * zonepg) << PAGE_SHIFT;
-+	dprop->pdp_usable = (zones.sdv_usable * zonepg) << PAGE_SHIFT;
-+	dprop->pdp_fusable = (zones.sdv_fusable * zonepg) << PAGE_SHIFT;
-+	dprop->pdp_used = (zones.sdv_used * zonepg) << PAGE_SHIFT;
-+
-+	return 0;
-+}
-+
-+int smap_drive_init(struct mpool_descriptor *mp, struct mc_smap_parms *mcsp, u16 pdh)
-+{
-+	struct mpool_dev_info *pd __maybe_unused;
-+	int rc;
-+
-+	pd = &mp->pds_pdv[pdh];
-+
-+	if ((mcsp->mcsp_spzone > 100) || !(mcsp->mcsp_rgnc > 0)) {
-+		rc = -EINVAL;
-+		mp_pr_err("smap(%s, %s): drive init failed, spzone %u rcnt %lu", rc, mp->pds_name,
-+			  pd->pdi_name, mcsp->mcsp_spzone, (ulong)mcsp->mcsp_rgnc);
-+		return rc;
-+	}
-+
-+	rc = smap_drive_alloc(mp, mcsp, pdh);
-+	if (!rc) {
-+		rc = smap_drive_sballoc(mp, pdh);
-+		if (rc)
-+			mp_pr_err("smap(%s, %s): sb alloc failed", rc, mp->pds_name, pd->pdi_name);
-+	} else {
-+		mp_pr_err("smap(%s, %s): drive alloc failed", rc, mp->pds_name, pd->pdi_name);
-+	}
-+
-+	if (rc)
-+		smap_drive_free(mp, pdh);
-+
-+	return rc;
-+}
-+
-+void smap_drive_free(struct mpool_descriptor *mp, u16 pdh)
-+{
-+	struct mpool_dev_info *pd = &mp->pds_pdv[pdh];
-+	u8 rgn = 0;
-+
-+	if (pd->pdi_rmbktv) {
-+		struct media_class     *mc;
-+		struct mc_smap_parms    mcsp;
-+
-+		mc = &mp->pds_mc[pd->pdi_mclass];
-+		(void)mc_smap_parms_get(&mp->pds_mc[mc->mc_parms.mcp_classp],
-+					&mp->pds_params, &mcsp);
-+
-+		for (rgn = 0; rgn < mcsp.mcsp_rgnc; rgn++) {
-+			struct smap_zone   *zone, *tmp;
-+			struct rb_root     *root;
-+
-+			root = &pd->pdi_rmbktv[rgn].pdi_rmroot;
-+
-+			rbtree_postorder_for_each_entry_safe(zone, tmp, root, smz_node) {
-+				kmem_cache_free(smap_zone_cache, zone);
-+			}
-+		}
-+
-+		kfree(pd->pdi_rmbktv);
-+		pd->pdi_rmbktv = NULL;
-+	}
-+
-+	pd->pdi_ds.sda_rgnsz = 0;
-+	pd->pdi_ds.sda_rgnladdr = 0;
-+	pd->pdi_ds.sda_rgnalloc = 0;
-+	pd->pdi_ds.sda_zoneeff = 0;
-+	pd->pdi_ds.sda_utgt = 0;
-+	pd->pdi_ds.sda_uact = 0;
-+}
-+
-+static bool smap_alloccheck(struct mpool_dev_info *pd, u64 zonecnt, enum smap_space_type sapolicy)
-+{
-+	struct smap_dev_alloc *ds;
-+	bool alloced = false;
-+	u64 zoneextra;
-+
-+	ds = &pd->pdi_ds;
-+
-+	spin_lock(&ds->sda_dalock);
-+
-+	switch (sapolicy) {
-+
-+	case SMAP_SPC_USABLE_ONLY:
-+		if ((ds->sda_uact + zonecnt) > ds->sda_utgt)
++		if (atomic64_read(&xvm->xvm_nrpages) < 32)
 +			break;
 +
-+		ds->sda_uact = ds->sda_uact + zonecnt;
-+		alloced = true;
-+		break;
++		if (need_resched())
++			cond_resched();
 +
-+	case SMAP_SPC_SPARE_ONLY:
-+		if ((ds->sda_sact + zonecnt) > ds->sda_stgt)
-+			break;
-+
-+		ds->sda_sact = ds->sda_sact + zonecnt;
-+		alloced = true;
-+		break;
-+
-+	case SMAP_SPC_USABLE_2_SPARE:
-+		if ((ds->sda_uact + ds->sda_sact + zonecnt) > ds->sda_zoneeff)
-+			break;
-+
-+		if ((ds->sda_uact + zonecnt) <= ds->sda_utgt) {
-+			ds->sda_uact = ds->sda_uact + zonecnt;
-+		} else {
-+			zoneextra = (ds->sda_uact + zonecnt) - ds->sda_utgt;
-+			ds->sda_uact = ds->sda_utgt;
-+			ds->sda_sact = ds->sda_sact + zoneextra;
-+		}
-+		alloced = true;
-+		break;
-+
-+	case SMAP_SPC_SPARE_2_USABLE:
-+		if ((ds->sda_sact + ds->sda_uact + zonecnt) > ds->sda_zoneeff)
-+			break;
-+
-+		if ((ds->sda_sact + zonecnt) <= ds->sda_stgt) {
-+			ds->sda_sact = ds->sda_sact + zonecnt;
-+		} else {
-+			zoneextra = (ds->sda_sact + zonecnt) - ds->sda_stgt;
-+			ds->sda_sact = ds->sda_stgt;
-+			ds->sda_uact = ds->sda_uact + zoneextra;
-+		}
-+		alloced = true;
-+		break;
-+
-+	default:
-+		break;
++		ttl = atomic_read(&reap->reap_ttl_cur) * 1000ul;
++		now = local_clock();
 +	}
-+
-+	spin_unlock(&ds->sda_dalock);
-+
-+	return alloced;
-+}
-+
-+int smap_alloc(struct mpool_descriptor *mp, u16 pdh, u64 zonecnt,
-+	       enum smap_space_type sapolicy, u64 *zoneaddr, u64 align)
-+{
-+	struct mc_smap_parms mcsp;
-+	struct mpool_dev_info *pd;
-+	struct smap_dev_alloc *ds;
-+	struct smap_zone *elem = NULL;
-+	struct rb_root *rmap = NULL;
-+	struct mutex *rmlock = NULL;
-+	struct media_class *mc;
-+	u64 fsoff = 0, fslen = 0, ualen = 0;
-+	u8 rgn = 0, rgnc;
-+	s8 rgnleft;
-+	bool res;
-+	int rc;
-+
-+	*zoneaddr = 0;
-+	pd = &mp->pds_pdv[pdh];
-+
-+	if (!zonecnt || !saptype_valid(sapolicy))
-+		return -EINVAL;
-+
-+	ASSERT(is_power_of_2(align));
-+
-+	ds = &pd->pdi_ds;
-+	mc = &mp->pds_mc[pd->pdi_mclass];
-+	rc = mc_smap_parms_get(&mp->pds_mc[mc->mc_parms.mcp_classp], &mp->pds_params, &mcsp);
-+	if (rc)
-+		return rc;
-+
-+	rgnc = mcsp.mcsp_rgnc;
-+
-+	/*
-+	 * We do not update the last rgn alloced beyond this point as it
-+	 * would incur search penalty if all the regions except one are highly
-+	 * fragmented, i.e., the last alloc rgn would never change in this case.
-+	 */
-+	spin_lock(&ds->sda_dalock);
-+	ds->sda_rgnalloc = (ds->sda_rgnalloc + 1) % rgnc;
-+	rgn = ds->sda_rgnalloc;
-+	spin_unlock(&ds->sda_dalock);
-+
-+	rgnleft = rgnc;
-+
-+	/* Search per-rgn space maps for contiguous region. */
-+	while (rgnleft--) {
-+		struct rb_node *node;
-+
-+		rmlock = &pd->pdi_rmbktv[rgn].pdi_rmlock;
-+		rmap = &pd->pdi_rmbktv[rgn].pdi_rmroot;
-+
-+		mutex_lock(rmlock);
-+
-+		for (node = rb_first(rmap); node; node = rb_next(node)) {
-+			elem  = rb_entry(node, struct smap_zone, smz_node);
-+			fsoff = elem->smz_key;
-+			fslen = elem->smz_value;
-+
-+			if (zonecnt > fslen)
-+				continue;
-+
-+			if (IS_ALIGNED(fsoff, align)) {
-+				ualen = 0;
-+				break;
-+			}
-+
-+			ualen = ALIGN(fsoff, align) - fsoff;
-+			if (ualen + zonecnt > fslen)
-+				continue;
-+
-+			break;
-+		}
-+
-+		if (node)
-+			break;
-+
-+		mutex_unlock(rmlock);
-+
-+		rgn = (rgn + 1) % rgnc;
-+	}
-+
-+	if (rgnleft < 0)
-+		return -ENOSPC;
-+
-+	/* Alloc from this free space if permitted. First fit. */
-+	res = smap_alloccheck(pd, zonecnt, sapolicy);
-+	if (!res) {
-+		mutex_unlock(rmlock);
-+		return -ENOSPC;
-+	}
-+
-+	fsoff = fsoff + ualen;
-+	fslen = fslen - ualen;
-+
-+	*zoneaddr = fsoff;
-+	rb_erase(&elem->smz_node, rmap);
-+
-+	if (zonecnt < fslen) {
-+		/* Re-use elem */
-+		elem->smz_key   = fsoff + zonecnt;
-+		elem->smz_value = fslen - zonecnt;
-+		smap_zone_insert(rmap, elem);
-+		elem = NULL;
-+	}
-+
-+	if (ualen) {
-+		if (!elem) {
-+			elem = kmem_cache_alloc(smap_zone_cache, GFP_ATOMIC);
-+			if (!elem) {
-+				mutex_unlock(rmlock);
-+				return -ENOMEM;
-+			}
-+		}
-+
-+		elem->smz_key   = fsoff - ualen;
-+		elem->smz_value = ualen;
-+		smap_zone_insert(rmap, elem);
-+		elem = NULL;
-+	}
-+
-+	mutex_unlock(rmlock);
-+
-+	if (elem)
-+		kmem_cache_free(smap_zone_cache, elem);
-+
-+	return 0;
-+}
-+
-+/*
-+ * smap internal functions
-+ */
-+
-+/*
-+ * Init empty space map for drive pdh with a % spare zones of spzone.
-+ * Returns: 0 if successful, -errno otherwise...
-+ */
-+static int smap_drive_alloc(struct mpool_descriptor *mp, struct mc_smap_parms *mcsp, u16 pdh)
-+{
-+	struct mpool_dev_info *pd = &mp->pds_pdv[pdh];
-+	struct smap_zone *urb_elem = NULL;
-+	struct smap_zone *found_ue = NULL;
-+	u32 rgnsz = 0;
-+	u8 rgn = 0;
-+	u8 rgn2 = 0;
-+	u8 rgnc;
-+	int rc;
-+
-+	rgnc  = mcsp->mcsp_rgnc;
-+	rgnsz = pd->pdi_parm.dpr_zonetot / rgnc;
-+	if (!rgnsz) {
-+		rc = -EINVAL;
-+		mp_pr_err("smap(%s, %s): drive alloc failed, invalid rgn size",
-+			  rc, mp->pds_name, pd->pdi_name);
-+		return rc;
-+	}
-+
-+	/* Allocate and init per channel space maps and associated locks */
-+	pd->pdi_rmbktv = kcalloc(rgnc, sizeof(*pd->pdi_rmbktv), GFP_KERNEL);
-+	if (!pd->pdi_rmbktv) {
-+		rc = -ENOMEM;
-+		mp_pr_err("smap(%s, %s): rmbktv alloc failed", rc, mp->pds_name, pd->pdi_name);
-+		return rc;
-+	}
-+
-+	/* Define all space on all channels as being free (drive empty) */
-+	for (rgn = 0; rgn < rgnc; rgn++) {
-+		mutex_init(&pd->pdi_rmbktv[rgn].pdi_rmlock);
-+
-+		urb_elem = kmem_cache_alloc(smap_zone_cache, GFP_KERNEL);
-+		if (!urb_elem) {
-+			struct rb_root *rmroot;
-+
-+			for (rgn2 = 0; rgn2 < rgn; rgn2++) {
-+				rmroot = &pd->pdi_rmbktv[rgn2].pdi_rmroot;
-+
-+				found_ue = smap_zone_find(rmroot, 0);
-+				if (found_ue) {
-+					rb_erase(&found_ue->smz_node, rmroot);
-+					kmem_cache_free(smap_zone_cache, found_ue);
-+				}
-+			}
-+
-+			kfree(pd->pdi_rmbktv);
-+			pd->pdi_rmbktv = NULL;
-+
-+			rc = -ENOMEM;
-+			mp_pr_err("smap(%s, %s): rb node alloc failed, rgn %u",
-+				  rc, mp->pds_name, pd->pdi_name, rgn);
-+			return rc;
-+		}
-+
-+		urb_elem->smz_key = rgn * rgnsz;
-+		if (rgn < rgnc - 1)
-+			urb_elem->smz_value = rgnsz;
-+		else
-+			urb_elem->smz_value = pd->pdi_parm.dpr_zonetot - (rgn * rgnsz);
-+		smap_zone_insert(&pd->pdi_rmbktv[rgn].pdi_rmroot, urb_elem);
-+	}
-+
-+	spin_lock_init(&pd->pdi_ds.sda_dalock);
-+	pd->pdi_ds.sda_rgnalloc = 0;
-+	pd->pdi_ds.sda_rgnsz = rgnsz;
-+	pd->pdi_ds.sda_rgnladdr = (rgnc - 1) * rgnsz;
-+	pd->pdi_ds.sda_zoneeff = pd->pdi_parm.dpr_zonetot;
-+	pd->pdi_ds.sda_utgt = (pd->pdi_ds.sda_zoneeff * (100 - mcsp->mcsp_spzone)) / 100;
-+	pd->pdi_ds.sda_uact = 0;
-+	pd->pdi_ds.sda_stgt = pd->pdi_ds.sda_zoneeff - pd->pdi_ds.sda_utgt;
-+	pd->pdi_ds.sda_sact = 0;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Add entry to space map covering superblocks on drive pdh.
-+ * Returns: 0 if successful, -errno otherwise...
-+ */
-+static int smap_drive_sballoc(struct mpool_descriptor *mp, u16 pdh)
-+{
-+	struct mpool_dev_info *pd = &mp->pds_pdv[pdh];
-+	int rc;
-+	u32 cnt;
-+
-+	cnt = sb_zones_for_sbs(&(pd->pdi_prop));
-+	if (cnt < 1) {
-+		rc = -ESPIPE;
-+		mp_pr_err("smap(%s, %s): identifying sb failed", rc, mp->pds_name, pd->pdi_name);
-+		return rc;
-+	}
-+
-+	rc = smap_insert(mp, pdh, 0, cnt);
-+	if (rc)
-+		mp_pr_err("smap(%s, %s): insert failed, cnt %u",
-+			  rc, mp->pds_name, pd->pdi_name, cnt);
-+
-+	return rc;
-+}
-+
-+void smap_mclass_usage(struct mpool_descriptor *mp, u8 mclass, struct mpool_usage *usage)
-+{
-+	struct smap_dev_znstats zones;
-+	struct mpool_dev_info *pd;
-+	struct media_class *mc;
-+	u32 zonepg = 0;
-+
-+	mc = &mp->pds_mc[mclass];
-+	if (mc->mc_pdmc < 0)
-+		return;
-+
-+	pd = &mp->pds_pdv[mc->mc_pdmc];
-+	zonepg = pd->pdi_zonepg;
-+
-+	spin_lock(&pd->pdi_ds.sda_dalock);
-+	smap_calc_znstats(pd, &zones);
-+	spin_unlock(&pd->pdi_ds.sda_dalock);
-+
-+	usage->mpu_total  += ((zones.sdv_total * zonepg) << PAGE_SHIFT);
-+	usage->mpu_usable += ((zones.sdv_usable * zonepg) << PAGE_SHIFT);
-+	usage->mpu_used   += ((zones.sdv_used * zonepg) << PAGE_SHIFT);
-+	usage->mpu_spare  += ((zones.sdv_spare * zonepg) << PAGE_SHIFT);
-+	usage->mpu_fspare += ((zones.sdv_fspare * zonepg) << PAGE_SHIFT);
-+	usage->mpu_fusable += ((zones.sdv_fusable * zonepg) << PAGE_SHIFT);
-+}
-+
-+static u32 smap_addr2rgn(struct mpool_descriptor *mp, struct mpool_dev_info *pd, u64 zoneaddr)
-+{
-+	struct mc_smap_parms   mcsp;
-+
-+	mc_smap_parms_get(&mp->pds_mc[pd->pdi_mclass], &mp->pds_params, &mcsp);
-+
-+	if (zoneaddr >= pd->pdi_ds.sda_rgnladdr)
-+		return mcsp.mcsp_rgnc - 1;
-+
-+	return zoneaddr / pd->pdi_ds.sda_rgnsz;
-+}
-+
-+/*
-+ * Add entry to space map in rgn starting at zoneaddr
-+ * and continuing for zonecnt blocks.
-+ *
-+ *   Returns: 0 if successful, -errno otherwise...
-+ */
-+static int smap_insert_byrgn(struct mpool_dev_info *pd, u32 rgn, u64 zoneaddr, u16 zonecnt)
-+{
-+	const char *msg __maybe_unused;
-+	struct smap_zone *elem = NULL;
-+	struct rb_root *rmap;
-+	struct rb_node *node;
-+	u64 fsoff, fslen;
-+	int rc;
-+
-+	fsoff = fslen = 0;
-+	rc = 0;
-+	msg = NULL;
-+
-+	mutex_lock(&pd->pdi_rmbktv[rgn].pdi_rmlock);
-+	rmap = &pd->pdi_rmbktv[rgn].pdi_rmroot;
-+
-+	node = rmap->rb_node;
-+	if (!node) {
-+		msg = "invalid rgn map";
-+		rc = -EINVAL;
-+		goto errout;
-+	}
-+
-+	/* Use binary search to find the insertion point in the tree.
-+	 */
-+	while (node) {
-+		elem = rb_entry(node, struct smap_zone, smz_node);
-+
-+		if (zoneaddr < elem->smz_key)
-+			node = node->rb_left;
-+		else if (zoneaddr > elem->smz_key + elem->smz_value)
-+			node = node->rb_right;
-+		else
-+			break;
-+	}
-+
-+	fsoff = elem->smz_key;
-+	fslen = elem->smz_value;
-+
-+	/* Bail out if we're past zoneaddr in space map w/o finding the required chunk. */
-+	if (zoneaddr < fsoff) {
-+		elem = NULL;
-+		msg = "requested range not free";
-+		rc = -EINVAL;
-+		goto errout;
-+	}
-+
-+	/* The allocation must fit entirely within this chunk or it fails. */
-+	if (zoneaddr + zonecnt > fsoff + fslen) {
-+		elem = NULL;
-+		msg = "requested range does not fit";
-+		rc = -EINVAL;
-+		goto errout;
-+	}
-+
-+	rb_erase(&elem->smz_node, rmap);
-+
-+	if (zoneaddr > fsoff) {
-+		elem->smz_key = fsoff;
-+		elem->smz_value = zoneaddr - fsoff;
-+		smap_zone_insert(rmap, elem);
-+		elem = NULL;
-+	}
-+	if (zoneaddr + zonecnt < fsoff + fslen) {
-+		if (!elem)
-+			elem = kmem_cache_alloc(smap_zone_cache, GFP_KERNEL);
-+		if (!elem) {
-+			msg = "chunk alloc failed";
-+			rc = -ENOMEM;
-+			goto errout;
-+		}
-+
-+		elem->smz_key = zoneaddr + zonecnt;
-+		elem->smz_value = (fsoff + fslen) - (zoneaddr + zonecnt);
-+		smap_zone_insert(rmap, elem);
-+		elem = NULL;
-+	}
-+
-+	/* Insert consumes usable only; possible for uact > utgt.*/
-+	spin_lock(&pd->pdi_ds.sda_dalock);
-+	pd->pdi_ds.sda_uact = pd->pdi_ds.sda_uact + zonecnt;
-+	spin_unlock(&pd->pdi_ds.sda_dalock);
-+
-+errout:
-+	mutex_unlock(&pd->pdi_rmbktv[rgn].pdi_rmlock);
-+
-+	if (elem != NULL) {
-+		/* Was an exact match */
-+		ASSERT((zoneaddr == fsoff) && (zonecnt == fslen));
-+		kmem_cache_free(smap_zone_cache, elem);
-+	}
-+
-+	if (rc)
-+		mp_pr_err("smap pd %s: %s, zoneaddr %lu zonecnt %u fsoff %lu fslen %lu",
-+			  rc, pd->pdi_name, msg ? msg : "(no detail)",
-+			  (ulong)zoneaddr, zonecnt, (ulong)fsoff, (ulong)fslen);
-+
-+	return rc;
-+}
-+
-+int smap_insert(struct mpool_descriptor *mp, u16 pdh, u64 zoneaddr, u32 zonecnt)
-+{
-+	struct mpool_dev_info *pd = &mp->pds_pdv[pdh];
-+	u32 rstart = 0, rend = 0;
-+	u64 raddr = 0, rcnt = 0;
-+	u64 zoneadded = 0;
-+	int rgn = 0;
-+	int rc = 0;
-+
-+	if (zoneaddr >= pd->pdi_parm.dpr_zonetot ||
-+	    (zoneaddr + zonecnt) > pd->pdi_parm.dpr_zonetot) {
-+		rc = -EINVAL;
-+		mp_pr_err("smap(%s, %s): insert failed, zoneaddr %lu zonecnt %u zonetot %u",
-+			  rc, mp->pds_name, pd->pdi_name, (ulong)zoneaddr,
-+			  zonecnt, pd->pdi_parm.dpr_zonetot);
-+		return rc;
-+	}
-+
-+	/*
-+	 * smap_alloc() never crosses regions. however a previous instantiation
-+	 * of this mpool might have used a different value of rgn count
-+	 * so must handle inserts that cross regions.
-+	 */
-+	rstart = smap_addr2rgn(mp, pd, zoneaddr);
-+	rend = smap_addr2rgn(mp, pd, zoneaddr + zonecnt - 1);
-+	zoneadded = 0;
-+
-+	for (rgn = rstart; rgn < rend + 1; rgn++) {
-+		/* Compute zone address and count for this rgn */
-+		if (rgn == rstart)
-+			raddr = zoneaddr;
-+		else
-+			raddr = (u64)rgn * pd->pdi_ds.sda_rgnsz;
-+
-+		if (rgn < rend)
-+			rcnt = ((rgn + 1) * pd->pdi_ds.sda_rgnsz) - raddr;
-+		else
-+			rcnt = zonecnt - zoneadded;
-+
-+		rc = smap_insert_byrgn(pd, rgn, raddr, rcnt);
-+		if (rc) {
-+			mp_pr_err("smap(%s, %s): insert byrgn failed, rgn %d raddr %lu rcnt %lu",
-+				  rc, mp->pds_name, pd->pdi_name, rgn, (ulong)raddr, (ulong)rcnt);
-+			break;
-+		}
-+		zoneadded = zoneadded + rcnt;
-+	}
-+
-+	return rc;
 +}
 +
 +/**
-+ * smap_free_byrgn() - free the specified range of zones
-+ * @pd:         physical device object
-+ * @rgn:       allocation rgn specifier
-+ * @zoneaddr:    offset into the space map
-+ * @zonecnt:     length of range to be freed
-+ *
-+ * Free the given range of zone (i.e., [%zoneaddr, %zoneaddr + %zonecnt])
-+ * back to the indicated space map.  Always coalesces ranges in the space
-+ * map that abut the range to be freed so as to minimize fragmentation.
-+ *
-+ * Return: 0 if successful, -errno otherwise...
++ * mpc_reap_evict() - Evict "cold" pages from the given XVMs
++ * @process:    A list of one of more XVMs to be reaped
 + */
-+static int smap_free_byrgn(struct mpool_dev_info *pd, u32 rgn, u64 zoneaddr, u32 zonecnt)
++static void mpc_reap_evict(struct list_head *process)
 +{
-+	const char *msg __maybe_unused;
-+	struct smap_zone *left, *right;
-+	struct smap_zone *new, *old;
-+	struct rb_root *rmap;
-+	struct rb_node *node;
-+	u32 orig_zonecnt = zonecnt;
-+	int rc = 0;
++	struct mpc_xvm *xvm, *next;
 +
-+	new = old = left = right = NULL;
-+	msg = NULL;
++	list_for_each_entry_safe(xvm, next, process, xvm_list) {
++		if (atomic_read(&xvm->xvm_reap->reap_lwm))
++			mpc_reap_evict_vma(xvm);
 +
-+	mutex_lock(&pd->pdi_rmbktv[rgn].pdi_rmlock);
-+	rmap = &pd->pdi_rmbktv[rgn].pdi_rmroot;
-+
-+	node = rmap->rb_node;
-+
-+	/* Use binary search to find chunks to the left and/or right of the range being freed. */
-+	while (node) {
-+		struct smap_zone *this;
-+
-+		this = rb_entry(node, struct smap_zone, smz_node);
-+
-+		if (zoneaddr + zonecnt <= this->smz_key) {
-+			right = this;
-+			node = node->rb_left;
-+		} else if (zoneaddr >= this->smz_key + this->smz_value) {
-+			left = this;
-+			node = node->rb_right;
-+		} else {
-+			msg = "chunk overlapping";
-+			rc = -EINVAL;
-+			goto unlock;
-+		}
++		atomic_cmpxchg(&xvm->xvm_evicting, 1, 0);
 +	}
-+
-+	/* If the request abuts the chunk to the right then coalesce them. */
-+	if (right) {
-+		if (zoneaddr + zonecnt == right->smz_key) {
-+			zonecnt += right->smz_value;
-+			rb_erase(&right->smz_node, rmap);
-+
-+			new = right;  /* re-use right node */
-+		}
-+	}
-+
-+	/* If the request abuts the chunk to the left then coalesce them. */
-+	if (left) {
-+		if (left->smz_key + left->smz_value == zoneaddr) {
-+			zoneaddr = left->smz_key;
-+			zonecnt += left->smz_value;
-+			rb_erase(&left->smz_node, rmap);
-+
-+			old = new;  /* free new/left outside the critsec */
-+			new = left; /* re-use left node */
-+		}
-+	}
-+
-+	/*
-+	 * If the request did not abut either the current or the previous
-+	 * chunk (i.e., new == NULL) then we must create a new chunk node
-+	 * and insert it into the smap.  Otherwise, we'll re-use one of
-+	 * the abutting chunk nodes (i.e., left or right).
-+	 *
-+	 * Note: If we have to call kmalloc and it fails (unlikely) then
-+	 * this chunk will be lost only for the current session.  It will
-+	 * be recovered once the mpool is closed and re-opened.
-+	 */
-+	if (!new) {
-+		new = kmem_cache_alloc(smap_zone_cache, GFP_ATOMIC);
-+		if (!new) {
-+			msg = "chunk alloc failed";
-+			rc = -ENOMEM;
-+			goto unlock;
-+		}
-+	}
-+
-+	new->smz_key = zoneaddr;
-+	new->smz_value = zonecnt;
-+
-+	if (!smap_zone_insert(rmap, new)) {
-+		kmem_cache_free(smap_zone_cache, new);
-+		msg = "chunk insert failed";
-+		rc = -ENOTRECOVERABLE;
-+		goto unlock;
-+	}
-+
-+	/* Freed space goes to spare first then usable. */
-+	zonecnt = orig_zonecnt;
-+
-+	spin_lock(&pd->pdi_ds.sda_dalock);
-+	if (pd->pdi_ds.sda_sact > 0) {
-+		if (pd->pdi_ds.sda_sact > zonecnt) {
-+			pd->pdi_ds.sda_sact -= zonecnt;
-+			zonecnt = 0;
-+		} else {
-+			zonecnt -= pd->pdi_ds.sda_sact;
-+			pd->pdi_ds.sda_sact = 0;
-+		}
-+	}
-+
-+	pd->pdi_ds.sda_uact -= zonecnt;
-+	spin_unlock(&pd->pdi_ds.sda_dalock);
-+
-+unlock:
-+	mutex_unlock(&pd->pdi_rmbktv[rgn].pdi_rmlock);
-+
-+	if (old)
-+		kmem_cache_free(smap_zone_cache, old);
-+
-+	if (rc)
-+		mp_pr_err("smap pd %s: %s, free byrgn failed, rgn %u zoneaddr %lu zonecnt %u",
-+			  rc, pd->pdi_name, msg ? msg : "(no detail)",
-+			  rgn, (ulong)zoneaddr, zonecnt);
-+
-+	return rc;
 +}
 +
-+int smap_free(struct mpool_descriptor *mp, u16 pdh, u64 zoneaddr, u16 zonecnt)
++/**
++ * mpc_reap_scan() - Scan for pages to purge
++ * @elem:
++ * @idx:    reap list index
++ */
++static void mpc_reap_scan(struct mpc_reap_elem *elem)
 +{
-+	struct mpool_dev_info *pd = NULL;
-+	u32 rstart = 0, rend = 0;
-+	u32 raddr = 0, rcnt = 0;
-+	u64 zonefreed = 0;
-+	u32 rgn = 0;
-+	int rc = 0;
++	struct list_head *list, process;
++	struct mpc_xvm *xvm, *next;
++	u64 nrpages, n;
 +
-+	pd = &mp->pds_pdv[pdh];
++	INIT_LIST_HEAD(&process);
 +
-+	if (zoneaddr >= pd->pdi_parm.dpr_zonetot || zoneaddr + zonecnt > pd->pdi_parm.dpr_zonetot) {
-+		rc = -EINVAL;
-+		mp_pr_err("smap(%s, %s): free failed, zoneaddr %lu zonecnt %u zonetot: %u",
-+			  rc, mp->pds_name, pd->pdi_name, (ulong)zoneaddr,
-+			  zonecnt, pd->pdi_parm.dpr_zonetot);
-+		return rc;
-+	}
++	mutex_lock(&elem->reap_lock);
++	list = &elem->reap_list;
++	n = 0;
 +
-+	if (!zonecnt)
-+		return 0; /* Nothing to be returned */
++	list_for_each_entry_safe(xvm, next, list, xvm_list) {
++		nrpages = atomic64_read(&xvm->xvm_nrpages);
 +
-+	/*
-+	 * smap_alloc() never crosses regions. however a previous instantiation
-+	 * of this mpool might have used a different value of rgn count
-+	 * so must handle frees that cross regions.
-+	 */
++		if (nrpages < 32)
++			continue;
 +
-+	rstart = smap_addr2rgn(mp, pd, zoneaddr);
-+	rend = smap_addr2rgn(mp, pd, zoneaddr + zonecnt - 1);
++		if (atomic_read(&xvm->xvm_reapref) == 1)
++			continue;
 +
-+	for (rgn = rstart; rgn < rend + 1; rgn++) {
-+		/* Compute zone address and count for this rgn */
-+		if (rgn == rstart)
-+			raddr = zoneaddr;
-+		else
-+			raddr = rgn * pd->pdi_ds.sda_rgnsz;
++		if (atomic_cmpxchg(&xvm->xvm_evicting, 0, 1))
++			continue;
 +
-+		if (rgn < rend)
-+			rcnt = ((u64)(rgn + 1) * pd->pdi_ds.sda_rgnsz) - raddr;
-+		else
-+			rcnt = zonecnt - zonefreed;
++		list_del(&xvm->xvm_list);
++		list_add(&xvm->xvm_list, &process);
 +
-+		rc = smap_free_byrgn(pd, rgn, raddr, rcnt);
-+		if (rc) {
-+			mp_pr_err("smap(%s, %s): free byrgn failed, rgn %d raddr %lu, rcnt %lu",
-+				  rc, mp->pds_name, pd->pdi_name, rgn, (ulong)raddr, (ulong)rcnt);
++		if (++n > 4)
 +			break;
++	}
++	mutex_unlock(&elem->reap_lock);
++
++	mpc_reap_evict(&process);
++
++	mutex_lock(&elem->reap_lock);
++	list_splice_tail(&process, list);
++	mutex_unlock(&elem->reap_lock);
++
++	usleep_range(300, 700);
++}
++
++static void mpc_reap_run(struct work_struct *work)
++{
++	struct mpc_reap_elem *elem;
++	struct mpc_reap *reap;
++
++	elem = container_of(work, struct mpc_reap_elem, reap_work);
++	reap = elem->reap_reap;
++
++	while (atomic_read(&reap->reap_lwm))
++		mpc_reap_scan(elem);
++
++	atomic_cmpxchg(&elem->reap_running, 1, 0);
++}
++
++/**
++ * mpc_reap_tune() - Dynamic tuning of reap knobs.
++ * @reap:
++ */
++static void mpc_reap_tune(struct mpc_reap *reap)
++{
++	ulong total_pages, hpages, wpages, cpages, mfree;
++	uint freepct, hwm, lwm, ttl, debug, i;
++
++	hpages = wpages = cpages = 0;
++
++	/*
++	 * Take a live snapshot of the current memory usage.  Disable
++	 * preemption so that the result is reasonably accurate.
++	 */
++	preempt_disable();
++	mpc_reap_meminfo(&mfree, NULL, PAGE_SHIFT);
++
++	for (i = 0; i < REAP_ELEM_MAX; ++i) {
++		struct mpc_reap_elem *elem = &reap->reap_elem[i];
++
++		hpages += atomic64_read(&elem->reap_hpages);
++		wpages += atomic64_read(&elem->reap_wpages);
++		cpages += atomic64_read(&elem->reap_cpages);
++	}
++	preempt_enable();
++
++	total_pages = mfree + hpages + wpages + cpages;
++
++	/*
++	 * Determine the current percentage of free memory relative to the
++	 * number of hot+warm+cold pages tracked by the reaper.  freepct,
++	 * lwm, and hwm are scaled to 10000 for finer resolution.
++	 */
++	freepct = ((hpages + wpages + cpages) * 10000) / total_pages;
++	freepct = 10000 - freepct;
++
++	lwm = (100 - reap->reap_mempct) * 100;
++	hwm = (lwm * 10300) / 10000;
++	hwm = min_t(u32, hwm, 9700);
++	ttl = reap->reap_ttl;
++
++	if (freepct >= hwm) {
++		if (atomic_read(&reap->reap_ttl_cur) != ttl)
++			atomic_set(&reap->reap_ttl_cur, ttl);
++		if (atomic_read(&reap->reap_lwm))
++			atomic_set(&reap->reap_lwm, 0);
++	} else if (freepct < lwm || atomic_read(&reap->reap_lwm) > 0) {
++		ulong x = 10000 - (freepct * 10000) / hwm;
++
++		if (atomic_read(&reap->reap_lwm) != x) {
++			atomic_set(&reap->reap_lwm, x);
++
++			x = (ttl * (500ul * 500)) / (x * x);
++			if (x > ttl)
++				x = ttl;
++
++			atomic_set(&reap->reap_ttl_cur, x);
 +		}
-+		zonefreed = zonefreed + rcnt;
 +	}
 +
-+	return rc;
-+}
-+
-+void smap_wait_usage_done(struct mpool_descriptor *mp)
-+{
-+	struct smap_usage_work *usagew = &mp->pds_smap_usage_work;
-+
-+	cancel_delayed_work_sync(&usagew->smapu_wstruct);
-+}
-+
-+#define SMAP_FREEPCT_DELTA 5
-+#define SMAP_FREEPCT_LOG_THLD   50
-+
-+void smap_log_mpool_usage(struct work_struct *ws)
-+{
-+	struct smap_usage_work *smapu;
-+	struct mpool_descriptor *mp;
-+	struct mpool_usage usage;
-+	int last, cur, delta;
-+
-+	smapu = container_of(ws, struct smap_usage_work, smapu_wstruct.work);
-+	mp = smapu->smapu_mp;
-+
-+	/* Get the current mpool space usage stats */
-+	smap_mpool_usage(mp, MP_MED_ALL, &usage);
-+
-+	if (usage.mpu_usable == 0) {
-+		mp_pr_err("smap mpool %s: zero usable space", -EINVAL, mp->pds_name);
++	debug = reap->reap_debug;
++	if (!debug || (debug == 1 && freepct > hwm))
 +		return;
-+	}
-+	/*
-+	 * Calculate the delta of free usable space/total usable space,
-+	 * since last time a message was logged
-+	 */
-+	last = smapu->smapu_freepct;
-+	cur = usage.mpu_fusable * 100 / usage.mpu_usable;
-+	delta = cur - last;
 +
-+	/*
-+	 * Log a message if delta >= 5% && free usable space % < 50%
-+	 */
-+	if ((abs(delta) >= SMAP_FREEPCT_DELTA) && (cur < SMAP_FREEPCT_LOG_THLD)) {
++	if (atomic_inc_return(&reap->reap_emit) % REAP_ELEM_MAX > 0)
++		return;
 +
-+		smapu->smapu_freepct = cur;
-+		if (last == 0)
-+			mp_pr_info("smap mpool %s, free space %d%%",
-+				   mp->pds_name, smapu->smapu_freepct);
-+
-+		else
-+			mp_pr_info("smap mpool %s, free space %s from %d%% to %d%%",
-+				   mp->pds_name, (delta > 0) ? "increases" : "decreases",
-+				   last, smapu->smapu_freepct);
-+	}
-+
-+	/* Schedule the next run of smap_log_mpool_usage() */
-+	queue_delayed_work(mp->pds_workq, &smapu->smapu_wstruct,
-+			   msecs_to_jiffies(mp->pds_params.mp_mpusageperiod));
++	mp_pr_info(
++		"%lu %lu, hot %lu, warm %lu, cold %lu, freepct %u, lwm %u, hwm %u, %2u, ttl %u",
++		mfree >> (20 - PAGE_SHIFT), total_pages >> (20 - PAGE_SHIFT),
++		hpages >> (20 - PAGE_SHIFT), wpages >> (20 - PAGE_SHIFT),
++		cpages >> (20 - PAGE_SHIFT), freepct, lwm, hwm,
++		atomic_read(&reap->reap_lwm), atomic_read(&reap->reap_ttl_cur) / 1000);
 +}
 +
-+int smap_init(void)
++static void mpc_reap_prune(struct work_struct *work)
 +{
-+	int rc = 0;
++	struct mpc_reap_elem *elem;
++	struct mpc_xvm *xvm, *next;
++	struct mpc_reap *reap;
++	struct list_head freeme;
++	uint nfreed, eidx;
++	ulong delay;
 +
-+	smap_zone_cache = kmem_cache_create("mpool_smap_zone", sizeof(struct smap_zone),
-+					    0, SLAB_HWCACHE_ALIGN | SLAB_POISON, NULL);
-+	if (!smap_zone_cache) {
-+		rc = -ENOMEM;
-+		mp_pr_err("kmem_cache_create(smap_zone, %zu) failed",
-+			  rc, sizeof(struct smap_zone));
++	reap = container_of(work, struct mpc_reap, reap_dwork.work);
++
++	/*
++	 * First, assesss the current memory situation.  If free
++	 * memory is below the low watermark then try to start a
++	 * reaper to evict some pages.
++	 */
++	mpc_reap_tune(reap);
++
++	if (atomic_read(&reap->reap_lwm)) {
++		eidx = atomic_read(&reap->reap_eidx) % REAP_ELEM_MAX;
++		elem = reap->reap_elem + eidx;
++
++		if (!atomic_cmpxchg(&elem->reap_running, 0, 1))
++			queue_work(reap->reap_wq, &elem->reap_work);
 +	}
 +
-+	return rc;
++	/* Next, advance to the next elem and prune VMAs that have been freed. */
++	eidx = atomic_inc_return(&reap->reap_eidx) % REAP_ELEM_MAX;
++
++	elem = reap->reap_elem + eidx;
++	INIT_LIST_HEAD(&freeme);
++
++	nfreed = atomic_read(&elem->reap_nfreed);
++
++	if (nfreed && mutex_trylock(&elem->reap_lock)) {
++		struct list_head   *list = &elem->reap_list;
++		uint                npruned = 0;
++
++		list_for_each_entry_safe(xvm, next, list, xvm_list) {
++			if (atomic_read(&xvm->xvm_reapref) > 1)
++				continue;
++
++			list_del(&xvm->xvm_list);
++			list_add_tail(&xvm->xvm_list, &freeme);
++
++			if (++npruned >= nfreed)
++				break;
++		}
++		mutex_unlock(&elem->reap_lock);
++
++		list_for_each_entry_safe(xvm, next, &freeme, xvm_list)
++			mpc_xvm_free(xvm);
++
++		atomic_sub(npruned, &elem->reap_nfreed);
++	}
++
++	delay = reap->reap_mempct < 100 ? 1000 / REAP_ELEM_MAX : 1000;
++	delay = msecs_to_jiffies(delay);
++
++	queue_delayed_work(reap->reap_wq, &reap->reap_dwork, delay);
 +}
 +
-+void smap_exit(void)
++#define REAP_MEMPCT_MIN    5
++#define REAP_MEMPCT_MAX    100
++#define REAP_TTL_MIN       100
++#define REAP_DEBUG_MAX     3
++
++static ssize_t mpc_reap_mempct_show(struct device *dev, struct device_attribute *da, char *buf)
 +{
-+	kmem_cache_destroy(smap_zone_cache);
-+	smap_zone_cache = NULL;
++	return scnprintf(buf, PAGE_SIZE, "%d\n", dev_to_reap(dev)->reap_mempct);
 +}
++
++static ssize_t mpc_reap_mempct_store(struct device *dev, struct device_attribute *da,
++				     const char *buf, size_t count)
++{
++	struct mpc_reap *reap;
++	unsigned int val;
++	int rc;
++
++	rc = kstrtouint(buf, 10, &val);
++	if (rc || (val < REAP_MEMPCT_MIN || val > REAP_MEMPCT_MAX))
++		return -EINVAL;
++
++	reap = dev_to_reap(dev);
++	reap->reap_mempct = val;
++
++	return count;
++}
++
++static ssize_t mpc_reap_debug_show(struct device *dev, struct device_attribute *da, char *buf)
++{
++	return scnprintf(buf, PAGE_SIZE, "%d\n", dev_to_reap(dev)->reap_debug);
++}
++
++static ssize_t mpc_reap_debug_store(struct device *dev, struct device_attribute *da,
++				    const char *buf, size_t count)
++{
++	struct mpc_reap *reap;
++	unsigned int val;
++	int rc;
++
++	rc = kstrtouint(buf, 10, &val);
++	if (rc || val > REAP_DEBUG_MAX)
++		return -EINVAL;
++
++	reap = dev_to_reap(dev);
++	reap->reap_debug = val;
++
++	return count;
++}
++
++static ssize_t mpc_reap_ttl_show(struct device *dev, struct device_attribute *da, char *buf)
++{
++	return scnprintf(buf, PAGE_SIZE, "%d\n", dev_to_reap(dev)->reap_ttl);
++}
++
++static ssize_t mpc_reap_ttl_store(struct device *dev, struct device_attribute *da,
++				  const char *buf, size_t count)
++{
++	struct mpc_reap *reap;
++	unsigned int val;
++	int rc;
++
++	rc = kstrtouint(buf, 10, &val);
++	if (rc || val < REAP_TTL_MIN)
++		return -EINVAL;
++
++	reap = dev_to_reap(dev);
++	reap->reap_ttl = val;
++
++	return count;
++}
++
++void mpc_reap_params_add(struct device_attribute *dattr)
++{
++	MPC_ATTR_RW(dattr++, reap_mempct);
++	MPC_ATTR_RW(dattr++, reap_debug);
++	MPC_ATTR_RW(dattr, reap_ttl);
++}
++
++static void mpc_reap_mempct_init(struct mpc_reap *reap)
++{
++	ulong mavail;
++	uint pct = 60;
++
++	mpc_reap_meminfo(NULL, &mavail, 30);
++
++	if (mavail > 256)
++		pct = 10;
++	else if (mavail > 128)
++		pct = 13;
++	else if (mavail > 64)
++		pct = 25;
++	else if (mavail > 32)
++		pct = 40;
++
++	reap->reap_mempct = clamp_t(unsigned int, 100 - pct, 1, 100);
++}
++
++/**
++ * mpc_reap_create() - Allocate and initialize reap data strctures
++ * @reapout: Initialized reap structure.
++ *
++ * Returns -ENOMEM if the allocation fails.
++ */
++int mpc_reap_create(struct mpc_reap **reapp)
++{
++	struct mpc_reap_elem *elem;
++	struct mpc_reap *reap;
++	uint flags, i;
++
++	flags = WQ_UNBOUND | WQ_HIGHPRI | WQ_CPU_INTENSIVE;
++	*reapp = NULL;
++
++	reap = kzalloc(roundup_pow_of_two(sizeof(*reap)), GFP_KERNEL);
++	if (!reap)
++		return -ENOMEM;
++
++	reap->reap_wq = alloc_workqueue("mpc_reap", flags, REAP_ELEM_MAX + 1);
++	if (!reap->reap_wq) {
++		kfree(reap);
++		return -ENOMEM;
++	}
++
++	atomic_set(&reap->reap_lwm, 0);
++	atomic_set(&reap->reap_ttl_cur, 0);
++	atomic_set(&reap->reap_eidx, 0);
++	atomic_set(&reap->reap_emit, 0);
++
++	for (i = 0; i < REAP_ELEM_MAX; ++i) {
++		elem = &reap->reap_elem[i];
++
++		mutex_init(&elem->reap_lock);
++		INIT_LIST_HEAD(&elem->reap_list);
++
++		INIT_WORK(&elem->reap_work, mpc_reap_run);
++		atomic_set(&elem->reap_running, 0);
++		elem->reap_reap = reap;
++
++		atomic64_set(&elem->reap_hpages, 0);
++		atomic64_set(&elem->reap_wpages, 0);
++		atomic64_set(&elem->reap_cpages, 0);
++		atomic_set(&elem->reap_nfreed, 0);
++	}
++
++	reap->reap_ttl   = 10 * 1000 * 1000;
++	reap->reap_debug = 0;
++	mpc_reap_mempct_init(reap);
++
++	INIT_DELAYED_WORK(&reap->reap_dwork, mpc_reap_prune);
++	queue_delayed_work(reap->reap_wq, &reap->reap_dwork, 1);
++
++	*reapp = reap;
++
++	return 0;
++}
++
++void mpc_reap_destroy(struct mpc_reap *reap)
++{
++	struct mpc_reap_elem *elem;
++	int i;
++
++	if (!reap)
++		return;
++
++	cancel_delayed_work_sync(&reap->reap_dwork);
++
++	/*
++	 * There shouldn't be any reapers running at this point,
++	 * but perform a flush/wait for good measure...
++	 */
++	atomic_set(&reap->reap_lwm, 0);
++
++	if (reap->reap_wq)
++		flush_workqueue(reap->reap_wq);
++
++	for (i = 0; i < REAP_ELEM_MAX; ++i) {
++		elem = &reap->reap_elem[i];
++
++		ASSERT(atomic64_read(&elem->reap_hpages) == 0);
++		ASSERT(atomic64_read(&elem->reap_wpages) == 0);
++		ASSERT(atomic64_read(&elem->reap_cpages) == 0);
++		ASSERT(atomic_read(&elem->reap_nfreed) == 0);
++		ASSERT(list_empty(&elem->reap_list));
++
++		mutex_destroy(&elem->reap_lock);
++	}
++
++	if (reap->reap_wq)
++		destroy_workqueue(reap->reap_wq);
++	kfree(reap);
++}
++
++void mpc_reap_xvm_add(struct mpc_reap *reap, struct mpc_xvm *xvm)
++{
++	struct mpc_reap_elem *elem;
++	uint idx, mult;
++
++	if (!reap || !xvm)
++		return;
++
++	if (xvm->xvm_advice == MPC_VMA_PINNED)
++		return;
++
++	mult = 1;
++	if (xvm->xvm_advice == MPC_VMA_WARM)
++		mult = 10;
++	else if (xvm->xvm_advice == MPC_VMA_HOT)
++		mult = 30;
++
++	/* Acquire a reference on xvm for the reaper... */
++	atomic_inc(&xvm->xvm_reapref);
++	xvm->xvm_reap = reap;
++
++	idx = (get_cycles() >> 1) % REAP_ELEM_MAX;
++
++	elem = &reap->reap_elem[idx];
++
++	mutex_lock(&elem->reap_lock);
++	xvm->xvm_freedp = &elem->reap_nfreed;
++
++	if (xvm->xvm_advice == MPC_VMA_HOT)
++		xvm->xvm_hcpagesp = &elem->reap_hpages;
++	else if (xvm->xvm_advice == MPC_VMA_WARM)
++		xvm->xvm_hcpagesp = &elem->reap_wpages;
++	else
++		xvm->xvm_hcpagesp = &elem->reap_cpages;
++
++	list_add_tail(&xvm->xvm_list, &elem->reap_list);
++	mutex_unlock(&elem->reap_lock);
++}
++
++void mpc_reap_xvm_evict(struct mpc_xvm *xvm)
++{
++	pgoff_t start, end, bktsz;
++
++	if (atomic_cmpxchg(&xvm->xvm_evicting, 0, 1))
++		return;
++
++	start = mpc_xvm_pgoff(xvm);
++	end = mpc_xvm_pglen(xvm) + start;
++	bktsz = xvm->xvm_bktsz >> PAGE_SHIFT;
++
++	if (bktsz < 1024)
++		bktsz = end - start;
++
++	/* Evict in chunks to improve mmap_sem interleaving... */
++	for (; start < end; start += bktsz)
++		invalidate_inode_pages2_range(xvm->xvm_mapping, start, start + bktsz);
++
++	atomic_cmpxchg(&xvm->xvm_evicting, 1, 0);
++}
++
++void mpc_reap_xvm_touch(struct mpc_xvm *xvm, int index)
++{
++	struct mpc_reap *reap;
++	atomic64_t *atimep;
++	uint mbnum, lwm;
++	pgoff_t offset;
++	ulong delay;
++	u64 now;
++
++	reap = xvm->xvm_reap;
++	if (!reap)
++		return;
++
++	offset = (index << PAGE_SHIFT) % (1ul << xvm_size_max);
++	mbnum = offset / xvm->xvm_bktsz;
++
++	atimep = &xvm->xvm_mbinfov[mbnum].mbatime;
++	now = local_clock();
++
++	/*
++	 * Don't update atime too frequently.  If we set atime to
++	 * U64_MAX in mpc_reap_evict_vma() then the addition here
++	 * will roll over and atime will be updated.
++	 */
++	if (atomic64_read(atimep) + (10 * USEC_PER_SEC) < now)
++		atomic64_set(atimep, now);
++
++	/* Sleep a bit if the reaper is having trouble meeting the free memory target. */
++	lwm = atomic_read(&reap->reap_lwm);
++	if (lwm < 3333)
++		return;
++
++	delay = 500000 / (10001 - lwm) - (500000 / 10001);
++	delay = min_t(ulong, delay, 3000);
++
++	usleep_range(delay, delay * 2);
++}
++
++bool mpc_reap_xvm_duress(struct mpc_xvm *xvm)
++{
++	struct mpc_reap *reap;
++	uint lwm;
++
++	if (xvm->xvm_advice == MPC_VMA_HOT)
++		return false;
++
++	reap = xvm->xvm_reap;
++	if (!reap)
++		return false;
++
++	lwm = atomic_read(&reap->reap_lwm);
++	if (lwm < 1500)
++		return false;
++
++	if (lwm > 3000)
++		return true;
++
++	return (xvm->xvm_advice == MPC_VMA_COLD);
++}
+diff --git a/drivers/mpool/reaper.h b/drivers/mpool/reaper.h
+new file mode 100644
+index 000000000000..d3af6aef918d
+--- /dev/null
++++ b/drivers/mpool/reaper.h
+@@ -0,0 +1,71 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
++ */
++
++#ifndef MPOOL_REAPER_H
++#define MPOOL_REAPER_H
++
++#define MPC_REAP_PARAMS_CNT    3
++
++struct mpc_reap;
++struct mpc_xvm;
++
++/**
++ * mpc_reap_create() - Allocate and initialize reap data strctures
++ * @reapp: Ptr to initialized reap structure.
++ *
++ * Return: -ENOMEM if the allocaiton fails.
++ */
++int mpc_reap_create(struct mpc_reap **reapp);
++
++/**
++ * mpc_reap_destroy() - Destroy the given reaper
++ * @reap:
++ */
++void mpc_reap_destroy(struct mpc_reap *reap);
++
++/**
++ * mpc_reap_xvm_add() - Add an extended VMA to the reap list
++ * @xvm: extended VMA
++ */
++void mpc_reap_xvm_add(struct mpc_reap *reap, struct mpc_xvm *xvm);
++
++/**
++ * mpc_reap_xvm_evict() - Evict all pages of given extended VMA
++ * @xvm: extended VMA
++ */
++void mpc_reap_xvm_evict(struct mpc_xvm *xvm);
++
++/**
++ * mpc_reap_xvm_touch() - Update extended VMA mblock atime
++ * @xvm:    extended VMA
++ * @index:  valid page index within the extended VMA
++ *
++ * Update the access time stamp of the mblock given by the valid
++ * page %index within the VMA.  Might sleep for some number of
++ * microseconds if the reaper is under duress (i.e., the more
++ * urgent the duress the longer the sleep).
++ *
++ * This function is called only by mpc_vm_fault_impl(), once
++ * for each successful page fault.
++ */
++void mpc_reap_xvm_touch(struct mpc_xvm *xvm, int index);
++
++/**
++ * mpc_reap_xvm_duress() - Check to see if reaper is under duress
++ * @xvm:   extended VMA
++ *
++ * Return: %false if the VMA is marked MPC_XVM_HOT.
++ * Return: %false if reaper is not enabled nor under duress.
++ * Return: %true depending upon the urgency of duress and the
++ * VMA advice (MPC_XVM_WARM or MPC_XVM_COLD).
++ *
++ * This function is called only by mpc_readpages() to decide whether
++ * or not to reduce the size of a speculative readahead request.
++ */
++bool mpc_reap_xvm_duress(struct mpc_xvm *xvm);
++
++void mpc_reap_params_add(struct device_attribute *dattr);
++
++#endif /* MPOOL_REAPER_H */
 -- 
 2.17.2
 
