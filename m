@@ -2,186 +2,201 @@ Return-Path: <SRS0=cicp=DF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D9AC4346E
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 01:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE06C4346E
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 01:53:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26A5F23A51
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 01:37:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2967E23A40
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 01:53:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2xbBdbw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GyrcoizW";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="vagEDzKA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726396AbgI1Bhb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Sep 2020 21:37:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34052 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726387AbgI1Bhb (ORCPT
+        id S1726461AbgI1Bxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Sep 2020 21:53:49 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:60535 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726406AbgI1Bxt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Sep 2020 21:37:31 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFC2DC0613CE;
-        Sun, 27 Sep 2020 18:37:45 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id s12so10322341wrw.11;
-        Sun, 27 Sep 2020 18:37:45 -0700 (PDT)
+        Sun, 27 Sep 2020 21:53:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1601258029; x=1632794029;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=AtOGROFYMJTtYgVe9lHVhGMl4Qe3MpUWfAq6cCbvwEM=;
+  b=GyrcoizW72UZ7shzzB68Z2iuQIx32wbYmuJTR3TMGdE0bYEjBIdzFcuB
+   JYrpjtE2Z2kH6TuXVu+wHdQTPu+VlzrB3x40P6M2cfhvGmwwes+sXw9Vo
+   kthaVfSh4YjqzACTfDo7FnMh1I06Q7h5sDnxMon/WW9U/+W5oYIHmiC3w
+   BhuQhFbhEsl+6hz/zuN7tMcxE9YObDKQjWpOceT8jKsD042Syde6RZiwl
+   gNjUNTDh0itOqAqGvIAjwETgRhQSjJMJE1utgEQAwcQ1igmYpAEgZ/hMv
+   p9tgLrbPDOMbvu1+X/mNm7Z/FykQaC6jgiLTzgdpF+xUG54nOzAFYWNN/
+   g==;
+IronPort-SDR: 4qWzYfHOOEOxJY0WprrqTnej9GsL9ZKAUkchYSunF7CqtTEp7JfZNfmm1oODSZGauZXwzSDCq+
+ onZwtwA9ptt7dhwiofxaUi6q+oXjGNCLk0oMfS9yOEdwyqb3EzfTPOzN36TchZMHumQ3haC0xQ
+ SyrtvmuPofuxGVMFy5a8K/WLgFYZ9WEKZYXQp/ozJgdsaWULdQZPpjuWDSo9l+AiHqGZR4lQmF
+ GzOdfCIcE0Az2B469zM6o8ha5CCjjw1en1f2ucxulLtBoN4/SmU5r8sN1jBEJLdAGn/oXrbAr3
+ Fh4=
+X-IronPort-AV: E=Sophos;i="5.77,312,1596470400"; 
+   d="scan'208";a="148421539"
+Received: from mail-bl2nam02lp2050.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.50])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Sep 2020 09:53:48 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OdPZpQICkmRCC70gfaUsW3l99Hw/rUXT0EOksg9lS2HOqQ/VpA9+T8cgFDj4tziwGgKI9XXYTRQrFECyTiN0JdCrcFRQgLOrp4LKVJvqyvN/YBlLh4nFBKVdamE6k1OLAyaEfvlwWNyArfpAzSUpE+wn1HB2LhGf4/Urp92pMOZZdRA9AUcg0tSF5cFVE75VyqEhvQVYwOuBmftLahHr4mEw5zK00fyz05MSVnm3aoIlchsLkT/MSD5z7aK0/GLZwPJRBZ5/k7AnP+gmu8bWJUfQB6ZMgNJYXpA8fcpk9zcS3Ff2g6S8Bgbd0rVHrOahGVEvQsyKg7DfF0VSrbIwTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=evd1s3ayeapN2SP/YtoTO0xcProBPcgVz6HadYdKqQk=;
+ b=YydYnNd1rdrFl4MvA8hpZO2aepyl+QlzYNQwkukOi4yO7Uj4fOsmu7wRc8SNX/K+uMGRe1GYCTzjayzjzyvohWSv36tSp3LoEUfUcY4wQMMS/o3ozvFrTmenswst68RZfHBSD2WFhmimwn95HdXXJ0jKM8OU/pQRfoV/4OMmGdEWAGbvY3X1/BKrgHkEoLAvf4wriE8eeK4w85ZyX7i0guMio20v2QMKb9Qs11CgpMB3XVU6qttYzay6Fs19DreWNnIcSgnQfytY6GJB0RqVfNKagONWmLiGnU3YZjiKi7IF9b8A3uKza28QDGK8bdrXdPmBX6lz0bTbT/GM8yNR2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=zLGZFQFaWeWMhE5qI1OgAaqF4OKDe3pYPyyGfeXn6g4=;
-        b=J2xbBdbwwEdoMqeOr8SHGVm1BtN65wnMTWwxqIB/OOGO3Ede4hmdFnCk6/yLlkEgyN
-         VCwCrvp31JaAPLeIil/ec+nmWtHNFAW/oyDir6kH5SEAUGooiYJkq5twNu+ohJLoLhIk
-         LVwQmFT0Bfc3Egi1uOxomCLXRDzW6wk0I2dzOldS8wraiNld1shwmMZ/0xiRrZOITfXw
-         i9yGUN8vM95/Oa5/FglWEPPTABfpD2UQJ0GQ5p/pOduj7mulHUabGAsB3E6YpKGbfaXh
-         Eppa70CRjMYvVZCy6xQ7de4HscEHsFuPGFpodMzzOfPEPBU0Kl3KibRj/V0/yqN2pTk0
-         JiqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=zLGZFQFaWeWMhE5qI1OgAaqF4OKDe3pYPyyGfeXn6g4=;
-        b=L0MLtywyNvH4WaYXDqBdAeNeGm8gMVEyg6NqrxU89/CewSt3WvVdxGbAh8+7I3mQP7
-         MsJz33DuUYf3LioIniBm/vnk8KXNbh+r/qH5w+sF76M6FaiZEodr44uc6Vmp1uw30mpT
-         7mysQYwMpHbCf4zaWUjxBGQCDtxahquTWxdDfKmBNLx3TMfNYc0aXQ/EShXxRy4KytBk
-         zYcsGCa89qWWDkYS/S/y+Ljh1YvDJXsAp6I/7VXCSwohCepUr7fxKtKgnZN5U45l0lFS
-         hhBOBoqCL7HjrGfgOZkbpp+P1IGJxmNs5e815E3zzv0sRSweGybbIlMonISr+hUdjq3Y
-         id9A==
-X-Gm-Message-State: AOAM530aCWOdh4DC+GsAjXIu/zy/hBr4xuzo5o/zB91/XSx1SkxI9dcm
-        5pBq34KtV5xmYBIVOdLqsOE=
-X-Google-Smtp-Source: ABdhPJxwPgg1qSGTiidlI4WlLq5FCulPCs1MOedIoHMaiDsjDkF5nXCuRvcy9YcYDotyujTF6aUUTQ==
-X-Received: by 2002:adf:c64e:: with SMTP id u14mr15771941wrg.373.1601257064328;
-        Sun, 27 Sep 2020 18:37:44 -0700 (PDT)
-Received: from [172.16.20.20] ([87.200.95.144])
-        by smtp.gmail.com with ESMTPSA id t1sm6792924wmi.16.2020.09.27.18.37.42
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 27 Sep 2020 18:37:43 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.15\))
-Subject: Re: Deadlock under load with Linux 5.9 and other recent kernels
-From:   Christian Hewitt <christianshewitt@gmail.com>
-In-Reply-To: <91886A80-8164-4699-8662-E7D3444A4F12@gmail.com>
-Date:   Mon, 28 Sep 2020 05:37:40 +0400
-Cc:     linux-block@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-amlogic@lists.infradead.org, furkan@fkardame.com,
-        Brad Harper <bjharper@gmail.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=evd1s3ayeapN2SP/YtoTO0xcProBPcgVz6HadYdKqQk=;
+ b=vagEDzKAl/915ZERCE2hxlG/5eg3YuiueIPodbY6LEc308/PsY5uJhulSfW55ivcj6S/9Na8CmobtvWfl/uA3CQzScnvFrPL+/wjH5gVbbfLFZsNc3ZoCYuzuZgEBpri/s5YxPHfGrlOSiwQklh64jwNsKrjc5du7cLJqPWi8WA=
+Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
+ by CY4PR0401MB3634.namprd04.prod.outlook.com (2603:10b6:910:8f::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.24; Mon, 28 Sep
+ 2020 01:53:46 +0000
+Received: from CY4PR04MB3751.namprd04.prod.outlook.com
+ ([fe80::9124:2453:fe9c:9a7]) by CY4PR04MB3751.namprd04.prod.outlook.com
+ ([fe80::9124:2453:fe9c:9a7%12]) with mapi id 15.20.3412.029; Mon, 28 Sep 2020
+ 01:53:46 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     "hch@infradead.org" <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     Keith Busch <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [GIT PULL] nvme updates for 5.10
+Thread-Topic: [GIT PULL] nvme updates for 5.10
+Thread-Index: AQHWlJ8pb2J1rHdCcEWtcKUFLcesqw==
+Date:   Mon, 28 Sep 2020 01:53:46 +0000
+Message-ID: <CY4PR04MB3751593431168AD25F312A1CE7350@CY4PR04MB3751.namprd04.prod.outlook.com>
+References: <20200927072343.GA381603@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2400:2411:43c0:6000:809d:4e2f:7912:1e64]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: a2805fc3-f612-4da6-94b5-08d863515660
+x-ms-traffictypediagnostic: CY4PR0401MB3634:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-microsoft-antispam-prvs: <CY4PR0401MB3634BD93C071A77334FD4166E7350@CY4PR0401MB3634.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:2089;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 77nl5p4n/LxXzUt9ra4CeJyUaZnQmILUwhktVWzt4IdWio9+8j+/NZgUSqtv45HDa2Nfy+8LLFT5eBSDdLdkR+Owhr3VbFRCsYghmSmxzh2TVHdl/ezCErxzXgvIqBJQJuPJa2Wj0osaoIBUvrEEmzhULFYYq8tCrti1X4NK1rFlZ2UcT+q8P6390TPc5qNO2v0fwec1ikTvIFf8s5tqBY+zrihGY789RXP+DDK30gmmoQmiCYM4VvxBl/vTo1kzLFV6aHvE8coHykHqs4Oa9pgUBoQx2OFbRNqAhBLmvoXJRH+e96SjTqU3u3VKVFXn7B+N45XfKYogj3m3s967uA32W+EoQpVLxG277FcIqwS5Zav4HURJ12UTiRxEH/2EaGfvg7RypT/szBBAGmWDtZ9ePIzrTrAR458bCQL645XeSo+6x0IiH9XZ/U58MyWwZ3GnZ7YHUI5NWbftKI5FVg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(366004)(396003)(39860400002)(346002)(83380400001)(55016002)(64756008)(66446008)(66556008)(8936002)(86362001)(66946007)(91956017)(76116006)(5660300002)(9686003)(71200400001)(52536014)(15650500001)(4326008)(33656002)(478600001)(966005)(6506007)(53546011)(66476007)(7696005)(2906002)(8676002)(186003)(110136005)(54906003)(316002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: K7i2ODsGYLzWFWmjbN+mACsSUMUlaNWyJU2bsrrb/gufRhHgSlZdhqNqDf7jyheNGvgtRpdDPeLsvyh/p9/AkFITVFEyZhEQROmbv1kFlJAWWHa5owHOPIAn0EXflhPdisGHjasSPpxgk0EgChb3co+kTTf+JOCOzni3BPo0VZqe9xEFV1Xd50nKYwxwMgFnfgcfUXXHoiQYcio4IGEoozihEavG+baneAdfF3785ybfj1cUo3J2DGWui4Qmrb8hrUA7bForJw0R14WiJCEjJrIvEETONX3oKHwnAOzaqG/XSmHlraemONRMCaWq+LkgTQfFaGSa1MZeGQ2ba+K8IQ2uSl5o3+YqnhqNljjxzJiQg3qfZn/ZE1TBwrgOwugthzdCluNakTvzFNOTRvmxi8EZC4lKfRbPepXR+weTupz9Ayhe5Pbpy3kdYiKbWF90agqHOzzv0ZbC0vt2stdPkUVURDMYB0V+kC5nppgTlb52h3FC83Vqsfi8KIjh7zInrK2vEjMnevOY9It/anCn2EQ2k4JD8TomTauAqSl6XcTr381E/DQe6wVpD5JhxXOPJItHZqAHN1IRB+9RmnvV6VRZv1VUu7CdoZlmCAflypV8Pj52Dwhl3k5vdiEzUCjqo016ZZ/qTHewpFtU4F9ifPsXHx/dka6oG037hkGtcZRZk97/HQfpwH8lRB33+MPQAO1v+iR4tw+U/qm8jOfPxQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <BA41AA25-8647-474E-87E6-64D4F030E590@gmail.com>
-References: <5878AC01-8A1B-4F39-B4BD-BDDEFAECFAA2@gmail.com>
- <4a51f6d8-486b-73ee-0585-f2154aa90a83@kernel.dk>
- <EE8C801E-0AD8-43E2-9C65-92CD512904BE@gmail.com>
- <c431ae48-6913-acc0-dc0a-b52065e9eaed@kernel.dk>
- <91886A80-8164-4699-8662-E7D3444A4F12@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.15)
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a2805fc3-f612-4da6-94b5-08d863515660
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2020 01:53:46.4646
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cFKEr244akTyMsFTcJ+QriVoO7vVA/CmElZPNGx1UcY7Jxq6f6miGVMqoUhrysELq+P+fTD6QtwJ9nnxid/0Hw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0401MB3634
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-> On 26 Sep 2020, at 4:28 pm, Christian Hewitt =
-<christianshewitt@gmail.com> wrote:
->=20
->>=20
->> On 26 Sep 2020, at 4:13 pm, Jens Axboe <axboe@kernel.dk> wrote:
->>=20
->> On 9/26/20 5:55 AM, Christian Hewitt wrote:
->>>>=20
->>>> On 26 Sep 2020, at 2:51 pm, Jens Axboe <axboe@kernel.dk> wrote:
->>>>=20
->>>> On 9/26/20 1:55 AM, Christian Hewitt wrote:
->>>>> I am using an ARM SBC device with Amlogic S922X chip (Beelink
->>>>> GS-King-X, an Android STB) to boot the Kodi mediacentre distro
->>>>> LibreELEC (which I work on) although the issue is also =
-reproducible
->>>>> with Manjaro and Armbian on the same hardware, and with the =
-GT-King
->>>>> and GT-King Pro devices from the same vendor - all three devices =
-are
->>>>> using a common dtsi:
->>>>>=20
->>>>> =
-https://github.com/chewitt/linux/blob/amlogic-5.9-integ/arch/arm64/boot/dt=
-s/amlogic/meson-g12b-gsking-x.dts
->>>>> =
-https://github.com/chewitt/linux/blob/amlogic-5.9-integ/arch/arm64/boot/dt=
-s/amlogic/meson-g12b-gtking-pro.dts
->>>>> =
-https://github.com/chewitt/linux/blob/amlogic-5.9-integ/arch/arm64/boot/dt=
-s/amlogic/meson-g12b-gtking.dts
->>>>> =
-https://github.com/chewitt/linux/blob/amlogic-5.9-integ/arch/arm64/boot/dt=
-s/amlogic/meson-g12b-w400.dtsi
->>>>>=20
->>>>> I have schematics for the devices, but can only share those =
-privately
->>>>> on request.
->>>>>=20
->>>>> For testing I am booting LibreELEC from SD card. The box has a 4TB
->>>>> SATA drive internally connected with a USB > SATA bridge, see =
-dmesg:
->>>>> http://ix.io/2yLh and I connect a USB stick with a 4GB ISO file =
-that I
->>>>> copy to the internal SATA drive. Within 10-20 seconds of starting =
-the
->>>>> copy the box deadlocks needing a hard power cycle to recover. The
->>>>> timing of the deadlock is variable but the device _always_ =
-deadlocks.
->>>>> Although I am using a simple copy use-case, there are similar =
-reports
->>>>> in Armbian forums performing tasks like installs/updates that =
-involve
->>>>> I/O loads.
->>>>>=20
->>>>> Following advice in the #linux-amlogic IRC channel I added
->>>>> CONFIG_SOFTLOCKUP_DETECTOR and CONFIG_DETECT_HUNG_TASK and was =
-able to
->>>>> get output on the HDMI screen (it is not possible to connect to =
-UART
->>>>> pins without destroying the box case). If you advance the =
-following
->>>>> video frame by frame in VLC you can see the output:
->>>>>=20
->>>>> https://www.dropbox.com/s/klvcizim8cs5lze/lockup_clip.mov?dl=3D0
->>>>=20
->>>> Try with this patch:
->>>>=20
->>>> =
-https://lore.kernel.org/linux-block/20200925191902.543953-1-shakeelb@googl=
-e.com/
->>>=20
->>> It still locks up approx. 25 seconds into the copy operation. =
-Here=E2=80=99s the output in video again (a little blurry):
->>>=20
->>> https://www.dropbox.com/s/3j2czaq509arg6g/lockup_clip2.mov?dl=3D0
->>=20
->> Can you try and set CONFIG_SLUB in your .config instead of =
-CONFIG_SLAB?
->=20
-> CONFIG_SLUB is already set, here=E2=80=99s the full defconfig =
-http://paste.ubuntu.com/p/5BNdZv6J3c/
->=20
-> # dmesg | grep -i slub
-> [    0.000000] SLUB: HWalign=3D64, Order=3D0-3, MinObjects=3D0, =
-CPUs=3D6, Nodes=3D1
->=20
->> Also, just take a picture, should be easier to get readable than a =
-video.
->> And the static trace is all that is needed.
->=20
-> This is from a GT-King Pro which someone reminded me has a large RS232 =
-port on the rear:
->=20
-> https://pastebin.com/raw/sGtzgreN
-
-from 5.9=E2=80=94rc7 https://pastebin.com/raw/nbHJmrqe
-
-Christian
-
-
-
-
+On 2020/09/27 16:23, Christoph Hellwig wrote:=0A=
+> The following changes since commit 163090c14a42778c3ccfbdaf39133129bea686=
+32:=0A=
+> =0A=
+>   Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/g=
+it/song/md into for-5.10/drivers (2020-09-25 07:48:20 -0600)=0A=
+> =0A=
+> are available in the Git repository at:=0A=
+> =0A=
+>   git://git.infradead.org/nvme.git tags/nvme-5.10-2020-09-27=0A=
+> =0A=
+> for you to fetch changes up to 21cc2f3f799fa228f812f7ab971fa8d43c893392:=
+=0A=
+> =0A=
+>   nvme-pci: allocate separate interrupt for the reserved non-polled I/O q=
+ueue (2020-09-27 09:14:19 +0200)=0A=
+> =0A=
+> ----------------------------------------------------------------=0A=
+> nvme updates for 5.10=0A=
+> =0A=
+>  - fix keep alive timer modification (Amit Engel)=0A=
+>  - order the PCI ID list more sensibly (Andy Shevchenko)=0A=
+>  - cleanup the open by controller helper (Chaitanya Kulkarni)=0A=
+>  - use an xarray for th CSE log lookup (Chaitanya Kulkarni)=0A=
+>  - support ZNS in nvmet passthrough mode (Chaitanya Kulkarni)=0A=
+>  - fix nvme_ns_report_zones (me)=0A=
+=0A=
+Shouldn't this one go into 5.9-rc7 as a fix ?=0A=
+=0A=
+>  - add a sanity check to nvmet-fc (James Smart)=0A=
+>  - fix interrupt allocation when too many polled queues are specified=0A=
+>    (Jeffle Xu)=0A=
+>  - small nvmet-tcp optimization (Mark Wunderlich)=0A=
+> =0A=
+> ----------------------------------------------------------------=0A=
+> Amit Engel (1):=0A=
+>       nvmet: handle keep-alive timer when kato is modified by a set featu=
+res cmd=0A=
+> =0A=
+> Andy Shevchenko (1):=0A=
+>       nvme-pci: Move enumeration by class to be last in the table=0A=
+> =0A=
+> Chaitanya Kulkarni (3):=0A=
+>       nvme: lift the file open code from nvme_ctrl_get_by_path=0A=
+>       nvme: use an xarray to lookup the Commands Supported and Effects lo=
+g=0A=
+>       nvmet: add passthru ZNS support=0A=
+> =0A=
+> Christoph Hellwig (1):=0A=
+>       nvme: fix error handling in nvme_ns_report_zones=0A=
+> =0A=
+> James Smart (1):=0A=
+>       nvmet-fc: fix missing check for no hostport struct=0A=
+> =0A=
+> Jeffle Xu (1):=0A=
+>       nvme-pci: allocate separate interrupt for the reserved non-polled I=
+/O queue=0A=
+> =0A=
+> Mark Wunderlich (1):=0A=
+>       nvmet-tcp: have queue io_work context run on sock incoming cpu=0A=
+> =0A=
+>  drivers/nvme/host/core.c        | 56 +++++++----------------------------=
+------=0A=
+>  drivers/nvme/host/nvme.h        |  4 +--=0A=
+>  drivers/nvme/host/pci.c         | 35 +++++++++++++-------------=0A=
+>  drivers/nvme/host/zns.c         | 41 ++++++++++++------------------=0A=
+>  drivers/nvme/target/admin-cmd.c |  2 ++=0A=
+>  drivers/nvme/target/core.c      |  4 +--=0A=
+>  drivers/nvme/target/fc.c        |  2 +-=0A=
+>  drivers/nvme/target/nvmet.h     |  2 ++=0A=
+>  drivers/nvme/target/passthru.c  | 43 +++++++++++++++++++++++--------=0A=
+>  drivers/nvme/target/tcp.c       | 21 ++++++++--------=0A=
+>  10 files changed, 93 insertions(+), 117 deletions(-)=0A=
+> =0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
