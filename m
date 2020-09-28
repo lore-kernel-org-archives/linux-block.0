@@ -2,148 +2,144 @@ Return-Path: <SRS0=cicp=DF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4418C4346E
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 02:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B5AC2D0A8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 03:15:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40A8523119
-	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 02:58:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Bc4jl4V9";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Er3n0jGi"
+	by mail.kernel.org (Postfix) with ESMTP id 5021223718
+	for <linux-block@archiver.kernel.org>; Mon, 28 Sep 2020 03:15:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726516AbgI1C6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Sep 2020 22:58:01 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:27554 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726497AbgI1C6B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Sep 2020 22:58:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1601261881; x=1632797881;
-  h=from:to:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=ViAg2eCDuUm9fCtH1ACY1Y7v/2T6nlbGDyJAIiDvVpQ=;
-  b=Bc4jl4V9yMNFD4+gh6/i6XpQ4rRtX8aOxBzw4X6bRYYke8DVO2xQ42/n
-   QvU7cRpWvE8Xfzopg8dPw7STStX4Fu7M2lBu0etYK9p1q8tn9S+9oNYwn
-   Yi4WFPEYEX20tmcBuFsFUR6PjF7LsTcSnnsruKkmm2zyXO9mOgbXfDZca
-   26VlMDDRD9wcsLvqv2F892vRO/+ecureIP/b+M7z77z7YEVt9A5ITwjXa
-   kzeuKpP8kxkVsiyCV5LlIQSmIyEkY31MOtHOM7eyOB1lJlGzQwWZPB+KI
-   12ku36AISt5U9gYHW1JAMQ3qeT20kGK/ISGBGrYwqAjiSBjpyJT+vsvZk
-   g==;
-IronPort-SDR: J/pFGiUWRIiKhy9vqB/LBMSCMijHi48kuqIX8pDUralfrCBkIAcZmQUxQoQhkhKYMduw45RUGY
- /LNFtxY6NdR9M/NCjbADW4LJDuCEtOtq/SG2GgiOK5j16DdpHfcL21PYTOitm2kz5wpuaeP01l
- GRCDkF1L6K8X6UqtCNfA2xdetbmEmMHHlRDFY4SgKQNg6X+HRB2udVRcVWzyTmbjiINGErlm3C
- fRVshZLj7jZYaWDZWQEdOFLRw9QaKTubRLjQycJZ99EJvF/ClC5J11zSPdQ3cvWjQVj3ZShN2x
- 5as=
-X-IronPort-AV: E=Sophos;i="5.77,312,1596470400"; 
-   d="scan'208";a="148425353"
-Received: from mail-co1nam11lp2177.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.177])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Sep 2020 10:58:00 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VITWII/1BvIjEkhwE/jIt3gUxTTh6LQKZkR2itQGpUV77rap8j90PyefGmuZ6w1uQ+8aOzzVjUf2EQ7gKk2tMlMXHDMXNQwPTpbRC/pkVOqn6HMwWkCGz8ZIn/3hC22Fhnw9CoDkfY0eCiqhulmtIsRGTktT9sLFTytyOJQvRHlpQVvQ56oeI5sr/RzntCY/6svCRs8HxCHPvzJRZdpKyVAAKnFscuNgv7fxTE9MlCVUxBaOQS1JnBl/twFVobVucjD+7ySeEciIMONaFVdpPhpIPbFq059plpvuVNzrstq7CXB9JpzR1Yg45h3y5S52B0+1goHzfp/XNXoS8IP+JA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ScVvKCt7XfrW1aoYmtBtSRUkeYRrtc9eOlk8uoTuPco=;
- b=SPwCFOqMSHUN80nHA4YSxieNgst+7F2L2t9N9uWRsy9X5v4VPj3SOGDjnxSlJCbYZgYJAB1KPXQdRfLtb8luQ6hhqQccJPrJXiM30m2fA0kSg7HEBRPRe2Jxw6oX/b6lCSW8S1pDksHZ7eVlIRcntN8WcWd2eAqkCxpLJfeaXY9yrRKammCEb9bTy9TbppZROOy6Mu1BrkuS/TEAJ9s+sgyS8VreOmFiFs/g2BRnb/JrW7468M9Do3o+voTb/gPlFxrGRLfIeIhdSOI2KPPynOllYxfnjqML2frODSLXjMdRpA8gW2kMtxeaQYBODsLCfAvZLQLbJfvTBCc1hXwi7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ScVvKCt7XfrW1aoYmtBtSRUkeYRrtc9eOlk8uoTuPco=;
- b=Er3n0jGiktxKBVHhOrN3AGvJzwYl8p5OqUrK4N46v99wyq93zrM2KGQ5IFx9pw3WJeewIiTkaUKsImSYAlXncw758cRkUmLlo/iTWoGtHKay+wZO6q6HWbZoyB9900XoV0736MHyac11anKqVUaoE0EjEUi9OznSjyj9Gwy0Gyw=
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY1PR04MB2313.namprd04.prod.outlook.com (2a01:111:e400:c60e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20; Mon, 28 Sep
- 2020 02:57:59 +0000
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::9124:2453:fe9c:9a7]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::9124:2453:fe9c:9a7%12]) with mapi id 15.20.3412.029; Mon, 28 Sep 2020
- 02:57:59 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Wang Qing <wangqing@vivo.com>, Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: fix a typo for skd_main.c
-Thread-Topic: [PATCH] block: fix a typo for skd_main.c
-Thread-Index: AQHWk6p2onDsXA7IX0SNWou/lLgP8A==
-Date:   Mon, 28 Sep 2020 02:57:59 +0000
-Message-ID: <CY4PR04MB375129B151BF9E9F9A7364A9E7350@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <1601086321-1173-1-git-send-email-wangqing@vivo.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: vivo.com; dkim=none (message not signed)
- header.d=none;vivo.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:809d:4e2f:7912:1e64]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: c2cd5395-d915-4438-a000-08d8635a4eec
-x-ms-traffictypediagnostic: CY1PR04MB2313:
-x-microsoft-antispam-prvs: <CY1PR04MB23131FD69CD614443E513BC6E7350@CY1PR04MB2313.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:758;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZvyLzi8kB9tAxlr/FHNHZO0i5JjxHJ6YUJmQT4QmkodqzVNqD1ZyEaB5IkHFasnm0vYd0g82LUSXdSK4aSBiCobDBnCMAt5nvNHN9a5RPg+yHWHtNzIozTy7r7n5aKK1vfeNJKIvUUrmwuPpK3e9tDL24B0nGnscOQRFjwITwqgnbIpBmoYVT/7IknRREQbiOt90m2PG8hTR5kD6uT97yz2jlzA8dZ3gqO3fGobrqoQ9G6wbHapqbldXb+/U0dmXHkeThlguXYdNwaRvlTNJNmbynjPZUaqpsF7ys2Ewcy62SYrY7FIVDG0WPNIZU2gRjo+waI76Z58LmsZp9ebf1e61Uiexxe198TQNCkSpw+q2KbMbGolXH/OiHH4677pX
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(366004)(39860400002)(396003)(136003)(6506007)(71200400001)(52536014)(66446008)(64756008)(66556008)(66476007)(83380400001)(33656002)(91956017)(66946007)(76116006)(4744005)(5660300002)(55016002)(186003)(8676002)(86362001)(53546011)(7696005)(9686003)(2906002)(110136005)(478600001)(316002)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: /u2BpsoflwKzRuxDglXmL8xskscPcEEBuJr8BB/1OMdpf/DOYyhmzyF2Sk0w2cOo53q55veOzN0xEjhYvlFL7QqU8KoI2kflJHAfXL8c2zBOjsOAA0Zafw1ZsEDjE8fHxIj9Bc4MAfD+Ria9oPzkZOScZZG0Qp3RcocCnngjtxBmaOmdg4cUfUR+bRDnmtkTyWxg2sXDiPRBGyY6/YBIKv2Gvd4K3Iv7q1F5DIKrZGE81wyVBhTU9rZ71XN3+0YE+RAV8Xs2h7wq7seakMoTEfhQn/p3TRqBsWqJVWIf40Be5+0X0dPkNjQv1ESHTFfLwmvLpzCvwTSvWgUAvQuT/6h45nB+BhumpYINKcjrjX40Vf+4NsNLv6kQ2guvO0pjmK6Ul7+aV2B/LB6UH1n1nIRg3c7o0b1HI5hDaWj5bGjkvnJk5nOOG8cR30saW+KGLR3jRgbDoFnii87AZxJMgtb3W9XiaHE2djeWVm4OF2UiWW1o68OYztxLX83PhMisxMo1ZYXZGtq0XoIVNLvMXUd0uqt/xp4s1f44aA/Ye3Kl++3t8kdgwa0tOBpT73ds7g6YkO9DVsIAFrzL7KOYDBdgU1Owy4uQuewj9t06eaAxmG9qbPgBof+vPwe3ayErKRLYN8yh4c4A0V1RELqqFnYVnKH0y+ZC3a280EsIjyb8WIDA3vaSu5AXMCt/B7OE9yqGLiQ8OI9XoYqzMQOLdw==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726477AbgI1DPZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Sep 2020 23:15:25 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44598 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726458AbgI1DPZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 27 Sep 2020 23:15:25 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 0984DAC19;
+        Mon, 28 Sep 2020 03:15:24 +0000 (UTC)
+Subject: Re: [BUG] discard_granularity is 0 on rk3399-gru-kevin
+To:     Vicente Bergas <vicencb@gmail.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Evan Green <evgreen@chromium.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Xiao Ni <xni@redhat.com>, linux-block@vger.kernel.org,
+        linux-rockchip@lists.infradead.org
+References: <2438c500-eb41-4ae2-b890-83d287ad3bcd@gmail.com>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Message-ID: <32986577-b2c2-98ac-1a30-28790414b25d@suse.de>
+Date:   Mon, 28 Sep 2020 11:15:16 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR04MB3751.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2cd5395-d915-4438-a000-08d8635a4eec
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2020 02:57:59.4392
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1ukYiyOGdCnHSa5RxkslMl8ZxGobJ43FHcJv3EYBkMy14Da8b3OvHMihWaWwkeZG39WrQ8T/9rA59HMHdVE6CQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2313
+In-Reply-To: <2438c500-eb41-4ae2-b890-83d287ad3bcd@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/09/26 11:12, Wang Qing wrote:=0A=
-> Modify the comment typo: "compliment" -> "complement".=0A=
-> =0A=
-> Signed-off-by: Wang Qing <wangqing@vivo.com>=0A=
-> ---=0A=
->  drivers/block/skd_main.c | 2 +-=0A=
->  1 file changed, 1 insertion(+), 1 deletion(-)=0A=
-> =0A=
-> diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c=0A=
-> index ae6454c..e70e764=0A=
-> --- a/drivers/block/skd_main.c=0A=
-> +++ b/drivers/block/skd_main.c=0A=
-> @@ -2037,7 +2037,7 @@ static void skd_enable_interrupts(struct skd_device=
- *skdev)=0A=
->  	val =3D FIT_ISH_FW_STATE_CHANGE +=0A=
->  	      FIT_ISH_COMPLETION_POSTED + FIT_ISH_MSG_FROM_DEV;=0A=
->  =0A=
-> -	/* Note that the compliment of mask is written. A 1-bit means=0A=
-> +	/* Note that the complement of mask is written. A 1-bit means=0A=
->  	 * disable, a 0 means enable. */=0A=
->  	SKD_WRITEL(skdev, ~val, FIT_INT_MASK_HOST);=0A=
->  	dev_dbg(&skdev->pdev->dev, "interrupt mask=3D0x%x\n", ~val);=0A=
-> =0A=
-=0A=
-Looks good.=0A=
-=0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On 2020/9/28 04:29, Vicente Bergas wrote:
+> Hi,
+> since recently the rk3399-gru-kevin is reporting the trace below.
+> The issue has been uncovered by
+>  b35fd7422c2f8e04496f5a770bd4e1a205414b3f
+>  block: check queue's limits.discard_granularity in
+> __blkdev_issue_discard()
+
+Hi Vicente,
+
+Thanks for the information. It seems the device with f2fs declares to
+support DISCARD but don't initialize discard_granularity for its queue.
+
+Can I know which block driver is under f2fs ?
+
+Thanks.
+
+Coly Li
+
+
+> 
+> WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
+> CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
+> Hardware name: Google Kevin (DT)
+> pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=--)
+> pc : __blkdev_issue_discard+0x200/0x294
+> lr : __blkdev_issue_discard+0x54/0x294
+> sp : ffff800011dd3b10
+> x29: ffff800011dd3b10 x28: 0000000000000000 x27: ffff800011dd3cc4 x26:
+> ffff800011dd3e18 x25: 000000000004e69b x24: 0000000000000c40 x23:
+> ffff0000f1deaaf0 x22: ffff0000f2849200 x21: 00000000002734d8 x20:
+> 0000000000000008 x19: 0000000000000000 x18: 0000000000000000 x17:
+> 0000000000000000 x16: 0000000000000000 x15: 0000000000000000 x14:
+> 0000000000000394 x13: 0000000000000000 x12: 0000000000000000 x11:
+> 0000000000000000 x10: 00000000000008b0 x9 : ffff800011dd3cb0 x8 :
+> 000000000004e69b x7 : 0000000000000000 x6 : ffff0000f1926400 x5 :
+> ffff0000f1940800 x4 : 0000000000000000 x3 : 0000000000000c40 x2 :
+> 0000000000000008 x1 : 00000000002734d8 x0 : 0000000000000000 Call trace:
+> __blkdev_issue_discard+0x200/0x294
+> __submit_discard_cmd+0x128/0x374
+> __issue_discard_cmd_orderly+0x188/0x244
+> __issue_discard_cmd+0x2e8/0x33c
+> issue_discard_thread+0xe8/0x2f0
+> kthread+0x11c/0x120
+> ret_from_fork+0x10/0x1c
+> ---[ end trace e4c8023d33dfe77a ]---
+> mmcblk1p2: Error: discard_granularity is 0.
+> mmcblk1p2: Error: discard_granularity is 0.
+> <last message repeated multiple times>
+
