@@ -2,96 +2,77 @@ Return-Path: <SRS0=YBZ7=DG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB42FC2D0A8
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 00:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD10C2D0A8
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 01:18:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B93D20738
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 00:45:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C16721734
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 01:18:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727153AbgI2Apa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Sep 2020 20:45:30 -0400
-Received: from smtprelay0076.hostedemail.com ([216.40.44.76]:56402 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726698AbgI2Apa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Sep 2020 20:45:30 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay01.hostedemail.com (Postfix) with ESMTP id 780A9100E7B40;
-        Tue, 29 Sep 2020 00:45:28 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: self77_011759527186
-X-Filterd-Recvd-Size: 2723
-Received: from XPS-9350.home (unknown [47.151.133.149])
-        (Authenticated sender: joe@perches.com)
-        by omf03.hostedemail.com (Postfix) with ESMTPA;
-        Tue, 29 Sep 2020 00:45:25 +0000 (UTC)
-Message-ID: <b1174f9be2ce65f6b5ebefcba0b48e792926abbc.camel@perches.com>
-Subject: Re: [PATCH 00/18] use semicolons rather than commas to separate
- statements
-From:   Joe Perches <joe@perches.com>
-To:     Mark Brown <broonie@kernel.org>, linux-iio@vger.kernel.org,
-        Julia Lawall <Julia.Lawall@inria.fr>
-Cc:     linux-stm32@st-md-mailman.stormreply.com,
-        linux-crypto@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        linux-acpi@vger.kernel.org, David Lechner <david@lechnology.com>,
-        Valdis =?UTF-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
-        kernel-janitors@vger.kernel.org, drbd-dev@lists.linbit.com,
-        openipmi-developer@lists.sourceforge.net,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        linux-ide@vger.kernel.org, linux-amlogic@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-wireless@vger.kernel.org,
-        Neil Armstrong <narmstrong@baylibre.com>
-Date:   Mon, 28 Sep 2020 17:45:24 -0700
-In-Reply-To: <160132172369.55460.9237357219623604216.b4-ty@kernel.org>
-References: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
-         <160132172369.55460.9237357219623604216.b4-ty@kernel.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.36.4-0ubuntu1 
+        id S1727058AbgI2BSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Sep 2020 21:18:13 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:50910 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725272AbgI2BSN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Sep 2020 21:18:13 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 97D79A21096BE3224121;
+        Tue, 29 Sep 2020 09:18:11 +0800 (CST)
+Received: from [10.174.179.106] (10.174.179.106) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 29 Sep 2020 09:18:10 +0800
+Subject: Re: [PATCH] block-mq: fix comments in blk_mq_queue_tag_busy_iter
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>, <hch@lst.de>
+References: <20200919035425.3316563-1-yangerkun@huawei.com>
+From:   yangerkun <yangerkun@huawei.com>
+Message-ID: <e03f43b1-ffeb-0fca-3f8f-1507773ffb2e@huawei.com>
+Date:   Tue, 29 Sep 2020 09:18:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200919035425.3316563-1-yangerkun@huawei.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.106]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2020-09-28 at 20:35 +0100, Mark Brown wrote:
-> On Sun, 27 Sep 2020 21:12:10 +0200, Julia Lawall wrote:
-> > These patches replace commas by semicolons.  This was done using the
-> > Coccinelle semantic patch (http://coccinelle.lip6.fr/) shown below.
-> > 
-> > This semantic patch ensures that commas inside for loop headers will not be
-> > transformed.  It also doesn't touch macro definitions.
-> > 
-> > Coccinelle ensures that braces are added as needed when a single-statement
-> > branch turns into a multi-statement one.
-> > 
-> > [...]
+Ping...
+
+ÔÚ 2020/9/19 11:54, yangerkun Ð´µÀ:
+> 'f5bbbbe4d635 ("blk-mq: sync the update nr_hw_queues with
+> blk_mq_queue_tag_busy_iter")' introduce a bug what we may sleep between
+> rcu lock. Then '530ca2c9bd69 ("blk-mq: Allow blocking queue tag iter
+> callbacks")' fix it by get request_queue's ref. And 'a9a808084d6a ("block:
+> Remove the synchronize_rcu() call from __blk_mq_update_nr_hw_queues()")'
+> remove the synchronize_rcu in __blk_mq_update_nr_hw_queues. We need
+> update the confused comments in blk_mq_queue_tag_busy_iter.
 > 
-> Applied to
+> Signed-off-by: yangerkun <yangerkun@huawei.com>
+> ---
+>   block/blk-mq-tag.c | 4 +---
+>   1 file changed, 1 insertion(+), 3 deletions(-)
 > 
->    https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regmap.git for-next
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 32d82e23b095..051227bd5a03 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -398,9 +398,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+>   	/*
+>   	 * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and queue_hw_ctx
+>   	 * while the queue is frozen. So we can use q_usage_counter to avoid
+> -	 * racing with it. __blk_mq_update_nr_hw_queues() uses
+> -	 * synchronize_rcu() to ensure this function left the critical section
+> -	 * below.
+> +	 * racing with it.
+>   	 */
+>   	if (!percpu_ref_tryget(&q->q_usage_counter))
+>   		return;
 > 
-> Thanks!
-> 
-> [1/1] regmap: debugfs: use semicolons rather than commas to separate statements
->       commit: 7f4a122d0b50b40c64d24a5cf7aafe26dd9487ee
-
-Hi Mark.
-
-Rather than replying to the 0/n cover letter to a patch
-series, can you reply to each of the specific patches in
-the patch series you are applying?
-
-Otherwise, it's a bit difficult to figure out which patches
-you are applying.
-
-thanks
-
