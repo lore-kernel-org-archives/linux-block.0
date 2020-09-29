@@ -2,94 +2,84 @@ Return-Path: <SRS0=YBZ7=DG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CECC4346E
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 10:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C9D3C4727F
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 11:54:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9AC62158C
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 10:35:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601375758;
-	bh=u4myyC2FCs6IeunqeNEz8KzBIYzR3949I//QihYj6Wc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=tVFptHL1yHlwaSbP+8NcT1q89c/xyG2SpI23biiBuU6nEu0KT1eicp2GQ16JrYdEl
-	 0SGSI1uM/m+BoNUuB+E8AsPHC5ve3K37l2hfr+YfRJLv85rRXGxEPfxF06QfUTRkc9
-	 QCxCATVkn7HGjYcJhXuCXTqb6xIyfRLhsA/WXTwU=
+	by mail.kernel.org (Postfix) with ESMTP id 51A20206CA
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 11:54:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728162AbgI2Kfz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Sep 2020 06:35:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42794 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725306AbgI2Kfy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Sep 2020 06:35:54 -0400
-Received: from localhost (unknown [213.57.247.131])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B8CF02075F;
-        Tue, 29 Sep 2020 10:35:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601375754;
-        bh=u4myyC2FCs6IeunqeNEz8KzBIYzR3949I//QihYj6Wc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=t39Ob8b965lJzHVgrp91VQv3HZgivaKc4BiOwFS1n7y4qtVKlA5fTteqGxoeTICnf
-         Il/sc9legvzzDNaoFyM1N/o9c8LxHhttwZTH3LiYcwywKN3ietVy4UMKvywhl39kiY
-         xuRac5zW6X8o8oRZdBZfTi1KqrUZBq3flLJ1IXGA=
-Date:   Tue, 29 Sep 2020 13:35:49 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH blk-next 1/2] blk-mq-rdma: Delete not-used multi-queue
- RDMA map queue code
-Message-ID: <20200929103549.GE3094@unreal>
-References: <20200929091358.421086-1-leon@kernel.org>
- <20200929091358.421086-2-leon@kernel.org>
- <20200929102046.GA14445@lst.de>
+        id S1731123AbgI2LyR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Sep 2020 07:54:17 -0400
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:32180 "EHLO
+        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730629AbgI2Lq2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Sep 2020 07:46:28 -0400
+X-IronPort-AV: E=Sophos;i="5.77,318,1596492000"; 
+   d="scan'208";a="470044784"
+Received: from abo-173-121-68.mrs.modulonet.fr (HELO hadrien) ([85.68.121.173])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 13:46:20 +0200
+Date:   Tue, 29 Sep 2020 13:46:19 +0200 (CEST)
+From:   Julia Lawall <julia.lawall@inria.fr>
+X-X-Sender: jll@hadrien
+To:     Mark Brown <broonie@kernel.org>
+cc:     Joe Perches <joe@perches.com>, linux-iio@vger.kernel.org,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        linux-acpi@vger.kernel.org, David Lechner <david@lechnology.com>,
+        =?UTF-8?Q?Valdis_Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+        kernel-janitors@vger.kernel.org, drbd-dev@lists.linbit.com,
+        openipmi-developer@lists.sourceforge.net,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        linux-ide@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-wireless@vger.kernel.org,
+        Neil Armstrong <narmstrong@baylibre.com>
+Subject: Re: [PATCH 00/18] use semicolons rather than commas to separate
+ statements
+In-Reply-To: <20200929113745.GB4799@sirena.org.uk>
+Message-ID: <alpine.DEB.2.22.394.2009291344590.2808@hadrien>
+References: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr> <160132172369.55460.9237357219623604216.b4-ty@kernel.org> <b1174f9be2ce65f6b5ebefcba0b48e792926abbc.camel@perches.com> <20200929113745.GB4799@sirena.org.uk>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200929102046.GA14445@lst.de>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 29, 2020 at 12:20:46PM +0200, Christoph Hellwig wrote:
-> On Tue, Sep 29, 2020 at 12:13:57PM +0300, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> >
-> > The RDMA vector affinity code is not backed up by any driver and always
-> > returns NULL to every ib_get_vector_affinity() call.
-> >
-> > This means that blk_mq_rdma_map_queues() always takes fallback path.
-> >
-> > Fixes: 9afc97c29b03 ("mlx5: remove support for ib_get_vector_affinity")
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+
+
+On Tue, 29 Sep 2020, Mark Brown wrote:
+
+> On Mon, Sep 28, 2020 at 05:45:24PM -0700, Joe Perches wrote:
+> > On Mon, 2020-09-28 at 20:35 +0100, Mark Brown wrote:
 >
-> So you guys totally broken the nvme queue assignment without even
-> telling anyone?  Great job!
+> > > [1/1] regmap: debugfs: use semicolons rather than commas to separate statements
+> > >       commit: 7f4a122d0b50b40c64d24a5cf7aafe26dd9487ee
+>
+> > Rather than replying to the 0/n cover letter to a patch
+> > series, can you reply to each of the specific patches in
+> > the patch series you are applying?
+>
+> > Otherwise, it's a bit difficult to figure out which patches
+> > you are applying.
+>
+> Feel free to submit patches to b4.  Ideally things like this wouldn't be
+> being sent as serieses in the first place, there's no dependencies or
+> interactions between the patches.
 
-Who is "you guys" and it wasn't silent either? I'm sure that Sagi knows the craft.
-https://lore.kernel.org/linux-rdma/20181224221606.GA25780@ziepe.ca/
+It was suggested (a long time ago, not with respect to this patch in
+particular) that sending such patches in a series is useful because it
+allows people who are not interested in the 18 patches to skip over them
+more easily.  So there are two conflicting needs...
 
-commit 759ace7832802eaefbca821b2b43a44ab896b449
-Author: Sagi Grimberg <sagi@grimberg.me>
-Date:   Thu Nov 1 13:08:07 2018 -0700
-
-    i40iw: remove support for ib_get_vector_affinity
-
-....
-
-commit 9afc97c29b032af9a4112c2f4a02d5313b4dc71f
-Author: Sagi Grimberg <sagi@grimberg.me>
-Date:   Thu Nov 1 09:13:12 2018 -0700
-
-    mlx5: remove support for ib_get_vector_affinity
-
-Thanks
+julia
