@@ -2,171 +2,84 @@ Return-Path: <SRS0=YBZ7=DG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD082C4346E
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 09:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E89C4346E
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 09:14:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 872232076B
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 09:09:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B432420848
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 09:14:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1601370854;
+	bh=Zd9UpoW6JRJ/ucEPMrtkJe/8coFXg+LYrhj/oUBaD2o=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=m1t/bzxlVbvl2DBfcxNsGShT7tjO2ApwnWWEtT9biw37415pbiHUbmSjX+jujbSnu
+	 S1UsALklXks1ZPxEd0wS5uVySRZhTUkFeyoZuvIeOO3s+yZhXcgZtGaoG4RXiyvugY
+	 dg/H1z982HE6IHeQ+/FM7kuEvZ6DaCxCO2/G97tI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727769AbgI2JJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Sep 2020 05:09:29 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:14767 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727740AbgI2JJ2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Sep 2020 05:09:28 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id BD9716342F84CB9E7FC7;
-        Tue, 29 Sep 2020 17:09:26 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 29 Sep 2020 17:09:18 +0800
-From:   chenxiang <chenxiang66@hisilicon.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linuxarm@huawei.com>,
-        Xiang Chen <chenxiang66@hisilicon.com>
-Subject: [PATCH] block:elevator:remove un-used input parameter request_queue in some functions
-Date:   Tue, 29 Sep 2020 17:05:37 +0800
-Message-ID: <1601370338-138592-1-git-send-email-chenxiang66@hisilicon.com>
-X-Mailer: git-send-email 2.8.1
+        id S1728002AbgI2JOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Sep 2020 05:14:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36128 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727879AbgI2JOE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Sep 2020 05:14:04 -0400
+Received: from localhost (unknown [213.57.247.131])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6D68F204FD;
+        Tue, 29 Sep 2020 09:14:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1601370844;
+        bh=Zd9UpoW6JRJ/ucEPMrtkJe/8coFXg+LYrhj/oUBaD2o=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Bdi7sPqZh06EI8g/goIIEMz6G8OVAf9790vfiKw6Yz1SddLqyM7WYENSIxT+d93ni
+         OTRf+Tt5fIWI93mdEFgegpbGhEdFzGbnDJx6oGB3+rkNe2olWYNvjBjbiEHpEf9iTj
+         OQvxWAqel4xC0PZcraekXubc1B/+wbzozTybMBWg=
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>
+Cc:     Leon Romanovsky <leonro@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH blk-next 0/2] Delete the get_vector_affinity leftovers
+Date:   Tue, 29 Sep 2020 12:13:56 +0300
+Message-Id: <20200929091358.421086-1-leon@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xiang Chen <chenxiang66@hisilicon.com>
+From: Leon Romanovsky <leonro@nvidia.com>
 
-In elevator.c, the input parameter request_queue is not used in function
-elv_rqhash_del()/elv_rb_former_request()/elv_rb_latter_request(), so
-remove it.
+There are no drivers that implement .get_vector_affinity(), so delete
+the RDMA function and simplify block code.
 
-Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
----
- block/bfq-iosched.c      |  2 +-
- block/elevator.c         | 12 +++++-------
- block/mq-deadline.c      |  2 +-
- include/linux/elevator.h | 10 +++++-----
- 4 files changed, 12 insertions(+), 14 deletions(-)
+Thanks
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index a4c0bec..78caf16 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2167,7 +2167,7 @@ static void bfq_remove_request(struct request_queue *q,
- 	bfqd->queued--;
- 	elv_rb_del(&bfqq->sort_list, rq);
- 
--	elv_rqhash_del(q, rq);
-+	elv_rqhash_del(rq);
- 	if (q->last_merge == rq)
- 		q->last_merge = NULL;
- 
-diff --git a/block/elevator.c b/block/elevator.c
-index 90ed7a2..45efe94 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -204,7 +204,7 @@ static inline void __elv_rqhash_del(struct request *rq)
- 	rq->rq_flags &= ~RQF_HASHED;
- }
- 
--void elv_rqhash_del(struct request_queue *q, struct request *rq)
-+void elv_rqhash_del(struct request *rq)
- {
- 	if (ELV_ON_HASH(rq))
- 		__elv_rqhash_del(rq);
-@@ -418,7 +418,7 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
- 	struct elevator_queue *e = q->elevator;
- 
- 	if (e->type->ops.next_request)
--		return e->type->ops.next_request(q, rq);
-+		return e->type->ops.next_request(rq);
- 
- 	return NULL;
- }
-@@ -428,7 +428,7 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
- 	struct elevator_queue *e = q->elevator;
- 
- 	if (e->type->ops.former_request)
--		return e->type->ops.former_request(q, rq);
-+		return e->type->ops.former_request(rq);
- 
- 	return NULL;
- }
-@@ -809,8 +809,7 @@ ssize_t elv_iosched_show(struct request_queue *q, char *name)
- 	return len;
- }
- 
--struct request *elv_rb_former_request(struct request_queue *q,
--				      struct request *rq)
-+struct request *elv_rb_former_request(struct request *rq)
- {
- 	struct rb_node *rbprev = rb_prev(&rq->rb_node);
- 
-@@ -821,8 +820,7 @@ struct request *elv_rb_former_request(struct request_queue *q,
- }
- EXPORT_SYMBOL(elv_rb_former_request);
- 
--struct request *elv_rb_latter_request(struct request_queue *q,
--				      struct request *rq)
-+struct request *elv_rb_latter_request(struct request *rq)
- {
- 	struct rb_node *rbnext = rb_next(&rq->rb_node);
- 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index b57470e..bf20044 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -118,7 +118,7 @@ static void deadline_remove_request(struct request_queue *q, struct request *rq)
- 	if (!RB_EMPTY_NODE(&rq->rb_node))
- 		deadline_del_rq_rb(dd, rq);
- 
--	elv_rqhash_del(q, rq);
-+	elv_rqhash_del(rq);
- 	if (q->last_merge == rq)
- 		q->last_merge = NULL;
- }
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index bacc40a..3821cc1 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -46,8 +46,8 @@ struct elevator_mq_ops {
- 	bool (*has_work)(struct blk_mq_hw_ctx *);
- 	void (*completed_request)(struct request *, u64);
- 	void (*requeue_request)(struct request *);
--	struct request *(*former_request)(struct request_queue *, struct request *);
--	struct request *(*next_request)(struct request_queue *, struct request *);
-+	struct request *(*former_request)(struct request *);
-+	struct request *(*next_request)(struct request *);
- 	void (*init_icq)(struct io_cq *);
- 	void (*exit_icq)(struct io_cq *);
- };
-@@ -90,7 +90,7 @@ struct elevator_type
- 
- #define ELV_HASH_BITS 6
- 
--void elv_rqhash_del(struct request_queue *q, struct request *rq);
-+void elv_rqhash_del(struct request *rq);
- void elv_rqhash_add(struct request_queue *q, struct request *rq);
- void elv_rqhash_reposition(struct request_queue *q, struct request *rq);
- struct request *elv_rqhash_find(struct request_queue *q, sector_t offset);
-@@ -140,8 +140,8 @@ extern struct elevator_queue *elevator_alloc(struct request_queue *,
- /*
-  * Helper functions.
-  */
--extern struct request *elv_rb_former_request(struct request_queue *, struct request *);
--extern struct request *elv_rb_latter_request(struct request_queue *, struct request *);
-+extern struct request *elv_rb_former_request(struct request *);
-+extern struct request *elv_rb_latter_request(struct request *);
- 
- /*
-  * rb support functions.
--- 
-2.8.1
+P.S. Probably it should go through block tree.
+
+Leon Romanovsky (2):
+  blk-mq-rdma: Delete not-used multi-queue RDMA map queue code
+  RDMA/core: Delete not-implemented get_vector_affinity
+
+ block/Kconfig                    |  5 ----
+ block/Makefile                   |  1 -
+ block/blk-mq-rdma.c              | 44 --------------------------------
+ drivers/infiniband/core/device.c |  1 -
+ drivers/nvme/host/rdma.c         |  7 ++---
+ include/linux/blk-mq-rdma.h      | 11 --------
+ include/rdma/ib_verbs.h          | 23 -----------------
+ 7 files changed, 2 insertions(+), 90 deletions(-)
+ delete mode 100644 block/blk-mq-rdma.c
+ delete mode 100644 include/linux/blk-mq-rdma.h
+
+--
+2.26.2
 
