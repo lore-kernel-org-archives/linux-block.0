@@ -2,259 +2,192 @@ Return-Path: <SRS0=YBZ7=DG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B83B6C54FC8
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 20:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCDD3C47423
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 22:04:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5834C2076B
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 20:40:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85350208B8
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 22:04:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oS07A22k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBhHauvD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729004AbgI2UkZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Sep 2020 16:40:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37868 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729253AbgI2Uj4 (ORCPT
+        id S1728291AbgI2WEl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Sep 2020 18:04:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48995 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728450AbgI2WEk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Sep 2020 16:39:56 -0400
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3EF2C061755
-        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2020 13:39:55 -0700 (PDT)
-Received: by mail-qk1-x743.google.com with SMTP id w16so5832881qkj.7
-        for <linux-block@vger.kernel.org>; Tue, 29 Sep 2020 13:39:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sMTUhRtCxJUsKQa8lWSMtjMRe19Fo8nho/L0Qwh7iyo=;
-        b=oS07A22ksJFP/7LlOUycz/+jB2f6MlBvAOohuIw7HI7s397TX+tz1ajGHkiyRNVIGw
-         GgNsiV+B+dHX1S9OlHBeNzU+idisjvlCNUjz6eztMp7+0UsIA5EOwZcYRBB72aqFU/Ji
-         m2VFtOnF2yJzebbQSeWndYA8wJFs5uHLsYJP+kaMrk+g8VfpWm3tanNI8tTJIVuxdOqK
-         VM5ZLrlUytrC9NgHje0zavwWrpKHFsDF5V9Ks86Aaz8vy2LzZDeOC4lbXOPfuuf+ywsS
-         A66oCi7FwvZiScrmPzJ4r8Ba68eCayUPL29qAeaVHFLanVQjONgxaNByg/lnuxfPoP/s
-         SsQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=sMTUhRtCxJUsKQa8lWSMtjMRe19Fo8nho/L0Qwh7iyo=;
-        b=nDSb/mcmsK/RnkrmEZ1vcwC/oAYD4Sd3x+3HolexF+3Ozmn4cbF5Hs9D0g17SGxNM9
-         jTWgUVDgcmJk1Pe+101qS9WiIZc9hFv2sgiXbuS/zH3+DOmLAH/sRKSmKFLzcdcmesdB
-         EZkOMusZNjd6JD1K7n4hTq25spjnT3jyDN1diJw04IMMvTjoWSjD72unMUWg6bEmCAM6
-         D64RIOB+mxbyT9hiY6l7W+7EOH/QcMLVJoOwrAQDgG4i2+5vyRJ7qgrQ4PnY5BqD1drv
-         lzHn8WcRBxz/5Ug+GyBlnVsAWl/+ROS4bLIPqI5gEg1el4gQ0AaR5BXruCPtDS0VWBy9
-         viJw==
-X-Gm-Message-State: AOAM531DZqytqVAxQYKOD/wxMnu9x4vpPfs4MLnDEi1RL0a+v8rsjdN8
-        J51pPyWwtv9SOFR/eLxGUDk9Yr9+gvgq+Q==
-X-Google-Smtp-Source: ABdhPJw6/0w3PjPmwfjKAedASq1Q1IPvzg5LFAs40kuAwjsyHSs8b1oYGcpeCJ4D+icBI79osgAznQ==
-X-Received: by 2002:a37:e218:: with SMTP id g24mr6151311qki.496.1601411994170;
-        Tue, 29 Sep 2020 13:39:54 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id y29sm7015653qtj.20.2020.09.29.13.39.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2020 13:39:53 -0700 (PDT)
-Sender: Mike Snitzer <snitzer@gmail.com>
-Date:   Tue, 29 Sep 2020 16:39:52 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc:     dm-devel@redhat.com, joseph.qi@linux.alibaba.com,
-        ming.lei@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH] dm: fix missing imposition of queue_limits from dm_wq_work()
- thread
-Message-ID: <20200929203952.GA19218@lobo>
-References: <20200927120435.44118-1-jefflexu@linux.alibaba.com>
- <20200928160322.GA23320@redhat.com>
+        Tue, 29 Sep 2020 18:04:40 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601417078;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OB3ESLB6nEiZFjHHmb4cCVa9SrjhknJkIGtA5MjcRWA=;
+        b=WBhHauvDv/h93CUz56e28ZFlyHFEl/WzGvVN/1PvFDQcPcaWEsnrsU/FTtL+gAU4Kc69j4
+        XncfSXiiBPSuO4Vwt3pxRb+gzCy2z0oolE4vBYO4dUlfHa/Zof7kwE/TFpDf6qjVl8pyAi
+        s2UEo1wHpMTc0NN3FrYURETUCOIT7AQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-259-0AsrE8_2Mdud1gobOU8Bng-1; Tue, 29 Sep 2020 18:04:36 -0400
+X-MC-Unique: 0AsrE8_2Mdud1gobOU8Bng-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE3AE87311B;
+        Tue, 29 Sep 2020 22:04:34 +0000 (UTC)
+Received: from [10.10.110.11] (unknown [10.10.110.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8884560C13;
+        Tue, 29 Sep 2020 22:04:33 +0000 (UTC)
+Reply-To: tasleson@redhat.com
+Subject: Re: [v5 01/12] struct device: Add function callback durable_name
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org
+References: <20200925161929.1136806-1-tasleson@redhat.com>
+ <20200925161929.1136806-2-tasleson@redhat.com>
+ <20200929175102.GA1613@infradead.org> <20200929180415.GA1400445@kroah.com>
+From:   Tony Asleson <tasleson@redhat.com>
+Organization: Red Hat
+Cc:     Hannes Reinecke <hare@suse.de>
+Message-ID: <20e220a6-4bde-2331-6e5e-24de39f9aa3b@redhat.com>
+Date:   Tue, 29 Sep 2020 17:04:32 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200928160322.GA23320@redhat.com>
+In-Reply-To: <20200929180415.GA1400445@kroah.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 28 2020 at 12:03P -0400,
-Mike Snitzer <snitzer@redhat.com> wrote:
+On 9/29/20 1:04 PM, Greg Kroah-Hartman wrote:
+> On Tue, Sep 29, 2020 at 06:51:02PM +0100, Christoph Hellwig wrote:
+>> Independ of my opinion on the whole scheme that I shared last time,
+>> we really should not bloat struct device with function pointers.
 
-> On Sun, Sep 27 2020 at  8:04am -0400,
-> Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
+Christoph, thank you for sharing a bit more of your concerns and
+bringing Greg into the discussion.  It's more productive.
+
+>>
+>> On Fri, Sep 25, 2020 at 11:19:18AM -0500, Tony Asleson wrote:
+>>> Function callback and function to be used to write a persistent
+>>> durable name to the supplied character buffer.  This will be used to add
+>>> structured key-value data to log messages for hardware related errors
+>>> which allows end users to correlate message and specific hardware.
+>>>
+>>> Signed-off-by: Tony Asleson <tasleson@redhat.com>
+>>> ---
+>>>  drivers/base/core.c    | 24 ++++++++++++++++++++++++
+>>>  include/linux/device.h |  4 ++++
+>>>  2 files changed, 28 insertions(+)
 > 
-> > Hi Mike, would you mind further expalin why bio processed by dm_wq_work()
-> > always gets a previous ->submit_bio. Considering the following call graph:
-> > 
-> > ->submit_bio, that is, dm_submit_bio
-> >   DMF_BLOCK_IO_FOR_SUSPEND set, thus queue_io()
-> > 
-> > then worker thread dm_wq_work()
-> >   dm_process_bio  // at this point. the input bio is the original bio
-> >                      submitted to dm device
-> > 
-> > Please let me know if I missed something.
-> > 
-> > Thanks.
-> > Jeffle
+> I can't find this patch anywhere in my archives, why was I not cc:ed on
+> it?  It's a v5 and no one thought to ask the driver core
+> developers/maintainers about it???
+
+You were CC'd into v3, ref.
+
+https://lore.kernel.org/linux-ide/20200714081750.GB862637@kroah.com/
+
+I should have continued to CC you on it, sorry about that.
+
+
+> {sigh}
 > 
-> In general you have a valid point, that blk_queue_split() won't have
-> been done for the suspended device case, but blk_queue_split() cannot be
-> used if not in ->submit_bio -- IIUC you cannot just do it from a worker
-> thread and hope to have proper submission order (depth first) as
-> provided by __submit_bio_noacct().  Because this IO will be submitted
-> from worker you could have multiple threads allocating from the
-> q->bio_split mempool at the same time.
+> And for log messages, what about the dynamic debug developers, why not
+> include them as well?  Since when is this a storage-only thing?
+
+Hannes Reinecke has been involved in the discussion some and he's
+involved in dynamic debug AFAIK.
+
+If others have a need to identify a specific piece of hardware in a
+potential sea of identical hardware that is encountering errors and
+logging messages and can optionally be added and removed at run-time,
+then yes they should be included too.  There is nothing with this patch
+series that is preventing any device from registering a callback which
+provides this information when asked.
+
+
+>>> diff --git a/include/linux/device.h b/include/linux/device.h
+>>> index 5efed864b387..074125999dd8 100644
+>>> --- a/include/linux/device.h
+>>> +++ b/include/linux/device.h
+>>> @@ -614,6 +614,8 @@ struct device {
+>>>  	struct iommu_group	*iommu_group;
+>>>  	struct dev_iommu	*iommu;
+>>>  
+>>> +	int (*durable_name)(const struct device *dev, char *buff, size_t len);
 > 
-> All said, I'm not quite sure how to address this report.  But I'll keep
-> at it and see what I can come up with.
+> No, that's not ok at all, why is this even a thing?
+> 
+> Who is setting this?  Why can't the bus do this without anything
+> "special" needed from the driver core?
 
-Here is what I've staged for 5.10:
+I'm setting it in the different storage subsystems.  The intent is that
+when we go through a common logging path eg. dev_printk you can ask the
+device what it's ID is so that it can be logged as structured data with
+the log message.  I was trying to avoid having separate logging
+functions all over the place which enforces a consistent meta data to
+log messages, but maybe that would be better than adding a function
+pointer to struct device?  My first patch tried adding a call back to
+struct device_type, but that ran into the issue where struct device_type
+is static const in a number of areas.
 
-From: Mike Snitzer <snitzer@redhat.com>
-Date: Mon, 28 Sep 2020 13:41:36 -0400
-Subject: [PATCH] dm: fix missing imposition of queue_limits from dm_wq_work() thread
+Basically for any piece of hardware with a serial number, call this
+function to get it.  That was the intent anyway.
 
-If a DM device was suspended when bios were issued to it, those bios
-would be deferred using queue_io(). Once the DM device was resumed
-dm_process_bio() could be called by dm_wq_work() for original bio that
-still needs splitting. dm_process_bio()'s check for current->bio_list
-(meaning call chain is within ->submit_bio) as a prerequisite for
-calling blk_queue_split() for "abnormal IO" would result in
-dm_process_bio() never imposing corresponding queue_limits
-(e.g. discard_granularity, discard_max_bytes, etc).
+> We have a mapping of 'struct device' to a unique hardware device at a
+> specific point in time, why are you trying to create another one?
 
-Fix this by folding dm_process_bio() into dm_submit_bio() and
-always have dm_wq_work() resubmit deferred bios using
-submit_bio_noacct().
+I don't think I'm creating anything new.  Can you clarify this a bit
+more?  I'm trying to leverage what is already in place.
 
-Side-effect is blk_queue_split() is always called for "abnormal IO" from
-->submit_bio, be it from application thread or dm_wq_work() workqueue,
-so proper bio splitting and depth-first bio submission is performed.
+> What is wrong with what we have today?
 
-While at it, cleanup dm_submit_bio()'s DMF_BLOCK_IO_FOR_SUSPEND related
-branching and expand scope of dm_get_live_table() rcu reference on map
-via common 'out' label to dm_put_live_table(). Also, rename bio variable
-in dm_wq_work() from 'c' to 'bio'.
+I'm trying to figure out a way to positively identify which storage
+device an error belongs to over time.  Logging how something is attached
+and not what is attached, only solves for right now, this point in time.
+ Additionally when the only identifier is in the actual message itself,
+it makes user space break every time the message content changes.  Also
+what we have today in dev_printk doesn't tag the meta-data consistently
+for journald to leverage.
 
-Fixes: cf9c37865557 ("dm: fix comment in dm_process_bio()")
-Reported-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- drivers/md/dm.c | 67 +++++++++++++++++++++------------------------------------
- 1 file changed, 24 insertions(+), 43 deletions(-)
+This patch series adds structured data to the log entry for positive
+identification.  It doesn't change when the content of the log message
+changes.  It's true over time and it's true if a device gets moved to a
+different system.
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index a1adcf0ab821..1813201d772a 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1665,34 +1665,6 @@ static blk_qc_t __process_bio(struct mapped_device *md, struct dm_table *map,
- 	return ret;
- }
- 
--static blk_qc_t dm_process_bio(struct mapped_device *md,
--			       struct dm_table *map, struct bio *bio)
--{
--	blk_qc_t ret = BLK_QC_T_NONE;
--
--	if (unlikely(!map)) {
--		bio_io_error(bio);
--		return ret;
--	}
--
--	/*
--	 * If in ->submit_bio we need to use blk_queue_split(), otherwise
--	 * queue_limits for abnormal requests (e.g. discard, writesame, etc)
--	 * won't be imposed.
--	 * If called from dm_wq_work() for deferred bio processing, bio
--	 * was already handled by following code with previous ->submit_bio.
--	 */
--	if (current->bio_list) {
--		if (is_abnormal_io(bio))
--			blk_queue_split(&bio);
--		/* regular IO is split by __split_and_process_bio */
--	}
--
--	if (dm_get_md_type(md) == DM_TYPE_NVME_BIO_BASED)
--		return __process_bio(md, map, bio);
--	return __split_and_process_bio(md, map, bio);
--}
--
- static blk_qc_t dm_submit_bio(struct bio *bio)
- {
- 	struct mapped_device *md = bio->bi_disk->private_data;
-@@ -1713,22 +1685,34 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
- 	}
- 
- 	map = dm_get_live_table(md, &srcu_idx);
-+	if (unlikely(!map)) {
-+		bio_io_error(bio);
-+		goto out;
-+	}
- 
--	/* if we're suspended, we have to queue this io for later */
-+	/* If suspended, queue this IO for later */
- 	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
--		dm_put_live_table(md, srcu_idx);
--
- 		if (bio->bi_opf & REQ_NOWAIT)
- 			bio_wouldblock_error(bio);
--		else if (!(bio->bi_opf & REQ_RAHEAD))
--			queue_io(md, bio);
--		else
-+		else if (bio->bi_opf & REQ_RAHEAD)
- 			bio_io_error(bio);
--		return ret;
-+		else
-+			queue_io(md, bio);
-+		goto out;
- 	}
- 
--	ret = dm_process_bio(md, map, bio);
-+	/*
-+	 * Use blk_queue_split() for abnormal IO (e.g. discard, writesame, etc)
-+	 * otherwise associated queue_limits won't be imposed.
-+	 */
-+	if (is_abnormal_io(bio))
-+		blk_queue_split(&bio);
- 
-+	if (dm_get_md_type(md) == DM_TYPE_NVME_BIO_BASED)
-+		ret = __process_bio(md, map, bio);
-+	else
-+		ret = __split_and_process_bio(md, map, bio);
-+out:
- 	dm_put_live_table(md, srcu_idx);
- 	return ret;
- }
-@@ -2385,7 +2369,7 @@ static void dm_wq_work(struct work_struct *work)
- {
- 	struct mapped_device *md = container_of(work, struct mapped_device,
- 						work);
--	struct bio *c;
-+	struct bio *bio;
- 	int srcu_idx;
- 	struct dm_table *map;
- 
-@@ -2393,16 +2377,13 @@ static void dm_wq_work(struct work_struct *work)
- 
- 	while (!test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags)) {
- 		spin_lock_irq(&md->deferred_lock);
--		c = bio_list_pop(&md->deferred);
-+		bio = bio_list_pop(&md->deferred);
- 		spin_unlock_irq(&md->deferred_lock);
- 
--		if (!c)
-+		if (!bio)
- 			break;
- 
--		if (dm_request_based(md))
--			(void) submit_bio_noacct(c);
--		else
--			(void) dm_process_bio(md, map, c);
-+		submit_bio_noacct(bio);
- 	}
- 
- 	dm_put_live_table(md, srcu_idx);
--- 
-2.15.0
+> So this is a HARD NAK on this patch for now.
+
+Thank you for supplying some feedback and asking questions.  I've been
+asking for suggestions and would very much like to have a discussion on
+how this issue is best solved.  I'm not attached to what I've provided.
+I'm just trying to get towards a solution.
+
+
+We've looked at user space quite a bit and there is an inherit race
+condition with trying to fetch the unique hardware id for a message when
+it gets emitted from the kernel as udev rules haven't even run (assuming
+we even have the meta-data to make the association).  The last thing
+people want to do is delay writing the log message to disk until the
+device it belongs to can be identified.  Of course this patch series
+still has a window from where the device is first discovered by the
+kernel and fetches the needed vpd data from the device.  Any kernel
+messages logged during that time have no id to associate with it.
+
+Thanks,
+Tony
+
 
