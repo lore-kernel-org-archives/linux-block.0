@@ -2,109 +2,242 @@ Return-Path: <SRS0=YBZ7=DG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EA32C4727C
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 18:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 569E5C4727C
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 18:50:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB72C208B8
-	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 18:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2E0C2075F
+	for <linux-block@archiver.kernel.org>; Tue, 29 Sep 2020 18:50:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cbwaulEb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728084AbgI2SYx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Sep 2020 14:24:53 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:46567 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727605AbgI2SYx (ORCPT
+        id S1728443AbgI2SuU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Sep 2020 14:50:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49088 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728215AbgI2SuU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Sep 2020 14:24:53 -0400
-Received: by mail-pf1-f195.google.com with SMTP id b124so5373732pfg.13;
-        Tue, 29 Sep 2020 11:24:52 -0700 (PDT)
+        Tue, 29 Sep 2020 14:50:20 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A36C061755;
+        Tue, 29 Sep 2020 11:50:19 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id a9so5934013wmm.2;
+        Tue, 29 Sep 2020 11:50:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CNJt0onxUCMMWKtijmk+/s8cyxgaUUUU8TxKJdwf3SE=;
+        b=cbwaulEbECRgKujM4oD1rf0dCUjcvQwj44icbxaZj16EEQYFnJyKiq8iQTXjNOwyp4
+         LtgFhMITHjjy/fcDH6pInueGam6oN5dGo/8HjsOg0i56d9TVQ5VG57IaLyXC6XOqQyEw
+         fkDvE+VZZVRqBCT2SxIcp8s/HA+bHH4ftsu33Sm//L7Rmw482kt8KrgfBJV5Psy+QKy2
+         v8ThzZbWWkQ6qHlyVK+k1uwRprMQqq1uKM4pVnsTQ7hjcCKDphwvaH6/rtIGwJnYsg+b
+         DZZZetaRcigJWRrwMrzesxGEF4lQFNYvZmuh7o2KDW8h+EZgYQxt5Mu921Pbf+d1Vnzj
+         YcDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cv+VtdAufAAEWbfdy6MfzzVxHEHSITCss8O60CesZRI=;
-        b=O+hwRRZpmuer0Q6VQPfOuW6CEk1eiJoplBPWiTQpGHFX3ouyT+GWyotWfN1GJ8MnR9
-         CMAvUx+p5T0FhpGxiF/QU7XuR6szMlN+RpPi9JtNdywnisREk5PrqXSUvPMEqUtjIFBa
-         eKvNu24vrc4XFThAJYPiQMAFqMsLitaO+uPiJoIbTtJ6glqQQuilxpF22/x0Vjpzx5t+
-         rSukMrDQPVYSei0QKVZLB5XH8o/rfwiJqnn5ezfIv3aZso20rPOlbo2APQZ5D8jTX4xE
-         t+wRt0U0Xz6lELXZsTc9y0Gvev51dVpgYNXAI92veSM7HrocpivEKXuXTSRUcOo/Otwo
-         FDSg==
-X-Gm-Message-State: AOAM530wHuq7EaKPFBuFTr0BhtJ0sqa/lTkX+gtchWU52rCN9pn+KTmb
-        kOlBgY6wRnc9CpfvtCIQgYVmZUQUowk=
-X-Google-Smtp-Source: ABdhPJwR+inYO61Gp1C9kisMtoi7s9azwzq1iyNQo/GL2lBe5OlQ8O+681Hel3isFB/Jj9f1DrfKRQ==
-X-Received: by 2002:a17:902:9041:b029:d0:cc02:8540 with SMTP id w1-20020a1709029041b02900d0cc028540mr5533911plz.41.1601403891897;
-        Tue, 29 Sep 2020 11:24:51 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:8ff9:9348:1454:22ce? ([2601:647:4802:9070:8ff9:9348:1454:22ce])
-        by smtp.gmail.com with ESMTPSA id m5sm5229070pjn.19.2020.09.29.11.24.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Sep 2020 11:24:51 -0700 (PDT)
-Subject: Re: [PATCH blk-next 1/2] blk-mq-rdma: Delete not-used multi-queue
- RDMA map queue code
-To:     Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc:     Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org
-References: <20200929091358.421086-1-leon@kernel.org>
- <20200929091358.421086-2-leon@kernel.org> <20200929102046.GA14445@lst.de>
- <20200929103549.GE3094@unreal>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <879916e4-b572-16b9-7b92-94dba7e918a3@grimberg.me>
-Date:   Tue, 29 Sep 2020 11:24:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CNJt0onxUCMMWKtijmk+/s8cyxgaUUUU8TxKJdwf3SE=;
+        b=O42AEmq3xp0HiNMA/xWJXV01+mOQlwDnqFzaHScDpc2Dq0ewr8WtMN0e2kg3m+4Dfy
+         vq1APfYL5i2KpzI/tfs1iSm+wy9e8ws3NB8c30lyeuLBol0O0GKErI0J2pgzMpG2E7Ac
+         /XdvhfAJM6yzyBEln831bpOkw0YbuGuxKHSEVrk4Ds6WnRYVVatSLD8XVwnSIyM7nyjF
+         VtksB0YKaGIwQ5EL5r4lLgubK/PC7AKSMgbikTHE9KPRsgY/wmce0kYlbzaZPwM9nXnd
+         PFXfgAdpH+PZl4Ej9AaNROdGSZjwZTIGhQt3UEsmegtpaF/jnAE6AnNiougdMEcXCLAj
+         co5A==
+X-Gm-Message-State: AOAM532qBrTg+5ar26m3gA40Fv0ABllFBO12RfutuUg8n+413EsFRitQ
+        NvFDCekvDLcjZt32kCQFjPygqGtzi5Ob2SJ2qijSViWBgmB3Dhci0Ps=
+X-Google-Smtp-Source: ABdhPJzezBrVB5Ar4cx8TTLyBXFwiu0GkZxAui4OWx8hKqwZIcIr8sD2S6eevw4SDX0J8JdbVOFIY6lm9+ShrQrQ5Ec=
+X-Received: by 2002:a1c:dfc2:: with SMTP id w185mr5904005wmg.15.1601405418221;
+ Tue, 29 Sep 2020 11:50:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200929103549.GE3094@unreal>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CA+1E3rLM4G4SwzD6RWsK6Ssp7NmhiPedZDjrqN3kORQr9fxCtw@mail.gmail.com>
+ <MWHPR04MB375863C20C1EF2CB27E62703E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731091416.GA29634@infradead.org> <MWHPR04MB37586D39CA389296CE0252A4E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731094135.GA4104@infradead.org> <MWHPR04MB3758A4B2967DB1FABAAD9265E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731125110.GA11500@infradead.org> <CY4PR04MB37517D633920E4D31AC6EA0DE74B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200814081411.GA16943@infradead.org> <CA+1E3r+WXC_MK5Zf2OZEv17ddJDjtXbhpRFoeDns4F341xMhow@mail.gmail.com>
+ <20200908151801.GA16742@infradead.org> <CA+1E3r+MSEW=-SL8L+pquq+cFAu+nQOULQ+HZoQsCvdjKMkrNw@mail.gmail.com>
+ <MWHPR04MB3758A78AFAED3543F8D38266E7360@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <CA+1E3rJANOsPOzjtJHSViVMq+Uc-sB0iZoExxBG++v2ghaL4uA@mail.gmail.com> <CY4PR04MB3751BFF86D1F7F1D22A143E6E7320@CY4PR04MB3751.namprd04.prod.outlook.com>
+In-Reply-To: <CY4PR04MB3751BFF86D1F7F1D22A143E6E7320@CY4PR04MB3751.namprd04.prod.outlook.com>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Wed, 30 Sep 2020 00:19:52 +0530
+Message-ID: <CA+1E3rLXm6x-pivNiW=t0g=H0NnLTdz3NMKNV-d=ezPGr5i2Qg@mail.gmail.com>
+Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "hch@infradead.org" <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Sep 29, 2020 at 6:54 AM Damien Le Moal <Damien.LeMoal@wdc.com> wrote:
+>
+> On 2020/09/29 3:58, Kanchan Joshi wrote:
+> [...]
+> > ZoneFS is better when it is about dealing at single-zone granularity,
+> > and direct-block seems better when it is about grouping zones (in
+> > various ways including striping). The latter case (i.e. grouping
+> > zones) requires more involved mapping, and I agree that it can be left
+> > to application (for both ZoneFS and raw-block backends).
+> > But when an application tries that on ZoneFS, apart from mapping there
+> > would be additional cost of indirection/fd-management (due to
+> > file-on-files).
+>
+> There is no indirection in zonefs. fd-to-struct file/inode conversion is very
+> fast and happens for every system call anyway, regardless of what the fd
+> represents. So I really do not understand what your worry is here.
 
->>> From: Leon Romanovsky <leonro@nvidia.com>
->>>
->>> The RDMA vector affinity code is not backed up by any driver and always
->>> returns NULL to every ib_get_vector_affinity() call.
->>>
->>> This means that blk_mq_rdma_map_queues() always takes fallback path.
->>>
->>> Fixes: 9afc97c29b03 ("mlx5: remove support for ib_get_vector_affinity")
->>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
->>
->> So you guys totally broken the nvme queue assignment without even
->> telling anyone?  Great job!
-> 
-> Who is "you guys" and it wasn't silent either? I'm sure that Sagi knows the craft.
-> https://lore.kernel.org/linux-rdma/20181224221606.GA25780@ziepe.ca/
-> 
-> commit 759ace7832802eaefbca821b2b43a44ab896b449
-> Author: Sagi Grimberg <sagi@grimberg.me>
-> Date:   Thu Nov 1 13:08:07 2018 -0700
-> 
->      i40iw: remove support for ib_get_vector_affinity
-> 
-> ....
-> 
-> commit 9afc97c29b032af9a4112c2f4a02d5313b4dc71f
-> Author: Sagi Grimberg <sagi@grimberg.me>
-> Date:   Thu Nov 1 09:13:12 2018 -0700
-> 
->      mlx5: remove support for ib_get_vector_affinity
-> 
-> Thanks
+file-over-files.....if application (user-space FS/DB) has to place
+file-abstraction over zonefs again, to group/map the zones in a
+different manner (larger files, striped mapping etc.).
+Imagine a file over say 4 zones.....with zonefs backend, application
+will invoke kernel at least 4 times to open the fds. With raw-block
+backend, these system calls won't be required in the first place.
 
-Yes, basically usage of managed affinity caused people to report
-regressions not being able to change irq affinity from procfs.
+> If you are
+> worried about overhead/performance, then please show numbers. If something is
+> wrong, we can work on fixing it.
+>
+> > And if new features (zone-append for now) are available only on
+> > ZoneFS, it forces application to use something that maynot be most
+> > optimal for its need.
+>
+> "may" is not enough to convince me...
+>
+> > Coming to the original problem of plumbing append - I think divergence
+> > started because RWF_APPEND did not have any meaning for block device.
+> > Did I miss any other reason?
+>
+> Correct.
+>
+> > How about write-anywhere semantics (RWF_RELAXED_WRITE or
+> > RWF_ANONYMOUS_WRITE flag) on block-dev.
+>
+> "write-anywhere" ? What do you mean ? That is not possible on zoned devices,
+> even with zone append, since you at least need to guarantee that zones have
+> enough unwritten space to accept an append command.
+>
+> > Zone-append works a lot like write-anywhere on block-dev (or on any
+> > other file that combines multiple-zones, in non-sequential fashion).
+>
+> That is an over-simplification that is not helpful at all. Zone append is not
+> "write anywhere" at all. And "write anywhere" is not a concept that exist on
+> regular block devices anyway. Writes only go to the offset that the user
+> decided, through lseek(), pwrite() or aio->aio_offset. It is not like the block
+> layer decides where the writes land. The same constraint applies to zone append:
+> the user decide the target zone. That is not "anywhere". Please be precise with
+> wording and implied/desired semantic. Narrow down the scope of your concept
+> names for clarity.
 
-Back then I started a discussion with Thomas to make managed
-affinity to still allow userspace to modify this, but this
-was dropped at some point. So currently rdma cannot do
-automatic irq affinitization out of the box.
+This -
+<start>
+Issue write on offset X with no flag, it happens at X.
+Issue write on offset X with "anywhere" flag, it happens
+anywhere....and application comes to know that on completion.
+</start>
+Above is fairly generic as far as high-level interface is concerned.
+Return offset can be file-pointer or supplied-offset or something
+completely different. If anywhere-flag is passed, the caller should
+not assume anything and must explicitly check where write happened.
+The "anywhere" part can be decided by the component that implements
+the interface.
+For zoned block dev,  this "anywhere" can come by issuing zone-append
+underneath. Some other components are free to implement "anywhere" in
+another way, or do nothing....in that case write continues to happen
+at X.
+
+For zoned raw-block, we have got an address-space that contains N
+zones placed sequentially.
+Write on offset O1 with anywhere flag: => The O1 is rounded-down to
+zone-start (say Z1) by direct-io code, zone-append is issued on Z1,
+and completion-offset O2 is returned.
+write-anywhere on another offset O3 of address space => zone-start
+could be Z2, and completion-offset O4 is returned.
+Application picks completion offsets O3 and O4 and goes about its
+business, not needing to know about Z1 or Z2.
+
+> And talking about "file that combines multiple-zones" would mean that we are now
+> back in FS land, not raw block device file accesses anymore. So which one are we
+> talking about ?
+
+About user-space FS/DB/SDS using zoned-storage, aiming optimized placement.
+In all this discussion, I have been referring to ZoneFS and Raw-block
+as backends for higher-level abstraction residing in user-space.
+
+> It looks like you are confusing what the application does and
+> how it uses whatever usable interface to the device with what that interface
+> actually is. It is very confusing.
+>
+> >>> Also it seems difficult (compared to block dev) to fit simple-copy TP
+> >>> in ZoneFS. The new
+> >>> command needs: one NVMe drive, list of source LBAs and one destination
+> >>> LBA. In ZoneFS, we would deal with N+1 file-descriptors (N source zone
+> >>> file, and one destination zone file) for that. While with block
+> >>> interface, we do not need  more than one file-descriptor representing
+> >>> the entire device. With more zone-files, we face open/close overhead too.
+> >>
+> >> Are you expecting simple-copy to allow requests that are not zone aligned ? I do
+> >> not think that will ever happen. Otherwise, the gotcha cases for it would be far
+> >> too numerous. Simple-copy is essentially an optimized regular write command.
+> >> Similarly to that command, it will not allow copies over zone boundaries and
+> >> will need the destination LBA to be aligned to the destination zone WP. I have
+> >> not checked the TP though and given the NVMe NDA, I will stop the discussion here.
+> >
+> > TP is ratified, if that is the problem you are referring to.
+>
+> Ah. Yes. Got confused with ZRWA. Simple-copy is a different story anyway. Let's
+> not mix it into zone append user interface please.
+>
+> >
+> >> filesend() could be used as the interface for simple-copy. Implementing that in
+> >> zonefs would not be that hard. What is your plan for simple-copy interface for
+> >> raw block device ? An  ioctl ? filesend() too ? As as with any other user level
+> >> API, we should not be restricted to a particular device type if we can avoid it,
+> >> so in-kernel emulation of the feature is needed for devices that do not have
+> >> simple-copy or scsi extended copy. filesend() seems to me like the best choice
+> >> since all of that is already implemented there.
+> >
+> > At this moment, ioctl as sync and io-uring for async. sendfile() and
+> > copy_file_range() takes two fds....with that we can represent copy
+> > from one source zone to another zone.
+> > But it does not fit to represent larger copy (from N source zones to
+> > one destination zone).
+>
+> nvme passthrough ? If that does not fit your use case, then think of an
+> interface, its definition/semantic and propose it. But again, use a different
+> thread. This is mixing up zone-append and simple copy, which I do not think are
+> directly related.
+>
+> > Not sure if I am clear, perhaps sending RFC would be better for
+> > discussion on simple-copy.
+>
+> Separate this discussion from zone append please. Mixing up 2 problems in one
+> thread is not helpful to make progress.
+Fine.
+
+
+-- 
+Joshi
