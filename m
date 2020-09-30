@@ -2,107 +2,131 @@ Return-Path: <SRS0=Yhvv=DH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3243C4727C
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 16:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AE7C4727E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 17:24:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C48E20759
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 16:17:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601482669;
-	bh=3E8K3ITFIRuYqJsCUgJjDp/HNSfeQmlf3FgOS329N3s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=lxBzMZ6JssNzJPdd60+qfTnLw6F+zU0rfTDcMK4ngu4mydtmlFqRzdl9QpMaAhDNo
-	 HPR8Tqgg1nBM5oA4LlEA5INOFz02DGSbR1lEvK+36aL+WZvqnhKl+CvuB4KJNH+BgU
-	 3PblsFPIlZRTmRDFD9bFpLtosFpq7weRHWdttaA0=
+	by mail.kernel.org (Postfix) with ESMTP id 4ABF420754
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 17:24:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725893AbgI3QRp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Sep 2020 12:17:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49874 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725800AbgI3QRp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Sep 2020 12:17:45 -0400
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F77FC061755;
-        Wed, 30 Sep 2020 09:17:45 -0700 (PDT)
-Received: by mail-qt1-x841.google.com with SMTP id d1so1646197qtr.6;
-        Wed, 30 Sep 2020 09:17:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=W/Hkl9GFIJfxfeMpU//nmP4ISzumsOYvRtgWyW3bzsw=;
-        b=Zu7583FLPnLVk2W7IwechryeUFMKXKRxYi4bjyon/ez2PDMjPBGoc6aa+yX8MxHF/y
-         3RIPLiYOlIJfH6j8sXrnQusWZ9Q3bbhIG3+qO5bXXPWkRv/x6y7WegTM/ZD8uABw2Rno
-         XfMCyau5o1G8eUlk3M0LmyRKActBQkotAm9D1VqTqTo3M0uBmFgOUuW6xPkW0XnJvFZT
-         j3nIrng7UNU9LahUWLhownPwtqlVSwZKiKWyxGoj5mvoHIB2Pge3jrqUCoLQqpRbXXMu
-         srw1PsL5fTzTMxrL8RXGq1Q9Zx58OEHZufZfJqZjT8FkOiSl767ULIUDx6h0VUSENXDA
-         KMiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=W/Hkl9GFIJfxfeMpU//nmP4ISzumsOYvRtgWyW3bzsw=;
-        b=ZoKFab7B8wqO5YttiAyuz8NXywlA3PYnnmJ6c3yl1Nw9akOqa0jAZAT+H5VZM7InpT
-         f5Z9KIzSXtQNdqvfweyPWUo7XCmpXlzIg+AnDT3yLt0rmUlMc/kuD4qekrH9WrYIKoC3
-         xyKeIx/lPbcnw6/LXWIc7M27iPzCo5ojP0ME3G/KltGEPObDtAQo6HD6hRbHGwUDXjxG
-         Uw/AAGn5ra6F5fk7o1AF4N5q9pl5s5A3RBKkaP1uPwSTYoHg71Z+fFr5G0j+mtPrTWaP
-         IMvbJA8YsPUarzfAzR2ClsVq5jhHl7sa0v+i5Vpmjmeey4ADwIQ/Ce3kk9JpSwglFaXE
-         6zMg==
-X-Gm-Message-State: AOAM5323zK0Dz7GRm4RR9BPpPvKAFLLvXlQGr4pRPQ0kVKMbU36WOvFg
-        8uNGtnwP+ZNtNCmU+rc2jLA=
-X-Google-Smtp-Source: ABdhPJw0TgZ5mKhFLZ+syDtkW1lFUgKFwa6w0NbBcz85VahxcBypNFNzyK7OZe3EZB+fpLleb7T/KQ==
-X-Received: by 2002:aed:34c1:: with SMTP id x59mr3123308qtd.374.1601482664189;
-        Wed, 30 Sep 2020 09:17:44 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1:e9fa])
-        by smtp.gmail.com with ESMTPSA id z2sm2606770qkg.40.2020.09.30.09.17.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Sep 2020 09:17:43 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 30 Sep 2020 12:17:42 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        Minho Ban <mhban@samsung.com>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org
-Subject: Re: RFC: sort out get_gendisk abuses
-Message-ID: <20200930161742.GF4441@mtj.duckdns.org>
-References: <20200925161447.1486883-1-hch@lst.de>
+        id S1731440AbgI3RX5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Sep 2020 13:23:57 -0400
+Received: from mga02.intel.com ([134.134.136.20]:38534 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725837AbgI3RX4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Sep 2020 13:23:56 -0400
+IronPort-SDR: PAuC9TzZNqSxdIWFpc4DYuc8i63cdVGdB1gZ/FsnMVCYAqFhd0YTRlDaQsqrxAY36mCLOf4wAs
+ ZAJQ2N60/nPg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9760"; a="150157847"
+X-IronPort-AV: E=Sophos;i="5.77,322,1596524400"; 
+   d="scan'208";a="150157847"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2020 10:23:56 -0700
+IronPort-SDR: i/Wr/vMjVXkZ5qogz7WZNWTib8KiEGRz3nH8oSSMXjiat3fjS8SP+4r76rLDlC36IzFZqUs5N6
+ 0O98strF7WMw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,322,1596524400"; 
+   d="scan'208";a="457741574"
+Received: from ahunter-desktop.fi.intel.com (HELO [10.237.72.190]) ([10.237.72.190])
+  by orsmga004.jf.intel.com with ESMTP; 30 Sep 2020 10:23:52 -0700
+Subject: Re: [PATCH] mmc: core: don't set limits.discard_granularity as 0
+To:     Coly Li <colyli@suse.de>, linux-mmc@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Vicente Bergas <vicencb@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+References: <20200930160854.65710-1-colyli@suse.de>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+Message-ID: <5178b9e0-6b95-45ef-80f1-862de554e625@intel.com>
+Date:   Wed, 30 Sep 2020 20:23:19 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200925161447.1486883-1-hch@lst.de>
+In-Reply-To: <20200930160854.65710-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Christoph.
+On 30/09/20 7:08 pm, Coly Li wrote:
+> In mmc_queue_setup_discard() the mmc driver queue's discard_granularity
+> might be set as 0 (when card->pref_erase > max_discard) while the mmc
+> device still declares to support discard operation. This is buggy and
+> triggered the following kernel warning message,
+> 
+> WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
+> CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
+> Hardware name: Google Kevin (DT)
+> pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=--)
+> pc : __blkdev_issue_discard+0x200/0x294
+> lr : __blkdev_issue_discard+0x54/0x294
+> sp : ffff800011dd3b10
+> x29: ffff800011dd3b10 x28: 0000000000000000 x27: ffff800011dd3cc4 x26: ffff800011dd3e18 x25: 000000000004e69b x24: 0000000000000c40 x23: ffff0000f1deaaf0 x22: ffff0000f2849200 x21: 00000000002734d8 x20: 0000000000000008 x19: 0000000000000000 x18: 0000000000000000 x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000 x14: 0000000000000394 x13: 0000000000000000 x12: 0000000000000000 x11: 0000000000000000 x10: 00000000000008b0 x9 : ffff800011dd3cb0 x8 : 000000000004e69b x7 : 0000000000000000 x6 : ffff0000f1926400 x5 : ffff0000f1940800 x4 : 0000000000000000 x3 : 0000000000000c40 x2 : 0000000000000008 x1 : 00000000002734d8 x0 : 0000000000000000 Call trace:
+> __blkdev_issue_discard+0x200/0x294
+> __submit_discard_cmd+0x128/0x374
+> __issue_discard_cmd_orderly+0x188/0x244
+> __issue_discard_cmd+0x2e8/0x33c
+> issue_discard_thread+0xe8/0x2f0
+> kthread+0x11c/0x120
+> ret_from_fork+0x10/0x1c
+> ---[ end trace e4c8023d33dfe77a ]---
+> 
+> This patch fixes the issue by setting discard_granularity as SECTOR_SIZE
+> instead of 0 when (card->pref_erase > max_discard) is true. Now no more
+> complain from __blkdev_issue_discard() for the improper value of discard
+> granularity.
+> 
+> Fixes: commit e056a1b5b67b ("mmc: queue: let host controllers specify maximum discard timeout")
 
-On Fri, Sep 25, 2020 at 06:14:45PM +0200, Christoph Hellwig wrote:
-> this series tries to remove two abuses of the get_gendisk API.
-> The first one is fairly straigt forward and switched the blk-cgroup
-> configuration API to properly open the block device, but I'd love to see
-> it reviewed and tested by the cgroup maintainers, as I don't really know
-> how this code is actually used.
+That "Fixes" tag is a bit misleading.  For some time, the block layer had
+no problem with discard_granularity of zero, and blk_bio_discard_split()
+still doesn't (see below).
 
-I'm a bit worried that requiring fully opening the device for configuration
-can lead to surprising behaviors. A now-unlikely but still possible case
-would be trying to configure IO parameters for a device w/ removeable media.
-All that the user is trying to do is configuring a bunch of parameters but
-the kernel would try to spin up the media and fail configuration and so on.
+static struct bio *blk_bio_discard_split(struct request_queue *q,
+					 struct bio *bio,
+					 struct bio_set *bs,
+					 unsigned *nsegs)
+{
+	unsigned int max_discard_sectors, granularity;
+	int alignment;
+	sector_t tmp;
+	unsigned split_sectors;
 
-The use case of needing to access the associated data structures without
-fully activating the IO device seems valid to me. Whether that interface is
-blkdev_get() or something better abstracted, I don't really care.
+	*nsegs = 1;
 
-Thanks.
+	/* Zero-sector (unknown) and one-sector granularities are the same.  */
+	granularity = max(q->limits.discard_granularity >> 9, 1U);
 
--- 
-tejun
+
+> Reported-by: Vicente Bergas <vicencb@gmail.com>
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Adrian Hunter <adrian.hunter@intel.com>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> ---
+>  drivers/mmc/core/queue.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+> index 6c022ef0f84d..350d0cc4ee62 100644
+> --- a/drivers/mmc/core/queue.c
+> +++ b/drivers/mmc/core/queue.c
+> @@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct request_queue *q,
+>  	q->limits.discard_granularity = card->pref_erase << 9;
+>  	/* granularity must not be greater than max. discard */
+>  	if (card->pref_erase > max_discard)
+> -		q->limits.discard_granularity = 0;
+> +		q->limits.discard_granularity = SECTOR_SIZE;
+>  	if (mmc_can_secure_erase_trim(card))
+>  		blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
+>  }
+> 
+
