@@ -2,164 +2,91 @@ Return-Path: <SRS0=Yhvv=DH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E3FC4727E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 19:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA33C4741F
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 19:33:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B7CB20708
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 19:14:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="N40fcAv7"
+	by mail.kernel.org (Postfix) with ESMTP id 8ED5F20739
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 19:33:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729992AbgI3TO5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Sep 2020 15:14:57 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:37998 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729936AbgI3TO5 (ORCPT
+        id S1726540AbgI3Tdr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Sep 2020 15:33:47 -0400
+Received: from smtprelay0007.hostedemail.com ([216.40.44.7]:56070 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725799AbgI3Tdr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Sep 2020 15:14:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=jmZbySZXjmmi8+BukunACpKuNnADqVJZ1o4R+xzQg+E=; b=N40fcAv78b/blRHBFQYip0COej
-        g6RB480BZooR2bMyuinVdWeMW1oRMnxaTl1evqDkqSmk/6Z/EvqACVHNlU1VZvKZvZlAcxvIs85xu
-        CkFUi0Dx2tfwqW7I42N4Wb6I54wkefoRTe+377YPLq1gSZJLWGmi0poVqyzLYA7F/5KhA381m43J7
-        B8LldDmMJYKN74phHMAVYq+d7fCO7z2tZmzHpDicuFhche8NI8uNOgtLiRm1XMBB90aZti8/AfefW
-        J7XgCoup8FBfXfC0koE9TQjQdSr36HXa0tIw1UEPzUDPsg1c/FEpys6E7fjPGVOTaTc3OQXbXKUd/
-        dCEM/K0g==;
-Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
-        by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <gunthorp@deltatee.com>)
-        id 1kNhFE-0000uy-4y; Wed, 30 Sep 2020 12:54:29 -0600
-Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
-        (envelope-from <gunthorp@deltatee.com>)
-        id 1kNhFD-00030O-CH; Wed, 30 Sep 2020 12:54:27 -0600
-From:   Logan Gunthorpe <logang@deltatee.com>
-To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed, 30 Sep 2020 12:54:13 -0600
-Message-Id: <20200930185422.11494-3-logang@deltatee.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200930185422.11494-1-logang@deltatee.com>
-References: <20200930185422.11494-1-logang@deltatee.com>
+        Wed, 30 Sep 2020 15:33:47 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay04.hostedemail.com (Postfix) with ESMTP id 97B421801EC3E;
+        Wed, 30 Sep 2020 19:33:45 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: bag86_060c7b527195
+X-Filterd-Recvd-Size: 2698
+Received: from XPS-9350.home (unknown [47.151.133.149])
+        (Authenticated sender: joe@perches.com)
+        by omf17.hostedemail.com (Postfix) with ESMTPA;
+        Wed, 30 Sep 2020 19:33:41 +0000 (UTC)
+Message-ID: <db26d49401dc0bd6b9013a603a155f9827f404a4.camel@perches.com>
+Subject: Re: [PATCH 00/18] use semicolons rather than commas to separate
+ statements
+From:   Joe Perches <joe@perches.com>
+To:     Mark Brown <broonie@kernel.org>
+Cc:     linux-iio@vger.kernel.org, Julia Lawall <Julia.Lawall@inria.fr>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        linux-acpi@vger.kernel.org, David Lechner <david@lechnology.com>,
+        Valdis =?UTF-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+        kernel-janitors@vger.kernel.org, drbd-dev@lists.linbit.com,
+        openipmi-developer@lists.sourceforge.net,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        linux-ide@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-wireless@vger.kernel.org,
+        Neil Armstrong <narmstrong@baylibre.com>
+Date:   Wed, 30 Sep 2020 12:33:39 -0700
+In-Reply-To: <20200929113745.GB4799@sirena.org.uk>
+References: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
+         <160132172369.55460.9237357219623604216.b4-ty@kernel.org>
+         <b1174f9be2ce65f6b5ebefcba0b48e792926abbc.camel@perches.com>
+         <20200929113745.GB4799@sirena.org.uk>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, osandov@osandov.com, sagi@grimberg.me, Chaitanya.Kulkarni@wdc.com, sbates@raithlin.com, logang@deltatee.com
-X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH blktests v2 02/11] common/xfs: Create common helper to check for XFS support
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Two nvme tests create and mount XFS filesystems and check for mkfs.xfs.
+On Tue, 2020-09-29 at 12:37 +0100, Mark Brown wrote:
+> On Mon, Sep 28, 2020 at 05:45:24PM -0700, Joe Perches wrote:
+> > On Mon, 2020-09-28 at 20:35 +0100, Mark Brown wrote:
+> > > [1/1] regmap: debugfs: use semicolons rather than commas to separate statements
+> > >       commit: 7f4a122d0b50b40c64d24a5cf7aafe26dd9487ee
+> > Rather than replying to the 0/n cover letter to a patch
+> > series, can you reply to each of the specific patches in
+> > the patch series you are applying?
+> > Otherwise, it's a bit difficult to figure out which patches
+> > you are applying.
+> 
+> Feel free to submit patches to b4.
 
-They should also check for XFS support in the kernel so create a common
-helper for this.
+Have you tried the existing option to send
+thank you's on a specific ranges of patches?
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
----
- common/rc      |  8 ++++++++
- common/xfs     | 11 +++++++++++
- tests/nvme/012 |  6 ++++--
- tests/nvme/013 |  4 +++-
- 4 files changed, 26 insertions(+), 3 deletions(-)
- create mode 100644 common/xfs
+b4 ty
+~~~~~
+usage:
+  b4 ty [-h] [-g GITDIR] [-o OUTDIR] [-l] [-s SEND [SEND ...]] [-d DISCARD [DISCARD ...]] [-a] [-b BRANCH] [--since SINCE]
 
-diff --git a/common/rc b/common/rc
-index cdc0150ea5ea..44cb218c2fac 100644
---- a/common/rc
-+++ b/common/rc
-@@ -181,6 +181,14 @@ _have_tracepoint() {
- 	return 0
- }
- 
-+_have_fs() {
-+	modprobe "$1" >/dev/null 2>&1
-+	if [[ ! -d "/sys/fs/$1" ]]; then
-+		SKIP_REASON="kernel does not support filesystem $1"
-+		return 1
-+	fi
-+}
-+
- _test_dev_is_rotational() {
- 	[[ $(cat "${TEST_DEV_SYSFS}/queue/rotational") -ne 0 ]]
- }
-diff --git a/common/xfs b/common/xfs
-new file mode 100644
-index 000000000000..d1a603b8c7b5
---- /dev/null
-+++ b/common/xfs
-@@ -0,0 +1,11 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2017 Omar Sandoval
-+#
-+# fio helper functions.
-+
-+. common/shellcheck
-+
-+_have_xfs() {
-+	_have_fs xfs && _have_program mkfs.xfs
-+}
-diff --git a/tests/nvme/012 b/tests/nvme/012
-index 1dbd59804ed7..1d8d8e3cc271 100755
---- a/tests/nvme/012
-+++ b/tests/nvme/012
-@@ -5,14 +5,16 @@
- # Test mkfs with data verification for block device backed ns.
- 
- . tests/nvme/rc
-+. common/xfs
- 
- DESCRIPTION="run mkfs and data verification fio job on NVMeOF block device-backed ns"
- TIMED=1
- 
- requires() {
- 	_nvme_requires
--	_have_program mkfs.xfs && _have_program fio && \
--		_have_modules loop
-+	_have_xfs
-+	_have_program fio
-+	_have_modules loop
- 	_require_nvme_trtype_is_fabrics
- }
- 
-diff --git a/tests/nvme/013 b/tests/nvme/013
-index df7f23e69252..3819a2730d9b 100755
---- a/tests/nvme/013
-+++ b/tests/nvme/013
-@@ -5,13 +5,15 @@
- # Test mkfs with data verification for file backed ns.
- 
- . tests/nvme/rc
-+. common/xfs
- 
- DESCRIPTION="run mkfs and data verification fio job on NVMeOF file-backed ns"
- TIMED=1
- 
- requires() {
- 	_nvme_requires
--	_have_program mkfs.xfs && _have_fio
-+	_have_xfs
-+	_have_fio
- 	_require_nvme_trtype_is_fabrics
- }
- 
--- 
-2.20.1
+[]
+ -s SEND, --send SEND  Generate thankyous for specific entries from -l (e.g.: 1,3-5,7-; or "all")
+
+
 
