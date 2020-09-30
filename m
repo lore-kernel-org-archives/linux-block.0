@@ -2,167 +2,86 @@ Return-Path: <SRS0=Yhvv=DH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8985C4727E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 11:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FFBC4727E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 13:30:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81898206FC
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 11:06:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BBC82075F
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 13:30:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="ehfWBFfO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729268AbgI3LGg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Sep 2020 07:06:36 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53894 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729205AbgI3LGf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Sep 2020 07:06:35 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 9E74CB25E;
-        Wed, 30 Sep 2020 11:06:33 +0000 (UTC)
-Subject: Re: [BUG] discard_granularity is 0 on rk3399-gru-kevin
-To:     Adrian Hunter <adrian.hunter@intel.com>
-Cc:     Vicente Bergas <vicencb@gmail.com>, cjb@laptop.org,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-rockchip@lists.infradead.org
-References: <2438c500-eb41-4ae2-b890-83d287ad3bcd@gmail.com>
- <32986577-b2c2-98ac-1a30-28790414b25d@suse.de>
- <ba57d7a8-bafc-e06e-8ed2-87db4ff96904@suse.de>
- <a2b74575-3899-8450-8d11-10d6524cfc41@intel.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <5cff0e29-f3e5-ebed-0e6a-393fd4485e9e@suse.de>
-Date:   Wed, 30 Sep 2020 19:06:27 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+        id S1730258AbgI3NaQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Sep 2020 09:30:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52136 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730198AbgI3NaQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Sep 2020 09:30:16 -0400
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DADFDC0613D0
+        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2020 06:30:15 -0700 (PDT)
+Received: by mail-ej1-x642.google.com with SMTP id q13so2814794ejo.9
+        for <linux-block@vger.kernel.org>; Wed, 30 Sep 2020 06:30:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=I1LDkQQNXAVKEqr0+tqeGQXJ1mdD4On0ZbGgfQW9Bm0=;
+        b=ehfWBFfOpeiXSM8K3ALecLLOYUcExD0bVjWpUSLJD+wC2rIkpXAlPehwx2dUEcr+E9
+         jTjAtSSvApyOBbOpQ4PpEJp+KXQa/Uisja0tY8sp0ke4jUI1GEZvhgejqo/I0kHqtbpQ
+         Zb3/DxG2Hmwuod4+XjdmzCrX+RUKW1gPmSEujGpcsjz6sTBwXPk9O+vRtjxqtbfGzer4
+         8TLucGiGTJOoUyDllYv8wJU1EJFrxGAku7SNSdTs01ett8+66yMgsdCtQkG6nI28O1MY
+         0APTctfFS7UMfUVLwFTZxbKRsAqWqetzK+DDxEvZ/gvmaEbqclc5JwjTIaLPoRDKt3vV
+         CPTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=I1LDkQQNXAVKEqr0+tqeGQXJ1mdD4On0ZbGgfQW9Bm0=;
+        b=A+CluB9UDVwXvNkbKAr3uuDYcCmbTwfFzB6PgoCLQr/Z6+4W3AYGEsjAtp8gHYKJby
+         vW3XvDOJOp5ePpOBjFY6n+3ae18IfhEaXVensKDXOqqHX6EKZuifbZvylWFfCYMYYvxW
+         /l6yOeRuumQnsj7r5AhBuk7SbHmO9HUF6tmWF4yn6LiKfxCWgRXOHiDkjaQNzcYBtdpN
+         agIi1BPT9ENVs4b2inEfPnbHyaw6u72jbxhHM+ZyyjHbn3TUU3UQ1oOd5BXJpE7PqZ4P
+         PaWAJIrSx3is1iO1z3wOkmWvcQYlKZlPIPZ96I3MlQvOp96RW29mD9WbB7eaj04CQGzF
+         Zwrw==
+X-Gm-Message-State: AOAM531iUk++M1QXiQiLO1M+FTxQ6GH3Tz9uiy8Hz5oKrVwuXgv3OkIG
+        sZXI5iTjYogpOBL7z0y6FyIS7OvQDmWoi5gdD/nOPA==
+X-Google-Smtp-Source: ABdhPJxexbd6G3TxMmQMKWcWvmbIx5AeUioE+moumV4nV8b1xn7KvTl+m9m58v9dQcMxkHLF1Cd3vFsJOAHoqsFR/lA=
+X-Received: by 2002:a17:906:b24c:: with SMTP id ce12mr2896421ejb.353.1601472614378;
+ Wed, 30 Sep 2020 06:30:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a2b74575-3899-8450-8d11-10d6524cfc41@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200918072356.10331-1-gi-oh.kim@clous.ionos.com> <CAMGffEn79RE=JbTPR0AzW+3EZO0MwemwTLwkc-LTnK8f06dKWA@mail.gmail.com>
+In-Reply-To: <CAMGffEn79RE=JbTPR0AzW+3EZO0MwemwTLwkc-LTnK8f06dKWA@mail.gmail.com>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Wed, 30 Sep 2020 15:30:03 +0200
+Message-ID: <CAMGffEkzEv7hEyVAw-tGLJ53cRv-tq+JrVD0oDWvqXtmYsrJLA@mail.gmail.com>
+Subject: Re: [PATCH] block/rnbd: send_msg_close if any error occurs after send_msg_open
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/9/30 18:48, Adrian Hunter wrote:
-> On 28/09/20 8:02 am, Coly Li wrote:
->> On 2020/9/28 11:15, Coly Li wrote:
->>> On 2020/9/28 04:29, Vicente Bergas wrote:
->>>> Hi,
->>>> since recently the rk3399-gru-kevin is reporting the trace below.
->>>> The issue has been uncovered by
->>>>  b35fd7422c2f8e04496f5a770bd4e1a205414b3f
->>>>  block: check queue's limits.discard_granularity in
->>>> __blkdev_issue_discard()
->>>
->>> Hi Vicente,
->>>
->>> Thanks for the information. It seems the device with f2fs declares to
->>> support DISCARD but don't initialize discard_granularity for its queue.
->>>
->>> Can I know which block driver is under f2fs ?
->>
->> Maybe it is the mmc driver. A zero value discard_granularity is from the
->> following commit:
->>
->> commit e056a1b5b67b4e4bfad00bf143ab14f634777705
->> Author: Adrian Hunter <adrian.hunter@intel.com>
->> Date:   Tue Jun 28 17:16:02 2011 +0300
->>
->>     mmc: queue: let host controllers specify maximum discard timeout
->>
->>     Some host controllers will not operate without a hardware
->>     timeout that is limited in value.  However large discards
->>     require large timeouts, so there needs to be a way to
->>     specify the maximum discard size.
->>
->>     A host controller driver may now specify the maximum discard
->>     timeout possible so that max_discard_sectors can be calculated.
->>
->>     However, for eMMC when the High Capacity Erase Group Size
->>     is not in use, the timeout calculation depends on clock
->>     rate which may change.  For that case Preferred Erase Size
->>     is used instead.
->>
->>     Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
->>     Signed-off-by: Chris Ball <cjb@laptop.org>
->>
->>
->> Hi Adrian and Chris,
->>
->> I am not familiar with mmc driver, therefore I won't provide a quick fix
->> like this (which might probably wrong),
->> --- a/drivers/mmc/core/queue.c
->> +++ b/drivers/mmc/core/queue.c
->> @@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct
->> request_queue *q,
->>         q->limits.discard_granularity = card->pref_erase << 9;
->>         /* granularity must not be greater than max. discard */
->>         if (card->pref_erase > max_discard)
->> -               q->limits.discard_granularity = 0;
->> +               q->limits.discard_granularity = SECTOR_SIZE;
->>         if (mmc_can_secure_erase_trim(card))
->>                 blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
->>  }
->>
->>
->> It is improper for a device driver to declare to support DISCARD but set
->> queue's discard_granularity as 0.
->>
->> Could you please to take a look for mmc_queue_setup_discard() ?
-> 
-> This should be OK.
-
-OK Then I will post a fix and CC you. Thank for the review.
-
-Coly Li
+On Fri, Sep 18, 2020 at 10:18 AM Jinpu Wang <jinpu.wang@cloud.ionos.com> wrote:
+>
+> On Fri, Sep 18, 2020 at 9:24 AM Gioh Kim <gi-oh.kim@cloud.ionos.com> wrote:
+> >
+> > From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+> >
+> > After send_msg_open is done, send_msg_close should be done
+> > if any error occurs and it is necessary to recover
+> > what has been done.
+> >
+> > Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+> Looks good to me!
+> Thanks!
+> Acked-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+ping Jens, could you queue this up?
