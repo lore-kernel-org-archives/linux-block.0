@@ -2,131 +2,161 @@ Return-Path: <SRS0=Yhvv=DH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AE7C4727E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 17:24:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C696BC4727C
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 19:14:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4ABF420754
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 17:24:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5ED9B20708
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 19:14:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="HTnJIJfm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731440AbgI3RX5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Sep 2020 13:23:57 -0400
-Received: from mga02.intel.com ([134.134.136.20]:38534 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725837AbgI3RX4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Sep 2020 13:23:56 -0400
-IronPort-SDR: PAuC9TzZNqSxdIWFpc4DYuc8i63cdVGdB1gZ/FsnMVCYAqFhd0YTRlDaQsqrxAY36mCLOf4wAs
- ZAJQ2N60/nPg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9760"; a="150157847"
-X-IronPort-AV: E=Sophos;i="5.77,322,1596524400"; 
-   d="scan'208";a="150157847"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2020 10:23:56 -0700
-IronPort-SDR: i/Wr/vMjVXkZ5qogz7WZNWTib8KiEGRz3nH8oSSMXjiat3fjS8SP+4r76rLDlC36IzFZqUs5N6
- 0O98strF7WMw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,322,1596524400"; 
-   d="scan'208";a="457741574"
-Received: from ahunter-desktop.fi.intel.com (HELO [10.237.72.190]) ([10.237.72.190])
-  by orsmga004.jf.intel.com with ESMTP; 30 Sep 2020 10:23:52 -0700
-Subject: Re: [PATCH] mmc: core: don't set limits.discard_granularity as 0
-To:     Coly Li <colyli@suse.de>, linux-mmc@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Vicente Bergas <vicencb@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-References: <20200930160854.65710-1-colyli@suse.de>
-From:   Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-Message-ID: <5178b9e0-6b95-45ef-80f1-862de554e625@intel.com>
-Date:   Wed, 30 Sep 2020 20:23:19 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1729551AbgI3TOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Sep 2020 15:14:46 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:37968 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725814AbgI3TOq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Sep 2020 15:14:46 -0400
+X-Greylist: delayed 1216 seconds by postgrey-1.27 at vger.kernel.org; Wed, 30 Sep 2020 15:14:45 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=3RAJBVksSo0cuTjFg31u+aw+fKrhWOPH0N0BwI0sRyU=; b=HTnJIJfmag/RrlMjX22EujwH30
+        sz/um49gdqYcaH5QdPnqKKA5mpfXf8JXZp3cNgz5LAjE27eRse3bMkiyD9c2w8IJCUBQNJ6B599OU
+        JyQIsoOPOGAe9WHuFuSmNcXon+K1Ji3EMdrIdPGeFOo2yotBQVbc/mneAd5aIcfHbiyX8o6Uid8sR
+        S6xSAKxtpAnrKR2H+3dXgqUV8NLN+F5r3vzisV/Dh86hNdCmt6QSIVJlFNsDXnN8TCfFa+CqaT+nB
+        3s1aIhMOcZDQBohU/w5fbIDPoeqKARD2ZWrXbccAUAusWz5Hwh37yMt3FHgbgyI2bHOKIpMb5wzWf
+        4VgD2vkw==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1kNhFE-0000uw-4y; Wed, 30 Sep 2020 12:54:30 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1kNhFD-00030J-2R; Wed, 30 Sep 2020 12:54:27 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Wed, 30 Sep 2020 12:54:11 -0600
+Message-Id: <20200930185422.11494-1-logang@deltatee.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200930160854.65710-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, osandov@osandov.com, sagi@grimberg.me, Chaitanya.Kulkarni@wdc.com, sbates@raithlin.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH blktests v2 00/11] NVMe Target Passthru Block Tests
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/09/20 7:08 pm, Coly Li wrote:
-> In mmc_queue_setup_discard() the mmc driver queue's discard_granularity
-> might be set as 0 (when card->pref_erase > max_discard) while the mmc
-> device still declares to support discard operation. This is buggy and
-> triggered the following kernel warning message,
-> 
-> WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
-> CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
-> Hardware name: Google Kevin (DT)
-> pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=--)
-> pc : __blkdev_issue_discard+0x200/0x294
-> lr : __blkdev_issue_discard+0x54/0x294
-> sp : ffff800011dd3b10
-> x29: ffff800011dd3b10 x28: 0000000000000000 x27: ffff800011dd3cc4 x26: ffff800011dd3e18 x25: 000000000004e69b x24: 0000000000000c40 x23: ffff0000f1deaaf0 x22: ffff0000f2849200 x21: 00000000002734d8 x20: 0000000000000008 x19: 0000000000000000 x18: 0000000000000000 x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000 x14: 0000000000000394 x13: 0000000000000000 x12: 0000000000000000 x11: 0000000000000000 x10: 00000000000008b0 x9 : ffff800011dd3cb0 x8 : 000000000004e69b x7 : 0000000000000000 x6 : ffff0000f1926400 x5 : ffff0000f1940800 x4 : 0000000000000000 x3 : 0000000000000c40 x2 : 0000000000000008 x1 : 00000000002734d8 x0 : 0000000000000000 Call trace:
-> __blkdev_issue_discard+0x200/0x294
-> __submit_discard_cmd+0x128/0x374
-> __issue_discard_cmd_orderly+0x188/0x244
-> __issue_discard_cmd+0x2e8/0x33c
-> issue_discard_thread+0xe8/0x2f0
-> kthread+0x11c/0x120
-> ret_from_fork+0x10/0x1c
-> ---[ end trace e4c8023d33dfe77a ]---
-> 
-> This patch fixes the issue by setting discard_granularity as SECTOR_SIZE
-> instead of 0 when (card->pref_erase > max_discard) is true. Now no more
-> complain from __blkdev_issue_discard() for the improper value of discard
-> granularity.
-> 
-> Fixes: commit e056a1b5b67b ("mmc: queue: let host controllers specify maximum discard timeout")
+Hi,
 
-That "Fixes" tag is a bit misleading.  For some time, the block layer had
-no problem with discard_granularity of zero, and blk_bio_discard_split()
-still doesn't (see below).
+This series adds blktests for the nvmet passthru feature that was merged
+for 5.9. It's been reconciled with Sagi's blktest series that Omar
+recently merged.
 
-static struct bio *blk_bio_discard_split(struct request_queue *q,
-					 struct bio *bio,
-					 struct bio_set *bs,
-					 unsigned *nsegs)
-{
-	unsigned int max_discard_sectors, granularity;
-	int alignment;
-	sector_t tmp;
-	unsigned split_sectors;
+This series is based off of the current blktests master and a git repo is
+available for this here:
 
-	*nsegs = 1;
+https://github.com/Eideticom/blktests nvmet_passthru_v2
 
-	/* Zero-sector (unknown) and one-sector granularities are the same.  */
-	granularity = max(q->limits.discard_granularity >> 9, 1U);
+Thanks,
+
+Logan
+
+--
+
+Changes in v2:
+
+- Rebased on latest blktests master and changed to use the common
+  helpers Sagi introduced in his series
+- Collected Chaitanya's reviewed-by tag
+
+--
+
+Logan Gunthorpe (11):
+  common/fio: Remove state file in common helper
+  common/xfs: Create common helper to check for XFS support
+  common/xfs: Create common helper to verify block device with xfs
+  nvme: Search for specific subsysnqn in _find_nvme_loop_dev
+  nvme: Add common helpers for passthru tests
+  nvme/033: Simple test to create and connect to a passthru target
+  nvme/034: Add test for passthru data verification
+  nvme/035: Add test to verify passthru controller with a filesystem
+  nvme/036: Add test for testing reset command on nvme-passthru
+  nvme/037: Add test which loops passthru connect and disconnect
+  nvme/038: Test removal of un-enabled subsystem and ports
+
+ common/fio         |  1 +
+ common/rc          |  8 +++++
+ common/xfs         | 33 ++++++++++++++++++
+ tests/nvme/004     |  2 +-
+ tests/nvme/005     |  2 +-
+ tests/nvme/008     |  2 +-
+ tests/nvme/009     |  2 +-
+ tests/nvme/010     |  3 +-
+ tests/nvme/011     |  3 +-
+ tests/nvme/012     | 23 ++++---------
+ tests/nvme/013     | 21 +++---------
+ tests/nvme/014     |  2 +-
+ tests/nvme/015     |  2 +-
+ tests/nvme/018     |  2 +-
+ tests/nvme/019     |  2 +-
+ tests/nvme/020     |  2 +-
+ tests/nvme/021     |  2 +-
+ tests/nvme/022     |  2 +-
+ tests/nvme/023     |  2 +-
+ tests/nvme/024     |  2 +-
+ tests/nvme/025     |  2 +-
+ tests/nvme/026     |  2 +-
+ tests/nvme/027     |  2 +-
+ tests/nvme/028     |  2 +-
+ tests/nvme/029     |  2 +-
+ tests/nvme/033     | 67 +++++++++++++++++++++++++++++++++++++
+ tests/nvme/033.out |  7 ++++
+ tests/nvme/034     | 35 +++++++++++++++++++
+ tests/nvme/034.out |  3 ++
+ tests/nvme/035     | 37 +++++++++++++++++++++
+ tests/nvme/035.out |  3 ++
+ tests/nvme/036     | 37 +++++++++++++++++++++
+ tests/nvme/036.out |  3 ++
+ tests/nvme/037     | 35 +++++++++++++++++++
+ tests/nvme/037.out |  2 ++
+ tests/nvme/038     | 36 ++++++++++++++++++++
+ tests/nvme/038.out |  2 ++
+ tests/nvme/rc      | 83 ++++++++++++++++++++++++++++++++++++++++++++--
+ 38 files changed, 420 insertions(+), 58 deletions(-)
+ create mode 100644 common/xfs
+ create mode 100755 tests/nvme/033
+ create mode 100644 tests/nvme/033.out
+ create mode 100755 tests/nvme/034
+ create mode 100644 tests/nvme/034.out
+ create mode 100755 tests/nvme/035
+ create mode 100644 tests/nvme/035.out
+ create mode 100755 tests/nvme/036
+ create mode 100644 tests/nvme/036.out
+ create mode 100755 tests/nvme/037
+ create mode 100644 tests/nvme/037.out
+ create mode 100755 tests/nvme/038
+ create mode 100644 tests/nvme/038.out
 
 
-> Reported-by: Vicente Bergas <vicencb@gmail.com>
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: Adrian Hunter <adrian.hunter@intel.com>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> ---
->  drivers/mmc/core/queue.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-> index 6c022ef0f84d..350d0cc4ee62 100644
-> --- a/drivers/mmc/core/queue.c
-> +++ b/drivers/mmc/core/queue.c
-> @@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct request_queue *q,
->  	q->limits.discard_granularity = card->pref_erase << 9;
->  	/* granularity must not be greater than max. discard */
->  	if (card->pref_erase > max_discard)
-> -		q->limits.discard_granularity = 0;
-> +		q->limits.discard_granularity = SECTOR_SIZE;
->  	if (mmc_can_secure_erase_trim(card))
->  		blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
->  }
-> 
-
+base-commit: 20445c5eb6456addca9131ec6917d2a2d7414e04
+--
+2.20.1
