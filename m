@@ -7,109 +7,126 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4FDC4727C
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 20:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A350C4363D
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 21:49:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1477F20709
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 20:00:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C34DE20888
+	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 21:49:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="Sy0HR9ah"
+	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="IeFPMJPA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729848AbgI3UAJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Sep 2020 16:00:09 -0400
-Received: from mail-co1nam11on2062.outbound.protection.outlook.com ([40.107.220.62]:15585
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        id S1730457AbgI3Vtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Sep 2020 17:49:39 -0400
+Received: from mail-dm6nam10on2046.outbound.protection.outlook.com ([40.107.93.46]:34560
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725799AbgI3UAJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Sep 2020 16:00:09 -0400
+        id S1730442AbgI3Vtj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Sep 2020 17:49:39 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kt9WEdTH+mKHKx99cQ9/jOcU8JjSyb4wJ5VdPr1hSq1IaGFUyB2+G8gW1gWsABWnP4AKjh4+3RIP8BfBWt01CvPopa+5G+W5qMjL6BYSBHOtAB9Wc+nN18gm9+kyhoeOCrlBzM6vt89CoAzgiSq4F6ynJyYBGJAwQAgPc618ypeq2BwAvaZLDtlXQzum7XaOrAPDbh7Y/nIuaozgpKFHLUVkrXubGhLSpVq60vpNmCyJhXJ7t76S7EfEOvOIw65tg8u1IcY1rA1YrQLIUcJuh4N52ntRFIjf3ooZHPZtD5e3jpSrsETzceCaAm6N4rd6r+bqajYpF9QxBOxQy5pVgA==
+ b=iveozn/kZUPQm5Y2zBt1v/nsIQegan/+nqVn9cObLifINE3f2QU2uES2BtELdpriUyG5i2OvXqzu+F+QzpDIBTKZwC+kNLaSbbvFOoRp2aIMw5Rhje8x4mQxFkK71/6M2/v1IQKkQOYECVYb/PREqthJrDmyOH96cnP14reKVRBzV2tq/UbVD2ehep/1HJDOfk5jwtiCF6z7Rvl6hD1AmCqP7EkmyXWoU9W1MaQTiLmL0WKQcNV3tSK0Sg/GGzC5ElN6Mmm+Qqbq+pWAQeeUKQYviNsPLtHKd3C1KLae2t/uxYUYvvbFzbwWLX8Z0WSp/RjdebC9N9MHG1pnvehIYg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XS0EqSIbRvhHf02ES3DP1MYUjHDpTDJIztV5UUySz7A=;
- b=ocwqKyg4rz8QoUk0JF9MIRduZFKwg4NbNsllXLTx2JA7CWM7utZIaZr53Cc2rE/0Lv+CqaaTCabZkc6hNLdwJB6Vpnf2Xn5PnH3KnjCYDuPyRdPWCSmZKKI7uE22IeURb7ix6gNikjB8OTImq/45v26J8vw78yATI387XegfULJg8kZoQ5PEB9vJ0ZHtNHwKJ+WqaPUfcy8VA2wvxxCp2IDFrUGlZhPZFkoWje1PuaJ1Bsj9k54xtj3zLCMEVatdw6b6sv1QvpyWaRQO/Dbs7F19JH392zlylD9zuwplVaTF2t8gMDAjJODYNJoZvHeRUY4neEMQCKf+rqsAlI+YVA==
+ bh=XIW3Sk3LIBtMcrluAFKosVttI6l0Zi+KRFJq5MAIyaY=;
+ b=J3rQQ7PbLKtIPA6lJWzpPW2LRa4XK2YpXy7khuIk62ozECwx4hagKBd19I+Skm79q6oW+KSgEcO0fUS9RqAfArZefpYp00cOuSfBHnCHFJJ8l4ISmWTj6NUPdy599E7v7vz5UAICIQd/W1rYVVlOFmffNPeC6buNk6lZtt0hhZq8WpmTen61zvVag5mEbJtxwDofDw3CmvZQUiSJafshWr2+0hzFnKKGwncFhrQg1cms/BUTd2ZsvAtnJFpWg3MwE6YBh96ZdJuJoTl+eU7OgiT1mJRxLRBRK3Yn7OOHmLF4zJthywoV4c6iIJbQaTUXeFHtxwoeL120okLmp9i5gA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=micron.com; dmarc=pass action=none header.from=micron.com;
  dkim=pass header.d=micron.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XS0EqSIbRvhHf02ES3DP1MYUjHDpTDJIztV5UUySz7A=;
- b=Sy0HR9ahGIlpZ3EMgD3oOzTp7Hx+KpketaJUMNd/VbxEXpu/c9/4X3LXJPnz+AmAmJj8My+8YfmjG76ObvCiIjJHk7KZZoz9JsAstvTaGoip0QVSdVnmEfjIa4B4YPwJH7A6eR9dKyD6qH0TrCrDjdcvKly4TlcfOzegHQIilC8=
+ bh=XIW3Sk3LIBtMcrluAFKosVttI6l0Zi+KRFJq5MAIyaY=;
+ b=IeFPMJPAmjgDFIOlReoUzWq49P7r+J5SSDQu2U7DfKCEBSJhPGFOfpXqDEtNErIV60fgqLovxWuki31FNJguYzJte0nAe3T9g1o+UPQdT0qnqM9lCMC5LWf7VGiupS5SpOUkPcFVCURc7EF2QEaxQn+OHfP8I6buIKd23B/zzI0=
 Received: from SN6PR08MB4208.namprd08.prod.outlook.com (2603:10b6:805:3b::21)
- by SN6PR08MB4623.namprd08.prod.outlook.com (2603:10b6:805:9c::22) with
+ by SN2PR0801MB2144.namprd08.prod.outlook.com (2603:10b6:804:10::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.21; Wed, 30 Sep
- 2020 20:00:06 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.34; Wed, 30 Sep
+ 2020 21:49:36 +0000
 Received: from SN6PR08MB4208.namprd08.prod.outlook.com
  ([fe80::f459:dd7f:5b2:effa]) by SN6PR08MB4208.namprd08.prod.outlook.com
  ([fe80::f459:dd7f:5b2:effa%7]) with mapi id 15.20.3433.035; Wed, 30 Sep 2020
- 20:00:06 +0000
+ 21:49:36 +0000
 From:   "Nabeel Meeramohideen Mohamed (nmeeramohide)" 
         <nmeeramohide@micron.com>
-To:     Randy Dunlap <rdunlap@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+To:     Hillf Danton <hdanton@sina.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>
-CC:     "Steve Moyer (smoyer)" <smoyer@micron.com>,
+        "Steve Moyer (smoyer)" <smoyer@micron.com>,
         "Greg Becker (gbecker)" <gbecker@micron.com>,
         "Pierre Labat (plabat)" <plabat@micron.com>,
         "John Groves (jgroves)" <jgroves@micron.com>
-Subject: RE: [EXT] Re: [PATCH 17/22] mpool: add mpool lifecycle management
- ioctls
-Thread-Topic: [EXT] Re: [PATCH 17/22] mpool: add mpool lifecycle management
- ioctls
-Thread-Index: AQHWlbcLPnsRCBRfHEK8v2KQZl9QlqmAUZwAgAFG53A=
-Date:   Wed, 30 Sep 2020 20:00:06 +0000
-Message-ID: <SN6PR08MB420825E40A88DBDFE66C5E13B3330@SN6PR08MB4208.namprd08.prod.outlook.com>
+Subject: RE: [EXT] Re: [PATCH 01/22] mpool: add utility routines and ioctl
+ definitions
+Thread-Topic: [EXT] Re: [PATCH 01/22] mpool: add utility routines and ioctl
+ definitions
+Thread-Index: AQHWlbb9ZgKauLTm+0edDEOGPyMi1KmBDd2AgACq1EA=
+Date:   Wed, 30 Sep 2020 21:49:36 +0000
+Message-ID: <SN6PR08MB4208CA2400FC06C4939D54F9B3330@SN6PR08MB4208.namprd08.prod.outlook.com>
 References: <20200928164534.48203-1-nmeeramohide@micron.com>
- <20200928164534.48203-18-nmeeramohide@micron.com>
- <43f24e68-2625-36ce-1727-fcf981955b17@infradead.org>
-In-Reply-To: <43f24e68-2625-36ce-1727-fcf981955b17@infradead.org>
+ <20200930112715.18532-1-hdanton@sina.com>
+In-Reply-To: <20200930112715.18532-1-hdanton@sina.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=micron.com;
+authentication-results: sina.com; dkim=none (message not signed)
+ header.d=none;sina.com; dmarc=none action=none header.from=micron.com;
 x-originating-ip: [104.129.198.89]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: dd8972c7-5afe-4341-8fd4-08d8657b6d54
-x-ms-traffictypediagnostic: SN6PR08MB4623:
+x-ms-office365-filtering-correlation-id: 60e8e3dd-867c-4a3d-9f5c-08d8658ab98a
+x-ms-traffictypediagnostic: SN2PR0801MB2144:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN6PR08MB4623FB781AC4642D5249E1B0B3330@SN6PR08MB4623.namprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3513;
+x-microsoft-antispam-prvs: <SN2PR0801MB21444A3F16ABA93C6D2BAC60B3330@SN2PR0801MB2144.namprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1227;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 4zrnwoW9XzFV1vnyzqopa3Tja1Ofr+HikE47t5qySZlBjDynzHZc+WvovD/7eTf/7qwZmkKQlEfjQODHeerByxQKia0gmAPTaXLrfWU7gXpOiKfMNJh+Rv9fX9JBEefoZ+rR1VFUhobJTIA/3AMFdvPStHau1D0Rhir9JCx6E3Aggi1wZjZw3sGvfx8UEIJGdCgMyps2nbyhE0LyRUd+E8aRQKvyJ2P3VkpFXrr58jnL5WAxrVBWUr8oYFXOj8VTpsq4WxTRCMN0p7fZfs3P1LCKBvUYUUQXmAHjXCzMXJl7xoAwRqVkAyft63j+dPnRax2an1lwwUYL9y1EVMgwwh7XgeLsDPX0NfJL4nxqwWj0MOe6hzbzEjf2TYkI5gV+
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR08MB4208.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(346002)(376002)(39860400002)(366004)(9686003)(52536014)(55236004)(76116006)(66476007)(64756008)(66556008)(66446008)(86362001)(316002)(53546011)(5660300002)(6506007)(186003)(54906003)(55016002)(2906002)(8676002)(8936002)(66946007)(7696005)(4326008)(4744005)(33656002)(478600001)(110136005)(26005)(71200400001)(107886003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: B5J51C/gFl99K26sQ+RFIZ9HUliHC/50xSIYkve2BeI7hjOF35y6KnzxcP6wRacR+22uKJgZUvE6h+YJA1ttmNZJKEJOtLK2z2RQYrWVMZ8YFOWmWntlvQsAMUtRNGxs1acJuwvxJIm8gjRJtNxaYnlj1V5k6z5cxGxRnOl7ARMsHn6HAJD0BHKK4hGmuAFhHPiTEt6pg6Uqh3ATXUVUxYKkIpGPSZEG2S9/MK1ifSYfXteSaom7EYZ8i30UZCEMmGQRDeH0M0GUn6rYYN+eVyVm9SZyItbaya71x7D2udnww8N91fXPY/R3MhBCYxQe8QIkTK5e7zVK7hiifqdw8t/1CeuG0JN9fux7oo8mzd+PYToJciZmvjffprZqj+GuIo38mtjMAnO7Z2KWrEXMNJAB1B4b4fQXcMxM30LPjm0u4c/A66lKwJlnnLnbCt30tjtcKEj5B6lFhztV4fdpLbEgB+ix+amlhO6T3Qp7lO/fMpT7x3X+JNfbX7vsjp2d2YW0rM69vTQSp04wSBWDfZ4CtURng4Hul6V8fWSekSH+TjHNCbVQi3Yuz+gh2T+CMZTknR++YrUUqbAckXUlquq2hwGkePlTp2eBlTRTHOuytJJyfS896Up7E6mx9hvDkD/gMG+ZOsWB7CyxwG2pIw==
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+x-microsoft-antispam-message-info: UMgOdkenBDGQl5tJHRoihhVc0jAAE6I2dplKx43fTaoidnxuFZaHWPqICeK2hRS7zsSBjLwitKEFUDQ+6AXSQh64Da0PffsdBBiu1AjlCB716EUyC+eEXFmpFn1Xm0IKk/K1X0HEr5UNzbYMAU5PF6h/7t5heQfIBsj7y4iexMcTrw1keocdlej+GvyVqDdgLY1qShSr12YrnJt4HAeh2j4YietyahZB5xg5wrmh81M33pvoYeLuRvilHSylS6Fiqvq/evTsTqP6BRO7PKMTyOFgT7oZR/7gKkhiH90kw13bXiWLD9YjSmFVfWxDJWP06jk1HuDA2qXK/EhwDnV/6g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR08MB4208.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(136003)(366004)(396003)(53546011)(55236004)(71200400001)(55016002)(5660300002)(8676002)(4326008)(6916009)(8936002)(83380400001)(478600001)(54906003)(107886003)(76116006)(33656002)(64756008)(66556008)(66476007)(66446008)(66946007)(316002)(86362001)(6506007)(52536014)(186003)(9686003)(4744005)(7696005)(2906002)(26005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: ECsh3bHOhnI0sr1ttZQ9Kh0EQypF+9UkGDFXaZO5yuWe3FKyP7oo82JNWdpznGyX7pK6KecCKZop2PkAmk7hl3nXmqz3+95hLUna7c8MiQGbVDf7GnyDbHGcszLFy9H5oYN7Exks+pRkETZemQ90HjQvJqbE2JNC2dUXZ1K+mWtvdZv37sh06EPg/TkrYC2hf3WDl1yluvE5DPi2C+1r/ZjCGX/uZvfxhajGlBi7dAAyLODzuV+1vP0Wh2zobMx08B5m9TQoAGatjT0Uz3wKedpCreLQptKOPLU6/FeKz9esQD8ex6pjz5U7h06vS9rf3tr7nrdJXV6UBwj8oU5Dofcp2rCGY8RNajkuXsTBHZvyWcRM3JpKBMHUtJicKyl2ron/pUrHEWIMMfdF/+qZC38kVxBcZS37IKNlYp7fqAEIqhaxf7s6gduaSQaSnkWcSqnqxIEbrwqCjJygdmqyZit83IQFlt6Cbj7j2J2lvBI21dVtgCH9pRehWLvQL4caFjZofD4QARQfWqYlzEHs4Djq48Y5DBLBfl0KmRdmwXVmcFR2XML/lmRl9Gv87fcC5RS3jiAS0Qk7M68MjXlaRtK4hCDEpYCtiJz8XGSMnbUrOEbIvAUEed2GaD4zH2/r57OmpKF7K9f0w1H3WTDEng==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: micron.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR08MB4208.namprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd8972c7-5afe-4341-8fd4-08d8657b6d54
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2020 20:00:06.0917
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60e8e3dd-867c-4a3d-9f5c-08d8658ab98a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2020 21:49:36.4437
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: f38a5ecd-2813-4862-b11b-ac1d563c806f
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QKKRe6Af0gaKqt4adsv/b14kpxVyq6mUF0mfiVrOV4an5Kxj8qoKYciCvYS2/BzFLRDR4CXzVL05qMd12loU5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR08MB4623
+X-MS-Exchange-CrossTenant-userprincipalname: W+yBvS15ITvykTlWcCKm6YjB9L4rbE5OvDZeS/N9hRUPJPd/7+OG5EYKzry/dGns9tEnrBpXvwfVUZgwGYApXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR0801MB2144
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGkgUmFuZHksDQoNCk9uIFR1ZXNkYXksIFNlcHRlbWJlciAyOSwgMjAyMCA2OjEzIFBNLCBSYW5k
-eSBEdW5sYXAgPHJkdW5sYXBAaW5mcmFkZWFkLm9yZz4gd3JvdGU6DQo+IE9uIDkvMjgvMjAgOTo0
-NSBBTSwgbm1lZXJhbW9oaWRlQG1pY3Jvbi5jb20gd3JvdGU6DQo+ID4gKwlpZiAoX0lPQ19UWVBF
-KGNtZCkgIT0gTVBJT0NfTUFHSUMpDQo+IEhpLA0KPiANCj4gTVBJT0NfTUFHSUMgaXMgZGVmaW5l
-ZCBpbiBwYXRjaCAwMS8yMi4NCj4gSXQgc2hvdWxkIGFsc28gYmUgYWRkZWQgdG8gRG9jdW1lbnRh
-dGlvbi91c2Vyc3BhY2UtYXBpL2lvY3RsL2lvY3RsLW51bWJlci5yc3QuDQo+IA0KDQpTdXJlLCB0
-aGFua3MhIEkndmUgbWFkZSBhIG5vdGUgb2YgdGhpcyBhbmQgd2lsbCBhZGRyZXNzIGl0IGluIHYy
-Lg0KDQpUaGFua3MsDQpOYWJlZWwNCg==
+Hi Hillf,
+
+On Wednesday, September 30, 2020 5:27 AM, Hillf Danton <hdanton@sina.com> w=
+rote:
+> On Mon, 28 Sep 2020 11:45:13 -0500 Nabeel M Mohamed wrote:
+> >
+> > +/* Rate limited version of mp_pr_err(). */
+> > +#define mp_pr_rl(_fmt, _err, ...)				\
+> > +do {								\
+> > +	static unsigned long mp_pr_rl_state;			\
+>=20
+> We do not need to declare a mp_pr_rl_state per use case of mp_pr_rl.
+
+Agreed, will make it a global state to rate limit all messages vs. by call =
+site.
+
+>=20
+> > +	uint dly =3D msecs_to_jiffies(333);			\
+>=20
+> printk_timed_ratelimit() needs msec as input instead of tick.
+
+Nice catch, thanks!
+
+Will address both your comments in v2.
+
+Thanks,
+Nabeel
