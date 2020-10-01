@@ -1,132 +1,178 @@
-Return-Path: <SRS0=Yhvv=DH=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=e+pS=DI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A350C4363D
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 21:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 340D9C4727C
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 04:36:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C34DE20888
-	for <linux-block@archiver.kernel.org>; Wed, 30 Sep 2020 21:49:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="IeFPMJPA"
+	by mail.kernel.org (Postfix) with ESMTP id E8CC821D46
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 04:36:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730457AbgI3Vtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Sep 2020 17:49:39 -0400
-Received: from mail-dm6nam10on2046.outbound.protection.outlook.com ([40.107.93.46]:34560
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730442AbgI3Vtj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Sep 2020 17:49:39 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iveozn/kZUPQm5Y2zBt1v/nsIQegan/+nqVn9cObLifINE3f2QU2uES2BtELdpriUyG5i2OvXqzu+F+QzpDIBTKZwC+kNLaSbbvFOoRp2aIMw5Rhje8x4mQxFkK71/6M2/v1IQKkQOYECVYb/PREqthJrDmyOH96cnP14reKVRBzV2tq/UbVD2ehep/1HJDOfk5jwtiCF6z7Rvl6hD1AmCqP7EkmyXWoU9W1MaQTiLmL0WKQcNV3tSK0Sg/GGzC5ElN6Mmm+Qqbq+pWAQeeUKQYviNsPLtHKd3C1KLae2t/uxYUYvvbFzbwWLX8Z0WSp/RjdebC9N9MHG1pnvehIYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XIW3Sk3LIBtMcrluAFKosVttI6l0Zi+KRFJq5MAIyaY=;
- b=J3rQQ7PbLKtIPA6lJWzpPW2LRa4XK2YpXy7khuIk62ozECwx4hagKBd19I+Skm79q6oW+KSgEcO0fUS9RqAfArZefpYp00cOuSfBHnCHFJJ8l4ISmWTj6NUPdy599E7v7vz5UAICIQd/W1rYVVlOFmffNPeC6buNk6lZtt0hhZq8WpmTen61zvVag5mEbJtxwDofDw3CmvZQUiSJafshWr2+0hzFnKKGwncFhrQg1cms/BUTd2ZsvAtnJFpWg3MwE6YBh96ZdJuJoTl+eU7OgiT1mJRxLRBRK3Yn7OOHmLF4zJthywoV4c6iIJbQaTUXeFHtxwoeL120okLmp9i5gA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=micron.com; dmarc=pass action=none header.from=micron.com;
- dkim=pass header.d=micron.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XIW3Sk3LIBtMcrluAFKosVttI6l0Zi+KRFJq5MAIyaY=;
- b=IeFPMJPAmjgDFIOlReoUzWq49P7r+J5SSDQu2U7DfKCEBSJhPGFOfpXqDEtNErIV60fgqLovxWuki31FNJguYzJte0nAe3T9g1o+UPQdT0qnqM9lCMC5LWf7VGiupS5SpOUkPcFVCURc7EF2QEaxQn+OHfP8I6buIKd23B/zzI0=
-Received: from SN6PR08MB4208.namprd08.prod.outlook.com (2603:10b6:805:3b::21)
- by SN2PR0801MB2144.namprd08.prod.outlook.com (2603:10b6:804:10::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.34; Wed, 30 Sep
- 2020 21:49:36 +0000
-Received: from SN6PR08MB4208.namprd08.prod.outlook.com
- ([fe80::f459:dd7f:5b2:effa]) by SN6PR08MB4208.namprd08.prod.outlook.com
- ([fe80::f459:dd7f:5b2:effa%7]) with mapi id 15.20.3433.035; Wed, 30 Sep 2020
- 21:49:36 +0000
-From:   "Nabeel Meeramohideen Mohamed (nmeeramohide)" 
-        <nmeeramohide@micron.com>
-To:     Hillf Danton <hdanton@sina.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Steve Moyer (smoyer)" <smoyer@micron.com>,
-        "Greg Becker (gbecker)" <gbecker@micron.com>,
-        "Pierre Labat (plabat)" <plabat@micron.com>,
-        "John Groves (jgroves)" <jgroves@micron.com>
-Subject: RE: [EXT] Re: [PATCH 01/22] mpool: add utility routines and ioctl
- definitions
-Thread-Topic: [EXT] Re: [PATCH 01/22] mpool: add utility routines and ioctl
- definitions
-Thread-Index: AQHWlbb9ZgKauLTm+0edDEOGPyMi1KmBDd2AgACq1EA=
-Date:   Wed, 30 Sep 2020 21:49:36 +0000
-Message-ID: <SN6PR08MB4208CA2400FC06C4939D54F9B3330@SN6PR08MB4208.namprd08.prod.outlook.com>
-References: <20200928164534.48203-1-nmeeramohide@micron.com>
- <20200930112715.18532-1-hdanton@sina.com>
-In-Reply-To: <20200930112715.18532-1-hdanton@sina.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: sina.com; dkim=none (message not signed)
- header.d=none;sina.com; dmarc=none action=none header.from=micron.com;
-x-originating-ip: [104.129.198.89]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 60e8e3dd-867c-4a3d-9f5c-08d8658ab98a
-x-ms-traffictypediagnostic: SN2PR0801MB2144:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN2PR0801MB21444A3F16ABA93C6D2BAC60B3330@SN2PR0801MB2144.namprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1227;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UMgOdkenBDGQl5tJHRoihhVc0jAAE6I2dplKx43fTaoidnxuFZaHWPqICeK2hRS7zsSBjLwitKEFUDQ+6AXSQh64Da0PffsdBBiu1AjlCB716EUyC+eEXFmpFn1Xm0IKk/K1X0HEr5UNzbYMAU5PF6h/7t5heQfIBsj7y4iexMcTrw1keocdlej+GvyVqDdgLY1qShSr12YrnJt4HAeh2j4YietyahZB5xg5wrmh81M33pvoYeLuRvilHSylS6Fiqvq/evTsTqP6BRO7PKMTyOFgT7oZR/7gKkhiH90kw13bXiWLD9YjSmFVfWxDJWP06jk1HuDA2qXK/EhwDnV/6g==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR08MB4208.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(136003)(366004)(396003)(53546011)(55236004)(71200400001)(55016002)(5660300002)(8676002)(4326008)(6916009)(8936002)(83380400001)(478600001)(54906003)(107886003)(76116006)(33656002)(64756008)(66556008)(66476007)(66446008)(66946007)(316002)(86362001)(6506007)(52536014)(186003)(9686003)(4744005)(7696005)(2906002)(26005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: ECsh3bHOhnI0sr1ttZQ9Kh0EQypF+9UkGDFXaZO5yuWe3FKyP7oo82JNWdpznGyX7pK6KecCKZop2PkAmk7hl3nXmqz3+95hLUna7c8MiQGbVDf7GnyDbHGcszLFy9H5oYN7Exks+pRkETZemQ90HjQvJqbE2JNC2dUXZ1K+mWtvdZv37sh06EPg/TkrYC2hf3WDl1yluvE5DPi2C+1r/ZjCGX/uZvfxhajGlBi7dAAyLODzuV+1vP0Wh2zobMx08B5m9TQoAGatjT0Uz3wKedpCreLQptKOPLU6/FeKz9esQD8ex6pjz5U7h06vS9rf3tr7nrdJXV6UBwj8oU5Dofcp2rCGY8RNajkuXsTBHZvyWcRM3JpKBMHUtJicKyl2ron/pUrHEWIMMfdF/+qZC38kVxBcZS37IKNlYp7fqAEIqhaxf7s6gduaSQaSnkWcSqnqxIEbrwqCjJygdmqyZit83IQFlt6Cbj7j2J2lvBI21dVtgCH9pRehWLvQL4caFjZofD4QARQfWqYlzEHs4Djq48Y5DBLBfl0KmRdmwXVmcFR2XML/lmRl9Gv87fcC5RS3jiAS0Qk7M68MjXlaRtK4hCDEpYCtiJz8XGSMnbUrOEbIvAUEed2GaD4zH2/r57OmpKF7K9f0w1H3WTDEng==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1725894AbgJAEgb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Oct 2020 00:36:31 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40170 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725876AbgJAEgb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Oct 2020 00:36:31 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 9F878AF40;
+        Thu,  1 Oct 2020 04:36:29 +0000 (UTC)
+To:     Adrian Hunter <adrian.hunter@intel.com>
+Cc:     linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Vicente Bergas <vicencb@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20200930160854.65710-1-colyli@suse.de>
+ <5178b9e0-6b95-45ef-80f1-862de554e625@intel.com>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Subject: Re: [PATCH] mmc: core: don't set limits.discard_granularity as 0
+Message-ID: <026e4bab-5d1d-50b9-29c4-e871fcd27b8b@suse.de>
+Date:   Thu, 1 Oct 2020 12:36:25 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-X-OriginatorOrg: micron.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR08MB4208.namprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60e8e3dd-867c-4a3d-9f5c-08d8658ab98a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2020 21:49:36.4437
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: f38a5ecd-2813-4862-b11b-ac1d563c806f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: W+yBvS15ITvykTlWcCKm6YjB9L4rbE5OvDZeS/N9hRUPJPd/7+OG5EYKzry/dGns9tEnrBpXvwfVUZgwGYApXQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR0801MB2144
+In-Reply-To: <5178b9e0-6b95-45ef-80f1-862de554e625@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Hillf,
+On 2020/10/1 01:23, Adrian Hunter wrote:
+> On 30/09/20 7:08 pm, Coly Li wrote:
+>> In mmc_queue_setup_discard() the mmc driver queue's discard_granularity
+>> might be set as 0 (when card->pref_erase > max_discard) while the mmc
+>> device still declares to support discard operation. This is buggy and
+>> triggered the following kernel warning message,
+>>
+>> WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
+>> CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
+>> Hardware name: Google Kevin (DT)
+>> pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=--)
+>> pc : __blkdev_issue_discard+0x200/0x294
+>> lr : __blkdev_issue_discard+0x54/0x294
+>> sp : ffff800011dd3b10
+>> x29: ffff800011dd3b10 x28: 0000000000000000 x27: ffff800011dd3cc4 x26: ffff800011dd3e18 x25: 000000000004e69b x24: 0000000000000c40 x23: ffff0000f1deaaf0 x22: ffff0000f2849200 x21: 00000000002734d8 x20: 0000000000000008 x19: 0000000000000000 x18: 0000000000000000 x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000 x14: 0000000000000394 x13: 0000000000000000 x12: 0000000000000000 x11: 0000000000000000 x10: 00000000000008b0 x9 : ffff800011dd3cb0 x8 : 000000000004e69b x7 : 0000000000000000 x6 : ffff0000f1926400 x5 : ffff0000f1940800 x4 : 0000000000000000 x3 : 0000000000000c40 x2 : 0000000000000008 x1 : 00000000002734d8 x0 : 0000000000000000 Call trace:
+>> __blkdev_issue_discard+0x200/0x294
+>> __submit_discard_cmd+0x128/0x374
+>> __issue_discard_cmd_orderly+0x188/0x244
+>> __issue_discard_cmd+0x2e8/0x33c
+>> issue_discard_thread+0xe8/0x2f0
+>> kthread+0x11c/0x120
+>> ret_from_fork+0x10/0x1c
+>> ---[ end trace e4c8023d33dfe77a ]---
+>>
+>> This patch fixes the issue by setting discard_granularity as SECTOR_SIZE
+>> instead of 0 when (card->pref_erase > max_discard) is true. Now no more
+>> complain from __blkdev_issue_discard() for the improper value of discard
+>> granularity.
+>>
+>> Fixes: commit e056a1b5b67b ("mmc: queue: let host controllers specify maximum discard timeout")
+> 
+> That "Fixes" tag is a bit misleading.  For some time, the block layer had
+> no problem with discard_granularity of zero, and blk_bio_discard_split()
+> still doesn't (see below).
+> 
+> static struct bio *blk_bio_discard_split(struct request_queue *q,
+> 					 struct bio *bio,
+> 					 struct bio_set *bs,
+> 					 unsigned *nsegs)
+> {
+> 	unsigned int max_discard_sectors, granularity;
+> 	int alignment;
+> 	sector_t tmp;
+> 	unsigned split_sectors;
+> 
+> 	*nsegs = 1;
+> 
+> 	/* Zero-sector (unknown) and one-sector granularities are the same.  */
+> 	granularity = max(q->limits.discard_granularity >> 9, 1U);
+> 
 
-On Wednesday, September 30, 2020 5:27 AM, Hillf Danton <hdanton@sina.com> w=
-rote:
-> On Mon, 28 Sep 2020 11:45:13 -0500 Nabeel M Mohamed wrote:
-> >
-> > +/* Rate limited version of mp_pr_err(). */
-> > +#define mp_pr_rl(_fmt, _err, ...)				\
-> > +do {								\
-> > +	static unsigned long mp_pr_rl_state;			\
->=20
-> We do not need to declare a mp_pr_rl_state per use case of mp_pr_rl.
+From Documentation/block/queue-sysfs.rst, the discard_granularity is
+described as,
 
-Agreed, will make it a global state to rate limit all messages vs. by call =
-site.
+discard_granularity (RO)
+------------------------
+This shows the size of internal allocation of the device in bytes, if
+reported by the device. A value of '0' means device does not support
+the discard functionality.
 
->=20
-> > +	uint dly =3D msecs_to_jiffies(333);			\
->=20
-> printk_timed_ratelimit() needs msec as input instead of tick.
 
-Nice catch, thanks!
+And from Documentation/ABI/testing/sysfs-block, the discard_granularity
+is described as,
 
-Will address both your comments in v2.
+What:           /sys/block/<disk>/queue/discard_granularity
+Date:           May 2011
+Contact:        Martin K. Petersen <martin.petersen@oracle.com>
+Description:
+                Devices that support discard functionality may
+                internally allocate space using units that are bigger
+                than the logical block size. The discard_granularity
+                parameter indicates the size of the internal allocation
+                unit in bytes if reported by the device. Otherwise the
+                discard_granularity will be set to match the device's
+                physical block size. A discard_granularity of 0 means
+                that the device does not support discard functionality.
 
-Thanks,
-Nabeel
+
+Therefore I took it as a bug when a driver sets its queue
+discard_granularity as 0 but still announces to support discard operation.
+
+But if you don't like the Fixes: tag, it is OK for me to remove it in
+next version.
+
+(CC Martin because he is the origin of the above information)
+
+Thanks.
+
+Coly Li
