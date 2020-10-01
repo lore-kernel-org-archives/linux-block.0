@@ -2,207 +2,109 @@ Return-Path: <SRS0=e+pS=DI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30210C4727F
-	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 11:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F3CC4727C
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 15:38:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF1A72137B
-	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 11:48:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601552913;
-	bh=0SS/1CUEH6KOZaR1vNXQSO0iQE6lB5yr3hxEdMoHOcw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=cPvzySn4zRTECxCBK5KBcz4nTC7vgAbd/n4AuXcZvVLn2K61fbRraZNQNflI4l5E8
-	 FsmPReW36+3uMo1uR4v3OshvslZjlRvgi3813f1BOFcoAuv3N9uGnshmobQCfAsv6g
-	 lJy+a2hr9yW85uAydVUsIuzgd1UdgkL//LsbNcUE=
+	by mail.kernel.org (Postfix) with ESMTP id 29F54206C1
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 15:38:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MNb0TCAv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731893AbgJALsc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Oct 2020 07:48:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42270 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731826AbgJALsc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Oct 2020 07:48:32 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1732368AbgJAPi3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Oct 2020 11:38:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43324 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732104AbgJAPi3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Oct 2020 11:38:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601566707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JgrEZ8j9/nFRaKvjMm0r5U5f27doNCfVkl4QLjZxDI4=;
+        b=MNb0TCAvryeES+5s+u00uJWDR3/GA4/03M6HQUcxc251ons1gsFAPLnqGsuQFYPpg7ZDeV
+        mkxkUtqp8A+9EDj1T8vASArhDmMnlAXhooy2p6aOx7YSeg9Os1FRwh8wAkXSZiYfXn9AN+
+        PTHwle0bkJ6kIdalVlHQ6zVcECBGuxI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-443-ZMUhCtafNMmLsDo3SeWcpw-1; Thu, 01 Oct 2020 11:38:24 -0400
+X-MC-Unique: ZMUhCtafNMmLsDo3SeWcpw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 320DA20B1F;
-        Thu,  1 Oct 2020 11:48:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601552911;
-        bh=0SS/1CUEH6KOZaR1vNXQSO0iQE6lB5yr3hxEdMoHOcw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qfP2ToTp3qu+2pfCjVkt1eSreNq9ISTIAj7AbmRHBGl/973Ouzr27DvwRf3sJhLxL
-         0VGuBQCqBfM7iUfu/svafiF47/iDbmQ4+cMY0VA8E55WdV7OSeromPlfrrF8/r+oa8
-         zRMOSfScuJbcZ7fxpTIAHoYo78QvlmNTCDnFgmoo=
-Date:   Thu, 1 Oct 2020 13:48:32 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Tony Asleson <tasleson@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [v5 01/12] struct device: Add function callback durable_name
-Message-ID: <20201001114832.GC2368232@kroah.com>
-References: <20200925161929.1136806-1-tasleson@redhat.com>
- <20200925161929.1136806-2-tasleson@redhat.com>
- <20200929175102.GA1613@infradead.org>
- <20200929180415.GA1400445@kroah.com>
- <20e220a6-4bde-2331-6e5e-24de39f9aa3b@redhat.com>
- <20200930073859.GA1509708@kroah.com>
- <c6b031b8-f617-0580-52a5-26532da4ee03@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C504B803654;
+        Thu,  1 Oct 2020 15:38:17 +0000 (UTC)
+Received: from T590 (ovpn-12-47.pek2.redhat.com [10.72.12.47])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AB4E178807;
+        Thu,  1 Oct 2020 15:38:10 +0000 (UTC)
+Date:   Thu, 1 Oct 2020 23:38:06 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Veronika Kabatova <vkabatov@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH V6 1/2] percpu_ref: reduce memory footprint of percpu_ref
+ in fast path
+Message-ID: <20201001153806.GA23222@T590>
+References: <20200930082657.3305143-1-ming.lei@redhat.com>
+ <20200930082657.3305143-2-ming.lei@redhat.com>
+ <20200930160015.GC4441@mtj.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c6b031b8-f617-0580-52a5-26532da4ee03@redhat.com>
+In-Reply-To: <20200930160015.GC4441@mtj.duckdns.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 30, 2020 at 09:35:52AM -0500, Tony Asleson wrote:
-> On 9/30/20 2:38 AM, Greg Kroah-Hartman wrote:
-> > On Tue, Sep 29, 2020 at 05:04:32PM -0500, Tony Asleson wrote:
-> >> I'm trying to figure out a way to positively identify which storage
-> >> device an error belongs to over time.
-> > 
-> > "over time" is not the kernel's responsibility.
-> > 
-> > This comes up every 5 years or so. The kernel provides you, at runtime,
-> > a mapping between a hardware device and a "logical" device.  It can
-> > provide information to userspace about this mapping, but once that
-> > device goes away, the kernel is free to reuse that logical device again.
-> > 
-> > If you want to track what logical devices match up to what physical
-> > device, then do it in userspace, by parsing the log files.
+On Wed, Sep 30, 2020 at 12:00:15PM -0400, Tejun Heo wrote:
+> On Wed, Sep 30, 2020 at 04:26:56PM +0800, Ming Lei wrote:
+> > diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
+> > index 87d8a38bdea1..1d6ed9ca23dd 100644
+> > --- a/include/linux/percpu-refcount.h
+> > +++ b/include/linux/percpu-refcount.h
+> > @@ -92,18 +92,23 @@ enum {
+> >  	PERCPU_REF_ALLOW_REINIT	= 1 << 2,
+> >  };
+> >  
+> > -struct percpu_ref {
+> > +struct percpu_ref_data {
+> >  	atomic_long_t		count;
+> > -	/*
+> > -	 * The low bit of the pointer indicates whether the ref is in percpu
+> > -	 * mode; if set, then get/put will manipulate the atomic_t.
+> > -	 */
+> > -	unsigned long		percpu_count_ptr;
+> >  	percpu_ref_func_t	*release;
+> >  	percpu_ref_func_t	*confirm_switch;
+> >  	bool			force_atomic:1;
+> >  	bool			allow_reinit:1;
+> >  	struct rcu_head		rcu;
+> > +	struct percpu_ref	*ref;
+> > +};
+> > +
+> > +struct percpu_ref {
+> > +	/*
+> > +	 * The low bit of the pointer indicates whether the ref is in percpu
+> > +	 * mode; if set, then get/put will manipulate the atomic_t.
+> > +	 */
+> > +	unsigned long		percpu_count_ptr;
+> > +	struct percpu_ref_data  *data;
+> >  };
 > 
-> I don't understand why people think it's acceptable to ask user space to
-> parse text that is subject to change.
+> Can you please add a comment explaining why the two structs are split?
 
-What text is changing?  The format of of the prefix of dev_*() is well
-known and has been stable for 15+ years now, right?  What is difficult
-in parsing it?
+Sure, will do that in next version.
 
-> >> Thank you for supplying some feedback and asking questions.  I've been
-> >> asking for suggestions and would very much like to have a discussion on
-> >> how this issue is best solved.  I'm not attached to what I've provided.
-> >> I'm just trying to get towards a solution.
-> > 
-> > Again, solve this in userspace, you have the information there at
-> > runtime, why not use it?
-> 
-> We usually don't have the needed information if you remove the
-> expectation that user space should parse the human readable portion of
-> the error message.
+Thanks,
+Ming
 
-I don't expect that userspace should have to parse any human readable
-portion, if they don't want to.  But if you do want it to, it is pretty
-trivial to parse what you have today:
-
-	scsi 2:0:0:0: Direct-Access     Generic  STORAGE DEVICE   1531 PQ: 0 ANSI: 6
-
-If you really have a unique identifier, then great, parse it today:
-
-	usb 4-1.3.1: Product: USB3.0 Card Reader
-	usb 4-1.3.1: Manufacturer: Generic
-	usb 4-1.3.1: SerialNumber: 000000001531
-
-What's keeping that from working now?
-
-In fact, I would argue that it does seem to work, as there are many
-commercial tools out there that seem to handle it just fine...
-
-> >> We've looked at user space quite a bit and there is an inherit race
-> >> condition with trying to fetch the unique hardware id for a message when
-> >> it gets emitted from the kernel as udev rules haven't even run (assuming
-> >> we even have the meta-data to make the association).
-> > 
-> > But one moment later you do have the information, so you can properly
-> > correlate it, right?
-> 
-> We could have the information if all the storage paths went through
-> dev_printk.  Here is what we get today when we encounter a read error
-> which uses printk in the block layer:
-> 
-> {
->         "_HOSTNAME" : "pn",
->         "_TRANSPORT" : "kernel",
->         "__MONOTONIC_TIMESTAMP" : "1806379233",
->         "SYSLOG_IDENTIFIER" : "kernel",
->         "_SOURCE_MONOTONIC_TIMESTAMP" : "1805611354",
->         "SYSLOG_FACILITY" : "0",
->         "MESSAGE" : "blk_update_request: critical medium error, dev
-> nvme0n1, sector 10000 op 0x0:(READ) flags 0x80700 phys_seg 3 prio class 0",
->         "PRIORITY" : "3",
->         "_MACHINE_ID" : "3f31a0847cea4c95b7a9cec13d07deeb",
->         "__REALTIME_TIMESTAMP" : "1601471260802301",
->         "_BOOT_ID" : "b03ed610f21d46ab8243a495ba5a0058",
->         "__CURSOR" :
-> "s=a063a22bbb384da0b0412e8f652deabb;i=23c2;b=b03ed610f21d46ab8243a495ba5a0058;m=6bab28e1;t=5b087959e3cfd;x=20528862f8f765c9"
-> }
-
-Ok, messy stuff, don't do that :)
-
-> Unless you parse the message text you cannot make the association.  If
-> the same message was changed to dev_printk we would get:
-> 
-> 
-> {
->         "__REALTIME_TIMESTAMP" : "1589401901093443",
->         "__CURSOR" :
-> "s=caac9703b34a48fd92f7875adae55a2f;i=1c713;b=e2ae14a9def345aa803a13648b95429c;m=7d25b4f;t=5a58d77b85243;x=b034c2d3fb853870",
->         "SYSLOG_IDENTIFIER" : "kernel",
->         "_KERNEL_DEVICE" : "b259:917504",
->         "__MONOTONIC_TIMESTAMP" : "131226447",
->         "_UDEV_SYSNAME" : "nvme0n1",
->         "PRIORITY" : "3",
->         "_KERNEL_SUBSYSTEM" : "block",
->         "_SOURCE_MONOTONIC_TIMESTAMP" : "130941917",
->         "_TRANSPORT" : "kernel",
->         "_MACHINE_ID" : "3f31a0847cea4c95b7a9cec13d07deeb",
->         "_HOSTNAME" : "pn",
->         "SYSLOG_FACILITY" : "0",
->         "_BOOT_ID" : "e2ae14a9def345aa803a13648b95429c",
->         "_UDEV_DEVLINK" : [
->                 "/dev/disk/by-uuid/22fc262a-d621-452a-a951-7761d9fcf0dc",
->                 "/dev/disk/by-path/pci-0000:00:05.0-nvme-1",
-> 
-> "/dev/disk/by-id/nvme-nvme.8086-4445414442454546-51454d55204e564d65204374726c-00000001",
->                 "/dev/disk/by-id/nvme-QEMU_NVMe_Ctrl_DEADBEEF"
->         ],
->         "MESSAGE" : "block nvme0n1: blk_update_request: critical medium
-> error, dev nvme0n1, sector 10000 op 0x0:(READ) flags 0x0 phys_seg 1 prio
-> class 0",
->         "_UDEV_DEVNODE" : "/dev/nvme0n1"
-> }
-
-Great, you have a udev sysname, a kernel subsystem and a way to
-associate that with a real device, what more are you wanting?
-
-> Journald already knows how to utilize the dev_printk meta data.
-
-And if you talk to the printk developers (which you seem to be keeping
-out of the loop here), they are ripping out the meta data facility as
-fast as possible.  So don't rely on extending that please.
-
-> One idea that I've suggested along the way is creating a dev_printk
-> function that doesn't change the message text.  We then avoid breaking
-> people that are parsing.  Is this something that would be acceptable to
-> folks?  It doesn't solve early boot where udev rules haven't even run,
-> but it's better.
-
-I still fail to understand the root problem here.
-
-Ok, no, I think I understand what you think the problem is, I just don't
-see why it is up to the kernel to change what we have today when there
-are lots of tools out there working just fine without any kernel changes
-needed.
-
-So try explaining the problem as you see it please, so we all know where
-to work from.
-
-But again, cutting out the developers of the subsystems you were wanting
-to modify might just be making me really grumpy about this whole
-thing...
-
-greg k-h
