@@ -2,241 +2,160 @@ Return-Path: <SRS0=e+pS=DI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3686CC4727E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 16:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B9CEC4741F
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 18:47:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA418207FB
-	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 16:10:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAA5F20878
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 18:47:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Sv07Hj7J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SdfnfK1s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730534AbgJAQKW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Oct 2020 12:10:22 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:41110 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732026AbgJAQKV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Oct 2020 12:10:21 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1601568617;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=z+vQhRIcNOFubiodWundG6oDwgbIvTfNw83adZRsmIY=;
-        b=Sv07Hj7JIvzJObv5T42Qu/Th07mzQCna+Z75lOIlPhm0sc2MZkMtpY4IP4TDFp3F3DOha0
-        h98/0J31nHpRXX9x1R2STDQOdN6dZiitg1G+d/2vKgG/tAb93HiTaPJKqfcDZRYR2ka3rw
-        9Eg4MDAofNxRSOmO+y/MWBk2AL62Vns=
-Received: from EUR02-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur02lp2050.outbound.protection.outlook.com [104.47.5.50]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-22-O8IiS_ncOB6ThqHyW_1WkA-1; Thu, 01 Oct 2020 18:10:15 +0200
-X-MC-Unique: O8IiS_ncOB6ThqHyW_1WkA-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HJQI11zcA/gt56e02+ZtgWkaR4K4cU0flJd6Dj2/A4zzVlu67d/bmW2QtHLy1+SoNcH9IPR0UGtYdCnKmXU9kM8v5iHVgap/br7tvb9cuh4TubAE/ga3UTpF/tTJeShhqQCO1i39DPkGoHhsNSu2pn8aGsq9SegoAkKw73l9i/7Uo7MEN5bsa86SxWoqIvD6SydjrjxuvtUHYbOmKNAsPsalo+nDYIFHYuui5OtLWOhXydmutUMca15tep95dBF/tniLfSKKz3TWYiqFqiMlz9GiAtQv3H3OzWDzCDWchkIudcvdvnBfYthGNu88KlNHNBtqYe6vYvCpvUsMFzGs/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z+vQhRIcNOFubiodWundG6oDwgbIvTfNw83adZRsmIY=;
- b=fM5dvTRXAfta7TODxnXURuwgCqSLxZGSZHQpT5ae+b2k1PYIm91htpCnZYyMxT98B32/SozxXg+qUTEY5mq+QRT8xJUjOXAp5aYlH/I6evNoT+a1y4YcYn7gxTII9yIEGP34q7hThjny31o5lbvtMYm7O7SCi5Z4PoxpKPikS5DLeo7iDHqTRsfpAx9OavqPLq1iT7g2C5XN9X9BEONYMDb/wOvddno+sCYZIQtvy9vGWiXdxxVuajRuFUrbP9d03NhYr+OErk/TGZ1+86P/0HIzwuyFaTTrgDZRZ/9Rpoc6QwfOHKReZTtj6LMJDr72WKmchzo2dIl+z76Am/TTdg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: suse.de; dkim=none (message not signed)
- header.d=none;suse.de; dmarc=none action=none header.from=suse.com;
-Received: from AM5PR04MB3089.eurprd04.prod.outlook.com (2603:10a6:206:b::28)
- by AM6PR04MB4021.eurprd04.prod.outlook.com (2603:10a6:209:3f::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20; Thu, 1 Oct
- 2020 16:10:12 +0000
-Received: from AM5PR04MB3089.eurprd04.prod.outlook.com
- ([fe80::993e:654f:399e:8230]) by AM5PR04MB3089.eurprd04.prod.outlook.com
- ([fe80::993e:654f:399e:8230%6]) with mapi id 15.20.3412.029; Thu, 1 Oct 2020
- 16:10:12 +0000
-Subject: Re: [PATCH v9 6/7] scsi: libiscsi: use sendpage_ok() in
- iscsi_tcp_segment_map()
-To:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
-        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
-        ceph-devel@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Vasily Averin <vvs@virtuozzo.com>,
-        Cong Wang <amwang@redhat.com>,
-        Mike Christie <michaelc@cs.wisc.edu>,
-        Chris Leech <cleech@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>
-References: <20201001075408.25508-1-colyli@suse.de>
- <20201001075408.25508-7-colyli@suse.de>
-From:   Lee Duncan <lduncan@suse.com>
-Autocrypt: addr=lduncan@suse.com; keydata=
- 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
- Xd8p+B+giaT8a1b5hWuz85V0
-Message-ID: <0df9cb0e-7fd1-5ba0-564a-378aa0b8955f@suse.com>
-Date:   Thu, 1 Oct 2020 09:10:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
-In-Reply-To: <20201001075408.25508-7-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR07CA0080.eurprd07.prod.outlook.com
- (2603:10a6:207:6::14) To AM5PR04MB3089.eurprd04.prod.outlook.com
- (2603:10a6:206:b::28)
+        id S1732541AbgJASrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Oct 2020 14:47:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41356 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729047AbgJASrd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Oct 2020 14:47:33 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 598C2C0613D0;
+        Thu,  1 Oct 2020 11:47:33 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id k15so6984233wrn.10;
+        Thu, 01 Oct 2020 11:47:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:mime-version:message-id:in-reply-to
+         :references:user-agent:content-transfer-encoding;
+        bh=vBNgwRRGY9uJ0bKBJoC+SDh8VJ4r0cHyoogyU7fjpEw=;
+        b=SdfnfK1sKJ6zVq5lKGc7v/4rZTE3i1lmAA+PEUtKT227TeflVetUV5WVidsTWk+Waw
+         Hes/VktNGqMYuK2tIQ0EpwUe71jKQkK+dRBfKnwRfXCm7UtyeCGJKARUdn0wTNs3atyN
+         gS4PIMmNbH+tEPvxQ4038A6IjSR9xefoQRO+mphaJQLwV8DsTCzBXmqWEM+fTnSy2EGr
+         NTEqVLYuTHABkwLP2J87PcDxPEZY8suVksOan3BQGR6S2EzeYOVupLwdEix926QpvKEm
+         IB9OlN8n2b/eCmjIW8xcDZ8m7YH1QaHAcdr1zoZPLBL3Vmo3okAPTH4cUkRXcnaKpXC2
+         vnag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:mime-version:message-id
+         :in-reply-to:references:user-agent:content-transfer-encoding;
+        bh=vBNgwRRGY9uJ0bKBJoC+SDh8VJ4r0cHyoogyU7fjpEw=;
+        b=kHZwMwCjQIKwaFqwOqKdvAWd6LmM121eBGTOSZEyf38K4mjnazS0tVv0P0IPseTLfC
+         zeCI+A5CB8LeQb7X3GVaH6xaQy9Kj2sY956UdTHyr00GISIP25E8CKtGw9H6rqF8dy9t
+         BxN6QaekGR8v8qWhU1DcFwUmSm1uafgak2MPJiFMuy45J6+LlFGYO4y0qDYYHP283WQ3
+         tvyobRglpTcS0wL1bX0vqvWm5NBfIMYE48IHbJkMe7XY+jTaICgeZGdAH1OaVQqHqM/q
+         X79HTbRmm/NT6//4MnPcWFvg/S9hc/+udhsTCqaiQ8V5bbTfdOxi8wnfxX9cwOfq8/G+
+         BRyA==
+X-Gm-Message-State: AOAM531JEK/vmH+CpDGP/JDM6Qfdq3We5ZVYfJXEU3YVkY94tyuTXX8p
+        9+oA15r4cpcNHTCTRkpkWo4=
+X-Google-Smtp-Source: ABdhPJwt8erLW4gJgt3o1NQloFrwHdbIbRYWGbJQrfRxoXfCwVKso78iB9sGKxDE2dHilUdtwwLNCg==
+X-Received: by 2002:adf:eb04:: with SMTP id s4mr11313112wrn.81.1601578052037;
+        Thu, 01 Oct 2020 11:47:32 -0700 (PDT)
+Received: from localhost ([170.253.46.69])
+        by smtp.gmail.com with ESMTPSA id 70sm1320001wmb.41.2020.10.01.11.47.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Oct 2020 11:47:31 -0700 (PDT)
+From:   Vicente Bergas <vicencb@gmail.com>
+To:     Coly Li <colyli@suse.de>
+Cc:     <linux-mmc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Subject: Re: [PATCH v3] mmc: core: don't set =?iso-8859-1?Q?limits.discard=5Fgranularity_as_0?=
+Date:   Thu, 01 Oct 2020 20:47:29 +0200
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.20.3] (73.25.22.216) by AM3PR07CA0080.eurprd07.prod.outlook.com (2603:10a6:207:6::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.13 via Frontend Transport; Thu, 1 Oct 2020 16:10:09 +0000
-X-Originating-IP: [73.25.22.216]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4b562a3b-e332-4c0b-e51e-08d8662479f7
-X-MS-TrafficTypeDiagnostic: AM6PR04MB4021:
-X-Microsoft-Antispam-PRVS: <AM6PR04MB4021886BD5136EC7DE8BAA56DA300@AM6PR04MB4021.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8fycaqf/Gi59yL9rz9oMz0E9hxGJONJhHY8isUbCSWDNkHTFwWHpM8SE9cKixlQUF6es19aaw+rO6mxaLJ0YP/HH5TYwh3hOAOYRTrE9SRGkCBlLoyrEpFZYq0tNsWmIOCOmzwAWZ/AjacI/WBQ05nC5xuj3e+vPH3rhONY+yQuM2OSg78R9jclBmz0UJBVKc96Slsn0+8mLAsc2A6UShdMcjt8JpZypFgZ8LyXU+plJdrhpFlcc/hozeY05rXBDp6jpVPMJvIhws5keQNYcAjtYR+1SYwNuMpnGnIOzNV751HgbowaqaQ2b+KWiuC5dK1sVOjGr/Xi0I0ijTIbMDzZQ6NfCFpGB1IcXO2JhqHyXugVEGVJj19Ma1syqO2pJ4csqMzOouzgpFibwShP20JuxqlHbtHBHiIy1srLrqBE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3089.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(376002)(136003)(346002)(39850400004)(396003)(31686004)(54906003)(186003)(26005)(16526019)(36756003)(2906002)(7416002)(6666004)(52116002)(83380400001)(316002)(53546011)(16576012)(86362001)(66556008)(5660300002)(8936002)(8676002)(31696002)(2616005)(478600001)(956004)(66946007)(4326008)(66476007)(6486002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: /uN04sei8HD93JsRZJwIjo0qHT9F5IDzcy00XFRdmYku+oLvUqOSSB2RKWANONcFWShLWLeft2isFs8VLkKbPIsT9sILvKdYRmNY/kbpenraAiScLKwirMJzq8klOjzhgudCvQSRFtBnMoGtVSBBynjtryYvMRtRe3DQnpZ5QzOM+xuiCpyPQ+n3FH9oonutF0vfAT1r9CF57x/BPHVE9+E0LgWmQA4GzZX78aJnsoGkrKn3xBbr463YAHtlMolO3skJC4TGm6bHL3nvpyJuGEROYhLjywT282keSuQRVG26GTl6kgNXIoBv1/VJmTIiyK70x34zXWJxnPJ398j5jeNLjZdUBYgJjXn0JlQR7dCQ7iPY4xI8xwR1CS7HcGErfaK4fsnGupFeavj7MXcU8E7ucvMbAMRo94Va1U9orqSN+oyvB4sUk0050CtjBy/QZdfolbObgYNvnbjVnyQA5KC8rXf0cIB2mwNQORp+OGGu//R6yPwtvVqLp5l04/TuZbKV9pONDKh3M07756KNvmytk92HccwSH/ml767ix1avNE5oqpYQSt4LBikn1ksv+sCPcKyoeOb2zTGEujW5Qs6z/JiT90TP/SE3PHNdShOsq39ANsRb3BEjazhIKx51wUAn/QEM9pCmpms0opjS9g==
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b562a3b-e332-4c0b-e51e-08d8662479f7
-X-MS-Exchange-CrossTenant-AuthSource: AM5PR04MB3089.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2020 16:10:12.6318
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nSzft0wCRbrgGA99DrRrwlFodoaf3C3OORxfFamCyMcosDX1qcUes3b6bWalEa6Q/q48ZyZnEfsaV/2lOcsVcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB4021
+Message-ID: <b3cdb5fe-40df-41df-ae10-0b7be4dcd7a6@gmail.com>
+In-Reply-To: <20201001071824.24995-1-colyli@suse.de>
+References: <20201001071824.24995-1-colyli@suse.de>
+User-Agent: Trojita
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/1/20 12:54 AM, Coly Li wrote:
-> In iscsci driver, iscsi_tcp_segment_map() uses the following code to
-> check whether the page should or not be handled by sendpage:
->     if (!recv && page_count(sg_page(sg)) >= 1 && !PageSlab(sg_page(sg)))
-> 
-> The "page_count(sg_page(sg)) >= 1 && !PageSlab(sg_page(sg)" part is to
-> make sure the page can be sent to network layer's zero copy path. This
-> part is exactly what sendpage_ok() does.
-> 
-> This patch uses  use sendpage_ok() in iscsi_tcp_segment_map() to replace
-> the original open coded checks.
-> 
+On Thursday, October 1, 2020 9:18:24 AM CEST, Coly Li wrote:
+> In mmc_queue_setup_discard() the mmc driver queue's discard_granularity
+> might be set as 0 (when card->pref_erase > max_discard) while the mmc
+> device still declares to support discard operation. This is buggy and
+> triggered the following kernel warning message,
+>
+> WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
+> CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
+> Hardware name: Google Kevin (DT)
+> pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=3D--)
+> pc : __blkdev_issue_discard+0x200/0x294
+> lr : __blkdev_issue_discard+0x54/0x294
+> sp : ffff800011dd3b10
+> x29: ffff800011dd3b10 x28: 0000000000000000 x27:=20
+> ffff800011dd3cc4 x26: ffff800011dd3e18 x25: 000000000004e69b=20
+> x24: 0000000000000c40 x23: ffff0000f1deaaf0 x22:=20
+> ffff0000f2849200 x21: 00000000002734d8 x20: 0000000000000008=20
+> x19: 0000000000000000 x18: 0000000000000000 x17:=20
+> 0000000000000000 x16: 0000000000000000 x15: 0000000000000000=20
+> x14: 0000000000000394 x13: 0000000000000000 x12:=20
+> 0000000000000000 x11: 0000000000000000 x10: 00000000000008b0 x9=20
+> : ffff800011dd3cb0 x8 : 000000000004e69b x7 : 0000000000000000=20
+> x6 : ffff0000f1926400 x5 : ffff0000f1940800 x4 :=20
+> 0000000000000000 x3 : 0000000000000c40 x2 : 0000000000000008 x1=20
+> : 00000000002734d8 x0 : 0000000000000000 Call trace:
+> __blkdev_issue_discard+0x200/0x294
+> __submit_discard_cmd+0x128/0x374
+> __issue_discard_cmd_orderly+0x188/0x244
+> __issue_discard_cmd+0x2e8/0x33c
+> issue_discard_thread+0xe8/0x2f0
+> kthread+0x11c/0x120
+> ret_from_fork+0x10/0x1c
+> ---[ end trace e4c8023d33dfe77a ]---
+>
+> This patch fixes the issue by setting discard_granularity as SECTOR_SIZE
+> instead of 0 when (card->pref_erase > max_discard) is true. Now no more
+> complain from __blkdev_issue_discard() for the improper value of discard
+> granularity.
+>
+> This issue is exposed after commit b35fd7422c2f ("block: check queue's
+> limits.discard_granularity in __blkdev_issue_discard()"), a "Fixes:" tag
+> is also added for the commit to make sure people won't miss this patch
+> after applying the change of __blkdev_issue_discard().
+>
+> Fixes: e056a1b5b67b ("mmc: queue: let host controllers specify=20
+> maximum discard timeout")
+> Fixes: b35fd7422c2f ("block: check queue's=20
+> limits.discard_granularity in __blkdev_issue_discard()").
+> Reported-by: Vicente Bergas <vicencb@gmail.com>
 > Signed-off-by: Coly Li <colyli@suse.de>
-> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Vasily Averin <vvs@virtuozzo.com>
-> Cc: Cong Wang <amwang@redhat.com>
-> Cc: Mike Christie <michaelc@cs.wisc.edu>
-> Cc: Lee Duncan <lduncan@suse.com>
-> Cc: Chris Leech <cleech@redhat.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.de>
+> Acked-by: Adrian Hunter <adrian.hunter@intel.com>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
 > ---
->  drivers/scsi/libiscsi_tcp.c | 2 +-
+> Changelog,
+> v3, add Fixes tag for both commits.
+> v2, change commit id of the Fixes tag.
+> v1, initial version.
+>
+>  drivers/mmc/core/queue.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/scsi/libiscsi_tcp.c b/drivers/scsi/libiscsi_tcp.c
-> index 37e5d4e48c2f..83f14b2c8804 100644
-> --- a/drivers/scsi/libiscsi_tcp.c
-> +++ b/drivers/scsi/libiscsi_tcp.c
-> @@ -128,7 +128,7 @@ static void iscsi_tcp_segment_map(struct iscsi_segment *segment, int recv)
->  	 * coalescing neighboring slab objects into a single frag which
->  	 * triggers one of hardened usercopy checks.
->  	 */
-> -	if (!recv && page_count(sg_page(sg)) >= 1 && !PageSlab(sg_page(sg)))
-> +	if (!recv && sendpage_ok(sg_page(sg)))
->  		return;
->  
->  	if (recv) {
-> 
+>
+> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+> index 6c022ef0f84d..350d0cc4ee62 100644
+> --- a/drivers/mmc/core/queue.c
+> +++ b/drivers/mmc/core/queue.c
+> @@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct=20
+> request_queue *q,
+>  =09q->limits.discard_granularity =3D card->pref_erase << 9;
+>  =09/* granularity must not be greater than max. discard */
+>  =09if (card->pref_erase > max_discard)
+> -=09=09q->limits.discard_granularity =3D 0;
+> +=09=09q->limits.discard_granularity =3D SECTOR_SIZE;
+>  =09if (mmc_can_secure_erase_trim(card))
+>  =09=09blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
+>  }
 
-Reviewed-by: Lee Duncan <lduncan@suse.com>
+Tested on rk3399-gru-kevin with f2fs filesystem over the mmc driver, that
+is, the same setup that reproduced the issue.
+The kernel warning message is no longer reported.
+So,
+Tested-by: Vicente Bergas <vicencb@gmail.com>
 
