@@ -7,29 +7,30 @@ X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D317DC4727C
-	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 10:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D150C4727C
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 10:06:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3AF02176B
-	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 10:00:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26C342176B
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 10:06:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731611AbgJAKAK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Oct 2020 06:00:10 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58090 "EHLO mx2.suse.de"
+        id S1731134AbgJAKGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Oct 2020 06:06:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:35072 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726992AbgJAKAJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Oct 2020 06:00:09 -0400
+        id S1731131AbgJAKGI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Oct 2020 06:06:08 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 44BDDACB7;
-        Thu,  1 Oct 2020 10:00:08 +0000 (UTC)
-Subject: Re: [PATCH v3] mmc: core: don't set limits.discard_granularity as 0
+        by mx2.suse.de (Postfix) with ESMTP id 00D0AAC55;
+        Thu,  1 Oct 2020 10:06:06 +0000 (UTC)
 To:     Vicente Bergas <vicencb@gmail.com>
 Cc:     Adrian Hunter <adrian.hunter@intel.com>, linux-mmc@vger.kernel.org,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-block@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
 References: <20201001071824.24995-1-colyli@suse.de>
  <CAAMcf8Ao8Go7GdB2XFXAHsWrcxb0VqtDRpHReOGTsjegq2XP0Q@mail.gmail.com>
+ <ebd42dfe-d39c-5c13-bbd9-1c6463d73ff0@intel.com>
+ <CAAMcf8AXUx8UwJvGyBaSvuMaN8u0i1CTbz=WvC+snvLBe=mtLQ@mail.gmail.com>
 From:   Coly Li <colyli@suse.de>
 Autocrypt: addr=colyli@suse.de; keydata=
  mQINBFYX6S8BEAC9VSamb2aiMTQREFXK4K/W7nGnAinca7MRuFUD4JqWMJ9FakNRd/E0v30F
@@ -74,100 +75,113 @@ Autocrypt: addr=colyli@suse.de; keydata=
  K0Jx4CEZubakJe+894sX6pvNFiI7qUUdB882i5GR3v9ijVPhaMr8oGuJ3kvwBIA8lvRBGVGn
  9xvzkQ8Prpbqh30I4NMp8MjFdkwCN6znBKPHdjNTwE5PRZH0S9J0o67IEIvHfH0eAWAsgpTz
  +jwc7VKH7vkvgscUhq/v1/PEWCAqh9UHy7R/jiUxwzw/288OpgO+i+2l11Y=
-Message-ID: <443b9ed1-b075-d86d-e734-c9ec78653842@suse.de>
-Date:   Thu, 1 Oct 2020 18:00:04 +0800
+Subject: Re: [PATCH v3] mmc: core: don't set limits.discard_granularity as 0
+Message-ID: <86352b66-204e-0979-d060-70e953256e6b@suse.de>
+Date:   Thu, 1 Oct 2020 18:06:02 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
  Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <CAAMcf8Ao8Go7GdB2XFXAHsWrcxb0VqtDRpHReOGTsjegq2XP0Q@mail.gmail.com>
+In-Reply-To: <CAAMcf8AXUx8UwJvGyBaSvuMaN8u0i1CTbz=WvC+snvLBe=mtLQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/10/1 16:38, Vicente Bergas wrote:
-> On Thu, Oct 1, 2020 at 9:18 AM Coly Li <colyli@suse.de> wrote:
+On 2020/10/1 17:27, Vicente Bergas wrote:
+> On Thu, Oct 1, 2020 at 11:07 AM Adrian Hunter <adrian.hunter@intel.com> wrote:
 >>
->> In mmc_queue_setup_discard() the mmc driver queue's discard_granularity
->> might be set as 0 (when card->pref_erase > max_discard) while the mmc
->> device still declares to support discard operation. This is buggy and
->> triggered the following kernel warning message,
+>> On 1/10/20 11:38 am, Vicente Bergas wrote:
+>>> On Thu, Oct 1, 2020 at 9:18 AM Coly Li <colyli@suse.de> wrote:
+>>>>
+>>>> In mmc_queue_setup_discard() the mmc driver queue's discard_granularity
+>>>> might be set as 0 (when card->pref_erase > max_discard) while the mmc
+>>>> device still declares to support discard operation. This is buggy and
+>>>> triggered the following kernel warning message,
+>>>>
+>>>> WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
+>>>> CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
+>>>> Hardware name: Google Kevin (DT)
+>>>> pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=--)
+>>>> pc : __blkdev_issue_discard+0x200/0x294
+>>>> lr : __blkdev_issue_discard+0x54/0x294
+>>>> sp : ffff800011dd3b10
+>>>> x29: ffff800011dd3b10 x28: 0000000000000000 x27: ffff800011dd3cc4 x26: ffff800011dd3e18 x25: 000000000004e69b x24: 0000000000000c40 x23: ffff0000f1deaaf0 x22: ffff0000f2849200 x21: 00000000002734d8 x20: 0000000000000008 x19: 0000000000000000 x18: 0000000000000000 x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000 x14: 0000000000000394 x13: 0000000000000000 x12: 0000000000000000 x11: 0000000000000000 x10: 00000000000008b0 x9 : ffff800011dd3cb0 x8 : 000000000004e69b x7 : 0000000000000000 x6 : ffff0000f1926400 x5 : ffff0000f1940800 x4 : 0000000000000000 x3 : 0000000000000c40 x2 : 0000000000000008 x1 : 00000000002734d8 x0 : 0000000000000000 Call trace:
+>>>> __blkdev_issue_discard+0x200/0x294
+>>>> __submit_discard_cmd+0x128/0x374
+>>>> __issue_discard_cmd_orderly+0x188/0x244
+>>>> __issue_discard_cmd+0x2e8/0x33c
+>>>> issue_discard_thread+0xe8/0x2f0
+>>>> kthread+0x11c/0x120
+>>>> ret_from_fork+0x10/0x1c
+>>>> ---[ end trace e4c8023d33dfe77a ]---
+>>>>
+>>>> This patch fixes the issue by setting discard_granularity as SECTOR_SIZE
+>>>> instead of 0 when (card->pref_erase > max_discard) is true. Now no more
+>>>> complain from __blkdev_issue_discard() for the improper value of discard
+>>>> granularity.
+>>>>
+>>>> This issue is exposed after commit b35fd7422c2f ("block: check queue's
+>>>> limits.discard_granularity in __blkdev_issue_discard()"), a "Fixes:" tag
+>>>> is also added for the commit to make sure people won't miss this patch
+>>>> after applying the change of __blkdev_issue_discard().
+>>>>
+>>>> Fixes: e056a1b5b67b ("mmc: queue: let host controllers specify maximum discard timeout")
+>>>> Fixes: b35fd7422c2f ("block: check queue's limits.discard_granularity in __blkdev_issue_discard()").
+>>>> Reported-by: Vicente Bergas <vicencb@gmail.com>
+>>>
+>>> Hi Coly, Adrian,
+>>> would you like me to reply with a tested-by?
+>>> before testing it: what are the chances of losing data?
 >>
->> WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
->> CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
->> Hardware name: Google Kevin (DT)
->> pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=--)
->> pc : __blkdev_issue_discard+0x200/0x294
->> lr : __blkdev_issue_discard+0x54/0x294
->> sp : ffff800011dd3b10
->> x29: ffff800011dd3b10 x28: 0000000000000000 x27: ffff800011dd3cc4 x26: ffff800011dd3e18 x25: 000000000004e69b x24: 0000000000000c40 x23: ffff0000f1deaaf0 x22: ffff0000f2849200 x21: 00000000002734d8 x20: 0000000000000008 x19: 0000000000000000 x18: 0000000000000000 x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000 x14: 0000000000000394 x13: 0000000000000000 x12: 0000000000000000 x11: 0000000000000000 x10: 00000000000008b0 x9 : ffff800011dd3cb0 x8 : 000000000004e69b x7 : 0000000000000000 x6 : ffff0000f1926400 x5 : ffff0000f1940800 x4 : 0000000000000000 x3 : 0000000000000c40 x2 : 0000000000000008 x1 : 00000000002734d8 x0 : 0000000000000000 Call trace:
->> __blkdev_issue_discard+0x200/0x294
->> __submit_discard_cmd+0x128/0x374
->> __issue_discard_cmd_orderly+0x188/0x244
->> __issue_discard_cmd+0x2e8/0x33c
->> issue_discard_thread+0xe8/0x2f0
->> kthread+0x11c/0x120
->> ret_from_fork+0x10/0x1c
->> ---[ end trace e4c8023d33dfe77a ]---
->>
->> This patch fixes the issue by setting discard_granularity as SECTOR_SIZE
->> instead of 0 when (card->pref_erase > max_discard) is true. Now no more
->> complain from __blkdev_issue_discard() for the improper value of discard
->> granularity.
->>
->> This issue is exposed after commit b35fd7422c2f ("block: check queue's
->> limits.discard_granularity in __blkdev_issue_discard()"), a "Fixes:" tag
->> is also added for the commit to make sure people won't miss this patch
->> after applying the change of __blkdev_issue_discard().
->>
->> Fixes: e056a1b5b67b ("mmc: queue: let host controllers specify maximum discard timeout")
->> Fixes: b35fd7422c2f ("block: check queue's limits.discard_granularity in __blkdev_issue_discard()").
->> Reported-by: Vicente Bergas <vicencb@gmail.com>
+>> Very low I would hope, but that is no reason not to have backups :-)
 > 
-> Hi Coly, Adrian,
-> would you like me to reply with a tested-by?
-> before testing it: what are the chances of losing data?
+> I do have backup, it is for the hassle of reinstalling the OS and
+> restoring the backup.
+> I'll test it later, maybe today.
+> 
+>>> Regards,
+>>>   Vicente.
+>>>
+>>>> Signed-off-by: Coly Li <colyli@suse.de>
+>>>> Acked-by: Adrian Hunter <adrian.hunter@intel.com>
+>>>> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+>>>> ---
+>>>> Changelog,
+>>>> v3, add Fixes tag for both commits.
+>>>> v2, change commit id of the Fixes tag.
+>>>> v1, initial version.
+>>>>
+>>>>  drivers/mmc/core/queue.c | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+>>>> index 6c022ef0f84d..350d0cc4ee62 100644
+>>>> --- a/drivers/mmc/core/queue.c
+>>>> +++ b/drivers/mmc/core/queue.c
+>>>> @@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct request_queue *q,
+>>>>         q->limits.discard_granularity = card->pref_erase << 9;
+>>>>         /* granularity must not be greater than max. discard */
+> 
+> Just out of curiosity, wouldn't it be more performant something like:
+> q->limits.discard_granularity = minimum(card->pref_erase, max_discard) << 9;
+> or is just that SECTOR_SIZE is a number guaranteed to work?
+> 
 
+The discard_granularity is a hint for the minimal acceptable length of
+the discard request. The discard request might be accepted by device
+when the discard request covers a discard_granularity range. The
+discard_granularity rage is the minimum available discard request
+length, it is a LBA range which starts on discard_granularity aligned
+LBA, and length is discard_granularity.
 
-Hi Vicente,
-
-Please do :-)
-
-I will wait for your reply and post a v4 version.
-
-Thanks.
+Therefore setting discard_granularity to SECTOR_SIZE won't hurt discard
+performance, the discard bio split does not depend on it. It is a hint
+for a minimal acceptable length of discard request.
 
 Coly Li
 
 
->> Signed-off-by: Coly Li <colyli@suse.de>
->> Acked-by: Adrian Hunter <adrian.hunter@intel.com>
->> Cc: Ulf Hansson <ulf.hansson@linaro.org>
->> ---
->> Changelog,
->> v3, add Fixes tag for both commits.
->> v2, change commit id of the Fixes tag.
->> v1, initial version.
->>
->>  drivers/mmc/core/queue.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
->> index 6c022ef0f84d..350d0cc4ee62 100644
->> --- a/drivers/mmc/core/queue.c
->> +++ b/drivers/mmc/core/queue.c
->> @@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct request_queue *q,
->>         q->limits.discard_granularity = card->pref_erase << 9;
->>         /* granularity must not be greater than max. discard */
->>         if (card->pref_erase > max_discard)
->> -               q->limits.discard_granularity = 0;
->> +               q->limits.discard_granularity = SECTOR_SIZE;
->>         if (mmc_can_secure_erase_trim(card))
->>                 blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
->>  }
->> --
->> 2.26.2
->>
+
 
