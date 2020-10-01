@@ -2,36 +2,49 @@ Return-Path: <SRS0=e+pS=DI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A667DC4727E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 07:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 269F8C4727C
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 07:54:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AD6521531
-	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 07:18:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D810721D46
+	for <linux-block@archiver.kernel.org>; Thu,  1 Oct 2020 07:54:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730357AbgJAHSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Oct 2020 03:18:31 -0400
-Received: from mx2.suse.de ([195.135.220.15]:51384 "EHLO mx2.suse.de"
+        id S1725975AbgJAHyh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Oct 2020 03:54:37 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44124 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725878AbgJAHSb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Oct 2020 03:18:31 -0400
+        id S1725878AbgJAHyh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Oct 2020 03:54:37 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id B357CADB3;
-        Thu,  1 Oct 2020 07:18:29 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 1A9C6AC97;
+        Thu,  1 Oct 2020 07:54:35 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
-To:     linux-mmc@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>, Vicente Bergas <vicencb@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Subject: [PATCH v3] mmc: core: don't set limits.discard_granularity as 0
-Date:   Thu,  1 Oct 2020 15:18:24 +0800
-Message-Id: <20201001071824.24995-1-colyli@suse.de>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        netdev@vger.kernel.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Chris Leech <cleech@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Cong Wang <amwang@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Ilya Dryomov <idryomov@gmail.com>, Jan Kara <jack@suse.com>,
+        Jeff Layton <jlayton@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Lee Duncan <lduncan@suse.com>,
+        Mike Christie <michaelc@cs.wisc.edu>,
+        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Vasily Averin <vvs@virtuozzo.com>,
+        Vlastimil Babka <vbabka@suse.com>
+Subject: [PATCH v9 0/7] Introduce sendpage_ok() to detect misused sendpage in network related drivers
+Date:   Thu,  1 Oct 2020 15:54:01 +0800
+Message-Id: <20201001075408.25508-1-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -39,66 +52,88 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In mmc_queue_setup_discard() the mmc driver queue's discard_granularity
-might be set as 0 (when card->pref_erase > max_discard) while the mmc
-device still declares to support discard operation. This is buggy and
-triggered the following kernel warning message,
+This series was original by a bug fix in nvme-over-tcp driver which only
+checked whether a page was allocated from slab allcoator, but forgot to
+check its page_count: The page handled by sendpage should be neither a
+Slab page nor 0 page_count page.
 
-WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
-CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
-Hardware name: Google Kevin (DT)
-pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=--)
-pc : __blkdev_issue_discard+0x200/0x294
-lr : __blkdev_issue_discard+0x54/0x294
-sp : ffff800011dd3b10
-x29: ffff800011dd3b10 x28: 0000000000000000 x27: ffff800011dd3cc4 x26: ffff800011dd3e18 x25: 000000000004e69b x24: 0000000000000c40 x23: ffff0000f1deaaf0 x22: ffff0000f2849200 x21: 00000000002734d8 x20: 0000000000000008 x19: 0000000000000000 x18: 0000000000000000 x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000 x14: 0000000000000394 x13: 0000000000000000 x12: 0000000000000000 x11: 0000000000000000 x10: 00000000000008b0 x9 : ffff800011dd3cb0 x8 : 000000000004e69b x7 : 0000000000000000 x6 : ffff0000f1926400 x5 : ffff0000f1940800 x4 : 0000000000000000 x3 : 0000000000000c40 x2 : 0000000000000008 x1 : 00000000002734d8 x0 : 0000000000000000 Call trace:
-__blkdev_issue_discard+0x200/0x294
-__submit_discard_cmd+0x128/0x374
-__issue_discard_cmd_orderly+0x188/0x244
-__issue_discard_cmd+0x2e8/0x33c
-issue_discard_thread+0xe8/0x2f0
-kthread+0x11c/0x120
-ret_from_fork+0x10/0x1c
----[ end trace e4c8023d33dfe77a ]---
+As Sagi Grimberg suggested, the original fix is refind to a more common
+inline routine:
+    static inline bool sendpage_ok(struct page *page)
+    {
+        return  (!PageSlab(page) && page_count(page) >= 1);
+    }
+If sendpage_ok() returns true, the checking page can be handled by the
+concrete zero-copy sendpage method in network layer.
 
-This patch fixes the issue by setting discard_granularity as SECTOR_SIZE
-instead of 0 when (card->pref_erase > max_discard) is true. Now no more
-complain from __blkdev_issue_discard() for the improper value of discard
-granularity.
+The v9 series has 7 patches, no change from v8 series,
+- The 1st patch in this series introduces sendpage_ok() in header file
+  include/linux/net.h.
+- The 2nd patch adds WARN_ONCE() for improper zero-copy send in
+  kernel_sendpage().
+- The 3rd patch fixes the page checking issue in nvme-over-tcp driver.
+- The 4th patch adds page_count check by using sendpage_ok() in
+  do_tcp_sendpages() as Eric Dumazet suggested.
+- The 5th and 6th patches just replace existing open coded checks with
+  the inline sendpage_ok() routine.
 
-This issue is exposed after commit b35fd7422c2f ("block: check queue's
-limits.discard_granularity in __blkdev_issue_discard()"), a "Fixes:" tag
-is also added for the commit to make sure people won't miss this patch
-after applying the change of __blkdev_issue_discard().
+Coly Li
 
-Fixes: e056a1b5b67b ("mmc: queue: let host controllers specify maximum discard timeout")
-Fixes: b35fd7422c2f ("block: check queue's limits.discard_granularity in __blkdev_issue_discard()").
-Reported-by: Vicente Bergas <vicencb@gmail.com>
-Signed-off-by: Coly Li <colyli@suse.de>
-Acked-by: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc: Chris Leech <cleech@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Cong Wang <amwang@redhat.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <eric.dumazet@gmail.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Ilya Dryomov <idryomov@gmail.com>
+Cc: Jan Kara <jack@suse.com>
+Cc: Jeff Layton <jlayton@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Lee Duncan <lduncan@suse.com>
+Cc: Mike Christie <michaelc@cs.wisc.edu>
+Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Vasily Averin <vvs@virtuozzo.com>
+Cc: Vlastimil Babka <vbabka@suse.com>
 ---
-Changelog,
-v3, add Fixes tag for both commits.
-v2, change commit id of the Fixes tag.
-v1, initial version.
+Changelog:
+v9, fix a typo pointed out by Greg KH.
+    add Acked-by tags from Martin K. Petersen and Ilya Dryomov.
+v8: add WARN_ONCE() in kernel_sendpage() as Christoph suggested.
+v7: remove outer brackets from the return line of sendpage_ok() as
+    Eric Dumazet suggested.
+v6: fix page check in do_tcp_sendpages(), as Eric Dumazet suggested.
+    replace other open coded checks with sendpage_ok() in libceph,
+    iscsi drivers.
+v5, include linux/mm.h in include/linux/net.h
+v4, change sendpage_ok() as an inline helper, and post it as
+    separate patch, as Christoph Hellwig suggested.
+v3, introduce a more common sendpage_ok() as Sagi Grimberg suggested.
+v2, fix typo in patch subject
+v1, the initial version.
 
- drivers/mmc/core/queue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 6c022ef0f84d..350d0cc4ee62 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct request_queue *q,
- 	q->limits.discard_granularity = card->pref_erase << 9;
- 	/* granularity must not be greater than max. discard */
- 	if (card->pref_erase > max_discard)
--		q->limits.discard_granularity = 0;
-+		q->limits.discard_granularity = SECTOR_SIZE;
- 	if (mmc_can_secure_erase_trim(card))
- 		blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
- }
+Coly Li (7):
+  net: introduce helper sendpage_ok() in include/linux/net.h
+  net: add WARN_ONCE in kernel_sendpage() for improper zero-copy send
+  nvme-tcp: check page by sendpage_ok() before calling kernel_sendpage()
+  tcp: use sendpage_ok() to detect misused .sendpage
+  drbd: code cleanup by using sendpage_ok() to check page for
+    kernel_sendpage()
+  scsi: libiscsi: use sendpage_ok() in iscsi_tcp_segment_map()
+  libceph: use sendpage_ok() in ceph_tcp_sendpage()
+
+ drivers/block/drbd/drbd_main.c |  2 +-
+ drivers/nvme/host/tcp.c        |  7 +++----
+ drivers/scsi/libiscsi_tcp.c    |  2 +-
+ include/linux/net.h            | 16 ++++++++++++++++
+ net/ceph/messenger.c           |  2 +-
+ net/ipv4/tcp.c                 |  3 ++-
+ net/socket.c                   |  6 ++++--
+ 7 files changed, 28 insertions(+), 10 deletions(-)
+
 -- 
 2.26.2
 
