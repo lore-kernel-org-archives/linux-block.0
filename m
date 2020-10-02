@@ -2,62 +2,133 @@ Return-Path: <SRS0=oVJv=DJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF11FC4363D
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 06:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4E0C4363D
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 08:27:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4F20206DD
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 06:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD8B3206B8
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 08:27:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726042AbgJBGuT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Oct 2020 02:50:19 -0400
-Received: from verein.lst.de ([213.95.11.211]:51231 "EHLO verein.lst.de"
+        id S2387597AbgJBI1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Oct 2020 04:27:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49210 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725968AbgJBGuS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Oct 2020 02:50:18 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id C736F68B02; Fri,  2 Oct 2020 08:50:15 +0200 (CEST)
-Date:   Fri, 2 Oct 2020 08:50:15 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        Minho Ban <mhban@samsung.com>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux PM <linux-pm@vger.kernel.org>
-Subject: Re: [PATCH 2/2] PM/hibernate: remove the bogus call to get_gendisk
- in software_resume
-Message-ID: <20201002065015.GA9691@lst.de>
-References: <20200925161447.1486883-1-hch@lst.de> <20200925161447.1486883-3-hch@lst.de> <CAJZ5v0h8TbOZ=seE8+OqFKTRxOYK25aTXDam7Lez0VR5qnkM3Q@mail.gmail.com>
+        id S1725993AbgJBI1y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Oct 2020 04:27:54 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 37D19AC82;
+        Fri,  2 Oct 2020 08:27:52 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     davem@davemloft.net, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
+        ceph-devel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Chris Leech <cleech@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Cong Wang <amwang@redhat.com>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Ilya Dryomov <idryomov@gmail.com>, Jan Kara <jack@suse.com>,
+        Jeff Layton <jlayton@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Lee Duncan <lduncan@suse.com>,
+        Mike Christie <michaelc@cs.wisc.edu>,
+        Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Vasily Averin <vvs@virtuozzo.com>,
+        Vlastimil Babka <vbabka@suse.com>
+Subject: [PATCH v10 0/7] Introduce sendpage_ok() to detect misused sendpage in network related drivers
+Date:   Fri,  2 Oct 2020 16:27:27 +0800
+Message-Id: <20201002082734.13925-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJZ5v0h8TbOZ=seE8+OqFKTRxOYK25aTXDam7Lez0VR5qnkM3Q@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 30, 2020 at 05:45:27PM +0200, Rafael J. Wysocki wrote:
-> On Fri, Sep 25, 2020 at 6:15 PM Christoph Hellwig <hch@lst.de> wrote:
-> >
-> > get_gendisk grabs a reference on the disk and file operation, so this
-> > code will leak both of them while having absolutely no use for the
-> > gendisk itself.
-> >
-> > This effectively reverts commit 2df83fa4bce421f
-> > ("PM / Hibernate: Use get_gendisk to verify partition if resume_file is integer format")
-> >
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> 
-> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+As Sagi Grimberg suggested, the original fix is refind to a more common
+inline routine:
+    static inline bool sendpage_ok(struct page *page)
+    {
+        return  (!PageSlab(page) && page_count(page) >= 1);
+    }
+If sendpage_ok() returns true, the checking page can be handled by the
+concrete zero-copy sendpage method in network layer.
 
-Can you pick it up through the PM tree?  The big rework in this area
-I have planned won't land before 5.11 anyway.
+The v10 series has 7 patches, fixes a WARN_ONCE() usage from v9 series,
+- The 1st patch in this series introduces sendpage_ok() in header file
+  include/linux/net.h.
+- The 2nd patch adds WARN_ONCE() for improper zero-copy send in
+  kernel_sendpage().
+- The 3rd patch fixes the page checking issue in nvme-over-tcp driver.
+- The 4th patch adds page_count check by using sendpage_ok() in
+  do_tcp_sendpages() as Eric Dumazet suggested.
+- The 5th and 6th patches just replace existing open coded checks with
+  the inline sendpage_ok() routine.
+
+Coly Li
+
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc: Chris Leech <cleech@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Cong Wang <amwang@redhat.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <eric.dumazet@gmail.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Ilya Dryomov <idryomov@gmail.com>
+Cc: Jan Kara <jack@suse.com>
+Cc: Jeff Layton <jlayton@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Lee Duncan <lduncan@suse.com>
+Cc: Mike Christie <michaelc@cs.wisc.edu>
+Cc: Mikhail Skorzhinskii <mskorzhinskiy@solarflare.com>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Vasily Averin <vvs@virtuozzo.com>
+Cc: Vlastimil Babka <vbabka@suse.com>
+---
+Changelog:
+v10, fix WARN_ONCE() usage, and add Reivewed-by tag from Lee Duncan.
+v9, fix a typo pointed out by Greg KH.
+    add Acked-by tags from Martin K. Petersen and Ilya Dryomov.
+v8: add WARN_ONCE() in kernel_sendpage() as Christoph suggested.
+v7: remove outer brackets from the return line of sendpage_ok() as
+    Eric Dumazet suggested.
+v6: fix page check in do_tcp_sendpages(), as Eric Dumazet suggested.
+    replace other open coded checks with sendpage_ok() in libceph,
+    iscsi drivers.
+v5, include linux/mm.h in include/linux/net.h
+v4, change sendpage_ok() as an inline helper, and post it as
+    separate patch, as Christoph Hellwig suggested.
+v3, introduce a more common sendpage_ok() as Sagi Grimberg suggested.
+v2, fix typo in patch subject
+v1, the initial version. 
+
+Coly Li (7):
+  net: introduce helper sendpage_ok() in include/linux/net.h
+  net: add WARN_ONCE in kernel_sendpage() for improper zero-copy send
+  nvme-tcp: check page by sendpage_ok() before calling kernel_sendpage()
+  tcp: use sendpage_ok() to detect misused .sendpage
+  drbd: code cleanup by using sendpage_ok() to check page for
+    kernel_sendpage()
+  scsi: libiscsi: use sendpage_ok() in iscsi_tcp_segment_map()
+  libceph: use sendpage_ok() in ceph_tcp_sendpage()
+
+ drivers/block/drbd/drbd_main.c |  2 +-
+ drivers/nvme/host/tcp.c        |  7 +++----
+ drivers/scsi/libiscsi_tcp.c    |  2 +-
+ include/linux/net.h            | 16 ++++++++++++++++
+ net/ceph/messenger.c           |  2 +-
+ net/ipv4/tcp.c                 |  3 ++-
+ net/socket.c                   |  6 ++++--
+ 7 files changed, 28 insertions(+), 10 deletions(-)
+
+-- 
+2.26.2
+
