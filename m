@@ -2,57 +2,62 @@ Return-Path: <SRS0=oVJv=DJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E785C47423
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 06:45:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF11FC4363D
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 06:50:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A4712072E
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 06:45:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4F20206DD
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 06:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726017AbgJBGpL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Oct 2020 02:45:11 -0400
-Received: from verein.lst.de ([213.95.11.211]:51214 "EHLO verein.lst.de"
+        id S1726042AbgJBGuT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Oct 2020 02:50:19 -0400
+Received: from verein.lst.de ([213.95.11.211]:51231 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725968AbgJBGpL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Oct 2020 02:45:11 -0400
+        id S1725968AbgJBGuS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Oct 2020 02:50:18 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id A2DCC68B02; Fri,  2 Oct 2020 08:45:06 +0200 (CEST)
-Date:   Fri, 2 Oct 2020 08:45:05 +0200
+        id C736F68B02; Fri,  2 Oct 2020 08:50:15 +0200 (CEST)
+Date:   Fri, 2 Oct 2020 08:50:15 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH blk-next 1/2] blk-mq-rdma: Delete not-used multi-queue
- RDMA map queue code
-Message-ID: <20201002064505.GA9593@lst.de>
-References: <20200929091358.421086-1-leon@kernel.org> <20200929091358.421086-2-leon@kernel.org> <20200929102046.GA14445@lst.de> <20200929103549.GE3094@unreal> <879916e4-b572-16b9-7b92-94dba7e918a3@grimberg.me>
+To:     "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
+        Minho Ban <mhban@samsung.com>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>
+Subject: Re: [PATCH 2/2] PM/hibernate: remove the bogus call to get_gendisk
+ in software_resume
+Message-ID: <20201002065015.GA9691@lst.de>
+References: <20200925161447.1486883-1-hch@lst.de> <20200925161447.1486883-3-hch@lst.de> <CAJZ5v0h8TbOZ=seE8+OqFKTRxOYK25aTXDam7Lez0VR5qnkM3Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <879916e4-b572-16b9-7b92-94dba7e918a3@grimberg.me>
+In-Reply-To: <CAJZ5v0h8TbOZ=seE8+OqFKTRxOYK25aTXDam7Lez0VR5qnkM3Q@mail.gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 29, 2020 at 11:24:49AM -0700, Sagi Grimberg wrote:
-> Yes, basically usage of managed affinity caused people to report
-> regressions not being able to change irq affinity from procfs.
+On Wed, Sep 30, 2020 at 05:45:27PM +0200, Rafael J. Wysocki wrote:
+> On Fri, Sep 25, 2020 at 6:15 PM Christoph Hellwig <hch@lst.de> wrote:
+> >
+> > get_gendisk grabs a reference on the disk and file operation, so this
+> > code will leak both of them while having absolutely no use for the
+> > gendisk itself.
+> >
+> > This effectively reverts commit 2df83fa4bce421f
+> > ("PM / Hibernate: Use get_gendisk to verify partition if resume_file is integer format")
+> >
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> 
+> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-Well, why would they change it?  The whole point of the infrastructure
-is that there is a single sane affinity setting for a given setup. Now
-that setting needed some refinement from the original series (e.g. the
-current series about only using housekeeping cpus if cpu isolation is
-in use).  But allowing random users to modify affinity is just a receipe
-for a trainwreck.
-
-So I think we need to bring this back ASAP, as doing affinity right
-out of the box is an absolute requirement for sane performance without
-all the benchmarketing deep magic.
+Can you pick it up through the PM tree?  The big rework in this area
+I have planned won't land before 5.11 anyway.
