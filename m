@@ -2,159 +2,106 @@ Return-Path: <SRS0=oVJv=DJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A5FC4363D
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 16:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E27C4363C
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 17:47:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CFFB2137B
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 16:47:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601657239;
-	bh=C5WPK5CZPKLO2lWVgIHLaU7b38EYaryCUeyxv2/Hv/I=;
-	h=Subject:To:Cc:References:From:Date:In-Reply-To:List-ID:From;
-	b=xbrekvTKerCGM1gcLffMrgV4wHl/NBa8T+zPr1gm3t/ceqwZ9dPmaGwZjecELEMeS
-	 VXDi9Qt9UMl1pPOmFSHUlvFHAhjeYgQ9L5zcrY+Vn6I0tYYHQ3uKBkky1CVTaZ7DDA
-	 hneLQ6QNlLUAonbCXKHs4tz14mGDi2Qdrz7sYvQQ=
+	by mail.kernel.org (Postfix) with ESMTP id 3E5C6206DD
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 17:47:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pxT99LNC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388175AbgJBQrR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Oct 2020 12:47:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47628 "EHLO
+        id S2388064AbgJBRrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Oct 2020 13:47:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388170AbgJBQrR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Oct 2020 12:47:17 -0400
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22986C0613E9
-        for <linux-block@vger.kernel.org>; Fri,  2 Oct 2020 09:47:17 -0700 (PDT)
-Received: by mail-io1-xd43.google.com with SMTP id u19so2245813ion.3
-        for <linux-block@vger.kernel.org>; Fri, 02 Oct 2020 09:47:17 -0700 (PDT)
+        with ESMTP id S1726017AbgJBRrr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Oct 2020 13:47:47 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7FEDC0613D0
+        for <linux-block@vger.kernel.org>; Fri,  2 Oct 2020 10:47:45 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id v8so2426940iom.6
+        for <linux-block@vger.kernel.org>; Fri, 02 Oct 2020 10:47:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Li4M3GK5y6x0SzTfqjxLLA9AT+ROiUGVRcFqRzm5Djg=;
-        b=a1gXL5toNpXLmacnL7yhtJtYu+HmO+zq2HSfVRcyZ9z5aGYPOUMcOsxSjRxLjTiwhj
-         zJBgESeE1qI3ToOAsK8MZWwKmHt51a3nMoD6FLDGupRKEjHEktpPC4yX8sNz7w/nKYtr
-         hL0t3LhSNNDXOlNOrlInWA796iaMFGVw4FjQQ=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=rv5qVj3+rF5ltroQE/F5cU/WaAvUhON77A31FZqvAZk=;
+        b=pxT99LNCA1I66d/VaiCp9y9oQDM6llWuipEoaBm9aGmWHNQekHPU1RrHbgrBzW57cR
+         Qi9r6wLBuiFHxs/jQp35XI6lmj7RCKl8n/lHlHOBy06RbMjlXNouLbjqqdORGgZYAVOZ
+         ODcAqKrC+aq8CqxIR3NImJtimeCmzutG8vBXPDHKSr2FGREYquY2wTdFnkZKb3wm6D08
+         7kOwVGJ+VwKtpaNjMef9CnGX8RJrf1YILQqFHmr/AQUnl44QDWvw4W1k+MkN7ZqFuHk2
+         t5Dw+4GMkCNSWPbwgYufKBaAveunXtWiamBzHy7PIJ5kBzKmnR2HLUXCGTgjq5HN4GgB
+         pg1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Li4M3GK5y6x0SzTfqjxLLA9AT+ROiUGVRcFqRzm5Djg=;
-        b=M7Ml3D0vWMDSpNljnhCQB6u6r0Xo6nTC3g8TOFgXYLQCZNGBbw0WaL0e4PJB2+m8pl
-         cLng1DjzjQtHknOiyBg36YR1XMfeHmZksz0ZqOc3FhfQlGN+2K5UfTvBZPiHENwMQFyy
-         +FVOmXlBi9UfFTxadj+By/1EWqzC0HcKPNms+CHvo1ygYugNph8nt6lDVcjmwRy/8vg2
-         arfiTYcgWppHSb46VBFmyAoXyEpcVl85SnlV7IjlZhXEYbMD53qjyRBXZzEZjP0hlcht
-         9kaIVBr3e805kgDjYRZwO89py0d96fEhLLGjuKoJb8pqW3DyCleSRxDh283pxn7sRJJd
-         YuYw==
-X-Gm-Message-State: AOAM530IS6c23biwewBRHNkRkV2tPL+h4bfUhJCq3rHaTjoDq9YtDYo/
-        AOMENY3pKTZiy7JwgYr95M3/gQ==
-X-Google-Smtp-Source: ABdhPJzrfRpNIYzV2uFrhJdCHt/QTSYBKDnpK2pS6zKI5Da6BP91uaqOQt3S2LEYZ+yKmaDKjo66AQ==
-X-Received: by 2002:a05:6638:10e9:: with SMTP id g9mr2960820jae.139.1601657236070;
-        Fri, 02 Oct 2020 09:47:16 -0700 (PDT)
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
-        by smtp.gmail.com with ESMTPSA id h2sm932771ioj.5.2020.10.02.09.47.14
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=rv5qVj3+rF5ltroQE/F5cU/WaAvUhON77A31FZqvAZk=;
+        b=jxxx+81i/YsV5XRJ4NbwRCZudkyA317SVhcHdbHTA2eQFoJh0JaQCvzvbhL08tOs/I
+         dY4c0xM8EPy7w/fTmcS3szRGLOFcm76BUAqvhONuWBGBSmBs0kU39ewZY/R3+Df0luUy
+         O7Q8vi5RLsSIIBf8op4PsIBPSzBHy+IcEY5INR4blv1H2kaDmtQ6LD8lmPnnoD1hq+tw
+         ooE+pUX4453/ItmBIv0PwwM0gG2f0YKpN61QcK1jFNLufMjJYicSv1Io0VtbDBGNvmrk
+         1yN/EuJ7Q7akttZ7yceocEhku0GSFrQG774Wog+gMrA+dxOX8LnFkrwCF0nLUfnMCs0n
+         EaFg==
+X-Gm-Message-State: AOAM530RD7fRnVy2yVtCa6ChPPJEBFcYKSxh1Mq5MwWHQRy3QMPONCLm
+        qtdc61gNplgunq8/wcr+l9UYA720YHydaQ==
+X-Google-Smtp-Source: ABdhPJw3Cv6JvIcN7c4cZ3ixQLbFNVEK0OapWBoywHQQ/W/IonuOwRNyQb5IXL4C86V4zdxS1AwYpQ==
+X-Received: by 2002:a5d:8b46:: with SMTP id c6mr2812606iot.69.1601660864935;
+        Fri, 02 Oct 2020 10:47:44 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id v78sm1052336ilk.20.2020.10.02.10.47.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Oct 2020 09:47:15 -0700 (PDT)
-Subject: Re: [PATCH 00/18] use semicolons rather than commas to separate
- statements
-To:     Joe Perches <joe@perches.com>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Shuah Khan <shuah@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, linux-iio@vger.kernel.org,
-        drbd-dev@tron.linbit.com,
-        =?UTF-8?Q?Valdis_Kl=c4=93tnieks?= <valdis.kletnieks@vt.edu>,
-        David Lechner <david@lechnology.com>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        linux-wireless@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-amlogic@lists.infradead.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        openipmi-developer@lists.sourceforge.net,
-        linux-clk@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Jerome Brunet <jbrunet@baylibre.com>
-References: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
- <CAMj1kXGh+CzuXkAnqsoMO2A3T1p=D6uFOV347Ym5+VFn5U1gWg@mail.gmail.com>
- <20200929124108.GY4282@kadam>
- <alpine.DEB.2.22.394.2009291445050.2808@hadrien>
- <5f0d2b20f5088281363bb4a35c5652a2c087f159.camel@perches.com>
- <cd75e2d1-9923-b725-78cd-fd5611431584@linuxfoundation.org>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <81b94c3a-43d6-c9f5-0bc0-43bf65b3d5fc@linuxfoundation.org>
-Date:   Fri, 2 Oct 2020 10:47:13 -0600
+        Fri, 02 Oct 2020 10:47:44 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 5.9-rc
+Message-ID: <5d07d1d6-174d-f131-71e7-712c207ebcf2@kernel.dk>
+Date:   Fri, 2 Oct 2020 11:47:43 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <cd75e2d1-9923-b725-78cd-fd5611431584@linuxfoundation.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/29/20 7:42 AM, Shuah Khan wrote:
-> On 9/29/20 7:34 AM, Joe Perches wrote:
->> On Tue, 2020-09-29 at 14:47 +0200, Julia Lawall wrote:
->>> On Tue, 29 Sep 2020, Dan Carpenter wrote:
->>>> The times where commas are used deliberately to replace curly braces 
->>>> are
->>>> just evil.  Either way the code is cleaner with semi-colons.
->>>
->>> I also found exaamples like the following to be particularly unforunate:
->>>
->>>                                  fprintf(stderr,
->>>                                          "page_nr %lu wrong count %Lu 
->>> %Lu\n",
->>>                                         page_nr, count,
->>>                                         count_verify[page_nr]), exit(1);
->>>
->>> The exit is very hard to see, unless you know to look for it.
->>
->> I sent that patch last month.
->> https://patchwork.kernel.org/patch/11734877/
->>
-> 
-> I see what happened. This patch touches lib, cpupower, and selftests.
-> Guess lost in the limbo of who takes it.
-> 
->   tools/lib/subcmd/help.c                    |  10 +-
->   tools/power/cpupower/utils/cpufreq-set.c   |  14 +-
->   tools/testing/selftests/vm/gup_benchmark.c |  18 +-
->   tools/testing/selftests/vm/userfaultfd.c   | 296 +++++++++++++--------
->   4 files changed, 210 insertions(+), 128 deletions(-)
-> 
-> I can take it through one of my trees.
-> 
+Hi Linus,
 
-Rafael, Andrew,
+Single fix for a ->commit_rqs failure case.
 
-This patch is now applied to
-https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git 
-fixes branch.
-
-This spans pm, kselftest-mm tests and tools/lib and has been
-in limbo for a few weeks for that reason.
-
-I decided to take this through kselftest tree to avoid having
-Joe split the patches.
-
-thanks,
--- Shuah
+Please pull!
 
 
+The following changes since commit 3aab91774bbd8e571cfaddaf839aafd07718333c:
 
+  block: remove unused BLK_QC_T_EAGAIN flag (2020-09-25 07:54:50 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.9-2020-10-02
+
+for you to fetch changes up to 632bfb6323799c087fcb4108dfe59518609667a7:
+
+  blk-mq: call commit_rqs while list empty but error happen (2020-09-29 08:10:17 -0600)
+
+----------------------------------------------------------------
+block-5.9-2020-10-02
+
+----------------------------------------------------------------
+yangerkun (1):
+      blk-mq: call commit_rqs while list empty but error happen
+
+ block/blk-mq.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+-- 
+Jens Axboe
 
