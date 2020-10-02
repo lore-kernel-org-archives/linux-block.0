@@ -2,105 +2,242 @@ Return-Path: <SRS0=oVJv=DJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F3C9C4363D
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 12:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 973DCC4363D
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 13:01:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AB8B20708
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 12:57:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 477BC206E3
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 13:01:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="N6+ZDP0R"
+	dkim=pass (1024-bit key) header.d=veeam.com header.i=@veeam.com header.b="D7VABUE4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387857AbgJBM5U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Oct 2020 08:57:20 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:50426 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726017AbgJBM5U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Oct 2020 08:57:20 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 092CeFiN068695;
-        Fri, 2 Oct 2020 12:57:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=Yz+Q6OE1DXZBCUdtHcDuHW69uia55WS2ndwEbX+ut20=;
- b=N6+ZDP0R6cAyerDaiKg41K5byE5nc4auXRnESlnhLPd2osbRrAE7QflgU+Clbl0q2N9E
- WjdEbHhSqp6IX/KxluBzL8LMYL9hrHRLfzUw7i7B9oKA4xdeFZ1ohpwlEAJ72qlwSmvh
- oBFk1mGosAaJZWF2Jep8NElDM8D+YyHxg5ytInqnkweRSfYSnqKItdvCgh2dh6arqUE4
- 8jTadlvtxsT0zNDrap93w8lVKg2KpqNvjMqs0Uc2nRZkv3kKz0+H3XHIv0/jjQcrXII2
- jFaYPU+sHYhOEt0op8QEDux6s3EEq+4okEIs6uw7d0Oyv8NHqMy3MCrkn+/bpNL8jRoG cw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2130.oracle.com with ESMTP id 33wupg1q61-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 02 Oct 2020 12:57:14 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 092CuZbI176214;
-        Fri, 2 Oct 2020 12:57:13 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 33tfj3226b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 02 Oct 2020 12:57:13 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 092CvCuS027221;
-        Fri, 2 Oct 2020 12:57:12 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 02 Oct 2020 05:57:11 -0700
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Vicente Bergas <vicencb@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Subject: Re: [PATCH v4] mmc: core: don't set limits.discard_granularity as 0
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1pn60g5r4.fsf@ca-mkp.ca.oracle.com>
-References: <20201002013852.51968-1-colyli@suse.de>
-Date:   Fri, 02 Oct 2020 08:57:09 -0400
-In-Reply-To: <20201002013852.51968-1-colyli@suse.de> (Coly Li's message of
-        "Fri, 2 Oct 2020 09:38:52 +0800")
+        id S2387777AbgJBNBU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Oct 2020 09:01:20 -0400
+Received: from mx2.veeam.com ([64.129.123.6]:53752 "EHLO mx2.veeam.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726029AbgJBNBU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Oct 2020 09:01:20 -0400
+X-Greylist: delayed 355 seconds by postgrey-1.27 at vger.kernel.org; Fri, 02 Oct 2020 09:01:18 EDT
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id BC6F641351;
+        Fri,  2 Oct 2020 08:55:17 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
+        t=1601643318; bh=ZJ/ocNO5lMu2BA92+jTuM3MeJsRqnpIpfBb0bZxFk4A=;
+        h=From:To:CC:Subject:Date:From;
+        b=D7VABUE4/1RjMmBoxuBG6ijzMdir/dW/vivU7NpTM3xZPLN8L8xPTZHFPl5+YuV4c
+         CUAXw10MiVJU5Yu1qlcn1Q8MnYQ/0ScbXw2a18fY0s7YreKTten/Mm073OyaNv37wT
+         G7JrOtXYfwc4Hm3nnFEzUdL5qgWta5c1Zs+4OvGk=
+Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
+ prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.595.3;
+ Fri, 2 Oct 2020 14:55:15 +0200
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     <axboe@kernel.dk>, <mchehab+huawei@kernel.org>,
+        <davem@davemloft.net>, <robh@kernel.org>, <koct9i@gmail.com>,
+        <damien.lemoal@wdc.com>, <jack@suse.cz>, <ming.lei@redhat.com>,
+        <steve@sk2.org>, <linux-kernel@vger.kernel.org>,
+        <linux-kbuild@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Subject: [PATCH 0/1] Block snapshot module and block layer filter API
+Date:   Fri, 2 Oct 2020 15:56:01 +0300
+Message-ID: <1601643362-7370-1-git-send-email-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9761 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999 bulkscore=0
- phishscore=0 malwarescore=0 adultscore=0 suspectscore=1 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010020100
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9761 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 impostorscore=0 priorityscore=1501 clxscore=1011
- phishscore=0 mlxscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
- suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010020099
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.0.172) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29C604D26B6C7C67
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello everyone! Requesting for your comments and suggestions.
 
-Coly,
+We propose a new kernel module - blk-snap.
 
-> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-> index 6c022ef0f84d..350d0cc4ee62 100644
-> --- a/drivers/mmc/core/queue.c
-> +++ b/drivers/mmc/core/queue.c
-> @@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct request_queue *q,
->  	q->limits.discard_granularity = card->pref_erase << 9;
->  	/* granularity must not be greater than max. discard */
->  	if (card->pref_erase > max_discard)
-> -		q->limits.discard_granularity = 0;
-> +		q->limits.discard_granularity = SECTOR_SIZE;
->  	if (mmc_can_secure_erase_trim(card))
->  		blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
->  }
+This module implements snapshot and changed block tracking functionality.
+It is intended to create backup copies of any block devices without usage
+of device-mapper.
+Snapshots are temporary and are destroyed after the backup process has
+finished. Changed block tracking allows for incremental and differential
+backup copies.
 
-The granularity should probably be set to the logical block size instead
-of SECTOR_SIZE. However, looking at mmc_setup_queue() it doesn't appear
-the logical block size is read from the CSD until after discard has been
-configured. So that will require a bit of code shuffling.
+blk-snap uses block layer filter API.
+Block layer filter API provides a callback to intercept bio-requests.
+If a block device disappears for whatever reason, send a synchronous
+request to remove the device from filtering.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Previously, we have already offered a patch with the implementation of the
+block layer filter api (https://patchwork.kernel.org/patch/11741447/).
+Link to that discussion:
+https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2290127.html.
+Now we also offer the in-tree module.
+
+blk-snap kernel module is a product of a deep refactoring of the
+out-of-tree kernel veeamsnap (https://github.com/veeam/veeamsnap/) module:
+* all conditional compilation branches that served for the purpose of
+compatibility with older kernels have been removed;
+* linux kernel code style has been applied;
+* blk-snap mostly takes advantage of the existing kernel code instead of
+reinventing the wheel;
+* all redundant code (such as persistent cbt and snapstore collector) has
+been removed.
+
+We would appreciate your feedback!
+
+Several important things are still have to be done:
+* refactoring the module interface for interaction with a user-space code,
+it is already clear that the implementation of some calls can be improved;
+* haven't yet tested the build on architectures other than x86_64;
+* the user-space library is not ready yet and tool to control the module
+is to be created;
+* autotests need to be created;
+* regression testing has been conducted in a cursory manner, so there is
+a chance for mistakes.
+
+
+Sergei Shtepa (1):
+  blk-snap - Block snapshot module This module implements snapshot and
+    changed block tracking functionality. It is intended to create
+    backup copies of any block devices without usage of device-mapper.
+
+ MAINTAINERS                                 |  14 +
+ block/Kconfig                               |  11 +
+ block/Makefile                              |   1 +
+ block/blk-core.c                            |  11 +-
+ block/blk-filter-internal.h                 |  34 +
+ block/blk-filter.c                          | 288 ++++++
+ block/genhd.c                               |  24 +
+ drivers/block/Kconfig                       |   6 +-
+ drivers/block/Makefile                      |   3 +-
+ drivers/block/blk-snap/Kconfig              |  24 +
+ drivers/block/blk-snap/Makefile             |  29 +
+ drivers/block/blk-snap/big_buffer.c         | 193 ++++
+ drivers/block/blk-snap/big_buffer.h         |  24 +
+ drivers/block/blk-snap/blk-snap-ctl.h       | 190 ++++
+ drivers/block/blk-snap/blk_deferred.c       | 566 +++++++++++
+ drivers/block/blk-snap/blk_deferred.h       |  67 ++
+ drivers/block/blk-snap/blk_descr_file.c     |  82 ++
+ drivers/block/blk-snap/blk_descr_file.h     |  26 +
+ drivers/block/blk-snap/blk_descr_mem.c      |  66 ++
+ drivers/block/blk-snap/blk_descr_mem.h      |  14 +
+ drivers/block/blk-snap/blk_descr_multidev.c |  86 ++
+ drivers/block/blk-snap/blk_descr_multidev.h |  25 +
+ drivers/block/blk-snap/blk_descr_pool.c     | 190 ++++
+ drivers/block/blk-snap/blk_descr_pool.h     |  38 +
+ drivers/block/blk-snap/blk_redirect.c       | 507 ++++++++++
+ drivers/block/blk-snap/blk_redirect.h       |  73 ++
+ drivers/block/blk-snap/blk_util.c           |  33 +
+ drivers/block/blk-snap/blk_util.h           |  10 +
+ drivers/block/blk-snap/cbt_map.c            | 210 +++++
+ drivers/block/blk-snap/cbt_map.h            |  62 ++
+ drivers/block/blk-snap/common.h             |  29 +
+ drivers/block/blk-snap/ctrl_fops.c          | 693 ++++++++++++++
+ drivers/block/blk-snap/ctrl_fops.h          |  19 +
+ drivers/block/blk-snap/ctrl_pipe.c          | 562 +++++++++++
+ drivers/block/blk-snap/ctrl_pipe.h          |  34 +
+ drivers/block/blk-snap/ctrl_sysfs.c         |  73 ++
+ drivers/block/blk-snap/ctrl_sysfs.h         |   5 +
+ drivers/block/blk-snap/defer_io.c           | 393 ++++++++
+ drivers/block/blk-snap/defer_io.h           |  39 +
+ drivers/block/blk-snap/filter.c             |  72 ++
+ drivers/block/blk-snap/filter.h             |   7 +
+ drivers/block/blk-snap/main.c               |  83 ++
+ drivers/block/blk-snap/params.c             |  57 ++
+ drivers/block/blk-snap/params.h             |  29 +
+ drivers/block/blk-snap/rangevector.c        |  85 ++
+ drivers/block/blk-snap/rangevector.h        |  31 +
+ drivers/block/blk-snap/snapimage.c          | 982 ++++++++++++++++++++
+ drivers/block/blk-snap/snapimage.h          |  16 +
+ drivers/block/blk-snap/snapshot.c           | 228 +++++
+ drivers/block/blk-snap/snapshot.h           |  17 +
+ drivers/block/blk-snap/snapstore.c          | 929 ++++++++++++++++++
+ drivers/block/blk-snap/snapstore.h          |  68 ++
+ drivers/block/blk-snap/snapstore_device.c   | 532 +++++++++++
+ drivers/block/blk-snap/snapstore_device.h   |  63 ++
+ drivers/block/blk-snap/snapstore_file.c     |  52 ++
+ drivers/block/blk-snap/snapstore_file.h     |  15 +
+ drivers/block/blk-snap/snapstore_mem.c      |  89 ++
+ drivers/block/blk-snap/snapstore_mem.h      |  20 +
+ drivers/block/blk-snap/snapstore_multidev.c | 118 +++
+ drivers/block/blk-snap/snapstore_multidev.h |  22 +
+ drivers/block/blk-snap/tracker.c            | 521 +++++++++++
+ drivers/block/blk-snap/tracker.h            |  50 +
+ drivers/block/blk-snap/tracking.c           | 260 ++++++
+ drivers/block/blk-snap/tracking.h           |  12 +
+ drivers/block/blk-snap/version.h            |   7 +
+ include/linux/blk-filter.h                  |  41 +
+ include/linux/genhd.h                       |   3 +-
+ 67 files changed, 9157 insertions(+), 6 deletions(-)
+ create mode 100644 block/blk-filter-internal.h
+ create mode 100644 block/blk-filter.c
+ create mode 100644 drivers/block/blk-snap/Kconfig
+ create mode 100644 drivers/block/blk-snap/Makefile
+ create mode 100644 drivers/block/blk-snap/big_buffer.c
+ create mode 100644 drivers/block/blk-snap/big_buffer.h
+ create mode 100644 drivers/block/blk-snap/blk-snap-ctl.h
+ create mode 100644 drivers/block/blk-snap/blk_deferred.c
+ create mode 100644 drivers/block/blk-snap/blk_deferred.h
+ create mode 100644 drivers/block/blk-snap/blk_descr_file.c
+ create mode 100644 drivers/block/blk-snap/blk_descr_file.h
+ create mode 100644 drivers/block/blk-snap/blk_descr_mem.c
+ create mode 100644 drivers/block/blk-snap/blk_descr_mem.h
+ create mode 100644 drivers/block/blk-snap/blk_descr_multidev.c
+ create mode 100644 drivers/block/blk-snap/blk_descr_multidev.h
+ create mode 100644 drivers/block/blk-snap/blk_descr_pool.c
+ create mode 100644 drivers/block/blk-snap/blk_descr_pool.h
+ create mode 100644 drivers/block/blk-snap/blk_redirect.c
+ create mode 100644 drivers/block/blk-snap/blk_redirect.h
+ create mode 100644 drivers/block/blk-snap/blk_util.c
+ create mode 100644 drivers/block/blk-snap/blk_util.h
+ create mode 100644 drivers/block/blk-snap/cbt_map.c
+ create mode 100644 drivers/block/blk-snap/cbt_map.h
+ create mode 100644 drivers/block/blk-snap/common.h
+ create mode 100644 drivers/block/blk-snap/ctrl_fops.c
+ create mode 100644 drivers/block/blk-snap/ctrl_fops.h
+ create mode 100644 drivers/block/blk-snap/ctrl_pipe.c
+ create mode 100644 drivers/block/blk-snap/ctrl_pipe.h
+ create mode 100644 drivers/block/blk-snap/ctrl_sysfs.c
+ create mode 100644 drivers/block/blk-snap/ctrl_sysfs.h
+ create mode 100644 drivers/block/blk-snap/defer_io.c
+ create mode 100644 drivers/block/blk-snap/defer_io.h
+ create mode 100644 drivers/block/blk-snap/filter.c
+ create mode 100644 drivers/block/blk-snap/filter.h
+ create mode 100644 drivers/block/blk-snap/main.c
+ create mode 100644 drivers/block/blk-snap/params.c
+ create mode 100644 drivers/block/blk-snap/params.h
+ create mode 100644 drivers/block/blk-snap/rangevector.c
+ create mode 100644 drivers/block/blk-snap/rangevector.h
+ create mode 100644 drivers/block/blk-snap/snapimage.c
+ create mode 100644 drivers/block/blk-snap/snapimage.h
+ create mode 100644 drivers/block/blk-snap/snapshot.c
+ create mode 100644 drivers/block/blk-snap/snapshot.h
+ create mode 100644 drivers/block/blk-snap/snapstore.c
+ create mode 100644 drivers/block/blk-snap/snapstore.h
+ create mode 100644 drivers/block/blk-snap/snapstore_device.c
+ create mode 100644 drivers/block/blk-snap/snapstore_device.h
+ create mode 100644 drivers/block/blk-snap/snapstore_file.c
+ create mode 100644 drivers/block/blk-snap/snapstore_file.h
+ create mode 100644 drivers/block/blk-snap/snapstore_mem.c
+ create mode 100644 drivers/block/blk-snap/snapstore_mem.h
+ create mode 100644 drivers/block/blk-snap/snapstore_multidev.c
+ create mode 100644 drivers/block/blk-snap/snapstore_multidev.h
+ create mode 100644 drivers/block/blk-snap/tracker.c
+ create mode 100644 drivers/block/blk-snap/tracker.h
+ create mode 100644 drivers/block/blk-snap/tracking.c
+ create mode 100644 drivers/block/blk-snap/tracking.h
+ create mode 100644 drivers/block/blk-snap/version.h
+ create mode 100644 include/linux/blk-filter.h
+
+--
+2.28.0
+
