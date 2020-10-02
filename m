@@ -7,155 +7,198 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F910C47095
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 19:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1992C35257
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 19:39:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4FDC20758
+	by mail.kernel.org (Postfix) with ESMTP id 36E7F20758
 	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 19:39:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YptR3Ltj"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FzjSWXdP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388367AbgJBTjs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2388358AbgJBTjs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 2 Oct 2020 15:39:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24544 "EHLO
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25624 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726224AbgJBTjr (ORCPT
+        by vger.kernel.org with ESMTP id S2388367AbgJBTjr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 2 Oct 2020 15:39:47 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 092Ja5gq039869;
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 092JVEbV168430;
         Fri, 2 Oct 2020 15:39:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=MOQQdNbPOMiNQtKca8KciHgWM+uaX6eiOuWBfLUHIcI=;
- b=YptR3Ltjnjl9+dOI7fqPxBvIWA4T7AYiXVgoQ3iUouDbXMi5cLAhxbYCKmkpJqD2OyWV
- 9RJTOloDmclTuDAcOP7+Iy80JOZMIVdw3m6NlBneXKcuzCJtC0hpZBN1lpPnE3tOGJ3P
- IglcpBJjwupNR0ZadxhTDSKmDH7MRJLT9w6hG8yGdv2LQITrbPs4N7WL3ZQ0W4sF2MKS
- nhSZsEQqRQomKnHAcIZ7xlRIb30EGtJSnNbWRCvDe7lDHyTVv29ZN7C8NYCIF1Xbdvvl
- LYPM4+x6zlTk1kQjziccWr2d0nf1IIpYyiEzs3ZEWbi8RarOWXzPeR/HWozYU0TZ6jc3 +g== 
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33xa0ygps4-1
+ : date : message-id : in-reply-to : references; s=pp1;
+ bh=ELqCMVcwRSnt/DkgeqiRwng6VF8eOsmes3PzPG78T2c=;
+ b=FzjSWXdPgqhCRh+NsRv7Xkx2rLpwM7KRLgTNX1Jksca9CvyrzH3vGwZxtHRXEAVXeXRg
+ YycSrSC9EWoTrYrK7FAvyXTOcLy+yVWNWBrBioqjFiHAHFLQ0ffUU29MOkSCopchxZPJ
+ E0iiEh9win52Wqz5GJJnmZURo9Rgotx24peQM5zPFRtWfTKLfUiLJ02tG5Gg+cIy6m/z
+ olM01uKUWBLNfjMXUmauhlpkfjmnbA09FkxbjGreq2kdACNZPuchfLXlN7kB4BK6To5c
+ paJ60UazOiDkiRwBJmjdP6bSKViLzHDlos76DmNKgGcBGmBxFc2g1DMjUiq6YcW1NJp5 kg== 
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33x9q499hr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 02 Oct 2020 15:39:46 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 092JcGlJ017638;
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 092JcD6k028483;
         Fri, 2 Oct 2020 19:39:44 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 33sw983m2s-1
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 33v5kg1umu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 02 Oct 2020 19:39:44 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 092JdfJE26607888
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 092Jdfek28311910
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Fri, 2 Oct 2020 19:39:41 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30F7642042;
-        Fri,  2 Oct 2020 19:39:41 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E36242041;
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2D34F52050;
         Fri,  2 Oct 2020 19:39:41 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 14F1C52052;
         Fri,  2 Oct 2020 19:39:41 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
-        id A2BBBE02E4; Fri,  2 Oct 2020 21:39:40 +0200 (CEST)
+        id A566BE02F6; Fri,  2 Oct 2020 21:39:40 +0200 (CEST)
 From:   Stefan Haberland <sth@linux.ibm.com>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
         linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
         gor@linux.ibm.com, borntraeger@de.ibm.com
-Subject: [PATCH 01/10] s390/cio: Export information about Endpoint-Security Capability
-Date:   Fri,  2 Oct 2020 21:39:31 +0200
-Message-Id: <20201002193940.24012-2-sth@linux.ibm.com>
+Subject: [PATCH 02/10] s390/cio: Provide Endpoint-Security Mode per CU
+Date:   Fri,  2 Oct 2020 21:39:32 +0200
+Message-Id: <20201002193940.24012-3-sth@linux.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201002193940.24012-1-sth@linux.ibm.com>
 References: <20201002193940.24012-1-sth@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-10-02_14:2020-10-02,2020-10-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 mlxlogscore=999 priorityscore=1501 impostorscore=0
- mlxscore=0 spamscore=0 phishscore=0 malwarescore=0 suspectscore=1
- adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ impostorscore=0 mlxscore=0 mlxlogscore=727 malwarescore=0 phishscore=0
+ spamscore=0 lowpriorityscore=0 suspectscore=1 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2010020137
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Sebastian Ott <sebott@linux.ibm.com>
+From: Vineeth Vijayan <vneethv@linux.ibm.com>
 
-Add a new sysfs attribute 'esc' per chpid. This new attribute exports
-the Endpoint-Security-Capability byte of channel-path description block,
-which could be 0-None, 1-Authentication, 2 and 3-Encryption.
-
-For example:
-$ cat /sys/devices/css0/chp0.34/esc
-0
+Add an interface in the CIO layer to retrieve the information about the
+Endpoint-Security Mode (ESM) of the specified CU. The ESM values are
+defined as 0-None, 1-Authenticated or 2, 3-Encrypted.
 
 Reference-ID: IO1812
 Signed-off-by: Sebastian Ott <sebott@linux.ibm.com>
-[vneethv@linux.ibm.com: cleaned-up & modified description]
+[vneethv@linux.ibm.com: cleaned-up and modified description]
 Signed-off-by: Vineeth Vijayan <vneethv@linux.ibm.com>
-Reviewed-by: Jan Höppner <hoeppner@linux.ibm.com>
 Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
 Acked-by: Vasily Gorbik <gor@linux.ibm.com>
 Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
 ---
- drivers/s390/cio/chp.c  | 15 +++++++++++++++
- drivers/s390/cio/chsc.h |  3 ++-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ arch/s390/include/asm/cio.h |  1 +
+ drivers/s390/cio/chsc.c     | 83 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
 
-diff --git a/drivers/s390/cio/chp.c b/drivers/s390/cio/chp.c
-index dfcbe54591fb..8d0de6adcad0 100644
---- a/drivers/s390/cio/chp.c
-+++ b/drivers/s390/cio/chp.c
-@@ -384,6 +384,20 @@ static ssize_t chp_chid_external_show(struct device *dev,
- }
- static DEVICE_ATTR(chid_external, 0444, chp_chid_external_show, NULL);
+diff --git a/arch/s390/include/asm/cio.h b/arch/s390/include/asm/cio.h
+index b5bfb3123cb1..66e06d0efb72 100644
+--- a/arch/s390/include/asm/cio.h
++++ b/arch/s390/include/asm/cio.h
+@@ -373,5 +373,6 @@ struct gen_pool *cio_gp_dma_create(struct device *dma_dev, int nr_pages);
+ int chsc_sstpc(void *page, unsigned int op, u16 ctrl, u64 *clock_delta);
+ int chsc_sstpi(void *page, void *result, size_t size);
+ int chsc_sgib(u32 origin);
++int chsc_scud(u16 cu, u64 *esm, u8 *esm_valid);
  
-+static ssize_t chp_esc_show(struct device *dev,
-+			    struct device_attribute *attr, char *buf)
+ #endif
+diff --git a/drivers/s390/cio/chsc.c b/drivers/s390/cio/chsc.c
+index c314e9495c1b..513fc5748d6e 100644
+--- a/drivers/s390/cio/chsc.c
++++ b/drivers/s390/cio/chsc.c
+@@ -1403,3 +1403,86 @@ int chsc_sgib(u32 origin)
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(chsc_sgib);
++
++#define SCUD_REQ_LEN	0x10 /* SCUD request block length */
++#define SCUD_REQ_CMD	0x4b /* SCUD Command Code */
++
++struct chse_cudb {
++	u16 flags:8;
++	u16 chp_valid:8;
++	u16 cu;
++	u32 esm_valid:8;
++	u32:24;
++	u8 chpid[8];
++	u32:32;
++	u32:32;
++	u8 esm[8];
++	u32 efla[8];
++} __packed;
++
++struct chsc_scud {
++	struct chsc_header request;
++	u16:4;
++	u16 fmt:4;
++	u16 cssid:8;
++	u16 first_cu;
++	u16:16;
++	u16 last_cu;
++	u32:32;
++	struct chsc_header response;
++	u16:4;
++	u16 fmt_resp:4;
++	u32:24;
++	struct chse_cudb cudb[];
++} __packed;
++
++/**
++ * chsc_scud() - Store control-unit description.
++ * @cu:		number of the control-unit
++ * @esm:	8 1-byte endpoint security mode values
++ * @esm_valid:	validity mask for @esm
++ *
++ * Interface to retrieve information about the endpoint security
++ * modes for up to 8 paths of a control unit.
++ *
++ * Returns 0 on success.
++ */
++int chsc_scud(u16 cu, u64 *esm, u8 *esm_valid)
 +{
-+	struct channel_path *chp = to_channelpath(dev);
-+	ssize_t rc;
++	struct chsc_scud *scud = chsc_page;
++	int ret;
 +
-+	mutex_lock(&chp->lock);
-+	rc = sprintf(buf, "%x\n", chp->desc_fmt1.esc);
-+	mutex_unlock(&chp->lock);
++	spin_lock_irq(&chsc_page_lock);
++	memset(chsc_page, 0, PAGE_SIZE);
++	scud->request.length = SCUD_REQ_LEN;
++	scud->request.code = SCUD_REQ_CMD;
++	scud->fmt = 0;
++	scud->cssid = 0;
++	scud->first_cu = cu;
++	scud->last_cu = cu;
 +
-+	return rc;
++	ret = chsc(scud);
++	if (!ret)
++		ret = chsc_error_from_response(scud->response.code);
++
++	if (!ret && (scud->response.length <= 8 || scud->fmt_resp != 0
++			|| !(scud->cudb[0].flags & 0x80)
++			|| scud->cudb[0].cu != cu)) {
++
++		CIO_MSG_EVENT(2, "chsc: scud failed rc=%04x, L2=%04x "
++			"FMT=%04x, cudb.flags=%02x, cudb.cu=%04x",
++			scud->response.code, scud->response.length,
++			scud->fmt_resp, scud->cudb[0].flags, scud->cudb[0].cu);
++		ret = -EINVAL;
++	}
++
++	if (ret)
++		goto out;
++
++	memcpy(esm, scud->cudb[0].esm, sizeof(*esm));
++	*esm_valid = scud->cudb[0].esm_valid;
++out:
++	spin_unlock_irq(&chsc_page_lock);
++	return ret;
 +}
-+static DEVICE_ATTR(esc, 0444, chp_esc_show, NULL);
-+
- static ssize_t util_string_read(struct file *filp, struct kobject *kobj,
- 				struct bin_attribute *attr, char *buf,
- 				loff_t off, size_t count)
-@@ -414,6 +428,7 @@ static struct attribute *chp_attrs[] = {
- 	&dev_attr_shared.attr,
- 	&dev_attr_chid.attr,
- 	&dev_attr_chid_external.attr,
-+	&dev_attr_esc.attr,
- 	NULL,
- };
- static struct attribute_group chp_attr_group = {
-diff --git a/drivers/s390/cio/chsc.h b/drivers/s390/cio/chsc.h
-index 7ecf7e4c402e..4f049d17355d 100644
---- a/drivers/s390/cio/chsc.h
-+++ b/drivers/s390/cio/chsc.h
-@@ -27,7 +27,8 @@ struct channel_path_desc_fmt1 {
- 	u8 lsn;
- 	u8 desc;
- 	u8 chpid;
--	u32:24;
-+	u32:16;
-+	u8 esc;
- 	u8 chpp;
- 	u32 unused[2];
- 	u16 chid;
++EXPORT_SYMBOL_GPL(chsc_scud);
 -- 
 2.17.1
 
