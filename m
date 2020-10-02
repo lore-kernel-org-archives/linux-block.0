@@ -2,107 +2,176 @@ Return-Path: <SRS0=oVJv=DJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 893B2C4727E
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 01:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 828E5C47423
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 01:35:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 383CD20848
-	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 01:28:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xMJQ47fD"
+	by mail.kernel.org (Postfix) with ESMTP id 4B513207F7
+	for <linux-block@archiver.kernel.org>; Fri,  2 Oct 2020 01:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387531AbgJBB2I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Oct 2020 21:28:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46764 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727780AbgJBB2I (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Oct 2020 21:28:08 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12EEDC0613E2
-        for <linux-block@vger.kernel.org>; Thu,  1 Oct 2020 18:28:08 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id u24so418493pgi.1
-        for <linux-block@vger.kernel.org>; Thu, 01 Oct 2020 18:28:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=i49beg2TUcxlSmAmpEnMzD9aInnD0fnuYKI/AnJhgbE=;
-        b=xMJQ47fDFDHqQa476XcpKAZXW7TuVWgvZW/QmHcAqIuIV9DFSbAX7elelGWEA/G4aX
-         0UnWntItvp/GDW1fAGXNRlpurLCpNL5zedDqrGYI4NIZGfSGPh5g2byO4WCkXTikRQBH
-         f/PfDKhHOm6HGp8xBUm2NQLkJu7sS8jwyKOpTRBN2npTR+/UwGR5Fu9BNXvE94hwPILb
-         Cq6YpCYma90tIC9HKbxtX+YyCnbbOGVUecsie8ED3ZvkRvI3CIl9RKSt79nqpeEV6i3J
-         H8ZQPo6+6oEQw3S8eTFVmE1Eh0Atu1iq4y3B6rHUzxXiCqT9XfOKZEfKFg6+Yegy+neP
-         xOKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=i49beg2TUcxlSmAmpEnMzD9aInnD0fnuYKI/AnJhgbE=;
-        b=jTp9d98QCYpftIkolVu90DcIwfhSFi9xSPz6LoFUn6tNIT14ttozRB8Bv+sfimJAPs
-         7cw3Ibgiz4v1ajA48gJkQsPomZQiq2B5Seod9rixhNsb/NCeAaZ0/TuL1ZkwjPOJXJBi
-         +uGJoEnS7IASg8Vt20J6sofeEZMQeUfYCe+FO7OsKpR1UgJHuIQ2Mhw0e5r2P5JiwWKo
-         JEgxlqGHmFdbxMBlJZ053c5HZN1Qa4Q0dQB3YKYQSpw1t0YyUspDbVXuQAUHU1Urv3O9
-         GmPg62GA5SL7PSD0JJq7aQQwIHkxmqK9O+kve6WYTaCm+rLUFocm1QhyQzNi2h2Lw82f
-         H+Cw==
-X-Gm-Message-State: AOAM533ywf+0f/LS8ZUI8FSh7ZPyTqa3UN6vOMxbVrIp/L6xA9BSK9Nd
-        FNOEvRIQNskMGwGuj/JcU6P0rQ==
-X-Google-Smtp-Source: ABdhPJx4J9xNU2tN+51Poiudt5CAv0U+oeVjUvc0hIUy4PR0CzIyI8s7265jfYspdpKb4EBcKmIdgA==
-X-Received: by 2002:aa7:8ec7:0:b029:13e:d13d:a080 with SMTP id b7-20020aa78ec70000b029013ed13da080mr10086938pfr.23.1601602087508;
-        Thu, 01 Oct 2020 18:28:07 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id w203sm7729589pfc.97.2020.10.01.18.28.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Oct 2020 18:28:06 -0700 (PDT)
-Subject: Re: [PATCH blk-next 0/2] Delete the get_vector_affinity leftovers
-To:     Leon Romanovsky <leonro@nvidia.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Keith Busch <kbusch@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>
-References: <20200929091358.421086-1-leon@kernel.org>
- <20201001050101.GT3094@unreal>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <063a6648-a8bc-cefd-ced8-573d78a9cb8d@kernel.dk>
-Date:   Thu, 1 Oct 2020 19:28:05 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S2387543AbgJBBfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Oct 2020 21:35:05 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54534 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387496AbgJBBfF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Oct 2020 21:35:05 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 0D976B0D1;
+        Fri,  2 Oct 2020 01:35:03 +0000 (UTC)
+Subject: Re: [PATCH v3] mmc: core: don't set limits.discard_granularity as 0
+To:     Vicente Bergas <vicencb@gmail.com>
+Cc:     linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+References: <20201001071824.24995-1-colyli@suse.de>
+ <b3cdb5fe-40df-41df-ae10-0b7be4dcd7a6@gmail.com>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Message-ID: <0eab931f-7f18-0074-3d8c-04ab0cf34e31@suse.de>
+Date:   Fri, 2 Oct 2020 09:34:57 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201001050101.GT3094@unreal>
+In-Reply-To: <b3cdb5fe-40df-41df-ae10-0b7be4dcd7a6@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/30/20 11:01 PM, Leon Romanovsky wrote:
-> On Tue, Sep 29, 2020 at 12:13:56PM +0300, Leon Romanovsky wrote:
->> From: Leon Romanovsky <leonro@nvidia.com>
+On 2020/10/2 02:47, Vicente Bergas wrote:
+> On Thursday, October 1, 2020 9:18:24 AM CEST, Coly Li wrote:
+>> In mmc_queue_setup_discard() the mmc driver queue's discard_granularity
+>> might be set as 0 (when card->pref_erase > max_discard) while the mmc
+>> device still declares to support discard operation. This is buggy and
+>> triggered the following kernel warning message,
 >>
->> There are no drivers that implement .get_vector_affinity(), so delete
->> the RDMA function and simplify block code.
+>> WARNING: CPU: 0 PID: 135 at __blkdev_issue_discard+0x200/0x294
+>> CPU: 0 PID: 135 Comm: f2fs_discard-17 Not tainted 5.9.0-rc6 #1
+>> Hardware name: Google Kevin (DT)
+>> pstate: 00000005 (nzcv daif -PAN -UAO BTYPE=--)
+>> pc : __blkdev_issue_discard+0x200/0x294
+>> lr : __blkdev_issue_discard+0x54/0x294
+>> sp : ffff800011dd3b10
+>> x29: ffff800011dd3b10 x28: 0000000000000000 x27: ffff800011dd3cc4 x26:
+>> ffff800011dd3e18 x25: 000000000004e69b x24: 0000000000000c40 x23:
+>> ffff0000f1deaaf0 x22: ffff0000f2849200 x21: 00000000002734d8 x20:
+>> 0000000000000008 x19: 0000000000000000 x18: 0000000000000000 x17:
+>> 0000000000000000 x16: 0000000000000000 x15: 0000000000000000 x14:
+>> 0000000000000394 x13: 0000000000000000 x12: 0000000000000000 x11:
+>> 0000000000000000 x10: 00000000000008b0 x9 : ffff800011dd3cb0 x8 :
+>> 000000000004e69b x7 : 0000000000000000 x6 : ffff0000f1926400 x5 :
+>> ffff0000f1940800 x4 : 0000000000000000 x3 : 0000000000000c40 x2 :
+>> 0000000000000008 x1 : 00000000002734d8 x0 : 0000000000000000 Call trace:
+>> __blkdev_issue_discard+0x200/0x294
+>> __submit_discard_cmd+0x128/0x374
+>> __issue_discard_cmd_orderly+0x188/0x244
+>> __issue_discard_cmd+0x2e8/0x33c
+>> issue_discard_thread+0xe8/0x2f0
+>> kthread+0x11c/0x120
+>> ret_from_fork+0x10/0x1c
+>> ---[ end trace e4c8023d33dfe77a ]---
 >>
->> Thanks
+>> This patch fixes the issue by setting discard_granularity as SECTOR_SIZE
+>> instead of 0 when (card->pref_erase > max_discard) is true. Now no more
+>> complain from __blkdev_issue_discard() for the improper value of discard
+>> granularity.
 >>
->> P.S. Probably it should go through block tree.
+>> This issue is exposed after commit b35fd7422c2f ("block: check queue's
+>> limits.discard_granularity in __blkdev_issue_discard()"), a "Fixes:" tag
+>> is also added for the commit to make sure people won't miss this patch
+>> after applying the change of __blkdev_issue_discard().
 >>
->> Leon Romanovsky (2):
->>   blk-mq-rdma: Delete not-used multi-queue RDMA map queue code
->>   RDMA/core: Delete not-implemented get_vector_affinity
+>> Fixes: e056a1b5b67b ("mmc: queue: let host controllers specify maximum
+>> discard timeout")
+>> Fixes: b35fd7422c2f ("block: check queue's limits.discard_granularity
+>> in __blkdev_issue_discard()").
+>> Reported-by: Vicente Bergas <vicencb@gmail.com>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Acked-by: Adrian Hunter <adrian.hunter@intel.com>
+>> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+>> ---
+>> Changelog,
+>> v3, add Fixes tag for both commits.
+>> v2, change commit id of the Fixes tag.
+>> v1, initial version.
+>>
+>>  drivers/mmc/core/queue.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+>> index 6c022ef0f84d..350d0cc4ee62 100644
+>> --- a/drivers/mmc/core/queue.c
+>> +++ b/drivers/mmc/core/queue.c
+>> @@ -190,7 +190,7 @@ static void mmc_queue_setup_discard(struct
+>> request_queue *q,
+>>      q->limits.discard_granularity = card->pref_erase << 9;
+>>      /* granularity must not be greater than max. discard */
+>>      if (card->pref_erase > max_discard)
+>> -        q->limits.discard_granularity = 0;
+>> +        q->limits.discard_granularity = SECTOR_SIZE;
+>>      if (mmc_can_secure_erase_trim(card))
+>>          blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
+>>  }
 > 
-> Jens, Keith
+> Tested on rk3399-gru-kevin with f2fs filesystem over the mmc driver, that
+> is, the same setup that reproduced the issue.
+> The kernel warning message is no longer reported.
+> So,
+> Tested-by: Vicente Bergas <vicencb@gmail.com>
 > 
-> How can we progress here?
 
-I'd really like for the nvme side to sign off on this first.
+Hi Vicente,
 
--- 
-Jens Axboe
+Thank you very much!
 
+Coly Li
