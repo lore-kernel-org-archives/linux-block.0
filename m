@@ -2,175 +2,175 @@ Return-Path: <SRS0=8nL5=DK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2ECC4363D
-	for <linux-block@archiver.kernel.org>; Sat,  3 Oct 2020 10:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27231C4363D
+	for <linux-block@archiver.kernel.org>; Sat,  3 Oct 2020 18:40:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBDF2207DE
-	for <linux-block@archiver.kernel.org>; Sat,  3 Oct 2020 10:43:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9B8E206DB
+	for <linux-block@archiver.kernel.org>; Sat,  3 Oct 2020 18:40:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725764AbgJCKnJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Oct 2020 06:43:09 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48952 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725681AbgJCKm5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 3 Oct 2020 06:42:57 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 12058B2B6;
-        Sat,  3 Oct 2020 10:42:55 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-Subject: ...
-To:     David Miller <davem@davemloft.net>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        netdev@vger.kernel.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, chaitanya.kulkarni@wdc.com,
-        cleech@redhat.com, hch@lst.de, amwang@redhat.com,
-        eric.dumazet@gmail.com, hare@suse.de, idryomov@gmail.com,
-        jack@suse.com, jlayton@kernel.org, axboe@kernel.dk,
-        lduncan@suse.com, michaelc@cs.wisc.edu,
-        mskorzhinskiy@solarflare.com, philipp.reisner@linbit.com,
-        sagi@grimberg.me, vvs@virtuozzo.com, vbabka@suse.com
-References: <20201002082734.13925-1-colyli@suse.de>
- <20201002.152829.1002796270145913943.davem@davemloft.net>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <7dcb7b57-9313-0a78-0bf1-be799c0efa52@suse.de>
-Date:   Sat, 3 Oct 2020 18:42:45 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+        id S1725825AbgJCSkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Oct 2020 14:40:55 -0400
+Received: from smtprelay0046.hostedemail.com ([216.40.44.46]:41004 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725816AbgJCSkz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 3 Oct 2020 14:40:55 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 9054F18029210;
+        Sat,  3 Oct 2020 18:40:53 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: stop55_5311f74271af
+X-Filterd-Recvd-Size: 6242
+Received: from XPS-9350.home (unknown [47.151.133.149])
+        (Authenticated sender: joe@perches.com)
+        by omf13.hostedemail.com (Postfix) with ESMTPA;
+        Sat,  3 Oct 2020 18:40:49 +0000 (UTC)
+Message-ID: <f44d19ad596f261c0287c9ab18c45161003efb43.camel@perches.com>
+Subject: Re: [PATCH 00/18] use semicolons rather than commas to separate
+ statements
+From:   Joe Perches <joe@perches.com>
+To:     Mark Brown <broonie@kernel.org>, tools@linux.kernel.org,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc:     linux-iio@vger.kernel.org, Julia Lawall <Julia.Lawall@inria.fr>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        linux-acpi@vger.kernel.org, David Lechner <david@lechnology.com>,
+        Valdis =?UTF-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+        kernel-janitors@vger.kernel.org, drbd-dev@lists.linbit.com,
+        openipmi-developer@lists.sourceforge.net,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        linux-ide@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-wireless@vger.kernel.org,
+        Neil Armstrong <narmstrong@baylibre.com>
+Date:   Sat, 03 Oct 2020 11:40:48 -0700
+In-Reply-To: <20201001110150.GA6715@sirena.org.uk>
+References: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
+         <160132172369.55460.9237357219623604216.b4-ty@kernel.org>
+         <b1174f9be2ce65f6b5ebefcba0b48e792926abbc.camel@perches.com>
+         <20200929113745.GB4799@sirena.org.uk>
+         <db26d49401dc0bd6b9013a603a155f9827f404a4.camel@perches.com>
+         <20201001110150.GA6715@sirena.org.uk>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-In-Reply-To: <20201002.152829.1002796270145913943.davem@davemloft.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/10/3 06:28, David Miller wrote:
-> From: Coly Li <colyli@suse.de>
-> Date: Fri,  2 Oct 2020 16:27:27 +0800
+(Adding tools and Konstantin Ryabitsev)
+
+There seems to be some mismatch between b4's use of the
+cover letter to a patch series and what maintainers that
+apply a subset of the patches in the patch series.
+
+The merge description shows the entire patch series as
+applied, but the actual merge is only a subset of the
+series.
+
+Can this be improved in b4?
+
+For example, regarding:
+
+https://lore.kernel.org/linux-amlogic/160132172369.55460.9237357219623604216.b4-ty@kernel.org/
+https://lore.kernel.org/lkml/b1174f9be2ce65f6b5ebefcba0b48e792926abbc.camel@perches.com/#t
+
+On Thu, 2020-10-01 at 12:01 +0100, Mark Brown wrote:
+> On Wed, Sep 30, 2020 at 12:33:39PM -0700, Joe Perches wrote:
+> > On Tue, 2020-09-29 at 12:37 +0100, Mark Brown wrote:
+> > > Feel free to submit patches to b4.
+> > Have you tried the existing option to send
+> > thank you's on a specific ranges of patches?
 > 
->> As Sagi Grimberg suggested, the original fix is refind to a more common
->> inline routine:
->>     static inline bool sendpage_ok(struct page *page)
->>     {
->>         return  (!PageSlab(page) && page_count(page) >= 1);
->>     }
->> If sendpage_ok() returns true, the checking page can be handled by the
->> concrete zero-copy sendpage method in network layer.
-> 
-> Series applied.
-> 
->> The v10 series has 7 patches, fixes a WARN_ONCE() usage from v9 series,
->  ...
-> 
-> I still haven't heard from you how such a fundamental build failure
-> was even possible.
-> 
+> I am relying on b4 to identify which patches that I've downloaded are in
+> the pushed branches.  Given that it explicitly lists the patches that
+> are applied it appears to be doing an OK job here.
 
-Hi David,
+I'm not so sure about that.
 
-Here is the detail steps how I leaked this uncompleted patch to you,
-1) Add WARN_ONCE() as WARN_ON() to kernel_sendpage(). Maybe I was still
-hesitating when I typed WARN_ONCE() on keyboard.
-2) Generate the patches, prepare to post
-3) Hmm, compiling failed, oh it is WARN_ONCE(). Yeah, WARN_ONCE() might
-be more informative and better.
-4) Modify to use WARN_ONCE() and compile and try, looks fine.
-5) Re-generate the patches to overwrite the previous ones.
-6) Post the patches.
+The commit merge description in -next shows 23 files
+modified but the commit range shown in the merge shows
+only a single patch applied:
 
-The missing part was, before I post the patches, I should do rebase and
-commit the change, but (interrupted by other stuffs) it skipped in my
-mind. Although I regenerated the series but the change was not included.
-The result was, uncompleted patch posted and the second-half change
-still stayed in my local file.
+From next-20201002:
 
+(I've removed some of the commit description below)
 
-> If the v9 patch series did not even compile, how in the world did you
-> perform functional testing of these changes?
-> 
+$ git log --stat -1 2defc3fa18a68963a330187f5386968e50832d06
+commit 2defc3fa18a68963a330187f5386968e50832d06
+Merge: eb45df24fe82 7f4a122d0b50
+Author: Mark Brown <broonie@kernel.org>
+Date:   Mon Sep 28 18:28:48 2020 +0100
 
-Only 0002-net-add-WARN_ONCE-in-kernel_sendpage-for-improper-ze.patch was
-tested in v9 series, other tests were done in previous versions.
+    Merge series "use semicolons rather than commas to separate statements" from Julia Lawall <Julia.Lawall@inria.fr>:
+    
+    These patches replace commas by semicolons.  This was done using the
+    Coccinelle semantic patch (http://coccinelle.lip6.fr/) shown below.
 
-> Please explain this to me, instead of just quietly fixing it and
-> posting an updated series.
+[some of the long description elided]
 
+        ---
+    
+     drivers/acpi/processor_idle.c               |    4 +++-
+     drivers/ata/pata_icside.c                   |   21 +++++++++++++--------
+     drivers/base/regmap/regmap-debugfs.c        |    2 +-
+     drivers/bcma/driver_pci_host.c              |    4 ++--
+     drivers/block/drbd/drbd_receiver.c          |    6 ++++--
+     drivers/char/agp/amd-k7-agp.c               |    2 +-
+     drivers/char/agp/nvidia-agp.c               |    2 +-
+     drivers/char/agp/sworks-agp.c               |    2 +-
+     drivers/char/hw_random/iproc-rng200.c       |    8 ++++----
+     drivers/char/hw_random/mxc-rnga.c           |    6 +++---
+     drivers/char/hw_random/stm32-rng.c          |    8 ++++----
+     drivers/char/ipmi/bt-bmc.c                  |    6 +++---
+     drivers/clk/meson/meson-aoclk.c             |    2 +-
+     drivers/clk/mvebu/ap-cpu-clk.c              |    2 +-
+     drivers/clk/uniphier/clk-uniphier-cpugear.c |    2 +-
+     drivers/clk/uniphier/clk-uniphier-mux.c     |    2 +-
+     drivers/clocksource/mps2-timer.c            |    6 +++---
+     drivers/clocksource/timer-armada-370-xp.c   |    8 ++++----
+     drivers/counter/ti-eqep.c                   |    2 +-
+     drivers/crypto/amcc/crypto4xx_alg.c         |    2 +-
+     drivers/crypto/atmel-tdes.c                 |    2 +-
+     drivers/crypto/hifn_795x.c                  |    4 ++--
+     drivers/crypto/talitos.c                    |    8 ++++----
+     23 files changed, 60 insertions(+), 51 deletions(-)
 
-And not all the patches in the series were tested. Here is the testing
-coverage of the series:
+But the commit range of the merge shows only the single commit:
 
-The following ones were tested and verified to break nothing and avoid
-the mm corruption and panic,
-0001-net-introduce-helper-sendpage_ok-in-include-linux-ne.patch
-0002-net-add-WARN_ONCE-in-kernel_sendpage-for-improper-ze.patch
-0003-nvme-tcp-check-page-by-sendpage_ok-before-calling-ke.patch
-0006-scsi-libiscsi-use-sendpage_ok-in-iscsi_tcp_segment_m.patch
+$ git log --stat eb45df24fe82..7f4a122d0b50
+commit 7f4a122d0b50b40c64d24a5cf7aafe26dd9487ee
+Author: Julia Lawall <Julia.Lawall@inria.fr>
+Date:   Sun Sep 27 21:12:24 2020 +0200
 
-The following ones were not tested, due to complicated environment setup,
-0005-drbd-code-cleanup-by-using-sendpage_ok-to-check-page.patch
-0007-libceph-use-sendpage_ok-in-ceph_tcp_sendpage.patch
+    regmap: debugfs: use semicolons rather than commas to separate statements
+    
+    Replace commas with semicolons.  What is done is essentially described by
+    the following Coccinelle semantic patch (http://coccinelle.lip6.fr/):
+    
+    // <smpl>
+    @@ expression e1,e2; @@
+    e1
+    -,
+    +;
+    e2
+    ... when any
+    // </smpl>
+    
+    Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+    Link: https://lore.kernel.org/r/1601233948-11629-15-git-send-email-Julia.La>
+    Signed-off-by: Mark Brown <broonie@kernel.org>
 
-This patch I didn't explicitly test, due to lack of knowledge to modify
-network code to trigger a buggy condition. It just went with other
-tested patches,
-0004-tcp-use-sendpage_ok-to-detect-misused-.sendpage.patch
-
-
-Back to the built failure, I don't have excuse for leaking this
-uncompleted version to you. Of cause I will try to avoid to
-inefficiently occupy maintainer's time by such silly mess up.
-
-Thanks for your review and the thorough maintenance.
-
-Coly Li
+ drivers/base/regmap/regmap-debugfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 
