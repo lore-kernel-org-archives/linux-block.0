@@ -2,94 +2,141 @@ Return-Path: <SRS0=syOM=DM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7AC3C4363A
-	for <linux-block@archiver.kernel.org>; Mon,  5 Oct 2020 16:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C7EC4727D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Oct 2020 16:53:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99A13207BC
-	for <linux-block@archiver.kernel.org>; Mon,  5 Oct 2020 16:48:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EXHjpbbY"
+	by mail.kernel.org (Postfix) with ESMTP id 098BC20874
+	for <linux-block@archiver.kernel.org>; Mon,  5 Oct 2020 16:53:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1601916802;
+	bh=p/E99tTjql4QstxaT4SSl5drfyNj4h+kQn/1L+FU6Hg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=tKThos6UrGsHSJBN7HOUerySU9WEl+/UCwEa6XSf7mcRVkXvcnU6Ac1xV+p5ehM7X
+	 78TFYHqrpvR5t0AOP/+Stft9R4M70xCGvRyLVr1/myOEtdwbZ5iKVhSf6SzTH5Pzom
+	 /kqnbKFZktfQ11UQYnUo+3/iDhx7lsU7lshyv+LQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727147AbgJEQsU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Oct 2020 12:48:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32846 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726772AbgJEQsS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Oct 2020 12:48:18 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756EBC0613CE
-        for <linux-block@vger.kernel.org>; Mon,  5 Oct 2020 09:48:18 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id k25so9884317ioh.7
-        for <linux-block@vger.kernel.org>; Mon, 05 Oct 2020 09:48:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+JrT5f4ODECOY6SLMg6ZmVv5vw3hnZeQHmUKznSjjA8=;
-        b=EXHjpbbYBzPCQUtwgIQJuUvC/iLMwOJMiCKxS51uaJFQyuishzIiVwXnOQFrQ+ozAo
-         NKzZm/jwPFZFZXAdy5+45xNMXeLoQNSzAYRoFDKK9SnA+HNbW8RLKlz5vtFi1SV/NAOY
-         XrP051y8idHZvXY3jS12G2PwyvG6B+jXPfk67Skyj8GjGrgOSiC7kc/zTehaQTpTTb75
-         rFhSNI5Y5o1TsDaOL39Y6i0Z0/MiaOmj+vgyB3gM4YhEV3AuhPhXBoLUnQOH9JiwEeLB
-         1+oabFJY+TGWcojB5qGa9C7q4tJDnj0A63BgGl5lqo9Q7M0y2zvnbeGPAhE1JexLgngL
-         XeUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+JrT5f4ODECOY6SLMg6ZmVv5vw3hnZeQHmUKznSjjA8=;
-        b=rZdfo0x2Nwx/+8Quf2qCxkb2IAJr1wHdjuG/PnnaJGBxlVuMwNa52EK3+JCqHdCl0o
-         HWNuDTFFlTA2KRZlCWn3k1K8PBkMK3VYV3ZNAUtDlrEGy7lHKSRfF/qS78w0WIVQqQMi
-         XoXoKm20TuCSC/APijubonrevNXRLl7J/2pJa6XSC9Opg5J+sjWOtDfuNWF/wwiMbRMl
-         WYUMgcVeq9luw6YBV45j38o/ALjjgt0rzgR2ltxK8dlnbmJWKIlFc1IEd9pr6CgDrvLs
-         RjLaD8FrNHATyrgLqqJYuyVAaiwq5rup28IQlWDzUB//iEdF/+ExBNrTcPfbs2UMZZue
-         DNGQ==
-X-Gm-Message-State: AOAM5300mnIegkblmHioN1+WMiJty/yIltbL3k3qO6lpTgJWFLa5kDyM
-        IyMfhVINR2eYObVgpYL6AXUd1A==
-X-Google-Smtp-Source: ABdhPJzloX6QJEEcEQVQh8m+fFPWalOjPXRzbAMgwJTGWE8+oGR3GAtbw5onccd1LTQlSaWTLbmFXA==
-X-Received: by 2002:a05:6602:2d90:: with SMTP id k16mr378592iow.19.1601916497737;
-        Mon, 05 Oct 2020 09:48:17 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id s10sm178133ilh.33.2020.10.05.09.48.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Oct 2020 09:48:17 -0700 (PDT)
-Subject: Re: [PATCH v2 0/3] block: fix up bio_crypt_ctx allocation
-To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org
-Cc:     dm-devel@redhat.com, Satya Tangirala <satyat@google.com>,
-        Miaohe Lin <linmiaohe@huawei.com>
-References: <20200916035315.34046-1-ebiggers@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b84faa9c-f5e7-8c90-d54b-6a1dbf68a35b@kernel.dk>
-Date:   Mon, 5 Oct 2020 10:48:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726938AbgJEQxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Oct 2020 12:53:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60268 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725940AbgJEQxK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Oct 2020 12:53:10 -0400
+Received: from localhost (fw-tnat.cambridge.arm.com [217.140.96.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7BDA1207BC;
+        Mon,  5 Oct 2020 16:53:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1601916790;
+        bh=p/E99tTjql4QstxaT4SSl5drfyNj4h+kQn/1L+FU6Hg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gBC/IzIeywxmI9gsb/JTsx+zOOUJIooFw3wfYC06TBiHzICVtnlgNaAv/yO1EfA51
+         zVseZLj5T0M70hmLa6qq17YAe111X+Q9rT1NlLPW8KVTi2SkXaQsGts5rIE+F43U3z
+         nybuOkwnpLc2tf4yEu29xxvUOBIsDUDyDKfTSVTQ=
+Date:   Mon, 5 Oct 2020 17:52:06 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Joe Perches <joe@perches.com>
+Cc:     Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        Julia Lawall <julia.lawall@inria.fr>, tools@linux.kernel.org,
+        linux-iio@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        linux-acpi@vger.kernel.org, David Lechner <david@lechnology.com>,
+        Valdis =?utf-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+        kernel-janitors@vger.kernel.org, drbd-dev@lists.linbit.com,
+        openipmi-developer@lists.sourceforge.net,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        linux-ide@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-wireless@vger.kernel.org,
+        Neil Armstrong <narmstrong@baylibre.com>
+Subject: Re: [PATCH 00/18] use semicolons rather than commas to separate
+ statements
+Message-ID: <20201005165206.GA2440@sirena.org.uk>
+References: <160132172369.55460.9237357219623604216.b4-ty@kernel.org>
+ <b1174f9be2ce65f6b5ebefcba0b48e792926abbc.camel@perches.com>
+ <20200929113745.GB4799@sirena.org.uk>
+ <db26d49401dc0bd6b9013a603a155f9827f404a4.camel@perches.com>
+ <20201001110150.GA6715@sirena.org.uk>
+ <f44d19ad596f261c0287c9ab18c45161003efb43.camel@perches.com>
+ <20201003191501.o56tqq63d2buq5ox@chatter.i7.local>
+ <alpine.DEB.2.22.394.2010032118420.2741@hadrien>
+ <20201003193137.z2bpwzlz5a66kkex@chatter.i7.local>
+ <9ab43333596f08abbbbbf1fa8cdf1ded4b65af2a.camel@perches.com>
 MIME-Version: 1.0
-In-Reply-To: <20200916035315.34046-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
+Content-Disposition: inline
+In-Reply-To: <9ab43333596f08abbbbbf1fa8cdf1ded4b65af2a.camel@perches.com>
+X-Cookie: God is real, unless declared integer.
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/15/20 9:53 PM, Eric Biggers wrote:
-> This series makes allocation of encryption contexts either able to fail,
-> or explicitly require __GFP_DIRECT_RECLAIM (via WARN_ON_ONCE).
-> 
-> This applies to linux-block/for-next.
-> 
-> Changed since v1 (https://lkml.kernel.org/r/20200902051511.79821-1-ebiggers@kernel.org):
->     - Added patches 2 and 3.
->     - Added kerneldoc for bio_crypt_clone().
->     - Adjusted commit message.
 
-Applied for 5.10, thanks.
+--sdtB3X0nJg68CQEu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Jens Axboe
+On Sat, Oct 03, 2020 at 12:43:13PM -0700, Joe Perches wrote:
+> On Sat, 2020-10-03 at 15:31 -0400, Konstantin Ryabitsev wrote:
 
+> > I'm worried that this can get unwieldy for series of 50 patches where 4=
+9=20
+> > got applied. Would the following be better:
+
+=2E..
+
+> > A subset of these patches was applied to
+> >=20
+> >   https://...
+> >=20
+> > Thanks!
+> >=20
+> > [5/18] regmap: debugfs:
+> >        commit:
+
+It's definitely an improvement but TBH I'm not sure how much it's going
+to help those struggling to parse the current messages.
+
+> > I think this is a better solution than potentially flooding everyone=20
+> > with 49 emails.
+
+I would tend to prefer cutting down on mail volume but I don't think
+there's any way to keep everyone happy with this stuff.
+
+> I think it would be better to reply individually as
+> the likelihood that the maintainer skips just a few
+> patches of a large series is relatively low.
+
+It's not at all unusual for driver updates to both add new DT bindings
+(either for entirely new drivers or new properties/compatibles for
+existing drivers) and also have DTS file updates using those bindings,
+these go via separate trees.
+
+--sdtB3X0nJg68CQEu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl97TzUACgkQJNaLcl1U
+h9DI9Qf/dhOghwYGEqexRQ644ACI4w9j7rH7Z4qsTYl+rdj06q5wrcOFnyypjB/j
+N/Qx3llsTbG0UagMLyGeuFi5bzhxALnrvmrbv8cBPI0/3jS2D7u22cD5m6toS+Tp
+f08tgo7VkjfkB3QCZn9A7XGAPq3bEvoaCvFalxqGt0FPUw5kVGrboVa1dgJCzRL/
+CtWXDQfG9vy5ZVs0cY+s+O9yvAbrZJyMPaKkeoa7dwnqzOQz1Ga4ADtUZsUWyieK
+wuCO/HNGdf77CmSbOuG6BMrWi5SGoEtRmVO+w5NmYO1yOfnooSih3uWDR4H01xVg
+3zFgbOHRZMIwAEzTfTqRA4vzPMXRQQ==
+=wwYC
+-----END PGP SIGNATURE-----
+
+--sdtB3X0nJg68CQEu--
