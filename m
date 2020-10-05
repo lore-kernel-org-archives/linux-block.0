@@ -2,62 +2,68 @@ Return-Path: <SRS0=syOM=DM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D634C4363A
-	for <linux-block@archiver.kernel.org>; Mon,  5 Oct 2020 07:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCE4C4727D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Oct 2020 08:38:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0072420796
-	for <linux-block@archiver.kernel.org>; Mon,  5 Oct 2020 07:26:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gZ3le+Br"
+	by mail.kernel.org (Postfix) with ESMTP id 106F12078D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Oct 2020 08:38:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725880AbgJEH0A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Oct 2020 03:26:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58408 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725875AbgJEH0A (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Oct 2020 03:26:00 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73A33C0613CE;
-        Mon,  5 Oct 2020 00:26:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=5sM6+fPAuGy2swhfps1Vh088uPyk+Nclxk6vr8avp4U=; b=gZ3le+BrS/YBFbsfqY9n0gSqSd
-        GdTnl+ZXSnKjByjsumxnE3yMQpa4pnT0q+YzM3hDXAmmcLFC4gDTkaQKwOYueuDPDl65KzXOWQCd3
-        onUw2Xb3pcYhvLgGNsQSDdzx+rlsE3HisgN0jtBA6l36wUgtWnjF+a6KR3Q8Hqn01z4a0kthN19UV
-        3MCG+Oi7SWO8sEgYWdVeK0S3SNXsjMKrI2dwdk1CzR+qf7HmapjOJGOtmLz3q4b/vxb/qUtdTR53A
-        BSkJqC/kwPWCXwS5gEyo1qr+6UYJjR3qIOb/t23QdQXqkdnUo7W/8OIRJMQXQ+bH9QlvmQTejpW9B
-        X4SuaQgg==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kPKsf-0004UC-VK; Mon, 05 Oct 2020 07:25:58 +0000
-Date:   Mon, 5 Oct 2020 08:25:57 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH][next] block: scsi_ioctl: Avoid the use of one-element
- arrays
-Message-ID: <20201005072557.GB14204@infradead.org>
-References: <20201002231033.GA6273@embeddedor>
+        id S1725885AbgJEIiU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Oct 2020 04:38:20 -0400
+Received: from verein.lst.de ([213.95.11.211]:58129 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725893AbgJEIiU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Oct 2020 04:38:20 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 5276867373; Mon,  5 Oct 2020 10:38:17 +0200 (CEST)
+Date:   Mon, 5 Oct 2020 10:38:17 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org
+Subject: Re: [PATCH blk-next 1/2] blk-mq-rdma: Delete not-used multi-queue
+ RDMA map queue code
+Message-ID: <20201005083817.GA14908@lst.de>
+References: <20200929091358.421086-1-leon@kernel.org> <20200929091358.421086-2-leon@kernel.org> <20200929102046.GA14445@lst.de> <20200929103549.GE3094@unreal> <879916e4-b572-16b9-7b92-94dba7e918a3@grimberg.me> <20201002064505.GA9593@lst.de> <14fab6a7-f7b5-2f9d-e01f-923b1c36816d@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201002231033.GA6273@embeddedor>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <14fab6a7-f7b5-2f9d-e01f-923b1c36816d@grimberg.me>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 02, 2020 at 06:10:33PM -0500, Gustavo A. R. Silva wrote:
-> One-element arrays are being deprecated[1]. Replace the one-element array
-> with a simple object of type compat_caddr_t: 'compat_caddr_t unused'[2],
-> once it seems this field is actually never used.
+On Fri, Oct 02, 2020 at 01:20:35PM -0700, Sagi Grimberg wrote:
+>> Well, why would they change it?  The whole point of the infrastructure
+>> is that there is a single sane affinity setting for a given setup. Now
+>> that setting needed some refinement from the original series (e.g. the
+>> current series about only using housekeeping cpus if cpu isolation is
+>> in use).  But allowing random users to modify affinity is just a receipe
+>> for a trainwreck.
+>
+> Well allowing people to mangle irq affinity settings seem to be a hard
+> requirement from the discussions in the past.
+>
+>> So I think we need to bring this back ASAP, as doing affinity right
+>> out of the box is an absolute requirement for sane performance without
+>> all the benchmarketing deep magic.
+>
+> Well, it's hard to say that setting custom irq affinity settings is
+> deemed non-useful to anyone and hence should be prevented. I'd expect
+> that irq settings have a sane default that works and if someone wants to
+> change it, it can but there should be no guarantees on optimal
+> performance. But IIRC this had some dependencies on drivers and some
+> more infrastructure to handle dynamic changes...
 
-They are only deprecated when abused as variable length array.  That is
-not the case here.
+The problem is that people change random settings.  We need to generalize
+it into a sane API (e.g. the housekeeping CPUs thing which totally makes
+sense).
