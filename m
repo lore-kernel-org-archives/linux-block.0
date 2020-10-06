@@ -2,147 +2,153 @@ Return-Path: <SRS0=/MU2=DN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A491C41604
-	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 14:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 432E5C41604
+	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 16:34:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0087520663
-	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 14:46:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tsi/6Hbx"
+	by mail.kernel.org (Postfix) with ESMTP id 164BF206D4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 16:34:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725996AbgJFOq4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Oct 2020 10:46:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34158 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725946AbgJFOqz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Oct 2020 10:46:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601995614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pQ0F46ul9JeXgnEyIVKzI2+rVwCewslFuDp/yzkCGXw=;
-        b=Tsi/6HbxeJKpcZdzHnj2yi9F7fAGZm1pntv1nJCd5TfFGJMqwPzX1M/s1sJFHK18hal5hx
-        tH6JsTTKPI03fy8WlSYn9GZ8gPoB8WyioLonb5bdw7T5YPuhDBMO1jrFaOEylX7DBsDf19
-        gGtxbWlOCXptD1myOKgOkCgCcmZ+ZD4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-xbtObHZwMD-haVEj2CzP3Q-1; Tue, 06 Oct 2020 10:46:52 -0400
-X-MC-Unique: xbtObHZwMD-haVEj2CzP3Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A0351084C86;
-        Tue,  6 Oct 2020 14:46:51 +0000 (UTC)
-Received: from gondolin (ovpn-112-156.ams2.redhat.com [10.36.112.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AE3710013DB;
-        Tue,  6 Oct 2020 14:46:49 +0000 (UTC)
-Date:   Tue, 6 Oct 2020 16:46:46 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Stefan Haberland <sth@linux.ibm.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        hoeppner@linux.ibm.com, linux-s390@vger.kernel.org,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com
-Subject: Re: [PATCH 02/10] s390/cio: Provide Endpoint-Security Mode per CU
-Message-ID: <20201006164646.5b586679.cohuck@redhat.com>
-In-Reply-To: <20201002193940.24012-3-sth@linux.ibm.com>
-References: <20201002193940.24012-1-sth@linux.ibm.com>
-        <20201002193940.24012-3-sth@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726128AbgJFQel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Oct 2020 12:34:41 -0400
+Received: from icebox.esperi.org.uk ([81.187.191.129]:47298 "EHLO
+        mail.esperi.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725981AbgJFQel (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Oct 2020 12:34:41 -0400
+Received: from loom (nix@sidle.srvr.nix [192.168.14.8])
+        by mail.esperi.org.uk (8.16.1/8.16.1) with ESMTP id 096GYYti006487;
+        Tue, 6 Oct 2020 17:34:34 +0100
+From:   Nix <nix@esperi.org.uk>
+To:     Kai Krakow <kai@kaishome.de>
+Cc:     Eric Wheeler <bcache@lists.ewheeler.net>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] bcache: introduce bcache sysfs entries for ioprio-based bypass/writeback hints
+References: <20201003111056.14635-1-kai@kaishome.de>
+        <20201003111056.14635-2-kai@kaishome.de>
+        <87362ucen3.fsf@esperi.org.uk>
+        <CAC2ZOYt+ZMep=PT5FbQKiqZ0EE1f4+JJn=oTJUtQjLwGvy=KfQ@mail.gmail.com>
+        <alpine.LRH.2.11.2010051923330.2180@pop.dreamhost.com>
+        <87o8lfa692.fsf@esperi.org.uk>
+        <CAC2ZOYvA966Jwa1CGepRDUmBn4=-vpZR82YZZQxT8L+f7-HTUQ@mail.gmail.com>
+Emacs:  (setq software-quality (/ 1 number-of-authors))
+Date:   Tue, 06 Oct 2020 17:34:34 +0100
+In-Reply-To: <CAC2ZOYvA966Jwa1CGepRDUmBn4=-vpZR82YZZQxT8L+f7-HTUQ@mail.gmail.com>
+        (Kai Krakow's message of "Tue, 6 Oct 2020 15:10:37 +0200")
+Message-ID: <87imbn9uud.fsf@esperi.org.uk>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3.50 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain
+X-DCC-x.dcc-servers-Metrics: loom 104; Body=4 Fuz1=4 Fuz2=4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri,  2 Oct 2020 21:39:32 +0200
-Stefan Haberland <sth@linux.ibm.com> wrote:
+On 6 Oct 2020, Kai Krakow verbalised:
 
-> From: Vineeth Vijayan <vneethv@linux.ibm.com>
-> 
-> Add an interface in the CIO layer to retrieve the information about the
-> Endpoint-Security Mode (ESM) of the specified CU. The ESM values are
-> defined as 0-None, 1-Authenticated or 2, 3-Encrypted.
-> 
-> Reference-ID: IO1812
-> Signed-off-by: Sebastian Ott <sebott@linux.ibm.com>
-> [vneethv@linux.ibm.com: cleaned-up and modified description]
-> Signed-off-by: Vineeth Vijayan <vneethv@linux.ibm.com>
-> Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
-> Acked-by: Vasily Gorbik <gor@linux.ibm.com>
-> Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
-> ---
->  arch/s390/include/asm/cio.h |  1 +
->  drivers/s390/cio/chsc.c     | 83 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 84 insertions(+)
- 
-(...)
+> Am Di., 6. Okt. 2020 um 14:28 Uhr schrieb Nix <nix@esperi.org.uk>:
+>> That sounds like a bug in the mq-scsi machinery: it surely should be
+>> passing the ioprio off to the worker thread so that the worker thread
+>> can reliably mimic the behaviour of the thread it's acting on behalf of.
+>
+> Maybe this was only an issue early in mq-scsi before it got more
+> schedulers than just iosched-none? It has bfq now, and it should work.
+> Depending on the filesystem, tho, that may still not fully apply...
+> e.g. btrfs doesn't use ioprio for delayed refs resulting from such io,
+> it will simply queue it up at the top of the io queue.
 
-> +/**
-> + * chsc_scud() - Store control-unit description.
-> + * @cu:		number of the control-unit
-> + * @esm:	8 1-byte endpoint security mode values
-> + * @esm_valid:	validity mask for @esm
-> + *
-> + * Interface to retrieve information about the endpoint security
-> + * modes for up to 8 paths of a control unit.
-> + *
-> + * Returns 0 on success.
-> + */
-> +int chsc_scud(u16 cu, u64 *esm, u8 *esm_valid)
-> +{
-> +	struct chsc_scud *scud = chsc_page;
-> +	int ret;
-> +
+Yeah. FWIW I'm using bfq for all the underlying devices and everything
+still seems to be working, idle I/O doesn't get bcached etc.
 
-I'm wondering if it would make sense to check in the chsc
-characteristics whether that chsc is actually installed (if there's
-actually a bit for it, although I'd expect so). Some existing chscs
-check for bits in the characteristics, others don't. (Don't know
-whether QEMU is the only platform that doesn't provide this chsc.)
+>> using cgroups would make this essentially unusable for
+>> me, and probably for most other people, because on a systemd system the
+>> cgroup hierarchy is more or less owned in fee simple by systemd, and it
+>> won't let you use cgroups for something else,
+>
+> That's probably not completely true, you can still define slices which
+> act as a cgroup container for all services and processes contained in
+> it, and you can use "systemctl edit myscope.slice" to change
+> scheduler, memory accounting, and IO params at runtime.
 
-> +	spin_lock_irq(&chsc_page_lock);
-> +	memset(chsc_page, 0, PAGE_SIZE);
-> +	scud->request.length = SCUD_REQ_LEN;
-> +	scud->request.code = SCUD_REQ_CMD;
-> +	scud->fmt = 0;
-> +	scud->cssid = 0;
-> +	scud->first_cu = cu;
-> +	scud->last_cu = cu;
-> +
-> +	ret = chsc(scud);
-> +	if (!ret)
-> +		ret = chsc_error_from_response(scud->response.code);
-> +
-> +	if (!ret && (scud->response.length <= 8 || scud->fmt_resp != 0
-> +			|| !(scud->cudb[0].flags & 0x80)
-> +			|| scud->cudb[0].cu != cu)) {
-> +
-> +		CIO_MSG_EVENT(2, "chsc: scud failed rc=%04x, L2=%04x "
-> +			"FMT=%04x, cudb.flags=%02x, cudb.cu=%04x",
-> +			scud->response.code, scud->response.length,
-> +			scud->fmt_resp, scud->cudb[0].flags, scud->cudb[0].cu);
-> +		ret = -EINVAL;
-> +	}
-> +
-> +	if (ret)
-> +		goto out;
-> +
-> +	memcpy(esm, scud->cudb[0].esm, sizeof(*esm));
-> +	*esm_valid = scud->cudb[0].esm_valid;
-> +out:
-> +	spin_unlock_irq(&chsc_page_lock);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(chsc_scud);
+That's... a lot clunkier than being able to say 'ionice -c 3 foo' to run
+foo without caching. root has to prepare for it on a piece-by-piece
+basis... not that ionice is the most pleasant of utilities to use
+either.
 
+>> (And as for making systemd set up suitable cgroups, that too would make
+>> it unusable for me: I tend to run jobs ad-hoc with ionice, use ionice in
+>> scripts etc to reduce caching when I know it won't be needed, and that
+>> sort of thing is just not mature enough to be reliable in systemd yet.
+>
+> You can still define a slice for such ad-hoc processes by using
+> systemd-run to make your process into a transient one-shot service.
+
+That's one of the things that crashed my system when I tried it. I just
+tried it again and it seems to work now. :) (Hm, does systemd-run wait
+for return and hand back the exit code... yes, via --scope or --wait,
+both of which seem to have elaborate constraints that I don't fully
+understand and that makes me rather worried that using them might not be
+reliable: but in this it is just like almost everything else in
+systemd.)
+
+>> It's rare for a systemd --user invocation to get everything so confused
+>> that the entire system is reundered unusable, but it has happened to me
+>> in the past, so unlike ionice I am now damn wary of using systemd --user
+>> invocations for anything. They're a hell of a lot clunkier for ad-hoc
+>> use than a simple ionice, too: you can't just say "run this command in a
+>> --user", you have to set up a .service file etc.)
+>
+> Not sure what you did, I never experienced that. Usually that happens
+
+It was early in the development of --user, so it may well have been a
+bug that was fixed later on. In general I have found systemd to be too
+tightly coupled and complex to be reliable: there seem to be all sorts
+of ways to use local mounts and fs namespaces and the like to fubar PID
+1 and force a reboot (which you can't do because PID 1 is too unhappy,
+so it's /sbin/reboot -f time). Admittedly I do often do rather extreme
+things with tens of thousands of mounts and the like, but y'know the
+only thing that makes unhappy is... systemd. :/
+
+(I have used systemd enough to both rely on it and cordially loathe it
+as an immensely overcomplicated monster with far too many edge cases and
+far too much propensity to insist on your managing the system its way
+(e.g. what it does with cgroups), and if I do anything but the simplest
+stuff I'm likely to trip over one or more bugs in those edge cases. I'd
+switch to something else simple enough to understand if only all the
+things I might switch to were not also too simple to be able to do the
+things I want to do. The usual software engineering dilemma...)
+
+In general, though, the problem with cgroups is that courtesy of v2
+having a unified hierarchy, if any one thing uses cgroups, nothing else
+really can, because they all have to agree on the shape of the
+hierarchy, which is most unlikely if they're using cgroups for different
+purposes. So it is probably a mistake to use cgroups for *anything*
+other than handing control of it to a single central thing (like
+systemd) and then trying to forget that cgroups ever existed for any
+other purpose because you'll never be able to use them yourself.
+
+A shame. They could have been a powerful abstraction...
+
+> and some more. The trick is to define all slices with a
+> lower bound of memory below which the kernel won't reclaim memory from
+> it - I found that's one of the most important knobs to fight laggy
+> desktop usage.
+
+I cheated and just got a desktop with 16GiB RAM and no moving parts and
+a server with so much RAM that it never swaps, and 10GbE between the two
+so the desktop can get stuff off the server as fast as its disks can do
+contiguous reads. bcace cuts down seek time enough that I hardly ever
+have to wait for it, and bingo :)
+
+(But my approach is probably overkill: yours is more elegant.)
+
+> I usually look at the memory needed by the processes when running,
+
+I've not bothered with that for years: 16GiB seems to be enough that
+Chrome plus even a fairly big desktop doesn't cause the remotest
+shortage of memory, and the server, well, I can run multiple Emacsen and
+20+ VMs on that without touching the sides. (Also... how do you look at
+it? PSS is pretty good, but other than ps_mem almost nothing uses it,
+not even the insanely overdesigned procps top.)
