@@ -2,223 +2,171 @@ Return-Path: <SRS0=/MU2=DN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B294C41604
-	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 10:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 191D4C4727D
+	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 13:10:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04A66206D4
-	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 10:26:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFDFB2078E
+	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 13:10:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MV71gqT9"
+	dkim=pass (1024-bit key) header.d=kaishome.de header.i=@kaishome.de header.b="fs1T0rMz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726012AbgJFK0o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Oct 2020 06:26:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60971 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725943AbgJFK0o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Oct 2020 06:26:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601980002;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B+xpK39ipzEQZP2pUbR9zVuwbrzagaVE3kPCHYxBbPQ=;
-        b=MV71gqT97PslyWSevjZQ4hcp2oilCEMiteWQGr/4141e8v+DHvWvoSAR0PkK2wjEZxX3CB
-        q1wehVBePbNWikRJnt4SeAFv2h+PGYx373f5HWwHNWLpwMTA6iCM22lrFGDV5NrtyBYkKM
-        X72CAB2Y5D6dcPx2rJCsk9OoCEurnjY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-563-4I0E1M8oOVG9ptvJv5UMzQ-1; Tue, 06 Oct 2020 06:26:38 -0400
-X-MC-Unique: 4I0E1M8oOVG9ptvJv5UMzQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF8608D985B;
-        Tue,  6 Oct 2020 10:26:36 +0000 (UTC)
-Received: from gondolin (ovpn-112-156.ams2.redhat.com [10.36.112.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0CC541A923;
-        Tue,  6 Oct 2020 10:26:34 +0000 (UTC)
-Date:   Tue, 6 Oct 2020 12:26:32 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Stefan Haberland <sth@linux.ibm.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        hoeppner@linux.ibm.com, linux-s390@vger.kernel.org,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com
-Subject: Re: [PATCH 08/10] s390/dasd: Display FC Endpoint Security
- information via sysfs
-Message-ID: <20201006122632.098149ba.cohuck@redhat.com>
-In-Reply-To: <20201002193940.24012-9-sth@linux.ibm.com>
-References: <20201002193940.24012-1-sth@linux.ibm.com>
-        <20201002193940.24012-9-sth@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726032AbgJFNKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Oct 2020 09:10:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51806 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725939AbgJFNKv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Oct 2020 09:10:51 -0400
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BA5C061755
+        for <linux-block@vger.kernel.org>; Tue,  6 Oct 2020 06:10:51 -0700 (PDT)
+Received: by mail-qt1-x841.google.com with SMTP id a9so858829qto.11
+        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2020 06:10:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kaishome.de; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AbUhUUNI4zeM3nS4/k6XhwyQZ4L7s7xPoEddzecSbmM=;
+        b=fs1T0rMzfHiHp+0QkvdBQfRrR9yAufazbcMprA/zXvF9LAW7nhhug6gvCM7JazsNlK
+         sKjwQSqEh127P2s9b2crM96nLRBhlY/U506zCnQb03k1bIb10DUSH8tXgg1jcR/fH3cS
+         dH9w04F6ff3wE9BWdMkNaxlvnNZp3EuI4e3mE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AbUhUUNI4zeM3nS4/k6XhwyQZ4L7s7xPoEddzecSbmM=;
+        b=gocFXQyIKkB6mBLoyiaU3NtCnEOfZ+x9LaakOZTf88RTXkKvo9j9EeUrPAUm4ebdkx
+         UkAchgJ9KHDZR2W31C4/Hhtq7p3R6x0ScmG/hC4aJsHo0WYvCM9JBSFNxAeQGiwtocFA
+         PBX5jEVUWmEp54Zsbe61qyibLzbhODQ3otYhSLS8caVqLBknjW6z08EqAOyQ3B1Vuqur
+         WZAzt9Lw1+HfLH1jT8FX8cP9XN2PuJdrHsLaAHMGDdj87J4eaWemD0ViJ/agMN4T4UrX
+         a9GI1LKRpbKfLgw1ra+qhO+dUWCr+K3nO/CEiWCIiZI2K/Y7NushN7IMfqOZGXSkuOfb
+         2XHg==
+X-Gm-Message-State: AOAM531tDAaP0wNuJ0mXGY3z/HPWKMx5xqi0y29V19FfMnyjJEtrQ+RE
+        KJrGexsZXgkN/+qXoSUuB3KeX7j3PYdTRhafv3nakA==
+X-Google-Smtp-Source: ABdhPJzkDe0vlNSFdhQSqP5I4mfR397Rmx3jtq7Stx8cVcMRdRIfUDiHLVvMCOYAloTzTzjRbupOIEnNPiq77mkcrk0=
+X-Received: by 2002:ac8:24b9:: with SMTP id s54mr4984732qts.138.1601989850064;
+ Tue, 06 Oct 2020 06:10:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20201003111056.14635-1-kai@kaishome.de> <20201003111056.14635-2-kai@kaishome.de>
+ <87362ucen3.fsf@esperi.org.uk> <CAC2ZOYt+ZMep=PT5FbQKiqZ0EE1f4+JJn=oTJUtQjLwGvy=KfQ@mail.gmail.com>
+ <alpine.LRH.2.11.2010051923330.2180@pop.dreamhost.com> <87o8lfa692.fsf@esperi.org.uk>
+In-Reply-To: <87o8lfa692.fsf@esperi.org.uk>
+From:   Kai Krakow <kai@kaishome.de>
+Date:   Tue, 6 Oct 2020 15:10:37 +0200
+Message-ID: <CAC2ZOYvA966Jwa1CGepRDUmBn4=-vpZR82YZZQxT8L+f7-HTUQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] bcache: introduce bcache sysfs entries for
+ ioprio-based bypass/writeback hints
+To:     Nix <nix@esperi.org.uk>
+Cc:     Eric Wheeler <bcache@lists.ewheeler.net>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri,  2 Oct 2020 21:39:38 +0200
-Stefan Haberland <sth@linux.ibm.com> wrote:
+Am Di., 6. Okt. 2020 um 14:28 Uhr schrieb Nix <nix@esperi.org.uk>:
+>
+> On 5 Oct 2020, Eric Wheeler verbalised:
+>
+> > [+cc:bcache and blocklist]
+> >
+> > (It did not look like this was being CC'd to the list so I have pasted the
+> > relevant bits of conversation. Kai, please resend your patch set and CC
+> > the list linux-bcache@vger.kernel.org)
+>
+> Oh sorry. I don't know what's been going on with the Cc:s here.
+>
+> > I am glad that people are still making effective use of this patch!
+>
+> :)
+>
+> > It works great unless you are using mq-scsi (or perhaps mq-dm). For the
+> > multi-queue systems out there, ioprio does not seem to pass down through
+> > the stack into bcache, probably because it is passed through a worker
+> > thread for the submission or some other detail that I have not researched.
+>
+> That sounds like a bug in the mq-scsi machinery: it surely should be
+> passing the ioprio off to the worker thread so that the worker thread
+> can reliably mimic the behaviour of the thread it's acting on behalf of.
 
-> From: Jan H=C3=B6ppner <hoeppner@linux.ibm.com>
->=20
-> Add a new sysfs attribute (fc_security) per device and per operational
-> channel path. The information of the current FC Endpoint Security state
-> is received through the CIO layer.
->=20
-> The state of the FC Endpoint Security can be either "Unsupported",
-> "Authentication", or "Encryption".
->=20
-> For example:
-> $ cat /sys/bus/ccw/devices/0.0.c600/fc_security
-> Encryption
->=20
-> If any of the operational paths is in a state different from all
-> others, the device sysfs attribute will display the additional state
-> "Inconsistent".
->=20
-> The sysfs attributes per paths are organised in a new directory called
-> "paths_info" with subdirectories for each path.
->=20
-> /sys/bus/ccw/devices/0.0.c600/paths_info/
-> =E2=94=9C=E2=94=80=E2=94=80 0.38
-> =E2=94=82=C2=A0=C2=A0 =E2=94=94=E2=94=80=E2=94=80 fc_security
-> =E2=94=9C=E2=94=80=E2=94=80 0.39
-> =E2=94=82=C2=A0=C2=A0 =E2=94=94=E2=94=80=E2=94=80 fc_security
-> =E2=94=9C=E2=94=80=E2=94=80 0.3a
-> =E2=94=82=C2=A0=C2=A0 =E2=94=94=E2=94=80=E2=94=80 fc_security
-> =E2=94=94=E2=94=80=E2=94=80 0.3b
->     =E2=94=94=E2=94=80=E2=94=80 fc_security
->=20
-> Reference-ID: IO1812
-> Signed-off-by: Jan H=C3=B6ppner <hoeppner@linux.ibm.com>
-> Reviewed-by: Stefan Haberland <sth@linux.ibm.com>
-> Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
-> ---
->  drivers/s390/block/dasd_devmap.c | 105 +++++++++++++++++++++++++++++++
->  drivers/s390/block/dasd_eckd.c   |  30 +++++++++
->  drivers/s390/block/dasd_int.h    |  68 ++++++++++++++++++++
->  3 files changed, 203 insertions(+)
->=20
+Maybe this was only an issue early in mq-scsi before it got more
+schedulers than just iosched-none? It has bfq now, and it should work.
+Depending on the filesystem, tho, that may still not fully apply...
+e.g. btrfs doesn't use ioprio for delayed refs resulting from such io,
+it will simply queue it up at the top of the io queue.
 
-(...)
+>
+> > Long ago others had concerns using ioprio as the mechanism for cache
+> > hinting, so what does everyone think about implementing cgroup inside of
+> > bcache? From what I can tell, cgroups have a stronger binding to an IO
+> > than ioprio hints.
+>
+> Nice idea, but...
 
-> +static struct kobj_type path_attr_type =3D {
-> +	.release	=3D dasd_path_release,
+Yeah, it would fit my use-case perfectly.
 
-This function does nothing; I think there's something wrong with your
-kobject handling?
+> using cgroups would make this essentially unusable for
+> me, and probably for most other people, because on a systemd system the
+> cgroup hierarchy is more or less owned in fee simple by systemd, and it
+> won't let you use cgroups for something else,
 
-> +	.default_attrs	=3D paths_info_attrs,
-> +	.sysfs_ops	=3D &kobj_sysfs_ops,
-> +};
-> +
-> +static void dasd_path_init_kobj(struct dasd_device *device, int chp)
-> +{
-> +	device->path[chp].kobj.kset =3D device->paths_info;
-> +	kobject_init(&device->path[chp].kobj, &path_attr_type);
+That's probably not completely true, you can still define slices which
+act as a cgroup container for all services and processes contained in
+it, and you can use "systemctl edit myscope.slice" to change
+scheduler, memory accounting, and IO params at runtime.
 
-This inits a static kobject; as you never free it, doesn't the code
-moan about state_initialized if you try to do that a second time?
+> or even make your own
+> underneath the ones it's managing: it sometimes seems to work but they
+> can suddenly go away without warning and all the processes in them get
+> transferred out by systemd or even killed off.
 
-> +}
-> +
-> +void dasd_path_create_kobj(struct dasd_device *device, int chp)
-> +{
-> +	int rc;
-> +
-> +	if (test_bit(DASD_FLAG_OFFLINE, &device->flags))
-> +		return;
-> +	if (!device->paths_info) {
-> +		dev_warn(&device->cdev->dev, "Unable to create paths objects\n");
+See above, use slices, don't try to sneak around systemd's cgroup
+management - especially not in services.
 
-I guess this warns every time you come along here, is warning more than
-once useful?
+> (And as for making systemd set up suitable cgroups, that too would make
+> it unusable for me: I tend to run jobs ad-hoc with ionice, use ionice in
+> scripts etc to reduce caching when I know it won't be needed, and that
+> sort of thing is just not mature enough to be reliable in systemd yet.
 
-> +		return;
-> +	}
-> +	if (device->path[chp].in_sysfs)
-> +		return;
-> +	if (!device->path[chp].conf_data)
+You can still define a slice for such ad-hoc processes by using
+systemd-run to make your process into a transient one-shot service.
+It's not much different from prepending "ionice ... schedtool ...".
+I'm using that put some desktop programs in a resource jail to avoid
+cache thrashing, e.g. by browsers which tend to dominate the cache:
+https://github.com/kakra/gentoo-cgw (this will integrate with the
+package manager to replace the original executable with a wrapper).
+But that has some flaws, as in when running a browser from a Steam
+container, it starts to act strange... But otherwise I'm using it
+quite successfully.
 
-Out of interest: Have you tried this with vfio-ccw under QEMU, where
-some information is simply not available?
+> It's rare for a systemd --user invocation to get everything so confused
+> that the entire system is reundered unusable, but it has happened to me
+> in the past, so unlike ionice I am now damn wary of using systemd --user
+> invocations for anything. They're a hell of a lot clunkier for ad-hoc
+> use than a simple ionice, too: you can't just say "run this command in a
+> --user", you have to set up a .service file etc.)
 
-> +		return;
-> +
-> +	dasd_path_init_kobj(device, chp);
-> +
-> +	rc =3D kobject_add(&device->path[chp].kobj, NULL, "%x.%02x",
-> +			 device->path[chp].cssid, device->path[chp].chpid);
-> +	if (rc)
-> +		kobject_put(&device->path[chp].kobj);
+Not sure what you did, I never experienced that. Usually that happens
+when processes managed by a systemd service try to escape the current
+session, i.e. by running "su -" or "sudo", so some uses of ionice may
+experience similar results.
 
-This will eventually lead to the nop release function, which doesn't
-unset state_initialized (see above) -- but OTOH, it shouldn't muck
-around with kobject internals anyway.
+So my current situation is: I defined a slice for background jobs
+(backup, maintenance jobs etc), one for games (boosting the CPU/IO/mem
+share), one for browsers (limiting CPU to fight against run-away
+javascripts), and some more. The trick is to define all slices with a
+lower bound of memory below which the kernel won't reclaim memory from
+it - I found that's one of the most important knobs to fight laggy
+desktop usage. I usually look at the memory needed by the processes
+when running, then add some amount of cache I think would be useful
+for the processes, as cgroup memory accounting luckily app allocations
+AND cache memory. Actually, limiting memory with cgroups can have
+quite an opposite effect (as processes tend to swap then, even with
+plenty of RAM available).
 
-I think the kobjects really want to be dynamically allocated; instead
-of going through a remove/add cycle, is there a way to make path
-objects "invisible" instead? Or add an "available" attribute, and error
-out reading any other attribute?
-
-> +	device->path[chp].in_sysfs =3D true;
-> +}
-> +EXPORT_SYMBOL(dasd_path_create_kobj);
-> +
-> +void dasd_path_create_kobjects(struct dasd_device *device)
-> +{
-> +	u8 lpm, opm;
-> +
-> +	opm =3D dasd_path_get_opm(device);
-> +	for (lpm =3D 0x80; lpm; lpm >>=3D 1) {
-> +		if (!(lpm & opm))
-> +			continue;
-
-Any reason you do not simply create objects for _all_ paths, combined
-with returning n/a or erroring out for paths where this does not apply?
-(I might be missing something obvious.)
-
-> +		dasd_path_create_kobj(device, pathmask_to_pos(lpm));
-> +	}
-> +}
-> +EXPORT_SYMBOL(dasd_path_create_kobjects);
-> +
-> +void dasd_path_remove_kobj(struct dasd_device *device, int chp)
-> +{
-> +	if (device->path[chp].in_sysfs) {
-> +		kobject_put(&device->path[chp].kobj);
-> +		device->path[chp].in_sysfs =3D false;
-> +	}
-> +}
-> +EXPORT_SYMBOL(dasd_path_remove_kobj);
-
-Also, how is userspace supposed to deal with changes here? Should there
-be a uevent on the parent device to notify about changes?
-
-> =20
->  int dasd_add_sysfs_files(struct ccw_device *cdev)
->  {
-
-(...)
-
-> +static inline void dasd_path_release(struct kobject *kobj)
-> +{
-> +/* Memory for the dasd_path kobject is freed when dasd_free_device() is =
-called */
-> +}
-> +
-
-As already said, I don't think that's a correct way to implement this.
-
-(...)
-
+Regards,
+Kai
