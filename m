@@ -7,83 +7,86 @@ X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9365C41604
-	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 07:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2868C41604
+	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 08:49:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CA9120760
-	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 07:41:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E3342080A
+	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 08:49:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HbZ0KgXg"
+	dkim=pass (1024-bit key) header.d=veeam.com header.i=@veeam.com header.b="ZxPWIA3P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726769AbgJFHlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Oct 2020 03:41:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28185 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726670AbgJFHlS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Oct 2020 03:41:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601970077;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eFC0ISn2+rWqsHgSwE4sZ0+UQ3DhHxUZGAadpsJBkLw=;
-        b=HbZ0KgXg7ZHibs438bH4h/9Nri0vQlJ6f8masGM9ykU2bTGyqVgaYRILeXPy1BH8IwH68G
-        kkjjQ5pSOdO63lXrnN5YyRYYK3K6urvHWeORbGQYh2pOwGX5rEigIdA22vl6e27TZn7UcE
-        3G+TnKlqnMYcCd7JOT38Vk5k6clcvrM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-JKwoqOqxNom9jlTPhAa4hQ-1; Tue, 06 Oct 2020 03:41:15 -0400
-X-MC-Unique: JKwoqOqxNom9jlTPhAa4hQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1725939AbgJFItl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Oct 2020 04:49:41 -0400
+Received: from mx4.veeam.com ([104.41.138.86]:48200 "EHLO mx4.veeam.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725912AbgJFItl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Oct 2020 04:49:41 -0400
+X-Greylist: delayed 430 seconds by postgrey-1.27 at vger.kernel.org; Tue, 06 Oct 2020 04:49:41 EDT
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC3AE1868411;
-        Tue,  6 Oct 2020 07:41:13 +0000 (UTC)
-Received: from T590 (ovpn-12-63.pek2.redhat.com [10.72.12.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C4C5755767;
-        Tue,  6 Oct 2020 07:41:04 +0000 (UTC)
-Date:   Tue, 6 Oct 2020 15:41:00 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     Veronika Kabatova <vkabatov@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>, Tejun Heo <tj@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH V7 0/2] percpu_ref & block: reduce memory footprint of
- percpu_ref in fast path
-Message-ID: <20201006074100.GA26059@T590>
-References: <20201001154842.26896-1-ming.lei@redhat.com>
+        by mx4.veeam.com (Postfix) with ESMTPS id A280D1C0EA;
+        Tue,  6 Oct 2020 11:42:43 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
+        t=1601973763; bh=e9f9XYoSs4yUz+6D/V0mbo/RjIBkU4bh11PRahPKKpM=;
+        h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+        b=ZxPWIA3PCdH7kv811Feros9C+xubBZ2Z524Ik/NnkcTGj7Ize7riljrfCh4Uir2wK
+         JimOg2zgRP5KbNKvez+Wkoh3JrT1YYstOeAenrBlX7SP9KSoAQ5eZUACCnQLVNOuwT
+         FfjobPKg0OHc5Zl5qwRqLoEXFz/WId4R82X0vBqc=
+Received: from veeam.com (172.24.14.5) by prgmbx01.amust.local (172.24.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.595.3; Tue, 6 Oct 2020
+ 10:42:41 +0200
+Date:   Tue, 6 Oct 2020 11:43:32 +0300
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     Konstantin Khlebnikov <koct9i@gmail.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
+        David Miller <davem@davemloft.net>,
+        "robh@kernel.org" <robh@kernel.org>,
+        "damien.lemoal@wdc.com" <damien.lemoal@wdc.com>,
+        Jan Kara <jack@suse.cz>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "steve@sk2.org" <steve@sk2.org>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        linux-kbuild <linux-kbuild@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/1] blk-snap - Block snapshot module This module
+ implements snapshot and changed block tracking functionality. It is intended
+ to create backup copies of any block devices without usage of device-mapper.
+Message-ID: <20201006084332.GA9979@veeam.com>
+References: <1601643362-7370-1-git-send-email-sergei.shtepa@veeam.com>
+ <1601643362-7370-2-git-send-email-sergei.shtepa@veeam.com>
+ <CALYGNiORw=DrKxoaoQPJP8TNM-S_W0Zdtpvra_eMs+Ri5f2P-g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20201001154842.26896-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CALYGNiORw=DrKxoaoQPJP8TNM-S_W0Zdtpvra_eMs+Ri5f2P-g@mail.gmail.com>
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx01.amust.local (172.24.0.171) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29C604D26A657660
+X-Veeam-MMEX: True
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx4.veeam.com [172.31.224.40]); Tue, 06 Oct 2020 11:42:43 +0300 (MSK)
+X-Veeam-MailScanner-Information: Please contact email@veeam.com if you have any problems
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 01, 2020 at 11:48:40PM +0800, Ming Lei wrote:
-> Hi,
-> 
-> The 1st patch removes memory footprint of percpu_ref in fast path
-> from 7 words to 2 words, since it is often used in fast path and
-> embedded in user struct.
-> 
-> The 2nd patch moves .q_usage_counter to 1st cacheline of
-> 'request_queue'.
-> 
-> Simple test on null_blk shows ~2% IOPS boost on one 16cores(two threads
-> per core) machine, dual socket/numa.
-> 
-> V7:
-> 	- add comments about reason for struct split
+Thanks for the answer.
 
-Hello Jens
+Unfortunately, blk-rq-qos cannot be used efficiently for this purpose.
+blk-rq-qos is good for collecting request queue processing metrics.
+The level at which the interception is performed is too low - it happens 
+after the device driver has already received the request for processing.
 
-Can you consider to merge the patchset in block tree if you are fine?
+For the filter to work efficiently, we need to ensure that the interception
+is performed on a higher level. It is required to put processing of 
+multiple BIOs on hold while COW algorithm is being executed for them.
+We must not be blocking the request processing queue, and also we would
+like to avoid impacting the IO scheduler operations.
 
-
-Thanks,
-Ming
-
+-- 
+Sergei Shtepa
+Veeam Software developer.
