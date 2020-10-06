@@ -2,153 +2,310 @@ Return-Path: <SRS0=/MU2=DN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 432E5C41604
-	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 16:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84108C41604
+	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 16:57:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 164BF206D4
-	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 16:34:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E8D5206F7
+	for <linux-block@archiver.kernel.org>; Tue,  6 Oct 2020 16:57:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lHvNwVs4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726128AbgJFQel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Oct 2020 12:34:41 -0400
-Received: from icebox.esperi.org.uk ([81.187.191.129]:47298 "EHLO
-        mail.esperi.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725981AbgJFQel (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Oct 2020 12:34:41 -0400
-Received: from loom (nix@sidle.srvr.nix [192.168.14.8])
-        by mail.esperi.org.uk (8.16.1/8.16.1) with ESMTP id 096GYYti006487;
-        Tue, 6 Oct 2020 17:34:34 +0100
-From:   Nix <nix@esperi.org.uk>
-To:     Kai Krakow <kai@kaishome.de>
-Cc:     Eric Wheeler <bcache@lists.ewheeler.net>,
-        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/3] bcache: introduce bcache sysfs entries for ioprio-based bypass/writeback hints
-References: <20201003111056.14635-1-kai@kaishome.de>
-        <20201003111056.14635-2-kai@kaishome.de>
-        <87362ucen3.fsf@esperi.org.uk>
-        <CAC2ZOYt+ZMep=PT5FbQKiqZ0EE1f4+JJn=oTJUtQjLwGvy=KfQ@mail.gmail.com>
-        <alpine.LRH.2.11.2010051923330.2180@pop.dreamhost.com>
-        <87o8lfa692.fsf@esperi.org.uk>
-        <CAC2ZOYvA966Jwa1CGepRDUmBn4=-vpZR82YZZQxT8L+f7-HTUQ@mail.gmail.com>
-Emacs:  (setq software-quality (/ 1 number-of-authors))
-Date:   Tue, 06 Oct 2020 17:34:34 +0100
-In-Reply-To: <CAC2ZOYvA966Jwa1CGepRDUmBn4=-vpZR82YZZQxT8L+f7-HTUQ@mail.gmail.com>
-        (Kai Krakow's message of "Tue, 6 Oct 2020 15:10:37 +0200")
-Message-ID: <87imbn9uud.fsf@esperi.org.uk>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3.50 (gnu/linux)
+        id S1726100AbgJFQ5y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Oct 2020 12:57:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21000 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725902AbgJFQ5y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Oct 2020 12:57:54 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 096GjgxP067642;
+        Tue, 6 Oct 2020 12:57:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=V1L4wmpC9GNRXyXNtycNQM7SwutbMQPQPEsTUd/ZD9Y=;
+ b=lHvNwVs4/9+vUpLd9ATJUyZqmRK5+Tn5KYg7y2trwVh4uw1I2eZ22v0qqWnd9+qnOzpI
+ 9idp8bVYkUxPfUHCRrh+QO45cPcTg1yC4/QwZtXFA55ysMPEJTYv4RRr44QJzGFuhk8g
+ NeaAaVy7BHwaO2EBaZhkl+jN4A+72OTxOaL1O58jymNKcciT/FibOgG51wFYDiqthW/R
+ t2ufrhsa531E87gPdzFEeuUH1vIxZ6gwNGTxdlmpdY45eN/VWKFNyFwBn3HwcvmwycZw
+ Iwq9EQR3ZgYOQ+TUlOhfDGxMlYKhkrK9Eh+YUBfMtPejz1uPVIRWSv6J/lsCCM70ZSka Qw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 340vcug9y2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Oct 2020 12:57:52 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 096Glew8071404;
+        Tue, 6 Oct 2020 12:57:52 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 340vcug9x0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Oct 2020 12:57:52 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 096GvmuP017883;
+        Tue, 6 Oct 2020 16:57:50 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 33xgx8bew2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Oct 2020 16:57:50 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 096GvlME7733696
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 6 Oct 2020 16:57:47 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 66F864C050;
+        Tue,  6 Oct 2020 16:57:47 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08CDB4C04E;
+        Tue,  6 Oct 2020 16:57:47 +0000 (GMT)
+Received: from [9.145.166.39] (unknown [9.145.166.39])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  6 Oct 2020 16:57:46 +0000 (GMT)
+Subject: Re: [PATCH 08/10] s390/dasd: Display FC Endpoint Security information
+ via sysfs
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Stefan Haberland <sth@linux.ibm.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com
+References: <20201002193940.24012-1-sth@linux.ibm.com>
+ <20201002193940.24012-9-sth@linux.ibm.com>
+ <20201006122632.098149ba.cohuck@redhat.com>
+From:   =?UTF-8?Q?Jan_H=c3=b6ppner?= <hoeppner@linux.ibm.com>
+Message-ID: <d88b8230-993e-d63d-394a-efcaf60f813d@linux.ibm.com>
+Date:   Tue, 6 Oct 2020 18:57:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-DCC-x.dcc-servers-Metrics: loom 104; Body=4 Fuz1=4 Fuz2=4
+In-Reply-To: <20201006122632.098149ba.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-06_09:2020-10-06,2020-10-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 mlxlogscore=999 suspectscore=2
+ impostorscore=0 adultscore=0 priorityscore=1501 mlxscore=0 phishscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010060102
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6 Oct 2020, Kai Krakow verbalised:
+On 10/6/20 12:26 PM, Cornelia Huck wrote:
+> On Fri,  2 Oct 2020 21:39:38 +0200
+> Stefan Haberland <sth@linux.ibm.com> wrote:
+> 
+>> From: Jan Höppner <hoeppner@linux.ibm.com>
+>>
+>> Add a new sysfs attribute (fc_security) per device and per operational
+>> channel path. The information of the current FC Endpoint Security state
+>> is received through the CIO layer.
+>>
+>> The state of the FC Endpoint Security can be either "Unsupported",
+>> "Authentication", or "Encryption".
+>>
+>> For example:
+>> $ cat /sys/bus/ccw/devices/0.0.c600/fc_security
+>> Encryption
+>>
+>> If any of the operational paths is in a state different from all
+>> others, the device sysfs attribute will display the additional state
+>> "Inconsistent".
+>>
+>> The sysfs attributes per paths are organised in a new directory called
+>> "paths_info" with subdirectories for each path.
+>>
+>> /sys/bus/ccw/devices/0.0.c600/paths_info/
+>> ├── 0.38
+>> │   └── fc_security
+>> ├── 0.39
+>> │   └── fc_security
+>> ├── 0.3a
+>> │   └── fc_security
+>> └── 0.3b
+>>     └── fc_security
+>>
+>> Reference-ID: IO1812
+>> Signed-off-by: Jan Höppner <hoeppner@linux.ibm.com>
+>> Reviewed-by: Stefan Haberland <sth@linux.ibm.com>
+>> Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+>> ---
+>>  drivers/s390/block/dasd_devmap.c | 105 +++++++++++++++++++++++++++++++
+>>  drivers/s390/block/dasd_eckd.c   |  30 +++++++++
+>>  drivers/s390/block/dasd_int.h    |  68 ++++++++++++++++++++
+>>  3 files changed, 203 insertions(+)
+>>
+> 
+> (...)
+> 
+>> +static struct kobj_type path_attr_type = {
+>> +	.release	= dasd_path_release,
+> 
+> This function does nothing; I think there's something wrong with your
+> kobject handling?
 
-> Am Di., 6. Okt. 2020 um 14:28 Uhr schrieb Nix <nix@esperi.org.uk>:
->> That sounds like a bug in the mq-scsi machinery: it surely should be
->> passing the ioprio off to the worker thread so that the worker thread
->> can reliably mimic the behaviour of the thread it's acting on behalf of.
->
-> Maybe this was only an issue early in mq-scsi before it got more
-> schedulers than just iosched-none? It has bfq now, and it should work.
-> Depending on the filesystem, tho, that may still not fully apply...
-> e.g. btrfs doesn't use ioprio for delayed refs resulting from such io,
-> it will simply queue it up at the top of the io queue.
+Explanation below.
 
-Yeah. FWIW I'm using bfq for all the underlying devices and everything
-still seems to be working, idle I/O doesn't get bcached etc.
+> 
+>> +	.default_attrs	= paths_info_attrs,
+>> +	.sysfs_ops	= &kobj_sysfs_ops,
+>> +};
+>> +
+>> +static void dasd_path_init_kobj(struct dasd_device *device, int chp)
+>> +{
+>> +	device->path[chp].kobj.kset = device->paths_info;
+>> +	kobject_init(&device->path[chp].kobj, &path_attr_type);
+> 
+> This inits a static kobject; as you never free it, doesn't the code
 
->> using cgroups would make this essentially unusable for
->> me, and probably for most other people, because on a systemd system the
->> cgroup hierarchy is more or less owned in fee simple by systemd, and it
->> won't let you use cgroups for something else,
->
-> That's probably not completely true, you can still define slices which
-> act as a cgroup container for all services and processes contained in
-> it, and you can use "systemctl edit myscope.slice" to change
-> scheduler, memory accounting, and IO params at runtime.
+kobject_put() frees the kobject data.
 
-That's... a lot clunkier than being able to say 'ionice -c 3 foo' to run
-foo without caching. root has to prepare for it on a piece-by-piece
-basis... not that ionice is the most pleasant of utilities to use
-either.
+> moan about state_initialized if you try to do that a second time?
 
->> (And as for making systemd set up suitable cgroups, that too would make
->> it unusable for me: I tend to run jobs ad-hoc with ionice, use ionice in
->> scripts etc to reduce caching when I know it won't be needed, and that
->> sort of thing is just not mature enough to be reliable in systemd yet.
->
-> You can still define a slice for such ad-hoc processes by using
-> systemd-run to make your process into a transient one-shot service.
+No, because we check whether we have this kobject already present
+in sysfs before we try to initialize it (we have in_sysfs per path
+object for this).
 
-That's one of the things that crashed my system when I tried it. I just
-tried it again and it seems to work now. :) (Hm, does systemd-run wait
-for return and hand back the exit code... yes, via --scope or --wait,
-both of which seem to have elaborate constraints that I don't fully
-understand and that makes me rather worried that using them might not be
-reliable: but in this it is just like almost everything else in
-systemd.)
+> 
+>> +}
+>> +
+>> +void dasd_path_create_kobj(struct dasd_device *device, int chp)
+>> +{
+>> +	int rc;
+>> +
+>> +	if (test_bit(DASD_FLAG_OFFLINE, &device->flags))
+>> +		return;
+>> +	if (!device->paths_info) {
+>> +		dev_warn(&device->cdev->dev, "Unable to create paths objects\n");
+> 
+> I guess this warns every time you come along here, is warning more than
+> once useful?
+> 
 
->> It's rare for a systemd --user invocation to get everything so confused
->> that the entire system is reundered unusable, but it has happened to me
->> in the past, so unlike ionice I am now damn wary of using systemd --user
->> invocations for anything. They're a hell of a lot clunkier for ad-hoc
->> use than a simple ionice, too: you can't just say "run this command in a
->> --user", you have to set up a .service file etc.)
->
-> Not sure what you did, I never experienced that. Usually that happens
+paths_info is a kset created during the device initialization. Do you mean,
+in case the kset creation fails, this check here should only warn once?
+I'm not sure about that, hm.
 
-It was early in the development of --user, so it may well have been a
-bug that was fixed later on. In general I have found systemd to be too
-tightly coupled and complex to be reliable: there seem to be all sorts
-of ways to use local mounts and fs namespaces and the like to fubar PID
-1 and force a reboot (which you can't do because PID 1 is too unhappy,
-so it's /sbin/reboot -f time). Admittedly I do often do rather extreme
-things with tens of thousands of mounts and the like, but y'know the
-only thing that makes unhappy is... systemd. :/
+>> +		return;
+>> +	}
+>> +	if (device->path[chp].in_sysfs)
+>> +		return;
+>> +	if (!device->path[chp].conf_data)
+> 
+> Out of interest: Have you tried this with vfio-ccw under QEMU, where
+> some information is simply not available?
 
-(I have used systemd enough to both rely on it and cordially loathe it
-as an immensely overcomplicated monster with far too many edge cases and
-far too much propensity to insist on your managing the system its way
-(e.g. what it does with cgroups), and if I do anything but the simplest
-stuff I'm likely to trip over one or more bugs in those edge cases. I'd
-switch to something else simple enough to understand if only all the
-things I might switch to were not also too simple to be able to do the
-things I want to do. The usual software engineering dilemma...)
+I did not, sorry.
 
-In general, though, the problem with cgroups is that courtesy of v2
-having a unified hierarchy, if any one thing uses cgroups, nothing else
-really can, because they all have to agree on the shape of the
-hierarchy, which is most unlikely if they're using cgroups for different
-purposes. So it is probably a mistake to use cgroups for *anything*
-other than handing control of it to a single central thing (like
-systemd) and then trying to forget that cgroups ever existed for any
-other purpose because you'll never be able to use them yourself.
+> 
+>> +		return;
+>> +
+>> +	dasd_path_init_kobj(device, chp);
+>> +
+>> +	rc = kobject_add(&device->path[chp].kobj, NULL, "%x.%02x",
+>> +			 device->path[chp].cssid, device->path[chp].chpid);
+>> +	if (rc)
+>> +		kobject_put(&device->path[chp].kobj);
+> 
+> This will eventually lead to the nop release function, which doesn't
+> unset state_initialized (see above) -- but OTOH, it shouldn't muck
+> around with kobject internals anyway.
 
-A shame. They could have been a powerful abstraction...
+The release function is supposed to free memory of the structure where
+the kobject lies in (our release function is explained below).
+The rest is taking care of by the kobject library.
 
-> and some more. The trick is to define all slices with a
-> lower bound of memory below which the kernel won't reclaim memory from
-> it - I found that's one of the most important knobs to fight laggy
-> desktop usage.
+> 
+> I think the kobjects really want to be dynamically allocated; instead
+> of going through a remove/add cycle, is there a way to make path
+> objects "invisible" instead? Or add an "available" attribute, and error
+> out reading any other attribute?
+> 
+>> +	device->path[chp].in_sysfs = true;
+>> +}
+>> +EXPORT_SYMBOL(dasd_path_create_kobj);
+>> +
+>> +void dasd_path_create_kobjects(struct dasd_device *device)
+>> +{
+>> +	u8 lpm, opm;
+>> +
+>> +	opm = dasd_path_get_opm(device);
+>> +	for (lpm = 0x80; lpm; lpm >>= 1) {
+>> +		if (!(lpm & opm))
+>> +			continue;
+> 
+> Any reason you do not simply create objects for _all_ paths, combined
+> with returning n/a or erroring out for paths where this does not apply?
+> (I might be missing something obvious.)
 
-I cheated and just got a desktop with 16GiB RAM and no moving parts and
-a server with so much RAM that it never swaps, and 10GbE between the two
-so the desktop can get stuff off the server as fast as its disks can do
-contiguous reads. bcace cuts down seek time enough that I hardly ever
-have to wait for it, and bingo :)
+Because we likely don't have all information required to create the kobject
+for other paths, e.g. the cssid and chpid (which are required for the
+proper name).
 
-(But my approach is probably overkill: yours is more elegant.)
+> 
+>> +		dasd_path_create_kobj(device, pathmask_to_pos(lpm));
+>> +	}
+>> +}
+>> +EXPORT_SYMBOL(dasd_path_create_kobjects);
+>> +
+>> +void dasd_path_remove_kobj(struct dasd_device *device, int chp)
+>> +{
+>> +	if (device->path[chp].in_sysfs) {
+>> +		kobject_put(&device->path[chp].kobj);
+>> +		device->path[chp].in_sysfs = false;
+>> +	}
+>> +}
+>> +EXPORT_SYMBOL(dasd_path_remove_kobj);
+> 
+> Also, how is userspace supposed to deal with changes here? Should there
+> be a uevent on the parent device to notify about changes?
 
-> I usually look at the memory needed by the processes when running,
+I can't think of a user just yet. I'll keep this in mind for further
+improvements. I certainly won't hurt to create uevents here.
 
-I've not bothered with that for years: 16GiB seems to be enough that
-Chrome plus even a fairly big desktop doesn't cause the remotest
-shortage of memory, and the server, well, I can run multiple Emacsen and
-20+ VMs on that without touching the sides. (Also... how do you look at
-it? PSS is pretty good, but other than ps_mem almost nothing uses it,
-not even the insanely overdesigned procps top.)
+> 
+>>  
+>>  int dasd_add_sysfs_files(struct ccw_device *cdev)
+>>  {
+> 
+> (...)
+> 
+>> +static inline void dasd_path_release(struct kobject *kobj)
+>> +{
+>> +/* Memory for the dasd_path kobject is freed when dasd_free_device() is called */
+>> +}
+>> +
+> 
+> As already said, I don't think that's a correct way to implement this.
+> 
+
+As you correctly pointed out, our release function doesn't do anything.
+This is because our path data is a (static) part of our device.
+This data is critical to keep our devices operational.
+We can't simply rely on allocated memory if systems are under stress. 
+
+Having this data dynamically allocated involves a lot of rework of our
+path handling as well. There are a few things that are subject to improvement
+and evaluating whether our dasd_path structures can be dynamic is one of
+these things. However, even then, the above concern persists and I
+highly doubt that dynamic dasd_paths objects are doable for us at this
+moment.
+
+I do understand the concerns, however, we release the memory for dasd_path
+structures eventually when dasd_free_device() is called. Until that point,
+the data has to be kept alive. The rest is taking care of by the kobject
+library.
+In our path handling we also make sure that we can always verify/validate
+paths information even if a system is under high memory pressure. Another
+reason why it would contradictory for dasd_path objects to be dynamic.
+
+I hope this explains the reasoning behind the release function.
+
+so long,
+Jan
