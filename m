@@ -2,153 +2,132 @@ Return-Path: <SRS0=w7gf=DO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE12C41604
-	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 14:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80C1C41604
+	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 14:19:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBCC1205F4
-	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 14:03:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FC9B212CC
+	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 14:19:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BACYfm2J"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="efO53mfu";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="moU73/e/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728568AbgJGODx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Oct 2020 10:03:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50858 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728469AbgJGODw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 7 Oct 2020 10:03:52 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 097E2oEJ041052;
-        Wed, 7 Oct 2020 10:03:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=/R6H+Jh1soFEYiNGbm+WyHy+i4VFYPzyhFJbhMU+gR0=;
- b=BACYfm2JB3aPjghXbc8Ex4wSZTI1DGXwU4FIAtFKmkpYN04Pxfaolf44lgfwrNVPvw4g
- UA/gM5Wm71rFeen4AnH94kV7J7iZL1IeHfMAK/1XLgwycDSc5o77E7NAdrAsZ3pxTaAv
- +F6Vj757Cf7gt2Hk0ak4/JaWxfLRjPQxLBa/ir2QaZYDoSiXjMscxw/y9+ho9u4VK6mF
- fHDdpgYlC8KNtfvPn+ubWo1rbos22ZC25SfJuescN/N1zFiI7QW4iH3LW+MDhGSJNyzv
- OZZqLpIw/Bm2FEQEqGC1a9rUBtiGU84OosB/YAlP89u9bHduIBx6fyMVrJfRS6jAACy3 wA== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 341d7e4bp4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Oct 2020 10:03:47 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 097Dpvub024287;
-        Wed, 7 Oct 2020 14:03:32 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 33xgx8cc0y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Oct 2020 14:03:32 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 097E2EcO25756120
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Oct 2020 14:02:14 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7CA85A4040;
-        Wed,  7 Oct 2020 14:02:14 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2F16EA405D;
-        Wed,  7 Oct 2020 14:02:14 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.175.219])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Oct 2020 14:02:14 +0000 (GMT)
-Subject: Re: [PATCH] partitions/ibm: fix non-DASD devices
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, sth@linux.ibm.com,
-        linux-s390@vger.kernel.org
-References: <20201007124009.1438269-1-hch@lst.de>
- <a8b1c076-c280-d201-8403-2392a42d2163@kernel.dk>
- <20201007135411.GA1000@lst.de>
- <874c518d-7c15-d08a-61a2-116f605c4b5a@kernel.dk>
- <20201007140109.GA1042@lst.de>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <14283127-1c99-525e-9abd-14b4ca1e0681@de.ibm.com>
-Date:   Wed, 7 Oct 2020 16:02:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
-MIME-Version: 1.0
-In-Reply-To: <20201007140109.GA1042@lst.de>
-Content-Type: text/plain; charset=utf-8
+        id S1728618AbgJGOTX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Oct 2020 10:19:23 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:34218 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728583AbgJGOTX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Oct 2020 10:19:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1602080362; x=1633616362;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=bP1V2YRXLs22OB2d57K1hU5vmYfsMcBh72oWRrDIUmM=;
+  b=efO53mfuH0GPBRm4OqS1OlCJgGBXAm3TPOFxCk90/Uo9AwYEjkSnvihF
+   r74XOAF06nhXXMtyrUN+gcHWP6QClH+rA1ediEtmxLNLgL3NXDJQCErcm
+   Lcm/FQbEVuhOgPD7TLKM+u/GUQBck/JvDzNcCz2sGE4l0ZGQkgOxNpXhE
+   dFUugf8zBajg6P+9cnghseA8DWC6SU9EadF8JNNH8rUx3KEhVccGOfJCH
+   9A4wPtvAhhxd2A8DuqThh6ta8VuzJfN6CI/jRIiBopLDulW+swDyXs3WC
+   /csr6CACdO6LK7bvnhaUp5t3aKNhz42NRCrdOhrDpqIDpJDV9DU8wok5u
+   g==;
+IronPort-SDR: 9Wiqrp3BT9DYdMuleioXzHj4S0z6N1F32lrpMS79dMQYqQWALCXFEh4djc3s4jtKAs4DRzyb5I
+ APjiuORp+Lh6kBejnHQJuWLvRKem3VUUmgzGaroYQjkuOUJ9bNvMqhCJ8iGdrbnya2UosOZYVI
+ epooiGh4KFs6wW0IPQYLCwTOLx9sXZRPIElmjgCp5+zPGTaguW7LsfVHiOmbPywPkAiqjNF966
+ FM+laf/0LaFwdWQD9g+3FZW0fUaa4frfgIIskfmFlTUPEZW/loMlAG498vtxx3CcOH22EFfVVS
+ k4o=
+X-IronPort-AV: E=Sophos;i="5.77,347,1596470400"; 
+   d="scan'208";a="149177669"
+Received: from mail-bn7nam10lp2102.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.102])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Oct 2020 22:19:21 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hCwv3eWbAGL7XCVW8N/lIrRcPMRs5cvfiPXbZJmjHd3FJE2/zckLWUMmHLEVcerptpAL2ZjntjEyvy6whbToNza8DJA88ArGb+1X4UwTpmFedlhVcX0Rh093fAXDO+3hEEx5WCMZfbSSUIx9F0PO3CI8MurlHmRL/AGLp95ia2lL7EkAnvd05Zep0O2IC8uZU5Hho0cXmKBmKy09NOENqtW71QwwzNrQuw1Y/gP8AWzhKzFcTv5qGYk7STMkqag4JDALRukWjj0T9yB0Tr9naeRboQEzSIqI6dZewpqnajtRj5XyTW2uHHC3DdYhPkwpc+3F1word3bBpRxo3C+2hA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bP1V2YRXLs22OB2d57K1hU5vmYfsMcBh72oWRrDIUmM=;
+ b=LFYraQxsbZj5ygN4bipKfpieezNl56I1hxTJkZcm0aqbzoJYls5sYI6BHyGZBuB1STZEkMRmdqZdY4PvWKYFHBO419mfXkI4K+ZQW6foziME679jRAIHK4NM77JcWrQOFjonsNgkWd5JJG3Z4rN+hNZESmj5bzFvjTv/v6R+AVR+tv+psUs6qV3tsF85W1MPweozGtXDP1IX8OZkkVBgXiMTd3vJk4Ps7yw8m2qsZKQWR2sEE8thZ2RixiKOj92nHbex+6rKxZ9rqa6s0ko9ui2Q5rU5KOt0pPap1LFkdaoYjfJBzBbKG2uJ9Ho0bW3AroCAGU+yp5qHVjX1PxwTmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bP1V2YRXLs22OB2d57K1hU5vmYfsMcBh72oWRrDIUmM=;
+ b=moU73/e/FjLSBzFE2H+RIexk3d2HqKzW890FkDkXHT3RoFUUWZy6qivR0bqP6fkt/DGTqiLjKBhismupcrk3R5RLDAsIhv6f1G8NSan3Wjuw5/vPe5lLhXmxzEnQcyzM2S/1e2a5cAeEUBGuWhMkBZmOyAFy65h+LIzwZQrmPlo=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN6PR04MB3885.namprd04.prod.outlook.com
+ (2603:10b6:805:48::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Wed, 7 Oct
+ 2020 14:19:17 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::619a:567c:d053:ce25]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::619a:567c:d053:ce25%6]) with mapi id 15.20.3433.045; Wed, 7 Oct 2020
+ 14:19:17 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] block: soft limit zone-append sectors as well
+Thread-Topic: [PATCH] block: soft limit zone-append sectors as well
+Thread-Index: AQHWnIsT4YZR0LScLUiFnh8wH9QslA==
+Date:   Wed, 7 Oct 2020 14:19:17 +0000
+Message-ID: <SN4PR0401MB359845933138BBAFFA287DEB9B0A0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <2358a1f93c2c2f9f7564eb77334a7ea679453deb.1602062387.git.johannes.thumshirn@wdc.com>
+ <a04275e3-48e9-a2e7-c28e-8fce0827a06e@kernel.dk>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-10-07_09:2020-10-06,2020-10-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1011
- impostorscore=0 mlxscore=0 mlxlogscore=993 adultscore=0 lowpriorityscore=0
- priorityscore=1501 bulkscore=0 spamscore=0 malwarescore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010070089
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: kernel.dk; dkim=none (message not signed)
+ header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2001:a62:1460:3d01:d469:2a91:d2e8:8338]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 937625e4-7a97-4981-95ae-08d86acbf9f5
+x-ms-traffictypediagnostic: SN6PR04MB3885:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN6PR04MB388567A0C6441C773C1DB3CB9B0A0@SN6PR04MB3885.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:651;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: iX3SDhDHxgb79z2WzXsV1dUmAEw/gNkX8AKdpHS6WTa+R+2Ed1fLyDTkDpWBh56Q1ASl3G3JrXHTT794QETf9A/7JyhgfIRbyfPP8pYZ2+d6iT37MyTCOacn74peEqcM3ZCeKo8H/FmfOMXLtGSSFk0gQn7mNkg674nuABXqrgleuqbTi/TwjBOmtdNmoDdWVahOHBcOnwXxGj3Cx5vm9ppiXjfF6gl+7eEpNRWtPoH8zEH9oBdXnDivdzyIPOWzaggb9Z01gjPnEDEeAMwM+R4etbZ3L8dUoyi4W29NOlyUUV+TsrHFjszoRX7m6BnS
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(136003)(376002)(39860400002)(346002)(91956017)(33656002)(83380400001)(66556008)(2906002)(6506007)(76116006)(66476007)(66446008)(66946007)(71200400001)(5660300002)(64756008)(86362001)(53546011)(186003)(4744005)(52536014)(316002)(55016002)(478600001)(9686003)(6916009)(54906003)(8936002)(8676002)(4326008)(7696005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: xIbw4fW0AktaWmFwgHc8LSKBZFCDNkUP9Bmxs07QhFvo9KgzOydSFlV1ExX/zaFakSgg5EsFtJn+ill54eNn34JTTJ+vTzQz7bHl+m5WoBfjTR+wA5yJ6EPxwlpslwhKTAcjuQDEt3ciSCF3OQVTINFyLeNA9v1AVBspjxGNlqHuMhs4KGPvJKZeWSbu43tbhhyS53RIpjmawk2748PEHl7gauNTnKgXScbr2f5Ri72DU5Ft8kZigPBFjgIuk7/SeCQ+VuJACAIaKtuUAc+8QknQS7RiIH5q15UJeImIiJOWGPR6IFPp5vpbxCee7bwBsbMBjNIq7lfEFwBQH/d5W3RyebIeMQnUBA8BrdwEY5t4E5EG099HcxoN36wQ20UcmL1ktw42JzGWrN1zI3fM5WMHFigenBu1vlMccElQbDkaDuh/aT2B41FHrdM53xdibLFzchUY4Oetc31/7tsuuYZgBjj68K1lDOjkf3uA9lUIvqgDPGRzE0h1t/n2yGRxtNMAOM0kfiNszZjiNgRLVh00pCm3vC0RNOXn2fo+Q+Tp/R459jyea1H9EN/ikx7GUUaMidRiCsxGmoa3vJcwgAyq2KaoKbLX4br6Hki1JEb5CvfY206jrabuskGfOh1ONwWVDq3iyKX0B+Hx3e1iT5ZRGR89+M8gPWcr4EiBxHpCGpVxB+KXcHkFQOBJ9btyB2LWT/Z6f0kuynumfkXQ0w==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 937625e4-7a97-4981-95ae-08d86acbf9f5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Oct 2020 14:19:17.5912
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rkFtfHu9uFyYn/rwp98se2CoMw+eiigJTNDd8lBdeL4tvLeWua0DfIaWjgUof1v/imNY9tGz8elM82PjnzfuVmq4MRxk9FAYc8eCXPnVZPg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB3885
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 07.10.20 16:01, Christoph Hellwig wrote:
-> On Wed, Oct 07, 2020 at 07:54:45AM -0600, Jens Axboe wrote:
->> On 10/7/20 7:54 AM, Christoph Hellwig wrote:
->>> On Wed, Oct 07, 2020 at 07:53:27AM -0600, Jens Axboe wrote:
->>>> On 10/7/20 6:40 AM, Christoph Hellwig wrote:
->>>>> Don't error out if the dasd_biodasdinfo symbol is not available.
->>>>
->>>> Should this be marked for 5.8-stable?
->>>
->>> The Fixes tag should automatically take care of that.
->>
->> Not if it's not marked for stable. Maybe auto-selection will pick it
->> up, but it's not a given.
-> 
-> Yes, trivial patches with a fixes tag get reliably picked out.  But
-> if you don't trust the system feel free to add a stable tag.
-
-Yes, we want to have it for 5.8 stable, so a stable tag certainly does not hurt. 
+On 07/10/2020 15:58, Jens Axboe wrote:=0A=
+> As the test robot points out, this won't even compile... How much=0A=
+> testing did you do with this?=0A=
+> =0A=
+=0A=
+Please see the v2 and my answer on Martin's mail, I forgot to commit --amen=
+d =0A=
+the fix before sending.=0A=
+=0A=
+As for testing it passed the zonefs testsuite on a null_blk device with a d=
+efault of 127=0A=
+max sectors and a run with a limit of 64 sectors.=0A=
