@@ -2,96 +2,178 @@ Return-Path: <SRS0=w7gf=DO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 116A4C3279D
-	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 00:14:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0E9C46466
+	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 00:42:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3F15206F0
-	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 00:14:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="WomVnvTx"
+	by mail.kernel.org (Postfix) with ESMTP id 59EE62078E
+	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 00:42:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726745AbgJGAOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Oct 2020 20:14:46 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:32972 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725972AbgJGAOq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Oct 2020 20:14:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=hUEDYTtYWRLTZhUJ1PsnTG6DKx8J9AiKmozhxnd9g4Y=; b=WomVnvTxGhGIUQZu62C6lncFUu
-        W/EtMAVRX4r5X2yCavZqOW/QOtThugT/K6DAWw+hbKyAl5tBV+P2Z51HP2X19GPw652+tB9w3iGMg
-        6YGVy+e33IEhaOmr1vKnHWF4NROcNJzeikdaR65s/8LLn+YYy36RYoEBqSVRF48uizjJyjuL5kRP0
-        GikLOIGvasauzQVTy+nTD3m+Gi2CrRHLhd+FcTm142tYKDyNxhA1mjBXXhLB98SBi74UQ6OPfV/V7
-        O4hHkrvHx8DXhuy0+t+CkUatb8nrM5A+vWoZ3LRCIEyvhDio6gzuEBaDaMU2FZpaa2WK/tioAwhiU
-        yJ9ydGQA==;
-Received: from [172.16.1.162]
-        by ale.deltatee.com with esmtp (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1kPwjn-0006fK-Tc; Tue, 06 Oct 2020 17:51:20 -0600
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@osandov.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20200930185422.11494-1-logang@deltatee.com>
- <20200930185422.11494-3-logang@deltatee.com>
- <BYAPR04MB4965388F1D0E70EDCEDD57E2860D0@BYAPR04MB4965.namprd04.prod.outlook.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <b809f785-fc8b-4fa5-5de2-26dc9a4aed94@deltatee.com>
-Date:   Tue, 6 Oct 2020 17:51:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1726672AbgJGAmJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Oct 2020 20:42:09 -0400
+Received: from mx.ewheeler.net ([173.205.220.69]:43062 "EHLO mail.ewheeler.net"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725972AbgJGAmJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Oct 2020 20:42:09 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.ewheeler.net (Postfix) with ESMTP id D523EA0633;
+        Wed,  7 Oct 2020 00:42:08 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mail.ewheeler.net ([127.0.0.1])
+        by localhost (mail.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id YRO9wqD0pCB3; Wed,  7 Oct 2020 00:42:03 +0000 (UTC)
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mail.ewheeler.net (Postfix) with ESMTPSA id 52833A0612;
+        Wed,  7 Oct 2020 00:42:03 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ewheeler.net 52833A0612
+Date:   Wed, 7 Oct 2020 00:41:59 +0000 (UTC)
+From:   Eric Wheeler <bcache@lists.ewheeler.net>
+X-X-Sender: lists@pop.dreamhost.com
+To:     Nix <nix@esperi.org.uk>
+cc:     Kai Krakow <kai@kaishome.de>, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] bcache: introduce bcache sysfs entries for ioprio-based
+ bypass/writeback hints
+In-Reply-To: <87imbn9uud.fsf@esperi.org.uk>
+Message-ID: <alpine.LRH.2.11.2010070035310.27518@pop.dreamhost.com>
+References: <20201003111056.14635-1-kai@kaishome.de>        <20201003111056.14635-2-kai@kaishome.de>        <87362ucen3.fsf@esperi.org.uk>        <CAC2ZOYt+ZMep=PT5FbQKiqZ0EE1f4+JJn=oTJUtQjLwGvy=KfQ@mail.gmail.com>        <alpine.LRH.2.11.2010051923330.2180@pop.dreamhost.com>
+        <87o8lfa692.fsf@esperi.org.uk>        <CAC2ZOYvA966Jwa1CGepRDUmBn4=-vpZR82YZZQxT8L+f7-HTUQ@mail.gmail.com> <87imbn9uud.fsf@esperi.org.uk>
+User-Agent: Alpine 2.11 (LRH 23 2013-08-11)
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB4965388F1D0E70EDCEDD57E2860D0@BYAPR04MB4965.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, sagi@grimberg.me, osandov@osandov.com, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, Chaitanya.Kulkarni@wdc.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH blktests v2 02/11] common/xfs: Create common helper to
- check for XFS support
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, 6 Oct 2020, Nix wrote:
+> On 6 Oct 2020, Kai Krakow verbalised:
+> 
+> > Am Di., 6. Okt. 2020 um 14:28 Uhr schrieb Nix <nix@esperi.org.uk>:
+> >> That sounds like a bug in the mq-scsi machinery: it surely should be
+> >> passing the ioprio off to the worker thread so that the worker thread
+> >> can reliably mimic the behaviour of the thread it's acting on behalf of.
+> >
+> > Maybe this was only an issue early in mq-scsi before it got more
+> > schedulers than just iosched-none? It has bfq now, and it should work.
+> > Depending on the filesystem, tho, that may still not fully apply...
+> > e.g. btrfs doesn't use ioprio for delayed refs resulting from such io,
+> > it will simply queue it up at the top of the io queue.
+> 
+> Yeah. FWIW I'm using bfq for all the underlying devices and everything
+> still seems to be working, idle I/O doesn't get bcached etc.
+> 
+> >> using cgroups would make this essentially unusable for
+> >> me, and probably for most other people, because on a systemd system the
+> >> cgroup hierarchy is more or less owned in fee simple by systemd, and it
+> >> won't let you use cgroups for something else,
+> >
+> > That's probably not completely true, you can still define slices which
+> > act as a cgroup container for all services and processes contained in
+> > it, and you can use "systemctl edit myscope.slice" to change
+> > scheduler, memory accounting, and IO params at runtime.
+> 
+> That's... a lot clunkier than being able to say 'ionice -c 3 foo' to run
+> foo without caching. root has to prepare for it on a piece-by-piece
+> basis... not that ionice is the most pleasant of utilities to use
+> either.
+
+I always make my own cgroups with cgcreate, cgset, and cgexec.  We're 
+using centos7 which is all systemd and I've never had a problem:
+
+Something (hypothetically) like this:
+	cgcreate -g blkio:/my_bcache_settings
+	cgset -r blkio.bcache.bypass='read,write'    my_bcache_settings
+	cgset -r blkio.bcache.writeback='write,meta' my_bcache_settings
+
+Then all you need to do is run this which isn't all that different from an 
+ionice invocation:
+	cgexec -g blkio:my_bcache_settings /usr/local/bin/some-program
 
 
-On 2020-10-06 5:44 p.m., Chaitanya Kulkarni wrote:
-> On 9/30/20 11:54, Logan Gunthorpe wrote:
->>  
->>  requires() {
->>  	_nvme_requires
->> -	_have_program mkfs.xfs && _have_fio
->> +	_have_xfs
->> +	_have_fio
-> Can you make _have_xfs return true false ? so it can be used with && ?
+--
+Eric Wheeler
 
-_have_xfs() does return true/false and can be used with && or in a
-conditional.
 
-Per [1], my opinion is that using && in the requires() function where
-the return value is ignored is confusing so I prefer not to do it in new
-code.
 
-If we want to reconsider this we, should add a check to ensure the
-return value of requires() matches the expectation of the global
-variable it uses.
-
-Logan
-
-[1]
-https://lore.kernel.org/linux-block/92478e6f-622a-a1ae-6189-4009f9a307bc@deltatee.com/
+> 
+> >> (And as for making systemd set up suitable cgroups, that too would make
+> >> it unusable for me: I tend to run jobs ad-hoc with ionice, use ionice in
+> >> scripts etc to reduce caching when I know it won't be needed, and that
+> >> sort of thing is just not mature enough to be reliable in systemd yet.
+> >
+> > You can still define a slice for such ad-hoc processes by using
+> > systemd-run to make your process into a transient one-shot service.
+> 
+> That's one of the things that crashed my system when I tried it. I just
+> tried it again and it seems to work now. :) (Hm, does systemd-run wait
+> for return and hand back the exit code... yes, via --scope or --wait,
+> both of which seem to have elaborate constraints that I don't fully
+> understand and that makes me rather worried that using them might not be
+> reliable: but in this it is just like almost everything else in
+> systemd.)
+> 
+> >> It's rare for a systemd --user invocation to get everything so confused
+> >> that the entire system is reundered unusable, but it has happened to me
+> >> in the past, so unlike ionice I am now damn wary of using systemd --user
+> >> invocations for anything. They're a hell of a lot clunkier for ad-hoc
+> >> use than a simple ionice, too: you can't just say "run this command in a
+> >> --user", you have to set up a .service file etc.)
+> >
+> > Not sure what you did, I never experienced that. Usually that happens
+> 
+> It was early in the development of --user, so it may well have been a
+> bug that was fixed later on. In general I have found systemd to be too
+> tightly coupled and complex to be reliable: there seem to be all sorts
+> of ways to use local mounts and fs namespaces and the like to fubar PID
+> 1 and force a reboot (which you can't do because PID 1 is too unhappy,
+> so it's /sbin/reboot -f time). Admittedly I do often do rather extreme
+> things with tens of thousands of mounts and the like, but y'know the
+> only thing that makes unhappy is... systemd. :/
+> 
+> (I have used systemd enough to both rely on it and cordially loathe it
+> as an immensely overcomplicated monster with far too many edge cases and
+> far too much propensity to insist on your managing the system its way
+> (e.g. what it does with cgroups), and if I do anything but the simplest
+> stuff I'm likely to trip over one or more bugs in those edge cases. I'd
+> switch to something else simple enough to understand if only all the
+> things I might switch to were not also too simple to be able to do the
+> things I want to do. The usual software engineering dilemma...)
+> 
+> In general, though, the problem with cgroups is that courtesy of v2
+> having a unified hierarchy, if any one thing uses cgroups, nothing else
+> really can, because they all have to agree on the shape of the
+> hierarchy, which is most unlikely if they're using cgroups for different
+> purposes. So it is probably a mistake to use cgroups for *anything*
+> other than handing control of it to a single central thing (like
+> systemd) and then trying to forget that cgroups ever existed for any
+> other purpose because you'll never be able to use them yourself.
+> 
+> A shame. They could have been a powerful abstraction...
+> 
+> > and some more. The trick is to define all slices with a
+> > lower bound of memory below which the kernel won't reclaim memory from
+> > it - I found that's one of the most important knobs to fight laggy
+> > desktop usage.
+> 
+> I cheated and just got a desktop with 16GiB RAM and no moving parts and
+> a server with so much RAM that it never swaps, and 10GbE between the two
+> so the desktop can get stuff off the server as fast as its disks can do
+> contiguous reads. bcace cuts down seek time enough that I hardly ever
+> have to wait for it, and bingo :)
+> 
+> (But my approach is probably overkill: yours is more elegant.)
+> 
+> > I usually look at the memory needed by the processes when running,
+> 
+> I've not bothered with that for years: 16GiB seems to be enough that
+> Chrome plus even a fairly big desktop doesn't cause the remotest
+> shortage of memory, and the server, well, I can run multiple Emacsen and
+> 20+ VMs on that without touching the sides. (Also... how do you look at
+> it? PSS is pretty good, but other than ps_mem almost nothing uses it,
+> not even the insanely overdesigned procps top.)
+> 
