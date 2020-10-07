@@ -2,149 +2,169 @@ Return-Path: <SRS0=w7gf=DO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00388C3279D
-	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 03:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B341FC4363C
+	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 05:22:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB43E208C3
-	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 03:17:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F467214DB
+	for <linux-block@archiver.kernel.org>; Wed,  7 Oct 2020 05:22:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="i/c2g+os"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SPH49tUH";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="IVSVgsNz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727072AbgJGDRW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Oct 2020 23:17:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727355AbgJGDRM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Oct 2020 23:17:12 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F629C0613D3
-        for <linux-block@vger.kernel.org>; Tue,  6 Oct 2020 20:17:11 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id f19so508608pfj.11
-        for <linux-block@vger.kernel.org>; Tue, 06 Oct 2020 20:17:11 -0700 (PDT)
+        id S1726385AbgJGFWV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Oct 2020 01:22:21 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:63779 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726009AbgJGFWV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Oct 2020 01:22:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1602048139; x=1633584139;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=7AbG3Ypd+Wsmv6BiC2SKvJ5en7NDGGyJkalc/78jLe8=;
+  b=SPH49tUHaMhp/e6QCESE5AkCYVSVfUgV+h9ufvmDHtfdT1iA8JL6wXfQ
+   ZhOgq7BvfqmSrC6nHc5+BMCiNrN+unw2ejh5yT96eMx2ifMGFouf9V8dE
+   4v1XFefsU2KnXrgGUd1oJcEdQOt3R1S9ce8V3DsEOoHFl81DBCrovDKSM
+   jAhKWFTsh2dR5lxO5GhPhEyhHQHY3HpJUxul/N/ALvUsgMG8D1R76HLAv
+   ODrHgNWi/6P/dyCMhK7JRu3eegSOF2/XBWbaWyDjt7K/DX2etE5P3mfZ6
+   Oba4xKWU1CSX6Cm8zpgvh7S6Vi31lOYl+0Llkwr+8nIB4XEpLuRclWFBS
+   A==;
+IronPort-SDR: jey4tDS3u/i1Csz25ZVruKxFrSor1yg7ZX4foALu4lJ29UQL1Rcb7HHylBuY+E0/ZB3dMJh3cn
+ 6nMPJdeERlO3s1wpBCDD3pu7A2xfkbAcD88QC1weawxd0P6eo1OrrKBQOnrLRhDLbWqCqx/tTl
+ Q8kAceBBxu+FZ9t/stoF1+VLGRfvbDklTAEaqDSEjcLyrVkseoSe4A04sZLUnqmf+t4cohkoab
+ nqROgmvZQcSV4JcSIKm0KFSS/D+UR8yB53r2ZgWeUchtcLlQ1Qy/1hXm+1lncseIN4a9ZyN15R
+ 3uA=
+X-IronPort-AV: E=Sophos;i="5.77,345,1596470400"; 
+   d="scan'208";a="149145486"
+Received: from mail-co1nam04lp2055.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.55])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Oct 2020 13:22:19 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HM5JAoCpked5VjKf3XevtKzCYxtjkXwyWN9OoOXHfSy4lx2I0XazU84BR9t3g7YhQffvL1YQrgTiVMPnf/u5JQ8ON+pXA/NZMV24r9VAATRNaxRnt5l58EpIcv30EEACRru+t56EGVeqXdghFivtv0QGDzIgOxpQwSpWyC2ARZO3RKdRIDKPattQmdkSfzyOA8x9RRrug91A8MFAFs2QAqO9z0cg1K2PDeH50PavJ1S0wVc5jPTOSfhnCCzrVZVN5UnGkrhiGvXdODSAACkaQFGZyYG7Df9cgpFe2B7O6AavNYRlP62z4/xLwhRnhEU5vRepZfk2zuh/3zu+jE3Mjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z0oxlk06pG8lEBQMRmL9B+S8Pbv711ZKoAETCQtFE8E=;
+ b=HYcF1dmHEB+OVO0FShudjHqvr2t+z4AmWLbbEw+NiK+RrwrlvAumBocDuQIxPK9y/VlaMRD5ex9JYEa8WfCclkrU2RO8PKgn6wawhuCfoey8OlTg78ywaW84RbjGubzvPk8HumZFuB8izj+oS+6H0nqyQo9U1g3NgOOLGRgL+iqvUO1guVtttwJBd5Wl0zRJSgmoOQxDgqdEcMnd5eXAqNd+sA2k/aRr0XHg0tAtyk2AQ6lzEJfizUYmUQ2iqo2bZj5eU6fGySGS/aYQCT9tMGuwBdnCGkMjBD5xUwk2WDlhoDI9UU68cdrC5lL8qpAHD02dyivFuyaVmADbaNfRLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=nPkmLEjjOLqKd/lOoAyA8z7n9dUCjwGzd+W0L3DZgSM=;
-        b=i/c2g+osuUxGIsLB3AH+kyrVOsH7GDY82yaZk6DFm7TuOhQlVuanhZZn96R5kN3izp
-         QCF6S7wYFvfEzqAWN4JNKCbmAxfjPUM41Xq23XmkKwysvjXL85bj9vgw91NQOOK5/Rt+
-         p+HAZAhwRnRxmNuQa9Jgi2tqC06ZPFxoLEpOswxrCs3AWf0oIMM7K699j2Mt7owk9KFe
-         TpVS1j5IyNSI1FB1hBUGb33xr+uCXUaBh5wd7IfXrgUXBdLrsG5ogZ9CFp5EPiUScT41
-         Moa9yhVJI/PXM6UYGWvx5QP0lRzV4L7N8vOyZ0EFG8ZmnTZ2IDJjOSjJHTwSWKzAEH6U
-         zKHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nPkmLEjjOLqKd/lOoAyA8z7n9dUCjwGzd+W0L3DZgSM=;
-        b=d88sKio9Ub53GnGJPECcHxx2JgWkGpmOqM0T6FUHuYzQtGRZgt+BQVuduOX5yjYcXl
-         wIXlNMvp/xPQUB3jNBXMJgubW3LM3UADAO33CgUnS3XRzoWezhHdGXJQTDBLvw+b0Atw
-         PrS53ajEAr/zYY1f8FS8g+4nMwuFMG49WvGSf/nF8pl97+Fi8ed/F4grGvZH6hHVRVj+
-         Hb++q5kt1vRqonRXxViWV3VxY3Dmq4ICqj4AWFDGFB8DeNB2NNQ1xR5kiNVLuHKQmix2
-         ip3T6bRCo0k0mYIaMoNGcD+U4pSeok1q8ACzxAiXWjBKqyMUbBy8bOPUo3gMHF7LAcYd
-         ckcA==
-X-Gm-Message-State: AOAM533KyjQ9Jvww2OXexfGNISzebAzwV/LOcQWSBVdvvVlNLviq0h13
-        CGMcxjq2Dd1FePWK8oUMqxN9tQ==
-X-Google-Smtp-Source: ABdhPJzxgagkn4cVqjUy8sr7sdcfRTWbXc2ao2DIrr5tMY6Uq7VD6rrtEFb369pBeTAqS3uisiBzXw==
-X-Received: by 2002:a65:4bcc:: with SMTP id p12mr1093870pgr.353.1602040631013;
-        Tue, 06 Oct 2020 20:17:11 -0700 (PDT)
-Received: from localhost.localdomain ([103.136.221.72])
-        by smtp.gmail.com with ESMTPSA id e1sm729094pfd.198.2020.10.06.20.17.05
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Oct 2020 20:17:10 -0700 (PDT)
-From:   Muchun Song <songmuchun@bytedance.com>
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zhuyinyin@bytedance.com,
-        Muchun Song <songmuchun@bytedance.com>,
-        Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>
-Subject: [PATCH v3 4/4] io_uring: Fix double list add in io_queue_async_work()
-Date:   Wed,  7 Oct 2020 11:16:35 +0800
-Message-Id: <20201007031635.65295-5-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.21.0 (Apple Git-122)
-In-Reply-To: <20201007031635.65295-1-songmuchun@bytedance.com>
-References: <20201007031635.65295-1-songmuchun@bytedance.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z0oxlk06pG8lEBQMRmL9B+S8Pbv711ZKoAETCQtFE8E=;
+ b=IVSVgsNzwvfE6c0Tdl5kjw1gmXkbmoph46hwvboRpPNptIzJ2aBRz0ynnYTICsljSz0T/0spqaGTqqjUdlR/SoelRfsglk67sqfgscF+Tk87E0ROGVw43JuIdE7KJ9M+VvDj4/7QEd/isTeplxaW19PurIDd3YgnUbiWfZpwaII=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN6PR04MB4862.namprd04.prod.outlook.com
+ (2603:10b6:805:90::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.32; Wed, 7 Oct
+ 2020 05:22:17 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::619a:567c:d053:ce25]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::619a:567c:d053:ce25%6]) with mapi id 15.20.3433.045; Wed, 7 Oct 2020
+ 05:22:17 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] block: make maximum zone append size configurable
+Thread-Topic: [PATCH] block: make maximum zone append size configurable
+Thread-Index: AQHWm+sasNtmaR7+P0yDCraMVO0/aA==
+Date:   Wed, 7 Oct 2020 05:22:17 +0000
+Message-ID: <SN4PR0401MB359826A04A90E9FCDBF111479B0A0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <8fe2e364c4dac89e3ecd1234fab24a690d389038.1601993564.git.johannes.thumshirn@wdc.com>
+ <CY4PR04MB375140F36014D95A7AA439A8E70D0@CY4PR04MB3751.namprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2001:a62:1460:3d01:4025:ad46:30b7:4cee]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 09ab1aee-ac20-4d78-6f14-08d86a80f516
+x-ms-traffictypediagnostic: SN6PR04MB4862:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN6PR04MB4862BDB5395B1AABE903E0B69B0A0@SN6PR04MB4862.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: rLt+rzqF+PsgGmV51SLX3NO+nr4fbWRG97XkTTVoOwYR4CZyoVx4DfzbU2Bm1x2YBP/luOjxaDhl61Vhj64FfcAZh27iVeyIAvluTd+O4eeRkZrDDBkKrLN/TjOgy0a/d+8iWSQHZL+YAxrOjVEgtzgjpcrrzykK9pnvHS3QisoFYCPkX5zeDKS9rVwICcpRjcgQNJa/oUpv43ruabO008+OtXdxfDO2HG1T0qJjDLj3cpUOnTIoFA3voSDBBd6Z73b2NTB2BpXbsQuBUHgWlUQLknPW15HDcCBWli46+jNRPS2nO5EOf6Y+kX9dJ2LfVUKwKcAzRT/TkYJW2E53iA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(136003)(366004)(39850400004)(86362001)(91956017)(71200400001)(66446008)(53546011)(76116006)(2906002)(9686003)(64756008)(66556008)(66946007)(66476007)(6506007)(110136005)(33656002)(8676002)(52536014)(4326008)(316002)(186003)(54906003)(55016002)(83380400001)(5660300002)(478600001)(8936002)(7696005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: zwpdXes7WcSWnftHDweOknNnLMHTeEku3NkzRE6ufaSWW2FX+JxxQARxkXxfq2egPSCnPFypPXLVNvXENbfOhKO4j86cJxqZ5ACHsUhWbtSEabPQdP2sqtkva/7NMtiRYprNYX61VmTyrXDY4jJ302ZQ5+lsDqpWJjkpNnu+UP2z4F6lr1czwmVzzsLcWkKvs0eFffI5CUf7xJGtcLV2flkrsnMOv03qAdPDzmM12pPbbs3wAcNQzqrYscR22lSBRGORIFNw/jXyU8nQRW6ncmDhPGiwDE6S3DhCiGaJZGIQ3XETH8LcJNtLhvIM1/GRoTPrKE8C8n3pEBEWOhu8TkKHXpKO5fK4rWjObi3i7UpBQs3GR096vsPHOZKA42OfwKm/zXhtTsLmX4FSzexVsaES3o9SOy66C251YM9QaFK4o7XPS5nqfQrOmIg8imo5f/gfgGb3Kw5tmeW0Zqpe5E+zi60hl+2jiGokBjbbkFiEjM8xUbC+VlpfUodkVfCEwBOy5Wu6WjYopXb8WDEhJu19E/X7emZ/RFUIYGVhOTyzgFNWwuzDVk/SOTOdYdhVAmMPqLZ1HRWkjgEaqVk5+H4fGmKhgvcN8x76wHoXzu+JcuGuAKvi8H6WEsVr33MdjgiKlg8UOQrIvklfAguFiDgKNe9rcoAfG0n/H/xBm4MBAHBZxUykXwZYNm5ELSt8CtRpT0/bthPUnuQKh5Zmiw==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09ab1aee-ac20-4d78-6f14-08d86a80f516
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Oct 2020 05:22:17.1092
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IwGHowLyPlhd7aiEmUPDYLf2j84fmzAi76O8W4Y4tD8nXwUHCG8q47lodwu1L/TOmbrMvXJ6RLySqosNa4NXN/FHzNQiZhtrnCuKgHKN1c0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4862
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we queue work in io_poll_wake(), it will leads to list double
-add. So we should add the list when the callback func is the
-io_sq_wq_submit_work.
-
-The following oops was seen:
-
-    list_add double add: new=ffff9ca6a8f1b0e0, prev=ffff9ca62001cee8,
-    next=ffff9ca6a8f1b0e0.
-    ------------[ cut here ]------------
-    kernel BUG at lib/list_debug.c:31!
-    Call Trace:
-     <IRQ>
-     io_poll_wake+0xf3/0x230
-     __wake_up_common+0x91/0x170
-     __wake_up_common_lock+0x7a/0xc0
-     io_commit_cqring+0xea/0x280
-     ? blkcg_iolatency_done_bio+0x2b/0x610
-     io_cqring_add_event+0x3e/0x60
-     io_complete_rw+0x58/0x80
-     dio_complete+0x106/0x250
-     blk_update_request+0xa0/0x3b0
-     blk_mq_end_request+0x1a/0x110
-     blk_mq_complete_request+0xd0/0xe0
-     nvme_irq+0x129/0x270 [nvme]
-     __handle_irq_event_percpu+0x7b/0x190
-     handle_irq_event_percpu+0x30/0x80
-     handle_irq_event+0x3c/0x60
-     handle_edge_irq+0x91/0x1e0
-     do_IRQ+0x4d/0xd0
-     common_interrupt+0xf/0xf
-
-Fixes: 1c4404efcf2c ("io_uring: make sure async workqueue is canceled on exit")
-Reported-by: Jiachen Zhang <zhangjiachen.jaycee@bytedance.com>
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
----
- fs/io_uring.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index c65f78f395655..a7cfe976480d8 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -513,12 +513,14 @@ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
- 		}
- 	}
- 
--	req->files = current->files;
-+	if (req->work.func == io_sq_wq_submit_work) {
-+		req->files = current->files;
- 
--	spin_lock_irqsave(&ctx->task_lock, flags);
--	list_add(&req->task_list, &ctx->task_list);
--	req->work_task = NULL;
--	spin_unlock_irqrestore(&ctx->task_lock, flags);
-+		spin_lock_irqsave(&ctx->task_lock, flags);
-+		list_add(&req->task_list, &ctx->task_list);
-+		req->work_task = NULL;
-+		spin_unlock_irqrestore(&ctx->task_lock, flags);
-+	}
- 
- 	queue_work(ctx->sqo_wq[rw], &req->work);
- }
-@@ -667,6 +669,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
- 		state->cur_req++;
- 	}
- 
-+	INIT_LIST_HEAD(&req->task_list);
- 	req->file = NULL;
- 	req->ctx = ctx;
- 	req->flags = 0;
--- 
-2.11.0
-
+On 07/10/2020 01:33, Damien Le Moal wrote:=0A=
+[...]=0A=
+> Hmmm. That is one more tunable knob, and one that the user/sysadmin may n=
+ot=0A=
+> consider without knowing that the FS is actually using zone append. E.g. =
+btrfs=0A=
+> does, f2fs does not. I was thinking of something simpler:=0A=
+> =0A=
+> * Keep the soft limit zone_append_max_bytes/max_zone_append_sectors as RO=
+=0A=
+> * Change its value when the generic soft limit max_sectors is changed.=0A=
+> =0A=
+> Something like this:=0A=
+> =0A=
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c=0A=
+> index 7dda709f3ccb..78817d7acb66 100644=0A=
+> --- a/block/blk-sysfs.c=0A=
+> +++ b/block/blk-sysfs.c=0A=
+> @@ -246,6 +246,11 @@ queue_max_sectors_store(struct request_queue *q, con=
+st char=0A=
+> *page, size_t count)=0A=
+>         spin_lock_irq(&q->queue_lock);=0A=
+>         q->limits.max_sectors =3D max_sectors_kb << 1;=0A=
+>         q->backing_dev_info->io_pages =3D max_sectors_kb >> (PAGE_SHIFT -=
+ 10);=0A=
+> +=0A=
+> +       q->limits.max_zone_append_sectors =3D=0A=
+> +               min(q->limits.max_sectors,=0A=
+> +                   q->limits.max_hw_zone_append_sectors);=0A=
+> +=0A=
+>         spin_unlock_irq(&q->queue_lock);=0A=
+> =0A=
+>         return ret;=0A=
+> =0A=
+> The reasoning is that zone appends are a variation of write commands, and=
+ since=0A=
+> max_sectors will gate the size of all read and write commands, it should =
+also=0A=
+> gate the size zone append writes. And that avoids adding yet another tuni=
+ng knob=0A=
+> for users to get confused about.=0A=
+=0A=
+True, but my thought was to have two different knobs so an administrator ca=
+n fine tune=0A=
+the normal write path vs the zone-append path.=0A=
+=0A=
+But that may indeed be over-engineering.=0A=
+=0A=
+Byte,=0A=
+	Johannes=0A=
