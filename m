@@ -2,89 +2,164 @@ Return-Path: <SRS0=cFNo=DP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5703CC433E7
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 16:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA34C433DF
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 16:40:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4C97221F1
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 16:17:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5762221FE
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 16:40:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="uTcjROP5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="fLcIjlv5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729419AbgJHQRb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Oct 2020 12:17:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45428 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728323AbgJHQRb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Oct 2020 12:17:31 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BAEEC061755
-        for <linux-block@vger.kernel.org>; Thu,  8 Oct 2020 09:17:29 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id m17so6843864ioo.1
-        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2020 09:17:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EKt5sARbaeBXD8SOAPswCPhU8AGRqOPEdIpYITIFbpc=;
-        b=uTcjROP5kCykWunpt0CCBXWJ/L3iIcpcUyxdl6arX84OxXF3JdNtNwJhbQ//GiXO0d
-         uxdkL5S0GXLmOFTFf86uMvQfh0v2sVtmfl/D/vOCXvsddrLUVtOB98+64p9RYQ1vMyVk
-         ZDUCOHbMP8BlW6C2exMOZbQlNvWFfJQHsiuQHwyzJHojlUktINJHvFq5uKA3b1anJewX
-         RQkK/LUW2GEUXXiDlSc8U/ji057BjziIebSk8x4gOhsBiAygLTXmcCEnR4eMYBg3vG8y
-         Au7aHH0isC7b4XDx8M9tRSkIl7uTnxuX2D1MWqW/oK6re/E8m4bchr7b1H2elQiuKICZ
-         ZfCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EKt5sARbaeBXD8SOAPswCPhU8AGRqOPEdIpYITIFbpc=;
-        b=fRd5YIariH+XRakw1FvWCvIiHH0bxhYvpbdKWyg/x1SZHzhzT2/L+HOC50piwWoCN9
-         9ALvV4t+58aQAHbVQGDrC9bofcoPzpvEOKQ48kQ431P7+qtgqGH4tT9eeKe18ir8i5Jj
-         OiAtb9cmZyGcNROjzccsvfGzYPlcpTXhqlFHXUk+1JtSYtLvTqeWNLxIKdviLm1yQa4B
-         +VvCvfDBixMb7CyDXQm6MHPIm8lYPq8rM1Yz0ca7a8pU2MX0o0z6RqcBwEMmpvol4m03
-         pQiCNvOWTPdjmThmS06v6e3mVI/tC0qlJ5IjOSELNcLc0Le4J8+sGTHk6lVNO/VF486Z
-         u/YA==
-X-Gm-Message-State: AOAM5316YLVWCHgCOZlAC3yNq68tNdx7JA0YRaIB6hceMotyaX774qiD
-        iHNjzWeo1bfn4Ey98nRt6ujOxbqgXz5nMQ==
-X-Google-Smtp-Source: ABdhPJy/lHH7Gvjz9pqKYlY4lzuzEYxBRUUj0g3Qttib3Hpze9ZqluaiBh2km0pCvRd1LAk81mdBEA==
-X-Received: by 2002:a5d:9e16:: with SMTP id h22mr6469555ioh.141.1602173848935;
-        Thu, 08 Oct 2020 09:17:28 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id w78sm1259384ila.85.2020.10.08.09.17.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Oct 2020 09:17:28 -0700 (PDT)
-Subject: Re: [PATCH v2] block: ratelimit handle_bad_sector() message
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-References: <20201008064049.GA29599@infradead.org>
- <20201008133723.5311-1-penguin-kernel@I-love.SAKURA.ne.jp>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <977fabb8-b049-a36b-aed2-dacae694049e@kernel.dk>
-Date:   Thu, 8 Oct 2020 10:17:27 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728323AbgJHQkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Oct 2020 12:40:33 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:48794 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725616AbgJHQkd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Oct 2020 12:40:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=tyFGCWU6L6lDBY3zLY1rfePLMMRW/v3T/hGVwL8WZnY=; b=fLcIjlv5U0a6Bu7IdnvtONnG51
+        0+0ExI436um7EWaC5+iRkecbPtKZ8v3leJB5C/djsCzsMoaATmNYPpwdnXjsntysrUrSOnSKLf5q/
+        xr/IzuNMSlWK3ybkenKVGPNjtH4q5VONjWBDLs001Zgos9k7fH85UPXJDvxGNO+OZ8Cn8yusECHDh
+        IXqG+frSwwscmjuuWYTn1WjVZ6Y4BTl0ZJQuKrLkUaUfgHSH+UEyuie6H32TBA5vz04dlPHJ+G8WT
+        5jVxpqDBDUJcSlXFB31bru8LoJ6UhJ/ZHY0Hy+Xh0D2R6Ic/3te7I1+FYX95QSAl2gbQTPr/NfM4U
+        pov27J9A==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1kQYxz-0000if-Pp; Thu, 08 Oct 2020 10:40:32 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1kQYxy-0003HG-Lm; Thu, 08 Oct 2020 10:40:30 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu,  8 Oct 2020 10:40:13 -0600
+Message-Id: <20201008164024.12546-1-logang@deltatee.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20201008133723.5311-1-penguin-kernel@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, osandov@osandov.com, sagi@grimberg.me, Chaitanya.Kulkarni@wdc.com, sbates@raithlin.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH blktests v3 00/11] NVMe Target Passthru Block Tests
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/8/20 7:37 AM, Tetsuo Handa wrote:
-> syzbot is reporting unkillable task [1], for the caller is failing to
-> handle a corrupted filesystem image which attempts to access beyond
-> the end of the device. While we need to fix the caller, flooding the
-> console with handle_bad_sector() message is unlikely useful.
+Hi,
 
-Applied, thanks.
+This series adds blktests for the nvmet passthru feature that was merged
+for 5.9. It's been reconciled with Sagi's blktest series that Omar
+recently merged.
 
--- 
-Jens Axboe
+This series is based off of the current blktests master and a git repo is
+available for this here:
 
+https://github.com/Eideticom/blktests nvmet_passthru_v3
+
+Thanks,
+
+Logan
+
+--
+
+Changes in v3:
+- Fixed a nit with variable initialization in patch 5 (per Chaitanya)
+- Replaced use of printf with echo (per Chaitanya)
+
+Changes in v2:
+
+- Rebased on latest blktests master and changed to use the common
+  helpers Sagi introduced in his series
+- Collected Chaitanya's reviewed-by tag
+
+--
+
+
+Logan Gunthorpe (11):
+  common/fio: Remove state file in common helper
+  common/xfs: Create common helper to check for XFS support
+  common/xfs: Create common helper to verify block device with xfs
+  nvme: Search for specific subsysnqn in _find_nvme_loop_dev
+  nvme: Add common helpers for passthru tests
+  nvme/033: Simple test to create and connect to a passthru target
+  nvme/034: Add test for passthru data verification
+  nvme/035: Add test to verify passthru controller with a filesystem
+  nvme/036: Add test for testing reset command on nvme-passthru
+  nvme/037: Add test which loops passthru connect and disconnect
+  nvme/038: Test removal of un-enabled subsystem and ports
+
+ common/fio         |  1 +
+ common/rc          |  8 +++++
+ common/xfs         | 33 +++++++++++++++++++
+ tests/nvme/004     |  2 +-
+ tests/nvme/005     |  2 +-
+ tests/nvme/008     |  2 +-
+ tests/nvme/009     |  2 +-
+ tests/nvme/010     |  3 +-
+ tests/nvme/011     |  3 +-
+ tests/nvme/012     | 23 ++++---------
+ tests/nvme/013     | 21 +++---------
+ tests/nvme/014     |  2 +-
+ tests/nvme/015     |  2 +-
+ tests/nvme/018     |  2 +-
+ tests/nvme/019     |  2 +-
+ tests/nvme/020     |  2 +-
+ tests/nvme/021     |  2 +-
+ tests/nvme/022     |  2 +-
+ tests/nvme/023     |  2 +-
+ tests/nvme/024     |  2 +-
+ tests/nvme/025     |  2 +-
+ tests/nvme/026     |  2 +-
+ tests/nvme/027     |  2 +-
+ tests/nvme/028     |  2 +-
+ tests/nvme/029     |  2 +-
+ tests/nvme/033     | 67 +++++++++++++++++++++++++++++++++++++
+ tests/nvme/033.out |  7 ++++
+ tests/nvme/034     | 35 ++++++++++++++++++++
+ tests/nvme/034.out |  3 ++
+ tests/nvme/035     | 37 +++++++++++++++++++++
+ tests/nvme/035.out |  3 ++
+ tests/nvme/036     | 37 +++++++++++++++++++++
+ tests/nvme/036.out |  3 ++
+ tests/nvme/037     | 35 ++++++++++++++++++++
+ tests/nvme/037.out |  2 ++
+ tests/nvme/038     | 36 ++++++++++++++++++++
+ tests/nvme/038.out |  2 ++
+ tests/nvme/rc      | 82 ++++++++++++++++++++++++++++++++++++++++++++--
+ 38 files changed, 419 insertions(+), 58 deletions(-)
+ create mode 100644 common/xfs
+ create mode 100755 tests/nvme/033
+ create mode 100644 tests/nvme/033.out
+ create mode 100755 tests/nvme/034
+ create mode 100644 tests/nvme/034.out
+ create mode 100755 tests/nvme/035
+ create mode 100644 tests/nvme/035.out
+ create mode 100755 tests/nvme/036
+ create mode 100644 tests/nvme/036.out
+ create mode 100755 tests/nvme/037
+ create mode 100644 tests/nvme/037.out
+ create mode 100755 tests/nvme/038
+ create mode 100644 tests/nvme/038.out
+
+
+base-commit: 20445c5eb6456addca9131ec6917d2a2d7414e04
+--
+2.20.1
