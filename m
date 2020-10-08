@@ -2,63 +2,64 @@ Return-Path: <SRS0=cFNo=DP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5615C47423
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A36BEC04EBE
 	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 13:13:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 897722184D
+	by mail.kernel.org (Postfix) with ESMTP id 452022083B
 	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 13:13:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gmTS6tU+"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ckGq6HOX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729718AbgJHNNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1729765AbgJHNNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 8 Oct 2020 09:13:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33796 "EHLO
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37004 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729810AbgJHNNn (ORCPT
+        by vger.kernel.org with ESMTP id S1729815AbgJHNNn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 8 Oct 2020 09:13:43 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 098CWZao140634;
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 098D3N6k031025;
         Thu, 8 Oct 2020 09:13:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=qBz++3K/F5KsjvjI2n8k626PHO4M9VzBHZW9Axd8MjE=;
- b=gmTS6tU+FiMsf+jf+qlp77LnUO+nsFZ0PnLnnAcn3YDcS/fkicLm0oXqdUUrazP5hz1J
- uymAsufhOvwChDZZZumDSARqm168MoMVJ6PYGUHd7QqeZamL8QXibyC/WUcmLIl1mgej
- MW+Wca/aAEqsPGg4Zl7mHUgaHvSQGrLBw32H0U3mITzK5iCbRgotKkAPxCGM9avHbgv4
- SCxk9Ofh2Ag+3sr5m1gDr9AiDQwn7xujsotZLWOQgP0Zi7DJ19BMp3e91vTxitx7l4j4
- H3V3QDoltNwMB32S62G2iMlkjjK4J103PrNrJkL/9WLi7ZjCtCYwNbk8YxObS0EN42v7 GQ== 
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3422u09evg-1
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=b1ArIAGD7IQ70ScKGX0vx2rDY2woFz6ashDbbwbQuUc=;
+ b=ckGq6HOXubiO6EVD4tJSuXFzbNcdpUk70dAUy8poucu3iiEHB7AycZpkkxZ0H0rUs8vS
+ DznvVwdeieY0MBk9a0+Xlzj2espkTHCf6XMnYd+4tnqDzDADU0jw2Mg60UjqdaP+UxQy
+ dI2VEwrWZ7KoqwrmoiD4AN1Jft/Lhv8hWVohgbjI395Yiqq2eQdqTCYGc42UljRYqaRS
+ Bfh/BOUyte4ye+9iYOqNcx8hHYDFG4GYvGlAqjDnurrurLQ6nHpXjcbBTVypPw2tCkZD
+ KRXo3uCWF5a4GURs6Co/1Q4WT68weij1w9LVSaNnqQFV7MqpR1ZN7/3ADjIaYhas+dMi GA== 
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3421q0tryg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Oct 2020 09:13:41 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 098DDdWW030583;
-        Thu, 8 Oct 2020 13:13:39 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 33xgx82t2s-1
+        Thu, 08 Oct 2020 09:13:42 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 098DDeN6007606;
+        Thu, 8 Oct 2020 13:13:40 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 33xgx8at7h-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 08 Oct 2020 13:13:39 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 098DDaCx33948128
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 098DDbgQ32637432
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 8 Oct 2020 13:13:36 GMT
+        Thu, 8 Oct 2020 13:13:37 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 907054204D;
+        by IMSVA (Postfix) with ESMTP id EAC384204D;
         Thu,  8 Oct 2020 13:13:36 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 76A7542047;
+        by IMSVA (Postfix) with ESMTP id CECC042049;
         Thu,  8 Oct 2020 13:13:36 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Thu,  8 Oct 2020 13:13:36 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
-        id 22B6FE24CC; Thu,  8 Oct 2020 15:13:36 +0200 (CEST)
+        id 323F5E24D2; Thu,  8 Oct 2020 15:13:36 +0200 (CEST)
 From:   Stefan Haberland <sth@linux.ibm.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
@@ -66,144 +67,385 @@ Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
         Heiko Carstens <heiko.carstens@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH v2 02/10] s390/cio: Provide Endpoint-Security Mode per CU
-Date:   Thu,  8 Oct 2020 15:13:28 +0200
-Message-Id: <20201008131336.61100-3-sth@linux.ibm.com>
+Subject: [PATCH v2 08/10] s390/dasd: Display FC Endpoint Security information via sysfs
+Date:   Thu,  8 Oct 2020 15:13:34 +0200
+Message-Id: <20201008131336.61100-9-sth@linux.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201008131336.61100-1-sth@linux.ibm.com>
 References: <20201008131336.61100-1-sth@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-10-08_07:2020-10-08,2020-10-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 clxscore=1015 bulkscore=0 adultscore=0 impostorscore=0
- phishscore=0 suspectscore=0 lowpriorityscore=0 mlxlogscore=790 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010080094
+ definitions=2020-10-08_08:2020-10-08,2020-10-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 impostorscore=0
+ lowpriorityscore=0 mlxlogscore=997 mlxscore=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2010080097
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Vineeth Vijayan <vneethv@linux.ibm.com>
+From: Jan Höppner <hoeppner@linux.ibm.com>
 
-Add an interface in the CIO layer to retrieve the information about the
-Endpoint-Security Mode (ESM) of the specified CU. The ESM values are
-defined as 0-None, 1-Authenticated or 2, 3-Encrypted.
+Add a new sysfs attribute (fc_security) per device and per operational
+channel path. The information of the current FC Endpoint Security state
+is received through the CIO layer.
 
-Signed-off-by: Sebastian Ott <sebott@linux.ibm.com>
-[vneethv@linux.ibm.com: cleaned-up and modified description]
-Signed-off-by: Vineeth Vijayan <vneethv@linux.ibm.com>
-Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
-Acked-by: Vasily Gorbik <gor@linux.ibm.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+The state of the FC Endpoint Security can be either "Unsupported",
+"Authentication", or "Encryption".
+
+For example:
+$ cat /sys/bus/ccw/devices/0.0.c600/fc_security
+Encryption
+
+If any of the operational paths is in a state different from all
+others, the device sysfs attribute will display the additional state
+"Inconsistent".
+
+The sysfs attributes per paths are organised in a new directory called
+"paths_info" with subdirectories for each path.
+
+/sys/bus/ccw/devices/0.0.c600/paths_info/
+├── 0.38
+│   └── fc_security
+├── 0.39
+│   └── fc_security
+├── 0.3a
+│   └── fc_security
+└── 0.3b
+    └── fc_security
+
+Signed-off-by: Jan Höppner <hoeppner@linux.ibm.com>
+Reviewed-by: Stefan Haberland <sth@linux.ibm.com>
 Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
 ---
- arch/s390/include/asm/cio.h |  1 +
- drivers/s390/cio/chsc.c     | 83 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
+ drivers/s390/block/dasd_devmap.c | 109 +++++++++++++++++++++++++++++++
+ drivers/s390/block/dasd_eckd.c   |  30 +++++++++
+ drivers/s390/block/dasd_int.h    |  68 +++++++++++++++++++
+ 3 files changed, 207 insertions(+)
 
-diff --git a/arch/s390/include/asm/cio.h b/arch/s390/include/asm/cio.h
-index b5bfb3123cb1..66e06d0efb72 100644
---- a/arch/s390/include/asm/cio.h
-+++ b/arch/s390/include/asm/cio.h
-@@ -373,5 +373,6 @@ struct gen_pool *cio_gp_dma_create(struct device *dma_dev, int nr_pages);
- int chsc_sstpc(void *page, unsigned int op, u16 ctrl, u64 *clock_delta);
- int chsc_sstpi(void *page, void *result, size_t size);
- int chsc_sgib(u32 origin);
-+int chsc_scud(u16 cu, u64 *esm, u8 *esm_valid);
+diff --git a/drivers/s390/block/dasd_devmap.c b/drivers/s390/block/dasd_devmap.c
+index 32fc51341d99..16bb135c20aa 100644
+--- a/drivers/s390/block/dasd_devmap.c
++++ b/drivers/s390/block/dasd_devmap.c
+@@ -576,6 +576,11 @@ dasd_create_device(struct ccw_device *cdev)
+ 	dev_set_drvdata(&cdev->dev, device);
+ 	spin_unlock_irqrestore(get_ccwdev_lock(cdev), flags);
  
- #endif
-diff --git a/drivers/s390/cio/chsc.c b/drivers/s390/cio/chsc.c
-index c314e9495c1b..513fc5748d6e 100644
---- a/drivers/s390/cio/chsc.c
-+++ b/drivers/s390/cio/chsc.c
-@@ -1403,3 +1403,86 @@ int chsc_sgib(u32 origin)
- 	return ret;
++	device->paths_info = kset_create_and_add("paths_info", NULL,
++						 &device->cdev->dev.kobj);
++	if (!device->paths_info)
++		dev_warn(&cdev->dev, "Could not create paths_info kset\n");
++
+ 	return device;
  }
- EXPORT_SYMBOL_GPL(chsc_sgib);
+ 
+@@ -622,6 +627,9 @@ dasd_delete_device(struct dasd_device *device)
+ 	wait_event(dasd_delete_wq, atomic_read(&device->ref_count) == 0);
+ 
+ 	dasd_generic_free_discipline(device);
 +
-+#define SCUD_REQ_LEN	0x10 /* SCUD request block length */
-+#define SCUD_REQ_CMD	0x4b /* SCUD Command Code */
++	kset_unregister(device->paths_info);
 +
-+struct chse_cudb {
-+	u16 flags:8;
-+	u16 chp_valid:8;
-+	u16 cu;
-+	u32 esm_valid:8;
-+	u32:24;
-+	u8 chpid[8];
-+	u32:32;
-+	u32:32;
-+	u8 esm[8];
-+	u32 efla[8];
-+} __packed;
-+
-+struct chsc_scud {
-+	struct chsc_header request;
-+	u16:4;
-+	u16 fmt:4;
-+	u16 cssid:8;
-+	u16 first_cu;
-+	u16:16;
-+	u16 last_cu;
-+	u32:32;
-+	struct chsc_header response;
-+	u16:4;
-+	u16 fmt_resp:4;
-+	u32:24;
-+	struct chse_cudb cudb[];
-+} __packed;
-+
-+/**
-+ * chsc_scud() - Store control-unit description.
-+ * @cu:		number of the control-unit
-+ * @esm:	8 1-byte endpoint security mode values
-+ * @esm_valid:	validity mask for @esm
-+ *
-+ * Interface to retrieve information about the endpoint security
-+ * modes for up to 8 paths of a control unit.
-+ *
-+ * Returns 0 on success.
-+ */
-+int chsc_scud(u16 cu, u64 *esm, u8 *esm_valid)
+ 	/* Disconnect dasd_device structure from ccw_device structure. */
+ 	cdev = device->cdev;
+ 	device->cdev = NULL;
+@@ -1641,6 +1649,39 @@ dasd_path_interval_store(struct device *dev, struct device_attribute *attr,
+ static DEVICE_ATTR(path_interval, 0644, dasd_path_interval_show,
+ 		   dasd_path_interval_store);
+ 
++static ssize_t
++dasd_device_fcs_show(struct device *dev, struct device_attribute *attr,
++		     char *buf)
 +{
-+	struct chsc_scud *scud = chsc_page;
-+	int ret;
++	struct dasd_device *device;
++	int fc_sec;
++	int rc;
 +
-+	spin_lock_irq(&chsc_page_lock);
-+	memset(chsc_page, 0, PAGE_SIZE);
-+	scud->request.length = SCUD_REQ_LEN;
-+	scud->request.code = SCUD_REQ_CMD;
-+	scud->fmt = 0;
-+	scud->cssid = 0;
-+	scud->first_cu = cu;
-+	scud->last_cu = cu;
++	device = dasd_device_from_cdev(to_ccwdev(dev));
++	if (IS_ERR(device))
++		return -ENODEV;
++	fc_sec = dasd_path_get_fcs_device(device);
++	if (fc_sec == -EINVAL)
++		rc = snprintf(buf, PAGE_SIZE, "Inconsistent\n");
++	else
++		rc = snprintf(buf, PAGE_SIZE, "%s\n", dasd_path_get_fcs_str(fc_sec));
++	dasd_put_device(device);
 +
-+	ret = chsc(scud);
-+	if (!ret)
-+		ret = chsc_error_from_response(scud->response.code);
++	return rc;
++}
++static DEVICE_ATTR(fc_security, 0444, dasd_device_fcs_show, NULL);
 +
-+	if (!ret && (scud->response.length <= 8 || scud->fmt_resp != 0
-+			|| !(scud->cudb[0].flags & 0x80)
-+			|| scud->cudb[0].cu != cu)) {
++static ssize_t
++dasd_path_fcs_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
++{
++	struct dasd_path *path = to_dasd_path(kobj);
++	unsigned int fc_sec = path->fc_security;
 +
-+		CIO_MSG_EVENT(2, "chsc: scud failed rc=%04x, L2=%04x "
-+			"FMT=%04x, cudb.flags=%02x, cudb.cu=%04x",
-+			scud->response.code, scud->response.length,
-+			scud->fmt_resp, scud->cudb[0].flags, scud->cudb[0].cu);
-+		ret = -EINVAL;
++	return snprintf(buf, PAGE_SIZE, "%s\n", dasd_path_get_fcs_str(fc_sec));
++}
++
++static struct kobj_attribute path_fcs_attribute =
++	__ATTR(fc_security, 0444, dasd_path_fcs_show, NULL);
+ 
+ #define DASD_DEFINE_ATTR(_name, _func)					\
+ static ssize_t dasd_##_name##_show(struct device *dev,			\
+@@ -1697,6 +1738,7 @@ static struct attribute * dasd_attrs[] = {
+ 	&dev_attr_path_reset.attr,
+ 	&dev_attr_hpf.attr,
+ 	&dev_attr_ese.attr,
++	&dev_attr_fc_security.attr,
+ 	NULL,
+ };
+ 
+@@ -1777,6 +1819,73 @@ dasd_set_feature(struct ccw_device *cdev, int feature, int flag)
+ }
+ EXPORT_SYMBOL(dasd_set_feature);
+ 
++static struct attribute *paths_info_attrs[] = {
++	&path_fcs_attribute.attr,
++	NULL,
++};
++
++static struct kobj_type path_attr_type = {
++	.release	= dasd_path_release,
++	.default_attrs	= paths_info_attrs,
++	.sysfs_ops	= &kobj_sysfs_ops,
++};
++
++static void dasd_path_init_kobj(struct dasd_device *device, int chp)
++{
++	device->path[chp].kobj.kset = device->paths_info;
++	kobject_init(&device->path[chp].kobj, &path_attr_type);
++}
++
++void dasd_path_create_kobj(struct dasd_device *device, int chp)
++{
++	int rc;
++
++	if (test_bit(DASD_FLAG_OFFLINE, &device->flags))
++		return;
++	if (!device->paths_info) {
++		dev_warn(&device->cdev->dev, "Unable to create paths objects\n");
++		return;
++	}
++	if (device->path[chp].in_sysfs)
++		return;
++	if (!device->path[chp].conf_data)
++		return;
++
++	dasd_path_init_kobj(device, chp);
++
++	rc = kobject_add(&device->path[chp].kobj, NULL, "%x.%02x",
++			 device->path[chp].cssid, device->path[chp].chpid);
++	if (rc)
++		kobject_put(&device->path[chp].kobj);
++	device->path[chp].in_sysfs = true;
++}
++EXPORT_SYMBOL(dasd_path_create_kobj);
++
++void dasd_path_create_kobjects(struct dasd_device *device)
++{
++	u8 lpm, opm;
++
++	opm = dasd_path_get_opm(device);
++	for (lpm = 0x80; lpm; lpm >>= 1) {
++		if (!(lpm & opm))
++			continue;
++		dasd_path_create_kobj(device, pathmask_to_pos(lpm));
++	}
++}
++EXPORT_SYMBOL(dasd_path_create_kobjects);
++
++/*
++ * As we keep kobjects for the lifetime of a device, this function must not be
++ * called anywhere but in the context of offlining a device.
++ */
++void dasd_path_remove_kobj(struct dasd_device *device, int chp)
++{
++	if (device->path[chp].in_sysfs) {
++		kobject_put(&device->path[chp].kobj);
++		device->path[chp].in_sysfs = false;
++	}
++}
++EXPORT_SYMBOL(dasd_path_remove_kobj);
+ 
+ int dasd_add_sysfs_files(struct ccw_device *cdev)
+ {
+diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
+index 3273b26b25b0..cfffab4c627b 100644
+--- a/drivers/s390/block/dasd_eckd.c
++++ b/drivers/s390/block/dasd_eckd.c
+@@ -1035,6 +1035,30 @@ static void dasd_eckd_clear_conf_data(struct dasd_device *device)
+ 		device->path[i].ssid = 0;
+ 		device->path[i].chpid = 0;
+ 		dasd_path_notoper(device, i);
++		dasd_path_remove_kobj(device, i);
++	}
++}
++
++static void dasd_eckd_read_fc_security(struct dasd_device *device)
++{
++	struct dasd_eckd_private *private = device->private;
++	u8 esm_valid;
++	u8 esm[8];
++	int chp;
++	int rc;
++
++	rc = chsc_scud(private->uid.ssid, (u64 *)esm, &esm_valid);
++	if (rc) {
++		for (chp = 0; chp < 8; chp++)
++			device->path[chp].fc_security = 0;
++		return;
 +	}
 +
-+	if (ret)
-+		goto out;
++	for (chp = 0; chp < 8; chp++) {
++		if (esm_valid & (0x80 >> chp))
++			device->path[chp].fc_security = esm[chp];
++		else
++			device->path[chp].fc_security = 0;
+ 	}
+ }
+ 
+@@ -1164,6 +1188,8 @@ static int dasd_eckd_read_conf(struct dasd_device *device)
+ 		}
+ 	}
+ 
++	dasd_eckd_read_fc_security(device);
 +
-+	memcpy(esm, scud->cudb[0].esm, sizeof(*esm));
-+	*esm_valid = scud->cudb[0].esm_valid;
-+out:
-+	spin_unlock_irq(&chsc_page_lock);
-+	return ret;
+ 	return path_err;
+ }
+ 
+@@ -1430,6 +1456,8 @@ static void do_path_verification_work(struct work_struct *work)
+ 		dasd_path_add_cablepm(device, cablepm);
+ 		dasd_path_add_nohpfpm(device, hpfpm);
+ 		spin_unlock_irqrestore(get_ccwdev_lock(device->cdev), flags);
++
++		dasd_path_create_kobj(device, pos);
+ 	}
+ 	clear_bit(DASD_FLAG_PATH_VERIFY, &device->flags);
+ 	dasd_put_device(device);
+@@ -2069,6 +2097,8 @@ dasd_eckd_check_characteristics(struct dasd_device *device)
+ 	if (rc)
+ 		goto out_err3;
+ 
++	dasd_path_create_kobjects(device);
++
+ 	/* Read Feature Codes */
+ 	dasd_eckd_read_features(device);
+ 
+diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
+index 6dce9d4c55ce..93d9cc938924 100644
+--- a/drivers/s390/block/dasd_int.h
++++ b/drivers/s390/block/dasd_int.h
+@@ -426,6 +426,35 @@ extern struct dasd_discipline *dasd_diag_discipline_pointer;
+ #define DASD_THRHLD_MAX		4294967295U
+ #define DASD_INTERVAL_MAX	4294967295U
+ 
++/* FC Endpoint Security Capabilities */
++#define DASD_FC_SECURITY_UNSUP		0
++#define DASD_FC_SECURITY_AUTH		1
++#define DASD_FC_SECURITY_ENC_FCSP2	2
++#define DASD_FC_SECURITY_ENC_ERAS	3
++
++#define DASD_FC_SECURITY_ENC_STR	"Encryption"
++static const struct {
++	u8 value;
++	char *name;
++} dasd_path_fcs_mnemonics[] = {
++	{ DASD_FC_SECURITY_UNSUP,	"Unsupported" },
++	{ DASD_FC_SECURITY_AUTH,	"Authentication" },
++	{ DASD_FC_SECURITY_ENC_FCSP2,	DASD_FC_SECURITY_ENC_STR },
++	{ DASD_FC_SECURITY_ENC_ERAS,	DASD_FC_SECURITY_ENC_STR },
++};
++
++static inline char *dasd_path_get_fcs_str(int val)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(dasd_path_fcs_mnemonics); i++) {
++		if (dasd_path_fcs_mnemonics[i].value == val)
++			return dasd_path_fcs_mnemonics[i].name;
++	}
++
++	return dasd_path_fcs_mnemonics[0].name;
 +}
-+EXPORT_SYMBOL_GPL(chsc_scud);
++
+ struct dasd_path {
+ 	unsigned long flags;
+ 	u8 cssid;
+@@ -434,8 +463,18 @@ struct dasd_path {
+ 	struct dasd_conf_data *conf_data;
+ 	atomic_t error_count;
+ 	unsigned long errorclk;
++	u8 fc_security;
++	struct kobject kobj;
++	bool in_sysfs;
+ };
+ 
++#define to_dasd_path(path) container_of(path, struct dasd_path, kobj)
++
++static inline void dasd_path_release(struct kobject *kobj)
++{
++/* Memory for the dasd_path kobject is freed when dasd_free_device() is called */
++}
++
+ 
+ struct dasd_profile_info {
+ 	/* legacy part of profile data, as in dasd_profile_info_t */
+@@ -547,6 +586,7 @@ struct dasd_device {
+ 	struct dentry *hosts_dentry;
+ 	struct dasd_profile profile;
+ 	struct dasd_format_entry format_entry;
++	struct kset *paths_info;
+ };
+ 
+ struct dasd_block {
+@@ -824,6 +864,9 @@ int dasd_set_feature(struct ccw_device *, int, int);
+ 
+ int dasd_add_sysfs_files(struct ccw_device *);
+ void dasd_remove_sysfs_files(struct ccw_device *);
++void dasd_path_create_kobj(struct dasd_device *, int);
++void dasd_path_create_kobjects(struct dasd_device *);
++void dasd_path_remove_kobj(struct dasd_device *, int);
+ 
+ struct dasd_device *dasd_device_from_cdev(struct ccw_device *);
+ struct dasd_device *dasd_device_from_cdev_locked(struct ccw_device *);
+@@ -1113,6 +1156,31 @@ static inline __u8 dasd_path_get_hpfpm(struct dasd_device *device)
+ 	return hpfpm;
+ }
+ 
++static inline u8 dasd_path_get_fcs_path(struct dasd_device *device, int chp)
++{
++	return device->path[chp].fc_security;
++}
++
++static inline int dasd_path_get_fcs_device(struct dasd_device *device)
++{
++	u8 fc_sec = 0;
++	int chp;
++
++	for (chp = 0; chp < 8; chp++) {
++		if (device->opm & (0x80 >> chp)) {
++			fc_sec = device->path[chp].fc_security;
++			break;
++		}
++	}
++	for (; chp < 8; chp++) {
++		if (device->opm & (0x80 >> chp))
++			if (device->path[chp].fc_security != fc_sec)
++				return -EINVAL;
++	}
++
++	return fc_sec;
++}
++
+ /*
+  * add functions for path masks
+  * the existing path mask will be extended by the given path mask
 -- 
 2.17.1
 
