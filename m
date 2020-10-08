@@ -2,243 +2,247 @@ Return-Path: <SRS0=cFNo=DP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63623C04EBE
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 10:46:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC43C43467
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 11:05:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 079A621D40
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 10:46:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23D27215A4
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 11:04:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="L2ktugXy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729558AbgJHKqJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Oct 2020 06:46:09 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33204 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726760AbgJHKqJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Oct 2020 06:46:09 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 413E9AC4D;
-        Thu,  8 Oct 2020 10:46:06 +0000 (UTC)
-Subject: Re: [PATCH 1/3] bcache: introduce bcache sysfs entries for
- ioprio-based bypass/writeback hints
-To:     Eric Wheeler <bcache@lists.ewheeler.net>
-Cc:     Kai Krakow <kai@kaishome.de>, Nix <nix@esperi.org.uk>,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
-References: <20201003111056.14635-1-kai@kaishome.de>
- <20201003111056.14635-2-kai@kaishome.de> <87362ucen3.fsf@esperi.org.uk>
- <CAC2ZOYt+ZMep=PT5FbQKiqZ0EE1f4+JJn=oTJUtQjLwGvy=KfQ@mail.gmail.com>
- <alpine.LRH.2.11.2010051923330.2180@pop.dreamhost.com>
- <alpine.LRH.2.11.2010072022130.27518@pop.dreamhost.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <5c5dfd1d-55f3-e9cf-0c71-d69036cb3ded@suse.de>
-Date:   Thu, 8 Oct 2020 18:45:27 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.1
+        id S1725890AbgJHLE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Oct 2020 07:04:59 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45036 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725852AbgJHLE6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Oct 2020 07:04:58 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 098B3CRW060052;
+        Thu, 8 Oct 2020 07:04:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ygHhJ+k9Xgc6Yv6v2BUMeYd2RGOiavfQh4VBmKc4WR0=;
+ b=L2ktugXytLzjjC2ux2atzd/7A31BJcJ625370iWlcRBbQvmbPysDrgNbLcvTjquSo02b
+ YQf4LK2MUi/70hBs0g3ReSMr2Ek7shYVkimyEKBpVyJp/mGhELrmJ2AsssOvqdPMpQkt
+ xu6i601ztdoQLVBCSaKlTnyxEtmtotaH6HbJDqtFPEZRjkZrhJulcD7+YrHobxeV8oap
+ GjtndqqN6yYIVVXl9KJYwGtRFnX3rfMkMWOzlS3dOpig3CjyQMeb0DJH+IHDiXtfbH05
+ KqUvNmYpC6ApmO2KIBLZI7dtMcfCKpCl+eIYSGrzxrxfyTbyNNKNZiOvBfypGKI1pgfe xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3421by8dg3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Oct 2020 07:04:55 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 098B3VDk061799;
+        Thu, 8 Oct 2020 07:04:55 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3421by8dfa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Oct 2020 07:04:54 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 098B1SYl022617;
+        Thu, 8 Oct 2020 11:04:53 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 33xgx858kt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Oct 2020 11:04:53 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 098B4o3L30343652
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 8 Oct 2020 11:04:50 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7480352057;
+        Thu,  8 Oct 2020 11:04:50 +0000 (GMT)
+Received: from linux.fritz.box (unknown [9.145.40.105])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2C72952059;
+        Thu,  8 Oct 2020 11:04:50 +0000 (GMT)
+Subject: Re: [PATCH 08/10] s390/dasd: Display FC Endpoint Security information
+ via sysfs
+To:     Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Jan_H=c3=b6ppner?= <hoeppner@linux.ibm.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com
+References: <20201002193940.24012-1-sth@linux.ibm.com>
+ <20201002193940.24012-9-sth@linux.ibm.com>
+ <20201006122632.098149ba.cohuck@redhat.com>
+ <d88b8230-993e-d63d-394a-efcaf60f813d@linux.ibm.com>
+ <20201007114928.6a088a7d.cohuck@redhat.com>
+ <243fe10e-ce80-57de-a92c-3a6457cde40a@linux.ibm.com>
+ <20201007184011.6dece07f.cohuck@redhat.com>
+ <702cf75e-5193-92d3-79a7-182ac86df16e@linux.ibm.com>
+ <20201008090319.4161c220.cohuck@redhat.com>
+From:   Stefan Haberland <sth@linux.ibm.com>
+Autocrypt: addr=sth@linux.ibm.com; keydata=
+ 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
+ cH4TNHyhiR0KAbxE8qKx3Jc=
+Message-ID: <98443e35-081f-12cf-9dd1-3078dcc1d015@linux.ibm.com>
+Date:   Thu, 8 Oct 2020 13:04:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.11.2010072022130.27518@pop.dreamhost.com>
+In-Reply-To: <20201008090319.4161c220.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-08_07:2020-10-08,2020-10-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 impostorscore=0 suspectscore=2 clxscore=1015
+ malwarescore=0 phishscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2010080077
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/10/8 04:35, Eric Wheeler wrote:
-> [+cc coly]
-> 
-> On Mon, 5 Oct 2020, Eric Wheeler wrote:
->> On Sun, 4 Oct 2020, Kai Krakow wrote:
+Am 08.10.20 um 09:03 schrieb Cornelia Huck:
+> On Wed, 7 Oct 2020 22:10:11 +0200
+> Jan Höppner <hoeppner@linux.ibm.com> wrote:
+>
+>> On 10/7/20 6:40 PM, Cornelia Huck wrote:
+>>> On Wed, 7 Oct 2020 16:33:37 +0200
+>>> Jan Höppner <hoeppner@linux.ibm.com> wrote:
+>>>   
+>>>>>>>> +static inline void dasd_path_release(struct kobject *kobj)
+>>>>>>>> +{
+>>>>>>>> +/* Memory for the dasd_path kobject is freed when dasd_free_device() is called */
+>>>>>>>> +}
+>>>>>>>> +      
+>>>>>>> As already said, I don't think that's a correct way to implement this.
+>>>>>>>       
+>>>>>> As you correctly pointed out, our release function doesn't do anything.
+>>>>>> This is because our path data is a (static) part of our device.
+>>>>>> This data is critical to keep our devices operational.
+>>>>>> We can't simply rely on allocated memory if systems are under stress.     
+>>>>> Yes, avoiding freeing and reallocating memory certainly makes sense.
+>>>>>     
+>>>>>> Having this data dynamically allocated involves a lot of rework of our
+>>>>>> path handling as well. There are a few things that are subject to improvement
+>>>>>> and evaluating whether our dasd_path structures can be dynamic is one of
+>>>>>> these things. However, even then, the above concern persists and I
+>>>>>> highly doubt that dynamic dasd_paths objects are doable for us at this
+>>>>>> moment.
+>>>>>>
+>>>>>> I do understand the concerns, however, we release the memory for dasd_path
+>>>>>> structures eventually when dasd_free_device() is called. Until that point,
+>>>>>> the data has to be kept alive. The rest is taking care of by the kobject
+>>>>>> library.    
+>>>>> Yes, there doesn't seem to be any memory leakage.
+>>>>>     
+>>>>>> In our path handling we also make sure that we can always verify/validate
+>>>>>> paths information even if a system is under high memory pressure. Another
+>>>>>> reason why it would contradictory for dasd_path objects to be dynamic.
+>>>>>>
+>>>>>> I hope this explains the reasoning behind the release function.    
+>>>>> I understand where you're coming from.
+>>>>>
+>>>>> However, "static" kobjects (in the sense of "we may re-register the
+>>>>> same kobject") are still problematic. Is there any way to simply
+>>>>> "disappear" path objects that are not valid at the moment, or mark them
+>>>>> as not valid?    
+>>>> You could use kobject_del(), but it is rather intended to be used for
+>>>> a two-stage removal of the kobject.
+>>>>  
+>>>>> Also, the simple act of registering/unregistering a kobject already
+>>>>> creates stress from its sysfs interactions... it seems you should try
+>>>>> to avoid that as well?
+>>>>>     
+>>>> We don't re-register kobjects over and over again. The kobjects are
+>>>> infact initialized and created only _once_. This is done either during
+>>>> device initialization (after dasd_eckd_read_conf() in
+>>>> dasd_eckd_check_characteristics()) or when a path is newly added
+>>>> (in the path event handler).
+>>>> The kobject will stay until the memory for the whole device is being
+>>>> freed. This is also the reason why the kobject can stay initialized and
+>>>> we track ourselves whether we did the initialization/creation already
+>>>> (which we check e.g. when a path is removed and added again).
+>>>> So, instead of the release function freeing the kobject data,
+>>>> it is done by our dasd_free_device() (same thing, different function IMHO).
+>>>>
+>>>> I think the concerns would be more worrisome if we'd remove/add
+>>>> the kobjects every time. And then I agree, we'd run into trouble.
+>>>>  
+>>> The thing that tripped me is
+>>>
+>>> +void dasd_path_remove_kobj(struct dasd_device *device, int chp)
+>>> +{
+>>> +	if (device->path[chp].in_sysfs) {
+>>> +		kobject_put(&device->path[chp].kobj);
+>>> +		device->path[chp].in_sysfs = false;
+>>> +	}
+>>> +}
+>>>
+>>> As an exported function, it is not clear where this may be called from.
+>>> Given your explanation above (and some more code reading on my side),
+>>> the code looks ok in its current incarnation (but non-idiomatic).
+>>>
+>>> Is there a way to check that indeed nobody re-adds a previously removed
+>>> path object due to a (future) programming error? And maybe add a
+>>> comment that you must never re-register a path? "The path is gone,
+>>> let's remove the object" looks quite tempting.
+>>>   
+>> A comment is the minimum I can think of at the moment and
+>> I'll prepare a fixup patch or a new version of this patch that adds
+>> a proper comment for this function.
+>> Other ways to protect the usage must be investigated. 
+>> I have to discuss with Stefan what the best approach would be as the patchset
+>> is supposed to be ready for upstream integration.
 >>
->>> Hey Nix!
->>>
->>> Apparently, `git send-email` probably swallowed the patch 0/3 message for you.
->>>
->>> It was about adding one additional patch which reduced boot time for
->>> me with idle mode active by a factor of 2.
->>>
->>> You can look at it here:
->>> https://github.com/kakra/linux/pull/4
->>>
->>> It's "bcache: Only skip data request in io_prio bypass mode" just if
->>> you're curious.
->>>
->>> Regards,
->>> Kai
->>>
->>> Am So., 4. Okt. 2020 um 15:19 Uhr schrieb Nix <nix@esperi.org.uk>:
->>>>
->>>> On 3 Oct 2020, Kai Krakow spake thusly:
->>>>
->>>>> Having idle IOs bypass the cache can increase performance elsewhere
->>>>> since you probably don't care about their performance.  In addition,
->>>>> this prevents idle IOs from promoting into (polluting) your cache and
->>>>> evicting blocks that are more important elsewhere.
->>>>
->>>> FYI, stats from 20 days of uptime with this patch live in a stack with
->>>> XFS above it and md/RAID-6 below (20 days being the time since the last
->>>> reboot: I've been running this patch for years with older kernels
->>>> without incident):
->>>>
->>>> stats_total/bypassed: 282.2G
->>>> stats_total/cache_bypass_hits: 123808
->>>> stats_total/cache_bypass_misses: 400813
->>>> stats_total/cache_hit_ratio: 53
->>>> stats_total/cache_hits: 9284282
->>>> stats_total/cache_miss_collisions: 51582
->>>> stats_total/cache_misses: 8183822
->>>> stats_total/cache_readaheads: 0
->>>> written: 168.6G
->>>>
->>>> ... so it's still saving a lot of seeking. This is despite having
->>>> backups running every three hours (in idle mode), and the usual updatedb
->>>> runs, etc, plus, well, actual work which sometimes involves huge greps
->>>> etc: I also tend to do big cp -al's of transient stuff like build dirs
->>>> in idle mode to suppress caching, because the build dir will be deleted
->>>> long before it expires from the page cache.
->>>>
->>>> The SSD, which is an Intel DC S3510 and is thus read-biased rather than
->>>> write-biased (not ideal for this use-case: whoops, I misread the
->>>> datasheet), says
->>>>
->>>> EnduranceAnalyzer : 506.90 years
->>>>
->>>> despite also housing all the XFS journals. I am... not worried about the
->>>> SSD wearing out. It'll outlast everything else at this rate. It'll
->>>> probably outlast the machine's case and the floor the machine sits on.
->>>> It'll certainly outlast me (or at least last long enough to be discarded
->>>> by reason of being totally obsolete). Given that I really really don't
->>>> want to ever have to replace it (and no doubt screw up replacing it and
->>>> wreck the machine), this is excellent.
->>>>
->>>> (When I had to run without the ioprio patch, the expected SSD lifetime
->>>> and cache hit rate both plunged. It was still years, but enough years
->>>> that it could potentially have worn out before the rest of the machine
->>>> did. Using ioprio for this might be a bit of an abuse of ioprio, and
->>>> really some other mechanism might be better, but in the absence of such
->>>> a mechanism, ioprio *is*, at least for me, fairly tightly correlated
->>>> with whether I'm going to want to wait for I/O from the same block in
->>>> future.)
->>>
->> From Nix on 10/03 at 5:39 AM PST
->>> I suppose. I'm not sure we don't want to skip even that for truly
->>> idle-time I/Os, though: booting is one thing, but do you want all the
->>> metadata associated with random deep directory trees you access once a
->>> year to be stored in your SSD's limited space, pushing out data you
->>> might actually use, because the idle-time backup traversed those trees?
->>> I know I don't. The whole point of idle-time I/O is that you don't care
->>> how fast it returns. If backing it up is speeding things up, I'd be
->>> interested in knowing why... what this is really saying is that metadata
->>> should be considered important even if the user says it isn't!
->>>
->>> (I guess this is helping because of metadata that is read by idle I/Os
->>> first, but then non-idle ones later, in which case for anyone who runs
->>> backups this is just priming the cache with all metadata on the disk.
->>> Why not just run a non-idle-time cronjob to do that in the middle of the
->>> night if it's beneficial?)
->>
->> (It did not look like this was being CC'd to the list so I have pasted the 
->> relevant bits of conversation. Kai, please resend your patch set and CC 
->> the list linux-bcache@vger.kernel.org)
->>
->> I am glad that people are still making effective use of this patch!
->>
->> It works great unless you are using mq-scsi (or perhaps mq-dm). For the 
->> multi-queue systems out there, ioprio does not seem to pass down through 
->> the stack into bcache, probably because it is passed through a worker 
->> thread for the submission or some other detail that I have not researched. 
->>
->> Long ago others had concerns using ioprio as the mechanism for cache 
->> hinting, so what does everyone think about implementing cgroup inside of 
->> bcache? From what I can tell, cgroups have a stronger binding to an IO 
->> than ioprio hints. 
->>
->> I think there are several per-cgroup tunables that could be useful. Here 
->> are the ones that I can think of, please chime in if anyone can think of 
->> others: 
->>  - should_bypass_write
->>  - should_bypass_read
->>  - should_bypass_meta
->>  - should_bypass_read_ahead
->>  - should_writeback
->>  - should_writeback_meta
->>  - should_cache_read
->>  - sequential_cutoff
->>
->> Indeed, some of these could be combined into a single multi-valued cgroup 
->> option such as:
->>  - should_bypass = read,write,meta
-> 
-> 
-> Hi Coly,
-> 
-> Do you have any comments on the best cgroup implementation for bcache?
-> 
-> What other per-process cgroup parameters might be useful for tuning 
-> bcache behavior to various workloads?
+>> I'd prefer a fixup patch that we could send with at least one more fixup patch
+>> that we have in the pipe already. Let's see. I hope that's fine with you
+>> (and Jens obviously) so far.
+> Fine with me. I don't really have a horse in that race; I just wanted
+> to look at this from a vfio-ccw perspective and then stumbled over the
+> kobject handling...
+>
 
-Hi Eric,
+Thanks for this. I will send a v2 shortly.
 
-This is much better than the magic numbers to control io prio.
-
-I am not familiar with cgroup configuration and implementation, I just
-wondering because most of I/Os in bcache are done by kworker or kthread,
-is it possible to do per-process control.
-
-Anyway, we may start from the bypass stuffs in your example. If you may
-help to compose patches and maintain them in long term, I am glad to
-take them in.
-
-Thanks.
-
-Coly Li
-
-Thanks.
-
-Coly Li
