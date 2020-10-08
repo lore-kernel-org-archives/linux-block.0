@@ -2,65 +2,108 @@ Return-Path: <SRS0=cFNo=DP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F3C7C433E7
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 03:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8EF0C433E7
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 04:48:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BC8C2085B
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 03:53:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80D202173E
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 04:48:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1602132488;
+	bh=l0qrHjPVsW78fE4iMqd/aK426rQMlUvVabMpWWXIv5g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=xSwinqjepAy7cdEddrmyW+7lFR5eNgJDdr4Dq+8pRlIGZDKXjlpZWXlLxTiswHBdd
+	 Lg9KboFwhCVkC85Cpubo2fruQrO4t0u9mqHd37iyY1cS9hdp7C3ZayQN2dLAW2H2AW
+	 ujDo3xm+Dc2HtTeMi0bihhx6lqbdb+OKVxkK1Cok=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728483AbgJHDxb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Oct 2020 23:53:31 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:53763 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728082AbgJHDxa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 7 Oct 2020 23:53:30 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UBG9jZH_1602129161;
-Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UBG9jZH_1602129161)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 08 Oct 2020 11:52:41 +0800
-From:   Baolin Wang <baolin.wang@linux.alibaba.com>
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     baolin.wang@linux.alibaba.com, baolin.wang7@gmail.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 8/8] blk-throttle: Re-use the throtl_set_slice_end()
-Date:   Thu,  8 Oct 2020 11:52:29 +0800
-Message-Id: <f46c1c65ccf30f755df6fbfd6f2eaae9b9e6dc4b.1602128837.git.baolin.wang@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1602128837.git.baolin.wang@linux.alibaba.com>
-References: <cover.1602128837.git.baolin.wang@linux.alibaba.com>
-In-Reply-To: <cover.1602128837.git.baolin.wang@linux.alibaba.com>
-References: <cover.1602128837.git.baolin.wang@linux.alibaba.com>
+        id S1727854AbgJHEsH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Oct 2020 00:48:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36392 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726216AbgJHEsH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Oct 2020 00:48:07 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AC2E820789;
+        Thu,  8 Oct 2020 04:48:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1602132485;
+        bh=l0qrHjPVsW78fE4iMqd/aK426rQMlUvVabMpWWXIv5g=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ABpoieSTLK2pGJRb7l8G+YYhkXZSdwzaOO/m7N+bSzrNFB4q+2EV+X0dRaOM4KHvd
+         lHvfyyomiEY6Rc4IP3GqgBefL4UfaSAJ++GoZhbeQ96L4yo/sgkCfwO/j9RRJpm5U1
+         SIK+0EYkm1skyFjC7mAvrEH0SyCMpX9GcNjisLow=
+Date:   Thu, 8 Oct 2020 06:48:49 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Tony Asleson <tasleson@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>, pmladek@suse.com,
+        David Lehman <dlehman@redhat.com>,
+        sergey.senozhatsky@gmail.com, jbaron@akamai.com,
+        James.Bottomley@hansenpartnership.com,
+        linux-kernel@vger.kernel.org, rafael@kernel.org,
+        martin.petersen@oracle.com, kbusch@kernel.org, axboe@fb.com,
+        sagi@grimberg.me, akpm@linux-foundation.org, orson.zhai@unisoc.com,
+        viro@zeniv.linux.org.uk
+Subject: Re: [v5 01/12] struct device: Add function callback durable_name
+Message-ID: <20201008044849.GA163423@kroah.com>
+References: <20200925161929.1136806-1-tasleson@redhat.com>
+ <20200925161929.1136806-2-tasleson@redhat.com>
+ <20200929175102.GA1613@infradead.org>
+ <20200929180415.GA1400445@kroah.com>
+ <20e220a6-4bde-2331-6e5e-24de39f9aa3b@redhat.com>
+ <20200930073859.GA1509708@kroah.com>
+ <c6b031b8-f617-0580-52a5-26532da4ee03@redhat.com>
+ <20201001114832.GC2368232@kroah.com>
+ <72be0597-a3e2-bf7b-90b2-799d10fdf56c@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <72be0597-a3e2-bf7b-90b2-799d10fdf56c@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Re-use throtl_set_slice_end() to remove duplicate code.
+On Wed, Oct 07, 2020 at 03:10:17PM -0500, Tony Asleson wrote:
+> On 10/1/20 6:48 AM, Greg Kroah-Hartman wrote:
+> > On Wed, Sep 30, 2020 at 09:35:52AM -0500, Tony Asleson wrote:
+> >> On 9/30/20 2:38 AM, Greg Kroah-Hartman wrote:
+> >>> On Tue, Sep 29, 2020 at 05:04:32PM -0500, Tony Asleson wrote:
+> >>>> I'm trying to figure out a way to positively identify which storage
+> >>>> device an error belongs to over time.
+> >>>
+> >>> "over time" is not the kernel's responsibility.
+> >>>
+> >>> This comes up every 5 years or so. The kernel provides you, at runtime,
+> >>> a mapping between a hardware device and a "logical" device.  It can
+> >>> provide information to userspace about this mapping, but once that
+> >>> device goes away, the kernel is free to reuse that logical device again.
+> >>>
+> >>> If you want to track what logical devices match up to what physical
+> >>> device, then do it in userspace, by parsing the log files.
+> >>
+> >> I don't understand why people think it's acceptable to ask user space to
+> >> parse text that is subject to change.
+> > 
+> > What text is changing? The format of of the prefix of dev_*() is well
+> > known and has been stable for 15+ years now, right?  What is difficult
+> > in parsing it?
+> 
+> Many of the storage layer messages are using printk, not dev_printk.
 
-Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
----
- block/blk-throttle.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ok, then stop right there.  Fix that up.  Don't try to route around the
+standard way of displaying log messages by creating a totally different
+way of doing things.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index fc5c14f..b771c42 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -808,7 +808,7 @@ static inline void throtl_set_slice_end(struct throtl_grp *tg, bool rw,
- static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
- 				       unsigned long jiffy_end)
- {
--	tg->slice_end[rw] = roundup(jiffy_end, tg->td->throtl_slice);
-+	throtl_set_slice_end(tg, rw, jiffy_end);
- 	throtl_log(&tg->service_queue,
- 		   "[%c] extend slice start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
--- 
-1.8.3.1
+Just use the dev_*() calls, and all will be fine.  Kernel log messages
+are not "ABI" in that they have to be preserved in any specific way, so
+adding a prefix to them as dev_*() does, will be fine.
 
+thanks,
+
+greg k-h
