@@ -2,77 +2,80 @@ Return-Path: <SRS0=cFNo=DP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E54DC433E7
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 01:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 972FDC4363A
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 03:38:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B21DC20882
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 01:02:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3563920714
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 03:38:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727018AbgJHBCC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Oct 2020 21:02:02 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:50629 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726671AbgJHBCC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Oct 2020 21:02:02 -0400
-X-Greylist: delayed 2267 seconds by postgrey-1.27 at vger.kernel.org; Wed, 07 Oct 2020 21:02:01 EDT
-Received: from fsav404.sakura.ne.jp (fsav404.sakura.ne.jp [133.242.250.103])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 0980Ntjp043957;
-        Thu, 8 Oct 2020 09:23:55 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav404.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav404.sakura.ne.jp);
- Thu, 08 Oct 2020 09:23:55 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav404.sakura.ne.jp)
-Received: from localhost.localdomain (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 0980No8b043905
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-        Thu, 8 Oct 2020 09:23:55 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH] block: ratelimit handle_bad_sector() message
-Date:   Thu,  8 Oct 2020 09:23:44 +0900
-Message-Id: <20201008002344.6759-1-penguin-kernel@I-love.SAKURA.ne.jp>
-X-Mailer: git-send-email 2.18.4
+        id S1727765AbgJHDiL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Oct 2020 23:38:11 -0400
+Received: from mail-io1-f77.google.com ([209.85.166.77]:42442 "EHLO
+        mail-io1-f77.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726323AbgJHDiL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Oct 2020 23:38:11 -0400
+Received: by mail-io1-f77.google.com with SMTP id k14so2888430ioj.9
+        for <linux-block@vger.kernel.org>; Wed, 07 Oct 2020 20:38:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=4IhbBH7ECghcPFerwikAMQpqWj6YlBpaCR+/1lLbfIE=;
+        b=KiaVXSZx7j7tIYN/7fTf96o8kyP/5NbbCI9mnDGxsni4bISB1Nm5+Q+J6f/1TiZQ1c
+         6+fgM6oLnkcKmCG8ZUTz/LveZuTQV317naiM/KFOU6D3eNlg6huzrChhq3ipUs2Q2EF0
+         75e7VjIEN42mjAFHPJSGNjKJ2DVBfBZc00aEFfgSkBeiIPWP+4N8CF7D1BuAa8ppZaz+
+         v9qROsFkF161Y15Vtwpano1SlXibNA3xgdHmOvf9n86jDHx9T/szvw3/ThjAOlL2Hh0h
+         3WoNvJUdf7XedM0LhcSxwyvGfwKSbQywUzGiBXvSzrtw4jgbMFhJWCX2CMF9LM0oDLo2
+         X12w==
+X-Gm-Message-State: AOAM533RmUOU99N2fDGAeLc9tWDge9uV3ke83U4IWB8740FGtQrvGOic
+        rsNGrwZGcHz4gE6iJ5llmobdFmpFqI4NKL35pNoQGcBtenKQ
+X-Google-Smtp-Source: ABdhPJynKSURyz8krzVv92HNweDLHB/5PqX1t0MirYXocBnDSftoIzE01f7AZnfI+TcgJdlhKPHkNqcCx/gg/MZ7dJ+aWSiS2SjA
+MIME-Version: 1.0
+X-Received: by 2002:a6b:f30a:: with SMTP id m10mr2888088ioh.164.1602128289047;
+ Wed, 07 Oct 2020 20:38:09 -0700 (PDT)
+Date:   Wed, 07 Oct 2020 20:38:09 -0700
+In-Reply-To: <0000000000009323e705ae870d48@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008dab1205b1208fe6@google.com>
+Subject: Re: KASAN: use-after-free Read in delete_partition
+From:   syzbot <syzbot+b8639c8dcb5ec4483d4f@syzkaller.appspotmail.com>
+To:     anant.thazhemadam@gmail.com, axboe@kernel.dk,
+        bgolaszewski@baylibre.com, dan.j.williams@intel.com,
+        dragonjetli@gmail.com, gregkh@linuxfoundation.org, hch@lst.de,
+        hl1998@protonmail.com, jack@suse.cz, jean-philippe@linaro.org,
+        johannes.thumshirn@wdc.com, jroedel@suse.de,
+        linux-block@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-kernel@vger.kernel.org, rafael@kernel.org,
+        saravanak@google.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot is reporting unkillable task [1], for the caller is failing to
-handle a corrupted filesystem image which attempts to access beyond
-the end of the device. While we need to fix the caller, flooding the
-console with handle_bad_sector() message is unlikely useful.
+syzbot suspects this issue was fixed by commit:
 
-[1] https://syzkaller.appspot.com/bug?id=f1f49fb971d7a3e01bd8ab8cff2ff4572ccf3092
+commit 08fc1ab6d748ab1a690fd483f41e2938984ce353
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Tue Sep 1 09:59:41 2020 +0000
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- block/blk-core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+    block: fix locking in bdev_del_partition
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 10c08ac50697..8b67b6e941db 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -803,8 +803,8 @@ static void handle_bad_sector(struct bio *bio, sector_t maxsector)
- {
- 	char b[BDEVNAME_SIZE];
- 
--	printk(KERN_INFO "attempt to access beyond end of device\n");
--	printk(KERN_INFO "%s: rw=%d, want=%Lu, limit=%Lu\n",
-+	printk_ratelimited(KERN_INFO "attempt to access beyond end of device\n");
-+	printk_ratelimited(KERN_INFO "%s: rw=%d, want=%Lu, limit=%Lu\n",
- 			bio_devname(bio, b), bio->bi_opf,
- 			(unsigned long long)bio_end_sector(bio),
- 			(long long)maxsector);
--- 
-2.18.4
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1259b1e7900000
+start commit:   f75aef39 Linux 5.9-rc3
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3c5f6ce8d5b68299
+dashboard link: https://syzkaller.appspot.com/bug?extid=b8639c8dcb5ec4483d4f
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15c43c79900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=173dfa1e900000
 
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: block: fix locking in bdev_del_partition
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
