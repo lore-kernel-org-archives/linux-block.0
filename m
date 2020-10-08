@@ -2,205 +2,162 @@ Return-Path: <SRS0=cFNo=DP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BD5C43457
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 20:03:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD7AC43467
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 20:06:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71D002222A
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 20:03:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C171122228
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 20:06:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MBSsfQHT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729899AbgJHUDg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Oct 2020 16:03:36 -0400
-Received: from mx.ewheeler.net ([173.205.220.69]:56899 "EHLO mail.ewheeler.net"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729822AbgJHUDg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Oct 2020 16:03:36 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.ewheeler.net (Postfix) with ESMTP id 4E3C4A0633;
-        Thu,  8 Oct 2020 20:03:36 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mail.ewheeler.net ([127.0.0.1])
-        by localhost (mail.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id fILmHGiYJO7I; Thu,  8 Oct 2020 20:03:30 +0000 (UTC)
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mail.ewheeler.net (Postfix) with ESMTPSA id B4435A0612;
-        Thu,  8 Oct 2020 20:03:30 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ewheeler.net B4435A0612
-Date:   Thu, 8 Oct 2020 20:03:30 +0000 (UTC)
-From:   Eric Wheeler <bcache@lists.ewheeler.net>
-X-X-Sender: lists@pop.dreamhost.com
-To:     linux-bcache@vger.kernel.org
-cc:     Kai Krakow <kai@kaishome.de>, Nix <nix@esperi.org.uk>,
-        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: bcache cgroups for per-process tuning
-Message-ID: <alpine.LRH.2.11.2010081953490.27518@pop.dreamhost.com>
-User-Agent: Alpine 2.11 (LRH 23 2013-08-11)
+        id S1729973AbgJHUGD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Oct 2020 16:06:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52452 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729968AbgJHUGB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Oct 2020 16:06:01 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D2BC0613D4
+        for <linux-block@vger.kernel.org>; Thu,  8 Oct 2020 13:05:59 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id d20so7670032iop.10
+        for <linux-block@vger.kernel.org>; Thu, 08 Oct 2020 13:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xwsDN6X1qdoLg6NoAWCRmcDuaBAzrQD/adalLvAVzBM=;
+        b=MBSsfQHTbWTXU/Yo5oGR95qtqkxoYAzaQvxVsuRfdQ4ZObCo2tdGyIiJERjZQweYce
+         KxNB90ZUwlQg+Gxx6z+NcRCHpm3Bnb2vdXXmu9MIZHZ/8ovjPdiL9wdMGpm1fnSufB5e
+         GFTbJysN82Dy/Wf6qyNC2tI+u8l/kjgpC9uFDN1jPzcpFnavCFYgLjpNJzzIqlG45a+c
+         AG/pDOd00sjD4x5D940bOvtstcB+IfHykZiUl7YaTCXwPrDIRjGjXMW/CntXIv5+nTa0
+         4D8Eooi96KsAhpdB3KauJM5Np1nH3BTBOzTf1Re8T/9SZG7sg+prxjycdLxwUpTL9M09
+         xRuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xwsDN6X1qdoLg6NoAWCRmcDuaBAzrQD/adalLvAVzBM=;
+        b=dCCq/mEwbmeUOut0Y68lm9BxC2bZY3wH7GQj008P3vOXSH8yn2Wt0F+JftE4m44MxB
+         iYisg0gi7QY/GuXI8XkXm9T0CnMgfQxCtWRvwWT15zvMe1eOxVDTRmoOMfRU9dFgnf6h
+         jacysbqZV0p3EoH2saKSSs+02+qx6tcctKd8na4OUTDSXA27kaC2W3p7AZBWwpzQ9/yb
+         B1bvbj4gre8jQOgUebq/0H6nBnUtAuZF/EMdmtmR5TTr9nG4y1emMkRQt/rULobTNKg1
+         QqNTsrFzTIm0//mOjVEwhIhWLMI4B0TgMZ/KX2J7NoyQhii63BPicwAPa3bOwAtEYr2g
+         QP5A==
+X-Gm-Message-State: AOAM532wI8rdplt5KVwJJ3LNwkTrmZm0T0bPi4WVojEFN2HYa9xABDuy
+        UvhIT9N2/BfUq918oFLKj7BZcXHG+MUBqnkFBY2hwg==
+X-Google-Smtp-Source: ABdhPJwRCRIfxkJxJDVD6dM9ZY7goLBzqf32rCpZ4VHK8YdlkCRXmoFRaE02yXNCdOUnFtWCNypXdYNx4H1pQRSz0+Q=
+X-Received: by 2002:a02:a0c2:: with SMTP id i2mr8174613jah.92.1602187558626;
+ Thu, 08 Oct 2020 13:05:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+References: <CA+G9fYtwisRJtN4ht=ApeWc1jWssDok-7y2wee6Z0kzMP-atKg@mail.gmail.com>
+In-Reply-To: <CA+G9fYtwisRJtN4ht=ApeWc1jWssDok-7y2wee6Z0kzMP-atKg@mail.gmail.com>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Fri, 9 Oct 2020 01:35:47 +0530
+Message-ID: <CA+G9fYseTYRWoHUNZ=j4mjFs9dDJ-KOD8hDy+RnyDPx75HcVWw@mail.gmail.com>
+Subject: Re: [ Regressions ] linux next 20201008: blk_update_request: I/O
+ error, dev sda, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
+To:     Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        drbd-dev@lists.linbit.com,
+        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
+        <linux-ide@vger.kernel.org>, linux-raid@vger.kernel.org,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        lkft-triage@lists.linaro.org
+Cc:     Song Liu <song@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Jens Axboe <axboe@kernel.dk>, martin.petersen@oracle.com,
+        Hannes Reinecke <hare@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 8 Oct 2020, Coly Li wrote:
+On Thu, 8 Oct 2020 at 23:41, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>
+> There are two major regressions noticed on linux next tag 20201008.
+> I will bisect this problem and get back to you.
 
-> On 2020/10/8 04:35, Eric Wheeler wrote:
-> > [+cc coly]
-> > 
-> > On Mon, 5 Oct 2020, Eric Wheeler wrote:
-> >> On Sun, 4 Oct 2020, Kai Krakow wrote:
-> >>
-> >>> Hey Nix!
-> >>>
-> >>> Apparently, `git send-email` probably swallowed the patch 0/3 message for you.
-> >>>
-> >>> It was about adding one additional patch which reduced boot time for
-> >>> me with idle mode active by a factor of 2.
-> >>>
-> >>> You can look at it here:
-> >>> https://github.com/kakra/linux/pull/4
-> >>>
-> >>> It's "bcache: Only skip data request in io_prio bypass mode" just if
-> >>> you're curious.
-> >>>
-> >>> Regards,
-> >>> Kai
-> >>>
-> >>> Am So., 4. Okt. 2020 um 15:19 Uhr schrieb Nix <nix@esperi.org.uk>:
-> >>>>
-> >>>> On 3 Oct 2020, Kai Krakow spake thusly:
-> >>>>
-> >>>>> Having idle IOs bypass the cache can increase performance elsewhere
-> >>>>> since you probably don't care about their performance.  In addition,
-> >>>>> this prevents idle IOs from promoting into (polluting) your cache and
-> >>>>> evicting blocks that are more important elsewhere.
-> >>>>
-> >>>> FYI, stats from 20 days of uptime with this patch live in a stack with
-> >>>> XFS above it and md/RAID-6 below (20 days being the time since the last
-> >>>> reboot: I've been running this patch for years with older kernels
-> >>>> without incident):
-> >>>>
-> >>>> stats_total/bypassed: 282.2G
-> >>>> stats_total/cache_bypass_hits: 123808
-> >>>> stats_total/cache_bypass_misses: 400813
-> >>>> stats_total/cache_hit_ratio: 53
-> >>>> stats_total/cache_hits: 9284282
-> >>>> stats_total/cache_miss_collisions: 51582
-> >>>> stats_total/cache_misses: 8183822
-> >>>> stats_total/cache_readaheads: 0
-> >>>> written: 168.6G
-> >>>>
-> >>>> ... so it's still saving a lot of seeking. This is despite having
-> >>>> backups running every three hours (in idle mode), and the usual updatedb
-> >>>> runs, etc, plus, well, actual work which sometimes involves huge greps
-> >>>> etc: I also tend to do big cp -al's of transient stuff like build dirs
-> >>>> in idle mode to suppress caching, because the build dir will be deleted
-> >>>> long before it expires from the page cache.
-> >>>>
-> >>>> The SSD, which is an Intel DC S3510 and is thus read-biased rather than
-> >>>> write-biased (not ideal for this use-case: whoops, I misread the
-> >>>> datasheet), says
-> >>>>
-> >>>> EnduranceAnalyzer : 506.90 years
-> >>>>
-> >>>> despite also housing all the XFS journals. I am... not worried about the
-> >>>> SSD wearing out. It'll outlast everything else at this rate. It'll
-> >>>> probably outlast the machine's case and the floor the machine sits on.
-> >>>> It'll certainly outlast me (or at least last long enough to be discarded
-> >>>> by reason of being totally obsolete). Given that I really really don't
-> >>>> want to ever have to replace it (and no doubt screw up replacing it and
-> >>>> wreck the machine), this is excellent.
-> >>>>
-> >>>> (When I had to run without the ioprio patch, the expected SSD lifetime
-> >>>> and cache hit rate both plunged. It was still years, but enough years
-> >>>> that it could potentially have worn out before the rest of the machine
-> >>>> did. Using ioprio for this might be a bit of an abuse of ioprio, and
-> >>>> really some other mechanism might be better, but in the absence of such
-> >>>> a mechanism, ioprio *is*, at least for me, fairly tightly correlated
-> >>>> with whether I'm going to want to wait for I/O from the same block in
-> >>>> future.)
-> >>>
-> >> From Nix on 10/03 at 5:39 AM PST
-> >>> I suppose. I'm not sure we don't want to skip even that for truly
-> >>> idle-time I/Os, though: booting is one thing, but do you want all the
-> >>> metadata associated with random deep directory trees you access once a
-> >>> year to be stored in your SSD's limited space, pushing out data you
-> >>> might actually use, because the idle-time backup traversed those trees?
-> >>> I know I don't. The whole point of idle-time I/O is that you don't care
-> >>> how fast it returns. If backing it up is speeding things up, I'd be
-> >>> interested in knowing why... what this is really saying is that metadata
-> >>> should be considered important even if the user says it isn't!
-> >>>
-> >>> (I guess this is helping because of metadata that is read by idle I/Os
-> >>> first, but then non-idle ones later, in which case for anyone who runs
-> >>> backups this is just priming the cache with all metadata on the disk.
-> >>> Why not just run a non-idle-time cronjob to do that in the middle of the
-> >>> night if it's beneficial?)
-> >>
-> >> (It did not look like this was being CC'd to the list so I have pasted the 
-> >> relevant bits of conversation. Kai, please resend your patch set and CC 
-> >> the list linux-bcache@vger.kernel.org)
-> >>
-> >> I am glad that people are still making effective use of this patch!
-> >>
-> >> It works great unless you are using mq-scsi (or perhaps mq-dm). For the 
-> >> multi-queue systems out there, ioprio does not seem to pass down through 
-> >> the stack into bcache, probably because it is passed through a worker 
-> >> thread for the submission or some other detail that I have not researched. 
-> >>
-> >> Long ago others had concerns using ioprio as the mechanism for cache 
-> >> hinting, so what does everyone think about implementing cgroup inside of 
-> >> bcache? From what I can tell, cgroups have a stronger binding to an IO 
-> >> than ioprio hints. 
-> >>
-> >> I think there are several per-cgroup tunables that could be useful. Here 
-> >> are the ones that I can think of, please chime in if anyone can think of 
-> >> others: 
-> >>  - should_bypass_write
-> >>  - should_bypass_read
-> >>  - should_bypass_meta
-> >>  - should_bypass_read_ahead
-> >>  - should_writeback
-> >>  - should_writeback_meta
-> >>  - should_cache_read
-> >>  - sequential_cutoff
-> >>
-> >> Indeed, some of these could be combined into a single multi-valued cgroup 
-> >> option such as:
-> >>  - should_bypass = read,write,meta
-> > 
-> > 
-> > Hi Coly,
-> > 
-> > Do you have any comments on the best cgroup implementation for bcache?
-> > 
-> > What other per-process cgroup parameters might be useful for tuning 
-> > bcache behavior to various workloads?
-> 
-> Hi Eric,
-> 
-> This is much better than the magic numbers to control io prio.
-> 
-> I am not familiar with cgroup configuration and implementation, I just
-> wondering because most of I/Os in bcache are done by kworker or kthread,
-> is it possible to do per-process control.
+Reverting scsi: patch set on  linux next tag 20201008 fixed reported problems.
+git revert --no-edit 653eb7c99d84..ed7fb2d018fd
 
-It should, bio's get associated with processes tied to a cgroup IIRC.  
-Maybe someone can fill in the details here.
 
-> Anyway, we may start from the bypass stuffs in your example. If you may
-> help to compose patches and maintain them in long term, I am glad to
-> take them in.
-
-That sounds like a plan.
-
-Nix, Kai, anyone:
-
-Are you up for writing a first draft?
-
--Eric
+>
+> 1) qemu_i386 and qemu_x86 boot failed due to mount rootfs failing [1].
+>
+>         Starting Remount Root and Kernel File Systems...
+> [    1.750740] ata1.00: WARNING: zero len r/w req
+> [    1.751423] ata1.00: WARNING: zero len r/w req
+> [    1.752361] ata1.00: WARNING: zero len r/w req
+> [    1.753400] ata1.00: WARNING: zero len r/w req
+> [    1.754447] ata1.00: WARNING: zero len r/w req
+> [    1.755529] ata1.00: WARNING: zero len r/w req
+> [    1.756630] sd 0:0:0:0: [sda] tag#0 FAILED Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK cmd_age=0s
+> [    1.758622] sd 0:0:0:0: [sda] tag#0 CDB: Synchronize Cache(10) 35
+> 00 00 00 00 00 00 00 00 00
+> [    1.760576] blk_update_request: I/O error, dev sda, sector 0 op
+> 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
+> [    1.761534] Buffer I/O error on dev sda, logical block 0, lost sync
+> page write
+> [    1.764158] EXT4-fs (sda): I/O error while writing superblock
+>
+>
+> 2) the devices boot pass but mkfs failed on x86_64, i386, arm64
+> Juno-r2 devices [2].
+>
+> mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG03ACA100_37O9KGL0F
+> [   72.159789] ata3.00: WARNING: zero len r/w req
+> [   72.164287] ata3.00: WARNING: zero len r/w req
+> [   72.168774] ata3.00: WARNING: zero len r/w req
+> [   72.168777] ata3.00: WARNING: zero len r/w req
+> [   72.168779] ata3.00: WARNING: zero len r/w req
+> [   72.168781] ata3.00: WARNING: zero len r/w req
+> [   72.168786] sd 2:0:0:0: [sda] tag#5 FAILED Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK cmd_age=0s
+> [   72.168788] sd 2:0:0:0: [sda] tag#5 CDB: Synchronize Cache(10) 35
+> 00 00 00 00 00 00 00 00 00
+> [   72.168791] blk_update_request: I/O error, dev sda, sector 0 op
+> 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
+>
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+>
+> metadata:
+>   git branch: master
+>   git repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+>   git commit: e4fb79c771fbe2e6fcb3cffa87d5823a9bbf3f10
+>   git describe: next-20201008
+>   make_kernelversion: 5.9.0-rc8
+>   kernel-config:
+> https://builds.tuxbuild.com/pOW-FELX2VUycejkuyiKZg/kernel.config
+>
+>
+> steps to reproduce:
+> --------------------------
+> 1) qemu boot command:
+>
+> /usr/bin/qemu-system-x86_64 -cpu host -enable-kvm -nographic -net
+> nic,model=virtio,macaddr=DE:AD:BE:EF:66:06 -net tap -m 1024 -monitor
+> none -kernel bzImage --append "root=/dev/sda  rootwait
+> console=ttyS0,115200" -hda
+> rpb-console-image-lkft-intel-corei7-64-20200723162342-41.rootfs.ext4
+> -m 4096 -smp 4 -nographic
+>
+> 2) boot x86_64 with linux next 20201008 tag kernel and attach SDD drive.
+>
+> mkfs -t ext4 /dev/<drive-partition>
+>
+> Full log links,
+> [1 ]https://lkft.validation.linaro.org/scheduler/job/1823906#L688
+> [2] https://lkft.validation.linaro.org/scheduler/job/1823938#L2065
+>
+>
+> --
+> Linaro LKFT
+> https://lkft.linaro.org
