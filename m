@@ -2,63 +2,64 @@ Return-Path: <SRS0=cFNo=DP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B347C4727E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DAF7C46466
 	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 13:13:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C97C32083B
-	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 13:13:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FAC521897
+	for <linux-block@archiver.kernel.org>; Thu,  8 Oct 2020 13:13:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FyoOmNC9"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qMhiiPhT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725871AbgJHNNo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Oct 2020 09:13:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52526 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729799AbgJHNNn (ORCPT
+        id S1730034AbgJHNNp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Oct 2020 09:13:45 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56978 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725874AbgJHNNn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 8 Oct 2020 09:13:43 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 098D2r2V081743;
-        Thu, 8 Oct 2020 09:13:42 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 098D7r2c178742;
+        Thu, 8 Oct 2020 09:13:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=VDYZGDSHvYwK1QcUZpCfmNOp9FT7+7O6ELxHtBbJLCk=;
- b=FyoOmNC9ZFkQ0q9GkBHw58CyWYa9smljr0Ama64JJmL0u1e22QUoIpQxp4vg+Z3XacqQ
- v641mMC6oqWOC+2rJK7g7s+DgYQ+S/xu9IEWBileVvaSqgga7tLPhEg/QCkCmSHHY/cv
- COnCts+HdPl45s0GLtqsm4A1m8eOq3uWKZUuCciGVPI4JA7Ct/C/Qeiwh9ei7j6wgmwR
- iH2HZAyeBTSFTjPDqhoUoW7n9yNiWgxi2p/T8/2G6zCdbfngJMf//JfdN3FZarU3CS9/
- NTuOKCGrv8w76JB95Vi7n8ShK4yyknt4gznIpJ5KcwTqTqu/3c4pp8EwAasyHOtbR6h8 SA== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3422uk9bn1-1
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=e9ZwAydAtILKmdY3n9m7YDwOUui7jyD4t7OLVXgaBAY=;
+ b=qMhiiPhTqRbWVPviii890SIxh3dDKDd2Dbx9UGrEoVfmUG6h7Oo4+Fc951yJ7KycMTLy
+ YW1FpB7FOUv0AGppxs5eMRLSMUou3HV8MlbPApyJ2KvAMcors0A99t2Y/eGb4ZOlK7aE
+ dkLovBY/f3bZzl1T4CeQabXKt0qnlc1oAT5F4FpJZ6VV1nrLYTnAieK3clFMVMSrYusm
+ FD5hd6kA9HwiCpI19rHhs0UFDD2NgQeNVzZbnYcItO+xVEsLE21GxzQzpVSDZVrnK5zG
+ wZ0AkB4c9p1zmqkyeTIDy032LnNZxj19xH2EdggbSGGRGTjA22V3dR4JYESw4YqJ4Faq wg== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34203bxr3k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 08 Oct 2020 09:13:41 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 098DDPGx017748;
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 098DC213008203;
         Thu, 8 Oct 2020 13:13:39 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 33xgx85c2u-1
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 33xgx8dc9j-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 08 Oct 2020 13:13:39 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 098DDajA21365170
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 098DDbwn27787662
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 8 Oct 2020 13:13:36 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 93EC0A4062;
+        Thu, 8 Oct 2020 13:13:37 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EABB8AE04D;
         Thu,  8 Oct 2020 13:13:36 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AA93A405C;
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CE5C7AE057;
         Thu,  8 Oct 2020 13:13:36 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Thu,  8 Oct 2020 13:13:36 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
-        id 254EEE24CD; Thu,  8 Oct 2020 15:13:36 +0200 (CEST)
+        id 34DF9E24D3; Thu,  8 Oct 2020 15:13:36 +0200 (CEST)
 From:   Stefan Haberland <sth@linux.ibm.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
@@ -66,209 +67,246 @@ Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
         Heiko Carstens <heiko.carstens@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH v2 03/10] s390/cio: Add support for FCES status notification
-Date:   Thu,  8 Oct 2020 15:13:29 +0200
-Message-Id: <20201008131336.61100-4-sth@linux.ibm.com>
+Subject: [PATCH v2 09/10] s390/dasd: Prepare for additional path event handling
+Date:   Thu,  8 Oct 2020 15:13:35 +0200
+Message-Id: <20201008131336.61100-10-sth@linux.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201008131336.61100-1-sth@linux.ibm.com>
 References: <20201008131336.61100-1-sth@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-10-08_08:2020-10-08,2020-10-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- bulkscore=0 suspectscore=0 mlxscore=0 clxscore=1015 lowpriorityscore=0
- adultscore=0 impostorscore=0 priorityscore=1501 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010080097
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=794
+ adultscore=0 phishscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ suspectscore=2 mlxscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010080094
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Vineeth Vijayan <vneethv@linux.ibm.com>
+From: Jan Höppner <hoeppner@linux.ibm.com>
 
-Fibre Channel Endpoint-Security event is received as an sei:nt0 type
-in the CIO layer. This information needs to be shared with the
-CCW device drivers using the path_events callback.
+As more path events need to be handled for ECKD the current path
+verification infrastructure can be reused. Rename all path verifcation
+code to fit the more broadly based task of path event handling and put
+the path verification in a new separate function.
 
-Signed-off-by: Vineeth Vijayan <vneethv@linux.ibm.com>
-Co-developed-by: Sebastian Ott <sebott@linux.ibm.com>
-Signed-off-by: Sebastian Ott <sebott@linux.ibm.com>
-Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
-Acked-by: Vasily Gorbik <gor@linux.ibm.com>
+Signed-off-by: Jan Höppner <hoeppner@linux.ibm.com>
+Reviewed-by: Stefan Haberland <sth@linux.ibm.com>
 Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
 ---
- arch/s390/include/asm/ccwdev.h |  2 ++
- drivers/s390/cio/chp.h         |  1 +
- drivers/s390/cio/chsc.c        | 62 +++++++++++++++++++++++++++++-----
- drivers/s390/cio/device.c      | 15 +++++++-
- 4 files changed, 70 insertions(+), 10 deletions(-)
+ drivers/s390/block/dasd.c      |  4 +-
+ drivers/s390/block/dasd_eckd.c | 78 +++++++++++++++++++---------------
+ drivers/s390/block/dasd_int.h  |  1 +
+ 3 files changed, 47 insertions(+), 36 deletions(-)
 
-diff --git a/arch/s390/include/asm/ccwdev.h b/arch/s390/include/asm/ccwdev.h
-index 3cfe1eb89838..14e1bbfd969e 100644
---- a/arch/s390/include/asm/ccwdev.h
-+++ b/arch/s390/include/asm/ccwdev.h
-@@ -104,6 +104,8 @@ struct ccw_device {
- 					       was successfully verified. */
- #define PE_PATHGROUP_ESTABLISHED	0x4 /* A pathgroup was reset and had
- 					       to be established again. */
-+#define PE_PATH_FCES_EVENT		0x8 /* The FCES Status of a path has
-+					     * changed. */
+diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+index 9a0300d2e744..97c11d557052 100644
+--- a/drivers/s390/block/dasd.c
++++ b/drivers/s390/block/dasd.c
+@@ -2115,8 +2115,8 @@ static void __dasd_device_check_path_events(struct dasd_device *device)
+ 	if (device->stopped &
+ 	    ~(DASD_STOPPED_DC_WAIT | DASD_UNRESUMED_PM))
+ 		return;
+-	rc = device->discipline->verify_path(device,
+-					     dasd_path_get_tbvpm(device));
++	rc = device->discipline->pe_handler(device,
++					    dasd_path_get_tbvpm(device));
+ 	if (rc)
+ 		dasd_device_set_timer(device, 50);
+ 	else
+diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
+index cfffab4c627b..2e1cfacbf4d8 100644
+--- a/drivers/s390/block/dasd_eckd.c
++++ b/drivers/s390/block/dasd_eckd.c
+@@ -103,7 +103,7 @@ struct ext_pool_exhaust_work_data {
+ };
  
- /*
-  * Possible CIO actions triggered by the unit check handler.
-diff --git a/drivers/s390/cio/chp.h b/drivers/s390/cio/chp.h
-index 20259f3fbf45..7ee9eba0abcb 100644
---- a/drivers/s390/cio/chp.h
-+++ b/drivers/s390/cio/chp.h
-@@ -23,6 +23,7 @@
- #define CHP_OFFLINE 1
- #define CHP_VARY_ON 2
- #define CHP_VARY_OFF 3
-+#define CHP_FCES_EVENT 4
+ /* definitions for the path verification worker */
+-struct path_verification_work_data {
++struct pe_handler_work_data {
+ 	struct work_struct worker;
+ 	struct dasd_device *device;
+ 	struct dasd_ccw_req cqr;
+@@ -112,8 +112,8 @@ struct path_verification_work_data {
+ 	int isglobal;
+ 	__u8 tbvpm;
+ };
+-static struct path_verification_work_data *path_verification_worker;
+-static DEFINE_MUTEX(dasd_path_verification_mutex);
++static struct pe_handler_work_data *pe_handler_worker;
++static DEFINE_MUTEX(dasd_pe_handler_mutex);
  
- struct chp_link {
- 	struct chp_id chpid;
-diff --git a/drivers/s390/cio/chsc.c b/drivers/s390/cio/chsc.c
-index 513fc5748d6e..04fbcfcf9e42 100644
---- a/drivers/s390/cio/chsc.c
-+++ b/drivers/s390/cio/chsc.c
-@@ -37,6 +37,9 @@ static void *sei_page;
- static void *chsc_page;
- static DEFINE_SPINLOCK(chsc_page_lock);
- 
-+#define SEI_VF_FLA	0xc0 /* VF flag for Full Link Address */
-+#define SEI_RS_CHPID	0x4  /* 4 in RS field indicates CHPID */
-+
- /**
-  * chsc_error_from_response() - convert a chsc response to an error
-  * @response: chsc response code
-@@ -285,6 +288,15 @@ static void s390_process_res_acc(struct chp_link *link)
- 	css_schedule_reprobe();
+ struct check_attention_work_data {
+ 	struct work_struct worker;
+@@ -1249,7 +1249,7 @@ static int verify_fcx_max_data(struct dasd_device *device, __u8 lpm)
  }
  
-+static int process_fces_event(struct subchannel *sch, void *data)
-+{
-+	spin_lock_irq(sch->lock);
-+	if (sch->driver && sch->driver->chp_event)
-+		sch->driver->chp_event(sch, data, CHP_FCES_EVENT);
-+	spin_unlock_irq(sch->lock);
-+	return 0;
-+}
-+
- struct chsc_sei_nt0_area {
- 	u8  flags;
- 	u8  vf;				/* validity flags */
-@@ -362,6 +374,16 @@ static char *store_ebcdic(char *dest, const char *src, unsigned long len,
- 	return dest + len;
- }
- 
-+static void chsc_link_from_sei(struct chp_link *link,
-+				struct chsc_sei_nt0_area *sei_area)
-+{
-+	if ((sei_area->vf & SEI_VF_FLA) != 0) {
-+		link->fla	= sei_area->fla;
-+		link->fla_mask	= ((sei_area->vf & SEI_VF_FLA) == SEI_VF_FLA) ?
-+							0xffff : 0xff00;
-+	}
-+}
-+
- /* Format node ID and parameters for output in LIR log message. */
- static void format_node_data(char *params, char *id, struct node_descriptor *nd)
+ static int rebuild_device_uid(struct dasd_device *device,
+-			      struct path_verification_work_data *data)
++			      struct pe_handler_work_data *data)
  {
-@@ -451,15 +473,7 @@ static void chsc_process_sei_res_acc(struct chsc_sei_nt0_area *sei_area)
- 	}
- 	memset(&link, 0, sizeof(struct chp_link));
- 	link.chpid = chpid;
--	if ((sei_area->vf & 0xc0) != 0) {
--		link.fla = sei_area->fla;
--		if ((sei_area->vf & 0xc0) == 0xc0)
--			/* full link address */
--			link.fla_mask = 0xffff;
--		else
--			/* link address */
--			link.fla_mask = 0xff00;
+ 	struct dasd_eckd_private *private = device->private;
+ 	__u8 lpm, opm = dasd_path_get_opm(device);
+@@ -1287,10 +1287,9 @@ static int rebuild_device_uid(struct dasd_device *device,
+ 	return rc;
+ }
+ 
+-static void do_path_verification_work(struct work_struct *work)
++static void dasd_eckd_path_available_action(struct dasd_device *device,
++					    struct pe_handler_work_data *data)
+ {
+-	struct path_verification_work_data *data;
+-	struct dasd_device *device;
+ 	struct dasd_eckd_private path_private;
+ 	struct dasd_uid *uid;
+ 	__u8 path_rcd_buf[DASD_ECKD_RCD_DATA_SIZE];
+@@ -1300,19 +1299,6 @@ static void do_path_verification_work(struct work_struct *work)
+ 	char print_uid[60];
+ 	int rc, pos;
+ 
+-	data = container_of(work, struct path_verification_work_data, worker);
+-	device = data->device;
+-
+-	/* delay path verification until device was resumed */
+-	if (test_bit(DASD_FLAG_SUSPENDED, &device->flags)) {
+-		schedule_work(work);
+-		return;
 -	}
-+	chsc_link_from_sei(&link, sei_area);
- 	s390_process_res_acc(&link);
- }
+-	/* check if path verification already running and delay if so */
+-	if (test_and_set_bit(DASD_FLAG_PATH_VERIFY, &device->flags)) {
+-		schedule_work(work);
+-		return;
+-	}
+ 	opm = 0;
+ 	npm = 0;
+ 	ppm = 0;
+@@ -1459,30 +1445,54 @@ static void do_path_verification_work(struct work_struct *work)
  
-@@ -568,6 +582,33 @@ static void chsc_process_sei_ap_cfg_chg(struct chsc_sei_nt0_area *sei_area)
- 	ap_bus_cfg_chg();
- }
- 
-+static void chsc_process_sei_fces_event(struct chsc_sei_nt0_area *sei_area)
-+{
-+	struct chp_link link;
-+	struct chp_id chpid;
-+	struct channel_path *chp;
-+
-+	CIO_CRW_EVENT(4,
-+	"chsc: FCES status notification (rs=%02x, rs_id=%04x, FCES-status=%x)\n",
-+		sei_area->rs, sei_area->rsid, sei_area->ccdf[0]);
-+
-+	if (sei_area->rs != SEI_RS_CHPID)
-+		return;
-+	chp_id_init(&chpid);
-+	chpid.id = sei_area->rsid;
-+
-+	/* Ignore the event on unknown/invalid chp */
-+	chp = chpid_to_chp(chpid);
-+	if (!chp)
-+		return;
-+
-+	memset(&link, 0, sizeof(struct chp_link));
-+	link.chpid = chpid;
-+	chsc_link_from_sei(&link, sei_area);
-+
-+	for_each_subchannel_staged(process_fces_event, NULL, &link);
+ 		dasd_path_create_kobj(device, pos);
+ 	}
 +}
 +
- static void chsc_process_sei_nt2(struct chsc_sei_nt2_area *sei_area)
- {
- 	switch (sei_area->cc) {
-@@ -609,6 +650,9 @@ static void chsc_process_sei_nt0(struct chsc_sei_nt0_area *sei_area)
- 	case 14: /* scm available notification */
- 		chsc_process_sei_scm_avail(sei_area);
- 		break;
-+	case 15: /* FCES event notification */
-+		chsc_process_sei_fces_event(sei_area);
-+		break;
- 	default: /* other stuff */
- 		CIO_CRW_EVENT(2, "chsc: sei nt0 unhandled cc=%d\n",
- 			      sei_area->cc);
-diff --git a/drivers/s390/cio/device.c b/drivers/s390/cio/device.c
-index b29fe8d50baf..aab13c78db9f 100644
---- a/drivers/s390/cio/device.c
-+++ b/drivers/s390/cio/device.c
-@@ -1170,7 +1170,8 @@ static int io_subchannel_chp_event(struct subchannel *sch,
- 				   struct chp_link *link, int event)
- {
- 	struct ccw_device *cdev = sch_get_cdev(sch);
--	int mask;
-+	int mask, chpid, valid_bit;
-+	int path_event[8];
- 
- 	mask = chp_ssd_get_mask(&sch->ssd_info, link);
- 	if (!mask)
-@@ -1205,6 +1206,18 @@ static int io_subchannel_chp_event(struct subchannel *sch,
- 			cdev->private->path_new_mask |= mask;
- 		io_subchannel_verify(sch);
- 		break;
-+	case CHP_FCES_EVENT:
-+		/* Forward Endpoint Security event */
-+		for (chpid = 0, valid_bit = 0x80; chpid < 8; chpid++,
-+				valid_bit >>= 1) {
-+			if (mask & valid_bit)
-+				path_event[chpid] = PE_PATH_FCES_EVENT;
-+			else
-+				path_event[chpid] = PE_NONE;
-+		}
-+		if (cdev)
-+			cdev->drv->path_event(cdev, path_event);
-+		break;
- 	}
- 	return 0;
++static void do_pe_handler_work(struct work_struct *work)
++{
++	struct pe_handler_work_data *data;
++	struct dasd_device *device;
++
++	data = container_of(work, struct pe_handler_work_data, worker);
++	device = data->device;
++
++	/* delay path verification until device was resumed */
++	if (test_bit(DASD_FLAG_SUSPENDED, &device->flags)) {
++		schedule_work(work);
++		return;
++	}
++	/* check if path verification already running and delay if so */
++	if (test_and_set_bit(DASD_FLAG_PATH_VERIFY, &device->flags)) {
++		schedule_work(work);
++		return;
++	}
++
++	dasd_eckd_path_available_action(device, data);
++
+ 	clear_bit(DASD_FLAG_PATH_VERIFY, &device->flags);
+ 	dasd_put_device(device);
+ 	if (data->isglobal)
+-		mutex_unlock(&dasd_path_verification_mutex);
++		mutex_unlock(&dasd_pe_handler_mutex);
+ 	else
+ 		kfree(data);
  }
+ 
+-static int dasd_eckd_verify_path(struct dasd_device *device, __u8 lpm)
++static int dasd_eckd_pe_handler(struct dasd_device *device, __u8 lpm)
+ {
+-	struct path_verification_work_data *data;
++	struct pe_handler_work_data *data;
+ 
+ 	data = kmalloc(sizeof(*data), GFP_ATOMIC | GFP_DMA);
+ 	if (!data) {
+-		if (mutex_trylock(&dasd_path_verification_mutex)) {
+-			data = path_verification_worker;
++		if (mutex_trylock(&dasd_pe_handler_mutex)) {
++			data = pe_handler_worker;
+ 			data->isglobal = 1;
+-		} else
++		} else {
+ 			return -ENOMEM;
++		}
+ 	} else {
+ 		memset(data, 0, sizeof(*data));
+ 		data->isglobal = 0;
+ 	}
+-	INIT_WORK(&data->worker, do_path_verification_work);
++	INIT_WORK(&data->worker, do_pe_handler_work);
+ 	dasd_get_device(device);
+ 	data->device = device;
+ 	data->tbvpm = lpm;
+@@ -6725,7 +6735,7 @@ static struct dasd_discipline dasd_eckd_discipline = {
+ 	.check_device = dasd_eckd_check_characteristics,
+ 	.uncheck_device = dasd_eckd_uncheck_device,
+ 	.do_analysis = dasd_eckd_do_analysis,
+-	.verify_path = dasd_eckd_verify_path,
++	.pe_handler = dasd_eckd_pe_handler,
+ 	.basic_to_ready = dasd_eckd_basic_to_ready,
+ 	.online_to_ready = dasd_eckd_online_to_ready,
+ 	.basic_to_known = dasd_eckd_basic_to_known,
+@@ -6786,16 +6796,16 @@ dasd_eckd_init(void)
+ 				    GFP_KERNEL | GFP_DMA);
+ 	if (!dasd_vol_info_req)
+ 		return -ENOMEM;
+-	path_verification_worker = kmalloc(sizeof(*path_verification_worker),
+-				   GFP_KERNEL | GFP_DMA);
+-	if (!path_verification_worker) {
++	pe_handler_worker = kmalloc(sizeof(*pe_handler_worker),
++				    GFP_KERNEL | GFP_DMA);
++	if (!pe_handler_worker) {
+ 		kfree(dasd_reserve_req);
+ 		kfree(dasd_vol_info_req);
+ 		return -ENOMEM;
+ 	}
+ 	rawpadpage = (void *)__get_free_page(GFP_KERNEL);
+ 	if (!rawpadpage) {
+-		kfree(path_verification_worker);
++		kfree(pe_handler_worker);
+ 		kfree(dasd_reserve_req);
+ 		kfree(dasd_vol_info_req);
+ 		return -ENOMEM;
+@@ -6804,7 +6814,7 @@ dasd_eckd_init(void)
+ 	if (!ret)
+ 		wait_for_device_probe();
+ 	else {
+-		kfree(path_verification_worker);
++		kfree(pe_handler_worker);
+ 		kfree(dasd_reserve_req);
+ 		kfree(dasd_vol_info_req);
+ 		free_page((unsigned long)rawpadpage);
+@@ -6816,7 +6826,7 @@ static void __exit
+ dasd_eckd_cleanup(void)
+ {
+ 	ccw_driver_unregister(&dasd_eckd_driver);
+-	kfree(path_verification_worker);
++	kfree(pe_handler_worker);
+ 	kfree(dasd_reserve_req);
+ 	free_page((unsigned long)rawpadpage);
+ }
+diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
+index 93d9cc938924..3ae1c8d42b8a 100644
+--- a/drivers/s390/block/dasd_int.h
++++ b/drivers/s390/block/dasd_int.h
+@@ -298,6 +298,7 @@ struct dasd_discipline {
+ 	 * configuration.
+ 	 */
+ 	int (*verify_path)(struct dasd_device *, __u8);
++	int (*pe_handler)(struct dasd_device *, __u8);
+ 
+ 	/*
+ 	 * Last things to do when a device is set online, and first things
 -- 
 2.17.1
 
