@@ -7,73 +7,67 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E91BC433E7
-	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 18:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D92BBC433E7
+	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 18:47:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A146222BA
-	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 18:46:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77830222BA
+	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 18:47:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="2B2Icuvn"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="TnO4+Fp6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387525AbgJISqr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Oct 2020 14:46:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37036 "EHLO
+        id S2387680AbgJISrP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Oct 2020 14:47:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387499AbgJISqq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Oct 2020 14:46:46 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF86FC0613D2
-        for <linux-block@vger.kernel.org>; Fri,  9 Oct 2020 11:46:46 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id f19so7587261pfj.11
-        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2020 11:46:46 -0700 (PDT)
+        with ESMTP id S1733050AbgJISrP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Oct 2020 14:47:15 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FA4BC0613D2
+        for <linux-block@vger.kernel.org>; Fri,  9 Oct 2020 11:47:15 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id c6so4875881plr.9
+        for <linux-block@vger.kernel.org>; Fri, 09 Oct 2020 11:47:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DvcPVK52TeNGe98XcbxvkqT3utUuhvx8w1/It1iKwEY=;
-        b=2B2IcuvnFVgxHqo1kutPy1Gw0AqK79pzvXF6mUZX3GfTzQ/i31LqvwPiAIknrVTBSC
-         a6gbVSFp34Ic3S4oG5bbubPTfvqv2NfdryMsXx6uoMHudUtqpjpJqmXkYn75oAL24SWC
-         5a6D1kD0A2SX6mZRVoE5ClYo6KpbFXLW78FnPwL8URFtR8FgAY9ha3/sbvftE7y/wAOa
-         DsuZlEVfEKvuoModoTWjcIemDCp1nKuF2OBXhU4wh21y6+/mtU8u4euj0B+4HYTtLS1f
-         FJnblch/iSmgukYy3cPTn15LzV433HDSi2OOlIGcgco5/SjcGuwvsUufGOaRWYJzGaHc
-         hP0A==
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=4kJGOhJiRobN4JIdukAgdgD/2GSI6s8jm5UKtfeAL4U=;
+        b=TnO4+Fp6Vwkx7VXqpUYM5z10GK1DlZvu5gvm4EMhVcDoF6da5GV3uijYfz+8ZWki5K
+         janv/P6s6JN3sR6H79+Bz3peFljww0hcZAtJpbfnyH8HhUxiKAsGQdLInG4M3Iifo4GX
+         8edQS4oLIiZkPSU/wYv+rIcmRh7LXZM/NEJ8XB9gVagtUdZGDaUUb9w1L4yH9A9Zuy1B
+         7SsWf/fqjBTlV2EpOEZWGuqJ8wYty4IFNh+gypeety08+tw2x8zGJF86Bo0GGaFdmnuA
+         DKtRYIv0b1UJhULpOYE0auK8OgL7rVIUEmdTWakIxyoJkYs/G61tbQ0mIMomEvJD4AIX
+         AOcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=DvcPVK52TeNGe98XcbxvkqT3utUuhvx8w1/It1iKwEY=;
-        b=Kf10SHqI81swS2fwXdwfME8zrLI3CkI9VMd0oUYbu4pB+kzW06dLhWyVl0L43rtvM5
-         p6xaHEgwk25Y6NmEJwody6zkVMTTgP5wYp0cXZhhm0cqOyPjfX6FhpFVw2Q/t1C0w2gZ
-         zSG9sTdRsUoGtv9uHD7IRvsMZWjh9UaFaFLokrBpLJL/uEq69egtkK28i/7g+53fZ4l7
-         wjT8qAcWv/FbDavHOPdHboqPkV2Q+09eNb1nYhYDyz9neyvPFINQ6X3XmxeVZdUQkm9P
-         gfGKp50U6/sWcoEjMXv1kVoRHFya1QQTrVoDhw9289WwNp1MBWJ4+3HzmGunBfiKOQUL
-         yIdA==
-X-Gm-Message-State: AOAM5333zfP5BvRNoGHxdxLM7YQJ/KFHrzv264ghesHp8fLqntKAOtX1
-        U9AX44uatUCIsxUFwNlUqu44KA==
-X-Google-Smtp-Source: ABdhPJwf8GOLGvume3xRY7oSa3O7Uo2JdCRLzeltY01exD4qH4O2ABj6D2+2Mcc+VMZHneC/88DTlg==
-X-Received: by 2002:a62:7f08:0:b029:155:79a4:1364 with SMTP id a8-20020a627f080000b029015579a41364mr6748421pfd.38.1602269206388;
-        Fri, 09 Oct 2020 11:46:46 -0700 (PDT)
+        bh=4kJGOhJiRobN4JIdukAgdgD/2GSI6s8jm5UKtfeAL4U=;
+        b=I1rdR4X4fr6G738/fFAiZ1LB7GSnHV66wBf7coe03xcGuh61zxsGOElHeDmBYjiUMH
+         QdpR/NOFi9wE2NvzxCMpUJxqH139bSxrC87M0jULLo+v0lhQ4oTHDivB5BuvLjrwkuO2
+         vz8sHIBzdTRTIClgCsBRsQmod1SfSe3TCrkx11FRRkIAM7Gq9B8z51r0AhGi5s5aMR6H
+         LsrduU6w0xDEZcdAsI/E7IBgILIh97PDZaTDgYc8xJ1CxnF/75YBYBFGsBSycnbWVtF6
+         zeIHA910+Q5L8tcvOAg8zwH7HUG65OwkVYz0OdyejJOPjG/6cEZq85x5NIm4gwIAqyaT
+         BRKw==
+X-Gm-Message-State: AOAM532Z6/vvHf14texXuCc1bWKLDaaD9UYGJa2+dV5Xtb4DIQc55pDq
+        ns/WpbPZm5SSwhNrP7QFHS8aB+TWahE+drdG
+X-Google-Smtp-Source: ABdhPJwvA459/3+vvMPIv1mn88Fsq1PNNaOB3kEEvd4kmy60DV0M42TAKjmJVBJu5GHyjyx5L7V9DQ==
+X-Received: by 2002:a17:902:d68d:b029:d3:dcce:d7f1 with SMTP id v13-20020a170902d68db02900d3dcced7f1mr13164127ply.84.1602269234860;
+        Fri, 09 Oct 2020 11:47:14 -0700 (PDT)
 Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id p6sm12674785pjd.1.2020.10.09.11.46.44
+        by smtp.gmail.com with ESMTPSA id ge19sm12470580pjb.55.2020.10.09.11.47.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Oct 2020 11:46:45 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: move cancel of hctx->run_work to the front of
- blk_exit_queue
-To:     Yang Yang <yang.yang@vivo.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     onlyfever@icloud.com
-References: <20201009080015.3217-1-yang.yang@vivo.com>
+        Fri, 09 Oct 2020 11:47:14 -0700 (PDT)
+Subject: Re: [PATCH] block: fix uapi blkzoned.h comments
+To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
+References: <20201009090714.285968-1-damien.lemoal@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ab2c4655-0ae0-f5c8-2d59-5e699fe9059e@kernel.dk>
-Date:   Fri, 9 Oct 2020 12:46:43 -0600
+Message-ID: <5d13086f-66bb-a475-7f58-b40fdab627b5@kernel.dk>
+Date:   Fri, 9 Oct 2020 12:47:12 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201009080015.3217-1-yang.yang@vivo.com>
+In-Reply-To: <20201009090714.285968-1-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,10 +75,10 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/9/20 2:00 AM, Yang Yang wrote:
-> blk_exit_queue will free elevator_data, while blk_mq_run_work_fn
-> will access it. Move cancel of hctx->run_work to the front of
-> blk_exit_queue to avoid use-after-free.
+On 10/9/20 3:07 AM, Damien Le Moal wrote:
+> Update the kdoc comments for struct blk_zone (capacity field description
+> missing) and for struct blk_zone_report (flags field description
+> missing).
 
 Applied, thanks.
 
