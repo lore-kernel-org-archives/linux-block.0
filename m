@@ -2,123 +2,122 @@ Return-Path: <SRS0=NSF0=DQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23CAEC433DF
-	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 21:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AA2BC433E7
+	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 21:35:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC72A22245
-	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 21:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50CDB22247
+	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 21:35:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1602279341;
+	bh=af4HYKUXjfzQEnpRkoqrLOtb/VuZgD2GaaA85DESAB8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=lRKdM84r5Lj+mCL/T9tFYtyjVFf1qK6yMh6qjn4Jzod7m2tJOzmg+iJKI8iqsmWNB
+	 FydTmvPjmF8ijyIXB2buXL/3q1/Ql6ua3/4PPeJxyReKL0xWya3dxwE36fVeB0CENs
+	 x9y8sALpP/TVr2dLOSVZa5XG4YJ14ow24S3lALQc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731589AbgJIV2Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Oct 2020 17:28:24 -0400
-Received: from mslow2.mail.gandi.net ([217.70.178.242]:58948 "EHLO
-        mslow2.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731533AbgJIV2Y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Oct 2020 17:28:24 -0400
-Received: from relay9-d.mail.gandi.net (unknown [217.70.183.199])
-        by mslow2.mail.gandi.net (Postfix) with ESMTP id 7B3623AC855
-        for <linux-block@vger.kernel.org>; Fri,  9 Oct 2020 21:19:05 +0000 (UTC)
-X-Originating-IP: 67.5.25.97
-Received: from localhost (unknown [67.5.25.97])
-        (Authenticated sender: josh@joshtriplett.org)
-        by relay9-d.mail.gandi.net (Postfix) with ESMTPSA id 45FE1FF804;
-        Fri,  9 Oct 2020 21:18:40 +0000 (UTC)
-Date:   Fri, 9 Oct 2020 14:18:37 -0700
-From:   Josh Triplett <josh@joshtriplett.org>
-To:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH] nbd: Support Kconfig configuration of nbds_max and max_part
-Message-ID: <f0a162a4c7073e3ed47d981b86d845d3bb9aa955.1602278122.git.josh@joshtriplett.org>
+        id S2391653AbgJIVfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Oct 2020 17:35:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42006 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388587AbgJIVei (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Oct 2020 17:34:38 -0400
+Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 44F7C21D6C;
+        Fri,  9 Oct 2020 21:34:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1602279277;
+        bh=af4HYKUXjfzQEnpRkoqrLOtb/VuZgD2GaaA85DESAB8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mAKgXcy5CifgRYN2i2C2c94+Jg5oLVaoZk49jTIFxseeqdMtEOOqP5cL66hXhKNTI
+         eNSQDBkgqgAc1Wd7XIXje+joGiBVI4yatMIDb1+kpBlSLeGvwRiFFGcw+A+0IeryZM
+         wi38bfOOqpr1rBlahq6SJoGGKG4xvvKCLXOhXA9s=
+Date:   Fri, 9 Oct 2020 14:34:34 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     ira.weiny@intel.com
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>, linux-aio@kvack.org,
+        linux-efi@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-mmc@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        target-devel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-kselftest@vger.kernel.org, samba-technical@lists.samba.org,
+        ceph-devel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-rdma@vger.kernel.org,
+        x86@kernel.org, amd-gfx@lists.freedesktop.org,
+        linux-afs@lists.infradead.org, cluster-devel@redhat.com,
+        linux-cachefs@redhat.com, intel-wired-lan@lists.osuosl.org,
+        xen-devel@lists.xenproject.org, linux-ext4@vger.kernel.org,
+        Fenghua Yu <fenghua.yu@intel.com>, ecryptfs@vger.kernel.org,
+        linux-um@lists.infradead.org, intel-gfx@lists.freedesktop.org,
+        linux-erofs@lists.ozlabs.org, reiserfs-devel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        io-uring@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, netdev@vger.kernel.org,
+        kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, bpf@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH RFC PKS/PMEM 22/58] fs/f2fs: Utilize new kmap_thread()
+Message-ID: <20201009213434.GA839@sol.localdomain>
+References: <20201009195033.3208459-1-ira.weiny@intel.com>
+ <20201009195033.3208459-23-ira.weiny@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20201009195033.3208459-23-ira.weiny@intel.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This allows configuring them at compile time, not just via the kernel
-command line or module parameters. This doesn't change the default
-defaults, just makes them configurable.
+On Fri, Oct 09, 2020 at 12:49:57PM -0700, ira.weiny@intel.com wrote:
+> From: Ira Weiny <ira.weiny@intel.com>
+> 
+> The kmap() calls in this FS are localized to a single thread.  To avoid
+> the over head of global PKRS updates use the new kmap_thread() call.
+> 
+> Cc: Jaegeuk Kim <jaegeuk@kernel.org>
+> Cc: Chao Yu <chao@kernel.org>
+> Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+> ---
+>  fs/f2fs/f2fs.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+> index d9e52a7f3702..ff72a45a577e 100644
+> --- a/fs/f2fs/f2fs.h
+> +++ b/fs/f2fs/f2fs.h
+> @@ -2410,12 +2410,12 @@ static inline struct page *f2fs_pagecache_get_page(
+>  
+>  static inline void f2fs_copy_page(struct page *src, struct page *dst)
+>  {
+> -	char *src_kaddr = kmap(src);
+> -	char *dst_kaddr = kmap(dst);
+> +	char *src_kaddr = kmap_thread(src);
+> +	char *dst_kaddr = kmap_thread(dst);
+>  
+>  	memcpy(dst_kaddr, src_kaddr, PAGE_SIZE);
+> -	kunmap(dst);
+> -	kunmap(src);
+> +	kunmap_thread(dst);
+> +	kunmap_thread(src);
+>  }
 
-Signed-off-by: Josh Triplett <josh@joshtriplett.org>
----
-I'd like to be able to simplify the kernel command line I'm currently
-using, by removing the nbd module parameters from it; this change would
-make it possible to configure them when building the kernel, instead.
+Wouldn't it make more sense to switch cases like this to kmap_atomic()?
+The pages are only mapped to do a memcpy(), then they're immediately unmapped.
 
- drivers/block/Kconfig | 28 ++++++++++++++++++++++++++++
- drivers/block/nbd.c   | 10 ++++++----
- 2 files changed, 34 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index ecceaaa1a66f..7df9a9609aee 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -273,6 +273,34 @@ config BLK_DEV_NBD
- 
- 	  If unsure, say N.
- 
-+config BLK_DEV_NBD_DEFAULT_NBDS_MAX
-+	int "Default maximum number of NBD devices"
-+	depends on BLK_DEV_NBD
-+	default 16
-+	help
-+	  The NBD driver can provide a set of unconfigured NBD devices (nbd0,
-+	  nbd1, ...) by default, so that userspace can open and configure these
-+	  devices via the ioctl interface. If you know that your userspace uses
-+	  exclusively the new netlink interface, you can set this to 0 to
-+	  reduce the amount of time needed for the NBD driver to initialize.
-+	  You can also set this parameter at runtime using the nbds_max module
-+	  parameter.
-+
-+config BLK_DEV_NBD_DEFAULT_MAX_PART
-+	int "Default maximum number of NBD device partitions"
-+	depends on BLK_DEV_NBD
-+	default 16
-+	help
-+	  Once an NBD device is set up and opened, the kernel can probe it for
-+	  partitions, and set up corresponding devices for each partition
-+	  (nbd0p1, nbd0p2, ...). By default, the kernel probes for up to 16
-+	  partitions per device. This also adds a bit of time to NBD device
-+	  initialization. You can set this to a lower number if you know you'll
-+	  never use more than that many partitions on an NBD device. If you
-+	  exclusively use unpartitioned NBD devices, you can set this to 0 to
-+	  skip partition probing entirely.  You can also set this parameter at
-+	  runtime using the max_part module parameter.
-+
- config BLK_DEV_SKD
- 	tristate "STEC S1120 Block Driver"
- 	depends on PCI
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index edf8b632e3d2..42851956c9ce 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -145,8 +145,8 @@ static struct dentry *nbd_dbg_dir;
- 
- #define NBD_DEF_BLKSIZE 1024
- 
--static unsigned int nbds_max = 16;
--static int max_part = 16;
-+static unsigned int nbds_max = CONFIG_BLK_DEV_NBD_DEFAULT_NBDS_MAX;
-+static int max_part = CONFIG_BLK_DEV_NBD_DEFAULT_MAX_PART;
- static int part_shift;
- 
- static int nbd_dev_dbg_init(struct nbd_device *nbd);
-@@ -2456,6 +2456,8 @@ MODULE_DESCRIPTION("Network Block Device");
- MODULE_LICENSE("GPL");
- 
- module_param(nbds_max, int, 0444);
--MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
-+MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: "
-+	__stringify(CONFIG_BLK_DEV_NBD_DEFAULT_NBDS_MAX) ")");
- module_param(max_part, int, 0444);
--MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
-+MODULE_PARM_DESC(max_part, "number of partitions per device (default: "
-+	__stringify(CONFIG_BLK_DEV_NBD_DEFAULT_MAX_PART) ")");
--- 
-2.28.0
-
+- Eric
