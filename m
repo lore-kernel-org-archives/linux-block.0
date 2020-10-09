@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70FF9C433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6CFC433DF
 	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 03:23:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 293A42222E
+	by mail.kernel.org (Postfix) with ESMTP id 4E79622248
 	for <linux-block@archiver.kernel.org>; Fri,  9 Oct 2020 03:23:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730967AbgJIDX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1730078AbgJIDX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 8 Oct 2020 23:23:26 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:14757 "EHLO huawei.com"
+Received: from szxga05-in.huawei.com ([45.249.212.191]:14756 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730078AbgJIDX0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1729593AbgJIDX0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Thu, 8 Oct 2020 23:23:26 -0400
 Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 22EB0D0E36ABE8CA138D;
+        by Forcepoint Email with ESMTP id 16F4CB4E61498A36C986;
         Fri,  9 Oct 2020 11:23:24 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS409-HUB.china.huawei.com
  (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 9 Oct 2020
- 11:23:21 +0800
+ 11:23:22 +0800
 From:   Yufen Yu <yuyufen@huawei.com>
 To:     <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>, <hch@lst.de>
-Subject: [RESEND PATCH v2 1/7] block: invoke blk_mq_exit_sched no matter whether have .exit_sched
-Date:   Thu, 8 Oct 2020 23:26:27 -0400
-Message-ID: <20201009032633.83645-2-yuyufen@huawei.com>
+Subject: [RESEND PATCH v2 2/7] block: remove redundant mq check
+Date:   Thu, 8 Oct 2020 23:26:28 -0400
+Message-ID: <20201009032633.83645-3-yuyufen@huawei.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20201009032633.83645-1-yuyufen@huawei.com>
 References: <20201009032633.83645-1-yuyufen@huawei.com>
@@ -43,47 +43,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We will register debugfs for scheduler no matter whether it have
-defined callback funciton .exit_sched. So, blk_mq_exit_sched()
-is always needed to unregister debugfs. Also, q->elevator should
-be set as NULL after exiting scheduler.
-
-For now, since all register scheduler have defined .exit_sched,
-it will not cause any actual problem. But It will be more reasonable
-to do this change.
+elv_support_iosched() will check queue_is_mq() for us. So, remove
+the redundant check to clean code.
 
 Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 ---
- block/blk-sysfs.c | 1 -
- block/elevator.c  | 3 +--
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ block/elevator.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 7dda709f3ccb..ee2cd4d1054c 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -883,7 +883,6 @@ static void blk_exit_queue(struct request_queue *q)
- 	if (q->elevator) {
- 		ioc_clear_queue(q);
- 		__elevator_exit(q, q->elevator);
--		q->elevator = NULL;
- 	}
- 
- 	/*
 diff --git a/block/elevator.c b/block/elevator.c
-index 90ed7a28c21d..7d76b61e157a 100644
+index 7d76b61e157a..b506895b34c7 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -191,8 +191,7 @@ static void elevator_release(struct kobject *kobj)
- void __elevator_exit(struct request_queue *q, struct elevator_queue *e)
- {
- 	mutex_lock(&e->sysfs_lock);
--	if (e->type->ops.exit_sched)
--		blk_mq_exit_sched(q, e);
-+	blk_mq_exit_sched(q, e);
- 	mutex_unlock(&e->sysfs_lock);
+@@ -615,7 +615,7 @@ int elevator_switch_mq(struct request_queue *q,
  
- 	kobject_put(&e->kobj);
+ static inline bool elv_support_iosched(struct request_queue *q)
+ {
+-	if (!q->mq_ops ||
++	if (!queue_is_mq(q) ||
+ 	    (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED)))
+ 		return false;
+ 	return true;
+@@ -763,7 +763,7 @@ ssize_t elv_iosched_store(struct request_queue *q, const char *name,
+ {
+ 	int ret;
+ 
+-	if (!queue_is_mq(q) || !elv_support_iosched(q))
++	if (!elv_support_iosched(q))
+ 		return count;
+ 
+ 	ret = __elevator_change(q, name);
 -- 
 2.25.4
 
