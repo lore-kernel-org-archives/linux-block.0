@@ -2,458 +2,335 @@ Return-Path: <SRS0=5nn9=DR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA51FC433DF
-	for <linux-block@archiver.kernel.org>; Sat, 10 Oct 2020 06:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7EBC2D0A1
+	for <linux-block@archiver.kernel.org>; Sat, 10 Oct 2020 22:57:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50A8A20731
-	for <linux-block@archiver.kernel.org>; Sat, 10 Oct 2020 06:09:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABF84207FB
+	for <linux-block@archiver.kernel.org>; Sat, 10 Oct 2020 22:57:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LHvKFqPm"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fFl+sWZ6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726000AbgJJGIz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Oct 2020 02:08:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21992 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725863AbgJJGIv (ORCPT
+        id S2390463AbgJJW5O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Oct 2020 18:57:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48570 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731461AbgJJTYW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Oct 2020 02:08:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602310127;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2lCjwDSk1P9+fcHZpndTzgRCiVFoyIUf+RDCNbMBmKY=;
-        b=LHvKFqPmJfxSUwBL2xNLW5GufUVixw7SrDFTqhz27Vil10f81yIUoUD5uTjYvPUa0Y3Jon
-        8FODHzsXMrI8uKUDb3YqQkv+/1FqxOMSlKEnx1KZ5DOdE5TO0LKNvhmYxbGNNvXmlZzY9N
-        1h2AIZoyiEq++ARLCHvHeemlFdCdmdc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-xEaTkORNPjmQR14kWwlojA-1; Sat, 10 Oct 2020 02:08:43 -0400
-X-MC-Unique: xEaTkORNPjmQR14kWwlojA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B4951005513;
-        Sat, 10 Oct 2020 06:08:42 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-12-112.pek2.redhat.com [10.72.12.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A66FD7665A;
-        Sat, 10 Oct 2020 06:08:35 +0000 (UTC)
-Subject: Re: [PATCH] block: re-introduce blk_mq_complete_request_sync
-To:     Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20201008213750.899462-1-sagi@grimberg.me>
- <20201009043938.GC27356@T590>
- <1711488120.3435389.1602219830518.JavaMail.zimbra@redhat.com>
- <e39b711e-ebbd-8955-ca19-07c1dad26fa2@grimberg.me>
- <23f19725-f46b-7de7-915d-b97fd6d69cdc@redhat.com>
- <ced685bf-ad48-ac41-8089-8c5ba09abfcb@grimberg.me>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Message-ID: <7a7aca6e-30f5-0754-fb7f-599699b97108@redhat.com>
-Date:   Sat, 10 Oct 2020 14:08:32 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        Sat, 10 Oct 2020 15:24:22 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09ABWNgQ096520
+        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2020 07:36:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=in-reply-to : subject :
+ from : to : cc : date : mime-version : references :
+ content-transfer-encoding : content-type : message-id; s=pp1;
+ bh=NiDLo4pOxkTOHNh379y2lMt59tGJeK9BGhibE+AHe30=;
+ b=fFl+sWZ60CJNW5vj7Uw0QdIFBZaJLDIK+TmFY7+uXdPQEExbAUVKU05YhKg5dS5u6J9M
+ gRTcbWK1ehAiHgiW0QiEErv4vh+5MOV1iJMmz3AgZqVrCWi+Nh1nNGlGLl5qNxYu9TT3
+ rsErWvzJTnT/TvD/yGmIkQ5cIJnW2dxyfP5KEerqQF50430xLTdRCdzrzGOBj/IVBjpb
+ ZIGntFQpbgC01amsKXwfy1cB65UwCiqnbdgLT6Z6Qd+CSe7yV4n3BXy+qSd8xdiYdQTK
+ an7SA2yY6csjDSnstIEkYdPhg6mYvKJGwGGY1NoLkcuzdqKyvDxx/5UGYpv3tzPn6Oq9 ZA== 
+Received: from smtp.notes.na.collabserv.com (smtp.notes.na.collabserv.com [192.155.248.91])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 343c5882vv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Sat, 10 Oct 2020 07:36:56 -0400
+Received: from localhost
+        by smtp.notes.na.collabserv.com with smtp.notes.na.collabserv.com ESMTP
+        for <linux-block@vger.kernel.org> from <BMT@zurich.ibm.com>;
+        Sat, 10 Oct 2020 11:36:55 -0000
+Received: from us1a3-smtp05.a3.dal06.isc4sb.com (10.146.71.159)
+        by smtp.notes.na.collabserv.com (10.106.227.143) with smtp.notes.na.collabserv.com ESMTP;
+        Sat, 10 Oct 2020 11:36:50 -0000
+Received: from us1a3-mail162.a3.dal06.isc4sb.com ([10.146.71.4])
+          by us1a3-smtp05.a3.dal06.isc4sb.com
+          with ESMTP id 2020101011364991-175970 ;
+          Sat, 10 Oct 2020 11:36:49 +0000 
+In-Reply-To: <20201009195033.3208459-11-ira.weiny@intel.com>
+Subject: Re: [PATCH RFC PKS/PMEM 10/58] drivers/rdma: Utilize new kmap_thread()
+From:   "Bernard Metzler" <BMT@zurich.ibm.com>
+To:     ira.weiny@intel.com
+Cc:     "Andrew Morton" <akpm@linux-foundation.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "Andy Lutomirski" <luto@kernel.org>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        "Mike Marciniszyn" <mike.marciniszyn@intel.com>,
+        "Dennis Dalessandro" <dennis.dalessandro@intel.com>,
+        "Doug Ledford" <dledford@redhat.com>,
+        "Jason Gunthorpe" <jgg@ziepe.ca>,
+        "Faisal Latif" <faisal.latif@intel.com>,
+        "Shiraz Saleem" <shiraz.saleem@intel.com>, x86@kernel.org,
+        "Dave Hansen" <dave.hansen@linux.intel.com>,
+        "Dan Williams" <dan.j.williams@intel.com>,
+        "Fenghua Yu" <fenghua.yu@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvdimm@lists.01.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+        kexec@lists.infradead.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, devel@driverdev.osuosl.org,
+        linux-efi@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
+        reiserfs-devel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
+        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-rdma@vger.kernel.org, amd-gfx@lists.freed.esktop.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        drbd-dev@tron.linbit.com, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-cachefs@redhat.com,
+        samba-technical@lists.samba.org, intel-wired-lan@lists.osuosl.org
+Date:   Sat, 10 Oct 2020 11:36:49 +0000
 MIME-Version: 1.0
-In-Reply-To: <ced685bf-ad48-ac41-8089-8c5ba09abfcb@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Sensitivity: 
+Importance: Normal
+X-Priority: 3 (Normal)
+References: <20201009195033.3208459-11-ira.weiny@intel.com>,<20201009195033.3208459-1-ira.weiny@intel.com>
+X-Mailer: IBM iNotes ($HaikuForm 1054.1) | IBM Domino Build
+ SCN1812108_20180501T0841_FP65 April 15, 2020 at 09:48
+X-LLNOutbound: False
+X-Disclaimed: 59823
+X-TNEFEvaluated: 1
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+x-cbid: 20101011-2475-0000-0000-0000044A0339
+X-IBM-SpamModules-Scores: BY=0.233045; FL=0; FP=0; FZ=0; HX=0; KW=0; PH=0;
+ SC=0.421684; ST=0; TS=0; UL=0; ISC=; MB=0.000000
+X-IBM-SpamModules-Versions: BY=3.00013982; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000295; SDB=6.01447073; UDB=6.00777937; IPR=6.01229775;
+ MB=3.00034472; MTD=3.00000008; XFM=3.00000015; UTC=2020-10-10 11:36:54
+X-IBM-AV-DETECTION: SAVI=unsuspicious REMOTE=unsuspicious XFE=unused
+X-IBM-AV-VERSION: SAVI=2020-10-10 06:57:40 - 6.00011937
+x-cbparentid: 20101011-2476-0000-0000-0000DAA5035B
+Message-Id: <OF849D92D8.F4735ECA-ON002585FD.003F5F27-002585FD.003FCBD6@notes.na.collabserv.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-10_04:2020-10-09,2020-10-10 signatures=0
+X-Proofpoint-Spam-Reason: orgsafe
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+-----ira.weiny@intel.com wrote: -----
 
+>To: "Andrew Morton" <akpm@linux-foundation.org>, "Thomas Gleixner"
+><tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>, "Borislav
+>Petkov" <bp@alien8.de>, "Andy Lutomirski" <luto@kernel.org>, "Peter
+>Zijlstra" <peterz@infradead.org>
+>From: ira.weiny@intel.com
+>Date: 10/09/2020 09:52PM
+>Cc: "Ira Weiny" <ira.weiny@intel.com>, "Mike Marciniszyn"
+><mike.marciniszyn@intel.com>, "Dennis Dalessandro"
+><dennis.dalessandro@intel.com>, "Doug Ledford" <dledford@redhat.com>,
+>"Jason Gunthorpe" <jgg@ziepe.ca>, "Faisal Latif"
+><faisal.latif@intel.com>, "Shiraz Saleem" <shiraz.saleem@intel.com>,
+>"Bernard Metzler" <bmt@zurich.ibm.com>, x86@kernel.org, "Dave Hansen"
+><dave.hansen@linux.intel.com>, "Dan Williams"
+><dan.j.williams@intel.com>, "Fenghua Yu" <fenghua.yu@intel.com>,
+>linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+>linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
+>linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+>linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+>netdev@vger.kernel.org, bpf@vger.kernel.org,
+>kexec@lists.infradead.org, linux-bcache@vger.kernel.org,
+>linux-mtd@lists.infradead.org, devel@driverdev.osuosl.org,
+>linux-efi@vger.kernel.org, linux-mmc@vger.kernel.org,
+>linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+>linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+>linux-ext4@vger.kernel.org, linux-aio@kvack.org,
+>io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+>linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
+>reiserfs-devel@vger.kernel.org,
+>linux-f2fs-devel@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+>cluster-devel@redhat.com, ecryptfs@vger.kernel.org,
+>linux-cifs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+>linux-afs@lists.infradead.org, linux-rdma@vger.kernel.org,
+>amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+>intel-gfx@lists.freedesktop.org, drbd-dev@tron.linbit.com,
+>linux-block@vger.kernel.org, xen-devel@lists.xenproject.org,
+>linux-cachefs@redhat.com, samba-technical@lists.samba.org,
+>intel-wired-lan@lists.osuosl.org
+>Subject: [EXTERNAL] [PATCH RFC PKS/PMEM 10/58] drivers/rdma: Utilize
+>new kmap=5Fthread()
+>
+>From: Ira Weiny <ira.weiny@intel.com>
+>
+>The kmap() calls in these drivers are localized to a single thread.
+>To
+>avoid the over head of global PKRS updates use the new kmap=5Fthread()
+>call.
+>
+>Cc: Mike Marciniszyn <mike.marciniszyn@intel.com>
+>Cc: Dennis Dalessandro <dennis.dalessandro@intel.com>
+>Cc: Doug Ledford <dledford@redhat.com>
+>Cc: Jason Gunthorpe <jgg@ziepe.ca>
+>Cc: Faisal Latif <faisal.latif@intel.com>
+>Cc: Shiraz Saleem <shiraz.saleem@intel.com>
+>Cc: Bernard Metzler <bmt@zurich.ibm.com>
+>Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+>---
+> drivers/infiniband/hw/hfi1/sdma.c      |  4 ++--
+> drivers/infiniband/hw/i40iw/i40iw=5Fcm.c | 10 +++++-----
+> drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c  | 14 +++++++-------
+> 3 files changed, 14 insertions(+), 14 deletions(-)
+>
+>diff --git a/drivers/infiniband/hw/hfi1/sdma.c
+>b/drivers/infiniband/hw/hfi1/sdma.c
+>index 04575c9afd61..09d206e3229a 100644
+>--- a/drivers/infiniband/hw/hfi1/sdma.c
+>+++ b/drivers/infiniband/hw/hfi1/sdma.c
+>@@ -3130,7 +3130,7 @@ int ext=5Fcoal=5Fsdma=5Ftx=5Fdescs(struct hfi1=5Fdev=
+data
+>*dd, struct sdma=5Ftxreq *tx,
+> 		}
+>=20
+> 		if (type =3D=3D SDMA=5FMAP=5FPAGE) {
+>-			kvaddr =3D kmap(page);
+>+			kvaddr =3D kmap=5Fthread(page);
+> 			kvaddr +=3D offset;
+> 		} else if (WARN=5FON(!kvaddr)) {
+> 			=5F=5Fsdma=5Ftxclean(dd, tx);
+>@@ -3140,7 +3140,7 @@ int ext=5Fcoal=5Fsdma=5Ftx=5Fdescs(struct hfi1=5Fdev=
+data
+>*dd, struct sdma=5Ftxreq *tx,
+> 		memcpy(tx->coalesce=5Fbuf + tx->coalesce=5Fidx, kvaddr, len);
+> 		tx->coalesce=5Fidx +=3D len;
+> 		if (type =3D=3D SDMA=5FMAP=5FPAGE)
+>-			kunmap(page);
+>+			kunmap=5Fthread(page);
+>=20
+> 		/* If there is more data, return */
+> 		if (tx->tlen - tx->coalesce=5Fidx)
+>diff --git a/drivers/infiniband/hw/i40iw/i40iw=5Fcm.c
+>b/drivers/infiniband/hw/i40iw/i40iw=5Fcm.c
+>index a3b95805c154..122d7a5642a1 100644
+>--- a/drivers/infiniband/hw/i40iw/i40iw=5Fcm.c
+>+++ b/drivers/infiniband/hw/i40iw/i40iw=5Fcm.c
+>@@ -3721,7 +3721,7 @@ int i40iw=5Faccept(struct iw=5Fcm=5Fid *cm=5Fid, str=
+uct
+>iw=5Fcm=5Fconn=5Fparam *conn=5Fparam)
+> 		ibmr->device =3D iwpd->ibpd.device;
+> 		iwqp->lsmm=5Fmr =3D ibmr;
+> 		if (iwqp->page)
+>-			iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap(iwqp->page);
+>+			iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap=5Fthread(iwqp->page);
+> 		dev->iw=5Fpriv=5Fqp=5Fops->qp=5Fsend=5Flsmm(&iwqp->sc=5Fqp,
+> 							iwqp->ietf=5Fmem.va,
+> 							(accept.size + conn=5Fparam->private=5Fdata=5Flen),
+>@@ -3729,12 +3729,12 @@ int i40iw=5Faccept(struct iw=5Fcm=5Fid *cm=5Fid,
+>struct iw=5Fcm=5Fconn=5Fparam *conn=5Fparam)
+>=20
+> 	} else {
+> 		if (iwqp->page)
+>-			iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap(iwqp->page);
+>+			iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap=5Fthread(iwqp->page);
+> 		dev->iw=5Fpriv=5Fqp=5Fops->qp=5Fsend=5Flsmm(&iwqp->sc=5Fqp, NULL, 0, 0);
+> 	}
+>=20
+> 	if (iwqp->page)
+>-		kunmap(iwqp->page);
+>+		kunmap=5Fthread(iwqp->page);
+>=20
+> 	iwqp->cm=5Fid =3D cm=5Fid;
+> 	cm=5Fnode->cm=5Fid =3D cm=5Fid;
+>@@ -4102,10 +4102,10 @@ static void i40iw=5Fcm=5Fevent=5Fconnected(struct
+>i40iw=5Fcm=5Fevent *event)
+> 	i40iw=5Fcm=5Finit=5Ftsa=5Fconn(iwqp, cm=5Fnode);
+> 	read0 =3D (cm=5Fnode->send=5Frdma0=5Fop =3D=3D SEND=5FRDMA=5FREAD=5FZERO=
+);
+> 	if (iwqp->page)
+>-		iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap(iwqp->page);
+>+		iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap=5Fthread(iwqp->page);
+> 	dev->iw=5Fpriv=5Fqp=5Fops->qp=5Fsend=5Frtt(&iwqp->sc=5Fqp, read0);
+> 	if (iwqp->page)
+>-		kunmap(iwqp->page);
+>+		kunmap=5Fthread(iwqp->page);
+>=20
+> 	memset(&attr, 0, sizeof(attr));
+> 	attr.qp=5Fstate =3D IB=5FQPS=5FRTS;
+>diff --git a/drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c
+>b/drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c
+>index d19d8325588b..4ed37c328d02 100644
+>--- a/drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c
+>+++ b/drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c
+>@@ -76,7 +76,7 @@ static int siw=5Ftry=5F1seg(struct siw=5Fiwarp=5Ftx *c=
+=5Ftx,
+>void *paddr)
+> 			if (unlikely(!p))
+> 				return -EFAULT;
+>=20
+>-			buffer =3D kmap(p);
+>+			buffer =3D kmap=5Fthread(p);
+>=20
+> 			if (likely(PAGE=5FSIZE - off >=3D bytes)) {
+> 				memcpy(paddr, buffer + off, bytes);
+>@@ -84,7 +84,7 @@ static int siw=5Ftry=5F1seg(struct siw=5Fiwarp=5Ftx *c=
+=5Ftx,
+>void *paddr)
+> 				unsigned long part =3D bytes - (PAGE=5FSIZE - off);
+>=20
+> 				memcpy(paddr, buffer + off, part);
+>-				kunmap(p);
+>+				kunmap=5Fthread(p);
+>=20
+> 				if (!mem->is=5Fpbl)
+> 					p =3D siw=5Fget=5Fupage(mem->umem,
+>@@ -96,10 +96,10 @@ static int siw=5Ftry=5F1seg(struct siw=5Fiwarp=5Ftx
+>*c=5Ftx, void *paddr)
+> 				if (unlikely(!p))
+> 					return -EFAULT;
+>=20
+>-				buffer =3D kmap(p);
+>+				buffer =3D kmap=5Fthread(p);
+> 				memcpy(paddr + part, buffer, bytes - part);
+> 			}
+>-			kunmap(p);
+>+			kunmap=5Fthread(p);
+> 		}
+> 	}
+> 	return (int)bytes;
+>@@ -505,7 +505,7 @@ static int siw=5Ftx=5Fhdt(struct siw=5Fiwarp=5Ftx *c=
+=5Ftx,
+>struct socket *s)
+> 				page=5Farray[seg] =3D p;
+>=20
+> 				if (!c=5Ftx->use=5Fsendpage) {
+>-					iov[seg].iov=5Fbase =3D kmap(p) + fp=5Foff;
+>+					iov[seg].iov=5Fbase =3D kmap=5Fthread(p) + fp=5Foff;
 
-On 10/10/20 2:29 AM, Sagi Grimberg wrote:
->
->
-> On 10/9/20 6:55 AM, Yi Zhang wrote:
->> Hi Sagi
->>
->> On 10/9/20 4:09 PM, Sagi Grimberg wrote:
->>>> Hi Sagi
->>>>
->>>> I applied this patch on block origin/for-next and still can 
->>>> reproduce it.
->>>
->>> That's unexpected, can you try this patch?
->>> -- 
->>> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
->>> index 629b025685d1..46428ff0b0fc 100644
->>> --- a/drivers/nvme/host/tcp.c
->>> +++ b/drivers/nvme/host/tcp.c
->>> @@ -2175,7 +2175,7 @@ static void nvme_tcp_complete_timed_out(struct 
->>> request *rq)
->>>         /* fence other contexts that may complete the command */
->>>         mutex_lock(&to_tcp_ctrl(ctrl)->teardown_lock);
->>>         nvme_tcp_stop_queue(ctrl, nvme_tcp_queue_id(req->queue));
->>> -       if (!blk_mq_request_completed(rq)) {
->>> +       if (blk_mq_request_started(rq) && 
->>> !blk_mq_request_completed(rq)) {
->>>                 nvme_req(rq)->status = NVME_SC_HOST_ABORTED_CMD;
->>>                 blk_mq_complete_request_sync(rq);
->>>         }
->> No WARNING with this patch, but the test still will be hang and never 
->> finished, here is the kernel log:
->
-> Thanks Yi,
->
-> Good to know no warning, that confirms the issue analysis.
->
-Cool, feel fee to add Tested-by: Yi Zhang <yi.zhang@redhat.com>
+This misses a corresponding kunmap=5Fthread() in siw=5Funmap=5Fpages()
+(pls change line 403 in siw=5Fqp=5Ftx.c as well)
 
-> As for the test, I'm able to successfuly pass this on my VM, and
-> this test is not designed to generate errors, just fio to
-> a file backed namespace. I'm wandering what is causing these
-> delays in I/O that cause timeouts...
+Thanks,
+Bernard.
+
+> 					iov[seg].iov=5Flen =3D plen;
+>=20
+> 					/* Remember for later kunmap() */
+>@@ -518,9 +518,9 @@ static int siw=5Ftx=5Fhdt(struct siw=5Fiwarp=5Ftx *c=
+=5Ftx,
+>struct socket *s)
+> 							plen);
+> 				} else if (do=5Fcrc) {
+> 					crypto=5Fshash=5Fupdate(c=5Ftx->mpa=5Fcrc=5Fhd,
+>-							    kmap(p) + fp=5Foff,
+>+							    kmap=5Fthread(p) + fp=5Foff,
+> 							    plen);
+>-					kunmap(p);
+>+					kunmap=5Fthread(p);
+> 				}
+> 			} else {
+> 				u64 va =3D sge->laddr + sge=5Foff;
+>--=20
+>2.28.0.rc0.12.gb6a658bd00c9
 >
-I just found all the failure occurred on AMD with 4G memory, not sure 
-whether it's related to the low memory.
-Let me know if you need any test for further investigation . :)
->>
->> [ 3327.011067] run blktests nvme/012 at 2020-10-09 06:21:59
->> [ 3327.278169] loop: module loaded
->> [ 3327.314287] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
->> [ 3327.346276] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
->> [ 3327.396746] nvmet: creating controller 1 for subsystem 
->> blktests-subsystem-1 for NQN 
->> nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
->> [ 3327.411000] nvme nvme0: creating 12 I/O queues.
->> [ 3327.416963] nvme nvme0: mapped 12/0/0 default/read/poll queues.
->> [ 3327.428836] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr 
->> 127.0.0.1:4420
->> [ 3329.403658] XFS (nvme0n1): Mounting V5 Filesystem
->> [ 3329.417213] XFS (nvme0n1): Ending clean mount
->> [ 3329.423044] xfs filesystem being mounted at /mnt/blktests supports 
->> timestamps until 2038 (0x7fffffff)
->> [ 3390.069126] nvme nvme0: queue 6: timeout request 0x21 type 4
->> [ 3390.074797] nvme nvme0: starting error recovery
->> [ 3390.079362] nvme nvme0: queue 6: timeout request 0x22 type 4
->> [ 3390.079932] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.081999] nvme nvme0: Reconnecting in 10 seconds...
->> [ 3390.095467] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.100879] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.106279] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.111691] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.117098] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.122507] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.127920] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.133333] block nvme0n1: no usable path - requeuing I/O
->> [ 3390.138734] block nvme0n1: no usable path - requeuing I/O
->> [ 3415.669659] nvmet: ctrl 2 keep-alive timer (15 seconds) expired!
->> [ 3415.675682] nvmet: ctrl 2 fatal error occurred!
->> [ 3419.765738] nvmet: ctrl 1 keep-alive timer (15 seconds) expired!
->> [ 3419.771762] nvmet: ctrl 1 fatal error occurred!
->> [ 3440.000352] nvmet: creating controller 2 for subsystem 
->> blktests-subsystem-1 for NQN 
->> nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
->> [ 3463.286700] nvme nvme0: queue 0: timeout request 0x0 type 4
->> [ 3463.292357] nvme nvme0: Connect command failed, error wo/DNR bit: 881
->> [ 3463.298830] nvme nvme0: failed to connect queue: 0 ret=881
->> [ 3463.304352] nvme nvme0: Failed reconnect attempt 1
->> [ 3463.309156] nvme nvme0: Reconnecting in 10 seconds...
->> [ 3473.527574] nvmet: creating controller 1 for subsystem 
->> blktests-subsystem-1 for NQN 
->> nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
->> [ 3473.541438] nvme_ns_head_submit_bio: 47 callbacks suppressed
->> [ 3473.541445] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.552521] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.557923] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.563319] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.568739] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.574678] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.580068] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.585461] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.590861] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.596249] block nvme0n1: no usable path - requeuing I/O
->> [ 3473.601880] nvme nvme0: creating 12 I/O queues.
->> [ 3473.613955] nvme nvme0: mapped 12/0/0 default/read/poll queues.
->> [ 3473.622106] nvme nvme0: Successfully reconnected (2 attempt)
->> [ 3531.384170] nvme nvme0: queue 1: timeout request 0x62 type 4
->> [ 3531.389837] nvme nvme0: starting error recovery
->> [ 3531.394396] nvme nvme0: queue 7: timeout request 0x61 type 4
->> [ 3531.394954] nvme_ns_head_submit_bio: 14 callbacks suppressed
->> [ 3531.394964] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.411147] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.416548] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.421954] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.427361] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.432763] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.438287] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.443701] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.449103] block nvme0n1: no usable path - requeuing I/O
->> [ 3531.454497] block nvme0n1: no usable path - requeuing I/O
->> [ 3560.568832] nvmet: ctrl 1 keep-alive timer (15 seconds) expired!
->> [ 3560.574839] nvmet: ctrl 1 fatal error occurred!
->>
->>
->>> -- 
->>>
->>>>
->>>> [  724.267865] run blktests nvme/012 at 2020-10-09 00:48:52
->>>> [  724.518498] loop: module loaded
->>>> [  724.552880] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
->>>> [  724.586609] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
->>>> [  724.648898] nvmet: creating controller 1 for subsystem 
->>>> blktests-subsystem-1 for NQN 
->>>> nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
->>>> [  724.663300] nvme nvme0: creating 12 I/O queues.
->>>> [  724.669826] nvme nvme0: mapped 12/0/0 default/read/poll queues.
->>>> [  724.681350] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", 
->>>> addr 127.0.0.1:4420
->>>> [  726.641605] XFS (nvme0n1): Mounting V5 Filesystem
->>>> [  726.654637] XFS (nvme0n1): Ending clean mount
->>>> [  726.660302] xfs filesystem being mounted at /mnt/blktests 
->>>> supports timestamps until 2038 (0x7fffffff)
->>>> [  787.042066] nvme nvme0: queue 2: timeout request 0xe type 4
->>>> [  787.047649] nvme nvme0: starting error recovery
->>>> [  787.052211] nvme nvme0: queue 4: timeout request 0x61 type 4
->>>> [  787.053407] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.054543] nvme nvme0: Reconnecting in 10 seconds...
->>>> [  787.057877] ------------[ cut here ]------------
->>>> [  787.063274] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.068313] refcount_t: underflow; use-after-free.
->>>> [  787.068370] WARNING: CPU: 3 PID: 30 at lib/refcount.c:28 
->>>> refcount_warn_saturate+0xa6/0xf0
->>>> [  787.072941] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.072945] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.078333] Modules linked in: loop nvme_tcp nvme_fabrics 
->>>> nvme_core nvmet_tcp nvmet rpcsec_gss_krb5 auth_rpcgss nfsv4 
->>>> dns_resolver nfs lockd grace fscache sunrpc snd_hda_codec_realtek 
->>>> snd_hda_codec_generic ledtrig_audio snd_hda_intel snd_intel_dspcfg 
->>>> snd_hda_codec snd_hda_core snd_hwdep snd_pcm snd_timer 
->>>> amd64_edac_mod snd edac_mce_amd soundcore kvm_amd ccp kvm pcspkr 
->>>> irqbypass hp_wmi sparse_keymap rfkill k10temp wmi_bmof nv_tco 
->>>> i2c_nforce2 acpi_cpufreq ip_tables xfs nouveau video mxm_wmi 
->>>> i2c_algo_bit drm_kms_helper mptsas cec scsi_transport_sas ttm 
->>>> mptscsih ata_generic firewire_ohci pata_acpi firewire_core drm 
->>>> serio_raw mptbase forcedeth crc_itu_t sata_nv pata_amd wmi floppy
->>>> [  787.083142] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.091304] CPU: 3 PID: 30 Comm: kworker/3:0H Not tainted 
->>>> 5.9.0-rc8.update+ #3
->>>> [  787.096673] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.096674] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.096680] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.096681] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.096683] block nvme0n1: no usable path - requeuing I/O
->>>> [  787.201242] Hardware name: Hewlett-Packard HP xw9400 
->>>> Workstation/0A1Ch, BIOS 786D6 v04.02 04/21/2009
->>>> [  787.210366] Workqueue: kblockd blk_mq_timeout_work
->>>> [  787.215161] RIP: 0010:refcount_warn_saturate+0xa6/0xf0
->>>> [  787.220295] Code: 05 aa 98 22 01 01 e8 9f cf ad ff 0f 0b c3 80 
->>>> 3d 98 98 22 01 00 75 95 48 c7 c7 48 54 3e a2 c6 05 88 98 22 01 01 
->>>> e8 80 cf ad ff <0f> 0b c3 80 3d 77 98 22 01 00 0f 85 72 ff ff ff 48 
->>>> c7 c7 a0 54 3e
->>>> [  787.239021] RSP: 0018:ffffb860407b3dc8 EFLAGS: 00010292
->>>> [  787.244240] RAX: 0000000000000026 RBX: 0000000000000000 RCX: 
->>>> ffff9d93ddc58d08
->>>> [  787.251361] RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: 
->>>> ffff9d93ddc58d00
->>>> [  787.258480] RBP: ffff9d93dbd6c200 R08: 000000b740ed60e8 R09: 
->>>> ffffffffa2fffbc4
->>>> [  787.265612] R10: 0000000000000477 R11: 0000000000028320 R12: 
->>>> ffff9d93dbd6c2e8
->>>> [  787.272741] R13: ffff9d93dbea0000 R14: ffffb860407b3e70 R15: 
->>>> ffff9d93dbea0000
->>>> [  787.279864] FS:  0000000000000000(0000) 
->>>> GS:ffff9d93ddc40000(0000) knlGS:0000000000000000
->>>> [  787.287948] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> [  787.293695] CR2: 00007f45fd8fa024 CR3: 00000000792dc000 CR4: 
->>>> 00000000000006e0
->>>> [  787.300820] Call Trace:
->>>> [  787.303277]  blk_mq_check_expired+0x109/0x1b0
->>>> [  787.307638]  blk_mq_queue_tag_busy_iter+0x1b8/0x330
->>>> [  787.312524]  ? blk_poll+0x300/0x300
->>>> [  787.316022]  blk_mq_timeout_work+0x44/0xe0
->>>> [  787.320128]  process_one_work+0x1b4/0x370
->>>> [  787.324137]  worker_thread+0x53/0x3e0
->>>> [  787.327809]  ? process_one_work+0x370/0x370
->>>> [  787.332015]  kthread+0x11b/0x140
->>>> [  787.335245]  ? __kthread_bind_mask+0x60/0x60
->>>> [  787.339515]  ret_from_fork+0x22/0x30
->>>> [  787.343094] ---[ end trace 606cf9189379fcfc ]---
->>>>
->>>>
->>>> Best Regards,
->>>>    Yi Zhang
->>>>
->>>>
->>>> ----- Original Message -----
->>>> From: "Ming Lei" <ming.lei@redhat.com>
->>>> To: "Sagi Grimberg" <sagi@grimberg.me>
->>>> Cc: "Jens Axboe" <axboe@kernel.dk>, "Yi Zhang" 
->>>> <yi.zhang@redhat.com>, linux-nvme@lists.infradead.org, 
->>>> linux-block@vger.kernel.org, "Keith Busch" <kbusch@kernel.org>, 
->>>> "Christoph Hellwig" <hch@lst.de>
->>>> Sent: Friday, October 9, 2020 12:39:38 PM
->>>> Subject: Re: [PATCH] block: re-introduce blk_mq_complete_request_sync
->>>>
->>>> On Thu, Oct 08, 2020 at 02:37:50PM -0700, Sagi Grimberg wrote:
->>>>> In nvme-tcp and nvme-rdma, the timeout handler in certain conditions
->>>>> needs to complete an aborted request. The timeout handler serializes
->>>>> against an error recovery sequence that iterates over the inflight
->>>>> requests and cancels them.
->>>>>
->>>>> However, the fact that blk_mq_complete_request may defer to a 
->>>>> different
->>>>> core that serialization breaks.
->>>>>
->>>>> Hence re-introduce blk_mq_complete_request_sync and use that in the
->>>>> timeout handler to make sure that we don't get a use-after-free
->>>>> condition.
->>>>>
->>>>> This was uncovered by the blktests:
->>>>> -- 
->>>>> $ nvme_trtype=tcp ./check nvme/012
->>>>>
->>>>> [ 2152.546343] run blktests nvme/012 at 2020-10-08 05:59:03
->>>>> [ 2152.799640] loop: module loaded
->>>>> [ 2152.835222] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
->>>>> [ 2152.860697] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
->>>>> [ 2152.937889] nvmet: creating controller 1 for subsystem 
->>>>> blktests-subsystem-1 for NQN 
->>>>> nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
->>>>> [ 2152.952085] nvme nvme0: creating 12 I/O queues.
->>>>> [ 2152.958042] nvme nvme0: mapped 12/0/0 default/read/poll queues.
->>>>> [ 2152.969948] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", 
->>>>> addr 127.0.0.1:4420
->>>>> [ 2154.927953] XFS (nvme0n1): Mounting V5 Filesystem
->>>>> [ 2154.942432] XFS (nvme0n1): Ending clean mount
->>>>> [ 2154.948183] xfs filesystem being mounted at /mnt/blktests 
->>>>> supports timestamps until 2038 (0x7fffffff)
->>>>> [ 2215.193645] nvme nvme0: queue 7: timeout request 0x11 type 4
->>>>> [ 2215.199331] nvme nvme0: starting error recovery
->>>>> [ 2215.203890] nvme nvme0: queue 7: timeout request 0x12 type 4
->>>>> [ 2215.204483] block nvme0n1: no usable path - requeuing I/O
->>>>> [ 2215.214976] block nvme0n1: no usable path - requeuing I/O
->>>>> [ 2215.215495] nvme nvme0: Reconnecting in 10 seconds...
->>>>> [ 2215.215502] ------------[ cut here ]------------
->>>>> [ 2215.215505] refcount_t: underflow; use-after-free.
->>>>> [ 2215.215617] WARNING: CPU: 6 PID: 45 at lib/refcount.c:28 
->>>>> refcount_warn_saturate+0xa6/0xf0
->>>>> [ 2215.215745] RSP: 0018:ffffb71b80837dc8 EFLAGS: 00010292
->>>>> [ 2215.215750] RAX: 0000000000000026 RBX: 0000000000000000 RCX: 
->>>>> ffff93f37dcd8d08
->>>>> [ 2215.215753] RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: 
->>>>> ffff93f37dcd8d00
->>>>> [ 2215.215755] RBP: ffff93f37a812400 R08: 00000203c5221fce R09: 
->>>>> ffffffffa7fffbc4
->>>>> [ 2215.215758] R10: 0000000000000477 R11: 000000000002835c R12: 
->>>>> ffff93f37a8124e8
->>>>> [ 2215.215761] R13: ffff93f37a2b0000 R14: ffffb71b80837e70 R15: 
->>>>> ffff93f37a2b0000
->>>>> [ 2215.215765] FS:  0000000000000000(0000) 
->>>>> GS:ffff93f37dcc0000(0000) knlGS:0000000000000000
->>>>> [ 2215.215768] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>>> [ 2215.215771] CR2: 00005637b4137028 CR3: 000000007c1be000 CR4: 
->>>>> 00000000000006e0
->>>>> [ 2215.215773] Call Trace:
->>>>> [ 2215.215784]  blk_mq_check_expired+0x109/0x1b0
->>>>> [ 2215.215797]  blk_mq_queue_tag_busy_iter+0x1b8/0x330
->>>>> [ 2215.215801]  ? blk_poll+0x300/0x300
->>>>> [ 2215.215806]  blk_mq_timeout_work+0x44/0xe0
->>>>> [ 2215.215814]  process_one_work+0x1b4/0x370
->>>>> [ 2215.215820]  worker_thread+0x53/0x3e0
->>>>> [ 2215.215825]  ? process_one_work+0x370/0x370
->>>>> [ 2215.215829]  kthread+0x11b/0x140
->>>>> [ 2215.215834]  ? __kthread_bind_mask+0x60/0x60
->>>>> [ 2215.215841]  ret_from_fork+0x22/0x30
->>>>> [ 2215.215847] ---[ end trace 7d137e36e23c0d19 ]---
->>>>> -- 
->>>>>
->>>>> Reported-by: Yi Zhang <yi.zhang@redhat.com>
->>>>> Fixes: 236187c4ed19 ("nvme-tcp: fix timeout handler")
->>>>> Fixes: 0475a8dcbcee ("nvme-rdma: fix timeout handler")
->>>>> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
->>>>> ---
->>>>> Yi, would appreciate your Tested-by tag
->>>>>
->>>>>   block/blk-mq.c           | 7 +++++++
->>>>>   drivers/nvme/host/rdma.c | 2 +-
->>>>>   drivers/nvme/host/tcp.c  | 2 +-
->>>>>   include/linux/blk-mq.h   | 1 +
->>>>>   4 files changed, 10 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>> index f8e1e759c905..2d154722ef39 100644
->>>>> --- a/block/blk-mq.c
->>>>> +++ b/block/blk-mq.c
->>>>> @@ -729,6 +729,13 @@ bool blk_mq_complete_request_remote(struct 
->>>>> request *rq)
->>>>>   }
->>>>>   EXPORT_SYMBOL_GPL(blk_mq_complete_request_remote);
->>>>>   +void blk_mq_complete_request_sync(struct request *rq)
->>>>> +{
->>>>> +    WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
->>>>> +    rq->q->mq_ops->complete(rq);
->>>>> +}
->>>>> +EXPORT_SYMBOL_GPL(blk_mq_complete_request_sync);
->>>>> +
->>>>>   /**
->>>>>    * blk_mq_complete_request - end I/O on a request
->>>>>    * @rq:        the request being processed
->>>>> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
->>>>> index 9e378d0a0c01..45fc605349da 100644
->>>>> --- a/drivers/nvme/host/rdma.c
->>>>> +++ b/drivers/nvme/host/rdma.c
->>>>> @@ -1975,7 +1975,7 @@ static void 
->>>>> nvme_rdma_complete_timed_out(struct request *rq)
->>>>>       nvme_rdma_stop_queue(queue);
->>>>>       if (!blk_mq_request_completed(rq)) {
->>>>>           nvme_req(rq)->status = NVME_SC_HOST_ABORTED_CMD;
->>>>> -        blk_mq_complete_request(rq);
->>>>> +        blk_mq_complete_request_sync(rq);
->>>>>       }
->>>>>       mutex_unlock(&ctrl->teardown_lock);
->>>>>   }
->>>>> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
->>>>> index 8f4f29f18b8c..629b025685d1 100644
->>>>> --- a/drivers/nvme/host/tcp.c
->>>>> +++ b/drivers/nvme/host/tcp.c
->>>>> @@ -2177,7 +2177,7 @@ static void 
->>>>> nvme_tcp_complete_timed_out(struct request *rq)
->>>>>       nvme_tcp_stop_queue(ctrl, nvme_tcp_queue_id(req->queue));
->>>>>       if (!blk_mq_request_completed(rq)) {
->>>>>           nvme_req(rq)->status = NVME_SC_HOST_ABORTED_CMD;
->>>>> -        blk_mq_complete_request(rq);
->>>>> +        blk_mq_complete_request_sync(rq);
->>>>
->>>> Or complete the request in the following way? Then one block layer API
->>>> can be saved:
->>>>
->>>>     blk_mq_complete_request_remote(rq);
->>>>     nvme_complete_rq(rq);
->>>>
->>>>
->>>> thanks,
->>>> Ming
->>>>
->>>>
->>>> _______________________________________________
->>>> Linux-nvme mailing list
->>>> Linux-nvme@lists.infradead.org
->>>> http://lists.infradead.org/mailman/listinfo/linux-nvme
->>>>
->>>>
->>>> _______________________________________________
->>>> Linux-nvme mailing list
->>>> Linux-nvme@lists.infradead.org
->>>> http://lists.infradead.org/mailman/listinfo/linux-nvme
->>>>
->>>
->>
 >
-> _______________________________________________
-> Linux-nvme mailing list
-> Linux-nvme@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-nvme
 
