@@ -2,160 +2,123 @@ Return-Path: <SRS0=jKGj=DT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A82C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 07:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00813C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 08:13:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F38252080D
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 07:41:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99B982087D
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 08:13:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H99Jz3UE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728326AbgJLHlQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Oct 2020 03:41:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44468 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727722AbgJLHk4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Oct 2020 03:40:56 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 3DEE1AC1D;
-        Mon, 12 Oct 2020 07:40:52 +0000 (UTC)
-Subject: Re: [PATCH RFC PKS/PMEM 48/58] drivers/md: Utilize new kmap_thread()
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>, x86@kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-        kexec@lists.infradead.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, devel@driverdev.osuosl.org,
-        linux-efi@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
-        reiserfs-devel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
-        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-rdma@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-cachefs@redhat.com,
-        samba-technical@lists.samba.org, intel-wired-lan@lists.osuosl.org
-References: <20201009195033.3208459-1-ira.weiny@intel.com>
- <20201009195033.3208459-49-ira.weiny@intel.com>
- <c802fbf4-f67a-b205-536d-9c71b440f9c8@suse.de>
- <20201012052817.GZ2046448@iweiny-DESK2.sc.intel.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <026a7658-6c43-6510-a8b5-32f29de7b281@suse.de>
-Date:   Mon, 12 Oct 2020 15:40:27 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.1
+        id S1727468AbgJLINb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Oct 2020 04:13:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35838 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728956AbgJLIN2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Oct 2020 04:13:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602490406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cem/gNp247LYga6BNkaCK5NWZZonWFz2KLOKkw9NSWo=;
+        b=H99Jz3UEz5Kp6cxaspdWzKR2W9GlwUYUaZJUnKe3p8WyVKtfoCjWE3M7hX7YWQKOEd/YMS
+        jvvLZ1L3QWSzqRmEwSeqBpfNEMb6wss+5ppRhmRo+c09XAGIqNNcDBFZwAEzYogmplhK/+
+        r+xTYTKyznpJrlZBKAXYNaXmlQbBkBM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-rGX0XLj5PQOQbez47LxsFw-1; Mon, 12 Oct 2020 04:13:24 -0400
+X-MC-Unique: rGX0XLj5PQOQbez47LxsFw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6480718BE161;
+        Mon, 12 Oct 2020 08:13:22 +0000 (UTC)
+Received: from T590 (ovpn-13-62.pek2.redhat.com [10.72.13.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 80117614F5;
+        Mon, 12 Oct 2020 08:13:11 +0000 (UTC)
+Date:   Mon, 12 Oct 2020 16:13:06 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Chao Leng <lengchao@huawei.com>
+Cc:     Yi Zhang <yi.zhang@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: re-introduce blk_mq_complete_request_sync
+Message-ID: <20201012081306.GB556731@T590>
+References: <20201008213750.899462-1-sagi@grimberg.me>
+ <20201009043938.GC27356@T590>
+ <1711488120.3435389.1602219830518.JavaMail.zimbra@redhat.com>
+ <e39b711e-ebbd-8955-ca19-07c1dad26fa2@grimberg.me>
+ <23f19725-f46b-7de7-915d-b97fd6d69cdc@redhat.com>
+ <ced685bf-ad48-ac41-8089-8c5ba09abfcb@grimberg.me>
+ <7a7aca6e-30f5-0754-fb7f-599699b97108@redhat.com>
+ <6f2a5ae2-2e6a-0386-691c-baefeecb5478@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20201012052817.GZ2046448@iweiny-DESK2.sc.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6f2a5ae2-2e6a-0386-691c-baefeecb5478@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/10/12 13:28, Ira Weiny wrote:
-> On Sat, Oct 10, 2020 at 10:20:34AM +0800, Coly Li wrote:
->> On 2020/10/10 03:50, ira.weiny@intel.com wrote:
->>> From: Ira Weiny <ira.weiny@intel.com>
->>>
->>> These kmap() calls are localized to a single thread.  To avoid the over
->>> head of global PKRS updates use the new kmap_thread() call.
->>>
->>
->> Hi Ira,
->>
->> There were a number of options considered.
->>
->> 1) Attempt to change all the thread local kmap() calls to kmap_atomic()
->> 2) Introduce a flags parameter to kmap() to indicate if the mapping
->> should be global or not
->> 3) Change ~20-30 call sites to 'kmap_global()' to indicate that they
->> require a global mapping of the pages
->> 4) Change ~209 call sites to 'kmap_thread()' to indicate that the
->> mapping is to be used within that thread of execution only
->>
->>
->> I copied the above information from patch 00/58 to this message. The
->> idea behind kmap_thread() is fine to me, but as you said the new api is
->> very easy to be missed in new code (even for me). I would like to be
->> supportive to option 2) introduce a flag to kmap(), then we won't forget
->> the new thread-localized kmap method, and people won't ask why a
->> _thread() function is called but no kthread created.
+On Mon, Oct 12, 2020 at 11:59:21AM +0800, Chao Leng wrote:
 > 
-> Thanks for the feedback.
 > 
-> I'm going to hold off making any changes until others weigh in.  FWIW, I kind
-> of like option 2 as well.  But there is already kmap_atomic() so it seemed like
-> kmap_XXXX() was more in line with the current API.
+> On 2020/10/10 14:08, Yi Zhang wrote:
+> > 
+> > 
+> > On 10/10/20 2:29 AM, Sagi Grimberg wrote:
+> > > 
+> > > 
+> > > On 10/9/20 6:55 AM, Yi Zhang wrote:
+> > > > Hi Sagi
+> > > > 
+> > > > On 10/9/20 4:09 PM, Sagi Grimberg wrote:
+> > > > > > Hi Sagi
+> > > > > > 
+> > > > > > I applied this patch on block origin/for-next and still can reproduce it.
+> > > > > 
+> > > > > That's unexpected, can you try this patch?
+> > > > > -- 
+> > > > > diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> > > > > index 629b025685d1..46428ff0b0fc 100644
+> > > > > --- a/drivers/nvme/host/tcp.c
+> > > > > +++ b/drivers/nvme/host/tcp.c
+> > > > > @@ -2175,7 +2175,7 @@ static void nvme_tcp_complete_timed_out(struct request *rq)
+> > > > >         /* fence other contexts that may complete the command */
+> > > > >         mutex_lock(&to_tcp_ctrl(ctrl)->teardown_lock);
+> > > > >         nvme_tcp_stop_queue(ctrl, nvme_tcp_queue_id(req->queue));
+> > > > > -       if (!blk_mq_request_completed(rq)) {
+> > > > > +       if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq)) {
+> > > > >                 nvme_req(rq)->status = NVME_SC_HOST_ABORTED_CMD;
+> > > > >                 blk_mq_complete_request_sync(rq);
+> > > > >         }
+> This may just reduce the probability. The concurrency of timeout and teardown will cause the same request
+> be treated repeatly, this is not we expected.
 
-I understand it now, the idea is fine to me.
+That is right, not like SCSI, NVME doesn't apply atomic request completion, so
+request may be completed/freed from both timeout & nvme_cancel_request().
 
-Acked-by: Coly Li <colyli@suse.de>
+.teardown_lock still may cover the race with Sagi's patch because teardown
+actually cancels requests in sync style.
 
-Thanks.
+> In the teardown process, after quiesced queues delete the timer and cancel the timeout work maybe a better option.
 
-Coly Li
+Seems better solution, given it is aligned with NVME PCI's reset
+handling. nvme_sync_queues() may be called in nvme_tcp_teardown_io_queues() to
+avoid this race.
+
+
+Thanks, 
+Ming
+
