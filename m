@@ -7,89 +7,104 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 767A7C433E7
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 19:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB2B5C433E7
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 19:50:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34F4E2074A
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 19:33:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B2CD20BED
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 19:50:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vq98jG2i"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ST6QdcCn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730246AbgJLTdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Oct 2020 15:33:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57698 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728031AbgJLTdd (ORCPT
+        id S1726721AbgJLTuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Oct 2020 15:50:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59626 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726676AbgJLTuq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Oct 2020 15:33:33 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871F0C0613D1
-        for <linux-block@vger.kernel.org>; Mon, 12 Oct 2020 12:33:31 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id m17so18826409ioo.1
-        for <linux-block@vger.kernel.org>; Mon, 12 Oct 2020 12:33:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=C8sNmLoSFxlYfZxUwMFlxG4rV54hIYRn+EU7ipQkT6U=;
-        b=vq98jG2iYw0BLMiGIjvEDfZhLdneIxWqnB0uJpyAgiQU/j0kRv4/TTsx7BM1kKOYa8
-         LhLLHVyGddUrO9h/ph+J5bCwjUIpqHMoO2BdpPLew0CU950aihx8CeTnZfDKqbWoraOF
-         uhzOemRscBB4gBSqRkHIg/HVUpEM6sdP28EGj+4wFGchCG6dSYi1fblv+G8Y3RIVuZKM
-         i6KPh6pqjUx38RAAKzg8a/ZlRQmbUYlnLTEQ7hNKrkQKnOYNsRv4sVW6s8W9ZpKMgA8P
-         4JMDX0M1g15ebFdpF3z9cbyRPCS8KVvLvlJSyWrt2MHmaoGTac2ZYeHEZa64YgKvGF7T
-         qL4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=C8sNmLoSFxlYfZxUwMFlxG4rV54hIYRn+EU7ipQkT6U=;
-        b=ImmeZaN5AHoDFBp1PgSpXH5nepFzJNbkevRA6K87IPU7SALweT4vuryiXCip6wE3k9
-         CRQgNSAb48kUCO1wEgVre/f47riNSoa6qRGgJQAZHzekMgH6z+Pbpc0ZAB2J4I1awj6h
-         XzrKgQEGJpaFogHuMNOPmtshGPddbEmjOrTzbYafZeC9hw3WPA3Wes2ewApoRu+5MaCg
-         rPXnR9vu7Vem5QpVc/aot1Yuyo5Zw+JM1VhJeZcRR+kB8Y1Ir+fGvxwv+k4FjsOJOlWa
-         bWIfQrac1jJIyuF7ahBnP6uX6Li7pBbtrH8psoopvsjtsvBin66IoYBuaP+zAt3HROI0
-         jLGg==
-X-Gm-Message-State: AOAM530tia8L7/d8gMToBj8pbSH60/D6sZSC7DxCYSJG8M3htK028Xz8
-        atwcKsN40oWBivf1IAvIeL9UcA==
-X-Google-Smtp-Source: ABdhPJzYPTj5Coyc6Is7fEUBjgibYwothILYm/lDvJM8rX6a8+tp7K7gfIoxT+65uOAzEuTbt4K1Ew==
-X-Received: by 2002:a05:6638:d0b:: with SMTP id q11mr19701658jaj.68.1602531210528;
-        Mon, 12 Oct 2020 12:33:30 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id y75sm7803398iof.36.2020.10.12.12.33.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Oct 2020 12:33:29 -0700 (PDT)
-Subject: Re: [PATCH v2 00/10] DASD FC endpoint security
-To:     Stefan Haberland <sth@linux.ibm.com>
+        Mon, 12 Oct 2020 15:50:46 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09CJWLPm093759;
+        Mon, 12 Oct 2020 15:50:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=VWPGcO3ZgggpxQYZYBbsHCTFxsPTlRztqzZpbzfdkdY=;
+ b=ST6QdcCn7DzFPjh1DWCvtxHioz8asBmKaPadsVcvcxzRNUBDDQwOL0wzugHDI1J2vcV1
+ +Y8ZPGHBe3DOjZ4lzCkK2ZmkuU86gczyULWiliTT+uuJuSgBKdt0dwURD7eXtZt5rUAF
+ p9ecJUVX61yy26eXN2PwHjEOnXUzuhNeLY77d9aOl0kqQnHQ3m257wHPMG2ED25BCmGf
+ 7VP6/p7r+lnOaPhUkCgB16FS805zByeO08ae2k0rK+XT/ZKJ3ptA8Ap6UGQFmaQCH6oA
+ Pvonho/xzAWnJ4ttULZWwSWqFt1SQVPBKEWfPsgSHuuxcahVekU6dEFS7w0h3i3U5UOM fA== 
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 344w3t8s66-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Oct 2020 15:50:44 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09CJkgpQ004483;
+        Mon, 12 Oct 2020 19:50:42 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 3434k7s6kt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Oct 2020 19:50:42 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09CJodtM29032736
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Oct 2020 19:50:39 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A87A04C04A;
+        Mon, 12 Oct 2020 19:50:39 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5756E4C040;
+        Mon, 12 Oct 2020 19:50:39 +0000 (GMT)
+Received: from linux.fritz.box (unknown [9.145.163.240])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Oct 2020 19:50:39 +0000 (GMT)
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
         linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>
 References: <20201008131336.61100-1-sth@linux.ibm.com>
  <20201012183550.GA12341@imap.linux.ibm.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <07b0f296-e0b2-1383-56a1-0d5411c101da@kernel.dk>
-Date:   Mon, 12 Oct 2020 13:33:29 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <07b0f296-e0b2-1383-56a1-0d5411c101da@kernel.dk>
+From:   Stefan Haberland <sth@linux.ibm.com>
+Subject: Re: [PATCH v2 00/10] DASD FC endpoint security
+Message-ID: <b5038d44-aa46-bbde-7a9f-0de46fed516a@linux.ibm.com>
+Date:   Mon, 12 Oct 2020 21:50:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201012183550.GA12341@imap.linux.ibm.com>
+In-Reply-To: <07b0f296-e0b2-1383-56a1-0d5411c101da@kernel.dk>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-12_15:2020-10-12,2020-10-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=993
+ priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0 suspectscore=0
+ clxscore=1015 malwarescore=0 lowpriorityscore=0 adultscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010120141
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/12/20 1:06 PM, Stefan Haberland wrote:
-> Hi Jens,
-> 
-> quick ping. Are you going to apply this for 5.10?
+Am 12.10.20 um 21:33 schrieb Jens Axboe:
+> On 10/12/20 1:06 PM, Stefan Haberland wrote:
+>> Hi Jens,
+>>
+>> quick ping. Are you going to apply this for 5.10?
+> I actually wasn't planning on it - it arrived a bit late, and
+> it seemed like one of those things that needed a bit more review
+> talk before being able to be applied.
+>
 
-I actually wasn't planning on it - it arrived a bit late, and
-it seemed like one of those things that needed a bit more review
-talk before being able to be applied.
+OK, too bad. I had hoped that this was still OK.
+The patches have been tested and reviewed internally for quite a while.
+Which actually was the reason for the late submission. Cornelia also
+gave her RB last week.
 
--- 
-Jens Axboe
+But OK, if you think this needs some more review we will have to wait
+for 5.11.
+
 
