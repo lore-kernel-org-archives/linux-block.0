@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5CEC35272
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C57C04EBE
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:29:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78AC92080A
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:29:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B6642080A
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:29:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="SfZWJTdS"
+	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="Ey+m4eax"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403893AbgJLQ3I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Oct 2020 12:29:08 -0400
-Received: from mail-eopbgr770045.outbound.protection.outlook.com ([40.107.77.45]:40419
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        id S2403851AbgJLQ31 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Oct 2020 12:29:27 -0400
+Received: from mail-dm6nam10on2068.outbound.protection.outlook.com ([40.107.93.68]:22624
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2403833AbgJLQ2f (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Oct 2020 12:28:35 -0400
+        id S2403837AbgJLQ2Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Oct 2020 12:28:24 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AjV7BZYYXb9uFQlY64YleouoDFbmx0FLiGG4vkpHN2+ZX9AEW98rC7xIYNR6gGzSr5VRvcAFunyLalmOT9o4SXnld9CtUtAPLFcSHxZQYErKgr4rhsa81R1ih3U9WyM4s0pllMozx5TNpJ9bmuLLjY1JeTSxRF3C0LHpjK9/hqKUtlJ+2JZMAJNgEIO2zYKs/XHf1BY6X5SRZ2wDeojOvsilUgkSOBYFVeXEIgE/va6GSmiNvXEZNALD7FQFRQx223YMAmn15G/HpQ9Wk6sQs6bFDQa9ksEzGtyjBvDtDwftoSCt6XcmHDsKECJ6J0A7ZbxxF3MjNHGhPGxA9su3BA==
+ b=bRmcb8JJ6F93FKVZEO5uV4HObyGXhu2CGuypkL0yP/F+WXZi4pZWhXsIGv5HdrHBxixYECTXyaNDzxGgRu7WhqEZLdKflCpuRY3dH+/b5faKsbvlnP5aQScsxZd/AKJJt+1LmxadVbNr2+KJtuvee9bI5XN5iyIxdxqjzOCBNczYaR7dPVJ8DFdDuVu7IuB1t1dEJolnSVroZOwRO/jUdwh6UiYtMXfHCpZiZSAa2cYf0i2rX6KXYj7qoGAxkFEMpR5tocPyY0WANpm8RsqSb5ukeotmaonCUJWjTgzYOpQ+lnCGTV5ltLR6vlFDarNR6O6QUwY8IF5u8W1wOWGIhQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8lPVjMl112n2Wdwt/6MpSvuGRaC0sj2K18gQ850C2mE=;
- b=hORIy8MXjmbwj9oRSL+pgrE1JqponebiPr/nyqosDzjgaE/Y5QgSzHv2hxOvOwO+VN/mRV/E2XTBwAlZzv6n5rgJIbWIBhVcsox3uwv44JlEGzfSPjufhpxF+9Fe5Tssxr+dcuCseeBDd08Sf9lRqHNuTXoubQQh8K2FbFQk/o5EElAfiuzHg82S/rqe/q6RT9Craz8+ap+lGfQBDBvALo10OI+2WUQJG6xGGyjxCDUpwVFYBmOHyMKjmCE8tURA+2Tp+pP9DOP3f9XZ0t0dp8bBRA7JUaXvBekZqhCEUbHubneS+5qxSmaxEGnDnWaKZTaaROXJFPMeU+cAay1hUQ==
+ bh=2rhb8zJ2Mj75vN4Yb2awa4VaTZkefSOpwpjHHemsnic=;
+ b=OzBj8g1NaNYyrO8l4P8h29ixw18gSefW4hpcjjdhpwB4HIrmQLa4BHFBH6rCRAYhSgLS+DoJnVGwGfFYH998OPYcP/t7+w/8im3qv8O8JVuq+mK0n2KKc6o6IrJFBGtGFTV2Ds4agaBASu+Y3BhkpNQkJackkIuFVQiUQSwJsK1jbK0iFhPPVU0gXeh0uyb+ylsi67jVzFXikiSs3mHUOJl1hngLoj9RvDKtdP3ZRVgRjyEwkzGTBbYWj/vY0tjOdNbKe8RycSsEwvbvV1do6bCm1g7sjTHOSvrRBcJY02c3t79zTtHKF2oRsN0oYQsiMMLoyIMV6cRGxTC4TFJt0g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  137.201.242.130) smtp.rcpttodomain=kvack.org smtp.mailfrom=micron.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=micron.com;
@@ -36,18 +36,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8lPVjMl112n2Wdwt/6MpSvuGRaC0sj2K18gQ850C2mE=;
- b=SfZWJTdSUg7TPzu3/rAAZjlChNHJNoRCMXtEOiVyOiVFHqwdSyStnrb+9Fvol6/5IWXdLul+XwhIzpo3NcgwqG/uKooaB9YMzKz4VJrHWOCoIoqQNJd5D9u5spCDFIfiB2GNutYLuWJtHEwNlNaecJWOvukxbK2Idb6Lg266dew=
-Received: from SA9PR10CA0011.namprd10.prod.outlook.com (2603:10b6:806:a7::16)
- by CY4PR08MB2438.namprd08.prod.outlook.com (2603:10b6:903:3f::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.23; Mon, 12 Oct
- 2020 16:28:11 +0000
-Received: from SN1NAM01FT051.eop-nam01.prod.protection.outlook.com
- (2603:10b6:806:a7:cafe::56) by SA9PR10CA0011.outlook.office365.com
- (2603:10b6:806:a7::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.27 via Frontend
- Transport; Mon, 12 Oct 2020 16:28:11 +0000
+ bh=2rhb8zJ2Mj75vN4Yb2awa4VaTZkefSOpwpjHHemsnic=;
+ b=Ey+m4eax4LfMyf05AIBXxc7F7eNT5xxzQBv7h28OqUQqruM/I+s1BCeL08iRWYT+gQl4mAa66EGrjq05stEU8C2dXISmpsSx4JL9Em8QCpBZjG9xjOOWEowRrKuhMPLHjkU8WS/+QOIAAlTho25C5TYMwP87yGnbFuZx7ZMjThE=
+Received: from SN4PR0201CA0060.namprd02.prod.outlook.com
+ (2603:10b6:803:20::22) by DM6PR08MB4570.namprd08.prod.outlook.com
+ (2603:10b6:5:12::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Mon, 12 Oct
+ 2020 16:28:13 +0000
+Received: from SN1NAM01FT015.eop-nam01.prod.protection.outlook.com
+ (2603:10b6:803:20:cafe::1f) by SN4PR0201CA0060.outlook.office365.com
+ (2603:10b6:803:20::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21 via Frontend
+ Transport; Mon, 12 Oct 2020 16:28:13 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 137.201.242.130)
  smtp.mailfrom=micron.com; kvack.org; dkim=none (message not signed)
  header.d=none;kvack.org; dmarc=pass action=none header.from=micron.com;
@@ -55,21 +55,21 @@ Received-SPF: Pass (protection.outlook.com: domain of micron.com designates
  137.201.242.130 as permitted sender) receiver=protection.outlook.com;
  client-ip=137.201.242.130; helo=mail.micron.com;
 Received: from mail.micron.com (137.201.242.130) by
- SN1NAM01FT051.mail.protection.outlook.com (10.152.64.150) with Microsoft SMTP
+ SN1NAM01FT015.mail.protection.outlook.com (10.152.65.55) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3455.23 via Frontend Transport; Mon, 12 Oct 2020 16:28:11 +0000
+ 15.20.3455.23 via Frontend Transport; Mon, 12 Oct 2020 16:28:13 +0000
 Received: from micron.com (10.114.5.55) by bowex17c.micron.com
  (137.201.21.211) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 12 Oct
- 2020 10:28:06 -0600
+ 2020 10:28:09 -0600
 From:   Nabeel M Mohamed <nmeeramohide@micron.com>
 To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-mm@kvack.org>,
         <linux-nvdimm@lists.01.org>
 CC:     <smoyer@micron.com>, <gbecker@micron.com>, <plabat@micron.com>,
         <jgroves@micron.com>, Nabeel M Mohamed <nmeeramohide@micron.com>
-Subject: [PATCH v2 14/22] mpool: add pool metadata routines to create persistent mpools
-Date:   Mon, 12 Oct 2020 11:27:28 -0500
-Message-ID: <20201012162736.65241-15-nmeeramohide@micron.com>
+Subject: [PATCH v2 17/22] mpool: add mpool lifecycle management ioctls
+Date:   Mon, 12 Oct 2020 11:27:31 -0500
+Message-ID: <20201012162736.65241-18-nmeeramohide@micron.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20201012162736.65241-1-nmeeramohide@micron.com>
 References: <20201012162736.65241-1-nmeeramohide@micron.com>
@@ -78,83 +78,79 @@ Content-Type: text/plain
 X-ClientProxiedBy: bowex17a.micron.com (137.201.21.209) To bowex17c.micron.com
  (137.201.21.211)
 X-TM-AS-Product-Ver: SMEX-12.0.0.1782-8.200.1013-24646.005
-X-TM-AS-Result: No--9.380900-0.000000-31
-X-TM-AS-MatchedID: 704500-701073-700071-105700-121367-703712-703959-704135-7
-        03215-705161-704397-703851-700010-700836-701410-700028-700717-700863-701077
-        -703226-700335-702415-700958-704842-701480-701809-703017-703140-702395-1880
-        19-703213-121336-701105-704673-703967-703027-701275-703815-702754-700351-70
-        4962-704477-704053-704346-705022-702853-703408-702914-701128-105630-137717-
-        702787-704961-702688-703904-704090-702617-702779-701705-704714-702855-70497
-        8-700065-702444-704328-106420-701919-700077-702365-701263-703572-702619-704
-        727-700786-703080-702699-700737-188199-703115-847575-702316-703853-700876-7
-        01333-701750-701667-703635-701744-701108-703920-148004-148036-29997-42000-4
+X-TM-AS-Result: No--10.641500-0.000000-31
+X-TM-AS-MatchedID: 700076-703904-701478-121588-702559-701342-704053-703017-7
+        03173-701270-700328-703572-186035-704841-702617-701343-705041-703532-702732
+        -704926-704381-702619-703694-703348-700535-703905-700335-705161-704961-7044
+        99-703140-701480-702395-188019-704477-703812-702433-300015-704978-704318-70
+        3357-702914-704521-851458-700069-188199-703880-702102-703213-703991-704401-
+        700714-704402-702525-701750-703534-700863-703215-703864-701919-704239-78004
+        8-702907-700458-704929-702908-703385-701443-704002-702590-705244-702490-704
+        718-700786-700716-700060-702779-701475-700717-702415-701104-704418-702438-7
+        01172-704804-703027-701295-780001-703865-702298-148004-148036-29997-42000-4
         2003
 X-TM-AS-User-Approved-Sender: Yes
 X-TM-AS-User-Blocked-Sender: No
 X-MT-Whitelisted: matched
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d87edd09-be7d-4cfd-e7de-08d86ecbcfd5
-X-MS-TrafficTypeDiagnostic: CY4PR08MB2438:
-X-Microsoft-Antispam-PRVS: <CY4PR08MB24386C61D46C9B6E38F2E9D4B3070@CY4PR08MB2438.namprd08.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: e5db479c-4c9e-4121-730d-08d86ecbd0d9
+X-MS-TrafficTypeDiagnostic: DM6PR08MB4570:
+X-Microsoft-Antispam-PRVS: <DM6PR08MB45703311850F84A6AE007056B3070@DM6PR08MB4570.namprd08.prod.outlook.com>
 X-MS-Exchange-Transport-Forked: True
 X-EXT-ByPass: 1
 X-MT-RULE-Whitelisted: Triggered
-X-MS-Oob-TLC-OOBClassifiers: OLM:1850;
+X-MS-Oob-TLC-OOBClassifiers: OLM:69;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: USUqtGDgJzf4e5qzRcjnqCo/6B6162rP7G02sxacgF31qmV+5E4tC5VO/8v98SyN45vYDewHc3lEypyixoNFpxULBRXFdLtJkghr6qCp+QGozzylEX/vKSVZEBc8rZ+CDWqeFlV2DJOo+RkVOhL/1LMGd3jl2LnEV2qYmutqtFe2DNIs9C5ZRUDuKE+1eYDl+9j4u2KA3D/shZQ4kKCkcBre+wMvc+cSgxofdB/AAMxKRItgo9Sn90R7LeUEfR8v77Ln1ufyehWzDJiNCMR4NCn+f2DpjNESZwYdLEgTbULT63UBjaxgvvPqkMiKfCqZdRso3OfFZ22KGA77ybMlinA2uBmNUzB76NsmQRXVz1Z2trd0tHoaexMg1usXXiKkpafs1VVuxiuVRALkAms9LTayLpPZjXXNfvky88RwLdC9SBXxOwbLVo6uSHbFLnfoveStoYZq6qkBvvyP5T637g==
-X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(346002)(376002)(136003)(39860400002)(396003)(46966005)(6286002)(2906002)(186003)(356005)(33310700002)(26005)(316002)(70206006)(8936002)(70586007)(7696005)(83380400001)(110136005)(54906003)(36756003)(8676002)(6666004)(82310400003)(478600001)(336012)(4326008)(55016002)(30864003)(7636003)(2616005)(1076003)(107886003)(5660300002)(86362001)(47076004)(82740400003)(426003)(2101003)(559001)(579004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: MsdpVd8LG+yqcjqiqboamhufrFpPbJgom9gRT3cJ956zSZuv7xeh9mTovMRvrAx19mA3u6E9+dWsWu7a01JgTxRqRwvR0ohL03wLGJwfVUAMNTbbMd5ghjpxAtHvydUbQwbrkRlJ383Ym2FyKw/YvbioTxy/d/HKSdb7UFa3wVwK1RMR4lveD+NzbAv6LchiOGWOpri6j1Vi07ZP598+99jn8ZNHASoluwaYTPZ735cVeM7p/KszQCTVF2Vppd7sMxfvwYZJTDL1kHHQWF+1iuOr5uGo13u9K8dsg/9dy+HN2hCgs7VhPkAwIGLzSXYs8yr7Q8KGHzpleZsQIvXQVg9d53g/n8Gvjnat51qHiSfnte3ZVg8B57FHVF5SrpuZuCV1aKKUVuNdZHt8sw33cEe9CBJoOmUxWT2p1TqTWrHdzHXbaRCrYK0l+dtXks2eBoLxHXd8Bb82/shnNoGLDg==
+X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(136003)(39860400002)(46966005)(30864003)(47076004)(82740400003)(8676002)(1076003)(83380400001)(7696005)(82310400003)(8936002)(55016002)(54906003)(5660300002)(110136005)(186003)(86362001)(33310700002)(426003)(2616005)(336012)(26005)(36756003)(478600001)(70206006)(6666004)(4326008)(316002)(70586007)(107886003)(6286002)(356005)(7636003)(2906002)(2101003)(579004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: micron.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2020 16:28:11.5384
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2020 16:28:13.2564
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d87edd09-be7d-4cfd-e7de-08d86ecbcfd5
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5db479c-4c9e-4121-730d-08d86ecbd0d9
 X-MS-Exchange-CrossTenant-Id: f38a5ecd-2813-4862-b11b-ac1d563c806f
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f38a5ecd-2813-4862-b11b-ac1d563c806f;Ip=[137.201.242.130];Helo=[mail.micron.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1NAM01FT051.eop-nam01.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: SN1NAM01FT015.eop-nam01.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR08MB2438
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR08MB4570
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Mpool metadata is stored in metadata containers (MDC). An
-mpool can have a maximum of 256 MDCs, MDC-0 through MDC-255.
-The following metadata manager functionality is added here
-for object persistence:
+This adds the open, release and mpool management ioctls for
+the mpool driver.
 
-- Initialize and validate MDC0
-- Allocate and initialize MDC 1-N. An mpool is created with
-  16 MDCs to provide the requisite concurrency.
-- Dynamically scale up the number of MDCs when running low
-  on space and the garbage is below a certain threshold
-  across all MDCs
-- Deserialize metadata records from MDC 0-N at mpool activation
-  and setup the corresponding in-memory structures
-- Pre-compact MDC-K based on its usage and if the garbage in
-  MDC-K is above a certain threshold. A pre-compacting MDC is
-  not chosen for object allocation.
+The create, destroy, activate, deactivate and rename ioctls
+are issued to the mpool control device (/dev/mpoolctl),
+and the rest are issued to the mpool device
+(/dev/mpool/<mpool_name>).
 
-MDC0 is a distinguished container that stores both the metadata
-for accessing MDC-1 through MDC-255 and all mpool properties.
-MDC-1 through MDC-255 store the metadata for accessing client
-allocated mblocks and mlogs. Metadata for accessing the mlogs
-comprising MDC-0 is in the superblock for the capacity media
-class.
+The mpool control device is owned by (root, disk) with
+mode 0664. Non-default uid, gid and mode can be assigned to
+an mpool device either at create time or post creation using
+the params set ioctl.
 
-In the context of MDC-1/255, compacting MDC-K is simply
-serializing the in-memory metadata for accessing the still-live
-client objects associated with MDC-K. In the context of MDC-0,
-compacting is simply serializing the in-memory mpool properties
-and in-memory metadata for accessing MDC-1/255.
+Both the per-mpool and common parameters are available in
+the sysfs device tree path created by the kernel for each mpool
+device minor (/sys/devices/virtual/mpool). Mpool parameters
+cannot be changed via the sysfs tree at this point.
 
-An instance of struct pmd_mdc_info is created for each MDC in
-an mpool. This struct hosts both the uncommitted and committed
-object trees and a lock protecting each of the two trees.
-Compacting an MDC requires freezing both the list of committed
-objects in that MDC and the metadata for those objects,
-which is facilitated by the compact lock in each MDC instance.
+The mpool management ioctl handlers invoke the mpool lifecycle
+management routines to administer mpools. Activating an mpool
+creates a unit object which stores some key information like
+reference to the device object, reference to the mpc_mpool
+instance containing the per-mpool private data, device props,
+ownership and mode bits, device open count, flags etc. The
+per-mpool parameters are persisted in MDC0 at activation.
+
+Deactivating an mpool tears down the unit object and releases
+all its associated resources.
+
+An mpool can be renamed only when it's deactivated.  Renaming
+an mpool updates the superblock on all its constituent storage
+volumes with the new mpool name.
 
 Co-developed-by: Greg Becker <gbecker@micron.com>
 Signed-off-by: Greg Becker <gbecker@micron.com>
@@ -164,2107 +160,1615 @@ Co-developed-by: John Groves <jgroves@micron.com>
 Signed-off-by: John Groves <jgroves@micron.com>
 Signed-off-by: Nabeel M Mohamed <nmeeramohide@micron.com>
 ---
- drivers/mpool/pmd.c     | 2046 +++++++++++++++++++++++++++++++++++++++
- drivers/mpool/pmd_obj.c |    8 -
- 2 files changed, 2046 insertions(+), 8 deletions(-)
- create mode 100644 drivers/mpool/pmd.c
+ drivers/mpool/mpctl.c | 1560 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1560 insertions(+)
 
-diff --git a/drivers/mpool/pmd.c b/drivers/mpool/pmd.c
-new file mode 100644
-index 000000000000..07e08b5eed43
---- /dev/null
-+++ b/drivers/mpool/pmd.c
-@@ -0,0 +1,2046 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
-+ */
+diff --git a/drivers/mpool/mpctl.c b/drivers/mpool/mpctl.c
+index 21eb7ac4610b..de62f9a5524d 100644
+--- a/drivers/mpool/mpctl.c
++++ b/drivers/mpool/mpctl.c
+@@ -80,6 +80,9 @@ static struct mpc_softstate mpc_softstate;
+ static unsigned int mpc_ctl_uid __read_mostly;
+ static unsigned int mpc_ctl_gid __read_mostly = 6;
+ static unsigned int mpc_ctl_mode __read_mostly = 0664;
++static unsigned int mpc_default_uid __read_mostly;
++static unsigned int mpc_default_gid __read_mostly = 6;
++static unsigned int mpc_default_mode __read_mostly = 0660;
+ 
+ static const struct mpc_uinfo mpc_uinfo_ctl = {
+ 	.ui_typename = "mpoolctl",
+@@ -111,6 +114,202 @@ static inline gid_t mpc_current_gid(void)
+ 	return from_kgid(current_user_ns(), current_gid());
+ }
+ 
++#define MPC_MPOOL_PARAMS_CNT     7
 +
-+/*
-+ * DOC: Module info.
-+ *
-+ * Pool metadata (pmd) module.
-+ *
-+ * Defines functions for probing, reading, and writing drives in an mpool.
-+ *
-+ */
-+
-+#include <linux/workqueue.h>
-+#include <linux/atomic.h>
-+#include <linux/rwsem.h>
-+#include <linux/mutex.h>
-+#include <linux/slab.h>
-+
-+#include "assert.h"
-+#include "mpool_printk.h"
-+
-+#include "mpool_ioctl.h"
-+#include "mdc.h"
-+#include "upgrade.h"
-+#include "smap.h"
-+#include "omf_if.h"
-+#include "mpcore.h"
-+#include "pmd.h"
-+
-+static DEFINE_MUTEX(pmd_s_lock);
-+
-+#define pmd_co_foreach(_cinfo, _node) \
-+	for ((_node) = rb_first(&(_cinfo)->mmi_co_root); (_node); (_node) = rb_next((_node)))
-+
-+static int pmd_mdc0_validate(struct mpool_descriptor *mp, int activation);
-+
-+static void pmd_mda_init(struct mpool_descriptor *mp)
++static ssize_t mpc_uid_show(struct device *dev, struct device_attribute *da, char *buf)
 +{
-+	int i;
-+
-+	spin_lock_init(&mp->pds_mda.mdi_slotvlock);
-+	mp->pds_mda.mdi_slotvcnt = 0;
-+
-+	for (i = 0; i < MDC_SLOTS; ++i) {
-+		struct pmd_mdc_info *pmi = mp->pds_mda.mdi_slotv + i;
-+
-+		mutex_init(&pmi->mmi_compactlock);
-+		mutex_init(&pmi->mmi_uc_lock);
-+		pmi->mmi_uc_root = RB_ROOT;
-+		init_rwsem(&pmi->mmi_co_lock);
-+		pmi->mmi_co_root = RB_ROOT;
-+		mutex_init(&pmi->mmi_uqlock);
-+		pmi->mmi_luniq = 0;
-+		pmi->mmi_recbuf = NULL;
-+		pmi->mmi_lckpt = objid_make(0, OMF_OBJ_UNDEF, i);
-+		memset(&pmi->mmi_stats, 0, sizeof(pmi->mmi_stats));
-+
-+		/*
-+		 * Initial mpool metadata content version.
-+		 */
-+		pmi->mmi_mdcver.mdcv_major = 1;
-+		pmi->mmi_mdcver.mdcv_minor = 0;
-+		pmi->mmi_mdcver.mdcv_patch = 0;
-+		pmi->mmi_mdcver.mdcv_dev   = 0;
-+
-+		pmi->mmi_credit.ci_slot = i;
-+
-+		mutex_init(&pmi->mmi_stats_lock);
-+	}
-+
-+	mp->pds_mda.mdi_slotv[1].mmi_luniq = UROOT_OBJID_MAX;
-+	mp->pds_mda.mdi_sel.mds_tbl_idx.counter = 0;
++	return scnprintf(buf, PAGE_SIZE, "%d\n", dev_to_unit(dev)->un_uid);
 +}
 +
-+static void pmd_mda_free(struct mpool_descriptor *mp)
++static ssize_t mpc_gid_show(struct device *dev, struct device_attribute *da, char *buf)
 +{
-+	int sidx;
-+
-+	/*
-+	 * close mdc0 last because closing other mdc logs can result in
-+	 * mdc0 updates
-+	 */
-+	for (sidx = mp->pds_mda.mdi_slotvcnt - 1; sidx > -1; sidx--) {
-+		struct pmd_layout      *layout, *tmp;
-+		struct pmd_mdc_info    *cinfo;
-+
-+		cinfo = &mp->pds_mda.mdi_slotv[sidx];
-+
-+		mp_mdc_close(cinfo->mmi_mdc);
-+		kfree(cinfo->mmi_recbuf);
-+		cinfo->mmi_recbuf = NULL;
-+
-+		/* Release committed objects... */
-+		rbtree_postorder_for_each_entry_safe(
-+			layout, tmp, &cinfo->mmi_co_root, eld_nodemdc) {
-+
-+			pmd_obj_put(layout);
-+		}
-+
-+		/* Release uncommitted objects... */
-+		rbtree_postorder_for_each_entry_safe(
-+			layout, tmp, &cinfo->mmi_uc_root, eld_nodemdc) {
-+
-+			pmd_obj_put(layout);
-+		}
-+	}
++	return scnprintf(buf, PAGE_SIZE, "%d\n", dev_to_unit(dev)->un_gid);
 +}
 +
-+static int pmd_mdc0_init(struct mpool_descriptor *mp, struct pmd_layout *mdc01,
-+		     struct pmd_layout *mdc02)
++static ssize_t mpc_mode_show(struct device *dev, struct device_attribute *da, char *buf)
 +{
-+	struct pmd_mdc_info *cinfo = &mp->pds_mda.mdi_slotv[0];
++	return scnprintf(buf, PAGE_SIZE, "0%o\n", dev_to_unit(dev)->un_mode);
++}
++
++static ssize_t mpc_ra_show(struct device *dev, struct device_attribute *da, char *buf)
++{
++	return scnprintf(buf, PAGE_SIZE, "%u\n", dev_to_unit(dev)->un_ra_pages_max);
++}
++
++static ssize_t mpc_label_show(struct device *dev, struct device_attribute *da, char *buf)
++{
++	return scnprintf(buf, PAGE_SIZE, "%s\n", dev_to_unit(dev)->un_label);
++}
++
++static ssize_t mpc_type_show(struct device *dev, struct device_attribute *da, char *buf)
++{
++	struct mpool_uuid  uuid;
++	char               uuid_str[MPOOL_UUID_STRING_LEN + 1] = { };
++
++	memcpy(uuid.uuid, dev_to_unit(dev)->un_utype.b, MPOOL_UUID_SIZE);
++	mpool_unparse_uuid(&uuid, uuid_str);
++
++	return scnprintf(buf, PAGE_SIZE, "%s\n", uuid_str);
++}
++
++static void mpc_mpool_params_add(struct device_attribute *dattr)
++{
++	MPC_ATTR_RO(dattr++, uid);
++	MPC_ATTR_RO(dattr++, gid);
++	MPC_ATTR_RO(dattr++, mode);
++	MPC_ATTR_RO(dattr++, ra);
++	MPC_ATTR_RO(dattr++, label);
++	MPC_ATTR_RO(dattr,   type);
++}
++
++static int mpc_params_register(struct mpc_unit *unit, int cnt)
++{
++	struct device_attribute *dattr;
++	struct mpc_attr *attr;
 +	int rc;
 +
-+	cinfo->mmi_recbuf = kzalloc(OMF_MDCREC_PACKLEN_MAX, GFP_KERNEL);
-+	if (!cinfo->mmi_recbuf) {
-+		rc = -ENOMEM;
-+		mp_pr_err("mpool %s, log rec buffer alloc %zu failed",
-+			  rc, mp->pds_name, OMF_MDCREC_PACKLEN_MAX);
-+		return rc;
-+	}
++	attr = mpc_attr_create(unit->un_device, "parameters", cnt);
++	if (!attr)
++		return -ENOMEM;
 +
-+	/*
-+	 * we put the mdc0 mlog layouts in mdc 0 because mdc0 mlog objids have a
-+	 * slot # of 0 so the rest of the code expects to find the layout there.
-+	 * this allows the majority of the code to treat mdc0 mlog metadata
-+	 * exactly the same as for mdcN (and user mlogs), even though mdc0
-+	 * metadata is actually stored in superblocks.  however there are a few
-+	 * places that need to recognize mdc0 mlogs are special, including
-+	 * pmd_mdc_compact() and pmd_obj_erase().
-+	 */
++	dattr = attr->a_dattr;
 +
-+	mp->pds_mda.mdi_slotvcnt = 1;
-+	pmd_co_insert(cinfo, mdc01);
-+	pmd_co_insert(cinfo, mdc02);
++	/* Per-mpool parameters */
++	if (mpc_unit_ismpooldev(unit))
++		mpc_mpool_params_add(dattr);
 +
-+	rc = mp_mdc_open(mp, mdc01->eld_objid, mdc02->eld_objid, MDC_OF_SKIP_SER, &cinfo->mmi_mdc);
++	rc = mpc_attr_group_create(attr);
 +	if (rc) {
-+		mp_pr_err("mpool %s, MDC0 open failed", rc, mp->pds_name);
-+
-+		pmd_co_remove(cinfo, mdc01);
-+		pmd_co_remove(cinfo, mdc02);
-+
-+		kfree(cinfo->mmi_recbuf);
-+		cinfo->mmi_recbuf = NULL;
-+
-+		mp->pds_mda.mdi_slotvcnt = 0;
-+	}
-+
-+	return rc;
-+}
-+
-+/**
-+ * pmd_mdc0_validate() -
-+ * @mp:
-+ * @activation:
-+ *
-+ * Called during mpool activation and mdc alloc because a failed
-+ * mdc alloc can result in extraneous mdc mlog objects which if
-+ * found we attempt to clean-up here. when called during activation
-+ * we may need to adjust mp.mda. this is not so when called from
-+ * mdc alloc and in fact decreasing slotvcnt post activation would
-+ * violate a key invariant.
-+ */
-+static int pmd_mdc0_validate(struct mpool_descriptor *mp, int activation)
-+{
-+	struct pmd_mdc_info *cinfo;
-+	struct pmd_layout *layout;
-+	struct rb_node *node;
-+	int err = 0, err1, err2, i;
-+	u64 mdcn, mdcmax = 0;
-+	u64 logid1, logid2;
-+	u16 slotvcnt;
-+	u8 *lcnt;
-+
-+	/*
-+	 * Activation is single-threaded and mdc alloc is serialized
-+	 * so the number of active mdc (slotvcnt) will not change.
-+	 */
-+	spin_lock(&mp->pds_mda.mdi_slotvlock);
-+	slotvcnt = mp->pds_mda.mdi_slotvcnt;
-+	spin_unlock(&mp->pds_mda.mdi_slotvlock);
-+
-+	if (!slotvcnt) {
-+		/* Must be at least mdc0 */
-+		err = -EINVAL;
-+		mp_pr_err("mpool %s, no MDC0", err, mp->pds_name);
-+		return err;
-+	}
-+
-+	cinfo = &mp->pds_mda.mdi_slotv[0];
-+
-+	lcnt = kcalloc(MDC_SLOTS, sizeof(*lcnt), GFP_KERNEL);
-+	if (!lcnt) {
-+		err = -ENOMEM;
-+		mp_pr_err("mpool %s, lcnt alloc failed", err, mp->pds_name);
-+		return err;
-+	}
-+
-+	pmd_co_rlock(cinfo, 0);
-+
-+	pmd_co_foreach(cinfo, node) {
-+		layout = rb_entry(node, typeof(*layout), eld_nodemdc);
-+
-+		mdcn = objid_uniq(layout->eld_objid) >> 1;
-+		if (mdcn < MDC_SLOTS) {
-+			lcnt[mdcn] = lcnt[mdcn] + 1;
-+			mdcmax = max(mdcmax, mdcn);
-+		}
-+		if (mdcn >= MDC_SLOTS || lcnt[mdcn] > 2 ||
-+		    objid_type(layout->eld_objid) != OMF_OBJ_MLOG ||
-+		    objid_slot(layout->eld_objid)) {
-+			err = -EINVAL;
-+			mp_pr_err("mpool %s, MDC0 number of MDCs %lu %u or bad otype, objid 0x%lx",
-+				  err, mp->pds_name, (ulong)mdcn,
-+				  lcnt[mdcn], (ulong)layout->eld_objid);
-+			break;
-+		}
-+	}
-+
-+	pmd_co_runlock(cinfo);
-+
-+	if (err)
-+		goto exit;
-+
-+	if (!mdcmax) {
-+		/*
-+		 * trivial case of mdc0 only; no mdc alloc failure to
-+		 * clean-up
-+		 */
-+		if (lcnt[0] != 2 || slotvcnt != 1) {
-+			err = -EINVAL;
-+			mp_pr_err("mpool %s, inconsistent number of MDCs or slots %d %d",
-+				  err, mp->pds_name, lcnt[0], slotvcnt);
-+		}
-+
-+		goto exit;
-+	}
-+
-+	if ((mdcmax != (slotvcnt - 1)) && mdcmax != slotvcnt) {
-+		err = -EINVAL;
-+
-+		/*
-+		 * mdcmax is normally slotvcnt-1; can be slotvcnt if
-+		 * mdc alloc failed
-+		 */
-+		mp_pr_err("mpool %s, inconsistent max number of MDCs %lu %u",
-+			  err, mp->pds_name, (ulong)mdcmax, slotvcnt);
-+		goto exit;
-+	}
-+
-+	/* Both logs must always exist below mdcmax */
-+	for (i = 0; i < mdcmax; i++) {
-+		if (lcnt[i] != 2) {
-+			err = -ENOENT;
-+			mp_pr_err("mpool %s, MDC0 missing mlogs %lu %d %u",
-+				  err, mp->pds_name, (ulong)mdcmax, i, lcnt[i]);
-+			goto exit;
-+		}
-+	}
-+
-+	/* Clean-up from failed mdc alloc if needed */
-+	if (lcnt[mdcmax] != 2 || mdcmax == slotvcnt) {
-+		/* Note: if activation then mdcmax == slotvcnt-1 always */
-+		err1 = 0;
-+		err2 = 0;
-+		logid1 = logid_make(2 * mdcmax, 0);
-+		logid2 = logid_make(2 * mdcmax + 1, 0);
-+
-+		layout = pmd_obj_find_get(mp, logid1, 1);
-+		if (layout) {
-+			err1 = pmd_obj_delete(mp, layout);
-+			if (err1)
-+				mp_pr_err("mpool %s, MDC0 %d, can't delete mlog %lu %lu %u %u",
-+					  err1, mp->pds_name, activation, (ulong)logid1,
-+					  (ulong)mdcmax, lcnt[mdcmax], slotvcnt);
-+		}
-+
-+		layout = pmd_obj_find_get(mp, logid2, 1);
-+		if (layout) {
-+			err2 = pmd_obj_delete(mp, layout);
-+			if (err2)
-+				mp_pr_err("mpool %s, MDC0 %d, can't delete mlog %lu %lu %u %u",
-+					  err2, mp->pds_name, activation, (ulong)logid2,
-+					  (ulong)mdcmax, lcnt[mdcmax], slotvcnt);
-+		}
-+
-+		if (activation) {
-+			/*
-+			 * Mpool activation can ignore mdc alloc clean-up
-+			 * failures; single-threaded; don't need slotvlock
-+			 * or uqlock to adjust mda
-+			 */
-+			cinfo->mmi_luniq = mdcmax - 1;
-+			mp->pds_mda.mdi_slotvcnt = mdcmax;
-+			mp_pr_warn("mpool %s, MDC0 alloc recovery: uniq %llu slotvcnt %d",
-+				   mp->pds_name, (unsigned long long)cinfo->mmi_luniq,
-+				   mp->pds_mda.mdi_slotvcnt);
-+		} else {
-+			/* MDC alloc cannot tolerate clean-up failures */
-+			if (err1)
-+				err = err1;
-+			else if (err2)
-+				err = err2;
-+
-+			if (err)
-+				mp_pr_err("mpool %s, MDC0 alloc recovery, cleanup failed %lu %u %u",
-+					  err, mp->pds_name, (ulong)mdcmax, lcnt[mdcmax], slotvcnt);
-+			else
-+				mp_pr_warn("mpool %s, MDC0 alloc recovery", mp->pds_name);
-+
-+		}
-+	}
-+
-+exit:
-+	kfree(lcnt);
-+
-+	return err;
-+}
-+
-+int pmd_mdc_alloc(struct mpool_descriptor *mp, u64 mincap, u32 iter)
-+{
-+	struct pmd_obj_capacity ocap;
-+	enum mp_media_classp mclassp;
-+	struct pmd_mdc_info *cinfo, *cinew;
-+	struct pmd_layout *layout1, *layout2;
-+	const char *msg = "(no detail)";
-+	u64 mdcslot, logid1, logid2;
-+	bool reverse = false;
-+	u32 pdcnt;
-+	int err;
-+
-+	/*
-+	 * serialize to prevent gap in mdc slot space in event of failure
-+	 */
-+	mutex_lock(&pmd_s_lock);
-+
-+	/*
-+	 * recover previously failed mdc alloc if needed; cannot continue
-+	 * if fails
-+	 * note: there is an unlikely corner case where we logically delete an
-+	 * mlog from a previously failed mdc alloc but a background op is
-+	 * preventing its full removal; this will show up later in this
-+	 * fn as a failed alloc.
-+	 */
-+	err = pmd_mdc0_validate(mp, 0);
-+	if (err) {
-+		mutex_unlock(&pmd_s_lock);
-+
-+		mp_pr_err("mpool %s, allocating an MDC, inconsistent MDC0", err, mp->pds_name);
-+		return err;
-+	}
-+
-+	/* MDC0 exists by definition; created as part of mpool creation */
-+	cinfo = &mp->pds_mda.mdi_slotv[0];
-+
-+	pmd_mdc_lock(&cinfo->mmi_uqlock, 0);
-+	mdcslot = cinfo->mmi_luniq;
-+	pmd_mdc_unlock(&cinfo->mmi_uqlock);
-+
-+	if (mdcslot >= MDC_SLOTS - 1) {
-+		mutex_unlock(&pmd_s_lock);
-+
-+		err = -ENOSPC;
-+		mp_pr_err("mpool %s, allocating an MDC, too many %lu",
-+			  err, mp->pds_name, (ulong)mdcslot);
-+		return err;
-+	}
-+	mdcslot = mdcslot + 1;
-+
-+	/*
-+	 * Alloc rec buf for new mdc slot; not visible so don't need to
-+	 * lock fields.
-+	 */
-+	cinew = &mp->pds_mda.mdi_slotv[mdcslot];
-+	cinew->mmi_recbuf = kzalloc(OMF_MDCREC_PACKLEN_MAX, GFP_KERNEL);
-+	if (!cinew->mmi_recbuf) {
-+		mutex_unlock(&pmd_s_lock);
-+
-+		mp_pr_warn("mpool %s, MDC%lu pack/unpack buf alloc failed %lu",
-+			   mp->pds_name, (ulong)mdcslot, (ulong)OMF_MDCREC_PACKLEN_MAX);
-+		return -ENOMEM;
-+	}
-+	cinew->mmi_credit.ci_slot = mdcslot;
-+
-+	mclassp = MP_MED_CAPACITY;
-+	pdcnt = 1;
-+
-+	/*
-+	 * Create new mdcs with same parameters and on same media class
-+	 * as mdc0.
-+	 */
-+	ocap.moc_captgt = mincap;
-+	ocap.moc_spare  = false;
-+
-+	logid1 = logid_make(2 * mdcslot, 0);
-+	logid2 = logid_make(2 * mdcslot + 1, 0);
-+
-+	if (!(pdcnt & 0x1) && ((iter * 2 / pdcnt) & 0x1)) {
-+		/*
-+		 * Reverse the allocation order.
-+		 * The goal is to have active mlogs on all the mpool PDs.
-+		 * If 2 PDs, no parity, no reserve, the active mlogs
-+		 * will be on PDs 0,1,0,1,0,1,0,1 etc
-+		 * instead of 0,0,0,0,0 etc without reversing.
-+		 * No need to reverse if the number of PDs is odd.
-+		 */
-+		reverse = true;
-+	}
-+
-+	/*
-+	 * Each mlog must meet mincap since only one is active at a
-+	 * time.
-+	 */
-+	layout1 = NULL;
-+	err = pmd_obj_alloc_cmn(mp, reverse ? logid2 : logid1, OMF_OBJ_MLOG,
-+				&ocap, mclassp, 0, false, &layout1);
-+	if (err) {
-+		if (err != -ENOENT)
-+			msg = "allocation of first mlog failed";
-+		goto exit;
-+	}
-+
-+	layout2 = NULL;
-+	err = pmd_obj_alloc_cmn(mp, reverse ? logid1 : logid2, OMF_OBJ_MLOG,
-+				&ocap, mclassp, 0, false, &layout2);
-+	if (err) {
-+		pmd_obj_abort(mp, layout1);
-+		if (err != -ENOENT)
-+			msg = "allocation of second mlog failed";
-+		goto exit;
-+	}
-+
-+	/*
-+	 * Must erase before commit to guarantee new mdc logs start
-+	 * empty; mlogs not committed so pmd_obj_erase()
-+	 * not needed to make atomic.
-+	 */
-+	pmd_obj_wrlock(layout1);
-+	err = pmd_layout_erase(mp, layout1);
-+	pmd_obj_wrunlock(layout1);
-+
-+	if (err) {
-+		msg = "erase of first mlog failed";
-+	} else {
-+		pmd_obj_wrlock(layout2);
-+		err = pmd_layout_erase(mp, layout2);
-+		pmd_obj_wrunlock(layout2);
-+
-+		if (err)
-+			msg = "erase of second mlog failed";
-+	}
-+	if (err) {
-+		pmd_obj_abort(mp, layout1);
-+		pmd_obj_abort(mp, layout2);
-+		goto exit;
-+	}
-+
-+	/*
-+	 * don't need to commit logid1 and logid2 atomically; mdc0
-+	 * validation deletes non-paired mdc logs to handle failing part
-+	 * way through this process
-+	 */
-+	err = pmd_obj_commit(mp, layout1);
-+	if (err) {
-+		pmd_obj_abort(mp, layout1);
-+		pmd_obj_abort(mp, layout2);
-+		msg = "commit of first mlog failed";
-+		goto exit;
-+	} else {
-+		err = pmd_obj_commit(mp, layout2);
-+		if (err) {
-+			pmd_obj_delete(mp, layout1);
-+			pmd_obj_abort(mp, layout2);
-+			msg = "commit of second mlog failed";
-+			goto exit;
-+		}
-+	}
-+
-+	/*
-+	 * Finalize new mdc slot before making visible; don't need to
-+	 * lock fields.
-+	 */
-+	err = mp_mdc_open(mp, logid1, logid2, MDC_OF_SKIP_SER, &cinew->mmi_mdc);
-+	if (err) {
-+		msg = "mdc open failed";
-+
-+		/* Failed open so just delete logid1/2; don't
-+		 * need to delete atomically since mdc0 validation
-+		 * will cleanup any detritus
-+		 */
-+		pmd_obj_delete(mp, layout1);
-+		pmd_obj_delete(mp, layout2);
-+		goto exit;
-+	}
-+
-+	/*
-+	 * Append the version record.
-+	 */
-+	if (omfu_mdcver_cmp2(omfu_mdcver_cur(), ">=", 1, 0, 0, 1)) {
-+		err = pmd_mdc_addrec_version(mp, mdcslot);
-+		if (err) {
-+			msg = "error adding the version record";
-+			/*
-+			 * No version record in a MDC will trigger a MDC
-+			 * compaction if a activate is attempted later with this
-+			 * empty MDC.
-+			 * The compaction will add the version record in that
-+			 * empty MDC.
-+			 * Same error handling as above.
-+			 */
-+			pmd_obj_delete(mp, layout1);
-+			pmd_obj_delete(mp, layout2);
-+			goto exit;
-+		}
-+	}
-+
-+	/* Make new mdc visible */
-+	pmd_mdc_lock(&cinfo->mmi_uqlock, 0);
-+
-+	spin_lock(&mp->pds_mda.mdi_slotvlock);
-+	cinfo->mmi_luniq = mdcslot;
-+	mp->pds_mda.mdi_slotvcnt = mdcslot + 1;
-+	spin_unlock(&mp->pds_mda.mdi_slotvlock);
-+
-+	pmd_mdc_unlock(&cinfo->mmi_uqlock);
-+
-+exit:
-+	if (err) {
-+		kfree(cinew->mmi_recbuf);
-+		cinew->mmi_recbuf = NULL;
-+	}
-+
-+	mutex_unlock(&pmd_s_lock);
-+
-+	mp_pr_debug("new mdc logid1 %llu logid2 %llu",
-+		    0, (unsigned long long)logid1, (unsigned long long)logid2);
-+
-+	if (err) {
-+		mp_pr_err("mpool %s, MDC%lu: %s", err, mp->pds_name, (ulong)mdcslot, msg);
-+
-+	} else {
-+		mp_pr_debug("mpool %s, delta slotvcnt from %u to %llu", 0, mp->pds_name,
-+			    mp->pds_mda.mdi_slotvcnt, (unsigned long long)mdcslot + 1);
-+
-+	}
-+	return err;
-+}
-+
-+/**
-+ * pmd_mdc_alloc_set() - allocates a set of MDCs
-+ * @mp: mpool descriptor
-+ *
-+ * Creates MDCs in multiple of MPOOL_MDC_SET_SZ. If allocation had
-+ * failed in prior iteration allocate MDCs to make it even multiple
-+ * of MPOOL_MDC_SET_SZ.
-+ *
-+ * Locking: lock should not be held when calling this function.
-+ */
-+static void pmd_mdc_alloc_set(struct mpool_descriptor *mp)
-+{
-+	u8 mdc_cnt, sidx;
-+	int rc;
-+
-+	/*
-+	 * MDCs are created in multiple of MPOOL_MDC_SET_SZ.
-+	 * However, if past allocation had failed there may not be an
-+	 * even multiple of MDCs in that case create any remaining
-+	 * MDCs to get an even multiple.
-+	 */
-+	mdc_cnt =  MPOOL_MDC_SET_SZ - ((mp->pds_mda.mdi_slotvcnt - 1) % MPOOL_MDC_SET_SZ);
-+
-+	mdc_cnt = min(mdc_cnt, (u8)(MDC_SLOTS - (mp->pds_mda.mdi_slotvcnt)));
-+
-+	for (sidx = 1; sidx <= mdc_cnt; sidx++) {
-+		rc = pmd_mdc_alloc(mp, mp->pds_params.mp_mdcncap, 0);
-+		if (rc) {
-+			mp_pr_err("mpool %s, only %u of %u MDCs created",
-+				  rc, mp->pds_name, sidx-1, mdc_cnt);
-+
-+			/*
-+			 * For MDCN creation failure ignore the error.
-+			 * Attempt to create any remaining MDC next time
-+			 * next time new mdcs are required.
-+			 */
-+			rc = 0;
-+			break;
-+		}
-+	}
-+}
-+
-+/**
-+ * pmd_cmp_drv_mdc0() - compare the drive info read from the MDC0 drive list
-+ *	to what is obtained from the drive itself or from the configuration.
-+ * @mp:
-+ * @pdh:
-+ * @omd:
-+ *
-+ * The drive is in list passed to mpool open or an UNAVAIL mdc0 drive.
-+ */
-+static int pmd_cmp_drv_mdc0(struct mpool_descriptor *mp, u8 pdh,
-+			    struct omf_devparm_descriptor *omd)
-+{
-+	const char *msg __maybe_unused;
-+	struct mc_parms mcp_mdc0list, mcp_pd;
-+	struct mpool_dev_info *pd;
-+
-+	pd = &mp->pds_pdv[pdh];
-+
-+	mc_pd_prop2mc_parms(&(pd->pdi_parm.dpr_prop), &mcp_pd);
-+	mc_omf_devparm2mc_parms(omd, &mcp_mdc0list);
-+
-+	if (!memcmp(&mcp_pd, &mcp_mdc0list, sizeof(mcp_pd)))
-+		return 0;
-+
-+	if (mpool_pd_status_get(pd) == PD_STAT_UNAVAIL)
-+		msg = "UNAVAIL mdc0 drive parms don't match those in drive list record";
-+	else
-+		msg = "mismatch between MDC0 drive list record and drive parms";
-+
-+	mp_pr_warn("mpool %s, %s for %s, mclassp %d %d zonepg %u %u sectorsz %u %u devtype %u %u features %lu %lu",
-+		   mp->pds_name, msg, pd->pdi_name, mcp_pd.mcp_classp, mcp_mdc0list.mcp_classp,
-+		   mcp_pd.mcp_zonepg, mcp_mdc0list.mcp_zonepg, mcp_pd.mcp_sectorsz,
-+		   mcp_mdc0list.mcp_sectorsz, mcp_pd.mcp_devtype, mcp_mdc0list.mcp_devtype,
-+		   (ulong)mcp_pd.mcp_features, (ulong)mcp_mdc0list.mcp_features);
-+
-+	return -EINVAL;
-+}
-+
-+static const char *msg_unavail1 __maybe_unused =
-+	"defunct and unavailable drive still belong to the mpool";
-+
-+static const char *msg_unavail2 __maybe_unused =
-+	"defunct and available drive still belong to the mpool";
-+
-+static int pmd_props_load(struct mpool_descriptor *mp)
-+{
-+	struct omf_devparm_descriptor netdev[MP_MED_NUMBER] = { };
-+	struct omf_mdcrec_data *cdr;
-+	enum mp_media_classp mclassp;
-+	struct pmd_mdc_info *cinfo;
-+	struct media_class *mc;
-+	bool zombie[MPOOL_DRIVES_MAX];
-+	int spzone[MP_MED_NUMBER], i;
-+	size_t rlen = 0;
-+	u64 pdh, buflen;
-+	int err;
-+
-+	cinfo = &mp->pds_mda.mdi_slotv[0];
-+	buflen = OMF_MDCREC_PACKLEN_MAX;
-+
-+	/*  Note: single threaded here so don't need any locks */
-+
-+	/* Set mpool properties to defaults; overwritten by property records (if any). */
-+	for (mclassp = 0; mclassp < MP_MED_NUMBER; mclassp++)
-+		spzone[mclassp] = -1;
-+
-+	/*
-+	 * read mdc0 to capture net of drives, content version & other
-+	 * properties; ignore obj records
-+	 */
-+	err = mp_mdc_rewind(cinfo->mmi_mdc);
-+	if (err) {
-+		mp_pr_err("mpool %s, MDC0 init for read properties failed", err, mp->pds_name);
-+		return err;
-+	}
-+
-+	cdr = kzalloc(sizeof(*cdr), GFP_KERNEL);
-+	if (!cdr) {
-+		err = -ENOMEM;
-+		mp_pr_err("mpool %s, cdr alloc failed", err, mp->pds_name);
-+		return err;
-+	}
-+
-+	while (true) {
-+		err = mp_mdc_read(cinfo->mmi_mdc, cinfo->mmi_recbuf, buflen, &rlen);
-+		if (err) {
-+			mp_pr_err("mpool %s, MDC0 read next failed %lu",
-+				  err, mp->pds_name, (ulong)rlen);
-+			break;
-+		}
-+		if (rlen == 0)
-+			/* Hit end of log */
-+			break;
-+
-+		/*
-+		 * skip object-related mdcrec in mdc0; not ready to unpack
-+		 * these yet
-+		 */
-+		if (omf_mdcrec_isobj_le(cinfo->mmi_recbuf))
-+			continue;
-+
-+		err = omf_mdcrec_unpack_letoh(&(cinfo->mmi_mdcver), mp, cdr, cinfo->mmi_recbuf);
-+		if (err) {
-+			mp_pr_err("mpool %s, MDC0 property unpack failed", err, mp->pds_name);
-+			break;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_MCCONFIG) {
-+			struct omf_devparm_descriptor *src;
-+
-+			src = &cdr->u.dev.omd_parm;
-+			ASSERT(src->odp_mclassp < MP_MED_NUMBER);
-+
-+			memcpy(&netdev[src->odp_mclassp], src, sizeof(*src));
-+			continue;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_MCSPARE) {
-+			mclassp = cdr->u.mcs.omd_mclassp;
-+			if (mclass_isvalid(mclassp)) {
-+				spzone[mclassp] = cdr->u.mcs.omd_spzone;
-+			} else {
-+				err = -EINVAL;
-+
-+				/* Should never happen */
-+				mp_pr_err("mpool %s, MDC0 mclass spare record, invalid mclassp %u",
-+					  err, mp->pds_name, mclassp);
-+				break;
-+			}
-+			continue;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_VERSION) {
-+			cinfo->mmi_mdcver = cdr->u.omd_version;
-+			if (omfu_mdcver_cmp(&cinfo->mmi_mdcver, ">", omfu_mdcver_cur())) {
-+				char *buf1, *buf2 = NULL;
-+
-+				buf1 = kmalloc(2 * MAX_MDCVERSTR, GFP_KERNEL);
-+				if (buf1) {
-+					buf2 = buf1 + MAX_MDCVERSTR;
-+					omfu_mdcver_to_str(&cinfo->mmi_mdcver, buf1, sizeof(buf1));
-+					omfu_mdcver_to_str(omfu_mdcver_cur(), buf2, sizeof(buf2));
-+				}
-+
-+				err = -EOPNOTSUPP;
-+				mp_pr_err("mpool %s, MDC0 version %s, binary version %s",
-+					  err, mp->pds_name, buf1, buf2);
-+				kfree(buf1);
-+				break;
-+			}
-+			continue;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_MPCONFIG)
-+			mp->pds_cfg = cdr->u.omd_cfg;
-+	}
-+
-+	if (err) {
-+		kfree(cdr);
-+		return err;
-+	}
-+
-+	/* Reconcile net drive list with those in mpool descriptor */
-+	for (i = 0; i < mp->pds_pdvcnt; i++)
-+		zombie[i] = true;
-+
-+	for (i = 0; i < MP_MED_NUMBER; i++) {
-+		struct omf_devparm_descriptor *omd;
-+		int    j;
-+
-+		omd = &netdev[i];
-+
-+		if (mpool_uuid_is_null(&omd->odp_devid))
-+			continue;
-+
-+		j = mp->pds_pdvcnt;
-+		while (j--) {
-+			if (mpool_uuid_compare(&mp->pds_pdv[j].pdi_devid, &omd->odp_devid) == 0)
-+				break;
-+		}
-+
-+		if (j >= 0) {
-+			zombie[j] = false;
-+			err = pmd_cmp_drv_mdc0(mp, j, omd);
-+			if (err)
-+				break;
-+		} else {
-+			err = mpool_desc_unavail_add(mp, omd);
-+			if (err)
-+				break;
-+			zombie[mp->pds_pdvcnt - 1] = false;
-+		}
-+	}
-+
-+	/* Check for zombie drives and recompute uacnt[] */
-+	if (!err) {
-+		for (i = 0; i < MP_MED_NUMBER; i++) {
-+			mc = &mp->pds_mc[i];
-+			mc->mc_uacnt = 0;
-+		}
-+
-+		for (pdh = 0; pdh < mp->pds_pdvcnt; pdh++) {
-+			struct mpool_dev_info  *pd;
-+
-+			mc = &mp->pds_mc[mp->pds_pdv[pdh].pdi_mclass];
-+			pd = &mp->pds_pdv[pdh];
-+			if (zombie[pdh]) {
-+				char uuid_str[40];
-+
-+				mpool_unparse_uuid(&pd->pdi_devid, uuid_str);
-+				err = -ENXIO;
-+
-+				if (mpool_pd_status_get(pd) == PD_STAT_UNAVAIL)
-+					mp_pr_err("mpool %s, drive %s %s %s", err, mp->pds_name,
-+						   uuid_str, pd->pdi_name, msg_unavail1);
-+				else
-+					mp_pr_err("mpool %s, drive %s %s %s", err, mp->pds_name,
-+						  uuid_str, pd->pdi_name, msg_unavail2);
-+				break;
-+			} else if (mpool_pd_status_get(pd) == PD_STAT_UNAVAIL) {
-+				mc->mc_uacnt += 1;
-+			}
-+		}
-+	}
-+
-+	/*
-+	 * Now it is possible to update the percent spare because all
-+	 * the media classes of the mpool have been created because all
-+	 * the mpool PDs have been added in their classes.
-+	 */
-+	if (!err) {
-+		for (mclassp = 0; mclassp < MP_MED_NUMBER; mclassp++) {
-+			if (spzone[mclassp] >= 0) {
-+				err = mc_set_spzone(&mp->pds_mc[mclassp], spzone[mclassp]);
-+				/*
-+				 * Should never happen, it should exist a class
-+				 * with perf. level mclassp with a least 1 PD.
-+				 */
-+				if (err)
-+					break;
-+			}
-+		}
-+		if (err)
-+			mp_pr_err("mpool %s, can't set spare %u because the class %u has no PD",
-+				  err, mp->pds_name, spzone[mclassp], mclassp);
-+	}
-+
-+	kfree(cdr);
-+
-+	return err;
-+}
-+
-+static int pmd_objs_load(struct mpool_descriptor *mp, u8 cslot)
-+{
-+	struct omf_mdcrec_data *cdr = NULL;
-+	struct pmd_mdc_info *cinfo;
-+	struct rb_node *node;
-+	u64 argv[2] = { 0 };
-+	const char *msg;
-+	size_t recbufsz;
-+	char *recbuf;
-+	u64 mdcmax;
-+	int err;
-+
-+	/* Note: single threaded here so don't need any locks */
-+
-+	recbufsz = OMF_MDCREC_PACKLEN_MAX;
-+	msg = "(no detail)";
-+	mdcmax = 0;
-+
-+	cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+
-+	/* Initialize mdc if not mdc0. */
-+	if (cslot) {
-+		u64 logid1 = logid_make(2 * cslot, 0);
-+		u64 logid2 = logid_make(2 * cslot + 1, 0);
-+
-+		/* Freed in pmd_mda_free() */
-+		cinfo->mmi_recbuf = kmalloc(recbufsz, GFP_KERNEL);
-+		if (!cinfo->mmi_recbuf) {
-+			msg = "MDC recbuf alloc failed";
-+			err = -ENOMEM;
-+			goto errout;
-+		}
-+
-+		err = mp_mdc_open(mp, logid1, logid2, MDC_OF_SKIP_SER, &cinfo->mmi_mdc);
-+		if (err) {
-+			msg = "mdc open failed";
-+			goto errout;
-+		}
-+	}
-+
-+	/* Read mdc and capture net result of object data records. */
-+	err = mp_mdc_rewind(cinfo->mmi_mdc);
-+	if (err) {
-+		msg = "mdc rewind failed";
-+		goto errout;
-+	}
-+
-+	/* Cache these pointers to simplify the ensuing code. */
-+	recbuf = cinfo->mmi_recbuf;
-+
-+	cdr = kzalloc(sizeof(*cdr), GFP_KERNEL);
-+	if (!cdr) {
-+		msg = "cdr alloc failed";
-+		goto errout;
-+	}
-+
-+	while (true) {
-+		struct pmd_layout *layout, *found;
-+		size_t rlen = 0;
-+		u64 objid;
-+
-+		err = mp_mdc_read(cinfo->mmi_mdc, recbuf, recbufsz, &rlen);
-+		if (err) {
-+			msg = "mdc read data failed";
-+			break;
-+		}
-+		if (rlen == 0)
-+			break; /* Hit end of log */
-+
-+		/*
-+		 * Version record, if present, must be first.
-+		 */
-+		if (omf_mdcrec_unpack_type_letoh(recbuf) == OMF_MDR_VERSION) {
-+			omf_mdcver_unpack_letoh(cdr, recbuf);
-+			cinfo->mmi_mdcver = cdr->u.omd_version;
-+
-+			if (omfu_mdcver_cmp(&cinfo->mmi_mdcver, ">", omfu_mdcver_cur())) {
-+				char *buf1, *buf2 = NULL;
-+
-+				buf1 = kmalloc(2 * MAX_MDCVERSTR, GFP_KERNEL);
-+				if (buf1) {
-+					buf2 = buf1 + MAX_MDCVERSTR;
-+					omfu_mdcver_to_str(&cinfo->mmi_mdcver, buf1, sizeof(buf1));
-+					omfu_mdcver_to_str(omfu_mdcver_cur(), buf2, sizeof(buf2));
-+				}
-+
-+				err = -EOPNOTSUPP;
-+				mp_pr_err("mpool %s, MDC%u version %s, binary version %s",
-+					  err, mp->pds_name, cslot, buf1, buf2);
-+				kfree(buf1);
-+				break;
-+			}
-+			continue;
-+		}
-+
-+		/* Skip non object-related mdcrec in mdc0; i.e., property
-+		 * records.
-+		 */
-+		if (!cslot && !omf_mdcrec_isobj_le(recbuf))
-+			continue;
-+
-+		err = omf_mdcrec_unpack_letoh(&cinfo->mmi_mdcver, mp, cdr, recbuf);
-+		if (err) {
-+			msg = "mlog record unpack failed";
-+			break;
-+		}
-+
-+		objid = cdr->u.obj.omd_objid;
-+
-+		if (objid_slot(objid) != cslot) {
-+			msg = "mlog record wrong slot";
-+			err = -EBADSLT;
-+			break;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_OCREATE) {
-+			layout = cdr->u.obj.omd_layout;
-+			layout->eld_state = PMD_LYT_COMMITTED;
-+
-+			found = pmd_co_insert(cinfo, layout);
-+			if (found) {
-+				msg = "OCREATE duplicate object ID";
-+				pmd_obj_put(layout);
-+				err = -EEXIST;
-+				break;
-+			}
-+
-+			atomic_inc(&cinfo->mmi_pco_cnt.pcc_cr);
-+			atomic_inc(&cinfo->mmi_pco_cnt.pcc_cobj);
-+
-+			continue;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_ODELETE) {
-+			found = pmd_co_find(cinfo, objid);
-+			if (!found) {
-+				msg = "ODELETE object not found";
-+				err = -ENOENT;
-+				break;
-+			}
-+
-+			pmd_co_remove(cinfo, found);
-+			pmd_obj_put(found);
-+
-+			atomic_inc(&cinfo->mmi_pco_cnt.pcc_del);
-+			atomic_dec(&cinfo->mmi_pco_cnt.pcc_cobj);
-+
-+			continue;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_OIDCKPT) {
-+			/*
-+			 * objid == mmi_lckpt == 0 is legit. Such records
-+			 * are appended by mpool MDC compaction due to a
-+			 * mpool metadata upgrade on an empty mpool.
-+			 */
-+			if ((objid_uniq(objid) || objid_uniq(cinfo->mmi_lckpt))
-+				&& (objid_uniq(objid) <= objid_uniq(cinfo->mmi_lckpt))) {
-+				msg = "OIDCKPT cdr ckpt %lu <= cinfo ckpt %lu";
-+				argv[0] = objid_uniq(objid);
-+				argv[1] = objid_uniq(cinfo->mmi_lckpt);
-+				err = -EINVAL;
-+				break;
-+			}
-+
-+			cinfo->mmi_lckpt = objid;
-+			continue;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_OERASE) {
-+			layout = pmd_co_find(cinfo, objid);
-+			if (!layout) {
-+				msg = "OERASE object not found";
-+				err = -ENOENT;
-+				break;
-+			}
-+
-+			/* Note: OERASE gen can equal layout gen after a compaction. */
-+			if (cdr->u.obj.omd_gen < layout->eld_gen) {
-+				msg = "OERASE cdr gen %lu < layout gen %lu";
-+				argv[0] = cdr->u.obj.omd_gen;
-+				argv[1] = layout->eld_gen;
-+				err = -EINVAL;
-+				break;
-+			}
-+
-+			layout->eld_gen = cdr->u.obj.omd_gen;
-+
-+			atomic_inc(&cinfo->mmi_pco_cnt.pcc_er);
-+			continue;
-+		}
-+
-+		if (cdr->omd_rtype == OMF_MDR_OUPDATE) {
-+			layout = cdr->u.obj.omd_layout;
-+
-+			found = pmd_co_find(cinfo, objid);
-+			if (!found) {
-+				msg = "OUPDATE object not found";
-+				pmd_obj_put(layout);
-+				err = -ENOENT;
-+				break;
-+			}
-+
-+			pmd_co_remove(cinfo, found);
-+			pmd_obj_put(found);
-+
-+			layout->eld_state = PMD_LYT_COMMITTED;
-+			pmd_co_insert(cinfo, layout);
-+
-+			atomic_inc(&cinfo->mmi_pco_cnt.pcc_up);
-+
-+			continue;
-+		}
-+	}
-+
-+	if (err)
-+		goto errout;
-+
-+	/*
-+	 * Add all existing objects to space map.
-+	 * Also add/update per-mpool space usage stats
-+	 */
-+	pmd_co_foreach(cinfo, node) {
-+		struct pmd_layout *layout;
-+
-+		layout = rb_entry(node, typeof(*layout), eld_nodemdc);
-+
-+		/* Remember objid and gen in case of error... */
-+		cdr->u.obj.omd_objid = layout->eld_objid;
-+		cdr->u.obj.omd_gen = layout->eld_gen;
-+
-+		if (objid_slot(layout->eld_objid) != cslot) {
-+			msg = "layout wrong slot";
-+			err = -EBADSLT;
-+			break;
-+		}
-+
-+		err = pmd_smap_insert(mp, layout);
-+		if (err) {
-+			msg = "smap insert failed";
-+			break;
-+		}
-+
-+		pmd_update_obj_stats(mp, layout, cinfo, PMD_OBJ_LOAD);
-+
-+		/* For mdc0 track last logical mdc created. */
-+		if (!cslot)
-+			mdcmax = max(mdcmax, (objid_uniq(layout->eld_objid) >> 1));
-+	}
-+
-+	if (err)
-+		goto errout;
-+
-+	cdr->u.obj.omd_objid = 0;
-+	cdr->u.obj.omd_gen = 0;
-+
-+	if (!cslot) {
-+		/* MDC0: finish initializing mda */
-+		cinfo->mmi_luniq = mdcmax;
-+		mp->pds_mda.mdi_slotvcnt = mdcmax + 1;
-+
-+		/* MDC0 only: validate other mdc metadata; may make adjustments to mp.mda. */
-+		err = pmd_mdc0_validate(mp, 1);
-+		if (err)
-+			msg = "MDC0 validation failed";
-+	} else {
-+		/*
-+		 * other mdc: set luniq to guaranteed max value
-+		 * previously used and ensure next objid allocation
-+		 * will be checkpointed; supports realloc of
-+		 * uncommitted objects after a crash
-+		 */
-+		cinfo->mmi_luniq = objid_uniq(cinfo->mmi_lckpt) + OBJID_UNIQ_DELTA - 1;
-+	}
-+
-+errout:
-+	if (err) {
-+		char *msgbuf;
-+
-+		msgbuf = kmalloc(64, GFP_KERNEL);
-+		if (msgbuf)
-+			snprintf(msgbuf, 64, msg, argv[0], argv[1]);
-+
-+		mp_pr_err("mpool %s, %s: cslot %u, ckpt %lx, %lx/%lu",
-+			  err, mp->pds_name, msgbuf, cslot, (ulong)cinfo->mmi_lckpt,
-+			  (ulong)cdr->u.obj.omd_objid, (ulong)cdr->u.obj.omd_gen);
-+
-+		kfree(msgbuf);
-+	}
-+
-+	kfree(cdr);
-+
-+	return err;
-+}
-+
-+/**
-+ * pmd_objs_load_worker() -
-+ * @ws:
-+ *
-+ * worker thread for loading user MDC 1~N
-+ * Each worker instance will do the following (not counting errors):
-+ * * grab an MDC number atomically from olw->olw_progress
-+ * * If the MDC number is invalid, exit
-+ * * load the objects from that MDC
-+ *
-+ * If an error occurs in this or any other worker, don't load any more MDCs
-+ */
-+static void pmd_objs_load_worker(struct work_struct *ws)
-+{
-+	struct pmd_obj_load_work *olw;
-+	int sidx, rc;
-+
-+	olw = container_of(ws, struct pmd_obj_load_work, olw_work);
-+
-+	while (atomic_read(olw->olw_err) == 0) {
-+		sidx = atomic_fetch_add(1, olw->olw_progress);
-+		if (sidx >= olw->olw_mp->pds_mda.mdi_slotvcnt)
-+			break; /* No more MDCs to load */
-+
-+		rc = pmd_objs_load(olw->olw_mp, sidx);
-+		if (rc)
-+			atomic_set(olw->olw_err, rc);
-+	}
-+}
-+
-+/**
-+ * pmd_objs_load_parallel() - load MDC 1~N in parallel
-+ * @mp:
-+ *
-+ * By loading user MDCs in parallel, we can reduce the mpool activate
-+ * time, since the jobs of loading MDC 1~N are independent.
-+ * On the other hand, we don't want to start all the jobs at once.
-+ * If any one fails, we don't have to start others.
-+ */
-+static int pmd_objs_load_parallel(struct mpool_descriptor *mp)
-+{
-+	struct pmd_obj_load_work *olwv;
-+	atomic_t err = ATOMIC_INIT(0);
-+	atomic_t progress = ATOMIC_INIT(1);
-+	uint njobs, inc, cpu, i;
-+
-+	if (mp->pds_mda.mdi_slotvcnt < 2)
-+		return 0; /* No user MDCs allocated */
-+
-+	njobs = mp->pds_params.mp_objloadjobs;
-+	njobs = clamp_t(uint, njobs, 1, mp->pds_mda.mdi_slotvcnt - 1);
-+
-+	if (mp->pds_mda.mdi_slotvcnt / njobs >= 4 && num_online_cpus() > njobs)
-+		njobs *= 2;
-+
-+	olwv = kcalloc(njobs, sizeof(*olwv), GFP_KERNEL);
-+	if (!olwv)
-+		return -ENOMEM;
-+
-+	inc = (num_online_cpus() / njobs) & ~1u;
-+	cpu = raw_smp_processor_id();
-+
-+	/*
-+	 * Each of njobs workers will atomically grab MDC numbers from &progress
-+	 * and load them, until all valid user MDCs have been loaded.
-+	 */
-+	for (i = 0; i < njobs; ++i) {
-+		INIT_WORK(&olwv[i].olw_work, pmd_objs_load_worker);
-+		olwv[i].olw_progress = &progress;
-+		olwv[i].olw_err = &err;
-+		olwv[i].olw_mp = mp;
-+
-+		/*
-+		 * Try to distribute work across all NUMA nodes.
-+		 * queue_work_node() would be preferable, but
-+		 * it's not available on older kernels.
-+		 */
-+		cpu = (cpu + inc) % nr_cpumask_bits;
-+		cpu = cpumask_next_wrap(cpu, cpu_online_mask, nr_cpumask_bits, false);
-+		queue_work_on(cpu, mp->pds_workq, &olwv[i].olw_work);
-+	}
-+
-+	/* Wait for all worker threads to complete */
-+	flush_workqueue(mp->pds_workq);
-+
-+	kfree(olwv);
-+
-+	return atomic_read(&err);
-+}
-+
-+static int pmd_mdc_append(struct mpool_descriptor *mp, u8 cslot,
-+			  struct omf_mdcrec_data *cdr, int sync)
-+{
-+	struct pmd_mdc_info *cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+	s64 plen;
-+
-+	plen = omf_mdcrec_pack_htole(mp, cdr, cinfo->mmi_recbuf);
-+	if (plen < 0) {
-+		mp_pr_warn("mpool %s, MDC%u append failed", mp->pds_name, cslot);
-+		return plen;
-+	}
-+
-+	return mp_mdc_append(cinfo->mmi_mdc, cinfo->mmi_recbuf, plen, sync);
-+}
-+
-+/**
-+ * pmd_log_all_mdc_cobjs() - write in the new active mlog the object records.
-+ * @mp:
-+ * @cslot:
-+ * @compacted: output
-+ * @total: output
-+ */
-+static int pmd_log_all_mdc_cobjs(struct mpool_descriptor *mp, u8 cslot,
-+				 struct omf_mdcrec_data *cdr, u32 *compacted, u32 *total)
-+{
-+	struct pmd_mdc_info *cinfo;
-+	struct pmd_layout *layout;
-+	struct rb_node *node;
-+	int rc;
-+
-+	cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+	rc = 0;
-+
-+	pmd_co_foreach(cinfo, node) {
-+		layout = rb_entry(node, typeof(*layout), eld_nodemdc);
-+
-+		if (!objid_mdc0log(layout->eld_objid)) {
-+			cdr->omd_rtype = OMF_MDR_OCREATE;
-+			cdr->u.obj.omd_layout = layout;
-+
-+			rc = pmd_mdc_append(mp, cslot, cdr, 0);
-+			if (rc) {
-+				mp_pr_err("mpool %s, MDC%u log committed obj failed, objid 0x%lx",
-+					  rc, mp->pds_name, cslot, (ulong)layout->eld_objid);
-+				break;
-+			}
-+
-+			++(*compacted);
-+		}
-+		++(*total);
-+	}
-+
-+	for (; node; node = rb_next(node))
-+		++(*total);
-+
-+	return rc;
-+}
-+
-+/**
-+ * pmd_log_mdc0_cobjs() - write in the new active mlog (of MDC0) the MDC0
-+ *	records that are particular to MDC0.
-+ * @mp:
-+ */
-+static int pmd_log_mdc0_cobjs(struct mpool_descriptor *mp)
-+{
-+	struct mpool_dev_info *pd;
-+	int rc = 0, i;
-+
-+	/*
-+	 * Log a drive record (OMF_MDR_MCCONFIG) for every drive in pds_pdv[]
-+	 * that is not defunct.
-+	 */
-+	for (i = 0; i < mp->pds_pdvcnt; i++) {
-+		pd = &(mp->pds_pdv[i]);
-+		rc = pmd_prop_mcconfig(mp, pd, true);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	/*
-+	 * Log a media class spare record (OMF_MDR_MCSPARE) for every media
-+	 * class.
-+	 * mc count can't change now. Because the MDC0 compact lock is held
-+	 * and that blocks the addition of PDs in the  mpool.
-+	 */
-+	for (i = 0; i < MP_MED_NUMBER; i++) {
-+		struct media_class *mc;
-+
-+		mc = &mp->pds_mc[i];
-+		if (mc->mc_pdmc >= 0) {
-+			rc = pmd_prop_mcspare(mp, mc->mc_parms.mcp_classp,
-+					       mc->mc_sparms.mcsp_spzone, true);
-+			if (rc)
-+				return rc;
-+		}
-+	}
-+
-+	return pmd_prop_mpconfig(mp, &mp->pds_cfg, true);
-+}
-+
-+/**
-+ * pmd_log_non_mdc0_cobjs() - write in the new active mlog (of MDCi i>0) the
-+ *	MDCi records that are particular to MDCi (not used by MDC0).
-+ * @mp:
-+ * @cslot:
-+ */
-+static int pmd_log_non_mdc0_cobjs(struct mpool_descriptor *mp, u8 cslot,
-+				  struct omf_mdcrec_data *cdr)
-+{
-+	struct pmd_mdc_info *cinfo;
-+
-+	cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+
-+	/*
-+	 * if not mdc0 log last objid checkpoint to support realloc of
-+	 * uncommitted objects after a crash and to guarantee objids are
-+	 * never reused.
-+	 */
-+	cdr->omd_rtype = OMF_MDR_OIDCKPT;
-+	cdr->u.obj.omd_objid = cinfo->mmi_lckpt;
-+
-+	return pmd_mdc_append(mp, cslot, cdr, 0);
-+}
-+
-+/**
-+ * pmd_pre_compact_reset() - called on MDCi i>0
-+ * @cinfo:
-+ * @compacted: object create records appended in the new active mlog.
-+ *
-+ * Locking:
-+ *	MDCi compact lock is held by the caller.
-+ */
-+static void pmd_pre_compact_reset(struct pmd_mdc_info *cinfo, u32 compacted)
-+{
-+	struct pre_compact_ctrs *pco_cnt;
-+
-+	pco_cnt = &cinfo->mmi_pco_cnt;
-+	ASSERT(pco_cnt->pcc_cobj.counter == compacted);
-+
-+	atomic_set(&pco_cnt->pcc_cr, compacted);
-+	atomic_set(&pco_cnt->pcc_cobj, compacted);
-+	atomic_set(&pco_cnt->pcc_up, 0);
-+	atomic_set(&pco_cnt->pcc_del, 0);
-+	atomic_set(&pco_cnt->pcc_er, 0);
-+}
-+
-+/**
-+ * pmd_mdc_compact() - compact an mpool MDCi with i >= 0.
-+ * @mp:
-+ * @cslot: the "i" of MDCi
-+ *
-+ * Locking:
-+ * 1) caller must hold MDCi compact lock
-+ * 2) MDC compaction freezes the state of all MDCs objects [and for MDC0
-+ *    also freezes all mpool properties] by simply holding MDC
-+ *    mmi_compactlock mutex. Hence, MDC compaction does not need to
-+ *    read-lock individual object layouts or mpool property data
-+ *    structures to read them. It is why this function and its callees don't
-+ *    take any lock.
-+ *
-+ * Note: this function or its callees must call pmd_mdc_append() with no sync
-+ *	instead of pmd_mdc_addrec() to avoid triggering nested compaction of
-+ *	a same MDCi.
-+ *	The sync/flush is done by append of cend, no need to sync before that.
-+ */
-+static int pmd_mdc_compact(struct mpool_descriptor *mp, u8 cslot)
-+{
-+	struct pmd_mdc_info *cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+	u64 logid1 = logid_make(2 * cslot, 0);
-+	u64 logid2 = logid_make(2 * cslot + 1, 0);
-+	struct omf_mdcrec_data *cdr;
-+	int retry = 0, rc = 0;
-+
-+	cdr = kzalloc(sizeof(*cdr), GFP_KERNEL);
-+	if (!cdr) {
-+		rc = -ENOMEM;
-+		mp_pr_crit("mpool %s, alloc failure during compact", rc, mp->pds_name);
++		mpc_attr_destroy(attr);
 +		return rc;
 +	}
 +
-+	for (retry = 0; retry < MPOOL_MDC_COMPACT_RETRY_DEFAULT; retry++) {
-+		u32 compacted = 0;
-+		u32 total = 0;
-+
-+		if (rc) {
-+			rc = mp_mdc_open(mp, logid1, logid2, MDC_OF_SKIP_SER, &cinfo->mmi_mdc);
-+			if (rc)
-+				continue;
-+		}
-+
-+		mp_pr_debug("mpool %s, MDC%u start: mlog1 gen %lu mlog2 gen %lu",
-+			    rc, mp->pds_name, cslot,
-+			    (ulong)((struct pmd_layout *)cinfo->mmi_mdc->mdc_logh1)->eld_gen,
-+			    (ulong)((struct pmd_layout *)cinfo->mmi_mdc->mdc_logh2)->eld_gen);
-+
-+		rc = mp_mdc_cstart(cinfo->mmi_mdc);
-+		if (rc)
-+			continue;
-+
-+		if (omfu_mdcver_cmp2(omfu_mdcver_cur(), ">=", 1, 0, 0, 1)) {
-+			rc = pmd_mdc_addrec_version(mp, cslot);
-+			if (rc) {
-+				mp_mdc_close(cinfo->mmi_mdc);
-+				continue;
-+			}
-+		}
-+
-+		if (cslot)
-+			rc = pmd_log_non_mdc0_cobjs(mp, cslot, cdr);
-+		else
-+			rc = pmd_log_mdc0_cobjs(mp);
-+		if (rc)
-+			continue;
-+
-+		rc = pmd_log_all_mdc_cobjs(mp, cslot, cdr, &compacted, &total);
-+
-+		mp_pr_debug("mpool %s, MDC%u compacted %u of %u objects: retry=%d",
-+			    rc, mp->pds_name, cslot, compacted, total, retry);
-+
-+		/*
-+		 * Append the compaction end record in the new active
-+		 * mlog, and flush/sync all the previous records
-+		 * appended in the new active log by the compaction
-+		 * above.
-+		 */
-+		if (!rc)
-+			rc = mp_mdc_cend(cinfo->mmi_mdc);
-+
-+		if (!rc) {
-+			if (cslot) {
-+				/*
-+				 * MDCi i>0 compacted successfully
-+				 * MDCi compact lock is held.
-+				 */
-+				pmd_pre_compact_reset(cinfo, compacted);
-+			}
-+
-+			mp_pr_debug("mpool %s, MDC%u end: mlog1 gen %lu mlog2 gen %lu",
-+				    rc, mp->pds_name, cslot,
-+				    (ulong)((struct pmd_layout *)
-+					    cinfo->mmi_mdc->mdc_logh1)->eld_gen,
-+				    (ulong)((struct pmd_layout *)
-+					    cinfo->mmi_mdc->mdc_logh2)->eld_gen);
-+			break;
-+		}
-+	}
-+
-+	if (rc)
-+		mp_pr_crit("mpool %s, MDC%u compaction failed", rc, mp->pds_name, cslot);
-+
-+	kfree(cdr);
-+
-+	return rc;
-+}
-+
-+static int pmd_mdc_addrec(struct mpool_descriptor *mp, u8 cslot, struct omf_mdcrec_data *cdr)
-+{
-+	int rc;
-+
-+	rc = pmd_mdc_append(mp, cslot, cdr, 1);
-+
-+	if (rc == -EFBIG) {
-+		rc = pmd_mdc_compact(mp, cslot);
-+		if (!rc)
-+			rc = pmd_mdc_append(mp, cslot, cdr, 1);
-+	}
-+
-+	if (rc)
-+		mp_pr_rl("mpool %s, MDC%u append failed%s", rc, mp->pds_name, cslot,
-+			 (rc == -EFBIG) ? " post compaction" : "");
-+
-+	return rc;
-+}
-+
-+int pmd_mdc_addrec_version(struct mpool_descriptor *mp, u8 cslot)
-+{
-+	struct omf_mdcrec_data cdr;
-+	struct omf_mdcver *ver;
-+
-+	cdr.omd_rtype = OMF_MDR_VERSION;
-+
-+	ver = omfu_mdcver_cur();
-+	cdr.u.omd_version = *ver;
-+
-+	return pmd_mdc_addrec(mp, cslot, &cdr);
-+}
-+
-+int pmd_prop_mcconfig(struct mpool_descriptor *mp, struct mpool_dev_info *pd, bool compacting)
-+{
-+	struct omf_mdcrec_data cdr;
-+	struct mc_parms mc_parms;
-+
-+	cdr.omd_rtype = OMF_MDR_MCCONFIG;
-+	mpool_uuid_copy(&cdr.u.dev.omd_parm.odp_devid, &pd->pdi_devid);
-+	mc_pd_prop2mc_parms(&pd->pdi_parm.dpr_prop, &mc_parms);
-+	mc_parms2omf_devparm(&mc_parms, &cdr.u.dev.omd_parm);
-+	cdr.u.dev.omd_parm.odp_zonetot = pd->pdi_parm.dpr_zonetot;
-+	cdr.u.dev.omd_parm.odp_devsz = pd->pdi_parm.dpr_devsz;
-+
-+	/* If compacting no sync needed and don't trigger another compaction. */
-+	if (compacting)
-+		return pmd_mdc_append(mp, 0, &cdr, 0);
-+
-+	return pmd_mdc_addrec(mp, 0, &cdr);
-+}
-+
-+int pmd_prop_mcspare(struct mpool_descriptor *mp, enum mp_media_classp mclassp,
-+		     u8 spzone, bool compacting)
-+{
-+	struct omf_mdcrec_data cdr;
-+	int rc;
-+
-+	if (!mclass_isvalid(mclassp) || spzone > 100) {
-+		rc = -EINVAL;
-+		mp_pr_err("persisting %s spare zone info, invalid arguments %d %u",
-+			  rc, mp->pds_name, mclassp, spzone);
-+		return rc;
-+	}
-+
-+	cdr.omd_rtype = OMF_MDR_MCSPARE;
-+	cdr.u.mcs.omd_mclassp = mclassp;
-+	cdr.u.mcs.omd_spzone = spzone;
-+
-+	/* If compacting no sync needed and don't trigger another compaction. */
-+	if (compacting)
-+		return pmd_mdc_append(mp, 0, &cdr, 0);
-+
-+	return pmd_mdc_addrec(mp, 0, &cdr);
-+}
-+
-+int pmd_log_delete(struct mpool_descriptor *mp, u64 objid)
-+{
-+	struct omf_mdcrec_data cdr;
-+
-+	cdr.omd_rtype = OMF_MDR_ODELETE;
-+	cdr.u.obj.omd_objid = objid;
-+
-+	return pmd_mdc_addrec(mp, objid_slot(objid), &cdr);
-+}
-+
-+int pmd_log_create(struct mpool_descriptor *mp, struct pmd_layout *layout)
-+{
-+	struct omf_mdcrec_data cdr;
-+
-+	cdr.omd_rtype = OMF_MDR_OCREATE;
-+	cdr.u.obj.omd_layout = layout;
-+
-+	return pmd_mdc_addrec(mp, objid_slot(layout->eld_objid), &cdr);
-+}
-+
-+int pmd_log_erase(struct mpool_descriptor *mp, u64 objid, u64 gen)
-+{
-+	struct omf_mdcrec_data cdr;
-+
-+	cdr.omd_rtype = OMF_MDR_OERASE;
-+	cdr.u.obj.omd_objid = objid;
-+	cdr.u.obj.omd_gen = gen;
-+
-+	return pmd_mdc_addrec(mp, objid_slot(objid), &cdr);
-+}
-+
-+int pmd_log_idckpt(struct mpool_descriptor *mp, u64 objid)
-+{
-+	struct omf_mdcrec_data cdr;
-+
-+	cdr.omd_rtype = OMF_MDR_OIDCKPT;
-+	cdr.u.obj.omd_objid = objid;
-+
-+	return pmd_mdc_addrec(mp, objid_slot(objid), &cdr);
-+}
-+
-+int pmd_prop_mpconfig(struct mpool_descriptor *mp, const struct mpool_config *cfg, bool compacting)
-+{
-+	struct omf_mdcrec_data cdr = { };
-+
-+	cdr.omd_rtype = OMF_MDR_MPCONFIG;
-+	cdr.u.omd_cfg = *cfg;
-+
-+	if (compacting)
-+		return pmd_mdc_append(mp, 0, &cdr, 0);
-+
-+	return pmd_mdc_addrec(mp, 0, &cdr);
-+}
-+
-+/**
-+ * pmd_need_compact() - determine if MDCi corresponding to cslot need compaction of not.
-+ * @mp:
-+ * @cslot:
-+ *
-+ * The MDCi needs compaction if the active mlog is above some threshold and
-+ * if there is enough garbage (that can be eliminated by the compaction).
-+ *
-+ * Locking: not lock need to be held when calling this function.
-+ *	as a result of not holding lock the result may be off if a compaction
-+ *	of MDCi (with i = cslot) is taking place at the same time.
-+ */
-+static bool pmd_need_compact(struct mpool_descriptor *mp, u8 cslot, char *msgbuf, size_t msgsz)
-+{
-+	struct pre_compact_ctrs *pco_cnt;
-+	struct pmd_mdc_info *cinfo;
-+	u64 rec, cobj, len, cap;
-+	u32 garbage, pct;
-+
-+	ASSERT(cslot > 0);
-+
-+	cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+	pco_cnt = &(cinfo->mmi_pco_cnt);
-+
-+	cap = atomic64_read(&pco_cnt->pcc_cap);
-+	if (cap == 0)
-+		return false; /* MDC closed for now. */
-+
-+	len = atomic64_read(&pco_cnt->pcc_len);
-+	rec = atomic_read(&pco_cnt->pcc_cr) + atomic_read(&pco_cnt->pcc_up) +
-+		atomic_read(&pco_cnt->pcc_del) + atomic_read(&pco_cnt->pcc_er);
-+	cobj = atomic_read(&pco_cnt->pcc_cobj);
-+
-+	pct = (len * 100) / cap;
-+	if (pct < mp->pds_params.mp_pcopctfull)
-+		return false; /* Active mlog not filled enough */
-+
-+	if (rec > cobj) {
-+		garbage = (rec - cobj) * 100;
-+		garbage /= rec;
-+	} else {
-+
-+		/*
-+		 * We may arrive here rarely if the caller doesn't
-+		 * hold the compact lock. In that case, the update of
-+		 * the counters may be seen out of order or a compaction
-+		 * may take place at the same time.
-+		 */
-+		garbage = 0;
-+	}
-+
-+	if (garbage < mp->pds_params.mp_pcopctgarbage)
-+		return false;
-+
-+	if (msgbuf)
-+		snprintf(msgbuf, msgsz,
-+			 "bytes used %lu, total %lu, pct %u, records %lu, objects %lu, garbage %u",
-+			 (ulong)len, (ulong)cap, pct, (ulong)rec, (ulong)cobj, garbage);
-+
-+	return true;
-+}
-+
-+/**
-+ * pmd_mdc_needed() - determines if new MDCns should be created
-+ * @mp:  mpool descriptor
-+ *
-+ * New MDC's are created if total free space across all MDC's
-+ * is above a threshold value and the garbage to reclaim space
-+ * is below a garbage threshold.
-+ *
-+ * Locking: no lock needs to be held when calling this function.
-+ *
-+ * NOTES:
-+ * - Skip non-active MDC
-+ * - Accumulate total capacity, total garbage and total in-use capacity
-+ *   across all active MDCs.
-+ * - Return true if total used capacity across all MDCs is threshold and
-+ *   garbage is < a threshold that would yield significant free space upon
-+ *   compaction.
-+ */
-+static bool pmd_mdc_needed(struct mpool_descriptor *mp)
-+{
-+	struct pre_compact_ctrs *pco_cnt;
-+	struct pmd_mdc_info *cinfo;
-+	u64 cap, tcap, used, garbage, record, rec, cobj;
-+	u32 pct, pctg, mdccnt;
-+	u16 cslot;
-+
-+	ASSERT(mp->pds_mda.mdi_slotvcnt <= MDC_SLOTS);
-+
-+	cap = used = garbage = record = pctg = 0;
-+
-+	if (mp->pds_mda.mdi_slotvcnt == MDC_SLOTS)
-+		return false;
-+
-+	for (cslot = 1, mdccnt = 0; cslot < mp->pds_mda.mdi_slotvcnt; cslot++) {
-+
-+		cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+		pco_cnt = &(cinfo->mmi_pco_cnt);
-+
-+		tcap = atomic64_read(&pco_cnt->pcc_cap);
-+		if (tcap == 0) {
-+			/*
-+			 * MDC closed for now and will not be considered
-+			 * in making a decision to create new MDC.
-+			 */
-+			mp_pr_warn("MDC %u not open", cslot);
-+			continue;
-+		}
-+		cap += tcap;
-+
-+		mdccnt++;
-+
-+		used += atomic64_read(&pco_cnt->pcc_len);
-+		rec = atomic_read(&pco_cnt->pcc_cr) + atomic_read(&pco_cnt->pcc_up) +
-+			atomic_read(&pco_cnt->pcc_del) + atomic_read(&pco_cnt->pcc_er);
-+
-+		cobj = atomic_read(&pco_cnt->pcc_cobj);
-+
-+		if (rec > cobj)
-+			garbage += (rec - cobj);
-+
-+		record += rec;
-+	}
-+
-+	if (mdccnt == 0) {
-+		mp_pr_warn("No mpool MDCs available");
-+		return false;
-+	}
-+
-+	/* Percentage capacity used across all MDCs */
-+	pct  = (used  * 100) / cap;
-+
-+	/* Percentage garbage available across all MDCs */
-+	if (garbage)
-+		pctg = (garbage * 100) / record;
-+
-+	if (pct > mp->pds_params.mp_crtmdcpctfull && pctg < mp->pds_params.mp_crtmdcpctgrbg) {
-+		mp_pr_debug("MDCn %u cap %u used %u rec %u grbg %u pct used %u grbg %u Thres %u-%u",
-+			    0, mdccnt, (u32)cap, (u32)used, (u32)record, (u32)garbage, pct, pctg,
-+			    (u32)mp->pds_params.mp_crtmdcpctfull,
-+			    (u32)mp->pds_params.mp_crtmdcpctgrbg);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+
-+/**
-+ * pmd_precompact() - precompact an mpool MDC
-+ * @work:
-+ *
-+ * The goal of this thread is to minimize the application objects commit time.
-+ * This thread pre compacts the MDC1/255. As a consequence MDC1/255 compaction
-+ * does not occurs in the context of an application object commit.
-+ */
-+static void pmd_precompact(struct work_struct *work)
-+{
-+	struct pre_compact_ctrl *pco;
-+	struct mpool_descriptor *mp;
-+	struct pmd_mdc_info *cinfo;
-+	char msgbuf[128];
-+	uint nmtoc, delay;
-+	bool compact;
-+	u8 cslot;
-+
-+	pco = container_of(work, typeof(*pco), pco_dwork.work);
-+	mp = pco->pco_mp;
-+
-+	nmtoc = atomic_fetch_add(1, &pco->pco_nmtoc);
-+
-+	/* Only compact MDC1/255 not MDC0. */
-+	cslot = (nmtoc % (mp->pds_mda.mdi_slotvcnt - 1)) + 1;
-+
-+	/*
-+	 * Check if the next mpool mdc to compact needs compaction.
-+	 *
-+	 * Note that this check is done without taking any lock.
-+	 * This is safe because the mpool MDCs don't go away as long as
-+	 * the mpool is activated. The mpool can't deactivate before
-+	 * this thread exit.
-+	 */
-+	compact = pmd_need_compact(mp, cslot, NULL, 0);
-+	if (compact) {
-+		cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+
-+		/*
-+		 * Check a second time while we hold the compact lock
-+		 * to avoid doing a useless compaction.
-+		 */
-+		pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
-+		compact = pmd_need_compact(mp, cslot, msgbuf, sizeof(msgbuf));
-+		if (compact)
-+			pmd_mdc_compact(mp, cslot);
-+		pmd_mdc_unlock(&cinfo->mmi_compactlock);
-+
-+		if (compact)
-+			mp_pr_info("mpool %s, MDC%u %s", mp->pds_name, cslot, msgbuf);
-+	}
-+
-+	/* If running low on MDC space create new MDCs */
-+	if (pmd_mdc_needed(mp))
-+		pmd_mdc_alloc_set(mp);
-+
-+	pmd_update_credit(mp);
-+
-+	delay = clamp_t(uint, mp->pds_params.mp_pcoperiod, 1, 3600);
-+
-+	queue_delayed_work(mp->pds_workq, &pco->pco_dwork, msecs_to_jiffies(delay * 1000));
-+}
-+
-+void pmd_precompact_start(struct mpool_descriptor *mp)
-+{
-+	struct pre_compact_ctrl *pco;
-+
-+	pco = &mp->pds_pco;
-+	pco->pco_mp = mp;
-+	atomic_set(&pco->pco_nmtoc, 0);
-+
-+	INIT_DELAYED_WORK(&pco->pco_dwork, pmd_precompact);
-+	queue_delayed_work(mp->pds_workq, &pco->pco_dwork, 1);
-+}
-+
-+void pmd_precompact_stop(struct mpool_descriptor *mp)
-+{
-+	cancel_delayed_work_sync(&mp->pds_pco.pco_dwork);
-+}
-+
-+static int pmd_write_meta_to_latest_version(struct mpool_descriptor *mp, bool permitted)
-+{
-+	struct pmd_mdc_info *cinfo_converted = NULL, *cinfo;
-+	char buf1[MAX_MDCVERSTR] __maybe_unused;
-+	char buf2[MAX_MDCVERSTR] __maybe_unused;
-+	u32 cslot;
-+	int rc;
-+
-+	/*
-+	 * Compact MDC0 first (before MDC1-255 compaction appends in MDC0) to
-+	 * avoid having a potential mix of new and old records in MDC0.
-+	 */
-+	for (cslot = 0; cslot < mp->pds_mda.mdi_slotvcnt; cslot++) {
-+		cinfo = &mp->pds_mda.mdi_slotv[cslot];
-+
-+		/*
-+		 * At that point the version on media should be smaller or
-+		 * equal to the latest version supported by this binary.
-+		 * If it is not the case, the activate fails earlier.
-+		 */
-+		if (omfu_mdcver_cmp(&cinfo->mmi_mdcver, "==", omfu_mdcver_cur()))
-+			continue;
-+
-+		omfu_mdcver_to_str(&cinfo->mmi_mdcver, buf1, sizeof(buf1));
-+		omfu_mdcver_to_str(omfu_mdcver_cur(), buf2, sizeof(buf2));
-+
-+		if (!permitted) {
-+			rc = -EPERM;
-+			mp_pr_err("mpool %s, MDC%u upgrade needed from version %s to %s",
-+				  rc, mp->pds_name, cslot, buf1, buf2);
-+			return rc;
-+		}
-+
-+		mp_pr_info("mpool %s, MDC%u upgraded from version %s to %s",
-+			   mp->pds_name, cslot, buf1, buf2);
-+
-+		cinfo_converted = cinfo;
-+
-+		pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
-+		rc = pmd_mdc_compact(mp, cslot);
-+		pmd_mdc_unlock(&cinfo->mmi_compactlock);
-+
-+		if (rc) {
-+			mp_pr_err("mpool %s, failed to compact MDC %u post upgrade from %s to %s",
-+				  rc, mp->pds_name, cslot, buf1, buf2);
-+			return rc;
-+		}
-+	}
-+
-+	if (cinfo_converted != NULL)
-+		mp_pr_info("mpool %s, converted MDC from version %s to %s", mp->pds_name,
-+			   omfu_mdcver_to_str(&cinfo_converted->mmi_mdcver, buf1, sizeof(buf1)),
-+			   omfu_mdcver_to_str(omfu_mdcver_cur(), buf2, sizeof(buf2)));
++	unit->un_attr = attr;
 +
 +	return 0;
 +}
 +
-+void pmd_mdc_cap(struct mpool_descriptor *mp, u64 *mdcmax, u64 *mdccap, u64 *mdc0cap)
++static void mpc_params_unregister(struct mpc_unit *unit)
 +{
-+	struct pmd_mdc_info *cinfo = NULL;
-+	struct pmd_layout *layout = NULL;
-+	struct rb_node *node = NULL;
-+	u64 mlogsz;
-+	u32 zonepg = 0;
-+	u16 mdcn = 0;
-+
-+	if (!mdcmax || !mdccap || !mdc0cap)
-+		return;
-+
-+	/* Serialize to prevent race with pmd_mdc_alloc() */
-+	mutex_lock(&pmd_s_lock);
-+
-+	/*
-+	 * exclude mdc0 from stats because not used for mpool user
-+	 * object metadata
-+	 */
-+	cinfo = &mp->pds_mda.mdi_slotv[0];
-+
-+	pmd_mdc_lock(&cinfo->mmi_uqlock, 0);
-+	*mdcmax = cinfo->mmi_luniq;
-+	pmd_mdc_unlock(&cinfo->mmi_uqlock);
-+
-+	/*  Taking compactlock to freeze all object layout metadata in mdc0 */
-+	pmd_mdc_lock(&cinfo->mmi_compactlock, 0);
-+	pmd_co_rlock(cinfo, 0);
-+
-+	pmd_co_foreach(cinfo, node) {
-+		layout = rb_entry(node, typeof(*layout), eld_nodemdc);
-+
-+		mdcn = objid_uniq(layout->eld_objid) >> 1;
-+
-+		if (mdcn > *mdcmax)
-+			/* Ignore detritus from failed pmd_mdc_alloc() */
-+			continue;
-+
-+		zonepg = mp->pds_pdv[layout->eld_ld.ol_pdh].pdi_parm.dpr_zonepg;
-+		mlogsz = (layout->eld_ld.ol_zcnt * zonepg) << PAGE_SHIFT;
-+
-+		if (!mdcn)
-+			*mdc0cap = *mdc0cap + mlogsz;
-+		else
-+			*mdccap = *mdccap + mlogsz;
-+	}
-+
-+	pmd_co_runlock(cinfo);
-+	pmd_mdc_unlock(&cinfo->mmi_compactlock);
-+	mutex_unlock(&pmd_s_lock);
-+
-+	/* Only count capacity of one mlog in each mdc mlog pair */
-+	*mdccap  = *mdccap >> 1;
-+	*mdc0cap = *mdc0cap >> 1;
++	mpc_attr_group_destroy(unit->un_attr);
++	mpc_attr_destroy(unit->un_attr);
++	unit->un_attr = NULL;
 +}
 +
-+int pmd_mpool_activate(struct mpool_descriptor *mp, struct pmd_layout *mdc01,
-+		       struct pmd_layout *mdc02, int create)
++/**
++ * mpc_toascii() - convert string to restricted ASCII
++ *
++ * Zeroes out the remainder of str[] and returns the length.
++ */
++static size_t mpc_toascii(char *str, size_t sz)
 +{
++	size_t len = 0;
++	int i;
++
++	if (!str || sz < 1)
++		return 0;
++
++	if (str[0] == '-')
++		str[0] = '_';
++
++	for (i = 0; i < (sz - 1) && str[i]; ++i) {
++		if (isalnum(str[i]) || strchr("_.-", str[i]))
++			continue;
++
++		str[i] = '_';
++	}
++
++	len = i;
++
++	while (i < sz)
++		str[i++] = '\000';
++
++	return len;
++}
++
++static void mpool_params_merge_defaults(struct mpool_params *params)
++{
++	if (params->mp_spare_cap == MPOOL_SPARES_INVALID)
++		params->mp_spare_cap = MPOOL_SPARES_DEFAULT;
++
++	if (params->mp_spare_stg == MPOOL_SPARES_INVALID)
++		params->mp_spare_stg = MPOOL_SPARES_DEFAULT;
++
++	if (params->mp_ra_pages_max == U32_MAX)
++		params->mp_ra_pages_max = MPOOL_RA_PAGES_MAX;
++	params->mp_ra_pages_max = clamp_t(u32, params->mp_ra_pages_max, 0, MPOOL_RA_PAGES_MAX);
++
++	if (params->mp_mode != -1)
++		params->mp_mode &= 0777;
++
++	params->mp_rsvd0 = 0;
++	params->mp_rsvd1 = 0;
++	params->mp_rsvd2 = 0;
++	params->mp_rsvd3 = 0;
++	params->mp_rsvd4 = 0;
++
++	if (!strcmp(params->mp_label, MPOOL_LABEL_INVALID))
++		strcpy(params->mp_label, MPOOL_LABEL_DEFAULT);
++
++	mpc_toascii(params->mp_label, sizeof(params->mp_label));
++}
++
++static void mpool_to_mpcore_params(struct mpool_params *params, struct mpcore_params *mpc_params)
++{
++	u64 mdc0cap, mdcncap;
++	u32 mdcnum;
++
++	mpcore_params_defaults(mpc_params);
++
++	mdc0cap = (u64)params->mp_mdc0cap << 20;
++	mdcncap = (u64)params->mp_mdcncap << 20;
++	mdcnum  = params->mp_mdcnum;
++
++	if (mdc0cap != 0)
++		mpc_params->mp_mdc0cap = mdc0cap;
++
++	if (mdcncap != 0)
++		mpc_params->mp_mdcncap = mdcncap;
++
++	if (mdcnum != 0)
++		mpc_params->mp_mdcnum = mdcnum;
++}
++
++static bool mpool_params_merge_config(struct mpool_params *params, struct mpool_config *cfg)
++{
++	uuid_le uuidnull = { };
++	bool changed = false;
++
++	if (params->mp_uid != -1 && params->mp_uid != cfg->mc_uid) {
++		cfg->mc_uid = params->mp_uid;
++		changed = true;
++	}
++
++	if (params->mp_gid != -1 && params->mp_gid != cfg->mc_gid) {
++		cfg->mc_gid = params->mp_gid;
++		changed = true;
++	}
++
++	if (params->mp_mode != -1 && params->mp_mode != cfg->mc_mode) {
++		cfg->mc_mode = params->mp_mode;
++		changed = true;
++	}
++
++	if (memcmp(&uuidnull, &params->mp_utype, sizeof(uuidnull)) &&
++	    memcmp(&params->mp_utype, &cfg->mc_utype, sizeof(params->mp_utype))) {
++		memcpy(&cfg->mc_utype, &params->mp_utype, sizeof(cfg->mc_utype));
++		changed = true;
++	}
++
++	if (strcmp(params->mp_label, MPOOL_LABEL_DEFAULT) &&
++	    strncmp(params->mp_label, cfg->mc_label, sizeof(params->mp_label))) {
++		strlcpy(cfg->mc_label, params->mp_label, sizeof(cfg->mc_label));
++		changed = true;
++	}
++
++	return changed;
++}
++
+ /**
+  * mpc_mpool_release() - release kref handler for mpc_mpool object
+  * @refp:  kref pointer
+@@ -215,6 +414,9 @@ static void mpc_unit_release(struct kref *refp)
+ 	if (unit->un_mpool)
+ 		mpc_mpool_put(unit->un_mpool);
+ 
++	if (unit->un_attr)
++		mpc_params_unregister(unit);
++
+ 	if (unit->un_device)
+ 		device_destroy(ss->ss_class, unit->un_devno);
+ 
+@@ -227,6 +429,89 @@ static void mpc_unit_put(struct mpc_unit *unit)
+ 		kref_put(&unit->un_ref, mpc_unit_release);
+ }
+ 
++/**
++ * mpc_unit_lookup() - Look up a unit by minor number.
++ * @minor:  minor number
++ * @unitp:  unit ptr
++ *
++ * Returns a referenced ptr to the unit (via *unitp) if found,
++ * otherwise it sets *unitp to NULL.
++ */
++static void mpc_unit_lookup(int minor, struct mpc_unit **unitp)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpc_unit *unit;
++
++	*unitp = NULL;
++
++	mutex_lock(&ss->ss_lock);
++	unit = idr_find(&ss->ss_unitmap, minor);
++	if (unit) {
++		kref_get(&unit->un_ref);
++		*unitp = unit;
++	}
++	mutex_unlock(&ss->ss_lock);
++}
++
++/**
++ * mpc_unit_lookup_by_name_itercb() - Test to see if unit matches arg.
++ * @item:   unit ptr
++ * @arg:    argument vector base ptr
++ *
++ * This iterator callback is called by mpc_unit_lookup_by_name()
++ * for each unit in the units table.
++ *
++ * Return: If the unit matching the given name is found returns
++ * the referenced unit pointer in argv[2], otherwise NULL.
++ */
++static int mpc_unit_lookup_by_name_itercb(int minor, void *item, void *arg)
++{
++	struct mpc_unit *unit = item;
++	void **argv = arg;
++	struct mpc_unit *parent = argv[0];
++	const char *name = argv[1];
++
++	if (!unit)
++		return ITERCB_NEXT;
++
++	if (mpc_unit_isctldev(parent) && !mpc_unit_ismpooldev(unit))
++		return ITERCB_NEXT;
++
++	if (parent->un_mpool && unit->un_mpool != parent->un_mpool)
++		return ITERCB_NEXT;
++
++	if (strcmp(unit->un_name, name) == 0) {
++		kref_get(&unit->un_ref);
++		argv[2] = unit;
++		return ITERCB_DONE;
++	}
++
++	return ITERCB_NEXT;
++}
++
++/**
++ * mpc_unit_lookup_by_name() - Look up an mpool unit by name.
++ * @parent: parent unit
++ * @name:   unit name. This is not the mpool name.
++ * @unitp:  unit ptr
++ *
++ * If a unit exists in the system which has the given name and parent
++ * then it is referenced and returned via *unitp.  Otherwise, *unitp
++ * is set to NULL.
++ */
++static void mpc_unit_lookup_by_name(struct mpc_unit *parent, const char *name,
++				    struct mpc_unit **unitp)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	void *argv[] = { parent, (void *)name, NULL };
++
++	mutex_lock(&ss->ss_lock);
++	idr_for_each(&ss->ss_unitmap, mpc_unit_lookup_by_name_itercb, argv);
++	mutex_unlock(&ss->ss_lock);
++
++	*unitp = argv[2];
++}
++
+ /**
+  * mpc_unit_setup() - Create a device unit object and special file
+  * @uinfo:
+@@ -327,6 +612,36 @@ static int mpc_unit_setup(const struct mpc_uinfo *uinfo, const char *name,
+ 	return rc;
+ }
+ 
++
++static int mpc_cf_journal(struct mpc_unit *unit)
++{
++	struct mpool_config cfg = { };
++	struct mpc_mpool *mpool;
 +	int rc;
 +
-+	mp_pr_debug("mdc01: %lu mdc02: %lu", 0, (ulong)mdc01->eld_objid, (ulong)mdc02->eld_objid);
++	mpool = unit->un_mpool;
++	if (!mpool)
++		return -EINVAL;
 +
-+	/* Activation is intense; serialize it when have multiple mpools */
-+	mutex_lock(&pmd_s_lock);
++	down_write(&mpool->mp_lock);
 +
-+	/* Init metadata array for mpool */
-+	pmd_mda_init(mp);
++	cfg.mc_uid = unit->un_uid;
++	cfg.mc_gid = unit->un_gid;
++	cfg.mc_mode = unit->un_mode;
++	cfg.mc_oid1 = unit->un_ds_oidv[0];
++	cfg.mc_oid2 = unit->un_ds_oidv[1];
++	cfg.mc_captgt = unit->un_mdc_captgt;
++	cfg.mc_ra_pages_max = unit->un_ra_pages_max;
++	memcpy(&cfg.mc_utype, &unit->un_utype, sizeof(cfg.mc_utype));
++	strlcpy(cfg.mc_label, unit->un_label, sizeof(cfg.mc_label));
 +
-+	/* Initialize mdc0 for mpool */
-+	rc = pmd_mdc0_init(mp, mdc01, mdc02);
-+	if (rc) {
-+		/*
-+		 * pmd_mda_free() will dealloc mdc01/2 on subsequent
-+		 * activation failures
-+		 */
-+		pmd_obj_put(mdc01);
-+		pmd_obj_put(mdc02);
-+		goto exit;
-+	}
++	rc = mpool_config_store(mpool->mp_desc, &cfg);
 +
-+	/* Load mpool properties from mdc0 including drive list and states */
-+	if (!create) {
-+		rc = pmd_props_load(mp);
-+		if (rc)
-+			goto exit;
-+	}
-+
-+	/*
-+	 * initialize smaps for all drives in mpool (now that list
-+	 * is finalized)
-+	 */
-+	rc = smap_mpool_init(mp);
-+	if (rc)
-+		goto exit;
-+
-+	/* Load mdc layouts from mdc0 and finalize mda initialization */
-+	rc = pmd_objs_load(mp, 0);
-+	if (rc)
-+		goto exit;
-+
-+	/* Load user object layouts from all other mdc */
-+	rc = pmd_objs_load_parallel(mp);
-+	if (rc) {
-+		mp_pr_err("mpool %s, failed to load user MDCs", rc, mp->pds_name);
-+		goto exit;
-+	}
-+
-+	/*
-+	 * If the format of the mpool metadata read from media during activate
-+	 * is not the latest, it is time to write the metadata on media with
-+	 * the latest format.
-+	 */
-+	if (!create) {
-+		rc = pmd_write_meta_to_latest_version(mp, true);
-+		if (rc) {
-+			mp_pr_err("mpool %s, failed to compact MDCs (metadata conversion)",
-+				  rc, mp->pds_name);
-+			goto exit;
-+		}
-+	}
-+exit:
-+	if (rc) {
-+		/* Activation failed; cleanup */
-+		pmd_mda_free(mp);
-+		smap_mpool_free(mp);
-+	}
-+
-+	mutex_unlock(&pmd_s_lock);
++	up_write(&mpool->mp_lock);
 +
 +	return rc;
 +}
 +
-+void pmd_mpool_deactivate(struct mpool_descriptor *mp)
+ /**
+  * mpc_uevent() - Hook to intercept and modify uevents before they're posted to udev
+  * @dev:    mpc driver device
+@@ -347,6 +662,1251 @@ static int mpc_uevent(struct device *dev, struct kobj_uevent_env *env)
+ 	return 0;
+ }
+ 
++/**
++ * mpc_mp_chown() - Change ownership of an mpool.
++ * @unit: mpool unit ptr
++ * @mps:
++ *
++ * Return:  Returns 0 if successful, -errno otherwise...
++ */
++static int mpc_mp_chown(struct mpc_unit *unit, struct mpool_params *params)
 +{
-+	/* Deactivation is intense; serialize it when have multiple mpools */
-+	mutex_lock(&pmd_s_lock);
++	mode_t mode;
++	uid_t uid;
++	gid_t gid;
++	int rc = 0;
 +
-+	/* Close all open user (non-mdc) mlogs */
-+	mlogutil_closeall(mp);
++	if (!mpc_unit_ismpooldev(unit))
++		return -EINVAL;
 +
-+	pmd_mda_free(mp);
-+	smap_mpool_free(mp);
++	uid  = params->mp_uid;
++	gid  = params->mp_gid;
++	mode = params->mp_mode;
 +
-+	mutex_unlock(&pmd_s_lock);
++	if (mode != -1)
++		mode &= 0777;
++
++	if (uid != -1 && uid != unit->un_uid && !capable(CAP_CHOWN))
++		return -EPERM;
++
++	if (gid != -1 && gid != unit->un_gid && !capable(CAP_CHOWN))
++		return -EPERM;
++
++	if (mode != -1 && mode != unit->un_mode && !capable(CAP_FOWNER))
++		return -EPERM;
++
++	if (-1 != uid)
++		unit->un_uid = uid;
++	if (-1 != gid)
++		unit->un_gid = gid;
++	if (-1 != mode)
++		unit->un_mode = mode;
++
++	if (uid != -1 || gid != -1 || mode != -1)
++		rc = kobject_uevent(&unit->un_device->kobj, KOBJ_CHANGE);
++
++	return rc;
 +}
-diff --git a/drivers/mpool/pmd_obj.c b/drivers/mpool/pmd_obj.c
-index 8966fc0abd0e..18157fecccfb 100644
---- a/drivers/mpool/pmd_obj.c
-+++ b/drivers/mpool/pmd_obj.c
-@@ -507,9 +507,7 @@ int pmd_obj_commit(struct mpool_descriptor *mp, struct pmd_layout *layout)
- 
- 	pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
- 
--#ifdef OBJ_PERSISTENCE_ENABLED
- 	rc = pmd_log_create(mp, layout);
--#endif
- 	if (!rc) {
- 		pmd_uc_lock(cinfo, cslot);
- 		found = pmd_uc_remove(cinfo, layout);
-@@ -675,9 +673,7 @@ int pmd_obj_delete(struct mpool_descriptor *mp, struct pmd_layout *layout)
- 		return (refcnt > 2) ? -EBUSY : -EINVAL;
- 	}
- 
--#ifdef OBJ_PERSISTENCE_ENABLED
- 	rc = pmd_log_delete(mp, objid);
--#endif
- 	if (!rc) {
- 		pmd_co_wlock(cinfo, cslot);
- 		found = pmd_co_remove(cinfo, layout);
-@@ -763,9 +759,7 @@ int pmd_obj_erase(struct mpool_descriptor *mp, struct pmd_layout *layout, u64 ge
- 
- 		pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
- 
--#ifdef OBJ_PERSISTENCE_ENABLED
- 		rc = pmd_log_erase(mp, layout->eld_objid, gen);
--#endif
- 		if (!rc) {
- 			layout->eld_gen = gen;
- 			if (cslot)
-@@ -830,9 +824,7 @@ static int pmd_alloc_idgen(struct mpool_descriptor *mp, enum obj_type_omf otype,
- 		 * to prevent a race with mdc compaction.
- 		 */
- 		pmd_mdc_lock(&cinfo->mmi_compactlock, cslot);
--#ifdef OBJ_PERSISTENCE_ENABLED
- 		rc = pmd_log_idckpt(mp, *objid);
--#endif
- 		if (!rc)
- 			cinfo->mmi_lckpt = *objid;
- 		pmd_mdc_unlock(&cinfo->mmi_compactlock);
++
++/**
++ * mpioc_params_get() - get parameters of an activated mpool
++ * @unit:   mpool unit ptr
++ * @get:    mpool params
++ *
++ * MPIOC_PARAMS_GET ioctl handler to get mpool parameters
++ *
++ * Return:  Returns 0 if successful, -errno otherwise...
++ */
++static int mpioc_params_get(struct mpc_unit *unit, struct mpioc_params *get)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpool_descriptor *desc;
++	struct mpool_params *params;
++	struct mpool_xprops xprops = { };
++	u8 mclass;
++
++	if (!mpc_unit_ismpooldev(unit))
++		return -EINVAL;
++
++	desc = unit->un_mpool->mp_desc;
++
++	mutex_lock(&ss->ss_lock);
++
++	params = &get->mps_params;
++	memset(params, 0, sizeof(*params));
++	params->mp_uid = unit->un_uid;
++	params->mp_gid = unit->un_gid;
++	params->mp_mode = unit->un_mode;
++	params->mp_mdc_captgt = MPOOL_ROOT_LOG_CAP;
++	params->mp_oidv[0] = unit->un_ds_oidv[0];
++	params->mp_oidv[1] = unit->un_ds_oidv[1];
++	params->mp_ra_pages_max = unit->un_ra_pages_max;
++	memcpy(&params->mp_utype, &unit->un_utype, sizeof(params->mp_utype));
++	strlcpy(params->mp_label, unit->un_label, sizeof(params->mp_label));
++	strlcpy(params->mp_name, unit->un_name, sizeof(params->mp_name));
++
++	/* Get mpool properties.. */
++	mpool_get_xprops(desc, &xprops);
++
++	for (mclass = 0; mclass < MP_MED_NUMBER; mclass++)
++		params->mp_mblocksz[mclass] = xprops.ppx_params.mp_mblocksz[mclass];
++
++	params->mp_spare_cap = xprops.ppx_drive_spares[MP_MED_CAPACITY];
++	params->mp_spare_stg = xprops.ppx_drive_spares[MP_MED_STAGING];
++
++	memcpy(params->mp_poolid.b, xprops.ppx_params.mp_poolid.b, MPOOL_UUID_SIZE);
++
++	mutex_unlock(&ss->ss_lock);
++
++	return 0;
++}
++
++/**
++ * mpioc_params_set() - set parameters of an activated mpool
++ * @unit:   mpool unit ptr
++ * @set:    mpool params
++ *
++ * MPIOC_PARAMS_SET ioctl handler to set mpool parameters
++ *
++ * Return:  Returns 0 if successful, -errno otherwise...
++ */
++static int mpioc_params_set(struct mpc_unit *unit, struct mpioc_params *set)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpool_descriptor *mp;
++	struct mpool_params *params;
++	uuid_le uuidnull = { };
++	int rerr = 0, err = 0;
++	bool journal = false;
++
++	if (!mpc_unit_ismpooldev(unit))
++		return -EINVAL;
++
++	params = &set->mps_params;
++
++	mutex_lock(&ss->ss_lock);
++	if (params->mp_uid != -1 || params->mp_gid != -1 || params->mp_mode != -1) {
++		err = mpc_mp_chown(unit, params);
++		if (err) {
++			mutex_unlock(&ss->ss_lock);
++			return err;
++		}
++		journal = true;
++	}
++
++	if (params->mp_label[0]) {
++		mpc_toascii(params->mp_label, sizeof(params->mp_label));
++		strlcpy(unit->un_label, params->mp_label, sizeof(unit->un_label));
++		journal = true;
++	}
++
++	if (memcmp(&uuidnull, &params->mp_utype, sizeof(uuidnull))) {
++		memcpy(&unit->un_utype, &params->mp_utype, sizeof(unit->un_utype));
++		journal = true;
++	}
++
++	if (params->mp_ra_pages_max != U32_MAX) {
++		unit->un_ra_pages_max = clamp_t(u32, params->mp_ra_pages_max,
++						0, MPOOL_RA_PAGES_MAX);
++		journal = true;
++	}
++
++	if (journal)
++		err = mpc_cf_journal(unit);
++	mutex_unlock(&ss->ss_lock);
++
++	if (err) {
++		mp_pr_err("%s: params commit failed", err, unit->un_name);
++		return err;
++	}
++
++	mp = unit->un_mpool->mp_desc;
++
++	if (params->mp_spare_cap != MPOOL_SPARES_INVALID) {
++		err = mpool_drive_spares(mp, MP_MED_CAPACITY, params->mp_spare_cap);
++		if (err && err != -ENOENT)
++			rerr = err;
++	}
++
++	if (params->mp_spare_stg != MPOOL_SPARES_INVALID) {
++		err = mpool_drive_spares(mp, MP_MED_STAGING, params->mp_spare_stg);
++		if (err && err != -ENOENT)
++			rerr = err;
++	}
++
++	return rerr;
++}
++
++/**
++ * mpioc_mp_mclass_get() - get information regarding an mpool's mclasses
++ * @unit:   mpool unit ptr
++ * @mcl:    mclass info struct
++ *
++ * MPIOC_MP_MCLASS_GET ioctl handler to get mclass information
++ *
++ * Return:  Returns 0 if successful, -errno otherwise...
++ */
++static int mpioc_mp_mclass_get(struct mpc_unit *unit, struct mpioc_mclass *mcl)
++{
++	struct mpool_descriptor *desc = unit->un_mpool->mp_desc;
++	struct mpool_mclass_xprops mcxv[MP_MED_NUMBER];
++	uint32_t mcxc = ARRAY_SIZE(mcxv);
++	int rc;
++
++	if (!mcl || !desc)
++		return -EINVAL;
++
++	if (!mcl->mcl_xprops) {
++		mpool_mclass_get_cnt(desc, &mcl->mcl_cnt);
++		return 0;
++	}
++
++	memset(mcxv, 0, sizeof(mcxv));
++
++	rc = mpool_mclass_get(desc, &mcxc, mcxv);
++	if (rc)
++		return rc;
++
++	if (mcxc > mcl->mcl_cnt)
++		mcxc = mcl->mcl_cnt;
++	mcl->mcl_cnt = mcxc;
++
++	rc = copy_to_user(mcl->mcl_xprops, mcxv, sizeof(mcxv[0]) * mcxc);
++
++	return rc ? -EFAULT : 0;
++}
++
++/**
++ * mpioc_devprops_get() - Get device properties
++ * @unit:   mpool unit ptr
++ *
++ * MPIOC_PROP_GET ioctl handler to retrieve properties for the specified device.
++ */
++static int mpioc_devprops_get(struct mpc_unit *unit, struct mpioc_devprops *devprops)
++{
++	int rc = 0;
++
++	if (unit->un_mpool) {
++		struct mpool_descriptor *mp = unit->un_mpool->mp_desc;
++
++		rc = mpool_get_devprops_by_name(mp, devprops->dpr_pdname, &devprops->dpr_devprops);
++	}
++
++	return rc;
++}
++
++/**
++ * mpioc_prop_get() - Get mpool properties.
++ * @unit:   mpool unit ptr
++ *
++ * MPIOC_PROP_GET ioctl handler to retrieve properties for the specified device.
++ */
++static void mpioc_prop_get(struct mpc_unit *unit, struct mpioc_prop *kprop)
++{
++	struct mpool_descriptor *desc = unit->un_mpool->mp_desc;
++	struct mpool_params *params;
++	struct mpool_xprops *xprops;
++
++	memset(kprop, 0, sizeof(*kprop));
++
++	/* Get unit properties.. */
++	params = &kprop->pr_xprops.ppx_params;
++	params->mp_uid = unit->un_uid;
++	params->mp_gid = unit->un_gid;
++	params->mp_mode = unit->un_mode;
++	params->mp_mdc_captgt = unit->un_mdc_captgt;
++	params->mp_oidv[0] = unit->un_ds_oidv[0];
++	params->mp_oidv[1] = unit->un_ds_oidv[1];
++	params->mp_ra_pages_max = unit->un_ra_pages_max;
++	memcpy(&params->mp_utype, &unit->un_utype, sizeof(params->mp_utype));
++	strlcpy(params->mp_label, unit->un_label, sizeof(params->mp_label));
++	strlcpy(params->mp_name, unit->un_name, sizeof(params->mp_name));
++
++	/* Get mpool properties.. */
++	xprops = &kprop->pr_xprops;
++	mpool_get_xprops(desc, xprops);
++	mpool_get_usage(desc, MP_MED_ALL, &kprop->pr_usage);
++
++	params->mp_spare_cap = xprops->ppx_drive_spares[MP_MED_CAPACITY];
++	params->mp_spare_stg = xprops->ppx_drive_spares[MP_MED_STAGING];
++
++	kprop->pr_mcxc = ARRAY_SIZE(kprop->pr_mcxv);
++	mpool_mclass_get(desc, &kprop->pr_mcxc, kprop->pr_mcxv);
++}
++
++/**
++ * mpioc_proplist_get_itercb() - Get properties iterator callback.
++ * @item:   unit ptr
++ * @arg:    argument list
++ *
++ * Return: Returns properties for each unit matching the input criteria.
++ */
++static int mpioc_proplist_get_itercb(int minor, void *item, void *arg)
++{
++	struct mpc_unit *unit = item;
++	struct mpioc_prop __user *uprop;
++	struct mpioc_prop kprop;
++	struct mpc_unit *match;
++	struct mpioc_list *ls;
++	void **argv = arg;
++	int *cntp, rc;
++	int *errp;
++
++	if (!unit)
++		return ITERCB_NEXT;
++
++	match = argv[0];
++	ls = argv[1];
++
++	if (mpc_unit_isctldev(match) && !mpc_unit_ismpooldev(unit) &&
++	    ls->ls_cmd != MPIOC_LIST_CMD_PROP_GET)
++		return ITERCB_NEXT;
++
++	if (mpc_unit_ismpooldev(match) && !mpc_unit_ismpooldev(unit) &&
++	    ls->ls_cmd != MPIOC_LIST_CMD_PROP_GET)
++		return ITERCB_NEXT;
++
++	if (mpc_unit_ismpooldev(match) && unit->un_mpool != match->un_mpool)
++		return ITERCB_NEXT;
++
++	cntp = argv[2];
++	errp = argv[3];
++
++	mpioc_prop_get(unit, &kprop);
++
++	uprop = (struct mpioc_prop __user *)ls->ls_listv + *cntp;
++
++	rc = copy_to_user(uprop, &kprop, sizeof(*uprop));
++	if (rc) {
++		*errp = -EFAULT;
++		return ITERCB_DONE;
++	}
++
++	return (++(*cntp) >= ls->ls_listc) ? ITERCB_DONE : ITERCB_NEXT;
++}
++
++/**
++ * mpioc_proplist_get() - Get mpool properties.
++ * @unit:   mpool unit ptr
++ * @ls:     properties parameter block
++ *
++ * MPIOC_PROP_GET ioctl handler to retrieve properties for one
++ * or more mpools.
++ *
++ * Return:  Returns 0 if successful, -errno otherwise...
++ */
++static int mpioc_proplist_get(struct mpc_unit *unit, struct mpioc_list *ls)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	int err = 0;
++	int cnt = 0;
++	void *argv[] = { unit, ls, &cnt, &err };
++
++	if (!ls || ls->ls_listc < 1 || ls->ls_cmd == MPIOC_LIST_CMD_INVALID)
++		return -EINVAL;
++
++	mutex_lock(&ss->ss_lock);
++	idr_for_each(&ss->ss_unitmap, mpioc_proplist_get_itercb, argv);
++	mutex_unlock(&ss->ss_lock);
++
++	ls->ls_listc = cnt;
++
++	return err;
++}
++
++/**
++ * mpc_mpool_open() - Open the mpool specified by the given drive paths,
++ *                    and then create an mpool object to track the
++ *                    underlying mpool.
++ * @dpathc: drive count
++ * @dpathv: drive path name vector
++ * @mpoolp: mpool ptr. Set only if success.
++ * @pd_prop: PDs properties
++ *
++ * Return:  Returns 0 if successful and sets *mpoolp.
++ *          Returns -errno on error.
++ */
++static int mpc_mpool_open(uint dpathc, char **dpathv, struct mpc_mpool **mpoolp,
++			  struct pd_prop *pd_prop, struct mpool_params *params, u32 flags)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpcore_params mpc_params;
++	struct mpc_mpool *mpool;
++	size_t mpoolsz, len;
++	int rc;
++
++	if (!ss || !dpathv || !mpoolp || !params)
++		return -EINVAL;
++
++	len = mpc_toascii(params->mp_name, sizeof(params->mp_name));
++	if (len < 1 || len >= MPOOL_NAMESZ_MAX)
++		return (len < 1) ? -EINVAL : -ENAMETOOLONG;
++
++	mpoolsz = sizeof(*mpool) + len + 1;
++
++	mpool = kzalloc(mpoolsz, GFP_KERNEL);
++	if (!mpool)
++		return -ENOMEM;
++
++	if (!try_module_get(THIS_MODULE)) {
++		kfree(mpool);
++		return -EBUSY;
++	}
++
++	mpool_to_mpcore_params(params, &mpc_params);
++
++	rc = mpool_activate(dpathc, dpathv, pd_prop, MPOOL_ROOT_LOG_CAP,
++			    &mpc_params, flags, &mpool->mp_desc);
++	if (rc) {
++		mp_pr_err("Activating %s failed", rc, params->mp_name);
++		module_put(THIS_MODULE);
++		kfree(mpool);
++		return rc;
++	}
++
++	kref_init(&mpool->mp_ref);
++	init_rwsem(&mpool->mp_lock);
++	mpool->mp_dpathc = dpathc;
++	mpool->mp_dpathv = dpathv;
++	strcpy(mpool->mp_name, params->mp_name);
++
++	*mpoolp = mpool;
++
++	return 0;
++}
++
++/**
++ * mpioc_mp_create() - create an mpool.
++ * @mp:      mpool parameter block
++ * @pd_prop:
++ * @dpathv:
++ *
++ * MPIOC_MP_CREATE ioctl handler to create an mpool.
++ *
++ * Return:  Returns 0 if the mpool is created, -errno otherwise...
++ */
++static int mpioc_mp_create(struct mpc_unit *ctl, struct mpioc_mpool *mp,
++			   struct pd_prop *pd_prop, char ***dpathv)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpcore_params mpc_params;
++	struct mpool_config cfg = { };
++	struct mpc_mpool *mpool = NULL;
++	struct mpc_unit *unit = NULL;
++	size_t len;
++	mode_t mode;
++	uid_t uid;
++	gid_t gid;
++	int rc;
++
++	if (!ctl || !mp || !pd_prop || !dpathv)
++		return -EINVAL;
++
++	len = mpc_toascii(mp->mp_params.mp_name, sizeof(mp->mp_params.mp_name));
++	if (len < 1 || len >= MPOOL_NAMESZ_MAX)
++		return (len < 1) ? -EINVAL : -ENAMETOOLONG;
++
++	mpool_params_merge_defaults(&mp->mp_params);
++
++	uid  = mp->mp_params.mp_uid;
++	gid  = mp->mp_params.mp_gid;
++	mode = mp->mp_params.mp_mode;
++
++	if (uid == -1)
++		uid = mpc_default_uid;
++	if (gid == -1)
++		gid = mpc_default_gid;
++	if (mode == -1)
++		mode = mpc_default_mode;
++
++	mode &= 0777;
++
++	if (uid != mpc_current_uid() && !capable(CAP_CHOWN)) {
++		rc = -EPERM;
++		mp_pr_err("chown permission denied, uid %d", rc, uid);
++		return rc;
++	}
++
++	if (gid != mpc_current_gid() && !capable(CAP_CHOWN)) {
++		rc = -EPERM;
++		mp_pr_err("chown permission denied, gid %d", rc, gid);
++		return rc;
++	}
++
++	if (!capable(CAP_SYS_ADMIN)) {
++		rc = -EPERM;
++		mp_pr_err("chmod/activate permission denied", rc);
++		return rc;
++	}
++
++	mpool_to_mpcore_params(&mp->mp_params, &mpc_params);
++
++	rc = mpool_create(mp->mp_params.mp_name, mp->mp_flags, *dpathv,
++			  pd_prop, &mpc_params, MPOOL_ROOT_LOG_CAP);
++	if (rc) {
++		mp_pr_err("%s: create failed", rc, mp->mp_params.mp_name);
++		return rc;
++	}
++
++	/*
++	 * Create an mpc_mpool object through which we can (re)open and manage
++	 * the mpool.  If successful, mpc_mpool_open() adopts dpathv.
++	 */
++	mpool_params_merge_defaults(&mp->mp_params);
++
++	rc = mpc_mpool_open(mp->mp_dpathc, *dpathv, &mpool, pd_prop, &mp->mp_params, mp->mp_flags);
++	if (rc) {
++		mp_pr_err("%s: mpc_mpool_open failed", rc, mp->mp_params.mp_name);
++		mpool_destroy(mp->mp_dpathc, *dpathv, pd_prop, mp->mp_flags);
++		return rc;
++	}
++
++	*dpathv = NULL;
++
++	mlog_lookup_rootids(&cfg.mc_oid1, &cfg.mc_oid2);
++	cfg.mc_uid = uid;
++	cfg.mc_gid = gid;
++	cfg.mc_mode = mode;
++	cfg.mc_rsvd0 = mp->mp_params.mp_rsvd0;
++	cfg.mc_captgt = MPOOL_ROOT_LOG_CAP;
++	cfg.mc_ra_pages_max = mp->mp_params.mp_ra_pages_max;
++	cfg.mc_rsvd1 = mp->mp_params.mp_rsvd1;
++	cfg.mc_rsvd2 = mp->mp_params.mp_rsvd2;
++	cfg.mc_rsvd3 = mp->mp_params.mp_rsvd3;
++	cfg.mc_rsvd4 = mp->mp_params.mp_rsvd4;
++	memcpy(&cfg.mc_utype, &mp->mp_params.mp_utype, sizeof(cfg.mc_utype));
++	strlcpy(cfg.mc_label, mp->mp_params.mp_label, sizeof(cfg.mc_label));
++
++	rc = mpool_config_store(mpool->mp_desc, &cfg);
++	if (rc) {
++		mp_pr_err("%s: config store failed", rc, mp->mp_params.mp_name);
++		goto errout;
++	}
++
++	/* A unit is born with two references:  A birth reference, and one for the caller. */
++	rc = mpc_unit_setup(&mpc_uinfo_mpool, mp->mp_params.mp_name,
++			    &cfg, mpool, &unit);
++	if (rc) {
++		mp_pr_err("%s: unit setup failed", rc, mp->mp_params.mp_name);
++		goto errout;
++	}
++
++	/* Return resolved params to caller. */
++	mp->mp_params.mp_uid = uid;
++	mp->mp_params.mp_gid = gid;
++	mp->mp_params.mp_mode = mode;
++	mp->mp_params.mp_mdc_captgt = cfg.mc_captgt;
++	mp->mp_params.mp_oidv[0] = cfg.mc_oid1;
++	mp->mp_params.mp_oidv[1] = cfg.mc_oid2;
++
++	rc = mpc_params_register(unit, MPC_MPOOL_PARAMS_CNT);
++	if (rc) {
++		mpc_unit_put(unit); /* drop birth ref */
++		goto errout;
++	}
++
++	mutex_lock(&ss->ss_lock);
++	idr_replace(&ss->ss_unitmap, unit, MINOR(unit->un_devno));
++	mutex_unlock(&ss->ss_lock);
++
++	mpool = NULL;
++
++errout:
++	if (mpool) {
++		mpool_deactivate(mpool->mp_desc);
++		mpool->mp_desc = NULL;
++		mpool_destroy(mp->mp_dpathc, mpool->mp_dpathv, pd_prop, mp->mp_flags);
++	}
++
++	/*
++	 * For failures after mpc_unit_setup() (i.e., mpool != NULL)
++	 * dropping the final unit ref will release the mpool ref.
++	 */
++	if (unit)
++		mpc_unit_put(unit); /* Drop caller's ref */
++	else if (mpool)
++		mpc_mpool_put(mpool);
++
++	return rc;
++}
++
++/**
++ * mpioc_mp_activate() - activate an mpool.
++ * @mp:      mpool parameter block
++ * @pd_prop:
++ * @dpathv:
++ *
++ * MPIOC_MP_ACTIVATE ioctl handler to activate an mpool.
++ *
++ * Return:  Returns 0 if the mpool is activated, -errno otherwise...
++ */
++static int mpioc_mp_activate(struct mpc_unit *ctl, struct mpioc_mpool *mp,
++			     struct pd_prop *pd_prop, char ***dpathv)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpool_config cfg;
++	struct mpc_mpool *mpool = NULL;
++	struct mpc_unit *unit = NULL;
++	size_t len;
++	int rc;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
++
++	if (!ctl || !mp || !pd_prop || !dpathv)
++		return -EINVAL;
++
++	len = mpc_toascii(mp->mp_params.mp_name, sizeof(mp->mp_params.mp_name));
++	if (len < 1 || len >= MPOOL_NAMESZ_MAX)
++		return (len < 1) ? -EINVAL : -ENAMETOOLONG;
++
++	mpool_params_merge_defaults(&mp->mp_params);
++
++	/*
++	 * Create an mpc_mpool object through which we can (re)open and manage
++	 * the mpool.  If successful, mpc_mpool_open() adopts dpathv.
++	 */
++	rc = mpc_mpool_open(mp->mp_dpathc, *dpathv, &mpool, pd_prop, &mp->mp_params, mp->mp_flags);
++	if (rc) {
++		mp_pr_err("%s: mpc_mpool_open failed", rc, mp->mp_params.mp_name);
++		return rc;
++	}
++
++	*dpathv = NULL; /* Was adopted by successful mpc_mpool_open() */
++
++	rc = mpool_config_fetch(mpool->mp_desc, &cfg);
++	if (rc) {
++		mp_pr_err("%s config fetch failed", rc, mp->mp_params.mp_name);
++		goto errout;
++	}
++
++	if (mpool_params_merge_config(&mp->mp_params, &cfg))
++		mpool_config_store(mpool->mp_desc, &cfg);
++
++	/* A unit is born with two references:  A birth reference, and one for the caller. */
++	rc = mpc_unit_setup(&mpc_uinfo_mpool, mp->mp_params.mp_name,
++			    &cfg, mpool, &unit);
++	if (rc) {
++		mp_pr_err("%s unit setup failed", rc, mp->mp_params.mp_name);
++		goto errout;
++	}
++
++	/* Return resolved params to caller. */
++	mp->mp_params.mp_uid = cfg.mc_uid;
++	mp->mp_params.mp_gid = cfg.mc_gid;
++	mp->mp_params.mp_mode = cfg.mc_mode;
++	mp->mp_params.mp_mdc_captgt = cfg.mc_captgt;
++	mp->mp_params.mp_oidv[0] = cfg.mc_oid1;
++	mp->mp_params.mp_oidv[1] = cfg.mc_oid2;
++	mp->mp_params.mp_ra_pages_max = cfg.mc_ra_pages_max;
++	mp->mp_params.mp_vma_size_max = cfg.mc_vma_size_max;
++	memcpy(&mp->mp_params.mp_utype, &cfg.mc_utype, sizeof(mp->mp_params.mp_utype));
++	strlcpy(mp->mp_params.mp_label, cfg.mc_label, sizeof(mp->mp_params.mp_label));
++
++	rc = mpc_params_register(unit, MPC_MPOOL_PARAMS_CNT);
++	if (rc) {
++		mpc_unit_put(unit); /* drop birth ref */
++		goto errout;
++	}
++
++	mutex_lock(&ss->ss_lock);
++	idr_replace(&ss->ss_unitmap, unit, MINOR(unit->un_devno));
++	mutex_unlock(&ss->ss_lock);
++
++	mpool = NULL;
++
++errout:
++	/*
++	 * For failures after mpc_unit_setup() (i.e., mpool != NULL)
++	 * dropping the final unit ref will release the mpool ref.
++	 */
++	if (unit)
++		mpc_unit_put(unit); /* drop caller's ref */
++	else if (mpool)
++		mpc_mpool_put(mpool);
++
++	return rc;
++}
++
++/**
++ * mpioc_mp_deactivate_impl() - deactivate an mpool.
++ * @unit:   control device unit ptr
++ * @mp:     mpool parameter block
++ *
++ * MPIOC_MP_DEACTIVATE ioctl handler to deactivate an mpool.
++ */
++static int mp_deactivate_impl(struct mpc_unit *ctl, struct mpioc_mpool *mp, bool locked)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpc_unit *unit = NULL;
++	size_t len;
++	int rc;
++
++	if (!ctl || !mp)
++		return -EINVAL;
++
++	if (!mpc_unit_isctldev(ctl))
++		return -ENOTTY;
++
++	len = mpc_toascii(mp->mp_params.mp_name, sizeof(mp->mp_params.mp_name));
++	if (len < 1 || len >= MPOOL_NAMESZ_MAX)
++		return (len < 1) ? -EINVAL : -ENAMETOOLONG;
++
++	if (!locked) {
++		rc = down_interruptible(&ss->ss_op_sema);
++		if (rc)
++			return rc;
++	}
++
++	mpc_unit_lookup_by_name(ctl, mp->mp_params.mp_name, &unit);
++	if (!unit) {
++		rc = -ENXIO;
++		goto errout;
++	}
++
++	/*
++	 * In order to be determined idle, a unit shall not be open
++	 * and shall have a ref count of exactly two (the birth ref
++	 * and the lookup ref from above).
++	 */
++	mutex_lock(&ss->ss_lock);
++	if (unit->un_open_cnt > 0 || kref_read(&unit->un_ref) != 2) {
++		rc = -EBUSY;
++		mp_pr_err("%s: busy, cannot deactivate", rc, unit->un_name);
++	} else {
++		idr_replace(&ss->ss_unitmap, NULL, MINOR(unit->un_devno));
++		rc = 0;
++	}
++	mutex_unlock(&ss->ss_lock);
++
++	if (!rc)
++		mpc_unit_put(unit); /* drop birth ref */
++
++	mpc_unit_put(unit); /* drop lookup ref */
++
++errout:
++	if (!locked)
++		up(&ss->ss_op_sema);
++
++	return rc;
++}
++
++static int mpioc_mp_deactivate(struct mpc_unit *ctl, struct mpioc_mpool *mp)
++{
++	return mp_deactivate_impl(ctl, mp, false);
++}
++
++static int mpioc_mp_cmd(struct mpc_unit *ctl, uint cmd, struct mpioc_mpool *mp)
++{
++	struct mpc_softstate *ss = &mpc_softstate;
++	struct mpc_unit *unit = NULL;
++	struct pd_prop *pd_prop = NULL;
++	char **dpathv = NULL, *dpaths;
++	size_t dpathvsz, pd_prop_sz;
++	const char *action;
++	size_t len;
++	int rc, i;
++
++	if (!ctl || !mp)
++		return -EINVAL;
++
++	if (!mpc_unit_isctldev(ctl))
++		return -EOPNOTSUPP;
++
++	if (mp->mp_dpathc < 1 || mp->mp_dpathc > MPOOL_DRIVES_MAX)
++		return -EDOM;
++
++	len = mpc_toascii(mp->mp_params.mp_name, sizeof(mp->mp_params.mp_name));
++	if (len < 1 || len >= MPOOL_NAMESZ_MAX)
++		return (len < 1) ? -EINVAL : -ENAMETOOLONG;
++
++	switch (cmd) {
++	case MPIOC_MP_CREATE:
++		action = "create";
++		break;
++
++	case MPIOC_MP_DESTROY:
++		action = "destroy";
++		break;
++
++	case MPIOC_MP_ACTIVATE:
++		action = "activate";
++		break;
++
++	case MPIOC_MP_RENAME:
++		action = "rename";
++		break;
++
++	default:
++		return -EINVAL;
++	}
++
++	if (!mp->mp_pd_prop || !mp->mp_dpaths) {
++		rc = -EINVAL;
++		mp_pr_err("%s: %s, (%d drives), drives names %p or PD props %p invalid",
++			  rc, mp->mp_params.mp_name, action, mp->mp_dpathc,
++			  mp->mp_dpaths, mp->mp_pd_prop);
++
++		return rc;
++	}
++
++	if (mp->mp_dpathssz > (mp->mp_dpathc + 1) * PATH_MAX)
++		return -EINVAL;
++
++	rc = down_interruptible(&ss->ss_op_sema);
++	if (rc)
++		return rc;
++
++	/*
++	 * If mpc_unit_lookup_by_name() succeeds it will have acquired
++	 * a reference on unit.  We release that reference at the
++	 * end of this function.
++	 */
++	mpc_unit_lookup_by_name(ctl, mp->mp_params.mp_name, &unit);
++
++	if (unit && cmd != MPIOC_MP_DESTROY) {
++		if (cmd == MPIOC_MP_ACTIVATE)
++			goto errout;
++		rc = -EEXIST;
++		mp_pr_err("%s: mpool already activated", rc, mp->mp_params.mp_name);
++		goto errout;
++	}
++
++	/*
++	 * The device path names are in one long string separated by
++	 * newlines.  Here we allocate one chunk of memory to hold
++	 * all the device paths and a vector of ptrs to them.
++	 */
++	dpathvsz = mp->mp_dpathc * sizeof(*dpathv) + mp->mp_dpathssz;
++	if (dpathvsz > MPOOL_DRIVES_MAX * (PATH_MAX + sizeof(*dpathv))) {
++		rc = -E2BIG;
++		mp_pr_err("%s: %s, too many member drives %zu",
++			  rc, mp->mp_params.mp_name, action, dpathvsz);
++		goto errout;
++	}
++
++	dpathv = kmalloc(dpathvsz, GFP_KERNEL);
++	if (!dpathv) {
++		rc = -ENOMEM;
++		goto errout;
++	}
++
++	dpaths = (char *)dpathv + mp->mp_dpathc * sizeof(*dpathv);
++
++	rc = copy_from_user(dpaths, mp->mp_dpaths, mp->mp_dpathssz);
++	if (rc) {
++		rc = -EFAULT;
++		goto errout;
++	}
++
++	for (i = 0; i < mp->mp_dpathc; ++i) {
++		dpathv[i] = strsep(&dpaths, "\n");
++		if (!dpathv[i]) {
++			rc = -EINVAL;
++			goto errout;
++		}
++	}
++
++	/* Get the PDs properties from user space buffer. */
++	pd_prop_sz = mp->mp_dpathc * sizeof(*pd_prop);
++	pd_prop = kmalloc(pd_prop_sz, GFP_KERNEL);
++	if (!pd_prop) {
++		rc = -ENOMEM;
++		mp_pr_err("%s: %s, alloc pd prop %zu failed",
++			  rc, mp->mp_params.mp_name, action, pd_prop_sz);
++		goto errout;
++	}
++
++	rc = copy_from_user(pd_prop, mp->mp_pd_prop, pd_prop_sz);
++	if (rc) {
++		rc = -EFAULT;
++		mp_pr_err("%s: %s, copyin pd prop %zu failed",
++			  rc, mp->mp_params.mp_name, action, pd_prop_sz);
++		goto errout;
++	}
++
++	switch (cmd) {
++	case MPIOC_MP_CREATE:
++		rc = mpioc_mp_create(ctl, mp, pd_prop, &dpathv);
++		break;
++
++	case MPIOC_MP_ACTIVATE:
++		rc = mpioc_mp_activate(ctl, mp, pd_prop, &dpathv);
++		break;
++
++	case MPIOC_MP_DESTROY:
++		if (unit) {
++			mpc_unit_put(unit);
++			unit = NULL;
++
++			rc = mp_deactivate_impl(ctl, mp, true);
++			if (rc) {
++				action = "deactivate";
++				break;
++			}
++		}
++		rc = mpool_destroy(mp->mp_dpathc, dpathv, pd_prop, mp->mp_flags);
++		break;
++
++	case MPIOC_MP_RENAME:
++		rc = mpool_rename(mp->mp_dpathc, dpathv, pd_prop, mp->mp_flags,
++				   mp->mp_params.mp_name);
++		break;
++	}
++
++	if (rc)
++		mp_pr_err("%s: %s failed", rc, mp->mp_params.mp_name, action);
++
++errout:
++	mpc_unit_put(unit);
++	up(&ss->ss_op_sema);
++
++	kfree(pd_prop);
++	kfree(dpathv);
++
++	return rc;
++}
++
++/**
++ * mpioc_mp_add() - add a device to an existing mpool
++ * @unit:   mpool unit ptr
++ * @drv:    mpool device parameter block
++ *
++ * MPIOC_MP_ADD ioctl handler to add a drive to a activated mpool
++ *
++ * Return:  Returns 0 if successful, -errno otherwise...
++ */
++static int mpioc_mp_add(struct mpc_unit *unit, struct mpioc_drive *drv)
++{
++	struct mpool_descriptor *desc = unit->un_mpool->mp_desc;
++	size_t pd_prop_sz, dpathvsz;
++	struct pd_prop *pd_prop;
++	char **dpathv, *dpaths;
++	int rc, i;
++
++	/*
++	 * The device path names are in one long string separated by
++	 * newlines.  Here we allocate one chunk of memory to hold
++	 * all the device paths and a vector of ptrs to them.
++	 */
++	dpathvsz = drv->drv_dpathc * sizeof(*dpathv) + drv->drv_dpathssz;
++	if (drv->drv_dpathc > MPOOL_DRIVES_MAX ||
++	    dpathvsz > MPOOL_DRIVES_MAX * (PATH_MAX + sizeof(*dpathv))) {
++		rc = -E2BIG;
++		mp_pr_err("%s: invalid pathc %u, pathsz %zu",
++			  rc, unit->un_name, drv->drv_dpathc, dpathvsz);
++		return rc;
++	}
++
++	dpathv = kmalloc(dpathvsz, GFP_KERNEL);
++	if (!dpathv) {
++		rc = -ENOMEM;
++		mp_pr_err("%s: alloc dpathv %zu failed", rc, unit->un_name, dpathvsz);
++		return rc;
++	}
++
++	dpaths = (char *)dpathv + drv->drv_dpathc * sizeof(*dpathv);
++	rc = copy_from_user(dpaths, drv->drv_dpaths, drv->drv_dpathssz);
++	if (rc) {
++		rc = -EFAULT;
++		mp_pr_err("%s: copyin dpaths %u failed", rc, unit->un_name, drv->drv_dpathssz);
++		kfree(dpathv);
++		return rc;
++	}
++
++	for (i = 0; i < drv->drv_dpathc; ++i) {
++		dpathv[i] = strsep(&dpaths, "\n");
++		if (!dpathv[i] || (strlen(dpathv[i]) > PATH_MAX - 1)) {
++			rc = -EINVAL;
++			mp_pr_err("%s: ill-formed dpathv list ", rc, unit->un_name);
++			kfree(dpathv);
++			return rc;
++		}
++	}
++
++	/* Get the PDs properties from user space buffer. */
++	pd_prop_sz = drv->drv_dpathc * sizeof(*pd_prop);
++
++	pd_prop = kmalloc(pd_prop_sz, GFP_KERNEL);
++	if (!pd_prop) {
++		rc = -ENOMEM;
++		mp_pr_err("%s: alloc pd prop %zu failed", rc, unit->un_name, pd_prop_sz);
++		kfree(dpathv);
++		return rc;
++	}
++
++	rc = copy_from_user(pd_prop, drv->drv_pd_prop, pd_prop_sz);
++	if (rc) {
++		rc = -EFAULT;
++		mp_pr_err("%s: copyin pd prop %zu failed", rc, unit->un_name, pd_prop_sz);
++		kfree(pd_prop);
++		kfree(dpathv);
++		return rc;
++	}
++
++	for (i = 0; i < drv->drv_dpathc; ++i) {
++		rc = mpool_drive_add(desc, dpathv[i], &pd_prop[i]);
++		if (rc)
++			break;
++	}
++
++	kfree(pd_prop);
++	kfree(dpathv);
++
++	return rc;
++}
++
++static struct mpc_softstate *mpc_cdev2ss(struct cdev *cdev)
++{
++	if (!cdev || cdev->owner != THIS_MODULE) {
++		mp_pr_crit("module dissociated", -EINVAL);
++		return NULL;
++	}
++
++	return container_of(cdev, struct mpc_softstate, ss_cdev);
++}
++
++/*
++ * MPCTL file operations.
++ */
++
++/**
++ * mpc_open() - Open an mpool device.
++ * @ip: inode ptr
++ * @fp: file ptr
++ *
++ * Return:  Returns 0 on success, -errno otherwise...
++ */
++static int mpc_open(struct inode *ip, struct file *fp)
++{
++	struct mpc_softstate *ss;
++	struct mpc_unit *unit;
++	bool firstopen;
++	int rc = 0;
++
++	ss = mpc_cdev2ss(ip->i_cdev);
++	if (!ss || ss != &mpc_softstate)
++		return -EBADFD;
++
++	/* Acquire a reference on the unit object.  We'll release it in mpc_release(). */
++	mpc_unit_lookup(iminor(fp->f_inode), &unit);
++	if (!unit)
++		return -ENODEV;
++
++	if (down_trylock(&unit->un_open_lock)) {
++		rc = (fp->f_flags & O_NONBLOCK) ? -EWOULDBLOCK :
++			down_interruptible(&unit->un_open_lock);
++
++		if (rc)
++			goto errout;
++	}
++
++	firstopen = (unit->un_open_cnt == 0);
++
++	if (!firstopen) {
++		if (fp->f_mapping != unit->un_mapping)
++			rc = -EBUSY;
++		else if (unit->un_open_excl || (fp->f_flags & O_EXCL))
++			rc = -EBUSY;
++		goto unlock;
++	}
++
++	if (!mpc_unit_ismpooldev(unit)) {
++		unit->un_open_excl = !!(fp->f_flags & O_EXCL);
++		goto unlock; /* control device */
++	}
++
++	/* First open of an mpool unit (not the control device). */
++	if (!fp->f_mapping || fp->f_mapping != ip->i_mapping) {
++		rc = -EINVAL;
++		goto unlock;
++	}
++
++	fp->f_op = &mpc_fops_default;
++
++	unit->un_mapping = fp->f_mapping;
++
++	inode_lock(ip);
++	i_size_write(ip, 1ul << (__BITS_PER_LONG - 1));
++	inode_unlock(ip);
++
++	unit->un_open_excl = !!(fp->f_flags & O_EXCL);
++
++unlock:
++	if (!rc) {
++		fp->private_data = unit;
++		nonseekable_open(ip, fp);
++		++unit->un_open_cnt;
++	}
++	up(&unit->un_open_lock);
++
++errout:
++	if (rc) {
++		if (rc != -EBUSY)
++			mp_pr_err("open %s failed", rc, unit->un_name);
++		mpc_unit_put(unit);
++	}
++
++	return rc;
++}
++
++/**
++ * mpc_release() - Close the specified mpool device.
++ * @ip: inode ptr
++ * @fp: file ptr
++ *
++ * Return:  Returns 0 on success, -errno otherwise...
++ */
++static int mpc_release(struct inode *ip, struct file *fp)
++{
++	struct mpc_unit *unit;
++	bool lastclose;
++
++	unit = fp->private_data;
++	if (!unit)
++		return -EBADFD;
++
++	down(&unit->un_open_lock);
++	lastclose = (--unit->un_open_cnt == 0);
++	if (!lastclose)
++		goto errout;
++
++	if (mpc_unit_ismpooldev(unit))
++		unit->un_mapping = NULL;
++
++	unit->un_open_excl = false;
++
++errout:
++	up(&unit->un_open_lock);
++
++	mpc_unit_put(unit);
++
++	return 0;
++}
++
++/**
++ * mpc_ioctl() - mpc driver ioctl entry point
++ * @fp:     file pointer
++ * @cmd:    an mpool ioctl command (i.e.,  MPIOC_*)
++ * @arg:    varies..
++ *
++ * Perform the specified mpool ioctl command.
++ *
++ * Return:  Returns 0 on success, -errno otherwise...
++ */
++static long mpc_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
++{
++	char argbuf[256] __aligned(16);
++	struct mpc_unit *unit;
++	size_t argbufsz;
++	void *argp;
++	ulong iosz;
++	int rc;
++
++	if (_IOC_TYPE(cmd) != MPIOC_MAGIC)
++		return -ENOTTY;
++
++	if ((fp->f_flags & O_ACCMODE) == O_RDONLY) {
++		switch (cmd) {
++		case MPIOC_PROP_GET:
++		case MPIOC_DEVPROPS_GET:
++		case MPIOC_MP_MCLASS_GET:
++			break;
++
++		default:
++			return -EINVAL;
++		}
++	}
++
++	unit = fp->private_data;
++	argbufsz = sizeof(argbuf);
++	iosz = _IOC_SIZE(cmd);
++	argp = (void *)arg;
++
++	if (!unit || (iosz > sizeof(union mpioc_union)))
++		return -EINVAL;
++
++	/* Set up argp/argbuf for read/write requests. */
++	if (_IOC_DIR(cmd) & (_IOC_READ | _IOC_WRITE)) {
++		argp = argbuf;
++		if (iosz > argbufsz) {
++			argbufsz = roundup_pow_of_two(iosz);
++
++			argp = kzalloc(argbufsz, GFP_KERNEL);
++			if (!argp)
++				return -ENOMEM;
++		}
++
++		if (_IOC_DIR(cmd) & _IOC_WRITE) {
++			if (copy_from_user(argp, (const void __user *)arg, iosz)) {
++				if (argp != argbuf)
++					kfree(argp);
++				return -EFAULT;
++			}
++		}
++	}
++
++	switch (cmd) {
++	case MPIOC_MP_CREATE:
++	case MPIOC_MP_ACTIVATE:
++	case MPIOC_MP_DESTROY:
++	case MPIOC_MP_RENAME:
++		rc = mpioc_mp_cmd(unit, cmd, argp);
++		break;
++
++	case MPIOC_MP_DEACTIVATE:
++		rc = mpioc_mp_deactivate(unit, argp);
++		break;
++
++	case MPIOC_DRV_ADD:
++		rc = mpioc_mp_add(unit, argp);
++		break;
++
++	case MPIOC_PARAMS_SET:
++		rc = mpioc_params_set(unit, argp);
++		break;
++
++	case MPIOC_PARAMS_GET:
++		rc = mpioc_params_get(unit, argp);
++		break;
++
++	case MPIOC_MP_MCLASS_GET:
++		rc = mpioc_mp_mclass_get(unit, argp);
++		break;
++
++	case MPIOC_PROP_GET:
++		rc = mpioc_proplist_get(unit, argp);
++		break;
++
++	case MPIOC_DEVPROPS_GET:
++		rc = mpioc_devprops_get(unit, argp);
++		break;
++
++	default:
++		rc = -ENOTTY;
++		mp_pr_rl("invalid command %x: dir=%u type=%c nr=%u size=%u",
++			 rc, cmd, _IOC_DIR(cmd), _IOC_TYPE(cmd), _IOC_NR(cmd), _IOC_SIZE(cmd));
++		break;
++	}
++
++	if (!rc && _IOC_DIR(cmd) & _IOC_READ) {
++		if (copy_to_user((void __user *)arg, argp, iosz))
++			rc = -EFAULT;
++	}
++
++	if (argp != argbuf)
++		kfree(argp);
++
++	return rc;
++}
++
++static const struct file_operations mpc_fops_default = {
++	.owner		= THIS_MODULE,
++	.open		= mpc_open,
++	.release	= mpc_release,
++	.unlocked_ioctl	= mpc_ioctl,
++};
++
+ static int mpc_exit_unit(int minor, void *item, void *arg)
+ {
+ 	mpc_unit_put(item);
 -- 
 2.17.2
 
