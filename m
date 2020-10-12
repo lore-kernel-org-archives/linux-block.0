@@ -4,31 +4,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AD5C2D0A3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F84CC3279D
 	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:29:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D153C2087D
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:29:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A39F208D5
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:29:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="Z2T+SuZF"
+	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="caIHBZ99"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404005AbgJLQ32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Oct 2020 12:29:28 -0400
-Received: from mail-eopbgr750048.outbound.protection.outlook.com ([40.107.75.48]:26373
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        id S2403837AbgJLQ33 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Oct 2020 12:29:29 -0400
+Received: from mail-mw2nam12on2081.outbound.protection.outlook.com ([40.107.244.81]:56672
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388766AbgJLQ2T (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Oct 2020 12:28:19 -0400
+        id S2403849AbgJLQ2U (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Oct 2020 12:28:20 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iqV5EyECtmEyHpqOZKEQ773tsCzixm1FH5OziIGDm5rqmHZdp//5l7mrm6rkglXIOCcYGQH02ju13kBCfavUoJ0ROpgQa+K5d8/auqpzRwfFi9WF+2gOh2+bTuFXQwy/Th4XTPDTMMt0zRq/s7z+kc+13ussLkyQvO0prthvkiyCGeDZcvyxXKd9+fFjoeTSkHKwxk40+QfcqGnCcyCecPNY9Popk9DmEt7L+JWYCLR/QL3Nk4FeUyf0Nouy4Xln3T66wof2sk87YN6W4donjvdirWMUbLFJRdfJt/Td58NM39eeGb7akqYfVhIqY0fNPNgTocxDomR4x9AOdpi5sQ==
+ b=JYVP6r4aTnfhNrdQRrKHzutBc52lMR7XCx9ETXqAUhGQasBWJKtZiD1FolNuT/lEK+SZylGTHh97JeMa+vCe9NTqx9xK2o22HeNflhtMYRcgnLzg4bLmCHGFz2I64IIG1k2L/wXZ2YAj8M0OqT1NfLFUQavPCq9OtAlH1peQ85qHVw1VbrAprehWpLpgJxUBqZpT+LoaXo9fILy6/4MiBL3b87euObgNQH3trfOGJ+dYMU/qq1XsVQGVYTpHQQ1uVSGV1RnSk19IIaxU08XZlol9cjWrXTX6MBzIRztvWPwFk4emxXQEedZEIx2mWjWnKHr4KNErxuhvUZbOGCTGAw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kMcC/WkWvy5y0OW3Hhjr5sSx9X/kauqvbqpWFnsD6B8=;
- b=OxNqSk5kZ4bxJGsWoUxa8HOHsQcvfug9jYwyGLd/R5sNap7mRBJwjhcLjsNUKePXUHJVI2Dw3urY2eHTiz+J4NNywHHJyemn0LPgSUFAL0tquXTKz+HG/ZlZWTgOj2kZ5DZJo1eeH1UdKdGbvQuij8+j3jrkobAq6NAnWvGqoPbFVmMCTemjBbLBO+C7faNlR8k10eq6RC6lwjTjY8QjWlYcSiFAW4/SIWKP1xzgVhZmd6Bb10FMjLGi2cMWpApUMUDdgXrayhLP2uNXXqtTLHSmGZdQiXxtVK9YtgP+5J0pFd1oEL9q6xovP06o7b00xcoWi+R+DA/XXu4d6YoBrw==
+ bh=OKDNuYWPvqW17HEfn2YlDnJSz6UClueobWWQ1euI3Io=;
+ b=T7ZvO/tOsojUyWvIcxhWGrYKf/eRmIlmiEghfMa4lgtdW+kWXaX5Jp4CwI0v7PCFB+2DHKIHvMTg/+pncgoIi6VdkD/1+7yYHrN9KAufDdXq9RniM3pzS5KVWHY+mxCE++Y5jWiRiVupb6DbaUipPlqpmQHH42wLh/NRBksGZ94QXb8s6FU+W38aevhjY9qfFp8u1OFQYTBBbUMlvkTN0QMHb3YgY96DBOPcqaVyUbf0xe+yShEUa8gYeyJS0Xz0Ktgcd5OMrpWMsRp44WnsJIM5qlVcWM5yuGxbc3VV1sbuwIxwAu08ihrjRtw6v0GGVU9CTMxX1C6jbhr+8KjWeg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  137.201.242.130) smtp.rcpttodomain=kvack.org smtp.mailfrom=micron.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=micron.com;
@@ -36,18 +36,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kMcC/WkWvy5y0OW3Hhjr5sSx9X/kauqvbqpWFnsD6B8=;
- b=Z2T+SuZF5Qj6N41R+OtdvrpF0vBXWEE33kJvLVRenFixr3wsdV2g9yPp45pTa3uFVMc/q5j7fOM081IcA6tKPlLbBFA499mo/Y3mjphlWAqe4ucDoX56udh6aphI+pFVUrFApKbUQQXSh+ThwkOOIJ5yIvN3AXgmGLpFwt4orwM=
-Received: from SN4PR0201CA0055.namprd02.prod.outlook.com
- (2603:10b6:803:20::17) by DM6PR08MB4922.namprd08.prod.outlook.com
- (2603:10b6:5:52::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.28; Mon, 12 Oct
- 2020 16:28:04 +0000
+ bh=OKDNuYWPvqW17HEfn2YlDnJSz6UClueobWWQ1euI3Io=;
+ b=caIHBZ994oA/1R9um+PUqctQpfaRzIT/OuFhsD3Jk/mxmuClkUnYP5156WyBifPhJ7VhaLQo8mNlIxpzEWev6fd3hddVidxVaa+4E5644UxqXYyEyDOydQbRupEcKEO9rCstigu2v9ldUmv1gjiNiZ05h3lXM5+dcg57gN6rnSI=
+Received: from SN4PR0201CA0056.namprd02.prod.outlook.com
+ (2603:10b6:803:20::18) by MWHPR08MB2478.namprd08.prod.outlook.com
+ (2603:10b6:300:d::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.23; Mon, 12 Oct
+ 2020 16:28:14 +0000
 Received: from SN1NAM01FT015.eop-nam01.prod.protection.outlook.com
- (2603:10b6:803:20:cafe::51) by SN4PR0201CA0055.outlook.office365.com
- (2603:10b6:803:20::17) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:803:20:cafe::5a) by SN4PR0201CA0056.outlook.office365.com
+ (2603:10b6:803:20::18) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.22 via Frontend
- Transport; Mon, 12 Oct 2020 16:28:04 +0000
+ Transport; Mon, 12 Oct 2020 16:28:14 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 137.201.242.130)
  smtp.mailfrom=micron.com; kvack.org; dkim=none (message not signed)
  header.d=none;kvack.org; dmarc=pass action=none header.from=micron.com;
@@ -57,19 +57,19 @@ Received-SPF: Pass (protection.outlook.com: domain of micron.com designates
 Received: from mail.micron.com (137.201.242.130) by
  SN1NAM01FT015.mail.protection.outlook.com (10.152.65.55) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3455.23 via Frontend Transport; Mon, 12 Oct 2020 16:28:03 +0000
+ 15.20.3455.23 via Frontend Transport; Mon, 12 Oct 2020 16:28:14 +0000
 Received: from micron.com (10.114.5.55) by bowex17c.micron.com
  (137.201.21.211) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 12 Oct
- 2020 10:27:56 -0600
+ 2020 10:28:11 -0600
 From:   Nabeel M Mohamed <nmeeramohide@micron.com>
 To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-mm@kvack.org>,
         <linux-nvdimm@lists.01.org>
 CC:     <smoyer@micron.com>, <gbecker@micron.com>, <plabat@micron.com>,
         <jgroves@micron.com>, Nabeel M Mohamed <nmeeramohide@micron.com>
-Subject: [PATCH v2 03/22] mpool: add on-media struct definitions
-Date:   Mon, 12 Oct 2020 11:27:17 -0500
-Message-ID: <20201012162736.65241-4-nmeeramohide@micron.com>
+Subject: [PATCH v2 19/22] mpool: add support to mmap arbitrary collection of mblocks
+Date:   Mon, 12 Oct 2020 11:27:33 -0500
+Message-ID: <20201012162736.65241-20-nmeeramohide@micron.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20201012162736.65241-1-nmeeramohide@micron.com>
 References: <20201012162736.65241-1-nmeeramohide@micron.com>
@@ -78,54 +78,81 @@ Content-Type: text/plain
 X-ClientProxiedBy: bowex17a.micron.com (137.201.21.209) To bowex17c.micron.com
  (137.201.21.211)
 X-TM-AS-Product-Ver: SMEX-12.0.0.1782-8.200.1013-24646.005
-X-TM-AS-Result: No--15.128200-0.000000-31
-X-TM-AS-MatchedID: 155702-700076-702178-701912-703851-704959-847575-701029-7
-        00863-704401-705022-702177-701480-704962-701809-703017-703140-702395-188019
-        -703213-121336-701105-704673-703967-701475-701910-703027-701275-701073-7049
-        83-704500-701604-702754-704376-701589-705220-702965-700535-704477-702433-70
-        4990-701576-704318-851458-702914-700864-704997-701772-700809-701342-702346-
-        704481-704463-703173-704978-704397-702940-704210-701366-700025-853544-70078
-        7-704183-702688-703215-700524-704792-703393-703357-703080-121104-702779-703
-        957-704718-704895-700071-188199-704815-188198-702888-705279-704418-702504-1
-        21536-702972-705023-702171-702837-702008-703958-148004-148036-42000-42003-1
-        90014
+X-TM-AS-Result: No--20.037900-0.000000-31
+X-TM-AS-MatchedID: 154075-701478-705247-702754-847298-700958-704718-703812-7
+        00400-704960-701162-702876-105040-704418-705041-704397-701724-704637-702877
+        -704318-703878-701270-703027-702914-705161-700328-186035-701342-704500-7049
+        26-703532-861243-702619-701592-780052-701590-703357-703956-704728-701480-70
+        1809-701280-703017-702395-188019-702299-704477-300015-703140-703213-121336-
+        701105-704673-703967-700698-703953-700076-701932-703173-700286-703958-70308
+        0-703624-700181-705220-121367-139504-703279-700351-704053-105630-703904-703
+        865-702298-704934-705279-702837-106420-703325-700069-703766-137717-702617-7
+        04001-702975-704338-701847-701750-705022-704264-148004-148036-42000-42003
 X-TM-AS-User-Approved-Sender: Yes
 X-TM-AS-User-Blocked-Sender: No
 X-MT-Whitelisted: matched
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ff522184-b91d-4c74-29fa-08d86ecbcb2c
-X-MS-TrafficTypeDiagnostic: DM6PR08MB4922:
-X-Microsoft-Antispam-PRVS: <DM6PR08MB4922AAD48A38FC91CE18523CB3070@DM6PR08MB4922.namprd08.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 514fe41f-f74d-4277-37c2-08d86ecbd166
+X-MS-TrafficTypeDiagnostic: MWHPR08MB2478:
+X-Microsoft-Antispam-PRVS: <MWHPR08MB2478F97AD41A83C4E91D69F7B3070@MWHPR08MB2478.namprd08.prod.outlook.com>
 X-MS-Exchange-Transport-Forked: True
 X-EXT-ByPass: 1
 X-MT-RULE-Whitelisted: Triggered
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gpmtbST5UaJ5O8kqVywlNoPk2BkXzSxpqXv1e/c3DiAwPrCAo2LJQf48AiR0EC5jhA62T8t4T2IRKjSYQR+vlhLaaJbK5Tz8doyTZZ5L46ZMx1iXou38CrUjDKVtVrZ6Hhdxh2lCk4lPL7vkCMTRYaaPJJv975TtwrLQuCTY9whId7Z8sH7EHHp2/QWkSYYOnfFs80OwbBbwSwS40f0Mv/JnSgkJ6G855t8kmy5Vwe+Ii9Gt8STtAXgdG2cU94ki0spHa4Wldme6YWyJ6lHTms6Mi8OtftAnuwcb4BXp5o8Lgvdo3g5aE+OTsx6M6AVMxp0NgZ1NOU9SflnBROpQvqtdHOk6l5htwi4zUrWGGHlPnvp//EhE4bwgSy8y+/6Qc3nIJWEmx4Fb9Uhn54ou9G7WfwMk99++c4rEO8P9usoP22dLN9w3NxgFAPVoXJ+ShIec+l1fIzjM+LLMJuvdyNuW+nC3CEHqKmbCk/Csn/Q=
-X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(396003)(136003)(46966005)(426003)(55016002)(8936002)(7696005)(478600001)(82740400003)(110136005)(316002)(70206006)(54906003)(26005)(2616005)(70586007)(2906002)(336012)(7636003)(83380400001)(6286002)(8676002)(86362001)(47076004)(82310400003)(5660300002)(30864003)(36756003)(1076003)(33310700002)(356005)(186003)(6666004)(107886003)(4326008)(461764006)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: +URp68n8QDRg2M29SGVQbrWj6m7dQOkJ0pWm6CC9PYJF7/Upt6UI2TIEIXB1A33Tp7n9Jrl80n7K1FLJ2gCkEYyJuTCF7iyaShJs7vEKRCUBcglC1io6lK0eMIkzfVZP0lDOGobqfkPxmPwUoMuBY/DyzIfbZN7nh9bl21pJ8blgEhK9MuN1SkFY3XPJArF8WblREJwfRNzLyvQMPWq5P1nUVQ7epO+IBwlvQnHhzVEA85Da6Pk1NWgf0rdyMXXRgxwM4J/JKKSscgLIJAAYighuoNy3a82HKhGEJY/pLCW85yuhStgmCF1uC1cRxX1e2olW3jJAeRYfvlkqGvHVFm3twZT0xaOwqHjt2DZ0QGRYXGdA5s1JpVbXMz6fQ16qaxYuXP2ZN0nBxwxuLwijyLyoBrDxS4b4MPU9HazFqm50AkAQC2U05pDoqCodI7hlBA5qMlKMGOoXy8aND1I2jg==
+X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(39860400002)(396003)(136003)(346002)(376002)(46966005)(107886003)(47076004)(8936002)(8676002)(86362001)(1076003)(83380400001)(6286002)(33310700002)(4326008)(6666004)(478600001)(356005)(7636003)(36756003)(55016002)(110136005)(26005)(5660300002)(70206006)(70586007)(186003)(7696005)(82310400003)(336012)(82740400003)(426003)(316002)(2906002)(54906003)(2616005)(30864003)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: micron.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2020 16:28:03.7281
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2020 16:28:14.1839
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff522184-b91d-4c74-29fa-08d86ecbcb2c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 514fe41f-f74d-4277-37c2-08d86ecbd166
 X-MS-Exchange-CrossTenant-Id: f38a5ecd-2813-4862-b11b-ac1d563c806f
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f38a5ecd-2813-4862-b11b-ac1d563c806f;Ip=[137.201.242.130];Helo=[mail.micron.com]
 X-MS-Exchange-CrossTenant-AuthSource: SN1NAM01FT015.eop-nam01.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR08MB4922
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR08MB2478
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds headers containing the following on-media formats:
-- Mpool superblock
-- Object management records: create, update, delete, and erase
-- Mpool configuration record
-- Media class config and spare record
-- OID checkpoint and version record
-- Mlog page header and framing records
+This implements the mmap file operation for the mpool driver.
+
+Mblock and mlog writes avoid the Linux page cache. Mblocks are
+written, committed, and made immutable before they can be read
+either directly (avoiding the page cache) or memory-mapped.
+Mlogs are always read and updated directly and cannot be
+memory-mapped.
+
+Mblocks are memory-mapped by creating an mcache map.
+The mcache map APIs allow an arbitrary collection of mblocks
+(specified as a vector of mblock OIDs) to be mapped linearly
+into the virtual address space of an mpool client.
+
+An extended VMA instance (mpc_xvm) is created for each
+mcache map. The xvm takes a ref on all the mblocks it maps.
+The size of an xvm region is 1G by default and can be tuned
+using the module parameter 'xvm_size_max'. When an mcache
+map is created, its xvm instance is assigned with the next
+available device offset range. The device offset -> xvm
+mapping is inserted into a region map stored in the mpool's
+unit object.
+
+The mmap driver entry point uses the vma page offset to deduce
+the device offset of the corresponding mcache map. The xvm
+instance is looked up from the region map using device offset
+as the key. A reference to this xvm instance is stored in the
+vma private data, which enables the page fault handler to find
+the xvm for the faulting range in constant time. The offset into
+the mcache map can then be used to determine the mblock id and
+offset to be read for filling the page.
+
+Readahead is enabled for the mpool device by providing the
+fadvise file op and by initializing file_ra_state.ra_pages.
+Readahead requests are dispatched to one of the four
+readahead workqueues and served by the workqueue threads.
 
 Co-developed-by: Greg Becker <gbecker@micron.com>
 Signed-off-by: Greg Becker <gbecker@micron.com>
@@ -135,1134 +162,1388 @@ Co-developed-by: John Groves <jgroves@micron.com>
 Signed-off-by: John Groves <jgroves@micron.com>
 Signed-off-by: Nabeel M Mohamed <nmeeramohide@micron.com>
 ---
- drivers/mpool/omf.h     | 593 ++++++++++++++++++++++++++++++++++++++++
- drivers/mpool/omf_if.h  | 381 ++++++++++++++++++++++++++
- drivers/mpool/upgrade.h | 128 +++++++++
- 3 files changed, 1102 insertions(+)
- create mode 100644 drivers/mpool/omf.h
- create mode 100644 drivers/mpool/omf_if.h
- create mode 100644 drivers/mpool/upgrade.h
+ drivers/mpool/init.c   |   16 +
+ drivers/mpool/init.h   |    2 +
+ drivers/mpool/mcache.c | 1029 ++++++++++++++++++++++++++++++++++++++++
+ drivers/mpool/mcache.h |   96 ++++
+ drivers/mpool/mpctl.c  |   45 +-
+ drivers/mpool/mpctl.h  |    3 +
+ 6 files changed, 1190 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/mpool/mcache.c
+ create mode 100644 drivers/mpool/mcache.h
 
-diff --git a/drivers/mpool/omf.h b/drivers/mpool/omf.h
-new file mode 100644
-index 000000000000..c750573720dd
---- /dev/null
-+++ b/drivers/mpool/omf.h
-@@ -0,0 +1,593 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
-+ */
-+/*
-+ * Pool on-drive format (omf) module.
-+ *
-+ * Defines:
-+ * + on-drive format for mpool superblocks
-+ * + on-drive formats for mlogs, mblocks, and metadata containers (mdc)
-+ * + utility functions for working with these on-drive formats
-+ * That includes structures and enums used by the on-drive format.
-+ *
-+ * All mpool metadata is versioned and stored on media in little-endian format.
-+ *
-+ * Naming conventions:
-+ * -------------------
-+ * The name of the structures ends with _omf
-+ * The name of the structure members start with a "p" that means "packed".
-+ */
+diff --git a/drivers/mpool/init.c b/drivers/mpool/init.c
+index 126c6c7142b5..b1fe3286773a 100644
+--- a/drivers/mpool/init.c
++++ b/drivers/mpool/init.c
+@@ -12,11 +12,20 @@
+ #include "smap.h"
+ #include "pmd_obj.h"
+ #include "sb.h"
++#include "mcache.h"
+ #include "mpctl.h"
+ 
+ /*
+  * Module params...
+  */
++unsigned int xvm_max __read_mostly = 1048576 * 128;
++module_param(xvm_max, uint, 0444);
++MODULE_PARM_DESC(xvm_max, " max extended VMA regions");
 +
-+#ifndef MPOOL_OMF_H
-+#define MPOOL_OMF_H
++unsigned int xvm_size_max __read_mostly = 30;
++module_param(xvm_size_max, uint, 0444);
++MODULE_PARM_DESC(xvm_size_max, " max extended VMA size log2");
 +
-+#include <linux/bug.h>
-+#include <asm/byteorder.h>
-+
-+/*
-+ * The following two macros exist solely to enable the OMF_SETGET macros to
-+ * work on 8 bit members as well as 16, 32 and 64 bit members.
-+ */
-+#define le8_to_cpu(x)  (x)
-+#define cpu_to_le8(x)  (x)
-+
-+
-+/* Helper macro to define set/get methods for 8, 16, 32 or 64 bit scalar OMF struct members. */
-+#define OMF_SETGET(type, member, bits) \
-+	OMF_SETGET2(type, member, bits, member)
-+
-+#define OMF_SETGET2(type, member, bits, name)				\
-+	static __always_inline u##bits omf_##name(const type * s)	\
-+	{								\
-+		BUILD_BUG_ON(sizeof(((type *)0)->member)*8 != (bits));	\
-+		return le##bits##_to_cpu(s->member);			\
-+	}								\
-+	static __always_inline void omf_set_##name(type *s, u##bits val)\
-+	{								\
-+		s->member = cpu_to_le##bits(val);			\
+ unsigned int maxunits __read_mostly = 1024;
+ module_param(maxunits, uint, 0444);
+ MODULE_PARM_DESC(maxunits, " max mpools");
+@@ -40,6 +49,7 @@ MODULE_PARM_DESC(chunk_size_kb, "Chunk size (in KiB) for device I/O");
+ static void mpool_exit_impl(void)
+ {
+ 	mpctl_exit();
++	mcache_exit();
+ 	pmd_exit();
+ 	smap_exit();
+ 	sb_exit();
+@@ -82,6 +92,12 @@ static __init int mpool_init(void)
+ 		goto errout;
+ 	}
+ 
++	rc = mcache_init();
++	if (rc) {
++		errmsg = "mcache init failed";
++		goto errout;
 +	}
 +
-+/* Helper macro to define set/get methods for character strings embedded in OMF structures. */
-+#define OMF_SETGET_CHBUF(type, member) \
-+	OMF_SETGET_CHBUF2(type, member, member)
-+
-+#define OMF_SETGET_CHBUF2(type, member, name)				\
-+	static inline void omf_set_##name(type *s, const void *p, size_t plen) \
-+	{								\
-+		size_t len = sizeof(((type *)0)->member);		\
-+		memcpy(s->member, p, len < plen ? len : plen);		\
-+	}								\
-+	static inline void omf_##name(const type *s, void *p, size_t plen)\
-+	{								\
-+		size_t len = sizeof(((type *)0)->member);		\
-+		memcpy(p, s->member, len < plen ? len : plen);		\
-+	}
-+
-+
-+/* MPOOL_NAMESZ_MAX should match OMF_MPOOL_NAME_LEN */
-+#define OMF_MPOOL_NAME_LEN 32
-+
-+/* MPOOL_UUID_SIZE should match OMF_UUID_PACKLEN */
-+#define OMF_UUID_PACKLEN 16
-+
-+/**
-+ * enum mc_features_omf - Drive features that participate in media classes
-+ *	                  definition. These values are ored in a 64 bits field.
-+ */
-+enum mc_features_omf {
-+	OMF_MC_FEAT_MLOG_TGT   = 0x1,
-+	OMF_MC_FEAT_MBLOCK_TGT = 0x2,
-+	OMF_MC_FEAT_CHECKSUM   = 0x4,
-+};
-+
-+
-+/**
-+ * enum devtype_omf -
-+ * @OMF_PD_DEV_TYPE_BLOCK_STREAM: Block device implementing streams.
-+ * @OMF_PD_DEV_TYPE_BLOCK_STD:    Standard (non-streams) device (SSD, HDD).
-+ * @OMF_PD_DEV_TYPE_FILE:	  File in user space for UT.
-+ * @OMF_PD_DEV_TYPE_MEM:	  Memory semantic device. Such as NVDIMM
-+ *                                direct access (raw or dax mode).
-+ * @OMF_PD_DEV_TYPE_ZONE:	  zone-like device, such as open channel SSD
-+ *				  (OC-SSD) and SMR HDD (using ZBC/ZAC).
-+ * @OMF_PD_DEV_TYPE_BLOCK_NVDIMM: Standard (non-streams) NVDIMM in sector mode.
-+ */
-+enum devtype_omf {
-+	OMF_PD_DEV_TYPE_BLOCK_STREAM	= 1,
-+	OMF_PD_DEV_TYPE_BLOCK_STD	= 2,
-+	OMF_PD_DEV_TYPE_FILE		= 3,
-+	OMF_PD_DEV_TYPE_MEM		= 4,
-+	OMF_PD_DEV_TYPE_ZONE		= 5,
-+	OMF_PD_DEV_TYPE_BLOCK_NVDIMM    = 6,
-+};
-+
-+
-+/**
-+ * struct layout_descriptor_omf - Layout descriptor version 1.
-+ * @pol_zcnt: number of zones
-+ * @pol_zaddr: zone start addr
-+ *
-+ * Introduced with binary version 1.0.0.0.
-+ * "pol_" = packed omf layout
-+ */
-+struct layout_descriptor_omf {
-+	__le32 pol_zcnt;
-+	__le64 pol_zaddr;
-+} __packed;
-+
-+/* Define set/get methods for layout_descriptor_omf */
-+OMF_SETGET(struct layout_descriptor_omf, pol_zcnt, 32)
-+OMF_SETGET(struct layout_descriptor_omf, pol_zaddr, 64)
-+#define OMF_LAYOUT_DESC_PACKLEN (sizeof(struct layout_descriptor_omf))
-+
-+
-+/**
-+ * struct devparm descriptor_omf - packed omf devparm descriptor
-+ * @podp_devid:    UUID for drive
-+ * @podp_zonetot:  total number of zones
-+ * @podp_devsz:    size of partition in bytes
-+ * @podp_features: Features, ored bits of enum mc_features_omf
-+ * @podp_mclassp:   enum mp_media_classp
-+ * @podp_devtype:   PD type (enum devtype_omf)
-+ * @podp_sectorsz:  2^podp_sectorsz = sector size
-+ * @podp_zonepg:    zone size in number of zone pages
-+ *
-+ * The fields mclassp, devtype, sectosz, and zonepg uniquely identify the media class of the PD.
-+ * All drives in a media class must have the same values in these fields.
-+ */
-+struct devparm_descriptor_omf {
-+	u8     podp_mclassp;
-+	u8     podp_devtype;
-+	u8     podp_sectorsz;
-+	u8     podp_devid[OMF_UUID_PACKLEN];
-+	u8     podp_pad[5];
-+	__le32 podp_zonepg;
-+	__le32 podp_zonetot;
-+	__le64 podp_devsz;
-+	__le64 podp_features;
-+} __packed;
-+
-+/* Define set/get methods for devparm_descriptor_omf */
-+OMF_SETGET(struct devparm_descriptor_omf, podp_mclassp, 8)
-+OMF_SETGET(struct devparm_descriptor_omf, podp_devtype, 8)
-+OMF_SETGET(struct devparm_descriptor_omf, podp_sectorsz, 8)
-+OMF_SETGET_CHBUF(struct devparm_descriptor_omf, podp_devid)
-+OMF_SETGET(struct devparm_descriptor_omf, podp_zonepg, 32)
-+OMF_SETGET(struct devparm_descriptor_omf, podp_zonetot, 32)
-+OMF_SETGET(struct devparm_descriptor_omf, podp_devsz, 64)
-+OMF_SETGET(struct devparm_descriptor_omf, podp_features, 64)
-+#define OMF_DEVPARM_DESC_PACKLEN (sizeof(struct devparm_descriptor_omf))
-+
-+
-+/*
-+ * mlog structure:
-+ * + An mlog comprises a consecutive sequence of log blocks,
-+ *   where each log block is a single page within a zone
-+ * + A log block comprises a header and a consecutive sequence of records
-+ * + A record is a typed blob
-+ *
-+ * Log block headers must be versioned. Log block records do not
-+ * require version numbers because they are typed and new types can
-+ * always be added.
-+ */
-+
-+/*
-+ * Log block format -- version 1
-+ *
-+ * log block := header record+ eolb? trailer?
-+ *
-+ * header := struct omf_logblock_header where vers=2
-+ *
-+ * record := lrd byte*
-+ *
-+ * lrd := struct omf_logrec_descriptor with value
-+ *   (<record length>, <chunk length>, enum logrec_type_omf value)
-+ *
-+ * eolb (end of log block marker) := struct omf_logrec_descriptor with value
-+ *   (0, 0, enum logrec_type_omf.EOLB/0)
-+ *
-+ * trailer := zero bytes from end of last log block record to end of log block
-+ *
-+ * OMF_LOGREC_CEND must be the max. value for this enum.
-+ */
-+
-+/**
-+ * enum logrec_type_omf -
-+ * @OMF_LOGREC_EOLB:      end of log block marker (start of trailer)
-+ * @OMF_LOGREC_DATAFULL:  data record; contains all specified data
-+ * @OMF_LOGREC_DATAFIRST: data record; contains first part of specified data
-+ * @OMF_LOGREC_DATAMID:   data record; contains interior part of data
-+ * @OMF_LOGREC_DATALAST:  data record; contains final part of specified data
-+ * @OMF_LOGREC_CSTART:    compaction start marker
-+ * @OMF_LOGREC_CEND:      compaction end marker
-+ *
-+ * A log record type of 0 signifies EOLB. This is really the start of the
-+ * trailer but this simplifies parsing for partially filled log blocks.
-+ * DATAFIRST, -MID, -LAST types are used for chunking logical data records.
-+ */
-+enum logrec_type_omf {
-+	OMF_LOGREC_EOLB      = 0,
-+	OMF_LOGREC_DATAFULL  = 1,
-+	OMF_LOGREC_DATAFIRST = 2,
-+	OMF_LOGREC_DATAMID   = 3,
-+	OMF_LOGREC_DATALAST  = 4,
-+	OMF_LOGREC_CSTART    = 5,
-+	OMF_LOGREC_CEND      = 6,
-+};
-+
-+
-+/**
-+ * struct logrec_descriptor_omf -packed omf logrec descriptor
-+ * @polr_tlen:  logical length of data record (all chunks)
-+ * @polr_rlen:  length of data chunk in this log record
-+ * @polr_rtype: enum logrec_type_omf value
-+ */
-+struct logrec_descriptor_omf {
-+	__le32 polr_tlen;
-+	__le16 polr_rlen;
-+	u8     polr_rtype;
-+	u8     polr_pad;
-+} __packed;
-+
-+/* Define set/get methods for logrec_descriptor_omf */
-+OMF_SETGET(struct logrec_descriptor_omf, polr_tlen, 32)
-+OMF_SETGET(struct logrec_descriptor_omf, polr_rlen, 16)
-+OMF_SETGET(struct logrec_descriptor_omf, polr_rtype, 8)
-+#define OMF_LOGREC_DESC_PACKLEN (sizeof(struct logrec_descriptor_omf))
-+#define OMF_LOGREC_DESC_RLENMAX 65535
-+
-+
-+#define OMF_LOGBLOCK_VERS    1
-+
-+/**
-+ * struct logblock_header_omf - packed omf logblock header for all versions
-+ * @polh_vers:    log block hdr version, offset 0 in all vers
-+ * @polh_magic:   unique magic per mlog
-+ * @polh_pfsetid: flush set ID of the previous log block
-+ * @polh_cfsetid: flush set ID this log block belongs to
-+ * @polh_gen:     generation number
-+ */
-+struct logblock_header_omf {
-+	__le16 polh_vers;
-+	u8     polh_magic[OMF_UUID_PACKLEN];
-+	u8     polh_pad[6];
-+	__le32 polh_pfsetid;
-+	__le32 polh_cfsetid;
-+	__le64 polh_gen;
-+} __packed;
-+
-+/* Define set/get methods for logblock_header_omf */
-+OMF_SETGET(struct logblock_header_omf, polh_vers, 16)
-+OMF_SETGET_CHBUF(struct logblock_header_omf, polh_magic)
-+OMF_SETGET(struct logblock_header_omf, polh_pfsetid, 32)
-+OMF_SETGET(struct logblock_header_omf, polh_cfsetid, 32)
-+OMF_SETGET(struct logblock_header_omf, polh_gen, 64)
-+/* On-media log block header length */
-+#define OMF_LOGBLOCK_HDR_PACKLEN (sizeof(struct logblock_header_omf))
-+
-+
-+/*
-+ * Metadata container (mdc) mlog data record formats.
-+ *
-+ * NOTE: mdc records are typed and as such do not need a version number as new
-+ * types can always be added as required.
-+ */
-+/**
-+ * enum mdcrec_type_omf -
-+ * @OMF_MDR_UNDEF:   undefined; should never occur
-+ * @OMF_MDR_OCREATE:  object create
-+ * @OMF_MDR_OUPDATE:  object update
-+ * @OMF_MDR_ODELETE:  object delete
-+ * @OMF_MDR_OIDCKPT:  object id checkpoint
-+ * @OMF_MDR_OERASE:   object erase, also log mlog gen number
-+ * @OMF_MDR_MCCONFIG: media class config
-+ * @OMF_MDR_MCSPARE:  media class spare zones set
-+ * @OMF_MDR_VERSION:  MDC content version.
-+ * @OMF_MDR_MPCONFIG:  mpool config record
-+ */
-+enum mdcrec_type_omf {
-+	OMF_MDR_UNDEF       = 0,
-+	OMF_MDR_OCREATE     = 1,
-+	OMF_MDR_OUPDATE     = 2,
-+	OMF_MDR_ODELETE     = 3,
-+	OMF_MDR_OIDCKPT     = 4,
-+	OMF_MDR_OERASE      = 5,
-+	OMF_MDR_MCCONFIG    = 6,
-+	OMF_MDR_MCSPARE     = 7,
-+	OMF_MDR_VERSION     = 8,
-+	OMF_MDR_MPCONFIG    = 9,
-+	OMF_MDR_MAX         = 10,
-+};
-+
-+/**
-+ * struct mdcver_omf - packed mdc version, version of an mpool MDC content.
-+ * @pv_rtype:      OMF_MDR_VERSION
-+ * @pv_mdcv_major: to compare with MAJOR in binary version.
-+ * @pv_mdcv_minor: to compare with MINOR in binary version.
-+ * @pv_mdcv_patch: to compare with PATCH in binary version.
-+ * @pv_mdcv_dev:   used during development cycle when the above
-+ *                 numbers don't change.
-+ *
-+ * This is not the version of the message framing used for the MDC. This is
-+ * version of the binary that introduced that version of the MDC content.
-+ */
-+struct mdcver_omf {
-+	u8     pv_rtype;
-+	u8     pv_pad;
-+	__le16 pv_mdcv_major;
-+	__le16 pv_mdcv_minor;
-+	__le16 pv_mdcv_patch;
-+	__le16 pv_mdcv_dev;
-+} __packed;
-+
-+/* Define set/get methods for mdcrec_version_omf */
-+OMF_SETGET(struct mdcver_omf, pv_rtype, 8)
-+OMF_SETGET(struct mdcver_omf, pv_mdcv_major, 16)
-+OMF_SETGET(struct mdcver_omf, pv_mdcv_minor, 16)
-+OMF_SETGET(struct mdcver_omf, pv_mdcv_patch, 16)
-+OMF_SETGET(struct mdcver_omf, pv_mdcv_dev,   16)
-+
-+
-+/**
-+ * struct mdcrec_data_odelete_omf - packed data record odelete
-+ * @pdro_rtype: mdrec_type_omf:OMF_MDR_ODELETE, OMF_MDR_OIDCKPT
-+ * @pdro_objid: object identifier
-+ */
-+struct mdcrec_data_odelete_omf {
-+	u8     pdro_rtype;
-+	u8     pdro_pad[7];
-+	__le64 pdro_objid;
-+} __packed;
-+
-+/* Define set/get methods for  mdcrec_data_odelete_omf */
-+OMF_SETGET(struct  mdcrec_data_odelete_omf, pdro_rtype, 8)
-+OMF_SETGET(struct  mdcrec_data_odelete_omf, pdro_objid, 64)
-+
-+
-+/**
-+ * struct mdcrec_data_oerase_omf - packed data record oerase
-+ * @pdrt_rtype: mdrec_type_omf: OMF_MDR_OERASE
-+ * @pdrt_objid: object identifier
-+ * @pdrt_gen:   object generation number
-+ */
-+struct mdcrec_data_oerase_omf {
-+	u8     pdrt_rtype;
-+	u8     pdrt_pad[7];
-+	__le64 pdrt_objid;
-+	__le64 pdrt_gen;
-+} __packed;
-+
-+/* Define set/get methods for mdcrec_data_oerase_omf */
-+OMF_SETGET(struct mdcrec_data_oerase_omf, pdrt_rtype, 8)
-+OMF_SETGET(struct mdcrec_data_oerase_omf, pdrt_objid, 64)
-+OMF_SETGET(struct mdcrec_data_oerase_omf, pdrt_gen, 64)
-+#define OMF_MDCREC_OERASE_PACKLEN (sizeof(struct mdcrec_data_oerase_omf))
-+
-+
-+/**
-+ * struct mdcrec_data_mcconfig_omf - packed data record mclass config
-+ * @pdrs_rtype: mdrec_type_omf: OMF_MDR_MCCONFIG
-+ * @pdrs_parm:
-+ */
-+struct mdcrec_data_mcconfig_omf {
-+	u8                             pdrs_rtype;
-+	u8                             pdrs_pad[7];
-+	struct devparm_descriptor_omf  pdrs_parm;
-+} __packed;
-+
-+
-+OMF_SETGET(struct mdcrec_data_mcconfig_omf, pdrs_rtype, 8)
-+#define OMF_MDCREC_MCCONFIG_PACKLEN (sizeof(struct mdcrec_data_mcconfig_omf))
-+
-+
-+/**
-+ * struct mdcrec_data_mcspare_omf - packed data record mcspare
-+ * @pdra_rtype:   mdrec_type_omf: OMF_MDR_MCSPARE
-+ * @pdra_mclassp: enum mp_media_classp
-+ * @pdra_spzone:   percent spare zones for drives in media class
-+ */
-+struct mdcrec_data_mcspare_omf {
-+	u8     pdra_rtype;
-+	u8     pdra_mclassp;
-+	u8     pdra_spzone;
-+} __packed;
-+
-+/* Define set/get methods for mdcrec_data_mcspare_omf */
-+OMF_SETGET(struct mdcrec_data_mcspare_omf, pdra_rtype, 8)
-+OMF_SETGET(struct mdcrec_data_mcspare_omf, pdra_mclassp, 8)
-+OMF_SETGET(struct mdcrec_data_mcspare_omf, pdra_spzone, 8)
-+#define OMF_MDCREC_CLS_SPARE_PACKLEN (sizeof(struct mdcrec_data_mcspare_omf))
-+
-+
-+/**
-+ * struct mdcrec_data_ocreate_omf - packed data record ocreate
-+ * @pdrc_rtype:     mdrec_type_omf: OMF_MDR_OCREATE or OMF_MDR_OUPDATE
-+ * @pdrc_mclass:
-+ * @pdrc_uuid:
-+ * @pdrc_ld:
-+ * @pdrc_objid:     object identifier
-+ * @pdrc_gen:       object generation number
-+ * @pdrc_mblen:     amount of data written in the mblock, for mlog this is 0
-+ * @pdrc_uuid:      Used only for mlogs. Must be at the end of this struct.
-+ */
-+struct mdcrec_data_ocreate_omf {
-+	u8                             pdrc_rtype;
-+	u8                             pdrc_mclass;
-+	u8                             pdrc_pad[2];
-+	struct layout_descriptor_omf   pdrc_ld;
-+	__le64                         pdrc_objid;
-+	__le64                         pdrc_gen;
-+	__le64                         pdrc_mblen;
-+	u8                             pdrc_uuid[];
-+} __packed;
-+
-+/* Define set/get methods for mdcrec_data_ocreate_omf */
-+OMF_SETGET(struct mdcrec_data_ocreate_omf, pdrc_rtype, 8)
-+OMF_SETGET(struct mdcrec_data_ocreate_omf, pdrc_mclass, 8)
-+OMF_SETGET(struct mdcrec_data_ocreate_omf, pdrc_objid, 64)
-+OMF_SETGET(struct mdcrec_data_ocreate_omf, pdrc_gen, 64)
-+OMF_SETGET(struct mdcrec_data_ocreate_omf, pdrc_mblen, 64)
-+#define OMF_MDCREC_OBJCMN_PACKLEN (sizeof(struct mdcrec_data_ocreate_omf) + \
-+				   OMF_UUID_PACKLEN)
-+
-+
-+/**
-+ * struct mdcrec_data_mpconfig_omf - packed data mpool config
-+ * @pdmc_rtype:
-+ * @pdmc_oid1:
-+ * @pdmc_oid2:
-+ * @pdmc_uid:
-+ * @pdmc_gid:
-+ * @pdmc_mode:
-+ * @pdmc_mclassp:
-+ * @pdmc_captgt:
-+ * @pdmc_ra_pages_max:
-+ * @pdmc_vma_size_max:
-+ * @pdmc_utype:         user-defined type (uuid)
-+ * @pdmc_label:         user-defined label (ascii)
-+ */
-+struct mdcrec_data_mpconfig_omf {
-+	u8      pdmc_rtype;
-+	u8      pdmc_pad[7];
-+	__le64  pdmc_oid1;
-+	__le64  pdmc_oid2;
-+	__le32  pdmc_uid;
-+	__le32  pdmc_gid;
-+	__le32  pdmc_mode;
-+	__le32  pdmc_rsvd0;
-+	__le64  pdmc_captgt;
-+	__le32  pdmc_ra_pages_max;
-+	__le32  pdmc_vma_size_max;
-+	__le32  pdmc_rsvd1;
-+	__le32  pdmc_rsvd2;
-+	__le64  pdmc_rsvd3;
-+	__le64  pdmc_rsvd4;
-+	u8      pdmc_utype[16];
-+	u8      pdmc_label[MPOOL_LABELSZ_MAX];
-+} __packed;
-+
-+/* Define set/get methods for mdcrec_data_mpconfig_omf */
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_rtype, 8)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_oid1, 64)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_oid2, 64)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_uid, 32)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_gid, 32)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_mode, 32)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_rsvd0, 32)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_captgt, 64)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_ra_pages_max, 32)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_vma_size_max, 32)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_rsvd1, 32)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_rsvd2, 32)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_rsvd3, 64)
-+OMF_SETGET(struct mdcrec_data_mpconfig_omf, pdmc_rsvd4, 64)
-+OMF_SETGET_CHBUF(struct mdcrec_data_mpconfig_omf, pdmc_utype)
-+OMF_SETGET_CHBUF(struct mdcrec_data_mpconfig_omf, pdmc_label)
-+#define OMF_MDCREC_MPCONFIG_PACKLEN (sizeof(struct mdcrec_data_mpconfig_omf))
-+
-+
-+/*
-+ * Object types embedded in opaque uint64 object ids by the pmd module.
-+ * This encoding is also present in the object ids stored in the
-+ * data records on media.
-+ *
-+ * The obj_type field is 4 bits. There are two valid obj types.
-+ */
-+enum obj_type_omf {
-+	OMF_OBJ_UNDEF       = 0,
-+	OMF_OBJ_MBLOCK      = 1,
-+	OMF_OBJ_MLOG        = 2,
-+};
-+
-+/**
-+ * sb_descriptor_ver_omf - Mpool super block version
-+ * @OMF_SB_DESC_UNDEF: value not on media
-+ */
-+enum sb_descriptor_ver_omf {
-+	OMF_SB_DESC_UNDEF        = 0,
-+	OMF_SB_DESC_V1           = 1,
-+
-+};
-+#define OMF_SB_DESC_VER_LAST   OMF_SB_DESC_V1
-+
-+
-+/**
-+ * struct sb_descriptor_omf - packed super block, super block descriptor format version 1.
-+ * @psb_magic:  mpool magic value; offset 0 in all vers
-+ * @psb_name:   mpool name
-+ * @psb_poolid: UUID of pool this drive belongs to
-+ * @psb_vers:   sb format version; offset 56
-+ * @psb_gen:    sb generation number on this drive
-+ * @psb_cksum1: checksum of all fields above
-+ * @psb_parm:   parameters for this drive
-+ * @psb_cksum2: checksum of psb_parm
-+ * @psb_mdc01gen:   mdc0 log1 generation number
-+ * @psb_mdc01uuid:
-+ * @psb_mdc01devid: mdc0 log1 device UUID
-+ * @psb_mdc01strip: mdc0 log1 strip desc.
-+ * @psb_mdc01desc:  mdc0 log1 layout
-+ * @psb_mdc02gen:   mdc0 log2 generation number
-+ * @psb_mdc02uuid:
-+ * @psb_mdc02devid: mdc0 log2 device UUID
-+ * @psb_mdc02strip: mdc0 log2 strip desc.
-+ * @psb_mdc02desc:  mdc0 log2 layout
-+ * @psb_mdc0dev:    drive param for mdc0 strip
-+ *
-+ * Note: these fields, up to and including psb_cksum1, are known to libblkid.
-+ * cannot change them without havoc. Fields from psb_magic to psb_cksum1
-+ * included are at same offset in all versions.
-+ */
-+struct sb_descriptor_omf {
-+	__le64                         psb_magic;
-+	u8                             psb_name[OMF_MPOOL_NAME_LEN];
-+	u8                             psb_poolid[OMF_UUID_PACKLEN];
-+	__le16                         psb_vers;
-+	__le32                         psb_gen;
-+	u8                             psb_cksum1[4];
-+
-+	u8                             psb_pad1[6];
-+	struct devparm_descriptor_omf  psb_parm;
-+	u8                             psb_cksum2[4];
-+
-+	u8                             psb_pad2[4];
-+	__le64                         psb_mdc01gen;
-+	u8                             psb_mdc01uuid[OMF_UUID_PACKLEN];
-+	u8                             psb_mdc01devid[OMF_UUID_PACKLEN];
-+	struct layout_descriptor_omf   psb_mdc01desc;
-+
-+	u8                             psb_pad3[4];
-+	__le64                         psb_mdc02gen;
-+	u8                             psb_mdc02uuid[OMF_UUID_PACKLEN];
-+	u8                             psb_mdc02devid[OMF_UUID_PACKLEN];
-+	struct layout_descriptor_omf   psb_mdc02desc;
-+
-+	u8                             psb_pad4[4];
-+	struct devparm_descriptor_omf  psb_mdc0dev;
-+} __packed;
-+
-+OMF_SETGET(struct sb_descriptor_omf, psb_magic, 64)
-+OMF_SETGET_CHBUF(struct sb_descriptor_omf, psb_name)
-+OMF_SETGET_CHBUF(struct sb_descriptor_omf, psb_poolid)
-+OMF_SETGET(struct sb_descriptor_omf, psb_vers, 16)
-+OMF_SETGET(struct sb_descriptor_omf, psb_gen, 32)
-+OMF_SETGET_CHBUF(struct sb_descriptor_omf, psb_cksum1)
-+OMF_SETGET_CHBUF(struct sb_descriptor_omf, psb_cksum2)
-+OMF_SETGET(struct sb_descriptor_omf, psb_mdc01gen, 64)
-+OMF_SETGET_CHBUF(struct sb_descriptor_omf, psb_mdc01uuid)
-+OMF_SETGET_CHBUF(struct sb_descriptor_omf, psb_mdc01devid)
-+OMF_SETGET(struct sb_descriptor_omf, psb_mdc02gen, 64)
-+OMF_SETGET_CHBUF(struct sb_descriptor_omf, psb_mdc02uuid)
-+OMF_SETGET_CHBUF(struct sb_descriptor_omf, psb_mdc02devid)
-+#define OMF_SB_DESC_PACKLEN (sizeof(struct sb_descriptor_omf))
-+
-+/*
-+ * For object-related records OCREATE/OUPDATE is max so compute that here as:
-+ * rtype + objid + gen + layout desc
-+ */
-+#define OMF_MDCREC_PACKLEN_MAX max(OMF_MDCREC_OBJCMN_PACKLEN,            \
-+				   max(OMF_MDCREC_MCCONFIG_PACKLEN,      \
-+				       max(OMF_MDCREC_CLS_SPARE_PACKLEN, \
-+					   OMF_MDCREC_MPCONFIG_PACKLEN)))
-+
-+#endif /* MPOOL_OMF_H */
-diff --git a/drivers/mpool/omf_if.h b/drivers/mpool/omf_if.h
+ 	rc = mpctl_init();
+ 	if (rc) {
+ 		errmsg = "mpctl init failed";
+diff --git a/drivers/mpool/init.h b/drivers/mpool/init.h
+index 3d8f809a5e45..507d43a55c01 100644
+--- a/drivers/mpool/init.h
++++ b/drivers/mpool/init.h
+@@ -6,6 +6,8 @@
+ #ifndef MPOOL_INIT_H
+ #define MPOOL_INIT_H
+ 
++extern unsigned int xvm_max;
++extern unsigned int xvm_size_max;
+ extern unsigned int maxunits;
+ extern unsigned int rwsz_max_mb;
+ extern unsigned int rwconc_max;
+diff --git a/drivers/mpool/mcache.c b/drivers/mpool/mcache.c
 new file mode 100644
-index 000000000000..5f11a03ef500
+index 000000000000..07c79615ecf1
 --- /dev/null
-+++ b/drivers/mpool/omf_if.h
-@@ -0,0 +1,381 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
++++ b/drivers/mpool/mcache.c
+@@ -0,0 +1,1029 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
 +
-+#ifndef MPOOL_OMF_IF_H
-+#define MPOOL_OMF_IF_H
++#include <linux/module.h>
++#include <linux/memcontrol.h>
++#include <linux/kref.h>
++#include <linux/migrate.h>
++#include <linux/delay.h>
++#include <linux/uio.h>
++#include <linux/fadvise.h>
++#include <linux/prefetch.h>
 +
-+#include "uuid.h"
 +#include "mpool_ioctl.h"
 +
 +#include "mp.h"
-+#include "omf.h"
++#include "mpool_printk.h"
++#include "assert.h"
 +
-+struct mpool_descriptor;
-+struct pmd_layout;
++#include "mpctl.h"
 +
-+/*
-+ * Common defs: versioned via version number field of enclosing structs
-+ */
-+
-+/**
-+ * struct omf_layout_descriptor - version 1 layout descriptor
-+ * @ol_zaddr:
-+ * @ol_zcnt: number of zones
-+ * @ol_pdh:
-+ */
-+struct omf_layout_descriptor {
-+	u64    ol_zaddr;
-+	u32    ol_zcnt;
-+	u16    ol_pdh;
-+};
-+
-+/**
-+ * struct omf_devparm_descriptor - version 1 devparm descriptor
-+ * @odp_devid:    UUID for drive
-+ * @odp_devsz:    size, in bytes, of the volume/device
-+ * @odp_zonetot:  total number of zones
-+ * @odp_zonepg:   zone size in number of zone pages
-+ * @odp_mclassp:  enum mp_media_classp
-+ * @odp_devtype:  PD type. Enum pd_devtype
-+ * @odp_sectorsz: 2^podp_sectorsz = sector size
-+ * @odp_features: Features, ored bits of enum mp_mc_features
-+ *
-+ * The fields zonepg, mclassp, devtype, sectosz, and features uniquely identify
-+ * the media class of the PD.
-+ * All drives in a media class must have the same values in the below fields.
-+ */
-+struct omf_devparm_descriptor {
-+	struct mpool_uuid  odp_devid;
-+	u64                odp_devsz;
-+	u32                odp_zonetot;
-+
-+	u32                odp_zonepg;
-+	u8                 odp_mclassp;
-+	u8                 odp_devtype;
-+	u8                 odp_sectorsz;
-+	u64                odp_features;
-+};
++#ifndef lru_to_page
++#define lru_to_page(_head)  (list_entry((_head)->prev, struct page, lru))
++#endif
 +
 +/*
-+ * Superblock (sb) -- version 1
++ * MPC_RA_IOV_MAX - Max pages per call to mblock read by a readahead
++ * request.  Be careful about increasing this as it directly adds
++ * (n * 24) bytes to the stack frame of mpc_readpages_cb().
++ */
++#define MPC_RA_IOV_MAX      (8)
++
++#define NODEV               MKDEV(0, 0)    /* Non-existent device */
++
++/*
++ * Arguments required to initiate an asynchronous call to mblock_read()
++ * and which must also be preserved across that call.
 + *
-+ * Note this is 8-byte-wide reversed to get correct ascii order
++ * Note: We could make things more efficient by changing a_pagev[]
++ * to a struct kvec if mblock_read() would guarantee that it will
++ * not alter the given iovec.
 + */
-+#define OMF_SB_MAGIC  0x7665446c6f6f706dULL  /* ASCII mpoolDev - no null */
-+
-+/**
-+ * struct omf_sb_descriptor - version 1 superblock descriptor
-+ * @osb_magic:  mpool magic value
-+ * @osb_name:   mpool name, contains a terminating 0 byte
-+ * @osb_cktype: enum mp_cksum_type value
-+ * @osb_vers:   sb format version
-+ * @osb_poolid: UUID of pool this drive belongs to
-+ * @osb_gen:    sb generation number on this drive
-+ * @osb_parm:   parameters for this drive
-+ * @osb_mdc01gen:   mdc0 log1 generation number
-+ * @osb_mdc01uuid:
-+ * @osb_mdc01devid:
-+ * @osb_mdc01desc:  mdc0 log1 layout
-+ * @osb_mdc02gen:   mdc0 log2 generation number
-+ * @osb_mdc02uuid:
-+ * @osb_mdc02devid:
-+ * @osb_mdc02desc:  mdc0 log2 layout
-+ * @osb_mdc0dev:   drive param for mdc0
-+ */
-+struct omf_sb_descriptor {
-+	u64                            osb_magic;
-+	u8                             osb_name[MPOOL_NAMESZ_MAX];
-+	u8                             osb_cktype;
-+	u16                            osb_vers;
-+	struct mpool_uuid              osb_poolid;
-+	u32                            osb_gen;
-+	struct omf_devparm_descriptor  osb_parm;
-+
-+	u64                            osb_mdc01gen;
-+	struct mpool_uuid              osb_mdc01uuid;
-+	struct mpool_uuid              osb_mdc01devid;
-+	struct omf_layout_descriptor   osb_mdc01desc;
-+
-+	u64                            osb_mdc02gen;
-+	struct mpool_uuid              osb_mdc02uuid;
-+	struct mpool_uuid              osb_mdc02devid;
-+	struct omf_layout_descriptor   osb_mdc02desc;
-+
-+	struct omf_devparm_descriptor  osb_mdc0dev;
++struct readpage_args {
++	void                       *a_xvm;
++	struct mblock_descriptor   *a_mbdesc;
++	u64                         a_mboffset;
++	int                         a_pagec;
++	struct page                *a_pagev[];
 +};
 +
-+/**
-+ * struct omf_logrec_descriptor -
-+ * @olr_tlen:  logical length of data record (all chunks)
-+ * @olr_rlen:  length of data chunk in this log record
-+ * @olr_rtype: enum logrec_type_omf value
-+ *
-+ */
-+struct omf_logrec_descriptor {
-+	u32    olr_tlen;
-+	u16    olr_rlen;
-+	u8     olr_rtype;
++struct readpage_work {
++	struct work_struct      w_work;
++	struct readpage_args    w_args;
 +};
 +
-+/**
-+ * struct omf_logblock_header -
-+ * @olh_magic:   unique ID per mlog
-+ * @olh_pfsetid: flush set ID of the previous log block
-+ * @olh_cfsetid: flush set ID this log block
-+ * @olh_gen:     generation number
-+ * @olh_vers:    log block format version
-+ */
-+struct omf_logblock_header {
-+	struct mpool_uuid    olh_magic;
-+	u32                olh_pfsetid;
-+	u32                olh_cfsetid;
-+	u64                olh_gen;
-+	u16                olh_vers;
-+};
++static void mpc_xvm_put(struct mpc_xvm *xvm);
 +
-+/**
-+ * struct omf_mdcver - version of an mpool MDC content.
-+ * @mdcver:
-+ *
-+ * mdcver[0]: major version number
-+ * mdcver[1]: minor version number
-+ * mdcver[2]: patch version number
-+ * mdcver[3]: development version number. Used during development cycle when
-+ *            the above numbers don't change.
-+ *
-+ * This is not the version of the message framing used for the MDC.
-+ * This the version of the binary that introduced that version of the MDC
-+ * content.
-+ */
-+struct omf_mdcver {
-+	u16    mdcver[4];
-+};
++static int mpc_readpage_impl(struct page *page, struct mpc_xvm *map);
 +
-+#define mdcv_major    mdcver[0]
-+#define mdcv_minor    mdcver[1]
-+#define mdcv_patch    mdcver[2]
-+#define mdcv_dev      mdcver[3]
++/* The following structures are initialized at the end of this file. */
++static const struct vm_operations_struct mpc_vops_default;
++const struct address_space_operations mpc_aops_default;
 +
-+/**
-+ * struct omf_mdcrec_data -
-+ * @omd_version:  OMF_MDR_VERSION record
-+ * @omd_objid:  object identifier
-+ * @omd_gen:    object generation number
-+ * @omd_layout:
-+ * @omd_mblen:  Length of written data in object
-+ * @omd_old:
-+ * @omd_uuid:
-+ * @omd_parm:
-+ * @omd_mclassp: mp_media_classp
-+ * @omd_spzone:   percent spare zones for drives in media class
-+ * @omd_cfg:
-+ * @omd_rtype: enum mdcrec_type_omf value
-+ *
-+ * object-related rtypes:
-+ * ODELETE, OIDCKPT: objid field only; others ignored
-+ * OERASE: objid and gen fields only; others ignored
-+ * OCREATE, OUPDATE: layout field only; others ignored
-+ */
-+struct omf_mdcrec_data {
-+	union ustruct {
-+		struct omf_mdcver omd_version;
++static struct workqueue_struct *mpc_wq_trunc __read_mostly;
++static struct workqueue_struct *mpc_wq_rav[4] __read_mostly;
 +
-+		struct object {
-+			u64                             omd_objid;
-+			u64                             omd_gen;
-+			struct pmd_layout              *omd_layout;
-+			u64                             omd_mblen;
-+			struct omf_layout_descriptor    omd_old;
-+			struct mpool_uuid               omd_uuid;
-+			u8                              omd_mclass;
-+		} obj;
++static size_t mpc_xvm_cachesz[2] __read_mostly;
++static struct kmem_cache *mpc_xvm_cache[2] __read_mostly;
 +
-+		struct drive_state {
-+			struct omf_devparm_descriptor  omd_parm;
-+		} dev;
-+
-+		struct media_cls_spare {
-+			u8 omd_mclassp;
-+			u8 omd_spzone;
-+		} mcs;
-+
-+		struct mpool_config    omd_cfg;
-+	} u;
-+
-+	u8             omd_rtype;
-+};
-+
-+/**
-+ * objid_type() - Return the type field from an objid
-+ * @objid:
-+ */
-+static inline int objid_type(u64 objid)
++static struct workqueue_struct *mpc_rgn2wq(uint rgn)
 +{
-+	return ((objid & 0xF00) >> 8);
++	return mpc_wq_rav[rgn % ARRAY_SIZE(mpc_wq_rav)];
 +}
 +
-+static inline bool objtype_valid(enum obj_type_omf otype)
++static int mpc_rgnmap_isorphan(int rgn, void *item, void *data)
 +{
-+	return otype && (otype <= 2);
-+};
++	struct mpc_xvm *xvm = item;
++	void **headp = data;
++
++	if (xvm && kref_read(&xvm->xvm_ref) == 1 && !atomic_read(&xvm->xvm_opened)) {
++		idr_replace(&xvm->xvm_rgnmap->rm_root, NULL, rgn);
++		xvm->xvm_next = *headp;
++		*headp = xvm;
++	}
++
++	return ITERCB_NEXT;
++}
++
++void mpc_rgnmap_flush(struct mpc_rgnmap *rm)
++{
++	struct mpc_xvm *head = NULL, *xvm;
++
++	if (!rm)
++		return;
++
++	/* Wait for all mpc_xvm_free_cb() callbacks to complete... */
++	flush_workqueue(mpc_wq_trunc);
++
++	/*
++	 * Build a list of all orphaned XVMs and release their birth
++	 * references (i.e., XVMs that were created but never mmapped).
++	 */
++	mutex_lock(&rm->rm_lock);
++	idr_for_each(&rm->rm_root, mpc_rgnmap_isorphan, &head);
++	mutex_unlock(&rm->rm_lock);
++
++	while ((xvm = head)) {
++		head = xvm->xvm_next;
++		mpc_xvm_put(xvm);
++	}
++}
++
++static struct mpc_xvm *mpc_xvm_lookup(struct mpc_rgnmap *rm, uint key)
++{
++	struct mpc_xvm *xvm;
++
++	mutex_lock(&rm->rm_lock);
++	xvm = idr_find(&rm->rm_root, key);
++	if (xvm && !kref_get_unless_zero(&xvm->xvm_ref))
++		xvm = NULL;
++	mutex_unlock(&rm->rm_lock);
++
++	return xvm;
++}
++
++void mpc_xvm_free(struct mpc_xvm *xvm)
++{
++	struct mpc_rgnmap *rm;
++
++	ASSERT((u32)(uintptr_t)xvm == xvm->xvm_magic);
++
++	rm = xvm->xvm_rgnmap;
++
++	mutex_lock(&rm->rm_lock);
++	idr_remove(&rm->rm_root, xvm->xvm_rgn);
++	mutex_unlock(&rm->rm_lock);
++
++	xvm->xvm_magic = 0xbadcafe;
++	xvm->xvm_rgn = -1;
++
++	kmem_cache_free(xvm->xvm_cache, xvm);
++
++	atomic_dec(&rm->rm_rgncnt);
++}
++
++static void mpc_xvm_free_cb(struct work_struct *work)
++{
++	struct mpc_xvm *xvm = container_of(work, typeof(*xvm), xvm_work);
++
++	mpc_xvm_free(xvm);
++}
++
++static void mpc_xvm_get(struct mpc_xvm *xvm)
++{
++	kref_get(&xvm->xvm_ref);
++}
++
++static void mpc_xvm_release(struct kref *kref)
++{
++	struct mpc_xvm *xvm = container_of(kref, struct mpc_xvm, xvm_ref);
++	struct mpc_rgnmap *rm = xvm->xvm_rgnmap;
++	int i;
++
++	ASSERT((u32)(uintptr_t)xvm == xvm->xvm_magic);
++
++	mutex_lock(&rm->rm_lock);
++	ASSERT(kref_read(kref) == 0);
++	idr_replace(&rm->rm_root, NULL, xvm->xvm_rgn);
++	mutex_unlock(&rm->rm_lock);
++
++	/*
++	 * Wait for all in-progress readaheads to complete
++	 * before we drop our mblock references.
++	 */
++	if (atomic_add_return(WQ_MAX_ACTIVE, &xvm->xvm_rabusy) > WQ_MAX_ACTIVE)
++		flush_workqueue(mpc_rgn2wq(xvm->xvm_rgn));
++
++	for (i = 0; i < xvm->xvm_mbinfoc; ++i)
++		mblock_put(xvm->xvm_mbinfov[i].mbdesc);
++
++	INIT_WORK(&xvm->xvm_work, mpc_xvm_free_cb);
++	queue_work(mpc_wq_trunc, &xvm->xvm_work);
++}
++
++static void mpc_xvm_put(struct mpc_xvm *xvm)
++{
++	kref_put(&xvm->xvm_ref, mpc_xvm_release);
++}
 +
 +/*
-+ * omf API functions -- exported functions for working with omf structures
++ * VM operations
 + */
++
++static void mpc_vm_open(struct vm_area_struct *vma)
++{
++	mpc_xvm_get(vma->vm_private_data);
++}
++
++static void mpc_vm_close(struct vm_area_struct *vma)
++{
++	mpc_xvm_put(vma->vm_private_data);
++}
++
++static int mpc_alloc_and_readpage(struct vm_area_struct *vma, pgoff_t offset, gfp_t gfp)
++{
++	struct address_space *mapping;
++	struct file *file;
++	struct page *page;
++	int rc;
++
++	page = __page_cache_alloc(gfp | __GFP_NOWARN);
++	if (!page)
++		return -ENOMEM;
++
++	file    = vma->vm_file;
++	mapping = file->f_mapping;
++
++	rc = add_to_page_cache_lru(page, mapping, offset, gfp & GFP_KERNEL);
++	if (rc == 0)
++		rc = mpc_readpage_impl(page, vma->vm_private_data);
++	else if (rc == -EEXIST)
++		rc = 0;
++
++	put_page(page);
++
++	return rc;
++}
++
++static bool mpc_lock_page_or_retry(struct page *page, struct mm_struct *mm, uint flags)
++{
++	might_sleep();
++
++	if (trylock_page(page))
++		return true;
++
++	if (flags & FAULT_FLAG_ALLOW_RETRY) {
++		if (flags & FAULT_FLAG_RETRY_NOWAIT)
++			return false;
++
++		mmap_read_unlock(mm);
++		/* _killable version is not exported by the kernel. */
++		wait_on_page_locked(page);
++		return false;
++	}
++
++	if (flags & FAULT_FLAG_KILLABLE) {
++		int rc;
++
++		rc = lock_page_killable(page);
++		if (rc) {
++			mmap_read_unlock(mm);
++			return false;
++		}
++	} else {
++		lock_page(page);
++	}
++
++	return true;
++}
++
++static int mpc_handle_page_error(struct page *page, struct vm_area_struct *vma)
++{
++	int rc;
++
++	ClearPageError(page);
++
++	rc = mpc_readpage_impl(page, vma->vm_private_data);
++	if (rc == 0) {
++		wait_on_page_locked(page);
++		if (!PageUptodate(page))
++			rc = -EIO;
++	}
++
++	put_page(page);
++
++	return rc;
++}
++
++static vm_fault_t mpc_vm_fault_impl(struct vm_area_struct *vma, struct vm_fault *vmf)
++{
++	struct address_space *mapping;
++	struct inode *inode;
++	struct page *page;
++	vm_fault_t vmfrc;
++	pgoff_t offset;
++	loff_t size;
++
++	mapping = vma->vm_file->f_mapping;
++	inode   = mapping->host;
++	offset  = vmf->pgoff;
++	vmfrc   = 0;
++
++	size = round_up(i_size_read(inode), PAGE_SIZE);
++	if (offset >= (size >> PAGE_SHIFT))
++		return VM_FAULT_SIGBUS;
++
++retry_find:
++	page = find_get_page(mapping, offset);
++	if (!page) {
++		int rc = mpc_alloc_and_readpage(vma, offset, mapping_gfp_mask(mapping));
++
++		if (rc < 0)
++			return (rc == -ENOMEM) ? VM_FAULT_OOM : VM_FAULT_SIGBUS;
++
++		vmfrc = VM_FAULT_MAJOR;
++		goto retry_find;
++	}
++
++	/* At this point, page is not locked but has a ref. */
++	if (vmfrc == VM_FAULT_MAJOR)
++		count_vm_event(PGMAJFAULT);
++
++	if (!mpc_lock_page_or_retry(page, vma->vm_mm, vmf->flags)) {
++		put_page(page);
++		return vmfrc | VM_FAULT_RETRY;
++	}
++
++	/* At this point, page is locked with a ref. */
++	if (unlikely(page->mapping != mapping)) {
++		unlock_page(page);
++		put_page(page);
++		goto retry_find;
++	}
++
++	VM_BUG_ON_PAGE(page->index != offset, page);
++
++	if (unlikely(!PageUptodate(page))) {
++		int rc = mpc_handle_page_error(page, vma);
++
++		/* At this point, page is not locked and has no ref. */
++		if (rc)
++			return VM_FAULT_SIGBUS;
++		goto retry_find;
++	}
++
++	/* Page is locked with a ref. */
++	vmf->page = page;
++
++	return vmfrc | VM_FAULT_LOCKED;
++}
++
++static vm_fault_t mpc_vm_fault(struct vm_fault *vmf)
++{
++	return mpc_vm_fault_impl(vmf->vma, vmf);
++}
++
++/*
++ * MPCTL address-space operations.
++ */
++
++static int mpc_readpage_impl(struct page *page, struct mpc_xvm *xvm)
++{
++	struct mpc_mbinfo *mbinfo;
++	struct kvec iov[1];
++	off_t offset;
++	uint mbnum;
++	int rc;
++
++	offset  = page->index << PAGE_SHIFT;
++	offset %= (1ul << xvm_size_max);
++
++	mbnum = offset / xvm->xvm_bktsz;
++	if (mbnum >= xvm->xvm_mbinfoc) {
++		unlock_page(page);
++		return -EINVAL;
++	}
++
++	mbinfo = xvm->xvm_mbinfov + mbnum;
++	offset %= xvm->xvm_bktsz;
++
++	if (offset >= mbinfo->mblen) {
++		unlock_page(page);
++		return -EINVAL;
++	}
++
++	iov[0].iov_base = page_address(page);
++	iov[0].iov_len = PAGE_SIZE;
++
++	rc = mblock_read(xvm->xvm_mpdesc, mbinfo->mbdesc, iov, 1, offset, PAGE_SIZE);
++	if (rc) {
++		unlock_page(page);
++		return rc;
++	}
++
++	if (xvm->xvm_hcpagesp)
++		atomic64_inc(xvm->xvm_hcpagesp);
++	atomic64_inc(&xvm->xvm_nrpages);
++
++	SetPagePrivate(page);
++	set_page_private(page, (ulong)xvm);
++	SetPageUptodate(page);
++	unlock_page(page);
++
++	return 0;
++}
++
++#define MPC_RPARGSBUFSZ \
++	(sizeof(struct readpage_args) + MPC_RA_IOV_MAX * sizeof(void *))
 +
 +/**
-+ * omf_sb_pack_htole() - pack superblock
-+ * @sb: struct omf_sb_descriptor *
-+ * @outbuf: char *
++ * mpc_readpages_cb() - mpc_readpages() callback
++ * @work:   w_work.work from struct readpage_work
 + *
-+ * Pack superblock into outbuf little-endian computing specified checksum.
-+ *
-+ * Return: 0 if successful, -EINVAL otherwise
++ * The incoming arguments are in the first page (a_pagev[0]) which
++ * we are about to overwrite, so we copy them to the stack.
 + */
-+int omf_sb_pack_htole(struct omf_sb_descriptor *sb, char *outbuf);
++static void mpc_readpages_cb(struct work_struct *work)
++{
++	struct kvec iovbuf[MPC_RA_IOV_MAX];
++	char argsbuf[MPC_RPARGSBUFSZ];
++	struct readpage_args *args = (void *)argsbuf;
++	struct readpage_work *w;
++	struct mpc_xvm *xvm;
++	struct kvec *iov = iovbuf;
++	size_t argssz;
++	int pagec, rc, i;
++
++	w = container_of(work, struct readpage_work, w_work);
++
++	pagec = w->w_args.a_pagec;
++	argssz = sizeof(*args) + sizeof(args->a_pagev[0]) * pagec;
++
++	ASSERT(pagec <= ARRAY_SIZE(iovbuf));
++	ASSERT(argssz <= sizeof(argsbuf));
++
++	memcpy(args, &w->w_args, argssz);
++	w = NULL; /* Do not touch! */
++
++	xvm = args->a_xvm;
++
++	/*
++	 * Synchronize with mpc_xvm_put() to prevent dropping our
++	 * mblock references while there are reads in progress.
++	 */
++	if (atomic_inc_return(&xvm->xvm_rabusy) > WQ_MAX_ACTIVE) {
++		rc = -ENXIO;
++		goto errout;
++	}
++
++	for (i = 0; i < pagec; ++i) {
++		iov[i].iov_base = page_address(args->a_pagev[i]);
++		iov[i].iov_len = PAGE_SIZE;
++	}
++
++	rc = mblock_read(xvm->xvm_mpdesc, args->a_mbdesc, iov,
++			 pagec, args->a_mboffset, pagec << PAGE_SHIFT);
++	if (rc)
++		goto errout;
++
++	if (xvm->xvm_hcpagesp)
++		atomic64_add(pagec, xvm->xvm_hcpagesp);
++	atomic64_add(pagec, &xvm->xvm_nrpages);
++	atomic_dec(&xvm->xvm_rabusy);
++
++	for (i = 0; i < pagec; ++i) {
++		struct page *page = args->a_pagev[i];
++
++		SetPagePrivate(page);
++		set_page_private(page, (ulong)xvm);
++		SetPageUptodate(page);
++
++		unlock_page(page);
++		put_page(page);
++	}
++
++	return;
++
++errout:
++	atomic_dec(&xvm->xvm_rabusy);
++
++	for (i = 0; i < pagec; ++i) {
++		unlock_page(args->a_pagev[i]);
++		put_page(args->a_pagev[i]);
++	}
++}
++
++static int mpc_readpages(struct file *file, struct address_space *mapping,
++			 struct list_head *pages, uint nr_pages)
++{
++	struct workqueue_struct *wq;
++	struct readpage_work *w;
++	struct work_struct *work;
++	struct mpc_mbinfo *mbinfo;
++	struct mpc_unit *unit;
++	struct mpc_xvm *xvm;
++	struct page *page;
++	off_t offset, mbend;
++	uint mbnum, iovmax, i;
++	uint ra_pages_max;
++	ulong index;
++	gfp_t gfp;
++	u32 key;
++	int rc;
++
++	unit = file->private_data;
++
++	ra_pages_max = unit->un_ra_pages_max;
++	if (ra_pages_max < 1)
++		return 0;
++
++	page   = lru_to_page(pages);
++	offset = page->index << PAGE_SHIFT;
++	index  = page->index;
++	work   = NULL;
++	w      = NULL;
++
++	key = offset >> xvm_size_max;
++
++	/*
++	 * The idr value here (xvm) is pinned for the lifetime of the address map.
++	 * Therefore, we can exit the rcu read-side critsec without worry that xvm will be
++	 * destroyed before put_page() has been called on each and every page in the given
++	 * list of pages.
++	 */
++	rcu_read_lock();
++	xvm = idr_find(&unit->un_rgnmap.rm_root, key);
++	rcu_read_unlock();
++
++	if (!xvm)
++		return 0;
++
++	offset %= (1ul << xvm_size_max);
++
++	mbnum = offset / xvm->xvm_bktsz;
++	if (mbnum >= xvm->xvm_mbinfoc)
++		return 0;
++
++	mbinfo = xvm->xvm_mbinfov + mbnum;
++
++	mbend = mbnum * xvm->xvm_bktsz + mbinfo->mblen;
++	iovmax = MPC_RA_IOV_MAX;
++
++	gfp = mapping_gfp_mask(mapping) & GFP_KERNEL;
++	wq = mpc_rgn2wq(xvm->xvm_rgn);
++
++	nr_pages = min_t(uint, nr_pages, ra_pages_max);
++
++	for (i = 0; i < nr_pages; ++i) {
++		page    = lru_to_page(pages);
++		offset  = page->index << PAGE_SHIFT;
++		offset %= (1ul << xvm_size_max);
++
++		/* Don't read past the end of the mblock. */
++		if (offset >= mbend)
++			break;
++
++		/* mblock reads must be logically contiguous. */
++		if (page->index != index && work) {
++			queue_work(wq, work);
++			work = NULL;
++		}
++
++		index = page->index + 1; /* next expected page index */
++
++		prefetchw(&page->flags);
++		list_del(&page->lru);
++
++		rc = add_to_page_cache_lru(page, mapping, page->index, gfp);
++		if (rc) {
++			if (work) {
++				queue_work(wq, work);
++				work = NULL;
++			}
++			put_page(page);
++			continue;
++		}
++
++		if (!work) {
++			w = page_address(page);
++			INIT_WORK(&w->w_work, mpc_readpages_cb);
++			w->w_args.a_xvm = xvm;
++			w->w_args.a_mbdesc = mbinfo->mbdesc;
++			w->w_args.a_mboffset = offset % xvm->xvm_bktsz;
++			w->w_args.a_pagec = 0;
++			work = &w->w_work;
++
++			iovmax = MPC_RA_IOV_MAX;
++			iovmax -= page->index % MPC_RA_IOV_MAX;
++		}
++
++		w->w_args.a_pagev[w->w_args.a_pagec++] = page;
++
++		/*
++		 * Restrict batch size to the number of struct kvecs
++		 * that will fit into a page (minus our header).
++		 */
++		if (w->w_args.a_pagec >= iovmax) {
++			queue_work(wq, work);
++			work = NULL;
++		}
++	}
++
++	if (work)
++		queue_work(wq, work);
++
++	return 0;
++}
 +
 +/**
-+ * omf_sb_unpack_letoh() - unpack superblock
-+ * @sb: struct omf_sb_descriptor *
-+ * @inbuf: char *
-+ * @omf_ver: on-media-format superblock version
++ * mpc_releasepage() - Linux VM calls the release page when pages are released.
++ * @page:
++ * @gfp:
 + *
-+ * Unpack little-endian superblock from inbuf into sb verifying checksum.
-+ *
-+ * Return: 0 if successful, -errno otherwise
++ * The function is added as part of tracking incoming and outgoing pages.
 + */
-+int omf_sb_unpack_letoh(struct omf_sb_descriptor *sb, const char *inbuf, u16 *omf_ver);
++static int mpc_releasepage(struct page *page, gfp_t gfp)
++{
++	struct mpc_xvm *xvm;
++
++	if (!PagePrivate(page))
++		return 0;
++
++	xvm = (void *)page_private(page);
++	if (!xvm)
++		return 0;
++
++	ClearPagePrivate(page);
++	set_page_private(page, 0);
++
++	ASSERT((u32)(uintptr_t)xvm == xvm->xvm_magic);
++
++	if (xvm->xvm_hcpagesp)
++		atomic64_dec(xvm->xvm_hcpagesp);
++	atomic64_dec(&xvm->xvm_nrpages);
++
++	return 1;
++}
++
++static void mpc_invalidatepage(struct page *page, uint offset, uint length)
++{
++	mpc_releasepage(page, 0);
++}
 +
 +/**
-+ * omf_sb_has_magic_le() - Determine if buffer has superblock magic value
-+ * @inbuf: char *
++ * mpc_migratepage() -  Callback for handling page migration.
++ * @mapping:
++ * @newpage:
++ * @page:
++ * @mode:
 + *
-+ * Determine if little-endian buffer inbuf has superblock magic value
-+ * where expected; does NOT imply inbuf is a valid superblock.
-+ *
-+ * Return: 1 if true; 0 otherwise
++ * The drivers having private pages are supplying this callback.
++ * Not sure the page migration releases or invalidates the page being migrated,
++ * or else the tracking of incoming and outgoing pages will be in trouble. The
++ * callback is added to deal with uncertainties around migration. The migration
++ * will be declined so long as the page is private and it belongs to mpctl.
 + */
-+bool omf_sb_has_magic_le(const char *inbuf);
++static int mpc_migratepage(struct address_space *mapping, struct page *newpage,
++			   struct page *page, enum migrate_mode mode)
++{
++	if (page_has_private(page) &&
++	    !try_to_release_page(page, GFP_KERNEL))
++		return -EAGAIN;
++
++	ASSERT(PageLocked(page));
++
++	return migrate_page(mapping, newpage, page, mode);
++}
++
++int mpc_mmap(struct file *fp, struct vm_area_struct *vma)
++{
++	struct mpc_unit *unit = fp->private_data;
++	struct mpc_xvm *xvm;
++	off_t off;
++	ulong len;
++	u32 key;
++
++	off = vma->vm_pgoff << PAGE_SHIFT;
++	len = vma->vm_end - vma->vm_start - 1;
++
++	/* Verify that the request does not cross an xvm region boundary. */
++	if ((off >> xvm_size_max) != ((off + len) >> xvm_size_max))
++		return -EINVAL;
++
++	/* Acquire a reference on the region map for this region. */
++	key = off >> xvm_size_max;
++
++	xvm = mpc_xvm_lookup(&unit->un_rgnmap, key);
++	if (!xvm)
++		return -EINVAL;
++
++	/*
++	 * Drop the birth ref on first open so that the final call
++	 * to mpc_vm_close() will cause the vma to be destroyed.
++	 */
++	if (atomic_inc_return(&xvm->xvm_opened) == 1)
++		mpc_xvm_put(xvm);
++
++	vma->vm_ops = &mpc_vops_default;
++
++	vma->vm_flags &= ~(VM_RAND_READ | VM_SEQ_READ);
++	vma->vm_flags &= ~(VM_MAYWRITE | VM_MAYEXEC);
++
++	vma->vm_flags = (VM_DONTEXPAND | VM_DONTDUMP | VM_NORESERVE);
++	vma->vm_flags |= VM_MAYREAD | VM_READ | VM_RAND_READ;
++
++	vma->vm_private_data = xvm;
++
++	fp->f_ra.ra_pages = unit->un_ra_pages_max;
++	fp->f_mode |= FMODE_RANDOM;
++
++	return 0;
++}
 +
 +/**
-+ * omf_logblock_header_pack_htole() - pack log block header
-+ * @lbh: struct omf_logblock_header *
-+ * @outbuf: char *
++ * mpc_fadvise() -
 + *
-+ * Pack header into little-endian log block buffer lbuf, ex-checksum.
++ * mpc_fadvise() currently handles only POSIX_FADV_WILLNEED.
 + *
-+ * Return: 0 if successful, -errno otherwise
++ * The code path that leads here is: madvise_willneed() -> vfs_fadvise() -> mpc_fadvise()
 + */
-+int omf_logblock_header_pack_htole(struct omf_logblock_header *lbh, char *lbuf);
++int mpc_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
++{
++	pgoff_t start, end;
++
++	if (!file)
++		return -EINVAL;
++
++	if (advice != POSIX_FADV_WILLNEED)
++		return -EOPNOTSUPP;
++
++	start = offset >> PAGE_SHIFT;
++	end = (offset + len - 1) >> PAGE_SHIFT;
++
++	if (end < start)
++		return -EINVAL;
++
++	/* To force page cache readahead */
++	spin_lock(&file->f_lock);
++	file->f_mode |= FMODE_RANDOM;
++	spin_unlock(&file->f_lock);
++
++	page_cache_sync_readahead(file->f_mapping, &file->f_ra, file, start, end - start + 1);
++
++	return 0;
++}
 +
 +/**
-+ * omf_logblock_header_len_le() - Determine header length of log block
-+ * @lbuf: char *
-+ *
-+ * Check little-endian log block in lbuf to determine header length.
-+ *
-+ * Return: bytes in packed header; -EINVAL if invalid header vers
++ * mpioc_xvm_create() - create an extended VMA map (AKA mcache map)
++ * @unit:
++ * @arg:
 + */
-+int omf_logblock_header_len_le(char *lbuf);
++int mpioc_xvm_create(struct mpc_unit *unit, struct mpool_descriptor *mp, struct mpioc_vma *ioc)
++{
++	struct mpc_mbinfo *mbinfov;
++	struct kmem_cache *cache;
++	struct mpc_rgnmap *rm;
++	struct mpc_xvm *xvm;
++	size_t largest, sz;
++	uint mbidc, mult;
++	u64 *mbidv;
++	int rc, i;
++
++	if (!unit || !unit->un_mapping || !ioc)
++		return -EINVAL;
++
++	if (ioc->im_mbidc < 1)
++		return -EINVAL;
++
++	if (ioc->im_advice > MPC_VMA_PINNED)
++		return -EINVAL;
++
++	mult = 1;
++	if (ioc->im_advice == MPC_VMA_WARM)
++		mult = 10;
++	else if (ioc->im_advice == MPC_VMA_HOT)
++		mult = 100;
++
++	mbidc = ioc->im_mbidc;
++
++	sz = sizeof(*xvm) + sizeof(*mbinfov) * mbidc;
++	if (sz > mpc_xvm_cachesz[1])
++		return -EINVAL;
++	else if (sz > mpc_xvm_cachesz[0])
++		cache = mpc_xvm_cache[1];
++	else
++		cache = mpc_xvm_cache[0];
++
++	sz = mbidc * sizeof(mbidv[0]);
++
++	mbidv = kmalloc(sz, GFP_KERNEL);
++	if (!mbidv)
++		return -ENOMEM;
++
++	rc = copy_from_user(mbidv, ioc->im_mbidv, sz);
++	if (rc) {
++		kfree(mbidv);
++		return -EFAULT;
++	}
++
++	xvm = kmem_cache_zalloc(cache, GFP_KERNEL);
++	if (!xvm) {
++		kfree(mbidv);
++		return -ENOMEM;
++	}
++
++	xvm->xvm_magic = (u32)(uintptr_t)xvm;
++	xvm->xvm_mbinfoc = mbidc;
++	xvm->xvm_mpdesc = mp;
++
++	xvm->xvm_mapping = unit->un_mapping;
++	xvm->xvm_rgnmap = &unit->un_rgnmap;
++	xvm->xvm_advice = ioc->im_advice;
++	kref_init(&xvm->xvm_ref);
++	xvm->xvm_cache = cache;
++	atomic_set(&xvm->xvm_opened, 0);
++
++	atomic64_set(&xvm->xvm_nrpages, 0);
++	atomic_set(&xvm->xvm_rabusy, 0);
++
++	largest = 0;
++
++	mbinfov = xvm->xvm_mbinfov;
++
++	for (i = 0; i < mbidc; ++i) {
++		struct mpc_mbinfo *mbinfo = mbinfov + i;
++		struct mblock_props props;
++
++		rc = mblock_find_get(mp, mbidv[i], 1, &props, &mbinfo->mbdesc);
++		if (rc) {
++			mbidc = i;
++			goto errout;
++		}
++
++		mbinfo->mblen = ALIGN(props.mpr_write_len, PAGE_SIZE);
++		mbinfo->mbmult = mult;
++		atomic64_set(&mbinfo->mbatime, 0);
++
++		largest = max_t(size_t, largest, mbinfo->mblen);
++	}
++
++	xvm->xvm_bktsz = roundup_pow_of_two(largest);
++
++	if (xvm->xvm_bktsz * mbidc > (1ul << xvm_size_max)) {
++		rc = -E2BIG;
++		goto errout;
++	}
++
++	rm = &unit->un_rgnmap;
++
++	mutex_lock(&rm->rm_lock);
++	xvm->xvm_rgn = idr_alloc(&rm->rm_root, NULL, 1, -1, GFP_KERNEL);
++	if (xvm->xvm_rgn < 1) {
++		mutex_unlock(&rm->rm_lock);
++
++		rc = xvm->xvm_rgn ?: -EINVAL;
++		goto errout;
++	}
++
++	ioc->im_offset = (ulong)xvm->xvm_rgn << xvm_size_max;
++	ioc->im_bktsz = xvm->xvm_bktsz;
++	ioc->im_len = xvm->xvm_bktsz * mbidc;
++	ioc->im_len = ALIGN(ioc->im_len, (1ul << xvm_size_max));
++
++	atomic_inc(&rm->rm_rgncnt);
++
++	idr_replace(&rm->rm_root, xvm, xvm->xvm_rgn);
++	mutex_unlock(&rm->rm_lock);
++
++errout:
++	if (rc) {
++		for (i = 0; i < mbidc; ++i)
++			mblock_put(mbinfov[i].mbdesc);
++		kmem_cache_free(cache, xvm);
++	}
++
++	kfree(mbidv);
++
++	return rc;
++}
 +
 +/**
-+ * omf_logblock_header_unpack_letoh() - unpack log block header
-+ * @lbh: struct omf_logblock_header *
-+ * @inbuf: char *
-+ *
-+ * Unpack little-endian log block header from lbuf into lbh; does not
-+ * verify checksum.
-+ *
-+ * Return: 0 if successful, -EINVAL if invalid log block header vers
++ * mpioc_xvm_destroy() - destroy an extended VMA
++ * @unit:
++ * @arg:
 + */
-+int omf_logblock_header_unpack_letoh(struct omf_logblock_header *lbh, const char *inbuf);
++int mpioc_xvm_destroy(struct mpc_unit *unit, struct mpioc_vma *ioc)
++{
++	struct mpc_rgnmap *rm;
++	struct mpc_xvm *xvm;
++	u64 rgn;
 +
-+/**
-+ * omf_logrec_desc_pack_htole() - pack log record descriptor
-+ * @lrd: struct omf_logrec_descriptor *
-+ * @outbuf: char *
-+ *
-+ * Pack log record descriptor into outbuf little-endian.
-+ *
-+ * Return: 0 if successful, -EINVAL if invalid log rec type
-+ */
-+int omf_logrec_desc_pack_htole(struct omf_logrec_descriptor *lrd, char *outbuf);
++	if (!unit || !ioc)
++		return -EINVAL;
 +
-+/**
-+ * omf_logrec_desc_unpack_letoh() - unpack log record descriptor
-+ * @lrd: struct omf_logrec_descriptor *
-+ * @inbuf: char *
-+ *
-+ * Unpack little-endian log record descriptor from inbuf into lrd.
-+ */
-+void omf_logrec_desc_unpack_letoh(struct omf_logrec_descriptor *lrd, const char *inbuf);
++	rgn = ioc->im_offset >> xvm_size_max;
++	rm = &unit->un_rgnmap;
 +
-+/**
-+ * omf_mdcrec_pack_htole() - pack mdc record
-+ * @mp: struct mpool_descriptor *
-+ * @cdr: struct omf_mdcrec_data *
-+ * @outbuf: char *
-+ *
-+ * Pack mdc record into outbuf little-endian.
-+ * NOTE: Assumes outbuf has enough space for the layout structure.
-+ *
-+ * Return: bytes packed if successful, -EINVAL otherwise
-+ */
-+int omf_mdcrec_pack_htole(struct mpool_descriptor *mp, struct omf_mdcrec_data *cdr, char *outbuf);
++	mutex_lock(&rm->rm_lock);
++	xvm = idr_find(&rm->rm_root, rgn);
++	if (xvm && kref_read(&xvm->xvm_ref) == 1 && !atomic_read(&xvm->xvm_opened))
++		idr_remove(&rm->rm_root, rgn);
++	else
++		xvm = NULL;
++	mutex_unlock(&rm->rm_lock);
 +
-+/**
-+ * omf_mdcrec_unpack_letoh() - unpack mdc record
-+ * @mdcver: mdc content version of the mdc from which this data comes.
-+ *          NULL means latest MDC content version known by this binary.
-+ * @mp:     struct mpool_descriptor *
-+ * @cdr:    struct omf_mdcrec_data *
-+ * @inbuf:  char *
-+ *
-+ * Unpack little-endian mdc record from inbuf into cdr.
-+ *
-+ * Return: 0 if successful, -errno on error
-+ */
-+int omf_mdcrec_unpack_letoh(struct omf_mdcver *mdcver, struct mpool_descriptor *mp,
-+			    struct omf_mdcrec_data *cdr, const char *inbuf);
++	if (xvm)
++		mpc_xvm_put(xvm);
 +
-+/**
-+ * omf_mdcrec_isobj_le() - determine if mdc recordis object-related
-+ * @inbuf: char *
-+ *
-+ * Return true if little-endian mdc record in inbuf is object-related.
-+ */
-+int omf_mdcrec_isobj_le(const char *inbuf);
++	return 0;
++}
 +
-+/**
-+ * omf_mdcver_unpack_letoh() - Unpack le mdc version record from inbuf.
-+ * @cdr:
-+ * @inbuf:
-+ */
-+void omf_mdcver_unpack_letoh(struct omf_mdcrec_data *cdr, const char *inbuf);
++int mpioc_xvm_purge(struct mpc_unit *unit, struct mpioc_vma *ioc)
++{
++	struct mpc_xvm *xvm;
++	u64 rgn;
 +
-+/**
-+ * omf_mdcrec_unpack_type_letoh() - extract the record type from a packed MDC record.
-+ * @inbuf: packed MDC record.
-+ */
-+u8 omf_mdcrec_unpack_type_letoh(const char *inbuf);
++	if (!unit || !ioc)
++		return -EINVAL;
 +
-+/**
-+ * logrec_type_datarec() - data record or not
-+ * @rtype:
-+ *
-+ * Return: true if the log record type is related to a data record.
-+ */
-+bool logrec_type_datarec(enum logrec_type_omf rtype);
++	rgn = ioc->im_offset >> xvm_size_max;
 +
-+/**
-+ * omf_sbver_to_mdcver() - Returns the matching mdc version for a given superblock version
-+ * @sbver: superblock version
-+ */
-+struct omf_mdcver *omf_sbver_to_mdcver(enum sb_descriptor_ver_omf sbver);
++	xvm = mpc_xvm_lookup(&unit->un_rgnmap, rgn);
++	if (!xvm)
++		return -ENOENT;
 +
-+int omf_init(void) __cold;
-+void omf_exit(void) __cold;
++	mpc_xvm_put(xvm);
 +
-+#endif /* MPOOL_OMF_IF_H */
-diff --git a/drivers/mpool/upgrade.h b/drivers/mpool/upgrade.h
++	return 0;
++}
++
++int mpioc_xvm_vrss(struct mpc_unit *unit, struct mpioc_vma *ioc)
++{
++	struct mpc_xvm *xvm;
++	u64 rgn;
++
++	if (!unit || !ioc)
++		return -EINVAL;
++
++	rgn = ioc->im_offset >> xvm_size_max;
++
++	xvm = mpc_xvm_lookup(&unit->un_rgnmap, rgn);
++	if (!xvm)
++		return -ENOENT;
++
++	ioc->im_vssp = mpc_xvm_pglen(xvm);
++	ioc->im_rssp = atomic64_read(&xvm->xvm_nrpages);
++
++	mpc_xvm_put(xvm);
++
++	return 0;
++}
++
++int mcache_init(void)
++{
++	size_t sz;
++	int rc, i;
++
++	xvm_max = clamp_t(uint, xvm_max, 1024, 1u << 30);
++	xvm_size_max = clamp_t(ulong, xvm_size_max, 27, 32);
++
++	sz = sizeof(struct mpc_mbinfo) * 8;
++	mpc_xvm_cachesz[0] = sizeof(struct mpc_xvm) + sz;
++
++	mpc_xvm_cache[0] = kmem_cache_create("mpool_xvm_0", mpc_xvm_cachesz[0], 0,
++					     SLAB_HWCACHE_ALIGN | SLAB_POISON, NULL);
++	if (!mpc_xvm_cache[0]) {
++		rc = -ENOMEM;
++		mp_pr_err("mpc xvm cache 0 create failed", rc);
++		return rc;
++	}
++
++	sz = sizeof(struct mpc_mbinfo) * 32;
++	mpc_xvm_cachesz[1] = sizeof(struct mpc_xvm) + sz;
++
++	mpc_xvm_cache[1] = kmem_cache_create("mpool_xvm_1", mpc_xvm_cachesz[1], 0,
++					     SLAB_HWCACHE_ALIGN | SLAB_POISON, NULL);
++	if (!mpc_xvm_cache[1]) {
++		rc = -ENOMEM;
++		mp_pr_err("mpc xvm cache 1 create failed", rc);
++		goto errout;
++	}
++
++	mpc_wq_trunc = alloc_workqueue("mpc_wq_trunc", WQ_UNBOUND, 16);
++	if (!mpc_wq_trunc) {
++		rc = -ENOMEM;
++		mp_pr_err("trunc workqueue alloc failed", rc);
++		goto errout;
++	}
++
++	for (i = 0; i < ARRAY_SIZE(mpc_wq_rav); ++i) {
++		int     maxactive = 16;
++		char    name[16];
++
++		snprintf(name, sizeof(name), "mpc_wq_ra%d", i);
++
++		mpc_wq_rav[i] = alloc_workqueue(name, 0, maxactive);
++		if (!mpc_wq_rav[i]) {
++			rc = -ENOMEM;
++			mp_pr_err("mpctl ra workqueue alloc failed", rc);
++			goto errout;
++		}
++	}
++
++	return 0;
++
++errout:
++	mcache_exit();
++	return rc;
++}
++
++void mcache_exit(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(mpc_wq_rav); ++i) {
++		if (mpc_wq_rav[i])
++			destroy_workqueue(mpc_wq_rav[i]);
++		mpc_wq_rav[i] = NULL;
++	}
++
++	if (mpc_wq_trunc)
++		destroy_workqueue(mpc_wq_trunc);
++	kmem_cache_destroy(mpc_xvm_cache[1]);
++	kmem_cache_destroy(mpc_xvm_cache[0]);
++}
++
++static const struct vm_operations_struct mpc_vops_default = {
++	.open           = mpc_vm_open,
++	.close          = mpc_vm_close,
++	.fault          = mpc_vm_fault,
++};
++
++const struct address_space_operations mpc_aops_default = {
++	.readpages      = mpc_readpages,
++	.releasepage    = mpc_releasepage,
++	.invalidatepage = mpc_invalidatepage,
++	.migratepage    = mpc_migratepage,
++};
+diff --git a/drivers/mpool/mcache.h b/drivers/mpool/mcache.h
 new file mode 100644
-index 000000000000..3b3748c47a3e
+index 000000000000..fe6f45a05494
 --- /dev/null
-+++ b/drivers/mpool/upgrade.h
-@@ -0,0 +1,128 @@
++++ b/drivers/mpool/mcache.h
+@@ -0,0 +1,96 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
 +
-+/*
-+ * Defines structures for upgrading MPOOL meta data
-+ */
++#ifndef MPOOL_MCACHE_H
++#define MPOOL_MCACHE_H
 +
-+#ifndef MPOOL_UPGRADE_H
-+#define MPOOL_UPGRADE_H
++#include <linux/kref.h>
 +
-+#include "omf_if.h"
++#include "init.h"
++#include "mblock.h"
 +
-+/*
-+ * Size of version converted to string.
-+ * 4 * (5 bytes for a u16) + 3 * (1 byte for the '.') + 1 byte for \0
-+ */
-+#define MAX_MDCVERSTR          24
-+
-+/*
-+ * Naming conventions:
-+ *
-+ * omf structures:
-+ * ---------------
-+ * The old structure names end with _omf_v<version number>.
-+ * For example: layout_descriptor_omf_v1
-+ * The current/latest structure name end simply with _omf.
-+ * For example: layout_descriptor_omf
-+ *
-+ * Conversion functions:
-+ * ---------------------
-+ * They are named like:
-+ * omf_convert_<blabla>_<maj>_<min>_<patch>_<dev>to<maj>_<min>_<patch>_<dev>()
-+ *
-+ * For example: omf_convert_sb_1_0_0_0to1_0_0_1()
-+ *
-+ * They are not named like omf_convert_<blabla>_v1tov2() because sometimes the
-+ * input and output structures are exactly the same and the conversion is
-+ * related to some subtle interpretation of structure filed[s] content.
-+ *
-+ * Unpack functions:
-+ * -----------------
-+ * They are named like:
-+ * omf_<blabla>_unpack_letoh_v<version number>()
-+ * <version number> being the version of the structure.
-+ *
-+ * For example: omf_layout_unpack_letoh_v1()
-+ * Note that for the latest/current version of the structure we cannot
-+ * name the unpack function omf_<blabla>_unpack_letoh() because that would
-+ * introduce a name conflict with the top unpack function that calls
-+ * omf_unpack_letoh_and_convert()
-+ *
-+ * For example for layout we have:
-+ * omf_layout_unpack_letoh_v1() unpacks layout_descriptor_omf_v1
-+ * omf_layout_unpack_letoh_v2() unpacks layout_descriptor_omf
-+ * omf_layout_unpack_letoh() calls one of the two above.
-+ */
++struct mpc_unit;
 +
 +/**
-+ * struct upgrade_history -
-+ * @uh_size:    size of the current version in-memory structure
-+ * @uh_unpack:  unpacking function from on-media format to in-memory format
-+ * @uh_conv:    conversion function from previous version to current version,
-+ *              set to NULL for the first version
-+ * @uh_sbver:   corresponding superblock version since which the change has
-+ *              been introduced. If this structure is not used by superblock
-+ *              set uh_sbver =  OMF_SB_DESC_UNDEF.
-+ * @uh_mdcver: corresponding mdc ver since which the change has been
-+ *              introduced
++ * struct mpc_rgnmap - extended vma (xvm) region management
++ * @rm_lock:    protects rm_root
++ * @rm_root:    root of the region map
++ * @rm_rgncnt;  number of active regions
 + *
-+ * Every time we update a nested structure in superblock or MDC, we need to
-+ * save the following information about this update, such that we can keep the
-+ * update history of this structure
++ * Note that this is not a ref-counted object, its lifetime
++ * is tied to struct mpc_unit.
 + */
-+struct upgrade_history {
-+	size_t                      uh_size;
-+	int (*uh_unpack)(void *out, const char *inbuf);
-+	int (*uh_conv)(const void *pre, void *cur);
-+	enum sb_descriptor_ver_omf  uh_sbver;
-+	struct omf_mdcver          uh_mdcver;
++struct mpc_rgnmap {
++	struct mutex    rm_lock;
++	struct idr      rm_root;
++	atomic_t        rm_rgncnt;
++} ____cacheline_aligned;
++
++
++struct mpc_mbinfo {
++	struct mblock_descriptor   *mbdesc;
++	u32                         mblen;
++	u32                         mbmult;
++	atomic64_t                  mbatime;
++} __aligned(32);
++
++struct mpc_xvm {
++	size_t                      xvm_bktsz;
++	uint                        xvm_mbinfoc;
++	uint                        xvm_rgn;
++	struct kref                 xvm_ref;
++	u32                         xvm_magic;
++	struct mpool_descriptor    *xvm_mpdesc;
++
++	atomic64_t                 *xvm_hcpagesp;
++	struct address_space       *xvm_mapping;
++	struct mpc_rgnmap          *xvm_rgnmap;
++
++	enum mpc_vma_advice         xvm_advice;
++	atomic_t                    xvm_opened;
++	struct kmem_cache          *xvm_cache;
++	struct mpc_xvm             *xvm_next;
++
++	____cacheline_aligned
++	atomic64_t                  xvm_nrpages;
++	atomic_t                    xvm_rabusy;
++	struct work_struct          xvm_work;
++
++	____cacheline_aligned
++	struct mpc_mbinfo           xvm_mbinfov[];
 +};
 +
-+/**
-+ * omfu_mdcver_cur() - Return the latest mpool MDC content version understood by this binary
-+ */
-+struct omf_mdcver *omfu_mdcver_cur(void);
++extern const struct address_space_operations mpc_aops_default;
 +
-+/**
-+ * omfu_mdcver_comment() - Return mpool MDC content version comment passed in via "mdcver".
-+ * @mdcver:
-+ */
-+const char *omfu_mdcver_comment(struct omf_mdcver *mdcver);
++void mpc_rgnmap_flush(struct mpc_rgnmap *rm);
 +
-+/**
-+ * omfu_mdcver_to_str() - convert a version into a string.
-+ * @mdcver: version to convert
-+ * @buf:    buffer in which to place the conversion.
-+ * @sz:     size of "buf" in bytes.
-+ *
-+ * Returns "buf"
-+ */
-+char *omfu_mdcver_to_str(struct omf_mdcver *mdcver, char *buf, size_t sz);
++int mpc_mmap(struct file *fp, struct vm_area_struct *vma);
 +
-+/**
-+ * omfu_mdcver_cmp() - compare two versions a and b
-+ * @a:  first version
-+ * @op: compare operator (C syntax), can be "<", "<=", ">", ">=", "==".
-+ * @b:  second version
-+ *
-+ * Return (a op b)
-+ */
-+bool omfu_mdcver_cmp(struct omf_mdcver *a, char *op, struct omf_mdcver *b);
++int mpc_fadvise(struct file *file, loff_t offset, loff_t len, int advice);
 +
-+/**
-+ * omfu_mdcver_cmp2() - compare two versions
-+ * @a:     first version
-+ * @op:    compare operator (C syntax), can be "<", "<=", ">", ">=", "==".
-+ * @major: major, minor, patch and dev which composes the second version
-+ * @minor:
-+ * @patch:
-+ * @dev:
-+ *
-+ * Return true (a op b)
-+ */
-+bool omfu_mdcver_cmp2(struct omf_mdcver *a, char *op, u16 major, u16 minor, u16 patch, u16 dev);
++int mpioc_xvm_create(struct mpc_unit *unit, struct mpool_descriptor *mp, struct mpioc_vma *ioc);
 +
-+#endif /* MPOOL_UPGRADE_H */
++int mpioc_xvm_destroy(struct mpc_unit *unit, struct mpioc_vma *ioc);
++
++int mpioc_xvm_purge(struct mpc_unit *unit, struct mpioc_vma *ioc);
++
++int mpioc_xvm_vrss(struct mpc_unit *unit, struct mpioc_vma *ioc);
++
++void mpc_xvm_free(struct mpc_xvm *xvm);
++
++int mcache_init(void) __cold;
++void mcache_exit(void) __cold;
++
++static inline pgoff_t mpc_xvm_pgoff(struct mpc_xvm *xvm)
++{
++	return ((ulong)xvm->xvm_rgn << xvm_size_max) >> PAGE_SHIFT;
++}
++
++static inline size_t mpc_xvm_pglen(struct mpc_xvm *xvm)
++{
++	return (xvm->xvm_bktsz * xvm->xvm_mbinfoc) >> PAGE_SHIFT;
++}
++
++#endif /* MPOOL_MCACHE_H */
+diff --git a/drivers/mpool/mpctl.c b/drivers/mpool/mpctl.c
+index 3a231cf982b3..f11f522ec90c 100644
+--- a/drivers/mpool/mpctl.c
++++ b/drivers/mpool/mpctl.c
+@@ -142,6 +142,11 @@ static ssize_t mpc_label_show(struct device *dev, struct device_attribute *da, c
+ 	return scnprintf(buf, PAGE_SIZE, "%s\n", dev_to_unit(dev)->un_label);
+ }
+ 
++static ssize_t mpc_vma_show(struct device *dev, struct device_attribute *da, char *buf)
++{
++	return scnprintf(buf, PAGE_SIZE, "%u\n", xvm_size_max);
++}
++
+ static ssize_t mpc_type_show(struct device *dev, struct device_attribute *da, char *buf)
+ {
+ 	struct mpool_uuid  uuid;
+@@ -160,6 +165,7 @@ static void mpc_mpool_params_add(struct device_attribute *dattr)
+ 	MPC_ATTR_RO(dattr++, mode);
+ 	MPC_ATTR_RO(dattr++, ra);
+ 	MPC_ATTR_RO(dattr++, label);
++	MPC_ATTR_RO(dattr++, vma);
+ 	MPC_ATTR_RO(dattr,   type);
+ }
+ 
+@@ -243,6 +249,8 @@ static void mpool_params_merge_defaults(struct mpool_params *params)
+ 	if (params->mp_mode != -1)
+ 		params->mp_mode &= 0777;
+ 
++	params->mp_vma_size_max = xvm_size_max;
++
+ 	params->mp_rsvd0 = 0;
+ 	params->mp_rsvd1 = 0;
+ 	params->mp_rsvd2 = 0;
+@@ -382,6 +390,10 @@ static int mpc_unit_create(const char *name, struct mpc_mpool *mpool, struct mpc
+ 	kref_init(&unit->un_ref);
+ 	unit->un_mpool = mpool;
+ 
++	mutex_init(&unit->un_rgnmap.rm_lock);
++	idr_init(&unit->un_rgnmap.rm_root);
++	atomic_set(&unit->un_rgnmap.rm_rgncnt, 0);
++
+ 	mutex_lock(&ss->ss_lock);
+ 	minor = idr_alloc(&ss->ss_unitmap, NULL, 0, -1, GFP_KERNEL);
+ 	mutex_unlock(&ss->ss_lock);
+@@ -421,6 +433,8 @@ static void mpc_unit_release(struct kref *refp)
+ 	if (unit->un_device)
+ 		device_destroy(ss->ss_class, unit->un_devno);
+ 
++	idr_destroy(&unit->un_rgnmap.rm_root);
++
+ 	kfree(unit);
+ }
+ 
+@@ -633,6 +647,7 @@ static int mpc_cf_journal(struct mpc_unit *unit)
+ 	cfg.mc_oid2 = unit->un_ds_oidv[1];
+ 	cfg.mc_captgt = unit->un_mdc_captgt;
+ 	cfg.mc_ra_pages_max = unit->un_ra_pages_max;
++	cfg.mc_vma_size_max = xvm_size_max;
+ 	memcpy(&cfg.mc_utype, &unit->un_utype, sizeof(cfg.mc_utype));
+ 	strlcpy(cfg.mc_label, unit->un_label, sizeof(cfg.mc_label));
+ 
+@@ -742,6 +757,7 @@ static int mpioc_params_get(struct mpc_unit *unit, struct mpioc_params *get)
+ 	params->mp_oidv[0] = unit->un_ds_oidv[0];
+ 	params->mp_oidv[1] = unit->un_ds_oidv[1];
+ 	params->mp_ra_pages_max = unit->un_ra_pages_max;
++	params->mp_vma_size_max = xvm_size_max;
+ 	memcpy(&params->mp_utype, &unit->un_utype, sizeof(params->mp_utype));
+ 	strlcpy(params->mp_label, unit->un_label, sizeof(params->mp_label));
+ 	strlcpy(params->mp_name, unit->un_name, sizeof(params->mp_name));
+@@ -785,6 +801,8 @@ static int mpioc_params_set(struct mpc_unit *unit, struct mpioc_params *set)
+ 
+ 	params = &set->mps_params;
+ 
++	params->mp_vma_size_max = xvm_size_max;
++
+ 	mutex_lock(&ss->ss_lock);
+ 	if (params->mp_uid != -1 || params->mp_gid != -1 || params->mp_mode != -1) {
+ 		err = mpc_mp_chown(unit, params);
+@@ -919,6 +937,7 @@ static void mpioc_prop_get(struct mpc_unit *unit, struct mpioc_prop *kprop)
+ 	params->mp_oidv[0] = unit->un_ds_oidv[0];
+ 	params->mp_oidv[1] = unit->un_ds_oidv[1];
+ 	params->mp_ra_pages_max = unit->un_ra_pages_max;
++	params->mp_vma_size_max = xvm_size_max;
+ 	memcpy(&params->mp_utype, &unit->un_utype, sizeof(params->mp_utype));
+ 	strlcpy(params->mp_label, unit->un_label, sizeof(params->mp_label));
+ 	strlcpy(params->mp_name, unit->un_name, sizeof(params->mp_name));
+@@ -1171,6 +1190,7 @@ static int mpioc_mp_create(struct mpc_unit *ctl, struct mpioc_mpool *mp,
+ 	cfg.mc_rsvd0 = mp->mp_params.mp_rsvd0;
+ 	cfg.mc_captgt = MPOOL_ROOT_LOG_CAP;
+ 	cfg.mc_ra_pages_max = mp->mp_params.mp_ra_pages_max;
++	cfg.mc_vma_size_max = mp->mp_params.mp_vma_size_max;
+ 	cfg.mc_rsvd1 = mp->mp_params.mp_rsvd1;
+ 	cfg.mc_rsvd2 = mp->mp_params.mp_rsvd2;
+ 	cfg.mc_rsvd3 = mp->mp_params.mp_rsvd3;
+@@ -1300,6 +1320,7 @@ static int mpioc_mp_activate(struct mpc_unit *ctl, struct mpioc_mpool *mp,
+ 	mp->mp_params.mp_oidv[0] = cfg.mc_oid1;
+ 	mp->mp_params.mp_oidv[1] = cfg.mc_oid2;
+ 	mp->mp_params.mp_ra_pages_max = cfg.mc_ra_pages_max;
++	mp->mp_params.mp_vma_size_max = cfg.mc_vma_size_max;
+ 	memcpy(&mp->mp_params.mp_utype, &cfg.mc_utype, sizeof(mp->mp_params.mp_utype));
+ 	strlcpy(mp->mp_params.mp_label, cfg.mc_label, sizeof(mp->mp_params.mp_label));
+ 
+@@ -2313,6 +2334,7 @@ static int mpc_open(struct inode *ip, struct file *fp)
+ 	}
+ 
+ 	fp->f_op = &mpc_fops_default;
++	fp->f_mapping->a_ops = &mpc_aops_default;
+ 
+ 	unit->un_mapping = fp->f_mapping;
+ 
+@@ -2361,8 +2383,11 @@ static int mpc_release(struct inode *ip, struct file *fp)
+ 	if (!lastclose)
+ 		goto errout;
+ 
+-	if (mpc_unit_ismpooldev(unit))
++	if (mpc_unit_ismpooldev(unit)) {
++		mpc_rgnmap_flush(&unit->un_rgnmap);
++
+ 		unit->un_mapping = NULL;
++	}
+ 
+ 	unit->un_open_excl = false;
+ 
+@@ -2530,6 +2555,22 @@ static long mpc_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
+ 		rc = mpioc_mlog_erase(unit, argp);
+ 		break;
+ 
++	case MPIOC_VMA_CREATE:
++		rc = mpioc_xvm_create(unit, unit->un_mpool->mp_desc, argp);
++		break;
++
++	case MPIOC_VMA_DESTROY:
++		rc = mpioc_xvm_destroy(unit, argp);
++		break;
++
++	case MPIOC_VMA_PURGE:
++		rc = mpioc_xvm_purge(unit, argp);
++		break;
++
++	case MPIOC_VMA_VRSS:
++		rc = mpioc_xvm_vrss(unit, argp);
++		break;
++
+ 	default:
+ 		rc = -ENOTTY;
+ 		mp_pr_rl("invalid command %x: dir=%u type=%c nr=%u size=%u",
+@@ -2553,6 +2594,8 @@ static const struct file_operations mpc_fops_default = {
+ 	.open		= mpc_open,
+ 	.release	= mpc_release,
+ 	.unlocked_ioctl	= mpc_ioctl,
++	.mmap           = mpc_mmap,
++	.fadvise        = mpc_fadvise,
+ };
+ 
+ static int mpc_exit_unit(int minor, void *item, void *arg)
+diff --git a/drivers/mpool/mpctl.h b/drivers/mpool/mpctl.h
+index 412a6a491c15..b93e44248f03 100644
+--- a/drivers/mpool/mpctl.h
++++ b/drivers/mpool/mpctl.h
+@@ -11,6 +11,8 @@
+ #include <linux/device.h>
+ #include <linux/semaphore.h>
+ 
++#include "mcache.h"
++
+ #define ITERCB_NEXT     (0)
+ #define ITERCB_DONE     (1)
+ 
+@@ -23,6 +25,7 @@ struct mpc_unit {
+ 	uid_t                       un_uid;
+ 	gid_t                       un_gid;
+ 	mode_t                      un_mode;
++	struct mpc_rgnmap           un_rgnmap;
+ 	dev_t                       un_devno;
+ 	const struct mpc_uinfo     *un_uinfo;
+ 	struct mpc_mpool           *un_mpool;
 -- 
 2.17.2
 
