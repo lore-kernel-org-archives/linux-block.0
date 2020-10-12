@@ -4,31 +4,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA60C352B9
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E60BBC2D0A3
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:28:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A15B2087E
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:28:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91B7820838
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 16:28:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="Dk19TubV"
+	dkim=pass (1024-bit key) header.d=micron.com header.i=@micron.com header.b="pRiSpgI1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403842AbgJLQ2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Oct 2020 12:28:16 -0400
-Received: from mail-dm6nam12on2041.outbound.protection.outlook.com ([40.107.243.41]:58465
+        id S2403798AbgJLQ2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Oct 2020 12:28:10 -0400
+Received: from mail-dm6nam12on2078.outbound.protection.outlook.com ([40.107.243.78]:56576
         "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2403809AbgJLQ2N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Oct 2020 12:28:13 -0400
+        id S2403795AbgJLQ2J (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Oct 2020 12:28:09 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OFpE0cv9VUJClI6EjBT13zzPKCelzk9d0q6trQrmuN+pm9QgUxSfh4yF5HKaDQyRfBwmGPfMbatvAM5xCRNCJS64r2nk0OTb6nKdr3UDOnOK0c/eDhJSofMd9gr17Kb+hTI5d7Bj+TKQF9rLd7soi6uRxfVzYIMT6IuL0dYw15Hbd+pjqYxIuDLl4U+a2Fa5aMYmqs5NRSXuHVubT4dAJmmGVaF3IVz1LOwcQA8zELf+hQ/ptKgbnE+S4OeISfRXsxJZ/xb92SlwPggiONp3XFlulkePniPhNjXE2YGr5qdBe+vRBsiijmOI4KkwMcsHvxhf+qNCthNndgkMMgJy4w==
+ b=SiddeJpjNqhtH3adefsjWpdZ9wlDsb7zI6t1ba2MudJKb6+o3WvQNosRRqAyGc4nMyytrKBSaRa573JoqVA91q3hyP7N6so66t7KsXdH4kSPTUJh68N1AnUsSGuJqMTaqDk800A8ahoXevOW0cBrgoQVZqmPxXtlv/EdRis02uqXcCYL7LyxqofbKAr74TZuW5GYAyowJ4jV3CSRlEO1nTDgnmj/IbvcwJmdBPS85HC7ZIzxSGbs3ntgWcJoQ/LCTL017AEkaksamJWzjjpITdZV4rPr1sAty6w2SMtYtlxaVCqTrhCOv8r4MKrtecQzaBfdaQT6wNa2pVg4V1LqJA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CUslZuWHgaMMCjTRndro6LXHrMR+8pxbpxWqvKPKqmQ=;
- b=mqjylcrHud17r7nrLE+VYI3GElr1tYm4mvTURJcFl0ZRVuXKPZAn+mAXz2UtHwpT61kcduBKk5H42vqX/NCWd6+1iBVWYwuWqU/2LOKE8P6+rCduldV8GU5UqeOrOXXpEztjZTUTVkTjFf0ZG6wW4yIWD8fm8sydgM+7hZOVXEjzq+Ig5PrAYZQIYaVNEQtHQ/20TITxEtgENF+kbEqboXv/CMlwgXWngoYJco/NrTBbDoLjmzU0m9/oCkL5/aCCLXLq4VIDdpy23QkoDWvg4JiUR7uEAK82O8YZ19PER5LgOx4t17A36dTa3XDyuHrNvAFvxB1qiHUPJJw8oOZLMg==
+ bh=jeqO1XOCAbA4eD3X+aSNpGKjC2bXt2pdV5gICxWVT80=;
+ b=I+qKR61hKtE/KODKkK/K3nwfkediO6NnlIeTPvUBFIpQ+4Z/yQElwZQe1jSHnG5tO5OgH+6wh1s06yz6McKZMziTiziU4lgx8ScMUL1EVXurmZU2VbQF928akBe8MYCqzNbuTUrZ2vVB6X7DGI6cBoOtrdPPAamjGY2G+9Ro+T/47RBD3NjteAY3jPf8VKtlpz2maV4ZYlo0+YBzaD09eQ0H1qdUWm9xV4aRgER+ekCtWpBN+KYfDjfvGAi3mUJHWQ8aC17W4iNyTCqGPAdhjaFlvtg11h9Gye5jwA71UVf0Amaznxjj8u1YWT5j5X3xOJZbLUqJTnH5fA33C/sAJw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  137.201.242.130) smtp.rcpttodomain=kvack.org smtp.mailfrom=micron.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=micron.com;
@@ -36,18 +36,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CUslZuWHgaMMCjTRndro6LXHrMR+8pxbpxWqvKPKqmQ=;
- b=Dk19TubV0xiyEXIAiUCk0+Yv6HR1yPSGqsycGDH2QKZnAYN4VM3SyoNnWTFL8xJuyP6COyLKs7mVmcLnkDDPiUiW6SjJXoqtXNDtLzoyCTtN22hBWMJOpX3xSuFVQ0Nm5WsrfUMHg7FC/NPS1pM3bdoZIDKUEw5+zvm/aGWJMdA=
-Received: from SN4PR0201CA0060.namprd02.prod.outlook.com
- (2603:10b6:803:20::22) by SN4PR0801MB3805.namprd08.prod.outlook.com
- (2603:10b6:803:49::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.29; Mon, 12 Oct
- 2020 16:28:09 +0000
+ bh=jeqO1XOCAbA4eD3X+aSNpGKjC2bXt2pdV5gICxWVT80=;
+ b=pRiSpgI1Al9/fsuZC9OcIGkw5tM1aPmffA0PJPJlWl6aEI1wxldty4TvxlHnF1Pb+eqKoIWlP5iQuTivO/c+FiHEU25ufsBehd8y5+7xkMoVsw9xOT9GqK16hHx4mZxOsWFRpLBqgnbQBOoy0SCJfJy8O3ls7qm29J0tE7y+RGg=
+Received: from SN4PR0201CA0064.namprd02.prod.outlook.com
+ (2603:10b6:803:20::26) by BN8PR08MB5729.namprd08.prod.outlook.com
+ (2603:10b6:408:b6::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.28; Mon, 12 Oct
+ 2020 16:28:05 +0000
 Received: from SN1NAM01FT015.eop-nam01.prod.protection.outlook.com
- (2603:10b6:803:20:cafe::1f) by SN4PR0201CA0060.outlook.office365.com
- (2603:10b6:803:20::22) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:803:20:cafe::ac) by SN4PR0201CA0064.outlook.office365.com
+ (2603:10b6:803:20::26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21 via Frontend
- Transport; Mon, 12 Oct 2020 16:28:09 +0000
+ Transport; Mon, 12 Oct 2020 16:28:05 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 137.201.242.130)
  smtp.mailfrom=micron.com; kvack.org; dkim=none (message not signed)
  header.d=none;kvack.org; dmarc=pass action=none header.from=micron.com;
@@ -57,19 +57,19 @@ Received-SPF: Pass (protection.outlook.com: domain of micron.com designates
 Received: from mail.micron.com (137.201.242.130) by
  SN1NAM01FT015.mail.protection.outlook.com (10.152.65.55) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3455.23 via Frontend Transport; Mon, 12 Oct 2020 16:28:08 +0000
+ 15.20.3455.23 via Frontend Transport; Mon, 12 Oct 2020 16:28:04 +0000
 Received: from micron.com (10.114.5.55) by bowex17c.micron.com
  (137.201.21.211) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 12 Oct
- 2020 10:28:02 -0600
+ 2020 10:27:57 -0600
 From:   Nabeel M Mohamed <nmeeramohide@micron.com>
 To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-mm@kvack.org>,
         <linux-nvdimm@lists.01.org>
 CC:     <smoyer@micron.com>, <gbecker@micron.com>, <plabat@micron.com>,
         <jgroves@micron.com>, Nabeel M Mohamed <nmeeramohide@micron.com>
-Subject: [PATCH v2 09/22] mpool: add mblock lifecycle management and IO routines
-Date:   Mon, 12 Oct 2020 11:27:23 -0500
-Message-ID: <20201012162736.65241-10-nmeeramohide@micron.com>
+Subject: [PATCH v2 04/22] mpool: add pool drive component which handles mpool IO using the block layer API
+Date:   Mon, 12 Oct 2020 11:27:18 -0500
+Message-ID: <20201012162736.65241-5-nmeeramohide@micron.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20201012162736.65241-1-nmeeramohide@micron.com>
 References: <20201012162736.65241-1-nmeeramohide@micron.com>
@@ -78,61 +78,57 @@ Content-Type: text/plain
 X-ClientProxiedBy: bowex17a.micron.com (137.201.21.209) To bowex17c.micron.com
  (137.201.21.211)
 X-TM-AS-Product-Ver: SMEX-12.0.0.1782-8.200.1013-24646.005
-X-TM-AS-Result: No--14.586700-0.000000-31
-X-TM-AS-MatchedID: 702732-703812-705244-701073-702751-703115-704949-704585-7
-        01844-704318-701656-703966-704499-704397-700335-705161-113230-701480-701809
-        -703017-703140-702395-188019-703213-121336-701105-704673-703967-703027-7024
-        15-701275-703815-702754-704895-702688-701964-780039-701880-105250-705018-70
-        1744-703534-704002-704477-703694-700714-851458-700958-704401-700717-702779-
-        702960-702874-701919-704749-701847-847575-703080-703215-704714-700286-70281
-        2-702719-703286-703953-701723-825159-703357-702914-703958-705247-121270-704
-        264-703816-703954-700863-704418-701698-703904-704001-702525-700698-704718-7
-        03117-702558-701032-701724-148004-148036-42000-42003
+X-TM-AS-Result: No--16.147700-0.000000-31
+X-TM-AS-MatchedID: 701475-702501-702686-703812-705244-703226-701342-704949-7
+        04318-860560-703027-703953-702559-701480-701809-701280-703017-702395-188019
+        -702754-121224-702914-703967-702299-704477-300015-703140-703213-121336-7011
+        05-704673-701343-701275-703815-701443-704388-704895-704183-704264-117072-70
+        2230-704481-137717-121665-703881-702558-700946-703878-851458-701847-703816-
+        705161-704193-701590-703357-704542-701705-700458-704184-113872-702898-86459
+        6-702700-188199-700069-702617-704978-704397-701813-704239-702613-703285-186
+        035-148004-148036-42000-42003-190014
 X-TM-AS-User-Approved-Sender: Yes
 X-TM-AS-User-Blocked-Sender: No
 X-MT-Whitelisted: matched
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: be77ac95-f52c-44b1-f65d-08d86ecbce1c
-X-MS-TrafficTypeDiagnostic: SN4PR0801MB3805:
-X-Microsoft-Antispam-PRVS: <SN4PR0801MB3805BFFF1C3F020F8323A15EB3070@SN4PR0801MB3805.namprd08.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: d85fde22-5ac5-4e34-5996-08d86ecbcbd8
+X-MS-TrafficTypeDiagnostic: BN8PR08MB5729:
+X-Microsoft-Antispam-PRVS: <BN8PR08MB5729E98C1A157B0C7990F2F8B3070@BN8PR08MB5729.namprd08.prod.outlook.com>
 X-MS-Exchange-Transport-Forked: True
 X-EXT-ByPass: 1
 X-MT-RULE-Whitelisted: Triggered
-X-MS-Oob-TLC-OOBClassifiers: OLM:104;
+X-MS-Oob-TLC-OOBClassifiers: OLM:826;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1RnQalBCmqJesLQUVfOOnZHOy2DszZxW6uMVPsw+Gj9Iekz4b+rjLAVGB497ECW3J3xamOiPFFlyYf28fDlZcl2F1jVR/HHJIhSwgtJnYRwViVrVt/nSMRMnFzrVUFU4/kXBkIyIWpf+ANrXACNNRbQIdJ65lxEpHsv5kDE0/1F6bRsPDKuhAYIRXcwAxR5w65U5O1mds/pK+ebgmNMh6uLiCYb1wKecMz7pHG9Qv5aLCs2hC/dJ5fjH7HdZBEG1OXbZoRjcyU4moOoSh+qJcptZ97TbYwG9kwHzVosehcZEN+A0tM8hQgo/LdrnS3VGFgKUtmcx39nxpPrFBqJrzA4SRb5UT+Uz4bNFCmulieHdInkBZjw7gHai3fBO5tSiT1RaAIhM0FcROyc01mPVdk3tw8BuFGC7dQnzs+IiGBoKfMX7HbWIW7sMdA18fNCL+8xzzRGO5z88VpsmQYALKg==
-X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(39860400002)(136003)(376002)(396003)(346002)(46966005)(55016002)(356005)(2906002)(186003)(8676002)(110136005)(47076004)(82740400003)(478600001)(86362001)(33310700002)(7636003)(54906003)(6666004)(316002)(30864003)(6286002)(82310400003)(8936002)(4326008)(5660300002)(7696005)(336012)(70586007)(70206006)(2616005)(83380400001)(107886003)(1076003)(26005)(36756003)(426003)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: anEl4Lyw+tXeTkE7XWB1CsMqa+AL29uS9WkfCAoYe/wgIcn4XWvDkb4DUnGf6WFZW1KQY8K3UKNnGTVsaqNkMDr9DqDJWosGBybLit+9rhiTY+1aYTjKrmws7PcJ5DhdKjfj0QzUv8WOHcUKQuO7ZGwS6Mq5vIzLHyJO4z/rCAhP8yHTbz83BPL1DrWvxtp9mavkmbcN+c5zjvuHuy71vY9rGcCoQb4mHAHi3rFQQtXugbqunxmWoEMUWEHXUCri1C1egfkNCYRhlqCIFjj35zim7yN0dFYI78o7ezPU9cj3sUoeUp/oIXz5ZZHin0Etfp3aO7yfRl+pmiaAE8pA7U7AGEz9pam9E9vdkYOcOZ0NNtXoRusm3iDv/aDokc5Th+2e+2TAOe9VingUz67KTsDQGXqig+1DjcVL/CFNKuRmr/mKBIBkJDmKD02h6BYmbY51S5CuWSNo9if8cN4G/A==
+X-Forefront-Antispam-Report: CIP:137.201.242.130;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.micron.com;PTR:masquerade.micron.com;CAT:NONE;SFS:(4636009)(376002)(346002)(39860400002)(396003)(136003)(46966005)(8936002)(7696005)(6666004)(54906003)(8676002)(107886003)(2906002)(1076003)(55016002)(316002)(186003)(26005)(70206006)(6286002)(110136005)(30864003)(86362001)(70586007)(5660300002)(33310700002)(478600001)(356005)(7636003)(4326008)(47076004)(83380400001)(82740400003)(426003)(336012)(82310400003)(2616005)(36756003)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: micron.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2020 16:28:08.6757
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2020 16:28:04.8546
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: be77ac95-f52c-44b1-f65d-08d86ecbce1c
+X-MS-Exchange-CrossTenant-Network-Message-Id: d85fde22-5ac5-4e34-5996-08d86ecbcbd8
 X-MS-Exchange-CrossTenant-Id: f38a5ecd-2813-4862-b11b-ac1d563c806f
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f38a5ecd-2813-4862-b11b-ac1d563c806f;Ip=[137.201.242.130];Helo=[mail.micron.com]
 X-MS-Exchange-CrossTenant-AuthSource: SN1NAM01FT015.eop-nam01.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0801MB3805
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR08MB5729
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implements the mblock lifecycle management functions: allocate,
-commit, abort, read, write, destroy etc.
+The pool drive (pd) component interfaces with the block layer to
+read, write, flush, and discard mpool objects.
 
-Mblocks are containers comprising a linear sequence of bytes that
-can be written exactly once, are immutable after writing, and can
-be read in whole or in part as needed until deleted.
+The underlying block device(s) are opened during mpool activation
+and remains open until deactivated.
 
-Mpool currently supports only fixed size mblocks whose size is the
-same as the zone size and is established at mpool create.
-
-Mblock API uses the metadata manager interface to reserve storage
-space at allocation time, store metadata for the mblock in its
-associated MDC-K when committing it, record end-of-life for the
-mblock in its associated MDC-K when deleting it and read/write
-mblock data.
+Read/write IO to an mpool device is chunked by the PD layer.
+Chunking interleaves IO from different streams providing better
+QoS.  The size of each chunk (or BIO size) is determined by the
+module parameter 'chunk_size_kb'.  All the chunks from a single
+r/w request is issued asynchronously to the block layer using
+BIO chaining.
 
 Co-developed-by: Greg Becker <gbecker@micron.com>
 Signed-off-by: Greg Becker <gbecker@micron.com>
@@ -142,617 +138,509 @@ Co-developed-by: John Groves <jgroves@micron.com>
 Signed-off-by: John Groves <jgroves@micron.com>
 Signed-off-by: Nabeel M Mohamed <nmeeramohide@micron.com>
 ---
- drivers/mpool/mblock.c | 432 +++++++++++++++++++++++++++++++++++++++++
- drivers/mpool/mblock.h | 161 +++++++++++++++
- 2 files changed, 593 insertions(+)
- create mode 100644 drivers/mpool/mblock.c
- create mode 100644 drivers/mpool/mblock.h
+ drivers/mpool/init.c |  31 +++-
+ drivers/mpool/init.h |  12 ++
+ drivers/mpool/pd.c   | 424 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 466 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/mpool/init.h
+ create mode 100644 drivers/mpool/pd.c
 
-diff --git a/drivers/mpool/mblock.c b/drivers/mpool/mblock.c
-new file mode 100644
-index 000000000000..10c47ec74ff6
---- /dev/null
-+++ b/drivers/mpool/mblock.c
-@@ -0,0 +1,432 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
-+ */
-+
-+/*
-+ * DOC: Module info.
-+ *
-+ * Mblock module.
-+ *
-+ * Defines functions for writing, reading, and managing the lifecycle
-+ * of mblocks.
-+ *
-+ */
-+
-+#include <linux/vmalloc.h>
-+#include <linux/blk_types.h>
-+#include <linux/mm.h>
-+
+diff --git a/drivers/mpool/init.c b/drivers/mpool/init.c
+index 0493fb5b1157..294cf3cbbaa7 100644
+--- a/drivers/mpool/init.c
++++ b/drivers/mpool/init.c
+@@ -5,13 +5,42 @@
+ 
+ #include <linux/module.h>
+ 
 +#include "mpool_printk.h"
-+#include "assert.h"
 +
 +#include "pd.h"
-+#include "pmd_obj.h"
-+#include "mpcore.h"
-+#include "mblock.h"
-+
-+/**
-+ * mblock2layout() - convert opaque mblock handle to pmd_layout
-+ *
-+ * This function converts the opaque handle (mblock_descriptor) used by
-+ * clients to the internal representation (pmd_layout).  The
-+ * conversion is a simple cast, followed by a sanity check to verify the
-+ * layout object is an mblock object.  If the validation fails, a NULL
-+ * pointer is returned.
-+ */
-+static struct pmd_layout *mblock2layout(struct mblock_descriptor *mbh)
-+{
-+	struct pmd_layout *layout = (void *)mbh;
-+
-+	if (!layout)
-+		return NULL;
-+
-+	ASSERT(layout->eld_objid > 0);
-+	ASSERT(kref_read(&layout->eld_ref) >= 2);
-+
-+	return mblock_objid(layout->eld_objid) ? layout : NULL;
-+}
-+
-+static u32 mblock_optimal_iosz_get(struct mpool_descriptor *mp, struct pmd_layout *layout)
-+{
-+	struct mpool_dev_info *pd = pmd_layout_pd_get(mp, layout);
-+
-+	return pd->pdi_optiosz;
-+}
-+
-+/**
-+ * layout2mblock() - convert pmd_layout to opaque mblock_descriptor
-+ *
-+ * This function converts the internally used pmd_layout to
-+ * the externally used opaque mblock_descriptor.
-+ */
-+static struct mblock_descriptor *layout2mblock(struct pmd_layout *layout)
-+{
-+	return (struct mblock_descriptor *)layout;
-+}
-+
-+static void mblock_getprops_cmn(struct mpool_descriptor *mp, struct pmd_layout *layout,
-+				struct mblock_props *prop)
-+{
-+	struct mpool_dev_info *pd;
-+
-+	pd = pmd_layout_pd_get(mp, layout);
-+
-+	prop->mpr_objid = layout->eld_objid;
-+	prop->mpr_alloc_cap = pmd_layout_cap_get(mp, layout);
-+	prop->mpr_write_len = layout->eld_mblen;
-+	prop->mpr_optimal_wrsz = mblock_optimal_iosz_get(mp, layout);
-+	prop->mpr_mclassp = pd->pdi_mclass;
-+	prop->mpr_iscommitted = layout->eld_state & PMD_LYT_COMMITTED;
-+}
-+
-+static int mblock_alloc_cmn(struct mpool_descriptor *mp, u64 objid,
-+			    enum mp_media_classp mclassp, bool spare,
-+			    struct mblock_props *prop, struct mblock_descriptor **mbh)
-+{
-+	struct pmd_obj_capacity ocap = { .moc_spare = spare };
-+	struct pmd_layout *layout = NULL;
-+	int rc;
-+
-+	if (!mp)
-+		return -EINVAL;
-+
-+	*mbh = NULL;
-+
-+	if (!objid) {
-+		rc = pmd_obj_alloc(mp, OMF_OBJ_MBLOCK, &ocap, mclassp, &layout);
-+		if (rc)
-+			return rc;
-+	} else {
-+		rc = pmd_obj_realloc(mp, objid, &ocap, mclassp, &layout);
-+		if (rc) {
-+			if (rc != -ENOENT)
-+				mp_pr_err("mpool %s, re-allocating mblock 0x%lx failed",
-+					  rc, mp->pds_name, (ulong)objid);
-+			return rc;
-+		}
-+	}
-+
-+	if (!layout)
-+		return -ENOTRECOVERABLE;
-+
-+	if (prop) {
-+		pmd_obj_rdlock(layout);
-+		mblock_getprops_cmn(mp, layout, prop);
-+		pmd_obj_rdunlock(layout);
-+	}
-+
-+	*mbh = layout2mblock(layout);
-+
-+	return 0;
-+}
-+
-+int mblock_alloc(struct mpool_descriptor *mp, enum mp_media_classp mclassp, bool spare,
-+		 struct mblock_descriptor **mbh, struct mblock_props *prop)
-+{
-+	return mblock_alloc_cmn(mp, 0, mclassp, spare, prop, mbh);
-+}
-+
-+int mblock_find_get(struct mpool_descriptor *mp, u64 objid, int which,
-+		    struct mblock_props *prop, struct mblock_descriptor **mbh)
-+{
-+	struct pmd_layout *layout;
-+
-+	*mbh = NULL;
-+
-+	if (!mblock_objid(objid))
-+		return -EINVAL;
-+
-+	layout = pmd_obj_find_get(mp, objid, which);
-+	if (!layout)
-+		return -ENOENT;
-+
-+	if (prop) {
-+		pmd_obj_rdlock(layout);
-+		mblock_getprops_cmn(mp, layout, prop);
-+		pmd_obj_rdunlock(layout);
-+	}
-+
-+	*mbh = layout2mblock(layout);
-+
-+	return 0;
-+}
-+
-+void mblock_put(struct mblock_descriptor *mbh)
-+{
-+	struct pmd_layout *layout;
-+
-+	layout = mblock2layout(mbh);
-+	if (layout)
-+		pmd_obj_put(layout);
-+}
 +
 +/*
-+ * Helper function to log a message that many functions need to log:
++ * Module params...
 + */
-+#define mp_pr_layout_not_found(_mp, _mbh)				\
-+do {									\
-+	static unsigned long state;					\
-+	uint dly = msecs_to_jiffies(1000);				\
-+									\
-+	if (printk_timed_ratelimit(&state, dly)) {			\
-+		mp_pr_warn("mpool %s, layout not found: mbh %p",	\
-+			   (_mp)->pds_name, (_mbh));			\
-+		dump_stack();						\
-+	}								\
-+} while (0)
++unsigned int rsvd_bios_max __read_mostly = 16;
++module_param(rsvd_bios_max, uint, 0444);
++MODULE_PARM_DESC(rsvd_bios_max, "max reserved bios in mpool bioset");
 +
-+int mblock_commit(struct mpool_descriptor *mp, struct mblock_descriptor *mbh)
++int chunk_size_kb __read_mostly = 128;
++module_param(chunk_size_kb, uint, 0644);
++MODULE_PARM_DESC(chunk_size_kb, "Chunk size (in KiB) for device I/O");
++
++static void mpool_exit_impl(void)
 +{
-+	struct mpool_dev_info *pd;
-+	struct pmd_layout *layout;
++	pd_exit();
++}
++
+ static __init int mpool_init(void)
+ {
+-	return 0;
 +	int rc;
 +
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	pd = pmd_layout_pd_get(mp, layout);
-+	if (!pd->pdi_fua) {
-+		rc = pd_dev_flush(&pd->pdi_parm);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	/* Commit will fail with EBUSY if aborting flag set. */
-+	rc = pmd_obj_commit(mp, layout);
++	rc = pd_init();
 +	if (rc) {
-+		mp_pr_rl("mpool %s, committing mblock 0x%lx failed",
-+			 rc, mp->pds_name, (ulong)layout->eld_objid);
-+		return rc;
++		mp_pr_err("pd init failed", rc);
++		mpool_exit_impl();
 +	}
 +
-+	return 0;
-+}
-+
-+int mblock_abort(struct mpool_descriptor *mp, struct mblock_descriptor *mbh)
-+{
-+	struct pmd_layout *layout;
-+	int rc;
-+
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	rc = pmd_obj_abort(mp, layout);
-+	if (rc) {
-+		mp_pr_err("mpool %s, aborting mblock 0x%lx failed",
-+			  rc, mp->pds_name, (ulong)layout->eld_objid);
-+		return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+int mblock_delete(struct mpool_descriptor *mp, struct mblock_descriptor *mbh)
-+{
-+	struct pmd_layout *layout;
-+
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	return pmd_obj_delete(mp, layout);
-+}
-+
-+/**
-+ * mblock_rw_argcheck() - Validate mblock_write() and mblock_read().
-+ * @mp:      Mpool descriptor
-+ * @layout:  Layout of the mblock
-+ * @iov:     iovec array
-+ * @iovcnt:  iovec count
-+ * @boff:    Byte offset into the layout.  Must be equal to layout->eld_mblen for write
-+ * @rw:      MPOOL_OP_READ or MPOOL_OP_WRITE
-+ * @len:     number of bytes in iov list
-+ *
-+ * Returns: 0 if successful, -errno otherwise
-+ *
-+ * Note: be aware that there are checks in this function that prevent illegal
-+ * arguments in lower level functions (lower level functions should assert the
-+ * requirements but not otherwise check them)
-+ */
-+static int mblock_rw_argcheck(struct mpool_descriptor *mp, struct pmd_layout *layout,
-+			      loff_t boff, int rw, size_t len)
-+{
-+	u64 opt_iosz;
-+	u32 mblock_cap;
-+	int rc;
-+
-+	mblock_cap = pmd_layout_cap_get(mp, layout);
-+	opt_iosz = mblock_optimal_iosz_get(mp, layout);
-+
-+	if (rw == MPOOL_OP_READ) {
-+		/* boff must be a multiple of the OS page size */
-+		if (!PAGE_ALIGNED(boff)) {
-+			rc = -EINVAL;
-+			mp_pr_err("mpool %s, read offset 0x%lx is not multiple of OS page size",
-+				  rc, mp->pds_name, (ulong) boff);
-+			return rc;
-+		}
-+
-+		/* Check that boff is not past end of mblock capacity. */
-+		if (mblock_cap <= boff) {
-+			rc = -EINVAL;
-+			mp_pr_err("mpool %s, read offset 0x%lx >= mblock capacity 0x%x",
-+				  rc, mp->pds_name, (ulong)boff, mblock_cap);
-+			return rc;
-+		}
-+
-+		/*
-+		 * Check that the request does not extend past the data
-+		 * written.  Don't record an error if this appears to
-+		 * be an mcache readahead request.
-+		 *
-+		 * TODO: Use (len != MCACHE_RA_PAGES_MAX)
-+		 */
-+		if (boff + len > layout->eld_mblen)
-+			return -EINVAL;
-+	} else {
-+		/* Write boff required to match eld_mblen */
-+		if (boff != layout->eld_mblen) {
-+			rc = -EINVAL;
-+			mp_pr_err("mpool %s write boff (%ld) != eld_mblen (%d)",
-+				  rc, mp->pds_name, (ulong)boff, layout->eld_mblen);
-+			return rc;
-+		}
-+
-+		/* Writes must be optimal iosz aligned */
-+		if (boff % opt_iosz) {
-+			rc = -EINVAL;
-+			mp_pr_err("mpool %s, write not optimal iosz aligned, offset 0x%lx",
-+				  rc, mp->pds_name, (ulong)boff);
-+			return rc;
-+		}
-+
-+		/* Check for write past end of allocated space (!) */
-+		if ((len + boff) > mblock_cap) {
-+			rc = -EINVAL;
-+			mp_pr_err("(write): len %lu + boff %lu > mblock_cap %lu",
-+				  rc, (ulong)len, (ulong)boff, (ulong)mblock_cap);
-+			return rc;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+int mblock_write(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+		 const struct kvec *iov, int iovcnt, size_t len)
-+{
-+	struct pmd_layout *layout;
-+	loff_t boff;
-+	u8 state;
-+	int rc;
-+
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	rc = mblock_rw_argcheck(mp, layout, layout->eld_mblen, MPOOL_OP_WRITE, len);
-+	if (rc) {
-+		mp_pr_debug("mblock write argcheck failed ", rc);
-+		return rc;
-+	}
-+
-+	if (len == 0)
-+		return 0;
-+
-+	boff = layout->eld_mblen;
-+
-+	ASSERT(PAGE_ALIGNED(len));
-+	ASSERT(PAGE_ALIGNED(boff));
-+	ASSERT(iovcnt == (len >> PAGE_SHIFT));
-+
-+	pmd_obj_wrlock(layout);
-+	state = layout->eld_state;
-+	if (!(state & PMD_LYT_COMMITTED)) {
-+		struct mpool_dev_info *pd = pmd_layout_pd_get(mp, layout);
-+		int flags = 0;
-+
-+		if (pd->pdi_fua)
-+			flags = REQ_FUA;
-+
-+		rc = pmd_layout_rw(mp, layout, iov, iovcnt, boff, flags, MPOOL_OP_WRITE);
-+		if (!rc)
-+			layout->eld_mblen += len;
-+	}
-+	pmd_obj_wrunlock(layout);
-+
-+	return !(state & PMD_LYT_COMMITTED) ? rc : -EALREADY;
-+}
-+
-+int mblock_read(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+		const struct kvec *iov, int iovcnt, loff_t boff, size_t len)
-+{
-+	struct pmd_layout *layout;
-+	u8 state;
-+	int rc;
-+
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	rc = mblock_rw_argcheck(mp, layout, boff, MPOOL_OP_READ, len);
-+	if (rc) {
-+		mp_pr_debug("mblock read argcheck failed ", rc);
-+		return rc;
-+	}
-+
-+	if (len == 0)
-+		return 0;
-+
-+	ASSERT(PAGE_ALIGNED(len));
-+	ASSERT(PAGE_ALIGNED(boff));
-+	ASSERT(iovcnt == (len >> PAGE_SHIFT));
-+
-+	/*
-+	 * Read lock the mblock layout; mblock reads can proceed concurrently;
-+	 * Mblock writes are serialized but concurrent with reads
-+	 */
-+	pmd_obj_rdlock(layout);
-+	state = layout->eld_state;
-+	if (state & PMD_LYT_COMMITTED)
-+		rc = pmd_layout_rw(mp, layout, iov, iovcnt, boff, 0, MPOOL_OP_READ);
-+	pmd_obj_rdunlock(layout);
-+
-+	return (state & PMD_LYT_COMMITTED) ? rc : -EAGAIN;
-+}
-+
-+int mblock_get_props_ex(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+			struct mblock_props_ex *prop)
-+{
-+	struct pmd_layout *layout;
-+
-+	layout = mblock2layout(mbh);
-+	if (!layout) {
-+		mp_pr_layout_not_found(mp, mbh);
-+		return -EINVAL;
-+	}
-+
-+	pmd_obj_rdlock(layout);
-+	prop->mbx_zonecnt = layout->eld_ld.ol_zcnt;
-+	mblock_getprops_cmn(mp, layout, &prop->mbx_props);
-+	pmd_obj_rdunlock(layout);
-+
-+	return 0;
-+}
-+
-+bool mblock_objid(u64 objid)
-+{
-+	return objid && (pmd_objid_type(objid) == OMF_OBJ_MBLOCK);
-+}
-diff --git a/drivers/mpool/mblock.h b/drivers/mpool/mblock.h
++	return rc;
+ }
+ 
+ static __exit void mpool_exit(void)
+ {
++	mpool_exit_impl();
+ }
+ 
+ module_init(mpool_init);
+diff --git a/drivers/mpool/init.h b/drivers/mpool/init.h
 new file mode 100644
-index 000000000000..2a5435875a92
+index 000000000000..e02a9672e727
 --- /dev/null
-+++ b/drivers/mpool/mblock.h
-@@ -0,0 +1,161 @@
++++ b/drivers/mpool/init.h
+@@ -0,0 +1,12 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
 +
++#ifndef MPOOL_INIT_H
++#define MPOOL_INIT_H
++
++extern unsigned int rsvd_bios_max;
++extern int chunk_size_kb;
++
++#endif /* MPOOL_INIT_H */
+diff --git a/drivers/mpool/pd.c b/drivers/mpool/pd.c
+new file mode 100644
+index 000000000000..f13c7704efad
+--- /dev/null
++++ b/drivers/mpool/pd.c
+@@ -0,0 +1,424 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * DOC: Module info.
-+ *
-+ * Defines functions for writing, reading, and managing the lifecycle of mlogs.
-+ *
++ * Copyright (C) 2015-2020 Micron Technology, Inc.  All rights reserved.
 + */
-+
-+#ifndef MPOOL_MBLOCK_H
-+#define MPOOL_MBLOCK_H
-+
-+#include <linux/uio.h>
-+
-+#include "mpool_ioctl.h"
 +/*
-+ * Opaque handles for clients
-+ */
-+struct mpool_descriptor;
-+struct mblock_descriptor;
-+struct mpool_obj_layout;
-+
-+/*
-+ * mblock API functions
++ * Pool drive module with backing block devices.
++ *
++ * Defines functions for probing, reading, and writing drives in an mpool.
++ * IO is done using kerel BIO facilities.
 + */
 +
-+/**
-+ * mblock_alloc() - Allocate an mblock.
-+ * @mp:         mpool descriptor
-+ * @capreq:     mblock capacity requested
-+ * @mclassp:    media class
-+ * @mbh:        mblock handle returned
-+ * @prop:       mblock properties returned
-+ *
-+ * Allocate mblock with erasure code and capacity params as specified in
-+ * ecparm and capreq on drives in a media class mclassp;
-+ * if successful mbh is a handle for the mblock and prop contains its
-+ * properties.
-+ * Note: mblock is not persistent until committed; allocation can be aborted.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+int mblock_alloc(struct mpool_descriptor *mp, enum mp_media_classp mclassp, bool spare,
-+		 struct mblock_descriptor **mbh, struct mblock_props *prop);
++#define _LARGEFILE64_SOURCE
 +
-+/**
-+ * mblock_find_get() - Get handle and properties for existing mblock with specified objid.
-+ * @mp:
-+ * @objid:
-+ * @which:
-+ * @prop:
-+ * @mbh:
-+ *
-+ * If successful, the caller holds a ref on the mblock (which must be put eventually).
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+int mblock_find_get(struct mpool_descriptor *mp, u64 objid, int which,
-+		    struct mblock_props *prop, struct mblock_descriptor **mbh);
++#include <linux/fs.h>
++#include <linux/blkdev.h>
++#include <linux/blk_types.h>
 +
-+/**
-+ * mblock_put() - Put (release) a ref on an mblock
-+ * @mbh:
-+ *
-+ * Put a ref on a known mblock.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+void mblock_put(struct mblock_descriptor *mbh);
++#include "mpool_printk.h"
++#include "assert.h"
 +
-+/**
-+ * mblock_commit() - Make allocated mblock persistent
-+ * @mp:
-+ * @mbh:
-+ *
-+ * if fails mblock still exists in an
-+ * uncommitted state so can retry commit or abort except as noted.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ * EBUSY if must abort
-+ */
-+int mblock_commit(struct mpool_descriptor *mp, struct mblock_descriptor *mbh);
++#include "init.h"
++#include "omf_if.h"
++#include "pd.h"
 +
-+/**
-+ * mblock_abort() - Discard uncommitted mblock
-+ * @mp:
-+ * @mbh:
-+ *
-+ * If successful mbh is invalid after call.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ *
-+ */
-+int mblock_abort(struct mpool_descriptor *mp, struct mblock_descriptor *mbh);
++#ifndef SECTOR_SHIFT
++#define SECTOR_SHIFT   9
++#endif
 +
-+/**
-+ * mblock_delete() - Delete committed mblock
-+ * @mp:
-+ * @mbh:
-+ *
-+ * If successful mbh is invalid after call.
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+int mblock_delete(struct mpool_descriptor *mp, struct mblock_descriptor *mbh);
++static struct bio_set mpool_bioset;
++
++static const fmode_t    pd_bio_fmode = FMODE_READ | FMODE_WRITE | FMODE_EXCL;
++static char            *pd_bio_holder = "mpool";
++
++int pd_dev_open(const char *path, struct pd_dev_parm *dparm, struct pd_prop *pd_prop)
++{
++	struct block_device *bdev;
++
++	bdev = blkdev_get_by_path(path, pd_bio_fmode, pd_bio_holder);
++	if (IS_ERR(bdev))
++		return PTR_ERR(bdev);
++
++	dparm->dpr_dev_private = bdev;
++	dparm->dpr_prop = *pd_prop;
++
++	if ((pd_prop->pdp_devtype != PD_DEV_TYPE_BLOCK_STD) &&
++	    (pd_prop->pdp_devtype != PD_DEV_TYPE_BLOCK_NVDIMM)) {
++		int rc = -EINVAL;
++
++		mp_pr_err("unsupported PD type %d", rc, pd_prop->pdp_devtype);
++		return rc;
++	}
++
++	return 0;
++}
++
++int pd_dev_close(struct pd_dev_parm *dparm)
++{
++	struct block_device *bdev = dparm->dpr_dev_private;
++
++	if (bdev) {
++		dparm->dpr_dev_private = NULL;
++		sync_blockdev(bdev);
++		invalidate_bdev(bdev);
++		blkdev_put(bdev, pd_bio_fmode);
++	}
++
++	return bdev ? 0 : -EINVAL;
++}
++
++int pd_dev_flush(struct pd_dev_parm *dparm)
++{
++	struct block_device *bdev;
++	int rc;
++
++	bdev = dparm->dpr_dev_private;
++	if (!bdev) {
++		rc = -EINVAL;
++		mp_pr_err("bdev %s not registered", rc, dparm->dpr_name);
++		return rc;
++	}
++
++	rc = blkdev_issue_flush(bdev, GFP_NOIO);
++	if (rc)
++		mp_pr_err("bdev %s, flush failed", rc, dparm->dpr_name);
++
++	return rc;
++}
 +
 +/**
-+ * mblock_write() - Write iov to mblock
-+ * @mp:
-+ * @mbh:
++ * pd_bio_discard() - issue discard command to erase a byte-aligned region
++ * @dparm:
++ * @off:
++ * @len:
++ */
++static int pd_bio_discard(struct pd_dev_parm *dparm, loff_t off, size_t len)
++{
++	struct block_device *bdev;
++	int rc;
++
++	bdev = dparm->dpr_dev_private;
++	if (!bdev) {
++		rc = -EINVAL;
++		mp_pr_err("bdev %s not registered", rc, dparm->dpr_name);
++		return rc;
++	}
++
++	/* Validate I/O offset is sector-aligned */
++	if (off & PD_SECTORMASK(&dparm->dpr_prop)) {
++		rc = -EINVAL;
++		mp_pr_err("bdev %s, offset 0x%lx not multiple of sec size %u",
++			  rc, dparm->dpr_name, (ulong)off, (1 << PD_SECTORSZ(&dparm->dpr_prop)));
++		return rc;
++	}
++
++	if (off > PD_LEN(&dparm->dpr_prop)) {
++		rc = -EINVAL;
++		mp_pr_err("bdev %s, offset 0x%lx past end 0x%lx",
++			  rc, dparm->dpr_name, (ulong)off, (ulong)PD_LEN(&dparm->dpr_prop));
++		return rc;
++	}
++
++	rc = blkdev_issue_discard(bdev, off >> SECTOR_SHIFT, len >> SECTOR_SHIFT, GFP_NOIO, 0);
++	if (rc)
++		mp_pr_err("bdev %s, offset 0x%lx len 0x%lx, discard faiure",
++			  rc, dparm->dpr_name, (ulong)off, (ulong)len);
++
++	return rc;
++}
++
++/**
++ * pd_zone_erase() - issue write-zeros or discard commands to erase PD
++ * @dparm:
++ * @zaddr:
++ * @zonecnt:
++ * @flag:
++ * @afp:
++ */
++int pd_zone_erase(struct pd_dev_parm *dparm, u64 zaddr, u32 zonecnt, bool reads_erased)
++{
++	int rc = 0;
++	u64 cmdopt;
++
++	/* Validate args against zone param */
++	if (zaddr >= dparm->dpr_zonetot)
++		return -EINVAL;
++
++	if (zonecnt == 0)
++		zonecnt = dparm->dpr_zonetot - zaddr;
++
++	if (zonecnt > (dparm->dpr_zonetot - zaddr))
++		return -EINVAL;
++
++	if (zonecnt == 0)
++		return 0;
++
++	/*
++	 * When both DIF and SED are enabled, read from a discared block
++	 * would fail, so we can't discard blocks if both DIF and SED are
++	 * enabled AND we need to read blocks after erase.
++	 */
++	cmdopt = dparm->dpr_cmdopt;
++	if ((cmdopt & PD_CMD_DISCARD) &&
++	    !(reads_erased && (cmdopt & PD_CMD_DIF_ENABLED) && (cmdopt & PD_CMD_SED_ENABLED))) {
++		size_t zlen;
++
++		zlen = dparm->dpr_zonepg << PAGE_SHIFT;
++		rc = pd_bio_discard(dparm, zaddr * zlen, zonecnt * zlen);
++	}
++
++	return rc;
++}
++
++static void pd_bio_init(struct bio *bio, struct block_device *bdev, int rw, loff_t off, int flags)
++{
++	bio_set_op_attrs(bio, rw, flags);
++	bio->bi_iter.bi_sector = off >> SECTOR_SHIFT;
++	bio_set_dev(bio, bdev);
++}
++
++static struct bio *pd_bio_chain(struct bio *target, unsigned int nr_pages, gfp_t gfp)
++{
++	struct bio *new;
++
++	new = bio_alloc_bioset(gfp, nr_pages, &mpool_bioset);
++
++	if (!target)
++		return new;
++
++	if (new) {
++		bio_chain(target, new);
++		submit_bio(target);
++	} else {
++		submit_bio_wait(target);
++		bio_put(target);
++	}
++
++	return new;
++}
++
++/**
++ * pd_bio_rw() -
++ * @dparm:
 + * @iov:
 + * @iovcnt:
-+ * @len:
++ * @off: offset in bytes on disk
++ * @rw:
++ * @opflags:
 + *
-+ * Mblocks can be written until they are committed, or
-+ * until they are full.  If a caller needs to issue more than one write call
-+ * to the same mblock, all but the last write call must be optimal write size aligned.
-+ * The mpr_optimal_wrsz field in struct mblock_props gives the optimal write size.
++ * pd_bio_rw() expects a list of kvecs wherein each base ptr is sector
++ * aligned and each length is multiple of sectors.
 + *
-+ * Return: %0 if success, -errno otherwise...
++ * If the IO is bigger than 1MiB (BIO_MAX_PAGES pages) or chunk_size_kb,
++ * it is split in several IOs.
 + */
-+int mblock_write(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+		 const struct kvec *iov, int iovcnt, size_t len);
++static int pd_bio_rw(struct pd_dev_parm *dparm, const struct kvec *iov,
++		     int iovcnt, loff_t off, int rw, int opflags)
++{
++	struct block_device *bdev;
++	struct page *page;
++	struct bio *bio;
++	uintptr_t iov_base;
++	u64 sector_mask;
++	u32 tot_pages, tot_len, len, iov_len, left, iolimit;
++	int i, cc, rc = 0;
 +
-+/**
-+ * mblock_read() - Read data from mblock mbnum in committed mblock into iov
-+ * @mp:
-+ * @mbh:
-+ * @iov:
-+ * @iovcnt:
-+ * @boff:
-+ * @len:
-+ *
-+ * Read data from mblock mbnum in committed mblock into iov starting at
-+ * byte offset boff; boff and iov buffers must be a multiple of OS page
-+ * size for the mblock.
-+ *
-+ * If fails can call mblock_get_props() to confirm mblock was written.
-+ *
-+ * Return: 0 if successful, -errno otherwise...
-+ */
-+int mblock_read(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+		const struct kvec *iov, int iovcnt, loff_t boff, size_t len);
++	if (iovcnt < 1)
++		return 0;
 +
-+/**
-+ * mblock_get_props_ex() - Return extended mblock properties in prop
-+ * @mp:
-+ * @mbh:
-+ * @prop:
-+ *
-+ * Return: %0 if successful, -errno otherwise...
-+ */
-+int mblock_get_props_ex(struct mpool_descriptor *mp, struct mblock_descriptor *mbh,
-+			struct mblock_props_ex *prop);
++	bdev = dparm->dpr_dev_private;
++	if (!bdev) {
++		rc = -EINVAL;
++		mp_pr_err("bdev %s not registered", rc, dparm->dpr_name);
++		return rc;
++	}
 +
-+bool mblock_objid(u64 objid);
++	sector_mask = PD_SECTORMASK(&dparm->dpr_prop);
++	if (off & sector_mask) {
++		rc = -EINVAL;
++		mp_pr_err("bdev %s, %s offset 0x%lx not multiple of sector size %u",
++			  rc, dparm->dpr_name, (rw == REQ_OP_READ) ? "read" : "write",
++			  (ulong)off, (1 << PD_SECTORSZ(&dparm->dpr_prop)));
++		return rc;
++	}
 +
-+#endif /* MPOOL_MBLOCK_H */
++	if (off > PD_LEN(&dparm->dpr_prop)) {
++		rc = -EINVAL;
++		mp_pr_err("bdev %s, %s offset 0x%lx past device end 0x%lx",
++			  rc, dparm->dpr_name, (rw == REQ_OP_READ) ? "read" : "write",
++			  (ulong)off, (ulong)PD_LEN(&dparm->dpr_prop));
++		return rc;
++	}
++
++	tot_pages = 0;
++	tot_len = 0;
++	for (i = 0; i < iovcnt; i++) {
++		if (!PAGE_ALIGNED((uintptr_t)iov[i].iov_base) || (iov[i].iov_len & sector_mask)) {
++			rc = -EINVAL;
++			mp_pr_err("bdev %s, %s off 0x%lx, misaligned kvec, base 0x%lx, len 0x%lx",
++				  rc, dparm->dpr_name, (rw == REQ_OP_READ) ? "read" : "write",
++				  (ulong)off, (ulong)iov[i].iov_base, (ulong)iov[i].iov_len);
++			return rc;
++		}
++
++		iov_len = iov[i].iov_len;
++		tot_len += iov_len;
++		while (iov_len > 0) {
++			len = min_t(size_t, PAGE_SIZE, iov_len);
++			iov_len -= len;
++			tot_pages++;
++		}
++	}
++
++	if (off + tot_len > PD_LEN(&dparm->dpr_prop)) {
++		rc = -EINVAL;
++		mp_pr_err("bdev %s, %s I/O end past device end 0x%lx, 0x%lx:0x%x",
++			  rc, dparm->dpr_name, (rw == REQ_OP_READ) ? "read" : "write",
++			  (ulong)PD_LEN(&dparm->dpr_prop), (ulong)off, tot_len);
++		return rc;
++	}
++
++	if (tot_len == 0)
++		return 0;
++
++	/* IO size for each bio is determined by the chunk size. */
++	iolimit = chunk_size_kb >> (PAGE_SHIFT - 10);
++	iolimit = clamp_t(u32, iolimit, 32, BIO_MAX_PAGES);
++
++	left = 0;
++	bio = NULL;
++
++	for (i = 0; i < iovcnt; i++) {
++		iov_base = (uintptr_t)iov[i].iov_base;
++		iov_len = iov[i].iov_len;
++
++		while (iov_len > 0) {
++			if (left == 0) {
++				left = min_t(size_t, tot_pages, iolimit);
++
++				bio = pd_bio_chain(bio, left, GFP_NOIO);
++				if (!bio)
++					return -ENOMEM;
++
++				pd_bio_init(bio, bdev, rw, off, opflags);
++			}
++
++			len = min_t(size_t, PAGE_SIZE, iov_len);
++			page = virt_to_page(iov_base);
++			cc = -1;
++
++			if (page)
++				cc = bio_add_page(bio, page, len, 0);
++
++			if (cc != len) {
++				if (cc == 0 && bio->bi_vcnt > 0) {
++					left = 0;
++					continue;
++				}
++
++				bio_io_error(bio);
++				bio_put(bio);
++				return -ENOTRECOVERABLE;
++			}
++
++			iov_len -= len;
++			iov_base += len;
++			off += len;
++			left--;
++			tot_pages--;
++		}
++	}
++
++	ASSERT(bio);
++	ASSERT(tot_pages == 0);
++
++	rc = submit_bio_wait(bio);
++	bio_put(bio);
++
++	return rc;
++}
++
++int pd_zone_pwritev(struct pd_dev_parm *dparm, const struct kvec *iov,
++		    int iovcnt, u64 zaddr, loff_t boff, int opflags)
++{
++	loff_t woff;
++
++	woff = ((u64)dparm->dpr_zonepg << PAGE_SHIFT) * zaddr + boff;
++
++	return pd_bio_rw(dparm, iov, iovcnt, woff, REQ_OP_WRITE, opflags);
++}
++
++int pd_zone_pwritev_sync(struct pd_dev_parm *dparm, const struct kvec *iov,
++			 int iovcnt, u64 zaddr, loff_t boff)
++{
++	struct block_device *bdev;
++	int rc;
++
++	rc = pd_zone_pwritev(dparm, iov, iovcnt, zaddr, boff, REQ_FUA);
++	if (rc)
++		return rc;
++
++	/*
++	 * This sync & invalidate bdev ensures that the data written from the
++	 * kernel is immediately visible to the user-space.
++	 */
++	bdev = dparm->dpr_dev_private;
++	if (bdev) {
++		sync_blockdev(bdev);
++		invalidate_bdev(bdev);
++	}
++
++	return 0;
++}
++
++int pd_zone_preadv(struct pd_dev_parm *dparm, const struct kvec *iov,
++		   int iovcnt, u64 zaddr, loff_t boff)
++{
++	loff_t roff;
++
++	roff = ((u64)dparm->dpr_zonepg << PAGE_SHIFT) * zaddr + boff;
++
++	return pd_bio_rw(dparm, iov, iovcnt, roff, REQ_OP_READ, 0);
++}
++
++void pd_dev_set_unavail(struct pd_dev_parm *dparm, struct omf_devparm_descriptor *omf_devparm)
++{
++	struct pd_prop *pd_prop = &(dparm->dpr_prop);
++
++	/*
++	 * Fill in dparm for unavailable drive; sets zone parm and other
++	 * PD properties we keep in metadata; no ops vector because we need
++	 * the device to be available to know it (the discovery gets it).
++	 */
++	strncpy(dparm->dpr_prop.pdp_didstr, PD_DEV_ID_PDUNAVAILABLE, PD_DEV_ID_LEN);
++	pd_prop->pdp_devstate = PD_DEV_STATE_UNAVAIL;
++	pd_prop->pdp_cmdopt = PD_CMD_NONE;
++
++	pd_prop->pdp_zparam.dvb_zonepg  = omf_devparm->odp_zonepg;
++	pd_prop->pdp_zparam.dvb_zonetot = omf_devparm->odp_zonetot;
++	pd_prop->pdp_mclassp  = omf_devparm->odp_mclassp;
++	pd_prop->pdp_phys_if  = 0;
++	pd_prop->pdp_sectorsz = omf_devparm->odp_sectorsz;
++	pd_prop->pdp_devsz    = omf_devparm->odp_devsz;
++}
++
++
++int pd_init(void)
++{
++	int rc;
++
++	chunk_size_kb = clamp_t(uint, chunk_size_kb, 128, 1024);
++
++	rsvd_bios_max = clamp_t(uint, rsvd_bios_max, 1, 1024);
++
++	rc = bioset_init(&mpool_bioset, rsvd_bios_max, 0, BIOSET_NEED_BVECS);
++	if (rc)
++		mp_pr_err("mpool bioset init failed", rc);
++
++	return rc;
++}
++
++void pd_exit(void)
++{
++	bioset_exit(&mpool_bioset);
++}
 -- 
 2.17.2
 
