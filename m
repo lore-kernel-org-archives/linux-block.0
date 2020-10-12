@@ -2,218 +2,401 @@ Return-Path: <SRS0=jKGj=DT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC799C4363A
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 02:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FDBC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 03:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABA68208FE
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 02:30:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IFoIj5Lm";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="bu3NZ6nE"
+	by mail.kernel.org (Postfix) with ESMTP id 7C3F120790
+	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 03:59:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726348AbgJLCa1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Oct 2020 22:30:27 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:26311 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725882AbgJLCa0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Oct 2020 22:30:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1602469826; x=1634005826;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=B2H/dL/4Tk6ifO229+CDbwJhsi61Ae0kMhbusFZSfYA=;
-  b=IFoIj5Lmvd7DgG7HVctd7QXEBq5iKRq1R7YLToSqatAuf4DhTyaI7TUk
-   83tHlkFY453/6xywbIO21GpX+lMUI0l1MsH+vIm25UlDETgrzqQHIPj9s
-   hQXO7drpWY795z+VjQ0X878czpAnYl85qeeMfMMg/PwZM1ztD+5qgmn71
-   6AI6PPS+viNEtMoV0hVHTsGTEq9WjlfxeTCqiY3aSLUJSp1B9vdv23I3h
-   AJSkepTYuvZgQ6QWCdBtCm2492xxiZmYPrcJzyVaaBsNYD47zAoe23fjQ
-   U9eAeQxQoIRK0GNPUhv/2SC052VX3msw2Fwzl+w/+f5fgGw/92Gtr4ix2
-   A==;
-IronPort-SDR: otNXfCl468GV2kaRfPMurNEzzb+5DTvHbKamj2s+8BDLocQWr4zuQ3M3i+IKAljLE0jNxd9VpM
- cO+rQZXBC3hCB4USGfnGA9ogfGdhVarakItuizW2Gy++p8Z+M6RlhT6/ZGAyh4Bb4soyndVApS
- t1CbgZ/xItk8xcO9aKd2ojIIDU+T0Z2LVw84K7kBp34/4Smmy1km93xm3x16vuxVWJ3+pskOv3
- siKun/r5wc2+puveLQmD3LIou+hiTE8AMRzhJ76wz/XN32b0xaH0DxtBNrPj7bQ2z+DqpFhCU+
- uec=
-X-IronPort-AV: E=Sophos;i="5.77,365,1596470400"; 
-   d="scan'208";a="150813289"
-Received: from mail-bn8nam12lp2169.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.169])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Oct 2020 10:30:21 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gx/LTHF9rvHW8Oe8ILITCqr1oekN0sSJJn9RkpcHF8rIin2//JVyW6AgAlQAeO/v1EowEo57pZXHLTZIAy/oh4sgxpcSGZDKN5oz0Qe5qPK5ALqfSLuBJmsV9AjLyCrQw4LfNvVHA5X/BDt9kKApbyWTlvE/mChWEAeK2jwUV+avUBnk6VOQeR5wnt5ri1PntjTXlIuGOC1C+wB/9l2juXZbCJp4Pz4p8f7Fz7xkvRrQ4+eJwlbmv6boTHlg5Kw8lXE/1AjnM4ZgS0AFsifxbxuSIjOVAxEndjwMb+y3JcGsuVp5FkLwRs65TutRE74FFvIf22sxhDPzR40XvIfT3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nSbIdboq5PT4g9q0YvKJz3kaJMX2RtABGp66gEoNwmc=;
- b=Kok+1aaGCiSZfqW1wmfB+kHe79JMm2f0m4TbxYf9iF9O5G/ZXp38pxI6FEhdVvJczC1oxUEx0BiWJ/jH1cJTKJ7qsq1BJbVSGcJTsAorroGNrYmYM+t+8l7Wbh5IWvJ0VGXdwladeVfJOpcoqinFt4xiAnbhaH0uGewPXN4kRMuNmUGT0t/etLda3IPoUpK7rFgAL7ObgaolOSF9YiV1tKcRYfXVoLRA9X+eXZQtAEs4qBuZHPYEZf91PR0dFaLSXlnkDhV3/6JNvTP1YcC6arSVI+ByCj2IBl8Uhj9qBZ+KZZJ487Embj0mtjbFITcETuHh+wrsFcIy0nDYldJobg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nSbIdboq5PT4g9q0YvKJz3kaJMX2RtABGp66gEoNwmc=;
- b=bu3NZ6nEIRGWvcX7BdK5F82a2Su5/ALOZX5mADuG3ixHeWl8vkyQlIEiI35HkhS1z2iLz2dIGt5v/ks6P0iyAim2GKOXOJDRdbUJuqpyR6LOJWHd5LzT+oOasYNyetl+MyoT9N0v8T1iC7HL9CruXmyPts3iLmme8nvBuhJdvlI=
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com (2603:10b6:208:1ca::23)
- by MN2PR04MB6928.namprd04.prod.outlook.com (2603:10b6:208:1e3::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.24; Mon, 12 Oct
- 2020 02:30:19 +0000
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::4c3e:2b29:1dc5:1a85]) by BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::4c3e:2b29:1dc5:1a85%6]) with mapi id 15.20.3455.029; Mon, 12 Oct 2020
- 02:30:19 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     "ira.weiny@intel.com" <ira.weiny@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-CC:     Naohiro Aota <Naohiro.Aota@wdc.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "kexec@lists.infradead.org" <kexec@lists.infradead.org>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-        "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>,
-        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
-        "linux-ntfs-dev@lists.sourceforge.net" 
-        <linux-ntfs-dev@lists.sourceforge.net>,
-        "reiserfs-devel@vger.kernel.org" <reiserfs-devel@vger.kernel.org>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
-        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
-        "ecryptfs@vger.kernel.org" <ecryptfs@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "linux-cachefs@redhat.com" <linux-cachefs@redhat.com>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Subject: Re: [PATCH RFC PKS/PMEM 26/58] fs/zonefs: Utilize new kmap_thread()
-Thread-Topic: [PATCH RFC PKS/PMEM 26/58] fs/zonefs: Utilize new kmap_thread()
-Thread-Index: AQHWnnW5LYLzak05pEGSI1gzotA84w==
-Date:   Mon, 12 Oct 2020 02:30:18 +0000
-Message-ID: <BL0PR04MB65146627753E6A8125C30044E7070@BL0PR04MB6514.namprd04.prod.outlook.com>
-References: <20201009195033.3208459-1-ira.weiny@intel.com>
- <20201009195033.3208459-27-ira.weiny@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:dbd:ddb3:86a4:b7da]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 2d8e38c9-c661-47b4-955c-08d86e56c300
-x-ms-traffictypediagnostic: MN2PR04MB6928:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB69281462D64954D72F6383A1E7070@MN2PR04MB6928.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2089;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: nb7ZZkrOcnI45uzu82g63ZPDCw/m4UEa+T14BlRir04UDAmgqTKjBKFQ/1tq3q95aFreC/myPH7bQVuOZygHUtANTgMCUzT/Pyur4q2rkZgxQjgu2tK2/9wVp2h2SQ2PIehISfjlFkUmEohfWX26Cg+7Fw+ncYVUGCA3GBq/iNQrWxbeF5GIkE4ciKI2Ta+JMFg530FWmVV/3MNOdO5PIr93+nS5dgdzR8tDl4fNZNcda6K0U+RBmBhAF6G4PiHCwu4dLKAqHtEtpN1w+lsxrk7joY78vLDxPGvR8dOWqU93TlxExhLGaLZNWnYKeI3pA3QpzCWmAeR04Ul6/pWdYg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR04MB6514.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(346002)(136003)(376002)(366004)(8936002)(71200400001)(86362001)(186003)(91956017)(4326008)(66446008)(64756008)(66556008)(76116006)(7366002)(52536014)(8676002)(4744005)(5660300002)(33656002)(6506007)(7406005)(7416002)(478600001)(66946007)(66476007)(9686003)(53546011)(55016002)(7696005)(316002)(110136005)(54906003)(2906002)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: jjLBIa8rzP8PSUzUPRNNjZPO+F9m4B6rNx2BP5Hxn4hovZp8mG8VwNQRMnSFbWOz3vIBGGbrlwmZ2h/rrQ3LAnV478QA8TsJeEWgnROLCLR26e3M2EbbogZuJfrd8ZHepR6teHHrbin/rSSMJcyuivIccqO+Io91CjJtVLKGT+IxxyJeBxmaC3EM+JLu8Rm3Kx8m967TzWpRyeGTzqzgeKyG0yThTif6ugu1X+cS2L5ObX1F/fl2leT5khZ92kjaRHmV42QjfDSDQBRJ5T2sWkjLqL6qZdGMf2A7TG8LiEhWaSnE+PmptdxY4alKupBmftgWegPnh18eZ3klScKVzKqPJWtLa3seT93Q56fQAqIthA5+kX5qt7UatZBhg0gKm0KkBt+EXNCPEi6hfwJXTcKfMhrLXdmO4xo5z+sSfQStIvDc5rcmkS1pZ7oYknbDJlJtS3SQSqbBQQUJPafcSH0MKoCCaLHQYYEZElvKn9S/oXh/zKwEQ9/zN4tqic4ypaC6xgod9dW89WUn6IRtPbzsXwH70beu1D6sABibklUQzTXk4zAezxU4pLpXOEpjFmzQIZ8wo7n5pOvKphLu99Aqpkh/XR9us5YFAynE0SXyaG0lSyNOUkHX4czg41/a9jardublYq7n+2PgYlLtR3YEH/hKmOGAbSLFeveqJxrdOEFzmYAfv7w/UdGZFRYD9O0jto4jXaOrMeEBD/8QJw==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727241AbgJLD72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Oct 2020 23:59:28 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3569 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727202AbgJLD72 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 11 Oct 2020 23:59:28 -0400
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id A9E7EC788E9E3ADCD1C9;
+        Mon, 12 Oct 2020 11:59:24 +0800 (CST)
+Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Mon, 12 Oct 2020 11:59:22 +0800
+Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
+ (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Mon, 12
+ Oct 2020 11:59:22 +0800
+Subject: Re: [PATCH] block: re-introduce blk_mq_complete_request_sync
+To:     Yi Zhang <yi.zhang@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        <linux-nvme@lists.infradead.org>, Christoph Hellwig <hch@lst.de>
+References: <20201008213750.899462-1-sagi@grimberg.me>
+ <20201009043938.GC27356@T590>
+ <1711488120.3435389.1602219830518.JavaMail.zimbra@redhat.com>
+ <e39b711e-ebbd-8955-ca19-07c1dad26fa2@grimberg.me>
+ <23f19725-f46b-7de7-915d-b97fd6d69cdc@redhat.com>
+ <ced685bf-ad48-ac41-8089-8c5ba09abfcb@grimberg.me>
+ <7a7aca6e-30f5-0754-fb7f-599699b97108@redhat.com>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <6f2a5ae2-2e6a-0386-691c-baefeecb5478@huawei.com>
+Date:   Mon, 12 Oct 2020 11:59:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR04MB6514.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d8e38c9-c661-47b4-955c-08d86e56c300
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Oct 2020 02:30:18.8981
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FtNVgLbLUqLnCuOwFgwFyh+Wo2k/+4LOuBCyiRJEYABushz8+FxnNx4RRBUxLG0y9/lhxKLevLpPI63mq8apww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6928
+In-Reply-To: <7a7aca6e-30f5-0754-fb7f-599699b97108@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.169.42.93]
+X-ClientProxiedBy: dggeme705-chm.china.huawei.com (10.1.199.101) To
+ dggema772-chm.china.huawei.com (10.1.198.214)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/10/10 4:52, ira.weiny@intel.com wrote:=0A=
-> From: Ira Weiny <ira.weiny@intel.com>=0A=
-> =0A=
-> The kmap() calls in this FS are localized to a single thread.  To avoid=
-=0A=
-> the over head of global PKRS updates use the new kmap_thread() call.=0A=
-> =0A=
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-> Cc: Naohiro Aota <naohiro.aota@wdc.com>=0A=
-> Signed-off-by: Ira Weiny <ira.weiny@intel.com>=0A=
-> ---=0A=
->  fs/zonefs/super.c | 4 ++--=0A=
->  1 file changed, 2 insertions(+), 2 deletions(-)=0A=
-> =0A=
-> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c=0A=
-> index 8ec7c8f109d7..2fd6c86beee1 100644=0A=
-> --- a/fs/zonefs/super.c=0A=
-> +++ b/fs/zonefs/super.c=0A=
-> @@ -1297,7 +1297,7 @@ static int zonefs_read_super(struct super_block *sb=
-)=0A=
->  	if (ret)=0A=
->  		goto free_page;=0A=
->  =0A=
-> -	super =3D kmap(page);=0A=
-> +	super =3D kmap_thread(page);=0A=
->  =0A=
->  	ret =3D -EINVAL;=0A=
->  	if (le32_to_cpu(super->s_magic) !=3D ZONEFS_MAGIC)=0A=
-> @@ -1349,7 +1349,7 @@ static int zonefs_read_super(struct super_block *sb=
-)=0A=
->  	ret =3D 0;=0A=
->  =0A=
->  unmap:=0A=
-> -	kunmap(page);=0A=
-> +	kunmap_thread(page);=0A=
->  free_page:=0A=
->  	__free_page(page);=0A=
->  =0A=
-> =0A=
-=0A=
-acked-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+
+
+On 2020/10/10 14:08, Yi Zhang wrote:
+> 
+> 
+> On 10/10/20 2:29 AM, Sagi Grimberg wrote:
+>>
+>>
+>> On 10/9/20 6:55 AM, Yi Zhang wrote:
+>>> Hi Sagi
+>>>
+>>> On 10/9/20 4:09 PM, Sagi Grimberg wrote:
+>>>>> Hi Sagi
+>>>>>
+>>>>> I applied this patch on block origin/for-next and still can reproduce it.
+>>>>
+>>>> That's unexpected, can you try this patch?
+>>>> -- 
+>>>> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+>>>> index 629b025685d1..46428ff0b0fc 100644
+>>>> --- a/drivers/nvme/host/tcp.c
+>>>> +++ b/drivers/nvme/host/tcp.c
+>>>> @@ -2175,7 +2175,7 @@ static void nvme_tcp_complete_timed_out(struct request *rq)
+>>>>         /* fence other contexts that may complete the command */
+>>>>         mutex_lock(&to_tcp_ctrl(ctrl)->teardown_lock);
+>>>>         nvme_tcp_stop_queue(ctrl, nvme_tcp_queue_id(req->queue));
+>>>> -       if (!blk_mq_request_completed(rq)) {
+>>>> +       if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq)) {
+>>>>                 nvme_req(rq)->status = NVME_SC_HOST_ABORTED_CMD;
+>>>>                 blk_mq_complete_request_sync(rq);
+>>>>         }
+This may just reduce the probability. The concurrency of timeout and teardown will cause the same request
+be treated repeatly, this is not we expected.
+In the teardown process, after quiesced queues delete the timer and cancel the timeout work maybe a better option.
+Teardown process will cancel all doing IO, timer and timeout work should be canceled.
+After unquiesce queue, the timer of queue will be add when start request.
+>>> No WARNING with this patch, but the test still will be hang and never finished, here is the kernel log:
+>>
+>> Thanks Yi,
+>>
+>> Good to know no warning, that confirms the issue analysis.
+>>
+> Cool, feel fee to add Tested-by: Yi Zhang <yi.zhang@redhat.com>
+> 
+>> As for the test, I'm able to successfuly pass this on my VM, and
+>> this test is not designed to generate errors, just fio to
+>> a file backed namespace. I'm wandering what is causing these
+>> delays in I/O that cause timeouts...
+>>
+> I just found all the failure occurred on AMD with 4G memory, not sure whether it's related to the low memory.
+> Let me know if you need any test for further investigation . :)
+>>>
+>>> [ 3327.011067] run blktests nvme/012 at 2020-10-09 06:21:59
+>>> [ 3327.278169] loop: module loaded
+>>> [ 3327.314287] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>> [ 3327.346276] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+>>> [ 3327.396746] nvmet: creating controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
+>>> [ 3327.411000] nvme nvme0: creating 12 I/O queues.
+>>> [ 3327.416963] nvme nvme0: mapped 12/0/0 default/read/poll queues.
+>>> [ 3327.428836] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr 127.0.0.1:4420
+>>> [ 3329.403658] XFS (nvme0n1): Mounting V5 Filesystem
+>>> [ 3329.417213] XFS (nvme0n1): Ending clean mount
+>>> [ 3329.423044] xfs filesystem being mounted at /mnt/blktests supports timestamps until 2038 (0x7fffffff)
+>>> [ 3390.069126] nvme nvme0: queue 6: timeout request 0x21 type 4
+>>> [ 3390.074797] nvme nvme0: starting error recovery
+>>> [ 3390.079362] nvme nvme0: queue 6: timeout request 0x22 type 4
+>>> [ 3390.079932] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.081999] nvme nvme0: Reconnecting in 10 seconds...
+>>> [ 3390.095467] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.100879] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.106279] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.111691] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.117098] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.122507] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.127920] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.133333] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3390.138734] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3415.669659] nvmet: ctrl 2 keep-alive timer (15 seconds) expired!
+>>> [ 3415.675682] nvmet: ctrl 2 fatal error occurred!
+>>> [ 3419.765738] nvmet: ctrl 1 keep-alive timer (15 seconds) expired!
+>>> [ 3419.771762] nvmet: ctrl 1 fatal error occurred!
+>>> [ 3440.000352] nvmet: creating controller 2 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
+>>> [ 3463.286700] nvme nvme0: queue 0: timeout request 0x0 type 4
+>>> [ 3463.292357] nvme nvme0: Connect command failed, error wo/DNR bit: 881
+>>> [ 3463.298830] nvme nvme0: failed to connect queue: 0 ret=881
+>>> [ 3463.304352] nvme nvme0: Failed reconnect attempt 1
+>>> [ 3463.309156] nvme nvme0: Reconnecting in 10 seconds...
+>>> [ 3473.527574] nvmet: creating controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
+>>> [ 3473.541438] nvme_ns_head_submit_bio: 47 callbacks suppressed
+>>> [ 3473.541445] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.552521] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.557923] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.563319] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.568739] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.574678] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.580068] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.585461] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.590861] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.596249] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3473.601880] nvme nvme0: creating 12 I/O queues.
+>>> [ 3473.613955] nvme nvme0: mapped 12/0/0 default/read/poll queues.
+>>> [ 3473.622106] nvme nvme0: Successfully reconnected (2 attempt)
+>>> [ 3531.384170] nvme nvme0: queue 1: timeout request 0x62 type 4
+>>> [ 3531.389837] nvme nvme0: starting error recovery
+>>> [ 3531.394396] nvme nvme0: queue 7: timeout request 0x61 type 4
+>>> [ 3531.394954] nvme_ns_head_submit_bio: 14 callbacks suppressed
+>>> [ 3531.394964] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.411147] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.416548] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.421954] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.427361] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.432763] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.438287] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.443701] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.449103] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3531.454497] block nvme0n1: no usable path - requeuing I/O
+>>> [ 3560.568832] nvmet: ctrl 1 keep-alive timer (15 seconds) expired!
+>>> [ 3560.574839] nvmet: ctrl 1 fatal error occurred!
+>>>
+>>>
+>>>> -- 
+>>>>
+>>>>>
+>>>>> [  724.267865] run blktests nvme/012 at 2020-10-09 00:48:52
+>>>>> [  724.518498] loop: module loaded
+>>>>> [  724.552880] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>>>> [  724.586609] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+>>>>> [  724.648898] nvmet: creating controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
+>>>>> [  724.663300] nvme nvme0: creating 12 I/O queues.
+>>>>> [  724.669826] nvme nvme0: mapped 12/0/0 default/read/poll queues.
+>>>>> [  724.681350] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr 127.0.0.1:4420
+>>>>> [  726.641605] XFS (nvme0n1): Mounting V5 Filesystem
+>>>>> [  726.654637] XFS (nvme0n1): Ending clean mount
+>>>>> [  726.660302] xfs filesystem being mounted at /mnt/blktests supports timestamps until 2038 (0x7fffffff)
+>>>>> [  787.042066] nvme nvme0: queue 2: timeout request 0xe type 4
+>>>>> [  787.047649] nvme nvme0: starting error recovery
+>>>>> [  787.052211] nvme nvme0: queue 4: timeout request 0x61 type 4
+>>>>> [  787.053407] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.054543] nvme nvme0: Reconnecting in 10 seconds...
+>>>>> [  787.057877] ------------[ cut here ]------------
+>>>>> [  787.063274] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.068313] refcount_t: underflow; use-after-free.
+>>>>> [  787.068370] WARNING: CPU: 3 PID: 30 at lib/refcount.c:28 refcount_warn_saturate+0xa6/0xf0
+>>>>> [  787.072941] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.072945] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.078333] Modules linked in: loop nvme_tcp nvme_fabrics nvme_core nvmet_tcp nvmet rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache sunrpc snd_hda_codec_realtek snd_hda_codec_generic ledtrig_audio snd_hda_intel snd_intel_dspcfg snd_hda_codec snd_hda_core snd_hwdep snd_pcm snd_timer amd64_edac_mod snd edac_mce_amd soundcore kvm_amd ccp kvm pcspkr irqbypass hp_wmi sparse_keymap rfkill k10temp wmi_bmof nv_tco i2c_nforce2 acpi_cpufreq ip_tables xfs nouveau video mxm_wmi i2c_algo_bit drm_kms_helper mptsas cec scsi_transport_sas ttm mptscsih ata_generic firewire_ohci pata_acpi firewire_core drm serio_raw mptbase forcedeth crc_itu_t sata_nv pata_amd wmi floppy
+>>>>> [  787.083142] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.091304] CPU: 3 PID: 30 Comm: kworker/3:0H Not tainted 5.9.0-rc8.update+ #3
+>>>>> [  787.096673] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.096674] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.096680] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.096681] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.096683] block nvme0n1: no usable path - requeuing I/O
+>>>>> [  787.201242] Hardware name: Hewlett-Packard HP xw9400 Workstation/0A1Ch, BIOS 786D6 v04.02 04/21/2009
+>>>>> [  787.210366] Workqueue: kblockd blk_mq_timeout_work
+>>>>> [  787.215161] RIP: 0010:refcount_warn_saturate+0xa6/0xf0
+>>>>> [  787.220295] Code: 05 aa 98 22 01 01 e8 9f cf ad ff 0f 0b c3 80 3d 98 98 22 01 00 75 95 48 c7 c7 48 54 3e a2 c6 05 88 98 22 01 01 e8 80 cf ad ff <0f> 0b c3 80 3d 77 98 22 01 00 0f 85 72 ff ff ff 48 c7 c7 a0 54 3e
+>>>>> [  787.239021] RSP: 0018:ffffb860407b3dc8 EFLAGS: 00010292
+>>>>> [  787.244240] RAX: 0000000000000026 RBX: 0000000000000000 RCX: ffff9d93ddc58d08
+>>>>> [  787.251361] RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff9d93ddc58d00
+>>>>> [  787.258480] RBP: ffff9d93dbd6c200 R08: 000000b740ed60e8 R09: ffffffffa2fffbc4
+>>>>> [  787.265612] R10: 0000000000000477 R11: 0000000000028320 R12: ffff9d93dbd6c2e8
+>>>>> [  787.272741] R13: ffff9d93dbea0000 R14: ffffb860407b3e70 R15: ffff9d93dbea0000
+>>>>> [  787.279864] FS:  0000000000000000(0000) GS:ffff9d93ddc40000(0000) knlGS:0000000000000000
+>>>>> [  787.287948] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>> [  787.293695] CR2: 00007f45fd8fa024 CR3: 00000000792dc000 CR4: 00000000000006e0
+>>>>> [  787.300820] Call Trace:
+>>>>> [  787.303277]  blk_mq_check_expired+0x109/0x1b0
+>>>>> [  787.307638]  blk_mq_queue_tag_busy_iter+0x1b8/0x330
+>>>>> [  787.312524]  ? blk_poll+0x300/0x300
+>>>>> [  787.316022]  blk_mq_timeout_work+0x44/0xe0
+>>>>> [  787.320128]  process_one_work+0x1b4/0x370
+>>>>> [  787.324137]  worker_thread+0x53/0x3e0
+>>>>> [  787.327809]  ? process_one_work+0x370/0x370
+>>>>> [  787.332015]  kthread+0x11b/0x140
+>>>>> [  787.335245]  ? __kthread_bind_mask+0x60/0x60
+>>>>> [  787.339515]  ret_from_fork+0x22/0x30
+>>>>> [  787.343094] ---[ end trace 606cf9189379fcfc ]---
+>>>>>
+>>>>>
+>>>>> Best Regards,
+>>>>>    Yi Zhang
+>>>>>
+>>>>>
+>>>>> ----- Original Message -----
+>>>>> From: "Ming Lei" <ming.lei@redhat.com>
+>>>>> To: "Sagi Grimberg" <sagi@grimberg.me>
+>>>>> Cc: "Jens Axboe" <axboe@kernel.dk>, "Yi Zhang" <yi.zhang@redhat.com>, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, "Keith Busch" <kbusch@kernel.org>, "Christoph Hellwig" <hch@lst.de>
+>>>>> Sent: Friday, October 9, 2020 12:39:38 PM
+>>>>> Subject: Re: [PATCH] block: re-introduce blk_mq_complete_request_sync
+>>>>>
+>>>>> On Thu, Oct 08, 2020 at 02:37:50PM -0700, Sagi Grimberg wrote:
+>>>>>> In nvme-tcp and nvme-rdma, the timeout handler in certain conditions
+>>>>>> needs to complete an aborted request. The timeout handler serializes
+>>>>>> against an error recovery sequence that iterates over the inflight
+>>>>>> requests and cancels them.
+>>>>>>
+>>>>>> However, the fact that blk_mq_complete_request may defer to a different
+>>>>>> core that serialization breaks.
+>>>>>>
+>>>>>> Hence re-introduce blk_mq_complete_request_sync and use that in the
+>>>>>> timeout handler to make sure that we don't get a use-after-free
+>>>>>> condition.
+>>>>>>
+>>>>>> This was uncovered by the blktests:
+>>>>>> -- 
+>>>>>> $ nvme_trtype=tcp ./check nvme/012
+>>>>>>
+>>>>>> [ 2152.546343] run blktests nvme/012 at 2020-10-08 05:59:03
+>>>>>> [ 2152.799640] loop: module loaded
+>>>>>> [ 2152.835222] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>>>>> [ 2152.860697] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+>>>>>> [ 2152.937889] nvmet: creating controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:e544149126a24145abeeb6129b0ec52c.
+>>>>>> [ 2152.952085] nvme nvme0: creating 12 I/O queues.
+>>>>>> [ 2152.958042] nvme nvme0: mapped 12/0/0 default/read/poll queues.
+>>>>>> [ 2152.969948] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr 127.0.0.1:4420
+>>>>>> [ 2154.927953] XFS (nvme0n1): Mounting V5 Filesystem
+>>>>>> [ 2154.942432] XFS (nvme0n1): Ending clean mount
+>>>>>> [ 2154.948183] xfs filesystem being mounted at /mnt/blktests supports timestamps until 2038 (0x7fffffff)
+>>>>>> [ 2215.193645] nvme nvme0: queue 7: timeout request 0x11 type 4
+>>>>>> [ 2215.199331] nvme nvme0: starting error recovery
+>>>>>> [ 2215.203890] nvme nvme0: queue 7: timeout request 0x12 type 4
+>>>>>> [ 2215.204483] block nvme0n1: no usable path - requeuing I/O
+>>>>>> [ 2215.214976] block nvme0n1: no usable path - requeuing I/O
+>>>>>> [ 2215.215495] nvme nvme0: Reconnecting in 10 seconds...
+>>>>>> [ 2215.215502] ------------[ cut here ]------------
+>>>>>> [ 2215.215505] refcount_t: underflow; use-after-free.
+>>>>>> [ 2215.215617] WARNING: CPU: 6 PID: 45 at lib/refcount.c:28 refcount_warn_saturate+0xa6/0xf0
+>>>>>> [ 2215.215745] RSP: 0018:ffffb71b80837dc8 EFLAGS: 00010292
+>>>>>> [ 2215.215750] RAX: 0000000000000026 RBX: 0000000000000000 RCX: ffff93f37dcd8d08
+>>>>>> [ 2215.215753] RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff93f37dcd8d00
+>>>>>> [ 2215.215755] RBP: ffff93f37a812400 R08: 00000203c5221fce R09: ffffffffa7fffbc4
+>>>>>> [ 2215.215758] R10: 0000000000000477 R11: 000000000002835c R12: ffff93f37a8124e8
+>>>>>> [ 2215.215761] R13: ffff93f37a2b0000 R14: ffffb71b80837e70 R15: ffff93f37a2b0000
+>>>>>> [ 2215.215765] FS:  0000000000000000(0000) GS:ffff93f37dcc0000(0000) knlGS:0000000000000000
+>>>>>> [ 2215.215768] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>>> [ 2215.215771] CR2: 00005637b4137028 CR3: 000000007c1be000 CR4: 00000000000006e0
+>>>>>> [ 2215.215773] Call Trace:
+>>>>>> [ 2215.215784]  blk_mq_check_expired+0x109/0x1b0
+>>>>>> [ 2215.215797]  blk_mq_queue_tag_busy_iter+0x1b8/0x330
+>>>>>> [ 2215.215801]  ? blk_poll+0x300/0x300
+>>>>>> [ 2215.215806]  blk_mq_timeout_work+0x44/0xe0
+>>>>>> [ 2215.215814]  process_one_work+0x1b4/0x370
+>>>>>> [ 2215.215820]  worker_thread+0x53/0x3e0
+>>>>>> [ 2215.215825]  ? process_one_work+0x370/0x370
+>>>>>> [ 2215.215829]  kthread+0x11b/0x140
+>>>>>> [ 2215.215834]  ? __kthread_bind_mask+0x60/0x60
+>>>>>> [ 2215.215841]  ret_from_fork+0x22/0x30
+>>>>>> [ 2215.215847] ---[ end trace 7d137e36e23c0d19 ]---
+>>>>>> -- 
+>>>>>>
+>>>>>> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+>>>>>> Fixes: 236187c4ed19 ("nvme-tcp: fix timeout handler")
+>>>>>> Fixes: 0475a8dcbcee ("nvme-rdma: fix timeout handler")
+>>>>>> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+>>>>>> ---
+>>>>>> Yi, would appreciate your Tested-by tag
+>>>>>>
+>>>>>>   block/blk-mq.c           | 7 +++++++
+>>>>>>   drivers/nvme/host/rdma.c | 2 +-
+>>>>>>   drivers/nvme/host/tcp.c  | 2 +-
+>>>>>>   include/linux/blk-mq.h   | 1 +
+>>>>>>   4 files changed, 10 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>>>>> index f8e1e759c905..2d154722ef39 100644
+>>>>>> --- a/block/blk-mq.c
+>>>>>> +++ b/block/blk-mq.c
+>>>>>> @@ -729,6 +729,13 @@ bool blk_mq_complete_request_remote(struct request *rq)
+>>>>>>   }
+>>>>>>   EXPORT_SYMBOL_GPL(blk_mq_complete_request_remote);
+>>>>>>   +void blk_mq_complete_request_sync(struct request *rq)
+>>>>>> +{
+>>>>>> +    WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+>>>>>> +    rq->q->mq_ops->complete(rq);
+>>>>>> +}
+>>>>>> +EXPORT_SYMBOL_GPL(blk_mq_complete_request_sync);
+>>>>>> +
+>>>>>>   /**
+>>>>>>    * blk_mq_complete_request - end I/O on a request
+>>>>>>    * @rq:        the request being processed
+>>>>>> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+>>>>>> index 9e378d0a0c01..45fc605349da 100644
+>>>>>> --- a/drivers/nvme/host/rdma.c
+>>>>>> +++ b/drivers/nvme/host/rdma.c
+>>>>>> @@ -1975,7 +1975,7 @@ static void nvme_rdma_complete_timed_out(struct request *rq)
+>>>>>>       nvme_rdma_stop_queue(queue);
+>>>>>>       if (!blk_mq_request_completed(rq)) {
+>>>>>>           nvme_req(rq)->status = NVME_SC_HOST_ABORTED_CMD;
+>>>>>> -        blk_mq_complete_request(rq);
+>>>>>> +        blk_mq_complete_request_sync(rq);
+>>>>>>       }
+>>>>>>       mutex_unlock(&ctrl->teardown_lock);
+>>>>>>   }
+>>>>>> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+>>>>>> index 8f4f29f18b8c..629b025685d1 100644
+>>>>>> --- a/drivers/nvme/host/tcp.c
+>>>>>> +++ b/drivers/nvme/host/tcp.c
+>>>>>> @@ -2177,7 +2177,7 @@ static void nvme_tcp_complete_timed_out(struct request *rq)
+>>>>>>       nvme_tcp_stop_queue(ctrl, nvme_tcp_queue_id(req->queue));
+>>>>>>       if (!blk_mq_request_completed(rq)) {
+>>>>>>           nvme_req(rq)->status = NVME_SC_HOST_ABORTED_CMD;
+>>>>>> -        blk_mq_complete_request(rq);
+>>>>>> +        blk_mq_complete_request_sync(rq);
+>>>>>
+>>>>> Or complete the request in the following way? Then one block layer API
+>>>>> can be saved:
+>>>>>
+>>>>>     blk_mq_complete_request_remote(rq);
+>>>>>     nvme_complete_rq(rq);
+>>>>>
+>>>>>
+>>>>> thanks,
+>>>>> Ming
+>>>>>
+>>>>>
+>>>>> _______________________________________________
+>>>>> Linux-nvme mailing list
+>>>>> Linux-nvme@lists.infradead.org
+>>>>> http://lists.infradead.org/mailman/listinfo/linux-nvme
+>>>>>
+>>>>>
+>>>>> _______________________________________________
+>>>>> Linux-nvme mailing list
+>>>>> Linux-nvme@lists.infradead.org
+>>>>> http://lists.infradead.org/mailman/listinfo/linux-nvme
+>>>>>
+>>>>
+>>>
+>>
+>> _______________________________________________
+>> Linux-nvme mailing list
+>> Linux-nvme@lists.infradead.org
+>> http://lists.infradead.org/mailman/listinfo/linux-nvme
+> 
+> 
+> _______________________________________________
+> Linux-nvme mailing list
+> Linux-nvme@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-nvme
