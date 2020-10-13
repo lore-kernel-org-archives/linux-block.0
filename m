@@ -2,121 +2,135 @@ Return-Path: <SRS0=bHvQ=DU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92DC2C433E7
-	for <linux-block@archiver.kernel.org>; Tue, 13 Oct 2020 19:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AAD6C433E7
+	for <linux-block@archiver.kernel.org>; Tue, 13 Oct 2020 19:37:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C92720BED
-	for <linux-block@archiver.kernel.org>; Tue, 13 Oct 2020 19:29:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E6E020EDD
+	for <linux-block@archiver.kernel.org>; Tue, 13 Oct 2020 19:37:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ISBkvlYX"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iOPFuszm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726775AbgJMT3B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Oct 2020 15:29:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54012 "EHLO
+        id S1728814AbgJMThL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Oct 2020 15:37:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725919AbgJMT3B (ORCPT
+        with ESMTP id S1725919AbgJMThL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Oct 2020 15:29:01 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3457AC0613D0
-        for <linux-block@vger.kernel.org>; Tue, 13 Oct 2020 12:29:01 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id u3so563774pjr.3
-        for <linux-block@vger.kernel.org>; Tue, 13 Oct 2020 12:29:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wJkUIlK6yHS5spEVsLyHE0CYvuoA8ZWwU2FFYP4wVSo=;
-        b=ISBkvlYXU9euHIKP7zQvzWUUphUkNW/b1pGsd3eOZhcyFtRun6ixdJaIWbYGynU0vY
-         9lqLsQaAGz2vkE6mDcJlLq2NhrvpJESxQCLXHB8Yz4I4FMLrUW0Z+rgcCzHmdt+UIK3Q
-         +eAfcSEM/r1203XndcUMpYPMo3b2SHfLQdvWLs8OYIX6BIfW+IyzAtvnFeSKLne5siB4
-         aW8L/0E2HIBQ+6+/mYFZhxpVRsrLDlfLL+v8M7IOobCHwBLg5yEto3cQUUiIcVqmvHi9
-         aJPUzz1VJa//TsLGxWr43sm9IDGYfGdJ75Z/1ldSXsZ4GpaTu8Iy6cCoJTF3L0Ij973V
-         arlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wJkUIlK6yHS5spEVsLyHE0CYvuoA8ZWwU2FFYP4wVSo=;
-        b=IlczqzkrrkYwx+9H6GtykcpkI/JMbbK9K0BmOVbLN+qFKqDEwKDI4EWqU05eXYrFWA
-         9COGOu2ORTOMvIG8lhOUUnAPSkCv18galpJDaUtaCIkWxwe12gZIF551dC2sv1d0RbHJ
-         S4cOzvr1S8h1jkL4b55FqOS/D5D4g5yZbMiHyBRUGCMeF7Ceyu8L/qsBPW0zhmSQ2LD9
-         HDFo9Zol8DVKB236Oso1nvuxmdvhHk9bGWBUgXhGltNKIrhpBXl0u6ZVqYqMOEW4trVy
-         hD3J0Se5R/FM6iYFVfthjIqYXIpDvVQkSZ+EF7W7K4sn86JndqWYcGbSw5wtwI0pZEm1
-         6k+g==
-X-Gm-Message-State: AOAM532OQgPIgeyb2+5o3PWvWPwZyix3W/HAZoZVRJ8+lScIQMF0Fi3d
-        3kUM5R4xRC4Q75VxPNZ1NKi0yQNkF2+FyZGE
-X-Google-Smtp-Source: ABdhPJzo3+l1V7XT73t7XohGERB+u0MdyzBSQXVgqjKbHL77sAV5wLA4mzPS0tND3qXK+yc+I52mRw==
-X-Received: by 2002:a17:90b:388b:: with SMTP id mu11mr1240420pjb.204.1602617340710;
-        Tue, 13 Oct 2020 12:29:00 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id y5sm454302pgo.5.2020.10.13.12.28.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Oct 2020 12:29:00 -0700 (PDT)
-Subject: Re: [PATCH] block: set NOWAIT for sync polling
-To:     Ming Lei <ming.lei@redhat.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        xiaoguang.wang@linux.alibaba.com
-References: <20201013084051.27255-1-jefflexu@linux.alibaba.com>
- <20201013120913.GA614668@T590>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9ab6bda9-2009-f8e8-5bff-5d26873bc6c9@kernel.dk>
-Date:   Tue, 13 Oct 2020 13:28:59 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 13 Oct 2020 15:37:11 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF0FC0613D0;
+        Tue, 13 Oct 2020 12:37:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=julNFvrjaFWkGS8+6W5JRZKKlBpdy19jf/hCoUdzdEM=; b=iOPFuszmnN+d5S+Ahd5uX1N4pM
+        9RF6NzOI8Sd5OvAHWw4A5T4V7HBzV5SYmEitcrT6L9uijzivpv3AAlrlQ+EeeMBwBERzfaRW96tDf
+        PKzX+Sl2uCT2ULOLsIaATERkdV1cx8TAcLFUKC9PDDXh3BUb0PThsEH5DExMv1qS5B9SNDc+ifGE8
+        i5adkcq3oTTGJk72Oatktad6H8mS4gZ84Snyq0JJxGsD2588n+HRQh2ps2O3qrgewJ3m2qt+GgsvN
+        M0CVp3vtxwWhumjXm1Xcpjg1G/4g9JvOqlT5q+mB/7fQkjMGPjGhStjIFbjEA/fecM1aATnK3yCCv
+        pha3ulKA==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kSQ6F-000768-Gq; Tue, 13 Oct 2020 19:36:43 +0000
+Date:   Tue, 13 Oct 2020 20:36:43 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     "Weiny, Ira" <ira.weiny@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Nicolas Pitre <nico@fluxnic.net>, X86 ML <x86@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux MM <linux-mm@kvack.org>, linux-kselftest@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, bpf@vger.kernel.org,
+        Kexec Mailing List <kexec@lists.infradead.org>,
+        linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
+        devel@driverdev.osuosl.org, linux-efi <linux-efi@vger.kernel.org>,
+        linux-mmc@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>,
+        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        ceph-devel@vger.kernel.org,
+        linux-ext4 <linux-ext4@vger.kernel.org>, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
+        reiserfs-devel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
+        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-btrfs <linux-btrfs@vger.kernel.org>,
+        linux-afs@lists.infradead.org,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>, intel-gfx@lists.freedesktop.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        xen-devel <xen-devel@lists.xenproject.org>,
+        linux-cachefs@redhat.com, samba-technical@lists.samba.org,
+        intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH RFC PKS/PMEM 33/58] fs/cramfs: Utilize new kmap_thread()
+Message-ID: <20201013193643.GK20115@casper.infradead.org>
+References: <20201009195033.3208459-1-ira.weiny@intel.com>
+ <20201009195033.3208459-34-ira.weiny@intel.com>
+ <CAPcyv4gL3jfw4d+SJGPqAD3Dp4F_K=X3domuN4ndAA1FQDGcPg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20201013120913.GA614668@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4gL3jfw4d+SJGPqAD3Dp4F_K=X3domuN4ndAA1FQDGcPg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/13/20 6:09 AM, Ming Lei wrote:
-> On Tue, Oct 13, 2020 at 04:40:51PM +0800, Jeffle Xu wrote:
->> Sync polling also needs REQ_NOWAIT flag. One sync read/write may be
->> split into several bios (and thus several requests), and can used up the
->> queue depth sometimes. Thus the following bio in the same sync
->> read/write will wait for usable request if REQ_NOWAIT flag not set, in
->> which case the following sync polling will cause a deadlock.
->>
->> One case (maybe the only case) for above situation is preadv2/pwritev2
->> + direct + highpri. Two conditions need to be satisfied to trigger the
->> deadlock.
->>
->> 1. HIPRI IO in sync routine. Normal read(2)/pread(2)/readv(2)/preadv(2)
->> and corresponding write family syscalls don't support high-priority IO and
->> thus won't trigger polling routine. Only preadv2(2)/pwritev2(2) supports
->> high-priority IO by RWF_HIPRI flag of @flags parameter.
->>
->> 2. Polling support in sync routine. Currently both the blkdev and
->> iomap-based fs (ext4/xfs, etc) support polling in direct IO routine. The
->> general routine is described as follows.
->>
->> submit_bio
->>   wait for blk_mq_get_tag(), waiting for requests completion, which
->>   should be done by the following polling, thus causing a deadlock.
+On Tue, Oct 13, 2020 at 11:44:29AM -0700, Dan Williams wrote:
+> On Fri, Oct 9, 2020 at 12:52 PM <ira.weiny@intel.com> wrote:
+> >
+> > From: Ira Weiny <ira.weiny@intel.com>
+> >
+> > The kmap() calls in this FS are localized to a single thread.  To avoid
+> > the over head of global PKRS updates use the new kmap_thread() call.
+> >
+> > Cc: Nicolas Pitre <nico@fluxnic.net>
+> > Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+> > ---
+> >  fs/cramfs/inode.c | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
+> > index 912308600d39..003c014a42ed 100644
+> > --- a/fs/cramfs/inode.c
+> > +++ b/fs/cramfs/inode.c
+> > @@ -247,8 +247,8 @@ static void *cramfs_blkdev_read(struct super_block *sb, unsigned int offset,
+> >                 struct page *page = pages[i];
+> >
+> >                 if (page) {
+> > -                       memcpy(data, kmap(page), PAGE_SIZE);
+> > -                       kunmap(page);
+> > +                       memcpy(data, kmap_thread(page), PAGE_SIZE);
+> > +                       kunmap_thread(page);
 > 
-> Another blocking point is rq_qos_throttle(), so I guess falling back to
-> REQ_NOWAIT may not fix the issue completely.
-> 
-> Given iopoll isn't supposed to in case of big IO, another solution
-> may be to disable iopoll when bio splitting is needed, something
-> like the following change:
+> Why does this need a sleepable kmap? This looks like a textbook
+> kmap_atomic() use case.
 
-I kind of like that better, especially since polling for split bio's is
-somewhat of a weird thing. Needs a better comment though, not just on
-size, but also why multiple bio polling isn't really something that
-works.
+There's a lot of code of this form.  Could we perhaps have:
 
--- 
-Jens Axboe
+static inline void copy_to_highpage(struct page *to, void *vfrom, unsigned int size)
+{
+	char *vto = kmap_atomic(to);
 
+	memcpy(vto, vfrom, size);
+	kunmap_atomic(vto);
+}
+
+in linux/highmem.h ?
