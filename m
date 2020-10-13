@@ -1,156 +1,132 @@
-Return-Path: <SRS0=jKGj=DT=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=bHvQ=DU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC3BC35265
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 23:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02942C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 13 Oct 2020 08:40:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF1B9208D5
-	for <linux-block@archiver.kernel.org>; Mon, 12 Oct 2020 23:31:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B133420E65
+	for <linux-block@archiver.kernel.org>; Tue, 13 Oct 2020 08:40:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387986AbgJLXba (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Oct 2020 19:31:30 -0400
-Received: from mga11.intel.com ([192.55.52.93]:32822 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726780AbgJLXb3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Oct 2020 19:31:29 -0400
-IronPort-SDR: v8kc3Fio+LjPoyvQb3mY8ylUGqFR6CzeawpaCTXAqt1VAiQ6XIXdXgWe/N/tGX+W/WtGkwX1MB
- Yyz30aCCeR2g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9772"; a="162351722"
-X-IronPort-AV: E=Sophos;i="5.77,368,1596524400"; 
-   d="scan'208";a="162351722"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2020 16:31:28 -0700
-IronPort-SDR: tYujEEKuwB7pwkDEJNgfSBtOh7hwJ+YZEVhRvoIibttlBusG3o0pRElwiIGjx+C70rOitVdHyl
- N8yvUi3stUVQ==
-X-IronPort-AV: E=Sophos;i="5.77,368,1596524400"; 
-   d="scan'208";a="313606559"
-Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2020 16:31:27 -0700
-Date:   Mon, 12 Oct 2020 16:31:26 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>, linux-aio@kvack.org,
-        linux-efi@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-mmc@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-        target-devel@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-kselftest@vger.kernel.org, samba-technical@lists.samba.org,
-        ceph-devel@vger.kernel.org, drbd-dev@lists.linbit.com,
-        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-rdma@vger.kernel.org,
-        x86@kernel.org, amd-gfx@lists.freedesktop.org,
-        linux-afs@lists.infradead.org, cluster-devel@redhat.com,
-        linux-cachefs@redhat.com, intel-wired-lan@lists.osuosl.org,
-        xen-devel@lists.xenproject.org, linux-ext4@vger.kernel.org,
-        Fenghua Yu <fenghua.yu@intel.com>, ecryptfs@vger.kernel.org,
-        linux-um@lists.infradead.org, intel-gfx@lists.freedesktop.org,
-        linux-erofs@lists.ozlabs.org, reiserfs-devel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        io-uring@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, netdev@vger.kernel.org,
-        kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, bpf@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH RFC PKS/PMEM 22/58] fs/f2fs: Utilize new kmap_thread()
-Message-ID: <20201012233126.GD2046448@iweiny-DESK2.sc.intel.com>
-References: <20201009195033.3208459-23-ira.weiny@intel.com>
- <20201009213434.GA839@sol.localdomain>
- <20201010003954.GW20115@casper.infradead.org>
- <20201010013036.GD1122@sol.localdomain>
- <20201012065635.GB2046448@iweiny-DESK2.sc.intel.com>
- <20201012161946.GA858@sol.localdomain>
- <5d621db9-23d4-e140-45eb-d7fca2093d2b@intel.com>
- <20201012164438.GA20115@casper.infradead.org>
- <20201012195354.GC2046448@iweiny-DESK2.sc.intel.com>
- <20201012200254.GB20115@casper.infradead.org>
+        id S2403914AbgJMIkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Oct 2020 04:40:55 -0400
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:39065 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2403912AbgJMIky (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Oct 2020 04:40:54 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R761e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0UBuhU9Q_1602578451;
+Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UBuhU9Q_1602578451)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 13 Oct 2020 16:40:52 +0800
+From:   Jeffle Xu <jefflexu@linux.alibaba.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
+        xiaoguang.wang@linux.alibaba.com
+Subject: [PATCH] block: set NOWAIT for sync polling
+Date:   Tue, 13 Oct 2020 16:40:51 +0800
+Message-Id: <20201013084051.27255-1-jefflexu@linux.alibaba.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201012200254.GB20115@casper.infradead.org>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 12, 2020 at 09:02:54PM +0100, Matthew Wilcox wrote:
-> On Mon, Oct 12, 2020 at 12:53:54PM -0700, Ira Weiny wrote:
-> > On Mon, Oct 12, 2020 at 05:44:38PM +0100, Matthew Wilcox wrote:
-> > > On Mon, Oct 12, 2020 at 09:28:29AM -0700, Dave Hansen wrote:
-> > > > kmap_atomic() is always preferred over kmap()/kmap_thread().
-> > > > kmap_atomic() is _much_ more lightweight since its TLB invalidation is
-> > > > always CPU-local and never broadcast.
-> > > > 
-> > > > So, basically, unless you *must* sleep while the mapping is in place,
-> > > > kmap_atomic() is preferred.
-> > > 
-> > > But kmap_atomic() disables preemption, so the _ideal_ interface would map
-> > > it only locally, then on preemption make it global.  I don't even know
-> > > if that _can_ be done.  But this email makes it seem like kmap_atomic()
-> > > has no downsides.
-> > 
-> > And that is IIUC what Thomas was trying to solve.
-> > 
-> > Also, Linus brought up that kmap_atomic() has quirks in nesting.[1]
-> > 
-> > >From what I can see all of these discussions support the need to have something
-> > between kmap() and kmap_atomic().
-> > 
-> > However, the reason behind converting call sites to kmap_thread() are different
-> > between Thomas' patch set and mine.  Both require more kmap granularity.
-> > However, they do so with different reasons and underlying implementations but
-> > with the _same_ resulting semantics; a thread local mapping which is
-> > preemptable.[2]  Therefore they each focus on changing different call sites.
-> > 
-> > While this patch set is huge I think it serves a valuable purpose to identify a
-> > large number of call sites which are candidates for this new semantic.
-> 
-> Yes, I agree.  My problem with this patch-set is that it ties it to
-> some Intel feature that almost nobody cares about.
+Sync polling also needs REQ_NOWAIT flag. One sync read/write may be
+split into several bios (and thus several requests), and can used up the
+queue depth sometimes. Thus the following bio in the same sync
+read/write will wait for usable request if REQ_NOWAIT flag not set, in
+which case the following sync polling will cause a deadlock.
 
-I humbly disagree.  At this level the only thing this is tied to is the idea
-that there are additional memory protections available which can be enabled
-quickly on a per-thread basis.  PKS on Intel is but 1 implementation of that.
+One case (maybe the only case) for above situation is preadv2/pwritev2
++ direct + highpri. Two conditions need to be satisfied to trigger the
+deadlock.
 
-Even the kmap code only has knowledge that there is something which needs to be
-done special on a devm page.
+1. HIPRI IO in sync routine. Normal read(2)/pread(2)/readv(2)/preadv(2)
+and corresponding write family syscalls don't support high-priority IO and
+thus won't trigger polling routine. Only preadv2(2)/pwritev2(2) supports
+high-priority IO by RWF_HIPRI flag of @flags parameter.
 
->
-> Maybe we should
-> care about it, but you didn't try very hard to make anyone care about
-> it in the cover letter.
+2. Polling support in sync routine. Currently both the blkdev and
+iomap-based fs (ext4/xfs, etc) support polling in direct IO routine. The
+general routine is described as follows.
 
-Ok my bad.  We have customers who care very much about restricting access to
-the PMEM pages to prevent bugs in the kernel from causing permanent damage to
-their data/file systems.  I'll reword the cover letter better.
+submit_bio
+  wait for blk_mq_get_tag(), waiting for requests completion, which
+  should be done by the following polling, thus causing a deadlock.
+blk_poll
+  poll in current process context
 
-> 
-> For a future patch-set, I'd like to see you just introduce the new
-> API.  Then you can optimise the Intel implementation of it afterwards.
-> Those patch-sets have entirely different reviewers.
+This issue can be reproduced by following steps:
+1. set max_sectors_kb to '4', and set nr_requests to '4'.
+This deliberate setting is imposed to stress the issue.
 
-I considered doing this.  But this seemed more logical because the feature is
-being driven by PMEM which is behind the kmap interface not by the users of the
-API.
+2. fio test with the following configuration:
+ioengine=pvsync2
+iodepth=128
+numjobs=1
+thread
+rw=randread
+direct=1
+hipri=1
+bs=4M
+filename=/dev/nvme0n1
 
-I can introduce a patch set with a kmap_thread() call which does nothing if
-that is more palatable but it seems wrong to me to do so.
+In this case one sync read will be split into 1024 bios and will exhaust
+the queue depth rapidly, causing the following bio waiting in the
+following stack forever.
 
-Ira
+[<0>] blk_mq_get_tag+0x19d/0x290
+[<0>] __blk_mq_alloc_request+0x5c/0x130
+[<0>] blk_mq_submit_bio+0x103/0x5d0
+[<0>] submit_bio_noacct+0x309/0x400
+[<0>] submit_bio+0x81/0x190
+[<0>] blkdev_direct_IO+0x44c/0x4a0
+[<0>] generic_file_read_iter+0x80/0x160
+[<0>] do_iter_readv_writev+0x186/0x1c0
+[<0>] do_iter_read+0xc6/0x1c0
+[<0>] vfs_readv+0x7e/0xc0
+[<0>] do_preadv+0xad/0xc0
+[<0>] do_syscall_64+0x2d/0x40
+[<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+Fix: 675d9e95538e5 ("block: add bio_set_polled() helper")
+Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+---
+ include/linux/bio.h | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index c6d765382926..884ee5aa3df4 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -800,17 +800,15 @@ static inline int bio_integrity_add_page(struct bio *bio, struct page *page,
+ #endif /* CONFIG_BLK_DEV_INTEGRITY */
+ 
+ /*
+- * Mark a bio as polled. Note that for async polled IO, the caller must
+- * expect -EWOULDBLOCK if we cannot allocate a request (or other resources).
++ * Mark a bio as polled. Note that for polled IO, the caller must expect
++ * -EWOULDBLOCK if we cannot allocate a request (or other resources).
+  * We cannot block waiting for requests on polled IO, as those completions
+  * must be found by the caller. This is different than IRQ driven IO, where
+  * it's safe to wait for IO to complete.
+  */
+ static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
+ {
+-	bio->bi_opf |= REQ_HIPRI;
+-	if (!is_sync_kiocb(kiocb))
+-		bio->bi_opf |= REQ_NOWAIT;
++	bio->bi_opf |= REQ_HIPRI | REQ_NOWAIT;
+ }
+ 
+ #endif /* __LINUX_BIO_H */
+-- 
+2.27.0
+
