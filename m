@@ -8,68 +8,68 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_TVD_MIME_NO_HEADERS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B82C433E7
-	for <linux-block@archiver.kernel.org>; Wed, 14 Oct 2020 12:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0155C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Oct 2020 12:26:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CB1020848
-	for <linux-block@archiver.kernel.org>; Wed, 14 Oct 2020 12:25:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B7A2208B3
+	for <linux-block@archiver.kernel.org>; Wed, 14 Oct 2020 12:26:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TTpd86Bc"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bk8tdKat"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729548AbgJNMZo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Oct 2020 08:25:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40444 "EHLO
+        id S1730139AbgJNM0z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Oct 2020 08:26:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727247AbgJNMZo (ORCPT
+        with ESMTP id S1730097AbgJNM0z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Oct 2020 08:25:44 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E130BC061755
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2020 05:25:43 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id w21so1680271plq.3
-        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2020 05:25:43 -0700 (PDT)
+        Wed, 14 Oct 2020 08:26:55 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4D6C061755
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2020 05:26:55 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id md26so4518590ejb.10
+        for <linux-block@vger.kernel.org>; Wed, 14 Oct 2020 05:26:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=from:to:cc:subject:date:message-id;
-        bh=mjc0dpVSW7tdTRSp5b9bS9V1F4UZwqFdTKvQ0g6zBak=;
-        b=TTpd86Bc08HrR0sPYmb4f9jERWUUz1d/YjbweeehsuRXRi4x6DMqcuKSx3I+t+xES/
-         CsKWjfZH5erTecugD3KrHwgXUOtaKNAW4MxKoWiHs0CQrbGoJCtvTbJo83RQHtM/f90q
-         w8EKYsSrbHH1WTD2phKN9/kUXTVBAmoTFjig4=
+        bh=8iClLAx+MZe8knf0/voNpGcSSEd+68GjRjA1ABsjroA=;
+        b=bk8tdKatMLnxBqwpVK+970IrdVkG82s2wVlk6HsR4wcBlhqS40E/PFFO6cv5Y/k2Pm
+         cG10H++V0kVs4xoJ/cR3uIuP6g5N06MW0A/f4phowCAYRM/G4sxW48vTg6cFYUcnbeLb
+         BlV0m0dexuKYpH2J8lc/Ls48S1qbKsJaygqao=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=mjc0dpVSW7tdTRSp5b9bS9V1F4UZwqFdTKvQ0g6zBak=;
-        b=smbx6rIG5dQVc4YB/QUG6ZAKwEgX0Ot2a1GtfoaEIcq0cIYObxPBheVYsOORv2JYVK
-         TjZcntHzWF9hdTbNh5kyAyTOPMaZ6iSr6deSlGSyAXw1lvg+TMHLBrlttSXLpv6S8bwj
-         LBcmaXfBtJatIDTpBdFbql41YwZnsFDoERFzterK6FOqAzRvPjXt+JIXd3bSD0fh4oUL
-         POKauplolm13Q6r7A/kRW4Xpxba2caxBqiVmfGbAkUoiM348o9WLmNdB3cig1MdHhfcx
-         PA1r7vxCRx2XzYI+lXvPx+sgmrdUYKJYXr41COBxon4bvvs5LaBL3sUGSXGMa1q5K/ov
-         KJuA==
-X-Gm-Message-State: AOAM531o5jYL7XUxdpB4WzisEZ7s5UbTei1zNIM/2W+Q/DHxFRtnA7qQ
-        DqSgVEfrLv9N22jpDAQKgwKUyw==
-X-Google-Smtp-Source: ABdhPJxtUh14l0aLvB6TkimexhAeRlCCPTS2d8+YcOWmQlEHMsHLBa29WKuRookdeDxaqSgrS/29Nw==
-X-Received: by 2002:a17:90a:fd02:: with SMTP id cv2mr3010543pjb.63.1602678343297;
-        Wed, 14 Oct 2020 05:25:43 -0700 (PDT)
+        bh=8iClLAx+MZe8knf0/voNpGcSSEd+68GjRjA1ABsjroA=;
+        b=ZRDVqyI3Xh3KG9EGJMkTDOP9MZHyCKx+hAJVOL8eRgHujNJbLUoYLeqnY43641Eiai
+         qpmjET+T9y3c1Zz6LO/9K1p1gDfGv3P/tKTX3+INzl3nvwBIsQ7eRPpDY0mnoIK5ZY+Q
+         yh2Yz0vBqjSWoV7mivlPBCZhFSSyK/GfAHa2SrRwNX7lYm7rcNWy7i1RhIpE86g1NBI3
+         zgHl3QtKN0SPGUK2ZyhNfe4yNS4kNKdkRawcMkrFOBlCxN7L1R0W70c6EMLsnnQftbC+
+         taHilspS6ndpIkJ1WokrzkbCiPghV1egBNWg8tjZPLo2iydurKD+85gDmWp07RNGhd8T
+         DSNw==
+X-Gm-Message-State: AOAM532oiKlugfaTgjvHrd6boR5Of+vYQfnR+juPzc2PohS3arW+eVDG
+        KhoC+fjhfPXl4F4ZUJ6oMtWWEA==
+X-Google-Smtp-Source: ABdhPJzwT9b98N+pkQsDgYgVYPfebGg3/RX/c+RsgBVURQByt57iPpzOdgzTnLRExjGbAH47I/Vpjg==
+X-Received: by 2002:a17:906:4a97:: with SMTP id x23mr4858751eju.471.1602678413580;
+        Wed, 14 Oct 2020 05:26:53 -0700 (PDT)
 Received: from drv-bst-rhel8.static.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id 17sm3043977pgv.58.2020.10.14.05.25.40
+        by smtp.gmail.com with ESMTPSA id w4sm1532505eds.83.2020.10.14.05.26.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2020 05:25:42 -0700 (PDT)
+        Wed, 14 Oct 2020 05:26:52 -0700 (PDT)
 From:   Kashyap Desai <kashyap.desai@broadcom.com>
-To:     --to=linux-scsi@vger.kernel.org
+To:     linux-scsi@vger.kernel.org
 Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
         sumit.saxena@broadcom.com, chandrakanth.patil@broadcom.com,
         linux-block@vger.kernel.org
 Subject: [PATCH 1/3] add io_uring with IOPOLL support in scsi layer
-Date:   Wed, 14 Oct 2020 17:55:07 +0530
-Message-Id: <20201014122507.201162-1-kashyap.desai@broadcom.com>
+Date:   Wed, 14 Oct 2020 17:56:29 +0530
+Message-Id: <20201014122629.201223-1-kashyap.desai@broadcom.com>
 X-Mailer: git-send-email 2.18.1
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="0000000000005d448705b1a0a1e0"
+        boundary="0000000000008e7d7705b1a0a567"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---0000000000005d448705b1a0a1e0
+--0000000000008e7d7705b1a0a567
 
 io_uring with IOPOLL is not currently supported in scsi mid layer.
 Outside of that everything else should work and no extra support in the driver is needed.
@@ -179,7 +179,7 @@ index 701f178b20ae..905ee6b00c55 100644
 2.18.1
 
 
---0000000000005d448705b1a0a1e0
+--0000000000008e7d7705b1a0a567
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -251,12 +251,12 @@ M+LbYxcXFT2gXvoYd2Ms8zsLrhO2M6pMzeNGWk2HWTof9s7EEHDjis/MRlbYSNaohV23IUzNlBw7
 IG52LXNhMTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0g
 RzMCDDSdoX7GqonhoE7TszANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgbHqrDkcF
 3beG++5BhHzytcv/DHdVyOZv5XNGVK8oC+gwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMjAxMDE0MTIyNTQzWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
+hkiG9w0BCQUxDxcNMjAxMDE0MTIyNjU0WjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
 BglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBALU7y9lIwwMOB31gOpKyKQp7RY+q
-q0LvKAVuJGb4HakhqDOZlPrfntsAeNyJC3mHTlOZwip/iO0Hn1wEaF1W1s5uKxTkVl1zZ8SiJNO2
-2NvJdRpcHOyiSffQ9HCPyS1iowZr5ozWrRFMEIpZa6aardHrodTpnLVe1gtszEjAd5JnIYiy1I5B
-SsCKWazeTZnrg1WT6YxE8wdvM0x0BrvAccMuawpP+MPjcyFFZLrZGvbEGf83lBugyXwE/xHHSdQ8
-QQ5N2uh2w2UzRvR4z7xMkaLhm24ebRBrF0Dynj2+wmrmHF6Rz1MN0dgaseSPkDb/SH46pguzfgob
-6yJvItXaM8s=
---0000000000005d448705b1a0a1e0--
+9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAGwOx1QNaWRD6izCG2jmYvAFo5SA
+z3RYHAUycXfmJCVHJiLEuXIUSVVPZ3xcjKiaFuUsw4pbDHHfuLydiQYmtWE1Uagtz1A71/0wmZ7z
+duv9uQA0dCWah7rMRcTsRGDI6Y1dx0G5Id50gziMTgaMfG9qpXv0bgzxqp+JHWEsSdu3K+uWCFDU
+vq56DgJ2NDXxTYcUNF6nhcEFP2De5WRRYzc9EKUrj5OjLZCmqrkAOgK35olDSBRrud2e6kNJ90Bq
+cRZOj4iOEjE+ncIm7nwrJEKgq0YHrHQBO+DHkSqDi4Z+7Inf1480Nvd0jGuWZrFHl/8YGhSPKcQa
+F4EqR5e5Evg=
+--0000000000008e7d7705b1a0a567--
