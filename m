@@ -5,60 +5,60 @@ X-Spam-Level:
 X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AEE1C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 15 Oct 2020 21:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5523EC43457
+	for <linux-block@archiver.kernel.org>; Thu, 15 Oct 2020 22:05:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C96F42076A
-	for <linux-block@archiver.kernel.org>; Thu, 15 Oct 2020 21:55:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D30162084C
+	for <linux-block@archiver.kernel.org>; Thu, 15 Oct 2020 22:05:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wFCkhlAY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YyI2hHjl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728010AbgJOVzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Oct 2020 17:55:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41690 "EHLO
+        id S1731682AbgJOWFY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Oct 2020 18:05:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727972AbgJOVzk (ORCPT
+        with ESMTP id S1731165AbgJOWFY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Oct 2020 17:55:40 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F4BAC0613CF
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2020 14:55:40 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id l18so153648pgg.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2020 14:55:40 -0700 (PDT)
+        Thu, 15 Oct 2020 18:05:24 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E0C9C0613CF
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2020 15:05:24 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id gm14so219784pjb.2
+        for <linux-block@vger.kernel.org>; Thu, 15 Oct 2020 15:05:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Mp0fFCaPEBpQGNEbuV9IgZPXZ47zhWeprp5HxFaRp04=;
-        b=wFCkhlAYm/QEhKkK6Ma2sXLBVRZbAk1HDW8YSC0qUO2cQPVCSZb9D4YwWZT07c4j1D
-         7FndbErn3dLyTVrYVcSSQZfWI8dkvJGaogQ/UtijAHbKNtdswZMTc+HpxSrT+jELb0eT
-         i9uK0yNCPv0duyegRAj/bsAneOnbDFYM1nUMzea8n8vqCiDNpZ14N4GxJ1an2cBs+bpX
-         CWUUTUrvCY3OhGR0IYV1zqigeBFQzl+xwr950qPZwMDIkPhF1/yff8CAGT8AYqCH1oN9
-         CtgJRTdViZY9cMHeI7X4jyUrqYaOTvIo+YXxst32itDqkU+inAjqEGESOa346szaOR0Q
-         AWtw==
+        bh=700dSlreVGZIbwr3AdAuK7QeFJxaPoeuAx3F/ELDRDo=;
+        b=YyI2hHjlGVMdiNNuzARzWWPUiBmNs3oQjJCJGo+DBpaEJkZHTSch2TDv7bhYi0ayd7
+         0Tiug6g9ouWnCvNCvyppOJJMcWJ70krwZeHg307DjM4M4ciwWM168DIguFHICNfGwBTQ
+         0fztJeUGNoHaZGzvewoMRmJZE7w9xAixVlOhJ8kgsfddznBNmg7jA67fAyG1fZqnRzW2
+         H7jW2xnA80M0pgO+LpVdhsflSYVJaXXgjY2LiFONp4lXtOo4wWFoml2ngxy7G+CNmI8f
+         ygiE+osIjuskN1NPsYcVMTu++R4xxzF9U+Uu7hIfFBksBQ7z2UX3TIoPsOA67aVRk4rr
+         pL1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Mp0fFCaPEBpQGNEbuV9IgZPXZ47zhWeprp5HxFaRp04=;
-        b=HTbMkxq9NV6ZcBRG6HKEcxXSw+7yCJXA58aURzCT+HNC/h/h/PtkCCQsGzss9Vknc/
-         ZdSE3EmrnKrwA9rM4hoJAM13ZlPYB/QpneSZqYN4k8i1/4a8qvSvb4Er5HF3ST6a7+hX
-         29WXTuW+GmazUsnAD+yj6Z1xxt+vtvSS8CJvMwtIg9ZitAxaTFxkVy1P5Zn47buX+Tti
-         28Fshfn8QaR0A2PgKJ29xjDHn1qDhnVhwUMsjKqrltndpV++6hvvIomyiBiGLJi2rIJG
-         4oJE2UONuta/4nklUXSbKYhJbXelEiTIwScI7mm9Qfzdg839BJUf951cfcR8Y61FsKoD
-         qhdA==
-X-Gm-Message-State: AOAM5339FGUJz/8tCF0BEgwoKfHfWFlP3qq2nWQ4zN9W49nFt4aZaSQx
-        PYOx/cV1e96s4cMbO+qw2uyiHw==
-X-Google-Smtp-Source: ABdhPJxLXVcVr8KojpvEjCXdEZ6KAspUKoe2F0+QMs61OvnoBOXCEoHxSWNtaR7ijwwz2xclViQPrQ==
-X-Received: by 2002:a62:7b11:0:b029:156:3610:7e25 with SMTP id w17-20020a627b110000b029015636107e25mr614898pfc.53.1602798939559;
-        Thu, 15 Oct 2020 14:55:39 -0700 (PDT)
+        bh=700dSlreVGZIbwr3AdAuK7QeFJxaPoeuAx3F/ELDRDo=;
+        b=d0tC/duJDZNN9B1gXV9xGdf5gQBLEsN3YRPeapxJC+hOE7Psey4RTPHdIwp0uobdnr
+         5qS8jI+r0oVeOFIXt2JCV51cB0tH4Go08gbk3SgVpqUGYq4nVtNYQoUclI0ek6uwQxSP
+         IBXJaPOrabAP3P5ZS+Usew7ckcuYYbKIQ4kX/lqt5lBkCB685JKz3oc+5NX7Yg+a1/vF
+         C9Bksuunvu2gAnU4XqgwpB7ubF1MJ1rJPzMn/EBImVknRBCwQLOd55ZZ+pZ6hDNpRi74
+         2Zhhzfry6Id58I61SrfbVOvTpK6Nysnqui2Yax14xDtRoOm/+TdltN4F1H9y/1ewmVMD
+         YQ1w==
+X-Gm-Message-State: AOAM533AVDo2l9FGA/elVhj/ymaT6bvh7U7t/HXBXZfrhbgED9mysopx
+        G20+CcGKZj/f+P3u3hRgQAgu2w==
+X-Google-Smtp-Source: ABdhPJzUX9wxifuk/NX4KO9hxnbTmPIzCu5nOp+krk3Lv2bCZAZCkS014tzTx/UPz0a1f2BvXPsGKQ==
+X-Received: by 2002:a17:90a:9317:: with SMTP id p23mr762160pjo.160.1602799523789;
+        Thu, 15 Oct 2020 15:05:23 -0700 (PDT)
 Received: from google.com (154.137.233.35.bc.googleusercontent.com. [35.233.137.154])
-        by smtp.gmail.com with ESMTPSA id js21sm303276pjb.14.2020.10.15.14.55.38
+        by smtp.gmail.com with ESMTPSA id e8sm295045pgj.8.2020.10.15.15.05.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2020 14:55:38 -0700 (PDT)
-Date:   Thu, 15 Oct 2020 21:55:35 +0000
+        Thu, 15 Oct 2020 15:05:23 -0700 (PDT)
+Date:   Thu, 15 Oct 2020 22:05:19 +0000
 From:   Satya Tangirala <satyat@google.com>
 To:     Mike Snitzer <snitzer@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
@@ -66,22 +66,22 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
         dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>
 Subject: Re: [PATCH 2/3] dm: add support for passing through inline crypto
  support
-Message-ID: <20201015215535.GA48329@google.com>
+Message-ID: <20201015220519.GB48329@google.com>
 References: <20200909234422.76194-1-satyat@google.com>
  <20200909234422.76194-3-satyat@google.com>
  <20200924012103.GE10500@redhat.com>
- <20200924074810.GB1894729@google.com>
- <20200924134021.GA13849@redhat.com>
+ <20200924073842.GA1894729@google.com>
+ <20200924142353.GC13849@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200924134021.GA13849@redhat.com>
+In-Reply-To: <20200924142353.GC13849@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 09:40:22AM -0400, Mike Snitzer wrote:
-> On Thu, Sep 24 2020 at  3:48am -0400,
+On Thu, Sep 24, 2020 at 10:23:54AM -0400, Mike Snitzer wrote:
+> On Thu, Sep 24 2020 at  3:38am -0400,
 > Satya Tangirala <satyat@google.com> wrote:
 > 
 > > On Wed, Sep 23, 2020 at 09:21:03PM -0400, Mike Snitzer wrote:
@@ -148,30 +148,62 @@ On Thu, Sep 24, 2020 at 09:40:22AM -0400, Mike Snitzer wrote:
 > > > >  	atomic_t open_count;
 > > > 
 > > > Any reason you placed the ksm member where you did?
+> > > 
+> > > Looking at 'struct blk_keyslot_manager' I'm really hating adding that
+> > > bloat to every DM device for a feature that really won't see much broad
+> > > use (AFAIK).
+> > > 
+> > > Any chance you could allocate 'struct blk_keyslot_manager' as needed so
+> > > that most users of DM would only be carrying 1 extra pointer (set to
+> > > NULL)?
 > >
-> > As in, any reason why it's placed right after the struct request_queue
-> > *queue? The ksm is going to be set up in the request_queue and is a part
-> > of the request_queue is some sense, so it seemed reasonable to me to
-> > group them together....but I don't think there's any reason it *has* to
-> > be there, if you think it should be put elsewhere (or maybe I'm
-> > misunderstanding your question :) ).
+> > I don't think there's any technical problem with doing that - the only
+> > other thing that would need addressing is that the patch uses
+> > "container_of" on that blk_keyslot_manager in dm_keyslot_evict() to get
+> > a pointer to the struct mapped_device. I could try adding a "private"
+> > field to struct blk_keyslot_manager and store a pointer to the struct
+> > mapped_device there).
 > 
-> Placing the full struct where you did is highly disruptive to the prior
-> care taken to tune alignment of struct members within mapped_device.
+> Yes, that'd be ideal.
 > 
-Ah I see - sorry about that! I ended up removing it entirely in the next
-version of this series while trying to address this and your other
-comments :). The next version is at
+> As for the lifetime of the struct blk_keyslot_manager pointer DM would
+> manage (in your future code revision): you meantioned in one reply that
+> the request_queue takes care of setting up the ksm... but the ksm
+> is tied to the queue at a later phase using blk_ksm_register(). 
+> 
+I probably wasn't clear in that reply :(. So the request_queue isn't
+responsible for setting up the ksm - setting up the ksm in the request
+queue is the responsibility of the DM device.
+> In any case, I think my feature reequest (to have DM allocate the ksm
+> struct only as needed) is a bit challenging because of how DM allocates
+> the request_queue upfront in alloc_dev() and then later completes the
+> request_queue initialization based on DM_TYPE* in dm_setup_md_queue().
+> 
+> It _could_ be that you'll need to add a new DM_TYPE_KSM_BIO_BASED or
+> something.  But you have a catch-22 in that the dm-table.c code to
+> establish the intersection of supported modes assumes ksm is already
+> allocated.  So something needs to give by reasoning through: _what_ is
+> the invariant that will trigger the delayed allocation of the ksm
+> struct?  I don't yet see how you can make that informed decision that
+> the target(s) in the DM table _will_ use the ksm if it exists.
+> 
+What I tried doing in the next version that I just sent out was to get
+the DM device to set up the ksm as appropriate on table swaps (and also
+to verify the "new" ksm on table swaps and loads, so that we reject any
+new table that would require a new ksm that would drop any capabability
+that the current ksm supports)
+> But then once the ksm is allocated, it never gets allocated again
+> because md->queue->ksm is already set, and it inherits the lifetime that
+> is used when destroying the mapped_device (md->queue, etc).
+>
+This is what the new version of the series does :). It also just sets up
+the ksm directly in md->queue, and completely drops the md->ksm field
+(because unless I'm misunderstanding things, each DM device is
+associated with exactly one queue).
 
-https://lore.kernel.org/linux-block/20201015214632.41951-5-satyat@google.com/
+Btw, the new version is at
 
-> Switching to a pointer will be less so, but even still it might be best
-> to either find a hole in the struct (not looked recently, but there may
-> not be one) or simply put it at the end of the structure.
-> 
-> The pahole utility is very useful for this kind of struct member
-> placement, etc.  But it is increasingly unavailable in modern Linux
-> distros...
-> 
+https://lore.kernel.org/linux-block/20201015214632.41951-1-satyat@google.com/
+
 > Mike
 > 
