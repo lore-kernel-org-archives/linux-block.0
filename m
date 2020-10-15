@@ -2,109 +2,61 @@ Return-Path: <SRS0=w0su=DW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7EE0C433E7
-	for <linux-block@archiver.kernel.org>; Thu, 15 Oct 2020 07:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB44C04EBE
+	for <linux-block@archiver.kernel.org>; Thu, 15 Oct 2020 08:03:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54C4622249
-	for <linux-block@archiver.kernel.org>; Thu, 15 Oct 2020 07:59:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 235A22224E
+	for <linux-block@archiver.kernel.org>; Thu, 15 Oct 2020 08:03:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="N1EfMwPh"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mMRHnNZT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729979AbgJOH7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Oct 2020 03:59:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53056 "EHLO
+        id S2387428AbgJOIC7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Oct 2020 04:02:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729184AbgJOH7N (ORCPT
+        with ESMTP id S1728048AbgJOIC6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Oct 2020 03:59:13 -0400
+        Thu, 15 Oct 2020 04:02:58 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E4DC061755;
-        Thu, 15 Oct 2020 00:59:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6477EC061755;
+        Thu, 15 Oct 2020 01:02:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=PRz1qStSSoVUDOFVhMhmjYK5kRbHYbzYS7mP6GZbHmY=; b=N1EfMwPhf3TH8UisGkms6CSNr4
-        PNofhyxkf2+vwiKwqsIXaJ1TiADasNATnVOetmTEMYsK1vxtm5nbaZTwKf0rPDi4k/jt3qMtYGBDT
-        iiJbRsECo0DyW6Gz4e2Xt5jy0wRG4bPbHLq7vpEHyJbK0tG8Aenbj6ea6qTn/18fsWgqMjqZW1DY3
-        k4yj4JtYY3OaK+LulzHDFHIObzRz/q0fwnGbNNuL4nIpfMOodDC5lpfNir+Kf0t2S82o0FdHnWyWb
-        BeRmeHKrHVHme4KKAkgRlaHxMn58p5ZvrUxaXiwBAYZ3WfkFtIDhP3lqpyJYm0KvXzc4ph36L7sVY
-        zIO9xCYQ==;
+        bh=a2qZql200AZN5N8nLwRfRT3TJyI5WyTogEl+yUVcMaU=; b=mMRHnNZTH9o/HtpUjP8YHNIQyp
+        AsR7PsYskBsLyou/+zQT+n+HEg36cIqGJo4jK+hwKhZ6+up4QpErlS2U5uPhGAMXxmA3H11U0UNYb
+        1zJkNa5i6EcfKih1iPRHJfuNEg9ub8J7V9cICfb3i3ze+7ssw6/V0nKuUGS7SOkzZef6WPMlrDx0p
+        EDKti4gagCtiMFFd/3tPfO5iHN33GZmMVpj3tNBlQsID/rHbQeP7zzyp01dFUB3WMnNCXwxYlJDvg
+        1PEKzLUSzj2WDjb+BWXqgZcS2of6pFNVLrq8IjyCFbSd7zYsuYq42W2SvUMAlTxq5kC6pxaKJDwDs
+        1j6BdwiQ==;
 Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kSyAF-0007uN-A2; Thu, 15 Oct 2020 07:59:07 +0000
-Date:   Thu, 15 Oct 2020 08:59:07 +0100
+        id 1kSyDu-0008AD-QZ; Thu, 15 Oct 2020 08:02:54 +0000
+Date:   Thu, 15 Oct 2020 09:02:54 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc:     axboe@kernel.dk, hch@infradead.org, viro@zeniv.linux.org.uk,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        ming.lei@redhat.com, joseph.qi@linux.alibaba.com,
-        xiaoguang.wang@linux.alibaba.com
-Subject: Re: [v2 2/2] block,iomap: disable iopoll when split needed
-Message-ID: <20201015075907.GB30117@infradead.org>
-References: <20201015074031.91380-1-jefflexu@linux.alibaba.com>
- <20201015074031.91380-3-jefflexu@linux.alibaba.com>
+To:     Nabeel M Mohamed <nmeeramohide@micron.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-mm@kvack.org,
+        linux-nvdimm@lists.01.org, smoyer@micron.com, gbecker@micron.com,
+        plabat@micron.com, jgroves@micron.com
+Subject: Re: [PATCH v2 00/22] add Object Storage Media Pool (mpool)
+Message-ID: <20201015080254.GA31136@infradead.org>
+References: <20201012162736.65241-1-nmeeramohide@micron.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201015074031.91380-3-jefflexu@linux.alibaba.com>
+In-Reply-To: <20201012162736.65241-1-nmeeramohide@micron.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 15, 2020 at 03:40:31PM +0800, Jeffle Xu wrote:
-> Both blkdev fs and iomap-based fs (ext4, xfs, etc.) currently support
-> sync iopoll. One single bio can contain at most BIO_MAX_PAGES, i.e. 256
-> bio_vec. If the input iov_iter contains more than 256 segments, then
-> the IO request described by this iov_iter will be split into multiple
-> bios, which may cause potential deadlock for sync iopoll.
-> 
-> When it comes to sync iopoll, the bio is submitted without REQ_NOWAIT
-> flag set and the process may hang in blk_mq_get_tag() if the input
-> iov_iter has to be split into multiple bios and thus rapidly exhausts
-> the queue depth. The process has to wait for the completion of the
-> previously allocated requests, which should be done by the following
-> sync polling, and thus causing a deadlock.
-> 
-> Actually there's subtle difference between the behaviour of handling
-> HIPRI IO of blkdev and iomap, when the input iov_iter need to split
-> into multiple bios. blkdev will set REQ_HIPRI for only the last split
-> bio, leaving the previous bio queued into normal hardware queues, which
-> will not cause the trouble described above though. iomap will set
-> REQ_HIPRI for all bios split from one iov_iter, and thus may cause the
-> potential deadlock decribed above.
-> 
-> Disable iopoll when one request need to be split into multiple bios.
-> Though blkdev may not suffer the problem, still it may not make much
-> sense to iopoll for big IO, since iopoll is initially for small size,
-> latency sensitive IO.
-> 
-> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-> ---
->  fs/block_dev.c       | 7 +++++++
->  fs/iomap/direct-io.c | 9 ++++++++-
->  2 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 9e84b1928b94..a8a52cab15ab 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -491,6 +491,13 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
->  	if (is_sync_kiocb(iocb) && nr_pages <= BIO_MAX_PAGES)
->  		return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
->  
-> +	/*
-> +	 * IOpoll is initially for small size, latency sensitive IO.
-> +	 * Disable iopoll if split needed.
-> +	 */
-> +	if (nr_pages > BIO_MAX_PAGES)
-> +		iocb->ki_flags &= ~IOCB_HIPRI;
-
-more pages than BIO_MAX_PAGES don't imply a split because we can
-physically merge pages into a single vector (yes, BIO_MAX_PAGES is
-utterly misnamed now).
+I don't think this belongs into the kernel.  It is a classic case for
+infrastructure that should be built in userspace.  If anything is
+missing to implement it in userspace with equivalent performance we
+need to improve out interfaces, although io_uring should cover pretty
+much everything you need.
