@@ -2,140 +2,146 @@ Return-Path: <SRS0=I4RS=DX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B30C433E7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Oct 2020 12:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6798C433E7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Oct 2020 13:30:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85DBE207DE
-	for <linux-block@archiver.kernel.org>; Fri, 16 Oct 2020 12:52:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjfIj8Ml"
+	by mail.kernel.org (Postfix) with ESMTP id 9770720848
+	for <linux-block@archiver.kernel.org>; Fri, 16 Oct 2020 13:30:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406603AbgJPMwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Oct 2020 08:52:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28230 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2406340AbgJPMwQ (ORCPT
+        id S2408037AbgJPNad (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Oct 2020 09:30:33 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:35428 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2407228AbgJPNad (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Oct 2020 08:52:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602852734;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z0/LoGe906XEgLwCWaskAdP2HbSkFXb4cQI3gy/W0QA=;
-        b=cjfIj8MlHkAuCgV9On72mjfsMvj0b+DE9VJsjp7p97CiIPd0a/wzfeIvYpxsnthlKuaKk0
-        HgbIvCUHg/MzunMRs6tJDAXUYHoXxNimgoEeJBnVdJy9fzJcgRWfQTb4KlFyhLolZNMcg+
-        Piap7UuBgBmjUQv4ruegietwmHwgi3A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-e8fknLUeOEGE7zKF53MdjQ-1; Fri, 16 Oct 2020 08:52:10 -0400
-X-MC-Unique: e8fknLUeOEGE7zKF53MdjQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A26288EF31;
-        Fri, 16 Oct 2020 12:52:06 +0000 (UTC)
-Received: from T590 (ovpn-12-93.pek2.redhat.com [10.72.12.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EDB5427C21;
-        Fri, 16 Oct 2020 12:51:55 +0000 (UTC)
-Date:   Fri, 16 Oct 2020 20:51:51 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+        Fri, 16 Oct 2020 09:30:33 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UCD.CAZ_1602855027;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UCD.CAZ_1602855027)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 16 Oct 2020 21:30:28 +0800
+Subject: Re: [PATCH v3 2/2] block,iomap: disable iopoll when split needed
+To:     Ming Lei <ming.lei@redhat.com>
 Cc:     axboe@kernel.dk, hch@infradead.org, viro@zeniv.linux.org.uk,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         joseph.qi@linux.alibaba.com, xiaoguang.wang@linux.alibaba.com
-Subject: Re: [PATCH v3 1/2] block: disable iopoll for split bio
-Message-ID: <20201016125151.GC1218835@T590>
 References: <20201016091851.93728-1-jefflexu@linux.alibaba.com>
- <20201016091851.93728-2-jefflexu@linux.alibaba.com>
+ <20201016091851.93728-3-jefflexu@linux.alibaba.com>
+ <20201016102625.GA1218835@T590>
+ <d6d6b80b-6b16-637a-fac3-7f5a161b8f51@linux.alibaba.com>
+ <20201016123925.GB1218835@T590>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <e9d477ed-df87-d46a-5a81-f3fb377e4233@linux.alibaba.com>
+Date:   Fri, 16 Oct 2020 21:30:27 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201016091851.93728-2-jefflexu@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20201016123925.GB1218835@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 16, 2020 at 05:18:50PM +0800, Jeffle Xu wrote:
-> iopoll is initially for small size, latency sensitive IO. It doesn't
-> work well for big IO, especially when it needs to be split to multiple
-> bios. In this case, the returned cookie of __submit_bio_noacct_mq() is
-> indeed the cookie of the last split bio. The completion of *this* last
-> split bio done by iopoll doesn't mean the whole original bio has
-> completed. Callers of iopoll still need to wait for completion of other
-> split bios.
-> 
-> Besides bio splitting may cause more trouble for iopoll which isn't
-> supposed to be used in case of big IO.
-> 
-> iopoll for split bio may cause potential race if CPU migration happens
-> during bio submission. Since the returned cookie is that of the last
-> split bio, polling on the corresponding hardware queue doesn't help
-> complete other split bios, if these split bios are enqueued into
-> different hardware queues. Since interrupts are disabled for polling
-> queues, the completion of these other split bios depends on timeout
-> mechanism, thus causing a potential hang.
-> 
-> iopoll for split bio may also cause hang for sync polling. Currently
-> both the blkdev and iomap-based fs (ext4/xfs, etc) support sync polling
-> in direct IO routine. These routines will submit bio without REQ_NOWAIT
-> flag set, and then start sync polling in current process context. The
-> process may hang in blk_mq_get_tag() if the submitted bio has to be
-> split into multiple bios and can rapidly exhaust the queue depth. The
-> process are waiting for the completion of the previously allocated
-> requests, which should be reaped by the following polling, and thus
-> causing a deadlock.
-> 
-> To avoid these subtle trouble described above, just disable iopoll for
-> split bio.
-> 
-> Suggested-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-> ---
->  block/blk-merge.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index bcf5e4580603..924db7c428b4 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -279,6 +279,20 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
->  	return NULL;
->  split:
->  	*segs = nsegs;
-> +
-> +	/*
-> +	 * bio splitting may cause more trouble for iopoll which isn't supposed
-> +	 * to be used in case of big IO.
-> +	 * iopoll is initially for small size, latency sensitive IO. It doesn't
-> +	 * work well for big IO, especially when it needs to be split to multiple
-> +	 * bios. In this case, the returned cookie of __submit_bio_noacct_mq()
-> +	 * is indeed the cookie of the last split bio. The completion of *this*
-> +	 * last split bio done by iopoll doesn't mean the whole original bio has
-> +	 * completed. Callers of iopoll still need to wait for completion of
-> +	 * other split bios.
-> +	 */
-> +	bio->bi_opf &= ~REQ_HIPRI;
-> +
->  	return bio_split(bio, sectors, GFP_NOIO, bs);
->  }
 
-The above change may not be enough, since caller of submit_bio() still
-can call into blk_poll() even though REQ_HIPRI is cleared for splitted
-bio, for avoiding this issue:
+On 10/16/20 8:39 PM, Ming Lei wrote:
+> On Fri, Oct 16, 2020 at 07:02:44PM +0800, JeffleXu wrote:
+>> On 10/16/20 6:26 PM, Ming Lei wrote:
+>>> On Fri, Oct 16, 2020 at 05:18:51PM +0800, Jeffle Xu wrote:
+>>>> Both blkdev fs and iomap-based fs (ext4, xfs, etc.) currently support
+>>>> sync iopoll. One single bio can contain at most BIO_MAX_PAGES, i.e. 256
+>>>> bio_vec. If the input iov_iter contains more than 256 segments, then
+>>>> one dio will be split into multiple bios, which may cause potential
+>>>> deadlock for sync iopoll.
+>>>>
+>>>> When it comes to sync iopoll, the bio is submitted without REQ_NOWAIT
+>>>> flag set and the process may hang in blk_mq_get_tag() if the dio needs
+>>>> to be split into multiple bios and thus can rapidly exhausts the queue
+>>>> depth. The process has to wait for the completion of the previously
+>>>> allocated requests, which should be reaped by the following sync
+>>>> polling, and thus causing a deadlock.
+>>>>
+>>>> In fact there's a subtle difference of handling of HIPRI IO between
+>>>> blkdev fs and iomap-based fs, when dio need to be split into multiple
+>>>> bios. blkdev fs will set REQ_HIPRI for only the last split bio, leaving
+>>>> the previous bios queued into normal hardware queues, and not causing
+>>>> the trouble described above. iomap-based fs will set REQ_HIPRI for all
+>>>> split bios, and thus may cause the potential deadlock decribed above.
+>>>>
+>>>> Thus disable iopoll when one dio need to be split into multiple bios.
+>>>> Though blkdev fs may not suffer this issue, still it may not make much
+>>>> sense to iopoll for big IO, since iopoll is initially for small size,
+>>>> latency sensitive IO.
+>>>>
+>>>> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+>>>> ---
+>>>>    fs/block_dev.c       | 7 +++++++
+>>>>    fs/iomap/direct-io.c | 8 ++++++++
+>>>>    2 files changed, 15 insertions(+)
+>>>>
+>>>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>>>> index 9e84b1928b94..1b56b39e35b5 100644
+>>>> --- a/fs/block_dev.c
+>>>> +++ b/fs/block_dev.c
+>>>> @@ -436,6 +436,13 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+>>>>    			break;
+>>>>    		}
+>>>> +		/*
+>>>> +		 * The current dio need to be split into multiple bios here.
+>>>> +		 * iopoll is initially for small size, latency sensitive IO,
+>>>> +		 * and thus disable iopoll if split needed.
+>>>> +		 */
+>>>> +		iocb->ki_flags &= ~IOCB_HIPRI;
+>>>> +
+>>> Not sure if it is good to clear IOCB_HIPRI of iocb, since it is usually
+>>> maintained by upper layer code(io_uring, aio, ...) and we shouldn't
+>>> touch this flag here.
+>> If we queue bios into the DEFAULT hardware queue, but leaving the
+>> corresponding kiocb->ki_flags's
+>>
+>> IOCB_HIPRI set (exactly what the first patch does), is this another
+>> inconsistency?
+> My question is that if it is good for this code to clear IOCB_HIPRI of iocb,
+> given this is the 1st such usage. And does io_uring implementation expect
+> the flag to be cleared by lower layer?
 
-- Either we may add check in blk_poll() to only allow hctx with HCTX_TYPE_POLL
-to poll,
-- or return BLK_QC_T_NONE from blk_mq_submit_bio() if REQ_HIPRI is cleared.
+I know your point. I will check code in io_uring later.
 
 
-
-thanks,
-Ming
-
+>
+>> Please consider the following code snippet from __blkdev_direct_IO()
+>>
+>> ```
+>> 	for (;;) {
+>> 		set_current_state(TASK_UNINTERRUPTIBLE);
+>> 		if (!READ_ONCE(dio->waiter))
+>> 			break;
+>>
+>> 		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+>> 		    !blk_poll(bdev_get_queue(bdev), qc, true))
+>> 			blk_io_schedule();
+>> 	}
+>> ```
+>>
+>> The IOCB_HIPRI flag is still set in iocb->ki_flags, but the corresponding
+>> bios are queued into DEFAULT hardware queue since the first patch.
+>> blk_poll() is still called in this case.
+> It may be handled in the following way:
+>
+>   		if (!((iocb->ki_flags & IOCB_HIPRI) && !dio->multi_bio) ||
+>   		    !blk_poll(bdev_get_queue(bdev), qc, true))
+>   				blk_io_schedule();
+>
+> BTW, even for single bio with IOCB_HIPRI, the single fs bio can still be
+> splitted, and blk_poll() will be called too.
+Yes that's exactly I'm concerned and I've seen your comments in patch 1. 
+Thanks.
+>
+>
+> Thanks,
+> Ming
