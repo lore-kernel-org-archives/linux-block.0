@@ -2,72 +2,139 @@ Return-Path: <SRS0=I4RS=DX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEDC1C433E7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Oct 2020 09:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0D02C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 16 Oct 2020 10:26:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DDFA20EDD
-	for <linux-block@archiver.kernel.org>; Fri, 16 Oct 2020 09:19:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42DB02084C
+	for <linux-block@archiver.kernel.org>; Fri, 16 Oct 2020 10:26:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KEz91sOJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406066AbgJPJSx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Oct 2020 05:18:53 -0400
-Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:54017 "EHLO
-        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2405946AbgJPJSx (ORCPT
+        id S2395281AbgJPK0q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Oct 2020 06:26:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58089 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2395282AbgJPK0q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Oct 2020 05:18:53 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R631e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UCBNGHj_1602839931;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UCBNGHj_1602839931)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 16 Oct 2020 17:18:51 +0800
-From:   Jeffle Xu <jefflexu@linux.alibaba.com>
-To:     axboe@kernel.dk, hch@infradead.org, viro@zeniv.linux.org.uk
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        ming.lei@redhat.com, joseph.qi@linux.alibaba.com,
-        xiaoguang.wang@linux.alibaba.com
-Subject: [PATCH v3 0/2] block, iomap: disable iopoll for split bio
-Date:   Fri, 16 Oct 2020 17:18:49 +0800
-Message-Id: <20201016091851.93728-1-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
+        Fri, 16 Oct 2020 06:26:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602844004;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1C4rOLd47+tSC7UT866Mf329X/wl57JsIP5mIOWf2N4=;
+        b=KEz91sOJz5Off9QqCvgo+i0cncfuNIXqKRG5JsbcUBEPvJFtzZ+CKzMYk8a8O4lxCSWc8J
+        6MDU8Dx4jgLc5Das+R/lcYSQilZ1NWqkzpUpXAuboxY/DGJ+bBGBKPZaTZJbZcK8fgO+af
+        TOReZove19kohxWZ9l5iS0vR3AmUeaE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-165-beDgsN6lNA-zUZx3z1E-fA-1; Fri, 16 Oct 2020 06:26:40 -0400
+X-MC-Unique: beDgsN6lNA-zUZx3z1E-fA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D9D3ADC26;
+        Fri, 16 Oct 2020 10:26:38 +0000 (UTC)
+Received: from T590 (ovpn-12-93.pek2.redhat.com [10.72.12.93])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 518D176649;
+        Fri, 16 Oct 2020 10:26:29 +0000 (UTC)
+Date:   Fri, 16 Oct 2020 18:26:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     axboe@kernel.dk, hch@infradead.org, viro@zeniv.linux.org.uk,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, xiaoguang.wang@linux.alibaba.com
+Subject: Re: [PATCH v3 2/2] block,iomap: disable iopoll when split needed
+Message-ID: <20201016102625.GA1218835@T590>
+References: <20201016091851.93728-1-jefflexu@linux.alibaba.com>
+ <20201016091851.93728-3-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201016091851.93728-3-jefflexu@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patchset is to fix the potential hang occurred in sync polling.
+On Fri, Oct 16, 2020 at 05:18:51PM +0800, Jeffle Xu wrote:
+> Both blkdev fs and iomap-based fs (ext4, xfs, etc.) currently support
+> sync iopoll. One single bio can contain at most BIO_MAX_PAGES, i.e. 256
+> bio_vec. If the input iov_iter contains more than 256 segments, then
+> one dio will be split into multiple bios, which may cause potential
+> deadlock for sync iopoll.
+> 
+> When it comes to sync iopoll, the bio is submitted without REQ_NOWAIT
+> flag set and the process may hang in blk_mq_get_tag() if the dio needs
+> to be split into multiple bios and thus can rapidly exhausts the queue
+> depth. The process has to wait for the completion of the previously
+> allocated requests, which should be reaped by the following sync
+> polling, and thus causing a deadlock.
+> 
+> In fact there's a subtle difference of handling of HIPRI IO between
+> blkdev fs and iomap-based fs, when dio need to be split into multiple
+> bios. blkdev fs will set REQ_HIPRI for only the last split bio, leaving
+> the previous bios queued into normal hardware queues, and not causing
+> the trouble described above. iomap-based fs will set REQ_HIPRI for all
+> split bios, and thus may cause the potential deadlock decribed above.
+> 
+> Thus disable iopoll when one dio need to be split into multiple bios.
+> Though blkdev fs may not suffer this issue, still it may not make much
+> sense to iopoll for big IO, since iopoll is initially for small size,
+> latency sensitive IO.
+> 
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> ---
+>  fs/block_dev.c       | 7 +++++++
+>  fs/iomap/direct-io.c | 8 ++++++++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 9e84b1928b94..1b56b39e35b5 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -436,6 +436,13 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+>  			break;
+>  		}
+>  
+> +		/*
+> +		 * The current dio need to be split into multiple bios here.
+> +		 * iopoll is initially for small size, latency sensitive IO,
+> +		 * and thus disable iopoll if split needed.
+> +		 */
+> +		iocb->ki_flags &= ~IOCB_HIPRI;
+> +
 
-Please refer the following link for background info and the v1 patch:
-https://patchwork.kernel.org/project/linux-block/patch/20201013084051.27255-1-jefflexu@linux.alibaba.com/
+Not sure if it is good to clear IOCB_HIPRI of iocb, since it is usually
+maintained by upper layer code(io_uring, aio, ...) and we shouldn't
+touch this flag here.
 
-The first patch disables iopoll for split bio in block layer, which is
-suggested by Ming Lei.
+>  		if (!dio->multi_bio) {
+>  			/*
+>  			 * AIO needs an extra reference to ensure the dio
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index c1aafb2ab990..46668cceefd2 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -308,6 +308,14 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  		copied += n;
+>  
+>  		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
+> +		/*
+> +		 * The current dio need to be split into multiple bios here.
+> +		 * iopoll is initially for small size, latency sensitive IO,
+> +		 * and thus disable iopoll if split needed.
+> +		 */
+> +		if (nr_pages)
+> +			dio->iocb->ki_flags &= ~IOCB_HIPRI;
 
-The second patch disables iopoll when one dio need to be split into
-multiple bios.
+Same concern as above.
 
-
-
-changes since v2:
-- tune the line length of patch 1
-- fix the condition checking whether split needed in patch 2
-
-changes since v1:
-- adopt the fix suggested by Ming Lei, to disable iopoll for split bio directly
-- disable iopoll in direct IO routine of blkdev fs and iomap
-
-Jeffle Xu (2):
-  block: disable iopoll for split bio
-  block,iomap: disable iopoll when split needed
-
- block/blk-merge.c    | 14 ++++++++++++++
- fs/block_dev.c       |  7 +++++++
- fs/iomap/direct-io.c |  8 ++++++++
- 3 files changed, 29 insertions(+)
-
--- 
-2.27.0
+Thanks,
+Ming
 
