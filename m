@@ -2,103 +2,86 @@ Return-Path: <SRS0=uz0K=DY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE03C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 17 Oct 2020 07:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D447C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 17 Oct 2020 14:11:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BDDD2068E
-	for <linux-block@archiver.kernel.org>; Sat, 17 Oct 2020 07:37:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C214820756
+	for <linux-block@archiver.kernel.org>; Sat, 17 Oct 2020 14:11:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BRyAxexz"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="T1tIoroi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391502AbgJQHhu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Oct 2020 03:37:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43852 "EHLO
+        id S2438281AbgJQOL2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Oct 2020 10:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390880AbgJQHhu (ORCPT
+        with ESMTP id S2438243AbgJQOL1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Oct 2020 03:37:50 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27FADC061755;
-        Sat, 17 Oct 2020 00:37:50 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id a17so2577048pju.1;
-        Sat, 17 Oct 2020 00:37:50 -0700 (PDT)
+        Sat, 17 Oct 2020 10:11:27 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5683C061755
+        for <linux-block@vger.kernel.org>; Sat, 17 Oct 2020 07:11:26 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id n9so3166231pgf.9
+        for <linux-block@vger.kernel.org>; Sat, 17 Oct 2020 07:11:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=V7WTw4kQ5sRpBkhDX+SWEg0pWl+mUzy6Zy/Hpg45vAU=;
-        b=BRyAxexzDzzzMw90bVD+Z+pge6fXwE2rberWdEfLDpgLwS1B/X2D0J/LESkoyZXDR+
-         YEX+R5tyYbmirDWhIR41z3HsZUzfP/bybG0s9aekel9iUkNgWKyLge0RszpfVhOpRNxD
-         CLBew4qcavwez8YtqabBR14x7FNxlSo9CjhYB/vxOJzPYy5DnNCKuDoxh4Jl5DH7Luyp
-         Fyf+zzjNWIRgTDKZccMpqQsw/9jszwYUwkOmfzILb8A+cGJKTdImNphyKeJxo7UFCivW
-         L3bTVo4+kCVPa2Y/5uJcbqv+T0+p+tLzatD1faaSESKxd6PyGv8so38qPaJK5r1PnlUb
-         Vq2Q==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=12Ji5Bjg6Q6+5eR/BATj6e1cUfsvLG8jGphkcoZtqEs=;
+        b=T1tIoroiskrApvot4qmdEcSv676E9+PsPQrL8UIy19cwwPYy7m9Wf4CjAzcOuw/528
+         9SDZFrfwYhXT1Gk/ps3UXn0i0esdabOCGTOHxBJCS13qdW7GnmcjzD/S6WZ9x74WNsEd
+         hZ8Amf2RKauFD7DqiPnNFslTR6ox0JGb6NKieB9W+DKm5J7Wjm/OX5dCcpCzpkGJHHAi
+         4XJVYurZoFmEH5krNbqD4q9y+Scw3K1SqJlACTSFUgAJ36+sFqdBcBGhvQPcsswnLxJW
+         5lY1rV8czhvnffMOBV7hFLtzOSwykhvBPooA+cllVvAzI65cgogdBnvXxn1F/Mg/22py
+         jmrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=V7WTw4kQ5sRpBkhDX+SWEg0pWl+mUzy6Zy/Hpg45vAU=;
-        b=dOm7hKfR/+uqoXtNqB7q4YBBlNFgkMR4ydWq71HASO7RIfk6p+gpJfkFxgDK3geiQM
-         f8FNrZ1E+Ip6cxvq71l1tmNz30A2w+X2Lnug/QM3xrDvaWw3F6Z5aZa7r6gRrwooMzuT
-         YDUqeHBOCFw/CpKqpffntVjtDeDc7wn1fx45gNxUGSvR8t+4M7BIkTSVSBFifn32yBEO
-         u0zwCk0XdiHR/N4a5VqWF/0qs55g42KMb6hYVleGkGjrv0N3eYsnusNkWMkd+4spZMkr
-         5geqbLwNcMZbtlY9r6HEgTV5J0c5eoCG6KmOnyTGmhpHuWsTB33xx1VXljCn/4yoMigE
-         G1pg==
-X-Gm-Message-State: AOAM533F928F7RR6iXUfwe6A8VW221Xabq/wbcTwIt5DEda4FwDCQPMx
-        lcFaN3rvjJmu1dD+zk6rOnY=
-X-Google-Smtp-Source: ABdhPJz1yDCnaAkjxMzBSI/408KpVtWPUAHlzCEZvFya28EWo8I7aw/XRgxmRLP75R6W60S0O75D6A==
-X-Received: by 2002:a17:90a:6282:: with SMTP id d2mr8099887pjj.86.1602920269684;
-        Sat, 17 Oct 2020 00:37:49 -0700 (PDT)
-Received: from localhost.localdomain.localdomain (li885-200.members.linode.com. [45.56.83.200])
-        by smtp.gmail.com with ESMTPSA id z185sm4815539pfz.32.2020.10.17.00.37.40
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 17 Oct 2020 00:37:49 -0700 (PDT)
-From:   Jeff Xie <chongguiguzi@gmail.com>
-X-Google-Original-From: Jeff Xie <huan.xie@suse.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        chongguiguzi@gmail.com, huan.xie@suse.com
-Subject: [PATCH] block: use helper function bio_copy_dev to __bio_clone_fast
-Date:   Sat, 17 Oct 2020 15:37:26 +0800
-Message-Id: <1602920246-25131-1-git-send-email-huan.xie@suse.com>
-X-Mailer: git-send-email 1.8.3.1
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=12Ji5Bjg6Q6+5eR/BATj6e1cUfsvLG8jGphkcoZtqEs=;
+        b=uLTouT+uG6nL0z+jMZLV6VfqN5TgVX+HXntS58Qz7dMDzu2RbfStxJeW1Wj1s9jt9n
+         LHnGbFJPq20a4zApIkupeLDUdjxHYNHJrhAMkG+ZHQnVkXukovRl1JFABNIbLYNBITc+
+         2+ko/WGCAG5pT86Cw1L41Fuv07CDLMMwj/OMdU6RtiZZKQsYxNOcwL2+pjPRaVPQh6ro
+         qZNv1B+MMu/PMekJ+UmLK4HeQigWTQ56Fk1jDGAtJm0TiVNvB9778AvYCooDhymffPm7
+         ieRW7dBPTxnz7ivoqnWl28FmPKvyYPeTf9LHa+BEpfq6mB/Ipr0OFWKFSj9+NQ5Jw13f
+         cl1Q==
+X-Gm-Message-State: AOAM531HjXf870yxG1KTD0fXc8+eMe2hUXp4sFClZyPJ5dqH0r/yFAFf
+        Xu44y1WRvZDV5wOGX0ZOoqazDA==
+X-Google-Smtp-Source: ABdhPJwCzxxjLR6d5+9u+pKVZ98sOcfRf9TTR3qMd2Wvz49D6bWNcprTvFqEZf2k1myQVqjVb6PZcg==
+X-Received: by 2002:a62:878f:0:b029:155:ec80:9658 with SMTP id i137-20020a62878f0000b0290155ec809658mr8501357pfe.57.1602943886134;
+        Sat, 17 Oct 2020 07:11:26 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id f7sm6170615pfd.111.2020.10.17.07.11.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 17 Oct 2020 07:11:25 -0700 (PDT)
+Subject: Re: [PATCH] skd_main: remove unused including <linux/version.h>
+To:     Tian Tao <tiantao6@hisilicon.com>, Damien.LeMoal@wdc.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1602899549-8241-1-git-send-email-tiantao6@hisilicon.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c57d8f33-30d8-61b6-36c7-037211ad9900@kernel.dk>
+Date:   Sat, 17 Oct 2020 08:11:24 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <1602899549-8241-1-git-send-email-tiantao6@hisilicon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have introduced helper function bio_copy_dev. Just use it.
+On 10/16/20 7:52 PM, Tian Tao wrote:
+> Remove including <linux/version.h> that don't need it.
 
-Signed-off-by: Jeff Xie <huan.xie@suse.com>
----
- block/bio.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Applied, thanks.
 
-diff --git a/block/bio.c b/block/bio.c
-index 640d0fb..9fce7df 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -679,8 +679,6 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	 * most users will be overriding ->bi_disk with a new target,
- 	 * so we don't set nor calculate new physical/hw segment counts here
- 	 */
--	bio->bi_disk = bio_src->bi_disk;
--	bio->bi_partno = bio_src->bi_partno;
- 	bio_set_flag(bio, BIO_CLONED);
- 	if (bio_flagged(bio_src, BIO_THROTTLED))
- 		bio_set_flag(bio, BIO_THROTTLED);
-@@ -690,7 +688,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_iter = bio_src->bi_iter;
- 	bio->bi_io_vec = bio_src->bi_io_vec;
- 
--	bio_clone_blkg_association(bio, bio_src);
-+	bio_copy_dev(bio, bio_src);
- 	blkcg_bio_issue_init(bio);
- }
- EXPORT_SYMBOL(__bio_clone_fast);
 -- 
-1.8.3.1
+Jens Axboe
 
