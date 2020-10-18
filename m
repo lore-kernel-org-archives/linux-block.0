@@ -7,46 +7,48 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51698C433E7
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 19:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7ECC43457
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 19:47:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 169D7206CA
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 19:41:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD09C206ED
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 19:47:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603050065;
-	bh=acmOn8DqEDhDyakHFgwde4nbqmaXmf1ElTBFFceAZyo=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=D3t1gGcyEvL/efnVgMD5XYjAezeaAI4wmRjDPsPsEY8pbs8lBE+YAKwBrQvm6fNI6
-	 iPEGb8NxAuFEH2gElAG1LPTez+jsXGhXguklV1l3GTdyR1d+kzySh52oEHaPjVFG1h
-	 dJtvZNq0uWIG+LW2mojla3liAfDkxFAKwXmqaV8c=
+	s=default; t=1603050423;
+	bh=CABQCfiIlkUUv1ROXKZhVMXVjel4c7ecedP+9uIvzSA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=2kuAz3z4qsv6MyaxpGynBfjECThdb1pmGkb6B1N8sYRT4FUT46xw7DZ9aJXoBFtrN
+	 8bcllVeaRNggTIT+jW0A75Ft92tCgcS6q9PwqutcsBnszeHtgPl1y7D/NB6TTTsvd/
+	 cJplZK5pGEqwoncS6rlfxNUt10UF+vd1jW0ZiaGA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730703AbgJRTYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Oct 2020 15:24:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38290 "EHLO mail.kernel.org"
+        id S1733299AbgJRTqw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Oct 2020 15:46:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35402 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730445AbgJRTYT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Oct 2020 15:24:19 -0400
+        id S1729891AbgJRTWf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Oct 2020 15:22:35 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AE94E2137B;
-        Sun, 18 Oct 2020 19:24:18 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4B7D8222E7;
+        Sun, 18 Oct 2020 19:22:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603049059;
-        bh=acmOn8DqEDhDyakHFgwde4nbqmaXmf1ElTBFFceAZyo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=L04Q6Zrc5gxwjBB9N54ITtyLYbTWuJD09dnf6Z20rfv0kfWWJ6buLUvcCu8MC0IIk
-         lksPhReK3oDaXi3vwT2irbRvlcrxlTt+dI2hgcLPK6w/6JpaRRtpCG5MSoi3kvWPvT
-         LZVByhpJFKrejrlcQG8Yp/XIuR98d2iONfr4mvlo=
+        s=default; t=1603048955;
+        bh=CABQCfiIlkUUv1ROXKZhVMXVjel4c7ecedP+9uIvzSA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=tVwrnsLPIZ+H23ihLQOoSvsE+WlycDO+gLIXLtHqv5J5MtEkIuWiHaiCDiTBP1d9v
+         J0lZM5EWff8AgrL52BKcCIrnx4GNn3+ywN+XKB1K81eiAQzAJJNU5nvcNJ20LshWxA
+         Rs/FVExzKSurt+PJKQn6F34P9x+eGehtLWqpQ3bI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 01/56] block: ratelimit handle_bad_sector() message
-Date:   Sun, 18 Oct 2020 15:23:22 -0400
-Message-Id: <20201018192417.4055228-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 02/80] block: ratelimit handle_bad_sector() message
+Date:   Sun, 18 Oct 2020 15:21:13 -0400
+Message-Id: <20201018192231.4054535-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201018192231.4054535-1-sashal@kernel.org>
+References: <20201018192231.4054535-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -75,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index ce3710404544c..445b878e35194 100644
+index 81aafb601df06..d2213220099d3 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -2127,11 +2127,10 @@ static void handle_bad_sector(struct bio *bio, sector_t maxsector)
+@@ -743,11 +743,10 @@ static void handle_bad_sector(struct bio *bio, sector_t maxsector)
  {
  	char b[BDEVNAME_SIZE];
  
