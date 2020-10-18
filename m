@@ -2,160 +2,103 @@ Return-Path: <SRS0=pi9Y=DZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6154C43457
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 17:14:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA64BC43467
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 18:59:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE22B2063A
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 17:14:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4636D22266
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 18:59:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qhWiWAYm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726831AbgJRROD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Oct 2020 13:14:03 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:52039 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726725AbgJRRNu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Oct 2020 13:13:50 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 6545520425C;
-        Sun, 18 Oct 2020 19:13:48 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id jD2poka938Cf; Sun, 18 Oct 2020 19:13:46 +0200 (CEST)
-Received: from xtwo70.bingwo.ca (host-104-157-204-209.dyn.295.ca [104.157.204.209])
-        by smtp.infotech.no (Postfix) with ESMTPA id 9678D204258;
-        Sun, 18 Oct 2020 19:13:43 +0200 (CEST)
-From:   Douglas Gilbert <dgilbert@interlog.com>
-To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     martin.petersen@oracle.com, axboe@kernel.dk, bvanassche@acm.org,
-        bostroesser@gmail.com
-Subject: [PATCH v2 2/4] scatterlist: add sgl_copy_sgl() function
-Date:   Sun, 18 Oct 2020 13:13:34 -0400
-Message-Id: <20201018171336.63839-3-dgilbert@interlog.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201018171336.63839-1-dgilbert@interlog.com>
-References: <20201018171336.63839-1-dgilbert@interlog.com>
+        id S1727525AbgJRS7x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Oct 2020 14:59:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57724 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727427AbgJRS7w (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Oct 2020 14:59:52 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790A6C061755;
+        Sun, 18 Oct 2020 11:59:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=q0BhqrN3gbd6Z80uxUuHxnuOGNa3MQpvn/ujKpbjoKc=; b=qhWiWAYm9fZ2KNDR/Yk3WeXFl4
+        HF2RciAjYHBQMCf3sjKhvFkXSfibnOaNYa7rSxO4GAjMdOb5lKFie8w5W48ySlrw8CCYSSnOZO0Xg
+        5v+vzHZ7K/VxCxY2aBAso6UvZLXpaapi00aBgR18RXogoXyWfK3p9m9265NrgW55bmABmFf/ljB+D
+        9Af5uL1UZOzL5n8T3eza+cGiO5HDs2I27gnorvuwnA1XSsP05jdLks+n6C8PrE6p/2IOOkRu9s0Qf
+        2gQIITEDGF8BYWCD3hQsOGqb9beW/Q62vFU/IQef0kDvAQTCEweywjgtWsVjiKxR3wbF0iuVRtPwK
+        m1h79KbA==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kUDuB-0007Wk-NT; Sun, 18 Oct 2020 18:59:43 +0000
+Date:   Sun, 18 Oct 2020 19:59:43 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     trix@redhat.com
+Cc:     linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
+        clang-built-linux@googlegroups.com, linux-iio@vger.kernel.org,
+        nouveau@lists.freedesktop.org, storagedev@microchip.com,
+        dri-devel@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
+        ath10k@lists.infradead.org, MPT-FusionLinux.pdl@broadcom.com,
+        linux-stm32@st-md-mailman.stormreply.com,
+        usb-storage@lists.one-eyed-alien.net,
+        linux-watchdog@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvdimm@lists.01.org, amd-gfx@lists.freedesktop.org,
+        linux-acpi@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        industrypack-devel@lists.sourceforge.net,
+        linux-pci@vger.kernel.org, spice-devel@lists.freedesktop.org,
+        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-nfc@lists.01.org, linux-pm@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-gpio@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-amlogic@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        platform-driver-x86@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-crypto@vger.kernel.org, patches@opensource.cirrus.com,
+        bpf@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        linux-power@fi.rohmeurope.com
+Subject: Re: [Ocfs2-devel] [RFC] treewide: cleanup unreachable breaks
+Message-ID: <20201018185943.GM20115@casper.infradead.org>
+References: <20201017160928.12698-1-trix@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201017160928.12698-1-trix@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Both the SCSI and NVMe subsystems receive user data from the block
-layer in scatterlist_s (aka scatter gather lists (sgl) which are
-often arrays). If drivers in those subsystems represent storage
-(e.g. a ramdisk) or cache "hot" user data then they may also
-choose to use scatterlist_s. Currently there are no sgl to sgl
-operations in the kernel. Start with a copy.
+On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
+> clang has a number of useful, new warnings see
+> https://urldefense.com/v3/__https://clang.llvm.org/docs/DiagnosticsReference.html__;!!GqivPVa7Brio!Krxz78O3RKcB9JBMVo_F98FupVhj_jxX60ddN6tKGEbv_cnooXc1nnBmchm-e_O9ieGnyQ$ 
 
-Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
----
- include/linux/scatterlist.h |  4 ++
- lib/scatterlist.c           | 74 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 78 insertions(+)
+Please get your IT department to remove that stupidity.  If you can't,
+please send email from a non-Red Hat email address.
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 80178afc2a4a..6649414c0749 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -321,6 +321,10 @@ size_t sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
- size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
- 		       size_t buflen, off_t skip);
- 
-+size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_skip,
-+		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
-+		    size_t n_bytes);
-+
- /*
-  * Maximum number of entries that will be allocated in one piece, if
-  * a list larger than this is required then chaining will be utilized.
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index d5770e7f1030..a0a86059c10e 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -974,3 +974,77 @@ size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
- 	return offset;
- }
- EXPORT_SYMBOL(sg_zero_buffer);
-+
-+/**
-+ * sgl_copy_sgl - Copy over a destination sgl from a source sgl
-+ * @d_sgl:		 Destination sgl
-+ * @d_nents:		 Number of SG entries in destination sgl
-+ * @d_skip:		 Number of bytes to skip in destination before starting
-+ * @s_sgl:		 Source sgl
-+ * @s_nents:		 Number of SG entries in source sgl
-+ * @s_skip:		 Number of bytes to skip in source before starting
-+ * @n_bytes:		 The (maximum) number of bytes to copy
-+ *
-+ * Returns the number of copied bytes.
-+ *
-+ * Notes:
-+ *   Destination arguments appear before the source arguments, as with memcpy().
-+ *
-+ *   Stops copying if either d_sgl, s_sgl or n_bytes is exhausted.
-+ *
-+ *   Since memcpy() is used, overlapping copies (where d_sgl and s_sgl belong
-+ *   to the same sgl and the copy regions overlap) are not supported.
-+ *
-+ *   Large copies are broken into copy segments whose sizes may vary. Those
-+ *   copy segment sizes are chosen by the min3() statement in the code below.
-+ *   Since SG_MITER_ATOMIC is used for both sides, each copy segment is started
-+ *   with kmap_atomic() [in sg_miter_next()] and completed with kunmap_atomic()
-+ *   [in sg_miter_stop()]. This means pre-emption is inhibited for relatively
-+ *   short periods even in very large copies.
-+ *
-+ *   If d_skip is large, potentially spanning multiple d_nents then some
-+ *   integer arithmetic to adjust d_sgl may improve performance. For example
-+ *   if d_sgl is built using sgl_alloc_order(chainable=false) then the sgl
-+ *   will be an array with equally sized segments facilitating that
-+ *   arithmetic. The suggestion applies to s_skip, s_sgl and s_nents as well.
-+ *
-+ **/
-+size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_skip,
-+		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
-+		    size_t n_bytes)
-+{
-+	size_t len;
-+	size_t offset = 0;
-+	struct sg_mapping_iter d_iter, s_iter;
-+
-+	if (n_bytes == 0)
-+		return 0;
-+	sg_miter_start(&s_iter, s_sgl, s_nents, SG_MITER_ATOMIC | SG_MITER_FROM_SG);
-+	sg_miter_start(&d_iter, d_sgl, d_nents, SG_MITER_ATOMIC | SG_MITER_TO_SG);
-+	if (!sg_miter_skip(&s_iter, s_skip))
-+		goto fini;
-+	if (!sg_miter_skip(&d_iter, d_skip))
-+		goto fini;
-+
-+	while (offset < n_bytes) {
-+		if (!sg_miter_next(&s_iter))
-+			break;
-+		if (!sg_miter_next(&d_iter))
-+			break;
-+		len = min3(d_iter.length, s_iter.length, n_bytes - offset);
-+
-+		memcpy(d_iter.addr, s_iter.addr, len);
-+		offset += len;
-+		/* LIFO order (stop d_iter before s_iter) needed with SG_MITER_ATOMIC */
-+		d_iter.consumed = len;
-+		sg_miter_stop(&d_iter);
-+		s_iter.consumed = len;
-+		sg_miter_stop(&s_iter);
-+	}
-+fini:
-+	sg_miter_stop(&d_iter);
-+	sg_miter_stop(&s_iter);
-+	return offset;
-+}
-+EXPORT_SYMBOL(sgl_copy_sgl);
-+
--- 
-2.25.1
+I don't understand why this is a useful warning to fix.  What actual
+problem is caused by the code below?
+
+> return and break
+> 
+>  	switch (c->x86_vendor) {
+>  	case X86_VENDOR_INTEL:
+>  		intel_p5_mcheck_init(c);
+>  		return 1;
+> -		break;
+
+Sure, it's unnecessary, but it's not masking a bug.  It's not unclear.
+Why do we want to enable this warning?
 
