@@ -2,100 +2,121 @@ Return-Path: <SRS0=pi9Y=DZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B06C433E7
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 20:01:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9DAC43467
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 21:50:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBF0422269
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 20:01:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603051269;
-	bh=cq+HexrErJpDokrOjx21YF85E9vSbfnJd5Mi4Q7CgEM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=glpRe/kkyMYNy970kj41MJG5ZWF6Zqm8RzFY66CdcRkmijERFLQJE1zjWAnlHQmew
-	 qUuhXVDOb9ei7o094p6oF0xzpF/JGGxbCBT0VVCQ0EQkuynsXAEhvJU6D6JGFNFKjn
-	 H7SfOZp6o3hBx/z9VpIArOI2VXD7HTLFV9bLEVdk=
+	by mail.kernel.org (Postfix) with ESMTP id 7831522280
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 21:50:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BT6sX70H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727339AbgJRTSO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Oct 2020 15:18:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56026 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726762AbgJRTSL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Oct 2020 15:18:11 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CBE73222B9;
-        Sun, 18 Oct 2020 19:18:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603048690;
-        bh=cq+HexrErJpDokrOjx21YF85E9vSbfnJd5Mi4Q7CgEM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ehTZYdBbVd5DDUAPxNUAWUkDxDhxZIRt7UCr3ONLRaA0Le8tfFhBb0EmsKZLEbAhA
-         iXCERRhTRJKMdK/rZxkZ+tjPgKzwjbVdtxxVoU8k0jiVMwQvDcEZGTj5Ddv4F3aGPQ
-         4SBR8//Xwfm6JQTY7FjtAMU38A+MDENomwF1LK3E=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.9 002/111] block: ratelimit handle_bad_sector() message
-Date:   Sun, 18 Oct 2020 15:16:18 -0400
-Message-Id: <20201018191807.4052726-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201018191807.4052726-1-sashal@kernel.org>
-References: <20201018191807.4052726-1-sashal@kernel.org>
+        id S1728585AbgJRVuP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Oct 2020 17:50:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55738 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726249AbgJRVuO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Oct 2020 17:50:14 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797D3C061755;
+        Sun, 18 Oct 2020 14:50:14 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id m65so4983425qte.11;
+        Sun, 18 Oct 2020 14:50:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LW7NtPMGJ2R8VOhKgzw6sjc10vh2YbY8kQEEkfju8fA=;
+        b=BT6sX70H+s8KhgIkqlKxOTyt7nLW9Zkkp/pWMqwoIwpRPwASphI99ISJJY/DrRq4YB
+         tuxxuQta89p2LltScao7kwUamcV10d6qq0/0GsMri9Y5uCbzF0DQIPVBZym6oh2w8IRp
+         jGv4FzahYM8UB3UvXODpIfq1ilK2uqq9Xd/9k1Vp0D25EYeZvsrsLMiSOVKbh0jHo8ly
+         ZwpyiDfjYzQI7omWM6lYTXWC4WxC4zXCwovEKbG2sVh0lXA3kgHlfvQ9kncK/jS7lzXB
+         WtZ4PQbPMGBo2Fvzsm14b4aTThFD0/Vsyl0CynTIq6qQwMl+W5yJA342KaaYBMt5xICG
+         NkkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LW7NtPMGJ2R8VOhKgzw6sjc10vh2YbY8kQEEkfju8fA=;
+        b=A54fIiuMEzcWU81kWizVMjWexILYSifLNSzkHPsvY2YrLg8OawjexicsjeQJnFnBDX
+         lFgMcBFXA82PdWXGIIPhsA9feRYqx1SsNLbcJ/ziaN4LYnD1cKUMCksOLHy3lFXz5KLL
+         mu9EmHYogFvkDCXUl8CHzXsYLO+k6XJR5vHxIizc57xHGVrJllBoAsjDznA1f3vEv4gq
+         7r/cDjJ56/USRGuhaG/HGaCbsUTFN5E6xSa5feLVxVzOgJvtHqkKZCTYXCcsqR5D9EDP
+         B2OZD0jdfFS8VVd8PckfIcCDEueSt7zf1C/eHHzfQ2kzEXzjmS452U49hb5WZ726v4sf
+         2NGA==
+X-Gm-Message-State: AOAM533U1Tx5J8OhD7nMqzqK4J++qB+CTP2+s6UHp1PSbvAYT+XXA4Gn
+        4VQzZkhSxbqT6YowujhmHWmAgdDYog4L64/VD5A=
+X-Google-Smtp-Source: ABdhPJw59Z9ZSI7YkUnrDX/NzYUwLZIQMERPV41io/elXdvNyA/Ph+eIMdFGNAEYy/TP8jUOuq9oIUb3paHWMlURueE=
+X-Received: by 2002:aed:2983:: with SMTP id o3mr12423656qtd.285.1603057812125;
+ Sun, 18 Oct 2020 14:50:12 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <20200817091617.28119-1-allen.cryptic@gmail.com>
+In-Reply-To: <20200817091617.28119-1-allen.cryptic@gmail.com>
+From:   Richard Weinberger <richard.weinberger@gmail.com>
+Date:   Sun, 18 Oct 2020 23:50:00 +0200
+Message-ID: <CAFLxGvxsHD6zvTJSHeo2gaoRQfjUPZ6M=5BirOObHFjGqnzfew@mail.gmail.com>
+Subject: Re: [PATCH] arch: um: convert tasklets to use new tasklet_setup() API
+To:     Allen Pais <allen.cryptic@gmail.com>
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        3chas3@gmail.com, Jens Axboe <axboe@kernel.dk>,
+        stefanr@s5r6.in-berlin.de, Dave Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Sebastian Reichel <sre@kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Helge Deller <deller@gmx.de>, dmitry.torokhov@gmail.com,
+        jassisinghbrar@gmail.com, Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        mporter@kernel.crashing.org, alex.bou9@gmail.com,
+        Mark Brown <broonie@kernel.org>, martyn@welchs.me.uk,
+        manohar.vanga@gmail.com, mitch@sfgoth.com,
+        "David S. Miller" <davem@davemloft.net>, kuba@kernel.org,
+        Kees Cook <keescook@chromium.org>,
+        linux-um <linux-um@lists.infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux1394-devel@lists.sourceforge.net,
+        intel-gfx@lists.freedesktop.org,
+        DRI mailing list <dri-devel@lists.freedesktop.org>,
+        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
+        "open list:SPI SUBSYSTEM" <linux-spi@vger.kernel.org>,
+        devel@driverdev.osuosl.org, Allen Pais <allen.lkml@gmail.com>,
+        Romain Perier <romain.perier@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+On Mon, Aug 17, 2020 at 11:17 AM Allen Pais <allen.cryptic@gmail.com> wrote:
+>
+> From: Allen Pais <allen.lkml@gmail.com>
+>
+> In preparation for unconditionally passing the
+> struct tasklet_struct pointer to all tasklet
+> callbacks, switch to using the new tasklet_setup()
+> and from_tasklet() to pass the tasklet pointer explicitly.
+>
+> Signed-off-by: Romain Perier <romain.perier@gmail.com>
+> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+> ---
+>  arch/um/drivers/vector_kern.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-[ Upstream commit f4ac712e4fe009635344b9af5d890fe25fcc8c0d ]
+Anton, can you please review this patch?
 
-syzbot is reporting unkillable task [1], for the caller is failing to
-handle a corrupted filesystem image which attempts to access beyond
-the end of the device. While we need to fix the caller, flooding the
-console with handle_bad_sector() message is unlikely useful.
-
-[1] https://syzkaller.appspot.com/bug?id=f1f49fb971d7a3e01bd8ab8cff2ff4572ccf3092
-
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-core.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 10c08ac506978..0014e7caae3d2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -803,11 +803,10 @@ static void handle_bad_sector(struct bio *bio, sector_t maxsector)
- {
- 	char b[BDEVNAME_SIZE];
- 
--	printk(KERN_INFO "attempt to access beyond end of device\n");
--	printk(KERN_INFO "%s: rw=%d, want=%Lu, limit=%Lu\n",
--			bio_devname(bio, b), bio->bi_opf,
--			(unsigned long long)bio_end_sector(bio),
--			(long long)maxsector);
-+	pr_info_ratelimited("attempt to access beyond end of device\n"
-+			    "%s: rw=%d, want=%llu, limit=%llu\n",
-+			    bio_devname(bio, b), bio->bi_opf,
-+			    bio_end_sector(bio), maxsector);
- }
- 
- #ifdef CONFIG_FAIL_MAKE_REQUEST
 -- 
-2.25.1
-
+Thanks,
+//richard
