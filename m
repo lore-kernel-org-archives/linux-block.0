@@ -2,131 +2,126 @@ Return-Path: <SRS0=pi9Y=DZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE9DC43467
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 19:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDACC433E7
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 19:18:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FA5022274
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 19:18:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="WcP5INjn";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="WcP5INjn"
+	by mail.kernel.org (Postfix) with ESMTP id 136F1222EA
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 19:18:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1603048721;
+	bh=AFKSqP4Sk2XqD1p6XQv5tDp/EspU/W0wAQxsWRRx6is=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=eg0dZAhUTK8ZRhvcILhUmrH8As7hUOHWZaFcSLjmHKvARlOXMDU/8tP+NK5DMTKob
+	 I5se8PxUbHaGJa4t48STYBA4Qdpb/unoJTevhE6fTdjP0w3HrSmyAF7Jjer/RrgwDR
+	 iPov9OAbJ1tUkgfDwgtc/StBsvr+74dSISaeiF80=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727072AbgJRTSE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Oct 2020 15:18:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60498 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726885AbgJRTSD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Oct 2020 15:18:03 -0400
-X-Greylist: delayed 264 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 18 Oct 2020 12:18:03 PDT
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AA74C061755;
-        Sun, 18 Oct 2020 12:18:03 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 7A1D5128046A;
-        Sun, 18 Oct 2020 12:18:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1603048682;
-        bh=aTHhEGSm6DrUFNt/hKuOWL0f+WzaMvx/rc4IP5RJYRs=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=WcP5INjnqihCMCJ+2ZkHdzEWBsqi3wavZOcf0NGlcoun37UNiQ4GoZk+2AoMrr8hd
-         1s2t7Y8IzQcDUGm581+QcIuy/enpzpZm6HswhyX4zoKl9l3S5fk96frr/LU4I9kVw8
-         r8s7AtR/5wOGbwEsua/QdQrVgo3j6VSqYIXYukhg=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id ywWMwLsGscQI; Sun, 18 Oct 2020 12:18:02 -0700 (PDT)
-Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:600:8280:66d1::c447])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727737AbgJRTSk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Oct 2020 15:18:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56702 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727137AbgJRTSf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Oct 2020 15:18:35 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 340C31280456;
-        Sun, 18 Oct 2020 12:18:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1603048682;
-        bh=aTHhEGSm6DrUFNt/hKuOWL0f+WzaMvx/rc4IP5RJYRs=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=WcP5INjnqihCMCJ+2ZkHdzEWBsqi3wavZOcf0NGlcoun37UNiQ4GoZk+2AoMrr8hd
-         1s2t7Y8IzQcDUGm581+QcIuy/enpzpZm6HswhyX4zoKl9l3S5fk96frr/LU4I9kVw8
-         r8s7AtR/5wOGbwEsua/QdQrVgo3j6VSqYIXYukhg=
-Message-ID: <0a739bcd421a3154c2521b49779b287e6c0d08a2.camel@HansenPartnership.com>
-Subject: Re: [Ocfs2-devel] [RFC] treewide: cleanup unreachable breaks
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     trix@redhat.com, linux-kernel@vger.kernel.org,
-        alsa-devel@alsa-project.org, clang-built-linux@googlegroups.com,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        storagedev@microchip.com, dri-devel@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
-        ath10k@lists.infradead.org, MPT-FusionLinux.pdl@broadcom.com,
-        linux-stm32@st-md-mailman.stormreply.com,
-        usb-storage@lists.one-eyed-alien.net,
-        linux-watchdog@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvdimm@lists.01.org, amd-gfx@lists.freedesktop.org,
-        linux-acpi@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        industrypack-devel@lists.sourceforge.net,
-        linux-pci@vger.kernel.org, spice-devel@lists.freedesktop.org,
-        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-nfc@lists.01.org, linux-pm@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-gpio@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-amlogic@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-crypto@vger.kernel.org, patches@opensource.cirrus.com,
-        bpf@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        linux-power@fi.rohmeurope.com
-Date:   Sun, 18 Oct 2020 12:17:59 -0700
-In-Reply-To: <20201018191618.GO20115@casper.infradead.org>
-References: <20201017160928.12698-1-trix@redhat.com>
-         <20201018185943.GM20115@casper.infradead.org>
-         <45efa7780c79972eae9ca9bdeb9f7edbab4f3643.camel@HansenPartnership.com>
-         <20201018191618.GO20115@casper.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        by mail.kernel.org (Postfix) with ESMTPSA id 51F68222C3;
+        Sun, 18 Oct 2020 19:18:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603048715;
+        bh=AFKSqP4Sk2XqD1p6XQv5tDp/EspU/W0wAQxsWRRx6is=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=I/OCeEvLb8KiAJNBuuMw01NrgoG3dor7BeNJsrYY+DZmjGoLf0NQ+IGQ42xnpk20J
+         LayffzL5g+wTI+Wx6x+jPEB4ORLfkmbUCT6mjatnQjHAwGNX91Zxok4Q1B4uPE22dJ
+         +rMslXJitOJyGvb6iQd7bdWhGPBWNXxD5bz563ss=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>,
+        David Milburn <dmilburn@redhat.com>,
+        "Ewan D . Milne" <emilne@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.9 022/111] blk-mq: always allow reserved allocation in hctx_may_queue
+Date:   Sun, 18 Oct 2020 15:16:38 -0400
+Message-Id: <20201018191807.4052726-22-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201018191807.4052726-1-sashal@kernel.org>
+References: <20201018191807.4052726-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 2020-10-18 at 20:16 +0100, Matthew Wilcox wrote:
-> On Sun, Oct 18, 2020 at 12:13:35PM -0700, James Bottomley wrote:
-> > On Sun, 2020-10-18 at 19:59 +0100, Matthew Wilcox wrote:
-> > > On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
-> > > > clang has a number of useful, new warnings see
-> > > > https://urldefense.com/v3/__https://clang.llvm.org/docs/DiagnosticsReference.html__;!!GqivPVa7Brio!Krxz78O3RKcB9JBMVo_F98FupVhj_jxX60ddN6tKGEbv_cnooXc1nnBmchm-e_O9ieGnyQ$ 
-> > > 
-> > > Please get your IT department to remove that stupidity.  If you
-> > > can't, please send email from a non-Red Hat email address.
-> > 
-> > Actually, the problem is at Oracle's end somewhere in the ocfs2
-> > list ... if you could fix it, that would be great.  The usual real
-> > mailing lists didn't get this transformation
-> > 
-> > https://lore.kernel.org/bpf/20201017160928.12698-1-trix@redhat.com/
-> > 
-> > but the ocfs2 list archive did:
-> > 
-> > https://oss.oracle.com/pipermail/ocfs2-devel/2020-October/015330.html
-> > 
-> > I bet Oracle IT has put some spam filter on the list that mangles
-> > URLs this way.
-> 
-> *sigh*.  I'm sure there's a way.  I've raised it with someone who
-> should be able to fix it.
+From: Ming Lei <ming.lei@redhat.com>
 
-As someone who works for IBM I can only say I feel your pain ...
+[ Upstream commit 285008501c65a3fcee05d2c2c26cbf629ceff2f0 ]
 
-James
+NVMe shares tagset between fabric queue and admin queue or between
+connect_q and NS queue, so hctx_may_queue() can be called to allocate
+request for these queues.
 
+Tags can be reserved in these tagset. Before error recovery, there is
+often lots of in-flight requests which can't be completed, and new
+reserved request may be needed in error recovery path. However,
+hctx_may_queue() can always return false because there is too many
+in-flight requests which can't be completed during error handling.
+Finally, nothing can proceed.
+
+Fix this issue by always allowing reserved tag allocation in
+hctx_may_queue(). This is reasonable because reserved tags are supposed
+to always be available.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Cc: David Milburn <dmilburn@redhat.com>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-mq-tag.c | 3 ++-
+ block/blk-mq.c     | 5 +++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 32d82e23b0953..a1c1e7c611f7b 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -59,7 +59,8 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 			    struct sbitmap_queue *bt)
+ {
+-	if (!data->q->elevator && !hctx_may_queue(data->hctx, bt))
++	if (!data->q->elevator && !(data->flags & BLK_MQ_REQ_RESERVED) &&
++			!hctx_may_queue(data->hctx, bt))
+ 		return BLK_MQ_NO_TAG;
+ 
+ 	if (data->shallow_depth)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index cdced4aca2e81..96425e4bd2b2c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1105,10 +1105,11 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+ 	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) {
+ 		bt = &rq->mq_hctx->tags->breserved_tags;
+ 		tag_offset = 0;
++	} else {
++		if (!hctx_may_queue(rq->mq_hctx, bt))
++			return false;
+ 	}
+ 
+-	if (!hctx_may_queue(rq->mq_hctx, bt))
+-		return false;
+ 	tag = __sbitmap_queue_get(bt);
+ 	if (tag == BLK_MQ_NO_TAG)
+ 		return false;
+-- 
+2.25.1
 
