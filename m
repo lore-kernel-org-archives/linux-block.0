@@ -2,136 +2,106 @@ Return-Path: <SRS0=pi9Y=DZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4ECEC43457
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 14:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95EE0C433E7
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 17:13:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CAFF21655
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 14:05:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CE3TTm0Z"
+	by mail.kernel.org (Postfix) with ESMTP id 5F85F2063A
+	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 17:13:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726969AbgJROF0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Oct 2020 10:05:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41333 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726980AbgJROFA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Oct 2020 10:05:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603029898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kBVMPnQfqrYuRmZ0mFLSkNqYWCaxPfshC6ZYuKW12NQ=;
-        b=CE3TTm0ZWS3xUbYzjwLA7+TYTk7Dg+VxIL4Zp73oDsqTuzAXXNjBX0Doq5M5Cu6ffXkYev
-        bZ3C9BpL47kMqRFuXYSmeuVfmCYD0R8cyybmNyMbwair6n3qDaCsRQ2KiiaxG8Fe9Zs8sm
-        6xUrramWNvo4ZIP3aUKUh3vEKSsfIgI=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-HkggFhigOoy8_eC2kb-9bA-1; Sun, 18 Oct 2020 10:04:56 -0400
-X-MC-Unique: HkggFhigOoy8_eC2kb-9bA-1
-Received: by mail-qk1-f198.google.com with SMTP id d5so5473048qkg.16
-        for <linux-block@vger.kernel.org>; Sun, 18 Oct 2020 07:04:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=kBVMPnQfqrYuRmZ0mFLSkNqYWCaxPfshC6ZYuKW12NQ=;
-        b=Agq6bWGZrJifxapLvAyYPvmSMm+6+gvUeUPtqRvpOXdJCdjn502CWebc9ALwRjaoe6
-         4OCMvf5BaOk0l8QJJRPeEqFlEWtyRb9ebF0lxeE+9GUuwAs0sxLyk96VO15g8AsbtK83
-         /VbkK0Vy5Nu+dptl9k63bxUmLfgEWcZrs+uQm2juPnL3mqWaP2iOcrufep99EngRamym
-         no96NRG+gASkm/R9DPyaTHMOtpWu33OgPDsuQnYVkVGRnHMS7dszZ4f/Dm4oQ7uqBUBB
-         Hyo+kQNGLUsBMnuHfi5roDmxMZRxBP/BBtnpCbfjsPs/DZNt4HaIaBSjlDtdOWnLKTXj
-         b9ww==
-X-Gm-Message-State: AOAM532DsXNsnnfBFH3IUjqPAHO7Lo74gRbCTvtUXGHmmMq/Ivi/D+lb
-        f6LrIRIrSnTf85evVR+KQoCkI5WbpsyFgT7enubWC9ngfB/XI4/3uT3UTmgOEfmUzXXyw7it9Kk
-        or3NbKJBr0MOsfmGCSHmPBbk=
-X-Received: by 2002:a05:620a:1287:: with SMTP id w7mr12724325qki.436.1603029896366;
-        Sun, 18 Oct 2020 07:04:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy6z5rS79nBj0nCbIqVRZ9qmkAzjArqewdITB0rtwnhi1UUe/kvxLZTENMJDRITA4iBlrUAlw==
-X-Received: by 2002:a05:620a:1287:: with SMTP id w7mr12724258qki.436.1603029896034;
-        Sun, 18 Oct 2020 07:04:56 -0700 (PDT)
-Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
-        by smtp.gmail.com with ESMTPSA id u16sm3288927qth.42.2020.10.18.07.04.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Oct 2020 07:04:55 -0700 (PDT)
-Subject: Re: [RFC] treewide: cleanup unreachable breaks
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-power@fi.rohmeurope.com, linux-gpio@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        spice-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
-        linux-amlogic@lists.infradead.org,
-        industrypack-devel@lists.sourceforge.net,
-        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-can@vger.kernel.org, netdev@vger.kernel.org,
-        intel-wired-lan@lists.osuosl.org, ath10k@lists.infradead.org,
-        linux-wireless@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com, linux-nfc@lists.01.org,
-        linux-nvdimm@lists.01.org, linux-pci@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
-        storagedev@microchip.com, devel@driverdev.osuosl.org,
-        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net,
-        linux-watchdog@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        bpf@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        alsa-devel@alsa-project.org, clang-built-linux@googlegroups.com
-References: <20201017160928.12698-1-trix@redhat.com>
- <20201018054332.GB593954@kroah.com>
-From:   Tom Rix <trix@redhat.com>
-Message-ID: <eecb7c3e-88b2-ec2f-0235-280da51ae69c@redhat.com>
-Date:   Sun, 18 Oct 2020 07:04:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1725776AbgJRRNt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Oct 2020 13:13:49 -0400
+Received: from smtp.infotech.no ([82.134.31.41]:52020 "EHLO smtp.infotech.no"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726689AbgJRRNt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Oct 2020 13:13:49 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 849A220425B;
+        Sun, 18 Oct 2020 19:13:46 +0200 (CEST)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id P5SUJaaRNZ+X; Sun, 18 Oct 2020 19:13:43 +0200 (CEST)
+Received: from xtwo70.bingwo.ca (host-104-157-204-209.dyn.295.ca [104.157.204.209])
+        by smtp.infotech.no (Postfix) with ESMTPA id 8AB1520424C;
+        Sun, 18 Oct 2020 19:13:41 +0200 (CEST)
+From:   Douglas Gilbert <dgilbert@interlog.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     martin.petersen@oracle.com, axboe@kernel.dk, bvanassche@acm.org,
+        bostroesser@gmail.com
+Subject: [PATCH v2 1/4] sgl_alloc_order: remove 4 GiB limit, sgl_free() warning
+Date:   Sun, 18 Oct 2020 13:13:33 -0400
+Message-Id: <20201018171336.63839-2-dgilbert@interlog.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201018171336.63839-1-dgilbert@interlog.com>
+References: <20201018171336.63839-1-dgilbert@interlog.com>
 MIME-Version: 1.0
-In-Reply-To: <20201018054332.GB593954@kroah.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This patch removes a check done by sgl_alloc_order() before it starts
+any allocations. The comment before the removed code says: "Check for
+integer overflow" arguably gives a false sense of security. The right
+hand side of the expression in the condition is resolved as u32 so
+cannot exceed UINT32_MAX (4 GiB) which means 'length' cannot exceed
+that amount. If that was the intention then the comment above it
+could be dropped and the condition rewritten more clearly as:
+     if (length > UINT32_MAX) <<failure path >>;
 
-On 10/17/20 10:43 PM, Greg KH wrote:
-> On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
->> From: Tom Rix <trix@redhat.com>
->>
->> This is a upcoming change to clean up a new warning treewide.
->> I am wondering if the change could be one mega patch (see below) or
->> normal patch per file about 100 patches or somewhere half way by collecting
->> early acks.
-> Please break it up into one-patch-per-subsystem, like normal, and get it
-> merged that way.
+The author's intention is to use sgl_alloc_order() to replace
+vmalloc(unsigned long) for a large allocation (debug ramdisk).
+vmalloc has no limit at 4 GiB so its seems unreasonable that:
+    sgl_alloc_order(unsigned long long length, ....)
+does. sgl_s made with sgl_alloc_order(chainable=false) have equally
+sized segments placed in a scatter gather array. That allows O(1)
+navigation around a big sgl using some simple integer maths.
 
-OK.
+Having previously sent a patch to fix a memory leak in
+sg_alloc_order() take the opportunity to put a one line comment above
+sgl_free()'s declaration that it is not suitable when order > 0 . The
+mis-use of sgl_free() when order > 0 was the reason for the memory
+leak. The other users of sgl_alloc_order() in the kernel where
+checked and found to handle free-ing properly.
 
-Thanks,
+Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
+---
+ include/linux/scatterlist.h | 1 +
+ lib/scatterlist.c           | 3 ---
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
-Tom
-
->
-> Sending us a patch, without even a diffstat to review, isn't going to
-> get you very far...
->
-> thanks,
->
-> greg k-h
->
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 45cf7b69d852..80178afc2a4a 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -302,6 +302,7 @@ struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
+ 			      unsigned int *nent_p);
+ void sgl_free_n_order(struct scatterlist *sgl, int nents, int order);
+ void sgl_free_order(struct scatterlist *sgl, int order);
++/* Only use sgl_free() when order is 0 */
+ void sgl_free(struct scatterlist *sgl);
+ #endif /* CONFIG_SGL_ALLOC */
+ 
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index c448642e0f78..d5770e7f1030 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -493,9 +493,6 @@ struct scatterlist *sgl_alloc_order(unsigned long long length,
+ 	u32 elem_len;
+ 
+ 	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
+-	/* Check for integer overflow */
+-	if (length > (nent << (PAGE_SHIFT + order)))
+-		return NULL;
+ 	nalloc = nent;
+ 	if (chainable) {
+ 		/* Check for integer overflow */
+-- 
+2.25.1
 
