@@ -2,121 +2,98 @@ Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB175C43457
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 08:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D1BC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 08:31:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5349622268
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 08:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26DAA2225A
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 08:31:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728405AbgJSIEA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Oct 2020 04:04:00 -0400
-Received: from ivanoab7.miniserver.com ([37.128.132.42]:44146 "EHLO
-        www.kot-begemot.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727505AbgJSIEA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Oct 2020 04:04:00 -0400
-X-Greylist: delayed 1456 seconds by postgrey-1.27 at vger.kernel.org; Mon, 19 Oct 2020 04:03:58 EDT
-Received: from tun252.jain.kot-begemot.co.uk ([192.168.18.6] helo=jain.kot-begemot.co.uk)
-        by www.kot-begemot.co.uk with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <anton.ivanov@cambridgegreys.com>)
-        id 1kUPl5-0003bi-LB; Mon, 19 Oct 2020 07:39:07 +0000
-Received: from jain.kot-begemot.co.uk ([192.168.3.3])
-        by jain.kot-begemot.co.uk with esmtp (Exim 4.92)
-        (envelope-from <anton.ivanov@cambridgegreys.com>)
-        id 1kUPl3-00080t-CR; Mon, 19 Oct 2020 08:39:07 +0100
-Subject: Re: [PATCH] arch: um: convert tasklets to use new tasklet_setup() API
-To:     Allen Pais <allen.cryptic@gmail.com>, jdike@addtoit.com,
-        richard@nod.at, 3chas3@gmail.com, axboe@kernel.dk,
-        stefanr@s5r6.in-berlin.de, airlied@linux.ie, daniel@ffwll.ch,
-        sre@kernel.org, James.Bottomley@HansenPartnership.com,
-        kys@microsoft.com, deller@gmx.de, dmitry.torokhov@gmail.com,
-        jassisinghbrar@gmail.com, shawnguo@kernel.org,
-        s.hauer@pengutronix.de, maximlevitsky@gmail.com, oakad@yahoo.com,
-        ulf.hansson@linaro.org, mporter@kernel.crashing.org,
-        alex.bou9@gmail.com, broonie@kernel.org, martyn@welchs.me.uk,
-        manohar.vanga@gmail.com, mitch@sfgoth.com, davem@davemloft.net,
-        kuba@kernel.org
-Cc:     devel@driverdev.osuosl.org, linux-s390@vger.kernel.org,
-        linux-hyperv@vger.kernel.org,
-        Romain Perier <romain.perier@gmail.com>, keescook@chromium.org,
-        linux-parisc@vger.kernel.org, linux-ntb@googlegroups.com,
-        netdev@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-atm-general@lists.sourceforge.net,
-        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-spi@vger.kernel.org,
-        linux-block@vger.kernel.org, Allen Pais <allen.lkml@gmail.com>,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux1394-devel@lists.sourceforge.net,
-        linux-arm-kernel@lists.infradead.org
-References: <20200817091617.28119-1-allen.cryptic@gmail.com>
-From:   Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Message-ID: <3359192b-8f02-feb4-a9a7-a13b5d876998@cambridgegreys.com>
-Date:   Mon, 19 Oct 2020 08:39:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S1728968AbgJSIbL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Oct 2020 04:31:11 -0400
+Received: from smtp.h3c.com ([60.191.123.50]:45106 "EHLO h3cspam02-ex.h3c.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728871AbgJSIbK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Oct 2020 04:31:10 -0400
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([10.8.0.66])
+        by h3cspam02-ex.h3c.com with ESMTPS id 09J8USuc021549
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 19 Oct 2020 16:30:28 +0800 (GMT-8)
+        (envelope-from tian.xianting@h3c.com)
+Received: from localhost.localdomain (10.99.212.201) by
+ DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 19 Oct 2020 16:30:31 +0800
+From:   Xianting Tian <tian.xianting@h3c.com>
+To:     <axboe@kernel.dk>, <raghavendra.kt@linux.vnet.ibm.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <mhocko@suse.com>, Xianting Tian <tian.xianting@h3c.com>
+Subject: [PATCH] blk-mq: remove the calling of local_memory_node()
+Date:   Mon, 19 Oct 2020 16:20:47 +0800
+Message-ID: <20201019082047.31113-1-tian.xianting@h3c.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20200817091617.28119-1-allen.cryptic@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Clacks-Overhead: GNU Terry Pratchett
+Content-Type: text/plain
+X-Originating-IP: [10.99.212.201]
+X-ClientProxiedBy: BJSMTP02-EX.srv.huawei-3com.com (10.63.20.133) To
+ DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66)
+X-DNSRBL: 
+X-MAIL: h3cspam02-ex.h3c.com 09J8USuc021549
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+We don't need to check whether the node is memoryless numa node before
+calling allocator interface. SLUB(and SLAB,SLOB) relies on the page
+allocator to pick a node. Page allocator should deal with memoryless
+nodes just fine. It has zonelists constructed for each possible nodes.
+And it will automatically fall back into a node which is closest to the
+requested node. As long as __GFP_THISNODE is not enforced of course.
 
+The code comments of kmem_cache_alloc_node() of SLAB also showed this:
+ * Fallback to other node is possible if __GFP_THISNODE is not set.
 
-On 17/08/2020 10:15, Allen Pais wrote:
-> From: Allen Pais <allen.lkml@gmail.com>
-> 
-> In preparation for unconditionally passing the
-> struct tasklet_struct pointer to all tasklet
-> callbacks, switch to using the new tasklet_setup()
-> and from_tasklet() to pass the tasklet pointer explicitly.
-> 
-> Signed-off-by: Romain Perier <romain.perier@gmail.com>
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-> ---
->   arch/um/drivers/vector_kern.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/um/drivers/vector_kern.c b/arch/um/drivers/vector_kern.c
-> index 8735c468230a..06980870ae23 100644
-> --- a/arch/um/drivers/vector_kern.c
-> +++ b/arch/um/drivers/vector_kern.c
-> @@ -1196,9 +1196,9 @@ static int vector_net_close(struct net_device *dev)
->   
->   /* TX tasklet */
->   
-> -static void vector_tx_poll(unsigned long data)
-> +static void vector_tx_poll(struct tasklet_struct *t)
->   {
-> -	struct vector_private *vp = (struct vector_private *)data;
-> +	struct vector_private *vp = from_tasklet(vp, t, tx_poll);
->   
->   	vp->estats.tx_kicks++;
->   	vector_send(vp->tx_queue);
-> @@ -1629,7 +1629,7 @@ static void vector_eth_configure(
->   	});
->   
->   	dev->features = dev->hw_features = (NETIF_F_SG | NETIF_F_FRAGLIST);
-> -	tasklet_init(&vp->tx_poll, vector_tx_poll, (unsigned long)vp);
-> +	tasklet_setup(&vp->tx_poll, vector_tx_poll);
->   	INIT_WORK(&vp->reset_tx, vector_reset_tx);
->   
->   	timer_setup(&vp->tl, vector_timer_expire, 0);
-> 
+blk-mq code doesn't set __GFP_THISNODE, so we can remove the calling
+of local_memory_node().
 
-Acked-By: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Fixes: bffed457160ab ("blk-mq: Avoid memoryless numa node encoded in hctx numa_node")
 
+Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
+---
+ block/blk-mq-cpumap.c | 2 +-
+ block/blk-mq.c        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
+index 0157f2b34..3db84d319 100644
+--- a/block/blk-mq-cpumap.c
++++ b/block/blk-mq-cpumap.c
+@@ -89,7 +89,7 @@ int blk_mq_hw_queue_to_node(struct blk_mq_queue_map *qmap, unsigned int index)
+ 
+ 	for_each_possible_cpu(i) {
+ 		if (index == qmap->mq_map[i])
+-			return local_memory_node(cpu_to_node(i));
++			return cpu_to_node(i);
+ 	}
+ 
+ 	return NUMA_NO_NODE;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index cdced4aca..48f8366b2 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2737,7 +2737,7 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
+ 		for (j = 0; j < set->nr_maps; j++) {
+ 			hctx = blk_mq_map_queue_type(q, j, i);
+ 			if (nr_hw_queues > 1 && hctx->numa_node == NUMA_NO_NODE)
+-				hctx->numa_node = local_memory_node(cpu_to_node(i));
++				hctx->numa_node = cpu_to_node(i);
+ 		}
+ 	}
+ }
 -- 
-Anton R. Ivanov
-Cambridgegreys Limited. Registered in England. Company Number 10273661
-https://www.cambridgegreys.com/
+2.17.1
+
