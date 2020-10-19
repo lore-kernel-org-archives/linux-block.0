@@ -1,122 +1,102 @@
-Return-Path: <SRS0=pi9Y=DZ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9DAC43467
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 21:50:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C71C433E7
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 00:50:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7831522280
-	for <linux-block@archiver.kernel.org>; Sun, 18 Oct 2020 21:50:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB64522275
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 00:50:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BT6sX70H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bo/phCBI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728585AbgJRVuP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Oct 2020 17:50:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55738 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726249AbgJRVuO (ORCPT
+        id S1730111AbgJSAuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Oct 2020 20:50:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42467 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727173AbgJSAuv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Oct 2020 17:50:14 -0400
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797D3C061755;
-        Sun, 18 Oct 2020 14:50:14 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id m65so4983425qte.11;
-        Sun, 18 Oct 2020 14:50:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LW7NtPMGJ2R8VOhKgzw6sjc10vh2YbY8kQEEkfju8fA=;
-        b=BT6sX70H+s8KhgIkqlKxOTyt7nLW9Zkkp/pWMqwoIwpRPwASphI99ISJJY/DrRq4YB
-         tuxxuQta89p2LltScao7kwUamcV10d6qq0/0GsMri9Y5uCbzF0DQIPVBZym6oh2w8IRp
-         jGv4FzahYM8UB3UvXODpIfq1ilK2uqq9Xd/9k1Vp0D25EYeZvsrsLMiSOVKbh0jHo8ly
-         ZwpyiDfjYzQI7omWM6lYTXWC4WxC4zXCwovEKbG2sVh0lXA3kgHlfvQ9kncK/jS7lzXB
-         WtZ4PQbPMGBo2Fvzsm14b4aTThFD0/Vsyl0CynTIq6qQwMl+W5yJA342KaaYBMt5xICG
-         NkkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LW7NtPMGJ2R8VOhKgzw6sjc10vh2YbY8kQEEkfju8fA=;
-        b=A54fIiuMEzcWU81kWizVMjWexILYSifLNSzkHPsvY2YrLg8OawjexicsjeQJnFnBDX
-         lFgMcBFXA82PdWXGIIPhsA9feRYqx1SsNLbcJ/ziaN4LYnD1cKUMCksOLHy3lFXz5KLL
-         mu9EmHYogFvkDCXUl8CHzXsYLO+k6XJR5vHxIizc57xHGVrJllBoAsjDznA1f3vEv4gq
-         7r/cDjJ56/USRGuhaG/HGaCbsUTFN5E6xSa5feLVxVzOgJvtHqkKZCTYXCcsqR5D9EDP
-         B2OZD0jdfFS8VVd8PckfIcCDEueSt7zf1C/eHHzfQ2kzEXzjmS452U49hb5WZ726v4sf
-         2NGA==
-X-Gm-Message-State: AOAM533U1Tx5J8OhD7nMqzqK4J++qB+CTP2+s6UHp1PSbvAYT+XXA4Gn
-        4VQzZkhSxbqT6YowujhmHWmAgdDYog4L64/VD5A=
-X-Google-Smtp-Source: ABdhPJw59Z9ZSI7YkUnrDX/NzYUwLZIQMERPV41io/elXdvNyA/Ph+eIMdFGNAEYy/TP8jUOuq9oIUb3paHWMlURueE=
-X-Received: by 2002:aed:2983:: with SMTP id o3mr12423656qtd.285.1603057812125;
- Sun, 18 Oct 2020 14:50:12 -0700 (PDT)
+        Sun, 18 Oct 2020 20:50:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603068650;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fE/Y48CjGF5exAFdQXpq91w93L8qvd2SuneNHFuHjak=;
+        b=bo/phCBIESLMZBMepOPbKeq2goTJFFcQ2ZeZ2GD8tBfbWEtHMl5V2fzNZJ1ygRem/diu53
+        UBpmu/o8QduXeRAUJtiz9I9ulVBOoyL6y4j9pl3eHB/abWbxfM+VXxPbSmj9fvIZdjO40v
+        Ev/wnMnkawOZmVVCl9K050EVCQWSfQM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-euvLwKOSMQCm2r3_YSjqSA-1; Sun, 18 Oct 2020 20:50:46 -0400
+X-MC-Unique: euvLwKOSMQCm2r3_YSjqSA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B877C1868403;
+        Mon, 19 Oct 2020 00:50:43 +0000 (UTC)
+Received: from T590 (ovpn-12-185.pek2.redhat.com [10.72.12.185])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D6F8D5D9F3;
+        Mon, 19 Oct 2020 00:50:33 +0000 (UTC)
+Date:   Mon, 19 Oct 2020 08:50:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>
+Cc:     Chao Leng <lengchao@huawei.com>, Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCH 1/4] blk-mq: check rq->state explicitly in
+ blk_mq_tagset_count_completed_rqs
+Message-ID: <20201019005029.GB1301072@T590>
+References: <20201016142811.1262214-1-ming.lei@redhat.com>
+ <20201016142811.1262214-2-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20200817091617.28119-1-allen.cryptic@gmail.com>
-In-Reply-To: <20200817091617.28119-1-allen.cryptic@gmail.com>
-From:   Richard Weinberger <richard.weinberger@gmail.com>
-Date:   Sun, 18 Oct 2020 23:50:00 +0200
-Message-ID: <CAFLxGvxsHD6zvTJSHeo2gaoRQfjUPZ6M=5BirOObHFjGqnzfew@mail.gmail.com>
-Subject: Re: [PATCH] arch: um: convert tasklets to use new tasklet_setup() API
-To:     Allen Pais <allen.cryptic@gmail.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        3chas3@gmail.com, Jens Axboe <axboe@kernel.dk>,
-        stefanr@s5r6.in-berlin.de, Dave Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Sebastian Reichel <sre@kernel.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Helge Deller <deller@gmx.de>, dmitry.torokhov@gmail.com,
-        jassisinghbrar@gmail.com, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        mporter@kernel.crashing.org, alex.bou9@gmail.com,
-        Mark Brown <broonie@kernel.org>, martyn@welchs.me.uk,
-        manohar.vanga@gmail.com, mitch@sfgoth.com,
-        "David S. Miller" <davem@davemloft.net>, kuba@kernel.org,
-        Kees Cook <keescook@chromium.org>,
-        linux-um <linux-um@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux1394-devel@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org,
-        DRI mailing list <dri-devel@lists.freedesktop.org>,
-        linux-hyperv@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-s390@vger.kernel.org,
-        "open list:SPI SUBSYSTEM" <linux-spi@vger.kernel.org>,
-        devel@driverdev.osuosl.org, Allen Pais <allen.lkml@gmail.com>,
-        Romain Perier <romain.perier@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201016142811.1262214-2-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 17, 2020 at 11:17 AM Allen Pais <allen.cryptic@gmail.com> wrote:
->
-> From: Allen Pais <allen.lkml@gmail.com>
->
-> In preparation for unconditionally passing the
-> struct tasklet_struct pointer to all tasklet
-> callbacks, switch to using the new tasklet_setup()
-> and from_tasklet() to pass the tasklet pointer explicitly.
->
-> Signed-off-by: Romain Perier <romain.perier@gmail.com>
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+On Fri, Oct 16, 2020 at 10:28:08PM +0800, Ming Lei wrote:
+> blk_mq_tagset_count_completed_rqs() is called from
+> blk_mq_tagset_wait_completed_request() for draining requests to be
+> completed remotely. What we need to do is to see request->state to
+> switch to non-MQ_RQ_COMPLETE.
+> 
+> So check MQ_RQ_COMPLETE explicitly in blk_mq_tagset_count_completed_rqs().
+> 
+> Meantime mark flush request as IDLE in its .end_io() for aligning to
+> end normal request because flush request may stay in inflight tags in case
+> of !elevator, so we need to change its state into IDLE.
+> 
+> Cc: Chao Leng <lengchao@huawei.com>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  arch/um/drivers/vector_kern.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  block/blk-flush.c  | 2 ++
+>  block/blk-mq-tag.c | 2 +-
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 53abb5c73d99..31a2ae04d3f0 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -231,6 +231,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+>  		return;
+>  	}
+>  
+> +	WRITE_ONCE(rq->state, MQ_RQ_IDLE);
 
-Anton, can you please review this patch?
+oops, the above line should have been:
 
--- 
+	WRITE_ONCE(flush_rq->state, MQ_RQ_IDLE);
+
 Thanks,
-//richard
+Ming
+
