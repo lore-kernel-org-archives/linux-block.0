@@ -2,101 +2,160 @@ Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C71C433E7
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 00:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D865CC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 03:45:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB64522275
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 00:50:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AE4222268
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 03:45:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bo/phCBI"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="LAn1zvUq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730111AbgJSAuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Oct 2020 20:50:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42467 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727173AbgJSAuv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Oct 2020 20:50:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603068650;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fE/Y48CjGF5exAFdQXpq91w93L8qvd2SuneNHFuHjak=;
-        b=bo/phCBIESLMZBMepOPbKeq2goTJFFcQ2ZeZ2GD8tBfbWEtHMl5V2fzNZJ1ygRem/diu53
-        UBpmu/o8QduXeRAUJtiz9I9ulVBOoyL6y4j9pl3eHB/abWbxfM+VXxPbSmj9fvIZdjO40v
-        Ev/wnMnkawOZmVVCl9K050EVCQWSfQM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-euvLwKOSMQCm2r3_YSjqSA-1; Sun, 18 Oct 2020 20:50:46 -0400
-X-MC-Unique: euvLwKOSMQCm2r3_YSjqSA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B877C1868403;
-        Mon, 19 Oct 2020 00:50:43 +0000 (UTC)
-Received: from T590 (ovpn-12-185.pek2.redhat.com [10.72.12.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D6F8D5D9F3;
-        Mon, 19 Oct 2020 00:50:33 +0000 (UTC)
-Date:   Mon, 19 Oct 2020 08:50:29 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>
-Cc:     Chao Leng <lengchao@huawei.com>, Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 1/4] blk-mq: check rq->state explicitly in
- blk_mq_tagset_count_completed_rqs
-Message-ID: <20201019005029.GB1301072@T590>
-References: <20201016142811.1262214-1-ming.lei@redhat.com>
- <20201016142811.1262214-2-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201016142811.1262214-2-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        id S1731637AbgJSDpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Oct 2020 23:45:54 -0400
+Received: from m12-14.163.com ([220.181.12.14]:56684 "EHLO m12-14.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731534AbgJSDpy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Oct 2020 23:45:54 -0400
+X-Greylist: delayed 906 seconds by postgrey-1.27 at vger.kernel.org; Sun, 18 Oct 2020 23:45:51 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=From:Mime-Version:Subject:Message-Id:Date; bh=7IvJ3
+        IO42eFK6fnoLa0WIPrl1Xf2HyPsX3t8lsPUvU0=; b=LAn1zvUqNLU6+rVbSLRCI
+        snaSdX8rhSX+E/lN95nf7ywRTygtDDiCKHPwhAsuh4w1jot9FnVkTjJpHZaSpLmc
+        pnNNUXShm9RVI1xRcrdFWOs4402xa/Rsmlx2+baRuzvhumTUPKWNMvCdoxBnoHxA
+        oVny35e+aXifcUJmXvEMLs=
+Received: from [127.0.0.1] (unknown [223.112.105.131])
+        by smtp10 (Coremail) with SMTP id DsCowABnj_spCI1fXuO5Qw--.25655S3;
+        Mon, 19 Oct 2020 11:29:45 +0800 (CST)
+From:   lining <lining2020x@163.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: [bug report] NBD: rbd-nbd + ext4 stuck after nbd resized
+Message-Id: <464B35DA-D889-41F8-9193-EBBC8C4F7E9D@163.com>
+Date:   Mon, 19 Oct 2020 11:29:44 +0800
+Cc:     donglifekernel@126.com
+To:     josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+        yunchuan.wen@kylin-cloud.com, ceph-users@ceph.io
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
+X-CM-TRANSID: DsCowABnj_spCI1fXuO5Qw--.25655S3
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJw1UWrWUKr18Gw1UXr13Jwb_yoW5AFW3pF
+        srK3W5GF1v9w1UWF4xWF1UXFyF9an2y3WUW392gr1jvrZFqrn7t3WIka42gF4UK39rWws7
+        WF95tws2gr1UGaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j4E_NUUUUU=
+X-Originating-IP: [223.112.105.131]
+X-CM-SenderInfo: polqx0bjsqjir06rljoofrz/1tbiKxfCNlQHWKR4OAAAsn
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 16, 2020 at 10:28:08PM +0800, Ming Lei wrote:
-> blk_mq_tagset_count_completed_rqs() is called from
-> blk_mq_tagset_wait_completed_request() for draining requests to be
-> completed remotely. What we need to do is to see request->state to
-> switch to non-MQ_RQ_COMPLETE.
-> 
-> So check MQ_RQ_COMPLETE explicitly in blk_mq_tagset_count_completed_rqs().
-> 
-> Meantime mark flush request as IDLE in its .end_io() for aligning to
-> end normal request because flush request may stay in inflight tags in case
-> of !elevator, so we need to change its state into IDLE.
-> 
-> Cc: Chao Leng <lengchao@huawei.com>
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-flush.c  | 2 ++
->  block/blk-mq-tag.c | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-flush.c b/block/blk-flush.c
-> index 53abb5c73d99..31a2ae04d3f0 100644
-> --- a/block/blk-flush.c
-> +++ b/block/blk-flush.c
-> @@ -231,6 +231,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
->  		return;
->  	}
->  
-> +	WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+Hi kernel=E3=80=81ceph comunity:
 
-oops, the above line should have been:
+We run into an issue that mainly related to the (kernel) nbd driver and =
+(ceph) rbd-nbd.=20
+After some investigations, I found that the root cause of the problem =
+seems to be related to the change in the block size of nbd.
 
-	WRITE_ONCE(flush_rq->state, MQ_RQ_IDLE);
+I am not sure whether it is the nbd driver or rbd-nbd bug, however there =
+is such a problem.
 
-Thanks,
-Ming
+
+What happened=EF=BC=9A
+It will always hang when accessing the mount point of nbd device with =
+ext4 after nbd resized.=20
+
+
+Environment information:
+- kernel:               v4.19.25 or master
+- rbd-nbd(ceph):  v12.2.0 Luminous or master
+- the fs of nbd:    ext4
+
+
+Steps to reproduce:
+1. rbd create --size 2G rbdpool/foo  # create a 2G size rbd image
+2. rbd-nbd map rbdpool/foo            # map the rbd image as a local =
+block device /dev/nbd0, block size is 512(the default block size is set =
+in rbd-nbd code when nbd mapped).
+3. mkfs.ext4 /dev/nbd0                     # mkfs.ext4 on nbd0, only nbd =
++ ext4 can reproduce the problem
+4. mount /dev/nbd0 /mnt                # mount nbd0 on /mnt
+5. rbd resize --size 4G rbdpool/foo   # expand the nbd backend image =
+from 2G to 4G size
+6. ls /mnt                                         # `ls` stuck here =
+forever
+
+ln@ubuntu:linux>$ ps -ef |grep mnt
+root        8670    7519 98 10:16 pts/5    00:28:46 ls --color=3Dauto =
+/mnt/
+ln          9508    9293  0 10:45 pts/6    00:00:00 grep --color=3Dauto =
+mnt
+
+
+ln@ubuntu:linux>$ sudo cat /proc/8670/stack
+[<0>] io_schedule+0x1a/0x40
+[<0>] __lock_page+0x105/0x150
+[<0>] pagecache_get_page+0x199/0x2c0
+[<0>] __getblk_gfp+0xef/0x290
+[<0>] ext4_getblk+0x83/0x1a0
+[<0>] ext4_bread+0x26/0xb0
+[<0>] __ext4_read_dirblock+0x34/0x2c0
+[<0>] htree_dirblock_to_tree+0x56/0x1c0
+[<0>] ext4_htree_fill_tree+0xad/0x330
+[<0>] ext4_readdir+0x6a3/0x980
+[<0>] iterate_dir+0x9e/0x1a0
+[<0>] ksys_getdents64+0xa0/0x130
+[<0>] __x64_sys_getdents64+0x1e/0x30
+[<0>] do_syscall_64+0x5e/0x110
+[<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[<0>] 0xffffffffffffffff
+
+
+Some investigations on the kernel side:
+By git bisect, I found the problem is related to this commit: =
+https://github.com/torvalds/linux/commit/9a9c3c02eacecf4bfde74b08ed32749a4=
+929a2cf .
+The kernel with this commit (9a9c3c02) can reproduce the problem, revert =
+the commit and the problem disappears.
+
+
+Some Logical analysis about the nbd block size changing:
+1. rbd-nbd map rbdpool/foo     =20
+    =3D> ioctl NBD_BLKSZSET 512=20
+      =3D> nbd_size_set()=20
+        =3D> nbd_size_update(nbd)=20
+          =3D>{
+                  bdev =3D bdget_disk(nbd->disk, 0);
+                  bd_set_size(bdev, 512) =20
+                  set_blocksize(bdev, 512)
+               }
+
+2. mkfs.ext4 /dev/nbd0
+
+3. mount /dev/nbd0 /mnt   =20
+    =3D> vfs mount
+      =3D>  ext4_mount()=20
+        =3D> =E2=80=A6=20
+          =3D> sb_set_blocksize()=20
+            =3D> set_blocksize(bdev, 4096)   <=3D mount ext4 will set =
+the nbd blocksize to 4096
+
+4. rbd resize =E2=80=93size 4G rbdpool/foo  =20
+    =3D> ioctl NBD_SET_SIZE 4G   <=3D rbd-nbd will update the latest =
+total size of nbd device
+      =3D>  nbd_size_set()=20
+        =3D> nbd_size_update(nbd)=20
+          =3D>{
+                  bdev =3D bdget_disk(nbd->disk, 0);
+                  bd_set_size(bdev, 512) =20
+                  set_blocksize(bdev, 512)   <=3D the blocksize is set =
+back to 512 [code line: set_blocksize(bdev, config->blksize);  ]. It =
+seems to be the root cause.
+               }=20
+
+
 
