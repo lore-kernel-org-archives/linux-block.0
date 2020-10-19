@@ -2,164 +2,150 @@ Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB60CC43467
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 19:19:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19406C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 19:42:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7227322365
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 19:19:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2FE522365
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 19:42:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vqIoQqfP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731106AbgJSTTw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Oct 2020 15:19:52 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:56037 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730938AbgJSTTh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Oct 2020 15:19:37 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 5A8432041BB;
-        Mon, 19 Oct 2020 21:19:35 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id lrXC0i9gKLTe; Mon, 19 Oct 2020 21:19:35 +0200 (CEST)
-Received: from xtwo70.bingwo.ca (vpn.infotech.no [82.134.31.155])
-        by smtp.infotech.no (Postfix) with ESMTPA id 083A520414F;
-        Mon, 19 Oct 2020 21:19:33 +0200 (CEST)
-From:   Douglas Gilbert <dgilbert@interlog.com>
-To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     martin.petersen@oracle.com, axboe@kernel.dk, bvanassche@acm.org,
-        bostroesser@gmail.com
-Subject: [PATCH v3 2/4] scatterlist: add sgl_copy_sgl() function
-Date:   Mon, 19 Oct 2020 15:19:26 -0400
-Message-Id: <20201019191928.77845-3-dgilbert@interlog.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201019191928.77845-1-dgilbert@interlog.com>
-References: <20201019191928.77845-1-dgilbert@interlog.com>
+        id S1731306AbgJSTmb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Oct 2020 15:42:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731250AbgJSTm3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Oct 2020 15:42:29 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7EEC0613E2
+        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 12:42:28 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id h4so380373pjk.0
+        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 12:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=no6WOfZDuAXhTDfVia9Vunkz4L7BthY0F8m0jo4//vs=;
+        b=vqIoQqfPtCUD7ceHGEmbvFqqUZd/9dE0IpLQQ4p4nyONBXQMSFxBG5OzgCaJfT8eu8
+         Ez0DMwUntzcU9c2WJzs/WqMvxG3bzlj0mstlcz+E4fW0gt02sZNjrL1HdU6SHVwmCE5R
+         WFeHYzJRJuPZspqj8YJ2wlUmUN4Mc8MNrI6kLekCJ8yejCepkvkgEUeb7TbpDze1NnEh
+         TP2SjhqdakZDUedR00qYjd62k5W2m7FgfHIpcuS/rhjqMGxVL3Apppn+UDRO/ftdIfoh
+         duvoKavmXDacw9mysFV+xdp1Tg4QxCPiDxNSeCeZyO+34Y2S1kYSdX61NJzSKhmGsX5T
+         HLpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=no6WOfZDuAXhTDfVia9Vunkz4L7BthY0F8m0jo4//vs=;
+        b=FV6WC7u48QVifwiiTJZuwBcKSGftoDtPzJEHUG8PNuc+qa1O+xPUz84CotFFTr8zpX
+         T6CZk5WzAv1g6NWpyvrCY+2lyXOReDH8OgXfIiNCX7RutCHhGtA9EFGel6Eu2un2fMSd
+         xaf9B2iPl/Wicahg5sC56WGAkW4pFI78QXuKP72+u2/HuRveNziVirQbVBn6OnnK+s1/
+         rc7LcM+7wfIVXgYLVfAAypMeJp0/Qu7TjTkn+xMl4tc8AVwKIZUyM52vN7E5QO36WDE1
+         czuREEf3hPwHnZ48eRHlJP4rDsBQZ5UJW86qQo+NZXi7WMZPtiy4bkcZgoziKPLyCitb
+         Ch3A==
+X-Gm-Message-State: AOAM530PT4kh4Ht/OOOyL30BIjo9WpjVKWUbbmfTZDUpqTCJ6r31lFIQ
+        exeNA9S4m1OVGK8Z1Dn4Kxb6rNc0CCUR0eibmBX87w==
+X-Google-Smtp-Source: ABdhPJxy4K+2uRaBuhFTeTSlHPetqrP1uAAP7dKvm6UBZz10SCa23PJUxb54E5JJmlle9J/y892Qp+TTrKvO4GeNXIk=
+X-Received: by 2002:a17:90a:ee87:: with SMTP id i7mr921476pjz.25.1603136546933;
+ Mon, 19 Oct 2020 12:42:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201017160928.12698-1-trix@redhat.com> <20201018054332.GB593954@kroah.com>
+In-Reply-To: <20201018054332.GB593954@kroah.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 19 Oct 2020 12:42:15 -0700
+Message-ID: <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
+Subject: Re: [RFC] treewide: cleanup unreachable breaks
+To:     Tom Rix <trix@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-edac@vger.kernel.org,
+        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-power@fi.rohmeurope.com, linux-gpio@vger.kernel.org,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        spice-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
+        linux-amlogic@lists.infradead.org,
+        industrypack-devel@lists.sourceforge.net,
+        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-can@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        intel-wired-lan@lists.osuosl.org, ath10k@lists.infradead.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com, linux-nfc@lists.01.org,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        linux-pci@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
+        storagedev@microchip.com, devel@driverdev.osuosl.org,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net,
+        linux-watchdog@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        bpf <bpf@vger.kernel.org>, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        alsa-devel@alsa-project.org,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        George Burgess <gbiv@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Both the SCSI and NVMe subsystems receive user data from the block
-layer in scatterlist_s (aka scatter gather lists (sgl) which are
-often arrays). If drivers in those subsystems represent storage
-(e.g. a ramdisk) or cache "hot" user data then they may also
-choose to use scatterlist_s. Currently there are no sgl to sgl
-operations in the kernel. Start with a sgl to sgl copy. Stops
-when the first of the number of requested bytes to copy, or the
-source sgl, or the destination sgl is exhausted. So the
-destination sgl will _not_ grow.
+On Sat, Oct 17, 2020 at 10:43 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
+> > From: Tom Rix <trix@redhat.com>
+> >
+> > This is a upcoming change to clean up a new warning treewide.
+> > I am wondering if the change could be one mega patch (see below) or
+> > normal patch per file about 100 patches or somewhere half way by collecting
+> > early acks.
+>
+> Please break it up into one-patch-per-subsystem, like normal, and get it
+> merged that way.
+>
+> Sending us a patch, without even a diffstat to review, isn't going to
+> get you very far...
 
-Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
----
- include/linux/scatterlist.h |  4 ++
- lib/scatterlist.c           | 75 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 79 insertions(+)
+Tom,
+If you're able to automate this cleanup, I suggest checking in a
+script that can be run on a directory.  Then for each subsystem you
+can say in your commit "I ran scripts/fix_whatever.py on this subdir."
+ Then others can help you drive the tree wide cleanup.  Then we can
+enable -Wunreachable-code-break either by default, or W=2 right now
+might be a good idea.
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 80178afc2a4a..6649414c0749 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -321,6 +321,10 @@ size_t sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
- size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
- 		       size_t buflen, off_t skip);
- 
-+size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_skip,
-+		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
-+		    size_t n_bytes);
-+
- /*
-  * Maximum number of entries that will be allocated in one piece, if
-  * a list larger than this is required then chaining will be utilized.
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index d5770e7f1030..1f9e093ad7da 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -974,3 +974,78 @@ size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
- 	return offset;
- }
- EXPORT_SYMBOL(sg_zero_buffer);
-+
-+/**
-+ * sgl_copy_sgl - Copy over a destination sgl from a source sgl
-+ * @d_sgl:		 Destination sgl
-+ * @d_nents:		 Number of SG entries in destination sgl
-+ * @d_skip:		 Number of bytes to skip in destination before starting
-+ * @s_sgl:		 Source sgl
-+ * @s_nents:		 Number of SG entries in source sgl
-+ * @s_skip:		 Number of bytes to skip in source before starting
-+ * @n_bytes:		 The (maximum) number of bytes to copy
-+ *
-+ * Returns:
-+ *   The number of copied bytes.
-+ *
-+ * Notes:
-+ *   Destination arguments appear before the source arguments, as with memcpy().
-+ *
-+ *   Stops copying if either d_sgl, s_sgl or n_bytes is exhausted.
-+ *
-+ *   Since memcpy() is used, overlapping copies (where d_sgl and s_sgl belong
-+ *   to the same sgl and the copy regions overlap) are not supported.
-+ *
-+ *   Large copies are broken into copy segments whose sizes may vary. Those
-+ *   copy segment sizes are chosen by the min3() statement in the code below.
-+ *   Since SG_MITER_ATOMIC is used for both sides, each copy segment is started
-+ *   with kmap_atomic() [in sg_miter_next()] and completed with kunmap_atomic()
-+ *   [in sg_miter_stop()]. This means pre-emption is inhibited for relatively
-+ *   short periods even in very large copies.
-+ *
-+ *   If d_skip is large, potentially spanning multiple d_nents then some
-+ *   integer arithmetic to adjust d_sgl may improve performance. For example
-+ *   if d_sgl is built using sgl_alloc_order(chainable=false) then the sgl
-+ *   will be an array with equally sized segments facilitating that
-+ *   arithmetic. The suggestion applies to s_skip, s_sgl and s_nents as well.
-+ *
-+ **/
-+size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_skip,
-+		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
-+		    size_t n_bytes)
-+{
-+	size_t len;
-+	size_t offset = 0;
-+	struct sg_mapping_iter d_iter, s_iter;
-+
-+	if (n_bytes == 0)
-+		return 0;
-+	sg_miter_start(&s_iter, s_sgl, s_nents, SG_MITER_ATOMIC | SG_MITER_FROM_SG);
-+	sg_miter_start(&d_iter, d_sgl, d_nents, SG_MITER_ATOMIC | SG_MITER_TO_SG);
-+	if (!sg_miter_skip(&s_iter, s_skip))
-+		goto fini;
-+	if (!sg_miter_skip(&d_iter, d_skip))
-+		goto fini;
-+
-+	while (offset < n_bytes) {
-+		if (!sg_miter_next(&s_iter))
-+			break;
-+		if (!sg_miter_next(&d_iter))
-+			break;
-+		len = min3(d_iter.length, s_iter.length, n_bytes - offset);
-+
-+		memcpy(d_iter.addr, s_iter.addr, len);
-+		offset += len;
-+		/* LIFO order (stop d_iter before s_iter) needed with SG_MITER_ATOMIC */
-+		d_iter.consumed = len;
-+		sg_miter_stop(&d_iter);
-+		s_iter.consumed = len;
-+		sg_miter_stop(&s_iter);
-+	}
-+fini:
-+	sg_miter_stop(&d_iter);
-+	sg_miter_stop(&s_iter);
-+	return offset;
-+}
-+EXPORT_SYMBOL(sgl_copy_sgl);
-+
+Ah, George (gbiv@, cc'ed), did an analysis recently of
+`-Wunreachable-code-loop-increment`, `-Wunreachable-code-break`, and
+`-Wunreachable-code-return` for Android userspace.  From the review:
+```
+Spoilers: of these, it seems useful to turn on
+-Wunreachable-code-loop-increment and -Wunreachable-code-return by
+default for Android
+...
+While these conventions about always having break arguably became
+obsolete when we enabled -Wfallthrough, my sample turned up zero
+potential bugs caught by this warning, and we'd need to put a lot of
+effort into getting a clean tree. So this warning doesn't seem to be
+worth it.
+```
+Looks like there's an order of magnitude of `-Wunreachable-code-break`
+than the other two.
+
+We probably should add all 3 to W=2 builds (wrapped in cc-option).
+I've filed https://github.com/ClangBuiltLinux/linux/issues/1180 to
+follow up on.
 -- 
-2.25.1
-
+Thanks,
+~Nick Desaulniers
