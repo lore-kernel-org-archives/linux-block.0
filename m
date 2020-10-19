@@ -2,77 +2,182 @@ Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,
-	CHARSET_FARAWAY_HEADER,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F54C433E7
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 14:46:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB08CC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 14:46:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2E09222E9
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 14:46:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="myhmrCI+"
+	by mail.kernel.org (Postfix) with ESMTP id 8E119222EB
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 14:46:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1603118784;
+	bh=6MLPIaz9JPGMQ1lMox1e7+tzPnpfZCmpBfHYVQqDvLg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=U8rYphmM3ysec4fCY5TMpe+11bvAV+q8rjPMJO7BsUXe8wjzSF7uK1NxaaqR/hvLQ
+	 rfBQ4p05kJfipSsQPh5I0Mt62PYZPM9GoIOJg111DIRuUegfS5TZkEvLduDnwAAaXu
+	 T1lHHaDiLHIuKz57Nybt5TF4WSKbAR0v5IdtiMzw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729223AbgJSOqS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Oct 2020 10:46:18 -0400
-Received: from m134.mail.163.com ([220.181.13.4]:15916 "EHLO m134.mail.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728311AbgJSOqS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Oct 2020 10:46:18 -0400
-X-Greylist: delayed 916 seconds by postgrey-1.27 at vger.kernel.org; Mon, 19 Oct 2020 10:45:54 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=Date:From:Subject:MIME-Version:Message-ID; bh=U7LM+
-        dC5vhJuqgB7bSYkXHferWewlR6tdqdoY40buGQ=; b=myhmrCI+zQ8Mq0kKdJZz0
-        C5zfewNVQm0NZlFSD262dpBA7BeXsXv7GVQJTlXUuu4bkZhJgzdC6/7agb7FyGQr
-        QKikr8O9U3boBWA6JLm784vqB3MAcTSVPfQQGgX2EqraahlLVRauaZwKlc2c5PZc
-        KTWScsCAweRGrwGrqDaosY=
-Received: from sh_def$163.com ( [139.162.39.19] ) by ajax-webmail-wmsvr4
- (Coremail) ; Mon, 19 Oct 2020 22:30:06 +0800 (CST)
-X-Originating-IP: [139.162.39.19]
-Date:   Mon, 19 Oct 2020 22:30:06 +0800 (CST)
-From:   =?GBK?B?y9W71A==?= <sh_def@163.com>
-To:     "Johannes Thumshirn" <Johannes.Thumshirn@wdc.com>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re:Re: [PATCH] blk: use REQ_OP_WRITE instead of hard code
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.10 build 20190724(ac680a23)
- Copyright (c) 2002-2020 www.mailtech.cn 163com
-In-Reply-To: <SN4PR0401MB3598441A5D53ED264496CF419B1E0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20201019135059.GA16475@rlk>
- <SN4PR0401MB3598441A5D53ED264496CF419B1E0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+        id S1729606AbgJSOqX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Oct 2020 10:46:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44058 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729544AbgJSOqX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Oct 2020 10:46:23 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20727C0613CE;
+        Mon, 19 Oct 2020 07:46:22 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id p9so374862ilr.1;
+        Mon, 19 Oct 2020 07:46:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jH9tOACmpXUPBysf5MfcJ9Ja6eT9Sj9D2qdGKGGFkek=;
+        b=p5kCljRgP6SMV3bkc97b6EXsb0T/kx746J4Pl5Br3bD/TqasJEYFTwCxm5eOi+0kkZ
+         adB/R2hTn8nmXjOfUsh93W0122NTWr6/U6O9x9MGWaENG2/lvhurVOnM2t4EUREhCwK6
+         f384Q/mhWOKPWbi6pmHTKDIdUNGH8J35PoX25DuFtjUqtBEOfa/VrUOXfe3k9+UNy/iB
+         jKDrN/n0qsaE6pUT90ySKYPOmuBW+dnJNu378L3qKDKV7g5ZqNTBaf0o6fSDhHVgjINY
+         HtcCumJgzIfZ92l2IgMobM+SOrQMVIJ56LNLUF0eFSHkCsTzrLn5bpeyuRsvXHDj5FNk
+         1Edw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=jH9tOACmpXUPBysf5MfcJ9Ja6eT9Sj9D2qdGKGGFkek=;
+        b=tO5sB+BT+w35bN1tm2FIWcnGgFexxtE5aTesxSDjUW0pOo06EQdnlB4URNm+aR3VQU
+         XoeeaWtKQcgQrVvGTSjlqVRGCwhg1EFHi21GzxZEFfKkxmufUta/gETQWkVNLBcbKgDN
+         9tuQxlI5+trxHmGi+nVrK/aNV3qe3bc0sKKTBRMQK6oy+JkLfJQTxAFVDecgm7M/SINT
+         gWswF2wQGl0bsvEfAKf4KczY904a+CvBcsULyX31lgN29PtLec+XROyyrUeflwHQj9TG
+         rgjyCAiyI1wsH1BiYRhwH6WJy7drf6k7kJ5zQHLZHa+XnCb6U30xh13CRjRBEih15XhL
+         ggrQ==
+X-Gm-Message-State: AOAM5330ZJHq/+bnku+lChBR/BPkeDWtx5TlUa9v0RB8pXLAijQK7PxC
+        NuXwv5Ixtt3c70Ah3sdpXeqqSUUADU0img==
+X-Google-Smtp-Source: ABdhPJx0dk/O5UfJ45rshBk7n2a6r7KpML5v6GQOoxGI9+HwAlhbXAPHpfSEUkgTBUN9/TrFv4seIA==
+X-Received: by 2002:a92:98c5:: with SMTP id a66mr272692ill.50.1603118781405;
+        Mon, 19 Oct 2020 07:46:21 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:b34d])
+        by smtp.gmail.com with ESMTPSA id c9sm11840964iow.1.2020.10.19.07.46.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Oct 2020 07:46:20 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 19 Oct 2020 10:46:19 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Muneendra <muneendra.kumar@broadcom.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org, jsmart2021@gmail.com,
+        emilne@redhat.com, mkumar@redhat.com, pbonzini@redhat.com
+Subject: Re: [RFC v2 02/18] blkcg: Added a app identifier support for blkcg
+Message-ID: <20201019144619.GC4418@mtj.thefacebook.com>
+References: <1603093393-12875-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1603093393-12875-3-git-send-email-muneendra.kumar@broadcom.com>
 MIME-Version: 1.0
-Message-ID: <3e965865.5946.17541447519.Coremail.sh_def@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: BMGowADX9v7voo1fGGBoAA--.47468W
-X-CM-SenderInfo: xvkbvvri6rljoofrz/1tbiMR3CX1UMWAjmbAABsz
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1603093393-12875-3-git-send-email-muneendra.kumar@broadcom.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-WWVhaCwgeW91IGFyZSByaWdodCwgdGhhbmtzIGZvciB5b3VyIGV4cGxhbmF0aW9uPGJyLz48YnIv
-Pk1heWJlIHdlIHNob3VsZCBkZWZpbmUgYSBNQVNLIHRvIGRvIHRoaXM/CkF0IDIwMjAtMTAtMTkg
-MjI6MDk6NDAsICJKb2hhbm5lcyBUaHVtc2hpcm4iIDxKb2hhbm5lcy5UaHVtc2hpcm5Ad2RjLmNv
-bT4gd3JvdGU6Cj5PbiAxOS8xMC8yMDIwIDE2OjA2LCBIdWkgU3Ugd3JvdGU6DQo+PiB1c2UgUkVR
-X09QX1dSSVRFIGluc3RlYWQgb2YgaGFyZCBjb2RlIGluDQo+PiBvcF9pc193cml0ZSgpLg0KPj4g
-DQo+PiBTaWduZWQtb2ZmLWJ5OiBIdWkgU3UgPHNoX2RlZkAxNjMuY29tPg0KPj4gLS0tDQo+PiAg
-aW5jbHVkZS9saW51eC9ibGtfdHlwZXMuaCB8IDIgKy0NCj4+ICAxIGZpbGUgY2hhbmdlZCwgMSBp
-bnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4+IA0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUv
-bGludXgvYmxrX3R5cGVzLmggYi9pbmNsdWRlL2xpbnV4L2Jsa190eXBlcy5oDQo+PiBpbmRleCA3
-ZDdjMTMyMzhmZGIuLjdiOWIwMjM3OGMyNCAxMDA2NDQNCj4+IC0tLSBhL2luY2x1ZGUvbGludXgv
-YmxrX3R5cGVzLmgNCj4+ICsrKyBiL2luY2x1ZGUvbGludXgvYmxrX3R5cGVzLmgNCj4+IEBAIC00
-NDAsNyArNDQwLDcgQEAgc3RhdGljIGlubGluZSB2b2lkIGJpb19zZXRfb3BfYXR0cnMoc3RydWN0
-IGJpbyAqYmlvLCB1bnNpZ25lZCBvcCwNCj4+ICANCj4+ICBzdGF0aWMgaW5saW5lIGJvb2wgb3Bf
-aXNfd3JpdGUodW5zaWduZWQgaW50IG9wKQ0KPj4gIHsNCj4+IC0JcmV0dXJuIChvcCAmIDEpOw0K
-Pj4gKwlyZXR1cm4gKG9wICYgUkVRX09QX1dSSVRFKTsNCj4NCj5vcF9pc193cml0ZSgpIHJldHVy
-bnMgdHJ1ZSBmb3IgZXZlcnkgcmVxX29wIHRoYXQgd3JpdGVzIHRvIGEgZGV2aWNlICh0aGV5IGFs
-bCBoYXZlIA0KPnRoZSBsb3dlc3QgYml0IHNldCksIHdoaWxlIFJFUV9PUF9XUklURSBtZWFucyBh
-IFdSSVRFLiBZb3UnbGwgY2hhbmdlIHRoZSBzZW1hbnRpY3MNCj53aXRoIHRoaXMgcGF0Y2guDQo=
+On Mon, Oct 19, 2020 at 01:12:57PM +0530, Muneendra wrote:
+> This Patch added a unique application identifier i.e
+> app_id  knob to  blkcg which allows identification of traffic
+> sources at an individual cgroup based Applications
+> (ex:virtual machine (VM))level in both host and
+> fabric infrastructure.
+> 
+> Provided the interface blkcg_get_app_identifier to
+> grab the app identifier associated with a bio.
+> 
+> Provided the interface blkcg_set_app_identifier to
+> set the app identifier in a blkcgrp associated with cgroup id
+> 
+> Signed-off-by: Muneendra <muneendra.kumar@broadcom.com>
+> 
+> ---
+> v2:
+> renamed app_identifier to app_id
+> removed the  sysfs interface blkio.app_identifie under
+> /sys/fs/cgroup/blkio
+> Added a new interface blkcg_set_app_identifier
+> ---
+>  block/blk-cgroup.c         | 31 +++++++++++++++++++++++++++++++
+>  include/linux/blk-cgroup.h | 22 ++++++++++++++++++++++
+>  2 files changed, 53 insertions(+)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 619a79b51068..672971521010 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -546,6 +546,37 @@ static struct blkcg_gq *blkg_lookup_check(struct blkcg *blkcg,
+>  	return __blkg_lookup(blkcg, q, true /* update_hint */);
+>  }
+>  
+> +/*
+> + * Sets the app_identifier field associted to blkcg
+> + * @buf: application identifier
+> + * @id: cgrp id
+> + * @len: size of appid
+> + */
+> +int blkcg_set_app_identifier(char *buf, u64 id, size_t len)
 
+Can you please use a name which is more specific?
+
+> +{
+> +	struct cgroup *cgrp = NULL;
+> +	struct cgroup_subsys_state *css = NULL;
+> +	struct blkcg *blkcg = NULL;
+> +
+> +	cgrp = cgroup_get_from_kernfs_id(id);
+> +	if (!cgrp)
+> +		return -ENOENT;
+> +
+> +	css = cgroup_get_e_css(cgrp, &io_cgrp_subsys);
+> +	if (!css)
+> +		return -ENOENT;
+> +
+> +	blkcg = css_to_blkcg(css);
+> +	if (!blkcg)
+> +		return -ENOENT;
+> +
+> +	if (len > APPID_LEN)
+> +		return -EINVAL;
+> +	strlcpy(blkcg->app_id, buf, len);
+
+Shouldn't the cgrp and css be put before exit?
+
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(blkcg_set_app_identifier);
+> +
+>  /**
+>   * blkg_conf_prep - parse and prepare for per-blkg config update
+>   * @inputp: input string pointer
+> diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+> index c8fc9792ac77..5bd3f9f397ac 100644
+> --- a/include/linux/blk-cgroup.h
+> +++ b/include/linux/blk-cgroup.h
+> @@ -30,6 +30,8 @@
+>  
+>  /* Max limits for throttle policy */
+>  #define THROTL_IOPS_MAX		UINT_MAX
+> +#define APPID_LEN              128
+> +
+>  
+>  #ifdef CONFIG_BLK_CGROUP
+>  
+> @@ -55,6 +57,8 @@ struct blkcg {
+>  	struct blkcg_policy_data	*cpd[BLKCG_MAX_POLS];
+>  
+>  	struct list_head		all_blkcgs_node;
+> +	char                            app_id[APPID_LEN];
+
+Please use a more specific name and gate them behind a CONFIG.
+
+Thanks.
+
+-- 
+tejun
