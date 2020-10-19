@@ -2,98 +2,115 @@ Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D1BC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 08:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC05C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 10:14:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26DAA2225A
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 08:31:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2325722268
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 10:14:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="usqFcIX/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728968AbgJSIbL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Oct 2020 04:31:11 -0400
-Received: from smtp.h3c.com ([60.191.123.50]:45106 "EHLO h3cspam02-ex.h3c.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728871AbgJSIbK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Oct 2020 04:31:10 -0400
-Received: from DAG2EX03-BASE.srv.huawei-3com.com ([10.8.0.66])
-        by h3cspam02-ex.h3c.com with ESMTPS id 09J8USuc021549
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 19 Oct 2020 16:30:28 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from localhost.localdomain (10.99.212.201) by
- DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Mon, 19 Oct 2020 16:30:31 +0800
-From:   Xianting Tian <tian.xianting@h3c.com>
-To:     <axboe@kernel.dk>, <raghavendra.kt@linux.vnet.ibm.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <mhocko@suse.com>, Xianting Tian <tian.xianting@h3c.com>
-Subject: [PATCH] blk-mq: remove the calling of local_memory_node()
-Date:   Mon, 19 Oct 2020 16:20:47 +0800
-Message-ID: <20201019082047.31113-1-tian.xianting@h3c.com>
-X-Mailer: git-send-email 2.17.1
+        id S1725921AbgJSKOC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Oct 2020 06:14:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58298 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725892AbgJSKOC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Oct 2020 06:14:02 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B2AC0613CE;
+        Mon, 19 Oct 2020 03:14:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4ZUsuMrR+ngWpncutSCoMS/lWOgKT6Cj9cHkeDMetR0=; b=usqFcIX/i+y71mXlgiCmt07zPf
+        3GhE+28+QPqGVJEeCsK6m/+gyJ2SoyTGn6vthGjNUeXDKMBvpztWgc6iZXcpYvzluOq5ZFdb1GpZF
+        jeVyYJ78fusnRlk8MH7yyIeehMAolr8QLdll8bczFg7EW1AupGLl+Qv3r4H0/Qgmq/LOo7gUPJxpi
+        h2ep0USqn2voW1yuaECtBbzehj6yAeWYqtbyC6Nkh0BP1NugiBOV/5buw1x97OU9Et3nvMoscX57L
+        ZvS1/r8M5QLWM6cD4qEwb1tlDq0CmouxSIHCgn6hYxEzBC0qHRrUnPaZNodjwoGsv222RX5rh7epH
+        wDakJl8g==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kUSAt-0002S3-1F; Mon, 19 Oct 2020 10:13:55 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id ACA9A3035D4;
+        Mon, 19 Oct 2020 12:13:53 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 93F622B07595D; Mon, 19 Oct 2020 12:13:53 +0200 (CEST)
+Date:   Mon, 19 Oct 2020 12:13:53 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Mike Galbraith <umgwanakikbuti@gmail.com>, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, bigeasy@linutronix.de,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH] zram: Fix __zram_bvec_{read,write}() locking order
+Message-ID: <20201019101353.GJ2628@hirez.programming.kicks-ass.net>
+References: <CABXGCsOL0pW0Ghh-w5d12P75ve6FS9Rgmzm6DvsYbJY-jMTCdg@mail.gmail.com>
+ <20201016124009.GQ2611@hirez.programming.kicks-ass.net>
+ <20201016153324.GA1976566@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.99.212.201]
-X-ClientProxiedBy: BJSMTP02-EX.srv.huawei-3com.com (10.63.20.133) To
- DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66)
-X-DNSRBL: 
-X-MAIL: h3cspam02-ex.h3c.com 09J8USuc021549
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201016153324.GA1976566@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We don't need to check whether the node is memoryless numa node before
-calling allocator interface. SLUB(and SLAB,SLOB) relies on the page
-allocator to pick a node. Page allocator should deal with memoryless
-nodes just fine. It has zonelists constructed for each possible nodes.
-And it will automatically fall back into a node which is closest to the
-requested node. As long as __GFP_THISNODE is not enforced of course.
 
-The code comments of kmem_cache_alloc_node() of SLAB also showed this:
- * Fallback to other node is possible if __GFP_THISNODE is not set.
+Mikhail reported a lockdep spat detailing how __zram_bvec_read() and
+__zram_bvec_write() use zstrm->lock and zspage->lock in opposite order.
 
-blk-mq code doesn't set __GFP_THISNODE, so we can remove the calling
-of local_memory_node().
-
-Fixes: bffed457160ab ("blk-mq: Avoid memoryless numa node encoded in hctx numa_node")
-
-Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
+Reported-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Tested-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
 ---
- block/blk-mq-cpumap.c | 2 +-
- block/blk-mq.c        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/zram/zram_drv.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 0157f2b34..3db84d319 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -89,7 +89,7 @@ int blk_mq_hw_queue_to_node(struct blk_mq_queue_map *qmap, unsigned int index)
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 9100ac36670a..c1e2c2e1cde8 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1216,10 +1216,11 @@ static void zram_free_page(struct zram *zram, size_t index)
+ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
+ 				struct bio *bio, bool partial_io)
+ {
+-	int ret;
++	struct zcomp_strm *zstrm;
+ 	unsigned long handle;
+ 	unsigned int size;
+ 	void *src, *dst;
++	int ret;
  
- 	for_each_possible_cpu(i) {
- 		if (index == qmap->mq_map[i])
--			return local_memory_node(cpu_to_node(i));
-+			return cpu_to_node(i);
- 	}
+ 	zram_slot_lock(zram, index);
+ 	if (zram_test_flag(zram, index, ZRAM_WB)) {
+@@ -1250,6 +1251,9 @@ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
  
- 	return NUMA_NO_NODE;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index cdced4aca..48f8366b2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2737,7 +2737,7 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- 		for (j = 0; j < set->nr_maps; j++) {
- 			hctx = blk_mq_map_queue_type(q, j, i);
- 			if (nr_hw_queues > 1 && hctx->numa_node == NUMA_NO_NODE)
--				hctx->numa_node = local_memory_node(cpu_to_node(i));
-+				hctx->numa_node = cpu_to_node(i);
- 		}
- 	}
- }
--- 
-2.17.1
-
+ 	size = zram_get_obj_size(zram, index);
+ 
++	if (size != PAGE_SIZE)
++		zstrm = zcomp_stream_get(zram->comp);
++
+ 	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
+ 	if (size == PAGE_SIZE) {
+ 		dst = kmap_atomic(page);
+@@ -1257,8 +1261,6 @@ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
+ 		kunmap_atomic(dst);
+ 		ret = 0;
+ 	} else {
+-		struct zcomp_strm *zstrm = zcomp_stream_get(zram->comp);
+-
+ 		dst = kmap_atomic(page);
+ 		ret = zcomp_decompress(zstrm, src, size, dst);
+ 		kunmap_atomic(dst);
