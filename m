@@ -2,97 +2,114 @@ Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FA2C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 15:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA49CC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 16:43:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EAF122269
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 15:32:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78704222EA
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 16:43:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Y/TH7WtZ"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ZgCHt8Ot"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729910AbgJSPcw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Oct 2020 11:32:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51610 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729845AbgJSPcw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Oct 2020 11:32:52 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D60C0613D0
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 08:32:52 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id j17so567757ilr.2
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 08:32:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=G6IqZPH/xvsjeV+KO4PrfwtgG9S8DY4P3ygKvGFV+Wk=;
-        b=Y/TH7WtZNNRhTiDN1VAyBBdljrCIJKN6XT05Ag7KnMLwK12/Ung3jtuMQBGYi5vmhL
-         72/8lisWN3QniaCEz9Ib59crBAL4W1ZrUu/PaALYAA96srEE+L40iZ2Fnizhbkk2angL
-         n6p7BdbI7RXC6n4N5OwCcPTdftLKF1OCH+NUNUPpmCAhDrhdkH82Rv1C7nl9I/ojaHcV
-         kmS7yyp69BJmWKnQSo8qs4q3hxKII5v/b9LrtNGumGkzr/60C+mgBR70JPZ1kZ0Da7c/
-         NnasKweHHQHA+GwqdLowZhENOTy302Sg6tYVr8qE71tIiiRNXAfefesK4386lqvMYonD
-         vH1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=G6IqZPH/xvsjeV+KO4PrfwtgG9S8DY4P3ygKvGFV+Wk=;
-        b=K82sl7RFjYHiwJuYjG2iruX+UaISCYoAiLbQh2w2INSCnq1CWl//fP5uYzhNUPUxjb
-         zlTmnjTC0CPB2Ud9EwgKB/iPmn9SWHIeShcFX3TFZPdA1m/xW++jH9gRmMAIMf32EzVB
-         ufztO5AVHZc66EMbnfu7Jch7UEWWd0zbSqKcAUcyrR0rSaTgBDpnEuB3524t68+oJXPU
-         z10E71akS4JGyDO2bBM64hHEsxGQm5O1xoyWi0na2IB+GXTxTevgvRsN93XHIHYLGs+c
-         U9GQWM+4BgShKa21HmGZsdM7jkajB+H6HoNmV29GumHP1uxm+yqP1lagJjZWlT8seOuZ
-         fQ5Q==
-X-Gm-Message-State: AOAM531SQ01Bwwp8XETUGbeCl8m3Hq1SfxEpfEpGJoj1jZPZmUszbws1
-        qz231cg/03NKeIfq5hV9oRPqqJwdEZgXfQ==
-X-Google-Smtp-Source: ABdhPJybmO34vOS8G/CY+b47HRjCg2ALL11YTrOppEKdrvmkSd2kXA82tTKNLtwzSN0eoE8vTukKMg==
-X-Received: by 2002:a92:dc8f:: with SMTP id c15mr387228iln.293.1603121571501;
-        Mon, 19 Oct 2020 08:32:51 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id z200sm65790iof.47.2020.10.19.08.32.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Oct 2020 08:32:50 -0700 (PDT)
-Subject: Re: [PATCH] zram: Fix __zram_bvec_{read,write}() locking order
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Minchan Kim <minchan@kernel.org>
-Cc:     Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Mike Galbraith <umgwanakikbuti@gmail.com>, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, bigeasy@linutronix.de,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <CABXGCsOL0pW0Ghh-w5d12P75ve6FS9Rgmzm6DvsYbJY-jMTCdg@mail.gmail.com>
- <20201016124009.GQ2611@hirez.programming.kicks-ass.net>
- <20201016153324.GA1976566@google.com>
- <20201019101353.GJ2628@hirez.programming.kicks-ass.net>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b50bdd18-941b-cc05-2be3-6288f227be4d@kernel.dk>
-Date:   Mon, 19 Oct 2020 09:32:49 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1730367AbgJSQnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Oct 2020 12:43:22 -0400
+Received: from m12-11.163.com ([220.181.12.11]:34633 "EHLO m12-11.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729879AbgJSQnW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Oct 2020 12:43:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=Date:From:Subject:Message-ID:MIME-Version; bh=YC7Ho
+        mMsF1MVd69eG5Tkh0OhJDK52Iatm/gNKnLN6Hw=; b=ZgCHt8Oth4PwwxBrN3a6W
+        93pEO49qRBuDZr5JsEBMJhwcxV86eRPOm7Xsy12j4cD5yPblTAIG4Zr+E3xS7I85
+        e0FgxWw/G5v5K27H/lah7nK0uhGk+JyFe+VqHJmsC2K3uBVQPr74iH7ecXVvSe6F
+        OOSYrzO4ijI4PRpvDHnOzA=
+Received: from localhost (unknown [101.86.214.18])
+        by smtp7 (Coremail) with SMTP id C8CowAAX_dkGwo1fOyrtDw--.24180S2;
+        Tue, 20 Oct 2020 00:42:46 +0800 (CST)
+Date:   Tue, 20 Oct 2020 00:42:46 +0800
+From:   Hui Su <sh_def@163.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] block/elevator: reduce the critical section
+Message-ID: <20201019164246.GA79115@rlk>
 MIME-Version: 1.0
-In-Reply-To: <20201019101353.GJ2628@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-CM-TRANSID: C8CowAAX_dkGwo1fOyrtDw--.24180S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tw4rJFWfJrWfWF1xWry3Jwb_yoW8Wr4kpr
+        sIg3sxKr1kXryxZwsrAa429w1Iq34j9r4jqryrCw10kFnrXw43W3W7Ca17XF4YyayxXFs8
+        WF1ktFWDAFWUZr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jYksDUUUUU=
+X-Originating-IP: [101.86.214.18]
+X-CM-SenderInfo: xvkbvvri6rljoofrz/1tbiIAbCX10TB0yC3wAAsj
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/19/20 4:13 AM, Peter Zijlstra wrote:
-> 
-> Mikhail reported a lockdep spat detailing how __zram_bvec_read() and
-> __zram_bvec_write() use zstrm->lock and zspage->lock in opposite order.
+1.reduce the critical section in elevator_get().
+2.reduce the critical section in elevator_get_by_features().
+3.remove the found variable.
 
-Applied, thanks.
+the elv_list_lock is used to protect the elv_list,
+and the operations of elevator_type does not need
+to be protected.
 
+Signed-off-by: Hui Su <sh_def@163.com>
+---
+ block/elevator.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/block/elevator.c b/block/elevator.c
+index 293c5c81397a..727902b31954 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -151,11 +151,11 @@ static struct elevator_type *elevator_get(struct request_queue *q,
+ 		spin_lock(&elv_list_lock);
+ 		e = elevator_find(name, q->required_elevator_features);
+ 	}
++	spin_unlock(&elv_list_lock);
+ 
+ 	if (e && !try_module_get(e->elevator_owner))
+ 		e = NULL;
+ 
+-	spin_unlock(&elv_list_lock);
+ 	return e;
+ }
+ 
+@@ -633,23 +633,21 @@ static struct elevator_type *elevator_get_default(struct request_queue *q)
+  */
+ static struct elevator_type *elevator_get_by_features(struct request_queue *q)
+ {
+-	struct elevator_type *e, *found = NULL;
++	struct elevator_type *e = NULL;
+ 
+ 	spin_lock(&elv_list_lock);
+-
+ 	list_for_each_entry(e, &elv_list, list) {
+ 		if (elv_support_features(e->elevator_features,
+ 					 q->required_elevator_features)) {
+-			found = e;
+ 			break;
+ 		}
+ 	}
++	spin_unlock(&elv_list_lock);
+ 
+-	if (found && !try_module_get(found->elevator_owner))
+-		found = NULL;
++	if (e && !try_module_get(e->elevator_owner))
++		e = NULL;
+ 
+-	spin_unlock(&elv_list_lock);
+-	return found;
++	return e;
+ }
+ 
+ /*
 -- 
-Jens Axboe
+2.25.1
+
 
