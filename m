@@ -2,115 +2,160 @@ Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC05C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 10:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C7FFC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 11:18:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2325722268
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 10:14:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D03E22257
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 11:18:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="usqFcIX/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j2o7B/XN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725921AbgJSKOC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Oct 2020 06:14:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58298 "EHLO
+        id S1727770AbgJSLSq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Oct 2020 07:18:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725892AbgJSKOC (ORCPT
+        with ESMTP id S1727496AbgJSLSp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Oct 2020 06:14:02 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B2AC0613CE;
-        Mon, 19 Oct 2020 03:14:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=4ZUsuMrR+ngWpncutSCoMS/lWOgKT6Cj9cHkeDMetR0=; b=usqFcIX/i+y71mXlgiCmt07zPf
-        3GhE+28+QPqGVJEeCsK6m/+gyJ2SoyTGn6vthGjNUeXDKMBvpztWgc6iZXcpYvzluOq5ZFdb1GpZF
-        jeVyYJ78fusnRlk8MH7yyIeehMAolr8QLdll8bczFg7EW1AupGLl+Qv3r4H0/Qgmq/LOo7gUPJxpi
-        h2ep0USqn2voW1yuaECtBbzehj6yAeWYqtbyC6Nkh0BP1NugiBOV/5buw1x97OU9Et3nvMoscX57L
-        ZvS1/r8M5QLWM6cD4qEwb1tlDq0CmouxSIHCgn6hYxEzBC0qHRrUnPaZNodjwoGsv222RX5rh7epH
-        wDakJl8g==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kUSAt-0002S3-1F; Mon, 19 Oct 2020 10:13:55 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id ACA9A3035D4;
-        Mon, 19 Oct 2020 12:13:53 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 93F622B07595D; Mon, 19 Oct 2020 12:13:53 +0200 (CEST)
-Date:   Mon, 19 Oct 2020 12:13:53 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Mike Galbraith <umgwanakikbuti@gmail.com>, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, bigeasy@linutronix.de,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH] zram: Fix __zram_bvec_{read,write}() locking order
-Message-ID: <20201019101353.GJ2628@hirez.programming.kicks-ass.net>
-References: <CABXGCsOL0pW0Ghh-w5d12P75ve6FS9Rgmzm6DvsYbJY-jMTCdg@mail.gmail.com>
- <20201016124009.GQ2611@hirez.programming.kicks-ass.net>
- <20201016153324.GA1976566@google.com>
+        Mon, 19 Oct 2020 07:18:45 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C9C9C0613CE;
+        Mon, 19 Oct 2020 04:18:44 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id t21so9810654eds.6;
+        Mon, 19 Oct 2020 04:18:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=45s2FCkwzyyTYjXpdLwRQnD7aZKp7qq3wruiWtEoA1o=;
+        b=j2o7B/XNkY6QxAUAH9C351tgOWQYsxOBcYAFqEPbz5qI0dLEg5vA0FTiZdfZvZyD4N
+         +Z7wS6AMAbyE+PMsMIOXAc+VCm+0HcwRZXq3GBTdMpTiCJxQhsIGb7f6M1tqs5wQPcYD
+         9mKeSEBGXwJ1y3TA11fdiQ8CICZ/LAZj/3pnThAPTMVjvkll18eU4mkdmIL5WaFaZAKg
+         5dPyAdbvco8Y67FeIK67sMD282GkbIPRS0KZAxvgxtOjn83m+l0IXH/jmr+D3dp/3wxA
+         U3kG39Cgcbq1R2+z2y8zAeXzvWFC2UvaEqcxynYUVJELMvBzbzEqPvGOAaEFw+MCsHlN
+         U/uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=45s2FCkwzyyTYjXpdLwRQnD7aZKp7qq3wruiWtEoA1o=;
+        b=lbhpALajv+gnVUxAlYpkjImX0/88AZ7PjP0QAadBdyafRZbB+HAX4viMI6xitN7bQ6
+         HX7OMmM6dkethJbqiYS0wkWP3Qgvmjc82Pci9DAix69vIz5zZr9sEE+GmCbrX0rHK93M
+         iOW4+G3Hnb/hMbACVjFuoWy99EH8wVJZazmKCd/HZjTR2iOlnEigpsDWIs6b2wIyiKUf
+         oXBi4Xih7domL0pzPDFNVjPnSG2Hu1BwAVOdWfLD+ufLD4zAhB6TJSmLwyBOrq6YDSZr
+         NVw8efu5cV1mGsQ9/pWI0PMTDEFz2HdvKpY9660NHSkCsG2dxqGNcIcxJkxH3jrZE6Xv
+         h3bQ==
+X-Gm-Message-State: AOAM533SWioSpQsOeiL5hUuXyaU/uPf4WderEAtZ05pzBiB5kwjwjfQr
+        6QObiXFci0K1PkLSnZ9a2oN7eEfOGw/r5Q==
+X-Google-Smtp-Source: ABdhPJw2B7R7ZQuAnZZQqQwRpR70rr/Vg1pWrC/W/1VOCzjuKr6oga62jViR/knTDnu+L4fnJQDPjg==
+X-Received: by 2002:aa7:c54f:: with SMTP id s15mr17950954edr.107.1603106322909;
+        Mon, 19 Oct 2020 04:18:42 -0700 (PDT)
+Received: from [192.168.178.40] ([188.192.138.212])
+        by smtp.gmail.com with ESMTPSA id d6sm10259216edr.26.2020.10.19.04.18.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Oct 2020 04:18:42 -0700 (PDT)
+Subject: Re: [PATCH v2 4/4] scatterlist: add sgl_memset()
+To:     Douglas Gilbert <dgilbert@interlog.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     martin.petersen@oracle.com, axboe@kernel.dk, bvanassche@acm.org
+References: <20201018171336.63839-1-dgilbert@interlog.com>
+ <20201018171336.63839-5-dgilbert@interlog.com>
+From:   Bodo Stroesser <bostroesser@gmail.com>
+Message-ID: <75d9b1cf-e418-cee1-89de-c59c5b2b4304@gmail.com>
+Date:   Mon, 19 Oct 2020 13:18:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201016153324.GA1976566@google.com>
+In-Reply-To: <20201018171336.63839-5-dgilbert@interlog.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+AFAICS, there are 2 unneeded lines in the new implementation
+of sgl_memset. Please see details below.
 
-Mikhail reported a lockdep spat detailing how __zram_bvec_read() and
-__zram_bvec_write() use zstrm->lock and zspage->lock in opposite order.
 
-Reported-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Tested-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
----
- drivers/block/zram/zram_drv.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Am 18.10.20 um 19:13 schrieb Douglas Gilbert:
+> The existing sg_zero_buffer() function is a bit restrictive.
+> For example protection information (PI) blocks are usually
+> initialized to 0xff bytes. As its name suggests sgl_memset()
+> is modelled on memset(). One difference is the type of the
+> val argument which is u8 rather than int. Plus it returns
+> the number of bytes (over)written.
+> 
+> Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
+> ---
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 9100ac36670a..c1e2c2e1cde8 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1216,10 +1216,11 @@ static void zram_free_page(struct zram *zram, size_t index)
- static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
- 				struct bio *bio, bool partial_io)
- {
--	int ret;
-+	struct zcomp_strm *zstrm;
- 	unsigned long handle;
- 	unsigned int size;
- 	void *src, *dst;
-+	int ret;
- 
- 	zram_slot_lock(zram, index);
- 	if (zram_test_flag(zram, index, ZRAM_WB)) {
-@@ -1250,6 +1251,9 @@ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
- 
- 	size = zram_get_obj_size(zram, index);
- 
-+	if (size != PAGE_SIZE)
-+		zstrm = zcomp_stream_get(zram->comp);
-+
- 	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
- 	if (size == PAGE_SIZE) {
- 		dst = kmap_atomic(page);
-@@ -1257,8 +1261,6 @@ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
- 		kunmap_atomic(dst);
- 		ret = 0;
- 	} else {
--		struct zcomp_strm *zstrm = zcomp_stream_get(zram->comp);
--
- 		dst = kmap_atomic(page);
- 		ret = zcomp_decompress(zstrm, src, size, dst);
- 		kunmap_atomic(dst);
+...
+
+> +
+> +/**
+> + * sgl_memset - set byte 'val' up to n_bytes times on SG list
+> + * @sgl:		 The SG list
+> + * @nents:		 Number of SG entries in sgl
+> + * @skip:		 Number of bytes to skip before starting
+> + * @val:		 byte value to write to sgl
+> + * @n_bytes:		 The (maximum) number of bytes to modify
+> + *
+> + * Returns:
+> + *   The number of bytes written.
+> + *
+> + * Notes:
+> + *   Stops writing if either sgl or n_bytes is exhausted. If n_bytes is
+> + *   set SIZE_MAX then val will be written to each byte until the end
+> + *   of sgl.
+> + *
+> + *   The notes in sgl_copy_sgl() about large sgl_s _applies here as well.
+> + *
+> + **/
+> +size_t sgl_memset(struct scatterlist *sgl, unsigned int nents, off_t skip,
+> +		  u8 val, size_t n_bytes)
+> +{
+> +	size_t offset = 0;
+> +	size_t len;
+> +	struct sg_mapping_iter miter;
+> +
+> +	if (n_bytes == 0)
+> +		return 0;
+> +	sg_miter_start(&miter, sgl, nents, SG_MITER_ATOMIC | SG_MITER_TO_SG);
+> +	if (!sg_miter_skip(&miter, skip))
+> +		goto fini;
+> +
+> +	while ((offset < n_bytes) && sg_miter_next(&miter)) {
+> +		len = min(miter.length, n_bytes - offset);
+> +		memset(miter.addr, val, len);
+> +		offset += len;
+> +		miter.consumed = len;
+
+The above line will not change miter.consumed in all loop cycles but the
+last, since len will be miter.length for all loop cycles but the last
+and sg_miter_next initializes miter.consumed to contain miter.length.
+In the last loop cycle it does not harm if miter.consumed stays bigger
+than len. So this line is not needed and can be removed.
+
+> +		sg_miter_stop(&miter);
+
+Since the code does not use nested sg_miter, the sg_miter_stop() here is
+not needed, you can remove that line.
+
+Either the next call to sg_miter_next will call sg_miter_stop before
+preparing next chunk of mem, or sg_miter_stop is called behind the loop.
+
+> +	}
+> +fini:
+> +	sg_miter_stop(&miter);
+> +	return offset;
+> +}
+> +EXPORT_SYMBOL(sgl_memset);
+> +
+> 
