@@ -2,164 +2,164 @@ Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MIME_HEADER_CTYPE_ONLY,
-	MIME_NO_TEXT,SPF_HELO_NONE,SPF_PASS,T_TVD_MIME_NO_HEADERS,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_HEADER_CTYPE_ONLY,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_TVD_MIME_NO_HEADERS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3939C43457
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 14:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 097B1C433E7
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 14:36:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55FCF222C3
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 14:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97A58222E7
+	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 14:36:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b6UmV/68"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="C4Zz3tL1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729506AbgJSOgn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Oct 2020 10:36:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42498 "EHLO
+        id S1728311AbgJSOgq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Oct 2020 10:36:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728311AbgJSOgn (ORCPT
+        with ESMTP id S1729517AbgJSOgq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Oct 2020 10:36:43 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2602C0613CE
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 07:36:42 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id a17so5427568pju.1
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 07:36:42 -0700 (PDT)
+        Mon, 19 Oct 2020 10:36:46 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CCF9C0613D0
+        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 07:36:46 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id lw2so1183555pjb.3
+        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 07:36:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=nDy0itLtLAf4UMutYDY0CAhGuHzDMOta4k4ikkKOnxE=;
-        b=b6UmV/68tBrdTPKiLT2JbiA/H/47zJmJtNfa9edEPmK43ZkCegntPbK/nWy3TSz6y1
-         VUcsiJQ/1fHehh3y40/dY5VFgh/WSYSyQSzN7lkjZ7hnfgaXnq7/b8P2U125tISv/itI
-         fP30Xtq9rHc6ChVwAXH0JYQ0k1H5x9e2/u2uU=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=GcRLTDmjAyLkoQJ+bnXLHGOaJNVZcDv44dO+ZlqsAhM=;
+        b=C4Zz3tL1htpAw0t5R2HCwPSMb0zA1OXQB8XyMPaJmUZMKGrc6g+rpRspER6dA7Hood
+         0bYxezvXoAi5qyYrz4uj0awUUYLCepIlqn1zZhqR6R0wgwgY5scUY/TjtPW9O+xhx38h
+         v1Ke/itrX62wSs2jjzhQFgsF4jtQ9Gi2HbuKY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=nDy0itLtLAf4UMutYDY0CAhGuHzDMOta4k4ikkKOnxE=;
-        b=G5n/nnbHHCTcILsXi9jOZqauvWEHUoMrYkJbgBbIRGeLc1Hx3z2Mpg8X/e5fFQ694x
-         6mG3DFIW8NE4Rcvh4xXNBbB/CUHRNZqkcPgDHxr2LnThLWUU/sMuwBqXkX0UvZgjELyZ
-         7oHgduQKNSlK/676v5qjvkcbPFZuH7No8g7t+NZUcqO2oXxzx43JB0uwg7fZsF2dxdft
-         5L1SUGbmoohqdpqHr6WQlhiCdw/ZeJEfLe+vL8vgh51cD8tTyLe8zEvPxMKR67IAOcyP
-         8ulok7pHuZ+M7caCvBmFA0qfnL3Vnc1g5x0MlpzfTjr+zcMaytb7mddHA50YGXY/thw6
-         Yy4Q==
-X-Gm-Message-State: AOAM531vfFhWXTHlYIm1+HKQ/zEufZbvQjkUiJcqrTlwqmDkLg6rwAwo
-        dGRjS0rwndTZflfUvB5Ck11RLFrxq5ldWNay0wR1RgjM5Z3ENnVE2N4TSQVzRHesb3Lj6047Efg
-        cP7RzjED6XRd1n9Rt4WbK1qLV+vDgMpzTcHSBMtrkkYZ7bVm3oAUVSEHN6k63POlwDmvwmgbjKP
-        /Z7mb8d2c7kG0m
-X-Google-Smtp-Source: ABdhPJw8g0ggBgWrFuIEB/3PX4xxXEVsEGAUst16VN8Lea5TIAxKFgbEqnWwNMtJeWYBzjF1Rhdepw==
-X-Received: by 2002:a17:902:7298:b029:d4:c71a:357a with SMTP id d24-20020a1709027298b02900d4c71a357amr17308244pll.38.1603118201816;
-        Mon, 19 Oct 2020 07:36:41 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=GcRLTDmjAyLkoQJ+bnXLHGOaJNVZcDv44dO+ZlqsAhM=;
+        b=mokPYEvLz8u/sok1Bzd3PoaLnjtoZnvgTHKKuYLFLDujcfgKW8qqQgjKftQRnmAkcr
+         eXPVLQD//bh7ds3scHyWwD/Kx+1ri7WsRX9KbQC4ITVo8YTMSc5V9yOxO2cdwprgUSG6
+         ZIrb9OIxV0+10SrXUvO9pQz2WRC4vXbLFHYG7x5fhUb6D1swXUcpTrnYUT2dVzJ2Nc08
+         jA0pje2aIatIPJ2yIbRw3GJ99t8Z1qyfRd2uq3IebTq3HfBe2X+PUGhk0Blze9iCZyjA
+         saL3zLAWsP04N6ypR8N/eHQnP1RKUuWA8pKlu9gBMHflix6viRb92BCUWzSJO6N7A7QR
+         gK5A==
+X-Gm-Message-State: AOAM5316y5LYIYUOfxOl/APvCEv8aOATT4R8MkIOXUHc70p5TZT3EX23
+        N2wC6pzMB0prNrZYlkO5WdxrEPBWdTWM3e9HMDtWgnyuGhQj+vWHJU3gagWEVAoCLGWww4t/3jE
+        Ki+eEkecxCqFZTr7DlkWg0zSdKaXqdY1ubQfEp+SmiwBH2VDu6Z24xQZT6yhJzlNqRSYeD0mqLw
+        jT2FRwduIC/uPW
+X-Google-Smtp-Source: ABdhPJxJTHTWuBPPKZfRmbNisYnsTQhfguxC9/ZUkbp3EwnAfwfRjg4TM+UBtI1hYJks2iLdlGaB8w==
+X-Received: by 2002:a17:90a:4b4e:: with SMTP id o14mr90782pjl.216.1603118205179;
+        Mon, 19 Oct 2020 07:36:45 -0700 (PDT)
 Received: from localhost.localdomain ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id kb15sm53377pjb.17.2020.10.19.07.36.38
+        by smtp.gmail.com with ESMTPSA id kb15sm53377pjb.17.2020.10.19.07.36.42
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Oct 2020 07:36:41 -0700 (PDT)
+        Mon, 19 Oct 2020 07:36:44 -0700 (PDT)
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
         pbonzini@redhat.com, Muneendra <muneendra.kumar@broadcom.com>
-Subject: [RFC v2 00/18] blkcg:Support to track FC storage blk io traffic
-Date:   Mon, 19 Oct 2020 13:12:55 +0530
-Message-Id: <1603093393-12875-1-git-send-email-muneendra.kumar@broadcom.com>
+Subject: [RFC v2 01/18] cgroup: Added cgroup_get_from_kernfs_id
+Date:   Mon, 19 Oct 2020 13:12:56 +0530
+Message-Id: <1603093393-12875-2-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1603093393-12875-1-git-send-email-muneendra.kumar@broadcom.com>
+References: <1603093393-12875-1-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000fdfb9805b2070a4c"
+        boundary="0000000000002ccc2e05b2070b46"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000fdfb9805b2070a4c
+--0000000000002ccc2e05b2070b46
 
-This Patch added a unique application identifier i.e
-app_id  knob to  blkcg which allows identification of traffic
-sources at an individual cgroup based Applications
-(ex:virtual machine (VM))level in both host and
-fabric infrastructure.
+Added a new function cgroup_get_from_kernfs_id  to retrieve the cgroup
+associated with cgroup id.
+It takes cgroupid as an argument and returns cgrp and on failure
+it returns NULL.
+Exported the same as this can be used by blk-cgorup.c
 
-Added a new sysfs attribute appid_store to set the application identfier
-in  the blkcg associted with cgroup id
-/sys/class/fc/fc_udev_device/* 
-With this new interface the user can set the application identfier
-in  the blkcg associted with cgroup id.
+Added function declaration of cgroup_get_from_kernfs_id in cgorup.h
 
-This capability can be utilized by multiple block transport infrastructure
-like fc,iscsi,roce.
+Signed-off-by: Muneendra <muneendra.kumar@broadcom.com>
 
-Existing FC fabric will use this feature and the description of
-the use case is below.
+---
+v2:
+New patch
+---
+ include/linux/cgroup.h |  6 ++++++
+ kernel/cgroup/cgroup.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-Various virtualization technologies used in Fibre Channel
-SAN deployments have created the opportunity to identify
-and associate traffic with specific virtualized applications.
-The concepts behind the T11 Application Services standard is
-to provide the general mechanisms needed to identify
-virtualized services.
-It enables the Fabric and the storage targets to
-identify, monitor, and handle FC traffic
-based on vm tags by inserting application specific identification
-into the FC frame.
-
-The patches were cut against  5.10/scsi-queue tree
-
-V2:
-renamed app_identifier to app_id.
-removed the  sysfs interface blkio.app_identifie under
-/sys/fs/cgroup/blkio
-Ported the patch on top of 5.10/scsi-queue.
-Removed redundant code due to changes since last submit.
-Added a fix for issuing QFPA command.
-
-Gaurav Srivastava (15):
-  lpfc: vmid: Add the datastructure for supporting VMID in lpfc
-  lpfc: vmid: API to check if VMID is enabled.
-  lpfc: vmid: Supplementary data structures for vmid
-  lpfc: vmid: Forward declarations for APIs
-  lpfc: vmid: Add support for vmid in mailbox command
-  lpfc: vmid: VMID params initialization
-  lpfc: vmid: vmid resource allocation
-  lpfc: vmid: cleanup vmid resources
-  lpfc: vmid: Implements ELS commands for appid patch
-  lpfc: vmid: Functions to manage vmids
-  lpfc: vmid: Implements CT commands for appid.
-  lpfc: vmid: Appends the vmid in the wqe before sending request
-  lpfc: vmid: Timeout implementation for vmid
-  lpfc: vmid: Adding qfpa and vmid timeout check in worker thread
-  lpfc: vmid: Introducing vmid in io path.
-
-Muneendra (3):
-  cgroup: Added cgroup_get_from_kernfs_id
-  blkcg: Added a app identifier support for blkcg
-  nvme: Added a newsysfs attribute appid_store
-
- block/blk-cgroup.c               |  31 +++
- drivers/nvme/host/fc.c           |  73 ++++++-
- drivers/scsi/lpfc/lpfc.h         | 121 +++++++++++
- drivers/scsi/lpfc/lpfc_attr.c    |  47 ++++
- drivers/scsi/lpfc/lpfc_crtn.h    |  11 +
- drivers/scsi/lpfc/lpfc_ct.c      | 249 +++++++++++++++++++++
- drivers/scsi/lpfc/lpfc_disc.h    |   1 +
- drivers/scsi/lpfc/lpfc_els.c     | 356 ++++++++++++++++++++++++++++++-
- drivers/scsi/lpfc/lpfc_hbadisc.c | 151 +++++++++++++
- drivers/scsi/lpfc/lpfc_hw.h      | 124 ++++++++++-
- drivers/scsi/lpfc/lpfc_hw4.h     |  12 ++
- drivers/scsi/lpfc/lpfc_init.c    | 108 ++++++++++
- drivers/scsi/lpfc/lpfc_mbox.c    |   6 +
- drivers/scsi/lpfc/lpfc_scsi.c    | 325 ++++++++++++++++++++++++++++
- drivers/scsi/lpfc/lpfc_sli.c     |  65 +++++-
- drivers/scsi/lpfc/lpfc_sli.h     |   8 +
- include/linux/blk-cgroup.h       |  22 ++
- include/linux/cgroup.h           |   6 +
- kernel/cgroup/cgroup.c           |  25 +++
- 19 files changed, 1728 insertions(+), 13 deletions(-)
-
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index 618838c48313..1741f02a41d6 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -696,6 +696,7 @@ static inline void cgroup_kthread_ready(void)
+ }
+ 
+ void cgroup_path_from_kernfs_id(u64 id, char *buf, size_t buflen);
++struct cgroup *cgroup_get_from_kernfs_id(u64 id);
+ #else /* !CONFIG_CGROUPS */
+ 
+ struct cgroup_subsys_state;
+@@ -743,6 +744,11 @@ static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
+ 
+ static inline void cgroup_path_from_kernfs_id(u64 id, char *buf, size_t buflen)
+ {}
++
++static struct cgroup *cgroup_get_from_kernfs_id(u64 id)
++{
++	return NULL;
++}
+ #endif /* !CONFIG_CGROUPS */
+ 
+ #ifdef CONFIG_CGROUPS
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index dd247747ec14..f34ca94b04c0 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -5803,6 +5803,31 @@ void cgroup_path_from_kernfs_id(u64 id, char *buf, size_t buflen)
+ 	kernfs_put(kn);
+ }
+ 
++/*
++ * cgroup_get_from_kernfs_id : get the cgroup associated with cgroup id
++ * @id: cgroup id
++ * On success it returns the cgrp on failure it returns NULL
++ */
++struct cgroup *cgroup_get_from_kernfs_id(u64 id)
++{
++	struct kernfs_node *kn;
++	struct cgroup *cgrp = NULL;
++
++	mutex_lock(&cgroup_mutex);
++	kn = kernfs_find_and_get_node_by_id(cgrp_dfl_root.kf_root, id);
++	if (!kn)
++		goto out_unlock;
++
++	cgrp = kn->priv;
++	if (cgroup_is_dead(cgrp) || !cgroup_tryget(cgrp))
++		cgrp = NULL;
++	kernfs_put(kn);
++out_unlock:
++	mutex_unlock(&cgroup_mutex);
++	return cgrp;
++}
++EXPORT_SYMBOL_GPL(cgroup_get_from_kernfs_id);
++
+ /*
+  * proc_cgroup_show()
+  *  - Print task's cgroup paths into seq_file, one line for each hierarchy
 -- 
 2.26.2
 
 
---000000000000fdfb9805b2070a4c
+--0000000000002ccc2e05b2070b46
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -230,13 +230,13 @@ LbMkW5lUoTb8ycBNOKLYhNE8UEOY8jRTUtMEhzT6NJDEE+1hb3kSGfArrrF3Z8pRYiUUhcpC5GKL
 EpmWnHflnrBcah5Ozy137DGCAm8wggJrAgEBMG0wXTELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEds
 b2JhbFNpZ24gbnYtc2ExMzAxBgNVBAMTKkdsb2JhbFNpZ24gUGVyc29uYWxTaWduIDIgQ0EgLSBT
 SEEyNTYgLSBHMwIMX/krgFDQUQNyOf+1MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEi
-BCAKyRBo8WJmEjOgUeA/5AHO3qgAYZnAQxFeTHNeoOrMDTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
-AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEwMTkxNDM2NDJaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
+BCAXhObmJACsAb8RI4a/Tz/hk1u4CyXZsbpeaBZpoU4LzTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEwMTkxNDM2NDVaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEK
-MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEADWx1/6Vpe3e6EFQO
-A5swbUDWn6XSA0aAXp/E5LA2VArmvwfmnrgtQh15JzgKy7MFFWHq0JoG1n67DEVnR1Kc5nYNqc17
-KRMVbRAdHFZ9Q3410VK9PZAcRxdYJMWqX7+8u1Uk4p482JqjGH+3uDdR62OPqXNdJrR550bsj0f2
-Fb8emauINS1VzQLMa93v8eAFeCKOymrE+vjDTVoH2wCvcgm+MvhKYC1wl3CBRADj/kBpBZpHl6ph
-wOcOhon8NeL4gWAi2b/vXXmciw999OldYRbc2XOXkrItwp90SEVO2D3zdmJVriYnsoXojcVamO3e
-vro3HCG2YrQCelwIa2EOFw==
---000000000000fdfb9805b2070a4c--
+MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEArySwj6HKftRqWS7L
+o+F3ylGADSWwL3raGAOsd6gqH3LNYVYOoYVCJapjNuudgXaCIaeJsbRkKrCAg80HgwIbtwKItXZ0
+QTST9mCYSsNOaaF+dnfhhAqDDlAPVDcznzrjpGJB+nsbp7MKczEx6KwLxZdYLgbNKHRLR+Gw64WM
+ZzMt3HbyLKtH2orLWNYtD1A2FaGFdXx1x+jCGk0e0omLIrWq3q5F11s4/Fqj7mQVs2HcPkXOnZhr
+++tWKYjEqWNmRKW//HxEiOITRm+vvJaOeXgFi8S2f7geUA100KYOkmpWDkET1F/pmmGJhBOmQddW
+rpuE3OFIxNv6ALcOV1AURw==
+--0000000000002ccc2e05b2070b46--
