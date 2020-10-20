@@ -2,155 +2,111 @@ Return-Path: <SRS0=yWXY=D3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F385C4363A
-	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 21:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 423CBC4363A
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 22:42:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 912FA2224A
-	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 21:35:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C12C422283
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 22:42:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="vz2AkNUQ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AFQhPaJH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438710AbgJTVf5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Oct 2020 17:35:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2438708AbgJTVf5 (ORCPT
+        id S2439198AbgJTWmA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Oct 2020 18:42:00 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:38442 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2439144AbgJTWmA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Oct 2020 17:35:57 -0400
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169CEC0613D3
-        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 14:35:57 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id a3so4914773ejy.11
-        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 14:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iYeGwSIoad54GydKSNZgZE6g2uU5cfbPFHvZ08BT6RM=;
-        b=vz2AkNUQj4/8TjPt9jfB06mE5lh3/rlUf+7TZCmQybUg2w9Uy6vQWbxXQCV3LtCDo6
-         8NrtKsKDpJKbo08xxZc3HVsXDnUkKREszdVB2trWrs/2AdrZ3mckGXVRO6A2eIKS2906
-         Z3RSSNONukymyOXsAGQm4R3ZP6mqVzcK95g/x/1IMvf8wVgCEz66GYAsUm+U916t5qMV
-         Ud4Q2SPAHqkVMkhaMoeNEEg/w+QWIpXZYUr+Go78/SEGrUm7J3KqYmBLlQo51CR7KtRg
-         TEmUrewGCc0Mw15SfxVDhlxCP3L6jNmETWroPevOTLaxA96Bn4Xgyce/T0RK/mgi2IXd
-         /x1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iYeGwSIoad54GydKSNZgZE6g2uU5cfbPFHvZ08BT6RM=;
-        b=E/lXKH2REBwBMsg1uC4qDrrfwAaJeTGwNL4J5XjBd6z/9bGUaMUqtn/+xp0dCdh/ih
-         EdfvpZ0ziVyA5O4NZxyrzw4GpUjueubanoQgyAfm8JfpTivgA/lo0MSQrlhsCX6iqnuu
-         dGc2zIN2MTMYXWygkD8Ij2scQ/QBrShmW5hpoZV4fa9Mmf8K5etfznEhcYuz/RnPZwYj
-         od+1eb+tJ8pSVbdolyYfZsXH3QxHg7iYjyvbDkfM3ZaQrZlfIun2UHdcTvYX6uYb/Ubp
-         cMqrxT5wqScNGJZ4gzXPRRlnaqpJcwWFlIzI7F9b/i9C+SOco+TDmvmpSQ81EpSAxiBl
-         5Edg==
-X-Gm-Message-State: AOAM530B66St57Kw0q5getSKCKQzsOK+3xs39Ab1gj65Dob7VEXgRkI7
-        u0mYz8uSm+/zbExWwtrPpIDJkztfC7diuOz+yRbgVg==
-X-Google-Smtp-Source: ABdhPJxdsFzso6n0bhQlIsaXXdnNPz55lLRK+7wVqKJ60Myp6XphIfmevRWnAF5iTVW1mTgE1+z4eTNT633n3PsqwaQ=
-X-Received: by 2002:a17:906:c20f:: with SMTP id d15mr155804ejz.341.1603229755722;
- Tue, 20 Oct 2020 14:35:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201012162736.65241-1-nmeeramohide@micron.com>
- <20201015080254.GA31136@infradead.org> <SN6PR08MB420880574E0705BBC80EC1A3B3030@SN6PR08MB4208.namprd08.prod.outlook.com>
- <CAPcyv4j7a0gq++rL--2W33fL4+S0asYjYkvfBfs+hY+3J=c_GA@mail.gmail.com> <SN6PR08MB420843C280D54D7B5B76EB78B31E0@SN6PR08MB4208.namprd08.prod.outlook.com>
-In-Reply-To: <SN6PR08MB420843C280D54D7B5B76EB78B31E0@SN6PR08MB4208.namprd08.prod.outlook.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Tue, 20 Oct 2020 14:35:44 -0700
-Message-ID: <CAPcyv4iYOk3i0pPgXxDTy47BxWCXqqXS0J6mrY5o+1M_41XoAw@mail.gmail.com>
-Subject: Re: [EXT] Re: [PATCH v2 00/22] add Object Storage Media Pool (mpool)
-To:     "Nabeel Meeramohideen Mohamed (nmeeramohide)" 
-        <nmeeramohide@micron.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
-        "Steve Moyer (smoyer)" <smoyer@micron.com>,
-        "Greg Becker (gbecker)" <gbecker@micron.com>,
-        "Pierre Labat (plabat)" <plabat@micron.com>,
-        "John Groves (jgroves)" <jgroves@micron.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 20 Oct 2020 18:42:00 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09KMeIT5106193;
+        Tue, 20 Oct 2020 22:41:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=9CF09juyMLDXwlB/JkIoYdAQ4cPLEFn1gDhrmUFNFFU=;
+ b=AFQhPaJHKjg1sx+si5bCuqcy5H6YLrMFjtowvLtbQcdu4/RNLL8orH453XKYh70W0hP5
+ KzbYf1FI3KwAcGZ6f81gYrYaV972Wth2C2qiIGp4yJ8ukRchm94n5uaQk+l/VFbvFQng
+ /O966LamzYaxgxEL3TOjmZi/tCSgVo1YIVdusMThZPQqBwZTE/1wqsHl4y8mbJoA/xNW
+ ZyGueNU9nVtO5hilPR/EeORohzRkGa2BlewUECSHVTzuB8wY4dCQ2L0AGW2HtZNDUMuv
+ W2kP5C36CKaDPRxrb5MkxxbjZAFiabi2G6lquS90B6h+BEzkJb3Vd5x4yCk6Ir5Crh6y KA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 347s8mwkxh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 20 Oct 2020 22:41:57 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09KMdtr9032914;
+        Tue, 20 Oct 2020 22:41:57 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 348acrc5n6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Oct 2020 22:41:57 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09KMfuIS007397;
+        Tue, 20 Oct 2020 22:41:56 GMT
+Received: from localhost.localdomain (/10.211.9.80)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 20 Oct 2020 15:41:55 -0700
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] blk-mq: fix comment as bt_tags_for_each() is not only for started request
+Date:   Tue, 20 Oct 2020 15:41:32 -0700
+Message-Id: <20201020224132.22539-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.17.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9780 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 adultscore=0
+ mlxscore=0 malwarescore=0 suspectscore=1 spamscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010200154
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9780 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 suspectscore=1
+ lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 spamscore=0
+ phishscore=0 clxscore=1011 bulkscore=0 impostorscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010200154
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 19, 2020 at 3:30 PM Nabeel Meeramohideen Mohamed
-(nmeeramohide) <nmeeramohide@micron.com> wrote:
->
-> Hi Dan,
->
-> On Friday, October 16, 2020 4:12 PM, Dan Williams <dan.j.williams@intel.com> wrote:
-> >
-> > On Fri, Oct 16, 2020 at 2:59 PM Nabeel Meeramohideen Mohamed
-> > (nmeeramohide) <nmeeramohide@micron.com> wrote:
-> > >
-> > > On Thursday, October 15, 2020 2:03 AM, Christoph Hellwig
-> > <hch@infradead.org> wrote:
-> > > > I don't think this belongs into the kernel.  It is a classic case for
-> > > > infrastructure that should be built in userspace.  If anything is
-> > > > missing to implement it in userspace with equivalent performance we
-> > > > need to improve out interfaces, although io_uring should cover pretty
-> > > > much everything you need.
-> > >
-> > > Hi Christoph,
-> > >
-> > > We previously considered moving the mpool object store code to user-space.
-> > > However, by implementing mpool as a device driver, we get several benefits
-> > > in terms of scalability, performance, and functionality. In doing so, we relied
-> > > only on standard interfaces and did not make any changes to the kernel.
-> > >
-> > > (1)  mpool's "mcache map" facility allows us to memory-map (and later unmap)
-> > > a collection of logically related objects with a single system call. The objects in
-> > > such a collection are created at different times, physically disparate, and may
-> > > even reside on different media class volumes.
-> > >
-> > > For our HSE storage engine application, there are commonly 10's to 100's of
-> > > objects in a given mcache map, and 75,000 total objects mapped at a given
-> > time.
-> > >
-> > > Compared to memory-mapping objects individually, the mcache map facility
-> > > scales well because it requires only a single system call and single
-> > vm_area_struct
-> > > to memory-map a complete collection of objects.
->
-> > Why can't that be a batch of mmap calls on io_uring?
->
-> Agreed, we could add the capability to invoke mmap via io_uring to help mitigate the
-> system call overhead of memory-mapping individual objects, versus our mache map
-> mechanism. However, there is still the scalability issue of having a vm_area_struct
-> for each object (versus one for each mache map).
->
-> We ran YCSB workload C in two different configurations -
-> Config 1: memory-mapping each individual object
-> Config 2: memory-mapping a collection of related objects using mcache map
->
-> - Config 1 incurred ~3.3x additional kernel memory for the vm_area_struct slab -
-> 24.8 MB (127188 objects) for config 1, versus 7.3 MB (37482 objects) for config 2.
->
-> - Workload C exhibited around 10-25% better tail latencies (4-nines) for config 2,
-> not sure if it's due the reduced complexity of searching VMAs during page faults.
+Since the introduction of 'BT_TAG_ITER_STARTED' by commit 602380d28e28
+("blk-mq: add blk_mq_all_tag_iter"), the bt_tags_for_each() is not only
+used for started request, e.g., in below case:
 
-So this gets to the meta question that is giving me pause on this
-whole proposal:
+blk_mq_hctx_has_requests()
+-> blk_mq_all_tag_iter()
+   -> __blk_mq_all_tag_iter() --> only BT_TAG_ITER_STATIC_RQS is set
+      -> bt_tags_for_each()
+         -> bt_tags_iter()
 
-    What does Linux get from merging mpool?
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+ block/blk-mq-tag.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-What you have above is a decent scalability bug report. That type of
-pressure to meet new workload needs is how Linux interfaces evolve.
-However, rather than evolve those interfaces mpool is a revolutionary
-replacement that leaves the bugs intact for everyone that does not
-switch over to mpool.
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 9c92053e704d..43af5063fe2e 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -289,10 +289,10 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+  * @tags:	Tag map to iterate over.
+  * @bt:		sbitmap to examine. This is either the breserved_tags member
+  *		or the bitmap_tags member of struct blk_mq_tags.
+- * @fn:		Pointer to the function that will be called for each started
+- *		request. @fn will be called as follows: @fn(rq, @data,
+- *		@reserved) where rq is a pointer to a request. Return true
+- *		to continue iterating tags, false to stop.
++ * @fn:		Pointer to the function that will be called for each request
++ *		depending on the value of @flags. @fn will be called as
++ *		follows: @fn(rq, @data, @reserved) where rq is a pointer to a
++ *		request. Return true to continue iterating tags, false to stop.
+  * @data:	Will be passed as second argument to @fn.
+  * @flags:	BT_TAG_ITER_*
+  */
+-- 
+2.17.1
 
-Consider io_uring as an example where the kernel resisted trends
-towards userspace I/O engines and instead evolved a solution that
-maintained kernel control while also achieving similar performance
-levels.
-
-The exercise is useful to identify places where Linux has
-deficiencies, but wholesale replacing an entire I/O submission model
-is a direction that leaves the old apis to rot.
