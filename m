@@ -2,88 +2,99 @@ Return-Path: <SRS0=yWXY=D3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A693C433E7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 09:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8211AC433E7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 13:08:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E0A78206DC
-	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 09:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2394722404
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 13:08:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Euj2GW9Z"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cqQOg5Tl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403850AbgJTJoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Oct 2020 05:44:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30055 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2403839AbgJTJoj (ORCPT
+        id S2407265AbgJTNI5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Oct 2020 09:08:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55692 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407241AbgJTNIx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Oct 2020 05:44:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603187078;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QXYs6egZBi1dDPtBtWTXxsg0s20RzV1tfBLOiwQO35Y=;
-        b=Euj2GW9ZsiOF8yqxfdoi21xpgXHtGgV1MPVo8hLLy0CtTvniH7fYTCIkFf8SrVcs8vrjzY
-        8hxkmdIpHWXJ8BlWEUcFucVsYlZjdmR7A4HMMEEgxsWUHefl7ShX1JgsExzdiukaFAiDaz
-        p1IwqKvZ8z77PAVldmyboDldjPEGLJQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17--q8sY-yOPza9jAQy6bEoYg-1; Tue, 20 Oct 2020 05:44:36 -0400
-X-MC-Unique: -q8sY-yOPza9jAQy6bEoYg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72549640AC;
-        Tue, 20 Oct 2020 09:44:34 +0000 (UTC)
-Received: from T590 (ovpn-12-164.pek2.redhat.com [10.72.12.164])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D8856198C;
-        Tue, 20 Oct 2020 09:44:24 +0000 (UTC)
-Date:   Tue, 20 Oct 2020 17:44:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Chao Leng <lengchao@huawei.com>, Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH 3/4] nvme: tcp: fix race between timeout and normal
- completion
-Message-ID: <20201020094420.GD1429635@T590>
-References: <20201016142811.1262214-1-ming.lei@redhat.com>
- <20201016142811.1262214-4-ming.lei@redhat.com>
- <e9d2e28e-fb55-358c-3e8c-6f3e9dd91c25@grimberg.me>
+        Tue, 20 Oct 2020 09:08:53 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8AEC0613CE
+        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 06:08:51 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id j8so2146680ilk.0
+        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 06:08:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=vMjv69Q8ygJTDYUmtmqR5brlN9bQw64VIyI24z18jzA=;
+        b=cqQOg5TlBhSHYK8ucEO8iGioZ3ug3JvxYTXOjTVruEHdm9SvDU5nrkAwp9nMQNNSiO
+         EcwqyjcskunxgNXegcl9ilsGpyw0hpdo0FDdRoKIi+U1Q92X+dvrugsHSrDUQuM5O8NE
+         db30d7d6VKywjCwMbZQyAqPxAxPxjGSAHsAN9PBY6JVofOH281yX0TUdUceYJ5s4nyf0
+         G44npvNgm5E817+gLEokiS/RfoNI3E4xmOF9UEZooKfdhCoCBoT/RTPjSfK63YG4hpwu
+         ZuopdYqg7vHZ+TmaHzpOqEKOq8/UT/t3M2wt1Zo2m0E9mEx0IcEPq/eBQZ2hwPrhdnJT
+         +cKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vMjv69Q8ygJTDYUmtmqR5brlN9bQw64VIyI24z18jzA=;
+        b=D7GvxSu21B6SIaCZixId61AXocSyyieFZ/sRvYKF4P9U9h7Vli+wDA/+XbTpXJ8lTj
+         TPWQl1YQorYN24tC7MSW68moK0e1N6GMYeWpo+gxqzrMc5hZTB4c/aNpzjJ1PgXpnEk/
+         6ElV/B63iVRCi9SrDZAB7GTSdNp18qfH9RMgHfGhYgjjZkZC0NDtyBAz0oj9CqqyNlMH
+         njqQsdycRO1odjGG71+CqCcrAQ+Bb/a90VFiguLt+TbbXHhwx/9xU8H7MdyzY52Ha3ey
+         YHm3gqzyrN05F6o+MoSRMi0es+imXrZbMOJ4x36qfTnWYOjdE2HiZU/J5fqkaX4ReSQf
+         L1QA==
+X-Gm-Message-State: AOAM531zGPrwvbjcDrpM57606+8myvu22LSpueAIc7x2incpf+N4a9J6
+        h0oV71D8eSO8tCrm1DiLYlqfsg==
+X-Google-Smtp-Source: ABdhPJzm9BWlfeceU/Pa8coannvqHVejEwNaW+D/pLKRy4IBr4U+OwVIbd3EIC8zCU9He1KiPKZ4fw==
+X-Received: by 2002:a92:9119:: with SMTP id t25mr1811593ild.90.1603199331115;
+        Tue, 20 Oct 2020 06:08:51 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id o19sm1767373ilt.24.2020.10.20.06.08.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Oct 2020 06:08:50 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: remove the calling of local_memory_node()
+To:     Xianting Tian <tian.xianting@h3c.com>,
+        raghavendra.kt@linux.vnet.ibm.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mhocko@suse.com
+References: <20201019082047.31113-1-tian.xianting@h3c.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1db7f790-b4df-435b-25b1-d99222ed7c50@kernel.dk>
+Date:   Tue, 20 Oct 2020 07:08:49 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e9d2e28e-fb55-358c-3e8c-6f3e9dd91c25@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20201019082047.31113-1-tian.xianting@h3c.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 20, 2020 at 01:11:11AM -0700, Sagi Grimberg wrote:
+On 10/19/20 2:20 AM, Xianting Tian wrote:
+> We don't need to check whether the node is memoryless numa node before
+> calling allocator interface. SLUB(and SLAB,SLOB) relies on the page
+> allocator to pick a node. Page allocator should deal with memoryless
+> nodes just fine. It has zonelists constructed for each possible nodes.
+> And it will automatically fall back into a node which is closest to the
+> requested node. As long as __GFP_THISNODE is not enforced of course.
 > 
-> > NVMe TCP timeout handler allows to abort request directly when the
-> > controller isn't in LIVE state. nvme_tcp_error_recovery() updates
-> > controller state as RESETTING, and schedule reset work function. If
-> > new timeout comes before the work function is called, the new timedout
-> > request will be aborted directly, however at that time, the controller
-> > isn't shut down yet, then timeout abort vs. normal completion race
-> > will be triggered.
+> The code comments of kmem_cache_alloc_node() of SLAB also showed this:
+>  * Fallback to other node is possible if __GFP_THISNODE is not set.
 > 
-> This assertion is incorrect, the before completing the request from
-> the timeout handler, we call nvme_tcp_stop_queue, which guarantees upon
-> return that no more completions will be seen from this queue.
+> blk-mq code doesn't set __GFP_THISNODE, so we can remove the calling
+> of local_memory_node().
 
-OK, then looks the issue can be fixed by patch 1 & 2 only.
+Applied, thanks.
 
-Yi, can you test again and see if the issue can be fixed by patch 1 & 2?
-
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
