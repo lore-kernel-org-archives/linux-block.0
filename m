@@ -2,178 +2,88 @@ Return-Path: <SRS0=yWXY=D3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB51C433E7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 09:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A693C433E7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 09:44:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF4F5222C8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 09:04:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0A78206DC
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 09:44:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Euj2GW9Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389666AbgJTJEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Oct 2020 05:04:32 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3646 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389610AbgJTJEb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Oct 2020 05:04:31 -0400
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id 58830B7502192D6CB01D;
-        Tue, 20 Oct 2020 17:04:30 +0800 (CST)
-Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Tue, 20 Oct 2020 17:04:29 +0800
-Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
- (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Tue, 20
- Oct 2020 17:04:29 +0800
-Subject: Re: [PATCH V2 3/4] nvme: tcp: complete non-IO requests atomically
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        "Christoph Hellwig" <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-CC:     Sagi Grimberg <sagi@grimberg.me>, Yi Zhang <yi.zhang@redhat.com>
-References: <20201020085301.1553959-1-ming.lei@redhat.com>
- <20201020085301.1553959-4-ming.lei@redhat.com>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <e1d53ce3-ea27-439e-5e7a-ba790742908e@huawei.com>
-Date:   Tue, 20 Oct 2020 17:04:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S2403850AbgJTJoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Oct 2020 05:44:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30055 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2403839AbgJTJoj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Oct 2020 05:44:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603187078;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QXYs6egZBi1dDPtBtWTXxsg0s20RzV1tfBLOiwQO35Y=;
+        b=Euj2GW9ZsiOF8yqxfdoi21xpgXHtGgV1MPVo8hLLy0CtTvniH7fYTCIkFf8SrVcs8vrjzY
+        8hxkmdIpHWXJ8BlWEUcFucVsYlZjdmR7A4HMMEEgxsWUHefl7ShX1JgsExzdiukaFAiDaz
+        p1IwqKvZ8z77PAVldmyboDldjPEGLJQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17--q8sY-yOPza9jAQy6bEoYg-1; Tue, 20 Oct 2020 05:44:36 -0400
+X-MC-Unique: -q8sY-yOPza9jAQy6bEoYg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72549640AC;
+        Tue, 20 Oct 2020 09:44:34 +0000 (UTC)
+Received: from T590 (ovpn-12-164.pek2.redhat.com [10.72.12.164])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D8856198C;
+        Tue, 20 Oct 2020 09:44:24 +0000 (UTC)
+Date:   Tue, 20 Oct 2020 17:44:20 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Chao Leng <lengchao@huawei.com>, Yi Zhang <yi.zhang@redhat.com>
+Subject: Re: [PATCH 3/4] nvme: tcp: fix race between timeout and normal
+ completion
+Message-ID: <20201020094420.GD1429635@T590>
+References: <20201016142811.1262214-1-ming.lei@redhat.com>
+ <20201016142811.1262214-4-ming.lei@redhat.com>
+ <e9d2e28e-fb55-358c-3e8c-6f3e9dd91c25@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <20201020085301.1553959-4-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.169.42.93]
-X-ClientProxiedBy: dggeme718-chm.china.huawei.com (10.1.199.114) To
- dggema772-chm.china.huawei.com (10.1.198.214)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e9d2e28e-fb55-358c-3e8c-6f3e9dd91c25@grimberg.me>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Oct 20, 2020 at 01:11:11AM -0700, Sagi Grimberg wrote:
+> 
+> > NVMe TCP timeout handler allows to abort request directly when the
+> > controller isn't in LIVE state. nvme_tcp_error_recovery() updates
+> > controller state as RESETTING, and schedule reset work function. If
+> > new timeout comes before the work function is called, the new timedout
+> > request will be aborted directly, however at that time, the controller
+> > isn't shut down yet, then timeout abort vs. normal completion race
+> > will be triggered.
+> 
+> This assertion is incorrect, the before completing the request from
+> the timeout handler, we call nvme_tcp_stop_queue, which guarantees upon
+> return that no more completions will be seen from this queue.
+
+OK, then looks the issue can be fixed by patch 1 & 2 only.
+
+Yi, can you test again and see if the issue can be fixed by patch 1 & 2?
 
 
-On 2020/10/20 16:53, Ming Lei wrote:
-> During controller's CONNECTING state, admin/fabric/connect requests
-> are submitted for recovery controller, and we allow to abort this request
-> directly in time out handler for not blocking setup procedure.
-> 
-> So timout vs. normal completion race exists on these requests since
-> admin/fabirc/connect queues won't be shutdown before handling timeout
-> during CONNECTING state.
-> 
-> Add atomic completion for requests from connect/fabric/admin queue for
-> avoiding the race.
-> 
-> CC: Chao Leng <lengchao@huawei.com>
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Tested-by: Yi Zhang <yi.zhang@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   drivers/nvme/host/tcp.c | 40 +++++++++++++++++++++++++++++++++++++---
->   1 file changed, 37 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index d6a3e1487354..7e85bd4a8d1b 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -30,6 +30,8 @@ static int so_priority;
->   module_param(so_priority, int, 0644);
->   MODULE_PARM_DESC(so_priority, "nvme tcp socket optimize priority");
->   
-> +#define REQ_STATE_COMPLETE     0
-> +
->   enum nvme_tcp_send_state {
->   	NVME_TCP_SEND_CMD_PDU = 0,
->   	NVME_TCP_SEND_H2C_PDU,
-> @@ -56,6 +58,8 @@ struct nvme_tcp_request {
->   	size_t			offset;
->   	size_t			data_sent;
->   	enum nvme_tcp_send_state state;
-> +
-> +	unsigned long		comp_state;
-I do not think adding state is a good idea.
-It is similar to rq->state.
-In the teardown process, after quiesced queues delete the timer and
-cancel the timeout work maybe a better option.
-I will send the patch later.
-The patch is already tested with roce more than one week.
->   };
->   
->   enum nvme_tcp_queue_flags {
-> @@ -469,6 +473,33 @@ static void nvme_tcp_error_recovery(struct nvme_ctrl *ctrl)
->   	queue_work(nvme_reset_wq, &to_tcp_ctrl(ctrl)->err_work);
->   }
->   
-> +/*
-> + * requests originated from admin, fabrics and connect_q have to be
-> + * completed atomically because we don't cover the race between timeout
-> + * and normal completion for these queues.
-> + */
-> +static inline bool nvme_tcp_need_atomic_complete(struct request *rq)
-> +{
-> +	return !rq->rq_disk;
-> +}
-> +
-> +static inline void nvme_tcp_clear_rq_complete(struct request *rq)
-> +{
-> +	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
-> +
-> +	if (unlikely(nvme_tcp_need_atomic_complete(rq)))
-> +		clear_bit(REQ_STATE_COMPLETE, &req->comp_state);
-> +}
-> +
-> +static inline bool nvme_tcp_mark_rq_complete(struct request *rq)
-> +{
-> +	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
-> +
-> +	if (unlikely(nvme_tcp_need_atomic_complete(rq)))
-> +		return !test_and_set_bit(REQ_STATE_COMPLETE, &req->comp_state);
-> +	return true;
-> +}
-> +
->   static int nvme_tcp_process_nvme_cqe(struct nvme_tcp_queue *queue,
->   		struct nvme_completion *cqe)
->   {
-> @@ -483,7 +514,8 @@ static int nvme_tcp_process_nvme_cqe(struct nvme_tcp_queue *queue,
->   		return -EINVAL;
->   	}
->   
-> -	if (!nvme_try_complete_req(rq, cqe->status, cqe->result))
-> +	if (nvme_tcp_mark_rq_complete(rq) &&
-> +			!nvme_try_complete_req(rq, cqe->status, cqe->result))
->   		nvme_complete_rq(rq);
->   	queue->nr_cqe++;
->   
-> @@ -674,7 +706,8 @@ static inline void nvme_tcp_end_request(struct request *rq, u16 status)
->   {
->   	union nvme_result res = {};
->   
-> -	if (!nvme_try_complete_req(rq, cpu_to_le16(status << 1), res))
-> +	if (nvme_tcp_mark_rq_complete(rq) &&
-> +			!nvme_try_complete_req(rq, cpu_to_le16(status << 1), res))
->   		nvme_complete_rq(rq);
->   }
->   
-> @@ -2174,7 +2207,7 @@ static void nvme_tcp_complete_timed_out(struct request *rq)
->   	/* fence other contexts that may complete the command */
->   	mutex_lock(&to_tcp_ctrl(ctrl)->teardown_lock);
->   	nvme_tcp_stop_queue(ctrl, nvme_tcp_queue_id(req->queue));
-> -	if (!blk_mq_request_completed(rq)) {
-> +	if (nvme_tcp_mark_rq_complete(rq) && !blk_mq_request_completed(rq)) {
->   		nvme_req(rq)->status = NVME_SC_HOST_ABORTED_CMD;
->   		blk_mq_complete_request(rq);
->   	}
-> @@ -2315,6 +2348,7 @@ static blk_status_t nvme_tcp_queue_rq(struct blk_mq_hw_ctx *hctx,
->   	if (unlikely(ret))
->   		return ret;
->   
-> +	nvme_tcp_clear_rq_complete(rq);
->   	blk_mq_start_request(rq);
->   
->   	nvme_tcp_queue_request(req, true, bd->last);
-> 
+Thanks,
+Ming
+
