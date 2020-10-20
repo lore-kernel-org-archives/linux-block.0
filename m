@@ -1,148 +1,135 @@
-Return-Path: <SRS0=eZc3=D2=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=yWXY=D3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE93C433E7
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 23:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 807FCC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 02:53:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA77E2242A
-	for <linux-block@archiver.kernel.org>; Mon, 19 Oct 2020 23:06:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="R0THCPfe"
+	by mail.kernel.org (Postfix) with ESMTP id 4EE13222E9
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 02:53:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388911AbgJSXGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Oct 2020 19:06:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37902 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727778AbgJSXFt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Oct 2020 19:05:49 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA9DC0613D4
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 16:05:49 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id 67so43832iob.8
-        for <linux-block@vger.kernel.org>; Mon, 19 Oct 2020 16:05:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KZcwJitFojA7RhzeD/UU8gbzehCBdvf6g5ia0ZYCrq4=;
-        b=R0THCPfeT+NjRv5n7wRuWr3+iQQVH5mYQugrcFEorv7jMlZOJpq4gWO8x2sltRZ1S3
-         8+uXkfK+0xraFRPc7RLEyC+L1Eqn+lwfgcQ60rCu3Ir6T0iqCUlHxkXPI8IxQxljNihW
-         MxA7dERE+Fo0B6yhfEPLGm6gbjuMrGvt0ee7i4ozPAa6C0OwTV1SJBaz+sj8rzyyiIix
-         DQ1LhxNguLsVQ2r9xWcmCur9QDHoeimXQtC/UVpN+4Yl8O9ZbpYKUwlrKFZtzYHwjpgZ
-         iC+kREvCZvwgmOBCIm7DmgxG6/6ncKrp6QDCnbxkp/qIzrhuMyauJsg53LWTp//HSslk
-         z+3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KZcwJitFojA7RhzeD/UU8gbzehCBdvf6g5ia0ZYCrq4=;
-        b=NRpfNOk90OojbfdOyHWIoPdabDaSnXqpbjSKZ6/DKM0I0uu9K1xwN++sOjrfq9p59T
-         gAbqVtsrY6poRYF4dxlW0YuH//2V3sETqX5MYKmVkZ99j22AP9LeONWMOp+X1dVD3cOX
-         oN525hpfeO6Ua9s4jP/wca6kHKaf9qUI/qUYvl9yaHp/9cnGBNEQy1qUOJflu8PiFFkg
-         zwF1JaAGcIvPAbR1cY7RffZJ0ktEFB0JXMd8wHR+ipcRcDkj321hBzmTZz+xfBWa/d3P
-         6tlYZEJZbIaDmIGAjO0u9C6WUaSsbschlCuqb+QkObCoKRj0f6ooCoz4H2VKO5DKeRY/
-         IjdA==
-X-Gm-Message-State: AOAM530XECVw0ugLCgi6R1NJru+BUM7AtNtTxGmKqPH4/XuGl9mjaoiG
-        9DF1fmC/Wo9j0+K6RqEIctZCLg==
-X-Google-Smtp-Source: ABdhPJwE/qhLAedndnNRaUrUDMs331Onaq8Iz+VDEVRJN+4h4B5ckC67pNXDnvS9MRF/DxLJjNlnIQ==
-X-Received: by 2002:a6b:5019:: with SMTP id e25mr44377iob.123.1603148748578;
-        Mon, 19 Oct 2020 16:05:48 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id u8sm7938ilm.36.2020.10.19.16.05.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Oct 2020 16:05:47 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kUeDq-002hRf-LL; Mon, 19 Oct 2020 20:05:46 -0300
-Date:   Mon, 19 Oct 2020 20:05:46 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Tom Rix <trix@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
-        linux-edac@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-pm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-power@fi.rohmeurope.com, linux-gpio@vger.kernel.org,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        spice-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
-        linux-amlogic@lists.infradead.org,
-        industrypack-devel@lists.sourceforge.net,
-        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-can@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>,
-        intel-wired-lan@lists.osuosl.org, ath10k@lists.infradead.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        linux-stm32@st-md-mailman.stormreply.com, linux-nfc@lists.01.org,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        linux-pci@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
-        storagedev@microchip.com, devel@driverdev.osuosl.org,
-        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net,
-        linux-watchdog@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        bpf <bpf@vger.kernel.org>, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        alsa-devel@alsa-project.org,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        George Burgess <gbiv@google.com>
-Subject: Re: [RFC] treewide: cleanup unreachable breaks
-Message-ID: <20201019230546.GH36674@ziepe.ca>
-References: <20201017160928.12698-1-trix@redhat.com>
- <20201018054332.GB593954@kroah.com>
- <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
+        id S2390874AbgJTCxZ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Oct 2020 22:53:25 -0400
+Received: from smtp.h3c.com ([60.191.123.56]:17530 "EHLO h3cspam01-ex.h3c.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390804AbgJTCxZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Oct 2020 22:53:25 -0400
+Received: from DAG2EX09-IDC.srv.huawei-3com.com ([10.8.0.72])
+        by h3cspam01-ex.h3c.com with ESMTPS id 09K2qjIx075291
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 20 Oct 2020 10:52:45 +0800 (GMT-8)
+        (envelope-from tian.xianting@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX09-IDC.srv.huawei-3com.com (10.8.0.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 20 Oct 2020 10:52:46 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%7]) with
+ mapi id 15.01.2106.002; Tue, 20 Oct 2020 10:52:46 +0800
+From:   Tianxianting <tian.xianting@h3c.com>
+To:     Michal Hocko <mhocko@suse.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "raghavendra.kt@linux.vnet.ibm.com" 
+        <raghavendra.kt@linux.vnet.ibm.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] blk-mq: remove the calling of local_memory_node()
+Thread-Topic: [PATCH] blk-mq: remove the calling of local_memory_node()
+Thread-Index: AQHWpfIblb4hxO1wEUaIIqHsdHbO2qmeRzOAgAGEP4A=
+Date:   Tue, 20 Oct 2020 02:52:46 +0000
+Message-ID: <eadeb35dc2ea4b9c9df6b36b9e9f19e2@h3c.com>
+References: <20201019082047.31113-1-tian.xianting@h3c.com>
+ <20201019114011.GE27114@dhcp22.suse.cz>
+In-Reply-To: <20201019114011.GE27114@dhcp22.suse.cz>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.99.141.128]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
+X-DNSRBL: 
+X-MAIL: h3cspam01-ex.h3c.com 09K2qjIx075291
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 19, 2020 at 12:42:15PM -0700, Nick Desaulniers wrote:
-> On Sat, Oct 17, 2020 at 10:43 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
-> > > From: Tom Rix <trix@redhat.com>
-> > >
-> > > This is a upcoming change to clean up a new warning treewide.
-> > > I am wondering if the change could be one mega patch (see below) or
-> > > normal patch per file about 100 patches or somewhere half way by collecting
-> > > early acks.
-> >
-> > Please break it up into one-patch-per-subsystem, like normal, and get it
-> > merged that way.
-> >
-> > Sending us a patch, without even a diffstat to review, isn't going to
-> > get you very far...
+Thanks Michal,
+Hi, raghavendra, Jens
+Could you help comment this issue? Thanks in advance.
+
+-----Original Message-----
+From: Michal Hocko [mailto:mhocko@suse.com] 
+Sent: Monday, October 19, 2020 7:40 PM
+To: tianxianting (RD) <tian.xianting@h3c.com>
+Cc: axboe@kernel.dk; raghavendra.kt@linux.vnet.ibm.com; linux-block@vger.kernel.org; linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: remove the calling of local_memory_node()
+
+On Mon 19-10-20 16:20:47, Xianting Tian wrote:
+> We don't need to check whether the node is memoryless numa node before 
+> calling allocator interface. SLUB(and SLAB,SLOB) relies on the page 
+> allocator to pick a node. Page allocator should deal with memoryless 
+> nodes just fine. It has zonelists constructed for each possible nodes.
+> And it will automatically fall back into a node which is closest to 
+> the requested node. As long as __GFP_THISNODE is not enforced of course.
 > 
-> Tom,
-> If you're able to automate this cleanup, I suggest checking in a
-> script that can be run on a directory.  Then for each subsystem you
-> can say in your commit "I ran scripts/fix_whatever.py on this subdir."
->  Then others can help you drive the tree wide cleanup.  Then we can
-> enable -Wunreachable-code-break either by default, or W=2 right now
-> might be a good idea.
+> The code comments of kmem_cache_alloc_node() of SLAB also showed this:
+>  * Fallback to other node is possible if __GFP_THISNODE is not set.
+> 
+> blk-mq code doesn't set __GFP_THISNODE, so we can remove the calling 
+> of local_memory_node().
 
-I remember using clang-modernize in the past to fix issues very
-similar to this, if clang machinery can generate the warning, can't
-something like clang-tidy directly generate the patch?
+yes, this is indeed the case. I cannot really judge the blg-mq code but it seems to be unnecessary. Maybe there are some subtle details not explained by bffed457160ab though.
 
-You can send me a patch for drivers/infiniband/* as well
+> Fixes: bffed457160ab ("blk-mq: Avoid memoryless numa node encoded in 
+> hctx numa_node")
 
-Thanks,
-Jason
+But the existing code is not broken. It just overdoes what needs to be done. So effectively bffed457160ab was not needed. I do not think that Fixes is really necessary.
+
+> Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
+> ---
+>  block/blk-mq-cpumap.c | 2 +-
+>  block/blk-mq.c        | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c index 
+> 0157f2b34..3db84d319 100644
+> --- a/block/blk-mq-cpumap.c
+> +++ b/block/blk-mq-cpumap.c
+> @@ -89,7 +89,7 @@ int blk_mq_hw_queue_to_node(struct blk_mq_queue_map 
+> *qmap, unsigned int index)
+>  
+>  	for_each_possible_cpu(i) {
+>  		if (index == qmap->mq_map[i])
+> -			return local_memory_node(cpu_to_node(i));
+> +			return cpu_to_node(i);
+>  	}
+>  
+>  	return NUMA_NO_NODE;
+> diff --git a/block/blk-mq.c b/block/blk-mq.c index 
+> cdced4aca..48f8366b2 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2737,7 +2737,7 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
+>  		for (j = 0; j < set->nr_maps; j++) {
+>  			hctx = blk_mq_map_queue_type(q, j, i);
+>  			if (nr_hw_queues > 1 && hctx->numa_node == NUMA_NO_NODE)
+> -				hctx->numa_node = local_memory_node(cpu_to_node(i));
+> +				hctx->numa_node = cpu_to_node(i);
+>  		}
+>  	}
+>  }
+> --
+> 2.17.1
+
+--
+Michal Hocko
+SUSE Labs
