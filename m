@@ -2,99 +2,179 @@ Return-Path: <SRS0=yWXY=D3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8211AC433E7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 13:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D78C8C4363A
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 13:56:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2394722404
-	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 13:08:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 738DB22240
+	for <linux-block@archiver.kernel.org>; Tue, 20 Oct 2020 13:56:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cqQOg5Tl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QUp+Tm/4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407265AbgJTNI5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Oct 2020 09:08:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55692 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407241AbgJTNIx (ORCPT
+        id S2407731AbgJTN4E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Oct 2020 09:56:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45466 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2407715AbgJTN4E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Oct 2020 09:08:53 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8AEC0613CE
-        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 06:08:51 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id j8so2146680ilk.0
-        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 06:08:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vMjv69Q8ygJTDYUmtmqR5brlN9bQw64VIyI24z18jzA=;
-        b=cqQOg5TlBhSHYK8ucEO8iGioZ3ug3JvxYTXOjTVruEHdm9SvDU5nrkAwp9nMQNNSiO
-         EcwqyjcskunxgNXegcl9ilsGpyw0hpdo0FDdRoKIi+U1Q92X+dvrugsHSrDUQuM5O8NE
-         db30d7d6VKywjCwMbZQyAqPxAxPxjGSAHsAN9PBY6JVofOH281yX0TUdUceYJ5s4nyf0
-         G44npvNgm5E817+gLEokiS/RfoNI3E4xmOF9UEZooKfdhCoCBoT/RTPjSfK63YG4hpwu
-         ZuopdYqg7vHZ+TmaHzpOqEKOq8/UT/t3M2wt1Zo2m0E9mEx0IcEPq/eBQZ2hwPrhdnJT
-         +cKw==
+        Tue, 20 Oct 2020 09:56:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603202163;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HyQ28xr5/lapv6azTtFCvHFT5XQ1+OzeHk+84iEm66Y=;
+        b=QUp+Tm/49C2D2ArfwdGiXcYEZLmxY3ITF9bXZyS+HEfcJJoqaGxmch+2EHiNHeADDWpHNz
+        Ouzap4oFcZixuWmorb4Ub+lRVmWRZDipZO+0tL8W1vnU06zVM/xfLz81/8VfcBPp80A1RW
+        EdBHqnK2mgm1gY9dzcmZeB2rW1Al8Fc=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-506-tlfiUwYaNIibs-j_d8RlXg-1; Tue, 20 Oct 2020 09:56:01 -0400
+X-MC-Unique: tlfiUwYaNIibs-j_d8RlXg-1
+Received: by mail-qv1-f69.google.com with SMTP id ec4so1376695qvb.21
+        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 06:56:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vMjv69Q8ygJTDYUmtmqR5brlN9bQw64VIyI24z18jzA=;
-        b=D7GvxSu21B6SIaCZixId61AXocSyyieFZ/sRvYKF4P9U9h7Vli+wDA/+XbTpXJ8lTj
-         TPWQl1YQorYN24tC7MSW68moK0e1N6GMYeWpo+gxqzrMc5hZTB4c/aNpzjJ1PgXpnEk/
-         6ElV/B63iVRCi9SrDZAB7GTSdNp18qfH9RMgHfGhYgjjZkZC0NDtyBAz0oj9CqqyNlMH
-         njqQsdycRO1odjGG71+CqCcrAQ+Bb/a90VFiguLt+TbbXHhwx/9xU8H7MdyzY52Ha3ey
-         YHm3gqzyrN05F6o+MoSRMi0es+imXrZbMOJ4x36qfTnWYOjdE2HiZU/J5fqkaX4ReSQf
-         L1QA==
-X-Gm-Message-State: AOAM531zGPrwvbjcDrpM57606+8myvu22LSpueAIc7x2incpf+N4a9J6
-        h0oV71D8eSO8tCrm1DiLYlqfsg==
-X-Google-Smtp-Source: ABdhPJzm9BWlfeceU/Pa8coannvqHVejEwNaW+D/pLKRy4IBr4U+OwVIbd3EIC8zCU9He1KiPKZ4fw==
-X-Received: by 2002:a92:9119:: with SMTP id t25mr1811593ild.90.1603199331115;
-        Tue, 20 Oct 2020 06:08:51 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id o19sm1767373ilt.24.2020.10.20.06.08.49
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=HyQ28xr5/lapv6azTtFCvHFT5XQ1+OzeHk+84iEm66Y=;
+        b=hUjqUvpA/gMWNhRVVBI4wNjBXD1IwtYQ1yLJMmimMcC1fBYAB4CS882goQkC0WT8GY
+         iL4SD67Cq6vzPtA07HbYvWanLgW9/E0hrdMz/MAwLLbhhn1FQ8ndcluBNGUYaxw5RiV8
+         g0piKaW9xxv0rRFQyy5HmBPW39ES9EPQxPydPz7nCIxd27JwRULPJ0rHIOIqsnkj/ayU
+         o14MzOnXWj4muS2veONUvi6qf8XvgUycFQn43Q844DuSHh5OXM0TSe4wrZty1MFq/lEm
+         kkfS4dTMlunr8KBQ1qcxJkYY16WgGlefYeJfEY1RpAdqiTXWCBHXjZoiR4LJZlUWOOPq
+         CuAw==
+X-Gm-Message-State: AOAM5330aHuBrcS+PPzkgoG38O4P5CCjSMNkiqC4QeF3MlB5baG0BfVL
+        yitfJV3RDKp8JbyIVS/U1VdabNf16DswUDnjI+Cuq8Siqe+2YCqXKLI53SvTpljmBLU8DUa/o8L
+        y1S7qnQ7wD2G1fLudKsBs9qQ=
+X-Received: by 2002:a05:6214:174f:: with SMTP id dc15mr3370428qvb.25.1603202160687;
+        Tue, 20 Oct 2020 06:56:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyLUAfqrAOJzxwKF3+voCBF5yQYNbMOvfOkDZhumkJj3bEnT15V4x8vUJ5iQ5pWt9KusIZtsQ==
+X-Received: by 2002:a05:6214:174f:: with SMTP id dc15mr3370377qvb.25.1603202160139;
+        Tue, 20 Oct 2020 06:56:00 -0700 (PDT)
+Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
+        by smtp.gmail.com with ESMTPSA id b8sm775938qkn.133.2020.10.20.06.55.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Oct 2020 06:08:50 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: remove the calling of local_memory_node()
-To:     Xianting Tian <tian.xianting@h3c.com>,
-        raghavendra.kt@linux.vnet.ibm.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mhocko@suse.com
-References: <20201019082047.31113-1-tian.xianting@h3c.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1db7f790-b4df-435b-25b1-d99222ed7c50@kernel.dk>
-Date:   Tue, 20 Oct 2020 07:08:49 -0600
+        Tue, 20 Oct 2020 06:55:59 -0700 (PDT)
+Subject: Re: [RFC] treewide: cleanup unreachable breaks
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-edac@vger.kernel.org,
+        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-power@fi.rohmeurope.com, linux-gpio@vger.kernel.org,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        spice-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
+        linux-amlogic@lists.infradead.org,
+        industrypack-devel@lists.sourceforge.net,
+        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-can@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        intel-wired-lan@lists.osuosl.org, ath10k@lists.infradead.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com, linux-nfc@lists.01.org,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        linux-pci@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
+        storagedev@microchip.com, devel@driverdev.osuosl.org,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net,
+        linux-watchdog@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        bpf <bpf@vger.kernel.org>, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        alsa-devel@alsa-project.org,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        George Burgess <gbiv@google.com>, Joe Perches <joe@perches.com>
+References: <20201017160928.12698-1-trix@redhat.com>
+ <20201018054332.GB593954@kroah.com>
+ <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
+From:   Tom Rix <trix@redhat.com>
+Message-ID: <ca1f50d6-1005-8e3d-8d5c-98c82a704338@redhat.com>
+Date:   Tue, 20 Oct 2020 06:55:52 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201019082047.31113-1-tian.xianting@h3c.com>
+In-Reply-To: <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/19/20 2:20 AM, Xianting Tian wrote:
-> We don't need to check whether the node is memoryless numa node before
-> calling allocator interface. SLUB(and SLAB,SLOB) relies on the page
-> allocator to pick a node. Page allocator should deal with memoryless
-> nodes just fine. It has zonelists constructed for each possible nodes.
-> And it will automatically fall back into a node which is closest to the
-> requested node. As long as __GFP_THISNODE is not enforced of course.
-> 
-> The code comments of kmem_cache_alloc_node() of SLAB also showed this:
->  * Fallback to other node is possible if __GFP_THISNODE is not set.
-> 
-> blk-mq code doesn't set __GFP_THISNODE, so we can remove the calling
-> of local_memory_node().
 
-Applied, thanks.
+On 10/19/20 12:42 PM, Nick Desaulniers wrote:
+> On Sat, Oct 17, 2020 at 10:43 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+>> On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
+>>> From: Tom Rix <trix@redhat.com>
+>>>
+>>> This is a upcoming change to clean up a new warning treewide.
+>>> I am wondering if the change could be one mega patch (see below) or
+>>> normal patch per file about 100 patches or somewhere half way by collecting
+>>> early acks.
+>> Please break it up into one-patch-per-subsystem, like normal, and get it
+>> merged that way.
+>>
+>> Sending us a patch, without even a diffstat to review, isn't going to
+>> get you very far...
+> Tom,
+> If you're able to automate this cleanup, I suggest checking in a
+> script that can be run on a directory.  Then for each subsystem you
+> can say in your commit "I ran scripts/fix_whatever.py on this subdir."
+>  Then others can help you drive the tree wide cleanup.  Then we can
+> enable -Wunreachable-code-break either by default, or W=2 right now
+> might be a good idea.
 
--- 
-Jens Axboe
+I should have waited for Joe Perches's fixer addition to checkpatch :)
+
+The easy fixes I did only cover about 1/2 of the problems.
+
+Remaining are mostly nested switches, which from a complexity standpoint is bad.
+
+>
+> Ah, George (gbiv@, cc'ed), did an analysis recently of
+> `-Wunreachable-code-loop-increment`, `-Wunreachable-code-break`, and
+> `-Wunreachable-code-return` for Android userspace.  From the review:
+> ```
+> Spoilers: of these, it seems useful to turn on
+> -Wunreachable-code-loop-increment and -Wunreachable-code-return by
+> default for Android
+
+In my simple add-a-cflag bot, i see there are about 250
+
+issues for -Wunreachable-code-return.
+
+I'll see about doing this one next.
+
+> ...
+> While these conventions about always having break arguably became
+> obsolete when we enabled -Wfallthrough, my sample turned up zero
+> potential bugs caught by this warning, and we'd need to put a lot of
+> effort into getting a clean tree. So this warning doesn't seem to be
+> worth it.
+> ```
+> Looks like there's an order of magnitude of `-Wunreachable-code-break`
+> than the other two.
+>
+> We probably should add all 3 to W=2 builds (wrapped in cc-option).
+> I've filed https://github.com/ClangBuiltLinux/linux/issues/1180 to
+> follow up on.
+
+Yes, i think think these should be added.
+
+Tom
 
