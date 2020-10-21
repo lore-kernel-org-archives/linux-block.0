@@ -2,116 +2,93 @@ Return-Path: <SRS0=zsIv=D4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEE5C55179
-	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 15:12:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBD3C5DF9E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 16:12:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 632052237B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 15:12:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sjFBa4jL"
+	by mail.kernel.org (Postfix) with ESMTP id BA0152177B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 16:12:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1603296744;
+	bh=Skv4VHOsxkbjExqgUALTljS6pv/j0ztelpvS9+0CtRw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=NIa86Yv2JNk338jPx9gNoNUp1eNzX+GjNKXftMFhJuJu+fG+tlmPqn2x8SPEwVGRg
+	 YmxXMFm20O3hvUCRp8npP/yWKH3enSGeg6cjkoF3HN1maF0TwXkBFiVsrpgwKq9THE
+	 Btc7Nc1uzr3gsh03Ub0HUmsPO+7T/2hqFiH7RZo0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2444077AbgJUPMG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Oct 2020 11:12:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43564 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2444029AbgJUPMG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Oct 2020 11:12:06 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B7EC0613CE;
-        Wed, 21 Oct 2020 08:12:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
-        Reply-To:Cc:Content-ID:Content-Description;
-        bh=QRmeq+WhhmJFQx9ptzkESWhLkZL0448bxepNUGUOWXM=; b=sjFBa4jL1qJ+CEJeH03Xwxxk6e
-        kuNFWgpIshoWVHEx/rq5Jx9hLUNKt/gdaTaUGZQLnFS2ETWD6gd417JHritOq1mzxCaLbV29n5Aoi
-        2FAs94ESvUe8q1G9lCdeKgB3zPw/Ve2EBKfeN8+sALcVjdAY4090snwd+T/V3umbd0IMWT+lfo/DR
-        4OECSXEF1A/MhrpaIoG/8dZcG1JZQH7CDN3IEeYBy4cvu/e1z1vqraOFlwQ3p0j8HS6vDjmMhoMnB
-        hRyiuMSHHeLbr3n+EBgGHmZVPdNsRcE4t26ZtnopA6lMEoCLsHnQcJeHcyctFKwCzEDkUDS6DvsMA
-        kh7Tjo6w==;
-Received: from [2601:1c0:6280:3f0::507c]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kVFmU-0003zU-Dg; Wed, 21 Oct 2020 15:12:02 +0000
-Subject: Re: [PATCH 2/2] blk-snap - snapshots and change-tracking for block
- devices
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, hch@infradead.org,
-        darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, rjw@rjwysocki.net,
-        len.brown@intel.com, pavel@ucw.cz, akpm@linux-foundation.org,
-        johannes.thumshirn@wdc.com, ming.lei@redhat.com, jack@suse.cz,
-        tj@kernel.org, gustavo@embeddedor.com, bvanassche@acm.org,
-        osandov@fb.com, koct9i@gmail.com, damien.lemoal@wdc.com,
-        steve@sk2.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-mm@kvack.org
-References: <1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com>
- <1603271049-20681-3-git-send-email-sergei.shtepa@veeam.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <e11c8a85-9d51-2668-53ec-f2795024c762@infradead.org>
-Date:   Wed, 21 Oct 2020 08:11:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S2502875AbgJUQMX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Oct 2020 12:12:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56946 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2502871AbgJUQMX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Oct 2020 12:12:23 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 77C932087D;
+        Wed, 21 Oct 2020 16:12:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603296742;
+        bh=Skv4VHOsxkbjExqgUALTljS6pv/j0ztelpvS9+0CtRw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SY2cnni/yKiqNX2D+MolwtBJkJZ25el2hwQIqa11SFtDmBTq22ksfzgjhnYpbguzD
+         uBJI7QL3KluS3eIdXrPW4GsEYXfXh8wZGwW2M5LAz2S2HyPezXFwhGB9FXwsuwf6Qg
+         XKD6E/hfwsCovIhfz5qaKfu2Q5NHx6cNpzquq6Po=
+Date:   Wed, 21 Oct 2020 18:13:01 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Christoph Hellwig <hch@lst.de>, kernel-team@android.com
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        David Laight <David.Laight@aculab.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-mm@kvack.org,
+        netdev@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Message-ID: <20201021161301.GA1196312@kroah.com>
+References: <20200925045146.1283714-1-hch@lst.de>
+ <20200925045146.1283714-3-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <1603271049-20681-3-git-send-email-sergei.shtepa@veeam.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200925045146.1283714-3-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/21/20 2:04 AM, Sergei Shtepa wrote:
-> diff --git a/drivers/block/blk-snap/Kconfig b/drivers/block/blk-snap/Kconfig
-> new file mode 100644
-> index 000000000000..7a2db99a80dd
-> --- /dev/null
-> +++ b/drivers/block/blk-snap/Kconfig
-> @@ -0,0 +1,24 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# blk-snap block io layer filter module configuration
-> +#
-> +#
-> +#select BLK_FILTER
-> +
-> +config BLK_SNAP
-> +	tristate "Block device snapshot filter"
-> +	depends on BLK_FILTER
-> +	help
-> +
+On Fri, Sep 25, 2020 at 06:51:39AM +0200, Christoph Hellwig wrote:
+> From: David Laight <David.Laight@ACULAB.COM>
+> 
+> This lets the compiler inline it into import_iovec() generating
+> much better code.
+> 
+> Signed-off-by: David Laight <david.laight@aculab.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/read_write.c | 179 ------------------------------------------------
+>  lib/iov_iter.c  | 176 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 176 insertions(+), 179 deletions(-)
 
-No blank line here.
+Strangely, this commit causes a regression in Linus's tree right now.
 
-> +	  Allow to create snapshots and track block changes for a block
+I can't really figure out what the regression is, only that this commit
+triggers a "large Android system binary" from working properly.  There's
+no kernel log messages anywhere, and I don't have any way to strace the
+thing in the testing framework, so any hints that people can provide
+would be most appreciated.
 
-	                                                    for block
+thanks,
 
-> +	  devices. Designed for creating backups for any block devices
-> +	  (without device mapper). Snapshots are temporary and are released
-> +	  then backup is completed. Change block tracking allows you to
-
-	  when
-
-> +	  create incremental or differential backups.
-> +
-> +config BLK_SNAP_SNAPSTORE_MULTIDEV
-> +	bool "Multi device snapstore configuration support"
-> +	depends on BLK_SNAP
-> +	help
-> +
-No blank line here.
-
-> +	  Allow to create snapstore on multiple block devices.
-
-
-thanks.
--- 
-~Randy
-
+greg k-h
