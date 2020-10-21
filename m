@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD04CC4363A
-	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 10:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A01C4363A
+	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 11:15:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27F6B2237B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 10:26:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F40EE21655
+	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 11:15:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=veeam.com header.i=@veeam.com header.b="jrDBfzIY"
+	dkim=pass (1024-bit key) header.d=veeam.com header.i=@veeam.com header.b="J7l2nPmP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392144AbgJUK0l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Oct 2020 06:26:41 -0400
-Received: from mx4.veeam.com ([104.41.138.86]:35840 "EHLO mx4.veeam.com"
+        id S2441922AbgJULPL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Oct 2020 07:15:11 -0400
+Received: from mx4.veeam.com ([104.41.138.86]:43548 "EHLO mx4.veeam.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390048AbgJUK0k (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Oct 2020 06:26:40 -0400
+        id S2410622AbgJULPJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Oct 2020 07:15:09 -0400
 Received: from mail.veeam.com (spbmbx01.amust.local [172.17.17.171])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id B5A348A76E;
-        Wed, 21 Oct 2020 13:26:37 +0300 (MSK)
+        by mx4.veeam.com (Postfix) with ESMTPS id EABE6897F6;
+        Wed, 21 Oct 2020 14:15:04 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
-        t=1603275998; bh=/p6v/6SAhY5h2ewrJ9FDQ7iNuIivMlmHNS95z40vB54=;
+        t=1603278905; bh=N8h1eQSrAq99HPEtyM6BB2zVpJlELnewpRvhCbmIWg8=;
         h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-        b=jrDBfzIYLZTU18COuJMG0YH/YRmu3Q2RULo8V7nTZTWqSfnco57Gjh+9xOeIo3NaI
-         DD/wJhV5nzj4GgE0Gu4lUnVWX35iD1GJuqg39VSgVYIWx4tn/xt9ulFjk+JltEEkS1
-         opM1cZ9QZI/RTdxiEPExGJcHHduM+DtFPWfA6B5o=
+        b=J7l2nPmPgQ3+NtzyjsDswFT4EL2ccUF1DN0D2J1KfzxygUgBbVhHcK0KiRQ8Q+V/6
+         KC/Pd96uBtdio9IQNueanRxv1rESVaecIkV8l8ImrZxq+xWWmB4broU3y45Ul5S82q
+         K2EBYYbfSJz43xB9cYDQtHeEo0RBMQiavsVAv00Q=
 Received: from veeam.com (172.24.14.5) by spbmbx01.amust.local (172.17.17.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.595.3; Wed, 21 Oct 2020
- 13:26:35 +0300
-Date:   Wed, 21 Oct 2020 13:27:24 +0300
+ 14:15:02 +0300
+Date:   Wed, 21 Oct 2020 14:15:51 +0300
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     Damien Le Moal <Damien.LeMoal@wdc.com>
 CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
@@ -61,15 +61,16 @@ CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
         "linux-mm@kvack.org" <linux-mm@kvack.org>
-Subject: Re: [PATCH 1/2] Block layer filter - second version
-Message-ID: <20201021102724.GC20749@veeam.com>
+Subject: Re: [PATCH 2/2] blk-snap - snapshots and change-tracking for block
+ devices
+Message-ID: <20201021111551.GD20749@veeam.com>
 References: <1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com>
- <1603271049-20681-2-git-send-email-sergei.shtepa@veeam.com>
- <BL0PR04MB65141320C7BF75B7142CA30CE71C0@BL0PR04MB6514.namprd04.prod.outlook.com>
+ <1603271049-20681-3-git-send-email-sergei.shtepa@veeam.com>
+ <BL0PR04MB65142D9F391FE8777F096EF5E71C0@BL0PR04MB6514.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <BL0PR04MB65141320C7BF75B7142CA30CE71C0@BL0PR04MB6514.namprd04.prod.outlook.com>
+In-Reply-To: <BL0PR04MB65142D9F391FE8777F096EF5E71C0@BL0PR04MB6514.namprd04.prod.outlook.com>
 X-Originating-IP: [172.24.14.5]
 X-ClientProxiedBy: spbmbx02.amust.local (172.17.17.172) To
  spbmbx01.amust.local (172.17.17.171)
@@ -80,21 +81,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-EXPORT_SYMBOL_GPL - ok.
+> And this is a 8600+ lines patch.
+> Can you split this into manageable pieces ?
 
-#ifdef CONFIG_BLK_FILTER or IS_ENABLED() - It's a matter of habit.
+Yes, the module was quite large. But I think it's not good to show
+the elephant in parts. 
+https://en.wikipedia.org/wiki/Blind_men_and_an_elephant
 
-> double blank line
-Ok, I did.
-Looks like a candidate for ./scripts/checkpatch.pl.
+> I do not think anybody will review such a huge patch.
 
-> Separate into multiple patches: one that introduces the filter
-> functions/ops code and another that changes the block layer where needed.
+Yes, it will be a lot of work. But I hope that the code architecture
+and splitting entities into separate files will help.
 
-I'll think about it. Personally, it seems to me that this separation
-does not make it easier to understand the code. 
-It is important for me to know immediately where the function is called,
-and this determines its behavior.
+If someone can advise how to divide a module into a chain of patches,
+I will be happy. I do not dare to divide it without losing meaning.
 
 -- 
 Sergei Shtepa
