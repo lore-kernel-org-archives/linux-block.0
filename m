@@ -2,121 +2,261 @@ Return-Path: <SRS0=zsIv=D4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D97AAC5517A
-	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 05:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C638C56201
+	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 09:04:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5000E22242
-	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 05:28:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D81EA22250
+	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 09:04:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RWYA4HDj"
+	dkim=pass (1024-bit key) header.d=veeam.com header.i=@veeam.com header.b="D1RQaq6u"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407793AbgJUF2B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Oct 2020 01:28:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37660 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407778AbgJUF2B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Oct 2020 01:28:01 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 540F1C0613CE
-        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 22:28:01 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id t22so612529plr.9
-        for <linux-block@vger.kernel.org>; Tue, 20 Oct 2020 22:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7GB5y84r6xMSGeFUmcejHOzMFE3WByKQWJdu7wCKtTc=;
-        b=RWYA4HDjyZRR/gOIdhaMUvs6IOrXEQ7pFlvkdy5B1AY+pEfSru5e/kxQXIs2jIARnG
-         fW7TnyQVYuoWoErldkcgG3slDRoi4tq7RkYTAZtJ1NQuUdnK0RflcDnO6jU1c2F8ExIJ
-         CCp8bLDyIoiI1qyt3/HuIlCI0G1l6Tf2iu9aUj2jVfRCez2hf2t6aIClifyB54An/nC/
-         jCAykXyhzTQDSaa87W07nHg5+d6v5TTjRSC+84Dst1jFWKubk0dXOvh54JZYzILHIK+L
-         uHY6LnpAr0a9id+prj0iNIKObARtsh8b1QV+J3pK+oVMu5oprB1f0rk4AxgcxEVju2i5
-         8mfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7GB5y84r6xMSGeFUmcejHOzMFE3WByKQWJdu7wCKtTc=;
-        b=pUOQS1A46dN1/XKU0bZ4VK1AM00vg4fIk6RMj6G1emoo6PCYrgrBl8DhHl4cWTGiZr
-         6RT7lX2WedahRHxEI4vTFTVERA5YUwC+9J+5Jifr+FlyHVqlpNbhRPI4uKxKeawr9T3J
-         lvsQugY3CNEdorO2jbmCyqvtU1fQZLvgx26AQlx7AfVE8kFZcUI49G5sonYVSTm04KmH
-         HMUXjtAWEiZVMsluadPSqFNeBd2yhfD2mlAnSO51MOKtekwvTILh73z63mWcj1eQUmWb
-         OnN0PKGErCp+Ck4qO7ttvlpuGf2r97KuUP/jTZ8xi7M8oVAfDah5u8GifQ4V8jJZsebh
-         ijXA==
-X-Gm-Message-State: AOAM5302mcv7Kj1SUMWOfgXjbWruuIl7wTcU4S4T1lSQcS7ft8toJ5oG
-        dBY9VNLhm8gjQ3jv+Xx4dx88+A==
-X-Google-Smtp-Source: ABdhPJz/C1gaOL5hjy8zFTXccY3UyWJy8F9I2GVGOtdTnA9WyL1I4Sz6zoWRWPflnNBRW2alRjjx8A==
-X-Received: by 2002:a17:902:c697:b029:d3:df24:163e with SMTP id r23-20020a170902c697b02900d3df24163emr1837466plx.18.1603258080533;
-        Tue, 20 Oct 2020 22:28:00 -0700 (PDT)
-Received: from google.com (154.137.233.35.bc.googleusercontent.com. [35.233.137.154])
-        by smtp.gmail.com with ESMTPSA id 194sm713228pfz.182.2020.10.20.22.27.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Oct 2020 22:27:59 -0700 (PDT)
-Date:   Wed, 21 Oct 2020 05:27:55 +0000
-From:   Satya Tangirala <satyat@google.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v2 1/4] block: keyslot-manager: Introduce passthrough
- keyslot manager
-Message-ID: <20201021052755.GA1165871@google.com>
-References: <20201015214632.41951-1-satyat@google.com>
- <20201015214632.41951-2-satyat@google.com>
- <20201016072044.GB14885@infradead.org>
- <20201021044423.GB3939@sol.localdomain>
+        id S2387948AbgJUJEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Oct 2020 05:04:32 -0400
+Received: from mx4.veeam.com ([104.41.138.86]:49886 "EHLO mx4.veeam.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387791AbgJUJEb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Oct 2020 05:04:31 -0400
+Received: from mail.veeam.com (spbmbx01.amust.local [172.17.17.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx4.veeam.com (Postfix) with ESMTPS id 8A0905C60C;
+        Wed, 21 Oct 2020 12:04:26 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
+        t=1603271066; bh=7pCinxh9CDdZ18baGj9Agc/InVPsneMyQj+wVyVjQ3I=;
+        h=From:To:Subject:Date:From;
+        b=D1RQaq6u5Gf6SP2mNiIVrCRlPSmaF6XvLmflwyZ7o4C8ia3u2i76fRSrT4beQCO05
+         yBr95+z13pJlPECDmYUR+W1eG8IdFt5fuPpnyP0aknKPqEapJX7GFwzvbP1K4dY+5J
+         IGFPiinN/RxRhRuxEA2BpzaqYdBybPJt1hCyn/4M=
+Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
+ spbmbx01.amust.local (172.17.17.171) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.595.3;
+ Wed, 21 Oct 2020 12:04:24 +0300
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     <axboe@kernel.dk>, <viro@zeniv.linux.org.uk>, <hch@infradead.org>,
+        <darrick.wong@oracle.com>, <linux-xfs@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <rjw@rjwysocki.net>,
+        <len.brown@intel.com>, <pavel@ucw.cz>, <akpm@linux-foundation.org>,
+        <johannes.thumshirn@wdc.com>, <ming.lei@redhat.com>,
+        <jack@suse.cz>, <tj@kernel.org>, <gustavo@embeddedor.com>,
+        <bvanassche@acm.org>, <osandov@fb.com>, <koct9i@gmail.com>,
+        <damien.lemoal@wdc.com>, <steve@sk2.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>, <linux-mm@kvack.org>,
+        <sergei.shtepa@veeam.com>
+Subject: [PATCH 0/2] block layer filter and block device snapshot module
+Date:   Wed, 21 Oct 2020 12:04:07 +0300
+Message-ID: <1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201021044423.GB3939@sol.localdomain>
+Content-Type: text/plain
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: spbmbx01.amust.local (172.17.17.171) To
+ spbmbx01.amust.local (172.17.17.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A295605D26A677562
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 20, 2020 at 09:44:23PM -0700, Eric Biggers wrote:
-> On Fri, Oct 16, 2020 at 08:20:44AM +0100, Christoph Hellwig wrote:
-> > And this just validates my argument that calling the inline crypto work
-> > directly from the block layer instead of just down below in blk-mq was
-> > wrong.  We should not require any support from stacking drivers at the
-> > keyslot manager level.
-> 
-> I'm not sure what you're referring to here; could you clarify?
-> 
-> It's true that device-mapper devices don't need the actual keyslot management.
-> But they do need the ability to expose crypto capabilities as well as a key
-> eviction function.  And those are currently handled by
-> "struct blk_keyslot_manager".  Hence the need for a "passthrough keyslot
-> manager" that does those other things but not the actual keyslot management.
-> 
-> FWIW, I suggested splitting these up, but you disagreed and said you wanted the
-> crypto capabilities to remain part of the blk_keyslot_manager
-> (https://lkml.kernel.org/linux-block/20200327170047.GA24682@infradead.org/).
-> If you've now changed your mind, please be clear about it.
-> 
-I thought what Christoph meant (and of course, please let us know
-if I'm misunderstanding you, Christoph) was that if blk-mq
-handled all the blk-crypto stuff including deciding whether to
-use the blk-crypto-fallback, and blk-mq was responsible for
-calling out to blk-crypto-fallback if required, then the device
-mapper wouldn't need to expose any capabilities at all... or at
-least not for bio-based device mapper devices, since bios would
-go through the device mapper and eventually hit blk-mq which
-would then handle crypto appropriately.
+Hello everyone! Requesting for your comments and suggestions.
 
-We couldn't do that because the crypto ciphers for the
-blk-crypto-fallback couldn't be allocated on the data path (so we
-needed fscrypt to ask blk-crypto to check whether the underlying
-device supported the crypto capabilities it required, and
-allocate ciphers appropriately, before the data path required the
-ciphers). I'm checking to see if anything has changed w.r.t
-allocating crypto ciphers on the data path (and checking if
-memalloc_noio_save/restore() helps with that).
-> - Eric
+# blk-filter
+
+Block layer filter allows to intercept BIO requests to a block device.
+
+Interception is performed at the very beginning of the BIO request
+processing, and therefore does not affect the operation of the request
+processing queue. This also makes it possible to intercept requests from
+a specific block device, rather than from the entire disk.
+
+The logic of the submit_bio function has been changed - since the
+function execution results are not processed anywhere (except for swap
+and direct-io) the function won't return a value anymore.
+
+Now the submit_bio_direct() function is called whenever the result of
+the blk_qc_t function is required. submit_bio_direct() is not
+intercepted by the block layer filter. This is logical for swap and
+direct-io.
+
+Block layer filter allows you to enable and disable the filter driver on
+the fly. When a new block device is added, the filter driver can start
+filtering this device. When you delete a device, the filter can remove
+its own filter.
+
+The idea of multiple altitudes had to be abandoned in order to simplify
+implementation and make it more reliable. Different filter drivers can
+work simultaneously, but each on its own block device.
+
+# blk-snap
+
+We propose a new kernel module - blk-snap. This module implements
+snapshot and changed block tracking functionality. It is intended to
+create backup copies of any block devices without usage of device mapper.
+Snapshots are temporary and are destroyed after the backup process has
+finished. Changed block tracking allows for incremental and differential
+backup copies.
+
+blk-snap uses block layer filter. Block layer filter provides a callback
+to intercept bio-requests. If a block device disappears for whatever
+reason, send a synchronous request to remove the device from filtering.
+
+blk-snap kernel module is a product of a deep refactoring of the
+out-of-tree kernel veeamsnap kernel module
+(https://github.com/veeam/veeamsnap/):
+* all conditional compilation branches that served for the purpose of
+  compatibility with older kernels have been removed;
+* linux kernel code style has been applied;
+* blk-snap mostly takes advantage of the existing kernel code instead of
+  reinventing the wheel;
+* all redundant code (such as persistent cbt and snapstore collector)
+  has been removed.
+
+Several important things are still have to be done:
+* refactor the module interface for interaction with a user-space code -
+  it is already clear that the implementation of some calls can be
+  improved.
+
+Your feedback would be greatly appreciated!
+
+Sergei Shtepa (2):
+  Block layer filter - second version
+  blk-snap - snapshots and change-tracking for block devices
+
+ block/Kconfig                               |  11 +
+ block/Makefile                              |   1 +
+ block/blk-core.c                            |  52 +-
+ block/blk-filter-internal.h                 |  29 +
+ block/blk-filter.c                          | 286 ++++++
+ block/partitions/core.c                     |  14 +-
+ drivers/block/Kconfig                       |   2 +
+ drivers/block/Makefile                      |   1 +
+ drivers/block/blk-snap/Kconfig              |  24 +
+ drivers/block/blk-snap/Makefile             |  28 +
+ drivers/block/blk-snap/big_buffer.c         | 193 ++++
+ drivers/block/blk-snap/big_buffer.h         |  24 +
+ drivers/block/blk-snap/blk-snap-ctl.h       | 190 ++++
+ drivers/block/blk-snap/blk_deferred.c       | 566 +++++++++++
+ drivers/block/blk-snap/blk_deferred.h       |  67 ++
+ drivers/block/blk-snap/blk_descr_file.c     |  82 ++
+ drivers/block/blk-snap/blk_descr_file.h     |  26 +
+ drivers/block/blk-snap/blk_descr_mem.c      |  66 ++
+ drivers/block/blk-snap/blk_descr_mem.h      |  14 +
+ drivers/block/blk-snap/blk_descr_multidev.c |  86 ++
+ drivers/block/blk-snap/blk_descr_multidev.h |  25 +
+ drivers/block/blk-snap/blk_descr_pool.c     | 190 ++++
+ drivers/block/blk-snap/blk_descr_pool.h     |  38 +
+ drivers/block/blk-snap/blk_redirect.c       | 507 ++++++++++
+ drivers/block/blk-snap/blk_redirect.h       |  73 ++
+ drivers/block/blk-snap/blk_util.c           |  33 +
+ drivers/block/blk-snap/blk_util.h           |  33 +
+ drivers/block/blk-snap/cbt_map.c            | 210 +++++
+ drivers/block/blk-snap/cbt_map.h            |  62 ++
+ drivers/block/blk-snap/common.h             |  31 +
+ drivers/block/blk-snap/ctrl_fops.c          | 691 ++++++++++++++
+ drivers/block/blk-snap/ctrl_fops.h          |  19 +
+ drivers/block/blk-snap/ctrl_pipe.c          | 562 +++++++++++
+ drivers/block/blk-snap/ctrl_pipe.h          |  34 +
+ drivers/block/blk-snap/ctrl_sysfs.c         |  73 ++
+ drivers/block/blk-snap/ctrl_sysfs.h         |   5 +
+ drivers/block/blk-snap/defer_io.c           | 397 ++++++++
+ drivers/block/blk-snap/defer_io.h           |  39 +
+ drivers/block/blk-snap/main.c               |  82 ++
+ drivers/block/blk-snap/params.c             |  58 ++
+ drivers/block/blk-snap/params.h             |  29 +
+ drivers/block/blk-snap/rangevector.c        |  85 ++
+ drivers/block/blk-snap/rangevector.h        |  31 +
+ drivers/block/blk-snap/snapimage.c          | 982 ++++++++++++++++++++
+ drivers/block/blk-snap/snapimage.h          |  16 +
+ drivers/block/blk-snap/snapshot.c           | 225 +++++
+ drivers/block/blk-snap/snapshot.h           |  17 +
+ drivers/block/blk-snap/snapstore.c          | 929 ++++++++++++++++++
+ drivers/block/blk-snap/snapstore.h          |  68 ++
+ drivers/block/blk-snap/snapstore_device.c   | 532 +++++++++++
+ drivers/block/blk-snap/snapstore_device.h   |  63 ++
+ drivers/block/blk-snap/snapstore_file.c     |  52 ++
+ drivers/block/blk-snap/snapstore_file.h     |  15 +
+ drivers/block/blk-snap/snapstore_mem.c      |  91 ++
+ drivers/block/blk-snap/snapstore_mem.h      |  20 +
+ drivers/block/blk-snap/snapstore_multidev.c | 118 +++
+ drivers/block/blk-snap/snapstore_multidev.h |  22 +
+ drivers/block/blk-snap/tracker.c            | 449 +++++++++
+ drivers/block/blk-snap/tracker.h            |  38 +
+ drivers/block/blk-snap/tracking.c           | 270 ++++++
+ drivers/block/blk-snap/tracking.h           |  13 +
+ drivers/block/blk-snap/version.h            |   7 +
+ fs/block_dev.c                              |   6 +-
+ fs/direct-io.c                              |   2 +-
+ fs/iomap/direct-io.c                        |   2 +-
+ include/linux/bio.h                         |   4 +-
+ include/linux/blk-filter.h                  |  76 ++
+ include/linux/genhd.h                       |   8 +-
+ kernel/power/swap.c                         |   2 +-
+ mm/page_io.c                                |   4 +-
+ 70 files changed, 9074 insertions(+), 26 deletions(-)
+ create mode 100644 block/blk-filter-internal.h
+ create mode 100644 block/blk-filter.c
+ create mode 100644 drivers/block/blk-snap/Kconfig
+ create mode 100644 drivers/block/blk-snap/Makefile
+ create mode 100644 drivers/block/blk-snap/big_buffer.c
+ create mode 100644 drivers/block/blk-snap/big_buffer.h
+ create mode 100644 drivers/block/blk-snap/blk-snap-ctl.h
+ create mode 100644 drivers/block/blk-snap/blk_deferred.c
+ create mode 100644 drivers/block/blk-snap/blk_deferred.h
+ create mode 100644 drivers/block/blk-snap/blk_descr_file.c
+ create mode 100644 drivers/block/blk-snap/blk_descr_file.h
+ create mode 100644 drivers/block/blk-snap/blk_descr_mem.c
+ create mode 100644 drivers/block/blk-snap/blk_descr_mem.h
+ create mode 100644 drivers/block/blk-snap/blk_descr_multidev.c
+ create mode 100644 drivers/block/blk-snap/blk_descr_multidev.h
+ create mode 100644 drivers/block/blk-snap/blk_descr_pool.c
+ create mode 100644 drivers/block/blk-snap/blk_descr_pool.h
+ create mode 100644 drivers/block/blk-snap/blk_redirect.c
+ create mode 100644 drivers/block/blk-snap/blk_redirect.h
+ create mode 100644 drivers/block/blk-snap/blk_util.c
+ create mode 100644 drivers/block/blk-snap/blk_util.h
+ create mode 100644 drivers/block/blk-snap/cbt_map.c
+ create mode 100644 drivers/block/blk-snap/cbt_map.h
+ create mode 100644 drivers/block/blk-snap/common.h
+ create mode 100644 drivers/block/blk-snap/ctrl_fops.c
+ create mode 100644 drivers/block/blk-snap/ctrl_fops.h
+ create mode 100644 drivers/block/blk-snap/ctrl_pipe.c
+ create mode 100644 drivers/block/blk-snap/ctrl_pipe.h
+ create mode 100644 drivers/block/blk-snap/ctrl_sysfs.c
+ create mode 100644 drivers/block/blk-snap/ctrl_sysfs.h
+ create mode 100644 drivers/block/blk-snap/defer_io.c
+ create mode 100644 drivers/block/blk-snap/defer_io.h
+ create mode 100644 drivers/block/blk-snap/main.c
+ create mode 100644 drivers/block/blk-snap/params.c
+ create mode 100644 drivers/block/blk-snap/params.h
+ create mode 100644 drivers/block/blk-snap/rangevector.c
+ create mode 100644 drivers/block/blk-snap/rangevector.h
+ create mode 100644 drivers/block/blk-snap/snapimage.c
+ create mode 100644 drivers/block/blk-snap/snapimage.h
+ create mode 100644 drivers/block/blk-snap/snapshot.c
+ create mode 100644 drivers/block/blk-snap/snapshot.h
+ create mode 100644 drivers/block/blk-snap/snapstore.c
+ create mode 100644 drivers/block/blk-snap/snapstore.h
+ create mode 100644 drivers/block/blk-snap/snapstore_device.c
+ create mode 100644 drivers/block/blk-snap/snapstore_device.h
+ create mode 100644 drivers/block/blk-snap/snapstore_file.c
+ create mode 100644 drivers/block/blk-snap/snapstore_file.h
+ create mode 100644 drivers/block/blk-snap/snapstore_mem.c
+ create mode 100644 drivers/block/blk-snap/snapstore_mem.h
+ create mode 100644 drivers/block/blk-snap/snapstore_multidev.c
+ create mode 100644 drivers/block/blk-snap/snapstore_multidev.h
+ create mode 100644 drivers/block/blk-snap/tracker.c
+ create mode 100644 drivers/block/blk-snap/tracker.h
+ create mode 100644 drivers/block/blk-snap/tracking.c
+ create mode 100644 drivers/block/blk-snap/tracking.h
+ create mode 100644 drivers/block/blk-snap/version.h
+ create mode 100644 include/linux/blk-filter.h
+
+--
+2.20.1
+
