@@ -2,105 +2,247 @@ Return-Path: <SRS0=zsIv=D4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 237BBC388F9
-	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 17:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C88C56201
+	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 20:39:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0DA62242F
-	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 17:48:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01AE52237B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Oct 2020 20:39:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="DVzkzBJt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ek0LNcar"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503718AbgJURsh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Oct 2020 13:48:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39620 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2503716AbgJURsh (ORCPT
+        id S2444164AbgJUUjU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Oct 2020 16:39:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46567 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2439488AbgJUUjU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Oct 2020 13:48:37 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31080C0613CF
-        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2020 10:48:37 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id l16so3471777eds.3
-        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2020 10:48:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wz+eFQ9E3XaBY60yIiY6/7ACNu1JGiJC/eGXK+f1jPc=;
-        b=DVzkzBJthtEEE9BytDByy1Zyi6AvIrMMfqilJKnpXorOKZpcoMkmRc0+51O1rnlt68
-         bMY0od0cPkgr22Fq/K+EKbRk9QUUZlKvr9mGhIHdkRS+RFdmguKEoaDMpwVT2MTekysU
-         aICew+9IVF+RRyoiu/PaGJVFHpxpM2ZfnviDOpSraD9hqMuMque7/usM9pzF/eaK9iyi
-         qZF3JdUTjmf2nLs5oVUYf43A1aDD3wYoYI9oxDRZY55ia14p0XqJNtzi/CDl0A92VIsH
-         Ytn7i5HZw9HsfFtKjUgs2Sf+IlYn4ti3aGTMDIrNugvXoKAtZI0M50rVaCu67NNkO/yB
-         jfiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wz+eFQ9E3XaBY60yIiY6/7ACNu1JGiJC/eGXK+f1jPc=;
-        b=jOQmR3p0/j4ZSLDsR3I1jro1dHGaK5QnqlXXqQa9xQaCYWUUcGT3incGkLQ16/gnDk
-         SnEw8wnzI+7vIYxqLd7lfrNKQPQ/2KEo6yauMYk7z0dGPSrvi9qUoMDiG9C/osUKOf8J
-         ig7b7SiPUJpDPOZeLaxTBgimHfsYNIvcYMCcM1RlYljwFZoRcadtwqwlesQAxdbMSf6I
-         s+S56siQPkXtpY1+KnCQE1xcgtmDYqrFgvSFLtFbNI/1IPeHIO9fI6UQbXEhiPj8HKrd
-         YRpCyEdpPwhFAcf1V987uFw8Ic1f3bgl+D+nVPWnpMbu0chpyyP5KQC1kj5r2j2g2uLu
-         D+Jw==
-X-Gm-Message-State: AOAM533AH58NiY7t9DzwzKj87MxJSk9M1sW5AwNHP/mzOXheW+TZ7j/e
-        VGyADeh1pz5peWghQTaC3sDGBc/Gs5MkQJ93R05SXA==
-X-Google-Smtp-Source: ABdhPJyjfO8m3iOuqLFtlf+FomXd1BC4F7cQcApVrqZXlZQ1jUukEoyZcjOKoq++KT+r97hpdUtXqWK1yOAZ0wQ8O8o=
-X-Received: by 2002:a05:6402:31b3:: with SMTP id dj19mr4292662edb.210.1603302515911;
- Wed, 21 Oct 2020 10:48:35 -0700 (PDT)
+        Wed, 21 Oct 2020 16:39:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603312757;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XFu7nKGWfgR41NTGeZhISUfmva0FXZ+FWfy7+zaFqEM=;
+        b=Ek0LNcar+wUFY67rfS8yasuOnZ2g8wyI7GrKvlplD3eq8LSCQXlv++6tYZvgMgqFqmAdoX
+        HZwbv/gdndd/j6cNXi/AEVljEIXa+JboGTYgG+oUotjK0XeTQfu4HTsXCqpozoFa2no9+n
+        Bj/mSvKAchzFXqB9/V1aWpzP8fMKhmg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-574-O-udNqsyOlqVR3QBMTYdhg-1; Wed, 21 Oct 2020 16:39:13 -0400
+X-MC-Unique: O-udNqsyOlqVR3QBMTYdhg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EF39107AFA5;
+        Wed, 21 Oct 2020 20:39:12 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B70895B4B1;
+        Wed, 21 Oct 2020 20:39:07 +0000 (UTC)
+Date:   Wed, 21 Oct 2020 16:39:07 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        joseph.qi@linux.alibaba.com, xiaoguang.wang@linux.alibaba.com,
+        haoxu@linux.alibaba.com
+Subject: Re: [RFC 0/3] Add support of iopoll for dm device
+Message-ID: <20201021203906.GA10896@redhat.com>
+References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-References: <20201012162736.65241-1-nmeeramohide@micron.com>
- <20201015080254.GA31136@infradead.org> <SN6PR08MB420880574E0705BBC80EC1A3B3030@SN6PR08MB4208.namprd08.prod.outlook.com>
- <CAPcyv4j7a0gq++rL--2W33fL4+S0asYjYkvfBfs+hY+3J=c_GA@mail.gmail.com>
- <SN6PR08MB420843C280D54D7B5B76EB78B31E0@SN6PR08MB4208.namprd08.prod.outlook.com>
- <CAPcyv4iYOk3i0pPgXxDTy47BxWCXqqXS0J6mrY5o+1M_41XoAw@mail.gmail.com> <SN6PR08MB4208A22F5C94AB05439A2703B31C0@SN6PR08MB4208.namprd08.prod.outlook.com>
-In-Reply-To: <SN6PR08MB4208A22F5C94AB05439A2703B31C0@SN6PR08MB4208.namprd08.prod.outlook.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Wed, 21 Oct 2020 10:48:24 -0700
-Message-ID: <CAPcyv4gOGi392Q3knF=cAuvKONnmp2AoKX82VQEQJU0c7o7AKA@mail.gmail.com>
-Subject: Re: [EXT] Re: [PATCH v2 00/22] add Object Storage Media Pool (mpool)
-To:     "Nabeel Meeramohideen Mohamed (nmeeramohide)" 
-        <nmeeramohide@micron.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
-        "Steve Moyer (smoyer)" <smoyer@micron.com>,
-        "Greg Becker (gbecker)" <gbecker@micron.com>,
-        "Pierre Labat (plabat)" <plabat@micron.com>,
-        "John Groves (jgroves)" <jgroves@micron.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 21, 2020 at 10:11 AM Nabeel Meeramohideen Mohamed
-(nmeeramohide) <nmeeramohide@micron.com> wrote:
->
-> On Tuesday, October 20, 2020 3:36 PM, Dan Williams <dan.j.williams@intel.com> wrote:
-> >
-> >     What does Linux get from merging mpool?
-> >
->
-> What Linux gets from merging mpool is a generic object store target with some
-> unique and beneficial features:
+On Tue, Oct 20 2020 at  2:54am -0400,
+Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
 
-I'll try to make the point a different way. Mpool points out places
-where the existing apis fail to scale. Rather than attempt to fix that
-problem it proposes to replace the old apis. However, the old apis are
-still there. So now upstream has 2 maintenance burdens when it could
-have just had one. So when I ask "what does Linux get" it is in
-reference to the fact that Linux gets a compounded maintenance problem
-and whether the benefits of mpool outweigh that burden. Historically
-Linux has been able to evolve to meet the scaling requirements of new
-applications, so I am asking whether you have tried to solve the
-application problem by evolving rather than replacing existing
-infrastructure? The justification to replace rather than evolve is
-high because that's how core Linux stays relevant.
+> This patch set adds support of iopoll for dm device.
+> 
+> This is only an RFC patch. I'm really looking forward getting your
+> feedbacks on if you're interested in supporting iopoll for dm device,
+> or if there's a better design to implement that.
+> 
+> Thanks.
+> 
+> 
+> [Purpose]
+> IO polling is an important mode of io_uring. Currently only mq devices
+> support iopoll. As for dm devices, only dm-multipath is request-base,
+> while others are all bio-based and have no support for iopoll.
+> Supporting iopoll for dm devices can be of great meaning when the
+> device seen by application is dm device such as dm-linear/dm-stripe,
+> in which case iopoll is not usable for io_uring.
+
+I appreciate you taking the initiative on this; polling support is on my
+TODO so your work serves as a nice reminder to pursue this more
+urgently.
+
+> [Design Notes]
+> 
+> cookie
+> ------
+> Let's start from cookie. Cookie is one important concept in iopoll. It
+> is used to identify one specific request in one specific hardware queue.
+> The concept of cookie is initially designed as a per-bio concept, and
+> thus it doesn't work well when bio-split involved. When bio is split,
+> the returned cookie is indeed the cookie of one of the split bio, and
+> the following polling on this returned cookie can only guarantee the
+> completion of this specific split bio, while the other split bios may
+> be still uncompleted. Bio-split is also resolved for dm device, though
+> in another form, in which case the original bio submitted to the dm
+> device may be split into multiple bios submitted to the underlying
+> devices.
+> 
+> In previous discussion, Lei Ming has suggested that iopoll should be
+> disabled for bio-split. This works for the normal bio-split (done in
+> blk_mq_submit_bio->__blk_queue_split), while iopoll will never be
+> usable for dm devices if this also applies for dm device.
+> 
+> So come back to the design of the cookie for dm devices. At the very
+> beginning I want to refactor the design of cookie, from 'unsigned int'
+> type to the pointer type for dm device, so that cookie can point to
+> something, e.g. a list containing all cookies of one original bio,
+> something like this:
+> 
+> struct dm_io { // the returned cookie points to dm_io
+> 	...
+> 	struct list_head cookies; 
+> };
+> 
+> In this design, we can fetch all cookies of one original bio, but the
+> implementation can be difficult and buggy. For example, the
+> 'struct dm_io' structure may be already freed when the returned cookie
+> is used in blk_poll(). Then what if maintain a refcount in struct dm_io
+> so that 'struct dm_io' structure can not be freed until blk_poll()
+> called? Then the 'struct dm_io' structure will never be freed if the
+> IO polling is not used at all.
+
+I'd have to look closer at the race in the code you wrote (though you
+didn't share it); but we cannot avoid properly mapping a cookie to each
+split bio.  Otherwise you resort to inefficiently polling everything.
+
+Seems your attempt to have the cookie point to a dm_io object was likely
+too coarse-grained (when bios are split they get their own dm_io on
+recursive re-entry to DM core from ->submit_bio); but isn't having a
+list of cookies still too imprecise for polling purposes?  You could
+easily have a list that translates to many blk-mq queues.  Possibly
+better than your current approach of polling everything -- but not
+much.
+
+> So finally I gived up refactoring the design of cookie and maintain all
+> cookies of one original bio. The initial design of cookie gets retained.
+> The returned cookie is still the cookie of one of the split bio, and thus
+> it is not used at all when polling dm devices. The polling of dm device,
+> is indeed iterating and polling on all hardware queues (in polling mode)
+> of all underlying target devices.
+>
+> This design is simple and easy to implement. But I'm not sure if the
+> performance can be an issue if one dm device mapped to too many target
+> devices or the dm stack depth grows.
+
+You showed 40% performance improvement but it really just does the bare
+minimum of implementing polling.  It is so simplistic that I really
+don't think the design even serves as a starting point for what will be
+needed.  So this needs further design time.
+
+What you've _done_ could serve as a stop-gap but I'd really rather we
+get it properly designed from the start.
+
+> REQ_NOWAIT
+> ----------
+> The polling bio will set REQ_NOWAIT in bio->bi_flags, and the device
+> need to be capable of handling REQ_NOWAIT. Commit 021a24460dc2
+> ("block: add QUEUE_FLAG_NOWAIT") and commit 6abc49468eea ("dm: add
+> support for REQ_NOWAIT and enable it for linear target") add this
+> support for dm device, and currently only dm-linear supports that.
+> 
+> hybrid polling
+> --------------
+> When execute hybrid polling, cookie is used to fetch the request,
+> and check if the request has completed or not. In the design for
+> dm device described above, the returned cookie is still the cookie
+> of one of the split bios, and thus we have no way checking if all
+> the split bios have completed or not. Thus in the current
+> implementation, hybrid polling is not supported for dm device.
+
+I'll look closer at all this.  But DM targets do allow for additional
+target specific per-bio-data to be added to the overall per-bio-data
+size (via ti->per_io_data_size).  DM core _could_ internalize adding
+additional space to per-bio-data for storing a unique cookie per
+split/clone bio.
+
+Conversely, block-core's bio cloning could manage this so long as it
+knew how to access the offset into the established per-bio-data.  But
+that might be more challenging to do without impacting use-cases outside
+of DM.
+
+Thanks,
+Mike
+
+
+> [Performance]
+> I test 4k-randread on a dm-linear mapped to only one nvme device.
+> 
+> SSD: INTEL SSDPEDME800G4
+> dm-linear:dmsetup create testdev --table "0 209715200 linear /dev/nvme0n1 0"
+> 
+> fio configs:
+> ```
+> ioengine=io_uring
+> iodepth=128
+> numjobs=1
+> thread
+> rw=randread
+> direct=1
+> registerfiles=1
+> #hipri=1 with iopoll enabled, hipri=0 with iopoll disabled
+> bs=4k
+> size=100G
+> runtime=60
+> time_based
+> group_reporting
+> randrepeat=0
+> 
+> [device]
+> filename=/dev/mapper/testdev
+> ```
+> 
+> The test result shows that there's ~40% performance growth when iopoll
+> enabled.
+> 
+> test | iops | bw | avg lat
+> ---- | ---- | ---- | ----
+> iopoll-disabled | 244k | 953MiB/s  | 524us
+> iopoll-enabled  | 345k | 1349MiB/s | 370us
+> 
+> [TODO]
+> The store method of "io_poll"/"io_poll_delay" has not been adapted
+> for dm device.
+> 
+> 
+> Jeffle Xu (3):
+>   block/mq: add iterator for polling hw queues
+>   block: add back ->poll_fn in request queue
+>   dm: add support for IO polling
+> 
+>  block/blk-mq.c         | 30 ++++++++++++++++++++++++------
+>  drivers/md/dm-core.h   |  1 +
+>  drivers/md/dm-table.c  | 30 ++++++++++++++++++++++++++++++
+>  drivers/md/dm.c        | 40 ++++++++++++++++++++++++++++++++++++++++
+>  include/linux/blk-mq.h |  6 ++++++
+>  include/linux/blkdev.h |  3 +++
+>  6 files changed, 104 insertions(+), 6 deletions(-)
+> 
+> -- 
+> 2.27.0
+> 
+
