@@ -2,112 +2,118 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99BADC388F7
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 05:58:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7245C63699
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 08:26:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5383B2225F
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 05:58:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 962D6223C7
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 08:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1603355189;
+	bh=dmCNgDGTpNmF+8O2fjJO2XplnMkrwwsAXNmOMHG4kDE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=lZh2Qll7SYr2V06OALLl9Nm9iGycOFs6UhGfc+AMVz5xxM5MukcXqbwmLL+D7SK8m
+	 rVc6aETrcEziO0MhBymJG1drrZPuu5E3WlxyveTuxvWC3nXwoeQHbzr2qenBZ2r4uI
+	 lrMs+9nffsgKZCfcQfFB70B/CSuXG/wgKQ8AruTg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2507987AbgJVF61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 01:58:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59080 "EHLO mx2.suse.de"
+        id S2507649AbgJVI0T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 04:26:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56800 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2409361AbgJVF61 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 01:58:27 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 15CBCAC55;
-        Thu, 22 Oct 2020 05:58:25 +0000 (UTC)
-Subject: Re: [PATCH 0/2] block layer filter and block device snapshot module
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-        "len.brown@intel.com" <len.brown@intel.com>,
-        "pavel@ucw.cz" <pavel@ucw.cz>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "jack@suse.cz" <jack@suse.cz>, "tj@kernel.org" <tj@kernel.org>,
-        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "koct9i@gmail.com" <koct9i@gmail.com>,
-        "damien.lemoal@wdc.com" <damien.lemoal@wdc.com>,
-        "steve@sk2.org" <steve@sk2.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>
-References: <1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com>
- <71926887-5707-04a5-78a2-ffa2ee32bd68@suse.de>
- <20201021141044.GF20749@veeam.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <ca8eaa40-b422-2272-1fd9-1d0a354c42bf@suse.de>
-Date:   Thu, 22 Oct 2020 07:58:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S2444122AbgJVI0S (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Oct 2020 04:26:18 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2ABFB2065D;
+        Thu, 22 Oct 2020 08:26:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603355177;
+        bh=dmCNgDGTpNmF+8O2fjJO2XplnMkrwwsAXNmOMHG4kDE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=zDx/QVbNU8SimNSxRnLGamZjzaL0aYk8447/KE6GRihUCtWhJ6Z86tE/3/Weg2vwC
+         GiWZsECpqwLisbFLZe5yubGxrkvnswusVy8o3gK7vn/eUfbf4ADoW/+TTZixBrP7Y/
+         ZuwgVCa1BoOMrly/6gJ13uZ1QxD/B6i974xOGQS0=
+Date:   Thu, 22 Oct 2020 10:26:54 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Christoph Hellwig <hch@lst.de>, kernel-team@android.com,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        David Laight <David.Laight@aculab.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-mm@kvack.org,
+        netdev@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Message-ID: <20201022082654.GA1477657@kroah.com>
+References: <20200925045146.1283714-1-hch@lst.de>
+ <20200925045146.1283714-3-hch@lst.de>
+ <20201021161301.GA1196312@kroah.com>
+ <20201021233914.GR3576660@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20201021141044.GF20749@veeam.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201021233914.GR3576660@ZenIV.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/21/20 4:10 PM, Sergei Shtepa wrote:
-> The 10/21/2020 16:31, Hannes Reinecke wrote:
->> I do understand where you are coming from, but then we already have a
->> dm-snap which does exactly what you want to achieve.
->> Of course, that would require a reconfiguration of the storage stack on
->> the machine, which is not always possible (or desired).
+On Thu, Oct 22, 2020 at 12:39:14AM +0100, Al Viro wrote:
+> On Wed, Oct 21, 2020 at 06:13:01PM +0200, Greg KH wrote:
+> > On Fri, Sep 25, 2020 at 06:51:39AM +0200, Christoph Hellwig wrote:
+> > > From: David Laight <David.Laight@ACULAB.COM>
+> > > 
+> > > This lets the compiler inline it into import_iovec() generating
+> > > much better code.
+> > > 
+> > > Signed-off-by: David Laight <david.laight@aculab.com>
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > > ---
+> > >  fs/read_write.c | 179 ------------------------------------------------
+> > >  lib/iov_iter.c  | 176 +++++++++++++++++++++++++++++++++++++++++++++++
+> > >  2 files changed, 176 insertions(+), 179 deletions(-)
+> > 
+> > Strangely, this commit causes a regression in Linus's tree right now.
+> > 
+> > I can't really figure out what the regression is, only that this commit
+> > triggers a "large Android system binary" from working properly.  There's
+> > no kernel log messages anywhere, and I don't have any way to strace the
+> > thing in the testing framework, so any hints that people can provide
+> > would be most appreciated.
 > 
-> Yes, reconfiguring the storage stack on a machine is almost impossible.
+> It's a pure move - modulo changed line breaks in the argument lists
+> the functions involved are identical before and after that (just checked
+> that directly, by checking out the trees before and after, extracting two
+> functions in question from fs/read_write.c and lib/iov_iter.c (before and
+> after, resp.) and checking the diff between those.
 > 
->>
->> What I _could_ imagine would be a 'dm-intercept' thingie, which
->> redirects the current submit_bio() function for any block device, and
->> re-routes that to a linear device-mapper device pointing back to the
->> original block device.
->>
->> That way you could attach it to basically any block device, _and_ can
->> use the existing device-mapper functionality to do fancy stuff once the
->> submit_io() callback has been re-routed.
->>
->> And it also would help in other scenarios, too; with such a
->> functionality we could seamlessly clone devices without having to move
->> the whole setup to device-mapper first.
-> 
-> Hm...
-> Did I understand correctly that the filter itself can be left approximately
-> as it is, but the blk-snap module can be replaced with 'dm-intercept',
-> which would use the re-route mechanism from the dm?
-> I think I may be able to implement it, if you describe your idea in more
-> detail.
-> 
-> 
-Actually, once we have an dm-intercept, why do you need the block-layer 
-filter at all?
- From you initial description the block-layer filter was implemented 
-such that blk-snap could work; but if we have dm-intercept (and with it 
-the ability to use device-mapper functionality even for normal block 
-devices) there wouldn't be any need for the block-layer filter, no?
+> How certain is your bisection?
 
-Cheers,
+The bisection is very reproducable.
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+But, this looks now to be a compiler bug.  I'm using the latest version
+of clang and if I put "noinline" at the front of the function,
+everything works.
+
+Nick, any ideas here as to who I should report this to?
+
+I'll work on a fixup patch for the Android kernel tree to see if I can
+work around it there, but others will hit this in Linus's tree sooner or
+later...
+
+thanks,
+
+greg k-h
