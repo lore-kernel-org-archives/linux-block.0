@@ -2,150 +2,129 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A15E4C388F7
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 15:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B9CC388F9
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:11:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 25B5821707
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 15:58:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C14852463D
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:11:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="SlCn6jkP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="czEwsvzD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S368842AbgJVP6O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 11:58:14 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:46900 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S368827AbgJVP6O (ORCPT
+        id S2895933AbgJVQL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 12:11:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49248 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2895930AbgJVQL4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 11:58:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=mGsxdGbyIvAWqUy9xZkX4iq2nhpPqIe9Zm31e9HjaQE=; b=SlCn6jkP9lDFNww1zr47YkPl10
-        TZVs4PvKDL3U+du2tRYgqUo0kBbRq9rHP/tlX6IPHN2KFNc2xU8imvlJDnykNEp2+o4XoOv14KZ02
-        iul0+bD/sXPe9fWR0OkPaOFa/BRmuX8o+UDlEjm2ChnQ5D4Zl3q/Gis+4QZTmuCRgEtPRzPdy42Do
-        O20vCiXaLDyMOQ2592Y60ARM8s0W3bw5cKQh644aL2+7yxWFMIhBBRKc+Ha60KkpbRl/Ovr7D69yy
-        nwYE5P1lC1cmUfqL4SdOYqcD2V/NXkz52GsjdRRN1hF2o4KInso36vgIRC98GwBwroew2fC2L9q6h
-        qZd74tVg==;
-Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1kVcya-0008Ne-3L; Thu, 22 Oct 2020 09:58:05 -0600
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     hch@lst.de, sagi@grimberg.me, kbusch@kernel.org
-References: <20201022010234.8304-1-chaitanya.kulkarni@wdc.com>
- <20201022010234.8304-7-chaitanya.kulkarni@wdc.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <9ba9c9ba-7caf-e24c-1471-62c199cfcd4a@deltatee.com>
-Date:   Thu, 22 Oct 2020 09:57:58 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        Thu, 22 Oct 2020 12:11:56 -0400
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB39BC0613CE;
+        Thu, 22 Oct 2020 09:11:55 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id 188so1992129qkk.12;
+        Thu, 22 Oct 2020 09:11:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VUEOW9CHp/deOH81JRtiOJPAOKkJUb1n+cEO+W0skrI=;
+        b=czEwsvzDLL9JQQ6KoahV8nHWd/xlhJZxwM9sfK+JVoR52s79ywU+GifieRjOrbO6us
+         rLzd9+DgGUIU9llOXX0ErTqoKhJ7Wkm7Zh63MloPRtyDn0lPgMcf2OsiRZ9cwE1mQ+B1
+         mW0AmVI8jlxTuXwbjiQrrtBGNLpFbepp8w5k9nOahFPTjl5WpUmoEoz+XrJZCKAzm0AX
+         MH20/10P9ptj6aS/4tbXjn7NV1KFF8jnJO5C1rlpkaa/BXyRwuZgFnof746WQoj87GSl
+         LmnuPwpdDCHoCEHRe1s5Bu8BH+gyNZYTE6fVTc4E8c6kyCkLN5+p9MDevjhpXzDuDt+Q
+         vKQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VUEOW9CHp/deOH81JRtiOJPAOKkJUb1n+cEO+W0skrI=;
+        b=qRxIkXZFo4JrVENEGKcQuwmbCMTOTrSAj/UoyB3eoAvYf/4wm+CIcIvVfkErMDU32e
+         h4tDamQYifMNOtpDHZ7pVg2KJ3iE8uxC2uX/ypU1IqHDqRn2JB9pWRpcJ/YLcVT2NSFt
+         SauogkDLpQFK8XD86HMKOdicFTQE+6EiAbOvL3S9xBZZ5pB4ROWqBzT/DlinXgYOeG/+
+         6fmpPrt3LOZVPviErtnFZt2R3E9R70JLp543bb9D9JD+eeUHdIL6eQPhP/BkFqgKtW3w
+         885owZPpfJNV2JerfoKtf/hi7cUu0mNU5FYsNKWB3WOzLeHlkymVqwufhtBH8HCDQYWp
+         ZkGw==
+X-Gm-Message-State: AOAM533xjEwDdVEFKXMOGjY8yPi+MegEkDRvJiTGXfx3StCb7Igi6+rY
+        U/eCtZfEF/Y8PHJN3/qtyg==
+X-Google-Smtp-Source: ABdhPJwgIrpu/BfYe75NhyjTLrrEM95HxEVBcWn9d1YWIRoeshtLB4TIH2jYH5PbbgiOfjKTInbrFQ==
+X-Received: by 2002:a37:6688:: with SMTP id a130mr1549507qkc.219.1603383114941;
+        Thu, 22 Oct 2020 09:11:54 -0700 (PDT)
+Received: from presler.lan (a95-94-69-32.cpe.netcabo.pt. [95.94.69.32])
+        by smtp.gmail.com with ESMTPSA id g24sm1228192qka.111.2020.10.22.09.11.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Oct 2020 09:11:54 -0700 (PDT)
+From:   Rui Salvaterra <rsalvaterra@gmail.com>
+To:     minchan@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Rui Salvaterra <rsalvaterra@gmail.com>
+Subject: [PATCH] zram: break the strict dependency from lzo
+Date:   Thu, 22 Oct 2020 17:11:34 +0100
+Message-Id: <20201022161134.2115-1-rsalvaterra@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20201022010234.8304-7-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.145.4
-X-SA-Exim-Rcpt-To: kbusch@kernel.org, sagi@grimberg.me, hch@lst.de, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, chaitanya.kulkarni@wdc.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH V3 6/6] nvmet: use inline bio for passthru fast path
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+There's nothing special about zram and lzo. It works just fine without it, so
+as long as at least one of the other supported compression algorithms is
+selected.
 
+Additionally, drop the explicit dependency from CRYPTO, as it's implied by the
+selection of the algorithms themselves.
 
+Signed-off-by: Rui Salvaterra <rsalvaterra@gmail.com>
+---
+ drivers/block/zram/Kconfig | 8 ++++++--
+ drivers/block/zram/zcomp.c | 2 ++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-On 2020-10-21 7:02 p.m., Chaitanya Kulkarni wrote:
-> In nvmet_passthru_execute_cmd() which is a high frequency function
-> it uses bio_alloc() which leads to memory allocation from the fs pool
-> for each I/O.
-> 
-> For NVMeoF nvmet_req we already have inline_bvec allocated as a part of
-> request allocation that can be used with preallocated bio when we
-> already know the size of request before bio allocation with bio_alloc(),
-> which we already do.
-> 
-> Introduce a bio member for the nvmet_req passthru anon union. In the
-> fast path, check if we can get away with inline bvec and bio from
-> nvmet_req with bio_init() call before actually allocating from the
-> bio_alloc().
-> 
-> This will be useful to avoid any new memory allocation under high
-> memory pressure situation and get rid of any extra work of
-> allocation (bio_alloc()) vs initialization (bio_init()) when
-> transfer len is < NVMET_MAX_INLINE_DATA_LEN that user can configure at
-> compile time.
-> 
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> ---
->  drivers/nvme/target/nvmet.h    |  1 +
->  drivers/nvme/target/passthru.c | 20 ++++++++++++++++++--
->  2 files changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-> index 559a15ccc322..408a13084fb4 100644
-> --- a/drivers/nvme/target/nvmet.h
-> +++ b/drivers/nvme/target/nvmet.h
-> @@ -330,6 +330,7 @@ struct nvmet_req {
->  			struct work_struct      work;
->  		} f;
->  		struct {
-> +			struct bio		inline_bio;
->  			struct request		*rq;
->  			struct work_struct      work;
->  			bool			use_workqueue;
-> diff --git a/drivers/nvme/target/passthru.c b/drivers/nvme/target/passthru.c
-> index 496ffedb77dc..32498b4302cc 100644
-> --- a/drivers/nvme/target/passthru.c
-> +++ b/drivers/nvme/target/passthru.c
-> @@ -178,6 +178,14 @@ static void nvmet_passthru_req_done(struct request *rq,
->  	blk_mq_free_request(rq);
->  }
->  
-> +static void nvmet_passthru_bio_done(struct bio *bio)
-> +{
-> +	struct nvmet_req *req = bio->bi_private;
-> +
-> +	if (bio != &req->p.inline_bio)
-> +		bio_put(bio);
-> +}
-> +
->  static int nvmet_passthru_map_sg(struct nvmet_req *req, struct request *rq)
->  {
->  	int sg_cnt = req->sg_cnt;
-> @@ -186,13 +194,21 @@ static int nvmet_passthru_map_sg(struct nvmet_req *req, struct request *rq)
->  	int i;
->  
->  	bio = bio_alloc(GFP_KERNEL, min(sg_cnt, BIO_MAX_PAGES));
-> -	bio->bi_end_io = bio_put;
-> +	if (req->transfer_len <= NVMET_MAX_INLINE_DATA_LEN) {
-> +		bio = &req->p.inline_bio;
-> +		bio_init(bio, req->inline_bvec, ARRAY_SIZE(req->inline_bvec));
-> +	} else {
-> +		bio = bio_alloc(GFP_KERNEL, min(sg_cnt, BIO_MAX_PAGES));
-> +	}
-> +
-> +	bio->bi_end_io = nvmet_passthru_bio_done;
+diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+index fe7a4b7d30cf..2641b86f8677 100644
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -1,8 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ config ZRAM
+ 	tristate "Compressed RAM block device support"
+-	depends on BLOCK && SYSFS && ZSMALLOC && CRYPTO
+-	select CRYPTO_LZO
++	depends on BLOCK && SYSFS && ZSMALLOC
+ 	help
+ 	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
+ 	  Pages written to these disks are compressed and stored in memory
+@@ -37,3 +36,8 @@ config ZRAM_MEMORY_TRACKING
+ 	  /sys/kernel/debug/zram/zramX/block_state.
+ 
+ 	  See Documentation/admin-guide/blockdev/zram.rst for more information.
++
++config ZRAM_AUTOSEL_ALGO
++	def_bool y
++	depends on ZRAM && !(CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842 || CRYPTO_ZSTD)
++	select CRYPTO_LZO
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index 33e3b76c4fa9..052aa3f65514 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -15,8 +15,10 @@
+ #include "zcomp.h"
+ 
+ static const char * const backends[] = {
++#if IS_ENABLED(CONFIG_CRYPTO_LZO)
+ 	"lzo",
+ 	"lzo-rle",
++#endif
+ #if IS_ENABLED(CONFIG_CRYPTO_LZ4)
+ 	"lz4",
+ #endif
+-- 
+2.28.0
 
-I still think it's cleaner to change bi_endio for the inline/alloc'd
-cases by simply setting bi_endi_io to bio_put() only in the bio_alloc
-case. This should also be more efficient as it's one less indirect call
-and condition for the inline case.
-
-Besides that, the entire series looks good to me.
-
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-
-Logan
