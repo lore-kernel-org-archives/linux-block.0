@@ -2,80 +2,162 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F893C4363A
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 18:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4FB2C5DF9D
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 19:05:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9FC224640
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 18:45:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B5D724656
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 19:05:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="lq05AoxR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KQqTFOK8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S368945AbgJVSpj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 14:45:39 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:48334 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S368848AbgJVSpi (ORCPT
+        id S369855AbgJVTFP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 15:05:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S369769AbgJVTFF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 14:45:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=uf6C3j/ocrBTm97iqgRtQoheYZQH4nzs9ZR+u0LyQS0=; b=lq05AoxRq5ysREPtYrPSKtt+zZ
-        IiorJvq1mo/HpX8T89V7Nb7wfbLJ9rBkb/cKdr0iPL3Jn+727NrDZeVoUxsYiiz0dVZjydHb4q+/w
-        ZtVALKjISZkAdX0RdP4UNqc0tVK/iPwPzNSDv7LwCrL6ANRr05UISlOl3WWm+w+Tlzxx0Gj1j2Sty
-        T+/3ZsL7GHq4Bm6o/XdDcgXK+SpoGXvPiKkAEjfI7cvh3u4LyuNDrYfCF5CrYSm7HtMbtjLbvPhGe
-        CCZ/nsQ4kzykeOcvlWPsPUj0JAslOxvgXdTVNPJHkpeotI5iLuu2xXy+XuCG5r6BblFAsV1FdrEXv
-        6KitHdtQ==;
-Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1kVfaa-0002PY-K8; Thu, 22 Oct 2020 12:45:29 -0600
-To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20201008164024.12546-1-logang@deltatee.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <29f3dc94-50c3-1548-034e-09c5394ef781@deltatee.com>
-Date:   Thu, 22 Oct 2020 12:45:25 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        Thu, 22 Oct 2020 15:05:05 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F1DC0613CF
+        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2020 12:05:04 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id b19so1472569pld.0
+        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2020 12:05:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ob2vCJvO6llStuDKjUpnqeOT2ObygH+mOzcnW04eANY=;
+        b=KQqTFOK8RfeQlRsCMQ+rOlUOsaIw3aFT2tl0EvIIitPh93BRypnBq10dbZ1VQInVA9
+         YBqadNAg8WpA2s2M51/9SZIy6oP0pnbbWbfMb7wIWJV2snjJBMbyo5oSDcHw4N1zr7/S
+         VZLvINfglpSloiYKbOwAZRZgsEq5EwVd6j156C6w/ZUnsQNcPlNYKpHJP5uI2nd5y9vn
+         Eb462d8qlKbplpH5u1WCwEWQN9mxoYO0QRuuyd1KRKvAJJWpZKPK5rzGEmieFY4kQrsm
+         FHET+zmyltpbQH7fuqtpyH09Ge3zLiQZSD5eVuK163dQLFMNQGhprwY4hoqO0xWMFeFJ
+         fZNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ob2vCJvO6llStuDKjUpnqeOT2ObygH+mOzcnW04eANY=;
+        b=gD6KDTS4kpFg61hc2KwkdpTEzy13X+frIalpy6CeklwNr8PJ+TsXbGeSYLjQODh4ez
+         mndDAguRfp6WJ6vK13olnUuRPRlEp693+cBYyUHT+rqkFWUQour+YVkTr608mlW61uU0
+         413GG76d84MFLBZGYTmzgnagduxh0G6quKYzUby9xYT+FzotJUMHyLiUTt8SdrR091vj
+         Ng1ip5UzMNvjhQulHqTfJXXe6WPlHCHJ+qaZFsGSNiMkiJh/Iz82xFuj4e1S+7nx5pv9
+         dMNFKZh4+ZdPgQrSU8lhgHfsZxxJoJlGzzdoPPUc89AF0HAxBpGrrPNAhnCixF5RG0WZ
+         +HbQ==
+X-Gm-Message-State: AOAM531bcxrQJGtwHJIyR0FgA1owC/I1lTM0SkQuRPiSIQ57syunelQH
+        EAsOKIedm0/jlydI2OwnmvLe0xRuxn9lBBVehYppnw==
+X-Google-Smtp-Source: ABdhPJywMCKq0vfUuAKWQ9RLmH3NxEeoaMuMMn+wDHsffqxkAqXyKJ4o6MiCnyTmuBnnGxJWFn5poUUGRnshTJa4lRY=
+X-Received: by 2002:a17:902:c40b:b029:d3:def2:d90f with SMTP id
+ k11-20020a170902c40bb02900d3def2d90fmr3608595plk.29.1603393503931; Thu, 22
+ Oct 2020 12:05:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201008164024.12546-1-logang@deltatee.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.145.4
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, sagi@grimberg.me, osandov@osandov.com, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH blktests v3 00/11] NVMe Target Passthru Block Tests
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+References: <20201021233914.GR3576660@ZenIV.linux.org.uk> <20201022082654.GA1477657@kroah.com>
+ <80a2e5fa-718a-8433-1ab0-dd5b3e3b5416@redhat.com> <5d2ecb24db1e415b8ff88261435386ec@AcuMS.aculab.com>
+ <df2e0758-b8ed-5aec-6adc-a18f499c0179@redhat.com> <20201022090155.GA1483166@kroah.com>
+ <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com> <a1533569-948a-1d5b-e231-5531aa988047@redhat.com>
+ <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com> <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
+ <20201022132342.GB8781@lst.de> <8f1fff0c358b4b669d51cc80098dbba1@AcuMS.aculab.com>
+ <CAKwvOdnix6YGFhsmT_mY8ORNPTOsN3HwS33Dr0Ykn-pyJ6e-Bw@mail.gmail.com> <CAK8P3a3LjG+ZvmQrkb9zpgov8xBkQQWrkHBPgjfYSqBKGrwT4w@mail.gmail.com>
+In-Reply-To: <CAK8P3a3LjG+ZvmQrkb9zpgov8xBkQQWrkHBPgjfYSqBKGrwT4w@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Thu, 22 Oct 2020 12:04:52 -0700
+Message-ID: <CAKwvOdnhONvrHLAuz_BrAuEpnF5mD9p0YPGJs=NZZ0EZNo7dFQ@mail.gmail.com>
+Subject: Re: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     David Laight <David.Laight@aculab.com>,
+        Christoph Hellwig <hch@lst.de>,
+        David Hildenbrand <david@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        David Howells <dhowells@redhat.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Oct 22, 2020 at 11:13 AM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Thu, Oct 22, 2020 at 7:54 PM Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> > On Thu, Oct 22, 2020 at 9:35 AM David Laight <David.Laight@aculab.com> wrote:
+> > >
+> > > Which makes it a bug in the kernel C syscall wrappers.
+> > > They need to explicitly mask the high bits of 32bit
+> > > arguments on arm64 but not x86-64.
+> >
+> > Why not x86-64? Wouldn't it be *any* LP64 ISA?
+>
+> x86-64 is slightly special because most instructions on a 32-bit
+> argument clear the upper 32 bits, while on most architectures
+> the same instruction would leave the upper bits unchanged.
 
-On 2020-10-08 10:40 a.m., Logan Gunthorpe wrote:
-> Hi,
-> 
-> This series adds blktests for the nvmet passthru feature that was merged
-> for 5.9. It's been reconciled with Sagi's blktest series that Omar
-> recently merged.
+Oh interesting, depends on the operations too on x86_64 IIUC?
 
-Bump. This has been around for a while now. Omar, can you please
-consider picking this up?
+>
+> > Attaching a patch that uses the proper width, but I'm pretty sure
+> > there's still a signedness issue .  Greg, would you mind running this
+> > through the wringer?
+>
+> I would not expect this to change anything for the bug that Greg
+> is chasing, unless there is also a bug in clang.
+>
+> In the version before the patch, we get a 64-bit argument from
+> user space, which may consist of the intended value in the lower
+> bits plus garbage in the upper bits. However, vlen only gets
+> passed down  into import_iovec() without any other operations
+> on it, and since import_iovec takes a 32-bit argument, this is
+> where it finally gets narrowed.
 
+Passing an `unsigned long` as an `unsigned int` does no such
+narrowing: https://godbolt.org/z/TvfMxe (same vice-versa, just tail
+calls, no masking instructions).
+So if rw_copy_check_uvector() is inlined into import_iovec() (looking
+at the mainline@1028ae406999), then children calls of
+`rw_copy_check_uvector()` will be interpreting the `nr_segs` register
+unmodified, ie. garbage in the upper 32b.
+
+>
+> After your patch, the SYSCALL_DEFINE3() does the narrowing
+> conversion with the same clearing of the upper bits.
+>
+> If there is a problem somewhere leading up to import_iovec(),
+> it would have to in some code that expects to get a 32-bit
+> register argument but gets called with a register that has
+> garbage in the upper bits /without/ going through a correct
+> sanitizing function like SYSCALL_DEFINE3().
+>
+>       Arnd
+
+
+
+-- 
 Thanks,
-
-Logan
+~Nick Desaulniers
