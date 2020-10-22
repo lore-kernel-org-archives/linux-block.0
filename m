@@ -2,101 +2,80 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86558C388F9
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 18:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F893C4363A
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 18:45:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B9F124641
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 18:35:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9FC224640
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 18:45:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="lq05AoxR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S369715AbgJVSfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 14:35:16 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:42208 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S368258AbgJVSfQ (ORCPT
+        id S368945AbgJVSpj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 14:45:39 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:48334 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S368848AbgJVSpi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 14:35:16 -0400
-Received: by mail-pf1-f193.google.com with SMTP id x13so1675919pfa.9;
-        Thu, 22 Oct 2020 11:35:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1XI2Q+0LJ+MrF6PTdb/vTI0hg1qM7/BgdBxfc/cQLFU=;
-        b=KfvJzwfxn7jq43862MSUDXsjHVLQiDL2XxoZJGmoXONgP4vY3GlCA5FN+8DrSsW8wB
-         9SmbJi6W4JdS5zP5MzYogQw2PEMOlYdeKT6+WY0h01gtWfYbQhRjLOx0oc5r/8kiEOLp
-         4eIQiBAyv4wvJfpI6+JS713/r5xD54+18A2io2LjdPOKLQCw3Xa5BGWDUkjlj5m5F1SR
-         raWFqZtJq/rlWV3AqoLz7KXLZypGdBl3h/vciJMketksAu0hImF/F4e3OxebTToubG+f
-         1/VAmkFB1GxeNxg75NKaDKeoIUGinxz/SKDwgRSkrGuq/Xq3oIYt2o+5il5uSpTq1j7G
-         cmcQ==
-X-Gm-Message-State: AOAM53173u/AwlX54c+Hsy6e5BJ0qGFyF8+wWy5WJICweLZmcvJ93i1Y
-        hO+KLdQJP5Q3SwhAmQL9TxmqQ9iFEr7O+8FtCOE=
-X-Google-Smtp-Source: ABdhPJz36fkFyGr3qzw17+AgK9oYpIzBshcfChZVSHFTISPy8X4z6IdPGqE/7nwcLSyFF6/1DoPxCQ5X7a4DVfLIwnM=
-X-Received: by 2002:a63:a546:: with SMTP id r6mr3310324pgu.160.1603391713825;
- Thu, 22 Oct 2020 11:35:13 -0700 (PDT)
+        Thu, 22 Oct 2020 14:45:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
+        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=uf6C3j/ocrBTm97iqgRtQoheYZQH4nzs9ZR+u0LyQS0=; b=lq05AoxRq5ysREPtYrPSKtt+zZ
+        IiorJvq1mo/HpX8T89V7Nb7wfbLJ9rBkb/cKdr0iPL3Jn+727NrDZeVoUxsYiiz0dVZjydHb4q+/w
+        ZtVALKjISZkAdX0RdP4UNqc0tVK/iPwPzNSDv7LwCrL6ANRr05UISlOl3WWm+w+Tlzxx0Gj1j2Sty
+        T+/3ZsL7GHq4Bm6o/XdDcgXK+SpoGXvPiKkAEjfI7cvh3u4LyuNDrYfCF5CrYSm7HtMbtjLbvPhGe
+        CCZ/nsQ4kzykeOcvlWPsPUj0JAslOxvgXdTVNPJHkpeotI5iLuu2xXy+XuCG5r6BblFAsV1FdrEXv
+        6KitHdtQ==;
+Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1kVfaa-0002PY-K8; Thu, 22 Oct 2020 12:45:29 -0600
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20201008164024.12546-1-logang@deltatee.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <29f3dc94-50c3-1548-034e-09c5394ef781@deltatee.com>
+Date:   Thu, 22 Oct 2020 12:45:25 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com>
-In-Reply-To: <1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com>
-From:   Mike Snitzer <snitzer@redhat.com>
-Date:   Thu, 22 Oct 2020 14:35:02 -0400
-Message-ID: <CAMM=eLfTf2f2Me7f5tpL5DEGgKsqaFaAS0qTDVpLAYrwR5Jf5g@mail.gmail.com>
-Subject: Re: [PATCH 0/2] block layer filter and block device snapshot module
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>, rjw@rjwysocki.net,
-        len.brown@intel.com, Pavel Machek <pavel@ucw.cz>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        johannes.thumshirn@wdc.com, Ming Lei <ming.lei@redhat.com>,
-        Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
-        gustavo@embeddedor.com, Bart Van Assche <bvanassche@acm.org>,
-        osandov@fb.com, koct9i@gmail.com,
-        Damien Le Moal <damien.lemoal@wdc.com>, steve@sk2.org,
-        linux-block <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-pm@vger.kernel.org, linux-mm@kvack.org,
-        device-mapper development <dm-devel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20201008164024.12546-1-logang@deltatee.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.145.4
+X-SA-Exim-Rcpt-To: sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, sagi@grimberg.me, osandov@osandov.com, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH blktests v3 00/11] NVMe Target Passthru Block Tests
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 21, 2020 at 5:04 AM Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
->
-> Hello everyone! Requesting for your comments and suggestions.
->
-> # blk-filter
->
-> Block layer filter allows to intercept BIO requests to a block device.
->
-> Interception is performed at the very beginning of the BIO request
-> processing, and therefore does not affect the operation of the request
-> processing queue. This also makes it possible to intercept requests from
-> a specific block device, rather than from the entire disk.
->
-> The logic of the submit_bio function has been changed - since the
-> function execution results are not processed anywhere (except for swap
-> and direct-io) the function won't return a value anymore.
 
-Your desire to switch to a void return comes exactly when I've noticed
-we need it.
+On 2020-10-08 10:40 a.m., Logan Gunthorpe wrote:
+> Hi,
+> 
+> This series adds blktests for the nvmet passthru feature that was merged
+> for 5.9. It's been reconciled with Sagi's blktest series that Omar
+> recently merged.
 
-->submit_bio's blk_qc_t return is the cookie assigned by blk-mq.  Up
-to this point we haven't actually used it for bio-based devices but it
-seems clear we'll soon need for bio-based IO polling support.
+Bump. This has been around for a while now. Omar, can you please
+consider picking this up?
 
-Just today, I've been auditing drivers/md/dm.c with an eye toward
-properly handling the blk_qc_t return (or lack thereof) from various
-DM methods.
+Thanks,
 
-It could easily be that __submit_bio_noacct and __submit_bio_noacct_mq
-will be updated to do something meaningful with the returned cookie
-(or that DM will) to facilitate proper IO polling.
-
-Mike
+Logan
