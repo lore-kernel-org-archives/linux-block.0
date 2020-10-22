@@ -2,117 +2,122 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AA7C56201
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A42C388F7
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:28:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E458824650
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:23:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AF9rUsfI"
+	by mail.kernel.org (Postfix) with ESMTP id 446D9241A6
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:28:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S372257AbgJVVW6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 17:22:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40976 "EHLO
+        id S2898220AbgJVV2q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 17:28:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S372232AbgJVVWc (ORCPT
+        with ESMTP id S2507136AbgJVV2q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 17:22:32 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCD1C0613D6;
-        Thu, 22 Oct 2020 14:22:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=ljAA4PGd/GSmX+kkh/i6lw2/EaP+AhT2hL7GA28WXSQ=; b=AF9rUsfI+8g5rTMEZGeaJnZ8QA
-        Rt/ef7DEtRmk8GSl6EY20t+Gf/mTE+Dc9s8MDNmXl283W3Pppo8IVftue49/Qpq/DqwQEzVWwh/YN
-        KZ8w8VrMsbjOmDE3wlx5LESl0wk84wJry96DjMVtSqP5J973VE820NPe+afNVOccPGbawER146eve
-        y0tnsnpUYZRfDdapTk8Dr5VJj46BpIVFp1bgqiHWNXUFm6OjWVS8gUIibYrP2a707LppAfsEDBnwr
-        5RLTxDg2Zpp4LgB8mxoD8Go5WKOOhx6Y5yh3kUwmOmNjztLxOdKxNbfirsrifgQz80Jz2fPq7Q/Sj
-        BQaOhQfA==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kVi2Z-00046d-6A; Thu, 22 Oct 2020 21:22:31 +0000
-From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Subject: [PATCH 5/6] fs: Turn decrypt_bh into decrypt_bio
-Date:   Thu, 22 Oct 2020 22:22:27 +0100
-Message-Id: <20201022212228.15703-6-willy@infradead.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20201022212228.15703-1-willy@infradead.org>
-References: <20201022212228.15703-1-willy@infradead.org>
+        Thu, 22 Oct 2020 17:28:46 -0400
+Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0E9C0613CE;
+        Thu, 22 Oct 2020 14:28:45 -0700 (PDT)
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kVi8K-006V84-LA; Thu, 22 Oct 2020 21:28:28 +0000
+Date:   Thu, 22 Oct 2020 22:28:28 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Laight <David.Laight@aculab.com>,
+        Christoph Hellwig <hch@lst.de>,
+        David Hildenbrand <david@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Subject: Re: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Message-ID: <20201022212828.GZ3576660@ZenIV.linux.org.uk>
+References: <20201022090155.GA1483166@kroah.com>
+ <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com>
+ <a1533569-948a-1d5b-e231-5531aa988047@redhat.com>
+ <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
+ <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
+ <20201022132342.GB8781@lst.de>
+ <8f1fff0c358b4b669d51cc80098dbba1@AcuMS.aculab.com>
+ <20201022164040.GV20115@casper.infradead.org>
+ <CAKwvOdnq-yYLcF_coo=jMV-RH-SkuNp_kMB+KCBF5cz3PwiB8g@mail.gmail.com>
+ <20201022205932.GB3613750@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201022205932.GB3613750@gmail.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Pass a bio to decrypt_bio instead of a buffer_head to decrypt_bh.
-Another step towards doing decryption per-BIO instead of per-BH.
+On Thu, Oct 22, 2020 at 01:59:32PM -0700, Eric Biggers wrote:
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- fs/buffer.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+> Also note the following program succeeds on Linux 5.9 on x86_64.  On kernels
+> that have this bug, it should fail.  (I couldn't get it to actually fail, so it
+> must depend on the compiler and/or the kernel config...)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 627ae1d853c0..f859e0929b7e 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -299,22 +299,24 @@ static void end_buffer_async_read(struct buffer_head *bh, int uptodate)
- 	return;
- }
- 
--struct decrypt_bh_ctx {
-+struct decrypt_bio_ctx {
- 	struct work_struct work;
--	struct buffer_head *bh;
-+	struct bio *bio;
- };
- 
--static void decrypt_bh(struct work_struct *work)
-+static void decrypt_bio(struct work_struct *work)
- {
--	struct decrypt_bh_ctx *ctx =
--		container_of(work, struct decrypt_bh_ctx, work);
--	struct buffer_head *bh = ctx->bh;
-+	struct decrypt_bio_ctx *ctx =
-+		container_of(work, struct decrypt_bio_ctx, work);
-+	struct bio *bio = ctx->bio;
-+	struct buffer_head *bh = bio->bi_private;
- 	int err;
- 
- 	err = fscrypt_decrypt_pagecache_blocks(bh->b_page, bh->b_size,
- 					       bh_offset(bh));
- 	end_buffer_async_read(bh, err == 0);
- 	kfree(ctx);
-+	bio_put(bio);
- }
- 
- /*
-@@ -3093,13 +3095,12 @@ static void end_bio_bh_io_sync(struct bio *bio)
- 	/* Decrypt if needed */
- 	if ((bio_data_dir(bio) == READ) && uptodate &&
- 	    fscrypt_inode_uses_fs_layer_crypto(bh->b_page->mapping->host)) {
--		struct decrypt_bh_ctx *ctx = kmalloc(sizeof(*ctx), GFP_ATOMIC);
-+		struct decrypt_bio_ctx *ctx = kmalloc(sizeof(*ctx), GFP_ATOMIC);
- 
- 		if (ctx) {
--			INIT_WORK(&ctx->work, decrypt_bh);
--			ctx->bh = bh;
-+			INIT_WORK(&ctx->work, decrypt_bio);
-+			ctx->bio = bio;
- 			fscrypt_enqueue_decrypt_work(&ctx->work);
--			bio_put(bio);
- 			return;
- 		}
- 		uptodate = 0;
--- 
-2.28.0
+It doesn't.  See https://www.spinics.net/lists/linux-scsi/msg147836.html for
+discussion of that mess.
 
+ssize_t vfs_readv(struct file *file, const struct iovec __user *vec,
+                  unsigned long vlen, loff_t *pos, rwf_t flags)
+{
+        struct iovec iovstack[UIO_FASTIOV];
+        struct iovec *iov = iovstack;
+        struct iov_iter iter;
+        ssize_t ret;
+
+        ret = import_iovec(READ, vec, vlen, ARRAY_SIZE(iovstack), &iov, &iter);
+        if (ret >= 0) {
+                ret = do_iter_read(file, &iter, pos, flags);
+                kfree(iov);
+        }
+
+        return ret;
+}
+
+and import_iovec() takes unsigned int as the third argument, so it *will*
+truncate to 32 bits, no matter what.  Has done so since 0504c074b546
+"switch {compat_,}do_readv_writev() to {compat_,}import_iovec()" back in
+March 2015.  Yes, it was an incompatible userland ABI change, even though
+nothing that used glibc/uclibc/dietlibc would've noticed.
+
+Better yet, up until 2.1.90pre1 passing a 64bit value as the _first_ argument
+of readv(2) used to fail with -EBADF if it was too large; at that point it
+started to get quietly truncated to 32bit first.  And again, no libc users
+would've noticed (neither would anything except deliberate regression test
+looking for that specific behaviour).
+
+Note that we also have process_madvise(2) with size_t for vlen (huh?  It's
+a number of array elements, not an object size) and process_vm_{read,write}v(2),
+that have unsigned long for the same thing.  And the last two *are* using
+the same unsigned long from glibc POV.
