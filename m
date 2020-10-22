@@ -2,128 +2,159 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFC0C388F7
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8790DC388F7
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A16E121D43
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:19:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2F9224630
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:22:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U9CbMxFw"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="j0gytLMN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2899186AbgJVVTa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 17:19:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40490 "EHLO
+        id S372253AbgJVVWd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 17:22:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2897428AbgJVVT3 (ORCPT
+        with ESMTP id S2897727AbgJVVWc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 17:19:29 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531B2C0613CE;
-        Thu, 22 Oct 2020 14:19:29 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id s22so1774160pga.9;
-        Thu, 22 Oct 2020 14:19:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3W/IOmdOMUGlXlTzumA+5bE0zrAqv8UmjtWcnintli8=;
-        b=U9CbMxFwmbX0fhv+7Qcq0QxQoZfeBEaxscO+5CXSLFUuRYCe6TgHRMTagtmXBBXPEv
-         QGBGDqQdo7K+2zfpDLEuRecZqTDzDWVda4/VxjhpxD/s2tKgExJsxq5MqK+ZZBg2VVJP
-         jxP1y1tJZ3Z0i+014MaPrDOEFO2GJM49mkuR343t7tsjPGEIp0cIQH8bQ2lXZn3GKoye
-         A8RAEdRbkWGeR1hngtnV20p0aVk/aqmTfMjVQftZXMP48cmjEVld9qJyTTuq2Kj31bld
-         3Khpy3tVdqI1DRTK27XXx7uMiOLouMfglmdnsIjfsyaJpqsa9MrdAK6W4Lx8mrU6F7pq
-         Blzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3W/IOmdOMUGlXlTzumA+5bE0zrAqv8UmjtWcnintli8=;
-        b=N2RJBhx4lFtokAekv6MoMIKyeIbQoupP2un1NxSxQb45xatEi6GnU6xuBlQ+UOy8V4
-         BfnrSKJPZccFgc/Gz1v2sZPsAjjY5E74kdokjHMA9vuPY1Fs8+UwQh7l0UbsPUsp5PUw
-         +n81zHITSHL00ylzUlZEQ5sKKcuIUZ0nfykLFXTRTOgSmi8/ICc37KPYyY3uaa49w42K
-         Ox/7VlbRQzoXBA/fMCiZzIijCCJIDbYKyG5ioKoQe8AFaTGPDKduF6232SsGDMZVd9Qn
-         GMURQMwNsWb09+Du/BTef/X0k78CzO4C6UxxKnddfJ0yNXNtVdI20KTetyC25kZoHDqc
-         CzoA==
-X-Gm-Message-State: AOAM532ppnc8EZhGP0JYi2WYiuPz2Sma1nm45zD31phPLboFDHa0rUT3
-        OXZhjT3iQFG7yMal+KyofPqqmJD1J8DORHgEzA==
-X-Google-Smtp-Source: ABdhPJwI2PlyNT/SIF/Rw95v2BBZOro346Q8rSD3bOyrMFNR7Fpob2djOzpAfN18RMuvRJJ4xWjtSgyJgz1CVe+MaDI=
-X-Received: by 2002:a17:90a:ce8c:: with SMTP id g12mr3853435pju.185.1603401568802;
- Thu, 22 Oct 2020 14:19:28 -0700 (PDT)
+        Thu, 22 Oct 2020 17:22:32 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1895EC0613CE;
+        Thu, 22 Oct 2020 14:22:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=/Sk507X/XJRZb80wAXzDRfdLw7egwWlksVqiUNUiyjs=; b=j0gytLMNDZRI40meEo4hRH0jPx
+        MaadKOoRAPi5awBfQX5VgWUV5s2w/Vq8fLZU7MEYAZpA6hWI36nO0Yyy87RMst0MaWjYFrDwDYkmY
+        1Mmm67OCuN6KpXH2OEfhgTkkLEX2rnoG1L5KxXBqM5t6ocYmlKBJYQ/KA3fq64qupBiiNHa1+eBp3
+        kns7bcC2TbVAOpW6oKEFdQmtxu79GBBw0QBR/Xz/d9YDOUs65+/sr7Eg55SFiCgJlHLYA5qGL7xkq
+        WRRCEoB7yu1gIVj8FVkelOahlDSNLRO/ULvcB2rU3q4Haps42hFd+dyKw3WMTHvndlWFGTwarGCc0
+        DCgHAx1A==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kVi2Y-00046F-AE; Thu, 22 Oct 2020 21:22:30 +0000
+From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
+Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Subject: [PATCH 1/6] block: Add blk_completion
+Date:   Thu, 22 Oct 2020 22:22:23 +0100
+Message-Id: <20201022212228.15703-2-willy@infradead.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20201022212228.15703-1-willy@infradead.org>
+References: <20201022212228.15703-1-willy@infradead.org>
 MIME-Version: 1.0
-References: <20201022161134.2115-1-rsalvaterra@gmail.com>
-In-Reply-To: <20201022161134.2115-1-rsalvaterra@gmail.com>
-From:   Rui Salvaterra <rsalvaterra@gmail.com>
-Date:   Thu, 22 Oct 2020 22:19:17 +0100
-Message-ID: <CALjTZva495Lp39D=AKoRcdK2MbqwVRenaaMA+4KUPtLCXEeKJQ@mail.gmail.com>
-Subject: Re: [PATCH] zram: break the strict dependency from lzo
-To:     minchan@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Oops, this is broken, I'll send a v2 soon.
+This new data structure allows a task to wait for N things to complete.
+Usually the submitting task will handle cleanup, but if it is killed,
+the last completer will take care of it.
 
-On Thu, 22 Oct 2020 at 17:11, Rui Salvaterra <rsalvaterra@gmail.com> wrote:
->
-> There's nothing special about zram and lzo. It works just fine without it, so
-> as long as at least one of the other supported compression algorithms is
-> selected.
->
-> Additionally, drop the explicit dependency from CRYPTO, as it's implied by the
-> selection of the algorithms themselves.
->
-> Signed-off-by: Rui Salvaterra <rsalvaterra@gmail.com>
-> ---
->  drivers/block/zram/Kconfig | 8 ++++++--
->  drivers/block/zram/zcomp.c | 2 ++
->  2 files changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
-> index fe7a4b7d30cf..2641b86f8677 100644
-> --- a/drivers/block/zram/Kconfig
-> +++ b/drivers/block/zram/Kconfig
-> @@ -1,8 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0
->  config ZRAM
->         tristate "Compressed RAM block device support"
-> -       depends on BLOCK && SYSFS && ZSMALLOC && CRYPTO
-> -       select CRYPTO_LZO
-> +       depends on BLOCK && SYSFS && ZSMALLOC
->         help
->           Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
->           Pages written to these disks are compressed and stored in memory
-> @@ -37,3 +36,8 @@ config ZRAM_MEMORY_TRACKING
->           /sys/kernel/debug/zram/zramX/block_state.
->
->           See Documentation/admin-guide/blockdev/zram.rst for more information.
-> +
-> +config ZRAM_AUTOSEL_ALGO
-> +       def_bool y
-> +       depends on ZRAM && !(CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842 || CRYPTO_ZSTD)
-> +       select CRYPTO_LZO
-> diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-> index 33e3b76c4fa9..052aa3f65514 100644
-> --- a/drivers/block/zram/zcomp.c
-> +++ b/drivers/block/zram/zcomp.c
-> @@ -15,8 +15,10 @@
->  #include "zcomp.h"
->
->  static const char * const backends[] = {
-> +#if IS_ENABLED(CONFIG_CRYPTO_LZO)
->         "lzo",
->         "lzo-rle",
-> +#endif
->  #if IS_ENABLED(CONFIG_CRYPTO_LZ4)
->         "lz4",
->  #endif
-> --
-> 2.28.0
->
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ block/blk-core.c    | 61 +++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/bio.h | 11 ++++++++
+ 2 files changed, 72 insertions(+)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 10c08ac50697..2892246f2176 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1900,6 +1900,67 @@ void blk_io_schedule(void)
+ }
+ EXPORT_SYMBOL_GPL(blk_io_schedule);
+ 
++void blk_completion_init(struct blk_completion *cmpl, int n)
++{
++	spin_lock_init(&cmpl->cmpl_lock);
++	cmpl->cmpl_count = n;
++	cmpl->cmpl_task = current;
++	cmpl->cmpl_status = BLK_STS_OK;
++}
++
++int blk_completion_sub(struct blk_completion *cmpl, blk_status_t status, int n)
++{
++	int ret = 0;
++
++	spin_lock_bh(&cmpl->cmpl_lock);
++	if (cmpl->cmpl_status == BLK_STS_OK && status != BLK_STS_OK)
++		cmpl->cmpl_status = status;
++	cmpl->cmpl_count -= n;
++	BUG_ON(cmpl->cmpl_count < 0);
++	if (cmpl->cmpl_count == 0) {
++		if (cmpl->cmpl_task)
++			wake_up_process(cmpl->cmpl_task);
++		else
++			ret = -EINTR;
++	}
++	spin_unlock_bh(&cmpl->cmpl_lock);
++	if (ret < 0)
++		kfree(cmpl);
++	return ret;
++}
++
++int blk_completion_wait_killable(struct blk_completion *cmpl)
++{
++	int err = 0;
++
++	for (;;) {
++		set_current_state(TASK_KILLABLE);
++		spin_lock_bh(&cmpl->cmpl_lock);
++		if (cmpl->cmpl_count == 0)
++			break;
++		spin_unlock_bh(&cmpl->cmpl_lock);
++		blk_io_schedule();
++		if (fatal_signal_pending(current)) {
++			spin_lock_bh(&cmpl->cmpl_lock);
++			cmpl->cmpl_task = NULL;
++			if (cmpl->cmpl_count != 0) {
++				spin_unlock_bh(&cmpl->cmpl_lock);
++				cmpl = NULL;
++			}
++			err = -ERESTARTSYS;
++			break;
++		}
++	}
++	set_current_state(TASK_RUNNING);
++	if (cmpl) {
++		spin_unlock_bh(&cmpl->cmpl_lock);
++		err = blk_status_to_errno(cmpl->cmpl_status);
++		kfree(cmpl);
++	}
++
++	return err;
++}
++
+ int __init blk_dev_init(void)
+ {
+ 	BUILD_BUG_ON(REQ_OP_LAST >= (1 << REQ_OP_BITS));
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index f254bc79bb3a..0bde05f5548c 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -814,4 +814,15 @@ static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
+ 		bio->bi_opf |= REQ_NOWAIT;
+ }
+ 
++struct blk_completion {
++	struct task_struct *cmpl_task;
++	spinlock_t cmpl_lock;
++	int cmpl_count;
++	blk_status_t cmpl_status;
++};
++
++void blk_completion_init(struct blk_completion *, int n);
++int blk_completion_sub(struct blk_completion *, blk_status_t status, int n);
++int blk_completion_wait_killable(struct blk_completion *);
++
+ #endif /* __LINUX_BIO_H */
+-- 
+2.28.0
+
