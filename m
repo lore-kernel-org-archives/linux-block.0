@@ -2,178 +2,128 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B01B0C388F7
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 20:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFC0C388F7
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:19:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48136223C7
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 20:59:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603400378;
-	bh=Xexx6LzGU5CEQ5pUb/Rnl3sbc1IKJSCv776XJ3IiUZY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=LNx8JUC2+uCLN28Re4yqVPAn6eoM73+M0T2XvbL8PLnpNwwDn4+DIVGXpmctxeJqy
-	 F2yAyy+q45swc/CgUf8W5BI2HNGnqWn32v/04Cm9iVoOz+0Sl+2xTCdTeMRoFWE0A7
-	 SfU23Qi7Xsb14mRNC1N05yq6jU5poXUYSXLaKiLw=
+	by mail.kernel.org (Postfix) with ESMTP id A16E121D43
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 21:19:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U9CbMxFw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S371985AbgJVU7h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 16:59:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47852 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2897292AbgJVU7h (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 16:59:37 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8D47120874;
-        Thu, 22 Oct 2020 20:59:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603400375;
-        bh=Xexx6LzGU5CEQ5pUb/Rnl3sbc1IKJSCv776XJ3IiUZY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=zdUyA37A1L47KHgoyE+FT2EuXbQ76eLgYxDhD0pRsQ/vZP9VSxvex63p/S7m2wh2S
-         LPo1qkQ3neXSHmpGEcAArmow8IRVH9ABGEBSoWdWkIGldhGddb2MyLlCZgza1+BxJr
-         XSVfJ1lZvRBFbHtiVn91WdB+7mhw78zhWJSY/86E=
-Date:   Thu, 22 Oct 2020 13:59:32 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        David Laight <David.Laight@aculab.com>,
-        Christoph Hellwig <hch@lst.de>,
-        David Hildenbrand <david@redhat.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "kernel-team@android.com" <kernel-team@android.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        David Howells <dhowells@redhat.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Subject: Re: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Message-ID: <20201022205932.GB3613750@gmail.com>
-References: <df2e0758-b8ed-5aec-6adc-a18f499c0179@redhat.com>
- <20201022090155.GA1483166@kroah.com>
- <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com>
- <a1533569-948a-1d5b-e231-5531aa988047@redhat.com>
- <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
- <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
- <20201022132342.GB8781@lst.de>
- <8f1fff0c358b4b669d51cc80098dbba1@AcuMS.aculab.com>
- <20201022164040.GV20115@casper.infradead.org>
- <CAKwvOdnq-yYLcF_coo=jMV-RH-SkuNp_kMB+KCBF5cz3PwiB8g@mail.gmail.com>
+        id S2899186AbgJVVTa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 17:19:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40490 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2897428AbgJVVT3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Oct 2020 17:19:29 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531B2C0613CE;
+        Thu, 22 Oct 2020 14:19:29 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id s22so1774160pga.9;
+        Thu, 22 Oct 2020 14:19:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3W/IOmdOMUGlXlTzumA+5bE0zrAqv8UmjtWcnintli8=;
+        b=U9CbMxFwmbX0fhv+7Qcq0QxQoZfeBEaxscO+5CXSLFUuRYCe6TgHRMTagtmXBBXPEv
+         QGBGDqQdo7K+2zfpDLEuRecZqTDzDWVda4/VxjhpxD/s2tKgExJsxq5MqK+ZZBg2VVJP
+         jxP1y1tJZ3Z0i+014MaPrDOEFO2GJM49mkuR343t7tsjPGEIp0cIQH8bQ2lXZn3GKoye
+         A8RAEdRbkWGeR1hngtnV20p0aVk/aqmTfMjVQftZXMP48cmjEVld9qJyTTuq2Kj31bld
+         3Khpy3tVdqI1DRTK27XXx7uMiOLouMfglmdnsIjfsyaJpqsa9MrdAK6W4Lx8mrU6F7pq
+         Blzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3W/IOmdOMUGlXlTzumA+5bE0zrAqv8UmjtWcnintli8=;
+        b=N2RJBhx4lFtokAekv6MoMIKyeIbQoupP2un1NxSxQb45xatEi6GnU6xuBlQ+UOy8V4
+         BfnrSKJPZccFgc/Gz1v2sZPsAjjY5E74kdokjHMA9vuPY1Fs8+UwQh7l0UbsPUsp5PUw
+         +n81zHITSHL00ylzUlZEQ5sKKcuIUZ0nfykLFXTRTOgSmi8/ICc37KPYyY3uaa49w42K
+         Ox/7VlbRQzoXBA/fMCiZzIijCCJIDbYKyG5ioKoQe8AFaTGPDKduF6232SsGDMZVd9Qn
+         GMURQMwNsWb09+Du/BTef/X0k78CzO4C6UxxKnddfJ0yNXNtVdI20KTetyC25kZoHDqc
+         CzoA==
+X-Gm-Message-State: AOAM532ppnc8EZhGP0JYi2WYiuPz2Sma1nm45zD31phPLboFDHa0rUT3
+        OXZhjT3iQFG7yMal+KyofPqqmJD1J8DORHgEzA==
+X-Google-Smtp-Source: ABdhPJwI2PlyNT/SIF/Rw95v2BBZOro346Q8rSD3bOyrMFNR7Fpob2djOzpAfN18RMuvRJJ4xWjtSgyJgz1CVe+MaDI=
+X-Received: by 2002:a17:90a:ce8c:: with SMTP id g12mr3853435pju.185.1603401568802;
+ Thu, 22 Oct 2020 14:19:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdnq-yYLcF_coo=jMV-RH-SkuNp_kMB+KCBF5cz3PwiB8g@mail.gmail.com>
+References: <20201022161134.2115-1-rsalvaterra@gmail.com>
+In-Reply-To: <20201022161134.2115-1-rsalvaterra@gmail.com>
+From:   Rui Salvaterra <rsalvaterra@gmail.com>
+Date:   Thu, 22 Oct 2020 22:19:17 +0100
+Message-ID: <CALjTZva495Lp39D=AKoRcdK2MbqwVRenaaMA+4KUPtLCXEeKJQ@mail.gmail.com>
+Subject: Re: [PATCH] zram: break the strict dependency from lzo
+To:     minchan@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 22, 2020 at 10:00:44AM -0700, Nick Desaulniers wrote:
-> On Thu, Oct 22, 2020 at 9:40 AM Matthew Wilcox <willy@infradead.org> wrote:
-> >
-> > On Thu, Oct 22, 2020 at 04:35:17PM +0000, David Laight wrote:
-> > > Wait...
-> > > readv(2) defines:
-> > >       ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
-> >
-> > It doesn't really matter what the manpage says.  What does the AOSP
-> > libc header say?
-> 
-> Same: https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/sys/uio.h#38
-> 
-> Theoretically someone could bypass libc to make a system call, right?
-> 
-> >
-> > > But the syscall is defined as:
-> > >
-> > > SYSCALL_DEFINE3(readv, unsigned long, fd, const struct iovec __user *, vec,
-> > >                 unsigned long, vlen)
-> > > {
-> > >         return do_readv(fd, vec, vlen, 0);
-> > > }
-> >
-> 
+Oops, this is broken, I'll send a v2 soon.
 
-FWIW, glibc makes the readv() syscall assuming that fd and vlen are 'int' as
-well.  So this problem isn't specific to Android's libc.
-
-From objdump -d /lib/x86_64-linux-gnu/libc.so.6:
-
-	00000000000f4db0 <readv@@GLIBC_2.2.5>:
-	   f4db0:       64 8b 04 25 18 00 00    mov    %fs:0x18,%eax
-	   f4db7:       00
-	   f4db8:       85 c0                   test   %eax,%eax
-	   f4dba:       75 14                   jne    f4dd0 <readv@@GLIBC_2.2.5+0x20>
-	   f4dbc:       b8 13 00 00 00          mov    $0x13,%eax
-	   f4dc1:       0f 05                   syscall
-	   ...
-
-There's some code for pthread cancellation, but no zeroing of the upper half of
-the fd and vlen arguments, which are in %edi and %edx respectively.  But the
-glibc function prototype uses 'int' for them, not 'unsigned long'
-'ssize_t readv(int fd, const struct iovec *iov, int iovcnt);'.
-
-So the high halves of the fd and iovcnt registers can contain garbage.  Or at
-least that's what gcc (9.3.0) and clang (9.0.1) assume; they both compile the
-following
-
-void g(unsigned int x);
-
-void f(unsigned long x)
-{
-        g(x);
-}
-
-into f() making a tail call to g(), without zeroing the top half of %rdi.
-
-Also note the following program succeeds on Linux 5.9 on x86_64.  On kernels
-that have this bug, it should fail.  (I couldn't get it to actually fail, so it
-must depend on the compiler and/or the kernel config...)
-
-	#include <fcntl.h>
-	#include <stdio.h>
-	#include <sys/syscall.h>
-	#include <sys/uio.h>
-	#include <unistd.h>
-
-	int main()
-	{
-		int fd = open("/dev/zero", O_RDONLY);
-		char buf[1000];
-		struct iovec iov = { .iov_base = buf, .iov_len = sizeof(buf) };
-		long ret;
-
-		ret = syscall(__NR_readv, fd, &iov, 0x100000001);
-		if (ret < 0)
-			perror("readv failed");
-		else
-			printf("read %ld bytes\n", ret);
-	}
-
-I think the right fix is to change the readv() (and writev(), etc.) syscalls to
-take 'unsigned int' rather than 'unsigned long', as that is what the users are
-assuming...
-
-- Eric
+On Thu, 22 Oct 2020 at 17:11, Rui Salvaterra <rsalvaterra@gmail.com> wrote:
+>
+> There's nothing special about zram and lzo. It works just fine without it, so
+> as long as at least one of the other supported compression algorithms is
+> selected.
+>
+> Additionally, drop the explicit dependency from CRYPTO, as it's implied by the
+> selection of the algorithms themselves.
+>
+> Signed-off-by: Rui Salvaterra <rsalvaterra@gmail.com>
+> ---
+>  drivers/block/zram/Kconfig | 8 ++++++--
+>  drivers/block/zram/zcomp.c | 2 ++
+>  2 files changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+> index fe7a4b7d30cf..2641b86f8677 100644
+> --- a/drivers/block/zram/Kconfig
+> +++ b/drivers/block/zram/Kconfig
+> @@ -1,8 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  config ZRAM
+>         tristate "Compressed RAM block device support"
+> -       depends on BLOCK && SYSFS && ZSMALLOC && CRYPTO
+> -       select CRYPTO_LZO
+> +       depends on BLOCK && SYSFS && ZSMALLOC
+>         help
+>           Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
+>           Pages written to these disks are compressed and stored in memory
+> @@ -37,3 +36,8 @@ config ZRAM_MEMORY_TRACKING
+>           /sys/kernel/debug/zram/zramX/block_state.
+>
+>           See Documentation/admin-guide/blockdev/zram.rst for more information.
+> +
+> +config ZRAM_AUTOSEL_ALGO
+> +       def_bool y
+> +       depends on ZRAM && !(CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842 || CRYPTO_ZSTD)
+> +       select CRYPTO_LZO
+> diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+> index 33e3b76c4fa9..052aa3f65514 100644
+> --- a/drivers/block/zram/zcomp.c
+> +++ b/drivers/block/zram/zcomp.c
+> @@ -15,8 +15,10 @@
+>  #include "zcomp.h"
+>
+>  static const char * const backends[] = {
+> +#if IS_ENABLED(CONFIG_CRYPTO_LZO)
+>         "lzo",
+>         "lzo-rle",
+> +#endif
+>  #if IS_ENABLED(CONFIG_CRYPTO_LZ4)
+>         "lz4",
+>  #endif
+> --
+> 2.28.0
+>
