@@ -2,91 +2,105 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A752EC388F7
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15521C56201
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:40:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B70D24641
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:39:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C521D24655
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:40:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fv4QiOX9"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MtK1TZXc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2897473AbgJVQjB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 12:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53472 "EHLO
+        id S2897557AbgJVQkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 12:40:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2897386AbgJVQjB (ORCPT
+        with ESMTP id S2897502AbgJVQkw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 12:39:01 -0400
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39851C0613CE
-        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2020 09:39:00 -0700 (PDT)
-Received: by mail-il1-x12c.google.com with SMTP id p16so2307548ilq.5
-        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2020 09:39:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=XabwvqT4ScK/GFmYuC/wQR/uIais57ndBXLbMLsPdYE=;
-        b=fv4QiOX9WiQeZG5MG/l94UgY1pb7DuLRznqepX77ueBbr0C97KgS0Eqf4JsJtKwTve
-         3qeXRkz/60Jud0kSxdufk8FeXwwHVs9ACz+xs23lxcucBabYut2ZMOx/5M3ayIgbBEuL
-         EAYUlNP0S+2Y1rY+2+fg+NA9nmA4i3BnmitFI/XnyQQn/pVynQuins+HMBFd6i5UxBIQ
-         UDCRqpDF6PJHlpBwHYFS7tAIsDtfZtfzSin1ECZWv7t2NROXa43Kki/U//QM2qeM0QT8
-         qESvMrfPuUgc2Lr24aJc0c/WRLAOc8CpEfzh0ecp0x+na19O16Ux6o+M9At+19JQX/oY
-         6vqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XabwvqT4ScK/GFmYuC/wQR/uIais57ndBXLbMLsPdYE=;
-        b=MEPI6rbCbFa2jhKxIwkuL75wd4N7xv8jJ+kXQ6Njk2RW3d0pe+HsKWuLazSWE53wCW
-         QP/mGhjaQbAzol9Z6KCqg2+2udo+6HSQKGKxIkjBwfqBRPlZ4aQKV/K0Wara0Avlr5z7
-         JytE8++BF4cpWUXkLL45tNaWFwXy4BBF3JdeEusVHB4IRWYl/Li0ZYvidc+ksv0FctTF
-         NGtUo0Yh4lbC+ASlMjhITFsPpYxiR6tIgX/yZyeQY+qcho/d6pycZwLKxg7QQSf/P8tk
-         tEAT0jTh3uJePg1F6ZFKrj3HmqbAdILMlh0fFefrWZtP5Ov01RrXxdmkYsoncBTpQijP
-         tOlw==
-X-Gm-Message-State: AOAM531rXa5sNoxUPCXbV0GdfiqSKaZSsvd6NQRlMeJmL1GxtyOzFIy4
-        ykmnF+yky57I3aqzSOVSpaUMBQ==
-X-Google-Smtp-Source: ABdhPJytx6VrLGfvqGldVLmqwiKaSXbOVnfHW36tsO5advVBhA7LdyM0zkqD9kJgO6ikU4en9YG86A==
-X-Received: by 2002:a92:1801:: with SMTP id 1mr2466133ily.219.1603384739544;
-        Thu, 22 Oct 2020 09:38:59 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 18sm1302784ilg.3.2020.10.22.09.38.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Oct 2020 09:38:59 -0700 (PDT)
-Subject: Re: [PATCHv2] null_blk: use zone status for max active/open
-To:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org
-Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>
-References: <20201022154739.1694152-1-kbusch@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a4ad08a2-57e7-ffdf-f5c3-2658675198df@kernel.dk>
-Date:   Thu, 22 Oct 2020 10:38:58 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 22 Oct 2020 12:40:52 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A0BC0613CE;
+        Thu, 22 Oct 2020 09:40:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=IreJsWAehwwc9BigrWTsj0+t0+yJCwyFYLOnBdIPcSg=; b=MtK1TZXciwmKvAXJnEsSoBMqrf
+        72WiHkjyyFo9h6lPVsS32dBYqPHdi5iojV1xKAx6YuDdk1affu1pbBrT2k20OPlS+2gByBZEcvd9j
+        MlFH0jBbmth/M/2D+92OFAiZfPEHzOaHPspxeiSjK15e6TDFdxwEjlSFuOSJj6rfmS8IzOOXphXvG
+        Ht7qrXEw/cFXbdw4rjjzM4xSPRXX4g6iUWHMpU3Njtfxtxy5DA+zObVJbcYkefXEH4g9KJq62LzKN
+        0WCqRhPDlo3ZK7DTgaDVgnHVzVD3U2hWPPP4hFxd8Z8Po1erHVxohPm9W28iiZl9eK3OjpBjKRk8a
+        +67cBPOg==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kVddo-0002sM-QL; Thu, 22 Oct 2020 16:40:40 +0000
+Date:   Thu, 22 Oct 2020 17:40:40 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     'Christoph Hellwig' <hch@lst.de>,
+        David Hildenbrand <david@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Subject: Re: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Message-ID: <20201022164040.GV20115@casper.infradead.org>
+References: <80a2e5fa-718a-8433-1ab0-dd5b3e3b5416@redhat.com>
+ <5d2ecb24db1e415b8ff88261435386ec@AcuMS.aculab.com>
+ <df2e0758-b8ed-5aec-6adc-a18f499c0179@redhat.com>
+ <20201022090155.GA1483166@kroah.com>
+ <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com>
+ <a1533569-948a-1d5b-e231-5531aa988047@redhat.com>
+ <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
+ <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
+ <20201022132342.GB8781@lst.de>
+ <8f1fff0c358b4b669d51cc80098dbba1@AcuMS.aculab.com>
 MIME-Version: 1.0
-In-Reply-To: <20201022154739.1694152-1-kbusch@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8f1fff0c358b4b669d51cc80098dbba1@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/22/20 9:47 AM, Keith Busch wrote:
-> The block layer provides special status codes when requests go beyond
-> the zone resource limits. Use these codes instead of the generic IOERR
-> for requests that exceed the max active or open limits the null_blk
-> device was configured with so that applications know how these special
-> conditions should be handled.
+On Thu, Oct 22, 2020 at 04:35:17PM +0000, David Laight wrote:
+> Wait...
+> readv(2) defines:
+> 	ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
 
-Applied, thanks.
+It doesn't really matter what the manpage says.  What does the AOSP
+libc header say?
 
--- 
-Jens Axboe
+> But the syscall is defined as:
+> 
+> SYSCALL_DEFINE3(readv, unsigned long, fd, const struct iovec __user *, vec,
+>                 unsigned long, vlen)
+> {
+>         return do_readv(fd, vec, vlen, 0);
+> }
 
