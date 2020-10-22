@@ -2,129 +2,121 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B9CC388F9
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FC9C388F9
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:15:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C14852463D
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:11:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="czEwsvzD"
+	by mail.kernel.org (Postfix) with ESMTP id F15FF241A3
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:15:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2895933AbgJVQL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 12:11:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49248 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2895930AbgJVQL4 (ORCPT
+        id S2901606AbgJVQPK convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 12:15:10 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:34319 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2901603AbgJVQPJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 12:11:56 -0400
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB39BC0613CE;
-        Thu, 22 Oct 2020 09:11:55 -0700 (PDT)
-Received: by mail-qk1-x743.google.com with SMTP id 188so1992129qkk.12;
-        Thu, 22 Oct 2020 09:11:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VUEOW9CHp/deOH81JRtiOJPAOKkJUb1n+cEO+W0skrI=;
-        b=czEwsvzDLL9JQQ6KoahV8nHWd/xlhJZxwM9sfK+JVoR52s79ywU+GifieRjOrbO6us
-         rLzd9+DgGUIU9llOXX0ErTqoKhJ7Wkm7Zh63MloPRtyDn0lPgMcf2OsiRZ9cwE1mQ+B1
-         mW0AmVI8jlxTuXwbjiQrrtBGNLpFbepp8w5k9nOahFPTjl5WpUmoEoz+XrJZCKAzm0AX
-         MH20/10P9ptj6aS/4tbXjn7NV1KFF8jnJO5C1rlpkaa/BXyRwuZgFnof746WQoj87GSl
-         LmnuPwpdDCHoCEHRe1s5Bu8BH+gyNZYTE6fVTc4E8c6kyCkLN5+p9MDevjhpXzDuDt+Q
-         vKQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VUEOW9CHp/deOH81JRtiOJPAOKkJUb1n+cEO+W0skrI=;
-        b=qRxIkXZFo4JrVENEGKcQuwmbCMTOTrSAj/UoyB3eoAvYf/4wm+CIcIvVfkErMDU32e
-         h4tDamQYifMNOtpDHZ7pVg2KJ3iE8uxC2uX/ypU1IqHDqRn2JB9pWRpcJ/YLcVT2NSFt
-         SauogkDLpQFK8XD86HMKOdicFTQE+6EiAbOvL3S9xBZZ5pB4ROWqBzT/DlinXgYOeG/+
-         6fmpPrt3LOZVPviErtnFZt2R3E9R70JLp543bb9D9JD+eeUHdIL6eQPhP/BkFqgKtW3w
-         885owZPpfJNV2JerfoKtf/hi7cUu0mNU5FYsNKWB3WOzLeHlkymVqwufhtBH8HCDQYWp
-         ZkGw==
-X-Gm-Message-State: AOAM533xjEwDdVEFKXMOGjY8yPi+MegEkDRvJiTGXfx3StCb7Igi6+rY
-        U/eCtZfEF/Y8PHJN3/qtyg==
-X-Google-Smtp-Source: ABdhPJwgIrpu/BfYe75NhyjTLrrEM95HxEVBcWn9d1YWIRoeshtLB4TIH2jYH5PbbgiOfjKTInbrFQ==
-X-Received: by 2002:a37:6688:: with SMTP id a130mr1549507qkc.219.1603383114941;
-        Thu, 22 Oct 2020 09:11:54 -0700 (PDT)
-Received: from presler.lan (a95-94-69-32.cpe.netcabo.pt. [95.94.69.32])
-        by smtp.gmail.com with ESMTPSA id g24sm1228192qka.111.2020.10.22.09.11.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Oct 2020 09:11:54 -0700 (PDT)
-From:   Rui Salvaterra <rsalvaterra@gmail.com>
-To:     minchan@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Rui Salvaterra <rsalvaterra@gmail.com>
-Subject: [PATCH] zram: break the strict dependency from lzo
-Date:   Thu, 22 Oct 2020 17:11:34 +0100
-Message-Id: <20201022161134.2115-1-rsalvaterra@gmail.com>
-X-Mailer: git-send-email 2.28.0
+        Thu, 22 Oct 2020 12:15:09 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-158-p8RgjWwGO4aFW5kpOv-aSA-1; Thu, 22 Oct 2020 17:15:06 +0100
+X-MC-Unique: p8RgjWwGO4aFW5kpOv-aSA-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Thu, 22 Oct 2020 17:15:05 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Thu, 22 Oct 2020 17:15:05 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Greg KH' <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>
+CC:     David Hildenbrand <david@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        David Howells <dhowells@redhat.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Subject: RE: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Thread-Topic: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Thread-Index: AQHWqE5GNDfnH4y9nkGWtfqJueR1KKmjTCJQgAAN4UiAAAD2IIAAVswJgAAaEtA=
+Date:   Thu, 22 Oct 2020 16:15:05 +0000
+Message-ID: <80332728fbc3438f806aee74003e26c1@AcuMS.aculab.com>
+References: <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com>
+ <a1533569-948a-1d5b-e231-5531aa988047@redhat.com>
+ <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
+ <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
+ <20201022104805.GA1503673@kroah.com> <20201022121849.GA1664412@kroah.com>
+ <98d9df88-b7ef-fdfb-7d90-2fa7a9d7bab5@redhat.com>
+ <20201022125759.GA1685526@kroah.com> <20201022135036.GA1787470@kroah.com>
+ <CAK8P3a1B7OVdyzW0-97JwzZiwp0D0fnSfyete16QTvPp_1m07A@mail.gmail.com>
+ <20201022144021.GA1969554@kroah.com>
+In-Reply-To: <20201022144021.GA1969554@kroah.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There's nothing special about zram and lzo. It works just fine without it, so
-as long as at least one of the other supported compression algorithms is
-selected.
+From: Greg KH
+> Sent: 22 October 2020 15:40
+> 
+> On Thu, Oct 22, 2020 at 04:28:20PM +0200, Arnd Bergmann wrote:
+...
+> > Can you attach the iov_iter.s files from the broken build, plus the
+> > one with 'noinline' for comparison? Maybe something can be seen
+> > in there.
+> 
+> I don't know how to extract the .s files easily from the AOSP build
+> system, I'll look into that.  I'm also now testing by downgrading to an
+> older version of clang (10 instead of 11), to see if that matters at all
+> or not...
 
-Additionally, drop the explicit dependency from CRYPTO, as it's implied by the
-selection of the algorithms themselves.
+Back from a day out - after it stopped raining.
+Trying to use up leave before the end of the year.
 
-Signed-off-by: Rui Salvaterra <rsalvaterra@gmail.com>
----
- drivers/block/zram/Kconfig | 8 ++++++--
- drivers/block/zram/zcomp.c | 2 ++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+Can you use objdump on the kernel binary itself and cut out
+the single function?
 
-diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
-index fe7a4b7d30cf..2641b86f8677 100644
---- a/drivers/block/zram/Kconfig
-+++ b/drivers/block/zram/Kconfig
-@@ -1,8 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- config ZRAM
- 	tristate "Compressed RAM block device support"
--	depends on BLOCK && SYSFS && ZSMALLOC && CRYPTO
--	select CRYPTO_LZO
-+	depends on BLOCK && SYSFS && ZSMALLOC
- 	help
- 	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
- 	  Pages written to these disks are compressed and stored in memory
-@@ -37,3 +36,8 @@ config ZRAM_MEMORY_TRACKING
- 	  /sys/kernel/debug/zram/zramX/block_state.
- 
- 	  See Documentation/admin-guide/blockdev/zram.rst for more information.
-+
-+config ZRAM_AUTOSEL_ALGO
-+	def_bool y
-+	depends on ZRAM && !(CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842 || CRYPTO_ZSTD)
-+	select CRYPTO_LZO
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 33e3b76c4fa9..052aa3f65514 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -15,8 +15,10 @@
- #include "zcomp.h"
- 
- static const char * const backends[] = {
-+#if IS_ENABLED(CONFIG_CRYPTO_LZO)
- 	"lzo",
- 	"lzo-rle",
-+#endif
- #if IS_ENABLED(CONFIG_CRYPTO_LZ4)
- 	"lz4",
- #endif
--- 
-2.28.0
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
