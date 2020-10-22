@@ -2,44 +2,81 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10BE0C388F7
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 310BDC4363A
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 17:01:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C142122267
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:50:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CCA0324641
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 17:01:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FaZk1syk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2902061AbgJVQuJ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 12:50:09 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:56785 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2902056AbgJVQuI (ORCPT
+        id S2505592AbgJVRBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 13:01:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56864 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2902219AbgJVRA5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 12:50:08 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-194-WOVSzex2MCy7e08hIPnLOQ-1; Thu, 22 Oct 2020 17:50:05 +0100
-X-MC-Unique: WOVSzex2MCy7e08hIPnLOQ-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Thu, 22 Oct 2020 17:50:04 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Thu, 22 Oct 2020 17:50:04 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Matthew Wilcox' <willy@infradead.org>
-CC:     'Christoph Hellwig' <hch@lst.de>,
+        Thu, 22 Oct 2020 13:00:57 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92136C0613D9
+        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2020 10:00:56 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id f38so997357pgm.2
+        for <linux-block@vger.kernel.org>; Thu, 22 Oct 2020 10:00:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mPq1xxojTLCMg9dkpihVuEy7NB86hVAVpi/132X7kAw=;
+        b=FaZk1syk0YMG3iZb8SLWxC2V/X6x12JUTFYfL5Y4vorI7cxebKk0A4wGmpbUSoSX7r
+         Hs46zZ8QPE3GLHjpbq58EcQYAjpUsLiFd7rIWVJJucFcvXO83HQmjrAvVcsSpWuzKmDn
+         Ir7y+Hx076Ra7VE3qkMs0wIP4MuvMyPqFMZD7ErBK/erglmryprKfIJjlK9s4TEK+eV0
+         zi9+rcSPkS3oUdnHJUbiyp5gMYyTX6WkcGQdAuWCh4z6o6XxBzLh/IQ3EqBPjn/4zA8/
+         /ycOC8rWbYoFZIzXS+kSVT0mB240mCkdd7OfRPndvUPHV4Kpd/AlMGehp4EnqX4ufYBk
+         bELw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mPq1xxojTLCMg9dkpihVuEy7NB86hVAVpi/132X7kAw=;
+        b=F5gDIn3EkNiRwXagZbpGTCcWVZrEZTcSGalv1PfPta8WKukGW9FCyIwYGSZ2R64KZz
+         9/sUUVAR2TFBsqJc70Y5LRcq14tLLZxvldzmOHJ/ps126vAvCLyNYO6H3VrgAiqzS9ax
+         cISTQmntVTnsmewCHvNAkfS6ehOTYK5qH7DTrRjj8D4rAGKKkUvZz0ebsscuzxLLbKPx
+         AKp+0sKlwKCoB8bKs08VJj0AsgYzo1MN8E/N53t/jAEANLKTHGB4IDmrpoguZpMrjRNC
+         w3GRTNyqu2kW1d7r1wdxddnzZWR11/sIb2L2COHQuHO1b8+AENbxCy7OwdlYU+v8boaH
+         w1CA==
+X-Gm-Message-State: AOAM533q6H9Fggz1wkpreC7MAhivvKheWm6hpV92Uan1Zh6orCd56MPt
+        6I0vSMk9lCAoE2Cjha3Wncvnia7z6i/uw4+85YKLuw==
+X-Google-Smtp-Source: ABdhPJzMoyVci79YwTV4KRMhMNBvKksmGgmX62puAUjhkzpwpVCVuG2Q30QHXgEacyFzXNHAtggJkv+M7hW6xpUief0=
+X-Received: by 2002:a62:6408:0:b029:154:dde2:a5eb with SMTP id
+ y8-20020a6264080000b0290154dde2a5ebmr3767384pfb.30.1603386055586; Thu, 22 Oct
+ 2020 10:00:55 -0700 (PDT)
+MIME-Version: 1.0
+References: <80a2e5fa-718a-8433-1ab0-dd5b3e3b5416@redhat.com>
+ <5d2ecb24db1e415b8ff88261435386ec@AcuMS.aculab.com> <df2e0758-b8ed-5aec-6adc-a18f499c0179@redhat.com>
+ <20201022090155.GA1483166@kroah.com> <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com>
+ <a1533569-948a-1d5b-e231-5531aa988047@redhat.com> <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
+ <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com> <20201022132342.GB8781@lst.de>
+ <8f1fff0c358b4b669d51cc80098dbba1@AcuMS.aculab.com> <20201022164040.GV20115@casper.infradead.org>
+In-Reply-To: <20201022164040.GV20115@casper.infradead.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Thu, 22 Oct 2020 10:00:44 -0700
+Message-ID: <CAKwvOdnq-yYLcF_coo=jMV-RH-SkuNp_kMB+KCBF5cz3PwiB8g@mail.gmail.com>
+Subject: Re: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     David Laight <David.Laight@aculab.com>,
+        Christoph Hellwig <hch@lst.de>,
         David Hildenbrand <david@redhat.com>,
         Greg KH <gregkh@linuxfoundation.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
-        Nick Desaulniers <ndesaulniers@google.com>,
         "kernel-team@android.com" <kernel-team@android.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        "Jens Axboe" <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
         David Howells <dhowells@redhat.com>,
         "linux-arm-kernel@lists.infradead.org" 
         <linux-arm-kernel@lists.infradead.org>,
@@ -60,61 +97,26 @@ CC:     'Christoph Hellwig' <hch@lst.de>,
         "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
         "linux-security-module@vger.kernel.org" 
         <linux-security-module@vger.kernel.org>
-Subject: RE: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Thread-Topic: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Thread-Index: AQHWqE5GNDfnH4y9nkGWtfqJueR1KKmjTCJQgAAN4UiAAAD2IIAAQY5tgAAwVkD///XpAIAAEjsw
-Date:   Thu, 22 Oct 2020 16:50:04 +0000
-Message-ID: <089031589f0f43a39f9a5a7737443880@AcuMS.aculab.com>
-References: <80a2e5fa-718a-8433-1ab0-dd5b3e3b5416@redhat.com>
- <5d2ecb24db1e415b8ff88261435386ec@AcuMS.aculab.com>
- <df2e0758-b8ed-5aec-6adc-a18f499c0179@redhat.com>
- <20201022090155.GA1483166@kroah.com>
- <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com>
- <a1533569-948a-1d5b-e231-5531aa988047@redhat.com>
- <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
- <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
- <20201022132342.GB8781@lst.de>
- <8f1fff0c358b4b669d51cc80098dbba1@AcuMS.aculab.com>
- <20201022164040.GV20115@casper.infradead.org>
-In-Reply-To: <20201022164040.GV20115@casper.infradead.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
-MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Matthew Wilcox <willy@infradead.org>
-> Sent: 22 October 2020 17:41
-> 
+On Thu, Oct 22, 2020 at 9:40 AM Matthew Wilcox <willy@infradead.org> wrote:
+>
 > On Thu, Oct 22, 2020 at 04:35:17PM +0000, David Laight wrote:
 > > Wait...
 > > readv(2) defines:
-> > 	ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
-> 
+> >       ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+>
 > It doesn't really matter what the manpage says.  What does the AOSP
 > libc header say?
 
-The only copy I can find is:
+Same: https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/sys/uio.h#38
 
-/usr/include/x86_64-linux-gnu/sys/uio.h:extern ssize_t readv (int __fd, const struct iovec *__iovec, int __count)
-/usr/include/x86_64-linux-gnu/sys/uio.h-  __wur;
+Theoretically someone could bypass libc to make a system call, right?
 
-and not surprisingly agrees.
-POSIX and/or TOG will (more or less) mandate the prototype.
-
+>
 > > But the syscall is defined as:
 > >
 > > SYSCALL_DEFINE3(readv, unsigned long, fd, const struct iovec __user *, vec,
@@ -122,12 +124,9 @@ POSIX and/or TOG will (more or less) mandate the prototype.
 > > {
 > >         return do_readv(fd, vec, vlen, 0);
 > > }
+>
 
-I wonder when the high bits of 'fd' get zapped?
 
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+-- 
+Thanks,
+~Nick Desaulniers
