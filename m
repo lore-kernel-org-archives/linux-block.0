@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A450C2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 01:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3368BC55178
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 01:03:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B52992244C
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 01:03:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA5402244C
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 01:03:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=permerror (0-bit key) header.d=wdc.com header.i=@wdc.com header.b="mfY8c4nV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="irGT1CRy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2441063AbgJVBDO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Oct 2020 21:03:14 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:28452 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2440469AbgJVBDN (ORCPT
+        id S2894554AbgJVBDW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Oct 2020 21:03:22 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:59966 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2440469AbgJVBDW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Oct 2020 21:03:13 -0400
+        Wed, 21 Oct 2020 21:03:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1603329098; x=1634865098;
+  t=1603328601; x=1634864601;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/RfTDNkwgpWkWBDLqJjIjFnT/dbeT/R3kr2Wn8mjMuQ=;
-  b=mfY8c4nVJFbLYrKuR5JjjEmYLfoXjgmr03T6bcUSjPwmZvMiC7KaG7pZ
-   eJWRmjYIl1tZnGBMNQTmUgGgl223C02TK1HT3CxJ763VWf3+FnjO7AdDK
-   /so97oTq+HnYS9vJfJyG/jC0GiEpp3mqI1kHnDAqcC7ve/NcGaeqXvgZy
-   Dpetzl00oJzZaX3UF4Xf/UHsHHmAtPwWRrp/yrogKF1K3psc3B1R76gfV
-   vLRD1Y1LDifXOI6VVzSSYCsuipeBXl5CEiHkxqPqAUj4ztUzkhhRnKrnJ
-   sne5CHdRkYjHtNiY9XrH63AkctAflKYU0L1nON27jkfulwF9O7QSTQUzQ
-   Q==;
-IronPort-SDR: 0JX9FqkuQHwf0LmadtJ5LP/ZeqTJL+D213zg/HSr2nk3kPR/rFcCsacCHu8rTIV5jAq8WfXGCr
- klYNtslMrQw8RWYEjT/Sv06xWkTi1AOXbKw/9Wkk66OL5nAAeqS2A1O8MfphMYhHK97KhGnKMw
- EcBn0A6Dda9G6bqwhtS8aI14PnDwcHT3V/Dj8eMPjzMeKMWBObU7ESPW0Ox1xftw3QE94pXuCX
- cNcaVy/gwWiKqmAPJqT9beYTzUroyvx9Y4omm+nkCEbnhi+1k28juCTu3aMAGJau2kzmu85Y43
- bTY=
+  bh=ZjuoyMHl/0ocfowOMPnoFX7SM4xH6ht94j8DCRztaGo=;
+  b=irGT1CRyNy11TFDohyCRY5q2niqjUFE3zf7IRpk9C3+b8vH076Zqyynd
+   38MjTdTMvqtLQreJgiN9DtNlyMnHqAPGe1wjZoaoae0USAmBy+KOepGRo
+   9luaM7F80mSM/7/lxtD1XBzEr8pcyFVd/RWGQRkVzE2K1tDeoWays2Y8G
+   IWX3TUD9GkQskjkDavn7n3rssNXra96Hhvvh4atwoKlrADtRrdoki0ZXW
+   ZX9fakxeT41fXjmgY+bOApa3C9hM94ro+z5bKSJ+XeKq8TES1mteKXlAC
+   DecVopCx0e/DY9GLFSPXavaPMenHgcVhXv8abXvLnOfhVizOzkK8gPyUL
+   w==;
+IronPort-SDR: /llUuxA1XZxSC+AQfwwN7ZnHB3gMbV0nbiu+Q7Cv9TA6qIlFA0VpKnuFuAYpU0aBkps54o7tmI
+ fEfzIzv0WnNHqt5ZQMYiUBht/CxhMqPZxMjWQ6Sg+nCBvWLgu0TlE4NqHkcqw8wHe9Om3Ro5kw
+ t2yKAulIMqG7pbq3nK5a/ewu1a1RnLgBgxYpgG2sIKh5w0xjj/oS1kW32sZmSW4SxlGeu8/0Uz
+ 5z9Bf650btNS3bLx13WU5/gp39GdGiYEH+rsatrv5ICCPXa+EGzjsrzCNl9GT3p17eTi2Fc+lw
+ 9JY=
 X-IronPort-AV: E=Sophos;i="5.77,402,1596470400"; 
-   d="scan'208";a="254069127"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Oct 2020 09:11:38 +0800
-IronPort-SDR: GTXmbWd+wiWIDu68zguGYopOewtwsxijIyh09jY20BGp9G89f7nRtoo2sDPdr8AjWNq4v1antA
- dREcHA0mqUJLNGAyR9sltiraDCu0of2sX7ytJtPQPi67yrmaZa2NFuzHxPIRAZ54tevygH2mHC
- XFi2IogXoea2BR0QW5udbh3MylBUwrdXZ0rPl44xhBLUEIOR3NOuhPyLWDwotzH5JO+5FHHGD5
- 81mbNqKGQ63mwXtBzFgYyjZl4O7zpRJxVx80YS5Q++OiePW7heHcdVOONuo1ut8hfj6XQWEKb2
- WToeriBilMxc6xmBNHOMgz3z
+   d="scan'208";a="151798028"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 22 Oct 2020 09:03:20 +0800
+IronPort-SDR: G59NYVSisCYU+lZeI00huyuEVdYGE+avnJ9YD5zoLn+fmv3/0DNjRnsmVox1BQEVtEClC1tKHF
+ Ji7LWJAN+iv5Sa4ZrGIYUIWBjSYTMVIGHMMRC9sL61cmkxWAlAZMRIFzfuP6FXx+vUxhJLh5Eb
+ qzHGV/0cusdOmTOIGVCvEu5ZVNZ7n3GAfr8qZhTiY9hmKccFC2QxxtmdkaBJYS1mmlq6+Eyd80
+ aqLwQbuyKueux3AXYz112CuSs+AqwpLZmsvd2Qi4hG+eV56A8w+GmzW//MwvKzY6R76pRo+TPn
+ yA4ZFJVD+/TFT0V0+rLNEpkL
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2020 17:49:37 -0700
-IronPort-SDR: R3PBID0f94uoiQ6ju64A/GLZ0XL/NIYbC2b0dR2GUtfcspSUZDFR0ENg/IrW2Ne1/h5dyHGvf0
- 7hl+sMUvNM4dxTMcOcFD5WyxfBT59aRnqRUtemncthgRfF42nLwrr9Il5y4fF0u84wdUdhXxxb
- HmNNBYlsaF9q7Lm8IITGcmV69bL6xuOotmIAEIE8fTfz2HPr8I9cgz89xMBn4dwQhCgJTg+/Qr
- Fuh7agPymWeQj/CviyKDo0c+XKra0++jIl+j5SLkoMd0ckvnoV7/+e0HpOT/ZPiwv7Yy336yK3
- /Ig=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2020 17:48:53 -0700
+IronPort-SDR: tFvkaRu8x1mKxkoX4SXoM8AXOzEb5BaJcg/3a7oijkA4ynzu0K8QAYWv9/9B8jD9j6JyAI16os
+ 5DET0GzAGIAi3VE0NUF7KXw+PU88vagDlKzHGDoSrhCfQBAjVaiUAbRn/1GrQ/nOJnAV03moUx
+ GMNuOooj9wuAxW+/XY97o7hBbdOWlkqAOLQJ2I2xEo1a9IQ6YEsVuIXSqf/ae4Cl9IW4RsUk1L
+ PZSBP/SmWghO6lWVjfnIl1zo9m5092tlltDKqD32GzQIHLfNDCXDt/CPhYRYHCI6PR3bshdKYc
+ USM=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 21 Oct 2020 18:03:13 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 21 Oct 2020 18:03:21 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     hch@lst.de, sagi@grimberg.me, kbusch@kernel.org,
         logang@deltatee.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V3 4/6] block: move blk_rq_bio_prep() to linux/blk-mq.h
-Date:   Wed, 21 Oct 2020 18:02:32 -0700
-Message-Id: <20201022010234.8304-5-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V3 5/6] nvmet: use minimized version of blk_rq_append_bio
+Date:   Wed, 21 Oct 2020 18:02:33 -0700
+Message-Id: <20201022010234.8304-6-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20201022010234.8304-1-chaitanya.kulkarni@wdc.com>
 References: <20201022010234.8304-1-chaitanya.kulkarni@wdc.com>
@@ -76,63 +76,89 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a preparation patch to have minimal block layer request bio
-append functionality in the context of the NVMeOF Passthru driver which
-falls in the fast path and doesn't need calls from blk_rq_append_bio().
+The function blk_rq_append_bio() is a genereric API written for all
+types driver (having bounce buffers) and different context (where
+request is already having a bio i.e. rq->bio != NULL).
+
+It does mainly three things: calculating the segments, bounce queue and
+if req->bio == NULL call blk_rq_bio_prep() or handle low level merge()
+case.
+
+The NVMe PCIe and fabrics transports currently does not use queue
+bounce mechanism. In order to find this for each request processing
+in the passthru blk_rq_append_bio() does extra work in the fast path
+for each request.
+
+When I ran I/Os with different block sizes on the passthru controller
+I found that we can reuse the req->sg_cnt instead of iterating over the
+bvecs to find out nr_segs in blk_rq_append_bio(). This calculation in
+blk_rq_append_bio() is a duplication of work given that we have the
+value in req->sg_cnt. (correct me here if I'm wrong).
+
+With NVMe passthru request based driver we allocate fresh request each
+time, so every call to blk_rq_append_bio() rq->bio will be NULL i.e.
+we don't really need the second condition in the blk_rq_append_bio()
+and the resulting error condition in the caller of blk_rq_append_bio().
+
+So for NVMeOF passthru driver recalculating the segments, bounce check
+and ll_back_merge code is not needed such that we can get away with the
+minimal version of the blk_rq_append_bio() which removes the error check
+in the fast path along with extra variable in nvmet_passthru_map_sg().
+
+This patch updates the nvmet_passthru_map_sg() such that it does only
+appending the bio to the request in the context of the NVMeOF Passthru
+driver. Following are perf numbers :-
+
+With current implementation (blk_rq_append_bio()) :-
+----------------------------------------------------
++    5.80%     0.02%  kworker/0:2-mm_  [nvmet]  [k] nvmet_passthru_execute_cmd
++    5.44%     0.01%  kworker/0:2-mm_  [nvmet]  [k] nvmet_passthru_execute_cmd
++    4.88%     0.00%  kworker/0:2-mm_  [nvmet]  [k] nvmet_passthru_execute_cmd
++    5.44%     0.01%  kworker/0:2-mm_  [nvmet]  [k] nvmet_passthru_execute_cmd
++    4.86%     0.01%  kworker/0:2-mm_  [nvmet]  [k] nvmet_passthru_execute_cmd
++    5.17%     0.00%  kworker/0:2-eve  [nvmet]  [k] nvmet_passthru_execute_cmd
+
+With this patch using blk_rq_bio_prep() :-
+----------------------------------------------------
++    3.14%     0.02%  kworker/0:2-eve  [nvmet]  [k] nvmet_passthru_execute_cmd
++    3.26%     0.01%  kworker/0:2-eve  [nvmet]  [k] nvmet_passthru_execute_cmd
++    5.37%     0.01%  kworker/0:2-mm_  [nvmet]  [k] nvmet_passthru_execute_cmd
++    5.18%     0.02%  kworker/0:2-eve  [nvmet]  [k] nvmet_passthru_execute_cmd
++    4.84%     0.02%  kworker/0:2-mm_  [nvmet]  [k] nvmet_passthru_execute_cmd
++    4.87%     0.01%  kworker/0:2-mm_  [nvmet]  [k] nvmet_passthru_execute_cmd
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk.h            | 12 ------------
- include/linux/blk-mq.h | 12 ++++++++++++
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ drivers/nvme/target/passthru.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk.h b/block/blk.h
-index dfab98465db9..e05507a8d1e3 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -91,18 +91,6 @@ static inline bool bvec_gap_to_prev(struct request_queue *q,
- 	return __bvec_gap_to_prev(q, bprv, offset);
+diff --git a/drivers/nvme/target/passthru.c b/drivers/nvme/target/passthru.c
+index e5b5657bcce2..496ffedb77dc 100644
+--- a/drivers/nvme/target/passthru.c
++++ b/drivers/nvme/target/passthru.c
+@@ -183,7 +183,7 @@ static int nvmet_passthru_map_sg(struct nvmet_req *req, struct request *rq)
+ 	int sg_cnt = req->sg_cnt;
+ 	struct scatterlist *sg;
+ 	struct bio *bio;
+-	int i, ret;
++	int i;
+ 
+ 	bio = bio_alloc(GFP_KERNEL, min(sg_cnt, BIO_MAX_PAGES));
+ 	bio->bi_end_io = bio_put;
+@@ -198,11 +198,7 @@ static int nvmet_passthru_map_sg(struct nvmet_req *req, struct request *rq)
+ 		sg_cnt--;
+ 	}
+ 
+-	ret = blk_rq_append_bio(rq, &bio);
+-	if (unlikely(ret)) {
+-		bio_put(bio);
+-		return ret;
+-	}
++	blk_rq_bio_prep(rq, bio, req->sg_cnt);
+ 
+ 	return 0;
  }
- 
--static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
--		unsigned int nr_segs)
--{
--	rq->nr_phys_segments = nr_segs;
--	rq->__data_len = bio->bi_iter.bi_size;
--	rq->bio = rq->biotail = bio;
--	rq->ioprio = bio_prio(bio);
--
--	if (bio->bi_disk)
--		rq->rq_disk = bio->bi_disk;
--}
--
- #ifdef CONFIG_BLK_DEV_INTEGRITY
- void blk_flush_integrity(void);
- bool __bio_integrity_endio(struct bio *);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index b23eeca4d677..d1d277073761 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -591,6 +591,18 @@ static inline void blk_mq_cleanup_rq(struct request *rq)
- 		rq->q->mq_ops->cleanup_rq(rq);
- }
- 
-+static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
-+		unsigned int nr_segs)
-+{
-+	rq->nr_phys_segments = nr_segs;
-+	rq->__data_len = bio->bi_iter.bi_size;
-+	rq->bio = rq->biotail = bio;
-+	rq->ioprio = bio_prio(bio);
-+
-+	if (bio->bi_disk)
-+		rq->rq_disk = bio->bi_disk;
-+}
-+
- blk_qc_t blk_mq_submit_bio(struct bio *bio);
- 
- #endif
 -- 
 2.22.1
 
