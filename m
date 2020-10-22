@@ -2,147 +2,135 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A64C388F9
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0C9C388F7
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:36:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D420624641
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D95EF2463F
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 16:36:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="R/SYES0s";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="KWn1OIvX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2901841AbgJVQfa convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Oct 2020 12:35:30 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:59433 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2901836AbgJVQfX (ORCPT
+        id S2901863AbgJVQgZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Oct 2020 12:36:25 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:8403 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2901862AbgJVQgZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Oct 2020 12:35:23 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-276-A1zb3avLNamAEPsIomTLEw-1; Thu, 22 Oct 2020 17:35:18 +0100
-X-MC-Unique: A1zb3avLNamAEPsIomTLEw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Thu, 22 Oct 2020 17:35:17 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Thu, 22 Oct 2020 17:35:17 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Christoph Hellwig' <hch@lst.de>,
-        David Hildenbrand <david@redhat.com>
-CC:     Greg KH <gregkh@linuxfoundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        "kernel-team@android.com" <kernel-team@android.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Jens Axboe" <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        David Howells <dhowells@redhat.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Subject: RE: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Thread-Topic: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Thread-Index: AQHWqE5GNDfnH4y9nkGWtfqJueR1KKmjTCJQgAAN4UiAAAD2IIAAQY5tgAAwVkA=
-Date:   Thu, 22 Oct 2020 16:35:17 +0000
-Message-ID: <8f1fff0c358b4b669d51cc80098dbba1@AcuMS.aculab.com>
-References: <20201021233914.GR3576660@ZenIV.linux.org.uk>
- <20201022082654.GA1477657@kroah.com>
- <80a2e5fa-718a-8433-1ab0-dd5b3e3b5416@redhat.com>
- <5d2ecb24db1e415b8ff88261435386ec@AcuMS.aculab.com>
- <df2e0758-b8ed-5aec-6adc-a18f499c0179@redhat.com>
- <20201022090155.GA1483166@kroah.com>
- <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com>
- <a1533569-948a-1d5b-e231-5531aa988047@redhat.com>
- <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
- <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
- <20201022132342.GB8781@lst.de>
-In-Reply-To: <20201022132342.GB8781@lst.de>
-Accept-Language: en-GB, en-US
+        Thu, 22 Oct 2020 12:36:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1603384585; x=1634920585;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=JgZHORJnccck41xd8A5410JE2DZoMACZzrTn4lk0UN0=;
+  b=R/SYES0sVgsZ7nE2XDQ/FDhwPb0jIHua6yVdemQ5UrpT2wBSlkbRQppH
+   XWg5tP3xMYQGnHiRbDnPAgHa7B/ASARxet5kXCd+cRUaQ8TRKz88tGExY
+   BDKxmvyg6vqQpTl0XekI6mX+EeeMBUzxdxVUesoLdxUCADKcM2htrPzMb
+   G3a2nTqZFka6sZhpxR99oCm7mUUvkvWQ/rto0LVE1RRzTGAvM2b+2wPp0
+   KHzmUtQhj8oO88sExoc9c/kyFqZpbMVmMKj5RJu6Ia0Y251euLxs7p21t
+   slTf33z/wF6gXi/PCzl4xGQYzXEpdrxnSlXRUK8IOgzeJOWlxtZXmG1nD
+   Q==;
+IronPort-SDR: uk56uZHRObimQo73CO2iQVWed+Ih8jQFQ32K65WeCvkySWPjLXaX1Bb12tyNOuaIjvwnn+EBQy
+ cwCfRDcHsWa8M6M4bgRFPMvaDQmGtAH03cgIz0vC7J1A2zx/W5jz5pLT2ap98hzvFXi+GgKCMB
+ cM/+PBwUw9RpqQPxcnPx0amNyJ6PaPteXDbYk0EClqPvy72J8djhmBa/sTWZF7vToK+PAo9I5h
+ 4RPgrH5j5Ek2Zr4W0V3KsfQx+zUKp5HE1jnLV6ss5OYlM+8ocoe7OLRSXyGk4M5GT12L+9R+1R
+ 4Es=
+X-IronPort-AV: E=Sophos;i="5.77,404,1596470400"; 
+   d="scan'208";a="151863502"
+Received: from mail-bn7nam10lp2109.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.109])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 00:36:24 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nxVj9BV2coGMkjo93zm1DkPYqrbC3LD5NSAwSDlV4VTROyIyuGT47B7yzx9m2P0LZ2sNa4DGx1FuHtWh6eos0L++7JVJwQQF22NEJtd1zxBNINXLrMGaJMYSv5paMPcG57EdHMzpkZr62GZdTT49+q6kHkP0K2g5dpk3Cc4FyXHIsQfc7QyJ+g9MWSnaQwLD6wEfFYvG5Fuw5xqC+fL66x3mXD21HnozlR0GWm/nngAXKN0a3Z7gyaEuoRAhweyDbKjkM9qJgUx/hxRmXhPz26amlBD1GZSqs7GqgpFhVnRxvpoYmvBoynOAR6gmCYmuQTd0C1rjIETMISPafWTqPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JgZHORJnccck41xd8A5410JE2DZoMACZzrTn4lk0UN0=;
+ b=CqJXq+8cYmcQ5eGXJ1YHsm8qHMkAJ8nfk0fjDBddkq/WZhKzY9EA7P5e9Azej2ntLv51AsKKLk3KJ4rwJAfqq9UijhX302wodI00CvSCebAG6QzsjgzhMXfJ7BcW+TP+xXJ46jNO3WlZ20o19lDhp+fdKvBfsxerMCAfPIgwyvNpAAzb+iKn2hDPgACGtc40iomVcdgQDzvxGdV8ku5CP4je5K8EFrbpgZuO6dfipUBOh+kUg36auhi6yeU97mZM8cKxsA04a5DHRHYi+v8lKFQumQoN2FIE//nvntdSAOmIxsW2nW5PXRghqoKAt3/+R83W6fkzfLYj7Ytq7lFuaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JgZHORJnccck41xd8A5410JE2DZoMACZzrTn4lk0UN0=;
+ b=KWn1OIvXia2v0oO3Tc4RCpy39ZC3Bl4MnCmMxibWtGIgv5eaPBTbxK/wPYfGYktNd2V2C0zaAezbZkuYK5tAauEe16qbvf3gGXo0DL+/H08Ri/Rn/kBIBsVA5KN0Fzm7bNxhEUs3Ll/Q4PG7jhQXgk0UpGnPeUT0LXjvjdJBrE4=
+Received: from DM6PR04MB5483.namprd04.prod.outlook.com (2603:10b6:5:126::20)
+ by DM6PR04MB6793.namprd04.prod.outlook.com (2603:10b6:5:249::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.25; Thu, 22 Oct
+ 2020 16:36:23 +0000
+Received: from DM6PR04MB5483.namprd04.prod.outlook.com
+ ([fe80::c8ee:62d1:5ed1:2ee]) by DM6PR04MB5483.namprd04.prod.outlook.com
+ ([fe80::c8ee:62d1:5ed1:2ee%6]) with mapi id 15.20.3477.028; Thu, 22 Oct 2020
+ 16:36:23 +0000
+From:   Niklas Cassel <Niklas.Cassel@wdc.com>
+To:     Keith Busch <kbusch@kernel.org>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCHv2] null_blk: use zone status for max active/open
+Thread-Topic: [PATCHv2] null_blk: use zone status for max active/open
+Thread-Index: AQHWqIqwkAV121eYrEaqkPjMkL9Cd6mj0d4A
+Date:   Thu, 22 Oct 2020 16:36:23 +0000
+Message-ID: <20201022163622.GA62838@localhost.localdomain>
+References: <20201022154739.1694152-1-kbusch@kernel.org>
+In-Reply-To: <20201022154739.1694152-1-kbusch@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+authentication-results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [85.226.244.4]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 016fcc40-47b1-48ae-e729-08d876a89d0d
+x-ms-traffictypediagnostic: DM6PR04MB6793:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR04MB67936D6AC44CB4AFAE17374EF21D0@DM6PR04MB6793.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:2043;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: smqrG0ylg0YIT005l+GKxzB/JpR2EDrhzDI8Z2spc/fuUqsRC+1rIdcTNooZ3vaqoWHce4tKaHTPTZgkJCshNNQHgA9yPGmERzkW4ds2NV3Xu/bHAL/xImPWp2MfFeUT5uAjK1RBnpm1jt1WH30AkprMgWE3VI/FXN6rxYT1QnmG8w+7h7GacxK0sj1u8IZQtAmRNBDC/LCn/sq2fh6owiqwd8MFner2+BAA918MmP8btT2jTfz3glw/ML02kOdJygU9PJ7vlXIfQbVVI4kBc7C6fhnUv7kOPymTBx5RzQR6H5MRaNCAT1FYRQLx4rDeA+y2pg+Glxv29VVEUor9GQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB5483.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(346002)(366004)(396003)(376002)(33656002)(91956017)(66476007)(64756008)(186003)(5660300002)(4744005)(71200400001)(6506007)(54906003)(6512007)(6486002)(66556008)(9686003)(8936002)(66946007)(83380400001)(66446008)(76116006)(1076003)(316002)(26005)(478600001)(86362001)(6916009)(4326008)(8676002)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: hYfDl+IkCF3MQ+1fmRP5N6kdUK2nTLVnfR7VpSuW/cXOAs2X40p5staCkQ30xsq3Ksx6UnS40+OAxX2FeUQambOAPyhgK/2GL3BU1CeBdIV7G8wkPU+56tQneMkp9nd2jEVd603r8qwasgoZgHUDdd5XShaNr2YP7nuiX+BfhPQqfI9z7YXR3VMTNR+tSQy97rLFK44tKalSRoR0ixi7o6WInFAbA58bbWuvjvW/NNEmp4hanry+4NLjLdbSw+fkyL2jz66BA5YP5uN7YL7IQFZG4gzefFQqOCis2bYnWYCVy64e+uQeH8ZQn6AJA50xGAb0+ZgyghSgnA9fW5bRm3IgYkWf9xfuo5ReqM7jXBiSNN06DKzkbywKAZr2X23ReHFMKbQbq/Fqsy6tsnNVvArIqT6X9qxkHtbXJq55Hi1F8zMT3dkFI7lB4+o8fWXkOSnTPqB4fl9rs1rmzEGOb5RmYtzEovUeChvPagjzHp1eDBraQiBV/UdGeEub97p5mlDHxrJOksZIvN9BcYl9gAn23ihE5N5Uc7Zjr/h0xIwPtKafD9RQDb9cs1lBe6p1OyV/ugZeZOk+7brmFFLF1AnSQZ3HS2aT7BJ2xdRCEsq/bMA8nKE+cM3/byjs07mMzHFKSD/eA02R4vf/+DbWHA==
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <296E4ECBCA9D7A42A0F050579A414EF4@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB5483.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 016fcc40-47b1-48ae-e729-08d876a89d0d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Oct 2020 16:36:23.3802
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eABqBPmTclxiDug2bIsWkBwZZtcYtFoTNvrF92XF/kDLBYeoeSxCnZ9eQ6CZ1PDLqOOvwtCojyhZAzOPgXzkaQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6793
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig
-> Sent: 22 October 2020 14:24
-> 
-> On Thu, Oct 22, 2020 at 11:36:40AM +0200, David Hildenbrand wrote:
-> > My thinking: if the compiler that calls import_iovec() has garbage in
-> > the upper 32 bit
-> >
-> > a) gcc will zero it out and not rely on it being zero.
-> > b) clang will not zero it out, assuming it is zero.
-> >
-> > But
-> >
-> > a) will zero it out when calling the !inlined variant
-> > b) clang will zero it out when calling the !inlined variant
-> >
-> > When inlining, b) strikes. We access garbage. That would mean that we
-> > have calling code that's not generated by clang/gcc IIUC.
-> 
-> Most callchains of import_iovec start with the assembly syscall wrappers.
+On Thu, Oct 22, 2020 at 08:47:39AM -0700, Keith Busch wrote:
+> The block layer provides special status codes when requests go beyond
+> the zone resource limits. Use these codes instead of the generic IOERR
+> for requests that exceed the max active or open limits the null_blk
+> device was configured with so that applications know how these special
+> conditions should be handled.
+>=20
+> Cc: Damien Le Moal <damien.lemoal@wdc.com>
+> Cc: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
 
-Wait...
-readv(2) defines:
-	ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
-
-But the syscall is defined as:
-
-SYSCALL_DEFINE3(readv, unsigned long, fd, const struct iovec __user *, vec,
-                unsigned long, vlen)
-{
-        return do_readv(fd, vec, vlen, 0);
-}
-
-I'm guessing that nothing actually masks the high bits that come
-from an application that is compiled with clang?
-
-The vlen is 'unsigned long' through the first few calls.
-So unless there is a non-inlined function than takes vlen
-as 'int' the high garbage bits from userspace are kept.
-
-Which makes it a bug in the kernel C syscall wrappers.
-They need to explicitly mask the high bits of 32bit
-arguments on arm64 but not x86-64.
-
-What does the ARM EABI say about register parameters?
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Reviewed-by: Niklas Cassel <niklas.cassel@wdc.com>=
