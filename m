@@ -2,190 +2,170 @@ Return-Path: <SRS0=SOzO=D5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B41F0C2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 02:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85449C388F7
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 03:15:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A45D22249
-	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 02:45:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 264E82063A
+	for <linux-block@archiver.kernel.org>; Thu, 22 Oct 2020 03:15:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="tbsBipmQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GTvLNpZd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2895184AbgJVCpk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Oct 2020 22:45:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37680 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2895172AbgJVCpk (ORCPT
+        id S2895313AbgJVDPA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Oct 2020 23:15:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46059 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2895318AbgJVDPA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Oct 2020 22:45:40 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA5A7C0613CE
-        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2020 19:45:38 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id o9so169026plx.10
-        for <linux-block@vger.kernel.org>; Wed, 21 Oct 2020 19:45:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=kONrq/lRtklL1Qqq4SPUIkJR3qq5A1gBIILz2gGUwb4=;
-        b=tbsBipmQmIUWj3rztkdcEygRjAbt9YQF+z+XR87qeJFHpK5vQgX/LOdCtB9wbwRXDr
-         kBEQLiiE6Zn/i/ui8CDv77vasMVSdl2QJYPku87wMhWhmXGsYVG/DuGccEugsNRXdRlz
-         7QteN6yuPG2Y5KMSiznapWkXP7Nrna9dSi0bVQEpLg9VYTQ2WXDIObfeXs0BfUx/JciZ
-         E2zWzBU+RJ1wNg8fiya2a7ENBa3n5rW3zvYmNRwDoio1aC3gFiB9dFy22eNo60tRrqb2
-         S2Ugnlqu5yNCnRi+fXnEdrjD9LJ7yBJZQGJxQeaVT0SLQF13ya8wyJQLl2sciVgNFpB5
-         xK5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kONrq/lRtklL1Qqq4SPUIkJR3qq5A1gBIILz2gGUwb4=;
-        b=eU3/yppylK0LFJgnsIteNwl92Qtjoz/SdLF6/xU3bscgqW7MICNG+xhNJDNm72C1ea
-         3HRaxO+oYDPizJ9BrmT1uTdnFFd2FItDLpMGmczP4kcTmVgKonUp9tWPSyq45av/TTr9
-         2qwI8F6cG3iPUuycXHI0o7xru32p5YEyfu/1mV/SL+8xBpQX7utk//oJ/Pa44g+HJgL0
-         Yj115TNglKMLqedOHiKTfAUXZBESCXqYnYQLyBz0lkOAVRD+rC3w+IfXpf005M4q7RMn
-         MO+pczGl3CPUwU8SKr2Qxip7LRjHdLRa0ZisX2CS2mUMMm0Sm+p4CePkqKZfNlq9QWHn
-         AF8g==
-X-Gm-Message-State: AOAM530IVRJGstMVQo6ywN1leZtHsy+tS1/wAMGkLlWZjw7NjUSV3opb
-        /Y9wYnv6Ohvs1pub9GG55BzRHA==
-X-Google-Smtp-Source: ABdhPJzzmGkjj1kW8pPUT7PDWhaDs8EkgTx32Mkx04ju06cTsVG33FQ5AgUOn0BN0hgBAvDTa3KcAA==
-X-Received: by 2002:a17:90b:198d:: with SMTP id mv13mr357993pjb.13.1603334738261;
-        Wed, 21 Oct 2020 19:45:38 -0700 (PDT)
-Received: from [10.2.24.220] ([61.120.150.77])
-        by smtp.gmail.com with ESMTPSA id v16sm212387pgk.26.2020.10.21.19.45.35
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Oct 2020 19:45:37 -0700 (PDT)
-Subject: PING: [PATCH] block: add io_error stat for block device
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200910022026.632617-1-pizhenwei@bytedance.com>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-Message-ID: <e6dfc767-a54e-d14e-c6c4-fcb68f43180a@bytedance.com>
-Date:   Thu, 22 Oct 2020 10:45:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Wed, 21 Oct 2020 23:15:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603336498;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=umsnH84+PDM7ZGwyi7HysBs+SYUuznU2DNOaV+tgCl8=;
+        b=GTvLNpZdIswR4XSY+/auDhqOSWH1J7ABTNxQAVGE7EEqkvFm5iUkdH+fNuQ6+/63s2iPYt
+        YXI/z5HRUcx0OQpmua59xo+s6xxdl08VLCRS1ySAnpbjNOQ5zBn/PkKp36GW4k5GU5POJt
+        uF2bkpmJK8KvoGAFk7ZIEpU64pIpmxI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-233-GbB2fAm_PySjIaqP4Ud-_A-1; Wed, 21 Oct 2020 23:14:56 -0400
+X-MC-Unique: GbB2fAm_PySjIaqP4Ud-_A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5279D1084D69;
+        Thu, 22 Oct 2020 03:14:55 +0000 (UTC)
+Received: from T590 (ovpn-12-46.pek2.redhat.com [10.72.12.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A019A19728;
+        Thu, 22 Oct 2020 03:14:38 +0000 (UTC)
+Date:   Thu, 22 Oct 2020 11:14:34 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     snitzer@redhat.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, joseph.qi@linux.alibaba.com,
+        xiaoguang.wang@linux.alibaba.com, haoxu@linux.alibaba.com
+Subject: Re: [RFC 3/3] dm: add support for IO polling
+Message-ID: <20201022031434.GA1643586@T590>
+References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
+ <20201020065420.124885-4-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <20200910022026.632617-1-pizhenwei@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201020065420.124885-4-jefflexu@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
-
-What do you think about this, adding io error stat for block devices is 
-reasonable?
-
-On 9/10/20 10:20 AM, zhenwei pi wrote:
-> Currently if hitting block req error, block layer only prints error
-> log with a rate limitation. Then agent has to parse kernel log to
-> record what happens.
+On Tue, Oct 20, 2020 at 02:54:20PM +0800, Jeffle Xu wrote:
+> Design of cookie is initially constrained as a per-bio concept. It
+> dosn't work well when bio-split needed, and it is really an issue when
+> adding support of iopoll for dm devices.
 > 
-> In this patch, add read/write/discard/flush stat counter to record
-> io errors.
+> The current algorithm implementation is simple. The returned cookie of
+> dm device is actually not used since it is just the cookie of one of
+> the cloned bios. Polling of dm device is actually polling on all
+> hardware queues (in poll mode) of all underlying target devices.
 > 
-> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
 > ---
->   block/blk-core.c          | 14 +++++++++++---
->   block/genhd.c             | 19 +++++++++++++++++++
->   include/linux/part_stat.h |  1 +
->   3 files changed, 31 insertions(+), 3 deletions(-)
+>  drivers/md/dm-core.h  |  1 +
+>  drivers/md/dm-table.c | 30 ++++++++++++++++++++++++++++++
+>  drivers/md/dm.c       | 39 +++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 70 insertions(+)
 > 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 10c08ac50697..8f1424835700 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1558,9 +1558,17 @@ bool blk_update_request(struct request *req, blk_status_t error,
->   		req->q->integrity.profile->complete_fn(req, nr_bytes);
->   #endif
->   
-> -	if (unlikely(error && !blk_rq_is_passthrough(req) &&
-> -		     !(req->rq_flags & RQF_QUIET)))
-> -		print_req_error(req, error, __func__);
-> +	if (unlikely(error && !blk_rq_is_passthrough(req))) {
-> +		if (op_is_flush(req_op(req)))
-> +			part_stat_inc(&req->rq_disk->part0,
-> +				io_errors[STAT_FLUSH]);
-> +		else
-> +			part_stat_inc(&req->rq_disk->part0,
-> +				io_errors[op_stat_group(req_op(req))]);
-> +
-> +		if (!(req->rq_flags & RQF_QUIET))
-> +			print_req_error(req, error, __func__);
-> +	}
->   
->   	blk_account_io_completion(req, nr_bytes);
->   
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 99c64641c314..852035095485 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -104,6 +104,7 @@ static void part_stat_read_all(struct hd_struct *part, struct disk_stats *stat)
->   			stat->sectors[group] += ptr->sectors[group];
->   			stat->ios[group] += ptr->ios[group];
->   			stat->merges[group] += ptr->merges[group];
-> +			stat->io_errors[group] += ptr->io_errors[group];
->   		}
->   
->   		stat->io_ticks += ptr->io_ticks;
-> @@ -1374,6 +1375,22 @@ static ssize_t disk_discard_alignment_show(struct device *dev,
->   	return sprintf(buf, "%d\n", queue_discard_alignment(disk->queue));
->   }
->   
-> +static ssize_t io_error_show(struct device *dev,
-> +		      struct device_attribute *attr, char *buf)
+> diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+> index d522093cb39d..f18e066beffe 100644
+> --- a/drivers/md/dm-core.h
+> +++ b/drivers/md/dm-core.h
+> @@ -187,4 +187,5 @@ extern atomic_t dm_global_event_nr;
+>  extern wait_queue_head_t dm_global_eventq;
+>  void dm_issue_global_event(void);
+>  
+> +int dm_io_poll(struct request_queue *q, blk_qc_t cookie);
+>  #endif
+> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> index ce543b761be7..634b79842519 100644
+> --- a/drivers/md/dm-table.c
+> +++ b/drivers/md/dm-table.c
+> @@ -1809,6 +1809,31 @@ static bool dm_table_requires_stable_pages(struct dm_table *t)
+>  	return false;
+>  }
+>  
+> +static int device_not_support_poll(struct dm_target *ti, struct dm_dev *dev,
+> +					   sector_t start, sector_t len, void *data)
 > +{
-> +	struct hd_struct *p = dev_to_part(dev);
-> +	struct disk_stats stat;
+> +	struct request_queue *q = bdev_get_queue(dev->bdev);
 > +
-> +	part_stat_read_all(p, &stat);
-> +
-> +	return sprintf(buf,
-> +		"%8lu %8lu %8lu %8lu\n",
-> +		stat.io_errors[STAT_READ],
-> +		stat.io_errors[STAT_WRITE],
-> +		stat.io_errors[STAT_DISCARD],
-> +		stat.io_errors[STAT_FLUSH]);
+> +	return q && !(q->queue_flags & QUEUE_FLAG_POLL);
 > +}
 > +
->   static DEVICE_ATTR(range, 0444, disk_range_show, NULL);
->   static DEVICE_ATTR(ext_range, 0444, disk_ext_range_show, NULL);
->   static DEVICE_ATTR(removable, 0444, disk_removable_show, NULL);
-> @@ -1386,6 +1403,7 @@ static DEVICE_ATTR(capability, 0444, disk_capability_show, NULL);
->   static DEVICE_ATTR(stat, 0444, part_stat_show, NULL);
->   static DEVICE_ATTR(inflight, 0444, part_inflight_show, NULL);
->   static DEVICE_ATTR(badblocks, 0644, disk_badblocks_show, disk_badblocks_store);
-> +static DEVICE_ATTR(io_error, 0444, io_error_show, NULL);
->   
->   #ifdef CONFIG_FAIL_MAKE_REQUEST
->   ssize_t part_fail_show(struct device *dev,
-> @@ -1437,6 +1455,7 @@ static struct attribute *disk_attrs[] = {
->   #ifdef CONFIG_FAIL_IO_TIMEOUT
->   	&dev_attr_fail_timeout.attr,
->   #endif
-> +	&dev_attr_io_error.attr,
->   	NULL
->   };
->   
-> diff --git a/include/linux/part_stat.h b/include/linux/part_stat.h
-> index 24125778ef3e..4fe3836d2308 100644
-> --- a/include/linux/part_stat.h
-> +++ b/include/linux/part_stat.h
-> @@ -9,6 +9,7 @@ struct disk_stats {
->   	unsigned long sectors[NR_STAT_GROUPS];
->   	unsigned long ios[NR_STAT_GROUPS];
->   	unsigned long merges[NR_STAT_GROUPS];
-> +	unsigned long io_errors[NR_STAT_GROUPS];
->   	unsigned long io_ticks;
->   	local_t in_flight[2];
->   };
-> 
+> +bool dm_table_supports_poll(struct dm_table *t)
+> +{
+> +	struct dm_target *ti;
+> +	unsigned int i;
+> +
+> +	/* Ensure that all targets support DAX. */
+> +	for (i = 0; i < dm_table_get_num_targets(t); i++) {
+> +		ti = dm_table_get_target(t, i);
+> +
+> +		if (!ti->type->iterate_devices ||
+> +		    ti->type->iterate_devices(ti, device_not_support_poll, NULL))
+> +			return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+>  			       struct queue_limits *limits)
+>  {
+> @@ -1901,6 +1926,11 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+>  #endif
+>  
+>  	blk_queue_update_readahead(q);
+> +
+> +	if (dm_table_supports_poll(t)) {
+> +		q->poll_fn = dm_io_poll;
+> +		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
+> +	}
+>  }
+>  
+>  unsigned int dm_table_get_num_targets(struct dm_table *t)
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index c18fc2548518..4eceaf87ffd4 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -1666,6 +1666,45 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+>  	return ret;
+>  }
+>  
+> +static int dm_poll_one_dev(struct request_queue *q, blk_qc_t cookie)
+> +{
+> +	/* Iterate polling on all polling queues for mq device */
+> +	if (queue_is_mq(q)) {
+> +		struct blk_mq_hw_ctx *hctx;
+> +		int i, ret = 0;
+> +
+> +		if (!percpu_ref_tryget(&q->q_usage_counter))
+> +			return 0;
+> +
+> +		queue_for_each_poll_hw_ctx(q, hctx, i) {
+> +			ret += q->mq_ops->poll(hctx);
+> +		}
 
--- 
-zhenwei pi
+IMO, this way may not be accepted from performance viewpoint, .poll()
+often requires per-hw-queue lock. So in case of > 1 io thread,
+contention/cache ping-pong on hw queue resource can be very serious.
+
+I guess you may have to find one way to pass correct cookie to ->poll().
+
+
+Thanks,
+Ming
+
