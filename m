@@ -2,94 +2,83 @@ Return-Path: <SRS0=d006=D6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37431C4363A
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 13:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C5CC4363A
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 13:52:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE8C2208E4
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 13:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B29C9208B6
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 13:52:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="VCC09/Lm"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fdzB5UuF";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="drGgKFg3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S464849AbgJWNaD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 09:30:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48552 "EHLO
+        id S1750125AbgJWNwY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 09:52:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S464848AbgJWNaC (ORCPT
+        with ESMTP id S1750124AbgJWNwX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 09:30:02 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9BEC0613CE
-        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2020 06:30:01 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id p15so1790827ioh.0
-        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2020 06:30:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wo33AF/eHl++Ndc4RAiFaBKLGpgps3aqCkCP9OF1aaE=;
-        b=VCC09/LmkVAnukssUgfSBi9Djclq4e3kv/XMUshDAlsoQ69J8XkKZAX9jI2WNNlMUW
-         dwL/b/GwFHJUnhzQZXDig70fEoCpibkUN395N61QZIfEtV5XwQeFrzDcaFJCDa6fh2OR
-         /3k/Wd8/hjBunCvL2tzHWybkz/xNPxSa5PrF55R1t0F1UAsU8PN3OVPSh3EwtoS8z52o
-         ip6cLFED0Gu/vo6ENfa8cyDwdSCXhqZ5lGQk2+NZJjUK7YHoXBm1+KlW+xo14QasyTO+
-         eSWHnEGC1uOqIw7+TIWBmGi8MR73CRoREgSIw88/jT49jS6bO/ZwHwM/ivu3UCWroYdZ
-         4WbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wo33AF/eHl++Ndc4RAiFaBKLGpgps3aqCkCP9OF1aaE=;
-        b=aIb8VoBQm7LPFjuLMOlNdZGy3ItrrB6d9R9jebP6Mb5f42n3ddRKszAoUP65v/akEJ
-         WGsF1Xdtq1FTG3nt/f0HoOmLE+4Fb2VZmA4YatjCCd1yehHyuMcsYL7WSq16pUmcwdJA
-         Dx0/6CSC1/yxjSBICjXTyigMw/zoju3N7BmFvt56ivR/21ztWBAOqEu+Gx/SfeY4QfV9
-         sG1gz/1LJkLQIxiTVpPymi7kNHYPzDLDrjBq8O93yHGV65g2HL+NpQVUSm1dOz/EPYLO
-         MEVHSTPAQrSq+1oVHB4wBB7ECoBb9JE347PZa4G4CNg8ta4BUET35s0B73EUcsuxRiSm
-         oXHA==
-X-Gm-Message-State: AOAM531nCB7XRWUsfgCOVHFPj3/zIUa6InDoacxxnXaMPdOtCzEVB12j
-        SvjsTS/E3Q8V/OVklHdMDX6hshrcs/UXvA==
-X-Google-Smtp-Source: ABdhPJzi8cVQHujhSxpuIjUe0YPPRanj0p5gTW6m5d+T4mscJHJ1ed6v9ixcli+/EXwS+SxKKuPc3A==
-X-Received: by 2002:a6b:fd08:: with SMTP id c8mr1580771ioi.16.1603459801254;
-        Fri, 23 Oct 2020 06:30:01 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id o13sm781343iop.46.2020.10.23.06.30.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Oct 2020 06:30:00 -0700 (PDT)
-Subject: Re: [GIT PULL] nvme fixes for 5.10-rc1
+        Fri, 23 Oct 2020 09:52:23 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CB2C0613CE;
+        Fri, 23 Oct 2020 06:52:22 -0700 (PDT)
+Date:   Fri, 23 Oct 2020 15:52:19 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1603461141;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9mSwLBiQN8wgOA1EFVT7t2Fh/mBpsT8gU/jlnEuQWt8=;
+        b=fdzB5UuFFowfwPRMWd5yX43uPmKAxvOXRixse6gFs8C6jHd8FGLFrKm5x4reeeUWp7O56t
+        sqe/0MlfnTUDc6r6f/unMp7HWgBU7db+F239GI2xl4UZDYEda8FrIX+xkOuRZKO8cAv1gK
+        IafvRjj0x3j1cnlBX7nxyNOe+kwvsG6XiIAQ+0YwFeQpBo25RFgZdn35biaArgq7gYr9hX
+        YrzPo3h5/HKaGKe/bnTXrOXyZgmw2NvN3Uy8E1itkvjiQ+vXa9y24ZETR0PmZVfWw+CmrU
+        j61B/IwQodzy3wxYrHIIB1j6n6s2zpPeNSgl3PGocufv34QHB0mwq46flA68dg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1603461141;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9mSwLBiQN8wgOA1EFVT7t2Fh/mBpsT8gU/jlnEuQWt8=;
+        b=drGgKFg3WTRVPkBaGDa+ttUhbedrrsoR19jaWdrA52t4mnhMJyKF433463bINPKtAr0UsM
+        14d3ln1cB9U/6vBQ==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <20201023110035.GA3504312@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2e3120d9-7c08-1aba-1481-118131a459b0@kernel.dk>
-Date:   Fri, 23 Oct 2020 07:30:00 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+Cc:     David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: Re: [PATCH RFC] blk-mq: Don't IPI requests on PREEMPT_RT
+Message-ID: <20201023135219.mzzl76eqqy6tqwhe@linutronix.de>
+References: <20201021175059.GA4989@hmbx>
+ <20201023110400.bx3uzsb7xy5jtsea@linutronix.de>
+ <20201023112130.GA23790@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20201023110035.GA3504312@infradead.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20201023112130.GA23790@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/23/20 5:00 AM, Christoph Hellwig wrote:
-> The following changes since commit cb3a92da231bcf55c243d00fa619ee36281b0001:
+On 2020-10-23 12:21:30 [+0100], Christoph Hellwig wrote:
+> > -	if (!IS_ENABLED(CONFIG_SMP) ||
+> > +	if (!IS_ENABLED(CONFIG_SMP) || IS_ENABLED(CONFIG_PREEMPT_RT) ||
+> >  	    !test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags))
 > 
->   block: remove unused members for io_context (2020-10-20 07:10:14 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-5.10-2020-10-23
+> This needs a big fat comment explaining your rationale.  And probably
+> a separate if statement to make it obvious as well.
 
-Pulled, thanks.
+Okay.
+How much difference does it make between completing in-softirq vs
+in-IPI? I'm asking because acquiring a spinlock_t in an IPI shouldn't be
+done (as per Documentation/locking/locktypes.rst). We don't have
+anything in lockdep that will complain here on !RT and we the above we
+avoid the case on RT.
 
--- 
-Jens Axboe
-
+Sebastian
