@@ -2,90 +2,107 @@ Return-Path: <SRS0=d006=D6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F579C55179
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 18:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 885A7C5DF9D
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 18:35:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20A2A22254
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 18:20:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="K4uLjNuh"
+	by mail.kernel.org (Postfix) with ESMTP id 487B920882
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 18:35:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1754578AbgJWSUz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 14:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37594 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750610AbgJWSUz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 14:20:55 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A54FC0613D2
-        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2020 11:20:55 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id g7so2275615ilr.12
-        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2020 11:20:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tGH0KxAuUfEqEQSA/wPpDyz3C0EygW5ob8CmE2nbYgE=;
-        b=K4uLjNuhKf2aARCJKa8vDLkfPOrqIxz2vtYLaCdcDz+Kfp840MDLnJznSeI1L0tPsz
-         zbQ50bHxmwsrJsTbH1w/h0hFTq8nHwYnCp2p+O1p/LffHc34xImzz7vzQ2qFsfc5cCqH
-         MPLmH4WY/J7X55OtA4wzI6T9s0mP8nNBVcp+e+7IWgCjDAf7BnVh+65RyvttF04BVAAH
-         tOuP9GFT5UK2agbEXI0JJAgmzHF3aYtKj9C9NmHmp/7gKpuiA2e0MswY6vuaONg/tWMd
-         ulrEj7MxrJPSRdur933rkqHgfs8eCjlZ0zQgxrSNAFu2MkYtCnGFXK32FU9jU62+H8v9
-         E8yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tGH0KxAuUfEqEQSA/wPpDyz3C0EygW5ob8CmE2nbYgE=;
-        b=YQ5wXuZuJtsbFOjYGDUAWILP2PumWLfxyNEtZsOd7JYHJd/ZY/8rnyn8k3B1l5QX1J
-         FVNg9VtVs1DPlD7J2M10epFgR7tHnb9K/dsAC0pIP1dsDzCj+mci0HXtfy4mPWfbqPk0
-         IO0kYOQVRR4rJyJaCASzudnU2Wygpd9AX4hT0hAh+ABoj+Kg2LzkMvhsUtgNH8wU3q6I
-         vvmeFtymHz32SOjZWlpLYt3Z+q8Wk9RBRslmoBIX7scpn3viCdIk4iPVY9myrzaAmpfI
-         5APpI/LJ2cKZ1hzsb3KsKXzztem9dFMLVk3WKvIUUYbC5vMXFClGkq2sfsokEJriXW2I
-         ZYOg==
-X-Gm-Message-State: AOAM532WodtX9pixX5VBeVrn+j0oJpKqPUM29l6VTh3bwdXrnoD5vXWm
-        iZ22BEfOTasxfxdsJyXx7dnFGQ==
-X-Google-Smtp-Source: ABdhPJzmGb8eQvwa+DPW7bgcyfKJWuCVzKCSBgN5Wb0Pk4tUujzEqRpN/81g5tA793qs8MP+CWmizw==
-X-Received: by 2002:a92:5b46:: with SMTP id p67mr940694ilb.150.1603477254496;
-        Fri, 23 Oct 2020 11:20:54 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id w70sm1321978ila.87.2020.10.23.11.20.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Oct 2020 11:20:53 -0700 (PDT)
-Subject: Re: [PATCH v3 07/56] block: blk-mq: fix a kernel-doc markup
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1603469755.git.mchehab+huawei@kernel.org>
- <da771fd9e5281537f39c6e927a199b681ff6204f.1603469755.git.mchehab+huawei@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <05f72376-6f3e-e216-ec15-8f5ce9d6e55c@kernel.dk>
-Date:   Fri, 23 Oct 2020 12:20:53 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <da771fd9e5281537f39c6e927a199b681ff6204f.1603469755.git.mchehab+huawei@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1754977AbgJWSer (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 14:34:47 -0400
+Received: from gate.crashing.org ([63.228.1.57]:46520 "EHLO gate.crashing.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754809AbgJWSep (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Oct 2020 14:34:45 -0400
+Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
+        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 09NIREDK014153;
+        Fri, 23 Oct 2020 13:27:15 -0500
+Received: (from segher@localhost)
+        by gate.crashing.org (8.14.1/8.14.1/Submit) id 09NIRD8Q014147;
+        Fri, 23 Oct 2020 13:27:13 -0500
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date:   Fri, 23 Oct 2020 13:27:13 -0500
+From:   Segher Boessenkool <segher@kernel.crashing.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     David Hildenbrand <david@redhat.com>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "'Greg KH'" <gregkh@linuxfoundation.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        David Laight <David.Laight@aculab.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move rw_copy_check_uvector() into lib/iov_iter.c"
+Message-ID: <20201023182713.GG2672@gate.crashing.org>
+References: <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com> <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com> <20201022104805.GA1503673@kroah.com> <20201022121849.GA1664412@kroah.com> <98d9df88-b7ef-fdfb-7d90-2fa7a9d7bab5@redhat.com> <20201022125759.GA1685526@kroah.com> <20201022135036.GA1787470@kroah.com> <134f162d711d466ebbd88906fae35b33@AcuMS.aculab.com> <935f7168-c2f5-dd14-7124-412b284693a2@redhat.com> <20201023175857.GA3576660@ZenIV.linux.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201023175857.GA3576660@ZenIV.linux.org.uk>
+User-Agent: Mutt/1.4.2.3i
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/23/20 10:32 AM, Mauro Carvalho Chehab wrote:
-> Fix a typo:
-> 	blk_mq_run_hw_queue -> blk_mq_run_hw_queues
+On Fri, Oct 23, 2020 at 06:58:57PM +0100, Al Viro wrote:
+> On Fri, Oct 23, 2020 at 03:09:30PM +0200, David Hildenbrand wrote:
+> 
+> > Now, I am not a compiler expert, but as I already cited, at least on
+> > x86-64 clang expects that the high bits were cleared by the caller - in
+> > contrast to gcc. I suspect it's the same on arm64, but again, I am no
+> > compiler expert.
+> > 
+> > If what I said and cites for x86-64 is correct, if the function expects
+> > an "unsigned int", it will happily use 64bit operations without further
+> > checks where valid when assuming high bits are zero. That's why even
+> > converting everything to "unsigned int" as proposed by me won't work on
+> > clang - it assumes high bits are zero (as indicated by Nick).
+> > 
+> > As I am neither a compiler experts (did I mention that already? ;) ) nor
+> > an arm64 experts, I can't tell if this is a compiler BUG or not.
+> 
+> On arm64 when callee expects a 32bit argument, the caller is *not* responsible
+> for clearing the upper half of 64bit register used to pass the value - it only
+> needs to store the actual value into the lower half.  The callee must consider
+> the contents of the upper half of that register as undefined.  See AAPCS64 (e.g.
+> https://github.com/ARM-software/abi-aa/blob/master/aapcs64/aapcs64.rst#parameter-passing-rules
+> ); AFAICS, the relevant bit is
+> 	"Unlike in the 32-bit AAPCS, named integral values must be narrowed by
+> the callee rather than the caller."
 
-Applied, thanks.
+Or the formal rule:
 
--- 
-Jens Axboe
+C.9 	If the argument is an Integral or Pointer Type, the size of the
+	argument is less than or equal to 8 bytes and the NGRN is less
+	than 8, the argument is copied to the least significant bits in
+	x[NGRN]. The NGRN is incremented by one. The argument has now
+	been allocated.
 
+
+Segher
