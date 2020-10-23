@@ -2,172 +2,118 @@ Return-Path: <SRS0=d006=D6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19280C388F9
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 09:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B4DC388F9
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 09:14:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F9A4241A4
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 09:11:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB1CA241A4
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 09:14:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YnttPICi"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lHd/Y1XE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S461195AbgJWJLd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 05:11:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56794 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S461106AbgJWJLc (ORCPT
+        id S461216AbgJWJOM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 05:14:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37052 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S461183AbgJWJOL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 05:11:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603444291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ijQ6kK0YtRWVe5HPUr2IQosPARcuDmczPugAjgLMw9s=;
-        b=YnttPICiN8yIQ6QDP18kC1E0721PCiKNIcHkFxaRjulte12C93y8oxNokSL6hPVV6aRYJ0
-        r3Z/pB2ISiXobCqio/rMnpeT7Hs3YpznQ9egNEwYgMuLON7vNEPS6rUsXEISRYIydU0ffu
-        Xi9QHA3VUjqPzf6RPfx3tXf3qELeWLQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-yReuvm70MBCwbq_2wD-Yxw-1; Fri, 23 Oct 2020 05:11:29 -0400
-X-MC-Unique: yReuvm70MBCwbq_2wD-Yxw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7046210E2197;
-        Fri, 23 Oct 2020 09:11:24 +0000 (UTC)
-Received: from T590 (ovpn-12-163.pek2.redhat.com [10.72.12.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 082415B4B3;
-        Fri, 23 Oct 2020 09:11:06 +0000 (UTC)
-Date:   Fri, 23 Oct 2020 17:11:03 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Weiping Zhang <zwp10758@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
-        mpatocka@redhat.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC] block: fix inaccurate io_ticks
-Message-ID: <20201023091103.GE1698172@T590>
-References: <20201023064621.GA16839@192.168.3.9>
- <20201023084653.GD1698172@T590>
- <CAA70yB6HQhaoGatAHhPnNbdMZfD3SdoEdpU+ip63JPXAvbL2iA@mail.gmail.com>
+        Fri, 23 Oct 2020 05:14:11 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C989C0613CE;
+        Fri, 23 Oct 2020 02:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Bc/Tl7QrHQ8TS00H9eZHX8HpJf7gnLju80W3+dBio3s=; b=lHd/Y1XEta78XOwzEbRgq/UpU2
+        A73VJLFqdMTxta2mKEIuA4xhXip9HWuId1knbAKvRkldwoW/HCUVhiDtojltIj8JcsLhWqCrMVJVu
+        TWggv/tZBG2rywCZT9hxTZ1KWViMWFeX+/1jN8Q4GJNcQl/5tO1GpHlomoV7+s5pg4/GoXkBAHxXl
+        N9bvOBR1/3BgkmHsIoiihX/L2LKkryJc3oI7y7muTeVt4v66HZE/jkji3cbb6myWrMgnKFX/EW0HI
+        3FYEGvf4D5QnGxvF83oZCyFuAF/SKnjGgp9x4wtd8xSoAh69Cgmt+1sg259JZHpXkc0NkMJbJafpJ
+        P8zwFb2Q==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kVt8s-0006xU-8j; Fri, 23 Oct 2020 09:13:46 +0000
+Date:   Fri, 23 Oct 2020 10:13:46 +0100
+From:   "hch@infradead.org" <hch@infradead.org>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Sergei Shtepa <sergei.shtepa@veeam.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+        "len.brown@intel.com" <len.brown@intel.com>,
+        "pavel@ucw.cz" <pavel@ucw.cz>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "jack@suse.cz" <jack@suse.cz>, "tj@kernel.org" <tj@kernel.org>,
+        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "koct9i@gmail.com" <koct9i@gmail.com>,
+        "steve@sk2.org" <steve@sk2.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        Alasdair G Kergon <agk@redhat.com>
+Subject: Re: [PATCH 0/2] block layer filter and block device snapshot module
+Message-ID: <20201023091346.GA25115@infradead.org>
+References: <1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com>
+ <71926887-5707-04a5-78a2-ffa2ee32bd68@suse.de>
+ <20201021141044.GF20749@veeam.com>
+ <ca8eaa40-b422-2272-1fd9-1d0a354c42bf@suse.de>
+ <20201022094402.GA21466@veeam.com>
+ <BL0PR04MB6514AC1B1FF313E6A14D122CE71D0@BL0PR04MB6514.namprd04.prod.outlook.com>
+ <20201022135213.GB21466@veeam.com>
+ <20201022151418.GR9832@magnolia>
+ <CAMM=eLfO_L-ZzcGmpPpHroznnSOq_KEWignFoM09h7Am9yE83g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAA70yB6HQhaoGatAHhPnNbdMZfD3SdoEdpU+ip63JPXAvbL2iA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <CAMM=eLfO_L-ZzcGmpPpHroznnSOq_KEWignFoM09h7Am9yE83g@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 23, 2020 at 04:56:08PM +0800, Weiping Zhang wrote:
-> On Fri, Oct 23, 2020 at 4:49 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Fri, Oct 23, 2020 at 02:46:32PM +0800, Weiping Zhang wrote:
-> > > Do not add io_ticks if there is no infligh io when start a new IO,
-> > > otherwise an extra 1 jiffy will be add to this IO.
-> > >
-> > > I run the following command on a host, with different kernel version.
-> > >
-> > > fio -name=test -ioengine=sync -bs=4K -rw=write
-> > > -filename=/home/test.fio.log -size=100M -time_based=1 -direct=1
-> > > -runtime=300 -rate=2m,2m
-> > >
-> > > If we run fio in a sync direct io mode, IO will be proccessed one by one,
-> > > you can see that there are 512 IOs completed in one second.
-> > >
-> > > kernel: 4.19.0
-> > >
-> > > Device: rrqm/s wrqm/s  r/s    w/s rMB/s wMB/s avgrq-sz avgqu-sz await r_await w_await svctm %util
-> > > vda       0.00   0.00 0.00 512.00  0.00  2.00     8.00     0.21  0.40    0.00    0.40  0.40 20.60
-> > >
-> > > The averate io.latency is 0.4ms, so the disk time cost in one second
-> > > should be 0.4 * 512 = 204.8 ms, that means, %util should be 20%.
-> > >
-> > > Becase update_io_ticks will add a extra 1 jiffy(1ms) for every IO, the
-> > > io.latency io.latency will be 1 + 0.4 = 1.4ms,
-> > > 1.4 * 512 = 716.8ms, so the %util show it about 72%.
-> > >
-> > > Device  r/s    w/s rMB/s wMB/s rrqm/s wrqm/s %rrqm %wrqm r_await w_await aqu-sz rareq-sz wareq-sz svctm  %util
-> > > vda    0.00 512.00  0.00  2.00   0.00   0.00  0.00  0.00    0.00    0.40   0.20     0.00     4.00  1.41  72.10
-> > >
-> > > After this patch:
-> > > Device  r/s    w/s rMB/s wMB/s rrqm/s wrqm/s %rrqm %wrqm r_await w_await aqu-sz rareq-sz wareq-sz svctm  %util
-> > > vda    0.00 512.00  0.00  2.00   0.00   0.00  0.00  0.00    0.00    0.40   0.20     0.00     4.00  0.39  20.00
-> > >
-> > > Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
-> > > Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-> > > ---
-> > >  block/blk-core.c | 19 ++++++++++++++-----
-> > >  block/blk.h      |  1 +
-> > >  block/genhd.c    |  2 +-
-> > >  3 files changed, 16 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/block/blk-core.c b/block/blk-core.c
-> > > index ac00d2fa4eb4..789a5c40b6a6 100644
-> > > --- a/block/blk-core.c
-> > > +++ b/block/blk-core.c
-> > > @@ -1256,14 +1256,14 @@ unsigned int blk_rq_err_bytes(const struct request *rq)
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(blk_rq_err_bytes);
-> > >
-> > > -static void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
-> > > +static void update_io_ticks(struct hd_struct *part, unsigned long now, bool inflight)
-> > >  {
-> > >       unsigned long stamp;
-> > >  again:
-> > >       stamp = READ_ONCE(part->stamp);
-> > >       if (unlikely(stamp != now)) {
-> > > -             if (likely(cmpxchg(&part->stamp, stamp, now) == stamp))
-> > > -                     __part_stat_add(part, io_ticks, end ? now - stamp : 1);
-> > > +             if (likely(cmpxchg(&part->stamp, stamp, now) == stamp) && inflight)
-> > > +                     __part_stat_add(part, io_ticks, now - stamp);
-> > >       }
-> > >       if (part->partno) {
-> > >               part = &part_to_disk(part)->part0;
-> > > @@ -1310,13 +1310,20 @@ void blk_account_io_done(struct request *req, u64 now)
-> > >
-> > >  void blk_account_io_start(struct request *rq)
-> > >  {
-> > > +     struct hd_struct *part;
-> > > +     struct request_queue *q;
-> > > +     int inflight;
-> > > +
-> > >       if (!blk_do_io_stat(rq))
-> > >               return;
-> > >
-> > >       rq->part = disk_map_sector_rcu(rq->rq_disk, blk_rq_pos(rq));
-> > >
-> > >       part_stat_lock();
-> > > -     update_io_ticks(rq->part, jiffies, false);
-> > > +     part = rq->part;
-> > > +     q = part_to_disk(part)->queue;
-> > > +     inflight = blk_mq_in_flight(q, part);
-> > > +     update_io_ticks(part, jiffies, inflight > 0 ? true : false);
-> >
-> > Yeah, this account issue can be fixed by applying such 'inflight' info.
-> > However, blk_mq_in_flight() isn't cheap enough, I did get soft lockup
-> > report because of blk_mq_in_flight() called in I/O path.
-> >
-> > BTW, this way is just like reverting 5b18b5a73760 ("block: delete
-> > part_round_stats and switch to less precise counting").
-> >
-> >
-> Hello Ming,
+On Thu, Oct 22, 2020 at 01:54:16PM -0400, Mike Snitzer wrote:
+> On Thu, Oct 22, 2020 at 11:14 AM Darrick J. Wong
+> > Stupid question: Why don't you change the block layer to make it
+> > possible to insert device mapper devices after the blockdev has been set
+> > up?
 > 
-> Shall we switch it to atomic mode ? update inflight_count when
-> start/done for every IO.
+> Not a stupid question.  Definitely something that us DM developers
+> have wanted to do for a while.  Devil is in the details but it is the
+> right way forward.
+> 
 
-That is more expensive than blk_mq_in_flight().
+Yes, I think that is the right thing to do.  And I don't think it should
+be all that hard.  All we'd need in the I/O path is something like the
+pseudo-patch below, which will allow the interposer driver to resubmit
+bios using submit_bio_noacct as long as the driver sets BIO_INTERPOSED.
 
-> Or any other cheaper way.
-
-I guess it is hard to figure out one cheaper way to figure out
-IO in-flight count especially in case of multiple CPU cores and
-Millions of IOPS.
-
-Thanks,
-Ming
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ac00d2fa4eb48d..3f6f1eb565e0a8 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1051,6 +1051,9 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
+ 		return BLK_QC_T_NONE;
+ 	}
+ 
++	if (blk_has_interposer(bio->bi_disk) &&
++	    !(bio->bi_flags & BIO_INTERPOSED))
++		return __submit_bio_interposed(bio);
+ 	if (!bio->bi_disk->fops->submit_bio)
+ 		return __submit_bio_noacct_mq(bio);
+ 	return __submit_bio_noacct(bio);
