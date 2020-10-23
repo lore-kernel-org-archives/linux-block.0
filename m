@@ -2,112 +2,140 @@ Return-Path: <SRS0=d006=D6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255F6C388F9
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:00:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE859C388F9
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:03:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A090A24182
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:00:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 881AA21D43
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:03:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Qn6C/eVx"
+	dkim=pass (1024-bit key) header.d=veeam.com header.i=@veeam.com header.b="FVRYdNY4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S462653AbgJWLAm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 07:00:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53518 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S462651AbgJWLAl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 07:00:41 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DD3C0613CE
-        for <linux-block@vger.kernel.org>; Fri, 23 Oct 2020 04:00:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=u+eKJ66BtwRzfpZO0koRnDJYiwMP68LngP9eep3gWf8=; b=Qn6C/eVxnjrOzLG9NQ8WpWBiCx
-        7TnNDpql5SUh0VMFXYTYkc2EoK2I+5fdHiC56T+juTeTMict1E0fjiPBKFyYI/VvXNP/ETGd0KASw
-        ui0iyfnZd6tq7uaZzQwPt5+JOCgOJYDLYTLkNbQGc2TeRHRLKCZj2xQA7CjUy3zYJXPFvoQhboqL5
-        AjgRh2d7yN/dVLMJp9gYSp1B8EiXtFWrbtGasuSd+Ry75VpvelkpYF2cxFF7Y1tCIH4SNtKON4Lyh
-        0+KpkTaselHWRBoEPUbQETcUcyU4xdc8wFuphQ58uCzymuaLhQ41UkA1nzclSQCMO6VyqkGI67gKz
-        v3LGUWyw==;
-Received: from [2001:4bb8:18c:20bd:88ad:7c9d:e85e:89ca] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kVuoI-00057p-Lg; Fri, 23 Oct 2020 11:00:39 +0000
-Date:   Fri, 23 Oct 2020 13:00:35 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     axboe@kernel.dk
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for 5.10-rc1
-Message-ID: <20201023110035.GA3504312@infradead.org>
+        id S462634AbgJWLD1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 07:03:27 -0400
+Received: from mx4.veeam.com ([104.41.138.86]:52752 "EHLO mx4.veeam.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S462618AbgJWLD0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Oct 2020 07:03:26 -0400
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx4.veeam.com (Postfix) with ESMTPS id 6D9A8887F2;
+        Fri, 23 Oct 2020 14:03:22 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
+        t=1603451002; bh=65sH+UMPTiYCb05Btrrm4bWQp8NDibtw9NY4NHi6CiU=;
+        h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+        b=FVRYdNY4iU3fryanL+UcAz/hDXzgEbgZP/dN7KMYRZ/my5KPzb1LupgLfz5nx0rts
+         d6uwIFh++QA1slMQ0phsgOo/Dqs+ABXRfXgHxjCpuKrD2YULI2KOxQ3cjxpTiFcOZN
+         rqp2382d6jWDTvDYgPIp+o9hPZuHB2UraC1JzjNI=
+Received: from veeam.com (172.24.14.5) by prgmbx01.amust.local (172.24.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2; Fri, 23 Oct 2020
+ 13:03:20 +0200
+Date:   Fri, 23 Oct 2020 14:04:07 +0300
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     Hannes Reinecke <hare@suse.de>
+CC:     "hch@infradead.org" <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        "Damien Le Moal" <Damien.LeMoal@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+        "len.brown@intel.com" <len.brown@intel.com>,
+        "pavel@ucw.cz" <pavel@ucw.cz>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "jack@suse.cz" <jack@suse.cz>, "tj@kernel.org" <tj@kernel.org>,
+        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "koct9i@gmail.com" <koct9i@gmail.com>,
+        "steve@sk2.org" <steve@sk2.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        Alasdair G Kergon <agk@redhat.com>
+Subject: Re: [PATCH 0/2] block layer filter and block device snapshot module
+Message-ID: <20201023110407.GA23020@veeam.com>
+References: <71926887-5707-04a5-78a2-ffa2ee32bd68@suse.de>
+ <20201021141044.GF20749@veeam.com>
+ <ca8eaa40-b422-2272-1fd9-1d0a354c42bf@suse.de>
+ <20201022094402.GA21466@veeam.com>
+ <BL0PR04MB6514AC1B1FF313E6A14D122CE71D0@BL0PR04MB6514.namprd04.prod.outlook.com>
+ <20201022135213.GB21466@veeam.com>
+ <20201022151418.GR9832@magnolia>
+ <CAMM=eLfO_L-ZzcGmpPpHroznnSOq_KEWignFoM09h7Am9yE83g@mail.gmail.com>
+ <20201023091346.GA25115@infradead.org>
+ <d50062cd-929d-c8ff-5851-4e1d517dc4cb@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <d50062cd-929d-c8ff-5851-4e1d517dc4cb@suse.de>
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.0.172) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29C604D26A677764
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit cb3a92da231bcf55c243d00fa619ee36281b0001:
+The 10/23/2020 13:31, Hannes Reinecke wrote:
+> On 10/23/20 11:13 AM, hch@infradead.org wrote:
+> > On Thu, Oct 22, 2020 at 01:54:16PM -0400, Mike Snitzer wrote:
+> >> On Thu, Oct 22, 2020 at 11:14 AM Darrick J. Wong
+> >>> Stupid question: Why don't you change the block layer to make it
+> >>> possible to insert device mapper devices after the blockdev has been set
+> >>> up?
+> >>
+> >> Not a stupid question.  Definitely something that us DM developers
+> >> have wanted to do for a while.  Devil is in the details but it is the
+> >> right way forward.
+> >>
+> > 
+> > Yes, I think that is the right thing to do.  And I don't think it should
+> > be all that hard.  All we'd need in the I/O path is something like the
+> > pseudo-patch below, which will allow the interposer driver to resubmit
+> > bios using submit_bio_noacct as long as the driver sets BIO_INTERPOSED.
+> > 
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index ac00d2fa4eb48d..3f6f1eb565e0a8 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -1051,6 +1051,9 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
+> >   		return BLK_QC_T_NONE;
+> >   	}
+> >   
+> > +	if (blk_has_interposer(bio->bi_disk) &&
+> > +	    !(bio->bi_flags & BIO_INTERPOSED))
+> > +		return __submit_bio_interposed(bio);
+> >   	if (!bio->bi_disk->fops->submit_bio)
+> >   		return __submit_bio_noacct_mq(bio);
+> >   	return __submit_bio_noacct(bio);
+> > 
 
-  block: remove unused members for io_context (2020-10-20 07:10:14 -0600)
+It`s will be great! Approximately this interception capability is not
+enough now.
 
-are available in the Git repository at:
+> My thoughts went more into the direction of hooking into ->submit_bio, 
+> seeing that it's a NULL pointer for most (all?) block drivers.
+> 
+> But sure, I'll check how the interposer approach would turn out.
 
-  git://git.infradead.org/nvme.git tags/nvme-5.10-2020-10-23
+If anyone will do the patch blk-interposer, please add me to CC.
+I will try to offer my module that will use blk-interposer.
 
-for you to fetch changes up to f673714a1247669bc90322dfb14a5cf553833796:
-
-  nvme-fc: shorten reconnect delay if possible for FC (2020-10-23 12:54:45 +0200)
-
-----------------------------------------------------------------
-nvme fixes for 5.10
-
- - rdma error handling fixes (Chao Leng)
- - fc error handling and reconnect fixes (James Smart)
- - fix the qid displace when tracing ioctl command (Keith Busch)
- - don't use BLK_MQ_REQ_NOWAIT for passthru (Chaitanya Kulkarni)
- - fix MTDT for passthru (Logan Gunthorpe)
- - blacklist Write Same on more devices (Kai-Heng Feng)
- - fix an uninitialized work struct (zhenwei pi)
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (1):
-      nvmet: don't use BLK_MQ_REQ_NOWAIT for passthru
-
-Chao Leng (2):
-      nvme-rdma: fix crash when connect rejected
-      nvme-rdma: fix crash due to incorrect cqe
-
-James Smart (4):
-      nvme-fc: fix io timeout to abort I/O
-      nvme-fc: fix error loop in create_hw_io_queues
-      nvme-fc: wait for queues to freeze before calling update_hr_hw_queues
-      nvme-fc: shorten reconnect delay if possible for FC
-
-Kai-Heng Feng (1):
-      nvme-pci: disable Write Zeroes on Sandisk Skyhawk
-
-Keith Busch (1):
-      nvme: use queuedata for nvme_req_qid
-
-Logan Gunthorpe (2):
-      nvmet: limit passthru MTDS by BIO_MAX_PAGES
-      nvmet: cleanup nvmet_passthru_map_sg()
-
-zhenwei pi (1):
-      nvmet: fix uninitialized work for zero kato
-
- drivers/nvme/host/fc.c         | 138 ++++++++++++++++++++++++++++-------------
- drivers/nvme/host/nvme.h       |   2 +-
- drivers/nvme/host/pci.c        |   2 +
- drivers/nvme/host/rdma.c       |   6 +-
- drivers/nvme/target/core.c     |   3 +-
- drivers/nvme/target/passthru.c |  18 ++++--
- 6 files changed, 115 insertions(+), 54 deletions(-)
+-- 
+Sergei Shtepa
+Veeam Software developer.
