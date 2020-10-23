@@ -2,82 +2,118 @@ Return-Path: <SRS0=d006=D6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D12DC388F9
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B52C388F9
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 12:46:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D810020EDD
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:42:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ACJo1cAn"
+	by mail.kernel.org (Postfix) with ESMTP id DA3BB24182
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 12:46:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S463149AbgJWLmW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 07:42:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59916 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S463147AbgJWLmW (ORCPT
+        id S464028AbgJWMqn convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 08:46:43 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:56558 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S463977AbgJWMqm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 07:42:22 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83323C0613CE;
-        Fri, 23 Oct 2020 04:42:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=uTBzimS1PCb6rk5CYfmm7DQ57ZumL5IF6N2uuwCT5ic=; b=ACJo1cAnkf3SCtOXvhzF84HPAz
-        utZFVfmrmNmBVfyFa5t0dItqVsR7LlM9a/jTwu2II5s5V7yF3kAfVMAnMzrXyZDJpdWcEwVJSnBdA
-        ssO+4GIuRRj3bJhia6MZuAmiwlqfgDAZwC+arcGcmvM62SC4BkH/APIgbr+WE9JUWbkEsxQJv1T+8
-        URB45+a6Ia7ysOI4DPNhoQMYW4TeQKE/LaC/YAFY5RH5zcgq+ifmOcQ6rd+lmpRFWMkpzlB1/MrUx
-        w1PAwnEZ8ryBA9uzRY/Ptw2NcZNt8qJY6m1u4wwhuG9ZxAeJpjMOjMJrrw6GfqYiffp3/XudIOj1F
-        F69t2U5g==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kVvSe-0007Yd-Ua; Fri, 23 Oct 2020 11:42:21 +0000
-Date:   Fri, 23 Oct 2020 12:42:20 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC] synchronous readpage for buffer_heads
-Message-ID: <20201023114220.GY20115@casper.infradead.org>
-References: <20201022152256.GU20115@casper.infradead.org>
- <25528b1a-7434-62cb-705a-7269d050bbc1@suse.de>
+        Fri, 23 Oct 2020 08:46:42 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-256-SaM_0Qo5N_as2A7LuQL-Wg-1; Fri, 23 Oct 2020 13:46:37 +0100
+X-MC-Unique: SaM_0Qo5N_as2A7LuQL-Wg-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Fri, 23 Oct 2020 13:46:36 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Fri, 23 Oct 2020 13:46:36 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Greg KH' <gregkh@linuxfoundation.org>,
+        David Hildenbrand <david@redhat.com>
+CC:     Al Viro <viro@zeniv.linux.org.uk>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Subject: RE: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Thread-Topic: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Thread-Index: AQHWqE5GNDfnH4y9nkGWtfqJueR1KKmjTCJQgAAN4UiAAAD2IIAASOeCgAF+12A=
+Date:   Fri, 23 Oct 2020 12:46:36 +0000
+Message-ID: <134f162d711d466ebbd88906fae35b33@AcuMS.aculab.com>
+References: <df2e0758-b8ed-5aec-6adc-a18f499c0179@redhat.com>
+ <20201022090155.GA1483166@kroah.com>
+ <e04d0c5d-e834-a15b-7844-44dcc82785cc@redhat.com>
+ <a1533569-948a-1d5b-e231-5531aa988047@redhat.com>
+ <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
+ <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
+ <20201022104805.GA1503673@kroah.com> <20201022121849.GA1664412@kroah.com>
+ <98d9df88-b7ef-fdfb-7d90-2fa7a9d7bab5@redhat.com>
+ <20201022125759.GA1685526@kroah.com> <20201022135036.GA1787470@kroah.com>
+In-Reply-To: <20201022135036.GA1787470@kroah.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <25528b1a-7434-62cb-705a-7269d050bbc1@suse.de>
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 23, 2020 at 08:22:07AM +0200, Hannes Reinecke wrote:
-> On 10/22/20 5:22 PM, Matthew Wilcox wrote:
-> Hmm. You are aware, of course, that hch et al are working on replacing bhs
-> with iomap, right?
+From: Greg KH <gregkh@linuxfoundation.org>
+> Sent: 22 October 2020 14:51
 
-$ git shortlog --author=Wilcox origin/master -- fs/iomap |head -1
-Matthew Wilcox (Oracle) (17):
+I've rammed the code into godbolt.
 
-But actually, I don't see anyone working on a mass migration of
-filesystems from either using BHs directly or using the mpage code to
-using iomap.  I have a summer student for next summer who I'm going to
-let loose on this problem, but I fear buffer_heads will be with us for
-a long time to come.
+https://godbolt.org/z/9v5PPW
 
-I mean, who's going to convert reiserfs to iomap?
-$ git log --no-merges --since=2015-01-01 origin/master fs/reiserfs |grep -c ^comm
-130
+Definitely a clang bug.
 
-Not exactly a thriving development community.  It doesn't even support
-fallocate.
+Search for [wx]24 in the clang output.
+nr_segs comes in as w2 and the initial bound checks are done on w2.
+w24 is loaded from w2 - I don't believe this changes the high bits.
+There are no references to w24, just x24.
+So the kmalloc_array() is passed 'huge' and will fail.
+The iov_iter_init also gets the 64bit value.
 
-> So wouldn't it be more useful to concentrate on the iomap code, and ensure
-> that _that_ is working correctly?
+Note that the gcc code has a sign-extend copy of w2.
 
-Did that one first, then did mpage_readpage(), now I've moved on to
-block_read_full_page().  Now I'm going to go back and redo iomap
-with everything I learned doing block_read_full_page().  It's going
-to use blk_completion.
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
