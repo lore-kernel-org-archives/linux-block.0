@@ -2,83 +2,149 @@ Return-Path: <SRS0=d006=D6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D640C55178
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 20:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3235EC388F9
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 21:29:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 829122087D
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 20:42:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nLRKQF5K"
+	by mail.kernel.org (Postfix) with ESMTP id D0D2B20936
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 21:29:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1756271AbgJWUmN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 16:42:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59416 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756266AbgJWUmN (ORCPT
+        id S1756691AbgJWV3H convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 17:29:07 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:35570 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1756697AbgJWV3F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 16:42:13 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6515C0613CE;
-        Fri, 23 Oct 2020 13:42:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HPNK4arnkW2Dq4M58HcOUzaclycvISxal8U4KN3Txio=; b=nLRKQF5KgnrgPpI/VAe1RNljYQ
-        9W/uDSWFLEg+5sW/8dsvxg6gb26oN31X4825l5eV4eGhF7lPXdsPJDBOZgt3a4sifk3QmEsqtC5uH
-        H2WInmO64irZy4SFAMbTGh/1JnBSJnIP5NqQltd/AKW38wZQPSQ59VXL0ydC41YfgsZaLasND1tWr
-        JKZPlh3sSqkp7EWd1zbc9un46BWjRYQ2VGC8xti1T61Z7fNLF92WLYxq+iP/7tgSwu3b2hu6FkgoN
-        JYUkcHubvHmvYwUALsxmMMfX4e/du/jDZ2AHt1ZK3OQTuhVuIgu9TwJfSxUewAwzDyhYPYtw+cDxW
-        HMfvMtfA==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kW3t4-0000TQ-MJ; Fri, 23 Oct 2020 20:42:11 +0000
-Date:   Fri, 23 Oct 2020 21:42:10 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
-Subject: Re: [PATCH 3/6] fs: Convert block_read_full_page to be synchronous
-Message-ID: <20201023204210.GF20115@casper.infradead.org>
-References: <20201022212228.15703-1-willy@infradead.org>
- <20201022212228.15703-4-willy@infradead.org>
- <20201022234011.GD3613750@gmail.com>
- <20201023132138.GB20115@casper.infradead.org>
- <20201023161335.GB3908702@gmail.com>
+        Fri, 23 Oct 2020 17:29:05 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-101-a0KTql5iP42OxX-i9IRDjQ-1; Fri, 23 Oct 2020 22:29:00 +0100
+X-MC-Unique: a0KTql5iP42OxX-i9IRDjQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Fri, 23 Oct 2020 22:28:59 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Fri, 23 Oct 2020 22:28:59 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Segher Boessenkool' <segher@kernel.crashing.org>,
+        Al Viro <viro@zeniv.linux.org.uk>
+CC:     David Hildenbrand <david@redhat.com>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        'Greg KH' <gregkh@linuxfoundation.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Subject: RE: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Thread-Topic: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Thread-Index: AQHWqE5GNDfnH4y9nkGWtfqJueR1KKmjTCJQgAAN4UiAAAD2IIAASOeCgAF+12CAAGD4RoAAL/Bg
+Date:   Fri, 23 Oct 2020 21:28:59 +0000
+Message-ID: <e9a3136ead214186877804aabde74b38@AcuMS.aculab.com>
+References: <bc0a091865f34700b9df332c6e9dcdfd@AcuMS.aculab.com>
+ <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
+ <20201022104805.GA1503673@kroah.com> <20201022121849.GA1664412@kroah.com>
+ <98d9df88-b7ef-fdfb-7d90-2fa7a9d7bab5@redhat.com>
+ <20201022125759.GA1685526@kroah.com> <20201022135036.GA1787470@kroah.com>
+ <134f162d711d466ebbd88906fae35b33@AcuMS.aculab.com>
+ <935f7168-c2f5-dd14-7124-412b284693a2@redhat.com>
+ <20201023175857.GA3576660@ZenIV.linux.org.uk>
+ <20201023182713.GG2672@gate.crashing.org>
+In-Reply-To: <20201023182713.GG2672@gate.crashing.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201023161335.GB3908702@gmail.com>
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 23, 2020 at 09:13:35AM -0700, Eric Biggers wrote:
-> On Fri, Oct 23, 2020 at 02:21:38PM +0100, Matthew Wilcox wrote:
-> > I wonder about allocating bios that can accommodate more bvecs.  Not sure
-> > how often filesystems have adjacent blocks which go into non-adjacent
-> > sub-page blocks.  It's certainly possible that a filesystem might have
-> > a page consisting of DDhhDDDD ('D' for Data, 'h' for hole), but how
-> > likely is it to have written the two data chunks next to each other?
-> > Maybe with O_SYNC?
+From: Segher Boessenkool
+> Sent: 23 October 2020 19:27
 > 
-> I think that's a rare case that's not very important to optimize.  And there's
-> already a lot of code where filesystems *could* submit a single bio in that case
-> but don't.  For example, both fs/direct-io.c and fs/iomap/direct-io.c only
-> submit bios that contain logically contiguous data.
+> On Fri, Oct 23, 2020 at 06:58:57PM +0100, Al Viro wrote:
+> > On Fri, Oct 23, 2020 at 03:09:30PM +0200, David Hildenbrand wrote:
+> >
+> > > Now, I am not a compiler expert, but as I already cited, at least on
+> > > x86-64 clang expects that the high bits were cleared by the caller - in
+> > > contrast to gcc. I suspect it's the same on arm64, but again, I am no
+> > > compiler expert.
+> > >
+> > > If what I said and cites for x86-64 is correct, if the function expects
+> > > an "unsigned int", it will happily use 64bit operations without further
+> > > checks where valid when assuming high bits are zero. That's why even
+> > > converting everything to "unsigned int" as proposed by me won't work on
+> > > clang - it assumes high bits are zero (as indicated by Nick).
+> > >
+> > > As I am neither a compiler experts (did I mention that already? ;) ) nor
+> > > an arm64 experts, I can't tell if this is a compiler BUG or not.
+> >
+> > On arm64 when callee expects a 32bit argument, the caller is *not* responsible
+> > for clearing the upper half of 64bit register used to pass the value - it only
+> > needs to store the actual value into the lower half.  The callee must consider
+> > the contents of the upper half of that register as undefined.  See AAPCS64 (e.g.
+> > https://github.com/ARM-software/abi-aa/blob/master/aapcs64/aapcs64.rst#parameter-passing-rules
+> > ); AFAICS, the relevant bit is
+> > 	"Unlike in the 32-bit AAPCS, named integral values must be narrowed by
+> > the callee rather than the caller."
+> 
+> Or the formal rule:
+> 
+> C.9 	If the argument is an Integral or Pointer Type, the size of the
+> 	argument is less than or equal to 8 bytes and the NGRN is less
+> 	than 8, the argument is copied to the least significant bits in
+> 	x[NGRN]. The NGRN is incremented by one. The argument has now
+> 	been allocated.
 
-True.  iomap/buffered-io.c will do it though.
+So, in essence, if the value is in a 64bit register the calling
+code is independent of the actual type of the formal parameter.
+Clearly a value might need explicit widening.
 
-> If you do implement this optimization, note that it wouldn't work when a
-> bio_crypt_ctx is set, since the data must be logically contiguous in that case.
-> To handle that you'd need to call fscrypt_mergeable_bio_bh() when adding each
-> block, and submit the bio if it returns false.  (In contrast, with your current
-> proposal, calling fscrypt_mergeable_bio_bh() isn't necessary because each bio
-> only contains logically contiguous data within one page.)
+I've found a copy of the 64 bit arm instruction set.
+Unfortunately it is alpha sorted and repetitive so shows none
+of the symmetry and makes things difficult to find.
+But, contrary to what someone suggested most register writes
+(eg from arithmetic) seem to zero/extend the high bits.
 
-Oh, that's disappointing.  I had assumed that you'd set up the dun for
-the logical block corresponding to the start of the page and then you'd
-be able to decrypt any range in the page.
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
