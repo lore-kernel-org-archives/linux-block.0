@@ -2,140 +2,102 @@ Return-Path: <SRS0=d006=D6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE859C388F9
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D6D4C55178
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:04:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 881AA21D43
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:03:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D707B24182
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:04:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=veeam.com header.i=@veeam.com header.b="FVRYdNY4"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VU/I/Bg0";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UnEzQ4M/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S462634AbgJWLD1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 07:03:27 -0400
-Received: from mx4.veeam.com ([104.41.138.86]:52752 "EHLO mx4.veeam.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S462618AbgJWLD0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 07:03:26 -0400
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 6D9A8887F2;
-        Fri, 23 Oct 2020 14:03:22 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
-        t=1603451002; bh=65sH+UMPTiYCb05Btrrm4bWQp8NDibtw9NY4NHi6CiU=;
-        h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-        b=FVRYdNY4iU3fryanL+UcAz/hDXzgEbgZP/dN7KMYRZ/my5KPzb1LupgLfz5nx0rts
-         d6uwIFh++QA1slMQ0phsgOo/Dqs+ABXRfXgHxjCpuKrD2YULI2KOxQ3cjxpTiFcOZN
-         rqp2382d6jWDTvDYgPIp+o9hPZuHB2UraC1JzjNI=
-Received: from veeam.com (172.24.14.5) by prgmbx01.amust.local (172.24.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2; Fri, 23 Oct 2020
- 13:03:20 +0200
-Date:   Fri, 23 Oct 2020 14:04:07 +0300
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     Hannes Reinecke <hare@suse.de>
-CC:     "hch@infradead.org" <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        "Damien Le Moal" <Damien.LeMoal@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-        "len.brown@intel.com" <len.brown@intel.com>,
-        "pavel@ucw.cz" <pavel@ucw.cz>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "jack@suse.cz" <jack@suse.cz>, "tj@kernel.org" <tj@kernel.org>,
-        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "koct9i@gmail.com" <koct9i@gmail.com>,
-        "steve@sk2.org" <steve@sk2.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Alasdair G Kergon <agk@redhat.com>
-Subject: Re: [PATCH 0/2] block layer filter and block device snapshot module
-Message-ID: <20201023110407.GA23020@veeam.com>
-References: <71926887-5707-04a5-78a2-ffa2ee32bd68@suse.de>
- <20201021141044.GF20749@veeam.com>
- <ca8eaa40-b422-2272-1fd9-1d0a354c42bf@suse.de>
- <20201022094402.GA21466@veeam.com>
- <BL0PR04MB6514AC1B1FF313E6A14D122CE71D0@BL0PR04MB6514.namprd04.prod.outlook.com>
- <20201022135213.GB21466@veeam.com>
- <20201022151418.GR9832@magnolia>
- <CAMM=eLfO_L-ZzcGmpPpHroznnSOq_KEWignFoM09h7Am9yE83g@mail.gmail.com>
- <20201023091346.GA25115@infradead.org>
- <d50062cd-929d-c8ff-5851-4e1d517dc4cb@suse.de>
+        id S462703AbgJWLEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 07:04:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54026 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S462548AbgJWLED (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Oct 2020 07:04:03 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A242C0613CE;
+        Fri, 23 Oct 2020 04:04:03 -0700 (PDT)
+Date:   Fri, 23 Oct 2020 13:04:00 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1603451041;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=j1o05ovjntirIj7cvm7bSPa5eySCqPWLuUvFBBxTkcA=;
+        b=VU/I/Bg0fjftmhfkNoiTI5iQAkWt1oroH4F41nG/CTl2uJHdNhPckdnBQqbVas1E1ON0pK
+        yWtYg+1sxh8pnuRX09q7grhMA5ExKHvEq4tUlD5e4PmTGZD8eILAiC50zsA2xoekbuC7GI
+        V7Et6fYnqpFWlxEW8NaEqob68BlhofnBfRLmNmF9Vgd4t2YrRsDVn9saDXGfeMGxf6PvL9
+        HcBqVwWt7NPl1ot8NBdkEbY9q7Ah/hgACZz+zThD4LBIcE5pNr69pdBISg+FwQp/IplXRh
+        u0UcS7rrdehouC3VUYfoOc3rjBpHD9hmVL6CFsG1G8xBvaXus7B2u+obpb2uUQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1603451041;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=j1o05ovjntirIj7cvm7bSPa5eySCqPWLuUvFBBxTkcA=;
+        b=UnEzQ4M/+js0ciQkn+pulvrti1+fg2aEU1ycvfsSoEgkxQxIRZJkVTxbb25CBaUFmUS6MF
+        hm4LzqNXplO2z+DQ==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     David Runge <dave@sleepmap.de>
+Cc:     linux-rt-users@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH RFC] blk-mq: Don't IPI requests on PREEMPT_RT
+Message-ID: <20201023110400.bx3uzsb7xy5jtsea@linutronix.de>
+References: <20201021175059.GA4989@hmbx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <d50062cd-929d-c8ff-5851-4e1d517dc4cb@suse.de>
-X-Originating-IP: [172.24.14.5]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.0.172) To prgmbx01.amust.local
- (172.24.0.171)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29C604D26A677764
-X-Veeam-MMEX: True
+In-Reply-To: <20201021175059.GA4989@hmbx>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The 10/23/2020 13:31, Hannes Reinecke wrote:
-> On 10/23/20 11:13 AM, hch@infradead.org wrote:
-> > On Thu, Oct 22, 2020 at 01:54:16PM -0400, Mike Snitzer wrote:
-> >> On Thu, Oct 22, 2020 at 11:14 AM Darrick J. Wong
-> >>> Stupid question: Why don't you change the block layer to make it
-> >>> possible to insert device mapper devices after the blockdev has been set
-> >>> up?
-> >>
-> >> Not a stupid question.  Definitely something that us DM developers
-> >> have wanted to do for a while.  Devil is in the details but it is the
-> >> right way forward.
-> >>
-> > 
-> > Yes, I think that is the right thing to do.  And I don't think it should
-> > be all that hard.  All we'd need in the I/O path is something like the
-> > pseudo-patch below, which will allow the interposer driver to resubmit
-> > bios using submit_bio_noacct as long as the driver sets BIO_INTERPOSED.
-> > 
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index ac00d2fa4eb48d..3f6f1eb565e0a8 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -1051,6 +1051,9 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
-> >   		return BLK_QC_T_NONE;
-> >   	}
-> >   
-> > +	if (blk_has_interposer(bio->bi_disk) &&
-> > +	    !(bio->bi_flags & BIO_INTERPOSED))
-> > +		return __submit_bio_interposed(bio);
-> >   	if (!bio->bi_disk->fops->submit_bio)
-> >   		return __submit_bio_noacct_mq(bio);
-> >   	return __submit_bio_noacct(bio);
-> > 
+blk_mq_complete_request_remote() will dispatch request completion to
+another CPU via IPI if the CPU belongs to a different cache domain.
 
-It`s will be great! Approximately this interception capability is not
-enough now.
+This breaks on PREEMPT_RT because the IPI function will complete the
+request in IRQ context which includes acquiring spinlock_t typed locks.
+Completing the IPI request in softirq on the remote CPU is probably less
+efficient because it would require to wake ksoftirqd for this task
+(which runs at SCHED_OTHER).
 
-> My thoughts went more into the direction of hooking into ->submit_bio, 
-> seeing that it's a NULL pointer for most (all?) block drivers.
-> 
-> But sure, I'll check how the interposer approach would turn out.
+Ignoring the IPI request and completing the request locally is probably
+the best option. It be completed either in the IRQ-thread or at the end
+of the routine in softirq context.
 
-If anyone will do the patch blk-interposer, please add me to CC.
-I will try to offer my module that will use blk-interposer.
+Let blk_mq_complete_need_ipi() return that there is no need for IPI on
+PREEMPT_RT.
 
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e37aa31332b70..99d2fb51e0e84 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -647,7 +647,7 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
+ {
+ 	int cpu = raw_smp_processor_id();
+ 
+-	if (!IS_ENABLED(CONFIG_SMP) ||
++	if (!IS_ENABLED(CONFIG_SMP) || IS_ENABLED(CONFIG_PREEMPT_RT) ||
+ 	    !test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags))
+ 		return false;
+ 
 -- 
-Sergei Shtepa
-Veeam Software developer.
+2.28.0
+
