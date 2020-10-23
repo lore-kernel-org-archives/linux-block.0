@@ -6,93 +6,61 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A56DC388F9
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0210AC388F9
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:21:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05EA321D43
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:13:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98CB92084C
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:21:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ie9QJ2wq"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="X43iKc+A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S462785AbgJWLNW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 07:13:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55452 "EHLO
+        id S462853AbgJWLVe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 07:21:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S462757AbgJWLNV (ORCPT
+        with ESMTP id S462851AbgJWLVe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 07:13:21 -0400
+        Fri, 23 Oct 2020 07:21:34 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B23D3C0613CE;
-        Fri, 23 Oct 2020 04:13:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C047C0613CE;
+        Fri, 23 Oct 2020 04:21:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=L5+0ZOmshEWGRjYQbZQfyKQ/jkbENBN4GZDIbl9am3E=; b=Ie9QJ2wqfW+8LSUdxH/tSg8hAa
-        8C2mIC2GrZ8PI1MXKvN9BsfRilt8jYdEkGxyFOfAVDvy6Td3hQ9uBq6ez/h9E2ABxawDSJiOLHdJI
-        LsZGNhEw0cC/ka2DrAdzFFZOie+px6AWbWK1jzCBTuyNuGJIbDc7Ua0tb1SKyYrwGa4R7W5BG1jO8
-        lxiEoi4nFgMohtN2CS2nX2Xcq7PIeN+Dvq+4Kp4WllzbqLpZqVP7tQsfMfzuy3e8gjTCMhW6FI+3k
-        4bz8a/7pem0jnI9l+DNScgPNKZTBfOKlV0f3hYQ2enHlqjYNexs64ubBaoTEtoMg6kzVaSt0292L4
-        yhh0jICQ==;
+        bh=VTzREImgBpc2Ef+UDWW8JBTMD/ctCUwWEOpMdvOHXqw=; b=X43iKc+ANUZlHkD3jHcDE7LMAK
+        29HfAqHQgjl0jLBRr9wIcXH9+3KsrMlz4nCy7arZRXqQq44KQKMhNDsqeMTECzj08Q+ja+bcwdNnt
+        qTOl8mBnORqZIr8XockcIMM6bVYKrbSsUqLDOa+0Fh3V6HTHT48nvlrALvvbPqftX9Lmq48cIcjTQ
+        IXqmCUTHgzYzJCZ/h9SlHMFjQPNPdjD1GnFB4bcdmwJa/LoIEJmF13PLbzJ/w36xcRKfEKVb3Uu3t
+        qhSxBMGaQdapFp1w77gTkgDkn1nevkPy7MKyTROSbrwjCfO12K96FQ4s4NujxN4z8J+aETAwzxVUC
+        V8XjpX4Q==;
 Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kVv09-0005sV-5b; Fri, 23 Oct 2020 11:12:53 +0000
-Date:   Fri, 23 Oct 2020 12:12:53 +0100
-From:   "hch@infradead.org" <hch@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     "hch@infradead.org" <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "jack@suse.cz" <jack@suse.cz>,
-        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        "pavel@ucw.cz" <pavel@ucw.cz>, "steve@sk2.org" <steve@sk2.org>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Alasdair G Kergon <agk@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        "len.brown@intel.com" <len.brown@intel.com>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        Sergei Shtepa <sergei.shtepa@veeam.com>,
-        "koct9i@gmail.com" <koct9i@gmail.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>
-Subject: Re: [dm-devel] [PATCH 0/2] block layer filter and block device
- snapshot module
-Message-ID: <20201023111253.GA22468@infradead.org>
-References: <71926887-5707-04a5-78a2-ffa2ee32bd68@suse.de>
- <20201021141044.GF20749@veeam.com>
- <ca8eaa40-b422-2272-1fd9-1d0a354c42bf@suse.de>
- <20201022094402.GA21466@veeam.com>
- <BL0PR04MB6514AC1B1FF313E6A14D122CE71D0@BL0PR04MB6514.namprd04.prod.outlook.com>
- <20201022135213.GB21466@veeam.com>
- <20201022151418.GR9832@magnolia>
- <CAMM=eLfO_L-ZzcGmpPpHroznnSOq_KEWignFoM09h7Am9yE83g@mail.gmail.com>
- <20201023091346.GA25115@infradead.org>
- <d50062cd-929d-c8ff-5851-4e1d517dc4cb@suse.de>
+        id 1kVv8U-0006MT-Km; Fri, 23 Oct 2020 11:21:30 +0000
+Date:   Fri, 23 Oct 2020 12:21:30 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: Re: [PATCH RFC] blk-mq: Don't IPI requests on PREEMPT_RT
+Message-ID: <20201023112130.GA23790@infradead.org>
+References: <20201021175059.GA4989@hmbx>
+ <20201023110400.bx3uzsb7xy5jtsea@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d50062cd-929d-c8ff-5851-4e1d517dc4cb@suse.de>
+In-Reply-To: <20201023110400.bx3uzsb7xy5jtsea@linutronix.de>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 23, 2020 at 12:31:05PM +0200, Hannes Reinecke wrote:
-> My thoughts went more into the direction of hooking into ->submit_bio,
-> seeing that it's a NULL pointer for most (all?) block drivers.
-> 
-> But sure, I'll check how the interposer approach would turn out.
+> -	if (!IS_ENABLED(CONFIG_SMP) ||
+> +	if (!IS_ENABLED(CONFIG_SMP) || IS_ENABLED(CONFIG_PREEMPT_RT) ||
+>  	    !test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags))
 
-submit_bio is owned by the underlying device, and for a good reason
-stored in a const struct..
+This needs a big fat comment explaining your rationale.  And probably
+a separate if statement to make it obvious as well.
