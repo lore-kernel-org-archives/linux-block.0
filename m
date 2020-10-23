@@ -6,61 +6,78 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0210AC388F9
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D12DC388F9
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:42:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98CB92084C
-	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:21:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D810020EDD
+	for <linux-block@archiver.kernel.org>; Fri, 23 Oct 2020 11:42:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="X43iKc+A"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ACJo1cAn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S462853AbgJWLVe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Oct 2020 07:21:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56706 "EHLO
+        id S463149AbgJWLmW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Oct 2020 07:42:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S462851AbgJWLVe (ORCPT
+        with ESMTP id S463147AbgJWLmW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Oct 2020 07:21:34 -0400
+        Fri, 23 Oct 2020 07:42:22 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C047C0613CE;
-        Fri, 23 Oct 2020 04:21:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83323C0613CE;
+        Fri, 23 Oct 2020 04:42:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VTzREImgBpc2Ef+UDWW8JBTMD/ctCUwWEOpMdvOHXqw=; b=X43iKc+ANUZlHkD3jHcDE7LMAK
-        29HfAqHQgjl0jLBRr9wIcXH9+3KsrMlz4nCy7arZRXqQq44KQKMhNDsqeMTECzj08Q+ja+bcwdNnt
-        qTOl8mBnORqZIr8XockcIMM6bVYKrbSsUqLDOa+0Fh3V6HTHT48nvlrALvvbPqftX9Lmq48cIcjTQ
-        IXqmCUTHgzYzJCZ/h9SlHMFjQPNPdjD1GnFB4bcdmwJa/LoIEJmF13PLbzJ/w36xcRKfEKVb3Uu3t
-        qhSxBMGaQdapFp1w77gTkgDkn1nevkPy7MKyTROSbrwjCfO12K96FQ4s4NujxN4z8J+aETAwzxVUC
-        V8XjpX4Q==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kVv8U-0006MT-Km; Fri, 23 Oct 2020 11:21:30 +0000
-Date:   Fri, 23 Oct 2020 12:21:30 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCH RFC] blk-mq: Don't IPI requests on PREEMPT_RT
-Message-ID: <20201023112130.GA23790@infradead.org>
-References: <20201021175059.GA4989@hmbx>
- <20201023110400.bx3uzsb7xy5jtsea@linutronix.de>
+        bh=uTBzimS1PCb6rk5CYfmm7DQ57ZumL5IF6N2uuwCT5ic=; b=ACJo1cAnkf3SCtOXvhzF84HPAz
+        utZFVfmrmNmBVfyFa5t0dItqVsR7LlM9a/jTwu2II5s5V7yF3kAfVMAnMzrXyZDJpdWcEwVJSnBdA
+        ssO+4GIuRRj3bJhia6MZuAmiwlqfgDAZwC+arcGcmvM62SC4BkH/APIgbr+WE9JUWbkEsxQJv1T+8
+        URB45+a6Ia7ysOI4DPNhoQMYW4TeQKE/LaC/YAFY5RH5zcgq+ifmOcQ6rd+lmpRFWMkpzlB1/MrUx
+        w1PAwnEZ8ryBA9uzRY/Ptw2NcZNt8qJY6m1u4wwhuG9ZxAeJpjMOjMJrrw6GfqYiffp3/XudIOj1F
+        F69t2U5g==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kVvSe-0007Yd-Ua; Fri, 23 Oct 2020 11:42:21 +0000
+Date:   Fri, 23 Oct 2020 12:42:20 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC] synchronous readpage for buffer_heads
+Message-ID: <20201023114220.GY20115@casper.infradead.org>
+References: <20201022152256.GU20115@casper.infradead.org>
+ <25528b1a-7434-62cb-705a-7269d050bbc1@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201023110400.bx3uzsb7xy5jtsea@linutronix.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <25528b1a-7434-62cb-705a-7269d050bbc1@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -	if (!IS_ENABLED(CONFIG_SMP) ||
-> +	if (!IS_ENABLED(CONFIG_SMP) || IS_ENABLED(CONFIG_PREEMPT_RT) ||
->  	    !test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags))
+On Fri, Oct 23, 2020 at 08:22:07AM +0200, Hannes Reinecke wrote:
+> On 10/22/20 5:22 PM, Matthew Wilcox wrote:
+> Hmm. You are aware, of course, that hch et al are working on replacing bhs
+> with iomap, right?
 
-This needs a big fat comment explaining your rationale.  And probably
-a separate if statement to make it obvious as well.
+$ git shortlog --author=Wilcox origin/master -- fs/iomap |head -1
+Matthew Wilcox (Oracle) (17):
+
+But actually, I don't see anyone working on a mass migration of
+filesystems from either using BHs directly or using the mpage code to
+using iomap.  I have a summer student for next summer who I'm going to
+let loose on this problem, but I fear buffer_heads will be with us for
+a long time to come.
+
+I mean, who's going to convert reiserfs to iomap?
+$ git log --no-merges --since=2015-01-01 origin/master fs/reiserfs |grep -c ^comm
+130
+
+Not exactly a thriving development community.  It doesn't even support
+fallocate.
+
+> So wouldn't it be more useful to concentrate on the iomap code, and ensure
+> that _that_ is working correctly?
+
+Did that one first, then did mpage_readpage(), now I've moved on to
+block_read_full_page().  Now I'm going to go back and redo iomap
+with everything I learned doing block_read_full_page().  It's going
+to use blk_completion.
