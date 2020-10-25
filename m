@@ -1,161 +1,190 @@
-Return-Path: <SRS0=STaV=D7=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=qssB=EA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E71DC2D0A3
-	for <linux-block@archiver.kernel.org>; Sat, 24 Oct 2020 21:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 336F7C4363A
+	for <linux-block@archiver.kernel.org>; Sun, 25 Oct 2020 04:44:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10D7921D41
-	for <linux-block@archiver.kernel.org>; Sat, 24 Oct 2020 21:12:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B3A922202
+	for <linux-block@archiver.kernel.org>; Sun, 25 Oct 2020 04:44:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UAcieGgn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1764576AbgJXVMS convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Oct 2020 17:12:18 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:25848 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1764566AbgJXVMR (ORCPT
+        id S1767052AbgJYEom (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Oct 2020 00:44:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43784 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1767051AbgJYEol (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Oct 2020 17:12:17 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mtapsc-3-gvyTKESiOkaAGmzuPOOVdg-1; Sat, 24 Oct 2020 22:12:12 +0100
-X-MC-Unique: gvyTKESiOkaAGmzuPOOVdg-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Sat, 24 Oct 2020 22:12:11 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Sat, 24 Oct 2020 22:12:11 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Segher Boessenkool' <segher@kernel.crashing.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        David Hildenbrand <david@redhat.com>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "kernel-team@android.com" <kernel-team@android.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-        'Greg KH' <gregkh@linuxfoundation.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: RE: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Thread-Topic: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Thread-Index: AQHWqE5GNDfnH4y9nkGWtfqJueR1KKmjTCJQgAAN4UiAAAD2IIAASOeCgAF+12CAAGD4RoAAL/BggAFBVoCAAE2bsA==
-Date:   Sat, 24 Oct 2020 21:12:11 +0000
-Message-ID: <7c642593ca08469f8c00c0de10a09540@AcuMS.aculab.com>
-References: <20201022104805.GA1503673@kroah.com>
- <20201022121849.GA1664412@kroah.com>
- <98d9df88-b7ef-fdfb-7d90-2fa7a9d7bab5@redhat.com>
- <20201022125759.GA1685526@kroah.com> <20201022135036.GA1787470@kroah.com>
- <134f162d711d466ebbd88906fae35b33@AcuMS.aculab.com>
- <935f7168-c2f5-dd14-7124-412b284693a2@redhat.com>
- <20201023175857.GA3576660@ZenIV.linux.org.uk>
- <20201023182713.GG2672@gate.crashing.org>
- <e9a3136ead214186877804aabde74b38@AcuMS.aculab.com>
- <20201024172903.GK2672@gate.crashing.org>
-In-Reply-To: <20201024172903.GK2672@gate.crashing.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Sun, 25 Oct 2020 00:44:41 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7199C0613CE;
+        Sat, 24 Oct 2020 21:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=DxxJd92FLDAv/H5nin4JPkQwQ23uTochIP++Tt4+efY=; b=UAcieGgnohyfuSIeKBm3Dwy5cP
+        zg6CFyhEqrrEV4aAhwoxHt3p8g+4adtsCoJONi9UpeOwCNKGduGpuwMoDyGGFH2ys9uNutDwapoA0
+        tbuXlVWBi9lGFkHykj9Kj/yEst6bps7EwzBzfW5dOHNPUbm1VhsFQLp7W/PFfMmWNLglLhKkL2XwZ
+        JQoPGva4CnqoIHocphyfzamQOifJvGJFtbM7msBvcVrNHhxrxiZa+Cu8ARd3sCSKpB1b09tuLHtZT
+        W+j4y5ZpWhNH25rwdZ5tM+6KaCBXNY20X9kKZr1yBZykLVF9OpEzD9yA1RDpMZHbGrjRoqGTrtEn9
+        5IxbOCZQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kWXtW-0000vf-Uz; Sun, 25 Oct 2020 04:44:39 +0000
+Date:   Sun, 25 Oct 2020 04:44:38 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     linux-block@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [RFC] Removing b_end_io
+Message-ID: <20201025044438.GI20115@casper.infradead.org>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Segher Boessenkool
-> Sent: 24 October 2020 18:29
-> 
-> On Fri, Oct 23, 2020 at 09:28:59PM +0000, David Laight wrote:
-> > From: Segher Boessenkool
-> > > Sent: 23 October 2020 19:27
-> > > On Fri, Oct 23, 2020 at 06:58:57PM +0100, Al Viro wrote:
-> > > > On Fri, Oct 23, 2020 at 03:09:30PM +0200, David Hildenbrand wrote:
-> > > > On arm64 when callee expects a 32bit argument, the caller is *not* responsible
-> > > > for clearing the upper half of 64bit register used to pass the value - it only
-> > > > needs to store the actual value into the lower half.  The callee must consider
-> > > > the contents of the upper half of that register as undefined.  See AAPCS64 (e.g.
-> > > > https://github.com/ARM-software/abi-aa/blob/master/aapcs64/aapcs64.rst#parameter-passing-rules
-> > > > ); AFAICS, the relevant bit is
-> > > > 	"Unlike in the 32-bit AAPCS, named integral values must be narrowed by
-> > > > the callee rather than the caller."
-> > >
-> > > Or the formal rule:
-> > >
-> > > C.9 	If the argument is an Integral or Pointer Type, the size of the
-> > > 	argument is less than or equal to 8 bytes and the NGRN is less
-> > > 	than 8, the argument is copied to the least significant bits in
-> > > 	x[NGRN]. The NGRN is incremented by one. The argument has now
-> > > 	been allocated.
-> >
-> > So, in essence, if the value is in a 64bit register the calling
-> > code is independent of the actual type of the formal parameter.
-> > Clearly a value might need explicit widening.
-> 
-> No, this says that if you pass a 32-bit integer in a 64-bit register,
-> then the top 32 bits of that register hold an undefined value.
 
-That's sort of what I meant.
-The 'normal' junk in the hight bits will there because the variable
-in the calling code is wider.
+On my laptop, I have about 31MB allocated to buffer_heads.
 
-> > I've found a copy of the 64 bit arm instruction set.
-> > Unfortunately it is alpha sorted and repetitive so shows none
-> > of the symmetry and makes things difficult to find.
-> 
-> All of this is ABI, not ISA.  Look at the AAPCS64 pointed to above.
-> 
-> > But, contrary to what someone suggested most register writes
-> > (eg from arithmetic) seem to zero/extend the high bits.
-> 
-> Everything that writes a "w" does, yes.  But that has nothing to do with
-> the parameter passing rules, that is ABI.  It just means that very often
-> a 32-bit integer will be passed zero-extended in a 64-bit register, but
-> that is just luck (or not, it makes finding bugs harder ;-) )
+buffer_head       182728 299910    104   39    1 : tunables    0    0    0 : slabdata   7690   7690      0
 
-Working out why the code is wrong is more of an ISA issue than an ABI one.
-It may be an ABI one, but the analysis is ISA.
+Reducing the size of the buffer_head by 8 bytes gets us to 96 bytes,
+which means we get 42 per page instead of 39 and saves me 2MB of memory.
 
-I've written a lot of asm over the years - decoding compiler generated
-asm isn't that hard.
-At least ARM doesn't have annulled delay slots.
+I think b_end_io() is ripe for removal.  It's only used while the I/O
+is in progress, and it's always set to end_bio_bh_io_sync() which
+may set the quiet bit, calls ->b_end_io and calls bio_put().
 
-	David
+So how about this as an approach?  Only another 40 or so call-sites
+to take care of to eliminate b_end_io from the buffer_head.  Yes, this
+particular example should be entirely rewritten to do away with buffer
+heads, but that's been true since 2006.  I'm looking for an approach
+which can be implemented quickly since the buffer_head does not appear
+to be going away any time soon.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+diff --git a/drivers/md/md-bitmap.c b/drivers/md/md-bitmap.c
+index d61b524ae440..7f985b138372 100644
+--- a/drivers/md/md-bitmap.c
++++ b/drivers/md/md-bitmap.c
+@@ -314,14 +314,16 @@ static void write_page(struct bitmap *bitmap, struct page *page, int wait)
+ 		md_bitmap_file_kick(bitmap);
+ }
+ 
+-static void end_bitmap_write(struct buffer_head *bh, int uptodate)
++static void end_bitmap_write(struct bio *bio)
+ {
++	struct buffer_head *bh = bio->bi_private;
+ 	struct bitmap *bitmap = bh->b_private;
+ 
+-	if (!uptodate)
++	if (bio->bi_status != BLK_STS_OK)
+ 		set_bit(BITMAP_WRITE_ERROR, &bitmap->flags);
+ 	if (atomic_dec_and_test(&bitmap->pending_writes))
+ 		wake_up(&bitmap->write_wait);
++	bio_put(bio);
+ }
+ 
+ static void free_buffers(struct page *page)
+@@ -388,12 +390,11 @@ static int read_page(struct file *file, unsigned long index,
+ 			else
+ 				count -= (1<<inode->i_blkbits);
+ 
+-			bh->b_end_io = end_bitmap_write;
+ 			bh->b_private = bitmap;
+ 			atomic_inc(&bitmap->pending_writes);
+ 			set_buffer_locked(bh);
+ 			set_buffer_mapped(bh);
+-			submit_bh(REQ_OP_READ, 0, bh);
++			bh_submit(bh, REQ_OP_READ, end_bitmap_write);
+ 		}
+ 		blk_cur++;
+ 		bh = bh->b_this_page;
+diff --git a/fs/buffer.c b/fs/buffer.c
+index d468ed9981e0..668c586b2ed1 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3022,8 +3022,9 @@ static void end_bio_bh_io_sync(struct bio *bio)
+ 	bio_put(bio);
+ }
+ 
+-static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+-			 enum rw_hint write_hint, struct writeback_control *wbc)
++static void __bh_submit(struct buffer_head *bh, unsigned req_flags,
++		enum rw_hint write_hint, struct writeback_control *wbc,
++		bio_end_io_t end_bio)
+ {
+ 	struct bio *bio;
+ 
+@@ -3036,7 +3037,7 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 	/*
+ 	 * Only clear out a write error when rewriting
+ 	 */
+-	if (test_set_buffer_req(bh) && (op == REQ_OP_WRITE))
++	if (test_set_buffer_req(bh) && (op_is_write(req_flags)))
+ 		clear_buffer_write_io_error(bh);
+ 
+ 	bio = bio_alloc(GFP_NOIO, 1);
+@@ -3050,14 +3051,14 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 	bio_add_page(bio, bh->b_page, bh->b_size, bh_offset(bh));
+ 	BUG_ON(bio->bi_iter.bi_size != bh->b_size);
+ 
+-	bio->bi_end_io = end_bio_bh_io_sync;
++	bio->bi_end_io = end_bio;
+ 	bio->bi_private = bh;
+ 
+ 	if (buffer_meta(bh))
+-		op_flags |= REQ_META;
++		req_flags |= REQ_META;
+ 	if (buffer_prio(bh))
+-		op_flags |= REQ_PRIO;
+-	bio_set_op_attrs(bio, op, op_flags);
++		req_flags |= REQ_PRIO;
++	bio->bi_opf = req_flags;
+ 
+ 	/* Take care of bh's that straddle the end of the device */
+ 	guard_bio_eod(bio);
+@@ -3068,6 +3069,12 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 	}
+ 
+ 	submit_bio(bio);
++}
++
++static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
++			 enum rw_hint write_hint, struct writeback_control *wbc)
++{
++	__bh_submit(bh, op | op_flags, write_hint, wbc, end_bio_bh_io_sync);
+ 	return 0;
+ }
+ 
+@@ -3077,6 +3084,11 @@ int submit_bh(int op, int op_flags, struct buffer_head *bh)
+ }
+ EXPORT_SYMBOL(submit_bh);
+ 
++void bh_submit(struct buffer_head *bh, unsigned req_flags, bio_end_io_t end_io)
++{
++	__bh_submit(bh, req_flags, 0, NULL, end_io);
++}
++
+ /**
+  * ll_rw_block: low-level access to block devices (DEPRECATED)
+  * @op: whether to %READ or %WRITE
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 6b47f94378c5..cc9113befe15 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -203,6 +203,7 @@ int sync_dirty_buffer(struct buffer_head *bh);
+ int __sync_dirty_buffer(struct buffer_head *bh, int op_flags);
+ void write_dirty_buffer(struct buffer_head *bh, int op_flags);
+ int submit_bh(int, int, struct buffer_head *);
++void bh_submit(struct buffer_head *, unsigned req_flags, bio_end_io_t);
+ void write_boundary_block(struct block_device *bdev,
+ 			sector_t bblock, unsigned blocksize);
+ int bh_uptodate_or_lock(struct buffer_head *bh);
