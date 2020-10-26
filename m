@@ -1,97 +1,125 @@
-Return-Path: <SRS0=i0oD=EB=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=+SaT=EC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64564C56201
-	for <linux-block@archiver.kernel.org>; Mon, 26 Oct 2020 23:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7C3C2D0A3
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 00:02:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E01920773
-	for <linux-block@archiver.kernel.org>; Mon, 26 Oct 2020 23:59:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603756783;
-	bh=cGWIoh6h6aOYlfAIP7Hm21DZreYR0Se6xpETKsgYV8I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=PHz+wMv3c5TnvhP8SBrqgVHWTuGLRsvr8XHlIpamCJisBQf0P3HAXq+GFJjKEtPWQ
-	 3hR6juWspxcx+RQT44FvazLMNOOWWKHkpOWuFGr8YX62RKHKzpuU0lgNP2E1cF+4ju
-	 CrUjan3Ic5JQ5pbF9DA4peTs/gT/8LeQL6udDVPw=
+	by mail.kernel.org (Postfix) with ESMTP id 05EF820872
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 00:02:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZWDgA8+y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2410899AbgJZX7m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Oct 2020 19:59:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37240 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2436621AbgJZX4v (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Oct 2020 19:56:51 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7FCA520882;
-        Mon, 26 Oct 2020 23:56:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603756611;
-        bh=cGWIoh6h6aOYlfAIP7Hm21DZreYR0Se6xpETKsgYV8I=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cvexm3YBGmxPaCliIvS4g18uCwtzLrkgfUxyJF5SSEFev4tfd9oCJoHdRRv30QriH
-         fjkQqs+Sa5UvUp8ka7ibKrJ++3b9gagdJR6z3EW8/MKTJcIN0nRsOLQYQWUNSFzZh+
-         9mqzT0fjU3N+W2JUqf7EfJEXhf0YHYhqJ/haVjsg=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Xiubo Li <xiubli@redhat.com>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 5.4 78/80] nbd: make the config put is called before the notifying the waiter
-Date:   Mon, 26 Oct 2020 19:55:14 -0400
-Message-Id: <20201026235516.1025100-78-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201026235516.1025100-1-sashal@kernel.org>
-References: <20201026235516.1025100-1-sashal@kernel.org>
+        id S1729969AbgJ0ACG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Oct 2020 20:02:06 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34969 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2411092AbgJZX4R (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Oct 2020 19:56:17 -0400
+Received: by mail-pg1-f194.google.com with SMTP id f38so6986640pgm.2
+        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2020 16:56:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=wqqvkA3oKUwkO5eXRPOBy8lXyQg0CiUtokie2wwagwI=;
+        b=ZWDgA8+yUlKx2dZgiyZDe66Bv6aQYo4o4sBrgULvsJ7L1mqryuSoN/tRsTLtRNf5gl
+         QA5GzgrsJ4IIXk6KefYiWNloPp5dTgRya5PAi5H2X1Ck5liCNMZ9plZFbXAFJkRhGENX
+         zRADl3Fzwzqt5UTeMExAEl9+J6C00UJYGVeM9r+kQpMj10I4tNzbDp+KUhpG26z8ohQ5
+         u9LGW1VxEtuEY5uYo6W0qmYrYYX9WPLdyfh3K/l7hHXtbXds+UPAtJe/6QdzpKUrKNEa
+         IHnev7OPcOoKpcEMuZBXfSj3e5H/bPp0SHxbMGuGbkkGN2ORlWbNlGQCKJOUg6Ub1kcx
+         WOrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wqqvkA3oKUwkO5eXRPOBy8lXyQg0CiUtokie2wwagwI=;
+        b=HUnfyNNJiottsAg6qRKrNfriJ+TIdqYqbHTgTk4alig8lDDQZcrj5gvgVghm+37iQ6
+         z3wwn06ftm0sqmIHNHRZN+qxmSlnO9d6tTYAqmBMlFPN8IM/kM9bUDORY/GmVYHQXE/2
+         uoqzBF9BHdMjxLKqnkg192vD5C9ic1wyhSnv3dqxrs+/j7l2VNPxqc1M4hTZH4UHuXmC
+         J6bDblLotFNy1WaUT3N+IO4Xsto1JuyvyyXQNGQV5ikc/1sA96pF0uWsmhlhjfeFO2Ih
+         JWJtu36r2yBldtHAlHho+E+qfSeQTwbtLCf92XycjCjfyi8AgLZvkdkb5LowyF+jYuf0
+         Ibdw==
+X-Gm-Message-State: AOAM5329aPEnI46HUJcJDjMAcC6FrGUdTTxnnvwoDU7t5/LM7gpvEbm2
+        PhDgKkKjtTPT0bJGfHANXqgroQ==
+X-Google-Smtp-Source: ABdhPJzXWytxnG400Dp//klgHvFRu6jftuSrTTs7sW7oWyETnW8LM2mlLlQ2a53Jfzf5mLG9B/rX/w==
+X-Received: by 2002:a63:5f42:: with SMTP id t63mr569296pgb.0.1603756574857;
+        Mon, 26 Oct 2020 16:56:14 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id s38sm3637009pgm.62.2020.10.26.16.56.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Oct 2020 16:56:14 -0700 (PDT)
+Subject: Re: [REGRESSION] mm: process_vm_readv testcase no longer works after
+ compat_prcoess_vm_readv removed
+To:     Kyle Huey <me@kylehuey.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Robert O'Callahan <robert@ocallahan.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        "moderated list:ARM PORT" <linux-arm-kernel@lists.infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        "open list:FILESYSTEMS (VFS and infrastructure)" 
+        <linux-fsdevel@vger.kernel.org>, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+References: <CAP045Aqrsb=CXHDHx4nS-pgg+MUDj14r-kN8_Jcbn-NAUziVag@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <70d5569e-4ad6-988a-e047-5d12d298684c@kernel.dk>
+Date:   Mon, 26 Oct 2020 17:56:11 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAP045Aqrsb=CXHDHx4nS-pgg+MUDj14r-kN8_Jcbn-NAUziVag@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xiubo Li <xiubli@redhat.com>
+On 10/26/20 4:55 PM, Kyle Huey wrote:
+> A test program from the rr[0] test suite, vm_readv_writev[1], no
+> longer works on 5.10-rc1 when compiled as a 32 bit binary and executed
+> on a 64 bit kernel. The first process_vm_readv call (on line 35) now
+> fails with EFAULT. I have bisected this to
+> c3973b401ef2b0b8005f8074a10e96e3ea093823.
+> 
+> It should be fairly straightforward to extract the test case from our
+> repository into a standalone program.
 
-[ Upstream commit 87aac3a80af5cbad93e63250e8a1e19095ba0d30 ]
+Can you check with this applied?
 
-There has one race case for ceph's rbd-nbd tool. When do mapping
-it may fail with EBUSY from ioctl(nbd, NBD_DO_IT), but actually
-the nbd device has already unmaped.
+diff --git a/mm/process_vm_access.c b/mm/process_vm_access.c
+index fd12da80b6f2..05676722d9cd 100644
+--- a/mm/process_vm_access.c
++++ b/mm/process_vm_access.c
+@@ -273,7 +273,8 @@ static ssize_t process_vm_rw(pid_t pid,
+ 		return rc;
+ 	if (!iov_iter_count(&iter))
+ 		goto free_iov_l;
+-	iov_r = iovec_from_user(rvec, riovcnt, UIO_FASTIOV, iovstack_r, false);
++	iov_r = iovec_from_user(rvec, riovcnt, UIO_FASTIOV, iovstack_r,
++				in_compat_syscall());
+ 	if (IS_ERR(iov_r)) {
+ 		rc = PTR_ERR(iov_r);
+ 		goto free_iov_l;
 
-It dues to if just after the wake_up(), the recv_work() is scheduled
-out and defers calling the nbd_config_put(), though the map process
-has exited the "nbd->recv_task" is not cleared.
-
-Signed-off-by: Xiubo Li <xiubli@redhat.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7c577cabb9c3b..742f8160b6e28 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -787,9 +787,9 @@ static void recv_work(struct work_struct *work)
- 
- 		blk_mq_complete_request(blk_mq_rq_from_pdu(cmd));
- 	}
-+	nbd_config_put(nbd);
- 	atomic_dec(&config->recv_threads);
- 	wake_up(&config->recv_wq);
--	nbd_config_put(nbd);
- 	kfree(args);
- }
- 
 -- 
-2.25.1
+Jens Axboe
 
