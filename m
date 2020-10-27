@@ -2,231 +2,233 @@ Return-Path: <SRS0=+SaT=EC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 815D8C4363A
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 04:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 643A4C4363A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 04:26:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 078302158C
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 04:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFA2F21556
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 04:26:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XJ7cgHfz";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="qzjAbGks"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpD1actg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409206AbgJ0EJI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Oct 2020 00:09:08 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:20329 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2409072AbgJ0EJI (ORCPT
+        id S2505399AbgJ0E0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Oct 2020 00:26:47 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:37152 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2505398AbgJ0E0q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Oct 2020 00:09:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1603771746; x=1635307746;
-  h=from:to:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=Cr928VxoWQTe4PMAbAjLId32ReB9Jg5ba3Fdr90jcmk=;
-  b=XJ7cgHfzvtaymtyLi/4vB6iOWI+nGLrFP1wncKuBHeWtYGIIO2qcoYj1
-   dL/7i1ftHOqu0EkAHBi+J8v6sumSkhM5UpGfSGbvuRiTuxcZrOAQs9Zny
-   YL/h3FOWQUsiMBByffLzPyrXwHY6pYiTxi907l7OifXC1oC1qCkKLy4XI
-   jPb3ua3bXVbPdSB57vGNDcAR5ck0ukkEenZMJ/wl3YqPzfgIXAtiHaBHd
-   8DN2TTiGGFXAA57hVtlKD9YJ94dUr7rf4n/u52rssy0XGhN6+qtGApsxA
-   2MYIm/c6MgGxFY/ZVl7pxaGdkkFKu/5WaM0JTFQrGTAbbLkfgAXZPpYFZ
-   A==;
-IronPort-SDR: GNyETeTag9QFFmd5CtWTFm8xo746JPECEKz1iBghZ/XEtR1YNm7jKnmVMLuoRTAWlzHO2m9fa5
- 2pkklKU5bnC10+8+mnWORMhT0oxZnnbGD+7UtgmNigjDD7cr3fO2Aa3hLWmiVaKvXOVqMe282J
- dhSTIoAM7Mj4rjpj9uR3f9H16SXRMGxXC2jjSjl+qhsdL0Ph56FU0RPPC3zi0KiE58+4J77FnS
- bshUQvs7jToUi31AmRlbIis6zpdzKWaj1g3YOZKZfHskgK/gSPOYukZEAsezgZx1LGZFqwEH28
- TZc=
-X-IronPort-AV: E=Sophos;i="5.77,422,1596470400"; 
-   d="scan'208";a="155383235"
-Received: from mail-dm6nam12lp2170.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.170])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Oct 2020 12:09:06 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mmuoCyk3KoR+w1lAUveXNcaUYKFWs7BgPVJs69Gd7Bx7zSjxH+QmFdNDVRF0FV4Z/4n61WMbWsgfVPxGD9VG5zw0ttmKW6BGUhUMMempDOpQ0+7dGHnKnmhqjohiWV++QpjqSooVZp25RVWxO+ZhNsaucV71x++gXxqQKgRGW9xuHBZw4NPjr5ksfrVi3tL6sXkIzUVUlJ0TbFosmBtU/ZcU1KiAm9woJSDv1PaERZxwaCL6z9p/cPuCEtqpO5YCZsTJYFJodbe3KlgzgGId9Wigtoq6oxaLPt0orBMDdllXcSJGbddyvifUB/EQ2zmmWbUotybOAdXyjWuIwxob6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TFNxFpIqFwhcQHv0KiKYEzyyueGlzUUUvS09yZNTIm8=;
- b=PHtnyMKW/ux7CXy9rSK22HEGz2SUE+h+NAdDMnV+o38IBUkYVCGN9E6AN3j/QkhoWPxhjgPAFBrORlxYFIhIXla4KtbvAD2DvOij5SATf0xFwd5DwTqQT3dfpb4E/A4HUgh2KqMKA7w+JjqxnIfCdMmNJW8bk49vMhBvkwriG/S96rBijvk3HoKYMXT1FBMYE5whRA3FTsiy1GE97H+q5uMjLYT+Vid0sslf5F7CWYHeJPoYAXtoU7zZLnCkEOaa6yhfDqtcgWxucWalMy9OBxyD9tJkqkfZRNC/jAPWKRNMOvlLTok/xaxiSCyHNEl+XVOVSHbXeySJPCU9YySV9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Tue, 27 Oct 2020 00:26:46 -0400
+Received: by mail-qt1-f196.google.com with SMTP id h19so160711qtq.4
+        for <linux-block@vger.kernel.org>; Mon, 26 Oct 2020 21:26:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TFNxFpIqFwhcQHv0KiKYEzyyueGlzUUUvS09yZNTIm8=;
- b=qzjAbGksfdDsOeA4IbuzEqGpU5BPut5a3QxZoSmQCniM1FUK2s3OOELMsc3RD8Xgf7KblXPYf1uXvz6iQcGCbCOzEvPweTnMKZxIHr5Xx/9lc82YqQgc55cxn+K90O5h5QGRF0LHp7r8Bs/Hsv59DtwBmTm7s9QtxVsiqjSlVcM=
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com (2603:10b6:208:1ca::23)
- by BL0PR04MB4770.namprd04.prod.outlook.com (2603:10b6:208:49::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21; Tue, 27 Oct
- 2020 04:09:05 +0000
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::4c3e:2b29:1dc5:1a85]) by BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::4c3e:2b29:1dc5:1a85%7]) with mapi id 15.20.3477.028; Tue, 27 Oct 2020
- 04:09:05 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Tian Tao <tiantao6@hisilicon.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] skd: replace spin_lock_irqsave by spin_lock in hard IRQ
-Thread-Topic: [PATCH] skd: replace spin_lock_irqsave by spin_lock in hard IRQ
-Thread-Index: AQHWp0fG0krxUmEHkkSBi3Qjiu2mWw==
-Date:   Tue, 27 Oct 2020 04:09:05 +0000
-Message-ID: <BL0PR04MB65149BE243D53CEF34C992C5E7160@BL0PR04MB6514.namprd04.prod.outlook.com>
-References: <1603243006-9189-1-git-send-email-tiantao6@hisilicon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: hisilicon.com; dkim=none (message not signed)
- header.d=none;hisilicon.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:3dd3:d7e5:5981:e303]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 5abbd289-a12b-4605-8b77-08d87a2e0ba4
-x-ms-traffictypediagnostic: BL0PR04MB4770:
-x-microsoft-antispam-prvs: <BL0PR04MB47704F36EF747A65FF995FC6E7160@BL0PR04MB4770.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2657;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: iUgs9XwArQlkBBsxK7yXBJpriC8aN1w6JO/AGJ4ZMI5+bRb8nph4FnzWMjjXGV6eiK6rzCEMe6NHAEBJYkIUnQiqzXa+0R5XWDIq21GWvpjjp/YdZCmgtQxf4gGl0rwJzEvg0XfG54w8jyx8SJiR32owq/+/CPahS2jE/pMXZ6LuPqqCsnMAxqQhu7aqfYhKApN4XA+3UXszaZaEEVR1vT/dM3G5zDm9fV4wtD6KfGzIEszJNs74I9fQRmkYRmWLNeezvZoDI+4SLaI+w2bgBm6EhW2GJh1zcx3ddGVkwwK/lZcL2gQBqOeIYooES6WeeWHhRCSK5tTlSauf9BoQRA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR04MB6514.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(396003)(136003)(39860400002)(366004)(86362001)(91956017)(66946007)(66446008)(7696005)(64756008)(52536014)(33656002)(76116006)(66476007)(478600001)(71200400001)(66556008)(83380400001)(5660300002)(2906002)(186003)(55016002)(110136005)(316002)(8676002)(6506007)(53546011)(8936002)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: ybBf7aKuour32JXLNCXXSBZiEnB7nhyzr7pmotEdLMlmj/r+7yuA8p5Lq0rAzg7K7r8ej1qiqQMueqe/1UfYuQA/8c+x9nF1zu6f6sH7yUhJcvwD1UNcG4eRvFzZ2dgHfQEWXdbcraTte+cARnW4qWgzQbOxlTZcSk2Z8WjlcoFFeVOsJ9kWw/GhBl6ziSRSGZq3HGBYZQmv4cKRkNhKHRF5x8iZQa5X0t32Wbm6XElQ6HeDON/bHuE07y3CDhynjjDqzYutW8RsjXrqHLDbLpNDfYO0b3/hLBrxYx3H8hRuTE5Am/w6bValBaffco4JB72PFU8umlMvix6mOVl5+9PRJAHmPPoGmOSoskge753r+YqX9CkXFL6zlEOd3HGWmvKe9enlq+TJ0ILxFE5ZBosqJYU70noJRhO7KKfFc82TMYD1wveq/D9q40aMSJdf0YMMCguxtEsJZfgci2w6L7DwnjtKCH8AziCLawHXv9975/ry5e03Ks+PCE0TH8fw+xQEYnUOM/uUbOfFnUe7rcbrT2FOy5Xe1mzAmFZwOKICIO2sPgBlc5hLAc8Najo0mzs7+cLa8xwc5pjOA6qdiIPLgdYnx1AGtJQuNgSzWkH6uwqh1UP5DmNnmrMoWcfb6xQNdb4t4qjDdHPHIIXIC5fa+szzAj3TwZ2sj3hDHqVIAWOJYw6VW/AJMwaTEZV30amXfAmKIgvAFGqE2CVeEA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8oMvcF1c8a21/0G+yKHJFxhJNQuYsqkizB3YeUNdN0o=;
+        b=DpD1actgnnfTgbMVlgZoSNAOBLJ4S1t7151TltvxtSX0AqO9BAtvqKYULt1OfKUJV8
+         L42AofpEAkORbR+VsszI1xf2xuDSbw5RtB51b82VUjCL39FtTSC4YOhh8nX9SjRkIE0t
+         RzLtU0/5DQLHMlt0eHq6fFz9iaL3h4mO52aJVjx1TDJl2feOvvU7jIzEVUihY5hRksJ6
+         FWT55U3zQt08rESSbVq6rSEy/z5WynvCyHkdWNWrXijdCADiYEypsteg3i/vO3YX9aJf
+         qLFwNto3EmRfs1h7hrymJ/cW1n+RaFXVi+apR55QxvwwMLv2d18JuzX1OSsoBbGx9Kzm
+         301w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8oMvcF1c8a21/0G+yKHJFxhJNQuYsqkizB3YeUNdN0o=;
+        b=mV6dKK48WtJZ5ZWmCFfjVQt8t5xKx7gJiN7hOdAHYWOp6G9OnOXST7SLhys149QA8+
+         f+YZWwGd8AsFRu24bCIovY0RjjZ7HBGU5H5yHn3SGNX2FAEQeZ7WOA34aSiPHY0xH9+I
+         6QVitoG6IbDlIPcTbCiqoiGIlxjIafI/oLpwSrAg/3rogb5Xgl7tnbspOhfZYK7oNR3y
+         U+lzCQtpEiqHZvgeX0j7ZHw41DFhg6J1Nb9cCM1OfQzflUNEVcAIMkIwfJbMJj62AAQl
+         EY+iirXrpfkf10IPrS2lrkEVeqY6jsdFQ7/HC42DZnTrQFSwSRld48xXb1+lxVQdRXTx
+         yfbA==
+X-Gm-Message-State: AOAM532b5fjGT1jrl35hHW5x06/dsTYZh8eDujuga43hZPQyTD4eRbhm
+        MAX5FAZJ/N0wnm3ZKevlzDSOcMXhJkN+XWGfsihgc1qdqdl3sA==
+X-Google-Smtp-Source: ABdhPJzjf7o72ZRWFXxT0ubUA6BrABUawNWdQe7BsNtjgCyx8w1Ol3SmzZ1hHHYnl3z3bvQEt5jUlpKNUkAobvHz2Mo=
+X-Received: by 2002:ac8:67c3:: with SMTP id r3mr429494qtp.297.1603772804804;
+ Mon, 26 Oct 2020 21:26:44 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR04MB6514.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5abbd289-a12b-4605-8b77-08d87a2e0ba4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2020 04:09:05.3749
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 11ci+8/yYc5T+Z9yXi6LCWavcmJhiv7GOQJ/uCVOSA+DwPWOT2RqmiQvFyioAwCLHlQ1HnLSayS+EfGxELPLAw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR04MB4770
+References: <20200324031942.GA3060@ming.t460p> <20200324035313.GE30700@redhat.com>
+ <CAA70yB5mFgKKBbJRQ=3Nv+XbVXbSUjmnAGOsUtBT2+s9f4az+Q@mail.gmail.com>
+ <CAA70yB73hVgt-KppSYaXuh_yOpmJ0zQi3hWP-236a0oUTnOxpg@mail.gmail.com> <156351603710306@mail.yandex-team.ru>
+In-Reply-To: <156351603710306@mail.yandex-team.ru>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Tue, 27 Oct 2020 12:26:33 +0800
+Message-ID: <CAA70yB6_vKHtWLqpkQhN9xdVsbtGxOFt6P2j5u8J1Y2SCXMvdQ@mail.gmail.com>
+Subject: Re: very inaccurate %util of iostat
+To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Cc:     Mike Snitzer <snitzer@redhat.com>, Ming Lei <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "mpatocka@redhat.com" <mpatocka@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/10/21 10:16, Tian Tao wrote:=0A=
-> The code has been in a irq-disabled context since it is hard IRQ. There=
-=0A=
-> is no necessity to do it again.=0A=
-> =0A=
-> Signed-off-by: Tian Tao <tiantao6@hisilicon.com>=0A=
-> ---=0A=
->  drivers/block/skd_main.c | 25 ++++++++++---------------=0A=
->  1 file changed, 10 insertions(+), 15 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c=0A=
-> index ae6454c..e80b670 100644=0A=
-> --- a/drivers/block/skd_main.c=0A=
-> +++ b/drivers/block/skd_main.c=0A=
-> @@ -2368,40 +2368,37 @@ static int skd_unquiesce_dev(struct skd_device *s=
-kdev)=0A=
->  static irqreturn_t skd_reserved_isr(int irq, void *skd_host_data)=0A=
->  {=0A=
->  	struct skd_device *skdev =3D skd_host_data;=0A=
-> -	unsigned long flags;=0A=
->  =0A=
-> -	spin_lock_irqsave(&skdev->lock, flags);=0A=
-> +	spin_lock(&skdev->lock);=0A=
->  	dev_dbg(&skdev->pdev->dev, "MSIX =3D 0x%x\n",=0A=
->  		SKD_READL(skdev, FIT_INT_STATUS_HOST));=0A=
->  	dev_err(&skdev->pdev->dev, "MSIX reserved irq %d =3D 0x%x\n", irq,=0A=
->  		SKD_READL(skdev, FIT_INT_STATUS_HOST));=0A=
->  	SKD_WRITEL(skdev, FIT_INT_RESERVED_MASK, FIT_INT_STATUS_HOST);=0A=
-> -	spin_unlock_irqrestore(&skdev->lock, flags);=0A=
-> +	spin_unlock(&skdev->lock);=0A=
->  	return IRQ_HANDLED;=0A=
->  }=0A=
->  =0A=
->  static irqreturn_t skd_statec_isr(int irq, void *skd_host_data)=0A=
->  {=0A=
->  	struct skd_device *skdev =3D skd_host_data;=0A=
-> -	unsigned long flags;=0A=
->  =0A=
-> -	spin_lock_irqsave(&skdev->lock, flags);=0A=
-> +	spin_lock(&skdev->lock);=0A=
->  	dev_dbg(&skdev->pdev->dev, "MSIX =3D 0x%x\n",=0A=
->  		SKD_READL(skdev, FIT_INT_STATUS_HOST));=0A=
->  	SKD_WRITEL(skdev, FIT_ISH_FW_STATE_CHANGE, FIT_INT_STATUS_HOST);=0A=
->  	skd_isr_fwstate(skdev);=0A=
-> -	spin_unlock_irqrestore(&skdev->lock, flags);=0A=
-> +	spin_unlock(&skdev->lock);=0A=
->  	return IRQ_HANDLED;=0A=
->  }=0A=
->  =0A=
->  static irqreturn_t skd_comp_q(int irq, void *skd_host_data)=0A=
->  {=0A=
->  	struct skd_device *skdev =3D skd_host_data;=0A=
-> -	unsigned long flags;=0A=
->  	int flush_enqueued =3D 0;=0A=
->  	int deferred;=0A=
->  =0A=
-> -	spin_lock_irqsave(&skdev->lock, flags);=0A=
-> +	spin_lock(&skdev->lock);=0A=
->  	dev_dbg(&skdev->pdev->dev, "MSIX =3D 0x%x\n",=0A=
->  		SKD_READL(skdev, FIT_INT_STATUS_HOST));=0A=
->  	SKD_WRITEL(skdev, FIT_ISH_COMPLETION_POSTED, FIT_INT_STATUS_HOST);=0A=
-> @@ -2415,7 +2412,7 @@ static irqreturn_t skd_comp_q(int irq, void *skd_ho=
-st_data)=0A=
->  	else if (!flush_enqueued)=0A=
->  		schedule_work(&skdev->start_queue);=0A=
->  =0A=
-> -	spin_unlock_irqrestore(&skdev->lock, flags);=0A=
-> +	spin_unlock(&skdev->lock);=0A=
->  =0A=
->  	return IRQ_HANDLED;=0A=
->  }=0A=
-> @@ -2423,27 +2420,25 @@ static irqreturn_t skd_comp_q(int irq, void *skd_=
-host_data)=0A=
->  static irqreturn_t skd_msg_isr(int irq, void *skd_host_data)=0A=
->  {=0A=
->  	struct skd_device *skdev =3D skd_host_data;=0A=
-> -	unsigned long flags;=0A=
->  =0A=
-> -	spin_lock_irqsave(&skdev->lock, flags);=0A=
-> +	spin_lock(&skdev->lock);=0A=
->  	dev_dbg(&skdev->pdev->dev, "MSIX =3D 0x%x\n",=0A=
->  		SKD_READL(skdev, FIT_INT_STATUS_HOST));=0A=
->  	SKD_WRITEL(skdev, FIT_ISH_MSG_FROM_DEV, FIT_INT_STATUS_HOST);=0A=
->  	skd_isr_msg_from_dev(skdev);=0A=
-> -	spin_unlock_irqrestore(&skdev->lock, flags);=0A=
-> +	spin_unlock(&skdev->lock);=0A=
->  	return IRQ_HANDLED;=0A=
->  }=0A=
->  =0A=
->  static irqreturn_t skd_qfull_isr(int irq, void *skd_host_data)=0A=
->  {=0A=
->  	struct skd_device *skdev =3D skd_host_data;=0A=
-> -	unsigned long flags;=0A=
->  =0A=
-> -	spin_lock_irqsave(&skdev->lock, flags);=0A=
-> +	spin_lock(&skdev->lock);=0A=
->  	dev_dbg(&skdev->pdev->dev, "MSIX =3D 0x%x\n",=0A=
->  		SKD_READL(skdev, FIT_INT_STATUS_HOST));=0A=
->  	SKD_WRITEL(skdev, FIT_INT_QUEUE_FULL, FIT_INT_STATUS_HOST);=0A=
-> -	spin_unlock_irqrestore(&skdev->lock, flags);=0A=
-> +	spin_unlock(&skdev->lock);=0A=
->  	return IRQ_HANDLED;=0A=
->  }=0A=
->  =0A=
-> =0A=
-=0A=
-Looks OK to me.=0A=
-=0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On Mon, Oct 26, 2020 at 7:17 PM Konstantin Khlebnikov
+<khlebnikov@yandex-team.ru> wrote:
+>
+> 23.10.2020, 08:51, "Weiping Zhang" <zwp10758@gmail.com>:
+>
+> On Fri, Oct 23, 2020 at 10:48 AM Weiping Zhang <zwp10758@gmail.com> wrote:
+>
+>
+>  On Tue, Mar 24, 2020 at 11:54 AM Mike Snitzer <snitzer@redhat.com> wrote:
+>  >
+>  > On Mon, Mar 23 2020 at 11:19pm -0400,
+>  > Ming Lei <ming.lei@redhat.com> wrote:
+>  >
+>  > > Hi Guys,
+>  > >
+>  > > Commit 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
+>  > > changes calculation of 'io_ticks' a lot.
+>  > >
+>  > > In theory, io_ticks counts the time when there is any IO in-flight or in-queue,
+>  > > so it has to rely on in-flight counting of IO.
+>  > >
+>  > > However, commit 5b18b5a73760 changes io_ticks's accounting into the
+>  > > following way:
+>  > >
+>  > > stamp = READ_ONCE(part->stamp);
+>  > > if (unlikely(stamp != now)) {
+>  > > if (likely(cmpxchg(&part->stamp, stamp, now) == stamp))
+>  > > __part_stat_add(part, io_ticks, 1);
+>  > > }
+>  > >
+>  > > So this way doesn't use any in-flight IO's info, simply adding 1 if stamp
+>  > > changes compared with previous stamp, no matter if there is any in-flight
+>  > > IO or not.
+>  > >
+>  > > Now when there is very heavy IO on disks, %util is still much less than
+>  > > 100%, especially on HDD, the reason could be that IO latency can be much more
+>  > > than 1ms in case of 1000HZ, so the above calculation is very inaccurate.
+>  > >
+>  > > Another extreme example is that if IOs take long time to complete, such
+>  > > as IO stall, %util may show 0% utilization, instead of 100%.
+>  >
+>  > Hi Ming,
+>  >
+>  > Your email triggered a memory of someone else (Konstantin Khlebnikov)
+>  > having reported and fixed this relatively recently, please see this
+>  > patchset: https://lkml.org/lkml/2020/3/2/336
+>  >
+>  > Obviously this needs fixing. If you have time to review/polish the
+>  > proposed patches that'd be great.
+>  >
+>  > Mike
+>  >
+>
+>  Hi,
+>
+>  commit 5b18b5a73760 makes io.util larger than the real, when IO
+>  inflight count <= 1,
+>  even with the commit 2b8bd423614, the problem is exist too.
+>
+>  static void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
+>  {
+>          unsigned long stamp;
+>  again:
+>          stamp = READ_ONCE(part->stamp);
+>          if (unlikely(stamp != now)) {
+>                  if (likely(cmpxchg(&part->stamp, stamp, now) == stamp))
+>                          __part_stat_add(part, io_ticks, end ? now - stamp : 1);
+>          }
+>
+>  when a new start, blk_account_io_start => update_io_ticks and add 1 jiffy to
+>  io_ticks, even there is no IO before, so it will always add an extra 1 jiffy.
+>  So we should know is there any inflight IO before.
+>
+>
+>
+>  Before commit 5b18b5a73760,
+>  The io_ticks will not be added, if there is no inflight when start a new IO.
+>  static void part_round_stats_single(struct request_queue *q,
+>                                      struct hd_struct *part, unsigned long now,
+>                                      unsigned int inflight)
+>  {
+>          if (inflight) {
+>                  __part_stat_add(part, time_in_queue,
+>                                  inflight * (now - part->stamp));
+>                  __part_stat_add(part, io_ticks, (now - part->stamp));
+>          }
+>          part->stamp = now;
+>  }
+>
+>
+>  Reproduce:
+>  fio -name=test -ioengine=sync -bs=4K -rw=write
+>  -filename=/home/test.fio.log -size=100M -time_based=1 -direct=1
+>  -runtime=300 -rate=2m,2m
+>
+>
+>
+>
+> Let's explain in more detail.
+>
+> I run the following command on a host, with different kernel version.
+>
+> fio -name=test -ioengine=sync -bs=4K -rw=write
+> -filename=/home/test.fio.log -size=100M -time_based=1 -direct=1
+> -runtime=300 -rate=2m,2m
+>
+> If we run fio in a sync direct io mode, IO will be proccessed one by one,
+> you can see that there are 512 IOs completed in one second.
+>
+>
+> kernel: 4.19.0
+>
+> Device: rrqm/s wrqm/s r/s w/s rMB/s wMB/s
+> avgrq-sz avgqu-sz await r_await w_await svctm %util
+> vda 0.00 0.00 0.00 512.00 0.00 2.00
+> 8.00 0.21 0.40 0.00 0.40 0.40 20.60
+>
+> The averate io.latency is 0.4ms
+> So the disk time cost in one second should be 0.4 * 512 = 204.8 ms,
+> that means, %util should be 20%.
+>
+>
+> kernel: commit f9893351ac
+> In the latest kernel commit f9893351ac, I got the follow number,
+> Becase update_io_ticks will add a extra 1 jiffy(1ms) for every IO, the
+> io.latency io.latency will be 1 + 0.4 = 1.4ms,
+> 1.4 * 512 = 716.8ms, so the %util show it about 72%.
+>
+> Device r/s w/s rMB/s wMB/s rrqm/s wrqm/s
+> %rrqm %wrqm r_await w_await aqu-sz rareq-sz wareq-sz svctm %util
+> vda 0.00 512.00 0.00 2.00 0.00 0.00
+> 0.00 0.00 0.00 0.40 0.20 0.00 4.00 1.41 72.10
+>
+> There is a big gap for %util.
+>
+>
+> Yep. Meaning of this statistics has changed. Now it approximates count of jiffies where was running at last one request. I.e. every tiny request always accounts whole jiffy were it started/finished.
+>
+When Q2Q >= 1 jiffy, an extra 1jiffy was added when IO start, it's
+really not reasonable,
+
+
+modprobe null_blk submit_queues=8 queue_mode=2 irqmode=2 completion_nsec=100000
+fio -name=test -ioengine=sync -bs=4K -rw=write -filename=/dev/nullb0
+-size=100M -time_based=1 -direct=1 -runtime=300 -rate=4m &
+
+                        w/s   w_await  %util
+-----------------------------------------------
+before patch 1024         0.15  100
+after   patch  1024         0.15  14.5
+
+The gap is really unacceptable.
+
+The test patch:
+https://github.com/dublio/linux/commits/fix_util_v5
+
+> %util is still useful - it shows how disk activity is grouped across time.
+>
+> You could get precise "utilization" in form of average queue depth from read/write time.
+It's hard to get the percent of overlap each other for inflight IOs
+when device has high queue depth.
