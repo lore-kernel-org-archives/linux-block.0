@@ -2,118 +2,56 @@ Return-Path: <SRS0=+SaT=EC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D712C55178
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 18:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F3AC388F9
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 18:50:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3EF4206C1
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 18:30:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cBFanisP"
+	by mail.kernel.org (Postfix) with ESMTP id C84CC207E8
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 18:50:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1828357AbgJ0Sam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Oct 2020 14:30:42 -0400
-Received: from casper.infradead.org ([90.155.50.34]:52600 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1828355AbgJ0Sal (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Oct 2020 14:30:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=k8YtwpCK7R8pKcTld7F9D1V8h2ZjYCprcpu/NK57ECs=; b=cBFanisPufg0Spq8y+zneyPmtT
-        ieTeefLjEP+KHtvqs4l0CJhxPBBxrya3ffRROg0prDYtdiCfL7DwpNPFMG2n+G+79Wfsu42T22FCm
-        6CgoyMmvSeO7gb3HERNwTg0l8ZK5T1LFLyQrBdtwQj2qgKUo638gZFYAQJtAgvQcwxSrnGM1zo9Vm
-        aLt8yAAvemubRHmJNbxXlFPnWiyQW+R0DEFgy9peCKxc6GPYNbNOmwAQBu90F7ck9T91eELvLOSYh
-        OKKAZUCt2aSnvWlo0kYB8TePFQiyxjKpxrlE49Q0swYQ/a6QyfztGCQAP8JPvow4EjT6So9r9oj/K
-        rA4LzfHw==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kXTjz-0002RI-Fy; Tue, 27 Oct 2020 18:30:39 +0000
-Date:   Tue, 27 Oct 2020 18:30:39 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
-Subject: Re: [PATCH 1/6] block: Add blk_completion
-Message-ID: <20201027183039.GA7983@infradead.org>
-References: <20201022212228.15703-1-willy@infradead.org>
- <20201022212228.15703-2-willy@infradead.org>
+        id S1829151AbgJ0St4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Oct 2020 14:49:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41432 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1829129AbgJ0St2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Oct 2020 14:49:28 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id BA698ACAA;
+        Tue, 27 Oct 2020 18:49:27 +0000 (UTC)
+Date:   Tue, 27 Oct 2020 19:49:26 +0100
+From:   Petr Vorel <pvorel@suse.cz>
+To:     linux-block@vger.kernel.org
+Cc:     Martijn Coenen <maco@android.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, ltp@lists.linux.it,
+        Cyril Hrubis <chrubis@suse.cz>
+Subject: Ocassional dropping of uevent of loop device (possible race)
+Message-ID: <20201027184926.GA24024@dell5510>
+Reply-To: Petr Vorel <pvorel@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201022212228.15703-2-willy@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 22, 2020 at 10:22:23PM +0100, Matthew Wilcox (Oracle) wrote:
-> This new data structure allows a task to wait for N things to complete.
-> Usually the submitting task will handle cleanup, but if it is killed,
-> the last completer will take care of it.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> ---
->  block/blk-core.c    | 61 +++++++++++++++++++++++++++++++++++++++++++++
->  include/linux/bio.h | 11 ++++++++
->  2 files changed, 72 insertions(+)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 10c08ac50697..2892246f2176 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1900,6 +1900,67 @@ void blk_io_schedule(void)
->  }
->  EXPORT_SYMBOL_GPL(blk_io_schedule);
->  
-> +void blk_completion_init(struct blk_completion *cmpl, int n)
-> +{
-> +	spin_lock_init(&cmpl->cmpl_lock);
-> +	cmpl->cmpl_count = n;
-> +	cmpl->cmpl_task = current;
-> +	cmpl->cmpl_status = BLK_STS_OK;
-> +}
-> +
-> +int blk_completion_sub(struct blk_completion *cmpl, blk_status_t status, int n)
+Hi
 
-This needs documentation.  e.g. to explain what 'n' is.
+commit 716ad0986cbd ("loop: Switch to set_capacity_revalidate_and_notify()")
+from v5.8-rc1 caused occasional dropping of uevent of attached or detached loop
+device (not sure which one). The only difference is that
+set_capacity_revalidate_and_notify() has condition:
+if (capacity != size && capacity != 0 && size != 0)
+thus notification is not triggered here but in a different part of code.
 
-> +int blk_completion_wait_killable(struct blk_completion *cmpl)
-> +{
-> +	int err = 0;
-> +
-> +	for (;;) {
-> +		set_current_state(TASK_KILLABLE);
-> +		spin_lock_bh(&cmpl->cmpl_lock);
-> +		if (cmpl->cmpl_count == 0)
-> +			break;
-> +		spin_unlock_bh(&cmpl->cmpl_lock);
-> +		blk_io_schedule();
-> +		if (fatal_signal_pending(current)) {
-> +			spin_lock_bh(&cmpl->cmpl_lock);
-> +			cmpl->cmpl_task = NULL;
-> +			if (cmpl->cmpl_count != 0) {
-> +				spin_unlock_bh(&cmpl->cmpl_lock);
-> +				cmpl = NULL;
-> +			}
-> +			err = -ERESTARTSYS;
-> +			break;
-> +		}
-> +	}
-> +	set_current_state(TASK_RUNNING);
-> +	if (cmpl) {
-> +		spin_unlock_bh(&cmpl->cmpl_lock);
-> +		err = blk_status_to_errno(cmpl->cmpl_status);
-> +		kfree(cmpl);
-> +	}
-> +
-> +	return err;
-> +}
+It was found with LTP test uevent01 [1]:
 
-What are the life time rules for cmpl?  Who frees it in the case
-of a fatal signal?
+# i=0; while true; do i=$((i+1)); echo "== $i =="; rmmod -f loop; ./uevent01 || break; done
+
+It looks to be a race. Usually ~ 10 loops is enough.
+
+Kind regards,
+Petr
