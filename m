@@ -2,106 +2,91 @@ Return-Path: <SRS0=+SaT=EC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27888C2D0A3
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 00:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD2EBC8302E
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 00:34:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3646207DE
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 00:23:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603758224;
-	bh=yDvzrYTvHdXk70NDohiR7SvD6wB+nbWX2pF8bVKrvus=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=PYbuSBJIAYqCm8afFiZCwjcLH5EG2jJefXgziQq+q70f5HVc8N2uPIy0GCqCD7Qai
-	 Qz9BL32ov7nLuUp54c6ER/Fh+krom1t80/yr9HIQTsxQUK2MGejNA3KbcyutZC+GV4
-	 a5SmDDLPkIV9v0gJq2+EsU03AGfkVpCJ/yP2xQgE=
+	by mail.kernel.org (Postfix) with ESMTP id B9CF1216FD
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 00:34:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2410302AbgJZXyF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Oct 2020 19:54:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59320 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2410288AbgJZXyD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Oct 2020 19:54:03 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BA96521655;
-        Mon, 26 Oct 2020 23:54:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603756442;
-        bh=yDvzrYTvHdXk70NDohiR7SvD6wB+nbWX2pF8bVKrvus=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MNiAtmT3JO18FIz7UvmOzZP0XZLKe2f+yt+1BQud64Xkld09W88N4ZfWYdCqNP3BD
-         y9M+Qaifz/0kk3ihrvDrxK6mQbbFy1d4GV3FQ/WoLrCw/muHIKRlO7vdtZxKoD3VLX
-         Nqj70vB09as5zi/jSv4zM1tb0lxxUYEe0P2aV5IU=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Omar Sandoval <osandov@fb.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.8 095/132] block: Consider only dispatched requests for inflight statistic
-Date:   Mon, 26 Oct 2020 19:51:27 -0400
-Message-Id: <20201026235205.1023962-95-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201026235205.1023962-1-sashal@kernel.org>
-References: <20201026235205.1023962-1-sashal@kernel.org>
+        id S2440756AbgJ0AeI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Oct 2020 20:34:08 -0400
+Received: from zeniv.linux.org.uk ([195.92.253.2]:44164 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2436545AbgJ0Acv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Oct 2020 20:32:51 -0400
+X-Greylist: delayed 1637 seconds by postgrey-1.27 at vger.kernel.org; Mon, 26 Oct 2020 20:32:46 EDT
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kXCUL-009VwG-7r; Tue, 27 Oct 2020 00:05:21 +0000
+Date:   Tue, 27 Oct 2020 00:05:21 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Kyle Huey <me@kylehuey.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Robert O'Callahan <robert@ocallahan.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        "moderated list:ARM PORT" <linux-arm-kernel@lists.infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        "open list:FILESYSTEMS (VFS and infrastructure)" 
+        <linux-fsdevel@vger.kernel.org>, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [REGRESSION] mm: process_vm_readv testcase no longer works after
+ compat_prcoess_vm_readv removed
+Message-ID: <20201027000521.GD3576660@ZenIV.linux.org.uk>
+References: <CAP045Aqrsb=CXHDHx4nS-pgg+MUDj14r-kN8_Jcbn-NAUziVag@mail.gmail.com>
+ <70d5569e-4ad6-988a-e047-5d12d298684c@kernel.dk>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <70d5569e-4ad6-988a-e047-5d12d298684c@kernel.dk>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gabriel Krisman Bertazi <krisman@collabora.com>
+On Mon, Oct 26, 2020 at 05:56:11PM -0600, Jens Axboe wrote:
+> On 10/26/20 4:55 PM, Kyle Huey wrote:
+> > A test program from the rr[0] test suite, vm_readv_writev[1], no
+> > longer works on 5.10-rc1 when compiled as a 32 bit binary and executed
+> > on a 64 bit kernel. The first process_vm_readv call (on line 35) now
+> > fails with EFAULT. I have bisected this to
+> > c3973b401ef2b0b8005f8074a10e96e3ea093823.
+> > 
+> > It should be fairly straightforward to extract the test case from our
+> > repository into a standalone program.
+> 
+> Can you check with this applied?
+> 
+> diff --git a/mm/process_vm_access.c b/mm/process_vm_access.c
+> index fd12da80b6f2..05676722d9cd 100644
+> --- a/mm/process_vm_access.c
+> +++ b/mm/process_vm_access.c
+> @@ -273,7 +273,8 @@ static ssize_t process_vm_rw(pid_t pid,
+>  		return rc;
+>  	if (!iov_iter_count(&iter))
+>  		goto free_iov_l;
+> -	iov_r = iovec_from_user(rvec, riovcnt, UIO_FASTIOV, iovstack_r, false);
+> +	iov_r = iovec_from_user(rvec, riovcnt, UIO_FASTIOV, iovstack_r,
+> +				in_compat_syscall());
 
-[ Upstream commit a926c7afffcc0f2e35e6acbccb16921bacf34617 ]
+_ouch_
 
-According to Documentation/block/stat.rst, inflight should not include
-I/O requests that are in the queue but not yet dispatched to the device,
-but blk-mq identifies as inflight any request that has a tag allocated,
-which, for queues without elevator, happens at request allocation time
-and before it is queued in the ctx (default case in blk_mq_submit_bio).
-
-In addition, current behavior is different for queues with elevator from
-queues without it, since for the former the driver tag is allocated at
-dispatch time.  A more precise approach would be to only consider
-requests with state MQ_RQ_IN_FLIGHT.
-
-This effectively reverts commit 6131837b1de6 ("blk-mq: count allocated
-but not started requests in iostats inflight") to consolidate blk-mq
-behavior with itself (elevator case) and with original documentation,
-but it differs from the behavior used by the legacy path.
-
-This version differs from v1 by using blk_mq_rq_state to access the
-state attribute.  Avoid using blk_mq_request_started, which was
-suggested, since we don't want to include MQ_RQ_COMPLETE.
-
-Signed-off-by: Gabriel Krisman Bertazi <krisman@collabora.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8e623e0282757..88b0dc0034cff 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -103,7 +103,7 @@ static bool blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
- {
- 	struct mq_inflight *mi = priv;
- 
--	if (rq->part == mi->part)
-+	if (rq->part == mi->part && blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT)
- 		mi->inflight[rq_data_dir(rq)]++;
- 
- 	return true;
--- 
-2.25.1
-
+There's a bug, all right, but I'm not sure that this is all there is to it.
+For now it's probably the right fix, but...  Consider the fun trying to
+use that from 32bit process to access the memory of 64bit one.  IOW, we
+might want to add an explicit flag for "force 64bit addresses/sizes
+in rvec".
