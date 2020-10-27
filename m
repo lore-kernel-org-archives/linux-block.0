@@ -2,106 +2,92 @@ Return-Path: <SRS0=+SaT=EC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83205C4363A
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 00:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60010C4363A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 01:18:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4845C20829
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 00:38:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603759102;
-	bh=9+3VoOP+nxTVMDbH4zV35RJX/lzj91BA3Ht3ZiGjQZk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=XEsxObROM4rQrEafZgYUjQCU3eUMAxmf6VSJ8tlCL006eXb7pqmiVZ55cO+MLO3zX
-	 BjgSg0CAtpMttnPksIw/TwJSBecNtn2jHsgFrnyAxe5CB1KWHumQlzta1WIBeyVcbc
-	 PHkFQ3RFaC3JrC8kXpYU8YLsVUn9r6vysCSxNL/w=
+	by mail.kernel.org (Postfix) with ESMTP id ED0C22080A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 01:18:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HJra2W5U"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2410131AbgJ0Ae0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Oct 2020 20:34:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51576 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2409330AbgJZXvL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Oct 2020 19:51:11 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2503718AbgJ0BSW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Oct 2020 21:18:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60926 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2411311AbgJ0BSV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Oct 2020 21:18:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603761500;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8SrYT8zX0tHJ+L74DDGK2r1FEkedibAS0AWcoEpa4aY=;
+        b=HJra2W5UP7IGKEGxRSxYh2tBGS4yP1hqmshRLAUB3h1sE8tlyiW8U97QzMjsAjboPKiM5y
+        MlM0QZpvt+XropVcbn2ScAtHLK1qqtM2GaDX+og7DtQevBWVtTzlBak1PKIUwWebaKM7t2
+        zXT+6C0KPK2LafODqCBgq0YkHL5vjwc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-OOkJbHEYPKOO7ro1yyiCeg-1; Mon, 26 Oct 2020 21:18:16 -0400
+X-MC-Unique: OOkJbHEYPKOO7ro1yyiCeg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B344E20878;
-        Mon, 26 Oct 2020 23:51:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603756271;
-        bh=9+3VoOP+nxTVMDbH4zV35RJX/lzj91BA3Ht3ZiGjQZk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=G/JQei82sTEmJQClUB3HlFlw//547F5HGUk1+CGa8qr6j2Ce2dHKlq+w84z9ZPsce
-         gkxRdU1LrhToWxLv7WY1RrbA76aw9zzlwxIurTgSnFJInil32LLkEW//SOqt/jQWwX
-         4uZa7sQL1tkBc72SlsXZ3ORuYDXiNG/65mcG6vvU=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Omar Sandoval <osandov@fb.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.9 103/147] block: Consider only dispatched requests for inflight statistic
-Date:   Mon, 26 Oct 2020 19:48:21 -0400
-Message-Id: <20201026234905.1022767-103-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201026234905.1022767-1-sashal@kernel.org>
-References: <20201026234905.1022767-1-sashal@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36CC51009E27;
+        Tue, 27 Oct 2020 01:18:14 +0000 (UTC)
+Received: from T590 (ovpn-12-132.pek2.redhat.com [10.72.12.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 246455C1BB;
+        Tue, 27 Oct 2020 01:18:05 +0000 (UTC)
+Date:   Tue, 27 Oct 2020 09:18:01 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     lining <lining2020x@163.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+        nbd@other.debian.org, yunchuan.wen@kylin-cloud.com,
+        ceph-users@ceph.io, donglifekernel@126.com
+Subject: Re: [bug report] NBD: rbd-nbd + ext4 stuck after nbd resized
+Message-ID: <20201027011801.GA1828887@T590>
+References: <AA00244F-0E5A-4E52-B358-4F36A3486EBF@163.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <AA00244F-0E5A-4E52-B358-4F36A3486EBF@163.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gabriel Krisman Bertazi <krisman@collabora.com>
+On Wed, Oct 21, 2020 at 09:08:10AM +0800, lining wrote:
+> (Sorry for sending this mail again, this one add nbd@other.debian.org)
+> 
+> Hi kernel、ceph comunity:
+> 
+> We run into an issue that mainly related to the (kernel) nbd driver and (ceph) rbd-nbd. 
+> After some investigations, I found that the root cause of the problem seems to be related to the change in the block size of nbd.
+> 
+> I am not sure whether it is the nbd driver or rbd-nbd bug, however there is such a problem.
+> 
+> 
+> What happened：
+> It will always hang when accessing the mount point of nbd device with ext4 after nbd resized. 
+> 
+> 
+> Environment information:
+> - kernel:               v4.19.25 or master
+> - rbd-nbd(ceph):  v12.2.0 Luminous or master
+> - the fs of nbd:    ext4
 
-[ Upstream commit a926c7afffcc0f2e35e6acbccb16921bacf34617 ]
+Hello lining,
 
-According to Documentation/block/stat.rst, inflight should not include
-I/O requests that are in the queue but not yet dispatched to the device,
-but blk-mq identifies as inflight any request that has a tag allocated,
-which, for queues without elevator, happens at request allocation time
-and before it is queued in the ctx (default case in blk_mq_submit_bio).
+Can you reproduce this issue on v5.9 kernel?
 
-In addition, current behavior is different for queues with elevator from
-queues without it, since for the former the driver tag is allocated at
-dispatch time.  A more precise approach would be to only consider
-requests with state MQ_RQ_IN_FLIGHT.
 
-This effectively reverts commit 6131837b1de6 ("blk-mq: count allocated
-but not started requests in iostats inflight") to consolidate blk-mq
-behavior with itself (elevator case) and with original documentation,
-but it differs from the behavior used by the legacy path.
-
-This version differs from v1 by using blk_mq_rq_state to access the
-state attribute.  Avoid using blk_mq_request_started, which was
-suggested, since we don't want to include MQ_RQ_COMPLETE.
-
-Signed-off-by: Gabriel Krisman Bertazi <krisman@collabora.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index cdced4aca2e81..fd578a0ea67dc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -105,7 +105,7 @@ static bool blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
- {
- 	struct mq_inflight *mi = priv;
- 
--	if (rq->part == mi->part)
-+	if (rq->part == mi->part && blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT)
- 		mi->inflight[rq_data_dir(rq)]++;
- 
- 	return true;
--- 
-2.25.1
+Thanks,
+Ming
 
