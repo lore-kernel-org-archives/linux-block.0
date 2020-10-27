@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9ADC4363A
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 07:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B76FFC388F9
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 07:19:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABD1D20727
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 07:19:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82F5F20727
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 07:19:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436785AbgJ0HTY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Oct 2020 03:19:24 -0400
-Received: from mx2.didiglobal.com ([111.202.154.82]:4451 "HELO
+        id S2507476AbgJ0HTv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Oct 2020 03:19:51 -0400
+Received: from mx2.didiglobal.com ([111.202.154.82]:10380 "HELO
         bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1728828AbgJ0HTX (ORCPT
+        with SMTP id S1728453AbgJ0HTv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Oct 2020 03:19:23 -0400
-X-ASG-Debug-ID: 1603783147-0e41083db9d4da0000d-Cu09wu
-Received: from mail.didiglobal.com (bogon [172.20.36.204]) by bsf02.didichuxing.com with ESMTP id rnSWKz9UD1QEB0wS; Tue, 27 Oct 2020 15:19:11 +0800 (CST)
+        Tue, 27 Oct 2020 03:19:51 -0400
+X-ASG-Debug-ID: 1603783147-0e41083db9d4da0000a-Cu09wu
+Received: from mail.didiglobal.com (bogon [172.20.36.204]) by bsf02.didichuxing.com with ESMTP id YN2DGxZ3IdcMAX4n; Tue, 27 Oct 2020 15:19:10 +0800 (CST)
 X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
 Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
  (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 27 Oct
- 2020 12:54:35 +0800
-Date:   Tue, 27 Oct 2020 12:54:34 +0800
+ 2020 12:54:25 +0800
+Date:   Tue, 27 Oct 2020 12:54:24 +0800
 From:   Weiping Zhang <zhangweiping@didiglobal.com>
 To:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <snitzer@redhat.com>,
         <mpatocka@redhat.com>
 CC:     <linux-block@vger.kernel.org>
-Subject: [PATCH v5 2/2] blk-mq: break more earlier when interate hctx
-Message-ID: <20201027045434.GA40399@192.168.3.9>
-X-ASG-Orig-Subj: [PATCH v5 2/2] blk-mq: break more earlier when interate hctx
+Subject: [PATCH v5 1/2] block: fix inaccurate io_ticks
+Message-ID: <20201027045424.GA40118@192.168.3.9>
+X-ASG-Orig-Subj: [PATCH v5 1/2] block: fix inaccurate io_ticks
 Mail-Followup-To: axboe@kernel.dk, ming.lei@redhat.com, snitzer@redhat.com,
         mpatocka@redhat.com, linux-block@vger.kernel.org
 MIME-Version: 1.0
@@ -44,178 +44,194 @@ X-Originating-IP: [172.22.50.20]
 X-ClientProxiedBy: BJEXCAS01.didichuxing.com (172.20.36.235) To
  BJSGEXMBX03.didichuxing.com (172.20.15.133)
 X-Barracuda-Connect: bogon[172.20.36.204]
-X-Barracuda-Start-Time: 1603783151
+X-Barracuda-Start-Time: 1603783150
 X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 5543
+X-Barracuda-Scan-Msg-Size: 5959
 X-Barracuda-BRTS-Status: 1
 X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -1.52
-X-Barracuda-Spam-Status: No, SCORE=-1.52 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=BSF_RULE7568M
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
 X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.85498
         Rule breakdown below
          pts rule name              description
         ---- ---------------------- --------------------------------------------------
-        0.50 BSF_RULE7568M          Custom Rule 7568M
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For blk_mq_part_is_in_inflight and blk_mq_queue_inflight they do not
-care how many inflight IOs, so they stop interate other hxtc when find
-a request meets their requirement. Some cpu cycles can be saved in such
-way.
+Do not add io_ticks if there is no infligh io when start a new IO,
+otherwise an extra 1 jiffy will be add to this IO.
 
+I run the following command on a host, with different kernel version.
+
+fio -name=test -ioengine=sync -bs=4K -rw=write
+-filename=/home/test.fio.log -size=100M -time_based=1 -direct=1
+-runtime=300 -rate=2m,2m
+
+If we run fio in a sync direct io mode, IO will be proccessed one by one,
+you can see that there are 512 IOs completed in one second.
+
+kernel: 4.19.0
+
+Device: rrqm/s wrqm/s  r/s    w/s rMB/s wMB/s avgrq-sz avgqu-sz await r_await w_await svctm %util
+vda       0.00   0.00 0.00 512.00  0.00  2.00     8.00     0.21  0.40    0.00    0.40  0.40 20.60
+
+The averate io.latency is 0.4ms, so the disk time cost in one second
+should be 0.4 * 512 = 204.8 ms, that means, %util should be 20%.
+
+Becase update_io_ticks will add a extra 1 jiffy(1ms) for every IO, the
+io.latency will be 1 + 0.4 = 1.4ms, 1.4 * 512 = 716.8ms,
+so the %util show it about 72%.
+
+Device  r/s    w/s rMB/s wMB/s rrqm/s wrqm/s %rrqm %wrqm r_await w_await aqu-sz rareq-sz wareq-sz svctm  %util
+vda    0.00 512.00  0.00  2.00   0.00   0.00  0.00  0.00    0.00    0.40   0.20     0.00     4.00  1.41  72.10
+
+After this patch:
+Device  r/s    w/s rMB/s wMB/s rrqm/s wrqm/s %rrqm %wrqm r_await w_await aqu-sz rareq-sz wareq-sz svctm  %util
+vda    0.00 512.00  0.00  2.00   0.00   0.00  0.00  0.00    0.00    0.40   0.20     0.00     4.00  0.39  20.00
+
+Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
+Fixes: 2b8bd423614c ("block/diskstats: more accurate approximation of io_ticks for slow disks")
+Reported-by: Yabin Li <liyabinliyabin@didiglobal.com>
 Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
 ---
- block/blk-mq-tag.c     | 11 +++++++++--
- block/blk-mq-tag.h     |  2 +-
- block/blk-mq.c         | 34 +++++++++++++++++++++++++++++-----
- include/linux/blk-mq.h |  1 +
- 4 files changed, 40 insertions(+), 8 deletions(-)
+ block/blk-core.c | 28 ++++++++++++++++++++++++++--
+ block/blk-mq.c   | 26 ++++++++++++++++++++++++++
+ block/blk-mq.h   |  1 +
+ block/blk.h      |  1 +
+ block/genhd.c    | 13 +++++++++++++
+ 5 files changed, 67 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 9c92053e704d..f364682dabe1 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -401,14 +401,17 @@ EXPORT_SYMBOL(blk_mq_tagset_wait_completed_request);
-  *		reserved) where rq is a pointer to a request and hctx points
-  *		to the hardware queue associated with the request. 'reserved'
-  *		indicates whether or not @rq is a reserved request.
-- * @priv:	Will be passed as third argument to @fn.
-+ *@check_break: Pointer to the function that will callbed for earch hctx on @q.
-+ *		@check_break will break the loop for hctx when it return false,
-+ *		if you want to iterate all hctx, set it to NULL.
-+ * @priv:	Will be passed as third argument to @fn, or arg to @check_break
-  *
-  * Note: if @q->tag_set is shared with other request queues then @fn will be
-  * called for all requests on all queues that share that tag set and not only
-  * for requests associated with @q.
-  */
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
--		void *priv)
-+		check_break_fn *check_break, void *priv)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
-@@ -434,7 +437,11 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 		if (tags->nr_reserved_tags)
- 			bt_for_each(hctx, tags->breserved_tags, fn, priv, true);
- 		bt_for_each(hctx, tags->bitmap_tags, fn, priv, false);
-+
-+		if (check_break && !check_break(priv))
-+			goto out;
- 	}
-+out:
- 	blk_queue_exit(q);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ac00d2fa4eb4..000c300e6c07 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1256,14 +1256,38 @@ unsigned int blk_rq_err_bytes(const struct request *rq)
  }
+ EXPORT_SYMBOL_GPL(blk_rq_err_bytes);
  
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 7d3e6b333a4a..d122be9f87cb 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -42,7 +42,7 @@ extern void blk_mq_tag_resize_shared_sbitmap(struct blk_mq_tag_set *set,
- 
- extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
--		void *priv);
-+		check_break_fn *check_break, void *priv);
- void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
- 		void *priv);
- 
++
++static int blk_part_get_inflight(struct hd_struct *part)
++{
++	struct request_queue *q;
++	bool inflight;
++
++	q = part_to_disk(part)->queue;
++	if (queue_is_mq(q))
++		inflight = blk_mq_part_is_in_flight(q, part);
++	else
++		inflight = part_is_in_flight(part);
++
++	return inflight ? 1 : 0;
++}
++
+ static void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
+ {
+ 	unsigned long stamp;
++	int inflight = -1;
+ again:
+ 	stamp = READ_ONCE(part->stamp);
+ 	if (unlikely(stamp != now)) {
+-		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp))
+-			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
++		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp)) {
++			if(end) {
++				__part_stat_add(part, io_ticks, now - stamp);
++			} else {
++				if (inflight == -1)
++					inflight = blk_part_get_inflight(part);
++				if (inflight > 0)
++					__part_stat_add(part, io_ticks, now - stamp);
++			}
++		}
+ 	}
+ 	if (part->partno) {
+ 		part = &part_to_disk(part)->part0;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 126a6a6f7035..458ade751b01 100644
+index 696450257ac1..126a6a6f7035 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -115,7 +115,7 @@ unsigned int blk_mq_in_flight(struct request_queue *q, struct hd_struct *part)
- {
- 	struct mq_inflight mi = { .part = part };
- 
--	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, NULL, &mi);
- 
- 	return mi.inflight[0] + mi.inflight[1];
- }
-@@ -125,11 +125,22 @@ void blk_mq_in_flight_rw(struct request_queue *q, struct hd_struct *part,
- {
- 	struct mq_inflight mi = { .part = part };
- 
--	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, NULL, &mi);
- 	inflight[0] = mi.inflight[0];
+@@ -130,6 +130,32 @@ void blk_mq_in_flight_rw(struct request_queue *q, struct hd_struct *part,
  	inflight[1] = mi.inflight[1];
  }
  
-+static bool blk_mq_part_check_break(void *priv)
++static bool blk_mq_part_check_inflight(struct blk_mq_hw_ctx *hctx,
++				  struct request *rq, void *priv,
++				  bool reserved)
 +{
 +	struct mq_inflight *mi = priv;
 +
-+	/* return false to stop interate other hctx */
-+	if (mi->inflight[0] || mi->inflight[1])
++	if (rq->part == mi->part && blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) {
++		mi->inflight[rq_data_dir(rq)]++;
++		/* return false to break loop early */
 +		return false;
++	}
 +
 +	return true;
 +}
 +
- static bool blk_mq_part_check_inflight(struct blk_mq_hw_ctx *hctx,
- 				  struct request *rq, void *priv,
- 				  bool reserved)
-@@ -151,7 +162,8 @@ bool blk_mq_part_is_in_flight(struct request_queue *q, struct hd_struct *part)
- 
- 	mi.inflight[0] = mi.inflight[1] = 0;
- 
--	blk_mq_queue_tag_busy_iter(q, blk_mq_part_check_inflight, &mi);
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_part_check_inflight,
-+					blk_mq_part_check_break, &mi);
- 
- 	return mi.inflight[0] + mi.inflight[1] > 0;
- }
-@@ -909,11 +921,23 @@ static bool blk_mq_rq_inflight(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	return true;
- }
- 
-+static bool blk_mq_rq_check_break(void *priv)
++bool blk_mq_part_is_in_flight(struct request_queue *q, struct hd_struct *part)
 +{
-+	bool *busy = priv;
++	struct mq_inflight mi = { .part = part };
 +
-+	/* return false to stop interate other hctx */
-+	if (*busy)
-+		return false;
++	mi.inflight[0] = mi.inflight[1] = 0;
 +
-+	return true;
++	blk_mq_queue_tag_busy_iter(q, blk_mq_part_check_inflight, &mi);
++
++	return mi.inflight[0] + mi.inflight[1] > 0;
 +}
 +
- bool blk_mq_queue_inflight(struct request_queue *q)
+ void blk_freeze_queue_start(struct request_queue *q)
  {
- 	bool busy = false;
+ 	mutex_lock(&q->mq_freeze_lock);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index a52703c98b77..bb7e22d746e1 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -76,6 +76,7 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last);
+ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 				    struct list_head *list);
++bool blk_mq_part_is_in_flight(struct request_queue *q, struct hd_struct *part);
  
--	blk_mq_queue_tag_busy_iter(q, blk_mq_rq_inflight, &busy);
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_rq_inflight,
-+			blk_mq_rq_check_break, &busy);
- 	return busy;
+ /*
+  * CPU -> queue mappings
+diff --git a/block/blk.h b/block/blk.h
+index dfab98465db9..2572b7aadcbb 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -443,5 +443,6 @@ static inline void part_nr_sects_write(struct hd_struct *part, sector_t size)
+ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
+ 		struct page *page, unsigned int len, unsigned int offset,
+ 		unsigned int max_sectors, bool *same_page);
++bool part_is_in_flight(struct hd_struct *part);
+ 
+ #endif /* BLK_INTERNAL_H */
+diff --git a/block/genhd.c b/block/genhd.c
+index 0a273211fec2..4a089bed9dcb 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -109,6 +109,19 @@ static void part_stat_read_all(struct hd_struct *part, struct disk_stats *stat)
+ 	}
  }
- EXPORT_SYMBOL_GPL(blk_mq_queue_inflight);
-@@ -1018,7 +1042,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	if (!percpu_ref_tryget(&q->q_usage_counter))
- 		return;
  
--	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, NULL, &next);
- 
- 	if (next != 0) {
- 		mod_timer(&q->timeout, next);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index b23eeca4d677..efd1e8269f0b 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -280,6 +280,7 @@ struct blk_mq_queue_data {
- typedef bool (busy_iter_fn)(struct blk_mq_hw_ctx *, struct request *, void *,
- 		bool);
- typedef bool (busy_tag_iter_fn)(struct request *, void *, bool);
-+typedef bool (check_break_fn)(void *);
- 
- /**
-  * struct blk_mq_ops - Callback functions that implements block driver
++bool part_is_in_flight(struct hd_struct *part)
++{
++	int cpu;
++
++	for_each_possible_cpu(cpu) {
++		if (part_stat_local_read_cpu(part, in_flight[0], cpu) ||
++			    part_stat_local_read_cpu(part, in_flight[1], cpu))
++			return true;
++	}
++
++	return false;
++}
++
+ static unsigned int part_in_flight(struct hd_struct *part)
+ {
+ 	unsigned int inflight = 0;
 -- 
 2.18.4
 
