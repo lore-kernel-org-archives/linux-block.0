@@ -2,60 +2,86 @@ Return-Path: <SRS0=+SaT=EC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B8AC388F9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 19:33:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E00C4363A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 20:05:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED40C2222C
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 19:33:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jbOEIj7q"
+	by mail.kernel.org (Postfix) with ESMTP id E4A0C2225E
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 20:05:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1603829120;
+	bh=f+2hjx0YuqPqtRa+YtUvmPaLqiGcwczmgW7+ZwGJdrY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=E+uSN67bBTyrjA6h2RBFP5M0ZLMuLeBD9D2ZtCVnPJbGzVpIdNkvyuQuIzqL0O98s
+	 RMuTk4XEHwjkqyFVSbVK1WTESNnaTsugKaJO2UrVzEb91CjI8HTkNwhhQzdA78dBqZ
+	 Fn3FjF7GMu6S/Y/UIT1PsC7+DH8cXmuzKGPuYVzo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1830113AbgJ0Td2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Oct 2020 15:33:28 -0400
-Received: from casper.infradead.org ([90.155.50.34]:54352 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2503729AbgJ0Td2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Oct 2020 15:33:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=NHrVLbQzcjLB5YvgSgRq84nEm1neW7IrzYRWtYbr+/k=; b=jbOEIj7qccjOQH9puOolryZhp8
-        VALZx9iDIJCgZ7WtbyKAQdQ4gUyWdImWbRr2ANmggjQEl3+OWUejIx+D0sGE/LIfKrQJIOBUu53p1
-        aJpFQM7gOqN9QK9lzbq6dfjhXcKGEnZYwQVcLFtmUrJL7Iqq30hosGSO5trcCVkaowDLmqR501SO1
-        BLwhDUxe31kimlgCmx4AshFMwTERgdWEjJZ74nYMX9Ws6+g4yqjLgUxomxjQ7A1Yp4a5cpVQ9jiIU
-        OiT7FXwAnnaJouoeXeED3uehkBdgH0mf66r5Ow+YKLWSs5PIEMi3Se56N4N6U117Z8hQ/vxz3V/Fc
-        DgHQu12w==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kXUik-0006ul-1H; Tue, 27 Oct 2020 19:33:26 +0000
-Date:   Tue, 27 Oct 2020 19:33:25 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, hch@infradead.org,
-        joseph.qi@linux.alibaba.com
-Subject: Re: [RFC] blk-mq: don't plug for HIPRI IO
-Message-ID: <20201027193325.GA26382@infradead.org>
-References: <20201027132951.121812-1-xiaoguang.wang@linux.alibaba.com>
+        id S1830812AbgJ0UEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Oct 2020 16:04:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44124 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1830753AbgJ0UEn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Oct 2020 16:04:43 -0400
+Received: from gmail.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 965AF2222C;
+        Tue, 27 Oct 2020 20:04:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603829082;
+        bh=f+2hjx0YuqPqtRa+YtUvmPaLqiGcwczmgW7+ZwGJdrY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NU0KV8zW5ixCAu+sNYnAH6LjIGq57HEQiDTruW66p/XuJi+agDC0uCFDvRfJGKuwm
+         xBuME07GZ1sMYD+XuQolKP8fi43DApYhwyL1CkpUO4+qEn/BfIRoJwr6NgLf7A1/ox
+         DQ345kGma6N7sYoDvZ7S2Ja1xdpf6xh/XgY7UWag=
+Date:   Tue, 27 Oct 2020 13:04:41 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH v2 1/4] block: keyslot-manager: Introduce passthrough
+ keyslot manager
+Message-ID: <20201027200441.GA2416412@gmail.com>
+References: <20201015214632.41951-1-satyat@google.com>
+ <20201015214632.41951-2-satyat@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201027132951.121812-1-xiaoguang.wang@linux.alibaba.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20201015214632.41951-2-satyat@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 09:29:51PM +0800, Xiaoguang Wang wrote:
-> Commit cb700eb3faa4 ("block: don't plug for aio/O_DIRECT HIPRI IO")
-> only does not call blk_start_plug() or blk_finish_plug for HIPRI IO
-> in __blkdev_direct_IO(), but if upper layer subsystem, such as io_uring,
-> still initializes valid plug, block layer may still plug HIPRI IO.
-> To disable plug for HIPRI IO completely, do it in blk_mq_plug().
+On Thu, Oct 15, 2020 at 09:46:29PM +0000, Satya Tangirala wrote:
+> +/**
+> + * blk_ksm_init_passthrough() - Init a passthrough keyslot manager
+> + * @ksm: The keyslot manager to init
+> + *
+> + * Initialize a passthrough keyslot manager.
+> + * Called by e.g. storage drivers to set up a keyslot manager in their
+> + * request_queue, when the storage driver wants to manage its keys by itself.
+> + * This is useful for inline encryption hardware that doesn't have the concept
+> + * of keyslots, and for layered devices.
+> + *
+> + * See blk_ksm_init() for more details about the parameters.
+> + */
+> +void blk_ksm_init_passthrough(struct blk_keyslot_manager *ksm)
+> +{
+> +	memset(ksm, 0, sizeof(*ksm));
+> +	init_rwsem(&ksm->lock);
+> +}
+> +EXPORT_SYMBOL_GPL(blk_ksm_init_passthrough);
 
-This creates a somewhat awkward layering.  Why can't io_uring just
-stop creating a plug?
+The last paragraph of the comment ("See blk_ksm_init() for more details about
+the parameters.") isn't useful and should be removed.
+
+Otherwise this patch looks fine.  You can add:
+
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+
+- Eric
