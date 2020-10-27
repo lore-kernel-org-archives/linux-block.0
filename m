@@ -2,236 +2,233 @@ Return-Path: <SRS0=+SaT=EC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B76FFC388F9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 07:19:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D026C4363A
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 07:25:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 82F5F20727
-	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 07:19:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1013C22264
+	for <linux-block@archiver.kernel.org>; Tue, 27 Oct 2020 07:25:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="S4OidH0B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2507476AbgJ0HTv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Oct 2020 03:19:51 -0400
-Received: from mx2.didiglobal.com ([111.202.154.82]:10380 "HELO
-        bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1728453AbgJ0HTv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Oct 2020 03:19:51 -0400
-X-ASG-Debug-ID: 1603783147-0e41083db9d4da0000a-Cu09wu
-Received: from mail.didiglobal.com (bogon [172.20.36.204]) by bsf02.didichuxing.com with ESMTP id YN2DGxZ3IdcMAX4n; Tue, 27 Oct 2020 15:19:10 +0800 (CST)
-X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
-Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
- (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 27 Oct
- 2020 12:54:25 +0800
-Date:   Tue, 27 Oct 2020 12:54:24 +0800
-From:   Weiping Zhang <zhangweiping@didiglobal.com>
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <snitzer@redhat.com>,
-        <mpatocka@redhat.com>
-CC:     <linux-block@vger.kernel.org>
-Subject: [PATCH v5 1/2] block: fix inaccurate io_ticks
-Message-ID: <20201027045424.GA40118@192.168.3.9>
-X-ASG-Orig-Subj: [PATCH v5 1/2] block: fix inaccurate io_ticks
-Mail-Followup-To: axboe@kernel.dk, ming.lei@redhat.com, snitzer@redhat.com,
-        mpatocka@redhat.com, linux-block@vger.kernel.org
+        id S1731440AbgJ0HZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Oct 2020 03:25:29 -0400
+Received: from m12-13.163.com ([220.181.12.13]:54169 "EHLO m12-13.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731322AbgJ0HZ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Oct 2020 03:25:29 -0400
+X-Greylist: delayed 14442 seconds by postgrey-1.27 at vger.kernel.org; Tue, 27 Oct 2020 03:25:26 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=Subject:From:Message-ID:Date:MIME-Version; bh=8xjrP
+        oZl0LE4NJ4jZ4CpWo8I6Cx3nIDJmye1dff5iis=; b=S4OidH0BUxrN92CHQmToA
+        usN9sFGEqnbBkaULgDTo0Z2/tJn47xE9Z8hF+MuNmUCVKNXeyGexYcyNTQQnuWua
+        mMOj1jufuHD+wCdAurrx6wO+wvYL829FDWjFO3Im/pP5X9d+qeX77NTmHrsDmmAn
+        YCByIC/mveHCRVpHrQgQEQ=
+Received: from [172.20.145.84] (unknown [223.112.105.132])
+        by smtp9 (Coremail) with SMTP id DcCowAAXrGqwh5df9SmeNQ--.4678S2;
+        Tue, 27 Oct 2020 10:36:34 +0800 (CST)
+Subject: Re: [bug report] NBD: rbd-nbd + ext4 stuck after nbd resized
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+        nbd@other.debian.org, yunchuan.wen@kylin-cloud.com,
+        ceph-users@ceph.io, donglifekernel@126.com, magicdx@gmail.com,
+        yanhaishuang@cmss.chinamobile.com
+References: <AA00244F-0E5A-4E52-B358-4F36A3486EBF@163.com>
+ <20201027011801.GA1828887@T590>
+From:   lining <lining2020x@163.com>
+Message-ID: <7aa067eb-dc31-94d4-86ee-f99ad486b332@163.com>
+Date:   Tue, 27 Oct 2020 10:35:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Originating-IP: [172.22.50.20]
-X-ClientProxiedBy: BJEXCAS01.didichuxing.com (172.20.36.235) To
- BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: bogon[172.20.36.204]
-X-Barracuda-Start-Time: 1603783150
-X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 5959
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.85498
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
+In-Reply-To: <20201027011801.GA1828887@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: DcCowAAXrGqwh5df9SmeNQ--.4678S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3JFWUAryftr4xuw15Jry3XFb_yoWxCr4rpr
+        4UtFWUCF4kJr1UJF4UJF1UGw15JFs2va1UX347Aryvy3W5Ww17Xr4jyrWUA34DKr4Du347
+        tF4DWw10k34qyaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jAjjDUUUUU=
+X-Originating-IP: [223.112.105.132]
+X-CM-SenderInfo: polqx0bjsqjir06rljoofrz/1tbiUBPKNlWBpCcsfgAAs6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Do not add io_ticks if there is no infligh io when start a new IO,
-otherwise an extra 1 jiffy will be add to this IO.
+Hello Ming,
 
-I run the following command on a host, with different kernel version.
+Thanks for following up on this issue. It can be reproduced on v5.9 kernel.
 
-fio -name=test -ioengine=sync -bs=4K -rw=write
--filename=/home/test.fio.log -size=100M -time_based=1 -direct=1
--runtime=300 -rate=2m,2m
+I reproduced it just now. Here is the details.
 
-If we run fio in a sync direct io mode, IO will be proccessed one by one,
-you can see that there are 512 IOs completed in one second.
+ln@ubuntu:linux>$ git describe HEAD
+v5.9-14722-gd76913908102
 
-kernel: 4.19.0
+ln@ubuntu:linux>$ uname -a
+Linux ubuntu 5.9.0+ #3 SMP Mon Oct 26 16:56:48 CST 2020 x86_64 x86_64 
+x86_64 GNU/Linux
 
-Device: rrqm/s wrqm/s  r/s    w/s rMB/s wMB/s avgrq-sz avgqu-sz await r_await w_await svctm %util
-vda       0.00   0.00 0.00 512.00  0.00  2.00     8.00     0.21  0.40    0.00    0.40  0.40 20.60
+ln@ubuntu:~>$ sudo bash -x repro.sh
++ umount /tmp/mntnbd
+umount: /tmp/mntnbd: no mount point specified.
++ rbd-nbd unmap kcp/foo
+rbd-nbd: kcp/foo is not mapped
++ rbd rm kcp/foo
+Removing image: 100% complete...done.
++ rbd create -s 2G kcp/foo
++ rbd-nbd map kcp/foo
+/dev/nbd0
++ mkfs.ext4 /dev/nbd0
+mke2fs 1.45.5 (07-Jan-2020)
+Discarding device blocks: done
+Creating filesystem with 524288 4k blocks and 131072 inodes
+Filesystem UUID: f4b9635c-152f-4042-b9ca-602428628cf0
+Superblock backups stored on blocks:
+         32768, 98304, 163840, 229376, 294912
 
-The averate io.latency is 0.4ms, so the disk time cost in one second
-should be 0.4 * 512 = 204.8 ms, that means, %util should be 20%.
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (16384 blocks): done
+Writing superblocks and filesystem accounting information: done
 
-Becase update_io_ticks will add a extra 1 jiffy(1ms) for every IO, the
-io.latency will be 1 + 0.4 = 1.4ms, 1.4 * 512 = 716.8ms,
-so the %util show it about 72%.
++ mkdir -p /tmp/mntnbd
++ mount /dev/nbd0 /tmp/mntnbd
++ rbd resize kcp/foo --size 4G
+Resizing image: 100% complete...done.
+ln@ubuntu:~>$ ls /tmp/mntnbd/
 
-Device  r/s    w/s rMB/s wMB/s rrqm/s wrqm/s %rrqm %wrqm r_await w_await aqu-sz rareq-sz wareq-sz svctm  %util
-vda    0.00 512.00  0.00  2.00   0.00   0.00  0.00  0.00    0.00    0.40   0.20     0.00     4.00  1.41  72.10
+^C^C
 
-After this patch:
-Device  r/s    w/s rMB/s wMB/s rrqm/s wrqm/s %rrqm %wrqm r_await w_await aqu-sz rareq-sz wareq-sz svctm  %util
-vda    0.00 512.00  0.00  2.00   0.00   0.00  0.00  0.00    0.00    0.40   0.20     0.00     4.00  0.39  20.00
 
-Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
-Fixes: 2b8bd423614c ("block/diskstats: more accurate approximation of io_ticks for slow disks")
-Reported-by: Yabin Li <liyabinliyabin@didiglobal.com>
-Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
----
- block/blk-core.c | 28 ++++++++++++++++++++++++++--
- block/blk-mq.c   | 26 ++++++++++++++++++++++++++
- block/blk-mq.h   |  1 +
- block/blk.h      |  1 +
- block/genhd.c    | 13 +++++++++++++
- 5 files changed, 67 insertions(+), 2 deletions(-)
+ln@ubuntu:~>$ top
+top - 10:30:19 up 7 min,  2 users,  load average: 2.06, 1.63, 0.82
+Tasks: 378 total,   2 running, 376 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  8.3 sy,  0.0 ni, 91.6 id,  0.0 wa,  0.0 hi,  0.0 si, 
+  0.0 st
+MiB Mem :  15787.1 total,  13036.7 free,    970.5 used,   1779.8 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.  14529.2 avail Mem
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ac00d2fa4eb4..000c300e6c07 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1256,14 +1256,38 @@ unsigned int blk_rq_err_bytes(const struct request *rq)
- }
- EXPORT_SYMBOL_GPL(blk_rq_err_bytes);
- 
-+
-+static int blk_part_get_inflight(struct hd_struct *part)
-+{
-+	struct request_queue *q;
-+	bool inflight;
-+
-+	q = part_to_disk(part)->queue;
-+	if (queue_is_mq(q))
-+		inflight = blk_mq_part_is_in_flight(q, part);
-+	else
-+		inflight = part_is_in_flight(part);
-+
-+	return inflight ? 1 : 0;
-+}
-+
- static void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
- {
- 	unsigned long stamp;
-+	int inflight = -1;
- again:
- 	stamp = READ_ONCE(part->stamp);
- 	if (unlikely(stamp != now)) {
--		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp))
--			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
-+		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp)) {
-+			if(end) {
-+				__part_stat_add(part, io_ticks, now - stamp);
-+			} else {
-+				if (inflight == -1)
-+					inflight = blk_part_get_inflight(part);
-+				if (inflight > 0)
-+					__part_stat_add(part, io_ticks, now - stamp);
-+			}
-+		}
- 	}
- 	if (part->partno) {
- 		part = &part_to_disk(part)->part0;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 696450257ac1..126a6a6f7035 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -130,6 +130,32 @@ void blk_mq_in_flight_rw(struct request_queue *q, struct hd_struct *part,
- 	inflight[1] = mi.inflight[1];
- }
- 
-+static bool blk_mq_part_check_inflight(struct blk_mq_hw_ctx *hctx,
-+				  struct request *rq, void *priv,
-+				  bool reserved)
-+{
-+	struct mq_inflight *mi = priv;
-+
-+	if (rq->part == mi->part && blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) {
-+		mi->inflight[rq_data_dir(rq)]++;
-+		/* return false to break loop early */
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+bool blk_mq_part_is_in_flight(struct request_queue *q, struct hd_struct *part)
-+{
-+	struct mq_inflight mi = { .part = part };
-+
-+	mi.inflight[0] = mi.inflight[1] = 0;
-+
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_part_check_inflight, &mi);
-+
-+	return mi.inflight[0] + mi.inflight[1] > 0;
-+}
-+
- void blk_freeze_queue_start(struct request_queue *q)
- {
- 	mutex_lock(&q->mq_freeze_lock);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index a52703c98b77..bb7e22d746e1 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -76,6 +76,7 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last);
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 				    struct list_head *list);
-+bool blk_mq_part_is_in_flight(struct request_queue *q, struct hd_struct *part);
- 
- /*
-  * CPU -> queue mappings
-diff --git a/block/blk.h b/block/blk.h
-index dfab98465db9..2572b7aadcbb 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -443,5 +443,6 @@ static inline void part_nr_sects_write(struct hd_struct *part, sector_t size)
- int bio_add_hw_page(struct request_queue *q, struct bio *bio,
- 		struct page *page, unsigned int len, unsigned int offset,
- 		unsigned int max_sectors, bool *same_page);
-+bool part_is_in_flight(struct hd_struct *part);
- 
- #endif /* BLK_INTERNAL_H */
-diff --git a/block/genhd.c b/block/genhd.c
-index 0a273211fec2..4a089bed9dcb 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -109,6 +109,19 @@ static void part_stat_read_all(struct hd_struct *part, struct disk_stats *stat)
- 	}
- }
- 
-+bool part_is_in_flight(struct hd_struct *part)
-+{
-+	int cpu;
-+
-+	for_each_possible_cpu(cpu) {
-+		if (part_stat_local_read_cpu(part, in_flight[0], cpu) ||
-+			    part_stat_local_read_cpu(part, in_flight[1], cpu))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- static unsigned int part_in_flight(struct hd_struct *part)
- {
- 	unsigned int inflight = 0;
--- 
-2.18.4
+     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ 
+COMMAND
+    3020 ln        20   0    6508    828    724 R 100.0   0.0   5:48.08 ls
+     199 root      20   0       0      0      0 I   0.3   0.0   0:00.18 
+kworker/10:2-events
+    1058 root      20   0       0      0      0 I   0.3   0.0   0:00.03 
+kworker/8:2-events
+
+
+ln@ubuntu:~>$ dmesg
+...
+[   75.279029] EXT4-fs (nbd0): mounted filesystem with ordered data 
+mode. Opts: (null)
+[   78.490171] BUG: kernel NULL pointer dereference, address: 
+0000000000000010
+[   78.490212] #PF: supervisor read access in kernel mode
+[   78.490223] #PF: error_code(0x0000) - not-present page
+[   78.490254] PGD 0 P4D 0
+[   78.490262] Oops: 0000 [#1] SMP PTI
+[   78.490271] CPU: 9 PID: 2972 Comm: ext4lazyinit Not tainted 5.9.0+ #3
+[   78.490297] Hardware name: VMware, Inc. VMware Virtual Platform/440BX 
+Desktop Reference Platform, BIOS 6.00 07/22/2020
+[   78.490321] RIP: 0010:__ext4_journal_get_write_access+0x2c/0x120
+[   78.490347] Code: 44 00 00 55 48 89 e5 41 57 49 89 cf 41 56 41 55 41 
+54 49 89 d4 53 48 83 ec 18 48 89 7d d0 89 75 cc e8 78 74 7b 00 49 8b 47 
+30 <4c> 8b 68 10 4d 85 ed 74 2f 49 8b 85 d8 00 00 00 49 8b 9d 80 03 00
+[   78.490379] RSP: 0018:ffffb0f581793dd0 EFLAGS: 00010246
+[   78.490389] RAX: 0000000000000000 RBX: 0000000000000001 RCX: 
+ffff9167954c4000
+[   78.490402] RDX: ffff91679550f690 RSI: 000000000000061f RDI: 
+ffffffff84c4aa50
+[   78.490416] RBP: ffffb0f581793e10 R08: 0000000000001ff5 R09: 
+0000000000000001
+[   78.490428] R10: ffff916784cb0a00 R11: 000000000a002b8c R12: 
+ffff91679550f690
+[   78.490441] R13: ffff9167901ce000 R14: 0000000000000200 R15: 
+ffff9167954c4000
+[   78.490454] FS:  0000000000000000(0000) GS:ffff916aae040000(0000) 
+knlGS:0000000000000000
+[   78.490469] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   78.490479] CR2: 0000000000000010 CR3: 000000010a1d8004 CR4: 
+00000000003706e0
+[   78.490537] Call Trace:
+[   78.490547]  ? __ext4_journal_start_sb+0x106/0x120
+[   78.490558]  ext4_init_inode_table+0x168/0x390
+[   78.490976]  ext4_lazyinit_thread+0x38b/0x520
+[   78.491359]  kthread+0x114/0x150
+[   78.491603]  ? ext4_journalled_writepage_callback+0x60/0x60
+[   78.491849]  ? kthread_park+0x90/0x90
+[   78.492103]  ret_from_fork+0x22/0x30
+[   78.492348] Modules linked in: nbd rfcomm xt_conntrack xt_MASQUERADE 
+nf_conntrack_netlink nfnetlink xfrm_user xfrm_algo xt_addrtype 
+iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 bpfilter 
+bnep bonding vsock_loopback vmw_vsock_virtio_transport_common vsock 
+binfmt_misc intel_rapl_msr intel_rapl_common kvm_intel kvm 
+crct10dif_pclmul crc32_pclmul ghash_clmulni_intel aesni_intel 
+crypto_simd cryptd glue_helper rapl btusb btrtl btbcm btintel bluetooth 
+joydev vmw_balloon psmouse input_leds ecdh_generic ecc e1000 vmw_vmci 
+i2c_piix4 mac_hid sch_fq_codel btrfs blake2b_generic libcrc32c xor 
+zstd_compress raid6_pq overlay iptable_filter ip6table_filter ip6_tables 
+br_netfilter serio_raw bridge mptspi scsi_transport_spi ahci mptscsih 
+libahci mptbase pata_acpi stp llc arp_tables vmwgfx hid_generic 
+drm_kms_helper usbhid hid syscopyarea sysfillrect sysimgblt fb_sys_fops 
+cec ttm drm parport_pc ppdev lp parport ip_tables x_tables autofs4
+[   78.495718] CR2: 0000000000000010
+[   78.496074] ---[ end trace d98825069bfe2e2a ]---
+[   78.496425] RIP: 0010:__ext4_journal_get_write_access+0x2c/0x120
+[   78.496775] Code: 44 00 00 55 48 89 e5 41 57 49 89 cf 41 56 41 55 41 
+54 49 89 d4 53 48 83 ec 18 48 89 7d d0 89 75 cc e8 78 74 7b 00 49 8b 47 
+30 <4c> 8b 68 10 4d 85 ed 74 2f 49 8b 85 d8 00 00 00 49 8b 9d 80 03 00
+[   78.497834] RSP: 0018:ffffb0f581793dd0 EFLAGS: 00010246
+[   78.498259] RAX: 0000000000000000 RBX: 0000000000000001 RCX: 
+ffff9167954c4000
+[   78.498606] RDX: ffff91679550f690 RSI: 000000000000061f RDI: 
+ffffffff84c4aa50
+[   78.498944] RBP: ffffb0f581793e10 R08: 0000000000001ff5 R09: 
+0000000000000001
+[   78.499295] R10: ffff916784cb0a00 R11: 000000000a002b8c R12: 
+ffff91679550f690
+[   78.499630] R13: ffff9167901ce000 R14: 0000000000000200 R15: 
+ffff9167954c4000
+[   78.499964] FS:  0000000000000000(0000) GS:ffff916aae040000(0000) 
+knlGS:0000000000000000
+[   78.500316] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   78.500655] CR2: 0000000000000010 CR3: 000000010a1d8004 CR4: 
+00000000003706e0
+...
+
+
+在 2020/10/27 9:18, Ming Lei 写道:
+> On Wed, Oct 21, 2020 at 09:08:10AM +0800, lining wrote:
+>> (Sorry for sending this mail again, this one add nbd@other.debian.org)
+>>
+>> Hi kernel、ceph comunity:
+>>
+>> We run into an issue that mainly related to the (kernel) nbd driver and (ceph) rbd-nbd.
+>> After some investigations, I found that the root cause of the problem seems to be related to the change in the block size of nbd.
+>>
+>> I am not sure whether it is the nbd driver or rbd-nbd bug, however there is such a problem.
+>>
+>>
+>> What happened：
+>> It will always hang when accessing the mount point of nbd device with ext4 after nbd resized.
+>>
+>>
+>> Environment information:
+>> - kernel:               v4.19.25 or master
+>> - rbd-nbd(ceph):  v12.2.0 Luminous or master
+>> - the fs of nbd:    ext4
+> 
+> Hello lining,
+> 
+> Can you reproduce this issue on v5.9 kernel?
+> 
+> 
+> Thanks,
+> Ming
+> 
 
