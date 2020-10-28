@@ -2,76 +2,121 @@ Return-Path: <SRS0=RRdq=EE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 492DAC4363A
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 02:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D21C55179
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 02:03:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA7C320720
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 02:02:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99822215A4
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 02:03:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CgD2LZ1Y"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DqEN+Mr+";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="JI9PUKbZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727318AbgJ1Vsw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 17:48:52 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:57330 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbgJ1VnN (ORCPT
+        id S1729043AbgJ2CDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 22:03:04 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42463 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727903AbgJ1Vsn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:43:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=tjSu2r9Bd9biMwop8Y+5xZtR8qA8hCA/zD7QW3Q6gMw=; b=CgD2LZ1Y5veuIIAid305ik/pa9
-        YXiupXv3xMxxpXUTfAwvU+hMTAVV2/HgYkdQbRyLz9K5Nem7UQbJmwNvO3LZbqNWk+RenntYKH0ln
-        G2f2QmL58EDN678aOzhm51beGQZBXKhme+/jAIaUz2dKbeWdkbo2zMG91Uj09Z2BpZok6/ZcJTbnG
-        rqKR4oINLS8FplmKtv/6T0j+feA87E24fqyA1taK+unANSq1wiRvkRDnQ2vrPQ6ANp1dBHptlJg0N
-        Rj67qcm6NlEFuRJZ53tI9Wzpbr8pEoYbfOtLG2FkiJ8iX89BFgWBGR2+qVyd6z6GF+04LBUDLZuNr
-        q3JRKBnQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kXiJa-0003mv-N5; Wed, 28 Oct 2020 10:04:22 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id DCEF9300455;
-        Wed, 28 Oct 2020 11:04:20 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id C57CC20B28590; Wed, 28 Oct 2020 11:04:20 +0100 (CET)
-Date:   Wed, 28 Oct 2020 11:04:20 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCH RFC] blk-mq: Don't IPI requests on PREEMPT_RT
-Message-ID: <20201028100420.GY2628@hirez.programming.kicks-ass.net>
-References: <20201021175059.GA4989@hmbx>
- <20201023110400.bx3uzsb7xy5jtsea@linutronix.de>
- <20201023112130.GA23790@infradead.org>
- <20201023135219.mzzl76eqqy6tqwhe@linutronix.de>
- <20201027092606.GA20805@infradead.org>
- <20201027101102.cvczdb3mkvtoguo5@linutronix.de>
- <20201027160742.GA19073@infradead.org>
- <87eelj1tx0.fsf@nanos.tec.linutronix.de>
- <20201027172309.GA15004@infradead.org>
+        Wed, 28 Oct 2020 17:48:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1603921722; x=1635457722;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=SHatl5wKLhbJ1HTEYcwsngnXnHrZQwgmxwifuFPenoY=;
+  b=DqEN+Mr+THv5gUMtdadmlB2lZ9CC4Y/BzM/EiSs0ADSuPyW+uHcebW1I
+   szI2yo+CDxWlZr2RIifYjBdWU5LXI4gsfxyjQ3klPHWFVWbv1eIU5ki6O
+   O/h/WdAjTQu4mJQsLKmKao9jOp8dQ5Sut1toE5GFsUAwtMHUIozgMKa2b
+   7ewfWMC6pVLEJpmUnviZdjqvWFHm6sTyxOi30aDWTzwH49mjqvppkjwMR
+   Rh+BaQN64ZeuIlqObnoEM5WPA1u7pqFOpv/621LAOxoStDBh53EwsH/WT
+   P3dCFAA/DF11of9uuBfy4BFdSOwb4gPkzEbCn3zcVzIorG1wvVXtaklcO
+   Q==;
+IronPort-SDR: eQucXinzePyv54C/qXbWVHbmr7WyRTpWwVXHp7SwwyatGxBALKCrLZpHoOCC+HZ+7w/k8YmE0O
+ RKwRh0BCUj8ZXKqjd1i9RWHB0yHpj0gkA9aU+UGEYBhwar87a0USUzDBw001zAitq0V/s6G9Df
+ AVQn4VtWdGMdfMNvL67ERQEvPFRkxeLJae0V0ckVJIFgNMQPIjPGy2VTStqn+Dw/G+fubTC0iC
+ v0o6KGJC5R0pSWx3S4LCZ8ChEcHBF5/FagzCXhW5FWHZAUqlDxCmFGjamRhXi8mgA3FD+Zg1sU
+ ZJc=
+X-IronPort-AV: E=Sophos;i="5.77,425,1596470400"; 
+   d="scan'208";a="151169949"
+Received: from mail-dm6nam10lp2101.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.101])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Oct 2020 16:45:07 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=C/AciDJZoe8xPVJ7wX1Yrdru5AkvigpzqfivXwO+ucJb72WF2Je5+6ZoG/gTIq5W6wzqjHth9kz9FcET6gZbZA/XgKXMyzgaTeUZb9VwSCaweWnTQ9fgDxk9n0dNbDF7BoUqUK7XDwx8/s6n/E/2xMKR2AES0F6M/BvR6ZrJ3sqQZ4xMoC0tMH/zxRwvAlu7Exmm+3QBZII5QaMHFbHHE4emJHdkuot2z58WpU06YLPXkuaXe8ntmlAB9zBkvJC9UhuFQhbzOhNnYLchcI+f178Mp+WQEuUZjrdJWnBSX/7ygvgCFDNmLrj6jmrAIsPDLtPFx76pgP52CX4YSC7jlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SHatl5wKLhbJ1HTEYcwsngnXnHrZQwgmxwifuFPenoY=;
+ b=oDPfWQDfjuj6A2ap3RhWilF8HQsZWd3ubbEw0gYE8CDoLwT6jebVUrfCWKHmz595hsWKMt9MY5/EgZLhQMH1jNstFln7tef7F8C0IMgwUeiQsfM/nTS223XIg8ICC6AdvQ34+ZSHG8iyCZl+yjzUqMozG1Q6JIhlqol3CwkPQSDwbE+5uKgFAjHMmJ1JZ2o0FuLSBJ8edHoYndXWW5P/tfxCHIx72438mOj1tDAgc9+qbQ0XCtKjeiKRrjH7I8sOvwexsVzlqcZFXMQvxFWsPjTDb2kLtDh9Iocm/FTTBdrkoeEvsMWIKy1S72cIEwmoqJclSdobycFE+uxsypyQew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SHatl5wKLhbJ1HTEYcwsngnXnHrZQwgmxwifuFPenoY=;
+ b=JI9PUKbZtpQPaOfGku4fDm+ySg9kUUoTlFxt1UsPsONZfPI4/OtqEBOAz4kxO+mOTDlwVWK3grz+5K91gTZhVtWlnHhQ3816xc3AXOyUg+jrVz9oSyuv+7zzOIxCBend3rjc/oQCm3mis7rl0l6EjL0y5/qTpQaBmcxNNyIa7Xc=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SA0PR04MB7420.namprd04.prod.outlook.com
+ (2603:10b6:806:e8::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Wed, 28 Oct
+ 2020 08:45:05 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::619a:567c:d053:ce25]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::619a:567c:d053:ce25%6]) with mapi id 15.20.3477.028; Wed, 28 Oct 2020
+ 08:45:05 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Naohiro Aota <Naohiro.Aota@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH] block: advance iov_iter on bio_add_hw_page failure
+Thread-Topic: [PATCH] block: advance iov_iter on bio_add_hw_page failure
+Thread-Index: AQHWrPuN5bEkPswN00253WdAP7+4zQ==
+Date:   Wed, 28 Oct 2020 08:45:05 +0000
+Message-ID: <SN4PR0401MB3598F35451C8A3A8D9719A009B170@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <7e91d39fccbd06efdee40ad119833dbfeafd2fb7.1603868801.git.naohiro.aota@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2001:a62:14ff:e901:156e:c9ac:ebdd:d314]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: ccba5323-1090-430c-3bd2-08d87b1dc47a
+x-ms-traffictypediagnostic: SA0PR04MB7420:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SA0PR04MB74202D79DA6C15519E6C4AF59B170@SA0PR04MB7420.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:2803;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: LXyrODMq6+eRNVa0GtN/23tk752zc4xkAzRIIL+l5XAmCNvsZv9V5ATg7O7FfJ9Rby+Wa4eKcw+slCNw0AC0U7uE8d7wj5RWh6L8ZsaV1uwZ+zryMc7BVND1/BlS11m4IpOfPBKeD2S1VCj2mmWZq4gypb6j082Xa2JNo4jWHsf2b+LMZyPQ/56pN9Q2DFJ4YjzzAZSBaNAWojr8+Yln1L4qPKVmG8wYnbuTVdY4CLhMyD2JdoMrHfI2oOAt1Def9SKlg5bDCH4ziKzYktMXYpHJbGEPBRvbQ/dgby2lPpbKQQfyn7i9jC+K8+T2gpTg0JZRVMNqVmJsgqBno2LboA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(346002)(136003)(39860400002)(376002)(2906002)(9686003)(66556008)(66476007)(91956017)(64756008)(76116006)(66946007)(66446008)(316002)(5660300002)(8936002)(55016002)(8676002)(19618925003)(110136005)(186003)(52536014)(86362001)(4270600006)(478600001)(33656002)(558084003)(6506007)(7696005)(54906003)(4326008)(71200400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: 6kNR3adqSqqtwvSJZMHmH83t98yyqwxtZuR0u48tTphGSkgDfg6MDE49cT/8tqVj3NpwzpOVyLHTYBpFd40hxHIAufvCp3+ky0tHKDLz6ZNOW2yOEIe9fYl6Yu5GmQng1zZzY1ecDgQ+6A+5vy+c212QMTnEkvmpBiXu/c8SqUmWKZr/AUZkh2McHprRGUaL73Sz3I7gG1zQufEOFLmFDdmocv5EC0aejg4nltcYVpSxRQTHeO1+7S/zv1Hu5rTOnV+5tigrL2xFxrUH884D95e6d4HpjBvc5YAMbWdlm+SwGcMG3zUuONh8HfoTfpxph+4oZLst7WJjrGipDz5wTk72myLWUlEgf0v1MX0QXTrGSBmGahGT/9nKK4iyzOVLVU6/DiWSKO9K7RSkDn9AY4Cz739fhr2WRvsBiKW+7J58w3TyirVrcQE1noBHEE+7WjKg1ffS7DX1CtGnz8q71WxoN125Bw2IzNYUAjD/gVPx4/0Teqyl3JSdGMVz/9E+lvP6lgPrTuNxb8+jfJoMYQ3O5SQmXkUn3lV1UGgx2FSDh+9rdxhTfciDz8eeWeFxESViIg+ux8LoDPdoKpySnPMV9liCu5eUG7+yvIe46M9jUdeUhJ6pBsSa8RithkKw7cJVaMoGatqkCZ6CH/KOz/s892ehMxVsEUk7y7tC5rlHR3kJoyJJhgCkzmGcYPCJtPyKFVSR5Tkrl/HQr/bt8w==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201027172309.GA15004@infradead.org>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ccba5323-1090-430c-3bd2-08d87b1dc47a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Oct 2020 08:45:05.2618
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6VtnRcb6LiRUtEoXf/xjCdLKFnJYZwqbwujkIMoY9/0B9kso/lA70wT7QmTU0eckeAQ3NjrBgxEItzfwrLYSBPLeCW+rEumjzmEmZRAuiYM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR04MB7420
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 05:23:09PM +0000, Christoph Hellwig wrote:
-> Ok.  I was hoping we could hide this in core code somehow, especially
-> a peterz didn't like the use of smp_call_function_single_async in the
-> blk-mq completion code very much.
-
-It's smp_call_function_single_async() in general that I don't much like.
-But Linus seemed unconvinced, so we'll keep it for a while I suppose.
+Thanks,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
