@@ -2,82 +2,108 @@ Return-Path: <SRS0=RRdq=EE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D81C388F7
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 00:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DF0C4363A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 00:32:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C3652080C
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 00:31:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DA41207DE
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 00:32:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MEr4Wj2p"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eGFQCcb4";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iVtEV4q9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728368AbgJ2Abu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 20:31:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55974 "EHLO
+        id S2387707AbgJ1Waa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 18:30:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387910AbgJ1Wbb (ORCPT
+        with ESMTP id S1732937AbgJ1W30 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:31:31 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90954C0613D1;
-        Wed, 28 Oct 2020 15:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=11r151o8JcIiklZdrY5InpTby+OlWFUHOfysaQ6dEeo=; b=MEr4Wj2p6V6PCicC2/5IqSL14D
-        CvUuk7+ZmDja8bW9YCBqbzS8GUFijYKiYAa8vT88s7Kjl3vvBnadljzN5Rz40L7uUZrkrzbdF8Ygi
-        EyGe1dGZjF7bB+ADMWngAr7MMW24qcbizYzZ9MkxaAH205OLRzXiWGJtYkgRIEnSrzNtE+s4CxZeg
-        9NKDrKFx2xKV1pli4hqdxkQq5IaEfSBQgSlHHh6hNrRwaqAkPfDjBDimONIEyPSlK8DP5shpCF+Et
-        2suFpQ2fDAA413qvSqCUppesziln55ZKBg3rRqod8rJ3M/wZ3aP/tzXLXfVfNOFWZL8sImIqowjYv
-        eE4oaCjg==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kXfNY-0006jP-FQ; Wed, 28 Oct 2020 06:56:16 +0000
-Date:   Wed, 28 Oct 2020 06:56:16 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+        Wed, 28 Oct 2020 18:29:26 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60A5FC0613CF;
+        Wed, 28 Oct 2020 15:29:26 -0700 (PDT)
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1603894383;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Oenc0cjwon5MKl60ej1HgOeBLKZJX10OgXE32L/q/r0=;
+        b=eGFQCcb4z4k36cszZuqTNmUJikgNEzbyFVRCjge6IXwC3ZAH0e5nl4KmHm8/ftNUSub5Dw
+        K7pqoLSKoeQ39+j9rTSzbH5bp9P17T+/nnsSy+6Gm4wiuYHdvzbc4FFdipEuCECsU0o7SJ
+        O0X0I3dkY8Fm3YXyW5nlEPTyANDPrVcngBHWnOVbrXbuafY4xlzYcUbrwdZQ2Qi0MteyPp
+        1Jf4yGov3w2zlUk3GoGMAhKxiPa6xc4vDRexD1xrJGFiqjIyevLbmvniPa86ifwo+A1ZkM
+        ecUw+WDtU7fbi1T0P2t4eglia2AUnWmw0eygOWZTZpBIv22ndERDIa5OhCiqxg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1603894383;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Oenc0cjwon5MKl60ej1HgOeBLKZJX10OgXE32L/q/r0=;
+        b=iVtEV4q992c+tNfqD1NVjkVxYTneooEp1OPB/tjKSRYmmg/wdwSQS5s3PxTmAsOms+52Mg
+        +HVKmzHGKKtDm4CA==
+To:     linux-block@vger.kernel.org
 Cc:     Christoph Hellwig <hch@infradead.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
         Peter Zijlstra <peterz@infradead.org>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCH RFC] blk-mq: Don't IPI requests on PREEMPT_RT
-Message-ID: <20201028065616.GA24449@infradead.org>
-References: <20201021175059.GA4989@hmbx>
- <20201023110400.bx3uzsb7xy5jtsea@linutronix.de>
- <20201023112130.GA23790@infradead.org>
- <20201023135219.mzzl76eqqy6tqwhe@linutronix.de>
- <20201027092606.GA20805@infradead.org>
- <20201027101102.cvczdb3mkvtoguo5@linutronix.de>
- <20201027160742.GA19073@infradead.org>
- <87eelj1tx0.fsf@nanos.tec.linutronix.de>
- <20201027172309.GA15004@infradead.org>
- <20201027205806.s7qau5xf4lzuslcu@linutronix.de>
+        Daniel Wagner <dwagner@suse.de>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH 2/3] blk-mq: Always complete remote completions requests in softirq
+Date:   Wed, 28 Oct 2020 15:12:50 +0100
+Message-Id: <20201028141251.3608598-2-bigeasy@linutronix.de>
+In-Reply-To: <20201028141251.3608598-1-bigeasy@linutronix.de>
+References: <20201028065616.GA24449@infradead.org>
+ <20201028141251.3608598-1-bigeasy@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201027205806.s7qau5xf4lzuslcu@linutronix.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> The remaining part is a switch to llist which avoids locking (IRQ
-> off/on) and it allows invoke the IPI/raise softirq only if something was
-> added. The entries are now processed in the reverse order but this
-> shouldn't matter right?
+Controllers with multiple queues have their IRQ-handelers pinned to a
+CPU. The core shouldn't need to complete the request on a remote CPU.
 
-For correctness it should not matter, but I think it could have
-performance implications.  I think you'll have to throw in a
-llist_reverse_order.
+Remove this case and always raise the softirq to complete the request.
 
-> I would split this into two patches (the blk_mq_complete_need_ipi() hunk
-> and the llist part) unless there are objections.
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ block/blk-mq.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-Yes, please do.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 421a40968c9ff..769d2d532a825 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -626,19 +626,7 @@ static void __blk_mq_complete_request_remote(void *dat=
+a)
+ {
+ 	struct request *rq =3D data;
+=20
+-	/*
+-	 * For most of single queue controllers, there is only one irq vector
+-	 * for handling I/O completion, and the only irq's affinity is set
+-	 * to all possible CPUs.  On most of ARCHs, this affinity means the irq
+-	 * is handled on one specific CPU.
+-	 *
+-	 * So complete I/O requests in softirq context in case of single queue
+-	 * devices to avoid degrading I/O performance due to irqsoff latency.
+-	 */
+-	if (rq->q->nr_hw_queues =3D=3D 1)
+-		blk_mq_trigger_softirq(rq);
+-	else
+-		rq->q->mq_ops->complete(rq);
++	blk_mq_trigger_softirq(rq);
+ }
+=20
+ static inline bool blk_mq_complete_need_ipi(struct request *rq)
+--=20
+2.28.0
+
