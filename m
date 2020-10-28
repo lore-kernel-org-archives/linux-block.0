@@ -2,87 +2,110 @@ Return-Path: <SRS0=cVCO=ED=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27077C388F7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 21:54:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B38C5DF9E
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 21:56:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6CDA2470E
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 21:54:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6037524724
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 21:56:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JkIIwAYw";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4iuuf+8c"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TESpJ4K5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728224AbgJ1Vy1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 17:54:27 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:57384 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728767AbgJ1Vy1 (ORCPT
+        id S1728627AbgJ1VyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 17:54:09 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:58206 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728551AbgJ1VyI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:54:27 -0400
-Date:   Wed, 28 Oct 2020 15:47:41 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1603896463;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vjxQZUT2XHIUN+A5Fq2QlowNbrTxdzuKdrciR3H6eT4=;
-        b=JkIIwAYwW8CRXGEsk/H+Ea/gaV6UximvDbFI1DEeB0b+yAYJKp9Es0yHfrVtylY5Dz4v1x
-        m3NDKjm/bdeFMj+7znQdGoSIzGHx1OPX/yYFu0h68berJJi9ZoeHT4isJo1yEhizXxKdMi
-        a4pSSkC7e8AMNbKgmAeWFWavGjlpDjSZE/MPYMpz397Ak/59pe1HoI8V1DGjX6WsYbeir6
-        vt3eWm1r3H4hrO1CXI4Zito/OYJ+0hkbR4d7Osgp58l7W+qvjvcKY4GtVs7VxBw35Par/8
-        feIYosw8eTeB85FXa6omP1rxG1ZRVO5EKy654FiELlu82IwQ95cB2VUiUeVYUA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1603896463;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vjxQZUT2XHIUN+A5Fq2QlowNbrTxdzuKdrciR3H6eT4=;
-        b=4iuuf+8cmL2s16nDaTS4C0Gm5gWOJ8Loc9uy5WFZxOEzMGzh3jsM02ZwrQpX/leh5TjhCr
-        iKbyVNXinlcGZpCw==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCH 3/3] blk-mq: Use llist_head for blk_cpu_done
-Message-ID: <20201028144741.zvldomzk2pwj4zq6@linutronix.de>
-References: <20201028065616.GA24449@infradead.org>
- <20201028141251.3608598-1-bigeasy@linutronix.de>
- <20201028141251.3608598-3-bigeasy@linutronix.de>
- <20201028144453.GA18610@infradead.org>
+        Wed, 28 Oct 2020 17:54:08 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09S8P7mI106340;
+        Wed, 28 Oct 2020 08:29:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=DshjwVmYgG3RJTI20RdVygoq5BuGaCOAk7RVuAE3G/Q=;
+ b=TESpJ4K5zFevI983/TDO0IjSpjrIFN9IBC/kXB2NbNuiOoY56b4tVN91uHQGbUmliE0Y
+ p7tnESmQPms7gEM5AIAFrZCa5aaMJBpCueEpHudVVk32hp3zVhYEpB+BBF9pmBOeudvh
+ q94OKdfAS4Cxmj81aSctnUlRUKlXe4J+zFi3Fed6XaPcVn0xlbvWRpaLAA8z6kEOEjrM
+ 8ucYr0HzkhIsVtOsRq53hnBmauCGHtizrJxXyjJvnr3CYhN/OiSAFwU1TAAYmETJ+DDo
+ Dh7T1BxuPF+P0SwjNAndlmUocibm96A/7Zcehl3RE3JaqAOSgvBFhU0kqXs2Flrq0UDr 3w== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 34cc7kwy15-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 28 Oct 2020 08:29:02 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09S8PKmW031538;
+        Wed, 28 Oct 2020 08:27:01 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 34cx6wy1xv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 28 Oct 2020 08:27:01 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09S8R0Ix031492;
+        Wed, 28 Oct 2020 08:27:00 GMT
+Received: from [192.168.1.102] (/39.109.231.106)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 28 Oct 2020 01:27:00 -0700
+Subject: Re: [PATCH RFC 1/7] block: export part_stat_read_all
+To:     Josef Bacik <josef@toxicpanda.com>, linux-btrfs@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <cover.1603751876.git.anand.jain@oracle.com>
+ <047fe87c52b64caf1bd09eee4b1ca5130062a885.1603751876.git.anand.jain@oracle.com>
+ <5c772e21-a401-1198-29d0-7ce0278b1544@toxicpanda.com>
+From:   Anand Jain <anand.jain@oracle.com>
+Message-ID: <551a851b-fbaf-3173-09a5-8cbd92b2e7a2@oracle.com>
+Date:   Wed, 28 Oct 2020 16:26:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201028144453.GA18610@infradead.org>
+In-Reply-To: <5c772e21-a401-1198-29d0-7ce0278b1544@toxicpanda.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
+ bulkscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010280056
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 adultscore=0
+ malwarescore=0 spamscore=0 clxscore=1015 mlxscore=0 suspectscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010280056
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-10-28 14:44:53 [+0000], Christoph Hellwig wrote:
-> On Wed, Oct 28, 2020 at 03:12:51PM +0100, Sebastian Andrzej Siewior wrote:
-> >  static int blk_softirq_cpu_dead(unsigned int cpu)
-> >  {
-> > -	/*
-> > -	 * If a CPU goes away, splice its entries to the current CPU
-> > -	 * and trigger a run of the softirq
-> > -	 */
-> > -	local_irq_disable();
-> > -	list_splice_init(&per_cpu(blk_cpu_done, cpu),
-> > -			 this_cpu_ptr(&blk_cpu_done));
-> > -	raise_softirq_irqoff(BLOCK_SOFTIRQ);
-> > -	local_irq_enable();
-> > -
-> > +	blk_complete_reqs(&per_cpu(blk_cpu_done, cpu));
-> >  	return 0;
+On 28/10/20 2:09 am, Josef Bacik wrote:
+> On 10/26/20 7:55 PM, Anand Jain wrote:
+>> For mirrored raid profiles such as raid1, raid1c3, raid1c4, and raid10,
+>> currently, btrfs use the PID method to determine which one of the
+>> mirrored devices to use to read the block. However, the PID method is
+>> not the best choice if the devices are heterogeneous in terms of type,
+>> speed, and size, as we may end up reading from the slower device.
+>>
+>> Export the function part_stat_read_all() so that the btrfs can determine
+>> the device with the least average wait time to use.
+>>
+>> Cc: linux-block@vger.kernel.org
+>> Signed-off-by: Anand Jain <anand.jain@oracle.com>
 > 
-> How can this be preempted?  Can't we keep using this_cpu_ptr here?
+> You don't need this, it can be accomplished with part_stat_read, or any 
+> variety of the helpers in part_stat.h.  Thanks,
 
-cpu of the dead CPU != this CPU.
+Oh. I have missed #define part_stat_read. It works for now.
+We don't have to export part_stat_read_all() as in this patch.
 
-Sebastian
+Sorry for the noise.
+
+Thanks, Anand
+
+> 
+> Josef
+
