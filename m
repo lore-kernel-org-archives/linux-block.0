@@ -2,518 +2,232 @@ Return-Path: <SRS0=cVCO=ED=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 012A8C55178
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 01:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B32C55179
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 21:49:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9403722281
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 01:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D8BB24743
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 21:49:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ts/5RjHq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YQSJQ9rV";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="wEHfLYZw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726217AbgJ1Bio (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Oct 2020 21:38:44 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39946 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1833069AbgJ0X64 (ORCPT
+        id S1727433AbgJ1VtF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 17:49:05 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42487 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727409AbgJ1VtD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Oct 2020 19:58:56 -0400
-Received: by mail-pf1-f193.google.com with SMTP id w21so1861667pfc.7
-        for <linux-block@vger.kernel.org>; Tue, 27 Oct 2020 16:58:53 -0700 (PDT)
+        Wed, 28 Oct 2020 17:49:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1603921742; x=1635457742;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=Q14eeuR4boNpmbxQprtFqPRdAVTaOyZ2KnsPlQ5KLd4=;
+  b=YQSJQ9rVKdmEXe7hIgJmsqC3LUOxIsDE8u1/HlpZplCRzCEsLdinh9Gz
+   2JFgFOoVPcJXpAoWSNVjv1NfoO3MKb989UMI/jSC5WKS7zhI6pKOMYa0F
+   h/fRdqGurykbk4Y7WAdQ9F0+knPbeSc9o23527uZq14zOMjs/MS3S2WxA
+   My2cOsrjEBZYH87R15IH6KHs3ZMGIHW8OFZaziO2zNSJMW0oRmao+redO
+   TJMsp9ZxLSg9DvMiX9T6DFKXlQSnWsBiq4NsGvn387OLXsYFCuF90IIm3
+   FI0nCBzrsxlPuaSqXORXeSacMkATbHw27JR19lnX1/VWPuFhIxbGKKwgc
+   Q==;
+IronPort-SDR: F6zbqOICUAdKy9wH8vtuLKRyQO6f7D8HjWy/YpN9g3BTllQoUsbhHuUbvFYSB9XqwP2vISCx+S
+ k+zVnCUeo5oIOWC9JOlyFVUZiyDjHP0bP8P1/wCLkEZ0xkbkHh75KaJ4R4ObuBwQP6oi3PuvYO
+ 0L0l4ZJdLA1nY5SPWnVvP2wmuJRqUFdGrZWwpAi8SRRR2jlfHPkOYRXy37Z51JuEAWHLBHQRyx
+ 9Xow/d4xCKjM4D8E5/Hj6/llwn9c5XCYp/Venuf+i1w5BDgF9gAWa8HZC6Vt49AU/hh2IN84Ni
+ QVk=
+X-IronPort-AV: E=Sophos;i="5.77,425,1596470400"; 
+   d="scan'208";a="151136848"
+Received: from mail-dm6nam11lp2171.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.171])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Oct 2020 09:45:12 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QAvuF2f38CliV1UbsJEHuXRBuFmgv8MH/zKGQwAIwyhsnnK2MOWGXbWEtPrHB3m5W/ZWxJukoDZnypCAVN9EFskC1zCNfoRA3V+Hcnhr4kzoJrsOshGAH9EfmTwCYC0Oviq89lBIx88aewyWEdBeXw/kOlRjTklbYV6fL6z2sacC2X/RY5s1lVkCMvdnX07Xf2UVn7t/M2O/UMVgz2Byqtnnx32+ZCQF6sQuN4MkhRTRGtE5p+rCzCU8Vk9OIihSdnLMAq1aMO94WgZjQmPPy4+WqkuFKHyDEQhlujnBbT0UqbiFFjK795RKDI5KfNOwNHNUHA13Xrz42SvHJi9ueg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gtJFPJh2aaZtSYflfqkxXN+7Yh0kRZQfRuV56vsbw2I=;
+ b=HO0uPlLfd556VU74ip0Ik8viBZV6N41SqMxAEdWIv/DMgBMoDnuIeflXO8T3HD5yxH5SP45WNDm0dTajeDq+tHQYHzHB5fQiFwDyjWZeyq0xLkWEq39c99sIeQjncg+fZ80pN97M90AVYmrHNKdoIYVcOQZbu2G5KDaAE3mWg5lZxCqtSGpr4RuXwdqLE8VrnMxEhNMUC5seAenMTQCHxALiQ/xlyfmaU75wIrN7GbWYSVwwP0WMkPSmR/qTYG60adaIxN3GDF66qdh6s8ng1UxxjyId8HuuRaINEkZD5JnWhwZF6Yrr4Vky9FyDWLFPojiUMFFAxtDJeGXTL6hx6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=prJFM1A+LaL7bE5goJtHOCXfaaN+QkoPscl96s9VWu8=;
-        b=Ts/5RjHqqC30wGIkAY0EE9rOaMF6jOPqrzprLi7sihZcsNxJmjgk9cAu9A2j7iaoXr
-         fakED5GdHpRVHAtakUNx8H549ALNl1SAY3tDQmokGqLfPCh5esDbxFb717eSuEOWF9zc
-         6iQ1adI44xp2aUWWWfnZxbS1k8b15Ily8WrHElWpFYzWjpHujIjIw2ukdZQWVuWYO9MN
-         LSjUaU61KwHbo5A/6NvPu88cNpyVmD88zpV9zcMvsjT+HyWVSrAqVtLEecwIZ2N3eZ8j
-         ncv7h3HH25wh6+T7PREaAjlHVAZjpiWL+CRwAFaPG6nNZQwTV+GjNaaAhyKqOoLfDZnO
-         DQ2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=prJFM1A+LaL7bE5goJtHOCXfaaN+QkoPscl96s9VWu8=;
-        b=gA8up3DuH3H5hIn4Q33R+B/yN0AAeNqYcsXWyTrXmKKm5r06BJQ4+fTXxTAECfA5+G
-         B3aDuLHcjqTrhUr1Pn3YHfNKkp7PKjPKtfKomOuNJG8y3FdnmgbV5V7OSoSoxPcO2D7C
-         1r0cRDxoSLZx2wWsL+5t41P/iEd3loMUdo+2lHfeIkCkNJWu8bmTCQPOTtC7Q+8O862+
-         wFdNabf6TzajA1IV+aP87DzrfspGZYqAoEscYc33/uoV5tPvcS6RpBtDFsnfTNgOEiCt
-         6Csvdx7F6g8XPNQC9YxirpSaq+NSyshFIqHzHac0ITP8kYKGDRPT/fYzNtN2rV+UnYUT
-         QXgg==
-X-Gm-Message-State: AOAM533Bk/EVx2iGoJ/EZ6bCNX8EC7i/GHUr1XnhcM89T2efIX31suMY
-        77s0Rw71Bv2k0RVvgljBaiykkPO7Ye24Sw==
-X-Google-Smtp-Source: ABdhPJzBLdCE6b8oewLm8yf9VFb0H6DzJhNaHPs823K64gcgA13cRHpU09Ini5JvdgSrL94mLKCNzQ==
-X-Received: by 2002:a62:3:0:b029:160:d92:2680 with SMTP id 3-20020a6200030000b02901600d922680mr4534880pfa.44.1603843132907;
-        Tue, 27 Oct 2020 16:58:52 -0700 (PDT)
-Received: from google.com (154.137.233.35.bc.googleusercontent.com. [35.233.137.154])
-        by smtp.gmail.com with ESMTPSA id t6sm3505178pfl.50.2020.10.27.16.58.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2020 16:58:52 -0700 (PDT)
-Date:   Tue, 27 Oct 2020 23:58:47 +0000
-From:   Satya Tangirala <satyat@google.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Subject: Re: [PATCH v2 3/4] dm: add support for passing through inline crypto
- support
-Message-ID: <20201027235847.GA913775@google.com>
-References: <20201015214632.41951-1-satyat@google.com>
- <20201015214632.41951-4-satyat@google.com>
- <20201027213151.GC2416412@gmail.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gtJFPJh2aaZtSYflfqkxXN+7Yh0kRZQfRuV56vsbw2I=;
+ b=wEHfLYZwTiXMpQKpiYTzatmDFqgGdg9prD82FqdIKGz6UK+EgT5aJFAOMHQqkqWYCAWMHCd06tmc+CdDE5oZNmBeuVr6ZvoK3Zdx/ilYtEuCeTvjRNvh/jkE6nsVuvxChgUaPfKqoQ0Pfgf4QE5nW7zFexeh/tRQTReguhhvbyo=
+Received: from DM6PR04MB6527.namprd04.prod.outlook.com (2603:10b6:5:20e::9) by
+ DM5PR04MB0890.namprd04.prod.outlook.com (2603:10b6:4:41::37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3477.28; Wed, 28 Oct 2020 01:45:10 +0000
+Received: from DM6PR04MB6527.namprd04.prod.outlook.com
+ ([fe80::bc32:8dc6:39dd:f827]) by DM6PR04MB6527.namprd04.prod.outlook.com
+ ([fe80::bc32:8dc6:39dd:f827%9]) with mapi id 15.20.3499.018; Wed, 28 Oct 2020
+ 01:45:10 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
+        "javier.gonz@samsung.com" <javier.gonz@samsung.com>,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v2 1/1] null_blk: synchronization fix for zoned device
+Thread-Topic: [PATCH v2 1/1] null_blk: synchronization fix for zoned device
+Thread-Index: AQHWlX4IaLdglWyy80qXrKErMeNvWA==
+Date:   Wed, 28 Oct 2020 01:45:10 +0000
+Message-ID: <DM6PR04MB652715459ACA71EBA758A1DDE7170@DM6PR04MB6527.namprd04.prod.outlook.com>
+References: <20200928095549.184510-1-joshi.k@samsung.com>
+ <CGME20200928095914epcas5p1beae8d5a201c35b598fde8288532d58d@epcas5p1.samsung.com>
+ <20200928095549.184510-2-joshi.k@samsung.com>
+ <CY4PR04MB37511C151D0F37DC62BB4CE6E7350@CY4PR04MB3751.namprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: kernel.dk; dkim=none (message not signed)
+ header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2400:2411:43c0:6000:3dd3:d7e5:5981:e303]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: eece3745-8416-472c-3f0b-08d87ae31b4b
+x-ms-traffictypediagnostic: DM5PR04MB0890:
+x-microsoft-antispam-prvs: <DM5PR04MB08909763C6C63824E101B211E7170@DM5PR04MB0890.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:2887;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 8DR82d0AQfQnygQtp347jd4wtLvkRZMoihehANgREXroicIja6GEldwpgMbcN/q56NfCPn+GhWkp2/FDFQtBdWxVSVLT5J5LV/K8aZFKhKrizlad13wG5nXJXq7SmCihaiebXeplVMVTLwFdZnRoTIXcamK5QoGzdf5I65x5zteEFgyD7el2hAom4pPlENDi39DC+/Uup9RILrH+qN18L3upgfAwN1BQ0Ls04bA2VZNLH2cg+31z/xEnkeg8xb9mq5p4+DFKB2JrCQnTh0XlEm+SBbaMYX6sunvZ9OQjQjxW9e6GnU4ZW5TvNPn+BCLYb7sbQMGYVquDF8vqNuslSw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6527.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(39860400002)(346002)(366004)(376002)(8936002)(53546011)(6506007)(8676002)(2906002)(55016002)(316002)(9686003)(6916009)(186003)(91956017)(66946007)(54906003)(76116006)(86362001)(83380400001)(478600001)(66556008)(71200400001)(33656002)(4326008)(66446008)(64756008)(5660300002)(52536014)(7696005)(66476007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: 7E5bB+QE0nKT4NF1npHh3WWWQpW/UqPilneiJoTcnGvjqGa9wm2zSX3jBk6t3lqz+CSNHtSQkPRba5Q8AYkfaew7EyWzNeTwFh9aNKnVX2RAlN8EM9xRV23SuV/F4WaALKMx8y0RpGu8xt26MEIeasMYwulp1sTkTj9jyYGdnuJBae3yE7aLiH0FnCK6lB+wiMk9xrR7lZHZPTx1tn5N4F9oGgzP1gmgVKejBWeXahRnJ+RIFU8pjyFHFHYxLnVQz+z8GIVCgbyahwjagkMaoqKj1AukrbkGRabrxUeIr2Y/j1KGx3xwcRSrDdEx+rIDGN7ASlxemjR22pK9LMyZEi6BWh8z6gCRw/V6MNEN/9FSPLqMv+vZCVvazu4ULktF7HUsJa/X3GdcJpFrxAxUOQOcYDgpIQJL5yDAprWMCmMRfFvXmgCSiKLKjG/in+4UzqfR3of+kfNHaHYgMbYufKlFuFPeecba6zDfcRZUjQTIIYGXw7zRVZgFgKg9VK/X91diKTOdUpCC/KKjDWZoOpeCzSkZ1ftKDbHyI6ooQagUlxQ09ktX3B9sy/dHq1UcFIW/AybnDiIrDQTNsJnDCzK2ExLIxSA62eWhpcqnwjjA1Kmo2ki0ybhp5RHxxijeNPdzNePxI73aecM2adysgwx/bRjo3JOa6ATFhnbY1Wd7EcF0cENFCOPfdnNl8DaXFmBcHE48cJmQrgwH1am/lw==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201027213151.GC2416412@gmail.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB6527.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eece3745-8416-472c-3f0b-08d87ae31b4b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Oct 2020 01:45:10.6090
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QqYDmfV88StqNgaW9KcSmTVZeuYM2bqCh9WRRUZ4q/kAxLOjNCYNLkggYC22gLWUCIyLq+pBrWhirgnpzrc4Wg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB0890
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 02:31:51PM -0700, Eric Biggers wrote:
-> On Thu, Oct 15, 2020 at 09:46:31PM +0000, Satya Tangirala wrote:
-> > Update the device-mapper core to support exposing the inline crypto
-> > support of the underlying device(s) through the device-mapper device.
-> > 
-> > This works by creating a "passthrough keyslot manager" for the dm
-> > device, which declares support for encryption settings which all
-> > underlying devices support.  When a supported setting is used, the bio
-> > cloning code handles cloning the crypto context to the bios for all the
-> > underlying devices.  When an unsupported setting is used, the blk-crypto
-> > fallback is used as usual.
-> > 
-> > Crypto support on each underlying device is ignored unless the
-> > corresponding dm target opts into exposing it.  This is needed because
-> > for inline crypto to semantically operate on the original bio, the data
-> > must not be transformed by the dm target.  Thus, targets like dm-linear
-> > can expose crypto support of the underlying device, but targets like
-> > dm-crypt can't.  (dm-crypt could use inline crypto itself, though.)
-> > 
-> > When a key is evicted from the dm device, it is evicted from all
-> > underlying devices.
-> > 
-> > A DM device's table can only be changed if the "new" inline encryption
-> > capabilities are a superset of the "old" inline encryption capabilities.
-> > Attempts to make changes to the table that result in some inline encryption
-> > capability becoming no longer supported will be rejected.
-> > 
-> > Co-developed-by: Eric Biggers <ebiggers@google.com>
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > Signed-off-by: Satya Tangirala <satyat@google.com>
-> > ---
-> >  block/blk-crypto.c              |   1 +
-> >  block/keyslot-manager.c         |  89 +++++++++++++
-> >  drivers/md/dm-ioctl.c           |   8 ++
-> >  drivers/md/dm.c                 | 217 +++++++++++++++++++++++++++++++-
-> >  drivers/md/dm.h                 |  19 +++
-> >  include/linux/device-mapper.h   |   6 +
-> >  include/linux/keyslot-manager.h |  17 +++
-> >  7 files changed, 356 insertions(+), 1 deletion(-)
-> 
-> I'm having a hard time understanding what's going on in this patch now.  Besides
-> the simplifications I'm suggesting in other comments below, you should consider
-> splitting this into more than one patch.  The block layer changes could be a
-> separate patch, as could the key eviction support.
-> 
-Sure - I'll also add more details on the patch in the commit message.
-> > 
-> > diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-> > index 5da43f0973b4..c2be8f15006c 100644
-> > --- a/block/blk-crypto.c
-> > +++ b/block/blk-crypto.c
-> > @@ -409,3 +409,4 @@ int blk_crypto_evict_key(struct request_queue *q,
-> >  	 */
-> >  	return blk_crypto_fallback_evict_key(key);
-> >  }
-> > +EXPORT_SYMBOL_GPL(blk_crypto_evict_key);
-> > diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
-> > index 5ad476dafeab..e16e4a074765 100644
-> > --- a/block/keyslot-manager.c
-> > +++ b/block/keyslot-manager.c
-> > @@ -416,6 +416,95 @@ void blk_ksm_unregister(struct request_queue *q)
-> >  {
-> >  	q->ksm = NULL;
-> >  }
-> > +EXPORT_SYMBOL_GPL(blk_ksm_unregister);
-> 
-> blk_ksm_unregister() doesn't seem to be necessary, since it just sets a pointer
-> to NULL, which the callers could easily do themselves.
-> 
-> > +/**
-> > + * blk_ksm_intersect_modes() - restrict supported modes by child device
-> > + * @parent: The keyslot manager for parent device
-> > + * @child: The keyslot manager for child device, or NULL
-> > + *
-> > + * Clear any crypto mode support bits in @parent that aren't set in @child.
-> > + * If @child is NULL, then all parent bits are cleared.
-> > + *
-> > + * Only use this when setting up the keyslot manager for a layered device,
-> > + * before it's been exposed yet.
-> > + */
-> > +void blk_ksm_intersect_modes(struct blk_keyslot_manager *parent,
-> > +			     const struct blk_keyslot_manager *child)
-> > +{
-> > +	if (child) {
-> > +		unsigned int i;
-> > +
-> > +		parent->max_dun_bytes_supported =
-> > +			min(parent->max_dun_bytes_supported,
-> > +			    child->max_dun_bytes_supported);
-> > +		for (i = 0; i < ARRAY_SIZE(child->crypto_modes_supported);
-> > +		     i++) {
-> > +			parent->crypto_modes_supported[i] &=
-> > +				child->crypto_modes_supported[i];
-> > +		}
-> > +	} else {
-> > +		parent->max_dun_bytes_supported = 0;
-> > +		memset(parent->crypto_modes_supported, 0,
-> > +		       sizeof(parent->crypto_modes_supported));
-> > +	}
-> > +}
-> > +EXPORT_SYMBOL_GPL(blk_ksm_intersect_modes);
-> > +
-> > +/**
-> > + * blk_ksm_is_superset() - Check if a KSM supports a superset of crypto modes
-> > + *			   and DUN bytes that another KSM supports.
-> > + * @ksm_superset: The KSM that we want to verify is a superset
-> > + * @ksm_subset: The KSM that we want to verify is a subset
-> > + *
-> > + * Return: True if @ksm_superset supports a superset of the crypto modes and DUN
-> > + *	   bytes that @ksm_subset supports.
-> > + */
-> > +bool blk_ksm_is_superset(struct blk_keyslot_manager *ksm_superset,
-> > +			 struct blk_keyslot_manager *ksm_subset)
-> 
-> blk_ksm_is_superset() is confusing because it actually does "superset or the
-> same", not just "superset".  That *is* the mathematical definition of superset,
-> but it may not be what people expect when they read this...  Is there a better
-> name, or can the comment properly explain it?
-> 
-A better name still eludes me, but I'll definitely at least comment it better
-if I still can't think of a better name.
-> > +/**
-> > + * blk_ksm_update_capabilities() - Update the restrictions of a KSM to those of
-> > + *				   another KSM
-> > + * @target_ksm: The KSM whose restrictions to update.
-> > + * @reference_ksm: The KSM to whose restrictions this function will update
-> > + *		   @target_ksm's restrictions to,
-> > + */
-> > +void blk_ksm_update_capabilities(struct blk_keyslot_manager *target_ksm,
-> > +				 struct blk_keyslot_manager *reference_ksm)
-> > +{
-> > +	memcpy(target_ksm->crypto_modes_supported,
-> > +	       reference_ksm->crypto_modes_supported,
-> > +	       sizeof(target_ksm->crypto_modes_supported));
-> > +
-> > +	target_ksm->max_dun_bytes_supported =
-> > +				reference_ksm->max_dun_bytes_supported;
-> > +}
-> > +EXPORT_SYMBOL_GPL(blk_ksm_update_capabilities);
-> 
-> Wouldn't it be easier to replace the original blk_keyslot_manager, rather than
-> modify it?  Then blk_ksm_update_capabilities() wouldn't be needed.
-> 
-I didn't want to replace the original blk_keyslot_manager because it's
-possible that e.g. fscrypt is checking for crypto capabilities support
-via blk_ksm_crypto_cfg_supported() when DM wants to replace the
-blk_keyslot_manager. DM would have to free the memory used by the
-blk_keyslot_manager, but blk_ksm_crypto_cfg_supported() might still
-be trying to access that memory. I did it this way to avoid having to
-add refcounts or something else to the blk_keyslot_manager...(And I
-didn't bother adding any synchronization code since the capabilities
-only ever expand, and never contract).
-> > diff --git a/drivers/md/dm-ioctl.c b/drivers/md/dm-ioctl.c
-> > index cd0478d44058..2b3efa9f9fae 100644
-> > --- a/drivers/md/dm-ioctl.c
-> > +++ b/drivers/md/dm-ioctl.c
-> > @@ -1358,6 +1358,10 @@ static int table_load(struct file *filp, struct dm_ioctl *param, size_t param_si
-> >  		goto err_unlock_md_type;
-> >  	}
-> >  
-> > +	r = dm_verify_inline_encryption(md, t);
-> > +	if (r)
-> > +		goto err_unlock_md_type;
-> > +
-> >  	if (dm_get_md_type(md) == DM_TYPE_NONE) {
-> >  		/* Initial table load: acquire type of table. */
-> >  		dm_set_md_type(md, dm_table_get_type(t));
-> > @@ -2114,6 +2118,10 @@ int __init dm_early_create(struct dm_ioctl *dmi,
-> >  	if (r)
-> >  		goto err_destroy_table;
-> >  
-> > +	r = dm_verify_inline_encryption(md, t);
-> > +	if (r)
-> > +		goto err_destroy_table;
-> > +
-> >  	md->type = dm_table_get_type(t);
-> >  	/* setup md->queue to reflect md's type (may block) */
-> >  	r = dm_setup_md_queue(md, t);
-> 
-> Both table_load() and dm_early_create() call dm_setup_md_queue().  Wouldn't it
-> be simpler to handle inline encryption in dm_setup_md_queue(), instead of doing
-> it in both table_load() and dm_early_create()?
-> 
-table_load() only calls dm_setup_md_queue() on initial table load (when
-the md_type is DM_TYPE_NONE), so I can't call
-dm_verify_inline_encryption() in only dm_setup_md_queue(), because
-dm_verify_inline_encryption() needs to run on every table load.
-> > +/*
-> > + * Constructs and returns a keyslot manager that represents the crypto
-> > + * capabilities of the devices described by the dm_table. However, if the
-> > + * constructed keyslot manager does not support a superset of the crypto
-> > + * capabilities supported by the currect keyslot manager of the mapped_device,
-> > + * it returns an error instead, since we don't support restricting crypto
-> > + * capabilities on table changes.
-> > + */
-> > +static struct blk_keyslot_manager *
-> > +dm_init_inline_encryption(struct mapped_device *md, struct dm_table *t)
-> > +{
-> > +	struct blk_keyslot_manager *ksm;
-> > +	struct dm_target *ti;
-> > +	unsigned int i;
-> > +
-> > +	ksm = kmalloc(sizeof(*ksm), GFP_KERNEL);
-> > +	if (!ksm)
-> > +		return ERR_PTR(-EINVAL);
-> 
-> ENOMEM, not EINVAL.
-> 
-Ahhh :(
-> > +	blk_ksm_init_passthrough(ksm);
-> > +	ksm->ksm_ll_ops = dm_ksm_ll_ops;
-> > +	ksm->max_dun_bytes_supported = UINT_MAX;
-> > +	memset(ksm->crypto_modes_supported, 0xFF,
-> > +	       sizeof(ksm->crypto_modes_supported));
-> > +	ksm->priv = md;
-> > +
-> > +	for (i = 0; i < dm_table_get_num_targets(t); i++) {
-> > +		ti = dm_table_get_target(t, i);
-> > +
-> > +		if (!ti->may_passthrough_inline_crypto) {
-> > +			blk_ksm_intersect_modes(ksm, NULL);
-> > +			break;
-> > +		}
-> > +		if (!ti->type->iterate_devices)
-> > +			continue;
-> > +		ti->type->iterate_devices(ti, device_intersect_crypto_modes,
-> > +					  ksm);
-> > +	}
-> > +
-> > +	if (!blk_ksm_is_superset(ksm, md->queue->ksm)) {
-> > +		DMWARN("Inline encryption capabilities of new DM table were more restrictive than the old table's. This is not supported!");
-> > +		blk_ksm_destroy(ksm);
-> > +		return ERR_PTR(-EOPNOTSUPP);
-> 
-> Missing kfree(ksm).
-> 
-Ah I totally forgot blk_ksm_destroy() doesn't free the memory used by
-the ksm (not anymore at least, I'm getting confused by the numerous
-revisions that code went through) - I'll need to fix that everywhere.
-> Also it looks like other code is using EINVAL for a bad dm table.
-> 
-> > +	}
-> > +
-> > +	return ksm;
-> 
-> How about returning NULL if no crypto modes are actually supported?
-> 
-> > +/**
-> > + * dm_verify_inline_encryption() - Verifies that the current keyslot manager of
-> > + *				   the mapped_device can be replaced by the
-> > + *				   keyslot manager of a given dm_table.
-> > + * @md: The mapped_device
-> > + * @t: The dm_table
-> > + *
-> > + * In particular, this function checks that the keyslot manager that will be
-> > + * constructed for the dm_table will support a superset of the capabilities that
-> > + * the current keyslot manager of the mapped_device supports.
-> > + *
-> > + * Return: 0 if the table's keyslot_manager can replace the current keyslot
-> > + *	   manager of the mapped_device. Negative value otherwise.
-> > + */
-> > +int dm_verify_inline_encryption(struct mapped_device *md, struct dm_table *t)
-> > +{
-> > +	struct blk_keyslot_manager *ksm = dm_init_inline_encryption(md, t);
-> > +
-> > +	if (IS_ERR(ksm))
-> > +		return PTR_ERR(ksm);
-> > +	blk_ksm_destroy(ksm);
-> > +
-> > +	return 0;
-> > +}
-> 
-> This function seems redundant with dm_init_inline_encryption().  Wouldn't it be
-> simpler to do:
-> 
-> - dm_setup_md_queue() and dm_swap_table() call dm_init_inline_encryption() after
->   dm_calculate_queue_limits().
-> 
-> - ksm gets passed to dm_table_set_restrictions(), which calls
->   dm_update_keyslot_manager() (maybe rename to dm_update_inline_encryption()?)
->   to actually set q->ksm.
-> 
-> That way, the crypto capabilities would be handled similarly to how the
-> queue_limits are already handled.
-> 
-If we call it from dm_swap_table(), we could have it pass the returned
-ksm to __bind(), either as a new argument, or by adding the ksm to the
-queue_limits (I'll have to check if that's ok/a good idea in the first
-place), and __bind() could send the argument to
-dm_table_set_restrictions()
-
-But the real issue is, I think we should check whether a new table is
-valid (from the ksm capabilities support perspective) at the time that
-table is loaded (as opposed to only checking it when DM attempts to swap
-it in, which might be a lot later, when the user resumes the device) - so
-I can't only call it from dm_setup_md_queue(), and I'd have to call it
-from table_load() anyway. And the returned ksm that table_load() obtains
-from dm_init_inline_encryption() can't really be used - because
-1) the ksm constructed at dm_swap_table() might actually support more
-capabilities than the ksm constructed in table_load(), because
-underlying devices might get resumed, and have new tables swapped in,
-and might support more capabilities than before
-2) a subsequent dm_swap_table() call could fail for whatever reason, and
-we'll need to revert to the current ksm.
-
-What I'm doing right now is simply freeing the ksm returned by
-dm_init_inline_encryption() whenever it's called from table_load()
-(and I'm trying to make that process a little nicer by wrapping it in a
-function called dm_verify_inline_encryption()) - so if we're going to
-have to call dm_init_inline_encryption() and then freeing the returned
-ksm in table_load(), I think it might be better to continue to have
-dm_verify_inline_encryption(), unless you'd prefer just open coding the
-function directly.
-> > +static void dm_update_keyslot_manager(struct mapped_device *md,
-> > +				      struct blk_keyslot_manager *ksm)
-> > +{
-> > +	bool ksm_is_empty = true;
-> > +	int i;
-> > +
-> > +	/*
-> > +	 * If the new KSM doesn't actually support any crypto modes, we may as
-> > +	 * well set a NULL ksm.
-> > +	 */
-> > +	ksm_is_empty = true;
-> > +	for (i = 0; i < ARRAY_SIZE(ksm->crypto_modes_supported); i++) {
-> > +		if (ksm->crypto_modes_supported[i]) {
-> > +			ksm_is_empty = false;
-> > +			break;
-> > +		}
-> > +	}
-> 
-> dm_init_inline_encryption() seems like a better place for this "are no modes
-> supported" logic.
-> 
-Alright :)
-> > +	if (ksm_is_empty) {
-> > +		blk_ksm_destroy(ksm);
-> > +
-> > +		/* At this point, md->queue->ksm must also be NULL, since we're
-> > +		 * guaranteed that ksm is a superset of md->queue->ksm, and we
-> > +		 * never set md->queue->ksm to a non-null empty ksm.
-> > +		 */
-> > +		if (WARN_ON(md->queue->ksm))
-> > +			blk_ksm_register(NULL, md->queue);
-> > +		return;
-> > +	}
-> > +
-> > +	/* Make the ksm less restrictive */
-> > +	if (!md->queue->ksm) {
-> > +		blk_ksm_register(ksm, md->queue);
-> > +	} else {
-> > +		blk_ksm_update_capabilities(md->queue->ksm, ksm);
-> > +		blk_ksm_destroy(ksm);
-> > +	}
-> > +}
-> 
-> Wouldn't it be simpler to just destroy (and free) the existing
-> blk_keyslot_manager (if any), then set the new one (if it's not NULL)?
->
-Yeah, I really wanted to do that too, but as I addressed above, I don't
-think it's that straightforward :(
-> > +static void dm_destroy_inline_encryption(struct mapped_device *md)
-> > +{
-> > +	if (!md->queue->ksm)
-> > +		return;
-> > +	blk_ksm_destroy(md->queue->ksm);
-> 
-> Missing kfree().
->
-Thanks, will address this everywhere I call blk_ksm_destroy().
-> > +	blk_ksm_unregister(md->queue);
-> > +}
-> > +
-> > +#else /* CONFIG_BLK_INLINE_ENCRYPTION */
-> > +
-> > +static inline struct blk_keyslot_manager *
-> > +dm_init_inline_encryption(struct mapped_device *md, struct dm_table *t)
-> > +{
-> > +	return NULL;
-> > +}
-> 
-> Seems it would be simpler for these functions to take a request_queue instead of
-> a mapped_device.
-> 
-> >  /*
-> >   * Returns old map, which caller must destroy.
-> >   */
-> > @@ -1959,6 +2164,7 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
-> >  	struct request_queue *q = md->queue;
-> >  	bool request_based = dm_table_request_based(t);
-> >  	sector_t size;
-> > +	struct blk_keyslot_manager *ksm;
-> >  	int ret;
-> >  
-> >  	lockdep_assert_held(&md->suspend_lock);
-> > @@ -1994,12 +2200,21 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
-> >  		md->immutable_target = dm_table_get_immutable_target(t);
-> >  	}
-> >  
-> > +	ksm = dm_init_inline_encryption(md, t);
-> > +	if (IS_ERR(ksm)) {
-> > +		old_map = ERR_PTR(PTR_ERR(ksm));
-> > +		goto out;
-> > +	}
-> 
-> It seems too late to fail here, since the mapped_device already started being
-> updated.  What I suggested above would address this.
->
-Alright, I'll move the call to dm_init_inline_encryption() earlier, into
-dm_swap_table().
-> > +#ifdef CONFIG_BLK_INLINE_ENCRYPTION
-> > +
-> >  /**
-> >   * struct blk_ksm_ll_ops - functions to manage keyslots in hardware
-> >   * @keyslot_program:	Program the specified key into the specified slot in the
-> > @@ -106,6 +108,21 @@ void blk_ksm_reprogram_all_keys(struct blk_keyslot_manager *ksm);
-> >  
-> >  void blk_ksm_destroy(struct blk_keyslot_manager *ksm);
-> >  
-> > +void blk_ksm_intersect_modes(struct blk_keyslot_manager *parent,
-> > +			     const struct blk_keyslot_manager *child);
-> > +
-> >  void blk_ksm_init_passthrough(struct blk_keyslot_manager *ksm);
-> >  
-> > +bool blk_ksm_is_superset(struct blk_keyslot_manager *ksm_superset,
-> > +			 struct blk_keyslot_manager *ksm_subset);
-> > +
-> > +void blk_ksm_update_capabilities(struct blk_keyslot_manager *target_ksm,
-> > +				 struct blk_keyslot_manager *reference_ksm);
-> > +
-> > +#else /* CONFIG_BLK_INLINE_ENCRYPTION */
-> > +
-> > +static inline void blk_ksm_destroy(struct blk_keyslot_manager *ksm) { }
-> > +
-> > +#endif /* CONFIG_BLK_INLINE_ENCRYPTION */
-> 
-> Is the blk_ksm_destroy() stub really needed?
->
-I'm calling blk_ksm_destroy() from __bind() wihout any ifdefs, so I
-think it's necessary - I'll check again just in case.
-> - Eric
+On 2020/09/28 19:12, Damien Le Moal wrote:=0A=
+> On 2020/09/28 18:59, Kanchan Joshi wrote:=0A=
+>> Parallel write,read,zone-mgmt operations accessing/altering zone state=
+=0A=
+>> and write-pointer may get into race. Avoid the situation by using a new=
+=0A=
+>> spinlock for zoned device.=0A=
+>> Concurrent zone-appends (on a zone) returning same write-pointer issue=
+=0A=
+>> is also avoided using this lock.=0A=
+>>=0A=
+>> Fixes: e0489ed5daeb ("null_blk: Support REQ_OP_ZONE_APPEND")=0A=
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>=0A=
+>> ---=0A=
+>>  drivers/block/null_blk.h       |  1 +=0A=
+>>  drivers/block/null_blk_zoned.c | 22 ++++++++++++++++++----=0A=
+>>  2 files changed, 19 insertions(+), 4 deletions(-)=0A=
+>>=0A=
+>> diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h=0A=
+>> index daed4a9c3436..28099be50395 100644=0A=
+>> --- a/drivers/block/null_blk.h=0A=
+>> +++ b/drivers/block/null_blk.h=0A=
+>> @@ -44,6 +44,7 @@ struct nullb_device {=0A=
+>>  	unsigned int nr_zones;=0A=
+>>  	struct blk_zone *zones;=0A=
+>>  	sector_t zone_size_sects;=0A=
+>> +	spinlock_t zone_lock;=0A=
+>>  =0A=
+>>  	unsigned long size; /* device size in MB */=0A=
+>>  	unsigned long completion_nsec; /* time in ns to complete a request */=
+=0A=
+>> diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zon=
+ed.c=0A=
+>> index 3d25c9ad2383..e8d8b13aaa5a 100644=0A=
+>> --- a/drivers/block/null_blk_zoned.c=0A=
+>> +++ b/drivers/block/null_blk_zoned.c=0A=
+>> @@ -45,6 +45,7 @@ int null_init_zoned_dev(struct nullb_device *dev, stru=
+ct request_queue *q)=0A=
+>>  	if (!dev->zones)=0A=
+>>  		return -ENOMEM;=0A=
+>>  =0A=
+>> +	spin_lock_init(&dev->zone_lock);=0A=
+>>  	if (dev->zone_nr_conv >=3D dev->nr_zones) {=0A=
+>>  		dev->zone_nr_conv =3D dev->nr_zones - 1;=0A=
+>>  		pr_info("changed the number of conventional zones to %u",=0A=
+>> @@ -131,8 +132,11 @@ int null_report_zones(struct gendisk *disk, sector_=
+t sector,=0A=
+>>  		 * So use a local copy to avoid corruption of the device zone=0A=
+>>  		 * array.=0A=
+>>  		 */=0A=
+>> +		spin_lock_irq(&dev->zone_lock);=0A=
+>>  		memcpy(&zone, &dev->zones[first_zone + i],=0A=
+>>  		       sizeof(struct blk_zone));=0A=
+>> +		spin_unlock_irq(&dev->zone_lock);=0A=
+>> +=0A=
+>>  		error =3D cb(&zone, i, data);=0A=
+>>  		if (error)=0A=
+>>  			return error;=0A=
+>> @@ -277,18 +281,28 @@ static blk_status_t null_zone_mgmt(struct nullb_cm=
+d *cmd, enum req_opf op,=0A=
+>>  blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_opf=
+ op,=0A=
+>>  				    sector_t sector, sector_t nr_sectors)=0A=
+>>  {=0A=
+>> +	blk_status_t sts;=0A=
+>> +	struct nullb_device *dev =3D cmd->nq->dev;=0A=
+>> +=0A=
+>> +	spin_lock_irq(&dev->zone_lock);=0A=
+>>  	switch (op) {=0A=
+>>  	case REQ_OP_WRITE:=0A=
+>> -		return null_zone_write(cmd, sector, nr_sectors, false);=0A=
+>> +		sts =3D null_zone_write(cmd, sector, nr_sectors, false);=0A=
+>> +		break;=0A=
+>>  	case REQ_OP_ZONE_APPEND:=0A=
+>> -		return null_zone_write(cmd, sector, nr_sectors, true);=0A=
+>> +		sts =3D null_zone_write(cmd, sector, nr_sectors, true);=0A=
+>> +		break;=0A=
+>>  	case REQ_OP_ZONE_RESET:=0A=
+>>  	case REQ_OP_ZONE_RESET_ALL:=0A=
+>>  	case REQ_OP_ZONE_OPEN:=0A=
+>>  	case REQ_OP_ZONE_CLOSE:=0A=
+>>  	case REQ_OP_ZONE_FINISH:=0A=
+>> -		return null_zone_mgmt(cmd, op, sector);=0A=
+>> +		sts =3D null_zone_mgmt(cmd, op, sector);=0A=
+>> +		break;=0A=
+>>  	default:=0A=
+>> -		return null_process_cmd(cmd, op, sector, nr_sectors);=0A=
+>> +		sts =3D null_process_cmd(cmd, op, sector, nr_sectors);=0A=
+>>  	}=0A=
+>> +	spin_unlock_irq(&dev->zone_lock);=0A=
+>> +=0A=
+>> +	return sts;=0A=
+>>  }=0A=
+>>=0A=
+> =0A=
+> Looks good.=0A=
+> =0A=
+> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+=0A=
+Jens,=0A=
+=0A=
+Could you queue this patch for rc2 please ?=0A=
+We are seeing some issues with zone append in btrfs testing without it.=0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
