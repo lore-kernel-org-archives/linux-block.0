@@ -2,106 +2,106 @@ Return-Path: <SRS0=cVCO=ED=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9C3C56201
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D4FC56201
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:30:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E4A52071A
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:29:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2A4120720
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:29:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="s81GeZDO"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="31D5ynv4";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VzXM6tXW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733185AbgJ1W3B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 18:29:01 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:54622 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387470AbgJ1W2w (ORCPT
+        id S1733134AbgJ1W36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 18:29:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55598 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387570AbgJ1W30 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:28:52 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09S8PCoa106370;
-        Wed, 28 Oct 2020 08:32:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=ravJk633C2uE6JSphklEGkafQyLLeeKun8Ka8Tci5S0=;
- b=s81GeZDOEQuedA+GnZL5mXGkxmKNDW+6/GY3m2c4BwFNNaUSv/y2tOEQaDFfdcUnAcDj
- 6sK9AmelyQW3FG5vA59GH6E8KN5gOxTbwDq9TVSxWv9BY/w2240v31rRZzFRgOMJaH8T
- uX1M2xJgpcxIA5K5FwbL5t1U9MqRY/lho5NkezM9S0kMIC21IntFjnjOQnm0b6QK5UIH
- corqeTvrSNfVizic8WDh1TYINofhZFaAPKoAmxzW9WrzyUz7RVZefIAKTFxLFBmfRmZ8
- ZZHUTtJq2Cyl+leIaMyISKlwnmQwdb67NYXavGuqfifTV127Vr8AoaeUG7pYgwYocFe4 Zg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 34cc7kwyhk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 28 Oct 2020 08:32:12 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09S8UTgc057226;
-        Wed, 28 Oct 2020 08:32:12 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 34cwunb546-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Oct 2020 08:32:12 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09S8WAh6001574;
-        Wed, 28 Oct 2020 08:32:11 GMT
-Received: from [192.168.1.102] (/39.109.231.106)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 28 Oct 2020 01:32:10 -0700
-Subject: Re: [PATCH RFC 2/7] block: export part_stat_read_inflight
-To:     Josef Bacik <josef@toxicpanda.com>, linux-btrfs@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <cover.1603751876.git.anand.jain@oracle.com>
- <187d1f02f82019d48f66c97c0d1b99c9a58cd553.1603751876.git.anand.jain@oracle.com>
- <7e98c923-d484-d05e-b5de-4eb85114ba4d@toxicpanda.com>
-From:   Anand Jain <anand.jain@oracle.com>
-Message-ID: <d9e13a30-89e6-9e78-1d65-2cef5cc76f36@oracle.com>
-Date:   Wed, 28 Oct 2020 16:32:07 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        Wed, 28 Oct 2020 18:29:26 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9C4C0613D2;
+        Wed, 28 Oct 2020 15:29:26 -0700 (PDT)
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1603894382;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CqSkQpMY6URuz0G0Q4TnfzC+8Rq7slmLYOYzQAzOWGc=;
+        b=31D5ynv45XvdzRDTEELN87qhI/8dZPSaNTNTJOCAB47le0wvb6YrGebef1K6+R/yD/U6aU
+        aZ64XufcS/VUufhS7Ix6k2Xdd/nsIwWTrOQMf1QxkAHv0VF+qOQygb1VZGNOUnEwAknB17
+        xZ2CrxmX+E4AELBSKoqbTUFaG3OuM3ZlDPxznTpQuXbTGUdIGacOtnmb13e1fJx6IBSKuC
+        OhJpbARqtRuXXBOqZjh0a2y+lpPXH6A7pPv+nNAzKUKCF7M1fewCX05oSLRGX78+aldNf2
+        /PNLIH4ZgPav3aYvutCTrNdtRazco7kK/v1SHMy7J1oywJ3q/DP6BoFlCvGTeA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1603894382;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CqSkQpMY6URuz0G0Q4TnfzC+8Rq7slmLYOYzQAzOWGc=;
+        b=VzXM6tXWEg+XudQIjBFsQQy6kC9HVzTMeWbxvOMd5pYMok+TJDPH/B6ziFhpiKsdGF2Njk
+        C3Ye3gLCeVxDAXCg==
+To:     linux-block@vger.kernel.org
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Daniel Wagner <dwagner@suse.de>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH 1/3] blk-mq: Don't complete on a remote CPU in force threaded mode
+Date:   Wed, 28 Oct 2020 15:12:49 +0100
+Message-Id: <20201028141251.3608598-1-bigeasy@linutronix.de>
+In-Reply-To: <20201028065616.GA24449@infradead.org>
+References: <20201028065616.GA24449@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <7e98c923-d484-d05e-b5de-4eb85114ba4d@toxicpanda.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxscore=0 bulkscore=0
- spamscore=0 adultscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010280057
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 adultscore=0
- malwarescore=0 spamscore=0 clxscore=1015 mlxscore=0 suspectscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010280056
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/10/20 2:10 am, Josef Bacik wrote:
-> On 10/26/20 7:55 PM, Anand Jain wrote:
->> The exported function part_in_flight() returns commands in-flight in the
->> given block device.
->>
->> Cc: linux-block@vger.kernel.org
->> Signed-off-by: Anand Jain <anand.jain@oracle.com>
-> 
-> This is much more internal to block and I'd rather not rely on it, I 
-> feel like getting the average latency is good enough.  Thanks,
-> 
+With force threaded interrupts enabled, raising softirq from an SMP
+function call will always result in waking the ksoftirqd thread. This is
+not optimal given that the thread runs at SCHED_OTHER priority.
 
-And also, as mentioned in the cover letter, it is hard to know the 
-relation between the number of inflight commands and its effect on avg 
-latency.
+Completing the request in hard IRQ-context on PREEMPT_RT (which enforces
+the force threaded mode) is bad because the completion handler may
+acquire sleeping locks which violate the locking context.
 
-So ok, we don't need this.
+Disable request completing on a remote CPU in force threaded mode.
 
-Thanks, Anand
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ block/blk-mq.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-
-> Josef
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 55bcee5dc0320..421a40968c9ff 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -648,6 +648,14 @@ static inline bool blk_mq_complete_need_ipi(struct req=
+uest *rq)
+ 	if (!IS_ENABLED(CONFIG_SMP) ||
+ 	    !test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags))
+ 		return false;
++	/*
++	 * With force threaded interrupts enabled, raising softirq from an SMP
++	 * function call will always result in waking the ksoftirqd thread.
++	 * This is probably worse than completing the request on a different
++	 * cache domain.
++	 */
++	if (force_irqthreads)
++		return false;
+=20
+ 	/* same CPU or cache domain?  Complete locally */
+ 	if (cpu =3D=3D rq->mq_ctx->cpu ||
+--=20
+2.28.0
 
