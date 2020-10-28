@@ -2,112 +2,106 @@ Return-Path: <SRS0=cVCO=ED=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 747DDC56202
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9C3C56201
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:29:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22D6820704
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:26:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E4A52071A
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ins/48je"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="s81GeZDO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733098AbgJ1W0j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 18:26:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55104 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733094AbgJ1W0i (ORCPT
+        id S1733185AbgJ1W3B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 18:29:01 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:54622 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387470AbgJ1W2w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:26:38 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E852C0613D1;
-        Wed, 28 Oct 2020 15:26:38 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id p7so1212080ioo.6;
-        Wed, 28 Oct 2020 15:26:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sjEb0zN49oaIgAufe8xKhLgOv463zV86NX/WiY9lMDg=;
-        b=ins/48je6GCuzC77llgddm1BWOhvZ6uazsomXrcWJwl9hv29UzUQLz9mXKQ1dQrzon
-         GTRPslbb9K5uBXJj2gwvYX+LIKUP+0wVC4IstAQucpRuKed0cq8EONeycmWDPlhwGB1P
-         wF5W9zuEcjT1HQf0yZ3ppS9KwE2Lm6ac7WmgjRaUw1w09VkIp7Y1g762KEenVNHlaEdY
-         IJjf21Eg70oUsTB5yUAcmGAuKzF3LthEaQOfPnivZN5Al7Ipy4sh1Mnf3QN5Et6nEHEw
-         U1+u7Xxm+QhJHx4Aof9mQRhKDsCu0wvFwqLML/DN0p20Rw7rdfe1iuITaF2mbdq1Nxqw
-         YyKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sjEb0zN49oaIgAufe8xKhLgOv463zV86NX/WiY9lMDg=;
-        b=sgXRSDcJRqIkARJ9fWdVdop3nGZAKMGBikXV9amHGBmI81nIcm3eoXFBQdUlfTwdAA
-         +lFQ6a+LSjFlstBrAksZcBSOoN5bv0fToWwHjPX3hO0b0pASLhjbeNYtRmkDdfClLIPH
-         yJSihSD4HmTLAF7ifO7uGRD4CmDcCaSw9zxIylN98VnsERbracm6Thfpjciqi41ViZ14
-         EOmMjuS6/GsZHOjSmWpB0Vw9E9VfOA6Q3ctM+2gMyf9Lf4HPvI8I+fLORSgVPPfi1iKy
-         pDG9WiEBitBREbyBZ/lnPmhRpenPIjDsaidkFRnTEEFgneNNfI+DnQrZ0buIUd1hObdh
-         zj+g==
-X-Gm-Message-State: AOAM530J5+gFYiKomVbRPg9ihDcpgxBcqGRDFORwhwzGGBnMJ99MKDIG
-        EAiZa0MZdsS9xYiLEgu6IY0UDTVAyfk=
-X-Google-Smtp-Source: ABdhPJy/9p8gddGaTW5w39lJapijT3I+Qdeklbh+tEf1vk7pVfid4diusK/CP48SGgLCOD9c8BlcxA==
-X-Received: by 2002:a63:1d12:: with SMTP id d18mr618273pgd.314.1603909321194;
-        Wed, 28 Oct 2020 11:22:01 -0700 (PDT)
-Received: from localhost ([2401:fa00:8f:203:a6ae:11ff:fe11:4b46])
-        by smtp.gmail.com with ESMTPSA id b67sm276268pfa.151.2020.10.28.11.21.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2020 11:22:00 -0700 (PDT)
-Date:   Thu, 29 Oct 2020 03:21:58 +0900
-From:   Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To:     Rui Salvaterra <rsalvaterra@gmail.com>
-Cc:     Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        minchan@kernel.org, ngupta@vflare.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v3] zram: break the strict dependency from lzo
-Message-ID: <20201028182158.GA128655@google.com>
-References: <20201026085141.1179-1-rsalvaterra@gmail.com>
- <20201027012204.GD2412725@google.com>
- <CALjTZvbf4qK6SHEe7OhkTC_o7kaY4oOKQ+kk-D2OUq_ULsYAqQ@mail.gmail.com>
- <20201028101934.GB48825@google.com>
- <CALjTZvaTiAS1vMyrTNvrfy7KOjemy+tW5-hbTy5SHYfsbRE=_Q@mail.gmail.com>
+        Wed, 28 Oct 2020 18:28:52 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09S8PCoa106370;
+        Wed, 28 Oct 2020 08:32:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ravJk633C2uE6JSphklEGkafQyLLeeKun8Ka8Tci5S0=;
+ b=s81GeZDOEQuedA+GnZL5mXGkxmKNDW+6/GY3m2c4BwFNNaUSv/y2tOEQaDFfdcUnAcDj
+ 6sK9AmelyQW3FG5vA59GH6E8KN5gOxTbwDq9TVSxWv9BY/w2240v31rRZzFRgOMJaH8T
+ uX1M2xJgpcxIA5K5FwbL5t1U9MqRY/lho5NkezM9S0kMIC21IntFjnjOQnm0b6QK5UIH
+ corqeTvrSNfVizic8WDh1TYINofhZFaAPKoAmxzW9WrzyUz7RVZefIAKTFxLFBmfRmZ8
+ ZZHUTtJq2Cyl+leIaMyISKlwnmQwdb67NYXavGuqfifTV127Vr8AoaeUG7pYgwYocFe4 Zg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 34cc7kwyhk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 28 Oct 2020 08:32:12 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09S8UTgc057226;
+        Wed, 28 Oct 2020 08:32:12 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 34cwunb546-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 28 Oct 2020 08:32:12 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09S8WAh6001574;
+        Wed, 28 Oct 2020 08:32:11 GMT
+Received: from [192.168.1.102] (/39.109.231.106)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 28 Oct 2020 01:32:10 -0700
+Subject: Re: [PATCH RFC 2/7] block: export part_stat_read_inflight
+To:     Josef Bacik <josef@toxicpanda.com>, linux-btrfs@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <cover.1603751876.git.anand.jain@oracle.com>
+ <187d1f02f82019d48f66c97c0d1b99c9a58cd553.1603751876.git.anand.jain@oracle.com>
+ <7e98c923-d484-d05e-b5de-4eb85114ba4d@toxicpanda.com>
+From:   Anand Jain <anand.jain@oracle.com>
+Message-ID: <d9e13a30-89e6-9e78-1d65-2cef5cc76f36@oracle.com>
+Date:   Wed, 28 Oct 2020 16:32:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALjTZvaTiAS1vMyrTNvrfy7KOjemy+tW5-hbTy5SHYfsbRE=_Q@mail.gmail.com>
+In-Reply-To: <7e98c923-d484-d05e-b5de-4eb85114ba4d@toxicpanda.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxscore=0 bulkscore=0
+ spamscore=0 adultscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010280057
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 adultscore=0
+ malwarescore=0 spamscore=0 clxscore=1015 mlxscore=0 suspectscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010280056
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On (20/10/28 11:25), Rui Salvaterra wrote:
-> > diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
-> > index fe7a4b7d30cf..f93eed40e155 100644
-> > --- a/drivers/block/zram/Kconfig
-> > +++ b/drivers/block/zram/Kconfig
-> > @@ -2,7 +2,7 @@
-> >  config ZRAM
-> >         tristate "Compressed RAM block device support"
-> >         depends on BLOCK && SYSFS && ZSMALLOC && CRYPTO
-> > -       select CRYPTO_LZO
-> > +       depends on (CRYPTO_LZO || CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842 || CRYPTO_ZSTD)
+On 28/10/20 2:10 am, Josef Bacik wrote:
+> On 10/26/20 7:55 PM, Anand Jain wrote:
+>> The exported function part_in_flight() returns commands in-flight in the
+>> given block device.
+>>
+>> Cc: linux-block@vger.kernel.org
+>> Signed-off-by: Anand Jain <anand.jain@oracle.com>
 > 
-> This reverses the dependency order, as now we have to select a
-> supported compression algorithm in order for zram to be visible in the
-> block device drivers list.
+> This is much more internal to block and I'd rather not rely on it, I 
+> feel like getting the average latency is good enough.  Thanks,
+> 
 
-Right, but well we also need to select ZSMALLOC and CRYPTO for
-zram to become visible (the thing that I found out recently is
-that you can always check the hidden/blocked items by hitting
-'z' in menuconfig).
+And also, as mentioned in the cover letter, it is hard to know the 
+relation between the number of inflight commands and its effect on avg 
+latency.
 
-> This is why I wrote the ZRAM_AUTOSEL_ALGO
-> kconfig symbol, which automatically selects lzo as a fallback. If the
-> user chooses to select another supported algorithm, he will then be
-> allowed to deselect lzo. We thus follow the principle of least
-> surprise, IMHO.
+So ok, we don't need this.
 
-OK, makes sense.
+Thanks, Anand
 
-	-ss
+
+> Josef
+
