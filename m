@@ -2,97 +2,127 @@ Return-Path: <SRS0=cVCO=ED=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08327C4363A
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68976C56201
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:04:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 940D8246CD
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1538E246CD
+	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 22:04:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tirtnbfW"
+	dkim=permerror (0-bit key) header.d=wdc.com header.i=@wdc.com header.b="C2yEWrBp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729960AbgJ1WEq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 18:04:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729953AbgJ1WEp (ORCPT
+        id S1729325AbgJ1WEz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 18:04:55 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:20568 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728159AbgJ1WBo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:04:45 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB630C0613D1
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2020 15:04:45 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id c20so588176pfr.8
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2020 15:04:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=J50aqCoEMBtyZNJKdiytI/3RRo9lqaFR/Dl/dXrtNcE=;
-        b=tirtnbfWciU4QLqL6XlcPtwLdyJ2VM4KPzJ7huIKun4yjFXB/hjXolkqeWUwxmFp2P
-         FyfaEl//nYyHj2aei/Ojc+wGoxLz3U6lCRMToacGWASIvujWGc+cBujSXZ+lap415t0V
-         FKZJ48OMld27kCC34fCVYKd83cUx5HRY32X6Z5gq0DXygY4YKGCpCoMmb874piBp5nq6
-         eZisPgb6OfyRdPp1ydnvfAPi/angYx51p4ykKI+VTPhgOLXIq7jhBcjVYaSFuXXoM2FM
-         HAsRta/LxpAR/isC7RdO6pSO56srz6n4kbFKDfRxhN1DUXZldwWla2s8u5WgCoV0PO+G
-         S+IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=J50aqCoEMBtyZNJKdiytI/3RRo9lqaFR/Dl/dXrtNcE=;
-        b=o0yoJdPQdoFstM9T48gB6BmGMrLWlbEATH4wCUmNFmWabDobsDlKsK3ahO8uNTVOWM
-         UjjBy5wRyGQ6xDmzV9vrmN126HqWwBWbhGgV0huOZENi1N28lep457VXL6CTqJa9GiDQ
-         FME4KsstncdYbEOMoEMECApcfPUSzouLFV+S2kmm+g+u3nieOpZPCH/4PY5Va593fypt
-         VURylQfB3gWqapzO60Hu21KBrfjW6YaQ9+KwU/Ti9XCSb6cUn+BpSxTDWXr8Gfea7gao
-         Fm1w6bXPrzfm2u85RHZZ1Q6aNRHxIx88GITEfn+9HVg3AGpCCMkVFMvdxMNLUYbfUfMM
-         +xhg==
-X-Gm-Message-State: AOAM532R7ZPBQMEs0PDIlbThZUOYpfOHG861MMPalR0uYxkdxuBXRuXD
-        x7CilqXFuijWDrVAW2RYXFIeJrUM7qeClQ==
-X-Google-Smtp-Source: ABdhPJxDjFRZcRCJtqKUtYQ7ucNs8mt1Ic5OcHNVD8ftrJOhnBFViOoktkHSmb5uvU11l5TSDARcBQ==
-X-Received: by 2002:a6b:f909:: with SMTP id j9mr6391447iog.184.1603896160666;
-        Wed, 28 Oct 2020 07:42:40 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id f12sm2534129iop.45.2020.10.28.07.42.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Oct 2020 07:42:40 -0700 (PDT)
-Subject: Re: [RFC] blk-mq: don't plug for HIPRI IO
-To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        linux-block@vger.kernel.org
-Cc:     hch@infradead.org, joseph.qi@linux.alibaba.com
-References: <20201027132951.121812-1-xiaoguang.wang@linux.alibaba.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <80adbefe-2660-34a4-1242-c3db9cd689a6@kernel.dk>
-Date:   Wed, 28 Oct 2020 08:42:39 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 28 Oct 2020 18:01:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1603923387; x=1635459387;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=t9BTLL/KaYlKTWTt9H9j8nSxLtfePywSdxGReXSUWXk=;
+  b=C2yEWrBpASLk4VnPSVFNZ4X6eKIGzwHE5U4an1Ds/gQ2qSG486vBPuFn
+   l9IKKMv0GcX++q5T/uf4wKpzshqlLs5zWBc58FR96FL+pWSW6Krc9GQJS
+   ech6fGkq85A4V8adBrjzbU0Np/FNts94hoVJd4LByazSqp/jyXWaOrDSt
+   A0kz84E4s17OzpsEC9kwzPZoE1xnXur3d5wrTBtFG8r9fZVP04+CS2JiP
+   wq6btIE6OZnUMTMu6EUN7CodlB7UAMQl3/EHSLl9JO4hltsMaWev2HiqX
+   HdzRrlVZE9N6kT+ff+hdF2bKALmrVygHOdSLeAwjb5ZVLcEvYW1e68tp6
+   A==;
+IronPort-SDR: rSLdlvAay43jdPx2tB14JuMFB1Erh2Nba+pcYQVL9mqpIxKkqt2BL03heipRo/pq5Kq09XKVH/
+ rk3mpgjQEBggXWs4A9INzlCKBFlR1EcRt+uN01jISSMPSwGxwdGnvlrMliYKxllcJ/3frYdfAJ
+ d1nhIOibry8ZC2EfOWvRbT1hR1mmHdgr5MCA1i566dajrAHkSIukxhVlXtzoEzanaY2dXny2/I
+ T2hbJON3QLB227ymCLm2s5aE8mvkiEY3kKXcl0N1i0f6O/1X61IPbqzTrnbRneuIbBOwJ7x8PZ
+ wn8=
+X-IronPort-AV: E=Sophos;i="5.77,425,1596470400"; 
+   d="scan'208";a="254622937"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Oct 2020 15:39:06 +0800
+IronPort-SDR: CO/Y+PBqnXeBsRbtajN9qN5D35CCkXhzIaCziM8Mxj8ON+GEIHWWKWR353VJKxcvrzYD3d7BtR
+ u6DzOCp+9p2lM2i3zgbtX2eoS8lGe/NFsMS4UPurHM1/Z66vaYyb7rDv9NgSvm9lVWl40xFP9s
+ mtWTG+htrTyvtfzZXpRgflrLzi3ZG0Am8bg5Umx+7I8wWOd1vtPCNUYbjTff1BYFYHfdEnwnkI
+ rdWBibEePbkArlBVvV2yDgC3rl2xj4xOO8VlrOv4tjuWkH+t86hFvqqRCn3huehHOezmR104c7
+ nmYPv+RhSAM5oHZAF5LGdEnf
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2020 00:10:51 -0700
+IronPort-SDR: 3ilwfNzJlC+b7quw8/GVFka+o07dRt2HgVGIcAmcYf6tlTaK0OJTb1PTc94Wzj7GmUFiETc8jd
+ xxUvdirPD4GniobgTn6z0YvWcClcEfh1tMPT0CdGEkkxM5LERGEZGgOl/rSqm5+6jOjKDeOs1j
+ 0R5qBSooSqOwoi+pI+NfQxERxF5o9EqahftQCUuVYtW8wiG2w34uJfBi4eibmFMJxZJGCXI9sC
+ g3XMi2q54TinVFDHmk+XvzcTZvv/2gXi+pAwaxefaD+iF06BpMfMNb1umtabzoDSeWpstkOPlY
+ dmE=
+WDCIronportException: Internal
+Received: from naota.dhcp.fujisawa.hgst.com ([10.149.52.155])
+  by uls-op-cesaip02.wdc.com with ESMTP; 28 Oct 2020 00:25:40 -0700
+From:   Naohiro Aota <naohiro.aota@wdc.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org
+Cc:     johannes.thumshirn@wdc.com, Damien.LeMoal@wdc.com,
+        Naohiro Aota <naohiro.aota@wdc.com>, stable@vger.kernel.org
+Subject: [PATCH] block: advance iov_iter on bio_add_hw_page failure
+Date:   Wed, 28 Oct 2020 16:25:36 +0900
+Message-Id: <7e91d39fccbd06efdee40ad119833dbfeafd2fb7.1603868801.git.naohiro.aota@wdc.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-In-Reply-To: <20201027132951.121812-1-xiaoguang.wang@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/27/20 7:29 AM, Xiaoguang Wang wrote:
-> Commit cb700eb3faa4 ("block: don't plug for aio/O_DIRECT HIPRI IO")
-> only does not call blk_start_plug() or blk_finish_plug for HIPRI IO
-> in __blkdev_direct_IO(), but if upper layer subsystem, such as io_uring,
-> still initializes valid plug, block layer may still plug HIPRI IO.
-> To disable plug for HIPRI IO completely, do it in blk_mq_plug().
+When the bio's size reaches max_append_sectors, bio_add_hw_page returns
+0 then __bio_iov_append_get_pages returns -EINVAL. This is an expected
+result of building a small enough bio not to be split in the IO path.
+However, iov_iter is not advanced in this case, causing the same pages
+are filled for the bio again and again.
 
-There's something funky going on with plugging and polled IO. I tried
-to improve the io_uring plugging, so we don't plug for polled IO (or for
-non-bdev IO in general), and it tanked performance here from ~2.5M IOPS
-to ~1.4M IOPS. Thinking I had made some sort of mistake, I just tried
-your patch alone, and I see the same performance drop.
+Fix the case by properly advancing the iov_iter for already processed
+pages.
 
-This doesn't make a lot of sense, so some investigation is needed.
+Fixes: 0512a75b98f8 ("block: Introduce REQ_OP_ZONE_APPEND")
+Cc: stable@vger.kernel.org # 5.8+
+Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
+---
+ block/bio.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
+diff --git a/block/bio.c b/block/bio.c
+index e0d41ccc4e90..2dfe40be4d6b 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1082,6 +1082,7 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	ssize_t size, left;
+ 	unsigned len, i;
+ 	size_t offset;
++	int ret = 0;
+ 
+ 	if (WARN_ON_ONCE(!max_append_sectors))
+ 		return 0;
+@@ -1104,15 +1105,17 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
+ 
+ 		len = min_t(size_t, PAGE_SIZE - offset, left);
+ 		if (bio_add_hw_page(q, bio, page, len, offset,
+-				max_append_sectors, &same_page) != len)
+-			return -EINVAL;
++				max_append_sectors, &same_page) != len) {
++			ret = -EINVAL;
++			break;
++		}
+ 		if (same_page)
+ 			put_page(page);
+ 		offset = 0;
+ 	}
+ 
+-	iov_iter_advance(iter, size);
+-	return 0;
++	iov_iter_advance(iter, size - left);
++	return ret;
+ }
+ 
+ /**
 -- 
-Jens Axboe
+2.27.0
 
