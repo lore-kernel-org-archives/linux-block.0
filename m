@@ -1,118 +1,79 @@
-Return-Path: <SRS0=cVCO=ED=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=RRdq=EE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC6CC388F7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 23:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3118C4363A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 00:31:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02E2D20809
-	for <linux-block@archiver.kernel.org>; Wed, 28 Oct 2020 23:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 759DF207DE
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 00:31:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hyihyq1B"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hmnOVDO2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390453AbgJ1X3Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 19:29:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38805 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390450AbgJ1X3P (ORCPT
+        id S2388639AbgJ2Aba (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 20:31:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55996 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387933AbgJ1Wbh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 19:29:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603927754;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=kaDzfyKPMT/fRsMiakwMaI6egWNZdyjpXDOdIfwf3oY=;
-        b=hyihyq1BuoxQAstKOZWETyWzjGRCegE0BaO8AhGQ8Y5PJuQTlLyUnhU3NKqnBocyvx1a1A
-        NBDTi4w7yMX5sFvfxu+/woqax8EoDXh9tb3hG6mlkWZscTN1ZEgDv3oqhge2/pc8nB1xJE
-        dYg/397lo0H6xDwo0sHJgbwLpoXoUAk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-583-FELs93skOhW5kaGjSHkceg-1; Wed, 28 Oct 2020 03:24:45 -0400
-X-MC-Unique: FELs93skOhW5kaGjSHkceg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C37481882FB1;
-        Wed, 28 Oct 2020 07:24:43 +0000 (UTC)
-Received: from localhost (ovpn-13-61.pek2.redhat.com [10.72.13.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB845610F3;
-        Wed, 28 Oct 2020 07:24:39 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        lining <lining2020x@163.com>, Josef Bacik <josef@toxicpanda.com>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH] nbd: don't update block size after device is started
-Date:   Wed, 28 Oct 2020 15:24:34 +0800
-Message-Id: <20201028072434.1922108-1-ming.lei@redhat.com>
+        Wed, 28 Oct 2020 18:31:37 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4F6C0613D1;
+        Wed, 28 Oct 2020 15:31:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pbW1tCuoCb5OoMHKLe/zo1YdTNTlOPVa8AEEc+GMK0Y=; b=hmnOVDO2mdOUeHyF8dFmOqABl7
+        IXFwxMOZo6teAYlA1iNNnFgmC0MWOlUVzDGhdcFFMBqwluvZzjo+88drh7c/WUtjjzOtgaS615aOR
+        /BHOoqPXDwWPBkaFkPHuTDUwzExGsptpZiDp2vRREC2z8P7c3zBDl0Fw7h1VpmdhdycUk0NMmEqe3
+        0nff9M143urlCeeFNHU2ERF5NazR6z2vFFYcSpsxCCi4lhwJkZWNema1wQAEJsA+83rNH1a/1KSZI
+        LXl3MSdcHO4dW0kMOAvYlgjSQ7kcW9ghP0tE7MmnY0EDcJ7fEyaYRzHaKYaTQhw5q0hJj51EKgd1P
+        fVD2YZrg==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kXmh3-0004yC-Ds; Wed, 28 Oct 2020 14:44:53 +0000
+Date:   Wed, 28 Oct 2020 14:44:53 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: Re: [PATCH 3/3] blk-mq: Use llist_head for blk_cpu_done
+Message-ID: <20201028144453.GA18610@infradead.org>
+References: <20201028065616.GA24449@infradead.org>
+ <20201028141251.3608598-1-bigeasy@linutronix.de>
+ <20201028141251.3608598-3-bigeasy@linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201028141251.3608598-3-bigeasy@linutronix.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Mounted NBD device can be resized, one use case is rbd-nbd.
+On Wed, Oct 28, 2020 at 03:12:51PM +0100, Sebastian Andrzej Siewior wrote:
+>  static int blk_softirq_cpu_dead(unsigned int cpu)
+>  {
+> -	/*
+> -	 * If a CPU goes away, splice its entries to the current CPU
+> -	 * and trigger a run of the softirq
+> -	 */
+> -	local_irq_disable();
+> -	list_splice_init(&per_cpu(blk_cpu_done, cpu),
+> -			 this_cpu_ptr(&blk_cpu_done));
+> -	raise_softirq_irqoff(BLOCK_SOFTIRQ);
+> -	local_irq_enable();
+> -
+> +	blk_complete_reqs(&per_cpu(blk_cpu_done, cpu));
+>  	return 0;
 
-Fix the issue by setting up default block size, then not touch it
-in nbd_size_update() any more. This kind of usage is aligned with loop
-which has same use case too.
-
-Reported-by: lining <lining2020x@163.com>
-Cc: Josef Bacik <josef@toxicpanda.com>
-Cc: Jan Kara <jack@suse.cz>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/nbd.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 3c9485acdd81..e13ce0f75f80 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -296,7 +296,7 @@ static void nbd_size_clear(struct nbd_device *nbd)
- 	}
- }
- 
--static void nbd_size_update(struct nbd_device *nbd)
-+static void nbd_size_update(struct nbd_device *nbd, bool start)
- {
- 	struct nbd_config *config = nbd->config;
- 	struct block_device *bdev = bdget_disk(nbd->disk, 0);
-@@ -313,7 +313,8 @@ static void nbd_size_update(struct nbd_device *nbd)
- 	if (bdev) {
- 		if (bdev->bd_disk) {
- 			bd_set_nr_sectors(bdev, nr_sectors);
--			set_blocksize(bdev, config->blksize);
-+			if (start)
-+				set_blocksize(bdev, config->blksize);
- 		} else
- 			set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
- 		bdput(bdev);
-@@ -328,7 +329,7 @@ static void nbd_size_set(struct nbd_device *nbd, loff_t blocksize,
- 	config->blksize = blocksize;
- 	config->bytesize = blocksize * nr_blocks;
- 	if (nbd->task_recv != NULL)
--		nbd_size_update(nbd);
-+		nbd_size_update(nbd, false);
- }
- 
- static void nbd_complete_rq(struct request *req)
-@@ -1308,7 +1309,7 @@ static int nbd_start_device(struct nbd_device *nbd)
- 		args->index = i;
- 		queue_work(nbd->recv_workq, &args->work);
- 	}
--	nbd_size_update(nbd);
-+	nbd_size_update(nbd, true);
- 	return error;
- }
- 
--- 
-2.25.2
-
+How can this be preempted?  Can't we keep using this_cpu_ptr here?
