@@ -2,94 +2,108 @@ Return-Path: <SRS0=RRdq=EE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21506C56201
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 00:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D65C55179
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 01:32:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A375420790
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 00:40:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FDF12076D
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 01:32:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IZ1C3kIa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNA/hpF5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388739AbgJ2AkT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 20:40:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48690 "EHLO
+        id S1729837AbgJ2Bap (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Oct 2020 21:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731953AbgJ2AkT (ORCPT
+        with ESMTP id S1729580AbgJ2B3R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 20:40:19 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17054C0613CF
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2020 17:40:19 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id k27so1507964oij.11
-        for <linux-block@vger.kernel.org>; Wed, 28 Oct 2020 17:40:19 -0700 (PDT)
+        Wed, 28 Oct 2020 21:29:17 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D646EC0613CF;
+        Wed, 28 Oct 2020 18:29:16 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id o9so511538plx.10;
+        Wed, 28 Oct 2020 18:29:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=6JSP+gknecdQIb43HL25pDbZr81hZ8KDnNrBmTGdQyQ=;
-        b=IZ1C3kIaYcK/G2ClwunxqGHsFv2IHhnNyr3/1dNAioeOVs7VevEtVOQCDqZHuBK5QN
-         ubeC8+K+5JYRFnK0bmP2I1Uo8RsUKENUEmcSIixhppbebvpY8iCTaUDs++CbJaJUZBgu
-         byT/X0NQ24miKZlInT/MCffbrOMl4VR2ITW6vf7srIfVd2uh8YHCeTjcAc9iu/u5aT4S
-         MoMvbJOWYhJEMCmVQnY22EEACVRtqY2yP9mELPJbkjw8J5nboE+tJIuhH7FbwwAJWHE3
-         TyOAt6jZ0LLPKJiFGaDVnOHPMPfQXAwcfj80dy9D9q5tL6Q31tWe96FfozpRAJMj/BDl
-         mObw==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=5qS5USRrvbij0ydOHsLwR1E5fqhazw3/Mtfj6k5q0Ac=;
+        b=mNA/hpF5JZ46Mp9cqsQHCB8NcFVJmVldNDHVeK7cYKe/++CoVVVQu+93/98gISEpqj
+         GE1W4TclMYHsorN5daY1B5yHSPw/ZN51zm5tm4hMcVKpfRMbCnNMNx7HhRWK3V03/BaQ
+         ZTesGkIt/oadNPkZI5gOeI9lmWWfhFovTSpePlJv56e9QLRVIsKc5N4OXUwwwDSl91fv
+         fgTP1ZP59qwgdDXOug5tk/V/UjAkZHLTx0brEOQUsERZ/vIbWV16abw9hDSgTXzmNz3a
+         juYj9amW1dyc5JHfNBXUTHdH5C0U0uCpnccQKlrYXOTHWZP2vCfqIJ/WekqHqokZ0KCn
+         WUFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6JSP+gknecdQIb43HL25pDbZr81hZ8KDnNrBmTGdQyQ=;
-        b=fu6gjPVL9S1wRnWmc/C35klzAyeYzJUOsqvRqx8pbEXu7EBpT1sDS28xphddh1Ly0U
-         sEK1ylQVY3zyER79vSUsqGGGnSaEtMKSMeJ6o3zZ6stlOzqp9FrKBd1CjG9BLlB9S+3T
-         a5CRRsAFqjtuySY5Z0OVUbfvU47hwBXDXlt+yw6hPqKmSajYbrxEqaOwdIVwymMhsIOl
-         8n1GkuzO53EOJscQQofnaq8+7sDoPi3U2/qAxcdH/k1tNSJNKRZLkcMHu3esnWuYzJAp
-         jSmAXTm9CRhAApROn03oPYYf6jX4vGL44Ta+zollfVNg6xmx5wXHRd8x1bA5QTUjN7fL
-         qr7g==
-X-Gm-Message-State: AOAM533T6g4ZuNKASmm4bjGiG9wNi7ww5mcIJJS0s7qCBIPAfPg0nLQ+
-        8k+7lg2wsopF01H8eWVaa6f0zoTHcEbZmA==
-X-Google-Smtp-Source: ABdhPJyZSVd+JZaAYxUeIMvPGFoUD0i3wI32yHTc5e5c7SW3PYC40SS0vy9uNw2huBZNAxs4EV6Z3A==
-X-Received: by 2002:a17:90b:3842:: with SMTP id nl2mr4612274pjb.202.1603852862019;
-        Tue, 27 Oct 2020 19:41:02 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id f4sm3205726pjs.8.2020.10.27.19.41.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Oct 2020 19:41:01 -0700 (PDT)
-Subject: Re: [PATCH v2 1/1] null_blk: synchronization fix for zoned device
-To:     Kanchan Joshi <joshi.k@samsung.com>, Damien.LeMoal@wdc.com
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        stable@vger.kernel.org, selvakuma.s1@samsung.com,
-        nj.shetty@samsung.com, javier.gonz@samsung.com
-References: <20200928095549.184510-1-joshi.k@samsung.com>
- <CGME20200928095914epcas5p1beae8d5a201c35b598fde8288532d58d@epcas5p1.samsung.com>
- <20200928095549.184510-2-joshi.k@samsung.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c948100e-7e01-5f30-721a-7ed8c820a3b8@kernel.dk>
-Date:   Tue, 27 Oct 2020 20:40:59 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=5qS5USRrvbij0ydOHsLwR1E5fqhazw3/Mtfj6k5q0Ac=;
+        b=p8+oeOYJRv8LxDDYXAu6Xh7ph7Dxc5dHUHItPAif+AbxcX9t+F4q4hFM6HtdZyYNsY
+         oRVpBePKNM7Nj/2hivdUtELcYOklE1c4HwJ/rkTKVZYsOrLNjpZ5TMeYlWTyRzRODGar
+         cM63zUTfCPNdFyaVAexlP+Fx/tc1ErD1aZd3fSzFPbGA+6G+P/vrP0toT0zFC4imAy3W
+         fPTbOpJc+Q5Vn5Wpr0Uf6hlAQKtI2AgpGvWPVsxWr5zKaeQE3P43Cg1KDr+sbbJseKNX
+         6b9agqd8tpla4aaILKfmVbOlmzzXRTzXJGYdm0TVBDFqYp193QKEQdbBtMIGcL7Zc4JO
+         IqjA==
+X-Gm-Message-State: AOAM532kRnnWVXNbuis+qo2GEWV1IveVAV244xZgwDTwzAdfMX76Fk1U
+        hO4+MkECuXPBCIpyGGhvQaM=
+X-Google-Smtp-Source: ABdhPJyuUUd9h1m4NUFXfAoZY7OemOPR8JOmS+whyQjiccT2S7mwD3/f6QJ49bYUfRMgMXunoyFNPg==
+X-Received: by 2002:a17:902:8545:b029:d5:dbd4:4ab5 with SMTP id d5-20020a1709028545b02900d5dbd44ab5mr1716546plo.31.1603934956454;
+        Wed, 28 Oct 2020 18:29:16 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:a6ae:11ff:fe11:4b46])
+        by smtp.gmail.com with ESMTPSA id z26sm842646pfr.84.2020.10.28.18.29.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Oct 2020 18:29:15 -0700 (PDT)
+Date:   Thu, 29 Oct 2020 10:29:13 +0900
+From:   Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+To:     Rui Salvaterra <rsalvaterra@gmail.com>
+Cc:     Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        minchan@kernel.org, ngupta@vflare.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v3] zram: break the strict dependency from lzo
+Message-ID: <20201029012913.GC128655@google.com>
+References: <20201026085141.1179-1-rsalvaterra@gmail.com>
+ <20201027012204.GD2412725@google.com>
+ <CALjTZvbf4qK6SHEe7OhkTC_o7kaY4oOKQ+kk-D2OUq_ULsYAqQ@mail.gmail.com>
+ <20201028101934.GB48825@google.com>
+ <CALjTZvaTiAS1vMyrTNvrfy7KOjemy+tW5-hbTy5SHYfsbRE=_Q@mail.gmail.com>
+ <20201028182158.GA128655@google.com>
+ <CALjTZvZQyJb=y=XyUzpefEPL-XpK0gMwMW-+0GF1EUrW8Oapzg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200928095549.184510-2-joshi.k@samsung.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALjTZvZQyJb=y=XyUzpefEPL-XpK0gMwMW-+0GF1EUrW8Oapzg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/28/20 3:55 AM, Kanchan Joshi wrote:
-> Parallel write,read,zone-mgmt operations accessing/altering zone state
-> and write-pointer may get into race. Avoid the situation by using a new
-> spinlock for zoned device.
-> Concurrent zone-appends (on a zone) returning same write-pointer issue
-> is also avoided using this lock.
+Hi,
 
-Applied, thanks.
+On (20/10/28 23:11), Rui Salvaterra wrote:
+> Hi, again,
+> 
+> On Wed, 28 Oct 2020 at 18:22, Sergey Senozhatsky
+> <sergey.senozhatsky.work@gmail.com> wrote:
+> >
+> > Right, but well we also need to select ZSMALLOC and CRYPTO for
+> > zram to become visible (the thing that I found out recently is
+> > that you can always check the hidden/blocked items by hitting
+> > 'z' in menuconfig).
+> 
+> Sure, I can fix that too. Should I do it now, or wait for
+> Andrew's/Minchan's feedback?
 
--- 
-Jens Axboe
+Let's give Minchan and Andrew some time. It's still -rc1, so we have
+plenty of time to land this patch.
 
+> And that 'z' key… wow. Did you read the kconfig code?
+
+By accident, "fat fingers" lol
+
+	-ss
