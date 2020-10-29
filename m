@@ -7,391 +7,184 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 204F1C2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 15:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C55EC4363A
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 18:58:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B61D220838
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 15:51:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A8B820756
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 18:58:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="a8ovsw3q"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="a51t2eI/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728514AbgJ2PvA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Oct 2020 11:51:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49632 "EHLO
+        id S1725747AbgJ2S6P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Oct 2020 14:58:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728509AbgJ2Pu7 (ORCPT
+        with ESMTP id S1725910AbgJ2S6O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Oct 2020 11:50:59 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E3B3C0613CF;
-        Thu, 29 Oct 2020 08:41:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=iBrwQ7u9qumc4njkhWiPx+LnMHepKgVCZBO024rsKVU=; b=a8ovsw3qEH9a1JE2dbyz8caYti
-        XhDBkiE63ZuKYUZXZB77wo6BJuHEkndi44+JMWdHQsYop8n/jNE/wsrsTlb3x7e1p2A7qHSj6WUOv
-        cmQSsRgTkw36FvlABOPWp+LZlsDHWmIcbxbmFFVEeGTeg7fhq+Z9WTPIYnaw7HW9GB6lHx45/sHXr
-        HaiSW4mrH0pCqgEAfNRUvQXM8SvqJSvMRLJK4RaoZKpEbpcjHTAQnP0t9j9qDs3f6ecH12mk2TI7C
-        84wp+P+WARddkTA3COwlZ9AszfSNliRI2an3cxPSNvlgA6YQifX4GtjLiyBqniUfq5YnE8t5Kom7V
-        zBOeCiYA==;
-Received: from 089144193201.atnat0002.highway.a1.net ([89.144.193.201] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kYA3J-0008Dj-A7; Thu, 29 Oct 2020 15:41:26 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Denis Efremov <efremov@linux.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-        Finn Thain <fthain@telegraphics.com.au>,
-        Michael Schmitz <schmitzmic@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 18/18] block: switch gendisk lookup to a simple xarray
-Date:   Thu, 29 Oct 2020 15:58:41 +0100
-Message-Id: <20201029145841.144173-19-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201029145841.144173-1-hch@lst.de>
-References: <20201029145841.144173-1-hch@lst.de>
+        Thu, 29 Oct 2020 14:58:14 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D00C0613CF
+        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2020 11:58:14 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id g25so3327142edm.6
+        for <linux-block@vger.kernel.org>; Thu, 29 Oct 2020 11:58:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=89MgGJ2eLo/poQN08E10He93oDU/x3XhdHGWGtRSdCM=;
+        b=a51t2eI/vR9CHjHzV2REhSPK/Vmz6ph8JXpIIUT+PMfFCzVwKOxNjdvXrVoVJ5jQFy
+         kAjTIud/Db1ZhetL6W/9GdYwGECn53DEr38+d4OrAFocX6jREQUKl6Hgq3bkxt6q5SFX
+         Plkdn8fSpw8Cc56XK/P3CpQSSr4EkbuQ/1ETqix4LUFQFNZdMVVqoaZa3SBU1MRKxve/
+         IOKZy2NtVqf5baAHXUCUdlwaSSGr19/yeC2R/HMsQzMdtyIrXDR9XZYk/WAG7Hmy6VVJ
+         YmPz25XOModxbznKLvbv3hVBvOQz43AD97htQ4QKY4hGjTn+3alwWGV4Yr0xFuSj2wQX
+         N4+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=89MgGJ2eLo/poQN08E10He93oDU/x3XhdHGWGtRSdCM=;
+        b=nLb+/TK8Cgwz8XsTNE68ZmaCdHD034MEabvdAQ6ckXXforcVyrqLNVfzfr5dRhMZ68
+         XX+0FX3BbcorQdOVM42rwrHvylPllHt/aBmKYRXLV1w9BN3YBXzJ2YFi3XS5oc2ggk3e
+         MSJCDR96myG8uWEIvMxcCDJOt+81nGDxfiFMhpQeZKe+OXPwPJn2voG4RKqawBdDBQ/h
+         1+NNSSPwnc+SMdy1CWJeyzfmOhlU1PRMb6UNQZYY072A/1BOtsXI0lZ4wDqKjEGaNQJt
+         briH/qGRSd9b9lkyuiW7g0hIzLrwvg7DZHM7/LUhbAenOzV9LfuwJhXpyVLi5XxSAJ7+
+         ykEQ==
+X-Gm-Message-State: AOAM532tqXTeEpbvr05iRcJZ48nOlomcO0Xe0M/DuZL7RCplnSYDOK8V
+        uydjmHrcxr5WkYw5W3woMDngkA==
+X-Google-Smtp-Source: ABdhPJzCKg8H/rV7NMAwOKOsmKObGB2b4LfWMi8r1jAoj+6+80WZx39v/Svl8CzLDRRXX6+hUcIfMg==
+X-Received: by 2002:a50:8745:: with SMTP id 5mr5391983edv.49.1603997892755;
+        Thu, 29 Oct 2020 11:58:12 -0700 (PDT)
+Received: from ch-wrk-javier.localdomain (5.186.126.247.cgn.fibianet.dk. [5.186.126.247])
+        by smtp.gmail.com with ESMTPSA id p3sm1974957edy.38.2020.10.29.11.58.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Oct 2020 11:58:12 -0700 (PDT)
+From:   "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+X-Google-Original-From: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
+        sagi@grimberg.me, axboe@kernel.dk, joshi.k@samsung.com,
+        k.jensen@samsung.com,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+Subject: [PATCH] nvme: report capacity 0 for non supported ZNS SSDs
+Date:   Thu, 29 Oct 2020 19:57:53 +0100
+Message-Id: <20201029185753.14368-1-javier.gonz@samsung.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that bdev_map is only used for finding gendisks, we can use
-a simple xarray instead of the regions tracking structure for it.
+Allow ZNS SSDs to be presented to the host even when they implement
+features that are not supported by the kernel zoned block device.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Instead of rejecting the SSD at the NVMe driver level, deal with this in
+the block layer by setting capacity to 0, as we do with other things
+such as unsupported PI configurations. This allows to use standard
+management tools such as nvme-cli to choose a different format or
+firmware slot that is compatible with the Linux zoned block device.
+
+Signed-off-by: Javier González <javier.gonz@samsung.com>
 ---
- block/genhd.c         | 208 ++++++++----------------------------------
- include/linux/genhd.h |   7 --
- 2 files changed, 37 insertions(+), 178 deletions(-)
+ drivers/nvme/host/core.c |  5 +++++
+ drivers/nvme/host/nvme.h |  1 +
+ drivers/nvme/host/zns.c  | 31 ++++++++++++++-----------------
+ 3 files changed, 20 insertions(+), 17 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index e78c95cf3c00a9..439b444cac2038 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -27,15 +27,7 @@
- 
- static struct kobject *block_depr;
- 
--struct bdev_map {
--	struct bdev_map *next;
--	dev_t dev;
--	unsigned long range;
--	struct module *owner;
--	struct kobject *(*probe)(dev_t, int *, void *);
--	int (*lock)(dev_t, void *);
--	void *data;
--} *bdev_map[255];
-+static DEFINE_XARRAY(bdev_map);
- static DEFINE_MUTEX(bdev_map_lock);
- 
- /* for extended dynamic devt allocation, currently only one major is used */
-@@ -646,85 +638,26 @@ static char *bdevt_str(dev_t devt, char *buf)
- 	return buf;
- }
- 
--/*
-- * Register device numbers dev..(dev+range-1)
-- * range must be nonzero
-- * The hash chain is sorted on range, so that subranges can override.
-- */
--void blk_register_region(dev_t devt, unsigned long range, struct module *module,
--			 struct kobject *(*probe)(dev_t, int *, void *),
--			 int (*lock)(dev_t, void *), void *data)
--{
--	unsigned n = MAJOR(devt + range - 1) - MAJOR(devt) + 1;
--	unsigned index = MAJOR(devt);
--	unsigned i;
--	struct bdev_map *p;
--
--	n = min(n, 255u);
--	p = kmalloc_array(n, sizeof(struct bdev_map), GFP_KERNEL);
--	if (p == NULL)
--		return;
--
--	for (i = 0; i < n; i++, p++) {
--		p->owner = module;
--		p->probe = probe;
--		p->lock = lock;
--		p->dev = devt;
--		p->range = range;
--		p->data = data;
--	}
-+static void blk_register_region(struct gendisk *disk)
-+{
-+	int i;
- 
- 	mutex_lock(&bdev_map_lock);
--	for (i = 0, p -= n; i < n; i++, p++, index++) {
--		struct bdev_map **s = &bdev_map[index % 255];
--		while (*s && (*s)->range < range)
--			s = &(*s)->next;
--		p->next = *s;
--		*s = p;
-+	for (i = 0; i < disk->minors; i++) {
-+		if (xa_insert(&bdev_map, disk_devt(disk) + i, disk, GFP_KERNEL))
-+			WARN_ON_ONCE(1);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index c190c56bf702..9ca4f0a6ff2c 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2026,6 +2026,11 @@ static void nvme_update_disk_info(struct gendisk *disk,
+ 			capacity = 0;
  	}
- 	mutex_unlock(&bdev_map_lock);
- }
--EXPORT_SYMBOL(blk_register_region);
  
--void blk_unregister_region(dev_t devt, unsigned long range)
-+static void blk_unregister_region(struct gendisk *disk)
- {
--	unsigned n = MAJOR(devt + range - 1) - MAJOR(devt) + 1;
--	unsigned index = MAJOR(devt);
--	unsigned i;
--	struct bdev_map *found = NULL;
-+	int i;
++#ifdef CONFIG_BLK_DEV_ZONED
++	if (!ns->zone_sup)
++		capacity = 0;
++#endif
++
+ 	set_capacity_revalidate_and_notify(disk, capacity, false);
  
- 	mutex_lock(&bdev_map_lock);
--	for (i = 0; i < min(n, 255u); i++, index++) {
--		struct bdev_map **s;
--		for (s = &bdev_map[index % 255]; *s; s = &(*s)->next) {
--			struct bdev_map *p = *s;
--			if (p->dev == devt && p->range == range) {
--				*s = p->next;
--				if (!found)
--					found = p;
--				break;
--			}
--		}
--	}
-+	for (i = 0; i < disk->minors; i++)
-+		xa_erase(&bdev_map, disk_devt(disk) + i);
- 	mutex_unlock(&bdev_map_lock);
--	kfree(found);
--}
--EXPORT_SYMBOL(blk_unregister_region);
--
--static struct kobject *exact_match(dev_t devt, int *partno, void *data)
--{
--	struct gendisk *p = data;
--
--	return &disk_to_dev(p)->kobj;
--}
--
--static int exact_lock(dev_t devt, void *data)
--{
--	struct gendisk *p = data;
--
--	if (!get_disk_and_module(p))
--		return -1;
--	return 0;
- }
- 
- static void disk_scan_partitions(struct gendisk *disk)
-@@ -870,8 +803,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 		ret = bdi_register(bdi, "%u:%u", MAJOR(devt), MINOR(devt));
- 		WARN_ON(ret);
- 		bdi_set_owner(bdi, dev);
--		blk_register_region(disk_devt(disk), disk->minors, NULL,
--				    exact_match, exact_lock, disk);
-+		blk_register_region(disk);
- 	}
- 	register_disk(parent, disk, groups);
- 	if (register_queue)
-@@ -984,7 +916,7 @@ void del_gendisk(struct gendisk *disk)
- 	blk_unregister_queue(disk);
- 	
- 	if (!(disk->flags & GENHD_FL_HIDDEN))
--		blk_unregister_region(disk_devt(disk), disk->minors);
-+		blk_unregister_region(disk);
- 	/*
- 	 * Remove gendisk pointer from idr so that it cannot be looked up
- 	 * while RCU period before freeing gendisk is running to prevent
-@@ -1050,54 +982,22 @@ static void request_gendisk_module(dev_t devt)
- 		request_module("block-major-%d", MAJOR(devt));
- }
- 
--static struct gendisk *lookup_gendisk(dev_t dev, int *partno)
-+static bool get_disk_and_module(struct gendisk *disk)
- {
--	struct kobject *kobj;
--	struct bdev_map *p;
--	unsigned long best = ~0UL;
--
--retry:
--	mutex_lock(&bdev_map_lock);
--	for (p = bdev_map[MAJOR(dev) % 255]; p; p = p->next) {
--		struct kobject *(*probe)(dev_t, int *, void *);
--		struct module *owner;
--		void *data;
--
--		if (p->dev > dev || p->dev + p->range - 1 < dev)
--			continue;
--		if (p->range - 1 >= best)
--			break;
--		if (!try_module_get(p->owner))
--			continue;
--		owner = p->owner;
--		data = p->data;
--		probe = p->probe;
--		best = p->range - 1;
--		*partno = dev - p->dev;
--
--		if (!probe) {
--			mutex_unlock(&bdev_map_lock);
--			module_put(owner);
--			request_gendisk_module(dev);
--			goto retry;
--		}
-+	struct module *owner;
- 
--		if (p->lock && p->lock(dev, data) < 0) {
--			module_put(owner);
--			continue;
--		}
--		mutex_unlock(&bdev_map_lock);
--		kobj = probe(dev, partno, data);
--		/* Currently ->owner protects _only_ ->probe() itself. */
-+	if (!disk->fops)
-+		return false;
-+	owner = disk->fops->owner;
-+	if (owner && !try_module_get(owner))
-+		return false;
-+	if (!kobject_get_unless_zero(&disk_to_dev(disk)->kobj)) {
- 		module_put(owner);
--		if (kobj)
--			return dev_to_disk(kobj_to_dev(kobj));
--		goto retry;
-+		return false;
- 	}
--	mutex_unlock(&bdev_map_lock);
--	return NULL;
--}
-+	return true;
- 
-+}
- 
- /**
-  * get_gendisk - get partitioning information for a given device
-@@ -1116,7 +1016,19 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
- 	might_sleep();
- 
- 	if (MAJOR(devt) != BLOCK_EXT_MAJOR) {
--		disk = lookup_gendisk(devt, partno);
-+		mutex_lock(&bdev_map_lock);
-+		disk = xa_load(&bdev_map, devt);
-+		if (!disk) {
-+			mutex_unlock(&bdev_map_lock);
-+			request_gendisk_module(devt);
-+			mutex_lock(&bdev_map_lock);
-+			disk = xa_load(&bdev_map, devt);
-+		}
-+		if (disk && !get_disk_and_module(disk))
-+			disk = NULL;
-+		if (disk)
-+			*partno = devt - disk_devt(disk);
-+		mutex_unlock(&bdev_map_lock);
- 	} else {
- 		struct hd_struct *part;
- 
-@@ -1320,21 +1232,6 @@ static const struct seq_operations partitions_op = {
- };
+ 	nvme_config_discard(disk, ns);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 87737fa32360..42cbe5bbc518 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -443,6 +443,7 @@ struct nvme_ns {
+ 	u8 pi_type;
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 	u64 zsze;
++	bool zone_sup;
  #endif
+ 	unsigned long features;
+ 	unsigned long flags;
+diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+index 57cfd78731fb..77a7fed508ef 100644
+--- a/drivers/nvme/host/zns.c
++++ b/drivers/nvme/host/zns.c
+@@ -44,20 +44,23 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+ 	struct nvme_id_ns_zns *id;
+ 	int status;
  
--static void bdev_map_init(void)
--{
--	struct bdev_map *base;
--	int i;
--
--	base = kzalloc(sizeof(*base), GFP_KERNEL);
--	if (!base)
--		panic("cannot allocate bdev_map");
--
--	base->dev = 1;
--	base->range = ~0 ;
--	for (i = 0; i < 255; i++)
--		bdev_map[i] = base;
--}
--
- static int __init genhd_device_init(void)
- {
- 	int error;
-@@ -1343,7 +1240,6 @@ static int __init genhd_device_init(void)
- 	error = class_register(&block_class);
- 	if (unlikely(error))
- 		return error;
--	bdev_map_init();
- 	blk_dev_init();
- 
- 	register_blkdev(BLOCK_EXT_MAJOR, "blkext");
-@@ -1892,35 +1788,6 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- }
- EXPORT_SYMBOL(__alloc_disk_node);
- 
--/**
-- * get_disk_and_module - increments the gendisk and gendisk fops module refcount
-- * @disk: the struct gendisk to increment the refcount for
-- *
-- * This increments the refcount for the struct gendisk, and the gendisk's
-- * fops module owner.
-- *
-- * Context: Any context.
-- */
--struct kobject *get_disk_and_module(struct gendisk *disk)
--{
--	struct module *owner;
--	struct kobject *kobj;
--
--	if (!disk->fops)
--		return NULL;
--	owner = disk->fops->owner;
--	if (owner && !try_module_get(owner))
--		return NULL;
--	kobj = kobject_get_unless_zero(&disk_to_dev(disk)->kobj);
--	if (kobj == NULL) {
--		module_put(owner);
--		return NULL;
+-	/* Driver requires zone append support */
++	ns->zone_sup = true;
++
+ 	if (!(le32_to_cpu(log->iocs[nvme_cmd_zone_append]) &
+ 			NVME_CMD_EFFECTS_CSUPP)) {
++		ns->zone_sup = false;
+ 		dev_warn(ns->ctrl->device,
+ 			"append not supported for zoned namespace:%d\n",
+ 			ns->head->ns_id);
+-		return -EINVAL;
 -	}
--	return kobj;
 -
--}
--EXPORT_SYMBOL(get_disk_and_module);
--
- /**
-  * put_disk - decrements the gendisk refcount
-  * @disk: the struct gendisk to decrement the refcount for
-@@ -1957,7 +1824,6 @@ void put_disk_and_module(struct gendisk *disk)
- 		module_put(owner);
+-	/* Lazily query controller append limit for the first zoned namespace */
+-	if (!ns->ctrl->max_zone_append) {
+-		status = nvme_set_max_append(ns->ctrl);
+-		if (status)
+-			return status;
++	} else {
++		/* Lazily query controller append limit for the first
++		 * zoned namespace
++		 */
++		if (!ns->ctrl->max_zone_append) {
++			status = nvme_set_max_append(ns->ctrl);
++			if (status)
++				return status;
++		}
  	}
- }
--EXPORT_SYMBOL(put_disk_and_module);
  
- static void set_disk_ro_uevent(struct gendisk *gd, int ro)
- {
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 14b1bc7dea21d8..77c3489991f42e 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -340,15 +340,8 @@ int blk_add_partitions(struct gendisk *disk, struct block_device *bdev);
- int blk_drop_partitions(struct block_device *bdev);
+ 	id = kzalloc(sizeof(*id), GFP_KERNEL);
+@@ -73,25 +76,19 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+ 	if (status)
+ 		goto free_data;
  
- extern struct gendisk *__alloc_disk_node(int minors, int node_id);
--extern struct kobject *get_disk_and_module(struct gendisk *disk);
- extern void put_disk(struct gendisk *disk);
- extern void put_disk_and_module(struct gendisk *disk);
--extern void blk_register_region(dev_t devt, unsigned long range,
--			struct module *module,
--			struct kobject *(*probe)(dev_t, int *, void *),
--			int (*lock)(dev_t, void *),
--			void *data);
--extern void blk_unregister_region(dev_t devt, unsigned long range);
+-	/*
+-	 * We currently do not handle devices requiring any of the zoned
+-	 * operation characteristics.
+-	 */
+ 	if (id->zoc) {
++		ns->zone_sup = false;
+ 		dev_warn(ns->ctrl->device,
+ 			"zone operations:%x not supported for namespace:%u\n",
+ 			le16_to_cpu(id->zoc), ns->head->ns_id);
+-		status = -EINVAL;
+-		goto free_data;
+ 	}
  
- #define alloc_disk_node(minors, node_id)				\
- ({									\
+ 	ns->zsze = nvme_lba_to_sect(ns, le64_to_cpu(id->lbafe[lbaf].zsze));
+ 	if (!is_power_of_2(ns->zsze)) {
++		ns->zone_sup = false;
+ 		dev_warn(ns->ctrl->device,
+ 			"invalid zone size:%llu for namespace:%u\n",
+ 			ns->zsze, ns->head->ns_id);
+-		status = -EINVAL;
+-		goto free_data;
+ 	}
+ 
+ 	q->limits.zoned = BLK_ZONED_HM;
 -- 
-2.28.0
+2.17.1
 
