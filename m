@@ -2,77 +2,116 @@ Return-Path: <SRS0=RRdq=EE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5FE8C55179
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 14:57:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5060C56202
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 15:03:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61D282067C
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 14:57:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ECF1207DE
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 15:03:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bTYuNixG"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dVtVbVES"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726773AbgJ2O5r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Oct 2020 10:57:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41330 "EHLO
+        id S1727956AbgJ2PDZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Oct 2020 11:03:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725782AbgJ2O5r (ORCPT
+        with ESMTP id S1727933AbgJ2PDY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Oct 2020 10:57:47 -0400
+        Thu, 29 Oct 2020 11:03:24 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 565CAC0613CF;
-        Thu, 29 Oct 2020 07:57:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DF6AC0613D2;
+        Thu, 29 Oct 2020 08:03:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=gaixN9Bvdo5h62VzxGq1fbBr5CvrRZrgy2xdLXcGzLE=; b=bTYuNixGSW2EZao7BIhpVMoBkg
-        Fnfsb0miEeUi3RCG985nAhHBTRXcZ5zUyXS69dio+GuELyGkENctUrl4Si3aPWCXxI9R681ZfZjUb
-        FfnzHqlfL6psaiXl1i+23BNkSEYxmg9iFWriVvp4QfG3iorYGmwxddxjuoFqNQg8LkBZ20KWgGzCR
-        3VPByv+8ikppMJVye3Zvksowg+Q87VfPAephQ4TPxKsSRUGsqEvKk1gLB+rt2laTKdVPwKewgXJQQ
-        YCe4CkT2Bs/wAVsrqwBh/Cz6SUFnogZTvBB+LW6NHCdfQhfTtoDN4CdsdkGj82up76AVXl5Jlzpld
-        rE/iUJJg==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kY9N2-00056S-3U; Thu, 29 Oct 2020 14:57:44 +0000
-Date:   Thu, 29 Oct 2020 14:57:43 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Daniel Wagner <dwagner@suse.de>,
-        Mike Galbraith <efault@gmx.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 3/3] blk-mq: Use llist_head for blk_cpu_done
-Message-ID: <20201029145743.GA19379@infradead.org>
-References: <20201028065616.GA24449@infradead.org>
- <20201028141251.3608598-1-bigeasy@linutronix.de>
- <20201028141251.3608598-3-bigeasy@linutronix.de>
- <20201029131212.dsulzvsb6pahahbs@linutronix.de>
- <20201029140536.GA6376@infradead.org>
- <20201029145623.3zry7o6nh6ks5tjj@linutronix.de>
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=4rHB9G5No3o31/gkWnrX7b9t+exlEtyB0cyyq3jRbfk=; b=dVtVbVES0FQfTKM8HBIoujCzki
+        3eZO+8iOE/zc/vP5TzodgVMe6Jq+okUCt7Pt+L6+IiMqGghtnT85+tQY+zFpAi3zSHu1+TAz+8s7V
+        Gb3CF0rgw3fMu3GxPIwOKEFfBdciUHc9W3hSpm+Jw5yt0ExNK8hAmPDiQNk7qeIlFOFIiOj8OjC4S
+        aVzrvj9SI70TUFtqq57iH8+NosGQCnmtXtc5y9KHPq4LsWCsKw1U7uvo45sDo5L9IamkZAQhgpJHg
+        qAP51Bs5Dbna7PyEPSvQB0v5ZKZwplbcXluKKAdXhZgPWEYKSIaOyOoJdi/TXB9kArwZR85zBkbem
+        Qt9Fy+FA==;
+Received: from 089144193201.atnat0002.highway.a1.net ([89.144.193.201] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kY9SF-0005Sd-FK; Thu, 29 Oct 2020 15:03:09 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Denis Efremov <efremov@linux.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Song Liu <song@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+        Finn Thain <fthain@telegraphics.com.au>,
+        Michael Schmitz <schmitzmic@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 01/18] block: cleanup del_gendisk a bit
+Date:   Thu, 29 Oct 2020 15:58:24 +0100
+Message-Id: <20201029145841.144173-2-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201029145841.144173-1-hch@lst.de>
+References: <20201029145841.144173-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201029145623.3zry7o6nh6ks5tjj@linutronix.de>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 29, 2020 at 03:56:23PM +0100, Sebastian Andrzej Siewior wrote:
-> On 2020-10-29 14:05:36 [+0000], Christoph Hellwig wrote:
-> > Well, usb-storage obviously seems to do it, and the block layer
-> > does not prohibit it.
-> 
-> Also loop, nvme-tcp and then I stopped looking.
-> Any objections about adding local_bh_disable() around it?
+Merge three hidden gendisk checks into one.
 
-To me it seems like the whole IPI plus potentially softirq dance is
-a little pointless when completing from process context.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ block/genhd.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-Sagi, any opinion on that from the nvme-tcp POV?
+diff --git a/block/genhd.c b/block/genhd.c
+index 0a273211fec283..3ed591970ea640 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -892,6 +892,9 @@ void del_gendisk(struct gendisk *disk)
+ 
+ 	might_sleep();
+ 
++	if (WARN_ON_ONCE(!disk->queue))
++		return;
++
+ 	blk_integrity_del(disk);
+ 	disk_del_events(disk);
+ 
+@@ -914,20 +917,18 @@ void del_gendisk(struct gendisk *disk)
+ 	disk->flags &= ~GENHD_FL_UP;
+ 	up_write(&disk->lookup_sem);
+ 
+-	if (!(disk->flags & GENHD_FL_HIDDEN))
++	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+ 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+-	if (disk->queue) {
++
+ 		/*
+ 		 * Unregister bdi before releasing device numbers (as they can
+ 		 * get reused and we'd get clashes in sysfs).
+ 		 */
+-		if (!(disk->flags & GENHD_FL_HIDDEN))
+-			bdi_unregister(disk->queue->backing_dev_info);
+-		blk_unregister_queue(disk);
+-	} else {
+-		WARN_ON(1);
++		bdi_unregister(disk->queue->backing_dev_info);
+ 	}
+ 
++	blk_unregister_queue(disk);
++	
+ 	if (!(disk->flags & GENHD_FL_HIDDEN))
+ 		blk_unregister_region(disk_devt(disk), disk->minors);
+ 	/*
+-- 
+2.28.0
+
