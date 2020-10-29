@@ -2,130 +2,119 @@ Return-Path: <SRS0=RRdq=EE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDFAC2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 21:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE482C2D0A3
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 21:35:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CBE120790
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 21:08:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63A272087D
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 21:35:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726484AbgJ2VIH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Oct 2020 17:08:07 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37341 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726090AbgJ2VIH (ORCPT
+        id S1725813AbgJ2Vfz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Oct 2020 17:35:55 -0400
+Received: from smtprelay0163.hostedemail.com ([216.40.44.163]:44874 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725768AbgJ2Vfz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Oct 2020 17:08:07 -0400
-Received: by mail-wr1-f68.google.com with SMTP id w1so4292621wrm.4;
-        Thu, 29 Oct 2020 14:08:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vRtRiwlU8ma+WachtYWH3lvFwCoEOB/5npCtcFH4arM=;
-        b=Qqo9u+8y6RgAucV9/rj+vJLU7UgQBfB9zeYcYMEnwoFjjhLHfOJuq9qrvAz8wniUhc
-         8A8LVsycX+qcJChN/1P6LTm2oFvx+eOxn1898M3EbQ1dEVMS5CfFpTeib/u9Qe444LRf
-         pPSHOUXRpHLRfZJcOd5UGDLs1IUYyu4Scr4ueG2wzc2AE2HKI9ijLF29mYBTwHHkQL9T
-         sGml3oc5x68Bjf/pXafaCaZt7Tq5vT3Uzg8e+mx8zIegoWsEjlNPHTFjr7gQpU8n1Wwd
-         IszOa6O3NxE2Da9Ce2r7zit01A777nPsf/43m8oBXJJmqtU6PizkLLo2uw27OWoeXILi
-         ymCw==
-X-Gm-Message-State: AOAM533Yd5g08N8v9y/gkeG+U2eDC7N2omuf5qBbdOCYSQEXiAJwJ1wi
-        dKdfMaLdOctNUe/7weqPznMuxcSJ2ds=
-X-Google-Smtp-Source: ABdhPJwlEUnf5ZZxL8cZAYnaiF+ZohwTaYPGQE5w+F7efNltZt9KtENx2daUBCQnA2YFQkCJAxREQg==
-X-Received: by 2002:adf:c3cd:: with SMTP id d13mr7926005wrg.15.1604005684961;
-        Thu, 29 Oct 2020 14:08:04 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:d32:e3ef:ad74:6ea9? ([2601:647:4802:9070:d32:e3ef:ad74:6ea9])
-        by smtp.gmail.com with ESMTPSA id c129sm1806971wmd.7.2020.10.29.14.08.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Oct 2020 14:08:04 -0700 (PDT)
-Subject: Re: [PATCH 3/3] blk-mq: Use llist_head for blk_cpu_done
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Daniel Wagner <dwagner@suse.de>, Mike Galbraith <efault@gmx.de>
-References: <20201028065616.GA24449@infradead.org>
- <20201028141251.3608598-1-bigeasy@linutronix.de>
- <20201028141251.3608598-3-bigeasy@linutronix.de>
- <20201029131212.dsulzvsb6pahahbs@linutronix.de>
- <20201029140536.GA6376@infradead.org>
- <20201029145623.3zry7o6nh6ks5tjj@linutronix.de>
- <20201029145743.GA19379@infradead.org>
- <d2c15411-5b21-535b-6e07-331ebe22f8c8@grimberg.me>
- <20201029210103.ocufuvj6i4idf5hj@linutronix.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <deb40e55-d228-06c8-8719-fc8657a0a19b@grimberg.me>
-Date:   Thu, 29 Oct 2020 14:07:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 29 Oct 2020 17:35:55 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay03.hostedemail.com (Postfix) with ESMTP id 97E28837F24A;
+        Thu, 29 Oct 2020 21:35:53 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: arm95_560f16827290
+X-Filterd-Recvd-Size: 3499
+Received: from XPS-9350.home (unknown [47.151.133.149])
+        (Authenticated sender: joe@perches.com)
+        by omf11.hostedemail.com (Postfix) with ESMTPA;
+        Thu, 29 Oct 2020 21:35:51 +0000 (UTC)
+Message-ID: <f810a6db9f617208302953c7cf837a8f8dd0e39f.camel@perches.com>
+Subject: Re: [PATCH net-next 03/11] rsxx: remove extraneous 'const' qualifier
+From:   Joe Perches <joe@perches.com>
+To:     Nick Desaulniers <ndesaulniers@google.com>,
+        Arnd Bergmann <arnd@kernel.org>
+Cc:     Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Date:   Thu, 29 Oct 2020 14:35:50 -0700
+In-Reply-To: <CAKwvOdka+UFvwntx-Dcx3oX2nJEkcdo+krm8gu016vPVBF8MBQ@mail.gmail.com>
+References: <20201026213040.3889546-1-arnd@kernel.org>
+         <20201026213040.3889546-3-arnd@kernel.org>
+         <CAKwvOdka+UFvwntx-Dcx3oX2nJEkcdo+krm8gu016vPVBF8MBQ@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.38.1-1 
 MIME-Version: 1.0
-In-Reply-To: <20201029210103.ocufuvj6i4idf5hj@linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->>>>> Well, usb-storage obviously seems to do it, and the block layer
->>>>> does not prohibit it.
->>>>
->>>> Also loop, nvme-tcp and then I stopped looking.
->>>> Any objections about adding local_bh_disable() around it?
->>>
->>> To me it seems like the whole IPI plus potentially softirq dance is
->>> a little pointless when completing from process context.
->>
->> I agree.
->>
->>> Sagi, any opinion on that from the nvme-tcp POV?
->>
->> nvme-tcp should (almost) always complete from the context that matches
->> the rq->mq_ctx->cpu as the thread that processes incoming
->> completions (per hctx) should be affinitized to match it (unless cpus
->> come and go).
+On Thu, 2020-10-29 at 12:34 -0700, Nick Desaulniers wrote:
+> On Mon, Oct 26, 2020 at 2:31 PM Arnd Bergmann <arnd@kernel.org> wrote:
+> > 
+> > From: Arnd Bergmann <arnd@arndb.de>
+> > 
+> > The returned string from rsxx_card_state_to_str is 'const',
+> > but the other qualifier doesn't change anything here except
+> > causing a warning with 'clang -Wextra':
+> > 
+> > drivers/block/rsxx/core.c:393:21: warning: 'const' type qualifier on return type has no effect [-Wignored-qualifiers]
+> > static const char * const rsxx_card_state_to_str(unsigned int state)
+> > 
+> > Fixes: f37912039eb0 ("block: IBM RamSan 70/80 trivial changes.")
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > 
-> in which context?
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Not sure what is the question.
+Perhaps this should also be converted to avoid any possible
+dereference of strings with an invalid state.
+---
+ drivers/block/rsxx/core.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-> But this is probably nr_hw_queues > 1?
+diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
+index 8799e3bab067..f50b00b4887f 100644
+--- a/drivers/block/rsxx/core.c
++++ b/drivers/block/rsxx/core.c
+@@ -390,15 +390,27 @@ static irqreturn_t rsxx_isr(int irq, void *pdata)
+ }
+ 
+ /*----------------- Card Event Handler -------------------*/
+-static const char * const rsxx_card_state_to_str(unsigned int state)
++static const char *rsxx_card_state_to_str(unsigned int state)
+ {
+ 	static const char * const state_strings[] = {
+-		"Unknown", "Shutdown", "Starting", "Formatting",
+-		"Uninitialized", "Good", "Shutting Down",
+-		"Fault", "Read Only Fault", "dStroying"
++		"Unknown",		/* no bit set - all zeros */
++		"Shutdown",		/* BIT(0) */
++		"Starting",		/* BIT(1) */
++		"Formatting",		/* BIT(2) */
++		"Uninitialized",	/* BIT(3) */
++		"Good",			/* BIT(4) */
++		"Shutting Down",	/* BIT(5) */
++		"Fault",		/* BIT(6) */
++		"Read Only Fault",	/* BIT(7) */
++		"Destroying"		/* BIT(8) */
+ 	};
+ 
+-	return state_strings[ffs(state)];
++	int i = ffs(state);
++
++	if (i >= ARRAY_SIZE(state_strings))
++		return "Invalid state";
++
++	return state_strings[i];
+ }
+ 
+ static void card_state_change(struct rsxx_cardinfo *card,
+ 
 
-Yes.
-
->> So for nvme-tcp I don't expect blk_mq_complete_need_ipi to return true
->> in normal operation. That leaves the teardowns+aborts, which aren't very
->> interesting here.
-> 
-> The process context invocation is nvme_tcp_complete_timed_out().
-
-Yes.
-
->> I would note that nvme-tcp does not go to sleep after completing every
->> I/O like how sebastian indicated usb does.
->>
->> Having said that, today the network stack is calling nvme_tcp_data_ready
->> in napi context (softirq) which in turn triggers the queue thread to
->> handle network rx (and complete the I/O). It's been measured recently
->> that running the rx context directly in softirq will save some
->> latency (possible because nvme-tcp rx context is non-blocking).
->>
->> So I'd think that patch #2 is unnecessary and just add overhead for
->> nvme-tcp.. do note that the napi softirq cpu mapping depends on the RSS
->> steering, which is unlikely to match rq->mq_ctx->cpu, hence if completed
->> from napi context, nvme-tcp will probably always go to the IPI path.
-> 
-> but running it in softirq on the remote CPU would still allow of other
-> packets to come on the remote CPU (which would block BLOCK sofirq if
-> NET_RX is already running).
-
-Not sure I understand your comment, if napi triggers on core X and we
-complete from that, it will trigger IPI to core Y, and there with patch 
-#2 is will trigger softirq instead of calling ->complete directly no?
