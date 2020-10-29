@@ -2,131 +2,119 @@ Return-Path: <SRS0=RRdq=EE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99814C388F7
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 02:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E465C55179
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 07:30:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AB94208C3
-	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 02:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2BB9218AC
+	for <linux-block@archiver.kernel.org>; Thu, 29 Oct 2020 07:30:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXPjFqjw"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="SMVH32pB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727745AbgJ1Vsd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Oct 2020 17:48:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48396 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727805AbgJ1Vs0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:48:26 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA72CC0613CF;
-        Wed, 28 Oct 2020 14:48:26 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id h6so614755pgk.4;
-        Wed, 28 Oct 2020 14:48:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+UWJOE6DxOktV3nv6ien/sKPwx9j1tIJmpm9vGaYA7I=;
-        b=lXPjFqjwhXw/iFsQFBkHZ5VUqRkmGhvwPvT0vfWZywgfcJPDsdDAFJu4C1/nWgYvvr
-         Lk1XxSGsBCBag/lTfyxa0Rb+lTsj0OtFtb+jenJSxU1zPp14RsYBF4JgXkdR0TDB+Al+
-         GtulOoehGfzcEdhM8+32GbsxedgDCcMVomSOOY63hVyMoxhuqdhZgGIZtZoh4vS5yBGt
-         dZzc3SAaoe/mvXGlBGIHenC7zmjGFJEfNQ04Ah1vqiN/OS97z5BiKGVEGjCbCu8kk9M7
-         1ibCfRNKt34YkPRuQSbWm+/sbfSl6lFnRNN1F4MjoXZhr8NLk17Pzdivn2tvcy2rNryt
-         2GyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+UWJOE6DxOktV3nv6ien/sKPwx9j1tIJmpm9vGaYA7I=;
-        b=LiyYXW7S6es2b278rODh9jPu1BNrwVdJIYN22Xyr32p2ic7IbfLxkqchTQdNLYyUO5
-         JQZNQ4tJGLdnazs7bKZpaJtn1HMn4fE1ban3yo6mm2NPkDpbM8gBUx+C/2b5CJKre43R
-         h59YHYj8EGll5cyRNoefyC823tlV8EuOqgdQqSprUC+ymoLeHej7pTnvPP1ls8wgApeE
-         ytprLrZarD2bUYK3c/aENnL7xoTla2Qj46NEtx+zSxH6pojDAWsz13sdPONBX5C7PRN5
-         mmrHRSlTphY2sCrl5ZA9WDOxfxrGHSE3sLWThpAJG35u83mQsLNIlDJ/P34X9fQO1KJQ
-         MW7A==
-X-Gm-Message-State: AOAM533/cW3YX298xCTYwBB9Tk37cU6eWsiDY+p5ZmP1R67Ybd0fP/9N
-        HysI+w40a+OEn1KsBqnSZm4Y9Zl4zbA=
-X-Google-Smtp-Source: ABdhPJyrFXfda8gm0gS90dr7Yqvdo2q9Ev0XGHc5kZ7klLeWGxN1soRQy9eJZaz5+32PLMbtqvQ6pg==
-X-Received: by 2002:a63:1c0c:: with SMTP id c12mr725902pgc.21.1603911569773;
-        Wed, 28 Oct 2020 11:59:29 -0700 (PDT)
-Received: from localhost ([2401:fa00:8f:203:a6ae:11ff:fe11:4b46])
-        by smtp.gmail.com with ESMTPSA id x23sm337654pfc.47.2020.10.28.11.59.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2020 11:59:28 -0700 (PDT)
-Date:   Thu, 29 Oct 2020 03:59:27 +0900
-From:   Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To:     Minchan Kim <minchan@kernel.org>,
-        Rui Salvaterra <rsalvaterra@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] zram: break the strict dependency from lzo
-Message-ID: <20201028185927.GB128655@google.com>
-References: <20201028115921.848-1-rsalvaterra@gmail.com>
+        id S1728468AbgJ2Hab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Oct 2020 03:30:31 -0400
+Received: from m12-11.163.com ([220.181.12.11]:54485 "EHLO m12-11.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728475AbgJ2H3D (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Oct 2020 03:29:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=Subject:From:Message-ID:Date:MIME-Version; bh=qvOfV
+        N76kvCqakXlOnB+OC6oakS2ax+nlaKu5gpN3bQ=; b=SMVH32pBrfLcWweNvjMjR
+        Pu5v7RxdfYsLlte9wAcc5PxrnmKKwEWIySsmkh1CFaWB+0qknZC640szZ259aPGF
+        NXChF8gHzKpu/E6xY+KK3haXV43BV5rCqoNvMyho99xZy9t+NsuEX/tMw07/W2nh
+        rBvOGdCuvgojd/U8QeAu8g=
+Received: from [172.20.145.84] (unknown [223.112.105.132])
+        by smtp7 (Coremail) with SMTP id C8CowAAHR4NBM5pfswjLFw--.19478S2;
+        Thu, 29 Oct 2020 11:13:06 +0800 (CST)
+Subject: Re: [PATCH] nbd: don't update block size after device is started
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+        Jan Kara <jack@suse.cz>, yanhaishuang@cmss.chinamobile.com
+References: <20201028072434.1922108-1-ming.lei@redhat.com>
+From:   lining <lining2020x@163.com>
+Message-ID: <4145dd3d-dc1b-9833-9be6-9550eb2fcd13@163.com>
+Date:   Thu, 29 Oct 2020 11:13:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201028115921.848-1-rsalvaterra@gmail.com>
+In-Reply-To: <20201028072434.1922108-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: C8CowAAHR4NBM5pfswjLFw--.19478S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7WF4fXryrXF47GF4kGrykZrb_yoW8Zw18pF
+        yUCayrGrW8Wa1DXa1jvr90grW5K34vk340gry7A3409r93tr9ayr4kta42qrWDtr95JFsx
+        uFsagFWIv3WxXrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jldgZUUUUU=
+X-Originating-IP: [223.112.105.132]
+X-CM-SenderInfo: polqx0bjsqjir06rljoofrz/1tbifBXMNlr6nItafQABsC
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Cc-ing Andrew
+Tested on Ubuntu 20.04.1 LTS with kernel 5.10.0-rc1+, it works fine.
 
-message-id: 20201028115921.848-1-rsalvaterra@gmail.com
+Tested-by: lining <lining2020x@163.com>
 
-On (20/10/28 11:59), Rui Salvaterra wrote:
-> There's nothing special about zram and lzo. It works just fine without it, so
-> as long as at least one of the other supported compression algorithms is
-> selected.
+ÔÚ 2020/10/28 15:24, Ming Lei Ð´µÀ:
+> Mounted NBD device can be resized, one use case is rbd-nbd.
 > 
-> Suggested-by: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-> Signed-off-by: Rui Salvaterra <rsalvaterra@gmail.com>
+> Fix the issue by setting up default block size, then not touch it
+> in nbd_size_update() any more. This kind of usage is aligned with loop
+> which has same use case too.
+> 
+> Reported-by: lining <lining2020x@163.com>
+> Cc: Josef Bacik <josef@toxicpanda.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   drivers/block/nbd.c | 9 +++++----
+>   1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 3c9485acdd81..e13ce0f75f80 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -296,7 +296,7 @@ static void nbd_size_clear(struct nbd_device *nbd)
+>   	}
+>   }
+>   
+> -static void nbd_size_update(struct nbd_device *nbd)
+> +static void nbd_size_update(struct nbd_device *nbd, bool start)
+>   {
+>   	struct nbd_config *config = nbd->config;
+>   	struct block_device *bdev = bdget_disk(nbd->disk, 0);
+> @@ -313,7 +313,8 @@ static void nbd_size_update(struct nbd_device *nbd)
+>   	if (bdev) {
+>   		if (bdev->bd_disk) {
+>   			bd_set_nr_sectors(bdev, nr_sectors);
+> -			set_blocksize(bdev, config->blksize);
+> +			if (start)
+> +				set_blocksize(bdev, config->blksize);
+>   		} else
+>   			set_bit(GD_NEED_PART_SCAN, &nbd->disk->state);
+>   		bdput(bdev);
+> @@ -328,7 +329,7 @@ static void nbd_size_set(struct nbd_device *nbd, loff_t blocksize,
+>   	config->blksize = blocksize;
+>   	config->bytesize = blocksize * nr_blocks;
+>   	if (nbd->task_recv != NULL)
+> -		nbd_size_update(nbd);
+> +		nbd_size_update(nbd, false);
+>   }
+>   
+>   static void nbd_complete_rq(struct request *req)
+> @@ -1308,7 +1309,7 @@ static int nbd_start_device(struct nbd_device *nbd)
+>   		args->index = i;
+>   		queue_work(nbd->recv_workq, &args->work);
+>   	}
+> -	nbd_size_update(nbd);
+> +	nbd_size_update(nbd, true);
+>   	return error;
+>   }
+>   
+> 
 
-Minchan, I'm fine with the change.
-
-Two things from my side:
-
-1) The commit message, probably, can be a bit more informative. Something
-like this?
-
-	ZRAM always enables CRYPTO_LZO because lzo-rle is the hardcoded
-	fallback compression algorithm, which means that on systems where
-	ZRAM always use, for instance, CRYPTO_ZSTD lzo kernel module
-	becomes unneeded. This patch removes the hardcoded lzo-lre
-	dependency, instead ZRAM picks the first supported CRYPTO
-	compression algorithm, should it be ZSTD or LZ4, etc; and only
-	forcibly enables CRYPTO_LZO (previous behaviour) if none of the
-	alternative algorithms were selected.
-
-
-2) The ZRAM_AUTOSEL_ALGO allows to deselect CRYPTO_LZO only if
-CRYPTO_LZ4/CRYPTO_LZ4HC/CRYPTO_842/CRYPTO_ZSTD are compiled in (=y).
-If any of the algorithms is selected as a module (=m) then CRYPTO_LZO
-is selected as the default algorithm. Apparently depends on !(CONFIG_FOO)
-means depends on !(CONFIG_FOO=y).
-
-It appears that the below change fixes it, but it looks a bit ugly.
-
----
-diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
-index 141ce0ebad06..f2fd34de9200 100644
---- a/drivers/block/zram/Kconfig
-+++ b/drivers/block/zram/Kconfig
-@@ -15,7 +15,7 @@ config ZRAM
- 
- config ZRAM_AUTOSEL_ALGO
- 	def_bool y
--	depends on ZRAM && !(CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842 || CRYPTO_ZSTD)
-+	depends on ZRAM && !(CRYPTO_LZ4=m || CRYPTO_LZ4HC=m || CRYPTO_842=m || CRYPTO_ZSTD=m || CRYPTO_LZ4=y || CRYPTO_LZ4HC=y || CRYPTO_842=y || CRYPTO_ZSTD=y)
- 	select CRYPTO_LZO
- 
- config ZRAM_WRITEBACK
----
-
-	-ss
