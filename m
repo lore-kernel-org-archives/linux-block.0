@@ -2,77 +2,98 @@ Return-Path: <SRS0=St9l=EG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BEA3C388F7
-	for <linux-block@archiver.kernel.org>; Sat, 31 Oct 2020 12:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B97D2C4742C
+	for <linux-block@archiver.kernel.org>; Sat, 31 Oct 2020 14:58:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 030002071A
-	for <linux-block@archiver.kernel.org>; Sat, 31 Oct 2020 12:43:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88A83206ED
+	for <linux-block@archiver.kernel.org>; Sat, 31 Oct 2020 14:58:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="uVP5oeGo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727380AbgJaMnG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 31 Oct 2020 08:43:06 -0400
-Received: from mail-il1-f198.google.com ([209.85.166.198]:41109 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726738AbgJaMnG (ORCPT
+        id S1727862AbgJaO65 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 31 Oct 2020 10:58:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35704 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726089AbgJaO64 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 31 Oct 2020 08:43:06 -0400
-Received: by mail-il1-f198.google.com with SMTP id s19so6627070ilb.8
-        for <linux-block@vger.kernel.org>; Sat, 31 Oct 2020 05:43:05 -0700 (PDT)
+        Sat, 31 Oct 2020 10:58:56 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B54CC061A47
+        for <linux-block@vger.kernel.org>; Sat, 31 Oct 2020 07:58:55 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id 133so7520823pfx.11
+        for <linux-block@vger.kernel.org>; Sat, 31 Oct 2020 07:58:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=0zr0b/y5rkNm6oxrz4+W0bMdaVZDG5gT02DeVbHw98o=;
+        b=uVP5oeGo2YZHfMjuITKgMCFLRKszKlLHhu3NYhX0ToMOD9q3WR0wGFUFkWhaYhtsqt
+         BAXEhyU8dThRZMaOj2G/t8Pe1U4C83abPqUdJdvBRsprfX4o3o0dNPUzXz+OTNzS4Hsp
+         CUEhW0B8wY/RY+Th4RHI/09LirVvsxeVY9fEajaAgZIl+25Fb/2PCrfAyx476Qzl+TQm
+         CUUJidojEoMdNDmnDrCZARO6HcTvO8Caib55eG/L0aYjM/BPpAQIazpSmTMFoYpfInIj
+         RX3g3AP8AH3sA5rTGyq6Ghbu2bsLlNEE7x6UAT9gEFpa4OPcO4FgxEZBWLDJaVVE+aiH
+         YKtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=PLbcQV3CQNzMNiONV/iIo/BtH9u9OMn0g6YFDavSo4Y=;
-        b=MV9t0YjVnoPkhvPboSJKxmZe8zRENwuq5xv16DlM9L7QgDv3V0+d3BgYv8V6pSQDId
-         YCFBNsi8NL+V5rwj0ULxfJwvq7cbUz9Jotl2Gs91yvuc8ZaK//u/bOAdy8CM/5VhPKqR
-         HAeLAxd92oJaZTYmDI5GQWZFxjpeEGr8yTIM6mv8BXRlkTNP3hG6KvhAGsRJepOcL8bn
-         5MHLwG9sBFERITAJj2/tBlyfEr1KLT/2eZNkgR0HCltOiBVc73rkcTfngg6Qe5LypNWn
-         5yyt6YXIIpu1Xn+0FPkCwFOsRNvqe3wSfAVrasErejfr/cV2GYnIwhR+yKdfv6e4kNM9
-         V5kQ==
-X-Gm-Message-State: AOAM532iRL80KnBA7Wt/g1JtKx7CaWrFkfbah2YiNd3RPi8Zu0qG/a9w
-        t3QYTAY4khwM/LPEjzkC8zG2RFitXZeB9KDklPO8KatA/dGq
-X-Google-Smtp-Source: ABdhPJwdSnQMnKqhQpqOWGJCnQ4jy4D5pDlHd07KEgNof9hw/wBkglwShyh1D3kPvEOpyeQ37a+d+sNXdO7wr2zoodVg81gSIN6U
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0zr0b/y5rkNm6oxrz4+W0bMdaVZDG5gT02DeVbHw98o=;
+        b=ZCmTLiiAStzIigEozX6M2SNxB3W+El+2QcPEbjKYT3m/mjWQAu3OwIrDqiYKnkjw/D
+         Haujf78hpgvIsQMUiUpjYX6a1MQ7N3orQH78D4ov/7VUoZs4QGZoR4fkz/EIFEycJvOI
+         4t2Qucok3wmczOdihR4chWS34QVnbPuEN0ZY8C4BIHyWb3acqQRyXJH2oQ0UfZvbDThk
+         JzSGW+gq6nC8BGFR/AOE4AplmjrVM/qpY91f3IvqIATFa4cXd9iF4Q+EkqHaacW0HMyt
+         2KCAEYYb0aSo4rZ7pR/tfpqdoHo5Sr06tu7YhdRM/tfq4ALPKVYNe3GB9igXEI8qjvFO
+         PVmg==
+X-Gm-Message-State: AOAM532LEs7a3wIOLXYCU36dVMVc9iRzvU8Occu+JnKJ2a26mbYn1gEC
+        ZEGT2Ug14C2qPSoZ0EL1Aa7/ow==
+X-Google-Smtp-Source: ABdhPJxu4Rg5DJXBVruN6ahpydQKdUXsdC1eafH3KHv2+x9uXffRNUui5KAFMqg9AwAVU2K7WSB8Ww==
+X-Received: by 2002:a63:1b41:: with SMTP id b1mr6826953pgm.274.1604156334647;
+        Sat, 31 Oct 2020 07:58:54 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id q84sm9374774pfq.144.2020.10.31.07.58.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 31 Oct 2020 07:58:53 -0700 (PDT)
+Subject: Re: [PATCH 02/11] mtip32xx: return -ENOTTY for all unhanled ioctls
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Ilya Dryomov <idryomov@gmail.com>, Song Liu <song@kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
+References: <20201031085810.450489-1-hch@lst.de>
+ <20201031085810.450489-3-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f128e8bb-7ce4-b8f4-80cb-1afab503887c@kernel.dk>
+Date:   Sat, 31 Oct 2020 08:58:52 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Received: by 2002:a02:a813:: with SMTP id f19mr5306316jaj.2.1604148185206;
- Sat, 31 Oct 2020 05:43:05 -0700 (PDT)
-Date:   Sat, 31 Oct 2020 05:43:05 -0700
-In-Reply-To: <00000000000061316205b0e750fc@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bf140d05b2f6dae8@google.com>
-Subject: Re: INFO: task can't die in nbd_ioctl
-From:   syzbot <syzbot+69a90a5e8f6b59086b2a@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, hdanton@sina.com, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mchristi@redhat.com, nbd@other.debian.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20201031085810.450489-3-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this issue to:
+On 10/31/20 2:58 AM, Christoph Hellwig wrote:
+> -ENOTTY is the convention for "driver does not support this ioctl".
+> Use it properly in mtip32xx instead of the bogys -EINVAL.
 
-commit e9e006f5fcf2bab59149cb38a48a4817c1b538b4
-Author: Mike Christie <mchristi@redhat.com>
-Date:   Sun Aug 4 19:10:06 2019 +0000
+While that's certainly true, there is a risk in making a change like this
+years after the fact. Not that I expect there are any mtip32xx users
+left at this point, but...
 
-    nbd: fix max number of supported devs
+-- 
+Jens Axboe
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=154dc192500000
-start commit:   4e78c578 Add linux-next specific files for 20201030
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=174dc192500000
-console output: https://syzkaller.appspot.com/x/log.txt?x=134dc192500000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=83318758268dc331
-dashboard link: https://syzkaller.appspot.com/bug?extid=69a90a5e8f6b59086b2a
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e051a8500000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15bf75b8500000
-
-Reported-by: syzbot+69a90a5e8f6b59086b2a@syzkaller.appspotmail.com
-Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
