@@ -2,89 +2,90 @@ Return-Path: <SRS0=St9l=EG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D00C388F9
-	for <linux-block@archiver.kernel.org>; Sat, 31 Oct 2020 18:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F1BC55179
+	for <linux-block@archiver.kernel.org>; Sat, 31 Oct 2020 21:33:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F9BD2068D
-	for <linux-block@archiver.kernel.org>; Sat, 31 Oct 2020 18:09:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E76F206ED
+	for <linux-block@archiver.kernel.org>; Sat, 31 Oct 2020 21:33:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="efefLrOQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PXt1Lod6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728209AbgJaSJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 31 Oct 2020 14:09:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36810 "EHLO
+        id S1728554AbgJaVdI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 31 Oct 2020 17:33:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725887AbgJaSJ2 (ORCPT
+        with ESMTP id S1728553AbgJaVdI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 31 Oct 2020 14:09:28 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D67CC0617A6;
-        Sat, 31 Oct 2020 11:09:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=px5gzTDuAA6r6aEMSVnOAXp+7prn4u4PCSua36AjyrI=; b=efefLrOQX2QQSjz75MCop0tUDq
-        aRdVsfpVZlojVj7ptBWRjok41Bg71aM7sjg/y1MML1YxyXuo//NNUL5yfjw+/c+uMEo3x6AkMwZ8c
-        9cbFKRpSBKZ6VkIK4oaM8OyTdORTWLAQochwdu5JMjdIBRbjtClVCh1yjLD5bknYWn1p75vo/nb8V
-        hQpqO3Zga6PlZfFmEcV0EPNOmHSWucUPdk2bbaxv6OzyfMkVWSddc8FGJMlaG46V/2gbEw/6MG+Qf
-        dJ3tL+rC0Px/EldTofN9HJvczSlvUBOSiQI189HTuSWlVqsi0j7a8fxaDHeM6uD97WXwl0+84o249
-        Jw+e8/4Q==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kYvJP-0003MF-3m; Sat, 31 Oct 2020 18:09:11 +0000
-Date:   Sat, 31 Oct 2020 18:09:11 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Daniel Wagner <dwagner@suse.de>, Mike Galbraith <efault@gmx.de>
-Subject: Re: [PATCH 3/3] blk-mq: Use llist_head for blk_cpu_done
-Message-ID: <20201031180911.GA12737@infradead.org>
-References: <20201029131212.dsulzvsb6pahahbs@linutronix.de>
- <20201029140536.GA6376@infradead.org>
- <20201029145623.3zry7o6nh6ks5tjj@linutronix.de>
- <20201029145743.GA19379@infradead.org>
- <d2c15411-5b21-535b-6e07-331ebe22f8c8@grimberg.me>
- <20201029210103.ocufuvj6i4idf5hj@linutronix.de>
- <deb40e55-d228-06c8-8719-fc8657a0a19b@grimberg.me>
- <20201031104108.wjjdiklqrgyqmj54@linutronix.de>
- <3bbfb5e1-c5d7-8f3b-4b96-6dc02be0550d@kernel.dk>
- <76005875-1cfd-fb35-07f4-d35877d58b90@kernel.dk>
+        Sat, 31 Oct 2020 17:33:08 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D22C0617A6;
+        Sat, 31 Oct 2020 14:33:07 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id r8so6720114qtp.13;
+        Sat, 31 Oct 2020 14:33:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xHvOHUVvu4ckbchx1rcuGr08kZCMPwt4rJyailG9bbE=;
+        b=PXt1Lod62vg8gGET6LJhJCXNcAPFlFMqhaLW/oHUss2OGkbyS0YCJBKTjLTU9jBnJP
+         Xdkns0Q7fETaxj+olj5iMsdqrAkBUMBMh7IVyQosyXpFAMhodyWnYtGV9BHCihrGZN/B
+         dfd+D0Fc+FllJtZcwZTALVV7HrOQnFS8ownbwN+B+bRbMW7Bt1jOhcZGMn9EITUZ5ztH
+         JAgGTVa9Y+2y9DFCnki15TVU6X86FLg/UgI+M9QnWnKMVgQD6vZCAcpYeYKRixVxNZxT
+         oF2TZ3X/wjk3l44NHMlIGXDU4FtiZJ8X6kqba7Q+o+XP9/kvuSRSQuuohjNPfTLH6yRY
+         Dlmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xHvOHUVvu4ckbchx1rcuGr08kZCMPwt4rJyailG9bbE=;
+        b=Z4zKubUKPH3vR64hajDHk6bAOJ1dMUejEFFJzDQBYzBJROL0iBZU6cIDYNfTERZVXQ
+         lp+/WCfLPfiO9bXA8uCUEZ1kwkSap3r71h6t4ye679qsa+8SByoNtEOwWRKQ6YxeCQzU
+         N0GApT8eUQVFGU1QeEVhdAwJmAnC4YH5sSJvR3xPODdLu5iFYvzSGOlsBFRCRtypvbIO
+         fTrFoeNL7pXlD8UjXsnITc9mkfEa5PH152sJaF67pPjPIWE69136s1WzvgVYYJ1NtzO8
+         wdV6pTasJUKTjaZPsZ/fjsOPgUoT0NqKrSzrymYBgC/NwV0yGJEhnu1w3yr/MZVToOxH
+         XKJQ==
+X-Gm-Message-State: AOAM533VA5QmgBFMgmnunuDyci06JlNyYf8P11bEppKBu/hySopE3Hyz
+        L7GfyXDovE0FEzrL6uYuC0nSTJIRrJnxkas910JsyCY7VcU=
+X-Google-Smtp-Source: ABdhPJyH4x3XJbLMJ7sY9fe6Z2kSL4S37owrGlWRCqTmjoD87RzDjMLEM/6vqyHGxMoGH58ahNEztGNUEB1zdGP7kcs=
+X-Received: by 2002:aed:384a:: with SMTP id j68mr8263047qte.170.1604179987263;
+ Sat, 31 Oct 2020 14:33:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <76005875-1cfd-fb35-07f4-d35877d58b90@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+References: <20201031085810.450489-1-hch@lst.de> <20201031085810.450489-2-hch@lst.de>
+In-Reply-To: <20201031085810.450489-2-hch@lst.de>
+From:   Richard Weinberger <richard.weinberger@gmail.com>
+Date:   Sat, 31 Oct 2020 22:32:56 +0100
+Message-ID: <CAFLxGvzXaM8gKF5ffG6dgNaCuTV_g7uozoMiPPHtkmte2CY_bQ@mail.gmail.com>
+Subject: Re: [PATCH 01/11] mtd_blkdevs: don't override BLKFLSBUF
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-raid@vger.kernel.org,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-s390@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+        linux-block@vger.kernel.org, Song Liu <song@kernel.org>,
+        linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Ilya Dryomov <idryomov@gmail.com>, ceph-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Oct 31, 2020 at 09:01:45AM -0600, Jens Axboe wrote:
-> On 10/31/20 9:00 AM, Jens Axboe wrote:
-> > On 10/31/20 4:41 AM, Sebastian Andrzej Siewior wrote:
-> >> On 2020-10-29 14:07:59 [-0700], Sagi Grimberg wrote:
-> >>>> in which context?
-> >>>
-> >>> Not sure what is the question.
-> >>
-> >> The question is in which context do you complete your requests. My guess
-> >> by now is "usually softirq/NAPI and context in rare error case".
-> > 
-> > There really aren't any rules for this, and it's perfectly legit to
-> > complete from process context. Maybe you're a kthread driven driver and
-> > that's how you handle completions. The block completion path has always
-> > been hard IRQ safe, but possible to call from anywhere.
-> 
-> A more recent example is polled IO, which will always complete from
-> process/task context and very much is fast path.
+On Sat, Oct 31, 2020 at 10:08 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> BLKFLSBUF does not actually send a flush command to the device, but
+> teard down buffer cache structures.  Remove the mtd_blkdevs
+> implementation and just use the default semantics instead.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-But we never IPI for that anyway, so it is the easy case.
+Acked-by: Richard Weinberger <richard@nod.at>
+
+-- 
+Thanks,
+//richard
