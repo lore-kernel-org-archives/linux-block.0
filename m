@@ -2,74 +2,126 @@ Return-Path: <SRS0=t87n=EI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0AB2C00A89
-	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 15:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 326F8C388F2
+	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 16:28:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3FAA223AB
-	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 15:44:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604331894;
-	bh=8rEKR7fOW5uabQi7uw+C2UTt4Ld+cqI5rwCfQynFMcY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=eu/NlTvM8XXYuYaGUQcI9kyTzeDDQHsBZwjXYdolWjgc26Ph6budWvg1o61oLGQqO
-	 Fj+wYmMadXNYjDx6cOcfsI9/350QoOroKX5RF+yo/ugsbVjSPq1ZjyyEiAVquKpzum
-	 aLOfCrKsNxGbxsc3ioRkhWN3GFPtYiM44k2XqMFg=
+	by mail.kernel.org (Postfix) with ESMTP id D23B02222B
+	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 16:28:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3U+xHic"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726433AbgKBPoy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Nov 2020 10:44:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41624 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726385AbgKBPoy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Nov 2020 10:44:54 -0500
-Received: from dhcp-10-100-145-180.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726886AbgKBQ26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Nov 2020 11:28:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22875 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726795AbgKBQ26 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Nov 2020 11:28:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604334537;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZPIZCN+l/z1LBcTIqXH+625Dr2hdY3RdIvanAI2iRP8=;
+        b=S3U+xHicV8DHjBncAOs2z2WRaOrlmkV4IhN5OoYcOkF8D7Y9Ptph95TS86TdiGK95m0Vmf
+        D/pzd21HQirYkE163DghQsfBiRKSfEpS0s8bi82wYsRd/LKQMqAWg7PEdftyzlUDz1OH+I
+        55XSpYTsBG4JlBcaPVzaKtJmCcESW0g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-16-8pqwr9pZPbKG7B4yFYPvVw-1; Mon, 02 Nov 2020 11:28:53 -0500
+X-MC-Unique: 8pqwr9pZPbKG7B4yFYPvVw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DADE722275;
-        Mon,  2 Nov 2020 15:44:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604331893;
-        bh=8rEKR7fOW5uabQi7uw+C2UTt4Ld+cqI5rwCfQynFMcY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OpQoxJwm73vouKoP45vBD1VStPAi+CyeCPU0dL4RqxXspZoBq9V3cBuZqj5uhZn4j
-         gSrfjs96iqxoj2rTtuaP6MuOVDHWJ9CeAQ5R0MQYm95fy1O0KVJNPh9TdV9I88LsoS
-         CxswXKUhKWC0bWsndwHNCvWVcBmBIzPlUuRU9CwA=
-Date:   Mon, 2 Nov 2020 07:44:50 -0800
-From:   Keith Busch <kbusch@kernel.org>
-To:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, sagi@grimberg.me, axboe@kernel.dk, joshi.k@samsung.com,
-        k.jensen@samsung.com, Niklas.Cassel@wdc.com,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
-Subject: Re: [PATCH V2] nvme: report capacity 0 for non supported ZNS SSDs
-Message-ID: <20201102154450.GA1970293@dhcp-10-100-145-180.wdc.com>
-References: <20201102132214.22164-1-javier.gonz@samsung.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6D182FD0D;
+        Mon,  2 Nov 2020 16:28:51 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A8AA55766;
+        Mon,  2 Nov 2020 16:28:48 +0000 (UTC)
+Date:   Mon, 2 Nov 2020 10:28:23 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        joseph.qi@linux.alibaba.com, xiaoguang.wang@linux.alibaba.com,
+        haoxu@linux.alibaba.com, io-uring@vger.kernel.org
+Subject: Re: [RFC 0/3] Add support of iopoll for dm device
+Message-ID: <20201102152822.GA20466@redhat.com>
+References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
+ <20201021203906.GA10896@redhat.com>
+ <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
+ <20201026185334.GA8463@redhat.com>
+ <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201102132214.22164-1-javier.gonz@samsung.com>
+In-Reply-To: <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 02, 2020 at 02:22:14PM +0100, Javier González wrote:
-> Changes since V1:
->    - Apply feedback from Niklas:
-> 	- Use IS_ENABLED() for checking config option
+On Sun, Nov 01 2020 at 10:14pm -0500,
+JeffleXu <jefflexu@linux.alibaba.com> wrote:
 
-Your v1 was correct. Using IS_ENBALED() attempts to use an undefined
-symbol when the CONFIG is not enabled:
+> 
+> On 10/27/20 2:53 AM, Mike Snitzer wrote:
+> >What you detailed there isn't properly modeling what it needs to.
+> >A given dm_target_io could result in quite a few bios (e.g. for
+> >dm-striped we clone each bio for each of N stripes).  So the fan-out,
+> >especially if then stacked on N layers of stacked devices, to all the
+> >various hctx at the lowest layers is like herding cats.
+> >
+> >But the recursion in block core's submit_bio path makes that challenging
+> >to say the least.  So much so that any solution related to enabling
+> >proper bio-based IO polling is going to need a pretty significant
+> >investment in fixing block core (storing __submit_bio()'s cookie during
+> >recursion, possibly storing to driver provided memory location,
+> >e.g. DM initialized bio->submit_cookie pointer to a blk_qc_t within a DM
+> >clone bio's per-bio-data).
+> >
+> >SO __submit_bio_noacct would become:
+> >
+> >    retp = &ret;
+> >    if (bio->submit_cookie)
+> >           retp = bio->submit_cookie;
+> >    *retp = __submit_bio(bio);
+> 
+> Sorry for the late reply. Exactly I missed this point before. IF you
+> have not started working on this, I'd like to try to implement this as
+> an RFC.
 
-  drivers/nvme/host/core.c: In function ‘nvme_update_disk_info’:
-  drivers/nvme/host/core.c:2056:45: error: ‘struct nvme_ns’ has no member named ‘zoned_ns_supp’
-   2056 |  if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) && !ns->zoned_ns_supp)
-        |                                             ^~
+I did start on this line of development but it needs quite a bit more
+work.  Even the pseudo code I provided above isn't useful in the context
+of DM clone bios that have their own per-bio-data to assist with this
+implementation.  Because the __submit_bio_noacct() recursive call
+drivers/md/dm.c:__split_and_process_bio() makes is supplying the
+original bio (modified to only point to remaining work).
 
-That said, I don't mind the concept, though I recall Christoph had
-concerns about the existing 0-capacity namespace used for invalid
-formats, so I'd like to hear more on that if he has some spare time to
-comment.
+But sure, I'm not opposed to you carrying this line of work forward.  I
+can always lend a hand if you need help later or if you need to hand it
+off to me.
+
+> >I think you probably just got caught out by the recursive nature of the bio
+> >submission path -- makes creating a graph of submitted bios and their
+> >associated per-bio-data and generated cookies a mess to track (again,
+> >like herding cats).
+> >
+> >Could also be you didn't quite understand the DM code's various
+> >structures.
+> >
+> >In any case, the block core changes needed to make bio-based IO polling
+> >work is the main limiting factor right now.
+>
+> Yes the logic is kind of subtle and maybe what I'm concerned here is
+> really should be concerned at the coding phase.
+
+Definitely, lots of little details and associations.
+
+Mike
+
