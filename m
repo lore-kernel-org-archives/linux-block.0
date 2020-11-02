@@ -2,144 +2,91 @@ Return-Path: <SRS0=t87n=EI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A65BC00A89
-	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 18:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54130C00A89
+	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 18:34:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 35F1A22243
-	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 18:23:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F17F12225E
+	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 18:33:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1604342041;
+	bh=8Xk9SHcN724jkmqolETaQdwcKCNm99W5ejOMIzeeWWk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=lR5OJh3TBb61njuo6CxichiL02NjrBvKftRf3YbR0H8iPx6evCrH/1120mz7VX9Oj
+	 9T+K5rBHVixDSKBG1qOD6clzqkXZPsC6mUDKd1u8hRQEq6i/croumW6Mw1qF1oBavl
+	 dz56qY9+4QyVEPHqbdv/vKF1y7LO04zoOVG1XXw4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726492AbgKBSX1 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Nov 2020 13:23:27 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:28903 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726302AbgKBSXR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Nov 2020 13:23:17 -0500
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-221-3eybHYmXNVuuSrMONPCpiQ-1; Mon, 02 Nov 2020 18:23:12 +0000
-X-MC-Unique: 3eybHYmXNVuuSrMONPCpiQ-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Mon, 2 Nov 2020 18:23:11 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Mon, 2 Nov 2020 18:23:11 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Greg KH' <gregkh@linuxfoundation.org>
-CC:     'David Hildenbrand' <david@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "kernel-team@android.com" <kernel-team@android.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        David Howells <dhowells@redhat.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        id S1725806AbgKBSd7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Nov 2020 13:33:59 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38164 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725801AbgKBSd7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Nov 2020 13:33:59 -0500
+Received: from dhcp-10-100-145-180.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8C42722245;
+        Mon,  2 Nov 2020 18:33:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604342038;
+        bh=8Xk9SHcN724jkmqolETaQdwcKCNm99W5ejOMIzeeWWk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NJYgRC9RyEjCoXvd6B3nVza41sccjCZ4wJnXfKQnN9jRYOVPqg9GmO3rwyH/wTNrD
+         0ne2trMrwInSpSQp2N9HR4ZE3eRcXQDzJ6eYQuTuFttNt7mRSa9PNXUJhs6BP0Xgi8
+         HXUSmx0v5y6SDF2Gea/bmYVc/yh5Py30v05PyShA=
+Date:   Mon, 2 Nov 2020 10:33:55 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     "hch@lst.de" <hch@lst.de>
+Cc:     Javier Gonzalez <javier.gonz@samsung.com>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Subject: RE: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Thread-Topic: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
- rw_copy_check_uvector() into lib/iov_iter.c"
-Thread-Index: AQHWqE5GNDfnH4y9nkGWtfqJueR1KKmjTCJQgAAN4UiAAAD2IIAASOeCgAF+12CAAB+UKYAAAQNg///yIQCAD2i/YIAAT+MAgABLYlA=
-Date:   Mon, 2 Nov 2020 18:23:11 +0000
-Message-ID: <c751d3a7796e45a8a2640e2ded59d708@AcuMS.aculab.com>
-References: <20201022121849.GA1664412@kroah.com>
- <98d9df88-b7ef-fdfb-7d90-2fa7a9d7bab5@redhat.com>
- <20201022125759.GA1685526@kroah.com> <20201022135036.GA1787470@kroah.com>
- <134f162d711d466ebbd88906fae35b33@AcuMS.aculab.com>
- <935f7168-c2f5-dd14-7124-412b284693a2@redhat.com>
- <999e2926-9a75-72fd-007a-1de0af341292@redhat.com>
- <35d0ec90ef4f4a35a75b9df7d791f719@AcuMS.aculab.com>
- <20201023144718.GA2525489@kroah.com>
- <0ab5ac71f28d459db2f350c2e07b88ca@AcuMS.aculab.com>
- <20201102135202.GA1016272@kroah.com>
-In-Reply-To: <20201102135202.GA1016272@kroah.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "joshi.k@samsung.com" <joshi.k@samsung.com>,
+        "Klaus B. Jensen" <k.jensen@samsung.com>,
+        "Niklas.Cassel@wdc.com" <Niklas.Cassel@wdc.com>
+Subject: Re: [PATCH V2] nvme: report capacity 0 for non supported ZNS SSDs
+Message-ID: <20201102183355.GB1970293@dhcp-10-100-145-180.wdc.com>
+References: <CGME20201102161505eucas1p19415e34eb0b14c7eca5a2c648569cf1e@eucas1p1.samsung.com>
+ <0916865d50c640e3aa95dc542f3986b9@CAMSVWEXC01.scsc.local>
+ <20201102180836.GC20182@lst.de>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201102180836.GC20182@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: 'Greg KH'
-> Sent: 02 November 2020 13:52
+On Mon, Nov 02, 2020 at 07:08:37PM +0100, hch@lst.de wrote:
+> On Mon, Nov 02, 2020 at 04:15:01PM +0000, Javier Gonzalez wrote:
+> > That said, I don't mind the concept, though I recall Christoph had
+> > concerns about the existing 0-capacity namespace used for invalid
+> > formats, so I'd like to hear more on that if he has some spare time to
+> > comment.
 > 
-> On Mon, Nov 02, 2020 at 09:06:38AM +0000, David Laight wrote:
-> > From: 'Greg KH'
-> > > Sent: 23 October 2020 15:47
-> > >
-> > > On Fri, Oct 23, 2020 at 02:39:24PM +0000, David Laight wrote:
-> > > > From: David Hildenbrand
-> > > > > Sent: 23 October 2020 15:33
-> > > > ...
-> > > > > I just checked against upstream code generated by clang 10 and it
-> > > > > properly discards the upper 32bit via a mov w23 w2.
-> > > > >
-> > > > > So at least clang 10 indeed properly assumes we could have garbage and
-> > > > > masks it off.
-> > > > >
-> > > > > Maybe the issue is somewhere else, unrelated to nr_pages ... or clang 11
-> > > > > behaves differently.
-> > > >
-> > > > We'll need the disassembly from a failing kernel image.
-> > > > It isn't that big to hand annotate.
-> > >
-> > > I've worked around the merge at the moment in the android tree, but it
-> > > is still quite reproducable, and will try to get a .o file to
-> > > disassemble on Monday or so...
-> >
-> > Did this get properly resolved?
-> 
-> For some reason, 5.10-rc2 fixed all of this up.  I backed out all of the
-> patches I had to revert to get 5.10-rc1 to work properly, and then did
-> the merge and all is well.
-> 
-> It must have been something to do with the compat changes in this same
-> area that went in after 5.10-rc1, and something got reorganized in the
-> files somehow.  I really do not know, and at the moment, don't have the
-> time to track it down anymore.  So for now, I'd say it's all good, sorry
-> for the noise.
+> Yes, I really don't think 0 sized block devices are the right interface
+> for namespaces we can't access.  I think the proper fix is to ensure that
+> we have a character device that allows submitting I/O commands for each
+> namespaces including those where we don't understand the I/O command set
+> or parts of it.  That should also really help to have a proper access
+> model for the KV command set.  Initially we only need NVME_IOCTL_IO64_CMD,
+> but eventually we'll need some support for async submissions, be
+> that through io_uring or other ways.
 
-Hopefully it won't appear again.
+I can see this going one of two ways:
 
-Saved me spending a day off reading arm64 assembler.
+ a) Set up the existing controller character device with a generic
+    disk-less request_queue to the IO queues accepting IO commands to
+    arbitrary NSIDs.
 
-	David
+ b) Each namespace that can't be supported gets their own character
+    device.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+I'm leaning toward option "a". While it doesn't create handles to unique
+namespaces, it has more resilience to potentially future changes. And I
+recall the target side had a potential use for that, too.
