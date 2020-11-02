@@ -1,116 +1,98 @@
-Return-Path: <SRS0=NQrL=EH=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=t87n=EI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C32CCC2D0A3
-	for <linux-block@archiver.kernel.org>; Sun,  1 Nov 2020 16:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B508CC2D0A3
+	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 03:15:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7587D22265
-	for <linux-block@archiver.kernel.org>; Sun,  1 Nov 2020 16:46:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1fh8hw1b"
+	by mail.kernel.org (Postfix) with ESMTP id 67D7E20870
+	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 03:15:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727023AbgKAQqY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 1 Nov 2020 11:46:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46234 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726938AbgKAQqY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Nov 2020 11:46:24 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3398CC0617A6
-        for <linux-block@vger.kernel.org>; Sun,  1 Nov 2020 08:46:24 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id z24so8747604pgk.3
-        for <linux-block@vger.kernel.org>; Sun, 01 Nov 2020 08:46:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ZnX97cZi6Tq1d5eR74IXiOWMCb5Il9NZ1Se/Vo5HW5E=;
-        b=1fh8hw1b4PtM43PjPjUPsgwnC03eOzq1D/OIFg9Z2RLVbDo9D2nclogiTHPlZ9q9gq
-         rrmC+XRj9jIExjEAIOBmizVgp08ZK+1BOrKNPSsqt6PXuv87piwipBy0tmkGDLci20YZ
-         JR2v8tDBzCXLzUsRIF3SNeDwpgOyDiUoBmGT/dKyCVInbDNsH3XW6LdeawRrzdGSBvi3
-         mi2Zd1b281L8/5BerY1o0iDfhGaz4v1tgb6OR3HUy1joR3/yNIFriK7SN7QateperW5W
-         2nQPknP0sHnoa1Z7dhknzTXPvkZP1QGclC+Qpgjo7CRH5NKu46KBXTrYpjYhzZx1X2si
-         M+Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ZnX97cZi6Tq1d5eR74IXiOWMCb5Il9NZ1Se/Vo5HW5E=;
-        b=MEFNuRdGRY/apAsMcnaU9XLTkHeiT6q4dbZmB9TR/DVxcgFiSy1tx3XV1MIm3qO8u1
-         X5IwWnq9fd6nuHMT83QQ6U2RGdujq1H/J7c+hJWibc9Y41c5YQKYgifXasQzX+jwW9Gm
-         Tdb7LxgcyniOC3Z2v+4qUjzI63FZpdch+ApUn5bVkCPTtlKvD6YSPiyTqbzbEPXodxu2
-         eX8Em2JuKmAxRq01UmVDCR5KXQjL4ss6TiR/iharPrzCuR9ooCVm46GdgYIatk13b/gO
-         GG8eBshCBoW1stmGeZCj5CV3dOWJ89NV0LKa0RIj0O8Cbrv+vjQyS2sC0gpY4o8L7JGc
-         hkIw==
-X-Gm-Message-State: AOAM532z7NPLGBWHhSM/ZzX1LtkN0dPfZUPuiH12CLTHcJzV7I8xkzry
-        eQVhti13fA9LH2dWz8dT74yaaw==
-X-Google-Smtp-Source: ABdhPJxTQE4+lDH2ha7od50bGb6ipTN3YldzqLbuO9m9iCrZbUFUOoR3Y6ocz+rikoLtjR5mdUiVNw==
-X-Received: by 2002:a63:d74b:: with SMTP id w11mr10225608pgi.147.1604249183766;
-        Sun, 01 Nov 2020 08:46:23 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id t74sm1926656pfc.47.2020.11.01.08.46.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 01 Nov 2020 08:46:23 -0800 (PST)
-Subject: Re: block ioctl cleanups
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Ilya Dryomov <idryomov@gmail.com>, Song Liu <song@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
-References: <20201031085810.450489-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <877901e6-6cdb-42e9-3b32-cb8b93bfff4e@kernel.dk>
-Date:   Sun, 1 Nov 2020 09:46:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727470AbgKBDPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 1 Nov 2020 22:15:09 -0500
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:62633 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727450AbgKBDPJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 1 Nov 2020 22:15:09 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UDsZrDX_1604286896;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UDsZrDX_1604286896)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 02 Nov 2020 11:14:57 +0800
+Subject: Re: [RFC 0/3] Add support of iopoll for dm device
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        joseph.qi@linux.alibaba.com, xiaoguang.wang@linux.alibaba.com,
+        haoxu@linux.alibaba.com, io-uring@vger.kernel.org
+References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
+ <20201021203906.GA10896@redhat.com>
+ <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
+ <20201026185334.GA8463@redhat.com>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
+Date:   Mon, 2 Nov 2020 11:14:56 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.1
 MIME-Version: 1.0
-In-Reply-To: <20201031085810.450489-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20201026185334.GA8463@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/31/20 2:57 AM, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this series has a bunch of cleanups for the block layer ioctl code.
-> 
-> Diffstat:
->  block/genhd.c                     |    7 ----
->  block/ioctl.c                     |   62 ++++++--------------------------------
->  drivers/block/loop.c              |    2 -
->  drivers/block/mtip32xx/mtip32xx.c |   11 +-----
->  drivers/block/pktcdvd.c           |    6 ++-
->  drivers/block/rbd.c               |   41 ++-----------------------
->  drivers/md/bcache/request.c       |    5 +--
->  drivers/md/dm.c                   |    5 ++-
->  drivers/md/md.c                   |   62 +++++++++++++++++++-------------------
->  drivers/mtd/mtd_blkdevs.c         |   28 -----------------
->  drivers/s390/block/dasd.c         |    1 
->  drivers/s390/block/dasd_int.h     |    3 +
->  drivers/s390/block/dasd_ioctl.c   |   27 +++++-----------
->  include/linux/blkdev.h            |    3 -
->  include/linux/genhd.h             |    1 
->  15 files changed, 73 insertions(+), 191 deletions(-)
 
-Series looks good to me, apart from the mentioned mtip32xx change. If you
-repost this, can you look through commit messages and titles for typos,
-I spotted quite a few. If not I'll do it when applying.
+On 10/27/20 2:53 AM, Mike Snitzer wrote:
+> What you detailed there isn't properly modeling what it needs to.
+> A given dm_target_io could result in quite a few bios (e.g. for
+> dm-striped we clone each bio for each of N stripes).  So the fan-out,
+> especially if then stacked on N layers of stacked devices, to all the
+> various hctx at the lowest layers is like herding cats.
+>
+> But the recursion in block core's submit_bio path makes that challenging
+> to say the least.  So much so that any solution related to enabling
+> proper bio-based IO polling is going to need a pretty significant
+> investment in fixing block core (storing __submit_bio()'s cookie during
+> recursion, possibly storing to driver provided memory location,
+> e.g. DM initialized bio->submit_cookie pointer to a blk_qc_t within a DM
+> clone bio's per-bio-data).
+>
+> SO __submit_bio_noacct would become:
+>
+>     retp = &ret;
+>     if (bio->submit_cookie)
+>            retp = bio->submit_cookie;
+>     *retp = __submit_bio(bio);
 
--- 
-Jens Axboe
+Sorry for the late reply. Exactly I missed this point before. IF you 
+have not started working on this, I'd
+
+like to try to implement this as an RFC.
+
+
+> I think you probably just got caught out by the recursive nature of the bio
+> submission path -- makes creating a graph of submitted bios and their
+> associated per-bio-data and generated cookies a mess to track (again,
+> like herding cats).
+>
+> Could also be you didn't quite understand the DM code's various
+> structures.
+>
+> In any case, the block core changes needed to make bio-based IO polling
+> work is the main limiting factor right now.
+Yes the logic is kind of subtle and maybe what I'm concerned here is 
+really should be concerned
+
+at the coding phase.
+
+
+Thanks.
+
+Jeffle Xu
 
