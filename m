@@ -2,97 +2,125 @@ Return-Path: <SRS0=t87n=EI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B508CC2D0A3
-	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 03:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4692C388F2
+	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 09:08:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67D7E20870
-	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 03:15:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82A7522272
+	for <linux-block@archiver.kernel.org>; Mon,  2 Nov 2020 09:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727470AbgKBDPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 1 Nov 2020 22:15:09 -0500
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:62633 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727450AbgKBDPJ (ORCPT
+        id S1728309AbgKBJIG convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Nov 2020 04:08:06 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:47895 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728239AbgKBJID (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 1 Nov 2020 22:15:09 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UDsZrDX_1604286896;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UDsZrDX_1604286896)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 02 Nov 2020 11:14:57 +0800
-Subject: Re: [RFC 0/3] Add support of iopoll for dm device
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com,
-        joseph.qi@linux.alibaba.com, xiaoguang.wang@linux.alibaba.com,
-        haoxu@linux.alibaba.com, io-uring@vger.kernel.org
-References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
- <20201021203906.GA10896@redhat.com>
- <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
- <20201026185334.GA8463@redhat.com>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
-Date:   Mon, 2 Nov 2020 11:14:56 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.1
+        Mon, 2 Nov 2020 04:08:03 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id uk-mta-2-3gt7SuvxPWOqa-ZpIA1B2g-1;
+ Mon, 02 Nov 2020 09:06:39 +0000
+X-MC-Unique: 3gt7SuvxPWOqa-ZpIA1B2g-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Mon, 2 Nov 2020 09:06:38 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Mon, 2 Nov 2020 09:06:38 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Greg KH' <gregkh@linuxfoundation.org>
+CC:     'David Hildenbrand' <david@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Subject: RE: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Thread-Topic: Buggy commit tracked to: "Re: [PATCH 2/9] iov_iter: move
+ rw_copy_check_uvector() into lib/iov_iter.c"
+Thread-Index: AQHWqE5GNDfnH4y9nkGWtfqJueR1KKmjTCJQgAAN4UiAAAD2IIAASOeCgAF+12CAAB+UKYAAAQNg///yIQCAD2i/YA==
+Date:   Mon, 2 Nov 2020 09:06:38 +0000
+Message-ID: <0ab5ac71f28d459db2f350c2e07b88ca@AcuMS.aculab.com>
+References: <5fd6003b-55a6-2c3c-9a28-8fd3a575ca78@redhat.com>
+ <20201022104805.GA1503673@kroah.com> <20201022121849.GA1664412@kroah.com>
+ <98d9df88-b7ef-fdfb-7d90-2fa7a9d7bab5@redhat.com>
+ <20201022125759.GA1685526@kroah.com> <20201022135036.GA1787470@kroah.com>
+ <134f162d711d466ebbd88906fae35b33@AcuMS.aculab.com>
+ <935f7168-c2f5-dd14-7124-412b284693a2@redhat.com>
+ <999e2926-9a75-72fd-007a-1de0af341292@redhat.com>
+ <35d0ec90ef4f4a35a75b9df7d791f719@AcuMS.aculab.com>
+ <20201023144718.GA2525489@kroah.com>
+In-Reply-To: <20201023144718.GA2525489@kroah.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-In-Reply-To: <20201026185334.GA8463@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: 'Greg KH'
+> Sent: 23 October 2020 15:47
+> 
+> On Fri, Oct 23, 2020 at 02:39:24PM +0000, David Laight wrote:
+> > From: David Hildenbrand
+> > > Sent: 23 October 2020 15:33
+> > ...
+> > > I just checked against upstream code generated by clang 10 and it
+> > > properly discards the upper 32bit via a mov w23 w2.
+> > >
+> > > So at least clang 10 indeed properly assumes we could have garbage and
+> > > masks it off.
+> > >
+> > > Maybe the issue is somewhere else, unrelated to nr_pages ... or clang 11
+> > > behaves differently.
+> >
+> > We'll need the disassembly from a failing kernel image.
+> > It isn't that big to hand annotate.
+> 
+> I've worked around the merge at the moment in the android tree, but it
+> is still quite reproducable, and will try to get a .o file to
+> disassemble on Monday or so...
 
-On 10/27/20 2:53 AM, Mike Snitzer wrote:
-> What you detailed there isn't properly modeling what it needs to.
-> A given dm_target_io could result in quite a few bios (e.g. for
-> dm-striped we clone each bio for each of N stripes).  So the fan-out,
-> especially if then stacked on N layers of stacked devices, to all the
-> various hctx at the lowest layers is like herding cats.
->
-> But the recursion in block core's submit_bio path makes that challenging
-> to say the least.  So much so that any solution related to enabling
-> proper bio-based IO polling is going to need a pretty significant
-> investment in fixing block core (storing __submit_bio()'s cookie during
-> recursion, possibly storing to driver provided memory location,
-> e.g. DM initialized bio->submit_cookie pointer to a blk_qc_t within a DM
-> clone bio's per-bio-data).
->
-> SO __submit_bio_noacct would become:
->
->     retp = &ret;
->     if (bio->submit_cookie)
->            retp = bio->submit_cookie;
->     *retp = __submit_bio(bio);
+Did this get properly resolved?
 
-Sorry for the late reply. Exactly I missed this point before. IF you 
-have not started working on this, I'd
+	David
 
-like to try to implement this as an RFC.
-
-
-> I think you probably just got caught out by the recursive nature of the bio
-> submission path -- makes creating a graph of submitted bios and their
-> associated per-bio-data and generated cookies a mess to track (again,
-> like herding cats).
->
-> Could also be you didn't quite understand the DM code's various
-> structures.
->
-> In any case, the block core changes needed to make bio-based IO polling
-> work is the main limiting factor right now.
-Yes the logic is kind of subtle and maybe what I'm concerned here is 
-really should be concerned
-
-at the coding phase.
-
-
-Thanks.
-
-Jeffle Xu
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
