@@ -4,62 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30710C4742C
-	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 09:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A612C2D0A3
+	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 09:32:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E64F820756
-	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 09:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD595223BF
+	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 09:32:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725988AbgKCJGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Nov 2020 04:06:37 -0500
-Received: from verein.lst.de ([213.95.11.211]:36354 "EHLO verein.lst.de"
+        id S1727826AbgKCJcw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Nov 2020 04:32:52 -0500
+Received: from verein.lst.de ([213.95.11.211]:36466 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727836AbgKCJGb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Nov 2020 04:06:31 -0500
+        id S1725993AbgKCJcv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Nov 2020 04:32:51 -0500
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7146968B02; Tue,  3 Nov 2020 10:06:28 +0100 (CET)
-Date:   Tue, 3 Nov 2020 10:06:28 +0100
-From:   "hch@lst.de" <hch@lst.de>
-To:     Javier Gonzalez <javier@javigon.com>
-Cc:     "hch@lst.de" <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        "Klaus B. Jensen" <k.jensen@samsung.com>,
-        "Niklas.Cassel@wdc.com" <Niklas.Cassel@wdc.com>
-Subject: Re: nvme: report capacity 0 for non supported ZNS SSDs
-Message-ID: <20201103090628.GA15656@lst.de>
-References: <CGME20201102161505eucas1p19415e34eb0b14c7eca5a2c648569cf1e@eucas1p1.samsung.com> <0916865d50c640e3aa95dc542f3986b9@CAMSVWEXC01.scsc.local> <20201102180836.GC20182@lst.de> <20201102183355.GB1970293@dhcp-10-100-145-180.wdc.com> <20201102185851.GA21349@lst.de> <20201102212405.j43m47ewg65v4k5k@MacBook-Pro.localdomain>
+        id 5F1EC68B05; Tue,  3 Nov 2020 10:32:37 +0100 (CET)
+Date:   Tue, 3 Nov 2020 10:32:32 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     James Troup <james.troup@canonical.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ilya Dryomov <idryomov@gmail.com>, Song Liu <song@kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH 06/11] md: implement ->set_read_only to hook into
+ BLKROSET processing
+Message-ID: <20201103093232.GB17061@lst.de>
+References: <20201031085810.450489-1-hch@lst.de> <20201031085810.450489-7-hch@lst.de> <87y2jjpa09.fsf@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201102212405.j43m47ewg65v4k5k@MacBook-Pro.localdomain>
+In-Reply-To: <87y2jjpa09.fsf@canonical.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 02, 2020 at 10:24:05PM +0100, Javier Gonzalez wrote:
-> If I understand correctly, the model would be that a namespace will
-> always have (i) a character device associated where I/O is always allowed
-> through user formed commands, and if the namespace has full support in
-> the kernel (ii) a block device where I/O is as it is today. In case of
-> (ii) both interfaces can be used for I/O.
+On Tue, Nov 03, 2020 at 12:19:34AM +0000, James Troup wrote:
+> Christoph Hellwig <hch@lst.de> writes:
+> 
+> > @@ -7809,6 +7778,36 @@ static int md_compat_ioctl(struct block_device *bdev, fmode_t mode,
+> 
+> [...]
+> 
+> > +	 * Transitioning to readauto need only happen for arrays that call
+> > +	 * md_write_start and which are not ready for writes yet.
+> 
+> I realise you're just moving the comment around but perhaps you could
+> s/readauto/readonly/ while you're doing so?
 
-Yes.
-
-> While we work on iterations for c), do you believe it is reasonable to
-> merge a version of the current path that follows the PI convention for
-> unsupported command sets and features? I would assume that we will have
-> to convert PI to this model too when it is available.
-
-I'm rather torn.  I think the model of the zero capacity block device
-is a really, really bad one and we should haver never added it.  That
-being said, for a ZNS namespace that does not support Zone Append I
-can think of a model that actually makes sense:  expose it as a read-only
-block device, as we can actually read from it perfectly fine, and that
-would also allow ioctl access.
+readonly doesn't make sense here as we transition away from read-only.
+MD seems to have a read-auto mode, although it usually is spelled with
+the dash, so I'll switch this comment to use the more common spelling.
