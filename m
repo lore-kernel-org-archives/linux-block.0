@@ -2,89 +2,71 @@ Return-Path: <SRS0=cbU1=EJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E9BC4742C
-	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 01:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6137BC00A89
+	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 03:08:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5EEF2222B
-	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 01:27:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604366869;
-	bh=KWmQaJdU2iocIYH0eNyvWRoarripQ7D0c/jhctXP6ws=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=GzYsuiuPpWllqWmxDY0DoRb5BKIWGO8u6X71A5Y1txAGG+Q4wOgyVLFD0wW9jXmnj
-	 0RYG6NpGt7/cVn7pMbozSdx4AxlIKzXhfqxNvLdvV088lmiXGBxjckh7tBK8hZJ10g
-	 CYmLZy4Rpfm5gMhWp73Pp9SE/ya+WsEgbrYuTA9Y=
+	by mail.kernel.org (Postfix) with ESMTP id E5B5F22265
+	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 03:08:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ee45ChZR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727470AbgKCB1k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Nov 2020 20:27:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60720 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727463AbgKCBTD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Nov 2020 20:19:03 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1725968AbgKCDIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Nov 2020 22:08:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33012 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725913AbgKCDIV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Nov 2020 22:08:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604372900;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=MJYyF6XJcRo4Z+XhoYpQ8eIJ/B8rjWdWWqBVGeI+dmE=;
+        b=Ee45ChZRgJEjJboz+ZGdy8fXNXZwHOl01E2bbyh36dm8QCa9LTBhb5jdLbOfY0CdU3VTup
+        gREE3tdXDyzu8KjXaf61oBHt8jHloYqfukxkGWMe2PxBu8intyp9XizimP2VY6POWZx9gg
+        EB2KZ03mDXPmCkP1P0jKPHDnyJFYMtc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-rDuX3wu-PrOgKPMY8ynODw-1; Mon, 02 Nov 2020 22:08:18 -0500
+X-MC-Unique: rDuX3wu-PrOgKPMY8ynODw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 887B8223FB;
-        Tue,  3 Nov 2020 01:19:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604366342;
-        bh=KWmQaJdU2iocIYH0eNyvWRoarripQ7D0c/jhctXP6ws=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WA+nWJFaX3wxmunMKTWSSo2wwqiGkYdB5laFGhEkMEv4+31EHlNxmcJlo/I/tXsxM
-         DpRJvEfehE5jjfSYAJd7R25EbfABLHFNNNLflVwtu2kqTrfA8eFFeob22TGU2JzURM
-         JzYdCYMQolUOv574QrPNqXK+YhNW7fkMMFYUEin8=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.9 16/35] blk-cgroup: Fix memleak on error path
-Date:   Mon,  2 Nov 2020 20:18:21 -0500
-Message-Id: <20201103011840.182814-16-sashal@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201103011840.182814-1-sashal@kernel.org>
-References: <20201103011840.182814-1-sashal@kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2F16809DCD;
+        Tue,  3 Nov 2020 03:08:16 +0000 (UTC)
+Received: from lxbceph1.gsslab.pek2.redhat.com (vm37-120.gsslab.pek2.redhat.com [10.72.37.120])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1828575127;
+        Tue,  3 Nov 2020 03:08:10 +0000 (UTC)
+From:   xiubli@redhat.com
+To:     josef@toxicpanda.com, axboe@kernel.dk, ming.lei@redhat.com
+Cc:     nbd@other.debian.org, linux-block@vger.kernel.org,
+        jdillama@redhat.com, mgolub@suse.de, Xiubo Li <xiubli@redhat.com>
+Subject: [PATCH v2 0/2] nbd: fix use-after-freed and double lock bugs
+Date:   Mon,  2 Nov 2020 22:07:56 -0500
+Message-Id: <20201103030758.317781-1-xiubli@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gabriel Krisman Bertazi <krisman@collabora.com>
+From: Xiubo Li <xiubli@redhat.com>
 
-[ Upstream commit 52abfcbd57eefdd54737fc8c2dc79d8f46d4a3e5 ]
+Changed in V2:
+- fixed possible double lock issue in recv_work().
+- adding comments instead to explain why there won't have double lock
+issue.
 
-If new_blkg allocation raced with blk_policy change and
-blkg_lookup_check fails, new_blkg is leaked.
+Xiubo Li (2):
+  nbd: fix use-after-freed crash for nbd->recv_workq
+  nbd: add comments about double lock for config_lock confusion
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Gabriel Krisman Bertazi <krisman@collabora.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-cgroup.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/block/nbd.c | 36 +++++++++++++++++++++++++++++++-----
+ 1 file changed, 31 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index c195365c98172..7b2df042220d4 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -654,6 +654,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 		blkg = blkg_lookup_check(pos, pol, q);
- 		if (IS_ERR(blkg)) {
- 			ret = PTR_ERR(blkg);
-+			blkg_free(new_blkg);
- 			goto fail_unlock;
- 		}
- 
 -- 
-2.27.0
+2.18.4
 
