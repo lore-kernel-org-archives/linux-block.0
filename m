@@ -9,78 +9,79 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	T_TVD_MIME_NO_HEADERS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5751C388F9
-	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 14:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEB5C388F7
+	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 14:12:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DBF922264
-	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 14:12:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5489222264
+	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 14:12:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZxdSCq5u"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RJVkaivx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729603AbgKCOMe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Nov 2020 09:12:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44544 "EHLO
+        id S1729584AbgKCOMf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Nov 2020 09:12:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729584AbgKCOMP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Nov 2020 09:12:15 -0500
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68641C0613D1
-        for <linux-block@vger.kernel.org>; Tue,  3 Nov 2020 06:12:15 -0800 (PST)
-Received: by mail-pf1-x441.google.com with SMTP id a200so14276565pfa.10
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2020 06:12:15 -0800 (PST)
+        with ESMTP id S1729582AbgKCOMe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Nov 2020 09:12:34 -0500
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73650C0613D1
+        for <linux-block@vger.kernel.org>; Tue,  3 Nov 2020 06:12:34 -0800 (PST)
+Received: by mail-pg1-x543.google.com with SMTP id r10so13761213pgb.10
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2020 06:12:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=4IFaN1GPfHhJkNo+nBpVSzGkNc4x3OcTZpLmNA3S5qs=;
-        b=ZxdSCq5uyQcC8TIDdYcOKAugSEXqSCzZv+lzZwg6pMDlGk2PDYawnbPJ3piWfDjUAT
-         Y7wspf0Dxn90NFx+bHSQ5XTTbm3Tchr2ra9SUqGHVDt1HMbVso6/8XYoodI4kqqeECnV
-         e4xyCPoPFI9eEO01DkHCOOVUSwrUyNcMl0xC0=
+        bh=g/mLju0n1UtSWu9nX4tetWSWVYaIBBcAp11guaJ9+VY=;
+        b=RJVkaivx/vOv5AW77mvk3H9kagz3QYHnvjMnKA4EEJrtV7bN0mFf+l/M05rfdzxC4A
+         8ClBb54LfWsWBo3YCaWctYDdRO1vJvOOEgJnHzL901prlEhuM473MLDv9Nb+GB6sS7Bt
+         jFiXs/vcJGhPzaHNspfcET59twP15zkYreE4Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=4IFaN1GPfHhJkNo+nBpVSzGkNc4x3OcTZpLmNA3S5qs=;
-        b=qFgWZ6tY45IP1ezGQlkQ28ObNvu3OP8jWbnZcs/KZgE+ffPja2VRrJWO7SZTn9hDAa
-         cVIn9v5dsQD/ed0S7ItP19CubK1OeZkwp1VJrp5X7Iiq6TzoaWeiGrltzdpFNFHx2rh7
-         CH8lr+qU3CP2ZL9RAoTP/jtI8QHZb5PXAt2pkGR7VzN5lD93XtC5mVq9+L5SV8jcVUM/
-         cZaQiA8h0XqBz3Y7TP6+g+fmw8gmKPHuTWClOaXmABJzKlms6UBWDPMwbzxEM74lubAt
-         g4It9AWDfNFHmALUQVUFKVi1RCETsjFkl8C37qsocwpa/9bjLN3dh1nwzsaV/hqAvIsd
-         +GMQ==
-X-Gm-Message-State: AOAM530WL2QdhKgq56Pygh2HVL45TMZGqa1GkRMzA5vbcfdxq32zocyk
-        UapriIGk9K5X3OPnqkSZucW2zs5RUTgxCYTe0bkuKF1XiDxffp7miUCuD1OG9LQOakfZBB+4fjR
-        /WdJWahCJcLazglxdml29bx6XieNszesD87l3K/MaxT350fkACDEsMBc0cQhNeGU8VY3GVXt9jJ
-        jA2kkIY7ARje2m
-X-Google-Smtp-Source: ABdhPJyvGGSExdqFXUmDGxzkMdUqiP9e3oOlKWx9YnBZAVxeYhSVmRwxKPHNb6D3uJPW+c5RtLUi9g==
-X-Received: by 2002:a17:90b:4b84:: with SMTP id lr4mr4179979pjb.153.1604412734496;
-        Tue, 03 Nov 2020 06:12:14 -0800 (PST)
+        bh=g/mLju0n1UtSWu9nX4tetWSWVYaIBBcAp11guaJ9+VY=;
+        b=DVk0bmAGw0DVpb4ImEyvk1f+uH9AdtSPoDHElZEIdiZjUQrBDvqfbmHYsucmnGIJUv
+         mY3zwTDo2kGmJVMbR+wB5t1p7eOtz7YRV12Z9cXg7oPSz+JlloY2At57DfU9rhq9gE0j
+         6868/mHAG+FtnNw1gU4Kn5t5hSUMSci2EiB6AzekOvHh2f5VxeKKrB5TqbM91cTkYpjj
+         fMF/gkaqv71J9b8+WYlHb0lHTHo9rExiNfA4VQ7TRfYOTHDg9SI/V3LZVUSm/6U8ZskU
+         VMi6kXvmU+Pb6wDhyB1hY6m++gxjJS6wPyVxWlIR10uhXkoPJjjYM0d4C3GPiXi102Xr
+         G+Qw==
+X-Gm-Message-State: AOAM531GgwLBT9dCifMkqyzML4ieWc2zJuWLeVpkfYLWVtuxmwQU5YAv
+        Jg5svNkwiQPmKvLt2Ckkx0dqfafGtlh+P1oK11ISNpsF/OmUs3y0TMEn+ml4GSkYzjknQP8zMDl
+        PIZPYLi7I8A4p2kt1hMQnNo0VdSrNLh7tunQE00DKNi5pqZe0qZmzY/S+rWdSw2cAT/SBAf+EHW
+        VQOaBgVF/yaYZe
+X-Google-Smtp-Source: ABdhPJxplIM4J6XSeHZHKmouwkgPiwaxUO6v93pOvnD+sPyG9DhCKDuU4FXFiyorKGMUDxLeYD8pvQ==
+X-Received: by 2002:a17:90a:7522:: with SMTP id q31mr4160467pjk.158.1604412753325;
+        Tue, 03 Nov 2020 06:12:33 -0800 (PST)
 Received: from localhost.localdomain ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id t19sm3596691pgv.37.2020.11.03.06.12.11
+        by smtp.gmail.com with ESMTPSA id t19sm3596691pgv.37.2020.11.03.06.12.29
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 Nov 2020 06:12:13 -0800 (PST)
+        Tue, 03 Nov 2020 06:12:31 -0800 (PST)
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
         pbonzini@redhat.com,
         Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v3 08/19] lpfc: vmid: Add support for vmid in mailbox command
-Date:   Tue,  3 Nov 2020 12:48:12 +0530
-Message-Id: <1604387903-20006-9-git-send-email-muneendra.kumar@broadcom.com>
+Subject: [PATCH v3 13/19] lpfc: vmid: Functions to manage vmids
+Date:   Tue,  3 Nov 2020 12:48:17 +0530
+Message-Id: <1604387903-20006-14-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1604387903-20006-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1604387903-20006-1-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000236ece05b33473ff"
+        boundary="00000000000044a4e005b334748f"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000236ece05b33473ff
+--00000000000044a4e005b334748f
 
 From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 
-This patch adds supporting datastructures for mailbox command which helps
-in determining if the firmware supports appid or not.
+This patch contains the routines to save, retrieve and remove the vmids
+from the data structure. A hash table is used to save the vmids and
+the corresponding UUIDs associated with the application/VMs.
 
 Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
 Signed-off-by: James Smart <jsmart2021@gmail.com>
@@ -92,58 +93,171 @@ No change
 v2:
 Ported the patch on top of 5.10/scsi-queue
 ---
- drivers/scsi/lpfc/lpfc_hw4.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/scsi/lpfc/lpfc_scsi.c | 139 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 139 insertions(+)
 
-diff --git a/drivers/scsi/lpfc/lpfc_hw4.h b/drivers/scsi/lpfc/lpfc_hw4.h
-index 12e4e76233e6..76c072366a16 100644
---- a/drivers/scsi/lpfc/lpfc_hw4.h
-+++ b/drivers/scsi/lpfc/lpfc_hw4.h
-@@ -272,6 +272,9 @@ struct lpfc_sli4_flags {
- #define lpfc_vfi_rsrc_rdy_MASK		0x00000001
- #define lpfc_vfi_rsrc_rdy_WORD		word0
- #define LPFC_VFI_RSRC_RDY		1
-+#define lpfc_ftr_ashdr_SHIFT            4
-+#define lpfc_ftr_ashdr_MASK             0x00000001
-+#define lpfc_ftr_ashdr_WORD             word0
- };
+diff --git a/drivers/scsi/lpfc/lpfc_scsi.c b/drivers/scsi/lpfc/lpfc_scsi.c
+index 7bc1fd69b715..e5a1056cc575 100644
+--- a/drivers/scsi/lpfc/lpfc_scsi.c
++++ b/drivers/scsi/lpfc/lpfc_scsi.c
+@@ -28,6 +28,7 @@
+ #include <asm/unaligned.h>
+ #include <linux/t10-pi.h>
+ #include <linux/crc-t10dif.h>
++#include <linux/blk-cgroup.h>
+ #include <net/checksum.h>
  
- struct sli4_bls_rsp {
-@@ -2943,6 +2946,9 @@ struct lpfc_mbx_request_features {
- #define lpfc_mbx_rq_ftr_rq_mrqp_SHIFT		16
- #define lpfc_mbx_rq_ftr_rq_mrqp_MASK		0x00000001
- #define lpfc_mbx_rq_ftr_rq_mrqp_WORD		word2
-+#define lpfc_mbx_rq_ftr_rq_ashdr_SHIFT          17
-+#define lpfc_mbx_rq_ftr_rq_ashdr_MASK           0x00000001
-+#define lpfc_mbx_rq_ftr_rq_ashdr_WORD           word2
- 	uint32_t word3;
- #define lpfc_mbx_rq_ftr_rsp_iaab_SHIFT		0
- #define lpfc_mbx_rq_ftr_rsp_iaab_MASK		0x00000001
-@@ -2974,6 +2980,9 @@ struct lpfc_mbx_request_features {
- #define lpfc_mbx_rq_ftr_rsp_mrqp_SHIFT		16
- #define lpfc_mbx_rq_ftr_rsp_mrqp_MASK		0x00000001
- #define lpfc_mbx_rq_ftr_rsp_mrqp_WORD		word3
-+#define lpfc_mbx_rq_ftr_rsp_ashdr_SHIFT         17
-+#define lpfc_mbx_rq_ftr_rsp_ashdr_MASK          0x00000001
-+#define lpfc_mbx_rq_ftr_rsp_ashdr_WORD          word3
- };
+ #include <scsi/scsi.h>
+@@ -4485,6 +4486,144 @@ void lpfc_poll_timeout(struct timer_list *t)
+ 	}
+ }
  
- struct lpfc_mbx_supp_pages {
-@@ -4383,6 +4392,9 @@ struct wqe_common {
- #define wqe_nvme_SHIFT        4
- #define wqe_nvme_MASK         0x00000001
- #define wqe_nvme_WORD         word10
-+#define wqe_appid_SHIFT       5
-+#define wqe_appid_MASK        0x00000001
-+#define wqe_appid_WORD        word10
- #define wqe_oas_SHIFT         6
- #define wqe_oas_MASK          0x00000001
- #define wqe_oas_WORD          word10
++/*
++ * lpfc_get_vmid_from_hastable - search the UUID in the hash table
++ * @vport: The virtual port for which this call is being executed.
++ * @hash: calculated hash value
++ * @buf: uuid associated with the VE
++ * Returns the vmid entry associated with the UUID
++ * Make sure to acquire the appropriate lock before invoking this routine.
++ */
++struct lpfc_vmid *lpfc_get_vmid_from_hastable(struct lpfc_vport *vport,
++					      u32 hash, u8 *buf)
++{
++	struct lpfc_vmid *vmp;
++	u16 count = 0;
++
++	while (count < LPFC_VMID_HASH_SIZE) {
++		vmp = vport->hash_table[hash];
++		if (vmp) {
++			if (strncmp(&vmp->host_vmid[0], buf, 16) == 0)
++				return vmp;
++		} else {
++			return NULL;
++		}
++		/* search the next available slot and continue till entry */
++		/* is found */
++		count++;
++		hash++;
++
++		/* or the end is reached */
++		if (hash == LPFC_VMID_HASH_SIZE)
++			hash = 0;
++	}
++	return NULL;
++}
++
++/*
++ * lpfc_put_vmid_from_hastable - put the VMID in the hash table
++ * @vport: The virtual port for which this call is being executed.
++ * @hash - calculated hash value
++ * @vmp: Pointer to a VMID entry representing a VM sending IO
++ *
++ * This routine will insert the newly acquired vmid entity in the hash table.
++ * Make sure to acquire the appropriate lock before invoking this routine.
++ */
++int
++lpfc_put_vmid_in_hashtable(struct lpfc_vport *vport, u32 hash,
++			   struct lpfc_vmid *vmp)
++{
++	int count = 0;
++
++	while (count < LPFC_VMID_HASH_SIZE) {
++		if (!vport->hash_table[hash]) {
++			vport->hash_table[hash] = vmp;
++			vmp->hash_index = hash;
++			return 1;
++		}
++		/* if the slot is already occupied, a collision has occurred. */
++		/* Store in the next available slot */
++		count++;
++		hash++;
++		/* table is full */
++		if (hash == LPFC_VMID_HASH_SIZE)
++			hash = 0;
++	}
++	return 0;
++}
++
++/*
++ * lpfc_vmid_hash_fn- creates a hash value of the UUID
++ * @uuid: uuid associated with the VE
++ * @len: length of the UUID
++ * Returns the calculated hash value
++ */
++int lpfc_vmid_hash_fn(char *vmid, int len)
++{
++	int c;
++	int hash = 0;
++
++	if (len == 0)
++		return 0;
++	while (len--) {
++		c = *vmid++;
++		if (c >= 'A' && c <= 'Z')
++			c += 'a' - 'A';
++
++		hash = (hash + (c << LPFC_VMID_HASH_SHIFT) +
++			(c >> LPFC_VMID_HASH_SHIFT)) * 19;
++	}
++
++	return hash & LPFC_VMID_HASH_MASK;
++}
++
++/*
++ * lpfc_vmid_update_entry - update the vmid entry in the hash table
++ * @vport: The virtual port for which this call is being executed.
++ * @cmd: address of scsi cmmd descriptor
++ * @vmp: Pointer to a VMID entry representing a VM sending IO
++ * @tag: VMID tag
++ */
++void lpfc_vmid_update_entry(struct lpfc_vport *vport, struct scsi_cmnd
++				   *cmd, struct lpfc_vmid *vmp,
++				   union lpfc_vmid_io_tag *tag)
++{
++	u64 *lta;
++
++	if (vport->vmid_priority_tagging)
++		tag->cs_ctl_vmid = vmp->un.cs_ctl_vmid;
++	else
++		tag->app_id = vmp->un.app_id;
++
++	if (cmd->sc_data_direction == DMA_TO_DEVICE)
++		vmp->io_wr_cnt++;
++	else
++		vmp->io_rd_cnt++;
++
++	/* update the last access timestamp in the table */
++	lta = per_cpu_ptr(vmp->last_io_time, raw_smp_processor_id());
++	*lta = jiffies;
++}
++
++void lpfc_vmid_assign_cs_ctl(struct lpfc_vport *vport, struct lpfc_vmid *vmid)
++{
++	u32 hash;
++	struct lpfc_vmid *pvmid;
++
++	if (vport->port_type == LPFC_PHYSICAL_PORT) {
++		vmid->un.cs_ctl_vmid = lpfc_vmid_get_cs_ctl(vport);
++	} else {
++		hash = lpfc_vmid_hash_fn(vmid->host_vmid, vmid->vmid_len);
++		pvmid =
++		    lpfc_get_vmid_from_hastable(vport->phba->pport, hash,
++						vmid->host_vmid);
++		if (!pvmid)
++			vmid->un.cs_ctl_vmid = pvmid->un.cs_ctl_vmid;
++		else
++			vmid->un.cs_ctl_vmid = lpfc_vmid_get_cs_ctl(vport);
++	}
++}
++
+ /**
+  * lpfc_queuecommand - scsi_host_template queuecommand entry point
+  * @cmnd: Pointer to scsi_cmnd data structure.
 -- 
 2.26.2
 
 
---000000000000236ece05b33473ff
+--00000000000044a4e005b334748f
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -214,13 +328,13 @@ LbMkW5lUoTb8ycBNOKLYhNE8UEOY8jRTUtMEhzT6NJDEE+1hb3kSGfArrrF3Z8pRYiUUhcpC5GKL
 EpmWnHflnrBcah5Ozy137DGCAm8wggJrAgEBMG0wXTELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEds
 b2JhbFNpZ24gbnYtc2ExMzAxBgNVBAMTKkdsb2JhbFNpZ24gUGVyc29uYWxTaWduIDIgQ0EgLSBT
 SEEyNTYgLSBHMwIMX/krgFDQUQNyOf+1MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEi
-BCBargduRUaRrWMqauwG5kM5f2+QSQtYjx0zYs/ateziKzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
-AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDExMDMxNDEyMTRaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
+BCAfZwrkbljYC2xVdPIUn2wzxSDJeqd/b4OTOkuzywD10zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDExMDMxNDEyMzNaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEK
-MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAQayBhQ3d00gsfBdS
-hzzYgFtn0ddOefK/qJKTrc3r10WDeVKVqYYSZ8mBe4p6Ym0GXrPWFSTOR6MpFy3HWrLUrhcK4Ezi
-xoSQTYdJhtq9BjvM/zC0AZ/aoPIsKUg0lCfgaEJ68vbL8LUNObDgycz3jO5QuyXTWhuW3NfI67hI
-+lj5voUK6CRNqzxw+LMM0FFtFr8g3Ljv+t3nmz/ednYjRC2lFdc32ujcFru7mwla+oqVgUXn9r9x
-t7AS222aXqImBhvYbA3FP4oObeNbozNJzywdDifXqRLIJHz6jHEebiQMBdZ2d6g/NzZtHrNIovJJ
-5iXXukLYe9Kim+n55UjbnQ==
---000000000000236ece05b33473ff--
+MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAHThcE/HHFjTqXojZ
+4KF6GXgA/aKpt8G1g4YocX42TxlRc3ZgXDq/H4M78uJd/IPl0LjsI/N1K/5qyTvjiNmqlhyXnoQ9
+hVaI4Mif6q1Dw5BkExr8sFnxerUqRRboAiOqIikiXCj5Q/ZX0/Wqwg45fTUoIQoLCEZYNJdKFiAu
+OABou46/5oZzl0t9KWr/3zyZmtYhA8Qo2SiYuRgqxO/lwE3BlRziAn+tVkvXmXbiE9asH+tnxuse
+dNnyTAOR1kgn6d8lw831rr6RanbqVIvtCkh3zU125eF2E/wc0KbrX7wzEyR+M2jodkeusQV6/Lqv
+mYehpSsC0IWqqHlcHMbzow==
+--00000000000044a4e005b334748f--
