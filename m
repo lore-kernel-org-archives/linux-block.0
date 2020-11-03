@@ -9,77 +9,79 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	T_TVD_MIME_NO_HEADERS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF46CC2D0A3
-	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 14:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F5B2C55179
+	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 14:12:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4792322243
+	by mail.kernel.org (Postfix) with ESMTP id E81172236F
 	for <linux-block@archiver.kernel.org>; Tue,  3 Nov 2020 14:12:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FFdiViI5"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="U0EIBp/o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729590AbgKCOM2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Nov 2020 09:12:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44586 "EHLO
+        id S1729588AbgKCOM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Nov 2020 09:12:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729593AbgKCOM0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Nov 2020 09:12:26 -0500
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E62AC0613D1
-        for <linux-block@vger.kernel.org>; Tue,  3 Nov 2020 06:12:26 -0800 (PST)
-Received: by mail-pg1-x543.google.com with SMTP id f38so13790713pgm.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2020 06:12:26 -0800 (PST)
+        with ESMTP id S1729586AbgKCOMT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Nov 2020 09:12:19 -0500
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18D80C0617A6
+        for <linux-block@vger.kernel.org>; Tue,  3 Nov 2020 06:12:19 -0800 (PST)
+Received: by mail-pg1-x541.google.com with SMTP id w4so3550844pgg.13
+        for <linux-block@vger.kernel.org>; Tue, 03 Nov 2020 06:12:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Pj2k1kdy9l8q2CP+Rz8hEEYj3DeWiJbIsdU6+BhtPCA=;
-        b=FFdiViI51O3xNURpCUFvUB09TeVTrUq0CPz1rQvDN/M8jLqkl68sard8pPIX42NEe4
-         dS8v8yzXvRXGAeXk3yGbI5p9YLYdz5Ru8crGopWCd/qQECGus5tArjXW5sIvuGOatOGv
-         SikAJSULMREwaCsLv11XRrBCAhAV0gzegEdrs=
+        bh=6SLhZCMMReh3MrXXoWPRioJVVNuOFpE+ObISOBPY52Q=;
+        b=U0EIBp/oaPmYIU6pW0jizBTbantoL4j3GTP4MQGWLjbtLB8WGgHnBNvqoL3Oycu+TU
+         IQwnKIpl65np0qwQvnEtj+y9PJtLZyoT/s3dlbwzJhh3qMvC3yIvn5ry3gMwxaAb3evM
+         4NHoDk55lkRISrl95BdIiBSUgsn4Yha5IQEzU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=Pj2k1kdy9l8q2CP+Rz8hEEYj3DeWiJbIsdU6+BhtPCA=;
-        b=ilQF7rYp48M/lRmONkADHAsufoJBNtyZhhzl9m6hxOa/xEEbqilCMmRNrrePFlW7Ai
-         CYE4O+bF2LKJ5mgFK0i3b5dxvvNkI7wnbTgzWKmVKA+hkg9sdKYuKXRRc4xUHefsQ9kq
-         B8nMMtrJxikDR61NEEGVweQO7EXAVHgEcOHGKXSwVK5fDS3jWjYwN4Cw/S2ipfcHaUvY
-         c5wjR8mXQs0tEhIT06/4juZMGvcY3fdB1kffzBvNafZWonoV7YpR17zr2c+sbosu8Thz
-         9D4Rp5JlsTzArZQcLsiu9SqpDwzokh3p3KngJ0dT19RdXwoUxVKyXn7YAU+syRPp311/
-         uK9w==
-X-Gm-Message-State: AOAM530LyhFeAixNfQOSJSb1oIl2J8JDmxb9eqnvuZaUuv5MhGlZj0CT
-        AudSipimZeCUDRBqwTv7JwacSopeY56b/+N1uOmu78pokFMr6laAmcAlos70XeV5w4oEAmFnb31
-        8obdF4xcln0hOSDcBHINhemwdXV0NAVTVzgWAoFqicEP0gheYbgdmNePafyOy9ScnoxSpkiJEib
-        BNWzKzA+CXhmxg
-X-Google-Smtp-Source: ABdhPJxBcRy1IzeQYF7vAdLqwng0L4j6+eT2ctGGtkf3R1v+POJ5yTh/zVMARIdFjodWccmN8ylDfw==
-X-Received: by 2002:a17:90a:62c1:: with SMTP id k1mr4154706pjs.135.1604412745513;
-        Tue, 03 Nov 2020 06:12:25 -0800 (PST)
+        bh=6SLhZCMMReh3MrXXoWPRioJVVNuOFpE+ObISOBPY52Q=;
+        b=CS2ETTyY4b4UPwtifBTrbmzkgczmmSdofSz2jnk6hgslG6INlyO/2HLVJhtT03gUqD
+         PuGsBIIvpfP5aVXERulp8oYm3NRrjS2twg+vOGbO1iqRrgw3WWPlVAsPNls016sgEkwn
+         aHih44xxL+1KYDccH6l4WIAcEuOCT+hgBLiILwbRCz6W0BMoNo6/K4TsEQ1vRykukJ0a
+         MS1MgKdu679ZzRVpjn1D/xEO4vqoJCgfnccE4qk168B5ipDlGCDqAa2PXPXrdPiWfrcl
+         aMouN9FD+6IvLaOx/l/9QQ9Bz3zKl6raH8bXQxE+Jx7jYM8z0Sf5JXVAdjIv5nCRxIE9
+         /pIA==
+X-Gm-Message-State: AOAM5330Jj+frTkZzzJ9xVoN7CeZyuYKoc0AdK3dSfWoailJuov8m/0q
+        /Z++UEOOR6VYZUkbnu4txvq94pgYeyCt96luCunOp/YVKqLcNrAHralloXPZuMOg8X4mulwGUVf
+        /dEAdFUGcnliVyOq3nBp29MKwcplJnP6h1Y72+Zc/I+1U3GGsxyiQiHwxG7+kQkEH3wwvxwGUt9
+        XU+PVG+/LD5oej
+X-Google-Smtp-Source: ABdhPJxD7V8fqoYoU0izboJHi1CvgTIdtn9xRQdSU0M6g+Um6tjX8rSmUWOj0+8VYza50KLho0QE2g==
+X-Received: by 2002:a17:90a:f183:: with SMTP id bv3mr4035430pjb.23.1604412738188;
+        Tue, 03 Nov 2020 06:12:18 -0800 (PST)
 Received: from localhost.localdomain ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id t19sm3596691pgv.37.2020.11.03.06.12.22
+        by smtp.gmail.com with ESMTPSA id t19sm3596691pgv.37.2020.11.03.06.12.14
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 Nov 2020 06:12:24 -0800 (PST)
+        Tue, 03 Nov 2020 06:12:17 -0800 (PST)
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
         pbonzini@redhat.com,
         Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v3 11/19] lpfc: vmid: cleanup vmid resources
-Date:   Tue,  3 Nov 2020 12:48:15 +0530
-Message-Id: <1604387903-20006-12-git-send-email-muneendra.kumar@broadcom.com>
+Subject: [PATCH v3 09/19] lpfc: vmid: VMID params initialization
+Date:   Tue,  3 Nov 2020 12:48:13 +0530
+Message-Id: <1604387903-20006-10-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1604387903-20006-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1604387903-20006-1-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000cbd72c05b334738f"
+        boundary="0000000000005bba8c05b33473cc"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000cbd72c05b334738f
+--0000000000005bba8c05b33473cc
 
 From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 
-The patch cleans up the vmid resources and stops the timer.
+This patch initializes the VMID parameters like the type of vmid, max
+number of vmids supported and timeout value for the vmid registration
+based on the user input.
 
 Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
 Signed-off-by: James Smart <jsmart2021@gmail.com>
@@ -91,62 +93,86 @@ No change
 v2:
 Ported the patch on top of 5.10/scsi-queue
 ---
- drivers/scsi/lpfc/lpfc_init.c |  4 ++++
- drivers/scsi/lpfc/lpfc_scsi.c | 21 +++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ drivers/scsi/lpfc/lpfc_attr.c | 47 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/drivers/scsi/lpfc/lpfc_init.c b/drivers/scsi/lpfc/lpfc_init.c
-index e32d69515586..88777875f4b8 100644
---- a/drivers/scsi/lpfc/lpfc_init.c
-+++ b/drivers/scsi/lpfc/lpfc_init.c
-@@ -2843,6 +2843,10 @@ lpfc_cleanup(struct lpfc_vport *vport)
- 	if (phba->link_state > LPFC_LINK_DOWN)
- 		lpfc_port_link_failure(vport);
- 
-+	/* cleanup vmid resources */
-+	if (lpfc_is_vmid_enabled(phba))
-+		lpfc_vmid_vport_cleanup(vport);
-+
- 	list_for_each_entry_safe(ndlp, next_ndlp, &vport->fc_nodes, nlp_listp) {
- 		if (!NLP_CHK_NODE_ACT(ndlp)) {
- 			ndlp = lpfc_enable_node(vport, ndlp,
-diff --git a/drivers/scsi/lpfc/lpfc_scsi.c b/drivers/scsi/lpfc/lpfc_scsi.c
-index 5e802c8b22a9..7bc1fd69b715 100644
---- a/drivers/scsi/lpfc/lpfc_scsi.c
-+++ b/drivers/scsi/lpfc/lpfc_scsi.c
-@@ -4711,6 +4711,27 @@ lpfc_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *cmnd)
- 	return 0;
- }
+diff --git a/drivers/scsi/lpfc/lpfc_attr.c b/drivers/scsi/lpfc/lpfc_attr.c
+index e94eac194676..e73997bce65c 100644
+--- a/drivers/scsi/lpfc/lpfc_attr.c
++++ b/drivers/scsi/lpfc/lpfc_attr.c
+@@ -6138,6 +6138,44 @@ LPFC_BBCR_ATTR_RW(enable_bbcr, 1, 0, 1, "Enable BBC Recovery");
+  */
+ LPFC_ATTR_RW(enable_dpp, 1, 0, 1, "Enable Direct Packet Push");
  
 +/*
-+ * lpfc_vmid_vport_cleanup - cleans up the resources associated with a vports
-+ * @vport: The virtual port for which this call is being executed.
++ * lpfc_max_vmid: Maximum number of VMs to be tagged. This is valid only if
++ * either vmid_app_header or vmid_priority_tagging is enabled.
++ *       4 - 255  = vmid support enabled for 4-255 VMs
++ *       Value range is [4,255].
 + */
-+void lpfc_vmid_vport_cleanup(struct lpfc_vport *vport)
-+{
-+	/* delete the timer */
-+	if (vport->port_type == LPFC_PHYSICAL_PORT)
-+		del_timer_sync(&vport->phba->inactive_vmid_poll);
++LPFC_ATTR_RW(max_vmid, LPFC_MIN_VMID, LPFC_MIN_VMID, LPFC_MAX_VMID,
++	     "Maximum number of VMs supported");
 +
-+	/* free the resources */
-+	kfree(vport->qfpa_res);
-+	kfree(vport->vmid_priority.vmid_range);
-+	kfree(vport->vmid);
++/*
++ * lpfc_vmid_inactivity_timeout: Inactivity timeout duration in hours
++ *       0  = Timeout is disabled
++ * Value range is [0,24].
++ */
++LPFC_ATTR_RW(vmid_inactivity_timeout, 4, 0, 24,
++	     "Inactivity timeout in hours");
 +
-+	/* reset variables */
-+	vport->qfpa_res = NULL;
-+	vport->vmid_priority.vmid_range = NULL;
-+	vport->vmid = NULL;
-+	vport->cur_vmid_cnt = 0;
-+}
++/*
++ * lpfc_vmid_app_header: Enable App Header VMID support
++ *       0  = Support is disabled (default)
++ *       1  = Support is enabled
++ * Value range is [0,1].
++ */
++LPFC_ATTR_RW(vmid_app_header, LPFC_VMID_APP_HEADER_DISABLE,
++	     LPFC_VMID_APP_HEADER_DISABLE, LPFC_VMID_APP_HEADER_ENABLE,
++	     "Enable App Header VMID support");
++
++/*
++ * lpfc_vmid_priority_tagging: Enable Priority Tagging VMID support
++ *       0  = Support is disabled (default)
++ *       1  = Support is enabled
++ * Value range is [0,1]..
++ */
++LPFC_ATTR_RW(vmid_priority_tagging, LPFC_VMID_PRIO_TAG_DISABLE,
++	     LPFC_VMID_PRIO_TAG_DISABLE,
++	     LPFC_VMID_PRIO_TAG_ALL_TARGETS,
++	     "Enable Priority Tagging VMID support");
++
+ struct device_attribute *lpfc_hba_attrs[] = {
+ 	&dev_attr_nvme_info,
+ 	&dev_attr_scsi_stat,
+@@ -6255,6 +6293,10 @@ struct device_attribute *lpfc_hba_attrs[] = {
+ 	&dev_attr_lpfc_ras_fwlog_func,
+ 	&dev_attr_lpfc_enable_bbcr,
+ 	&dev_attr_lpfc_enable_dpp,
++	&dev_attr_lpfc_max_vmid,
++	&dev_attr_lpfc_vmid_inactivity_timeout,
++	&dev_attr_lpfc_vmid_app_header,
++	&dev_attr_lpfc_vmid_priority_tagging,
+ 	NULL,
+ };
  
- /**
-  * lpfc_abort_handler - scsi_host_template eh_abort_handler entry point
+@@ -7314,6 +7356,11 @@ lpfc_get_cfgparam(struct lpfc_hba *phba)
+ 	lpfc_enable_hba_heartbeat_init(phba, lpfc_enable_hba_heartbeat);
+ 
+ 	lpfc_EnableXLane_init(phba, lpfc_EnableXLane);
++	/* VMID Inits */
++	lpfc_max_vmid_init(phba, lpfc_max_vmid);
++	lpfc_vmid_inactivity_timeout_init(phba, lpfc_vmid_inactivity_timeout);
++	lpfc_vmid_app_header_init(phba, lpfc_vmid_app_header);
++	lpfc_vmid_priority_tagging_init(phba, lpfc_vmid_priority_tagging);
+ 	if (phba->sli_rev != LPFC_SLI_REV4)
+ 		phba->cfg_EnableXLane = 0;
+ 	lpfc_XLanePriority_init(phba, lpfc_XLanePriority);
 -- 
 2.26.2
 
 
---000000000000cbd72c05b334738f
+--0000000000005bba8c05b33473cc
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -217,13 +243,13 @@ LbMkW5lUoTb8ycBNOKLYhNE8UEOY8jRTUtMEhzT6NJDEE+1hb3kSGfArrrF3Z8pRYiUUhcpC5GKL
 EpmWnHflnrBcah5Ozy137DGCAm8wggJrAgEBMG0wXTELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEds
 b2JhbFNpZ24gbnYtc2ExMzAxBgNVBAMTKkdsb2JhbFNpZ24gUGVyc29uYWxTaWduIDIgQ0EgLSBT
 SEEyNTYgLSBHMwIMX/krgFDQUQNyOf+1MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEi
-BCC4DcAptaF909KxgauQplJDreTSIHWv8ZdS/M+uZ5jGwTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
-AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDExMDMxNDEyMjVaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
+BCAr6Y+QnzvMvIghZp3h7zRtYIY8UL6AjSlt20hxAofsDzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDExMDMxNDEyMThaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEK
-MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAV1VHDvGG2/wztNO3
-azF2dxuYWOcrPjc+C1nWhlvqSnx2YUJFnZU1BQbv5TvGPx6LyF5//5dSkKF65aym6HGLfqEaTzhS
-6hibVQP05eIaZNGzDQYegff7gym6XFSujzWNrAoQkqV7XbmvqRkABQFdDvDzMK+NzshJHTglfhIa
-ZcjigZoSdAmUnqpNzUQugA6/027zncUdomXEBUo3iaF/OGndHDuxuCcafsOlE/6UL0StuWTGx3d0
-jtQd5OOEf3pvzALPu0FTUnHdIbW2Esec9BaBWwX8FiqZTKg3Q8hynoCiVCuMaosIDIY3ijYZUKwx
-VWV4oh3dqOkSFvl6Co0YJg==
---000000000000cbd72c05b334738f--
+MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAGsYP19P7JA7+Vj8b
+aOS7vRDqTWXa4jAcvx97Yvbdxcn9lYC/5hPrnTrsLUaauV6/qs9luFgK0D35g8BdlKBQtnGYf7nk
+Kgwf4yWPl2Fc0m/W6+6r99xlA1nqi8BBCT9kRlTZcGoPyY0FNMl+Q6Qm3W5XLmGuAYw3WV7Ue9xz
+WxuMI5mrZuDzzodvy5uzizxu7+fZrR9GDvxDaT7yKmVC4VzPAk/Fkhyqg1p1bEFF/JdtKPQXhsaU
+x8bYkLyaqVu6ndA9Dbgj8aQDuag09BdELOtDefCz+6zYa0WaJukz3EE8JaHJJhXjPvV3hY7JlZ6+
+G/4eM3IsHwdR5MgjuMxsxQ==
+--0000000000005bba8c05b33473cc--
