@@ -2,186 +2,246 @@ Return-Path: <SRS0=E+wN=EK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E20C388F9
-	for <linux-block@archiver.kernel.org>; Wed,  4 Nov 2020 16:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE26C388F9
+	for <linux-block@archiver.kernel.org>; Wed,  4 Nov 2020 16:09:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F9032080D
-	for <linux-block@archiver.kernel.org>; Wed,  4 Nov 2020 16:07:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86E6B2080D
+	for <linux-block@archiver.kernel.org>; Wed,  4 Nov 2020 16:09:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ga9Vds1U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lrx337UG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729796AbgKDQHz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Nov 2020 11:07:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729141AbgKDQHy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Nov 2020 11:07:54 -0500
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702E7C061A4A
-        for <linux-block@vger.kernel.org>; Wed,  4 Nov 2020 08:07:54 -0800 (PST)
-Received: by mail-qk1-x735.google.com with SMTP id i21so19006781qka.12
-        for <linux-block@vger.kernel.org>; Wed, 04 Nov 2020 08:07:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=BHkSWNbIl562pW6AnASM+WBxDDx4+kAwGcMK0HUntks=;
-        b=ga9Vds1U7rymU0qKXfuvuOBdOO0J+h+Ij+YjSeqtnr06dmxmPHtRIIq6TJwrN+feFv
-         NdpvrLCtqjxpyr28ygOC8oS4jULWbJEUbXJUTdqAfIyLMbCJvZ/otoTc2sglWsaOtuno
-         owAkCVRWdCpbqlmmb1dt5YYx88ggt0nbze7nY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=BHkSWNbIl562pW6AnASM+WBxDDx4+kAwGcMK0HUntks=;
-        b=jS0QXl7ftafiPn5CtjQYtg3YlNxfhiSjEGhZGe4OUbhT+6fhkFFuqZ1zxzfZUpqq4T
-         jmb/0nDFCnCkEaHELTWA1z2yF6Sv1NwYNPw8uE0mSXuYpc5K9LbKrVMAK7aK5FMb3lZW
-         lkUbwA9g/zoh0Mi/8Pxno9ywg5q9x5q/cftbMN8pmVSUdTXOrcCA7/mgopmdHt5jfCXJ
-         wos68CHESoTHfuAn8BVx23YTTbVmu7iTq95gcNadoAHmN6dKYw0+utR5fNtNvfQizaxr
-         iNcVCzxzWWt5+bxPEgNYPgjeQMnYJVj18xkQQqYsXOS0zFS/gCi5+u/NVTvAuZO/TtEP
-         dlAQ==
-X-Gm-Message-State: AOAM533z05EYJFkSa02I7oxzcxwHbinS9HxKFKnPi9jlFEiCU+wylH0E
-        OqeLDWPMCqAtIc2kKxxojunY+O7w4jsJWWwcbuQvQg==
-X-Google-Smtp-Source: ABdhPJyL19Fpp6d56vpOKXqEPr2we4oFzgYBvwLPPmmflZubCGpEhohRofDGfi7/P9TqxN5f5iyB8/7SbINnwKu2ZAA=
-X-Received: by 2002:a37:7f03:: with SMTP id a3mr26053474qkd.72.1604506073355;
- Wed, 04 Nov 2020 08:07:53 -0800 (PST)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
-         <1597850436-116171-18-git-send-email-john.garry@huawei.com>
-         <fe3dff7dae4494e5a88caffbb4d877bbf472dceb.camel@redhat.com>
-         <385d5408-6ba2-6bb6-52d3-b59c9aa9c5e5@huawei.com>       <193a0440eed447209c48bda042f0e4db102355e7.camel@redhat.com>
-         <519e0d58-e73e-22ce-0ddb-1be71487ba6d@huawei.com>       <d8fd51b11d5d54e6ec7e4e9a4f7dcc83f1215cd3.camel@redhat.com>
- <d4f86cccccc3bffccc4eda39500ce1e1fee2109a.camel@redhat.com>
-In-Reply-To: <d4f86cccccc3bffccc4eda39500ce1e1fee2109a.camel@redhat.com>
+        id S1725889AbgKDQJZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Nov 2020 11:09:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50799 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726690AbgKDQJY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Nov 2020 11:09:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604506162;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aE9rchY8QZAZdhIZjjPadG9vwbyU73h82vy5PC6x/sg=;
+        b=Lrx337UGVUSxtqrwx6crq6eWtYGaO8s6OFPafTwt2yHiE/oAczq7NnzizC5bVR9wKA1tOV
+        LslneAbMjScLQ8D5JzKWDIYc7gH5fFjzKlKkpkU6KrM0gp8MDhlQBLAzeykyX45miThrnt
+        ozrdm55so185uSRmIbUwJXm7Id2YsGo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-KrSeL1oZOsK1Rvxc2wIyOw-1; Wed, 04 Nov 2020 11:09:18 -0500
+X-MC-Unique: KrSeL1oZOsK1Rvxc2wIyOw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DBD610A0B84;
+        Wed,  4 Nov 2020 16:09:17 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 934E15C5FD;
+        Wed,  4 Nov 2020 16:09:13 +0000 (UTC)
+Date:   Wed, 4 Nov 2020 10:08:48 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        joseph.qi@linux.alibaba.com, xiaoguang.wang@linux.alibaba.com,
+        haoxu@linux.alibaba.com, io-uring@vger.kernel.org
+Subject: Re: [RFC 0/3] Add support of iopoll for dm device
+Message-ID: <20201104150847.GB32761@redhat.com>
+References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
+ <20201021203906.GA10896@redhat.com>
+ <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
+ <20201026185334.GA8463@redhat.com>
+ <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
+ <20201102152822.GA20466@redhat.com>
+ <f165f38a-91d1-79aa-829d-a9cc69a5eee6@linux.alibaba.com>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQIEYzmMwLj9Hjt1oYRTL2F1ptHELAH4Y1GPA2MBE+ABLEW/HAJO7THRAbG1jfoBv/1U4QNIWkp0qOA9ROA=
-Date:   Wed, 4 Nov 2020 21:37:51 +0530
-Message-ID: <7624d3fe1613f19af5c3a77f4ae8fe55@mail.gmail.com>
-Subject: RE: [PATCH v8 17/18] scsi: megaraid_sas: Added support for shared
- host tagset for cpuhotplug
-To:     Qian Cai <cai@redhat.com>, John Garry <john.garry@huawei.com>,
-        axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, ming.lei@redhat.com, bvanassche@acm.org,
-        dgilbert@interlog.com, paolo.valente@linaro.org, hare@suse.de,
-        hch@lst.de
-Cc:     Sumit Saxena <sumit.saxena@broadcom.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, esc.storagedev@microsemi.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
-        chenxiang66@hisilicon.com, luojiaxing@huawei.com,
-        Hannes Reinecke <hare@suse.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="00000000000091cd3605b34a2e66"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f165f38a-91d1-79aa-829d-a9cc69a5eee6@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---00000000000091cd3605b34a2e66
-Content-Type: text/plain; charset="UTF-8"
+On Wed, Nov 04 2020 at  1:47am -0500,
+JeffleXu <jefflexu@linux.alibaba.com> wrote:
 
+> 
+> On 11/2/20 11:28 PM, Mike Snitzer wrote:
+> >On Sun, Nov 01 2020 at 10:14pm -0500,
+> >JeffleXu <jefflexu@linux.alibaba.com> wrote:
 > >
-> > v5.10-rc2 is also broken here.
->
-> John, Kashyap, any update on this? If this is going to take a while to fix
-> it
-> proper, should I send a patch to revert this or at least disable the
-> feature by
-> default for megaraid_sas in the meantime, so it no longer breaks the
-> existing
-> systems out there?
+> >>On 10/27/20 2:53 AM, Mike Snitzer wrote:
+> >>>What you detailed there isn't properly modeling what it needs to.
+> >>>A given dm_target_io could result in quite a few bios (e.g. for
+> >>>dm-striped we clone each bio for each of N stripes).  So the fan-out,
+> >>>especially if then stacked on N layers of stacked devices, to all the
+> >>>various hctx at the lowest layers is like herding cats.
+> >>>
+> >>>But the recursion in block core's submit_bio path makes that challenging
+> >>>to say the least.  So much so that any solution related to enabling
+> >>>proper bio-based IO polling is going to need a pretty significant
+> >>>investment in fixing block core (storing __submit_bio()'s cookie during
+> >>>recursion, possibly storing to driver provided memory location,
+> >>>e.g. DM initialized bio->submit_cookie pointer to a blk_qc_t within a DM
+> >>>clone bio's per-bio-data).
+> >>>
+> >>>SO __submit_bio_noacct would become:
+> >>>
+> >>>    retp = &ret;
+> >>>    if (bio->submit_cookie)
+> >>>           retp = bio->submit_cookie;
+> >>>    *retp = __submit_bio(bio);
+> >>Sorry for the late reply. Exactly I missed this point before. IF you
+> >>have not started working on this, I'd like to try to implement this as
+> >>an RFC.
+> >I did start on this line of development but it needs quite a bit more
+> >work.  Even the pseudo code I provided above isn't useful in the context
+> >of DM clone bios that have their own per-bio-data to assist with this
+> >implementation.  Because the __submit_bio_noacct() recursive call
+> >drivers/md/dm.c:__split_and_process_bio() makes is supplying the
+> >original bio (modified to only point to remaining work).
+> 
+> Yes I noticed this recently. Since the depth-first splitting
+> introduced in commit 18a25da84354
+> 
+> ("dm: ensure bio submission follows a depth-first tree walk"), one
+> bio to dm device can be
+> 
+> split into multiple bios to this dm device.
+> 
+> ```
+> 
+> one bio to dm device (dm0) = one dm_io (to nvme0) + one bio to this
+> same dm device (dm0)
+> 
+> ```
+> 
+> 
+> In this case we need a mechanism to track all split sub-bios of the
+> very beginning original bio.
 
-I am trying to get similar h/w to try out. All my current h/w works fine.
-Give me couple of days' time.
-If this is not obviously common issue and need time, we will go with module
-parameter disable method.
-I will let you know.
+Yes, splitting causes additional potential for sub-bios.  There are
+other cases that cause a 1-to-many bio generation (e.g. dm-striped) or
+splitting cases where a DM target makes use of dm_accept_partial_bio
+(e.g. dm-snapshot, dm-integrity, dm-writecache, etc).
 
-Kashyap
 
---00000000000091cd3605b34a2e66
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> I'm doubted if this should be implemented in block layer like:
+> 
+> ```
+> 
+> struct bio {
+> 
+>     ...
+> 
+>     struct list_head  cookies;
+> 
+> };
+> 
+> ```
+> 
+> After all it's only used by bio-based queue, or more specifically
+> only dm device currently.
 
-MIIQRQYJKoZIhvcNAQcCoIIQNjCCEDICAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg2aMIIE6DCCA9CgAwIBAgIOSBtqCRO9gCTKXSLwFPMwDQYJKoZIhvcNAQELBQAwTDEgMB4GA1UE
-CxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMT
-Ckdsb2JhbFNpZ24wHhcNMTYwNjE1MDAwMDAwWhcNMjQwNjE1MDAwMDAwWjBdMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEzMDEGA1UEAxMqR2xvYmFsU2lnbiBQZXJzb25h
-bFNpZ24gMiBDQSAtIFNIQTI1NiAtIEczMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-tpZok2X9LAHsYqMNVL+Ly6RDkaKar7GD8rVtb9nw6tzPFnvXGeOEA4X5xh9wjx9sScVpGR5wkTg1
-fgJIXTlrGESmaqXIdPRd9YQ+Yx9xRIIIPu3Jp/bpbiZBKYDJSbr/2Xago7sb9nnfSyjTSnucUcIP
-ZVChn6hKneVGBI2DT9yyyD3PmCEJmEzA8Y96qT83JmVH2GaPSSbCw0C+Zj1s/zqtKUbwE5zh8uuZ
-p4vC019QbaIOb8cGlzgvTqGORwK0gwDYpOO6QQdg5d03WvIHwTunnJdoLrfvqUg2vOlpqJmqR+nH
-9lHS+bEstsVJtZieU1Pa+3LzfA/4cT7XA/pnwwIDAQABo4IBtTCCAbEwDgYDVR0PAQH/BAQDAgEG
-MGoGA1UdJQRjMGEGCCsGAQUFBwMCBggrBgEFBQcDBAYIKwYBBQUHAwkGCisGAQQBgjcUAgIGCisG
-AQQBgjcKAwQGCSsGAQQBgjcVBgYKKwYBBAGCNwoDDAYIKwYBBQUHAwcGCCsGAQUFBwMRMBIGA1Ud
-EwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFGlygmIxZ5VEhXeRgMQENkmdewthMB8GA1UdIwQYMBaA
-FI/wS3+oLkUkrk1Q+mOai97i3Ru8MD4GCCsGAQUFBwEBBDIwMDAuBggrBgEFBQcwAYYiaHR0cDov
-L29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3RyMzA2BgNVHR8ELzAtMCugKaAnhiVodHRwOi8vY3Js
-Lmdsb2JhbHNpZ24uY29tL3Jvb3QtcjMuY3JsMGcGA1UdIARgMF4wCwYJKwYBBAGgMgEoMAwGCisG
-AQQBoDIBKAowQQYJKwYBBAGgMgFfMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2JhbHNp
-Z24uY29tL3JlcG9zaXRvcnkvMA0GCSqGSIb3DQEBCwUAA4IBAQConc0yzHxn4gtQ16VccKNm4iXv
-6rS2UzBuhxI3XDPiwihW45O9RZXzWNgVcUzz5IKJFL7+pcxHvesGVII+5r++9eqI9XnEKCILjHr2
-DgvjKq5Jmg6bwifybLYbVUoBthnhaFB0WLwSRRhPrt5eGxMw51UmNICi/hSKBKsHhGFSEaJQALZy
-4HL0EWduE6ILYAjX6BSXRDtHFeUPddb46f5Hf5rzITGLsn9BIpoOVrgS878O4JnfUWQi29yBfn75
-HajifFvPC+uqn+rcVnvrpLgsLOYG/64kWX/FRH8+mhVe+mcSX3xsUpcxK9q9vLTVtroU/yJUmEC4
-OcH5dQsbHBqjMIIDXzCCAkegAwIBAgILBAAAAAABIVhTCKIwDQYJKoZIhvcNAQELBQAwTDEgMB4G
-A1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNV
-BAMTCkdsb2JhbFNpZ24wHhcNMDkwMzE4MTAwMDAwWhcNMjkwMzE4MTAwMDAwWjBMMSAwHgYDVQQL
-ExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMK
-R2xvYmFsU2lnbjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMwldpB5BngiFvXAg7aE
-yiie/QV2EcWtiHL8RgJDx7KKnQRfJMsuS+FggkbhUqsMgUdwbN1k0ev1LKMPgj0MK66X17YUhhB5
-uzsTgHeMCOFJ0mpiLx9e+pZo34knlTifBtc+ycsmWQ1z3rDI6SYOgxXG71uL0gRgykmmKPZpO/bL
-yCiR5Z2KYVc3rHQU3HTgOu5yLy6c+9C7v/U9AOEGM+iCK65TpjoWc4zdQQ4gOsC0p6Hpsk+QLjJg
-6VfLuQSSaGjlOCZgdbKfd/+RFO+uIEn8rUAVSNECMWEZXriX7613t2Saer9fwRPvm2L7DWzgVGkW
-qQPabumDk3F2xmmFghcCAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8w
-HQYDVR0OBBYEFI/wS3+oLkUkrk1Q+mOai97i3Ru8MA0GCSqGSIb3DQEBCwUAA4IBAQBLQNvAUKr+
-yAzv95ZURUm7lgAJQayzE4aGKAczymvmdLm6AC2upArT9fHxD4q/c2dKg8dEe3jgr25sbwMpjjM5
-RcOO5LlXbKr8EpbsU8Yt5CRsuZRj+9xTaGdWPoO4zzUhw8lo/s7awlOqzJCK6fBdRoyV3XpYKBov
-Hd7NADdBj+1EbddTKJd+82cEHhXXipa0095MJ6RMG3NzdvQXmcIfeg7jLQitChws/zyrVQ4PkX42
-68NXSb7hLi18YIvDQVETI53O9zJrlAGomecsMx86OyXShkDOOyyGeMlhLxS67ttVb9+E7gUJTb0o
-2HLO02JQZR7rkpeDMdmztcpHWD9fMIIFRzCCBC+gAwIBAgIMNJ2hfsaqieGgTtOzMA0GCSqGSIb3
-DQEBCwUAMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTMwMQYDVQQD
-EypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0gRzMwHhcNMjAwOTE0MTE0
-NTE2WhcNMjIwOTE1MTE0NTE2WjCBkDELMAkGA1UEBhMCSU4xEjAQBgNVBAgTCUthcm5hdGFrYTES
-MBAGA1UEBxMJQmFuZ2Fsb3JlMRYwFAYDVQQKEw1Ccm9hZGNvbSBJbmMuMRYwFAYDVQQDEw1LYXNo
-eWFwIERlc2FpMSkwJwYJKoZIhvcNAQkBFhprYXNoeWFwLmRlc2FpQGJyb2FkY29tLmNvbTCCASIw
-DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALcJrXmVmbWEd4eX2uEKGBI6v43LPHKbbncKqMGH
-Dez52MTfr4QkOZYWM4Rqv8j6vb8LPlUc9k0CEnC9Yaj9ZzDOcR+gHfoZ3F1JXSVRWdguz25MiB6a
-bU8odXAymhaig9sNJLxiWid3RORmG/w1Nceflo/72Cwttt0ytDTKdF987/aVGqMIxg3NnXM/cn+T
-0wUiccp8WINUie4nuR9pzv5RKGqAzNYyo8krQ2URk+3fGm1cPRoFEVAkwrCs/FOs6LfggC2CC4LB
-yfWKfxJx8FcWmsjkSlrwDu+oVuDUa2wqeKBU12HQ4JAVd+LOb5edsbbFQxgGHu+MPuc/1hl9kTkC
-AwEAAaOCAdEwggHNMA4GA1UdDwEB/wQEAwIFoDCBngYIKwYBBQUHAQEEgZEwgY4wTQYIKwYBBQUH
-MAKGQWh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzcGVyc29uYWxzaWduMnNo
-YTJnM29jc3AuY3J0MD0GCCsGAQUFBzABhjFodHRwOi8vb2NzcDIuZ2xvYmFsc2lnbi5jb20vZ3Nw
-ZXJzb25hbHNpZ24yc2hhMmczME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEQGA1Ud
-HwQ9MDswOaA3oDWGM2h0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NwZXJzb25hbHNpZ24yc2hh
-MmczLmNybDAlBgNVHREEHjAcgRprYXNoeWFwLmRlc2FpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAK
-BggrBgEFBQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQU4dX1
-Yg4eoWXbqyPW/N1ZD/LPIWcwDQYJKoZIhvcNAQELBQADggEBABBuHYKGUwHIhCjd3LieJwKVuJNr
-YohEnZzCoNaOj33/j5thiA4cZehCh6SgrIlFBIktLD7jW9Dwl88Gfcy+RrVa7XK5Hyqwr1JlCVsW
-pNj4hlSJMNNqxNSqrKaD1cR4/oZVPFVnJJYlB01cLVjGMzta9x27e6XEtseo2s7aoPS2l82koMr7
-8S/v9LyyP4X2aRTWOg9RG8D/13rLxFAApfYvCrf0quIUBWw2BXlq3+e3r7pU7j40d6P04VV3Zxws
-M+LbYxcXFT2gXvoYd2Ms8zsLrhO2M6pMzeNGWk2HWTof9s7EEHDjis/MRlbYSNaohV23IUzNlBw7
-1FmvvW5GKK0xggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
-IG52LXNhMTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0g
-RzMCDDSdoX7GqonhoE7TszANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgOU+7gzyZ
-lEr6MnrW5BCTPUf6m/9NDzV+e+V/QE2MBWIwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMjAxMTA0MTYwNzUzWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
-BglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAEQsXQKdK3dVYGoXrkabGMiq323D
-Lu/ZxJYvMdTC+FILluEPIh1OniGCiFrM01yLlfFZSz4tk4mKkUudsKW/SwqxR4upfkMm2JsKOXBX
-EVzdFXi0PUBBQ7kiqrfvziQjv9SycfScPH9VpICklQlSREVa/qeDA0nva1S8jh4gt4VCJicAsg1V
-07HcKuBBEdkDPHs95Wnc/eYECf5TIZvpL+0mKIlFOjOq1h9Okatt8NImfH6PuHSrXXe6OHw25479
-rcxTOYVp/w9Zr60X9hiytD/sO1ZWS2SIWFMIHmUu3B9JwQIDlccuk1bYLVK3qhQm8RBD9TdXfhkB
-W0NMe0MMG6w=
---00000000000091cd3605b34a2e66--
+I do think this line of work really should be handled in block core
+because I cannot see any reason why MD or bcache or whatever bio-based
+device wouldn't want the ability to better support io_uring (with IO
+poll).
+
+> Another design I can come up with is to maintain a global data
+> structure for the very beginning
+> original bio. Currently the blocking point is that now one original
+> bio to the dm device (@bio of dm_submit()) can correspond to multiple
+> dm_io and thus we have nowhere to place the @cookies list.
+
+Yes, and that will always be the case.  We need the design to handle an
+arbitrary sprawl of splitting from a given bio.  The graph of bios
+resulting from that fan-out needs to be walked at various levels -- be
+it the top-level original bio's submit_bio() returned cookie or some
+intermediate point in the chain of bios.
+
+The problem is the lifetime of the data structure created for a given
+split bio versus layering boundaries (that come from block core's
+simplistic recursion via bio using submit_bio).
+
+> Now we have to maintain one data structure for every original bio,
+> something like
+> 
+> ```
+> 
+> struct dm_poll_instance {
+> 
+>     ...
+> 
+>     struct list_head cookies;
+> 
+> };
+> 
+> ```
+
+I do think we need a hybrid where at the point of recursion we're able
+to make the associated data structure available across the recursion
+boundary so that modeling the association in a chain of split bios is
+possible. (e.g. struct dm_poll_data or dm_poll_instance as you named it,
+_but_ that struct definition would live in block core, but would be part
+of per-bio-data; so 'struct blk_poll_data' is more logical name when
+elevated to block core).
+
+It _might_ be worthwhile to see if a new BIO_ flag could be added to
+allow augmenting the bio_split + bio_chain pattern to also track this
+additional case of carrying additional data per-bio while creating
+bio-chains.  I may not be clear yet, said differently: augmenting
+bio_chain to not only chain bios, but to _also_ thread/chain together
+per-bio-data that lives within those chained bios.  SO you have the
+chain of bios _and_ the chain of potentially opaque void * that happens
+to point to a list head for a list of 'struct blk_poll_data'.
+
+Does that make sense?
+
+> We can transfer this dm_poll_instance between split bios by
+> bio->bi_private, like
+> 
+> ```
+> 
+> dm_submit_bio(...) {
+> 
+>     struct dm_poll_instance *ins;
+> 
+>     if (bio->bi_private)
+> 
+>         ins = bio->bi_private;
+> 
+>     else {
+> 
+>         ins = alloc_poll_instance();
+> 
+>         bio->bi_private = ins;
+> 
+>     }
+> 
+>     ...
+> 
+> }
+> 
+> ```
+
+Sadly, we cannot (ab)use bi_private for this given its (ab)used via the
+bio_chain() interface.  It's almost like we need to add a new pointer in
+the bio that isn't left for block core to hijack.
+
+There is the well-worn pattern of saving off the original bi_private,
+hooking a new endio method and then when that endio is called restoring
+bi_private but we really want to avoid excessive indirect function calls
+for this usecase.  The entire point of implementing blk_poll support is
+for performance after all.
+
+Mike
+
