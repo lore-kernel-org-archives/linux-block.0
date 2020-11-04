@@ -6,96 +6,123 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 657ACC388F9
-	for <linux-block@archiver.kernel.org>; Wed,  4 Nov 2020 18:26:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CEAC2D0A3
+	for <linux-block@archiver.kernel.org>; Wed,  4 Nov 2020 19:15:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1939E2087D
-	for <linux-block@archiver.kernel.org>; Wed,  4 Nov 2020 18:26:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9848206ED
+	for <linux-block@archiver.kernel.org>; Wed,  4 Nov 2020 19:15:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731374AbgKDS0s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Nov 2020 13:26:48 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2051 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729488AbgKDS0s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Nov 2020 13:26:48 -0500
-X-Greylist: delayed 1093 seconds by postgrey-1.27 at vger.kernel.org; Wed, 04 Nov 2020 13:26:48 EST
-Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4CRF3T1YLBz67HGN;
-        Thu,  5 Nov 2020 02:07:01 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1913.5; Wed, 4 Nov 2020 19:08:32 +0100
-Received: from [10.47.0.132] (10.47.0.132) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Wed, 4 Nov 2020
- 18:08:31 +0000
-Subject: Re: [PATCH v8 17/18] scsi: megaraid_sas: Added support for shared
- host tagset for cpuhotplug
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        Qian Cai <cai@redhat.com>, <axboe@kernel.dk>,
-        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
-        <don.brace@microsemi.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <dgilbert@interlog.com>,
-        <paolo.valente@linaro.org>, <hare@suse.de>, <hch@lst.de>
-CC:     Sumit Saxena <sumit.saxena@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
-        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
- <1597850436-116171-18-git-send-email-john.garry@huawei.com>
- <fe3dff7dae4494e5a88caffbb4d877bbf472dceb.camel@redhat.com>
- <385d5408-6ba2-6bb6-52d3-b59c9aa9c5e5@huawei.com>
- <193a0440eed447209c48bda042f0e4db102355e7.camel@redhat.com>
- <519e0d58-e73e-22ce-0ddb-1be71487ba6d@huawei.com>
- <d8fd51b11d5d54e6ec7e4e9a4f7dcc83f1215cd3.camel@redhat.com>
- <d4f86cccccc3bffccc4eda39500ce1e1fee2109a.camel@redhat.com>
- <7624d3fe1613f19af5c3a77f4ae8fe55@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <d1040c06-74ea-7016-d259-195fa52196a9@huawei.com>
-Date:   Wed, 4 Nov 2020 18:08:28 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1730666AbgKDTPe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Nov 2020 14:15:34 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40364 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726564AbgKDTPe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Nov 2020 14:15:34 -0500
+Received: by mail-wm1-f66.google.com with SMTP id k18so3364280wmj.5;
+        Wed, 04 Nov 2020 11:15:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7v8XNWb378ZY/CjlNvIn/30UioBbrTjZQwuMGRkG3IQ=;
+        b=EWmns0/p6rhEnpxVmtUx4KY5rW8XtODDRB55Fd5q7SgcHF3xz7otJDvpCHoAqDOLKF
+         swHbrN4ZQUlrbo98SFAZx9RQDB7VdgM0F+dpJQLD4fHUVXTpKDirSDRjN2ewKTqQac2P
+         jHmyAuyBK3ylKJM4LgUxNlP173qIRfmp3UmyhGPlD3vU9PNs4Z+FK7eh19mlLaqtfJPf
+         XNz/nngtLHa8OVa45Tw/4LljEGorm32t2kwt7OnI6jnsE0CxGtD3t3pXyd4LEO6f7ofC
+         FLBMTkXYyqVpUHPL6oCLiVEyUODdBzjr0E0VFLtQ3HsR0Zk74bBapgN7O2KPayBLPpGS
+         LOdA==
+X-Gm-Message-State: AOAM530ZfGKKitBoUYHSQ5cmYJbuyZRl5cLhRi4UTHHG3+leqmQGBGdw
+        uTMwU3rBKHuRHlLlCyNY0Hk=
+X-Google-Smtp-Source: ABdhPJy+GUA1BUDCh53c1vQmUq/aXWgRuLFUU/fJOZ4/aRRtmTCr4ULfvetun6jIKGJqh/QpJQq0wg==
+X-Received: by 2002:a1c:3103:: with SMTP id x3mr6148797wmx.107.1604517331370;
+        Wed, 04 Nov 2020 11:15:31 -0800 (PST)
+Received: from ?IPv6:2601:647:4802:9070:f032:e586:d54c:b9cb? ([2601:647:4802:9070:f032:e586:d54c:b9cb])
+        by smtp.gmail.com with ESMTPSA id n4sm3498536wmi.32.2020.11.04.11.15.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Nov 2020 11:15:30 -0800 (PST)
+Subject: Re: [PATCH 3/3] blk-mq: Use llist_head for blk_cpu_done
+To:     Christoph Hellwig <hch@infradead.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Runge <dave@sleepmap.de>, linux-rt-users@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Daniel Wagner <dwagner@suse.de>, Mike Galbraith <efault@gmx.de>
+References: <20201029131212.dsulzvsb6pahahbs@linutronix.de>
+ <20201029140536.GA6376@infradead.org>
+ <20201029145623.3zry7o6nh6ks5tjj@linutronix.de>
+ <20201029145743.GA19379@infradead.org>
+ <d2c15411-5b21-535b-6e07-331ebe22f8c8@grimberg.me>
+ <20201029210103.ocufuvj6i4idf5hj@linutronix.de>
+ <deb40e55-d228-06c8-8719-fc8657a0a19b@grimberg.me>
+ <20201031104108.wjjdiklqrgyqmj54@linutronix.de>
+ <3bbfb5e1-c5d7-8f3b-4b96-6dc02be0550d@kernel.dk>
+ <20201102095533.fxc2xpauzsoju7cm@linutronix.de>
+ <20201102181238.GA17806@infradead.org>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <75970f9d-7e59-5fba-280a-d0d935fc4d2f@grimberg.me>
+Date:   Wed, 4 Nov 2020 11:15:27 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <7624d3fe1613f19af5c3a77f4ae8fe55@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20201102181238.GA17806@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.0.132]
-X-ClientProxiedBy: lhreml724-chm.china.huawei.com (10.201.108.75) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04/11/2020 16:07, Kashyap Desai wrote:
->>>
->>> v5.10-rc2 is also broken here.
+
+>>> There really aren't any rules for this, and it's perfectly legit to
+>>> complete from process context. Maybe you're a kthread driven driver and
+>>> that's how you handle completions. The block completion path has always
+>>> been hard IRQ safe, but possible to call from anywhere.
 >>
->> John, Kashyap, any update on this? If this is going to take a while to fix
->> it
->> proper, should I send a patch to revert this or at least disable the
->> feature by
->> default for megaraid_sas in the meantime, so it no longer breaks the
->> existing
->> systems out there?
+>> I'm not trying to put restrictions and forbidding completions from a
+>> kthread. I'm trying to avoid the pointless softirq dance for no added
+>> value. We could:
 > 
-> I am trying to get similar h/w to try out. All my current h/w works fine.
-> Give me couple of days' time.
-> If this is not obviously common issue and need time, we will go with module
-> parameter disable method.
-> I will let you know.
+>> to not break that assumption you just mentioned and provide
+>> |static inline void blk_mq_complete_request_local(struct request *rq)
+>> |{
+>> |                 rq->q->mq_ops->complete(rq);
+>> |}
+>>
+>> so that completion issued from from process context (like those from
+>> usb-storage) don't end up waking `ksoftird' (running at SCHED_OTHER)
+>> completing the requests but rather performing it right away. The softirq
+>> dance makes no sense here.
+> 
+> Agreed.  But I don't think your above blk_mq_complete_request_local
+> is all that useful either as ->complete is defined by the caller,
+> so we could just do a direct call.  Basically we should just
+> return false from blk_mq_complete_request_remote after updating
+> the state when called from process context.
 
-Hi Kashyap,
+Agreed.
 
-Please also consider just disabling for this card, so any other possible 
-issues are unearthed on other cards. I don't have this card or any x86 
-machine to test it unfortunately to assist.
+> But given that IIRC
+> we are not supposed to check what state we are called from
+> we'll need a helper just for updating the state instead and
+> ensure the driver uses the right helper.  Now of course we might
+> have process context callers that still want to bounce to the
+> submitting CPU, but in that case we should go directly to a
+> workqueue or similar.
 
-BTW, just to be clear, did you try the same .config as Qian Cai?
+This would mean that it may be suboptimal for nvme-tcp to complete
+requests in softirq context from the network context (determined by
+NIC steering). Because in this case, this would trigger workqueue
+schedule on a per-request basis rather than once per .data_ready
+call like we do today. Is that correct?
 
-Thanks,
-John
+It has been observed that completing commands in softirq context
+(network determined cpu) because basically the completion does
+IPI + local complete, not IPI + softirq or IPI + workqueue.
+
+> Either way doing this properly will probabl involve an audit of all
+> drivers, but I think that is worth it.
+
+Agree.
