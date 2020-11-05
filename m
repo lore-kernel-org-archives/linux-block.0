@@ -2,200 +2,132 @@ Return-Path: <SRS0=FEuC=EL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDABC4741F
-	for <linux-block@archiver.kernel.org>; Thu,  5 Nov 2020 20:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F04C388F7
+	for <linux-block@archiver.kernel.org>; Thu,  5 Nov 2020 21:52:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6132420719
-	for <linux-block@archiver.kernel.org>; Thu,  5 Nov 2020 20:58:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aDt+mWvk"
+	by mail.kernel.org (Postfix) with ESMTP id 04AEC20728
+	for <linux-block@archiver.kernel.org>; Thu,  5 Nov 2020 21:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732160AbgKEU6A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Nov 2020 15:58:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16442 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726801AbgKEU6A (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Nov 2020 15:58:00 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A5KuOAk106406;
-        Thu, 5 Nov 2020 15:57:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=uIaPG9KOvlm0C7hDrH8NX5ORxxb/hO/D/dXfsLrewTk=;
- b=aDt+mWvklXfmHhHG+r46Ld+1w9kYvuX5tZDw4VQ2XINT6U6AL8jkzD7BtLcRmZ41fY5F
- EvdzpDppKiOthGc2PGcVJ5zo99X5EvjzHpFprz85OGg8QqD1EU7JHi0v/SXHHMP9slZF
- EaFZlvLbKbJngPv2gUcEmNmWJuB0kmVqOluBupuLD/OkzEi5jSXgO0+mbvsrc7qQfxER
- T7vWWmCWzuUOlXTzRDcqR0stKq0TgmVar83wN6hlzMSZKwldiE/ZDU3si+IBPZxFLTlL
- ckzhFCNGXbwoWR01rcNxSYKJkR6nta128L3X9577wTenqsU/HOenT3S9recPyDQEGxl5 Hw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34mfdgne75-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Nov 2020 15:57:03 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A5Kv3IJ108031;
-        Thu, 5 Nov 2020 15:57:03 -0500
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34mfdgne68-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Nov 2020 15:57:02 -0500
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A5Kv0qE019035;
-        Thu, 5 Nov 2020 20:57:00 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06fra.de.ibm.com with ESMTP id 34h01kk0bc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Nov 2020 20:57:00 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A5Kuwve41484616
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Nov 2020 20:56:58 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4E060A4051;
-        Thu,  5 Nov 2020 20:56:58 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E0026A4040;
-        Thu,  5 Nov 2020 20:56:57 +0000 (GMT)
-Received: from imap.linux.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu,  5 Nov 2020 20:56:57 +0000 (GMT)
-Date:   Thu, 5 Nov 2020 21:56:47 +0100
-From:   Stefan Haberland <sth@linux.ibm.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ilya Dryomov <idryomov@gmail.com>,
-        Song Liu <song@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 06/10] dasd: implement ->set_read_only to hook into
- BLKROSET processing
-Message-ID: <20201105205634.GA78869@imap.linux.ibm.com>
-References: <20201103100018.683694-1-hch@lst.de>
- <20201103100018.683694-7-hch@lst.de>
+        id S1732317AbgKEVw1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Nov 2020 16:52:27 -0500
+Received: from smtp.infotech.no ([82.134.31.41]:34318 "EHLO smtp.infotech.no"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731508AbgKEVw1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Nov 2020 16:52:27 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id CB7F620426C;
+        Thu,  5 Nov 2020 22:52:24 +0100 (CET)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id eUVnhS7OG68Z; Thu,  5 Nov 2020 22:52:22 +0100 (CET)
+Received: from xtwo70.bingwo.ca (host-104-157-204-209.dyn.295.ca [104.157.204.209])
+        by smtp.infotech.no (Postfix) with ESMTPA id 0C6E7204248;
+        Thu,  5 Nov 2020 22:52:20 +0100 (CET)
+From:   Douglas Gilbert <dgilbert@interlog.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Cc:     axboe@kernel.dk, martin.petersen@oracle.com, bostroesser@gmail.com,
+        bvanassche@acm.org, ddiss@suse.de
+Subject: [PATCH v4 1/4] sgl_alloc_order: remove 4 GiB limit, sgl_free() warning
+Date:   Thu,  5 Nov 2020 16:52:13 -0500
+Message-Id: <20201105215216.23304-2-dgilbert@interlog.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201105215216.23304-1-dgilbert@interlog.com>
+References: <20201105215216.23304-1-dgilbert@interlog.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201103100018.683694-7-hch@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-05_14:2020-11-05,2020-11-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- mlxlogscore=999 spamscore=0 mlxscore=0 lowpriorityscore=0
- priorityscore=1501 impostorscore=0 clxscore=1011 phishscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011050129
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> schrieb am Tue, 03. Nov 11:00:
-> Implement the ->set_read_only method instead of parsing the actual
-> ioctl command.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/s390/block/dasd.c       |  1 +
->  drivers/s390/block/dasd_int.h   |  3 ++-
->  drivers/s390/block/dasd_ioctl.c | 27 +++++++++------------------
->  3 files changed, 12 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
-> index eb17fea8075c6f..db24e04ee9781e 100644
-> --- a/drivers/s390/block/dasd.c
-> +++ b/drivers/s390/block/dasd.c
-> @@ -3394,6 +3394,7 @@ dasd_device_operations = {
->  	.ioctl		= dasd_ioctl,
->  	.compat_ioctl	= dasd_ioctl,
->  	.getgeo		= dasd_getgeo,
-> +	.set_read_only	= dasd_set_read_only,
->  };
->  
->  /*******************************************************************************
-> diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
-> index fa552f9f166671..c59a0d63b506e6 100644
-> --- a/drivers/s390/block/dasd_int.h
-> +++ b/drivers/s390/block/dasd_int.h
-> @@ -844,7 +844,8 @@ int dasd_scan_partitions(struct dasd_block *);
->  void dasd_destroy_partitions(struct dasd_block *);
->  
->  /* externals in dasd_ioctl.c */
-> -int  dasd_ioctl(struct block_device *, fmode_t, unsigned int, unsigned long);
-> +int dasd_ioctl(struct block_device *, fmode_t, unsigned int, unsigned long);
-> +int dasd_set_read_only(struct block_device *bdev, bool ro);
->  
->  /* externals in dasd_proc.c */
->  int dasd_proc_init(void);
-> diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
-> index cb6427fb9f3d16..3359559517bfcf 100644
-> --- a/drivers/s390/block/dasd_ioctl.c
-> +++ b/drivers/s390/block/dasd_ioctl.c
-> @@ -532,28 +532,22 @@ static int dasd_ioctl_information(struct dasd_block *block, void __user *argp,
->  /*
->   * Set read only
->   */
-> -static int
-> -dasd_ioctl_set_ro(struct block_device *bdev, void __user *argp)
-> +int dasd_set_read_only(struct block_device *bdev, bool ro)
->  {
->  	struct dasd_device *base;
-> -	int intval, rc;
-> +	int rc;
->  
-> -	if (!capable(CAP_SYS_ADMIN))
-> -		return -EACCES;
-> +	/* do not manipulate hardware state for partitions */
->  	if (bdev_is_partition(bdev))
-> -		// ro setting is not allowed for partitions
-> -		return -EINVAL;
-> -	if (get_user(intval, (int __user *)argp))
-> -		return -EFAULT;
-> +		return 0;
-> +
->  	base = dasd_device_from_gendisk(bdev->bd_disk);
->  	if (!base)
->  		return -ENODEV;
-> -	if (!intval && test_bit(DASD_FLAG_DEVICE_RO, &base->flags)) {
-> -		dasd_put_device(base);
-> -		return -EROFS;
-> -	}
-> -	set_disk_ro(bdev->bd_disk, intval);
+This patch fixes a check done by sgl_alloc_order() before it starts
+any allocations. The comment in the original said: "Check for integer
+overflow" but the check itself contained an integer overflow! The
+right hand side (rhs) of the expression in the condition is resolved
+as u32 so it could not exceed UINT32_MAX (4 GiB) which means 'length'
+could not exceed that value. If that was the intention then the
+comment above it could be dropped and the condition rewritten more
+clearly as:
+     if (length > UINT32_MAX) <<failure path >>;
 
+Get around the integer overflow problem in the rhs of the original
+check by taking ilog2() of both sides.
 
-While testing this patch I just noticed that when I set a device readonly this is
-not going to be passed on to the partitions on this device any longer.
+This function may be used to replace vmalloc(unsigned long) for a
+large allocation (e.g. a ramdisk). vmalloc has no limit at 4 GiB so
+it seems unreasonable that:
+    sgl_alloc_order(unsigned long long length, ....)
+does. sgl_s made with sgl_alloc_order() have equally sized segments
+placed in a scatter gather array. That allows O(1) navigation around
+a big sgl using some simple integer arithmetic.
 
-This is caused by the removed call to set_disk_ro().
+Revise some of this function's description to more accurately reflect
+what this function is doing.
 
-Is this intentional or was this removed by accident?
+An earlier patch fixed a memory leak in sg_alloc_order() due to the
+misuse of sgl_free(). Take the opportunity to put a one line comment
+above sgl_free()'s declaration warning that it is not suitable when
+order > 0 .
 
-> -	rc = dasd_set_feature(base->cdev, DASD_FEATURE_READONLY, intval);
-> +	if (!ro && test_bit(DASD_FLAG_DEVICE_RO, &base->flags))
-> +		rc = -EROFS;
-> +	else
-> +		rc = dasd_set_feature(base->cdev, DASD_FEATURE_READONLY, ro);
->  	dasd_put_device(base);
->  	return rc;
->  }
-> @@ -633,9 +627,6 @@ int dasd_ioctl(struct block_device *bdev, fmode_t mode,
->  	case BIODASDPRRST:
->  		rc = dasd_ioctl_reset_profile(block);
->  		break;
-> -	case BLKROSET:
-> -		rc = dasd_ioctl_set_ro(bdev, argp);
-> -		break;
->  	case DASDAPIVER:
->  		rc = dasd_ioctl_api_version(argp);
->  		break;
-> -- 
-> 2.28.0
-> 
+Reviewed-by: Bodo Stroesser <bostroesser@gmail.com>
+Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
+---
+ include/linux/scatterlist.h |  1 +
+ lib/scatterlist.c           | 14 ++++++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 36c47e7e66a2..d9443ebd0a8e 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -308,6 +308,7 @@ struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
+ 			      unsigned int *nent_p);
+ void sgl_free_n_order(struct scatterlist *sgl, int nents, int order);
+ void sgl_free_order(struct scatterlist *sgl, int order);
++/* Only use sgl_free() when order is 0 */
+ void sgl_free(struct scatterlist *sgl);
+ #endif /* CONFIG_SGL_ALLOC */
+ 
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index a59778946404..4986545beef9 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -554,13 +554,15 @@ EXPORT_SYMBOL(sg_alloc_table_from_pages);
+ #ifdef CONFIG_SGL_ALLOC
+ 
+ /**
+- * sgl_alloc_order - allocate a scatterlist and its pages
++ * sgl_alloc_order - allocate a scatterlist with equally sized elements
+  * @length: Length in bytes of the scatterlist. Must be at least one
+- * @order: Second argument for alloc_pages()
++ * @order: Second argument for alloc_pages(). Each sgl element size will
++ *	   be (PAGE_SIZE*2^order) bytes
+  * @chainable: Whether or not to allocate an extra element in the scatterlist
+- *	for scatterlist chaining purposes
++ *	       for scatterlist chaining purposes
+  * @gfp: Memory allocation flags
+- * @nent_p: [out] Number of entries in the scatterlist that have pages
++ * @nent_p: [out] Number of entries in the scatterlist that have pages.
++ *		  Ignored if NULL is given.
+  *
+  * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
+  */
+@@ -574,8 +576,8 @@ struct scatterlist *sgl_alloc_order(unsigned long long length,
+ 	u32 elem_len;
+ 
+ 	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
+-	/* Check for integer overflow */
+-	if (length > (nent << (PAGE_SHIFT + order)))
++	/* Integer overflow if:  length > nent*2^(PAGE_SHIFT+order) */
++	if (ilog2(length) > ilog2(nent) + PAGE_SHIFT + order)
+ 		return NULL;
+ 	nalloc = nent;
+ 	if (chainable) {
+-- 
+2.25.1
+
