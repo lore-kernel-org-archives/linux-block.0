@@ -2,77 +2,59 @@ Return-Path: <SRS0=ZSeo=EM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD507C2D0A3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 14:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC13CC2D0A3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 14:19:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C9EE20882
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 14:14:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 107C1208B3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 14:19:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ck/ClVa5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbgKFOOd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 09:14:33 -0500
-Received: from verein.lst.de ([213.95.11.211]:51728 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726812AbgKFOOc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Nov 2020 09:14:32 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 71E9868B02; Fri,  6 Nov 2020 15:14:29 +0100 (CET)
-Date:   Fri, 6 Nov 2020 15:14:28 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@kernel.dk,
-        joshi.k@samsung.com, k.jensen@samsung.com, Niklas.Cassel@wdc.com,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
-Subject: Re: [PATCH] nvme: enable ro namespace for ZNS without append
-Message-ID: <20201106141428.GA23884@lst.de>
-References: <20201106122637.14490-1-javier.gonz@samsung.com>
+        id S1726813AbgKFOT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 09:19:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42344 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726010AbgKFOT2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 09:19:28 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E431DC0613CF
+        for <linux-block@vger.kernel.org>; Fri,  6 Nov 2020 06:19:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=q0iIzCch8dECVtr4ccwvqxYQ8ASSx68Fsd69Q1tG5cU=; b=ck/ClVa5041I5uApej8MpGj65M
+        QNfZifbbJORiIcNzFi26DBs+Zxz6ZsXhw2luEXQhDC0XyMdVgcO379VQsUaNOxZ4BbspZTE+GavBq
+        ARWf1dVibTu2ls3z99AAYC4Rf2ZGu7nEw9cgZvWrhUI3Lgt1c2HvVyihLi5EfX7K4OEsYNtRyzBUH
+        W/QJ4BFGF6jz07PHyOkajfCFkziDQvm4jKKNahZXObD4rhhrJyK88dP/MBoKMsdmBogyDjAbkeIQJ
+        EJ+iexEEqCRH7vxtw4Zl+WwDEP/Vu81d/MOzHj1UXWetMZ3kyIwXByVbLxe5XVSShtiLSgZChMLoN
+        s52ifIkA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kb2aM-0006Ka-Bo; Fri, 06 Nov 2020 14:19:26 +0000
+Date:   Fri, 6 Nov 2020 14:19:26 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] null_blk: Fix scheduling in atomic with zoned mode
+Message-ID: <20201106141926.GA24218@infradead.org>
+References: <20201106110141.5887-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201106122637.14490-1-javier.gonz@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20201106110141.5887-1-damien.lemoal@wdc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +#ifdef CONFIG_BLK_DEV_ZONED
-> +	if (blk_queue_is_zoned(disk->queue) && !ns->zoned_ns_supp)
-> +		set_disk_ro(disk, true);
-> +#endif
+Looks good for now:
 
-I think we can simplify this at bit.  Add a new NVME_NS_FORCE_RO flag
-to ns->flags, set it in nvme_update_zone_info, and just query it here
-without any ifdefs.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
->  	struct request_queue *q = disk->queue;
->  	struct nvme_command c = { };
->  	struct nvme_id_ns_zns *id;
-> +	bool zoned_ns_supp = true;
->  	int status;
->  
->  	/* Driver requires zone append support */
->  	if (!(le32_to_cpu(log->iocs[nvme_cmd_zone_append]) &
->  			NVME_CMD_EFFECTS_CSUPP)) {
-> +		zoned_ns_supp = false;
->  		dev_warn(ns->ctrl->device,
->  			"append not supported for zoned namespace:%d\n",
->  			ns->head->ns_id);
-> +	} else {
-> +		/* Lazily query controller append limit for the first
-> +		 * zoned namespace
-> +		 */
-> +		if (!ns->ctrl->max_zone_append) {
-> +			status = nvme_set_max_append(ns->ctrl);
-> +			if (status)
-> +				return status;
-> +		}
-
-While you're at it:  my inverse the polarity of the if check as that reads just
-a little more natural, and maybe mention in the warning that the namespace is
-forced to read-only mode?
-
-Otherwise this looks good.
+although I think we should address the global lock for the
+!memory_backed case rather sooner than later.
