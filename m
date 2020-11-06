@@ -2,80 +2,55 @@ Return-Path: <SRS0=ZSeo=EM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40735C2D0A3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFC4C55178
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:45:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7C682222A
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:30:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 645FA221FE
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:45:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="iJjd0Fsg"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="EF51HxtZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728131AbgKFTa1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 14:30:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726447AbgKFTa1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 14:30:27 -0500
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EEC8C0613D3
-        for <linux-block@vger.kernel.org>; Fri,  6 Nov 2020 11:30:27 -0800 (PST)
-Received: by mail-qk1-x744.google.com with SMTP id l2so2160616qkf.0
-        for <linux-block@vger.kernel.org>; Fri, 06 Nov 2020 11:30:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vFAruLUORQHUqfhAcqrK3kHFrju7FmZIpz+3LtddQik=;
-        b=iJjd0FsgKSz4UMVJ0yEYuTXP+TTkCpe11X1VygTFEfMhBu4zVCI1R/v6juANR2qB4Q
-         5Bels1w2oZzLmDsNDoThRLoK7kc/zdpwPO4UT6x6EAkceI8g/JOjAG91xGYl7kSFCQ/W
-         ZbgarmDUY3PKv06eSLmj2WHCkLP1NnOHCZkgrx7CXQDuCJ/z7qt+/GjYjmsDayhhFmyK
-         CViF4N4YOhwIP8BSr0EwEqNCdu9hb5mbPEEbp3iUTLeV3XnYywXW188JOM3kSYxEOLV5
-         mfupyKsZCd/zGG/BUy47UXOrZMvD0veRq8OcWLdma8c/DrK5Km76/lwmXa36HDCDsiN4
-         sXwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vFAruLUORQHUqfhAcqrK3kHFrju7FmZIpz+3LtddQik=;
-        b=DfZD7gugGcKlauTKySkxOcQQqECNwVCtKcjZ6zkYA84uDWaOUrvb9pTcFulh2HFVR8
-         9tgW+3poej2R3ZowhvvP6tot/cv2EOUQccgqzeQmaLXQ7EGoMsp+boLn8FQaBRzPJCmn
-         JE7WhAiVbQ8b0K87sOqy/ASMs5Kjf4uLizVsw9GN1nnyX5dnGjFhpxrO51+CDXgfk6R7
-         rMKfWgdlYEWPUfs/dGaek7+ydjk3PeyOIwOe6NeLAMjQCHrSGt8Lh4yTjzDUAmUumZ5l
-         A4ZzMFiY99DTJJ0iBuLB7j0EJnRE5la8GoysJtaOYCPzCEeoGqEak7TBX9N2LSyE3icq
-         /UqQ==
-X-Gm-Message-State: AOAM531woIH8v6D3SAQRPpHrUi6oh5QSSdVXzepAaRdhb2qQ7hmfO3xG
-        ggTQEjnbF6ZgD5TldgE1G1XplQ==
-X-Google-Smtp-Source: ABdhPJze2F/Rq9sRVVe7Xk43RUxz3sel2lY1t652tRL/srA9lFIVY1sT0rqjvYUmBSCT+htfHCsU0Q==
-X-Received: by 2002:a37:e40b:: with SMTP id y11mr3193612qkf.29.1604691026426;
-        Fri, 06 Nov 2020 11:30:26 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id s2sm1115967qtw.44.2020.11.06.11.30.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2020 11:30:25 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kb7RI-0011Hr-SE; Fri, 06 Nov 2020 15:30:24 -0400
-Date:   Fri, 6 Nov 2020 15:30:24 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Logan Gunthorpe <logang@deltatee.com>
+        id S1727591AbgKFTpP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 14:45:15 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:60078 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727129AbgKFTpP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 14:45:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
+        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=I/yMO/i0p9WTzMk8iTmPgQ7A1/uXaOZLwkcSaYry190=; b=EF51HxtZyF7eBA20tXsTF2DGDE
+        IbfHm083EMnHxXpJYgIYTsp6r+mp9XWQb/XLgGWhtegx4w0IF1oPg6Iu83aOkKiOvCrjcBL1l6ogP
+        F7p5WOzIjCQK9YLV8T/kmBmp579Gggn/M7dDLneVeKYVzdNnAWORs/zk7Cpponp8SJ0c/sAPS8uFI
+        TdwpSPfkB9Yzi6zrO+pbtX5bsuoiEjd662srFEbfjGuxKPYx//X+W4l4VIpaOuVbk+3CZ+nG4mm4/
+        C62E/EDifK+3yt9mSInjQU4Klaw8r/WG0lHCbRHdZaOWog4xjJbhQXiRfVcbPEdFxo8Ld7uiMWlFr
+        NGN7kz6Q==;
+Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1kb7fV-00055w-HL; Fri, 06 Nov 2020 12:45:06 -0700
+To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
         linux-mm@kvack.org, iommu@lists.linux-foundation.org,
         Stephen Bates <sbates@raithlin.com>,
         Christoph Hellwig <hch@lst.de>,
         Dan Williams <dan.j.williams@intel.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
         Ira Weiny <iweiny@intel.com>,
         John Hubbard <jhubbard@nvidia.com>,
         Don Dutile <ddutile@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
         Daniel Vetter <daniel.vetter@ffwll.ch>
-Subject: Re: [RFC PATCH 14/15] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <20201106193024.GW36674@ziepe.ca>
 References: <20201106170036.18713-1-logang@deltatee.com>
  <20201106170036.18713-15-logang@deltatee.com>
  <20201106172206.GS36674@ziepe.ca>
@@ -84,48 +59,62 @@ References: <20201106170036.18713-1-logang@deltatee.com>
  <2c2d2815-165e-2ef9-60d6-3ace7ff3aaa5@deltatee.com>
  <20201106180922.GV36674@ziepe.ca>
  <09885400-36f8-bc1d-27f0-a8adcf6104d4@deltatee.com>
+ <20201106193024.GW36674@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <03032637-0826-da76-aec2-121902b1c166@deltatee.com>
+Date:   Fri, 6 Nov 2020 12:44:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <09885400-36f8-bc1d-27f0-a8adcf6104d4@deltatee.com>
+In-Reply-To: <20201106193024.GW36674@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.145.4
+X-SA-Exim-Rcpt-To: daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH 14/15] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 06, 2020 at 11:20:05AM -0700, Logan Gunthorpe wrote:
+
+
+On 2020-11-06 12:30 p.m., Jason Gunthorpe wrote:
+>> I certainly can't make decisions for code that isn't currently
+>> upstream.
 > 
+> The rdma drivers are all upstream, what are you thinking about?
+
+Really? I feel like you should know what I mean here...
+
+I mean upstream code that actually uses the APIs that I'd have to
+introduce. I can't say here's an API feature that no code uses but the
+already upstream rdma driver might use eventually. It's fairly easy to
+send patches that make the necessary changes when someone adds a use of
+those changes inside the rdma code.
+
+>> Ultimately, if you aren't using the genpool you will have to implement
+>> your own mmap operation that somehow allocates the pages and your own
+>> page_free hook. 
 > 
-> On 2020-11-06 11:09 a.m., Jason Gunthorpe wrote:
-> >> Ah, hmm, yes. I guess the pages have to be hooked and returned to the
-> >> genalloc through free_devmap_managed_page(). 
-> > 
-> > That sounds about right, but in this case it doesn't need the VMA
-> > operations.
-> > 
-> >> Seems like it might be doable... but it will complicate things for
-> >> users that don't want to use the genpool (though no such users exist
-> >> upstream).
-> > 
-> > I would like to use this stuff in RDMA pretty much immediately and the
-> > genpool is harmful for those cases, so please don't make decisions
-> > that are tying thing to genpool
+> Sure, the mlx5 driver already has a specialized alloctor for it's BAR
+> pages.
+
+So it *might* make sense to carve out a common helper to setup a VMA for
+P2PDMA to do the vm_flags check and set VM_MIXEDMAP... but besides that,
+there's no code that would be common to the two cases.
+
+>> I also don't expect this to be going upstream in the near term so don't
+>> get too excited about using it.
 > 
-> I certainly can't make decisions for code that isn't currently
-> upstream.
+> I don't know, it is actually not that horrible, the GUP and IOMMU
+> related changes are simpler than I expected
 
-The rdma drivers are all upstream, what are you thinking about?
+I think the deal breaker is the SGL hack and the fact that there are
+important IOMMU implementations that won't have support.
 
-> Ultimately, if you aren't using the genpool you will have to implement
-> your own mmap operation that somehow allocates the pages and your own
-> page_free hook. 
+Logan
 
-Sure, the mlx5 driver already has a specialized alloctor for it's BAR
-pages.
-
-> I also don't expect this to be going upstream in the near term so don't
-> get too excited about using it.
-
-I don't know, it is actually not that horrible, the GUP and IOMMU
-related changes are simpler than I expected
-
-Jason
