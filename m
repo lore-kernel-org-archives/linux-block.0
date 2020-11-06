@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 019A3C388F2
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F44FC2D0A3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:02:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A197B217A0
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:02:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4948E2151B
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:02:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="LKLCRs5E"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="E4md01Ra"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727617AbgKFRBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 12:01:52 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:57670 "EHLO
+        id S1727662AbgKFRAz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 12:00:55 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:57612 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727763AbgKFRA6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 12:00:58 -0500
+        with ESMTP id S1727258AbgKFRAz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 12:00:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=/ib4hcAfbiHMdLX/8DBMNJM6Gg1f+72PJ0ND9MJ2JPY=; b=LKLCRs5E1fTNVSfyLyggO9F00J
-        ebA/QlSU1neMqjpg6RXX69lynbZmYxAVQReH4MRpE300YyrdAKMEEs0R9dBNTt2+Sn9fa5ZYuR2qE
-        BMJGKFEk2kv8lZODOz7/Dtmjj2ir+gpt5cQvYp7xvFZcw5Dg01QCyOzB1IZZCZoSDRM2c2UiBycyt
-        lu6DdPugsSp10V+yx5M0RwBAleHSQT17iLdK3N3AvfCMkGd9ZVFZwgiGPAbpHTORNODrCOzamsd3j
-        ftrZdcJQIcIIK7uAVQf127ZdItrwzvKQvj7WJHXN/+D/ivdDaNbuJLgvyxC5ssGGyLKrGSo+xNcA5
-        XYQETn/Q==;
+        bh=3JGE+zyDK4D2O+eP7VElzaTL/57y/ZuAN1RtFkDLi+Y=; b=E4md01RaDgc5ca4VxuE651O53Y
+        14g/QSSmSB24bw31bf1ZFImil9U+bjqhrYvHWtpO61bo+XuyxZkMTtWPhWJxJqRGEsgLAJjH5802J
+        F9RnesqbKHRcqmJ9KA908uEKak9SHV+DSH47V/C6f0fAAlFYfBOJ8tOMm+bWhXx9mx7hvO9X4vz4G
+        4EFqPx6gAqd+FAEa7fjbEBrPZ6tGZkORigKpQuIviHKvGN1VGx87R9X/9PXetfEMmTunOpS7xPyko
+        56CW4ryiWfSHOyjDY8AQ11NFDKJMf0wTFlHPwJ3O46OgU+f9Se4wBgJGHsCgQFpwZFAxOwUZ/ZU19
+        QKi3CluQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1kb56d-0002PX-U2; Fri, 06 Nov 2020 10:00:57 -0700
+        id 1kb56Z-0002PX-5l; Fri, 06 Nov 2020 10:00:53 -0700
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1kb56V-0004tQ-Od; Fri, 06 Nov 2020 10:00:47 -0700
+        id 1kb56U-0004st-Ad; Fri, 06 Nov 2020 10:00:46 -0700
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -56,8 +56,8 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Matthew Wilcox <willy@infradead.org>,
         Daniel Vetter <daniel.vetter@ffwll.ch>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Fri,  6 Nov 2020 10:00:34 -0700
-Message-Id: <20201106170036.18713-14-logang@deltatee.com>
+Date:   Fri,  6 Nov 2020 10:00:23 -0700
+Message-Id: <20201106170036.18713-3-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201106170036.18713-1-logang@deltatee.com>
 References: <20201106170036.18713-1-logang@deltatee.com>
@@ -66,54 +66,57 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, dan.j.williams@intel.com, iweiny@intel.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [RFC PATCH 13/15] block: Set FOLL_PCI_P2PDMA in bio_map_user_iov()
+Subject: [RFC PATCH 02/15] PCI/P2PDMA: Attempt to set map_type if it has not been set
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a bio's queue supports PCI P2PDMA, set FOLL_PCI_P2PDMA for
-iov_iter_get_pages_flags(). This allows PCI P2PDMA pages to be
-passed from userspace and enables the NVMe passthru requests to
-use P2PDMA pages.
+Attempt to find the mapping type for P2PDMA pages on the first
+DMA map attempt if it has not been done ahead of time.
+
+Previously, the mapping type was expected to be calculated ahead of
+time, but if pages are to come from userspace then there's no
+way to ensure the path was checked ahead of time.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-map.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/pci/p2pdma.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 21630dccac62..cad8fcfe4f17 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -245,6 +245,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 94583779c36e..ea8472278b11 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -824,11 +824,17 @@ EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
+ static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct pci_dev *provider,
+ 						    struct pci_dev *client)
  {
- 	unsigned int max_sectors = queue_max_hw_sectors(rq->q);
- 	struct bio *bio, *bounce_bio;
-+	unsigned int flags = 0;
- 	int ret;
- 	int j;
- 
-@@ -256,13 +257,17 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 		return -ENOMEM;
- 	bio->bi_opf |= req_op(rq);
- 
-+	if (blk_queue_pci_p2pdma(rq->q))
-+		flags |= FOLL_PCI_P2PDMA;
++	enum pci_p2pdma_map_type ret;
 +
- 	while (iov_iter_count(iter)) {
- 		struct page **pages;
- 		ssize_t bytes;
- 		size_t offs, added = 0;
- 		int npages;
+ 	if (!provider->p2pdma)
+ 		return PCI_P2PDMA_MAP_NOT_SUPPORTED;
  
--		bytes = iov_iter_get_pages_alloc(iter, &pages, LONG_MAX, &offs);
-+		bytes = iov_iter_get_pages_alloc_flags(iter, &pages, LONG_MAX,
-+						       &offs, flags);
- 		if (unlikely(bytes <= 0)) {
- 			ret = bytes ? bytes : -EFAULT;
- 			goto out_unmap;
+-	return xa_to_value(xa_load(&provider->p2pdma->map_types,
+-				   map_types_idx(client)));
++	ret = xa_to_value(xa_load(&provider->p2pdma->map_types,
++				  map_types_idx(client)));
++	if (ret != PCI_P2PDMA_MAP_UNKNOWN)
++		return ret;
++
++	return upstream_bridge_distance_warn(provider, client, NULL);
+ }
+ 
+ static int __pci_p2pdma_map_sg(struct pci_p2pdma_pagemap *p2p_pgmap,
+@@ -890,7 +896,6 @@ int pci_p2pdma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
+ 	case PCI_P2PDMA_MAP_BUS_ADDR:
+ 		return __pci_p2pdma_map_sg(p2p_pgmap, dev, sg, nents);
+ 	default:
+-		WARN_ON_ONCE(1);
+ 		return 0;
+ 	}
+ }
 -- 
 2.20.1
 
