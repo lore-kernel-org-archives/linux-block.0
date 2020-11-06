@@ -2,279 +2,181 @@ Return-Path: <SRS0=ZSeo=EM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 349ADC55179
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 02:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F418C2D0A3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 10:57:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D106A20782
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 02:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D0B120825
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 10:57:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=permerror (0-bit key) header.d=wdc.com header.i=@wdc.com header.b="euCsPK3Q";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="HRfQqbMK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725848AbgKFCvK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Nov 2020 21:51:10 -0500
-Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:49931 "EHLO
-        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725815AbgKFCvK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Nov 2020 21:51:10 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UENreRr_1604631064;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UENreRr_1604631064)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 06 Nov 2020 10:51:05 +0800
-Subject: Re: [dm-devel] [RFC 0/3] Add support of iopoll for dm device
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, haoxu@linux.alibaba.com,
-        io-uring@vger.kernel.org
-References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
- <20201021203906.GA10896@redhat.com>
- <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
- <20201026185334.GA8463@redhat.com>
- <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
- <20201102152822.GA20466@redhat.com>
- <f165f38a-91d1-79aa-829d-a9cc69a5eee6@linux.alibaba.com>
- <20201104150847.GB32761@redhat.com>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <2c5dab21-8125-fcdf-078e-00a158c57f43@linux.alibaba.com>
-Date:   Fri, 6 Nov 2020 10:51:04 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.1
-MIME-Version: 1.0
-In-Reply-To: <20201104150847.GB32761@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S1726925AbgKFK55 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 05:57:57 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:23749 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726422AbgKFK55 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 05:57:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1604660796; x=1636196796;
+  h=from:to:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=4K5IhEZ+kEO8pc4e01tk1UbfdBFdr4taAwLhhiNnljI=;
+  b=euCsPK3QjoUDfSOsGEeqB1eC2xz3y55XBWV8Gw63R4ilFTLr9Kso2NaE
+   s7uxLQwmaB5Mb9B3Bg+yhSIm/F65pMWiuQzxx3BswD1YOBAOscjHo1pln
+   39evA/kRRM4NIAv735yPSDoe8PIi36Zp2B3m3ed4Kty2Q2NJ1NCyp1KP8
+   D563d6xNjqXfsY88bGp2UXx9NZzJYrjM6IHLysooAjobnZ4FwZfKKdqHX
+   CqLjEQf6Y15BnkOPOXP75wzVDK5hbEJyhbBk+mFYX2NVUHR0kCWOOEiB3
+   6G/1MIcnxKqWdTEbGC99UFDuSSJauALTR99it/YbbW+N2Mai1y+Vzw1Id
+   g==;
+IronPort-SDR: Q5quV1wkFj/wD648oIB4R3K5AiIb+Lg/9vIBFtq+sRFgrMslT4VO0GGAmREeXh/8behaGI0bBk
+ wIm2HikKRqPgafXmbg84YtvDtYLXrdwBA9Y+bm4XrcLTZ4ilDhl19LJsK7olnF0Js4YTUqSRhr
+ tJ6VXvkuvuILTZSXqnHvSF7uYvb8KZ8oHbQSc78rm3MpnOH2rZ8UnohAwyGOXGTTqFOdKEL9e1
+ lAn33+ZkJFY0EZoTgyYzz+KrM0yrhWeikAoCZtdNjFKhpdjY8otdnAluSSVs7bHt0SsEn67rgV
+ 0xg=
+X-IronPort-AV: E=Sophos;i="5.77,456,1596470400"; 
+   d="scan'208";a="255569262"
+Received: from mail-bn3nam04lp2058.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.58])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Nov 2020 19:06:35 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d4BB2FnmaIR7St1tQm+uVUFgTaO2w3skmm1yKx4LFp6q3XNPA1ANfRL9ys6v686XzinfULbGZR02rmFHmdtGt0q6TVUN1PNcj963mwgNQaQiA25XmoNHTvtF4XZ31nsQjj/SoQ/OXB2PjOgWhCDaWulCBrAkl15E2aohxgjkfooqyaS2tqnmcjCFdQ3D2WhU3+plqqek3886nNv3YPmSboNhgmPf64qItXj5WlWFfugP1M79WYjTRhNDDi03OYrraOLRAe4LnQpks52gzRKMdedTK44WiTwNpW3Q6dZ4n81w5vyta7akFB92/4IRauRSd1t4cm+A/XUuw9W+/gnAvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xCuRDOVd6w8K6/ntDp5nR1EJGHEdRLR0zmqL7eA0exA=;
+ b=YuGwkImsu8W+ou0Hr6xIopCUjsN0O2qxT31ixksRukwesyWR6NIxJ3Wd3EYfy8cEnQIIf07hHFQ0xh6SUxE/n/hTDVTnZw4oAAfy/WoHradlChNf7/rgnKZnV7z0FbY/Zft54OaX0bP1fQvxG4O8mosQoc/Slv5ufI3govmLs9bl74nJNZH6BE7TOtXry6wbOsbls6UpBXBKBUznY+62a9P8e5EJjwTEOjXazcKJELDZKerwHj7t7Qto7visC0gJXmKe0y2CjBsg8OJD1iMWkUBecC1UqFsFvM9bACIiuAZw9/47gOjFwcBK325cW+m9IaZzlghbwVXIlb0ekIJLiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xCuRDOVd6w8K6/ntDp5nR1EJGHEdRLR0zmqL7eA0exA=;
+ b=HRfQqbMK/blK06VY5ztSIS9rtDcNyR2Wt28BZn17zCvOEqrvNuG1iIjGP0bhHm22Vpuxyj2SK/8LEcN+OlIjO6SLUH0haFqbxH07Zful1gJ81er64mTr3c3ERuKPusHiOBt6d9ILxfy9FYpRltjpYMsRu/TUSja+fowqHgXy95Q=
+Received: from BL0PR04MB6514.namprd04.prod.outlook.com (2603:10b6:208:1ca::23)
+ by MN2PR04MB6447.namprd04.prod.outlook.com (2603:10b6:208:1b2::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.27; Fri, 6 Nov
+ 2020 10:57:54 +0000
+Received: from BL0PR04MB6514.namprd04.prod.outlook.com
+ ([fe80::4c3e:2b29:1dc5:1a85]) by BL0PR04MB6514.namprd04.prod.outlook.com
+ ([fe80::4c3e:2b29:1dc5:1a85%7]) with mapi id 15.20.3499.032; Fri, 6 Nov 2020
+ 10:57:54 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v2] null_blk: Set mq device as blocking with zoned mode
+Thread-Topic: [PATCH v2] null_blk: Set mq device as blocking with zoned mode
+Thread-Index: AQHWs0OvtgHIoShf5kGEYq5mLnltvQ==
+Date:   Fri, 6 Nov 2020 10:57:53 +0000
+Message-ID: <BL0PR04MB65142985BDE48783C219F07DE7ED0@BL0PR04MB6514.namprd04.prod.outlook.com>
+References: <20201105071656.421762-1-damien.lemoal@wdc.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2400:2411:43c0:6000:89bb:1cde:d92a:2dcb]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: f8f7694c-faf1-45f4-425d-08d88242cfe3
+x-ms-traffictypediagnostic: MN2PR04MB6447:
+x-microsoft-antispam-prvs: <MN2PR04MB64473316E620DB2C02A43660E7ED0@MN2PR04MB6447.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: IwrN3W0BvifRg7LdGJjPjwnlJQf7b0wN3jPboSCRmusK/XCppjwnbeCAdJiTPE4BamBXBFDLD5FvNKuJwyZN2Sny5UsRbnzBAdKOw2oWKXq6CZQ3/geiiKmesfFd8QkMrCazmCiFQi6QOqA64IdI7vkqFSWfemr3y/f+PnOrBFP7Mp08vpoDjFpuKYG7g9NsGMz14TLoBFYV1sonFOh8wMEPNzoYFN5D+kIW1JK6bh6gDzazUg3NqgYwSyff8Rv4tkdWtnFTkjbXqWgiT8zV/vj/yYD4dULcNLhciWsiLNMQQ6InzP+EIodSaMM6K9UoU7g7ZPBSdEwAJfAA+SZ6Jg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR04MB6514.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(346002)(39860400002)(366004)(136003)(55016002)(316002)(2906002)(186003)(53546011)(5660300002)(86362001)(6506007)(83380400001)(33656002)(66476007)(71200400001)(76116006)(66946007)(478600001)(91956017)(7696005)(52536014)(110136005)(64756008)(8936002)(9686003)(66556008)(8676002)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: H00XIOcR7QiDayfItBEcOee7HS4PekrGLqMtaxyaCkS9r3C3jEnQOGcL8njY/gU9Cky6z5ZQ1iUVAHVoIaA33fS/iBokG8NrhtXN/luhjwMb2gJBOKiMzXI2H9rCXlqU99LfPBBAP/CrDXykQb0PTtMUXv0WXkjxrADQ8GW64sT+/cPRRVEDj/17VNe9ps3FsUdhqSckLUUIelW8Gov47re5bEt0O4HdCMLBKoMdLTyjwp9d0fyHYbEYUQu/J9RuRjzS+dG8Yg7VmMVHkbpPEySQ137UYq/h3ndjGDXY/1IrWaOvDaJS2eGBzQUMiJNvu+sBfZYqmLx1GNtNrnQTK4HXvjLCvsY1qUfWcKaUhB3uP3vG/zauNy0o9mEbw26SzvQcz1AuMhhDVm5/z4vkvufqvj/sba+iSxkVn4OjZNGbsIVUom0rtZXWtSNG4mujdIT505reIxmZXAXt+vrdWwodaQGmS+eBT+mf4Lqr1U4Wl2uS9/C8BaOSNMoveMW8Ufvf0jYW7ODmd4M05+0I4qon1E9qyXfXFKFsYlDE6lc43Nok09g6TPAob3YFbu93yyn0vk67DnCxvTM9WvU6cvzVG5FAwacSulHv9lYWouXkywPvZp59nCd4Nw1HLdLqS1Z3gaWEfnVwG1/HqjZJxbqMFMseKC8gkzvQUaLDFlpSe9jIRQh4wbJs4y0BUgpyOHM765jg6voI1OAq9LyaoQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR04MB6514.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8f7694c-faf1-45f4-425d-08d88242cfe3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Nov 2020 10:57:53.9438
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TsJXQEDCPzKPbK9YW6WtFVNTL8hiZpgXuKJ/3saZvFLUpzF/oZKwts9uXoIQbnDmJw219+6xLDR7Po0qn08Akg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6447
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 11/4/20 11:08 PM, Mike Snitzer wrote:
->> I'm doubted if this should be implemented in block layer like:
->>
->> ```
->>
->> struct bio {
->>
->>      ...
->>
->>      struct list_head  cookies;
->>
->> };
->>
->> ```
->>
->> After all it's only used by bio-based queue, or more specifically
->> only dm device currently.
-> I do think this line of work really should be handled in block core
-> because I cannot see any reason why MD or bcache or whatever bio-based
-> device wouldn't want the ability to better support io_uring (with IO
-> poll).
->
->> Another design I can come up with is to maintain a global data
->> structure for the very beginning
->> original bio. Currently the blocking point is that now one original
->> bio to the dm device (@bio of dm_submit()) can correspond to multiple
->> dm_io and thus we have nowhere to place the @cookies list.
-> Yes, and that will always be the case.  We need the design to handle an
-> arbitrary sprawl of splitting from a given bio.  The graph of bios
-> resulting from that fan-out needs to be walked at various levels -- be
-> it the top-level original bio's submit_bio() returned cookie or some
-> intermediate point in the chain of bios.
->
-> The problem is the lifetime of the data structure created for a given
-> split bio versus layering boundaries (that come from block core's
-> simplistic recursion via bio using submit_bio).
->
->> Now we have to maintain one data structure for every original bio,
->> something like
->>
->> ```
->>
->> struct dm_poll_instance {
->>
->>      ...
->>
->>      struct list_head cookies;
->>
->> };
->>
->> ```
-> I do think we need a hybrid where at the point of recursion we're able
-> to make the associated data structure available across the recursion
-> boundary so that modeling the association in a chain of split bios is
-> possible. (e.g. struct dm_poll_data or dm_poll_instance as you named it,
-> _but_ that struct definition would live in block core, but would be part
-> of per-bio-data; so 'struct blk_poll_data' is more logical name when
-> elevated to block core).
->
-> It _might_ be worthwhile to see if a new BIO_ flag could be added to
-> allow augmenting the bio_split + bio_chain pattern to also track this
-> additional case of carrying additional data per-bio while creating
-> bio-chains.  I may not be clear yet, said differently: augmenting
-> bio_chain to not only chain bios, but to _also_ thread/chain together
-> per-bio-data that lives within those chained bios.  SO you have the
-> chain of bios _and_ the chain of potentially opaque void * that happens
-> to point to a list head for a list of 'struct blk_poll_data'.
->
-> Does that make sense?
-
-
-I'm doubted if it really makes sense to maintain a *complete* bio chain 
-across the recursive
-
-call boundary.
-
-
-Considering the following device stack:
-
-```
-
-                                   dm0
-
-         dm1                   dm2           dm3
-
-nvme0  nvme1          ....               ....
-
-```
-
-
-We have the following bio graph (please let me know if it's wrong or the 
-image can't display)
-
-
-For example, for dm1 there are three bios containing valid cookie in the 
-end, that is
-
-bio 9/10/11. We only need to insert the corresponding blk_poll_data 
-(containing
-
-request_queue, cookie, etc) of these three bios into the very beginning 
-original
-
-bio (that is bio0). Of course we can track all the sub-bios down through 
-the device
-
-stack, layer by layer, e.g.,
-
-- get bio 1/2/3 from bio 0
-
-- get bio 4 from bio 3
-
-- finally get bio 9 from bio 4
-
-But I'm doubted if it's overkill to just implement the iopoll.
-
-
-Another issue still unclear is that, if we should implement the iopoll 
-in a recursive way.
-
-In a recursive way, to poll dm 0, we should poll all its sub-devices, 
-that is, bio 4/5/7/8.
-
-Oppositely we can insert only the bottom bio (bio 9/10/11 which have 
-valid cookie) at
-
-the very beginning (at submit_bio() phase), and to poll dm 0, we only 
-need to poll bio
-
-9/10/11.
-
-
-To implement this non-recursive design, we can add a field in struct bio
-
-```
-
-struct bio {
-
-     ...
-
-     struct bio *orig;
-
-}
-
-```
-
-@orig points to the original bio inputted into submit_bio(), that is, bio 0.
-
-
-@orig field is transmitted through bio splitting.
-
-```
-
-bio_split()
-
-     split->orig = bio->orig ? : bio
-
-
-dm.c: __clone_and_map_data_bio
-
-     clone->orig = bio->orig ? : bio
-
-```
-
-
-Finally bio 9/10/11 can be inserted into bio 0.
-
-```
-
-blk-mq.c: blk_mq_submit_bio
-
-     if (bio->orig)
-
-         init blk_poll_data and insert it into bio->orig's @cookies list
-
-```
-
->
->> We can transfer this dm_poll_instance between split bios by
->> bio->bi_private, like
->>
->> ```
->>
->> dm_submit_bio(...) {
->>
->>      struct dm_poll_instance *ins;
->>
->>      if (bio->bi_private)
->>
->>          ins = bio->bi_private;
->>
->>      else {
->>
->>          ins = alloc_poll_instance();
->>
->>          bio->bi_private = ins;
->>
->>      }
->>
->>      ...
->>
->> }
->>
->> ```
-> Sadly, we cannot (ab)use bi_private for this given its (ab)used via the
-> bio_chain() interface.  It's almost like we need to add a new pointer in
-> the bio that isn't left for block core to hijack.
->
-> There is the well-worn pattern of saving off the original bi_private,
-> hooking a new endio method and then when that endio is called restoring
-> bi_private but we really want to avoid excessive indirect function calls
-> for this usecase.  The entire point of implementing blk_poll support is
-> for performance after all.
->
-> Mike
->
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
-
--- 
-Thanks,
-Jeffle
-
+On 2020/11/05 16:17, Damien Le Moal wrote:=0A=
+> Commit aa1c09cb65e2 ("null_blk: Fix locking in zoned mode") changed zone=
+=0A=
+> locking to using the potentially sleeping wait_on_bit_io() function. A=0A=
+> zoned null_blk device must thus be marked as blocking to avoid calls to=
+=0A=
+> queue_rq() from invalid contexts triggering might_sleep() warnings.=0A=
+> =0A=
+> Reported-by: kernel test robot <lkp@intel.com>=0A=
+> Fixes: aa1c09cb65e2 ("null_blk: Fix locking in zoned mode")=0A=
+> Cc: stable@vger.kernel.org=0A=
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+=0A=
+Jens,=0A=
+=0A=
+Please ignore this patch. Sending shortly another one that removes the need=
+ for=0A=
+BLK_MQ_F_BLOCKING when memory backing is disabled.=0A=
+=0A=
+> ---=0A=
+> Changes from v1:=0A=
+> * Add "|| g_zoned" to condition for setting blocking to correctly handle=
+=0A=
+>   creation through modprobe.=0A=
+> =0A=
+>  drivers/block/null_blk_main.c | 9 +++++----=0A=
+>  1 file changed, 5 insertions(+), 4 deletions(-)=0A=
+> =0A=
+> diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.=
+c=0A=
+> index 4685ea401d5b..6bcf95d611a3 100644=0A=
+> --- a/drivers/block/null_blk_main.c=0A=
+> +++ b/drivers/block/null_blk_main.c=0A=
+> @@ -1714,7 +1714,7 @@ static int null_init_tag_set(struct nullb *nullb, s=
+truct blk_mq_tag_set *set)=0A=
+>  		set->flags |=3D BLK_MQ_F_TAG_HCTX_SHARED;=0A=
+>  	set->driver_data =3D NULL;=0A=
+>  =0A=
+> -	if ((nullb && nullb->dev->blocking) || g_blocking)=0A=
+> +	if ((nullb && nullb->dev->blocking) || g_blocking || g_zoned)=0A=
+>  		set->flags |=3D BLK_MQ_F_BLOCKING;=0A=
+>  =0A=
+>  	return blk_mq_alloc_tag_set(set);=0A=
+> @@ -1736,10 +1736,11 @@ static int null_validate_conf(struct nullb_device=
+ *dev)=0A=
+>  	dev->queue_mode =3D min_t(unsigned int, dev->queue_mode, NULL_Q_MQ);=0A=
+>  	dev->irqmode =3D min_t(unsigned int, dev->irqmode, NULL_IRQ_TIMER);=0A=
+>  =0A=
+> -	/* Do memory allocation, so set blocking */=0A=
+> -	if (dev->memory_backed)=0A=
+> +	/* Memory allocation and zone handling may sleep, so set blocking */=0A=
+> +	if (dev->memory_backed || dev->zoned)=0A=
+>  		dev->blocking =3D true;=0A=
+> -	else /* cache is meaningless */=0A=
+> +	/* Cache is meaningless without memory backing */=0A=
+> +	if (!dev->memory_backed)=0A=
+>  		dev->cache_size =3D 0;=0A=
+>  	dev->cache_size =3D min_t(unsigned long, ULONG_MAX / 1024 / 1024,=0A=
+>  						dev->cache_size);=0A=
+> =0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
