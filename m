@@ -5,38 +5,38 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 577DCC2D0A3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A879EC55ABD
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:05:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A5A82151B
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:05:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 460152151B
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:05:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tVd8geFS"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iiGVfdCI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728208AbgKFTEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 14:04:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59370 "EHLO
+        id S1728248AbgKFTFD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 14:05:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728053AbgKFTEm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 14:04:42 -0500
+        with ESMTP id S1728191AbgKFTEt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 14:04:49 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B129C0613CF;
-        Fri,  6 Nov 2020 11:04:42 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 091BEC0613D2;
+        Fri,  6 Nov 2020 11:04:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=4bS/eZqoJAQR/DSs9IGqi2g9LCY9L0WWDnWefDh2k5M=; b=tVd8geFSv+/a4ICZqJ4miUgAZr
-        bSnQVkuUj9Q1sOtmlqt7w1/fnbDPR0IyuD7NylvEPospNvxVXib/Q1nUDuQNSaWDRFbsRXA9dbw6O
-        R/GqSzwPpwI2zGGmixd50oCio/LgvmNAgH3JNK5kktQ8eJb8dFVZtMV8LOVf1+XaUk33UAT4qwsbd
-        gO37JazEvqPXopiAzJkFz2g/BDk5ZGRZJMue7aCghVAZN1rAh3Kp+t7apQN+sU6hGH5YlyzTNFcs+
-        V0tQaIvP9jr1OAo1S5SMYXLTVLk25tGMl0HLivTuYcN5VAr0bXyzDQ4D/TX6qd2S5zUuUJoLnnNDa
-        VVQ+Kqmw==;
+        bh=MupYDI4l/YovZ7RWUiZbIkKTEoIVA+KjloyNnUiTimo=; b=iiGVfdCIPPX+IkfTbBzmxkNClz
+        t982+XiX0rLzTMHY8HFo1Fp5Mtn7rK+diWNO+RHxxMdKcJUTti2/wcEDk1JuKfU/o4+K8dKleodTE
+        HTiaGtNCpYoo9vb3GGX4aLbLQQjLGGtNWkpDZpYqEwfuTn9hbBczupYDxFhREBpBASbSx6M7Lze9e
+        iKaTzCv7Ayt/qABbDvowSzznAcYB/VzFYgYnipTJO4suLkefkpjbVL2Cs7whyJwZIOchXyT0sQa+l
+        gQuWBa19/ZwoPZGFHeWQytUlRCgvx6EJq35hta2jU2txOK4i/ZI7bcgxRU7PROSuEa2OkMTwR08Xi
+        9io2po4w==;
 Received: from [2001:4bb8:184:9a8d:9e34:f7f4:e59e:ad6f] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kb729-00013h-89; Fri, 06 Nov 2020 19:04:25 +0000
+        id 1kb72H-00017b-Qy; Fri, 06 Nov 2020 19:04:34 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -57,9 +57,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 19/24] zram: use set_capacity_and_notify
-Date:   Fri,  6 Nov 2020 20:03:31 +0100
-Message-Id: <20201106190337.1973127-20-hch@lst.de>
+Subject: [PATCH 23/24] virtio-blk: remove a spurious call to revalidate_disk_size
+Date:   Fri,  6 Nov 2020 20:03:35 +0100
+Message-Id: <20201106190337.1973127-24-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201106190337.1973127-1-hch@lst.de>
 References: <20201106190337.1973127-1-hch@lst.de>
@@ -70,46 +70,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use set_capacity_and_notify to set the size of both the disk and block
-device.  This also gets the uevent notifications for the resize for free.
+revalidate_disk_size just updates the block device size from the disk
+size.  Thus calling it from revalidate_disk_size doesn't actually do
+anything.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/zram/zram_drv.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ drivers/block/virtio_blk.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 1b697208d66157..6d15d51cee2b7e 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1695,7 +1695,7 @@ static void zram_reset_device(struct zram *zram)
- 	disksize = zram->disksize;
- 	zram->disksize = 0;
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 3e812b4c32e669..145606dc52db1e 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -598,7 +598,6 @@ static void virtblk_update_cache_mode(struct virtio_device *vdev)
+ 	struct virtio_blk *vblk = vdev->priv;
  
--	set_capacity(zram->disk, 0);
-+	set_capacity_and_notify(zram->disk, 0);
- 	part_stat_set_all(&zram->disk->part0, 0);
+ 	blk_queue_write_cache(vblk->disk->queue, writeback, false);
+-	revalidate_disk_size(vblk->disk, true);
+ }
  
- 	up_write(&zram->init_lock);
-@@ -1741,9 +1741,7 @@ static ssize_t disksize_store(struct device *dev,
- 
- 	zram->comp = comp;
- 	zram->disksize = disksize;
--	set_capacity(zram->disk, zram->disksize >> SECTOR_SHIFT);
--
--	revalidate_disk_size(zram->disk, true);
-+	set_capacity_and_notify(zram->disk, zram->disksize >> SECTOR_SHIFT);
- 	up_write(&zram->init_lock);
- 
- 	return len;
-@@ -1790,7 +1788,6 @@ static ssize_t reset_store(struct device *dev,
- 	/* Make sure all the pending I/O are finished */
- 	fsync_bdev(bdev);
- 	zram_reset_device(zram);
--	revalidate_disk_size(zram->disk, true);
- 	bdput(bdev);
- 
- 	mutex_lock(&bdev->bd_mutex);
+ static const char *const virtblk_cache_types[] = {
 -- 
 2.28.0
 
