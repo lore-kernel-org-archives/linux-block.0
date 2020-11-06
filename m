@@ -2,271 +2,161 @@ Return-Path: <SRS0=ZSeo=EM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A40EC388F2
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 18:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D92C5517A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:04:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D26620702
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 18:46:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D320A21D81
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:04:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bcd7Yb6w"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kl8AxnoJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727914AbgKFSqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 13:46:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26569 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727084AbgKFSqC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Nov 2020 13:46:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604688359;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KYXMgpgXis5HDOFrwXjTVkW33lbZU10WK2LjptI7g1c=;
-        b=Bcd7Yb6wjkkZOHCp+kHveyiWK8WUndSqfMOiNXlRS12tSwHVgbl+56POZU2w6rUNVahBI/
-        qmdFUWg794iUFun5XexoTV69HXc5eR+B96u97Yx7p5vJlXCMcKKPNimvUOE3sIB6+3qd3Z
-        r8nw+OiIxXVskp/10z039UwBOX7gVkM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-sfCphrnjMTe-EAyIPf8bSA-1; Fri, 06 Nov 2020 13:45:57 -0500
-X-MC-Unique: sfCphrnjMTe-EAyIPf8bSA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4F8B6D249;
-        Fri,  6 Nov 2020 18:45:55 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D5E876645;
-        Fri,  6 Nov 2020 18:45:52 +0000 (UTC)
-Date:   Fri, 6 Nov 2020 12:45:26 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     JeffleXu <jefflexu@linux.alibaba.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, haoxu@linux.alibaba.com,
-        io-uring@vger.kernel.org
-Subject: Re: [RFC 0/3] Add support of iopoll for dm device
-Message-ID: <20201106174526.GA13292@redhat.com>
-References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
- <20201021203906.GA10896@redhat.com>
- <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
- <20201026185334.GA8463@redhat.com>
- <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
- <20201102152822.GA20466@redhat.com>
- <f165f38a-91d1-79aa-829d-a9cc69a5eee6@linux.alibaba.com>
- <20201104150847.GB32761@redhat.com>
- <2c5dab21-8125-fcdf-078e-00a158c57f43@linux.alibaba.com>
+        id S1727257AbgKFTEJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 14:04:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbgKFTEI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 14:04:08 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7077C0613CF;
+        Fri,  6 Nov 2020 11:04:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=GTpuLBfYyo8TaeZo/z07ad7aIfYXt5VjexG6J+Un22Y=; b=kl8AxnoJUKENxdqbmGjtDUBKGr
+        4VvvwsWDbIWXpjZUE80AyVmG5Pw1VqJDYsJwtH7NNnxp0mOGVXqwKxHaePcIX2QLEgCS8sFueGPzE
+        AiTGABB6Xp+kXJg8ish427RVP/SfCFu0d17IOJ1V1HiYBELRoZFB92ZTq6pCfkW0lsJkkJrifhsmZ
+        pmg+34MTaZP2+QSox6FaZ3V/B2bz9YfsUA2FysiawKz4wfLjLQFNhJ856xgqwRX1KDIB3yvZOlRbF
+        NcZ4l5avCx+EDEjbrxqOm6DFPEMZDdVeorTynAxTtJLBiF/5eE5hDbP4cAerzfFjspBXGft5tkdz/
+        xM4wPyUw==;
+Received: from [2001:4bb8:184:9a8d:9e34:f7f4:e59e:ad6f] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kb71b-0000th-31; Fri, 06 Nov 2020 19:03:52 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Justin Sanders <justin@coraid.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, nbd@other.debian.org,
+        ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: [PATCH 02/24] loop: remove loop_set_size
+Date:   Fri,  6 Nov 2020 20:03:14 +0100
+Message-Id: <20201106190337.1973127-3-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201106190337.1973127-1-hch@lst.de>
+References: <20201106190337.1973127-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2c5dab21-8125-fcdf-078e-00a158c57f43@linux.alibaba.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 05 2020 at  9:51pm -0500,
-JeffleXu <jefflexu@linux.alibaba.com> wrote:
+Just use set_capacity_revalidate_and_notify directly, as this function
+can update the block device size as well when the last parameter is set
+to true.
 
-> 
-> On 11/4/20 11:08 PM, Mike Snitzer wrote:
-> >>I'm doubted if this should be implemented in block layer like:
-> >>
-> >>```
-> >>
-> >>struct bio {
-> >>
-> >>     ...
-> >>
-> >>     struct list_head  cookies;
-> >>
-> >>};
-> >>
-> >>```
-> >>
-> >>After all it's only used by bio-based queue, or more specifically
-> >>only dm device currently.
-> >I do think this line of work really should be handled in block core
-> >because I cannot see any reason why MD or bcache or whatever bio-based
-> >device wouldn't want the ability to better support io_uring (with IO
-> >poll).
-> >
-> >>Another design I can come up with is to maintain a global data
-> >>structure for the very beginning
-> >>original bio. Currently the blocking point is that now one original
-> >>bio to the dm device (@bio of dm_submit()) can correspond to multiple
-> >>dm_io and thus we have nowhere to place the @cookies list.
-> >Yes, and that will always be the case.  We need the design to handle an
-> >arbitrary sprawl of splitting from a given bio.  The graph of bios
-> >resulting from that fan-out needs to be walked at various levels -- be
-> >it the top-level original bio's submit_bio() returned cookie or some
-> >intermediate point in the chain of bios.
-> >
-> >The problem is the lifetime of the data structure created for a given
-> >split bio versus layering boundaries (that come from block core's
-> >simplistic recursion via bio using submit_bio).
-> >
-> >>Now we have to maintain one data structure for every original bio,
-> >>something like
-> >>
-> >>```
-> >>
-> >>struct dm_poll_instance {
-> >>
-> >>     ...
-> >>
-> >>     struct list_head cookies;
-> >>
-> >>};
-> >>
-> >>```
-> >I do think we need a hybrid where at the point of recursion we're able
-> >to make the associated data structure available across the recursion
-> >boundary so that modeling the association in a chain of split bios is
-> >possible. (e.g. struct dm_poll_data or dm_poll_instance as you named it,
-> >_but_ that struct definition would live in block core, but would be part
-> >of per-bio-data; so 'struct blk_poll_data' is more logical name when
-> >elevated to block core).
-> >
-> >It _might_ be worthwhile to see if a new BIO_ flag could be added to
-> >allow augmenting the bio_split + bio_chain pattern to also track this
-> >additional case of carrying additional data per-bio while creating
-> >bio-chains.  I may not be clear yet, said differently: augmenting
-> >bio_chain to not only chain bios, but to _also_ thread/chain together
-> >per-bio-data that lives within those chained bios.  SO you have the
-> >chain of bios _and_ the chain of potentially opaque void * that happens
-> >to point to a list head for a list of 'struct blk_poll_data'.
-> >
-> >Does that make sense?
-> 
-> 
-> I'm doubted if it really makes sense to maintain a *complete* bio
-> chain across the recursive
-> 
-> call boundary.
-> 
-> 
-> Considering the following device stack:
-> 
-> ```
-> 
->                                   dm0
-> 
->         dm1                   dm2           dm3
-> 
-> nvme0  nvme1          ....               ....
-> 
-> ```
-> 
-> 
-> We have the following bio graph (please let me know if it's wrong or
-> the image can't display)
-> 
-> 
-> For example, for dm1 there are three bios containing valid cookie in
-> the end, that is
-> 
-> bio 9/10/11. We only need to insert the corresponding blk_poll_data
-> (containing
-> 
-> request_queue, cookie, etc) of these three bios into the very
-> beginning original
-> 
-> bio (that is bio0). Of course we can track all the sub-bios down
-> through the device
-> 
-> stack, layer by layer, e.g.,
-> 
-> - get bio 1/2/3 from bio 0
-> 
-> - get bio 4 from bio 3
-> 
-> - finally get bio 9 from bio 4
-> 
-> But I'm doubted if it's overkill to just implement the iopoll.
-> 
-> 
-> Another issue still unclear is that, if we should implement the
-> iopoll in a recursive way.
-> 
-> In a recursive way, to poll dm 0, we should poll all its
-> sub-devices, that is, bio 4/5/7/8.
-> 
-> Oppositely we can insert only the bottom bio (bio 9/10/11 which have
-> valid cookie) at
-> 
-> the very beginning (at submit_bio() phase), and to poll dm 0, we
-> only need to poll bio 9/10/11.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/loop.c | 37 +++++++------------------------------
+ 1 file changed, 7 insertions(+), 30 deletions(-)
 
-I feel we need the ability to walk the entire graph and call down to
-next level.  The lowest level would be what you call a "valid cookie"
-that blk-mq returned.  But the preceding cookies need to be made valid
-and used when walking the graph (from highest to lowest) and calling
-down to the underlying layers.
-
-> 
-> 
-> To implement this non-recursive design, we can add a field in struct bio
-> 
-> ```
-> 
-> struct bio {
-> 
->     ...
-> 
->     struct bio *orig;
-> 
-> }
-> 
-> ```
-> 
-> @orig points to the original bio inputted into submit_bio(), that is, bio 0.
-> 
-> 
-> @orig field is transmitted through bio splitting.
-> 
-> ```
-> 
-> bio_split()
-> 
->     split->orig = bio->orig ? : bio
-> 
-> 
-> dm.c: __clone_and_map_data_bio
-> 
->     clone->orig = bio->orig ? : bio
-> 
-> ```
-> 
-> 
-> Finally bio 9/10/11 can be inserted into bio 0.
-> 
-> ```
-> 
-> blk-mq.c: blk_mq_submit_bio
-> 
->     if (bio->orig)
-> 
->         init blk_poll_data and insert it into bio->orig's @cookies list
-> 
-> ```
-
-If you feel that is doable: certainly give it a shot.
-
-But it is not clear to me how you intend to translate from cookie passed
-in to ->blk_poll hook (returned from submit_bio) to the saved off
-bio->orig.
-
-What is your cookie strategy in this non-recursive implementation?  What
-will you be returning?  Where will you be storing it?
-
-Mike
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cb1191d6e945f2..86eb7e0691eef5 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -241,23 +241,6 @@ loop_validate_block_size(unsigned short bsize)
+ 	return 0;
+ }
+ 
+-/**
+- * loop_set_size() - sets device size and notifies userspace
+- * @lo: struct loop_device to set the size for
+- * @size: new size of the loop device
+- *
+- * Callers must validate that the size passed into this function fits into
+- * a sector_t, eg using loop_validate_size()
+- */
+-static void loop_set_size(struct loop_device *lo, loff_t size)
+-{
+-	struct block_device *bdev = lo->lo_device;
+-
+-	bd_set_nr_sectors(bdev, size);
+-
+-	set_capacity_revalidate_and_notify(lo->lo_disk, size, false);
+-}
+-
+ static inline int
+ lo_do_transfer(struct loop_device *lo, int cmd,
+ 	       struct page *rpage, unsigned roffs,
+@@ -1076,7 +1059,6 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	struct address_space *mapping;
+ 	struct block_device *claimed_bdev = NULL;
+ 	int		error;
+-	loff_t		size;
+ 	bool		partscan;
+ 	unsigned short  bsize;
+ 
+@@ -1164,9 +1146,8 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	loop_update_dio(lo);
+ 	loop_sysfs_init(lo);
+ 
+-	size = get_loop_size(lo, file);
+-	loop_set_size(lo, size);
+-
++	set_capacity_revalidate_and_notify(lo->lo_disk, get_loop_size(lo, file),
++			true);
+ 	set_blocksize(bdev, S_ISBLK(inode->i_mode) ?
+ 		      block_size(inode->i_bdev) : PAGE_SIZE);
+ 
+@@ -1402,9 +1383,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	lo->lo_flags |= prev_lo_flags & ~LOOP_SET_STATUS_CLEARABLE_FLAGS;
+ 
+ 	if (size_changed) {
+-		loff_t new_size = get_size(lo->lo_offset, lo->lo_sizelimit,
+-					   lo->lo_backing_file);
+-		loop_set_size(lo, new_size);
++		set_capacity_revalidate_and_notify(lo->lo_disk,
++				get_size(lo->lo_offset, lo->lo_sizelimit,
++					 lo->lo_backing_file), true);
+ 	}
+ 
+ 	loop_config_discard(lo);
+@@ -1580,14 +1561,10 @@ loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
+ 
+ static int loop_set_capacity(struct loop_device *lo)
+ {
+-	loff_t size;
+-
+ 	if (unlikely(lo->lo_state != Lo_bound))
+ 		return -ENXIO;
+-
+-	size = get_loop_size(lo, lo->lo_backing_file);
+-	loop_set_size(lo, size);
+-
++	set_capacity_revalidate_and_notify(lo->lo_disk,
++			get_loop_size(lo, lo->lo_backing_file), true);
+ 	return 0;
+ }
+ 
+-- 
+2.28.0
 
