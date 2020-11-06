@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3012C55178
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:43:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FF9C388F2
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:53:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73C47217A0
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:43:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 711AA2222F
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:53:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="BMhMQO2c"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="oUbweNGx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727679AbgKFRn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 12:43:29 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:58840 "EHLO
+        id S1725868AbgKFRxz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 12:53:55 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:58960 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726928AbgKFRn3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 12:43:29 -0500
+        with ESMTP id S1727647AbgKFRxz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 12:53:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
         In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
         Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
         :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
         List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=+aVF8hXlDJ8MzPtxX+XTVoXEhgBr/LXYLuXvlOqZpGU=; b=BMhMQO2caJsqnlb1LxCr7nBMdq
-        1Z2QCchiWLzUurwt3unaRF8yXphVx9GmAgyCNN72Z8goljgcSPoUwJVAZ1mDzXLyUGcszQIG0YL6V
-        Xh3RTrZLilCq+i/q7PRDd0P4JcITPVliaZMPbMnmuO/M8ewMGtTo8uMTblJXHulgQKx9mbUFNcvt2
-        5WwjAZfAP0p7IcvHkxV86Nh7/8FKbB35igvhByuo72QPVLb6cKG8TSef4tW5v/Br/8Hnj1dWC+CUd
-        xWx2R4ulYSIMFvjaEWxIIrphSNBNS/KyMiSZvesXCRZGPs/wP5ZtVbHSsHSTvIGKOYH2FRcoJ0bNW
-        pfRf3Ijw==;
+        bh=oqvtFGaVjszB5PFtWzeKmwJF6MYA6lw1F4gIUPtEKvE=; b=oUbweNGxfS2FaKore4Y7MKiNQ4
+        fg7zh2TgR0y03Add5nUBDQD4stjB1NKFFrVlgpzQC5fznCUfIGpE/akffcd0NrmPkS/77o3bGqNOw
+        Ei1cBrxMlXYTIEwe8u8J3/T0r8arqe8w4l390vQ3orocVyTIzf6z7CZrtej7nyQkhxp3EiA2y+pCs
+        ec5qyhMR/l/1TdiqL43zWSiILj0SMtpz8z8LbEIROwb7rpQwVQgIR2tT0Q6FH1Y0AE1K2D+k180Ro
+        sQw0YqkiFV6aAHs9Txi/B9Y7KeLuEZiAfw0VfHJZlQOxTnS2f2YIkOWlG9kr2vD0uu72FDyO+wSXj
+        C94axUyQ==;
 Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
         by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.92)
         (envelope-from <logang@deltatee.com>)
-        id 1kb5lh-0003H9-4R; Fri, 06 Nov 2020 10:43:22 -0700
+        id 1kb5vm-0003Mq-D0; Fri, 06 Nov 2020 10:53:47 -0700
 To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -52,22 +52,24 @@ Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         Matthew Wilcox <willy@infradead.org>,
         Daniel Vetter <daniel.vetter@ffwll.ch>
 References: <20201106170036.18713-1-logang@deltatee.com>
- <20201106170036.18713-16-logang@deltatee.com>
- <20201106173932.GT36674@ziepe.ca>
+ <20201106170036.18713-15-logang@deltatee.com>
+ <20201106172206.GS36674@ziepe.ca>
+ <b1e8dfce-d583-bed8-d04d-b7265a54c99f@deltatee.com>
+ <20201106174223.GU36674@ziepe.ca>
 From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <da53aaa5-94fd-c150-c5a4-8fec042eb196@deltatee.com>
-Date:   Fri, 6 Nov 2020 10:43:18 -0700
+Message-ID: <2c2d2815-165e-2ef9-60d6-3ace7ff3aaa5@deltatee.com>
+Date:   Fri, 6 Nov 2020 10:53:45 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201106173932.GT36674@ziepe.ca>
+In-Reply-To: <20201106174223.GU36674@ziepe.ca>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 24.64.145.4
 X-SA-Exim-Rcpt-To: daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
 X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 15/15] nvme-pci: Allow mmaping the CMB in userspace
+Subject: Re: [RFC PATCH 14/15] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
@@ -76,51 +78,56 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-
-On 2020-11-06 10:39 a.m., Jason Gunthorpe wrote:
-> On Fri, Nov 06, 2020 at 10:00:36AM -0700, Logan Gunthorpe wrote:
->> Allow userspace to obtain CMB memory by mmaping the controller's
->> char device. The mmap call allocates and returns a hunk of CMB memory,
->> (the offset is ignored) so userspace does not have control over the
->> address within the CMB.
+On 2020-11-06 10:42 a.m., Jason Gunthorpe wrote:
+> On Fri, Nov 06, 2020 at 10:28:00AM -0700, Logan Gunthorpe wrote:
 >>
->> A VMA allocated in this way will only be usable by drivers that set
->> FOLL_PCI_P2PDMA when calling GUP. And inter-device support will be
->> checked the first time the pages are mapped for DMA.
 >>
->> Currently this is only supported by O_DIRECT to an PCI NVMe device
->> or through the NVMe passthrough IOCTL.
+>> On 2020-11-06 10:22 a.m., Jason Gunthorpe wrote:
+>>> On Fri, Nov 06, 2020 at 10:00:35AM -0700, Logan Gunthorpe wrote:
+>>>> Introduce pci_mmap_p2pmem() which is a helper to allocate and mmap
+>>>> a hunk of p2pmem into userspace.
+>>>>
+>>>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>>>>  drivers/pci/p2pdma.c       | 104 +++++++++++++++++++++++++++++++++++++
+>>>>  include/linux/pci-p2pdma.h |   6 +++
+>>>>  2 files changed, 110 insertions(+)
+>>>>
+>>>> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+>>>> index 9961e779f430..8eab53ac59ae 100644
+>>>> +++ b/drivers/pci/p2pdma.c
+>>>> @@ -16,6 +16,7 @@
+>>>>  #include <linux/genalloc.h>
+>>>>  #include <linux/memremap.h>
+>>>>  #include <linux/percpu-refcount.h>
+>>>> +#include <linux/pfn_t.h>
+>>>>  #include <linux/random.h>
+>>>>  #include <linux/seq_buf.h>
+>>>>  #include <linux/xarray.h>
+>>>> @@ -1055,3 +1056,106 @@ ssize_t pci_p2pdma_enable_show(char *page, struct pci_dev *p2p_dev,
+>>>>  	return sprintf(page, "%s\n", pci_name(p2p_dev));
+>>>>  }
+>>>>  EXPORT_SYMBOL_GPL(pci_p2pdma_enable_show);
+>>>> +
+>>>> +struct pci_p2pdma_map {
+>>>> +	struct kref ref;
+>>>> +	struct pci_dev *pdev;
+>>>> +	void *kaddr;
+>>>> +	size_t len;
+>>>> +};
+>>>
+>>> Why have this at all? Nothing uses it and no vm_operations ops are
+>>> implemented?
 >>
->> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->>  drivers/nvme/host/core.c | 11 +++++++++++
->>  drivers/nvme/host/nvme.h |  1 +
->>  drivers/nvme/host/pci.c  |  9 +++++++++
->>  3 files changed, 21 insertions(+)
->>
->> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
->> index f14316c9b34a..fc642aba671d 100644
->> +++ b/drivers/nvme/host/core.c
->> @@ -3240,12 +3240,23 @@ static long nvme_dev_ioctl(struct file *file, unsigned int cmd,
->>  	}
->>  }
->>  
->> +static int nvme_dev_mmap(struct file *file, struct vm_area_struct *vma)
->> +{
->> +	struct nvme_ctrl *ctrl = file->private_data;
->> +
->> +	if (!ctrl->ops->mmap_cmb)
->> +		return -ENODEV;
->> +
->> +	return ctrl->ops->mmap_cmb(ctrl, vma);
->> +}
+>> It's necessary to free the allocated p2pmem when the mapping is torn down.
 > 
-> This needs to ensure that the VMA created is destroyed before the
-> driver is unprobed - ie the struct pages backing the BAR memory is
-> destroyed.
-> 
-> I don't see anything that synchronizes this in the nvme_dev_release()?
+> That's suspicious.. Once in a VMA the lifetime of the page must be
+> controlled by the page refcount, it can't be put back into the genpool
+> just because the vma was destroed.
 
-Yup, looks like something that needs to be fixed. Though I'd probably do
-it in the pci_p2pdma helper code instead.
+Ah, hmm, yes. I guess the pages have to be hooked and returned to the
+genalloc through free_devmap_managed_page(). Seems like it might be
+doable... but it will complicate things for users that don't want to use
+the genpool (though no such users exist upstream).
 
 Logan
+
