@@ -2,307 +2,130 @@ Return-Path: <SRS0=ZSeo=EM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B5F7C2D0A3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40735C2D0A3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:30:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAEC0206FA
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:26:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7C682222A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 19:30:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KNBQl5BA"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="iJjd0Fsg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728127AbgKFT0Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 14:26:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34536 "EHLO
+        id S1728131AbgKFTa1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 14:30:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728168AbgKFT0P (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 14:26:15 -0500
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74646C0613D2
-        for <linux-block@vger.kernel.org>; Fri,  6 Nov 2020 11:26:15 -0800 (PST)
-Received: by mail-oi1-x241.google.com with SMTP id q206so2443461oif.13
-        for <linux-block@vger.kernel.org>; Fri, 06 Nov 2020 11:26:15 -0800 (PST)
+        with ESMTP id S1726447AbgKFTa1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 14:30:27 -0500
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EEC8C0613D3
+        for <linux-block@vger.kernel.org>; Fri,  6 Nov 2020 11:30:27 -0800 (PST)
+Received: by mail-qk1-x744.google.com with SMTP id l2so2160616qkf.0
+        for <linux-block@vger.kernel.org>; Fri, 06 Nov 2020 11:30:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+wokpogFU0p0NCzrAitsHbsPGfKrGGNhdkkY5o6ky0U=;
-        b=KNBQl5BAvet7R0Bd/qlz3ySI6Y3hXF97QfAa1VRBgeM99PitwRjd7qm4vzlPvXyyvc
-         Z0NFqx8ROa+9Gm7rGDfZLRu250wZt6K5PFURXiQxF4VsyCnwR+ULHorpcDJrEh2uk322
-         vn+YrEty/vWLHnI8eOs4wqBv8P7vgHRL+P04M=
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vFAruLUORQHUqfhAcqrK3kHFrju7FmZIpz+3LtddQik=;
+        b=iJjd0FsgKSz4UMVJ0yEYuTXP+TTkCpe11X1VygTFEfMhBu4zVCI1R/v6juANR2qB4Q
+         5Bels1w2oZzLmDsNDoThRLoK7kc/zdpwPO4UT6x6EAkceI8g/JOjAG91xGYl7kSFCQ/W
+         ZbgarmDUY3PKv06eSLmj2WHCkLP1NnOHCZkgrx7CXQDuCJ/z7qt+/GjYjmsDayhhFmyK
+         CViF4N4YOhwIP8BSr0EwEqNCdu9hb5mbPEEbp3iUTLeV3XnYywXW188JOM3kSYxEOLV5
+         mfupyKsZCd/zGG/BUy47UXOrZMvD0veRq8OcWLdma8c/DrK5Km76/lwmXa36HDCDsiN4
+         sXwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+wokpogFU0p0NCzrAitsHbsPGfKrGGNhdkkY5o6ky0U=;
-        b=sr6Dv5nbv/Nfhazh80Irky4q3rek9YC2GhyWn/Mlk3Rajsdr7OSnIpJq6ew5D11Elh
-         B5gaA3QFHt18A5+KO4xwuwDGyv80iAuZFcp8+8ASwhAUNQyYvR4AteVBCVq4LsZ3R93K
-         +pTaeoyMI5tdsjCXEWXQFXCHRvQ6T0pNpxWD0Qsc1eXQqBspycxucoWWJu+Xf7LI1fpZ
-         8rjThWNZUxlqH/794VmGWohYNRA1EhvxlVM5K7e9NRXjjVVzUqSbOc2bq4gr8M1k4Js3
-         V3k8Fxr1YY1P6LmPHmNbpO7+Y7naiVG+6Dg3OU7HZXYMr6KpWhVAJtJHqxQ0y/OX9zuM
-         NfRw==
-X-Gm-Message-State: AOAM532zJWGdxA5Kx4J/lv5NVQfWS6zYogxQ62ZH/ZSFjnxrTE/y2B/Z
-        uj7bJEdS0MxN7LG4KnG3YeTgjxkzhhR9dn+gm3kRDw==
-X-Google-Smtp-Source: ABdhPJwoG2bMpbyMhuu4qtHq9P9HTV+YuREVlDGgbeZx7rG7Ba/QDtSpVdKZ8mBLv9hVU6+6PU4sPSaPcUbqfRIHhos=
-X-Received: by 2002:aca:5886:: with SMTP id m128mr2058209oib.29.1604690774289;
- Fri, 06 Nov 2020 11:26:14 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vFAruLUORQHUqfhAcqrK3kHFrju7FmZIpz+3LtddQik=;
+        b=DfZD7gugGcKlauTKySkxOcQQqECNwVCtKcjZ6zkYA84uDWaOUrvb9pTcFulh2HFVR8
+         9tgW+3poej2R3ZowhvvP6tot/cv2EOUQccgqzeQmaLXQ7EGoMsp+boLn8FQaBRzPJCmn
+         JE7WhAiVbQ8b0K87sOqy/ASMs5Kjf4uLizVsw9GN1nnyX5dnGjFhpxrO51+CDXgfk6R7
+         rMKfWgdlYEWPUfs/dGaek7+ydjk3PeyOIwOe6NeLAMjQCHrSGt8Lh4yTjzDUAmUumZ5l
+         A4ZzMFiY99DTJJ0iBuLB7j0EJnRE5la8GoysJtaOYCPzCEeoGqEak7TBX9N2LSyE3icq
+         /UqQ==
+X-Gm-Message-State: AOAM531woIH8v6D3SAQRPpHrUi6oh5QSSdVXzepAaRdhb2qQ7hmfO3xG
+        ggTQEjnbF6ZgD5TldgE1G1XplQ==
+X-Google-Smtp-Source: ABdhPJze2F/Rq9sRVVe7Xk43RUxz3sel2lY1t652tRL/srA9lFIVY1sT0rqjvYUmBSCT+htfHCsU0Q==
+X-Received: by 2002:a37:e40b:: with SMTP id y11mr3193612qkf.29.1604691026426;
+        Fri, 06 Nov 2020 11:30:26 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id s2sm1115967qtw.44.2020.11.06.11.30.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2020 11:30:25 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kb7RI-0011Hr-SE; Fri, 06 Nov 2020 15:30:24 -0400
+Date:   Fri, 6 Nov 2020 15:30:24 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        Ira Weiny <iweiny@intel.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>
+Subject: Re: [RFC PATCH 14/15] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
+Message-ID: <20201106193024.GW36674@ziepe.ca>
+References: <20201106170036.18713-1-logang@deltatee.com>
+ <20201106170036.18713-15-logang@deltatee.com>
+ <20201106172206.GS36674@ziepe.ca>
+ <b1e8dfce-d583-bed8-d04d-b7265a54c99f@deltatee.com>
+ <20201106174223.GU36674@ziepe.ca>
+ <2c2d2815-165e-2ef9-60d6-3ace7ff3aaa5@deltatee.com>
+ <20201106180922.GV36674@ziepe.ca>
+ <09885400-36f8-bc1d-27f0-a8adcf6104d4@deltatee.com>
 MIME-Version: 1.0
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
- <1597850436-116171-18-git-send-email-john.garry@huawei.com>
- <fe3dff7dae4494e5a88caffbb4d877bbf472dceb.camel@redhat.com>
- <385d5408-6ba2-6bb6-52d3-b59c9aa9c5e5@huawei.com> <193a0440eed447209c48bda042f0e4db102355e7.camel@redhat.com>
- <519e0d58-e73e-22ce-0ddb-1be71487ba6d@huawei.com> <d8fd51b11d5d54e6ec7e4e9a4f7dcc83f1215cd3.camel@redhat.com>
- <d4f86cccccc3bffccc4eda39500ce1e1fee2109a.camel@redhat.com>
- <7624d3fe1613f19af5c3a77f4ae8fe55@mail.gmail.com> <d1040c06-74ea-7016-d259-195fa52196a9@huawei.com>
-In-Reply-To: <d1040c06-74ea-7016-d259-195fa52196a9@huawei.com>
-From:   Sumit Saxena <sumit.saxena@broadcom.com>
-Date:   Sat, 7 Nov 2020 00:55:48 +0530
-Message-ID: <CAL2rwxoAAGQDud1djb3_LNvBw95YoYUGhe22FwE=hYhy7XOLSw@mail.gmail.com>
-Subject: Re: [PATCH v8 17/18] scsi: megaraid_sas: Added support for shared
- host tagset for cpuhotplug
-To:     John Garry <john.garry@huawei.com>
-Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        Qian Cai <cai@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        don.brace@microsemi.com, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>, dgilbert@interlog.com,
-        paolo.valente@linaro.org, Hannes Reinecke <hare@suse.de>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        esc.storagedev@microsemi.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
-        chenxiang66@hisilicon.com, luojiaxing@huawei.com,
-        Hannes Reinecke <hare@suse.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="0000000000009de48705b3752f3d"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09885400-36f8-bc1d-27f0-a8adcf6104d4@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---0000000000009de48705b3752f3d
-Content-Type: text/plain; charset="UTF-8"
+On Fri, Nov 06, 2020 at 11:20:05AM -0700, Logan Gunthorpe wrote:
+> 
+> 
+> On 2020-11-06 11:09 a.m., Jason Gunthorpe wrote:
+> >> Ah, hmm, yes. I guess the pages have to be hooked and returned to the
+> >> genalloc through free_devmap_managed_page(). 
+> > 
+> > That sounds about right, but in this case it doesn't need the VMA
+> > operations.
+> > 
+> >> Seems like it might be doable... but it will complicate things for
+> >> users that don't want to use the genpool (though no such users exist
+> >> upstream).
+> > 
+> > I would like to use this stuff in RDMA pretty much immediately and the
+> > genpool is harmful for those cases, so please don't make decisions
+> > that are tying thing to genpool
+> 
+> I certainly can't make decisions for code that isn't currently
+> upstream.
 
-On Wed, Nov 4, 2020 at 11:38 PM John Garry <john.garry@huawei.com> wrote:
->
-> On 04/11/2020 16:07, Kashyap Desai wrote:
-> >>>
-> >>> v5.10-rc2 is also broken here.
-> >>
-> >> John, Kashyap, any update on this? If this is going to take a while to fix
-> >> it
-> >> proper, should I send a patch to revert this or at least disable the
-> >> feature by
-> >> default for megaraid_sas in the meantime, so it no longer breaks the
-> >> existing
-> >> systems out there?
-> >
-> > I am trying to get similar h/w to try out. All my current h/w works fine.
-> > Give me couple of days' time.
-> > If this is not obviously common issue and need time, we will go with module
-> > parameter disable method.
-> > I will let you know.
->
-> Hi Kashyap,
->
-> Please also consider just disabling for this card, so any other possible
-> issues are unearthed on other cards. I don't have this card or any x86
-> machine to test it unfortunately to assist.
->
-> BTW, just to be clear, did you try the same .config as Qian Cai?
->
-> Thanks,
-> John
-I am able to hit the boot hang and similar kind of stack traces as
-reported by Qian with shared .config on x86 machine.
-In my case the system boots after a hang of 40-45 mins. Qian, is it
-true for you as well ?
-With module parameter -"host_tagset_enable=0", the issue is not seen.
-Below is snippet of the dmesg logs/traces which are observed during
-system bootup and after wait of 40-45 mins
-drives attached to megaraid_sas adapter are discovered:
+The rdma drivers are all upstream, what are you thinking about?
 
-========================================
-[ 1969.502913] INFO: task systemd-udevd:906 can't die for more than
-1720 seconds.
-[ 1969.597725] task:systemd-udevd   state:D stack:13456 pid:  906
-ppid:   858 flags:0x00000324
-[ 1969.597730] Call Trace:
-[ 1969.597734]  __schedule+0x263/0x7f0
-[ 1969.597737]  ? __lock_acquire+0x576/0xaf0
-[ 1969.597739]  ? wait_for_completion+0x7b/0x110
-[ 1969.597741]  schedule+0x4c/0xc0
-[ 1969.597743]  schedule_timeout+0x244/0x2e0
-[ 1969.597745]  ? find_held_lock+0x2d/0x90
-[ 1969.597748]  ? wait_for_completion+0xa6/0x110
-[ 1969.597750]  ? wait_for_completion+0x7b/0x110
-[ 1969.597752]  ? lockdep_hardirqs_on_prepare+0xd4/0x170
-[ 1969.597753]  ? wait_for_completion+0x7b/0x110
-[ 1969.597755]  wait_for_completion+0xae/0x110
-[ 1969.597757]  __flush_work+0x269/0x4b0
-[ 1969.597760]  ? init_pwq+0xf0/0xf0
-[ 1969.597763]  work_on_cpu+0x9c/0xd0
-[ 1969.597765]  ? work_is_static_object+0x10/0x10
-[ 1969.597768]  ? pci_device_shutdown+0x30/0x30
-[ 1969.597770]  pci_device_probe+0x197/0x1b0
-[ 1969.597773]  really_probe+0xda/0x410
-[ 1969.597776]  driver_probe_device+0xd9/0x140
-[ 1969.597778]  device_driver_attach+0x4a/0x50
-[ 1969.597780]  __driver_attach+0x83/0x140
-[ 1969.597782]  ? device_driver_attach+0x50/0x50
-[ 1969.597784]  ? device_driver_attach+0x50/0x50
-[ 1969.597787]  bus_for_each_dev+0x74/0xc0
-[ 1969.597789]  bus_add_driver+0x14b/0x1f0
-[ 1969.597791]  ? 0xffffffffc04fb000
-[ 1969.597793]  driver_register+0x66/0xb0
-[ 1969.597795]  ? 0xffffffffc04fb000
-[ 1969.597801]  megasas_init+0xe7/0x1000 [megaraid_sas]
-[ 1969.597803]  do_one_initcall+0x62/0x300
-[ 1969.597806]  ? do_init_module+0x1d/0x200
-[ 1969.597808]  ? kmem_cache_alloc_trace+0x296/0x2d0
-[ 1969.597811]  do_init_module+0x55/0x200
-[ 1969.597813]  load_module+0x15f2/0x17b0
-[ 1969.597816]  ? __do_sys_finit_module+0xad/0x110
-[ 1969.597818]  __do_sys_finit_module+0xad/0x110
-[ 1969.597820]  do_syscall_64+0x33/0x40
-[ 1969.597823]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[ 1969.597825] RIP: 0033:0x7f66340262bd
-[ 1969.597827] Code: Unable to access opcode bytes at RIP 0x7f6634026293.
-[ 1969.597828] RSP: 002b:00007ffca1011f48 EFLAGS: 00000246 ORIG_RAX:
-0000000000000139
-[ 1969.597831] RAX: ffffffffffffffda RBX: 000055f6720cf370 RCX: 00007f66340262bd
-[ 1969.597833] RDX: 0000000000000000 RSI: 00007f6634b9880d RDI: 0000000000000006
-[ 1969.597835] RBP: 00007f6634b9880d R08: 0000000000000000 R09: 00007ffca1012070
-[ 1969.597836] R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000000
-[ 1969.597838] R13: 000055f6720cce70 R14: 0000000000020000 R15: 0000000000000000
-[ 1969.597859]
-               Showing all locks held in the system:
-[ 1969.597862] 2 locks held by kworker/0:0/5:
-[ 1969.597863]  #0: ffff9af800194b38
-((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0x1e6/0x5e0
-[ 1969.597872]  #1: ffffbf3bc01f3e70
-((kfence_timer).work){+.+.}-{0:0}, at: process_one_work+0x1e6/0x5e0
-[ 1969.597890] 3 locks held by kworker/0:1/7:
-[ 1969.597960] 1 lock held by khungtaskd/643:
-[ 1969.597962]  #0: ffffffffa624cb60 (rcu_read_lock){....}-{1:2}, at:
-rcu_lock_acquire.constprop.54+0x0/0x30
-[ 1969.597982] 1 lock held by systemd-udevd/906:
-[ 1969.597983]  #0: ffff9af984a1c218 (&dev->mutex){....}-{3:3}, at:
-device_driver_attach+0x18/0x50
+> Ultimately, if you aren't using the genpool you will have to implement
+> your own mmap operation that somehow allocates the pages and your own
+> page_free hook. 
 
-[ 1969.598010] =============================================
+Sure, the mlx5 driver already has a specialized alloctor for it's BAR
+pages.
 
-[ 1983.242512] random: fast init done
-[ 2071.928411] sd 0:2:0:0: [sda] 1951399936 512-byte logical blocks:
-(999 GB/931 GiB)
-[ 2071.928480] sd 0:2:2:0: [sdc] 1756889088 512-byte logical blocks:
-(900 GB/838 GiB)
-[ 2071.928537] sd 0:2:1:0: [sdb] 285474816 512-byte logical blocks:
-(146 GB/136 GiB)
-[ 2071.928580] sd 0:2:0:0: [sda] Write Protect is off
-[ 2071.928625] sd 0:2:0:0: [sda] Mode Sense: 1f 00 00 08
-[ 2071.928629] sd 0:2:2:0: [sdc] Write Protect is off
-[ 2071.928669] sd 0:2:1:0: [sdb] Write Protect is off
-[ 2071.928706] sd 0:2:1:0: [sdb] Mode Sense: 1f 00 00 08
-[ 2071.928844] sd 0:2:2:0: [sdc] Mode Sense: 1f 00 00 08
-[ 2071.928848] sd 0:2:0:0: [sda] Write cache: disabled, read cache:
-enabled, doesn't support DPO or FUA
+> I also don't expect this to be going upstream in the near term so don't
+> get too excited about using it.
 
+I don't know, it is actually not that horrible, the GUP and IOMMU
+related changes are simpler than I expected
 
-================================
-
-I am working on it and need some time for debugging. BTW did anyone
-try "shared host tagset" patchset on some other adapter/s which are
-not really multiqueue at HW level
-but driver exposes multiple hardware queues(similar to megaraid_sas)
-with the .config shared by Qian ?
-
-Thanks,
-Sumit
-
---0000000000009de48705b3752f3d
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-ql5FIoyTBHkZa1rWro6Bk4flpRMhijfSWuh6VhRFBVtOaVOIgbD40WmJ+X89nCWPOICJWbN5AgMB
-AAGjggHQMIIBzDAOBgNVHQ8BAf8EBAMCBaAwgZ4GCCsGAQUFBwEBBIGRMIGOME0GCCsGAQUFBzAC
-hkFodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc3BlcnNvbmFsc2lnbjJzaGEy
-ZzNvY3NwLmNydDA9BggrBgEFBQcwAYYxaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL2dzcGVy
-c29uYWxzaWduMnNoYTJnMzBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYm
-aHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBEBgNVHR8E
-PTA7MDmgN6A1hjNodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzcGVyc29uYWxzaWduMnNoYTJn
-My5jcmwwJAYDVR0RBB0wG4EZc3VtaXQuc2F4ZW5hQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQUpzCt58hW
-0WfI/g8raLWKyEI8BS0wDQYJKoZIhvcNAQELBQADggEBABn1D0HuSsCyUahUkmwTypjdinst+Z+S
-4N5i6J49+CbquP1akYHRyf4Nd+F79uFZ42wiUHSnzifhaoecPU198OwVVGzru1s/xpRSYuoQAitN
-wDioUOV/qKD32mNeLn7RthZ9BIlaWfk08+23Hpk934W/ZCJiGJdx6ueHnAnqSNBf3RLgknqrexNh
-uUhYeznc3mlXj2g/lMjBSHKcYrBRlRwd8YalMCHZhPoNzKROm8YzvnaHvoqv4vDxTIsUrfXHnH/8
-/UU/NrpeqcPjOcwiL+eFvfSpDBTFCZl/9unc09yTueVQr3LWJHZYf5jAmZU7nBB+5pNPCa6CF+lk
-jNCOoNoxggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0gRzMC
-DEcQs2KoBVoYjBv2pDANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQg6lFYD5wJrkxH
-9MUZQW5knuc1PuG2b71LXUkaegCSqb8wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG
-9w0BCQUxDxcNMjAxMTA2MTkyNjE0WjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjALBglg
-hkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG9w0B
-AQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAFSr/S8jm64513HymrybVzDo6KZijIWu
-s3wEyKolVYjU/8P7eB9k4EQifGBWBWXt3vE0rK9W2mr1hgJCDeoT0w7Tyt1GY3srKbKS79/kWv+k
-LzizQxEZnJ8Towza40HNQ0gcQy12DGY2iw61SW4stHDk6U5n91ht8IYkfgMkUCbuRrHZN+u9bQim
-hobugOrrKc6WVD3Xhoqm7LIEOeXNqnjFHM5J+4/XR7C2+s3/CYTVoEOWlp6QS+OrfQNVkbCuZDhH
-zdZsGeIsFtZjrBT8EXAyUuI4ZIMLyptYefBBaraSzm1lS7X5OTMod3bBa2f2qyhi/PnG1FQEg5gj
-8tf8reI=
---0000000000009de48705b3752f3d--
+Jason
