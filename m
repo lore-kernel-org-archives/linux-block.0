@@ -2,126 +2,137 @@ Return-Path: <SRS0=ZSeo=EM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA05C388F2
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 043DEC2D0A3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:39:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 260CE22227
-	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:28:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AA4A2151B
+	for <linux-block@archiver.kernel.org>; Fri,  6 Nov 2020 17:39:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="ZP0R0Hzd"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="aVspDJwp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727499AbgKFR2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 12:28:16 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:58642 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727270AbgKFR2Q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 12:28:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=QpuHLB0GpYTnQrdJoCEWfsKDl3xh5PNClZ27s55U+do=; b=ZP0R0HzdgH1uFfEUZzzikuYDfI
-        zqaPSQGeQvgM5YjaFvhCmlSs4rN5X1m1sqlZV9ed6j0uJF7a1RS+fTwtp1gP1X9N8KodSiYvt+uPN
-        uZQKAE5qAr8FdL5Owfwzb8VEesIyBead7s8R6Zm9WHJN4vMTNGcM+ddbVw9gYc4myoSfcTyFWsqC7
-        47NWcc50emSaTQajUsHV0+gGGJfZIMPB5+TQg9V0LSTnPdPKecJnCqfC70vqTLUhWCaTf31rwFOlt
-        UmzKn/5wlKuw9Wdl7UBmStDMNhpka7cU6SP3l8+zi591j4n58kY7NS/qm8hOrSau9vRmLye1yHat0
-        4ObFWpcQ==;
-Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1kb5Wu-00036E-5n; Fri, 06 Nov 2020 10:28:05 -0700
-To:     Jason Gunthorpe <jgg@ziepe.ca>
+        id S1726176AbgKFRjf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 12:39:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46000 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726034AbgKFRjf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 12:39:35 -0500
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A47DC0613D3
+        for <linux-block@vger.kernel.org>; Fri,  6 Nov 2020 09:39:35 -0800 (PST)
+Received: by mail-qt1-x841.google.com with SMTP id i7so1317540qti.6
+        for <linux-block@vger.kernel.org>; Fri, 06 Nov 2020 09:39:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QqZ++Pt3MZPl0c26h7esX3kKVTLpDd4DLyuldQOeJ6E=;
+        b=aVspDJwpvtyG5+kighP26kbunhoVoDrk2g+dikuA78Pm3bA2qTEMgmEOIf1kZJzMIf
+         jREWUhSOExSA/q/FCxqA4XBVE24zI+bsJoB1MfEIxBjq2vdyDXVafteyCmFKOVp6mNFr
+         a+tx6++MRi2ULgDc9l1aIYs8bYmkHkHdREfE1OJi7rMzsOZFvHKvzXQ7XJqg4Rv2jtLq
+         /+Dlp7JoggqKZn8R6W1cCZQ0admWy+NkyCMZtOTh144o5mkYSgGm7bfVWOa4R1qrCUIm
+         0U96w1WKj0KdQqF8ogG0DBvSehQPHSPP+p8q7o2QpQF4H1UThgaq/hW1ayZpgvaa/xXc
+         nKQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QqZ++Pt3MZPl0c26h7esX3kKVTLpDd4DLyuldQOeJ6E=;
+        b=WnF+ilXlY41byAS6UtPCsYj4/K/BVkmleQ7gYcT4DYwpzVGhv35TAiSbhwiipuCbtN
+         XjeIqUYFL6Z21gvXOYai/nTqOHk64H/ffbyYkth1EyISps03QMoaEZUgISx0501vr5Ps
+         A9zjnl+AEqzarmqj5UgeOH/me45d3ovabUR9CwkrCjjrUaYb1k4HRb6HCfYxMRlrxAlI
+         pMX+AjcZXBMa7GYTS6KAaNjBQeBObvyE8SkAeuGdlDK/2ugbCDgMiI5oZ4QMw5TvMBIj
+         KmCKQwuIpvgiqerGyomxfbndp18MxORT61wN6+VUV1IIpHxRjMMuh+cmX8HwnCeTaprO
+         T/5A==
+X-Gm-Message-State: AOAM532uNWWic2WDlreZ6XutjMruV37Xeg3RdgSdST1MIrc9poYbkqMM
+        KOiYnmsspJ4t0feOltaV5M+5UQ==
+X-Google-Smtp-Source: ABdhPJwk/LVr/ux401xFB0f8tEBQvqxB/lNHOmPBnGlIZGn/taGrIczG0r9kVyPbYEVYIeCjEKrF7Q==
+X-Received: by 2002:ac8:1e84:: with SMTP id c4mr2651870qtm.340.1604684374450;
+        Fri, 06 Nov 2020 09:39:34 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id o19sm1032238qko.3.2020.11.06.09.39.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2020 09:39:33 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kb5i0-000zRk-Qy; Fri, 06 Nov 2020 13:39:32 -0400
+Date:   Fri, 6 Nov 2020 13:39:32 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Logan Gunthorpe <logang@deltatee.com>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
         linux-mm@kvack.org, iommu@lists.linux-foundation.org,
         Stephen Bates <sbates@raithlin.com>,
         Christoph Hellwig <hch@lst.de>,
         Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
         Ira Weiny <iweiny@intel.com>,
         John Hubbard <jhubbard@nvidia.com>,
         Don Dutile <ddutile@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
         Daniel Vetter <daniel.vetter@ffwll.ch>
+Subject: Re: [RFC PATCH 15/15] nvme-pci: Allow mmaping the CMB in userspace
+Message-ID: <20201106173932.GT36674@ziepe.ca>
 References: <20201106170036.18713-1-logang@deltatee.com>
- <20201106170036.18713-15-logang@deltatee.com>
- <20201106172206.GS36674@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <b1e8dfce-d583-bed8-d04d-b7265a54c99f@deltatee.com>
-Date:   Fri, 6 Nov 2020 10:28:00 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ <20201106170036.18713-16-logang@deltatee.com>
 MIME-Version: 1.0
-In-Reply-To: <20201106172206.GS36674@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.145.4
-X-SA-Exim-Rcpt-To: daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 14/15] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201106170036.18713-16-logang@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2020-11-06 10:22 a.m., Jason Gunthorpe wrote:
-> On Fri, Nov 06, 2020 at 10:00:35AM -0700, Logan Gunthorpe wrote:
->> Introduce pci_mmap_p2pmem() which is a helper to allocate and mmap
->> a hunk of p2pmem into userspace.
->>
->> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->>  drivers/pci/p2pdma.c       | 104 +++++++++++++++++++++++++++++++++++++
->>  include/linux/pci-p2pdma.h |   6 +++
->>  2 files changed, 110 insertions(+)
->>
->> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
->> index 9961e779f430..8eab53ac59ae 100644
->> +++ b/drivers/pci/p2pdma.c
->> @@ -16,6 +16,7 @@
->>  #include <linux/genalloc.h>
->>  #include <linux/memremap.h>
->>  #include <linux/percpu-refcount.h>
->> +#include <linux/pfn_t.h>
->>  #include <linux/random.h>
->>  #include <linux/seq_buf.h>
->>  #include <linux/xarray.h>
->> @@ -1055,3 +1056,106 @@ ssize_t pci_p2pdma_enable_show(char *page, struct pci_dev *p2p_dev,
->>  	return sprintf(page, "%s\n", pci_name(p2p_dev));
->>  }
->>  EXPORT_SYMBOL_GPL(pci_p2pdma_enable_show);
->> +
->> +struct pci_p2pdma_map {
->> +	struct kref ref;
->> +	struct pci_dev *pdev;
->> +	void *kaddr;
->> +	size_t len;
->> +};
+On Fri, Nov 06, 2020 at 10:00:36AM -0700, Logan Gunthorpe wrote:
+> Allow userspace to obtain CMB memory by mmaping the controller's
+> char device. The mmap call allocates and returns a hunk of CMB memory,
+> (the offset is ignored) so userspace does not have control over the
+> address within the CMB.
 > 
-> Why have this at all? Nothing uses it and no vm_operations ops are
-> implemented?
+> A VMA allocated in this way will only be usable by drivers that set
+> FOLL_PCI_P2PDMA when calling GUP. And inter-device support will be
+> checked the first time the pages are mapped for DMA.
+> 
+> Currently this is only supported by O_DIRECT to an PCI NVMe device
+> or through the NVMe passthrough IOCTL.
+> 
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>  drivers/nvme/host/core.c | 11 +++++++++++
+>  drivers/nvme/host/nvme.h |  1 +
+>  drivers/nvme/host/pci.c  |  9 +++++++++
+>  3 files changed, 21 insertions(+)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index f14316c9b34a..fc642aba671d 100644
+> +++ b/drivers/nvme/host/core.c
+> @@ -3240,12 +3240,23 @@ static long nvme_dev_ioctl(struct file *file, unsigned int cmd,
+>  	}
+>  }
+>  
+> +static int nvme_dev_mmap(struct file *file, struct vm_area_struct *vma)
+> +{
+> +	struct nvme_ctrl *ctrl = file->private_data;
+> +
+> +	if (!ctrl->ops->mmap_cmb)
+> +		return -ENODEV;
+> +
+> +	return ctrl->ops->mmap_cmb(ctrl, vma);
+> +}
 
-It's necessary to free the allocated p2pmem when the mapping is torn down.
+This needs to ensure that the VMA created is destroyed before the
+driver is unprobed - ie the struct pages backing the BAR memory is
+destroyed.
 
-> This is very inflexable, it would be better if this is designed like
-> io_remap_pfn where it just preps and fills the VMA, doesn't take
-> ownership of the entire VMA
+I don't see anything that synchronizes this in the nvme_dev_release()?
 
-If someone wants to manage their own P2P memory and create their own
-userspace mapping with vmf_insert_mixed they are free to do so. But this
-helper is specifically for users of pci_p2pdma_map_alloc(). I know you
-don't intend to use that but it doesn't make it any less valid.
+Many places do this by putting all the VMAs into an address space and
+zaping the address space when unprobing the driver to revoke the
+pages, but there is a tricky race here :\
 
-Logan
+https://lore.kernel.org/dri-devel/20201021125030.GK36674@ziepe.ca/
 
+Jason
