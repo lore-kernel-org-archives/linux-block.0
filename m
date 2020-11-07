@@ -2,133 +2,66 @@ Return-Path: <SRS0=Y6k2=EN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F9FC388F7
-	for <linux-block@archiver.kernel.org>; Sat,  7 Nov 2020 20:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE90C388F7
+	for <linux-block@archiver.kernel.org>; Sat,  7 Nov 2020 22:08:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 053D120885
-	for <linux-block@archiver.kernel.org>; Sat,  7 Nov 2020 20:14:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Td5JgPoj"
+	by mail.kernel.org (Postfix) with ESMTP id 0FF3920874
+	for <linux-block@archiver.kernel.org>; Sat,  7 Nov 2020 22:08:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1604786909;
+	bh=6Sd4LlhldpP03v6mDeNGZGPORSjZT3yNxlqALYWQwUc=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=N0Q0w4M8dCr7umaG+6FeNq4ofYbJSrpYBotO0cItYAxk8mZrwG/9+og5PlarjW3cN
+	 t1dJXJTPTkbyLT5ccDugloRq0uWB3YBEmHFzNca+KgFhoghm2PseG56Cf5B5I9YyZz
+	 RwGHwO0o7eTsKY1P3ErXhzTxZFkGOlBZ8Q+kRcO4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728634AbgKGUOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Nov 2020 15:14:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38392 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725836AbgKGUOE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Nov 2020 15:14:04 -0500
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE74C0613CF
-        for <linux-block@vger.kernel.org>; Sat,  7 Nov 2020 12:14:04 -0800 (PST)
-Received: by mail-pl1-x644.google.com with SMTP id k7so2587968plk.3
-        for <linux-block@vger.kernel.org>; Sat, 07 Nov 2020 12:14:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=Br3/u4cDGf9o3wvMmd+gUG91KAUJPY1IXRRmcNYch5w=;
-        b=Td5JgPojuQP4QfrgNydD8OcfnWLFgd+X85sBoVvSWMF15J+JcnRTZ6n6su+UGVSwDi
-         37tcW8rfX/w4hjzudJYs+Sz+68LnXl3i8TrvoAi9ceW6auEWQJrdHLuL+fb5zaweTSNH
-         8iGtcbncvCR2fbSqaKiX6Dii0iNytajm//EKA1+O1U3SbNAXxW6Ef0dIZ3lhW0xFhc1p
-         Q/E+SQZK3XYXt+h4QyA1o8xdlIoTYaB+1ccY/pF6KDDFaa4aAKebCUgVMS0gVOBfHPgj
-         nBMLfLU0xDRewmRImMtLT+5TytJEU79kk70U8hgPa12roEd8O18wPq7Xc4p+zCkj+4Vf
-         aE+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=Br3/u4cDGf9o3wvMmd+gUG91KAUJPY1IXRRmcNYch5w=;
-        b=TRje3y4MC+Qcx4Hju59D08q/PDyLu/n9Qxcwfe/HLEWo+7CMqSehAgqXIyi+wgoF5S
-         1VYntUHR5YQDPy/uaHs+N6YOQPrgvJKR3TCOKpiO0Wfnqdk6qQU2tB1xByjDJ3A+NCa+
-         exMvv0BGTd9Ol77QnrCnLaohFjVJAO88dQRUFPTIvBlnYWUg6N0ZTYYq5WV97K9dOtoS
-         uD7WrFdyeq+qcHIbt1e0b8M9gk4K0vdshrkUWdLfdRy/NRR3CH/F2GfTMikwBIwCdoHs
-         ap7Gr5qLOH1VtqMFUCBJ/iQZ6SGyPAncUKmf8fBgwEBufZbfapY692/KRSN9EJvkPK+N
-         Nthw==
-X-Gm-Message-State: AOAM5318uBy4q5UAyQ4OIFZVEPi4pS7bxgovx4C9MP1+ZJrmcszauarp
-        rkXhuixuA80x+zmuTn034PejvBihD/7ZUA==
-X-Google-Smtp-Source: ABdhPJzGdKFPdVjRrpllSHeJUTYAfIgnZ/GXmi93OHG+uOiDrBZEaKzZELDwr7rZRzVosJ8g4xFvqQ==
-X-Received: by 2002:a17:90a:bb18:: with SMTP id u24mr5624476pjr.85.1604780043913;
-        Sat, 07 Nov 2020 12:14:03 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id 22sm6712771pjw.34.2020.11.07.12.14.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Nov 2020 12:14:03 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.10-rc
-Message-ID: <bdeefa97-9ec3-cac8-3e6b-dd912d0c0c33@kernel.dk>
-Date:   Sat, 7 Nov 2020 13:14:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1728736AbgKGWI2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 Nov 2020 17:08:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50232 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725838AbgKGWI2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 7 Nov 2020 17:08:28 -0500
+Subject: Re: [GIT PULL] Block fixes for 5.10-rc
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604786907;
+        bh=6Sd4LlhldpP03v6mDeNGZGPORSjZT3yNxlqALYWQwUc=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=o1vr8BrHyoy4vaLyccs8361OwHXvdfHGrDbUQG90G92okj2gQaQY4g7jxT6Ajmjzc
+         5NT9IKPHx0HmBjUITi139dYKu5TNQ05KOZUzP4SNDP+kNxJ3987a4QQoVJ1dO3K6Ks
+         Ka6GpKr3Zdi4I9KjkUvVfYIzHTsvYsiuvEveTZLI=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <bdeefa97-9ec3-cac8-3e6b-dd912d0c0c33@kernel.dk>
+References: <bdeefa97-9ec3-cac8-3e6b-dd912d0c0c33@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <bdeefa97-9ec3-cac8-3e6b-dd912d0c0c33@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.10-2020-11-07
+X-PR-Tracked-Commit-Id: e1777d099728a76a8f8090f89649aac961e7e530
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4429f14aeea979b63bcafdcf9f09677fcf8fd475
+Message-Id: <160478690793.18289.14124482235571299779.pr-tracker-bot@kernel.org>
+Date:   Sat, 07 Nov 2020 22:08:27 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+The pull request you sent on Sat, 7 Nov 2020 13:14:02 -0700:
 
-A few fixes that should make it into this release:
+> git://git.kernel.dk/linux-block.git tags/block-5.10-2020-11-07
 
-- NVMe pull request from Christoph:
-	- revert a nvme_queue size optimization (Keith Bush)
-	- fabrics timeout races fixes (Chao Leng and Sagi Grimberg)"
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4429f14aeea979b63bcafdcf9f09677fcf8fd475
 
-- null_blk zone locking fix (Damien)
-
-Please pull!
-
-
-The following changes since commit 3cea11cd5e3b00d91caf0b4730194039b45c5891:
-
-  Linux 5.10-rc2 (2020-11-01 14:43:51 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.10-2020-11-07
-
-for you to fetch changes up to e1777d099728a76a8f8090f89649aac961e7e530:
-
-  null_blk: Fix scheduling in atomic with zoned mode (2020-11-06 09:36:42 -0700)
-
-----------------------------------------------------------------
-block-5.10-2020-11-07
-
-----------------------------------------------------------------
-Chao Leng (3):
-      nvme: introduce nvme_sync_io_queues
-      nvme-rdma: avoid race between time out and tear down
-      nvme-tcp: avoid race between time out and tear down
-
-Damien Le Moal (1):
-      null_blk: Fix scheduling in atomic with zoned mode
-
-Jens Axboe (1):
-      Merge tag 'nvme-5.10-2020-11-05' of git://git.infradead.org/nvme into block-5.10
-
-Keith Busch (1):
-      Revert "nvme-pci: remove last_sq_tail"
-
-Sagi Grimberg (2):
-      nvme-rdma: avoid repeated request completion
-      nvme-tcp: avoid repeated request completion
-
- drivers/block/null_blk.h       |  2 +-
- drivers/block/null_blk_zoned.c | 47 ++++++++++++++++++++++++++++--------------
- drivers/nvme/host/core.c       |  8 +++++--
- drivers/nvme/host/nvme.h       |  1 +
- drivers/nvme/host/pci.c        | 23 +++++++++++++++++----
- drivers/nvme/host/rdma.c       | 14 +++----------
- drivers/nvme/host/tcp.c        | 16 ++++----------
- 7 files changed, 65 insertions(+), 46 deletions(-)
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
