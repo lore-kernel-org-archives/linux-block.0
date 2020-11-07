@@ -2,117 +2,93 @@ Return-Path: <SRS0=Y6k2=EN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF5CC2D0A3
-	for <linux-block@archiver.kernel.org>; Sat,  7 Nov 2020 00:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D71C2D0A3
+	for <linux-block@archiver.kernel.org>; Sat,  7 Nov 2020 00:17:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D17E20867
-	for <linux-block@archiver.kernel.org>; Sat,  7 Nov 2020 00:15:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45CDB20728
+	for <linux-block@archiver.kernel.org>; Sat,  7 Nov 2020 00:17:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="aokkElWM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9HKmXRK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728130AbgKGAPC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Nov 2020 19:15:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726987AbgKGAPA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Nov 2020 19:15:00 -0500
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F745C0613D2
-        for <linux-block@vger.kernel.org>; Fri,  6 Nov 2020 16:14:59 -0800 (PST)
-Received: by mail-qt1-x844.google.com with SMTP id g17so2098580qts.5
-        for <linux-block@vger.kernel.org>; Fri, 06 Nov 2020 16:14:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2xP+5n8avN9R0PMRHtfY/hU7jf10h4hT8Klf4TvQEgQ=;
-        b=aokkElWMyWDPsBa6alzqFjXX6Ty/GtCdSx9WukymLV2/BbaYYEQkA6h6NtXkVdapG2
-         f4KRlQs9Y+5DAc9+pE/HHKpJIyuCn91sXpwCSZ+08lhM8dAiFiLN7V2xrbpk6hfNSKic
-         ieoBgAnzjzjw2iZmefkEtA4fme7kItwUr5LmWc4Urv+NDQjlRSC80EXdjXFB3UnTz0qc
-         xUHsKwFfqKXXKxkjKflCvn5HeQw2iywmUCXpbij/QRJ/D8iwlPNvI/Ibqockn0S2v+qQ
-         EoTvzw1G3AJLPsWVsVolt0ALyaAOomLE+whBhiXSdjlB8hbwuoItdTWe41htAX37ZvKD
-         VHSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2xP+5n8avN9R0PMRHtfY/hU7jf10h4hT8Klf4TvQEgQ=;
-        b=ohKKZXGsgRm+iVi4Sczgle+9c/ULu2hgF1BnPON5ASbN7q83x3BBsQnHcmqm1oKLYw
-         rbpCXdjxNv8OPqoUzWP/ijlnAhNlpKe3peAoc7sucQH1SwsiwwdmwSBjWthT188HVcF9
-         3RxVZRneZZeGm+hRDrl1DDQnPgoQZPb9xzRv1VpkuRktNQ4QQN5mjd0EhLQHmDH58xAB
-         3On4WVfDnFxRsGoXslqUT7QI2j0W5+0Tnzs66MgIp6EzQXcfnWDH0C4N40Y1p4bztJxY
-         xfY1+/znCtDGVQ0EXy+8nWA5GTBIlaTM+lDmeCAdwZAQkZdLstEN+NjDa47EfO5D41v9
-         7Jsg==
-X-Gm-Message-State: AOAM531PFr0bIHVMjAJ/7AM/hFlHZvxqUoTTvu2KT0sw2fLMwYBqOstK
-        i8lkQ9ztgJog7h6nmjZyHBmnEg==
-X-Google-Smtp-Source: ABdhPJxMxLKgSiQ4x1Of97Fg4BcrbjDaTMOumnt9gw+omdxttGmxoTEsM80CNgLqS0LcZZvrtkPZNw==
-X-Received: by 2002:aed:2c02:: with SMTP id f2mr4176029qtd.48.1604708098335;
-        Fri, 06 Nov 2020 16:14:58 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id u5sm1592838qtg.57.2020.11.06.16.14.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2020 16:14:57 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kbBsf-0015Rr-2V; Fri, 06 Nov 2020 20:14:57 -0400
-Date:   Fri, 6 Nov 2020 20:14:57 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        Ira Weiny <iweiny@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>
-Subject: Re: [RFC PATCH 14/15] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <20201107001457.GB244516@ziepe.ca>
-References: <20201106172206.GS36674@ziepe.ca>
- <b1e8dfce-d583-bed8-d04d-b7265a54c99f@deltatee.com>
- <20201106174223.GU36674@ziepe.ca>
- <2c2d2815-165e-2ef9-60d6-3ace7ff3aaa5@deltatee.com>
- <20201106180922.GV36674@ziepe.ca>
- <09885400-36f8-bc1d-27f0-a8adcf6104d4@deltatee.com>
- <20201106193024.GW36674@ziepe.ca>
- <03032637-0826-da76-aec2-121902b1c166@deltatee.com>
- <20201106195341.GA244516@ziepe.ca>
- <e6a99d54-b33a-0df1-ee33-4aa7a70124a6@deltatee.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e6a99d54-b33a-0df1-ee33-4aa7a70124a6@deltatee.com>
+        id S1728079AbgKGARX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Nov 2020 19:17:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26050 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728075AbgKGARX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Nov 2020 19:17:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604708242;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v6CWDfxUrEMSgCPHrZBAxJY/9eFy91aUYMF539q1D3E=;
+        b=T9HKmXRKe67pbFsaCcTAW104pUN17vEURRQuRd012PoMLKujOrSkY1QvTfySt1rTjy1QLh
+        ocGz4I9Inl+G75ZIc76RnBcQiwTT+g2L4NMQYz5kp4NO5g1qyuXD2ACQp1B4NaB/V4if+F
+        qNvwjUjk6mZt/jFjZePpaRK9C/v+09s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-SaysXiQwMqSg95MfWo-BJA-1; Fri, 06 Nov 2020 19:17:18 -0500
+X-MC-Unique: SaysXiQwMqSg95MfWo-BJA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30546185A0D2;
+        Sat,  7 Nov 2020 00:17:15 +0000 (UTC)
+Received: from ovpn-66-140.rdu2.redhat.com (ovpn-66-140.rdu2.redhat.com [10.10.66.140])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3414A5C1BD;
+        Sat,  7 Nov 2020 00:17:09 +0000 (UTC)
+Message-ID: <aaf849d38ca3cdd45151ffae9b6a99fe6f6ea280.camel@redhat.com>
+Subject: Re: [PATCH v8 17/18] scsi: megaraid_sas: Added support for shared
+ host tagset for cpuhotplug
+From:   Qian Cai <cai@redhat.com>
+To:     Sumit Saxena <sumit.saxena@broadcom.com>,
+        John Garry <john.garry@huawei.com>
+Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        don.brace@microsemi.com, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>, dgilbert@interlog.com,
+        paolo.valente@linaro.org, Hannes Reinecke <hare@suse.de>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        esc.storagedev@microsemi.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
+        chenxiang66@hisilicon.com, luojiaxing@huawei.com,
+        Hannes Reinecke <hare@suse.com>
+Date:   Fri, 06 Nov 2020 19:17:08 -0500
+In-Reply-To: <CAL2rwxoAAGQDud1djb3_LNvBw95YoYUGhe22FwE=hYhy7XOLSw@mail.gmail.com>
+References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
+         <1597850436-116171-18-git-send-email-john.garry@huawei.com>
+         <fe3dff7dae4494e5a88caffbb4d877bbf472dceb.camel@redhat.com>
+         <385d5408-6ba2-6bb6-52d3-b59c9aa9c5e5@huawei.com>
+         <193a0440eed447209c48bda042f0e4db102355e7.camel@redhat.com>
+         <519e0d58-e73e-22ce-0ddb-1be71487ba6d@huawei.com>
+         <d8fd51b11d5d54e6ec7e4e9a4f7dcc83f1215cd3.camel@redhat.com>
+         <d4f86cccccc3bffccc4eda39500ce1e1fee2109a.camel@redhat.com>
+         <7624d3fe1613f19af5c3a77f4ae8fe55@mail.gmail.com>
+         <d1040c06-74ea-7016-d259-195fa52196a9@huawei.com>
+         <CAL2rwxoAAGQDud1djb3_LNvBw95YoYUGhe22FwE=hYhy7XOLSw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 06, 2020 at 01:03:26PM -0700, Logan Gunthorpe wrote:
-> I don't think a function like that will work for the p2pmem use case. In
-> order to implement proper page freeing I expect I'll need a loop around
-> the allocator and vm_insert_mixed()... Something roughly like:
-> 
-> for (addr = vma->vm_start; addr < vma->vm_end; addr += PAGE_SIZE) {
->         vaddr = pci_alloc_p2pmem(pdev, PAGE_SIZE);
-> 	ret = vmf_insert_mixed(vma, addr,
->   		       __pfn_to_pfn_t(virt_to_pfn(vaddr), PFN_DEV | PFN_MAP));
-> }
-> 
-> That way we can call pci_free_p2pmem() when a page's ref count goes to
-> zero. I suspect your use case will need to do something similar.
+On Sat, 2020-11-07 at 00:55 +0530, Sumit Saxena wrote:
+> I am able to hit the boot hang and similar kind of stack traces as
+> reported by Qian with shared .config on x86 machine.
+> In my case the system boots after a hang of 40-45 mins. Qian, is it
+> true for you as well ?
+I don't know. I had never waited for that long.
 
-Yes, but I would say the pci_alloc_p2pmem() layer should be able to
-free pages on a page-by-page basis so you don't have to do stuff like
-the above.
-
-There is often a lot of value in having physical contiguous addresses,
-so allocating page by page as well seems poor.
-
-Jason
