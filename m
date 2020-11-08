@@ -2,311 +2,113 @@ Return-Path: <SRS0=4/Ig=EO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C682EC55178
-	for <linux-block@archiver.kernel.org>; Sun,  8 Nov 2020 01:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C24EC388F9
+	for <linux-block@archiver.kernel.org>; Sun,  8 Nov 2020 08:47:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DCE02151B
-	for <linux-block@archiver.kernel.org>; Sun,  8 Nov 2020 01:09:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3C13206E3
+	for <linux-block@archiver.kernel.org>; Sun,  8 Nov 2020 08:47:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="W67otHr1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726053AbgKHBJ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Nov 2020 20:09:58 -0500
-Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:37861 "EHLO
-        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726043AbgKHBJ6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 7 Nov 2020 20:09:58 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UEYXK2x_1604797793;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UEYXK2x_1604797793)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sun, 08 Nov 2020 09:09:54 +0800
-Subject: Re: [dm-devel] [RFC 0/3] Add support of iopoll for dm device
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, haoxu@linux.alibaba.com,
-        io-uring@vger.kernel.org
-References: <20201020065420.124885-1-jefflexu@linux.alibaba.com>
- <20201021203906.GA10896@redhat.com>
- <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
- <20201026185334.GA8463@redhat.com>
- <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
- <20201102152822.GA20466@redhat.com>
- <f165f38a-91d1-79aa-829d-a9cc69a5eee6@linux.alibaba.com>
- <20201104150847.GB32761@redhat.com>
- <2c5dab21-8125-fcdf-078e-00a158c57f43@linux.alibaba.com>
- <20201106174526.GA13292@redhat.com>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <23c73ad7-23e3-3172-8f0e-3c15e0fa5a87@linux.alibaba.com>
-Date:   Sun, 8 Nov 2020 09:09:53 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+        id S1726144AbgKHIrQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Nov 2020 03:47:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41666 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726115AbgKHIrP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Nov 2020 03:47:15 -0500
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47A18C0613CF
+        for <linux-block@vger.kernel.org>; Sun,  8 Nov 2020 00:47:14 -0800 (PST)
+Received: by mail-pj1-x1044.google.com with SMTP id w20so1672186pjh.1
+        for <linux-block@vger.kernel.org>; Sun, 08 Nov 2020 00:47:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/Nt8PyG6XTzRj0oeg+Tq6GJQjN/jJVl2VwJ8IDyOvio=;
+        b=W67otHr1Qgxg4hXBKhc7+ztKmaSqm6uKNZ/+8gtNzSPPsV2yYlFa63NUTqkqxg6WVZ
+         97TIxSxjsSKjXhFRWnVfhkaML6ksuUGnLAmomQxRIFraQgWGib/iCuXVCn3PRkcV6p9u
+         +AumSbpl26niIs9GGmlLUd4/ZyZcxj+hzoiy5TSxHPj1BrqbayC6IgRHSr5I8H0Qo0+b
+         Nzqa1EV/8lm3onHz+JNlejZrsCwncId3H6EMmcxWMQxyxELVK/lENLP7nsvqTdTJziIP
+         TQMiDssfdBHBFnNQceZ5zCbSZ8kxoeHED0kyZC4K+XYapRNhMdcq/1wkpSgxlovSEgxa
+         Jr/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/Nt8PyG6XTzRj0oeg+Tq6GJQjN/jJVl2VwJ8IDyOvio=;
+        b=VRXlqc4xEhrCvLFMNncfPo49XzdUK/Mg5uKix8JEa5Iw5+ehgIKWnStHfa9MTJF/VE
+         dZyoyzQJTStoGqmIUP7COs/vK8m2C22aeTpx1bqfFu3SrKbuOAFIytiZrOaCg9VB6L7i
+         8B2fNP4YdEreKdUIg8yA/2HM2sVIPHdLmgAEPJ0szFgABuGntnhtRTaH/2rq2ajUZSW9
+         uwzAmkjBBNl4GSfAn2J/gtfDs/gZeKQ0Lad6CtXmoRMpB3qbentPBx92z4nrwtvwTAdU
+         WuJHs72ghlgXdNih+ehCxTbk7XLx13rMyqFdRgIZ8xgzLSfw36+Y9x4pRzVMUXO86Adb
+         2k4w==
+X-Gm-Message-State: AOAM532/dAIkTnQLiRtkPy0yQvZf7WvyQlpc7AJJk2K9YLsdw5qHJRhm
+        AnChg0CJG8TzV2qKncNShGn2Md1S545uyYBj
+X-Google-Smtp-Source: ABdhPJwbAl3DdZhSyIwBG8RUNdjCerhPVKKKD9oAALXRcKYb7S4HxP6T66Fh9TjKA9uY2or6AUT0Ag==
+X-Received: by 2002:a17:902:bd05:b029:d6:f041:f5b with SMTP id p5-20020a170902bd05b02900d6f0410f5bmr8447671pls.9.1604825233633;
+        Sun, 08 Nov 2020 00:47:13 -0800 (PST)
+Received: from houpudeMacBook-Pro.local ([240e:b1:e401:4::9])
+        by smtp.gmail.com with ESMTPSA id x123sm7641844pfb.212.2020.11.08.00.47.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Nov 2020 00:47:13 -0800 (PST)
+Subject: Re: [PATCH v3 0/2] nbd: improve timeout handling and a fix
+To:     axboe@kernel.dk
+Cc:     josef@toxicpanda.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+References: <20200930032350.3936-1-houpu@bytedance.com>
+From:   Hou Pu <houpu@bytedance.com>
+Message-ID: <e0f31dec-fa4b-11d5-a784-9e661e2c054f@bytedance.com>
+Date:   Sun, 8 Nov 2020 16:46:50 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
  Gecko/20100101 Thunderbird/68.12.1
 MIME-Version: 1.0
-In-Reply-To: <20201106174526.GA13292@redhat.com>
+In-Reply-To: <20200930032350.3936-1-houpu@bytedance.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On 11/7/20 1:45 AM, Mike Snitzer wrote:
-> On Thu, Nov 05 2020 at  9:51pm -0500,
-> JeffleXu <jefflexu@linux.alibaba.com> wrote:
->
->> On 11/4/20 11:08 PM, Mike Snitzer wrote:
->>>> I'm doubted if this should be implemented in block layer like:
->>>>
->>>> ```
->>>>
->>>> struct bio {
->>>>
->>>>      ...
->>>>
->>>>      struct list_head  cookies;
->>>>
->>>> };
->>>>
->>>> ```
->>>>
->>>> After all it's only used by bio-based queue, or more specifically
->>>> only dm device currently.
->>> I do think this line of work really should be handled in block core
->>> because I cannot see any reason why MD or bcache or whatever bio-based
->>> device wouldn't want the ability to better support io_uring (with IO
->>> poll).
->>>
->>>> Another design I can come up with is to maintain a global data
->>>> structure for the very beginning
->>>> original bio. Currently the blocking point is that now one original
->>>> bio to the dm device (@bio of dm_submit()) can correspond to multiple
->>>> dm_io and thus we have nowhere to place the @cookies list.
->>> Yes, and that will always be the case.  We need the design to handle an
->>> arbitrary sprawl of splitting from a given bio.  The graph of bios
->>> resulting from that fan-out needs to be walked at various levels -- be
->>> it the top-level original bio's submit_bio() returned cookie or some
->>> intermediate point in the chain of bios.
->>>
->>> The problem is the lifetime of the data structure created for a given
->>> split bio versus layering boundaries (that come from block core's
->>> simplistic recursion via bio using submit_bio).
->>>
->>>> Now we have to maintain one data structure for every original bio,
->>>> something like
->>>>
->>>> ```
->>>>
->>>> struct dm_poll_instance {
->>>>
->>>>      ...
->>>>
->>>>      struct list_head cookies;
->>>>
->>>> };
->>>>
->>>> ```
->>> I do think we need a hybrid where at the point of recursion we're able
->>> to make the associated data structure available across the recursion
->>> boundary so that modeling the association in a chain of split bios is
->>> possible. (e.g. struct dm_poll_data or dm_poll_instance as you named it,
->>> _but_ that struct definition would live in block core, but would be part
->>> of per-bio-data; so 'struct blk_poll_data' is more logical name when
->>> elevated to block core).
->>>
->>> It _might_ be worthwhile to see if a new BIO_ flag could be added to
->>> allow augmenting the bio_split + bio_chain pattern to also track this
->>> additional case of carrying additional data per-bio while creating
->>> bio-chains.  I may not be clear yet, said differently: augmenting
->>> bio_chain to not only chain bios, but to _also_ thread/chain together
->>> per-bio-data that lives within those chained bios.  SO you have the
->>> chain of bios _and_ the chain of potentially opaque void * that happens
->>> to point to a list head for a list of 'struct blk_poll_data'.
->>>
->>> Does that make sense?
->>
->> I'm doubted if it really makes sense to maintain a *complete* bio
->> chain across the recursive
->>
->> call boundary.
->>
->>
->> Considering the following device stack:
->>
->> ```
->>
->>                                    dm0
->>
->>          dm1                   dm2           dm3
->>
->> nvme0  nvme1          ....               ....
->>
->> ```
->>
->>
->> We have the following bio graph (please let me know if it's wrong or
->> the image can't display)
->>
->>
->> For example, for dm1 there are three bios containing valid cookie in
->> the end, that is
->>
->> bio 9/10/11. We only need to insert the corresponding blk_poll_data
->> (containing
->>
->> request_queue, cookie, etc) of these three bios into the very
->> beginning original
->>
->> bio (that is bio0). Of course we can track all the sub-bios down
->> through the device
->>
->> stack, layer by layer, e.g.,
->>
->> - get bio 1/2/3 from bio 0
->>
->> - get bio 4 from bio 3
->>
->> - finally get bio 9 from bio 4
->>
->> But I'm doubted if it's overkill to just implement the iopoll.
->>
->>
->> Another issue still unclear is that, if we should implement the
->> iopoll in a recursive way.
->>
->> In a recursive way, to poll dm 0, we should poll all its
->> sub-devices, that is, bio 4/5/7/8.
->>
->> Oppositely we can insert only the bottom bio (bio 9/10/11 which have
->> valid cookie) at
->>
->> the very beginning (at submit_bio() phase), and to poll dm 0, we
->> only need to poll bio 9/10/11.
-> I feel we need the ability to walk the entire graph and call down to
-> next level.  The lowest level would be what you call a "valid cookie"
-> that blk-mq returned.  But the preceding cookies need to be made valid
-> and used when walking the graph (from highest to lowest) and calling
-> down to the underlying layers.
->
->>
->> To implement this non-recursive design, we can add a field in struct bio
->>
->> ```
->>
->> struct bio {
->>
->>      ...
->>
->>      struct bio *orig;
->>
->> }
->>
->> ```
->>
->> @orig points to the original bio inputted into submit_bio(), that is, bio 0.
->>
->>
->> @orig field is transmitted through bio splitting.
->>
->> ```
->>
->> bio_split()
->>
->>      split->orig = bio->orig ? : bio
->>
->>
->> dm.c: __clone_and_map_data_bio
->>
->>      clone->orig = bio->orig ? : bio
->>
->> ```
->>
->>
->> Finally bio 9/10/11 can be inserted into bio 0.
->>
->> ```
->>
->> blk-mq.c: blk_mq_submit_bio
->>
->>      if (bio->orig)
->>
->>          init blk_poll_data and insert it into bio->orig's @cookies list
->>
->> ```
-> If you feel that is doable: certainly give it a shot.
 
-Make sense.
+On 2020/9/30 11:23 AM, Hou Pu wrote:
+> Patch #1 is a fix. Patch #2 is trying to improve io timeout
+> handling.
+> 
+> Thanks,
+> Hou
+> 
+> v3 changes:
+> * Add 'Reviewed-by: Josef Bacik <josef@toxicpanda.com>' in patch #2.
 
-> But it is not clear to me how you intend to translate from cookie passed
-> in to ->blk_poll hook (returned from submit_bio) to the saved off
-> bio->orig.
->
-> What is your cookie strategy in this non-recursive implementation?  What
-> will you be returning?  Where will you be storing it?
+Hi Jens,
+Sorry to bother. Emmm, It would be great to pick up these 2 patches
+into the upstream. Could you give a helping hand?
 
-Actually I think it's a common issue to design the cookie returned by 
-submit_bio() whenever
-
-it's implemented in a recursive or non-recursive way. After all you need 
-to translate the
-
-returned cookie to the original bio even if it's implemented in a 
-recursive way as you
-
-described. Or how could you walk through the bio graph when the returned 
-cookie is
-
-only 'unsigned int' type?
-
-
-How about this:
-
-
-```
-
-typedef uintptr_t blk_qc_t;
-
-```
-
-
-or something like union
-
-```
-
-typedef union {
-
-     unsigned int cookie;
-
-     struct bio *orig; // the original bio of submit_bio()
-
-} blk_qc_t;
-
-```
-
-
-When serving for blk-mq, the integer part of blk_qc_t is used and it 
-stores the valid cookie,
-
-while it stores a pointer to the original bio when serving bio-based device.
-
-
-By the way, would you mind sharing your plan and progress on this work, 
-I mean, supporting
-
-iopoll for dm device. To be honest, I don't want to re-invent the wheel 
-as you have started on
-
-this work, but I do want to participate in somehow. Please let me know 
-if there's something
-
-I could do here.
-
-
--- 
 Thanks,
-Jeffle
+Hou
 
+> 
+> v2 changes:
+> * Add 'Reviewed-by: Josef Bacik <josef@toxicpanda.com>' in patch #1.
+> * Original patch #2 is dropped.
+> * Keep the behavior same as before when we don't set a .timeout
+> and num_connections > 1.
+> * Coding style fixes.
+> 
+> Hou Pu (2):
+>    nbd: return -ETIMEDOUT when NBD_DO_IT ioctl returns
+>    nbd: introduce a client flag to do zero timeout handling
+> 
+>   drivers/block/nbd.c      | 33 ++++++++++++++++++++++++++++-----
+>   include/uapi/linux/nbd.h |  4 ++++
+>   2 files changed, 32 insertions(+), 5 deletions(-)
+> 
