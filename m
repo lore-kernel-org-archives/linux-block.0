@@ -2,99 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5CCC388F7
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 16:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A6B8C2D0A3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 17:31:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7858B216C4
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 16:50:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7A11216C4
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 17:31:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="ThtDTaP+"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Pu4M0Lfg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730801AbgKIQuQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Nov 2020 11:50:16 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:33068 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730773AbgKIQuQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 11:50:16 -0500
+        id S1731754AbgKIRbC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Nov 2020 12:31:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34910 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731467AbgKIRbB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 12:31:01 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C69AFC0613CF
+        for <linux-block@vger.kernel.org>; Mon,  9 Nov 2020 09:31:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=JvTSJOBJXMYeKQM3WvNBTHeii6rtMfOVYOuXeE1KNJE=; b=ThtDTaP+0JSTSqxTpv0Wbo5rpZ
-        iRui8AXvdDo2GGy2jD+Ihq9bjJnDiDzsI2eDLeMfjQgtCqgG1tvLOdsfhRmNEUO5jfT5M0MI5pI2v
-        q2scQ0uSLY0gF95SrT5uiioU6950uU8eKRlO3IC5Z9K0t/8xAxKw/BHncD9WkCSO21vni9bfdfdjX
-        Ln7KngxHrH+R5I2NkjQEaqpyQ8667dJ8gO+usI96NSRpENPnyhncaujMAMnPoIfhN4BFg8hdAnZFw
-        mUlKnwOWo6dpdcffw7/1fMcc6qlFJ5qgEkOsQqBOUl2OSNvLl4XkpF9pd5ChHmt9ndYzbgPOuwY5t
-        OGbul4GA==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1kcAMk-00013k-Ea; Mon, 09 Nov 2020 09:50:03 -0700
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Ira Weiny <iweiny@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>
-References: <20201106170036.18713-1-logang@deltatee.com>
- <20201106170036.18713-16-logang@deltatee.com>
- <20201109150326.GA2221592@dhcp-10-100-145-180.wdc.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <e718b81f-9cb8-dfe8-b1a6-ebb79f302732@deltatee.com>
-Date:   Mon, 9 Nov 2020 09:50:00 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=QXTsp1tlKAI6ByHHFT44pQ9qFbymesTDA4cZ1owCOag=; b=Pu4M0Lfg7btzDIdiEBLzZHHgG5
+        0bEcun9hWz6zQS0rddvf3V42lTnfO6XKX6SRMmscdkzPrdBLe3TJP4eTxC+7XoIq/x8WbJ4ewrFJy
+        WG/+2+55/vKoa6xTttYBNA+VkBFq5A/R2lQ9ac7KlaD94c/noLBykOnXF02SOoDj8P+BJVeIdg5Ft
+        pWvKnV1oQ2aJ/Bn0CGw3/f+skAv8FODPd3BVTs254IKR0qv9q6J6EvKgXzHjw42VZMPnu5H4YGW1w
+        lAmLajOIq7fhjpxAL9KJknc4piaLgu2M5COXtXUxyi1ZHxeeth1sj1EmzO6JVL3rudCxQE9FJLxUN
+        gTR2OmlQ==;
+Received: from [2001:4bb8:180:6600:e0a4:2604:c520:8624] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kcB0N-00056p-Og; Mon, 09 Nov 2020 17:31:00 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     josef@toxicpanda.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH] nbd: fix a block_device refcount leak in nbd_release
+Date:   Mon,  9 Nov 2020 18:30:59 +0100
+Message-Id: <20201109173059.2500429-1-hch@lst.de>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20201109150326.GA2221592@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, kbusch@kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 15/15] nvme-pci: Allow mmaping the CMB in userspace
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+bdget_disk needs to be paired with bdput to not leak a reference
+on the block device inode.
 
+Fixes: 08ba91ee6e2c ("nbd: Add the nbd NBD_DISCONNECT_ON_CLOSE config flag.")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 2020-11-09 8:03 a.m., Keith Busch wrote:
-> On Fri, Nov 06, 2020 at 10:00:36AM -0700, Logan Gunthorpe wrote:
->> Allow userspace to obtain CMB memory by mmaping the controller's
->> char device. The mmap call allocates and returns a hunk of CMB memory,
->> (the offset is ignored) so userspace does not have control over the
->> address within the CMB.
->>
->> A VMA allocated in this way will only be usable by drivers that set
->> FOLL_PCI_P2PDMA when calling GUP. And inter-device support will be
->> checked the first time the pages are mapped for DMA.
->>
->> Currently this is only supported by O_DIRECT to an PCI NVMe device
->> or through the NVMe passthrough IOCTL.
-> 
-> Rather than make this be specific to nvme, could pci p2pdma create an
-> mmap'able file for any resource registered with it?
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index a6f51934391edb..45b0423ef2c53d 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1493,6 +1493,7 @@ static void nbd_release(struct gendisk *disk, fmode_t mode)
+ 	if (test_bit(NBD_RT_DISCONNECT_ON_CLOSE, &nbd->config->runtime_flags) &&
+ 			bdev->bd_openers == 0)
+ 		nbd_disconnect_and_put(nbd);
++	bdput(bdev);
+ 
+ 	nbd_config_put(nbd);
+ 	nbd_put(nbd);
+-- 
+2.28.0
 
-It's certainly possible. However, other people have been arguing that
-more of this should be specific to NVMe as some use cases do not want to
-use the genalloc inside p2pdma.
-
-Logan
