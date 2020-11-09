@@ -2,147 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD5FC4741F
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 16:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 986F5C2D0A3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 16:47:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DEF820789
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 16:15:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19D7F20789
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 16:47:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YPFikwaz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="J7+Mv2hm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730045AbgKIQPH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Nov 2020 11:15:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51228 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729451AbgKIQPH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 11:15:07 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A223C0613CF
-        for <linux-block@vger.kernel.org>; Mon,  9 Nov 2020 08:15:06 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id t13so8800407ilp.2
-        for <linux-block@vger.kernel.org>; Mon, 09 Nov 2020 08:15:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=czUMYa1lHXDUWtQzzxSzwqKh95tj/THhiMyAvkBiag8=;
-        b=YPFikwazpCmKxgRC1W+7l+U80M/Rp61hTHyC7v5qrPM/mM8sp/2vxm8WdkFaw7k8ii
-         DKD07u5mqjL2AXegbersa9xPFaJehST9jOql+cIsDcCxKrIZ9gGjS3pjl8UwgZaRmcmX
-         bIvB6c2KtoJnI2Oix398N/b7davPkbmC8gxprmMD/a6Jk2x1T2MilHGQfpWhrXwpJv+E
-         bx8dM4YcOkzoMSZ/MnC9bHJFyOtK9mOVqME2H0CFzAcnhlPYHwK1qPTdd+2PjkS/K4ee
-         IYy9zdMaM+0H36gGQNfC0sSRCbQ+IiBv/6ncVyWf6H9crvPFTmuCnSp/pDcNqTfN+qsL
-         d6dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=czUMYa1lHXDUWtQzzxSzwqKh95tj/THhiMyAvkBiag8=;
-        b=i8MX6pN8hay6foo//ZEAIi0MfTyo5g/wa+d9+c9ZOAXn96gIxhLXv4mx/bMxmmOZwM
-         Aly8FU4kBJ9u4wim80/oghyiUpvoNzJ+kX3f3kZi5AUmpqB3CDGAo3pptZaRGDhSRgeu
-         5xcnLmaf/ffGP4fgTbc9lI9SRFmekvxx1kd0Y2ORgISYanus8Ht0WsHYL6zdfFp9V126
-         iYT4lhlr+yOHF7hwWMyuqoyZUVtLtVNU3GTe9099zK5p793RHzCmrI2aV6UWcguxJK+H
-         BCQRE3aVFxwABDfTJosDYdqe9gzoWLd1gHQ7GBll/R5MD+mvlJkSd02B9vpbH5fAIYAt
-         +dxQ==
-X-Gm-Message-State: AOAM533EuhJR4Q6fE6e6vZJ98wsTwvCcCHZgraqf5oR59GQzAudWbQwK
-        HSpXUKx+6ur61iQCIO9Es2m6wIH3e/YmTg==
-X-Google-Smtp-Source: ABdhPJyJB5lZO6JsfBojPX/CiH1K7yacikeo8cXMEEqXDebChl0v5oOk3ZT9tw8xCMEi6dUdBz4YRA==
-X-Received: by 2002:a92:cc52:: with SMTP id t18mr1637488ilq.124.1604938505380;
-        Mon, 09 Nov 2020 08:15:05 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id y19sm7295292ilk.79.2020.11.09.08.15.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Nov 2020 08:15:04 -0800 (PST)
-Subject: =?UTF-8?Q?Re=3a_=e2=9d=8c_FAIL=3a_Test_report_for_kernel_5=2e10=2e0?=
- =?UTF-8?Q?-rc3_=28block=29?=
-To:     Veronika Kabatova <vkabatov@redhat.com>
-Cc:     linux-block@vger.kernel.org
-References: <cki.F35EC3202F.1TPV9ZC6SF@redhat.com>
- <449460775.17920557.1604938423946.JavaMail.zimbra@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4795330a-cd9c-a5cb-a256-35281fde5142@kernel.dk>
-Date:   Mon, 9 Nov 2020 09:15:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1730403AbgKIQrZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Nov 2020 11:47:25 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:32996 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729776AbgKIQrZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 11:47:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
+        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=M+FlpbSeF5MJfdXFDHCsfOBW2uUFOxuE0dG6gfttals=; b=J7+Mv2hmxQ4d09bkdoSjlqM2hY
+        vOukZfUTBRpLH8UGn1KHGgk0N/mPDRhd8A08oEOiCCh7q0cCAQVeglBNPPwfDNvy1V8uyt6Yu6ZUv
+        B226XvqReVoUsnygDkmcgOzKoZH3chhJ0pctPMiVhnGnBjWg9+3MBnhgwV0R2hIc8OBD0D4YeHHv3
+        0EhQ5E/lzpaFxooyniSTwwoOSq1y/+/a4VGSBpzogy8zYQeSpf0UXlcEzEqG/fRetW7/w+rJj2q0x
+        1m0DXzXIw3LJaLolwWEGKvxt4TbNZ8TqfPtxCyHuIFLEYgVlgR1OZb3qgvysUDswJ3GahxJvXZhyY
+        skh+Vrug==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtp (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1kcAK2-00011d-Rd; Mon, 09 Nov 2020 09:47:15 -0700
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Ira Weiny <iweiny@intel.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>
+References: <20201106170036.18713-1-logang@deltatee.com>
+ <20201106170036.18713-5-logang@deltatee.com> <20201109091258.GB28918@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <4e336c7e-207b-31fa-806e-c4e8028524a5@deltatee.com>
+Date:   Mon, 9 Nov 2020 09:47:11 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <449460775.17920557.1604938423946.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20201109091258.GB28918@lst.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, hch@lst.de
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH 04/15] lib/scatterlist: Add flag for indicating P2PDMA
+ segments in an SGL
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/9/20 9:13 AM, Veronika Kabatova wrote:
-> 
-> 
-> ----- Original Message -----
->> From: "CKI Project" <cki-project@redhat.com>
->> To: linux-block@vger.kernel.org, axboe@kernel.dk
->> Sent: Monday, November 9, 2020 5:11:45 PM
->> Subject: ❌ FAIL: Test report for kernel 5.10.0-rc3 (block)
->>
->>
->> Hello,
->>
->> We ran automated tests on a recent commit from this kernel tree:
->>
->>        Kernel repo:
->>        https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
->>             Commit: c91882ba0790 - Merge branch 'tif-task_work.arch' into
->>             for-next
->>
->> The results of these automated tests are provided below.
->>
->>     Overall result: FAILED (see details below)
->>              Merge: OK
->>            Compile: FAILED
->>
->> All kernel binaries, config files, and logs are available for download here:
->>
->>   https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/index.html?prefix=datawarehouse-public/2020/11/09/617345
->>
->> We attempted to compile the kernel for multiple architectures, but the
->> compile
->> failed on one or more architectures:
->>
->>             x86_64: FAILED (see build-x86_64.log.xz attachment)
->>
-> 
-> Hi, we're seeing the following errors with the last two git pushes
-> (the other one being commit dd8da1a825a9ba9ad3c7d0e707db9441c9182349):
-> 
-> 00:00:10 In file included from ./arch/x86/include/asm/atomic.h:5,
-> 00:00:10                  from ./include/linux/atomic.h:7,
-> 00:00:10                  from ./include/linux/crypto.h:15,
-> 00:00:10                  from arch/x86/kernel/asm-offsets.c:9:
-> 00:00:10 ./include/linux/sched/signal.h: In function ‘signal_pending’:
-> 00:00:10 ./include/linux/sched/signal.h:368:39: error: ‘TIF_NOTIFY_SIGNAL’ undeclared (first use in this function)
-> 00:00:10   368 |  if (unlikely(test_tsk_thread_flag(p, TIF_NOTIFY_SIGNAL)))
-> 00:00:10       |                                       ^~~~~~~~~~~~~~~~~
-> 00:00:10 ./include/linux/compiler.h:78:42: note: in definition of macro ‘unlikely’
-> 00:00:10    78 | # define unlikely(x) __builtin_expect(!!(x), 0)
-> 00:00:10       |                                          ^
-> 00:00:10 ./include/linux/sched/signal.h:368:39: note: each undeclared identifier is reported only once for each function it appears in
-> 00:00:10   368 |  if (unlikely(test_tsk_thread_flag(p, TIF_NOTIFY_SIGNAL)))
-> 00:00:10       |                                       ^~~~~~~~~~~~~~~~~
-> 00:00:10 ./include/linux/compiler.h:78:42: note: in definition of macro ‘unlikely’
-> 00:00:10    78 | # define unlikely(x) __builtin_expect(!!(x), 0)
-> 00:00:10       |                                          ^
-> 00:00:10   HDRINST usr/include/linux/thermal.h
-> 00:00:10   HDRINST usr/include/linux/time.h
-> 00:00:10 make[3]: *** [scripts/Makefile.build:117: arch/x86/kernel/asm-offsets.s] Error 1
-> 00:00:10   HDRINST usr/include/linux/time_types.h
-> 00:00:10   HDRINST usr/include/linux/timerfd.h
-> 00:00:10 make[2]: *** [Makefile:1200: prepare0] Error 2
 
-Missed branch on my part, it should be fine now.
 
--- 
-Jens Axboe
+On 2020-11-09 2:12 a.m., Christoph Hellwig wrote:
+> On Fri, Nov 06, 2020 at 10:00:25AM -0700, Logan Gunthorpe wrote:
+>> We make use of the top bit of the dma_length to indicate a P2PDMA
+>> segment.
+> 
+> I don't think "we" can.  There is nothing limiting the size of a SGL
+> segment.
 
+Yes, I expected this would be the unacceptable part. Any alternative ideas?
+
+Logan
