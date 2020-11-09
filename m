@@ -4,69 +4,100 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F89C2D0A3
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 14:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5152C2D0A3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 14:05:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FE2E20897
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 14:02:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 832FF20867
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 14:05:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730338AbgKIOC0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Nov 2020 09:02:26 -0500
-Received: from foss.arm.com ([217.140.110.172]:41070 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730035AbgKIOC0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Nov 2020 09:02:26 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8C77E31B;
-        Mon,  9 Nov 2020 06:02:25 -0800 (PST)
-Received: from [10.57.54.223] (unknown [10.57.54.223])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 383D53F719;
-        Mon,  9 Nov 2020 06:02:23 -0800 (PST)
-Subject: Re: [RFC PATCH 04/15] lib/scatterlist: Add flag for indicating P2PDMA
- segments in an SGL
-To:     Christoph Hellwig <hch@lst.de>,
-        Logan Gunthorpe <logang@deltatee.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>, linux-pci@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Ira Weiny <iweiny@intel.com>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        Stephen Bates <sbates@raithlin.com>,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux-foundation.org,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dan Williams <dan.j.williams@intel.com>
-References: <20201106170036.18713-1-logang@deltatee.com>
- <20201106170036.18713-5-logang@deltatee.com> <20201109091258.GB28918@lst.de>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <491c26de-bda0-3266-a67d-ee2580559a54@arm.com>
-Date:   Mon, 9 Nov 2020 14:02:21 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
- Thunderbird/78.4.1
+        id S1729999AbgKIOFg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Nov 2020 09:05:36 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2077 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729976AbgKIOFg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 09:05:36 -0500
+Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4CVCR11MdQz67Jdf;
+        Mon,  9 Nov 2020 22:04:13 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1913.5; Mon, 9 Nov 2020 15:05:34 +0100
+Received: from [10.47.0.244] (10.47.0.244) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Mon, 9 Nov 2020
+ 14:05:32 +0000
+Subject: Re: [PATCH v8 17/18] scsi: megaraid_sas: Added support for shared
+ host tagset for cpuhotplug
+To:     Qian Cai <cai@redhat.com>, Sumit Saxena <sumit.saxena@broadcom.com>
+CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        <don.brace@microsemi.com>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        <dgilbert@interlog.com>, <paolo.valente@linaro.org>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        <linux-block@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        "Linux SCSI List" <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
+        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
+ <1597850436-116171-18-git-send-email-john.garry@huawei.com>
+ <fe3dff7dae4494e5a88caffbb4d877bbf472dceb.camel@redhat.com>
+ <385d5408-6ba2-6bb6-52d3-b59c9aa9c5e5@huawei.com>
+ <193a0440eed447209c48bda042f0e4db102355e7.camel@redhat.com>
+ <519e0d58-e73e-22ce-0ddb-1be71487ba6d@huawei.com>
+ <d8fd51b11d5d54e6ec7e4e9a4f7dcc83f1215cd3.camel@redhat.com>
+ <d4f86cccccc3bffccc4eda39500ce1e1fee2109a.camel@redhat.com>
+ <7624d3fe1613f19af5c3a77f4ae8fe55@mail.gmail.com>
+ <d1040c06-74ea-7016-d259-195fa52196a9@huawei.com>
+ <CAL2rwxoAAGQDud1djb3_LNvBw95YoYUGhe22FwE=hYhy7XOLSw@mail.gmail.com>
+ <aaf849d38ca3cdd45151ffae9b6a99fe6f6ea280.camel@redhat.com>
+ <0c75b881-3096-12cf-07cc-1119ca6a453e@huawei.com>
+ <06a1a6bde51a66461d7b3135349641856315401d.camel@redhat.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <db92d37c-28fd-4f81-7b59-8f19e9178543@huawei.com>
+Date:   Mon, 9 Nov 2020 14:05:26 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <20201109091258.GB28918@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+In-Reply-To: <06a1a6bde51a66461d7b3135349641856315401d.camel@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.0.244]
+X-ClientProxiedBy: lhreml744-chm.china.huawei.com (10.201.108.194) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-11-09 09:12, Christoph Hellwig wrote:
-> On Fri, Nov 06, 2020 at 10:00:25AM -0700, Logan Gunthorpe wrote:
->> We make use of the top bit of the dma_length to indicate a P2PDMA
->> segment.
+On 09/11/2020 13:39, Qian Cai wrote:
+>> I suppose I could try do this myself also, but an authentic version
+>> would be nicer.
+> The closest one I have here is:
+> https://cailca.coding.net/public/linux/mm/git/files/master/arm64.config
 > 
-> I don't think "we" can.  There is nothing limiting the size of a SGL
-> segment.
+> but it only selects the Thunder X2 platform and needs to manually select
+> CONFIG_MEGARAID_SAS=m to start with, but none of arm64 systems here have
+> megaraid_sas.
 
-Right, the story behind ab2cbeb0ed30 ("iommu/dma: Handle SG length 
-overflow better") comes immediately to mind, for one. If all the P2P 
-users can agree to be in on the game then by all means implement this in 
-the P2P code, but I don't think it belongs in the generic top-level 
-scatterlist API.
+Thanks, I'm confident I can fix it up to get it going on my Huawei arm64 
+D06CS.
 
-Robin.
+So that board has a megaraid sas card. In addition, it also has hisi_sas 
+HW, which is another storage controller which we enabled this same 
+feature which is causing the problem.
+
+I'll report back when I can.
+
+Thanks,
+john
+
