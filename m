@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7686BC4741F
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 12:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B4E6C2D0A3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 12:51:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11DA320789
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 12:51:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 269BA20684
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 12:51:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="O5FBzsmu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="e38RmTlv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729499AbgKIMvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1729542AbgKIMvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 9 Nov 2020 07:51:32 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:43846 "EHLO
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:43848 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729673AbgKIMvV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 07:51:21 -0500
+        with ESMTP id S1729706AbgKIMvX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 07:51:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1604926281; x=1636462281;
+  t=1604926283; x=1636462283;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=t3J9BSpdpmukqpsDr084sd8dljMOfuJUKhBo9IZmVgc=;
-  b=O5FBzsmuyNpzkEJB/91lUTuzk0IIjK5GTrO0AMvwX9SKUu8NUHooeUbg
-   tFqR8E/8N9DCLKQ4uPRNh4yPRbftWP/VhkaWgKhy6BSwmYF6occgn1hFv
-   lbUyDbiClOJOI89GvFAyflQi/bsA7GRaLLsbpabcnNZlRsklCBfk4k+6b
-   AxZPRTEX0M0MJooUTd66F0B1HRS1o3s9WjQmVYH53A8Uzi1zvDpBzJ2CN
-   mtuzKIGQni2DL8kQCvbz1ULHy1t54ERQ/OcUiwZPQD5+0lwwIFUsjO7VU
-   kLzEGJy9Y3IdpetwrSnXNXiUQXoLbJB1vgABASrlcxTFuLnU+WeLU/sUw
+  bh=m1B39fyrZQP9vQPbD4bKnCrhlI094d+lWIsfKQQf4S4=;
+  b=e38RmTlv68PqxFspwlTbm9bsiJSnC9xzRZwkvEYXvLNRualEH5V7wOTH
+   TysiyV5D7/+6inp8Yb7YiPkAFr4yppePRFizlB94ztlqIxM33vM2f1f2P
+   CbvTPVN5an18nux3xXm0el2kJEQWwqjvq0j/ie42rDywwk1Jwk/T8lZxe
+   eTSj+nVw4oxXfOgDgyt35pa57tKsgex2fv7neHKRk9wFPX3S2AKwAa2Tb
+   Bj3Rqaik297eACLZMxZxD4wUCbzElu73TSCkTE5wsWSUnF3l9/uDVc6Kh
+   kxFJUHA/skup8iFub31MlTUijAeZkZrThCOfTxv0+0oBUGbXjNo4V9neN
    g==;
-IronPort-SDR: zQVuRx048lTp4jYjJElT5Au37bAbN04E/fh9IzJrV4ebZgf9AKDIBnLNGVZY+Hdw5707OQ4KgC
- /VBp7BJLFeFIPgfxINFO3okOWM9roOLG+XCybNRSzSUKuVRO0o0kc7W9iZUxgjvY+4YcqxgxRW
- FmEUoMyu5asnbfLVN5r6IDTwLB3COrHBlMONg65mhKNB9pFTr/adHGPmGXnt8A9knXfFL19tEF
- +QmFt91n/JyGwprDBlvou5F/K4CJEf4tNbLsLDbM97mBxxaBZfBCHnqkLP5Y467Az6Nncbfo5c
- gNg=
+IronPort-SDR: yh6StRns+47D3T4X8nKuLmzSgF82GtmmyXMujjK72kJZOWA7op2PkJU3VHUsgFxhvZKeAyQIEV
+ N57FxCYRl8RoFxwgguQyW3cIut2qD56RdWcTQJqJY2QtZoiJIJhsVtuwb+riPn8A3BCYChDFv2
+ GcufakVk2wzyUTOqtBe3+Q6NBGHyWZHCfoxUgjQTuGODbuwb/iRgy0twH3fgXUDtO4hzzYmeM5
+ SYeC8+izcsU/NeUrKeBBXEwUyLPi21tfKwPBGCwz10qwHSu2Yax241rNBIiznA0UjqU8RIfl/0
+ OtE=
 X-IronPort-AV: E=Sophos;i="5.77,463,1596470400"; 
-   d="scan'208";a="156668402"
+   d="scan'208";a="156668405"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Nov 2020 20:51:11 +0800
-IronPort-SDR: s2nlFwKvAZWxOEY1EMHMMhyOBmuf/VOVixvmQbQc2aKRHdruQZ7vjAnbiuERs6zM1RB4IwzdjA
- SeHRS1bQEl6mkRIWl+DOdDiaDQdB23eIjnhWLzWV8nD+xUVLJpNnHwLA+LQibBwiU93bEuVG8R
- lU6CSyLL3T1vDHbl9zQRL7h7akaow9O8VQvgvL4fra68pHPKMgJIDAU3QlK61T9kgTj7g14Atl
- Xp82whz4y91ALrOcfnknbJcnRc1a5nbr5POCP3/9Li3g/1ccaOZ3ygmsoZgSWrAQX/YUHerRJJ
- yhe1lGFjQrPzcnzAZk3HIhw5
+  by ob1.hgst.iphmx.com with ESMTP; 09 Nov 2020 20:51:12 +0800
+IronPort-SDR: 9ufbGoQSae1WAGmsGfgf+BAv231GRQ3dJ+khHd3UKCK2qdIBX8oIfqpzk2sq5v3/4c1GM1UPiY
+ 9MrOxkRSY2uFNAm18sf57Ov3+s05iY9rulzSJV4Mil4ECEQCZzv2h9+czzk0GyFwCIfzamijX8
+ nnsfZVNuqp7bMP8l/GYb0htNIZhREJeaNVfzWAnyJpwWN/Docjg99GzpHhcQhI8lk7EDaNBXyD
+ 4fvs+K0wOVhnB1sZnBcdg8XPXSUPpvnJi4UiO7j6FwYEkMO7v7ppnE/ZS22JSmGJMm+qE2/vPg
+ BZtCCMixcURCrxsmjQMxW1r/
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 04:37:13 -0800
-IronPort-SDR: PmaatJAMDasfmulYQAgj84EDIBB0PAaIyBzMEEiAyymEDyQY2s24zOUrxOvKXFKRTM4fBaTklX
- F6Y4J5cGzU5jIIP1kNGDoDADU9cLP9b2gWEY4kNUO3bJfpR7jCrsySqjd+hoXYZTGie7Kvwr6c
- l8yuSty+eEQuGrDc1EAwQjb/xXsh2e/IXI/g40Ra1aUhCoC1ZWv8fHSWbFUfgYN3YWgZe4mU4M
- EPlYz8aBcgJ97NcyHJeM9F5j+bo/jsMKrS8clorrPZg3qHF/chFTi9ObTx7TJoKsOOVACCtfnR
- IAA=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 04:37:14 -0800
+IronPort-SDR: ZyOIddS9Na/BPUwRiV+cwgsSvgo7VfT2dn8ktasQs5M5mja7w19mLGjr5byAdxXXNPNykrEFEn
+ 78sux6SynPRKuyQq4kkFTDwdE/QwjcKTj8s+G/Uqet7yAkLefjUHOeAphyKIDNst+LZ4pdR9mc
+ Zzf/2wgVpEhmm7V27xkg6z/at+EdJArN5JhUzgCL7CcVmkcwrwq2T6z3T9BxzHfTX9MUOj6A6V
+ lhSAEu9+QbF158JQH+Z3h2KU3GGLisioeUwvEz7ykbgao27b2zwsp3cTYgOYAIX0zP2zF/awOF
+ Js4=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 09 Nov 2020 04:51:11 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 09 Nov 2020 04:51:12 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/6] null_blk: Improve implicit zone close
-Date:   Mon,  9 Nov 2020 21:51:02 +0900
-Message-Id: <20201109125105.551734-4-damien.lemoal@wdc.com>
+Subject: [PATCH 5/6] null_blk: discard zones on reset
+Date:   Mon,  9 Nov 2020 21:51:04 +0900
+Message-Id: <20201109125105.551734-6-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201109125105.551734-1-damien.lemoal@wdc.com>
 References: <20201109125105.551734-1-damien.lemoal@wdc.com>
@@ -72,89 +72,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When open zone resource management is enabled, that is, when a null_blk
-zoned device is created with zone_max_open different than 0, implicitly
-or explicitly opening a zone may require implicitly closing a zone
-that is already implicitly open. This operation is done using the
-function null_close_first_imp_zone(), which search for an implicitly
-open zone to close starting from the first sequential zone. This
-implementation is simple but may result in the same being constantly
-implicitly closed and then implicitly reopened on write, namely, the
-lowest numbered zone that is being written.
-
-Avoid this by starting the search for an implicitly open zone starting
-from the zone following the last zone that was implicitly closed. The
-function null_close_first_imp_zone() is renamed
-null_close_imp_open_zone().
+When memory backing is enabled, use null_handle_discard() to free the
+backing memory used by a zone when the zone is being reset.
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/block/null_blk.h       |  1 +
- drivers/block/null_blk_zoned.c | 22 +++++++++++++++++-----
- 2 files changed, 18 insertions(+), 5 deletions(-)
+ drivers/block/null_blk.h       | 2 ++
+ drivers/block/null_blk_main.c  | 4 ++--
+ drivers/block/null_blk_zoned.c | 3 +++
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
-index 4c101c39c3d1..683b573b7e14 100644
+index 683b573b7e14..76bd190fa185 100644
 --- a/drivers/block/null_blk.h
 +++ b/drivers/block/null_blk.h
-@@ -45,6 +45,7 @@ struct nullb_device {
- 	unsigned int nr_zones_imp_open;
- 	unsigned int nr_zones_exp_open;
- 	unsigned int nr_zones_closed;
-+	unsigned int imp_close_zone_no;
- 	struct blk_zone *zones;
- 	sector_t zone_size_sects;
- 	bool need_zone_res_mgmt;
+@@ -95,6 +95,8 @@ struct nullb {
+ 	char disk_name[DISK_NAME_LEN];
+ };
+ 
++void null_handle_discard(struct nullb_device *dev, sector_t sector,
++			 sector_t nr_sectors);
+ blk_status_t null_process_cmd(struct nullb_cmd *cmd,
+ 			      enum req_opf op, sector_t sector,
+ 			      unsigned int nr_sectors);
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 1483413a81da..2150d6c7d8cd 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1076,8 +1076,8 @@ static void nullb_fill_pattern(struct nullb *nullb, struct page *page,
+ 	kunmap_atomic(dst);
+ }
+ 
+-static void null_handle_discard(struct nullb_device *dev, sector_t sector,
+-				sector_t nr_sectors)
++void null_handle_discard(struct nullb_device *dev, sector_t sector,
++			 sector_t nr_sectors)
+ {
+ 	struct nullb *nullb = dev->nullb;
+ 	size_t n = nr_sectors << SECTOR_SHIFT;
 diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index b2812ee01d3d..6f2ad14ef213 100644
+index 6f2ad14ef213..d9ae69f722e8 100644
 --- a/drivers/block/null_blk_zoned.c
 +++ b/drivers/block/null_blk_zoned.c
-@@ -91,6 +91,7 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
- 		pr_info("zone_max_open limit disabled, limit >= zone count\n");
- 	}
- 	dev->need_zone_res_mgmt = dev->zone_max_active || dev->zone_max_open;
-+	dev->imp_close_zone_no = dev->zone_nr_conv;
+@@ -595,6 +595,9 @@ static blk_status_t null_reset_zone(struct nullb_device *dev, struct blk_zone *z
  
- 	for (i = 0; i <  dev->zone_nr_conv; i++) {
- 		struct blk_zone *zone = &dev->zones[i];
-@@ -282,13 +283,24 @@ static blk_status_t __null_close_zone(struct nullb_device *dev,
+ 	null_unlock_zone_res(dev, flags);
+ 
++	if (dev->memory_backed)
++		null_handle_discard(dev, zone->start, zone->len);
++
  	return BLK_STS_OK;
  }
  
--static void null_close_first_imp_zone(struct nullb_device *dev)
-+static void null_close_imp_open_zone(struct nullb_device *dev)
- {
--	unsigned int i;
-+	struct blk_zone *zone;
-+	unsigned int zno, i;
-+
-+	zno = dev->imp_close_zone_no;
-+	if (zno >= dev->nr_zones)
-+		zno = dev->zone_nr_conv;
- 
- 	for (i = dev->zone_nr_conv; i < dev->nr_zones; i++) {
--		if (dev->zones[i].cond == BLK_ZONE_COND_IMP_OPEN) {
--			__null_close_zone(dev, &dev->zones[i]);
-+		zone = &dev->zones[zno];
-+		zno++;
-+		if (zno >= dev->nr_zones)
-+			zno = dev->zone_nr_conv;
-+
-+		if (zone->cond == BLK_ZONE_COND_IMP_OPEN) {
-+			__null_close_zone(dev, zone);
-+			dev->imp_close_zone_no = zno;
- 			return;
- 		}
- 	}
-@@ -316,7 +328,7 @@ static blk_status_t null_check_open(struct nullb_device *dev)
- 
- 	if (dev->nr_zones_imp_open) {
- 		if (null_check_active(dev) == BLK_STS_OK) {
--			null_close_first_imp_zone(dev);
-+			null_close_imp_open_zone(dev);
- 			return BLK_STS_OK;
- 		}
- 	}
 -- 
 2.26.2
 
