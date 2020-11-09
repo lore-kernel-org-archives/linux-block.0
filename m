@@ -2,167 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B80B8C388F7
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 18:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5D9C2D0A3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 23:28:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DDD820644
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 18:15:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PnFbzzA1"
+	by mail.kernel.org (Postfix) with ESMTP id 4372F206ED
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 23:28:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729445AbgKISPq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Nov 2020 13:15:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56553 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729302AbgKISPp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Nov 2020 13:15:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604945744;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PmOXsFY7PPboBbH/YirsDQDsybj2DbsHq557r+8r2gU=;
-        b=PnFbzzA1UVrnDmUKaBYoZ/+XvxRNCLPr6ClX6KPh8MyHOq6v3g/60FTSsKJNwScQlMbYON
-        ZKQZpQcRQ2ZPHYjVDBTmmtVuyhDY/diMcDItHyBy9R9BUf4MFeVoM48Ka969eklA/CNWrQ
-        nf4A48ssE9sut08yqdrB9d1Ftwm0dAQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-EfkJDmYXOOewkjA8waxW6g-1; Mon, 09 Nov 2020 13:15:37 -0500
-X-MC-Unique: EfkJDmYXOOewkjA8waxW6g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8162C80477A;
-        Mon,  9 Nov 2020 18:15:36 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 750467513A;
-        Mon,  9 Nov 2020 18:15:29 +0000 (UTC)
-Date:   Mon, 9 Nov 2020 13:15:28 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     JeffleXu <jefflexu@linux.alibaba.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, haoxu@linux.alibaba.com,
-        io-uring@vger.kernel.org
-Subject: Re: [RFC 0/3] Add support of iopoll for dm device
-Message-ID: <20201109181528.GA8599@redhat.com>
-References: <20201021203906.GA10896@redhat.com>
- <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
- <20201026185334.GA8463@redhat.com>
- <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
- <20201102152822.GA20466@redhat.com>
- <f165f38a-91d1-79aa-829d-a9cc69a5eee6@linux.alibaba.com>
- <20201104150847.GB32761@redhat.com>
- <2c5dab21-8125-fcdf-078e-00a158c57f43@linux.alibaba.com>
- <20201106174526.GA13292@redhat.com>
- <23c73ad7-23e3-3172-8f0e-3c15e0fa5a87@linux.alibaba.com>
+        id S1729451AbgKIX2z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Nov 2020 18:28:55 -0500
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:39700 "EHLO
+        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727070AbgKIX2z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 18:28:55 -0500
+Received: by mail-wm1-f53.google.com with SMTP id s13so1198991wmh.4;
+        Mon, 09 Nov 2020 15:28:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=uVd85Bl4q22td+3jSMit0FtxZJ1sJtChRiPRn7GLPMw=;
+        b=HmwiSpFl37ey7W+KPYX0yuTvszCkzbZPqiU2uXb6qT02LkHBR46YeEhm9srTHyhJF2
+         FRS9/deJcROvz4rWp1AWoJmDeFSQbccznPh0nKBwG/zkGqXCW3fOeKxDRzDhpycI6QOo
+         Xkp7YymryHYQdqkrPPqha15m0Td85ytosagMBI/DbYq0KErPYPeNriK0QKEK722VPLbZ
+         0pBJObub8M+MSF+2NQuhzdhpuvBZTgdW9H22O9sbjmuPDAPRyAy5BgNFOHGYmz2bDT6Z
+         2VOv+XV2Yi2cWR3JWgUzwccsUSeHdMpJthdjmXkX0NeItxwAZOEUtxCm/0Yk/mlAHsO0
+         4HPA==
+X-Gm-Message-State: AOAM531WI4EAudH0HhWYHlwY+eeDGMxcDgTkQF1n8zxx3HEmdg0fiyuE
+        LZ/VB59ZM7ilfY22SNRc62uTFY8US70=
+X-Google-Smtp-Source: ABdhPJyLfZWJAVtXVvWavay6Dkz/YKClz0bIC5QMERvUePaULd58OWlCLidmjNr2cN/ZVx4HfgINbw==
+X-Received: by 2002:a7b:c2f7:: with SMTP id e23mr1575766wmk.100.1604964532362;
+        Mon, 09 Nov 2020 15:28:52 -0800 (PST)
+Received: from ?IPv6:2601:647:4802:9070:f26a:270b:f54c:37eb? ([2601:647:4802:9070:f26a:270b:f54c:37eb])
+        by smtp.gmail.com with ESMTPSA id c17sm6900728wro.19.2020.11.09.15.28.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Nov 2020 15:28:51 -0800 (PST)
+Subject: Re: [PATCH 03/24] nvme: let set_capacity_revalidate_and_notify update
+ the bdev size
+To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, nbd@other.debian.org,
+        ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20201106190337.1973127-1-hch@lst.de>
+ <20201106190337.1973127-4-hch@lst.de>
+ <1d06cdfa-a904-30be-f3ec-08ae2fa85cbd@suse.de>
+ <20201109085340.GB27483@lst.de>
+ <e79f9a96-ef53-d6ea-f6e7-e141bdd2e2d2@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <d28042e3-3123-5dfc-d0a2-aab0012150c8@grimberg.me>
+Date:   Mon, 9 Nov 2020 15:28:44 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <e79f9a96-ef53-d6ea-f6e7-e141bdd2e2d2@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <23c73ad7-23e3-3172-8f0e-3c15e0fa5a87@linux.alibaba.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 07 2020 at  8:09pm -0500,
-JeffleXu <jefflexu@linux.alibaba.com> wrote:
 
+> [ .. ]
+>>> Originally nvme multipath would update/change the size of the multipath
+>>> device according to the underlying path devices.
+>>> With this patch the size of the multipath device will _not_ change if 
+>>> there
+>>> is a change on the underlying devices.
+>>
+>> Yes, it will.Â  Take a close look at nvme_update_disk_info and how it is
+>> called.
+>>
+> Okay, then: What would be the correct way of handling a size update for 
+> NVMe multipath?
+> Assuming we're getting an AEN for each path signalling the size change
+> (or a controller reset leading to a size change).
+> So if we're updating the size of the multipath device together with the 
+> path device at the first AEN/reset we'll end up with the other paths 
+> having a different size than the multipath device (and the path we've 
+> just been updating).
+> - Do we care, or cross fingers and hope for the best?
+> - Shouldn't we detect the case where we won't get a size update for the 
+> other paths, or, indeed, we have a genuine device size mismatch due to a 
+> misconfiguration on the target?
 > 
-> On 11/7/20 1:45 AM, Mike Snitzer wrote:
-> >On Thu, Nov 05 2020 at  9:51pm -0500,
-> >JeffleXu <jefflexu@linux.alibaba.com> wrote:
-> >
-> >>blk-mq.c: blk_mq_submit_bio
-> >>
-> >>     if (bio->orig)
-> >>
-> >>         init blk_poll_data and insert it into bio->orig's @cookies list
-> >>
-> >>```
-> >If you feel that is doable: certainly give it a shot.
-> 
-> Make sense.
-> 
-> >But it is not clear to me how you intend to translate from cookie passed
-> >in to ->blk_poll hook (returned from submit_bio) to the saved off
-> >bio->orig.
-> >
-> >What is your cookie strategy in this non-recursive implementation?  What
-> >will you be returning?  Where will you be storing it?
-> 
-> Actually I think it's a common issue to design the cookie returned
-> by submit_bio() whenever it's implemented in a recursive or
-> non-recursive way. After all you need to translate the returned cookie
-> to the original bio even if it's implemented in a recursive way as you
-> described.
+> IE shouldn't we have a flag 'size update pending' for the other paths,, 
+> to take them out ouf use temporarily until the other AENs/resets have 
+> been processed?
 
-Yes.
+the mpath device will take the minimum size from all the paths, that is
+what blk_stack_limits does. When the AEN for all the paths will arrive
+the mpath size will update.
 
-> Or how could you walk through the bio graph when the returned cookie
-> is only 'unsigned int' type?
-
-You could store a pointer (to orig bio, or per-bio-data stored in split
-clone, or whatever makes sense for how you're associating poll data with
-split bios) in 'unsigned int' type but that's very clumsy -- as I
-discovered when trying to do that ;)
-
-> How about this:
-> 
-> 
-> ```
-> 
-> typedef uintptr_t blk_qc_t;
-> 
-> ```
-> 
-> 
-> or something like union
-> 
-> ```
-> 
-> typedef union {
-> 
->     unsigned int cookie;
-> 
->     struct bio *orig; // the original bio of submit_bio()
-> 
-> } blk_qc_t;
-> 
-> ```
-> When serving for blk-mq, the integer part of blk_qc_t is used and it
-> stores the valid cookie, while it stores a pointer to the original bio
-> when serving bio-based device.
-
-Union looks ideal, but maybe make it a void *?  Initial implementation
-may store bio pointer but it _could_ evolve to be 'struct blk_poll_data
-*' or whatever.  But not a big deal either way.
-
-> By the way, would you mind sharing your plan and progress on this
-> work, I mean, supporting iopoll for dm device. To be honest, I don't
-> want to re-invent the wheel as you have started on this work, but I do
-> want to participate in somehow. Please let me know if there's something
-> I could do here.
-
-I thought I said as much before but: I really don't have anything
-meaningful to share.  My early exploration was more rough pseudo code
-that served to try to get my arms around the scope of the design
-problem.
-
-Please feel free to own all aspects of this work.
-
-I will gladly help analyze/test/refine your approach once you reach the
-point of sharing RFC patches.
-
-Thanks,
-Mike
-
+Not sure how this is different than what we have today...
