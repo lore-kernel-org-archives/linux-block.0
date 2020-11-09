@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FFB9C2D0A3
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 12:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D9CC4741F
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 12:51:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0F8720657
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 12:51:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AAB520684
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 12:51:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XIQdILbX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nlMJaraq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729666AbgKIMvg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1729715AbgKIMvg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 9 Nov 2020 07:51:36 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:43846 "EHLO
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:43848 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729761AbgKIMvc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 07:51:32 -0500
+        with ESMTP id S1729247AbgKIMvQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 07:51:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1604926292; x=1636462292;
+  t=1604926276; x=1636462276;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=q8DjSz449Eh2eqGNWYjeij7/XMqlOG4JLg1vETD36aM=;
-  b=XIQdILbXmAFUTymJCUKMz15XPNKPxn9JWKoq5LhzSPW1LliAuQnXXu6D
-   6py2Va8NMRcpGoxInASbhM3guDzJVmJwfFqkUBpqidHCKnGDNnzL7iC1t
-   JSUgS4Z9PcGIsj8OTvXxxcCH24njWyCj8Us+e/950261mtQ6vsPczAUvY
-   6aOY+jnoJEfb7tONAWOQjimKwr9JXZIVrfQGek2iEcBR5BqkRFGAOcfRQ
-   hu4q7fEI+pC4w39APubNTfJae+nyTl+8eM95HhWkU4MtTN+KgLa7KiePF
-   oqRfVxYWHC8zpC2uDPNdjGWVJJwFJmey5Suuk4x2meEuVkrTm+tlgMyWl
-   g==;
-IronPort-SDR: SbUqUbWNANQUwk4Xg85Z7DdqSFJGETDjgXQet7rsS2w1l1KThsUXauLj/fze9LTDSdC+wHtZ3H
- A1DW5o0yPcWw1b30ljihhz6JwX7ibvpLkMWHpJQ2xLiJPvJcdrJ8pWa13SmpPn30zU/i7TyN/k
- WeM6qu/mACkELL2XWRzg3IHlsRMvLUwIqSkqvaI7t2mGRtIwGxu5WdJMocpVEXH5AaDOYpqQ8E
- ijUN3FGZMXA2mPOKbAQRyMPAO4ulq9MCvVc1RlgLkDAOq/mv86PWDO/2hS2M1+IHbzMEOEILo6
- LOk=
+  bh=Gs91s4H9n0Om7t/enpIZtfjgR6t6tdaBBQzqDFdHcec=;
+  b=nlMJaraq4vYXk+F5ObBlme8YTJbVV41mzmJXgdS7nUvhkfFWI8XRc57v
+   ZPZ9x3BF/k8EX+aqzaMF6thv36WfB/MW+yetKYFmrvbAbRoeBtqY9w4UU
+   Ao6I8KdI60Jep95daMshzDGmTaoAec2/IuOWCnd2VhDvP/K8aGYop2XgH
+   GEs3FEh0wrRuesy3jmSi75by45SukGJZCw5jH9ZVNTGa0GFqFW0gZbHXv
+   AmmViKDPtSng9H6ME8psYR9jPns59EeIV3dv2cGpCAJRFjhfngXIuC/R2
+   uKUfUHVEDu16l86crjUaXEZvP71GjH8B+CiwBtkuteO/VCFGGkWSieqsh
+   A==;
+IronPort-SDR: 5FhWByMkcdKjGc86z2pAmBqP9NzY+c1F1BdafH6pYAQhutDpjquvWgdrOmneorVl/IgIKshSsz
+ jfh9zucGZh3+6HXcxxkZf1QEDi6NU6N02g84aous89GqzXXihyHrozcdxv9qVUTr6IB1oG5Kcs
+ 2jUaf1m6Jczp7rkTYffdOg2Ginb+37oDq7uMRn5dQYheRLLQXV8Pmsgmy/6s/xSbtw//oqVPWm
+ xe9qNfJmz9SGGv2fXvE2tAr0KyeFJagjDnrXWqn6tUjLtOM78cKpZziv2RrQtexrFFG0xvoqwY
+ J9Y=
 X-IronPort-AV: E=Sophos;i="5.77,463,1596470400"; 
-   d="scan'208";a="156668406"
+   d="scan'208";a="156668397"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Nov 2020 20:51:13 +0800
-IronPort-SDR: h/GjOC7HrkEdejFjV93mQEbHg2fruFA369XS5QrS5hZb/Qsto4j8xA2V76iuGIsW10kRNMDAjR
- Jje1ejpiqU6JFb5K11zUymHSIbB4GSrLeUp1T41fyEDjPY2Y8KSgZHHK85JlkYIpGN4R8Vk/ra
- c/2odUwO4S/pwY2SFVN2LUDukWPrWBzKFwbavR8Ogip0LaEMTvf9hVEJn4pyxer0tG42pDttCt
- CWKYJp3JKvkWzi7dnxZJuY5MCN95Hdp5Wcrhk+YRfAf+axW+jVYq2yuqGy63KQhDw/AGot/8nM
- y2iWnNUmJddswMllVoTwpP70
+  by ob1.hgst.iphmx.com with ESMTP; 09 Nov 2020 20:51:09 +0800
+IronPort-SDR: 7Xr9ECur7IybXBQoYbY4wT7BYzs+Q++Qmq1iQc0JKVAKhAmPN+K9a5uLeLSge7OLJrj5AXNDFr
+ Gyq/lfYw+xNQMMiIhv6sCyx0k1EVgt2uVAEd4iC7xtRAtDw5HGPP9X40sV6ZhlvY3uAMrNsEbl
+ 40STqTJQAQGXEnRFFN5vnlkNrMSYNBpC62HCxSyTtmk/Wot3h50MYVtjASh2OvvIQ76sgYn7YC
+ 2K/c+11mWWlHbxGeo1rW9vcXt6vkXuiqqhf/gHPMgrB76PNtz59Do3Tnzxc5ruxWeRPrRBv8ZX
+ ySwr9FPsO+cuYtwoh+uIutJv
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 04:37:15 -0800
-IronPort-SDR: oXnPxcYX6aTq9Kqd6RwveqpIm+vJ4a324ZYo5WH5XvjO1uj5sbOcslH+JMdHiRfZ7vuKuKKDZ8
- FlOuUCsNJe+X+rSzdx8MraX6/GsWZZemMoQfcYAqdiSMO7BeXt5aXEfiw0GiI1Izdc2grPJlo5
- 8I7SJ4gjh9UBpukzbaLW+gNf1D+i+A+zWxutSKiqbWdj/CC1RLQAK9AE8G8L9xe2AAwCAPNVgm
- zCwvdbH2beBhKV3CTaajJNl5flXT0x1DAR/CWl3TwRmCNPi1FHQnbtvp3RIHQJ0H9uqUf7bo7m
- 3G8=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 04:37:11 -0800
+IronPort-SDR: Cd7BY1YjA9p/r+0TuewdZgVD0xyyfUWnYlkD++a+gMoxhmtwmVVqlCXg6uaHJ3LckJgA7lgZ1M
+ DsA7CBtlKiSRCxwtbokaAAGCWesNhV2uaWX9z30p3DoEtko17MiUywIlW7zf8Hn95NigkaLspo
+ 3sw/kr8qHc8duVETfdEmyvcJUJozt9fsZPTB+Lx7V1nIw6rUUnLLZAcWQ9vrG8gp+9Aes9jrLO
+ I1WIF5OtF2SgY10FS1R2T9eHZniyBJyioVPhWFDZjT/0bWKO+9mABRpSo6b9Fdds0XOcL2GMJQ
+ Ju0=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 09 Nov 2020 04:51:13 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 09 Nov 2020 04:51:09 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 6/6] null_blk: Move driver into its own directory
-Date:   Mon,  9 Nov 2020 21:51:05 +0900
-Message-Id: <20201109125105.551734-7-damien.lemoal@wdc.com>
+Subject: [PATCH 1/6] null_blk: Fix zone size initialization
+Date:   Mon,  9 Nov 2020 21:51:00 +0900
+Message-Id: <20201109125105.551734-2-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201109125105.551734-1-damien.lemoal@wdc.com>
 References: <20201109125105.551734-1-damien.lemoal@wdc.com>
@@ -72,81 +72,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move null_blk driver code into the new sub-directory
-drivers/block/null_blk.
+All zones of a zoned null_blk device are currently initialized with the
+same size. However, if the specified size (capacity) of the null_blk
+device is not a multiple of the zone size, the last zone becomes too
+large and read/write accesses to it can cause out of bound errors.
+Fix this by correctly setting the size of the last zone of the device
+to the remainder of the disk capacity if this capacity is not a
+multiple of the zone size. For such smaller last zone, the zone
+capacity is also checked so that it does not exceed the smaller zone
+size.
 
+Reported-by: Naohiro Aota <naohiro.aota@wdc.com>
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/block/Makefile                        |  7 +------
- drivers/block/null_blk/Makefile               | 11 +++++++++++
- drivers/block/{ => null_blk}/null_blk.h       |  0
- drivers/block/{ => null_blk}/null_blk_main.c  |  0
- drivers/block/{ => null_blk}/null_blk_trace.c |  0
- drivers/block/{ => null_blk}/null_blk_trace.h |  0
- drivers/block/{ => null_blk}/null_blk_zoned.c |  0
- 7 files changed, 12 insertions(+), 6 deletions(-)
- create mode 100644 drivers/block/null_blk/Makefile
- rename drivers/block/{ => null_blk}/null_blk.h (100%)
- rename drivers/block/{ => null_blk}/null_blk_main.c (100%)
- rename drivers/block/{ => null_blk}/null_blk_trace.c (100%)
- rename drivers/block/{ => null_blk}/null_blk_trace.h (100%)
- rename drivers/block/{ => null_blk}/null_blk_zoned.c (100%)
+ drivers/block/null_blk_zoned.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index e1f63117ee94..a3170859e01d 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -41,12 +41,7 @@ obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
- obj-$(CONFIG_ZRAM) += zram/
- obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+index beb34b4f76b0..18911e67f792 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk_zoned.c
+@@ -16,7 +16,7 @@ static inline unsigned int null_zone_no(struct nullb_device *dev, sector_t sect)
  
--obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
--null_blk-objs	:= null_blk_main.o
--ifeq ($(CONFIG_BLK_DEV_ZONED), y)
--null_blk-$(CONFIG_TRACING) += null_blk_trace.o
--endif
--null_blk-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
-+obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
+ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+ {
+-	sector_t dev_size = (sector_t)dev->size * 1024 * 1024;
++	sector_t dev_capacity, zone_capacity;
+ 	sector_t sector = 0;
+ 	unsigned int i;
  
- skd-y		:= skd_main.o
- swim_mod-y	:= swim.o swim_asm.o
-diff --git a/drivers/block/null_blk/Makefile b/drivers/block/null_blk/Makefile
-new file mode 100644
-index 000000000000..a0b7bd066fea
---- /dev/null
-+++ b/drivers/block/null_blk/Makefile
-@@ -0,0 +1,11 @@
-+# SPDX-License-Identifier: GPL-2.0
+@@ -38,9 +38,14 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+ 		return -EINVAL;
+ 	}
+ 
++	zone_capacity = dev->zone_capacity << ZONE_SIZE_SHIFT;
++	dev_capacity = ((sector_t)dev->size * SZ_1M) >> SECTOR_SHIFT;
 +
-+# needed for trace events
-+ccflags-y				+= -I$(src)
+ 	dev->zone_size_sects = dev->zone_size << ZONE_SIZE_SHIFT;
+-	dev->nr_zones = dev_size >>
+-				(SECTOR_SHIFT + ilog2(dev->zone_size_sects));
++	dev->nr_zones = dev_capacity >> ilog2(dev->zone_size_sects);
++	if (dev_capacity & (dev->zone_size_sects - 1))
++		dev->nr_zones++;
 +
-+obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
-+null_blk-objs	:= null_blk_main.o
-+ifeq ($(CONFIG_BLK_DEV_ZONED), y)
-+null_blk-$(CONFIG_TRACING) += null_blk_trace.o
-+endif
-+null_blk-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
-diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk/null_blk.h
-similarity index 100%
-rename from drivers/block/null_blk.h
-rename to drivers/block/null_blk/null_blk.h
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk/null_blk_main.c
-similarity index 100%
-rename from drivers/block/null_blk_main.c
-rename to drivers/block/null_blk/null_blk_main.c
-diff --git a/drivers/block/null_blk_trace.c b/drivers/block/null_blk/null_blk_trace.c
-similarity index 100%
-rename from drivers/block/null_blk_trace.c
-rename to drivers/block/null_blk/null_blk_trace.c
-diff --git a/drivers/block/null_blk_trace.h b/drivers/block/null_blk/null_blk_trace.h
-similarity index 100%
-rename from drivers/block/null_blk_trace.h
-rename to drivers/block/null_blk/null_blk_trace.h
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk/null_blk_zoned.c
-similarity index 100%
-rename from drivers/block/null_blk_zoned.c
-rename to drivers/block/null_blk/null_blk_zoned.c
+ 	dev->zones = kvmalloc_array(dev->nr_zones, sizeof(struct blk_zone),
+ 			GFP_KERNEL | __GFP_ZERO);
+ 	if (!dev->zones)
+@@ -101,8 +106,12 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+ 		struct blk_zone *zone = &dev->zones[i];
+ 
+ 		zone->start = zone->wp = sector;
+-		zone->len = dev->zone_size_sects;
+-		zone->capacity = dev->zone_capacity << ZONE_SIZE_SHIFT;
++		if (zone->start + dev->zone_size_sects > dev_capacity)
++			zone->len = dev_capacity - zone->start;
++		else
++			zone->len = dev->zone_size_sects;
++		zone->capacity =
++			min_t(sector_t, zone->len, zone_capacity);
+ 		zone->type = BLK_ZONE_TYPE_SEQWRITE_REQ;
+ 		zone->cond = BLK_ZONE_COND_EMPTY;
+ 
 -- 
 2.26.2
 
