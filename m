@@ -3,55 +3,103 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 293EBC2D0A3
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 09:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BDACC2D0A3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 09:25:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4F182080C
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 09:13:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B27BB206ED
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 09:25:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728462AbgKIJNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Nov 2020 04:13:01 -0500
-Received: from verein.lst.de ([213.95.11.211]:57665 "EHLO verein.lst.de"
+        id S1726482AbgKIJZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Nov 2020 04:25:26 -0500
+Received: from mx2.suse.de ([195.135.220.15]:48186 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726482AbgKIJNB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Nov 2020 04:13:01 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8929268AFE; Mon,  9 Nov 2020 10:12:58 +0100 (CET)
-Date:   Mon, 9 Nov 2020 10:12:58 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Ira Weiny <iweiny@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>
-Subject: Re: [RFC PATCH 04/15] lib/scatterlist: Add flag for indicating
- P2PDMA segments in an SGL
-Message-ID: <20201109091258.GB28918@lst.de>
-References: <20201106170036.18713-1-logang@deltatee.com> <20201106170036.18713-5-logang@deltatee.com>
+        id S1726176AbgKIJZZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Nov 2020 04:25:25 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id CA23CABCC;
+        Mon,  9 Nov 2020 09:25:23 +0000 (UTC)
+Subject: Re: [PATCH 03/24] nvme: let set_capacity_revalidate_and_notify update
+ the bdev size
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, nbd@other.debian.org,
+        ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20201106190337.1973127-1-hch@lst.de>
+ <20201106190337.1973127-4-hch@lst.de>
+ <1d06cdfa-a904-30be-f3ec-08ae2fa85cbd@suse.de>
+ <20201109085340.GB27483@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <e79f9a96-ef53-d6ea-f6e7-e141bdd2e2d2@suse.de>
+Date:   Mon, 9 Nov 2020 10:25:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201106170036.18713-5-logang@deltatee.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20201109085340.GB27483@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 06, 2020 at 10:00:25AM -0700, Logan Gunthorpe wrote:
-> We make use of the top bit of the dma_length to indicate a P2PDMA
-> segment.
+On 11/9/20 9:53 AM, Christoph Hellwig wrote:
+> On Mon, Nov 09, 2020 at 08:53:58AM +0100, Hannes Reinecke wrote:
+>>> index 376096bfc54a83..4e86c9aafd88a7 100644
+>>> --- a/drivers/nvme/host/core.c
+>>> +++ b/drivers/nvme/host/core.c
+>>> @@ -2053,7 +2053,7 @@ static void nvme_update_disk_info(struct gendisk *disk,
+>>>    			capacity = 0;
+[ .. ]
+>> Originally nvme multipath would update/change the size of the multipath
+>> device according to the underlying path devices.
+>> With this patch the size of the multipath device will _not_ change if there
+>> is a change on the underlying devices.
+> 
+> Yes, it will.  Take a close look at nvme_update_disk_info and how it is
+> called.
+> 
+Okay, then: What would be the correct way of handling a size update for 
+NVMe multipath?
+Assuming we're getting an AEN for each path signalling the size change
+(or a controller reset leading to a size change).
+So if we're updating the size of the multipath device together with the 
+path device at the first AEN/reset we'll end up with the other paths 
+having a different size than the multipath device (and the path we've 
+just been updating).
+- Do we care, or cross fingers and hope for the best?
+- Shouldn't we detect the case where we won't get a size update for the 
+other paths, or, indeed, we have a genuine device size mismatch due to a 
+misconfiguration on the target?
 
-I don't think "we" can.  There is nothing limiting the size of a SGL
-segment.
+IE shouldn't we have a flag 'size update pending' for the other paths,, 
+to take them out ouf use temporarily until the other AENs/resets have 
+been processed?
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
