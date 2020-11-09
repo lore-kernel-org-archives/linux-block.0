@@ -2,200 +2,71 @@ Return-Path: <SRS0=Ui87=EP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A9FC388F7
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 13:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F89C2D0A3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 14:02:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69D5F206B2
-	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 13:55:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604930135;
-	bh=GeHqDeWzN0NgMShpJMw1r7uKCs2FS/IaxePMYnotcKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=L5OE35eo4UnY0LOaCKP+SP0qDTmn4PGXBgVPoyAsTo+Oy4Q3aM3wJ2Q6+lD+wJpj7
-	 aYU3ksC4Fw1EM+4njmIiZQa0twcPjFpnYThdeJyUVnPBm/dD3chMWXv3vENz+1AdYl
-	 XCGoB7aZ1adxQLrkIhGL1pWZvjl7wAJ3MpiRaK2I=
+	by mail.kernel.org (Postfix) with ESMTP id 6FE2E20897
+	for <linux-block@archiver.kernel.org>; Mon,  9 Nov 2020 14:02:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729994AbgKINze (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Nov 2020 08:55:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57800 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729974AbgKINzd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 08:55:33 -0500
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E2B9C0613CF;
-        Mon,  9 Nov 2020 05:55:33 -0800 (PST)
-Received: by mail-qt1-x842.google.com with SMTP id p12so5961846qtp.7;
-        Mon, 09 Nov 2020 05:55:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=GMJ4mpfGxerOX0IArSsoe0rUQxIJkHjRxiT6nbHNgbk=;
-        b=NfkaFzLo8TyiwTISMf9KmkM1ixinP22m3KHeSu7YytvWhnPsXLSYbMKgNHEsPMp6fC
-         vuIiH4OBfgZzvZ1f6Dot66OYsK4vEjvHpqafQ+q6EydZoagUbYtwbkhutxnSlCVGc48G
-         7oLOtrwsGQekbHud0HADFBKA/fNwK5it0hQChCVaGa7R/xpB8rQD9pfm6J93R6mzYJpg
-         bykijqclyRcE1oAxwvACyH+NyX5cuEOTQ//Yj9uLGD9XNB6UKVYjpKeO/l3REEyWz0rP
-         NOYsnHr1Oz9KE2yslCdbxzUWb0/qJrqIl/tRSg/BfMmj7m+/UIXRbPvb2cxJDqaNlq2g
-         BmSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=GMJ4mpfGxerOX0IArSsoe0rUQxIJkHjRxiT6nbHNgbk=;
-        b=s0/vVjUZj1BpaeejtR5XpPLLV61Xeh03iBtNv7ZO380Jh4vFv9/TRS1UZhhJdcSLyu
-         y8IyY2UlVH3MBFXClhWyMFVLmE5RGgYQpOz5td0NOByqWhjkk8vhNJQR7TuVvrZ3Jv0U
-         6eeEQCofzvWFS79xiD5k517P81EAGMkVC1OVp79lNePvtz8YjGH/tOIqHxFlMQHNpLoH
-         Otk1YCDayHg7Y8OLcQiyRmfyi2Db4OVYqwUVDy8zX319YzrpVwedrSXNUFzqCV7I4Ved
-         Hl2aWSMUL5YrBzSr7TSJPzBNdh+qDOjMaS/v/u3KO36jP0pQOy88BmO2WY9zuPDBD0Wp
-         v1WQ==
-X-Gm-Message-State: AOAM533vlNlXkJYag/3LEaRTgK6LD+J2jwFP4yMskinz4Ew6XhPLjrKL
-        q09XDsO4uELxjj2hsSIHS/0=
-X-Google-Smtp-Source: ABdhPJy/utpYjERO98eQpMFyeNQiowofecq1/I3Qc+4nrhWq9ZVxnExma/TCcQS8NSvhAp7xEi+uyA==
-X-Received: by 2002:ac8:6608:: with SMTP id c8mr6394223qtp.203.1604930132665;
-        Mon, 09 Nov 2020 05:55:32 -0800 (PST)
-Received: from localhost ([2620:10d:c091:480::1:fc2b])
-        by smtp.gmail.com with ESMTPSA id o63sm6275514qkd.96.2020.11.09.05.55.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2020 05:55:32 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 9 Nov 2020 08:55:19 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Muneendra <muneendra.kumar@broadcom.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, jsmart2021@gmail.com,
-        emilne@redhat.com, mkumar@redhat.com, pbonzini@redhat.com
-Subject: Re: [PATCH v4 02/19] blkcg: Added a app identifier support for blkcg
-Message-ID: <20201109135519.GD7496@mtj.duckdns.org>
-References: <1604895845-2587-1-git-send-email-muneendra.kumar@broadcom.com>
- <1604895845-2587-3-git-send-email-muneendra.kumar@broadcom.com>
+        id S1730338AbgKIOC0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Nov 2020 09:02:26 -0500
+Received: from foss.arm.com ([217.140.110.172]:41070 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730035AbgKIOC0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Nov 2020 09:02:26 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8C77E31B;
+        Mon,  9 Nov 2020 06:02:25 -0800 (PST)
+Received: from [10.57.54.223] (unknown [10.57.54.223])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 383D53F719;
+        Mon,  9 Nov 2020 06:02:23 -0800 (PST)
+Subject: Re: [RFC PATCH 04/15] lib/scatterlist: Add flag for indicating P2PDMA
+ segments in an SGL
+To:     Christoph Hellwig <hch@lst.de>,
+        Logan Gunthorpe <logang@deltatee.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>, linux-pci@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Ira Weiny <iweiny@intel.com>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        Stephen Bates <sbates@raithlin.com>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        iommu@lists.linux-foundation.org,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>
+References: <20201106170036.18713-1-logang@deltatee.com>
+ <20201106170036.18713-5-logang@deltatee.com> <20201109091258.GB28918@lst.de>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <491c26de-bda0-3266-a67d-ee2580559a54@arm.com>
+Date:   Mon, 9 Nov 2020 14:02:21 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1604895845-2587-3-git-send-email-muneendra.kumar@broadcom.com>
+In-Reply-To: <20201109091258.GB28918@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Again, some nits.
-
-On Mon, Nov 09, 2020 at 09:53:48AM +0530, Muneendra wrote:
-> This Patch added a unique application identifier i.e
-> app_id  knob to  blkcg which allows identification of traffic
-> sources at an individual cgroup based Applications
-> (ex:virtual machine (VM))level in both host and
-> fabric infrastructure.
+On 2020-11-09 09:12, Christoph Hellwig wrote:
+> On Fri, Nov 06, 2020 at 10:00:25AM -0700, Logan Gunthorpe wrote:
+>> We make use of the top bit of the dma_length to indicate a P2PDMA
+>> segment.
 > 
-> Provided the interface blkcg_get_fc_appid to
-> grab the app identifier associated with a bio.
-> 
-> Provided the interface blkcg_set_fc_appid to
-> set the app identifier in a blkcgrp associated with cgroup id
-> 
-> Added a new config BLK_CGROUP_FC_APPID and moved the changes
-> under this config
+> I don't think "we" can.  There is nothing limiting the size of a SGL
+> segment.
 
-Please reflow the paragraphs.
+Right, the story behind ab2cbeb0ed30 ("iommu/dma: Handle SG length 
+overflow better") comes immediately to mind, for one. If all the P2P 
+users can agree to be in on the game then by all means implement this in 
+the P2P code, but I don't think it belongs in the generic top-level 
+scatterlist API.
 
-> +config BLK_CGROUP_FC_APPID
-> +	bool "Enable support to track FC io Traffic across cgroup applications"
-> +	depends on BLK_CGROUP=y
-> +	help
-> +	Enabling this option enables the support to track FC io traffic across
-> +	cgroup applications.It enables the Fabric and the storage targets to
-                            ^
-                            space
-
-> +	identify, monitor, and handle FC traffic based on vm tags by inserting
-> +	application specific identification into the FC frame.
-...
->  /* Max limits for throttle policy */
->  #define THROTL_IOPS_MAX		UINT_MAX
-> +#define APPID_LEN              128
-
-Can you add the FC prefix for the above too?
-
-> +#ifdef CONFIG_BLK_CGROUP_FC_APPID
-> +/*
-
-/**
-
-> + * Sets the fc_app_id field associted to blkcg
-> + * @buf: application identifier
-> + * @id: cgrp id
-> + * @len: size of appid
-> + */
-> +static inline int blkcg_set_fc_appid(char *buf, u64 id, size_t len)
-
-I find the arguments really confusing, how about (@cgrp_id, @app_id,
-@app_id_len)?
-
-> +{
-> +	struct cgroup *cgrp = NULL;
-> +	struct cgroup_subsys_state *css = NULL;
-> +	struct blkcg *blkcg = NULL;
-
-No need to set these to NULL.
-
-> +	int ret  = 0;
-> +
-> +	cgrp = cgroup_get_from_kernfs_id(id);
-> +	if (!cgrp)
-> +		return -ENOENT;
-> +	css = cgroup_get_e_css(cgrp, &io_cgrp_subsys);
-> +	if (!css) {
-> +		ret = -ENOENT;
-> +		goto out_cgrp_put;
-> +	}
-> +	blkcg = css_to_blkcg(css);
-> +	if (!blkcg) {
-> +		ret = -ENOENT;
-> +		goto out_put;
-> +	}
-
-css_to_blkcg() can't fail. It's a simple pointer cast.
-
-> +	if (len > APPID_LEN) {
-> +		ret = -EINVAL;
-> +		goto out_put;
-> +	}
-
-This is input validation. Maybe do this at the beginning?
-
-> +	strlcpy(blkcg->fc_app_id, buf, len);
-> +out_put:
-> +	css_put(css);
-> +out_cgrp_put:
-> +	cgroup_put(cgrp);
-> +	return ret;
-> +}
-> +
-> +/**
-> + * blkcg_get_fc_appid - grab the app identifier associated with a bio
-> + * @bio: target bio
-> + *
-> + * This returns the app identifier associated with a bio,
-> + * %NULL if not associated.
-> + * Callers are expected to either handle %NULL or know association has been
-> + * done prior to calling this.
-
-Reflow.
-
-> + */
-> +static inline char *blkcg_get_fc_appid(struct bio *bio)
-> +{
-> +	if (bio && bio->bi_blkg &&
-> +			strlen(bio->bi_blkg->blkcg->fc_app_id))
-
-You can test fc_app_id[0] against '\0' instead of scanning the whole string.
-
-> +		return bio->bi_blkg->blkcg->fc_app_id;
-> +	return NULL;
-
-Thanks.
-
--- 
-tejun
+Robin.
