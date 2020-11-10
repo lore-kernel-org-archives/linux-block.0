@@ -2,195 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0F8C5517A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 01:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0106EC2D0A3
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 02:24:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E4802065D
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 01:43:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D450206F1
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 02:24:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=permerror (0-bit key) header.d=wdc.com header.i=@wdc.com header.b="pRRITVYJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729897AbgKJBnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Nov 2020 20:43:17 -0500
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:34121 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729452AbgKJBnQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Nov 2020 20:43:16 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UEq6B8P_1604972592;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UEq6B8P_1604972592)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 10 Nov 2020 09:43:12 +0800
-Subject: Re: [dm-devel] [RFC 0/3] Add support of iopoll for dm device
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, haoxu@linux.alibaba.com,
-        io-uring@vger.kernel.org
-References: <20201021203906.GA10896@redhat.com>
- <da936cfa-93a8-d6ec-bd88-c0fad6c67c8b@linux.alibaba.com>
- <20201026185334.GA8463@redhat.com>
- <33c32cd1-5116-9a42-7fe2-b2a383f1c7a0@linux.alibaba.com>
- <20201102152822.GA20466@redhat.com>
- <f165f38a-91d1-79aa-829d-a9cc69a5eee6@linux.alibaba.com>
- <20201104150847.GB32761@redhat.com>
- <2c5dab21-8125-fcdf-078e-00a158c57f43@linux.alibaba.com>
- <20201106174526.GA13292@redhat.com>
- <23c73ad7-23e3-3172-8f0e-3c15e0fa5a87@linux.alibaba.com>
- <20201109181528.GA8599@redhat.com>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <0b133186-024b-76e2-ef29-6bd6fa865a1c@linux.alibaba.com>
-Date:   Tue, 10 Nov 2020 09:43:12 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.1
+        id S1728607AbgKJCYJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Nov 2020 21:24:09 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:31560 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727311AbgKJCYJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Nov 2020 21:24:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1604975734; x=1636511734;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PuBaw3stJbTbaX8/cdgDgYBitU4HyXXto5yoOVDwa2Y=;
+  b=pRRITVYJ0cED8lT1rs/itmd7WassjkGg5v+PjAIbFDb0Luq46BHy0tQy
+   6yHK42iALoktP+80vuHdupMGICm4FZOckBxeC0SImjaAN/f82x7GpKUzt
+   3P88ZFy63M9kXeVqKblj3HS45xjeRr3yOwyvurH2VrA1jCLpQAfLup/8a
+   xFYEge6dQ3ZrHznVjc53ukEAB2asazDNIO5RYan9exWd9250e/fhDD+gW
+   ZZ0PT/TuqWTzp6339zgj3A8wSNSTNd1RYh+HbVKKYOCWRkzUPhKwqvPrN
+   8m2l8ELEpmTeFANPENOLxkT2a43uhJG5Hrs3PWFAQ132uW4kWLHY5W4EE
+   w==;
+IronPort-SDR: rPyC1I2clfRCnoYe2Gn/AzHzAFMpSIYu5D1n5m/CVHN0veQBBlSgtmBtUQh0AUAJY6csvza8mX
+ 2YPafM2yefjW90U8xV+a5uZS3M+5BJXmiHzd0+dAB4P8/MVwJN4QNwiojevtNUwvYqjaE29f+q
+ 88PYofX1Y8QxW3bincUASier4rb8/YguogzFZhRplszCSjk991aW2SxH0gIrOVM35jHclcqFm/
+ tk9Y+L1/e+Amu6XsjITp7xuJvyXhfXionM88+yCZzadjh6azR0AE3wakr6brqOH+i3r4q1LIPt
+ yOM=
+X-IronPort-AV: E=Sophos;i="5.77,465,1596470400"; 
+   d="scan'208";a="255796312"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Nov 2020 10:35:34 +0800
+IronPort-SDR: z5oZ2Ai4qmKsSdbdnlV/gSxj5pTW/wBhJa7UPrpC5BHLmXqkgMXtEEpA4TjNZ7rj3sYHMwq0ct
+ Z7TG9P9myos4A/ZMcpCAhxl8Z9d7TGmIXa50DkcpsQ3XWZ9zY2xP9SfrKp5wKWy7kivwSl7vWr
+ ZcRVz4xkwFh4d2CiWxtANvDlPUZI2lWUQMQ2kZcWRRXDiSM3mk+pWmA4/RSgn8tfyFXvw4J9ns
+ az8Bz+HkxgrHNQXhMp3LDayCYl7/fe2AyPLnlujuqx2RUnHiFhcQuoWIG1Ah6OXkIJtkCiAFqc
+ uctYf1kr5WSmJHjUEFuSeLkQ
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 18:08:56 -0800
+IronPort-SDR: OTIAnybxKDXy8FotM1TblXxalRopqTyeYcyk6tX3Hh7gWaPbnaZ/5TfPey4u+M4szFtWxCUuYs
+ j/7yI+wp4O6gUuccMRiSjUxWXZDrnFuG6iQdW4vMAN3s5y/3Fkwy6C/LKdc8xvJ6KZgNZk6tSM
+ kvvqWVvDplZffNJHoElb3YwlRRBt1r3FRYa4veYWLtZGNMUXmJUi6Nitkw2ljiGE6pRiDLWMQ/
+ GZYU37abmDd3TOyb2cyBRETeuq+mnnsdutSA1zM2Qc2FKmqzsyAZFQ/5FhbzbEvkdkg9fXrFJO
+ JPI=
+WDCIronportException: Internal
+Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
+  by uls-op-cesaip02.wdc.com with ESMTP; 09 Nov 2020 18:24:08 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me, hch@lst.de,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V4 0/6] nvmet: passthru improvements
+Date:   Mon,  9 Nov 2020 18:23:59 -0800
+Message-Id: <20201110022405.6707-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.22.1
 MIME-Version: 1.0
-In-Reply-To: <20201109181528.GA8599@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
-On 11/10/20 2:15 AM, Mike Snitzer wrote:
-> On Sat, Nov 07 2020 at  8:09pm -0500,
-> JeffleXu <jefflexu@linux.alibaba.com> wrote:
->
->> On 11/7/20 1:45 AM, Mike Snitzer wrote:
->>> On Thu, Nov 05 2020 at  9:51pm -0500,
->>> JeffleXu <jefflexu@linux.alibaba.com> wrote:
->>>
->>>> blk-mq.c: blk_mq_submit_bio
->>>>
->>>>      if (bio->orig)
->>>>
->>>>          init blk_poll_data and insert it into bio->orig's @cookies list
->>>>
->>>> ```
->>> If you feel that is doable: certainly give it a shot.
->> Make sense.
->>
->>> But it is not clear to me how you intend to translate from cookie passed
->>> in to ->blk_poll hook (returned from submit_bio) to the saved off
->>> bio->orig.
->>>
->>> What is your cookie strategy in this non-recursive implementation?  What
->>> will you be returning?  Where will you be storing it?
->> Actually I think it's a common issue to design the cookie returned
->> by submit_bio() whenever it's implemented in a recursive or
->> non-recursive way. After all you need to translate the returned cookie
->> to the original bio even if it's implemented in a recursive way as you
->> described.
-> Yes.
->
->> Or how could you walk through the bio graph when the returned cookie
->> is only 'unsigned int' type?
-> You could store a pointer (to orig bio, or per-bio-data stored in split
-> clone, or whatever makes sense for how you're associating poll data with
-> split bios) in 'unsigned int' type but that's very clumsy -- as I
-> discovered when trying to do that ;)
+This patch series has several small trivial cleanups and few code
+optimizations.
 
-Fine, that's also what I thought.
+Due to conflicting nature of patches I've generated this series on the
+top of timeout [1].
 
+Regards,
+Chaitanya
 
->
->> How about this:
->>
->>
->> ```
->>
->> typedef uintptr_t blk_qc_t;
->>
->> ```
->>
->>
->> or something like union
->>
->> ```
->>
->> typedef union {
->>
->>      unsigned int cookie;
->>
->>      struct bio *orig; // the original bio of submit_bio()
->>
->> } blk_qc_t;
->>
->> ```
->> When serving for blk-mq, the integer part of blk_qc_t is used and it
->> stores the valid cookie, while it stores a pointer to the original bio
->> when serving bio-based device.
-> Union looks ideal, but maybe make it a void *?  Initial implementation
-> may store bio pointer but it _could_ evolve to be 'struct blk_poll_data
-> *' or whatever.  But not a big deal either way.
+[1] http://lists.infradead.org/pipermail/linux-nvme/2020-November/020797.html
 
-Of course you could define blk_qc_t as a pointer type (e.g. void *), or 
-integer type (e.g. unsigned int),
+Changes from V3:-
 
-but you will get a gcc warning in each case. For example, if it's 
-defined as "void *", then gcc will warn
+1. Simplify nvme_alloc_request() and nvme_alloc_request_qid().
+2. Add helpers which are used by request alloc functions.
+3. Rebase and retest the code.
+4. Only init bio_end_io for bio_alloc() case in passthru.
+5. Add reviewed-by tags.
 
-'return makes pointer from integer without a cast' in request_to_qc_t() 
-as cookie returned by mq
+Changes from V2:-
 
-device is actually integer type. Vice versa. So we need a type cast in 
-request_to_qc_t().
+1. Remove "nvme-core: annotate nvme_alloc_request()" patch and
+   split the nvme_alloc_request() into nvme_alloc_request_qid_any()
+   and nvme_alloc_request_qid() with addition of the prep patch for
+   the same.
+2. Remove the cleanup patches and trim down the series.
+3. Remove the code for setting up the op_flags for passthru.  
+4. Rebase and retest on the nvme-5.10.
 
+Changes from V1:-
 
-The union is also not perfect though, as we also need type cast.
+1. Remove the sg_cnt check and nvmet_passthru_sg_map() annotation.
+2. Add annotations and performance numbers for newly added patch #1.
+3. Move ctrl refcount and module refcount into nvme_dev_open() and
+   nvme_dev_release(). Add prepration patch for the same.
+4. Add reviewed-by tags.
 
+Chaitanya Kulkarni (6):
+  nvme-core: add req init helpers
+  nvme-core: split nvme_alloc_request()
+  nvmet: remove op_flags for passthru commands
+  block: move blk_rq_bio_prep() to linux/blk-mq.h
+  nvmet: use minimized version of blk_rq_append_bio
+  nvmet: use inline bio for passthru fast path
 
-So both these two designs are quite equal to me, though 'void *' may be 
-more concise though.
-
-But one annoying issue is that the request_to_qc_t() and blk_poll() 
-should be revised somehow
-
-if it's defined as a union or 'void *'. For example if it's defined as 
-'void *', then in request_to_qc_t()
-
-integer need to be cast to pointer and in blk_poll() pointer need to be 
-cast to integer.
-
-
-The benefit of uintptr_t is that, it's still integer type which means 
-the original request_to_qc_t()/
-
-blk_poll() routine for blk-mq can retain unchanged, while the size of 
-the data type can be large
-
-enough to contain a pointer type. So we only need  type cast in 
-bio-based routine, while keeping
-
-the request-based routine unchanged.
-
-
-And yes it's a trivial issue though.
-
-
->> By the way, would you mind sharing your plan and progress on this
->> work, I mean, supporting iopoll for dm device. To be honest, I don't
->> want to re-invent the wheel as you have started on this work, but I do
->> want to participate in somehow. Please let me know if there's something
->> I could do here.
-> I thought I said as much before but: I really don't have anything
-> meaningful to share.  My early exploration was more rough pseudo code
-> that served to try to get my arms around the scope of the design
-> problem.
->
-> Please feel free to own all aspects of this work.
->
-> I will gladly help analyze/test/refine your approach once you reach the
-> point of sharing RFC patches.
-
-Got it. Thanks for that. Really. I will continue working on this.
-
+ block/blk.h                    | 12 ------
+ drivers/nvme/host/core.c       | 67 ++++++++++++++++++++++++----------
+ drivers/nvme/host/lightnvm.c   |  5 +--
+ drivers/nvme/host/nvme.h       |  2 +
+ drivers/nvme/host/pci.c        |  4 +-
+ drivers/nvme/target/nvmet.h    |  1 +
+ drivers/nvme/target/passthru.c | 30 +++++++--------
+ include/linux/blk-mq.h         | 12 ++++++
+ 8 files changed, 79 insertions(+), 54 deletions(-)
 
 -- 
-Thanks,
-Jeffle
+2.22.1
 
