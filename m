@@ -2,102 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB15C56202
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 08:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD575C388F7
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 09:28:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A77022080A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 08:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32DB42080A
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 09:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iuo8f+7v";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="y7osrUd/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XVtgjfJr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729584AbgKJIsh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Nov 2020 03:48:37 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:56904 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbgKJIsg (ORCPT
+        id S1726690AbgKJJ2g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Nov 2020 04:28:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24690 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726467AbgKJJ2g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Nov 2020 03:48:36 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1604998111;
+        Tue, 10 Nov 2020 04:28:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605000515;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+lFM+Dy1hrzRRrrrA3qnbGkxEtyVqIh0g4peYrriLeU=;
-        b=iuo8f+7vFglLggVRQElkiZ2WEkqCMbTG8xoMGtVyBk3DBfZOlzK9bn4iYE9n5TJlXEeyiw
-        mK2AsUoeE727uJ+eyVgbEeyt2qz1CsngbkfMTC30zg6BSGbxrFxVJV/nTlcmtj9NHSMsJn
-        sU38ljGJ30NJ8ooIZ53QTax6dO6NfnLLpRxklxBphTMVejdacYZZqkmCK8e4gkxhfN2Hq9
-        zuGNw+h8VUH3NFZO14JlYgbkNPH833xVYFQ2lmqEAC35a4/baTqfi6uG7ey36+HQyygrEi
-        Jy4I41umlX4stejJrRBLu7awPrfWhbLcelHNMzqQQSqRZrKTpO34TDntXU+02A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1604998111;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+lFM+Dy1hrzRRrrrA3qnbGkxEtyVqIh0g4peYrriLeU=;
-        b=y7osrUd/437dzM5/Hc5G9cQ/HuZ2jh7vgX8EDHSswmJuPLkHyLG6iEX8rrCl2sg3XohELe
-        1aQhUu8PTNjq+DAw==
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>, x86@kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-        kexec@lists.infradead.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, devel@driverdev.osuosl.org,
-        linux-efi@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
-        reiserfs-devel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
-        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-rdma@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-cachefs@redhat.com,
-        samba-technical@lists.samba.org, intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH RFC PKS/PMEM 05/58] kmap: Introduce k[un]map_thread
-In-Reply-To: <20201110045954.GL3976735@iweiny-DESK2.sc.intel.com>
-References: <20201009195033.3208459-1-ira.weiny@intel.com> <20201009195033.3208459-6-ira.weiny@intel.com> <87h7pyhv3f.fsf@nanos.tec.linutronix.de> <20201110045954.GL3976735@iweiny-DESK2.sc.intel.com>
-Date:   Tue, 10 Nov 2020 09:48:31 +0100
-Message-ID: <87eel1iom8.fsf@nanos.tec.linutronix.de>
+        bh=4Ec+6ZQtRo8XVMn8uxsrYDedFkoS+9ZcsqpLGSrJMak=;
+        b=XVtgjfJrBDRUHWfzOrX0PQvgQfaYLhRq4YxJcfLvJaVB/W6ff4bdTX/s9c5moZIuQ5LHNg
+        vQVOuCTqQVJGFlj1IgGxVVylr3zA9fofVeeHaC3H6XS5WmmJNlCtNm0RpBH+db/goMHtYZ
+        CDQN3/tBHmHvu0EQ068aT6Ipg/a7LOk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-593-4jIgp8J3Op2JG9PvyFdW3Q-1; Tue, 10 Nov 2020 04:28:31 -0500
+X-MC-Unique: 4jIgp8J3Op2JG9PvyFdW3Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D72611008312;
+        Tue, 10 Nov 2020 09:28:29 +0000 (UTC)
+Received: from T590 (ovpn-12-202.pek2.redhat.com [10.72.12.202])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A1C245C5BB;
+        Tue, 10 Nov 2020 09:28:21 +0000 (UTC)
+Date:   Tue, 10 Nov 2020 17:28:17 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V3 for 5.11 11/12] scsi: make sure sdev->queue_depth is
+ <= shost->can_queue
+Message-ID: <20201110092817.GD372588@T590>
+References: <20200923013339.1621784-1-ming.lei@redhat.com>
+ <20200923013339.1621784-12-ming.lei@redhat.com>
+ <5b229af8-520d-d3cf-caa0-5d3b11fa1083@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b229af8-520d-d3cf-caa0-5d3b11fa1083@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 09 2020 at 20:59, Ira Weiny wrote:
-> On Tue, Nov 10, 2020 at 02:13:56AM +0100, Thomas Gleixner wrote:
-> Also, we can convert the new memcpy_*_page() calls to kmap_local() as well.
-> [For now my patch just uses kmap_atomic().]
->
-> I've not looked at all of the patches in your latest version.  Have you
-> included converting any of the kmap() call sites?  I thought you were more
-> focused on converting the kmap_atomic() to kmap_local()?
+On Wed, Sep 23, 2020 at 08:38:44AM +0100, John Garry wrote:
+> On 23/09/2020 02:33, Ming Lei wrote:
+> > Obviously scsi device's queue depth can't be > host's can_queue,
+> > so make it explicitely in scsi_change_queue_depth().
+> 
+> ha, why not can_queue * nr_hw_queues?
 
-I did not touch any of those yet, but it's a logical consequence to
-convert all kmap() instances which are _not_ creating a global mapping
-over to it.
+Yeah, you are right, it should be can_queue * nr_hw_queues for
+non-shared-tags.
+
 
 Thanks,
-
-        tglx
+Ming
 
