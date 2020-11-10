@@ -2,178 +2,296 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD123C388F7
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 17:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B3EC388F7
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 18:54:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E41B2076E
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 17:42:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CD1820809
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 18:54:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726467AbgKJRm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Nov 2020 12:42:57 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2080 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726428AbgKJRm5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Nov 2020 12:42:57 -0500
-Received: from fraeml741-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4CVwCC0WCXz67KVN;
-        Wed, 11 Nov 2020 01:41:27 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml741-chm.china.huawei.com (10.206.15.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1913.5; Tue, 10 Nov 2020 18:42:49 +0100
-Received: from [10.47.88.91] (10.47.88.91) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 10 Nov
- 2020 17:42:48 +0000
-Subject: Re: [PATCH v8 17/18] scsi: megaraid_sas: Added support for shared
- host tagset for cpuhotplug
-From:   John Garry <john.garry@huawei.com>
-To:     Qian Cai <cai@redhat.com>, Sumit Saxena <sumit.saxena@broadcom.com>
-CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        <don.brace@microsemi.com>, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        <dgilbert@interlog.com>, <paolo.valente@linaro.org>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        <linux-block@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        "Linux SCSI List" <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>,
-        <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <1597850436-116171-1-git-send-email-john.garry@huawei.com>
- <1597850436-116171-18-git-send-email-john.garry@huawei.com>
- <fe3dff7dae4494e5a88caffbb4d877bbf472dceb.camel@redhat.com>
- <385d5408-6ba2-6bb6-52d3-b59c9aa9c5e5@huawei.com>
- <193a0440eed447209c48bda042f0e4db102355e7.camel@redhat.com>
- <519e0d58-e73e-22ce-0ddb-1be71487ba6d@huawei.com>
- <d8fd51b11d5d54e6ec7e4e9a4f7dcc83f1215cd3.camel@redhat.com>
- <d4f86cccccc3bffccc4eda39500ce1e1fee2109a.camel@redhat.com>
- <7624d3fe1613f19af5c3a77f4ae8fe55@mail.gmail.com>
- <d1040c06-74ea-7016-d259-195fa52196a9@huawei.com>
- <CAL2rwxoAAGQDud1djb3_LNvBw95YoYUGhe22FwE=hYhy7XOLSw@mail.gmail.com>
- <aaf849d38ca3cdd45151ffae9b6a99fe6f6ea280.camel@redhat.com>
- <0c75b881-3096-12cf-07cc-1119ca6a453e@huawei.com>
- <06a1a6bde51a66461d7b3135349641856315401d.camel@redhat.com>
- <db92d37c-28fd-4f81-7b59-8f19e9178543@huawei.com>
-Message-ID: <8043d516-c041-c94b-a7d9-61bdbfef0d7e@huawei.com>
-Date:   Tue, 10 Nov 2020 17:42:40 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1729630AbgKJSyj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Nov 2020 13:54:39 -0500
+Received: from verein.lst.de ([213.95.11.211]:37048 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725862AbgKJSyj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Nov 2020 13:54:39 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C1AF167373; Tue, 10 Nov 2020 19:54:35 +0100 (CET)
+Date:   Tue, 10 Nov 2020 19:54:35 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me, hch@lst.de,
+        Logan Gunthorpe <logang@deltatee.com>
+Subject: Re: [PATCH V4 2/6] nvme-core: split nvme_alloc_request()
+Message-ID: <20201110185435.GB29983@lst.de>
+References: <20201110022405.6707-1-chaitanya.kulkarni@wdc.com> <20201110022405.6707-3-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <db92d37c-28fd-4f81-7b59-8f19e9178543@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.88.91]
-X-ClientProxiedBy: lhreml727-chm.china.huawei.com (10.201.108.78) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201110022405.6707-3-chaitanya.kulkarni@wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/11/2020 14:05, John Garry wrote:
-> On 09/11/2020 13:39, Qian Cai wrote:
->>> I suppose I could try do this myself also, but an authentic version
->>> would be nicer.
->> The closest one I have here is:
->> https://cailca.coding.net/public/linux/mm/git/files/master/arm64.config
->>
->> but it only selects the Thunder X2 platform and needs to manually select
->> CONFIG_MEGARAID_SAS=m to start with, but none of arm64 systems here have
->> megaraid_sas.
-> 
-> Thanks, I'm confident I can fix it up to get it going on my Huawei arm64 
-> D06CS.
-> 
-> So that board has a megaraid sas card. In addition, it also has hisi_sas 
-> HW, which is another storage controller which we enabled this same 
-> feature which is causing the problem.
-> 
-> I'll report back when I can.
+On Mon, Nov 09, 2020 at 06:24:01PM -0800, Chaitanya Kulkarni wrote:
+> -static inline unsigned int nvme_req_op(struct nvme_command *cmd)
+> -{
+> -	return nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
+> -}
+> -
+> -static inline void nvme_init_req_default_timeout(struct request *req)
+> +static inline void nvme_init_req_timeout(struct request *req)
+>  {
+>  	if (req->q->queuedata)
+>  		req->timeout = NVME_IO_TIMEOUT;
+> @@ -539,28 +534,42 @@ static inline void nvme_init_req_default_timeout(struct request *req)
+>  		req->timeout = NVME_ADMIN_TIMEOUT;
+>  }
+>  
+> +static inline unsigned int nvme_req_op(struct nvme_command *cmd)
+> +{
+> +	return nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
+> +}
 
-So I had to hack that arm64 config a bit to get it booting:
-https://github.com/hisilicon/kernel-dev/commits/private-topic-sas-5.10-megaraid-hang
+This pointlessly moves things around.  I think life would be easier
+by merging the previous and this patch into one.  This is what I have
+in my local tree at the moment:
 
-Boot is ok on my board without the megaraid sas card, but includes 
-hisi_sas HW (which enables the equivalent option which is exposing the 
-problem).
+---
+From 910ac79ef0dcd62bc75e5d57c0d4c57e0cdaaa32 Mon Sep 17 00:00:00 2001
+From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Date: Mon, 9 Nov 2020 18:24:00 -0800
+Subject: nvme: split nvme_alloc_request()
 
-But the board with the megaraid sas boots very slowly, specifically 
-around the megaraid sas probe:
+Right now nvme_alloc_request() allocates a request from block layer
+based on the value of the qid. When qid set to NVME_QID_ANY it used
+blk_mq_alloc_request() else blk_mq_alloc_request_hctx().
 
-: ttyS0 at MMIO 0x3f00002f8 (irq = 17, base_baud = 115200) is a 16550A
-[   50.023726][    T1] printk: console [ttyS0] enabled
-[   50.412597][    T1] megasas: 07.714.04.00-rc1
-[   50.436614][    T5] megaraid_sas 0000:08:00.0: FW now in Ready state
-[   50.450079][    T5] megaraid_sas 0000:08:00.0: 63 bit DMA mask and 63 
-bit consistent mask
-[   50.467811][    T5] megaraid_sas 0000:08:00.0: firmware supports msix 
-        : (128)
-[   50.845995][    T5] megaraid_sas 0000:08:00.0: requested/available 
-msix 128/128
-[   50.861476][    T5] megaraid_sas 0000:08:00.0: current msix/online 
-cpus      : (128/128)
-[   50.877616][    T5] megaraid_sas 0000:08:00.0: RDPQ mode     : (enabled)
-[   50.891018][    T5] megaraid_sas 0000:08:00.0: Current firmware 
-supports maximum commands: 4077       LDIO threshold: 0
-[   51.262942][    T5] megaraid_sas 0000:08:00.0: Performance mode 
-:Latency (latency index = 1)
-[   51.280749][    T5] megaraid_sas 0000:08:00.0: FW supports sync cache 
-        : Yes
-[   51.295451][    T5] megaraid_sas 0000:08:00.0: 
-megasas_disable_intr_fusion is called outbound_intr_mask:0x40000009
-[   51.387474][    T5] megaraid_sas 0000:08:00.0: FW provided 
-supportMaxExtLDs: 1       max_lds: 64
-[   51.404931][    T5] megaraid_sas 0000:08:00.0: controller type 
-: MR(2048MB)
-[   51.419616][    T5] megaraid_sas 0000:08:00.0: Online Controller 
-Reset(OCR)  : Enabled
-[   51.436132][    T5] megaraid_sas 0000:08:00.0: Secure JBOD support 
-: Yes
-[   51.450265][    T5] megaraid_sas 0000:08:00.0: NVMe passthru support 
-: Yes
-[   51.464757][    T5] megaraid_sas 0000:08:00.0: FW provided TM 
-TaskAbort/Reset timeout        : 6 secs/60 secs
-[   51.484379][    T5] megaraid_sas 0000:08:00.0: JBOD sequence map 
-support     : Yes
-[   51.499607][    T5] megaraid_sas 0000:08:00.0: PCI Lane Margining 
-support    : No
-[   51.547610][    T5] megaraid_sas 0000:08:00.0: NVME page size 
-: (4096)
-[   51.608635][    T5] megaraid_sas 0000:08:00.0: 
-megasas_enable_intr_fusion is called outbound_intr_mask:0x40000000
-[   51.630285][    T5] megaraid_sas 0000:08:00.0: INIT adapter done
-[   51.649854][    T5] megaraid_sas 0000:08:00.0: pci id 
-: (0x1000)/(0x0016)/(0x19e5)/(0xd215)
-[   51.667873][    T5] megaraid_sas 0000:08:00.0: unevenspan support    : no
-[   51.681646][    T5] megaraid_sas 0000:08:00.0: firmware crash dump   : no
-[   51.695596][    T5] megaraid_sas 0000:08:00.0: JBOD sequence map 
-: enabled
-[   51.711521][    T5] megaraid_sas 0000:08:00.0: Max firmware commands: 
-4076 shared with nr_hw_queues = 127
-[   51.733056][    T5] scsi host0: Avago SAS based MegaRAID driver
-[   65.304363][    T5] scsi 0:0:0:0: Direct-Access     ATA      SAMSUNG 
-MZ7KH1T9 404Q PQ: 0 ANSI: 6
-[   65.392401][    T5] scsi 0:0:1:0: Direct-Access     ATA      SAMSUNG 
-MZ7KH1T9 404Q PQ: 0 ANSI: 6
-[   79.508307][    T5] scsi 0:0:65:0: Enclosure         HUAWEI 
-Expander 12Gx16  131  PQ: 0 ANSI: 6
-[  183.965109][   C14] random: fast init done
+The function nvme_alloc_request() is called from different context, The
+only place where it uses non NVME_QID_ANY value is for fabrics connect
+commands :-
 
-Notice the 14 and 104 second delays.
+nvme_submit_sync_cmd()		NVME_QID_ANY
+nvme_features()			NVME_QID_ANY
+nvme_sec_submit()		NVME_QID_ANY
+nvmf_reg_read32()		NVME_QID_ANY
+nvmf_reg_read64()		NVME_QID_ANY
+nvmf_reg_write32()		NVME_QID_ANY
+nvmf_connect_admin_queue()	NVME_QID_ANY
+nvme_submit_user_cmd()		NVME_QID_ANY
+	nvme_alloc_request()
+nvme_keep_alive()		NVME_QID_ANY
+	nvme_alloc_request()
+nvme_timeout()			NVME_QID_ANY
+	nvme_alloc_request()
+nvme_delete_queue()		NVME_QID_ANY
+	nvme_alloc_request()
+nvmet_passthru_execute_cmd()	NVME_QID_ANY
+	nvme_alloc_request()
+nvmf_connect_io_queue() 	QID
+	__nvme_submit_sync_cmd()
+		nvme_alloc_request()
 
-But does boot fully to get to the console. I'll wait for further issues, 
-which you guys seem to experience after a while.
+With passthru nvme_alloc_request() now falls into the I/O fast path such
+that blk_mq_alloc_request_hctx() is never gets called and that adds
+additional branch check in fast path.
 
-Thanks,
-John
+Split the nvme_alloc_request() into nvme_alloc_request() and
+nvme_alloc_request_qid().
+
+Replace each call of the nvme_alloc_request() with NVME_QID_ANY param
+with a call to newly added nvme_alloc_request() without NVME_QID_ANY.
+
+Replace a call to nvme_alloc_request() with QID param with a call to
+newly added nvme_alloc_request() and nvme_alloc_request_qid()
+based on the qid value set in the __nvme_submit_sync_cmd().
+
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c       | 52 +++++++++++++++++++++++-----------
+ drivers/nvme/host/lightnvm.c   |  5 ++--
+ drivers/nvme/host/nvme.h       |  2 ++
+ drivers/nvme/host/pci.c        |  4 +--
+ drivers/nvme/target/passthru.c |  2 +-
+ 5 files changed, 42 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 98bea150e5dc05..fff90200497c8c 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -518,21 +518,14 @@ static inline void nvme_clear_nvme_request(struct request *req)
+ 	}
+ }
+ 
+-struct request *nvme_alloc_request(struct request_queue *q,
+-		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid)
++static inline unsigned int nvme_req_op(struct nvme_command *cmd)
+ {
+-	unsigned op = nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
+-	struct request *req;
+-
+-	if (qid == NVME_QID_ANY) {
+-		req = blk_mq_alloc_request(q, op, flags);
+-	} else {
+-		req = blk_mq_alloc_request_hctx(q, op, flags,
+-				qid ? qid - 1 : 0);
+-	}
+-	if (IS_ERR(req))
+-		return req;
++	return nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
++}
+ 
++static inline void nvme_init_request(struct request *req,
++		struct nvme_command *cmd)
++{
+ 	if (req->q->queuedata)
+ 		req->timeout = NVME_IO_TIMEOUT;
+ 	else /* no queuedata implies admin queue */
+@@ -541,11 +534,33 @@ struct request *nvme_alloc_request(struct request_queue *q,
+ 	req->cmd_flags |= REQ_FAILFAST_DRIVER;
+ 	nvme_clear_nvme_request(req);
+ 	nvme_req(req)->cmd = cmd;
++}
+ 
++struct request *nvme_alloc_request(struct request_queue *q,
++		struct nvme_command *cmd, blk_mq_req_flags_t flags)
++{
++	struct request *req;
++
++	req = blk_mq_alloc_request(q, nvme_req_op(cmd), flags);
++	if (!IS_ERR(req))
++		nvme_init_request(req, cmd);
+ 	return req;
+ }
+ EXPORT_SYMBOL_GPL(nvme_alloc_request);
+ 
++struct request *nvme_alloc_request_qid(struct request_queue *q,
++		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid)
++{
++	struct request *req;
++
++	req = blk_mq_alloc_request_hctx(q, nvme_req_op(cmd), flags,
++			qid ? qid - 1 : 0);
++	if (!IS_ERR(req))
++		nvme_init_request(req, cmd);
++	return req;
++}
++EXPORT_SYMBOL_GPL(nvme_alloc_request_qid);
++
+ static int nvme_toggle_streams(struct nvme_ctrl *ctrl, bool enable)
+ {
+ 	struct nvme_command c;
+@@ -902,7 +917,10 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 	struct request *req;
+ 	int ret;
+ 
+-	req = nvme_alloc_request(q, cmd, flags, qid);
++	if (qid == NVME_QID_ANY)
++		req = nvme_alloc_request(q, cmd, flags);
++	else
++		req = nvme_alloc_request_qid(q, cmd, flags, qid);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+ 
+@@ -1073,7 +1091,7 @@ static int nvme_submit_user_cmd(struct request_queue *q,
+ 	void *meta = NULL;
+ 	int ret;
+ 
+-	req = nvme_alloc_request(q, cmd, 0, NVME_QID_ANY);
++	req = nvme_alloc_request(q, cmd, 0);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+ 
+@@ -1148,8 +1166,8 @@ static int nvme_keep_alive(struct nvme_ctrl *ctrl)
+ {
+ 	struct request *rq;
+ 
+-	rq = nvme_alloc_request(ctrl->admin_q, &ctrl->ka_cmd, BLK_MQ_REQ_RESERVED,
+-			NVME_QID_ANY);
++	rq = nvme_alloc_request(ctrl->admin_q, &ctrl->ka_cmd,
++			BLK_MQ_REQ_RESERVED);
+ 	if (IS_ERR(rq))
+ 		return PTR_ERR(rq);
+ 
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 88a7c8eac4556c..470cef3abec3db 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -653,7 +653,7 @@ static struct request *nvme_nvm_alloc_request(struct request_queue *q,
+ 
+ 	nvme_nvm_rqtocmd(rqd, ns, cmd);
+ 
+-	rq = nvme_alloc_request(q, (struct nvme_command *)cmd, 0, NVME_QID_ANY);
++	rq = nvme_alloc_request(q, (struct nvme_command *)cmd, 0);
+ 	if (IS_ERR(rq))
+ 		return rq;
+ 
+@@ -767,8 +767,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+ 	int ret = 0;
+ 
+-	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0,
+-			NVME_QID_ANY);
++	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0);
+ 	if (IS_ERR(rq)) {
+ 		ret = -ENOMEM;
+ 		goto err_cmd;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 824776a8ba13e6..83fb30e317e076 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -611,6 +611,8 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl);
+ 
+ #define NVME_QID_ANY -1
+ struct request *nvme_alloc_request(struct request_queue *q,
++		struct nvme_command *cmd, blk_mq_req_flags_t flags);
++struct request *nvme_alloc_request_qid(struct request_queue *q,
+ 		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid);
+ void nvme_cleanup_cmd(struct request *req);
+ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 6123040ff87204..5e6365dd0c8e9e 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1304,7 +1304,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 		 req->tag, nvmeq->qid);
+ 
+ 	abort_req = nvme_alloc_request(dev->ctrl.admin_q, &cmd,
+-			BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
++			BLK_MQ_REQ_NOWAIT);
+ 	if (IS_ERR(abort_req)) {
+ 		atomic_inc(&dev->ctrl.abort_limit);
+ 		return BLK_EH_RESET_TIMER;
+@@ -2218,7 +2218,7 @@ static int nvme_delete_queue(struct nvme_queue *nvmeq, u8 opcode)
+ 	cmd.delete_queue.opcode = opcode;
+ 	cmd.delete_queue.qid = cpu_to_le16(nvmeq->qid);
+ 
+-	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
++	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+ 
+diff --git a/drivers/nvme/target/passthru.c b/drivers/nvme/target/passthru.c
+index a062398305a76d..be8ae59dcb7109 100644
+--- a/drivers/nvme/target/passthru.c
++++ b/drivers/nvme/target/passthru.c
+@@ -248,7 +248,7 @@ static void nvmet_passthru_execute_cmd(struct nvmet_req *req)
+ 		timeout = req->sq->ctrl->subsys->admin_timeout;
+ 	}
+ 
+-	rq = nvme_alloc_request(q, req->cmd, 0, NVME_QID_ANY);
++	rq = nvme_alloc_request(q, req->cmd, 0);
+ 	if (IS_ERR(rq)) {
+ 		status = NVME_SC_INTERNAL;
+ 		goto out_put_ns;
+-- 
+2.28.0
+
