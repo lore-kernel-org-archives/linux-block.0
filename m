@@ -2,296 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B3EC388F7
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 18:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64BB7C388F7
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 19:56:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CD1820809
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 18:54:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1884520781
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 19:56:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="UP/1RwTZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729630AbgKJSyj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Nov 2020 13:54:39 -0500
-Received: from verein.lst.de ([213.95.11.211]:37048 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725862AbgKJSyj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Nov 2020 13:54:39 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id C1AF167373; Tue, 10 Nov 2020 19:54:35 +0100 (CET)
-Date:   Tue, 10 Nov 2020 19:54:35 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me, hch@lst.de,
-        Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH V4 2/6] nvme-core: split nvme_alloc_request()
-Message-ID: <20201110185435.GB29983@lst.de>
-References: <20201110022405.6707-1-chaitanya.kulkarni@wdc.com> <20201110022405.6707-3-chaitanya.kulkarni@wdc.com>
+        id S1730788AbgKJT4A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Nov 2020 14:56:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730618AbgKJT4A (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Nov 2020 14:56:00 -0500
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0304C0613D1
+        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 11:55:59 -0800 (PST)
+Received: by mail-ed1-x544.google.com with SMTP id o20so14137081eds.3
+        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 11:55:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=pgO8LSm7rMPKtTw+RAIb7HJGumePII/RfxxVSh9XMP0=;
+        b=UP/1RwTZeKv+aSUgb1FlkZ5/PIjZxNgK+KEMRzbIkyBDPFpQKEhladO7Z9+0xT3Wa7
+         mRMzvkmpmOiYEGuOR68MbAEBjN9zhiL6cJBz6PhTggHpyXLemfEcBVTaBwg8O76THgbp
+         4QPzBn4mjcHju5puRuZo7S7RPhkP0Z2GbBx1lGC/CNi9voaw1uiukuYgLCMsLi8xp11i
+         7pn9wI26agZFKqUM71DCJGysS8ZT8cttqI6SuwNNjMCxk1woEhQkBLXVeH69IugxHCUj
+         axa+BCN/7tk4Slp/i9cQps+tmhdXQCW+IOXBlnaElCLlgQVDcqEFlzIFApLIfyC3LmrA
+         ApGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=pgO8LSm7rMPKtTw+RAIb7HJGumePII/RfxxVSh9XMP0=;
+        b=PgH+oeWYO8ZnM1NwnvFP5nHZ2Wo/NgxpMt+3lV0ZpDaNrDk5nwmuzWSqvX/hFBJMNg
+         xW0cQ/zgF4Kjp492sXNIzAaZuqb09nCBCE5NyCJgyN9MyM2WYG+qRq3nSkxooblmkNlu
+         b74uTm6ULryhUQ0N62DlI+Ov5Zc8+rjKKuiOsP7ZHhNENzdh38QMvSuKYyR+2BLBE4mD
+         56OIJywNPYOVNWCQDFKkVIcHO+tIqs6+dKZLYwAJIkiiqmJaDixjMg/fGcpA5a86oWUt
+         Qp7wxSDcJJORwwqupOuh6UPauKTFIudLDoDuF4u6L7Ym6ON/M6QBNIDTQ2UC69c0xLmq
+         6uJw==
+X-Gm-Message-State: AOAM530Htr2p6YdjiqwdrWGXltDIWJX39OHDQcJl6Yc+YdK0wmJWYQrs
+        OlGx++1xSVrj8PrS5zYJO/xefg==
+X-Google-Smtp-Source: ABdhPJx0eHHki8+yi032+9uSCy/U1eYvA3pLpI8aZqWtK8JaOiCdpynRyj2vbX/T7T9JWkc7B8NqsA==
+X-Received: by 2002:aa7:d64b:: with SMTP id v11mr1106671edr.253.1605038158720;
+        Tue, 10 Nov 2020 11:55:58 -0800 (PST)
+Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id d19sm11103156eds.31.2020.11.10.11.55.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Nov 2020 11:55:58 -0800 (PST)
+Date:   Tue, 10 Nov 2020 20:55:57 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "joshi.k@samsung.com" <joshi.k@samsung.com>,
+        "k.jensen@samsung.com" <k.jensen@samsung.com>
+Subject: Re: nvme: enable ro namespace for ZNS without append
+Message-ID: <20201110195557.v25tq7eicxzwfgrz@MacBook-Pro.localdomain>
+References: <20201110093938.25386-1-javier.gonz@samsung.com>
+ <20201110094354.GB25672@lst.de>
+ <20201110112554.GA465503@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20201110022405.6707-3-chaitanya.kulkarni@wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201110112554.GA465503@localhost.localdomain>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 09, 2020 at 06:24:01PM -0800, Chaitanya Kulkarni wrote:
-> -static inline unsigned int nvme_req_op(struct nvme_command *cmd)
-> -{
-> -	return nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
-> -}
-> -
-> -static inline void nvme_init_req_default_timeout(struct request *req)
-> +static inline void nvme_init_req_timeout(struct request *req)
->  {
->  	if (req->q->queuedata)
->  		req->timeout = NVME_IO_TIMEOUT;
-> @@ -539,28 +534,42 @@ static inline void nvme_init_req_default_timeout(struct request *req)
->  		req->timeout = NVME_ADMIN_TIMEOUT;
->  }
->  
-> +static inline unsigned int nvme_req_op(struct nvme_command *cmd)
-> +{
-> +	return nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
-> +}
+On 10.11.2020 11:25, Niklas Cassel wrote:
+>On Tue, Nov 10, 2020 at 10:43:54AM +0100, Christoph Hellwig wrote:
+>> > -	if (id->nsattr & NVME_NS_ATTR_RO)
+>> > +	if (id->nsattr & NVME_NS_ATTR_RO ||
+>> > +			test_bit(NVME_NS_FORCE_RO, &ns->flags))
+>
+>Indentation for the test_bit() looks off.
+>I assume that Christoph can fixup that when applying.
+>
+>$ ./scripts/checkpatch.pl --strict ~/javier.patch
+>CHECK: Alignment should match open parenthesis
+>#280: FILE: drivers/nvme/host/core.c:2062:
+>+       if (id->nsattr & NVME_NS_ATTR_RO ||
+>+                       test_bit(NVME_NS_FORCE_RO, &ns->flags))
+>
+>
+>For the record:
+>
+>WARNING: From:/Signed-off-by: email address mismatch: 'From: "Javier González" <javier@javigon.com>' != 'Signed-off-by: Javier González <javier.gonz@samsung.com>'
+>
+>If you want to use a SoB that is different from the email address which
+>you are sending from, then according to the The canonical patch format:
+>
+>https://www.kernel.org/doc/html/latest/process/submitting-patches.html#the-canonical-patch-format
+>
+>"""
+>The from line must be the very first line in the message body, and has the form:
+>
+>    From: Patch Author <author@example.com>
+>
+>The from line specifies who will be credited as the author of the patch in the permanent changelog.
+>If the from line is missing, then the From: line from the email header will be used to determine
+>the patch author in the changelog.
+>
+>Note, the From: tag is optional when the From: author is also the person (and email) listed in the
+>From: line of the email header.
+>"""
+>
+>
+>That way, when the maintainers use git am, it will pick the author
+>from the "From:" in the message body, rather than from the email header.
+>
+>Otherwise the Author: field in the git log will be different from your SoB.
+>
+>There are several ways you can fix this, either by using the correct email
+>when you do the commit in the first place, then git format-patch will add
+>From: automatically, or by using the git config sendemail.from, or --from
+>option to git-send-email.
+>
 
-This pointlessly moves things around.  I think life would be easier
-by merging the previous and this patch into one.  This is what I have
-in my local tree at the moment:
+Thanks for taking the time Niklas. I have done this intentionally for
+quite some time - I use javier@javigon.com to submit and commit and then
+sign-off with my current employer.
 
----
-From 910ac79ef0dcd62bc75e5d57c0d4c57e0cdaaa32 Mon Sep 17 00:00:00 2001
-From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Date: Mon, 9 Nov 2020 18:24:00 -0800
-Subject: nvme: split nvme_alloc_request()
-
-Right now nvme_alloc_request() allocates a request from block layer
-based on the value of the qid. When qid set to NVME_QID_ANY it used
-blk_mq_alloc_request() else blk_mq_alloc_request_hctx().
-
-The function nvme_alloc_request() is called from different context, The
-only place where it uses non NVME_QID_ANY value is for fabrics connect
-commands :-
-
-nvme_submit_sync_cmd()		NVME_QID_ANY
-nvme_features()			NVME_QID_ANY
-nvme_sec_submit()		NVME_QID_ANY
-nvmf_reg_read32()		NVME_QID_ANY
-nvmf_reg_read64()		NVME_QID_ANY
-nvmf_reg_write32()		NVME_QID_ANY
-nvmf_connect_admin_queue()	NVME_QID_ANY
-nvme_submit_user_cmd()		NVME_QID_ANY
-	nvme_alloc_request()
-nvme_keep_alive()		NVME_QID_ANY
-	nvme_alloc_request()
-nvme_timeout()			NVME_QID_ANY
-	nvme_alloc_request()
-nvme_delete_queue()		NVME_QID_ANY
-	nvme_alloc_request()
-nvmet_passthru_execute_cmd()	NVME_QID_ANY
-	nvme_alloc_request()
-nvmf_connect_io_queue() 	QID
-	__nvme_submit_sync_cmd()
-		nvme_alloc_request()
-
-With passthru nvme_alloc_request() now falls into the I/O fast path such
-that blk_mq_alloc_request_hctx() is never gets called and that adds
-additional branch check in fast path.
-
-Split the nvme_alloc_request() into nvme_alloc_request() and
-nvme_alloc_request_qid().
-
-Replace each call of the nvme_alloc_request() with NVME_QID_ANY param
-with a call to newly added nvme_alloc_request() without NVME_QID_ANY.
-
-Replace a call to nvme_alloc_request() with QID param with a call to
-newly added nvme_alloc_request() and nvme_alloc_request_qid()
-based on the qid value set in the __nvme_submit_sync_cmd().
-
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c       | 52 +++++++++++++++++++++++-----------
- drivers/nvme/host/lightnvm.c   |  5 ++--
- drivers/nvme/host/nvme.h       |  2 ++
- drivers/nvme/host/pci.c        |  4 +--
- drivers/nvme/target/passthru.c |  2 +-
- 5 files changed, 42 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 98bea150e5dc05..fff90200497c8c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -518,21 +518,14 @@ static inline void nvme_clear_nvme_request(struct request *req)
- 	}
- }
- 
--struct request *nvme_alloc_request(struct request_queue *q,
--		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid)
-+static inline unsigned int nvme_req_op(struct nvme_command *cmd)
- {
--	unsigned op = nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
--	struct request *req;
--
--	if (qid == NVME_QID_ANY) {
--		req = blk_mq_alloc_request(q, op, flags);
--	} else {
--		req = blk_mq_alloc_request_hctx(q, op, flags,
--				qid ? qid - 1 : 0);
--	}
--	if (IS_ERR(req))
--		return req;
-+	return nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
-+}
- 
-+static inline void nvme_init_request(struct request *req,
-+		struct nvme_command *cmd)
-+{
- 	if (req->q->queuedata)
- 		req->timeout = NVME_IO_TIMEOUT;
- 	else /* no queuedata implies admin queue */
-@@ -541,11 +534,33 @@ struct request *nvme_alloc_request(struct request_queue *q,
- 	req->cmd_flags |= REQ_FAILFAST_DRIVER;
- 	nvme_clear_nvme_request(req);
- 	nvme_req(req)->cmd = cmd;
-+}
- 
-+struct request *nvme_alloc_request(struct request_queue *q,
-+		struct nvme_command *cmd, blk_mq_req_flags_t flags)
-+{
-+	struct request *req;
-+
-+	req = blk_mq_alloc_request(q, nvme_req_op(cmd), flags);
-+	if (!IS_ERR(req))
-+		nvme_init_request(req, cmd);
- 	return req;
- }
- EXPORT_SYMBOL_GPL(nvme_alloc_request);
- 
-+struct request *nvme_alloc_request_qid(struct request_queue *q,
-+		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid)
-+{
-+	struct request *req;
-+
-+	req = blk_mq_alloc_request_hctx(q, nvme_req_op(cmd), flags,
-+			qid ? qid - 1 : 0);
-+	if (!IS_ERR(req))
-+		nvme_init_request(req, cmd);
-+	return req;
-+}
-+EXPORT_SYMBOL_GPL(nvme_alloc_request_qid);
-+
- static int nvme_toggle_streams(struct nvme_ctrl *ctrl, bool enable)
- {
- 	struct nvme_command c;
-@@ -902,7 +917,10 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 	struct request *req;
- 	int ret;
- 
--	req = nvme_alloc_request(q, cmd, flags, qid);
-+	if (qid == NVME_QID_ANY)
-+		req = nvme_alloc_request(q, cmd, flags);
-+	else
-+		req = nvme_alloc_request_qid(q, cmd, flags, qid);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
-@@ -1073,7 +1091,7 @@ static int nvme_submit_user_cmd(struct request_queue *q,
- 	void *meta = NULL;
- 	int ret;
- 
--	req = nvme_alloc_request(q, cmd, 0, NVME_QID_ANY);
-+	req = nvme_alloc_request(q, cmd, 0);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
-@@ -1148,8 +1166,8 @@ static int nvme_keep_alive(struct nvme_ctrl *ctrl)
- {
- 	struct request *rq;
- 
--	rq = nvme_alloc_request(ctrl->admin_q, &ctrl->ka_cmd, BLK_MQ_REQ_RESERVED,
--			NVME_QID_ANY);
-+	rq = nvme_alloc_request(ctrl->admin_q, &ctrl->ka_cmd,
-+			BLK_MQ_REQ_RESERVED);
- 	if (IS_ERR(rq))
- 		return PTR_ERR(rq);
- 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 88a7c8eac4556c..470cef3abec3db 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -653,7 +653,7 @@ static struct request *nvme_nvm_alloc_request(struct request_queue *q,
- 
- 	nvme_nvm_rqtocmd(rqd, ns, cmd);
- 
--	rq = nvme_alloc_request(q, (struct nvme_command *)cmd, 0, NVME_QID_ANY);
-+	rq = nvme_alloc_request(q, (struct nvme_command *)cmd, 0);
- 	if (IS_ERR(rq))
- 		return rq;
- 
-@@ -767,8 +767,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 	DECLARE_COMPLETION_ONSTACK(wait);
- 	int ret = 0;
- 
--	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0,
--			NVME_QID_ANY);
-+	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0);
- 	if (IS_ERR(rq)) {
- 		ret = -ENOMEM;
- 		goto err_cmd;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 824776a8ba13e6..83fb30e317e076 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -611,6 +611,8 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl);
- 
- #define NVME_QID_ANY -1
- struct request *nvme_alloc_request(struct request_queue *q,
-+		struct nvme_command *cmd, blk_mq_req_flags_t flags);
-+struct request *nvme_alloc_request_qid(struct request_queue *q,
- 		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid);
- void nvme_cleanup_cmd(struct request *req);
- blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 6123040ff87204..5e6365dd0c8e9e 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1304,7 +1304,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		 req->tag, nvmeq->qid);
- 
- 	abort_req = nvme_alloc_request(dev->ctrl.admin_q, &cmd,
--			BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
-+			BLK_MQ_REQ_NOWAIT);
- 	if (IS_ERR(abort_req)) {
- 		atomic_inc(&dev->ctrl.abort_limit);
- 		return BLK_EH_RESET_TIMER;
-@@ -2218,7 +2218,7 @@ static int nvme_delete_queue(struct nvme_queue *nvmeq, u8 opcode)
- 	cmd.delete_queue.opcode = opcode;
- 	cmd.delete_queue.qid = cpu_to_le16(nvmeq->qid);
- 
--	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
-+	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
-diff --git a/drivers/nvme/target/passthru.c b/drivers/nvme/target/passthru.c
-index a062398305a76d..be8ae59dcb7109 100644
---- a/drivers/nvme/target/passthru.c
-+++ b/drivers/nvme/target/passthru.c
-@@ -248,7 +248,7 @@ static void nvmet_passthru_execute_cmd(struct nvmet_req *req)
- 		timeout = req->sq->ctrl->subsys->admin_timeout;
- 	}
- 
--	rq = nvme_alloc_request(q, req->cmd, 0, NVME_QID_ANY);
-+	rq = nvme_alloc_request(q, req->cmd, 0);
- 	if (IS_ERR(rq)) {
- 		status = NVME_SC_INTERNAL;
- 		goto out_put_ns;
--- 
-2.28.0
-
+If this presents an inconvenience, I don't mind changing the committer
+to my current Samsung email.
