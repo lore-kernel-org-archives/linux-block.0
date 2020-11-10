@@ -7,82 +7,103 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EFDDC388F7
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 15:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 875FBC388F7
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 15:52:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD7CC206B2
-	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 15:01:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B4F020674
+	for <linux-block@archiver.kernel.org>; Tue, 10 Nov 2020 15:52:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="NfZt6Z/3"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DHvuCqjH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730432AbgKJPBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Nov 2020 10:01:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730200AbgKJPBp (ORCPT
+        id S1730746AbgKJPwX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Nov 2020 10:52:23 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18954 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726721AbgKJPwW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Nov 2020 10:01:45 -0500
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD4B2C0613CF
-        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 07:01:45 -0800 (PST)
-Received: by mail-pg1-x541.google.com with SMTP id f18so5901285pgi.8
-        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 07:01:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yv0x4pKmyqoQ3NFgWKouoXjBWuY7N5DeTwdLHRsMbfM=;
-        b=NfZt6Z/35bJEdyriRwGK5uqICs+0CxQHGvpSYM3Lgc6R+5p0JpIhgJYh2xuBoSX7u3
-         v91SBGhKbidwlMHYyxh7pcfhGBIbZxj/YICsU7SSe3FwCLOD40+Vg0w5uKajxxxHQncP
-         fmjKrtSYgiDd21F+8j5vTTuezli89Jk6YEpo3+vQWcRGYu7TW0b0yBr4g3bSAwmIM0eR
-         GR28yd6yuJB04T6XI4484ptmrj7K8glvtMJfC28oh/j5xkVVyxwSIOUkOGY+jbO0A5z+
-         YtU1Aw4n/U0aMJUfImoROeoVJPIoGAQBb8lLu7D/coJM6vtGgQ95Av6cf2bCfyzTNzMr
-         Uyqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yv0x4pKmyqoQ3NFgWKouoXjBWuY7N5DeTwdLHRsMbfM=;
-        b=PVos3H2UmH/qCQTZcJzd0wKIqXew+v9VoqVhmo4jx8pvY9RWrKlKJnQwdafNGjg1Jw
-         057Uarls91PbxtAx1irPPDsXc9wsfOwJRbfs5nF3+bN69Czs5qHky/Jlkn3rnK92occ2
-         h4GjxXERvW4+PVqsObd15g0iGvxGgWkmUMmRujDs4q4V3whWAGDe4/clu9ZyF+IQH5wg
-         Xaoq03UImWvm5Sw54CvTZ7Tw4vs5JJlnualAgC5MyoE6/NpDAh1FQbqLnXFBAQUlriSi
-         /E2PjmGD5QXn8veEu+LTRLylYvclxJbMx/au/9OWKwTfeksAYScwqKlkJbMs7W8iqvPz
-         jSow==
-X-Gm-Message-State: AOAM530kw/BeHRDtM5CMhRJVDdWbBcEOl4hmS3oSInbmA9YZpPo4oQLv
-        tvIPu2Kw+UEBLV60d3DfX2edlFIlDsWe9g==
-X-Google-Smtp-Source: ABdhPJxuY9FhzKUndO6y0cD5/gR3kLJeqwn2W95CY52lKt35Oh+eeXPQnj4xA2xeoqIRbNo1Fh14uQ==
-X-Received: by 2002:a17:90a:4dc8:: with SMTP id r8mr75784pjl.1.1605020505013;
-        Tue, 10 Nov 2020 07:01:45 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id s22sm13304748pfu.119.2020.11.10.07.01.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2020 07:01:44 -0800 (PST)
-Subject: Re: [PATCH] nbd: fix a block_device refcount leak in nbd_release
-To:     Christoph Hellwig <hch@lst.de>, josef@toxicpanda.com
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org
-References: <20201109173059.2500429-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b1054866-85f3-54f9-999a-07760b1237f2@kernel.dk>
-Date:   Tue, 10 Nov 2020 08:01:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 10 Nov 2020 10:52:22 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AAFkv4j150651;
+        Tue, 10 Nov 2020 10:52:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=WeGskIQqtSbIZM7/zDMutEYYyecROKoFmboUQXGkHoA=;
+ b=DHvuCqjHY/4r7aTMOFYFObfsKoVrJRa+7GrUl6KNgMJp1XpZXAQmyd+AbKO/UBOtdBFa
+ 3x+9NjfrNWI8wp7YUVpHrje4gHhR2VCpWkKVMSFrpERX4gosG+nxYZsiD/I7HOBVaSp0
+ YC7WoLW29Bb0N6wbSk3KYoSVdPW2/9WN32L6s4jgTUCF6l81oWHfQFthpdCTkDZDCPvp
+ H2pjneY5wzg/+sjGYoeWTKySwi8aNkcZkT2E4PUM/f1avFlfjI0EX86Qf6VPiOSNq11F
+ nmlsJOjFdHxADQCRVi1jr2Z8L799ww+NFfA+tlTE5lJJliTTx5WeUibGO3LqjFnJ9hMe Mw== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34qanb743v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Nov 2020 10:52:19 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AAFWFgo004506;
+        Tue, 10 Nov 2020 15:50:56 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 34nk78kajq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Nov 2020 15:50:56 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AAFoscJ7930390
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Nov 2020 15:50:54 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD1324C04A;
+        Tue, 10 Nov 2020 15:50:53 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9DA2D4C050;
+        Tue, 10 Nov 2020 15:50:53 +0000 (GMT)
+Received: from linux.fritz.box (unknown [9.145.47.150])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 10 Nov 2020 15:50:53 +0000 (GMT)
+Subject: Re: [PATCH v2 00/10] DASD FC endpoint security
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20201008131336.61100-1-sth@linux.ibm.com>
+ <20201012183550.GA12341@imap.linux.ibm.com>
+ <07b0f296-e0b2-1383-56a1-0d5411c101da@kernel.dk>
+ <b5038d44-aa46-bbde-7a9f-0de46fed516a@linux.ibm.com>
+ <17e1142c-4108-6f74-971a-dee007162786@kernel.dk>
+ <ad3caaf7-ed8e-9f21-c3a6-c385139feb7b@linux.ibm.com>
+ <6468cfad-e14c-060d-a525-00d75fe66819@kernel.dk>
+From:   Stefan Haberland <sth@linux.ibm.com>
+Message-ID: <30740ed3-21b9-71cd-b48c-1d6947c6f029@linux.ibm.com>
+Date:   Tue, 10 Nov 2020 16:50:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201109173059.2500429-1-hch@lst.de>
+In-Reply-To: <6468cfad-e14c-060d-a525-00d75fe66819@kernel.dk>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-10_06:2020-11-10,2020-11-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
+ bulkscore=0 mlxlogscore=815 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 suspectscore=0 phishscore=0 adultscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011100111
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/9/20 10:30 AM, Christoph Hellwig wrote:
-> bdget_disk needs to be paired with bdput to not leak a reference
-> on the block device inode.
+Am 14.10.20 um 03:19 schrieb Jens Axboe:
+>
+>> So, instead could you please apply the patches for 5.11 as soon as it is
+>> suitable?
+> I will - I have it queued up, won't create anything public until we
+> get past the merge window.
+>
 
-Applied, thanks.
+Sorry to bother you again with this.
+Is there any outlook when you are going to push the patches to your
+for-next branch?
 
--- 
-Jens Axboe
+Or shall I resend the patches?
 
