@@ -2,91 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C195C55ABD
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 02:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97836C5517A
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 03:09:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 040D0221F7
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 02:16:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFYo4SOb"
+	by mail.kernel.org (Postfix) with ESMTP id 46DD52168B
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 03:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731788AbgKKCQJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Nov 2020 21:16:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41322 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726307AbgKKCQI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Nov 2020 21:16:08 -0500
-Received: from sol.attlocal.net (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4AAA721D91;
-        Wed, 11 Nov 2020 02:16:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605060968;
-        bh=PZRt3E6xxphWLNzNZIOoOuzGlDMjxwJgE196pZ7V150=;
-        h=From:To:Cc:Subject:Date:From;
-        b=jFYo4SObuhumM2OS4flaYv43pxymqBCEH26pzPgG3NsTvcCAj0KALgg9je/z3sQ54
-         l6WbWCayAo1Ma1mY4sBIZtczuWaj3AvOgaVDFwgjqi4lqy7NVRzRAIpUtT8Y3d8AuN
-         mo8DovjK/px47OISPMXoR7L1sEpmIbg02PWJnPQU=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-fscrypt@vger.kernel.org, Satya Tangirala <satyat@google.com>
-Subject: [PATCH] block/keyslot-manager: prevent crash when num_slots=1
-Date:   Tue, 10 Nov 2020 18:14:27 -0800
-Message-Id: <20201111021427.466349-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.29.2
+        id S1725894AbgKKDJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Nov 2020 22:09:07 -0500
+Received: from mail-il1-f197.google.com ([209.85.166.197]:44786 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725884AbgKKDJH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Nov 2020 22:09:07 -0500
+Received: by mail-il1-f197.google.com with SMTP id o12so383214ilq.11
+        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 19:09:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=wf9hL6Te9sp/yqa+Doc2BxzTapoLp41NMYlihKhsE5U=;
+        b=snDRMA+ZPQs4u3ivcuKtHy1NMxIEXD1AlbZyk9iK75SRUXFRHh+kOJosoaqjldUwLi
+         nCIY13EFFzMP8Tb22LWgZnH3odRRRS2La/3GSn7SYy4uvokH4GN5VXh49Q4Oni+5zUiG
+         62T2gyafGALIGCk59JZVhH5/gdfPjRuX2IPqAUINtYiiIdooUH1aXpNmOcK7h4Dsq6sh
+         ZnIqPlS6l1wJ3Mam03LFksYyM1p80NcQqmbs3BaM8JlVNBLqC0LDO6HQYwnjD4dTqoSq
+         +qG4OsC5nVA4uQ/lVJmHctOWLuCEmNK5+d2Gkkk4LWJk60M3pqo+n9XPENdhRqlWlHuY
+         dDuA==
+X-Gm-Message-State: AOAM530znPhLsVWLoPpbpfZhgyJAnIfGZ4Dr0ANpWGofV2hiz8BoYKau
+        1AVhtIefJzQ9cFEXBd0uyDVc+fKfze/5J7Rx0+Y2xbryOwdg
+X-Google-Smtp-Source: ABdhPJw322s2MJlVk9+t74N1ScoBaJO4J3N8LABAJKKIIvfejPk/tSGh8Y8hRv9pCYKg3l9qjzobyF5QLxxkTWZVc72IPUvFMa5q
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:ba14:: with SMTP id o20mr17040042ili.76.1605064145162;
+ Tue, 10 Nov 2020 19:09:05 -0800 (PST)
+Date:   Tue, 10 Nov 2020 19:09:05 -0800
+In-Reply-To: <000000000000b09d8c059a3240be@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000036d7e005b3cc1e79@google.com>
+Subject: Re: WARNING in percpu_ref_exit (2)
+From:   syzbot <syzbot+8c4a14856e657b43487c@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, ebiggers@kernel.org, hdanton@sina.com,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        paulmck@kernel.org, syzkaller-bugs@googlegroups.com,
+        viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+syzbot suspects this issue was fixed by commit:
 
-If there is only one keyslot, then blk_ksm_init() computes
-slot_hashtable_size=1 and log_slot_ht_size=0.  This causes
-blk_ksm_find_keyslot() to crash later because it uses
-hash_ptr(key, log_slot_ht_size) to find the hash bucket containing the
-key, and hash_ptr() doesn't support the bits == 0 case.
+commit c1e2148f8ecb26863b899d402a823dab8e26efd1
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Wed Mar 4 14:25:50 2020 +0000
 
-Fix this by making the hash table always have at least 2 buckets.
+    io_uring: free fixed_file_data after RCU grace period
 
-Tested by running:
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=161ea46e500000
+start commit:   63849c8f Merge tag 'linux-kselftest-5.6-rc5' of git://git...
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4527d1e2fb19fd5c
+dashboard link: https://syzkaller.appspot.com/bug?extid=8c4a14856e657b43487c
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c30061e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1251b731e00000
 
-    kvm-xfstests -c ext4 -g encrypt -m inlinecrypt \
-                 -o blk-crypto-fallback.num_keyslots=1
+If the result looks correct, please mark the issue as fixed by replying with:
 
-Fixes: 1b2628397058 ("block: Keyslot Manager for Inline Encryption")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- block/keyslot-manager.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+#syz fix: io_uring: free fixed_file_data after RCU grace period
 
-diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
-index 35abcb1ec051d..0a5b2772324ad 100644
---- a/block/keyslot-manager.c
-+++ b/block/keyslot-manager.c
-@@ -103,6 +103,13 @@ int blk_ksm_init(struct blk_keyslot_manager *ksm, unsigned int num_slots)
- 	spin_lock_init(&ksm->idle_slots_lock);
- 
- 	slot_hashtable_size = roundup_pow_of_two(num_slots);
-+
-+	/*
-+	 * hash_ptr() assumes bits != 0, so ensure the hash table has at least 2
-+	 * buckets.  This only makes a difference when there is only 1 keyslot.
-+	 */
-+	slot_hashtable_size = max(slot_hashtable_size, 2U);
-+
- 	ksm->log_slot_ht_size = ilog2(slot_hashtable_size);
- 	ksm->slot_hashtable = kvmalloc_array(slot_hashtable_size,
- 					     sizeof(ksm->slot_hashtable[0]),
-
-base-commit: f8394f232b1eab649ce2df5c5f15b0e528c92091
--- 
-2.29.2
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
