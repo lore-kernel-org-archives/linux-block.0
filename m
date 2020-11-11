@@ -2,131 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A163C388F9
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 05:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B6D7C55ABD
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 05:16:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D86F20729
+	by mail.kernel.org (Postfix) with ESMTP id F08FF20729
 	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 05:16:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FvSuAV5k"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UrAycymQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725949AbgKKFQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Nov 2020 00:16:52 -0500
+        id S1725971AbgKKFQx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Nov 2020 00:16:53 -0500
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:43928 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbgKKFQv (ORCPT
+        with ESMTP id S1725870AbgKKFQw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Nov 2020 00:16:51 -0500
+        Wed, 11 Nov 2020 00:16:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1605071811; x=1636607811;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=V+1pxFE3wfVWNzNv6wTByGQUOkJZV5/eLfE5mwWWuXM=;
-  b=FvSuAV5k4UCYKGk2FYUbiS05i2CDH8H5fDZlD9/5LF3ZPLRWWkq+BGHL
-   Fm3uUk4VqheQ4I/q52nJ9vLN8wI4vMjrvSVwUGpNkJU2W8852ucNEnLwq
-   OGi8hoF+iSVrPFv84mr7gwvyi2FoHBvDDtHVNPXaekbscWtV0FVfPbAnq
-   4hisncM+JUEmZ28sYeC3CsOYRhtMVxepa2czLtjDnXpRpd0TRZb3RzAf2
-   x6OzBPayF+YlnjvVfXctZCh3CQERflTY2P5g9xy9dFoB1q10xnys7U/jC
-   Tk6Z3rkmy56rFKXNKlIeH5391XXR6SJ8CFteUe+6u/Fain88Fxzjz5v/V
-   w==;
-IronPort-SDR: M2CwHEFDQEagBinIhoiSOKqIz6xIV9MmvMy6bkaK6SZRr2ETpIMpxgOArskBIFd9Swydr4r3iQ
- /3vaN6ttb5+5km2I+/HIcu/0nsh+brNDajLTQ3IQ5j96bWWbSQ4otkQQNxjoQDZeSQ51ZonYx8
- mTCjIlKfqml8sKzAeqttHepNSDA1Ca5lmCznUkAjWRCjTGB9HGllTiXSfyI1v7z6F+RXtwclVS
- T7Xw9LegDbmt+t66W/2Ludbpxr32/hgGcbNvFKub1Uad/BukpK05Mso0QWoUi9S8HQt5uHwCzb
- jMg=
+  t=1605071812; x=1636607812;
+  h=from:to:subject:date:message-id:in-reply-to:references:
+   mime-version:content-transfer-encoding;
+  bh=PKMMRUU9vYzHfv4nwkDX8jarpnBsCQGZ/fU3l0xt8Fk=;
+  b=UrAycymQ3z99iBjJbte3bi9quFQpFv9yc0E5Rq21MIqMojw42b0gnGzB
+   a1MN7uK6j+zB6FhK03yOiq4JwfhT/vBvFPQFpcQ+BzU0/9+1Y8tFTKXFX
+   cx/8J5xnr+MLmwBr6BTkmvo3VMp0gvqG/kIUWNNJPicj7GX4QiJPTMYBb
+   X/rnJx+bB/BDHRARjyonW9+yTfFYjWPbcIh9SM21Q+qq63y8SSja/TaRr
+   3vIwQFWvUISZ8lgo3B23CMIRNcqf0FgrHwjRAQUQZOuMuOvwbVE7IrTK3
+   AJq8X8s+NaWr5zQ2QY2ZLHX3vHciQ3lpulHfgMy26qvWngSzbrMF1hb96
+   Q==;
+IronPort-SDR: ERJIxLONaFWPp9psoK7LnyjlchNv20RrfM2U48fHCpBvS63stgpuGEdJcv85UfyB2JH3FmtJWf
+ 9m3r8n2mdFsFvQAxiosHtKXbcJGiBjpwklJdA8IuOxiJdNQmSYbC7VwtD0y5y9PyC41S0nq+5M
+ u6xnI4CEv/D7seiOilSUeSlfsV+kTzflDgXgTvF4NLXUrc1Bs00oKns5xNAmjPpBCuebegPaVx
+ hOPFOWvhhXjCKD2X3RDpWZkImTZ4ZGbhJ+i6dFgFssxG6GkxxbgvSD/EgPXF1h5tVSwzxFbEJG
+ jbw=
 X-IronPort-AV: E=Sophos;i="5.77,468,1596470400"; 
-   d="scan'208";a="152254624"
+   d="scan'208";a="152254625"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Nov 2020 13:16:50 +0800
-IronPort-SDR: z1oUvW9U2t+4yMlNnY/zrymdlWqQ0z17NYB2n6u9NNQMhSOhCqO3OgypaQQRnnDd7smtu2uCUZ
- 4Z2nYBa5brrNK8lMmBwUochSYLhm6ZUUzm4GecH28637HwuYhfr0M5NeQJDkKsL+935bYcAgU4
- tyg8hND935f8flZbnbXerFNoWcJJgHrLb9h+egtbC6IpC4/JawUH4TwmIbDGCcWjXs3N59k+e6
- 6Gt/ULKJ90YCT8k5ilitsCmSArVorO0CYPewt3FHctaQc28xRYS6rY24lZ/XCFD/otOYnrOSEI
- ndsLZyvC/BMHYrHlgGUkwlJj
+  by ob1.hgst.iphmx.com with ESMTP; 11 Nov 2020 13:16:51 +0800
+IronPort-SDR: EM2uzdqI/rxw1SBJbxFvxG7Te5IjK+59nh3x4sCG2zInV8irRWepqYNw2/0q4DKSyxpzQUiR5N
+ u7ll4dRL+DUUxRydapmc2FflofxGuFKjRjHUugHv9+8g8m/GDlocbkkceBtpYIHkvfWu77CYwr
+ +d75NbPaXawKyb6WWC7gBBRbrkXsm3YLE24jWRhGSAHg+H3ZRKl1lXkH9cY6dYngHmVK+dmcQa
+ U1ocbr0yLZncvB2s3wlXvb7d6ZVWBybPu1FQPRXp5qtsvBIao2Kr6noahgeMZdz3Xam9kl8EeZ
+ qqM49lYwIAgTGWgTok1uHffj
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 21:01:37 -0800
-IronPort-SDR: lFsDvR/UHZTaGd/jxi6nBFqBG/8vqGrGtG34DSUvGzY19Gh+tPnpoeJWy5wyszZtW5Jx7h3Y8F
- JFcRFYAlZqxZrqfsV9iMefvRRb/HWHVwQgEyw7s4u99Knd4oDp5bSJ8HvIzn4VkX3NQqZUrwMZ
- VP6JayWJtJ0Fapfy3Lj/LUzAQ60CmQyWHZM/b1ft18dZc9Tr6RXUv4mypUCpF/OT/xTk9ymawQ
- 0/nTxEAglyx25PH/PwsCFuRhRvJh1DcweI+SF4v0e6thxMXcv4/AkWXYyy2GtjAt1dLO87MAMd
- Mjg=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 21:01:38 -0800
+IronPort-SDR: jFkxlsc67ig6dc6maMjzGftxd1UiHdcyuKahsyfw9SvKIasm8XT4+k7ShfbOz1FPRZJ/Wmq2HB
+ yxAInFAzWuNCFqD+2qbLgUwtbGOK1xr3DQdG+yh1+XFaOlHN3G53KAhEos7yQGKXnqZGX5udno
+ tOkeAL3JrE77KmdPd/o6srOj1g9AN+Wb6angKBcv9APAc3qPFy66bwj1TzuiwT9jyFKuxrEB7r
+ k1Gqc5csdX2J7p1UvuDZg6aQnvD8htvf/SvxXRHLBlc4Ho0/MMrgkd1HPndwGvxnkAo9s8ZbsC
+ gwk=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 10 Nov 2020 21:16:50 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 10 Nov 2020 21:16:51 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2 0/9] null_blk fixes, improvements and cleanup
-Date:   Wed, 11 Nov 2020 14:16:39 +0900
-Message-Id: <20201111051648.635300-1-damien.lemoal@wdc.com>
+Subject: [PATCH v2 1/9] null_blk: Fix zone size initialization
+Date:   Wed, 11 Nov 2020 14:16:40 +0900
+Message-Id: <20201111051648.635300-2-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201111051648.635300-1-damien.lemoal@wdc.com>
+References: <20201111051648.635300-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens,
+For a null_blk device with zoned mode enabled is currently initialized
+with a number of zones equal to the device capacity divided by the zone
+size, without considering if the device capacity is a multiple of the
+zone size. If the zone size is not a divisor of the capacity, the zones
+end up not covering the entire capacity, potentially resulting is out
+of bounds accesses to the zone array.
 
-This series provides fixes and improvements for null_blk.
+Fix this by adding one last smaller zone with a size equal to the
+remainder of the disk capacity divided by the zone size if the capacity
+is not a multiple of the zone size. For such smaller last zone, the zone
+capacity is also checked so that it does not exceed the smaller zone
+size.
 
-The first two patches are bug fixes which likely should go into 5.10.
-The first patch fixes a problem with zone initialization when the
-device capacity is not a multiple of the zone size and the second
-patch fixes zone append handling.
+Reported-by: Naohiro Aota <naohiro.aota@wdc.com>
+Fixes: ca4b2a011948 ("null_blk: add zone support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/block/null_blk_zoned.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-The following patches are improvements and cleanups:
-* Patch 3 makes sure that the device max_sectors limit is aligned to the
-  block size.
-* Patch 4 improves zone locking overall, and especially the memory
-  backing disabled case by introducing a spinlock array to implement a
-  per zone lock in place of a global lock. With this patch, write
-  performance remains mostly unchanged, but read performance with a
-  multi-queue setup more than double from 1.3 MIOPS to 3.3 MIOPS (4K
-  random reads to zones with fio zonemode=zbd).
-* Patch 5 improves implicit zone close
-* Patch 6 and 7 cleanup discard handling code and use that code to free
-  the memory backing a zone that is being reset.
-* Patch 8 adds the max_sectors configuration option to allow changing
-  the max_sectors/max_hw_sectors of the device.
-* Finally, patch 9 moves nullblk into its own directory under
-  drivers/block/null_blk/
-
-Comments are as always welcome.
-
-Damien Le Moal (9):
-  null_blk: Fix zone size initialization
-  null_blk: Fail zone append to conventional zones
-  null_blk: Align max_hw_sectors to blocksize
-  null_blk: improve zone locking
-  null_blk: Improve implicit zone close
-  null_blk: cleanup discard handling
-  null_blk: discard zones on reset
-  null_blk: Allow controlling max_hw_sectors limit
-  null_blk: Move driver into its own directory
-
- drivers/block/Kconfig                         |   8 +-
- drivers/block/Makefile                        |   7 +-
- drivers/block/null_blk/Kconfig                |  12 +
- drivers/block/null_blk/Makefile               |  11 +
- .../{null_blk_main.c => null_blk/main.c}      |  65 +++--
- drivers/block/{ => null_blk}/null_blk.h       |   9 +-
- .../{null_blk_trace.c => null_blk/trace.c}    |   2 +-
- .../{null_blk_trace.h => null_blk/trace.h}    |   2 +-
- .../{null_blk_zoned.c => null_blk/zoned.c}    | 245 ++++++++++++------
- 9 files changed, 239 insertions(+), 122 deletions(-)
- create mode 100644 drivers/block/null_blk/Kconfig
- create mode 100644 drivers/block/null_blk/Makefile
- rename drivers/block/{null_blk_main.c => null_blk/main.c} (97%)
- rename drivers/block/{ => null_blk}/null_blk.h (94%)
- rename drivers/block/{null_blk_trace.c => null_blk/trace.c} (93%)
- rename drivers/block/{null_blk_trace.h => null_blk/trace.h} (97%)
- rename drivers/block/{null_blk_zoned.c => null_blk/zoned.c} (76%)
-
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+index beb34b4f76b0..1d0370d91fe7 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk_zoned.c
+@@ -6,8 +6,7 @@
+ #define CREATE_TRACE_POINTS
+ #include "null_blk_trace.h"
+ 
+-/* zone_size in MBs to sectors. */
+-#define ZONE_SIZE_SHIFT		11
++#define MB_TO_SECTS(mb) (((sector_t)mb * SZ_1M) >> SECTOR_SHIFT)
+ 
+ static inline unsigned int null_zone_no(struct nullb_device *dev, sector_t sect)
+ {
+@@ -16,7 +15,7 @@ static inline unsigned int null_zone_no(struct nullb_device *dev, sector_t sect)
+ 
+ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+ {
+-	sector_t dev_size = (sector_t)dev->size * 1024 * 1024;
++	sector_t dev_capacity_sects, zone_capacity_sects;
+ 	sector_t sector = 0;
+ 	unsigned int i;
+ 
+@@ -38,9 +37,13 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+ 		return -EINVAL;
+ 	}
+ 
+-	dev->zone_size_sects = dev->zone_size << ZONE_SIZE_SHIFT;
+-	dev->nr_zones = dev_size >>
+-				(SECTOR_SHIFT + ilog2(dev->zone_size_sects));
++	zone_capacity_sects = MB_TO_SECTS(dev->zone_capacity);
++	dev_capacity_sects = MB_TO_SECTS(dev->size);
++	dev->zone_size_sects = MB_TO_SECTS(dev->zone_size);
++	dev->nr_zones = dev_capacity_sects >> ilog2(dev->zone_size_sects);
++	if (dev_capacity_sects & (dev->zone_size_sects - 1))
++		dev->nr_zones++;
++
+ 	dev->zones = kvmalloc_array(dev->nr_zones, sizeof(struct blk_zone),
+ 			GFP_KERNEL | __GFP_ZERO);
+ 	if (!dev->zones)
+@@ -101,8 +104,12 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+ 		struct blk_zone *zone = &dev->zones[i];
+ 
+ 		zone->start = zone->wp = sector;
+-		zone->len = dev->zone_size_sects;
+-		zone->capacity = dev->zone_capacity << ZONE_SIZE_SHIFT;
++		if (zone->start + dev->zone_size_sects > dev_capacity_sects)
++			zone->len = dev_capacity_sects - zone->start;
++		else
++			zone->len = dev->zone_size_sects;
++		zone->capacity =
++			min_t(sector_t, zone->len, zone_capacity_sects);
+ 		zone->type = BLK_ZONE_TYPE_SEQWRITE_REQ;
+ 		zone->cond = BLK_ZONE_COND_EMPTY;
+ 
 -- 
 2.26.2
 
