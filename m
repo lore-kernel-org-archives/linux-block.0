@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B06C56201
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7B2C4742C
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:29:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DED792075A
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:29:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 259302074B
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:29:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RCXh8hHV"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HtE3Jf5V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726902AbgKKI26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Nov 2020 03:28:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726493AbgKKI11 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S1726315AbgKKI11 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 11 Nov 2020 03:27:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33522 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726416AbgKKI10 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Nov 2020 03:27:26 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12E13C0613D1;
-        Wed, 11 Nov 2020 00:27:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24450C0613D4;
+        Wed, 11 Nov 2020 00:27:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=7BWzzM1ONnukKsMJYvFCtkh7Po4ojUIcRAoXEXZQpls=; b=RCXh8hHVKHOdlbTgZudBE0UgxQ
-        OdZbQcCl+Yq46gbMhWR8GVkt7ot75syMIyMmRVs70SjQ1O8I3Qml7eCC8UgjmLw+eZKo3Y+wA2Jn3
-        swdtiCKDiqLib1ChlnI43270zWz+HESqHy3CFg19CGNjMaZmfyCASYpR/6tWH4C8l/mB79/1BSWgs
-        puiFVbzfVm1so5b0mSiZ9Ei1//wgG5uEkaKOW5zYLA6lZYmZLWg1vlPvHI0aYLKiQl40RWCE1w1Is
-        2SNvkcNq6XAtQw8IczEREzWr5hvM924WJzBVkrt1lqmXha4587UsPlSaCJVXmHuHTxzWvnOewG4Qb
-        h8NmpJFw==;
+        bh=msAxRVgou3+s48HjnTxbv/pHmvKh+OTllxGOwTa9PDs=; b=HtE3Jf5Vbg9BUyHuOP4LioCkGM
+        D5RSbkrHUpDFKIQjTw/EK4TzE+8HC7HKkeSRDQ5TzvYLeD176nt7vURqsS/VEBAOA0ZGVp2Hfk4BA
+        FS2uNGpdT5zytQL6JfJub2kZpw2LjaJ9Qgw8NxRTfmPK2IU9L78Jw1VK21pEcdjuzr8xdUwVC1AG8
+        FZzij4ATCs/rSb1EzfUVneXPwEq9nYX5eNo+i9hTfvU1x/iEwjUiJQP7bXoR4lZCu9eKsU3Nd9Bq0
+        Kq770Jj2OBzqFQPHPMIVFh4h4EqCewYZ87onZqxTquG/UH1fcZ9aZrou8dZ3Mf5neqm7MQBxdmEx8
+        6E4xnYtg==;
 Received: from [2001:4bb8:180:6600:bcde:334f:863c:27b8] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kclTD-0007b7-Eu; Wed, 11 Nov 2020 08:27:11 +0000
+        id 1kclT8-0007aM-Pa; Wed, 11 Nov 2020 08:27:06 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -58,9 +58,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 10/24] nbd: validate the block size in nbd_set_size
-Date:   Wed, 11 Nov 2020 09:26:44 +0100
-Message-Id: <20201111082658.3401686-11-hch@lst.de>
+Subject: [PATCH 06/24] block: add a return value to set_capacity_and_notify
+Date:   Wed, 11 Nov 2020 09:26:40 +0100
+Message-Id: <20201111082658.3401686-7-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201111082658.3401686-1-hch@lst.de>
 References: <20201111082658.3401686-1-hch@lst.de>
@@ -71,120 +71,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move the validation of the block from the callers into nbd_set_size.
+Return if the function ended up sending an uevent or not.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 ---
- drivers/block/nbd.c | 47 +++++++++++++++------------------------------
- 1 file changed, 15 insertions(+), 32 deletions(-)
+ block/genhd.c         | 7 +++++--
+ include/linux/genhd.h | 2 +-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index eb8a5da48ad75a..327060e01ad58e 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -296,16 +296,21 @@ static void nbd_size_clear(struct nbd_device *nbd)
- 	}
- }
+diff --git a/block/genhd.c b/block/genhd.c
+index d8d9d6c1c916e1..8c350fecfe8bfe 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -47,9 +47,9 @@ static void disk_release_events(struct gendisk *disk);
  
--static void nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
-+static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
- 		loff_t blksize)
+ /*
+  * Set disk capacity and notify if the size is not currently zero and will not
+- * be set to zero.
++ * be set to zero.  Returns true if a uevent was sent, otherwise false.
+  */
+-void set_capacity_and_notify(struct gendisk *disk, sector_t size)
++bool set_capacity_and_notify(struct gendisk *disk, sector_t size)
  {
- 	struct block_device *bdev;
+ 	sector_t capacity = get_capacity(disk);
  
-+	if (!blksize)
-+		blksize = NBD_DEF_BLKSIZE;
-+	if (blksize < 512 || blksize > PAGE_SIZE || !is_power_of_2(blksize))
-+		return -EINVAL;
+@@ -60,7 +60,10 @@ void set_capacity_and_notify(struct gendisk *disk, sector_t size)
+ 		char *envp[] = { "RESIZE=1", NULL };
+ 
+ 		kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
++		return true;
+ 	}
 +
- 	nbd->config->bytesize = bytesize;
- 	nbd->config->blksize = blksize;
- 
- 	if (!nbd->task_recv)
--		return;
-+		return 0;
- 
- 	if (nbd->config->flags & NBD_FLAG_SEND_TRIM) {
- 		nbd->disk->queue->limits.discard_granularity = blksize;
-@@ -325,6 +330,7 @@ static void nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
- 		bdput(bdev);
- 	}
- 	kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
-+	return 0;
++	return false;
  }
+ EXPORT_SYMBOL_GPL(set_capacity_and_notify);
  
- static void nbd_complete_rq(struct request *req)
-@@ -1304,8 +1310,7 @@ static int nbd_start_device(struct nbd_device *nbd)
- 		args->index = i;
- 		queue_work(nbd->recv_workq, &args->work);
- 	}
--	nbd_set_size(nbd, config->bytesize, config->blksize);
--	return error;
-+	return nbd_set_size(nbd, config->bytesize, config->blksize);
- }
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 596f31b5a3e133..4b22bfd9336e1a 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -315,7 +315,7 @@ static inline int get_disk_ro(struct gendisk *disk)
+ extern void disk_block_events(struct gendisk *disk);
+ extern void disk_unblock_events(struct gendisk *disk);
+ extern void disk_flush_events(struct gendisk *disk, unsigned int mask);
+-void set_capacity_and_notify(struct gendisk *disk, sector_t size);
++bool set_capacity_and_notify(struct gendisk *disk, sector_t size);
  
- static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *bdev)
-@@ -1347,14 +1352,6 @@ static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
- 		nbd_config_put(nbd);
- }
- 
--static bool nbd_is_valid_blksize(unsigned long blksize)
--{
--	if (!blksize || !is_power_of_2(blksize) || blksize < 512 ||
--	    blksize > PAGE_SIZE)
--		return false;
--	return true;
--}
--
- static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
- {
- 	nbd->tag_set.timeout = timeout * HZ;
-@@ -1379,19 +1376,12 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 	case NBD_SET_SOCK:
- 		return nbd_add_socket(nbd, arg, false);
- 	case NBD_SET_BLKSIZE:
--		if (!arg)
--			arg = NBD_DEF_BLKSIZE;
--		if (!nbd_is_valid_blksize(arg))
--			return -EINVAL;
--		nbd_set_size(nbd, config->bytesize, arg);
--		return 0;
-+		return nbd_set_size(nbd, config->bytesize, arg);
- 	case NBD_SET_SIZE:
--		nbd_set_size(nbd, arg, config->blksize);
--		return 0;
-+		return nbd_set_size(nbd, arg, config->blksize);
- 	case NBD_SET_SIZE_BLOCKS:
--		nbd_set_size(nbd, arg * config->blksize,
--			     config->blksize);
--		return 0;
-+		return nbd_set_size(nbd, arg * config->blksize,
-+				    config->blksize);
- 	case NBD_SET_TIMEOUT:
- 		nbd_set_cmd_timeout(nbd, arg);
- 		return 0;
-@@ -1808,18 +1798,11 @@ static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
- 	if (info->attrs[NBD_ATTR_SIZE_BYTES])
- 		bytes = nla_get_u64(info->attrs[NBD_ATTR_SIZE_BYTES]);
- 
--	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]) {
-+	if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES])
- 		bsize = nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
--		if (!bsize)
--			bsize = NBD_DEF_BLKSIZE;
--		if (!nbd_is_valid_blksize(bsize)) {
--			printk(KERN_ERR "Invalid block size %llu\n", bsize);
--			return -EINVAL;
--		}
--	}
- 
- 	if (bytes != config->bytesize || bsize != config->blksize)
--		nbd_set_size(nbd, bytes, bsize);
-+		return nbd_set_size(nbd, bytes, bsize);
- 	return 0;
- }
- 
+ /* drivers/char/random.c */
+ extern void add_disk_randomness(struct gendisk *disk) __latent_entropy;
 -- 
 2.28.0
 
