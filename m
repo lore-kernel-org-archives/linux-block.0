@@ -2,86 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A07C388F9
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 09:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EA7C4742C
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 09:49:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC5CA20759
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 09:45:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E9ED2075A
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 09:49:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PbeCk8mq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D40IYtVz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725859AbgKKJpr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Nov 2020 04:45:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45638 "EHLO
+        id S1725830AbgKKJt5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Nov 2020 04:49:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbgKKJpr (ORCPT
+        with ESMTP id S1726567AbgKKJt4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Nov 2020 04:45:47 -0500
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B27C0613D1
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 01:45:46 -0800 (PST)
-Received: by mail-pg1-x543.google.com with SMTP id f38so1128060pgm.2
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 01:45:46 -0800 (PST)
+        Wed, 11 Nov 2020 04:49:56 -0500
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F514C0613D1
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 01:49:56 -0800 (PST)
+Received: by mail-pl1-x642.google.com with SMTP id b3so690110pls.11
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 01:49:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=NjIaSEpNiDwwZKuhwZzNWaj2OCWVwqB2zttEUEyFMg4=;
-        b=PbeCk8mqq8R8ljKQvWxM7EIloYHLl5nWuSSVBMkChHK8UZ/dYUhcl4uEwMj0sCTWCb
-         sNE+qFbF8+SDFGf4ITm2CZR6uO3iDUWvIdRqc3IqORmlIGvKUeGaZKfOe50pFP9mCdFF
-         1yCdD/LZGZZFjJdmYDWS304hLkQOtv9vqqLlb/QQ1a9JvXbOT84XTXLC0ASj6BeGAOR/
-         ZMWQSVKTikbqkp7m86Cc8r1+Fgm69Uld0shQt+gGUoPUccG0aYWDZRQE4x+OiHeheOBr
-         BwzTHifFLCLVtCYVUwD0tphfA877lEFFFJigzdvgeIa9+LMY8/MBVz4x2X9H6YAN7zof
-         8knQ==
+        bh=wy9KYNhp3gLXHxDS3wldI7ei9OvcjTNMDjVAtG+sk3I=;
+        b=D40IYtVzVbalXaF6OaIasJDGe+NoAenJ4j1BxKnohUR/K3/6xIvRpl6RAq8xrrlZMN
+         2mSJRl+OMm8AkbifuVOFugVGFxd9UQ1ONpFI/PauYwQ6xiWTPnuVYrQFP1FQCcZ6ZB3G
+         V1KAoOU3OwU2eYMECd6mOD8bio1Nh0kZ/nn18MB6u08eJyuzTTmiSs4I1FMAVCfUxECz
+         nmkXRQuU/5psF+coA45QnX8O+NF2sfjGPVIaN1/2NiqRd7xzeePgFwaaYYnnEF05VcAA
+         6ZnbvRb+QCisguIaHTuV/8MDUtzgBVxN520Qlv8Z45o9dBy1YPkYx6LPIrb/3+bD+g9x
+         p8ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=NjIaSEpNiDwwZKuhwZzNWaj2OCWVwqB2zttEUEyFMg4=;
-        b=Ase62BlL46bdftTQsNJeAPjcP5fenVzkEgp6RS6Pqkqw1p0ZFnfGxdniyB4qE71L48
-         mrcgf4P6SKx/yXkMZZX2Zlyr/xfZCOFfrZBDb+FXKQdBgJ6g7YJ16tfuDE5eaDPUWhF2
-         gS8W7P7YEsnnOfhASa34KCUO7glJtpSqoQXhPK0fKBEae9pszpKIn4cN2Tk0tyl0nJZ0
-         tep6c6dG9qo8Y7iownyN5b0FwVXKldcEfWl31V13gn03e+JQRSqSjY4QrcPIgPoENOre
-         wBo7xunL0VwLdJjeLdCcXi7K3kkF9UtvM6Ivbz5Njf63VppwvxzTrJzlpjxNpPaYdOBu
-         Eayg==
-X-Gm-Message-State: AOAM533e0Gzf8X3/QsplyTfm7WFzNgeiqvU2gqJkpuYewPRffb6DEPrp
-        OUfzAgvjnn/1XbVJx5IeJEKhpQ==
-X-Google-Smtp-Source: ABdhPJzOs8jWe2qmtkaRDl7WfnnhESKVM/Z0So0cZqFQAgHlv7Qy4t6FEcquMk9j87wMLW2VMu4xFg==
-X-Received: by 2002:a63:574a:: with SMTP id h10mr21109186pgm.209.1605087946206;
-        Wed, 11 Nov 2020 01:45:46 -0800 (PST)
+        bh=wy9KYNhp3gLXHxDS3wldI7ei9OvcjTNMDjVAtG+sk3I=;
+        b=kMopU3aUiNwm1LGA21ik4jT0IlfCFqzXWk0QWVHrZlqcokbIw23e/0lIrZWpNgZyNB
+         o3gRJp6H7SeotAOj+wch4DsNThjJyeHs6j3xNiPZwjRV1aAZL2Wb5K49wn/QPchLyMP1
+         nWV8e9o6lWnhTGMGhtOjLCDZx/oE7qOxnLDnRXBhhpm5G4gjzPeVBbd8kO5HAh02UdBp
+         350t4HfarAwclwNRmAfPnbdrpjaONpXoui2oKGp+v55U/GL+0H1xcJyIhRPx0I9upuaJ
+         7zSnYsDrrVjdIz91w9l0UDzpW2/b0l2Efc/jFOSXn1tswFP0VBC812Cj+xM19S7jaZMt
+         2qAA==
+X-Gm-Message-State: AOAM532nUPYDQpniPc9vRnwjIZp2wbM4rWqnMhNHbkbBEkqQ/iodVkSs
+        b4mPnMBMGKNEMJ2zV815vlX6BJamkWs8Mg==
+X-Google-Smtp-Source: ABdhPJyqViOoiWT7aV5JXBTlH1xIMTKFRSp/aJCTu7kGf747y/N23xV9AXPxu8S7IXnFGVu8j9/xSQ==
+X-Received: by 2002:a17:902:244:b029:d6:c451:8566 with SMTP id 62-20020a1709020244b02900d6c4518566mr20626958plc.46.1605088195763;
+        Wed, 11 Nov 2020 01:49:55 -0800 (PST)
 Received: from google.com (154.137.233.35.bc.googleusercontent.com. [35.233.137.154])
-        by smtp.gmail.com with ESMTPSA id t74sm1891822pfc.47.2020.11.11.01.45.45
+        by smtp.gmail.com with ESMTPSA id e17sm1972385pfl.216.2020.11.11.01.49.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2020 01:45:45 -0800 (PST)
-Date:   Wed, 11 Nov 2020 09:45:38 +0000
+        Wed, 11 Nov 2020 01:49:55 -0800 (PST)
+Date:   Wed, 11 Nov 2020 09:49:51 +0000
 From:   Satya Tangirala <satyat@google.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-fscrypt@vger.kernel.org
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-fscrypt@vger.kernel.org
 Subject: Re: [PATCH] block/keyslot-manager: prevent crash when num_slots=1
-Message-ID: <20201111094538.GA3907007@google.com>
+Message-ID: <20201111094951.GB3907007@google.com>
 References: <20201111021427.466349-1-ebiggers@kernel.org>
- <20201111092305.GA13004@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201111092305.GA13004@infradead.org>
+In-Reply-To: <20201111021427.466349-1-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 11, 2020 at 09:23:05AM +0000, Christoph Hellwig wrote:
-> On Tue, Nov 10, 2020 at 06:14:27PM -0800, Eric Biggers wrote:
-> > +	 * hash_ptr() assumes bits != 0, so ensure the hash table has at least 2
-> > +	 * buckets.  This only makes a difference when there is only 1 keyslot.
-> > +	 */
-> > +	slot_hashtable_size = max(slot_hashtable_size, 2U);
+On Tue, Nov 10, 2020 at 06:14:27PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> shouldn't this be a min()?
-I think it should be max(), since we want whichever is larger between 2
-and the original slot_hashtable_size :)
+> If there is only one keyslot, then blk_ksm_init() computes
+> slot_hashtable_size=1 and log_slot_ht_size=0.  This causes
+> blk_ksm_find_keyslot() to crash later because it uses
+> hash_ptr(key, log_slot_ht_size) to find the hash bucket containing the
+> key, and hash_ptr() doesn't support the bits == 0 case.
+> 
+> Fix this by making the hash table always have at least 2 buckets.
+> 
+> Tested by running:
+> 
+>     kvm-xfstests -c ext4 -g encrypt -m inlinecrypt \
+>                  -o blk-crypto-fallback.num_keyslots=1
+> 
+> Fixes: 1b2628397058 ("block: Keyslot Manager for Inline Encryption")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  block/keyslot-manager.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
+> index 35abcb1ec051d..0a5b2772324ad 100644
+> --- a/block/keyslot-manager.c
+> +++ b/block/keyslot-manager.c
+> @@ -103,6 +103,13 @@ int blk_ksm_init(struct blk_keyslot_manager *ksm, unsigned int num_slots)
+>  	spin_lock_init(&ksm->idle_slots_lock);
+>  
+>  	slot_hashtable_size = roundup_pow_of_two(num_slots);
+> +
+> +	/*
+> +	 * hash_ptr() assumes bits != 0, so ensure the hash table has at least 2
+> +	 * buckets.  This only makes a difference when there is only 1 keyslot.
+> +	 */
+> +	slot_hashtable_size = max(slot_hashtable_size, 2U);
+> +
+>  	ksm->log_slot_ht_size = ilog2(slot_hashtable_size);
+>  	ksm->slot_hashtable = kvmalloc_array(slot_hashtable_size,
+>  					     sizeof(ksm->slot_hashtable[0]),
+> 
+> base-commit: f8394f232b1eab649ce2df5c5f15b0e528c92091
+> -- 
+> 2.29.2
+> 
+Looks good to me. Please feel free to add
+Reviewed-by: Satya Tangirala <satyat@google.com>
