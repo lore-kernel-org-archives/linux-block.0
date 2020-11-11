@@ -2,73 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D8EC388F7
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 03:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0BB2C61DD8
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 04:19:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94BFA207BB
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 03:14:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80B29221FC
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 04:19:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rdxx8bfC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725859AbgKKDOz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Nov 2020 22:14:55 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:44766 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725839AbgKKDOy (ORCPT
+        id S1725897AbgKKETn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Nov 2020 23:19:43 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:56610 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725468AbgKKETm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Nov 2020 22:14:54 -0500
-Received: by mail-pf1-f196.google.com with SMTP id y7so721431pfq.11
-        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 19:14:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9tPwAhbnkjt8FH6TQ9fgo69kxGjoToLjSgUZRQONTPQ=;
-        b=PRTbXKl39oXGPI3So3Xo1yHgCQzee0Q4hHmGbVSeHAAY1plMBFRvEmmQtuJBaEY2fD
-         h8FhRUwIB75+GcrKvr3hbwM47ZP/uSz5lToa+txRMpWIR1YFmTfjnkaM2SoWvdUfOXao
-         yJknu2amfeL8uVz5cE3Q0FOdUzbCbJK1yULiMzRfULw0vjI+KeikjTBcYkCzT8a9XD+z
-         g1kuPoLVPX5Rdbrc6MjO4wsoCff8A8RyKAhk9tTZPU7URv5ro7DXDVZfkXhd4RR8xZwD
-         9gZHor1rO2ZrCylTl703oBA9cOBoRvBTP/edhiANiEm98N9pCJnFVgRbVb/Knfgv9dko
-         Duiw==
-X-Gm-Message-State: AOAM530IU7x0Zc2XPfhit6ehPmFfbpdNyrmloLrmdMV2G5cTzYEKCNHl
-        K503ucAGoy5i81yTk9gLux4=
-X-Google-Smtp-Source: ABdhPJzkAXCaoeAbySCJ7/zywjBl18kpYaHWlXn/4ZmqpQac4EGY1JKNWp0dwknsCoLTWKL7FfAXGA==
-X-Received: by 2002:a62:f846:0:b029:15f:f897:7647 with SMTP id c6-20020a62f8460000b029015ff8977647mr21281604pfm.75.1605064494112;
-        Tue, 10 Nov 2020 19:14:54 -0800 (PST)
-Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id 82sm525268pfy.24.2020.11.10.19.14.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2020 19:14:53 -0800 (PST)
-Subject: Re: [PATCH 6/6] null_blk: Move driver into its own directory
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20201109125105.551734-1-damien.lemoal@wdc.com>
- <20201109125105.551734-7-damien.lemoal@wdc.com>
- <afdd6a5c-310f-7287-5eb4-d101a531cd6e@acm.org>
- <BL0PR04MB651412E090C15573E07CADB2E7E90@BL0PR04MB6514.namprd04.prod.outlook.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <b439dcea-a473-5823-8fb2-7a5be96f5490@acm.org>
-Date:   Tue, 10 Nov 2020 19:14:51 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        Tue, 10 Nov 2020 23:19:42 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AB49Tbn187079;
+        Wed, 11 Nov 2020 04:18:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=EwuOibuX72u5GW/vr3IZET1mbk4Qqp2f1lpQhsZMo3U=;
+ b=rdxx8bfCoz66U7/JxdRXyqosHLyk6104gocou3/pxKr+MBaHN9z+JG22xyBjdFrs/toj
+ u8kyE9Mnx40f+onFhQWnASdg9eewdpqao7JjD8N8PDe0bDGwb4iBUgCzzxwXH2tPfd4b
+ ZewD9ZDiq4ttMBKnV5hFCYBDOG9JBlIzwIQL8q1J/Y6q7a+0GcQKjASc2OGvEo13qqVS
+ YW2PdJ4GC1fZvqx8aM04P1FnQraTmrtlR84Q48lCpCKfWOIJkugsvGV1CkUq/whUbI2D
+ eu9b4yGyWVKNklkWbsL8Eg4w7p+siPP69BiWWD0dUAtW6doZkGUQe3KqPOb7wn/WWPSd sQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 34p72en941-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 11 Nov 2020 04:18:21 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AB4Arf2138947;
+        Wed, 11 Nov 2020 04:18:20 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 34p5g179j7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Nov 2020 04:18:20 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0AB4IBdx000879;
+        Wed, 11 Nov 2020 04:18:11 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 10 Nov 2020 20:18:09 -0800
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Roger Pau =?utf-8?Q?Monn=C3=A9?= <roger.pau@citrix.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        drbd-dev@tron.linbit.com, nbd@other.debian.org,
+        ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 04/24] sd: update the bdev size in sd_revalidate_disk
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle
+Message-ID: <yq1tutwedcb.fsf@ca-mkp.ca.oracle.com>
+References: <20201106190337.1973127-1-hch@lst.de>
+        <20201106190337.1973127-5-hch@lst.de>
+Date:   Tue, 10 Nov 2020 23:18:05 -0500
+In-Reply-To: <20201106190337.1973127-5-hch@lst.de> (Christoph Hellwig's
+        message of "Fri, 6 Nov 2020 20:03:16 +0100")
 MIME-Version: 1.0
-In-Reply-To: <BL0PR04MB651412E090C15573E07CADB2E7E90@BL0PR04MB6514.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9801 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 malwarescore=0
+ adultscore=0 phishscore=0 bulkscore=0 mlxlogscore=887 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011110019
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9801 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=877 mlxscore=0
+ malwarescore=0 suspectscore=1 lowpriorityscore=0 adultscore=0 phishscore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011110019
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/9/20 8:57 PM, Damien Le Moal wrote:
-> Can I add a "Suggested-by" tag with your name ?
 
-Sure, that would be welcome.
+Christoph,
 
-Thanks,
+> This avoids the extra call to revalidate_disk_size in sd_rescan and
+> is otherwise a no-op because the size did not change, or we are in
+> the probe path.
 
-Bart.
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
