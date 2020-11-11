@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C8CC56201
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 313F0C388F9
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:28:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22CBF206F1
+	by mail.kernel.org (Postfix) with ESMTP id C9EF12074B
 	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:28:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="INZhS6je"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QHBfDWzX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726802AbgKKI1n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Nov 2020 03:27:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33560 "EHLO
+        id S1725976AbgKKI2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Nov 2020 03:28:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726781AbgKKI1g (ORCPT
+        with ESMTP id S1726792AbgKKI1m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Nov 2020 03:27:36 -0500
+        Wed, 11 Nov 2020 03:27:42 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73337C0613D1;
-        Wed, 11 Nov 2020 00:27:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 918E4C0613D1;
+        Wed, 11 Nov 2020 00:27:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=7eiDjQ8ZjozXig6+m+V2Nb2yhyFiCm1kEOIxzxYYgzo=; b=INZhS6jek7sGzfAIL6nzYXyeXs
-        SsycI2Wi/bh4Pu9HbXbPFzDNdHlSwDosG0AcMwQMMm1UOxdqMl11eyvFrWr8b8z0IrJsEn0H42AYn
-        qK9iedvHnlhvSRdKVleqXJmjQGFSSkaIdxmnABppoi7MGvBdw70K6g4OEqXr8kkf1cCEWQ716tM5I
-        V+Aj8IGwwwfmE/a75KkaqAmHB6T6imPjEjCW+u7gRuoO7i2YL9fXBfMlWqCYSOkvaP4efehVbn86F
-        I/pA5x8OW7h9U9vg1qyAB+518eTm0anOOLvxsYmd8D9ABdtIXycMKu8rH3KJ32rwjG+GfPfEUHYEs
-        jyKDZgiw==;
+        bh=c57pfSGVIl7drxDQpyo1OuK6dxor1mcv+7J/1mq5sAE=; b=QHBfDWzXAKk1skY+lIGbw93ckc
+        gKqhO8I1MtrdA0LPeGiDCiNED15Azy7tBvKn9a/NXdjgwUWOEXCSOtkTdoRLcIExCuz/KX9/OW7A0
+        bwrrG0vavHuuIg73K4l6GtezLeYH07NZEzdRSXpJq8JeEltsUALPW2xV3YV/xy7BpOCwvxxf+U/q5
+        GFEDIhUfCtm2C6IeQS+uxCKl4zMoR4QAV/xgxKk2J9Inb2CSTlyu2LwxeTFDfvBkuCj1sNBh2EO26
+        M3kJUrKqmDYCtWbxJHee6dbwHQl9Imy4/bbjBDScuK54nYX+3bHWyilHFhYhNPvThld3SE2wmmiyY
+        w61ZJVLQ==;
 Received: from [2001:4bb8:180:6600:bcde:334f:863c:27b8] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kclTL-0007cU-2G; Wed, 11 Nov 2020 08:27:19 +0000
+        id 1kclTT-0007ei-Ov; Wed, 11 Nov 2020 08:27:28 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -58,9 +58,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 15/24] nvme: use set_capacity_and_notify in nvme_set_queue_dying
-Date:   Wed, 11 Nov 2020 09:26:49 +0100
-Message-Id: <20201111082658.3401686-16-hch@lst.de>
+Subject: [PATCH 21/24] md: use set_capacity_and_notify
+Date:   Wed, 11 Nov 2020 09:26:55 +0100
+Message-Id: <20201111082658.3401686-22-hch@lst.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201111082658.3401686-1-hch@lst.de>
 References: <20201111082658.3401686-1-hch@lst.de>
@@ -71,46 +71,121 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the block layer helper to update both the disk and block device
-sizes.  Contrary to the name no notification is sent in this case,
-as a size 0 is special cased.
+Use set_capacity_and_notify to set the size of both the disk and block
+device.  This also gets the uevent notifications for the resize for free.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Song Liu <song@kernel.org>
 ---
- drivers/nvme/host/core.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+ drivers/md/md-cluster.c |  6 ++----
+ drivers/md/md-linear.c  |  3 +--
+ drivers/md/md.c         | 24 ++++++++++--------------
+ 3 files changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 445274b28518fb..cc771c70047a96 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -93,16 +93,6 @@ static void nvme_put_subsystem(struct nvme_subsystem *subsys);
- static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
- 					   unsigned nsid);
- 
--static void nvme_update_bdev_size(struct gendisk *disk)
--{
--	struct block_device *bdev = bdget_disk(disk, 0);
--
--	if (bdev) {
--		bd_set_nr_sectors(bdev, get_capacity(disk));
--		bdput(bdev);
--	}
--}
--
- /*
-  * Prepare a queue for teardown.
-  *
-@@ -119,8 +109,7 @@ static void nvme_set_queue_dying(struct nvme_ns *ns)
- 	blk_set_queue_dying(ns->queue);
- 	blk_mq_unquiesce_queue(ns->queue);
- 
--	set_capacity(ns->disk, 0);
--	nvme_update_bdev_size(ns->disk);
-+	set_capacity_and_notify(ns->disk, 0);
+diff --git a/drivers/md/md-cluster.c b/drivers/md/md-cluster.c
+index 4aaf4820b6f625..87442dc59f6ca3 100644
+--- a/drivers/md/md-cluster.c
++++ b/drivers/md/md-cluster.c
+@@ -581,8 +581,7 @@ static int process_recvd_msg(struct mddev *mddev, struct cluster_msg *msg)
+ 		process_metadata_update(mddev, msg);
+ 		break;
+ 	case CHANGE_CAPACITY:
+-		set_capacity(mddev->gendisk, mddev->array_sectors);
+-		revalidate_disk_size(mddev->gendisk, true);
++		set_capacity_and_notify(mddev->gendisk, mddev->array_sectors);
+ 		break;
+ 	case RESYNCING:
+ 		set_bit(MD_RESYNCING_REMOTE, &mddev->recovery);
+@@ -1296,8 +1295,7 @@ static void update_size(struct mddev *mddev, sector_t old_dev_sectors)
+ 		if (ret)
+ 			pr_err("%s:%d: failed to send CHANGE_CAPACITY msg\n",
+ 			       __func__, __LINE__);
+-		set_capacity(mddev->gendisk, mddev->array_sectors);
+-		revalidate_disk_size(mddev->gendisk, true);
++		set_capacity_and_notify(mddev->gendisk, mddev->array_sectors);
+ 	} else {
+ 		/* revert to previous sectors */
+ 		ret = mddev->pers->resize(mddev, old_dev_sectors);
+diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
+index 5ab22069b5be9c..98f1b4b2bdcef8 100644
+--- a/drivers/md/md-linear.c
++++ b/drivers/md/md-linear.c
+@@ -200,9 +200,8 @@ static int linear_add(struct mddev *mddev, struct md_rdev *rdev)
+ 		"copied raid_disks doesn't match mddev->raid_disks");
+ 	rcu_assign_pointer(mddev->private, newconf);
+ 	md_set_array_sectors(mddev, linear_size(mddev, 0, 0));
+-	set_capacity(mddev->gendisk, mddev->array_sectors);
++	set_capacity_and_notify(mddev->gendisk, mddev->array_sectors);
+ 	mddev_resume(mddev);
+-	revalidate_disk_size(mddev->gendisk, true);
+ 	kfree_rcu(oldconf, rcu);
+ 	return 0;
  }
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 98bac4f304ae26..32e375d50fee17 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -5355,10 +5355,9 @@ array_size_store(struct mddev *mddev, const char *buf, size_t len)
  
- static void nvme_queue_scan(struct nvme_ctrl *ctrl)
+ 	if (!err) {
+ 		mddev->array_sectors = sectors;
+-		if (mddev->pers) {
+-			set_capacity(mddev->gendisk, mddev->array_sectors);
+-			revalidate_disk_size(mddev->gendisk, true);
+-		}
++		if (mddev->pers)
++			set_capacity_and_notify(mddev->gendisk,
++						mddev->array_sectors);
+ 	}
+ 	mddev_unlock(mddev);
+ 	return err ?: len;
+@@ -6107,8 +6106,7 @@ int do_md_run(struct mddev *mddev)
+ 	md_wakeup_thread(mddev->thread);
+ 	md_wakeup_thread(mddev->sync_thread); /* possibly kick off a reshape */
+ 
+-	set_capacity(mddev->gendisk, mddev->array_sectors);
+-	revalidate_disk_size(mddev->gendisk, true);
++	set_capacity_and_notify(mddev->gendisk, mddev->array_sectors);
+ 	clear_bit(MD_NOT_READY, &mddev->flags);
+ 	mddev->changed = 1;
+ 	kobject_uevent(&disk_to_dev(mddev->gendisk)->kobj, KOBJ_CHANGE);
+@@ -6423,10 +6421,9 @@ static int do_md_stop(struct mddev *mddev, int mode,
+ 			if (rdev->raid_disk >= 0)
+ 				sysfs_unlink_rdev(mddev, rdev);
+ 
+-		set_capacity(disk, 0);
++		set_capacity_and_notify(disk, 0);
+ 		mutex_unlock(&mddev->open_mutex);
+ 		mddev->changed = 1;
+-		revalidate_disk_size(disk, true);
+ 
+ 		if (mddev->ro)
+ 			mddev->ro = 0;
+@@ -7257,8 +7254,8 @@ static int update_size(struct mddev *mddev, sector_t num_sectors)
+ 		if (mddev_is_clustered(mddev))
+ 			md_cluster_ops->update_size(mddev, old_dev_sectors);
+ 		else if (mddev->queue) {
+-			set_capacity(mddev->gendisk, mddev->array_sectors);
+-			revalidate_disk_size(mddev->gendisk, true);
++			set_capacity_and_notify(mddev->gendisk,
++						mddev->array_sectors);
+ 		}
+ 	}
+ 	return rv;
+@@ -9035,10 +9032,9 @@ void md_do_sync(struct md_thread *thread)
+ 		mddev_lock_nointr(mddev);
+ 		md_set_array_sectors(mddev, mddev->pers->size(mddev, 0, 0));
+ 		mddev_unlock(mddev);
+-		if (!mddev_is_clustered(mddev)) {
+-			set_capacity(mddev->gendisk, mddev->array_sectors);
+-			revalidate_disk_size(mddev->gendisk, true);
+-		}
++		if (!mddev_is_clustered(mddev))
++			set_capacity_and_notify(mddev->gendisk,
++						mddev->array_sectors);
+ 	}
+ 
+ 	spin_lock(&mddev->lock);
 -- 
 2.28.0
 
