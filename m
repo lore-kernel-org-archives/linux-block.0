@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A118C55ABD
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 16:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AEFC55ABD
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 16:20:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7F9E20795
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 16:18:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA1912074B
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 16:20:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="E+UT7uDK"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="amXksHve"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726455AbgKKQR6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Nov 2020 11:17:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51378 "EHLO
+        id S1726101AbgKKQUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Nov 2020 11:20:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726039AbgKKQR6 (ORCPT
+        with ESMTP id S1725922AbgKKQUN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Nov 2020 11:17:58 -0500
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDFB1C0613D6
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 08:17:57 -0800 (PST)
-Received: by mail-io1-xd2f.google.com with SMTP id s10so2877019ioe.1
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 08:17:57 -0800 (PST)
+        Wed, 11 Nov 2020 11:20:13 -0500
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 316C4C0613D4
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 08:20:12 -0800 (PST)
+Received: by mail-io1-xd44.google.com with SMTP id r9so2847245ioo.7
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 08:20:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=hIBjUOhCL4FamySv2BSK1WhnluetPINBm9sx/SODghk=;
-        b=E+UT7uDKzv8M0Zf2lZ8UIYK1hcqMDMAvoGTdUr0tHYghvlxNxqiQgOW/5iqLyKbRZS
-         zVvYZGeU4MSOIwiwwYIlWhf/37CVkuzMdXfkbJgAuUAynl3foV2aD2CgntKM01Eag1w6
-         pQ8HBth/OBv12+fhMJKQGc1NkC3aSg3Ood/4QEvHAIURwz7xRQ3LiqHo+gH4kHkz/Tzz
-         kGrYC8QFOWBAL14ps4gGvDC3EJQ6RukmqNG7qjjJB2x3L16pNJsAI7fQJAXbZiNkIOyF
-         gOqtjfkreX6lm/ivN+Yhkt5U9rTka4eIy5SeWvarGIF0s96mi2fbJkGPVSL4J27D/Boc
-         p0OA==
+        bh=fOD1nMMF6xKjZcnCwmaEBCbtNKt+hxsuSOTEQV+SmIk=;
+        b=amXksHverqoYdwke+9U3grbcsYKP4hIoezX7XTE+yI0QL76PJpiWZ+/BjrhOT0OCcR
+         hMByiuxw2YIeoSo1c+hYvTJG59f980brkCQD37VLcEKT+Ol68/ng5pOXXvMZ1zXpwWu5
+         lmU4d+3qjeRYoBXlTlvPoXnGGy9Gw0htJ/zv3A3ZlEPGlVnCYO17WtZqT++uMEohqEXW
+         QLctHDoOAcoBWh6HAFpC255iG5PAqJUI+Yu7maQ5rxkHgXMgwGyw3JizPv0aWB5wWN4b
+         x/FRNAFD6a8W71sLULwNWxOJyGZzAwdh00mZ484WZnmQlWREC3shuoAPcWmTg1LDiQP1
+         P/SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hIBjUOhCL4FamySv2BSK1WhnluetPINBm9sx/SODghk=;
-        b=JXqcTHWhrCaOiBGClTztDMufpnNNbXRTzSEIyjDTTMAtQ/c5pjsU69UzNAXp3+fKQN
-         +escGx4n7WQcPCcSYDdIULJFfp4iLD7NFMpeDW9SMawXv5ki/qxo8mWhKeT7fJFnjTAp
-         7RfQcL0KkR9MNaSylxrZpcqOROM+l7y8d+eaClB1P6VD8Y+M6eYbCD2kjkaa39BWpJjq
-         eOp0vQDJJaPxM8PPxndM+4kXJKuZ0iyJBVh6Utku2E+J4LcnEzO3ok9o+XqQKDgfgdEH
-         TM531Sp2Oh+qGQV6W5XG5uXdAT3zbxm6DLyVdGiSc7ZdBK0il8GH0tLFU1eGLI63m94a
-         dPKA==
-X-Gm-Message-State: AOAM5300XrxJ95wH4xCFfV8ikwHJLgB16dih5PyU1iPbWiHSzzY3ezty
-        txLL1Ng68ctJL6VE/j1DfkAJcg==
-X-Google-Smtp-Source: ABdhPJyWFXPFFosbpi7Mw4IBURM5g2Va17wNDYQIiOuR5s1zvzKiVX4DBgORaOVic1unFcvUrR9Xmg==
-X-Received: by 2002:a6b:7114:: with SMTP id q20mr18531488iog.16.1605111477264;
-        Wed, 11 Nov 2020 08:17:57 -0800 (PST)
+        bh=fOD1nMMF6xKjZcnCwmaEBCbtNKt+hxsuSOTEQV+SmIk=;
+        b=Q1wQVquwd8d3VZ0LE2bNWCa3MPbAauZaJtB/VOIWWAax+0IUGTszMTQbQtq1fwABYo
+         /P3/cTpFQenu7BHLSTb+ixj2KVJtodPSGcy3vPn5Z4Y1pECgVD8457mDDdBS4FGarOwU
+         eQHAEgMm8swGko9MPn1HoxLrs+pGhOZ5+6DI8cFMkdM4OQ1xStVM8fBIOOArKeTdMBO2
+         32lVtI3Ioent/ESBWSlSFR6OY5byVd2auc0qftqi9cn5TEU43tm42QIm8XHCXv8K5vz2
+         +ftJIUB/P84aH9D8iiwb1QEN7W5oR4aDGf8x7mlnSpfIYYPeYewAhquLDMt0B4GNWzUh
+         ev6g==
+X-Gm-Message-State: AOAM533SIy3/e3/1xprRBrqfx6YO4Ox7EWj5IpsC+Rf5guxoxXdxOTAR
+        bzJrKWVLCjAwj6jeUqSJhHDTSCkECd3iog==
+X-Google-Smtp-Source: ABdhPJxTPobXuEImgKsoBtCjVpMmtDPsI8xNzPbLiDP1NZpNJXnD7n/7Ffd3N3YwPlTvyDuh085sig==
+X-Received: by 2002:a02:c817:: with SMTP id p23mr20600958jao.138.1605111611562;
+        Wed, 11 Nov 2020 08:20:11 -0800 (PST)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id v63sm1404927ioe.52.2020.11.11.08.17.56
+        by smtp.gmail.com with ESMTPSA id n1sm1399525ile.86.2020.11.11.08.20.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Nov 2020 08:17:56 -0800 (PST)
-Subject: Re: simplify gendisk lookup and remove struct block_device aliases v4
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Denis Efremov <efremov@linux.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-        Finn Thain <fthain@telegraphics.com.au>,
-        Michael Schmitz <schmitzmic@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-m68k@lists.linux-m68k.org
-References: <20201029145841.144173-1-hch@lst.de>
+        Wed, 11 Nov 2020 08:20:11 -0800 (PST)
+Subject: Re: [PATCH v2 00/10] DASD FC endpoint security
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20201008131336.61100-1-sth@linux.ibm.com>
+ <20201012183550.GA12341@imap.linux.ibm.com>
+ <07b0f296-e0b2-1383-56a1-0d5411c101da@kernel.dk>
+ <b5038d44-aa46-bbde-7a9f-0de46fed516a@linux.ibm.com>
+ <17e1142c-4108-6f74-971a-dee007162786@kernel.dk>
+ <ad3caaf7-ed8e-9f21-c3a6-c385139feb7b@linux.ibm.com>
+ <6468cfad-e14c-060d-a525-00d75fe66819@kernel.dk>
+ <30740ed3-21b9-71cd-b48c-1d6947c6f029@linux.ibm.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <92e869be-9717-8d97-a962-a630a2517f00@kernel.dk>
-Date:   Wed, 11 Nov 2020 09:17:55 -0700
+Message-ID: <be2933c0-4827-ab38-872f-01cb02e44fc4@kernel.dk>
+Date:   Wed, 11 Nov 2020 09:20:10 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201029145841.144173-1-hch@lst.de>
+In-Reply-To: <30740ed3-21b9-71cd-b48c-1d6947c6f029@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -86,28 +87,23 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/29/20 8:58 AM, Christoph Hellwig wrote:
-> Hi all,
+On 11/10/20 8:50 AM, Stefan Haberland wrote:
+> Am 14.10.20 um 03:19 schrieb Jens Axboe:
+>>
+>>> So, instead could you please apply the patches for 5.11 as soon as it is
+>>> suitable?
+>> I will - I have it queued up, won't create anything public until we
+>> get past the merge window.
+>>
 > 
-> this series removes the annoying struct block_device aliases, which can
-> happen for a bunch of old floppy drivers (and z2ram).  In that case
-> multiple struct block device instances for different dev_t's can point
-> to the same gendisk, without being partitions.  The cause for that
-> is the probe/get callback registered through blk_register_regions.
+> Sorry to bother you again with this.
+> Is there any outlook when you are going to push the patches to your
+> for-next branch?
 > 
-> This series removes blk_register_region entirely, splitting it it into
-> a simple xarray lookup of registered gendisks, and a probe callback
-> stored in the major_names array that can be used for modprobe overrides
-> or creating devices on demands when no gendisk is found.  The old
-> remapping is gone entirely, and instead the 4 remaining drivers just
-> register a gendisk for each operating mode.  In case of the two drivers
-> that have lots of aliases that is done on-demand using the new probe
-> callback, while for the other two I simply register all at probe time
-> to keep things simple.
-> 
-> Note that the m68k drivers are compile tested only.
+> Or shall I resend the patches?
 
-Applied, thanks.
+I already did apply it, just don't push out next release branches
+that early. Pushed out now, so it is in.
 
 -- 
 Jens Axboe
