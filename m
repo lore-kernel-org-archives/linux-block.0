@@ -2,78 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97836C5517A
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 03:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D8EC388F7
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 03:14:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 46DD52168B
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 03:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94BFA207BB
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 03:14:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725894AbgKKDJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Nov 2020 22:09:07 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:44786 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725884AbgKKDJH (ORCPT
+        id S1725859AbgKKDOz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Nov 2020 22:14:55 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44766 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725839AbgKKDOy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Nov 2020 22:09:07 -0500
-Received: by mail-il1-f197.google.com with SMTP id o12so383214ilq.11
-        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 19:09:05 -0800 (PST)
+        Tue, 10 Nov 2020 22:14:54 -0500
+Received: by mail-pf1-f196.google.com with SMTP id y7so721431pfq.11
+        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 19:14:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=wf9hL6Te9sp/yqa+Doc2BxzTapoLp41NMYlihKhsE5U=;
-        b=snDRMA+ZPQs4u3ivcuKtHy1NMxIEXD1AlbZyk9iK75SRUXFRHh+kOJosoaqjldUwLi
-         nCIY13EFFzMP8Tb22LWgZnH3odRRRS2La/3GSn7SYy4uvokH4GN5VXh49Q4Oni+5zUiG
-         62T2gyafGALIGCk59JZVhH5/gdfPjRuX2IPqAUINtYiiIdooUH1aXpNmOcK7h4Dsq6sh
-         ZnIqPlS6l1wJ3Mam03LFksYyM1p80NcQqmbs3BaM8JlVNBLqC0LDO6HQYwnjD4dTqoSq
-         +qG4OsC5nVA4uQ/lVJmHctOWLuCEmNK5+d2Gkkk4LWJk60M3pqo+n9XPENdhRqlWlHuY
-         dDuA==
-X-Gm-Message-State: AOAM530znPhLsVWLoPpbpfZhgyJAnIfGZ4Dr0ANpWGofV2hiz8BoYKau
-        1AVhtIefJzQ9cFEXBd0uyDVc+fKfze/5J7Rx0+Y2xbryOwdg
-X-Google-Smtp-Source: ABdhPJw322s2MJlVk9+t74N1ScoBaJO4J3N8LABAJKKIIvfejPk/tSGh8Y8hRv9pCYKg3l9qjzobyF5QLxxkTWZVc72IPUvFMa5q
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9tPwAhbnkjt8FH6TQ9fgo69kxGjoToLjSgUZRQONTPQ=;
+        b=PRTbXKl39oXGPI3So3Xo1yHgCQzee0Q4hHmGbVSeHAAY1plMBFRvEmmQtuJBaEY2fD
+         h8FhRUwIB75+GcrKvr3hbwM47ZP/uSz5lToa+txRMpWIR1YFmTfjnkaM2SoWvdUfOXao
+         yJknu2amfeL8uVz5cE3Q0FOdUzbCbJK1yULiMzRfULw0vjI+KeikjTBcYkCzT8a9XD+z
+         g1kuPoLVPX5Rdbrc6MjO4wsoCff8A8RyKAhk9tTZPU7URv5ro7DXDVZfkXhd4RR8xZwD
+         9gZHor1rO2ZrCylTl703oBA9cOBoRvBTP/edhiANiEm98N9pCJnFVgRbVb/Knfgv9dko
+         Duiw==
+X-Gm-Message-State: AOAM530IU7x0Zc2XPfhit6ehPmFfbpdNyrmloLrmdMV2G5cTzYEKCNHl
+        K503ucAGoy5i81yTk9gLux4=
+X-Google-Smtp-Source: ABdhPJzkAXCaoeAbySCJ7/zywjBl18kpYaHWlXn/4ZmqpQac4EGY1JKNWp0dwknsCoLTWKL7FfAXGA==
+X-Received: by 2002:a62:f846:0:b029:15f:f897:7647 with SMTP id c6-20020a62f8460000b029015ff8977647mr21281604pfm.75.1605064494112;
+        Tue, 10 Nov 2020 19:14:54 -0800 (PST)
+Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id 82sm525268pfy.24.2020.11.10.19.14.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Nov 2020 19:14:53 -0800 (PST)
+Subject: Re: [PATCH 6/6] null_blk: Move driver into its own directory
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20201109125105.551734-1-damien.lemoal@wdc.com>
+ <20201109125105.551734-7-damien.lemoal@wdc.com>
+ <afdd6a5c-310f-7287-5eb4-d101a531cd6e@acm.org>
+ <BL0PR04MB651412E090C15573E07CADB2E7E90@BL0PR04MB6514.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <b439dcea-a473-5823-8fb2-7a5be96f5490@acm.org>
+Date:   Tue, 10 Nov 2020 19:14:51 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-Received: by 2002:a92:ba14:: with SMTP id o20mr17040042ili.76.1605064145162;
- Tue, 10 Nov 2020 19:09:05 -0800 (PST)
-Date:   Tue, 10 Nov 2020 19:09:05 -0800
-In-Reply-To: <000000000000b09d8c059a3240be@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000036d7e005b3cc1e79@google.com>
-Subject: Re: WARNING in percpu_ref_exit (2)
-From:   syzbot <syzbot+8c4a14856e657b43487c@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, ebiggers@kernel.org, hdanton@sina.com,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        paulmck@kernel.org, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <BL0PR04MB651412E090C15573E07CADB2E7E90@BL0PR04MB6514.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+On 11/9/20 8:57 PM, Damien Le Moal wrote:
+> Can I add a "Suggested-by" tag with your name ?
 
-commit c1e2148f8ecb26863b899d402a823dab8e26efd1
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Wed Mar 4 14:25:50 2020 +0000
+Sure, that would be welcome.
 
-    io_uring: free fixed_file_data after RCU grace period
+Thanks,
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=161ea46e500000
-start commit:   63849c8f Merge tag 'linux-kselftest-5.6-rc5' of git://git...
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4527d1e2fb19fd5c
-dashboard link: https://syzkaller.appspot.com/bug?extid=8c4a14856e657b43487c
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c30061e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1251b731e00000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: io_uring: free fixed_file_data after RCU grace period
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Bart.
