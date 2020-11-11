@@ -2,76 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A104CC388F7
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 01:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C195C55ABD
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 02:16:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56538216C4
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 01:41:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 040D0221F7
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 02:16:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFYo4SOb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731746AbgKKBlT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Nov 2020 20:41:19 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:34198 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731713AbgKKBlT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Nov 2020 20:41:19 -0500
-Received: by mail-pf1-f193.google.com with SMTP id w6so592170pfu.1
-        for <linux-block@vger.kernel.org>; Tue, 10 Nov 2020 17:41:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xlHvNWa4yPPWg+JCLfaBgBaYnaHb/EDR8S1yfsdthVI=;
-        b=r/oLwWmY+knV1CTcJjSd+uiLtEAZU7bqHjk7ueOxKRkZuimGJMbKmYFYll1z6cESN5
-         52pXcWWrRHbEa41Xce+Yr+hoQUBhZbKEjpkweyiCCNTjcO3ohvJP+k5XJRWBH8VL5OBL
-         /H7HC5D5BnMwplnpeG6QDvkrjut1lbYyJhoKQul1xypcuBdHDYVIDJZkq4TutMWRI2TE
-         anm/iEggFdUfdl9UU7pW9bc3dcFxw4VLBf50kLhJn1IQKUkgWRfFFepbsK6XSrD7fqxB
-         D1ODIbHL3od9RwN4YHA9CU1BHe04FvcnhLL3dCV5oiyFXgtRg3WBBYx7VVWs1n9Jmy2p
-         RjlQ==
-X-Gm-Message-State: AOAM532NSJsg9jgIc4DxIvL47qP+KGbJhp8auzTqXEjyv8odm7wu1u0J
-        9tMoL/yE3fxDs+y0j2NKLYA=
-X-Google-Smtp-Source: ABdhPJzysruYkddhFxxLZHPQAlV3Si3fxM8NYhaHMKeV6NohtwI9UgFNvguQCuWfLfyOUoeKJR+A9g==
-X-Received: by 2002:a05:6a00:134d:b029:18b:2cde:d747 with SMTP id k13-20020a056a00134db029018b2cded747mr19956640pfu.60.1605058878583;
-        Tue, 10 Nov 2020 17:41:18 -0800 (PST)
-Received: from ?IPv6:2601:647:4802:9070:47ee:2018:3e3c:f9be? ([2601:647:4802:9070:47ee:2018:3e3c:f9be])
-        by smtp.gmail.com with ESMTPSA id s5sm358489pfh.164.2020.11.10.17.41.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2020 17:41:17 -0800 (PST)
-Subject: Re: [PATCH V3] nvme: enable ro namespace for ZNS without append
-To:     Keith Busch <kbusch@kernel.org>, javier@javigon.com
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, axboe@kernel.dk, joshi.k@samsung.com,
-        k.jensen@samsung.com, Niklas.Cassel@wdc.com,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>
-References: <20201110210708.5912-1-javier@samsung.com>
- <20201110220941.GA2225168@dhcp-10-100-145-180.wdc.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <87931ded-b17b-90b2-c5b2-a1a465d109cc@grimberg.me>
-Date:   Tue, 10 Nov 2020 17:41:15 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1731788AbgKKCQJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Nov 2020 21:16:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41322 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726307AbgKKCQI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Nov 2020 21:16:08 -0500
+Received: from sol.attlocal.net (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4AAA721D91;
+        Wed, 11 Nov 2020 02:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1605060968;
+        bh=PZRt3E6xxphWLNzNZIOoOuzGlDMjxwJgE196pZ7V150=;
+        h=From:To:Cc:Subject:Date:From;
+        b=jFYo4SObuhumM2OS4flaYv43pxymqBCEH26pzPgG3NsTvcCAj0KALgg9je/z3sQ54
+         l6WbWCayAo1Ma1mY4sBIZtczuWaj3AvOgaVDFwgjqi4lqy7NVRzRAIpUtT8Y3d8AuN
+         mo8DovjK/px47OISPMXoR7L1sEpmIbg02PWJnPQU=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-fscrypt@vger.kernel.org, Satya Tangirala <satyat@google.com>
+Subject: [PATCH] block/keyslot-manager: prevent crash when num_slots=1
+Date:   Tue, 10 Nov 2020 18:14:27 -0800
+Message-Id: <20201111021427.466349-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <20201110220941.GA2225168@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Eric Biggers <ebiggers@google.com>
 
->> -	if (id->nsattr & NVME_NS_ATTR_RO)
->> +	if (id->nsattr & NVME_NS_ATTR_RO || test_bit(NVME_NS_FORCE_RO, &ns->flags))
->>   		set_disk_ro(disk, true);
-> 
-> If the FORCE_RO flag is set, the disk is set to read-only. If that flag
-> is later cleared, nothing clears the disk's read-only setting.
+If there is only one keyslot, then blk_ksm_init() computes
+slot_hashtable_size=1 and log_slot_ht_size=0.  This causes
+blk_ksm_find_keyslot() to crash later because it uses
+hash_ptr(key, log_slot_ht_size) to find the hash bucket containing the
+key, and hash_ptr() doesn't support the bits == 0 case.
 
-Yea, that is true also for the non-force case, but before it broke
-BLKROSET so I reverted that. We can use this FORCE_RO for BLKROSET as
-well I think...
+Fix this by making the hash table always have at least 2 buckets.
+
+Tested by running:
+
+    kvm-xfstests -c ext4 -g encrypt -m inlinecrypt \
+                 -o blk-crypto-fallback.num_keyslots=1
+
+Fixes: 1b2628397058 ("block: Keyslot Manager for Inline Encryption")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ block/keyslot-manager.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
+index 35abcb1ec051d..0a5b2772324ad 100644
+--- a/block/keyslot-manager.c
++++ b/block/keyslot-manager.c
+@@ -103,6 +103,13 @@ int blk_ksm_init(struct blk_keyslot_manager *ksm, unsigned int num_slots)
+ 	spin_lock_init(&ksm->idle_slots_lock);
+ 
+ 	slot_hashtable_size = roundup_pow_of_two(num_slots);
++
++	/*
++	 * hash_ptr() assumes bits != 0, so ensure the hash table has at least 2
++	 * buckets.  This only makes a difference when there is only 1 keyslot.
++	 */
++	slot_hashtable_size = max(slot_hashtable_size, 2U);
++
+ 	ksm->log_slot_ht_size = ilog2(slot_hashtable_size);
+ 	ksm->slot_hashtable = kvmalloc_array(slot_hashtable_size,
+ 					     sizeof(ksm->slot_hashtable[0]),
+
+base-commit: f8394f232b1eab649ce2df5c5f15b0e528c92091
+-- 
+2.29.2
+
