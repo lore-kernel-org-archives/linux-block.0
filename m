@@ -2,65 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8220DC388F9
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC47BC4742C
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:05:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C007206E3
-	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D8CE206E3
+	for <linux-block@archiver.kernel.org>; Wed, 11 Nov 2020 08:05:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="j1VAhHZF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbgKKIDs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Nov 2020 03:03:48 -0500
-Received: from verein.lst.de ([213.95.11.211]:39122 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725828AbgKKIDq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Nov 2020 03:03:46 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id E204A6736F; Wed, 11 Nov 2020 09:03:34 +0100 (CET)
-Date:   Wed, 11 Nov 2020 09:03:34 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ilya Dryomov <idryomov@gmail.com>, Song Liu <song@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH, RFC 11/10] block: propagate BLKROSET to all partitions
-Message-ID: <20201111080334.GA23062@lst.de>
-References: <20201106140817.GA23557@lst.de> <yq1imacecwz.fsf@ca-mkp.ca.oracle.com>
+        id S1726140AbgKKIF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Nov 2020 03:05:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57208 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725916AbgKKIF4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Nov 2020 03:05:56 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15D66C0613D1
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 00:05:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=j1VAhHZFoiy/V7XvDoEwlwJcDO
+        6IXutpRI7TosgjGzZJ8N7VdPdLrGsn4+0PYjVgPrgZgQ2q5R/l4SyN0WUCz9d17m1bf+a3Y1ZQy8O
+        997Qu0pCJrctfqRkYARlfumceejsxm35IW1pLWaePuNcaAIxQDL39KWFZV7F0FbGhX0+G/Ys+U5VD
+        TVhbCJ6Ktv/P4FYmuo+jUsRZufpsU580tlYgAzaYqUstamGJ4kO8f2vDJnu7ui2+FAhSHx5W0R7u0
+        +4lk5IynzicW9zulFqohryW5Bod85fkH9RE8+LMNQg5xL6NGE+ENzizKiV6SCtTBM2Od4TDG5vqcC
+        TLSMasrg==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kcl8c-0006C3-BJ; Wed, 11 Nov 2020 08:05:54 +0000
+Date:   Wed, 11 Nov 2020 08:05:54 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v2 1/9] null_blk: Fix zone size initialization
+Message-ID: <20201111080554.GA23360@infradead.org>
+References: <20201111051648.635300-1-damien.lemoal@wdc.com>
+ <20201111051648.635300-2-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq1imacecwz.fsf@ca-mkp.ca.oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20201111051648.635300-2-damien.lemoal@wdc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 10, 2020 at 11:38:22PM -0500, Martin K. Petersen wrote:
-> 
-> Christoph,
-> 
-> > When setting the whole device read-only (or clearing the read-only
-> > state), also update the policy for all partitions.  The s390 dasd
-> > driver has awlways been doing this and it makes a lot of sense.
-> 
-> For your amusement, here's my attempt at addressing this from a while
-> back. Can't remember exactly why this stranded, I even wrote blktests
-> for it...
+Looks good,
 
-I added you to the Cc list because I had a vague memory that you were
-looking into this area a while ago.
-
-I actually think your patch that goes further is the right thing to do,
-and I was going to look into something similar for a problem with
-hardware read-only namespaces in NVMe.  I think I'll take your patch
-as a starting point and will work from there.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
