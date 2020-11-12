@@ -2,71 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EA5C2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 14:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 052D4C5519F
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 14:52:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF0572224B
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 14:43:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B03FA20872
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 14:52:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728155AbgKLOnL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Nov 2020 09:43:11 -0500
-Received: from verein.lst.de ([213.95.11.211]:43938 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727035AbgKLOnL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Nov 2020 09:43:11 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A475567373; Thu, 12 Nov 2020 15:43:07 +0100 (CET)
-Date:   Thu, 12 Nov 2020 15:43:07 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Petr Vorel <pvorel@suse.cz>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Martijn Coenen <maco@android.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, ltp@lists.linux.it
-Subject: Re: [PATCH 1/1] loop: Fix occasional uevent drop
-Message-ID: <20201112144307.GA8377@lst.de>
-References: <20201111180846.21515-1-pvorel@suse.cz>
+        id S1728492AbgKLOwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Nov 2020 09:52:45 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:7526 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728155AbgKLOwo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Nov 2020 09:52:44 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CX4MN1WtwzhkLK;
+        Thu, 12 Nov 2020 22:52:32 +0800 (CST)
+Received: from localhost (10.174.176.180) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 12 Nov 2020
+ 22:52:33 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <axboe@kernel.dk>, <maco@android.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH] loop: Fix passing zero to 'PTR_ERR' warning
+Date:   Thu, 12 Nov 2020 22:52:33 +0800
+Message-ID: <20201112145233.53060-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201111180846.21515-1-pvorel@suse.cz>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain
+X-Originating-IP: [10.174.176.180]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 11, 2020 at 07:08:46PM +0100, Petr Vorel wrote:
-> 716ad0986cbd caused to occasional drop of loop device uevent, which was
-> no longer triggered in loop_set_size() but in a different part of code.
-> 
-> Bug is reproducible with LTP test uevent01 [1]:
-> 
-> i=0; while true; do
->     i=$((i+1)); echo "== $i =="
->     lsmod |grep -q loop && rmmod -f loop
->     ./uevent01 || break
-> done
-> 
-> Put back triggering through code called in loop_set_size().
-> 
-> Fix required to add yet another parameter to
-> set_capacity_revalidate_and_notify().
+Fix smatch warning:
 
-I don't like where this is heading, especially as I've rewritten the whole
-area pending inclusion for 5.11. I think the you want something like what
-I did in this three commits with a loop commit equivalent to the last
-commit for nbd:
+drivers/block/loop.c:799 loop_attr_backing_file_show() warn: passing zero to 'PTR_ERR'
 
-http://git.infradead.org/users/hch/block.git/commitdiff/89348f9f510d77d0bf69994f096eb6b71199e0f4
+file_path() never returns 0, so use IS_ERR instead of
+IS_ERR_OR_NULL to fix this.
 
-http://git.infradead.org/users/hch/block.git/commitdiff/89348f9f510d77d0bf69994f096eb6b71199e0f4
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/block/loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Jens, maybe I should rebase things so that a version of that first
-commit can go into 5.10 and stable?
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 83701c2ae3ca..65d392307c6a 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -795,7 +795,7 @@ static ssize_t loop_attr_backing_file_show(struct loop_device *lo, char *buf)
+ 		p = file_path(lo->lo_backing_file, buf, PAGE_SIZE - 1);
+ 	spin_unlock_irq(&lo->lo_lock);
+ 
+-	if (IS_ERR_OR_NULL(p))
++	if (IS_ERR(p))
+ 		ret = PTR_ERR(p);
+ 	else {
+ 		ret = strlen(p);
+-- 
+2.17.1
+
