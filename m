@@ -2,97 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5BD2C2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 06:54:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A108C5517A
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 07:55:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7767221534
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 06:54:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15C8421D40
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 07:55:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="EWhVHCWX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8kPM04f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725960AbgKLGyG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Nov 2020 01:54:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44946 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725920AbgKLGyG (ORCPT
+        id S1725979AbgKLHzq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Nov 2020 02:55:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33998 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725884AbgKLHzq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Nov 2020 01:54:06 -0500
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0ECC0613D1
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 22:54:04 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id y16so4874732ljh.0
-        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 22:54:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=jyRvIdgyGAjWDq5W0K1ksXVJK+gQp1v4Z+e6lQNh9W4=;
-        b=EWhVHCWXmLiHsu0sT9VgjKIQLetXybwhvIk+GYPJAi46dOA5q9cfswM727cThj0AHk
-         +GjNmz/3sKj1D4AWB66dZa9ZjchhO+5U7Viy3G93v6VznQ5UHOhOMZogLFZvjAfZQZCk
-         gmGmKsfNlOO0H8hX6u0UETqwxi65Yvh+PcFKUblekKaKHTxIqn8li8wVOCJKjjQ7nbt5
-         AAHi70MWJApfJ4Pxodg7rrHSwQrk7PLTHZ+kiKTfhn4XCdv+ca8YyKP6I99dJjh9Sn39
-         mW3sAC+fmWksUt2AWrKDKm2e1n3q/MXRU4d8jdhPwPFDH6DOabDieUg8plUZx+XkSodP
-         e+qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=jyRvIdgyGAjWDq5W0K1ksXVJK+gQp1v4Z+e6lQNh9W4=;
-        b=H3brg0QL3sggTq9YY+AY7CFewfB8dTjSuI9X0lp94yxhPpOMo7oDJ9KmmRBcMe1ZxO
-         Q6NxlzNAw38KGC8IRIf73wzMh/w/1OqFJEdfYvnVBY5fam2gJU9saldCYVZUO3qR/FfA
-         kyc+YzTDizzfz5VLVTqmHIp/P58g32ihsCYDD1HZGi4HDaj5eH9lBHYE+qym1Z+9pKs8
-         nKDhhmwW3LlY0MjO26DTgn/4Llx0QBRs+S2KymeBP8/YCd2ZAxZ1hSsHWBTtKPdP+m2h
-         0sMx1EMsJopV6I+Eu1t9bIjs3WGw24B1FFVE8y8PTkh2rE3xsip66HEwULQelc1W94eu
-         q0Cw==
-X-Gm-Message-State: AOAM530HKhD5HS2Kp45aWm39EemcJuIafMaFkAdie1Cv5BpzYo4Hr4p2
-        9b0KuWWyFZoEsDXJ31tSGpSdkI3W7xkyH7Q+
-X-Google-Smtp-Source: ABdhPJxoE/WpHD4Hd69MvP0MpCUmik3AYwC2Pxu73yIXTy36mashD+1FV3Q3+u84EgwB606+fRcLhw==
-X-Received: by 2002:a2e:9988:: with SMTP id w8mr11162295lji.107.1605164042855;
-        Wed, 11 Nov 2020 22:54:02 -0800 (PST)
-Received: from ?IPv6:2a02:aa7:4008:7a47:dd24:ebba:eb9c:4d77? ([2a02:aa7:4008:7a47:dd24:ebba:eb9c:4d77])
-        by smtp.gmail.com with ESMTPSA id v1sm454368lfp.305.2020.11.11.22.54.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Nov 2020 22:54:02 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH] nvme: remove unnecessary return values
-Date:   Thu, 12 Nov 2020 07:54:01 +0100
-Message-Id: <5F62C483-424C-47D8-AFC9-B6B28B2C4D54@javigon.com>
-References: <BYAPR04MB4965213DB3D1F07B7B75B92586E70@BYAPR04MB4965.namprd04.prod.outlook.com>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, kbusch@kernel.org, sagi@grimberg.me,
-        =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>
-In-Reply-To: <BYAPR04MB4965213DB3D1F07B7B75B92586E70@BYAPR04MB4965.namprd04.prod.outlook.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-X-Mailer: iPhone Mail (18A8395)
+        Thu, 12 Nov 2020 02:55:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605167745;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6bz/KsOzR5wf+7A3G0krlSSNDvuKL7/IXddr5pTa7h0=;
+        b=c8kPM04ff2yRpTcJp2A31F6rbGe5o42zwNq/tCVMypnBamq8puMrfTDXPR9Vkx204H5G1V
+        n8Yl6wkQ0fYVsyUL9zSwoyhi1ilzKPB8vaY9hq9SQ52ZMsKGASlDOElogV7kK9dPnaFxmg
+        +E6nzkulsq16HRBTJRSuyVnq7S3vTDc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-jjHKepSSNHeZXwrszJvw7A-1; Thu, 12 Nov 2020 02:55:41 -0500
+X-MC-Unique: jjHKepSSNHeZXwrszJvw7A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9E168018AB;
+        Thu, 12 Nov 2020 07:55:38 +0000 (UTC)
+Received: from localhost (ovpn-12-132.pek2.redhat.com [10.72.12.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BEDA2CFBB;
+        Thu, 12 Nov 2020 07:55:36 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, Qian Cai <cai@redhat.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        John Garry <john.garry@huawei.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 0/3] blk-mq/nvme-loop: use nvme-loop's lock class for addressing lockdep false positive warning
+Date:   Thu, 12 Nov 2020 15:55:23 +0800
+Message-Id: <20201112075526.947079-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
-> On 12 Nov 2020, at 05.11, Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com> w=
-rote:
->=20
-> =EF=BB=BFOn 11/11/20 12:10, javier@javigon.com wrote:
->> From: Javier Gonz=C3=A1lez <javier.gonz@samsung.com>
->>=20
->> Cleanup unnecessary ret values that are not checked or used in
->> nvme_alloc_ns()
->>=20
->> Signed-off-by: Javier Gonz=C3=A1lez <javier
->=20
-> The ret value pattern is used to avoid the calls in the if () which is
->=20
-> not clean based on the comments I had in the past.
+Qian reported there is hang during booting when shared host tagset is
+introduced on megaraid sas. Sumit reported the whole SCSI probe takes
+about ~45min in his test.
 
-Thanks for the comment Chaitanya. I was working around this function and TBH=
- I have never thought about it this way.=20
+Turns out it is caused by nr_hw_queues increased, especially commit
+b3c6a5997541("block: Fix a lockdep complaint triggered by request queue flushing")
+adds synchronize_rcu() for each hctx's release handler.
 
-Will add it to the toolbelt then.=20
+Address the original lockdep false positive warning by simpler way, then
+long scsi probe can be avoided with lockdep enabled.
+
+Ming Lei (3):
+  blk-mq: add new API of blk_mq_hctx_set_fq_lock_class
+  nvme-loop: use blk_mq_hctx_set_fq_lock_class to set loop's lock class
+  Revert "block: Fix a lockdep complaint triggered by request queue
+    flushing"
+
+ block/blk-flush.c          | 30 +++++++++++++++++++++++++-----
+ block/blk.h                |  1 -
+ drivers/nvme/target/loop.c | 10 ++++++++++
+ include/linux/blk-mq.h     |  3 +++
+ 4 files changed, 38 insertions(+), 6 deletions(-)
+
+Cc: Qian Cai <cai@redhat.com>
+Cc: Sumit Saxena <sumit.saxena@broadcom.com>
+Cc: John Garry <john.garry@huawei.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Hannes Reinecke <hare@suse.de>
+-- 
+2.25.4
+
