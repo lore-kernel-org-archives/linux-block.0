@@ -2,129 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DF7C2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 12:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D8EC2D0A3
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 13:27:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39FDD2223F
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 12:01:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C01B2220B
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 13:27:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="grrkG6/X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727762AbgKLMA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Nov 2020 07:00:59 -0500
-Received: from mx2.suse.de ([195.135.220.15]:42406 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727147AbgKLMA6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Nov 2020 07:00:58 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6DF8DAC0C;
-        Thu, 12 Nov 2020 12:00:56 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 0F2961E130B; Thu, 12 Nov 2020 13:00:56 +0100 (CET)
-Date:   Thu, 12 Nov 2020 13:00:56 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        Peter Lieven <pl@kamp.de>, Jan Kara <jack@suse.cz>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Max Reitz <mreitz@redhat.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        qemu-block@nongnu.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 0/2] RFC: Issue with discards on raw block device without
- O_DIRECT
-Message-ID: <20201112120056.GC27697@quack2.suse.cz>
-References: <20201111153913.41840-1-mlevitsk@redhat.com>
- <03b01c699c9fab64736d04891f1e835aef06c886.camel@redhat.com>
- <20201112111951.GB27697@quack2.suse.cz>
+        id S1727035AbgKLN1h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Nov 2020 08:27:37 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20554 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727646AbgKLN1h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Nov 2020 08:27:37 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0ACD6Jn5172513;
+        Thu, 12 Nov 2020 08:27:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=NzEgnrbUfI1x4kE15Olf1XiFnie3lsOSefREnbDal9U=;
+ b=grrkG6/Xanfo/34+iWWlGVlg/hJcI0snlqxqxEM7nSyJXmrmAHLEgElDEI7ba1/NbwMC
+ UUgm8ZGcpzKR2ug11Yz8NWExSAU7f7FU9VMiu0kqM1siTmZmw0SsgUSOdVuN4i9FnsdE
+ I83RdvPNe0B4TT9cp7QG43FbOqIMz+ym0v2UeFTB/ObzWcCjB9AJFqvwiKF2TqBvHeGT
+ zQiMyfoftTYRNbEVr7lXlOVJ8KvSDUXDGsJM0/tnUIzq9yjRvXJFHfpmE801+iIL6JkL
+ 6PFK0tTFrAXMDW2NLZGLWtNCqDxM+HX1f913IlF1GVG5so+gGW/H9v3e4fqnAgqcLJug MQ== 
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34s5msrk56-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Nov 2020 08:27:35 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0ACDM5En000342;
+        Thu, 12 Nov 2020 13:27:33 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 34nk782wcg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Nov 2020 13:27:33 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0ACDRVKq3867378
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Nov 2020 13:27:31 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A5105204E;
+        Thu, 12 Nov 2020 13:27:31 +0000 (GMT)
+Received: from linux.fritz.box (unknown [9.145.59.230])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A3B675204F;
+        Thu, 12 Nov 2020 13:27:30 +0000 (GMT)
+Subject: Re: [PATCH v2 00/10] DASD FC endpoint security
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20201008131336.61100-1-sth@linux.ibm.com>
+ <20201012183550.GA12341@imap.linux.ibm.com>
+ <07b0f296-e0b2-1383-56a1-0d5411c101da@kernel.dk>
+ <b5038d44-aa46-bbde-7a9f-0de46fed516a@linux.ibm.com>
+ <17e1142c-4108-6f74-971a-dee007162786@kernel.dk>
+ <ad3caaf7-ed8e-9f21-c3a6-c385139feb7b@linux.ibm.com>
+ <6468cfad-e14c-060d-a525-00d75fe66819@kernel.dk>
+ <30740ed3-21b9-71cd-b48c-1d6947c6f029@linux.ibm.com>
+ <be2933c0-4827-ab38-872f-01cb02e44fc4@kernel.dk>
+From:   Stefan Haberland <sth@linux.ibm.com>
+Message-ID: <cb795828-48db-570b-e04d-cc1da6a87c95@linux.ibm.com>
+Date:   Thu, 12 Nov 2020 14:27:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201112111951.GB27697@quack2.suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <be2933c0-4827-ab38-872f-01cb02e44fc4@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-12_05:2020-11-12,2020-11-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 impostorscore=0 mlxscore=0 spamscore=0 mlxlogscore=833
+ bulkscore=0 adultscore=0 malwarescore=0 phishscore=0 priorityscore=1501
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011120075
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 12-11-20 12:19:51, Jan Kara wrote:
-> [added some relevant people and lists to CC]
-> 
-> On Wed 11-11-20 17:44:05, Maxim Levitsky wrote:
-> > On Wed, 2020-11-11 at 17:39 +0200, Maxim Levitsky wrote:
-> > > clone of "starship_production"
-> > 
-> > The git-publish destroyed the cover letter:
-> > 
-> > For the reference this is for bz #1872633
-> > 
-> > The issue is that current kernel code that implements 'fallocate'
-> > on kernel block devices roughly works like that:
-> > 
-> > 1. Flush the page cache on the range that is about to be discarded.
-> > 2. Issue the discard and wait for it to finish.
-> >    (as far as I can see the discard doesn't go through the
-> >    page cache).
-> > 
-> > 3. Check if the page cache is dirty for this range,
-> >    if it is dirty (meaning that someone wrote to it meanwhile)
-> >    return -EBUSY.
-> > 
-> > This means that if qemu (or qemu-img) issues a write, and then
-> > discard to the area that shares a page, -EBUSY can be returned by
-> > the kernel.
-> 
-> Indeed, if you don't submit PAGE_SIZE aligned discards, you can get back
-> EBUSY which seems wrong to me. IMO we should handle this gracefully in the
-> kernel so we need to fix this.
-> 
-> > On the other hand, for example, the ext4 implementation of discard
-> > doesn't seem to be affected. It does take a lock on the inode to avoid
-> > concurrent IO and flushes O_DIRECT writers prior to doing discard thought.
-> 
-> Well, filesystem hole punching is somewhat different beast than block device
-> discard (at least implementation wise).
-> 
-> > Doing fsync and retrying is seems to resolve this issue, but it might be
-> > a too big hammer.  Just retrying doesn't work, indicating that maybe the
-> > code that flushes the page cache in (1) doesn't do this correctly ?
-> > 
-> > It also can be racy unless special means are done to block IO from happening
-> > from qemu during this fsync.
-> > 
-> > This patch series contains two patches:
-> > 
-> > First patch just lets the file-posix ignore the -EBUSY errors, which is
-> > technically enough to fail back to plain write in this case, but seems wrong.
-> > 
-> > And the second patch adds an optimization to qemu-img to avoid such a
-> > fragmented write/discard in the first place.
-> > 
-> > Both patches make the reproducer work for this particular bugzilla,
-> > but I don't think they are enough.
-> > 
-> > What do you think?
-> 
-> So if the EBUSY error happens because something happened to the page cache
-> outside of discarded range (like you describe above), that is a kernel bug
-> than needs to get fixed. EBUSY should really mean - someone wrote to the
-> discarded range while discard was running and userspace app has to deal
-> with that depending on what it aims to do...
+Am 11.11.20 um 17:20 schrieb Jens Axboe:
+> On 11/10/20 8:50 AM, Stefan Haberland wrote:
+>> Am 14.10.20 um 03:19 schrieb Jens Axboe:
+>>>> So, instead could you please apply the patches for 5.11 as soon as it is
+>>>> suitable?
+>>> I will - I have it queued up, won't create anything public until we
+>>> get past the merge window.
+>>>
+>> Sorry to bother you again with this.
+>> Is there any outlook when you are going to push the patches to your
+>> for-next branch?
+>>
+>> Or shall I resend the patches?
+> I already did apply it, just don't push out next release branches
+> that early. Pushed out now, so it is in.
+>
 
-So I was looking what it would take to fix this inside the kernel. The
-problem is that invalidate_inode_pages2_range() is working on page
-granularity and it is non-trivial to extend it to work on byte granularity
-since we don't support something like "try to reclaim part of a page". But
-I'm also somewhat wondering why we use invalidate_inode_pages2_range() here
-instead of truncate_inode_pages_range() again? I mean the EBUSY detection
-cannot be reliable anyway and userspace has no way of knowing whether a
-write happened before discard or after it so just discarding data is fine
-from this point of view. Darrick?
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks a lot.
