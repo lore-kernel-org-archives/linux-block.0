@@ -2,279 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAB31C2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 06:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5BD2C2D0A3
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 06:54:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 471CF2084C
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 06:05:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7767221534
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 06:54:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="EWhVHCWX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725967AbgKLGFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Nov 2020 01:05:47 -0500
-Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:54317 "EHLO
-        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725966AbgKLGFq (ORCPT
+        id S1725960AbgKLGyG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Nov 2020 01:54:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44946 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725920AbgKLGyG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Nov 2020 01:05:46 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UF2fvup_1605161140;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UF2fvup_1605161140)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 12 Nov 2020 14:05:41 +0800
-Subject: Re: [dm-devel] dm: add support for DM_TARGET_NOWAIT for various
- targets
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     joseph.qi@linux.alibaba.com, dm-devel@redhat.com, koct9i@gmail.com,
-        axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20201110065558.22694-1-jefflexu@linux.alibaba.com>
- <20201111153824.GB22834@redhat.com>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <533a3b6b-146b-afe6-2e3e-d1bc2180a8c8@linux.alibaba.com>
-Date:   Thu, 12 Nov 2020 14:05:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.1
-MIME-Version: 1.0
-In-Reply-To: <20201111153824.GB22834@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        Thu, 12 Nov 2020 01:54:06 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0ECC0613D1
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 22:54:04 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id y16so4874732ljh.0
+        for <linux-block@vger.kernel.org>; Wed, 11 Nov 2020 22:54:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=jyRvIdgyGAjWDq5W0K1ksXVJK+gQp1v4Z+e6lQNh9W4=;
+        b=EWhVHCWXmLiHsu0sT9VgjKIQLetXybwhvIk+GYPJAi46dOA5q9cfswM727cThj0AHk
+         +GjNmz/3sKj1D4AWB66dZa9ZjchhO+5U7Viy3G93v6VznQ5UHOhOMZogLFZvjAfZQZCk
+         gmGmKsfNlOO0H8hX6u0UETqwxi65Yvh+PcFKUblekKaKHTxIqn8li8wVOCJKjjQ7nbt5
+         AAHi70MWJApfJ4Pxodg7rrHSwQrk7PLTHZ+kiKTfhn4XCdv+ca8YyKP6I99dJjh9Sn39
+         mW3sAC+fmWksUt2AWrKDKm2e1n3q/MXRU4d8jdhPwPFDH6DOabDieUg8plUZx+XkSodP
+         e+qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=jyRvIdgyGAjWDq5W0K1ksXVJK+gQp1v4Z+e6lQNh9W4=;
+        b=H3brg0QL3sggTq9YY+AY7CFewfB8dTjSuI9X0lp94yxhPpOMo7oDJ9KmmRBcMe1ZxO
+         Q6NxlzNAw38KGC8IRIf73wzMh/w/1OqFJEdfYvnVBY5fam2gJU9saldCYVZUO3qR/FfA
+         kyc+YzTDizzfz5VLVTqmHIp/P58g32ihsCYDD1HZGi4HDaj5eH9lBHYE+qym1Z+9pKs8
+         nKDhhmwW3LlY0MjO26DTgn/4Llx0QBRs+S2KymeBP8/YCd2ZAxZ1hSsHWBTtKPdP+m2h
+         0sMx1EMsJopV6I+Eu1t9bIjs3WGw24B1FFVE8y8PTkh2rE3xsip66HEwULQelc1W94eu
+         q0Cw==
+X-Gm-Message-State: AOAM530HKhD5HS2Kp45aWm39EemcJuIafMaFkAdie1Cv5BpzYo4Hr4p2
+        9b0KuWWyFZoEsDXJ31tSGpSdkI3W7xkyH7Q+
+X-Google-Smtp-Source: ABdhPJxoE/WpHD4Hd69MvP0MpCUmik3AYwC2Pxu73yIXTy36mashD+1FV3Q3+u84EgwB606+fRcLhw==
+X-Received: by 2002:a2e:9988:: with SMTP id w8mr11162295lji.107.1605164042855;
+        Wed, 11 Nov 2020 22:54:02 -0800 (PST)
+Received: from ?IPv6:2a02:aa7:4008:7a47:dd24:ebba:eb9c:4d77? ([2a02:aa7:4008:7a47:dd24:ebba:eb9c:4d77])
+        by smtp.gmail.com with ESMTPSA id v1sm454368lfp.305.2020.11.11.22.54.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Nov 2020 22:54:02 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH] nvme: remove unnecessary return values
+Date:   Thu, 12 Nov 2020 07:54:01 +0100
+Message-Id: <5F62C483-424C-47D8-AFC9-B6B28B2C4D54@javigon.com>
+References: <BYAPR04MB4965213DB3D1F07B7B75B92586E70@BYAPR04MB4965.namprd04.prod.outlook.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        hch@lst.de, kbusch@kernel.org, sagi@grimberg.me,
+        =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+In-Reply-To: <BYAPR04MB4965213DB3D1F07B7B75B92586E70@BYAPR04MB4965.namprd04.prod.outlook.com>
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+X-Mailer: iPhone Mail (18A8395)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens and guys in block/io_uring mailing list, this mail contains some 
-discussion abount
 
-RWF_NOWAIT, please see the following contents.
-
-
-
-On 11/11/20 11:38 PM, Mike Snitzer wrote:
-> On Tue, Nov 10 2020 at  1:55am -0500,
-> Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
->
->> This is one prep patch for supporting iopoll for dm device.
->>
->> The direct IO routine will set REQ_NOWAIT flag for REQ_HIPRI IO (that
->> is, IO will do iopoll) in bio_set_polled(). Then in the IO submission
->> routine, the ability of handling REQ_NOWAIT of the block device will
->> be checked for REQ_HIPRI IO in submit_bio_checks(). -EOPNOTSUPP will
->> be returned if the block device doesn't support REQ_NOWAIT.
-> submit_bio_checks() verifies the request_queue has QUEUE_FLAG_NOWAIT set
-> if the bio has REQ_NOWAIT.
-Yes that's the case.
->
->> DM lacks support for REQ_NOWAIT until commit 6abc49468eea ("dm: add
->> support for REQ_NOWAIT and enable it for linear target"). Since then,
->> dm targets that support REQ_NOWAIT should advertise DM_TARGET_NOWAIT
->> feature.
-> I'm not seeing why DM_TARGET_NOWAIT is needed (since you didn't add any
-> code that consumes the flag).
-
-As I said, it's needed if we support iopoll for dm device.  Only if a 
-block device is capable of
-
-handling NOWAIT, then it can support iopoll.
-
-
-IO submitted for iopoll (marked with IOCB_HIPRI) is usually also marked 
-with REQ_NOWAIT.
-
-There are two scenario when it could happen.
-
-
-1. io_uring will set REQ_NOWAIT
-
-The IO submission of io_uring can be divided into two phase. First, IO 
-will be submitted
-
-synchronously in user process context (when sqthread feature disabled), 
-or sqthread
-
-context (when sqthread feature enabled).
-
-
-```sh
-- current process context when sqthread disabled, or sqthread when it's 
-enabled
-     io_uring_enter
-         io_submit_sqes
-             io_submit_sqe
-                 io_queue_sqe
-                     __io_queue_sqe
-                         io_issue_sqe // with @force_nonblock is true
-                             io_read/io_write
-```
-
-In this case, IO should be handled in a NOWAIT way, since the user 
-process or sqthread
-
-can not be blocked for performance.
-
-```
-
-io_read/io_write
-
-     /* Ensure we clear previously set non-block flag */
-     if (!force_nonblock)
-         kiocb->ki_flags &= ~IOCB_NOWAIT;
-     else
-         kiocb->ki_flags |= IOCB_NOWAIT;
-
-```
-
-
-2. The direct IO routine will set REQ_NOWAIT for polling IO
-
-Both fs/block_dev.c: __blkdev_direct_IO and fs/iomap/direct-io.c: 
-iomap_dio_submit_bio will
-
-call bio_set_polled(), in which will set REQ_NOWAIT for polling IO.
-
-
-```sh
-__blkdev_direct_IO / iomap_dio_submit_bio:
-     if (dio->iocb->ki_flags & IOCB_HIPRI)
-         bio_set_polled
-           bio->bi_opf |= REQ_NOWAIT
-```
-
-
-Thus to support iopoll for dm device, the dm target should be capable of 
-handling NOWAIT,
-
-or submit_bio_checks() will fail with -EOPNOTSUPP when submitting bio to 
-dm device.
-
-
->
-> dm-table.c:dm_table_set_restrictions() has:
->
->          if (dm_table_supports_nowait(t))
->                  blk_queue_flag_set(QUEUE_FLAG_NOWAIT, q);
->          else
->                  blk_queue_flag_clear(QUEUE_FLAG_NOWAIT, q);
->
->> This patch adds support for DM_TARGET_NOWAIT for those dm targets, the
->> .map() algorithm of which just involves sector recalculation.
-> So you're looking to constrain which targets will properly support
-> REQ_NOWAIT, based on whether they do a simple remapping?
-
-To be honest, I'm a little confused about the semantics of REQ_NOWAIT. 
-Jens may had ever
-
-explained it in block or io_uring mailing list, but I can't find the 
-specific mail.
-
-
-The man page explains FMODE_NOWAIT as 'File is capable of returning 
--EAGAIN if I/O will
-
-block'.
-
-
-And RWF_NOWAIT as
-
-```
-
-               RWF_NOWAIT (since Linux 4.14)
-                      Don't wait if the I/O will block for operations 
-such as
-                      file block allocations, dirty page flush, mutex locks,
-                      or a congested block device inside the kernel.  If any
-                      of these conditions are met, the control block is re‐
-                      turned immediately with a return value of -EAGAIN in
-                      the res field of the io_event structure (see
-                      io_getevents(2)).
-
-```
-
-
-commit 6abc49468eea ("dm: add support for REQ_NOWAIT and enable it for 
-linear
-
-target") handles NOWAIT for DM core as
-
-
-```
-
-@@ -1802,7 +1802,9 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
-         if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
-+               if (bio->bi_opf & REQ_NOWAIT)
-+                       bio_wouldblock_error(bio);
-
-+               else if (!(bio->bi_opf & REQ_RAHEAD))
-                         queue_io(md, bio);
-
-```
-
-
-Theoretically the block device could advertise QUEUE_FLAG_NOWAIT as long 
-as it could
-
-'return -EAGAIN if I/O will block' as the man page said. However, 
-considering when the
-
-dm device detected as suspending, the submitted bios are deferred to 
-workqueue in
-
-drivers/dm/dm.c: dm_submit_bio. In this case, IO gets **deferred** while 
-the user process
-
-will not be **blocked**. Can we say IO gets **blocked** in this case?
-
-
-Actually several dm targets handle submitted bio in this deferred way, 
-such as dm-crypt/
-
-dm-delay/dm-era/dm-ebs. Can we say these targets are not capable of 
-handling NOWAIT?
-
-
-Also when system is short of memory, bio allocation in 
-bio_alloc_bioset() may trigger memory
-
-direct reclaim, as the gfp_mask is usually GFP_NOIO. While in memory 
-direct reclaim, the
-
-process may be scheduled out, but I have never seen the proper handling 
-for NOWAIT in this
-
-situation. Maybe the block or io_uring guys have more insights?
-
-
-So there's just too many possibilities that may get blocked, not to say 
-mutex locks.
-
-
->
->
->> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
->> ---
->> Hi Mike,
->>
->> I could split these boilerplate code that each dm target have one
->> seperate patch if you think that would be better.
-> One patch for all these is fine.  But it should include the code that I
-> assume you'll be adding to dm_table_supports_nowait() to further verify
-> that the targets in the table are all DM_TARGET_NOWAIT.
->
-> And why isn't dm-linear setting DM_TARGET_NOWAIT?
-These are all done in commit 6abc49468eea ("dm: add support for 
-REQ_NOWAIT and enable it for
-linear target").
->
-> Also, other targets _could_ be made to support REQ_NOWAIT by
-> conditionally returning bio_wouldblock_error() if appropriate
-> (e.g. bio-based dm-multipath's case of queue_if_no_path).
-
-
-
--- 
-Thanks,
-Jeffle
-
+> On 12 Nov 2020, at 05.11, Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com> w=
+rote:
+>=20
+> =EF=BB=BFOn 11/11/20 12:10, javier@javigon.com wrote:
+>> From: Javier Gonz=C3=A1lez <javier.gonz@samsung.com>
+>>=20
+>> Cleanup unnecessary ret values that are not checked or used in
+>> nvme_alloc_ns()
+>>=20
+>> Signed-off-by: Javier Gonz=C3=A1lez <javier
+>=20
+> The ret value pattern is used to avoid the calls in the if () which is
+>=20
+> not clean based on the comments I had in the past.
+
+Thanks for the comment Chaitanya. I was working around this function and TBH=
+ I have never thought about it this way.=20
+
+Will add it to the toolbelt then.=20
