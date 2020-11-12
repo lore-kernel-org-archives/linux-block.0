@@ -2,70 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25802C2D0A3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 14:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9BDC2D0A3
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 15:12:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3DDC20872
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 14:54:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E766216C4
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 15:12:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728389AbgKLOyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Nov 2020 09:54:09 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:7891 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728198AbgKLOyJ (ORCPT
+        id S1728220AbgKLPMS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Nov 2020 10:12:18 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:40857 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727035AbgKLPMP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Nov 2020 09:54:09 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CX4P118Mgz7658;
-        Thu, 12 Nov 2020 22:53:57 +0800 (CST)
-Received: from localhost (10.174.176.180) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Thu, 12 Nov 2020
- 22:53:58 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH] nbd: Fix passing zero to 'PTR_ERR' warning
-Date:   Thu, 12 Nov 2020 22:53:48 +0800
-Message-ID: <20201112145348.51284-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        Thu, 12 Nov 2020 10:12:15 -0500
+Received: by mail-pl1-f196.google.com with SMTP id j5so2922966plk.7
+        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2020 07:12:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0ypzV94H0yaYtd5pFfqZJmptSsWf67IW2o2OeYzuapo=;
+        b=GsKSo9j/1k1mO2/3+IoiCzDHwk3oeVemu5JqDmsKnPJod+TTguWYllEHQZfl3/hlMZ
+         K9WIZYQy6EF5aQGezseGDN3DJdQFpSOfbdbYeUMnpBURL83wk/ltnwVCdONbO7PkkhG8
+         OSQ8cbkxPYA7pG0SxY9MSN5/bOmv036yxEWpkZBotbn2j1RgOh8KMFiaBMb4kU/LJrw9
+         EHwdyb0HArETFqfxh0IKSezdBGO7AFoPppiyR6jzscDhXHTlFfRe035+Wi0PiXUHhCJP
+         ujOIYjOnf7fW3v7Cnu9v8NjpqKMPP7sAfYMeST8j/Ok0EatZNsmUJgEdEK7gns3XENJO
+         L5DA==
+X-Gm-Message-State: AOAM5316EIiGPRohSjmQcUedRsbMTAEUDoCTAkokEo9i0cvvT/aaONgb
+        Eb5Kj8fJzbEflKNMPH6u5y0=
+X-Google-Smtp-Source: ABdhPJxBuNQQ2bMqbglbC0YPn4oTwpZKmcJrsexAzX/EF4QkGxC/cBEdIlPVf3P+QL2Pjsoqe3mVBQ==
+X-Received: by 2002:a17:902:eb42:b029:d6:ba60:ba41 with SMTP id i2-20020a170902eb42b02900d6ba60ba41mr25994882pli.0.1605193934350;
+        Thu, 12 Nov 2020 07:12:14 -0800 (PST)
+Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id i11sm6921014pfq.156.2020.11.12.07.12.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Nov 2020 07:12:13 -0800 (PST)
+Subject: Re: [PATCH 3/3] Revert "block: Fix a lockdep complaint triggered by
+ request queue flushing"
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Qian Cai <cai@redhat.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        John Garry <john.garry@huawei.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Hannes Reinecke <hare@suse.de>
+References: <20201112075526.947079-1-ming.lei@redhat.com>
+ <20201112075526.947079-4-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <43bd8381-487b-098d-8e62-3946c75bcd8a@acm.org>
+Date:   Thu, 12 Nov 2020 07:12:11 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.176.180]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20201112075526.947079-4-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix smatch warning:
+On 11/11/20 11:55 PM, Ming Lei wrote:
+> This reverts commit b3c6a59975415bde29cfd76ff1ab008edbf614a9.
+> 
+> Now we can avoid nvme-loop lockdep warning of 'lockdep possible recursive
+> locking' by nvme-loop's lock class, no need to apply dynamically
+> allocated lock class key, so revert commit b3c6a5997541("block: Fix a
+> lockdep complaint triggered by request queue flushing").
+> 
+> This way fixes horrible SCSI probe delay issue on megaraid_sas, and it
+> is reported the whole probe may take more than half an hour.
 
-drivers/block/nbd.c:698 nbd_read_stat() warn: passing zero to 'ERR_PTR'
+The code touched by this patch is compiled out with locked disabled so
+it is not clear to me how this patch could affect a probe delay for
+megaraid_sas? Has the megaraid_sas probe issue perhaps not been root
+caused correctly?
 
-sock_xmit() never return 0, remove check 0 to fix this warning.
+Thanks,
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index aaae9220f3a0..1620d1217581 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -691,7 +691,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 	reply.magic = 0;
- 	iov_iter_kvec(&to, READ, &iov, 1, sizeof(reply));
- 	result = sock_xmit(nbd, index, 0, &to, MSG_WAITALL, NULL);
--	if (result <= 0) {
-+	if (result < 0) {
- 		if (!nbd_disconnected(config))
- 			dev_err(disk_to_dev(nbd->disk),
- 				"Receive control failed (result %d)\n", result);
--- 
-2.17.1
-
+Bart.
