@@ -2,104 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBCA9C61DD8
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 16:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFF9C2D0E4
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 18:02:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 899FE21D7F
-	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 16:50:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 353D922227
+	for <linux-block@archiver.kernel.org>; Thu, 12 Nov 2020 18:02:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AKPC7cTP"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Op80xd+a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728964AbgKLQuN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Nov 2020 11:50:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52674 "EHLO
+        id S1726465AbgKLSCX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Nov 2020 13:02:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728086AbgKLQuM (ORCPT
+        with ESMTP id S1726300AbgKLSCW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Nov 2020 11:50:12 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5176C0613D1
-        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2020 08:50:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=DJP/8vs4ykzHKc6DHLcxHUQQ4kXE+U15/2xsaVbVlkc=; b=AKPC7cTPU7x858fam2CQQEv3D5
-        PRUCOM6nvX1J0KxcgF6MEIotk/rL8Acxarp6Xnb6dr+OaUsverD//0zDounuTom3O52cVcoqDGxfU
-        C6fMvPen3vb0TsTDjszfcOxJhdc5BEuzJGJMqpTJ/ZOkGdHhx2MHl9kBnoXVGonQF4j2Usoqtin1i
-        VXKiEhpRA+TtgBGyvihNHi1rwnAYLmmOgswREmMYuwNoE9xNJ0K56Kz6KlD7B/rC2UW6vDmCouCUw
-        SnrATPE9AMdrWqg8KPyrXFW4L0OcZaOkSEkQf4AGhUrRo407uxIMJzCc9YLxBWOTEiHxB5+Fy3mtJ
-        kS9khKTw==;
-Received: from [2001:4bb8:180:6600:5c73:9bb4:23ff:391c] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kdFnW-0006yy-5o; Thu, 12 Nov 2020 16:50:10 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Petr Vorel <pvorel@suse.cz>, Martijn Coenen <maco@android.com>,
-        linux-block@vger.kernel.org, ltp@lists.linux.it
-Subject: [PATCH 2/2] loop: Fix occasional uevent drop
-Date:   Thu, 12 Nov 2020 17:50:05 +0100
-Message-Id: <20201112165005.4022502-3-hch@lst.de>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201112165005.4022502-1-hch@lst.de>
-References: <20201112165005.4022502-1-hch@lst.de>
+        Thu, 12 Nov 2020 13:02:22 -0500
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98BBC0613D1
+        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2020 10:02:22 -0800 (PST)
+Received: by mail-io1-xd41.google.com with SMTP id m9so6961886iox.10
+        for <linux-block@vger.kernel.org>; Thu, 12 Nov 2020 10:02:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=JB92aBZElM//76rTz+L8GOl8zGbr0pptcYjPzdqVG2s=;
+        b=Op80xd+aAWrCoExYMd+zd4/oCv1l5eWWAxL7M1KChpj+qGlV8ATMfmL62+ZK8aGvb1
+         8mIbgfjxyy4KuL1wVjqJmemSaGVAaFgGTMHNNt0qXphPi2oCtD4UNyMDOtIocvkO0dec
+         xj/fJQ89NfIZ6+2iI1T7rFXu5qLflCuRH/0ja/fUFxK/QNMrkScLHwKRxo6j60Asq56R
+         72phd6R3/6WnFaBmL3ub22em7X6ISTXudVSGPIN7Gtxhz2Nf7tiKxY7qQU3uHn7Rcxdf
+         ogSL3HoCbQt+cInIYkmqvKf71VNDt27dTPtnyknBmg0WKKyllsc63Vz3dNATyKeyshJ7
+         rtDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JB92aBZElM//76rTz+L8GOl8zGbr0pptcYjPzdqVG2s=;
+        b=WnqDsJCDLlGs57np5Qw2y4xTNILztksFbd+nTkwqt1j6ZR7qTLHG2scp+icbIaauoP
+         IehGJ7jY9uSLyPTUi15upUngwqURabqJfvuieGxRMm7e0ah9Hxd7VMRW15d6sK3jbeIm
+         /STweJqt+YPoG4ZzioG5WdEhID9J01lrklsuE9EDx24FkLLPGeQ7+IpY8qyOb/cxnOv2
+         0OkxHCv5gvRk2GF0NzdNiPpnELeHccQ2GfAbXCIs36+W9bFc4iVJ4cOmJWMcHf8NOnLM
+         KzWkpbANwQTyJnqapQmheSUgHR9jM/BnR9Tbf08Pv7b09NmGBpxYOolZKC86J15bd7Ch
+         6JCg==
+X-Gm-Message-State: AOAM532Uou29hL/lxlOrMgDquujG4xKF6tfrcRPGBhVmLUnE4ZbBuEgP
+        EwLYNBwHmT9pveQF8dZxuDWwqQ==
+X-Google-Smtp-Source: ABdhPJwEMh1n/6KyIprtuXgj+dBui6wMHNOhf3sf0Kaa7fVQv5w/H3XiG5xp4YqzhfDML0rgfZF4kw==
+X-Received: by 2002:a6b:8d58:: with SMTP id p85mr242757iod.74.1605204141949;
+        Thu, 12 Nov 2020 10:02:21 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id k7sm3292689ilq.48.2020.11.12.10.02.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Nov 2020 10:02:21 -0800 (PST)
+Subject: Re: [PATCH] iosched: Add i10 I/O Scheduler
+To:     Rachit Agarwal <rach4x0r@gmail.com>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jaehyun Hwang <jaehyun.hwang@cornell.edu>,
+        Qizhe Cai <qc228@cornell.edu>,
+        Midhul Vuppalapati <mvv25@cornell.edu>,
+        Rachit Agarwal <ragarwal@cs.cornell.edu>,
+        Sagi Grimberg <sagi@lightbitslabs.com>,
+        Rachit Agarwal <ragarwal@cornell.edu>
+References: <20201112140752.1554-1-rach4x0r@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5a954c4e-aa84-834d-7d04-0ce3545d45c9@kernel.dk>
+Date:   Thu, 12 Nov 2020 11:02:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20201112140752.1554-1-rach4x0r@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Petr Vorel <pvorel@suse.cz>
+On 11/12/20 7:07 AM, Rachit Agarwal wrote:
+> From: Rachit Agarwal <rach4x0r@gmail.com>>
+> 
+> Hi All,
+> 
+> I/O batching is beneficial for optimizing IOPS and throughput for
+> various applications. For instance, several kernel block drivers would
+> benefit from batching, including mmc [1] and tcp-based storage drivers
+> like nvme-tcp [2,3]. While we have support for batching dispatch [4],
+> we need an I/O scheduler to efficiently enable batching. Such a
+> scheduler is particularly interesting for disaggregated storage, where
+> the access latency of remote disaggregated storage may be higher than
+> local storage access; thus, batching can significantly help in
+> amortizing the remote access latency while increasing the throughput.
+> 
+> This patch introduces the i10 I/O scheduler, which performs batching
+> per hctx in terms of #requests, #bytes, and timeouts (at microseconds
+> granularity). i10 starts dispatching only when #requests or #bytes is
+> larger than a default threshold or when a timer expires. After that,
+> batching dispatch [3] would happen, allowing batching at device
+> drivers along with "bd->last" and ".commit_rqs".
+> 
+> The i10 I/O scheduler builds upon recent work on [6]. We have tested
+> the i10 I/O scheduler with nvme-tcp optimizaitons [2,3] and batching
+> dispatch [4], varying number of cores, varying read/write ratios, and
+> varying request sizes, and with NVMe SSD and RAM block device. For
+> NVMe SSDs, the i10 I/O scheduler achieves ~60% improvements in terms
+> of IOPS per core over "noop" I/O scheduler. These results are
+> available at [5], and many additional results are presented in [6].
+> 
+> While other schedulers may also batch I/O (e.g., mq-deadline), the
+> optimization target in the i10 I/O scheduler is throughput
+> maximization. Hence there is no latency target nor a need for a global
+> tracking context, so a new scheduler is needed rather than to build
+> this functionality to an existing scheduler.
+> 
+> We currently use fixed default values as batching thresholds (e.g., 16
+> for #requests, 64KB for #bytes, and 50us for timeout). These default
+> values are based on sensitivity tests in [6]. For our future work, we
+> plan to support adaptive batching according to system load and to
+> extend the scheduler to support isolation in multi-tenant deployments
+> (to simultaneously achieve low tail latency for latency-sensitive
+> applications and high throughput for throughput-bound applications).
 
-Commit 716ad0986cbd ("loop: Switch to set_capacity_revalidate_and_notify")
-causes an occasional drop of loop device uevent, which are no longer
-triggered in loop_set_size() but in a different part of code.
+I haven't taken a close look at the code yet so far, but one quick note
+that patches like this should be against the branches for 5.11. In fact,
+this one doesn't even compile against current -git, as
+blk_mq_bio_list_merge is now called blk_bio_list_merge.
 
-Bug is reproducible with LTP test uevent01 [1]:
+In any case, I did run this through some quick peak testing as I was
+curious, and I'm seeing about 20% drop in peak IOPS over none running
+this. Perf diff:
 
-i=0; while true; do
-    i=$((i+1)); echo "== $i =="
-    lsmod |grep -q loop && rmmod -f loop
-    ./uevent01 || break
-done
+    10.71%     -2.44%  [kernel.vmlinux]  [k] read_tsc
+     2.33%     -1.99%  [kernel.vmlinux]  [k] _raw_spin_lock
 
-Put back triggering through code called in loop_set_size().
+Also:
 
-Fix required to add yet another parameter to
-set_capacity_revalidate_and_notify().
+> [5] https://github.com/i10-kernel/upstream-linux/blob/master/dss-evaluation.pdf
 
-[1] https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/uevents/uevent01.c
+Was curious and wanted to look it up, but it doesn't exist.
 
-Fixes: 716ad0986cbd ("loop: Switch to set_capacity_revalidate_and_notify")
-Reported-by: <ltp@lists.linux.it>
-Signed-off-by: Petr Vorel <pvorel@suse.cz>
-[hch: rebased on a different change to the prototype of
- set_capacity_revalidate_and_notify]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cb1191d6e945f2..a58084c2ed7ceb 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -255,7 +255,8 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
- 
- 	bd_set_nr_sectors(bdev, size);
- 
--	set_capacity_revalidate_and_notify(lo->lo_disk, size, false);
-+	if (!set_capacity_revalidate_and_notify(lo->lo_disk, size, false))
-+		kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
- }
- 
- static inline int
 -- 
-2.28.0
+Jens Axboe
 
