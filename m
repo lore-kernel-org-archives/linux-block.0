@@ -2,151 +2,214 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE42C2D0E4
-	for <linux-block@archiver.kernel.org>; Fri, 13 Nov 2020 01:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E026FC388F7
+	for <linux-block@archiver.kernel.org>; Fri, 13 Nov 2020 06:59:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F3B821D7F
-	for <linux-block@archiver.kernel.org>; Fri, 13 Nov 2020 01:27:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9110120B80
+	for <linux-block@archiver.kernel.org>; Fri, 13 Nov 2020 06:59:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RY8X2Law"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="SquO4iml"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726041AbgKMB1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Nov 2020 20:27:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31713 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725972AbgKMB1o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Nov 2020 20:27:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605230863;
+        id S1726319AbgKMG7Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Nov 2020 01:59:25 -0500
+Received: from mx2.suse.de ([195.135.220.15]:43122 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726083AbgKMG7Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Nov 2020 01:59:25 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1605250763;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lV54YU+Y2Y4e+7PhqUzWDRed50pkkVt7/DClvgkkexc=;
-        b=RY8X2Lawbn/kfHL3gdn2iwd1SaAXZXcafde5hhdtMOvN3G8udfXLvI2iDVaQE8EvTDxIRb
-        d2p4AD5ySev1PmuZrw7sIbmSPvI39ycrAR4IyfcT1c5ttU7jdPF2KhrGQrMg/7r5IobVj4
-        4FD2vhDBwpr4vVETdlw3rEzT6C3EbwA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-slz7WspHMemeuUB_wBgjmg-1; Thu, 12 Nov 2020 20:27:41 -0500
-X-MC-Unique: slz7WspHMemeuUB_wBgjmg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACD12107B467;
-        Fri, 13 Nov 2020 01:27:39 +0000 (UTC)
-Received: from T590 (ovpn-12-25.pek2.redhat.com [10.72.12.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E42605B4DA;
-        Fri, 13 Nov 2020 01:27:26 +0000 (UTC)
-Date:   Fri, 13 Nov 2020 09:27:22 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
-Cc:     Qian Cai <cai@redhat.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        John Garry <john.garry@huawei.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V2 3/3] Revert "block: Fix a lockdep complaint triggered by
- request queue flushing"
-Message-ID: <20201113012722.GD1012796@T590>
-References: <20201112075526.947079-1-ming.lei@redhat.com>
- <20201112075526.947079-4-ming.lei@redhat.com>
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=ga889eb0oT96QWxjJLRoxCntyK13owMk4p7ZeZONSPU=;
+        b=SquO4imlqhVVY0oHgZ+6eScOly4pauEzn66Gmc2JxTPLxaC6yORehS35M0Dj7WC8eyJtIM
+        xprO+U92ooiu0PN1oG7LMEOCaHISB/iYg2zx0wvMGFv1D0Ax++6v88bSVLZM2KRbtwLVz1
+        3WbFKY9FqkvkuXVM0tuj2IR5GZRkC10=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id B8A25AD07;
+        Fri, 13 Nov 2020 06:59:23 +0000 (UTC)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Subject: [RFC] Enhancement of loop driver?
+Message-ID: <1a5ccfd6-d7c1-28d5-3562-05178f44ed3d@suse.com>
+Date:   Fri, 13 Nov 2020 07:59:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201112075526.947079-4-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="AfmDCdYfAuMDfYXSDRT5UXGbjy62cNW4B"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From a519f421957a1205918e9bcc15087d15234e4e9f Mon Sep 17 00:00:00 2001
-From: Ming Lei <ming.lei@redhat.com>
-Date: Thu, 12 Nov 2020 09:56:02 +0800
-Subject: [PATCH V2 3/3] Revert "block: Fix a lockdep complaint triggered by
- request queue flushing"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AfmDCdYfAuMDfYXSDRT5UXGbjy62cNW4B
+Content-Type: multipart/mixed; boundary="DwHghe5r6vnV0QlhYgT4gA3MBf8vgV0NP";
+ protected-headers="v1"
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Jens Axboe <axboe@kernel.dk>
+Message-ID: <1a5ccfd6-d7c1-28d5-3562-05178f44ed3d@suse.com>
+Subject: [RFC] Enhancement of loop driver?
 
-This reverts commit b3c6a59975415bde29cfd76ff1ab008edbf614a9.
+--DwHghe5r6vnV0QlhYgT4gA3MBf8vgV0NP
+Content-Type: multipart/mixed;
+ boundary="------------A80E6A77494D48D8E7330C16"
+Content-Language: en-US
 
-Now we can avoid nvme-loop lockdep warning of 'lockdep possible recursive
-locking' by nvme-loop's lock class, no need to apply dynamically
-allocated lock class key, so revert commit b3c6a5997541("block: Fix a
-lockdep complaint triggered by request queue flushing").
+This is a multi-part message in MIME format.
+--------------A80E6A77494D48D8E7330C16
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-This way fixes horrible SCSI probe delay issue on megaraid_sas(host_tagset is 1),
-and it is reported the whole probe may take more than half an hour. The reason
-is that synchronize_rcu() is implied in lockdep_unregister_key() which is
-called from each hctx's release handler, and some SCSI hosts can support
-too many hw queues, meantime generic SCSI probe may synchronously create
-and destroy lots of MQ request_queues for non-existent devices.
+Hi,
 
-Another benefit is that lockdep doesn't maintain so many runtime lock class for
-fq->mq_flush_lock which is per-hctx, then lock validation can be improved much.
+a large customer is asking for storage migration of the disk images of
+their virtual machines. They don't want to migrate the VM to another
+host, but only the disk image from one filer to another while the VM
+keeps running.
 
-Reported-by: Qian Cai <cai@redhat.com>
-Cc: Sumit Saxena <sumit.saxena@broadcom.com>
-Cc: John Garry <john.garry@huawei.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- add more commit log
+The natural way to setup something like this would be LVM and use
+mirroring, but the problem is that this requires to copy the image to
+a LVM enabled disk first, and this is no option due to time constraints
+(copying many GB of data takes too long, and in the end I'd like to be
+able to do the switch from the original image to the LVM backed with
+the VM kept running).
 
- block/blk-flush.c | 5 -----
- block/blk.h       | 1 -
- 2 files changed, 6 deletions(-)
+So my idea was to enhance the loop driver to be capable to support a
+list of backing files instead of only one and use a small prepended
+file for storing the needed LVM metadata, resulting in the ability to
+keep the existing disk image.
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 657743524e15..c64f049226f6 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -69,7 +69,6 @@
- #include <linux/blkdev.h>
- #include <linux/gfp.h>
- #include <linux/blk-mq.h>
--#include <linux/lockdep.h>
- 
- #include "blk.h"
- #include "blk-mq.h"
-@@ -469,9 +468,6 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
- 	INIT_LIST_HEAD(&fq->flush_queue[1]);
- 	INIT_LIST_HEAD(&fq->flush_data_in_flight);
- 
--	lockdep_register_key(&fq->key);
--	lockdep_set_class(&fq->mq_flush_lock, &fq->key);
--
- 	return fq;
- 
-  fail_rq:
-@@ -486,7 +482,6 @@ void blk_free_flush_queue(struct blk_flush_queue *fq)
- 	if (!fq)
- 		return;
- 
--	lockdep_unregister_key(&fq->key);
- 	kfree(fq->flush_rq);
- 	kfree(fq);
- }
-diff --git a/block/blk.h b/block/blk.h
-index dfab98465db9..806fd6537295 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -25,7 +25,6 @@ struct blk_flush_queue {
- 	struct list_head	flush_data_in_flight;
- 	struct request		*flush_rq;
- 
--	struct lock_class_key	key;
- 	spinlock_t		mq_flush_lock;
- };
- 
--- 
-2.25.4
+Would such an addition be acceptable?
 
+An alternative would be to have an additional layer on top of the
+current loop driver doing the concatenation of multiple loop devices,
+but this would require a lot of code duplication. And using a common
+base driver for the common code would be more code churn than just
+adding the support to loop.c.
+
+Thoughts?
+
+
+Juergen
+
+--------------A80E6A77494D48D8E7330C16
+Content-Type: application/pgp-keys;
+ name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
+cWx
+w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
+f8Z
+d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
+9bf
+IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
+G7/
+377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
+3Jv
+c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
+QIe
+AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
+hpw
+dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
+MbD
+1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
+oPH
+Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
+5QL
++qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
+2Vu
+IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
+QoL
+BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
+Wf0
+teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
+/nu
+AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
+ITT
+d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
+XBK
+7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
+80h
+SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
+AcD
+AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
+FOX
+gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
+jnD
+kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
+N51
+N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
+otu
+fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
+tqS
+EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
+hsD
+BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
+g3O
+ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
+dM7
+wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
+D+j
+LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
+V2x
+AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
+Eaw
+QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
+nHI
+s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
+wgn
+BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
+bVF
+LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
+pEd
+IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
+QAB
+wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
+Tbe
+8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
+vJz
+Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
+VGi
+wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
+svi
+uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
+zXs
+ZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------A80E6A77494D48D8E7330C16--
+
+--DwHghe5r6vnV0QlhYgT4gA3MBf8vgV0NP--
+
+--AfmDCdYfAuMDfYXSDRT5UXGbjy62cNW4B
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAl+uLssFAwAAAAAACgkQsN6d1ii/Ey/w
+4gf+JhnUpBfU5WN5CajkBV7YU/Q1EtVrVCpEsoF+gcW1EvQyIJ0DsfHuNoo55QN+NMeN5qQpEJye
+A9+sWd6XEzNkMQD2TcoY0OW8kBTfHfecsG0ChSR2QYXotQywInwkKEFyiEPjiHd6aH0F3WVsBfnB
+cFUWukcWVuxqeaB4BCnPixp2LkXYkRXEB01/ur0LF1i3ztFjJQxRiWfA8uNlcE/lo2+OZg05EIw8
+OnK82fQJVx2WHzj+YrHzp44okU31FQjq+6z6204eFIsLJGm0SO6xos6QJ2YWdLXCs59Hx/dQNVy+
+fBEWtB+Y1ib/Pzw6qIKgo2JRpE7ftG805Aq8Cq6T2Q==
+=KjJm
+-----END PGP SIGNATURE-----
+
+--AfmDCdYfAuMDfYXSDRT5UXGbjy62cNW4B--
