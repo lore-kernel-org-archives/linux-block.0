@@ -2,123 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B63D2C6369E
-	for <linux-block@archiver.kernel.org>; Fri, 13 Nov 2020 20:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3829C4742C
+	for <linux-block@archiver.kernel.org>; Fri, 13 Nov 2020 21:03:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78F5A2224D
-	for <linux-block@archiver.kernel.org>; Fri, 13 Nov 2020 20:58:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87D1322252
+	for <linux-block@archiver.kernel.org>; Fri, 13 Nov 2020 21:03:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SIqtSJpD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726439AbgKMU6N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Nov 2020 15:58:13 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:44342 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726003AbgKMU6N (ORCPT
+        id S1726112AbgKMVDL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Nov 2020 16:03:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36694 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725981AbgKMVDK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Nov 2020 15:58:13 -0500
-Received: by mail-pf1-f193.google.com with SMTP id y7so8617004pfq.11;
-        Fri, 13 Nov 2020 12:58:13 -0800 (PST)
+        Fri, 13 Nov 2020 16:03:10 -0500
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580B2C0613D1
+        for <linux-block@vger.kernel.org>; Fri, 13 Nov 2020 13:03:09 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id q5so8656836pfk.6
+        for <linux-block@vger.kernel.org>; Fri, 13 Nov 2020 13:03:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=1zoui9BUZXUZOqrTWaBrZykGcY0FRSZnrRzqMJQ8RwA=;
+        b=SIqtSJpDMUZf6A0Bp680OWghtTzBxCyFEittkvDw3lqzYn2Ps6IVbUdF4Bf3m1dHhb
+         /AsZrlSawXqvZfYZLk1N+1S43FCJPaOfMoqY9qoujbZiA6QWbaEsBAV+otmmbcKGB8uI
+         s3C2sYFRUEPz+dC1Kq9kik/qnrNy+NNJPscbllkTJ7YtOLUIz5k0eVizc3mfmSP+sLta
+         xJd2RATiOoXhTf+2TvePEngYQ7CNZ7PsTd4FUrL8YoF6TkAMthadpjk6+HVaLmvhsqEJ
+         FaPHfuDCO6cHzEUungyCmh3arO6bio30A9vmD/A9kTmX0KS/1Up9Zc2wqdsHsoFMlPk3
+         NeBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=eqiW5WCeO56holm7RXoi3eQgmDv2WVSj1ocHaA+r/9M=;
-        b=SD0NIz4vD6djBocDFHuL9faqso6+ZL+OWbv6vafsErXswxuleWC2KWuNDKMWtgJelq
-         wqmMjYhAdp/UsZB8V8ParcVhH3u/jU1tipksoZ+lcV9YwOXu9A7IpVuU8BkpfRDkgkuL
-         xaaN/fbRFx0WO9Bdoxx0xvNoGhTb/uBUvRMJFEkwaoNx73yqfiKrbaSuZ+6iDsHIvhS9
-         8sY0i+ZlDsw6OfH3eWagT3F/t7oID5D/PtWJIRe5Xw8QiOf3Jtj84GMal5PVxR/aSrWF
-         AyhGQOZCekU5E1JkHGtL6vg4a4AQTeWUW7ocW0u85ZsmSKA2ua/hGMtyvUhOlBVd25xm
-         ikyA==
-X-Gm-Message-State: AOAM5313KifQhjHGaY1yWoqRMfkfZz1p7pwYHmyIrjoA6Q8xT0/RIDjZ
-        crDdDv+T/v8cVNIj7wdkB1vVTFqJk+U=
-X-Google-Smtp-Source: ABdhPJwn08QDfPoq2VTpcaBPIWAw389P+6FOdpXkdFrwjnNGlFh6XICRT0Yz5zZUNeeVgaqEo7SODw==
-X-Received: by 2002:a62:7bcc:0:b029:18b:5859:d5e1 with SMTP id w195-20020a627bcc0000b029018b5859d5e1mr3398498pfc.40.1605301092806;
-        Fri, 13 Nov 2020 12:58:12 -0800 (PST)
-Received: from ?IPv6:2601:647:4802:9070:be97:ffd:339d:919c? ([2601:647:4802:9070:be97:ffd:339d:919c])
-        by smtp.gmail.com with ESMTPSA id r127sm10585552pfc.159.2020.11.13.12.58.10
+        bh=1zoui9BUZXUZOqrTWaBrZykGcY0FRSZnrRzqMJQ8RwA=;
+        b=cbBpFSUI/vqEocwM0SGHgcNSW2OOf8Gu1PYsH/6tpWbOYGsJsvY0w0HCm85BjwFYtC
+         WqYLB7dEOyAj+JP3mknR687jUsssI7JiM865iAWJIoLA4GoqErs9Gyy4tcF2kUXqBxW1
+         SL5YgXbT4F2R310HVhuYOKpPb17JT9Qb5YA/AFngHFuwOme5rIHnOOxWey2y71q+pNbC
+         AiKcJ/bZZijvrP7nsgNdAvE0FA47pE25lndVDtH08lGPHZ1WKpGEd3L3qdiM7FCo3pCx
+         Im42ulWZZhzC1aPC7IbczREWk+lkiafOvKcSg/7PtGnwfTKorM3cO5gakTvFzHN52NBO
+         ip5Q==
+X-Gm-Message-State: AOAM530Bpqb0W5LhNUJRGkZWFiPqlZganDPqiyO27TC8Yhc9u8vKzHZP
+        gEEZLp4pr28OJmCVHUPusGQ/kNJo2o+6Gw==
+X-Google-Smtp-Source: ABdhPJy9RxMN3SjWuODbONNveEfQJhguQEGd2j8B+Qx6ue32McdtKQK4nHihEq6cvGxKB+/5V9axzg==
+X-Received: by 2002:a63:161a:: with SMTP id w26mr3316313pgl.17.1605301388725;
+        Fri, 13 Nov 2020 13:03:08 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id d2sm11265021pjj.37.2020.11.13.13.03.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Nov 2020 12:58:12 -0800 (PST)
+        Fri, 13 Nov 2020 13:03:08 -0800 (PST)
 Subject: Re: [PATCH] iosched: Add i10 I/O Scheduler
-To:     Ming Lei <ming.lei@redhat.com>, Rachit Agarwal <rach4x0r@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Qizhe Cai <qc228@cornell.edu>,
-        Rachit Agarwal <ragarwal@cornell.edu>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org,
-        Midhul Vuppalapati <mvv25@cornell.edu>,
-        Jaehyun Hwang <jaehyun.hwang@cornell.edu>,
-        Rachit Agarwal <ragarwal@cs.cornell.edu>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@lightbitslabs.com>,
+To:     Sagi Grimberg <sagi@grimberg.me>,
+        Rachit Agarwal <rach4x0r@gmail.com>,
         Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jaehyun Hwang <jaehyun.hwang@cornell.edu>,
+        Qizhe Cai <qc228@cornell.edu>,
+        Midhul Vuppalapati <mvv25@cornell.edu>,
+        Rachit Agarwal <ragarwal@cs.cornell.edu>,
+        Sagi Grimberg <sagi@lightbitslabs.com>,
+        Rachit Agarwal <ragarwal@cornell.edu>
 References: <20201112140752.1554-1-rach4x0r@gmail.com>
- <20201113145912.GA1074955@T590>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <44d5bcb0-689e-50c8-fa8e-a7d2b569f75c@grimberg.me>
-Date:   Fri, 13 Nov 2020 12:58:10 -0800
+ <5a954c4e-aa84-834d-7d04-0ce3545d45c9@kernel.dk>
+ <da0c7aea-d917-4f3a-5136-89c30d12ba1f@grimberg.me>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <fd12993a-bcb7-7b45-5406-61da1979d49d@kernel.dk>
+Date:   Fri, 13 Nov 2020 14:03:05 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201113145912.GA1074955@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <da0c7aea-d917-4f3a-5136-89c30d12ba1f@grimberg.me>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-> blk-mq actually has built-in batching(or sort of) mechanism, which is enabled
-> if the hw queue is busy(hctx->dispatch_busy is > 0). We use EWMA to compute
-> hctx->dispatch_busy, and it is adaptive, even though the implementation is quite
-> coarse. But there should be much space to improve, IMO.
-
-You are correct, however nvme-tcp should be getting to dispatch_busy > 0
-IIUC.
-
-> It is reported that this way improves SQ high-end SCSI SSD very much[1],
-> and MMC performance gets improved too[2].
+On 11/13/20 1:34 PM, Sagi Grimberg wrote:
 > 
-> [1] https://lore.kernel.org/linux-block/3cc3e03901dc1a63ef32e036182521af@mail.gmail.com/
-> [2] https://lore.kernel.org/linux-block/CADBw62o9eTQDJ9RvNgEqSpXmg6Xcq=2TxH0Hfxhp29uF2W=TXA@mail.gmail.com/
-
-Yes, the guys paid attention to the MMC related improvements that you
-made.
-
->> The i10 I/O scheduler builds upon recent work on [6]. We have tested the i10 I/O
->> scheduler with nvme-tcp optimizaitons [2,3] and batching dispatch [4], varying number
->> of cores, varying read/write ratios, and varying request sizes, and with NVMe SSD and
->> RAM block device. For NVMe SSDs, the i10 I/O scheduler achieves ~60% improvements in
->> terms of IOPS per core over "noop" I/O scheduler. These results are available at [5],
->> and many additional results are presented in [6].
+>> I haven't taken a close look at the code yet so far, but one quick note
+>> that patches like this should be against the branches for 5.11. In fact,
+>> this one doesn't even compile against current -git, as
+>> blk_mq_bio_list_merge is now called blk_bio_list_merge.
 > 
-> In case of none scheduler, basically nvme driver won't provide any queue busy
-> feedback, so the built-in batching dispatch doesn't work simply.
-
-Exactly.
-
-> kyber scheduler uses io latency feedback to throttle and build io batch,
-> can you compare i10 with kyber on nvme/nvme-tcp?
-
-I assume it should be simple to get, I'll let Rachit/Jaehyun comment.
-
->> While other schedulers may also batch I/O (e.g., mq-deadline), the optimization target
->> in the i10 I/O scheduler is throughput maximization. Hence there is no latency target
->> nor a need for a global tracking context, so a new scheduler is needed rather than
->> to build this functionality to an existing scheduler.
+> Ugh, I guess that Jaehyun had this patch bottled up and didn't rebase
+> before submitting.. Sorry about that.
+> 
+>> In any case, I did run this through some quick peak testing as I was
+>> curious, and I'm seeing about 20% drop in peak IOPS over none running
+>> this. Perf diff:
 >>
->> We currently use fixed default values as batching thresholds (e.g., 16 for #requests,
->> 64KB for #bytes, and 50us for timeout). These default values are based on sensitivity
->> tests in [6]. For our future work, we plan to support adaptive batching according to
+>>      10.71%     -2.44%  [kernel.vmlinux]  [k] read_tsc
+>>       2.33%     -1.99%  [kernel.vmlinux]  [k] _raw_spin_lock
 > 
-> Frankly speaking, hardcode 16 #rquests or 64KB may not work everywhere,
-> and product environment could be much complicated than your sensitivity
-> tests. If possible, please start with adaptive batching.
+> You ran this with nvme? or null_blk? I guess neither would benefit
+> from this because if the underlying device will not benefit from
+> batching (at least enough for the extra cost of accounting for it) it
+> will be counter productive to use this scheduler.
 
-That was my feedback as well for sure. But given that this is a
-scheduler one would opt-in to anyway, that won't be a must-have
-initially. I'm not sure if the guys made progress with this yet, I'll
-let them comment.
+This is nvme, actual device. The initial posting could be a bit more
+explicit on the use case, it says:
+
+"For NVMe SSDs, the i10 I/O scheduler achieves ~60% improvements in
+terms of IOPS per core over "noop" I/O scheduler."
+
+which made me very skeptical, as it sounds like it's raw device claims.
+
+Does beg the question of why this is a new scheduler then. It's pretty
+basic stuff, something that could trivially just be added a side effect
+of the core (and in fact we have much of it already). Doesn't really seem
+to warrant a new scheduler at all. There isn't really much in there.
+
+>>> [5] https://github.com/i10-kernel/upstream-linux/blob/master/dss-evaluation.pdf
+>>
+>> Was curious and wanted to look it up, but it doesn't exist.
+> 
+> I think this is the right one:
+> https://github.com/i10-kernel/upstream-linux/blob/master/i10-evaluation.pdf
+> 
+> We had some back and forth around the naming, hence this was probably
+> omitted.
+
+That works, my local results were a bit worse than listed in there though.
+And what does this mean:
+
+"We note that Linux I/O scheduler introduces an additional kernel worker
+thread at the I/O dispatching stage"
+
+It most certainly does not for the common/hot case.
+
+-- 
+Jens Axboe
+
