@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 627B4C8301A
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCDEBC83021
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16CB1223C7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9046C22240
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qaAfbB35"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LW4/6M2B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730699AbgKPO6v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 09:58:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48980 "EHLO
+        id S1730759AbgKPO7B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 09:59:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730678AbgKPO6v (ORCPT
+        with ESMTP id S1730756AbgKPO7B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 09:58:51 -0500
+        Mon, 16 Nov 2020 09:59:01 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB38C0613CF;
-        Mon, 16 Nov 2020 06:58:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02656C0617A6;
+        Mon, 16 Nov 2020 06:59:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=pTUA48t42+HHCJV8On6c5azUAuBD9lzCSJPspjiep2g=; b=qaAfbB35avsytGqpNEWytrYnG3
-        Gzj30W9piDTxClPGcKhQyC+7xWVJuzk1wqdaEoOD9LirlO1oU4d+8MQk8YOX9kwzJ7YvxhfCYVwqV
-        R1dvaVAuFO/bc6xYy1Ev4vzKAgcI+bbNKPs2o+tMhgBNzFFqOC/Cs3j9//Uol04948xLm+DnqHaQV
-        JmjjR/YVKAVJHjcogeCp9WMAO/bNvPQrjfn23UtbJYTihH9NKGBOQhYu6ZZR0Bj/S8oBjTDj9QxIb
-        xdoFbJTJepAHEgsdxqO7JMl+zv8FirGSWZmdep8SDJQcE2TlUZhGVyxST/B+EptdxxxLsqlXBn1sz
-        2IVCtD9Q==;
+        bh=haCFfej0iNxilydygMyUNjj0Bzl5Tk5LXJ0r2tE8cD8=; b=LW4/6M2BzdkZTdqoW9FpaTex6c
+        yeKDdiRW6YnjlyAChX8LOEfPaouAWA0tFFvwyKbNtb7HoVUHscIVNlHgeVi2r165V1Tgx2aKkdZoP
+        5MjECd6pnbCNmIKVL6LmyxCwiO5++Zt+k2n/pjncfbsde1PoD8Cu5ziFp6YpuimOpFnfiFXcluzY4
+        HbgmfYC3nd/XNICvtV7c6pBxIpTCRYdTKbASCAZ7TD3/gUoOQTvaAnYemXljNQV80vURAaL809+Vh
+        hU7hK9mcTqnz4YcJiM0y5yyLVhx38oqqfkWNTgrF7gN0aHG6mAnvRtyuEG1/Rhv1Yoe0OxefT5aK2
+        GBVJ9+jg==;
 Received: from [2001:4bb8:180:6600:255b:7def:a93:4a09] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kefxi-0003ph-Re; Mon, 16 Nov 2020 14:58:35 +0000
+        id 1kefxx-0003tO-1m; Mon, 16 Nov 2020 14:58:49 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -58,9 +58,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 18/78] zram: use set_capacity_and_notify
-Date:   Mon, 16 Nov 2020 15:57:09 +0100
-Message-Id: <20201116145809.410558-19-hch@lst.de>
+Subject: [PATCH 28/78] md: implement ->set_read_only to hook into BLKROSET processing
+Date:   Mon, 16 Nov 2020 15:57:19 +0100
+Message-Id: <20201116145809.410558-29-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201116145809.410558-1-hch@lst.de>
 References: <20201116145809.410558-1-hch@lst.de>
@@ -71,46 +71,115 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use set_capacity_and_notify to set the size of both the disk and block
-device.  This also gets the uevent notifications for the resize for free.
+Implement the ->set_read_only method instead of parsing the actual
+ioctl command.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/zram/zram_drv.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ drivers/md/md.c | 62 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 31 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 1b697208d66157..6d15d51cee2b7e 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1695,7 +1695,7 @@ static void zram_reset_device(struct zram *zram)
- 	disksize = zram->disksize;
- 	zram->disksize = 0;
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 32e375d50fee17..fa31b71a72a35d 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -7477,7 +7477,6 @@ static inline bool md_ioctl_valid(unsigned int cmd)
+ {
+ 	switch (cmd) {
+ 	case ADD_NEW_DISK:
+-	case BLKROSET:
+ 	case GET_ARRAY_INFO:
+ 	case GET_BITMAP_FILE:
+ 	case GET_DISK_INFO:
+@@ -7504,7 +7503,6 @@ static int md_ioctl(struct block_device *bdev, fmode_t mode,
+ 	int err = 0;
+ 	void __user *argp = (void __user *)arg;
+ 	struct mddev *mddev = NULL;
+-	int ro;
+ 	bool did_set_md_closing = false;
  
--	set_capacity(zram->disk, 0);
-+	set_capacity_and_notify(zram->disk, 0);
- 	part_stat_set_all(&zram->disk->part0, 0);
- 
- 	up_write(&zram->init_lock);
-@@ -1741,9 +1741,7 @@ static ssize_t disksize_store(struct device *dev,
- 
- 	zram->comp = comp;
- 	zram->disksize = disksize;
--	set_capacity(zram->disk, zram->disksize >> SECTOR_SHIFT);
+ 	if (!md_ioctl_valid(cmd))
+@@ -7684,35 +7682,6 @@ static int md_ioctl(struct block_device *bdev, fmode_t mode,
+ 			goto unlock;
+ 		}
+ 		break;
 -
--	revalidate_disk_size(zram->disk, true);
-+	set_capacity_and_notify(zram->disk, zram->disksize >> SECTOR_SHIFT);
- 	up_write(&zram->init_lock);
+-	case BLKROSET:
+-		if (get_user(ro, (int __user *)(arg))) {
+-			err = -EFAULT;
+-			goto unlock;
+-		}
+-		err = -EINVAL;
+-
+-		/* if the bdev is going readonly the value of mddev->ro
+-		 * does not matter, no writes are coming
+-		 */
+-		if (ro)
+-			goto unlock;
+-
+-		/* are we are already prepared for writes? */
+-		if (mddev->ro != 1)
+-			goto unlock;
+-
+-		/* transitioning to readauto need only happen for
+-		 * arrays that call md_write_start
+-		 */
+-		if (mddev->pers) {
+-			err = restart_array(mddev);
+-			if (err == 0) {
+-				mddev->ro = 2;
+-				set_disk_ro(mddev->gendisk, 0);
+-			}
+-		}
+-		goto unlock;
+ 	}
  
- 	return len;
-@@ -1790,7 +1788,6 @@ static ssize_t reset_store(struct device *dev,
- 	/* Make sure all the pending I/O are finished */
- 	fsync_bdev(bdev);
- 	zram_reset_device(zram);
--	revalidate_disk_size(zram->disk, true);
- 	bdput(bdev);
+ 	/*
+@@ -7806,6 +7775,36 @@ static int md_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ }
+ #endif /* CONFIG_COMPAT */
  
- 	mutex_lock(&bdev->bd_mutex);
++static int md_set_read_only(struct block_device *bdev, bool ro)
++{
++	struct mddev *mddev = bdev->bd_disk->private_data;
++	int err;
++
++	err = mddev_lock(mddev);
++	if (err)
++		return err;
++
++	if (!mddev->raid_disks && !mddev->external) {
++		err = -ENODEV;
++		goto out_unlock;
++	}
++
++	/*
++	 * Transitioning to read-auto need only happen for arrays that call
++	 * md_write_start and which are not ready for writes yet.
++	 */
++	if (!ro && mddev->ro == 1 && mddev->pers) {
++		err = restart_array(mddev);
++		if (err)
++			goto out_unlock;
++		mddev->ro = 2;
++	}
++
++out_unlock:
++	mddev_unlock(mddev);
++	return err;
++}
++
+ static int md_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	/*
+@@ -7883,6 +7882,7 @@ const struct block_device_operations md_fops =
+ #endif
+ 	.getgeo		= md_getgeo,
+ 	.check_events	= md_check_events,
++	.set_read_only	= md_set_read_only,
+ };
+ 
+ static int md_thread(void *arg)
 -- 
 2.29.2
 
