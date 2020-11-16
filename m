@@ -2,96 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B4FC6369E
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79331C61DD8
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5346F20888
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:23:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EEB4221F9
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:28:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oKCR+gJC"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="hYh1H8oI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731097AbgKPPXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 10:23:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25516 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731021AbgKPPXy (ORCPT
+        id S1729569AbgKPP2c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 10:28:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728029AbgKPP2b (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 10:23:54 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AGF5Fvs191473;
-        Mon, 16 Nov 2020 10:23:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id; s=pp1;
- bh=YfyBAuxAoU/fCaWqFG6X/yKGgo8hTwdoVRlxvO2I2yY=;
- b=oKCR+gJC+GNkJH80mnO/KQK+C1lisQOJUDUvH0ogseYMLSsHYZxoZxGPUTxzNDxosGas
- IPFNpQevPoFo4n0ndzy2/7tlDS+ZjGEHl7Ue0hilQRlf0pxlt2jkwrXVjpjxFoCLPag9
- BN69dKIqjJWzKJwZk+UB0FvcAmhOLdWvoHibca+DtwhZsQ3qnoCTm8a2MoiQaGuiesg+
- Ivu6NR7Ti03dSDLi2W9QatO+ymn0Xo+8PkHqtEYvSah2m8dp8xRFXmfcT8S187D5HA9o
- bRko3b61fiWnByMVB+tKQwGTZBvX4nBhSU026Lsp/4zSZnjjgSr+Ak+Y+tIRdu0PXeIs Mw== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34uu48srh3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Nov 2020 10:23:53 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AGFH426011410;
-        Mon, 16 Nov 2020 15:23:50 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 34t6v8a83u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Nov 2020 15:23:50 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AGFNmhX33227076
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Nov 2020 15:23:48 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 15030A4078;
-        Mon, 16 Nov 2020 15:23:48 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 03F1DA405D;
-        Mon, 16 Nov 2020 15:23:48 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 16 Nov 2020 15:23:47 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
-        id 9DDA3E0367; Mon, 16 Nov 2020 16:23:47 +0100 (CET)
-From:   Stefan Haberland <sth@linux.ibm.com>
-To:     Jens Axboe <axboe@kernel.dk>
+        Mon, 16 Nov 2020 10:28:31 -0500
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671F9C0613D1
+        for <linux-block@vger.kernel.org>; Mon, 16 Nov 2020 07:28:30 -0800 (PST)
+Received: by mail-io1-xd43.google.com with SMTP id n129so17790679iod.5
+        for <linux-block@vger.kernel.org>; Mon, 16 Nov 2020 07:28:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5cjrSC5QyZm1b9x+1TfHrkUsiua1ov2aE33mdC49A8s=;
+        b=hYh1H8oI2IM6Bil0tmxzNEh4RKYUx/+nhK+eKlQb7zOj/vrW3FSN4b6BJrrDWYWctR
+         RDPA+F5lQClMvYY3WN3gOq7cLvMhZTqtB/wbpUJ4rjPw/NlXEvgpaP2vVy4O+HLotRTS
+         DkD/OX8Od682zSv5nIDskqBtjeDKsa9ggHsvJ+gAIy/dLJL2De2Sd9Qe1iQZUX73rqIg
+         eqejiStQ8VGV84DSHwNOten9Rqg00AxZ/NT0rKFgjgxUJZ6biwYDCfErHKd+pH+8t2Zf
+         pBFH7WhP/jYZ5YzHiaoU4JhCCy2ZF0VxD0fLT+4Mih8R1FAIIb5ncqgGEyZzmJoCC05k
+         mZ4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5cjrSC5QyZm1b9x+1TfHrkUsiua1ov2aE33mdC49A8s=;
+        b=K8UR/pZagFvhzYKF1aZiH+WabPpYOIAQaMOsLZfoyzZloJWhLLQQJ409LsfxxeT9Su
+         4LKytyHKBVwloBgGvTNO/y0/GqiOs6OcMhtASyaps1avulEwJR5qUjR+RvSsk8GLUTnL
+         VlPPoXYuRSeCIHiSIav5vS8wIeQmyeleJRKfEZfN5V/iga+pGCCNvsWxJfMx1zLEeFEI
+         FzJHge+e4+Gx/HwicrI2VboNRZ9UiCzLbHYLefjhHD60OO60pabeht3PXAQHL1ycDooE
+         TvBE2QacMm1pG5JD2yHkJq87pqd7H0wv54MpgX99AefGt2mt5ttyJSsoxr0q7hIQOBDQ
+         ABvw==
+X-Gm-Message-State: AOAM530y/hPbdNvHjJvwZD4cDkA4xhOZqeht783dsa3/vL7rUm0NWwPu
+        AQfjBFdT2fX7BcIfQRNQF5IAaw==
+X-Google-Smtp-Source: ABdhPJwXvh6hBJkw2iVfweDYQzCcK9t0E9MIUxf+RJhx68sba6/zEYLYAGsimcnpdpkxYzMxL1qHgQ==
+X-Received: by 2002:a02:a68b:: with SMTP id j11mr33352jam.32.1605540509666;
+        Mon, 16 Nov 2020 07:28:29 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id x13sm11280105ilo.54.2020.11.16.07.28.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Nov 2020 07:28:29 -0800 (PST)
+Subject: Re: [PATCH 0/1] fix null pointer dereference for ERP requests
+To:     Stefan Haberland <sth@linux.ibm.com>
 Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
         linux-s390@vger.kernel.org,
         Heiko Carstens <heiko.carstens@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH 0/1] fix null pointer dereference for ERP requests
-Date:   Mon, 16 Nov 2020 16:23:46 +0100
-Message-Id: <20201116152347.61093-1-sth@linux.ibm.com>
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-16_08:2020-11-13,2020-11-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1015
- priorityscore=1501 impostorscore=0 malwarescore=0 suspectscore=0
- mlxscore=0 mlxlogscore=767 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2011160092
+References: <20201116152347.61093-1-sth@linux.ibm.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8d6a4ff9-d5dc-131c-3fa7-afe0c843a731@kernel.dk>
+Date:   Mon, 16 Nov 2020 08:28:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20201116152347.61093-1-sth@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On 11/16/20 8:23 AM, Stefan Haberland wrote:
+> Hi Jens,
+> 
+> pleas apply the following patch that fixes a null pointer derefernce in the
+> DASD driver.
 
-pleas apply the following patch that fixes a null pointer derefernce in the
-DASD driver.
-
-Stefan Haberland (1):
-  s390/dasd: fix null pointer dereference for ERP requests
-
- drivers/s390/block/dasd.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Applied, thanks.
 
 -- 
-2.17.1
+Jens Axboe
 
