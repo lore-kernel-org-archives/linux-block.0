@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B6EFC82571
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E3BC8255B
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:00:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2CE9241A7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:00:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B0A1241A7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:00:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mMFTZRsV"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wYjWzLfz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731061AbgKPO74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 09:59:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49198 "EHLO
+        id S1731089AbgKPO77 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 09:59:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731014AbgKPO7q (ORCPT
+        with ESMTP id S1731082AbgKPO76 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 09:59:46 -0500
+        Mon, 16 Nov 2020 09:59:58 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9A7C0613CF;
-        Mon, 16 Nov 2020 06:59:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E729EC0613CF;
+        Mon, 16 Nov 2020 06:59:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=0e+oH+92GlExM9i4SIPWTJvhHTDsEZRU6nAY6yeduas=; b=mMFTZRsVcAqmf+VlCpySbI4/AO
-        Lvk1YHPUUx2pLWe6CEfyYTfSvNVAKhdEDtRNYgv0KknubQs4EEfe4Ww43hMMGLiSPbCzUY8fYe5/w
-        ImRQodVw+JPRr2LxSfoDq1Ob9sBNVvCDmhGgUHYNdyodB9r7BgLKKuS1T5JHMOpydlwgeRX6CcH24
-        Xj6k8bM1XYWX3OFouuNz5g4QXxFiyroDeYHmHTh09EcbYvOCQHjjCyVR/50jwzxvRUfG7haNExoXj
-        /C/YqFeSVuEWf5BDvfiyEyGDUrvIYpPAoZpqWlPGo4+IH/9U+ubwIYwcVjNgFnqzPbQcgexYh8oWx
-        MBTM2Vjg==;
+        bh=x6ThtvQgvwHIscZfOUELeo3Uy7svW74ISAsOiTBJTd8=; b=wYjWzLfzQlz5nMoIrs2dUqAKes
+        QFt+YLi/Ow0cGCkVgOnqteaZCNuUDwCov7PJB5hvC6nYp5cVF5aDTygDVep1VuFeVLzibRXVrb0PG
+        FwRPx4XB6Y0FbjEFe92tnC6Dld2W5KJSeAc8kJg120u3mpOcZ4tc9ydP5qFtsdEWA6KBA1phfelhv
+        ykkNgsnmusDbP9O5T8K6xNSTSx6pFYwqjKwfuv8O23V0jhAmUMdhinoTTyaCbb1UQNoqaNS8S8OhY
+        IkQHzpe8v4SVvuc9YJmie1VvzG8FrG8PonETyiwJgsN7wW5Xu/ggXJWk0IApLZbQQsH5DPzic6AvO
+        6QnJMDVw==;
 Received: from [2001:4bb8:180:6600:255b:7def:a93:4a09] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kefyh-00049g-7K; Mon, 16 Nov 2020 14:59:35 +0000
+        id 1kefyo-0004DN-O9; Mon, 16 Nov 2020 14:59:43 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -58,9 +58,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 59/78] mtip32xx: remove the call to fsync_bdev on removal
-Date:   Mon, 16 Nov 2020 15:57:50 +0100
-Message-Id: <20201116145809.410558-60-hch@lst.de>
+Subject: [PATCH 64/78] dm: simplify flush_bio initialization in __send_empty_flush
+Date:   Mon, 16 Nov 2020 15:57:55 +0100
+Message-Id: <20201116145809.410558-65-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201116145809.410558-1-hch@lst.de>
 References: <20201116145809.410558-1-hch@lst.de>
@@ -71,75 +71,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-del_gendisk already calls fsync_bdev for every partition, no need
-to do this twice.
+We don't really need the struct block_device to initialize a bio.  So
+switch from using bio_set_dev to manually setting up bi_disk (bi_partno
+will always be zero and has been cleared by bio_init already).
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 15 ---------------
- drivers/block/mtip32xx/mtip32xx.h |  2 --
- 2 files changed, 17 deletions(-)
+ drivers/md/dm.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 153e2cdecb4d40..53ac59d19ae530 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -3687,7 +3687,6 @@ static int mtip_block_initialize(struct driver_data *dd)
- 	/* Enable the block device and add it to /dev */
- 	device_add_disk(&dd->pdev->dev, dd->disk, NULL);
- 
--	dd->bdev = bdget_disk(dd->disk, 0);
- 	/*
- 	 * Now that the disk is active, initialize any sysfs attributes
- 	 * managed by the protocol layer.
-@@ -3721,9 +3720,6 @@ static int mtip_block_initialize(struct driver_data *dd)
- 	return rv;
- 
- kthread_run_error:
--	bdput(dd->bdev);
--	dd->bdev = NULL;
--
- 	/* Delete our gendisk. This also removes the device from /dev */
- 	del_gendisk(dd->disk);
- 
-@@ -3804,14 +3800,6 @@ static int mtip_block_remove(struct driver_data *dd)
- 	blk_mq_tagset_busy_iter(&dd->tags, mtip_no_dev_cleanup, dd);
- 	blk_mq_unquiesce_queue(dd->queue);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 54739f1b579bc8..6d7eb72d41f9ea 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1422,18 +1422,12 @@ static int __send_empty_flush(struct clone_info *ci)
+ 	 */
+ 	bio_init(&flush_bio, NULL, 0);
+ 	flush_bio.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC;
++	flush_bio.bi_disk = ci->io->md->disk;
++	bio_associate_blkg(&flush_bio);
++
+ 	ci->bio = &flush_bio;
+ 	ci->sector_count = 0;
  
 -	/*
--	 * Delete our gendisk structure. This also removes the device
--	 * from /dev
+-	 * Empty flush uses a statically initialized bio, as the base for
+-	 * cloning.  However, blkg association requires that a bdev is
+-	 * associated with a gendisk, which doesn't happen until the bdev is
+-	 * opened.  So, blkg association is done at issue time of the flush
+-	 * rather than when the device is created in alloc_dev().
 -	 */
--	if (dd->bdev) {
--		bdput(dd->bdev);
--		dd->bdev = NULL;
--	}
- 	if (dd->disk) {
- 		if (test_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag))
- 			del_gendisk(dd->disk);
-@@ -4206,9 +4194,6 @@ static void mtip_pci_remove(struct pci_dev *pdev)
- 	} while (atomic_read(&dd->irq_workers_active) != 0 &&
- 		time_before(jiffies, to));
- 
--	if (!dd->sr)
--		fsync_bdev(dd->bdev);
+-	bio_set_dev(ci->bio, ci->io->md->bdev);
 -
- 	if (atomic_read(&dd->irq_workers_active) != 0) {
- 		dev_warn(&dd->pdev->dev,
- 			"Completion workers still active!\n");
-diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
-index e22a7f0523bf30..88f4206310e4c8 100644
---- a/drivers/block/mtip32xx/mtip32xx.h
-+++ b/drivers/block/mtip32xx/mtip32xx.h
-@@ -463,8 +463,6 @@ struct driver_data {
- 
- 	int isr_binding;
- 
--	struct block_device *bdev;
--
- 	struct list_head online_list; /* linkage for online list */
- 
- 	struct list_head remove_list; /* linkage for removing list */
+ 	BUG_ON(bio_has_data(ci->bio));
+ 	while ((ti = dm_table_get_target(ci->map, target_nr++)))
+ 		__send_duplicate_bios(ci, ti, ti->num_flush_bios, NULL);
 -- 
 2.29.2
 
