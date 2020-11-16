@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85922C8302E
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F71C82543
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CC2822263
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED9BD22263
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YqzdVakm"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sXKHf4+K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730825AbgKPO7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 09:59:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49058 "EHLO
+        id S1730902AbgKPO7Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 09:59:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730817AbgKPO7K (ORCPT
+        with ESMTP id S1730846AbgKPO7X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 09:59:10 -0500
+        Mon, 16 Nov 2020 09:59:23 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57738C0613CF;
-        Mon, 16 Nov 2020 06:59:10 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7533C0613D3;
+        Mon, 16 Nov 2020 06:59:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=v/lQzgfk3g8cFkaFjGaW1PVi+J4d/Qp7XTb0qTcrcMw=; b=YqzdVakmLdPHF6ezNwy3j22Rhk
-        XQVP6AxA/GIysbqTVVeNbFaXKt7fGm9agC08PMgcnJUJeh74vxBSvOfGIuDA/W9HICp10ASgp343S
-        hLuXPuNnKIIaKSmewfilQzler2ZMSLSZNnA3JzXsI/oA/vpGcupQtF+vIl+sykv24N3IbJmKQaPjW
-        Jn9WRJEVebbUFdcTwhZRo/qo4f5NgH2pRWNmJeZrAnILNTOw/lnNzTwrq9w/rBYEhDgZjS59KWZ4g
-        UrBImqs7+qvykUY+GYj6lm5Ht8/hTyu9yEFUWTYQLA51bItg9eUgBTuodXJbLE5gVUevZsuOFItUu
-        Kp0yfIOw==;
+        bh=soDf5n/4IHZXpRDONsC4iRIWKhhdabm7wm1Ix3YyzkY=; b=sXKHf4+KcwIa5fuTcLVQORl6vc
+        Y03Gwu4v2aKXYxB2gC70w5AjOtoQE1Q1pXkpIHcqxu1afca2PvwHAIEb13ajBGY5qll0Bc+WJnuHt
+        TgCIRD/tv9h7SIzJyRqtqrpqxOYCL5TBFCCOpqvnrOBTaKdroJMy4aFUM6Eu1+1BjsZPfN+VBECoA
+        VBKTChEgoSg7gTk+HdF7LfwwqhGnCtekD9xT9Y736twxTwR4aWyi6Skc6DBIDj8x5uz90PEkL1KLh
+        CVLnyiuFwPdIlcsawji6tbe7dqrYAdB98VJPkjxf9YLh+GLVDgz+CUZ/XticM28L06ss6gSMN118i
+        lq40xEVw==;
 Received: from [2001:4bb8:180:6600:255b:7def:a93:4a09] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kefy5-0003vm-UU; Mon, 16 Nov 2020 14:58:58 +0000
+        id 1kefyH-0003yd-CW; Mon, 16 Nov 2020 14:59:09 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -57,10 +57,11 @@ Cc:     Justin Sanders <justin@coraid.com>,
         drbd-dev@lists.linbit.com, nbd@other.debian.org,
         ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 34/78] block: propagate BLKROSET to all partitions
-Date:   Mon, 16 Nov 2020 15:57:25 +0100
-Message-Id: <20201116145809.410558-35-hch@lst.de>
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 42/78] sd: use __register_blkdev to avoid a modprobe for an unregistered dev_t
+Date:   Mon, 16 Nov 2020 15:57:33 +0100
+Message-Id: <20201116145809.410558-43-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201116145809.410558-1-hch@lst.de>
 References: <20201116145809.410558-1-hch@lst.de>
@@ -71,31 +72,72 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When setting the whole device read-only (or clearing the read-only
-state), also update the policy for all partitions.  The s390 dasd
-driver has awlways been doing this and it makes a lot of sense.
+Switch from using blk_register_region to the probe callback passed to
+__register_blkdev to disable the request_module call for an unclaimed
+dev_t in the SD majors.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- block/ioctl.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/scsi/sd.c | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 6b785181344fe1..22f394d118c302 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -354,7 +354,10 @@ static int blkdev_roset(struct block_device *bdev, fmode_t mode,
- 		if (ret)
- 			return ret;
- 	}
--	bdev->bd_part->policy = n;
-+	if (bdev_is_partition(bdev))
-+		bdev->bd_part->policy = n;
-+	else
-+		set_disk_ro(bdev->bd_disk, n);
- 	return 0;
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index a2a4f385833d6c..679c2c02504763 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -630,13 +630,11 @@ static struct scsi_driver sd_template = {
+ };
+ 
+ /*
+- * Dummy kobj_map->probe function.
+- * The default ->probe function will call modprobe, which is
+- * pointless as this module is already loaded.
++ * Don't request a new module, as that could deadlock in multipath
++ * environment.
+  */
+-static struct kobject *sd_default_probe(dev_t devt, int *partno, void *data)
++static void sd_default_probe(dev_t devt)
+ {
+-	return NULL;
  }
  
+ /*
+@@ -3525,9 +3523,6 @@ static int sd_remove(struct device *dev)
+ 
+ 	free_opal_dev(sdkp->opal_dev);
+ 
+-	blk_register_region(devt, SD_MINORS, NULL,
+-			    sd_default_probe, NULL, NULL);
+-
+ 	mutex_lock(&sd_ref_mutex);
+ 	dev_set_drvdata(dev, NULL);
+ 	put_device(&sdkp->dev);
+@@ -3717,11 +3712,9 @@ static int __init init_sd(void)
+ 	SCSI_LOG_HLQUEUE(3, printk("init_sd: sd driver entry point\n"));
+ 
+ 	for (i = 0; i < SD_MAJORS; i++) {
+-		if (register_blkdev(sd_major(i), "sd") != 0)
++		if (__register_blkdev(sd_major(i), "sd", sd_default_probe))
+ 			continue;
+ 		majors++;
+-		blk_register_region(sd_major(i), SD_MINORS, NULL,
+-				    sd_default_probe, NULL, NULL);
+ 	}
+ 
+ 	if (!majors)
+@@ -3794,10 +3787,8 @@ static void __exit exit_sd(void)
+ 
+ 	class_unregister(&sd_disk_class);
+ 
+-	for (i = 0; i < SD_MAJORS; i++) {
+-		blk_unregister_region(sd_major(i), SD_MINORS);
++	for (i = 0; i < SD_MAJORS; i++)
+ 		unregister_blkdev(sd_major(i), "sd");
+-	}
+ }
+ 
+ module_init(init_sd);
 -- 
 2.29.2
 
