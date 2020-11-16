@@ -2,165 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B40C71156
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 03:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 161E5C61DD8
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 04:00:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF39F22263
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 03:05:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C101C20773
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 04:00:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SVyMZhuX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726787AbgKPDF1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Nov 2020 22:05:27 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:44591 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726759AbgKPDF1 (ORCPT
+        id S1726760AbgKPD6C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Nov 2020 22:58:02 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:51862 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726532AbgKPD6C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Nov 2020 22:05:27 -0500
-Received: by mail-pl1-f196.google.com with SMTP id b3so7648412pls.11;
-        Sun, 15 Nov 2020 19:05:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=qRKRjS62RKtDoHWQs4RID8UCcBBixKzfvMA3W55OBZ0=;
-        b=PFvukmo0NJn+eVTIbS9NSou4q7HvvA1aNHLi4BXjXqDDYfRwdMfvmSb4A1U9i8rK/N
-         xlhtgwWsakV0Z8z2NkpyKmBD1zP3GGjVhUkTfAeZQy96igw6g0OC35tS5F2/H/Fynv9Q
-         73yppVEkv7dkqUEzfnRZH76xGhSRB9HRhzYQMctJBfbsPNy1SvzYRFk7XW79QD4ST8Nb
-         PTo3apQFA+7uWFz4DxIgFPQB/7/ECbUbi968QLIcmWhxBiP+wIR/4TfBOIqRxH3BWe7K
-         fhoWgGqoY166Y6sPchY6bm0uvF2Oh8UHkk69Trd346vyhAX/jDWdRvVuofvJi/rz2Bwn
-         0UFg==
-X-Gm-Message-State: AOAM532xwNSu6Z2ckGcQnOTmP1/q1rKrczihnNBmJB9r5zwvyarJQWww
-        dJM+UuMdhg/5QOEJ7jpyNVs=
-X-Google-Smtp-Source: ABdhPJxQOrZRBaKFIsiabwJFhagwWIEM6IkIfozTICIcENxpdTCCM5dKaESke61vHRatnCMNV5iqaA==
-X-Received: by 2002:a17:902:aa06:b029:d6:da66:5048 with SMTP id be6-20020a170902aa06b02900d6da665048mr11772296plb.5.1605495926223;
-        Sun, 15 Nov 2020 19:05:26 -0800 (PST)
-Received: from asus.hsd1.ca.comcast.net (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id r3sm17148131pjl.23.2020.11.15.19.05.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Nov 2020 19:05:25 -0800 (PST)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Can Guo <cang@codeaurora.org>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Martin Kepplinger <martin.kepplinger@puri.sm>
-Subject: [PATCH v2 9/9] block: Do not accept any requests while suspended
-Date:   Sun, 15 Nov 2020 19:04:59 -0800
-Message-Id: <20201116030459.13963-10-bvanassche@acm.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201116030459.13963-1-bvanassche@acm.org>
-References: <20201116030459.13963-1-bvanassche@acm.org>
+        Sun, 15 Nov 2020 22:58:02 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AG3ohdG063656;
+        Mon, 16 Nov 2020 03:57:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=1/ZcOLHpYBSkWwqi4Q3cA0tNOhEviNVW1rpuzjWsg5Y=;
+ b=SVyMZhuXcxCo53XMMDfPquQDOmv0xQ8Dpc0VoEjVcdcuEJIIXj9Vp1+FhdRVLli6ry8p
+ TNHFBkqrQyz+PdvYYVdBxX+j7hQuuG7I791qwaTOwUYRFgJF+7fUF9yOR9nPLWaKEn06
+ j5FjSfkmhEr6lJskTQDsDKl2PYysM1ous2+2IKRbqsaTf0qZVZ4YlBlHvvVfc82/3ZJy
+ zRgzfIrBuMCwH1AxHrAu/jkoSn0D3UTMNFLTLZnbO8gEqomKhLGi9hp0eFH7hrFhuEC0
+ Upi7BL7IWCyvwbcKYDcWIHxhU92Jqj8rJwVPv6wTrahagkeoIsuRCFX4N2Olsm/lrQei Hw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 34t76kk7mx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 16 Nov 2020 03:57:54 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AG3nUsM110787;
+        Mon, 16 Nov 2020 03:55:54 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 34trtk5bk9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Nov 2020 03:55:54 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0AG3tdF5012629;
+        Mon, 16 Nov 2020 03:55:46 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 15 Nov 2020 19:55:38 -0800
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Oleksii Kurochko <olkuroch@cisco.com>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: Fix read-only block device setting after
+ revalidate
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1tutq6mbb.fsf@ca-mkp.ca.oracle.com>
+References: <20201113084702.4164912-1-hch@lst.de>
+        <20201113084702.4164912-2-hch@lst.de>
+Date:   Sun, 15 Nov 2020 22:55:36 -0500
+In-Reply-To: <20201113084702.4164912-2-hch@lst.de> (Christoph Hellwig's
+        message of "Fri, 13 Nov 2020 09:47:00 +0100")
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9806 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=1 mlxscore=0
+ bulkscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011160023
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9806 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 phishscore=0
+ adultscore=0 priorityscore=1501 bulkscore=0 clxscore=1015 mlxlogscore=999
+ malwarescore=0 mlxscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011160023
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Alan Stern <stern@rowland.harvard.edu>
 
-blk_queue_enter() accepts BLK_MQ_REQ_PREEMPT independent of the runtime
-power management state. Since SCSI domain validation no longer depends on
-this behavior, modify the behavior of blk_queue_enter() as follows:
-- Do not accept any requests while suspended.
-- Only process power management requests while suspending or resuming.
+Hi Christoph!
 
-Submitting BLK_MQ_REQ_PREEMPT requests to a device that is runtime-
-suspended causes runtime-suspended block devices not to resume as they
-should. The request which should cause a runtime resume instead gets
-issued directly, without resuming the device first. Of course the device
-can't handle it properly, the I/O fails, and the device remains suspended.
+> [hch: rebased.  don't mirror the compound read-only flag into a field,
 
-The problem is fixed by checking that the queue's runtime-PM status
-isn't RPM_SUSPENDED before allowing a request to be issued, and
-queuing a runtime-resume request if it is.  In particular, the inline
-blk_pm_request_resume() routine is renamed blk_pm_resume_queue() and
-the code is unified by merging the surrounding checks into the
-routine.  If the queue isn't set up for runtime PM, or there currently
-is no restriction on allowed requests, the request is allowed.
-Likewise if the BLK_MQ_REQ_PREEMPT flag is set and the status isn't
-RPM_SUSPENDED.  Otherwise a runtime resume is queued and the request
-is blocked until conditions are more suitable.
+My original patch separated "should-write-bios-be-rejected?" state from
+"did-the-user-set-this-partition-ro?". In the rebased version a
+full-device state transition in update_all_part_ro_state() blows away
+any policy the user has set on a given partition.
 
-Cc: Can Guo <cang@codeaurora.org>
-Cc: Stanley Chu <stanley.chu@mediatek.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-Reported-and-tested-by: Martin Kepplinger <martin.kepplinger@puri.sm>
-Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-[ bvanassche: modified commit message and removed Cc: stable because without
-  the previous patches from this series this patch would break parallel SCSI
-  domain validation ]
----
- block/blk-core.c |  6 +++---
- block/blk-pm.h   | 14 +++++++++-----
- 2 files changed, 12 insertions(+), 8 deletions(-)
+The blktests that fail are due to something like:
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a00bce9f46d8..230880cbf8c8 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -440,7 +440,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 			 * responsible for ensuring that that counter is
- 			 * globally visible before the queue is unfrozen.
- 			 */
--			if (pm || !blk_queue_pm_only(q)) {
-+			if ((pm && q->rpm_status != RPM_SUSPENDED) ||
-+			    !blk_queue_pm_only(q)) {
- 				success = true;
- 			} else {
- 				percpu_ref_put(&q->q_usage_counter);
-@@ -465,8 +466,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 
- 		wait_event(q->mq_freeze_wq,
- 			   (!q->mq_freeze_depth &&
--			    (pm || (blk_pm_request_resume(q),
--				    !blk_queue_pm_only(q)))) ||
-+			    blk_pm_resume_queue(pm, q)) ||
- 			   blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-diff --git a/block/blk-pm.h b/block/blk-pm.h
-index ea5507d23e75..a2283cc9f716 100644
---- a/block/blk-pm.h
-+++ b/block/blk-pm.h
-@@ -6,11 +6,14 @@
- #include <linux/pm_runtime.h>
- 
- #ifdef CONFIG_PM
--static inline void blk_pm_request_resume(struct request_queue *q)
-+static inline int blk_pm_resume_queue(const bool pm, struct request_queue *q)
- {
--	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
--		       q->rpm_status == RPM_SUSPENDING))
--		pm_request_resume(q->dev);
-+	if (!q->dev || !blk_queue_pm_only(q))
-+		return 1;	/* Nothing to do */
-+	if (pm && q->rpm_status != RPM_SUSPENDED)
-+		return 1;	/* Request allowed */
-+	pm_request_resume(q->dev);
-+	return 0;
- }
- 
- static inline void blk_pm_mark_last_busy(struct request *rq)
-@@ -44,8 +47,9 @@ static inline void blk_pm_put_request(struct request *rq)
- 		--rq->q->nr_pending;
- }
- #else
--static inline void blk_pm_request_resume(struct request_queue *q)
-+static inline int blk_pm_resume_queue(const bool pm, struct request_queue *q)
- {
-+	return 1;
- }
- 
- static inline void blk_pm_mark_last_busy(struct request *rq)
+# modprobe scsi_debug num_parts=2
+# blockdev --setro /dev/sda2
+# grep . /sys/block/sda/sda2/ro
+1
+# echo 1 > /sys/module/scsi_debug/parameters/wp
+# echo 1 > /sys/block/sda/device/rescan
+# echo 0 > /sys/module/scsi_debug/parameters/wp
+# echo 1 > /sys/block/sda/device/rescan
+# grep . /sys/block/sda/sda2/ro
+0
+
+The user expectation is that since they set partition 2 readonly it
+should remain that way until they either clear the flag or issue
+BLKRRPART to cause the partition table to be reread.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
