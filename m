@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC102C8302F
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51601C8301F
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80E2D241A3
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17D2424199
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="s3PyuNum"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="k9I9MrkY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730834AbgKPO7M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 09:59:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49054 "EHLO
+        id S1730751AbgKPO67 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 09:58:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730815AbgKPO7J (ORCPT
+        with ESMTP id S1730719AbgKPO6y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 09:59:09 -0500
+        Mon, 16 Nov 2020 09:58:54 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E783EC0613D1;
-        Mon, 16 Nov 2020 06:59:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C0FC0613D2;
+        Mon, 16 Nov 2020 06:58:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=hmW8AusT819Hpp1U0vQRnp8T84EK6KuhlshbO+/HZ1o=; b=s3PyuNumv2XJNuimh+ngj+d/f6
-        scNE+kFuc6xkgKNnr1zZ7z2rWNuEJjtRjoF8etdpy5umK3setslsL6lUQiK5cAVCegzHKOP2tNVRN
-        1Sa9ShGf1/F5HMkg28qrnE9RKWnptAc1NOgcS5xzLqKhJFI4gE0I6jkqsNfuoY0Yg/d/tfTnu2g27
-        +3jL897Lg+GjB+qFNGwVEtM3B26pX5XnYLr43N09shWkl6V+i4C3a3gB1Gh7uFE1MmG1EyGX2j2HD
-        PQjkAdNsC8nET4kWMgCjPetxyfW4P8cNls2hPSf7oPeT4Bi2Ng0klNLw8Pn/NUGmnPBoTRVCulBmk
-        W/SI5tEw==;
+        bh=IMIzlncMGNKmllwIOsfxmrv0eLBvrluJTUMF3jTpuQU=; b=k9I9MrkYIIqQ7JqFNAj/ZM1V4q
+        fnRQw9pHyuYdosXzcTsUpct/APGHyHZ7nQCzDTPBYWKb7HrWsqQXDORjJYWy8OjQdicyYdW3PlxPu
+        wqMi0Vhywi7qganw7NsAbQv4gOag+5ar1NaSXq2fKhYuZd8FwIJVH3dH1drAnztP4skkRRCgtIYLj
+        Pjw8ksGMPtkHYf08cbb503DDj0v+MfWTUIREPU72v6YjjL9QwNBor49syaMVeLgCn3qZSFU6g/s8L
+        U3jj6Zs9nBEf9ztd5cWkrrCJejXKia3qXo3DpHT4vJ84+lcQrWfocMAg1qs7gQeMEKKfZSWOVRuBo
+        VJid72pg==;
 Received: from [2001:4bb8:180:6600:255b:7def:a93:4a09] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kefy4-0003vL-Dh; Mon, 16 Nov 2020 14:58:56 +0000
+        id 1kefxm-0003qi-1m; Mon, 16 Nov 2020 14:58:38 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -58,9 +58,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 33/78] block: remove __blkdev_driver_ioctl
-Date:   Mon, 16 Nov 2020 15:57:24 +0100
-Message-Id: <20201116145809.410558-34-hch@lst.de>
+Subject: [PATCH 20/78] md: use set_capacity_and_notify
+Date:   Mon, 16 Nov 2020 15:57:11 +0100
+Message-Id: <20201116145809.410558-21-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201116145809.410558-1-hch@lst.de>
 References: <20201116145809.410558-1-hch@lst.de>
@@ -71,124 +71,121 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just open code it in the few callers.
+Use set_capacity_and_notify to set the size of both the disk and block
+device.  This also gets the uevent notifications for the resize for free.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Song Liu <song@kernel.org>
 ---
- block/ioctl.c               | 25 +++++--------------------
- drivers/block/pktcdvd.c     |  6 ++++--
- drivers/md/bcache/request.c |  5 +++--
- drivers/md/dm.c             |  5 ++++-
- include/linux/blkdev.h      |  2 --
- 5 files changed, 16 insertions(+), 27 deletions(-)
+ drivers/md/md-cluster.c |  6 ++----
+ drivers/md/md-linear.c  |  3 +--
+ drivers/md/md.c         | 24 ++++++++++--------------
+ 3 files changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 04255dc5f3bff3..6b785181344fe1 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -219,23 +219,6 @@ static int compat_put_ulong(compat_ulong_t __user *argp, compat_ulong_t val)
- }
- #endif
- 
--int __blkdev_driver_ioctl(struct block_device *bdev, fmode_t mode,
--			unsigned cmd, unsigned long arg)
--{
--	struct gendisk *disk = bdev->bd_disk;
--
--	if (disk->fops->ioctl)
--		return disk->fops->ioctl(bdev, mode, cmd, arg);
--
--	return -ENOTTY;
--}
--/*
-- * For the record: _GPL here is only because somebody decided to slap it
-- * on the previous export.  Sheer idiocy, since it wasn't copyrightable
-- * at all and could be open-coded without any exports by anybody who cares.
-- */
--EXPORT_SYMBOL_GPL(__blkdev_driver_ioctl);
--
- #ifdef CONFIG_COMPAT
- /*
-  * This is the equivalent of compat_ptr_ioctl(), to be used by block
-@@ -594,10 +577,12 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 	}
- 
- 	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
--	if (ret == -ENOIOCTLCMD)
--		return __blkdev_driver_ioctl(bdev, mode, cmd, arg);
-+	if (ret != -ENOIOCTLCMD)
-+		return ret;
- 
--	return ret;
-+	if (!bdev->bd_disk->fops->ioctl)
-+		return -ENOTTY;
-+	return bdev->bd_disk->fops->ioctl(bdev, mode, cmd, arg);
- }
- EXPORT_SYMBOL_GPL(blkdev_ioctl); /* for /dev/raw */
- 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 4326401cede445..b8bb8ec7538d9b 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2583,9 +2583,11 @@ static int pkt_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd,
- 	case CDROM_LAST_WRITTEN:
- 	case CDROM_SEND_PACKET:
- 	case SCSI_IOCTL_SEND_COMMAND:
--		ret = __blkdev_driver_ioctl(pd->bdev, mode, cmd, arg);
-+		if (!bdev->bd_disk->fops->ioctl)
-+			ret = -ENOTTY;
-+		else
-+			ret = bdev->bd_disk->fops->ioctl(bdev, mode, cmd, arg);
+diff --git a/drivers/md/md-cluster.c b/drivers/md/md-cluster.c
+index 4aaf4820b6f625..87442dc59f6ca3 100644
+--- a/drivers/md/md-cluster.c
++++ b/drivers/md/md-cluster.c
+@@ -581,8 +581,7 @@ static int process_recvd_msg(struct mddev *mddev, struct cluster_msg *msg)
+ 		process_metadata_update(mddev, msg);
  		break;
--
- 	default:
- 		pkt_dbg(2, pd, "Unknown ioctl (%x)\n", cmd);
- 		ret = -ENOTTY;
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 21432638314562..afac8d07c1bd00 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -1230,8 +1230,9 @@ static int cached_dev_ioctl(struct bcache_device *d, fmode_t mode,
- 
- 	if (dc->io_disable)
- 		return -EIO;
--
--	return __blkdev_driver_ioctl(dc->bdev, mode, cmd, arg);
-+	if (!dc->bdev->bd_disk->fops->ioctl)
-+		return -ENOTTY;
-+	return dc->bdev->bd_disk->fops->ioctl(dc->bdev, mode, cmd, arg);
+ 	case CHANGE_CAPACITY:
+-		set_capacity(mddev->gendisk, mddev->array_sectors);
+-		revalidate_disk_size(mddev->gendisk, true);
++		set_capacity_and_notify(mddev->gendisk, mddev->array_sectors);
+ 		break;
+ 	case RESYNCING:
+ 		set_bit(MD_RESYNCING_REMOTE, &mddev->recovery);
+@@ -1296,8 +1295,7 @@ static void update_size(struct mddev *mddev, sector_t old_dev_sectors)
+ 		if (ret)
+ 			pr_err("%s:%d: failed to send CHANGE_CAPACITY msg\n",
+ 			       __func__, __LINE__);
+-		set_capacity(mddev->gendisk, mddev->array_sectors);
+-		revalidate_disk_size(mddev->gendisk, true);
++		set_capacity_and_notify(mddev->gendisk, mddev->array_sectors);
+ 	} else {
+ 		/* revert to previous sectors */
+ 		ret = mddev->pers->resize(mddev, old_dev_sectors);
+diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
+index 5ab22069b5be9c..98f1b4b2bdcef8 100644
+--- a/drivers/md/md-linear.c
++++ b/drivers/md/md-linear.c
+@@ -200,9 +200,8 @@ static int linear_add(struct mddev *mddev, struct md_rdev *rdev)
+ 		"copied raid_disks doesn't match mddev->raid_disks");
+ 	rcu_assign_pointer(mddev->private, newconf);
+ 	md_set_array_sectors(mddev, linear_size(mddev, 0, 0));
+-	set_capacity(mddev->gendisk, mddev->array_sectors);
++	set_capacity_and_notify(mddev->gendisk, mddev->array_sectors);
+ 	mddev_resume(mddev);
+-	revalidate_disk_size(mddev->gendisk, true);
+ 	kfree_rcu(oldconf, rcu);
+ 	return 0;
  }
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 98bac4f304ae26..32e375d50fee17 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -5355,10 +5355,9 @@ array_size_store(struct mddev *mddev, const char *buf, size_t len)
  
- void bch_cached_dev_request_init(struct cached_dev *dc)
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 62ad44925e73ec..54739f1b579bc8 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -570,7 +570,10 @@ static int dm_blk_ioctl(struct block_device *bdev, fmode_t mode,
+ 	if (!err) {
+ 		mddev->array_sectors = sectors;
+-		if (mddev->pers) {
+-			set_capacity(mddev->gendisk, mddev->array_sectors);
+-			revalidate_disk_size(mddev->gendisk, true);
+-		}
++		if (mddev->pers)
++			set_capacity_and_notify(mddev->gendisk,
++						mddev->array_sectors);
+ 	}
+ 	mddev_unlock(mddev);
+ 	return err ?: len;
+@@ -6107,8 +6106,7 @@ int do_md_run(struct mddev *mddev)
+ 	md_wakeup_thread(mddev->thread);
+ 	md_wakeup_thread(mddev->sync_thread); /* possibly kick off a reshape */
+ 
+-	set_capacity(mddev->gendisk, mddev->array_sectors);
+-	revalidate_disk_size(mddev->gendisk, true);
++	set_capacity_and_notify(mddev->gendisk, mddev->array_sectors);
+ 	clear_bit(MD_NOT_READY, &mddev->flags);
+ 	mddev->changed = 1;
+ 	kobject_uevent(&disk_to_dev(mddev->gendisk)->kobj, KOBJ_CHANGE);
+@@ -6423,10 +6421,9 @@ static int do_md_stop(struct mddev *mddev, int mode,
+ 			if (rdev->raid_disk >= 0)
+ 				sysfs_unlink_rdev(mddev, rdev);
+ 
+-		set_capacity(disk, 0);
++		set_capacity_and_notify(disk, 0);
+ 		mutex_unlock(&mddev->open_mutex);
+ 		mddev->changed = 1;
+-		revalidate_disk_size(disk, true);
+ 
+ 		if (mddev->ro)
+ 			mddev->ro = 0;
+@@ -7257,8 +7254,8 @@ static int update_size(struct mddev *mddev, sector_t num_sectors)
+ 		if (mddev_is_clustered(mddev))
+ 			md_cluster_ops->update_size(mddev, old_dev_sectors);
+ 		else if (mddev->queue) {
+-			set_capacity(mddev->gendisk, mddev->array_sectors);
+-			revalidate_disk_size(mddev->gendisk, true);
++			set_capacity_and_notify(mddev->gendisk,
++						mddev->array_sectors);
  		}
  	}
+ 	return rv;
+@@ -9035,10 +9032,9 @@ void md_do_sync(struct md_thread *thread)
+ 		mddev_lock_nointr(mddev);
+ 		md_set_array_sectors(mddev, mddev->pers->size(mddev, 0, 0));
+ 		mddev_unlock(mddev);
+-		if (!mddev_is_clustered(mddev)) {
+-			set_capacity(mddev->gendisk, mddev->array_sectors);
+-			revalidate_disk_size(mddev->gendisk, true);
+-		}
++		if (!mddev_is_clustered(mddev))
++			set_capacity_and_notify(mddev->gendisk,
++						mddev->array_sectors);
+ 	}
  
--	r =  __blkdev_driver_ioctl(bdev, mode, cmd, arg);
-+	if (!bdev->bd_disk->fops->ioctl)
-+		r = -ENOTTY;
-+	else
-+		r = bdev->bd_disk->fops->ioctl(bdev, mode, cmd, arg);
- out:
- 	dm_unprepare_ioctl(md, srcu_idx);
- 	return r;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5c1ba8a8d2bc7e..05b346a68c2eee 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1867,8 +1867,6 @@ extern int blkdev_compat_ptr_ioctl(struct block_device *, fmode_t,
- #define blkdev_compat_ptr_ioctl NULL
- #endif
- 
--extern int __blkdev_driver_ioctl(struct block_device *, fmode_t, unsigned int,
--				 unsigned long);
- extern int bdev_read_page(struct block_device *, sector_t, struct page *);
- extern int bdev_write_page(struct block_device *, sector_t, struct page *,
- 						struct writeback_control *);
+ 	spin_lock(&mddev->lock);
 -- 
 2.29.2
 
