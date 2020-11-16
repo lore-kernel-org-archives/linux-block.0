@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A25EC83014
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7B6C83018
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:03:59 +0000 (UTC)
 Received: from vger.kernel.org (unknown [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03829206B7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:03:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1483206B7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 15:03:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WtUs/ZHH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03829206B7
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DKAlryWF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1483206B7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730828AbgKPO7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 09:59:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49048 "EHLO
+        id S1730794AbgKPO7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 09:59:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730793AbgKPO7I (ORCPT
+        with ESMTP id S1730793AbgKPO7E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 09:59:08 -0500
+        Mon, 16 Nov 2020 09:59:04 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A55DC0613CF;
-        Mon, 16 Nov 2020 06:59:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B79DC0613CF;
+        Mon, 16 Nov 2020 06:59:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=yQQZQPCQfQM7CUBXzCMUyqgLnLGQ9YPa8lq6jkcafKI=; b=WtUs/ZHHHWoA+J542Y6mYXW7Ql
-        wMixYk/BvE60aD54t7ExUm0AxV6UzJxr06L6viTlvpgjC2bEe3/zxQDkJkIFlS0bzo78ksny7Nq6W
-        OKlhR7wy5ubVTlN/2Y0WDj6CW0pG+vIu/78iIeWE+YehwQa4BqiEFEcMODKoBOrTVdWrXl0Sdysf+
-        pclwOsbyiCLrKl06HyP8fs+vPQOuBjK9Uq0ldqvVHcha7jCChZf433xQg5wtWEVmIZ0Td1rSjgQ2R
-        mY13xJ5gm6oR6Cum62zjZhpTXXhQHhsumfYYoZ2+ylyEnlTiukpjjXmewaWHdYuHaxhjjM+xQVSh0
-        CxfvNOfw==;
+        bh=d0zI0xiIcFHFTwTdsA7t1wqk2DnkvBTfmLOxL2TnUek=; b=DKAlryWF5aHE8/B3DVx5lhXd8h
+        RQsT9hPX38SbguocnZS554oaNmM9+EcgOmPSe3bSy4pQSqGGct2tuNtJ0yCfFmplFU4Jcw4DNR+Gz
+        J7Oz/e2SFesb/6AMnzcvu+cf+7L4KALASo9qO1gsK4PDLlxYsYhRBm5wzHXCJ4YuBYsjvABidOfFo
+        p48i+zCOuzCBz9Jt3Qs/XvlKgbU+XBWYolicobbwk3FUzb3sQBQPT35cBdmlTfMB9Ru0tm2W7/68r
+        NFrH8b8PC5q1fbzQHqZSTq90cUOcrpwyoWr9RhxuehKghoJ6srJuGYzg6d5pU+2MePhUr2LoGYkUr
+        biWVcMtQ==;
 Received: from [2001:4bb8:180:6600:255b:7def:a93:4a09] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kefy1-0003uf-KX; Mon, 16 Nov 2020 14:58:53 +0000
+        id 1kefxy-0003tn-LS; Mon, 16 Nov 2020 14:58:51 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -61,9 +61,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 31/78] loop: use set_disk_ro
-Date:   Mon, 16 Nov 2020 15:57:22 +0100
-Message-Id: <20201116145809.410558-32-hch@lst.de>
+Subject: [PATCH 29/78] dasd: implement ->set_read_only to hook into BLKROSET processing
+Date:   Mon, 16 Nov 2020 15:57:20 +0100
+Message-Id: <20201116145809.410558-30-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201116145809.410558-1-hch@lst.de>
 References: <20201116145809.410558-1-hch@lst.de>
@@ -74,27 +74,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use set_disk_ro instead of set_device_ro to match all other block
-drivers and to ensure all partitions mirror the read-only flag.
+Implement the ->set_read_only method instead of parsing the actual
+ioctl command.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/s390/block/dasd.c       |  1 +
+ drivers/s390/block/dasd_int.h   |  3 ++-
+ drivers/s390/block/dasd_ioctl.c | 27 +++++++++------------------
+ 3 files changed, 12 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 84a36c242e5550..41caf799df721f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1134,7 +1134,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	if (error)
- 		goto out_unlock;
+diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+index eb17fea8075c6f..db24e04ee9781e 100644
+--- a/drivers/s390/block/dasd.c
++++ b/drivers/s390/block/dasd.c
+@@ -3394,6 +3394,7 @@ dasd_device_operations = {
+ 	.ioctl		= dasd_ioctl,
+ 	.compat_ioctl	= dasd_ioctl,
+ 	.getgeo		= dasd_getgeo,
++	.set_read_only	= dasd_set_read_only,
+ };
  
--	set_device_ro(bdev, (lo->lo_flags & LO_FLAGS_READ_ONLY) != 0);
-+	set_disk_ro(lo->lo_disk, (lo->lo_flags & LO_FLAGS_READ_ONLY) != 0);
+ /*******************************************************************************
+diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
+index fa552f9f166671..c59a0d63b506e6 100644
+--- a/drivers/s390/block/dasd_int.h
++++ b/drivers/s390/block/dasd_int.h
+@@ -844,7 +844,8 @@ int dasd_scan_partitions(struct dasd_block *);
+ void dasd_destroy_partitions(struct dasd_block *);
  
- 	lo->use_dio = lo->lo_flags & LO_FLAGS_DIRECT_IO;
- 	lo->lo_device = bdev;
+ /* externals in dasd_ioctl.c */
+-int  dasd_ioctl(struct block_device *, fmode_t, unsigned int, unsigned long);
++int dasd_ioctl(struct block_device *, fmode_t, unsigned int, unsigned long);
++int dasd_set_read_only(struct block_device *bdev, bool ro);
+ 
+ /* externals in dasd_proc.c */
+ int dasd_proc_init(void);
+diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
+index cb6427fb9f3d16..3359559517bfcf 100644
+--- a/drivers/s390/block/dasd_ioctl.c
++++ b/drivers/s390/block/dasd_ioctl.c
+@@ -532,28 +532,22 @@ static int dasd_ioctl_information(struct dasd_block *block, void __user *argp,
+ /*
+  * Set read only
+  */
+-static int
+-dasd_ioctl_set_ro(struct block_device *bdev, void __user *argp)
++int dasd_set_read_only(struct block_device *bdev, bool ro)
+ {
+ 	struct dasd_device *base;
+-	int intval, rc;
++	int rc;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
+-		return -EACCES;
++	/* do not manipulate hardware state for partitions */
+ 	if (bdev_is_partition(bdev))
+-		// ro setting is not allowed for partitions
+-		return -EINVAL;
+-	if (get_user(intval, (int __user *)argp))
+-		return -EFAULT;
++		return 0;
++
+ 	base = dasd_device_from_gendisk(bdev->bd_disk);
+ 	if (!base)
+ 		return -ENODEV;
+-	if (!intval && test_bit(DASD_FLAG_DEVICE_RO, &base->flags)) {
+-		dasd_put_device(base);
+-		return -EROFS;
+-	}
+-	set_disk_ro(bdev->bd_disk, intval);
+-	rc = dasd_set_feature(base->cdev, DASD_FEATURE_READONLY, intval);
++	if (!ro && test_bit(DASD_FLAG_DEVICE_RO, &base->flags))
++		rc = -EROFS;
++	else
++		rc = dasd_set_feature(base->cdev, DASD_FEATURE_READONLY, ro);
+ 	dasd_put_device(base);
+ 	return rc;
+ }
+@@ -633,9 +627,6 @@ int dasd_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case BIODASDPRRST:
+ 		rc = dasd_ioctl_reset_profile(block);
+ 		break;
+-	case BLKROSET:
+-		rc = dasd_ioctl_set_ro(bdev, argp);
+-		break;
+ 	case DASDAPIVER:
+ 		rc = dasd_ioctl_api_version(argp);
+ 		break;
 -- 
 2.29.2
 
