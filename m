@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F71C82543
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:33 +0000 (UTC)
-Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED9BD22263
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 170BDC82540
 	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:32 +0000 (UTC)
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by mail.kernel.org (Postfix) with ESMTP id BD0AD24199
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 14:59:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sXKHf4+K"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tNKy0A5I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730902AbgKPO7Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 09:59:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49108 "EHLO
+        id S1730871AbgKPO7T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 09:59:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730846AbgKPO7X (ORCPT
+        with ESMTP id S1730860AbgKPO7R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 09:59:23 -0500
+        Mon, 16 Nov 2020 09:59:17 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7533C0613D3;
-        Mon, 16 Nov 2020 06:59:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45434C0613D1;
+        Mon, 16 Nov 2020 06:59:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=soDf5n/4IHZXpRDONsC4iRIWKhhdabm7wm1Ix3YyzkY=; b=sXKHf4+KcwIa5fuTcLVQORl6vc
-        Y03Gwu4v2aKXYxB2gC70w5AjOtoQE1Q1pXkpIHcqxu1afca2PvwHAIEb13ajBGY5qll0Bc+WJnuHt
-        TgCIRD/tv9h7SIzJyRqtqrpqxOYCL5TBFCCOpqvnrOBTaKdroJMy4aFUM6Eu1+1BjsZPfN+VBECoA
-        VBKTChEgoSg7gTk+HdF7LfwwqhGnCtekD9xT9Y736twxTwR4aWyi6Skc6DBIDj8x5uz90PEkL1KLh
-        CVLnyiuFwPdIlcsawji6tbe7dqrYAdB98VJPkjxf9YLh+GLVDgz+CUZ/XticM28L06ss6gSMN118i
-        lq40xEVw==;
+        bh=j9YzX4Imfj42oekp8Tth+LQoKAxJAOk+J48Ms5WWyRs=; b=tNKy0A5I0JGyRwszKo8CS5i8OD
+        +8V953YfFx3Xman6sQ8F42cjnDZ+fEMnGq+5JSKyBoWRq84B0ROGouApW++jZ44y6feigXqLuqKsR
+        cxqh2lFOkiVIegiphp90kij1qmc1NDslqQZNsGbC21VOg69MDd/n08QOAs5NDSIePC2uZIeQod82Z
+        T6wB+Z9xXg1/0NZKtWCv5t7lkIbvOb2buar5vD5Qry8bhovOugY2M7SSd4S16Dl+mklfVYWbkqbny
+        8IY3ZaEc9JVI0kFlBfL2Zv+6ubgx5Kd03xor/wsERRQOPm0Gj4ArtdUOT7w0cJYRw8cIK/bIaVXYw
+        0ktG/eKQ==;
 Received: from [2001:4bb8:180:6600:255b:7def:a93:4a09] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kefyH-0003yd-CW; Mon, 16 Nov 2020 14:59:09 +0000
+        id 1kefyB-0003xB-Ni; Mon, 16 Nov 2020 14:59:04 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Justin Sanders <justin@coraid.com>,
@@ -59,9 +59,9 @@ Cc:     Justin Sanders <justin@coraid.com>,
         linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 42/78] sd: use __register_blkdev to avoid a modprobe for an unregistered dev_t
-Date:   Mon, 16 Nov 2020 15:57:33 +0100
-Message-Id: <20201116145809.410558-43-hch@lst.de>
+Subject: [PATCH 38/78] block: rework requesting modules for unclaimed devices
+Date:   Mon, 16 Nov 2020 15:57:29 +0100
+Message-Id: <20201116145809.410558-39-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201116145809.410558-1-hch@lst.de>
 References: <20201116145809.410558-1-hch@lst.de>
@@ -72,72 +72,73 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Switch from using blk_register_region to the probe callback passed to
-__register_blkdev to disable the request_module call for an unclaimed
-dev_t in the SD majors.
+Instead of reusing the ranges in bdev_map, add a new helper that is
+called if no ranges was found.  This is a first step to unpeel and
+eventually remove the complex ranges structure.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/scsi/sd.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
+ block/genhd.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index a2a4f385833d6c..679c2c02504763 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -630,13 +630,11 @@ static struct scsi_driver sd_template = {
- };
+diff --git a/block/genhd.c b/block/genhd.c
+index 2a20372756625e..8391e7d83a6920 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1028,6 +1028,13 @@ static ssize_t disk_badblocks_store(struct device *dev,
+ 	return badblocks_store(disk->bb, page, len, 0);
+ }
  
- /*
-- * Dummy kobj_map->probe function.
-- * The default ->probe function will call modprobe, which is
-- * pointless as this module is already loaded.
-+ * Don't request a new module, as that could deadlock in multipath
-+ * environment.
-  */
--static struct kobject *sd_default_probe(dev_t devt, int *partno, void *data)
-+static void sd_default_probe(dev_t devt)
++static void request_gendisk_module(dev_t devt)
++{
++	if (request_module("block-major-%d-%d", MAJOR(devt), MINOR(devt)) > 0)
++		/* Make old-style 2.4 aliases work */
++		request_module("block-major-%d", MAJOR(devt));
++}
++
+ static struct gendisk *lookup_gendisk(dev_t dev, int *partno)
  {
--	return NULL;
- }
- 
- /*
-@@ -3525,9 +3523,6 @@ static int sd_remove(struct device *dev)
- 
- 	free_opal_dev(sdkp->opal_dev);
- 
--	blk_register_region(devt, SD_MINORS, NULL,
--			    sd_default_probe, NULL, NULL);
--
- 	mutex_lock(&sd_ref_mutex);
- 	dev_set_drvdata(dev, NULL);
- 	put_device(&sdkp->dev);
-@@ -3717,11 +3712,9 @@ static int __init init_sd(void)
- 	SCSI_LOG_HLQUEUE(3, printk("init_sd: sd driver entry point\n"));
- 
- 	for (i = 0; i < SD_MAJORS; i++) {
--		if (register_blkdev(sd_major(i), "sd") != 0)
-+		if (__register_blkdev(sd_major(i), "sd", sd_default_probe))
+ 	struct kobject *kobj;
+@@ -1052,6 +1059,14 @@ static struct gendisk *lookup_gendisk(dev_t dev, int *partno)
+ 		probe = p->probe;
+ 		best = p->range - 1;
+ 		*partno = dev - p->dev;
++
++		if (!probe) {
++			mutex_unlock(&bdev_map_lock);
++			module_put(owner);
++			request_gendisk_module(dev);
++			goto retry;
++		}
++
+ 		if (p->lock && p->lock(dev, data) < 0) {
+ 			module_put(owner);
  			continue;
- 		majors++;
--		blk_register_region(sd_major(i), SD_MINORS, NULL,
--				    sd_default_probe, NULL, NULL);
- 	}
+@@ -1290,15 +1305,6 @@ static const struct seq_operations partitions_op = {
+ };
+ #endif
  
- 	if (!majors)
-@@ -3794,10 +3787,8 @@ static void __exit exit_sd(void)
+-
+-static struct kobject *base_probe(dev_t devt, int *partno, void *data)
+-{
+-	if (request_module("block-major-%d-%d", MAJOR(devt), MINOR(devt)) > 0)
+-		/* Make old-style 2.4 aliases work */
+-		request_module("block-major-%d", MAJOR(devt));
+-	return NULL;
+-}
+-
+ static void bdev_map_init(void)
+ {
+ 	struct bdev_map *base;
+@@ -1310,7 +1316,6 @@ static void bdev_map_init(void)
  
- 	class_unregister(&sd_disk_class);
- 
--	for (i = 0; i < SD_MAJORS; i++) {
--		blk_unregister_region(sd_major(i), SD_MINORS);
-+	for (i = 0; i < SD_MAJORS; i++)
- 		unregister_blkdev(sd_major(i), "sd");
--	}
+ 	base->dev = 1;
+ 	base->range = ~0 ;
+-	base->probe = base_probe;
+ 	for (i = 0; i < 255; i++)
+ 		bdev_map[i] = base;
  }
- 
- module_init(init_sd);
 -- 
 2.29.2
 
