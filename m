@@ -7,23 +7,24 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C8AEC55ABD
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 07:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2CB5C4742C
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 07:55:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9DC22225E
-	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 07:54:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85A432225E
+	for <linux-block@archiver.kernel.org>; Mon, 16 Nov 2020 07:55:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727941AbgKPHuy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 02:50:54 -0500
-Received: from mx2.suse.de ([195.135.220.15]:52654 "EHLO mx2.suse.de"
+        id S1727983AbgKPHwZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 02:52:25 -0500
+Received: from mx2.suse.de ([195.135.220.15]:53580 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726524AbgKPHuy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 02:50:54 -0500
+        id S1726524AbgKPHwZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Nov 2020 02:52:25 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 883EEAF96;
-        Mon, 16 Nov 2020 07:50:52 +0000 (UTC)
-Subject: Re: [PATCH v4 07/19] lpfc: vmid: Forward declarations for APIs
+        by mx2.suse.de (Postfix) with ESMTP id 9B8CAAC55;
+        Mon, 16 Nov 2020 07:52:23 +0000 (UTC)
+Subject: Re: [PATCH v4 08/19] lpfc: vmid: Add support for vmid in mailbox
+ command
 To:     Muneendra <muneendra.kumar@broadcom.com>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org
@@ -31,14 +32,14 @@ Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
         pbonzini@redhat.com,
         Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 References: <1604895845-2587-1-git-send-email-muneendra.kumar@broadcom.com>
- <1604895845-2587-8-git-send-email-muneendra.kumar@broadcom.com>
+ <1604895845-2587-9-git-send-email-muneendra.kumar@broadcom.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <a88e24ae-159e-4cbc-9142-63c21cd85413@suse.de>
-Date:   Mon, 16 Nov 2020 08:50:51 +0100
+Message-ID: <4a0a6ff2-f2ec-bccf-4c65-f0182fa9f3c9@suse.de>
+Date:   Mon, 16 Nov 2020 08:52:23 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <1604895845-2587-8-git-send-email-muneendra.kumar@broadcom.com>
+In-Reply-To: <1604895845-2587-9-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -49,8 +50,8 @@ X-Mailing-List: linux-block@vger.kernel.org
 On 11/9/20 5:23 AM, Muneendra wrote:
 > From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 > 
-> This patch contains the forward declarations of commonly used APIs which
-> are used outside the scope of the file.
+> This patch adds supporting datastructures for mailbox command which helps
+> in determining if the firmware supports appid or not.
 > 
 > Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
 > Signed-off-by: James Smart <jsmart2021@gmail.com>
@@ -65,30 +66,55 @@ On 11/9/20 5:23 AM, Muneendra wrote:
 > v2:
 > Ported the patch on top of 5.10/scsi-queue
 > ---
->   drivers/scsi/lpfc/lpfc_crtn.h | 11 +++++++++++
->   1 file changed, 11 insertions(+)
+>   drivers/scsi/lpfc/lpfc_hw4.h | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
 > 
-> diff --git a/drivers/scsi/lpfc/lpfc_crtn.h b/drivers/scsi/lpfc/lpfc_crtn.h
-> index 782f6f76f18a..74ca5860ca8e 100644
-> --- a/drivers/scsi/lpfc/lpfc_crtn.h
-> +++ b/drivers/scsi/lpfc/lpfc_crtn.h
-> @@ -600,3 +600,14 @@ extern int lpfc_enable_nvmet_cnt;
->   extern unsigned long long lpfc_enable_nvmet[];
->   extern int lpfc_no_hba_reset_cnt;
->   extern unsigned long lpfc_no_hba_reset[];
-> +
-> +/* vmid interface */
-> +int lpfc_vmid_uvem(struct lpfc_vport *vport, struct lpfc_vmid *vmid, bool ins);
-> +u32 lpfc_vmid_get_cs_ctl(struct lpfc_vport *vport);
-> +int lpfc_vmid_cmd(struct lpfc_vport *vport,
-> +		  int cmdcode, struct lpfc_vmid *vmid);
-> +int lpfc_vmid_hash_fn(char *vmid, int len);
-> +struct lpfc_vmid *lpfc_get_vmid_from_hastable(struct lpfc_vport *vport,
-> +					      u32 hash, u8 *buf);
-> +void lpfc_vmid_vport_cleanup(struct lpfc_vport *vport);
-> +int lpfc_issue_els_qfpa(struct lpfc_vport *vport);
+> diff --git a/drivers/scsi/lpfc/lpfc_hw4.h b/drivers/scsi/lpfc/lpfc_hw4.h
+> index 12e4e76233e6..76c072366a16 100644
+> --- a/drivers/scsi/lpfc/lpfc_hw4.h
+> +++ b/drivers/scsi/lpfc/lpfc_hw4.h
+> @@ -272,6 +272,9 @@ struct lpfc_sli4_flags {
+>   #define lpfc_vfi_rsrc_rdy_MASK		0x00000001
+>   #define lpfc_vfi_rsrc_rdy_WORD		word0
+>   #define LPFC_VFI_RSRC_RDY		1
+> +#define lpfc_ftr_ashdr_SHIFT            4
+> +#define lpfc_ftr_ashdr_MASK             0x00000001
+> +#define lpfc_ftr_ashdr_WORD             word0
+>   };
+>   
+>   struct sli4_bls_rsp {
+> @@ -2943,6 +2946,9 @@ struct lpfc_mbx_request_features {
+>   #define lpfc_mbx_rq_ftr_rq_mrqp_SHIFT		16
+>   #define lpfc_mbx_rq_ftr_rq_mrqp_MASK		0x00000001
+>   #define lpfc_mbx_rq_ftr_rq_mrqp_WORD		word2
+> +#define lpfc_mbx_rq_ftr_rq_ashdr_SHIFT          17
+> +#define lpfc_mbx_rq_ftr_rq_ashdr_MASK           0x00000001
+> +#define lpfc_mbx_rq_ftr_rq_ashdr_WORD           word2
+>   	uint32_t word3;
+>   #define lpfc_mbx_rq_ftr_rsp_iaab_SHIFT		0
+>   #define lpfc_mbx_rq_ftr_rsp_iaab_MASK		0x00000001
+> @@ -2974,6 +2980,9 @@ struct lpfc_mbx_request_features {
+>   #define lpfc_mbx_rq_ftr_rsp_mrqp_SHIFT		16
+>   #define lpfc_mbx_rq_ftr_rsp_mrqp_MASK		0x00000001
+>   #define lpfc_mbx_rq_ftr_rsp_mrqp_WORD		word3
+> +#define lpfc_mbx_rq_ftr_rsp_ashdr_SHIFT         17
+> +#define lpfc_mbx_rq_ftr_rsp_ashdr_MASK          0x00000001
+> +#define lpfc_mbx_rq_ftr_rsp_ashdr_WORD          word3
+>   };
+>   
+>   struct lpfc_mbx_supp_pages {
+> @@ -4383,6 +4392,9 @@ struct wqe_common {
+>   #define wqe_nvme_SHIFT        4
+>   #define wqe_nvme_MASK         0x00000001
+>   #define wqe_nvme_WORD         word10
+> +#define wqe_appid_SHIFT       5
+> +#define wqe_appid_MASK        0x00000001
+> +#define wqe_appid_WORD        word10
+>   #define wqe_oas_SHIFT         6
+>   #define wqe_oas_MASK          0x00000001
+>   #define wqe_oas_WORD          word10
 > 
-uint32_t ...
+Please merge it with patch 10.
 
 Cheers,
 
