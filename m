@@ -2,126 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0EC3C64E75
-	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 07:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A307CC2D0E4
+	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 09:19:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B86B424656
-	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 07:57:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 645E92463C
+	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 09:19:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbgKQH4a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Nov 2020 02:56:30 -0500
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:37963 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725774AbgKQH4a (ORCPT
+        id S1726196AbgKQJTY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Nov 2020 04:19:24 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2110 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbgKQJTY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Nov 2020 02:56:30 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UFgn5fM_1605599785;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UFgn5fM_1605599785)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 17 Nov 2020 15:56:25 +0800
-From:   Jeffle Xu <jefflexu@linux.alibaba.com>
-To:     axboe@kernel.dk, hch@infradead.org, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        joseph.qi@linux.alibaba.com
-Subject: [PATCH v4 0/2] block, iomap: disable iopoll for split bio
-Date:   Tue, 17 Nov 2020 15:56:23 +0800
-Message-Id: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
+        Tue, 17 Nov 2020 04:19:24 -0500
+Received: from fraeml705-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Cb0hs5YlMz67DgV;
+        Tue, 17 Nov 2020 17:17:49 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml705-chm.china.huawei.com (10.206.15.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Tue, 17 Nov 2020 10:19:17 +0100
+Received: from [10.200.64.221] (10.200.64.221) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1913.5; Tue, 17 Nov 2020 09:19:08 +0000
+Subject: Re: [PATCH V4 05/12] sbitmap: export sbitmap_weight
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        <linux-scsi@vger.kernel.org>
+CC:     Omar Sandoval <osandov@fb.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        "Hannes Reinecke" <hare@suse.de>
+References: <20201116090737.50989-1-ming.lei@redhat.com>
+ <20201116090737.50989-6-ming.lei@redhat.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <d996b26f-b614-c8e4-805c-2c0fd48cee9e@huawei.com>
+Date:   Tue, 17 Nov 2020 09:18:54 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201116090737.50989-6-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.200.64.221]
+X-ClientProxiedBy: lhreml727-chm.china.huawei.com (10.201.108.78) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patchset is to fix the potential hang occurred in sync polling.
+On 16/11/2020 09:07, Ming Lei wrote:
+> +
+> +/**
+> + * sbitmap_weight() - Return how many real bits set in a &struct sbitmap.
+> + * @sb: Bitmap to check.
+> + *
+> + * Return: How many real bits set
+> + */
+> +unsigned int sbitmap_weight(const struct sbitmap *sb);
+> +
 
-Please refer the following link for background info and the v1 patch:
-https://patchwork.kernel.org/project/linux-block/patch/20201013084051.27255-1-jefflexu@linux.alibaba.com/
+Hi Ming,
 
-The first patch disables iopoll for split bio in block layer, which is
-suggested by Ming Lei.
+Just a nit on the comment - I think that "real bits set" is vague. How 
+about "set and not cleared bits", "busy bits", "net set bits" or 
+"aggregate bits set"?
 
-
-The second patch disables iopoll when one dio need to be split into
-multiple bios. As for this patch, Ming Lei had ever asked what's the
-expected behaviour of upper layers when simply clear IOCB_HIPRI in
-the direct routine of blkdev fs, iomap-based fs. Currently there are
-two parts concerning IOCB_HIPRI (or io polling). One is the sync
-polling logic embedded in the direct IO routine. In this case, sync
-polling won't be executed any more since IOCB_HIPRI flag has been
-cleared from iocb->ki_flags. Consider the following code snippet:
-
-fs/block_dev.c: __blkdev_direct_IO
-	for (;;) {
-		...
-		if (!(iocb->ki_flags & IOCB_HIPRI) ||
-		    !blk_poll(bdev_get_queue(bdev), qc, true))
-			blk_io_schedule();
-	}
-
-fs/iomap/direct-io.c: __iomap_dio_rw
-	for (;;) {
-		...
-		if (!(iocb->ki_flags & IOCB_HIPRI) ||
-		    !dio->submit.last_queue ||
-		    !blk_poll(dio->submit.last_queue,
-				 dio->submit.cookie, true))
-			blk_io_schedule();
-	}
-
-
-The other part is io_uring. 
-
-fs/io_uring.c: 
-io_iopoll_getevents
-  io_do_iopoll
-    list_for_each_entry_safe(...) {
-      ret = kiocb->ki_filp->f_op->iopoll(kiocb, spin);
-    }
-
-In this case, though the split bios have been enqueued into DEFAULT
-hw queues, io_uring will still poll POLL hw queues. When polling on
-the cookie returned by split bio, blk_poll() will return 0 immediately
-since the hw queue type check added in patch 1. If there's no other
-bio in the POLL hw queues, io_do_iopoll() will loop indefinitely
-until the split bio is completed by interrupt of DEFAULT queue. Indeed
-there may be a pulse of high CPU sys in this time window here, but it
-is no worse than before. After all io_do_iopoll() will still get stuck
-in this loop when there's only one bio (that we are polling on) in POLL
-hw queue, before this patch applied.
-
-The situation described above may be less impossible. As long as there
-are other bios in POLL hw queue, work of io_do_iopoll() is still
-meaningful as it *helps* reap these other bios in POLL hw queue, while
-the split bios are still completed by interrupt of DEFAULT hw queue.
-
-
-changes since v3:
-- patch 1: add hw queue type check in blk_poll(), so that cookie returned
-  by split bio won't get into the real polling routine
-
-changes since v2:
-- tune the line length of patch 1
-- fix the condition checking whether split needed in patch 2
-
-changes since v1:
-- adopt the fix suggested by Ming Lei, to disable iopoll for split bio directly
-- disable iopoll in direct IO routine of blkdev fs and iomap
-
-Jeffle Xu (2):
-  block: disable iopoll for split bio
-  block,iomap: disable iopoll when split needed
-
- block/blk-merge.c    |  7 +++++++
- block/blk-mq.c       |  6 ++++--
- fs/block_dev.c       |  9 +++++++++
- fs/iomap/direct-io.c | 10 ++++++++++
- 4 files changed, 30 insertions(+), 2 deletions(-)
-
--- 
-2.27.0
+Thanks,
+John
 
