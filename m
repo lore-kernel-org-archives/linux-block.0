@@ -2,116 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA97C56202
-	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 17:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A543C63697
+	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 17:37:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C4A12465E
-	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 17:23:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BA98246A7
+	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 17:37:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TQtpJOnZ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hxvbcotp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727746AbgKQRX3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Nov 2020 12:23:29 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:46676 "EHLO
+        id S1728573AbgKQRhc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Nov 2020 12:37:32 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:59342 "EHLO
         userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726547AbgKQRX2 (ORCPT
+        with ESMTP id S1727838AbgKQRhb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Nov 2020 12:23:28 -0500
+        Tue, 17 Nov 2020 12:37:31 -0500
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AHHJeh4023927;
-        Tue, 17 Nov 2020 17:23:02 GMT
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AHHXnYG056455;
+        Tue, 17 Nov 2020 17:37:22 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
  : subject : message-id : references : mime-version : content-type :
  in-reply-to; s=corp-2020-01-29;
- bh=lCI0j81S3i0woS5Vx28EWN/Xr3iRPfZ2DQ1EVZE5Cgs=;
- b=TQtpJOnZ048mOORXEp80yzCfzAhgyaSQ254isK3CPo681k6c4mTVs3Eu5Q5Nt/CqLKBn
- 0m8xjVNxqgQtuGDmGCP50G4ciqsK/k+HEsAkHQubbX6i6Msma/zD+9XHmV00r+97YSRW
- mQco7AJenksEjDQuToVpSpu/drlfqQtBi4b+8VOHwl1KQwxHys1ZCf53qZYZw9BKVnNS
- g77NlDdwuPIKLaSl+tX3R5AmyAseaz4DQ7hT+J/0PFQQhlTvwfb1SBIZavOzDTBj39mb
- AIcwTU61AYY3FD9KelpEu5VIA3YQV4ysq8TLhF/Nk/Q9pfTPAmG2i0vlvFp4691H0dZD 4A== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 34t7vn3rpc-1
+ bh=IY3/6KzdYHanN7Re6CdruxnqdXw5CGdA0oxwdbfzXeM=;
+ b=hxvbcotppMQ4KlaOkq9sy2shRFwCJr22LhWeLCo5Lt1SybqnlK3ma8rQwTKv6hBUm1a3
+ ZfPMy7VqfNmCSvL+xZeuFgFgTBjYpEcBNkeOtttbpIJBrwXDsa1RSk3tZRQjxPZNmAM7
+ twzofZJdOD6bCpBofoKjJ41HHtgsC8j4boNqSBl8dH0c8Jl4KZQ49OOmev+Mm2k3lVld
+ IF9SjD/tpR8zQQtTrwdW2RK8UCciWab3FH5FjuV2fYlK5f8M6P/AdeMl7zZj2u2zr7Ar
+ IqjWA34Ttw0v2/pGzYhXpp1EdFyNBoVY/u20QCVDmWDyOEL2/3vbEXeOEeDzkxbtS3rD SQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 34t7vn3ueb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 17 Nov 2020 17:23:01 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AHHJTfO091668;
-        Tue, 17 Nov 2020 17:21:01 GMT
+        Tue, 17 Nov 2020 17:37:22 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AHHZHAI016355;
+        Tue, 17 Nov 2020 17:37:21 GMT
 Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 34ts0r6huu-1
+        by aserp3020.oracle.com with ESMTP id 34umcygcuq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Nov 2020 17:21:01 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0AHHKxmJ011967;
-        Tue, 17 Nov 2020 17:20:59 GMT
+        Tue, 17 Nov 2020 17:37:21 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0AHHbKuG022883;
+        Tue, 17 Nov 2020 17:37:20 GMT
 Received: from localhost (/67.169.218.210)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 17 Nov 2020 09:20:58 -0800
-Date:   Tue, 17 Nov 2020 09:20:56 -0800
+        with ESMTP ; Tue, 17 Nov 2020 09:37:19 -0800
+Date:   Tue, 17 Nov 2020 09:37:18 -0800
 From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Satya Tangirala <satyat@google.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>, Chao Yu <chao@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
-Subject: Re: [PATCH v7 0/8] add support for direct I/O with fscrypt using
- blk-crypto
-Message-ID: <20201117172056.GW9695@magnolia>
-References: <20201117140708.1068688-1-satyat@google.com>
- <20201117171526.GD445084@mit.edu>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     axboe@kernel.dk, hch@infradead.org, ming.lei@redhat.com,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH v4 2/2] block,iomap: disable iopoll when split needed
+Message-ID: <20201117173718.GB9688@magnolia>
+References: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
+ <20201117075625.46118-3-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201117171526.GD445084@mit.edu>
+In-Reply-To: <20201117075625.46118-3-jefflexu@linux.alibaba.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9808 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- bulkscore=0 suspectscore=1 spamscore=0 malwarescore=0 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011170125
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 mlxscore=0 phishscore=0
+ spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011170127
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9808 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=2
  malwarescore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0 spamscore=0
  adultscore=0 mlxscore=0 priorityscore=1501 phishscore=0 clxscore=1011
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011170125
+ definitions=main-2011170127
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 17, 2020 at 12:15:26PM -0500, Theodore Y. Ts'o wrote:
-> What is the expected use case for Direct I/O using fscrypt?  This
-> isn't a problem which is unique to fscrypt, but one of the really
-> unfortunate aspects of the DIO interface is the silent fallback to
-> buffered I/O.  We've lived with this because DIO goes back decades,
-> and the original use case was to keep enterprise databases happy, and
-> the rules around what is necessary for DIO to work was relatively well
-> understood.
-> 
-> But with fscrypt, there's going to be some additional requirements
-> (e.g., using inline crypto) required or else DIO silently fall back to
-> buffered I/O for encrypted files.  Depending on the intended use case
-> of DIO with fscrypt, this caveat might or might not be unfortunately
-> surprising for applications.
-> 
-> I wonder if we should have some kind of interface so we can more
-> explicitly allow applications to query exactly what the requirements
-> might be for a particular file vis-a-vis Direct I/O.  What are the
-> memory alignment requirements, what are the file offset alignment
-> requirements, what are the write size requirements, for a particular
-> file.
+On Tue, Nov 17, 2020 at 03:56:25PM +0800, Jeffle Xu wrote:
+> Both blkdev fs and iomap-based fs (ext4, xfs, etc.) currently support
 
-In Ye Olde days there was XFS_IOC_DIOINFO to communicate all that (xfs
-hardcodes 512b file offset alignment), but in this modern era perhaps
-it's time to shovel that into statx...
+$ ./scripts/get_maintainer.pl fs/iomap/direct-io.c
+Christoph Hellwig <hch@infradead.org> (supporter:IOMAP FILESYSTEM LIBRARY)
+"Darrick J. Wong" <darrick.wong@oracle.com> (supporter:IOMAP FILESYSTEM LIBRARY)
+linux-xfs@vger.kernel.org (supporter:IOMAP FILESYSTEM LIBRARY)
+linux-fsdevel@vger.kernel.org (supporter:IOMAP FILESYSTEM LIBRARY)
+linux-kernel@vger.kernel.org (open list)
+
+Please cc both iomap maintainers and the appropriate lists when you
+propose changes to fs/iomap/.  At a bare minimum cc linux-fsdevel for
+changes under fs/.
+
+> sync iopoll. One single bio can contain at most BIO_MAX_PAGES, i.e. 256
+> bio_vec. If the input iov_iter contains more than 256 segments, then
+> one dio will be split into multiple bios, which may cause potential
+> deadlock for sync iopoll.
+> 
+> When it comes to sync iopoll, the bio is submitted without REQ_NOWAIT
+> flag set and the process may hang in blk_mq_get_tag() if the dio needs
+> to be split into multiple bios and thus can rapidly exhausts the queue
+> depth. The process has to wait for the completion of the previously
+> allocated requests, which should be reaped by the following sync
+> polling, and thus causing a potential deadlock.
+> 
+> In fact there's a subtle difference of handling of HIPRI IO between
+> blkdev fs and iomap-based fs, when dio need to be split into multiple
+> bios. blkdev fs will set REQ_HIPRI for only the last split bio, leaving
+> the previous bios queued into normal hardware queues, and not causing
+> the trouble described above. iomap-based fs will set REQ_HIPRI for all
+> split bios, and thus may cause the potential deadlock described above.
+> 
+> Noted that though the analysis described above, currently blkdev fs and
+> iomap-based fs won't trigger this potential deadlock. Because only
+> preadv2(2)/pwritev2(2) are capable of *sync* polling as only these two
+> can set RWF_NOWAIT. Currently the maximum number of iovecs of one single
+> preadv2(2)/pwritev2(2) call is UIO_MAXIOV, i.e. 1024, while the minimum
+> queue depth is BLKDEV_MIN_RQ i.e. 4. That means one
+> preadv2(2)/pwritev2(2) call can submit at most 4 bios, which will fill
+> up the queue depth *exactly* and thus there's no deadlock in this case.
+> 
+> However this constraint can be fragile. Disable iopoll when one dio need
+> to be split into multiple bios.Though blkdev fs may not suffer this issue,
+> still it may not make much sense to iopoll for big IO, since iopoll is
+> initially for small size, latency sensitive IO.
+> 
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> ---
+>  fs/block_dev.c       |  9 +++++++++
+>  fs/iomap/direct-io.c | 10 ++++++++++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 9e84b1928b94..ed3f46e8fa91 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -436,6 +436,15 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+>  			break;
+>  		}
+>  
+> +		/*
+> +		 * The current dio needs to be split into multiple bios here.
+> +		 * iopoll for split bio will cause subtle trouble such as
+> +		 * hang when doing sync polling, while iopoll is initially
+> +		 * for small size, latency sensitive IO. Thus disable iopoll
+> +		 * if split needed.
+> +		 */
+> +		iocb->ki_flags &= ~IOCB_HIPRI;
+> +
+>  		if (!dio->multi_bio) {
+>  			/*
+>  			 * AIO needs an extra reference to ensure the dio
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 933f234d5bec..396ac0f91a43 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -309,6 +309,16 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  		copied += n;
+>  
+>  		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
+> +		/*
+> +		 * The current dio needs to be split into multiple bios here.
+> +		 * iopoll for split bio will cause subtle trouble such as
+> +		 * hang when doing sync polling, while iopoll is initially
+> +		 * for small size, latency sensitive IO. Thus disable iopoll
+> +		 * if split needed.
+> +		 */
+> +		if (nr_pages)
+> +			dio->iocb->ki_flags &= ~IOCB_HIPRI;
+
+Hmm, I was about to ask what happens if the user's HIPRI request gets
+downgraded from polling mode, but the manpage doesn't say anything about
+the kernel having to return an error if it can't use polling mode, so I
+guess downgrading is...fine?
+
+Well, maybe it isn't, since this also results in a downgrade when I send
+a 1MB polled pwrite to my otherwise idle MegaSSD that has thousands of
+queue depth.  I think?  <shrug> I'm not the one who uses polling mode,
+fwiw.
 
 --D
 
+> +
+>  		iomap_dio_submit_bio(dio, iomap, bio, pos);
+>  		pos += n;
+>  	} while (nr_pages);
+> -- 
+> 2.27.0
 > 
-> 						- Ted
