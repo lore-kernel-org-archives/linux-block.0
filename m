@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C01DC63777
-	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 02:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EED69C388F9
+	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 02:18:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1F1F246A4
-	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 02:11:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B412F2469D
+	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 02:18:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuDa/Mys"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IqDX4D5e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727362AbgKQCKu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Nov 2020 21:10:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46283 "EHLO
+        id S1727246AbgKQCSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Nov 2020 21:18:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55392 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725730AbgKQCKu (ORCPT
+        by vger.kernel.org with ESMTP id S1727070AbgKQCSb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Nov 2020 21:10:50 -0500
+        Mon, 16 Nov 2020 21:18:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605579049;
+        s=mimecast20190719; t=1605579510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=w2Rh8FhHpIBZ/culaPBG6pZ40l7DsJWChqgoQcYXU0E=;
-        b=NuDa/MysTOhhP56Ilp8wgCtjN447lYahjiJfKLTyU+p98k+DEAHhLdlXBqbSkmSAeWZdXh
-        Dz1mtiRuhFGc5nfqxaUaldXxQBnGY/jkfMATrXx3/k9dhpUt5pr7Uc9rTonTwZnfPlnkOk
-        yiYxyLQp++ZfXeULszp/YJXrp30VWXc=
+        bh=AKKtHa1h1PzW7noxlsAP8m0qc1sSSRJ+Gpxn2ZnlPMA=;
+        b=IqDX4D5euaB78Hw+7gXg6RwvFvCrBFFgBM3JVBKyFe+pNLM6YI0YLKL5HqX1xkQxHexR7S
+        xVpy129+7I7QFtyQPkMLeRDs6Sk3VSw+dn1Ws06qFPYsEF5bWQPIy1KkIOjSoTUvpCFqJR
+        fGSHGYGcx5/BoVh2yIQ7DGR2ZUnaIns=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-7yhB8bSVMP6KLY_F9f5FCg-1; Mon, 16 Nov 2020 21:10:45 -0500
-X-MC-Unique: 7yhB8bSVMP6KLY_F9f5FCg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-586-Et3En6DBOVaeMmozytIcaw-1; Mon, 16 Nov 2020 21:18:27 -0500
+X-MC-Unique: Et3En6DBOVaeMmozytIcaw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1DD21084C88;
-        Tue, 17 Nov 2020 02:10:43 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 930AA80B736;
+        Tue, 17 Nov 2020 02:18:25 +0000 (UTC)
 Received: from T590 (ovpn-12-215.pek2.redhat.com [10.72.12.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 281196EF40;
-        Tue, 17 Nov 2020 02:10:34 +0000 (UTC)
-Date:   Tue, 17 Nov 2020 10:10:30 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DE09519D6C;
+        Tue, 17 Nov 2020 02:18:17 +0000 (UTC)
+Date:   Tue, 17 Nov 2020 10:18:13 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Hannes Reinecke <hare@suse.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -52,94 +52,75 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Kashyap Desai <kashyap.desai@broadcom.com>,
         Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
         "Ewan D . Milne" <emilne@redhat.com>
-Subject: Re: [PATCH V4 05/12] sbitmap: export sbitmap_weight
-Message-ID: <20201117021030.GC56247@T590>
+Subject: Re: [PATCH V4 11/12] scsi: make sure sdev->queue_depth is <=
+ max(shost->can_queue, 1024)
+Message-ID: <20201117021813.GD56247@T590>
 References: <20201116090737.50989-1-ming.lei@redhat.com>
- <20201116090737.50989-6-ming.lei@redhat.com>
- <d05cb6bf-35e6-d939-30a5-6ef3a9c8a679@suse.de>
+ <20201116090737.50989-12-ming.lei@redhat.com>
+ <4479fc11-5c4f-e575-a253-e08c841c5cb2@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d05cb6bf-35e6-d939-30a5-6ef3a9c8a679@suse.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <4479fc11-5c4f-e575-a253-e08c841c5cb2@suse.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 16, 2020 at 10:38:58AM +0100, Hannes Reinecke wrote:
+On Mon, Nov 16, 2020 at 10:44:54AM +0100, Hannes Reinecke wrote:
 > On 11/16/20 10:07 AM, Ming Lei wrote:
-> > SCSI's .device_busy will be converted to sbitmap, and sbitmap_weight
-> > is needed, so export the helper.
+> > Limit scsi device's queue depth is less than max(host->can_queue, 1024)
+> > in scsi_change_queue_depth(), and 1024 is big enough for saturating
+> > current fast SCSI LUN(SSD, or raid volume on multiple SSDs).
+> > 
+> > We need this patch for replacing sdev->device_busy with sbitmap which
+> > has to be pre-allocated with reasonable max depth.
 > > 
 > > Cc: Omar Sandoval <osandov@fb.com>
 > > Cc: Kashyap Desai <kashyap.desai@broadcom.com>
 > > Cc: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
 > > Cc: Ewan D. Milne <emilne@redhat.com>
-> > Reviewed-by: Hannes Reinecke <hare@suse.de>
 > > Tested-by: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
 > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > > ---
-> >   include/linux/sbitmap.h |  9 +++++++++
-> >   lib/sbitmap.c           | 11 ++++++-----
-> >   2 files changed, 15 insertions(+), 5 deletions(-)
+> >   drivers/scsi/scsi.c | 11 +++++++++++
+> >   1 file changed, 11 insertions(+)
 > > 
-> > diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-> > index 103b41c03311..34343ce3ef6c 100644
-> > --- a/include/linux/sbitmap.h
-> > +++ b/include/linux/sbitmap.h
-> > @@ -346,6 +346,15 @@ static inline int sbitmap_test_bit(struct sbitmap *sb, unsigned int bitnr)
-> >    */
-> >   void sbitmap_show(struct sbitmap *sb, struct seq_file *m);
+> > diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+> > index 24619c3bebd5..a28d48c850cf 100644
+> > --- a/drivers/scsi/scsi.c
+> > +++ b/drivers/scsi/scsi.c
+> > @@ -214,6 +214,15 @@ void scsi_finish_command(struct scsi_cmnd *cmd)
+> >   	scsi_io_completion(cmd, good_bytes);
+> >   }
 > > +
-> > +/**
-> > + * sbitmap_weight() - Return how many real bits set in a &struct sbitmap.
-> > + * @sb: Bitmap to check.
-> > + *
-> > + * Return: How many real bits set
+> > +/*
+> > + * 1024 is big enough for saturating the fast scsi LUN now
 > > + */
-> > +unsigned int sbitmap_weight(const struct sbitmap *sb);
+> > +static int scsi_device_max_queue_depth(struct scsi_device *sdev)
+> > +{
+> > +	return max_t(int, sdev->host->can_queue, 1024);
+> > +}
 > > +
-> >   /**
-> >    * sbitmap_bitmap_show() - Write a hex dump of a &struct sbitmap to a &struct
-> >    * seq_file.
-> > diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> > index dcd6a89b4d2f..fb1d3c2f70a2 100644
-> > --- a/lib/sbitmap.c
-> > +++ b/lib/sbitmap.c
-> > @@ -342,20 +342,21 @@ static unsigned int __sbitmap_weight(const struct sbitmap *sb, bool set)
-> >   	return weight;
-> >   }
-> > -static unsigned int sbitmap_weight(const struct sbitmap *sb)
-> > +static unsigned int sbitmap_cleared(const struct sbitmap *sb)
-> >   {
-> > -	return __sbitmap_weight(sb, true);
-> > +	return __sbitmap_weight(sb, false);
-> >   }
-> > -static unsigned int sbitmap_cleared(const struct sbitmap *sb)
-> > +unsigned int sbitmap_weight(const struct sbitmap *sb)
-> >   {
-> > -	return __sbitmap_weight(sb, false);
-> > +	return __sbitmap_weight(sb, true) - sbitmap_cleared(sb);
-> >   }
-> > +EXPORT_SYMBOL_GPL(sbitmap_weight);
-> That is extremely confusing. Why do you change the meaning of
-> 'sbitmap_weight' from __sbitmap_weight(sb, true) to
-> __sbitmap_weight(sb, true) - __sbitmap_weight(sb, false)?
+> 
+> Shouldn't this rather be initialized with scsi_host->can_queue?
 
-Because the only user of sbitmap_weight() just uses the following way:
+Multiple queues may be used for one single LUN, so in theory we should
+return max queue depth as host->can_queue * host->nr_hw_queues, but
+this number can be too big for the sbitmap's pre-allocation.
 
-	sbitmap_weight(sb) - sbitmap_cleared(sb)
+That is why this patch introduces one reasonable limit on this value
+of max(sdev->host->can_queue, 1024). Suppose single SSD can be saturated
+by ~128 requests, we still can saturate one LUN with 8 SSDs behind if
+the hw queue depth is set as too low.
 
-Frankly, I think sbitmap_weight(sb) should return real busy bits.
+> These 'should be enough' settings inevitable turn out to be not enough in
+> the long run ...
 
-> Does this mean that the original definition was wrong?
-> Or does this mean that this patch implies a different meaning of
-> 'sbitmap_weight'?
-
-Yeah, this patch changes meaning of sbitmap_weight(), now it is
-exported, and we should make it more accurate/readable from user view.
+I have provided the theory behind this idea, not just simple 'should be
+enough'.
 
 
-Thanks, 
+Thanks,
 Ming
 
