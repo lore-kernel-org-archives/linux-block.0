@@ -2,192 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A543C63697
-	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 17:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEEBCC2D0E4
+	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 17:51:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1BA98246A7
-	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 17:37:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hxvbcotp"
+	by mail.kernel.org (Postfix) with ESMTP id 62153217A0
+	for <linux-block@archiver.kernel.org>; Tue, 17 Nov 2020 17:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728573AbgKQRhc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Nov 2020 12:37:32 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:59342 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727838AbgKQRhb (ORCPT
+        id S1728984AbgKQRvd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Nov 2020 12:51:33 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:53551 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728187AbgKQRvd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Nov 2020 12:37:31 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AHHXnYG056455;
-        Tue, 17 Nov 2020 17:37:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=IY3/6KzdYHanN7Re6CdruxnqdXw5CGdA0oxwdbfzXeM=;
- b=hxvbcotppMQ4KlaOkq9sy2shRFwCJr22LhWeLCo5Lt1SybqnlK3ma8rQwTKv6hBUm1a3
- ZfPMy7VqfNmCSvL+xZeuFgFgTBjYpEcBNkeOtttbpIJBrwXDsa1RSk3tZRQjxPZNmAM7
- twzofZJdOD6bCpBofoKjJ41HHtgsC8j4boNqSBl8dH0c8Jl4KZQ49OOmev+Mm2k3lVld
- IF9SjD/tpR8zQQtTrwdW2RK8UCciWab3FH5FjuV2fYlK5f8M6P/AdeMl7zZj2u2zr7Ar
- IqjWA34Ttw0v2/pGzYhXpp1EdFyNBoVY/u20QCVDmWDyOEL2/3vbEXeOEeDzkxbtS3rD SQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 34t7vn3ueb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 17 Nov 2020 17:37:22 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AHHZHAI016355;
-        Tue, 17 Nov 2020 17:37:21 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 34umcygcuq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Nov 2020 17:37:21 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0AHHbKuG022883;
-        Tue, 17 Nov 2020 17:37:20 GMT
-Received: from localhost (/67.169.218.210)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 17 Nov 2020 09:37:19 -0800
-Date:   Tue, 17 Nov 2020 09:37:18 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc:     axboe@kernel.dk, hch@infradead.org, ming.lei@redhat.com,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        joseph.qi@linux.alibaba.com
-Subject: Re: [PATCH v4 2/2] block,iomap: disable iopoll when split needed
-Message-ID: <20201117173718.GB9688@magnolia>
-References: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
- <20201117075625.46118-3-jefflexu@linux.alibaba.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201117075625.46118-3-jefflexu@linux.alibaba.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9808 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 mlxscore=0 phishscore=0
- spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011170127
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9808 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=2
- malwarescore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0 spamscore=0
- adultscore=0 mlxscore=0 priorityscore=1501 phishscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011170127
+        Tue, 17 Nov 2020 12:51:33 -0500
+Received: from orion.localdomain ([95.118.38.12]) by mrelayeu.kundenserver.de
+ (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MpTpc-1jtxc701JU-00prgx; Tue, 17 Nov 2020 18:51:31 +0100
+From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
+To:     linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: [PATCH] drivers: block: Kconfig: indention cleanup
+Date:   Tue, 17 Nov 2020 18:51:30 +0100
+Message-Id: <20201117175130.6798-1-info@metux.net>
+X-Mailer: git-send-email 2.11.0
+X-Provags-ID: V03:K1:mZ2RaeE0WlohBHryGDQHPN0hjye2+k7L9HbGwkjDVzD7RolnPtI
+ jtEnPZRj6rOwdSuNCilqyGKBkAqvw2dRyGvzYeiivmShOOQhLiz1w/tvDI3Pr/aLEOj4a1u
+ ti5jibkHazcO9FhP8rU31rFBHtGEHmDcukwgQrWtVQ6+ijr2kWmG3A9VEXpXkVL63FR1+2L
+ rlBU2g8ycCIBSszcPAfiQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:t4x1dtKWYm4=:YPvqAJfQSN+iBNpvwqr014
+ kk8c0ktL4GWrPUn02mbo0sPR+jd0SxwNciRJCadsXByONgwemQgtR6TnGEWo/7xNvcmcaqBEV
+ BlcnODqHFc0Q0gAQCDFzV/SD75pVWRXMnJc4S8uFOslighCc5YQujJhX17ACs3uAaDxy9FAFB
+ wtxuPLUqW0fi6VTAtNoXFqw0WkAtFybczu9i/U3qpeZb/nx2+jmaOegzxvf3XsWitG4sVQKM5
+ +C2Y96qe6cBeGmi7P8zE4t25B0L117Z7iBh0JX6AgrS1omEu+ajQ3NTRBzBTqVDMxYGTEA7bA
+ qUAeE6fazLMLWA+6W4T2qMlym1ODqp1wSTsujsvQMS9PgMR7u8i/+ine89x9h5UTf2UosX5Aj
+ W3E1NZaou5kjldvXofLGSyzXtdGZXyP27o1zKX/BU8Q5vrqFhBZtPQOGtr2Nx
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 17, 2020 at 03:56:25PM +0800, Jeffle Xu wrote:
-> Both blkdev fs and iomap-based fs (ext4, xfs, etc.) currently support
+Making the indentions in Kconfig file a bit more consistent.
 
-$ ./scripts/get_maintainer.pl fs/iomap/direct-io.c
-Christoph Hellwig <hch@infradead.org> (supporter:IOMAP FILESYSTEM LIBRARY)
-"Darrick J. Wong" <darrick.wong@oracle.com> (supporter:IOMAP FILESYSTEM LIBRARY)
-linux-xfs@vger.kernel.org (supporter:IOMAP FILESYSTEM LIBRARY)
-linux-fsdevel@vger.kernel.org (supporter:IOMAP FILESYSTEM LIBRARY)
-linux-kernel@vger.kernel.org (open list)
+Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
+---
+ drivers/block/Kconfig | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-Please cc both iomap maintainers and the appropriate lists when you
-propose changes to fs/iomap/.  At a bare minimum cc linux-fsdevel for
-changes under fs/.
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index ecceaaa1a66f..48fee9be3cf8 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -142,10 +142,10 @@ config BLK_DEV_UBD
+ 	bool "Virtual block device"
+ 	depends on UML
+ 	help
+-          The User-Mode Linux port includes a driver called UBD which will let
+-          you access arbitrary files on the host computer as block devices.
+-          Unless you know that you do not need such virtual block devices say
+-          Y here.
++	  The User-Mode Linux port includes a driver called UBD which will let
++	  you access arbitrary files on the host computer as block devices.
++	  Unless you know that you do not need such virtual block devices say
++	  Y here.
+ 
+ config BLK_DEV_UBD_SYNC
+ 	bool "Always do synchronous disk IO for UBD"
+@@ -156,16 +156,16 @@ config BLK_DEV_UBD_SYNC
+ 	  Linux 'Virtual Machine' uses a journalling filesystem and the host
+ 	  computer crashes.
+ 
+-          Synchronous operation (i.e. always writing data to the host's disk
+-          immediately) is configurable on a per-UBD basis by using a special
+-          kernel command line option.  Alternatively, you can say Y here to
+-          turn on synchronous operation by default for all block devices.
++	  Synchronous operation (i.e. always writing data to the host's disk
++	  immediately) is configurable on a per-UBD basis by using a special
++	  kernel command line option.  Alternatively, you can say Y here to
++	  turn on synchronous operation by default for all block devices.
+ 
+-          If you're running a journalling file system (like reiserfs, for
+-          example) in your virtual machine, you will want to say Y here.  If
+-          you care for the safety of the data in your virtual machine, Y is a
+-          wise choice too.  In all other cases (for example, if you're just
+-          playing around with User-Mode Linux) you can choose N.
++	  If you're running a journalling file system (like reiserfs, for
++	  example) in your virtual machine, you will want to say Y here.  If
++	  you care for the safety of the data in your virtual machine, Y is a
++	  wise choice too.  In all other cases (for example, if you're just
++	  playing around with User-Mode Linux) you can choose N.
+ 
+ config BLK_DEV_COW_COMMON
+ 	bool
+@@ -430,7 +430,7 @@ config VIRTIO_BLK
+ 	depends on VIRTIO
+ 	help
+ 	  This is the virtual block driver for virtio.  It can be used with
+-          QEMU based VMMs (like KVM or Xen).  Say Y or M.
++	  QEMU based VMMs (like KVM or Xen).  Say Y or M.
+ 
+ config BLK_DEV_RBD
+ 	tristate "Rados block device (RBD)"
+-- 
+2.11.0
 
-> sync iopoll. One single bio can contain at most BIO_MAX_PAGES, i.e. 256
-> bio_vec. If the input iov_iter contains more than 256 segments, then
-> one dio will be split into multiple bios, which may cause potential
-> deadlock for sync iopoll.
-> 
-> When it comes to sync iopoll, the bio is submitted without REQ_NOWAIT
-> flag set and the process may hang in blk_mq_get_tag() if the dio needs
-> to be split into multiple bios and thus can rapidly exhausts the queue
-> depth. The process has to wait for the completion of the previously
-> allocated requests, which should be reaped by the following sync
-> polling, and thus causing a potential deadlock.
-> 
-> In fact there's a subtle difference of handling of HIPRI IO between
-> blkdev fs and iomap-based fs, when dio need to be split into multiple
-> bios. blkdev fs will set REQ_HIPRI for only the last split bio, leaving
-> the previous bios queued into normal hardware queues, and not causing
-> the trouble described above. iomap-based fs will set REQ_HIPRI for all
-> split bios, and thus may cause the potential deadlock described above.
-> 
-> Noted that though the analysis described above, currently blkdev fs and
-> iomap-based fs won't trigger this potential deadlock. Because only
-> preadv2(2)/pwritev2(2) are capable of *sync* polling as only these two
-> can set RWF_NOWAIT. Currently the maximum number of iovecs of one single
-> preadv2(2)/pwritev2(2) call is UIO_MAXIOV, i.e. 1024, while the minimum
-> queue depth is BLKDEV_MIN_RQ i.e. 4. That means one
-> preadv2(2)/pwritev2(2) call can submit at most 4 bios, which will fill
-> up the queue depth *exactly* and thus there's no deadlock in this case.
-> 
-> However this constraint can be fragile. Disable iopoll when one dio need
-> to be split into multiple bios.Though blkdev fs may not suffer this issue,
-> still it may not make much sense to iopoll for big IO, since iopoll is
-> initially for small size, latency sensitive IO.
-> 
-> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-> ---
->  fs/block_dev.c       |  9 +++++++++
->  fs/iomap/direct-io.c | 10 ++++++++++
->  2 files changed, 19 insertions(+)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 9e84b1928b94..ed3f46e8fa91 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -436,6 +436,15 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
->  			break;
->  		}
->  
-> +		/*
-> +		 * The current dio needs to be split into multiple bios here.
-> +		 * iopoll for split bio will cause subtle trouble such as
-> +		 * hang when doing sync polling, while iopoll is initially
-> +		 * for small size, latency sensitive IO. Thus disable iopoll
-> +		 * if split needed.
-> +		 */
-> +		iocb->ki_flags &= ~IOCB_HIPRI;
-> +
->  		if (!dio->multi_bio) {
->  			/*
->  			 * AIO needs an extra reference to ensure the dio
-> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> index 933f234d5bec..396ac0f91a43 100644
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -309,6 +309,16 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
->  		copied += n;
->  
->  		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
-> +		/*
-> +		 * The current dio needs to be split into multiple bios here.
-> +		 * iopoll for split bio will cause subtle trouble such as
-> +		 * hang when doing sync polling, while iopoll is initially
-> +		 * for small size, latency sensitive IO. Thus disable iopoll
-> +		 * if split needed.
-> +		 */
-> +		if (nr_pages)
-> +			dio->iocb->ki_flags &= ~IOCB_HIPRI;
-
-Hmm, I was about to ask what happens if the user's HIPRI request gets
-downgraded from polling mode, but the manpage doesn't say anything about
-the kernel having to return an error if it can't use polling mode, so I
-guess downgrading is...fine?
-
-Well, maybe it isn't, since this also results in a downgrade when I send
-a 1MB polled pwrite to my otherwise idle MegaSSD that has thousands of
-queue depth.  I think?  <shrug> I'm not the one who uses polling mode,
-fwiw.
-
---D
-
-> +
->  		iomap_dio_submit_bio(dio, iomap, bio, pos);
->  		pos += n;
->  	} while (nr_pages);
-> -- 
-> 2.27.0
-> 
