@@ -2,118 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39F5EC56202
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E57C56202
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:40:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFEA320855
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:32:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D63F21D7E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:40:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fFTiyRf+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZJyGK2XP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725823AbgKRJcS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Nov 2020 04:32:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50370 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725772AbgKRJcR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Nov 2020 04:32:17 -0500
-Received: from localhost (unknown [89.205.136.214])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 651A320855;
-        Wed, 18 Nov 2020 09:32:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1605691936;
-        bh=z9AARqxEifx27ZSfSqyQtp5/QTEI/AENwIGCm/wc71c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fFTiyRf+lNKL9ST4txcSeaDrCIqy8sGZqtdcsNAnsGly1+5GYCQkd5b0dJtsVNXW7
-         Ty+UOKz4POaIjvZvW72SkGo52lChY2pkhIjug9dEhWmDqtz52fKjvNwDSvPQKw5/EX
-         XjQbNqUIRf7iTd7GfCLBQpWa8uhdec/9xDR/QuiU=
-Date:   Wed, 18 Nov 2020 10:32:12 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Jan Beulich <jbeulich@suse.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: merge struct block_device and struct hd_struct
-Message-ID: <X7TqHNotTX6W/bmT@kroah.com>
-References: <20201118084800.2339180-1-hch@lst.de>
- <22ca5396-0253-f286-9eab-d417b2e0b3ad@suse.com>
- <20201118085804.GA20384@lst.de>
- <1ded2079-f1be-6d5d-01df-65754447df78@suse.com>
- <X7Tky/6dDN8+DrU7@kroah.com>
- <61044f85-cd41-87b5-3f41-36e3dffb6f2a@suse.com>
+        id S1726821AbgKRJkD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Nov 2020 04:40:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50818 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726759AbgKRJkD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Nov 2020 04:40:03 -0500
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AD62C061A4D
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 01:40:03 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id o25so1528885oie.5
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 01:40:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=xR6MYM6db8iiJw4qghcXmtpwJp4tqfTifMeaJbTfgLw=;
+        b=ZJyGK2XPLy1SShGaOhqrgCoRRV8vEyTPAU9Gbl+3jGQBK10b28E3f02uPS02QPXC8+
+         ++qsowwdObzVkQ2IHaZYfCr2jZfRYkszpmj1Z8VGsv1q4mHZckA20iyDQlQ51n9JhSzS
+         UliO7rzHSEUDWXr4RRLT7AB/uNfjYRUM3GXXo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=xR6MYM6db8iiJw4qghcXmtpwJp4tqfTifMeaJbTfgLw=;
+        b=sYAMLF8DfNY10CV92C4mkT65D3AYahMmgGzZ9KZwSyTVBBh0cq5kTHUQTLPpfIqWwW
+         QIFonEEzp+PZfFYwll+t4/rSYrEbfWrvcZU0527eEbKcPD9Pvu+6ZqYooZV+l6blabF1
+         rCxoiN+wH2wGVatFsX+5hPcG3/Hk3TLM79SOOOn0WLMTOf0y2oBV/+z7IJ3nF2NFst98
+         bsyFtD3h+naYgoiU1Kuo47ER1VEpZBKXvQdXkxmV053jz3a0pj7QwR5wNZJplvX9MHtU
+         3oV2et72CgWJx5Pm7YCzJO8eRy1eokSkbu8+AJeqqVzipJMZS5PcsHSByG8VxsNahTxv
+         suGA==
+X-Gm-Message-State: AOAM530JCsfQ8tm+4L2ujiwmAuaY3SGWd10CHsbh3Z6BsrKMA8Dhp8Lg
+        pEM4mL43rXZsfUF6F7KRBnKVAaphFCgtu9HkApy0lA==
+X-Google-Smtp-Source: ABdhPJybis0xhX3u3vase6uS/6eJw6v+KZwgfuY21ls3NKdAYzhNX347mZMYto+fwe8q+cixdJZ2wXjSIx6QomwlWLU=
+X-Received: by 2002:aca:c70b:: with SMTP id x11mr2162597oif.104.1605692401490;
+ Wed, 18 Nov 2020 01:40:01 -0800 (PST)
+From:   Muneendra Kumar M <muneendra.kumar@broadcom.com>
+References: <1604895845-2587-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1604895845-2587-3-git-send-email-muneendra.kumar@broadcom.com> <1a779905-e1d2-1c3b-1825-7a406e9b5ed6@suse.de>
+In-Reply-To: <1a779905-e1d2-1c3b-1825-7a406e9b5ed6@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <61044f85-cd41-87b5-3f41-36e3dffb6f2a@suse.com>
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQEJxrNIBaGfOqPmUSl269eGsoQjLAGaToMgAmUCCrKrR5TDsA==
+Date:   Wed, 18 Nov 2020 15:09:57 +0530
+Message-ID: <20235961dc048bb4abfc4fe42d080f9a@mail.gmail.com>
+Subject: RE: [PATCH v4 02/19] blkcg: Added a app identifier support for blkcg
+To:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, tj@kernel.org,
+        linux-nvme@lists.infradead.org
+Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
+        pbonzini@redhat.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="0000000000003a336105b45e6594"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 18, 2020 at 10:23:51AM +0100, Jan Beulich wrote:
-> On 18.11.2020 10:09, Greg KH wrote:
-> > On Wed, Nov 18, 2020 at 10:04:04AM +0100, Jan Beulich wrote:
-> >> On 18.11.2020 09:58, Christoph Hellwig wrote:
-> >>> On Wed, Nov 18, 2020 at 09:56:11AM +0100, Jan Beulich wrote:
-> >>>> since this isn't the first series from you recently spamming
-> >>>> xen-devel, may I ask that you don't Cc entire series to lists
-> >>>> which are involved with perhaps just one out of the many patches?
-> >>>> IMO Cc lists should be compiled on a per-patch basis; the cover
-> >>>> letter may of course be sent to the union of all of them.
-> >>>
-> >>> No way.  Individual CCs are completely broken as they don't provide
-> >>> the reviewer a context.
-> >>
-> >> That's the view of some people, but not all. Context can be easily
-> >> established by those who care going to one of the many archives on
-> >> which the entire series lands. Getting spammed, however, can't be
-> >> avoided by the dozens or hundreds of list subscribers.
-> > 
-> > kernel patches are never "spam", sorry, but for developers to try to
-> > determine which lists/maintainers want to see the whole series and which
-> > do not is impossible.
-> > 
-> > Patches in a series are easily deleted from sane mail clients with a
-> > single click/keystroke all at once, they aren't a problem that needs to
-> > be reduced in volume.
-> 
-> This doesn't scale, neither in the dimension of recipients nor in
-> the dimension of possible sources of such series.
+--0000000000003a336105b45e6594
+Content-Type: text/plain; charset="UTF-8"
 
-Again, trying to figure out what subsystem does, and does not, want
-stuff like this does not scale either.  Remember, we had 4000 developers
-last year, how are you going to tell all of them what the special rules
-are for your subsystem and how they differ from any other subsystem?
+Hi Hannes,
+Thanks for the review.
 
-And why does it matter?  We are all working on the same project, why
-wouldn't you want to see core block device handling patches?  What
-hurts with that, someone might notice something in one of them that a
-different developer did not.
+> +		ret = -EINVAL;
+> +		goto out_put;
+> +	}
+> +	strlcpy(blkcg->fc_app_id, buf, len);
 
-> While it may seem small, it's also a waste of resources to have mails
-> sent to hundreds of even thousands of people. So while from a
-> technical content perspective I surely agree with you saying 'kernel
-> patches are never "spam"', they still are from the perspective of
-> what "spam mail" originally means: Mail the recipients did not want
-> to receive.
+>String or UUID?
+>And will it be NULL-terminated?
+>Wouldn't it be better to use 'memcpy' here?
+>And it is NULL terminated: what happens if the user sets a 128-byte string?
+>IE shouldn't the app_id be 129 bytes long if it's assumed to be
+>NULL-terminated?
+[Muneendra]It is a string and it is NULL terminated.
+Agreed it should be 129 bytes long.
 
-Anyone on a kernel subsystem mailing list should expect to see kernel
-patches, that's part of the process, and always has been.
+Regards,
+Muneendra.
 
-Kernel subsystems are not silos, people on them should be aware of what
-else is going on in order to stay informed.  And again, if it's a huge
-problem, one click/keystroke and they are gone, no waste.
+--0000000000003a336105b45e6594
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-thanks,
-
-greg k-h
+MIIQTQYJKoZIhvcNAQcCoIIQPjCCEDoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg2iMIIE6DCCA9CgAwIBAgIOSBtqCRO9gCTKXSLwFPMwDQYJKoZIhvcNAQELBQAwTDEgMB4GA1UE
+CxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMT
+Ckdsb2JhbFNpZ24wHhcNMTYwNjE1MDAwMDAwWhcNMjQwNjE1MDAwMDAwWjBdMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEzMDEGA1UEAxMqR2xvYmFsU2lnbiBQZXJzb25h
+bFNpZ24gMiBDQSAtIFNIQTI1NiAtIEczMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+tpZok2X9LAHsYqMNVL+Ly6RDkaKar7GD8rVtb9nw6tzPFnvXGeOEA4X5xh9wjx9sScVpGR5wkTg1
+fgJIXTlrGESmaqXIdPRd9YQ+Yx9xRIIIPu3Jp/bpbiZBKYDJSbr/2Xago7sb9nnfSyjTSnucUcIP
+ZVChn6hKneVGBI2DT9yyyD3PmCEJmEzA8Y96qT83JmVH2GaPSSbCw0C+Zj1s/zqtKUbwE5zh8uuZ
+p4vC019QbaIOb8cGlzgvTqGORwK0gwDYpOO6QQdg5d03WvIHwTunnJdoLrfvqUg2vOlpqJmqR+nH
+9lHS+bEstsVJtZieU1Pa+3LzfA/4cT7XA/pnwwIDAQABo4IBtTCCAbEwDgYDVR0PAQH/BAQDAgEG
+MGoGA1UdJQRjMGEGCCsGAQUFBwMCBggrBgEFBQcDBAYIKwYBBQUHAwkGCisGAQQBgjcUAgIGCisG
+AQQBgjcKAwQGCSsGAQQBgjcVBgYKKwYBBAGCNwoDDAYIKwYBBQUHAwcGCCsGAQUFBwMRMBIGA1Ud
+EwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFGlygmIxZ5VEhXeRgMQENkmdewthMB8GA1UdIwQYMBaA
+FI/wS3+oLkUkrk1Q+mOai97i3Ru8MD4GCCsGAQUFBwEBBDIwMDAuBggrBgEFBQcwAYYiaHR0cDov
+L29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3RyMzA2BgNVHR8ELzAtMCugKaAnhiVodHRwOi8vY3Js
+Lmdsb2JhbHNpZ24uY29tL3Jvb3QtcjMuY3JsMGcGA1UdIARgMF4wCwYJKwYBBAGgMgEoMAwGCisG
+AQQBoDIBKAowQQYJKwYBBAGgMgFfMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2JhbHNp
+Z24uY29tL3JlcG9zaXRvcnkvMA0GCSqGSIb3DQEBCwUAA4IBAQConc0yzHxn4gtQ16VccKNm4iXv
+6rS2UzBuhxI3XDPiwihW45O9RZXzWNgVcUzz5IKJFL7+pcxHvesGVII+5r++9eqI9XnEKCILjHr2
+DgvjKq5Jmg6bwifybLYbVUoBthnhaFB0WLwSRRhPrt5eGxMw51UmNICi/hSKBKsHhGFSEaJQALZy
+4HL0EWduE6ILYAjX6BSXRDtHFeUPddb46f5Hf5rzITGLsn9BIpoOVrgS878O4JnfUWQi29yBfn75
+HajifFvPC+uqn+rcVnvrpLgsLOYG/64kWX/FRH8+mhVe+mcSX3xsUpcxK9q9vLTVtroU/yJUmEC4
+OcH5dQsbHBqjMIIDXzCCAkegAwIBAgILBAAAAAABIVhTCKIwDQYJKoZIhvcNAQELBQAwTDEgMB4G
+A1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNV
+BAMTCkdsb2JhbFNpZ24wHhcNMDkwMzE4MTAwMDAwWhcNMjkwMzE4MTAwMDAwWjBMMSAwHgYDVQQL
+ExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMK
+R2xvYmFsU2lnbjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMwldpB5BngiFvXAg7aE
+yiie/QV2EcWtiHL8RgJDx7KKnQRfJMsuS+FggkbhUqsMgUdwbN1k0ev1LKMPgj0MK66X17YUhhB5
+uzsTgHeMCOFJ0mpiLx9e+pZo34knlTifBtc+ycsmWQ1z3rDI6SYOgxXG71uL0gRgykmmKPZpO/bL
+yCiR5Z2KYVc3rHQU3HTgOu5yLy6c+9C7v/U9AOEGM+iCK65TpjoWc4zdQQ4gOsC0p6Hpsk+QLjJg
+6VfLuQSSaGjlOCZgdbKfd/+RFO+uIEn8rUAVSNECMWEZXriX7613t2Saer9fwRPvm2L7DWzgVGkW
+qQPabumDk3F2xmmFghcCAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8w
+HQYDVR0OBBYEFI/wS3+oLkUkrk1Q+mOai97i3Ru8MA0GCSqGSIb3DQEBCwUAA4IBAQBLQNvAUKr+
+yAzv95ZURUm7lgAJQayzE4aGKAczymvmdLm6AC2upArT9fHxD4q/c2dKg8dEe3jgr25sbwMpjjM5
+RcOO5LlXbKr8EpbsU8Yt5CRsuZRj+9xTaGdWPoO4zzUhw8lo/s7awlOqzJCK6fBdRoyV3XpYKBov
+Hd7NADdBj+1EbddTKJd+82cEHhXXipa0095MJ6RMG3NzdvQXmcIfeg7jLQitChws/zyrVQ4PkX42
+68NXSb7hLi18YIvDQVETI53O9zJrlAGomecsMx86OyXShkDOOyyGeMlhLxS67ttVb9+E7gUJTb0o
+2HLO02JQZR7rkpeDMdmztcpHWD9fMIIFTzCCBDegAwIBAgIMX/krgFDQUQNyOf+1MA0GCSqGSIb3
+DQEBCwUAMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTMwMQYDVQQD
+EypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0gRzMwHhcNMjAwOTA0MDgz
+NTI5WhcNMjIwOTA1MDgzNTI5WjCBljELMAkGA1UEBhMCSU4xEjAQBgNVBAgTCUthcm5hdGFrYTES
+MBAGA1UEBxMJQmFuZ2Fsb3JlMRYwFAYDVQQKEw1Ccm9hZGNvbSBJbmMuMRowGAYDVQQDExFNdW5l
+ZW5kcmEgS3VtYXIgTTErMCkGCSqGSIb3DQEJARYcbXVuZWVuZHJhLmt1bWFyQGJyb2FkY29tLmNv
+bTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMoadg8/B0JvnQVWQZyfiiEMmDhh0bSq
+BIThkSCjIdy7yOV9fBOs6MdrPZgCDeX5rJvOw6PJiWjeQQ9RkTJH6WccvxwXugoyspkG/RfFdUKk
+t0/bk1Ml9aUobcee2+cC79gyzwpHUjzEpcsx49FskGIxI+n9wybrDhpurtj8mmc1C1sVzKNoIEwC
+/eHrCsDnag9JEGotxVVv0KcLXv7N0CXs03bP8uvocms3+gO1K8dasJkc7noMt/i0/xcZnaABWkgV
+J/4V6ms/nIUi+/4vPYjckYUbRzkXm1/X0IyUfpp5cgdrFn9jBIk69fQGAUEhnVvwcXnHWotYxZFd
+Xew5Fz0CAwEAAaOCAdMwggHPMA4GA1UdDwEB/wQEAwIFoDCBngYIKwYBBQUHAQEEgZEwgY4wTQYI
+KwYBBQUHMAKGQWh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzcGVyc29uYWxz
+aWduMnNoYTJnM29jc3AuY3J0MD0GCCsGAQUFBzABhjFodHRwOi8vb2NzcDIuZ2xvYmFsc2lnbi5j
+b20vZ3NwZXJzb25hbHNpZ24yc2hhMmczME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsG
+AQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAA
+MEQGA1UdHwQ9MDswOaA3oDWGM2h0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NwZXJzb25hbHNp
+Z24yc2hhMmczLmNybDAnBgNVHREEIDAegRxtdW5lZW5kcmEua3VtYXJAYnJvYWRjb20uY29tMBMG
+A1UdJQQMMAoGCCsGAQUFBwMEMB8GA1UdIwQYMBaAFGlygmIxZ5VEhXeRgMQENkmdewthMB0GA1Ud
+DgQWBBR6On9cEmlB2VsuST951zNMSKtFBzANBgkqhkiG9w0BAQsFAAOCAQEAOGDBLQ17Ge8BVULh
+hsKhgh5eDx0mNmRRdhvTJnxOTRX5QsOKvsJGOUbyrKjD3BTTcGmIUti9HmbqDe/3gRTbhu8LA508
+LbMkW5lUoTb8ycBNOKLYhNE8UEOY8jRTUtMEhzT6NJDEE+1hb3kSGfArrrF3Z8pRYiUUhcpC5GKL
+9KsxA+DECRfSGfXJJQSq6nEZUGKhz+dz5CV1s8UIZLe9HEEfyJO4eRP+Fw9X16cthAbY0kpVnAvT
+/j45FAauY/h87uphdvSb5wC9v5w4VO0JKs0yNUjyWXg/RG+6JCvcViLFLAlRCLrcRcVaQwWZQ3YB
+EpmWnHflnrBcah5Ozy137DGCAm8wggJrAgEBMG0wXTELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEds
+b2JhbFNpZ24gbnYtc2ExMzAxBgNVBAMTKkdsb2JhbFNpZ24gUGVyc29uYWxTaWduIDIgQ0EgLSBT
+SEEyNTYgLSBHMwIMX/krgFDQUQNyOf+1MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEi
+BCBlTUAA8WhDbbB/tKdWDTdrlzbivOvs2+jFC1yWvXSg+zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDExMTgwOTQwMDFaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
+AWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEK
+MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAPjGbJMVF7l+QWV7E
+x/9pdRkFaKWd53x68k4VJiTpgtNOfvjdSxQTrxvx5h2vBUeF9VvbqobyUJe9JPssb7CUTLSdcoop
+ocj3Oa8tyaXdGbn78KhpqA/ZNtkeXu7CTbMqSSTTMTP7LlZHKYYME+gpitsEpywjL0CD32rMeg8I
+Uz5CZRLpqC6KdcbjEdEfF/IOhrvp0vAxHiFy+P8tD+tE+WuLPulrjCIGOr74hBanGHj1h1whi5EF
+lDs2laOuw130fYDDM5xYrFnBCc+YLpa/vfYLL41zVxmX5AL585/8mjPb0kNNiPO5PtyyvUDdJgoE
+QqoV+e1CbuhLiXZNRkfVbg==
+--0000000000003a336105b45e6594--
