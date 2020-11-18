@@ -2,146 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93077C64E69
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 00:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89455C2D0E4
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 01:12:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E49924181
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 00:48:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 394482465E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 01:12:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LgyAURrt"
+	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="xShNvBEf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726411AbgKRArx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Nov 2020 19:47:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53568 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725767AbgKRArx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Nov 2020 19:47:53 -0500
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDDF4C061A48
-        for <linux-block@vger.kernel.org>; Tue, 17 Nov 2020 16:47:51 -0800 (PST)
-Received: by mail-pf1-x443.google.com with SMTP id w14so309494pfd.7
-        for <linux-block@vger.kernel.org>; Tue, 17 Nov 2020 16:47:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=xjik3bPj3QD7dVsokOhUZfPJKy6Jis8hViC/+zvOQUM=;
-        b=LgyAURrtaY4pITG+veedMmuKbamN9sFy7cybnlGk8m4IWvoWE6/jPnxmCtdNdHheib
-         001vrHiofXWnYk+yb+VEmfWJrcONgi22lEHl+LQYsWpceSLSKECYVoF1aoVZA0//cWEg
-         TIaubHoKp9PNl8Sretrb+5J5Rq2txAtQ4YP9LmbYhGhq/noEL+45JU0gbiQ+REcte2Fx
-         DVzpeYQ/tzWl0mbSBZK25VeeYizlf1Ps4Un/X+MIz3/UTaF84gFEJI0zWZIP3arkIWd/
-         xfXJboO9/bw6PORTD2WB/8rR4WxcvYVfk960F4ROWyiD+I9RwOdWAwQ1EWdglXK2r12z
-         8LwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=xjik3bPj3QD7dVsokOhUZfPJKy6Jis8hViC/+zvOQUM=;
-        b=j8kKM1UlQvei9pUyeizpS+oWZr2H5Es4o3DgFMCtA2fl3mM28r8X4BFX8tB/ayAhE+
-         bQwNqXCVXWrPwe8t2EN4Y3dGhZSRgVvlgmjxBzuTcLeYZHvMdTTzjLrFJwyvVWPCCeMH
-         q5x1AULzz91yrKjm62R1oN2FNdskNLAQf+55KJOl+HpInd7ap0i2reRI5TCU2PZAN4tk
-         auUuabD+ZO8ACy7gQ14OXLMh9PZRV9/YGHzis59cTFRgG8LWl/VD3HM1NPKxCGDf/Os3
-         TahwbN66qiliN2u3xKOxpAbySyFldJChpfXznpd6ZtEHhjmY8oKqaf7S9o3kfSNaJA57
-         8vzw==
-X-Gm-Message-State: AOAM533rBnfmO20L/bxnF+D8PSCy+3kJaODtvdz8r0aio6hc72YDtLBH
-        h0vxZqSd6IZ8Zmq7jRl/qiSa+QpTVle55XtE
-X-Google-Smtp-Source: ABdhPJxZaJs674HlDlcgpHYSZtLoB+BQV7xXZC0KRKiWQP0CIKgbkZ691qPGW617771aWNtHMZ2/UA==
-X-Received: by 2002:a63:389:: with SMTP id 131mr5857528pgd.128.1605660471417;
-        Tue, 17 Nov 2020 16:47:51 -0800 (PST)
-Received: from dongjoo-desktop ([203.246.112.155])
-        by smtp.gmail.com with ESMTPSA id q14sm20992368pfl.163.2020.11.17.16.47.49
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 17 Nov 2020 16:47:50 -0800 (PST)
-Date:   Wed, 18 Nov 2020 09:47:46 +0900
-From:   Dongjoo Seo <commisori28@gmail.com>
-To:     axboe@kernel.dk, hch@infradead.org, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] blk-mq: modify hybrid sleep time to aggressive
-Message-ID: <20201118004746.GA29180@dongjoo-desktop>
+        id S1729677AbgKRBMw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Nov 2020 20:12:52 -0500
+Received: from m42-4.mailgun.net ([69.72.42.4]:44861 "EHLO m42-4.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727995AbgKRBMw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Nov 2020 20:12:52 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1605661971; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=xTyjQ9toNaO+YIybc97CIcLboXOhzdbqCV8FHhGdOaY=;
+ b=xShNvBEfzb4io1h07RVEnHb+H2JaJmZbmshKkymAN+huDdDPyAcziSnI+txPtL359Sg85/9u
+ f4pHl09GSCMV7GtnYgZwgY1zaikQuv3duGKeWTC/SBp8+j6hctTx0EJzDHQGChChwA9NdoYH
+ it3Pzve/gWD77EE/TvMF5Id+pW8=
+X-Mailgun-Sending-Ip: 69.72.42.4
+X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n03.prod.us-west-2.postgun.com with SMTP id
+ 5fb4750fba0e43f35506012b (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 18 Nov 2020 01:12:47
+ GMT
+Sender: cang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 928EAC43460; Wed, 18 Nov 2020 01:12:47 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: cang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id BC6EEC433C6;
+        Wed, 18 Nov 2020 01:12:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 18 Nov 2020 09:12:45 +0800
+From:   Can Guo <cang@codeaurora.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        Martin Kepplinger <martin.kepplinger@puri.sm>
+Subject: Re: [PATCH v2 9/9] block: Do not accept any requests while suspended
+In-Reply-To: <20201116030459.13963-10-bvanassche@acm.org>
+References: <20201116030459.13963-1-bvanassche@acm.org>
+ <20201116030459.13963-10-bvanassche@acm.org>
+Message-ID: <066dc92a56adcbf90fa5f7e460459f5e@codeaurora.org>
+X-Sender: cang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Current sleep time for hybrid polling is half of mean time.
-The 'half' sleep time is good for minimizing the cpu utilization.
-But, the problem is that its cpu utilization is still high.
-this patch can help to minimize the cpu utilization side.
+On 2020-11-16 11:04, Bart Van Assche wrote:
+> From: Alan Stern <stern@rowland.harvard.edu>
+> 
+> blk_queue_enter() accepts BLK_MQ_REQ_PREEMPT independent of the runtime
+> power management state. Since SCSI domain validation no longer depends 
+> on
+> this behavior, modify the behavior of blk_queue_enter() as follows:
+> - Do not accept any requests while suspended.
+> - Only process power management requests while suspending or resuming.
+> 
+> Submitting BLK_MQ_REQ_PREEMPT requests to a device that is runtime-
+> suspended causes runtime-suspended block devices not to resume as they
+> should. The request which should cause a runtime resume instead gets
+> issued directly, without resuming the device first. Of course the 
+> device
+> can't handle it properly, the I/O fails, and the device remains 
+> suspended.
+> 
+> The problem is fixed by checking that the queue's runtime-PM status
+> isn't RPM_SUSPENDED before allowing a request to be issued, and
+> queuing a runtime-resume request if it is.  In particular, the inline
+> blk_pm_request_resume() routine is renamed blk_pm_resume_queue() and
+> the code is unified by merging the surrounding checks into the
+> routine.  If the queue isn't set up for runtime PM, or there currently
+> is no restriction on allowed requests, the request is allowed.
+> Likewise if the BLK_MQ_REQ_PREEMPT flag is set and the status isn't
+> RPM_SUSPENDED.  Otherwise a runtime resume is queued and the request
+> is blocked until conditions are more suitable.
+> 
+> Cc: Can Guo <cang@codeaurora.org>
+> Cc: Stanley Chu <stanley.chu@mediatek.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> Reported-and-tested-by: Martin Kepplinger <martin.kepplinger@puri.sm>
+> Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-Below 1,2 is my test hardware sets.
+Reviewed-by: Can Guo <cang@codeaurora.org>
 
-1. Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz + Samsung 970 pro 1Tb
-2. Intel(R) Core(TM) i7-5820K CPU @ 3.30GHz + INTEL SSDPED1D480GA 480G
-
-        |  Classic Polling | Hybrid Polling  | this Patch
------------------------------------------------------------------
-        cpu util | IOPS(k) | cpu util | IOPS | cpu util | IOPS  |
------------------------------------------------------------------
-1.       99.96   |   491   |  56.98   | 467  | 35.98    | 442   |
------------------------------------------------------------------
-2.       99.94   |   582   |  56.3    | 582  | 35.28    | 582   |
-
-cpu util means that sum of sys and user util.
-
-I used 4k rand read for this test.
-because that case is worst case of I/O performance side.
-below one is my fio setup.
-
-name=pollTest
-ioengine=pvsync2
-hipri
-direct=1
-size=100%
-randrepeat=0
-time_based
-ramp_time=0
-norandommap
-refill_buffers
-log_avg_msec=1000
-log_max_value=1
-group_reporting
-filename=/dev/nvme0n1
-[rd_rnd_qd_1_4k_1w]
-bs=4k
-iodepth=32
-numjobs=[num of cpus]
-rw=randread
-runtime=60
-write_bw_log=bw_rd_rnd_qd_1_4k_1w
-write_iops_log=iops_rd_rnd_qd_1_4k_1w
-write_lat_log=lat_rd_rnd_qd_1_4k_1w
-
-Thanks
-
-Signed-off-by: Dongjoo Seo <commisori28@gmail.com>
----
- block/blk-mq.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1b25ec2fe9be..c3d578416899 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3749,8 +3749,7 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
- 		return ret;
- 
- 	if (q->poll_stat[bucket].nr_samples)
--		ret = (q->poll_stat[bucket].mean + 1) / 2;
--
-+		ret = (q->poll_stat[bucket].mean + 1) * 3 / 4;
- 	return ret;
- }
- 
--- 
-2.17.1
-
+> [ bvanassche: modified commit message and removed Cc: stable because 
+> without
+>   the previous patches from this series this patch would break parallel 
+> SCSI
+>   domain validation ]
+> ---
+>  block/blk-core.c |  6 +++---
+>  block/blk-pm.h   | 14 +++++++++-----
+>  2 files changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index a00bce9f46d8..230880cbf8c8 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -440,7 +440,8 @@ int blk_queue_enter(struct request_queue *q,
+> blk_mq_req_flags_t flags)
+>  			 * responsible for ensuring that that counter is
+>  			 * globally visible before the queue is unfrozen.
+>  			 */
+> -			if (pm || !blk_queue_pm_only(q)) {
+> +			if ((pm && q->rpm_status != RPM_SUSPENDED) ||
+> +			    !blk_queue_pm_only(q)) {
+>  				success = true;
+>  			} else {
+>  				percpu_ref_put(&q->q_usage_counter);
+> @@ -465,8 +466,7 @@ int blk_queue_enter(struct request_queue *q,
+> blk_mq_req_flags_t flags)
+> 
+>  		wait_event(q->mq_freeze_wq,
+>  			   (!q->mq_freeze_depth &&
+> -			    (pm || (blk_pm_request_resume(q),
+> -				    !blk_queue_pm_only(q)))) ||
+> +			    blk_pm_resume_queue(pm, q)) ||
+>  			   blk_queue_dying(q));
+>  		if (blk_queue_dying(q))
+>  			return -ENODEV;
+> diff --git a/block/blk-pm.h b/block/blk-pm.h
+> index ea5507d23e75..a2283cc9f716 100644
+> --- a/block/blk-pm.h
+> +++ b/block/blk-pm.h
+> @@ -6,11 +6,14 @@
+>  #include <linux/pm_runtime.h>
+> 
+>  #ifdef CONFIG_PM
+> -static inline void blk_pm_request_resume(struct request_queue *q)
+> +static inline int blk_pm_resume_queue(const bool pm, struct 
+> request_queue *q)
+>  {
+> -	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
+> -		       q->rpm_status == RPM_SUSPENDING))
+> -		pm_request_resume(q->dev);
+> +	if (!q->dev || !blk_queue_pm_only(q))
+> +		return 1;	/* Nothing to do */
+> +	if (pm && q->rpm_status != RPM_SUSPENDED)
+> +		return 1;	/* Request allowed */
+> +	pm_request_resume(q->dev);
+> +	return 0;
+>  }
+> 
+>  static inline void blk_pm_mark_last_busy(struct request *rq)
+> @@ -44,8 +47,9 @@ static inline void blk_pm_put_request(struct request 
+> *rq)
+>  		--rq->q->nr_pending;
+>  }
+>  #else
+> -static inline void blk_pm_request_resume(struct request_queue *q)
+> +static inline int blk_pm_resume_queue(const bool pm, struct 
+> request_queue *q)
+>  {
+> +	return 1;
+>  }
+> 
+>  static inline void blk_pm_mark_last_busy(struct request *rq)
