@@ -2,85 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5266DC63777
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D30E8C63697
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:05:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F20AF21734
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E80724656
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:05:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="bmXyeILM"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Emb8wF+b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726724AbgKRJEI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Nov 2020 04:04:08 -0500
-Received: from mx2.suse.de ([195.135.220.15]:33044 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725767AbgKRJEH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Nov 2020 04:04:07 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1605690246; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LkhYOLJvmFdpwfgmCORfd6M3DajwjiKhI3bCgvrsEjU=;
-        b=bmXyeILM/jFC2y7/cL8bo+i+qT42pSFQTqiJfE9lrw1eXqLr2D6ZDxQVQXD+H6sZYclscK
-        41e7ZVfbBmnYeTwtVfb+7Gjw2bitCfE/o1RVw9BIO+YSUBtHEGFI6Iz3TDO51XM38Wl3km
-        oroI4x9/8G6WspbnyxouqPKxYU34Y7M=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 19B49B138;
-        Wed, 18 Nov 2020 09:04:05 +0000 (UTC)
-Subject: Re: merge struct block_device and struct hd_struct
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Jens Axboe <axboe@kernel.dk>
-References: <20201118084800.2339180-1-hch@lst.de>
- <22ca5396-0253-f286-9eab-d417b2e0b3ad@suse.com>
- <20201118085804.GA20384@lst.de>
-From:   Jan Beulich <jbeulich@suse.com>
-Message-ID: <1ded2079-f1be-6d5d-01df-65754447df78@suse.com>
-Date:   Wed, 18 Nov 2020 10:04:04 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+        id S1726920AbgKRJFK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Nov 2020 04:05:10 -0500
+Received: from mailgw01.mediatek.com ([210.61.82.183]:54094 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726690AbgKRJFJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Nov 2020 04:05:09 -0500
+X-UUID: 60219152979d441796e68b5da55ec20e-20201118
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=sVHPcL5zweKCEakHoExS8RiyEaMih0MIWkOl8zmPlpQ=;
+        b=Emb8wF+bj3IdSOyacyI8v7uXczFHmZwoUWJTBz4k5YTPI2DR/G0+1/dCWRMsDzEFwwfuhxOm5+JMf6CmLU5YZITGvugypWtksKiYAVmie6WehioqDi5qrMvwOKlJvGk1675+HvmC346ZBxm89u7Z6cWmT5FU2fSuFzhdFl6lxYc=;
+X-UUID: 60219152979d441796e68b5da55ec20e-20201118
+Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
+        (envelope-from <stanley.chu@mediatek.com>)
+        (Cellopoint E-mail Firewall v4.1.14 Build 0819 with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 1189853474; Wed, 18 Nov 2020 17:05:04 +0800
+Received: from mtkcas07.mediatek.inc (172.21.101.84) by mtkexhb01.mediatek.inc
+ (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 18 Nov
+ 2020 17:05:02 +0800
+Received: from [172.21.77.33] (172.21.77.33) by mtkcas07.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 18 Nov 2020 17:05:02 +0800
+Message-ID: <1605690302.18082.1.camel@mtkswgap22>
+Subject: Re: [PATCH v2 9/9] block: Do not accept any requests while suspended
+From:   Stanley Chu <stanley.chu@mediatek.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+CC:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        "Can Guo" <cang@codeaurora.org>, Ming Lei <ming.lei@redhat.com>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        Martin Kepplinger <martin.kepplinger@puri.sm>
+Date:   Wed, 18 Nov 2020 17:05:02 +0800
+In-Reply-To: <20201116030459.13963-10-bvanassche@acm.org>
+References: <20201116030459.13963-1-bvanassche@acm.org>
+         <20201116030459.13963-10-bvanassche@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.2.3-0ubuntu6 
 MIME-Version: 1.0
-In-Reply-To: <20201118085804.GA20384@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MTK:  N
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18.11.2020 09:58, Christoph Hellwig wrote:
-> On Wed, Nov 18, 2020 at 09:56:11AM +0100, Jan Beulich wrote:
->> since this isn't the first series from you recently spamming
->> xen-devel, may I ask that you don't Cc entire series to lists
->> which are involved with perhaps just one out of the many patches?
->> IMO Cc lists should be compiled on a per-patch basis; the cover
->> letter may of course be sent to the union of all of them.
-> 
-> No way.  Individual CCs are completely broken as they don't provide
-> the reviewer a context.
+T24gTW9uLCAyMDIwLTExLTE2IGF0IDExOjA0ICswODAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6
+DQo+IEZyb206IEFsYW4gU3Rlcm4gPHN0ZXJuQHJvd2xhbmQuaGFydmFyZC5lZHU+DQo+IA0KPiBi
+bGtfcXVldWVfZW50ZXIoKSBhY2NlcHRzIEJMS19NUV9SRVFfUFJFRU1QVCBpbmRlcGVuZGVudCBv
+ZiB0aGUgcnVudGltZQ0KPiBwb3dlciBtYW5hZ2VtZW50IHN0YXRlLiBTaW5jZSBTQ1NJIGRvbWFp
+biB2YWxpZGF0aW9uIG5vIGxvbmdlciBkZXBlbmRzIG9uDQo+IHRoaXMgYmVoYXZpb3IsIG1vZGlm
+eSB0aGUgYmVoYXZpb3Igb2YgYmxrX3F1ZXVlX2VudGVyKCkgYXMgZm9sbG93czoNCj4gLSBEbyBu
+b3QgYWNjZXB0IGFueSByZXF1ZXN0cyB3aGlsZSBzdXNwZW5kZWQuDQo+IC0gT25seSBwcm9jZXNz
+IHBvd2VyIG1hbmFnZW1lbnQgcmVxdWVzdHMgd2hpbGUgc3VzcGVuZGluZyBvciByZXN1bWluZy4N
+Cj4gDQo+IFN1Ym1pdHRpbmcgQkxLX01RX1JFUV9QUkVFTVBUIHJlcXVlc3RzIHRvIGEgZGV2aWNl
+IHRoYXQgaXMgcnVudGltZS0NCj4gc3VzcGVuZGVkIGNhdXNlcyBydW50aW1lLXN1c3BlbmRlZCBi
+bG9jayBkZXZpY2VzIG5vdCB0byByZXN1bWUgYXMgdGhleQ0KPiBzaG91bGQuIFRoZSByZXF1ZXN0
+IHdoaWNoIHNob3VsZCBjYXVzZSBhIHJ1bnRpbWUgcmVzdW1lIGluc3RlYWQgZ2V0cw0KPiBpc3N1
+ZWQgZGlyZWN0bHksIHdpdGhvdXQgcmVzdW1pbmcgdGhlIGRldmljZSBmaXJzdC4gT2YgY291cnNl
+IHRoZSBkZXZpY2UNCj4gY2FuJ3QgaGFuZGxlIGl0IHByb3Blcmx5LCB0aGUgSS9PIGZhaWxzLCBh
+bmQgdGhlIGRldmljZSByZW1haW5zIHN1c3BlbmRlZC4NCj4gDQo+IFRoZSBwcm9ibGVtIGlzIGZp
+eGVkIGJ5IGNoZWNraW5nIHRoYXQgdGhlIHF1ZXVlJ3MgcnVudGltZS1QTSBzdGF0dXMNCj4gaXNu
+J3QgUlBNX1NVU1BFTkRFRCBiZWZvcmUgYWxsb3dpbmcgYSByZXF1ZXN0IHRvIGJlIGlzc3VlZCwg
+YW5kDQo+IHF1ZXVpbmcgYSBydW50aW1lLXJlc3VtZSByZXF1ZXN0IGlmIGl0IGlzLiAgSW4gcGFy
+dGljdWxhciwgdGhlIGlubGluZQ0KPiBibGtfcG1fcmVxdWVzdF9yZXN1bWUoKSByb3V0aW5lIGlz
+IHJlbmFtZWQgYmxrX3BtX3Jlc3VtZV9xdWV1ZSgpIGFuZA0KPiB0aGUgY29kZSBpcyB1bmlmaWVk
+IGJ5IG1lcmdpbmcgdGhlIHN1cnJvdW5kaW5nIGNoZWNrcyBpbnRvIHRoZQ0KPiByb3V0aW5lLiAg
+SWYgdGhlIHF1ZXVlIGlzbid0IHNldCB1cCBmb3IgcnVudGltZSBQTSwgb3IgdGhlcmUgY3VycmVu
+dGx5DQo+IGlzIG5vIHJlc3RyaWN0aW9uIG9uIGFsbG93ZWQgcmVxdWVzdHMsIHRoZSByZXF1ZXN0
+IGlzIGFsbG93ZWQuDQo+IExpa2V3aXNlIGlmIHRoZSBCTEtfTVFfUkVRX1BSRUVNUFQgZmxhZyBp
+cyBzZXQgYW5kIHRoZSBzdGF0dXMgaXNuJ3QNCj4gUlBNX1NVU1BFTkRFRC4gIE90aGVyd2lzZSBh
+IHJ1bnRpbWUgcmVzdW1lIGlzIHF1ZXVlZCBhbmQgdGhlIHJlcXVlc3QNCj4gaXMgYmxvY2tlZCB1
+bnRpbCBjb25kaXRpb25zIGFyZSBtb3JlIHN1aXRhYmxlLg0KPiANCj4gQ2M6IENhbiBHdW8gPGNh
+bmdAY29kZWF1cm9yYS5vcmc+DQo+IENjOiBTdGFubGV5IENodSA8c3RhbmxleS5jaHVAbWVkaWF0
+ZWsuY29tPg0KPiBDYzogTWluZyBMZWkgPG1pbmcubGVpQHJlZGhhdC5jb20+DQo+IENjOiBSYWZh
+ZWwgSi4gV3lzb2NraSA8cmFmYWVsLmoud3lzb2NraUBpbnRlbC5jb20+DQo+IFJlcG9ydGVkLWFu
+ZC10ZXN0ZWQtYnk6IE1hcnRpbiBLZXBwbGluZ2VyIDxtYXJ0aW4ua2VwcGxpbmdlckBwdXJpLnNt
+Pg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGFuIFN0ZXJuIDxzdGVybkByb3dsYW5kLmhhcnZhcmQuZWR1
+Pg0KPiBTaWduZWQtb2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJ2YW5hc3NjaGVAYWNtLm9yZz4N
+Cg0KUmV2aWV3ZWQtYnk6IFN0YW5sZXkgQ2h1IDxzdGFubGV5LmNodUBtZWRpYXRlay5jb20+DQoN
+Cg0K
 
-That's the view of some people, but not all. Context can be easily
-established by those who care going to one of the many archives on
-which the entire series lands. Getting spammed, however, can't be
-avoided by the dozens or hundreds of list subscribers.
-
->  If you don't want xen-blkfront patches to
-> go to xen-devel remove it from MAINTAINERS.
-
-Patches to Xen drivers very much ought to go to xen-devel imo, so
-no - removal is not an option.
-
-Jan
