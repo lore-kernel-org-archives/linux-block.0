@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F03C64E7A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87963C64E7D
 	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 08:48:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD14524654
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 08:48:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1685A2467D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 08:48:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Nx+h2rhZ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YtHXD8P3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727040AbgKRIs2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Nov 2020 03:48:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42882 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726981AbgKRIs1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S1727028AbgKRIs1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 18 Nov 2020 03:48:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42876 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726981AbgKRIs0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Nov 2020 03:48:26 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B524FC0613D4;
-        Wed, 18 Nov 2020 00:48:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F846C0613D4;
+        Wed, 18 Nov 2020 00:48:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=AZC0zIud/sy36HL3UqpdhruuJxaP+dAsE+XWl7N2xio=; b=Nx+h2rhZg/HvIdxi/V4Jhb3r0u
-        Ha9RMCfuFy1DcNiHVfggBRgvESO9x7+pxSBvldUugXJje0PXHGlc4RwDDAg7KizNUutdw1Oz6YYyv
-        GW4iMGk2/W7s5u9pbxqjoSdBjJixbVkMGKI4sJ3RWvWoE3K0iOy/pbqDa1e1ML4CIGcPuaXqz2g9g
-        GWC0Sp67FA+/219oiqS3gSXWZE8BQ1pE8WMHKNGls47Mx8ZIwmqDOxT3eb3qNMpqy/o6N2LhYhPo2
-        rajpeTK4bPGzZuMUv7onhX7MqP2bpqaR14FcEdjZKriDz9DBejg943e2dL+oCaa6VfesI9rxujAcy
-        PLSuDG6w==;
+        bh=AuzCwkw90Oy6IPNhoiC+qBglSTsZM+HyoDoCPgOfof0=; b=YtHXD8P3bl/ZEagDvWBMs7HUMz
+        zdBwVpVtkLRztaIitYOD+jnHVbFQ6nJ8vuy+RLNNTKM13Op/plycZzjy+O4m3LWRxyGds3Zqm8uXL
+        0XuTVrpZcPUDGwu7KtN8TqRfLjbMNJ84KtyxsgxJmnWMTEPOjVTiAMZb5/WgHNDE+x7H3rKLRuDmH
+        S0COUGr4VfDChivd1zEu5OgZhhAocAq3rfUghhZiWVdd7wm1RQ+tppv9VJnogHVF5m81oV1c+2vot
+        cs+KiVe+jSmoJYHNAdtCaO4J/3LKZi6FdgQumaduslpItNE93jCeXFM/TwIDIwiBiRp2E9vOvb5No
+        1S1bNtVg==;
 Received: from [2001:4bb8:18c:31ba:32b1:ec66:5459:36a] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kfJ8S-0007lc-Hx; Wed, 18 Nov 2020 08:48:16 +0000
+        id 1kfJ8O-0007lA-RG; Wed, 18 Nov 2020 08:48:13 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -48,9 +48,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 08/20] init: refactor devt_from_partuuid
-Date:   Wed, 18 Nov 2020 09:47:48 +0100
-Message-Id: <20201118084800.2339180-9-hch@lst.de>
+Subject: [PATCH 06/20] block: change the hash used for looking up block devices
+Date:   Wed, 18 Nov 2020 09:47:46 +0100
+Message-Id: <20201118084800.2339180-7-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201118084800.2339180-1-hch@lst.de>
 References: <20201118084800.2339180-1-hch@lst.de>
@@ -61,116 +61,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The code in devt_from_partuuid is very convoluted.  Refactor a bit by
-sanitizing the goto and variable name usage.
+Adding the minor to the major creates tons of pointless conflicts. Just
+use the dev_t itself, which is 32-bits and thus is guaranteed to fit
+into ino_t.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- init/do_mounts.c | 68 ++++++++++++++++++++++--------------------------
- 1 file changed, 31 insertions(+), 37 deletions(-)
+ fs/block_dev.c | 26 ++------------------------
+ 1 file changed, 2 insertions(+), 24 deletions(-)
 
-diff --git a/init/do_mounts.c b/init/do_mounts.c
-index aef2f24461c7f1..afa26a4028d25e 100644
---- a/init/do_mounts.c
-+++ b/init/do_mounts.c
-@@ -105,13 +105,10 @@ static int match_dev_by_uuid(struct device *dev, const void *data)
-  */
- static dev_t devt_from_partuuid(const char *uuid_str)
- {
--	dev_t res = 0;
- 	struct uuidcmp cmp;
- 	struct device *dev = NULL;
--	struct gendisk *disk;
--	struct hd_struct *part;
-+	dev_t devt = 0;
- 	int offset = 0;
--	bool clear_root_wait = false;
- 	char *slash;
- 
- 	cmp.uuid = uuid_str;
-@@ -120,52 +117,49 @@ static dev_t devt_from_partuuid(const char *uuid_str)
- 	/* Check for optional partition number offset attributes. */
- 	if (slash) {
- 		char c = 0;
-+
- 		/* Explicitly fail on poor PARTUUID syntax. */
--		if (sscanf(slash + 1,
--			   "PARTNROFF=%d%c", &offset, &c) != 1) {
--			clear_root_wait = true;
--			goto done;
--		}
-+		if (sscanf(slash + 1, "PARTNROFF=%d%c", &offset, &c) != 1)
-+			goto clear_root_wait;
- 		cmp.len = slash - uuid_str;
- 	} else {
- 		cmp.len = strlen(uuid_str);
- 	}
- 
--	if (!cmp.len) {
--		clear_root_wait = true;
--		goto done;
--	}
-+	if (!cmp.len)
-+		goto clear_root_wait;
- 
--	dev = class_find_device(&block_class, NULL, &cmp,
--				&match_dev_by_uuid);
-+	dev = class_find_device(&block_class, NULL, &cmp, &match_dev_by_uuid);
- 	if (!dev)
--		goto done;
--
--	res = dev->devt;
-+		return 0;
- 
--	/* Attempt to find the partition by offset. */
--	if (!offset)
--		goto no_offset;
-+	if (offset) {
-+		/*
-+		 * Attempt to find the requested partition by adding an offset
-+		 * to the partition number found by UUID.
-+		 */
-+		struct hd_struct *part;
- 
--	res = 0;
--	disk = part_to_disk(dev_to_part(dev));
--	part = disk_get_part(disk, dev_to_part(dev)->partno + offset);
--	if (part) {
--		res = part_devt(part);
--		put_device(part_to_dev(part));
-+		part = disk_get_part(dev_to_disk(dev),
-+				     dev_to_part(dev)->partno + offset);
-+		if (part) {
-+			devt = part_devt(part);
-+			put_device(part_to_dev(part));
-+		}
-+	} else {
-+		devt = dev->devt;
- 	}
- 
--no_offset:
- 	put_device(dev);
--done:
--	if (clear_root_wait) {
--		pr_err("VFS: PARTUUID= is invalid.\n"
--		       "Expected PARTUUID=<valid-uuid-id>[/PARTNROFF=%%d]\n");
--		if (root_wait)
--			pr_err("Disabling rootwait; root= is invalid.\n");
--		root_wait = 0;
--	}
--	return res;
-+	return devt;
-+
-+clear_root_wait:
-+	pr_err("VFS: PARTUUID= is invalid.\n"
-+	       "Expected PARTUUID=<valid-uuid-id>[/PARTNROFF=%%d]\n");
-+	if (root_wait)
-+		pr_err("Disabling rootwait; root= is invalid.\n");
-+	root_wait = 0;
-+	return 0;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index d8664f5c1ff669..29db12c3bb501c 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -870,35 +870,12 @@ void __init bdev_cache_init(void)
+ 	blockdev_superblock = bd_mnt->mnt_sb;   /* For writeback */
  }
  
- /**
+-/*
+- * Most likely _very_ bad one - but then it's hardly critical for small
+- * /dev and can be fixed when somebody will need really large one.
+- * Keep in mind that it will be fed through icache hash function too.
+- */
+-static inline unsigned long hash(dev_t dev)
+-{
+-	return MAJOR(dev)+MINOR(dev);
+-}
+-
+-static int bdev_test(struct inode *inode, void *data)
+-{
+-	return BDEV_I(inode)->bdev.bd_dev == *(dev_t *)data;
+-}
+-
+-static int bdev_set(struct inode *inode, void *data)
+-{
+-	BDEV_I(inode)->bdev.bd_dev = *(dev_t *)data;
+-	return 0;
+-}
+-
+ static struct block_device *bdget(dev_t dev)
+ {
+ 	struct block_device *bdev;
+ 	struct inode *inode;
+ 
+-	inode = iget5_locked(blockdev_superblock, hash(dev),
+-			bdev_test, bdev_set, &dev);
+-
++	inode = iget_locked(blockdev_superblock, dev);
+ 	if (!inode)
+ 		return NULL;
+ 
+@@ -910,6 +887,7 @@ static struct block_device *bdget(dev_t dev)
+ 		bdev->bd_super = NULL;
+ 		bdev->bd_inode = inode;
+ 		bdev->bd_part_count = 0;
++		bdev->bd_dev = dev;
+ 		inode->i_mode = S_IFBLK;
+ 		inode->i_rdev = dev;
+ 		inode->i_bdev = bdev;
 -- 
 2.29.2
 
