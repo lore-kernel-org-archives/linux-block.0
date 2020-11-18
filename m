@@ -2,81 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0FBC5519F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E00C7C5519F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 12:47:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5DDB22210
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 09:55:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D51E24180
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 12:47:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="LBEdxhCU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725947AbgKRJzs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Nov 2020 04:55:48 -0500
-Received: from mx2.suse.de ([195.135.220.15]:52186 "EHLO mx2.suse.de"
+        id S1726238AbgKRMri (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Nov 2020 07:47:38 -0500
+Received: from z5.mailgun.us ([104.130.96.5]:34148 "EHLO z5.mailgun.us"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725804AbgKRJzr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Nov 2020 04:55:47 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 8DCB7ABDE;
-        Wed, 18 Nov 2020 09:55:46 +0000 (UTC)
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Richard Weinberger <richard@nod.at>, Jan Kara <jack@suse.com>,
-        linux-block@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-References: <20201118084800.2339180-1-hch@lst.de>
- <20201118084800.2339180-20-hch@lst.de>
- <e7f826fd-cb9c-b4ab-fae8-dad398c14eed@suse.de> <X7TlIzxJPfa2p+Da@kroah.com>
-From:   Coly Li <colyli@suse.de>
-Subject: Re: [PATCH 19/20] bcache: remove a superflous lookup_bdev all
-Message-ID: <24c818c2-6aba-098c-0c73-0a5081175c06@suse.de>
-Date:   Wed, 18 Nov 2020 17:55:38 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.4.3
+        id S1726136AbgKRMri (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Nov 2020 07:47:38 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1605703658; h=Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Message-ID: Date: Subject: To: From: Sender;
+ bh=dTQgOUVuojBlogTXdtxUl0gbxkKymUygC3hcYieAfG0=; b=LBEdxhCUJFeOVBruU6cZoVBnxV/EiI7bqN4LDlSCT0sIUeUGkRpkNvzKQHYP6ZcVKzseun0c
+ 6NqlzWA0Kt/IMbCwjEUsI4WcVEg4Ywy/8x3CG55t/PLFhUxHp+52J/88aPfx4c0gaCEQvo3Y
+ JbcybDZil/+y84IY7tYsqjnPXRg=
+X-Mailgun-Sending-Ip: 104.130.96.5
+X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
+ 5fb517e98e090a888680b938 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 18 Nov 2020 12:47:37
+ GMT
+Sender: rsiddoji=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 88C27C43460; Wed, 18 Nov 2020 12:47:36 +0000 (UTC)
+Received: from rsiddoji1 (unknown [203.109.108.101])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: rsiddoji)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 261BDC433C6
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 12:47:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 261BDC433C6
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=rsiddoji@codeaurora.org
+From:   "Ravi Kumar Siddojigari" <rsiddoji@codeaurora.org>
+To:     <linux-block@vger.kernel.org>
+Subject: [PATCH] dm verity: correcting logic used with corrupted_errs counter
+Date:   Wed, 18 Nov 2020 18:17:25 +0530
+Organization: The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,\na Linux Foundation Collaborative Project
+Message-ID: <001a01d6bda8$fd4aee30$f7e0ca90$@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <X7TlIzxJPfa2p+Da@kroah.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+        charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: Ada9qDhYf7tQ7aqeSw2BxZmYJ5jwyA==
+Content-Language: en-us
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/18/20 5:10 PM, Greg KH wrote:
-> On Wed, Nov 18, 2020 at 04:54:51PM +0800, Coly Li wrote:
->> On 11/18/20 4:47 PM, Christoph Hellwig wrote:
->>> Don't bother to call lookup_bdev for just a slightly different error
->>> message without any functional change.
->>>
->>> Signed-off-by: Christoph Hellwig <hch@lst.de>ist
->>
->> Hi Christoph,
->>
->> NACK. This removing error message is frequently triggered and observed,
->> and distinct a busy device and an already registered device is important
->> (the first one is critical error and second one is not).
->>
->> Remove such error message will be a functional regression.
-> 
-> What normal operation causes this error message to be emitted?  And what
-> can a user do with it?
+In verity_handle_err we see that the "corrupted_errs"  is never going to be
+more than one as the code will fall through "out" label and hit
+panic/kernel_restart on the first error  which is not as expected.. 
+Following patch will make sure that corrupted_errs are incremented and only
+panic/kernel_restart once it reached DM_VERITY_MAX_CORRUPTED_ERRS.
 
-When there was bug and the caching or backing device was not
-unregistered successfully, people could see "device busy"; and if it was
-because the device registered again, it could be "already registered".
-Without the different message, people may think the device is always
-busy but indeed it isn't.
+Signed-off-by: Ravi Kumar Siddojigari <rsiddoji@codeaurora.org>
+---
+ drivers/md/dm-verity-target.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-he motivation of the patch is OK to me, but we need to make the logical
-consistent, otherwise we will have similar bug report for bogus warning
-dmesg from bcache users in soon future.
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index f74982dcbea0..d86900a2a8d7 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -221,8 +221,10 @@ static int verity_handle_err(struct dm_verity *v, enum
+verity_block_type type,
+ 	/* Corruption should be visible in device status in all modes */
+ 	v->hash_failed = 1;
+ 
+-	if (v->corrupted_errs >= DM_VERITY_MAX_CORRUPTED_ERRS)
++	if (v->corrupted_errs >= DM_VERITY_MAX_CORRUPTED_ERRS){
++		DMERR("%s: reached maximum errors", v->data_dev->name);
+ 		goto out;
++	}
+ 
+ 	v->corrupted_errs++;
+ 
+@@ -240,13 +242,13 @@ static int verity_handle_err(struct dm_verity *v, enum
+verity_block_type type,
+ 	DMERR_LIMIT("%s: %s block %llu is corrupted", v->data_dev->name,
+ 		    type_str, block);
+ 
+-	if (v->corrupted_errs == DM_VERITY_MAX_CORRUPTED_ERRS)
+-		DMERR("%s: reached maximum errors", v->data_dev->name);
+ 
+ 	snprintf(verity_env, DM_VERITY_ENV_LENGTH, "%s=%d,%llu",
+ 		DM_VERITY_ENV_VAR_NAME, type, block);
+ 
+ 	kobject_uevent_env(&disk_to_dev(dm_disk(md))->kobj, KOBJ_CHANGE,
+envp);
++	/* DM_VERITY_MAX_CORRUPTED_ERRS limit not reached yet */
++		return 0;
+ 
+ out:
+ 	if (v->mode == DM_VERITY_MODE_LOGGING)
+--
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a
+Linux Foundation Collaborative Project
 
-Coly Li
+
