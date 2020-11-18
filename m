@@ -7,25 +7,25 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F25C64EBC
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 21:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35033C64E7D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 21:34:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBAD820715
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 21:34:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9B72246CF
+	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 21:34:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726625AbgKRVeb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Nov 2020 16:34:31 -0500
-Received: from mx2.suse.de ([195.135.220.15]:52074 "EHLO mx2.suse.de"
+        id S1726886AbgKRVef (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Nov 2020 16:34:35 -0500
+Received: from mx2.suse.de ([195.135.220.15]:52536 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726199AbgKRVe0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Nov 2020 16:34:26 -0500
+        id S1726397AbgKRVe3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Nov 2020 16:34:29 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 35A12B011;
+        by mx2.suse.de (Postfix) with ESMTP id 4578DB018;
         Wed, 18 Nov 2020 21:34:24 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id A0C1D1E130B; Wed, 18 Nov 2020 15:10:24 +0100 (CET)
-Date:   Wed, 18 Nov 2020 15:10:24 +0100
+        id 94E761E132C; Wed, 18 Nov 2020 15:42:55 +0100 (CET)
+Date:   Wed, 18 Nov 2020 15:42:55 +0100
 From:   Jan Kara <jack@suse.cz>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
@@ -37,44 +37,72 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: Re: [PATCH 02/20] block: remove a duplicate __disk_get_part prototype
-Message-ID: <20201118141024.GG1981@quack2.suse.cz>
+Subject: Re: [PATCH 09/20] init: cleanup match_dev_by_uuid and
+ match_dev_by_label
+Message-ID: <20201118144255.GN1981@quack2.suse.cz>
 References: <20201118084800.2339180-1-hch@lst.de>
- <20201118084800.2339180-3-hch@lst.de>
+ <20201118084800.2339180-10-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201118084800.2339180-3-hch@lst.de>
+In-Reply-To: <20201118084800.2339180-10-hch@lst.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 18-11-20 09:47:42, Christoph Hellwig wrote:
+On Wed 18-11-20 09:47:49, Christoph Hellwig wrote:
+> Avoid a totally pointless goto label, and use the same style of
+> comparism for both helpers.
+> 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Looks good. You can add:
+OK. You can add:
 
 Reviewed-by: Jan Kara <jack@suse.cz>
 
 								Honza
-
 > ---
->  include/linux/genhd.h | 1 -
->  1 file changed, 1 deletion(-)
+>  init/do_mounts.c | 18 ++++++------------
+>  1 file changed, 6 insertions(+), 12 deletions(-)
 > 
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index 46553d6d602563..22f5b9fd96f8bf 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -250,7 +250,6 @@ static inline dev_t part_devt(struct hd_struct *part)
->  	return part_to_dev(part)->devt;
+> diff --git a/init/do_mounts.c b/init/do_mounts.c
+> index afa26a4028d25e..5879edf083b318 100644
+> --- a/init/do_mounts.c
+> +++ b/init/do_mounts.c
+> @@ -79,15 +79,10 @@ static int match_dev_by_uuid(struct device *dev, const void *data)
+>  	const struct uuidcmp *cmp = data;
+>  	struct hd_struct *part = dev_to_part(dev);
+>  
+> -	if (!part->info)
+> -		goto no_match;
+> -
+> -	if (strncasecmp(cmp->uuid, part->info->uuid, cmp->len))
+> -		goto no_match;
+> -
+> +	if (!part->info ||
+> +	    strncasecmp(cmp->uuid, part->info->uuid, cmp->len))
+> +		return 0;
+>  	return 1;
+> -no_match:
+> -	return 0;
 >  }
 >  
-> -extern struct hd_struct *__disk_get_part(struct gendisk *disk, int partno);
->  extern struct hd_struct *disk_get_part(struct gendisk *disk, int partno);
+>  /**
+> @@ -174,10 +169,9 @@ static int match_dev_by_label(struct device *dev, const void *data)
+>  	const char *label = data;
+>  	struct hd_struct *part = dev_to_part(dev);
 >  
->  static inline void disk_put_part(struct hd_struct *part)
+> -	if (part->info && !strcmp(label, part->info->volname))
+> -		return 1;
+> -
+> -	return 0;
+> +	if (!part->info || strcmp(label, part->info->volname))
+> +		return 0;
+> +	return 1;
+>  }
+>  
+>  static dev_t devt_from_partlabel(const char *label)
 > -- 
 > 2.29.2
 > 
