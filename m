@@ -2,108 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4164FC56201
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 17:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C52FC6369E
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 17:52:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D275A2468B
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 17:20:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3557B246D1
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 17:52:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="VGMYR7GI"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hEO4IqYN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728896AbgKSRUF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 12:20:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33950 "EHLO
+        id S1727195AbgKSRwu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 12:52:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727677AbgKSRUF (ORCPT
+        with ESMTP id S1727171AbgKSRwu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 12:20:05 -0500
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F03CFC0613CF
-        for <linux-block@vger.kernel.org>; Thu, 19 Nov 2020 09:20:03 -0800 (PST)
-Received: by mail-il1-x141.google.com with SMTP id z14so6009580ilp.11
-        for <linux-block@vger.kernel.org>; Thu, 19 Nov 2020 09:20:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=Cuh0RTTSFAlmIPVhGB92scgG2gp7uIXGl6U8eaIkwws=;
-        b=VGMYR7GIyigGqFMlURJN1OniF74reh1UdQXfBzrlKlnYeM+WRXlnHYCvAek+XLZl+j
-         fnMW4SKO1FBIJPHj2Yi6SohZxhvFabSdCp+cz9YCH2FNIeSNV62dzclA+evfaJH2QBOs
-         Or3W4G6dSf6MJ1czMoPcLasp5lrGvUJu9RH+cPxkDlBy4F/tLGo6R8vg1bhpk8h1xlPH
-         IvcvRDOyW/1XkjXvhwz6Jdg17E9LYTylvdyqaf7yXdmNocIbZLtvoDsXU01T+/2RfZkY
-         6xDKT6SF2aNEgX7rlD69MPQQakerXRxeaE3nPaaZ/WCkz12FdpPJxXHzisFXq1ATjZy+
-         LFOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Cuh0RTTSFAlmIPVhGB92scgG2gp7uIXGl6U8eaIkwws=;
-        b=rjT3NOdXq5sZRff9Z1yjeuRg5pewAxUreeWg+VVD3Q+7wpgwAtr0QQBl86lSrVFBY1
-         iMjQzvVWFbE3t2UvuYqJK1mRLYK9qfXYFCHIgsIfuaSYiyC1ms4Nv75m8fS/2p9V2Jy1
-         4PsrqkdwqSFdNLW05rEix2AwnNPRU0K9k//oMhFKGH69BHNIJfEdhdi1qeOpQbtlZHIO
-         b2Mf5O3n1C6H3sLvCJx+mmh/sI1lkcXxGHioNJX1iUkbxjUVF1p+FEUftZQcG5nmRthw
-         2+GO/GT/lDiPM2QN00L6Jm4I776jKRPfkBhNQBAG66LFeJhfw5cTmLIwUYJWQ+rFbXzM
-         lzUg==
-X-Gm-Message-State: AOAM533VrDCKkR4LObXNgqOnHJoKnEyaY9SSpsVm6f7iPLsFSGH2AW3k
-        I3GzkGtnsA+vy7bcIVrmbwGrjg==
-X-Google-Smtp-Source: ABdhPJxqW+pxzeKvGrbOkUbneyIPxMDLzPVQq32823a3f0cted9sUHxsKt6LdBhk+atDCT70aCQa4g==
-X-Received: by 2002:a92:d143:: with SMTP id t3mr2340629ilg.35.1605806403250;
-        Thu, 19 Nov 2020 09:20:03 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id x5sm237863ilc.15.2020.11.19.09.20.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Nov 2020 09:20:02 -0800 (PST)
-Subject: Re: [PATCH 0/2] optimise iov_iter
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org
-References: <cover.1605799583.git.asml.silence@gmail.com>
- <2b50322d-821f-469e-6f57-072b54e25ef4@kernel.dk>
- <629cabf2-3a23-9d95-dd88-281ef4d49ddd@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <72a1df1a-810b-5bf1-39bd-b702188a875b@kernel.dk>
-Date:   Thu, 19 Nov 2020 10:20:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 19 Nov 2020 12:52:50 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1777DC0613CF;
+        Thu, 19 Nov 2020 09:52:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=cQkJ8oOJbey+jhde6R1GtaMp6RE8pauahlmMPFtXjZs=; b=hEO4IqYNoc19Blikcdoe2QXwBn
+        ybNPIxxCWJWZXd6iQlUNxZUHh79QDprUSf7QQ/mHJLvv1JWsY693pbYp/Pl4ddsj0vuaxUe4OzZFz
+        vVXAV0aGpsPDxlRBTDE9GhOSRz9xs6wi3qFy4uLXgUe68l0rfPEkK8CKo2kLMBeEw6ds0Dv7CkXDU
+        L5MOnJLTkC/YhEVHADMZKcaMsFfu89FCcPOedkE5dru2/soU3sp4CCVTCfer4o9BK6GiJ6CMhVa/V
+        UzZ5x7zdlP1/5DaV3ZyRIr0ZneuehElgdb6dL0clD482W9RfVwxn1j3nt+N7wiGHJRpJmJ8AAylLF
+        LrnX29Bw==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kfo6k-0005fU-SJ; Thu, 19 Nov 2020 17:52:34 +0000
+Date:   Thu, 19 Nov 2020 17:52:34 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     axboe@kernel.dk, hch@infradead.org, ming.lei@redhat.com,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH v4 1/2] block: disable iopoll for split bio
+Message-ID: <20201119175234.GA20944@infradead.org>
+References: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
+ <20201117075625.46118-2-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <629cabf2-3a23-9d95-dd88-281ef4d49ddd@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201117075625.46118-2-jefflexu@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/19/20 10:14 AM, Pavel Begunkov wrote:
-> On 19/11/2020 16:46, Jens Axboe wrote:
->> On 11/19/20 8:29 AM, Pavel Begunkov wrote:
->>> The first patch optimises iov_iter_npages() for the bvec case, and the
->>> second helps code generation to kill unreachable code.
->>>
->>> Pavel Begunkov (2):
->>>   iov_iter: optimise iov_iter_npages for bvec
->>>   iov_iter: optimise iter type checking
->>>
->>>  include/linux/uio.h | 10 +++++-----
->>>  lib/iov_iter.c      | 10 +++++-----
->>>  2 files changed, 10 insertions(+), 10 deletions(-)
->>
->> Nice! Tested this and confirmed both the better code generation,
->> and reduction in overhead in iov_iter_npages().
+On Tue, Nov 17, 2020 at 03:56:24PM +0800, Jeffle Xu wrote:
+> iopoll is initially for small size, latency sensitive IO. It doesn't
+> work well for big IO, especially when it needs to be split to multiple
+> bios. In this case, the returned cookie of __submit_bio_noacct_mq() is
+> indeed the cookie of the last split bio. The completion of *this* last
+> split bio done by iopoll doesn't mean the whole original bio has
+> completed. Callers of iopoll still need to wait for completion of other
+> split bios.
 > 
-> Thanks! Did you find t-put/etc. boost with your setup?
+> Besides bio splitting may cause more trouble for iopoll which isn't
+> supposed to be used in case of big IO.
+> 
+> iopoll for split bio may cause potential race if CPU migration happens
+> during bio submission. Since the returned cookie is that of the last
+> split bio, polling on the corresponding hardware queue doesn't help
+> complete other split bios, if these split bios are enqueued into
+> different hardware queues. Since interrupts are disabled for polling
+> queues, the completion of these other split bios depends on timeout
+> mechanism, thus causing a potential hang.
+> 
+> iopoll for split bio may also cause hang for sync polling. Currently
+> both the blkdev and iomap-based fs (ext4/xfs, etc) support sync polling
+> in direct IO routine. These routines will submit bio without REQ_NOWAIT
+> flag set, and then start sync polling in current process context. The
+> process may hang in blk_mq_get_tag() if the submitted bio has to be
+> split into multiple bios and can rapidly exhaust the queue depth. The
+> process are waiting for the completion of the previously allocated
+> requests, which should be reaped by the following polling, and thus
+> causing a deadlock.
+> 
+> To avoid these subtle trouble described above, just disable iopoll for
+> split bio.
+> 
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> ---
+>  block/blk-merge.c | 7 +++++++
+>  block/blk-mq.c    | 6 ++++--
+>  2 files changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index bcf5e4580603..53ad781917a2 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -279,6 +279,13 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>  	return NULL;
+>  split:
+>  	*segs = nsegs;
+> +
+> +	/*
+> +	 * bio splitting may cause subtle trouble such as hang when doing iopoll,
 
-Yeah, for this kind of test, if we shave 1% off the stack overhead,
-that directly yields an increase in peak IOPS. My numbers were close
-to yours, dropped about 1% of system overhead.
+Please capitalize the first character of a multi-line comments.  Also
+this adds an overly long line.
 
--- 
-Jens Axboe
+> +	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
+> +	if (hctx->type != HCTX_TYPE_POLL)
+> +		return 0;
 
+I think this is good as a sanity check, but shouldn't we be able to
+avoid even hitting this patch if we ensure that BLK_QC_T_NONE is
+returned after a bio is split?
