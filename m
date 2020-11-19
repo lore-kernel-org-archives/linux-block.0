@@ -2,225 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A18C2D0E4
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 06:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C6B9C388F9
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 06:30:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EBB6246A5
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 06:21:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECE85246AD
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 06:30:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Mxq59exu"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RCnXMMIT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726481AbgKSGUn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 01:20:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44892 "EHLO
+        id S1726122AbgKSGaC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 01:30:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725917AbgKSGUn (ORCPT
+        with ESMTP id S1725944AbgKSGaC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 01:20:43 -0500
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF924C0613D4
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 22:20:42 -0800 (PST)
-Received: by mail-qv1-xf2a.google.com with SMTP id ek7so2344381qvb.6
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 22:20:42 -0800 (PST)
+        Thu, 19 Nov 2020 01:30:02 -0500
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE27DC0613D4
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 22:30:01 -0800 (PST)
+Received: by mail-qk1-x736.google.com with SMTP id q22so4419359qkq.6
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 22:30:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=from:references:in-reply-to:mime-version:thread-index:date
          :message-id:subject:to:cc;
-        bh=nXxpNfeQlHPVFhVnvfc7b4UQ3ZjdY87/KG82sz68JBw=;
-        b=Mxq59exuzz/wf/huyHLW2u5qSGSPWE3VZcawqGjOxwn5vWuiiYzQ7b3qFSqQrfosgq
-         B4uS65jE33fKfjHuAoud4sgygXDQjg7dUR9Pn+cmFVsd7gxDNdIOi/kcOVDTnUYAqkzy
-         JOwqty6yJscyOYgGZQg27tGxe2s6Xr7tcvIns=
+        bh=tHGoV4Zvy8mFULKy+/iaTp5F4KB48kx3Th06KdtFJ+k=;
+        b=RCnXMMITVd4fV8gZKbXMUL8qCNDK3TWlzaiYv8ZtN6zMSc2lMHd/TW1/lATp/Nv4xr
+         WmIRK7B68CbS2TSFfZtzMV4ThIcP60e/AEXGknEp9O/H6AY3m7zXEWuqdsGgohm8iE2H
+         Qe4CWWfeZrnJbGVKdTwXT17Vo2jTIeJ5LUuNE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:references:in-reply-to:mime-version
          :thread-index:date:message-id:subject:to:cc;
-        bh=nXxpNfeQlHPVFhVnvfc7b4UQ3ZjdY87/KG82sz68JBw=;
-        b=ka9NXBKLaf3nRMqsXVr5xWeO6nna/PmLYzfLesPCG+6BE5ojH/80Y2gaFi7aoj9cHX
-         RaGWGghK4sOz11WpEsMxc4kWrI4reaaDIR6qisFhfru2tCb3zYBX2VO+hX07cFhCgxJ8
-         P0evfqS27ernsGt21LZXZQRmKrysM9hV/4OHaJGwmls4heea950hrUK389QuYqoptLNL
-         UG7irKGCQClsmKMuIEqXNeYYl1Q7gSRVaRtmjyGVtj46v/a/+3t7WD013OeHDiAdwBt9
-         0bkVFRWcr9ewm1qlMZN9Xuw+jAjQ+eK8tA4Xk8Pi2zM/cvF1slR5/7AhHuuu06QWG1Ym
-         W/uw==
-X-Gm-Message-State: AOAM5303RbzgAolbxZOPQno7zJrNLu2EdT9u1WE+k6zI1uKf6xoIFpXr
-        dRHoQuW/LUhsDTWazMc2hYyE8Mg4O1hV4S23iCwIiA==
-X-Google-Smtp-Source: ABdhPJxVDq/c3RelSvea0BwhSUfyAbfyleeJ0fAGhGTp9mSsNJHONNDzKi7VwAupnVsNB5MXKLcV/1dvrn1lwuNyBhY=
-X-Received: by 2002:ad4:5888:: with SMTP id dz8mr9933116qvb.34.1605766841701;
- Wed, 18 Nov 2020 22:20:41 -0800 (PST)
+        bh=tHGoV4Zvy8mFULKy+/iaTp5F4KB48kx3Th06KdtFJ+k=;
+        b=BEBCkiI6yS20i68HGfsj+L8lQS+90lGnHxINld7fEvlIvcd7dqsYpPg1K8QA0/xyFv
+         N1IAF6mUJYQqRf7/KdkEPfkCDLWRg1pBxjySDAlE0qgpxMhNQFlYbwwv8iB6TzYPU6nc
+         zRMs/EeIMlp9/H536G0Nj8z4tPb2xydDkhdz3OzYw3Dry0ZTFw2+6uLiWCLly15hBJLS
+         3JeO4IzouUysxkmjmu2K5FEIopm368vxmFVVZ128v5Qbv3AWzmTpYh5j8BGlUu+G77hJ
+         x2nl4u9QRu7r8m7TCsinAt9bIAcyKBz+P4VrtBI+7YfrNsmgXdLvaxy72xvZzTHqmMqY
+         vbGQ==
+X-Gm-Message-State: AOAM533Uf4J4e0fDIFQsCpdlnZFwZnNY7eT9g/ns8KiVjV3odmudv9Df
+        Hp3lEQ97R3UrEzzSDMlP6SU8QA61i3iZgCYDPSz0wA==
+X-Google-Smtp-Source: ABdhPJyzV2D/qpLhcBGGbFW9nwsVykZgLieXwP+5RtqpuVOv4K1oHEVxYs+XEX3ffFxlpXjfBP++t61g+cAZKLEB+JY=
+X-Received: by 2002:a37:7f03:: with SMTP id a3mr9549191qkd.72.1605767400793;
+ Wed, 18 Nov 2020 22:30:00 -0800 (PST)
 From:   Kashyap Desai <kashyap.desai@broadcom.com>
 References: <20201116090737.50989-13-ming.lei@redhat.com> <202011161944.U7XHrbsd-lkp@intel.com>
- <20201118023507.GA92339@T590>
-In-Reply-To: <20201118023507.GA92339@T590>
+ <20201118023507.GA92339@T590> <99089c7f-422b-3a61-a9c5-677a1e629862@suse.de> <20201118074405.GA111852@T590>
+In-Reply-To: <20201118074405.GA111852@T590>
 MIME-Version: 1.0
 X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQIS9sCgRF18gKjqcruTOMh+o2IV3QHxSRdOAbmfafepOSVGgA==
-Date:   Thu, 19 Nov 2020 11:50:39 +0530
-Message-ID: <36b8e652641fefca6e8f95d3bbaaf3ca@mail.gmail.com>
+Thread-Index: AQIS9sCgRF18gKjqcruTOMh+o2IV3QHxSRdOAbmfafcBi0xdtQICciWJqRzGZbA=
+Date:   Thu, 19 Nov 2020 11:59:58 +0530
+Message-ID: <4214ad35c463dccb26cc261a7d1fbb9e@mail.gmail.com>
 Subject: RE: [PATCH V4 12/12] scsi: replace sdev->device_busy with sbitmap
-To:     Ming Lei <ming.lei@redhat.com>, kernel test robot <lkp@intel.com>,
-        Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+To:     Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
+Cc:     kernel test robot <lkp@intel.com>,
+        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         linux-scsi@vger.kernel.org, kbuild-all@lists.01.org,
         clang-built-linux@googlegroups.com, Omar Sandoval <osandov@fb.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.de>
+        "Ewan D . Milne" <emilne@redhat.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="00000000000037e42505b46fbad4"
+        boundary="0000000000008a210e05b46fdb36"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---00000000000037e42505b46fbad4
+--0000000000008a210e05b46fdb36
 Content-Type: text/plain; charset="UTF-8"
 
+> > From: Hannes Reinecke <hare@suse.de>
+> > Date: Wed, 18 Nov 2020 08:08:41 +0100
+> > Subject: [PATCH] megaraid_sas: use scsi_device_busy() instead of
+> > direct access  to atomic counter
 > >
-> > If you fix the issue, kindly add following tag as appropriate
-> > Reported-by: kernel test robot <lkp@intel.com>
+> > It's always a bad style to access structure internals, especially if
+> > there is an accessor for it. So convert to use scsi_device_busy()
+> > intead of accessing the atomic counter directly.
 > >
-> > All errors (new ones prefixed by >>):
+> > Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> > Cc: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
+> > Signed-off-by: Hannes Reinecke <hare@suse.de>
+> > ---
+> >  drivers/scsi/megaraid/megaraid_sas_fusion.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > >
-> > >> drivers/scsi/megaraid/megaraid_sas_fusion.c:365:41: error: no
-member
-> named 'device_busy' in 'struct scsi_device'
-> >            sdev_busy = atomic_read(&scmd->device->device_busy);
+> > diff --git a/drivers/scsi/megaraid/megaraid_sas_fusion.c
+> > b/drivers/scsi/megaraid/megaraid_sas_fusion.c
+> > index fd607287608e..272ff123bc6b 100644
+> > --- a/drivers/scsi/megaraid/megaraid_sas_fusion.c
+> > +++ b/drivers/scsi/megaraid/megaraid_sas_fusion.c
+> > @@ -362,7 +362,7 @@ megasas_get_msix_index(struct megasas_instance
+> *instance,
+> >  	/* TBD - if sml remove device_busy in future, driver
+> >  	 * should track counter in internal structure.
+> >  	 */
+> > -	sdev_busy = atomic_read(&scmd->device->device_busy);
+> > +	sdev_busy = scsi_device_busy(scmd->device);
 >
-> This new reference to sdev->device_busy is added by recent shared host
-tag
-> patch, and according to the comment, you may have planed to convert into
-> one megaraid internal counter.
+> megasas_get_msix_index() is called in .queuecommand() path,
+> scsi_device_busy() might take more cycles since it has to iterate over
+each
+> sbitmap words, especially when the sbitmap depth is high.
 >
->         /* TBD - if sml remove device_busy in future, driver
->          * should track counter in internal structure.
->          */
+> I'd suggest Kashyap/Sumanesh to check if there is better way to deal
+with it. If
+> not, scsi_device_busy() should be fine.
+
+Scsi_device_busy() add significant amount of overhead which will be
+visible in terms of reduced IOPS and high CPU cycle. I tested it earlier
+and noticed regression in performance.
+I posted megaraid_sas driver patch which will use internal per sdev
+outstanding similar to legacy sdev_busy counter.
+
+Kashyap
 >
-> So can you post one patch? And I am happy to fold it into this series.
-
-Ming - Please find the patch for megaraid_sas driver -
-I have used helper inline function just for inter-operability with older
-kernel to support in our out of box driver.
-This way it will be easy for us to replace helper function as per kernel
-version check.
-
-Subject: [PATCH] megaraid_sas: replace sdev_busy with local counter
-
----
- drivers/scsi/megaraid/megaraid_sas.h        |  2 ++
- drivers/scsi/megaraid/megaraid_sas_fusion.c | 34 ++++++++++++++++++---
- 2 files changed, 32 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/scsi/megaraid/megaraid_sas.h
-b/drivers/scsi/megaraid/megaraid_sas.h
-index 0f808d63580e..0c6a56b24c6e 100644
---- a/drivers/scsi/megaraid/megaraid_sas.h
-+++ b/drivers/scsi/megaraid/megaraid_sas.h
-@@ -2019,10 +2019,12 @@ union megasas_frame {
-  * struct MR_PRIV_DEVICE - sdev private hostdata
-  * @is_tm_capable: firmware managed tm_capable flag
-  * @tm_busy: TM request is in progress
-+ * @sdev_priv_busy: pending command per sdev
-  */
- struct MR_PRIV_DEVICE {
-        bool is_tm_capable;
-        bool tm_busy;
-+       atomic_t sdev_priv_busy;
-        atomic_t r1_ldio_hint;
-        u8 interface_type;
-        u8 task_abort_tmo;
-diff --git a/drivers/scsi/megaraid/megaraid_sas_fusion.c
-b/drivers/scsi/megaraid/megaraid_sas_fusion.c
-index fd607287608e..e813ea0ad8b7 100644
---- a/drivers/scsi/megaraid/megaraid_sas_fusion.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_fusion.c
-@@ -220,6 +220,32 @@ megasas_clear_intr_fusion(struct megasas_instance
-*instance)
-        return 1;
- }
-
-+static inline void
-+megasas_sdev_busy_inc(struct scsi_cmnd *scmd)
-+{
-+       struct MR_PRIV_DEVICE *mr_device_priv_data;
-+
-+       mr_device_priv_data = scmd->device->hostdata;
-+       atomic_inc(&mr_device_priv_data->sdev_priv_busy);
-+}
-+static inline void
-+megasas_sdev_busy_dec(struct scsi_cmnd *scmd)
-+{
-+       struct MR_PRIV_DEVICE *mr_device_priv_data;
-+
-+       mr_device_priv_data = scmd->device->hostdata;
-+       atomic_dec(&mr_device_priv_data->sdev_priv_busy);
-+}
-+static inline int
-+megasas_sdev_busy_read(struct scsi_cmnd *scmd)
-+{
-+       struct MR_PRIV_DEVICE *mr_device_priv_data;
-+
-+       mr_device_priv_data = scmd->device->hostdata;
-+       return atomic_read(&mr_device_priv_data->sdev_priv_busy);
-+}
-+
-+
- /**
-  * megasas_get_cmd_fusion -    Get a command from the free pool
-  * @instance:          Adapter soft state
-@@ -359,10 +385,7 @@ megasas_get_msix_index(struct megasas_instance
-*instance,
- {
-        int sdev_busy;
-
--       /* TBD - if sml remove device_busy in future, driver
--        * should track counter in internal structure.
--        */
--       sdev_busy = atomic_read(&scmd->device->device_busy);
-+       sdev_busy = megasas_sdev_busy_read(scmd);
-
-        if (instance->perf_mode == MR_BALANCED_PERF_MODE &&
-            sdev_busy > (data_arms * MR_DEVICE_HIGH_IOPS_DEPTH)) {
-@@ -3390,6 +3413,7 @@ megasas_build_and_issue_cmd_fusion(struct
-megasas_instance *instance,
-         * Issue the command to the FW
-         */
-
-+       megasas_sdev_busy_inc(scmd);
-        megasas_fire_cmd_fusion(instance, req_desc);
-
-        if (r1_cmd)
-@@ -3450,6 +3474,7 @@ megasas_complete_r1_command(struct megasas_instance
-*instance,
-                scmd_local->SCp.ptr = NULL;
-                megasas_return_cmd_fusion(instance, cmd);
-                scsi_dma_unmap(scmd_local);
-+               megasas_sdev_busy_dec(scmd_local);
-                scmd_local->scsi_done(scmd_local);
-        }
- }
-@@ -3550,6 +3575,7 @@ complete_cmd_fusion(struct megasas_instance
-*instance, u32 MSIxIndex,
-                                scmd_local->SCp.ptr = NULL;
-                                megasas_return_cmd_fusion(instance,
-cmd_fusion);
-                                scsi_dma_unmap(scmd_local);
-+                               megasas_sdev_busy_dec(scmd_local);
-                                scmd_local->scsi_done(scmd_local);
-                        } else  /* Optimal VD - R1 FP command completion.
-*/
-                                megasas_complete_r1_command(instance,
-cmd_fusion);
---
-2.18.1
-
 >
 > Thanks,
 > Ming
 
---00000000000037e42505b46fbad4
+--0000000000008a210e05b46fdb36
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -290,14 +198,14 @@ pNj4hlSJMNNqxNSqrKaD1cR4/oZVPFVnJJYlB01cLVjGMzta9x27e6XEtseo2s7aoPS2l82koMr7
 M+LbYxcXFT2gXvoYd2Ms8zsLrhO2M6pMzeNGWk2HWTof9s7EEHDjis/MRlbYSNaohV23IUzNlBw7
 1FmvvW5GKK0xggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
 IG52LXNhMTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0g
-RzMCDDSdoX7GqonhoE7TszANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQguVAe1QRB
-zOKbnc2lCOBcC5nExtMgWqr97ufyXWFY3IYwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMjAxMTE5MDYyMDQyWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
+RzMCDDSdoX7GqonhoE7TszANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQg5eyFB6ON
+G0ruzKDIcJXGcYPY2Qeo5XmjKJRvTM+8uFUwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
+hkiG9w0BCQUxDxcNMjAxMTE5MDYzMDAxWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
 BglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAHOp9L42Ep7hufQFarmY70WeVU6b
-xjQZvXsGtFOsgZ6xYHJ7JqmUc9AMb6VINSSYowd/jQHFEUwc0KtodrkDn+5qlsKF7TR0HoZ7yTEV
-HCEz9ZUW/Wv48JrYEiO2SuoP0FO6iy8twKd+bIcw9pggRDyZgg3UsKDM+dc8aQlxB7/6EO7Oc1qk
-OVtjHGjJoecS1+jeupxyGn5I4LxHtr4sXmLirBhGcTOdDjQMFvKs1RxR9wCh0JBdQH+sGzK5E35Z
-GLtNoaj5hwn0p+HMk/lPykmrraMHSb8gtBoAfeACPZ8RJG7bPK2Q9AKQiarWnOCKT9VdeuUKoGwa
-Zh2lSiKTwVE=
---00000000000037e42505b46fbad4--
+9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBALKttNuNrRDBT4yt8xWXTobYRQvR
+6x4DroY8u1kgJqi4jg1FVu+X02CzLn4axVLiMCNnsPA1oUUOWNtpcG8CN0V20Ow62QCuktAqDiJy
+MpUcj7zZTlTxq0UHx0bVg67hbA1rp+geSEjdcpOsTxaL7V9pAAoU20eZuy8bcryer7B7fu7C1yIu
+BxNMQW+iP6t+BxyN/LbCQcZ4KrM1rT03l4eMV7fYy7BXZiSjTcUSoevB38jAaQ9BDY1PZErUDFsh
+z4wd9K2ZeQPMovpvaNVl9PJnzhOHP4vrEzXh1WRrfBMDaEJBFQMy76hKmkzVzWxE7TjTXf/4B5Rq
+neFyO9R8ImU=
+--0000000000008a210e05b46fdb36--
