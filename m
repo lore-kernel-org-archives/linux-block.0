@@ -4,83 +4,106 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49DEFC388F9
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 10:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5DD4C2D0E4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 10:33:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F04A22470E
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 10:29:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 772C822202
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 10:33:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725905AbgKSK3V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 05:29:21 -0500
-Received: from mx2.suse.de ([195.135.220.15]:53876 "EHLO mx2.suse.de"
+        id S1726468AbgKSKc4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 05:32:56 -0500
+Received: from mx2.suse.de ([195.135.220.15]:34386 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725873AbgKSK3V (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 05:29:21 -0500
+        id S1726274AbgKSKc4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Nov 2020 05:32:56 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 768E3AA4F;
-        Thu, 19 Nov 2020 10:29:19 +0000 (UTC)
-Subject: Re: [PATCH V5 10/13] megaraid_sas: v2 replace sdev_busy with local
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     Omar Sandoval <osandov@fb.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>
-References: <20201119094705.280390-1-ming.lei@redhat.com>
- <20201119095147.GB279559@T590>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <0a3b01e0-434b-7962-ffc7-611bc9c680a1@suse.de>
-Date:   Thu, 19 Nov 2020 11:29:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        by mx2.suse.de (Postfix) with ESMTP id 3937FACBA;
+        Thu, 19 Nov 2020 10:32:54 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id D5CBE1E130B; Thu, 19 Nov 2020 11:32:53 +0100 (CET)
+Date:   Thu, 19 Nov 2020 11:32:53 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 13/20] block: remove ->bd_contains
+Message-ID: <20201119103253.GV1981@quack2.suse.cz>
+References: <20201118084800.2339180-1-hch@lst.de>
+ <20201118084800.2339180-14-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20201119095147.GB279559@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201118084800.2339180-14-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/19/20 10:51 AM, Ming Lei wrote:
->  From 4c13ab0b85057de70c523970bbb9d2268e6d980d Mon Sep 17 00:00:00 2001
-> From: Kashyap Desai <kashyap.desai@broadcom.com>
-> Date: Thu, 19 Nov 2020 12:39:01 +0530
-> Subject: [PATCH V5 10/13] megaraid_sas: v2 replace sdev_busy with local
->   counter
+On Wed 18-11-20 09:47:53, Christoph Hellwig wrote:
+> Now that each hd_struct has a reference to the corresponding
+> block_device, there is no need for the bd_contains pointer.  Add
+> a bdev_whole() helper to look up the whole device block_device
+> struture instead.
 > 
-> use local tracking of per sdev outstanding command since sdev_busy in
-> SML is improved for performance reason using sbitmap (earlier it was
-> atomic variable).
-> 
-> Cc: Omar Sandoval <osandov@fb.com>
-> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-> Cc: Ewan D. Milne <emilne@redhat.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
-> 
-> Fix checkpatch ERROR and WARNING.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   drivers/scsi/megaraid/megaraid_sas.h        |  2 +
->   drivers/scsi/megaraid/megaraid_sas_fusion.c | 47 +++++++++++++++++----
->   2 files changed, 41 insertions(+), 8 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Cheers,
+Just two nits below. Otherwise feel free to add:
 
-Hannes
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+> @@ -1521,7 +1510,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, void *holder,
+>  		if (bdev->bd_bdi == &noop_backing_dev_info)
+>  			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
+>  	} else {
+> -		if (bdev->bd_contains == bdev) {
+> +		if (!bdev->bd_partno) {
+
+This should be !bdev_is_partition(bdev) for consistency, right?
+
+>  			ret = 0;
+>  			if (bdev->bd_disk->fops->open)
+>  				ret = bdev->bd_disk->fops->open(bdev, mode);
+...
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 0069bee992063e..453b940b87d8e9 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -32,7 +32,6 @@ struct block_device {
+>  #ifdef CONFIG_SYSFS
+>  	struct list_head	bd_holder_disks;
+>  #endif
+> -	struct block_device *	bd_contains;
+>  	u8			bd_partno;
+>  	struct hd_struct *	bd_part;
+>  	/* number of times partitions within this device have been opened. */
+> @@ -48,6 +47,9 @@ struct block_device {
+>  	struct mutex		bd_fsfreeze_mutex;
+>  } __randomize_layout;
+>  
+> +#define bdev_whole(_bdev) \
+> +	((_bdev)->bd_disk->part0.bdev)
+> +
+>  #define bdev_kobj(_bdev) \
+>  	(&part_to_dev((_bdev)->bd_part)->kobj)
+
+I'd somewhat prefer if these helpers could actually be inline functions and
+not macros. I guess they are macros because hd_struct isn't in blk_types.h.
+But if we moved helpers to blkdev.h, we'd have all definitions we need...
+Is that a problem for some users?
+
+								Honza
+
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
