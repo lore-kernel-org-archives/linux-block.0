@@ -2,395 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94AEDC388F9
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 09:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD1EC2D0E4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 09:42:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D4292222A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 09:35:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KOA8BbK2"
+	by mail.kernel.org (Postfix) with ESMTP id E2DBD246E0
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 09:41:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726866AbgKSJfK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 04:35:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41240 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726853AbgKSJfK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 04:35:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605778507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6Wlbc27cKvfgUNNZQ/g5JfGgWMPe4yOWNHAmPB8iQ2o=;
-        b=KOA8BbK2gJc6HXqLqat70puWpA9iefHqnBKK91Rdg14PFuGTkUKyHgplIWAxiCdqD6Fxfj
-        5+p5uDHANzEJJJlXSfm5ORHutQznYXR8a1Ao/IG7+YTsnyG1i7a3AYjGHstG01zUHVoRfV
-        a6oVY096qZQH24aj/6M45Lj3nrqcrOA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-7Bn88RW8MqGfrV5Aqm4QKA-1; Thu, 19 Nov 2020 04:35:03 -0500
-X-MC-Unique: 7Bn88RW8MqGfrV5Aqm4QKA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F9681005D44;
-        Thu, 19 Nov 2020 09:35:01 +0000 (UTC)
-Received: from localhost (ovpn-13-167.pek2.redhat.com [10.72.13.167])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B7EC19C45;
-        Thu, 19 Nov 2020 09:35:00 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V5 08/13] blk-mq: return budget token from .get_budget callback
-Date:   Thu, 19 Nov 2020 17:33:57 +0800
-Message-Id: <20201119093402.279318-9-ming.lei@redhat.com>
-In-Reply-To: <20201119093402.279318-1-ming.lei@redhat.com>
-References: <20201119093402.279318-1-ming.lei@redhat.com>
+        id S1726633AbgKSJl7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 04:41:59 -0500
+Received: from mx2.suse.de ([195.135.220.15]:33482 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726511AbgKSJl7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Nov 2020 04:41:59 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id A3791AC98;
+        Thu, 19 Nov 2020 09:41:57 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 286A51E1303; Thu, 19 Nov 2020 10:41:57 +0100 (CET)
+Date:   Thu, 19 Nov 2020 10:41:57 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 11/20] block: reference struct block_device from struct
+ hd_struct
+Message-ID: <20201119094157.GT1981@quack2.suse.cz>
+References: <20201118084800.2339180-1-hch@lst.de>
+ <20201118084800.2339180-12-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201118084800.2339180-12-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SCSI uses one global atomic variable to track queue depth for each
-LUN/request queue.
+On Wed 18-11-20 09:47:51, Christoph Hellwig wrote:
+> To simplify block device lookup and a few other upcomdin areas, make sure
+> that we always have a struct block_device available for each disk and
+> each partition.  The only downside of this is that each device and
+> partition uses a little more memories.  The upside will be that a lot of
+				^^^ memory
 
-This way doesn't scale well when there is lots of CPU cores and the
-disk is very fast. It has been observed that IOPS is affected a lot
-by tracking queue depth via sdev->device_busy in IO path.
+> code can be simplified.
+> 
+> With that all we need to look up the block device is to lookup the inode
+> and do a few sanity checks on the gendisk, instead of the separate lookup
+> for the gendisk.
+> 
+> As part of the change switch bdget() to only find existing block devices,
+> given that we know that the block_device structure must be allocated at
+> probe / partition scan time.
+> 
+> blk-cgroup needed a bit of a special treatment as the only place that
+> wanted to lookup a gendisk outside of the normal blkdev_get path.  It is
+> switched to lookup using the block device hash now that this is the
+> primary lookup path.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Return budget token from .get_budget callback, and the budget token
-can be passed to driver, so that we can replace the atomic variable
-with sbitmap_queue, then the scale issue can be fixed.
+The patch looks good to me and I like the simplifications! I've found just
+one small issue below.
 
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-Cc: Ewan D. Milne <emilne@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Tested-by: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c    | 17 +++++++++++++----
- block/blk-mq.c          | 36 +++++++++++++++++++++++++-----------
- block/blk-mq.h          | 25 +++++++++++++++++++++----
- drivers/scsi/scsi_lib.c | 16 +++++++++++-----
- include/linux/blk-mq.h  |  4 ++--
- 5 files changed, 72 insertions(+), 26 deletions(-)
+> @@ -1748,16 +1600,18 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+>  	if (!disk)
+>  		return NULL;
+>  
+> +	disk->part0.bdev = bdev_alloc(disk, 0);
+> +	if (!disk->part0.bdev)
+> +		goto out_free_disk;
+> +
+>  	disk->part0.dkstats = alloc_percpu(struct disk_stats);
+>  	if (!disk->part0.dkstats)
+> -		goto out_free_disk;
+> +		goto out_bdput;
+>  
+>  	init_rwsem(&disk->lookup_sem);
+>  	disk->node_id = node_id;
+> -	if (disk_expand_part_tbl(disk, 0)) {
+> -		free_percpu(disk->part0.dkstats);
+> -		goto out_free_disk;
+> -	}
+> +	if (disk_expand_part_tbl(disk, 0))
+> +		goto out_free_bdstats;
+>  
+>  	ptbl = rcu_dereference_protected(disk->part_tbl, 1);
+>  	rcu_assign_pointer(ptbl->part[0], &disk->part0);
+> @@ -1772,8 +1626,10 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+>  	 * converted to make use of bd_mutex and sequence counters.
+>  	 */
+>  	hd_sects_seq_init(&disk->part0);
+> -	if (hd_ref_init(&disk->part0))
+> -		goto out_free_part0;
+> +	if (hd_ref_init(&disk->part0)) {
+> +		hd_free_part(&disk->part0);
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index d1eafe2c045c..bf046530ed4c 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -131,6 +131,7 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- 
- 	do {
- 		struct request *rq;
-+		int budget_token;
- 
- 		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
- 			break;
-@@ -140,12 +141,13 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- 			break;
- 		}
- 
--		if (!blk_mq_get_dispatch_budget(q))
-+		budget_token = blk_mq_get_dispatch_budget(q);
-+		if (budget_token < 0)
- 			break;
- 
- 		rq = e->type->ops.dispatch_request(hctx);
- 		if (!rq) {
--			blk_mq_put_dispatch_budget(q);
-+			blk_mq_put_dispatch_budget(q, budget_token);
- 			/*
- 			 * We're releasing without dispatching. Holding the
- 			 * budget could have blocked any "hctx"s with the
-@@ -157,6 +159,8 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- 			break;
- 		}
- 
-+		blk_mq_set_rq_budget_token(rq, budget_token);
-+
- 		/*
- 		 * Now this rq owns the budget which has to be released
- 		 * if this rq won't be queued to driver via .queue_rq()
-@@ -230,6 +234,8 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- 	struct request *rq;
- 
- 	do {
-+		int budget_token;
-+
- 		if (!list_empty_careful(&hctx->dispatch)) {
- 			ret = -EAGAIN;
- 			break;
-@@ -238,12 +244,13 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- 		if (!sbitmap_any_bit_set(&hctx->ctx_map))
- 			break;
- 
--		if (!blk_mq_get_dispatch_budget(q))
-+		budget_token = blk_mq_get_dispatch_budget(q);
-+		if (budget_token < 0)
- 			break;
- 
- 		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
- 		if (!rq) {
--			blk_mq_put_dispatch_budget(q);
-+			blk_mq_put_dispatch_budget(q, budget_token);
- 			/*
- 			 * We're releasing without dispatching. Holding the
- 			 * budget could have blocked any "hctx"s with the
-@@ -255,6 +262,8 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- 			break;
- 		}
- 
-+		blk_mq_set_rq_budget_token(rq, budget_token);
-+
- 		/*
- 		 * Now this rq owns the budget which has to be released
- 		 * if this rq won't be queued to driver via .queue_rq()
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ae023cf90c30..9e075c333498 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1296,10 +1296,15 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
- 						  bool need_budget)
- {
- 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-+	int budget_token = -1;
- 
--	if (need_budget && !blk_mq_get_dispatch_budget(rq->q)) {
--		blk_mq_put_driver_tag(rq);
--		return PREP_DISPATCH_NO_BUDGET;
-+	if (need_budget) {
-+		budget_token = blk_mq_get_dispatch_budget(rq->q);
-+		if (budget_token < 0) {
-+			blk_mq_put_driver_tag(rq);
-+			return PREP_DISPATCH_NO_BUDGET;
-+		}
-+		blk_mq_set_rq_budget_token(rq, budget_token);
- 	}
- 
- 	if (!blk_mq_get_driver_tag(rq)) {
-@@ -1316,7 +1321,7 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
- 			 * together during handling partial dispatch
- 			 */
- 			if (need_budget)
--				blk_mq_put_dispatch_budget(rq->q);
-+				blk_mq_put_dispatch_budget(rq->q, budget_token);
- 			return PREP_DISPATCH_NO_TAG;
- 		}
- 	}
-@@ -1326,12 +1331,16 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
- 
- /* release all allocated budgets before calling to blk_mq_dispatch_rq_list */
- static void blk_mq_release_budgets(struct request_queue *q,
--		unsigned int nr_budgets)
-+		struct list_head *list)
- {
--	int i;
-+	struct request *rq;
- 
--	for (i = 0; i < nr_budgets; i++)
--		blk_mq_put_dispatch_budget(q);
-+	list_for_each_entry(rq, list, queuelist) {
-+		int budget_token = blk_mq_get_rq_budget_token(rq);
-+
-+		if (budget_token >= 0)
-+			blk_mq_put_dispatch_budget(q, budget_token);
-+	}
- }
- 
- /*
-@@ -1429,7 +1438,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 			(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED);
- 		bool no_budget_avail = prep == PREP_DISPATCH_NO_BUDGET;
- 
--		blk_mq_release_budgets(q, nr_budgets);
-+		if (nr_budgets)
-+			blk_mq_release_budgets(q, list);
- 
- 		spin_lock(&hctx->lock);
- 		list_splice_tail_init(list, &hctx->dispatch);
-@@ -1999,6 +2009,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- {
- 	struct request_queue *q = rq->q;
- 	bool run_queue = true;
-+	int budget_token;
- 
- 	/*
- 	 * RCU or SRCU read lock is needed before checking quiesced flag.
-@@ -2016,11 +2027,14 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	if (q->elevator && !bypass_insert)
- 		goto insert;
- 
--	if (!blk_mq_get_dispatch_budget(q))
-+	budget_token = blk_mq_get_dispatch_budget(q);
-+	if (budget_token < 0)
- 		goto insert;
- 
-+	blk_mq_set_rq_budget_token(rq, budget_token);
-+
- 	if (!blk_mq_get_driver_tag(rq)) {
--		blk_mq_put_dispatch_budget(q);
-+		blk_mq_put_dispatch_budget(q, budget_token);
- 		goto insert;
- 	}
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index a52703c98b77..bb59a3e54c3b 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -186,17 +186,34 @@ unsigned int blk_mq_in_flight(struct request_queue *q, struct hd_struct *part);
- void blk_mq_in_flight_rw(struct request_queue *q, struct hd_struct *part,
- 			 unsigned int inflight[2]);
- 
--static inline void blk_mq_put_dispatch_budget(struct request_queue *q)
-+static inline void blk_mq_put_dispatch_budget(struct request_queue *q,
-+					      int budget_token)
- {
- 	if (q->mq_ops->put_budget)
--		q->mq_ops->put_budget(q);
-+		q->mq_ops->put_budget(q, budget_token);
- }
- 
--static inline bool blk_mq_get_dispatch_budget(struct request_queue *q)
-+static inline int blk_mq_get_dispatch_budget(struct request_queue *q)
- {
- 	if (q->mq_ops->get_budget)
- 		return q->mq_ops->get_budget(q);
--	return true;
-+	return 0;
-+}
-+
-+static inline void blk_mq_set_rq_budget_token(struct request *rq, int token)
-+{
-+	if (token < 0)
-+		return;
-+
-+	if (rq->q->mq_ops->set_rq_budget_token)
-+		rq->q->mq_ops->set_rq_budget_token(rq, token);
-+}
-+
-+static inline int blk_mq_get_rq_budget_token(struct request *rq)
-+{
-+	if (rq->q->mq_ops->get_rq_budget_token)
-+		return rq->q->mq_ops->get_rq_budget_token(rq);
-+	return -1;
- }
- 
- static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx)
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 022ed2991463..dafcfa3ae77c 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -328,6 +328,7 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
- 		atomic_dec(&starget->target_busy);
- 
- 	atomic_dec(&sdev->device_busy);
-+	cmd->budget_token = -1;
- }
- 
- static void scsi_kick_queue(struct request_queue *q)
-@@ -1138,6 +1139,7 @@ void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
- 	unsigned long jiffies_at_alloc;
- 	int retries, to_clear;
- 	bool in_flight;
-+	int budget_token = cmd->budget_token;
- 
- 	if (!blk_rq_is_scsi(rq) && !(flags & SCMD_INITIALIZED)) {
- 		flags |= SCMD_INITIALIZED;
-@@ -1166,6 +1168,7 @@ void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
- 	cmd->retries = retries;
- 	if (in_flight)
- 		__set_bit(SCMD_STATE_INFLIGHT, &cmd->state);
-+	cmd->budget_token = budget_token;
- 
- }
- 
-@@ -1598,19 +1601,19 @@ static void scsi_mq_done(struct scsi_cmnd *cmd)
- 	blk_mq_complete_request(cmd->request);
- }
- 
--static void scsi_mq_put_budget(struct request_queue *q)
-+static void scsi_mq_put_budget(struct request_queue *q, int budget_token)
- {
- 	struct scsi_device *sdev = q->queuedata;
- 
- 	atomic_dec(&sdev->device_busy);
- }
- 
--static bool scsi_mq_get_budget(struct request_queue *q)
-+static int scsi_mq_get_budget(struct request_queue *q)
- {
- 	struct scsi_device *sdev = q->queuedata;
- 
- 	if (scsi_dev_queue_ready(q, sdev))
--		return true;
-+		return 0;
- 
- 	atomic_inc(&sdev->restarts);
- 
-@@ -1632,7 +1635,7 @@ static bool scsi_mq_get_budget(struct request_queue *q)
- 	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
- 				!scsi_device_blocked(sdev)))
- 		blk_mq_delay_run_hw_queues(sdev->request_queue, SCSI_QUEUE_DELAY);
--	return false;
-+	return -1;
- }
- 
- static void scsi_mq_set_rq_budget_token(struct request *req, int token)
-@@ -1660,6 +1663,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	blk_status_t ret;
- 	int reason;
- 
-+	WARN_ON_ONCE(cmd->budget_token < 0);
-+
- 	/*
- 	 * If the device is not in running state we will reject some or all
- 	 * commands.
-@@ -1711,7 +1716,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (scsi_target(sdev)->can_queue > 0)
- 		atomic_dec(&scsi_target(sdev)->target_busy);
- out_put_budget:
--	scsi_mq_put_budget(q);
-+	scsi_mq_put_budget(q, cmd->budget_token);
-+	cmd->budget_token = -1;
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		break;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d2c66b453d07..b2e1b8daf12f 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -309,12 +309,12 @@ struct blk_mq_ops {
- 	 * reserved budget. Also we have to handle failure case
- 	 * of .get_budget for avoiding I/O deadlock.
- 	 */
--	bool (*get_budget)(struct request_queue *);
-+	int (*get_budget)(struct request_queue *);
- 
- 	/**
- 	 * @put_budget: Release the reserved budget.
- 	 */
--	void (*put_budget)(struct request_queue *);
-+	void (*put_budget)(struct request_queue *, int);
- 
- 	/*
- 	 * @set_rq_budget_toekn: store rq's budget token
+Aren't you missing kfree(disk) here?
+
+> +		return NULL;
+> +	}
+>  
+>  	disk->minors = minors;
+>  	rand_initialize_disk(disk);
+
+								Honza
 -- 
-2.25.4
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
