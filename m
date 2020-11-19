@@ -2,106 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E13C63798
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 12:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5B0C64E7C
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 14:39:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E47CB246E0
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 12:38:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d30vgQqo"
+	by mail.kernel.org (Postfix) with ESMTP id 8BDE02468B
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 14:39:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727283AbgKSMiZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 07:38:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46618 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727096AbgKSMiZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 07:38:25 -0500
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00760C0613CF;
-        Thu, 19 Nov 2020 04:38:24 -0800 (PST)
-Received: by mail-wm1-x344.google.com with SMTP id c198so5147449wmd.0;
-        Thu, 19 Nov 2020 04:38:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=g5OCS+3DQz7Ea5OMMP9QWzIynexAFFgWX0tm/4Z5oko=;
-        b=d30vgQqotHV48w2ArtccBzIaiOGmPp0buvGmsv8v/27kceQH8XlKTDqOShNy9YknnB
-         mB8qyQTD1hVVwuV5nj4jXYrMGaaDnrfMLabwLWzQkxsaMwPg2GOwggXwSOE0rOjfRELr
-         efDfmg1kc4+M5zvUYbRJtnDAuzG63L5pxrNnkHwipLjVnLVKWR1n25A5rHlKBkzZVPlt
-         UohPBbWYpHogXQdIfDGoEdicUcu248+qkb1bGWpd8vUJhpdn1rFJlyEtEzQdykVmwNBl
-         wiW33MpuJUtQP1XSTZE7XizB3eW8CoJv6EJcGD8u7iqd89ktIpjVmbXF4c4N9wRLm+xa
-         lqZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=g5OCS+3DQz7Ea5OMMP9QWzIynexAFFgWX0tm/4Z5oko=;
-        b=WmuhC6IaQF2Os3P4MDBJM+niQ4G7LfiqMpksLSCc2RZiuRmuXikJZgKvnZiuTuO8kx
-         iAhAXWSNy25TV9f2S4IY73TJ4mFb0jnQ4eYp49DuHFc+isSH9CpvwahW7dH3Wa3h8dOa
-         jG5jf08/F1hkVdcsG9/MK0R8dCzldB4XIYN1w8E5dSxZhuzFX7fvp6WR7xOw3mLykVPW
-         0bo+NmwNFt2c+gWBylerAbejuD6/POP32F8OQ4LVeWFOW0j31+pnVHtRwhYfO6WUNeQ+
-         jg6QGqDCFMCUu0nqdPT2mXnd3GtqYMy0h463Y91WvyWSkDdfyOer6PNze7eyJGBhyAvg
-         zwEQ==
-X-Gm-Message-State: AOAM533P/lCpPiH9/MdthkjDssHNRndZqQG91HZcDwck5NfHuXUyzRrf
-        SKeXarcncUHVZgTDi+6/GI05eHtghkI/KQ==
-X-Google-Smtp-Source: ABdhPJz86HOzzqqT9FXVVnQ03wd9cIQgODp8/POepa9dqHvmVxzqzZDKOF/uh6zgYWVC/sHP5jxZAg==
-X-Received: by 2002:a1c:4055:: with SMTP id n82mr4710640wma.68.1605789503774;
-        Thu, 19 Nov 2020 04:38:23 -0800 (PST)
-Received: from localhost.localdomain (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
-        by smtp.gmail.com with ESMTPSA id d10sm39362320wro.89.2020.11.19.04.38.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2020 04:38:23 -0800 (PST)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org
-Subject: [PATCH v2] blk-mq: skip hybrid polling if iopoll doesn't spin
-Date:   Thu, 19 Nov 2020 12:35:09 +0000
-Message-Id: <972a4d02be5d52d98e8e5523ff4440d30a9cf00a.1605789192.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <cb5e5c3bb9ac13ca7e1026ceb484c03c0367e14b.1605788995.git.asml.silence@gmail.com>
-References: 
+        id S1728157AbgKSOjY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 09:39:24 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51602 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728124AbgKSOjX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Nov 2020 09:39:23 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 3CBF6AA4F;
+        Thu, 19 Nov 2020 14:39:22 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id E1C061E130B; Thu, 19 Nov 2020 15:39:21 +0100 (CET)
+Date:   Thu, 19 Nov 2020 15:39:21 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 15/20] block: merge struct block_device and struct
+ hd_struct
+Message-ID: <20201119143921.GX1981@quack2.suse.cz>
+References: <20201118084800.2339180-1-hch@lst.de>
+ <20201118084800.2339180-16-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201118084800.2339180-16-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-io_uring might be iterating over several devices/files iopoll'ing each
-of them, for that it passes spin=false expecting quick return if there
-are no requests to complete.
+On Wed 18-11-20 09:47:55, Christoph Hellwig wrote:
+> Instead of having two structures that represent each block device with
+> different lift time rules merged them into a single one.  This also
+            ^^^ :) life     ^^^^ merge
 
-However, blk_poll() will sleep if hybrid poll is enabled. Skip sleeping
-there if specified not to spin.
+> greatly simplifies the reference counting rules, as we can use the inode
+> reference count as the main reference count for the new struct
+> block_device, with the device model reference front ending it for device
+> model interaction.  The percpu refcount in struct hd_struct is entirely
+> gone given that struct block_device must be opened and thus valid for
+> the duration of the I/O.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
+This patch is kind of difficult to review due to the size of mostly
+mechanical changes mixed with not completely mechanical changes. Can we
+perhaps split out the mechanical bits? E.g. the rq->part => rq->bdev
+renaming is mechanical and notable part of the patch. Similarly the
+part->foo => part->bd_foo bits...
 
-v2: inverse invalid spin check
+Also I'm kind of wondering: AFAIU the new lifetime rules, gendisk holds
+bdev reference and bdev is created on gendisk allocation so bdev lifetime is
+strictly larger than gendisk lifetime. But what now keeps bdev->bd_disk
+reference safe in presence device hot unplug? In most cases we are still
+protected by gendisk reference taken in __blkdev_get() but how about
+disk->lookup_sem and disk->flags dereferences before we actually grab the
+reference?
 
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Also I find it rather non-obvious (although elegant ;) that bdev->bd_device
+rules the lifetime of gendisk. Can you perhaps explain this in the
+changelog and probably also add somewhere to source a documentation about
+the new lifetime rules?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 55bcee5dc032..38262212fc99 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3865,7 +3865,7 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	 * the IO isn't complete, we'll get called again and will go
- 	 * straight to the busy poll loop.
- 	 */
--	if (blk_mq_poll_hybrid(q, hctx, cookie))
-+	if (spin && blk_mq_poll_hybrid(q, hctx, cookie))
- 		return 1;
- 
- 	hctx->poll_considered++;
+> diff --git a/block/blk.h b/block/blk.h
+> index 09cee7024fb43e..90dd2047c6cd29 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -215,7 +215,15 @@ static inline void elevator_exit(struct request_queue *q,
+>  	__elevator_exit(q, e);
+>  }
+>  
+> -struct hd_struct *__disk_get_part(struct gendisk *disk, int partno);
+> +static inline struct block_device *__bdget_disk(struct gendisk *disk,
+> +		int partno)
+> +{
+> +	struct disk_part_tbl *ptbl = rcu_dereference(disk->part_tbl);
+> +
+> +	if (unlikely(partno < 0 || partno >= ptbl->len))
+> +		return NULL;
+> +	return rcu_dereference(ptbl->part[partno]);
+> +}
+
+I understand this is lower-level counterpart of bdget_disk() but it is
+confusing to me that this has 'bdget' in the name and returns no bdev
+reference. Can we call it like __bdev_from_disk() or something like that?
+
+>  
+>  ssize_t part_size_show(struct device *dev, struct device_attribute *attr,
+>  		char *buf);
+
+
+									Honza
 -- 
-2.24.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
