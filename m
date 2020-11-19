@@ -2,320 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81995C388F9
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 07:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD943C63798
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 07:51:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB483246D4
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 07:09:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DC0F246DE
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 07:51:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TjT7CtXJ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OISqq6V4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726107AbgKSHJF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 02:09:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52300 "EHLO
+        id S1726251AbgKSHvH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 02:51:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726095AbgKSHJE (ORCPT
+        with ESMTP id S1725937AbgKSHvG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 02:09:04 -0500
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9212AC0613CF
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 23:09:04 -0800 (PST)
-Received: by mail-qt1-x841.google.com with SMTP id v11so3620847qtq.12
-        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 23:09:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=pshD8zv3BoE55BZQ4EEAmDJudOpAsTt3STIAoKffPQk=;
-        b=TjT7CtXJ/kjOMgg96uJhdU/4nCpPYVYCMw/PYKVgljTZz+NG4g47+5CPLgUKXInBHl
-         cNFEV4diBH1gn/87W+iN2nlima4Jq9RhZSE6sL9K4F9au2xmfsuqC9LTUgp3A46qccmi
-         CjYqzFYjktsuezqYHvr3VBg/2de58S+p6pw74=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=pshD8zv3BoE55BZQ4EEAmDJudOpAsTt3STIAoKffPQk=;
-        b=ks+ga1xGU+09dNAjab1XpERjRbxmKY/xKdySVAKas7sQ8mYcQpsEw+hg0dbkoZP4/V
-         Pg1pvQL6vSgvZ/GaO+2GJJDHtPpGCsDHK2AbVPh8uDXDS+uq7YhufAJMEW3HCri/ZqEm
-         jLqGiSfGbaDsYf5/z5j4JZ0CvKrOWQkDv4TU+6SDiic8U0Mx3q6xXjApUsNtOcej6mcn
-         TICRxam1mB5cPLdrQEyp1f39Vs0DvnMDSslowfeEMJSeOfsJsyplE1CQOfqedBXCWzlN
-         5jFhoAwJMh9Y/AH0hEU+DELUF/dWmdUnvi4ukVnZvsqcxjEFZkgWg964M/8UArOiyI5R
-         vimg==
-X-Gm-Message-State: AOAM530SxquBaNPYSs1yQNRAW6YQoupsqF4SEgltgf2GonNfr5Xd8Fol
-        2FSEeRGrX4sB9rWtPAROahsp3/LAX6e7KN9RHoODrw==
-X-Google-Smtp-Source: ABdhPJwYQ6tyqsZpg5m9++LrXF0oeZtoNi8kXVF0RzASLC2zqGVDLYZ19AtLZVQ+rxloMDXAGAL+kpq6ikaKTEs3gRA=
-X-Received: by 2002:ac8:5c15:: with SMTP id i21mr9400364qti.190.1605769743520;
- Wed, 18 Nov 2020 23:09:03 -0800 (PST)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <20201116090737.50989-13-ming.lei@redhat.com> <202011161944.U7XHrbsd-lkp@intel.com>
- <20201118023507.GA92339@T590> <36b8e652641fefca6e8f95d3bbaaf3ca@mail.gmail.com>
- <20201119063407.GB170672@T590>
-In-Reply-To: <20201119063407.GB170672@T590>
+        Thu, 19 Nov 2020 02:51:06 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB01C0613CF
+        for <linux-block@vger.kernel.org>; Wed, 18 Nov 2020 23:51:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=Pyu9heZIDLVyXwvBLRyPWIbTuCXkV5mAZehTNuiPea0=; b=OISqq6V4TeyD5DG2t3TMdXlEbG
+        MusG4yOkvrmrRQZ7vEwkX2W5xC1BkKgKbqnfiwNM5PkLpHNdTporJaGJ5uolfavnOGKYvR0v/qeAm
+        k3pV1KAH34Zq+bmPXC4Y+qDf60o7rN3SMphDudYOcZN1ugAaf5ya16tfXvJYQlDqwh/14rPjbe56u
+        d7oPNkyrj+Dinl3mj8FbEbu3apaaEz0Bp+YANRHAK22Mo5Oz07NN0q8jp8j2QuxJn9McXHPULmdVO
+        uyeSc5QTrtsdFaDZP+HXrIDGFfnYYikRI5yZD7zMPvSs5O/QWBDgO+YvHR0zohVDnc+U2tpMOXGPB
+        8YZ5u9Hg==;
+Received: from [2001:4bb8:18c:31ba:300a:fbec:1f54:a33a] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kfeiY-0000y8-U8; Thu, 19 Nov 2020 07:50:59 +0000
+Date:   Thu, 19 Nov 2020 08:50:57 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for 5.10
+Message-ID: <20201119075057.GA2465128@infradead.org>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQIS9sCgRF18gKjqcruTOMh+o2IV3QHxSRdOAbmfafcCCFe5eAJDXzHnqRbiriA=
-Date:   Thu, 19 Nov 2020 12:39:01 +0530
-Message-ID: <94182d5716e46be949b7f17a936e7c7e@mail.gmail.com>
-Subject: RE: [PATCH V4 12/12] scsi: replace sdev->device_busy with sbitmap
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     kernel test robot <lkp@intel.com>,
-        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, kbuild-all@lists.01.org,
-        clang-built-linux@googlegroups.com, Omar Sandoval <osandov@fb.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.de>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="0000000000002de60f05b4706722"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---0000000000002de60f05b4706722
-Content-Type: text/plain; charset="UTF-8"
+The following changes since commit 9f16a66733c90b5f33f624b0b0e36a345b0aaf93:
 
-> >  /**
-> >   * megasas_get_cmd_fusion -    Get a command from the free pool
-> >   * @instance:          Adapter soft state
-> > @@ -359,10 +385,7 @@ megasas_get_msix_index(struct megasas_instance
-> > *instance,  {
-> >         int sdev_busy;
-> >
-> > -       /* TBD - if sml remove device_busy in future, driver
-> > -        * should track counter in internal structure.
-> > -        */
-> > -       sdev_busy = atomic_read(&scmd->device->device_busy);
-> > +       sdev_busy = megasas_sdev_busy_read(scmd);
->
-> The above is only used for MR_BALANCED_PERF_MODE, so maybe you can
-> skip inc/dec/read the counter for other perf mode.
+  block: mark flush request as IDLE when it is really finished (2020-11-13 14:24:16 -0700)
 
-Agree. I have created V2.
+are available in the Git repository at:
 
-Subject: [PATCH] megaraid_sas: v2 replace sdev_busy with local counter
+  git://git.infradead.org/nvme.git tags/nvme-5.10-2020-11-19
 
-use local tracking of per sdev outstanding command since sdev_busy in
-SML is improved for peformance reason using sbitmap (earlier it was
-atomic variable).
+for you to fetch changes up to 8168d23fbcee4f9f6c5a1ce8650417f09aef70eb:
 
-Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
----
- drivers/scsi/megaraid/megaraid_sas.h        |  2 +
- drivers/scsi/megaraid/megaraid_sas_fusion.c | 51 +++++++++++++++++----
- 2 files changed, 45 insertions(+), 8 deletions(-)
+  nvme: fix memory leak freeing command effects (2020-11-14 09:57:55 +0100)
 
-diff --git a/drivers/scsi/megaraid/megaraid_sas.h
-b/drivers/scsi/megaraid/megaraid_sas.h
-index 0f808d63580e..0c6a56b24c6e 100644
---- a/drivers/scsi/megaraid/megaraid_sas.h
-+++ b/drivers/scsi/megaraid/megaraid_sas.h
-@@ -2019,10 +2019,12 @@ union megasas_frame {
-  * struct MR_PRIV_DEVICE - sdev private hostdata
-  * @is_tm_capable: firmware managed tm_capable flag
-  * @tm_busy: TM request is in progress
-+ * @sdev_priv_busy: pending command per sdev
-  */
- struct MR_PRIV_DEVICE {
-        bool is_tm_capable;
-        bool tm_busy;
-+       atomic_t sdev_priv_busy;
-        atomic_t r1_ldio_hint;
-        u8 interface_type;
-        u8 task_abort_tmo;
-diff --git a/drivers/scsi/megaraid/megaraid_sas_fusion.c
-b/drivers/scsi/megaraid/megaraid_sas_fusion.c
-index fd607287608e..c630404cbb2d 100644
---- a/drivers/scsi/megaraid/megaraid_sas_fusion.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_fusion.c
-@@ -220,6 +220,44 @@ megasas_clear_intr_fusion(struct megasas_instance
-*instance)
-        return 1;
- }
+----------------------------------------------------------------
+nvme fixes for 5.10
 
-+static inline void
-+megasas_sdev_busy_inc(struct megasas_instance *instance,
-+                     struct scsi_cmnd *scmd)
-+{
-+       struct MR_PRIV_DEVICE *mr_device_priv_data;
-+
-+       if (instance->perf_mode != MR_BALANCED_PERF_MODE)
-+               return;
-+
-+       mr_device_priv_data = scmd->device->hostdata;
-+       atomic_inc(&mr_device_priv_data->sdev_priv_busy);
-+}
-+static inline void
-+megasas_sdev_busy_dec(struct megasas_instance *instance,
-+                     struct scsi_cmnd *scmd)
-+{
-+       struct MR_PRIV_DEVICE *mr_device_priv_data;
-+
-+       if (instance->perf_mode != MR_BALANCED_PERF_MODE)
-+               return;
-+
-+       mr_device_priv_data = scmd->device->hostdata;
-+       atomic_dec(&mr_device_priv_data->sdev_priv_busy);
-+}
-+static inline int
-+megasas_sdev_busy_read(struct megasas_instance *instance,
-+                      struct scsi_cmnd *scmd)
-+{
-+       struct MR_PRIV_DEVICE *mr_device_priv_data;
-+
-+       if (instance->perf_mode != MR_BALANCED_PERF_MODE)
-+               return 0;
-+
-+       mr_device_priv_data = scmd->device->hostdata;
-+       return atomic_read(&mr_device_priv_data->sdev_priv_busy);
-+}
-+
-+
- /**
-  * megasas_get_cmd_fusion -    Get a command from the free pool
-  * @instance:          Adapter soft state
-@@ -357,15 +395,9 @@ megasas_get_msix_index(struct megasas_instance
-*instance,
-                       struct megasas_cmd_fusion *cmd,
-                       u8 data_arms)
- {
--       int sdev_busy;
--
--       /* TBD - if sml remove device_busy in future, driver
--        * should track counter in internal structure.
--        */
--       sdev_busy = atomic_read(&scmd->device->device_busy);
--
-        if (instance->perf_mode == MR_BALANCED_PERF_MODE &&
--           sdev_busy > (data_arms * MR_DEVICE_HIGH_IOPS_DEPTH)) {
-+           (megasas_sdev_busy_read(instance, scmd) >
-+           (data_arms * MR_DEVICE_HIGH_IOPS_DEPTH))) {
-                cmd->request_desc->SCSIIO.MSIxIndex =
-                        mega_mod64((atomic64_add_return(1,
-&instance->high_iops_outstanding) /
-                                        MR_HIGH_IOPS_BATCH_COUNT),
-instance->low_latency_index_start);
-@@ -3390,6 +3422,7 @@ megasas_build_and_issue_cmd_fusion(struct
-megasas_instance *instance,
-         * Issue the command to the FW
-         */
+ - Doorbell Buffer freeing fix (Minwoo Im)
+ - CSE log leak fix (Keith Busch)
 
-+       megasas_sdev_busy_inc(instance, scmd);
-        megasas_fire_cmd_fusion(instance, req_desc);
+----------------------------------------------------------------
+Keith Busch (2):
+      nvme: directly cache command effects log
+      nvme: fix memory leak freeing command effects
 
-        if (r1_cmd)
-@@ -3450,6 +3483,7 @@ megasas_complete_r1_command(struct megasas_instance
-*instance,
-                scmd_local->SCp.ptr = NULL;
-                megasas_return_cmd_fusion(instance, cmd);
-                scsi_dma_unmap(scmd_local);
-+               megasas_sdev_busy_dec(instance, scmd_local);
-                scmd_local->scsi_done(scmd_local);
-        }
- }
-@@ -3550,6 +3584,7 @@ complete_cmd_fusion(struct megasas_instance
-*instance, u32 MSIxIndex,
-                                scmd_local->SCp.ptr = NULL;
-                                megasas_return_cmd_fusion(instance,
-cmd_fusion);
-                                scsi_dma_unmap(scmd_local);
-+                               megasas_sdev_busy_dec(instance,
-scmd_local);
-                                scmd_local->scsi_done(scmd_local);
-                        } else  /* Optimal VD - R1 FP command completion.
-*/
-                                megasas_complete_r1_command(instance,
-cmd_fusion);
---
->
->
->
-> Thanks,
-> Ming
+Minwoo Im (1):
+      nvme: free sq/cq dbbuf pointers when dbbuf set fails
 
---0000000000002de60f05b4706722
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-yfWKfxJx8FcWmsjkSlrwDu+oVuDUa2wqeKBU12HQ4JAVd+LOb5edsbbFQxgGHu+MPuc/1hl9kTkC
-AwEAAaOCAdEwggHNMA4GA1UdDwEB/wQEAwIFoDCBngYIKwYBBQUHAQEEgZEwgY4wTQYIKwYBBQUH
-MAKGQWh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzcGVyc29uYWxzaWduMnNo
-YTJnM29jc3AuY3J0MD0GCCsGAQUFBzABhjFodHRwOi8vb2NzcDIuZ2xvYmFsc2lnbi5jb20vZ3Nw
-ZXJzb25hbHNpZ24yc2hhMmczME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEQGA1Ud
-HwQ9MDswOaA3oDWGM2h0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NwZXJzb25hbHNpZ24yc2hh
-MmczLmNybDAlBgNVHREEHjAcgRprYXNoeWFwLmRlc2FpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAK
-BggrBgEFBQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQU4dX1
-Yg4eoWXbqyPW/N1ZD/LPIWcwDQYJKoZIhvcNAQELBQADggEBABBuHYKGUwHIhCjd3LieJwKVuJNr
-YohEnZzCoNaOj33/j5thiA4cZehCh6SgrIlFBIktLD7jW9Dwl88Gfcy+RrVa7XK5Hyqwr1JlCVsW
-pNj4hlSJMNNqxNSqrKaD1cR4/oZVPFVnJJYlB01cLVjGMzta9x27e6XEtseo2s7aoPS2l82koMr7
-8S/v9LyyP4X2aRTWOg9RG8D/13rLxFAApfYvCrf0quIUBWw2BXlq3+e3r7pU7j40d6P04VV3Zxws
-M+LbYxcXFT2gXvoYd2Ms8zsLrhO2M6pMzeNGWk2HWTof9s7EEHDjis/MRlbYSNaohV23IUzNlBw7
-1FmvvW5GKK0xggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
-IG52LXNhMTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0g
-RzMCDDSdoX7GqonhoE7TszANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQg8eIYugEx
-JkSiOk1ftJ1s0Or1mKSAtoBaxycVLYTgCfwwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMjAxMTE5MDcwOTAzWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
-BglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAKLuOtYLXnsvqRiXPfYGQrgyUIfU
-QdY0Hc5v3clEsS25V5dt2lnOacYnq0jOwa1fPzWW2M6pEPWOqk/RDmPG0gw+R9SFmqNb+y0XM0Kc
-Xm1OE+wiDElqefICY4zb1MN3OvElygSfVqwdEEEp5FjkjF+umm2B+/KBNkaag4UaSKXd+BNSEXRq
-v/upgIPKCyU1w8w9PqSC1mFjG4ukSOKP+fYSusXpT1tMrf+zb3Qg6t9CPVwdY/hG5PScdZOMfBd0
-F4D+6/pU4uZdJHUXkoaZGFQZwWl5LLOspFuLkv7DCfuhVsPhcBh+Ny3LlV3eJ+uNkVe5f+jWNPNw
-0WPpNulK16U=
---0000000000002de60f05b4706722--
+ drivers/nvme/host/core.c | 25 ++++++++++++++++++-------
+ drivers/nvme/host/nvme.h |  6 ------
+ drivers/nvme/host/pci.c  | 15 +++++++++++++++
+ 3 files changed, 33 insertions(+), 13 deletions(-)
