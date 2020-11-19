@@ -2,124 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0B1C8300F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 21:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A91AC63697
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 03:06:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22595246C0
-	for <linux-block@archiver.kernel.org>; Wed, 18 Nov 2020 21:34:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA707238E6
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 03:06:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726397AbgKRVei (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Nov 2020 16:34:38 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51916 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726085AbgKRVe0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Nov 2020 16:34:26 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id EF58DAFFD;
-        Wed, 18 Nov 2020 21:34:23 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id BC1911E1321; Wed, 18 Nov 2020 15:22:37 +0100 (CET)
-Date:   Wed, 18 Nov 2020 15:22:37 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 06/20] block: change the hash used for looking up block
- devices
-Message-ID: <20201118142237.GK1981@quack2.suse.cz>
-References: <20201118084800.2339180-1-hch@lst.de>
- <20201118084800.2339180-7-hch@lst.de>
+        id S1726195AbgKSDGQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Nov 2020 22:06:16 -0500
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:46061 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726200AbgKSDGQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Nov 2020 22:06:16 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R751e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UFqsT0m_1605755169;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UFqsT0m_1605755169)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 19 Nov 2020 11:06:09 +0800
+Subject: Re: [PATCH v4 1/2] block: disable iopoll for split bio
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+To:     axboe@kernel.dk, hch@infradead.org, ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+References: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
+ <20201117075625.46118-2-jefflexu@linux.alibaba.com>
+Message-ID: <e0d59ea2-3c30-9edb-4cbb-f63703fdf0f1@linux.alibaba.com>
+Date:   Thu, 19 Nov 2020 11:06:08 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201118084800.2339180-7-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20201117075625.46118-2-jefflexu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 18-11-20 09:47:46, Christoph Hellwig wrote:
-> Adding the minor to the major creates tons of pointless conflicts. Just
-> use the dev_t itself, which is 32-bits and thus is guaranteed to fit
-> into ino_t.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Hi Jens,
 
-Fair enough. You can add:
+Would you mind giving a glance at this, at least patch 1?
 
-Reviewed-by: Jan Kara <jack@suse.cz>
 
-								Honza
+Patch 1 could fix the potential deadlock may be triggered by sync io polling
 
+in direct IO routine.
+
+
+Actually this patch could alleviate another potential hang in io_uring. The
+
+returned cookie of submit_bio() is actually the cookie of the last split bio
+
+if splitting happened. If the returned cookie is BLK_QC_T_NONE ( the
+
+last split bio get merged into another request, or queue depth exhausted
+
+and REQ_NOWAIT set by io_uring), then iocb->ki_cookie is BLK_QC_T_NONE.
+
+
+If there's only this one IO (though split to several bios) in the 
+polling hw queue,
+
+then io_do_iopoll() will get stuck in indefinite calling of blk_poll(), 
+while blk_poll()
+
+will return 0 immediately because of BLK_QC_T_NONE, without reaping any
+
+former completed requests.
+
+
+This hang rarly happened, maybe because as long as there's other IO, polling
+
+of these other IOs will help reap completed requests of the stuck IO 
+described
+
+above.
+
+
+Of course we could refactor the problematic logic of returning cookie in 
+submit_bio(),
+
+But this patch 1 could also fix this issue. Besides this patch 1 is also 
+needed to fix
+
+the potential deadlock triggered by sync io polling described above.
+
+
+Thanks,
+
+Jeffle
+
+
+
+On 11/17/20 3:56 PM, Jeffle Xu wrote:
+> iopoll is initially for small size, latency sensitive IO. It doesn't
+> work well for big IO, especially when it needs to be split to multiple
+> bios. In this case, the returned cookie of __submit_bio_noacct_mq() is
+> indeed the cookie of the last split bio. The completion of *this* last
+> split bio done by iopoll doesn't mean the whole original bio has
+> completed. Callers of iopoll still need to wait for completion of other
+> split bios.
+>
+> Besides bio splitting may cause more trouble for iopoll which isn't
+> supposed to be used in case of big IO.
+>
+> iopoll for split bio may cause potential race if CPU migration happens
+> during bio submission. Since the returned cookie is that of the last
+> split bio, polling on the corresponding hardware queue doesn't help
+> complete other split bios, if these split bios are enqueued into
+> different hardware queues. Since interrupts are disabled for polling
+> queues, the completion of these other split bios depends on timeout
+> mechanism, thus causing a potential hang.
+>
+> iopoll for split bio may also cause hang for sync polling. Currently
+> both the blkdev and iomap-based fs (ext4/xfs, etc) support sync polling
+> in direct IO routine. These routines will submit bio without REQ_NOWAIT
+> flag set, and then start sync polling in current process context. The
+> process may hang in blk_mq_get_tag() if the submitted bio has to be
+> split into multiple bios and can rapidly exhaust the queue depth. The
+> process are waiting for the completion of the previously allocated
+> requests, which should be reaped by the following polling, and thus
+> causing a deadlock.
+>
+> To avoid these subtle trouble described above, just disable iopoll for
+> split bio.
+>
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
 > ---
->  fs/block_dev.c | 26 ++------------------------
->  1 file changed, 2 insertions(+), 24 deletions(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index d8664f5c1ff669..29db12c3bb501c 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -870,35 +870,12 @@ void __init bdev_cache_init(void)
->  	blockdev_superblock = bd_mnt->mnt_sb;   /* For writeback */
->  }
->  
-> -/*
-> - * Most likely _very_ bad one - but then it's hardly critical for small
-> - * /dev and can be fixed when somebody will need really large one.
-> - * Keep in mind that it will be fed through icache hash function too.
-> - */
-> -static inline unsigned long hash(dev_t dev)
-> -{
-> -	return MAJOR(dev)+MINOR(dev);
-> -}
+>   block/blk-merge.c | 7 +++++++
+>   block/blk-mq.c    | 6 ++++--
+>   2 files changed, 11 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index bcf5e4580603..53ad781917a2 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -279,6 +279,13 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>   	return NULL;
+>   split:
+>   	*segs = nsegs;
+> +
+> +	/*
+> +	 * bio splitting may cause subtle trouble such as hang when doing iopoll,
+> +	 * not to mention iopoll isn't supposed to be used in case of big IO.
+> +	 */
+> +	bio->bi_opf &= ~REQ_HIPRI;
+> +
+>   	return bio_split(bio, sectors, GFP_NOIO, bs);
+>   }
+>   
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 55bcee5dc032..6d10652a7ed0 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3853,11 +3853,13 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+>   	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+>   		return 0;
+>   
+> +	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
+> +	if (hctx->type != HCTX_TYPE_POLL)
+> +		return 0;
+> +
+>   	if (current->plug)
+>   		blk_flush_plug_list(current->plug, false);
+>   
+> -	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
 > -
-> -static int bdev_test(struct inode *inode, void *data)
-> -{
-> -	return BDEV_I(inode)->bdev.bd_dev == *(dev_t *)data;
-> -}
-> -
-> -static int bdev_set(struct inode *inode, void *data)
-> -{
-> -	BDEV_I(inode)->bdev.bd_dev = *(dev_t *)data;
-> -	return 0;
-> -}
-> -
->  static struct block_device *bdget(dev_t dev)
->  {
->  	struct block_device *bdev;
->  	struct inode *inode;
->  
-> -	inode = iget5_locked(blockdev_superblock, hash(dev),
-> -			bdev_test, bdev_set, &dev);
-> -
-> +	inode = iget_locked(blockdev_superblock, dev);
->  	if (!inode)
->  		return NULL;
->  
-> @@ -910,6 +887,7 @@ static struct block_device *bdget(dev_t dev)
->  		bdev->bd_super = NULL;
->  		bdev->bd_inode = inode;
->  		bdev->bd_part_count = 0;
-> +		bdev->bd_dev = dev;
->  		inode->i_mode = S_IFBLK;
->  		inode->i_rdev = dev;
->  		inode->i_bdev = bdev;
-> -- 
-> 2.29.2
-> 
+>   	/*
+>   	 * If we sleep, have the caller restart the poll loop to reset
+>   	 * the state. Like for the other success return cases, the
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks,
+Jeffle
+
