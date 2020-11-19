@@ -2,70 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDBAC56201
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 17:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0380C56201
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 17:18:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA14724655
-	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 17:16:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 430FC24695
+	for <linux-block@archiver.kernel.org>; Thu, 19 Nov 2020 17:18:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bB+5+IQF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RUV5G90m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727280AbgKSRPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 12:15:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33318 "EHLO
+        id S1728323AbgKSRRv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 12:17:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726474AbgKSRPy (ORCPT
+        with ESMTP id S1727166AbgKSRRv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 12:15:54 -0500
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63CF1C0613CF;
-        Thu, 19 Nov 2020 09:15:54 -0800 (PST)
-Received: by mail-wr1-x441.google.com with SMTP id 23so7233120wrc.8;
-        Thu, 19 Nov 2020 09:15:54 -0800 (PST)
+        Thu, 19 Nov 2020 12:17:51 -0500
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A3FC0613CF;
+        Thu, 19 Nov 2020 09:17:50 -0800 (PST)
+Received: by mail-wr1-x444.google.com with SMTP id 23so7240172wrc.8;
+        Thu, 19 Nov 2020 09:17:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+        h=subject:to:references:from:autocrypt:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=NTlQpRFAgXi7+2j38CXpVzx++h7WQhzOl2JIZlqcQMo=;
-        b=bB+5+IQFMAn7TruC2V9EDh7t4Q/nD+Zw6xMmK+C3lUwYamWSYNjj59OD5FZFKQozaF
-         tFDzWSjTmkY+Fyupab8JlLci8FVScj+kaBXgFK1+Muw3Ode2ybxVEBXvZpt8b63+oXqL
-         PPNNGK0xFjl0xwA+WQln/vUbFKhxV3G5QYS5q5Q34G1ysVlLF4g800wE3B0l6epgfo4m
-         SIiz0SF1nBJT1zfJzbshoikiztLDcJ1RbuXbjWuUeFrQ6t6oMfDhzH6y3k5YYdh0UR7P
-         99k0y36x46+zAkWmrSOYMSE8L6e4zbHaRg8Pyl4TfDBjdBVJm6a95JLcQWsifU/NFZ+9
-         KUgQ==
+        bh=AyiTrcyJm4Zi90FzgQEOotlLIRlz5XcC+YAbqlzEl/w=;
+        b=RUV5G90mlsRgstfCBIItHAX8vPujzP1AaEyoTbS3zRCO2I3zEGPFh1/KaEHPQGLnBu
+         2ELRULTBJVDoIvzpoJTGtR7LLONKu35u+LBWq3svQRAOhEnr3shSys9TXwqEjz22kzjg
+         zuxdLTEFqeM1dlNRSNMBmobkW2BsoOvC9OrwUCuUfbqWgK2Wi7y9CbZ09BmnrOa2mBRh
+         MruSvWFbGiqNItHNdt5PGkJarljXuK1r9OHQsovYQDq/tCk/cC7++fFAOoowaBmrCbhi
+         Hpb1/rpGigoLocJ1sJhPPK+oFSyHWjTpRBWj6N8fJahPD/EBpQ1+CM2v4pJr0kh3wfJx
+         Z78Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=NTlQpRFAgXi7+2j38CXpVzx++h7WQhzOl2JIZlqcQMo=;
-        b=RCVnMIhNiAF21t5kWioZW1N54K59R7RBOeMo3SxkkQcJIBciTlwnNdgvAvc1MAYHcQ
-         0zW1yk3ymegukO51Qr5caxBlrj6IFEg0plV3PF7HDjmyAhcJ6FKsvmZRBMdte51ATY8E
-         ZvBwoQ7omDZsrT1H+gHsB+46IABS7f6Bp6CgBsxGf46CL15zWvSzN8+QcCQ316ABvLE3
-         Psdy/gKFVn/O/OsHrc9g+3GM73v/weiVjAPNezN0garmiNloHwl9Ek5V/vIGstNOKpJi
-         +hopX2KG066fbj/cIZsCJ40typkLh6fS/UYzlk7BeUXCtsV3yLxECdocFrM6wP8gNdhc
-         J9rA==
-X-Gm-Message-State: AOAM530cGuRadnokwME5i96y4nc0ks+C1g1PV1fgDaRMjekNB+6jp/Ub
-        bO3KovX0gzK6PTWirY9/Zy52cDkKS6MGgg==
-X-Google-Smtp-Source: ABdhPJxeN4KFaxlkucVrJDBuSLY9maKj44xrKp75Xz2n08/pB5e61mhKYTtJ+x1eD2RkPW504r0eUg==
-X-Received: by 2002:a5d:4acf:: with SMTP id y15mr4178161wrs.333.1605806152898;
-        Thu, 19 Nov 2020 09:15:52 -0800 (PST)
+        h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AyiTrcyJm4Zi90FzgQEOotlLIRlz5XcC+YAbqlzEl/w=;
+        b=SqbnGy0ul+jxFNyzmXPHbtmrV3XlDLujhXD2IWPZR/hBfPaT1ydQRsNYYKbuZOfzUC
+         jVYkiuY519uvUWsG8VAIAouY68MK4fCFaH6i7xVrGGBXFQz5yla8ptFbHBZRecmBKkiG
+         TMEtM4UXpPOz8ucX6QqnquXJ4FYWgVyrFfEsqRImvVmkuZdGbzOCWSteEpl8YupVkPV6
+         oeEKb9Z3VKNyz56TzmkCg77Yh6UDrfQDOe7V0yYylAQNGB6MBPiv0UF4johbfoJsWY55
+         xf3jSKJ5YFls63Yx+qGoh53bWS8m/989G+cCaKXvlGniCpAuRTLGKSTRpO+o4cTlV6rj
+         czJA==
+X-Gm-Message-State: AOAM5324gy6QbqzdYPNPrK3omH7VIkySHU1aI7ukhCm/x61C7fZL8c8D
+        641yGW06VUjJDKRi2gMO7UQHr+pdgaHJBg==
+X-Google-Smtp-Source: ABdhPJysLrAriSZOCdUdoziXnpetbfxIBxfEPi+pV6Vn1w6yccukiXKFU+0zLz8hifKIqRoqrHSczA==
+X-Received: by 2002:adf:a1c2:: with SMTP id v2mr11919882wrv.95.1605806269150;
+        Thu, 19 Nov 2020 09:17:49 -0800 (PST)
 Received: from [192.168.1.23] (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
-        by smtp.gmail.com with ESMTPSA id h15sm684772wrw.15.2020.11.19.09.15.51
+        by smtp.gmail.com with ESMTPSA id a15sm658363wrn.75.2020.11.19.09.17.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Nov 2020 09:15:52 -0800 (PST)
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Thu, 19 Nov 2020 09:17:48 -0800 (PST)
+Subject: Re: [PATCH 0/2] optimise iov_iter
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org
 References: <cover.1605799583.git.asml.silence@gmail.com>
- <9bc27cb3ef6ab49b6b2ccee3db6613838aee17af.1605799583.git.asml.silence@gmail.com>
- <20201119170340.GA6179@infradead.org>
+ <2b50322d-821f-469e-6f57-072b54e25ef4@kernel.dk>
 From:   Pavel Begunkov <asml.silence@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
@@ -110,38 +110,39 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Subject: Re: [PATCH 2/2] iov_iter: optimise iter type checking
-Message-ID: <ce79f47e-2ec0-ba29-a991-c537a8990dee@gmail.com>
-Date:   Thu, 19 Nov 2020 17:12:44 +0000
+Message-ID: <629cabf2-3a23-9d95-dd88-281ef4d49ddd@gmail.com>
+Date:   Thu, 19 Nov 2020 17:14:41 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20201119170340.GA6179@infradead.org>
+In-Reply-To: <2b50322d-821f-469e-6f57-072b54e25ef4@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19/11/2020 17:03, Christoph Hellwig wrote:
-> On Thu, Nov 19, 2020 at 03:29:43PM +0000, Pavel Begunkov wrote:
->> The problem here is that iov_iter_is_*() helpers check types for
->> equality, but all iterate_* helpers do bitwise ands. This confuses
->> a compiler, so even if some cases were handled separately with
->> iov_iter_is_*(), it can't eliminate and skip unreachable branches in
->> following iterate*().
+On 19/11/2020 16:46, Jens Axboe wrote:
+> On 11/19/20 8:29 AM, Pavel Begunkov wrote:
+>> The first patch optimises iov_iter_npages() for the bvec case, and the
+>> second helps code generation to kill unreachable code.
+>>
+>> Pavel Begunkov (2):
+>>   iov_iter: optimise iov_iter_npages for bvec
+>>   iov_iter: optimise iter type checking
+>>
+>>  include/linux/uio.h | 10 +++++-----
+>>  lib/iov_iter.c      | 10 +++++-----
+>>  2 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> I think we need to kill the iov_iter_is_* helpers, renumber to not do
-> the pointless bitmask and just check for equality (might turn into a
-> bunch of nice switch statements actually).
+> Nice! Tested this and confirmed both the better code generation,
+> and reduction in overhead in iov_iter_npages().
 
-There are uses like below though, and that would also add some overhead
-on iov_iter_type(), so it's not apparent to me which version would be
-cleaner/faster in the end. But yeah, we can experiment after landing
-this patch.
+Thanks! Did you find t-put/etc. boost with your setup?
 
-if (type & (ITER_BVEC|ITER_KVEC))
+> 
+> Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
 -- 
 Pavel Begunkov
