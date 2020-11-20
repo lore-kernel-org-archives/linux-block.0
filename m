@@ -2,110 +2,184 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A67C388F9
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 02:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C562AC63798
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 02:26:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FA5122282
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 02:25:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJ8jYlmc"
+	by mail.kernel.org (Postfix) with ESMTP id 74CA3223BE
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 02:26:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726342AbgKTCYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 21:24:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28396 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726100AbgKTCYm (ORCPT
+        id S1726894AbgKTCZr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 21:25:47 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:8375 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726172AbgKTCZr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 21:24:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605839081;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VQ9D3r+1A447JsLtjnYIsDZTTCNO7eTqqaIEx3Zq9b8=;
-        b=BJ8jYlmcj7KHfYV4Fb3BEcE9DJ2JQ3olwxJDp35xBtmUe33hfgdZRBEnC8Wfc2UvSgA2Os
-        rn9GCgEWDQjVqU0XntvX5CRXfn2tv/jBB8ihAFxXC4xH/isxjV6sOeZfx95uFVvbzp+GR2
-        LMh5PPzGtMGymkP714hKhcjijU9ntWE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-gmrJeu0QPQOmWuK204KoTg-1; Thu, 19 Nov 2020 21:24:39 -0500
-X-MC-Unique: gmrJeu0QPQOmWuK204KoTg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70B8B8143F3;
-        Fri, 20 Nov 2020 02:24:37 +0000 (UTC)
-Received: from T590 (ovpn-13-9.pek2.redhat.com [10.72.13.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CB82760854;
-        Fri, 20 Nov 2020 02:24:30 +0000 (UTC)
-Date:   Fri, 20 Nov 2020 10:24:26 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] iov_iter: optimise iov_iter_npages for bvec
-Message-ID: <20201120022426.GC333150@T590>
-References: <cover.1605827965.git.asml.silence@gmail.com>
- <ab04202d0f8c1424da47251085657c436d762785.1605827965.git.asml.silence@gmail.com>
- <20201120012017.GJ29991@casper.infradead.org>
- <35d5db17-f6f6-ec32-944e-5ecddcbcb0f1@gmail.com>
- <20201120014904.GK29991@casper.infradead.org>
- <3dc0b17d-b907-d829-bfec-eab96a6f4c30@gmail.com>
- <20201120020610.GL29991@casper.infradead.org>
+        Thu, 19 Nov 2020 21:25:47 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CcgPh1xSJz6xZ6;
+        Fri, 20 Nov 2020 10:25:28 +0800 (CST)
+Received: from [127.0.0.1] (10.174.176.144) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Fri, 20 Nov 2020
+ 10:25:42 +0800
+Subject: Re: [PATCH 1/1] block: move the PAGE_SECTORS definition into
+ <linux/blkdev.h>
+To:     John Dorminy <jdorminy@redhat.com>
+CC:     Coly Li <colyli@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel <dm-devel@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-bcache <linux-bcache@vger.kernel.org>
+References: <20200821020345.3358-1-thunder.leizhen@huawei.com>
+ <b4643e74-aad9-385f-01f2-f8e48ba4dbef@suse.de>
+ <ad100923-e479-faf0-f749-ac8e4cf87899@huawei.com>
+ <8aa638b7-6cfd-bf3d-8015-fbe59f28f31f@suse.de>
+ <c2f8cf50-d9f7-df19-40eb-0543e6208c0d@huawei.com>
+ <CAMeeMh_iBFpmSjgm8aC1WO-=iQPU5rQ2-Z6oe0L8nt5ke=+XQw@mail.gmail.com>
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <c0013047-e202-085c-f841-4468ae4072fa@huawei.com>
+Date:   Fri, 20 Nov 2020 10:25:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201120020610.GL29991@casper.infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <CAMeeMh_iBFpmSjgm8aC1WO-=iQPU5rQ2-Z6oe0L8nt5ke=+XQw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.144]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 20, 2020 at 02:06:10AM +0000, Matthew Wilcox wrote:
-> On Fri, Nov 20, 2020 at 01:56:22AM +0000, Pavel Begunkov wrote:
-> > On 20/11/2020 01:49, Matthew Wilcox wrote:
-> > > On Fri, Nov 20, 2020 at 01:39:05AM +0000, Pavel Begunkov wrote:
-> > >> On 20/11/2020 01:20, Matthew Wilcox wrote:
-> > >>> On Thu, Nov 19, 2020 at 11:24:38PM +0000, Pavel Begunkov wrote:
-> > >>>> The block layer spends quite a while in iov_iter_npages(), but for the
-> > >>>> bvec case the number of pages is already known and stored in
-> > >>>> iter->nr_segs, so it can be returned immediately as an optimisation
-> > >>>
-> > >>> Er ... no, it doesn't.  nr_segs is the number of bvecs.  Each bvec can
-> > >>> store up to 4GB of contiguous physical memory.
-> > >>
-> > >> Ah, really, missed min() with PAGE_SIZE in bvec_iter_len(), then it's a
-> > >> stupid statement. Thanks!
-> > >>
-> > >> Are there many users of that? All these iterators are a huge burden,
-> > >> just to count one 4KB page in bvec it takes 2% of CPU time for me.
-> > > 
-> > > __bio_try_merge_page() will create multipage BIOs, and that's
-> > > called from a number of places including
-> > > bio_try_merge_hw_seg(), bio_add_page(), and __bio_iov_iter_get_pages()
-> > 
-> > I get it that there are a lot of places, more interesting how often
-> > it's actually triggered and if that's performance critical for anybody.
-> > Not like I'm going to change it, just out of curiosity, but bvec.h
-> > can be nicely optimised without it.
+
+
+On 2020/11/20 9:27, John Dorminy wrote:
+> Greetings;
 > 
-> Typically when you're allocating pages for the page cache, they'll get
-> allocated in order and then you'll read or write them in order, so yes,
-> it ends up triggering quite a lot.  There was once a bug in the page
-> allocator which caused them to get allocated in reverse order and it
-> was a noticable performance hit (this was 15-20 years ago).
+> There are a lot of uses of PAGE_SIZE/SECTOR_SIZE scattered around, and
+> it seems like a medium improvement to be able to refer to it as
+> PAGE_SECTORS everywhere instead of just inside dm, bcache, and
+> null_blk. Did this change progress forward somewhere?
 
-hugepage use cases can benefit much from this way too.
+Actually, I'm trying to make further replacements after this patch is applied.
+But there was no response except Coly Li.
 
-
-Thanks,
-Ming
+> 
+> Thanks!
+> 
+> John Dorminy
+> 
+> 
+> On Mon, Sep 7, 2020 at 3:40 AM Leizhen (ThunderTown)
+> <thunder.leizhen@huawei.com> wrote:
+>>
+>> Hi, Jens Axboe, Alasdair Kergon, Mike Snitzer:
+>>   What's your opinion?
+>>
+>>
+>> On 2020/8/21 15:05, Coly Li wrote:
+>>> On 2020/8/21 14:48, Leizhen (ThunderTown) wrote:
+>>>>
+>>>>
+>>>> On 8/21/2020 12:11 PM, Coly Li wrote:
+>>>>> On 2020/8/21 10:03, Zhen Lei wrote:
+>>>>>> There are too many PAGE_SECTORS definitions, and all of them are the
+>>>>>> same. It looks a bit of a mess. So why not move it into <linux/blkdev.h>,
+>>>>>> to achieve a basic and unique definition.
+>>>>>>
+>>>>>> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+>>>>>
+>>>>>
+>>>>> A lazy question about page size > 4KB: currently in bcache code the
+>>>>> sector size is assumed to be 512 sectors, if kernel page > 4KB, it is
+>>>>> possible that PAGE_SECTORS in bcache will be a number > 8 ?
+>>>>
+>>>> Sorry, I don't fully understand your question. I known that the sector size
+>>>> can be 512 or 4K, and the PAGE_SIZE can be 4K or 64K. So even if sector size
+>>>> is 4K, isn't it greater than 8 for 64K pages?
+>>>>
+>>>> I'm not sure if the question you're asking is the one Matthew Wilcox has
+>>>> answered before:
+>>>> https://www.spinics.net/lists/raid/msg64345.html
+>>>
+>>> Thank you for the above information. Currently bcache code assumes
+>>> sector size is always 512 bytes, you may see how many "<< 9" or ">> 9"
+>>> are used. Therefore I doubt whether current code may stably work on e.g.
+>>> 4Kn SSDs (this is only doubt because I don't have such SSD).
+>>>
+>>> Anyway your patch is fine to me. This change to bcache doesn't make
+>>> thins worse or better, maybe it can be helpful to trigger my above
+>>> suspicious early if people do have this kind of problem on 4Kn sector SSDs.
+>>>
+>>> For the bcache part of this patch, you may add,
+>>> Acked-by: Coly Li <colyli@suse.de>
+>>>
+>>> Thanks.
+>>>
+>>> Coly Li
+>>>
+>>>>>> ---
+>>>>>>  drivers/block/brd.c           | 1 -
+>>>>>>  drivers/block/null_blk_main.c | 1 -
+>>>>>>  drivers/md/bcache/util.h      | 2 --
+>>>>>>  include/linux/blkdev.h        | 5 +++--
+>>>>>>  include/linux/device-mapper.h | 1 -
+>>>>>>  5 files changed, 3 insertions(+), 7 deletions(-)
+>>>>>>
+>>>>>
+>>>>> [snipped]
+>>>>>
+>>>>>> diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
+>>>>>> index c029f7443190805..55196e0f37c32c6 100644
+>>>>>> --- a/drivers/md/bcache/util.h
+>>>>>> +++ b/drivers/md/bcache/util.h
+>>>>>> @@ -15,8 +15,6 @@
+>>>>>>
+>>>>>>  #include "closure.h"
+>>>>>>
+>>>>>> -#define PAGE_SECTORS              (PAGE_SIZE / 512)
+>>>>>> -
+>>>>>>  struct closure;
+>>>>>>
+>>>>>>  #ifdef CONFIG_BCACHE_DEBUG
+>>>>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>>>>>> index bb5636cc17b91a7..b068dfc5f2ef0ab 100644
+>>>>>> --- a/include/linux/blkdev.h
+>>>>>> +++ b/include/linux/blkdev.h
+>>>>>> @@ -949,11 +949,12 @@ static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+>>>>>>   * multiple of 512 bytes. Hence these two constants.
+>>>>>>   */
+>>>>>>  #ifndef SECTOR_SHIFT
+>>>>>> -#define SECTOR_SHIFT 9
+>>>>>> +#define SECTOR_SHIFT              9
+>>>>>>  #endif
+>>>>>>  #ifndef SECTOR_SIZE
+>>>>>> -#define SECTOR_SIZE (1 << SECTOR_SHIFT)
+>>>>>> +#define SECTOR_SIZE               (1 << SECTOR_SHIFT)
+>>>>>>  #endif
+>>>>>> +#define PAGE_SECTORS              (PAGE_SIZE / SECTOR_SIZE)
+>>>>>>
+>>>>>>  /*
+>>>>>>   * blk_rq_pos()                   : the current sector
+>>>>> [snipped]
+>>>>>
+>>>>>
+>>>>
+>>>
+>>>
+>>> .
+>>>
+>>
+> 
+> 
+> .
+> 
 
