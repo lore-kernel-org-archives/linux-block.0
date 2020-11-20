@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F48C6379F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CBAC6379D
 	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:55:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C17A22255
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4A9B22255
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:55:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iuZOP/QV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="j43fzXIo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727159AbgKTBzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726485AbgKTBzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 19 Nov 2020 20:55:43 -0500
 Received: from esa3.hgst.iphmx.com ([216.71.153.141]:6553 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726479AbgKTBzn (ORCPT
+        with ESMTP id S1726479AbgKTBzm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 20:55:43 -0500
+        Thu, 19 Nov 2020 20:55:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1605837343; x=1637373343;
+  t=1605837342; x=1637373342;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=V7oCjS3GKfR7wtIyMbYqgVSC3/fcLyOTBkS3KX7Wx2w=;
-  b=iuZOP/QVpsXLDyueyQ+5PnUAndElZmr1PNMcWT6+URZ9Vngnq0IYO69D
-   lcjcAWJ7ja0JmhxQf8/BnN9lZyEw4YFJ/1lKxlHcVG6ZerXMEtVcXeO04
-   HG7gYirDhpBdOutv36Kdbh1goU+kDP/1Q/Umd3Au9G7uJs3PbVfvXjxZ6
-   UpP9yCVBZBEyxbQ2lFzdCYUDFxSisu7XsdgbU5TKOW3Ufbc1Pxqvs9XcA
-   cITwTB8ZtapvqWewvVEUai9SiMMFNPVAHbSOHkxLDPOqX76SLZfiH1vHC
-   XSv4froUMJO++B4EeZoC7vEzk2CvVXityyHkEAemW3P8fu77FXOLDTJyc
-   A==;
-IronPort-SDR: H8zj/vn2Oec4YeJvHJEn1WrUYb/I7EqyZR5E3PPmo1Vxt0hzLcxfyMx2rDx6vy8x+W2/rkK4AC
- zrZ5+J6OoYueo8f5ndkinGn9+ToXS4hetcvlzgxWZMLQDXFqFOerkNpvM5AYzm1iHC6fDDEDnI
- +EkbXfFBPRE6QErEsKxt9PcOm+ObJT7t5p58UQnijpHj0ctBhTLcKWd8Gu7z5MmSdNXBf4JoUB
- xotmfdeYgGfu0sU949Vam0Tu2AEtpxbDRfhejfyQHPI8bcCd6hA8QeA9bPsn9sCamil+3kdJg4
- FAg=
+  bh=u4RvdBCLXAsEgfYrFWz21p+kYwih56qACaS8qEWsIyc=;
+  b=j43fzXIojWu5eUYxqylNSkl8MrQcE60mUBnpQzCiyQ202PMBhAMAhxbm
+   zTpnL7O05i56rQ6ullqoMJAAgBmcUWfSDs42PvwJ2cufP9628wK/IFYIW
+   30tumUTvXjHAmvVLwAueRRqqsbm3YhKHX2nPWFAof47fJDqfZ/qp1Xmc3
+   EwEk40Z5PCe9s3o7D8vCmTXWAMquJOojqm8+K4xcyfcHxWUaqj+nDmd67
+   KM351MxwfQJjzBFekGdUiDi/lFKb8OpC1IZ1P4O3+qVwCYQVRUDtPbnw8
+   jJneiSq/sVNMoI+aCb7bev9JXAOfxdNAjefTRrcaxZ2u3ojO1eMKeZOKd
+   g==;
+IronPort-SDR: uojvf4odap6hLbhs2Mqo2QdbvucE1H4qDyjHQ0SWLhGRA81iW177XJC5n8038LI/h5hopG+qgZ
+ JgzLSyvwamHkc21w0wYfl4d0pCdIrHfntIxiWzqYbDK2nFojCDco6g01V2pyQ49lVqwv4E6j8q
+ TQbqG+L4g1INKY14Ll47DML8W/E0eZ7zdIkIoI5tGdi5Pw0wGmVGuW5NBWPsS1RtMxGd3zuJHX
+ TZlP6JlgAkT+Lar9CBoyOveqJ2J8csCOOREoiUwl/8BpGWcC0hBlwOAFVrVU90rU/FFwpLZVx/
+ M9Y=
 X-IronPort-AV: E=Sophos;i="5.78,354,1599494400"; 
-   d="scan'208";a="157516402"
+   d="scan'208";a="157516400"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2020 09:55:43 +0800
-IronPort-SDR: bh1lrH1W/2doieuMDUmzeAvH0mzT15rSdbp5o3uDs2yrqS+0XAWd1VqwT43ShN9C9c+c0WExNC
- 4rV5LKl7VSQFPi7xXJUc7FgCNGTzBPFQBIwlZoII+5SeXvSmsVqUtZMFm8OapvQRalZN2cEehd
- BeYsuDsdNfKioVs9dsKTHyHMn1HQTCMr9woXi9PqB93nK6e7mL3B2PV6Ist9/kdnVf8uSkzL71
- BdJg9xwrk0V/B2XQQ8mjNdvfygogwsqyks0rqkqfDtgKrq7v6E4mm/Twq78xP5VbFx+q/67NR0
- UakN3FggTqnK/7Y7DnAYL6uY
+  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2020 09:55:42 +0800
+IronPort-SDR: 4os4iUTjZn880bpSZwpNiFVlGXvbmiPeAkvOnnd1dpudX4rCSL92pFdukN1UFUGuI+aLGGShsb
+ mMuy+m0HH0knFyM3P44Z9e8qZvZGKhL1kNX9Lh3BngeBEWf0sKxcs8CYY9toaX8gwUvKT0ocrJ
+ jyv512QeQymaffSo5gyN9aE5BfiDLflXG3V4wmaZjGXMAq3mSXBwZcUvXYomS0n/lBEtpmG8D6
+ 172GSJd2eE5r5lkfrZwhSg9RezkYHnSv84yAdBPo2LQqZOUk+9f4NSfmAV7LnczJiGJX+8y8kd
+ TRY09pKNr1Qy7eaX9EvoP00v
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
   by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 17:41:32 -0800
-IronPort-SDR: xXUnY0CASWKklHxNjTp+5jkWjJZDohBixDj3FFJP4tR8xe4QyZLGu7QNWXPwhUKroteeFxCK2L
- MNuSoO+LglJogJOq2t5Vw/kuDwUtm4+owdClw1uKYrRuVSTLlZToDFE/tGwcvJdYXzX/mVPvSe
- jk/Hxn/Xdz1bIhlrxJ3GSWdLe2g+HShMETfXzgt+JlgJlfoiUhLD0+oko35cbA8mlBi/b8nTul
- MzoendEwl5rdL0xff21CUWEXvtwYfwmA72BlwHW2snzWsMh6QLRTPvZXniuOQbjUmj9KnJ3nfb
- sT8=
+IronPort-SDR: lV0ql2G6cpsSbO8x+el9kxACM74T/XReOo4yrKm1CVoXeiKyLvJmU19PBeX4CwmP0VQYbfY9zj
+ 8n7zWsJjRh4D+g2elPDGvMQD41t7VQbuNy3KphXDSPpAefcxxkqFw2xI8mfwr0hYla0Cu5afGd
+ NUZGP1iNzEfPspZhRWTZ0RAhLhave79ANmDW1UdP4qv5mTEnz9UbQ+BpUTq+1f6A1KkIST6pM/
+ QaPP3GdxSqyT1LS1hk+9glhOcbI755AVe01z6O0iAKRdUm1PIscBZw824EbpOFwb9T44yxjWFb
+ Ktw=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2020 17:55:42 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2020 17:55:41 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v4 3/9] block: Align max_hw_sectors to logical blocksize
-Date:   Fri, 20 Nov 2020 10:55:13 +0900
-Message-Id: <20201120015519.276820-4-damien.lemoal@wdc.com>
+Subject: [PATCH v4 2/9] null_blk: Fail zone append to conventional zones
+Date:   Fri, 20 Nov 2020 10:55:12 +0900
+Message-Id: <20201120015519.276820-3-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201120015519.276820-1-damien.lemoal@wdc.com>
 References: <20201120015519.276820-1-damien.lemoal@wdc.com>
@@ -73,72 +73,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Block device drivers do not have to call blk_queue_max_hw_sectors() to
-set a limit on request size if the default limit BLK_SAFE_MAX_SECTORS
-is acceptable. However, this limit (255 sectors) may not be aligned
-to the device logical block size which cannot be used as is for a
-request maximum size. This is the case for the null_blk device driver.
+Conventional zones do not have a write pointer and so cannot accept zone
+append writes. Make sure to fail any zone append write command issued to
+a conventional zone.
 
-Modify blk_queue_max_hw_sectors() to make sure that the request size
-limits specified by the max_hw_sectors and max_sectors queue limits
-are always aligned to the device logical block size. Additionally, to
-avoid introducing a dependence on the execution order of this function
-with blk_queue_logical_block_size(), also modify
-blk_queue_logical_block_size() to perform the same alignment when the
-logical block size is set after max_hw_sectors.
-
+Reported-by: Naohiro Aota <naohiro.aota@wdc.com>
+Fixes: e0489ed5daeb ("null_blk: Support REQ_OP_ZONE_APPEND")
+Cc: stable@vger.kernel.org
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/blk-settings.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ drivers/block/null_blk_zoned.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 9741d1d83e98..dde5c2e9a728 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -157,10 +157,16 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
- 		       __func__, max_hw_sectors);
- 	}
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+index 1d0370d91fe7..172f720b8d63 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk_zoned.c
+@@ -339,8 +339,11 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
  
-+	max_hw_sectors = round_down(max_hw_sectors,
-+				    limits->logical_block_size >> SECTOR_SHIFT);
- 	limits->max_hw_sectors = max_hw_sectors;
-+
- 	max_sectors = min_not_zero(max_hw_sectors, limits->max_dev_sectors);
- 	max_sectors = min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
-+	max_sectors = round_down(max_sectors,
-+				 limits->logical_block_size >> SECTOR_SHIFT);
- 	limits->max_sectors = max_sectors;
-+
- 	q->backing_dev_info->io_pages = max_sectors >> (PAGE_SHIFT - 9);
- }
- EXPORT_SYMBOL(blk_queue_max_hw_sectors);
-@@ -321,13 +327,20 @@ EXPORT_SYMBOL(blk_queue_max_segment_size);
-  **/
- void blk_queue_logical_block_size(struct request_queue *q, unsigned int size)
- {
--	q->limits.logical_block_size = size;
-+	struct queue_limits *limits = &q->limits;
+ 	trace_nullb_zone_op(cmd, zno, zone->cond);
  
--	if (q->limits.physical_block_size < size)
--		q->limits.physical_block_size = size;
-+	limits->logical_block_size = size;
+-	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
++	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL) {
++		if (append)
++			return BLK_STS_IOERR;
+ 		return null_process_cmd(cmd, REQ_OP_WRITE, sector, nr_sectors);
++	}
  
--	if (q->limits.io_min < q->limits.physical_block_size)
--		q->limits.io_min = q->limits.physical_block_size;
-+	if (limits->physical_block_size < size)
-+		limits->physical_block_size = size;
-+
-+	if (limits->io_min < limits->physical_block_size)
-+		limits->io_min = limits->physical_block_size;
-+
-+	limits->max_hw_sectors =
-+		round_down(limits->max_hw_sectors, size >> SECTOR_SHIFT);
-+	limits->max_sectors =
-+		round_down(limits->max_sectors, size >> SECTOR_SHIFT);
- }
- EXPORT_SYMBOL(blk_queue_logical_block_size);
+ 	null_lock_zone(dev, zno);
  
 -- 
 2.28.0
