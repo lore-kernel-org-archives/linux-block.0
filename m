@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 548B6C388F9
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F9CC6379D
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:55:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E267522259
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:55:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BACE22254
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:55:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RtSHHA47"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Z+66ktM0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727267AbgKTBzs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 20:55:48 -0500
+        id S1727040AbgKTBzt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 20:55:49 -0500
 Received: from esa3.hgst.iphmx.com ([216.71.153.141]:6558 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727241AbgKTBzr (ORCPT
+        with ESMTP id S1726479AbgKTBzt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 20:55:47 -0500
+        Thu, 19 Nov 2020 20:55:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
   t=1605837347; x=1637373347;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=pNUL4ST6yu4deA5ilYSy/0HGs6YN2e4PKGkMywlWeIA=;
-  b=RtSHHA47Q7WJz5tHIffyA4xj/01Zc0yQ/U9baYblltnAXukA9H/N+UQk
-   aubbDLc/uf1SOYa7siHXqYhmFV+0qeymn4k0U/Bl+MWGkQy+vEpnZctzt
-   cbGpl9PZH1zeHolxUAT+5RIq52EBRhTlsjUCEilWUkgmIXhy2Zs3yAeqa
-   pISUYTayA5SgrqZY0hGU//gzOd02Mx/0zUTq0dl4mr2EI9qwmTvSdsCjL
-   d3LUxO5duHv8y3Ip0FpIoivv/N95+5nnxs8+DfEk25L10Sy2Lx0lqraLf
-   +tL2GcVhQhHDuunuutzCHqmKUq30HpZstVbxsTPl9AJWNOqEC9yACHitm
-   g==;
-IronPort-SDR: bN0GP3zY0iqHRJLQ3vwNzQiqaHvupTTgGV54Xa3BctXVyIXS2j5YKN3J3Uxs9pkx8NogzqKb2L
- nFuMn4kFIcrVxdKL95uMLN/c5yR9o/OKH1VXqQOAeyiY1jrcI2c+/xIvc+GpjHBPIXhwTHZoD/
- C7EtITNat2t3sf76PkzH8fhdVE1XKiUGYaWU/XQNHcrZeBFvnbwNfr0KelE7BHRyIFISnowKDo
- 0/NgnnEqFqYRAbxQRtphFL5rLd55PHV71uhqn96IyusF0tPe8tFSR+ES4Li28XnsM5mvdbFNCV
- Lms=
+  bh=0QxzYPCbjov24q7/AyNBXvdAWCcFZLDgQuujZDOvIEQ=;
+  b=Z+66ktM0NYsy6CW6fwwMrxKKJn5iHqSUj/kpKXc2tEHyKFOR/fqFBSAR
+   NIx/ObjYao1PNfwITS8ZcwwFArG3yJA3rIKnnNV1h5zoLD7GSrYG8TV/U
+   oB7kOccGtg4viiUrwEuivZf7SZ1eUEm60aFIXSeUOiqHI9HLnK6hhePJ8
+   wZBSXaB0O6wmyM3c35NnI237cSZ1P88Dimm0pb/9NXNKlDg/xYks3bpTD
+   ULOEIiiFrN5XlRZ/mh1oyMr6dsXUhzjTB4aSdFNvRcn4LJsuq06kepmqs
+   bbp6/FTkaSLByRXtk9Q/3R8m9Pq/RqK+V+7pk6KTxUZkA8rWfZtpRTO2o
+   w==;
+IronPort-SDR: AwyiCHQNVTgLi6+BxkLDqN3eKMDmfjxYPa0zYRUyfsPJuNtFE/c7kvQoUidsPPZxb/+d2Uf0dk
+ s1yZtfB8wRxO7G6XpvwWQSV1Yf2TS7H3MpD5vBOzXoG14RlUrQOWg3WSzvOeaPeiSeoo5Plr8u
+ 8ZmgebW1DHkZtxLdO/EMa1DKaCs4Gb+4eUipS8UGZZr5pxzyBfZDPTYeBgBMwIAW2L3JnsKCct
+ cVFqTz01c3lynlQxXTttgVuxdLIkpqh7JQZzCONba43MNCHHCs3aZecsEOx/GAqq3QrH6eo0KR
+ NX0=
 X-IronPort-AV: E=Sophos;i="5.78,354,1599494400"; 
-   d="scan'208";a="157516409"
+   d="scan'208";a="157516416"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
   by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2020 09:55:47 +0800
-IronPort-SDR: 7CKxw/12dXVV4+UdsA5q7iO8ja2Kpj86bgyQdazFLDxJOpJJQcTqXl29G8glBMD8ZJK1fFG1Pj
- TCVhMiQElIw2Yj1K5LrvhAiQDWQLOa1vtB8fF2+9DAd9VmWrfiQMqwN5RdxjjdZtxhUlMgw1CR
- 8U24ujViITpCObzJCqbVRymL9el0+b10eT5FBz92KV+BOmvlpU1pw5W7pd0e49dHogXJc6P9cp
- I4oMiq1wpaUxU6HcyC4hOIVg44GUb+HarM6kHx4DFRR2U0cp856tziECpRWxtch5vQS0At2aXU
- gFbHjlsGmFP4G9El3eIIza7J
+IronPort-SDR: BbDDotb2+bbh7I7xhQWVird0TGDANVEOCxeQdRa+33LTTXkZg/NOV7wNFneRmh+7QNbs8lrzdV
+ Cy/r6oSCfAsXbEuJ2E7eiZRtzNFkBDajOKuiUhDG0MFGBAIok2ObBAzGgnOvgU1MY/Dr0WrQeY
+ Y/xE0rWlMJ53Vv5s0Xe/UVQK3WhhvypTBV0zV6x9YDfTgwW5kFsFH8RYkp8PJNbo91dciHLw+B
+ +yX4ydrOlDC/HiLNkX+rg56QbKIjK5ZT9RFGX6BoK/xmU/t6apkXKQu7Hxat+XJrQV+jlal0RW
+ DIXOejYodDyoItSHBrlSWE55
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 17:41:36 -0800
-IronPort-SDR: 4Cv15q0WRna8Bd+T9aAbYqMz7G7ajB3EdcylwfseMOkYbJhrCCpAo71WZFXm0UAXIdvL6z/MfK
- 8LMQL8m+Jz6Z6Wg62LtFQYjtjx6e9aL5dthVUHxn83zQQmd0SM4XidecXGGpkozxKRczHKAtgZ
- 4JplRSx/ueqHSz/GYefhpzaXYwQT4wrMsfNjAUHzgUGibBxaci3WrsKjW3XaCvacqFq203Rk4a
- +4Mi/wbYBiZhjBIN/3kBRvHxegJuMJf0WMXAvx4ZAxwhtBIjP5956Pl9jou0ruofmCLsDsok75
- 6/8=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 17:41:37 -0800
+IronPort-SDR: npl0KWFeJX/JoBgoUeScL0K7EnAAN64uzoC2aE/Xf0GVqnrU5o/ArsNaScFlIh5LZ1QLi1hcgm
+ jpVoyxJ2Dt7oAKJWA30uI/j7M/Jw28gVc4O18pxWhpwpm7HS0WL4fo7t9s1+3AVA/JD1tLhL4W
+ RDRZCNENcQYO4+m7P9bqBQDSZApZo0l1lOKoy4VTS2oIOig3j01tsUHv2vkQ7nOFCcMtDlqbAK
+ LKMlnzrxXtJIDVyPXOFOe3WC3EgVEKIjgexmGGpaMCisXbl4jHUaNLi9uEHENqGX1Kb+wSA/r/
+ dF0=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2020 17:55:46 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2020 17:55:47 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v4 8/9] null_blk: Allow controlling max_hw_sectors limit
-Date:   Fri, 20 Nov 2020 10:55:18 +0900
-Message-Id: <20201120015519.276820-9-damien.lemoal@wdc.com>
+Subject: [PATCH v4 9/9] null_blk: Move driver into its own directory
+Date:   Fri, 20 Nov 2020 10:55:19 +0900
+Message-Id: <20201120015519.276820-10-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201120015519.276820-1-damien.lemoal@wdc.com>
 References: <20201120015519.276820-1-damien.lemoal@wdc.com>
@@ -73,105 +73,158 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add the module option and configfs attribute max_sectors to allow
-configuring the maximum size of a command issued to a null_blk device.
-This allows exercising the block layer BIO splitting with different
-limits than the default BLK_SAFE_MAX_SECTORS. This is also useful for
-testing the zone append write path of file systems as the max_hw_sectors
-limit value is also used for the max_zone_append_sectors limit.
+Move null_blk driver code into the new sub-directory
+drivers/block/null_blk.
 
+Suggested-by: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/null_blk.h      |  1 +
- drivers/block/null_blk_main.c | 20 +++++++++++++++++++-
- 2 files changed, 20 insertions(+), 1 deletion(-)
+ drivers/block/Kconfig                                |  8 +-------
+ drivers/block/Makefile                               |  7 +------
+ drivers/block/null_blk/Kconfig                       | 12 ++++++++++++
+ drivers/block/null_blk/Makefile                      | 11 +++++++++++
+ drivers/block/{null_blk_main.c => null_blk/main.c}   |  0
+ drivers/block/{ => null_blk}/null_blk.h              |  0
+ drivers/block/{null_blk_trace.c => null_blk/trace.c} |  2 +-
+ drivers/block/{null_blk_trace.h => null_blk/trace.h} |  2 +-
+ drivers/block/{null_blk_zoned.c => null_blk/zoned.c} |  2 +-
+ 9 files changed, 28 insertions(+), 16 deletions(-)
+ create mode 100644 drivers/block/null_blk/Kconfig
+ create mode 100644 drivers/block/null_blk/Makefile
+ rename drivers/block/{null_blk_main.c => null_blk/main.c} (100%)
+ rename drivers/block/{ => null_blk}/null_blk.h (100%)
+ rename drivers/block/{null_blk_trace.c => null_blk/trace.c} (93%)
+ rename drivers/block/{null_blk_trace.h => null_blk/trace.h} (97%)
+ rename drivers/block/{null_blk_zoned.c => null_blk/zoned.c} (99%)
 
-diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
-index 63000aeeb2f3..83504f3cc9d6 100644
---- a/drivers/block/null_blk.h
-+++ b/drivers/block/null_blk.h
-@@ -85,6 +85,7 @@ struct nullb_device {
- 	unsigned int home_node; /* home node for the device */
- 	unsigned int queue_mode; /* block interface */
- 	unsigned int blocksize; /* block size */
-+	unsigned int max_sectors; /* Max sectors per command */
- 	unsigned int irqmode; /* IRQ completion handler */
- 	unsigned int hw_queue_depth; /* queue depth */
- 	unsigned int index; /* index of the disk, only valid with a disk */
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index b758b9366630..5357c3a4a36f 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -152,6 +152,10 @@ static int g_bs = 512;
- module_param_named(bs, g_bs, int, 0444);
- MODULE_PARM_DESC(bs, "Block size (in bytes)");
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index ecceaaa1a66f..262326973ee0 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -16,13 +16,7 @@ menuconfig BLK_DEV
  
-+static int g_max_sectors;
-+module_param_named(max_sectors, g_max_sectors, int, 0444);
-+MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sectors)");
+ if BLK_DEV
+ 
+-config BLK_DEV_NULL_BLK
+-	tristate "Null test block driver"
+-	select CONFIGFS_FS
+-
+-config BLK_DEV_NULL_BLK_FAULT_INJECTION
+-	bool "Support fault injection for Null test block driver"
+-	depends on BLK_DEV_NULL_BLK && FAULT_INJECTION
++source "drivers/block/null_blk/Kconfig"
+ 
+ config BLK_DEV_FD
+ 	tristate "Normal floppy disk support"
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index e1f63117ee94..a3170859e01d 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -41,12 +41,7 @@ obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
+ obj-$(CONFIG_ZRAM) += zram/
+ obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
+ 
+-obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
+-null_blk-objs	:= null_blk_main.o
+-ifeq ($(CONFIG_BLK_DEV_ZONED), y)
+-null_blk-$(CONFIG_TRACING) += null_blk_trace.o
+-endif
+-null_blk-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
++obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
+ 
+ skd-y		:= skd_main.o
+ swim_mod-y	:= swim.o swim_asm.o
+diff --git a/drivers/block/null_blk/Kconfig b/drivers/block/null_blk/Kconfig
+new file mode 100644
+index 000000000000..6bf1f8ca20a2
+--- /dev/null
++++ b/drivers/block/null_blk/Kconfig
+@@ -0,0 +1,12 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Null block device driver configuration
++#
 +
- static unsigned int nr_devices = 1;
- module_param(nr_devices, uint, 0444);
- MODULE_PARM_DESC(nr_devices, "Number of devices to register");
-@@ -346,6 +350,7 @@ NULLB_DEVICE_ATTR(submit_queues, uint, nullb_apply_submit_queues);
- NULLB_DEVICE_ATTR(home_node, uint, NULL);
- NULLB_DEVICE_ATTR(queue_mode, uint, NULL);
- NULLB_DEVICE_ATTR(blocksize, uint, NULL);
-+NULLB_DEVICE_ATTR(max_sectors, uint, NULL);
- NULLB_DEVICE_ATTR(irqmode, uint, NULL);
- NULLB_DEVICE_ATTR(hw_queue_depth, uint, NULL);
- NULLB_DEVICE_ATTR(index, uint, NULL);
-@@ -463,6 +468,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_home_node,
- 	&nullb_device_attr_queue_mode,
- 	&nullb_device_attr_blocksize,
-+	&nullb_device_attr_max_sectors,
- 	&nullb_device_attr_irqmode,
- 	&nullb_device_attr_hw_queue_depth,
- 	&nullb_device_attr_index,
-@@ -533,7 +539,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
- {
- 	return snprintf(page, PAGE_SIZE,
--			"memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size,zone_capacity,zone_nr_conv,zone_max_open,zone_max_active\n");
-+			"memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size,zone_capacity,zone_nr_conv,zone_max_open,zone_max_active,blocksize,max_sectors\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -588,6 +594,7 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->home_node = g_home_node;
- 	dev->queue_mode = g_queue_mode;
- 	dev->blocksize = g_bs;
-+	dev->max_sectors = g_max_sectors;
- 	dev->irqmode = g_irqmode;
- 	dev->hw_queue_depth = g_hw_queue_depth;
- 	dev->blocking = g_blocking;
-@@ -1867,6 +1874,11 @@ static int null_add_dev(struct nullb_device *dev)
- 
- 	blk_queue_logical_block_size(nullb->q, dev->blocksize);
- 	blk_queue_physical_block_size(nullb->q, dev->blocksize);
-+	if (!dev->max_sectors)
-+		dev->max_sectors = queue_max_hw_sectors(nullb->q);
-+	dev->max_sectors = min_t(unsigned int, dev->max_sectors,
-+				 BLK_DEF_MAX_SECTORS);
-+	blk_queue_max_hw_sectors(nullb->q, dev->max_sectors);
- 
- 	null_config_discard(nullb);
- 
-@@ -1910,6 +1922,12 @@ static int __init null_init(void)
- 		g_bs = PAGE_SIZE;
- 	}
- 
-+	if (g_max_sectors > BLK_DEF_MAX_SECTORS) {
-+		pr_warn("invalid max sectors\n");
-+		pr_warn("defaults max sectors to %u\n", BLK_DEF_MAX_SECTORS);
-+		g_max_sectors = BLK_DEF_MAX_SECTORS;
-+	}
++config BLK_DEV_NULL_BLK
++	tristate "Null test block driver"
++	select CONFIGFS_FS
 +
- 	if (g_home_node != NUMA_NO_NODE && g_home_node >= nr_online_nodes) {
- 		pr_err("invalid home_node value\n");
- 		g_home_node = NUMA_NO_NODE;
++config BLK_DEV_NULL_BLK_FAULT_INJECTION
++	bool "Support fault injection for Null test block driver"
++	depends on BLK_DEV_NULL_BLK && FAULT_INJECTION
+diff --git a/drivers/block/null_blk/Makefile b/drivers/block/null_blk/Makefile
+new file mode 100644
+index 000000000000..84c36e512ab8
+--- /dev/null
++++ b/drivers/block/null_blk/Makefile
+@@ -0,0 +1,11 @@
++# SPDX-License-Identifier: GPL-2.0
++
++# needed for trace events
++ccflags-y			+= -I$(src)
++
++obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
++null_blk-objs			:= main.o
++ifeq ($(CONFIG_BLK_DEV_ZONED), y)
++null_blk-$(CONFIG_TRACING) 	+= trace.o
++endif
++null_blk-$(CONFIG_BLK_DEV_ZONED) += zoned.o
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk/main.c
+similarity index 100%
+rename from drivers/block/null_blk_main.c
+rename to drivers/block/null_blk/main.c
+diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk/null_blk.h
+similarity index 100%
+rename from drivers/block/null_blk.h
+rename to drivers/block/null_blk/null_blk.h
+diff --git a/drivers/block/null_blk_trace.c b/drivers/block/null_blk/trace.c
+similarity index 93%
+rename from drivers/block/null_blk_trace.c
+rename to drivers/block/null_blk/trace.c
+index f246e7bff698..3711cba16071 100644
+--- a/drivers/block/null_blk_trace.c
++++ b/drivers/block/null_blk/trace.c
+@@ -4,7 +4,7 @@
+  *
+  * Copyright (C) 2020 Western Digital Corporation or its affiliates.
+  */
+-#include "null_blk_trace.h"
++#include "trace.h"
+ 
+ /*
+  * Helper to use for all null_blk traces to extract disk name.
+diff --git a/drivers/block/null_blk_trace.h b/drivers/block/null_blk/trace.h
+similarity index 97%
+rename from drivers/block/null_blk_trace.h
+rename to drivers/block/null_blk/trace.h
+index 4f83032eb544..ce3b430e88c5 100644
+--- a/drivers/block/null_blk_trace.h
++++ b/drivers/block/null_blk/trace.h
+@@ -73,7 +73,7 @@ TRACE_EVENT(nullb_report_zones,
+ #undef TRACE_INCLUDE_PATH
+ #define TRACE_INCLUDE_PATH .
+ #undef TRACE_INCLUDE_FILE
+-#define TRACE_INCLUDE_FILE null_blk_trace
++#define TRACE_INCLUDE_FILE trace
+ 
+ /* This part must be outside protection */
+ #include <trace/define_trace.h>
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk/zoned.c
+similarity index 99%
+rename from drivers/block/null_blk_zoned.c
+rename to drivers/block/null_blk/zoned.c
+index 65464f7559e0..148b871f263b 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk/zoned.c
+@@ -4,7 +4,7 @@
+ #include "null_blk.h"
+ 
+ #define CREATE_TRACE_POINTS
+-#include "null_blk_trace.h"
++#include "trace.h"
+ 
+ #define MB_TO_SECTS(mb) (((sector_t)mb * SZ_1M) >> SECTOR_SHIFT)
+ 
 -- 
 2.28.0
 
