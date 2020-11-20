@@ -2,93 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A223C6379F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 08:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B74C5519F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 08:14:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C0D7223AC
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 08:02:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C92042222F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 08:14:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Bt4O35kZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726719AbgKTICD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 03:02:03 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50416 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725797AbgKTICD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 03:02:03 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C65C0AB3D;
-        Fri, 20 Nov 2020 08:02:01 +0000 (UTC)
-Subject: Re: [PATCH 73/78] block: use put_device in put_disk
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Justin Sanders <justin@coraid.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, nbd@other.debian.org,
-        ceph-devel@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20201116145809.410558-1-hch@lst.de>
- <20201116145809.410558-74-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <a20f546f-6e14-2866-7c50-09fa385fe6f4@suse.de>
-Date:   Fri, 20 Nov 2020 09:02:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1726224AbgKTIOd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 03:14:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58596 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725818AbgKTIOc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Nov 2020 03:14:32 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98662C0613CF;
+        Fri, 20 Nov 2020 00:14:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=9eTcmneDEkMa+Ci3UvbK1WCqbss7MNqMPJgSFOsLpRE=; b=Bt4O35kZ1R0xwyIj1tfdoQRbiJ
+        RLqNsohzyZnBavvjnUbi4J/vPlbtPqB0v+F8c9zPB+fUoVnbd5Idu9mS2GlQ+pcXguuGCx/m7HvTA
+        vWp0oGm/wap0CLaD/6FSdL+5SJQdQ1D22M5Nc/fSvF8QKUUcpZPbxF7f0OKNadAZ9KCx5afiHjIhD
+        lXYwI7oXj9FkegV6Qo7M6ozH/OSVrzhzBDaVnEtIbHPaq0cd+VyRHyq8CsUPSducO55uG+cCDLXa0
+        gRXxiOW5Jhre/lGXZA2QM46wS3mieoX8TC4q9IMumt8zorTdWo3Cs+0B7vkl/+8qTQuSXsxf1+eUU
+        zoXCegvA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kg1Yr-0000Ag-Fs; Fri, 20 Nov 2020 08:14:29 +0000
+Date:   Fri, 20 Nov 2020 08:14:29 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] iov_iter: optimise iov_iter_npages for bvec
+Message-ID: <20201120081429.GA30801@infradead.org>
+References: <cover.1605827965.git.asml.silence@gmail.com>
+ <ab04202d0f8c1424da47251085657c436d762785.1605827965.git.asml.silence@gmail.com>
+ <20201120012017.GJ29991@casper.infradead.org>
+ <35d5db17-f6f6-ec32-944e-5ecddcbcb0f1@gmail.com>
+ <20201120022200.GB333150@T590>
+ <e70a3c05-a968-7802-df81-0529eaa7f7b4@gmail.com>
+ <20201120025457.GM29991@casper.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20201116145809.410558-74-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201120025457.GM29991@casper.infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/16/20 3:58 PM, Christoph Hellwig wrote:
-> Use put_device to put the device instead of poking into the internals
-> and using kobject_put.
+On Fri, Nov 20, 2020 at 02:54:57AM +0000, Matthew Wilcox wrote:
+> On Fri, Nov 20, 2020 at 02:25:08AM +0000, Pavel Begunkov wrote:
+> > On 20/11/2020 02:22, Ming Lei wrote:
+> > > iov_iter_npages(bvec) still can be improved a bit by the following way:
+> > 
+> > Yep, was doing exactly that, +a couple of other places that are in my way.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/genhd.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 56bc37e98ed852..f1e20ec1b62887 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -1659,7 +1659,7 @@ EXPORT_SYMBOL(__alloc_disk_node);
->   void put_disk(struct gendisk *disk)
->   {
->   	if (disk)
-> -		kobject_put(&disk_to_dev(disk)->kobj);
-> +		put_device(disk_to_dev(disk));
->   }
->   EXPORT_SYMBOL(put_disk);
->   
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Are you optimising the right thing here?  Assuming you're looking at
+> the one in do_blockdev_direct_IO(), wouldn't we be better off figuring
+> out how to copy the bvecs directly from the iov_iter into the bio
+> rather than calling dio_bio_add_page() for each page?
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Which is most effectively done by stopping to to use *blockdev_direct_IO
+and switching to iomap instead :)
