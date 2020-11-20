@@ -2,126 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B71DC6379F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFECC63777
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:10:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0A4A2220B
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:08:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C7F622210
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:10:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHwYJIYY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726768AbgKTJI1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 04:08:27 -0500
-Received: from verein.lst.de ([213.95.11.211]:42057 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726548AbgKTJIZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 04:08:25 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0DA3867373; Fri, 20 Nov 2020 10:08:21 +0100 (CET)
-Date:   Fri, 20 Nov 2020 10:08:20 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 14/20] block: remove the nr_sects field in struct
- hd_struct
-Message-ID: <20201120090820.GD21715@lst.de>
-References: <20201118084800.2339180-1-hch@lst.de> <20201118084800.2339180-15-hch@lst.de> <20201119120525.GW1981@quack2.suse.cz>
+        id S1727160AbgKTJKZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 04:10:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38962 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727182AbgKTJKZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Nov 2020 04:10:25 -0500
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60ACC0613CF;
+        Fri, 20 Nov 2020 01:10:24 -0800 (PST)
+Received: by mail-pg1-x541.google.com with SMTP id r18so6769894pgu.6;
+        Fri, 20 Nov 2020 01:10:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CjaLATDl2cTUYsdiLtOBub9W4/EnK9k7yCEhJHGSsUo=;
+        b=XHwYJIYYFCn+voouE0ynk+0BkN9YnMFxz/Jv3LfYVdt/zjgG8+mdPbxnlJfZ3P9De6
+         JHG2D97HECDDK76xIPaVJIq2vKIr/Mig9sZlLlltoNaiAuQeB42NNaVCE/gG/XolNcTP
+         Z80TC914UxYKrpe/o+zhm91yYhVdPm/raiFWmYZUX9ZBsQ0J7DDwYYyWIo5JhEy4SA3V
+         Z9K8KbxmTF4O3F5o2mNvzDpJCC5DSpWKXyjkArXYnmSU0QSWr5WNa8bIepBeJhZY1vSl
+         gnOheyk/Fq1w2bMVF302VEEGX2ohUXXTmnpIre3gsu0Qcxv9QaisjNkpBFt03VQLQQMA
+         Zvdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CjaLATDl2cTUYsdiLtOBub9W4/EnK9k7yCEhJHGSsUo=;
+        b=hvsJJFub7h1zavq5fzLEWLMuyObGgns+ByuceHONSskpJ7EHMUtUIPXVSUdxrYLfLC
+         LI43RAhrK5phriqjlskCp/jI5WRf4isw3VX6U2fGh3Q0Ibua2aD10DVApHwiZ4RwtN7M
+         0kinhZcfv8SPvoeblLNfTWBkr1gccz7AdoMWMBDKedo/dOcUuhXyk5hWfTcnDrTr8am5
+         Z4i1pP+IeyvUOkP01xi498EPADDhTF86YTee5leW7QQmlI9XsoFHiBk0YibNvwQBi9QL
+         LuDH195869IYA548wialIfuVpw/xH4uNsA6bcC4c+NFmYTSdnXKyA/7tbjr17l1qtep2
+         5jTQ==
+X-Gm-Message-State: AOAM531nDpLQpPu4ElYWN3JsO7mMXeiyWIUVNpDHUcIA7cH8+odXPxdF
+        CgwHeZVzuWAJhCSwoil9cW/PS83LLV/X/tqnjg==
+X-Google-Smtp-Source: ABdhPJxvr2Bzc6LIEbyDz2huULyNlz0t3Oe5MFYawGoKKWmg8wT1pcYcO7bKei8ocujSEGmx75RoBXyegZURPd4BIMk=
+X-Received: by 2002:a62:1408:0:b029:18b:78d:4c4b with SMTP id
+ 8-20020a6214080000b029018b078d4c4bmr12711553pfu.25.1605863424495; Fri, 20 Nov
+ 2020 01:10:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201119120525.GW1981@quack2.suse.cz>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <20201115101514.954-1-rsalvaterra@gmail.com> <20201119222610.GD3113267@google.com>
+In-Reply-To: <20201119222610.GD3113267@google.com>
+From:   Rui Salvaterra <rsalvaterra@gmail.com>
+Date:   Fri, 20 Nov 2020 09:10:13 +0000
+Message-ID: <CALjTZvbK6_UqDQFhMxdEQAR-FbsZKrztkEFronvoFpLUWsi_gw@mail.gmail.com>
+Subject: Re: [PATCH v5] zram: break the strict dependency from lzo
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 19, 2020 at 01:05:25PM +0100, Jan Kara wrote:
-> > @@ -613,7 +613,7 @@ void guard_bio_eod(struct bio *bio)
-> >  	rcu_read_lock();
-> >  	part = __disk_get_part(bio->bi_disk, bio->bi_partno);
-> >  	if (part)
-> > -		maxsector = part_nr_sects_read(part);
-> > +		maxsector = bdev_nr_sectors(part->bdev);
-> >  	else
-> >  		maxsector = get_capacity(bio->bi_disk);
-> 
-> I have to say that after these changes I find it a bit confusing that we
-> have get/set_capacity() and bdev_nr_sectors() / bdev_set_nr_sectors() and
-> they are all the same thing (i_size of the bdev). Is there a reason for the
-> distinction?
+Hi, Minchan,
 
-get_capacity/set_capacity are the existing unchanged interfaces that
-work on struct gendisk, and unchanged from what we had before.  They also
-have lots of users which makes them kinda awkward to touch.
+On Thu, 19 Nov 2020 at 22:26, Minchan Kim <minchan@kernel.org> wrote:
+>
+> What's the purpose of ZRAM_AUTOSEL_ALGO?
+> If you and Sergey already discussed, sorry about the missing it.
 
-bdev_nr_sectors is the public interface to query the size for any
-kind of struct block device, to be used by consumers of the block
-device interface.
+The purpose of ZRAM_AUTOSEL_ALGO is to make sure at least one of the
+required compression algorithms is enabled, either as a module or
+built-in. I believe Sergey agreed with the reasoning behind it, but
+he'll let us know if I misunderstood. :)
 
-bdev_set_nr_sectors is a private helper for the partitions core that
-avoids duplicating a bit of code, and works on partitions.
+> Below doesn't work for your goal?
 
+Unfortunately, it doesn't. :( It breaks the dependency chain, allowing
+you to deselect all compression algorithms in the crypto menu, and
+consequently disabling zram. This is only my opinion (and I know
+select directives should be very well justified), but I believe that
+it should be zram to make sure its required libraries are enabled, and
+not the other way around. Having to select a compression algorithm in
+the crypto menu for the zram block device to appear in the block
+devices menu seems backwards to me.
 
-
-> > @@ -38,6 +38,16 @@ static void disk_add_events(struct gendisk *disk);
-> >  static void disk_del_events(struct gendisk *disk);
-> >  static void disk_release_events(struct gendisk *disk);
-> >  
-> > +void set_capacity(struct gendisk *disk, sector_t sectors)
-> > +{
-> > +	struct block_device *bdev = disk->part0.bdev;
-> > +
-> > +	spin_lock(&bdev->bd_size_lock);
-> > +	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
-> > +	spin_unlock(&bdev->bd_size_lock);
-> 
-> AFAICT bd_size_lock is pointless after these changes so we can just remove
-> it?
-
-I don't think it is, as reuqiring bd_mutex for size updates leads to
-rather awkward lock ordering problems.
-
-> >  	if (capacity != size && capacity != 0 && size != 0) {
-> >  		char *envp[] = { "RESIZE=1", NULL };
-> >  
-> > +		pr_info("%s: detected capacity change from %lld to %lld\n",
-> > +		       disk->disk_name, size, capacity);
-> 
-> So we are now missing above message for transitions from / to 0 capacity?
-> Is there any other notification in the kernel log when e.g. media is
-> inserted into a CD-ROM drive? I remember using these messages for detecting
-> that...
-
-True, I guess we should keep the messages for that case at least under
-some circumstances.  Let me take a closer look at what could make sense.
-
-> Also what about GENHD_FL_HIDDEN devices? Are we sure we never set capacity
-> for them?
-
-We absolutely set the capacity for them, as we have to.  And even use
-this interface.  But yes, I think we should skip sending the uevent for
-them.
-
-> > @@ -1158,8 +1169,7 @@ ssize_t part_size_show(struct device *dev,
-> >  {
-> >  	struct hd_struct *p = dev_to_part(dev);
-> >  
-> > -	return sprintf(buf, "%llu\n",
-> > -		(unsigned long long)part_nr_sects_read(p));
-> > +	return sprintf(buf, "%llu\n", bdev_nr_sectors(p->bdev));
-> 
-> Is sector_t really guaranteed to be unsigned long long?
-
-Yes, it is these days, ever since I removed the option to have a 32-bit
-one on 32-bit platforms a while ago.
+Thanks,
+Rui
