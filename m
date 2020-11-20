@@ -2,96 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFECC63777
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:10:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72607C5519F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:12:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C7F622210
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:10:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F081F2224C
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:12:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHwYJIYY"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="SHXWMa+Q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727160AbgKTJKZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 04:10:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38962 "EHLO
+        id S1727137AbgKTJMI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 04:12:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727182AbgKTJKZ (ORCPT
+        with ESMTP id S1727140AbgKTJMH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 04:10:25 -0500
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60ACC0613CF;
-        Fri, 20 Nov 2020 01:10:24 -0800 (PST)
-Received: by mail-pg1-x541.google.com with SMTP id r18so6769894pgu.6;
-        Fri, 20 Nov 2020 01:10:24 -0800 (PST)
+        Fri, 20 Nov 2020 04:12:07 -0500
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7D5C0613CF
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2020 01:12:07 -0800 (PST)
+Received: by mail-lj1-x242.google.com with SMTP id h23so9262564ljg.13
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2020 01:12:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=CjaLATDl2cTUYsdiLtOBub9W4/EnK9k7yCEhJHGSsUo=;
-        b=XHwYJIYYFCn+voouE0ynk+0BkN9YnMFxz/Jv3LfYVdt/zjgG8+mdPbxnlJfZ3P9De6
-         JHG2D97HECDDK76xIPaVJIq2vKIr/Mig9sZlLlltoNaiAuQeB42NNaVCE/gG/XolNcTP
-         Z80TC914UxYKrpe/o+zhm91yYhVdPm/raiFWmYZUX9ZBsQ0J7DDwYYyWIo5JhEy4SA3V
-         Z9K8KbxmTF4O3F5o2mNvzDpJCC5DSpWKXyjkArXYnmSU0QSWr5WNa8bIepBeJhZY1vSl
-         gnOheyk/Fq1w2bMVF302VEEGX2ohUXXTmnpIre3gsu0Qcxv9QaisjNkpBFt03VQLQQMA
-         Zvdg==
+        bh=zYwHjbKEpls2WUbFGvsAlTnALvxjY3C45fMPKOCCdWo=;
+        b=SHXWMa+QBbvSWXTVTvc9oCEYja53wrH4XnNDPeDjBZ+0PzbUw/zJjF0sOwfukdto2I
+         yv4yeH324vWGnkO3rxD77aI3dC+Y7Nna31AhnQIDQ9yic0vUGsrNF06nsfiEwsD47Kro
+         UAi8KcIpnD8LZMUU1t1HDrAtiS/irUs9O71BHRasiL5n9VXF52ZIdC9wLjq86Qu22owJ
+         kMhLLzuIm7a6dgG6k1Si7fbwfZdq16DMcWEk7EETvYItWfSJTBFCIfLok5+DvbAbsi3r
+         S+o7ch2CzwMiFWx81DFF1H1ms+b082ZMsq6ftLFKcUJSGVL4uqQ8C5KS28zlaooJLeZK
+         WnTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=CjaLATDl2cTUYsdiLtOBub9W4/EnK9k7yCEhJHGSsUo=;
-        b=hvsJJFub7h1zavq5fzLEWLMuyObGgns+ByuceHONSskpJ7EHMUtUIPXVSUdxrYLfLC
-         LI43RAhrK5phriqjlskCp/jI5WRf4isw3VX6U2fGh3Q0Ibua2aD10DVApHwiZ4RwtN7M
-         0kinhZcfv8SPvoeblLNfTWBkr1gccz7AdoMWMBDKedo/dOcUuhXyk5hWfTcnDrTr8am5
-         Z4i1pP+IeyvUOkP01xi498EPADDhTF86YTee5leW7QQmlI9XsoFHiBk0YibNvwQBi9QL
-         LuDH195869IYA548wialIfuVpw/xH4uNsA6bcC4c+NFmYTSdnXKyA/7tbjr17l1qtep2
-         5jTQ==
-X-Gm-Message-State: AOAM531nDpLQpPu4ElYWN3JsO7mMXeiyWIUVNpDHUcIA7cH8+odXPxdF
-        CgwHeZVzuWAJhCSwoil9cW/PS83LLV/X/tqnjg==
-X-Google-Smtp-Source: ABdhPJxvr2Bzc6LIEbyDz2huULyNlz0t3Oe5MFYawGoKKWmg8wT1pcYcO7bKei8ocujSEGmx75RoBXyegZURPd4BIMk=
-X-Received: by 2002:a62:1408:0:b029:18b:78d:4c4b with SMTP id
- 8-20020a6214080000b029018b078d4c4bmr12711553pfu.25.1605863424495; Fri, 20 Nov
- 2020 01:10:24 -0800 (PST)
+        bh=zYwHjbKEpls2WUbFGvsAlTnALvxjY3C45fMPKOCCdWo=;
+        b=J77fbbuDsIsT790ecrxsGNcsKymXgbkug1N+WWQtbqBBOCr2wucigkpb79Bp0d6D7A
+         QLeuvyvDhO+dZvF+9wWZk5INP7vkXeY5Czwt2ru0sDAFW76U1PDHjIoVAygGEO0AmEA0
+         jgDTVW5UnEDDjKImQbf/k6DjUa+UJtbgemyWJkSDHhs5H6SAZ6l6yMNgGg1oruJUp1XP
+         7aDMKUskCxZ7bZNJK7aC0iAQqGsW1N/JYxxFkjPxGXEZ/bwOEAzQ+4CqeekNWvrXYr76
+         oEN3+wBR0h3mXFiG+It6/4S71p1bAH3tkotRswefjW0ks7p0ssQU1KgrnpRUtpogXmbc
+         cLrA==
+X-Gm-Message-State: AOAM530wEL8Ivgg7y3qEdFZ2SCCXTNwcvAPLYcaibnd5FWGVg7L/MXNL
+        k+eeMXrk5vE8roCiDD97H7D2S7M1QmP0+WFN90bm
+X-Google-Smtp-Source: ABdhPJxe3gqqTHhUOIoW4RhjpAyW8nk/gUrLRGbbSANUyqjh2R+b6qVn3dxWsuAQG4KNWibj/6cGMLuL7fDMiZQUMEw=
+X-Received: by 2002:a2e:a164:: with SMTP id u4mr7809363ljl.75.1605863525418;
+ Fri, 20 Nov 2020 01:12:05 -0800 (PST)
 MIME-Version: 1.0
-References: <20201115101514.954-1-rsalvaterra@gmail.com> <20201119222610.GD3113267@google.com>
-In-Reply-To: <20201119222610.GD3113267@google.com>
-From:   Rui Salvaterra <rsalvaterra@gmail.com>
-Date:   Fri, 20 Nov 2020 09:10:13 +0000
-Message-ID: <CALjTZvbK6_UqDQFhMxdEQAR-FbsZKrztkEFronvoFpLUWsi_gw@mail.gmail.com>
-Subject: Re: [PATCH v5] zram: break the strict dependency from lzo
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
+ <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org> <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
+ <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org> <CAHg0HuxJ-v7WgqbU62zkihquN9Kyc9nPzGhcung+UyFOG7LECQ@mail.gmail.com>
+ <a1446914-1388-40af-4204-5ef8b7618b42@acm.org>
+In-Reply-To: <a1446914-1388-40af-4204-5ef8b7618b42@acm.org>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Fri, 20 Nov 2020 10:11:54 +0100
+Message-ID: <CAHg0Huy6U5hKUVjPt0PtZQJ2ur7gFveZjnq_MV-vE4hF2d6f0Q@mail.gmail.com>
+Subject: Re: [RFC] Reliable Multicast on top of RTRS
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Minchan,
+Hi Bart,
 
-On Thu, 19 Nov 2020 at 22:26, Minchan Kim <minchan@kernel.org> wrote:
+On Sun, Sep 27, 2020 at 2:03 AM Bart Van Assche <bvanassche@acm.org> wrote:
 >
-> What's the purpose of ZRAM_AUTOSEL_ALGO?
-> If you and Sergey already discussed, sorry about the missing it.
+> On 2020-09-09 04:42, Danil Kipnis wrote:
+> > On Fri, Sep 4, 2020 at 5:33 PM Bart Van Assche <bvanassche@acm.org> wrote:
+> >> On 2020-09-04 04:35, Danil Kipnis wrote:
+> >>> On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> >>>> How will it be guaranteed that the resulting software does
+> >>>> not suffer from the problems that have been solved by the introduction
+> >>>> of the DRBD activity log
+> >>>> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
+> >>>
+> >>> The above would require some kind of activity log also, I'm afraid.
+> >>
+> >> How about collaborating with the DRBD team? My concern is that otherwise
+> >> we will end up with two drivers in the kernel that implement block device
+> >> replication between servers connected over a network.
+> >
+> > I have two general understanding questions:
+> > - What is the conceptual difference between DRBD and an md-raid1 with
+> > one local leg and one remote (imported over srp/nvmeof/rnbd)?
+>
+> I'm not sure there is a conceptual difference. But there will be a big
+> difference in recovery speed after a temporary network outage (assuming that
+> the md-raid write intent bitmap has been disabled).
 
-The purpose of ZRAM_AUTOSEL_ALGO is to make sure at least one of the
-required compression algorithms is enabled, either as a module or
-built-in. I believe Sergey agreed with the reasoning behind it, but
-he'll let us know if I misunderstood. :)
+I think RMR is conceptually different to either of the setups
+(drbd or md-raid over srp/iser/nvmeof/rnbd devices) in the sense that
+the logic required for replication policies (coding) is present inside rdma
+subsystem which would allow to potentially offload it to underlying
+rdma devices. The user of the rdma enabled devices can then utilize
+them for both: block io transport and replication.
 
-> Below doesn't work for your goal?
+Another difference is that one can put a volume manager on top of RMR and
+have it work as a distributed one.
 
-Unfortunately, it doesn't. :( It breaks the dependency chain, allowing
-you to deselect all compression algorithms in the crypto menu, and
-consequently disabling zram. This is only my opinion (and I know
-select directives should be very well justified), but I believe that
-it should be zram to make sure its required libraries are enabled, and
-not the other way around. Having to select a compression algorithm in
-the crypto menu for the zram block device to appear in the block
-devices menu seems backwards to me.
+>
+> > - Is this possible to setup an md-raid1 on a client sitting on top of
+> > two remote DRBD devices, which are configured in "active-active" mode?
+>
+> I don't think that DRBD supports this. From the DRBD source code:
+> "this code path is to recover from a situation that "should not happen":
+> concurrent writes in multi-primary setup."
 
-Thanks,
-Rui
+This means md-raid on top of two block devices imported over rdma has write
+latency twice shorter (while having recovery latency twice as high) as drbd.
+RMR would allow for having single hop for both: write IO and resync IO.
+
+Thank you,
+Danil.
