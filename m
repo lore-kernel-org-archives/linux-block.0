@@ -2,69 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F37ADC2D0E4
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 17:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AF47C2D0E4
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 17:25:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 882152225B
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 17:16:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB38122264
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 17:25:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XGpzxBZQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hdZMxoVq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728842AbgKTRQa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 12:16:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58068 "EHLO
+        id S1728410AbgKTRZ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 12:25:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbgKTRQ3 (ORCPT
+        with ESMTP id S1728220AbgKTRZ0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 12:16:29 -0500
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24E63C0613CF;
-        Fri, 20 Nov 2020 09:16:29 -0800 (PST)
-Received: by mail-ed1-x541.google.com with SMTP id v22so10284941edt.9;
-        Fri, 20 Nov 2020 09:16:29 -0800 (PST)
+        Fri, 20 Nov 2020 12:25:26 -0500
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 161FDC0613CF;
+        Fri, 20 Nov 2020 09:25:25 -0800 (PST)
+Received: by mail-wm1-x341.google.com with SMTP id d142so11053887wmd.4;
+        Fri, 20 Nov 2020 09:25:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:from:to:references:cc:autocrypt:message-id:date:user-agent
+        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=AYZHNIKzPwx8xoXFmx5rzquQBlnglYktH+BU+ZB6Shg=;
-        b=XGpzxBZQuw7uQse5M0HLOvrUY5+jAzipXHgtnAzAtHxN7q5aBgC1GtiAQX4lUD5K3B
-         W/YNRjmmnthlIlYzjqNCzFoaZxmJNoem2QHcGlJj2hfczPrDM63lFwxHRBN/lsPwEU4i
-         c0bQBBbSpgTbFwUSz8vP7aejSn1KeWmxINVYH1yAA+Yi8itcmE4FoX7UMNifdVv7JPOE
-         5hhIafC6WRg1ODPzlSLmHOqV5k3pzJ5T94KUUtV+sxBS1xyvXpreg9GghY84jqIDYX3Q
-         x/rAj/pAaVQsLlqWE5ggJpIFmR9/KYI4357ZPZnCEWTla1Zlw1fxtUz8ICuMHM6UGfUU
-         7lOQ==
+        bh=G0q/APOYHJwWcIxEVGu7BpAbHR0uizpMBxh1YXyG6BU=;
+        b=hdZMxoVqyTeMQqL9y1kNpAOMOUusUo32K+/CXr3HW0gXJkkPcRfUAJH3ZgpFiNUptD
+         3q4JfG4YNJDP9lrw/BkhC63EhxAAiqec8nTYiszXhVNiaate8PmoVVtXiivAgf8GXNA3
+         1ifvvL1pXVEaCo47jxw1bp9Aie50a5WkZmM3j69I10pa0PWK3q0apPeQOLGELmolCmGD
+         bknf30+BGiWbX1+BjKEtpka37NyTXYtutfRd9rET0mVbWT0PRw3pCvykcf5WaAvq0oof
+         5X0lBnrTXOKaCnbheVvAYI939QZy9ZjFHFU5Gk0k0noPpLWIgEjCAkvqEAO91su/muCK
+         2LUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:references:cc:autocrypt
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=AYZHNIKzPwx8xoXFmx5rzquQBlnglYktH+BU+ZB6Shg=;
-        b=bpGqmMNVryH4Z7Lt2vPNekhcQXKNKjiD3vi7MRq/joMYOEiy1pdbHTqPDsGncfEXHo
-         EWYgC+AXIc5AKXp+bYpokJ69MgZEC/s9jtm6sUA8Bfzl5E9/Y01/qFomW2mvWhwhlX/9
-         FuOQJY/h6/j3jfc/YEJPGnhKfWyQt3ewi0rjHvzrwuBjNQ7jn2fu/NTRAVfRp+twGnTl
-         7iM5unpQ0BhKNKjNz61bxrfeLsVvjlRnAgt6S5SAR4HmPzkqTDHS1ceVqgBw+8jmdxpx
-         c8140sKvRNvddlmj/JNpzPJKcVz00uXFSn36w4xiT2b6RkPgVaTxK8ASyISBR2ahixcf
-         qQDQ==
-X-Gm-Message-State: AOAM530dkJ1jFzyViyZQb1aheQmltWM3QK/+QRWIU+P6f4mB8pkArF9V
-        vCjyVjLjgLkgZ3ZoRo2gE7L4hL5AZGg=
-X-Google-Smtp-Source: ABdhPJx4Dv9V0qmxR0pZ+ILser7lVXeZbnVJnIDfxRiukj2lWLiHB33k4EsfIRtDg4QTnUaH1vItWQ==
-X-Received: by 2002:aa7:c61a:: with SMTP id h26mr6186172edq.327.1605892587551;
-        Fri, 20 Nov 2020 09:16:27 -0800 (PST)
+        bh=G0q/APOYHJwWcIxEVGu7BpAbHR0uizpMBxh1YXyG6BU=;
+        b=sHptKUDUG+5VLXQvhDvPFn99AdsSzNGbhkREqUKa/LA8YVpF1cA+d3DKZcF+psrBwd
+         7Cxm6A6ty/1yTvRi3pi+0INdvVnSVztLNWi1EUtPpYOEME230yvb0jbdBGPzvbxmNMpz
+         eENtGGa2qxGd7S9rU/8e/4OovwZ4IirMYAjB47F9MQrNW7kebGeCRJVOKzLxqM5Ne5Bp
+         LFlu+NEuQU4bhXbwlt/7NJbH1vDRKn4VBYGEquDTZrbRHezM/Q2YhI24NkHktTYFlGp3
+         b+kI7jd/64FT3t4DoEYqLuvbLxXekT8OWobj8mFpic4JvtSLcCdjogYS4fYl1dOf5gaV
+         42/A==
+X-Gm-Message-State: AOAM532OhpihRhLWX078Gidas/vPE5BdvtHutCoZkHbHm0MdPqMn+13e
+        Jqi6ExbSI6crfls6wCp4gmGHuEPTBlBFug==
+X-Google-Smtp-Source: ABdhPJyuve0won9k2RgIRAA1iF/2lDc6MRNi+CQzlxxVzD5s0dFci/DA0Dc2INhPHfNt2FcuHC+0Vg==
+X-Received: by 2002:a1c:1b43:: with SMTP id b64mr10585076wmb.64.1605893123586;
+        Fri, 20 Nov 2020 09:25:23 -0800 (PST)
 Received: from [192.168.1.31] (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
-        by smtp.gmail.com with ESMTPSA id rp13sm1362309ejb.79.2020.11.20.09.16.26
+        by smtp.gmail.com with ESMTPSA id c187sm5777998wmd.23.2020.11.20.09.25.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Nov 2020 09:16:26 -0800 (PST)
-Subject: Re: [PATCH] block: don't ignore REQ_NOWAIT for direct IO
+        Fri, 20 Nov 2020 09:25:23 -0800 (PST)
+Subject: Re: [PATCH v2 1/2] iov_iter: optimise iov_iter_npages for bvec
+To:     Ming Lei <ming.lei@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1605827965.git.asml.silence@gmail.com>
+ <ab04202d0f8c1424da47251085657c436d762785.1605827965.git.asml.silence@gmail.com>
+ <20201120012017.GJ29991@casper.infradead.org>
+ <35d5db17-f6f6-ec32-944e-5ecddcbcb0f1@gmail.com>
+ <20201120014904.GK29991@casper.infradead.org>
+ <3dc0b17d-b907-d829-bfec-eab96a6f4c30@gmail.com>
+ <20201120020610.GL29991@casper.infradead.org> <20201120022426.GC333150@T590>
 From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <546c66d26ae71abc151aa2074c3dd75ff5efb529.1605892141.git.asml.silence@gmail.com>
-Cc:     linux-kernel@vger.kernel.org
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
  bdwSHrhOWdW61pmfMbDYbTj6ZvGRvhoLWfGkzujB2wjNcbNTXIoOzJEGISHaPf6E2IQx1ik9
@@ -108,12 +117,12 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Message-ID: <19761b09-7c54-e9f2-681d-28e5bec66bc5@gmail.com>
-Date:   Fri, 20 Nov 2020 17:13:19 +0000
+Message-ID: <59329ec4-e894-e3ff-6f6e-7d89c34bebaf@gmail.com>
+Date:   Fri, 20 Nov 2020 17:22:15 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <546c66d26ae71abc151aa2074c3dd75ff5efb529.1605892141.git.asml.silence@gmail.com>
+In-Reply-To: <20201120022426.GC333150@T590>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -121,43 +130,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20/11/2020 17:10, Pavel Begunkov wrote:
-> io_uring's direct nowait requests end up waiting on io_schedule() in
-> sbitmap, that's seems to be so because blkdev_direct_IO() fails to
-> propagate IOCB_NOWAIT to a bio and hence to blk-mq.
+On 20/11/2020 02:24, Ming Lei wrote:
+> On Fri, Nov 20, 2020 at 02:06:10AM +0000, Matthew Wilcox wrote:
+>> On Fri, Nov 20, 2020 at 01:56:22AM +0000, Pavel Begunkov wrote:
+>>> On 20/11/2020 01:49, Matthew Wilcox wrote:
+>>>> On Fri, Nov 20, 2020 at 01:39:05AM +0000, Pavel Begunkov wrote:
+>>>>> On 20/11/2020 01:20, Matthew Wilcox wrote:
+>>>>>> On Thu, Nov 19, 2020 at 11:24:38PM +0000, Pavel Begunkov wrote:
+>>>>>>> The block layer spends quite a while in iov_iter_npages(), but for the
+>>>>>>> bvec case the number of pages is already known and stored in
+>>>>>>> iter->nr_segs, so it can be returned immediately as an optimisation
+>>>>>>
+>>>>>> Er ... no, it doesn't.  nr_segs is the number of bvecs.  Each bvec can
+>>>>>> store up to 4GB of contiguous physical memory.
+>>>>>
+>>>>> Ah, really, missed min() with PAGE_SIZE in bvec_iter_len(), then it's a
+>>>>> stupid statement. Thanks!
+>>>>>
+>>>>> Are there many users of that? All these iterators are a huge burden,
+>>>>> just to count one 4KB page in bvec it takes 2% of CPU time for me.
+>>>>
+>>>> __bio_try_merge_page() will create multipage BIOs, and that's
+>>>> called from a number of places including
+>>>> bio_try_merge_hw_seg(), bio_add_page(), and __bio_iov_iter_get_pages()
+>>>
+>>> I get it that there are a lot of places, more interesting how often
+>>> it's actually triggered and if that's performance critical for anybody.
+>>> Not like I'm going to change it, just out of curiosity, but bvec.h
+>>> can be nicely optimised without it.
+>>
+>> Typically when you're allocating pages for the page cache, they'll get
+>> allocated in order and then you'll read or write them in order, so yes,
+>> it ends up triggering quite a lot.  There was once a bug in the page
+>> allocator which caused them to get allocated in reverse order and it
+>> was a noticable performance hit (this was 15-20 years ago).
+> 
+> hugepage use cases can benefit much from this way too.
 
-I'll leave it for judgement to those who know that code better,
-but io_schedule() is gone from my traces.
+This didn't yield any considerable boost for me though. 1.5% -> 1.3%
+for 1 page reads. I'll send it anyway though because there are cases
+that can benefit, e.g. as Ming mentioned.
 
-> 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  fs/block_dev.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 9e84b1928b94..e7e860c78d93 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -263,6 +263,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
->  		bio.bi_opf = dio_bio_write_op(iocb);
->  		task_io_account_write(ret);
->  	}
-> +	if (iocb->ki_flags & IOCB_NOWAIT)
-> +		bio.bi_opf |= REQ_NOWAIT;
->  	if (iocb->ki_flags & IOCB_HIPRI)
->  		bio_set_polled(&bio, iocb);
->  
-> @@ -416,6 +418,8 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
->  			bio->bi_opf = dio_bio_write_op(iocb);
->  			task_io_account_write(bio->bi_iter.bi_size);
->  		}
-> +		if (iocb->ki_flags & IOCB_NOWAIT)
-> +			bio->bi_opf |= REQ_NOWAIT;
->  
->  		dio->size += bio->bi_iter.bi_size;
->  		pos += bio->bi_iter.bi_size;
-> 
+Ming would you want to send the patch yourself? After all you did post
+it first.
 
 -- 
 Pavel Begunkov
